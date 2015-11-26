@@ -22,9 +22,12 @@
 *     is supplied for parameter IREF.
 
 *  Usage:
-*     pol2scan in q u [iref] [config] [pixsize] [qudir] [retain] [msg_filter] [ilevel] [glevel] [logfile]
+*     pol2scan in q u [cat] [iref] [config] [pixsize] [qudir] [retain] [msg_filter] [ilevel] [glevel] [logfile]
 
 *  Parameters:
+*     CAT = LITERAL (Read)
+*        The output FITS vector catalogue. No catalogue is created if
+*        null (!) is supplied. [!]
 *     CONFIG = LITERAL (Read)
 *        The MAKEMAP configuration parameter values to use. If a null
 *        value (!) or "def" is supplied, the following defaults will be used:
@@ -48,6 +51,9 @@
 *        flagslow = 0.01
 *        downsampscale = 0
 *        noi.usevar=1
+*     DEBIAS = LOGICAL (Given)
+*        TRUE if a correction for statistical bias is to be made to
+*        percentage polarization and polarized intensity. [FALSE]
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
 *        Allowed values are as for "ILEVEL". The log file to create is
@@ -140,6 +146,10 @@
 *        reference direction used by the Q and U maps will be rotated to
 *        match the reference direction in the supplied QREF and UREF
 *        maps. [!]
+*     PI = NDF (Read)
+*        An output NDF in which to return the polarised intensity map.
+*        No polarised intensity map will be created if null (!) is
+*        supplied. [!]
 *     RETAIN = _LOGICAL (Read)
 *        Should the temporary directory containing the intermediate files
 *        created by this script be retained? If not, it will be deleted
@@ -190,6 +200,8 @@
 *     8-OCT-2015 (DSB):
 *        Only correct azel pointing error for data between 20150606 and
 *        20150930.
+*     26-NOV-2016 (DSB):
+*        Add parameters CAT, PI and DEBIAS.
 '''
 
 import os
@@ -243,6 +255,9 @@ try:
                                  default=None, exists=False, minsize=1,
                                  maxsize=1 ))
 
+   params.append(starutil.Par0S("CAT", "The output FITS vector catalogue",
+                                 default=None, noprompt=True))
+
    params.append(starutil.ParNDG("IREF", "The reference I map", default=None,
                                  noprompt=True, minsize=0, maxsize=1 ))
 
@@ -257,6 +272,13 @@ try:
 
    params.append(starutil.ParNDG("INQU", "NDFs containing previously calculated Q and U values",
                                  None,noprompt=True))
+
+   params.append(starutil.Par0L("DEBIAS", "Remove statistical bias from P"
+                                "and IP?", False, noprompt=True))
+
+   params.append(starutil.ParNDG("PI", "The output polarised intensity map",
+                                 default=None, noprompt=True, exists=False,
+                                 minsize=0, maxsize=1 ))
 
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
@@ -297,6 +319,15 @@ try:
 #  Now get the Q and U values to use.
    qmap = parsys["Q"].value
    umap = parsys["U"].value
+
+#  Get the output catalogue.
+   outcat = parsys["CAT"].value
+
+#  See if statistical debiasing is to be performed.
+   debias = parsys["DEBIAS"].value
+
+#  Now get the PI value to use.
+   pimap = parsys["PI"].value
 
 #  The user-supplied makemap config, and pixel size.
    config = parsys["CONFIG"].value
@@ -432,6 +463,69 @@ try:
                "match {0}...".format(qref) )
       invoke("$POLPACK_DIR/polrotref qin={0} uin={1} qout={2} uout={3} "
              "like={4}".format(tqmap,tumap,qmap,umap,qref) )
+
+# The rest we only do if an output catalogue is reqired.
+   if outcat:
+
+#  If no total intensity map was supplied, generate an artificial I image that
+#  is just equal to the polarised intensity image. This is needed because
+#  polpack:polvec uses the I value to normalise the Q and U values prior to
+#  calculating the polarised intensity and angle.
+      if iref == "!":
+         iref = NDG(1)
+         msg_out( "Generating an artificial total intensity image...")
+         if debias:
+            invoke( "$KAPPA_DIR/maths exp='sign(sqrt(abs(fa)),fa)' "
+                    "fa='iq**2+iu**2-(vq+vu)/2' ia={0} ib={1} out={2}".
+                    format(qmap,umap,iref))
+         else:
+            invoke( "$KAPPA_DIR/maths exp='sqrt(ia**2+ib**2)' ia={0} "
+                    "ib={1} out={2}".format(qmap,umap,iref))
+
+#  Ensure the Q U and I images all have the same bounds, equal to the
+#  overlap region between them. To get the overlap region, use MATHS to
+#  add them together. Then use ndfcopy to produce the sections from each,
+#  which match the overlap area.
+      tmp = NDG( 1 )
+      invoke( "$KAPPA_DIR/maths exp='ia+ib+ic' ia={0} ib={1} ic={2} out={3}".
+              format(qmap,umap,iref,tmp) )
+      qtrim = NDG( 1 )
+      invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(qmap,tmp,qtrim) )
+      utrim = NDG( 1 )
+      invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(umap,tmp,utrim) )
+      itrim = NDG( 1 )
+      invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(iref,tmp,itrim) )
+
+#  The polarisation vectors are calculated by the polpack:polvec command,
+#  which requires the input Stokes vectors in the form of a 3D cube. Paste
+#  the 2-dimensional Q, U and I images into a 3D cube.
+      planes = NDG( [qtrim,utrim,itrim] )
+      cube = NDG( 1 )
+      invoke( "$KAPPA_DIR/paste in={0} shift=\[0,0,1\] out={1}".format(planes,cube))
+
+#  The cube will have a 3D "POLANAL-SPECTRUM" WCS Frame, but POLVEC
+#  requires a 2D POLANAL Frame. So use wcsframe to create the 2D Frame
+#  from the 3D Frame, then delete the 3D Frame.
+      invoke( "$KAPPA_DIR/wcsframe ndf={0} frame=POLANAL".format(cube) )
+      invoke( "$KAPPA_DIR/wcsremove ndf={0} frame=POLANAL-SPECTRUM".format(cube) )
+
+#  Re-instate SKY as the current Frame
+      invoke( "$KAPPA_DIR/wcsframe ndf={0} frame=SKY".format(cube) )
+
+#  POLPACK needs to know the order of I, Q and U in the 3D cube. Store
+#  this information in the POLPACK enstension within "cube.sdf".
+      invoke( "$POLPACK_DIR/polext in={0} stokes=qui".format(cube) )
+
+#  Create a FITS catalogue containing the polarisation vectors.
+      command = "$POLPACK_DIR/polvec {0} cat={1} debias={2}".format(cube,outcat,debias)
+      if pimap:
+         command = "{0} ip={1}".format(command,pimap)
+         msg_out( "Creating the output catalogue '{0}' and polarised intensity map '{1}'...".format(outcat,pimap) )
+      else:
+         msg_out( "Creating the output catalogue: '{0}'...".format(outcat) )
+      msg = invoke( command )
+      msg_out( "\n{0}\n".format(msg) )
+
 
 #  Remove temporary files.
    cleanup()
