@@ -54,10 +54,10 @@
 *     o Random Gaussian noise is added to the returned time-stream data.
 *
 *     In both modes, instrumental polarisation is included in the
-*     artificial time-stream data (see parameter IPFORM). Two forms of
+*     artificial time-stream data (see parameter IPFORM). Three forms of
 *     instrumental polarisation can be used: the Johnstone/Kennedy IPDATA
-*     model, or an arbitrary user-define IP model (see parameters IPMAX,
-*     IPMIN and IPTHETA).
+*     model, the simplified planetary data "PL1" model, or an arbitrary
+*     user-define IP model (see parameters IPMAX, IPMIN and IPTHETA).
 
 *  Usage:
 *     pol2sim in out newart arti artq artu
@@ -167,16 +167,10 @@
 *        Only used if ADDON is False. [!]
 *     IPFORM = LITERAL (Read)
 *        The form of instrumental polarisation to use. Can be "JK" for the
-*        Johnstone/Kennedy model (see parameter IPDATA), "User" for a
-*        user-defined model (see parameters IPMAX, IPMIN and IPTHETA),
-*        or "None" if no instrumental polarisation is to be added to the
-*        simulated data. ["JK"]
-*     IPDATA = LITERAL (Read)
-*        The path to an HDS container file containing the data values
-*        defining the Johnstone/Kennedy model for POL2 instrumental
-*        polarisation. This parameter is only accessed if IPFORM is
-*        set to "JK". If null (!) is supplied, a default value of
-*        $STARLINK_DIR/share/smurf/ipdata.sdf will be used. [!]
+*        Johnstone/Kennedy model, "PL1" for the simplified planetary data model,
+*        "User" for a user-defined model (see parameters IPMAX, IPMIN and
+*        IPTHETA), or "None" if no instrumental polarisation is to be added
+*        to the simulated data. ["PL1"]
 *     IPEAK = _DOUBLE (Read)
 *        Peak intensity for new artificial total instensity map, in pW. [0.08]
 *     IPMIN = _DOUBLE (Read)
@@ -307,7 +301,9 @@
 *        - Added parameter ADDON.
 *        - Add azel pointing correction for old data.
 *        - Added parameters XC and YC.
-
+*     3-DEC-2015 (DSB):
+*        - Add support for PL1 IP model.
+*        - Remove IPDATA parameter.
 *-
 '''
 
@@ -375,17 +371,15 @@ try:
                                 "map (pixels)", 8, True ))
    params.append(starutil.Par0F("POL", "Fractional polarisation in "
                                 "artificial Q/U maps", 0.05, True ))
-   params.append(starutil.ParChoice("IPFORM", ['JK', 'User', 'None'],
+   params.append(starutil.ParChoice("IPFORM", ['JK', 'PL1', 'User', 'None'],
                                 "The form of instrumental polarisation "
-                                "to add to the simulated data", "JK", True ))
+                                "to add to the simulated data", "PL1", True ))
    params.append(starutil.Par0F("IPMAX", "Maximum fractional instrumental "
                                 "polarisation", 0.0008, True ))
    params.append(starutil.Par0F("IPMIN", "Minimum fractional instrumental "
                                 "polarisation", 0.0004, True ))
    params.append(starutil.Par0F("IPTHETA", "Angle for for instrumental "
                                 "polarisation (deg.s)", 15.0, True ))
-   params.append(starutil.Par0S("IPDATA", "Path to IP Model data file",
-                                None, True ))
    params.append(starutil.Par0F("GFACTOR", "Expansion factor for GAI values",
                                 1.0, True ))
    params.append(starutil.Par0F("CFACTOR", "Expansion factor for COM values",
@@ -730,7 +724,6 @@ try:
 
 #  Initialise value to "use no IP".
       ipqu = [ "!", "!" ]
-      ipdata = "!"
 
 #  See what form of IP to use.
       ipform = parsys["IPFORM"].value
@@ -760,14 +753,7 @@ try:
 
          ipqu.save( "IPQU" )
 
-#  Johnstone/Kennedy IP model.
-      elif ipform == "JK":
-         ipdata = parsys["IPDATA"].value
-         if ipdata == None:
-            ipdata = "!"
-
    else:
-      ipdata = "!"
       msg_out( "Re-using old instrumental polarisation values...")
 
 #  Create GAI values from the supplied template data.
@@ -823,39 +809,36 @@ try:
 #  parameter system to handle.
    msg_out( "Generating simulated POL2 time-stream data..." )
    if addon:
-      artdata = NDG( outdata )
+      artdata = NDG( len(outdata) )
    else:
       artdata = outdata
 
-   if ipdata != "!":
-      params = "ipdata='{0}' ".format(ipdata)
-   else:
-      params = " "
+   parlist = ""
+
 
    if pntfile != "!":
-      params = "{0} pointing={1} ".format(params,pntfile)
+      parlist = "{0} pointing={1} ".format(parlist,pntfile)
 
    if ipqu[0] != "!":
-      params = "{0} instq={1} ".format(params,ipqu[0])
+      parlist = "{0} instq={1} ".format(parlist,ipqu[0])
 
    if ipqu[1] != "!":
-      params = "{0} instu={1} ".format(params,ipqu[1])
+      parlist = "{0} instu={1} ".format(parlist,ipqu[1])
 
    if com != "!":
-      params = "{0} com={1} ".format(params,com)
+      parlist = "{0} com={1} ".format(parlist,com)
    elif comval != 0.0:
-      params = "{0} comval={1} ".format(params,comval)
+      parlist = "{0} comval={1} ".format(parlist,comval)
 
    if gai != "!":
-      params = "{0} gai={1} ".format(params,gai)
-
+      parlist = "{0} gai={1} ".format(parlist,gai)
 
    invoke("$SMURF_DIR/unmakemap in={0} qin={1} uin={2} ref={3} "
           "sigma={4} out={5} interp=sincsinc params=\[0,3\] "
           "amp4={6} phase4={7} amp2={8} phase2={9} amp16={10} "
-          "phase16={11} {12}".
+          "phase16={11} ipform={12} {13}".
           format(iart,qart,uart,ff,sigma,artdata,amp4,phase4,
-                 amp2,phase2,amp16,phase16,params) )
+                 amp2,phase2,amp16,phase16,ipform,parlist) )
 
 #  If required, add the artificial time-stream data onto the real
 #  time-stream data.

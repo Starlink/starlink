@@ -5889,9 +5889,7 @@ package @PACKAGE@ {
             parameter instq {
                 type NDF
                 access READ
-                vpath DEFAULT
-                ppath CURRENT, DEFAULT
-                default !
+                ppath CURRENT
                 prompt {Instrumental Q value for each boloemeter}
                 helpkey *
             }
@@ -5899,9 +5897,7 @@ package @PACKAGE@ {
             parameter instu {
                 type NDF
                 access READ
-                vpath DEFAULT
-                ppath CURRENT, DEFAULT
-                default !
+                ppath CURRENT
                 prompt {Instrumental U value for each boloemeter}
                 helpkey *
             }
@@ -5915,7 +5911,16 @@ package @PACKAGE@ {
                 default {Nearest}
             }
 
-            parameter ipdata {
+            parameter ipform {
+                type LITERAL
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                prompt {Instrumental polarisation model to use}
+                helpkey *
+                default {PL1}
+            }
+
+            parameter jkdata {
                 type LITERAL
                 vpath DEFAULT
                 ppath DEFAULT
@@ -5986,6 +5991,16 @@ package @PACKAGE@ {
                 prompt {Phase of 16 Hz signal in degrees}
                 default 0.0
                 helpkey *
+            }
+
+            parameter pl1data {
+               size *
+               type _DOUBLE
+               vpath DEFAULT
+               ppath DEFAULT
+               prompt {Parameter values for PL1 IP model}
+               default 3.288E-3 2.178E-2 -1.156E-2
+               helpkey *
             }
 
             parameter qin {

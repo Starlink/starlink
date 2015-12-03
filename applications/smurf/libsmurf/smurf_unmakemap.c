@@ -101,35 +101,33 @@
 *          The input 2D image of the sky. If NDFs are supplied for the
 *          QIN and UIN parameters, then IN should hold I values.
 *     INSTQ = NDF (Read)
-*          An optional 2D input NDF holding the instrumental normalised Q
-*          value for each bolometer, with respect to fixed analyser
-*          (alternatively, the instrumental polarisation may be specified
-*          in terms of the parameters of the Johnstone/Kennedy IP Model
-*          using parameter IPDATA). The NDF should have dimensions of
-*          (32,40). The total intensity falling on each bolometer is
-*          multiplied by the corresponding value in this file, to get the
-*          instrumental Q value that is added onto the value read from
-*          the QIN parameter. Bad values are treated as zero values. Note,
-*          currently there is no facility to use different INSTQ values
-*          for different sub-arrays - all data supplied via IN will use
-*          the same INSTQ values regardless of sub-array. To overcome this
-*          restriction, run unmakemap separately for each sub-array
-*          supplying a different INSTQ each time. [!]
+*          An optional 2D input NDF holding the instrumental normalised
+*          Q value for each bolometer, with respect to fixed analyser
+*          Ths parameter is only used if parameter IPFORM is set to
+*          "USER". The NDF should have dimensions of (32,40). The total
+*          intensity falling on each bolometer is multiplied by the
+*          corresponding value in this file, to get the instrumental Q
+*          value that is added onto the value read from the QIN parameter.
+*          Bad values are treated as zero values. Note, currently there
+*          is no facility to use different INSTQ values for different
+*          sub-arrays - all data supplied via IN will use the same INSTQ
+*          values regardless of sub-array. To overcome this restriction,
+*          run unmakemap separately for each sub-array supplying a
+*          different INSTQ each time.
 *     INSTU = NDF (Read)
-*          An optional 2D input NDF holding the instrumental normalised U
-*          value for each bolometer, with respect to fixed analyser
-*          (alternatively, the instrumental polarisation may be specified
-*          in terms of the parameters of the Johnstone/Kennedy IP Model
-*          using parameter IPDATA). The NDF should have dimensions of
-*          (32,40). The total intensity falling on each bolometer is
-*          multiplied by the corresponding value in this file, to get the
-*          instrumental U value that is added onto the value read from
-*          the UIN parameter. Bad values are treated as zero values. Note,
-*          currently there is no facility to use different INSTU values
-*          for different sub-arrays - all data supplied via IN will use
-*          the same INSTU values regardless of sub-array. To overcome this
-*          restriction, run unmakemap separately for each sub-array
-*          supplying a different INSTU each time. [!]
+*          An optional 2D input NDF holding the instrumental normalised
+*          U value for each bolometer, with respect to fixed analyser
+*          Ths parameter is only used if parameter IPFORM is set to
+*          "USER". The NDF should have dimensions of (32,40). The total
+*          intensity falling on each bolometer is multiplied by the
+*          corresponding value in this file, to get the instrumental U
+*          value that is added onto the value read from the UIN parameter.
+*          Bad values are treated as zero values. Note, currently there
+*          is no facility to use different INSTU values for different
+*          sub-arrays - all data supplied via IN will use the same INSTU
+*          values regardless of sub-array. To overcome this restriction,
+*          run unmakemap separately for each sub-array supplying a
+*          different INSTU each time.
 *     INTERP = LITERAL (Read)
 *          The method to use when resampling the input sky image pixel values.
 *          For details of these schemes, see the descriptions of routines
@@ -169,14 +167,28 @@
 *          scheme is similar to the "SincCos" scheme.
 *
 *          [current value]
-*     IPDATA = LITERAL (Read)
+*     IPFORM = LITERAL (Read)
+*          Indicates the nature the instrumental polarisation (IP) to be
+*          added to the returned time stream data if the template is a
+*          POL2 observation. It can be any of the following
+*          (case-insensitive):
+*
+*          - "JK": The Johnstone-Kennedy model based on analysis of skydip
+*          data.
+*
+*          - "PL1": A simpler model based on analysis of planetary data.
+*
+*          - "USER": IP is based on the values supplied for parameters
+*          INSTQ and INSTU.
+*
+*          - "NONE": No IP is added.
+*
+*          Supplying a null value (!) value is equivalent to "NONE".  ["PL1"]
+*     JKDATA = LITERAL (Read)
 *          The path to an HDS container file holding data defining the
 *          parameters of the Johnstone/Kennedy model of POL2 instrumental
-*          polarisation that is to be added to the returned Q and U values.
-*          This parameter is only used if a null (!) value is supplied for
-*          INSTQ or INSTU. If a null value is also supplied for IPDATA,
-*          then no instrumental polsaristion is added to the simulated
-*          data. ['$STARLINK_DIR/share/smurf/ipdata.sdf']
+*          polarisation. This parameter is only used if parameter IPFORM
+*          is set to "JK". ['$STARLINK_DIR/share/smurf/ipdata.sdf']
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
@@ -226,6 +238,19 @@
 *     PHASE16 = _DOUBLE (Read)
 *          The phase offset to apply to the 16 Hz signal specified via
 *          parameter AMP16, in degrees. [0.0]
+*     PL1DATA() = DOUBLE (Read)
+*          The numerical parameters of the PL1 IP model for POL2 data.
+*          This parameter is only used if parameter IPFORM is set to "PL1".
+*          This should be a vector of three values, being the coefficients
+*          of a quadratic polynomial that gives the fractional polarisation
+*          produced by instrumental polarisation, as a function of elevation
+*          (in radians):
+*
+*          fractional IP = A + B*elev + C*elev*elev
+*
+*          where the vector (A,B,C) is given by parameter PL1DATA. The PL1
+*          model assumes that the IP is parallel to the elevation axis at all
+*         elevations. [ 3.288E-3, 2.178E-2, -1.156E-2 ]
 *     POINTING = LITERAL (Read)
 *          The name of a text file containing corrections to the pointing
 *          read from the reference data files. If null (!) is supplied, no
@@ -312,6 +337,9 @@
 *        Added ADAM parameter POINTING.
 *     2-NOV-2015 (DSB):
 *        Added ADAM parameter COMVAL.
+*     3-DEC-2015 (DSB):
+*        Added support for PL1 IP model. The IP model to use is now
+*        specified by the new parameter "IPFORM".
 
 *  Copyright:
 *     Copyright (C) 2011 Science and Technology Facilities Council.
@@ -388,7 +416,7 @@ void smurf_unmakemap( int *status ) {
    HDSLoc *cloc = NULL;       /* HDS locator for component ipdata structure */
    HDSLoc *iploc = NULL;      /* HDS locator for top level ipdata structure */
    ThrWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
-   char ipdata[ 200 ];        /* Text buffer for IPDATA value */
+   char jkdata[ 200 ];        /* Text buffer for JKDATA value */
    char pabuf[ 10 ];          /* Text buffer for parameter value */
    char subarray[ 5 ];        /* Name of SCUBA-2 subarray (s8a,s8b,etc) */
    dim_t iel;                 /* Index of next element */
@@ -421,6 +449,7 @@ void smurf_unmakemap( int *status ) {
    double phase16;            /* Phase of 16 Hz signal */
    double phase2;             /* Phase of 2 Hz signal */
    double phase4;             /* Phase of 4 Hz signal */
+   double pl1data[3];         /* Parameters of the PL1 IP model */
    double sigma;              /* Standard deviation of noise to add to output */
    int alignsys;              /* Align data in the map's system? */
    int cdims[ 3 ];            /* Common-mode NDF dimensions */
@@ -444,6 +473,7 @@ void smurf_unmakemap( int *status ) {
    int indfq;                 /* Input Q map NDF identifier */
    int indfu;                 /* Input U map NDF identifier */
    int interp = 0;            /* Pixel interpolation method */
+   int ipform = 0;            /* IP model in use */
    int lbndc[ 3 ];            /* Array of lower bounds of COM NDF */
    int moving;                /* Is the telescope base position changing? */
    int ndim;                  /* Number of pixel axes in NDF */
@@ -645,18 +675,29 @@ void smurf_unmakemap( int *status ) {
    parameter QIN/UIN were supplied. */
    if( *status == SAI__OK && inq_data && inu_data ) {
 
-/* First see if the user wants to use the "INSTQ/INSTU" scheme for
-   specifying instrumental polarisation. */
-      ndfAssoc( "INSTQ", "Read", &indfiq, status );
-      ndfAssoc( "INSTU", "Read", &indfiu, status );
+/* Get the IP model to use. */
+      parChoic( "IPFORM", "PL1", "PL1,JK,USER,NONE", 0, pabuf,
+                sizeof(pabuf), status );
 
       if( *status == PAR__NULL ) {
-         ndfAnnul( &indfiq, status );
-         ndfAnnul( &indfiu, status );
          errAnnul( status );
 
-      } else {
+      } else if( !strcmp( pabuf, "PL1" ) ) {
+         ipform = 1;
+         msgOut( " ", "Using PL1 IP model", status );
+         parExacd( "PL1DATA", 3, pl1data, status );
+
+      } else if( !strcmp( pabuf, "JK" ) ) {
+         ipform = 2;
+         msgOut( " ", "Using Johnstone/Kennedy IP model", status );
+         parGet0c( "JKDATA", jkdata, sizeof(jkdata), status );
+         hdsOpen( jkdata, "READ", &iploc, status );
+
+      } else if( !strcmp( pabuf, "USER" ) ) {
+         ipform = 3;
          msgOut( " ", "Using user-defined IP model", status );
+         ndfAssoc( "INSTQ", "Read", &indfiq, status );
+         ndfAssoc( "INSTU", "Read", &indfiu, status );
 
          ndfDim( indfiq, 2, dims, &ndim, status );
          if( dims[ 0 ] != 32 || dims[ 1 ] != 40 ) {
@@ -678,21 +719,6 @@ void smurf_unmakemap( int *status ) {
          } else {
             ndfMap( indfiu, "DATA", "_DOUBLE", "READ", (void **) &uinst_data,
                     &nel, status );
-         }
-      }
-
-/* If not, see if the user wants to use the Johnstone/Kennedy instrumental
-   polarisation model. The IPDATA parameter gives the path to an HDS
-   container file contining NDFs holding the required IP data for all
-   subarrays. */
-      if( !qinst_data ) {
-         parGet0c( "IPDATA", ipdata, sizeof(ipdata), status );
-         if( *status == PAR__NULL ) {
-            errAnnul( status );
-         } else {
-            msgOutf( " ", "Using Johnstone/Kennedy IP model in %s",
-                     status, ipdata );
-            hdsOpen( ipdata, "READ", &iploc, status );
          }
       }
    }
@@ -753,7 +779,7 @@ void smurf_unmakemap( int *status ) {
                      status );
 
 /* If we are using the Johnstone/Kennedy IP model, open and map the
-   relevant parameter NDFs within the IPDATA container file. */
+   relevant parameter NDFs within the JKDATA container file. */
       if( iploc ) {
          datFind( iploc, subarray, &cloc, status );
 
@@ -957,8 +983,8 @@ void smurf_unmakemap( int *status ) {
    focal plane X to focal plane Y. */
          ang_data = astMalloc( ntslice*sizeof( *ang_data ) );
 
-/* Resample them both into 3D time series. These Q/U values arw with
-  respect to the sky image Y axis. */
+/* Resample them both into 3D time series. These Q/U values are with
+   respect to the sky image Y axis. */
          smf_resampmap( wf, odata, abskyfrm, skymap, moving, slbnd, subnd,
                         interp, params, sigma, inq_data, outq_data,
                         ang_data, &ngood, status );
@@ -971,9 +997,9 @@ void smurf_unmakemap( int *status ) {
          smf_uncalc_iqu( wf, odata, odata->pntr[ 0 ], outq_data, outu_data,
                          ang_data, pasign, AST__DD2R*paoff, AST__DD2R*angrot,
                          amp2, AST__DD2R*phase2, amp4, AST__DD2R*phase4,
-                         amp16, AST__DD2R*phase16, qinst_data, uinst_data,
-                         c0_data, p0_data, p1_data, angc_data, harmonic,
-                         status );
+                         amp16, AST__DD2R*phase16, ipform, pl1data,
+                         qinst_data, uinst_data, c0_data, p0_data, p1_data,
+                         angc_data, harmonic, status );
 
 /* Release work space. */
          outq_data = astFree( outq_data );

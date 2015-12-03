@@ -16,9 +16,11 @@
 *     void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
 *                          double *qdata, double *udata, double *angdata,
 *                          int pasign, double paoff, double angrot, double amp2,
-*                          double phase2, double amp4, double phase4, double amp16,
-*                          double phase16, const double *qinst, const double *uinst,
-*                          const double *c0, const double *p0, const double *p1,
+*                          double phase2, double amp4, double phase4,
+*                          double amp16, double phase16, int ipform,
+*                          const double *pl1data, const double *qinst,
+*                          const double *uinst, const double *c0,
+*                          const double *p0, const double *p1,
 *                          const double *angc, int harmonic, int *status );
 
 *  Arguments:
@@ -76,32 +78,36 @@
 *     phase16 = double (Given)
 *        Ignored if "harmonic" is not 4. It gives the phase offset for the
 *        16Hz signal to include in the returned Q and U signal, in radians.
+*     ipform = int (Given):
+*        Indicates the IP model to use: 0="NONE, 1 ="PL1", 2="JK", 3="USER".
+*     pl1data = const double * (Given):
+*        The parameters of the PL1 IP model. Only used if "ipform" is 1.
 *     qinst = const double * (Given)
-*        Array of normalised Q values for each bolometer, or NULL. The
-*        instrumental Q seen by each bolometer is found by multiplying
-*        the corresponding total intensity by this factor. The fixed
-*        analyser is assumed to be the reference direction.
+*        Only used if "ipform" is 3. An array of normalised Q values
+*        for each bolometer. The instrumental Q seen by each bolometer is
+*        found by multiplying the corresponding total intensity by this
+*        factor. The fixed analyser is assumed to be the reference direction.
 *     uinst = const double * (Given)
-*        Array of normalised U values for each bolometer, or NULL. The
-*        instrumental U seen by each bolometer is found by multiplying
-*        the corresponding total intensity by this factor. The fixed
-*        analyser is assumed to be the reference direction.
+*        Only used if "ipform" is 3. An array of normalised U values
+*        for each bolometer. The instrumental U seen by each bolometer is
+*        found by multiplying the corresponding total intensity by this
+*        factor. The fixed analyser is assumed to be the reference direction.
 *     c0 = const double * (Given)
-*        Array of C0 values for each bolometer, or NULL. Only used if
-*        qinst is NULL. C0 is one of terms in the POL2 instrumental
-*        polarisation model creted by Doug Johnstone and James Kennedy.
+*        Only used if "ipform" is 2. An array of C0 values for each
+*        bolometer. C0 is one of terms in the POL2 instrumental polarisation
+*        model created by Doug Johnstone and James Kennedy.
 *     p0 = const double * (Given)
-*        Array of P0 values for each bolometer, or NULL. Only used if
-*        qinst is NULL. P0 is one of terms in the POL2 instrumental
-*        polarisation model creted by Doug Johnstone and James Kennedy.
+*        Only used if "ipform" is 2. An array of P0 values for each
+*        bolometer. P0 is one of terms in the POL2 instrumental polarisation
+*        model created by Doug Johnstone and James Kennedy.
 *     p1 = const double * (Given)
-*        Array of P1 values for each bolometer, or NULL. Only used if
-*        qinst is NULL. P1 is one of terms in the POL2 instrumental
-*        polarisation model creted by Doug Johnstone and James Kennedy.
+*        Only used if "ipform" is 2. An array of P1 values for each
+*        bolometer. P1 is one of terms in the POL2 instrumental polarisation
+*        model created by Doug Johnstone and James Kennedy.
 *     angc = const double * (Given)
-*        Array of ANGC values for each bolometer, or NULL. Only used if
-*        qinst is NULL. ANGC is one of terms in the POL2 instrumental
-*        polarisation model creted by Doug Johnstone and James Kennedy.
+*        Only used if "ipform" is 2. An array of ANGC values for each
+*        bolometer. ANGC is one of terms in the POL2 instrumental polarisation
+*        model created by Doug Johnstone and James Kennedy.
 *     harmonic = int  (Given)
 *        The harmonic of the half-wave plate rotation from which the Q
 *        and U values should be derived. This should normally be 4, but
@@ -137,6 +143,8 @@
 *        Added arguments c0, p0, p1 and angc.
 *     7-SEP-2015 (DSB):
 *        Check for bad c0, p0, p1 and angc values.
+*     3-DEC-2015 (DSB):
+*        Added support for PL1 IP model.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -175,13 +183,14 @@
 
 /* Local data types: */
 typedef struct smfUncalcIQUJobData {
-   const double *qinst;
-   const double *uinst;
+   const JCMTState *allstates;
+   const double *angc;
    const double *c0;
    const double *p0;
    const double *p1;
-   const double *angc;
-   const JCMTState *allstates;
+   const double *pl1data;
+   const double *qinst;
+   const double *uinst;
    dim_t b1;
    dim_t b2;
    dim_t nbolo;
@@ -195,10 +204,10 @@ typedef struct smfUncalcIQUJobData {
    double amp2;
    double amp4;
    double amp16;
-   double elev;
    double phase2;
    double phase4;
    double phase16;
+   int ipform;
    int ipolcrd;
    int ntslice;
    int old;
@@ -221,15 +230,15 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
                      double *qdata, double *udata, double *angdata,
                      int pasign, double paoff, double angrot, double amp2,
                      double phase2, double amp4, double phase4, double amp16,
-                     double phase16, const double *qinst, const double *uinst,
-                     const double *c0, const double *p0, const double *p1,
-                     const double *angc, int harmonic, int *status ){
+                     double phase16, int ipform, const double *pl1data,
+                     const double *qinst, const double *uinst, const double *c0,
+                     const double *p0, const double *p1, const double *angc,
+                     int harmonic, int *status ){
 
 /* Local Variables: */
    const JCMTState *state;    /* JCMTState info for current time slice */
    dim_t nbolo;               /* No. of bolometers */
    dim_t ntslice;             /* Number of time-slices in data */
-   double elev;               /* Elevation (rads) at the central time slice */
    int bstep;                 /* Bolometer step between threads */
    int itime;                 /* Time slice index */
    int iworker;               /* Index of a worker thread */
@@ -297,9 +306,6 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
    smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, NULL, &bstride,
                  &tstride, status );
 
-/* Get the elevation (in rads) at the central time slice. */
-   elev = data->hdr->allState[ntslice/2].tcs_az_bc2;
-
 /* Create structures used to pass information to the worker threads. */
    nworker = wf ? wf->nworker : 1;
    job_data = astMalloc( nworker*sizeof( *job_data ) );
@@ -363,13 +369,14 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
          pdata->phase2 = phase2;
          pdata->phase4 = phase4;
          pdata->phase16 = phase16;
+         pdata->ipform = ipform;
+         pdata->pl1data = pl1data;
          pdata->qinst = qinst;
          pdata->uinst = uinst;
          pdata->c0 = c0;
          pdata->p0 = p0;
          pdata->p1 = p1;
          pdata->angc = angc;
-         pdata->elev = elev;
 
 /* Pass the job to the workforce for execution. */
          thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_uncalc_iqu_job, 0, NULL,
@@ -427,26 +434,31 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    double *ipu;               /* Pointer to supplied U array */
    double *qin;               /* Pointer to Q array for each bolometer*/
    double *uin;               /* Pointer to U array for each bolometer*/
+   double amp16;
    double amp2;
    double amp4;
-   double amp16;
-   double phase2;
-   double phase4;
-   double phase16;
    double angfac;
    double angle;              /* Phase angle for FFT */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
+   double ca;
+   double cb;
+   double cc;
    double cosval;             /* Cos of twice reference rotation angle */
    double ip_qi;              /* normalised instrument Q for current bolo */
    double ip_ui;              /* normalised instrument U for current bolo */
    double ival;               /* I  value */
+   double p1;
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
+   double phase16;
+   double phase2;
+   double phase4;
    double phi;                /* Angle from fixed analyser to effective analyser */
    double qval;               /* Q value wrt fixed analyser */
    double sinval;             /* Sin of twice reference rotation angle */
    double t1;
    double uval;               /* U value wrt fixed analyser */
    double wplate;             /* Angle from fixed analyser to have-wave plate */
+   int ipform;
    int ipolcrd;               /* Reference direction for pol_ang */
    int itime;                 /* Time slice index */
    int ntslice;               /* Number of time slices */
@@ -485,6 +497,10 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    phase4 = pdata->phase4;
    amp16 = pdata->amp16;
    phase16 = pdata->phase16;
+   ipform = pdata->ipform;
+   ca = pdata->pl1data[0];
+   cb = pdata->pl1data[1];
+   cc = pdata->pl1data[2];
 
 /* Check we have something to do. */
    if( b1 < nbolo ) {
@@ -497,31 +513,6 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
 
 /* Loop round all bolometers to be processed by this thread. */
       for( ibolo = b1; ibolo <= b2; ibolo++ ) {
-
-/* The instrumental polarisation seen by this bolometer. These are
-   normalised Q and U values. Multiply them by the total intensity to
-   get the instrument Q and U, with respect to the fixed analyser. */
-         if( pdata->qinst ) {
-            ip_qi = pdata->qinst[ ibolo ];
-            ip_ui = pdata->uinst[ ibolo ];
-         } else if( pdata->p0 ) {
-            if( pdata->c0[ ibolo ] != VAL__BADD &&
-                pdata->angc[ ibolo ] != VAL__BADD &&
-                pdata->p0[ ibolo ] != VAL__BADD &&
-                pdata->p1[ ibolo ] != VAL__BADD ) {
-               t1 = AST__DD2R*( pdata->c0[ ibolo ] + pdata->angc[ ibolo ] ) + pdata->elev ;
-               ip_qi = pdata->p0[ ibolo ]*cos( 2*pdata->angc[ ibolo ]*AST__DD2R ) +
-                       pdata->p1[ ibolo ]*cos( 2*t1 );
-               ip_ui = pdata->p0[ ibolo ]*sin( 2*pdata->angc[ ibolo ]*AST__DD2R ) +
-                       pdata->p1[ ibolo ]*sin( 2*t1 );
-            } else {
-               ip_qi = VAL__BADD;
-               ip_ui = VAL__BADD;
-            }
-         } else {
-            ip_qi = 0.0;
-            ip_ui = 0.0;
-         }
 
 /* Initialise pointers to the next I, Q and U time slice values for
    the current bolometer. */
@@ -543,11 +534,46 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
 /* Check the I, Q, U and angle values are good. */
             if( *iin != VAL__BADD && *qin != VAL__BADD &&
                 *uin != VAL__BADD && angle != VAL__BADD &&
-                *ipang != VAL__BADD &&
-                ip_qi != VAL__BADD && ip_ui != VAL__BADD ) {
+                *ipang != VAL__BADD ){
+
+/* The instrumental polarisation seen by this bolometer. These are
+   normalised Q and U values. Multiply them by the total intensity to
+   get the instrument Q and U, with respect to the fixed analyser. */
+               if( ipform == 3 ) {
+                  ip_qi = pdata->qinst[ ibolo ];
+                  ip_ui = pdata->uinst[ ibolo ];
+
+               } else if( ipform == 2 ) {
+                  if( pdata->c0[ ibolo ] != VAL__BADD &&
+                      pdata->angc[ ibolo ] != VAL__BADD &&
+                      pdata->p0[ ibolo ] != VAL__BADD &&
+                      pdata->p1[ ibolo ] != VAL__BADD ) {
+                     t1 = AST__DD2R*( pdata->c0[ ibolo ] + pdata->angc[ ibolo ] )
+                          + state->tcs_az_ac2;
+                     ip_qi = pdata->p0[ ibolo ]*cos( 2*pdata->angc[ ibolo ]*AST__DD2R ) +
+                             pdata->p1[ ibolo ]*cos( 2*t1 );
+                     ip_ui = pdata->p0[ ibolo ]*sin( 2*pdata->angc[ ibolo ]*AST__DD2R ) +
+                             pdata->p1[ ibolo ]*sin( 2*t1 );
+                  } else {
+                     ip_qi = VAL__BADD;
+                     ip_ui = VAL__BADD;
+                  }
+
+               } else if( ipform == 1 ) {
+                  p1 = ca + cb*state->tcs_az_ac2 + cc*state->tcs_az_ac2*state->tcs_az_ac2;
+                  ip_qi = p1*cos( -2*state->tcs_az_ac2 );
+                  ip_ui = p1*sin( -2*state->tcs_az_ac2 );
+
+               } else {
+                  ip_qi = 0.0;
+                  ip_ui = 0.0;
+               }
+
+/* Check the IP values are good. */
+               if( ip_qi != VAL__BADD && ip_ui != VAL__BADD ) {
 
 /* If POL_ANG is stored in arbitrary encoder units, convert to radians. */
-               if( old ) angle = angle*TORADS;
+                  if( old ) angle = angle*TORADS;
 
 /* Following SUN/223 (section "Single-beam polarimetry"/"The Polarimeter"),
    get the angle from the fixed analyser to the half-waveplate axis, in radians.
@@ -555,15 +581,15 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
 
    Not sure about the sign of tcs_az/tr_ang at the moment so do not use them
    yet. */
-               wplate = 0.0;
-               if( ipolcrd == 0 ) {
-                  wplate = pasign*angle + paoff;
+                  wplate = 0.0;
+                  if( ipolcrd == 0 ) {
+                     wplate = pasign*angle + paoff;
 
-               } else if( *status == SAI__OK ) {
-                  *status = SAI__ERROR;
-                  errRepf( "", "smf_uncalc_iqu: currently only POL_CRD = "
-                           "FPLANE is supported.", status );
-               }
+                  } else if( *status == SAI__OK ) {
+                     *status = SAI__ERROR;
+                     errRepf( "", "smf_uncalc_iqu: currently only POL_CRD = "
+                              "FPLANE is supported.", status );
+                  }
 
 /*
                if( ipolcrd == 1 ) {
@@ -576,36 +602,40 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
 /* Get the angle from the fixed analyser to the effective analyser
    position (see SUN/223 again). The effective analyser angle rotates twice
    as fast as the half-wave plate which is why there is a factor of 2 here. */
-               phi = 2*wplate;
+                  phi = 2*wplate;
 
 /* Rotate the Q,U values so that they refer to a reference direction
    parallel to the fixed analyser. */
-               angle = 2*( *ipang + angrot - AST__DPIBY2 );
-               cosval = cos( angle );
-               sinval = sin( angle );
-               qval = (*qin)*cosval + (*uin)*sinval;
-               uval = (*uin)*cosval - (*qin)*sinval;
+                  angle = 2*( *ipang + angrot - AST__DPIBY2 );
+                  cosval = cos( angle );
+                  sinval = sin( angle );
+                  qval = (*qin)*cosval + (*uin)*sinval;
+                  uval = (*uin)*cosval - (*qin)*sinval;
 
 /* Add in the instrumental polarisation. This is assumed to be fixed in
    focal planee coords, which means it is also fixed with respect to the
    analyser. */
-               ival = *iin;
-               qval += ip_qi*ival;
-               uval += ip_ui*ival;
+                  ival = *iin;
+                  qval += ip_qi*ival;
+                  uval += ip_ui*ival;
 
 /* Calculate the analysed intensity and store it in place of the I value.
    A phi value of zero corresponds to the fixed analyser (i.e. the new Q/U
    reference direction). Allow the angle to be scaled by some user-specified
    factor. This is to allow the investigation of other harmonics. */
-               *iin = 0.5*( ival + qval*cos( 2*phi*angfac ) +
-                                   uval*sin( 2*phi*angfac ) );
+                  *iin = 0.5*( ival + qval*cos( 2*phi*angfac ) +
+                                      uval*sin( 2*phi*angfac ) );
 
 /* If producing the usuall 8Hz harmonic, optionally add in 2, 4 and 16 Hz
    components to the signal. */
-               if( angfac == 1 ) {
-                  if( amp2 != 0.0 ) *iin += amp2*ival*sin( phi/2 + phase2 );
-                  if( amp4 != 0.0 ) *iin += amp4*ival*sin( phi + phase4 );
-                  if( amp16 != 0.0 ) *iin += amp16*ival*sin( 4*phi + phase16 );
+                  if( angfac == 1 ) {
+                     if( amp2 != 0.0 ) *iin += amp2*ival*sin( phi/2 + phase2 );
+                     if( amp4 != 0.0 ) *iin += amp4*ival*sin( phi + phase4 );
+                     if( amp16 != 0.0 ) *iin += amp16*ival*sin( 4*phi + phase16 );
+                  }
+
+               } else {
+                  *iin = VAL__BADD;
                }
 
             } else {
