@@ -5946,18 +5946,18 @@ package @PACKAGE@ {
             parameter paoff {
                 type _DOUBLE
                 vpath DEFAULT
-                ppath CURRENT, DEFAULT
+                ppath DEFAULT
                 prompt {Angle from fixed analyser to POL_ANG=0 (degs)}
-                default 0.0
+                default 18.65
                 helpkey *
             }
 
             parameter pasign {
                 type _LOGICAL
                 vpath DEFAULT
-                ppath CURRENT, DEFAULT
+                ppath DEFAULT
                 prompt {POL_ANG in sense of rotation from focal plane X to Y?}
-                default TRUE
+                default FALSE
                 helpkey *
             }
 

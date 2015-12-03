@@ -210,13 +210,13 @@
 *     PAOFF = _DOUBLE (Read)
 *          The angle from the fixed analyser to the have-wave plate for a
 *          POL_ANG value of zero, in degrees. Measured positive in the same
-*          sense as rotation from focal plane X to focal plane Y. [0.0]
+*          sense as rotation from focal plane X to focal plane Y. [18.65]
 *     PASIGN = _LOGICAL (Read)
 *          Indicates the sense of rotation of the spinning half-wave plate. If
 *          TRUE, it is assumed that a positive POL_ANG value corresponds
 *          to rotation from focal plane X to focal plane Y axis. If FALSE, it
 *          is assumed that a positive POL_ANG value corresponds to rotation
-*          from focal plane Y to focal plane X axis. [TRUE]
+*          from focal plane Y to focal plane X axis. [FALSE]
 *     PHASE2 = _DOUBLE (Read)
 *          The phase offset to apply to the 2 Hz signal specified via
 *          parameter AMP2, in degrees. [0.0]
