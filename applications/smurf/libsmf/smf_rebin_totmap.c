@@ -80,6 +80,9 @@
 *     3-NOV-2015 (DSB):
 *        Revert to setting SkyRefIs explicitly rather than calling
 *        smf_set_moving.
+*     3-DEC-2015 (DSB):
+*        Do not use static variables as this function is called from
+*        within threaded code.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -140,9 +143,8 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
    const char *system;         /* Coordinate system */
    double a;                   /* Longitude value */
    double b;                   /* Latitude value */
+   int have_azel;              /* Is input sky system an azel system ? */
    smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
-
-   static int have_azel = 0;   /* Is input sky system an azel system ? */
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return NULL;
@@ -179,14 +181,11 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
      return NULL;
    }
 
-/* Get the current Frame from the input WCS FrameSet. If this is the first
-   time slice, see if the current Frame is an AZEL Frame (it is assumed
-   that all subsequent time slices will have the same system as the first). */
+/* Get the current Frame from the input WCS FrameSet, and see if the current
+   Frame is an AZEL Frame (a small speed-up is possible later on if it is). */
    skyin = astGetFrame( swcsin, AST__CURRENT );
-   if( itime == 0 ) {
-      system = astGetC( skyin, "System" );
-      have_azel = system ? !strcmp( system, "AZEL" ) : 0;
-   }
+   system = astGetC( skyin, "System" );
+   have_azel = system ? !strcmp( system, "AZEL" ) : 0;
 
 /* Get a FrameSet containing a Mapping from the input sky system to the
    output absolute sky system. */
