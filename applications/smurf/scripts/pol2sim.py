@@ -629,6 +629,9 @@ try:
 #  Ensure the artificial maps have a defined polarimetric reference
 #  direction parallel to the pixel Y axis, and ensure they are in units
 #  of pW.
+   invoke("$KAPPA_DIR/erase object={0}.more.polpack ok=yes".format(iart),annul=True )
+   invoke("$KAPPA_DIR/erase object={0}.more.polpack ok=yes".format(qart),annul=True )
+   invoke("$KAPPA_DIR/erase object={0}.more.polpack ok=yes".format(uart),annul=True )
    invoke("$POLPACK_DIR/polext in={0} angrot=90".format(iart) )
    invoke("$POLPACK_DIR/polext in={0} angrot=90".format(qart) )
    invoke("$POLPACK_DIR/polext in={0} angrot=90".format(uart) )
