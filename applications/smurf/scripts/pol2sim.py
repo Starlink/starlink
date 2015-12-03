@@ -836,12 +836,19 @@ try:
    if gai != "!":
       parlist = "{0} gai={1} ".format(parlist,gai)
 
+   if amp4 != 0.0:
+      parlist = "{0} amp4={1} phase4={2}".format(parlist,amp4,phase4)
+
+   if amp2 != 0.0:
+      parlist = "{0} amp2={1} phase2={2}".format(parlist,amp2,phase2)
+
+   if amp16 != 0.0:
+      parlist = "{0} amp16={1} phase16={2}".format(parlist,amp16,phase16)
+
    invoke("$SMURF_DIR/unmakemap in={0} qin={1} uin={2} ref={3} "
           "sigma={4} out={5} interp=sincsinc params=\[0,3\] "
-          "amp4={6} phase4={7} amp2={8} phase2={9} amp16={10} "
-          "phase16={11} ipform={12} {13}".
-          format(iart,qart,uart,ff,sigma,artdata,amp4,phase4,
-                 amp2,phase2,amp16,phase16,ipform,parlist) )
+          "ipform={6} {7}".
+          format(iart,qart,uart,ff,sigma,artdata,ipform,parlist) )
 
 #  If required, add the artificial time-stream data onto the real
 #  time-stream data.
