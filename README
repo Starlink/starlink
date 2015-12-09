@@ -233,6 +233,18 @@ applications star2html and the latex classes provided in latexsupport.
    This will build, and install under STARCONF_DEFAULT_PREFIX, this
    component and _everything it depends on to be built_.
 
+ Using the Newly-built System
+ ----------------------------
+
+ To activate the Starlink system which you have just built, set the
+ STARLINK_DIR environment variable to the install location (as
+ chosen with STARCONF_DEFAULT_PREFIX) and source the cshrc and login
+ files (for csh/tcsh) or profile file (for bash).
+
+ % setenv STARLINK_DIR /local-star
+ % source ${STARLINK_DIR}/etc/login
+ % source ${STARLINK_DIR}/etc/cshrc
+
 
 Developing individual components
 --------------------------------
