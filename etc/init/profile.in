@@ -295,6 +295,12 @@ if test -f ${bindir}/fluxes/fluxes.csh; then
    export FLUXES_DIR=${bindir}/fluxes
 fi
 
+#  FROG
+
+if test -e ${starjavadir}/bin/frog; then
+    export FROG_DIR=${starjavadir}/bin/frog
+fi
+
 #  GAIA
 
 if test -f ${bindir}/gaia/gaia.sh; then
@@ -655,6 +661,14 @@ if test -f ${bindir}/fluxes/fluxes; then
 else
   fluxes () { ${STARLINK_DIR}/etc/notinst fluxes; }
   fluxnow () { ${STARLINK_DIR}/etc/notinst fluxnow; }
+fi
+
+# FROG
+
+if test -e ${starjavadir}/bin/frog; then
+  frog () { $FROG_DIR/runFROG; }
+else
+  frog () { ${STARLINK_DIR}/etc/notinst frog; }
 fi
 
 #
