@@ -245,15 +245,15 @@
    print( STDERR `rm -f /tmp/prolat.tex` );
 
 #  Add cross-links. Each reference to a parameter should now be in the form
-#  '(P|p)arameter {\tt "}name{\tt "}'.
+#  '(P|p)arameter \texttt{"} name\texttt{"}'.
    foreach $name (keys %allparams) {
       ($pname = $name) =~ s/_/\\_/g;
       ($rname = $name) =~ s/_/\\\\_/g;
        $qname = uc( $name );
        if( $subset == 0 ) {
-          $document =~ s/(arameter\s*\{\\tt \"\})$rname(\{\\tt \"\})/$1\\htmlref{$pname}{$qname}$2/gs;
+          $document =~ s/(arameter\s*\\texttt{\"})\s*$rname\s*(\\texttt{\"})/$1\\htmlref{$pname}{$qname}$2/gs;
        } else {
-          $document =~ s/(arameter\s*\{\\tt \"\})$rname(\{\\tt \"\})/$1\\xref{$pname}{sun258}{$qname}$2/gs;
+          $document =~ s/(arameter\s*\\texttt{\"})\s*$rname\s*(\\texttt{\"})/$1\\xref{$pname}{sun258}{$qname}$2/gs;
        }
    }
 
@@ -261,9 +261,7 @@
    $document =~ s/\\sstinvocation{/\\sstattributetype{/gs;
 
 #  Fix up constructs that don't otherwise convert to HTML properly.
-   $document =~ s/{\\tt \'}/'/gs;
-   $document =~ s/{\\tt \"}/{\\tt{\"}}/gs;
-   $document =~ s/(\$<\$undef\$>\$)/{\\tt $1}/gs;
+   $document =~ s/(\$<\$undef\$>\$)/\\texttt{$1}/gs;
 
 #  Write the modified latex out to the output file.
    open( OUTPUT, ">$outfile" );
