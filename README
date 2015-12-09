@@ -112,6 +112,10 @@ applications star2html and the latex classes provided in latexsupport.
 
  - Ensure that /tmp has sufficient free space and is writable.
 
+ - An example "sourceme" file for csh/tcsh is included in the repository.
+   You can customize it for your system and then use it to set up your
+   environment as described above.
+
 
  The build sequence
  ------------------
