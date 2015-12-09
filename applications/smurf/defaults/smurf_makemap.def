@@ -1134,7 +1134,7 @@ fakemce = 0
 #  Name: 	fakescale
 #  Type: 	real
 #  Default: 	1
-#  Purpose: 	Control the use oif the supplied fake map.
+#  Purpose: 	Control the use of the supplied fake map.
 #  Description: Each pixel in the supplied fake map (see paramater "fakemap")
 #		will be multiplied by this scaling factor before being added
 #		to the time stream data.
