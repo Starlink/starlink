@@ -427,7 +427,7 @@ sub readconf {
    if( $conf eq "" ) {
       $file = "\$SMURF_DIR/smurf_makemap.def";
    } else {
-      $file = "/star/share/smurf/dimmconfig_$conf.lis";
+      $file = "@STARLINK@/share/smurf/dimmconfig_$conf.lis";
    }
 
    $text = `\$KAPPA_DIR/configecho ! ^$file`;
