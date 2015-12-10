@@ -516,15 +516,24 @@ typedef enum {
   SMF__Q_APOD    = BIT_TO_VAL(5),   /* Apodized/boundary data */
   SMF__Q_STAT    = BIT_TO_VAL(6),   /* Telescope stationary */
   SMF__Q_COM     = BIT_TO_VAL(7),   /* Flagged as bad chunk in common-mode rejection */
-  SMF__Q_FILT    = BIT_TO_VAL(8),   /* Weight less than wlim when filtering */
-  SMF__Q_NOISE   = BIT_TO_VAL(9),   /* Bolometer flagged because of noise constraint */
-  SMF__Q_EXT     = BIT_TO_VAL(10),  /* Unable to apply extinction correction */
-  SMF__Q_LOWAP   = BIT_TO_VAL(11),  /* Apodisation factor is too low to invert */
-  SMF__Q_BADEF   = BIT_TO_VAL(12),  /* Optical efficiency correction is bad */
-  SMF__Q_RING    = BIT_TO_VAL(13),  /* Sample suffers from FLT ringing */
-  SMF__Q_SSN     = BIT_TO_VAL(14),  /* Flagged as bad by the SSN model */
-  SMF__Q_PCA     = BIT_TO_VAL(15),  /* Flagged as bad by the PCA model */
-  SMF__Q_IP      = BIT_TO_VAL(16)   /* Flagged as bad by the IP correction */
+  SMF__Q_NOISE   = BIT_TO_VAL(8),   /* Bolometer flagged because of noise constraint */
+  SMF__Q_EXT     = BIT_TO_VAL(9),   /* Unable to apply extinction correction */
+  SMF__Q_LOWAP   = BIT_TO_VAL(10),  /* Apodisation factor is too low to invert */
+  SMF__Q_RING    = BIT_TO_VAL(11),  /* Sample suffers from FLT ringing */
+  SMF__Q_SSN     = BIT_TO_VAL(12),  /* Flagged as bad by the SSN model */
+  SMF__Q_PCA     = BIT_TO_VAL(13),  /* Flagged as bad by the PCA model */
+  SMF__Q_IP      = BIT_TO_VAL(14),  /* Flagged as bad by the IP correction */
+
+  /* Quality values are stored in a smf_qual_t variable. This is currently
+     2 byte long. This means that if we ever go above 16 quality flags,
+     we would need to double the size of smf_qual_t to 4 bytes, thus seriously
+     increasing the amount of memory needed by makemap. This is bad, so
+     instead we amalgamate low priority flags into one in order to limit
+     ourselves to 16 flags. The following flags are never used in normal
+     use of makemap. */
+  SMF__Q_GENERIC = BIT_TO_VAL(15),  /* Generic value for other flags */
+  SMF__Q_FILT    = BIT_TO_VAL(15),  /* Weight less than wlim when filtering */
+  SMF__Q_BADEF   = BIT_TO_VAL(15)   /* Optical efficiency correction is bad */
 } smf_qual_bits;
 
 /* These macros are for several commonly-used combinations of quality flags */
@@ -579,10 +588,10 @@ typedef enum {
 /* Number of quality bits in each family. SMF__NQBITS can be used
    for declaring array sizes. */
 typedef enum {
-  SMF__NQBITS_TSERIES = 17,
+  SMF__NQBITS_TSERIES = 16,
   SMF__NQBITS_MAP     = 4,
   SMF__NQBITS_TCOMP   = 6,
-  SMF__NQBITS         = 17    /* Largest number of bits in a family */
+  SMF__NQBITS         = 16    /* Largest number of bits in a family */
 } smf_qfam_count_t;
 
 

@@ -437,7 +437,7 @@ static void smf1_qual_map( void *job_data_ptr, int *status ) {
                      } else if( pdata->ndfqtoval[k] & SMF__TCOMPQ_ENDS ) {
                         *p1 |= (SMF__Q_PAD|SMF__Q_APOD);
                      } else if( pdata->ndfqtoval[k] & SMF__TCOMPQ_BLIP ) {
-                        *p1 |= (SMF__Q_SPIKE | SMF__Q_JUMP | SMF__Q_FILT | SMF__Q_LOWAP | SMF__Q_BADEF);
+                        *p1 |= (SMF__Q_SPIKE | SMF__Q_JUMP | SMF__Q_LOWAP | SMF__Q_GENERIC);
                      } else if( pdata->ndfqtoval[k] & SMF__TCOMPQ_MATCH ) {
                         *p1 |= SMF__Q_COM;
                      } else if( pdata->ndfqtoval[k] & SMF__TCOMPQ_TEL ) {

@@ -71,6 +71,9 @@
 *        Add SMF__Q_LOWAP
 *     2011-09-19 (DSB):
 *        Add SMF__Q_BADEF
+*     2015-010-12 (DSB):
+*        Define SMF__Q_FILT and SMF__Q_BADEF to be the same value 
+*        (SMF__Q_GENERIC) in order to keep total number of bits below 17).
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Science & Technology Facilities Council.
@@ -175,9 +178,9 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
       ldescr = "Set iff data common-mode rejected";
       break;
 
-    case SMF__Q_FILT:
-      retval = "FILT";
-      ldescr = "Set iff sample could not be filtered";
+    case SMF__Q_GENERIC:
+      retval = "GENERIC";
+      ldescr = "Set if sample has some generic issue that prevents it being used";
       break;
 
     case SMF__Q_NOISE:
@@ -193,11 +196,6 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
     case SMF__Q_LOWAP:
       retval = "LOWAP";
       ldescr = "Set iff apodisation factor is too low to invert";
-      break;
-
-    case SMF__Q_BADEF:
-      retval = "BADEF";
-      ldescr = "Set iff optical efficiency value is bad";
       break;
 
     case SMF__Q_RING:
