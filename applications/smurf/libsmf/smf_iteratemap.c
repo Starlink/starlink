@@ -688,6 +688,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   smfArray **lut=NULL;          /* Pointing LUT for each file */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   smfGroup *lutgroup=NULL;      /* smfGroup of lut model files */
+  int make_flagmap = 0;         /* Should flagmaps be created? */
   double *mapchange=NULL;       /* Array storing change (map - lastmap)/sigma*/
   double mapchange_mean=0;      /* Mean change in map */
   double mapchange_l2;          /* Mean change from previous iteration */
@@ -962,10 +963,20 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       if( astMapGet1C(keymap, "FLAGMAP", SMF_QSTR_MAX, SMF__NQBITS, &nflags,
                       flagnames) ) {
 
-        /* Convert each string into a bit, and OR them together */
-        for( fcount=0; fcount<nflags; fcount++ ) {
-          flagname = flagnames+fcount*SMF_QSTR_MAX;
-          flagmap |= smf_qual_str_to_val( flagname, NULL, status );
+        /* If the single string CUBE has been supplied, create a 3D cube
+           containing counts of each quality bit in separate planes. */
+        if( nflags == 1 && astChrMatch( flagnames, "CUBE" ) ) {
+          flagmap = 0;
+          make_flagmap = 1;
+
+        /* Otherwise create a 2D map contining a count of the union of
+           the supplied flags. */
+        } else {
+          for( fcount=0; fcount<nflags; fcount++ ) {
+            flagname = flagnames+fcount*SMF_QSTR_MAX;
+            flagmap |= smf_qual_str_to_val( flagname, NULL, status );
+          }
+          if( flagmap ) make_flagmap = 1;
         }
       }
 
@@ -2992,7 +3003,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Create maps indicating locations of flags matching bitmask */
 
-      if( flagmap ) {
+      if( make_flagmap ) {
         smf_write_flagmap( wf, flagmap, lut[0], qua[0], &dat, flagrootgrp,
                            contchunk, lbnd_out, ubnd_out, outfset, status );
         /*** TIMER ***/

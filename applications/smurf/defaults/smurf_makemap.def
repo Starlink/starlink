@@ -1151,27 +1151,27 @@ fakescale = 1
 #		a set of "flagmaps", one for each continuous chunk of
 #		time-series data, each containing a count of the number
 #		of samples with a quality bit matching at least one of the
-#		specified flags. The following quality names can be used:
-#
-# 		- BADDA   : flagged bad by the DA system
-#
-# 		- BADBOL : entire bolometer is turned off
-#
-# 		- SPIKE   : flagged as a spike
-#
-# 		- DCJUMP  : location of a DC level step
-#
-# 		- STAT    : telescope was not moving within flagslow to flagfast
-#
-# 		- COM     : portion of data did not match the common-mode
-#
-# 		- FILT    : filtered data did not have sufficient contributions from good data
-#
-# 		- NOISE   : bolometer was flagged as being too noisy in general
+#		specified flags. Any of the standard quality names can be
+#               specified. These are: BADDA, BADB, SPIKE, JUMP, PAD, APOD,
+#               STAT, COM, FILT, NOISE, EXT, LOWAP, BADEF, RING, SSN, PCA,
+#               IP.
 #
 #		Note: If BADBOL is set the behaviour is slightly different than
 #		expected; the bolometer will be completely ignored when
 #		creating the flag map.
+#
+#               Alternatively, if the single value "CUBE" is supplied for
+#               flagmap, then each created NDF will be 3-dimensional,
+#               containing a plane for each individual quality flag. Each
+#               pixel in the lowest plane (pixel index -1) will count the
+#               number of samples that had no flags set. Each of the
+#               remaining planes will count the number of samples that had
+#               a specific quality flag set. The planes are stored in the
+#               same order in which the quality flags are listed above.
+#               Thus, the plane with pixel index 0 will count the number
+#               of samples that have the BADDA flag set, and the plane
+#               with pixel index 16 will count the number of samples that
+#               have the IP flag set
 #
 # 		The flagmap is mostly useful to verify whether the spike,
 #		jump, and common-mode rejection is correlated with features
