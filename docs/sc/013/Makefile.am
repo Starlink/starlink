@@ -7,7 +7,7 @@ sc13.htx_tar: examples/fpp.c.xml
 sc13.texml_tar: examples/fpp.c.xml
 
 # fpp.c.xml is proxy for the other similar files in examples/
-examples/fpp.c.xml: VERSION
+examples/fpp.c.xml:
 	cd examples; test -f configure || sh ./bootstrap
 	cd examples; ./configure
 	cd examples; $(MAKE) xmlexamples
@@ -17,7 +17,3 @@ examples/fpp.c.xml: VERSION
 sc13.$(VERSION)-examples.tar.gz:
 	cd examples; $(MAKE) dist
 	ln -f examples/sc13-examples-1.0.tar.gz $@
-
-# Communicate the version number to examples/configure.ac
-VERSION: configure.ac
-	echo $(VERSION) >VERSION

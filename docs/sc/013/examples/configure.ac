@@ -19,10 +19,6 @@ AC_PROG_FC
 
 AC_CHECK_HEADERS([errno.h])
 
-dnl  Find the version stored in ../VERSION
-SC13VERSION=`cat ../VERSION`
-AC_SUBST(SC13VERSION)
-
 dnl  What options do we need to pass to the compiler to get it to
 dnl  include profiling code?  Allow this to be specified with
 dnl  --with-profiling=<option>.  If that isn't present, then look
@@ -187,7 +183,7 @@ dnl      --enable-nounderscore=<option>, --enable-nan=<option>])
 dnl  fi
 dnl  rm -f conftest.*
 
-AC_CONFIG_FILES(Makefile README)
+AC_CONFIG_FILES(Makefile)
 dnl AC_CONFIG_FILES([stamp-h], [echo timestamp > stamp-h])
 
 AC_CONFIG_HEADERS(config.h)
