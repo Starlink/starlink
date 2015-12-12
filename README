@@ -242,8 +242,8 @@ applications star2html and the latex classes provided in latexsupport.
  files (for csh/tcsh) or profile file (for bash).
 
  % setenv STARLINK_DIR /local-star
- % source ${STARLINK_DIR}/etc/login
  % source ${STARLINK_DIR}/etc/cshrc
+ % source ${STARLINK_DIR}/etc/login
 
 
 Developing individual components
