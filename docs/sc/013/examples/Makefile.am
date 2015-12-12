@@ -39,13 +39,3 @@ bytesex.h: islittleendian
 	echo '#define BIGENDIAN' `if ./islittleendian; then echo 0; else echo 1;fi` >$@
 
 BUILT_SOURCES = bytesex.h
-
-
-
-# The following are maintenance targets only.
-# Create XML-ised versions of the example programs (with < and & escaped)
-%.xml: %
-	sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' $< > $@
-
-xmlexamples: $(EXAMPLES:=.xml)
-
