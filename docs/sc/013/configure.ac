@@ -17,4 +17,6 @@ STAR_LATEX_DOCUMENTATION(sc13)
 
 AC_CONFIG_FILES([Makefile component.xml])
 
+AC_CONFIG_SUBDIRS([examples])
+
 AC_OUTPUT
