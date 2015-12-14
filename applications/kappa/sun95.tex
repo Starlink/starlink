@@ -6,7 +6,7 @@
 \stardocsource    {sun95.42}
 \stardocnumber    {95.42}
 \stardocauthors   {Malcolm J. Currie \& David S. Berry}
-\stardocdate      {2015 July 16}
+\stardocdate      {2015 September 4}
 \stardoctitle     {KAPPA --- Kernel Application Package}
 \stardocversion   {2.3}
 \stardocmanual    {User's Guide}
@@ -53047,6 +53047,13 @@ The following new applications have been added:
 The following applications have been modified:
 \begin{description}[style=nextline]
 
+   \item [\htmlref{BEAMFIT}{BEAMFIT}]\mbox{}
+      \begin{itemize}
+        \item Now works for HEALPix maps with its apparently non-square pixels.
+        \item A long-standing issue of occasional nonsense WCS errors
+        has been rectified by using a better-conditioned algorithm.
+      \end{itemize}
+
    \item [\htmlref{FITSMOD}{FITSMOD}]\mbox{}
       \begin{itemize}
         \item A missing END header may be appended using the Write mode.
@@ -53071,6 +53078,11 @@ The following applications have been modified:
       \begin{itemize}
         \item Now writes out the rotation angle actually used to an output
          parameter (ANGLEUSED).
+      \end{itemize}
+
+   \item [\htmlref{SQORST}{SQORST}]\mbox{}
+      \begin{itemize}
+         \item Propagates UNITS as it used to in the IMAGE-format version.
       \end{itemize}
 
 \end{description}

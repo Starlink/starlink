@@ -13,6 +13,11 @@
 
 2 Modified_applications
 
+   o  BEAMFIT
+
+      -  Now works for HEALPix maps.
+      -  More robust derivation of position errors.
+
    o  FITSMOD
 
       -  A missing END header may be appended using the Write mode.
@@ -34,6 +39,11 @@
 
       -  Now writes out the rotation angle actually used to an output
       parameter (ANGLEUSED).
+
+   o  SQOORT
+
+      -  Propagates UNITS as it used to before the NDF version.
+
 
 1 KAPPA_Version_2.2
 
