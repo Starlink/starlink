@@ -6580,166 +6580,23 @@ the release notes.
 
 \section{Release Notes}
 
-\subsection{Release Notes V1.2}
-\subsubsection{New Applications}
-\begin{description}
-\item[\htmlref{READ\_NDF}{READ_NDF}] An IDL function to read an NDF component
-into an IDL array.
-\item[\htmlref{WRITE\_NDF}{WRITE_NDF}] An IDL procedure to write an IDL array to
-an NDF component.
-\end{description}
-The use of these converters for IDL is described in
-\latexelsehtml{Section~\ref{app_idl}}{\htmlref{Handling NDFs in IDL}{app_idl}}
+\subsection{Release Notes -- V1.8}
 
-\subsubsection{Changed applications}
-\begin{description}
-\item[\htmlref{NDF2TIFF}{NDF2TIFF}] Various alternative methods of scaling the
-NDF data are provided.
-\item[\htmlref{NDF2GIF}{NDF2GIF}] Various alternative methods of scaling the
-NDF data are provided (the scaling is performed by
-\htmlref{NDF2TIFF}{NDF2TIFF}).
-\item[\htmlref{NDF2FITS}{NDF2FITS}] Now has an additional parameter, ENCODING,
-to control the way WCS information is encoded within the FITS header.
-\item[\htmlref{NDF2IRAF}{NDF2IRAF}
-and
-\htmlref{IRAF2NDF}{IRAF2NDF}]
-These are re-built using libraries from \IRAFref\ release V2.11.1.
-\end{description}
-
-
-\subsubsection{Documentation}
-This document and \CONVERT\ help has been modified to reflect these changes.
-
-\subsection{Release Notes -- V1.2-4}
-
-All the converters which are ADAM tasks have been combined into a monolith
-to save disk space.
-
-The FITS converters now use the CFITSIO library.
-
-\htmlref{FITS2NDF}{FITS2NDF}
- will now report an error but continue to create the output NDF
-if an error occurs in creating history records.  It will also display
-warnings if it finds projections which include unsupported IRAF extensions.
-
-A problem causing error "!! FTPSCL: Error defining the scale and offset."
-when running
-\htmlref{NDF2FITS}{NDF2FITS}
-has been corrected.
+NDF2FITS has a new literal parameter called AXISORDER to specify the
+order of WCS axes in the output FITS header.  This is introduced so
+that the generated FITS file may be interpeted correctly by those FITS
+readers that assume certain axis orders. For example some expect
+equatorial co-ordinates to be ordered right ascension then
+declination, whereas the FITS standard lets you permute WCS axes in
+any order.
 
 \IRAFref\ release V2.11.3 libraries are used in this release for building
 \htmlref{NDF2IRAF}{NDF2IRAF}
 and
 \htmlref{IRAF2NDF}{IRAF2NDF}.
 
-This document has been updated to include this section and a copyright
-statement. Some bugs in the HTML version header have been corrected.
 
-\subsection{Release Notes -- V1.3-2}
-Two new converters,
-\htmlref{HDS2IDL}{HDS2IDL}
-and
-\htmlref{IDL2HDS}{IDL2HDS},
-are provided for IDL users. They handle complete structures, unlike
-\htmlref{READ\_NDF}{READ_NDF}
-and
-\htmlref{WRITE\_NDF}{WRITE_NDF}
-which only handle the main arrays of NDFs.
-
-\htmlref{NDF2FITS}{NDF2FITS}
-and
-\htmlref{FITS2NDF}{FITS2NDF}
-have been enhanced by the addition of FITS-AIPS and FITS-PC encodings. Also,
-appropriate messages are  output if there are no valid input files.
-
-\htmlref{FITS2NDF}{FITS2NDF}
-has also been enhanced to allow more flexibility over the handling of
-multi-extension FITS files. Syntax such as \texttt{filename.fit[1]} or
-\texttt{"filename.fit[extname=im2]"} can be used to specify a single FITS
-extension to be converted, and additional parameters EXTABLE and CONTAINER
-allow FITS extensions to be combined to produce a single NDF or a series of
-components of a top-level HDS container file.
-
-The scripts associated with the NDF on-the-fly conversion system have been
-modified to allow a single extension from a multi-extension FITS file to be
-specified.  This feature requires applications to have been built with NDF
-V1.5-6 or later.
-
-Different numbers of axes in the  BaseFrames of the NDF and FitsChan FrameSets
-are now allowed when creating the NDF's WCS component.
-
-\htmlref{NDF2FITS}{NDF2FITS} now uses the
-\xref{NDG}{sun2}{}
-library to allow conversion of NDFs stored as sub-components within an
-HDS container file (\textit{e.g.} scuba data, \textit{etc}).
-
-\IRAFref\ release V2.11.3 libraries are used in this release for building
-\htmlref{NDF2IRAF}{NDF2IRAF}
-and
-\htmlref{IRAF2NDF}{IRAF2NDF}.
-
-This document has been updated to describe the new applications and
-enhancements, and to include the
-\htmlref{`{\small IRAF} Versions' section}{iraf_versions}.
-Early release-note sections have been removed.
-On installation, only a link to the installed \LaTeX\ document is now retained
-in the source directory.
-
-\subsubsection{Release Notes -- V1.3-5}
-\htmlref{FITS2NDF}{FITS2NDF}
-now creates a component of type FITS\_HEADER, not NDF, in the container
-file for multi-extension FITS files if the FITS HDU does not contain a data
-array.
-
-\htmlref{NDF2FITS}{NDF2FITS}
-Corrects a problem with NDF2FITS if there is garbage beyond the END header
-record in the NDF's FITS airlock, and stops a second ORIGIN header being
-output (copied from the airlock) if the ORIGIN parameter has been used to
-specify a non-default ORIGIN.
-
-\htmlref{NDF2PGM}{NDF2PGM}
-A bug which caused the image to be offset by three bytes has been fixed,
-
-This document has been updated to include this section and to update the
-description of the CONTAINER parameter of
-\htmlref{FITS2NDF}{FITS2NDF}.
-
-\subsubsection{Release Notes -- V1.3-6}
-\htmlref{FITS2NDF}{FITS2NDF}
-\begin{itemize}
-\item Improve error reporting if no WCS encoding can be used.
-
-\item Don't handle WCS if NDIM less than or = 0.
-
-\item Correct handling of NDF history records in the FITS header.
-\end{itemize}
-
-\subsection{Release Notes -- V1.4}
-Added application \htmlref{MTFITS2NDF}{MTFITS2NDF} to convert FITS tapes to NDFs.
-
-\subsubsection{Release Notes -- V1.4-1}
-Updated the IDL converters to work with IDL 5.5. Fix a problem causing a crash
-on Linux and document the fact that the Starlink IDL converters cannot be used
-with the 64-bit Solaris version of IDL.
-
-Corrected an error in the section of this document describing the easy
-way to do IDL/NDF conversions.  \htmlref{WRITE\_NDF}{WRITE_NDF} was
-described as if it were a function rather than a procedure.
-
-\subsubsection{Release Notes -- V1.4-2}
-Parameter WCSATTRS is added to \htmlref{FITS2NDF}{FITS2NDF}.
-This enables users to modify the way WCS information is extracted from the
-FITS headers. This can be useful when the headers do not conform to conventions.
-
-\subsubsection{Release Notes -- V1.4-3}
-Fixed a problem in \htmlref{NDF2FITS}{NDF2FITS} caused by a mismatch of
-conventions used in the TFORM\textit{n} and TDIM\textit{n} header cards for
-multi-dimensional character arrays.  A corresponding fix was required for
-\htmlref{FITS2NDF}{FITS2NDF}.
-
-\subsubsection{Release Notes -- V1.4-4}
-Fixed a bug in \htmlref{FITS2NDF}{FITS2NDF} caused by a missing END card on a
-merged header.
+\section{Notes from Previous Few Releases}
 
 \subsection{Release Notes -- V1.5}
 
@@ -6980,15 +6837,5 @@ algorithm.
 
 \htmlref{SPECX2NDF}{SPECX2NDF} has a new SYSTEM parameter that
 specifies the NDF's co-ordinate system.
-
-\subsubsection{Release Notes -- V1.8}
-
-NDF2FITS has a new literal parameter called AXISORDER to specify the
-order of WCS axes in the output FITS header.  This is introduced so
-that the generated FITS file may be interpeted correctly by those FITS
-readers that assume certain axis orders. For example some expect
-equatorial co-ordinates to be ordered right ascension then
-declination, whereas the FITS standard lets you permute WCS axes in
-any order.
 
 \end{document}
