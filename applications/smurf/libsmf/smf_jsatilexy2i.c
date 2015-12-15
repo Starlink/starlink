@@ -33,8 +33,15 @@
 
 *  Description:
 *     This function returns a scalar integer index for a tile which is
-*     offfset by given numbers of tiles along the X (RA) and Y (Dec) axes
-*     away from the bottom left tile in the all-sky map.
+*     offset by given numbers of tiles along the X (RA) and Y (Dec) axes
+*     away from the bottom left tile in the all-sky map. If the offsets
+*     place the tile in the unused top-right half of the top-right facet,
+*     then the index of the corresponding tile in the top-right half of
+*     the bottom-left facet is returned. Likewise, if the offsets place the
+*     tile in the unused bottom-left half of the bottom-left facet, then
+*     the index of the corresponding tile in the bottom-left half of the
+*     top-right facet is returned (the top-rihgt and bottom-left facets
+*     cover the same area on the sky, and only half is used from each).
 
 *  Authors:
 *     DSB: David S Berry (JAC, UCLan)
@@ -49,6 +56,10 @@
 *        as defined by HEALPix.
 *     30-OCT-2013 (GSB):
 *        Use nested numbering scheme for JSA tiles.
+*     15-DEC-2015 (DSB):
+*        If the supplied offsets place the tile in the unsed top-right or
+*        bottom-left half-facet, then return the index of the
+*        corresponding tile in the used bottom-left or top-right half-facet.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -112,17 +123,36 @@ int smf_jsatilexy2i( int xt, int yt, smfJSATiling *skytiling, int *status ){
    if( *status != SAI__OK ) return itile;
 
 /* The facet with the lowest tile indices is split between the bottom
-   left and top right corners of the grid. Fill the bottom left half of
-   the bottom left facet with bad values. */
+   left and top right corners of the grid. If the supplied offsets refer
+   to a pixel in the unused bottom left half of the bottom left facet,
+   then modify them to refer to the used bottom left half of the top right
+   facet. */
+   if( yt < skytiling->ntpf - 1 && xt < skytiling->ntpf - 1 - yt ) {
+      xt += 4*skytiling->ntpf;
+      yt += 4*skytiling->ntpf;
+
+/* If the supplied offsets refer to a pixel in the unused top right half
+   of the top right facet, then modify them to refer to the used top
+   right half of the bottom left facet. */
+   } else if( yt >= 9*skytiling->ntpf - 1 ||
+              xt >= 9*skytiling->ntpf - 1 - yt ) {
+      xt -= 4*skytiling->ntpf;
+      yt -= 4*skytiling->ntpf;
+   }
+
+/* Sanity check. The offsets should now refer to a pixel in the used
+   section of the grid. But just in case (for instance, if the supplied
+   offsets were outside the bounds of the whole grid), check the offsets
+   again, and return a bad tile index if they are not in the used
+   section. */
    if( yt < skytiling->ntpf - 1 && xt < skytiling->ntpf - 1 - yt ) {
       itile = VAL__BADI;
 
-/* Fill the top right half of thetop right facet with bad values. */
    } else if( yt >= 9*skytiling->ntpf - 1 ||
               xt >= 9*skytiling->ntpf - 1 - yt ) {
       itile = VAL__BADI;
 
-/* Now handle the other parts of the grid. */
+/* So the the offsets are now in the used parts of the grid. */
    } else {
 
 /* Get the (x,y) indices of the facet containing the tile. */
