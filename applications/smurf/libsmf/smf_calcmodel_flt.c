@@ -179,6 +179,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   size_t bstride;               /* bolo stride */
   double dchisq=0;              /* this - last model residual chi^2 */
   int dofft;                    /* flag if we will actually do any filtering */
+  int do_ringing;               /* Apply ringing filter? */
   smfFilter *filt=NULL;         /* Pointer to filter struct */
   dim_t i;                      /* Pixel index */
   dim_t idx=0;                  /* Index within subgroup */
@@ -187,7 +188,8 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   AstKeyMap *kmap=NULL;         /* Pointer to FLT-specific keys */
   smfArray *lut=NULL;           /* Pointer to LUT at chunk */
   int *lut_data = NULL;         /* Array holding themap index for each sample */
-  unsigned char *mask;          /* Pointer to 2D mask map */
+  unsigned char *ringmask=NULL; /* Pointer to 2D AST mask map */
+  unsigned char *mask;          /* Pointer to 2D FLT mask map */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   double *model_data_copy=NULL; /* Copy of model_data for one bolo */
@@ -211,6 +213,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   double ring_box1;             /* Small scale box size for ringing filter */
   double ring_box2;             /* Small scale box size for ringing filter */
   int ring_freeze;              /* When to freeze the ringing filter */
+  int ring_mask;                /* Do not apply ringing filter to source regions? */
   double ring_minsize;          /* Smallest section of ringing samples to flag */
   double ring_nsigma;           /* Clipping limit for ringing filter */
   double ring_wing;             /* Size of wings for ringing filter */
@@ -278,6 +281,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   astMapGet0D( kmap, "RING_WING", &ring_wing );
   astMapGet0D( kmap, "RING_MINSIZE", &ring_minsize );
   astMapGet0I( kmap, "RING_FREEZE", &ring_freeze );
+  astMapGet0I( kmap, "RING_MASK", &ring_mask );
 
   /* If the ringing filter flags are to be frozen at any point,
      we need to find out how many initial AST-skipped iterations
@@ -289,6 +293,21 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
     astMapGet0I( kamap, "SKIP", &skip );
     kamap = astAnnul( kamap );
     ring_freeze += skip;
+  }
+
+  /* Set a flag indicating if a ringing filter should be applied */
+  do_ringing = ( ring_box1 > 0.0 && !dat->ast_skipped &&
+                 ( ring_freeze <= 0 || dat->iter <= ring_freeze ) );
+
+  /* If we are applying a ringing filter, and RING_MASK indicates that
+     source regions should not be filtered, then save a pointer to the mask
+     to be used. If the FLT mask is not available, use the AST mask. */
+  if( do_ringing && ring_mask ) {
+     if( mask ) {
+        ringmask = mask;
+     } else {
+        ringmask = smf_get_mask( wf, SMF__AST, keymap, dat, flags, status );
+     }
   }
 
   /* Assert bolo-ordered data */
@@ -499,8 +518,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
              from ringing now that the low frequency FLT model has been
              removed. DO not apply a ringing filter unless an AST model
              was used on the previous iteration. */
-          if( ring_box1 > 0.0 && !dat->ast_skipped &&
-              ( ring_freeze <= 0 || dat->iter <= ring_freeze ) ){
+          if( do_ringing ){
              msgOutif( MSG__DEBUG, "", "Flagging residuals that appear "
                        "to suffer from ringing.", status );
 
@@ -512,6 +530,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                pdata->ring_nsigma = ring_nsigma;
                pdata->ring_wing = (int)( ring_wing*period + 0.5 );
                pdata->ring_minsize = (int)( ring_minsize*period + 0.5 );
+               pdata->mask = ringmask;
                pdata->oper = 4;
                thrAddJob( wf, 0, pdata, smf1_calcmodel_flt, 0, NULL, status );
              }
@@ -598,7 +617,7 @@ static void smf1_calcmodel_flt( void *job_data_ptr, int *status ) {
             pm = pdata->model_data + ibase;
             for( itime = 0; itime < pdata->ntslice; itime++ ) {
 
-/*  Add the model value on to the residual. BADDA samples will have bad 
+/*  Add the model value on to the residual. BADDA samples will have bad
     values so check for them. */
                if( *pr != VAL__BADD ) *pr += *pm;
 
@@ -677,11 +696,12 @@ static void smf1_calcmodel_flt( void *job_data_ptr, int *status ) {
          pq = pdata->qua_data + ibolo*pdata->bstride;
          if( !( *pq & SMF__Q_BADB ) ) {
             pr = pdata->res_data + ibolo*pdata->bstride;
+            pl = pdata->lut_data + ibolo*pdata->bstride;
             smf_flag_rings( pr, pdata->tstride, pdata->ntslice,
                             pdata->ring_box1, pdata->ring_box2,
                             pdata->ring_nsigma, pdata->ring_wing,
                             pdata->ring_minsize, pq, SMF__Q_FIT,
-                            status );
+                            pdata->mask, pl, status );
          }
       }
 

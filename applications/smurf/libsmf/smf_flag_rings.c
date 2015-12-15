@@ -14,7 +14,9 @@
 *  Invocation:
 *     int smf_flag_rings( double *data, size_t stride, int nel, int box1,
 *                         int box2, double nsigma, int wing, int minsize,
-*                         smf_qual_t *qual, smf_qual_t mask, int *status )
+*                         smf_qual_t *qual, smf_qual_t qmask,
+*                         const unsigned char *mask, const int *lut,
+*                         int *status )
 
 *  Arguments:
 *     data = double * (Given and Returned)
@@ -39,12 +41,22 @@
 *        samples that will be flagged. Section shorter than this size
 *        will never be flagged.
 *     qual = smf_qual_t * (Given and Returned)
-*        The QUALITY array associated with the data array. Samples that
-*        are flagged as ringing samples by this function are assigned the
-*        quality SMF__Q_RING
-*     mask = smf_qual_t (Given)
+*        The QUALITY array associated with the data array. On entry, it
+*        is assumed that no samples are flagged with SMF__Q_RING. On exit,
+*        samples that are flagged as ringing samples by this function are
+*        assigned the quality SMF__Q_RING
+*     qmask = smf_qual_t (Given)
 *        Use with qual to define which samples should be included in the
 *        filtered values.
+*     mask = const unsigned char * (Given)
+*        NULL, or a pointer to a 2D mask which is zero in source regions,
+*        and non-zero for background regions. The mask should have the same
+*        pixel bounds as the output map. If supplied, samples that fall
+*        within source regions are never flagged by this function (i.e.
+*        only background pixels are flagged).
+*     lut = const int * (Given)
+*        Only used if "mask" is not NULL. It should be a pointer to the
+*        look-up-tyable that gives the map pixel index for each sample index.
 *     status = int * (Given and Returned)
 *        Pointer to global status.
 
@@ -63,6 +75,9 @@
 *  History:
 *     17-OCT-2013 (DSB):
 *        Initial version.
+*     11-DEC-2015 (DSB):
+*        - Rename old argument "mask" as "qmask".
+*        - Add new arguments "mask" and "lut".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -98,13 +113,15 @@
 
 int smf_flag_rings( double *data, size_t stride, int nel, int box1,
                     int box2, double nsigma, int wing, int minsize,
-                    smf_qual_t *qual, smf_qual_t mask, int *status ){
+                    smf_qual_t *qual, smf_qual_t qmask,
+                    const unsigned char *mask, const int *lut, int *status ){
 
 /* Local variables */
-   double *p2;
-   double *work2;
-   double *work1;
+   const int *pl;
    double *p1;
+   double *p2;
+   double *work1;
+   double *work2;
    double mean;
    double stddev;
    double thresh;
@@ -115,6 +132,7 @@ int smf_flag_rings( double *data, size_t stride, int nel, int box1,
    int result;
    int start;
    int state;
+   smf_qual_t *pq;
 
 /* Initialise returned value. */
    result = 0;
@@ -134,7 +152,7 @@ int smf_flag_rings( double *data, size_t stride, int nel, int box1,
 /* Smooth the data stream using a filter of width "box1" samples. This
    gives the low frequency background to the data array. The smoothed
    values are stored back in "work1". */
-   smf_boxcar1D( work1, nel, 1, box1, qual, mask, 1, NULL, status );
+   smf_boxcar1D( work1, nel, 1, box1, qual, qmask, 1, NULL, status );
 
 /* We are trying to identify sections of the above array that oscillate
    about zero - i.e. have a mean value close to zero over some larger
@@ -144,7 +162,7 @@ int smf_flag_rings( double *data, size_t stride, int nel, int box1,
    zero in "work1". We then square these values as the next step will
    be to find the RMS amplitude of any oscillations present in "work1". */
    work2 = astStore( NULL, work1, nel*sizeof( *work2 ) );
-   smf_boxcar1D( work2, nel, 1, box2, qual, mask, 1, NULL, status );
+   smf_boxcar1D( work2, nel, 1, box2, qual, qmask, 1, NULL, status );
 
    if( *status == SAI__OK ) {
       p1 = work1;
@@ -161,7 +179,7 @@ int smf_flag_rings( double *data, size_t stride, int nel, int box1,
 
 /* Now we seek the RMS amplitude of any oscillations, so smooth the square
    of the zero-mean low frequency background, using a large filter. */
-   smf_boxcar1D( work1, nel, 1, box2, qual, mask, 1, NULL, status );
+   smf_boxcar1D( work1, nel, 1, box2, qual, qmask, 1, NULL, status );
 
 /* Find the clipped mean and standard deviation of these mean squared
    amplitudes. */
@@ -210,6 +228,20 @@ int smf_flag_rings( double *data, size_t stride, int nel, int box1,
                }
             }
          }
+      }
+   }
+
+/* If a mask was supplied, ensure that no samples that correspond to source
+   regions within the supplied mask are flagged by SMF__Q_RING. */
+   if( mask ) {
+      pq = qual;
+      pl = lut;
+      for( i = 0; i < nel; i++ ) {
+         if( *pl != VAL__BADI && mask[ *pl ] == 0 ) {
+            *pq &= ~SMF__Q_RING;
+         }
+         pq += stride;
+         pl += stride;
       }
    }
 

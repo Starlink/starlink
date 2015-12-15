@@ -151,6 +151,9 @@ smf_qual_t smf_qual_str_to_val( const char *qname, smf_qfam_t * family, int * st
   } else if ( strcmp(qname, "TEL") == 0 ) {
     retval = SMF__TCOMPQ_TEL;
     lfamily = SMF__QFAM_TCOMP;
+  } else if ( strcmp(qname, "RINGING") == 0 ) {
+    retval = SMF__TCOMPQ_RING;
+    lfamily = SMF__QFAM_TCOMP;
   } else if ( strcmp(qname, "LOWAP") == 0 ) {
     retval = SMF__Q_LOWAP;
     lfamily = SMF__QFAM_TSERIES;

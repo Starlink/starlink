@@ -1460,6 +1460,33 @@ flt.ring_box2 = 1.5
 flt.ring_freeze = 10
 
 #-----------------------------------------------------------------
+#  Name: 	flt.ring_mask
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls the flagging of samples that suffer from ringing.
+#  Description: If this parameter is set to a non-zero value, then
+#               samples that fall within a source region (as defined
+#               by the AST and/or FLT mask) are never flagged by the
+#               ringing filter. If this parameter is set to zero (the
+#               default) then no distinction is made between background
+#               and source samples within the ringing filter.
+#
+#               If an FLT mask is available, it is used to define source
+#               regions. Otherwise, the AST mask is used. If no mask is
+#               available, then behaviour is as if zero was supplied for
+#               this parameter.
+#
+#               Bright compact sources can cause ringing, which the ringing
+#               filter would normally identify, resulting in the source
+#               samples being flagged and excluded from the map. This
+#               results in fewer samples in the source pixels and so higher
+#               noise. In bad cases, it can result in all source samples
+#               being rejected, thus causing a hole of bad pixels in the map
+#               at the position of the source. Setting this parameter to a
+#               non-zero value can help in such cases.
+flt.ring_mask = 0
+
+#-----------------------------------------------------------------
 #  Name: 	flt.ring_minsize
 #  Type: 	float
 #  Default: 	0.0

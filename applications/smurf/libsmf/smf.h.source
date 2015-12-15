@@ -1253,7 +1253,8 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status );
 
 int smf_flag_rings( double *data, size_t stride, int nel, int box1, int box2,
                     double nsigma, int wing, int minsize, smf_qual_t *qual,
-                    smf_qual_t mask, int *status );
+                    smf_qual_t qmask, const unsigned char *mask,
+                    const int *lut, int *status );
 
 void smf_flag_slewspeed( smfData *data, double smin, double smax,
                          size_t *nflagged, double *average_speed,

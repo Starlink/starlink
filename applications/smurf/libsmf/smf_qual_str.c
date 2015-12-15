@@ -72,7 +72,7 @@
 *     2011-09-19 (DSB):
 *        Add SMF__Q_BADEF
 *     2015-010-12 (DSB):
-*        Define SMF__Q_FILT and SMF__Q_BADEF to be the same value 
+*        Define SMF__Q_FILT and SMF__Q_BADEF to be the same value
 *        (SMF__Q_GENERIC) in order to keep total number of bits below 17).
 
 *  Copyright:
@@ -180,7 +180,7 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
 
     case SMF__Q_GENERIC:
       retval = "GENERIC";
-      ldescr = "Set if sample has some generic issue that prevents it being used";
+      ldescr = "Set if sample has some generic problem";
       break;
 
     case SMF__Q_NOISE:
@@ -205,7 +205,7 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
 
     case SMF__Q_SSN:
       retval = "SSN";
-      ldescr = "Set iff samples flag as bad by the Scan-Synchronous Noise model";
+      ldescr = "Set iff samples flag as bad by the SSN model";
       break;
 
     case SMF__Q_PCA:
@@ -215,7 +215,7 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
 
     case SMF__Q_IP:
       retval = "IP";
-      ldescr = "Set iff samples flag as bad by the Instrumental Polarisation model";
+      ldescr = "Set iff samples flag as bad by the IP model";
       break;
 
     default:
@@ -266,6 +266,10 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
     case SMF__TCOMPQ_TEL:
       retval = "TEL";
       ldescr = "Set if telescope was not in useful state";
+      break;
+    case SMF__TCOMPQ_RING:
+      retval = "RINGING";
+      ldescr = "Set if the FLT model caused ringing";
       break;
     default:
       retval = NULL;

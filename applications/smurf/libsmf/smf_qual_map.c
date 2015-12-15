@@ -442,6 +442,8 @@ static void smf1_qual_map( void *job_data_ptr, int *status ) {
                         *p1 |= SMF__Q_COM;
                      } else if( pdata->ndfqtoval[k] & SMF__TCOMPQ_TEL ) {
                         *p1 |= SMF__Q_STAT;
+                     } else if( pdata->ndfqtoval[k] & SMF__TCOMPQ_RING ) {
+                        *p1 |= SMF__Q_RING;
                      } else {
 
 /* just do the normal mapping */
