@@ -6119,6 +6119,10 @@ package @PACKAGE@ {
         obey {python $SMURF_DIR/pol2cat.py}
     }
 
+    command pol2ip {
+        obey {python $SMURF_DIR/pol2ip.py}
+    }
+
     command pol2scan {
         obey {python $SMURF_DIR/pol2scan.py}
     }
