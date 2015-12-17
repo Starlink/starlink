@@ -403,18 +403,24 @@ try:
 
 #  Get the mean Q value in a circle of diameter given by parameter DIAM
 #  centred on the source.
-      invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'0,0'\" diam=\"'0:0:{1}'\"".format(qmap,diam))
+      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(qmap) )
+      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(qmap) )
+      invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'0,0'\" diam={1}".format(qmap,diam))
       qlist.append( get_task_par( "mean", "aperadd" ) )
 
 #  Get the mean U value in the same circle.
-      invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'0,0'\" diam=\"'0:0:{1}'\"".format(umap,diam))
+      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(umap) )
+      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(umap) )
+      invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'0,0'\" diam={1}".format(umap,diam))
       ulist.append( get_task_par( "mean", "aperadd" ) )
 
 
 
 
 #  Now all observations are done, get the mean I value in the same circle.
-   invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'0,0'\" diam=\"'0:0:{1}'\"".format(iref,diam))
+   invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(iref) )
+   invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(iref) )
+   invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'0,0'\" diam={1}".format(iref,diam))
    ival = get_task_par( "mean", "aperadd" )
 
 #  Loop doing sigma-clipping.
