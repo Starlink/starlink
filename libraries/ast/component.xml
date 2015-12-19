@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 
 <component id="ast" support="S">
-  <version>8.0.5</version>
+  <version>8.0.7</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
