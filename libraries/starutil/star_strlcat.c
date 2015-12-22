@@ -84,8 +84,8 @@
 
 #include <stdlib.h>
 
-/* Use local or remote strlcpy */
-#if HAVE_STRLCPY
+/* Use local or remote strlcat */
+#if HAVE_STRLCAT
 #  include <string.h>
 #else
 size_t strlcat( char * dst, const char * src, size_t size);
