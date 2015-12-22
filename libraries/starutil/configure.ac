@@ -28,7 +28,9 @@ AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
 dnl    Check if sys/wait.h exists and is POSIX compatible
 AC_HEADER_STDC
+AC_SEARCH_LIBS(strlcpy, bsd)
 AC_CHECK_FUNCS(strlcpy)
+AC_SEARCH_LIBS(strlcat, bsd)
 AC_CHECK_FUNCS(strlcat)
 
 dnl    Declare the build and use dependencies for this package
@@ -39,7 +41,7 @@ dnl    which are present as .tex files in this directory.
  
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES(Makefile component.xml starutil_link)
 AC_CONFIG_HEADERS( config.h )
 
 dnl    This is the bit that does the actual work
