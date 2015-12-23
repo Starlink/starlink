@@ -84,6 +84,10 @@
 
 #include <stdlib.h>
 
+#ifdef HAVE_BSD_STRING_H
+#include <bsd/string.h>
+#endif
+
 /* Use local or remote strlcat */
 #if HAVE_STRLCAT
 #  include <string.h>

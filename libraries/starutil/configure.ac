@@ -28,9 +28,9 @@ AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
 dnl    Check if sys/wait.h exists and is POSIX compatible
 AC_HEADER_STDC
-AC_SEARCH_LIBS(strlcpy, bsd)
+AC_SEARCH_LIBS(strlcpy, bsd, [AC_CHECK_HEADERS(bsd/string.h)])
 AC_CHECK_FUNCS(strlcpy)
-AC_SEARCH_LIBS(strlcat, bsd)
+AC_SEARCH_LIBS(strlcat, bsd, [AC_CHECK_HEADERS(bsd/string.h)])
 AC_CHECK_FUNCS(strlcat)
 
 dnl    Declare the build and use dependencies for this package
