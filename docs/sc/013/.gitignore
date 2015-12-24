@@ -1,3 +1,5 @@
 /examples/bytesex.h
 /examples/islittleendian
+/examples/*.xml
 /sc13.pdf
+/VERSION
