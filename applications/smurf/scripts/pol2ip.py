@@ -433,6 +433,26 @@ try:
       invoke( "$KAPPA_DIR/wcsattrib ndf={0} mode=set name=skyrefis "
               "newval=origin".format(umap) )
 
+#  Ensure sky offset values are formatted as decimal seconds.
+      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(qmap) )
+      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(qmap) )
+      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(umap) )
+      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(umap) )
+
+#  Form the polarised intensity map (no de-biassing), and remove the
+#  spectral axis.
+      tmp1 = NDG( 1 )
+      invoke( "$KAPPA_DIR/maths exp='sqrt(ia**2+ib**2)' ia={0} ib={1} out={2}"
+              .format(qmap,umap,tmp1) )
+      pimap = NDG( 1 )
+      invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(tmp1,pimap) )
+
+#  Find the position of the source centre in sky coords within the polarised
+#  intensity map.
+      invoke("$KAPPA_DIR/centroid ndf={0} mode=int init=\"'0,0'\"".format(pimap) )
+      xcen = get_task_par( "xcen", "centroid" )
+      ycen = get_task_par( "ycen", "centroid" )
+
 #  Get the elevation at the middle of the observation.
       el1 = float( get_fits_header( qmap, "ELSTART" ) )
       el2 = float( get_fits_header( qmap, "ELEND" ) )
@@ -440,15 +460,11 @@ try:
 
 #  Get the mean Q value in a circle of diameter given by parameter DIAM
 #  centred on the source.
-      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(qmap) )
-      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(qmap) )
-      invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'0,0'\" diam={1}".format(qmap,diam))
+      invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(qmap,diam,xcen,ycen))
       qlist.append( get_task_par( "mean", "aperadd" ) )
 
 #  Get the mean U value in the same circle.
-      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(umap) )
-      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(umap) )
-      invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'0,0'\" diam={1}".format(umap,diam))
+      invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(umap,diam,xcen,ycen))
       ulist.append( get_task_par( "mean", "aperadd" ) )
 
 
@@ -467,7 +483,15 @@ try:
              format(junk,pixsize,imap) )
    else:
       imap = junk
-   invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'0,0'\" diam={1}".format(imap,diam))
+
+#  Find the position of the source centre in sky offsets within the total intensity map.
+   invoke("$KAPPA_DIR/centroid ndf={0} mode=int init=\"'0,0'\"".format(imap) )
+   xcen = get_task_par( "xcen", "centroid" )
+   ycen = get_task_par( "ycen", "centroid" )
+
+#  Find the mean I value in the aperture centred on the accurate source
+#  centre.
+   invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(imap,diam,xcen,ycen))
    ival = get_task_par( "mean", "aperadd" )
 
 #  Loop doing sigma-clipping.
