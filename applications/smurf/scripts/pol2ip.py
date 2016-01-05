@@ -6,7 +6,7 @@
 *     pol2ip
 
 *  Purpose:
-*     Create an Instrumentap Polarisation (IP) model from a set of POL2
+*     Create an Instrumental Polarisation (IP) model from a set of POL2
 *     observations.
 
 *  Language:
@@ -42,7 +42,7 @@
 *     calculated by this script.
 
 *  Usage:
-*     pol2ip obslist iref [diam]
+*     pol2ip obslist iref [diam] [pixsize]
 
 *  Parameters:
 *     DIAM = _REAL (Read)
@@ -78,7 +78,9 @@
 *     IREF = NDF (Read)
 *        A 2D NDF holding a map of total intensity (in pW) for the object
 *        covered by the observations in OBSLIST. It is assumed that the
-*        object is centred at the reference point in the map.
+*        object is centred at the reference point in the map. The
+*        supplied map is resampled to to give it the pixel size specified
+*        by parameter PIXSIZE.
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -103,6 +105,9 @@
 *        observations is expected to reside in a directory given by
 *        environment variable "SC2", within subdirectories with paths
 *        of the form: $SC2/s8a/20150918/00056/ etc.
+*     PIXSIZE = _REAL (Read)
+*        Pixel dimensions in the Q and U maps, in arcsec. The default
+*        is 4 arc-sec for 850 um data and 2 arc-sec for 450 um data. []
 *     RESTART = LITERAL (Read)
 *        If a value is assigned to this parameter, it should be the path
 *        to a directory containing the intermediate files created by a
@@ -282,6 +287,8 @@ try:
                                  minsize=0, maxsize=1 ))
    params.append(starutil.Par0F("DIAM", "Aperture diameter (arc-sec)",
                                  40.0, noprompt=True ))
+   params.append(starutil.Par0F("PIXSIZE", "Pixel size (arcsec)", None,
+                                 maxval=1000, minval=0.01, noprompt=True))
    params.append(starutil.Par0S("RESTART", "Restart using old files?", None,
                                  noprompt=True))
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
@@ -309,6 +316,13 @@ try:
 
 #  Get the aperture diameter, in arcsec.
    diam = parsys["DIAM"].value
+
+#  The user-supplied pixel size.
+   pixsize = parsys["PIXSIZE"].value
+   if pixsize:
+      pixsizepar = "pixsize={0}".format(pixsize)
+   else:
+      pixsizepar = ""
 
 #  See if old temp files are to be re-used.
    restart = parsys["RESTART"].value
@@ -345,6 +359,29 @@ try:
    fd.write("pol2fp=1\n")
    fd.close()
 
+#  If restarting, load the parameter values used by this script in the
+#  previous run.
+   newpixsize = False
+   oldpars = {}
+   if restart:
+      parfile = os.path.join(NDG.tempdir,"PARAMS")
+      if os.path.exists( parfile ):
+         with open(parfile) as f:
+            lines = f.read().splitlines()
+         for line in lines:
+            (par,val) = line.split("=")
+            oldpars[par] = float(val)
+
+#  Has the pixel size changed?
+         if "pixsize" in oldpars:
+            if not pixsize or oldpars["pixsize"] != pixsize:
+               newpixsize = True
+         elif pixsize:
+            newpixsize = True
+      else:
+         if pixsize:
+            newpixsize = True
+
 #  Loop round each observation.
    for obs in obslist:
       msg_out( "Doing observation {0}...".format(obs) )
@@ -373,17 +410,17 @@ try:
 #  Make maps from the Q and U time streams. These Q and U values are with
 #  respect to the focal plane Y axis.
       mapfile = "{0}/qmap.sdf".format(obsdir)
-      if not os.path.exists( mapfile ):
+      if not os.path.exists( mapfile ) or newpixsize:
          qmap = NDG( mapfile, False )
-         invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2}".format(qts,conf,qmap))
+         invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} {3}".format(qts,conf,qmap,pixsizepar))
       else:
          qmap = NDG( mapfile, True )
          msg_out("Re-using pre-calculated Q map for {0}.".format(obs))
 
       mapfile = "{0}/umap.sdf".format(obsdir)
-      if not os.path.exists( mapfile ):
+      if not os.path.exists( mapfile ) or newpixsize:
          umap = NDG( mapfile, False )
-         invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2}".format(uts,conf,umap))
+         invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} {3}".format(uts,conf,umap,pixsizepar))
       else:
          umap = NDG( mapfile, True )
          msg_out("Re-using pre-calculated U map for {0}.".format(obs))
@@ -417,10 +454,20 @@ try:
 
 
 
-#  Now all observations are done, get the mean I value in the same circle.
-   invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(iref) )
-   invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(iref) )
-   invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'0,0'\" diam={1}".format(iref,diam))
+#  Now all observations are done, get the mean I value in the same
+#  circle. First get rid of any spectral axis and resample the supplied I
+#  map onto the same pixel size as the Q an U maps.
+   junk = NDG(1)
+   invoke("$KAPPA_DIR/ndfcopy in={0} trim=yes out={1}".format(iref,junk) )
+   invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(junk) )
+   invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(junk) )
+   if pixsize:
+      imap = NDG(1)
+      invoke("$KAPPA_DIR/sqorst in={0} mode=pix pixscale=\\\"{1},{1}\\\" out={2}".
+             format(junk,pixsize,imap) )
+   else:
+      imap = junk
+   invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'0,0'\" diam={1}".format(imap,diam))
    ival = get_task_par( "mean", "aperadd" )
 
 #  Loop doing sigma-clipping.
@@ -452,6 +499,17 @@ try:
    (a,b,c) = res.x
    msg_out("\n\nA={0} B={1} C={2}".format(a,b,c))
    msg_out("Q RMS = {0} pW  U RMS = {1} pW\n".format(qrms,urms))
+   msg_out("Qn RMS = {0}   Un RMS = {1} \n".format(qrms/ival,urms/ival))
+
+#  Save the parameter values used in this script in case we want to
+#  re-use the intermediate files in a later run.
+   if retain:
+      parfile = os.path.join(NDG.tempdir,"PARAMS")
+      fd = open( parfile, "w" )
+      fd.write("diam={0}\n".format(diam))
+      if pixsize:
+         fd.write("pixsize={0}\n".format(diam))
+      fd.close()
 
 #  Remove temporary files.
    cleanup()
