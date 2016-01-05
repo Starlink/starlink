@@ -532,7 +532,7 @@ try:
       fd = open( parfile, "w" )
       fd.write("diam={0}\n".format(diam))
       if pixsize:
-         fd.write("pixsize={0}\n".format(diam))
+         fd.write("pixsize={0}\n".format(pixsize))
       fd.close()
 
 #  Remove temporary files.
