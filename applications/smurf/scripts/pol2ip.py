@@ -22,15 +22,16 @@
 *     It is assumed that the source is centred at the reference point of
 *     the supplied observations.
 
-*     An IP model gives the normalised Q and U values (Qn and Un) at
-*     any point as functions of elevation. The correction is applied as
-*     follows:
+*     An IP model gives the normalised Q and U values (Qn and Un) with
+*     respect to focal plane Y axis, at any point on the sky, as functions
+*     of elevation. The correction is applied as follows:
 *
 *        Q_corrected = Q_original - I*Qn
 *        U_corrected = U_original - I*Un
 *
 *     where "I" is the total intensity at the same point on the sky as
-*     Q_original and U_original.
+*     Q_original and U_original. All (Q,U) values use the focal plane Y
+*     axis as the reference direction.
 *
 *     The "PL1" IP model is as follows ("el" = elevation in radians):
 *
@@ -39,7 +40,9 @@
 *        Un = I*p1*sin(-2*el)
 *
 *     It is parameterised by three constants A, B and C, which are
-*     calculated by this script.
+*     calculated by this script.  It represents an instrumental
+*     polarisation that varies in size with elevation but is always
+*     parallel to elevation.
 
 *  Usage:
 *     pol2ip obslist iref [diam] [pixsize]
@@ -47,7 +50,10 @@
 *  Parameters:
 *     DIAM = _REAL (Read)
 *        The diameter of the circle (in arc-seconds), centred on the source,
-*        over which the mean Q, U and I values are found. [40]
+*        over which the mean Q, U and I values are found. If zero,, or a
+*        negative value, is supplied, the fit is based on the peak values
+*        within the source rather than the mean values. The peak values are
+*        found using kappa:beamfit. [40]
 *     ILEVEL = LITERAL (Read)
 *        Controls the level of information displayed on the screen by the
 *        script. It can take any of the following values (note, these values
@@ -456,23 +462,37 @@ try:
 #  Get the elevation at the middle of the observation.
       el1 = float( get_fits_header( qmap, "ELSTART" ) )
       el2 = float( get_fits_header( qmap, "ELEND" ) )
-      elist.append( 0.5*( el1 + el2 ) )
+      el = 0.5*( el1 + el2 )
+      elist.append( el )
 
-#  Get the mean Q value in a circle of diameter given by parameter DIAM
-#  centred on the source.
-      invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(qmap,diam,xcen,ycen))
-      qlist.append( get_task_par( "mean", "aperadd" ) )
+#  If we are fitting the peak values, use beamfit to fit a beam to the
+#  polarised intensity source and then get the peak polarised intensity value.
+      if diam <= 0.0:
+         invoke("$KAPPA_DIR/beamfit ndf={0}'(0~30,0~30)' pos=\"'{1},{2}'\" "
+                "gauss=no mode=int ".format( pimap,xcen,ycen) )
+         pipeak = get_task_par( "amp(1)", "beamfit" )
 
-#  Get the mean U value in the same circle.
-      invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(umap,diam,xcen,ycen))
-      ulist.append( get_task_par( "mean", "aperadd" ) )
+#  Get the peak Q and U values assuming that the IP is parallel to
+#  elevation, and append them to the end of the list if Q and U values.
+         qlist.append( pipeak*cos(-2*el) )
+         ulist.append( pipeak*sin(-2*el) )
+
+#  Otherwise, get the mean Q value in a circle of diameter given by parameter
+#  DIAM centred on the source.
+      else:
+         invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(qmap,diam,xcen,ycen))
+         qlist.append( get_task_par( "mean", "aperadd" ) )
+
+#  Likewise, get the mean U value in the same circle.
+         invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(umap,diam,xcen,ycen))
+         ulist.append( get_task_par( "mean", "aperadd" ) )
 
 
 
 
-#  Now all observations are done, get the mean I value in the same
-#  circle. First get rid of any spectral axis and resample the supplied I
-#  map onto the same pixel size as the Q an U maps.
+#  Now all observations are done, get the corresponding I value. First get rid
+#  of any spectral axis and resample the supplied I map onto the same pixel
+#  size as the Q an U maps.
    junk = NDG(1)
    invoke("$KAPPA_DIR/ndfcopy in={0} trim=yes out={1}".format(iref,junk) )
    invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(junk) )
@@ -489,12 +509,24 @@ try:
    xcen = get_task_par( "xcen", "centroid" )
    ycen = get_task_par( "ycen", "centroid" )
 
-#  Find the mean I value in the aperture centred on the accurate source
-#  centre.
-   invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(imap,diam,xcen,ycen))
-   ival = get_task_par( "mean", "aperadd" )
+#  If we are fitting the peak values, use beamfit to fit a beam to the total
+#  intensity source and then get the peak value.
+   if diam <= 0.0:
+      invoke("$KAPPA_DIR/beamfit ndf={0}'(0~30,0~30)' pos=\"'{1},{2}'\" "
+             "gauss=no mode=int ".format( imap,xcen,ycen) )
+      ival = get_task_par( "amp(1)", "beamfit" )
 
-#  Loop doing sigma-clipping.
+#  Otherwise, find the mean I value in the aperture centred on the
+#  accurate source centre.
+   else:
+      invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(imap,diam,xcen,ycen))
+      ival = get_task_par( "mean", "aperadd" )
+
+
+
+
+#  We now do the fit. Loop doing succesive fits, rejecting outliers on
+#  each pass (i.e. sigma clipping).
    msg_out( "Doing fit..." )
    for i in range(0,3):
       msg_out( "\nIteration {0}: Fitting to {1} data points...".format(i+1,len(elist)) )
