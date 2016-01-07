@@ -130,7 +130,8 @@ itcl::class gaia::GaiaImagePick {
             -text "Degrees:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth 8 \
-            -variable [scope show_degrees_]
+            -variable [scope show_degrees_] \
+            -command [code $this change_show_degrees_]
       }
       pack $itk_component(degrees) \
          -side top -fill x -padx 2m -pady 1m -before $itk_component(buttons)
@@ -222,6 +223,12 @@ itcl::class gaia::GaiaImagePick {
          return [$image_ statistics degrees]
       }
       return [$image_ statistics]
+   }
+
+   #  Handle change in show degrees.
+   protected method change_show_degrees_ {} {
+      picked_object
+      update_now
    }
 
    #  Protected variables.

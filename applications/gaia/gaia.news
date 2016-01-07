@@ -1,16 +1,24 @@
   Development Version
   ===================
 
-  Fix problem with object detection toolbox failing to set the correct
-  number of objects detected in the catalogue window.
+  Show decimal degrees immediately when selected in the pick object toolbox.
 
-  The URAT1 catalogue has been added to the standard Skycat catalogues.
+    Version 4.4-7
+    =============
 
-  The centroid option in optimal photometry is now disabled. This has
-  always been true, just previously toggling this control had no effect.
+  Star-2015B Release
+  ==================
 
-  Add work around for problems when printing a colour ramp from an image
-  that has a very large data range. Previously this failed completely.
+    Fix problem with object detection toolbox failing to set the correct
+    number of objects detected in the catalogue window.
+
+    The URAT1 catalogue has been added to the standard Skycat catalogues.
+
+    The centroid option in optimal photometry is now disabled. This has
+    always been true, just previously toggling this control had no effect.
+
+    Add work around for problems when printing a colour ramp from an image
+    that has a very large data range. Previously this failed completely.
     
   Star-2015A Release
   ==================
