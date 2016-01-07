@@ -7,7 +7,7 @@ dnl    run and gaia/configure, gaia3d/configure and gaiavo/configure
 dnl    scripts have been updated (this normally requires a bootstrap, 
 dnl    configure, bootstrap, the configure updates the local directories 
 dnl    which then require regenerating again).
-AC_INIT([gaia],[4.4-6],[starlink@jiscmail.ac.uk])
+AC_INIT([gaia],[4.4-7],[starlink@jiscmail.ac.uk])
 AC_CONFIG_AUX_DIR([build-aux])
 
 dnl    Require autoconf-2.50 at least
