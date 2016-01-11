@@ -587,7 +587,6 @@ itcl::class gaia::Gaia {
       set image_ $w_.image
       itk_component add image {
          GaiaImageCtrl $image_ \
-            -file $itk_option(-file) \
             -file_change_cmd [code $this file_loaded_] \
             -file_types $itk_option(-file_types) \
             -usexshm $itk_option(-usexshm) \
