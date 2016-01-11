@@ -774,7 +774,7 @@ package @PACKAGE@ {
                 prompt {Fix triggering issue?}
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
-                default FALSE
+                default TRUE
                 helpkey *
             }
 
@@ -783,7 +783,7 @@ package @PACKAGE@ {
                 prompt {Use least-squares method?}
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
-                default FALSE
+                default TRUE
                 helpkey *
             }
 
