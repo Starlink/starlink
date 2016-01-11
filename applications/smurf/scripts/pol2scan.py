@@ -464,6 +464,17 @@ try:
       invoke("$POLPACK_DIR/polrotref qin={0} uin={1} qout={2} uout={3} "
              "like={4}".format(tqmap,tumap,qmap,umap,qref) )
 
+#  Create the polarised intensity map if required.
+   if pimap:
+      msg_out( "Generating an polarised intensity image...")
+      if debias:
+         invoke( "$KAPPA_DIR/maths exp='sign(sqrt(abs(fa)),fa)' "
+                 "fa='iq**2+iu**2-(vq+vu)/2' ia={0} ib={1} out={2}".
+                 format(qmap,umap,pimap))
+      else:
+         invoke( "$KAPPA_DIR/maths exp='sqrt(ia**2+ib**2)' ia={0} "
+                 "ib={1} out={2}".format(qmap,umap,pimap))
+
 # The rest we only do if an output catalogue is reqired.
    if outcat:
 
@@ -472,15 +483,18 @@ try:
 #  polpack:polvec uses the I value to normalise the Q and U values prior to
 #  calculating the polarised intensity and angle.
       if iref == "!":
-         iref = NDG(1)
-         msg_out( "Generating an artificial total intensity image...")
-         if debias:
-            invoke( "$KAPPA_DIR/maths exp='sign(sqrt(abs(fa)),fa)' "
-                    "fa='iq**2+iu**2-(vq+vu)/2' ia={0} ib={1} out={2}".
-                    format(qmap,umap,iref))
+         if pimap:
+            iref = pimap
          else:
-            invoke( "$KAPPA_DIR/maths exp='sqrt(ia**2+ib**2)' ia={0} "
-                    "ib={1} out={2}".format(qmap,umap,iref))
+            iref = NDG(1)
+            msg_out( "Generating an artificial total intensity image...")
+            if debias:
+               invoke( "$KAPPA_DIR/maths exp='sign(sqrt(abs(fa)),fa)' "
+                       "fa='iq**2+iu**2-(vq+vu)/2' ia={0} ib={1} out={2}".
+                       format(qmap,umap,iref))
+            else:
+               invoke( "$KAPPA_DIR/maths exp='sqrt(ia**2+ib**2)' ia={0} "
+                       "ib={1} out={2}".format(qmap,umap,iref))
 
 #  Ensure the Q U and I images all have the same bounds, equal to the
 #  overlap region between them. To get the overlap region, use MATHS to
@@ -517,15 +531,9 @@ try:
       invoke( "$POLPACK_DIR/polext in={0} stokes=qui".format(cube) )
 
 #  Create a FITS catalogue containing the polarisation vectors.
-      command = "$POLPACK_DIR/polvec {0} cat={1} debias={2}".format(cube,outcat,debias)
-      if pimap:
-         command = "{0} ip={1}".format(command,pimap)
-         msg_out( "Creating the output catalogue '{0}' and polarised intensity map '{1}'...".format(outcat,pimap) )
-      else:
-         msg_out( "Creating the output catalogue: '{0}'...".format(outcat) )
-      msg = invoke( command )
+      msg_out( "Creating the output catalogue: '{0}'...".format(outcat) )
+      msg = invoke( "$POLPACK_DIR/polvec {0} cat={1} debias={2}".format(cube,outcat,debias) )
       msg_out( "\n{0}\n".format(msg) )
-
 
 #  Remove temporary files.
    cleanup()
