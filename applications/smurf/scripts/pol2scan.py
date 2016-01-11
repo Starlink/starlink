@@ -468,11 +468,11 @@ try:
    if pimap:
       msg_out( "Generating an polarised intensity image...")
       if debias:
-         invoke( "$KAPPA_DIR/maths exp='sign(sqrt(abs(fa)),fa)' "
-                 "fa='iq**2+iu**2-(vq+vu)/2' ia={0} ib={1} out={2}".
+         invoke( "$KAPPA_DIR/maths exp=\"'sign(sqrt(abs(fa)),fa)'\" "
+                 "fa=\"'ia**2+ib**2-(va+vb)/2'\" ia={0} ib={1} out={2}".
                  format(qmap,umap,pimap))
       else:
-         invoke( "$KAPPA_DIR/maths exp='sqrt(ia**2+ib**2)' ia={0} "
+         invoke( "$KAPPA_DIR/maths exp=\"'sqrt(ia**2+ib**2)'\" ia={0} "
                  "ib={1} out={2}".format(qmap,umap,pimap))
 
 # The rest we only do if an output catalogue is reqired.
@@ -489,11 +489,11 @@ try:
             iref = NDG(1)
             msg_out( "Generating an artificial total intensity image...")
             if debias:
-               invoke( "$KAPPA_DIR/maths exp='sign(sqrt(abs(fa)),fa)' "
-                       "fa='iq**2+iu**2-(vq+vu)/2' ia={0} ib={1} out={2}".
+               invoke( "$KAPPA_DIR/maths exp=\"'sign(sqrt(abs(fa)),fa)'\" "
+                       "fa=\"'ia**2+ib**2-(va+vb)/2'\" ia={0} ib={1} out={2}".
                        format(qmap,umap,iref))
             else:
-               invoke( "$KAPPA_DIR/maths exp='sqrt(ia**2+ib**2)' ia={0} "
+               invoke( "$KAPPA_DIR/maths exp=\"'sqrt(ia**2+ib**2)'\" ia={0} "
                        "ib={1} out={2}".format(qmap,umap,iref))
 
 #  Ensure the Q U and I images all have the same bounds, equal to the
@@ -501,7 +501,7 @@ try:
 #  add them together. Then use ndfcopy to produce the sections from each,
 #  which match the overlap area.
       tmp = NDG( 1 )
-      invoke( "$KAPPA_DIR/maths exp='ia+ib+ic' ia={0} ib={1} ic={2} out={3}".
+      invoke( "$KAPPA_DIR/maths exp=\"'ia+ib+ic'\" ia={0} ib={1} ic={2} out={3}".
               format(qmap,umap,iref,tmp) )
       qtrim = NDG( 1 )
       invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(qmap,tmp,qtrim) )
