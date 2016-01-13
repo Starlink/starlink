@@ -17,7 +17,7 @@
 *     vector catalogue from them.
 
 *  Usage:
-*     pol2stack in cat pi [retain] [qui] [msg_filter] [ilevel] [glevel]
+*     pol2stack inq inu ini cat pi [retain] [qui] [in] [msg_filter] [ilevel] [glevel]
 *               [logfile]
 
 *  Parameters:
@@ -64,7 +64,17 @@
 *     IN = Literal (Read)
 *        A group of container files, each containing three 2D NDFs in
 *        components Q, U and I, as created using the QUI parameter of the
-*        pol2cat script.
+*        pol2cat script. Parameters INQ, INU and INI are used if a null
+*        (!) value is supplied for IN. [!]
+*     INI = Literal (Read)
+*        A group of input I maps. Only used if a null value is supplied for
+*        parameter IN.
+*     INQ = Literal (Read)
+*        A group of input Q maps. Only used if a null value is supplied for
+*        parameter IN.
+*     INU = Literal (Read)
+*        A group of input U maps. Only used if a null value is supplied for
+*        parameter IN.
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -102,6 +112,7 @@
 
 *  Copyright:
 *     Copyright (C) 2013 Science & Technology Facilities Council.
+*     Copyright (C) 2015 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -131,6 +142,8 @@
 *        Added parameter "QUI".
 *     20-MAY-2013 (DSB):
 *        Fix bug in regexp that filters out the Q, U and I NDF names.
+*     12-JAN-2016 (DSB):
+*        Add parameters INQ, INU and INI.
 
 *-
 '''
@@ -172,8 +185,9 @@ try:
 #  constructor.
    params = []
 
-   params.append(starutil.ParNDG("IN", "The input Q, U and I images",
-                                 Parameter.UNSET))
+   params.append(starutil.ParNDG("INQ", "The input Q images"))
+   params.append(starutil.ParNDG("INU", "The input U images"))
+   params.append(starutil.ParNDG("INI", "The input I images"))
 
    params.append(starutil.Par0S("CAT", "The output FITS vector catalogue",
                                  "out.FIT"))
@@ -191,6 +205,9 @@ try:
    params.append(starutil.Par0L("DEBIAS", "Remove statistical bias from P"
                                 "and IP?", False, noprompt=True))
 
+   params.append(starutil.ParNDG("IN", "The input container files holding Q, U and I images",
+                                 None,noprompt=True))
+
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
    parsys = ParSys( params )
@@ -199,8 +216,22 @@ try:
 #  the user goes off for a coffee whilst the script is running and does not
 #  see a later parameter propmpt or error...
 
-#  Get the input Q, U and I images.
+#  Get the input Q, U and I images. First see if container files (i.e.
+#  stare & spin data) is being supplied.
    inqui = parsys["IN"].value
+
+#  If supplied, get groups containing all the Q, U and I images.
+   if inqui:
+      qin = inqui.filter("'\.Q$'" )
+      uin = inqui.filter("'\.U$'" )
+      iin = inqui.filter("'\.I$'" )
+
+#  If not supplied, try again using INQ, INU and INI (i.e. scan & spin
+#  data).
+   else:
+      qin = parsys["INQ"].value
+      uin = parsys["INU"].value
+      iin = parsys["INI"].value
 
 #  Now get the PI value to use.
    pimap = parsys["PI"].value
@@ -218,24 +249,48 @@ try:
 #  See statistical debiasing is to be performed.
    debias = parsys["DEBIAS"].value
 
-#  Get groups containing all the Q, U and I images.
-   qin = inqui.filter("'\.Q$'" )
-   uin = inqui.filter("'\.U$'" )
-   iin = inqui.filter("'\.I$'" )
+#  Remove any spectral axes
+   qtrim = NDG(qin)
+   invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(qin,qtrim) )
+   utrim = NDG(qin)
+   invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(uin,utrim) )
+   itrim = NDG(qin)
+   invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(iin,itrim) )
+
 
 #  Rotate them to use the same polarimetric reference direction.
-   qrot = NDG(qin)
-   urot = NDG(uin)
+   qrot = NDG(qtrim)
+   urot = NDG(utrim)
    invoke( "$POLPACK_DIR/polrotref qin={0} uin={1} like={2} qout={3} uout={4} ".
-           format(qin,uin,qin[0],qrot,urot) )
+           format(qin,uin,qtrim[0],qrot,urot) )
 
-#  Mosaic them into a single set of Q, U and I images.
+#  Mosaic them into a single set of Q, U and I images, aligning them
+#  with the first I image.
    qmos = NDG( 1 )
-   invoke( "$KAPPA_DIR/wcsmosaic in={0} out={1} method=bilin accept".format(qrot,qmos) )
+   invoke( "$KAPPA_DIR/wcsmosaic in={0} out={1} ref={2} method=bilin accept".format(qrot,qmos,itrim[0]) )
    umos = NDG( 1 )
-   invoke( "$KAPPA_DIR/wcsmosaic in={0} out={1} method=bilin accept".format(urot,umos) )
+   invoke( "$KAPPA_DIR/wcsmosaic in={0} out={1} ref={2} method=bilin accept".format(urot,umos,itrim[0]) )
    imos = NDG( 1 )
-   invoke( "$KAPPA_DIR/wcsmosaic in={0} out={1} method=bilin accept".format(iin,imos) )
+   invoke( "$KAPPA_DIR/wcsmosaic in={0} out={1} ref={2} method=bilin accept".format(itrim,imos,itrim[0]) )
+
+#  The mosaiced images will not contain a POLANAL Frame (assuming the I
+#  maps have no POLANAL Frame). So copy the POLANAL Frame from the
+#  original Q and U maps to the mosaics.
+   invoke( "$KAPPA_DIR/wcsadd ndf={0} refndf={1} maptype=refndf "
+           "frame=grid domain=polanal retain=yes".format(qmos,qrot[0]) )
+   invoke( "$KAPPA_DIR/wcsadd ndf={0} refndf={1} maptype=refndf "
+           "frame=grid domain=polanal retain=yes".format(umos,urot[0]) )
+
+#  The three mosaics will now be aligned in pixel coords, but they could
+#  still have different pixel bounds. We trim them to a common area by
+#  adding them together (the sum will only be valid where all inputs are
+#  valid). We then set all mosaics to have the same trimmed pixel bounds.
+   sum = NDG( 1 )
+   invoke( "$KAPPA_DIR/maths exp=\"'ia+ib+ic'\" ia={0} ib={1} ic={2} "
+           "out={3}".format(qmos,umos,imos,sum) )
+   invoke( "$KAPPA_DIR/setbound ndf={0} like={1}".format(qmos,sum) )
+   invoke( "$KAPPA_DIR/setbound ndf={0} like={1}".format(umos,sum) )
+   invoke( "$KAPPA_DIR/setbound ndf={0} like={1}".format(imos,sum) )
 
 #  If required, save the Q, U and I images.
    if qui != None:
@@ -251,7 +306,7 @@ try:
    invoke( "$KAPPA_DIR/paste in={0} shift=\[0,0,1\] out={1}".format(planes,cube))
 
 #  Check that the cube has a POLANAL frame, as required by POLPACK. First
-#  note the DOmain of the original current Frame
+#  note the Domain of the original current Frame
    domain = invoke( "$KAPPA_DIR/wcsattrib ndf={0} mode=get name=Domain".format(cube) )
    try:
       invoke( "$KAPPA_DIR/wcsframe ndf={0} frame=POLANAL".format(cube) )
