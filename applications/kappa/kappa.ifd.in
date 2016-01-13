@@ -3217,6 +3217,25 @@ package kappa {
             helpkey *
         }
 
+         parameter refndf {
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {An NDF from which to copy the required Frame}
+            helpkey *
+        }
+
+         parameter retain {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Retain the original current Frame in the modified NDF?}
+            default FALSE
+            helpkey *
+        }
+
          parameter shift {
             size *
             type _DOUBLE

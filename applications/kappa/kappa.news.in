@@ -1,6 +1,24 @@
-1 KAPPA_Version_2.3
+1 KAPPA_Version_2.4
 
    A new release of KAPPA (@PACKAGE_VERSION@) is under development.  The main
+   changes are listed below.  For complete details of all
+   changes, see the "Release Notes" appendix in SUN/95.
+
+2 Modified_applications
+
+   o  WCSADD
+
+      -  Has a new option MAPTYPE=REFNDF, which causes a copy of a
+         co-ordinate Frame read from a reference NDF to be added
+         into the modified NDF.
+      -  New parameter RETAIN allows control over whether or not the
+         new Frame becomes the current Frame in the modified NDF on
+         exit.
+
+
+1 KAPPA_Version_2.3
+
+   A new release of KAPPA is available in Starlink 2015B.  The main
    changes are listed below.  For complete details of all
    changes, see the "Release Notes" appendix in SUN/95.
 

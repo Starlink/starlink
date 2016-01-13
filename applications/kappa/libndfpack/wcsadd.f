@@ -39,7 +39,8 @@
 *     type of the new Frame). The value of the Domain attribute for the
 *     new Frame can be specified using parameter DOMAIN. Other attribute
 *     values for the new Frame may be specified using parameters ATTRS.
-*     The new Frame becomes the current co-ordinate Frame in the NDF.
+*     The new Frame becomes the current co-ordinate Frame in the NDF
+*     (unless parameter RETAIN is set TRUE).
 *
 *     WCSADD will only generate Mappings with the same number of
 *     input and output axes; this number is determined by the number
@@ -104,6 +105,11 @@
 *        the standard domain names such as GRID, FRACTION, PIXEL, AXIS,
 *        and GRAPHICS. The supplied value is stripped of spaces, and
 *        converted to upper case before being used.
+*
+*        Note, if parameter MAPTYPE is set to "REFNDF", then the value
+*        supplied for parameter "DOMAIN" indicates the Domain of the
+*        Frame within the reference NDF that is to be copied (see
+*        parameter REFNDF).
 *     EPOCH = _DOUBLE (Read)
 *        If the basis Frame is specified using a "Sky Co-ordinate
 *        System" specification for a celestial co-ordinate system (see
@@ -164,7 +170,10 @@
 *        - TIMEFRAME  -- A one-dimensional Frame representing moments
 *                        in time.
 *
-*        [!]
+*        Note, if parameter MAPTYPE is set to "REFNDF", then parameter
+*        "FRMTYPE" will not be used - the Frame used will instead always
+*        be a copy of the Frame from the reference NDF (as selected by
+*        parameter DOMAIN). [!]
 *     INVEXP = LITERAL (Read)
 *        The expressions to be used for the inverse co-ordinate
 *        transformations in a MathMap. See FOREXP.  INVEXP is only used
@@ -202,6 +211,10 @@
 *        - PINCUSHION -- A pincushion/barrel distortion (see parameters
 *                        DISCO and CENTRE)
 *
+*        - REFNDF     -- The Mapping is obtained by aligning the NDF
+*                        with a second reference NDF (see parameters
+*                        REFNDF)
+*
 *        - SHIFT      -- A translation (see parameter SHIFT)
 *
 *        - UNIT       -- A unit mapping
@@ -218,6 +231,23 @@
 *        null (!) value if you do not wish to add a Frame to an NDF (you
 *        can still use the MAPOUT parameter to write the Mapping to a
 *        text file).
+*     REFNDF = NDF (Read)
+*        A reference NDF from which to obtain the Mapping and Frame. The
+*        NDFs specified by parameters NDF and REFNDF are aligned in a
+*        suitable coordinate system (usually their current Frames - an
+*        error is reported if the two NDFs cannot be aligned). The Mapping
+*        from the basis Frame in "NDF" (specified by parameter FRAME) to
+*        the required Frame in "REFNDF" (specified by parameter DOMAIN) is
+*        then found and used. The Frame added into "NDF" is always a copy
+*        of the reference Frame - regardless of the setting of parameter
+*        FRMTYPE. Parameter REFNDF is only used when parameter MAPTYPE is
+*        set to "REFNDF", in which case a value must also be supplied for
+*        parameter NDF (an error will be reported otherwise).
+*     RETAIN = _LOGICAL (Read)
+*        Indicates whether the original current Frame should be retained
+*        within the WCS FrameSet of the modified NDF (see parameter NDF).
+*        If FALSE, the newly added Frame is the current Frame on exit.
+*        Otherwise, the original current Frame is retained on exit. [FALSE]
 *     SHIFT( ) = _DOUBLE (Read)
 *        A vector giving the displacement represented by the
 *        translation. There must be one element for each axis.  SHIFT
@@ -341,6 +371,14 @@
 *        This file could then be used by REGRID to resample
 *        the pixels of an NDF according to this transformation.
 *        No NDF is accessed.
+*     wcsadd qmosaic frame=grid domain=polanal maptype=refndf refndf=imosaic
+*        This adds a new co-ordinate Frame into the WCS component of the
+*        NDF called qmosaic. The new Frame has domain "POLANAL" and is
+*        copied from the NDF called imosaic (an error is reported if
+*        there is no such Frame with imosaic). The new co-ordinate Frame
+*        is attached to the base Frame (i.e. GRID co-ordinates) within
+*        qmosaic using a Mapping that produces alignment between qmosaic
+*        and imosaic.
 
 *  Notes:
 *     -  The new Frame has the same number of axes as the basis Frame.
@@ -409,6 +447,9 @@
 *        Added support for TimeFrames.
 *     15-NOV-2012 (DSB):
 *        Added parameter TRANSFER.
+*     13-JAN-2016 (DSB):
+*        - Added MAPTYPE=REFNDF option.
+*        - Added parameter RETAIN.
 *     {enter_further_changes_here}
 
 *-
@@ -473,9 +514,15 @@
       INTEGER I                  ! General loop count
       INTEGER IAT                ! Used length of a string
       INTEGER IBASIS             ! Index of basis Frame
+      INTEGER ICOPY              ! Index of Frame to be copied
+      INTEGER ICUR0              ! Index of original current Frame in IWCS
+      INTEGER ICURR              ! Index of original current Frame in IWCSR
       INTEGER IGRP               ! GRP group for MATHMAP expresssions
       INTEGER INDF               ! NDF identifier for NDF being modified
-      INTEGER IWCS               ! Pointer to WCS FrameSet
+      INTEGER INDFR              ! NDF identifier for reference NDF
+      INTEGER IWCS               ! Pointer to WCS FrameSet for INDF
+      INTEGER IWCS2              ! Merged WCS FrameSet
+      INTEGER IWCSR              ! Copy of WCS FrameSet for INDFR
       INTEGER J                  ! Column index
       INTEGER K                  ! Index within supplied list of
                                  ! coefficients
@@ -488,6 +535,7 @@
                                  ! coefficients
       INTEGER NFEXP              ! Number of expressions for forward
                                  ! transforms
+      INTEGER NFRM               ! Number of Frames in original FrameSet
       INTEGER NIEXP              ! Number of expressions for inverse
                                  ! transforms
       INTEGER RESULT             ! Pointer to result FrameSet
@@ -496,6 +544,7 @@
       INTEGER WORK( NDF__MXDIM ) ! Work space
       LOGICAL FIBOTH             ! Do we have both forward and inverse
                                  ! mappings?
+      LOGICAL RETAIN             ! Retain the original current Frame?
       LOGICAL SIMPFI             ! SimpFI attribute of MathMap
       LOGICAL SIMPIF             ! SimpIF attribute of MathMap
       LOGICAL XFER               ! Transfer attributes from basis to new frame?
@@ -538,6 +587,9 @@
 *  Get the WCS FrameSet associated with the NDF.
          CALL KPG1_GTWCS( INDF, IWCS, STATUS )
 
+*  Record the index of the original current Frame.
+         ICUR0 = AST_GETI( IWCS, 'Current', STATUS )
+
 *  Get the existing Frame which is to be used as the basis for the new
 *  Frame.   The selected Frame becomes the Current Frame.
          CALL NDF_MSG( 'NDF', INDF )
@@ -557,7 +609,7 @@
 
 *  Get the type of Mapping which is to be used.
       CALL PAR_CHOIC( 'MAPTYPE', 'LINEAR', 'DIAGONAL,FILE,LINEAR,'//
-     :                'MATH,PINCUSHION,SHIFT,UNIT,ZOOM', .FALSE.,
+     :                'MATH,PINCUSHION,REFNDF,SHIFT,UNIT,ZOOM', .FALSE.,
      :                MAPTYP, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -738,6 +790,49 @@
          CALL AST_SETL( MAP, 'SimpFI', SIMPFI, STATUS )
          CALL AST_SETL( MAP, 'SimpIF', SIMPIF, STATUS )
 
+*  Create a Mapping to a Frame in a different NDF, aligning the two NDFs
+*  in an appropriate Frame.
+      ELSE IF ( MAPTYP .EQ. 'REFNDF' ) THEN
+
+*  Obtain an identifier for the reference NDF.
+         CALL LPG_ASSOC( 'REFNDF', 'READ', INDFR, STATUS )
+
+*  Get the WCS FrameSet from the reference NDF.
+         CALL KPG1_GTWCS( INDFR, IWCSR, STATUS )
+
+*  Get the Frame within REFNDF that is to be added into NDF. It becomes
+*  the current Frame in IWCSR. We want to retain the original current
+*  Frame, so note its index first.
+         ICURR = AST_GETI( IWCSR, 'Current', STATUS )
+         CALL NDF_MSG( 'NDF', INDFR )
+         CALL KPG1_ASFRM( 'DOMAIN', 'EPOCH', IWCSR, 'PIXEL', 'AXIS',
+     :                    .TRUE., '^NDF', STATUS )
+
+*  Get the index of the Frame to be copied, and then reinstate the
+*  original current Frame within IWCSR.
+         ICOPY = AST_GETI( IWCSR, 'Current', STATUS )
+         CALL AST_SETI( IWCSR, 'Current', ICURR, STATUS )
+
+*  Merge the two FrameSets by aligning them in a common Frame. The IWCS
+*  FrameSet is modified on exit to include copies of all the Frames in
+*  IWCSR. First note the original number of Frames in IWCS so that we can
+*  identify which Frame is which afterwards. Also, use a copy of IWCS so
+*  that we do not modify the original.
+         IWCS2 = AST_COPY( IWCS, STATUS )
+         NFRM = AST_GETI( IWCS2, 'NFrame', STATUS )
+         CALL KPG1_ASMRG( IWCS2, IWCSR, ' ', .FALSE., 3, STATUS )
+
+*  Modify ICOPY so that it gives the index within IWCS2 of the Frame being
+*  copied.
+         ICOPY = ICOPY + NFRM
+
+*  Get the reuqired Mapping, and simplify it.
+         MAP = AST_GETMAPPING( IWCS2, IBASIS, ICOPY, STATUS )
+         MAP = AST_SIMPLIFY( MAP, STATUS )
+
+*  Get the Frame to be added into the returned NDF.
+         FRMN = AST_GETFRAME( IWCS2, ICOPY, STATUS )
+
 *  Create a PcdMap.
       ELSE IF ( MAPTYP .EQ. 'PINCUSHION' ) THEN
 
@@ -788,8 +883,10 @@
 *  Get the Frame to add.
 *  =====================
 
-*  We only need to do this if a basis Frame was supplied.
-      IF( FRMB .NE. AST__NULL ) THEN
+*  We only need to do this if a basis Frame was supplied. Also, if we are
+*  copying a Frame from a reference NDF, we will already have the required
+*  Frame pointer (FRMN).
+      IF( FRMB .NE. AST__NULL .AND. MAPTYP .NE. 'REFNDF' ) THEN
 
 *  Choose the suggested default for parameter FRMTYPE. Make it equal to
 *  the class of the basis Frame.
@@ -976,7 +1073,16 @@
 *  If we have an NDF, add the new Frame into the FrameSet, and store
 *  the modified FrameSet in the NDF.
       IF( INDF .NE. NDF__NOID ) THEN
+
+*  Add the new Frame into the FrameSet. It becomes the current Frame.
          CALL AST_ADDFRAME( IWCS, IBASIS, MAP, FRMN, STATUS )
+
+*  See if the original current Frame is to be retained. If so, reinstate
+*  the original current Frame.
+         CALL PAR_GET0L( 'RETAIN', RETAIN, STATUS )
+         IF( RETAIN ) CALL AST_SETI( IWCS, 'Current', ICUR0, STATUS )
+
+*  Store the FrameSet in the NDF.
          CALL NDF_PTWCS( IWCS, INDF, STATUS )
       END IF
 

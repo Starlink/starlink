@@ -3,12 +3,12 @@
 % -----------------------------------------------------------------------------
 \stardoccategory  {Starlink User Note}
 \stardocinitials  {SUN}
-\stardocsource    {sun95.42}
-\stardocnumber    {95.42}
+\stardocsource    {sun95.43}
+\stardocnumber    {95.43}
 \stardocauthors   {Malcolm J. Currie \& David S. Berry}
-\stardocdate      {2015 September 4}
+\stardocdate      {2016 January 13}
 \stardoctitle     {KAPPA --- Kernel Application Package}
-\stardocversion   {2.3}
+\stardocversion   {2.4}
 \stardocmanual    {User's Guide}
 % -----------------------------------------------------------------------------
 \stardocabstract{
@@ -46222,7 +46222,8 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
       Frame). The value of the \htmlattref{Domain}{Domain}~ attribute for
       the new Frame can be specified using Parameter DOMAIN.  Other attribute
       values for the new Frame may be specified using Parameter ATTRS.  The
-      new Frame becomes the current co-ordinate Frame in the NDF.
+      new Frame becomes the current co-ordinate Frame in the NDF (unless
+      parameter RETAIN is set TRUE).
 
       WCSADD will only generate Mappings with the same number of
       input and output axes; this number is determined by the number
@@ -46298,6 +46299,11 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
          \htmlref{standard domain names}{se:domains}~
          such as GRID, FRACTION, PIXEL, AXIS and GRAPHICS.  The supplied value is
          stripped of spaces, and converted to upper case before being used.
+
+         Note, if parameter MAPTYPE is set to ``REFNDF'', then the value
+	 supplied for parameter DOMAIN indicates the Domain of the Frame
+	 within the reference NDF that is to be copied (see parameter
+	 REFNDF).
       }
       \sstsubsection{
          EPOCH = \_DOUBLE (Read)
@@ -46374,8 +46380,15 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
             \texttt{"SPECFRAME"}  --- A one-dimensional Frame representing positions
                             within an electromagnetic spectrum.
 
+            \sstitem
+            \texttt{"TIMEFRAME"}  --- A one-dimensional Frame representing
+                            moments in time.
          }
-         \texttt{[!]}
+
+         Note, if parameter MAPTYPE is set to ``REFNDF'', then parameter
+	 FRMTYPE will not be used - the Frame used will instead always be
+	 a copy of the Frame from the reference NDF (as selected by
+	 parameter DOMAIN). \texttt{[!]}
       }
       \sstsubsection{
          INVEXP = LITERAL (Read)
@@ -46432,6 +46445,10 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
                             Parameters DISCO and CENTRE)
 
             \sstitem
+            \texttt{"REFNDF"}      --- The Mapping is obtained by aligning
+                 the NDF with a second reference NDF (see Parameter REFNDF)
+
+            \sstitem
             \texttt{"SHIFT"}      --- A translation (see Parameter SHIFT)
 
             \sstitem
@@ -46455,6 +46472,30 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
          The NDF in which to store a new co-ordinate Frame.  Supply a null (\texttt{{!}})
          value if you do not wish to add a Frame to an NDF (you can still
          use the MAPOUT parameter to write the Mapping to a text file).
+      }
+      \sstsubsection{
+         REFNDF = NDF (Read)
+      }{
+         A reference NDF from which to obtain the Mapping and Frame. The
+	 NDFs specified by parameters NDF and REFNDF are aligned in a
+	 suitable coordinate system (usually their current Frames - an
+	 error is reported if the two NDFs cannot be aligned). The
+	 Mapping from the basis Frame in ``NDF'' (specified by parameter
+	 FRAME) to the required Frame in ``REFNDF'' (specified by parameter
+	 DOMAIN) is then found and used. The Frame added into ``NDF'' is
+	 always a copy of the reference Frame - regardless of the setting
+	 of parameter FRMTYPE. Parameter REFNDF is only used when
+	 parameter MAPTYPE is set to ``REFNDF'', in which case a value must
+	 also be supplied for parameter NDF (an error will be reported
+	 otherwise).
+      }
+      \sstsubsection{
+         RETAIN = \_LOGICAL (Read)
+      }{
+         Indicates whether the original current Frame should be retained
+         within the WCS FrameSet of the modified NDF (see parameter NDF).
+         If FALSE, the newly added Frame is the current Frame on exit.
+         Otherwise, the original current Frame is retained on exit. \texttt{[FALSE]}
       }
       \sstsubsection{
          SHIFT( ) = \_DOUBLE (Read)
@@ -46621,6 +46662,17 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
          This file could then be used by REGRID to resample
          the pixels of an NDF according to this transformation.
          No NDF is accessed.
+      }
+      \sstexamplesubsection{
+         wcsadd qmosaic frame=grid domain=polanal maptype=refndf refndf=imosaic
+      }{
+         This adds a new co-ordinate Frame into the WCS component of the
+         NDF called qmosaic. The new Frame has domain ``POLANAL'' and is
+         copied from the NDF called imosaic (an error is reported if
+         there is no such Frame with imosaic). The new co-ordinate Frame
+         is attached to the base Frame (\emph{i.e.} GRID co-ordinates) within
+         qmosaic using a Mapping that produces alignment between qmosaic
+         and imosaic.
       }
    }
    \sstnotes{
@@ -53032,57 +53084,20 @@ and HDS data types is as follows:
 
 \newpage
 
-\section{\xlabel{se_changes}Release Notes---V2.3\label{se:changes}}
-
-\subsection{New Commands}
-The following new applications have been added:
-
-\begin{description}
-   \item [\htmlref{NDFCOMPARE}{NDFCOMPARE}] \mbox{}
-   Compares two NDFs and reports whether they are equivalent, based
-   on a range of different tests.
-\end{description}
+\section{\xlabel{se_changes}Release Notes---V2.4\label{se:changes}}
 
 \subsection{Modified Commands}
 The following applications have been modified:
 \begin{description}[style=nextline]
 
-   \item [\htmlref{BEAMFIT}{BEAMFIT}]\mbox{}
+   \item [\htmlref{WCSADD}{WCSADD}]\mbox{}
       \begin{itemize}
-        \item Now works for HEALPix maps with its apparently non-square pixels.
-        \item A long-standing issue of occasional nonsense WCS errors
-        has been rectified by using a better-conditioned algorithm.
-      \end{itemize}
-
-   \item [\htmlref{FITSMOD}{FITSMOD}]\mbox{}
-      \begin{itemize}
-        \item A missing END header may be appended using the Write mode.
-        Any associated value and/or comment are ignored.  The easiest way
-        to append an END header is with the wrapper
-        \htmlref{FITSWRITE}{FITSWRITE}.
-      \end{itemize}
-
-   \item [\htmlref{NORMALIZE}{NORMALIZE}]\mbox{}
-      \begin{itemize}
-        \item Now calculates and displays Pearson's coefficient of linear
-        correlation on the remaining data at every iteration.
-        \item New Parameter CORR added to hold the last displayed correlation
-        coefficient.
-        \item New Parameters OUTSLOPE, OUTOFFSET and OUTCORR added. These
-        are one-dimensional NDFs in which the slopes, offsets and correlation
-        coefficients respectively are stored when operating in looping mode (\emph{i.e.}
-        LOOP=\texttt{TRUE}).
-      \end{itemize}
-
-   \item [\htmlref{ROTATE}{ROTATE}]\mbox{}
-      \begin{itemize}
-        \item Now writes out the rotation angle actually used to an output
-         parameter (ANGLEUSED).
-      \end{itemize}
-
-   \item [\htmlref{SQORST}{SQORST}]\mbox{}
-      \begin{itemize}
-         \item Propagates UNITS as it used to in the IMAGE-format version.
+        \item Has a new option MAPTYPE=REFNDF, which causes a copy of a
+              co-ordinate Frame read from a reference NDF to be added
+              into the modified NDF.
+        \item New parameter RETAIN allows control over whether or not the
+              new Frame becomes the current Frame in the modified NDF on
+              exit.
       \end{itemize}
 
 \end{description}
@@ -53516,6 +53531,61 @@ The following applications have been modified:
       \begin{itemize}
         \item  A new parameter ALIGNREF can be used to control the
         co-ordinate system in which the input NDFs are aligned.
+      \end{itemize}
+
+\end{description}
+
+\subsection{Release Notes---V2.3}
+
+\subsection{New Commands}
+The following new applications have been added:
+
+\begin{description}
+   \item [\htmlref{NDFCOMPARE}{NDFCOMPARE}] \mbox{}
+   Compares two NDFs and reports whether they are equivalent, based
+   on a range of different tests.
+\end{description}
+
+\subsection{Modified Commands}
+The following applications have been modified:
+\begin{description}[style=nextline]
+
+   \item [\htmlref{BEAMFIT}{BEAMFIT}]\mbox{}
+      \begin{itemize}
+        \item Now works for HEALPix maps with its apparently non-square pixels.
+        \item A long-standing issue of occasional nonsense WCS errors
+        has been rectified by using a better-conditioned algorithm.
+      \end{itemize}
+
+   \item [\htmlref{FITSMOD}{FITSMOD}]\mbox{}
+      \begin{itemize}
+        \item A missing END header may be appended using the Write mode.
+        Any associated value and/or comment are ignored.  The easiest way
+        to append an END header is with the wrapper
+        \htmlref{FITSWRITE}{FITSWRITE}.
+      \end{itemize}
+
+   \item [\htmlref{NORMALIZE}{NORMALIZE}]\mbox{}
+      \begin{itemize}
+        \item Now calculates and displays Pearson's coefficient of linear
+        correlation on the remaining data at every iteration.
+        \item New Parameter CORR added to hold the last displayed correlation
+        coefficient.
+        \item New Parameters OUTSLOPE, OUTOFFSET and OUTCORR added. These
+        are one-dimensional NDFs in which the slopes, offsets and correlation
+        coefficients respectively are stored when operating in looping mode (\emph{i.e.}
+        LOOP=\texttt{TRUE}).
+      \end{itemize}
+
+   \item [\htmlref{ROTATE}{ROTATE}]\mbox{}
+      \begin{itemize}
+        \item Now writes out the rotation angle actually used to an output
+         parameter (ANGLEUSED).
+      \end{itemize}
+
+   \item [\htmlref{SQORST}{SQORST}]\mbox{}
+      \begin{itemize}
+         \item Propagates UNITS as it used to in the IMAGE-format version.
       \end{itemize}
 
 \end{description}

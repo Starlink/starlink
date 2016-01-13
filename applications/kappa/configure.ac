@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(kappa, 2.3-2, starlink@jiscmail.ac.uk)
+AC_INIT(kappa, 2.4, starlink@jiscmail.ac.uk)
 AC_CONFIG_AUX_DIR([build-aux])
 
 dnl    Require autoconf-2.50 at least
@@ -25,12 +25,12 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 
 STAR_CHECK_PROGS(prohlp,sst)
 STAR_CHECK_PROGS(ifd2star)
-STAR_CHECK_PROGS(awish) 
-STAR_CHECK_PROGS(atclsh) 
-STAR_CHECK_PROGS(hlib) 
+STAR_CHECK_PROGS(awish)
+STAR_CHECK_PROGS(atclsh)
+STAR_CHECK_PROGS(hlib)
 STAR_CHECK_PROGS(fgeneric)
 STAR_CHECK_PROGS(perl)
- 
+
 dnl    tk requires X11 so we need the X11 include path
 AC_PATH_XTRA
 
@@ -38,7 +38,7 @@ dnl    Look for tcl/tk system
 STAR_PATH_TCLTK(8.5, [tk])
 AC_CHECK_HEADERS([tcl.h tk.h])
 
-dnl KAPPA source files depend on include files from the following components 
+dnl KAPPA source files depend on include files from the following components
 STAR_DECLARE_DEPENDENCIES([build], [agi ast chr cnf fio grp hds ifd kaplibs mers ndf one par pcs prm psx sae shl tcl tk trn])
 
 dnl The KAPPA link script links against the following components
@@ -58,7 +58,7 @@ STAR_MESSGEN(kap_err.msg)
 
 AC_CONFIG_FILES([Makefile component.xml kappa.news
     kappa_mon.f ndfpack_mon.f kapview_mon.f kappa.ifd
-    kapsub/Makefile     libkapview/Makefile 
+    kapsub/Makefile     libkapview/Makefile
     libkappa/Makefile   libndfpack/Makefile])
 AC_CONFIG_FILES(kappa_link_adam,  [chmod +x kappa_link_adam])
 AC_CONFIG_FILES(lutedit.tcl,      [chmod +x lutedit.tcl])
