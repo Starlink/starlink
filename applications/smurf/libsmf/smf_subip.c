@@ -65,6 +65,8 @@
 *        - The supplied bolometer data is now corrected for extinction
 *        before subtracting the IP. The extinction correction is finally
 *        removed before returning the IP corrected bolometer data.
+*     15-JAN-2016 (DSB):
+*        Multi-thread the angle calculations.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -106,30 +108,43 @@
 
 /* Prototypes for local static functions. */
 static void smf1_subip( void *job_data_ptr, int *status );
-static double *smf1_calcang( smfData *data, const char *trsys, int *status );
+static double *smf1_calcang( ThrWorkForce *wf, smfData *data, const char *trsys,
+                             int *status );
 
 /* Local data types */
 typedef struct smfSubIPData {
    JCMTState *allstate;
    const char *qu;
+   const char *trsys;
+   const double *fx;
+   const double *fy;
+   const double *gx;
+   const double *gy;
    dim_t b1;
    dim_t b2;
+   dim_t t1;
+   dim_t t2;
    dim_t nbolo;
    dim_t ntslice;
    double *angcdata;
    double *c0data;
    double *imapdata;
+   double *ipang;
    double *p0data;
    double *p1data;
-   double *res_data;
-   double *ipang;
    double *pl1data;
+   double *res_data;
+   double *result;
    int *lut_data;
+   int oper;
    size_t bstride;
    size_t tstride;
+   smfData *data;
    smf_qual_t *qua_data;
 } SmfSubIPData;
 
+/* A mutex used to serialise access to the smfData */
+static pthread_mutex_t data_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
                  int *status ) {
@@ -301,7 +316,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    in the sense of rotation from focal plane Y to focal plane X, for
    every bolometer sample in the smfData. The values are bolo ordered so
    that "bstride" is 1 and "tstsride" is nbolo. */
-         ipang = smf1_calcang( data, trsys, status );
+         ipang = smf1_calcang( wf, data, trsys, status );
 
 /* Get the number of bolometers and time slices for the current subarray,
    together with the strides between adjacent bolometers and adjacent
@@ -407,6 +422,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
             pdata->angcdata = angcdata;
             pdata->allstate = data->hdr->allState;
             pdata->pl1data = pl1data;
+            pdata->oper = 1;
 
 /* Submit the job for execution by the next available thread. */
             thrAddJob( wf, 0, pdata, smf1_subip, 0, NULL, status );
@@ -466,18 +482,23 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    JCMTState *state;
    SmfSubIPData *pdata;
    const char *qu;
+   const char *trsys;
    dim_t ibolo;
    dim_t itime;
    dim_t nbolo;
    dim_t ntslice;
+   const double *fx;
+   const double *fy;
+   const double *gx;
+   const double *gy;
    double *imapdata;
    double *pa;
    double *pr;
    double angc;
+   double c0;
    double ca;
    double cb;
    double cc;
-   double c0;
    double cosval;
    double ival;
    double p0;
@@ -487,10 +508,11 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    double sinval;
    double ufp;
    double utr;
-   int bad;
    int *pl;
+   int bad;
    size_t bstride;
    size_t tstride;
+   smfData *data;
    smf_qual_t *pq;
 
 /* Check inherited status */
@@ -507,119 +529,218 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    bstride = pdata->bstride;
    imapdata = pdata->imapdata;
    qu = pdata->qu;
+   data = pdata->data;
+   trsys = pdata->trsys;
+   gx = pdata->gx;
+   gy = pdata->gy;
+   fx = pdata->fx;
+   fy = pdata->fy;
+
+/* Subtract the IP from a range of bolometers. */
+   if( pdata->oper == 1 ) {
 
 /* Loop round each bolometer to be processed by this thread. */
-   for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++ ) {
+      for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++ ) {
 
 /* Get a pointer to the first quality value for the current bolometer. */
-      pq = pdata->qua_data + ibolo*bstride;
+         pq = pdata->qua_data + ibolo*bstride;
 
 /* Check that the whole bolometer has not been flagged as bad. */
-      if( !( *pq & SMF__Q_BADB ) ) {
+         if( !( *pq & SMF__Q_BADB ) ) {
 
 /* Get the IP model parameters for this bolometer. */
-         if( pdata->p0data ) {    /* "JK" model */
-            p0 = pdata->p0data[ ibolo ];
-            p1 = pdata->p1data[ ibolo ];
-            c0 = pdata->c0data[ ibolo ];
-            angc = pdata->angcdata[ ibolo ];
-            bad = ( p0 == VAL__BADD || p1 == VAL__BADD ||
-                    c0 == VAL__BADD || angc == VAL__BADD );
+         if( pdata->p0data ) {       /* "JK" model */
+               p0 = pdata->p0data[ ibolo ];
+               p1 = pdata->p1data[ ibolo ];
+               c0 = pdata->c0data[ ibolo ];
+               angc = pdata->angcdata[ ibolo ];
+               bad = ( p0 == VAL__BADD || p1 == VAL__BADD ||
+                       c0 == VAL__BADD || angc == VAL__BADD );
 
 /* Cache values needed in the itime loop. */
-            ca = p0*cos( 2*angc*AST__DD2R );
-            cb = p0*sin( 2*angc*AST__DD2R );
-            cc = 2*( c0 + angc )*AST__DD2R;
+               ca = p0*cos( 2*angc*AST__DD2R );
+               cb = p0*sin( 2*angc*AST__DD2R );
+               cc = 2*( c0 + angc )*AST__DD2R;
 
-         } else {      /* "PL1" model */
-            p1 = VAL__BADD;
-            ca = pdata->pl1data[0];
-            cb = pdata->pl1data[1];
-            cc = pdata->pl1data[2];
-            bad = ( ca == VAL__BADD || cb == VAL__BADD || cc == VAL__BADD );
-         }
-
-/* If any parameter is bad, flag the whole bolometer as unusable. */
-         if( bad ) {
-            for( itime = 0; itime < ntslice; itime++ ) {
-               *pq |= ( SMF__Q_IP | SMF__Q_BADB );
-               pq += tstride;
+         } else {         /* "PL1" model */
+               p1 = VAL__BADD;
+               ca = pdata->pl1data[0];
+               cb = pdata->pl1data[1];
+               cc = pdata->pl1data[2];
+               bad = ( ca == VAL__BADD || cb == VAL__BADD || cc == VAL__BADD );
             }
 
+/* If any parameter is bad, flag the whole bolometer as unusable. */
+            if( bad ) {
+               for( itime = 0; itime < ntslice; itime++ ) {
+                  *pq |= ( SMF__Q_IP | SMF__Q_BADB );
+                  pq += tstride;
+               }
+
 /* If all the IP parameters are good, we can do the IP correction. */
-         } else {
+            } else {
 
 /* Get pointers to the first residual (i.e. the uncorrected Q or U value)
    and lut value (i.e. the index of the map pixel that receives the Q/U
    value) for the current bolometer. [ipang is always bolo-ordered so
    "bstride" is 1 and "tstride" is nbolo]. */
-            pr = pdata->res_data + ibolo*bstride;
-            pl = pdata->lut_data + ibolo*bstride;
-            pa = pdata->ipang ? pdata->ipang + ibolo : NULL;
+               pr = pdata->res_data + ibolo*bstride;
+               pl = pdata->lut_data + ibolo*bstride;
+               pa = pdata->ipang ? pdata->ipang + ibolo : NULL;
 
 /* Loop round each time slice, maintaining a pointer to the JCMTState
    info for the slice (we need this to get the elevation for each slice). */
-            state = pdata->allstate;
-            for( itime = 0; itime < ntslice; itime++,state++ ) {
+               state = pdata->allstate;
+               for( itime = 0; itime < ntslice; itime++,state++ ) {
 
 /* If there is no total intensity value for the sample, flag the sample. */
-               if( *pl == VAL__BADI ) {
-                  *pq |= SMF__Q_IP;
+                  if( *pl == VAL__BADI ) {
+                     *pq |= SMF__Q_IP;
 
 /* Get the total intensity for the sample. If it is bad, flag the sample. */
-               } else {
-                  ival = imapdata[ *pl ];
-                  if( ival == VAL__BADD ) {
-                     *pq |= SMF__Q_IP;
+                  } else {
+                     ival = imapdata[ *pl ];
+                     if( ival == VAL__BADD ) {
+                        *pq |= SMF__Q_IP;
 
 /* Skip this sample if the residual is bad or flagged, if the focal
    plane orientation is undefined, or the telescope elevation is
    unknown. */
-                  } else if( *pr != VAL__BADD && !( *pq & SMF__Q_MOD ) &&
-                             ( !pa || *pa != VAL__BADD ) &&
-                             state->tcs_az_ac2 != VAL__BADD) {
+                     } else if( *pr != VAL__BADD && !( *pq & SMF__Q_MOD ) &&
+                                ( !pa || *pa != VAL__BADD ) &&
+                                state->tcs_az_ac2 != VAL__BADD) {
 
 /* Find the normalised instrumental Q and U. These are with respect to the
    focal plane Y axis. */
-                     if( pdata->p0data ) {    /* "JK" model */
-                        qfp = ca + p1*cos( cc + 2*state->tcs_az_ac2 );
-                        ufp = cb + p1*sin( cc + 2*state->tcs_az_ac2 );
-                     } else {                 /* "PL1" model */
-                        p1 = ca + cb*state->tcs_az_ac2 + cc*state->tcs_az_ac2*state->tcs_az_ac2;
-                        qfp = p1*cos( -2*state->tcs_az_ac2 );
-                        ufp = p1*sin( -2*state->tcs_az_ac2 );
-                     }
+                     if( pdata->p0data ) {       /* "JK" model */
+                           qfp = ca + p1*cos( cc + 2*state->tcs_az_ac2 );
+                           ufp = cb + p1*sin( cc + 2*state->tcs_az_ac2 );
+                     } else {                    /* "PL1" model */
+                           p1 = ca + cb*state->tcs_az_ac2 + cc*state->tcs_az_ac2*state->tcs_az_ac2;
+                           qfp = p1*cos( -2*state->tcs_az_ac2 );
+                           ufp = p1*sin( -2*state->tcs_az_ac2 );
+                        }
 
 /* Rotate them to match the reference frame of the supplied Q and U
    values (unless the supplied Q and U values are w.r.t focal plane Y,
    in which case they already use the required reference direction). */
-                     if( pa ) {
-                        cosval = cos( 2*( *pa ) );
-                        sinval = sin( 2*( *pa ) );
-                        qtr = qfp*cosval + ufp*sinval;
-                        utr = -qfp*sinval + ufp*cosval;
-                     } else {
-                        qtr = qfp;
-                        utr = ufp;
-                     }
+                        if( pa ) {
+                           cosval = cos( 2*( *pa ) );
+                           sinval = sin( 2*( *pa ) );
+                           qtr = qfp*cosval + ufp*sinval;
+                           utr = -qfp*sinval + ufp*cosval;
+                        } else {
+                           qtr = qfp;
+                           utr = ufp;
+                        }
 
 /* Correct the residual Q or U value. */
-                     if( *qu == 'Q' ) {
-                        *pr -= ival*qtr;
-                     } else {
-                        *pr -= ival*utr;
+                        if( *qu == 'Q' ) {
+                           *pr -= ival*qtr;
+                        } else {
+                           *pr -= ival*utr;
+                        }
                      }
                   }
-               }
 
 /* Move onto the next time slice. */
-               pq += tstride;
-               pr += tstride;
-               pl += tstride;
-               if( pa ) pa += nbolo;
+                  pq += tstride;
+                  pr += tstride;
+                  pl += tstride;
+                  if( pa ) pa += nbolo;
+               }
             }
          }
       }
+
+/* Calculate the reference direction for a range of time slices. */
+   } else if( pdata->oper == 2 ) {
+
+      AstFrameSet *wcs;
+      AstMapping *g2s;
+      AstMapping *s2f;
+      double *fx2;
+      double *fy2;
+      double *pr;
+      double *sx;
+      double *sy;
+
+/* Allocate arrays to hold the sky coords for every bolometer. */
+      sx = astMalloc( nbolo*sizeof( *sx ) );
+      sy = astMalloc( nbolo*sizeof( *sy ) );
+
+/* Allocate arrays to hold the focal plane coords of a point slightly to
+   the north of every bolometer. */
+      fx2 = astMalloc( nbolo*sizeof( *fx2 ) );
+      fy2 = astMalloc( nbolo*sizeof( *fy2 ) );
+      if( *status == SAI__OK ) {
+
+/* Loop over all time slices. */
+         pr = pdata->result + pdata->t1*nbolo;
+         for( itime = pdata->t1; itime <= pdata->t2; itime++ ) {
+
+/* Get the WCS FrameSet for the time slice. Use a mutex to prevent multiple
+   threads writing to the header at the same time. Take a deep copy of
+   the FrameSet so that we can releasae the smfData immediately. */
+            thrMutexLock( &data_mutex, status );
+            smf_lock_data( data, 1, status );
+            smf_tslice_ast( data, itime, 1, NO_FTS, status );
+            wcs = data->hdr->wcs;
+            if( wcs ) wcs = astCopy( wcs );
+            smf_lock_data( data, 0, status );
+            thrMutexUnlock( &data_mutex, status );
+
+/* Get the WCS FrameSet for the time slice, and set its current Frame to the
+   frame used as the reference by the Q/U bolometer values. */
+            if( wcs ) {
+               astSetC( wcs, "System", trsys );
+
+/* Get the mapping from GRID to SKY. */
+               astBegin;
+               g2s = astSimplify( astGetMapping( wcs, AST__BASE, AST__CURRENT ));
+
+/* Get the mapping from SKY to focal plane (x,y) (the index of the FPLANE
+   Frame is fixed at 3 by file sc2ast.c). */
+               s2f = astSimplify( astGetMapping( wcs, AST__CURRENT, 3 ) );
+
+/* Transform the grid coords of all bolometers to SKY coordinates using the FrameSet. */
+               astTran2( g2s, nbolo, gx, gy, 1, sx, sy );
+
+/* Increment the sky positions slightly to the north. */
+               for( ibolo = 0; ibolo < nbolo; ibolo++ ) sy[ ibolo ] += 1.0E-6;
+
+/* Transform these modified sky coordinates to focal plane. */
+               astTran2( s2f, nbolo, sx, sy, 1, fx2, fy2 );
+               astEnd;
+
+/* Loop round all bolometers. */
+               for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+
+/* Get the angle from north to focal plane Y, measured positive in the
+   sense of rotation from focal plane Y to focal plane X. */
+                  if(  fx[ibolo] != VAL__BADD &&  fy[ibolo] != VAL__BADD &&
+                      fx2[ibolo] != VAL__BADD && fy2[ibolo] != VAL__BADD ) {
+                     *(pr++) = atan2( fx[ibolo] - fx2[ibolo], fy2[ibolo] - fy[ibolo] );
+                  } else {
+                     *(pr++) = VAL__BADD;
+                  }
+               }
+
+            } else {
+               for( ibolo = 0; ibolo < nbolo; ibolo++ ) *(pr++) = VAL__BADD;
+            }
+         }
+      }
+
+/* Free resources. */
+      fx2 = astFree( fx2 );
+      fy2 = astFree( fy2 );
+      sx = astFree( sx );
+      sy = astFree( sy );
+
+   } else if( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( "", "smf_subip: Illegal operation %d", status, pdata->oper );
    }
 }
 
@@ -639,29 +760,26 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    plane X, for every bolometer sample in a smfData. The values are bolo
    ordered so that "bstride" is 1 and "tstsride" is nbolo. The returned
    array should be freed using astFree when no longer needed. */
-static double *smf1_calcang( smfData *data, const char *trsys, int *status ){
+static double *smf1_calcang( ThrWorkForce *wf, smfData *data, const char *trsys,
+                             int *status ){
 
 /* Local Variables: */
    AstFrameSet *fpfset;
-   AstFrameSet *wcs;
-   AstMapping *g2s;
-   AstMapping *s2f;
+   SmfSubIPData *job_data = NULL;
+   SmfSubIPData *pdata;
    dim_t ibolo;
-   dim_t itime;
    dim_t nbolo;
    dim_t ncol;
    dim_t ntslice;
-   double *fx2;
    double *fx;
-   double *fy2;
    double *fy;
    double *gx;
    double *gy;
-   double *pr;
    double *result;
-   double *sx;
-   double *sy;
+   int iw;
+   int nw;
    int subsysnum;
+   size_t tstep;
 
 /* Check the inherited status. Also return NULL if the Q/U values are
    already referenced to the focal plane Y axis (i.e. all returned angles
@@ -680,18 +798,15 @@ static double *smf1_calcang( smfData *data, const char *trsys, int *status ){
    gx = astMalloc( nbolo*sizeof( *gx ) );
    gy = astMalloc( nbolo*sizeof( *gy ) );
 
-/* Allocate arrays to hold the sky coords for every bolometer. */
-   sx = astMalloc( nbolo*sizeof( *sx ) );
-   sy = astMalloc( nbolo*sizeof( *sy ) );
-
 /* Allocate arrays to hold the focal plane coords for every bolometer. */
    fx = astMalloc( nbolo*sizeof( *fx ) );
    fy = astMalloc( nbolo*sizeof( *fy ) );
 
-/* Allocate arrays to hold the focal plane coords of a point slightly to
-   the north of every bolometer. */
-   fx2 = astMalloc( nbolo*sizeof( *fx2 ) );
-   fy2 = astMalloc( nbolo*sizeof( *fy2 ) );
+/* Create structures used to pass information to the worker threads. */
+   nw = wf ? wf->nworker : 1;
+   job_data = astMalloc( nw*sizeof( *job_data ) );
+
+/* Check the pointers can be used safely. */
    if( *status == SAI__OK ) {
 
 /* Initialise the arrays holding the grid coords for every bolometer. */
@@ -708,66 +823,68 @@ static double *smf1_calcang( smfData *data, const char *trsys, int *status ){
 /* Use this to transform the bolometrer GRID coords to focal plane. */
       astTran2( fpfset, nbolo, gx, gy, 1, fx, fy );
 
-/* Loop over all time slices. */
-      pr = result;
-      for( itime = 0; itime < ntslice; itime++ ) {
+/* Unlock the smfData so that it can be locked by the threaded code. */
+      smf_lock_data( data, 0, status );
 
-/* Get the WCS FrameSet for the time slice, and set its current Frame to the
-   frame used as the reference by the Q/U bolometer values. */
-         smf_tslice_ast( data, itime, 1, NO_FTS, status );
-         wcs = data->hdr->wcs;
-         if( wcs ) {
-            astSetC( wcs, "System", trsys );
+/* See how many time slices to process in each thread. */
+      tstep = ntslice/nw;
+      if( tstep == 0 ) tstep = 1;
 
-/* Get the mapping from GRID to SKY. */
-            astBegin;
-            g2s = astSimplify( astGetMapping( wcs, AST__BASE, AST__CURRENT ));
+/* Create jobs to get the angles for a range of time slices. */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
 
-/* Get the mapping from SKY to focal plane (x,y) (the index of the FPLANE
-   Frame is fixed at 3 by file sc2ast.c). */
-            s2f = astSimplify( astGetMapping( wcs, AST__CURRENT, 3 ) );
-
-/* Transform the grid coords of all bolometers to SKY coordinates using the FrameSet. */
-            astTran2( g2s, nbolo, gx, gy, 1, sx, sy );
-
-/* Increment the sky positions slightly to the north. */
-            for( ibolo = 0; ibolo < nbolo; ibolo++ ) sy[ ibolo ] += 1.0E-6;
-
-/* Transform these modified sky coordinates to focal plane. */
-            astTran2( s2f, nbolo, sx, sy, 1, fx2, fy2 );
-            astEnd;
-
-/* Loop round all bolometers. */
-            for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
-
-/* Get the angle from north to focal plane Y, measured positive in the
-   sense of rotation from focal plane Y to focal plane X. */
-               if(  fx[ibolo] != VAL__BADD &&  fy[ibolo] != VAL__BADD &&
-                   fx2[ibolo] != VAL__BADD && fy2[ibolo] != VAL__BADD ) {
-                  *(pr++) = atan2( fx[ibolo] - fx2[ibolo], fy2[ibolo] - fy[ibolo] );
-               } else {
-                  *(pr++) = VAL__BADD;
-               }
-            }
-
+/* Set the range of timeslices (t1 to t2) to be processed by the current
+   job. */
+         pdata->t1 = iw*tstep;
+         if( iw < nw - 1 ) {
+            pdata->t2 = pdata->t1 + tstep - 1;
          } else {
-            for( ibolo = 0; ibolo < nbolo; ibolo++ ) *(pr++) = VAL__BADD;
+            pdata->t2 = ntslice - 1;
          }
+
+/* Store the other info needed by the worker thread. */
+         pdata->nbolo = nbolo;
+         pdata->result = result;
+         pdata->oper = 2;
+         pdata->data = data;
+         pdata->trsys = trsys;
+         pdata->gx = gx;
+         pdata->gy = gy;
+         pdata->fx = fx;
+         pdata->fy = fy;
+
+/* Submit the job for execution by the next available thread. */
+         thrAddJob( wf, 0, pdata, smf1_subip, 0, NULL, status );
       }
+
+/* Wait for all jobs to complete. */
+      thrWait( wf, status );
+
+/* Lock the smfData so that it can be used by subsequent code in the main
+   thread. */
+      smf_lock_data( data, 1, status );
    }
 
 /* Free resources. */
-   fx = astFree( fx );
-   fy = astFree( fy );
-   fx2 = astFree( fx2 );
-   fy2 = astFree( fy2 );
-   sx = astFree( sx );
-   sy = astFree( sy );
    gx = astFree( gx );
    gy = astFree( gy );
+   fx = astFree( fx );
+   fy = astFree( fy );
+   job_data = astFree( job_data );
 
 /* Return the array of angle values. */
    return result;
+
 }
+
+
+
+
+
+
+
+
+
 
 
