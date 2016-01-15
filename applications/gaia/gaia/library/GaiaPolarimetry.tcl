@@ -66,9 +66,9 @@
 #     15-JUN-2000 (DSB):
 #        Original version.
 #     15-JAN-2016 (DSB):
-#        If a bad selection expression is entered, leave the bad expression 
+#        If a bad selection expression is entered, leave the bad expression
 #        visible so that it can be corrected. Previously, the bad expression
-#        was cleared, meaning the user had to start entering it again from 
+#        was cleared, meaning the user had to start entering it again from
 #        scratch, with potential new mistakes.
 #     {enter_further_changes_here}
 
@@ -265,7 +265,7 @@ itcl::class gaia::GaiaPolarimetry {
 #  Create the tab notebook for containing each page of options.
       itk_component add notebook {
          ::iwidgets::tabnotebook $w_.notebook -tabpos w -background \
-                                 yellow -width 620 -height 300
+                                 yellow -width 800 -height 400
       }
       pack $itk_component(notebook) -side top -fill both -expand 1 \
          -ipadx 1m -ipady 1m
