@@ -261,14 +261,14 @@ itcl::class gaia::GaiaPolUSelOpt {
 
 #  Store a new selection expression...
 #  -----------------------------------
-   public method setSexp {s} {
+   public method setSexp {s isgood} {
 
 #  Strip leading and trailing spaces from the expression
       set tidy [string trim $s]
 
-#  If the expression is not blank, and if it is not already in the
-#  associated menu, we now add the tidied expression to the menu.
-      if { $tidy != "" } {
+#  If the expression is good, and it is not blank, and if it is not already
+#  in the associated menu, we now add the tidied expression to the menu.
+      if { $tidy != "" && $isgood != 0 } {
          if { [lsearch -exact $values_($this,sexps) $tidy] == -1 } {
 
 #  The values to be stored in the menu are kept in element "sexps"

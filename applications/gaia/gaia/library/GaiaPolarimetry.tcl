@@ -65,6 +65,11 @@
 #  History:
 #     15-JUN-2000 (DSB):
 #        Original version.
+#     15-JAN-2016 (DSB):
+#        If a bad selection expression is entered, leave the bad expression 
+#        visible so that it can be corrected. Previously, the bad expression
+#        was cleared, meaning the user had to start entering it again from 
+#        scratch, with potential new mistakes.
 #     {enter_further_changes_here}
 
 #-
@@ -1084,9 +1089,8 @@ itcl::class gaia::GaiaPolarimetry {
 #  Get the current selection expression.
          set sexp [$itk_component(sel) getSexp]
 
-#  Initialise the expression to store back in the recently used
-#  expressions menu.
-         set newexp ""
+#  Initialise a flag to indicate that the expression is not usable.
+         set isgood 0
 
 #  If not blank...
          if { $sexp != "" } {
@@ -1096,18 +1100,18 @@ itcl::class gaia::GaiaPolarimetry {
                error_dialog "No catalogue is currently displayed"
 
 #  Otherwise, find the corresponding vectors and select them. If
-#  succesful, re-instate the original selection expression.
+#  succesful, indicate the expression is usable.
             } else {
                if { [newsel $reset 2 "expr" $sexp] } {
-                  set newexp $sexp
+                  set isgood 1
                }
             }
          }
 
 #  Return the new expression to the GaiaPolUSelOpt GUI. This also adds the
 #  expression to the list of recently used expressions (so long as the
-#  expression is not already in the list).
-         $itk_component(sel) setSexp $newexp
+#  expression is not already in the list and so long as it is good).
+         $itk_component(sel) setSexp $sexp $isgood
       }
    }
 
@@ -1176,7 +1180,7 @@ itcl::class gaia::GaiaPolarimetry {
 
 #  Ensure the current selection expression in the "Selecting" panel
 #  corresponds to the expression stored with the catalogue (if any).
-         $itk_component(sel) setSexp [$newcat_ getSexp]
+         $itk_component(sel) setSexp [$newcat_ getSexp] 1
 
 #  Enable or disable the Cut item in the Edit menu depending on whether
 #  there are currently any selected vectors.
