@@ -1,9 +1,16 @@
 1 POLPACK
 
- Version 3.4 of POLPACK (an applications package for processing imaging
+ Version 3.5 of POLPACK (an applications package for processing imaging
  polarimetry data) is now available. It is fully documented in SUN/223.
 
  The main changes since V3.4 are:
+
+ o  The POLWRTCL command now excludes any rows that contain one or more
+ bad values.  This means that literal bad values (-0.340282E+39) are no
+ longer passed onto the GAIA polarimetry toolbox.
+
+
+ The main changes between V3.3. and V3.4 were:
 
  o  The ANGLE parameter of the POLROTREF command has been removed. A new
  parameter called AXIS has been added, which allows the new reference

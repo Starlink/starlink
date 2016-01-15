@@ -24,7 +24,8 @@
 *  Description:
 *     This application creates a description of a POLPACK catalogue which
 *     can be used by the Tcl applications such as the GAIA polarimetry
-*     toolbox. The description includes the bulk data.
+*     toolbox. The description includes the bulk data. Rows that contain
+*     any bad values are omitted from the output catalogue.
 *
 *     The desciption of the catalogue is written to an output text file
 *     and takes the form of a Tcl code fragment which assigns values to
@@ -46,7 +47,7 @@
 *      zhi_     : The maximum Z column value in the data (only set
 *                 if the catalogue has a Z column).
 *      ncol_    : The number of columns in the catalogue
-*      nrow_    : The number of rows in the catalogue
+*      nrow_    : The number of good rows in the catalogue
 *      data_    : A Tcl list of rows. Each row is itself a Tcl list of
 *                 column values.
 *      ra_      : A central RA value in h:m:s format (may be blank)
@@ -210,7 +211,8 @@
       INTEGER NCIN               ! No. of columns in input catalogue
       INTEGER NCOL               ! No. of columns in output catalogue
       INTEGER NDIM               ! No. of dimensions in WCS Base Frame
-      INTEGER NROW               ! No. of rows in output catalogue
+      INTEGER NROW               ! No. of rows in input catalogue
+      INTEGER NROWGD             ! No. of rows in output catalogue
       INTEGER RACOL              ! Index of RA column within output catalogue
       INTEGER SKYFRM             ! An AST SkyFrame pointer
       INTEGER SZBAT              ! Size of each batch
@@ -702,18 +704,6 @@
 
       CALL FIO_WRITE( FD, '}', STATUS )
 
-*  Write out the number of rows and columns. Add one on for the ID column
-*  added by this program.
-      TEXT = 'set nrow_ '
-      IAT = 10
-      CALL CHR_PUTI( NROW, TEXT, IAT )
-      CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
-
-      TEXT = 'set ncol_ '
-      IAT = 10
-      CALL CHR_PUTI( NCOL, TEXT, IAT )
-      CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
-
 *  Write out the equinox.
       TEXT = 'set equinox_ '
       IAT = 13
@@ -749,8 +739,20 @@
      :                 %VAL( CNF_PVAL( IPW1 ) ),
      :                 %VAL( CNF_PVAL( IPW2 ) ),
      :                 %VAL( CNF_PVAL( IPW3 ) ),
-     :                 %VAL( CNF_PVAL( IPW4 ) ), STATUS,
+     :                 %VAL( CNF_PVAL( IPW4 ) ), NROWGD, STATUS,
      :                 %VAL( CNF_CVAL( IDLEN ) ) )
+
+*  Write out the number of good rows and columns. Add one on for the ID column
+*  added by this program.
+      TEXT = 'set nrow_ '
+      IAT = 10
+      CALL CHR_PUTI( NROWGD, TEXT, IAT )
+      CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
+
+      TEXT = 'set ncol_ '
+      IAT = 10
+      CALL CHR_PUTI( NCOL, TEXT, IAT )
+      CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
 *  Free the work space.
       CALL PSX_FREE( IPW1, STATUS )

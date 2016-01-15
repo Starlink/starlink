@@ -1,6 +1,7 @@
       SUBROUTINE POL1_WRTCL( CI, GOTRD, MAKERD, NDIM, GA, MAP, NCOL,
      :                       GCOL, NROW, IDCOL, ZCOL, FD, SZBAT, LBND,
-     :                       UBND, WORK1, WORK2, WORK3, WORK4, STATUS )
+     :                       UBND, WORK1, WORK2, WORK3, WORK4, NROWGD,
+     :                       STATUS )
 *+
 *  Name:
 *     POL1_WRTCL
@@ -14,11 +15,11 @@
 *  Invocation:
 *     CALL POL1_WRTCL( CI, GOTRD, MAKERD, NDIM, GA, MAP, NCOL, GCOL, NROW,
 *                      IDCOL, ZCOL, FD, SZBAT, LBND, UBND, WORK1, WORK2,
-*                      WORK3, WORK4, STATUS )
+*                      WORK3, WORK4, NROWGD, STATUS )
 
 *  Description:
 *     This routine writes out a Tcl list holding the column data in a
-*     catalogue.
+*     catalogue. Any rows containing one or more bad values are omitted.
 
 *  Arguments:
 *     CI = INTEGER (Given)
@@ -66,6 +67,8 @@
 *        GOTRD is .TRUE., or NCOL - 2 otherwise.
 *     WORK4( SZBAT ) = CHARACTER * ( * ) (Returned)
 *        Work array for character ID strings.
+*     NROWGD = INTEGER (Returned)
+*        No. of good rows (i.e. rows without any bad values).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -84,6 +87,8 @@
 *        Add arguments NDIM and GA.
 *     15-APR-2005 (PWD):
 *        Parameterize use of backslash to improve portability
+*     15-JAN-2016 (DSB):
+*        Do not write out any rows that contain one or more bad values.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -128,6 +133,7 @@
       DOUBLE PRECISION WORK2( SZBAT, 2 )
       REAL WORK3( SZBAT, * )
       CHARACTER WORK4( SZBAT )*(*)
+      INTEGER NROWGD
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -178,6 +184,7 @@
       INTEGER RANROW( NRAN )     ! Random row numbers
       INTEGER SAVRAN             ! No. of random rows saved so far
       INTEGER UNIT               ! Fortran IO unit for output text file
+      LOGICAL BADROW             ! Does row contain any bad column values?
       LOGICAL CHARID             ! Are existing ID stored as characters?
       LOGICAL MAKEID             ! Create ID values?
       LOGICAL READX              ! Do we still need to read the X column?
@@ -205,6 +212,9 @@
      :		0.842357278, 0.897625804, 0.938356161, 0.981330872 /
 
 *.
+
+*  Initialise
+      NROWGD = 0
 
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -372,28 +382,44 @@
 
                END IF
 
-*  Write out the values, appending a backslash at the end of each line to
-*  tell tcl to ignore the line break.
-               WRITE( UNIT, * ) '{', X, Y, ' '//CONTIN
-               WRITE( UNIT, * ) RA, DEC, ' '//CONTIN
+*  See if any of the row values are bad.
+               BADROW = .FALSE.
                DO J = 1, NCOL - 4, 4
                   DO K = 0, MIN( 3, NCOL - 4 - J )
-                     IF( J + K + 4 .EQ. IDCOL ) THEN
-                        IF( CHARID ) THEN
-                           WRITE( UNIT, '(1X,A1,A,A1,$)' ) '"',
-     :                                                  WORK4( I ),'"'
-                        ELSE
-                           WRITE( UNIT, '(1X,G13.6,$)' )
-     :                                               WORK3( I, J + K )
-                        END IF
-                     ELSE
-                        WRITE( UNIT, '(1X,G13.6,$)' ) WORK3( I, J + K )
+                     IF( J + K + 4 .NE. IDCOL .AND.
+     :                   WORK3( I, J + K ) .EQ. VAL__BADR ) THEN
+                        BADROW = .TRUE.
                      END IF
                   END DO
-                  WRITE( UNIT, * ) ' '//CONTIN
-
                END DO
-               WRITE( UNIT, * ) '} '//CONTIN
+
+*  If the row is good, rrite out the values, appending a backslash at the
+*  end of each line to tell tcl to ignore the line break.
+               IF( .NOT. BADROW ) THEN
+                  NROWGD = NROWGD + 1
+
+                  WRITE( UNIT, * ) '{', X, Y, ' '//CONTIN
+                  WRITE( UNIT, * ) RA, DEC, ' '//CONTIN
+                  DO J = 1, NCOL - 4, 4
+                     DO K = 0, MIN( 3, NCOL - 4 - J )
+                        IF( J + K + 4 .EQ. IDCOL ) THEN
+                           IF( CHARID ) THEN
+                              WRITE( UNIT, '(1X,A1,A,A1,$)' ) '"',
+     :                                                    WORK4( I ),'"'
+                           ELSE
+                              WRITE( UNIT, '(1X,G13.6,$)' )
+     :                                                 WORK3( I, J + K )
+                           END IF
+                        ELSE
+                           WRITE( UNIT, '(1X,G13.6,$)' )
+     :                            WORK3( I, J + K )
+                        END IF
+                     END DO
+                     WRITE( UNIT, * ) ' '//CONTIN
+
+                  END DO
+                  WRITE( UNIT, * ) '} '//CONTIN
+               END IF
 
 *  Update the pixel bounding box.
                IF( X .LT. LBND( 1 ) ) LBND( 1 ) = X
@@ -447,26 +473,42 @@
                Y = REAL( WORK1( I, 2 ) )
                JROW = IROW + I - 1
 
-*  Write out the values, appending a backslash at the end of each line to
-*  tell tcl to ignore the line break.
-               WRITE( UNIT, * ) '{', X, Y, ' '//CONTIN
+*  See if any of the row values are bad.
+               BADROW = .FALSE.
                DO J = 1, NCOL - 2, 4
                   DO K = 0, MIN( 3, NCOL - 2 - J )
-                     IF( J + K + 2 .EQ. IDCOL ) THEN
-                        IF( CHARID ) THEN
-                           WRITE( UNIT, '(1X,A1,A,A1,$)' ) '"',
-     :                                                  WORK4( I ),'" '
-                        ELSE
-                           WRITE( UNIT, '(1X,G13.6,$)' )
-     :                                                 WORK3( I, J + K )
-                        END IF
-                     ELSE
-                        WRITE( UNIT, '(1X,G13.6,$)' ) WORK3( I, J + K )
+                     IF( J + K + 2 .NE. IDCOL .AND.
+     :                   WORK3( I, J + K ) .EQ. VAL__BADR ) THEN
+                        BADROW = .TRUE.
                      END IF
                   END DO
-                  WRITE( UNIT, * ) ' '//CONTIN
                END DO
-               WRITE( UNIT, * ) '} '//CONTIN
+
+*  If the row is good, write out the values, appending a backslash at the
+*  end of each line to tell tcl to ignore the line break.
+               IF( .NOT. BADROW ) THEN
+                  NROWGD = NROWGD + 1
+
+                  WRITE( UNIT, * ) '{', X, Y, ' '//CONTIN
+                  DO J = 1, NCOL - 2, 4
+                     DO K = 0, MIN( 3, NCOL - 2 - J )
+                        IF( J + K + 2 .EQ. IDCOL ) THEN
+                           IF( CHARID ) THEN
+                              WRITE( UNIT, '(1X,A1,A,A1,$)' ) '"',
+     :                                                   WORK4( I ),'" '
+                           ELSE
+                              WRITE( UNIT, '(1X,G13.6,$)' )
+     :                                                 WORK3( I, J + K )
+                           END IF
+                        ELSE
+                           WRITE( UNIT, '(1X,G13.6,$)' )
+     :                           WORK3( I, J + K )
+                        END IF
+                     END DO
+                     WRITE( UNIT, * ) ' '//CONTIN
+                  END DO
+                  WRITE( UNIT, * ) '} '//CONTIN
+               ENDIF
 
                IF( X .LT. LBND( 1 ) ) LBND( 1 ) = X
                IF( Y .LT. LBND( 2 ) ) LBND( 2 ) = Y

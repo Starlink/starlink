@@ -5949,7 +5949,13 @@ assumed that the reference direction is parallel to the first image axis).
 This section describes the major changes introduced at each release of
 POLPACK.
 
+\subsection{V3.5-0}
 
+\begin{itemize}
+ \item The POLWRTCL command now excludes any rows that contain one or more
+ bad values.  This means that literal bad values (-0.340282E+39) are no
+ longer passed onto the GAIA polarimetry toolbox.
+\end{itemize}
 
 \subsection{V3.4-0}
 
