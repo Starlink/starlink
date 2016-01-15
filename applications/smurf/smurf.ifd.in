@@ -743,9 +743,10 @@ package @PACKAGE@ {
             parameter config {
                 type LITERAL
                 access READ
-                ppath CURRENT
-                vpath CURRENT
+                ppath CURRENT DEFAULT
+                vpath DEFAULT
                 prompt {Configuration parameters}
+                default !
                 helpkey *
             }
 

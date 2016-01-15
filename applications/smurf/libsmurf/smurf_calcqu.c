@@ -137,7 +137,7 @@
 *        any unspecified parameters. Assigning the value "<def>" (case
 *        insensitive) to a keyword has the effect of resetting it to its
 *        default value. Parameters not understood will trigger an error.
-*        [current value]
+*        [!]
 *     FIX = _LOGICAL (Read)
 *        If TRUE, then attempt to fix up the data to take account of the
 *        POL-2 triggering issue that causes extra POL_ANG values to be
