@@ -251,6 +251,7 @@ smf_get_dims.c \
 smf_get_extpar.c \
 smf_get_findex.c \
 smf_get_freemem.c \
+smf_get_global0I.c \
 smf_get_goodrange.c \
 smf_get_gridcoords.c \
 smf_get_grp_metadata.c \
@@ -359,6 +360,7 @@ smf_pcorr.c \
 smf_polext.c \
 smf_pread.c \
 smf_projbox.c \
+smf_put_global0I.c \
 smf_puthistory.c \
 smf_qfamily_count.c \
 smf_qfamily_str.c \

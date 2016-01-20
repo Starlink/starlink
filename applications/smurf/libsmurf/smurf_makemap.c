@@ -1100,7 +1100,7 @@ void smurf_makemap( int *status ) {
          used to communicate any other required global values (i.e. it's
          not restricted to config parameters). */
        astMapGet0I( keymap, "VALIDATE_SCANS", &ival );
-       astMapPut0I( smurf_global_keymap, "VALIDATE_SCANS", ival, NULL );
+       smf_put_global0I( "VALIDATE_SCANS", ival, status );
     }
 
     parChoic("FTSPORT", "", "TRACKING,IMAGE", 0, fts_port_name, 10, status);

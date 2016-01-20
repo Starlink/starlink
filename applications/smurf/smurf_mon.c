@@ -301,8 +301,9 @@ void smurf_mon( int * status ) {
 
 
   /* Create an AST KeyMap that can be used to pass global parameters around
-     all SMURF routines. */
+     all SMURF routines. Unlock it so it can be accessed by any thread. */
   smurf_global_keymap = astKeyMap( "KeyCase=0" );
+  astUnlock( smurf_global_keymap, 1 );
 
   /* Call the subroutine associated with the requested task */
   if (strcmp( taskname, "BADBOLOS" ) == 0 ) {
@@ -439,6 +440,9 @@ void smurf_mon( int * status ) {
     errRep( "smurf_mon", "Unrecognized taskname: ^TASK", status);
   }
 
+
+  /* Lock the global parameters keymap so we can annul it. */
+  astLock( smurf_global_keymap, 0 );
 
   /* End the GRP NDF history block. */
   ndgEndgh( status );

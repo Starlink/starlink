@@ -519,8 +519,7 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
      value from the smurf globals keymap. The top level makemap function
      copies the VALIDATE_SCANS value from the config keymap to the globals
      keymap. */
-  if( !astMapGet0I( smurf_global_keymap, "VALIDATE_SCANS",
-                    &validate_scans ) )  validate_scans = 0;
+  validate_scans = smf_get_global0I( "VALIDATE_SCANS", 0, status );
   if ( validate_scans && !smf__validate_scan( hdr, status ) ) {
     size_t nframes = hdr->nframes;
     JCMTState * curstate;
