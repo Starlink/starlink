@@ -231,6 +231,11 @@
 
 void smurf_mon (int * );
 
+/* An AST KeyMap used to pass global parameters around all SMURF
+   routines. */
+
+AstKeyMap *smurf_global_keymap = NULL;
+
 /* Main monolith routine */
 
 void smurf_mon( int * status ) {
@@ -295,6 +300,9 @@ void smurf_mon( int * status ) {
   ndgBeggh( status );
 
 
+  /* Create an AST KeyMap that can be used to pass global parameters around
+     all SMURF routines. */
+  smurf_global_keymap = astKeyMap( "KeyCase=0" );
 
   /* Call the subroutine associated with the requested task */
   if (strcmp( taskname, "BADBOLOS" ) == 0 ) {

@@ -2743,6 +2743,27 @@ two.amap = <undef>
 two.bmap = <undef>
 
 #-----------------------------------------------------------------
+#  Name: 	validate_scans
+#  Type: 	integer
+#  Default: 	1
+#  Purpose: 	Controls the rejection of bad scan patterns
+#  Description: If non-zero, each raw data file is checked to see if the
+#               telescope goes crazy during the subscan (i.e. spends a
+#               significant amount of time outside the expected map area).
+#               If it does, a warning message is issued and the pointing
+#               information associated with the subscan is set blank so
+#               that the subscan is excluded from the map. It may be
+#               necessary to set this value to zero (i.e. inhibit the
+#               check) if any subscans intentionally spend a significant
+#               amount of time outside the expected map area.
+#
+#               The expected map area is defined by the MAP_HGHT and
+#               MAP_WDTH FITS headers, and is assumed to be centred on
+#               the tracking centre. If more than 10% of the frames are
+#               outside this area, the whole subscan is rejected.
+validate_scans = 1
+
+#-----------------------------------------------------------------
 #  Name: 	varmapmethod
 #  Type: 	integer
 #  Default: 	1

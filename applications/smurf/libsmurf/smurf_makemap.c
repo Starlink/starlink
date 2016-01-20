@@ -171,9 +171,9 @@
 *          by a factor that depends on elevation and focal plane position,
 *          to get the IP correction. These Q and U corrections are
 *          rotated so that they use the same reference direction as the input
-*          Q/U data, corrected for extinction, and are then subtracted from 
-*          the input Q or U value before going on to make a map from the 
-*          corrected values. The factors are determined using the IP model 
+*          Q/U data, corrected for extinction, and are then subtracted from
+*          the input Q or U value before going on to make a map from the
+*          corrected values. The factors are determined using the IP model
 *          specified by the "ipmodel" configuration parameter. [!]
 *     ITERMAPS = LITERAL (Read)
 *          Specifies the name of a file in which to place a copy of the
@@ -880,6 +880,7 @@ void smurf_makemap( int *status ) {
   int iterate=0;             /* Flag to denote ITERATE method */
   int iters;                 /* If interupted, the no. of completed iterations */
   size_t itile;              /* Output tile index */
+  int ival;                  /* Integer parameter value */
   int jin;                   /* Input NDF index within igrp */
   int jsatiles;              /* Create JSA tiles? */
   int junk;                  /* Unused integer */
@@ -1089,6 +1090,17 @@ void smurf_makemap( int *status ) {
       keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def",
                            sub_instruments, 1, status );
       sub_instruments = astAnnul( sub_instruments );
+
+      /* Set global values to reflect the contents of the above config keymap.
+         These global values are stored in another KeyMap created in
+         smurf_mon and accessed via the smurf_global_keymap pointer
+         declared within smf.h. This provides a mechanism for getting
+         config values to low level functions that do not have access to
+         the config keymap (e.g. smf_fix_metadata_scuba2). It can also be
+         used to communicate any other required global values (i.e. it's
+         not restricted to config parameters). */
+       astMapGet0I( keymap, "VALIDATE_SCANS", &ival );
+       astMapPut0I( smurf_global_keymap, "VALIDATE_SCANS", ival, NULL );
     }
 
     parChoic("FTSPORT", "", "TRACKING,IMAGE", 0, fts_port_name, 10, status);

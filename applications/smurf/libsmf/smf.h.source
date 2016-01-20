@@ -544,6 +544,14 @@ static inline void * debug_astStore( void * ptr, const void * data, size_t size 
 #endif
 
 
+/* External variable delcarations */
+
+/* An AST KeyMap used to pass global parameters around all SMURF
+   routines. Created in smurf_mon.c */
+extern AstKeyMap *smurf_global_keymap;
+
+
+
 /* Function Prototypes */
 
 void smf_accumulate_prov( const smfData * data, const Grp* igrp, size_t index,

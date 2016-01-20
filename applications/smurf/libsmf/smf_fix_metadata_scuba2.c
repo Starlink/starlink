@@ -166,7 +166,7 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
   smfHead *hdr = NULL;       /* Data header struct */
   AstKeyMap * obsmap = NULL; /* Info from all observations */
   AstKeyMap * objmap = NULL; /* All the object names used */
-
+  int validate_scans;        /* Should scan patterns be validated? */
   if (*status != SAI__OK) return have_fixed;
 
   /* Validate arguments - need smfFile and smfHead */
@@ -511,10 +511,17 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     have_fixed |= SMF__FIXED_FITSHDR;
   }
 
-  /* If the telescope goes crazy during the subscan (i.e. spends a significant 
+  /* If the telescope goes crazy during the subscan (i.e. spends a significant
      amount of time outside the expected map area), null the telescope data
-     for the subscan. */
-  if ( !smf__validate_scan( hdr, status ) ) {
+     for the subscan. This check can be suppressed by setting a zero
+     value for config parameter VALIDATE_SCANS. This function does not
+     have direct access to the config KeyMap, so it gets the VALIDATE_SCANS
+     value from the smurf globals keymap. The top level makemap function
+     copies the VALIDATE_SCANS value from the config keymap to the globals
+     keymap. */
+  if( !astMapGet0I( smurf_global_keymap, "VALIDATE_SCANS",
+                    &validate_scans ) )  validate_scans = 0;
+  if ( validate_scans && !smf__validate_scan( hdr, status ) ) {
     size_t nframes = hdr->nframes;
     JCMTState * curstate;
     size_t i;
@@ -522,7 +529,8 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
       curstate = &((hdr->allState)[i]);
       curstate->jos_drcontrol |= DRCNTRL__PTCS_BIT;
     }
-    msgOutif( msglev, "", INDENT "Blanking telescope data due to extreme excursion", status );
+    msgOut( "", INDENT "WARNING: Rejecting subscan due to extreme excursion",
+            status );
     have_fixed |= SMF__FIXED_JCMTSTATE;
   }
 
