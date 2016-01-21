@@ -49,7 +49,7 @@
 #
 #------------------------------------------------------------------------
 #
-require "timelocal.pl";
+use Time::Local;
 
 # handle command-line options
 use Getopt::Std;
