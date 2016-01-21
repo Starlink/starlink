@@ -49,6 +49,7 @@
 #
 #------------------------------------------------------------------------
 #
+use File::Spec;
 use Time::Local;
 
 # handle command-line options
@@ -60,7 +61,7 @@ getopts('nth');
 #
 # site configurable:
 #
-$newsdir = "LOCALNEWS"; # news directory
+$newsdir = File::Spec->catfile($ENV{'STARLINK_DIR'}, 'news'); # news directory
 $printc  = "LOCALPRINT"; # local print command
 #
 # script works these out for itself:
