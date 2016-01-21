@@ -112,7 +112,7 @@ reduce and visualise their data using \starlink\ packages.
 This guide covers the following:
 \begin{itemize}
 \itemsep0em
-\item \cref{Chapter}{sec:intro}{Chapter 1} -- Computer resources you'll need before getting started.
+\item \cref{Chapter}{sec:intro}{Chapter 1} -- Computer resources and software you'll need before getting started.
 \item \cref{Chapter}{sec:starlink}{Chapter 2} -- Starlink basics -- tools for exploring your data.
 \item \cref{Chapter}{sec:het}{Chapter 3}  -- Heterodyne observing at the JCMT.
 \item \cref{Chapter}{sec:raw}{Chapter 4}  -- Examining raw ACSIS data.
@@ -135,6 +135,32 @@ In this cookbook the following styles are followed:
 \item The names of attributes appear like \att{StdOfRest}.
 \item Useful tips or reminders are given in outlined boxes.
 \end{itemize}
+
+\section{\xlabel{computing} Before you start: computing resources}
+\label{sec:computing}
+
+Before reducing heterodyne data you should consider whether you have
+sufficient computing resources for your data.  That said, there can
+only be vague guidelines because resource usage depends on many
+factors, such as the spatial area and resolution, the number of
+observations being reduced together, observing and bandwidth modes
+(see \cref{Section}{sec:obsmodes}{Observing modes}), and the number of
+subbands.  However, the main factor is the volume of data being
+processed concurrently.
+
+The \oracdr\ \cite{oracdr} pipeline can demand approaching 300~GB of
+peak storage for the largest (about a degree square) HARP maps, and at
+least 24~GB of memory during spectral-cube creation.  For more-normal
+sized maps of individual targets, say 20 square arcminutes from your
+observations, would only require about 10~GB of storage and most
+modern computers would have sufficient memory.  The storage
+requirements can more than double if all intermediate files are
+retained for diagnostic purposes; intermediate files are normally
+removed at the end of each pass through a recipe.  Reducing manually
+permits you to tidy files as you move along, but is very time consuming.
+
+Reducing RxA data and HARP stares or small jiggle maps is
+undemanding of resources.
 
 \section{\xlabel{software}Before you start: Starlink software}
 
