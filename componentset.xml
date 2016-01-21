@@ -1822,7 +1822,7 @@ UNIX).
       starlink application 'latexsupport'.</p>
   </abstract>
   <dependencies >
-    <build>latexsupport</build><configure>perl</configure>
+    <build>latexsupport</build><build>perl</build><configure>perl</configure>
   </dependencies>
   <developers>
     <person>

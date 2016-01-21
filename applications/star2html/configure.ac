@@ -19,7 +19,7 @@ AC_PROG_MAKE_SET
 STAR_DEFAULTS
 
 dnl    This package has one dependencies,  latexsupport.
-STAR_DECLARE_DEPENDENCIES([build], [latexsupport])
+STAR_DECLARE_DEPENDENCIES([build], [latexsupport perl])
 
 dnl    And requires that Perl is already built, from which we use the
 dnl    starperl command.
