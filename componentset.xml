@@ -630,7 +630,7 @@ JCMT telescope based on Mauna Kea, Hawaii.
 </component>
 
 <component id="gaia" support="S">
-  <version>4.4-6</version>
+  <version>4.4-7</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
@@ -839,7 +839,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>2.3-2</version>
+  <version>2.4</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -1523,7 +1523,7 @@ spectropolarimetry data, complimenting facilities available in TSP.
 </component>
 
 <component id="polpack" support="S">
-  <version>3.4-0</version>
+  <version>3.5-0</version>
   <path>applications/polpack</path>
   <description>POLPACK - An Imaging Polarimetry Reduction Package</description>
   <abstract><p>
