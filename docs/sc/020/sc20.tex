@@ -114,14 +114,15 @@ This guide covers the following:
 \itemsep0em
 \item \cref{Chapter}{sec:intro}{Chapter 1} -- Computer resources and software you'll need before getting started.
 \item \cref{Chapter}{sec:starlink}{Chapter 2} -- Starlink basics -- tools for exploring your data.
-\item \cref{Chapter}{sec:het}{Chapter 3}  -- Heterodyne observing at the JCMT.
-\item \cref{Chapter}{sec:raw}{Chapter 4}  -- Examining raw ACSIS data.
-\item \cref{Chapter}{sec:reduce}{Chapter 5}  -- Regridding your data with \makecube.
-\item \cref{Chapter}{sec:analyse}{Chapter 6}  -- Analysing your reduced cube.
-\item \cref{Chapter}{sec:advanced}{Chapter 7}  -- Advanced analysis techniques such as changing co-ordinate frames.
-\item \cref{Chapter}{sec:gaia}{Chapter 8}  -- Using \gaia\ to analyse your data.
-\item \cref{Chapter}{sec:pipe}{Chapter 9}  -- The ACSIS pipeline and recipes explained.
-\item \cref{Chapter}{sec:runpipe}{Chapter 10}  -- How to run the pipeline.
+\item \cref{Chapter}{sec:het}{Chapter 3} -- Heterodyne observing at the JCMT.
+\item \cref{Chapter}{sec:raw}{Chapter 4} -- Naming convention and examining raw ACSIS data.
+\item \cref{Chapter}{sec:pipe}{Chapter 5} -- The ACSIS pipeline and recipes explained.
+\item \cref{Chapter}{sec:runpipe}{Chapter 6} -- How to run the pipeline.
+\item \cref{Chapter}{sec:reduce}{Chapter 7} -- Regridding your data with \makecube.
+\item \cref{Chapter}{sec:analyse}{Chapter 8} -- Analysing your reduced cube.
+\item \cref{Chapter}{sec:advanced}{Chapter 9} -- Advanced analysis techniques such as changing co-ordinate frames.
+\item \cref{Chapter}{sec:gaia}{Chapter 10} -- Using \gaia\ to analyse your data.
+\item \cref{Chapter}{sec:fromcadc}{Chapter 11} -- Getting your data from CADC.
 \end{itemize}
 
 \textbf{Style convention}\\
@@ -245,6 +246,8 @@ heterodyne data or those unfamiliar with the Starlink software.}
 The pipeline approach works well if your project is suited to using
 one of the standard recipes, as are most projects.  Running the pipeline
 is probably essential if you have a lot of data to process.
+To use the science pipeline, skip straight to
+\cref{Chapter}{sec:pipe}{The ACSIS Pipeline}.
 
 Performing each step by hand allows more fine-tuned control of certain
 processing and analysis steps, although some fine-tuning is available
@@ -254,8 +257,7 @@ in the pipeline via recipe parameters (see
 Once you have determined your optimal parameters you can pass them to
 the pipeline or a script. \cref{Chapter}{sec:reduce}{Regridding your
 Data} and \cref{Chapter}{sec:analyse}{Analysing your Cube} discuss the
-manual approach. To use the science pipeline, skip straight to
-\cref{Chapter}{sec:pipe}{The ACSIS Pipeline}.
+manual approach.
 
 While you have the option of running the pipeline yourself, you can
 find pipeline reduced files for individual and co-added observations by
@@ -845,7 +847,6 @@ there multiple lines in proximity.  The number of subsystems is a
 power of two up to a maximum of 16.
 
 \clearpage
-
 \chapter{\xlabel{data_files}Raw ACSIS Data}
 \label{sec:raw}
 
@@ -996,9 +997,571 @@ spectra (see Figures \ref{fig:maskreceptor} and
 \end{center}
 \end{figure}
 
+
+\newpage
+\chapter{\xlabel{pipeline}The ACSIS Pipeline}
+\label{sec:pipe}
+
+The ORAC-DR pipeline (\cite{oracdr}) is a generic automated data
+reduction pipeline that can process your raw JCMT data and return
+advanced data products: baselined single observation cubes, mosaicked
+and co-added cubes, moments map and clump catalogues.
+
+It has advanced algorithms for the common routines such as baseline
+subtraction. The data processing is performed using standard \Kappa,
+\smurf, and \cupid\ applications, the main ones of which are
+described in later chapters.
+
+\section{\xlabel{recipes}Recipes and primitives}
+\label{sec:recipes}
+
+Reduction recipes in ORAC-DR consist of a series of stand-alone
+processes, known as primitives. These primitives are linked together
+to form data reduction recipes. Each primitive can be fed different
+input data depending on the nature of the recipe in question and may
+sometimes be omitted altogether.
+
+There are four main science recipes available, each tailored to different
+type of observation:
+\begin{itemize}[noitemsep,,nolistsep]
+\item REDUCE\_SCIENCE\_NARROWLINE\\
+\item REDUCE\_SCIENCE\_BROADLINE\\
+\item REDUCE\_SCIENCE\_GRADIENT\\
+\item REDUCE\_SCIENCE\_LINEFOREST
+\end{itemize}
+
+A summary of these recipes is given below.
+
+\begin{table}[h!]
+\begin{tabular}{p{2.9cm}|p{7.3cm}|p{4.5cm}}
+\hline
+\textbf{RECIPE} & \textbf{DESCRIPTION OF EMISSION} & \textbf{BASELINE METHOD} \\
+\hline
+NARROWLINE & One or more narrow lines are expected across the band.
+Select this recipe if the expected lines are less than about 20
+channels wide.& Smoothing: \newline spatial = 5$\times$5 pixels
+\newline frequency = 10 channels\\
+\hline
+BROADLINE &This recipe is designed for wide lines that extend over a
+large fraction of the band. The line is typically too weak to see in a
+single observation so a pre-determined baseline window and linear
+baselines are used.  &Uses the outer 10\% of each end of the spectra
+to fit a single-order polynomial.  \\
+\hline
+GRADIENT &Typically one moderately wide line is expected, for which
+the center velocity varies significantly across the field. The
+baseline window changes across the field. Nearby galaxies often fall
+in this category. The expected lines should be wider than 20 channels
+and probably not wider than 20\% of the available bandwidth &
+Smoothing: \newline spatial = 3$\times$3 pixels \newline frequency =
+25 channels\\
+\hline
+LINEFOREST & A forest of lines is expected across the band. Bright,
+nearby star-formation sources may fall in this category.  This recipe
+also creates a separate moments map for each line (as defined by the
+parameter \param{PER\_LINE}).& Smoothing: \newline spatial = 5$\times$5 pixels
+\newline frequency = 10 channels \\
+\hline
+\end{tabular}
+\end{table}
+
+There are also variants of the recipes with the following suffixes.
+
+\begin{tabular}{p{2cm}p{10cm}}
+\_POL & polarimetry \\
+\_QL & Quick Look which merely runs \makecube\ to turn the raw time-series
+spectra into a spectral cube for display during data acquisition. \\
+\_SUMMIT & A limited reduction to keep pace with data acquisition at the
+JCMT.  It excludes any bad spectra rejection, quality assurance, or
+iterative baseline determination. \\
+\end{tabular}
+
+\newpage
+\section{\xlabel{recipe_process}The workflow}
+You can follow this commentary via the flow chart in Figure \ref{fig:pipeline}.
+
+Two notations are used in the following list:\\
+\textbullet\ \textbf{a\_cube} to mean the regridded cube of a single
+observation. \\
+\textbullet\ \textbf{g\_cube} to mean the group cube which is a co-add
+of all the \textbf{a\_cube} files.
+
+Note that the pipeline will co-add data into a group file whenever it
+encounters observations with identical LO frequencies, base positions
+and bandwidths.
+
+\begin{enumerate}[label=(\textbf{\arabic*})]
+
+\item The raw data is copied to the local directory. Typically,
+subsystems are treated as individual and separate observations by
+ORAC-DR except for hybrid-mode observations.
+
+\item Because data acquisition is asynchronous, time slices are not
+necessarily written in sequential order. The next step sort the
+time-series data into time order. This makes it easier to search for
+intermittent bad data
+
+\item Regions of high and low frequency interference are identified
+and flagged. Bad detectors are identified by comparing the deviation
+from linearity of each detector's baseline.
+
+\item The DC-level offset between corresponding sub-band observations
+is determined using the median of all the spectra.  The DC offset is
+then subtracted from the sub-band spectra, and the resulting sub-band
+spectra are mosaicked together to form single time-series cube.
+
+\item The data are thresholded by trimming the noisy ends of the band.
+The spectra are collapsed along the receptor using the `sigma'
+estimator to form a single spectrum. A constant value background is
+then fit to the resulting spectrum. The fitting regions are used to
+determine where the spectrum gets noisier (i.e. higher RMS values in
+the RMS spectrum). These high-noise regions are then trimmed from the
+ends in the frequency axis. %but still specify percentage - why??
+
+\item Quality assurance checks are run on the raw cubes. See Appendix
+\ref{app:qa} for a description of the checks performed. Any
+time-slices failing any of these checks gets flagged as bad and
+are not included in the group co-add that follows.
+
+\item Once all the raw observations have undergone the initial
+processing, the \textbf{a\_cube} files are combined to form a
+\textbf{g\_cube}.
+
+\item The \textbf{g\_cube} is smoothed by an amount specified by the
+particular science recipe being used. See Section \ref{sec:recipes}
+for details on the different recipes.
+
+\item \mfittrend\ is run to find the baseline regions on the smoothed
+\textbf{g\_cube}. The ranges are determined automatically by setting
+\param{auto=true}. A baseline mask is written out.
+
+\item The baseline mask is then applied to the unsmoothed
+\textbf{g\_cube} and \mfittrend\ is re-run. This time however, the
+emission regions have been masked out, so all remaining data is
+included in the fit by setting \param{auto=false}. The resulting
+baseline is subtracted.
+
+\item Moments maps and noise maps are made from the
+baseline-subtracted \textbf{g\_cube}.
+
+\item If another iteration is required, continue to Step 12. If not,
+the processing is complete.
+
+\item The baseline mask is converted back to the time-series with
+\unmakecube. There it is applied to the time-series data for each
+observation.
+
+\item A baseline is fit to the masked time-series data using
+\mfittrend\ and the result is subtracted from the unmasked time-series
+data.
+
+\item An \textbf{a\_cube} is made from the baseline subtracted data
+for each observation.
+
+\item The baseline-subtracted \textbf{a\_cubes} are combined to make a
+new \textbf{g\_cube}.
+
+\item Return to Step 8.
+\end{enumerate}
+
+%\setlength{\intextsep}{10.0pt plus 1.0pt minus 2.0pt}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.81\linewidth]{sc20_pipeline}
+\caption[Flow chart of the ORAC-DR ACSIS pipeline process.]{Flow chart
+  of the process employed by the ORAC-DR ACSIS pipeline. The prefix and
+  suffix of the file created at each stage is shown to the left of the
+  process box. Note that suffix `a' refers to an individual observation
+  while `g' refers to a group (or co-added) file.}
+\label{fig:pipeline}
+\end{center}
+\end{figure}
+\setlength{\textfloatsep}{20pt plus 1.0pt minus 2.0pt}
+
+\clearpage
+\chapter{\xlabel{running_pl}Running the pipeline}
+\label{sec:runpipe}
+
+\section{Checking and changing the science recipe}
+\label{sec:changerecipe}
+You can find out which recipe is set in the data header via the
+\param{RECIPE} keyword in the FITS header of any of your raw files.
+You can use either of the options below:
+\begin{terminalv}
+% fitsval a20130609_00059_01_0001 RECIPE
+% fitslist a20130609_00059_01_0001 | grep RECIPE
+\end{terminalv}
+
+You can override the recipe set in the FITS header by listing any different
+one on the command line when starting \oracdr. For example:
+\begin{terminalv}
+% oracdr -file mylist -loop file -log x REDUCE_SCIENCE_GRADIENT
+\end{terminalv}
+
+\section{Setting recipe parameters (optional)}
+\label{sec:recpars}
+
+You can tailor the recipe parameters by supplying a \file{.ini} file
+(called \file{myparams.ini} in the following example). This file contains the
+recipe name (which must match the one assigned to your data, whether
+from the header or any different one specified on the command line)
+followed by the options you wish to specify in the following format:
+
+\vspace{0.2cm}
+\begin{terminalv}
+[REDUCE_SCIENCE_NARROWLINE]
+MOMENTS_LOWER_VELOCITY = -30.0
+MOMENTS_UPPER_VELOCITY = 155.0
+PIXEL_SCALE = 6.0,10.0
+SPREAD_METHOD = gauss
+SPREAD_WIDTH = 9
+SPREAD_FWHM_OR_ZERO = 6
+REBIN = 2
+\end{terminalv}
+
+Notice the two values given for the \param{PIXEL\_SCALE} option. This
+means that two maps will be produced, one at each of the specified
+pixel scales. See Appendix \ref{app:params} for a full list of recipe
+parameters.
+
+
+\section{Setting quality-assurance parameters (optional)}
+\label{sec:qa}
+
+There is a set of quality-assurance (QA) parameters that are applied
+by default when you run the pipeline. These are found in the text file
+\param{\$ORAC\_DATA\_CAL/qa.ini}.
+
+You can set your own QA parameters by creating a local \textit{.ini}
+file (called \file{myqa.ini} in the following examples). You can then call
+this local QA file via \param{-calib qaparams=myqa.ini} when starting
+the pipeline.
+
+The example below illustrates the format of this QA file and
+highlights some of the main parameters you may consider tweaking.
+
+\vspace{0.2cm}
+\begin{terminalv}
+[default]
+BADPIX_MAP=0.1
+GOODRECEP=8
+TSYSBAD=550
+FLAGTSYSBAD=0.5
+TSYSMAX=550
+TSYSVAR=1.0
+RMSVAR_RCP=0.5
+\end{terminalv}
+The text in the square brackets describes the data to which the QA
+parameters should be applied. This is followed by the QA parameters
+and their values.
+
+The parameters listed under the [default] header will get picked up
+for \textit{all} observations unless overridden by other header
+descriptions. Extra header may describe a frequency range (e.g.
+\texttt{[default 200:300]}), a particular molecule and transition
+(e.g. \texttt{[default CO32]}), an instrument (e.g. \texttt{[RXA]}),
+or a legacy survey (e.g. \texttt{[GBS]}). You can also include
+combinations (e.g. \texttt{[GBS\_13CO32]}). Note that for any data
+taken by RxA or RxW, \param{GOODRECEP} must be set to 1.
+
+The example file below sets up a different set of parameters for two
+transitions of CO. Any QA parameters not explicitly set will revert to
+those specified in the default \file{qa.ini} file.
+
+\vspace{0.2cm}
+\begin{terminalv}
+[C18O32]
+RES_CHAN=10
+VELRES=1.0
+TSYSBAD=650
+
+[CO21]
+RES_CHAN=10
+VELRES=0.5
+TSYSBAD=550
+GOODRECEP=1
+\end{terminalv}
+
+See Appendix \ref{app:qa} for a description of all available QA parameters.
+
+
+\section{Specifying bad receptors (recommended)}
+\label{sec:badrec}
+
+If certain receptors are known to be bad for the full length of an
+observations (e.g. dead receptors), processing time can be reduced by
+not having the pipeline attempt to reduce that data.
+
+Information regarding bad receptors is stored in a master text file
+called \file{index.bad\_receptors}, located in your
+\param{ORAC\_DATA\_CAL} directory. This file lists dates and the
+corresponding receptors which are not operational. By default, when
+the pipeline runs it searches this file and discards the appropriate
+receptors. However, this master list is grossly incomplete so you
+should select another method for specifying bad receptors.
+
+We recommend using the \param{index} option, called via \param{-calib
+bad\_receptors=index} when starting the pipeline. This creates an
+index file called \file{index.bad\_receptors\_qa} in your
+\param{ORAC\_DATA\_OUT} directory, where any bad receptors identified
+during your reductions are indexed. This file is appended each time
+you run the pipeline and in this way you build up your own independent
+list.
+
+If an index file exists, then, by default, the pipeline will look for
+bad-receptor information in both
+\param{\$ORAC\_DATA\_CAL/index.bad\_receptors} and
+\param{\$ORAC\_DATA\_OUT/index.bad\_receptors\_qa}.
+
+\begin{table}[h!]
+\begin{tabular}{p{3cm}|p{12cm}}
+
+\textbf{bad\_receptors} & \textbf{Description} \\
+\hline
+masterorindex & Use both the master \file{index.bad\_receptors} and pipeline-generated
+                \file{index.bad\_receptors\_qa} files [Default].\\
+master        & Use the master \file{index.bad\_receptors} file in \param{\$ORAC\_DATA\_CAL}. \\
+index         & Use the \file{index.bad\_receptors\_qa} index file in
+                \param{\$ORAC\_DATA\_OUT} as generated by the pipeline. \\
+file          & Reads a file called \param{bad\_receptors.lis}, which
+                contains a  space-separated list of receptor names in the
+                first line. This file must be located in \param{\$ORAC\_DATA\_OUT}.
+                For instance, \param{-calib bad\_receptors=bad\_receptors.lis}.\\
+list          & A colon-separated list of receptor names can be supplied, such as
+                \param{-calib bad\_receptors=H01:H06}. You can append any of the other
+                options to the end of your list, such as \param{-calib bad\_receptors=H14:index}\\
+\hline
+\end{tabular}
+\label{tab:index-options}
+\caption[Pipeline options for the \param{-calib bad\_receptors}
+flag.]{\small The options available for the \param{-calib
+bad\_receptors} flag when running the pipeline.}
+\end{table}
+
+\section{\xlabel{starting_pl}Starting the pipeline}
+\label{sec:runpl}
+
+\begin{enumerate}[label=(\textbf{\arabic*})]
+
+\item Initialise the pipeline software.  This may be as simple as
+
+\begin{terminalv}
+% oracdr_acsis
+\end{terminalv}
+
+\item Define environment variables to ensure the data is read from,
+and written to, the right place. Many are set automatically when the
+pipeline is initialised but others must be set manually. Details of
+the optional variables are given in \acsispipelinesun\ but you should
+specify where to find the raw data and where to write any files that
+are created.
+\begin{terminalv}
+% setenv ORAC_DATA_IN <path to raw data>
+% setenv ORAC_DATA_OUT <where you want reduced data to go>
+\end{terminalv}
+
+These extra definitions can be avoided if you initialise with the
+following command.
+
+\begin{terminalv}
+% oracdr_acsis -cwd
+\end{terminalv}
+
+The \param{cwd} option requests that the current working directory is
+used for all input and output, which is most likely what you require.
+
+If you are supplying a text file listing the raw data
+\param{\$ORAC\_DATA\_IN} should be the location of this file. If
+supplying an external configuration file it should also be in this
+location.
+
+If you wish to keep the intermediate files produced by the pipeline
+you should also set \param{ORAC\_KEEP}.
+\begin{terminalv}
+% setenv ORAC_KEEP 1
+\end{terminalv}
+However, this still excludes temporary files made during a recipe step,
+whose names have the \file{oractemp} prefix.  To retain these set
+\begin{terminalv}
+% setenv ORAC_KEEP temp
+\end{terminalv}
+
+Retention of temporary and intermediate will require plenty of storage,
+but it can be invaluable during debugging.
+
+\item Now you are ready to run the pipeline. In this example, the
+recipe name on the end ensures that all data being processed using
+REDUCE\_SCIENCE\_NARROWLINE.
+
+\begin{terminalv}
+% oracdr -files list.txt -loop file -batch -log xf -calib qaparams=myqa.ini \
+  bad_receptors=index -recpars mypar.ini -nodisplay
+REDUCE_SCIENCE_NARROWLINE
+\end{terminalv}
+\end{enumerate}
+
+Below is a list of commonly used command line options when running the
+ORAC-DR pipeline from outside the EAO. For a full list of all possible
+options and their descriptions see \oracdrsun.
+\begin{table}[h!]
+\begin{tabular}{p{2.5cm}|p{12.5cm}}
+
+\textbf{Flag} & \textbf{Description} \\
+\hline
+\multicolumn{2}{l}{\textbf{Supplying data}} \\
+\hline
+%-from/-to         & Number of first/last observation \\
+%-list             & Comma separated list of observation numbers \\
+-file $<$mylist$>$ & Input data to be read in from a text file. Supply the
+                     file name (relative to current directory, or the full
+                     path) of an ASCII text file containing a list of all
+                     observation files to be reduced, one file per line. \\
+%-ut               & UT date of observations (defaults to current \emph{yyyymmdd}). \\
+\hline
+\multicolumn{2}{l}{\textbf{Looping}} \\
+\hline
+%-loop list & Default when using the -list option. The pipeline will stop once
+              the observations in the list have been reduced. \\
+-loop file  & Loop over all the lines in the file supplied by the \param{-file}
+              option. \\
+\hline
+\multicolumn{2}{l}{\textbf{Group processing}} \\
+\hline
+\param{-batch}    & Delays group processing until the individual files have been reduced.  \\
+%\param{-skip}    & Allow the data detection loop to skip missing observations.  \\
+\param{-onegroup} & Forces all the observations into the same group. Useful if
+                    building up a map from rasters with different target co-ordinates
+                    or from different dates.  \\
+\hline
+\multicolumn{2}{l}{\textbf{Supplying parameter files}} \\
+\hline
+\param{-calib}    & Under the calibration flag you can specify QA parameters by including
+                    \param{qaparams=<myqa.ini>} and bad receptors via
+                    \param{bad\_receptors=index}.  If you do not set the
+                    \texttt{qaparams} option but have a file called \texttt{qa.ini}
+                    in your output directory, the QA settings will come from this file.\\
+-recpars & Allows you to provide recipe parameters as a \file{.ini} file.  \\
+\hline
+\multicolumn{2}{l}{\textbf{Logs/Display}} \\
+\hline
+\param{-nodisplay} & Shorten processing times by turning off all graphical output. \\
+\param{-log sxfh}  & Send the log to a screen (\param{s}), an xwindow (\param{x}), file
+                     (\param{f}) or html (\param{h}). The logfile
+                     (\param{f}) has the name \file{.oracdr\_}$NNNN$\file{.log} where
+                     $NNNN$ is the current process ID. Only include the options you want.
+                     This defaults to \param{xf}.\\
+\hline
+\end{tabular}
+\label{tab:pipe-options}
+\caption{\small The options available on the command line when running
+the ORAC-DR pipeline from outside the EAO.}
+\end{table}
+
+\section{\xlabel{pl_output}Pipeline output}
+
+The pipeline will produce a group file for each object being
+processed. If the pipeline is given data from multiple nights, all
+those data will be included in the group co-add using inverse variance
+weighting.
+
+Files created from individual observations are prefixed with
+\file{a}, while group (co-added) maps are prefixed with \file{ga}.
+\cref{Table}{tab:pipe-out}{the table below} describes the files
+created. In addition PNG images are made of the reduced files at a
+variety of resolutions.
+
+\begin{tip}
+TIP: Even if just a single observation is processed, a group file is
+created so long as the observation passes the QA check.
+\end{tip}
+
+\subsection{Why have multiple reduced files been generated?}
+\label{sec:multireduced}
+
+You will find the pipeline splits large reduced cubes (e.g. from
+raster maps) into smaller tiles of $<$512\,MB. This is to save on
+computer memory. It does this from the central position outwards so
+you may find some of the smaller edge tiles are strange, often narrow,
+rectangles. These tiles can be pasted together with the \Kappa\
+command \paste\ but beware of the final file size. For example,
+\begin{terminalv}
+% paste ga20140601_15_1_reduced\*.sdf tiledmap
+\end{terminalv}
+Note, there is a recipe parameter CHUNKSIZE which adjusts the maximum
+tile size. If you make it larger than 512 it is possible to generate a
+single reduced cube.
+\begin{table}[h!]
+\centering
+\begin{tabular}{p{2.8cm}|p{11.8cm}}
+\hline
+\multicolumn{2}{l}{\textbf{Default Files}}\\
+\hline
+\file{cube001}    & Baselined cube \\
+\file{integ}      & Integrated intensity image \\
+\file{rimg}       & Representative image (same as \file{integ} file), used to form
+                    rimg PNG \\
+\file{sp001}      & Spectrum taken from position of peak intensity in the
+                    integ file \\
+\file{rsp}        & Representative spectrum (same as \file{sp001}), used to form
+                    rsp PNG \\
+\file{iwc}        & Intensity weighted co-ordinate image \\
+\file{noise}      & Noise map \\
+\file{reduced00$n$} & Final trimmed, baselined cube of the \mbox{$n^{\textnormal{th}}$} tile.
+                    There may be a few of these as large maps will be split into
+                    tiles of 512\,MB. \\
+\file{rmslo}      & Low-frequency noise \\
+\file{rmshi}      & High-frequency noise \\
+\hline
+\multicolumn{2}{l}{\textbf{Extra files kept with ORAC\_KEEP = 1}}\\
+\hline
+\file{em001}      & Ends of the frequency axis have been trimmed off \\
+\file{thr001}     & Time-series data with large spikes removed \\
+\file{ts001}      & Time-sorted time-series data \\
+\file{tss001}     & Time-series data with median DC signal removed \\
+\file{blmask001}  & Baseline mask cube. Regions of emission have been
+                    masked out. \\
+\file{bl001}      & Baselined cube \\
+\file{linteg00$n$} & Integrated intensity image formed around the
+                    $n^{\textnormal{th}}$ line. \\
+\hline
+\end{tabular}
+\label{tab:pipe-out}
+\caption{\small Table of the files written out by the science pipeline. Each
+  of these files is generated for both the individual observations and the
+  group files.}
+\end{table}
+
+In addition to these NDFs a number of log files are created.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{p{2.8cm}|p{11.8cm}}
+\hline
+\multicolumn{2}{l}{\textbf{Default Files}}\\
+\hline
+\file{.oracdr\_*.log}  & The \oracdr\ log file. \\
+\file{log.flat}   & Flat-field ratios for each receptor and observation. \\
+\file{log.group}  & The files contributing to each group. \\
+\file{log.noisestats} & Noise statistics for each observation and group. \\
+\file{log.qa}     & Quality assurance reports \\
+\hline
+\end{tabular}
+\label{tab:pipe-logfiles}
+\caption{\small Table of the log files written by the science pipeline.}
+\end{table}
+
+Finally there are HDS scratch \file{t*.sdf} files, and temporary files
+\file{oractemp*} which can be NDFs or small text files such as file
+lists.  These should be removed automatically at the end of processing,
+unless something has gone wrong.
+
+
 \clearpage
 \chapter{\xlabel{reduce}Regridding your Data}
 \label{sec:reduce}
+
+If you prefer to reduce your data manually, regridding your data
+is the best place to start.
 
 To convert your raw time-series cubes with spectral channel number,
 receptor index, time-slices axes into a spatial cube with RA, Dec (or
@@ -2479,565 +3042,7 @@ the check boxes on the side bar.
 \end{enumerate}
 
 
-\newpage
-\chapter{\xlabel{pipeline}The ACSIS Pipeline}
-\label{sec:pipe}
-
-The ORAC-DR pipeline (\cite{oracdr}) is a generic automated data
-reduction pipeline that can process your raw JCMT data and return
-advanced data products: baselined single observation cubes, mosaicked
-and co-added cubes, moments map and clump catalogues.
-
-It has advanced algorithms for the common routines such as baseline
-subtraction. The data processing is performed using standard \Kappa,
-\smurf, and \cupid\ applications, the main ones of which have been
-described in previous chapters.
-
-\section{\xlabel{recipes}Recipes and primitives}
-\label{sec:recipes}
-
-Reduction recipes in ORAC-DR consist of a series of stand-alone
-processes, known as primitives. These primitives are linked together
-to form data reduction recipes. Each primitive can be fed different
-input data depending on the nature of the recipe in question and may
-sometimes be omitted altogether.
-
-There are four main science recipes available, each tailored to different
-type of observation:
-\begin{itemize}[noitemsep,,nolistsep]
-\item REDUCE\_SCIENCE\_NARROWLINE\\
-\item REDUCE\_SCIENCE\_BROADLINE\\
-\item REDUCE\_SCIENCE\_GRADIENT\\
-\item REDUCE\_SCIENCE\_LINEFOREST
-\end{itemize}
-
-A summary of these recipes is given below.
-
-\begin{table}[h!]
-\begin{tabular}{p{2.9cm}|p{7.3cm}|p{4.5cm}}
-\hline
-\textbf{RECIPE} & \textbf{DESCRIPTION OF EMISSION} & \textbf{BASELINE METHOD} \\
-\hline
-NARROWLINE & One or more narrow lines are expected across the band.
-Select this recipe if the expected lines are less than about 20
-channels wide.& Smoothing: \newline spatial = 5$\times$5 pixels
-\newline frequency = 10 channels\\
-\hline
-BROADLINE &This recipe is designed for wide lines that extend over a
-large fraction of the band. The line is typically too weak to see in a
-single observation so a pre-determined baseline window and linear
-baselines are used.  &Uses the outer 10\% of each end of the spectra
-to fit a single-order polynomial.  \\
-\hline
-GRADIENT &Typically one moderately wide line is expected, for which
-the center velocity varies significantly across the field. The
-baseline window changes across the field. Nearby galaxies often fall
-in this category. The expected lines should be wider than 20 channels
-and probably not wider than 20\% of the available bandwidth &
-Smoothing: \newline spatial = 3$\times$3 pixels \newline frequency =
-25 channels\\
-\hline
-LINEFOREST & A forest of lines is expected across the band. Bright,
-nearby star-formation sources may fall in this category.  This recipe
-also creates a separate moments map for each line (as defined by the
-parameter \param{PER\_LINE}).& Smoothing: \newline spatial = 5$\times$5 pixels
-\newline frequency = 10 channels \\
-\hline
-\end{tabular}
-\end{table}
-
-There are also variants of the recipes with the following suffixes.
-
-\begin{tabular}{p{2cm}p{10cm}}
-\_POL & polarimetry \\
-\_QL & Quick Look which merely runs \makecube\ to turn the raw time-series
-spectra into a spectral cube for display during data acquisition. \\
-\_SUMMIT & A limited reduction to keep pace with data acquisition at the
-JCMT.  It excludes any bad spectra rejection, quality assurance, or
-iterative baseline determination. \\
-\end{tabular}
-
-\newpage
-\section{\xlabel{recipe_process}The workflow}
-You can follow this commentary via the flow chart in Figure \ref{fig:pipeline}.
-
-Two notations are used in the following list:\\
-\textbullet\ \textbf{a\_cube} to mean the regridded cube of a single
-observation. \\
-\textbullet\ \textbf{g\_cube} to mean the group cube which is a co-add
-of all the \textbf{a\_cube} files.
-
-Note that the pipeline will co-add data into a group file whenever it
-encounters observations with identical LO frequencies, base positions
-and bandwidths.
-
-\begin{enumerate}[label=(\textbf{\arabic*})]
-
-\item The raw data is copied to the local directory. Typically,
-subsystems are treated as individual and separate observations by
-ORAC-DR except for hybrid-mode observations.
-
-\item Because data acquisition is asynchronous, time slices are not
-necessarily written in sequential order. The next step sort the
-time-series data into time order. This makes it easier to search for
-intermittent bad data
-
-\item Regions of high and low frequency interference are identified
-and flagged. Bad detectors are identified by comparing the deviation
-from linearity of each detector's baseline.
-
-\item The DC-level offset between corresponding sub-band observations
-is determined using the median of all the spectra.  The DC offset is
-then subtracted from the sub-band spectra, and the resulting sub-band
-spectra are mosaicked together to form single time-series cube.
-
-\item The data are thresholded by trimming the noisy ends of the band.
-The spectra are collapsed along the receptor using the `sigma'
-estimator to form a single spectrum. A constant value background is
-then fit to the resulting spectrum. The fitting regions are used to
-determine where the spectrum gets noisier (i.e. higher RMS values in
-the RMS spectrum). These high-noise regions are then trimmed from the
-ends in the frequency axis. %but still specify percentage - why??
-
-\item Quality assurance checks are run on the raw cubes. See Appendix
-\ref{app:qa} for a description of the checks performed. Any
-time-slices failing any of these checks gets flagged as bad and
-are not included in the group co-add that follows.
-
-\item Once all the raw observations have undergone the initial
-processing, the \textbf{a\_cube} files are combined to form a
-\textbf{g\_cube}.
-
-\item The \textbf{g\_cube} is smoothed by an amount specified by the
-particular science recipe being used. See Section \ref{sec:recipes}
-for details on the different recipes.
-
-\item \mfittrend\ is run to find the baseline regions on the smoothed
-\textbf{g\_cube}. The ranges are determined automatically by setting
-\param{auto=true}. A baseline mask is written out.
-
-\item The baseline mask is then applied to the unsmoothed
-\textbf{g\_cube} and \mfittrend\ is re-run. This time however, the
-emission regions have been masked out, so all remaining data is
-included in the fit by setting \param{auto=false}. The resulting
-baseline is subtracted.
-
-\item Moments maps and noise maps are made from the
-baseline-subtracted \textbf{g\_cube}.
-
-\item If another iteration is required, continue to Step 12. If not,
-the processing is complete.
-
-\item The baseline mask is converted back to the time-series with
-\unmakecube. There it is applied to the time-series data for each
-observation.
-
-\item A baseline is fit to the masked time-series data using
-\mfittrend\ and the result is subtracted from the unmasked time-series
-data.
-
-\item An \textbf{a\_cube} is made from the baseline subtracted data
-for each observation.
-
-\item The baseline-subtracted \textbf{a\_cubes} are combined to make a
-new \textbf{g\_cube}.
-
-\item Return to Step 8.
-\end{enumerate}
-
-%\setlength{\intextsep}{10.0pt plus 1.0pt minus 2.0pt}
-\begin{figure}[h!]
-\begin{center}
-\includegraphics[width=0.81\linewidth]{sc20_pipeline}
-\caption[Flow chart of the ORAC-DR ACSIS pipeline process.]{Flow chart
-  of the process employed by the ORAC-DR ACSIS pipeline. The prefix and
-  suffix of the file created at each stage is shown to the left of the
-  process box. Note that suffix `a' refers to an individual observation
-  while `g' refers to a group (or co-added) file.}
-\label{fig:pipeline}
-\end{center}
-\end{figure}
-\setlength{\textfloatsep}{20pt plus 1.0pt minus 2.0pt}
-
-\clearpage
-\chapter{\xlabel{running_pl}Running the pipeline}
-\label{sec:runpipe}
-
-\section{Checking and changing the science recipe}
-\label{sec:changerecipe}
-You can find out which recipe is set in the data header via the
-\param{RECIPE} keyword in the FITS header of any of your raw files.
-You can use either of the options below:
-\begin{terminalv}
-% fitsval s8a20120725_00045_0003 RECIPE
-% fitslist s8a20120725_00045_0003 | grep RECIPE
-\end{terminalv}
-
-You can override the recipe set in the FITS header by listing any different
-one on the command line when starting \oracdr. For example:
-\begin{terminalv}
-% oracdr -file mylist -loop file -log x REDUCE_SCIENCE_GRADIENT
-\end{terminalv}
-
-\section{Setting recipe parameters (optional)}
-\label{sec:recpars}
-
-You can tailor the recipe parameters by supplying a \file{.ini} file
-(called \file{myparams.ini} in the following example). This file contains the
-recipe name (which must match the one assigned to your data, whether
-from the header or any different one specified on the command line)
-followed by the options you wish to specify in the following format:
-
-\vspace{0.2cm}
-\begin{terminalv}
-[REDUCE_SCIENCE_NARROWLINE]
-MOMENTS_LOWER_VELOCITY = -30.0
-MOMENTS_UPPER_VELOCITY = 155.0
-PIXEL_SCALE = 6.0,10.0
-SPREAD_METHOD = gauss
-SPREAD_WIDTH = 9
-SPREAD_FWHM_OR_ZERO = 6
-REBIN = 2
-\end{terminalv}
-
-Notice the two values given for the \param{PIXEL\_SCALE} option. This
-means that two maps will be produced, one at each of the specified
-pixel scales. See Appendix \ref{app:params} for a full list of recipe
-parameters.
-
-
-\section{Setting quality-assurance parameters (optional)}
-\label{sec:qa}
-
-There is a set of quality-assurance (QA) parameters that are applied
-by default when you run the pipeline. These are found in the text file
-\param{\$ORAC\_DATA\_CAL/qa.ini}.
-
-You can set your own QA parameters by creating a local \textit{.ini}
-file (called \file{myqa.ini} in the following examples). You can then call
-this local QA file via \param{-calib qaparams=myqa.ini} when starting
-the pipeline.
-
-The example below illustrates the format of this QA file and
-highlights some of the main parameters you may consider tweaking.
-
-\vspace{0.2cm}
-\begin{terminalv}
-[default]
-BADPIX_MAP=0.1
-GOODRECEP=8
-TSYSBAD=550
-FLAGTSYSBAD=0.5
-TSYSMAX=550
-TSYSVAR=1.0
-RMSVAR_RCP=0.5
-\end{terminalv}
-The text in the square brackets describes the data to which the QA
-parameters should be applied. This is followed by the QA parameters
-and their values.
-
-The parameters listed under the [default] header will get picked up
-for \textit{all} observations unless overridden by other header
-descriptions. Extra header may describe a frequency range (e.g.
-\texttt{[default 200:300]}), a particular molecule and transition
-(e.g. \texttt{[default CO32]}), an instrument (e.g. \texttt{[RXA]}),
-or a legacy survey (e.g. \texttt{[GBS]}). You can also include
-combinations (e.g. \texttt{[GBS\_13CO32]}). Note that for any data
-taken by RxA or RxW, \param{GOODRECEP} must be set to 1.
-
-The example file below sets up a different set of parameters for two
-transitions of CO. Any QA parameters not explicitly set will revert to
-those specified in the default \file{qa.ini} file.
-
-\vspace{0.2cm}
-\begin{terminalv}
-[C18O32]
-RES_CHAN=10
-VELRES=1.0
-TSYSBAD=650
-
-[CO21]
-RES_CHAN=10
-VELRES=0.5
-TSYSBAD=550
-GOODRECEP=1
-\end{terminalv}
-
-See Appendix \ref{app:qa} for a description of all available QA parameters.
-
-
-\section{Specifying bad receptors (recommended)}
-\label{sec:badrec}
-
-If certain receptors are known to be bad for the full length of an
-observations (e.g. dead receptors), processing time can be reduced by
-not having the pipeline attempt to reduce that data.
-
-Information regarding bad receptors is stored in a master text file
-called \file{index.bad\_receptors}, located in your
-\param{ORAC\_DATA\_CAL} directory. This file lists dates and the
-corresponding receptors which are not operational. By default, when
-the pipeline runs it searches this file and discards the appropriate
-receptors. However, this master list is grossly incomplete so you
-should select another method for specifying bad receptors.
-
-We recommend using the \param{index} option, called via \param{-calib
-bad\_receptors=index} when starting the pipeline. This creates an
-index file called \file{index.bad\_receptors\_qa} in your
-\param{ORAC\_DATA\_OUT} directory, where any bad receptors identified
-during your reductions are indexed. This file is appended each time
-you run the pipeline and in this way you build up your own independent
-list.
-
-If an index file exists, then, by default, the pipeline will look for
-bad-receptor information in both
-\param{\$ORAC\_DATA\_CAL/index.bad\_receptors} and
-\param{\$ORAC\_DATA\_OUT/index.bad\_receptors\_qa}.
-
-\begin{table}[h!]
-\begin{tabular}{p{3cm}|p{12cm}}
-
-\textbf{bad\_receptors} & \textbf{Description} \\
-\hline
-masterorindex & Use both the master \file{index.bad\_receptors} and pipeline-generated
-                \file{index.bad\_receptors\_qa} files [Default].\\
-master        & Use the master \file{index.bad\_receptors} file in \param{\$ORAC\_DATA\_CAL}. \\
-index         & Use the \file{index.bad\_receptors\_qa} index file in
-                \param{\$ORAC\_DATA\_OUT} as generated by the pipeline. \\
-file          & Reads a file called \param{bad\_receptors.lis}, which
-                contains a  space-separated list of receptor names in the
-                first line. This file must be located in \param{\$ORAC\_DATA\_OUT}.
-                For instance, \param{-calib bad\_receptors=bad\_receptors.lis}.\\
-list          & A colon-separated list of receptor names can be supplied, such as
-                \param{-calib bad\_receptors=H01:H06}. You can append any of the other
-                options to the end of your list, such as \param{-calib bad\_receptors=H14:index}\\
-\hline
-\end{tabular}
-\label{tab:index-options}
-\caption[Pipeline options for the \param{-calib bad\_receptors}
-flag.]{\small The options available for the \param{-calib
-bad\_receptors} flag when running the pipeline.}
-\end{table}
-
-\section{\xlabel{starting_pl}Starting the pipeline}
-\label{sec:runpl}
-
-\begin{enumerate}[label=(\textbf{\arabic*})]
-
-\item Initialise the pipeline software.  This may be as simple as
-
-\begin{terminalv}
-% oracdr_acsis
-\end{terminalv}
-
-\item Define environment variables to ensure the data is read from,
-and written to, the right place. Many are set automatically when the
-pipeline is initialised but others must be set manually. Details of
-the optional variables are given in \acsispipelinesun\ but you should
-specify where to find the raw data and where to write any files that
-are created.
-\begin{terminalv}
-% setenv ORAC_DATA_IN <path to raw data>
-% setenv ORAC_DATA_OUT <where you want reduced data to go>
-\end{terminalv}
-
-These extra definitions can be avoided if you initialise with the
-following command.
-
-\begin{terminalv}
-% oracdr_acsis -cwd
-\end{terminalv}
-
-The \param{cwd} option requests that the current working directory is
-used for all input and output, which is most likely what you require.
-
-If you are supplying a text file listing the raw data
-\param{\$ORAC\_DATA\_IN} should be the location of this file. If
-supplying an external configuration file it should also be in this
-location.
-
-If you wish to keep the intermediate files produced by the pipeline
-you should also set \param{ORAC\_KEEP}.
-\begin{terminalv}
-% setenv ORAC_KEEP 1
-\end{terminalv}
-However, this still excludes temporary files made during a recipe step,
-whose names have the \file{oractemp} prefix.  To retain these set
-\begin{terminalv}
-% setenv ORAC_KEEP temp
-\end{terminalv}
-
-Retention of temporary and intermediate will require plenty of storage,
-but it can be invaluable during debugging.
-
-\item Now you are ready to run the pipeline. In this example, the
-recipe name on the end ensures that all data being processed using
-REDUCE\_SCIENCE\_NARROWLINE.
-
-\begin{terminalv}
-% oracdr -files list.txt -loop file -batch -log xf -calib qaparams=myqa.ini \
-  bad_receptors=index -recpars mypar.ini -nodisplay
-REDUCE_SCIENCE_NARROWLINE
-\end{terminalv}
-\end{enumerate}
-
-Below is a list of commonly used command line options when running the
-ORAC-DR pipeline from outside the EAO. For a full list of all possible
-options and their descriptions see \oracdrsun.
-\begin{table}[h!]
-\begin{tabular}{p{2.5cm}|p{12.5cm}}
-
-\textbf{Flag} & \textbf{Description} \\
-\hline
-\multicolumn{2}{l}{\textbf{Supplying data}} \\
-\hline
-%-from/-to         & Number of first/last observation \\
-%-list             & Comma separated list of observation numbers \\
--file $<$mylist$>$ & Input data to be read in from a text file. Supply the
-                     file name (relative to current directory, or the full
-                     path) of an ASCII text file containing a list of all
-                     observation files to be reduced, one file per line. \\
-%-ut               & UT date of observations (defaults to current \emph{yyyymmdd}). \\
-\hline
-\multicolumn{2}{l}{\textbf{Looping}} \\
-\hline
-%-loop list & Default when using the -list option. The pipeline will stop once
-              the observations in the list have been reduced. \\
--loop file  & Loop over all the lines in the file supplied by the \param{-file}
-              option. \\
-\hline
-\multicolumn{2}{l}{\textbf{Group processing}} \\
-\hline
-\param{-batch}    & Delays group processing until the individual files have been reduced.  \\
-%\param{-skip}    & Allow the data detection loop to skip missing observations.  \\
-\param{-onegroup} & Forces all the observations into the same group. Useful if
-                    building up a map from rasters with different target co-ordinates
-                    or from different dates.  \\
-\hline
-\multicolumn{2}{l}{\textbf{Supplying parameter files}} \\
-\hline
-\param{-calib}    & Under the calibration flag you can specify QA parameters by including
-                    \param{qaparams=<myqa.ini>} and bad receptors via
-                    \param{bad\_receptors=index}.  If you do not set the
-                    \texttt{qaparams} option but have a file called \texttt{qa.ini}
-                    in your output directory, the QA settings will come from this file.\\
--recpars & Allows you to provide recipe parameters as a \file{.ini} file.  \\
-\hline
-\multicolumn{2}{l}{\textbf{Logs/Display}} \\
-\hline
-\param{-nodisplay} & Shorten processing times by turning off all graphical output. \\
-\param{-log sxfh}  & Send the log to a screen (\param{s}), an xwindow (\param{x}), file
-                     (\param{f}) or html (\param{h}). The logfile
-                     (\param{f}) has the name \file{.oracdr\_}$NNNN$\file{.log} where
-                     $NNNN$ is the current process ID. Only include the options you want.
-                     This defaults to \param{xf}.\\
-\hline
-\end{tabular}
-\label{tab:pipe-options}
-\caption{\small The options available on the command line when running
-the ORAC-DR pipeline from outside the EAO.}
-\end{table}
-
-\section{\xlabel{pl_output}Pipeline output}
-
-The pipeline will produce a group file for each object being
-processed. If the pipeline is given data from multiple nights, all
-those data will be included in the group co-add using inverse variance
-weighting.
-
-Files created from individual observations are prefixed with
-\file{a}, while group (co-added) maps are prefixed with \file{ga}.
-\cref{Table}{tab:pipe-out}{the table below} describes the files
-created. In addition PNG images are made of the reduced files at a
-variety of resolutions.
-
-\begin{tip}
-TIP: Even if just a single observation is processed, a group file is
-created so long as the observation passes the QA check.
-\end{tip}
-
-\subsection{Why have multiple reduced files been generated?}
-\label{sec:multireduced}
-
-You will find the pipeline splits large reduced cubes (e.g. from
-raster maps) into smaller tiles of $<$512\,MB. This is to save on
-computer memory. It does this from the central position outwards so
-you may find some of the smaller edge tiles are strange, often narrow,
-rectangles. These tiles can be pasted together with the \Kappa\
-command \paste\ but beware of the final file size. For example,
-\begin{terminalv}
-% paste ga20140601_15_1_reduced\*.sdf tiledmap
-\end{terminalv}
-Note, there is a recipe parameter CHUNKSIZE which adjusts the maximum
-tile size. If you make it larger than 512 it is possible to generate a
-single reduced cube.
-\begin{table}[h!]
-\centering
-\begin{tabular}{p{2.8cm}|p{11.8cm}}
-\hline
-\multicolumn{2}{l}{\textbf{Default Files}}\\
-\hline
-\file{cube001}    & Baselined cube \\
-\file{integ}      & Integrated intensity image \\
-\file{rimg}       & Representative image (same as \file{integ} file), used to form
-                    rimg PNG \\
-\file{sp001}      & Spectrum taken from position of peak intensity in the
-                    integ file \\
-\file{rsp}        & Representative spectrum (same as \file{sp001}), used to form
-                    rsp PNG \\
-\file{iwc}        & Intensity weighted co-ordinate image \\
-\file{noise}      & Noise map \\
-\file{reduced00$n$} & Final trimmed, baselined cube of the \mbox{$n^{\textnormal{th}}$} tile.
-                    There may be a few of these as large maps will be split into
-                    tiles of 512\,MB. \\
-\file{rmslo}      & Low-frequency noise \\
-\file{rmshi}      & High-frequency noise \\
-\hline
-\multicolumn{2}{l}{\textbf{Extra files kept with ORAC\_KEEP = 1}}\\
-\hline
-\file{em001}      & Ends of the frequency axis have been trimmed off \\
-\file{thr001}     & Time-series data with large spikes removed \\
-\file{ts001}      & Time-sorted time-series data \\
-\file{tss001}     & Time-series data with median DC signal removed \\
-\file{blmask001}  & Baseline mask cube. Regions of emission have been
-                    masked out. \\
-\file{bl001}      & Baselined cube \\
-\file{linteg00$n$} & Integrated intensity image formed around the
-                    $n^{\textnormal{th}}$ line. \\
-\hline
-\end{tabular}
-\label{tab:pipe-out}
-\caption{\small Table of the files written out by the science pipeline. Each
-  of these files is generated for both the individual observations and the
-  group files.}
-\end{table}
-
-In addition to these NDFs a number of log files are created.
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{p{2.8cm}|p{11.8cm}}
-\hline
-\multicolumn{2}{l}{\textbf{Default Files}}\\
-\hline
-\file{.oracdr\_*.log}  & The \oracdr\ log file. \\
-\file{log.flat}   & Flat-field ratios for each receptor and observation. \\
-\file{log.group}  & The files contributing to each group. \\
-\file{log.noisestats} & Noise statistics for each observation and group. \\
-\file{log.qa}     & Quality assurance reports \\
-\hline
-\end{tabular}
-\label{tab:pipe-logfiles}
-\caption{\small Table of the log files written by the science pipeline.}
-\end{table}
-
-Finally there are HDS scratch \file{t*.sdf} files, and temporary files
-\file{oractemp*} which can be NDFs or small text files such as file
-lists.  These should be removed automatically at the end of processing,
-unless something has gone wrong.
-
-
-\section{\xlabel{cadc}Getting your data from CADC}
+\chapter{\xlabel{cadc}Getting your data from CADC}
 \label{sec:fromcadc}
 
 The JCMT Science Archive is hosted by The Canadian Astronomy Data
