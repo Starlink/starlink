@@ -149,12 +149,12 @@ observations being reduced together, observing and bandwidth modes
 subbands.  However, the main factor is the volume of data being
 processed concurrently.
 
-The \oracdr\ \cite{oracdr} pipeline can demand approaching 300~GB of
-peak storage for the largest (about a degree square) HARP maps, and at
-least 24~GB of memory during spectral-cube creation.  For more-normal
-sized maps of individual targets, say 20 square arcminutes from your
-observations, would only require about 10~GB of storage and most
-modern computers would have sufficient memory.  The storage
+The \oracdr\ \cite{oracdr,oracdr_infra} pipeline can demand approaching
+300~GB of peak storage for the largest (about a degree square) HARP maps,
+and at least 24~GB of memory during spectral-cube creation.  For
+more-normal-sized maps of individual targets, say 20 square arcminutes
+from your observations, would only require about 10~GB of storage and
+most modern computers would have sufficient memory.  The storage
 requirements can more than double if all intermediate files are
 retained for diagnostic purposes; intermediate files are normally
 removed at the end of each pass through a recipe.  Reducing manually
@@ -3158,6 +3158,12 @@ Draper~P.~W., Taylor~M. and Allan~A., 2011, \textit{CCDPACK -- CCD data reductio
 Gibb~A.~G., Jenness~T., Economou~F., 2012, \textit{PICARD --- a
 PIpeline for Combining and Analyzing Reduced Data},
 \xref{Starlink User Note 265}{sun265}{}
+
+\bibitem{oracdr_infra}
+Jenness~T. \& Economou~F.,
+\htmladdnormallink{\textit{ORAC-DR: A generic data reduction pipeline
+infrastructure}}{http://dx.doi.org/10.1016/j.ascom.2014.10.005}, Astronomy and
+Computing, 9, 40 (DOI:10.1016/j.ascom.2014.10.005)
 
 \bibitem{heterodyne_pipeline}
 Jenness~T., Currie~M.~J., Tilanus~R., Cavanagh~B., Berry~D.~S.,
