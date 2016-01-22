@@ -64,8 +64,6 @@
 *        Some of the integer entries in JCMTState are now shorts.
 *     2012-02-23 (TIMJ):
 *        Add SC2_1KNTDTEMP
-*     2012-12-09 (TIMJ):
-*        Add SC2_MAG_XYZ
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -202,9 +200,6 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
                CHECK_ITEM("SC2_MIXTEMP",AST__FLOATTYPE,sizeof(float),sc2_mixtemp)
                CHECK_ITEM("SC2_FPUTEMP",AST__FLOATTYPE,sizeof(float),sc2_fputemp)
                CHECK_ITEM("SC2_1KNTDTEMP",AST__FLOATTYPE,sizeof(float),sc2_1kntdtemp)
-               CHECK_ITEM("SC2_MAG_X",AST__FLOATTYPE,sizeof(float),sc2_mag_x)
-               CHECK_ITEM("SC2_MAG_Y",AST__FLOATTYPE,sizeof(float),sc2_mag_y)
-               CHECK_ITEM("SC2_MAG_Z",AST__FLOATTYPE,sizeof(float),sc2_mag_z)
                CHECK_ITEM("SMU_AZ_CHOP_X",AST__DOUBLETYPE,sizeof(double),smu_az_chop_x)
                CHECK_ITEM("SMU_AZ_CHOP_Y",AST__DOUBLETYPE,sizeof(double),smu_az_chop_y)
                CHECK_ITEM("SMU_AZ_JIG_X",AST__DOUBLETYPE,sizeof(double),smu_az_jig_x)

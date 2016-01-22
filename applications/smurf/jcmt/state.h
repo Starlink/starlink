@@ -79,8 +79,6 @@
 *        Define largest string length for _CHAR types
 *     2012-02-23 (TIMJ):
 *        Add SC2_1KNTDTEMP
-*     2012-12-09 (TIMJ):
-*        Add SC2_MAG_X,Y,Z
 
 *  Copyright:
 *     Copyright (C) 2008-2012 Science and Technology Facilities Council.
@@ -194,9 +192,6 @@ typedef struct JCMTState {
   float  sc2_mixtemp;
   float  sc2_fputemp;
   float  sc2_1kntdtemp;
-  float  sc2_mag_x;
-  float  sc2_mag_y;
-  float  sc2_mag_z;
   float  acs_exposure;
   float  acs_offexposure;
   short  acs_no_prev_ref;
@@ -271,9 +266,6 @@ typedef enum
    SC2_MIXTEMP,
    SC2_FPUTEMP,
    SC2_1KNTDTEMP,
-   SC2_MAG_X,
-   SC2_MAG_Y,
-   SC2_MAG_Z,
    ACS_EXPOSURE,
    ACS_OFFEXPOSURE,
    ACS_NO_PREV_REF,
@@ -368,9 +360,6 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
     { SC2_MIXTEMP, "_REAL", "SC2_MIXTEMP", INST__SCUBA2, INST__SCUBA2 }, /* Old data did not have it */
     { SC2_FPUTEMP, "_REAL", "SC2_FPUTEMP", INST__SCUBA2, INST__SCUBA2 }, /* Old data did not have it */
     { SC2_1KNTDTEMP, "_REAL", "SC2_1KNTDTEMP", INST__SCUBA2, INST__SCUBA2 }, /* Old data did not have it */
-    { SC2_MAG_X, "_REAL", "SC2_MAG_X", INST__SCUBA2, INST__SCUBA2 }, /* Old data did not have it */
-    { SC2_MAG_Y, "_REAL", "SC2_MAG_Y", INST__SCUBA2, INST__SCUBA2 }, /* Old data did not have it */
-    { SC2_MAG_Z, "_REAL", "SC2_MAG_Z", INST__SCUBA2, INST__SCUBA2 }, /* Old data did not have it */
     { ACS_SOURCE_RO, CHARTYP(JCMT__SZACS_SOURCE_RO), "ACS_SOURCE_RO", INST__ACSIS, INST__NONE },
     { ACS_NO_PREV_REF, "_WORD", "ACS_NO_PREV_REF", INST__ACSIS, INST__NONE },
     { ACS_NO_NEXT_REF, "_WORD", "ACS_NO_NEXT_REF", INST__ACSIS, INST__NONE },
