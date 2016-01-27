@@ -42,6 +42,10 @@
 *        Position of the fiducial point in pixel co-ordinates.  The
 *        number of values supplied must match the number of pixel axes
 *        in the NDF.  It is only used if STYPE="Relative".
+*
+*        An object centred at the pixel co-ordinates given by parameter
+*        OBJ in the input NDF will be centred at the pixel co-ordinates
+*        given by parameter FID in the output NDF.
 *     IN = NDF (Read)
 *        The NDF to be translated.
 *     METHOD = LITERAL (Read)
@@ -76,6 +80,10 @@
 *        Position of the standard object in pixel co-ordinates.  The
 *        number of values supplied must match the number of pixel axes
 *        in the NDF.   It is only used if STYPE="Relative".
+*
+*        An object centred at the pixel co-ordinates given by parameter
+*        OBJ in the input NDF will be centred at the pixel co-ordinates
+*        given by parameter FID in the output NDF.
 *     OUT = NDF (Write)
 *        The translated NDF.
 *     PARAMS( ) = _DOUBLE (Read)

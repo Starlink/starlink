@@ -43910,6 +43910,10 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          Position of the fiducial point in pixel co-ordinates.  The number
          of values supplied must match the number of pixel axes in the NDF.
          It is only used if STYPE=\texttt{"Relative"}.
+
+         An object centred at the pixel co-ordinates given by parameter
+         OBJ in the input NDF will be centred at the pixel co-ordinates
+         given by parameter FID in the output NDF.
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -43967,6 +43971,10 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          Position of the standard object in pixel co-ordinates.  The number
          of values supplied must match the number of pixel axes in the NDF.
          It is only used if STYPE=\texttt{"Relative"}.
+
+         An object centred at the pixel co-ordinates given by parameter
+         OBJ in the input NDF will be centred at the pixel co-ordinates
+         given by parameter FID in the output NDF.
       }
       \sstsubsection{
          OUT = NDF (Write)
