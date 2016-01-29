@@ -19,8 +19,8 @@
 *  Description:
 *     This routine displays statistics for pixels that lie within a
 *     specified aperture of an NDF. The aperture can either be circular
-*     (specified by parameters CENTRE and DIAM), or arbitrary (specified
-*     by parameter ARDFILE). If the aperture is specified using parameters
+*     (specified by Parameters CENTRE and DIAM), or arbitrary (specified
+*     by Parameter ARDFILE). If the aperture is specified using Parameters
 *     CENTRE and DIAM, then it must be either one- or two-dimensional.
 *
 *     The following statistics are displayed:
@@ -40,7 +40,7 @@
 *     (i.e. if it has no VARIANCE component), then each pixel is assumed to
 *     have a constant variance equal to the variance of the pixel values
 *     within the aperture. There is an option to weight pixels so that
-*     pixels with larger variances are given less weight (see parameter
+*     pixels with larger variances are given less weight (see Parameter
 *     WEIGHT). The statistics are displayed on the screen and written to
 *     output parameters. They may also be written to a log file.
 *
@@ -58,7 +58,7 @@
 *        The name of an ARD file containing a description of the aperture.
 *        This allows apertures of almost any shape to be used. If a null
 *        (!) value is supplied then the aperture is assumed to be circular
-*        with centre and diameter given by parameters CENTRE and DIAM. ARD
+*        with centre and diameter given by Parameters CENTRE and DIAM. ARD
 *        files can be created either "by hand" using an editor, or using a
 *        specialist application should as KAPPA:ARDGEN.
 *
@@ -73,15 +73,15 @@
 *        co-ordinates.  [!]
 *     CENTRE = LITERAL (Read)
 *        The co-ordinates of the centre of the circular aperture. Only
-*        used if parameter ARDFILE is set to null. The position must be
+*        used if Parameter ARDFILE is set to null. The position must be
 *        given in the current co-ordinate Frame of the NDF (supplying
 *        a colon ":" will display details of the current co-ordinate
 *        Frame). The position should be supplied as a list of formatted
-*        axis values separated by spaces or commas. See also parameter
+*        axis values separated by spaces or commas. See also Parameter
 *        USEAXIS. The current co-ordinate Frame can be changed using
 *        KAPPA:WCSFRAME.
 *     DIAM = LITERAL (Read)
-*        The diameter of the circular aperture. Only used if parameter
+*        The diameter of the circular aperture. Only used if Parameter
 *        ARDFILE is set to null. If the current co-ordinate Frame of the
 *        NDF is a SKY Frame (e.g. RA and DEC), then the value should be
 *        supplied as an increment of celestial latitude (e.g. DEC). Thus,
@@ -132,7 +132,7 @@
 *        USEAXIS is only accessed if the current co-ordinate Frame of
 *        the NDF has too many axes. A group of strings should be
 *        supplied specifying the axes which are to be used when
-*        specifying the aperture using parameters ARDFILE, CENTRE and
+*        specifying the aperture using Parameters ARDFILE, CENTRE and
 *        DIAM.  Each axis can be specified using one of the following
 *        options.
 *
@@ -247,7 +247,7 @@
 *     2012 May 8 (MJC):
 *        Add _INT64 support.
 *     29-JAN-2016 (DSB):
-*        Add parameter MASK.
+*        Add Parameter MASK.
 *     {enter_further_changes_here}
 
 *-

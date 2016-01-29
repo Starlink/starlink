@@ -23,7 +23,7 @@
 *     The pixels of an NDF are shifted by a given number of pixels along
 *     each pixel axis.  The shift need not be an integer number of
 *     pixels, and pixel interpolation will be performed if necessary
-*     using the scheme selected by parameter METHOD.  The shifts to use
+*     using the scheme selected by Parameter METHOD.  The shifts to use
 *     are specified either by an absolute vector given by the ABS
 *     parameter or by the difference between a fiducial point and a
 *     standard object given by the FID and OBJ parameters respectively.
@@ -43,9 +43,9 @@
 *        number of values supplied must match the number of pixel axes
 *        in the NDF.  It is only used if STYPE="Relative".
 *
-*        An object centred at the pixel co-ordinates given by parameter
+*        An object centred at the pixel co-ordinates given by Parameter
 *        OBJ in the input NDF will be centred at the pixel co-ordinates
-*        given by parameter FID in the output NDF.
+*        given by Parameter FID in the output NDF.
 *     IN = NDF (Read)
 *        The NDF to be translated.
 *     METHOD = LITERAL (Read)
@@ -81,9 +81,9 @@
 *        number of values supplied must match the number of pixel axes
 *        in the NDF.   It is only used if STYPE="Relative".
 *
-*        An object centred at the pixel co-ordinates given by parameter
+*        An object centred at the pixel co-ordinates given by Parameter
 *        OBJ in the input NDF will be centred at the pixel co-ordinates
-*        given by parameter FID in the output NDF.
+*        given by Parameter FID in the output NDF.
 *     OUT = NDF (Write)
 *        The translated NDF.
 *     PARAMS( ) = _DOUBLE (Read)
