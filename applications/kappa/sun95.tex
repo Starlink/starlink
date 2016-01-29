@@ -9760,6 +9760,15 @@ KAPPA: \htmlref{CADD}{CADD},
          and is not intended for passing to other applications.  \texttt{[!]}
       }
       \sstsubsection{
+         MASK = NDF (Write)
+      }{
+         An output NDF containing the pixel mask used to evaluate the
+         reported statistics. The NDF will contain the value +1 for
+         pixels that are included in the statistics, and bad values
+         for all other pixels. The pixel bounds of the NDF will be the
+         smallest needed to encompass all used pixels. \texttt{[!]}
+      }
+      \sstsubsection{
          MEAN = \_DOUBLE (Write)
       }{
          The mean of the pixel values within the aperture.
@@ -53097,6 +53106,13 @@ and HDS data types is as follows:
 \subsection{Modified Commands}
 The following applications have been modified:
 \begin{description}[style=nextline]
+
+   \item [\htmlref{APERADD}{APERADD}]\mbox{}
+      \begin{itemize}
+        \item Has a new parameter MASK, which can be used to save an NDF
+              containing a mask showing which pixels were included in the
+              aperture.
+      \end{itemize}
 
    \item [\htmlref{WCSADD}{WCSADD}]\mbox{}
       \begin{itemize}

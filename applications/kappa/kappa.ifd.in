@@ -7668,6 +7668,16 @@ package kappa {
             helpkey *
          }
 
+         parameter mask {
+            type NDF
+            access WRITE
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Output NDF}
+            default !
+            helpkey *
+         }
+
          parameter mean {
             type _DOUBLE
             access WRITE

@@ -95,6 +95,12 @@
 *        Name of the text file to log the results.  If null, there
 *        will be no logging.  Note this is intended for the human reader
 *        and is not intended for passing to other applications.  [!]
+*     MASK = NDF (Write)
+*        An output NDF containing the pixel mask used to evaluate the
+*        reported statistics. The NDF will contain the value +1 for
+*        pixels that are included in the statistics, and bad values
+*        for all other pixels. The pixel bounds of the NDF will be the
+*        smallest needed to encompass all used pixels. [!]
 *     MEAN = _DOUBLE (Write)
 *        The mean of the pixel values within the aperture.
 *     NDF = NDF (Read)
@@ -240,6 +246,8 @@
 *        - Correct docs for DIAM parameter.
 *     2012 May 8 (MJC):
 *        Add _INT64 support.
+*     29-JAN-2016 (DSB):
+*        Add parameter MASK.
 *     {enter_further_changes_here}
 
 *-
@@ -282,6 +290,7 @@
       INTEGER IGRP               ! Group identifier
       INTEGER INDF1              ! Identifier for the input NDF
       INTEGER INDF2              ! Identifier for NDF section containing aperture
+      INTEGER INDF3              ! Identifier for output NDF containing aperture
       INTEGER IPDAT              ! Pointer to the data component of input NDF
       INTEGER IPIX               ! Index of PIXEL Frame within IWCS
       INTEGER IPMASK             ! Pointer to the full sized ARD logical mask
@@ -294,6 +303,7 @@
       INTEGER NGOOD              ! Number of good pixels
       INTEGER NUMPIX             ! Total number of pixels
       INTEGER NVAL               ! Number of supplied values
+      INTEGER NREP               ! Number of background pixels
       INTEGER REGVAL             ! Value assignied to the first ARD region
       INTEGER SDIM( NDF__MXDIM ) ! Indices of significant axes
       INTEGER SLBND( NDF__MXDIM )! Lower limit for input NDF
@@ -446,11 +456,27 @@
       IF( VAR ) CALL NDF_MAP( INDF2, 'VARIANCE', TYPE, 'READ', IPVAR,
      :                        EL, STATUS )
 
-*  Copy the section of the mask array which just encloses the aperture
-*  into a new mask array.
-      CALL PSX_CALLOC( EL, '_INTEGER', IPMSK2, STATUS )
-      CALL KPG1_CPNDI( NDIM, SLBND, SUBND, %VAL( CNF_PVAL( IPMASK ) ),
-     :                 LBNDI, UBNDI,
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) go to 999
+
+*  If the mask is to be retained in an output NDF, create the output NDF,
+*  set its data type to _INTEGER and map it.
+      CALL LPG_PROP( INDF2, 'WCS,Axis', 'MASK', INDF3, STATUS );
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL NDF_STYPE( '_INTEGER', INDF3, 'DATA', STATUS )
+         CALL NDF_MAP( INDF3, 'DATA', '_INTEGER', 'WRITE', IPMSK2, EL,
+     :                 STATUS )
+
+*  Otherwise, annul the error and allocate work array for the mask.
+      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         CALL PSX_CALLOC( EL, '_INTEGER', IPMSK2, STATUS )
+      END IF
+
+*  Copy the section of the mask array which just encloses the aperture into
+*  a new mask array.
+      CALL KPG1_CPNDI( NDIM, SLBND, SUBND,
+     :                 %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI,
      :                 %VAL( CNF_PVAL( IPMSK2 ) ), EL, STATUS )
 
 *  Calculate the required statistics. Call the appropriate routine for the
@@ -511,6 +537,14 @@
      :                    NGOOD, MEAN, SGMEAN, TOT,
      :                    SGTOT, NUMPIX, SIGMA, STATUS )
 
+      END IF
+
+
+*  If the mask is being writeen to an output NDF< convert the background
+*  values from zoer to bad.
+      IF( INDF3 .NE. NDF__NOID ) THEN
+         CALL KPG1_CHVAI( EL, %VAL( CNF_PVAL( IPMSK2 ) ), 0, VAL__BADI,
+     :                    %VAL( CNF_PVAL( IPMSK2 ) ), NREP, STATUS )
       END IF
 
 *  Abort if an error has occurred.
@@ -669,7 +703,7 @@
 
 *  Free the dynamic array space of the logical mask.
       CALL PSX_FREE( IPMASK, STATUS )
-      CALL PSX_FREE( IPMSK2, STATUS )
+      IF( INDF3 .EQ. NDF__NOID ) CALL PSX_FREE( IPMSK2, STATUS )
 
 *  Delete the group used to hold the ARD description.
       CALL GRP_DELET( IGRP, STATUS )
