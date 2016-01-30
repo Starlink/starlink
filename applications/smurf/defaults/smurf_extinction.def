@@ -57,6 +57,8 @@
 #        Add location of CSO fits data file.
 #     2015-11-19 (GSB):
 #        Add location of WVM fits data file.
+#     2016-01-29 (GSB):
+#        Add WVM despiking parameters.
 
 #-
 
@@ -94,6 +96,27 @@ ext.taurelation.850 =  (4.6,-0.0043)
 # 		size in seconds for the tophat function. A value of 0
 #		disables smoothing.
 ext.smoothwvm = 10.0
+
+#-----------------------------------------------------------------
+#  Name:        ext.despikewvm
+#  Type:        real
+#  Default:     30.0
+#  Purpose:     Controls the extinction values used in the EXT model
+#               and the EXTINCTION task.
+#  Description: Indicates if we want WVM despiking. The value is the
+#               size in seconds for the despiking window. A value of 0
+#               disables despiking.
+ext.despikewvm = 30.0
+
+#-----------------------------------------------------------------
+#  Name:        ext.despikewvmtol
+#  Type:        real
+#  Default:     0.10
+#  Purpose:     Controls the extinction values used in the EXT model
+#               and the EXTINCTION task.
+#  Description: Indicates tolerance level for WVM despiking. The value is the
+#               fractional spike threshold. A value of 0 disables despiking.
+ext.despikewvmtol = 0.10
 
 #-----------------------------------------------------------------
 #  Name: 	ext.csofit

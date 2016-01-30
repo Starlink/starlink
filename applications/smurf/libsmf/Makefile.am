@@ -132,6 +132,7 @@ smf_deepcopy_smfData.c \
 smf_deepcopy_smfFile.c \
 smf_deepcopy_smfHead.c \
 smf_deepcopy_smfFts.c \
+smf_despike_wvm.c \
 smf_detmask.c \
 smf_detpos_wcs.c \
 smf_diag.c \

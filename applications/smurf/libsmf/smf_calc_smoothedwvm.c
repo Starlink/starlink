@@ -73,6 +73,8 @@
 *        Multi-threaded implementation.
 *     2012-06-29 (TIMJ):
 *        Fix critical indexing bugs in multi-threaded implementation
+*     2016-01-29 (GSB):
+*        Add despiking step.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -462,8 +464,26 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
 
 
   if (*status == SAI__OK && extpars) {
-    /* Read extpars to see if we need to smooth */
+    /* Read extpars to see if we need to despike and/or smooth */
+    double despiketime = VAL__BADD;
+    double despiketol = VAL__BADD;
     double smoothtime = VAL__BADD;
+
+    if (astMapGet0D(extpars, "DESPIKEWVM", &despiketime)
+            && astMapGet0D(extpars, "DESPIKEWVMTOL", &despiketol)) {
+        if  ((despiketime != VAL__BADD) && (despiketol != VAL__BADD)) {
+            msgOutiff(MSG__VERB, "",
+                      "Despiking WVM data with %f s window and %f tolerance",
+                      status, despiketime, despiketol);
+
+            /* Apply despiking routine and subtract the (returned) number
+               of removed samples from those considered good. */
+            ngood -= smf_despike_wvm(
+                taudata, nframes,
+                (int) (despiketime / (thesedata->sdata)[0]->hdr->steptime),
+                despiketol, status);
+        }
+    }
 
     if (astMapGet0D( extpars, "SMOOTHWVM", &smoothtime ) ) {
       if (smoothtime != VAL__BADD && smoothtime > 0.0) {
