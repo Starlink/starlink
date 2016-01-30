@@ -140,6 +140,9 @@ typedef struct {
   dim_t nframes;
 } smfCalcWvmJobData;
 
+void smf__print_wvm_data(double* taudata, smfHead *hdr, size_t nframes,
+                         int* status);
+
 void smf__calc_wvm_job( void *job_data, int *status );
 
 #define FUNC_NAME "smf_calc_smoothedwvm"
@@ -472,6 +475,11 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
     if (astMapGet0D(extpars, "DESPIKEWVM", &despiketime)
             && astMapGet0D(extpars, "DESPIKEWVMTOL", &despiketol)) {
         if  ((despiketime != VAL__BADD) && (despiketol != VAL__BADD)) {
+            /* Use this to get the raw WVM output for debugging before despiking */
+            /*
+            smf__print_wvm_data(taudata, (thesedata->sdata)[0]->hdr, nframes, status);
+            */
+
             msgOutiff(MSG__VERB, "",
                       "Despiking WVM data with %f s window and %f tolerance",
                       status, despiketime, despiketol);
@@ -487,6 +495,11 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
 
     if (astMapGet0D( extpars, "SMOOTHWVM", &smoothtime ) ) {
       if (smoothtime != VAL__BADD && smoothtime > 0.0) {
+        /* Use this to get the raw WVM output for debugging before smoothing */
+        /*
+        smf__print_wvm_data(taudata, (thesedata->sdata)[0]->hdr, nframes, status);
+        */
+
         smfData * data = (thesedata->sdata)[0];
         double steptime = data->hdr->steptime;
         dim_t boxcar = (dim_t)( smoothtime / steptime );
@@ -509,17 +522,8 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
 
   /* Use this to get the raw WVM output for debugging */
   /*
-  if (*status == SAI__OK) {
-    smfData *data = (thesedata->sdata)[0];
-    smfHead *hdr = data->hdr;
-    printf("# IDX TAU RTS_NUM RTS_END WVM_TIME\n");
-    for (i=0; i<nframes;i++) {
-      JCMTState * state;
-      state = &(hdr->allState)[i];
-      printf("%zu %.*g %d %.*g %.*g\n", i, DBL_DIG, taudata[i], state->rts_num,
-             DBL_DIG, state->rts_end, DBL_DIG, state->wvm_time);
-    }
-  } */
+  smf__print_wvm_data(taudata, (thesedata->sdata)[0]->hdr, nframes, status);
+  */
 
   /* Free resources */
   if (tmpthesedata) smf_close_related( wf, &tmpthesedata, status );
@@ -534,6 +538,22 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
     *ngoodvals = ngood;
   }
 
+}
+
+/* Debugging routine to print out the raw WVM data. */
+void smf__print_wvm_data(double* taudata, smfHead *hdr, size_t nframes,
+                         int* status) {
+  size_t i;
+  if (*status == SAI__OK) {
+    fprintf(stderr, "# IDX TAU RTS_NUM RTS_END WVM_TIME\n");
+    for (i=0; i<nframes;i++) {
+      JCMTState * state = &(hdr->allState)[i];
+      fprintf(stderr, "%zu %.*g %d %.*g %.*g\n",
+              i, DBL_DIG, taudata[i], state->rts_num,
+              DBL_DIG, state->rts_end, DBL_DIG, state->wvm_time);
+    }
+    fprintf(stderr, "\n\n");
+  }
 }
 
 /* Routine called by thread queue to calculate a chunk of WVM data.
