@@ -8,9 +8,15 @@
 
    o APERADD
 
-      -  Has a new parameter called MASK, which can be used to save an
-         NDF containing a mask showing which pixels were included in the
+      -  Has a new parameter MASK, which can be used to save an NDF
+         containing a mask showing which pixels were included in the
          aperture.
+
+   o PROVSHOW
+
+      -  Has a new option SHOW=TREE, which allows the family tree to
+         be stepped through in an interactive manner, with the user
+         choosing which parent is to be displayed next.
 
    o  WCSADD
 

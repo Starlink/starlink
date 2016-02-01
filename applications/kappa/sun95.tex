@@ -6,7 +6,7 @@
 \stardocsource    {sun95.43}
 \stardocnumber    {95.43}
 \stardocauthors   {Malcolm J. Currie \& David S. Berry}
-\stardocdate      {2016 January 28}
+\stardocdate      {2016 January 13}
 \stardoctitle     {KAPPA --- Kernel Application Package}
 \stardocversion   {2.4}
 \stardocmanual    {User's Guide}
@@ -1345,7 +1345,7 @@ is defined by the \texttt{MSG\_FILTER} environment variable.  It controls
 the verbosity of informational messages.  Since it applies to all
 tasks that report such messages, it is convenient to allow GLOBALS to
 show its value.  Further details are in \slhyperref{Verbosity of
-Messages}{Section~}{}{se:msglev}.  Since it is not a
+Messages}{Section~}{}{se:msglev} for details.  Since it is not a
 parameter as such, the message-reporting level is not unset by
 \htmlref{NOGLOBALS}{NOGLOBALS}.
 
@@ -9655,8 +9655,8 @@ KAPPA: \htmlref{CADD}{CADD},
    \sstdescription{
       This routine displays statistics for pixels that lie within a
       specified aperture of an \NDFref{NDF}.  The aperture can either be circular
-      (specified by Parameters CENTRE and DIAM), or arbitrary (specified
-      by Parameter ARDFILE).  If the aperture is specified using Parameters
+      (specified by parameters CENTRE and DIAM), or arbitrary (specified
+      by Parameter ARDFILE).  If the aperture is specified using parameters
       CENTRE and DIAM, then it must be either one- or  two-dimensional.
 
       The following statistics are displayed:
@@ -9692,7 +9692,7 @@ KAPPA: \htmlref{CADD}{CADD},
       (\emph{i.e.} if it has no \htmlref{VARIANCE}{apndf:variance}~ component), then each pixel is assumed to
       have a constant variance equal to the variance of the pixel values
       within the aperture.  There is an option to weight pixels so that
-      pixels with larger variances are given less weight (see Parameter
+      pixels with larger variances are given less weight (see parameter
       WEIGHT).  The statistics are displayed on the screen and written to
       output parameters.  They may also be written to a log file.
 
@@ -9712,7 +9712,7 @@ KAPPA: \htmlref{CADD}{CADD},
          The name of an ARD file containing a description of the aperture.
          This allows apertures of almost any shape to be used.  If a null
          (\texttt{{!}}) value is supplied then the aperture is assumed to be circular
-         with centre and diameter given by Parameters CENTRE and DIAM.  ARD
+         with centre and diameter given by parameters CENTRE and DIAM.  ARD
          files can be created either `by hand' using an editor, or using a
          specialist application such as \htmlref{ARDGEN}{ARDGEN}.
 
@@ -9734,14 +9734,14 @@ KAPPA: \htmlref{CADD}{CADD},
          given in the current \htmlref{co-ordinate Frame}{se:domains}~  of the NDF (supplying
          a colon \texttt{":"} will display details of the current co-ordinate
          Frame).  The position should be supplied as a list of formatted
-         axis values separated by spaces or commas.  See also Parameter
+         axis values separated by spaces or commas.  See also parameter
          USEAXIS.  The current co-ordinate Frame can be changed using
          application \htmlref{WCSFRAME}{WCSFRAME}.
       }
       \sstsubsection{
          DIAM = LITERAL (Read)
       }{
-         The diameter of the circular aperture.  Only used if Parameter
+         The diameter of the circular aperture.  Only used if parameter
          ARDFILE is set to null.  If the \htmlref{current co-ordinate
          Frame}{se:curframe}~ of the NDF is a SKY Frame (\emph{e.g.} RA and
          DEC), then the value should be supplied as an increment of celestial
@@ -9825,7 +9825,7 @@ KAPPA: \htmlref{CADD}{CADD},
          USEAXIS is only accessed if the current co-ordinate Frame of the
          NDF has too many axes.  A group of strings should be supplied
          specifying the axes which are to be used when specifying the
-         aperture using Parameters ARDFILE, CENTRE and DIAM.  Each axis can
+         aperture using parameters ARDFILE, CENTRE and DIAM.  Each axis can
          be specified using one of the following options.
 
          \ssthitemlist{
@@ -9911,8 +9911,7 @@ KAPPA: \htmlref{CADD}{CADD},
       latter case consult \xref{SUN/183}{sun183}{} ~for full details of the ARD
       descriptors and syntax; however, much may be learnt from looking
       at the ARD files created by ARDGEN and the ARDGEN documentation.
-      There is also a \slhyperref{summary with examples}{summary with
-      examples in Section~}{}{se:ardwork}.
+      There is also a \slhyperref{summary with examples}{in Section~}{}{se:ardwork}.
 
    }
    \sstdiytopic{
@@ -39013,6 +39012,17 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
         ancestors of the existing NDF are not copied.  \texttt{[FALSE]}
       }
       \sstsubsection{
+         INEXT = LITERAL (Read)
+      }{
+        Determines which ancestor to display next. Only used if
+        parameter SHOW is set to ``Tree''. The user is re-prompted for
+        a new value for this parameter after each NDF is displayed. The
+        new value should be the integer identifier for one of the parents
+        of the currently displayed NDF. Alternatively, the string ``up''
+        can be supplied, causing the previously displayed NDF to be
+        displayed again.
+      }
+      \sstsubsection{
          NDF = NDF (Read)
       }{
          The NDF data structure.
@@ -39048,6 +39058,11 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
                                 supplied NDF. The supplied NDF itself is
                                 not displayed.
 
+            \sstitem
+            \texttt{"Tree"} --- Display the top level NDF and then asks the
+                                user which parent to display next (see
+                                parameter INEXT). The whole family tree can
+                                be navigated in this way.
          }
          \texttt{["All"]}
 
@@ -43921,9 +43936,9 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          of values supplied must match the number of pixel axes in the NDF.
          It is only used if STYPE=\texttt{"Relative"}.
 
-         An object centred at the pixel co-ordinates given by Parameter
+         An object centred at the pixel co-ordinates given by parameter
          OBJ in the input NDF will be centred at the pixel co-ordinates
-         given by Parameter FID in the output NDF.
+         given by parameter FID in the output NDF.
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -43982,9 +43997,9 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          of values supplied must match the number of pixel axes in the NDF.
          It is only used if STYPE=\texttt{"Relative"}.
 
-         An object centred at the pixel co-ordinates given by Parameter
+         An object centred at the pixel co-ordinates given by parameter
          OBJ in the input NDF will be centred at the pixel co-ordinates
-         given by Parameter FID in the output NDF.
+         given by parameter FID in the output NDF.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -53110,9 +53125,16 @@ The following applications have been modified:
 
    \item [\htmlref{APERADD}{APERADD}]\mbox{}
       \begin{itemize}
-        \item Has a new parameter called MASK, which can be used to save an NDF
+        \item Has a new parameter MASK, which can be used to save an NDF
               containing a mask showing which pixels were included in the
               aperture.
+      \end{itemize}
+
+   \item [\htmlref{PROVSHOW}{PROVSHOW}]\mbox{}
+      \begin{itemize}
+        \item Has a new option SHOW=TREE, which allows the family tree to
+              be stepped through in an interactive manner, with the user
+              choosing which parent is to be displayed next.
       \end{itemize}
 
    \item [\htmlref{WCSADD}{WCSADD}]\mbox{}

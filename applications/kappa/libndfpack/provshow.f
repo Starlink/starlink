@@ -67,6 +67,15 @@
 *        provenance tree using the "dot" format. This file can be
 *        visualised using third-party tools such as Graphviz, ZGRViewer,
 *        OmniGraffle, etc.
+*     HIDE = _LOGICAL (Read)
+*        If TRUE, then any ancestors which are flagged as "hidden" (for
+*        example, using PROVREM) are excluded from the display. If FALSE,
+*        then all requested ancestors, whether hidden or not, are included
+*        in the display (but hidden ancestors will be highlighted as such).
+*        Note, choosing to exclude hidden ancestors may change the index
+*        displayed for each ancestor. The default is to display hidden
+*        ancestors if and only if history is being displayed (see Parameter
+*        HISTORY). []
 *     HISTORY = _LOGICAL (Read)
 *        If TRUE, any history records stored with each ancestor are
 *        included in the displayed information. Since the amount of
@@ -80,21 +89,20 @@
 *        that describe operations performed on the existing NDF itself.
 *        Inherited history records that describe operations performed on
 *        ancestors of the existing NDF are not copied. [FALSE]
+*     INEXT = LITERAL (Read)
+*        Determines which ancestor to display next. Only used if
+*        parameter SHOW is set to "Tree". The user is re-prompted for
+*        a new value for this parameter after each NDF is displayed. The
+*        new value should be the integer identifier for one of the parents
+*        of the currently displayed NDF. Alternatively, the string "up"
+*        can be supplied, causing the previously displayed NDF to be
+*        displayed again.
 *     NDF = NDF (Read)
 *        The NDF data structure.
 *     PARENTS = FILENAME (Read)
 *        Name of a new text file in which to put the paths to the direct
 *        parents of the supplied NDF. These are written one per line with
 *        no extra text. If null, no file is created. [!]
-*     HIDE = _LOGICAL (Read)
-*        If TRUE, then any ancestors which are flagged as "hidden" (for
-*        example, using PROVREM) are excluded from the display. If FALSE,
-*        then all requested ancestors, whether hidden or not, are included
-*        in the display (but hidden ancestors will be highlighted as such).
-*        Note, choosing to exclude hidden ancestors may change the index
-*        displayed for each ancestor. The default is to display hidden
-*        ancestors if and only if history is being displayed (see Parameter
-*        HISTORY). []
 *     SHOW = LITERAL (Read)
 *        Determines which ancestors are displayed on the screen. It can
 *        take any of the following case-insensitive values (or any
@@ -109,6 +117,10 @@
 *
 *        - "Parents" -- Display only the direct parents of the supplied
 *                       NDF. The supplied NDF itself is not displayed.
+*
+*        - "Tree" -- Display the top level NDF and then asks the user
+*                    which parent to display next (see parameter INEXT).
+*                    The whole family tree can be navigated in this way.
 *
 *        ["All"]
 
@@ -197,6 +209,8 @@
 *        Use NDG_ANTMP rather than DAT_ANNUL to annul temporary HDS
 *        objects created by NDG. Using DAT_ANNUL does not erase such
 *        temporary objects form the HDS temp file.
+*     1-FEB-2016 (DSB):
+*        Added option SHOW=TREE.
 *     {enter_further_changes_here}
 
 *-
@@ -221,6 +235,10 @@
       INTEGER MXREC              ! Max number of history records
       PARAMETER( MXREC = 100 )
 
+
+      INTEGER MXDPTH             ! Max depth in tree
+      PARAMETER( MXDPTH = 100 )
+
 *  Local Variables:
       CHARACTER C*1              ! Current character
       CHARACTER ID*10            ! Integer index for the current NDF
@@ -231,7 +249,9 @@
       CHARACTER SHOW*7           ! The ancestors to be displayed
       CHARACTER TEXT*255         ! Text for output dot file
       CHARACTER VALUE*1024       ! Buffer for one field value
+      INTEGER CHILD( MXDPTH )    ! Child ID at each level in the tree
       INTEGER COMMA              ! Index of next comma
+      INTEGER DEPTH              ! Current depth in tree
       INTEGER DIRPAR( MXPAR )    ! Integer IDs for direct parents
       INTEGER DOTFD              ! File descriptor for dot file
       INTEGER FD                 ! File descriptor for parents file
@@ -257,6 +277,7 @@
       INTEGER NROW               ! No. of lines to display
       INTEGER PARI               ! Index of current parent in ancestors
       INTEGER START              ! Index of start of next parent id
+      LOGICAL DONE               ! All ancestors displayed?
       LOGICAL DOT                ! Produce an output dot file?
       LOGICAL FIRST              ! Is this the first word?
       LOGICAL HIDDEN             ! Is current ancestor hidden?
@@ -276,8 +297,8 @@
       CALL LPG_ASSOC( 'NDF', 'READ', INDF, STATUS )
 
 *  Determine which ancestors are to be displayed on the screenn.
-      CALL PAR_CHOIC( 'SHOW', 'All', 'All,Roots,Parents', .FALSE., SHOW,
-     :                STATUS )
+      CALL PAR_CHOIC( 'SHOW', 'All', 'All,Roots,Parents,Tree', .FALSE.,
+     :                SHOW, STATUS )
 
 *  See if history information is to be displayed.
       CALL PAR_GET0L( 'HISTORY', HIST, STATUS )
@@ -310,19 +331,27 @@
 
 *  See if the provenance should be written out to a text file as a
 *  directed acyclic graph (DAG) using the "dot" language. If so, write
-*  out the preamble.
-      CALL FIO_ASSOC( 'DOTFILE', 'WRITE', 'LIST', 255, DOTFD, STATUS )
-      IF( STATUS .EQ. PAR__NULL ) THEN
-         CALL ERR_ANNUL( STATUS )
-         DOT = .FALSE.
+*  out the preamble. Not available when displaying a tree.
+      IF( SHOW .NE. 'TREE' ) THEN
+         CALL FIO_ASSOC( 'DOTFILE', 'WRITE', 'LIST', 255, DOTFD,
+     :                   STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            DOT = .FALSE.
+         ELSE
+            CALL FIO_WRITE( DOTFD, 'digraph provenance {', STATUS )
+            CALL FIO_WRITE( DOTFD, '   edge [dir=back]', STATUS )
+            DOT = .TRUE.
+         END IF
       ELSE
-         CALL FIO_WRITE( DOTFD, 'digraph provenance {', STATUS )
-         CALL FIO_WRITE( DOTFD, '   edge [dir=back]', STATUS )
-         DOT = .TRUE.
+         DOT = .FALSE.
       END IF
 
-*  Loop round each NDF to be described.
-      DO IROW = 1, NROW
+*  Loop round displaying details of NDFs until all have been done.
+      DEPTH = 0
+      IROW = 1
+      DONE = .FALSE.
+      DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK )
 
 *  Get the KeyMap holding details for this row.
          CALL CHR_ITOC( IROW - 1, KEY, NC )
@@ -350,7 +379,7 @@
             GO TO 999
          END IF
 
-* Convert teh ID to an integer (the ancestor index).
+*  Convert the ID to an integer (the ancestor index).
          CALL CHR_CTOI( ID, INTID, STATUS )
 
 *  Get the list of direct parent ID values for this ancestor.
@@ -640,6 +669,52 @@
 
 *  Annul the keymap holding details for this row.
          CALL AST_ANNUL( KYMAP2, STATUS )
+
+*  The integer ID of the next ancestor to display. If SHOW=TREE, ask the
+*  user, allowing them to choose one of the parent IDs, or "UP".
+*  Otherwise just move on to the next one.
+         IF( SHOW .EQ. 'TREE' ) THEN
+            CALL PAR_CANCL( 'INEXT', STATUS )
+
+            IF( STATUS .EQ. SAI__OK ) THEN
+               IAT = CHR_LEN( PARIDS )
+               CALL CHR_APPND( ',UP', PARIDS, IAT )
+
+               CALL PAR_CHOIC( 'INEXT', ' ', PARIDS, .FALSE., ID,
+     :                         STATUS )
+
+               IF( STATUS .EQ. PAR__NULL ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  DONE = .TRUE.
+
+               ELSE IF( ID .EQ. 'UP' ) THEN
+                  IF( DEPTH .EQ. 0 ) THEN
+                     DONE = .TRUE.
+                  ELSE
+                     IROW = CHILD( DEPTH )
+                     DEPTH = DEPTH - 1
+                  END IF
+
+               ELSE
+                  DEPTH = DEPTH + 1
+                  IF( DEPTH .GT. MXDPTH ) THEN
+                     STATUS = SAI__ERROR
+                     CALL ERR_REP( ' ','Exceeded maximum tree depth',
+     :                             STATUS )
+                     GO TO 999
+                  END IF
+
+                  CHILD( DEPTH ) = IROW
+
+                  CALL CHR_CTOI( ID, IROW, STATUS )
+                  IROW = IROW + 1
+               END IF
+            END IF
+
+         ELSE
+            IROW = IROW + 1
+            IF( IROW .GT. NROW ) DONE = .TRUE.
+         END IF
 
       END DO
 

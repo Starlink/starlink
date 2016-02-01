@@ -2998,6 +2998,13 @@ package kappa {
             helpkey *
           }
 
+         parameter inext {
+            type LITERAL
+            access READ
+            prompt {Integer identifier for parent to display, or UP}
+            helpkey *
+          }
+
          parameter ndf {
             position 1
             type NDF
