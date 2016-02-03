@@ -48,9 +48,12 @@
 *     11-SEP-2015 (DSB):
 *        Re-written because the old algorithm found 100 bonus points in
 *        20150716/00021 when in fact there were none.
+*     3-FEB-2016 (DSB):
+*        Report error if HWP is not rotating.
 
 *  Copyright:
 *     Copyright (C) 2012 Science and Technology Facilities Council.
+*     Copyright (C) 2016 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -113,6 +116,7 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
    double langle;
    double ltime;
    double maxang;
+   double rotafreq;
    double rts_origin;
    double time;
    int curlag;
@@ -127,6 +131,14 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
    equivalent to 360 degrees. New data stored OL_ANG in radians. Assume
    new data until we find a POL_ANG value greater than 2*PI. */
    maxang = 2*AST__DPI;
+
+/* Check the HWP was spinning. */
+   smf_getfitsd( array->sdata[ 0 ]->hdr, "ROTAFREQ", &rotafreq, status );
+   if( rotafreq == 0.0 && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRep( " ", "Unusable observation: half-waveplate was not spinning.",
+              status );
+   }
 
 /* Loop over subarray. They probably all share the same header, but is it
    guaranteed? */

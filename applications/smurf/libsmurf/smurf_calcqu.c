@@ -263,11 +263,13 @@
 *        makemap will produce maps from Q and U independently).
 *        - Store the weights in the output Variance component (reciprocated
 *        first), rather than as a NDF in the SMURF extension.
+*     3-FEB-2016 (DSB):
+*        Report error if HWP is not rotating.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2011-2013 Science and Technology Facilities Council.
-*     Copyright (C) 2015 East Asian Observatory
+*     Copyright (C) 2015-2016 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -344,6 +346,7 @@ void smurf_calcqu( int *status ) {
    const char *north;         /* Celestial system to use as ref. direction  */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
+   double rotafreq;           /* HWP rotation frequency */
    float arcerror;            /* Max acceptable error (arcsec) in one block */
    int block_end;             /* Index of last time slice in block */
    int block_start;           /* Index of first time slice in block */
@@ -639,7 +642,7 @@ void smurf_calcqu( int *status ) {
                   if( strcmp( headval, "CONSTANT" ) && *status == SAI__OK ) {
                      *status = SAI__ERROR;
                      grpMsg( "N", sgrp, inidx );
-                     errRep( " ", "Input NDF ^N does not contain "
+                     errRep( " ", "Unusable observation: Input NDF ^N does not contain "
                              "polarimetry data obtained with a spinning "
                              "half-waveplate.", status );
                   }
@@ -650,7 +653,7 @@ void smurf_calcqu( int *status ) {
                   if( strcmp( headval, "Y" ) && *status == SAI__OK ) {
                      *status = SAI__ERROR;
                      grpMsg( "N", sgrp, inidx );
-                     errRep( " ", "Half-waveplate was not in the beam for "
+                     errRep( " ", "Unusable observation: Half-waveplate was not in the beam for "
                              "input NDF ^N.", status );
                   }
 
@@ -660,7 +663,15 @@ void smurf_calcqu( int *status ) {
                   if( strcmp( headval, "Y" ) && *status == SAI__OK ) {
                      *status = SAI__ERROR;
                      grpMsg( "N", sgrp, inidx );
-                     errRep( " ", "Analyser was not in the beam for input "
+                     errRep( " ", "Unusable observation: Analyser was not in the beam for input "
+                             "NDF ^N.", status );
+                  }
+
+                  smf_getfitsd( data->hdr, "ROTAFREQ", &rotafreq, status );
+                  if( rotafreq == 0.0 && *status == SAI__OK ) {
+                     *status = SAI__ERROR;
+                     grpMsg( "N", sgrp, inidx );
+                     errRep( " ", "Unusable observation: Half-waveplate was not spinning for input "
                              "NDF ^N.", status );
                   }
 
@@ -670,7 +681,7 @@ void smurf_calcqu( int *status ) {
                                    sizeof(headval), status );
                      if( strcmp( headval, polcrd ) && *status == SAI__OK ) {
                         *status = SAI__ERROR;
-                        errRep( " ", "Input NDFs have differing values for "
+                        errRep( " ", "Unusable observation: Input NDFs have differing values for "
                                 "FITS header 'POL_CRD'.", status );
                      }
 
@@ -687,7 +698,7 @@ void smurf_calcqu( int *status ) {
                         *status = SAI__ERROR;
                         msgSetc( "N", data->file->name );
                         msgSetc( "V", polcrd );
-                        errRep( " ", "Input NDF ^N contains unknown value "
+                        errRep( " ", "Unusable observation: Input NDF ^N contains unknown value "
                                 "'^V' for FITS header 'POL_CRD'.", status );
                      }
                   }
