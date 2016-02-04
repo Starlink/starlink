@@ -8,7 +8,11 @@ fts2gaia.py \
 jsajoin.py \
 jsasplit.py \
 jsatilemoc.py \
-skyloop.py
+skyloop.py \
+pol2scan.py \
+pol2sim.py \
+pol2ip.py \
+pol2stack.py
 
 # Help file
 scripts.hlp: $(PYSCRIPTS)
