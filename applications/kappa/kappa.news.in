@@ -4,6 +4,13 @@
    changes are listed below.  For complete details of all
    changes, see the "Release Notes" appendix in SUN/95.
 
+2 New_applications
+
+   o ALIGN2D
+
+      -  Aligns a pair of 2-dimensional NDFs by minimising the residuals
+         between them.
+
 2 Modified_applications
 
    o APERADD

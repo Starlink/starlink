@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="kaplibs" support="S">
-  <version>3.5</version>
+  <version>3.6</version>
   <path>libraries/kaplibs</path>
   <description>KAPLIBS - Internal subroutines used within the KAPPA package.</description>
   <abstract><p>KAPLIBS is a package of Fortran subroutine

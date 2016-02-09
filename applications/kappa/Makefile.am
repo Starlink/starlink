@@ -135,7 +135,7 @@ paste permaxes pixdupe psf rift regrid rotate segment setmagic shadow \
 slide sqorst stats sub substitute surfit thresh trandat trig wiener   \
 zaplin listmake listshow profile wcsalign wcsmosaic wcstran kapversion \
 kaphelp mfittrend makesnr oddeven cumulvec beamfit pluck wcsslide \
-regionmask configecho excludebad
+regionmask configecho excludebad align2d
 
 KAPVIEW_TASKS = ardplot clinplot colcomp contour cursor drawsig \
 drawnorth display elprof gdclear gdnames gdset gdstate linplot lutable \
@@ -284,7 +284,7 @@ cmult.ifc collapse.ifc compadd.ifc compave.ifc compick.ifc \
 convolve.ifc copybad.ifc creframe.ifc csub.ifc cumulvec.ifc \
 div.ifc beamfit.ifc pluck.ifc pow.ifc ndfpack_mon.ifc \
 kapview_mon.ifc kappa_mon.ifc wcsslide.ifc regionmask.ifc \
-configecho.ifc excludebad.ifc ndfcompare.ifc
+configecho.ifc excludebad.ifc ndfcompare.ifc align2d.ifc
 
 
 BUILT_IFL_FILES = kappa_mon.ifl beamfit.ifl carpet.ifl \
@@ -327,7 +327,7 @@ setqual.ifl setsky.ifl settitle.ifl settype.ifl provmod.ifl provrem.ifl \
 setunits.ifl setvar.ifl showqual.ifl provshow.ifl provadd.ifl \
 vecplot.ifl wcsadd.ifl wcsattrib.ifl wcscopy.ifl wcsframe.ifl \
 wcsremove.ifl wcsshow.ifl axconv.ifl mem2d.ifl wcsslide.ifl \
-regionmask.ifl configecho.ifl excludebad.ifl ndfcompare.ifl
+regionmask.ifl configecho.ifl excludebad.ifl ndfcompare.ifl align2d.ifl
 
 EXTRA_DIST = multiplot.csh.in kappa_master.hlp $(HELP_FILES)
 

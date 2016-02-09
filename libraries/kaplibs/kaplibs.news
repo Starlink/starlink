@@ -6,6 +6,11 @@ which provide general-purpose algorithms required by the KAPPA package,
 and which may be of use to anyone developing their own KAPPA-like
 applications (see SUN/238).
 
+Version 3.6
+   - New routine KPG1_ALIGN aligns an input 2-d NDF with a reference 2-d
+   NDF using an affine transformation which minimises the residuals between
+   the reference NDF and the transformed input NDF.
+
 Version 3.5
    - New generic KPG_STOCx calculates clipped ordered statistics,
      enabling the API of KPG_STOSx to remain unchanged.

@@ -250,6 +250,10 @@
          IF ( NAME .EQ. 'ADD' ) THEN
             CALL ADD ( STATUS )
 
+*  Align two 2-dimensioanl NDFs using image feaures.
+         ELSE IF ( NAME .EQ. 'ALIGN2D' ) THEN
+            CALL ALIGN2D ( STATUS )
+
 *  Derives statistics of pixels within a specified circle of a
 *  two-dimensional data array.
          ELSE IF ( NAME .EQ. 'APERADD' ) THEN

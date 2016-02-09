@@ -9332,6 +9332,8 @@ WCS component of an NDF.
 \label{cl:regrid}
 
 \begin{aligndesc}
+\classitem{ALIGN2D}
+ Aligns a pair of 2-dimensional NDFs by minimising the residuals between them.
 \classitem{PLUCK}
  Plucks slices from an NDF at arbitrary positions.
 \classitem{REGRID}
@@ -9643,6 +9645,291 @@ KAPPA: \htmlref{CADD}{CADD},
          \sstitem
          All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.
 
+      }
+   }
+}
+
+\sstroutine{
+   ALIGN2D
+}{
+   Aligns a pair of 2-dimensional NDFs by minimising the residuals between them.
+}{
+   \sstdescription{
+      This application attempts to align a 2-dimensional input NDF with a
+      2-dimensional reference NDF in pixel coordinates, using an affine
+      transformation of the form:
+
+         Xin = C1 $+$ C2$*$Xref $+$ C3$*$Yref
+
+         Yin = C4 $+$ C5$*$Xref $+$ C6$*$Yref
+
+      where (Xin,Yin) are pixel coordinates in the input NDF, and
+      (Xref,Yref) are pixel coordinates in the reference NDF. The
+      co-efficient values are determined by doing a least squares fit
+      that minimises the sum of the squared residuals between the
+      reference NDF and the transformed input NDF. If variance
+      information is present in either NDF, it is used to weight the
+      residuals within the fit, so that noisy data values have less
+      effect on the fit. The best fit co-efficients are displayed on
+      the screen and written to an output parameter. Optionally, the
+      transformation may be used to transform the input NDF to create
+      an output NDF (see Parameter OUT). It is possible to restrict the
+      transformation in order to prevent shear, rotation, scaling, etc.
+      (see Parameter FORM).
+   }
+   \sstusage{
+      align2d in ref out
+   }
+   \sstparameters{
+      \sstsubsection{
+         C( 6 ) = \_DOUBLE (Write)
+      }{
+         An output parameter to which are written the coefficients of the
+         fit.
+      }
+      \sstsubsection{
+         CONSERVE = \_LOGICAL (Read)
+      }{
+         If set TRUE, then the output pixel values will be scaled in
+         such a way as to preserve the total data value in a feature on
+         the sky.  The scaling factor is the ratio of the output pixel
+         size to the input pixel size.  This option can only be used if
+         the Mapping is successfully approximated by one or more linear
+         transformations.  Thus an error will be reported if it used
+         when the ACC parameter is set to zero (which stops the use of
+         linear approximations), or if the Mapping is too non-linear to
+         be approximated by a piece-wise linear transformation.  The
+         ratio of output to input pixel size is evaluated once for each
+         panel of the piece-wise linear approximation to the Mapping,
+         and is assumed to be constant for all output pixels in the
+         panel.  This parameter is ignored if the NORM parameter is set
+         FALSE.   \texttt{[TRUE]}
+      }
+      \sstsubsection{
+         FORM = \_INTEGER (Read)
+      }{
+         The form of the affine transformation to use:
+
+         \sstitemlist{
+
+            \sstitem
+            0: Full unrestricted 6 coefficient fit
+
+            \sstitem
+            1: Shift, rotation and a common X/Y scale but no shear.
+
+            \sstitem
+            2: Shift and rotation but no scale or shear.
+
+            \sstitem
+            3: Shift but not rotation, scale or shear.
+                                                                       [0]
+         }
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         NDF to be transformed.
+      }
+      \sstsubsection{
+         METHOD = LITERAL (Read)
+      }{
+         The method to use when sampling the input pixel values (if
+         resampling), or dividing an input pixel value between a group
+         of neighbouring output pixels (if rebinning). For details of
+         these schemes, see the descriptions of routines AST\_RESAMPLEx
+         and AST\_REBINSEQx in SUN/210. METHOD can take the following
+         values.
+
+         \sstitemlist{
+
+            \sstitem
+            \texttt{"} Linear\texttt{"}  -- When resampling, the output pixel values are
+            calculated by bi-linear interpolation among the four nearest
+            pixels values in the input NDF.  When rebinning, the input
+            pixel value is divided bi-linearly between the four nearest
+            output pixels.  Produces smoother output NDFs than the
+            nearest-neighbour scheme, but is marginally slower.
+
+            \sstitem
+            \texttt{"} Nearest\texttt{"}  -- When resampling, the output pixel values are
+            assigned the value of the single nearest input pixel.  When
+            rebinning, the input pixel value is assigned completely to the
+            single nearest output pixel.
+
+            \sstitem
+            \texttt{"} Sinc\texttt{"}  -- Uses the sinc(pi$*$x) kernel, where x is the pixel
+            offset from the interpolation point (resampling) or transformed
+            input pixel centre (rebinning), and sinc(z)=sin(z)/z.  Use of
+            this scheme is not recommended.
+
+            \sstitem
+            \texttt{"} SincSinc\texttt{"}  -- Uses the sinc(pi$*$x)sinc(k$*$pi$*$x) kernel. A
+            valuable general-purpose scheme, intermediate in its visual
+            effect on NDFs between the bi-linear and nearest-neighbour
+            schemes.
+
+            \sstitem
+            \texttt{"} SincCos\texttt{"}  -- Uses the sinc(pi$*$x)cos(k$*$pi$*$x) kernel.  Gives
+            similar results to the \texttt{"} Sincsinc\texttt{"}  scheme.
+
+            \sstitem
+            \texttt{"} SincGauss\texttt{"}  -- Uses the sinc(pi$*$x)exp(-k$*$x$*$x) kernel.  Good
+            results can be obtained by matching the FWHM of the
+            envelope function to the point-spread function of the
+            input data (see Parameter PARAMS).
+
+            \sstitem
+            \texttt{"} Somb\texttt{"}  -- Uses the somb(pi$*$x) kernel, where x is the pixel
+            offset from the interpolation point (resampling) or transformed
+            input pixel centre (rebinning), and somb(z)=2$*$J1(z)/z (J1 is
+            the first-order Bessel function of the first kind.  This scheme
+            is similar to the \texttt{"} Sinc\texttt{"}  scheme.
+
+            \sstitem
+            \texttt{"} SombCos\texttt{"}  -- Uses the somb(pi$*$x)cos(k$*$pi$*$x) kernel.  This
+            scheme is similar to the \texttt{"} SincCos\texttt{"}  scheme.
+
+            \sstitem
+            \texttt{"} Gauss\texttt{"}  -- Uses the exp(-k$*$x$*$x) kernel. The FWHM of the
+            Gaussian is given by Parameter PARAMS(2), and the point at
+            which to truncate the Gaussian to zero is given by Parameter
+            PARAMS(1).
+
+            \sstitem
+            \texttt{"} BlockAve\texttt{"}   -- Block averaging over all pixels in the
+            surrounding N-dimensional cube. This option is only available
+            when resampling (i.e. if REBIN is set to FALSE).
+
+         }
+         All methods propagate variances from input to output, but the
+         variance estimates produced by interpolation schemes other than
+         nearest neighbour need to be treated with care since the
+         spatial smoothing produced by these methods introduces
+         correlations in the variance estimates. Also, the degree of
+         smoothing produced varies across the NDF.  This is because a
+         sample taken at a pixel centre will have no contributions from
+         the neighbouring pixels, whereas a sample taken at the corner
+         of a pixel will have equal contributions from all four
+         neighbouring pixels, resulting in greater smoothing and lower
+         noise.  This effect can produce complex Moire patterns in the
+         output variance estimates, resulting from the interference of
+         the spatial frequencies in the sample positions and in the
+         pixel-centre positions.  For these reasons, if you want to use
+         the output variances, you are generally safer using
+         nearest-neighbour interpolation.  The initial default is
+         \texttt{"} Nearest\texttt{"} .  [current value]
+      }
+      \sstsubsection{
+         NORM = \_LOGICAL (Read)
+      }{
+         In general, each output pixel contains contributions from
+         multiple input pixel values, and the number of input pixels
+         contributing to each output pixel will vary from pixel to
+         pixel.  If NORM is set TRUE (the default), then each output
+         value is normalised by dividing it by the number of
+         contributing input pixels, resulting in each output value being
+         the weighted mean of the contributing input values.  However,
+         if NORM is set FALSE, this normalisation is not applied.  See
+         also Parameter CONSERVE.   \texttt{[TRUE]}
+      }
+      \sstsubsection{
+         OUT = NDF (Writed)
+      }{
+         An optional output NDF to contain a copy of IN aligned with OUT.
+         No output is created if null (!) is supplied.
+      }
+      \sstsubsection{
+         PARAMS( 2 ) = \_DOUBLE (Read)
+      }{
+         An optional array which consists of additional parameters
+         required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
+         SombCos, and Gauss methods.
+
+         PARAMS( 1 ) is required by all the above schemes.
+         It is used to specify how many pixels are to contribute to the
+         interpolated result on either side of the interpolation or
+         binning point in each dimension. Typically, a value of 2 is
+         appropriate and the minimum allowed value is 1 (i.e. one pixel
+         on each side). A value of zero or fewer indicates that a
+         suitable number of pixels should be calculated automatically.
+         [0]
+
+         PARAMS( 2 ) is required only by the SombCos, Gauss, SincSinc,
+         SincCos, and SincGauss schemes.  For the SombCos, SincSinc, and
+         SincCos schemes, it specifies the number of pixels at which the
+         envelope of the function goes to zero.  The minimum value is
+         1.0, and the run-time default value is 2.0.  For the Gauss and
+         SincGauss scheme, it specifies the full-width at half-maximum
+         (FWHM) of the Gaussian envelope measured in output pixels.
+         The minimum value is 0.1, and the run-time default is 1.0.  On
+         astronomical images and spectra, good results are often
+         obtained by approximately matching the FWHM of the envelope
+         function, given by PARAMS(2), to the point-spread function of
+         the input data.  []
+      }
+      \sstsubsection{
+         REBIN = \_LOGICAL (Read)
+      }{
+         Determines the algorithm used to calculate the output pixel
+         values.  If a TRUE value is given, a rebinning algorithm is
+         used.  Otherwise, a resampling algorithm is used. See the
+         \texttt{"} Choice of Algorithm\texttt{"}  below.  [current value]
+      }
+      \sstsubsection{
+         REF = NDF (Read)
+      }{
+         NDF to be used as a refernece.
+      }
+      \sstsubsection{
+         TOL = \_DOUBLE (Read)
+      }{
+         The maximum tolerable geometrical distortion which may be
+         introduced as a result of approximating non-linear Mappings
+         by a set of piece-wise linear transforms.  Both
+         algorithms approximate non-linear co-ordinate transformations
+         in order to improve performance, and this parameter controls
+         how inaccurate the resulting approximation is allowed to be,
+         as a displacement in pixels of the input NDF.  A value of
+         zero will ensure that no such approximation is done, at the
+         expense of increasing execution time. [0.05]
+      }
+      \sstsubsection{
+         WLIM = \_REAL (Read)
+      }{
+         This parameter is only used if REBIN is set TRUE. It specifies
+         the  minimum number of good pixels which must contribute to an
+         output pixel for the output pixel to be valid.  Note,
+         fractional values are allowed. A null (!) value causes a very
+         small positive value to be used resulting in output pixels
+         being set bad only if they receive no significant contribution
+         from any input pixel.  [!]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         aligned my\_data orionA my\_corrected form=2
+      }{
+         Aligns the two-dimensional NDF called my\_data with the
+         two-dimensional NDF called orionA, putting the aligned image in
+         a new NDF called my\_corrected. The transformation is restricted
+         to a shift of origin and a rotation.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: WCSALIGN.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         This routine correctly processes the DATA, VARIANCE, WCS,
+         LABEL, TITLE, and UNITS components of the NDF.
+
+         \sstitem
+         All non-complex numeric data types can be handled.
       }
    }
 }
@@ -53120,6 +53407,14 @@ and HDS data types is as follows:
 \section{\xlabel{se_changes}Release Notes---V2.4\label{se:changes}}
 
 \subsection{Modified Commands}
+\subsubsection{New Commands}
+The following new application have been added:
+
+\begin{description}
+   \item [\htmlref{ALIGN2D}{ALIGN2D}] \mbox{}
+   Aligns a pair of 2-dimensional NDFs by minimising the residuals between them.
+\end{description}
+
 The following applications have been modified:
 \begin{description}[style=nextline]
 
@@ -54230,6 +54525,8 @@ functions as follows.
 %
 \item {\large\bf Resampling and transformations}
 \begin{description}
+\classitem{ALIGN2D}
+ Aligns a pair of 2-dimensional NDFs by minimising the residuals between them.
 \classitem{PLUCK}
  Plucks slices from an NDF at arbitrary positions.
 \classitem{REGRID}

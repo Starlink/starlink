@@ -7633,6 +7633,122 @@ package kappa {
 
       }
 
+      action align2d {
+         alias {align(2d)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter conserve {
+            type _LOGICAL
+            vpath DYNAMIC
+            ppath CURRENT DYNAMIC
+            prompt {Conserve flux?}
+            helpkey *
+         }
+
+         parameter form {
+            type _integer
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Form of transformation to use (0-3)}
+            default 0
+            helpkey *
+         }
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The input NDF}
+            helpkey *
+         }
+
+         parameter method {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Re-sampling method}
+            helpkey *
+            default {Nearest}
+         }
+
+         parameter norm {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Normalise output values?}
+            helpkey *
+            default TRUE
+         }
+
+         parameter out {
+            position 3
+            type NDF
+            access WRITE
+            ppath DEFAULT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {The output aligned NDF}
+            default !
+            helpkey *
+         }
+
+         parameter params {
+            size *
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Auxiliary resampling parameters}
+            helpkey *
+         }
+
+         parameter rebin {
+            type _LOGICAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Create output pixel values by rebinning input pixels?}
+            helpkey *
+            default FALSE
+         }
+
+         parameter ref {
+            position 2
+            type NDF
+            access READ
+            ppath CURRENT
+            prompt {The reference NDF}
+            helpkey *
+         }
+
+         parameter tol {
+            type _DOUBLE
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default 0.05
+            prompt {Tolerance for linear transformation approximation}
+            helpkey *
+         }
+
+         parameter tr {
+            size *
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+         }
+
+         parameter wlim {
+            type _REAL
+            prompt {Minimum weight for valid output pixels}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+         }
+
+      }
+
       action aperadd {
          alias {aper(add)}
 
@@ -19028,7 +19144,6 @@ iraf! {
          }
 
       }
-
    }
 
    command exp10 {
