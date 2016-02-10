@@ -46,9 +46,6 @@
 *     align2d in ref out
 
 *  ADAM Parameters:
-*     C( 6 ) = _DOUBLE (Write)
-*        An output parameter to which are written the coefficients of the
-*        fit.
 *     CONSERVE = _LOGICAL (Read)
 *        If set TRUE, then the output pixel values will be scaled in
 *        such a way as to preserve the total data value in a feature on
@@ -203,6 +200,9 @@
 *        as a displacement in pixels of the input NDF.  A value of
 *        zero will ensure that no such approximation is done, at the
 *        expense of increasing execution time. [0.05]
+*     TR( 6 ) = _DOUBLE (Write)
+*        An output parameter to which are written the coefficients of the
+*        fit.
 *     WLIM = _REAL (Read)
 *        This parameter is only used if REBIN is set TRUE. It specifies
 *        the  minimum number of good pixels which must contribute to an

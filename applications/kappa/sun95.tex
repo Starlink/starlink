@@ -9682,12 +9682,6 @@ KAPPA: \htmlref{CADD}{CADD},
    }
    \sstparameters{
       \sstsubsection{
-         C( 6 ) = \_DOUBLE (Write)
-      }{
-         An output parameter to which are written the coefficients of the
-         fit.
-      }
-      \sstsubsection{
          CONSERVE = \_LOGICAL (Read)
       }{
          If set TRUE, then the output pixel values will be scaled in
@@ -9893,6 +9887,12 @@ KAPPA: \htmlref{CADD}{CADD},
          as a displacement in pixels of the input NDF.  A value of
          zero will ensure that no such approximation is done, at the
          expense of increasing execution time. [0.05]
+      }
+      \sstsubsection{
+         TR( 6 ) = \_DOUBLE (Write)
+      }{
+         An output parameter to which are written the coefficients of the
+         fit.
       }
       \sstsubsection{
          WLIM = \_REAL (Read)
