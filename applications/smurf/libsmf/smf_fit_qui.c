@@ -413,6 +413,15 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 /* Check this box is of a usable length. If not, set the box size to zero
    and increent the number of strange boxes. */
          if( box_size < lolim || box_size > hilim ) {
+            if( box_size < lolim ) {
+               msgOutiff( MSG__VERB, " ", "Unusually short POL_ANG block "
+                          "between time slice %zu and %zu.", status, istart,
+                          box_starts[ itime + 1 ] );
+            } else {
+               msgOutiff( MSG__VERB, " ", "Unusally long POL_ANG block "
+                          "between time slice %zu and %zu.", status, istart,
+                          box_starts[ itime + 1 ] );
+            }
             nodd++;
             box_size = 0;
          }
@@ -1376,6 +1385,9 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
 /* Return the limits for usable box lengths. */
    *lolim = (dim_t) ( s1 - 3.0*s2 );
    *hilim = (dim_t) ( s1 + 3.0*s2 );
+
+   msgOutiff( MSG__VERB, " ", "Mean POL_ANG block length: %g", status, s1 );
+   msgOutiff( MSG__VERB, " ", "Sigma of POL_ANG block lengths: %g", status, s2 );
 
 }
 
