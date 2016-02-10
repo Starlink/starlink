@@ -601,7 +601,6 @@
                IFVEC = IFVEC + 1
                IF( INTERP .NE. VAL__BADD .AND. WGT .GT. 0.0D0 ) THEN
                   FVEC( IFVEC ) = SQRT( WGT ) * ( INTERP - DREF )
-                  FSUM = FSUM + FVEC( IFVEC )**2
                   WSUM = WSUM + WGT
                ELSE
                   FVEC( IFVEC ) = 0.0D0
@@ -618,6 +617,7 @@
          NFVEC = IFVEC
          DO IFVEC = 1, NFVEC
             FVEC( IFVEC ) = FVEC( IFVEC ) * NORM
+            FSUM = FSUM + FVEC( IFVEC )**2
          END DO
       ELSE
          STATUS = SAI__ERROR
@@ -625,8 +625,8 @@
      :                 STATUS )
       END IF
 
-*  Return the square root of the sum of the squared residuals.
-      FSUM = SQRT( FSUM )
+*  Return the square root of the mean of the squared residuals.
+      FSUM = SQRT( FSUM/NFVEC )
 
       END
 
