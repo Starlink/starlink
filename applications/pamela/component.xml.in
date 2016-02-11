@@ -7,7 +7,13 @@
   <path>applications/pamela</path>
   <description>PAMELA</description>
   <abstract><p>
-Pamela is...
+    Pamela is a package of routines for the reduction of
+    two-dimensional spectral data to one-dimensional.  It does not
+    deal with any subsequent steps such as arc calibration etc. Pamela
+    includes full propagation of uncertainties through the reduction.
+    It implements two forms of optimal extraction: Keith Horne's
+    original method for reasonably straight spectra and a bespoke
+    version for spectra with significant tilts or curvature.
   </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
