@@ -36,7 +36,7 @@
       <uname>pwd</uname>
     </person>
   </developers>
-  <!-- <documentation> sun139</documentation> -->
+  <documentation> sun139</documentation>
   <bugreports>ccdpack@starlink.ac.uk</bugreports>
   <copyright>
     <year></year>
