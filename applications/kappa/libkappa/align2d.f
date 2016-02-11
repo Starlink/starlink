@@ -4,7 +4,8 @@
 *     ALIGN2D
 
 *  Purpose:
-*     Aligns a pair of 2-dimensional NDFs by minimising the residuals between them.
+*     Aligns a pair of two-dimensional NDFs by minimising the residuals 
+*     between them.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,27 +21,27 @@
 *        The global status.
 
 *  Description:
-*     This application attempts to align a 2-dimensional input NDF with a
-*     2-dimensional reference NDF in pixel coordinates, using an affine
-*     transformation of the form:
+*     This application attempts to align a two-dimensional input NDF
+*     with a two-dimensional reference NDF in pixel co-ordinates, using
+*     an affine transformation of the form:
 *
 *        Xin = C1 + C2*Xref + C3*Yref
 *
 *        Yin = C4 + C5*Xref + C6*Yref
 *
-*     where (Xin,Yin) are pixel coordinates in the input NDF, and
-*     (Xref,Yref) are pixel coordinates in the reference NDF. The
-*     co-efficient values are determined by doing a least squares fit
-*     that minimises the sum of the squared residuals between the
-*     reference NDF and the transformed input NDF. If variance
-*     information is present in either NDF, it is used to weight the
-*     residuals within the fit, so that noisy data values have less
-*     effect on the fit. The best fit co-efficients are displayed on
-*     the screen and written to an output parameter. Optionally, the
-*     transformation may be used to transform the input NDF to create
-*     an output NDF (see Parameter OUT). It is possible to restrict the
-*     transformation in order to prevent shear, rotation, scaling, etc.
-*     (see Parameter FORM).
+*     where (Xin,Yin) are pixel co-ordinates in the input NDF, and
+*     (Xref,Yref) are pixel co-ordinates in the reference NDF. The
+*     coefficient values (C1--C6) are determined by doing a
+*     least-squares fit that minimises the sum of the squared
+*     residuals between the reference NDF and the transformed input
+*     NDF. If variance information is present in either NDF, it is used
+*     to weight the residuals within the fit, so that noisy data values
+*     have less effect on the fit. The best fit coefficients are
+*     displayed on the screen and written to an output parameter.
+*     Optionally, the transformation may be applied to the input NDF to
+*     create an output NDF (see Parameter OUT). It is possible to
+*     restrict the transformation in order to prevent shear, rotation,
+*     scaling, etc. (see Parameter FORM).
 
 *  Usage:
 *     align2d in ref out
@@ -53,7 +54,7 @@
 *        size to the input pixel size.  This option can only be used if
 *        the Mapping is successfully approximated by one or more linear
 *        transformations.  Thus an error will be reported if it used
-*        when the ACC parameter is set to zero (which stops the use of
+*        when the TOL parameter is set to zero (which stops the use of
 *        linear approximations), or if the Mapping is too non-linear to
 *        be approximated by a piece-wise linear transformation.  The
 *        ratio of output to input pixel size is evaluated once for each
@@ -64,10 +65,10 @@
 *     FORM = _INTEGER (Read)
 *        The form of the affine transformation to use:
 *
-*        - 0: Full unrestricted 6 coefficient fit
-*        - 1: Shift, rotation and a common X/Y scale but no shear.
-*        - 2: Shift and rotation but no scale or shear.
-*        - 3: Shift but not rotation, scale or shear.
+*        - 0 -- full unrestricted 6 coefficient fit;
+*        - 1 -- shift, rotation and a common X/Y scale but no shear;
+*        - 2 -- shift and rotation but no scale or shear; or
+*        - 3 -- shift but not rotation, scale or shear.
 *                                                                   [0]
 *     IN = NDF (Read)
 *        NDF to be transformed.
@@ -155,8 +156,8 @@
 *        if NORM is set FALSE, this normalisation is not applied.  See
 *        also Parameter CONSERVE.  [TRUE]
 *     OUT = NDF (Writed)
-*        An optional output NDF to contain a copy of IN aligned with OUT.
-*        No output is created if null (!) is supplied.
+*        An optional output NDF to contain a copy of IN aligned with
+*        OUT.  No output is created if null (!) is supplied.
 *     PARAMS( 2 ) = _DOUBLE (Read)
 *        An optional array which consists of additional parameters
 *        required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
@@ -191,7 +192,7 @@
 *     REF = NDF (Read)
 *        NDF to be used as a refernece.
 *     TOL = _DOUBLE (Read)
-*        The maximum tolerable geometrical distortion which may be
+*        The maximum tolerable geometrical distortion that may be
 *        introduced as a result of approximating non-linear Mappings
 *        by a set of piece-wise linear transforms.  Both
 *        algorithms approximate non-linear co-ordinate transformations
@@ -201,8 +202,8 @@
 *        zero will ensure that no such approximation is done, at the
 *        expense of increasing execution time. [0.05]
 *     TR( 6 ) = _DOUBLE (Write)
-*        An output parameter to which are written the coefficients of the
-*        fit.
+*        An output parameter to which are written the coefficients of
+*        the fit.
 *     WLIM = _REAL (Read)
 *        This parameter is only used if REBIN is set TRUE. It specifies
 *        the  minimum number of good pixels which must contribute to an
@@ -213,7 +214,7 @@
 *        from any input pixel.  [!]
 
 *  Examples:
-*     aligned my_data orionA my_corrected form=2
+*     align2d my_data orionA my_corrected form=2
 *        Aligns the two-dimensional NDF called my_data with the
 *        two-dimensional NDF called orionA, putting the aligned image in
 *        a new NDF called my_corrected. The transformation is restricted
@@ -228,13 +229,69 @@
 *     -  All non-complex numeric data types can be handled.
 
 *  Implementation Deficiencies:
-*     -  The least squares minimisation starts from an initial guess
-*     which is A unit transformation between IN and REF. If the actual
+*     -  The least-squares minimisation starts from an initial guess,
+*     which is a unit transformation between IN and REF. If the actual
 *     transformation is very different, then it would be faster and more
-*     accurate to create a better first guess using an FFT approach such
-*     as phase correlation. See "Robust image registration using log-polar
-*     transform" by George Wolberg and Siavash Zokai
-*     (http://www-cs.engr.ccny.cuny.edu/~wolberg/pub/icip00.pdf)
+*     accurate to create a better first guess using an FFT approach,
+*     such as phase correlation.  See "Robust image registration using 
+*     log-polar transform" by George Wolberg and Siavash Zokai
+*     (http://www-cs.engr.ccny.cuny.edu/~wolberg/pub/icip00.pdf).
+
+*  Choice of Algorithm:
+*     The algorithm used to produce the output images is determined by
+*     the REBIN parameter, and is based either on resampling the output
+*     image or rebinning the corresponding input image.
+*
+*     The resampling algorithm steps through every pixel in the output
+*     image, sampling the input image at the corresponding position and
+*     storing the sampled input value in the output pixel. The method
+*     used for sampling the input image is determined by the METHOD
+*     parameter. The rebinning algorithm steps through every pixel in
+*     the input image, dividing the input pixel value between a group
+*     of neighbouring output pixels, incrementing these output pixel
+*     values by their allocated share of the input pixel value, and
+*     finally normalising each output value by the total number of
+*     contributing input values. The way in which the input sample is
+*     divided between the output pixels is determined by the METHOD
+*     parameter.
+*
+*     Both algorithms produce an output in which the each pixel value is
+*     the weighted mean of the near-by input values, and so do not alter
+*     the mean pixel values associated with a source, even if the pixel
+*     size changes. Thus the total data sum in a source will change if
+*     the input and output pixel sizes differ.  However, if the CONSERVE
+*     parameter is set TRUE, the output values are scaled by the ratio
+*     of the output to input pixel size, so that the total data sum in a
+*     source is preserved.
+*
+*     A difference between resampling and rebinning is that resampling
+*     guarantees to fill the output image with good pixel values
+*     (assuming the input image is filled with good input pixel values),
+*     whereas holes can be left by the rebinning algorithm if the output
+*     image has smaller pixels than the input image.  Such holes occur
+*     at output pixels which receive no contributions from any input
+*     pixels, and will be filled with the value zero in the output
+*     image.  If this problem occurs the solution is probably to change
+*     the width of the pixel spreading function by assigning a larger
+*     value to PARAMS(1) and/or PARAMS(2) (depending on the specific
+*     METHOD value being used).
+*
+*     Both algorithms have the capability to introduce artefacts into
+*     the output image.  These have various causes described below.
+*
+*     - Particularly sharp features in the input can cause rings around
+*     the corresponding features in the output image. This can be
+*     minimised by suitable settings for the METHOD and PARAMS
+*     parameters. In general such rings can be minimised by using a
+*     wider interpolation kernel (if resampling) or spreading function
+*     (if rebinning), at the cost of degraded resolution.
+*
+*     - The approximation of the Mapping using a piece-wise linear
+*     transformation (controlled by Parameter TOL) can produce artefacts
+*     at the joints between the panels of the approximation. They are
+*     caused by the discontinuities  between the adjacent panels of the
+*     approximation, and can be minimised by reducing the value assigned
+*     to the TOL parameter.
 
 *  Copyright:
 *     Copyright (C) 2016 East Asian Observatory.
@@ -421,12 +478,13 @@
       CALL KPG1_ALIGN( DIMS( 1 ), DIMS( 2 ), IPIN, IPREF, VIN, VREF,
      :                 IPVIN, IPVREF, FORM, C, STATUS )
 
-*  Get the pixel index bounds of the NDF sections used in the minimisation.
+*  Get the pixel index bounds of the NDF sections used in the
+*  minimisation.
       CALL NDF_BOUND( INDF1, 2, LBND, UBND, NDIM, STATUS )
 
-*  Modify the transformation so that it refers to PIXEL coordinates rather
-*  than GRID coordinates (i.e. takes account of the pixel origin of the
-*  NDF section).
+*  Modify the transformation so that it refers to PIXEL co-ordinates
+*  rather than GRID co-ordinates (i.e. takes account of the pixel origin
+*  of the NDF section).
       C( 1 ) = C( 1 ) + LBND(1) - 1.5 + C( 2 )*( 1.5 - LBND(1) )
      :         + C( 3 )*( 1.5 - LBND(2) )
       C( 4 ) = C( 4 ) + LBND(2) - 1.5 + C( 5 )*( 1.5 - LBND(1) )
@@ -560,8 +618,8 @@
             END IF
          END IF
 
-*  Create a Mapping from reference (i.e. output) pixel coordinates to
-*  input pixel coordinates.
+*  Create a Mapping from reference (i.e. output) pixel co-ordinates to
+*  input pixel co-ordinates.
          MATRIX( 1 ) = C( 2 )
          MATRIX( 2 ) = C( 3 )
          MATRIX( 3 ) = C( 5 )
@@ -603,7 +661,7 @@
      :                      'DATA,VARIANCE', ITYPE, DTYPE, STATUS )
          END IF
 
-*  Set the Data and possibly VARIANCE component data types.
+*  Set the DATA and possibly VARIANCE component data types.
          CALL NDF_STYPE( ITYPE, INDF3, 'DATA', STATUS )
          IF ( VIN ) THEN
             CALL NDF_STYPE( ITYPE, INDF3, 'VARIANCE', STATUS )
@@ -615,14 +673,14 @@
          CALL NDF_GTWCS( INDF3, IWCS3, STATUS )
 
 *  Merge the output and reference WCS FrameSets, aligning them in PIXEL
-*  coords.
+*  co-ordinates.
          CALL KPG1_ASMRG( IWCS3, IWCS2, 'PIXEL', .TRUE., 0, STATUS )
 
 *  Store the merged FrameSet back in the output NDF. All this means that
 *  the output NDF inherits the WCS of the reference NDF.
          CALL NDF_PTWCS( IWCS3, INDF3, STATUS )
 
-*  Map the Data array of the input and output NDFs.
+*  Map the DATA array of the input and output NDFs.
          CALL NDF_MAP( INDF1A, 'DATA', ITYPE, 'READ', IPDATI, ELI,
      :                 STATUS )
          CALL NDF_MAP( INDF3, 'DATA', ITYPE, 'WRITE', IPDATO, ELO,
@@ -860,7 +918,7 @@
 *  If an error occurred, then report context information.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'ALIGN2D_ERR',
-     :   'ALIGN2D: Error aligning two 2-dimensional NDFs.', STATUS )
+     :     'ALIGN2D: Error aligning two 2-dimensional NDFs.', STATUS )
       END IF
 
       END

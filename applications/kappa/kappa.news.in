@@ -8,8 +8,8 @@
 
    o ALIGN2D
 
-      -  Aligns a pair of 2-dimensional NDFs by minimising the residuals
-         between them.
+      -  Aligns a pair of two-dimensional NDFs by minimising the
+         residuals between them.
 
 2 Modified_applications
 
