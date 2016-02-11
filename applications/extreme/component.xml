@@ -13,7 +13,7 @@
   The principal focus of this is to move to use of 64 bits of address
   space on 64-bit operating systems.</p>
 
-  <p>This document (SSN/73) is squarely aimed at the problem of adapting the
+  <p>It is squarely aimed at the problem of adapting the
   Starlink Software Collection, and consequently focuses on
   the three operating systems (Solaris, Linux and Tru64) supported by Starlink,
   the compiled languages Fortran 77 and ANSI C,
@@ -34,7 +34,7 @@
       <role>owner</role>
     </person>
   </developers>
-  <!-- <documentation> ssn73</documentation> -->
+  <documentation> ssn73</documentation>
   <tests status="yes"/>
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
