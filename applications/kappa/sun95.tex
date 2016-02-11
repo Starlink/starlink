@@ -34667,6 +34667,18 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          device\texttt{}]
       }
       \sstsubsection{
+          DRAWMARK = \_LOGICAL (Read)
+      }{
+         The central markers for each bin are not included in the plot
+         if this parameter is set to FALSE. \texttt{[TRUE]}
+      }
+      \sstsubsection{
+          DRAWWIDTH = \_LOGICAL (Read)
+      }{
+         The ``error bars'' marking the width of each bin are not included
+         in the plot if this parameter is set to FALSE. \texttt{[TRUE]}
+      }
+      \sstsubsection{
          IN1 = NDF (Read)
       }{
          The NDF to be normalised.
@@ -53471,7 +53483,6 @@ and HDS data types is as follows:
 
 \section{\xlabel{se_changes}Release Notes---V2.4\label{se:changes}}
 
-\subsection{Modified Commands}
 \subsubsection{New Commands}
 The following new application have been added:
 
@@ -53480,6 +53491,7 @@ The following new application have been added:
    Aligns a pair of two-dimensional NDFs by minimising the residuals between them.
 \end{description}
 
+\subsection{Modified Commands}
 The following applications have been modified:
 \begin{description}[style=nextline]
 
@@ -53488,6 +53500,13 @@ The following applications have been modified:
         \item Has a new parameter MASK, which can be used to save an NDF
               containing a mask showing which pixels were included in the
               aperture.
+      \end{itemize}
+
+   \item [\htmlref{NORMALIZE}{NORMALIZE}]\mbox{}
+      \begin{itemize}
+        \item Has two new parameters DRAWMARK and DRAWWIDTH that can be
+              used to exclude central markers and width indicator from
+              the plot.
       \end{itemize}
 
    \item [\htmlref{PROVSHOW}{PROVSHOW}]\mbox{}

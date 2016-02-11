@@ -1,7 +1,7 @@
       SUBROUTINE KPS1_NMPLT( VA, VB, NEL, AMIN, AMAX, NBIN, NITER,
-     :                       SIGLIM, MINPIX, NDFA, NDFB, ZEROFF, NSUM,
-     :                       ASUM, BSUM, B2SUM, VARLIM, SLOPE, OFFSET,
-     :                       CORR, STATUS )
+     :                       SIGLIM, MINPIX, NDFA, NDFB, ZEROFF, DRWMRK,
+     :                       DRWERR, NSUM, ASUM, BSUM, B2SUM, VARLIM,
+     :                       SLOPE, OFFSET, CORR, STATUS )
 *+
 *  Name:
 *     KPS1_NMPLT
@@ -14,9 +14,10 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_NMPLT( VA, VB, NEL, AMIN, AMAX, NBIN, NITER, SIGLIM,
-*    :                 MINPIX, NDFA, NDFB, ZEROFF, NSUM, ASUM, BSUM,
-*    :                 B2SUM, VARLIM, SLOPE, OFFSET, CORR, STATUS )
+*     CALL KPS1_NMPLT( VA, VB, NEL, AMIN, AMAX, NBIN, NITER,
+*    :                 SIGLIM, MINPIX, NDFA, NDFB, ZEROFF, DRWMRK,
+*    :                 DRWERR, NSUM, ASUM, BSUM, B2SUM, VARLIM,
+*    :                 SLOPE, OFFSET, CORR, STATUS )
 
 *  Description:
 *     Intensities which are valid in each input vector and lie within
@@ -63,6 +64,10 @@
 *        taken.
 *     ZEROFF = LOGICAL (Given)
 *        If .TRUE., the offset of the fit is contrained to be zero.
+*     DRWMRK = LOGICAL (Given)
+*        The markers are only drawn if DRWMRK is .TRUE.
+*     DRWERR = LOGICAL (Given)
+*        The error bars are only drawn if DRWERR is .TRUE.
 *     NSUM( NBIN ) = INTEGER (Given and Returned)
 *        Work space.
 *     ASUM( NBIN ) = REAL (Given and Returned)
@@ -140,6 +145,8 @@
 *        Added argument ZEROFF.
 *     1-MAY-2015 (DSB):
 *        Added argument CORR.
+*     11-FEB-2016 (DSB):
+*        Added argument DRWMRK and DRWERR.
 *     {enter_further_changes_here}
 
 *-
@@ -165,6 +172,8 @@
       INTEGER NDFA
       INTEGER NDFB
       LOGICAL ZEROFF
+      LOGICAL DRWMRK
+      LOGICAL DRWERR
 
 *  Arguments Given and Returned:
       INTEGER NSUM( NBIN )
@@ -186,15 +195,17 @@
                                  ! component path)
       CHARACTER XL*( 255 )       ! Default Xaxis label
       CHARACTER YL*( 255 )       ! Default Y-axis label
-      DOUBLE PRECISION DA        ! Vector A value
-      DOUBLE PRECISION DB        ! Vector B value
       DOUBLE PRECISION ABOT      ! Lowest vector A value actually used
       DOUBLE PRECISION ATOP      ! Highest vector A value actually used
       DOUBLE PRECISION BSCALE( 2 )! Scaling for plot labels
+      DOUBLE PRECISION DA        ! Vector A value
+      DOUBLE PRECISION DB        ! Vector B value
       DOUBLE PRECISION DEN       ! Denominator
       DOUBLE PRECISION FINISH( 2 ) ! End of best fitting line
+      DOUBLE PRECISION SA        ! Sum of remaining A values
       DOUBLE PRECISION SAA       ! Sum of remaining A*A values
       DOUBLE PRECISION SAB       ! Sum of remaining A*B values
+      DOUBLE PRECISION SB        ! Sum of remaining B values
       DOUBLE PRECISION SBB       ! Sum of remaining B*B values
       DOUBLE PRECISION START( 2 ) ! Start of best fitting line
       DOUBLE PRECISION WT        ! Weight for current bin
@@ -211,6 +222,7 @@
       INTEGER ITER               ! Iteration counter
       INTEGER LENXL              ! Used length of XL
       INTEGER LENYL              ! Used length of YL
+      INTEGER MODE               ! Plotting mode
       INTEGER NDATA              ! Number of non-empty bins
       INTEGER NMLEN              ! Used length of NDFNAM
       INTEGER NPIX               ! Number of vector B values used
@@ -223,9 +235,8 @@
       REAL B                     ! Vector B value
       REAL BFIT                  ! Expected vector B value
       REAL DET                   ! Denominator of normal equations
+      REAL NSIGMA                ! No. of sigmas for error bars
       REAL Q0                    ! Min. possible variance for a bin
-      DOUBLE PRECISION SA        ! Sum of remaining A values
-      DOUBLE PRECISION SB        ! Sum of remaining B values
       REAL WTMAX                 ! Max. allowed bin weight
 
 *.
@@ -484,16 +495,29 @@
             CALL MSG_LOAD( ' ', 'Data value in ^NDF', YL, LENYL,
      :                     STATUS )
 
+*  Set KPG1_GRAPH argument values depending on what is to be drawn.
+            IF( DRWMRK ) THEN
+               MODE = 3
+            ELSE
+               MODE = 7
+            END IF
+
+            IF( DRWERR ) THEN
+               NSIGMA = 1.0
+            ELSE
+               NSIGMA = 0.0
+            END IF
+
 *  Draw the plot.
             IPLOT = AST__NULL
             BSCALE( 1 ) = 1.0D0
             BSCALE( 2 ) = 1.0D0
-            CALL KPG1_GRAPH( NDATA, ASUM, BSUM, 1.0, VARLIM,
+            CALL KPG1_GRAPH( NDATA, ASUM, BSUM, NSIGMA, VARLIM,
      :                       XL( : LENXL ), YL( : LENYL ),
-     :                       'Normalization plot', 'XDATA', 'YDATA', 3,
-     :                       .TRUE., VAL__BADR, VAL__BADR, VAL__BADR,
-     :                       VAL__BADR, 'KAPPA_NORMALIZE', .TRUE.,
-     :                       .FALSE., BSCALE, IPLOT, STATUS )
+     :                       'Normalization plot', 'XDATA', 'YDATA',
+     :                       MODE, .TRUE., VAL__BADR, VAL__BADR,
+     :                       VAL__BADR, VAL__BADR, 'KAPPA_NORMALIZE',
+     :                       .TRUE., .FALSE., BSCALE, IPLOT, STATUS )
 
 *  If a Plot was produced, we need to draw the best fitting straight
 *  line over it.

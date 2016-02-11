@@ -99,6 +99,7 @@
 *           6 - The same as Mode 1, except that bad values are not
 *               flanked by vertical lines drawn down to the lower edge
 *               of the viewport (a simple gap is left instead).
+*           7 - The data points are not drawn.
 *     MTYPE = INTEGER (Given)
 *        The PGPLOT marker type to use if MODE is 3 or 5.
 *     ERSHAP = INTEGER (Given)
@@ -179,6 +180,8 @@
 *        Added Mode=6.
 *     11-AUG-2010 (DSB):
 *        Added mode 6.
+*     11-FEB-2016 (DSB):
+*        Added mode 7.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -606,7 +609,7 @@
             MIDY = MODE .EQ. 1 .OR. ( GOODY .AND. GOODY0 )
 
 *  Draw line B) so long as the mid X position is known. In Mode 1, bad Y
-*  values are considered to be coincident with the bottom axis. In 
+*  values are considered to be coincident with the bottom axis. In
 *  Mode 6, bad Y values cause line B) to be omitted.
             IF( MIDX .AND. MIDY ) THEN
 
@@ -615,7 +618,7 @@
                   CALL PGMOVE( RXC, RY0 )
                   DOWN = .TRUE.
                END IF
- 
+
 *  Draw line B.
                CALL PGDRAW( RXC, RY )
 
@@ -797,7 +800,7 @@
          CALL KPG1_PGSTY( IPLOT, 'MARKERS', .FALSE., ATTR, STATUS )
 
 *  Report an error if the MODE value was illegal.
-      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+      ELSE IF( MODE .NE. 7 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'MODE', MODE )
          CALL ERR_REP( 'KPG1_PLTLN_ERR1', 'KPG1_PLTLN: Illegal MODE '//

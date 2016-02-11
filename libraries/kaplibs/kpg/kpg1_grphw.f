@@ -181,13 +181,18 @@
 *     MODE = INTEGER (Given)
 *        Determines the way in which the data points are represented.
 *           1 -- A "staircase" histogram, in which each horizontal line
-*                is centred on the X position.
+*                is centred on the X position. Bad values are flanked by 
+*                vertical lines drawn down to the lower edge of the viewport.
 *           2 -- The points are joined by straight lines.
 *           3 -- A marker is placed at each point.
 *           4 -- (not used)
 *           5 -- A "chain" in which each point is indicated by a marker
 *                and also join by straight lines to its neighbouring
 *                points.
+*           6 -- The same as Mode 1, except that bad values are not
+*               flanked by vertical lines drawn down to the lower edge
+*               of the viewport (a simple gap is left instead).
+*           7 -- The data points are not drawn.
 *     NULL = LOGICAL (Given)
 *        If .TRUE., then the user may supply a null (!) value for most
 *        of the parameters accessed by this routine to indicate that
@@ -311,6 +316,8 @@
 *        Ensure the DEVICE parameter is not cancelled if a null value is
 *        supplied for it. This is so that multiple LPG invocations of
 *        graphics apps such as NORMALIZE can work with "device=!".
+*     11-FEB-2016 (DSB):
+*        Added mode 7.
 *     {enter_further_changes_here}
 
 *  Bugs:

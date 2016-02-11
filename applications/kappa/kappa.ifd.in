@@ -14634,6 +14634,24 @@ iraf! {
             helpkey *
          }
 
+         parameter drawmark {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Draw a central marker for each bin?}
+            default TRUE
+            helpkey *
+         }
+
+         parameter drawwidth {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Draw a width bar for each bin?}
+            default TRUE
+            helpkey *
+         }
+
          parameter in1 {
             position 1
             type NDF

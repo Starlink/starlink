@@ -89,6 +89,12 @@
 *        The graphics workstation on which to produce the plot.  If a
 *        null value (!) is supplied no plot will be made.
 *        [Current graphics device]
+*     DRAWMARK = _LOGICAL (Read)
+*        The central markers for each bin are not included in the plot
+*        if this parameter is set to FALSE. [TRUE]
+*     DRAWWIDTH = _LOGICAL (Read)
+*        The "error bars" marking the width of each bin are not included in
+*        the plot if this parameter is set to FALSE. [TRUE]
 *     IN1 = NDF (Read)
 *        The NDF to be normalised.
 *     IN2 = NDF (Read)
@@ -401,6 +407,8 @@
 *        When looping, do not abort if a histogram could not be formed
 *        for a row/column, but continue to normalise any remaining
 *        rows/columns.
+*     11-FEB-2016 (DSB):
+*        Added parameters DRAWMARK and DRAWWIDTH.
 *     {enter_further_changes_here}
 
 *-
@@ -483,6 +491,8 @@
       INTEGER  SHIFT( 2 )        ! Pixel origin shift
       LOGICAL  BAD               ! Any bad pixels found?
       LOGICAL  DEFIND            ! NDF component is in a defined state?
+      LOGICAL  DRWDTH            ! Draw width bars?
+      LOGICAL  DRMARK            ! Draw markers?
       LOGICAL  LOOP              ! Loop over rows or columns?
       LOGICAL  LPOVR1            ! Loop over rows or columns in IN1?
       LOGICAL  OUTRQD            ! Is an output NDF is to be generated?
@@ -891,6 +901,12 @@
 *  See if the offset should be fixed at zero.
          CALL PAR_GET0L( 'ZEROFF', ZEROFF, STATUS )
 
+*  See if the central markers should be include din the plot.
+         CALL PAR_GET0L( 'DRAWMARK', DRMARK, STATUS )
+
+*  See if the width bars should be include din the plot.
+         CALL PAR_GET0L( 'DRAWWIDTH', DRWDTH, STATUS )
+
 *  Abort if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -899,7 +915,7 @@
          CALL KPS1_NMPLT( %VAL( CNF_PVAL( PNT2S( 1 ) ) ),
      :                    %VAL( CNF_PVAL( PNT1S( 1 ) ) ), NELS,
      :                DRANGE( 1 ), DRANGE( 2 ), NBIN, NITER, NSIGMA,
-     :                MINPIX, NDF2S, NDF1S, ZEROFF,
+     :                MINPIX, NDF2S, NDF1S, ZEROFF, DRMARK, DRWDTH,
      :                %VAL( CNF_PVAL( PNTW1 ) ),
      :                %VAL( CNF_PVAL( PNTW2 ) ),
      :                %VAL( CNF_PVAL( PNTW3 ) ),

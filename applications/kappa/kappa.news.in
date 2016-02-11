@@ -19,6 +19,11 @@
          containing a mask showing which pixels were included in the
          aperture.
 
+   o NORMALIZE
+
+      - Has two new parameters DRAWMARK and DRAWWIDTH that can be used
+        to exclude central markers and width indicator from the plot.
+
    o PROVSHOW
 
       -  Has a new option SHOW=TREE, which allows the family tree to

@@ -78,12 +78,17 @@
 *     MODE = INTEGER (Given)
 *        Determines the way in which the data points are represented:
 *            1 - A "staircase" histogram, in which each horizontal line is
-*                centred on the X position.
+*                centred on the X position. Bad values are flanked by vertical
+*                lines drawn down to the lower edge of the viewport.
 *            2 - The points are joined by straight lines.
-*            3 - A marker is placed at each point.
+*            3 - A marker is placed at each point (see MTYPE).
 *            4 - (not used)
 *            5 - A "chain" in which each point is marker by a marker and also
 *                join by straight lines to its neighbouring points.
+*            6 - The same as Mode 1, except that bad values are not
+*                flanked by vertical lines drawn down to the lower edge
+*                of the viewport (a simple gap is left instead).
+*            7 - The data points are not drawn.
 *     NULL = LOGICAL (Given)
 *        If .TRUE., then the user may supply a null (!) value for most of the
 *        parameters accessed by this routine to indicate that nothing is to
@@ -176,6 +181,8 @@
 *        Allow IPLOT to be used to supply default Frame attribute values.
 *     16-JUN-2011 (DSB):
 *        Added argument BSCALE.
+*     11-FEB-2016 (DSB):
+*        Added mode 7.
 *     {enter_further_changes_here}
 
 *  Bugs:
