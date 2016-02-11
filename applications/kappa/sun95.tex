@@ -3939,9 +3939,9 @@ The MODE parameter specifies the position of the new picture within the
 BASE picture; in this case \texttt{"cl"} indicates that the new picture is to be
 centred (\texttt{"c"}) vertically within the BASE picture and placed at the left
 (\texttt{"l"}) hand edge.  The FRACTION parameter specifies the dimensions of the
-picture; the first value (0.6) gives the horizontal size of the picture
+picture; the first value (\texttt{0.6}) gives the horizontal size of the picture
 as a fraction of the horizontal size of the BASE picture, and the second
-value (1.0) gives the vertical size of the picture as a fraction of the
+value (\texttt{1.0}) gives the vertical size of the picture as a fraction of the
 vertical size of the BASE picture.  Thus, the new picture is just over
 half the width of the BASE picture, and is the full height of the BASE
 picture.  The OUTLINE parameter specifies whether a box should be drawn on
@@ -5334,7 +5334,7 @@ supported types of \xref{Mapping}{sun210}{Mapping}).
 \htmlref{WCSREMOVE}{WCSREMOVE} allows Frames to be removed from the WCS
 component.
 
-Two common additional Frame \texttt{Domains} are SKY and SPECTRUM.  SKY
+Two common additional Frame \att{Domain} options are SKY and SPECTRUM.  SKY
 is reserved to refer to two-dimensional Frames that describe
 celestial longitude and latitude (known as
 \xref{`SkyFrames'}{sun210}{SkyFrame}). SPECTRUM is reserved to refer
@@ -5370,11 +5370,11 @@ common example of a uni-directional Mapping is that between the GRID
 and AXIS Frames in cases where the AXIS structures are non-monotonic.}
 
 Frames within a FrameSet are distinguished by their attribute values,
-primarily their \texttt{Domain} value.  In addition, each Frame has an integer
+primarily their \att{Domain} value.  In addition, each Frame has an integer
 \emph{Frame index}.  These indices are (in general) allocated sequentially
 in chronological order as Frames are added into the FrameSet.
 Applications that require the user to specify a Frame will usually allow
-the Frame to be specified either by \texttt{Domain} name, or by index.  Frame indices
+the Frame to be specified either by \att{Domain} name, or by index.  Frame indices
 can be examined using \htmlref{NDFTRACE}{NDFTRACE} (see below).
 
 One Frame within the FrameSet of an NDF is nominated as the \emph{current
@@ -5388,9 +5388,9 @@ position to be given within the current co-ordinate Frame of the NDF,
 The contents of the WCS component of an an NDF can be examined using
 NDFTRACE.  By default, this just shows the number of
 co-ordinates Frames defined within the NDF (including the four standard
-ones), and the \texttt{Title} and \texttt{Domain} of the current co-ordinate Frame.  More
+ones), and the \att{Title} and \att{Domain} of the current co-ordinate Frame.  More
 detail can be obtained using the keywords FULLWCS and FULLFRAME.  The
-first causes the \texttt{Title}, index and \texttt{Domain} of all Frames to be displayed,
+first causes the \att{Title}, index and \att{Domain} of all Frames to be displayed,
 together with the index of the current Frame.  The second causes a more
 complete description of each Frame to be displayed, including axis
 labels, units, celestial co-ordinate system (for
@@ -5428,12 +5428,12 @@ SpecFrame supports these particular attribute values).
 
 New co-ordinates Frames can be created and added into an NDF using
 \htmlref{WCSADD}{WCSADD}.  When you create a new Frame you should give it
-a meaningful \texttt{Domain} name which indicates the sort of
+a meaningful \att{Domain} name which indicates the sort of
 co-ordinates that it
 represents.  You are free to choose any name you like (white space is removed,
 and lower case characters are converted to upper case before using the
-supplied \texttt{Domain} string), but you should usually avoid the following reserved
-\texttt{Domain} names:
+supplied \att{Domain} string), but you should usually avoid the following reserved
+\att{Domain} names:
 
 \begin{description}
 \item [GRID] --- Reserved to represent grid co-ordinates (in units of
@@ -5497,7 +5497,7 @@ selected from those available in the FrameSet.
 \item As a \emph{Sky Co-ordinate System} (SCS) specification.  This notation
 has been inherited from the IRAS90 package (see \xref{SUN/163}{sun163{}}),
 and can be used to indicate a specific celestial co-ordinate system.
-Simply specifying the \texttt{Domain} name SKY will select any
+Simply specifying the \att{Domain} name SKY will select any
 \xref{SkyFrame}{sun210}{SkyFrame}~ that is present, irrespective of the
 particular celestial co-ordinate system that
 the SkyFrame represents.  If you want to request a particular celestial
@@ -5542,17 +5542,17 @@ different systems.
 \end{itemize}
 
 When specifying a new Frame (rather than selecting an existing Frame
-from a FrameSet), you can either give a \texttt{Domain} name, or an SCS
+from a FrameSet), you can either give a \att{Domain} name, or an SCS
 specification, but you cannot give a Frame index.  Any string may be used
-as a \texttt{Domain} name, and you will usually be required to specify
+as a \att{Domain} name, and you will usually be required to specify
 the number of axes in the Frame.  The exception to this is if you specify
-one of the \texttt{Domain} names SKY, GRAPHICS, NDC, CURPIC or BASEPIC, in which
+one of the \att{Domain} names SKY, GRAPHICS, NDC, CURPIC or BASEPIC, in which
 case a two-dimensional Frame is always created.
 
 The nature of the current Frame can also be changed using
 \htmlref{WCSATTRIB}{WCSATTRIB}, which allows new values to be assigned
 to specified \htmlref{Frame attributes}{ap:frmatt}.  For instance,
-assigning a new value to the \texttt{System} attribute will change the
+assigning a new value to the \att{System} attribute will change the
 co-ordinate system used to describe positions within the domain
 covered by the Frame.  The main attributes relevant to Frames are
 described \slhyperref{here}{in Appendix~}{}{ap:frmatt}.
@@ -5817,7 +5817,7 @@ Let's say you have a spectral cube in which the WCS axes are wavelength,
 RA and Dec.  In this case, the current co-ordinate Frame will actually be
 a `compound' Frame containing two `component' Frames; a one-dimensional
 spectral Frame and a two-dimensional sky Frame.  If we consider an attribute
-such as \texttt{System} (which all classes of Frame have), we now seem to have
+such as \att{System} (which all classes of Frame have), we now seem to have
 three different Systems to consider; the \att{System} value for the component
 spectral Frame, the \att{System} value for the component sky Frame and the
 \att{System} value for the compound Frame as a whole.  So if we want to set the
@@ -5833,7 +5833,7 @@ RA axis and 3 is the Dec. axis, then we would do the following:
 \end{terminalv}
 
 In fact, we could have used \texttt{"System(3)"} in place of \texttt{"System(2)"} since
-axes 2 and 3 are both contained within the same sky Frame and so setting
+Axes 2 and 3 are both contained within the same sky Frame and so setting
 the \att{System} attribute for either one will have the same effect.  We could
 now examine the attributes as follows:
 
@@ -6327,7 +6327,7 @@ subsequent positions are supplied.  Its first argument is the
 \htmlref{domain}{se:resdoms}.  Here the first \texttt{COFRAME(PIXEL)}
 refers to \htmlref{pixel co-ordinates}{fi:pixco}.  Note that these are
 not the same as \htmlref{pixel indices}{fi:pixind}, as they are
-displaced by -0.5 with respect to pixel indices.  The second \texttt{
+displaced by $-$0.5 with respect to pixel indices.  The second \texttt{
 COFRAME} selects a SKY domain using the FK5 system, so that regular
 equatorial co-ordinates may be supplied as arguments to subsequent
 keywords.  Other possible values for \htmlref{System}{System}~ include
@@ -6675,9 +6675,9 @@ So how do the quality and bad-bits mask combine to form a logical
 value?  They form the bit-wise `AND' and test it for equality for 0.
 None the wiser?  Regard each bit in the bad-bits mask as a switch
 to activate detection of the corresponding bit in a pixel's quality.
-The switch is on if it has value 1, and is off if it has value 0.
-Thus if the pixel is flagged only if one or more of the 8 bits
-has both quality and the corresponding bad-bit set to 1.  Here
+The switch is on if it has value \texttt{1}, and is off if it has value
+\texttt{0}. Thus if the pixel is flagged only if one or more of the
+eight bits has both quality and the corresponding bad-bit set to 1.  Here
 are some examples:
 
 \begin{center}
@@ -10884,8 +10884,8 @@ KAPPA: \htmlref{ARDGEN}{ARDGEN},
          The size of the plot to create, given as a multiple of the size
          of the Region being plotted.  This parameter is only accessed if
          no DATA picture can be found on the graphics device, or CLEAR is
-         \texttt{TRUE}.  A SIZE value of 1.0 causes the plot to be the same size as
-         the Region being plotted.  A value of 2.0 causes the plot to be
+         \texttt{TRUE}.  A SIZE value of \texttt{1.0} causes the plot to be the same size as
+         the Region being plotted.  A value of \texttt{2.0} causes the plot to be
          twice the size of the Region, \emph{etc}. \texttt{[2.0]}
       }
       \sstsubsection{
@@ -11977,7 +11977,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          smoothed output value will be calculated.  The value of this
          parameter should lie between 0.0 and 1.0 (the actual number
          used will be rounded up if necessary to correspond to at least
-         1 pixel).  \texttt{[!]}
+         one pixel).  \texttt{[!]}
       }
    }
    \sstexamples{
@@ -14242,7 +14242,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
             lower edge of the plot.
 
             \sstitem
-            \texttt{"GapHistogram"} -- The same as the \texttt{"Histogram"} option except bad
+            \texttt{"GapHistogram"} --- The same as the \texttt{"Histogram"} option except bad
             values are not flanked by vertical lines to the lower edge of
             the plot, leaving a gap.
 
@@ -15473,7 +15473,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
          result, otherwise the output value will be the sum of the
          good values.  The value of this parameter should lie between
          0.0 and 1.0 (the actual number used will be rounded up if
-         necessary to correspond to at least 1 pixel).  \texttt{[0.3]}
+         necessary to correspond to at least one pixel).  \texttt{[0.3]}
       }
    }
    \sstexamples{
@@ -15724,7 +15724,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          result, otherwise an averaged output value will be calculated.
          The value of this parameter should lie between 0.0 and 1.0
          (the actual number used will be rounded up if necessary to
-         correspond to at least 1 pixel).  \texttt{[0.3]}
+         correspond to at least one pixel).  \texttt{[0.3]}
       }
    }
    \sstexamples{
@@ -16803,9 +16803,9 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
          If this specified minimum weight is not present, then a bad
          output pixel will result, otherwise a smoothed output value
          will be calculated.  The value of this parameter should lie
-         between 0.0 and 1.0.  A value of 0.0 will result in a good
+         between 0.0 and 1.0.  A value of \texttt{0.0} will result in a good
          output pixel being created even if only one good input pixel
-         contributes to it.  A value of 1.0 will result in a good output
+         contributes to it.  A value of \texttt{1.0} will result in a good output
          pixel being created only if all the input pixels which
          contribute to it are good.  See also Parameter NORM.  \texttt{[!]}
       }
@@ -18448,12 +18448,12 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          XMAGN = \_REAL (Read)
       }{
          The horizontal magnification for the image.  The default
-         value of 1.0 corresponds to 'normal' magnification in which the
+         value of \texttt{1.0} corresponds to 'normal' magnification in which the
          the image fills the available space in at least one dimension.
          A value larger than 1.0 makes each data pixel wider.  If this
          results in the image being wider than the available space then
          the image will be clipped to display fewer pixels.  See also
-         Parameters YMAGN, CENTRE, SQRPIX, and FILL. [1.0]
+         Parameters YMAGN, CENTRE, SQRPIX, and FILL.  \texttt{[1.0]}
       }
       \sstsubsection{
          YMAGN = \_REAL (Read)
@@ -18473,15 +18473,6 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          area on the screen matching the pixel aspect ratio at the centre of
          the image, determined within the \htmlref{current WCS
          Frame.}{se:curframe}~ \texttt{[!]}
-
-         The vertical magnification for the image.  The default
-         value of 1.0 corresponds to 'normal' magnification in which the
-         the image fills the available space in at least one dimension.
-         A value larger than 1.0 makes each data pixel taller.  If this
-         results in the image being taller than the available space then
-         the image will be clipped to display fewer pixels.  See also
-         Parameters XMAGN, CENTRE, and FILL.  If a null (\texttt{{!}}) value is
-         supplied, the value used is the value supplied for XMAGN.  \texttt{[!]}
       }
    }
    \sstresparameters{
@@ -18777,7 +18768,7 @@ KAPPA: \htmlref{ADD}{ADD},
          BLANKSIZE = \_REAL (Read)
       }{
          Specifies the size of the blanked area (see Parameter BLANK).  A
-         value of 1.0 results in the blanked area being just large enough
+         value of \texttt{1.0} results in the blanked area being just large enough
          to contain the drawn arrows and labels. Values larger than 1.0
          introduce a blank margin around the drawn arrows and labels.  This
          parameter also specifies the size of the picture stored in the
@@ -19430,7 +19421,7 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM},
          width (opening angle) of 36 degrees (so that 360 degrees are
          covered in total).  Only the section of each sector bounded by
          radii of 50 and 60 pixels is included in the profile.  In this
-         case the default value of 1.0 is accepted for Parameter RATIO
+         case the default value of \texttt{1.0} is accepted for Parameter RATIO
          and so the bins will form a circular annulus of width 10
          pixels.
       }
@@ -20108,7 +20099,7 @@ KAPPA: \htmlref{LOG10}{LOG10},
          smoothed output value will be calculated.  The value of this
          parameter should lie between 0.0 and 1.0 (the actual number
          used will be rounded up if necessary to correspond to at least
-         1 pixel).  \texttt{[!]}
+         one pixel).  \texttt{[!]}
       }
    }
    \pagebreak
@@ -22045,17 +22036,17 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          READONLY = \_LOGICAL (Read)
       }{
          Determines if read or write access is requested for the NDF. If
-	 a TRUE value is supplied for READONLY, the NDF is opened for
+	 a \texttt{TRUE} value is supplied for READONLY, the NDF is opened for
 	 reading only. An error will then be reported if any of the
 	 requested editing operations would change the contents of the
-	 NDF. If a FALSE value is supplied for READONLY, the NDF is
+	 NDF. If a \texttt{FALSE} value is supplied for READONLY, the NDF is
 	 opened for both reading and writing, but an error will be
 	 reported if the NDF file is write-protected on disk. If the MODE
 	 parameter is set to \texttt{"File"}, the dynamic default value for
-	 READONLY is FALSE. If MODE is set to \texttt{"Interface"}, the
+	 READONLY is \texttt{FALSE}. If MODE is set to \texttt{"Interface"}, the
 	 dynamic default value for READONLY depends on the value of the
-	 EDIT parameter: TRUE for \texttt{"Print"} and \texttt{"Exist"}, and
-	 FALSE for all other editing commands.  \texttt{[]}
+	 EDIT parameter: \texttt{TRUE} for \texttt{"Print"} and \texttt{"Exist"}, and
+	 \texttt{FALSE} for all other editing commands.  \texttt{[]}
       }
       \sstsubsection{
          STRING = \_LOGICAL (Read)
@@ -23149,8 +23140,8 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          The number of the dimension along which the NDF's pixels
          should be reversed.  The value should lie between 1 and the
          total number of NDF dimensions.  If the NDF has only a single
-         dimension, then this parameter is not used, a value of 1 being
-         assumed.
+         dimension, then this parameter is not used, a value of \texttt{1}
+         being assumed.
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -25278,7 +25269,7 @@ KAPPA: \htmlref{LAPLACE}{LAPLACE},
          count of one to the corresponding histogram bin. If an NDF is
          supplied, the histogram count for a particular input pixel is
          formed by dividing its weight value (supplied in the WEIGHTS NDF)
-         by the value of parameter WEIGHTSTEP, and then taking the nearest
+         by the value of Parameter WEIGHTSTEP, and then taking the nearest
          integer. Input pixels with bad or zero weights are excluded from
          the histogram. \texttt{[!]}
       }
@@ -26444,7 +26435,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
             lower edge of the plot.
 
             \sstitem
-            \texttt{"GapHistogram"} -- The same as the \texttt{"Histogram"} option except bad
+            \texttt{"GapHistogram"} --- The same as the \texttt{"Histogram"} option except bad
             values are not flanked by vertical lines to the lower edge of
             the plot, leaving a gap.
 
@@ -30421,7 +30412,7 @@ KAPPA: \htmlref{COLLAPSE}{COLLAPSE},
          maths exp="pa$*$exp(ia$+$pb)" out=outfile pb=13.7 novariance
       }{
          The expression \texttt{"pa$*$exp(ia$+$pb)"} is evaluated with a value of
-         13.7 for the constant PB, and output is written to the NDF
+         \texttt{13.7} for the constant PB, and output is written to the NDF
          structure outfile.  The input NDF structure to be used for
          token IA and the value of the other numerical constant PA will
          be prompted for.  \texttt{NOVARIANCE} has been specified so that output
@@ -32285,8 +32276,8 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          used to annotate the horizontal axis, then an error will be
          reported if the profile passes through RA=0 because it will
          introduce a non-monotonic jump in axis value (from 0h to 24h, or
-         24h to 0h).  If a null (\texttt{{!}}) value is supplied, the value of Parameter
-         ABSAXS is used.  \texttt{[!]}
+         24h to 0h).  If a null (\texttt{{!}}) value is supplied, the value
+         of Parameter ABSAXS is used.  \texttt{[!]}
       }
       \sstsubsection{
          XLEFT = LITERAL (Read)
@@ -33826,27 +33817,27 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          \sstitemlist{
 
             \sstitem
-            \texttt{"Base"} -- The base file name.
+            \texttt{"Base"} --- The base file name.
 
             \sstitem
-            \texttt{"Dir"} -- The directory path (if any).
+            \texttt{"Dir"} --- The directory path (if any).
 
             \sstitem
-            \texttt{"Fspec"} -- The directory, base name and file type
+            \texttt{"Fspec"} --- The directory, base name and file type
             concatenated to form a full file specification.
 
             \sstitem
-            \texttt{"Ftype"} -- The file type (usually \texttt{.sdf} but may not be if
+            \texttt{"Ftype"} --- The file type (usually \texttt{.sdf} but may not be if
             any foreign NDFs are supplied).
 
             \sstitem
-            \texttt{"HDSpath"} -- The HDS path within the container file (if any).
+            \texttt{"HDSpath"} --- The HDS path within the container file (if any).
 
             \sstitem
-            \texttt{"Path"} -- The full name of the NDF as supplied by the user.
+            \texttt{"Path"} --- The full name of the NDF as supplied by the user.
 
             \sstitem
-            \texttt{"Slice"} -- The NDF slice specification (if any).
+            \texttt{"Slice"} --- The NDF slice specification (if any).
 
          }
          Note, the fields are extracted from the NDF names as supplied by
@@ -36461,10 +36452,10 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
          FRACTION controls the relative shape as well as the size of
          the new picture.  If only a single value is given then it is
          applied to both \textit{x} and \textit{y} axes, whereupon the new picture has
-         the shape of the reference picture.  So a value of 0.5 would
+         the shape of the reference picture.  So a value of \texttt{0.5} would
          create a picture 0.25 the area of the current or BASE picture.
-         The default is 0.5, unless Parameter ASPECT is not null, when
-         the default is 1.0.  This parameter is not used if the picture
+         The default is \texttt{0.5}, unless Parameter ASPECT is not null, when
+         the default is \texttt{1.0}.  This parameter is not used if the picture
          size is specified in centimetres using Parameter SIZE.  \texttt{[]}
       }
       \sstsubsection{
@@ -38063,7 +38054,7 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
             \sstitem
             \texttt{"Somb"} --- Uses the  ${\textrm{somb}}({\pi}x)$ kernel, where
             $x$ is the pixel offset from the interpolation point, and
-            ${\textrm{somb}}(z)=2*J_{1}(z)/z$ ($J_1$ is the first-order Bessel
+            ${\textrm{somb}}(z)=2*J_{1}(z)/z$. $J_1$ is the first-order Bessel
             function of the first kind.  This scheme is similar to the
             \texttt{"Sinc"} scheme.
 
@@ -38108,10 +38099,10 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
          SincCos, and SincGauss schemes.  For the SombCos, SincSinc, and
          SincCos schemes, it specifies the number of pixels at which the
          envelope of the function goes to zero.  The minimum value is
-         1.0, and the run-time default value is 2.0.  For the Gauss and
-         SincGauss scheme, it specifies the full-width at half-maximum
-         (FWHM) of the Gaussian envelope.  The minimum value is 0.1, and
-         the run-time default is 1.0.  On astronomical images and
+         \texttt{1.0}, and the run-time default value is \texttt{2.0}.  For the
+         Gauss and SincGauss scheme, it specifies the full-width at half-maximum
+         (FWHM) of the Gaussian envelope.  The minimum value is \texttt{0.1}, and
+         the run-time default is \texttt{1.0}.  On astronomical images and
          spectra, good results are often obtained by approximately
          matching the FWHM of the envelope function, given by PARAMS(2),
          to the point-spread function of the input data.  []
@@ -38129,7 +38120,7 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
          co-ordinates are supplied on the command line only one
          slice will be extracted; otherwise the application will ask
          for further positions which may be terminated by supplying the
-         null value (\texttt{{!}}).
+         null value (\texttt{!}).
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -38726,7 +38717,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
             \texttt{"xx,yy,zz"} --- A list of ancestor indices.
 
             \sstitem
-            \texttt{"xx:yy"} --  Ancestor indices between \emph{xx} and
+            \texttt{"xx:yy"} ---  Ancestor indices between \emph{xx} and
             \emph{yy} inclusively.  When \emph{xx} is omitted, the range
             begins from 0; when \emph{yy} is omitted, the range ends with the
             maximum value it can take, that is the number of ancestors
@@ -39316,7 +39307,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          be an arbitrary HDS structure and so full details cannot be
          given on a single line.  The HDSTRACE command can be used to
          examine the MORE field in detail.  To see full details of the
-         NDF with \texttt{"ID"} value of 12 (say), enter (from a UNIX shell)
+         NDF with \texttt{"ID"} value of \texttt{12} (say), enter (from a UNIX shell)
          \texttt{"hdstrace fred.more.provenance.ancestors'(12)'"}, where
          \texttt{fred} is the name of the NDF supplied for Parameter NDF.
          If the NDF has no extra information, this item will not be
@@ -40334,7 +40325,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
             \texttt{"Somb"} --- Uses the ${\textrm{somb}}({\pi}x)$ kernel, where $x$ is the pixel
             offset from the interpolation point (resampling) or transformed
             input pixel centre (rebinning), and
-            ${\textrm{somb}}(z)=2*J_{1}(z)/z$ ($J_1$ is the
+            ${\textrm{somb}}(z)=2*J_{1}(z)/z$.  $J_1$ is the
             first-order Bessel function of the first kind.  This scheme is
             similar to the \texttt{"Sinc"} scheme.
 
@@ -40349,7 +40340,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
             Parameter PARAMS(1).
 
             \sstitem
-            \texttt{"BlockAve"}  --- Block averaging over all pixels in the
+            \texttt{"BlockAve"} --- Block averaging over all pixels in the
             surrounding $N$-dimensional cube. This option is only available
             when resampling (\emph{i.e.} if REBIN is set to \texttt{FALSE}).
 
@@ -40369,7 +40360,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          spatial frequencies in the sample positions and in the pixel-centre
          positions.  For these reasons, if you want to use the
          output variances, you are generally safer using nearest-neighbour
-         interpolation.  The initial default is "Nearest".
+         interpolation.  The initial default is \texttt{"Nearest"}.
          \texttt{[}current value\texttt{{]}}
       }
       \sstsubsection{
@@ -42946,7 +42937,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          setmagic irasmap aitoff repval=-2000000
       }{
          This copies the NDF called irasmap to the NDF aitoff, except
-         that any pixels with the IPAC blank value of $-$2000000 are
+         that any pixels with the IPAC blank value of \texttt{$-$2000000} are
          flagged with the standard bad value in aitoff.
       }
       \sstexamplesubsection{
@@ -43039,7 +43030,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
       }{
          The axis dimension for which the normalisation flag is to be
          modified.  There are separate units for each NDF dimension.
-         A value of 0 sets the normalisation flag for all the axes.
+         A value of \texttt{0} sets the normalisation flag for all the axes.
          The value must lie between 0 and the number of dimensions of
          the NDF.  This defaults to 1 for a one-dimensional NDF.  The
          suggested default is the current value.  \texttt{[]}
@@ -45816,7 +45807,7 @@ KAPPA: \htmlref{HISTEQ}{HISTEQ},
 
       where \textit{x} is the supplied co-ordinate and $xoff$ is the value
       of the POFFSET parameter (which defaults to the minimum supplied
-      co-ordinate along an axis), $scale$ is the value of parameter PSCALE,
+      co-ordinate along an axis), $scale$ is the value of Parameter PSCALE,
       and FLOOR is a function that returns the largest integer that is
       smaller (\emph{i.e.} more negative) than its argument.
 
@@ -46872,7 +46863,7 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
       }{
          A reference NDF from which to obtain the Mapping and Frame. The
 	 NDFs specified by parameters NDF and REFNDF are aligned in a
-	 suitable coordinate system (usually their current Frames - an
+	 suitable co-ordinate system (usually their current Frames - an
 	 error is reported if the two NDFs cannot be aligned). The
 	 Mapping from the basis Frame in ``NDF'' (specified by parameter
 	 FRAME) to the required Frame in ``REFNDF'' (specified by parameter
@@ -47353,7 +47344,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
             \texttt{"Somb"} --- Uses the ${\textrm{somb}}({\pi}x)$ kernel, where $x$ is the pixel
             offset from the interpolation point (resampling) or transformed
             input pixel centre (rebinning), and
-            ${\textrm{somb}}(z)=2*J_{1}(z)/z$ ($J_1$ is the
+            ${\textrm{somb}}(z)=2*J_{1}(z)/z$.  $J_1$ is the
             first-order Bessel function of the first kind.  This scheme is
             similar to the \texttt{"Sinc"} scheme.
 
@@ -47577,7 +47568,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          The approximation of the Mapping using a piece-wise linear
          transformation (controlled by Parameter ACC) can produce artefacts
          at the joints between the panels of the approximation.  They are
-         caused by the discontinuities  between the adjacent panels of the
+         caused by the discontinuities between the adjacent panels of the
          approximation, and can be minimised by reducing the value assigned
          to the ACC parameter.
       }
@@ -48468,8 +48459,8 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
 
             \sstitem
             \texttt{"Somb"} --- Uses the  ${\textrm{somb}}({\pi}x)$ kernel, where
-            ${\textrm{somb}}(z)=2*J_{1}(z)/z$ ($J_1$ is the first-order Bessel function
-            of the first kind).  This scheme is similar to the \texttt{"Sinc"} scheme.
+            ${\textrm{somb}}(z)=2*J_{1}(z)/z$. $J_1$ is the first-order Bessel function
+            of the first kind.  This scheme is similar to the \texttt{"Sinc"} scheme.
 
             \sstitem
             \texttt{"SombCos"} --- Uses the ${\textrm{somb}}({\pi}x)\cos(k{\pi}x)$ kernel.
@@ -50356,9 +50347,9 @@ of an NDF, and change the values of those that are not read-only.
       frequency\texttt{{"}} is the topocentric frequency in Hz corresponding
       to the current value of the \htmlattref{DSBCentre}{DSBCentre}~
       attribute. The value of the
-      IF attribute may be positive or negative: a positive value results
+      \att{IF} attribute may be positive or negative: a positive value results
       in the LO frequency being above the central frequency, whilst a
-      negative IF value results in the LO frequency being below the
+      negative aatt{IF} value results in the LO frequency being below the
       central frequency. The sign of the IF attribute value determines
       the default value for the \htmlattref{SideBand}{SideBand}~ attribute.
 
@@ -52222,7 +52213,7 @@ It is often useful to specify values for some of the attributes of the current
       Conversely, larger values may speed up the plotting process in
       cases where high resolution is not required.
 
-      The \texttt{Tol} value should be given as a fraction of the minimum
+      The \att{Tol} value should be given as a fraction of the minimum
       dimension of the plotting area, and should lie in the range
       from 1.0E$-$7 to 1.0.  By default, a value of 0.001 is used.
    }
