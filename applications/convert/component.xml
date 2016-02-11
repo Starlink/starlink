@@ -9,7 +9,8 @@
   <abstract><p>
 The CONVERT package contains utilities for converting data files between
 Starlink's Extensible n-dimensional Data Format (NDF), which is used by most
-Starlink applications, and a number of other common data formats.
+Starlink applications, and a number of other common data formats
+including FITS.
   </p></abstract>
   <dependencies >
     <build>pcs</build><build>ast</build><build>chr</build><build>cnf</build><build>cvg</build><build>cfitsio</build><build>figaro</build><build>fio</build><build>grp</build><build>hds</build><build>kaplibs</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><sourceset>star2html</sourceset>
