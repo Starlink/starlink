@@ -7,9 +7,11 @@
   <path>applications/figaro</path>
   <description>FIGARO general data-reduction system</description>
   <abstract><p>
-Figaro is a general-purpose data reduction package.
-The programs it contains can be used to process a
-wide range of images and spectra.
+    Figaro is a general-purpose data reduction package. The programs
+    it contains can be used to process a wide range of images and
+    spectra.  It is amalgam of traditional Figaro and previously
+    separate packages TWODSPEC and SPECDRE.  It does not use Starlink's
+    AST infrastructure for world co-ordinate systems.
   </p></abstract>
   <dependencies >
     <build>pcs</build><build option='link'>pda</build><build option='link'>agi</build><build option='link'>grp</build><build option='link'>ndf</build><build option='link'>fio</build><build option='link'>idi</build><build option='link'>shl</build><build option='link'>sla</build><build option='link'>psx</build><sourceset>star2html</sourceset>
