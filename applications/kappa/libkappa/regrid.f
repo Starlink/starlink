@@ -59,7 +59,7 @@
 *        size to the input pixel size.  This option can only be used if
 *        the Mapping is successfully approximated by one or more linear
 *        transformations.  Thus an error will be reported if it used
-*        when the ACC parameter is set to zero (which stops the use of
+*        when the TOL parameter is set to zero (which stops the use of
 *        linear approximations), or if the Mapping is too non-linear to
 *        be approximated by a piece-wise linear transformation.  The
 *        ratio of output to input pixel size is evaluated once for each
@@ -245,7 +245,7 @@
 *        A Title for the output NDF structure.  A null value (!)
 *        propagates the title from the input NDF to the output NDF.  [!]
 *     TOL = _DOUBLE (Read)
-*        The maximum tolerable geometrical distortion which may be
+*        The maximum tolerable geometrical distortion that may be
 *        introduced as a result of approximating non-linear Mappings
 *        by a set of piece-wise linear transforms.  Both
 *        algorithms approximate non-linear co-ordinate transformations
