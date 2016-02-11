@@ -6,7 +6,16 @@
   <version>0.1</version>
   <path>docs/ssn/078</path>
   <description>Description of the build system</description>
-  <!-- <abstract><p></p></abstract> -->
+  <abstract>
+  <p>
+    This document provides an introduction to the Starlink build
+    system. It describes how to use the Starlink versions of the GNU
+    autotools (autoconf, automake and libtool), how to build the
+    software set from a checkout, how to add and configure new
+    components, and acts as a reference manual for the
+    Starlink-specific autoconf macros and Starlink automake features.
+  </p>
+  </abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
