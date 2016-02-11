@@ -13,18 +13,12 @@
     </p>
 
     <p>CCDPACK is designed to help you to reduce your data easily.
-    The basic reduction stages can be set up using an X based GUI that
+    The basic reduction stages can be set up using an X-based GUI that
     controls an automated reduction system.
     The GUI is designed to allow you to start working without any
     detailed knowledge of the package (or indeed of CCD reduction).
     Registration is performed using graphical, script based or automated
     techniques that help reduce the amount of work to a minimum.
-    </p>
-
-    <p>This document is intended for all users of CCDPACK.
-    It provides instruction in how to use CCDPACK, describes CCD reduction
-    in general and contains complete descriptions of the individual
-    programs.
     </p>
   </abstract>
   <dependencies >
