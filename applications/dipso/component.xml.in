@@ -7,7 +7,10 @@
   <path>applications/dipso</path>
   <description>DIPSO -- A friendly spectrum analysis program</description>
   <abstract><p>
-
+  DIPSO is an interactive spectrum manipulation, plotting and analysis tool.
+  It includes blended-spectral-line fitting.  Its macro facility allows
+  convenient execution of regularly used sequence of commands, and a simple
+  interface permits personal functions to be easily integrated.
   </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
