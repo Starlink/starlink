@@ -33,5 +33,6 @@
       <role>owner</role>
     </person>
   </developers>
+  <documentation> sun185</documentation>
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>

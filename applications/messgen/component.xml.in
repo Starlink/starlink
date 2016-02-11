@@ -33,5 +33,6 @@
       <role>owner</role>
     </person>
   </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
 </component>
