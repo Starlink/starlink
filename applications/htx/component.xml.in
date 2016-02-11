@@ -7,26 +7,19 @@
   <path>applications/htx</path>
   <description>Hypertext Cross-reference Utilities</description>
   <abstract>
-  <p>This document describes a set of ``Hypertext Cross-Reference
-  Utilities'' (HTX) which are designed to help maintain large
-  documentation sets whose constituent documents are written using the
-  Hypertext Markup Language (HTML).
-  </p>
-  <p>The central part of HTX is a hypertext linker, hlink. This allows
-  hyper-links (or cross-references) to be established between related
-  documents in such a way that it is easy to maintain their integrity as
-  individual documents are updated. Information produced by this linking
-  process is also used by other HTX utilities to provide document search
-  facilities and the ability to randomly access any part of a documentation
-  set. This latter capability forms a basis for constructing hypertext
-  help systems for use by other software.
-  </p>
-  <p>The expected readership of this document includes those who read hypertext
-  documentation, those who write it, and those who maintain it, especially
-  those who write and maintain Starlink documentation. Software developers
-  may also be interested in the possibilities for hypertext help that
-  HTX provides.
-  </p>
+    <p>HTX is a set of ``Hypertext Cross-Reference Utilities'', which are
+    designed to help maintain large documentation sets whose constituent
+    documents are written using the Hypertext Markup Language (HTML).
+    </p>
+    <p>The central part of HTX is a hypertext linker, hlink. This allows
+    hyper-links (or cross-references) to be established between related
+    documents in such a way that it is easy to maintain their integrity as
+    individual documents are updated. Information produced by this linking
+    process is also used by other HTX utilities to provide document search
+    facilities and the ability to randomly access any part of a documentation
+    set. This latter capability forms a basis for constructing hypertext
+    help systems for use by other software.
+    </p>
   </abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
@@ -39,7 +32,7 @@
       <role>owner</role>
     </person>
   </developers>
-  <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
   <copyright>
     <year></year>
