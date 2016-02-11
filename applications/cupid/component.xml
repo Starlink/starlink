@@ -8,7 +8,7 @@
   <description>CUPID - AST applications</description>
   <abstract><p>
 CUPID is a package of applications which identify and analyse clumps of
-emission within 2- or 3- dimensional data arrays.
+emission within one-, two- or three-dimensional data arrays.
   </p></abstract>
   <dependencies >
     <build>pcs</build><sourceset>messgen</sourceset><build>mers</build><build>atl</build><build>cnf</build><build>cvg</build><build>ifd</build><build>irq</build><build>ndf</build><build>sae</build><build>pda</build><build>thr</build><build option='link'>atl</build><build option='link'>kaplibs</build><build option='link'>ast</build><build option='link'>shl</build><build option='link'>thr</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
