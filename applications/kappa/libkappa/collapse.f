@@ -446,7 +446,7 @@
 *        warning.
 *     17-JUL-2012 (DSB):
 *        Added "NGood", "NBad", "FGood" and "FBad" estimators.
-*     2013 May 10 (MUJC):
+*     2013 May 10 (MJC):
 *        Do not pass COMP=Error to NDF_MTYPE.
 *     {enter_further_changes_here}
 
@@ -1316,7 +1316,7 @@
 *  the normal default of 0.3 used elsewhere in KAPPA.  At the risk of
 *  annoying some users, report the number of output data that were
 *  flagged by the WLIM threshold at the normal reporting level.
-      IF ( NFLAG .GT. 0 ) THEN
+      IF ( NFLAG .GT. 0 .AND. WLIM .GT. 0.0 ) THEN
 
 *  First set the number of decimal places commensurate with the number
 *  of output data values.
@@ -1329,12 +1329,19 @@
 
          CALL MSG_FMTR( 'WLIM', FORMAT( :NC ), WLIM )
          IF ( NFLAG .EQ. ELO ) THEN
-            CALL MSG_OUTIF( MSG__NORM, '',
-     :        'WARNING: All of the output pixels are set bad due to '/
-     :        /'an excessive number of bad values along the collapse '/
-     :        /'axis.  To obtain good values, try decreasing the '/
-     :        /'fraction of good values required with Parameter WLIM '/
-     :        /'(currently ^WLIM).', STATUS )
+            IF ( WLIM .GT. 0.0 ) THEN
+               CALL MSG_OUTIF( MSG__NORM, '',
+     :           'WARNING: All of the output pixels are set bad due '/
+     :           /'to an excessive number of bad values along the '/
+     :           /'collapse axis.  To obtain good values, try '/
+     :           /'decreasing the fraction of good values required '/
+     :           /'with Parameter WLIM (currently ^WLIM).', STATUS )
+            ELSE
+               CALL MSG_OUTIF( MSG__NORM, '',
+     :           'WARNING: All of the output pixels are set bad due '/
+     :           /'to an excessive number of bad values along the '/
+     :           /'collapse axis.', STATUS )
+            END IF
 
 *  The FRAC token is not directly comparable with WLIM.  Report the
 *  fraction of bad pixels.  Note this includes cases where all the input
@@ -1345,12 +1352,20 @@
 
             CALL MSG_SETI( 'NF', NFLAG )
             CALL MSG_SETI( 'EL', ELO )
-            CALL MSG_OUTIF( MSG__NORM, '',
-     :        'WARNING: ^FRAC of the output pixels (^NF of ^EL) are '/
-     :        /'set bad due to an excessive number of bad values '/
-     :        /'along the collapse axis.  If this is undesired, '/
-     :        /'decrease the fraction of good values required with '/
-     :        /'Parameter WLIM (currently ^WLIM).', STATUS )
+            IF ( WLIM .GT. 0.0 ) THEN
+               CALL MSG_OUTIF( MSG__NORM, '',
+     :           'WARNING: ^FRAC of the output pixels (^NF of ^EL) '/
+     :           /'are set bad due to an excessive number of bad '/
+     :           /'values along the collapse axis.  If this is '/
+     :           /'undesired, decrease the fraction of good values '/
+     :           /'required with Parameter WLIM (currently ^WLIM).',
+     :           STATUS )
+            ELSE
+               CALL MSG_OUTIF( MSG__NORM, '',
+     :           'WARNING: ^FRAC of the output pixels (^NF of ^EL) '/
+     :           /'are set bad due to an excessive number of bad '/
+     :           /'values along the collapse axis.', STATUS )
+            END IF
          END IF
       END IF
 
