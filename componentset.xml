@@ -76,18 +76,12 @@ high-level interface to the AST library.
     </p>
 
     <p>CCDPACK is designed to help you to reduce your data easily.
-    The basic reduction stages can be set up using an X based GUI that
+    The basic reduction stages can be set up using an X-based GUI that
     controls an automated reduction system.
     The GUI is designed to allow you to start working without any
     detailed knowledge of the package (or indeed of CCD reduction).
     Registration is performed using graphical, script based or automated
     techniques that help reduce the amount of work to a minimum.
-    </p>
-
-    <p>This document is intended for all users of CCDPACK.
-    It provides instruction in how to use CCDPACK, describes CCD reduction
-    in general and contains complete descriptions of the individual
-    programs.
     </p>
   </abstract>
   <dependencies >
@@ -105,6 +99,7 @@ high-level interface to the AST library.
       <uname>pwd</uname>
     </person>
   </developers>
+  <documentation> sun139</documentation>
   <bugreports>ccdpack@starlink.ac.uk</bugreports>
   <copyright>
     <year></year>
@@ -144,7 +139,8 @@ system are supported.
   <abstract><p>
 The CONVERT package contains utilities for converting data files between
 Starlink's Extensible n-dimensional Data Format (NDF), which is used by most
-Starlink applications, and a number of other common data formats.
+Starlink applications, and a number of other common data formats
+including FITS.
   </p></abstract>
   <dependencies >
     <build>pcs</build><build>ast</build><build>chr</build><build>cnf</build><build>cvg</build><build>cfitsio</build><build>figaro</build><build>fio</build><build>grp</build><build>hds</build><build>kaplibs</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><sourceset>star2html</sourceset>
@@ -181,7 +177,7 @@ Starlink applications, and a number of other common data formats.
   <description>CUPID - AST applications</description>
   <abstract><p>
 CUPID is a package of applications which identify and analyse clumps of
-emission within 2- or 3- dimensional data arrays.
+emission within one-, two- or three-dimensional data arrays.
   </p></abstract>
   <dependencies >
     <build>pcs</build><sourceset>messgen</sourceset><build>mers</build><build>atl</build><build>cnf</build><build>cvg</build><build>ifd</build><build>irq</build><build>ndf</build><build>sae</build><build>pda</build><build>thr</build><build option='link'>atl</build><build option='link'>kaplibs</build><build option='link'>ast</build><build option='link'>shl</build><build option='link'>thr</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
@@ -305,7 +301,10 @@ cube manipulation. </p></abstract>
   <path>applications/dipso</path>
   <description>DIPSO -- A friendly spectrum analysis program</description>
   <abstract><p>
-
+  DIPSO is an interactive spectrum manipulation, plotting and analysis tool.
+  It includes blended-spectral-line fitting.  Its macro facility allows
+  convenient execution of regularly used sequence of commands, and a simple
+  interface permits personal functions to be easily integrated.
   </p></abstract>
   <dependencies >
     <build option='link'>ast</build><build option='link'>cat</build><build option='link'>kaplibs</build><build option='link'>snx</build><build option='link'>pda</build><build option='link'>ndf</build><build option='link'>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
@@ -476,7 +475,7 @@ variety of formats.
   The principal focus of this is to move to use of 64 bits of address
   space on 64-bit operating systems.</p>
 
-  <p>This document (SSN/73) is squarely aimed at the problem of adapting the
+  <p>It is squarely aimed at the problem of adapting the
   Starlink Software Collection, and consequently focuses on
   the three operating systems (Solaris, Linux and Tru64) supported by Starlink,
   the compiled languages Fortran 77 and ANSI C,
@@ -497,6 +496,7 @@ variety of formats.
       <role>owner</role>
     </person>
   </developers>
+  <documentation> ssn73</documentation>
   <tests status="yes"/>
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
@@ -510,9 +510,11 @@ variety of formats.
   <path>applications/figaro</path>
   <description>FIGARO general data-reduction system</description>
   <abstract><p>
-Figaro is a general-purpose data reduction package.
-The programs it contains can be used to process a
-wide range of images and spectra.
+    Figaro is a general-purpose data reduction package. The programs
+    it contains can be used to process a wide range of images and
+    spectra.  It is amalgam of traditional Figaro and previously
+    separate packages TWODSPEC and SPECDRE.  It does not use Starlink's
+    AST infrastructure for world co-ordinate systems.
   </p></abstract>
   <dependencies >
     <build>pcs</build><build option='link'>pda</build><build option='link'>agi</build><build option='link'>grp</build><build option='link'>ndf</build><build option='link'>fio</build><build option='link'>idi</build><build option='link'>shl</build><build option='link'>sla</build><build option='link'>psx</build><sourceset>star2html</sourceset>
@@ -746,26 +748,19 @@ Traces an HDS file
   <path>applications/htx</path>
   <description>Hypertext Cross-reference Utilities</description>
   <abstract>
-  <p>This document describes a set of ``Hypertext Cross-Reference
-  Utilities'' (HTX) which are designed to help maintain large
-  documentation sets whose constituent documents are written using the
-  Hypertext Markup Language (HTML).
-  </p>
-  <p>The central part of HTX is a hypertext linker, hlink. This allows
-  hyper-links (or cross-references) to be established between related
-  documents in such a way that it is easy to maintain their integrity as
-  individual documents are updated. Information produced by this linking
-  process is also used by other HTX utilities to provide document search
-  facilities and the ability to randomly access any part of a documentation
-  set. This latter capability forms a basis for constructing hypertext
-  help systems for use by other software.
-  </p>
-  <p>The expected readership of this document includes those who read hypertext
-  documentation, those who write it, and those who maintain it, especially
-  those who write and maintain Starlink documentation. Software developers
-  may also be interested in the possibilities for hypertext help that
-  HTX provides.
-  </p>
+    <p>HTX is a set of ``Hypertext Cross-Reference Utilities'', which are
+    designed to help maintain large documentation sets whose constituent
+    documents are written using the Hypertext Markup Language (HTML).
+    </p>
+    <p>The central part of HTX is a hypertext linker, hlink. This allows
+    hyper-links (or cross-references) to be established between related
+    documents in such a way that it is easy to maintain their integrity as
+    individual documents are updated. Information produced by this linking
+    process is also used by other HTX utilities to provide document search
+    facilities and the ability to randomly access any part of a documentation
+    set. This latter capability forms a basis for constructing hypertext
+    help systems for use by other software.
+    </p>
   </abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
@@ -778,6 +773,7 @@ Traces an HDS file
       <role>owner</role>
     </person>
   </developers>
+  <documentation> sun188</documentation>
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
@@ -839,7 +835,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>2.4</version>
+  <version>2.4-3</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -929,6 +925,7 @@ packages.
       <role>owner</role>
     </person>
   </developers>
+  <documentation> sun185</documentation>
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
@@ -1414,7 +1411,13 @@ reduction program.
   <path>applications/pamela</path>
   <description>PAMELA</description>
   <abstract><p>
-Pamela is...
+    Pamela is a package of routines for the reduction of
+    two-dimensional spectral data to one-dimensional.  It does not
+    deal with any subsequent steps such as arc calibration etc. Pamela
+    includes full propagation of uncertainties through the reduction.
+    It implements two forms of optimal extraction: Keith Horne's
+    original method for reasonably straight spectra and a bespoke
+    version for spectra with significant tilts or curvature.
   </p></abstract>
   <dependencies >
     <build>pcs</build><build option='link'>fio</build><build option='link'>generic</build><build option='link'>prm</build><build option='link'>par</build><build option='link'>sae</build><build option='link'>hds</build>
@@ -2830,6 +2833,16 @@ to handle data from a variety of different instruments.
   <version>0.1</version>
   <path>docs/ssn/078</path>
   <description>Description of the build system</description>
+  <abstract>
+  <p>
+    This document provides an introduction to the Starlink build
+    system. It describes how to use the Starlink versions of the GNU
+    autotools (autoconf, automake and libtool), how to build the
+    software set from a checkout, how to add and configure new
+    components, and acts as a reference manual for the
+    Starlink-specific autoconf macros and Starlink automake features.
+  </p>
+  </abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -3863,7 +3876,7 @@ understand.
 </component>
 
 <component id="kaplibs" support="S">
-  <version>3.5</version>
+  <version>3.6</version>
   <path>libraries/kaplibs</path>
   <description>KAPLIBS - Internal subroutines used within the KAPPA package.</description>
   <abstract><p>KAPLIBS is a package of Fortran subroutine
