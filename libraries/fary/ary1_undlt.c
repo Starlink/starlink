@@ -853,7 +853,7 @@ F77_SUBROUTINE(ary1_undlt)( CHARACTER(LOC1), INTEGER(NDIM),
    except that it has the full "ndim" axes, rather than "ndim-1", with the
    compression axis being a degenerate axis that spans only a single
    pixel). Also find the number of elements in the collapsed section,
-   and initialise the pixel indicies of the current pixel (the "current
+   and initialise the pixel indices of the current pixel (the "current
    pixel" is the pixel at the start of the row which is currently being
    uncompressed). */
       nel_csection = 1;
@@ -937,7 +937,7 @@ F77_SUBROUTINE(ary1_undlt)( CHARACTER(LOC1), INTEGER(NDIM),
    we map each slice as needed. */
          } else {
 
-/* Get the one-based indicies of the first and last required element of the
+/* Get the one-based indices of the first and last required element of the
    DATA array. */
             dlb = ptr_firstd[ iv_cwhole ] + 1;
             if( iv_csection < last_csection ) {
@@ -1021,7 +1021,7 @@ F77_SUBROUTINE(ary1_undlt)( CHARACTER(LOC1), INTEGER(NDIM),
          }
 
 /* Update the pixel indices at the start of the row so that they refer
-   to the next row. Also update the vector indicies into the full (i.e. not
+   to the next row. Also update the vector indices into the full (i.e. not
    collapsed) section, and into the compressed whole array, at the start
    of the next row. */
          idim = 0;

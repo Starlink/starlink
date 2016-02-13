@@ -625,7 +625,7 @@
 
 
 
-*  Check the supplied array has values equal to the element indicies _ REAL
+*  Check the supplied array has values equal to the element indices _ REAL
       SUBROUTINE UNCOMPR( EL, ARRAY, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -652,7 +652,7 @@
 
       END
 
-*  Check the supplied array has values equal to the element indicies _ INTEGER
+*  Check the supplied array has values equal to the element indices _ INTEGER
       SUBROUTINE UNCOMPI( EL, ARRAY, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'

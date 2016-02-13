@@ -307,7 +307,7 @@
 *  returned array.
          IF( DCB_FRM( IDCB ) .EQ. 'DELTA' ) THEN
 
-*  Get the bounds of the MTR in the grid indicies of the whole
+*  Get the bounds of the MTR in the grid indices of the whole
 *  uncompressed array.
             DO I = 1, NDIMD
                DIML( I ) = MCB_LMTR( I, IMCB ) - DCB_LBND( I, IDCB ) + 1
