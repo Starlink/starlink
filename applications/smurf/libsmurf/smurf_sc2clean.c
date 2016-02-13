@@ -492,7 +492,8 @@ void smurf_sc2clean( int *status ) {
         size_t last_qcount[SMF__NQBITS];
         size_t last_nmap = 0;
         smf_qualstats_report( wf, MSG__VERB, SMF__QFAM_TSERIES, 1, concat,
-                              last_qcount, &last_nmap, 1, NULL, NULL, status );
+                              last_qcount, &last_nmap, 1, NULL, NULL, NULL,
+                              status );
       }
 
       /* Clean up for contchunk loop */

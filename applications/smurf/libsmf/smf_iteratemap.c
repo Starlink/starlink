@@ -25,7 +25,7 @@
 *                    char data_units[], double *nboloeff,
 *                    size_t *numcontchunks, size_t *ncontig, int *memlow,
 *                    size_t *numinsmp, size_t *numcnvg, int *iters,
-*                    int *masked, int *status );
+*                    int *masked, double *totexp, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -111,6 +111,9 @@
 *        Normally returned equal to -1, but if the application is interupted
 *        using control-C it will be returned holding the number of iterations
 *        that were completed.
+*     totexp = double * (Returned)
+*        Total exposure time (i.e. clock time on the sky) for all chunks,
+*        in seconds.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -613,7 +616,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      char data_units[], double * nboloeff,
                      size_t *numcontchunks,  size_t *ncontig, int *memlow,
                      size_t *numinsmp, size_t *numcnvg, int *iters,
-                     int *status ) {
+                     double *totexp, int *status ) {
 
   /* Local Variables */
   float ast_filt_diff;          /* Size of map-change filter */
@@ -645,6 +648,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int exportclean=0;            /* Are we doing to export clean data? */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int *exportNDF_which=NULL;    /* Which models in modelorder will be exported*/
+  double exptime;               /* Exposure time for current chunk */
   int firstiter;                /* First iteration in this invocation of makemap? */
   size_t count_mcnvg=0;         /* # chunks fail to converge */
   size_t count_minsmp=0;        /* # chunks fail due to insufficient samples */
@@ -1554,6 +1558,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
      These are called "contchunk".
    *************************************************************************** */
   sumchunkweights = 0.0;
+  *totexp = 0.0;
 
   for( contchunk=0; contchunk<ncontchunks  && !smf_interupt; contchunk++ ) {
 
@@ -2010,7 +2015,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           /* initial quality report */
           smf_qualstats_report( wf, MSG__NORM, SMF__QFAM_TSERIES, 1, qua[0],
                                 qcount_last, &nsamples, 1, &ntgood, &numdata,
-                                status );
+                                &exptime, status );
+          *totexp += exptime;
 
           /* If no good bolos left, set status */
           if( (*status==SAI__OK) &&
@@ -2495,7 +2501,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            the quality */
           smf_qualstats_report( wf, MSG__NORM, SMF__QFAM_TSERIES, 1, qua[0],
                                 qcount_last, &nsamples, 0, &ntgood, &numdata,
-                                status );
+                                NULL, status );
 
           /* If no good bolos left, set status */
           if( (*status==SAI__OK) &&

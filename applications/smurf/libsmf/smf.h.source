@@ -1521,7 +1521,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      char data_units[], double * nboloeff,
                      size_t *numcontchunks,  size_t *ncontig, int *memlow,
                      size_t *numinsmp, size_t *numcnvg, int *iters,
-                     int *status );
+                     double *totexp, int *status );
 
 const char *smf_keyname( AstKeyMap *keymap, const char *basename,
                          const char *qualifier, char *buf, size_t lbuf,
@@ -1752,7 +1752,7 @@ void smf_qualstats_model( ThrWorkForce *wf, smf_qfam_t qfamily, int nopad,
 void smf_qualstats_report( ThrWorkForce *wf, msglev_t msglev, smf_qfam_t qfamily, int nopad,
                            const smfArray *qua, size_t last_qcount[SMF__NQBITS],
                            size_t *last_nmap, int init, size_t *ngood_tslice,
-                           size_t *numdata, int *status );
+                           size_t *numdata, double *exptime, int *status );
 
 double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
                         smf_qual_t mask, int *status );

@@ -769,7 +769,9 @@
 *        accessed (unless JSA tiles are being created).
 *     2014-03-31 (DSB):
 *        smf_mapbounds fast mode has been fixed so that it now works for
-#        the JSA all-sky pixel grid.
+*        the JSA all-sky pixel grid.
+*     2016-01-13 (DSB):
+*        Store total expsoure time in map FITS extension.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1627,6 +1629,7 @@ void smurf_makemap( int *status ) {
     size_t ncontig=0;
     int memlow=0;
     NdgProvenance * oprov = NULL;
+    double totexp;
 
     /************************* I T E R A T E *************************************/
 
@@ -1759,7 +1762,7 @@ void smurf_makemap( int *status ) {
                       fts_port, maxmem-mapmem,
                       map, hitsmap, exp_time, variance, mapqual, weights, data_units,
                       &nboloeff, &ncontchunks, &ncontig, &memlow, &ninsmp,
-                      &ncnvg, &iters, status );
+                      &ncnvg, &iters, &totexp, status );
 
       /* If we have just run smf_iteratemap for the second time, free the
          snr mask allocated after the first run. */
@@ -1930,6 +1933,10 @@ void smurf_makemap( int *status ) {
     /* Store the effective bolometer count */
     atlPtftd( fchan, "NBOLOEFF", nboloeff,
               "Effective bolometer count", status );
+
+    /* Store the total exposure time. */
+    atlPtftd( fchan, "TOTEXP", totexp,
+              "[s] Total exposure time", status );
 
     /* If the FitsChan is not empty, store it in the FITS extension of the
        output NDF (any existing FITS extension is deleted). No need to

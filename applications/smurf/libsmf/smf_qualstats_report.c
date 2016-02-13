@@ -17,7 +17,7 @@
 *                           const smfArray *qua, size_t last_qcount[SMF__NQBITS],
 *                           size_t *last_nmap,
 *                           int init, size_t * ngood_tslice,
-*                           size_t *numdata, int *status )
+*                           size_t *numdata, double *exptime, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -44,6 +44,9 @@
 *        If non-null, contains the number of usable time slices.
 *     numdata = size_t* (Returned)
 *        If non-null, the maximum possible number of bolometers
+*     exptime = double * (Returned)
+*        If non-null, the total exposure time represented by the non-pad
+*        samples.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -90,6 +93,8 @@
 *        Add SMF__Q_EXT
 *     2015-03-23 (TIMJ):
 *        Do not report count of boundary slices if "nopad" is non-zero.
+*     2016-01-13 (DSB):
+*        Added argument exptime.
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -133,9 +138,8 @@
 
 void smf_qualstats_report( ThrWorkForce *wf, msglev_t msglev, smf_qfam_t qfamily, int nopad,
                            const smfArray *qua, size_t last_qcount[SMF__NQBITS],
-                           size_t *last_nmap, int init,
-                           size_t *ngood_tslice, size_t *numdata,
-                           int *status ) {
+                           size_t *last_nmap, int init, size_t *ngood_tslice,
+                           size_t *numdata, double *exptime, int *status ) {
 
   /* Local Variables */
   size_t i;                     /* loop counter */
@@ -195,6 +199,15 @@ void smf_qualstats_report( ThrWorkForce *wf, msglev_t msglev, smf_qfam_t qfamily
   /* Get a more accurate steptime if we can */
   if (qua->sdata[0] && qua->sdata[0]->hdr) {
     steptime = qua->sdata[0]->hdr->steptime;
+  }
+
+  /* Total observation time. */
+  if( exptime ) {
+    if( nopad ) {
+      *exptime = ntslice*steptime;
+    } else {
+      *exptime = ntgood*steptime;
+    }
   }
 
   /* Generate report */
