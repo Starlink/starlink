@@ -77,7 +77,7 @@
          OPEN ( UNIT = LUN, FILE = XLATE( :XLEN ), STATUS = 'OLD',
      :           IOSTAT = ISTAT )
 
-*     Initialise counters for indicies.
+*     Initialise counters for indices.
          AAA_NCREFS = 0
          AAA_MAIN_CATS = 0
          AAA_MINOR_CATS = 0

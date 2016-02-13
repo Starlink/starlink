@@ -23,7 +23,7 @@
 
 *  Description:
 *     This routine sets the search limits for a single-order search in
-*     terms of indicies in the feature database, and min/max dispersion.
+*     terms of indices in the feature database, and min/max dispersion.
 
 *  Invocation:
 *     CALL ECH_GET_WAVE_WINDOW(

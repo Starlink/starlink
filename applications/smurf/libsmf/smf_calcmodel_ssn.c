@@ -786,7 +786,7 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
       seclen = ntslice/nsection;
 
 /* Set up the constants needed to convert (az,el) offsets (in radians) into
-   bin indicies. */
+   bin indices. */
       nbin_az = 4 + ( dazhi - dazlo )/binsize;
       c1 = 1.0/binsize;
       c2 = 0.5*( nbin_az - (dazlo + dazhi)/binsize );

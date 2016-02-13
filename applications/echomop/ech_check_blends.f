@@ -56,7 +56,7 @@
 *        Input/Output status conditions.
 
 *  Method:
-*     Find the maximum and minimum indicies into ftr_list referenced
+*     Find the maximum and minimum indices into ftr_list referenced
 *     Loop through the identified features wavelengths
 *         Loop through feature list entries
 *             If two features in the list are so close to each other
@@ -115,7 +115,7 @@
       INTEGER TOTLIN
 *.
 
-*  Find the maximum and minimum indicies into ftr_list referenced.
+*  Find the maximum and minimum indices into ftr_list referenced.
       STATUS = 0
       MIN_INDEX = 1
       MAX_INDEX = 1

@@ -174,7 +174,7 @@
 *  Local Variables:
         REAL DISTANCE_L
         REAL DISTANCE_R
-        REAL INDICIES
+        REAL INDICES
         REAL RMIN
         REAL RMAX
         REAL CURRENT
@@ -279,12 +279,12 @@
 *     Initialise indexing parameters.
          CALL ECH_REPORT( 0, ' Composing database lookup index.' )
 
-*     The 'indicies' is the logarithmic range of the calculated ratios.
-         INDICIES = LOG10( RMAX ) - LOG10( RMIN )
+*     The 'indices' is the logarithmic range of the calculated ratios.
+         INDICES = LOG10( RMAX ) - LOG10( RMIN )
 
 *     The 'threshold' is calculated by first scaling the size of the
 *     database, and then evaluating the corresponding antilog.
-         THRESHOLD = 10.0 ** ( INDICIES / SQRT(
+         THRESHOLD = 10.0 ** ( INDICES / SQRT(
      :               FLOAT( DB_SCOPE * DB_SCOPE * WCAL_FTR ) ) )
 
 *     Set first lookup index using smallest ratio found.

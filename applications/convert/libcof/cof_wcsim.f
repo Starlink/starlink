@@ -344,7 +344,7 @@
 *  Note the number of Frames in the NDF FrameSet.
          NFRAME = AST_GETI( IWCS, 'Nframe', STATUS )
 
-*  Get the indicies of the base and current Frames in the FrameSet read
+*  Get the indices of the base and current Frames in the FrameSet read
 *  from the FITS file.
          ICURR = AST_GETI( OBJ, 'Current', STATUS )
          IBASE = AST_GETI( OBJ, 'Base', STATUS )

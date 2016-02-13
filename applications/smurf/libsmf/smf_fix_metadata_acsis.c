@@ -1266,8 +1266,8 @@ static int smf__fix_wrap( double *start, size_t stride, size_t nel,
   /* Convert the stride from bytes to doubles. */
   stride /= sizeof(double);
 
-  /* Find the indicies of the first and last longitude values that are
-     close to zero (i.e. below 0.01 radians). Also find the indicies of
+  /* Find the indices of the first and last longitude values that are
+     close to zero (i.e. below 0.01 radians). Also find the indices of
      the first and last longitude values that are close to 2.PI (i.e.
      above 6.27 radians). */
   p = start;
@@ -1289,7 +1289,7 @@ static int smf__fix_wrap( double *start, size_t stride, size_t nel,
   /* Check vaalues both below 0.01 and above 6.27 were found. */
   if( lo1 != SMF__BADSZT && hi1 != SMF__BADSZT ) {
 
-    /* Get the lowest and highest indicies to set bad. This depends on
+    /* Get the lowest and highest indices to set bad. This depends on
       whether the longitude values are generally decreasing or generally
       increasing. */
     if( hi1 > lo1 ) {

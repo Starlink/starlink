@@ -10257,7 +10257,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 
 /* Minor tick marks are drawn on both sides of each major tick mark. They
    are identified by an index number relative to major tick mark at zero.
-   Store the indicies of the first and last minor tick marks. */
+   Store the indices of the first and last minor tick marks. */
             minlo = ( 1 - info->nminor )/2;
             minhi = info->nminor/2;
 
@@ -10489,7 +10489,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
                      delta1 = gap[ axis  ]/(double)info->nminor;
                   }
 
-/* Store the indicies of the first and last minor tick marks, relative to
+/* Store the indices of the first and last minor tick marks, relative to
    a major tick mark. */
                   minlo = 1;
                   minhi = info->nminor - 1;

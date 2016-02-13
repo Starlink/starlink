@@ -391,7 +391,7 @@ foreach indir ($dir_list)
 #  Get the slice index.
                set iz = $izs[$islice]
 
-#  Get the source peak position (pixel indicies) for this time slice
+#  Get the source peak position (pixel indices) for this time slice
                set px = $peak1s[$islice]
                set py = $peak2s[$islice]
 

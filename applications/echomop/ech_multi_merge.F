@@ -157,12 +157,12 @@
 *     Loop thru orders
 *        Initialise output arrays
 *        If not a global scale then fill up relevant section of 'wavelength_scale'
-*        Initialise this orders' start/end bin indicies
+*        Initialise this orders' start/end bin indices
 *          Loop thru wavelength scale array
 *           If less than first scrunched wavelength, set min index
 *           If less than last scrunched wavelength, set min index
 *          End loop
-*        Set wavelength scale indicies for order
+*        Set wavelength scale indices for order
 *        Rebin order spectrum into new wavelength scale
 *     End loop
 *     Re-initialise output arrays
@@ -625,7 +625,7 @@
               hilim = iord*nx_rebin-1
            ENDIF
 
-*        Initialise this orders' start/end bin indicies
+*        Initialise this orders' start/end bin indices
           ELSE
            lowlim = 1
            hilim = 1
@@ -652,7 +652,7 @@
 
           ENDIF
 
-*        Set wavelength scale indicies for order
+*        Set wavelength scale indices for order
           wave_scale_index ( 1, iord ) = lowlim
           wave_scale_index ( 2, iord ) = hilim - lowlim + 1
          ELSE

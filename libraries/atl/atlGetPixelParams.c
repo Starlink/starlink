@@ -161,7 +161,7 @@ void atlGetPixelParams( AstFrameSet *fset, int *dims, int degs,
       if( cval && !strcmp( cval, "SKY" ) ) {
 
 /* Determine if this sky axis is a longitude or latitude axis, and record
-   the zero-based indicies of the longitude and latitude axes. */
+   the zero-based indices of the longitude and latitude axes. */
          sprintf( name, "IsLatAxis(%d)", iwcs + 1 );
          ival = astGetI( fset, name );
          if( ival ) {

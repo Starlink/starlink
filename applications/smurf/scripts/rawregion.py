@@ -143,7 +143,7 @@ try:
 #  See if temp files are to be retained.
    retain = parsys["RETAIN"].value
 
-#  See if JSA tile indicies are to be displayed.
+#  See if JSA tile indices are to be displayed.
    tiles = parsys["TILES"].value
 
 #  Get the required FITS headers from the NDF.

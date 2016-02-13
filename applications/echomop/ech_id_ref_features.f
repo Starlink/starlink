@@ -302,15 +302,15 @@
       REAL POS_OF_MAX_STRENGTH
 
       INTEGER BEST_FTR( MAX_FTR_CAND, MAX_ID_FTRS )
-*          ! Feature indicies for top candidates.
+*          ! Feature indices for top candidates.
       INTEGER BEST_NEXT_FTR( MAX_FTR_CAND, MAX_ID_FTRS )
-*          ! Feature neighbour indicies for top candidates.
+*          ! Feature neighbour indices for top candidates.
       INTEGER BEST_NEXT_FTR2( MAX_FTR_CAND, MAX_ID_FTRS )
-*          ! Feature neighbour indicies for top candidates.
+*          ! Feature neighbour indices for top candidates.
       INTEGER BEST_PREV_FTR( MAX_FTR_CAND, MAX_ID_FTRS )
-*          ! Feature neighbour indicies for top candidates.
+*          ! Feature neighbour indices for top candidates.
       INTEGER BEST_PREV_FTR2( MAX_FTR_CAND, MAX_ID_FTRS )
-*          ! Feature neighbour indicies for top candidates.
+*          ! Feature neighbour indices for top candidates.
       INTEGER META_GUESS( MAX_ID_FTRS )
       INTEGER META_FTRS( MAX_ID_FTRS )
       INTEGER INV_META_GUESS( MAX_ID_FTRS )
@@ -340,7 +340,7 @@
       LOGICAL MANUAL
 
       BYTE BEST_POSINDEX( MAX_FTR_CAND, 4, MAX_ID_FTRS )
-*          ! Database neighbour indicies for top candidates.
+*          ! Database neighbour indices for top candidates.
 
       CHARACTER*16 REF_STR1
       CHARACTER*16 REF_STR2

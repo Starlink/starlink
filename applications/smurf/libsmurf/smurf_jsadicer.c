@@ -41,7 +41,7 @@
 *        and the user is prompted for a value if none was supplied on
 *        the command line. []
 *     JSATILELIST() = _INTEGER (Write)
-*        Returned holding the zero-based indicies of the created JSA
+*        Returned holding the zero-based indices of the created JSA
 *        tiles. The number of such indices is given the "NTILE" parameter
 *     NTILE = _INTEGER (Write)
 *        AN output parameter which is returned holding the number of

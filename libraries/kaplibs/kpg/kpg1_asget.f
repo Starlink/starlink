@@ -298,7 +298,7 @@
          CALL KPG1_ASNDF( INDF, NDIM, SDIM, SLBND, SUBND, NEWFS,
      :                    STATUS )
 
-*  Find the indicies of the NDF special Frames within this FrameSet
+*  Find the indices of the NDF special Frames within this FrameSet
          IPIX1 = -1
          IGRI1 = -1
          IFRA1 = -1
@@ -352,7 +352,7 @@
          PMAP = AST_PERMMAP( NDIM, INPRM, NBAX, OUTPRM, 1.0D0, ' ',
      :                       STATUS )
 
-*  Find the indicies of the NDF special Frames in the FrameSet read from
+*  Find the indices of the NDF special Frames in the FrameSet read from
 *  the NDF.
          IPIX2 = -1
          IGRI2 = -1

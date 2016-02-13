@@ -32,7 +32,7 @@
 *        Specifies the Frame(s) to be removed. It can be a list of indices
 *        (within the WCS component of the supplied NDF) or list of Domain
 *        names. If one or more Domain name are specified, any WCS Frames
-*        which have a matching Domain are removed. If a list of indicies is
+*        which have a matching Domain are removed. If a list of indices is
 *        supplied, any indices outside the range of the available Frames are
 *        ignored. Single Frames or a set of adjacent Frames may be specified,
 *        e.g. typing [4,6-9,12,14-16] will remove Frames 4,6,7,8,9,12,14,15,16.
@@ -229,7 +229,7 @@
      :                            STATUS )
                END DO
 
-*  If the specification was parsed succesfully, we have a list of indicies.
+*  If the specification was parsed succesfully, we have a list of indices.
             ELSE
 
 *  A wildcard in the first part of a range or a full wildcard indicates the

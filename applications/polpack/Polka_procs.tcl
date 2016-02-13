@@ -502,7 +502,7 @@ proc BoundBox {px py map inv} {
       }
 
 # Create an NDF section string, describing these limits. Convert the
-# floating point pixel coordinates obtained above to integer pixel indicies.
+# floating point pixel coordinates obtained above to integer pixel indices.
       set xlo [expr int( $xlo + 1.0 )]
       set ylo [expr int( $ylo + 1.0 )]
       set xhi [expr int( $xhi + 1.0 )]

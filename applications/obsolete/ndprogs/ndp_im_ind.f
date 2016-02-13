@@ -8,7 +8,7 @@ C   -----------------------------
 C
 C   Description
 C   -----------
-C   Translate a real array into an array of integer colour indicies.
+C   Translate a real array into an array of integer colour indices.
 C
 C
 C   Parameters

@@ -204,7 +204,7 @@
                IF( COL .NE. 2 .OR. DX .NE. 0 ) THEN
 
 *  Increment the number of distinct test points, and store the X and Y
-*  indicies of the current test point.
+*  indices of the current test point.
                   NK = NK + 1
                   I( NK ) = ICOL( COL )
                   J( NK ) = JROW( ROW )

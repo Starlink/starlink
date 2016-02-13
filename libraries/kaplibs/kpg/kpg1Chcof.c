@@ -278,7 +278,7 @@ double *kpg1Chcof( int nloc,  HDSLoc **loc, int *ncoeff_f, int *nin,
       if( *status == SAI__OK ) {
 
 /* Initialise the array holding the current power for each axis. The
-   power can also be thought of as the zero-based indicies into the
+   power can also be thought of as the zero-based indices into the
    POLYNOMIAL.DATA_ARRAY array that holds the coefficients. */
          for( i = 0; i < ndim; i++ ) power[ i ] = 0;
 

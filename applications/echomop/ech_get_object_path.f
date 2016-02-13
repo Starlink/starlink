@@ -2,7 +2,7 @@
      :           OBJECT,
      :           FINAL_PATH_SPEC,
      :           PATH_NAME,
-     :           STATIC_INDICIES,
+     :           STATIC_INDICES,
      :           STATUS
      :          )
 *+
@@ -27,7 +27,7 @@
       CHARACTER*( * ) OBJECT
       CHARACTER*( * ) FINAL_PATH_SPEC
       CHARACTER*( * ) PATH_NAME
-      INTEGER STATIC_INDICIES
+      INTEGER STATIC_INDICES
       INTEGER STATUS
 
 *  Local Variables:
@@ -69,8 +69,8 @@
 
       INDEXING = .FALSE.
       CREATING = ( STATUS .EQ. ECH__CRE_OBJECT )
-      NO_TRANSLATE = ( STATIC_INDICIES .LT. 0 )
-      STATIC_INDICIES = 0
+      NO_TRANSLATE = ( STATIC_INDICES .LT. 0 )
+      STATIC_INDICES = 0
       VALUENOW = 0
 
 *  Non-workspace objects.
@@ -148,8 +148,8 @@
 
             PAR_NAME = REQUIRED_PATH( PAR_START_AT : PAR_END_AT )
             IF ( NO_TRANSLATE ) THEN
-               STATIC_INDICIES = STATIC_INDICIES + 1
-               DIMEN_INDEX( STATIC_INDICIES ) = PAR_NAME
+               STATIC_INDICES = STATIC_INDICES + 1
+               DIMEN_INDEX( STATIC_INDICES ) = PAR_NAME
                PATH_SPEC( COPY_INDEX + 1: ) = PAR_NAME
                COPY_INDEX = COPY_INDEX + ECH_WORD_LEN( PAR_NAME ) + 1
 
@@ -166,9 +166,9 @@
                IF ( WINDEX .EQ. 0 .AND. REG_DIMEN_VAR .AND.
      :              .NOT. CREATING ) THEN
                   VALUE = 1
-                  STATIC_INDICIES = STATIC_INDICIES + 1
-                  DIMEN_INDEX( STATIC_INDICIES ) = PAR_NAME
-                  DIMEN_VALUE( STATIC_INDICIES ) = VALUE
+                  STATIC_INDICES = STATIC_INDICES + 1
+                  DIMEN_INDEX( STATIC_INDICES ) = PAR_NAME
+                  DIMEN_VALUE( STATIC_INDICES ) = VALUE
                   IF ( PAR_NAME( :1 ) .NE. '1' ) THEN
                      IF ( IN_RDCTN_FILE( ECH_OBJ_IND( PAR_NAME ) ) )
      :                    THEN
@@ -187,7 +187,7 @@
                         CALL ECH_ACCESS_OBJECT( WORK_STRING,
      :                       'READ-INT', 'INT', 1, VALUENOW, 0,
      :                       DUMDIM, MAX_DIMENSIONS, 0, ' ', STATUS )
-                        DIMEN_VALUE( STATIC_INDICIES ) = VALUENOW
+                        DIMEN_VALUE( STATIC_INDICES ) = VALUENOW
   610                   CONTINUE
                      END IF
                   END IF
@@ -235,7 +235,7 @@
   710                   CONTINUE
 
                      ELSE
-                        DEFAULT_INDEX = DEFAULTS_INDICIES(
+                        DEFAULT_INDEX = DEFAULTS_INDICES(
      :                        ECH_OBJ_IND( PAR_NAME ) )
                         STATUS = ECH__ARRAY_INDEX
                         CALL ECH_GET_PARAMETER( PAR_NAME, 'INT', RVALUE,
@@ -254,23 +254,23 @@
                   VALUE = INT( RVALUE )
                   IF ( WINDEX .GT. 0 .OR. CREATING .OR.
      :                 .NOT. INDEXING ) THEN
-                     STATIC_INDICIES = STATIC_INDICIES + 1
-                     DIMEN_INDEX( STATIC_INDICIES ) = PAR_NAME
-                     DIMEN_VALUE( STATIC_INDICIES ) = VALUE
+                     STATIC_INDICES = STATIC_INDICES + 1
+                     DIMEN_INDEX( STATIC_INDICES ) = PAR_NAME
+                     DIMEN_VALUE( STATIC_INDICES ) = VALUE
                      IF ( .NOT. CREATING ) VALUE = 1
                      IF ( WINDEX .GT. 0 .AND.
-     :                    STATIC_INDICIES .EQ. 1 ) THEN
+     :                    STATIC_INDICES .EQ. 1 ) THEN
                         IF ( WS_DIMEN_MULT( WINDEX ) .GT. 0 ) THEN
-                           DIMEN_VALUE( STATIC_INDICIES ) =
-     :                           DIMEN_VALUE( STATIC_INDICIES )  *
+                           DIMEN_VALUE( STATIC_INDICES ) =
+     :                           DIMEN_VALUE( STATIC_INDICES )  *
      :                           WS_DIMEN_MULT( WINDEX )
                         END IF
                      END IF
 
                   ELSE IF ( PAR_NAME .EQ. 'IDX_NUM_ORDERS' ) THEN
-                     STATIC_INDICIES = STATIC_INDICIES + 1
-                     DIMEN_INDEX( STATIC_INDICIES ) = PAR_NAME
-                     DIMEN_VALUE( STATIC_INDICIES ) = VALUE
+                     STATIC_INDICES = STATIC_INDICES + 1
+                     DIMEN_INDEX( STATIC_INDICES ) = PAR_NAME
+                     DIMEN_VALUE( STATIC_INDICES ) = VALUE
                      VALUE = 1
                   END IF
                END IF

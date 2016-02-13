@@ -196,7 +196,7 @@
       INTEGER NEW_ADDRESS
       INTEGER NEW_Q_ADDRESS
       INTEGER NEW_E_ADDRESS
-      INTEGER STATIC_INDICIES
+      INTEGER STATIC_INDICES
       INTEGER NCHAR1
       INTEGER NCHAR2
       INTEGER NCHAR3
@@ -258,7 +258,7 @@
       ILEN = 0
       IDUMMY = 0
       NEW_OBJECT_SIZE = 0
-      STATIC_INDICIES = 0
+      STATIC_INDICES = 0
 
       EQULS = .FALSE.
       TERM = .FALSE.
@@ -304,7 +304,7 @@
 *        If slot is empty, remember its number for next use
 *     END IF
       CALL ECH_GET_DATA_PATH( REQUIRED_OBJECT, FULL_OBJECT_PATH,
-     :     TYPE, STATIC_INDICIES, STATUS )
+     :     TYPE, STATIC_INDICES, STATUS )
       ILEN = ECH_WORD_LEN( FULL_OBJECT_PATH )
       OBJECT_ACTIVE = .FALSE.
       ALREADY_ACTIVE = .FALSE.
@@ -318,7 +318,7 @@
             NEW_ACCESS_COUNT = I
 
          ELSE IF ( FULL_OBJECT_PATH .EQ. OBJECT_NAME( I ) )  THEN
-            IF ( OBJECT_STATICS( I ) .EQ. STATIC_INDICIES ) THEN
+            IF ( OBJECT_STATICS( I ) .EQ. STATIC_INDICES ) THEN
                IF ( OBJECT_TYPE( I )  .EQ. 'IMAGE' .AND.
      :              ( OBJECT_ADDRESS( I ) .EQ. 0 .OR.
      :              OBJECT_ADDRESS( I ) .EQ. -1 ) ) THEN
@@ -407,7 +407,7 @@
 
          IF ( TYPE .EQ. 'IMAGE' ) THEN
             NEW_OBJECT_TYPE = 'IMAGE'
-            IF ( STATIC_INDICIES .GT. 0 ) THEN
+            IF ( STATIC_INDICES .GT. 0 ) THEN
                IF ( LAST_NAME .NE. 'UNSET AS YET!' ) THEN
                   TEMP_STRING = LAST_NAME
 
@@ -543,7 +543,7 @@
      :                       ( OBJECT_QADDRESS( I ) .EQ. 0
      :                       .AND. NEEDS_QUALITY ) ) THEN
                            IF ( OBJECT_STATICS( I ) .EQ.
-     :                          STATIC_INDICIES ) THEN
+     :                          STATIC_INDICES ) THEN
                               ALREADY_ACTIVE = .TRUE.
                               FULL_OBJECT_PATH = OBJECT_NAME( I )
                               OBJECT_NUMBER = I
@@ -758,7 +758,7 @@
      :                       ( ( object_qaddress( i ) .EQ. 0 )
      :                       .AND. .NOT. needs_quality ) ) THEN
                            IF ( object_statics( i ) .EQ.
-     :                          static_indicies ) THEN
+     :                          static_indices ) THEN
                               ok_active = .TRUE.
                               full_object_path = object_name( i )
                               new_address = object_address( i )
@@ -894,7 +894,7 @@
                OBJECT_ADDRESS( NEW_ACCESS_COUNT ) = NEW_ADDRESS
                OBJECT_QADDRESS( NEW_ACCESS_COUNT ) = NEW_Q_ADDRESS
                OBJECT_EADDRESS( NEW_ACCESS_COUNT ) = NEW_E_ADDRESS
-               OBJECT_STATICS( NEW_ACCESS_COUNT ) = STATIC_INDICIES
+               OBJECT_STATICS( NEW_ACCESS_COUNT ) = STATIC_INDICES
                OBJECT_ACTIVE = .TRUE.
                OBJECT_NUMBER = NEW_ACCESS_COUNT
             END IF

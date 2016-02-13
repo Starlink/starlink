@@ -203,7 +203,7 @@
       DO I = 1, TINDEX
          TYPE = REQUIRED_TYPE( TUNERS( I ) )
          REF_NAM( I ) = REQUIRED_OBJECTS( TUNERS( I ) )( 6 : )
-         DEFAULT_INDEX = DEFAULTS_INDICIES( TUNERS( I ) )
+         DEFAULT_INDEX = DEFAULTS_INDICES( TUNERS( I ) )
          WORK_STRING = 'TUNE_' // REF_NAM( I )
 
 *     Determine whether this parameter is already defined.
@@ -347,7 +347,7 @@
             CALL ECH_REPORT( 0, WORK_STRING )
             CALL ECH_REPORT( 0, ' ' )
 
-            DEFAULT_INDEX = DEFAULTS_INDICIES( TUNERS( OPTION ) )
+            DEFAULT_INDEX = DEFAULTS_INDICES( TUNERS( OPTION ) )
             REF_NAME = REQUIRED_OBJECTS( TUNERS( OPTION ) )
             TYPE = REQUIRED_TYPE( TUNERS( OPTION ) )
             MIN = VALUE_MINS( DEFAULT_INDEX )

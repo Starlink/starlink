@@ -34,7 +34,7 @@
       REAL VALUE
       REAL SWITCH
 
-      INTEGER INDICIES( MAX_INDEX_OBJECTS + MAX_REQUIRED_OBJECTS )
+      INTEGER INDICES( MAX_INDEX_OBJECTS + MAX_REQUIRED_OBJECTS )
       INTEGER DUMDIM( MAX_DIMENSIONS )
       INTEGER MODULE_NUMBER
       INTEGER I
@@ -175,7 +175,7 @@
          EOI = ECH_OBJ_IND( INDEX_OBJECT( J ) )
          IF ( MODULE_NEEDS( EOI, MODULE_NUMBER ) ) THEN
             I = I + 1
-            INDICIES( I ) = EOI
+            INDICES( I ) = EOI
             USED( EOI ) = .TRUE.
          END IF
       END DO
@@ -183,12 +183,12 @@
          IF ( MODULE_NEEDS( J, MODULE_NUMBER ) .AND. .NOT.
      :        USED( J ) ) THEN
             I = I + 1
-            INDICIES( I ) = J
+            INDICES( I ) = J
          END IF
       END DO
       JLIMIT = I
       DO J = 1, JLIMIT
-         I = INDICIES( J )
+         I = INDICES( J )
          ABORTING = ECH_FATAL_ERROR( STATUS )
          IF ( STATUS .EQ. ECH__ABORT_INIT ) THEN
             CALL ECH_REPORT( 0, '!  Abort: user initiated abort.' )
@@ -235,7 +235,7 @@
                IF ( STATUS .NE. ECH__RETRY_ACCESS ) STATUS = 0
                REF_NAME = REQUIRED_OBJECTS( I )
                TYPE = REQUIRED_TYPE( I )
-               DEFAULT_INDEX = DEFAULTS_INDICIES( I )
+               DEFAULT_INDEX = DEFAULTS_INDICES( I )
                NEEDS_QUALITY =
      :               MODULE_NEEDS_QUALITY( I, MODULE_NUMBER )
                NEEDS_ERRORS = MODULE_NEEDS_ERRORS( I, MODULE_NUMBER )

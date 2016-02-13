@@ -1484,7 +1484,7 @@ void smurf_timesort( int *status ) {
                            iel = idet*nchan;
 
 /* Loop round all channels in the spectrum, incrementing the vector
-   indicies of the next input and output elements. */
+   indices of the next input and output elements. */
                            for( ichan = 0; ichan < nchan;
                                 ichan++, iel++, jel++ ) {
 

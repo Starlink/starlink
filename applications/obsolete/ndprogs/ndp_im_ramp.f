@@ -72,7 +72,7 @@ c    Local variables:
 c
       integer
      :   cispan,            ! number of colour values to be set
-     :   i, j,              ! loop indicies
+     :   i, j,              ! loop indices
      :   iarray(xdim,ydim), ! colour index array
      :   ci_start,ci_end,   ! colour index range
      :   status             ! status variable

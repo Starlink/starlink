@@ -360,7 +360,7 @@
          END IF
 
 *  Permute the axes of the total Frame to ensure that the indices of the
-*  RA and DEC axes are the same as the indicies of the RA and DEC columns
+*  RA and DEC axes are the same as the indices of the RA and DEC columns
 *  in GI.
          IF( FRM1 .NE. AST__NULL ) THEN
              J = 3

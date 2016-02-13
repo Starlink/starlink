@@ -745,7 +745,7 @@ void findclumps( int *status ) {
 *     Reinhold.CAThresh:
 *        Controls the operation of the cellular automata
 *        which is used to erode the (previously dilated) edges regions prior to
-*        filling them with clump indicies. If the number of edge pixels in
+*        filling them with clump indices. If the number of edge pixels in
 *        the 3x3x3 pixel cube (or 2x2 pixel square for 2D data) surrounding
 *        any pixel is greater than CAThresh, then the central pixel is
 *        considered to be an edge pixel. Otherwise it is not considered to be
@@ -755,7 +755,7 @@ void findclumps( int *status ) {
 *     Reinhold.CAIterations:
 *        This gives the number of times to apply
 *        the cellular automata which is used to erode the edges regions prior
-*        to filling them with clump indicies. [1]
+*        to filling them with clump indices. [1]
 *     Reinhold.FixClumpsIterations:
 *        This gives the number of times to
 *        apply the cellular automata which cleans up the filled clumps. This

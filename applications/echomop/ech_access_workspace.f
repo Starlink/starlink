@@ -34,7 +34,7 @@
       INTEGER I
       INTEGER ILEN
       INTEGER SIZE
-      INTEGER STATIC_INDICIES
+      INTEGER STATIC_INDICES
       INTEGER INDEX
       INTEGER VM_SIZE
       INTEGER TYPE_CODE
@@ -53,9 +53,9 @@
       INTEGER CHR_LEN
 *.
 
-      STATIC_INDICIES = 0
+      STATIC_INDICES = 0
       CALL ECH_GET_OBJECT_PATH( REQUIRED_OBJECT, FULL_OBJECT_PATH,
-     :     PATH_NAME, STATIC_INDICIES, STATUS )
+     :     PATH_NAME, STATIC_INDICES, STATUS )
 
 *  Check if object has already got an access active.
       ALREADY_ACTIVE = .FALSE.
@@ -81,8 +81,8 @@
       IF ( .NOT. ALREADY_ACTIVE ) THEN
          IF ( INDEX .EQ. 0 ) INDEX = WS_ACCESS_COUNT + 1
          SIZE = 1
-         IF ( STATIC_INDICIES .GT. 0 ) THEN
-            DO I = 1, STATIC_INDICIES
+         IF ( STATIC_INDICES .GT. 0 ) THEN
+            DO I = 1, STATIC_INDICES
                SIZE = SIZE * DIMEN_VALUE( I )
             END DO
          END IF

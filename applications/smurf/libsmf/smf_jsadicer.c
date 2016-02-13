@@ -59,7 +59,7 @@
 *     STC-S polygon is created describing the spatial outline of the good
 *     data values in the NDF, and stored in NDF extension OUTLINE.
 *
-*     The zero-based indicies of the created tiles are written to an output
+*     The zero-based indices of the created tiles are written to an output
 *     paramater called "JSATILELIST".
 
 *  Authors:
@@ -70,7 +70,7 @@
 *     7-NOV-2013 (DSB):
 *        Initial version.
 *     11-NOV-2013 (DSB):
-*        - Display tile indicies and write them to an output parameter.
+*        - Display tile indices and write them to an output parameter.
 *        - Re-structured to test for bad values in the supplied NDF
 *          rather than the tiles (testing in tiles is a bigger job).
 *     17-JAN-2014 (DSB):
@@ -465,8 +465,8 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
 /* Also re-order the WCS axes in the tile frame. */
       astPermAxes( tile_frm, outperm );
 
-/* We want the zero-based indicies of the input pixel axes corresponding
-   to ra, dec and spectral. So find the indicies of the pixel axes in the
+/* We want the zero-based indices of the input pixel axes corresponding
+   to ra, dec and spectral. So find the indices of the pixel axes in the
    supplied NDF that are most closely aligned with each WCS axis. */
       atlPairAxes( iwcs, NULL, gcen, NULL, inperm, status );
       if( inperm[ 0 ] == axlon ) {
@@ -743,7 +743,7 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
    }
    msgBlank( status );
 
-/* Write the indicies of the created tiles out to a parameter. */
+/* Write the indices of the created tiles out to a parameter. */
    if( *ntile ) parPut1i( "JSATILELIST", *ntile, created_tiles, status );
 
 /* Free resources. */

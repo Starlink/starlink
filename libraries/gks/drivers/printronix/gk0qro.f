@@ -91,7 +91,7 @@
          Y1=ABS(X)
 *
 *        No optimisation in this case. Raster is plotted bit by bit
-*        due to colour indicies in ICOLAR representing settings for
+*        due to colour indices in ICOLAR representing settings for
 *        pixels along X-axis and in a rotated frame X-axis is to be
 *        treated as Y-axis in a non-rotated.
 *

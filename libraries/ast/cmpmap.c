@@ -2656,7 +2656,7 @@ static int *MapSplit0( AstMapping *this_mapping, int nin, const int *in,
    the current component Mapping. */
                itop += astGetNin( map_list[ imap ] );
 
-/* Get the zero-based indicies of the required inputs that feed the current
+/* Get the zero-based indices of the required inputs that feed the current
    component Mapping. */
                ncin = 0;
                while( iin < nin && inp[ iin ] <= itop ) {

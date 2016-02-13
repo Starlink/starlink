@@ -67,20 +67,20 @@
       CHARACTER*33 COMP2
 *.
 
-*  Potentially dynamic parameters (i.e. IDX_ array indicies) are
+*  Potentially dynamic parameters (i.e. IDX_ array indices) are
 *  checked first as they will be often used.
       IF ( ref_name( :4 ) .EQ. 'IDX_' ) THEN
          index_number = 0
          comp1 = ref_name // ' '
-         DO iloop = 1, dynamic_indicies_used
+         DO iloop = 1, dynamic_indices_used
             comp2 = dynamic_index_name( iloop ) // ' '
             IF ( comp1 .EQ. comp2 ) THEN
                index_number = iloop
             END IF
          END DO
          IF ( index_number .EQ. 0 ) THEN
-            index_number = dynamic_indicies_used + 1
-            dynamic_indicies_used = dynamic_indicies_used + 1
+            index_number = dynamic_indices_used + 1
+            dynamic_indices_used = dynamic_indices_used + 1
             dynamic_index_name( index_number ) = comp1
          END IF
          dynamic_index_value( index_number ) = INT( value )

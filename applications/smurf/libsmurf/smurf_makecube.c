@@ -288,7 +288,7 @@
 *          appended to the end of the path specified by parameter "OUT". If
 *          "JSATILES" is TRUE, the "REF" parameter is ignored. [FALSE]
 *     JSATILELIST() = _INTEGER (Write)
-*          If parameter "JSATILES" is set TRUE, the zero-based indicies of
+*          If parameter "JSATILES" is set TRUE, the zero-based indices of
 *          the created JSA tiles will be written to this output parameter.
 *          The number of such indices is given the "NTILE" parameter
 *     LBND( 2 ) = _INTEGER (Read)

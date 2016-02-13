@@ -480,7 +480,7 @@ typedef struct AstFrameSet {
 /* Attributes specific to objects in this class. */
    AstFrame **frame;             /* Array of Frame pointers */
    AstMapping **map;             /* Array of Mapping pointers */
-   int *varfrm;                  /* Array of variants Frames indicies */
+   int *varfrm;                  /* Array of variants Frames indices */
    int *invert;                  /* Array of Mapping Invert values */
    int *link;                    /* Parent node index for each node */
    int *node;                    /* Index of node associated with Frame */

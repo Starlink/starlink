@@ -68,7 +68,7 @@ C  Locate parameter by searching the table for its name as passed by the caller
            status = 0
            ref_name = required_objects ( p_number )
            type = required_type ( p_number )
-           default_index = defaults_indicies ( p_number )
+           default_index = defaults_indices ( p_number )
 
            CALL ECH_GET_PARAMETER( ref_name, type, value,
      :          boolean_value, string, default_index, status )

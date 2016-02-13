@@ -2199,7 +2199,7 @@ static int ComponentMatch( AstCmpFrame *template, AstFrame *target, int matchsub
    the axes in the full result Frame in terms of the external template axis
    numbering. This involves shifting the indices for the second component
    Frame to leave room for the axes of the first component Frame, and
-   also permuting the axis indicies from internal to external order. */
+   also permuting the axis indices from internal to external order. */
             if( icomp ) {
                for( axis = 0; axis < nax1; axis++ ) {
                   (*template_axes)[ axis ] = operm[ axis ];
@@ -5885,7 +5885,7 @@ static void Overlay( AstFrame *template_frame, const int *template_axes,
 *        should be set to -1.
 *
 *        If a NULL pointer is supplied, the template and result axis
-*        indicies are assumed to be identical.
+*        indices are assumed to be identical.
 *     result
 *        Pointer to the Frame which is to receive the new attribute values.
 *     status

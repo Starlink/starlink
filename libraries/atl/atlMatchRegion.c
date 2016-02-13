@@ -169,7 +169,7 @@ AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frm, int *status ) {
          astMatchAxes( region, frame, axes );
 
 /* Get a list (WAXES) of the Frame axis indices that have no corresponding
-   region axis. Also get a list (RAXES) of the Region axes indicies that
+   region axis. Also get a list (RAXES) of the Region axes indices that
    have corresponding axes in the Frame. */
          nax = astGetI( frame, "Naxes" );
          nwpick = 0;

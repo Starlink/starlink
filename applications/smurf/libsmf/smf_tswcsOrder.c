@@ -102,7 +102,7 @@ void smf_tswcsOrder( AstFrameSet **tswcs, int isTordered, int *status ){
 /* Swap axes if required. */
       if( swap ) {
 
-/* Get the a list of the old WCS axis indicies in their new order. */
+/* Get the a list of the old WCS axis indices in their new order. */
          if( isTordered ) {
             perm[ 0 ] = 2;
             perm[ 1 ] = 3;

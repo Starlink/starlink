@@ -93,12 +93,12 @@
       ISTAT = 0
 
 *  Get zoning parameters.
-      IDEFAULT = DEFAULTS_INDICIES(
+      IDEFAULT = DEFAULTS_INDICES(
      :           ECH_OBJ_IND( 'TUNE_XZONE' ) )
       CALL ECH_GET_PARAMETER( 'TUNE_XZONE', 'INT', VALUE,
      :     .FALSE., ' ', IDEFAULT, ISTAT )
       IXZONE = MAX( 1, INT( VALUE ) )
-      IDEFAULT = DEFAULTS_INDICIES(
+      IDEFAULT = DEFAULTS_INDICES(
      :           ECH_OBJ_IND( 'TUNE_XZONE' ) )
       CALL ECH_GET_PARAMETER( 'TUNE_YZONE', 'INT', VALUE,
      :     .FALSE., ' ', IDEFAULT, ISTAT )

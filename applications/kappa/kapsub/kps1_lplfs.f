@@ -361,7 +361,7 @@
 *  Indicate we have found no bad axis values yet.
       BAD = .FALSE.
 
-*  If necessary, we create a LutMap which maps grid indicies to distance
+*  If necessary, we create a LutMap which maps grid indices to distance
 *  along the curve.
       IF( DIST .OR. XMAP .EQ. 'DISTANCE' ) THEN
 
@@ -427,7 +427,7 @@
          LUT0 = AST__NULL
       END IF
 
-*  If necessary, we create a LutMap which maps grid indicies to value on
+*  If necessary, we create a LutMap which maps grid indices to value on
 *  the selected axis.
       IF( .NOT. DIST ) THEN
 

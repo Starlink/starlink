@@ -26,7 +26,7 @@
 *     base of known features in arc spectra.
 *
 *     This routine set the search limits for a single order search in
-*     terms of indicies in the feature database , and min/max
+*     terms of indices in the feature database , and min/max
 *     dispersion.
 
 *  Arguments:

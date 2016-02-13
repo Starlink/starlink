@@ -321,7 +321,7 @@
 *  Make the ARDGRIDCO Frame the current Frame, as required by ARD1_CNTDR.
          CALL AST_SETI( JPLOT, 'CURRENT', IGRID, STATUS )
 
-*  If we are contouring below or above the range of region indicies used
+*  If we are contouring below or above the range of region indices used
 *  by the ARD description, skip the contouring since there is nothing to
 *  contour.
          IF( ABS( REGVAL ) .LT. RV ) THEN

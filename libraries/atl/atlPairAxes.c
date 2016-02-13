@@ -22,7 +22,7 @@ void atlPairAxes( AstFrameSet *from, AstFrameSet *to, double *p,
 *     For each axis in the base Frame of "From", this function finds the
 *     index of the most closely aligned axis in the base Frame of "to",
 *     (or the current Frame of "from" if "to" is not supplied), and
-*     returns these indicies.
+*     returns these indices.
 
 *  Arguments:
 *     from
@@ -30,7 +30,7 @@ void atlPairAxes( AstFrameSet *from, AstFrameSet *to, double *p,
 *     to
 *        An AST pointer to the second FrameSet. An error is reported if
 *        it is not possible to align the two FrameSets using astConvert.
-*        If NULL, then the returned axis indices are the indicies of the
+*        If NULL, then the returned axis indices are the indices of the
 *        corresponding current axes in "from".
 *     p
 *        The axis values of a point within the base Frame of "from" at
@@ -116,7 +116,7 @@ void atlPairAxes( AstFrameSet *from, AstFrameSet *to, double *p,
       astInvert( to );
       astInvert( from );
 
-/* Note the indicies of the new base Frames since astConvert will change
+/* Note the indices of the new base Frames since astConvert will change
    them. */
       ibase_from = astGetI( from, "Base" );
       ibase_to = astGetI( to, "Base" );
@@ -161,7 +161,7 @@ void atlPairAxes( AstFrameSet *from, AstFrameSet *to, double *p,
    nfrom = astGetI( map, "Nin" );
    nto = astGetI( map, "Nout" );
 
-/* Initalise the returned indicies. */
+/* Initalise the returned indices. */
    for( i = 0; i < nfrom; i++ ) axes[ i ] = 0;
 
 /* Allocate memory to hold a set of position in the base Frame of "from"

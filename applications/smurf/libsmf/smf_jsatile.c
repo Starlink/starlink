@@ -51,9 +51,9 @@
 *        extent of the tile. May be NULL. The Region will be defined
 *        defined within ICRS (RA,DEc).
 *     lbnd[ 2 ] = integer (Returned)
-*        The lower bounds of the spatial axes of the tile in PIXEL indicies.
+*        The lower bounds of the spatial axes of the tile in PIXEL indices.
 *     ubnd[ 2 ] = integer (Returned)
-*        The upper bounds of the spatial axes of the tile in PIXEL indicies.
+*        The upper bounds of the spatial axes of the tile in PIXEL indices.
 *     status = int * (Given)
 *        Pointer to the inherited status variable.
 
@@ -364,7 +364,7 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
       if( icrpix2 == tmp ) icrpix2++;
    }
 
-/* Find the lower bounds of the tile in NDF PIXEL indicies. These are
+/* Find the lower bounds of the tile in NDF PIXEL indices. These are
    chosen so that the origin of (RA,Dec) is always somewhere inside pixel
    zero. Note, the FITS reference point may be at either (RA,Dec)=(0h,0deg)
    or at (12h,0deg), depending on the tile. */
@@ -398,7 +398,7 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
       }
    }
 
-/* Find the corresponding upper bounds of the tile in NDF PIXEL indicies. */
+/* Find the corresponding upper bounds of the tile in NDF PIXEL indices. */
    ubnd[ 0 ] += lbnd[ 0 ] - 1;
    ubnd[ 1 ] += lbnd[ 1 ] - 1;
 

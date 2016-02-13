@@ -996,8 +996,8 @@ typedef struct smfSampleTable {
   int xpix;       /* X pixel index of the map pixel */
   int ypix;       /* X pixel index of the map pixel */
   size_t nrow;    /* Number of rows in the table */
-  size_t *times;  /* A column of time slices indicies */
-  size_t *bolos;  /* A column of bolometer indicies */
+  size_t *times;  /* A column of time slices indices */
+  size_t *bolos;  /* A column of bolometer indices */
   dim_t ncol;     /* Number of other columns */
   double **colvals;/* Columns of values */
   char **colnames; /* The name for each column */

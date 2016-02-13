@@ -150,7 +150,7 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain_list,
    are freed automatically when the context is ended. */
    astBegin;
 
-/* Get the indicies of the original base and current frames. */
+/* Get the indices of the original base and current frames. */
    ibase = astGetI( fset, "Base" );
    icurr = astGetI( fset, "Current" );
 
@@ -186,7 +186,7 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain_list,
       bfrm_in = astGetFrame( fset, AST__BASE );
       nb_in = astGetI( bfrm_in, "Naxes" );
 
-/* Allocate arrays to hold the indicies of the axes that are to be used
+/* Allocate arrays to hold the indices of the axes that are to be used
    to create the returned FrameSet. */
       caxes = astMalloc( nc_in*sizeof( *caxes ) );
       baxes = astMalloc( nb_in*sizeof( *baxes ) );
@@ -252,7 +252,7 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain_list,
 /* Get the Mapping from the base Frame to this Frame. */
                      oldmap = astGetMapping( fset, ibase, iframe );
 
-/* An array to hold the indicies of the axes to pick from this Frame. */
+/* An array to hold the indices of the axes to pick from this Frame. */
                      faxes = astMalloc( astGetI( oldmap, "Nout" )*sizeof( *faxes ) );
 
 /* See if the selected base Frame axes feed a distinct subset of axes in

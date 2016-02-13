@@ -7520,7 +7520,7 @@ static void Overlay( AstFrame *template_frame, const int *template_axes,
 *        should be set to -1.
 *
 *        If a NULL pointer is supplied, the template and result axis
-*        indicies are assumed to be identical.
+*        indices are assumed to be identical.
 *     result
 *        Pointer to the Frame which is to receive the new attribute values.
 *     status
@@ -8261,7 +8261,7 @@ f     IFRAME argument to specify the base Frame or the current
          RemoveMirrors( this, iframe, status );
 
 /* Any Frames that are mirroring variants in Frames higher than the
-   removed Frame need to have their mirror frame indicies decremented. */
+   removed Frame need to have their mirror frame indices decremented. */
          for ( ifr = 1; ifr <= this->nframe; ifr++ ) {
             if( this->varfrm[ ifr - 1 ] > iframe ) this->varfrm[ ifr - 1 ]--;
          }

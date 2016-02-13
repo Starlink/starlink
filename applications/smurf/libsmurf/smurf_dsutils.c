@@ -199,7 +199,7 @@
 *          The index of a test bolometer on the first GRID axis within
 *          the sub-array containing the bolometer. If values are supplied
 *          for all of IN, XBOL, YBOL and RADIUS, then a list of time slice
-*          indices are displayed. These are the indicies of the time
+*          indices are displayed. These are the indices of the time
 *          slice in which the reference point is close to the bolometer
 *          specified by (XBOL,YBOL). The RADIUS parameter spcified the
 *          distance limit. [!]
@@ -1467,11 +1467,11 @@ void smurf_dsutils( int *status ) {
 /* Obtain information about the input NDF. */
       smf_open_file( NULL, igrp, 1, "READ", 0, &data, status );
 
-/* Display the indicies of time slices for which the reference position
+/* Display the indices of time slices for which the reference position
    is close a to a specified bolometer. */
       if( ShowSlices( "OUTCAT", data, status ) ) goto L998;
 
-/* Display the indicies of time slices for which the reference position
+/* Display the indices of time slices for which the reference position
    is close a to a specified bolometer. */
       if( FindSlices( "XBOL", "YBOL", "RADIUS", data, status ) ) goto L998;
 

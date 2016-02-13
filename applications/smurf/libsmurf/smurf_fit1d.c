@@ -1319,7 +1319,7 @@ static void  map_axis_to_wcs ( smfData *data, int axis, AstMapping **wcsmap,
      axis. */
   if ( data && data->hdr && data->hdr->wcs ) {
 
-    /* Allocate an array to receive the indicies of the WCS axes that
+    /* Allocate an array to receive the indices of the WCS axes that
        are driven by the selected pixel axis. Make it the largest size
        that could possibly be needed (i.e. in case the pixel axis drives
        all the WCS axes). */

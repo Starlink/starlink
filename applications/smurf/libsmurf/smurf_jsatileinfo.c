@@ -29,7 +29,7 @@
 *     NDF can be created containing the tile index at every point on the
 *     whole sky (see parameter ALLSKY).
 *
-*     Also, the bounds of the overlap in pixel indicies between the tile
+*     Also, the bounds of the overlap in pixel indices between the tile
 *     and a specified NDF or Region can be found (see parameter TARGET).
 *
 *     The environment variable JSA_TILE_DIR should be defined prior to
@@ -703,7 +703,7 @@ void smurf_jsatileinfo( int *status ) {
             tubnd[ 0 ] = ceil( dubnd[ 0 ] - 0.5 );
             tubnd[ 1 ] = ceil( dubnd[ 1 ] - 0.5 );
 
-/* Convert to PIXEL indicies within the tile. */
+/* Convert to PIXEL indices within the tile. */
             tlbnd[ 0 ] += lbnd[ 0 ] - 1;
             tlbnd[ 1 ] += lbnd[ 1 ] - 1;
             tubnd[ 0 ] += lbnd[ 0 ] - 1;

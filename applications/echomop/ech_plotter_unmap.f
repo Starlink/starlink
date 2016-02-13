@@ -28,12 +28,12 @@
       INTEGER I
       INTEGER INDEX
       INTEGER PLEN
-      INTEGER STATIC_INDICIES
+      INTEGER STATIC_INDICES
 
       CHARACTER*128 PATH_NAME
       CHARACTER*128 FINAL_PATH
       CHARACTER*16 EXPANDED( NUM_ABBREV )
-      CHARACTER*80 CINDICIES
+      CHARACTER*80 CINDICES
       CHARACTER*80 STRING
       CHARACTER*6 ABBREV( NUM_ABBREV )
 
@@ -53,14 +53,14 @@
      :              '1DV',   'WAV' /
 *.
 
-*  Get the object name part and indicies part from the given string.
-      CINDICIES = ' '
+*  Get the object name part and indices part from the given string.
+      CINDICES = ' '
       INDEX = 0
       DO I = 1, LEN( OBJECT )
          IF ( OBJECT( I : I ) .EQ. '[' ) THEN
             IF ( INDEX .EQ. 0 ) THEN
                INDEX = I - 1
-               CINDICIES = OBJECT( I : ) // ' '
+               CINDICES = OBJECT( I : ) // ' '
                OBJECT = OBJECT( : INDEX ) // ' '
                GO TO 100
             END IF
@@ -77,9 +77,9 @@
       END DO
   200 CONTINUE
 
-      STATIC_INDICIES = -1
+      STATIC_INDICES = -1
       CALL ECH_GET_OBJECT_PATH( OBJECT, FINAL_PATH,
-     :     PATH_NAME, STATIC_INDICIES, STATUS )
+     :     PATH_NAME, STATIC_INDICES, STATUS )
       PLEN = ECH_WORD_LEN( FINAL_PATH )
       IF ( FINAL_PATH( PLEN : PLEN ) .EQ. '.' ) FINAL_PATH = OBJECT
       STRING = ' Path syntax: ' // FINAL_PATH( :PLEN )
@@ -87,7 +87,7 @@
       OBJECT = PATH_NAME
       PLEN = ECH_WORD_LEN( PATH_NAME )
       IF ( INDEX .GT. 0 )
-     :   OBJECT = PATH_NAME( :PLEN ) // CINDICIES // ' '
+     :   OBJECT = PATH_NAME( :PLEN ) // CINDICES // ' '
 
 *  Unmap the object if it is already mapped.
       PLEN = ECH_WORD_LEN( PATH_NAME )

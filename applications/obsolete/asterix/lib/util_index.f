@@ -1,4 +1,4 @@
-*+  UTIL_INDEX - Converts from element of vectorized array to indicies
+*+  UTIL_INDEX - Converts from element of vectorized array to indices
       SUBROUTINE UTIL_INDEX( NDIMS, DIMS, ELEMENT, INDEX )
 *    Description :
 *     Given the original array size & shape, this routine converts

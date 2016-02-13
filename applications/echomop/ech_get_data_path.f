@@ -2,7 +2,7 @@
      :           REQUIRED_OBJECT,
      :           FINAL_PATH_SPEC,
      :           TYPE,
-     :           STATIC_INDICIES,
+     :           STATIC_INDICES,
      :           STATUS
      :          )
 *+
@@ -26,7 +26,7 @@
       CHARACTER*( * ) REQUIRED_OBJECT
       CHARACTER*( * ) FINAL_PATH_SPEC
       CHARACTER*( * ) TYPE
-      INTEGER STATIC_INDICIES
+      INTEGER STATIC_INDICES
       INTEGER STATUS
 
 *  Local Variables:
@@ -60,7 +60,7 @@
       INTEGER ECH_WORD_LEN
 *.
 
-      STATIC_INDICIES = 0
+      STATIC_INDICES = 0
 
       DO I = 1, MAX_DIMENSIONS
          DIMEN_INDEX( I ) = ' '
@@ -96,7 +96,7 @@
      :        ( SCANNING_INDEX .AND. PATHC .EQ. ',' ) ) THEN
             PATH_SPEC( COPY_INDEX : COPY_INDEX ) = PATHC
          END IF
-         IF ( PATHC .EQ. '[' ) STATIC_INDICIES = 0
+         IF ( PATHC .EQ. '[' ) STATIC_INDICES = 0
          IF ( PATHC .EQ. '[' .OR.
      :        ( PATHC .EQ. ',' .AND. SCANNING_INDEX ) ) THEN
             SCANNING_INDEX = .TRUE.
@@ -122,9 +122,9 @@
   500       CONTINUE
             IF ( REG_DIMEN_VAR ) THEN
                VALUE = 1
-               STATIC_INDICIES = STATIC_INDICIES + 1
-               DIMEN_INDEX( STATIC_INDICIES ) = PAR_NAME
-               DIMEN_VALUE( STATIC_INDICIES ) = VALUE
+               STATIC_INDICES = STATIC_INDICES + 1
+               DIMEN_INDEX( STATIC_INDICES ) = PAR_NAME
+               DIMEN_VALUE( STATIC_INDICES ) = VALUE
 
             ELSE
                INDEXING = .FALSE.
@@ -138,14 +138,14 @@
      :                 RVALUE .NE. 0 ) THEN
                      PAR_NAME = 'IDX_' // PAR_NAME
                      INDEXING = .TRUE.
-                     STATIC_INDICIES = STATIC_INDICIES + 1
-                     DIMEN_INDEX( STATIC_INDICIES ) = PAR_NAME
-                     DIMEN_VALUE( STATIC_INDICIES ) = INT( RVALUE )
+                     STATIC_INDICES = STATIC_INDICES + 1
+                     DIMEN_INDEX( STATIC_INDICES ) = PAR_NAME
+                     DIMEN_VALUE( STATIC_INDICES ) = INT( RVALUE )
                   END IF
                END IF
 
                IF ( .NOT. INDEXING ) THEN
-                  DEFAULT_INDEX = DEFAULTS_INDICIES (
+                  DEFAULT_INDEX = DEFAULTS_INDICES (
      :                  ECH_OBJ_IND( PAR_NAME ) )
                   STATUS = ECH__ARRAY_INDEX
                   CALL ECH_GET_PARAMETER( PAR_NAME, 'INT',

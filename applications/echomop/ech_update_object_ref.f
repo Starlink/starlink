@@ -83,12 +83,12 @@
       INTEGER ECH_DEREF_INT
 *.
 
-*  Potentially dynamic parameters (ie IDX_ array indicies) are
+*  Potentially dynamic parameters (ie IDX_ array indices) are
 *  checked first as they will be often used.
       IF ( REF_NAME ( :4 ) .EQ. 'IDX_' ) THEN
          INDEX_NUMBER = 0
          COMP1 = REF_NAME // ' '
-         DO ILOOP = 1, DYNAMIC_INDICIES_USED
+         DO ILOOP = 1, DYNAMIC_INDICES_USED
             COMP2 = DYNAMIC_INDEX_NAME( ILOOP ) // ' '
             IF ( COMP1 .EQ. COMP2 ) THEN
                INDEX_NUMBER = ILOOP

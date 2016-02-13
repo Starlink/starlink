@@ -26,7 +26,7 @@
       CHARACTER*48 CURRENT_MODULE
 
       INTEGER OBJECT_SWITCH( MAX_REQUIRED_OBJECTS )
-      INTEGER DEFAULTS_INDICIES( MAX_REQUIRED_OBJECTS )
+      INTEGER DEFAULTS_INDICES( MAX_REQUIRED_OBJECTS )
       INTEGER WS_DIMEN_MULT( MAX_REQUIRED_OBJECTS )
       INTEGER CURRENT_MODULE_INDEX
 
@@ -38,7 +38,7 @@
 
       BYTE MODULE_PROPERTIES( MAX_REQUIRED_OBJECTS, MAX_MODULES )
 
-*  A default_indicies() entry which is negative
+*  A default_indices() entry which is negative
 *  denotes that the routine ECH_ADAPTIVE_DEFAULTS
 *  will be called to set the appropriate values at runtime.
 *  The ABS value of the index is used to index the arrays
@@ -55,7 +55,7 @@
      :       VALUE_DEFAULTS, VALUE_MINS, VALUE_MAXS
 
       COMMON / MODULE_OBJECTS_I /
-     :       DEFAULTS_INDICIES, OBJECT_SWITCH, WS_DIMEN_MULT,
+     :       DEFAULTS_INDICES, OBJECT_SWITCH, WS_DIMEN_MULT,
      :       CURRENT_MODULE_INDEX
 
       COMMON / MODULE_OBJECTS_L /

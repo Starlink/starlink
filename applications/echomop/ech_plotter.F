@@ -169,7 +169,7 @@
       CHARACTER*128 IMG_NAME
       CHARACTER*128 RAWSTRING
       CHARACTER*128 USTRING_1
-      CHARACTER*100 CINDICIES
+      CHARACTER*100 CINDICES
       CHARACTER*80 XLABEL
       CHARACTER*80 YLABEL
       CHARACTER*80 DMP_FORMAT
@@ -842,8 +842,8 @@
             END IF
          END DO
 
-*     Calculate indicies for the request.
-         CINDICIES = '['
+*     Calculate indices for the request.
+         CINDICES = '['
          IADD = 2
          DO I = 1, NUM_DIM
             IF ( DIMEN_INDEX( I ) .EQ. 'NX' ) THEN
@@ -865,17 +865,17 @@
             ELSE
                IIND = 1
             END IF
-            CALL CHR_ITOC( IIND, CINDICIES( IADD: ), NCHAR1 )
+            CALL CHR_ITOC( IIND, CINDICES( IADD: ), NCHAR1 )
             IADD = IADD + NCHAR1 + 1
-            CINDICIES( IADD - 1 : IADD ) = ', '
+            CINDICES( IADD - 1 : IADD ) = ', '
          END DO
-         IADD = ECH_WORD_LEN( CINDICIES )
-         IF ( CINDICIES( IADD : IADD ) .EQ. ',' )
-     :      CINDICIES( IADD : IADD ) = ']'
+         IADD = ECH_WORD_LEN( CINDICES )
+         IF ( CINDICES( IADD : IADD ) .EQ. ',' )
+     :      CINDICES( IADD : IADD ) = ']'
 
-*     Append indicies to path.
+*     Append indices to path.
          FULL_OBJECT_PATH = FULL_OBJECT_PATH(
-     :         :ECH_WORD_LEN( FULL_OBJECT_PATH )) // CINDICIES // ' '
+     :         :ECH_WORD_LEN( FULL_OBJECT_PATH )) // CINDICES // ' '
 
 *     Prepare the screen for the plot.
          CALL PGPAGE

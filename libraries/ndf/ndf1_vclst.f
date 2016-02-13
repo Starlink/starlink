@@ -144,7 +144,7 @@
      :                    'component name specified (possible '//
      :                    'programming error).', STATUS )
 
-*  Otherwise, find the indicies of the first and last non-blank characters
+*  Otherwise, find the indices of the first and last non-blank characters
 *  in the word.
          ELSE
             CALL CHR_FANDL( TEXT( START : END ), F, L )

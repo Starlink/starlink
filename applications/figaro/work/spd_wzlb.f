@@ -141,7 +141,7 @@
       INTEGER index_l_temp
       INTEGER index_r_temp
       INTEGER index_wave_temp
-      REAL indicies
+      REAL indices
       INTEGER index_count
       INTEGER quick_index_count
       LOGICAL sorted
@@ -235,12 +235,12 @@
            IF ( INFO ) CALL MSG_OUT( 'FDB_REPORT',
      :        ' Composing db lookup index', IGNORE )
 
-*          The 'indicies' is the logarithmic range of the calculated ratios
-           indicies = ( LOG10 ( max ) - LOG10 ( min ) )
+*          The 'indices' is the logarithmic range of the calculated ratios
+           indices = ( LOG10 ( max ) - LOG10 ( min ) )
 
 *          The 'threshold' is calculated by first scaling the size of the
 *          database , and then evaluating the corresponding antilog
-           threshold = 10.0 ** ( indicies / SQRT (
+           threshold = 10.0 ** ( indices / SQRT (
      :              FLOAT ( db_scope * db_scope *
      :                                          wcal_ftr ) ) )
 

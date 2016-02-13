@@ -213,7 +213,7 @@
       DO I = 1, TINDEX
          TYPE = REQUIRED_TYPE( PARAMS( I ) )
          REF_NAM( I ) = REQUIRED_OBJECTS( PARAMS( I ) )
-         DEFAULT_INDEX = DEFAULTS_INDICIES( PARAMS( I ) )
+         DEFAULT_INDEX = DEFAULTS_INDICES( PARAMS( I ) )
 
 *     Note that TUNE_NOARC is in the menu and should be updated
 *     in parallel with ARC.
@@ -390,7 +390,7 @@
             CALL ECH_REPORT( 0, ' Parameter: ' //
      :                       REQUIRED_OBJECTS( PARAMS( OPTION ) ) )
             REF_NAME = REF_NAM( OPTION )
-            DEFAULT_INDEX = DEFAULTS_INDICIES( PARAMS( OPTION ) )
+            DEFAULT_INDEX = DEFAULTS_INDICES( PARAMS( OPTION ) )
             TYPE = REQUIRED_TYPE( PARAMS( OPTION ) )
 
 *        If parameter is one we look for in the data frame first then

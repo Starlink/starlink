@@ -19023,8 +19023,8 @@ static AstMapping *IsMapTab2D( AstMapping *map, double scale, const char *unit,
    AstMapping *ret;        /* Returned WCS axis Mapping */
    AstMapping *tmap;
    AstPermMap *pm;
-   int *pix_axes;          /* Zero-based indicies of corresponding pixel axes */
-   int wcs_axes[ 2 ];      /* Zero-based indicies of selected WCS axes */
+   int *pix_axes;          /* Zero-based indices of corresponding pixel axes */
+   int wcs_axes[ 2 ];      /* Zero-based indices of selected WCS axes */
    int inperm[ 1 ];
    int outperm[ 2 ];
 
@@ -22118,7 +22118,7 @@ static double NearestPix( AstMapping *map, double val, int axis, int *status ){
    double **ptr1;          /* Pointer to data in pset1 */
    double **ptr2;          /* Pointer to data in pset2 */
    double result;          /* Returned value */
-   int *ins;               /* Array holding input axis indicies */
+   int *ins;               /* Array holding input axis indices */
    int i;                  /* Loop count */
    int nin;                /* Number of Mapping inputs */
    int nout;               /* Number of Mapping outputs */

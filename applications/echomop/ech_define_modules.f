@@ -77,7 +77,7 @@
          FORCE_UPPERCASE( I ) = .FALSE.
          WS_DIMENSIONS( I ) = ' '
          WS_DIMEN_MULT( I ) = 0
-         DEFAULTS_INDICIES( I ) = 0
+         DEFAULTS_INDICES( I ) = 0
          DO J = 1, MAX_MODULES
             MODULE_PROPERTIES( I, J ) = 0
          END DO
@@ -119,7 +119,7 @@
       REQUIRED_OBJECTS( OI ) = 'ASCII_FILE'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'echomop_output.txt'
 
       OI = OI + 1
@@ -144,7 +144,7 @@
       REQUIRED_OBJECTS( OI ) = 'BAD_ORDER'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0
       VALUE_MAXS( NI ) = 1000
       VALUE_DEFAULTS( NI ) = 0
@@ -160,7 +160,7 @@
       REQUIRED_OBJECTS( OI ) = 'BIN_SIZE'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.0
       VALUE_MAXS( NI ) = 10000000.
       VALUE_DEFAULTS( NI ) = 0.
@@ -181,7 +181,7 @@
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
       FORCE_UPPERCASE( CI ) = .TRUE.
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'POLY'
 
       OI = OI + 1
@@ -192,7 +192,7 @@
       REQUIRED_OBJECTS( OI ) = 'BLZ_NPOLY'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.
       VALUE_MAXS( NI ) = FLOAT( MAX_FIT_COEFFS )
       VALUE_DEFAULTS( NI ) = 7.
@@ -215,7 +215,7 @@
       REQUIRED_TYPE( OI ) = 'INT'
       EXPECT_IN_DATAFILE( OI ) = .TRUE.
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0
       VALUE_MAXS( NI ) = MAX_ALLOWED_ORDNUM
       VALUE_DEFAULTS( NI ) = 0
@@ -226,7 +226,7 @@
       REQUIRED_TYPE( OI ) = 'FLOAT'
       EXPECT_IN_DATAFILE( OI ) = .TRUE.
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.
       VALUE_MAXS( NI ) = ABS_MAX_WAVELENGTH
       VALUE_DEFAULTS( NI ) = 0.
@@ -370,28 +370,28 @@
       REQUIRED_OBJECTS( OI ) = 'ECH_ECHAR'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'ECH_ECHAR'
 
       OI = OI + 1
       REQUIRED_OBJECTS( OI ) = 'ECH_FTRDB'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'ARCDIRS:THAR'
 
       OI = OI + 1
       REQUIRED_OBJECTS( OI ) = 'ECH_RDCTN'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'ECH_RDCTN'
 
       OI = OI + 1
       REQUIRED_OBJECTS( OI ) = 'ECH_RDUCD'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'ECH_RDUCD'
 
       OI = OI + 1
@@ -528,7 +528,7 @@
       REQUIRED_OBJECTS( OI ) = 'EXTRACT_MODE'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'O'
       FORCE_UPPERCASE( CI ) = .TRUE.
 
@@ -720,7 +720,7 @@
       REQUIRED_OBJECTS( OI ) = 'FLTFIT'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'MEAN'
       FORCE_UPPERCASE( CI ) = .TRUE.
 
@@ -803,7 +803,7 @@
       REQUIRED_OBJECTS( OI ) = 'LOC_BOX_SIZ'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 1.
       VALUE_MAXS( NI ) = 100.
       VALUE_DEFAULTS( NI ) = 10.
@@ -819,7 +819,7 @@
       REQUIRED_OBJECTS( OI ) = 'MAX_DISPERSION'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.00001
       VALUE_MAXS( NI ) = 1000.
       VALUE_DEFAULTS( NI ) = 1.0
@@ -841,7 +841,7 @@
       REQUIRED_OBJECTS( OI ) = 'MIN_DISPERSION'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.00001
       VALUE_MAXS( NI ) = 1000.
       VALUE_DEFAULTS( NI ) = .01
@@ -891,7 +891,7 @@
       REQUIRED_OBJECTS( OI ) = 'NXBAD'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.
       VALUE_MAXS( NI ) = 99999.
       VALUE_DEFAULTS( NI ) = 0.
@@ -910,7 +910,7 @@
       REQUIRED_OBJECTS( OI ) = 'NYBAD'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.
       VALUE_MAXS( NI ) = 99999.
       VALUE_DEFAULTS( NI ) = 0.
@@ -950,7 +950,7 @@
       REQUIRED_OBJECTS( OI ) = 'OBJFIT'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       FORCE_UPPERCASE( CI ) = .TRUE.
       STRING_DEFAULTS( CI ) = 'POLY'
 
@@ -968,7 +968,7 @@
       REQUIRED_OBJECTS( OI ) = 'OPTEXT_MODE'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'O'
       FORCE_UPPERCASE( CI ) = .TRUE.
 
@@ -995,7 +995,7 @@
       REQUIRED_OBJECTS( OI ) = 'OUTFLAT'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'echflat'
 
       OI = OI + 1
@@ -1007,13 +1007,13 @@
       REQ_OBJ_LUT( 16 ) = OI
       REQUIRED_OBJECTS( OI ) = 'PFL_INTERACT'
       REQUIRED_TYPE( OI ) = 'LOGICAL'
-      DEFAULTS_INDICIES( OI ) = 1
+      DEFAULTS_INDICES( OI ) = 1
 
       OI = OI + 1
       REQUIRED_OBJECTS( OI ) = 'PFL_MODE'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'A'
       FORCE_UPPERCASE( CI ) = .TRUE.
 
@@ -1022,7 +1022,7 @@
       REQUIRED_TYPE( OI ) = 'FLOAT'
       EXPECT_IN_DATAFILE( OI ) = .TRUE.
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.000001
       VALUE_MAXS( NI ) = 1.0e6
       VALUE_DEFAULTS( NI ) = 1.0
@@ -1262,7 +1262,7 @@
       REQUIRED_TYPE( OI ) = 'FLOAT'
       EXPECT_IN_DATAFILE( OI ) = .TRUE.
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.0
       VALUE_MAXS( NI ) = 1.0e6
       VALUE_DEFAULTS( NI ) = 0.0
@@ -1272,7 +1272,7 @@
       REQUIRED_OBJECTS( OI ) = 'RESULT_FORMAT'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'NDF'
       FORCE_UPPERCASE( CI ) = .TRUE.
 
@@ -1280,7 +1280,7 @@
       REQUIRED_OBJECTS( OI ) = 'RESULT_TYPE'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'EXTOBJ'
       FORCE_UPPERCASE( CI ) = .TRUE.
 
@@ -1330,14 +1330,14 @@
       REQUIRED_OBJECTS( OI ) = 'SCRUNCH_TYPE'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'OBJ'
       FORCE_UPPERCASE( CI ) = .TRUE.
 
       OI = OI + 1
       REQUIRED_OBJECTS( OI ) = 'SET_WSCALE'
       REQUIRED_TYPE( OI ) = 'LOGICAL'
-      DEFAULTS_INDICIES( OI ) = 1
+      DEFAULTS_INDICES( OI ) = 1
 
       OI = OI + 1
       REQUIRED_OBJECTS( OI ) = 'SKY_MASK'
@@ -1358,7 +1358,7 @@
       REQUIRED_OBJECTS( OI ) = 'SKYFIT'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'MEAN'
       FORCE_UPPERCASE( CI ) = .TRUE.
 
@@ -1395,7 +1395,7 @@
       REQUIRED_OBJECTS( OI ) = 'STACK'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'ECHOMOP'
 
       OI = OI + 1
@@ -1421,7 +1421,7 @@
       REQUIRED_OBJECTS( OI ) = 'START_WAVE'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.0
       VALUE_MAXS( NI ) = 10000000.
       VALUE_DEFAULTS( NI ) = 0.
@@ -1444,7 +1444,7 @@
       REQUIRED_OBJECTS( OI ) = 'TRACE_MODE'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'C'
       FORCE_UPPERCASE( CI ) = .TRUE.
 
@@ -1472,7 +1472,7 @@
       REQUIRED_OBJECTS( OI ) = 'TRCFIT'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       FORCE_UPPERCASE( CI ) = .TRUE.
       STRING_DEFAULTS( CI ) = 'POLY'
 
@@ -1489,13 +1489,13 @@
       OI = OI + 1
       REQUIRED_OBJECTS( OI ) = 'TRC_INTERACT'
       REQUIRED_TYPE( OI ) = 'LOGICAL'
-      DEFAULTS_INDICIES( OI ) = 1
+      DEFAULTS_INDICES( OI ) = 1
 
       OI = OI + 1
       REQUIRED_OBJECTS( OI ) = 'TRC_NPOLY'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 1.
       VALUE_MAXS( NI ) = FLOAT( MAX_FIT_COEFFS )
       VALUE_DEFAULTS( NI ) = 4.
@@ -1515,7 +1515,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_AAACODE'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 1.
       VALUE_MAXS( NI ) = 200.
       VALUE_DEFAULTS( NI ) = 1.
@@ -1537,7 +1537,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_AUTOMATE'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = ' '
       FORCE_UPPERCASE( CI ) = .FALSE.
 
@@ -1553,14 +1553,14 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_CLONE'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'NULL'
 
       OI = OI + 1
       REQUIRED_OBJECTS( OI ) = 'TUNE_CLPBY'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 1.
       VALUE_MAXS( NI ) = 1000.
       VALUE_DEFAULTS( NI ) = 1.
@@ -1570,7 +1570,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_CLPMXDEV'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 1.0e-5
       VALUE_MAXS( NI ) = 10.
       VALUE_DEFAULTS( NI ) = 0.5
@@ -1580,7 +1580,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_CNSDEV'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.01
       VALUE_MAXS( NI ) = 10.0
       VALUE_DEFAULTS( NI ) = 0.5
@@ -1598,7 +1598,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_CRMAX'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0
       VALUE_MAXS( NI ) = 1000000
       VALUE_DEFAULTS( NI ) = 0
@@ -1612,7 +1612,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_CRXBOX'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 1
       VALUE_MAXS( NI ) = 49
       VALUE_DEFAULTS( NI ) = 5
@@ -1622,7 +1622,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_CRYBOX'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 1
       VALUE_MAXS( NI ) = 49
       VALUE_DEFAULTS( NI ) = 5
@@ -1632,7 +1632,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_DB_SCOPE'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 5
       VALUE_MAXS( NI ) = 30
       VALUE_DEFAULTS( NI ) = 10
@@ -1646,7 +1646,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_DEKABV'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.
       VALUE_MAXS( NI ) = 100.
       VALUE_DEFAULTS( NI ) = 0.
@@ -1656,7 +1656,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_DEKBLW'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.
       VALUE_MAXS( NI ) = 100.
       VALUE_DEFAULTS( NI ) = 0.
@@ -1666,7 +1666,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_DEKTHR'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.00001
       VALUE_MAXS( NI ) = 0.99999
       VALUE_DEFAULTS( NI ) = 0.8
@@ -1676,7 +1676,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_DPRBTHR'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.000001
       VALUE_MAXS( NI ) = 1.0
       VALUE_DEFAULTS( NI ) = 0.9
@@ -1686,7 +1686,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_DSGMTHR'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.01
       VALUE_MAXS( NI ) = 10.
       VALUE_DEFAULTS( NI ) = 2.5
@@ -1708,7 +1708,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_FFLSMP'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 3.
       VALUE_MAXS( NI ) = 1000.
       VALUE_DEFAULTS( NI ) = 10.
@@ -1718,7 +1718,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_FFNXREJ'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.0
       VALUE_MAXS( NI ) = 100.0
       VALUE_DEFAULTS( NI ) = 0.0
@@ -1728,7 +1728,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_FFNXPLY'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.0
       VALUE_MAXS( NI ) = FLOAT( MAX_FIT_COEFFS )
       VALUE_DEFAULTS( NI ) = 1.0
@@ -1738,7 +1738,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_FFNYREJ'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.0
       VALUE_MAXS( NI ) = 10.0
       VALUE_DEFAULTS( NI ) = 0.0
@@ -1748,7 +1748,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_FFNYPLY'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.0
       VALUE_MAXS( NI ) = FLOAT( MAX_FIT_COEFFS )
       VALUE_DEFAULTS( NI ) = 0.0
@@ -1762,7 +1762,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_FFTHRESH'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.0
       VALUE_MAXS( NI ) = 100.0
       VALUE_DEFAULTS( NI ) = 10.0
@@ -1776,7 +1776,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_FINCPLY'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 1.
       VALUE_MAXS( NI ) = FLOAT( MAX_FIT_COEFFS )
       VALUE_DEFAULTS( NI ) = 3.
@@ -1785,13 +1785,13 @@
       OI = OI + 1
       REQUIRED_OBJECTS( OI ) = 'TUNE_FLUX'
       REQUIRED_TYPE( OI ) = 'LOGICAL'
-      DEFAULTS_INDICIES( OI ) = 1
+      DEFAULTS_INDICES( OI ) = 1
 
       OI = OI + 1
       REQUIRED_OBJECTS( OI ) = 'TUNE_HELIO'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = -100.
       VALUE_MAXS( NI ) = 100.
       VALUE_DEFAULTS( NI ) = 0.
@@ -1801,7 +1801,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_IDINMN'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 8
       VALUE_MAXS( NI ) = 100
       VALUE_DEFAULTS( NI ) = 8
@@ -1811,7 +1811,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_IDINMX'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 8
       VALUE_MAXS( NI ) = 100
       VALUE_DEFAULTS( NI ) = 30
@@ -1821,7 +1821,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_IDMDLT'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 3
       VALUE_MAXS( NI ) = 11
       VALUE_DEFAULTS( NI ) = 6
@@ -1831,7 +1831,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_IDMXDIF'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.0000001
       VALUE_MAXS( NI ) = 1.0
       VALUE_DEFAULTS( NI ) = 0.03
@@ -1841,7 +1841,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_IDSDLT'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 2
       VALUE_MAXS( NI ) = 10
       VALUE_DEFAULTS( NI ) = 3
@@ -1851,7 +1851,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_IDSTRNG'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 1.000001
       VALUE_MAXS( NI ) = 1000000.
       VALUE_DEFAULTS( NI ) = 15.0
@@ -1873,7 +1873,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_MAX2DPNTS'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 10.
       VALUE_MAXS( NI ) = 100000.
       VALUE_DEFAULTS( NI ) = 1000.
@@ -1883,7 +1883,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_MAX2DPLY'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 2.
       VALUE_MAXS( NI ) = FLOAT( MAX_FIT_COEFFS )
       VALUE_DEFAULTS( NI ) = 30.
@@ -1893,7 +1893,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_MAXLINES'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 10.
       VALUE_MAXS( NI ) = 1000.
       VALUE_DEFAULTS( NI ) = 100.
@@ -1903,7 +1903,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_MAXPOLY'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 16.
       VALUE_MAXS( NI ) = FLOAT( MAX_FIT_COEFFS )
       VALUE_DEFAULTS( NI ) = 50.
@@ -1913,7 +1913,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_MAXRFLN'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 50.
       VALUE_MAXS( NI ) = FLOAT( max_allowed_rf_feat )
       VALUE_DEFAULTS( NI ) = 200.
@@ -1923,7 +1923,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_MAXWPLY'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 2.
       VALUE_MAXS( NI ) = FLOAT( MAX_FIT_COEFFS )
       VALUE_DEFAULTS( NI ) = 10.
@@ -1937,7 +1937,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_MINCR'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.
       VALUE_MAXS( NI ) = 1.0e20
       VALUE_DEFAULTS( NI ) = 0.
@@ -1947,7 +1947,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_MRGMAXX'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.
       VALUE_MAXS( NI ) = 10000.
       VALUE_DEFAULTS( NI ) = 0.
@@ -1957,7 +1957,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_MRGMINX'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.
       VALUE_MAXS( NI ) = 10000.
       VALUE_DEFAULTS( NI ) = 0.
@@ -1967,7 +1967,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_MRGWGHT'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'SN'
       FORCE_UPPERCASE( CI ) = .TRUE.
 
@@ -1975,7 +1975,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_MXBADSMP'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 1.
       VALUE_MAXS( NI ) = 1000.
       VALUE_DEFAULTS( NI ) = 10.
@@ -1985,7 +1985,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_MXSKYPIX'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 3.0
       VALUE_MAXS( NI ) = FLOAT( max_slice_pixels )
       VALUE_DEFAULTS( NI ) = 21.0
@@ -1995,7 +1995,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_MXSMP'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 20.0
       VALUE_MAXS( NI ) = 1000.0
       VALUE_DEFAULTS( NI ) = 500.0
@@ -2013,7 +2013,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_OBJABV'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.
       VALUE_MAXS( NI ) = 100.
       VALUE_DEFAULTS( NI ) = 0.
@@ -2023,7 +2023,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_OBJBLW'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.
       VALUE_MAXS( NI ) = 100.
       VALUE_DEFAULTS( NI ) = 0.
@@ -2033,7 +2033,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_OBJPOLY'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.0
       VALUE_MAXS( NI ) = FLOAT( MAX_FIT_COEFFS )
       VALUE_DEFAULTS( NI ) = 0.0
@@ -2043,7 +2043,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_OBJREJ'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.0
       VALUE_MAXS( NI ) = 1000.0
       VALUE_DEFAULTS( NI ) = 5.0
@@ -2053,7 +2053,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_OBJRTHR'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.01
       VALUE_MAXS( NI ) = 100.0
       VALUE_DEFAULTS( NI ) = 5.0
@@ -2063,7 +2063,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_PAGE'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.
       VALUE_MAXS( NI ) = 255.
       VALUE_DEFAULTS( NI ) = 0.
@@ -2077,7 +2077,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_PFLSSAMP'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 3.0
       VALUE_MAXS( NI ) = 5001.0
       VALUE_DEFAULTS( NI ) = 301.0
@@ -2087,7 +2087,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_PFSAMP'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 3.
       VALUE_MAXS( NI ) = 1001.
       VALUE_DEFAULTS( NI ) = 101.
@@ -2109,7 +2109,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_REPORT'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = ' '
       FORCE_UPPERCASE( CI ) = .TRUE.
 
@@ -2121,7 +2121,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_RFLNTHR'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 1.0
       VALUE_MAXS( NI ) = 1000000.
       VALUE_DEFAULTS( NI ) = 1.25
@@ -2131,7 +2131,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_SATRTN'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 1.
       VALUE_MAXS( NI ) = 1.0e20
       VALUE_DEFAULTS( NI ) = 1.0E20
@@ -2141,7 +2141,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_SCFRACT'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.
       VALUE_MAXS( NI ) = 1.
       VALUE_DEFAULTS( NI ) = 0.5
@@ -2151,7 +2151,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_SCRADD'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.0
       VALUE_MAXS( NI ) = 1.0e6
       VALUE_DEFAULTS( NI ) = 1.0
@@ -2161,7 +2161,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_SCRMODE'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.0
       VALUE_MAXS( NI ) = 1.0
       VALUE_DEFAULTS( NI ) = 1.0
@@ -2171,7 +2171,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_SKEW'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.0
       VALUE_MAXS( NI ) = 1.0e10
       VALUE_DEFAULTS( NI ) = 0.0
@@ -2185,7 +2185,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_SKYHILIM'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.00001
       VALUE_MAXS( NI ) = 0.99999
       VALUE_DEFAULTS( NI ) = 0.5
@@ -2199,7 +2199,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_SKYLINW'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 1.
       VALUE_MAXS( NI ) = 100.
       VALUE_DEFAULTS( NI ) = 5.
@@ -2209,7 +2209,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_SKYLTHR'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.0001
       VALUE_MAXS( NI ) = 1000000.
       VALUE_DEFAULTS( NI ) = 3.
@@ -2219,7 +2219,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_SKYPOLY'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = -1.0
       VALUE_MAXS( NI ) = FLOAT( MAX_FIT_COEFFS )
       VALUE_DEFAULTS( NI ) = 0.0
@@ -2229,7 +2229,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_SKYREJ'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.0
       VALUE_MAXS( NI ) = 1000.0
       VALUE_DEFAULTS( NI ) = 5.0
@@ -2239,7 +2239,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_SKYRTHR'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.01
       VALUE_MAXS( NI ) = 100.0
       VALUE_DEFAULTS( NI ) = 5.0
@@ -2253,7 +2253,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_SKYXPLY'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.
       VALUE_MAXS( NI ) = FLOAT( MAX_FIT_COEFFS )
       VALUE_DEFAULTS( NI ) = 0.
@@ -2263,7 +2263,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_TRCNS'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.01
       VALUE_MAXS( NI ) = 0.99
       VALUE_DEFAULTS( NI ) = 0.1
@@ -2273,7 +2273,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_TWTHR'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.01
       VALUE_MAXS( NI ) = 0.999
       VALUE_DEFAULTS( NI ) = 0.95
@@ -2287,7 +2287,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_USE_NXF'
       REQUIRED_TYPE( OI ) = 'FLOAT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 0.01
       VALUE_MAXS( NI ) = 2.0
       VALUE_DEFAULTS( NI ) = 0.2
@@ -2296,13 +2296,13 @@
       OI = OI + 1
       REQUIRED_OBJECTS( OI ) = 'TUNE_USEAAA'
       REQUIRED_TYPE( OI ) = 'LOGICAL'
-      DEFAULTS_INDICIES( OI ) = 1
+      DEFAULTS_INDICES( OI ) = 1
 
       OI = OI + 1
       REQUIRED_OBJECTS( OI ) = 'TUNE_XBOX'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 1.
       VALUE_MAXS( NI ) = 10000.
       VALUE_DEFAULTS( NI ) = 20.
@@ -2312,7 +2312,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_XZONE'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 1.
       VALUE_MAXS( NI ) = 8.
       VALUE_DEFAULTS( NI ) = 1.
@@ -2326,7 +2326,7 @@
       REQUIRED_OBJECTS( OI ) = 'TUNE_YZONE'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 1.
       VALUE_MAXS( NI ) = 8.
       VALUE_DEFAULTS( NI ) = 1.
@@ -2359,7 +2359,7 @@
       REQUIRED_OBJECTS( OI ) = 'W_NPOLY'
       REQUIRED_TYPE( OI ) = 'INT'
       NI = NI + 1
-      DEFAULTS_INDICIES( OI ) = NI
+      DEFAULTS_INDICES( OI ) = NI
       VALUE_MINS( NI ) = 1.
       VALUE_MAXS( NI ) = FLOAT( MAX_FIT_COEFFS )
       VALUE_DEFAULTS( NI ) = 7.
@@ -2407,7 +2407,7 @@
       REQUIRED_OBJECTS( OI ) = 'WAVFIT'
       REQUIRED_TYPE( OI ) = 'CHAR'
       CI = CI + 1
-      DEFAULTS_INDICIES( OI ) = CI
+      DEFAULTS_INDICES( OI ) = CI
       STRING_DEFAULTS( CI ) = 'POLY'
       FORCE_UPPERCASE( CI ) = .TRUE.
 
@@ -2536,7 +2536,7 @@
       OI = OI + 1
       REQUIRED_OBJECTS( OI ) = '2D_INTERACT'
       REQUIRED_TYPE( OI ) = 'LOGICAL'
-      DEFAULTS_INDICIES( OI ) = 1
+      DEFAULTS_INDICES( OI ) = 1
 
 *  Store index of last object defined.
       REQ_OBJ_LUT( 28 ) = OI
@@ -4334,8 +4334,8 @@
 
 *  All switches are `off' switches, ie. default behavior in absence of
 *  any switches is for all objects to be active.
-*  Positive switch-off indicies indicate a LOGICAL parameter specifying
-*  whether to use the primary object, Negative switch-off indicies
+*  Positive switch-off indices indicate a LOGICAL parameter specifying
+*  whether to use the primary object, Negative switch-off indices
 *  indicate an INTEGER (usually array dimension) parameter, for
 *  which parameter=0 indiciates don't use.
 *

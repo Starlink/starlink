@@ -143,7 +143,7 @@ int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, int *vout,
 /* Increment the index of the next output element to be written to. */
       i++;
 
-/* Increment the 1d vector index, and the 3D GRID indicies, of the next
+/* Increment the 1d vector index, and the 3D GRID indices, of the next
    input pixel. */
       iv += vskip;
       x[ 0 ] += xskip[ 0 ];

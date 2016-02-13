@@ -507,7 +507,7 @@
       ELSE IF( SELECT .EQ. 'MASK' ) THEN
          CALL LPG_ASSOC( 'MASK', 'READ', NDFMSK, STATUS )
 
-*  Pixels may alternatively be specified by a list of pixel indicies
+*  Pixels may alternatively be specified by a list of pixel indices
 *  supplied by the user. If this option is selected, create a GRP group
 *  in which to store the list of pixels.
       ELSE

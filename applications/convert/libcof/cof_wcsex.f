@@ -529,7 +529,7 @@
 *  number of pixel axes as the NDF contains.
          IF( AST_GETI( XWCS, 'Nin', STATUS ) .EQ. NDIM ) THEN
 
-*  Note the indicies of the base (i.e. GRID) and current Frames in the
+*  Note the indices of the base (i.e. GRID) and current Frames in the
 *  FrameSet read from the NDF FITS extension.
             IGRID = AST_GETI( XWCS, 'BASE', STATUS )
             ICURR0 = AST_GETI( XWCS, 'CURRENT', STATUS )

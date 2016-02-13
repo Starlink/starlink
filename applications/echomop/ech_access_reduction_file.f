@@ -78,7 +78,7 @@
       INTEGER DEFAULT_INDEX
       INTEGER USED_DIM
       INTEGER CLN_NUM_DIM
-      INTEGER STATIC_INDICIES
+      INTEGER STATIC_INDICES
       INTEGER DIM_USE
       INTEGER NCHAR1
       INTEGER NCHAR2
@@ -155,7 +155,7 @@
       REGISTERED = .FALSE.
 
       STATUS = 0
-      STATIC_INDICIES = 0
+      STATIC_INDICES = 0
       MAPPED_ADDRESS = 0
       INC_ACCESS = .FALSE.
 
@@ -370,7 +370,7 @@
       END IF
 
       CALL ECH_GET_OBJECT_PATH( REQ_OBJ, FULL_OBJECT_PATH,
-     :     PATH_NAME, STATIC_INDICIES, STATUS )
+     :     PATH_NAME, STATIC_INDICES, STATUS )
 
 *  Check if object has already got an access active.
       NEW_ACCESS_COUNT = 0
@@ -384,14 +384,14 @@
             NEW_ACCESS_COUNT = I
 
          ELSE IF ( FULL_OBJECT_PATH .EQ. OBJECT_NAME( I ) )  THEN
-            IF ( OBJECT_STATICS( I ) .EQ. STATIC_INDICIES ) THEN
+            IF ( OBJECT_STATICS( I ) .EQ. STATIC_INDICES ) THEN
                OBJECT_ACTIVE = .TRUE.
                OBJ_NUM = I
                NEW_OBJECT_SIZE = OBJECT_SIZE( I )
                MAPPED_ADDRESS = OBJECT_ADDRESS( I )
-               IF ( STATIC_INDICIES .GT. 0 .AND.
+               IF ( STATIC_INDICES .GT. 0 .AND.
      :              ONCE_PER_ORDER( MODULE_NUMBER ) ) THEN
-                  IF ( DIMEN_INDEX( STATIC_INDICIES ) .EQ.
+                  IF ( DIMEN_INDEX( STATIC_INDICES ) .EQ.
      :                 'IDX_NUM_ORDERS' ) THEN
                      CALL ECH_TYPEINFO( OBJECT_TYPE( I ),
      :                    TYPE_CODE, AUNIT )
@@ -402,9 +402,9 @@
                         IF ( MAPPED_ADDRESS .NE. 0 ) THEN
                            MAPPED_ADDRESS =
      :                       MAPPED_ADDRESS + AUNIT * (
-     :                       ( DIMEN_VALUE( STATIC_INDICIES ) - 1 ) *
+     :                       ( DIMEN_VALUE( STATIC_INDICES ) - 1 ) *
      :                       NEW_OBJECT_SIZE /
-     :                       DIMENSIONS( STATIC_INDICIES ) )
+     :                       DIMENSIONS( STATIC_INDICES ) )
                         END IF
                      END IF
                   END IF
@@ -488,8 +488,8 @@
 *     is being used EG. ARRAY[ 1, 1, order_number ], has a
 *     size defined by the first two (static) dimensions.
 *     Whereas ARRAY[ order_number ] refers to a single element.
-         IF ( STATIC_INDICIES .GT. 0 ) THEN
-            NUM_DIM = STATIC_INDICIES
+         IF ( STATIC_INDICES .GT. 0 ) THEN
+            NUM_DIM = STATIC_INDICES
             DO I = 1, NUM_DIM
                DIM_USE = DIMENSIONS( I )
                IF ( DIMEN_INDEX( I )( :4 ) .EQ. 'IDX_' ) THEN
@@ -502,7 +502,7 @@
                ELSE IF ( .NOT. IN_RDCTN_FILE(
      :                   ECH_OBJ_IND( DIMEN_INDEX( I ) ) ) )
      :                   THEN
-                  DEFAULT_INDEX = DEFAULTS_INDICIES(
+                  DEFAULT_INDEX = DEFAULTS_INDICES(
      :                ECH_OBJ_IND( DIMEN_INDEX( I ) ) )
                   STATUS = ECH__ARRAY_INDEX
                   CALL ECH_GET_PARAMETER( DIMEN_INDEX( I ), 'INT',
@@ -621,12 +621,12 @@
                END IF
               END DO
             END IF
-            IF ( STATIC_INDICIES .GT. 0 .AND.
+            IF ( STATIC_INDICES .GT. 0 .AND.
      :           ONCE_PER_ORDER( MODULE_NUMBER ) ) THEN
-               IF ( DIMEN_INDEX( STATIC_INDICIES ) .EQ.
+               IF ( DIMEN_INDEX( STATIC_INDICES ) .EQ.
      :              'IDX_NUM_ORDERS'  ) THEN
                   NEW_OBJECT_SIZE = NEW_OBJECT_SIZE *
-     :                  DIMENSIONS( STATIC_INDICIES )
+     :                  DIMENSIONS( STATIC_INDICES )
                END IF
             END IF
 
@@ -685,10 +685,10 @@
             ELSE
                STATUS = ECH__CRE_OBJECT
                CALL ECH_GET_OBJECT_PATH( REQ_OBJ, FULL_OBJECT_PATH,
-     :              PATH_NAME, STATIC_INDICIES, STATUS )
+     :              PATH_NAME, STATIC_INDICES, STATUS )
                NEW_OBJECT_SIZE = 1
-               IF ( STATIC_INDICIES .GT. 0 ) THEN
-                  NUM_DIM = STATIC_INDICIES
+               IF ( STATIC_INDICES .GT. 0 ) THEN
+                  NUM_DIM = STATIC_INDICES
                   DO I = 1, NUM_DIM
                      NEW_OBJECT_SIZE = NEW_OBJECT_SIZE *
      :                                 DIMEN_VALUE( I )
@@ -715,14 +715,14 @@
                END IF
                IF ( STATUS .EQ. 0 ) THEN
                   CALL ECH_GET_OBJECT_PATH( REQ_OBJ,
-     :                 full_object_path, path_name, static_indicies,
+     :                 full_object_path, path_name, static_indices,
      :                 status )
                   CALL ECH_ACCESS_OBJECT( FULL_OBJECT_PATH,
      :                 'READ-SIZE', ' ', 0, 0, 0, DIMENSIONS,
      :                 MAX_DIMENSIONS, NUM_DIM, ' ', STATUS )
                   ACTUAL_DIM = NUM_DIM
                   NEW_OBJECT_SIZE = 1
-                  IF ( STATIC_INDICIES .GT. 0 ) THEN
+                  IF ( STATIC_INDICES .GT. 0 ) THEN
                      DO I = 1, NUM_DIM
                         NEW_OBJECT_SIZE = NEW_OBJECT_SIZE *
      :                                    DIMENSIONS( I )
@@ -809,16 +809,16 @@
      :              1, 0, ' ', STATUS )
             END IF
             MAPPED_ADDRESS = NEW_ADDRESS
-            IF ( STATIC_INDICIES .GT. 0 .AND.
+            IF ( STATIC_INDICES .GT. 0 .AND.
      :           ONCE_PER_ORDER( MODULE_NUMBER ) ) THEN
-               IF ( DIMEN_INDEX( STATIC_INDICIES ) .EQ.
+               IF ( DIMEN_INDEX( STATIC_INDICES ) .EQ.
      :              'IDX_NUM_ORDERS' ) THEN
                   IF ( OPERATION .NE. 'WRITE' ) THEN
                      IF ( MAPPED_ADDRESS .NE. 0 ) THEN
                         MAPPED_ADDRESS = MAPPED_ADDRESS + AUNIT * (
-     :                        ( DIMEN_VALUE( STATIC_INDICIES ) - 1 ) *
+     :                        ( DIMEN_VALUE( STATIC_INDICES ) - 1 ) *
      :                        NEW_OBJECT_SIZE /
-     :                        DIMENSIONS( STATIC_INDICIES ) )
+     :                        DIMENSIONS( STATIC_INDICES ) )
                      END IF
                   END IF
                END IF
@@ -862,7 +862,7 @@
      :            ECH_OBJ_IND( REQ_OBJ )
             OBJECT_ADDRESS( NEW_ACCESS_COUNT ) = NEW_ADDRESS
             OBJECT_HANDLE( NEW_ACCESS_COUNT ) = NEW_HANDLE
-            OBJECT_STATICS( NEW_ACCESS_COUNT ) = STATIC_INDICIES
+            OBJECT_STATICS( NEW_ACCESS_COUNT ) = STATIC_INDICES
             OBJECT_ACTIVE = .TRUE.
             OBJ_NUM = NEW_ACCESS_COUNT
          END IF

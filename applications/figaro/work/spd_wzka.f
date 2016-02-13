@@ -378,12 +378,12 @@
       INTEGER no_of_positions    !Number of observed feature positions
       REAL best_distances ( max_ftr_cand , max_id_ftrs ) !Distance measures for top candidates
       REAL best_dispersion ( max_ftr_cand , max_id_ftrs ) !Dispersions for top candidates
-      INTEGER best_ftr ( max_ftr_cand , max_id_ftrs ) !Feature indicies for top candidates
-      INTEGER best_next_ftr ( max_ftr_cand , max_id_ftrs ) !Feature neighbour indicies for top candidates
-      INTEGER best_next_ftr2 ( max_ftr_cand , max_id_ftrs ) !Feature neighbour indicies for top candidates
-      INTEGER best_prev_ftr ( max_ftr_cand , max_id_ftrs ) !Feature neighbour indicies for top candidates
-      INTEGER best_prev_ftr2 ( max_ftr_cand , max_id_ftrs ) !Feature neighbour indicies for top candidates
-      BYTE best_posindex ( max_ftr_cand , 4 , max_id_ftrs ) !Database neighbour indicies for top candidates
+      INTEGER best_ftr ( max_ftr_cand , max_id_ftrs ) !Feature indices for top candidates
+      INTEGER best_next_ftr ( max_ftr_cand , max_id_ftrs ) !Feature neighbour indices for top candidates
+      INTEGER best_next_ftr2 ( max_ftr_cand , max_id_ftrs ) !Feature neighbour indices for top candidates
+      INTEGER best_prev_ftr ( max_ftr_cand , max_id_ftrs ) !Feature neighbour indices for top candidates
+      INTEGER best_prev_ftr2 ( max_ftr_cand , max_id_ftrs ) !Feature neighbour indices for top candidates
+      BYTE best_posindex ( max_ftr_cand , 4 , max_id_ftrs ) !Database neighbour indices for top candidates
       INTEGER start_wavelength_index !Database index for search start
       INTEGER end_wavelength_index !Database index for search end
       INTEGER meta_guess ( max_id_ftrs ) !Indicies of solution features

@@ -368,7 +368,7 @@
          CALL IRM_RDNDF( 'MASK',  NIN, NIN, '  Give more mask NDFs...',
      :                   IGRP3, NIN, STATUS )
 
-*  Pixels may alternatively be specified by a list of pixel indicies
+*  Pixels may alternatively be specified by a list of pixel indices
 *  supplied by the user. If this option is selected, create a GRP group
 *  in which to store the list of pixels.
       ELSE

@@ -129,9 +129,9 @@
 *    FTR_POSITIONS = INTEGER (Given)
 *        Active features.
 *    META_GUESS = INTEGER (Given)
-*        Candidate indicies for solution features.
+*        Candidate indices for solution features.
 *    META_FTRS = INTEGER (Given)
-*        Feature indicies for solution features.
+*        Feature indices for solution features.
 *    META_COUNT = INTEGER (Given)
 *        Number of features in solution.
 *    WAVE_NPOLY = INTEGER (Given)

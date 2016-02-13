@@ -752,7 +752,7 @@ static int smf1_check_steps( const char *param, int first, dim_t nx,
       pold = oldsteps;
       for( iold = 0; iold < nold; iold++,pold++ ) {
 
-/* Ignore old steps with bolometer indicies greater than 5000 */
+/* Ignore old steps with bolometer indices greater than 5000 */
          if( pold->ibolo > 5000 ) continue;
 
 /* Indicate no new step has yet been associated with the old step. */
