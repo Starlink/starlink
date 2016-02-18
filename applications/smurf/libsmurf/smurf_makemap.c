@@ -189,7 +189,7 @@
 *          appended to the end of the path specified by parameter "OUT". If
 *          "JSATILES" is TRUE, the "REF" parameter is ignored. [FALSE]
 *     JSATILELIST() = _INTEGER (Write)
-*          If parameter "JSATILES" is set TRUE, the zero-based indices of
+*          If parameter "JSATILES" is set TRUE, the zero-based indicies of
 *          the created JSA tiles will be written to this output parameter.
 *          The number of such indices is given the "NTILE" parameter
 *     LBND( 2 ) = _INTEGER (Read)
@@ -1935,8 +1935,8 @@ void smurf_makemap( int *status ) {
               "Effective bolometer count", status );
 
     /* Store the total exposure time. */
-    atlPtftd( fchan, "TOTEXP", totexp,
-              "[s] Total exposure time", status );
+    atlPtftd( fchan, "ELAPTIME", totexp,
+              "[s] Total duration of all observations in map", status );
 
     /* If the FitsChan is not empty, store it in the FITS extension of the
        output NDF (any existing FITS extension is deleted). No need to
