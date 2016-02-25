@@ -78,11 +78,14 @@
 *     2014-05-08 (GSB):
 *        Add OBSGEO headers to the list of items to keep from the end of
 *        the group.
+*     2016-02-25 (DSB):
+*        Add SEQSTART/SEQEND to the list of START and END FITS headers.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2007-2010 Science & Technology Facilities Council.
+*     Copyright (C) 2016 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -146,6 +149,7 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
      "SEEINGST",
      "FRLEGTST",
      "BKLEGTST",
+     "SEQSTART",
      NULL
    };
    const char * end_items[] = {
@@ -169,6 +173,7 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
      "SEEINGEN",
      "FRLEGTEN",
      "BKLEGTEN",
+     "SEQEND",
      "OBSGEO-X",
      "OBSGEO-Y",
      "OBSGEO-Z",

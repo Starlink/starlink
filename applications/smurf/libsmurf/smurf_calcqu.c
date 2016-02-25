@@ -265,6 +265,9 @@
 *        first), rather than as a NDF in the SMURF extension.
 *     3-FEB-2016 (DSB):
 *        Report error if HWP is not rotating.
+*     25-FEB-2016 (DSB):
+*        Correct badly mangled accumulating of output FITS headers and
+*        provenance in lsqfit mode
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -319,6 +322,11 @@
 #include "smurf_par.h"
 #include "smurflib.h"
 
+/* Prototypes for local functions. */
+static void smurf1__putprov(  ThrWorkForce *wf, int indf, void *oprov,
+                              int *status );
+
+/* Main entry */
 void smurf_calcqu( int *status ) {
 
 /* Local Variables: */
@@ -347,6 +355,7 @@ void smurf_calcqu( int *status ) {
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double rotafreq;           /* HWP rotation frequency */
+   double steptime;           /* STEPTIME header frm first input */
    float arcerror;            /* Max acceptable error (arcsec) in one block */
    int block_end;             /* Index of last time slice in block */
    int block_start;           /* Index of first time slice in block */
@@ -362,6 +371,7 @@ void smurf_calcqu( int *status ) {
    int minsize;               /* Min no. of time slices in a block */
    int nc;                    /* Number of characters written to a string */
    int nskipped;              /* Number of skipped blocks */
+   int nsubscan;              /* NSUBSCAN header from first input */
    int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
    int polbox;                /* HWP cycles in a fitting box */
    int qplace;                /* NDF placeholder for current block's Q image */
@@ -383,6 +393,7 @@ void smurf_calcqu( int *status ) {
    smfArray *flatramps = NULL;/* Flatfield ramps */
    smfData *data = NULL;      /* Concatenated data for one subarray */
    smfData *dkdata = NULL;    /* Concatenated dark squid data for one subarray */
+   smfData *indata = NULL;    /* One input data file */
    smfData *odatai = NULL;    /* Output I data for one subarray */
    smfData *odataq = NULL;    /* Output Q data for one subarray */
    smfData *odatau = NULL;    /* Output U data for one subarray */
@@ -589,19 +600,14 @@ void smurf_calcqu( int *status ) {
                           status, subarray );
             }
 
-/* In least-squares mode, the propagation of provenance and FITS headers
-   are handled by smf_ functions. Otherwise, we do it ourselves here. */
-            if( ! lsqfit ) {
-
 /* Create an empty provenance structure. Each input NDF that contributes
    to the current chunk and array will be added as an ancestor to this
    structure, which will later be stored in each output NDF created for
    this chunk and array. */
-               oprov = ndgReadProv( NDF__NOID, "SMURF:CALCQU", status );
+            oprov = ndgReadProv( NDF__NOID, "SMURF:CALCQU", status );
 
 /* Indicate we do not yet have any FITS headers for the output NDFs */
-               fc = NULL;
-            }
+            fc = NULL;
 
 /* Indicate we do not yet know the coordinate reference frame for the
    half-waveplate angle. */
@@ -610,6 +616,7 @@ void smurf_calcqu( int *status ) {
 
 /* Go through the smfGroup looking for groups of related input NDFs that
    contribute to the current chunk. */
+            nsubscan = -1;
             for( igroup = 0; igroup < sgroup->ngroups; igroup++ ) {
                if( sgroup->chunk[ igroup ] == ichunk ) {
 
@@ -620,90 +627,107 @@ void smurf_calcqu( int *status ) {
    smf_grp_related stores arrays within the sgroup->subgroups. */
                   inidx = sgroup->subgroups[ igroup ][ idx ];
 
-/* In least-squares mode, the propagation of provenance and FITS headers
-   are handled by smf_ functions. Otherwise, we do it ourselves here. */
-                  if( !lsqfit ) {
+/* Open the file. */
+                  smf_open_file( wf, sgrp, inidx, "READ", SMF__NOCREATE_DATA,
+                                 &indata, status );
 
 /* Add this input NDF as an ancestor into the output provenance structure. */
-                     smf_accumulate_prov( NULL, sgrp, inidx, NDF__NOID,
-                                          "SMURF:CALCQU", &oprov, status );
+                  smf_accumulate_prov( indata, sgrp, inidx, NDF__NOID,
+                                       "SMURF:CALCQU", &oprov, status );
+
+/* Check it is safe to dereference the indata pointer. */
+                  if( *status == SAI__OK ) {
 
 /* Merge the FITS headers from the current input NDF into the FitsChan
    that holds headers for the output NDFs. The merging retains only those
    headers which have the same value in all input NDFs. */
-                     smf_fits_outhdr( data->hdr->fitshdr, &fc, status );
-                  }
+                     smf_fits_outhdr( indata->hdr->fitshdr, &fc, status );
 
 /* Get the polarimetry related FITS headers and check that all input NDFs
    have usabie values. */
-                  headval[ 0 ] = 0;
-                  smf_getfitss( data->hdr, "POL_MODE", headval,
-                                sizeof(headval), status );
-                  if( strcmp( headval, "CONSTANT" ) && *status == SAI__OK ) {
-                     *status = SAI__ERROR;
-                     grpMsg( "N", sgrp, inidx );
-                     errRep( " ", "Unusable observation: Input NDF ^N does not contain "
-                             "polarimetry data obtained with a spinning "
-                             "half-waveplate.", status );
-                  }
-
-                  headval[ 0 ] = 0;
-                  smf_getfitss( data->hdr, "POLWAVIN", headval,
-                                sizeof(headval), status );
-                  if( strcmp( headval, "Y" ) && *status == SAI__OK ) {
-                     *status = SAI__ERROR;
-                     grpMsg( "N", sgrp, inidx );
-                     errRep( " ", "Unusable observation: Half-waveplate was not in the beam for "
-                             "input NDF ^N.", status );
-                  }
-
-                  headval[ 0 ] = 0;
-                  smf_getfitss( data->hdr, "POLANLIN", headval,
-                                sizeof(headval), status );
-                  if( strcmp( headval, "Y" ) && *status == SAI__OK ) {
-                     *status = SAI__ERROR;
-                     grpMsg( "N", sgrp, inidx );
-                     errRep( " ", "Unusable observation: Analyser was not in the beam for input "
-                             "NDF ^N.", status );
-                  }
-
-                  smf_getfitsd( data->hdr, "ROTAFREQ", &rotafreq, status );
-                  if( rotafreq == 0.0 && *status == SAI__OK ) {
-                     *status = SAI__ERROR;
-                     grpMsg( "N", sgrp, inidx );
-                     errRep( " ", "Unusable observation: Half-waveplate was not spinning for input "
-                             "NDF ^N.", status );
-                  }
-
-                  if( polcrd[ 0 ] ) {
                      headval[ 0 ] = 0;
-                     smf_getfitss( data->hdr, "POL_CRD", headval,
+                     smf_getfitss( indata->hdr, "POL_MODE", headval,
                                    sizeof(headval), status );
-                     if( strcmp( headval, polcrd ) && *status == SAI__OK ) {
+                     if( strcmp( headval, "CONSTANT" ) && *status == SAI__OK ) {
                         *status = SAI__ERROR;
-                        errRep( " ", "Unusable observation: Input NDFs have differing values for "
-                                "FITS header 'POL_CRD'.", status );
+                        grpMsg( "N", sgrp, inidx );
+                        errRep( " ", "Unusable observation: Input NDF ^N does not contain "
+                                "polarimetry data obtained with a spinning "
+                                "half-waveplate.", status );
                      }
 
-                  } else {
-                     smf_getfitss( data->hdr, "POL_CRD", polcrd,
-                                   sizeof(polcrd), status );
-                     if( !strcmp( polcrd, "FPLANE" ) ) {
-                        ipolcrd = 0;
-                     } else if( !strcmp( polcrd, "AZEL" ) ) {
-                        ipolcrd = 1;
-                     } else if( !strcmp( polcrd, "TRACKING" ) ) {
-                        ipolcrd = 2;
-                     } else if( *status == SAI__OK ) {
+                     headval[ 0 ] = 0;
+                     smf_getfitss( indata->hdr, "POLWAVIN", headval,
+                                   sizeof(headval), status );
+                     if( strcmp( headval, "Y" ) && *status == SAI__OK ) {
                         *status = SAI__ERROR;
-                        msgSetc( "N", data->file->name );
-                        msgSetc( "V", polcrd );
-                        errRep( " ", "Unusable observation: Input NDF ^N contains unknown value "
-                                "'^V' for FITS header 'POL_CRD'.", status );
+                        grpMsg( "N", sgrp, inidx );
+                        errRep( " ", "Unusable observation: Half-waveplate was not in the beam for "
+                                "input NDF ^N.", status );
+                     }
+
+                     headval[ 0 ] = 0;
+                     smf_getfitss( indata->hdr, "POLANLIN", headval,
+                                   sizeof(headval), status );
+                     if( strcmp( headval, "Y" ) && *status == SAI__OK ) {
+                        *status = SAI__ERROR;
+                        grpMsg( "N", sgrp, inidx );
+                        errRep( " ", "Unusable observation: Analyser was not in the beam for input "
+                                "NDF ^N.", status );
+                     }
+
+                     smf_getfitsd( indata->hdr, "ROTAFREQ", &rotafreq, status );
+                     if( rotafreq == 0.0 && *status == SAI__OK ) {
+                        *status = SAI__ERROR;
+                        grpMsg( "N", sgrp, inidx );
+                        errRep( " ", "Unusable observation: Half-waveplate was not spinning for input "
+                                "NDF ^N.", status );
+                     }
+
+                     if( polcrd[ 0 ] ) {
+                        headval[ 0 ] = 0;
+                        smf_getfitss( indata->hdr, "POL_CRD", headval,
+                                      sizeof(headval), status );
+                        if( strcmp( headval, polcrd ) && *status == SAI__OK ) {
+                           *status = SAI__ERROR;
+                           errRep( " ", "Unusable observation: Input NDFs have differing values for "
+                                   "FITS header 'POL_CRD'.", status );
+                        }
+
+                     } else {
+                        smf_getfitss( indata->hdr, "POL_CRD", polcrd,
+                                      sizeof(polcrd), status );
+                        if( !strcmp( polcrd, "FPLANE" ) ) {
+                           ipolcrd = 0;
+                        } else if( !strcmp( polcrd, "AZEL" ) ) {
+                           ipolcrd = 1;
+                        } else if( !strcmp( polcrd, "TRACKING" ) ) {
+                           ipolcrd = 2;
+                        } else if( *status == SAI__OK ) {
+                           *status = SAI__ERROR;
+                           msgSetc( "N", indata->file->name );
+                           msgSetc( "V", polcrd );
+                           errRep( " ", "Unusable observation: Input NDF ^N contains unknown value "
+                                   "'^V' for FITS header 'POL_CRD'.", status );
+                        }
+                     }
+
+/* We need the NSUBSCAN and STEPTIME value from the first file in the group. */
+                     if( nsubscan == -1 ) {
+                        smf_getfitsi( indata->hdr, "NSUBSCAN", &nsubscan, status );
+                        smf_getfitsd( indata->hdr, "STEPTIME", &steptime, status );
                      }
                   }
+
+/* close the input file */
+                  smf_close_file( wf, &indata, status );
                }
             }
+
+/* We need to include an NSUBSCAN and STEPTIME value in the output FITS header to
+   avoid makemap reporting an error. */
+            astSetFitsI( fc, "NSUBSCAN", nsubscan, NULL, 1 );
+            astSetFitsF( fc, "STEPTIME", steptime, NULL, 1 );
 
 /* Least squares approach..
    ========================  */
@@ -720,19 +744,30 @@ void smurf_calcqu( int *status ) {
                   north = northbuf;
                }
 
+/* Use the output FITS header that includes properly merged values for
+   start and end values, etc. */
+               if( data->hdr->fitshdr ) {
+                  data->hdr->fitshdr = astAnnul( data->hdr->fitshdr );
+               }
+               data->hdr->fitshdr = astClone( fc );
+
 /* Generate the I, Q and U time-streams for the current chunk. */
                smf_fit_qui( wf, data, &odataq, &odatau, ogrpi ? &odatai : NULL,
                             (dim_t) polbox, ipolcrd, pasign, AST__DD2R*paoff,
                             AST__DD2R*angrot, north, harmonic, status );
 
-/* Copy the smfData structures to the output NDFs. */
+/* Copy the smfData structures to the output NDFs. Store the output
+   provenenance info at the same time. */
                smf_write_smfData ( wf, odataq, NULL, NULL, ogrpq, gcount,
-                                   0, MSG__VERB, 0, NULL, NULL, status );
+                                   0, MSG__VERB, 0, smurf1__putprov, oprov,
+                                   status );
                smf_write_smfData ( wf, odatau, NULL, NULL, ogrpu, gcount,
-                                   0, MSG__VERB, 0, NULL, NULL, status );
+                                   0, MSG__VERB, 0, smurf1__putprov, oprov,
+                                   status );
                if( ogrpi ) {
                   smf_write_smfData ( wf, odatai, NULL, NULL, ogrpi, gcount,
-                                      0, MSG__VERB, 0, NULL, NULL, status );
+                                      0, MSG__VERB, 0, smurf1__putprov, oprov,
+                                      status );
                }
 
 /* Free the smfData structures. */
@@ -864,10 +899,6 @@ void smurf_calcqu( int *status ) {
                                              arcerror, maxsize, status );
                }
 
-/* Free resources */
-               oprov = ndgFreeProv( oprov, status );
-               fc = astAnnul( fc );
-
 /* Report the fraction of the data that was skipped due to being in a
    short block. Only do this for the first sub-array as all sub-arrays will
    be the same. */
@@ -884,6 +915,10 @@ void smurf_calcqu( int *status ) {
                            "samples.", status, mlength );
                }
             }
+
+/* Free resources */
+            oprov = ndgFreeProv( oprov, status );
+            fc = astAnnul( fc );
          }
 
 /* Free resources. */
@@ -932,3 +967,14 @@ L999:
      msgOutif( MSG__VERB, " ", "CALCQU failed.", status);
    }
 }
+
+
+
+/* Service routine called with smf_write_smfData. It adds provenance to
+   the output NDF. */
+static void smurf1__putprov(  ThrWorkForce *wf, int indf, void *oprov,
+                              int *status ){
+   if( oprov ) ndgWriteProv( oprov, indf, 1, status );
+}
+
+
