@@ -128,6 +128,17 @@
 *        created by this script be retained? If not, it will be deleted
 *        before the script exits. If retained, a message will be
 *        displayed at the end specifying the path to the directory. [FALSE]
+*     QUDIR = LITERAL (Read)
+*        Path to a directory containing any pre-exiting Q/U time streams
+*        or Q/U maps. Each UT date should have a separate subdirectory
+*        within "qudir", and each observation should have a separate
+*        subdirectory within its <UT> date subdirectory. If null (!) is
+*        supplied, the root directory is placed within the temporary
+*        directory used to store all other intermediate files. [!]
+*     TABLE = LITERAL (Read)
+*        The path to a new text file to create in which to place a table
+*        holding columns of elevation, Q, U, Qfit and Ufit, in TOPCAT
+*        ASCII format. [!]
 
 *  Copyright:
 *     Copyright (C) 2015 East Asian Observatory
@@ -173,7 +184,13 @@ from starutil import msg_out
 from starutil import UsageError
 
 import numpy as np
-from scipy.optimize import minimize
+try:
+   from scipy.optimize import minimize
+   dofit = True
+except ImportError:
+   msg_out( "Python scipy package no available - no fit will be done." )
+   dofit = False
+
 from math import cos as cos
 from math import sin as sin
 from math import radians as radians
@@ -299,6 +316,10 @@ try:
                                  noprompt=True))
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
+   params.append(starutil.Par0S("QUDIR", "Directory containing "
+                                "pre-existing Q/U data", None, noprompt=True))
+   params.append(starutil.Par0S("TABLE", "Output table holding raw and fitted "
+                                "Q/U values", None, noprompt=True))
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
@@ -322,6 +343,12 @@ try:
 
 #  Get the aperture diameter, in arcsec.
    diam = parsys["DIAM"].value
+
+#  Get the directory to store Q/U files.
+   qudir = parsys["QUDIR"].value
+
+#  Get the name of the output table.
+   table = parsys["TABLE"].value
 
 #  The user-supplied pixel size.
    pixsize = parsys["PIXSIZE"].value
@@ -401,7 +428,11 @@ try:
 #  direction. The Q and U files are placed into a subdirectory of the NDG
 #  temp directory. If the directory already exists, then re-use the files
 #  in it rather than calculating them again.
-      obsdir = "{0}/{1}".format( NDG.tempdir, obs )
+      if qudir:
+         obsdir = "{0}/{1}".format( qudir, obs )
+      else:
+         obsdir = "{0}/{1}".format( NDG.tempdir, obs )
+
       if not os.path.isdir(obsdir):
          os.makedirs(obsdir)
          invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config=def outq={1}/\*_QT "
@@ -409,14 +440,11 @@ try:
       else:
          msg_out("Re-using pre-calculated Q and U time streams for {0}.".format(obs))
 
-#  Get groups listing the time series files created by calcqu.
-      qts = NDG( "{0}/*_QT".format( obsdir ) )
-      uts = NDG( "{0}/*_UT".format( obsdir ) )
-
 #  Make maps from the Q and U time streams. These Q and U values are with
 #  respect to the focal plane Y axis.
       mapfile = "{0}/qmap.sdf".format(obsdir)
       if not os.path.exists( mapfile ) or newpixsize:
+         qts = NDG( "{0}/*_QT".format( obsdir ) )
          qmap = NDG( mapfile, False )
          invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} {3}".format(qts,conf,qmap,pixsizepar))
       else:
@@ -425,6 +453,7 @@ try:
 
       mapfile = "{0}/umap.sdf".format(obsdir)
       if not os.path.exists( mapfile ) or newpixsize:
+         uts = NDG( "{0}/*_UT".format( obsdir ) )
          umap = NDG( mapfile, False )
          invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} {3}".format(uts,conf,umap,pixsizepar))
       else:
@@ -522,40 +551,66 @@ try:
       invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(imap,diam,xcen,ycen))
       ival = get_task_par( "mean", "aperadd" )
 
-
-
-
 #  We now do the fit. Loop doing succesive fits, rejecting outliers on
 #  each pass (i.e. sigma clipping).
-   msg_out( "Doing fit..." )
-   for i in range(0,3):
-      msg_out( "\nIteration {0}: Fitting to {1} data points...".format(i+1,len(elist)) )
+   if dofit:
+      msg_out( "Doing fit..." )
+      for i in range(0,3):
+         msg_out( "\nIteration {0}: Fitting to {1} data points...".format(i+1,len(elist)) )
 
 #  Initial guess at model parameters (a constant 1% IP parallel to
 #  elevation).
-      x0 = np.array([0.01,0.0,0.0])
+         x0 = np.array([0.01,0.0,0.0])
 
 #  Do a fit to find the optimum model parameters.
-      res = minimize( objfun, x0, method='nelder-mead',
-                      options={'xtol': 1e-4, 'disp': True})
+         res = minimize( objfun, x0, method='nelder-mead',
+                         options={'xtol': 1e-4, 'disp': True})
 
 #  Find RMS Q residual between data and fit.
-      qrms = resid( True, res.x )
+         qrms = resid( True, res.x )
 
 #  Remove Q points more than 2 sigma from the fit.
-      reject( True, 2*qrms, res.x )
+         reject( True, 2*qrms, res.x )
 
 #  Find RMS U residual between data and fit.
-      urms = resid( False, res.x )
+         urms = resid( False, res.x )
 
 #  Remove U points more than 2 sigma from the fit.
-      reject( False, 2*urms, res.x )
+         reject( False, 2*urms, res.x )
 
 #  Display results.
-   (a,b,c) = res.x
-   msg_out("\n\nA={0} B={1} C={2}".format(a,b,c))
-   msg_out("Q RMS = {0} pW  U RMS = {1} pW\n".format(qrms,urms))
-   msg_out("Qn RMS = {0}   Un RMS = {1} \n".format(qrms/ival,urms/ival))
+      (a,b,c) = res.x
+      msg_out("\n\nA={0} B={1} C={2}".format(a,b,c))
+      msg_out("Q RMS = {0} pW  U RMS = {1} pW\n".format(qrms,urms))
+      msg_out("Qn RMS = {0}   Un RMS = {1} \n".format(qrms/ival,urms/ival))
+
+#  Write a table showing the Q and U values and the fits.
+      if table:
+         fd = open( table, "w" )
+
+         fd.write("#\n")
+         fd.write("# A={0} B={1} C={2}\n".format(a,b,c))
+         fd.write("# Q RMS = {0} pW  U RMS = {1} pW\n".format(qrms,urms))
+         fd.write("# Qn RMS = {0}   Un RMS = {1} \n".format(qrms/ival,urms/ival))
+         fd.write("#\n")
+         fd.write("# el q u qfit ufit\n")
+         for i in range(len(elist)):
+            (qfp,ufp) = model( i, res.x )
+            fd.write("{0} {1} {2} {3} {4}\n".format(elist[i], qlist[i], ulist[i],
+                                                    qfp, ufp ))
+         fd.close()
+         msg_out("\nTable written to file '{0}'".format(table))
+
+   else:
+      msg_out( "Skipping fit because scipy is not available." )
+      if table:
+         fd = open( table, "w" )
+
+         fd.write("# el q u qfit ufit\n")
+         for i in range(len(elist)):
+            fd.write("{0} {1} {2} null null\n".format(elist[i], qlist[i], ulist[i] ))
+         fd.close()
+         msg_out("\nTable written to file '{0}'".format(table))
 
 #  Save the parameter values used in this script in case we want to
 #  re-use the intermediate files in a later run.
@@ -565,7 +620,6 @@ try:
       fd.write("diam={0}\n".format(diam))
       if pixsize:
          fd.write("pixsize={0}\n".format(pixsize))
-      fd.close()
 
 #  Remove temporary files.
    cleanup()
