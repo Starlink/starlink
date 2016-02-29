@@ -318,6 +318,12 @@ new_lut_ndfs = []
 #  script exist.
 new_noi_ndfs = []
 
+#  A function that converts a string to an int, handling cases where the
+#  string ends with ".0" (the python intrinsic "int" function moans in 
+#  such cases).
+def myint( text ):
+   return int( float( text ) + 0.5 )
+
 #  A function to clean up before exiting. Delete all temporary NDFs etc,
 #  unless the script's RETAIN parameter indicates that they are to be
 #  retained. Also delete the script's temporary ADAM directory.
@@ -423,7 +429,7 @@ try:
 #  convert the string returned by "invoke" to an int explicitly, otherwise
 #  the equality is never satisfied and we end up assuming that the raw
 #  data has been precleaned, even if it hasn't been precleaned.
-   if int( invoke( "$KAPPA_DIR/configecho name=doclean config={0} "
+   if myint( invoke( "$KAPPA_DIR/configecho name=doclean config={0} "
               "defaults=$SMURF_DIR/smurf_makemap.def "
               "select=\"\'450=0,850=1\'\" defval=1".format(config))) == 1:
       precleaned = False
@@ -433,7 +439,7 @@ try:
 #  If requested, use numiter from the config file. Arbitrarily choose 850 um
 #  values for the waveband-specific parameters, but these are not actually used.
    if niter == 0:
-      niter = int( invoke( "$KAPPA_DIR/configecho name=numiter config={0} "
+      niter = myint( invoke( "$KAPPA_DIR/configecho name=numiter config={0} "
                            "defaults=$SMURF_DIR/smurf_makemap.def "
                            "select=\"\'450=0,850=1\'\" defval=5".format(config)))
 
@@ -457,18 +463,18 @@ try:
    zero_notlast = {}
    zero_freeze = {}
    for model in ["ast", "com", "flt"]:
-      zero_niter[model] = int( invoke( "$KAPPA_DIR/configecho name={0}.zero_niter config={1} "
+      zero_niter[model] = myint( invoke( "$KAPPA_DIR/configecho name={0}.zero_niter config={1} "
                                        "defaults=$SMURF_DIR/smurf_makemap.def "
                                        "select=\"\'450=0,850=1\'\"".format(model,config)))
-      zero_notlast[model] = int( invoke( "$KAPPA_DIR/configecho name={0}.zero_notlast config={1} "
+      zero_notlast[model] = myint( invoke( "$KAPPA_DIR/configecho name={0}.zero_notlast config={1} "
                                        "defaults=$SMURF_DIR/smurf_makemap.def "
                                        "select=\"\'450=0,850=1\'\"".format(model,config)))
-      zero_freeze[model] = int( invoke( "$KAPPA_DIR/configecho name={0}.zero_freeze config={1} "
+      zero_freeze[model] = myint( invoke( "$KAPPA_DIR/configecho name={0}.zero_freeze config={1} "
                                        "defaults=$SMURF_DIR/smurf_makemap.def "
                                        "select=\"\'450=0,850=1\'\"".format(model,config)))
 
 #  Similarly, we need to record com.freeze_flags.
-   com_freeze_flags = int( invoke( "$KAPPA_DIR/configecho name=com.freeze_flags config={0} "
+   com_freeze_flags = myint( invoke( "$KAPPA_DIR/configecho name=com.freeze_flags config={0} "
                                    "defaults=$SMURF_DIR/smurf_makemap.def "
                                    "select=\"\'450=0,850=1\'\"".format(config)))
 
@@ -489,17 +495,17 @@ try:
                                "name=flt.filt_edgelow_last config={0} "
                                "defaults=$SMURF_DIR/smurf_makemap.def "
                                "select=\"\'450=0,850=1\'\" defval=-1.0".format(config)))
-   flt_whiten_last = int( invoke( "$KAPPA_DIR/configecho "
+   flt_whiten_last = myint( invoke( "$KAPPA_DIR/configecho "
                                "name=flt.whiten_last config={0} "
                                "defaults=$SMURF_DIR/smurf_makemap.def "
                                "select=\"\'450=0,850=1\'\" defval=-1".format(config)))
-   com_perarray_last = int( invoke( "$KAPPA_DIR/configecho "
+   com_perarray_last = myint( invoke( "$KAPPA_DIR/configecho "
                                "name=com.perarray_last config={0} "
                                "defaults=$SMURF_DIR/smurf_makemap.def "
                                "select=\"\'450=0,850=1\'\" defval=-1".format(config)))
 
 #  Get the number of iterations for which no AST model should be used.
-   ast_skip = int( invoke( "$KAPPA_DIR/configecho name=ast.skip config={0} "
+   ast_skip = myint( invoke( "$KAPPA_DIR/configecho name=ast.skip config={0} "
                            "defaults=$SMURF_DIR/smurf_makemap.def "
                            "select=\"\'450=0,850=1\'\"".format(config)))
    if ast_skip < 0 :
