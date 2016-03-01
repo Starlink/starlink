@@ -210,7 +210,7 @@ elist = []
 qlist = []
 ulist = []
 utlist = []
-obslist = []
+obsnumlist = []
 
 # The mean total intensity within the aperture.
 ival = 0
@@ -501,7 +501,7 @@ try:
 
 #  Append the UT and obs number to the corresponding lists.
       utlist.append( float( get_fits_header( qmap, "UTDATE" ) ) )
-      obslist.append( float( get_fits_header( qmap, "OBSNUM" ) ) )
+      obsnumlist.append( float( get_fits_header( qmap, "OBSNUM" ) ) )
 
 #  If we are fitting the peak values, use beamfit to fit a beam to the
 #  polarised intensity source and then get the peak polarised intensity value.
@@ -614,8 +614,8 @@ try:
             else:
                rej = 1
             (qfp,ufp) = model2( elist0[i], res.x )
-            fd.write("{0} {1} {2} {3} {4} {5} {6}\n".format(utlist[i],
-                      obslist[i], elist0[i], qlist0[i], ulist0[i], qfp,
+            fd.write("{0} {1} {2} {3} {4} {5} {6} {7}\n".format(utlist[i],
+                      obsnumlist[i], elist0[i], qlist0[i], ulist0[i], qfp,
                       ufp, rej ))
          fd.close()
          msg_out("\nTable written to file '{0}'".format(table))
@@ -627,7 +627,7 @@ try:
          fd.write("# ut obs el q u qfit ufit rej\n")
          for i in range(len(elist0)):
             fd.write("{0} {1} {2} {3} {4} {5} {6}\n".format(utlist[i],
-                      obslist[i], elist0[i], qlist0[i], ulist0[i], "null",
+                      obsnumlist[i], elist0[i], qlist0[i], ulist0[i], "null",
                       "null", 0 ))
          fd.close()
          msg_out("\nTable written to file '{0}'".format(table))
