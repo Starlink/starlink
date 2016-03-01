@@ -207,10 +207,12 @@ restart = None
 
 #  Initialise empty lists to hold the elevation, Q and U for each observation.
 elist = []
+alist = []
 qlist = []
 ulist = []
 utlist = []
 obsnumlist = []
+wvmlist = []
 
 # The mean total intensity within the aperture.
 ival = 0
@@ -426,7 +428,10 @@ try:
 
 #  Create an NDG object describing all NDFs containsing raw data for the
 #  current observations.
-      raw = NDG( "{0}/s8\?/{1}/\*".format(sc2,obs) )
+      try:
+         raw = NDG( "{0}/s8\?/{1}/\*".format(sc2,obs) )
+      except starutil.StarUtilError:
+         raw = None
 
 #  Create Q and U time streams from the raw analysed intensity time
 #  streams. These Q and U values use the focal plane Y axis as the reference
@@ -439,6 +444,8 @@ try:
          obsdir = "{0}/{1}".format( NDG.tempdir, obs )
 
       if not os.path.isdir(obsdir):
+         if not raw:
+            raise UsageError( "Cannot find raw SCUBA-2 data.")
          os.makedirs(obsdir)
          invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config=def outq={1}/\*_QT "
                 "outu={1}/\*_UT fix=yes north=!".format( raw, obsdir ) )
@@ -499,6 +506,18 @@ try:
       el = 0.5*( el1 + el2 )
       elist.append( el )
 
+#  Get the azimuth at the middle of the observation.
+      az1 = float( get_fits_header( qmap, "AZSTART" ) )
+      az2 = float( get_fits_header( qmap, "AZEND" ) )
+      az = 0.5*( az1 + az2 )
+      alist.append( az )
+
+#  Get the WVM tau at the middle of the observation.
+      w1 = float( get_fits_header( qmap, "WVMTAUST" ) )
+      w2 = float( get_fits_header( qmap, "WVMTAUEN" ) )
+      w = 0.5*( w1 + w2 )
+      wvmlist.append( w )
+
 #  Append the UT and obs number to the corresponding lists.
       utlist.append( float( get_fits_header( qmap, "UTDATE" ) ) )
       obsnumlist.append( float( get_fits_header( qmap, "OBSNUM" ) ) )
@@ -533,6 +552,8 @@ try:
 #  size as the Q an U maps.
    junk = NDG(1)
    invoke("$KAPPA_DIR/ndfcopy in={0} trim=yes out={1}".format(iref,junk) )
+   invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=skyrefis "
+          "newval=origin".format(junk) )
    invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(junk) )
    invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(junk) )
    if pixsize:
@@ -607,28 +628,35 @@ try:
          fd.write("# Q RMS = {0} pW  U RMS = {1} pW\n".format(qrms,urms))
          fd.write("# Qn RMS = {0}   Un RMS = {1} \n".format(qrms/ival,urms/ival))
          fd.write("#\n")
-         fd.write("# ut obs el q u qfit ufit rej\n")
+         fd.write("# ut obs az el q u qfit ufit tau tran rej\n")
          for i in range(len(elist0)):
-            if elist0[i] in elist and qlist0[i] in qlist and ulist0[i] in ulist:
+            el = elist0[i]
+            if el in elist and qlist0[i] in qlist and ulist0[i] in ulist:
                rej = 0
             else:
                rej = 1
             (qfp,ufp) = model2( elist0[i], res.x )
-            fd.write("{0} {1} {2} {3} {4} {5} {6} {7}\n".format(utlist[i],
-                      obsnumlist[i], elist0[i], qlist0[i], ulist0[i], qfp,
-                      ufp, rej ))
+
+            tau = wvmlist[i]
+            tran = math.exp(-4.6*(tau-0.00435)/math.sin(math.radians(el)))
+
+            fd.write("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}\n".format(utlist[i],
+                      obsnumlist[i], alist[i], el, qlist0[i], ulist0[i], qfp,
+                      ufp, tau, tran, rej ))
          fd.close()
          msg_out("\nTable written to file '{0}'".format(table))
 
    else:
       msg_out( "Skipping fit because scipy is not available." )
       if table:
-         fd = open( table, "w" )
-         fd.write("# ut obs el q u qfit ufit rej\n")
+         fd.write("# ut obs az el q u qfit ufit tau tran rej\n")
          for i in range(len(elist0)):
-            fd.write("{0} {1} {2} {3} {4} {5} {6}\n".format(utlist[i],
-                      obsnumlist[i], elist0[i], qlist0[i], ulist0[i], "null",
-                      "null", 0 ))
+            el = elist0[i]
+            tau = wvmlist[i]
+            tran = math.exp(-4.6*(tau-0.00435)/math.sin(math.radians(el)))
+            fd.write("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}\n".format(utlist[i],
+                      obsnumlist[i], alist[i], el, qlist0[i], ulist0[i], "null",
+                      "null", tau, tran, 0 ))
          fd.close()
          msg_out("\nTable written to file '{0}'".format(table))
 
