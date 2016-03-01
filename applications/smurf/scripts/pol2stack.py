@@ -75,6 +75,9 @@
 *     INU = Literal (Read)
 *        A group of input U maps. Only used if a null value is supplied for
 *        parameter IN.
+*     JY = _LOGICAL (Read)
+*        If TRUE, the output catalogue, and the output Q, U and I maps,
+*        will be in units of Jy. Otherwise they will be in units of pW. [False]
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -144,6 +147,8 @@
 *        Fix bug in regexp that filters out the Q, U and I NDF names.
 *     12-JAN-2016 (DSB):
 *        Add parameters INQ, INU and INI.
+*     29-FEB-2016 (DSB):
+*        Add parameter JY.
 
 *-
 '''
@@ -208,6 +213,9 @@ try:
    params.append(starutil.ParNDG("IN", "The input container files holding Q, U and I images",
                                  None,noprompt=True))
 
+   params.append(starutil.Par0L("Jy", "Should units be converted from pW to Jy?",
+                 False, noprompt=True))
+
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
    parsys = ParSys( params )
@@ -249,6 +257,22 @@ try:
 #  See statistical debiasing is to be performed.
    debias = parsys["DEBIAS"].value
 
+#  See if we should convert pW to Jy.
+   jy = parsys["JY"].value
+
+#  Determine the waveband and get the corresponding FCF values with and
+#  without POL2 in the beam.
+   filter = int( float( starutil.get_fits_header( qin[0], "FILTER", True )))
+   if filter == 450:
+      fcf1 = 962
+      fcf2 = 491
+   elif filter == 850:
+      fcf1 = 725
+      fcf2 = 537
+   else:
+      raise starutil.InvalidParameterError("Invalid FILTER header value "
+             "'{0} found in {1}.".format( filter, qin[0] ) )
+
 #  Remove any spectral axes
    qtrim = NDG(qin)
    invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(qin,qtrim) )
@@ -256,7 +280,6 @@ try:
    invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(uin,utrim) )
    itrim = NDG(qin)
    invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(iin,itrim) )
-
 
 #  Rotate them to use the same polarimetric reference direction.
    qrot = NDG(qtrim)
@@ -291,6 +314,30 @@ try:
    invoke( "$KAPPA_DIR/setbound ndf={0} like={1}".format(qmos,sum) )
    invoke( "$KAPPA_DIR/setbound ndf={0} like={1}".format(umos,sum) )
    invoke( "$KAPPA_DIR/setbound ndf={0} like={1}".format(imos,sum) )
+
+#  If output PI and I values are in Jy, convert the Q, U and I maps to Jy.
+   if jy:
+      temp = NDG(1)
+      invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(qmos,fcf1,temp ))
+      invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy".format(temp ))
+      qmos = temp
+
+      temp = NDG(1)
+      invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(umos,fcf1,temp ))
+      invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy".format(temp ))
+      umos = temp
+
+      temp = NDG(1)
+      invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(imos,fcf2,temp ))
+      invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy".format(temp ))
+      imos = temp
+
+#  If output PI values are in pW, scale the I map to take account of the
+#  difference in FCF with and without POL2 in the beam.
+   else:
+      temp = NDG(1)
+      invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format( imos, fcf2/fcf1, temp ))
+      imos = temp
 
 #  If required, save the Q, U and I images.
    if qui != None:
