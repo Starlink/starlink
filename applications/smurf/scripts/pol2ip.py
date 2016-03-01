@@ -209,6 +209,8 @@ restart = None
 elist = []
 qlist = []
 ulist = []
+utlist = []
+obslist = []
 
 # The mean total intensity within the aperture.
 ival = 0
@@ -229,9 +231,12 @@ def cleanup():
 #  Returns the normalised Q and U representing the IP at a given
 #  elevation, assuming given model parameter values.
 def model( i, x ):
-   global qlist, ulist, elist
+   global elist
+   return model2( elist[i], x )
+
+def model2( el, x ):
    (a,b,c) = x
-   elval = radians( elist[i] )
+   elval = radians( el )
    pi = a + b*elval + c*elval*elval
    qfp = ival*pi*cos( -2*elval )
    ufp = ival*pi*sin( -2*elval )
@@ -494,6 +499,10 @@ try:
       el = 0.5*( el1 + el2 )
       elist.append( el )
 
+#  Append the UT and obs number to the corresponding lists.
+      utlist.append( float( get_fits_header( qmap, "UTDATE" ) ) )
+      obslist.append( float( get_fits_header( qmap, "OBSNUM" ) ) )
+
 #  If we are fitting the peak values, use beamfit to fit a beam to the
 #  polarised intensity source and then get the peak polarised intensity value.
       if diam <= 0.0:
@@ -551,6 +560,11 @@ try:
       invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(imap,diam,xcen,ycen))
       ival = get_task_par( "mean", "aperadd" )
 
+#  Record original lists before we reject any points.
+      qlist0 = qlist
+      ulist0 = ulist
+      elist0 = elist
+
 #  We now do the fit. Loop doing succesive fits, rejecting outliers on
 #  each pass (i.e. sigma clipping).
    if dofit:
@@ -593,11 +607,16 @@ try:
          fd.write("# Q RMS = {0} pW  U RMS = {1} pW\n".format(qrms,urms))
          fd.write("# Qn RMS = {0}   Un RMS = {1} \n".format(qrms/ival,urms/ival))
          fd.write("#\n")
-         fd.write("# el q u qfit ufit\n")
-         for i in range(len(elist)):
-            (qfp,ufp) = model( i, res.x )
-            fd.write("{0} {1} {2} {3} {4}\n".format(elist[i], qlist[i], ulist[i],
-                                                    qfp, ufp ))
+         fd.write("# ut obs el q u qfit ufit rej\n")
+         for i in range(len(elist0)):
+            if elist0[i] in elist and qlist0[i] in qlist and ulist0[i] in ulist:
+               rej = 0
+            else:
+               rej = 1
+            (qfp,ufp) = model2( elist0[i], res.x )
+            fd.write("{0} {1} {2} {3} {4} {5} {6}\n".format(utlist[i],
+                      obslist[i], elist0[i], qlist0[i], ulist0[i], qfp,
+                      ufp, rej ))
          fd.close()
          msg_out("\nTable written to file '{0}'".format(table))
 
@@ -605,10 +624,11 @@ try:
       msg_out( "Skipping fit because scipy is not available." )
       if table:
          fd = open( table, "w" )
-
-         fd.write("# el q u qfit ufit\n")
-         for i in range(len(elist)):
-            fd.write("{0} {1} {2} null null\n".format(elist[i], qlist[i], ulist[i] ))
+         fd.write("# ut obs el q u qfit ufit rej\n")
+         for i in range(len(elist0)):
+            fd.write("{0} {1} {2} {3} {4} {5} {6}\n".format(utlist[i],
+                      obslist[i], elist0[i], qlist0[i], ulist0[i], "null",
+                      "null", 0 ))
          fd.close()
          msg_out("\nTable written to file '{0}'".format(table))
 
