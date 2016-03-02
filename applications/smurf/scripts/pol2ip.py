@@ -137,8 +137,8 @@
 *        directory used to store all other intermediate files. [!]
 *     TABLE = LITERAL (Read)
 *        The path to a new text file to create in which to place a table
-*        holding columns of elevation, Q, U, Qfit and Ufit, in TOPCAT
-*        ASCII format. [!]
+*        holding columns of elevation, Q, U, Qfit and Ufit (and various
+*        other useful things), in TOPCAT ASCII format. [!]
 
 *  Copyright:
 *     Copyright (C) 2015 East Asian Observatory
@@ -195,6 +195,7 @@ from math import cos as cos
 from math import sin as sin
 from math import radians as radians
 from math import degrees as degrees
+from math import exp as exp
 from math import sqrt as sqrt
 from math import fabs as fabs
 from math import atan2 as atan2
@@ -423,6 +424,7 @@ try:
             newpixsize = True
 
 #  Loop round each observation.
+   actpixsize0 = None
    for obs in obslist:
       msg_out( "Doing observation {0}...".format(obs) )
 
@@ -463,6 +465,15 @@ try:
          qmap = NDG( mapfile, True )
          msg_out("Re-using pre-calculated Q map for {0}.".format(obs))
 
+      invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(qmap) )
+      actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
+      if actpixsize0 == None:
+         actpixsize0 = actpixsize
+      elif actpixsize != actpixsize0:
+         raise UsageError( "{0} had pixel size {1} - was expecting {2}".
+                           format(qmap,actpixsize,actpixsize0))
+
+
       mapfile = "{0}/umap.sdf".format(obsdir)
       if not os.path.exists( mapfile ) or newpixsize:
          uts = NDG( "{0}/*_UT".format( obsdir ) )
@@ -471,6 +482,12 @@ try:
       else:
          umap = NDG( mapfile, True )
          msg_out("Re-using pre-calculated U map for {0}.".format(obs))
+
+      invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(umap) )
+      actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
+      if actpixsize != actpixsize0:
+         raise UsageError( "{0} had pixel size {1} - was expecting {2}".
+                           format(qmap,actpixsize,actpixsize0))
 
 #  Ensure the maps use offset coordinates so that we can assume the
 #  source is centred at (0,0). This should already be the case for
@@ -519,8 +536,8 @@ try:
       wvmlist.append( w )
 
 #  Append the UT and obs number to the corresponding lists.
-      utlist.append( float( get_fits_header( qmap, "UTDATE" ) ) )
-      obsnumlist.append( float( get_fits_header( qmap, "OBSNUM" ) ) )
+      utlist.append( int( float( get_fits_header( qmap, "UTDATE" ) ) ) )
+      obsnumlist.append( int( float( get_fits_header( qmap, "OBSNUM" ) ) ) )
 
 #  If we are fitting the peak values, use beamfit to fit a beam to the
 #  polarised intensity source and then get the peak polarised intensity value.
@@ -531,8 +548,9 @@ try:
 
 #  Get the peak Q and U values assuming that the IP is parallel to
 #  elevation, and append them to the end of the list if Q and U values.
-         qlist.append( pipeak*cos(-2*el) )
-         ulist.append( pipeak*sin(-2*el) )
+         elval = -2*radians(el)
+         qlist.append( pipeak*cos(elval) )
+         ulist.append( pipeak*sin(elval) )
 
 #  Otherwise, get the mean Q value in a circle of diameter given by parameter
 #  DIAM centred on the source.
@@ -562,6 +580,11 @@ try:
              format(junk,pixsize,imap) )
    else:
       imap = junk
+   invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(imap) )
+   actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
+   if actpixsize != actpixsize0:
+      raise UsageError( "IREF map had pixel size {0} - was expecting {1}".
+                        format(actpixsize,actpixsize0))
 
 #  Find the position of the source centre in sky offsets within the total intensity map.
    invoke("$KAPPA_DIR/centroid ndf={0} mode=int init=\"'0,0'\"".format(imap) )
@@ -582,9 +605,9 @@ try:
       ival = get_task_par( "mean", "aperadd" )
 
 #  Record original lists before we reject any points.
-      qlist0 = qlist
-      ulist0 = ulist
-      elist0 = elist
+   qlist0 = qlist
+   ulist0 = ulist
+   elist0 = elist
 
 #  We now do the fit. Loop doing succesive fits, rejecting outliers on
 #  each pass (i.e. sigma clipping).
@@ -619,46 +642,56 @@ try:
       msg_out("Q RMS = {0} pW  U RMS = {1} pW\n".format(qrms,urms))
       msg_out("Qn RMS = {0}   Un RMS = {1} \n".format(qrms/ival,urms/ival))
 
-#  Write a table showing the Q and U values and the fits.
-      if table:
-         fd = open( table, "w" )
+   else:
+      msg_out( "Skipping fit because scipy is not available." )
 
-         fd.write("#\n")
+#  Write a table showing the Q and U values and the fits.
+   if table:
+      fd = open( table, "w" )
+      fd.write("#\n")
+      fd.write("# DIAM = {0}\n".format(diam))
+      fd.write("# IREF = {0}\n".format(iref))
+      fd.write("# PIXSIZE = {0}\n".format(actpixsize0))
+      fd.write("# Total intensity value = {0} pW\n".format(ival))
+      fd.write("#\n")
+      if dofit:
          fd.write("# A={0} B={1} C={2}\n".format(a,b,c))
          fd.write("# Q RMS = {0} pW  U RMS = {1} pW\n".format(qrms,urms))
          fd.write("# Qn RMS = {0}   Un RMS = {1} \n".format(qrms/ival,urms/ival))
          fd.write("#\n")
-         fd.write("# ut obs az el q u qfit ufit tau tran rej\n")
-         for i in range(len(elist0)):
-            el = elist0[i]
+
+      fd.write("# ut obs az el q u pi ang p qfit ufit pifit pfit tau tran rej\n")
+      for i in range(len(elist0)):
+         el = elist0[i]
+         if dofit:
             if el in elist and qlist0[i] in qlist and ulist0[i] in ulist:
                rej = 0
             else:
                rej = 1
             (qfp,ufp) = model2( elist0[i], res.x )
+            pifit = sqrt( qfp*qfp + ufp*ufp )
+            pfit = pifit/ival
+         else:
+            rej = 0
+            qfp = "null"
+            ufp = "null"
+            pifit = "null"
+            pfit = "null"
 
-            tau = wvmlist[i]
-            tran = math.exp(-4.6*(tau-0.00435)/math.sin(math.radians(el)))
+         tau = wvmlist[i]
+         tran = exp(-4.6*(tau-0.00435)/sin(radians(el)))
+         q = qlist0[i]
+         u = ulist0[i]
+         pi = sqrt( q*q + u*u )
+         ang = degrees( atan2( u, q ) )
+         p = pi/ival
 
-            fd.write("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}\n".format(utlist[i],
-                      obsnumlist[i], alist[i], el, qlist0[i], ulist0[i], qfp,
-                      ufp, tau, tran, rej ))
-         fd.close()
-         msg_out("\nTable written to file '{0}'".format(table))
-
-   else:
-      msg_out( "Skipping fit because scipy is not available." )
-      if table:
-         fd.write("# ut obs az el q u qfit ufit tau tran rej\n")
-         for i in range(len(elist0)):
-            el = elist0[i]
-            tau = wvmlist[i]
-            tran = math.exp(-4.6*(tau-0.00435)/math.sin(math.radians(el)))
-            fd.write("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}\n".format(utlist[i],
-                      obsnumlist[i], alist[i], el, qlist0[i], ulist0[i], "null",
-                      "null", tau, tran, 0 ))
-         fd.close()
-         msg_out("\nTable written to file '{0}'".format(table))
+         fd.write("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} "
+                  "{13} {14} {15}\n".format(utlist[i], obsnumlist[i],
+                  alist[i], el, q, u, pi, ang, p, qfp, ufp, pifit, pfit,
+                  tau, tran, rej ))
+      fd.close()
+      msg_out("\nTable written to file '{0}'".format(table))
 
 #  Save the parameter values used in this script in case we want to
 #  re-use the intermediate files in a later run.
