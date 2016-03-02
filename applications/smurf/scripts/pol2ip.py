@@ -542,15 +542,26 @@ try:
 #  If we are fitting the peak values, use beamfit to fit a beam to the
 #  polarised intensity source and then get the peak polarised intensity value.
       if diam <= 0.0:
-         invoke("$KAPPA_DIR/beamfit ndf={0}'(0~30,0~30)' pos=\"'{1},{2}'\" "
-                "gauss=no mode=int ".format( pimap,xcen,ycen) )
-         pipeak = get_task_par( "amp(1)", "beamfit" )
+         try:
+            invoke("$KAPPA_DIR/beamfit ndf={0}'(0~30,0~30)' pos=\"'{1},{2}'\" "
+                   "gauss=no mode=int ".format( pimap,xcen,ycen) )
+            pipeak = get_task_par( "amp(1)", "beamfit" )
 
 #  Get the peak Q and U values assuming that the IP is parallel to
 #  elevation, and append them to the end of the list if Q and U values.
-         elval = -2*radians(el)
-         qlist.append( pipeak*cos(elval) )
-         ulist.append( pipeak*sin(elval) )
+            elval = -2*radians(el)
+            qlist.append( pipeak*cos(elval) )
+            ulist.append( pipeak*sin(elval) )
+
+#  If beamfit failed, we cannot store q and u values, so remove the
+#  corresponding item from the other arrays (i.e the last element of each
+#  array).
+         except starutil.StarUtilError:
+            del obsnumlist[-1]
+            del wvmlist[-1]
+            del alist[-1]
+            del elist[-1]
+            del utlist[-1]
 
 #  Otherwise, get the mean Q value in a circle of diameter given by parameter
 #  DIAM centred on the source.
