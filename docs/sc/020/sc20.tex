@@ -611,11 +611,11 @@ in the spectrum in kelvin.
 
 
 \begin{tip}
-  Both $T_{\textnormal{sys}}$ and $T_{\textnormal{rec}})$ are stored
-  in the raw data files.  This information is stored in the
-  .MORE.ACSIS.TSYS and .MORE.ACSIS.TRX extensions respectively, and
-  can be viewed using \HDSTRACE\ (see \cref{Section}{sec:fitslist}{How
-    can I view the metadata?}).
+Both $T_{\textnormal{sys}}$ and $T_{\textnormal{rec}})$ are stored in
+the raw data files. This information is stored in the .MORE.ACSIS.TSYS
+and .MORE.ACSIS.TRX extensions respectively, and can be viewed using
+\HDSTRACE\ (see \cref{Section}{sec:fitslist}{How can I view the
+metadata?}).
 \end{tip}
 
 
@@ -1486,8 +1486,7 @@ REDUCE\_SCIENCE\_NARROWLINE.
 
 \begin{terminalv}
 % oracdr -files list.txt -loop file -batch -log xf -calib qaparams=myqa.ini \
-  bad_receptors=index -recpars mypar.ini -nodisplay
-REDUCE_SCIENCE_NARROWLINE
+  bad_receptors=index -recpars mypar.ini -nodisplay REDUCE_SCIENCE_NARROWLINE
 \end{terminalv}
 \end{enumerate}
 
