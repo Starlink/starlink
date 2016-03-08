@@ -19,12 +19,28 @@
 *     then converted into separate Q and U maps using SMURF:MAKEMAP.
 *
 *     Correction for instrumental polarisation is made only if a value
-*     is supplied for parameter IREF.
+*     is supplied for parameter IPREF.
 
 *  Usage:
-*     pol2scan in q u [cat] [iref] [config] [pixsize] [qudir] [retain] [msg_filter] [ilevel] [glevel] [logfile]
+*     pol2scan in q u [cat] [ipref] [config] [pixsize] [qudir] [retain] [msg_filter] [ilevel] [glevel] [logfile]
 
 *  Parameters:
+*     ALIGN = LOGICAL (Read)
+*        If TRUE, and if a non-null value is supplied for parameter REF,
+*        then corrections to the telescope pointing are determined and
+*        applied when creating the Q and U maps. To determine this pointing
+*        correction, a total intensity map is created from the supplied
+*        POL2 time-stream data using the supplied reference map (see
+*        parameter REF) to specify the pixel grid. Due to pointing errors,
+*        this total intensity map may not be aligned accurately with the
+*        reference map (errors of up to 8 arc-seconds have been seen). The
+*        positional shift required to minimise the residuals between the
+*        shifted total intensity map and the reference map is found, and
+*        used to correct the pointing when creating the Q and U map.
+*        Note, this option slows down the operation of pol2scan as it
+*        requires an extra invocation of smurf:makemap to create the
+*        total intensity map (which is not required if ALIGN is FALSE).
+*        [TRUE]
 *     CAT = LITERAL (Read)
 *        The output FITS vector catalogue. No catalogue is created if
 *        null (!) is supplied. [!]
@@ -93,16 +109,16 @@
 *        A group of POL-2 time series NDFs. Only used if a null (!) value is
 *        supplied for INQU.
 *     INQU = NDF (Read)
-*        A group of NDFs containing Q and U time-series calculated by a
-*        previous run of SMURF:CALCQU (the LSQFIT parameter must be set
+*        A group of NDFs containing Q, U and (optionally) I time-series calculated
+*        by a previous run of SMURF:CALCQU (the LSQFIT parameter must be set
 *        to TRUE when running CALCQU). If not supplied, the IN parameter
 *        is used to get input NDFs holding POL-2 time series data. [!]
-*     IREF = NDF (Read)
+*     IPREF = NDF (Read)
 *        A 2D NDF holding a map of total intensity within the sky area
 *        covered by the input POL2 data, in units of pW. If supplied,
 *        the returned Q and U maps will be corrected for instrumental
-*        polarisation, based on the total intensity values in IREF.
-*        The supplied IREF map need not be pre-aligned with the output
+*        polarisation, based on the total intensity values in IPREF.
+*        The supplied IPREF map need not be pre-aligned with the output
 *        Q and U maps - it will be resampled as necessary using a
 *        transformation derived form its WCS information. [!]
 *     LOGFILE = LITERAL (Read)
@@ -140,12 +156,11 @@
 *        same temporary direcory as all the other intermediate files. [!]
 *     U = NDF (Read)
 *        The output NDF in which to return the U intensity map.
-*     QREF = NDF (Read)
-*        An optional map defining the pixel grid for the output Q
-*        map. If both QREF and UREF are supplied, the polarimetric
-*        reference direction used by the Q and U maps will be rotated to
-*        match the reference direction in the supplied QREF and UREF
-*        maps. [!]
+*     REF = NDF (Read)
+*        An optional map defining the pixel grid for the output maps. If
+*        no value is specified for REF on the command line, it defaults
+*        to the value supplied for parameter IPREF. See also parameter
+*        ALIGN. []
 *     PI = NDF (Read)
 *        An output NDF in which to return the polarised intensity map.
 *        No polarised intensity map will be created if null (!) is
@@ -155,15 +170,9 @@
 *        created by this script be retained? If not, it will be deleted
 *        before the script exits. If retained, a message will be
 *        displayed at the end specifying the path to the directory. [FALSE]
-*     UREF = NDF (Read)
-*        An optional map defining the pixel grid for the output U
-*        map. If both QREF and UREF are supplied, the polarimetric
-*        reference direction used by the Q and U maps will be rotated to
-*        match the reference direction in the supplied QREF and UREF
-*        maps. [!]
 
 *  Copyright:
-*     Copyright (C) 2015 East Asian Observatory.
+*     Copyright (C) 2015, 2016 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -200,8 +209,13 @@
 *     8-OCT-2015 (DSB):
 *        Only correct azel pointing error for data between 20150606 and
 *        20150930.
-*     26-NOV-2016 (DSB):
+*     26-NOV-2015 (DSB):
 *        Add parameters CAT, PI and DEBIAS.
+*     3-MAR-2016 (DSB):
+*        - Rename parameter IREF as IPREF.
+*        - Add parameters REF and ALIGN.
+*        - Remove parameters QREF and UREF.
+*
 '''
 
 import os
@@ -258,8 +272,8 @@ try:
    params.append(starutil.Par0S("CAT", "The output FITS vector catalogue",
                                  default=None, noprompt=True))
 
-   params.append(starutil.ParNDG("IREF", "The reference I map", default=None,
-                                 noprompt=True, minsize=0, maxsize=1 ))
+   params.append(starutil.ParNDG("IPREF", "Reference map defining IP correction",
+                                 default=None, noprompt=True, minsize=0, maxsize=1 ))
 
    params.append(starutil.Par0S("CONFIG", "Map-maker tuning parameters",
                                 "def", noprompt=True))
@@ -280,13 +294,13 @@ try:
                                  default=None, noprompt=True, exists=False,
                                  minsize=0, maxsize=1 ))
 
+   params.append(starutil.Par0L("ALIGN", "Determine pointing corrections?", True,
+                                 noprompt=True))
+
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
 
-   params.append(starutil.ParNDG("QREF", "The reference Q map", default=None,
-                                 noprompt=True, minsize=0, maxsize=1 ))
-
-   params.append(starutil.ParNDG("UREF", "The reference U map", default=None,
+   params.append(starutil.ParNDG("REF", "Reference map defining the pixel grid", default=None,
                                  noprompt=True, minsize=0, maxsize=1 ))
 
    params.append(starutil.ParChoice( "NORTH", ("TRACKING","FK5","ICRS","AZEL",
@@ -326,6 +340,9 @@ try:
 #  See if statistical debiasing is to be performed.
    debias = parsys["DEBIAS"].value
 
+#  See if we should determine pointing corrections.
+   align = parsys["ALIGN"].value
+
 #  Now get the PI value to use.
    pimap = parsys["PI"].value
 
@@ -340,12 +357,17 @@ try:
 #  See if temp files are to be retained.
    retain = parsys["RETAIN"].value
 
-#  Get the I, Q and U reference maps
-   iref = parsys["IREF"].value
-   if not iref:
-      iref = "!"
-   qref = parsys["QREF"].value
-   uref = parsys["UREF"].value
+#  Get the reference maps
+   ipref = parsys["IPREF"].value
+   if not ipref:
+      ipref = "!"
+      parsys["REF"].default = None
+   else:
+      parsys["REF"].default = ipref
+
+   ref = parsys["REF"].value
+   if not ref:
+      ref = "!"
 
 #  If no Q and U values were supplied, create a set of Q and U time
 #  streams from the supplied analysed intensity time streams. Put them in
@@ -358,21 +380,24 @@ try:
       elif not os.path.exists(qudir):
          os.makedirs(qudir)
 
-      msg_out( "Calculating Q and U time streams for each bolometer...")
+      msg_out( "Calculating Q, U and I time streams for each bolometer...")
       invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config=def outq={1}/\*_QT "
-             "outu={1}/\*_UT fix=yes north={2}".format( indata, qudir, north ) )
+             "outu={1}/\*_UT outi={1}/\*_IT fix=yes north={2}".
+             format( indata, qudir, north ) )
 
 #  Get groups listing the time series files created by calcqu.
       qts = NDG( "{0}/*_QT".format( qudir ) )
       uts = NDG( "{0}/*_UT".format( qudir ) )
+      its = NDG( "{0}/*_IT".format( qudir ) )
 
-#  If pre-calculated Q and U values were supplied, identifiy the Q and U
+#  If pre-calculated Q and U values were supplied, identifiy the Q, U and I
 #  files.
    else:
-      msg_out( "Using pre-calculating Q and U values...")
+      msg_out( "Using pre-calculating Q, U and I values...")
 
       qndfs = []
       undfs = []
+      indfs = []
       for ndf in inqu:
          invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(ndf) )
          label = starutil.get_task_par( "LABEL", "ndftrace" )
@@ -380,14 +405,16 @@ try:
             qndfs.append( ndf )
          elif label == "U":
             undfs.append( ndf )
+         elif label == "I":
+            indfs.append( ndf )
          else:
             raise starutil.InvalidParameterError("Q/U time-series {0} has "
-                    "an unknown Label {1} - must be 'Q' or 'U'.".
+                    "an unknown Label {1} - must be 'Q', 'U' or 'I'.".
                     format(ndf,label))
 
       qts = NDG( qndfs )
       uts = NDG( undfs )
-
+      its = NDG( indfs )
 
 #  Create a config file to use with makemap.
    conf = os.path.join(NDG.tempdir,"conf")
@@ -416,16 +443,6 @@ try:
    fd.write("downsampscale=0\n")
    fd.close()
 
-#  If both QREF and UREF were supplied, we will be rotating the
-#  polarimetric reference direction. So store the orignal maps in
-#  intermediate NDFs rather than the final NDFs.
-   if qref and uref:
-      tqmap = NDG(1)
-      tumap = NDG(1)
-   else:
-      tqmap = qmap
-      tumap = umap
-
 #  AZ/EL pointing correction, for data between 20150606 and 20150930.
    ut = int(starutil.get_fits_header( qts[0], "UTDATE", True ))
    if ut >= 20150606 and ut <= 20150929:
@@ -439,30 +456,153 @@ try:
    else:
       pntfile = "!"
 
+#  If a reference map has been supplied, and we have some I time-stream
+#  files, we create an I map and determine any extra pointing corrections
+#  that are needed to bring the I map into alignment with the reference map.
+#  We can't apply two different pointing corrections. The user can supply
+#  ALIGN=NO to prevent this, since it can add significantly to the total
+#  run-time for pol2scan.
+   if ref != "!" and len(its) > 0 and pntfile == "!" and align:
+      msg_out( "Making a map from the I time series...")
+
+#  Create a config file to use when creating the I map. The I map needs an
+#  FLT model because  it is derived from the background level in the time
+#  stream data which can drift, rather then the modulation amplitude which
+#  is insensitive to drift. Also mask out edge regions more aggresively since
+#  we do not want spurious structures round the edges to upset the alignment
+#  process in kappa:align2d.
+      iconf = os.path.join(NDG.tempdir,"iconf")
+      fd = open(iconf,"w")
+      fd.write("^$STARLINK_DIR/share/smurf/dimmconfig_jsa_generic.lis\n")
+      fd.write("hitslimit=1\n")
+      fd.write("maptol=0.1\n")
+      fd.write("flagslow=0.01\n")
+      fd.write("downsampscale=0\n")
+      fd.write("noi.usevar=1\n")
+      fd.close()
+
+#  Create the I map.
+      imap = NDG( 1 )
+      invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3}".
+             format(its,iconf,imap,ref))
+
+#  See what translations (in pixels) are needed to align the imap with
+#  the reference map. The determination of the shift is more accurate if
+#  we first mask out background areas. Use the AST mask to define source
+#  pixels.
+      invoke("$KAPPA_DIR/showqual ndf={0}".format(imap))
+      if starutil.get_task_par( "QNAMES(1)", "showqual" ) == "AST":
+         bb = 1
+      elif starutil.get_task_par( "QNAMES(2)", "showqual" ) == "AST":
+         bb = 2
+      elif starutil.get_task_par( "QNAMES(3)", "showqual" ) == "AST":
+         bb = 4
+      else:
+         bb = 0
+
+      if bb == 0:
+         msg_out( "WARNING: The supplied makemap configuration does not "
+                  "include an AST mask, and so the source regions cannot "
+                  "be identified. Therefore the final Q and U maps cannot "
+                  "be corrected for pointing errors." )
+      else:
+         invoke("$KAPPA_DIR/setbb ndf={0} bb={1}".format(imap,bb))
+
+#  Find the pixel shift that aligns features in this masked, trimmed I map with
+#  corresponding features in the reference map.
+         invoke("$KAPPA_DIR/align2d ref={0} out=! in={1} form=3".format(ref,imap))
+         dx = float( starutil.get_task_par( "TR(1)", "align2d" ) )
+         dy = float( starutil.get_task_par( "TR(4)", "align2d" ) )
+
+#  If the shifts are suspiciously high, we do not believe them. In which
+#  case we cannot do pointing ocorrection when creating the Q and U maps.
+         if abs(dx) > 5 or abs(dy) > 5:
+            msg_out( "WARNING: The I map created from the POL2 data cannot be aligned "
+                     "with the supplied IP reference map. Therefore the final "
+                     "Q and U maps cannot be corrected for pointing errors." )
+
+#  Otherwise, convert the offset in pixels to (longitude,latitude) offsets
+#  in the sky system of the reference map, in arc-seconds....
+         else:
+
+#  Strip the wavelength axis off the total intensity map created above.
+            imap2d = NDG( 1 )
+            invoke("$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(imap,imap2d))
+
+#  Get the pixel coords at the centre of the total intensity map.
+            invoke("$KAPPA_DIR/ndftrace ndf={0}".format(imap2d))
+            lbndx = float( starutil.get_task_par( "LBOUND(1)", "ndftrace" ) )
+            lbndy = float( starutil.get_task_par( "LBOUND(2)", "ndftrace" ) )
+            ubndx = float( starutil.get_task_par( "UBOUND(1)", "ndftrace" ) )
+            ubndy = float( starutil.get_task_par( "UBOUND(2)", "ndftrace" ) )
+            cenx = 0.5*( lbndx + ubndx )
+            ceny = 0.5*( lbndy + ubndy )
+
+#  Convert to SKY coords, in radians. Use ATOOLS rather than pyast in
+#  order to avoid the need for people to install pyast. Also, ATOOLS
+#  integrates with NDFs more easily than pyast.
+            (cena,cenb) = invoke("$ATOOLS_DIR/asttran2 this={0} forward=yes "
+                                 "xin={1} yin={2}".format( imap2d,cenx,ceny)).split()
+            cena = float( cena )
+            cenb = float( cenb )
+
+#  Add on the pixel offsets, and convert to SKY coords, in radians.
+            offx = cenx + dx
+            offy = ceny + dy
+            (offa,offb) = invoke("$ATOOLS_DIR/asttran2 this={0} forward=yes "
+                                 "xin={1} yin={2}".format( imap2d,offx,offy)).split()
+            offa = float( offa )
+            offb = float( offb )
+
+#   Now find the arc-distance parallel to the longitude axis, between the central
+#   and offset positions, and convert from radians to arc-seconds.
+            dx = invoke("$ATOOLS_DIR/astdistance this={0}, point1=\[{1},{2}\] "
+                        "point2=\[{3},{4}\]".format(imap2d,cena,cenb,offa,cenb))
+            dx = 3600.0*math.degrees( float( dx ) )
+
+#  The value returned by astDistance is always positive. Adjust the sign
+#  of dx so that it goes the right way.
+            da = offa - cena
+            while da > math.pi:
+               da -= math.pi
+            while da < -math.pi:
+               da += math.pi
+            if da < 0.0:
+               dx = -dx
+
+#  Now find the arc-distance parallel to the latitude axis, between the central
+#  and offset positions, and convert from radians to arc-seconds.
+            dy = invoke("$ATOOLS_DIR/astdistance this={0}, point1=\[{1},{2}\] "
+                        "point2=\[{3},{4}\]".format(imap2d,cena,cenb,cena,offb))
+            dy = 3600.0*math.degrees( float( dy ) )
+
+#  The value returned by astDistance is always positive. Adjust the sign
+#  of dx so that it goes the right way.
+            db = offb - cenb
+            if db < 0.0:
+               dy = -dy
+
+#  Create the pointing correction file to use with subsequent makemap
+#  calls.
+#  "system=tracking" (usually FK5), and
+            msg_out( "Using pointing corrections of ({0},{1}) arc-seconds".format(dx,dy) )
+            pntfile = os.path.join(NDG.tempdir,"pointing")
+            fd = open(pntfile,"w")
+            fd.write("# system=tracking\n")
+            fd.write("# tai dlon dlat\n")
+            fd.write("54000 {0} {1}\n".format(dx,dy))
+            fd.write("56000 {0} {1}\n".format(dx,dy))
+            fd.close()
+
 #  Make a map from the Q time series.
    msg_out( "Making a map from the Q time series...")
-   if qref:
-      ref = qref
-   else:
-      ref = "!"
    invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
-          "ipref={5} {6}".format(qts,conf,tqmap,ref,pntfile,iref,pixsize))
+          "ipref={5} {6}".format(qts,conf,qmap,ref,pntfile,ipref,pixsize))
 
 #  Make a map from the U time series.
    msg_out( "Making a map from the U time series..." )
-   if uref:
-      ref = uref
-   else:
-      ref = "!"
    invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
-          "ipref={5} {6}".format(uts,conf,tumap,ref,pntfile,iref,pixsize))
-
-#  Rotate the polarimetric reference direction if required.
-   if qref and uref:
-      msg_out( "Rotating the polarimetric reference direction to "
-               "match {0}...".format(qref) )
-      invoke("$POLPACK_DIR/polrotref qin={0} uin={1} qout={2} uout={3} "
-             "like={4}".format(tqmap,tumap,qmap,umap,qref) )
+          "ipref={5} {6}".format(uts,conf,umap,ref,pntfile,ipref,pixsize))
 
 #  Create the polarised intensity map if required.
    if pimap:
@@ -482,19 +622,19 @@ try:
 #  is just equal to the polarised intensity image. This is needed because
 #  polpack:polvec uses the I value to normalise the Q and U values prior to
 #  calculating the polarised intensity and angle.
-      if iref == "!":
+      if ipref == "!":
          if pimap:
-            iref = pimap
+            ipref = pimap
          else:
-            iref = NDG(1)
+            ipref = NDG(1)
             msg_out( "Generating an artificial total intensity image...")
             if debias:
                invoke( "$KAPPA_DIR/maths exp=\"'sign(sqrt(abs(fa)),fa)'\" "
                        "fa=\"'ia**2+ib**2-(va+vb)/2'\" ia={0} ib={1} out={2}".
-                       format(qmap,umap,iref))
+                       format(qmap,umap,ipref))
             else:
                invoke( "$KAPPA_DIR/maths exp=\"'sqrt(ia**2+ib**2)'\" ia={0} "
-                       "ib={1} out={2}".format(qmap,umap,iref))
+                       "ib={1} out={2}".format(qmap,umap,ipref))
 
 #  Ensure the Q U and I images all have the same bounds, equal to the
 #  overlap region between them. To get the overlap region, use MATHS to
@@ -502,13 +642,13 @@ try:
 #  which match the overlap area.
       tmp = NDG( 1 )
       invoke( "$KAPPA_DIR/maths exp=\"'ia+ib+ic'\" ia={0} ib={1} ic={2} out={3}".
-              format(qmap,umap,iref,tmp) )
+              format(qmap,umap,ipref,tmp) )
       qtrim = NDG( 1 )
       invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(qmap,tmp,qtrim) )
       utrim = NDG( 1 )
       invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(umap,tmp,utrim) )
       itrim = NDG( 1 )
-      invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(iref,tmp,itrim) )
+      invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(ipref,tmp,itrim) )
 
 #  The polarisation vectors are calculated by the polpack:polvec command,
 #  which requires the input Stokes vectors in the form of a 3D cube. Paste
