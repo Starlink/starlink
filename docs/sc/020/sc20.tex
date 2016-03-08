@@ -8,7 +8,7 @@
 \stardoccopyright   {Copyright \copyright\ 2015-2016 Science and Technology Facilities Council}
 \stardocnumber      {20.1}
 \stardocauthors     {H.\ S.\ Thomas \& Malcolm J.\ Currie}
-\stardocdate        {2016 January 20}
+\stardocdate        {2016 March 7}
 \stardoctitle       {The Heterodyne Data Reduction Cookbook}
 \stardocversion     {1.1}
 \stardocmanual      {\ }
@@ -729,6 +729,7 @@ ones. Visit the JCMT web pages for a full list.
  && 0.488 MHz (RxA/RxW)\\
 \hline
 \end{tabular}
+\label{fig:backend}
 \end{center}
 \end{table}
 There are a number of special configurations available with ACSIS.
@@ -1225,6 +1226,94 @@ Notice the two values given for the \param{PIXEL\_SCALE} option. This
 means that two maps will be produced, one at each of the specified
 pixel scales. See Appendix \ref{app:params} for a full list of recipe
 parameters.
+
+The \file{.ini} file can contain an arbitrary number of \param{[]}
+constructs for different recipes, qualified by object name or
+\oracdr\ internal headers.
+
+While the use of recipe parameters is optional, once you have some
+experience with the pipeline you are encouraged to tailor the recipe
+parameters for your reductions to get the best out of the recipe and
+your data.
+
+\subsection{Setting recipe parameters by object name}
+\label{sec:recpars_object}
+
+You can further select the recipe parameters by object name, as given
+by the OBJECT FITS header converted to uppercase with spaces removed.
+Here are some examples.
+
+\vspace{0.2cm}
+\begin{terminalv}
+[REDUCE_SCIENCE_BROADLINE:NGC253]
+REBIN = 10.0,20.0,30.0
+PIXEL_SCALE = 15.0
+\end{terminalv}
+
+This would apply the two recipe parameters to the NGC~253 target
+when processed by REDUCE\_SCIENCE\_BROADLINE, while
+
+\vspace{0.2cm}
+\begin{terminalv}
+[REDUCE_SCIENCE_BROADLINE:ARP*]
+REBIN = 10.0,20.0,30.0
+PIXEL_SCALE = 15.0
+\end{terminalv}
+
+would apply the same parameter values for any beginning with the Arp
+designation.
+
+\subsection{Setting recipe parameters by ORAC-DR internal header}
+\label{sec:recpars_orac}
+
+The pipeline translates a selection of metadata from the FITS headers
+into \oracdr\ internal headers.  You can choose different sets of recipe
+parameters from the internal headers.  The available headers can be
+inspected with \task{translatehdr} supplied with one of your raw data
+files.
+
+\vspace{0.2cm}
+\begin{terminalv}
+% $STARLINK_DIR/Perl/bin/translatehdr a20151213_00067_01_0001.sdf
+\end{terminalv}
+
+Here is an example of how to select by internal header.
+
+\vspace{0.2cm}
+\begin{terminalv}
+[REDUCE_SCIENCE_NARROWLINE#SAMPLE_MODE=GRID]
+LV_IMAGE = 1
+LV_AXIS = skylon
+\end{terminalv}
+
+would apply these parameters only to data whose sample mode was grid.
+
+You can select by an arbitrary number of internal headers to
+narrow the selection.  The internal headers must follow any object name
+as in the following example.
+
+\vspace{0.2cm}
+\begin{terminalv}
+[REDUCE_SCIENCE_NARROWLINE:HH21#SPECIES=C-18-O#BANDWIDTH_MODE=250MHzx4096]
+FINAL_LOWER_VELOCITY = -100
+FINAL_UPPER_VELOCITY = 100
+MOMENTS_LOWER_VELOCITY = 1.2
+MOMENTS_UPPER_VELOCITY = 6
+FLATFIELD = 0
+\end{terminalv}
+
+\param{SPECIES} defines the molecule.  The rationale for this might be
+disable estimation of the flat field because the signal is much weaker
+for the molecule C$^{18}$O.  Other common values are \texttt{CO} for
+$^{12}$CO and \texttt{13-CO} for $^{13}$CO.  There is also a
+\param{TRANSITION} header to select by the transition.
+
+The velocity limits for the moments might be set narrower than for
+other molecules.  You might want to set a different velocity range in
+the final spectral cubes (set by the \param{FINAL\_LOWER\_VELOCITY} and
+\param{FINAL\_UPPER\_VELOCITY} parameters) depending on the spectral
+resolution given by \param{BANDWIDTH\_MODE} (see
+\cref{Figure}{fig:backend}{} for a list).
 
 
 \section{Setting quality-assurance parameters (optional)}
