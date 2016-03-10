@@ -3875,14 +3875,81 @@ application can distinguish it from the other options.  For example,
 
 
 \newpage
-\chapter{\xlabel{params}Recipe Parameters}
+\chapter{\xlabel{params}Classified Recipe Parameters}
 \label{app:params}
 
-The recipes REDUCE\_SCIENCE\_GRADIENT and REDUCE\_SCIENCE\_NARROWLINE
-support the following parameters. These should be supplied in an
-external file and called by the command line option \param{-recpars
-<params.ini>}. For an example recipe parameters file see
-\cref{Section}{sec:recpars}{Setting recipe parameters}. \\
+The recipes REDUCE\_SCIENCE\_NARROWLINE, REDUCE\_SCIENCE\_GRADIENT,
+REDUCE\_SCIENCE\_LINEFOREST, and REDUCE\_SCIENCE\_BROADLINE support
+the following parameters, except where noted.  Recipe parameters
+should be supplied in an external file and called by the command line
+option \param{-recpars <params.ini>}. For an example recipe-parameter
+file see \cref{Section}{sec:recpars}{Setting recipe parameters}. \\
+
+The parameters are classified for easier identification.
+
+\begin{table}[h!]
+\begin{small}
+\begin{tabular}{|p{6.8cm}|p{8.6cm}|}
+\hline
+\textbf{Parameter} & \textbf{Description} \\
+\hline
+CUBE\_WCS & The co-ordinate system in which to regrid cubes.\\
+\hline
+FINAL\_LOWER\_VELOCITY & Lower velocity limit for all the cube products.\\
+FINAL\_UPPER\_VELOCITY & Upper velocity limit for all the cube products.\\
+\hline
+PIXEL\_SCALE & The pixel scale, in arcseconds, of cubes.\\
+\hline
+REBIN & List of velocity resolutions to rebin the final cube to.\\
+\hline
+SPREAD\_FWHM\_OR\_ZERO & Depending on the spreading method, this parameter controls the
+                         number of arcseconds at which the envelope of the spreading
+                         function goes to zero, or the full-width at half-maximum
+                         for the Gaussian envelope. \\
+SPREAD\_METHOD & The method to use when spreading each input pixel between a group of
+                 neighbouring output pixels when regridding cubes.\\
+SPREAD\_WIDTH & The number of arcseconds on either side of the output position which
+                receive contributions from the input pixel.\\
+\hline
+\end{tabular}
+\label{tab:params}
+\end{small}
+\caption{The recipe parameters used to define the properties of the recipe products.}
+\end{table}
+
+\begin{table}[h!]
+\begin{small}
+\begin{tabular}{|p{6.8cm}|p{8.6cm}|}
+\hline
+\textbf{Parameter} & \textbf{Description} \\
+\hline
+FRACTION\_BAD & The maximum fraction of bad values permitted in a receptor (or
+                receptor's subband for a hybrid observation) permitted before the
+                a receptor is deemed to be bad. \\
+\hline
+RESTRICT\_LOWER\_VELOCITY & Trims all data to this lower velocity, not
+                            just at the end for the products. \\
+RESTRICT\_UPPER\_VELOCITY & Trims all data to this upper velocity, not
+                            just at the end for the products. \\
+\hline
+TRIM\_MINIMUM\_OVERLAP & The minimum number of desired channels that should
+                         overlap after trimming hybrid-mode observations. \\
+TRIM\_PERCENTAGE & The percentage of the total frequency range to trim
+                  from either end. This parameter only takes effect if
+                  both \param{TRIM\_PERCENTAGE\_LOWER} and
+                  \param{TRIM\_PERCENTAGE\_UPPER} are undefined. \\
+TRIM\_PERCENTAGE\_LOWER & The percentage of the total frequency range to
+                        trim from the lower end of the frequency range. \\
+TRIM\_PERCENTAGE\_UPPER & The percentage of the total frequency range to trim
+                        from the higher end of the frequency range. \\
+\hline
+\end{tabular}
+\label{tab:params}
+\end{small}
+\caption{The recipe parameters used to exclude areas of noisy spectrum
+or bad receptors.}
+\end{table}
+\newpage
 
 \begin{table}[h!]
 \begin{small}
@@ -3891,82 +3958,52 @@ external file and called by the command line option \param{-recpars
 \textbf{Parameter} & \textbf{Description} \\
 \hline
 BASELINE\_ORDER & The polynomial order to use when baselining cubes.\\
-
-BASELINE\_LINEARITY & If set to true, receptors with mostly or all non-linear baselines
-                      are excluded from the reduced products.\\
-
-BASELINE\_LINEARITY\_CLIP & This is used to reject receptors that have non-linear
-                            baselines. It is the maximum number of standard deviations
-                            above the median rms deviations for which a detector's
-                            non-linearity is regarded as acceptable.\\
-
-BASELINE\_LINEARITY\_LINEWIDTH  & This is used to reject receptors that have non-linear
-                                  baselines.  It is the extent of the source spectral
-                                  line measured in km/s, which is excluded from the
-                                  non-linearity tests.\\
-
-BASELINE\_LINEARITY\_MINRMS & This is used to retain receptors that have noisy or
-                              slightly non-linear baselines, or transient bad baselines
-                              (cf. LOWFREQ\_INTERFERENCE).  The parameter is the minimum
-                              rms deviation from linearity, measured in antenna
-                              temperature, for a receptor to be flagged as bad.\\
-
-BASELINE\_LINEARITY\_SCALELENGTH & This is used to reject receptors that have non-linear
-
-                                   baselines.  It is the smoothing scale length in
-                                   whole pixels. Features narrower than this are
-				   filtered out during the background-level determination.
-                                   It should be should be odd and sufficiently large to
-                                   remove the noise while not removing the
-				   low-frequency patterns in the spectra.\\
 \hline
-CUBE\_WCS & The co-ordinate system to regrid cubes to.\\
-
+BASELINE\_EDGES & Percentage of the full range to fit on either edge of the spectra
+                  for baselining purposes.  If set to a non-positive value and
+                  BASELINE\_REGIONS is undefined, then the baseline is derived after
+                  smoothing and automatic emission detection.  If assigned a negative
+                  value, BASELINE\_REGIONS, if it is defined, will be used instead to
+                  specify where to determine the baseline. \\
 \hline
-MOMENTS & Comma separated list of the moments maps to create (integ,iwc).\\
-
-MOMENTS\_LOWER\_VELOCITY & The lower velocity range from which the moments maps will be
-                           created.\\
-MOMENTS\_UPPER\_VELOCITY & The upper velocity range from which the moments maps will be
-                           created.\\
+BASELINE\_REGIONS & A comma-separated list of velocity ranges each in the format
+                    $v1:v2$, from where the baseline should be estimated.  It is
+                    countermanded should BASELINE\_EDGES be positive.  These can also
+                    be used to define where to test baseline linearity if
+                    BASELINE\_LINEARITY\_LINEWIDTH is set to \texttt{"base"}. \\
 \hline
-PIXEL\_SCALE & The pixel scale, in arcseconds, of cubes.\\
-\hline
-REBIN & List of velocity resolutions to rebin the final cube to.\\
-\hline
-FINAL\_LOWER\_VELOCITY & Lower velocity limit for all the cube products.\\
-
-FINAL\_UPPER\_VELOCITY & Upper velocity limit for all the cube products.\\
-\hline
-SPREAD\_METHOD & The method to use when spreading each input pixel between a group of
-                 neighbouring output pixels when regridding cubes.\\
-
-SPREAD\_WIDTH & The number of arcseconds on either side of the output position which
-                receive contributions from the input pixel.\\
-
-SPREAD\_FWHM\_OR\_ZERO & Depending on the spreading method, this parameter controls the
-                         number of arcseconds at which the envelope of the spreading
-                         function goes to zero, or the full-width at half-maximum
-                         for the Gaussian envelope. \\
-\hline
- \multicolumn{2}{|r|}{\emph{Continued over page}}\\
+FREQUENCY\_SMOOTH & The number of channels to smooth in the frequency axis when
+                    smoothing to determine baselines.  This number should be small
+                    ($\sim$10) for narrow-line observations and large
+                    ($\sim$25) for broad-line observations. \\
+SPATIAL\_SMOOTH & The number of pixels to smooth in both spatial axes when
+                  smoothing to determine baselines. \\
 \hline
 \end{tabular}
-\label{tab:params}
 \end{small}
+\caption{The recipe parameters to control how baselines are determined and fit.}
 \end{table}
+There are a number of ways to define the baseline regions:
+\begin{itemize}
+\item as a percentage of the spectrum width at either end of the spectrum
+      (see BASELINE\_EDGES);
+\item as a set of velocity ranges expected or known to be free of emission
+      lines (see BASELINE\_REGIONS); or if both of these arguments of
+      corresponding recipe parameters is undefined,
+\item use the whole spectrum smoothing spectrally and spatially (see
+      FREQUENCY\_SMOOTH and SPATIAL\_SMOOTH) with feature detection to mask
+      lines.
+\end{itemize}
+The first two are suitable for broadline emission.  The second is
+desirable in the presence of many lines.  The third is the default and
+most appropriate for a single narrow line.
+\bigskip
 
-
-\begin{table}[t!]
+\begin{table}[h!]
 \begin{small}
 \begin{tabular}{|p{7.5cm}|p{8cm}|}
 \hline
-\multicolumn{2}{|l|}{\emph{Continued from previous page}}\\
-\hline
-RESTRICT\_LOWER\_VELOCITY & Trims all data to this lower velocity.\\
-RESTRICT\_UPPER\_VELOCITY & Trims all data to this upper velocity.\\
-\hline
-CUBE\_MAXSIZE& Controls the maximum size of the reduced cube.\\
+\textbf{Parameter} & \textbf{Description} \\
 \hline
 LV\_IMAGE & Permits creation of a longitude-velocity map via primitive \_CREATE\_LV\_IMAGE\_\\
 LV\_AXIS & Specify the axis to collapse in the creation of the longitude-velocity map.\\
@@ -3977,11 +4014,24 @@ CREATE\_MOMENTS\_USING\_SNR & If set to true (1), moments maps will be created u
                               when observations were taken under differing sky conditions
                               and have different noise levels.\\
 \hline
-CHUNKSIZE & Maximum sized chunk used for the group cube.\\
+MOMENTS & Comma separated list of the moments maps to create (integ,iwc).\\
+
+MOMENTS\_LOWER\_VELOCITY & The lower velocity range from which the moments maps will be
+                           created.\\
+MOMENTS\_UPPER\_VELOCITY & The upper velocity range from which the moments maps will be
+                           created.\\
 \hline
-TILE & A true value (1) performs tiling of the cube to restrict the memory requirements.  Such
-       tiled cubes abut each other in pixel co-ordinates and may be pasted together to form
-       the complete spectral cube. \\
+\hline
+\end{tabular}
+\end{small}
+\caption{The recipe parameters used to specify moments and longitude-velocity products.}
+\end{table}
+
+\begin{table}[h!]
+\begin{small}
+\begin{tabular}{|p{6.8cm}|p{8.6cm}|}
+\hline
+\textbf{Parameter} & \textbf{Description} \\
 \hline
 FLATFIELD & Whether or not to perform flat-fielding.\\
 FLAT\_METHOD & Flatfield option to ratio voxel by voxel.\\
@@ -3990,6 +4040,36 @@ FLAT\_LOWER & Sets the lower limit by which to restrict the velocity range where
 FLAT\_UPPER & Sets the upper limit by which to restrict the velocity range where there is
               astronomical signal for FLAT\_METHOD.\\
 MINSNR & Allow selection of higher signal-to-noise voxels for FLAT\_METHOD. \\
+\hline
+\end{tabular}
+\end{small}
+\caption{The recipe parameters associated flat fielding.}
+\end{table}
+
+\begin{table}[h!]
+\begin{small}
+\begin{tabular}{|p{6.8cm}|p{8.6cm}|}
+\hline
+\textbf{Parameter} & \textbf{Description} \\
+\hline
+CHUNKSIZE & Maximum sized chunk used for the group cube.\\
+CUBE\_MAXSIZE & Controls the maximum size of the reduced cube. \\
+\hline
+TILE & A true value (1) performs tiling of the cube to restrict the memory requirements.
+       Such tiled cubes abut each other in pixel co-ordinates and may be pasted together
+       to form the complete spectral cube. \\
+\hline
+\end{tabular}
+\end{small}
+\caption{The recipe parameters used to limit computer memory requirements for large
+datasets or observation fields of view.}
+\end{table}
+
+\begin{table}[h!]
+\begin{small}
+\begin{tabular}{|p{6.8cm}|p{8.6cm}|}
+\hline
+\textbf{Parameter} & \textbf{Description} \\
 \hline
 HIGHFREQ\_INTERFERENCE & If set to true (1) the spectra for each receptor are analysed to
                          detect high-frequency interference noise, and those spectra deemed
@@ -4014,8 +4094,87 @@ HIGHFREQ\_RINGING\_MIN\_SPECTRA & Minimum number of good spectra for ringing fil
 \hline
 \end{tabular}
 \end{small}
+\caption{The recipe parameters associated exclusion of spectra
+affected by high-frequency noise.}
 \end{table}
 
+\begin{table}[h!]
+\begin{small}
+\begin{tabular}{|p{6.8cm}|p{8.6cm}|}
+\hline
+\textbf{Parameter} & \textbf{Description} \\
+\hline
+LOWFREQ\_INTERFERENCE & If set to true (1) the spectra for each receptor are
+                        analysed to detect low-frequency local interference
+                        ripples or bad baselines, and those spectra deemed too
+                        deviant from linearity are excluded from the reduced
+                        products. \\
+LOWFREQ\_INTERFERENCE\_EDGE\_CLIP & Used to reject spectra with low-frequency
+                                    interference.  It is the standard deviation to
+                                    clip the profile of summed-deviations from
+                                    linearity iteratively in order to measure the
+                                    mean and standard deviation of the profile
+                                    unaffected by bad spectra.  A comma-separated
+                                    list will perform iterative sigma clipping of
+                                    outliers, but standard deviations in the list
+                                    should not decrease. \\
+LOWFREQ\_INTERFERENCE\_THRESH\_CLIP & Used to reject spectra with low-frequency
+                                      interference.  This is the number of
+                                      standard deviations at which to threshold
+                                      the non-linearity profile above its median
+                                      level. \\
+\hline
+\end{tabular}
+\end{small}
+\caption{The recipe parameters associated exclusion of spectra
+affected by non-linear baselines.  These are for short periods during
+an observation where some external signal has affected the baselines.
+If most or whole of an observtion might be affected see
+\param{BASELINE\_LINEARITY} and related parameters below. These
+parameters are not available in the REDUCE\_SCIENCE\_BROADLINE recipe.}
+\end{table}
+
+
+\begin{table}[h!]
+\begin{small}
+\begin{tabular}{|p{6.8cm}|p{8.6cm}|}
+\hline
+\textbf{Parameter} & \textbf{Description} \\
+\hline
+
+BASELINE\_LINEARITY & If set to true, receptors with mostly or all non-linear
+                      baselines are excluded from the reduced products.\\
+
+BASELINE\_LINEARITY\_CLIP & This is used to reject receptors that have non-linear
+                            baselines. It is the maximum number of standard deviations
+                            above the median rms deviations for which a detector's
+                            non-linearity is regarded as acceptable.\\
+
+BASELINE\_LINEARITY\_LINEWIDTH  & This is used to reject receptors that have non-linear
+                                  baselines.  It is the extent of the source spectral
+                                  line measured in km/s, which is excluded from the
+                                  non-linearity tests.\\
+
+BASELINE\_LINEARITY\_MINRMS & This is used to retain receptors that have noisy or
+                              slightly non-linear baselines, or transient bad baselines
+                              (cf. LOWFREQ\_INTERFERENCE).  The parameter is the minimum
+                              rms deviation from linearity, measured in antenna
+                              temperature, for a receptor to be flagged as bad.\\
+
+BASELINE\_LINEARITY\_SCALELENGTH & This is used to reject receptors that have non-linear
+                                   baselines.  It is the smoothing scale length in
+                                   whole pixels. Features narrower than this are
+                                   filtered out during the background-level determination.
+                                   It should be should be odd and sufficiently large to
+                                   remove the noise while not removing the
+                                   low-frequency patterns in the spectra.\\
+\hline
+\end{tabular}
+\end{small}
+\caption{The recipe parameters associated exclusion of receptors
+affected by non-linear baselines throughout or most of an observation.
+The parameters are not available in the REDUCE\_SCIENCE\_BROADLINE recipe.}
+\end{table}
 
 \newpage
 \chapter{\xlabel{qa}Quality Assurance Parameters}
