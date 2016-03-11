@@ -111,7 +111,7 @@ misc/blank.bit
 #  Help files for command aliases, scripts, etc.
 
 HELP_FILES = help/fitsedit.hlp help/fitshead.hlp \
-help/fitsval.hlp help/fitswrite.hlp help/lutbgyrw.hlp help/lutcol.hlp \
+help/fitswrite.hlp help/lutbgyrw.hlp help/lutcol.hlp \
 help/lutcold.hlp help/lutcont.hlp help/lutfc.hlp help/lutgrey.hlp \
 help/lutheat.hlp help/lutikon.hlp help/lutneg.hlp help/lutramps.hlp \
 help/lutread.hlp help/lutspec.hlp help/lutwarm.hlp help/lutzebra.hlp \
