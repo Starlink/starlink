@@ -56,6 +56,14 @@
 *        stored in the graphics database.  [1.05]
 *     DEVICE = DEVICE (Read)
 *        The plotting device.  [Current graphics device]
+*     EPOCH = _DOUBLE (Read)
+*        If a "Sky Co-ordinate System" specification is supplied (using
+*        Parameter FRAME) for a celestial co-ordinate system, then an
+*        epoch value is needed to qualify it. This is the epoch at
+*        which the supplied sky positions were determined. It should be
+*        given as a decimal years value, with or without decimal places
+*        ("1996.8" for example). Such values are interpreted as a Besselian
+*        epoch if less than 1984.0 and as a Julian epoch otherwise.
 *     FRAME = LITERAL (Read)
 *        Specifies the co-ordinate Frame to which the drawn arrows
 *        refer.  If a null (!) value is supplied, the arrows are drawn
