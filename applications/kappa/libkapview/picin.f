@@ -40,6 +40,9 @@
 *        If this is {\tt TRUE}, the current picture is compared against the
 *        chosen name before searching from the most-recent picture
 *        within the current picture. [FALSE]
+*     DESCRIBE = _LOGICAL (Read)
+*        This controls whether or not the report (when REPORT=TRUE)
+*        should contain a description of the Frame being used.  [FALSE]
 *     DEVICE = DEVICE (Read)
 *        Name of the graphics device about which information is
 *        required. [Current graphics device]
