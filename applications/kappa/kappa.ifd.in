@@ -5856,15 +5856,6 @@ package kappa {
             default !
          }
 
-         parameter tempstyle {
-            type LITERAL
-            ppath DEFAULT
-            vpath DEFAULT
-            prompt {Temporary style changes}
-            helpkey *
-            default !
-         }
-
          parameter useaxis {
             type LITERAL
             vpath DEFAULT

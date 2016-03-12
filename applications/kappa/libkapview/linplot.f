@@ -1727,11 +1727,8 @@
       CALL AST_SETACTIVEUNIT( IPLOT, .TRUE., STATUS )
 
 *  Set the attributes of the Plot to give the required Plotting style.
-*  The plus sign requests support of temporary attributes.  Leave the
-*  TEMPSTYLE for backwards compatibility until users embrace the
-*  generic system.
+*  The plus sign requests support of temporary attributes.
       CALL KPG1_ASSET( 'KAPPA_LINPLOT', '+STYLE', IPLOT, STATUS )
-      CALL KPG1_ASSET( 'KAPPA_LINPLOT', 'TEMPSTYLE', IPLOT, STATUS )
 
 *  Generate a reference for the NDF to be stored in the graphics
 *  database.
