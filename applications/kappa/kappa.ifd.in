@@ -6178,15 +6178,6 @@ package kappa {
             helpkey *
          }
 
-         parameter clip {
-            type _REAL
-            vpath DEFAULT
-            prompt {Clipping standard deviation}
-            ppath CURRENT DEFAULT
-            default 3.0
-            helpkey *
-          }
-
          parameter high {
             position 3
             type _REAL
@@ -9504,15 +9495,6 @@ package kappa {
             ppath DEFAULT
             default 0.05
             prompt {Accuracy required}
-            helpkey *
-         }
-
-         parameter useaxis {
-            type LITERAL
-            ppath DEFAULT
-            vpath DYNAMIC DEFAULT
-            prompt {The axes to use}
-            default !
             helpkey *
          }
 
