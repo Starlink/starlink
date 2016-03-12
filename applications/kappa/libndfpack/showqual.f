@@ -27,7 +27,7 @@
 *     displaying the number of pixels which hold each quality.
 
 *  Usage:
-*     showqual in [count]
+*     showqual ndf [count]
 
 *  ADAM Parameters:
 *     COUNT = _LOGICAL (Read)
@@ -35,8 +35,8 @@
 *        each defined quality is displayed. These figures are shown
 *        in parentheses between the quality name and associated
 *        comment.  This option adds significantly to the run time.  [NO]
-*     IN = NDF (Read)
-*        The input NDF.
+*     NDF = NDF (Read)
+*        The NDF whose quality names are to be listed.
 *     QNAMES( ) = LITERAL (Write)
 *        The quality names associated with each bit, starting from the
 *        lowest significant bit.  Unassigned bits have blank strings.
