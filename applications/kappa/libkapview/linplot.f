@@ -592,7 +592,8 @@
 *     Research Councils.
 *     Copyright (C) 2006-2007 Particle Physics & Astronomy Research
 *     Council.
-*     Copyright (C) 2008, 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2010, 2011, 2016 Science & Technology
+*     Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -670,6 +671,8 @@
 *        pixel positions are defined by integer values in GRID coords.
 *        Without this change, a non-monotonic AXIS array would prevent
 *        a plot being created even if the current WCS Frame is not AXIS.
+*     2016 March 13 (MJC)
+*        Remove long-deprecated TEMPSTYLE.
 *     {enter_further_changes_here}
 
 *-
@@ -1774,7 +1777,7 @@
      :                 XVAR, YVAR, %VAL( CNF_PVAL( IPXBAR ) ),
      :                 %VAL( CNF_PVAL( IPYBAR ) ),
      :                 %VAL( CNF_PVAL( IPSTEP ) ),
-     :                 '+STYLE,TEMPSTYLE', IPLOT, IMODE, MTYPE,
+     :                 '+STYLE', IPLOT, IMODE, MTYPE,
      :                 ISHAPE, FREQ, 'KAPPA_LINPLOT', STATUS )
 
 *  Produce the Key.
