@@ -82,7 +82,27 @@
 #include "libsmf/smf_typ.h"
 #include "jcmt/state.h"
 
+static void smf1_pcorr( smfHead *head, const Grp *igrp, const char *name1,
+                        const char *name2, const char *name3, int *status );
+
 void smf_pcorr( smfHead *head, const Grp *igrp, int *status ){
+
+/* Local Variables: */
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* First apply the primary corrections (if any) given by metadata items
+   DLONMAP, DLATMAP and PSYSTEM within the supplied group. */
+   smf1_pcorr( head, igrp, "DLONMAP", "DLATMAP", "PSYSTEM", status );
+
+/* Now apply the secondary corrections (if any) given by metadata items
+   DLONMAP2, DLATMAP2 and PSYSTEM2 within the supplied group. */
+   smf1_pcorr( head, igrp, "DLONMAP2", "DLATMAP2", "PSYSTEM2", status );
+}
+
+static void smf1_pcorr( smfHead *head, const Grp *igrp, const char *name1,
+                        const char *name2, const char *name3, int *status ){
 
 /* Local Variables: */
    AstMapping *dlatmap;
@@ -93,20 +113,17 @@ void smf_pcorr( smfHead *head, const Grp *igrp, int *status ){
    double *dlat;
    double *dlon;
    double *tai;
-   double dlat_az;
-   double dlat_tr;
-   double dlon_az;
-   double dlon_tr;
    int azel;
    void *p;
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
 
-/* See if the supplied group has a metadata item called "DLONMAP". If
-   not, there are no pointing corrections to apply. */
+/* See if the supplied group has a metadata item with the name given by
+   argument name1. If not, there are no pointing corrections to apply.
+   This should be the DLONMAP item. */
    buff[ 0 ] = 0;
-   smf_get_grp_metadata( igrp, "DLONMAP", buff, status );
+   smf_get_grp_metadata( igrp, name1, buff, status );
    if( buff[ 0 ] ) {
 
 /* The value of the DLONMAP metadata item in the group is the formatted
@@ -116,10 +133,11 @@ void smf_pcorr( smfHead *head, const Grp *igrp, int *status ){
       sscanf( buff, "%p", &p );
       dlonmap = (AstMapping *) p;
 
-/* Likewise, get a pointer to the DLATMAP Mapping, from TAI MJD to arc-distance
-   offsets parallel to the latitude axis (in arc-seconds). */
+/* Likewise, get a pointer to the DLATMAP Mapping (given by argument name2),
+   from TAI MJD to arc-distance offsets parallel to the latitude axis (in
+   arc-seconds). */
       buff[ 0 ] = 0;
-      smf_get_grp_metadata( igrp, "DLATMAP", buff, status );
+      smf_get_grp_metadata( igrp, name2, buff, status );
       if( !buff[ 0 ] ) {
          dlatmap = NULL;
          *status = SAI__ERROR;
@@ -133,7 +151,7 @@ void smf_pcorr( smfHead *head, const Grp *igrp, int *status ){
 /* Also get the system of the axes - AZEL or TRACKING. Default to AZEL. */
       azel = 1;
       buff[ 0 ] = 0;
-      smf_get_grp_metadata( igrp, "PSYSTEM", buff, status );
+      smf_get_grp_metadata( igrp, name3, buff, status );
       if( buff[ 0 ] ) {
          buff[ astChrLen( buff ) ] = 0;
          if( astChrMatch( buff, "TRACKING" ) ) {
@@ -173,11 +191,6 @@ void smf_pcorr( smfHead *head, const Grp *igrp, int *status ){
          astUnlock( dlatmap, 1 );
 
 /* Loop round every time slice */
-         dlon_az = AST__BAD;
-         dlat_az = AST__BAD;
-         dlon_tr = AST__BAD;
-         dlat_tr = AST__BAD;
-
          for( iframe = 0; iframe < head->nframes ; iframe++ ){
             state = head->allState + iframe;
 

@@ -307,11 +307,17 @@
 *          DLON and DLAT columns should give arc-distance offsets parallel
 *          to the longitude and latitude axes, in arc-seconds. The TAI values
 *          should be monotonic increasing with row number. The longitude and
-*          latitude axes are either AXEL or TRACKING as determined by the
+*          latitude axes are either AZEL or TRACKING as determined by the
 *          SYSTEM value in the header comments. Blank lines are ignored.
 *          The DLON and DLAT values are added onto the SMU jiggle positions
 *          stored in the JCMTSTATE extension of the input NDFs. DLON and DLAT
-*          values for non-tabulated times are determined by interpolation. [!]
+*          values for non-tabulated times are determined by interpolation.
+*
+*          If you need to apply two sets of pointing corrections, one in
+*          TRACKING and one in AZEL, you can include two tables (one for
+*          each system) in a single text file. Both tables should use the
+*          format described above. The two tables must be separated by a line
+*          containing two or more minus signs with no leading spaces. [!]
 *     RATE_LIMITED = _LOGICAL (Write)
 *          Set TRUE on exit if the iterative loop was terminated because
 *          the mean normalised change in the map does not seem to be

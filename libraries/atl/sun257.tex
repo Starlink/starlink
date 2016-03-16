@@ -100,13 +100,13 @@ higher-level utility tasks.
 
          \sstitem
          The new axes are appended to the end of the existing axes, so the
-         axis indices associated with the new axes will extend from \texttt{"}nold$+$1\texttt{"}
-         to \texttt{"}nold$+$nnew\texttt{"}, where \texttt{"}nold\texttt{"} is the number of axes in the original
-         Frame, and \texttt{"}nnew\texttt{"} is the number of new axes.
+         axis indices associated with the new axes will extend from \texttt{"} nold$+$1\texttt{"}
+         to \texttt{"} nold$+$nnew\texttt{"} , where \texttt{"} nold\texttt{"}  is the number of axes in the original
+         Frame, and \texttt{"} nnew\texttt{"}  is the number of new axes.
 
          \sstitem
-         An error will be reported if the Nout attribute of \texttt{"}map\texttt{"} is
-         different to the Naxes attribute of \texttt{"}frm\texttt{"}.
+         An error will be reported if the Nout attribute of \texttt{"} map\texttt{"}  is
+         different to the Naxes attribute of \texttt{"} frm\texttt{"} .
       }
    }
 }
@@ -123,8 +123,8 @@ higher-level utility tasks.
       added into the FrameSet, one of which becomes the new current
       Frame. The only case in which more than one new Frame is added
       is if the current Frame has too many axes, and the FrameSet
-      contains more than one \texttt{"}ROI\texttt{"} Frame (that is, Frames which are
-      Regions and which have a Domain name beginning with \texttt{"}ROI\texttt{"}). If
+      contains more than one \texttt{"} ROI\texttt{"}  Frame (that is, Frames which are
+      Regions and which have a Domain name beginning with \texttt{"} ROI\texttt{"} ). If
       the FrameSet contains zero or one ROI Frame, then only a single
       new Frame is added into the FrameSet.
 
@@ -155,7 +155,7 @@ higher-level utility tasks.
 
       If it is not possible to determine the value for a dropped axis
       in this way, then a search is made for Frames that are Regions
-      having a Domain name beginning with \texttt{"}ROI\texttt{"}. If any are found,
+      having a Domain name beginning with \texttt{"} ROI\texttt{"} . If any are found,
       then a new Frame is added into the FrameSet for each ROI Region
       found, connected to the original current Frame via a PermMap.
       The values to be assigned to the dropped axes by the inverse
@@ -166,7 +166,7 @@ higher-level utility tasks.
       name of the corresponding ROI Region is stored in the Ident
       attribute of each new Frame so that later code can identify the
       corresponding ROI Region, and is also appended to the end of the
-      Frame\texttt{'}s Domain. The new Frame corresponding to the first ROI
+      Frame\texttt{'} s Domain. The new Frame corresponding to the first ROI
       Region found in the FrameSet is left as the current Frame on exit.
    }
    \sstinvocation{
@@ -207,7 +207,7 @@ higher-level utility tasks.
       \sstsubsection{
          WORK( $*$ ) = INTEGER (Given)
       }{
-         Work space. It\texttt{'}s length should be at least twice as large as
+         Work space. It\texttt{'} s length should be at least twice as large as
          the largest pixel dimension implied by LBND and UBND.
       }
       \sstsubsection{
@@ -240,7 +240,7 @@ higher-level utility tasks.
       \sstsubsection{
          REGEXP = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The regular expression. See \texttt{"}Template Syntax:\texttt{"} in the astChrSub
+         The regular expression. See \texttt{"} Template Syntax:\texttt{"}  in the astChrSub
          prologue. Note, this function differs from astChrSub in that any
          equals signs (=) in the regular expression are treated literally.
       }
@@ -249,7 +249,7 @@ higher-level utility tasks.
       }{
          The index of the character that follows the last character within
          the supplied test string (STR) that matched any parenthesises
-         sub-section of \texttt{"}regexp\texttt{"}. A value of 0 is returned if no matches
+         sub-section of \texttt{"} regexp\texttt{"} . A value of 0 is returned if no matches
          were found.
       }
       \sstsubsection{
@@ -277,7 +277,7 @@ higher-level utility tasks.
          by more than one sub-string within the test string, then only the
          first is returned. To return multiple matches, the regular
          expression should include multiple copies of the parenthesised
-         sub-string (for instance, separated by \texttt{"}.$+$?\texttt{"} if the intervening
+         sub-string (for instance, separated by \texttt{"} .$+$?\texttt{"}  if the intervening
          string is immaterial).
       }
    }
@@ -343,14 +343,14 @@ higher-level utility tasks.
          the colon. The string before the colon indicates the format
          required for the output text file:
 
-         \texttt{"}AST:\texttt{"}      - AST\_SHOW format
-         \texttt{"}STCS:\texttt{"}     - STCS format
-         \texttt{"}XML:\texttt{"}      - AST XML format
-         \texttt{"}FITS-xxx:\texttt{"} - FITS, using the specified encoding
-         \texttt{"}NATIVE:\texttt{"}   - FITS, using NATIVE encoding
+         \texttt{"} AST:\texttt{"}       - AST\_SHOW format
+         \texttt{"} STCS:\texttt{"}      - STCS format
+         \texttt{"} XML:\texttt{"}       - AST XML format
+         \texttt{"} FITS-xxx:\texttt{"}  - FITS, using the specified encoding
+         \texttt{"} NATIVE:\texttt{"}    - FITS, using NATIVE encoding
 
          The default (i.e. used if the string does not contain a
-         colon) is \texttt{"}AST\texttt{"}.
+         colon) is \texttt{"} AST\texttt{"} .
       }
       \sstsubsection{
          IAST = INTEGER (Given)
@@ -502,6 +502,88 @@ higher-level utility tasks.
    }
 }
 \sstroutine{
+   ATL\_GETPIXELPARAMS
+}{
+   Find typical values for \texttt{"} FITS-like\texttt{"}  parameters describing a FrameSet
+}{
+   \sstdescription{
+      This function finds values that resemble the the FITS keywords
+      CRVAL1/2/3.., CRPIX1/2/3..., CRDELT1/2/3... and CROTA2, on the
+      assumption that the base Frame in the supplied FrameSet describe
+      GRID coords (i.e. FITS pixel coords), and the current Frame describe
+      the required WCS.  It is not restricted to 2D FrameSets.
+
+      If the FrameSet can be written to a FitsChan successfully using
+      FITS-WCS encoding, the the resulting keyword values are returned.
+      Otherwise, the values are estimated by transforming closely spaced
+      pixel positions along each axis. If the current Frame contains a
+      SkyFrame, and the SkyFrame has a defined reference position, then
+      this position specifies the returned CRVAL values. Otherwise, the
+      reference position is assumed to be at the central pixel.
+   }
+   \sstinvocation{
+      CALL ATL\_GETPIXELPARAMS( FSET, DIMS, DEGS, CRPIX, CRVAL, CDELT,
+                               CROTA, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FSET = INTEGER (Given)
+      }{
+         The FrameSet.
+      }
+      \sstsubsection{
+         DIMS($*$) = INTEGER (Given)
+      }{
+         An array supplied holding the number of pixels along each
+         edge of the pixel array. The number of elements in this array
+         should match the number of axes in the base Frame of FSET.
+      }
+      \sstsubsection{
+         DEGS = LOGICAL (Given)
+      }{
+         If .TRUE., then the CRVAL, CDELT and CROTA values for sky axes
+         are returned in units of degrees. Otherwise they are returned in
+         radians.
+      }
+      \sstsubsection{
+         CRPIX($*$) = DOUBLE PRECISION (Returned)
+      }{
+         An array returned holding the position of the reference pixel
+         in the base Frame of FSET. The number of elements in this
+         array should match the number of axes in the base Frame of FSET.
+      }
+      \sstsubsection{
+         CRVAL($*$) = DOUBLE PRECISION (Returned)
+      }{
+         An array returned holding the position of the reference pixel
+         in the current Frame of FSET. The number of elements in this
+         array should match the number of axes in the current Frame of
+         FSET.
+      }
+      \sstsubsection{
+         CDELT($*$) = DOUBLE PRECISION (Returned)
+      }{
+         An array returned holding the geodesic distance along each
+         edge of the reference pixel, measured within the current
+         Frame of FSET. The number of elements in this array should
+         match the number of axes in the base Frame of FSET.
+      }
+      \sstsubsection{
+         CROTA = DOUBLE PRECISION (Returned)
+      }{
+         The angle from north in the current frame of FSET to the
+         second spatial pixel axis, measured positive through east.
+         This will be returned set to AST\_\_BAD if the current frame
+         of FSET does not contain a SkyFrame.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    ATL\_GTGRP
 }{
    Obtain lines of text from a parameter, and store them in a GRP group
@@ -595,7 +677,7 @@ higher-level utility tasks.
          ERRMSG = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The error message to report if the key is not found. This may
-         include references to the MSG token \texttt{"}$\wedge$K\texttt{"} which will hold the
+         include references to the MSG token \texttt{"} $\wedge$K\texttt{"}  which will hold the
          supplied key name.
       }
       \sstsubsection{
@@ -682,6 +764,11 @@ higher-level utility tasks.
          3 - Overlap: For every header in FC1, see if FC2 contains the same
              keyword. If it does, and if the keyword value is the same in
              both FitsChans, copy the FC1 header to the returned FitsChan.
+
+         4 - Union (with priority given to FC1): Copy FC1 to the output, then
+             for every header in FC2 append it to the end of the returned
+             FitsChan unless the card already exists. This is similar to method
+             2 except that cards from FC2 are dropped instead of cards from FC1.
       }
       \sstsubsection{
          FC1 = INTEGER (Given)
@@ -715,6 +802,10 @@ higher-level utility tasks.
          by formatting into a string (using the accuracy specified by the
          FitsDigits attributes of the two supplied FitsChans) and then
          comparing the formatted strings for exact equality.
+
+         \sstitem
+         Method 4 exists to allow a new header to be appended whilst
+         retaining the primary order of the cards from the first header.
       }
    }
 }
@@ -1154,11 +1245,11 @@ higher-level utility tasks.
          \sstitem
          If the group contains the dump of a Channel (of any class),
          then the Object returned via IAST will be the Channel itself. The
-         exception to this is that if the \texttt{"}Begin \texttt{"} line at the start of
-         the dump ends with the string \texttt{"}(Read)\texttt{"}, then the returned IAST
+         exception to this is that if the \texttt{"} Begin \texttt{"}  line at the start of
+         the dump ends with the string \texttt{"} (Read)\texttt{"} , then the returned IAST
          Object will be the Object read from the Channel, rather than the
          Channel itself. For instance, if the group contains the dump of a
-         FitsChan, and the first line of the dump is \texttt{"}Begin FitsChan(Read)\texttt{"},
+         FitsChan, and the first line of the dump is \texttt{"} Begin FitsChan(Read)\texttt{"} ,
          then the returned IAST object will be the Object read from the
          FitsChan, rather than the FitsChan itself. This facility is only
          available for top level objects (e.g. FitsChans contained within
@@ -1231,11 +1322,11 @@ higher-level utility tasks.
          \sstitem
          If the group contains the AST dump of a Channel (of any class),
          then the Object returned via IAST will be the Channel itself. The
-         exception to this is that if the \texttt{"}Begin \texttt{"} line at the start of
-         the dump ends with the string \texttt{"}(Read)\texttt{"}, then the returned IAST
+         exception to this is that if the \texttt{"} Begin \texttt{"}  line at the start of
+         the dump ends with the string \texttt{"} (Read)\texttt{"} , then the returned IAST
          Object will be the Object read from the Channel, rather than the
          Channel itself. For instance, if the group contains the AST dump of
-         a FitsChan, and the first line of the dump is \texttt{"}Begin FitsChan(Read)\texttt{"},
+         a FitsChan, and the first line of the dump is \texttt{"} Begin FitsChan(Read)\texttt{"} ,
          then the returned IAST object will be the Object read from the
          FitsChan, rather than the FitsChan itself. This facility is only
          available for top level objects (e.g. FitsChans contained within
@@ -1278,7 +1369,7 @@ higher-level utility tasks.
    Remove a file
 }{
    \sstdescription{
-      This subroutine calls the \texttt{"}PSX\_REMOVE\texttt{"} RTL function to remove a
+      This subroutine calls the \texttt{"} PSX\_REMOVE\texttt{"}  RTL function to remove a
       specified file. No error occurs if the file cannot be removed for
       any reason.
    }
@@ -1438,20 +1529,20 @@ higher-level utility tasks.
          It should contain entries with the following keys (the data type
          with which each entry is accessed is also shown):
 
-            \texttt{"}JFREST(1)\texttt{"} - \_INTEGER
-            \texttt{"}RA\_DEC(1)\texttt{"} - \_DOUBLE
-            \texttt{"}RA\_DEC(2)\texttt{"} - \_DOUBLE
-            \texttt{"}DPOS(1)\texttt{"} - \_DOUBLE
-            \texttt{"}DPOS(2)\texttt{"} - \_DOUBLE
-            \texttt{"}IDATE\texttt{"} - \_CHAR
-            \texttt{"}ITIME\texttt{"} - \_CHAR
-            \texttt{"}LSRFLG\texttt{"} - \_INTEGER
-            \texttt{"}V\_SETL(4)\texttt{"} - \_DOUBLE
-            \texttt{"}JFCEN(1)\texttt{"} - \_INTEGER
-            \texttt{"}JFINC(1)\texttt{"} - \_INTEGER
-            \texttt{"}IFFREQ(1)\texttt{"} - \_DOUBLE
+            \texttt{"} JFREST(1)\texttt{"}  - \_INTEGER
+            \texttt{"} RA\_DEC(1)\texttt{"}  - \_DOUBLE
+            \texttt{"} RA\_DEC(2)\texttt{"}  - \_DOUBLE
+            \texttt{"} DPOS(1)\texttt{"}  - \_DOUBLE
+            \texttt{"} DPOS(2)\texttt{"}  - \_DOUBLE
+            \texttt{"} IDATE\texttt{"}  - \_CHAR
+            \texttt{"} ITIME\texttt{"}  - \_CHAR
+            \texttt{"} LSRFLG\texttt{"}  - \_INTEGER
+            \texttt{"} V\_SETL(4)\texttt{"}  - \_DOUBLE
+            \texttt{"} JFCEN(1)\texttt{"}  - \_INTEGER
+            \texttt{"} JFINC(1)\texttt{"}  - \_INTEGER
+            \texttt{"} IFFREQ(1)\texttt{"}  - \_DOUBLE
 
-         In addition, the KeyMap may contain an item \texttt{"}CENTRECODE\texttt{"} (\_INTEGER)
+         In addition, the KeyMap may contain an item \texttt{"} CENTRECODE\texttt{"}  (\_INTEGER)
          that specifies the co-ordinate system to which the RA\_DEC and DPOS
          values refer. It may take any of the following values:
 
@@ -1473,14 +1564,14 @@ higher-level utility tasks.
          extension. If supplied, it should contain entries with the
          following keys:
 
-            \texttt{"}CELLSIZE(1)\texttt{"} - \_DOUBLE
-            \texttt{"}CELLSIZE(2)\texttt{"}  - \_DOUBLE
-            \texttt{"}POSANGLE\texttt{"} - \_DOUBLE
+            \texttt{"} CELLSIZE(1)\texttt{"}  - \_DOUBLE
+            \texttt{"} CELLSIZE(2)\texttt{"}   - \_DOUBLE
+            \texttt{"} POSANGLE\texttt{"}  - \_DOUBLE
 
-         In addition, the KeyMap may contain an item \texttt{"}CELLCODE\texttt{"} (\_INTEGER)
+         In addition, the KeyMap may contain an item \texttt{"} CELLCODE\texttt{"}  (\_INTEGER)
          that specifies the co-ordinate system to which the CELLSIZE and
          POSANGLE values refer. It may take any of the values listed for
-         CENTRECODE in the \texttt{"}KM1\texttt{"} argument description above. If CELLCODE
+         CENTRECODE in the \texttt{"} KM1\texttt{"}  argument description above. If CELLCODE
          is missing a value of 6 (FK4 B1950) is assumed.
       }
       \sstsubsection{
@@ -1587,13 +1678,13 @@ higher-level utility tasks.
 
          \sstitem
          The new axes are appended to the end of the existing axes, so the
-         axis indices associated with the new axes will extend from \texttt{"}nold$+$1\texttt{"}
-         to \texttt{"}nold$+$nnew\texttt{"}, where \texttt{"}nold\texttt{"} is the number of axes in the original
-         Frame, and \texttt{"}nnew\texttt{"} is the number of new axes.
+         axis indices associated with the new axes will extend from \texttt{"} nold$+$1\texttt{"}
+         to \texttt{"} nold$+$nnew\texttt{"} , where \texttt{"} nold\texttt{"}  is the number of axes in the original
+         Frame, and \texttt{"} nnew\texttt{"}  is the number of new axes.
 
          \sstitem
-         An error will be reported if the Nout attribute of \texttt{"}map\texttt{"} is
-         different to the Naxes attribute of \texttt{"}frm\texttt{"}.
+         An error will be reported if the Nout attribute of \texttt{"} map\texttt{"}  is
+         different to the Naxes attribute of \texttt{"} frm\texttt{"} .
       }
    }
 }
@@ -1626,6 +1717,90 @@ higher-level utility tasks.
          status
       }{
          Pointer to the global status variable.
+      }
+   }
+}
+\sstroutine{
+   atlFrameSetSplit
+}{
+   Extract axes from a supplied FrameSet to create a new FrameSet
+}{
+   \sstdescription{
+      This function searches the current Frame of the supplied FrameSet
+      for axes that have a specified Domain. If any are found, and if they
+      correspond to a distinct subset of axes in the base Frame of the
+      supplied FrameSet (i.e. they are independent of the other axes), a new
+      FrameSet is created and returned in which the current Frame contains the
+      requested axes from the current Frame of the supplied FrameSet, and the
+      base Frame contains the corresponding axes from the base Frame of the
+      supplied FrameSet. If possible, any other Frames in the supplied
+      FrameSet are also split and added to the returned FrameSet.
+
+      If the search is unsuccessful, or if the required current Frame axes
+      are not independent of the other axes, then each of the other Frames
+      in the FrameSet is searched in the same way (excluding the base Frame).
+      If no suitable Frame can be found, a NULL pointer is returned but no
+      error is reported.
+   }
+   \sstinvocation{
+      AstFrameSet $*$atlFrameSetSplit( AstFrameSet $*$fset, const char $*$domain,
+                                     int $*$$*$bax, int $*$$*$cax, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         fset
+      }{
+         The FrameSet to be split.
+      }
+      \sstsubsection{
+         domain
+      }{
+         The Domain value for the required current Frame axes. This can
+         be a space-separated list of Domains, in which case each Domain
+         will be used in turn until one is found which allows the
+         supplied FrameSet to be split succesfully (any remaining Domain
+         values will be ignored).
+      }
+      \sstsubsection{
+         bax
+      }{
+         If not NULL, this should be the address of a pointer in which to
+         return a pointer to an array holding the one-based indices of
+         the base frame axes that were included in the returned FrameSet.
+         The array should be freed using astFree when no longer needed.
+         The length of the array will equal the number of base Frame axes
+         in the returned FrameSet. A NULL pointer will be returned if the
+         FrameSet could not be split.
+      }
+      \sstsubsection{
+         cax
+      }{
+         If not NULL, this should be the address of a pointer in which to
+         return a pointer to an array holding the one-based indices of
+         the current frame axes that were included in the returned FrameSet.
+         The array should be freed using astFree when no longer needed.
+         The length of the array will equal the number of current Frame axes
+         in the returned FrameSet. A NULL pointer will be returned if the
+         FrameSet could not be split.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         A pointer to a new FrameSet, or NULL if no axes with the required
+      }{
+      }
+      \sstsubsection{
+         Domain could be found, or if the required axes do not correspond
+      }{
+      }
+      \sstsubsection{
+         to a distinct set of base Frame axes, or if an error occurs.
+      }{
       }
    }
 }
@@ -1675,6 +1850,90 @@ higher-level utility tasks.
    }
 }
 \sstroutine{
+   atlGetPixelParams
+}{
+   Find typical values for \texttt{"} FITS-like\texttt{"}  parameters describing a FrameSet
+}{
+   \sstdescription{
+      This function finds values that resemble the the FITS keywords
+      CRVAL1/2/3.., CRPIX1/2/3..., CRDELT1/2/3... and CROTA2, on the
+      assumption that the base Frame in the supplied FrameSet describe
+      GRID coords (i.e. FITS pixel coords), and the current Frame describe
+      the required WCS.  It is not restricted to 2D FrameSets.
+
+      If the FrameSet can be written to a FitsChan successfully using
+      FITS-WCS encoding, the the resulting keyword values are returned.
+      Otherwise, the values are estimated by transforming closely spaced
+      pixel positions along each axis. If the current Frame contains a
+      SkyFrame, and the SkyFrame has a defined reference position, then
+      this position specifies the returned CRVAL values. Otherwise, the
+      reference position is assumed to be at the central pixel.
+   }
+   \sstinvocation{
+      void atlGetPixelParams( AstFrameSet $*$fset, int $*$dims, int degs,
+                              double $*$crpix, double $*$crval, double $*$cdelt,
+                              double $*$crota, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         fset
+      }{
+         The FrameSet.
+      }
+      \sstsubsection{
+         dims
+      }{
+         Pointer to an array supplied holding the number of pixels along
+         each edge of the pixel array. The number of elements in this array
+         should match the number of axes in the base Frame of \texttt{"} fset\texttt{"} .
+      }
+      \sstsubsection{
+         degs
+      }{
+         If non-zero, then the crval, cdelt and crota values for sky axes
+         are returned in units of degrees. Otherwise they are returned in
+         radians.
+      }
+      \sstsubsection{
+         crpix
+      }{
+         Pointer to an array returned holding the position of the
+         reference pixel in the base Frame of \texttt{"} fset\texttt{"} . The number of
+         elements in this array should match the number of axes in the base
+         Frame of \texttt{"} fset\texttt{"} .
+      }
+      \sstsubsection{
+         crval
+      }{
+         Pointer to an array returned holding the position of the
+         reference pixel in the current Frame of \texttt{"} fset\texttt{"} . The number of
+         elements in this array should match the number of axes in the
+         current Frame of \texttt{"} fset\texttt{"} .
+      }
+      \sstsubsection{
+         cdelt
+      }{
+         Pointer to an array returned holding the geodesic distance
+         along each edge of the reference pixel, measured within the
+         current Frame of \texttt{"} fset\texttt{"} . The number of elements in this array
+         should match the number of axes in the base Frame of \texttt{"} fset\texttt{"} .
+      }
+      \sstsubsection{
+         crota
+      }{
+         Pointer to a double in which to return the angle from north in
+         the current frame of \texttt{"} fset\texttt{"}  to the second spatial pixel axis,
+         measured positive through east. This will be returned set to
+         AST\_\_BAD if the current frame of \texttt{"} fset\texttt{"}  does not contain a SkyFrame.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    atlMapGet1C
 }{
    Retrieve a vector of strings from an AST KeyMap entry as a list
@@ -1703,7 +1962,7 @@ higher-level utility tasks.
       \sstsubsection{
          bufsize
       }{
-         The length of the \texttt{"}buf\texttt{"} array.
+         The length of the \texttt{"} buf\texttt{"}  array.
       }
       \sstsubsection{
          len
@@ -1714,7 +1973,7 @@ higher-level utility tasks.
          nval
       }{
          Address of an int in which to return the number of fixed length
-         strings returned in \texttt{"}buf\texttt{"}. This will be less than the number of
+         strings returned in \texttt{"} buf\texttt{"} . This will be less than the number of
          elements in the KeyMap entry if the supplied buffer is not large
          enough to hold all the strings in the entry.
       }
@@ -1771,7 +2030,7 @@ higher-level utility tasks.
          value
       }{
          A character array containing the concatenated fixed length
-         strings. The length of this array should be at least \texttt{"}size$*$len\texttt{"}.
+         strings. The length of this array should be at least \texttt{"} size$*$len\texttt{"} .
       }
       \sstsubsection{
          len
@@ -1781,7 +2040,7 @@ higher-level utility tasks.
       \sstsubsection{
          size
       }{
-         The number of fixed length strings in \texttt{"}value\texttt{"}.
+         The number of fixed length strings in \texttt{"} value\texttt{"} .
       }
       \sstsubsection{
          status
@@ -1844,10 +2103,69 @@ higher-level utility tasks.
       \sstitemlist{
 
          \sstitem
-         If \texttt{"}frm\texttt{"} is a FrameSet, the current Frame is checked first. If
+         If \texttt{"} frm\texttt{"}  is a FrameSet, the current Frame is checked first. If
          no match is found, each other Frame is checked in turn, finishing with
          the base Frame. If any of these Frames match, it is left as the
          current Frame in the FrameSet on exit.
+      }
+   }
+}
+\sstroutine{
+   atlPairAxes
+}{
+   Find corresponding axes in a pair of Frames or FrameSets
+}{
+   \sstdescription{
+      For each axis in the base Frame of \texttt{"} From\texttt{"} , this function finds the
+      index of the most closely aligned axis in the base Frame of \texttt{"} to\texttt{"} ,
+      (or the current Frame of \texttt{"} from\texttt{"}  if \texttt{"} to\texttt{"}  is not supplied), and
+      returns these indices.
+   }
+   \sstinvocation{
+      void atlPairAxes( AstFrameSet $*$from, AstFrameSet $*$to, double $*$p,
+                        const char $*$domainlist, int $*$axes, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         from
+      }{
+         An AST pointer to the first FrameSet.
+      }
+      \sstsubsection{
+         to
+      }{
+         An AST pointer to the second FrameSet. An error is reported if
+         it is not possible to align the two FrameSets using astConvert.
+         If NULL, then the returned axis indices are the indices of the
+         corresponding current axes in \texttt{"} from\texttt{"} .
+      }
+      \sstsubsection{
+         p
+      }{
+         The axis values of a point within the base Frame of \texttt{"} from\texttt{"}  at
+         which the pairing is to be determined. None of the supplied axis
+         values should be zero.
+      }
+      \sstsubsection{
+         domainlist
+      }{
+         A list of domain names that define the prefered alignment
+         Frames. This list is used by astConvert to align the two
+         FrameSets. Only used if \texttt{"} to\texttt{"}  is not NULL.
+      }
+      \sstsubsection{
+         axes
+      }{
+         The length of this array should be equal to the number of base
+         Frame axes in \texttt{"} from\texttt{"} . Each returned value will be the one-based
+         index of the corresponding axis in the base Frame of \texttt{"} to\texttt{"}  (or
+         the current Frame of \texttt{"} from\texttt{"}  if \texttt{"} to\texttt{"}  is not supplied), or zero
+         if no corresponding axis can be found.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
       }
    }
 }
@@ -1859,7 +2177,7 @@ higher-level utility tasks.
    \sstdescription{
       This function creates an AST Object by reading the contents of a
       given text file. The file should contain a dump of an AST Object
-      such as produced by the \texttt{"}atlShow\texttt{"} function.
+      such as produced by the \texttt{"} atlShow\texttt{"}  function.
    }
    \sstinvocation{
       AstObject $*$atlReadFile( const char $*$fname, const char $*$options,
@@ -1900,15 +2218,22 @@ higher-level utility tasks.
 }{
    \sstdescription{
       This function creates an AST Table by reading the contents of a
-      given text file. The text file format matches that of TOPCAT\texttt{'}s
-      \texttt{"}ASCII\texttt{"} format, except that any comment lines before the first row
-      of column values that are of the form \texttt{"}\# name = value\texttt{"} or
-      \texttt{"}! name = value\texttt{"} are used to create Table parameters. Here \texttt{"}name\texttt{"}
-      is a contiguous block of alphanumeric characters, and \texttt{"}value\texttt{"}
+      given text file. The text file format matches that of TOPCAT\texttt{'} s
+      \texttt{"} ASCII\texttt{"}  format, except that any comment lines before the first row
+      of column values that are of the form \texttt{"} \# name = value\texttt{"}  or
+      \texttt{"} ! name = value\texttt{"}  are used to create Table parameters. Here \texttt{"} name\texttt{"}
+      is a contiguous block of alphanumeric characters, and \texttt{"} value\texttt{"}
       represents all characters following the equals sign, up to the end
       of the line, excluding leading and trailing white space. If value
       is a scalar integer or double, it is stored as such in the Table.
       Otherwise, it is stored as a string.
+
+      In addition, any row that consists just of two or more minus signs,
+      with no leading spaces, is taken to mark the end of the catalogue.
+      Any subsequent lines in the file are assumed to form a whole new
+      table that is read in exactly the same way as the first. This
+      second Table is stored as a parameter of the first Table using the
+      key \texttt{"} SubTable\texttt{"} .
    }
    \sstinvocation{
       AstTable $*$atlReadTable( const char $*$fname, int $*$status )
