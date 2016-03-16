@@ -458,11 +458,10 @@ try:
 
 #  If a reference map has been supplied, and we have some I time-stream
 #  files, we create an I map and determine any extra pointing corrections
-#  that are needed to bring the I map into alignment with the reference map.
-#  We can't apply two different pointing corrections. The user can supply
-#  ALIGN=NO to prevent this, since it can add significantly to the total
-#  run-time for pol2scan.
-   if ref != "!" and len(its) > 0 and pntfile == "!" and align:
+#  that are needed to bring the I map into alignment with the reference
+#  map. The user can supply ALIGN=NO to prevent this, since it can add
+#  significantly to the total run-time for pol2scan.
+   if ref != "!" and len(its) > 0 and align:
       msg_out( "Making a map from the I time series...")
 
 #  Create a config file to use when creating the I map. The I map needs an
@@ -483,8 +482,8 @@ try:
 
 #  Create the I map.
       imap = NDG( 1 )
-      invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3}".
-             format(its,iconf,imap,ref))
+      invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4}".
+             format(its,iconf,imap,ref,pntfile))
 
 #  See what translations (in pixels) are needed to align the imap with
 #  the reference map. The determination of the shift is more accurate if
@@ -583,11 +582,18 @@ try:
                dy = -dy
 
 #  Create the pointing correction file to use with subsequent makemap
-#  calls.
-#  "system=tracking" (usually FK5), and
+#  calls. If a file is already in use (because of the data being old)
+#  append the new pointing correction to the end of the file, preceeded
+#  by an "end-of-table" Marker (two minus signs). Makemap will then apply
+#  both correction.
             msg_out( "Using pointing corrections of ({0},{1}) arc-seconds".format(dx,dy) )
-            pntfile = os.path.join(NDG.tempdir,"pointing")
-            fd = open(pntfile,"w")
+            if pntfile == "!":
+               pntfile = os.path.join(NDG.tempdir,"pointing")
+               fd = open(pntfile,"w")
+            else:
+               fd = open(pntfile,"a")
+               fd.write("--\n")
+
             fd.write("# system=tracking\n")
             fd.write("# tai dlon dlat\n")
             fd.write("54000 {0} {1}\n".format(dx,dy))
