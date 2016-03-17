@@ -2161,7 +2161,7 @@ class NDG(object):
          self.__writeFile()
 
       # Ensure the NDF paths are absolute.
-      if not isabs:
+      if nfile > 0 and not isabs:
          self.__ndfs = invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" abspath=yes".format(self),True)
          if len(self.__ndfs) > 1:
             if not self.__file:
