@@ -67,6 +67,8 @@
 *        removed before returning the IP corrected bolometer data.
 *     15-JAN-2016 (DSB):
 *        Multi-thread the angle calculations.
+*     17-MAR-2016 (DSB):
+*        Fix data ordering bug in smf1_calcang.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -314,8 +316,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
 /* Get an array holding the angle (rad.s) from the reference direction
    used by the Q/U bolometer values  to focal plane Y, measured positive
    in the sense of rotation from focal plane Y to focal plane X, for
-   every bolometer sample in the smfData. The values are bolo ordered so
-   that "bstride" is 1 and "tstsride" is nbolo. */
+   every bolometer sample in the smfData. */
          ipang = smf1_calcang( wf, data, trsys, status );
 
 /* Get the number of bolometers and time slices for the current subarray,
@@ -549,20 +550,20 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
          if( !( *pq & SMF__Q_BADB ) ) {
 
 /* Get the IP model parameters for this bolometer. */
-         if( pdata->p0data ) {       /* "JK" model */
-               p0 = pdata->p0data[ ibolo ];
-               p1 = pdata->p1data[ ibolo ];
-               c0 = pdata->c0data[ ibolo ];
-               angc = pdata->angcdata[ ibolo ];
-               bad = ( p0 == VAL__BADD || p1 == VAL__BADD ||
-                       c0 == VAL__BADD || angc == VAL__BADD );
+            if( pdata->p0data ) {       /* "JK" model */
+                  p0 = pdata->p0data[ ibolo ];
+                  p1 = pdata->p1data[ ibolo ];
+                  c0 = pdata->c0data[ ibolo ];
+                  angc = pdata->angcdata[ ibolo ];
+                  bad = ( p0 == VAL__BADD || p1 == VAL__BADD ||
+                          c0 == VAL__BADD || angc == VAL__BADD );
 
 /* Cache values needed in the itime loop. */
-               ca = p0*cos( 2*angc*AST__DD2R );
-               cb = p0*sin( 2*angc*AST__DD2R );
-               cc = 2*( c0 + angc )*AST__DD2R;
+                  ca = p0*cos( 2*angc*AST__DD2R );
+                  cb = p0*sin( 2*angc*AST__DD2R );
+                  cc = 2*( c0 + angc )*AST__DD2R;
 
-         } else {         /* "PL1" model */
+            } else {         /* "PL1" model */
                p1 = VAL__BADD;
                ca = pdata->pl1data[0];
                cb = pdata->pl1data[1];
@@ -582,11 +583,10 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
 
 /* Get pointers to the first residual (i.e. the uncorrected Q or U value)
    and lut value (i.e. the index of the map pixel that receives the Q/U
-   value) for the current bolometer. [ipang is always bolo-ordered so
-   "bstride" is 1 and "tstride" is nbolo]. */
+   value) for the current bolometer. */
                pr = pdata->res_data + ibolo*bstride;
                pl = pdata->lut_data + ibolo*bstride;
-               pa = pdata->ipang ? pdata->ipang + ibolo : NULL;
+               pa = pdata->ipang ? pdata->ipang + ibolo*bstride : NULL;
 
 /* Loop round each time slice, maintaining a pointer to the JCMTState
    info for the slice (we need this to get the elevation for each slice). */
@@ -612,10 +612,10 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
 
 /* Find the normalised instrumental Q and U. These are with respect to the
    focal plane Y axis. */
-                     if( pdata->p0data ) {       /* "JK" model */
+                        if( pdata->p0data ) {       /* "JK" model */
                            qfp = ca + p1*cos( cc + 2*state->tcs_az_ac2 );
                            ufp = cb + p1*sin( cc + 2*state->tcs_az_ac2 );
-                     } else {                    /* "PL1" model */
+                        } else {                    /* "PL1" model */
                            p1 = ca + cb*state->tcs_az_ac2 + cc*state->tcs_az_ac2*state->tcs_az_ac2;
                            qfp = p1*cos( -2*state->tcs_az_ac2 );
                            ufp = p1*sin( -2*state->tcs_az_ac2 );
@@ -647,7 +647,7 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
                   pq += tstride;
                   pr += tstride;
                   pl += tstride;
-                  if( pa ) pa += nbolo;
+                  if( pa ) pa += tstride;
                }
             }
          }
@@ -676,8 +676,8 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
       if( *status == SAI__OK ) {
 
 /* Loop over all time slices. */
-         pr = pdata->result + pdata->t1*nbolo;
          for( itime = pdata->t1; itime <= pdata->t2; itime++ ) {
+            pr = pdata->result + itime*pdata->tstride;
 
 /* Get the WCS FrameSet for the time slice. Use a mutex to prevent multiple
    threads writing to the header at the same time. Take a deep copy of
@@ -720,14 +720,19 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    sense of rotation from focal plane Y to focal plane X. */
                   if(  fx[ibolo] != VAL__BADD &&  fy[ibolo] != VAL__BADD &&
                       fx2[ibolo] != VAL__BADD && fy2[ibolo] != VAL__BADD ) {
-                     *(pr++) = atan2( fx[ibolo] - fx2[ibolo], fy2[ibolo] - fy[ibolo] );
+                     *pr = atan2( fx[ibolo] - fx2[ibolo], fy2[ibolo] - fy[ibolo] );
                   } else {
-                     *(pr++) = VAL__BADD;
+                     *pr = VAL__BADD;
                   }
+
+                  pr += pdata->bstride;
                }
 
             } else {
-               for( ibolo = 0; ibolo < nbolo; ibolo++ ) *(pr++) = VAL__BADD;
+               for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+                  *pr = VAL__BADD;
+                   pr += pdata->bstride;
+               }
             }
          }
       }
@@ -757,8 +762,7 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
 /* Returns an array holding the angle (rad.s) from the reference
    direction used by the Q/U bolometer values to focal plane Y,
    measured positive in the sense of rotation from focal plane Y to focal
-   plane X, for every bolometer sample in a smfData. The values are bolo
-   ordered so that "bstride" is 1 and "tstsride" is nbolo. The returned
+   plane X, for every bolometer sample in a smfData. The returned
    array should be freed using astFree when no longer needed. */
 static double *smf1_calcang( ThrWorkForce *wf, smfData *data, const char *trsys,
                              int *status ){
@@ -780,6 +784,8 @@ static double *smf1_calcang( ThrWorkForce *wf, smfData *data, const char *trsys,
    int nw;
    int subsysnum;
    size_t tstep;
+   size_t bstride;
+   size_t tstride;
 
 /* Check the inherited status. Also return NULL if the Q/U values are
    already referenced to the focal plane Y axis (i.e. all returned angles
@@ -788,8 +794,8 @@ static double *smf1_calcang( ThrWorkForce *wf, smfData *data, const char *trsys,
 
 /* Get the number of bolometers and time slices, together with the strides
    between adjacent bolometers and adjacent time slices. */
-   smf_get_dims( data,  NULL, &ncol, &nbolo, &ntslice, NULL, NULL, NULL,
-                 status );
+   smf_get_dims( data,  NULL, &ncol, &nbolo, &ntslice, NULL, &bstride,
+                 &tstride, status );
 
 /* Allocate the returned array. */
    result = astMalloc( nbolo*ntslice*sizeof( *result ) );
@@ -853,6 +859,8 @@ static double *smf1_calcang( ThrWorkForce *wf, smfData *data, const char *trsys,
          pdata->gy = gy;
          pdata->fx = fx;
          pdata->fy = fy;
+         pdata->bstride = bstride;
+         pdata->tstride = tstride;
 
 /* Submit the job for execution by the next available thread. */
          thrAddJob( wf, 0, pdata, smf1_subip, 0, NULL, status );
