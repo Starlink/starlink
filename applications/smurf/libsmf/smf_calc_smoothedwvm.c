@@ -111,6 +111,9 @@
 #include <math.h>
 #include <sys/time.h>
 
+/* Define macro DEBUG_WVM to enable debugging output for WVM processing. */
+/* #define DEBUG_WVM 1 */
+
   /* Macro to find a smfData in the smfGroup that contains valid
      data at this time slice */
 #define SELECT_DATA( ALLDATA, SMFDATA, BADVAL, ITEM, INDEX )     \
@@ -140,8 +143,10 @@ typedef struct {
   dim_t nframes;
 } smfCalcWvmJobData;
 
+#ifdef DEBUG_WVM
 void smf__print_wvm_data(double* taudata, smfHead *hdr, size_t nframes,
                          int* status);
+#endif
 
 void smf__calc_wvm_job( void *job_data, int *status );
 
@@ -475,10 +480,10 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
     if (astMapGet0D(extpars, "DESPIKEWVM", &despiketime)
             && astMapGet0D(extpars, "DESPIKEWVMTOL", &despiketol)) {
         if  ((despiketime != VAL__BADD) && (despiketol != VAL__BADD)) {
-            /* Use this to get the raw WVM output for debugging before despiking */
-            /*
+            #ifdef DEBUG_WVM
+            /* Get the raw WVM output for debugging before despiking */
             smf__print_wvm_data(taudata, (thesedata->sdata)[0]->hdr, nframes, status);
-            */
+            #endif
 
             msgOutiff(MSG__VERB, "",
                       "Despiking WVM data with %f s window and %f tolerance",
@@ -495,10 +500,10 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
 
     if (astMapGet0D( extpars, "SMOOTHWVM", &smoothtime ) ) {
       if (smoothtime != VAL__BADD && smoothtime > 0.0) {
-        /* Use this to get the raw WVM output for debugging before smoothing */
-        /*
+        #ifdef DEBUG_WVM
+        /* Get the raw WVM output for debugging before smoothing */
         smf__print_wvm_data(taudata, (thesedata->sdata)[0]->hdr, nframes, status);
-        */
+        #endif
 
         smfData * data = (thesedata->sdata)[0];
         double steptime = data->hdr->steptime;
@@ -520,10 +525,10 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
     }
   }
 
-  /* Use this to get the raw WVM output for debugging */
-  /*
+  #ifdef DEBUG_WVM
+  /* Get the raw WVM output for debugging */
   smf__print_wvm_data(taudata, (thesedata->sdata)[0]->hdr, nframes, status);
-  */
+  #endif
 
   /* Free resources */
   if (tmpthesedata) smf_close_related( wf, &tmpthesedata, status );
@@ -540,6 +545,7 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
 
 }
 
+#ifdef DEBUG_WVM
 /* Debugging routine to print out the raw WVM data. */
 void smf__print_wvm_data(double* taudata, smfHead *hdr, size_t nframes,
                          int* status) {
@@ -555,6 +561,7 @@ void smf__print_wvm_data(double* taudata, smfHead *hdr, size_t nframes,
     fprintf(stderr, "\n\n");
   }
 }
+#endif
 
 /* Routine called by thread queue to calculate a chunk of WVM data.
    Actual arguments are passed in through job_data struct defined
