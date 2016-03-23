@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V8.0.7) of the Starlink AST (astrometry) library is
+   A new release (V8.1.0) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,15 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- The configure script has a new option "--without-fortran" that allows
+AST to be built in situations where no Fortran compiler is available. The
+resulting library has no Fortran interface and so cannot be used within
+Fortran applications. Also, the link scripts do not attempt to include the
+fortran runtime libraries.
+
+Main Changes in V8.0.7
+----------------------
 
 - A bug in FitsChan has been fixed which could cause a small shift in
   spectral axis value when writing out a spectral cube to FITS-WCS headers,

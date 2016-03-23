@@ -5,7 +5,6 @@
 GRP_C_ROUTINES = \
     axis.c \
     box.c \
-    c2f77.c \
     channel.c \
     circle.c \
     cmpframe.c \
@@ -15,64 +14,11 @@ GRP_C_ROUTINES = \
     dssmap.c \
     ellipse.c \
     error.c \
-    fbox.c \
-    fchannel.c \
-    fcircle.c \
-    fcmpframe.c \
-    fcmpmap.c \
-    fcmpregion.c \
-    fdsbspecframe.c \
-    fdssmap.c \
-    fellipse.c \
-    ferror.c \
-    ffitschan.c \
-    ffluxframe.c \
-    fframe.c \
-    fframeset.c \
-    fgrismmap.c \
-    finterval.c \
-    fintramap.c \
     fitschan.c \
-    fkeymap.c \
-    flutmap.c \
+    fitstable.c \
     fluxframe.c \
-    fmapping.c \
-    fmathmap.c \
-    fmatrixmap.c \
-    fnullregion.c \
-    fobject.c \
-    fpcdmap.c \
-    fpermmap.c \
-    fplot.c \
-    fplot3d.c \
-    fpointlist.c \
-    fpolygon.c \
-    fpolymap.c \
-    fprism.c \
     frame.c \
     frameset.c \
-    fratemap.c \
-    fnormmap.c \
-    fregion.c \
-    fshiftmap.c \
-    fskyframe.c \
-    fslamap.c \
-    fspecfluxframe.c \
-    fspecframe.c \
-    fspecmap.c \
-    ftimeframe.c \
-    ftimemap.c \
-    fsphmap.c \
-    ffitstable.c \
-    ftable.c \
-    ftranmap.c \
-    fselectormap.c \
-    fswitchmap.c \
-    funitmap.c \
-    fwcsmap.c \
-    fwinmap.c \
-    fxmlchan.c \
-    fzoommap.c \
     globals.c \
     grismmap.c \
     interval.c \
@@ -84,6 +30,7 @@ GRP_C_ROUTINES = \
     mathmap.c \
     matrixmap.c \
     memory.c \
+    normmap.c \
     nullregion.c \
     object.c \
     pcdmap.c \
@@ -95,9 +42,9 @@ GRP_C_ROUTINES = \
     polygon.c \
     polymap.c \
     prism.c \
-    normmap.c \
     ratemap.c \
     region.c \
+    selectormap.c \
     shiftmap.c \
     skyaxis.c \
     skyframe.c \
@@ -107,24 +54,16 @@ GRP_C_ROUTINES = \
     specmap.c \
     sphmap.c \
     stc.c \
-    stcresourceprofile.c \
-    stcsearchlocation.c \
     stccatalogentrylocation.c \
     stcobsdatalocation.c \
+    stcresourceprofile.c \
     stcschan.c \
-    fstc.c \
-    fstcresourceprofile.c \
-    fstcsearchlocation.c \
-    fstccatalogentrylocation.c \
-    fstcobsdatalocation.c \
-    fstcschan.c \
-    fitstable.c \
+    stcsearchlocation.c \
+    switchmap.c \
     table.c \
     timeframe.c \
     timemap.c \
     tranmap.c \
-    selectormap.c \
-    switchmap.c \
     unit.c \
     unitmap.c \
     wcsmap.c \
@@ -132,6 +71,75 @@ GRP_C_ROUTINES = \
     xml.c \
     xmlchan.c \
     zoommap.c
+
+
+# The C source files required for the Fortran interface
+if !NOFORTRAN
+F_C_ROUTINES = \
+    c2f77.c \
+    fbox.c \
+    fchannel.c \
+    fcircle.c \
+    fcmpframe.c \
+    fcmpmap.c \
+    fcmpregion.c \
+    fdsbspecframe.c \
+    fdssmap.c \
+    fellipse.c \
+    ferror.c \
+    ffitschan.c \
+    ffitstable.c \
+    ffluxframe.c \
+    fframe.c \
+    fframeset.c \
+    fgrismmap.c \
+    finterval.c \
+    fintramap.c \
+    fkeymap.c \
+    flutmap.c \
+    fmapping.c \
+    fmathmap.c \
+    fmatrixmap.c \
+    fnormmap.c \
+    fnullregion.c \
+    fobject.c \
+    fpcdmap.c \
+    fpermmap.c \
+    fplot.c \
+    fplot3d.c \
+    fpointlist.c \
+    fpolygon.c \
+    fpolymap.c \
+    fprism.c \
+    fratemap.c \
+    fregion.c \
+    fselectormap.c \
+    fshiftmap.c \
+    fskyframe.c \
+    fslamap.c \
+    fspecfluxframe.c \
+    fspecframe.c \
+    fspecmap.c \
+    fsphmap.c \
+    fstc.c \
+    fstccatalogentrylocation.c \
+    fstcobsdatalocation.c \
+    fstcresourceprofile.c \
+    fstcschan.c \
+    fstcsearchlocation.c \
+    fswitchmap.c \
+    ftable.c \
+    ftimeframe.c \
+    ftimemap.c \
+    ftranmap.c \
+    funitmap.c \
+    fwcsmap.c \
+    fwinmap.c \
+    fxmlchan.c \
+    fzoommap.c
+else
+F_C_ROUTINES =
+endif
 
 # Header files which contribute to the "ast.h" file, organised to correspond
 # with the class hierarchy.
@@ -211,7 +219,6 @@ AST_H_FILES = \
 # All the (C) include files required to build the library.
 GRP_C_INCLUDE_FILES = \
     $(AST_H_FILES) \
-    c2f77.h \
     ems.h \
     err.h \
     Ers.h \
@@ -232,12 +239,21 @@ GRP_C_INCLUDE_FILES = \
     wcstrig.h \
     xmlchan.h
 
+if !NOFORTRAN
+F_C_INCLUDE_FILES = \
+    c2f77.h
+
 # The following list should include AST_PAR, but that must not be
 # distributed, and so it is listed separately in
 # nodist_libast_la_SOURCES below.
 GRP_F_INCLUDE_FILES = \
     GRF_PAR \
     AST_ERR
+
+else
+F_C_INCLUDE_FILES =
+GRP_F_INCLUDE_FILES =
+endif
 
 ## Following declaration isn't used
 ## LATEX_DOCUMENTATION_FILES = \
@@ -607,7 +623,9 @@ endif
 #  The module containing the main AST classes
 libast_la_SOURCES = \
     $(GRP_C_ROUTINES) \
+    $(F_C_ROUTINES) \
     $(GRP_C_INCLUDE_FILES) \
+    $(F_C_INCLUDE_FILES) \
     $(GRP_F_INCLUDE_FILES) \
     $(CMINPACK_FILES) \
     $(WCSLIB_FILES) \
