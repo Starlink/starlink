@@ -191,8 +191,15 @@
       RESULT = AST_POLYTRAN( THIS, FORWRD, ACC, MAXACC, MAXORDER, LBND,
      :                       UBND, STATUS )
 
-*  Write the results out to a text file.
-      CALL ATL1_PTOBJ( 'RESULT', ' ', RESULT, STATUS )
+*  Write the results out to a text file, if a fit was found.
+      IF( RESULT .NE. AST__NULL ) THEN
+         CALL ATL1_PTOBJ( 'RESULT', ' ', RESULT, STATUS )
+
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( ' ', 'Could not fit the PolyMap to the '//
+     :                 'required accuracy.', STATUS )
+      END IF
 
 *  End the AST context.
       CALL AST_END( STATUS )
