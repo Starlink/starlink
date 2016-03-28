@@ -555,8 +555,14 @@ try:
          wvmlist.append( w )
 
 #  Get other environmental values.
-         w1 = get_fits_header( qmap, "HSTSTART" )
-         hstlist.append( w1 )
+         m = re.compile("T(\d\d):(\d\d):(\d\d)").search(get_fits_header( qmap, "HSTSTART" ))
+         if m:
+             w1 = float(m.group(1))+float(m.group(2))/60+float(m.group(3))/3600
+         m = re.compile("T(\d\d):(\d\d):(\d\d)").search(get_fits_header( qmap, "HSTEND" ))
+         if m:
+             w2 = float(m.group(1))+float(m.group(2))/60+float(m.group(3))/3600
+         w = 0.5*( w1 + w2 )
+         hstlist.append( w )
 
          w1 = float( get_fits_header( qmap, "ATSTART" ) )
          w2 = float( get_fits_header( qmap, "ATEND" ) )
@@ -726,7 +732,6 @@ try:
             qlist.append( float( words[4] ) )
             ulist.append( float( words[5] ) )
             wvmlist.append( float( words[13] ) )
-            hstlist.append( words[16] )
             atlist.append( float( words[17] ) )
             humlist.append( float( words[18] ) )
             bplist.append( float( words[19] ) )
@@ -734,6 +739,13 @@ try:
             wnddirlist.append( float( words[21] ) )
             frleglist.append( float( words[22] ) )
             bkleglist.append( float( words[23] ) )
+
+            m = re.compile("T(\d\d):(\d\d):(\d\d)").search(words[16])
+            if m:
+               hst = float(m.group(1))+float(m.group(2))/60+float(m.group(3))/3600
+               hstlist.append( hst )
+            else:
+               hstlist.append( float( words[16] ) )
 
 #  Record original lists before we reject any points.
    qlist0 = qlist
