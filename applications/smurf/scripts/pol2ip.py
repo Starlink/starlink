@@ -139,9 +139,14 @@
 *        The path to a new text file to create in which to place a table
 *        holding columns of elevation, Q, U, Qfit and Ufit (and various
 *        other useful things), in TOPCAT ASCII format. [!]
+*     TABLEIN = LITERAL (Read)
+*        The path to an existing text file containing a table created by
+*        a previous run of this script, using the TABLE parameter. If
+*        supplied, none of the other parameters are accessed, and a fit
+*        is performed to the values in the supplied table. [!]
 
 *  Copyright:
-*     Copyright (C) 2015 East Asian Observatory
+*     Copyright (C) 2015,2016 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -214,6 +219,14 @@ ulist = []
 utlist = []
 obsnumlist = []
 wvmlist = []
+hstlist = []
+atlist = []
+humlist = []
+bplist = []
+wndspdlist = []
+wnddirlist = []
+frleglist = []
+bkleglist = []
 
 # The mean total intensity within the aperture.
 ival = 0
@@ -328,6 +341,8 @@ try:
                                 "pre-existing Q/U data", None, noprompt=True))
    params.append(starutil.Par0S("TABLE", "Output table holding raw and fitted "
                                 "Q/U values", None, noprompt=True))
+   params.append(starutil.Par0S("TABLEIN", "Input table holding raw "
+                                "Q/U values", None, noprompt=True))
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
@@ -337,241 +352,292 @@ try:
 #  the user goes off for a coffee whilst the script is running and does not
 #  see a later parameter propmpt or error...
 
-#  Get the observation list. Verify it exists, and then read the contents
-#  into a list.
-   obslist_file = parsys["OBSLIST"].value
-   if not os.path.isfile(obslist_file):
-      raise UsageError("obslist file ({0}) does not exist.".
-            format(obslist_file) )
-   with open(obslist_file) as f:
-      obslist = f.read().splitlines()
-
-#  Get the I reference map.
-   iref = parsys["IREF"].value
-
-#  Get the aperture diameter, in arcsec.
-   diam = parsys["DIAM"].value
-
-#  Get the directory to store Q/U files.
-   qudir = parsys["QUDIR"].value
-
 #  Get the name of the output table.
    table = parsys["TABLE"].value
 
+#  Get the name of the input table.
+   tablein = parsys["TABLEIN"].value
+   if not tablein:
+
+#  Get the observation list. Verify it exists, and then read the contents
+#  into a list.
+      obslist_file = parsys["OBSLIST"].value
+      if not os.path.isfile(obslist_file):
+         raise UsageError("obslist file ({0}) does not exist.".
+               format(obslist_file) )
+      with open(obslist_file) as f:
+         obslist = f.read().splitlines()
+
+#  Get the I reference map.
+      iref = parsys["IREF"].value
+
+#  Get the aperture diameter, in arcsec.
+      diam = parsys["DIAM"].value
+
+#  Get the directory to store Q/U files.
+      qudir = parsys["QUDIR"].value
+
 #  The user-supplied pixel size.
-   pixsize = parsys["PIXSIZE"].value
-   if pixsize:
-      pixsizepar = "pixsize={0}".format(pixsize)
-   else:
-      pixsizepar = ""
+      pixsize = parsys["PIXSIZE"].value
+      if pixsize:
+         pixsizepar = "pixsize={0}".format(pixsize)
+      else:
+         pixsizepar = ""
 
 #  See if old temp files are to be re-used.
-   restart = parsys["RESTART"].value
-   if restart == None:
-      retain = parsys["RETAIN"].value
+      restart = parsys["RESTART"].value
+      if restart == None:
+         retain = parsys["RETAIN"].value
 
-   else:
-      retain = True
-      NDG.tempdir = restart
-      if not os.path.isdir(restart):
-         raise UsageError("\n\nThe directory specified by parameter RESTART ({0}) "
-                          "does not exist".format(restart) )
-      msg_out( "Re-using data in {0}".format(restart) )
+      else:
+         retain = True
+         NDG.tempdir = restart
+         if not os.path.isdir(restart):
+            raise UsageError("\n\nThe directory specified by parameter RESTART ({0}) "
+                             "does not exist".format(restart) )
+         msg_out( "Re-using data in {0}".format(restart) )
 
 #  Get the value of environment variable SC2.
-   if "SC2" not in os.environ:
-      raise UsageError( "Environment variable SC2 is undefined - cannot "
-                        "find raw SCUBA-2 data.")
-   sc2 = os.environ["SC2"]
+      if "SC2" not in os.environ:
+         raise UsageError( "Environment variable SC2 is undefined - cannot "
+                           "find raw SCUBA-2 data.")
+      sc2 = os.environ["SC2"]
 
 #  Get the value of environment variable STARLINK_DIR
-   if "STARLINK_DIR" not in os.environ:
-      raise UsageError( "Environment variable STARLINK_DIR is undefined.")
-   star = os.environ["STARLINK_DIR"]
+      if "STARLINK_DIR" not in os.environ:
+         raise UsageError( "Environment variable STARLINK_DIR is undefined.")
+      star = os.environ["STARLINK_DIR"]
 
 #  Create a config file to use with makemap. We use the standard POL2
 #  compact source condif, except we include "pol2fp=1". This is because
 #  calcqu creates the Q and U values in focal plane coords. makemap
 #  normally reports an error when supplied with Q/U values in focal plane
 #  coords - including "pol2fp=1" prevents this.
-   conf = os.path.join(NDG.tempdir,"conf")
-   fd = open(conf,"w")
-   fd.write("^{0}/share/smurf/dimmconfig_pol2_compact.lis\n".format(star))
-   fd.write("pol2fp=1\n")
-   fd.close()
+      conf = os.path.join(NDG.tempdir,"conf")
+      fd = open(conf,"w")
+      fd.write("^{0}/share/smurf/dimmconfig_pol2_compact.lis\n".format(star))
+      fd.write("pol2fp=1\n")
+      fd.close()
 
 #  If restarting, load the parameter values used by this script in the
 #  previous run.
-   newpixsize = False
-   oldpars = {}
-   if restart:
-      parfile = os.path.join(NDG.tempdir,"PARAMS")
-      if os.path.exists( parfile ):
-         with open(parfile) as f:
-            lines = f.read().splitlines()
-         for line in lines:
-            (par,val) = line.split("=")
-            oldpars[par] = float(val)
+      newpixsize = False
+      oldpars = {}
+      if restart:
+         parfile = os.path.join(NDG.tempdir,"PARAMS")
+         if os.path.exists( parfile ):
+            with open(parfile) as f:
+               lines = f.read().splitlines()
+            for line in lines:
+               (par,val) = line.split("=")
+               oldpars[par] = float(val)
 
 #  Has the pixel size changed?
-         if "pixsize" in oldpars:
-            if not pixsize or oldpars["pixsize"] != pixsize:
+            if "pixsize" in oldpars:
+               if not pixsize or oldpars["pixsize"] != pixsize:
+                  newpixsize = True
+            elif pixsize:
                newpixsize = True
-         elif pixsize:
-            newpixsize = True
-      else:
-         if pixsize:
-            newpixsize = True
+         else:
+            if pixsize:
+               newpixsize = True
 
 #  Loop round each observation.
-   actpixsize0 = None
-   for obs in obslist:
-      msg_out( "Doing observation {0}...".format(obs) )
+      actpixsize0 = None
+      for obs in obslist:
+         msg_out( "Doing observation {0}...".format(obs) )
 
 #  Create an NDG object describing all NDFs containsing raw data for the
 #  current observations.
-      try:
-         raw = NDG( "{0}/s8\?/{1}/\*".format(sc2,obs) )
-      except starutil.StarUtilError:
-         raw = None
+         try:
+            raw = NDG( "{0}/s8\?/{1}/\*".format(sc2,obs) )
+         except starutil.StarUtilError:
+            raw = None
 
 #  Create Q and U time streams from the raw analysed intensity time
 #  streams. These Q and U values use the focal plane Y axis as the reference
 #  direction. The Q and U files are placed into a subdirectory of the NDG
 #  temp directory. If the directory already exists, then re-use the files
 #  in it rather than calculating them again.
-      if qudir:
-         obsdir = "{0}/{1}".format( qudir, obs )
-      else:
-         obsdir = "{0}/{1}".format( NDG.tempdir, obs )
+         if qudir:
+            obsdir = "{0}/{1}".format( qudir, obs )
+         else:
+            obsdir = "{0}/{1}".format( NDG.tempdir, obs )
 
-      if not os.path.isdir(obsdir):
-         if not raw:
-            raise UsageError( "Cannot find raw SCUBA-2 data.")
-         os.makedirs(obsdir)
-         invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config=def outq={1}/\*_QT "
-                "outu={1}/\*_UT fix=yes north=!".format( raw, obsdir ) )
-      else:
-         msg_out("Re-using pre-calculated Q and U time streams for {0}.".format(obs))
+         if not os.path.isdir(obsdir):
+            if not raw:
+               raise UsageError( "Cannot find raw SCUBA-2 data.")
+            os.makedirs(obsdir)
+            invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config=def outq={1}/\*_QT "
+                   "outu={1}/\*_UT fix=yes north=!".format( raw, obsdir ) )
+         else:
+            msg_out("Re-using pre-calculated Q and U time streams for {0}.".format(obs))
 
 #  Make maps from the Q and U time streams. These Q and U values are with
 #  respect to the focal plane Y axis.
-      mapfile = "{0}/qmap.sdf".format(obsdir)
-      if not os.path.exists( mapfile ) or newpixsize:
-         qts = NDG( "{0}/*_QT".format( obsdir ) )
-         qmap = NDG( mapfile, False )
-         invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} {3}".format(qts,conf,qmap,pixsizepar))
-      else:
-         qmap = NDG( mapfile, True )
-         msg_out("Re-using pre-calculated Q map for {0}.".format(obs))
+         mapfile = "{0}/qmap.sdf".format(obsdir)
+         if not os.path.exists( mapfile ) or newpixsize:
+            qts = NDG( "{0}   /*_QT".format( obsdir ) )
+            qmap = NDG( mapfile, False )
+            invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} {3}".format(qts,conf,qmap,pixsizepar))
+         else:
+            qmap = NDG( mapfile, True )
+            msg_out("Re-using pre-calculated Q map for {0}.".format(obs))
 
-      invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(qmap) )
-      actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
-      if actpixsize0 == None:
-         actpixsize0 = actpixsize
-      elif actpixsize != actpixsize0:
-         raise UsageError( "{0} had pixel size {1} - was expecting {2}".
-                           format(qmap,actpixsize,actpixsize0))
+         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(qmap) )
+         actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
+         if actpixsize0 == None:
+            actpixsize0 = actpixsize
+         elif actpixsize != actpixsize0:
+            raise UsageError( "{0} had pixel size {1} - was expecting {2}".
+                              format(qmap,actpixsize,actpixsize0))
 
 
-      mapfile = "{0}/umap.sdf".format(obsdir)
-      if not os.path.exists( mapfile ) or newpixsize:
-         uts = NDG( "{0}/*_UT".format( obsdir ) )
-         umap = NDG( mapfile, False )
-         invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} {3}".format(uts,conf,umap,pixsizepar))
-      else:
-         umap = NDG( mapfile, True )
-         msg_out("Re-using pre-calculated U map for {0}.".format(obs))
+         mapfile = "{0}/umap.sdf".format(obsdir)
+         if not os.path.exists( mapfile ) or newpixsize:
+            uts = NDG( "{0}   /*_UT".format( obsdir ) )
+            umap = NDG( mapfile, False )
+            invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} {3}".format(uts,conf,umap,pixsizepar))
+         else:
+            umap = NDG( mapfile, True )
+            msg_out("Re-using pre-calculated U map for {0}.".format(obs))
 
-      invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(umap) )
-      actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
-      if actpixsize != actpixsize0:
-         raise UsageError( "{0} had pixel size {1} - was expecting {2}".
-                           format(qmap,actpixsize,actpixsize0))
+         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(umap) )
+         actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
+         if actpixsize != actpixsize0:
+            raise UsageError( "{0} had pixel size {1} - was expecting {2}".
+                              format(qmap,actpixsize,actpixsize0))
 
 #  Ensure the maps use offset coordinates so that we can assume the
 #  source is centred at (0,0). This should already be the case for
 #  planets, but will not be the case for non-moving objects.
-      invoke( "$KAPPA_DIR/wcsattrib ndf={0} mode=set name=skyrefis "
-              "newval=origin".format(qmap) )
-      invoke( "$KAPPA_DIR/wcsattrib ndf={0} mode=set name=skyrefis "
-              "newval=origin".format(umap) )
+         invoke( "$KAPPA_DIR/wcsattrib ndf={0} mode=set name=skyrefis "
+                 "newval=origin".format(qmap) )
+         invoke( "$KAPPA_DIR/wcsattrib ndf={0} mode=set name=skyrefis "
+                 "newval=origin".format(umap) )
 
 #  Ensure sky offset values are formatted as decimal seconds.
-      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(qmap) )
-      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(qmap) )
-      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(umap) )
-      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(umap) )
+         invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(qmap) )
+         invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(qmap) )
+         invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(umap) )
+         invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(umap) )
 
 #  Form the polarised intensity map (no de-biassing), and remove the
 #  spectral axis.
-      tmp1 = NDG( 1 )
-      invoke( "$KAPPA_DIR/maths exp='sqrt(ia**2+ib**2)' ia={0} ib={1} out={2}"
-              .format(qmap,umap,tmp1) )
-      pimap = NDG( 1 )
-      invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(tmp1,pimap) )
+         tmp1 = NDG( 1 )
+         invoke( "$KAPPA_DIR/maths exp='sqrt(ia**2+ib**2)' ia={0} ib={1} out={2}"
+                 .format(qmap,umap,tmp1) )
+         pimap = NDG( 1 )
+         invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(tmp1,pimap) )
 
 #  Find the position of the source centre in sky coords within the polarised
 #  intensity map.
-      invoke("$KAPPA_DIR/centroid ndf={0} mode=int init=\"'0,0'\"".format(pimap) )
-      xcen = get_task_par( "xcen", "centroid" )
-      ycen = get_task_par( "ycen", "centroid" )
+         invoke("$KAPPA_DIR/centroid ndf={0} mode=int init=\"'0,0'\"".format(pimap) )
+         xcen = get_task_par( "xcen", "centroid" )
+         ycen = get_task_par( "ycen", "centroid" )
 
 #  Get the elevation at the middle of the observation.
-      el1 = float( get_fits_header( qmap, "ELSTART" ) )
-      el2 = float( get_fits_header( qmap, "ELEND" ) )
-      el = 0.5*( el1 + el2 )
-      elist.append( el )
+         el1 = float( get_fits_header( qmap, "ELSTART" ) )
+         el2 = float( get_fits_header( qmap, "ELEND" ) )
+         el = 0.5*( el1 + el2 )
+         elist.append( el )
 
 #  Get the azimuth at the middle of the observation.
-      az1 = float( get_fits_header( qmap, "AZSTART" ) )
-      az2 = float( get_fits_header( qmap, "AZEND" ) )
-      az = 0.5*( az1 + az2 )
-      alist.append( az )
+         az1 = float( get_fits_header( qmap, "AZSTART" ) )
+         az2 = float( get_fits_header( qmap, "AZEND" ) )
+         az = 0.5*( az1 + az2 )
+         alist.append( az )
 
 #  Get the WVM tau at the middle of the observation.
-      w1 = float( get_fits_header( qmap, "WVMTAUST" ) )
-      w2 = float( get_fits_header( qmap, "WVMTAUEN" ) )
-      w = 0.5*( w1 + w2 )
-      wvmlist.append( w )
+         w1 = float( get_fits_header( qmap, "WVMTAUST" ) )
+         w2 = float( get_fits_header( qmap, "WVMTAUEN" ) )
+         w = 0.5*( w1 + w2 )
+         wvmlist.append( w )
+
+#  Get other environmental values.
+         w1 = get_fits_header( qmap, "HSTSTART" )
+         hstlist.append( w1 )
+
+         w1 = float( get_fits_header( qmap, "ATSTART" ) )
+         w2 = float( get_fits_header( qmap, "ATEND" ) )
+         w = 0.5*( w1 + w2 )
+         atlist.append( w )
+
+         w1 = float( get_fits_header( qmap, "HUMSTART" ) )
+         w2 = float( get_fits_header( qmap, "HUMEND" ) )
+         w = 0.5*( w1 + w2 )
+         humlist.append( w )
+
+         w1 = float( get_fits_header( qmap, "BPSTART" ) )
+         w2 = float( get_fits_header( qmap, "BPEND" ) )
+         w = 0.5*( w1 + w2 )
+         bplist.append( w )
+
+         w1 = float( get_fits_header( qmap, "WNDSPDST" ) )
+         w2 = float( get_fits_header( qmap, "WNDSPDEN" ) )
+         w = 0.5*( w1 + w2 )
+         wndspdlist.append( w )
+
+         w1 = float( get_fits_header( qmap, "WNDDIRST" ) )
+         w2 = float( get_fits_header( qmap, "WNDDIREN" ) )
+         w = 0.5*( w1 + w2 )
+         wnddirlist.append( w )
+
+         w1 = float( get_fits_header( qmap, "FRLEGTST" ) )
+         w2 = float( get_fits_header( qmap, "FRLEGTEN" ) )
+         w = 0.5*( w1 + w2 )
+         frleglist.append( w )
+
+         w1 = float( get_fits_header( qmap, "BKLEGTST" ) )
+         w2 = float( get_fits_header( qmap, "BKLEGTEN" ) )
+         w = 0.5*( w1 + w2 )
+         bkleglist.append( w )
 
 #  Append the UT and obs number to the corresponding lists.
-      utlist.append( int( float( get_fits_header( qmap, "UTDATE" ) ) ) )
-      obsnumlist.append( int( float( get_fits_header( qmap, "OBSNUM" ) ) ) )
+         utlist.append( int( float( get_fits_header( qmap, "UTDATE" ) ) ) )
+         obsnumlist.append( int( float( get_fits_header( qmap, "OBSNUM" ) ) ) )
 
 #  If we are fitting the peak values, use beamfit to fit a beam to the
 #  polarised intensity source and then get the peak polarised intensity value.
-      if diam <= 0.0:
-         try:
-            invoke("$KAPPA_DIR/beamfit ndf={0}'(0~30,0~30)' pos=\"'{1},{2}'\" "
-                   "gauss=no mode=int ".format( pimap,xcen,ycen) )
-            pipeak = get_task_par( "amp(1)", "beamfit" )
+         if diam <= 0.0:
+            try:
+               invoke("$KAPPA_DIR/beamfit ndf={0}'(0~30,0~30)' pos=\"'{1},{2}'\" "
+                      "gauss=no mode=int ".format( pimap,xcen,ycen) )
+               pipeak = get_task_par( "amp(1)", "beamfit" )
 
 #  Get the peak Q and U values assuming that the IP is parallel to
 #  elevation, and append them to the end of the list if Q and U values.
-            elval = -2*radians(el)
-            qlist.append( pipeak*cos(elval) )
-            ulist.append( pipeak*sin(elval) )
+               elval = -2*radians(el)
+               qlist.append( pipeak*cos(elval) )
+               ulist.append( pipeak*sin(elval) )
 
 #  If beamfit failed, we cannot store q and u values, so remove the
 #  corresponding item from the other arrays (i.e the last element of each
 #  array).
-         except starutil.StarUtilError:
-            del obsnumlist[-1]
-            del wvmlist[-1]
-            del alist[-1]
-            del elist[-1]
-            del utlist[-1]
+            except starutil.StarUtilError:
+               del obsnumlist[-1]
+               del wvmlist[-1]
+               del alist[-1]
+               del elist[-1]
+               del utlist[-1]
+               del hstlist[-1]
+               del atlist[-1]
+               del humlist[-1]
+               del bplist[-1]
+               del wndspdlist[-1]
+               del wnddirlist[-1]
+               del frleglist[-1]
+               del bkleglist[-1]
 
 #  Otherwise, get the mean Q value in a circle of diameter given by parameter
 #  DIAM centred on the source.
-      else:
-         invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(qmap,diam,xcen,ycen))
-         qlist.append( get_task_par( "mean", "aperadd" ) )
+         else:
+            invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(qmap,diam,xcen,ycen))
+            qlist.append( get_task_par( "mean", "aperadd" ) )
 
 #  Likewise, get the mean U value in the same circle.
-         invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(umap,diam,xcen,ycen))
-         ulist.append( get_task_par( "mean", "aperadd" ) )
+            invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(umap,diam,xcen,ycen))
+            ulist.append( get_task_par( "mean", "aperadd" ) )
 
 
 
@@ -579,41 +645,95 @@ try:
 #  Now all observations are done, get the corresponding I value. First get rid
 #  of any spectral axis and resample the supplied I map onto the same pixel
 #  size as the Q an U maps.
-   junk = NDG(1)
-   invoke("$KAPPA_DIR/ndfcopy in={0} trim=yes out={1}".format(iref,junk) )
-   invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=skyrefis "
-          "newval=origin".format(junk) )
-   invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(junk) )
-   invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(junk) )
-   if pixsize:
-      imap = NDG(1)
-      invoke("$KAPPA_DIR/sqorst in={0} mode=pix pixscale=\\\"{1},{1}\\\" out={2}".
-             format(junk,pixsize,imap) )
-   else:
-      imap = junk
-   invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(imap) )
-   actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
-   if actpixsize != actpixsize0:
-      raise UsageError( "IREF map had pixel size {0} - was expecting {1}".
-                        format(actpixsize,actpixsize0))
+      junk = NDG(1)
+      invoke("$KAPPA_DIR/ndfcopy in={0} trim=yes out={1}".format(iref,junk) )
+      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=skyrefis "
+             "newval=origin".format(junk) )
+      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(junk) )
+      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(junk) )
+      if pixsize:
+         imap = NDG(1)
+         invoke("$KAPPA_DIR/sqorst in={0} mode=pix pixscale=\\\"{1},{1}\\\" out={2}".
+                format(junk,pixsize,imap) )
+      else:
+         imap = junk
+      invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(imap) )
+      actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
+      if actpixsize != actpixsize0:
+         raise UsageError( "IREF map had pixel size {0} - was expecting {1}".
+                           format(actpixsize,actpixsize0))
 
 #  Find the position of the source centre in sky offsets within the total intensity map.
-   invoke("$KAPPA_DIR/centroid ndf={0} mode=int init=\"'0,0'\"".format(imap) )
-   xcen = get_task_par( "xcen", "centroid" )
-   ycen = get_task_par( "ycen", "centroid" )
+      invoke("$KAPPA_DIR/centroid ndf={0} mode=int init=\"'0,0'\"".format(imap) )
+      xcen = get_task_par( "xcen", "centroid" )
+      ycen = get_task_par( "ycen", "centroid" )
 
 #  If we are fitting the peak values, use beamfit to fit a beam to the total
 #  intensity source and then get the peak value.
-   if diam <= 0.0:
-      invoke("$KAPPA_DIR/beamfit ndf={0}'(0~30,0~30)' pos=\"'{1},{2}'\" "
-             "gauss=no mode=int ".format( imap,xcen,ycen) )
-      ival = get_task_par( "amp(1)", "beamfit" )
+      if diam <= 0.0:
+         invoke("$KAPPA_DIR/beamfit ndf={0}'(0~30,0~30)' pos=\"'{1},{2}'\" "
+                "gauss=no mode=int ".format( imap,xcen,ycen) )
+         ival = get_task_par( "amp(1)", "beamfit" )
 
 #  Otherwise, find the mean I value in the aperture centred on the
 #  accurate source centre.
+      else:
+         invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(imap,diam,xcen,ycen))
+         ival = get_task_par( "mean", "aperadd" )
+
+#  If an input table was supplied, read its contents.
    else:
-      invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(imap,diam,xcen,ycen))
-      ival = get_task_par( "mean", "aperadd" )
+      diam = 0.0
+      ival = 0.0
+      iref = 0.0
+      actpixsize0 = 0.0
+      lines  = []
+      bad = False
+      with open(tablein,"r") as f:
+        for line in f:
+           m = re.compile("# DIAM = (\S+)").match(line)
+           if m:
+              diam = float(m.group(1))
+
+           m = re.compile("# Total intensity value = (\S+) pW").match(line)
+           if m:
+              ival = float(m.group(1))
+
+           m = re.compile("# PIXSIZE = (\S+)").match(line)
+           if m:
+              actpixsize0 = float(m.group(1))
+
+           m = re.compile("# IREF = '(\S+)'").match(line)
+           if m:
+              iref = m.group(1)
+
+           if line.startswith("# ut obs az el q u pi ang p qfit ufit "
+               "pifit pfit tau tran rej hst at hum bp wndspd wnddir frleg bkleg"):
+              bad = False
+           elif not line.startswith("#"):
+              lines.append(line)
+
+      if diam == 0.0 or ival == 0.0 or bad:
+         raise UsageError( "TABLEIN file ('{0}') has unexpected structure.".
+                           format(tablein))
+      else:
+         for line in lines:
+            words = line.split()
+            utlist.append( float( words[0] ) )
+            obsnumlist.append( float( words[1] ) )
+            alist.append( float( words[2] ) )
+            elist.append( float( words[3] ) )
+            qlist.append( float( words[4] ) )
+            ulist.append( float( words[5] ) )
+            wvmlist.append( float( words[13] ) )
+            hstlist.append( words[16] )
+            atlist.append( float( words[17] ) )
+            humlist.append( float( words[18] ) )
+            bplist.append( float( words[19] ) )
+            wndspdlist.append( float( words[20] ) )
+            wnddirlist.append( float( words[21] ) )
+            frleglist.append( float( words[22] ) )
+            bkleglist.append( float( words[23] ) )
 
 #  Record original lists before we reject any points.
    qlist0 = qlist
@@ -671,7 +791,9 @@ try:
          fd.write("# Qn RMS = {0}   Un RMS = {1} \n".format(qrms/ival,urms/ival))
          fd.write("#\n")
 
-      fd.write("# ut obs az el q u pi ang p qfit ufit pifit pfit tau tran rej\n")
+      fd.write("# ut obs az el q u pi ang p qfit ufit pifit pfit tau tran rej "
+               "hst at hum bp wndspd wnddir frleg bkleg\n" )
+
       for i in range(len(elist0)):
          el = elist0[i]
          if dofit:
@@ -698,9 +820,13 @@ try:
          p = pi/ival
 
          fd.write("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} "
-                  "{13} {14} {15}\n".format(utlist[i], obsnumlist[i],
+                  "{13} {14} {15} {16} {17} {18} {19} {20} {21} {22} {23}\n"
+                  .format(utlist[i], obsnumlist[i],
                   alist[i], el, q, u, pi, ang, p, qfp, ufp, pifit, pfit,
-                  tau, tran, rej ))
+                  tau, tran, rej, hstlist[i], atlist[i], humlist[i],
+                  bplist[i], wndspdlist[i], wnddirlist[i], frleglist[i],
+                  bkleglist[i] ))
+
       fd.close()
       msg_out("\nTable written to file '{0}'".format(table))
 
