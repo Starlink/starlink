@@ -34,16 +34,16 @@
 *        The array which is to be used to form the histogram.
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The parameter name used to obtain the number of bins in the
-*        histogram.
+*        histogram.  NUMBIN is recommended.
 *     METHOD = CHARACTER * ( * ) (Given)
 *        The method used to evaluate the mode.  The choices are as
 *        follows.
 *
 *        - "HISTOGRAM" -- This finds the peak of an optimally binned
 *        histogram.  The number of bins may be altered given by
-*        through parameter NUMBIN, however it is recommended to use
-*        the optimal binsize derived from the prescription of Freedman
-*        & Diatonis.
+*        through the parameter given by PARAM, however it is recommended
+*        to use the optimal binsize derived from the prescription of
+*        Freedman & Diatonis.
 *
 *        - "MOMENTS" -- As "HISTOGRAM" but the mode is the weighted
 *        centroid from the moments of the peak bin and its neighbours.
@@ -91,7 +91,8 @@
 *        Wahrscheinlichkeitstheorie und verwandte Gebiete 57, 453.
 
 *  Copyright:
-*     Copyright (C) 2007, 2010, 2011 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2010, 2011, 2016 Science & Technology
+*     Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -127,6 +128,9 @@
 *       for NUMPER equal to 2.
 *     2011-08-22 (TIMJ):
 *        Add new WGTS and WEIGHT arguments to KPG1_GHSTx calls.
+*     2016 March 30 (MJC):
+*        Use the parameter name given by PARAM rather than the hardwired
+*        NUMBIN.
 *     {enter_further_changes_here}
 
 *-
@@ -251,7 +255,7 @@
      :                           NINT( ( DMAX - DMIN ) / OPTWID ) ) )
 
 *  making it the dynamic default when asking the user.
-      CALL PAR_GDR0I( 'NUMBIN', OPTBIN, MINBIN, MAXBIN, .TRUE., NUMBIN,
+      CALL PAR_GDR0I( PARAM, OPTBIN, MINBIN, MAXBIN, .TRUE., NUMBIN,
      :                STATUS )
 
 *  Obtain work space for the histogram.
