@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_MFSB( INDF, DTAXIS, NCLIP, CLIP, NUMBIN, ALL,
-     :                      MASK, STATUS )
+      SUBROUTINE KPS1_MFSB( INDF, DTAXIS, NCLIP, CLIP, FOREST, NUMBIN,
+     :                      ALL, MASK, STATUS )
 *+
 *  Name:
 *     KPS1_MFSB
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MFSB( INDF, DTAXIS, NCLIP, CLIP, NUMBIN, ALL, MASK,
-*                     STATUS )
+*     CALL KPS1_MFSB( INDF, DTAXIS, NCLIP, CLIP, FOREST, NUMBIN, ALL,
+*                     MASK, STATUS )
 
 *  Description:
 *     This routine serves MFITTREND.  This processes each line whose
@@ -36,6 +36,10 @@
 *     CLIP( NCLIP ) = REAL (Given)
 *        The clipping levels in standard deviations for the rejection
 *        of outliers.
+*     FOREST = LOGICAL (Given)
+*        If .TRUE. the data have many spectral features---a line
+*        forest---for which a revised approach using the mode of the
+*        histogram along each line of data.
 *     NUMBIN = INTEGER (Given)
 *        The number of bins in the compressed line.  This may be set
 *        to the number of elements in the line to prevent compression.
@@ -54,7 +58,8 @@
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2007, 2009 Science & Technology Facilities Council
+*     Copyright (C) 2007, 2009, 2016 Science & Technology Facilities
+*     Council
 *     All Rights Reserved.
 
 *  Licence:
@@ -86,6 +91,8 @@
 *        Add ALL argument.
 *     2009 August 7 (MJC):
 *        Allow for revised KPS1_MFEBx API.
+*     2016 March 29 (MJC):
+*        Add FOREST argument.
 *     {enter_changes_here}
 
 *-
@@ -103,6 +110,7 @@
       INTEGER DTAXIS
       INTEGER NCLIP
       REAL CLIP( NCLIP )
+      LOGICAL FOREST
       INTEGER NUMBIN
       LOGICAL ALL
 
@@ -251,11 +259,11 @@
 *  from each line being filtered in turn.
       ELSE
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_MFLDR( DTAXIS, NCLIP, CLIP, ODIMS,
+            CALL KPS1_MFLDR( DTAXIS, NCLIP, CLIP, FOREST, ODIMS,
      :                       %VAL( CNF_PVAL( IPAL ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_MFLDD( DTAXIS, NCLIP, CLIP, ODIMS,
+            CALL KPS1_MFLDD( DTAXIS, NCLIP, CLIP, FOREST, ODIMS,
      :                       %VAL( CNF_PVAL( IPAL ) ), STATUS )
          END IF
       END IF

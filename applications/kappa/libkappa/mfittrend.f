@@ -104,6 +104,16 @@
 *     FITTYPE = LITERAL (Read)
 *        The type of fit.  It must be either "Polynomial" for a
 *        polynomial or "Spline" for a bi-cubic B-spline.  ["Polynomial"]
+*     FOREST = _LOGICAL (Read)
+*        Set this TRUE if the data may contain spectral data with many
+*        lines---a line forest---when using the automatic range mode
+*        (AUTO=TRUE).  A different approach using the histogram
+*        determines the baseline mode and noise better in the presence
+*        of multiple lines.  This leads to improved masking of the
+*        spectral lines and affords a better determination of the
+*        baseline.  In a lineforest the ratio of baseline to line
+*        regions is much reduced and hence normal sigma clipping,
+*        when FOREST=FALSE, is biased.  [FALSE]
 *     KNOTS = _INTEGER (Read)
 *        The number of interior knots used for the cubic-spline fit
 *        along the trend axis.  Increasing this parameter value
@@ -350,8 +360,8 @@
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
 *     Council.
-*     Copyright (C) 2007-2008, 2012 Science and Technology Facilities
-*     Council.
+*     Copyright (C) 2007-2008, 2012, 2016 Science and Technology
+*     Facilities Council.
 *     All Rights reserved.
 
 *  Licence:
@@ -441,6 +451,9 @@
 *        Add _INT64 support.
 *     10-SEP-2013 (DSB):
 *        Added parameter PROPBAD.
+*     2016 March 29 (MJC):
+*        Added Parameter FOREST for automatic-mode masking of many
+*        spectral lines.
 *     {enter_further_changes_here}
 
 *-
@@ -512,6 +525,7 @@
       REAL FKNOT( TOKNOT )       ! Grid co-ordinates of fixed knots
       LOGICAL FILMSK             ! Fill a mask array?
       CHARACTER*14 FMT           ! Format string
+      LOGICAL FOREST             ! Data may contain line forests?
       LOGICAL GLOBAL             ! Use the automatic global method?
       LOGICAL HASBAD             ! Input NDF may have BAD pixels?
       LOGICAL HAVVAR             ! Have a variance component?
@@ -671,6 +685,9 @@
       ELSE IF ( STATUS .EQ. SAI__OK ) THEN
          CLIPRE = .TRUE.
       END IF
+
+*  Ask if there might be a line forest.
+      CALL PAR_GET0L( 'FOREST', FOREST, STATUS )
 
 *  Access the input NDF.
 *  =====================
@@ -1155,8 +1172,8 @@
 
 *  Form ranges by averaging the lines in the section, and then
 *  performing a fit, and rejecting outliers.
-            CALL KPS1_MFSB( INNDF, JAXIS, NCLIP, CLIP, NUMBIN, GLOBAL,
-     :                      %VAL( CNF_PVAL( IPMASK ) ), STATUS )
+            CALL KPS1_MFSB( INNDF, JAXIS, NCLIP, CLIP, FOREST, NUMBIN,
+     :                      GLOBAL, %VAL( CNF_PVAL( IPMASK ) ), STATUS )
 
 *  For the global option, blocks of the mask need to be accessed in the
 *  data-blocking loop.  An alternative storage is required in the shape
@@ -1397,8 +1414,9 @@
 *  performing a fit, and rejecting outliers that define the output
 *  mask array.
             IF ( .NOT. GLOBAL ) THEN
-               CALL KPS1_MFSB( IBL, JAXIS, NCLIP, CLIP, NUMBIN, GLOBAL,
-     :                         %VAL( CNF_PVAL( IPMASK ) ), STATUS )
+               CALL KPS1_MFSB( IBL, JAXIS, NCLIP, CLIP, FOREST, NUMBIN,
+     :                         GLOBAL, %VAL( CNF_PVAL( IPMASK ) ),
+     :                         STATUS )
             ELSE
 
 *  Copy the mask array block from the previously created temporary NDF

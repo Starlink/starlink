@@ -14144,6 +14144,24 @@ iraf! {
             helpkey *
          }
 
+         parameter forest {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Does the data contain any lineforests?}
+            default FALSE
+            helpkey *
+         }
+
+         parameter hnumbin {
+            type _INTEGER
+            vpath DYNAMIC NOPROMPT
+            ppath CURRENT DEFAULT
+            default 100
+            prompt {Number of bins for histogram to determine the mode}
+            helpkey *
+         }
+
          parameter knots {
             type _INTEGER
             vpath CURRENT DEFAULT

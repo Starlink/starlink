@@ -31487,6 +31487,19 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          \texttt{["Polynomial"]}
       }
       \sstsubsection{
+         FOREST = \_LOGICAL (Read)
+      }{
+         Set this \texttt{TRUE} if the data may contain spectral data with
+         many lines---a line forest---when using the automatic range mode
+         (AUTO=\texttt{TRUE}).  A different approach using the histogram
+         determines the baseline mode and noise better in the presence
+         of multiple lines.  This leads to improved masking of the
+         spectral lines and affords a better determination of the
+         baseline.  In a lineforest the ratio of baseline to line
+         regions is much reduced and hence normal sigma clipping,
+         when FOREST=\texttt{FALSE}, is biased.  \texttt{[FALSE]}
+      }
+      \sstsubsection{
          KNOTS = \_INTEGER (Read)
       }{
          The number of interior knots used for the cubic-spline fit
@@ -53524,7 +53537,14 @@ The following applications have been modified:
               aperture.
       \end{itemize}
 
-   \item [\htmlref{NORMALIZE}{NORMALIZE}]\mbox{}
+   \item [\htmlref{MFITTREND}{MFITTREND}]\mbox{}
+      \begin{itemize}
+        \item Has a new FOREST parameter, which improves spectral-line
+              masking in line forests using a smoothed mode rather than
+              the mean and a better estimate of the baseline noise.
+      \end{itemize}
+
+      \item [\htmlref{NORMALIZE}{NORMALIZE}]\mbox{}
       \begin{itemize}
         \item Has two new parameters DRAWMARK and DRAWWIDTH that can be
               used to exclude central markers and width indicator from

@@ -19,6 +19,11 @@
          containing a mask showing which pixels were included in the
          aperture.
 
+   o MFITTREND
+      -  Has a new FOREST parameter, which improves spectral-line
+         masking in line forests using a smoothed mode rather than
+         the mean and a better estimate of the baseline noise.
+
    o NORMALIZE
 
       - Has two new parameters DRAWMARK and DRAWWIDTH that can be used

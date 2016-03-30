@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_MFLD<T>( DTAXIS, NCLIP, CLIP, DIMS, ARRAY,
+      SUBROUTINE KPS1_MFLD<T>( DTAXIS, NCLIP, CLIP, FOREST, DIMS, ARRAY,
      :                         STATUS )
 *+
 *  Name:
@@ -12,7 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MFLD<T>( DTAXIS, NCLIP, CLIP, DIMS, ARRAY, STATUS )
+*     CALL KPS1_MFLD<T>( DTAXIS, NCLIP, CLIP, FOREST, DIMS, ARRAY,
+*                        STATUS )
 
 *  Description:
 *     This routine serves MFITTREND.  It fits a straight line to
@@ -28,6 +29,10 @@
 *     CLIP( NCLIP ) = REAL (Given)
 *        The clipping levels in standard deviations for the rejection 
 *        of outliers.
+*     FOREST = LOGICAL (Given)
+*        If .TRUE. the data have many spectral features---a line
+*        forest---for which a revised approach using the mode of the
+*        histogram along each line of data.
 *     DIMS( NDF__MXDIM ) = INTEGER (Given)
 *        The dimensions of the array to be analysed.
 *     ARRAY( EL ) = ? (Given & Returned)
@@ -43,7 +48,8 @@
 *     specified.
 
 *  Copyright:
-*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2008, 2016 Science & Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -71,6 +77,9 @@
 *        Original version adapted from KPS1_MFADx.
 *     2008 May 15 (MJC):
 *        Used revised API for KPS1_LFTx.
+*     2016 March 29 (MJC):
+*        Add FOREST argument and determine the mode from the histogram
+*        peak to assess outliers in line forests.
 *     {enter_changes_here}
 
 *-
@@ -88,6 +97,7 @@
       INTEGER DTAXIS
       INTEGER NCLIP
       REAL CLIP( NCLIP )
+      LOGICAL FOREST
       INTEGER DIMS( NDF__MXDIM )
 
 *  Arguments Given and Returned:
@@ -95,6 +105,9 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
+
+*  External References:
+      REAL VAL_DTO<T>            ! Double to <COMM> conversion
 
 *  Local Constants:
       LOGICAL BAD                ! Process bad pixels
@@ -111,21 +124,26 @@
 
 *  Local Variables:
       INTEGER AREA               ! Number of lines to be fit at once
+      REAL CLFRAC( 2 )           ! Clipped fractions
       INTEGER DIMPRM( NDF__MXDIM ) ! Permuted dimensions
       DOUBLE PRECISION DMAX      ! Max. value of pixels in array
-      DOUBLE PRECISION DMAXC     ! Max. pixel value after clipping
       DOUBLE PRECISION DMIN      ! Min. value of pixels in array
-      DOUBLE PRECISION DMINC     ! Min. pixel value after clipping
+      DOUBLE PRECISION DSTAT( 7 ) ! Array of floating-point statistics
+      DOUBLE PRECISION DSTATC( 7 ) ! Array of clipped f.p. statistics
       INTEGER DTEL               ! Number of elements along detrend axis
+      DOUBLE PRECISION DMODE     ! Dummy (mode of pixels in array)
+      DOUBLE PRECISION DPEVAL( 4 ) ! Dummy values at percentiles
       INTEGER EL                 ! Number of elements in supplied array
+      REAL FRAC( 2 )             ! Percentiles for data range
+      <LTYPE> GMEAN              ! Gaussian mean
+      INTEGER GNUMB              ! Number of values lower than GMEAN
       <LTYPE> HIGH               ! Higher rejection threshold
+      DOUBLE PRECISION HRANGE( 2 ) ! Histogram data limits
       INTEGER I                  ! Loop counter
       INTEGER IDIMS( NDF__MXDIM ) ! Paste-array dimensions
       INTEGER IERR               ! Position of first error (dummy)
-      INTEGER IMAX               ! Vector index of max. pixel
-      INTEGER IMAXC              ! Vector index of max. clipped pixel
-      INTEGER IMIN               ! Vector index of min. pixel
-      INTEGER IMINC              ! Vector index of min. clipped pixel
+      INTEGER IMAX( 1 )          ! Vector index of max. pixel
+      INTEGER IMIN( 1 )          ! Vector index of min. pixel
       INTEGER IPAS               ! Pointer to workspace for A matrix
       INTEGER IPBS               ! Pointer to coefficients
       INTEGER IPLINE             ! Pointer to a single detrend line
@@ -134,38 +152,52 @@
       INTEGER IPPRES             ! Pointer to permuted residuals array
       INTEGER IPRES              ! Pointer to residuals
       INTEGER IPRLIN             ! Pointer to a single line of residuals
-      INTEGER IPWORK             ! Pointer to work array 
+      INTEGER IPWORK             ! Pointer to work array
       INTEGER IPWRK1             ! Pointer to workspace
       INTEGER IPWRK2             ! Pointer to workspace
+      INTEGER ISTAT( 3 )         ! Array of integer statistics
+      INTEGER ISTATC( 3 )        ! Array of clipped integer statistics
       INTEGER J                  ! Loop counter
+      INTEGER K                  ! Loop counter
       INTEGER LBND( 1 )          ! Lower bound of the whole array
       INTEGER LBNDL( 1 )         ! Lower bound of a line section
       <LTYPE> LOW                ! Lower rejection threshold
       DOUBLE PRECISION MEAN      ! Mean of pixels in array
       DOUBLE PRECISION MEANC     ! Mean of pixels after clipping
+      DOUBLE PRECISION MEDIAN    ! Median of pixels in array
+      DOUBLE PRECISION MODE      ! Mode of pixels in array
       INTEGER NBAD               ! Number of bad values
       INTEGER NEL                ! Number of elements (not used)
       INTEGER NGOOD              ! Number of valid values
-      INTEGER NGOODC             ! Number valid values after clipping
       INTEGER NERR               ! Number of errors
       INTEGER NREPHI             ! Number of high residuals rejected
       INTEGER NREPLO             ! Number of low residuals rejected
       INTEGER ODIMS( NDF__MXDIM ) ! Base-array dimensions
       INTEGER OFFSET( NDF__MXDIM ) ! Paste origin offsets
+      REAL PERCNT( 4 )           ! Quartile and +/-2-sigma percentiles
       INTEGER PERMBA( NDF__MXDIM ) ! Backward-permutation indices
       INTEGER PERMFO( NDF__MXDIM ) ! Forward-permutation indices
+      DOUBLE PRECISION PERVAL( 4 ) ! Values corresponding to percentiles
       INTEGER RANGES( MAXRNG )   ! Exclusion ranges
+      DOUBLE PRECISION RNGAVE    ! Mean histogram limits
+      DOUBLE PRECISION RNGDIF    ! Extent of histogram limits
+      DOUBLE PRECISION SKEW      ! Skewness of pixels in array
       DOUBLE PRECISION STDEV     ! Standard devn. of pixels in array
-      DOUBLE PRECISION STDEVC    ! Std. devn. of pixels after clipping
+      DOUBLE PRECISION STDEVM    ! One-sided standard devn. from mode
       DOUBLE PRECISION SUM       ! Sum of pixels in array
-      DOUBLE PRECISION SUMC      ! Sum of pixels after clipping
+      LOGICAL TBAD               ! Modifiable flag process bad pixels?
       INTEGER UBND( 1 )          ! Upper bound of the whole array
       INTEGER UBNDL( 1 )         ! Upper bound of a line section
+      REAL UPECNT( 4 )           ! Used percentiles
+      LOGICAL USEMOD             ! Use the mode for clipping?
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
-            
+
+*  Local Data:
+      DATA PERCNT / 2.23, 25.0, 75.0, 97.77 /
+
 *.
 
 *  Check the inherited global status.
@@ -236,6 +268,7 @@
       CALL PSX_CALLOC( DTEL, '<HTYPE>', IPRLIN, STATUS )
       CALL PSX_CALLOC( DTEL, '<HTYPE>', IPLINE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
+      TBAD = BAD
 
       DO J = 1, NCLIP
 
@@ -269,6 +302,21 @@
          CALL KPS1_PRMX<T>( NDF__MXDIM, DIMS, DIMPRM, PERMFO, ARRAY,
      :                      %VAL( CNF_PVAL( IPPERM ) ), STATUS )
 
+*  Whether or not to attempt to use the mode.
+         USEMOD = .FALSE.
+
+*  Set the percentiles needed for the moments method to estimate the
+*  mode.
+         IF ( FOREST ) THEN
+            UPECNT( 2 ) = PERCNT( 2 )
+            UPECNT( 3 ) = PERCNT( 3 )
+
+*  Set the percentiles given as fractions to determine the value range
+*  for the histogram, limits that will exclude wild outliers.
+            FRAC( 1 ) = 0.001
+            FRAC( 2 ) = 0.999
+         END IF
+
          DO I = 1, AREA
 
 *  Extract a detrend line and its residuals.
@@ -287,16 +335,133 @@
 
 *  Derive the statistics of the residuals to the fit.  No clipping is
 *  applied here.
-            CALL KPG1_STAT<T>( BAD, DTEL, %VAL( CNF_PVAL( IPRLIN ) ), 0, 
-     :                         CLIP, NGOOD, IMIN, DMIN, IMAX, DMAX, SUM,
-     :                         MEAN, STDEV, NGOODC, IMINC, DMINC, 
-     :                         IMAXC, DMAXC, SUMC, MEANC, STDEVC,
-     :                         STATUS )
+            CALL KPG_OSTA<T>( BAD, DTEL, %VAL( CNF_PVAL( IPRLIN ) ), 0,
+     :                      CLIP, ISTAT, DSTAT, ISTATC, DSTATC, STATUS )
+
+            MEAN = DSTAT( 4 )
+            STDEV = DSTAT( 5 )
+            SKEW = DSTAT( 6 )
+            NGOOD = ISTAT( 1 )
 
 *  Flag outliers beyond the clipping interval.
             IF ( STDEV .NE. VAL__BADD ) THEN
-               LOW = NUM_DTO<T>( MEAN - DBLE( CLIP( J ) ) * STDEV )
-               HIGH = NUM_DTO<T>( MEAN + DBLE( CLIP ( J ) ) * STDEV )
+
+               IF ( FOREST ) THEN
+
+*  Obtain the percentile limits within the line, using a fine histogram
+*  with iterations if there are extreme outliers.
+                  CALL KPG1_FRAC<T>( DTEL, %VAL( CNF_PVAL( IPRLIN ) ),
+     :                               2, FRAC, TBAD, CLFRAC, HRANGE,
+     :                               STATUS )
+
+*  Determine the line's mode between those data limits by forming
+*  the zeroth moment using neighbouring histogram bins about the most
+*  populous bin.  Strictly we should calculate a possibly slightly
+*  lower NGOOD, but here it's not critical.  Protect against
+*  pathological cases.
+                  RNGDIF = ABS( HRANGE( 2 ) - HRANGE( 1 ) )
+                  RNGAVE = 0.5D0 * ( ABS( HRANGE( 2 ) ) +
+     :                               ABS( HRANGE( 1 ) ) )
+                  USEMOD = STATUS .EQ. SAI__OK .AND.
+     :                     RNGDIF .GT. 100D0 * VAL__EPSD * RNGAVE
+                  IF ( USEMOD ) THEN
+                     DO K = 1, 4
+                        PERVAL( K ) = 0.0D0
+                     END DO
+                     UPECNT( 2 ) = PERCNT( 2 )
+                     UPECNT( 3 ) = PERCNT( 3 )
+
+*  Obtain the percentile values.
+                     CALL KPG1_HSTA<T>( BAD, DTEL,
+     :                                  %VAL( CNF_PVAL( IPRLIN ) ), 4,
+     :                                  PERCNT, NGOOD, IMIN( 1 ), DMIN,
+     :                                  IMAX( 1 ), DMAX, SUM, MEAN,
+     :                                  MEDIAN, MODE, PERVAL, STATUS )
+
+*  Save the percentile values for later.  They will be overwritten
+*  otherwise.
+                     DO K = 1, 4
+                        DPEVAL( K ) = PERVAL( K )
+                     END DO
+
+*  Refine the mode.
+                     CALL KPS1_HSMO<T>( BAD, DTEL,
+     :                                  %VAL( CNF_PVAL( IPRLIN ) ),
+     :                                  'HNUMBIN', 'MOMENTS',
+     :                                  HRANGE( 2 ), HRANGE( 1 ), NGOOD,
+     :                                  2, UPECNT( 2 ),
+     :                                  DPEVAL, MODE, STATUS )
+                     USEMOD = STATUS .EQ. SAI__OK
+
+*  Restore the quartile percentiles which have been set bad by
+*  KPS1_HSMOx.
+                     UPECNT( 2 ) = PERCNT( 2 )
+                     UPECNT( 3 ) = PERCNT( 3 )
+
+*  Assume that the noise about the baseline is normally distributed,
+*  with a mean equal to the mode of the totla distribution of values
+*  in the line.  We want to find the two-sigma percentiles with respect
+*  to that, rather than the whole distribution.
+
+*  Call routine to count up the values.
+                     GMEAN = VAL_DTO<T>( .FALSE., MODE, STATUS )
+                     IF ( SKEW .GT. 0D0 ) THEN
+                        CALL KPG1_NUMB<T>( BAD, .FALSE., .FALSE., DTEL,
+     :                                     %VAL( CNF_PVAL( IPRLIN ) ),
+     :                                     GMEAN, GNUMB, STATUS )
+
+*  Scale the two-sigma percentile as if we were dealing with a Gaussian.
+                        UPECNT( 1 ) = PERCNT( 1 ) * 2.0 *
+     :                                REAL( GNUMB + 1 ) / REAL( NGOOD )
+
+*  Find the percentile corresponding to -2 sigma to estimate the
+*  baseline noise.
+                        CALL KPS1_HSMO<T>( BAD, DTEL,
+     :                                     %VAL( CNF_PVAL( IPRLIN ) ),
+     :                                     'HNUMBIN', 'MOMENTS',
+     :                                     HRANGE( 2 ), HRANGE( 1 ),
+     :                                     NGOOD, 3, UPECNT,
+     :                                     PERVAL, DMODE, STATUS )
+                     ELSE
+                        CALL KPG1_NUMB<T>( BAD, .FALSE., .TRUE., DTEL,
+     :                                     %VAL( CNF_PVAL( IPRLIN ) ),
+     :                                     GMEAN, GNUMB, STATUS )
+
+*  Scale the two-sigma noise percentile as if we were dealing with a Gaussian.
+                        UPECNT( 4 ) = PERCNT( 4 ) * 2.0 *
+     :                                REAL( GNUMB - 1 ) / REAL( NGOOD )
+
+*  Find the percentile corresponding to +2 sigma to estimate the
+*  baseline noise.  Note the percentile value is now the third.
+                        CALL KPS1_HSMO<T>( BAD, DTEL,
+     :                                     %VAL( CNF_PVAL( IPRLIN ) ),
+     :                                     'HNUMBIN', 'MOMENTS',
+     :                                     HRANGE( 2 ), HRANGE( 1 ),
+     :                                     NGOOD, 4, UPECNT,
+     :                                     PERVAL, DMODE, STATUS )
+                    END IF
+                  END IF
+               END IF
+
+               IF ( USEMOD ) THEN
+
+* Since there will normally be a strong skewness, use the spread of the
+* side without the tail to obtain the baseline noise with less bias from
+* spectral lines.  A broader noise causes too much of spectral-line
+* wings to be included in the fit leading to incorrect baseline
+* subtraction.
+                  IF ( SKEW .GT. 0D0 ) THEN
+                     STDEVM = 0.5D0 * ABS( MODE - PERVAL( 1 ) )
+                  ELSE
+                     STDEVM = 0.5D0 * ABS( MODE - PERVAL( 4 ) )
+                  END IF
+
+                  LOW = NUM_DTO<T>( MODE - DBLE( CLIP( J ) ) * STDEVM )
+                  HIGH = NUM_DTO<T>( MODE + DBLE( CLIP ( J ) ) * STDEVM )
+               ELSE
+                  LOW = NUM_DTO<T>( MEAN - DBLE( CLIP( J ) ) * STDEV )
+                  HIGH = NUM_DTO<T>( MEAN + DBLE( CLIP ( J ) ) * STDEV )
+               END IF
 
 *  Replace the values in the output array outside the range with the
 *  new values, otherwise copy from the input to the output NDF.
