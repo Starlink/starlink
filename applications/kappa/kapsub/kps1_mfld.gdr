@@ -27,7 +27,7 @@
 *     NCLIP = INTEGER (Given)
 *        The number of clipping cycles for the rejection of outliers.
 *     CLIP( NCLIP ) = REAL (Given)
-*        The clipping levels in standard deviations for the rejection 
+*        The clipping levels in standard deviations for the rejection
 *        of outliers.
 *     FOREST = LOGICAL (Given)
 *        If .TRUE. the data have many spectral features---a line
@@ -92,7 +92,7 @@
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      
+
 *  Arguments Given:
       INTEGER DTAXIS
       INTEGER NCLIP
@@ -204,7 +204,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Find the number of elements in the array and the size of the
-*  A- and B-matrix workspaces.  We need space for the cumulative 
+*  A- and B-matrix workspaces.  We need space for the cumulative
 *  coefficient sums and the coefficients themselves (Ax=B).
       EL = 1
       AREA = 1
@@ -251,14 +251,14 @@
 *  Obtain the workspace for the fits.
       CALL PSX_CALLOC( AREA * ( ORDER + 1 ) * ( ORDER + 1 ),
      :                 '_DOUBLE', IPAS, STATUS )
-       
+
       CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_DOUBLE', IPBS, STATUS )
       CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_DOUBLE', IPWRK1, STATUS )
       CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_INTEGER', IPWRK2,
      :                 STATUS )
-           
+
 *  Get some workspace for the subtracted array and a permuted version of
-*  it and the output array, a copy of the original data with rejected 
+*  it and the output array, a copy of the original data with rejected
 *  pixels flagged as bad, and a mask of rejected pixels.
       CALL PSX_CALLOC( EL, '<HTYPE>', IPRES, STATUS )
       CALL PSX_CALLOC( EL, '<HTYPE>', IPPERM, STATUS )
@@ -272,8 +272,8 @@
 
       DO J = 1, NCLIP
 
-*  Fit a linear slope to all the data. 
-         CALL KPS1_LFT<T>( ORDER, DTAXIS, MAXRNG, RANGES, .FALSE., 
+*  Fit a linear slope to all the data.
+         CALL KPS1_LFT<T>( ORDER, DTAXIS, MAXRNG, RANGES, .FALSE.,
      :                     ARRAY, .FALSE., ARRAY, DIMS, ARRAY,
      :                     %VAL( CNF_PVAL( IPAS ) ),
      :                     %VAL( CNF_PVAL( IPBS ) ),
@@ -282,20 +282,20 @@
 
 *  Copy the flagged (or the initial unflagged array on the first pass)
 *  array to what will become the subtracted-fit array.
-         CALL VEC_<T>TO<T>( BAD, EL, ARRAY, %VAL( CNF_PVAL( IPRES ) ), 
+         CALL VEC_<T>TO<T>( BAD, EL, ARRAY, %VAL( CNF_PVAL( IPRES ) ),
      :                      IERR, NERR, STATUS )
 
 *  Form the residuals from the fit.
-         CALL KPS1_LFTS<T>( ORDER, DTAXIS, .TRUE., DIMS, 
-     :                      %VAL( CNF_PVAL( IPBS ) ), 
+         CALL KPS1_LFTS<T>( ORDER, DTAXIS, .TRUE., DIMS,
+     :                      %VAL( CNF_PVAL( IPBS ) ),
      :                      %VAL( CNF_PVAL( IPRES ) ), STATUS )
 
 *  For the rejection process each line to be fit is filtered separately.
 *  To make this easier, permute the axes in the supplied array and
 *  residuals so that the trend axis is first.  Then within the permuted
-*  arrays, each line is offset from the next by the length of the trend 
+*  arrays, each line is offset from the next by the length of the trend
 *  axis in bytes.  There are AREA lines to test.
-         CALL KPS1_PRMX<T>( NDF__MXDIM, DIMS, DIMPRM, PERMFO, 
+         CALL KPS1_PRMX<T>( NDF__MXDIM, DIMS, DIMPRM, PERMFO,
      :                      %VAL( CNF_PVAL( IPRES ) ),
      :                      %VAL( CNF_PVAL( IPPRES ) ), STATUS )
 
@@ -322,16 +322,15 @@
 *  Extract a detrend line and its residuals.
             LBNDL( 1 ) = 1 + ( I - 1 ) * DTEL
             UBNDL( 1 ) = I * DTEL
-            CALL KPG1_CPND<T>( LINDIM, LBND, UBND,  
+            CALL KPG1_CPND<T>( LINDIM, LBND, UBND,
      :                         %VAL( CNF_PVAL( IPPRES ) ),
-     :                         LBNDL, UBNDL, 
+     :                         LBNDL, UBNDL,
      :                         %VAL( CNF_PVAL( IPRLIN ) ), NEL, STATUS )
 
-            CALL KPG1_CPND<T>( LINDIM, LBND, UBND, 
+            CALL KPG1_CPND<T>( LINDIM, LBND, UBND,
      :                         %VAL( CNF_PVAL( IPPERM ) ),
      :                         LBNDL, UBNDL,
      :                         %VAL( CNF_PVAL( IPLINE ) ), NEL, STATUS )
-
 
 *  Derive the statistics of the residuals to the fit.  No clipping is
 *  applied here.
@@ -474,28 +473,28 @@
 
 *  Multiply the values by 0 to form a mask of the rejected elements.
                   CALL KPG1_CMUL<T>( BAD, DTEL,
-     :                               %VAL( CNF_PVAL( IPWORK ) ), 
-     :                               0.0D0, %VAL( CNF_PVAL( IPMASK ) ), 
+     :                               %VAL( CNF_PVAL( IPWORK ) ),
+     :                               0.0D0, %VAL( CNF_PVAL( IPMASK ) ),
      :                               NBAD, STATUS )
 
 *  Add the mask to the array being fitted.
                   CALL VEC_ADD<T>( BAD, DTEL,
      :                             %VAL( CNF_PVAL( IPLINE ) ),
-     :                             %VAL( CNF_PVAL( IPMASK ) ), 
-     :                             %VAL( CNF_PVAL( IPWORK ) ), 
+     :                             %VAL( CNF_PVAL( IPMASK ) ),
+     :                             %VAL( CNF_PVAL( IPWORK ) ),
      :                             IERR, NERR, STATUS )
 
 *  Copy the flagged array to the returned, but permuted, array.
                   CALL VEC_<T>TO<T>( BAD, DTEL,
-     :                               %VAL( CNF_PVAL( IPWORK ) ), 
-     :                               %VAL( CNF_PVAL( IPLINE ) ), 
+     :                               %VAL( CNF_PVAL( IPWORK ) ),
+     :                               %VAL( CNF_PVAL( IPLINE ) ),
      :                               IERR, NERR, STATUS )
 
 *  Paste the line with flagged features back into the raw permuted data.
                   OFFSET( 1 ) = ( I - 1 ) * DTEL
-                  CALL KPG1_PAST<T>( .FALSE., .TRUE., OFFSET, IDIMS, 
+                  CALL KPG1_PAST<T>( .FALSE., .TRUE., OFFSET, IDIMS,
      :                               DTEL, %VAL( CNF_PVAL( IPLINE ) ),
-     :                               ODIMS, EL, 
+     :                               ODIMS, EL,
      :                               %VAL( CNF_PVAL( IPPERM ) ),
      :                               STATUS )
                END IF
