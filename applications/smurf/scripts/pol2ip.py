@@ -477,7 +477,7 @@ try:
 #  respect to the focal plane Y axis.
          mapfile = "{0}/qmap.sdf".format(obsdir)
          if not os.path.exists( mapfile ) or newpixsize:
-            qts = NDG( "{0}   /*_QT".format( obsdir ) )
+            qts = NDG( "{0}/*_QT".format( obsdir ) )
             qmap = NDG( mapfile, False )
             invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} {3}".format(qts,conf,qmap,pixsizepar))
          else:
@@ -495,7 +495,7 @@ try:
 
          mapfile = "{0}/umap.sdf".format(obsdir)
          if not os.path.exists( mapfile ) or newpixsize:
-            uts = NDG( "{0}   /*_UT".format( obsdir ) )
+            uts = NDG( "{0}/*_UT".format( obsdir ) )
             umap = NDG( mapfile, False )
             invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} {3}".format(uts,conf,umap,pixsizepar))
          else:
