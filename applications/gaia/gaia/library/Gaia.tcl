@@ -443,6 +443,19 @@ itcl::class gaia::Gaia {
          }
       }
 
+      #  Attempt to register as SAMP listener, adding callbacks to be
+      #  informed when the status of the SAMP connection changes.
+      if {$itk_option(-interop_menu)} {
+         init_samp_
+         if { $samp_client_ != "" } {
+            $samp_client_ reg_change_command [code $this samp_reg_changed_]
+            samp_reg_changed_
+            set tracker [$samp_client_ cget -client_tracker]
+            $tracker client_change_command [code $this samp_client_changed_]
+            samp_client_changed_
+         }
+      }
+
       #  Center image first time.
       after 0 [code $image_ center]
 
@@ -458,18 +471,6 @@ itcl::class gaia::Gaia {
          after 0 [code $this configure -autofit 1]
       }
 
-      #  Attempt to register as SAMP listener, adding callbacks to be
-      #  informed when the status of the SAMP connection changes.
-      if {$itk_option(-interop_menu)} {
-         init_samp_
-         if { $samp_client_ != "" } {
-            $samp_client_ reg_change_command [code $this samp_reg_changed_]
-            samp_reg_changed_
-            set tracker [$samp_client_ cget -client_tracker]
-            $tracker client_change_command [code $this samp_client_changed_]
-            samp_client_changed_
-         }
-      }
 
       #  Start the internal debug logging, if required.
       start_debuglog_
@@ -480,6 +481,7 @@ itcl::class gaia::Gaia {
 
       #  Trap window closing and handle that.
       wm protocol $w_ WM_DELETE_WINDOW [code $this close]
+
    }
 
    #  Set/get X defaults - can be overridden in subclass and/or
