@@ -1583,6 +1583,9 @@ itcl::class gaia::Gaia {
          return
       }
 
+      #  Wait to make sure image is loaded...
+      ::update
+
       #  See if this is a cube, if so offer to load it using the cube
       #  browser. Cheat bigtime by looking for a NAXIS3 card. This should work
       #  for FITS and NDF cubes.
