@@ -5131,9 +5131,9 @@ Consider, for example, a set of 3-dimensional coordinates and suppose
 we wish to transform them by swapping the first two coordinate values
 and multiplying the final one by 5, so that ($x_1,x_2,x_3$) transforms
 into ($x_2,x_1,5x_3$). Again, we can perform each of these steps
-individually using exactly the same PermMap and ZoomMap as used
-earlier (\secref{ss:seriescmpmap}). In this case, however, these
-individual Mappings are applied in parallel
+individually using Mappings similar to the PermMap and ZoomMap used
+earlier (\secref{ss:seriescmpmap}). In this case, however, the ZoomMap is
+1-dimensional and the individual Mappings are applied in parallel
 (\emph{c.f.}\ Figure~\ref{fig:parallelcmpmap}).
 
 Creating a CmpMap for this purpose is also very simple:
@@ -21604,8 +21604,8 @@ characters within FITS keyword names (i.e. characters not allowed by the
 FITS standard) being detected. This bug could under some circumstances
 cause a subsequent segmentation violation to occur.
 
-- A ``BadKeyName'' warning is now issued by the FitsChan class if a FITS 
-keyword name is encountered that contains any illegal characters. See 
+- A ``BadKeyName'' warning is now issued by the FitsChan class if a FITS
+keyword name is encountered that contains any illegal characters. See
 attribute ``Warnings'' and
 c+
 function ``astWarnings''.
