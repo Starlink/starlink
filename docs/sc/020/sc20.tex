@@ -1845,8 +1845,7 @@ parameter on the command line.  For instance,
 The default method is \param{Nearest} which assigns the input pixel
 completely to the nearest output pixel. This is the fastest method
 available but is not optimal. In particular it may result in blank
-pixels in HARP maps due to missing receptors (see Figure
-\ref{fig:spread}).
+pixels in HARP maps due to missing receptors (see Figure~\ref{fig:spread}).
 
 %If \param{spread=nearest} you can supply a value for the
 %\param{BADMASK} option. This determines the way in which bad pixels
@@ -2292,7 +2291,7 @@ both two- and three-dimensional data.
 
 \begin{enumerate}[label=(\arabic*)]
 \item Create your ARD mask. You may find it easiest to do this with
-\gaia. See Figure \ref{fig:ardmask} for an illustrated guide.
+\gaia. See Figure~\ref{fig:ardmask} for an illustrated guide.
 
 \item Trim off the third axis from your mask using \ndfcopy.
 \begin{terminalv}
@@ -2746,7 +2745,7 @@ form the final image.
 % chanmap in=cube axis=3 low=-10 high=5 nchan=6 shape=3 estimator=mean
 \end{terminalv}
 This grid of channel maps is filled from left to right, and bottom to
-top. It can be viewed with \gaia\ (see Figure \ref{fig:chanmap}) or
+top. It can be viewed with \gaia\ (see Figure~\ref{fig:chanmap}) or
 with \display.
 \begin{terminalv}
 % display chanmap mode=faint noaxes lut=$STARLINK_DIR/bin/kappa/smooth3_lut
@@ -2775,8 +2774,8 @@ algorithms FellWalker, GaussClumps, ClumpFind or Reinhold. You must
 supply a configuration file which lists the options for whichever
 algorithm you chose (see the \xref{\textsc{cupid} manual}{sun255}{}
 for a full list). The result is returned as a catalogue in a text file
-and as a NDF pixel mask showing the clump boundaries (see Figure
-\ref{fig:clumps2}). See Appendix \ref{app:clumpfind} for descriptions
+and as a NDF pixel mask showing the clump boundaries (see
+Figure~\ref{fig:clumps2}). See Appendix \ref{app:clumpfind} for descriptions
 of the various algorithms.
 
 \begin{terminalv}
