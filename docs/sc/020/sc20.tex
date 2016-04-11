@@ -3921,7 +3921,8 @@ SPREAD\_WIDTH & The number of arcseconds on either side of the output position w
 \hline
 \end{tabular}
 \end{small}
-\caption{\label{tab:makecube_params}The recipe parameters used to define the properties of the recipe products.}
+\caption{\label{tab:makecube_params}
+  The recipe parameters used to define the properties of the recipe products.}
 \end{table}
 
 \begin{table}[h!]
@@ -3988,7 +3989,8 @@ SPATIAL\_SMOOTH & The number of pixels to smooth in both spatial axes when
 \hline
 \end{tabular}
 \end{small}
-\caption{The recipe parameters to control how baselines are determined and fit.}
+\caption{\label{tab:bsfit_params}
+  The recipe parameters to control how baselines are determined and fit.}
 \end{table}
 There are a number of ways to define the baseline regions:
 \begin{itemize}
@@ -4031,7 +4033,8 @@ MOMENTS\_UPPER\_VELOCITY & The upper velocity range from which the moments maps 
 \hline
 \end{tabular}
 \end{small}
-\caption{The recipe parameters used to specify moments and longitude-velocity products.}
+\caption{\label{tab:moments_params}
+  The recipe parameters used to specify moments and longitude-velocity products.}
 \end{table}
 
 \begin{table}[h!]
@@ -4050,7 +4053,8 @@ MINSNR & Allow selection of higher signal-to-noise voxels for FLAT\_METHOD. \\
 \hline
 \end{tabular}
 \end{small}
-\caption{The recipe parameters associated flat fielding.}
+\caption{\label{tab:flat_params}
+  The recipe parameters associated flat fielding.}
 \end{table}
 
 \begin{table}[h!]
@@ -4068,8 +4072,9 @@ TILE & A true value (1) performs tiling of the cube to restrict the memory requi
 \hline
 \end{tabular}
 \end{small}
-\caption{The recipe parameters used to limit computer memory requirements for large
-datasets or observation fields of view.}
+\caption{\label{tab:largedata_params}
+  The recipe parameters used to limit computer memory requirements for large
+  datasets or observation fields of view.}
 \end{table}
 
 \begin{table}[h!]
@@ -4101,8 +4106,9 @@ HIGHFREQ\_RINGING\_MIN\_SPECTRA & Minimum number of good spectra for ringing fil
 \hline
 \end{tabular}
 \end{small}
-\caption{The recipe parameters associated exclusion of spectra
-affected by high-frequency noise.}
+\caption{\label{tab:hfi_params}
+  The recipe parameters associated exclusion of spectra affected by high-frequency
+  noise.}
 \end{table}
 
 \begin{table}[h!]
@@ -4133,12 +4139,14 @@ LOWFREQ\_INTERFERENCE\_THRESH\_CLIP & Used to reject spectra with low-frequency
 \hline
 \end{tabular}
 \end{small}
-\caption{The recipe parameters associated exclusion of spectra
-affected by non-linear baselines.  These are for short periods during
-an observation where some external signal has affected the baselines.
-If most or whole of an observtion might be affected see
-\param{BASELINE\_LINEARITY} and related parameters below. These
-parameters are not available in the REDUCE\_SCIENCE\_BROADLINE recipe.}
+\caption{\label{tab:lfi_params}
+  The recipe parameters associated exclusion of spectra affected by
+  non-linear baselines.  These are for short periods during an
+  observation where some external signal has affected the baselines.
+  If most or whole of an observtion might be affected see
+  \param{BASELINE\_LINEARITY} and related parameters below. These
+  parameters are not available in the REDUCE\_SCIENCE\_BROADLINE
+  recipe.}
 \end{table}
 
 
@@ -4178,9 +4186,10 @@ BASELINE\_LINEARITY\_SCALELENGTH & This is used to reject receptors that have no
 \hline
 \end{tabular}
 \end{small}
-\caption{The recipe parameters associated exclusion of receptors
-affected by non-linear baselines throughout or most of an observation.
-The parameters are not available in the REDUCE\_SCIENCE\_BROADLINE recipe.}
+\caption{\label{tab:bll_params}
+  The recipe parameters associated exclusion of receptors affected by
+  non-linear baselines throughout or most of an observation.  The
+  parameters are not available in the REDUCE\_SCIENCE\_BROADLINE recipe.}
 \end{table}
 
 \newpage
