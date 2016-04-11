@@ -1129,7 +1129,7 @@ time-slices failing any of these checks gets flagged as bad and
 are not included in the group co-add that follows.
 
 \item Once all the raw observations have undergone the initial
-processing, the individual timeseries files are combined to form a
+processing, the individual time-series files are combined to form a
 \textbf{g\_cube}.
 
 \item \label{step:loop}
@@ -1154,7 +1154,7 @@ baseline-subtracted \textbf{g\_cube}.
 Step~\ref{step:iterate}. If not, the processing is complete.
 
 \item \label{step:iterate}
-The baseline mask is converted back to the time-series with
+The baseline mask is converted back to the time series with
 \unmakecube. There it is applied to the time-series data for each
 observation.
 
@@ -1178,7 +1178,7 @@ to determining the receptor-to-receptor responses.   (See
 \item An \textbf{a\_cube} is made from the baseline subtracted data
 for each observation.
 
-\item The individual baseline-subtracted timeseries are combined
+\item The individual baseline-subtracted time series are combined
 to make a new \textbf{g\_cube}.
 
 \item Return to Step~\ref{step:loop}.
@@ -1206,7 +1206,7 @@ to make a new \textbf{g\_cube}.
   REDUCE\_SCIENCE\_GRADIENT recipes. A few minor processing steps are
   omitted to avoid the diagram being too long. Other recipes may have
   additional steps or omit steps as appropriate. Because of space
-  constraints baseline is sometimes abbreviated to `bs' and timeseries
+  constraints baseline is sometimes abbreviated to `bs' and time series
   to `ts' in the step descriptions.  The prefix and suffix of the file
   created at each stage is shown to the right of the process box.
   Note that suffix `a' refers to an individual observation, while `g'
@@ -2654,7 +2654,7 @@ convert the offset units to arcseconds instead of radians.
 %be quite conspicuous in the data cube as they occur at the same
 %frequency throughout the observed cube and at (almost) uniform
 %intensity. It is probably best to eliminate spikes in your data cube
-%from the raw time-series, i.e. before running \makecube\ or any other
+%from the raw time series, i.e. before running \makecube\ or any other
 %processing on your data.
 %
 %If you suspect you have a spike in your
