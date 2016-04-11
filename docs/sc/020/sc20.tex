@@ -1091,7 +1091,10 @@ of all the \textbf{a\_cube} files.
 
 Note that the pipeline will co-add data into a group file whenever it
 encounters observations with identical LO frequencies, base positions
-and bandwidths.
+and bandwidths.  You can also force a set of observations, such as
+ones of the same object taken on different nights, to be regarded as
+a single group to be combined via the \texttt{oracdr -onegroup}
+command-line option.
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
@@ -1102,24 +1105,30 @@ ORAC-DR except for hybrid-mode observations.
 \item Because data acquisition is asynchronous, time slices are not
 necessarily written in sequential order. The next step sort the
 time-series data into time order. This makes it easier to search for
-intermittent bad data
+intermittent bad data.
 
-\item Regions of high and low frequency interference are identified
-and flagged. Bad detectors are identified by comparing the deviation
-from linearity of each detector's baseline.
+\item The noisy ends of the spectral band dwarf most
+astronomical signal, and hence are removed as follows.
+The spectra are collapsed along the receptor using the `sigma'
+estimator to form a single spectrum. A constant value background is
+then fit to the resulting spectrum. The fitting regions are used to
+determine where the spectrum gets noisier (i.e. higher RMS values in
+the RMS spectrum). These high-noise regions are then trimmed from the
+ends in the frequency axis.   There is also an alternative to trim
+specified percentages through the \param{TRIM\_} recipe parameters
+(see Table~\ref{tab:trim_params}).
 
 \item The DC-level offset between corresponding sub-band observations
 is determined using the median of all the spectra.  The DC offset is
 then subtracted from the sub-band spectra, and the resulting sub-band
 spectra are mosaicked together to form single time-series cube.
 
-\item The data are thresholded by trimming the noisy ends of the band.
-The spectra are collapsed along the receptor using the `sigma'
-estimator to form a single spectrum. A constant value background is
-then fit to the resulting spectrum. The fitting regions are used to
-determine where the spectrum gets noisier (i.e. higher RMS values in
-the RMS spectrum). These high-noise regions are then trimmed from the
-ends in the frequency axis. %but still specify percentage - why??
+\item Regions or individual spectra containing high- and low-frequency
+interference from local sources are identified and flagged.  Bad
+detectors are identified by comparing the deviation from linearity of
+each detector's baseline.
+
+\item Strong spikes ($\pm$150) are replaced by bad values.
 
 \item Quality assurance checks are run on the raw cubes. See Appendix
 \ref{app:qa} for a description of the checks performed. Any
@@ -1127,10 +1136,11 @@ time-slices failing any of these checks gets flagged as bad and
 are not included in the group co-add that follows.
 
 \item Once all the raw observations have undergone the initial
-processing, the \textbf{a\_cube} files are combined to form a
+processing, the individual timeseries files are combined to form a
 \textbf{g\_cube}.
 
-\item The \textbf{g\_cube} is smoothed by an amount specified by the
+\item \label{step:loop}
+The \textbf{g\_cube} is smoothed by an amount specified by the
 particular science recipe being used. See Section \ref{sec:recipes}
 for details on the different recipes.
 
@@ -1140,31 +1150,45 @@ for details on the different recipes.
 
 \item The baseline mask is then applied to the unsmoothed
 \textbf{g\_cube} and \mfittrend\ is re-run. This time however, the
-emission regions have been masked out, so all remaining data is
+emission regions have been masked out, so all remaining data are
 included in the fit by setting \param{auto=false}. The resulting
 baseline is subtracted.
 
 \item Moments maps and noise maps are made from the
 baseline-subtracted \textbf{g\_cube}.
 
-\item If another iteration is required, continue to Step 12. If not,
-the processing is complete.
+\item If another iteration is required, continue to
+Step~\ref{step:iterate}. If not, the processing is complete.
 
-\item The baseline mask is converted back to the time-series with
+\item \label{step:iterate}
+The baseline mask is converted back to the time-series with
 \unmakecube. There it is applied to the time-series data for each
 observation.
 
 \item A baseline is fit to the masked time-series data using
 \mfittrend\ and the result is subtracted from the unmasked time-series
-data.
+data.  This can be a higher-order polynomial (up to
+15$^{\textnormal{th}}$ order), although a linear fit is often used.
+
+\item A flat field, i.e. the relative responsivities of the detectors,
+is optionally created and applied.  It involes making cubes for each
+each receptor combining all observations on a given date to improve
+the accuracy.  There is a choice of analysis methods, but an
+iterative approach of thresholding---to exclude the noisy baseline
+that would dilute the comparisons---worked best on most suitable
+observations.  Those with low signal-to-noise or signal only
+originating in a small percentage of the area mapped are not amenable
+to determining the receptor-to-receptor responses.   (See
+(see Table~\ref{tab:flat_params}).
+
 
 \item An \textbf{a\_cube} is made from the baseline subtracted data
 for each observation.
 
-\item The baseline-subtracted \textbf{a\_cubes} are combined to make a
-new \textbf{g\_cube}.
+\item The individual baseline-subtracted timeseries are combined
+to make a new \textbf{g\_cube}.
 
-\item Return to Step 8.
+\item Return to Step~\ref{step:loop}.
 \end{enumerate}
 
 %\setlength{\intextsep}{10.0pt plus 1.0pt minus 2.0pt}
