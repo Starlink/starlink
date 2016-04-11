@@ -14,14 +14,14 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MFTx( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, NRANGE, 
+*     CALL KPS1_MFTx( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, NRANGE,
 *                     RANGES, USEVAR, VARS, USEMSK, MASK, DIMS, DATS,
 *                     X, Z, W, NFIT, NGOOD, KNOT, COEFF, NCOEF, SCALE,
 *                     STATUS )
 
 *  Description:
-*     This routine fits cubic B-splines to all lines of data that lie 
-*     parallel to a given axis, and lie within ranges along that axis. 
+*     This routine fits cubic B-splines to all lines of data that lie
+*     parallel to a given axis, and lie within ranges along that axis.
 *     The fits can be weighted by the inverse values of the associated
 *     variances.  Features can also be excluded using a mask.
 *
@@ -35,8 +35,8 @@
 *  Arguments:
 *     INTERP = LOGICAL (Given)
 *        If set to true an interpolating least-squares spline is found
-*        and the NKNOT interior knots are equally spaced.  Otherwise a 
-*        smoothing spline is fit using a smoothing factor equal to the 
+*        and the NKNOT interior knots are equally spaced.  Otherwise a
+*        smoothing spline is fit using a smoothing factor equal to the
 *        number of data points; and the spline fit sets the knots.
 *        The order of polynomial to fit.  Starts at 0 for a constant.
 *     MXKNOT = INTEGER (Given)
@@ -61,7 +61,7 @@
 *        The variances of the data.  These will be used to weight the
 *        fits if USEVAR is true.
 *     USEMSK = LOGICAL (Given)
-*        If .TRUE. then the supplied mask (argument MASK) is used to 
+*        If .TRUE. then the supplied mask (argument MASK) is used to
 *        omit parts of the data from the fitting process.
 *     MASK( * ) = BYTE (Given)
 *        A mask in which bad values indicate that a given element of
@@ -79,8 +79,8 @@
 *        size of the second dimension of this should be the product of
 *        all the dimensions that are not the fit axis.
 *     Z( DIMS( AXIS ) + 2, * ) = REAL (Returned)
-*        Workspace for the values of ordered trends to fit.  The size of 
-*        the second dimension of this should be the product of all the 
+*        Workspace for the values of ordered trends to fit.  The size of
+*        the second dimension of this should be the product of all the
 *        dimensions that are not the fit axis.
 *     W( DIMS( AXIS ) + 2, * ) = REAL (Returned)
 *        Workspace for the co-ordinates of ordered trends to fit.  The
@@ -102,14 +102,14 @@
 *        all the dimensions that are not the fit axis.
 *     NCOEF( * ) = INTEGER (Returned)
 *        The number coefficents of the cubic B-splines for each trend.
-*        An element is set to zero if a fit could not be made, or if 
-*        there are too few good data within the trend.  The dimension of 
-*        this should be the product of all the dimensions that are not 
+*        An element is set to zero if a fit could not be made, or if
+*        there are too few good data within the trend.  The dimension of
+*        this should be the product of all the dimensions that are not
 *        the fit axis.
 *     SCALE( * ) = REAL (Returned)
 *        The scale factors of ordered trends that were used to scale
-*        each trend vector to the -1 to +1 range.  The dimension of this 
-*        should be the product of all the dimensions that are not the 
+*        each trend vector to the -1 to +1 range.  The dimension of this
+*        should be the product of all the dimensions that are not the
 *        fit axis.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -152,6 +152,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (Starlink)
+*     DSB: David S Berry (EAO):
 *     {enter_new_authors_here}
 
 *  History:
@@ -159,6 +160,8 @@
 *        Original version based upon KPS1_LFT.
 *     2008 May 21 (MJC):
 *        Added FKNOT argument.
+*     11-APR-2016 (DSB):
+*        Check for bad variance values.
 *     {enter_further_changes_here}
 
 *-
@@ -205,7 +208,7 @@
 
 *  Local Variables:
       INTEGER B                  ! Pixel index of work arrays
-      INTEGER DIMSB( NDF__MXDIM ) ! Dimensions excluding the 
+      INTEGER DIMSB( NDF__MXDIM ) ! Dimensions excluding the
       INTEGER I( 7 )             ! Equivalences of I1-I7 loop variables
       INTEGER I1, I2, I3, I4, I5, I6, I7 ! Loop variables
       INTEGER IP1, IP2, IP3, IP4, IP5, IP6, IP7 ! Loop variables
@@ -269,7 +272,7 @@
       END DO
       DIMSB( NDF__MXDIM ) = 0
 
-*  Create strides for this new dimensionality and count workspace 
+*  Create strides for this new dimensionality and count workspace
 *  elements.
       STRIDB( 1 ) = 1
       DO J = 2, NDF__MXDIM - 1
@@ -351,30 +354,36 @@
                               DO I1 = LLBND( 1 ), LUBND( 1 )
                                  IP1 = IP2 + I1
 
-*  Fill the array of position, value, and weight vectors provided 
-*  neither the value nor the mask is bad.  The curve fitting only
-*  uses single-precision arithmetic.
-                                 TVAL = DATS( IP1 )
-                                 IF ( TVAL .NE. VAL__BAD<T> .AND.
-     :                                MASK( IP1 ) .NE. VAL__BADB ) THEN
-                                    VAL = NUM_<T>TOR( TVAL )
-                                    IF ( USEVAR ) THEN
+*  Fill the array of position, value, and weight vectors provided
+*  neither the value, variance or the mask is bad.  The curve fitting
+*  only uses single-precision arithmetic.
+                                 IF ( USEVAR ) THEN
+                                    IF( VARS( IP1 ) .NE. VAL__BAD<T> ) THEN
                                        VAR = NUM_<T>TOR( VARS( IP1 ) )
                                     ELSE
-                                       VAR = 1.0
-                                    END IF
+                                       VAR = 0.0
+                                    ENDIF
+                                 ELSE
+                                    VAR = 1.0
+                                 END IF
+
+                                 TVAL = DATS( IP1 )
+                                 IF ( TVAL .NE. VAL__BAD<T> .AND.
+     :                                MASK( IP1 ) .NE. VAL__BADB .AND.
+     :                                VAR .GT. 0.0 ) THEN
+                                    VAL = NUM_<T>TOR( TVAL )
 
                                     NGOOD( B ) = NGOOD( B ) + 1
                                     X( NGOOD( B ), B ) = I( AXIS )
                                     Z( NGOOD( B ), B ) = VAL
-                                    W( NGOOD( B ), B ) = 1.0 / 
+                                    W( NGOOD( B ), B ) = 1.0 /
      :                                                   SQRT( VAR )
                                  END IF
 
 *  Move to the next workspace pixel.
                                  B = B + STRIDA( 1 )
                               END DO
-                              B = B + STRIDA( 2 ) - 
+                              B = B + STRIDA( 2 ) -
      :                            STRIDA( 1 ) * DIMS( 1 )
                            END DO
                            B = B + STRIDA( 3 ) - STRIDA( 2 ) * DIMS( 2 )
@@ -421,26 +430,31 @@
                                  IP1 = IP2 + I1
 
 *  Increment sums for this pixel.
-                                 TVAL = DATS( IP1 )
-                                 IF ( TVAL .NE. VAL__BAD<T> ) THEN
-                                    VAL = NUM_<T>TOR( TVAL )
-                                    IF ( USEVAR ) THEN
+                                 IF ( USEVAR ) THEN
+                                    IF( VARS( IP1 ) .NE. VAL__BAD<T> ) THEN
                                        VAR = NUM_<T>TOR( VARS( IP1 ) )
                                     ELSE
-                                       VAR = 1.0
-                                    END IF
+                                       VAR = 0.0
+                                    ENDIF
+                                 ELSE
+                                    VAR = 1.0
+                                 END IF
 
+                                 TVAL = DATS( IP1 )
+                                 IF ( TVAL .NE. VAL__BAD<T> .AND.
+     :                                VAR .GT. 0.0 ) THEN
+                                    VAL = NUM_<T>TOR( TVAL )
                                     NGOOD( B ) = NGOOD( B ) + 1
                                     X( NGOOD( B ), B ) = I( AXIS )
                                     Z( NGOOD( B ), B ) = VAL
-                                    W( NGOOD( B ), B ) = 1.0 / 
+                                    W( NGOOD( B ), B ) = 1.0 /
      :                                                   SQRT( VAR )
                                  END IF
 
 *  Move to the next workspace pixel.
                                  B = B + STRIDA( 1 )
                               END DO
-                              B = B + STRIDA( 2 ) - 
+                              B = B + STRIDA( 2 ) -
      :                            STRIDA( 1 ) * DIMS( 1 )
                            END DO
                            B = B + STRIDA( 3 ) - STRIDA( 2 ) * DIMS( 2 )
@@ -464,12 +478,12 @@
       DO J = 1, WEL
          IF ( NGOOD( J ) .GT. 4 ) THEN
             CALL ERR_MARK
-            CALL KPS1_MFSPF( INTERP, MXKNOT, NKNOT, FKNOT, 0.0, 
-     :                       REAL( DIMS( AXIS ) ), .TRUE., NWS, 
-     :                       NGOOD( J ), NDAT, X( 1, J ), Z( 1, J ), 
-     :                       W( 1, J ), %VAL( CNF_PVAL( PRMPTR ) ), 
-     :                       KNOT( 1, J ), COEFF( 1, J ), NCOEF( J ), 
-     :                       SCALE( J ), %VAL( CNF_PVAL( SWPTR ) ), 
+            CALL KPS1_MFSPF( INTERP, MXKNOT, NKNOT, FKNOT, 0.0,
+     :                       REAL( DIMS( AXIS ) ), .TRUE., NWS,
+     :                       NGOOD( J ), NDAT, X( 1, J ), Z( 1, J ),
+     :                       W( 1, J ), %VAL( CNF_PVAL( PRMPTR ) ),
+     :                       KNOT( 1, J ), COEFF( 1, J ), NCOEF( J ),
+     :                       SCALE( J ), %VAL( CNF_PVAL( SWPTR ) ),
      :                       %VAL( CNF_PVAL( SIWPTR ) ), STATUS )
 
             IF ( STATUS .NE. SAI__OK ) THEN
