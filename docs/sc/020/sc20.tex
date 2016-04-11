@@ -691,10 +691,9 @@ HARP&14\arcsec &0.63& 0.88\\
 \begin{figure}[b!]
 \begin{center}
 \includegraphics[width=0.7\linewidth]{sc20_acsis_front_sm}
-\caption[Front view of ACSIS at the JCMT]{Front view of ACSIS at the
-  JCMT. Although designed to work with HARP, ACSIS can be used with any
-  JCMT heterodyne receiver.}
-\label{fig:acsis}
+\caption[Front view of ACSIS at the JCMT]{\label{fig:acsis}
+  Front view of ACSIS at the JCMT. Although designed to work with HARP,
+  ACSIS can be used with any JCMT heterodyne receiver.}
 \end{center}
 \end{figure}
 
@@ -748,10 +747,9 @@ and SiO\,(6$_0$-5$_0$)/SO\,(4$_3$-3$_4$) for RxA.
 \includegraphics[width=5.2cm, height=5.2cm]{sc20_stare}
 \includegraphics[width=5.2cm, height=5.2cm]{sc20_jiggle}
 \includegraphics[width=5.2cm, height=5.2cm]{sc20_raster}
-\caption[Stare, jiggle and raster observing modes]{(Left) Stare mode
-with HARP. (Centre) Jiggle mapping with HARP. (Right) Raster mapping
-with HARP.}
-\label{fig:harpmodes}
+\caption[Stare, jiggle and raster observing modes]{\label{fig:harpmodes}
+(Left) Stare mode with HARP. (Centre) Jiggle mapping with HARP.
+(Right) Raster mapping with HARP.}
 \end{center}
 \end{figure}
 
@@ -830,11 +828,10 @@ useful when no emission-free reference position can be found.
 \begin{figure}[b!]
 \begin{center}
 \includegraphics[width=0.8\linewidth]{sc20_jiggles}
-\caption[HARP4 and HARP5 jiggle patterns]{Top row: HARP4 jiggle
-patterns produce a map of 16$\times$16 pixels each of 7.\uarcs5. Bottom
-row: HARP5 jiggle patterns produce a map of 20$\times$20 pixels each
-of 6\arcsec. }
-\label{fig:jiggle}
+\caption[HARP4 and HARP5 jiggle patterns]{\label{fig:jiggle}
+Top row: HARP4 jiggle patterns produce a map of 16$\times$16 pixels
+each of 7.\uarcs5. Bottom row: HARP5 jiggle patterns produce a map of
+20$\times$20 pixels each of 6\arcsec. }
 \end{center}
 \end{figure}
 
@@ -899,14 +896,13 @@ your data by moving the \gaiathing{Index of plane} slider.
 \begin{center}
 \includegraphics[width=0.9\linewidth]{sc20_gaia1}
 \typeout{sc20_gaia1 inserted on page \arabic{page}}
-\caption[\gaia\ main window.]{
+\caption[\gaia\ main window.]{\label{fig:rawgaia}
   Initial \textsc{Gaia} windows displayed upon loading a raw
   data file. The main window on the left shows a map of receptors at
   given time-samples during the observation. You may have to zoom in
   multiple times by clicking the large \gaiathing{Z} button on the side
   panel. On the right, the \gaiathing{Display image sections of a cube}
   window enables you to navigate the time axis.}
-\label{fig:rawgaia}
 \end{center}
 \end{figure}
 
@@ -914,14 +910,13 @@ your data by moving the \gaiathing{Index of plane} slider.
 \begin{center}
 \includegraphics[width=0.7\linewidth]{sc20_gaia2}
 \typeout{sc20_gaia2 inserted on page \arabic{page}}
-\caption[Spectral plot window with \gaia.]{
+\caption[Spectral plot window with \gaia.]{\label{fig:gaia2}
   The \gaiathing{Spectral plot} window displaying its time-varying
   signal, appears automatically once a pixel is clicked in the main window.
   The vertical red line indicates the time slice that is currently selected
   in the \gaiathing{Display image sections of a cube} window. This can be
   dragged across the spectrum to scroll through the spectra. Examine exposure
   time map etc. in ancillary arrays.}
-\label{fig:gaia2}
 \end{center}
 \end{figure}
 
@@ -974,14 +969,13 @@ spectra (see Figures \ref{fig:maskreceptor} and
 \begin{center}
 \includegraphics[width=1\linewidth]{sc20_maskreceptor}
 \typeout{sc20_maskreceptor inserted on page \arabic{page}}
-\caption[Identifying bad receptors in the raw data.]{
+\caption[Identifying bad receptors in the raw data.]{\label{fig:maskreceptor}
   The left-hand \gaia\ window shows the raw data before masking.
   Clicking on a pixel will show the spectra. The spectrum shown is from
   receptor H01 at Step 18 (see circled $Y$ value). To mask this receptor
   in time from Step 18 to 33---at which point the bad baselines
   disappear---use \chpix. The right-hand \gaia\ window shows the raw
   data after masking where the time range in question is now blank.}
-\label{fig:maskreceptor}
 \end{center}
 \end{figure}
 
@@ -989,13 +983,12 @@ spectra (see Figures \ref{fig:maskreceptor} and
 \begin{center}
 \includegraphics[width=0.9\linewidth]{sc20_badreceptor2}
 \typeout{sc20_badreceptor2 inserted on page \arabic{page}}
-\caption[Identifying bad receptors in the raw data: second method.]{
+\caption[Identifying bad receptors in the raw data: second method.]{\label{fig:maskreceptor2}
   In this example, the second axis (receptor number) has been
   selected. Use the arrows outlined in red on the \gaiathing{Index of
   plane} bar to scroll through the receptors. Here you can see
   Receptor 13 (see circled \gaiathing{Index of plane} value) which
   goes noisy two-thirds the way through the observation.}
-\label{fig:maskreceptor2}
 \end{center}
 \end{figure}
 
@@ -1207,17 +1200,17 @@ to make a new \textbf{g\_cube}.
 
 \begin{figure}[h!]
 \begin{center}
-\caption[Flow chart of the ORAC-DR ACSIS pipeline process.]{Flow chart
-  of the processes employed by the ORAC-DR ACSIS pipeline, specifically
-  the REDUCE\_SCIENCE\_NARROWLINE and REDUCE\_SCIENCE\_GRADIENT recipes.
-  A few minor processing steps are omitted to avoid the diagram being too
-  long. Other recipes may have additional steps or omit steps as appropriate.
-  Because of space constraints baseline is sometimes abbreviated to `bs' and
-  timeseries to `ts' in the step descriptions.  The prefix and suffix of the
-  file created at each stage is shown to the right of the process box.  Note
-  that suffix `a' refers to an individual observation, while `g' refers to a
-  group (or co-added) file.}
-\label{fig:pipeline}
+\caption[Flow chart of the ORAC-DR ACSIS pipeline process.]{\label{fig:pipeline}
+  Flow chart of the processes employed by the ORAC-DR ACSIS pipeline,
+  specifically the REDUCE\_SCIENCE\_NARROWLINE and
+  REDUCE\_SCIENCE\_GRADIENT recipes. A few minor processing steps are
+  omitted to avoid the diagram being too long. Other recipes may have
+  additional steps or omit steps as appropriate. Because of space
+  constraints baseline is sometimes abbreviated to `bs' and timeseries
+  to `ts' in the step descriptions.  The prefix and suffix of the file
+  created at each stage is shown to the right of the process box.
+  Note that suffix `a' refers to an individual observation, while `g'
+  refers to a group (or co-added) file.}
 \end{center}
 \end{figure}
 \setlength{\textfloatsep}{20pt plus 1.0pt minus 2.0pt}
@@ -1464,10 +1457,9 @@ list          & A colon-separated list of receptor names can be supplied, such a
                 options to the end of your list, such as \param{-calib bad\_receptors=H14:index}\\
 \hline
 \end{tabular}
-\label{tab:index-options}
 \caption[Pipeline options for the \param{-calib bad\_receptors}
-flag.]{\small The options available for the \param{-calib
-bad\_receptors} flag when running the pipeline.}
+flag.]{\label{tab:index-options}\small The options available for the
+\param{-calib bad\_receptors} flag when running the pipeline.}
 \end{table}
 
 \section{\xlabel{starting_pl}Starting the pipeline}
@@ -1583,9 +1575,8 @@ options and their descriptions see \oracdrsun.
                      This defaults to \param{xf}.\\
 \hline
 \end{tabular}
-\label{tab:pipe-options}
-\caption{\small The options available on the command line when running
-the ORAC-DR pipeline from outside the EAO.}
+\caption{\small \label{tab:pipe-options} The options available on the command line
+when running the ORAC-DR pipeline from outside the EAO.}
 \end{table}
 
 \section{\xlabel{pl_output}Pipeline output}
@@ -1656,10 +1647,9 @@ single reduced cube.
                     $n^{\textnormal{th}}$ line. \\
 \hline
 \end{tabular}
-\label{tab:pipe-out}
-\caption{\small Table of the files written out by the science pipeline. Each
-  of these files is generated for both the individual observations and the
-  group files.}
+\caption{\label{tab:pipe-out}\small Table of the files written out by the
+  science pipeline. Each of these files is generated for both the individual
+  observations and the group files.}
 \end{table}
 
 In addition to these NDFs a number of log files are created.
@@ -1677,8 +1667,7 @@ In addition to these NDFs a number of log files are created.
 \file{log.qa}     & Quality assurance reports \\
 \hline
 \end{tabular}
-\label{tab:pipe-logfiles}
-\caption{\small Table of the log files written by the science pipeline.}
+\caption{\label{tab:pipe-logfiles}\small Table of the log files written by the science pipeline.}
 \end{table}
 
 Finally there are HDS scratch \file{t*.sdf} files, and temporary files
@@ -1745,12 +1734,11 @@ Figure~\ref{fig:gaiareduced}.
 \begin{center}
 \includegraphics[width=0.65\linewidth]{sc20_makecubeout}
 \typeout{sc20_makecubeout inserted on page \arabic{page}}
-\caption[A regridded cube produced with \makecube.]{
+\caption[A regridded cube produced with \makecube.]{\label{fig:gaiareduced}
   The regridded cube displayed with \gaia. The 5$\times$5 jiggle
   pattern is evident in the map as is the missing receptor in the
   top-left corner. The smaller window shows the spectrum for the pixel
   selected by the blue cross on the map.}
-\label{fig:gaiareduced}
 \end{center}
 \end{figure}
 
@@ -1882,12 +1870,11 @@ details.
 \includegraphics[width=5.2cm, height=5.2cm]{sc20_nearest}
 \includegraphics[width=5.2cm, height=5.2cm]{sc20_gauss}
 \includegraphics[width=5.2cm, height=5.2cm]{sc20_sincsinc}
-\caption[Options for the \makecube\ parameter `spread']{Raster map
-regridded with \makecube\ and \param{spread = nearest} (left),
-\param{Gauss} (centre) and \param{SincSinc} (right). Blank pixels are
-coloured blue. You can see the Nearest option has resulted in multiple
-blank pixels throughout the map.}
-\label{fig:spread}
+\caption[Options for the \makecube\ parameter `spread']{\label{fig:spread}
+  Raster map regridded with \makecube\ and \param{spread = nearest}
+  (left), \param{Gauss} (centre) and \param{SincSinc} (right). Blank
+  pixels are coloured blue. You can see the Nearest option has
+  resulted in multiple blank pixels throughout the map.}
 \end{center}
 \end{figure}
 
@@ -1956,19 +1943,18 @@ and so on.
 The catalogue produced will be in FITS format. In the example above a
 file called \file{cat.FIT} is created. When viewing your map with \gaia\ this
 catalogue can be overlaid to identify the receptors contributing to
-each pixel (see Figure \ref{fig:makecube-outcat}).
+each pixel (see Figure~\ref{fig:makecube-outcat}).
 
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=1\linewidth]{sc20_makecube-outcat}
 \typeout{sc20_makecube-outcat inserted on page \arabic{page}}
-\caption[Displaying receptor positions in \gaia.]{
+\caption[Displaying receptor positions in \gaia.]{\label{fig:makecube-outcat}
   The receptor positions overlaid on a regridded cube of a HARP stare
   observation. This is viewed in \gaia\ by selecting
   \gaiathing{Data-Servers} $>$ \gaiathing{Local Catalogs} and selecting
   your \param{OUTCAT} filename (here \file{cat.FITS}). Notice that dead
   receptors are excluded from the list.}
-\label{fig:makecube-outcat}
 \end{center}
 \end{figure}
 
@@ -2424,8 +2410,7 @@ region using \gaia.}
 \includegraphics[height=7cm]{sc20_ard5}
 \hspace{0.3cm}
 \includegraphics[height=7cm]{sc20_ard6}
-\label{fig:crop}
-\caption[Cropping a region of a two-dimensional map.]{(Left) After
+\caption[Cropping a region of a two-dimensional map.]{\label{fig:crop}(Left) After
   applying the ARD mask, the cropped region is still surrounded by blank pixels.
   (Right) The blank pixels have been trimmed using \ndfcopy\ with the
   \param{trimbad} option.}
@@ -2468,11 +2453,10 @@ with holes and the final filled map.
 \hspace{0.5mm}
 \includegraphics[width=0.48\linewidth]{sc20_polyfillaharp}
 \typeout{sc20_polyfillaharp inserted on page \arabic{page}}
-\caption[Filling holes in your HARP map with \fillbad.]{
+\caption[Filling holes in your HARP map with \fillbad.]{\label{fig:fillholes}
   Filling holes in your HARP map with \fillbad. Compare the original map
   (left) with the filled map (right).  A blue pixel indicates an
   undefined spectrum.}
-\label{fig:fillholes}
 \end{center}
 \end{figure}
 
@@ -2520,9 +2504,8 @@ parameter.
 \includegraphics[width=0.6\linewidth]{sc20_noihisto1}
 \typeout{sc20_noihisto1 inserted on page \arabic{page}}
 \caption[
-  A histogram of the error component.]{
+  A histogram of the error component.]{\label{fig:noihisto}
   The error component plotted with \histogram.}
-\label{fig:noihisto}
 \end{center}
 \end{figure}
 
@@ -2547,9 +2530,9 @@ TIP: You can write out the error component into a new file using
 \begin{center}
 \includegraphics[width=0.6\linewidth]{sc20_noimap}
 \typeout{sc20_noimap inserted on page \arabic{page}}
-\caption[The noise map of a mosaic of tiles.]{The noise map of a mosaic
-  of tiles taken in differing weather conditions.}
-\label{fig:noisemap}
+\caption[The noise map of a mosaic of tiles.]{\label{fig:noisemap}
+  The noise map of a mosaic of tiles taken in differing weather
+  conditions.}
 \end{center}
 \end{figure}
 
@@ -2777,8 +2760,8 @@ Channel maps can also be created using \gaia. See
 \begin{center}
 \includegraphics[width=0.8\linewidth]{sc20_chanmap}
 \typeout{sc20_chanmap inserted on page \arabic{page}}
-\caption[Displaying a channel map with \gaia.]{Displaying a channel map with \gaia.}
-\label{fig:chanmap}
+\caption[Displaying a channel map with \gaia.]{\label{fig:chanmap}
+  Displaying a channel map with \gaia.}
 \end{center}
 \end{figure}
 
@@ -2832,11 +2815,11 @@ You can plot the clump outlines over an image using \gaia. See Section
 \begin{center}
 \includegraphics[width=0.7\linewidth]{sc20_clumps}
 \typeout{sc20_clumps inserted on page \arabic{page}}
-\caption[A velocity slice of the result of three-dimensional clump finding viewed with \gaia.]{
+\caption[A velocity slice of the result of three-dimensional clump finding
+viewed with \gaia.]{\label{fig:clumps2}
   A velocity slice of the result of three-dimensional clump finding viewed
   with \gaia. This output NDF contains boundaries of the clumps with the
   value reflecting the number of pixels contained within that clump.}
-\label{fig:clumps2}
 \end{center}
 \end{figure}
 
@@ -2867,8 +2850,8 @@ edges of these limit lines in the \gaiathing{Spectral plot} window.
 \begin{center}
 \includegraphics[width=0.9\linewidth]{sc20_gaia_baseline}
 \typeout{sc20_gaia_baseline inserted on page \arabic{page}}
-\caption[Removing a baseline with \gaia.]{Removing a baseline with \gaia.}
-\label{fig:gaiabaseline}
+\caption[Removing a baseline with \gaia.]{\label{fig:gaiabaseline}
+  Removing a baseline with \gaia.}
 \end{center}
 \end{figure}
 
@@ -2896,8 +2879,8 @@ window.
 \begin{center}
 \includegraphics[width=0.93\linewidth]{sc20_gaia_channel1}
 \typeout{sc20_gaia_channel1 inserted on page \arabic{page}}
-\caption[Creating a channel map with \gaia.]{Creating a channel map with \gaia.}
-\label{fig:gaia_chan1}
+\caption[Creating a channel map with \gaia.]{\label{fig:gaia_chan1}
+  Creating a channel map with \gaia.}
 \end{center}
 \end{figure}
 
@@ -2912,8 +2895,8 @@ display grid.
 \begin{center}
 \includegraphics[width=0.6\linewidth]{sc20_gaia_channel2}
 \typeout{sc20_gaia_channel2 inserted on page \arabic{page}}
-\caption[Channel map created with \gaia.]{Channel map created with \gaia.}
-\label{fig:gaia_chan2}
+\caption[Channel map created with \gaia.]{\label{fig:gaia_chan2}
+  Channel map created with \gaia.}
 \end{center}
 \end{figure}
 \end{enumerate}
@@ -2937,8 +2920,8 @@ below defines linearly spaced contours starting at 900K. Clicking the
 \begin{center}
 \includegraphics[width=0.4\linewidth]{sc20_contouring1}
 \typeout{sc20_contouring1 inserted on page \arabic{page}}
-\caption[Setting contours with \gaia.]{Setting contours with \gaia.}
-\label{fig:gaia_contour1}
+\caption[Setting contours with \gaia.]{\label{fig:gaia_contour1}
+  Setting contours with \gaia.}
 \end{center}
 \end{figure}
 
@@ -2952,8 +2935,8 @@ You can also input or edit the contour levels manually in the \gaiathing{Levels}
 \begin{center}
 \includegraphics[width=0.4\linewidth]{sc20_contouring2}
 \typeout{sc20_contouring2 inserted on page \arabic{page}}
-\caption[Formatting contours with \gaia.]{Formatting contours with \gaia.}
-\label{fig:gaia_contour2}
+\caption[Formatting contours with \gaia.]{\label{fig:gaia_contour2}
+  Formatting contours with \gaia.}
 \end{center}
 \end{figure}
 
@@ -2966,8 +2949,8 @@ remain fixed on top.
 \begin{center}
 \includegraphics[width=0.6\linewidth]{sc20_contouring6}
 \typeout{sc20_contouring6 inserted on page \arabic{page}}
-\caption[Contoured map in \gaia.]{Contoured map in \gaia.}
-\label{fig:gaia_contour3}
+\caption[Contoured map in \gaia.]{\label{fig:gaia_contour3}
+  Contoured map in \gaia.}
 \end{center}
 \end{figure}
 
@@ -3005,9 +2988,8 @@ Step 3.
 \begin{center}
 \includegraphics[width=0.5\linewidth]{sc20_plotclumps2b}
 \typeout{sc20_plotclumps2b inserted on page \arabic{page}}
-\caption[Importing a \cupid\ catalogue with \gaia.]{Importing a \cupid\
-  catalogue with \gaia.}
-\label{fig:gaia_clumps1}
+\caption[Importing a \cupid\ catalogue with \gaia.]{\label{fig:gaia_clumps1}
+  Importing a \cupid\ catalogue with \gaia.}
 \end{center}
 \end{figure}
 
@@ -3015,8 +2997,8 @@ Step 3.
 \begin{center}
 \includegraphics[width=0.5\linewidth]{sc20_plotclumps3}
 \typeout{sc20_plotclumps3 inserted on page \arabic{page}}
-\caption[Catalogue window in \gaia.]{Catalogue window in \gaia.}
-\label{fig:gaia_clumps2}
+\caption[Catalogue window in \gaia.]{\label{fig:gaia_clumps2}
+  Catalogue window in \gaia.}
 \end{center}
 \end{figure}
 
@@ -3033,8 +3015,8 @@ the sources and their positions and extents.
 \begin{center}
 \includegraphics[width=0.5\linewidth]{sc20_plotclumps5}
 \typeout{sc20_plotclumps5 inserted on page \arabic{page}}
-\caption[Catalogue window in \gaia.]{Catalogue window in \gaia.}
-\label{fig:gaia_clumps3}
+\caption[Catalogue window in \gaia.]{\label{fig:gaia_clumps3}
+  Catalogue window in \gaia.}
 \end{center}
 \end{figure}
 
@@ -3048,9 +3030,8 @@ in bold on your map.
 \begin{center}
 \includegraphics[width=0.6\linewidth]{sc20_plotclumps6}
 \typeout{sc20_plotclumps6 inserted on page \arabic{page}}
-\caption[Clumps outlined overlaid on integrated map in \gaia.]{Clumps
-  outlined overlaid on integrated map in \gaia.}
-\label{fig:gaia_clumps4}
+\caption[Clumps outlined overlaid on integrated map in \gaia.]{\label{fig:gaia_clumps4}
+  Clumps outlined overlaid on integrated map in \gaia.}
 \end{center}
 \end{figure}
 
@@ -3077,8 +3058,8 @@ below).
 \includegraphics[width=0.8\linewidth]{sc20_gaia_avgspec1}
 \typeout{sc20_gaia_avgspec1 inserted on page \arabic{page}}
 \end{center}
-\caption[Displaying an average spectrum with \gaia.]{Displaying an average spectrum
-  with \gaia.}
+\caption[Displaying an average spectrum with \gaia.]{\label{fig:gaia_avgspec1}
+  Displaying an average spectrum with \gaia.}
 \end{figure}
 
 \item Draw the shape on your map by clicking and dragging the mouse.
@@ -3095,10 +3076,9 @@ averaged spectrum gives a much clearer profile of the source.
 \hspace{0.5mm}
 \includegraphics[width=0.48\linewidth]{sc20_gaia_avgspec3}
 \typeout{sc20_gaia_avgspec3 inserted on page \arabic{page}}
-\label{fig:gaia_avgspec2}
-\caption[Example of averaged spectra.]{(Left) Average of the spectra within
-  the blue circle in the figure above. (Right) Single spectrum from the
-  centre of the blue circle above.}
+\caption[Example of averaged spectra.]{\label{fig:gaia_avgspec2}
+ (Left) Average of the spectra within the blue circle in the figure
+  above. (Right) Single spectrum from the centre of the blue circle above.}
 \end{center}
 \end{figure}
 
@@ -3133,8 +3113,8 @@ to show your collapse image.
 \begin{center}
 \includegraphics[width=0.9\linewidth]{sc20_gaia_collapse}
 \typeout{sc20_gaia_collapse inserted on page \arabic{page}}
-\caption[Collapsing your cube using \gaia.]{Collapsing your cube using \gaia.}
-\label{fig:gaia_collapse}
+\caption[Collapsing your cube using \gaia.]{\label{fig:gaia_collapse}
+  Collapsing your cube using \gaia.}
 \end{center}
 \end{figure}
 
@@ -3149,9 +3129,8 @@ of a cube} window.
 \begin{center}
 \includegraphics[width=0.45\linewidth]{sc20_gaia_3dmenu}
 \typeout{sc20_gaia_3dmenu inserted on page \arabic{page}}
-\caption[Selecting the Volume rendering menu in \gaia.]{
+\caption[Selecting the Volume rendering menu in \gaia.]{\label{fig:gaia_3d}
   Selecting the \gaiathing{Volume rendering} menu in \gaia.}
-\label{fig:gaia_3d}
 \end{center}
 \end{figure}
 
@@ -3162,9 +3141,8 @@ the \gaiathing{Volume render} window.
 \begin{center}
 \includegraphics[width=0.6\linewidth]{sc20_gaia-3dvolume2}
 \typeout{sc20_gaia-3dvolume2 inserted on page \arabic{page}}
-\caption[Three-dimensional visualisation in \gaia.]{Three-dimensional
-  visualisation in \gaia.}
-\label{fig:gaia_3d2}
+\caption[Three-dimensional visualisation in \gaia.]{\label{fig:gaia_3d2}
+  Three-dimensional visualisation in \gaia.}
 \end{center}
 \end{figure}
 
@@ -3192,8 +3170,8 @@ versus proprietary, raw versus reduced, and SCUBA-2 versus ACSIS data.
 \begin{figure}[b!]
 \begin{center}
 \includegraphics[width=0.98\linewidth]{sc20_cadc}
-\caption{Screenshot of the CADC search window for reduced HARP data.}
-\label{fig:cadc}
+\caption{\label{fig:cadc}
+  Screenshot of the CADC search window for reduced HARP data.}
 \end{center}
 \end{figure}
 
@@ -3492,8 +3470,8 @@ Regrid vs resample vs rebin
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=0.8\linewidth]{sc20_regrid}
-\caption{Regridding vs resampling.}
-\label{fig:regrid}
+\caption{\label{fig:regrid}
+  Regridding vs resampling.}
 \end{center}
 \end{figure}
 
@@ -3628,9 +3606,8 @@ Depending on your default settings you may get a map like the one below.
 \begin{center}
 \includegraphics[width=0.475\linewidth]{sc20_display1}
 \typeout{sc20_display1 inserted on page \arabic{page}}
-\caption[First attempt at displaying an integrated map with \Kappa:\display.]{
+\caption[First attempt at displaying an integrated map with \Kappa:\display.]{\label{fig:display1}
   First attempt at displaying an integrated map with \Kappa:\display.}
-\label{fig:display1}
 \end{center}
 \end{figure}
 
@@ -3643,10 +3620,9 @@ Depending on your default settings you may get a map like the one below.
 \begin{center}
 \includegraphics[width=0.475\linewidth]{sc20_display2}
 \typeout{sc20_display2 inserted on page \arabic{page}}
-\caption[Displaying an integrated map with \Kappa:\display\ using a style file.]{
+\caption[Displaying an integrated map with \Kappa:\display\ using a style file.]{\label{fig:display2}
   Displaying an integrated map with \Kappa:\display\ using a style file
   to format the plotting attributes.}
-\label{fig:display2}
 \end{center}
 \end{figure}
 
@@ -3679,9 +3655,8 @@ textlabgap(2)=0.01
 \begin{center}
 \includegraphics[width=0.47\linewidth]{sc20_display9}
 \typeout{sc20_display9 inserted on page \arabic{page}}
-\caption[Reversing the colour scale in \Kappa:\display.]{
+\caption[Reversing the colour scale in \Kappa:\display.]{\label{fig:display9}
   Reversing the colour scale in \Kappa:\display.}
-\label{fig:display9}
 \end{center}
 \end{figure}
 
@@ -3707,9 +3682,8 @@ details.
 \begin{center}
 \includegraphics[width=0.5\linewidth]{sc20_display10}
 \typeout{sc20_display10 inserted on page \arabic{page}}
-\caption[Displaying an integrated map in colour with \Kappa:\display.]{
+\caption[Displaying an integrated map in colour with \Kappa:\display.]{\label{fig:display10}
   Displaying an integrated map in colour with \Kappa:\display.}
-\label{fig:display10}
 \end{center}
 \end{figure}
 
@@ -3729,9 +3703,8 @@ override the text label size which is too big for these axes labels.
 \begin{center}
 \includegraphics[width=0.55\linewidth]{sc20_display3}
 \typeout{sc20_display3 inserted on page \arabic{page}}
-\caption[Displaying a spectrum with \Kappa:\linplot.]{
+\caption[Displaying a spectrum with \Kappa:\linplot.]{\label{fig:display3}
   Displaying a spectrum with \Kappa:\linplot.}
-\label{fig:display3}
 \end{center}
 \end{figure}
 
@@ -3756,9 +3729,8 @@ data range. In additional \param{extended}, the available options are
 \begin{center}
 \includegraphics[width=0.5\linewidth]{sc20_display4}
 \typeout{sc20_display4 inserted on page \arabic{page}}
-\caption[Displaying a zoomed-in spectrum with \Kappa:\linplot.]{
+\caption[Displaying a zoomed-in spectrum with \Kappa:\linplot.]{\label{fig:display4}
   Displaying a zoomed-in spectrum with \Kappa:\linplot.}
-\label{fig:display4}
 \end{center}
 \end{figure}
 
@@ -3778,9 +3750,8 @@ The plus sign means the change will not be remembered next time
 \begin{center}
 \includegraphics[width=0.55\linewidth]{sc20_display5}
 \typeout{sc20_display5 inserted on page \arabic{page}}
-\caption[Displaying two super-imposed spectra with \Kappa:\linplot.]{
+\caption[Displaying two super-imposed spectra with \Kappa:\linplot.]{\label{fig:display5}
   Displaying two super-imposed spectra with \Kappa:\linplot.}
-\label{fig:display5}
 \end{center}
 \end{figure}
 
@@ -3809,9 +3780,8 @@ axes.
 \begin{center}
 \includegraphics[width=0.9\linewidth]{sc20_clinplot}
 \typeout{sc20_clinplot inserted on page \arabic{page}}
-\caption[Displaying a grid of spectra with \clinplot.]{Displaying a grid of
-  spectra with \clinplot.}
-\label{fig:display6}
+\caption[Displaying a grid of spectra with \clinplot.]{\label{fig:display6}
+  Displaying a grid of spectra with \clinplot.}
 \end{center}
 \end{figure}
 
@@ -3855,9 +3825,8 @@ axes.
 \begin{center}
 \includegraphics[width=0.8\linewidth]{sc20_display7}
 \typeout{sc20_display7 inserted on page \arabic{page}}
-\caption[Displaying two super-imposed spectra with \Kappa:\linplot.]{Displaying two
-   super-imposed spectra with \Kappa:\linplot.}
-\label{fig:display7}
+\caption[Displaying two super-imposed spectra with \Kappa:\linplot.]{\label{fig:display7}
+   Displaying two super-imposed spectra with \Kappa:\linplot.}
 \end{center}
 \end{figure}
 
@@ -3871,9 +3840,8 @@ axes.
 \begin{center}
 \includegraphics[width=0.8\linewidth]{sc20_display8}
 \typeout{sc20_display8 inserted on page \arabic{page}}
-\caption[Displaying two super-imposed spectra with \Kappa:\linplot.]{
+\caption[Displaying two super-imposed spectra with \Kappa:\linplot.]{\label{fig:display8}
   Displaying two super-imposed spectra with \Kappa:\linplot.}
-\label{fig:display8}
 \end{center}
 \end{figure}
 
@@ -3953,9 +3921,8 @@ SPREAD\_WIDTH & The number of arcseconds on either side of the output position w
                 receive contributions from the input pixel.\\
 \hline
 \end{tabular}
-\label{tab:params}
 \end{small}
-\caption{The recipe parameters used to define the properties of the recipe products.}
+\caption{\label{tab:makecube_params}The recipe parameters used to define the properties of the recipe products.}
 \end{table}
 
 \begin{table}[h!]
@@ -3985,9 +3952,9 @@ TRIM\_PERCENTAGE\_UPPER & The percentage of the total frequency range to trim
                         from the higher end of the frequency range. \\
 \hline
 \end{tabular}
-\label{tab:params}
 \end{small}
-\caption{The recipe parameters used to exclude areas of noisy spectrum
+\caption{\label{tab:trim_params}
+The recipe parameters used to exclude areas of noisy spectrum
 or bad receptors.}
 \end{table}
 \newpage
