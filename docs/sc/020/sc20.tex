@@ -50,6 +50,7 @@
 %  \newcommand{\arcm}{\si{\arcminute}}%\hbox{$^{\prime$}}}
 %  \newcommand{\arcsec}{\si{\arcsecond}}%\arcm\hspace{-0.1em}\arcm}
   \newcommand{\uarcs}{\hspace{-0.27em}\arcsec\hspace{-0.07em}}
+  \newcommand{\kms}{\mbox{$\,$km~s$^{-1}$}}   % km/s
 
 \else
 %  \newcommand{\dgs}{\HCode{&deg}}
@@ -57,6 +58,7 @@
 %   \newcommand{\arcm}{$'$}
 %   \newcommand{\arcsec}{$''$}
    \newcommand{\uarcs}{$''$}
+   \newcommand{\kms}{\,km~s$\sp{-1}$}}   % km/s
 \fi
 
 
@@ -1034,8 +1036,8 @@ A summary of these recipes is given below.
 \textbf{RECIPE} & \textbf{DESCRIPTION OF EMISSION} & \textbf{BASELINE METHOD} \\
 \hline
 NARROWLINE & One or more narrow lines are expected across the band.
-Select this recipe if the expected lines are less than about 20
-channels wide.& Smoothing: \newline spatial = 5$\times$5 pixels
+Select this recipe if the expected lines are less than about
+8~\kms\ wide.& Smoothing: \newline spatial = 5$\times$5 pixels
 \newline frequency = 10 channels\\
 \hline
 BROADLINE &This recipe is designed for wide lines that extend over a
@@ -1047,8 +1049,8 @@ to fit a single-order polynomial.  \\
 GRADIENT &Typically one moderately wide line is expected, for which
 the center velocity varies significantly across the field. The
 baseline window changes across the field. Nearby galaxies often fall
-in this category. The expected lines should be wider than 20 channels
-and probably not wider than 20\% of the available bandwidth &
+in this category. The expected lines should be wider than about
+8~\kms\ and probably not wider than 20\% of the available bandwidth &
 Smoothing: \newline spatial = 3$\times$3 pixels \newline frequency =
 25 channels\\
 \hline
