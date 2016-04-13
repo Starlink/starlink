@@ -26,6 +26,11 @@
 
 % Local Definitions
 \providecommand{\lutedit}{\xref{\task{lutedit}}{sun95}{LUTEDIT}}
+\providecommand{\broadline}{\xref{REDUCE\_SCIENCE\_BROADLINE}{sun260}{REDUCE_SCIENCE_BROADLINE}}
+\providecommand{\gradient}{\xref{REDUCE\_SCIENCE\_GRADIENT}{sun260}{REDUCE_SCIENCE_GRADIENT}}
+\providecommand{\narrowline}{\xref{REDUCE\_SCIENCE\_NARROWLINE}{sun260}{REDUCE_SCIENCE_NARROWLINE}}
+\providecommand{\lineforest}{\xref{REDUCE\_SCIENCE\_LINEFOREST}{sun260}{REDUCE_SCIENCE_LINEFOREST}}
+
 \newcommand{\acsispipelinesun}{\xref{\textbf{SUN/260}}{sun260}{}}
 
 \providecommand{\gaiasc}{\xref{\textbf{SC/17}}{sc17}{}}
@@ -1022,10 +1027,10 @@ sometimes be omitted altogether.
 There are four main science recipes available, each tailored to different
 type of observation:
 \begin{itemize}[noitemsep,,nolistsep]
-\item REDUCE\_SCIENCE\_NARROWLINE\\
-\item REDUCE\_SCIENCE\_BROADLINE\\
-\item REDUCE\_SCIENCE\_GRADIENT\\
-\item REDUCE\_SCIENCE\_LINEFOREST
+\item \narrowline\\
+\item \broadline\\
+\item \gradient\\
+\item \lineforest
 \end{itemize}
 
 A summary of these recipes is given below.
@@ -1204,9 +1209,8 @@ to make a new \textbf{g\_cube}.
 \begin{center}
 \caption[Flow chart of the ORAC-DR ACSIS pipeline process.]{\label{fig:pipeline}
   Flow chart of the processes employed by the ORAC-DR ACSIS pipeline,
-  specifically the REDUCE\_SCIENCE\_NARROWLINE and
-  REDUCE\_SCIENCE\_GRADIENT recipes. A few minor processing steps are
-  omitted to avoid the diagram being too long. Other recipes may have
+  specifically the \narrowline\ and \gradient recipes. A few minor processing
+  steps are omitted to avoid the diagram being too long. Other recipes may have
   additional steps or omit steps as appropriate. Because of space
   constraints baseline is sometimes abbreviated to `bs' and time series
   to `ts' in the step descriptions.  The prefix and suffix of the file
@@ -1517,7 +1521,7 @@ but it can be invaluable during debugging.
 
 \item Now you are ready to run the pipeline. In this example, the
 recipe name on the end ensures that all data being processed using
-REDUCE\_SCIENCE\_NARROWLINE.
+\narrowline.
 
 \begin{terminalv}
 % oracdr -files list.txt -loop file -batch -log xf -calib qaparams=myqa.ini \
@@ -3890,8 +3894,7 @@ application can distinguish it from the other options.  For example,
 \chapter{\xlabel{params}Classified Recipe Parameters}
 \label{app:params}
 
-The recipes REDUCE\_SCIENCE\_NARROWLINE, REDUCE\_SCIENCE\_GRADIENT,
-REDUCE\_SCIENCE\_LINEFOREST, and REDUCE\_SCIENCE\_BROADLINE support
+The recipes \narrowline, \gradient, \lineforest, and \broadline\ support
 the following parameters, except where noted.  Recipe parameters
 should be supplied in an external file and called by the command line
 option \param{-recpars <params.ini>}. For an example recipe-parameter
@@ -4148,8 +4151,7 @@ LOWFREQ\_INTERFERENCE\_THRESH\_CLIP & Used to reject spectra with low-frequency
   observation where some external signal has affected the baselines.
   If most or whole of an observtion might be affected see
   \param{BASELINE\_LINEARITY} and related parameters below. These
-  parameters are not available in the REDUCE\_SCIENCE\_BROADLINE
-  recipe.}
+  parameters are not available in the \broadline\ recipe.}
 \end{table}
 
 
@@ -4192,7 +4194,7 @@ BASELINE\_LINEARITY\_SCALELENGTH & This is used to reject receptors that have no
 \caption{\label{tab:bll_params}
   The recipe parameters associated exclusion of receptors affected by
   non-linear baselines throughout or most of an observation.  The
-  parameters are not available in the REDUCE\_SCIENCE\_BROADLINE recipe.}
+  parameters are not available in the \broadline\ recipe.}
 \end{table}
 
 \newpage
@@ -4248,4 +4250,3 @@ VELRES\_13CO   & Velocity resolution for the second line ($^{13}$CO here). \\
 \end{table}
 
 \end{document}
-
