@@ -264,11 +264,11 @@ try:
 #  without POL2 in the beam.
    filter = int( float( starutil.get_fits_header( qin[0], "FILTER", True )))
    if filter == 450:
-      fcf1 = 962
-      fcf2 = 491
+      fcf1 = 962.0
+      fcf2 = 491.0
    elif filter == 850:
-      fcf1 = 725
-      fcf2 = 537
+      fcf1 = 725.0
+      fcf2 = 537.0
    else:
       raise starutil.InvalidParameterError("Invalid FILTER header value "
              "'{0} found in {1}.".format( filter, qin[0] ) )
@@ -276,16 +276,16 @@ try:
 #  Remove any spectral axes
    qtrim = NDG(qin)
    invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(qin,qtrim) )
-   utrim = NDG(qin)
+   utrim = NDG(uin)
    invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(uin,utrim) )
-   itrim = NDG(qin)
+   itrim = NDG(iin)
    invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(iin,itrim) )
 
 #  Rotate them to use the same polarimetric reference direction.
    qrot = NDG(qtrim)
    urot = NDG(utrim)
    invoke( "$POLPACK_DIR/polrotref qin={0} uin={1} like={2} qout={3} uout={4} ".
-           format(qin,uin,qtrim[0],qrot,urot) )
+           format(qtrim,utrim,qtrim[0],qrot,urot) )
 
 #  Mosaic them into a single set of Q, U and I images, aligning them
 #  with the first I image.
