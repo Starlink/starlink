@@ -115,6 +115,10 @@
 *        Allow COMP=ERROR.
 *     2012 May 11 (MJC):
 *        Add support for _INT64.
+*     19-APR-2016 (DSB):
+*        UTRIM is initialised to FALSE, so set it TRUE if there are WCS
+*        axes to be trimmed (rather than setting it FALSE if there are
+*        no WCS axes to be trimmed).
 *     {enter_further_changes_here}
 
 *-
@@ -234,12 +238,13 @@
          END IF
       END DO
 
-*  If there are no insignificant pixel axes, and the number of WCS axes
-*  equals the number of pixel axes, there is nothing to trim.
+*  If there are no insignificant pixel axes, but there are excess WCS 
+*  axes (i.e. more WCS axes than pixel axes), then there is something
+*  to trim.
       IF( SIGDIM .EQ. NDIM ) THEN
          CALL KPG1_GTWCS( INDF1, IWCS, STATUS )
-         IF( AST_GETI( IWCS, 'Nin', STATUS ) .GE.
-     :       AST_GETI( IWCS, 'NOUT', STATUS ) ) UTRIM = .FALSE.
+         IF( AST_GETI( IWCS, 'Nin', STATUS ) .LT.
+     :       AST_GETI( IWCS, 'NOUT', STATUS ) ) UTRIM = .TRUE.
 
 *  If there are no significant axes, trimming is not possible.
       ELSE IF( SIGDIM .EQ. 0 .AND. TRIM ) THEN
