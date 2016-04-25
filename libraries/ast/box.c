@@ -45,12 +45,12 @@ f     The Box class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -101,8 +101,12 @@ f     The Box class does not define any new routines beyond those
 *        bounding box resulting in matching region being far too big.
 *     10-APR-2014 (DSB):
 *        More work (in function Cache() ) on handling uncertainty regions that straddle
-*        a discontinuity. This time ensure that the extent of the box on each axis takes 
+*        a discontinuity. This time ensure that the extent of the box on each axis takes
 *        account of the possibly cyclic nature of the base Frame.
+*     25-4-2016 (DSB):
+*        Remove the unused box shrinking facility (a hang over from the
+*        days when the RegBaseGrid function operated by creating multiple
+*        meshes on the surface of the box, shrinking the box each time).
 *class--
 */
 
@@ -215,7 +219,6 @@ static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
 static double *GeoCorner( AstFrame *, int, double *, double *, double *, int * );
 static double *GeoLengths( AstFrame *, int, double *, double *, double *, int * );
 static double *RegCentre( AstRegion *this, double *, double **, int, int, int * );
-static double SetShrink( AstBox *, double, int * );
 static int GetObjSize( AstObject *, int * );
 static int MakeGrid( int, double **, int, double *, double *, int *, int, int, double, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
@@ -704,7 +707,6 @@ static void Cache( AstBox *this, int lohi, int *status ){
    double *lbnd_unc;
    double *geolen;
    double *lo;
-   double *shextent;
    double *ubnd_unc;
    double wid;
    int i;
@@ -720,15 +722,10 @@ static void Cache( AstBox *this, int lohi, int *status ){
 /* Allocate memory to store the half-width of the box on each axis. */
    extent = (double *) astMalloc( sizeof( double )*(size_t) nc );
 
-/* Allocate memory to store the half-width of the box on each axis,
-   taking account of the current shrink factor stored in this->shrink. */
-   shextent = (double *) astMalloc( sizeof( double )*(size_t) nc );
-
 /* Allocate memory to store the centre of the box on each axis. */
    centre = (double *) astMalloc( sizeof( double )*(size_t) nc );
 
-/* Allocate memory to store the high and low bounds taking account of the
-   shrink factor. */
+/* Allocate memory to store the high and low bounds. */
    hi = (double *) astMalloc( sizeof( double )*(size_t) nc );
    lo = (double *) astMalloc( sizeof( double )*(size_t) nc );
 
@@ -757,13 +754,12 @@ static void Cache( AstBox *this, int lohi, int *status ){
       GeoLengths( frm, nc, centre, hi, geolen, status );
 
 /* Calculate the half-width and store in the above array. Also store the
-   shrunk half-widths, and the shrunk lower and upper bounds. */
+   lower and upper bounds. */
       for( i = 0; i < nc; i++ ) {
          extent[ i ] = fabs( astAxDistance( frm, i + 1, ptr[ i ][ 1 ],
                                             centre[ i ] ) );
-         shextent[ i ] = extent[ i ]*this->shrink;
-         lo[ i ] = centre[ i ] - shextent[ i ];
-         hi[ i ] = centre[ i ] + shextent[ i ];
+         lo[ i ] = centre[ i ] - extent[ i ];
+         hi[ i ] = centre[ i ] + extent[ i ];
       }
 
       frm = astAnnul( frm );
@@ -773,20 +769,17 @@ static void Cache( AstBox *this, int lohi, int *status ){
       if( astOK ) {
          astFree( this->extent );
          astFree( this->centre );
-         astFree( this->shextent );
          astFree( this->lo );
          astFree( this->hi );
          astFree( this->geolen );
          this->extent = extent;
          this->centre = centre;
-         this->shextent = shextent;
          this->lo = lo;
          this->hi = hi;
          this->geolen = geolen;
          this->stale = 0;
          extent = NULL;
          centre = NULL;
-         shextent = NULL;
          lo = NULL;
          hi = NULL;
          geolen = NULL;
@@ -798,7 +791,7 @@ static void Cache( AstBox *this, int lohi, int *status ){
 
 /* If we are dealing with an unnegated closed Box or a negated open
    Box, ensure that the box does not have zero width on any axis. We do
-   this by ensuring that the shrunk extent on all axes is at least half the
+   this by ensuring that the extent on all axes is at least half the
    width  of the bounding box of the uncertainty Region. */
          if(  astGetNegated( this ) != astGetClosed( this ) ) {
 
@@ -807,12 +800,12 @@ static void Cache( AstBox *this, int lohi, int *status ){
             unc = astGetUncFrm( this, AST__BASE );
             astGetRegionBounds( unc, lbnd_unc, ubnd_unc );
 
-/* Ensure the shrunk extents are at least half the width of the uncertainty
+/* Ensure the extents are at least half the width of the uncertainty
    bounding box. */
             for ( i = 0; i < nc; i++ ) {
                wid = 0.5*( ubnd_unc[ i ] - lbnd_unc[ i ] );
-               if( this->shextent[ i ] < wid ) {
-                  this->shextent[ i ] = wid;
+               if( this->extent[ i ] < wid ) {
+                  this->extent[ i ] = wid;
                   this->lo[ i ] = this->centre[ i ] - wid;
                   this->hi[ i ] = this->centre[ i ] + wid;
                }
@@ -828,7 +821,6 @@ static void Cache( AstBox *this, int lohi, int *status ){
    if( !astOK ) {
       extent = astFree( extent );
       centre = astFree( centre );
-      shextent = astFree( shextent );
       lo = astFree( lo );
       hi = astFree( hi );
    }
@@ -1132,7 +1124,6 @@ static int GetObjSize( AstObject *this_object, int *status ) {
    result = (*parent_getobjsize)( this_object, status );
 
    result += astTSizeOf( this->extent );
-   result += astTSizeOf( this->shextent );
    result += astTSizeOf( this->centre );
    result += astTSizeOf( this->lo );
    result += astTSizeOf( this->hi );
@@ -2175,7 +2166,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
    size of the box on each axis.*/
    for( i = 0; i < nc; i++ ) {
       axcen = this->centre[ i ];
-      axlen = this->extent[ i ]*this->shrink;
+      axlen = this->extent[ i ];
       lbnd[ i ] = axcen - axlen;
       ubnd[ i ] = axcen + axlen;
    }
@@ -3121,8 +3112,8 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    found above, and the other of which is smaller than "this" by the widths
    found above. */
       for( i = 0; i < nc; i++ ) {
-         large[ i ] = this->centre[ i ]  + this->extent[ i ]*this->shrink + wid[ i ];
-         small[ i ] = this->extent[ i ]*this->shrink - wid[ i ];
+         large[ i ] = this->centre[ i ]  + this->extent[ i ] + wid[ i ];
+         small[ i ] = this->extent[ i ] - wid[ i ];
          if( small[ i ] < 0.0 ) small[ i ] = 0.0;
          small[ i ] += this->centre[ i ];
       }
@@ -3554,63 +3545,6 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm, int *status ) {
    astResetCache( this_region );
 }
 
-static double SetShrink( AstBox *this, double shrink, int *status ){
-/*
-*  Name:
-*     SetShrink
-
-*  Purpose:
-*     Store a new temporary shrink factor for a Box.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "box.h"
-*     double SetShrink( AstBox *this, double shrink, int *status );
-
-*  Class Membership:
-*     Box method
-
-*  Description:
-*     Boxes can be shrunk from their original size by calling this function.
-*     The original shrink factor is 1.0. This function should be used for
-*     assigning new values to since it also re-calculates Cahced information
-*     which depends on the current shrink factor.
-
-*  Parameters:
-*     this
-*        Pointer to the Box.
-*     shrink
-*        The new Shrink factor.
-*     status
-*        Pointer to the inherited status variable.
-
-*  Returned Value:
-*     The original shrink factor.
-
-*/
-
-/* Local Variables: */
-   double result;
-
-/* Check the inherited status. */
-   if( !astOK ) return 1.0;
-
-/* Store the orignal shrink factor. */
-   result = this->shrink;
-
-/* Set the new value. */
-   this->shrink = shrink;
-
-/* If the new value is not the same as the old value, indicate that we
-   need to re-calculate the cached information in the Box. */
-   if( result != shrink ) astResetCache( this );
-
-/* Return the original value */
-   return result;
-}
-
 static void SetUnc( AstRegion *this, AstRegion *unc, int *status ){
 /*
 *  Name:
@@ -3830,8 +3764,8 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /* If this output is fed the value of an input, then the output limits
    are equal to the corresponding input limits. */
             } else {
-               lbnd[ ic ] = newbox->centre[ feed ] - newbox->extent[ feed ]*newbox->shrink;
-               ubnd[ ic ] = newbox->centre[ feed ] + newbox->extent[ feed ]*newbox->shrink;
+               lbnd[ ic ] = newbox->centre[ feed ] - newbox->extent[ feed ];
+               ubnd[ ic ] = newbox->centre[ feed ] + newbox->extent[ feed ];
             }
 
 /* If either bound is missing we will produce an Interval rather than a
@@ -3860,8 +3794,8 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    instead of a Box. */
             if( feed < 0 ) {
                k = constants[ (-feed) - 1 ];
-               lb = newbox->centre[ ic ] - newbox->extent[ ic ]*newbox->shrink;
-               ub = newbox->centre[ ic ] + newbox->extent[ ic ]*newbox->shrink;
+               lb = newbox->centre[ ic ] - newbox->extent[ ic ];
+               ub = newbox->centre[ ic ] + newbox->extent[ ic ];
 
                if( closed == neg ) {
                   isNull = ( k <= lb || k >= ub );
@@ -4054,7 +3988,6 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
          }
 
          ps1 = astAnnul( ps1 );
-         ps2 = astAnnul( ps2 );
       }
 
 /* If we have yet been able to produce a simpler region, we now try
@@ -4371,7 +4304,6 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /* For safety, first clear any references to the input memory from
    the output Box. */
    out->extent = NULL;
-   out->shextent = NULL;
    out->centre = NULL;
    out->lo = NULL;
    out->hi = NULL;
@@ -4382,8 +4314,6 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    out->extent = astStore( NULL, in->extent,
                            sizeof( double )*(size_t)nax );
    out->centre = astStore( NULL, in->centre,
-                           sizeof( double )*(size_t)nax );
-   out->shextent = astStore( NULL, in->shextent,
                            sizeof( double )*(size_t)nax );
    out->lo = astStore( NULL, in->lo,
                            sizeof( double )*(size_t)nax );
@@ -4433,7 +4363,6 @@ static void Delete( AstObject *obj, int *status ) {
 /* Annul all resources. */
    this->extent = astFree( this->extent );
    this->centre = astFree( this->centre );
-   this->shextent = astFree( this->shextent );
    this->lo = astFree( this->lo );
    this->hi = astFree( this->hi );
    this->geolen = astFree( this->geolen );
@@ -4468,14 +4397,8 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 *        Pointer to the inherited status variable.
 */
 
-/* Local Variables: */
-   AstBox *this;                 /* Pointer to the Box structure */
-
 /* Check the global error status. */
    if ( !astOK ) return;
-
-/* Obtain a pointer to the Box structure. */
-   this = (AstBox *) this_object;
 
 /* Write out values representing the instance variables for the
    Box class.  Accompany these with appropriate comment strings,
@@ -4941,9 +4864,7 @@ AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab,
 
 /* Initialise the Box data. */
 /* ------------------------ */
-         new->shrink = 1.0;
          new->extent = NULL;
-         new->shextent = NULL;
          new->centre = NULL;
          new->lo = NULL;
          new->hi = NULL;
@@ -5090,9 +5011,7 @@ AstBox *astLoadBox_( void *mem, size_t size, AstBoxVtab *vtab,
 /* ---------------------------- */
 
 /* Initialise Box data */
-      new->shrink = 1.0;
       new->extent = NULL;
-      new->shextent = NULL;
       new->centre = NULL;
       new->lo = NULL;
       new->hi = NULL;

@@ -957,6 +957,7 @@ AstPolygon *astConvex##X##_( Xtype value, int oper, const Xtype array[], \
 \
 /* Initialise. */ \
    result = NULL; \
+   candidate = NULL; \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return result; \
@@ -4629,7 +4630,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
             }
          }
       } else {
-         for( ip = 0; ip < np; ip++, m++ ) {
+         for( ip = 0; ip < np; ip++ ) {
             if( ptr1[ 0 ][ ip ] != AST__BAD &&
                 ptr1[ 1 ][ ip ] != AST__BAD ) {
                result = 0;

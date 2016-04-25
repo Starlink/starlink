@@ -3775,6 +3775,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "restfreq= %lg %n%*s %n", &dval, &off, &nc ) )
         && ( nc >= len ) ) {
+      dtemp = AST__BAD;
 
 /* Is there a Mapping from the supplied units to Hz? If so, use the
    Mapping to convert the supplied value to Hz. */

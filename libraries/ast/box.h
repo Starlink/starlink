@@ -43,12 +43,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -98,11 +98,9 @@ typedef struct AstBox {
 
 /* Attributes specific to objects in this class. */
    double *extent;               /* Original axis half-widths */
-   double *shextent;             /* Shrunk axis half-widths */
    double *centre;               /* Box centre coords */
-   double shrink;                /* Temporary shrink factor */
-   double *lo;                   /* Shrunk low limits */
-   double *hi;                   /* Shrunk high limits */
+   double *lo;                   /* Low limits */
+   double *hi;                   /* High limits */
    double *geolen;               /* Geodesic half-dimensions of box */
    int stale;                    /* Is other info out of date? */
 } AstBox;

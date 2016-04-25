@@ -81,7 +81,7 @@ f     The Prism class does not define any new routines beyond those
 *     14-AUG-2014 (DSB):
 *        Over-ride the astGetRegionBounds method.
 *     9-SEP-2014 (DSB):
-*        Record the pointer to the Prism implementation of RegBaseMesh 
+*        Record the pointer to the Prism implementation of RegBaseMesh
 *        within the class virtual function table.
 *class--
 */
@@ -1012,7 +1012,6 @@ static void GetRegionBounds( AstRegion *this_region, double *lbnd,
    AstFrame *cfrm1;             /* Frame spanning current axes for 1st component Region */
    AstFrame *cfrm2;             /* Frame spanning current axes for 2nd component Region */
    AstFrame *cfrm;              /* Current Frame for total Prism */
-   AstMapping *fsmap;           /* Base->Current Mapping */
    AstMapping *map1;            /* Base->Current Mapping for axes of 1st component Region */
    AstMapping *map2;            /* Base->Current Mapping for axes of 2nd component Region */
    AstMapping *map;             /* Case->Current mapping for total Prism */

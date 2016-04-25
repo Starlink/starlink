@@ -63,12 +63,12 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -1401,15 +1401,15 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
          astTran1( umap, 1, &dval, 1, &dtemp );
          umap = astAnnul( umap );
 
+/* Set the intermediate frequency. */
+         astSetIF( this, dtemp );
+
 /* Otherwise report an error. */
       } else if( astOK ) {
          astError( AST__ATTIN, "astSetAttrib(%s): Intermediate frequency given "
                    "in an inappropriate system of units \"%g %s\".", status,
                    astGetClass( this ), dval, setting + off );
       }
-
-/* Set the intermediate frequency. */
-      astSetIF( this, dtemp );
 
 /* SideBand */
 /* -------- */
