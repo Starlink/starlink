@@ -147,8 +147,18 @@ static void Clear##attribute( Ast##class *this, int *status ) { \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
-/* Assign the "clear" value. */ \
-   this->component = (assign); \
+/* Report an error if the object has been cloned (i.e. has a reference \
+   count that is greater than one). */ \
+   if( astGetRefCount( this ) > 1 ) { \
+      astError( AST__IMMUT, "astClear(%s): The " #attribute "attribute of " \
+                "the supplied %s cannot be cleared because the %s has " \
+                "been cloned (programming error).", status, \
+                astGetClass(this), astGetClass(this), astGetClass(this) ); \
+\
+/* Otherwise, assign the "clear" value in the structure component. */ \
+   } else { \
+      this->component = (assign); \
+   } \
 \
 /* Update the derived constants. */ \
    UpdateConstants( this, status ); \
@@ -226,8 +236,18 @@ static void Set##attribute( Ast##class *this, type value, int *status ) { \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
-/* Store the new value in the structure component. */ \
-   this->component = (assign); \
+/* Report an error if the object has been cloned (i.e. has a reference \
+   count that is greater than one). */ \
+   if( astGetRefCount( this ) > 1 ) { \
+      astError( AST__IMMUT, "astSet(%s): The " #attribute "attribute of " \
+                "the supplied %s cannot be changed because the %s has " \
+                "been cloned (programming error).", status, \
+                astGetClass(this), astGetClass(this), astGetClass(this) ); \
+\
+/* Otherwise, store the new value in the structure component. */ \
+   } else { \
+      this->component = (assign); \
+   } \
 \
 /* Update the derived constants. */ \
    UpdateConstants( this, status ); \
@@ -278,6 +298,10 @@ void astSet##attribute##_( Ast##class *this, type value, int *status ) { \
 #include <stdlib.h>
 #include <limits.h>
 #include <string.h>
+
+/* Macros which return the maximum and minimum of two values. */
+#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
+#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
 
 /* Module Variables. */
 /* ================= */
@@ -1684,6 +1708,14 @@ static void UpdateConstants( AstGrismMap *this, int *status ){
 *     This attribute holds refractive index of the grism material at the
 *     reference wavelength (given by attribute GrismWaveR). The default
 *     value is 1.0.
+*
+*     Note, the value of this attribute may changed only if the GrismMap
+*     has no more than one reference. That is, an error is reported if the
+*     GrismMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     GrismMap
@@ -1718,6 +1750,14 @@ astMAKE_TEST(GrismMap,GrismNR,( this->nr != AST__BAD ))
 *     appropriate value for a pure grating disperser with no prism). The
 *     units of this attribute should be consistent with those of attributes
 *     GrismWaveR and GrismG.
+*
+*     Note, the value of this attribute may changed only if the GrismMap
+*     has no more than one reference. That is, an error is reported if the
+*     GrismMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     GrismMap
@@ -1749,6 +1789,14 @@ astMAKE_TEST(GrismMap,GrismNRP,( this->nrp != AST__BAD ))
 *     This attribute holds reference wavelength. The default value is
 *     5000 (Angstrom). The units of this attribute should be consistent with
 *     those of attributes GrismNRP and GrismG.
+*
+*     Note, the value of this attribute may changed only if the GrismMap
+*     has no more than one reference. That is, an error is reported if the
+*     GrismMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     GrismMap
@@ -1779,6 +1827,14 @@ astMAKE_TEST(GrismMap,GrismWaveR,( this->waver != AST__BAD ))
 *  Description:
 *     This attribute holds the angle between the incoming light and the
 *     normal to the grating surface, in radians. The default value is 0.
+*
+*     Note, the value of this attribute may changed only if the GrismMap
+*     has no more than one reference. That is, an error is reported if the
+*     GrismMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     GrismMap
@@ -1811,6 +1867,14 @@ astMAKE_TEST(GrismMap,GrismAlpha,( this->alpha != AST__BAD ))
 *     The unit of length used should be consistent with the units used
 *     for attributes GrismWaveR and GrismNRP. The default value is 0.0.
 *     (the appropriate value for a pure prism disperser with no grating).
+*
+*     Note, the value of this attribute may changed only if the GrismMap
+*     has no more than one reference. That is, an error is reported if the
+*     GrismMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     GrismMap
@@ -1841,6 +1905,14 @@ astMAKE_TEST(GrismMap,GrismG,( this->g != AST__BAD ))
 *  Description:
 *     This attribute holds the interference order being considered.
 *     The default value is 0.
+*
+*     Note, the value of this attribute may changed only if the GrismMap
+*     has no more than one reference. That is, an error is reported if the
+*     GrismMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     GrismMap
@@ -1873,6 +1945,14 @@ astMAKE_TEST(GrismMap,GrismM,( this->m != INT_MAX ))
 *     the grating or exit prism face, and the dispersion plane. The
 *     dispersion plane is the plane spanned by the incoming and outgoing
 *     ray. The default value is 0.0.
+*
+*     Note, the value of this attribute may changed only if the GrismMap
+*     has no more than one reference. That is, an error is reported if the
+*     GrismMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     GrismMap
@@ -1906,6 +1986,14 @@ astMAKE_TEST(GrismMap,GrismEps,( this->eps != AST__BAD ))
 *     detector. Specifically, it holds the angle (in radians) between
 *     the normal to the detector plane and an incident ray at the reference
 *     wavelength. The default value is 0.0.
+*
+*     Note, the value of this attribute may changed only if the GrismMap
+*     has no more than one reference. That is, an error is reported if the
+*     GrismMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     GrismMap

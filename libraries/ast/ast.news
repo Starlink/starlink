@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V8.1.0) of the Starlink AST (astrometry) library is
+   A new release (V8.2.0) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,21 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- The restriction that Mappings are immutable has been extended to all
+Mapping classes. This means that attributes representing parameters of
+a Mapping's forward or inverse transformation cannot be changed after
+the Mapping has been created. In order to minimise the risk to existing
+software, this rule does not apply to Mappings that have not yet been
+included in other objects such as CmpMaps or FrameSets, or which have not
+yet been cloned. In other words, an error is reported if an attempt is
+made to change the nature of a Mapping's transformation, but only if the
+reference count of the Mapping is greater than one. The Mapping classes
+affected include: GrismMap, LutMap, PcdMap, SphMap, WcsMap and ZoomMap.
+
+
+Main Changes in V8.1.0
+----------------------
 
 - The configure script has a new option "--without-fortran" that allows
 AST to be built in situations where no Fortran compiler is available. The

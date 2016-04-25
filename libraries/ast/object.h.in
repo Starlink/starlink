@@ -760,6 +760,95 @@ void astClear##attribute##_( Ast##class *this, int *status ) { \
 /*
 *+
 *  Name:
+*     astMAKE_CLEAR1
+
+*  Purpose:
+*     Implement a method to clear an attribute value for a class, reporting
+*     an error if the object has more than one reference.
+
+*  Type:
+*     Protected macro.
+
+*  Synopsis:
+*     #include "object.h"
+*     astMAKE_CLEAR1(class,attribute,component,assign)
+
+*  Class Membership:
+*     Defined by the Object class.
+
+*  Description:
+*     This macro expands to an implementation of a private member function of
+*     the form:
+*
+*        static void Clear<Attribute>( Ast<Class> *this )
+*
+*     and an external interface function of the form:
+*
+*        void astClear<Attribute>_( Ast<Class> *this )
+*
+*     which implement a method for clearing a specified attribute value for
+*     a class. An error is reported if the object has a reference count that
+*     is greater than one.
+
+*  Parameters:
+*     class
+*        The name (not the type) of the class to which the attribute belongs.
+*     attribute
+*        The name of the attribute to be cleared, as it appears in the function
+*        name (e.g. Label in "astClearLabel").
+*     component
+*        The name of the class structure component that holds the attribute
+*        value.
+*     assign
+*        An expression that evaluates to the value to assign to the component
+*        to clear its value.
+
+*  Notes:
+*     -  To avoid problems with some compilers, you should not leave any white
+*     space around the macro arguments.
+*-
+*/
+
+/* Define the macro. */
+#define astMAKE_CLEAR1(class,attribute,component,assign) \
+\
+/* Private member function. */ \
+/* ------------------------ */ \
+static void Clear##attribute( Ast##class *this, int *status ) { \
+\
+/* Check the inherited error status. */ \
+   if ( !astOK ) return; \
+\
+/* Report an error if the object has been cloned (i.e. has a reference \
+   count that is greater than one). */ \
+   if( astGetRefCount( this ) > 1 ) { \
+      astError( AST__IMMUT, "astClear(%s): The " #attribute "attribute of " \
+                "the supplied %s cannot be cleared because the %s has " \
+                "been cloned (programming error).", status, \
+                astGetClass(this), astGetClass(this), astGetClass(this) ); \
+\
+/* Otherwise, assign the "clear" value in the structure component. */ \
+   } else { \
+      this->component = (assign); \
+   } \
+} \
+\
+/* External interface. */ \
+/* ------------------- */ \
+void astClear##attribute##_( Ast##class *this, int *status ) { \
+\
+/* Check the inherited error status. */ \
+   if ( !astOK ) return; \
+\
+/* Invoke the required method via the virtual function table. */ \
+   (**astMEMBER(this,class,Clear##attribute))( this, status ); \
+}
+#endif
+
+#if defined(astCLASS)            /* Protected */
+/*
+*+
+*  Name:
 *     astMAKE_GET
 
 *  Purpose:
@@ -992,6 +1081,94 @@ static void Set##attribute( Ast##class *this, type value, int *status ) { \
 \
 /* Store the new value in the structure component. */ \
    this->component = (assign); \
+} \
+\
+/* External interface. */ \
+/* ------------------- */ \
+void astSet##attribute##_( Ast##class *this, type value, int *status ) { \
+\
+/* Check the inherited error status. */ \
+   if ( !astOK ) return; \
+\
+/* Invoke the required method via the virtual function table. */ \
+   (**astMEMBER(this,class,Set##attribute))( this, value, status ); \
+}
+#endif
+
+#if defined(astCLASS)            /* Protected */
+/*
+*+
+*  Name:
+*     astMAKE_SET1
+
+*  Purpose:
+*     Implement a method to set an attribute value for a class, reporting
+*     an error if the object has more than one reference.
+
+*  Type:
+*     Protected macro.
+
+*  Synopsis:
+*     #include "object.h"
+*     astMAKE_SET1(class,attribute,type,component,assign)
+
+*  Class Membership:
+*     Defined by the Object class.
+
+*  Description:
+*     This macro expands to an implementation of a private member function of
+*     the form:
+*
+*        static void Set<Attribute>( Ast<Class> *this, <Type> value )
+*
+*     and an external interface function of the form:
+*
+*        void astSet<Attribute>_( Ast<Class> *this, <Type> value )
+*
+*     which implement a method for setting a specified attribute value for a
+*     class. An error is reported if the object has a reference count that
+*     is greater than one.
+
+*  Parameters:
+*      class
+*         The name (not the type) of the class to which the attribute belongs.
+*      attribute
+*         The name of the attribute to be set, as it appears in the function
+*         name (e.g. Label in "astSetLabel").
+*      type
+*         The C type of the attribute.
+*      component
+*         The name of the class structure component that holds the attribute
+*         value.
+*      assign
+*         An expression that evaluates to the value to be assigned to the
+*         component.
+
+*-
+*/
+
+/* Define the macro. */
+#define astMAKE_SET1(class,attribute,type,component,assign) \
+\
+/* Private member function. */ \
+/* ------------------------ */ \
+static void Set##attribute( Ast##class *this, type value, int *status ) { \
+\
+/* Check the inherited error status. */ \
+   if ( !astOK ) return; \
+\
+/* Report an error if the object has been cloned (i.e. has a reference \
+   count that is greater than one). */ \
+   if( astGetRefCount( this ) > 1 ) { \
+      astError( AST__IMMUT, "astSet(%s): The " #attribute "attribute of " \
+                "the supplied %s cannot be changed because the %s has " \
+                "been cloned (programming error).", status, \
+                astGetClass(this), astGetClass(this), astGetClass(this) ); \
+\
+/* Otherwise, store the new value in the structure component. */ \
+   } else { \
+      this->component = (assign); \
+   } \
 } \
 \
 /* External interface. */ \

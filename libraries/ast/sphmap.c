@@ -45,12 +45,12 @@ f     The SphMap class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -1358,15 +1358,22 @@ f     therefore have the same coordinate values.
 *     the coordinates transformed by a SphMap. The lengths of the
 *     input 3-dimensional Cartesian vectors supplied are always
 *     ignored, even if UnitRadius is non-zero.
+*     - The value of this attribute may changed only if the SphMap
+*     has no more than one reference. That is, an error is reported if the
+*     SphMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     SphMap
 *        All SphMaps have this attribute.
 *att--
 */
-astMAKE_CLEAR(SphMap,UnitRadius,unitradius,-1)
+astMAKE_CLEAR1(SphMap,UnitRadius,unitradius,-1)
 astMAKE_GET(SphMap,UnitRadius,int,0,(this->unitradius == -1 ? 0 : this->unitradius))
-astMAKE_SET(SphMap,UnitRadius,int,unitradius,( value ? 1 : 0 ))
+astMAKE_SET1(SphMap,UnitRadius,int,unitradius,( value ? 1 : 0 ))
 astMAKE_TEST(SphMap,UnitRadius,( this->unitradius != -1 ))
 
 /* PolarLong */
@@ -1390,15 +1397,23 @@ astMAKE_TEST(SphMap,UnitRadius,( this->unitradius != -1 ))
 *     returned when a Cartesian position corresponding to either the north
 *     or south pole is transformed into spherical coordinates. The
 *     default value is zero.
+*
+*     Note, the value of this attribute may changed only if the SphMap
+*     has no more than one reference. That is, an error is reported if the
+*     SphMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     SphMap
 *        All SphMaps have this attribute.
 *att--
 */
-astMAKE_CLEAR(SphMap,PolarLong,polarlong,AST__BAD)
+astMAKE_CLEAR1(SphMap,PolarLong,polarlong,AST__BAD)
 astMAKE_GET(SphMap,PolarLong,double,0.0,(this->polarlong == AST__BAD ? 0.0 : this->polarlong))
-astMAKE_SET(SphMap,PolarLong,double,polarlong,value)
+astMAKE_SET1(SphMap,PolarLong,double,polarlong,value)
 astMAKE_TEST(SphMap,PolarLong,( this->polarlong != AST__BAD ))
 
 /* Copy constructor. */

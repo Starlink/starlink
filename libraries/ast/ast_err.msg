@@ -205,4 +205,7 @@ EXSPIX          <Supplied array has too many pixels>
 ! New codes introduced for V8.0.4
 NOCNV           <No mapping found between coordinate systems>
 
+! New codes introduced for V8.2.0
+IMMUT           <Attempt to change an immutable attribute>
+
 .END

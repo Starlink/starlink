@@ -210,6 +210,14 @@ static void SetPcdCen( AstPcdMap *, int, double, int * );
 
 /* Function Macros */
 /* =============== */
+/* Macros which return the maximum and minimum of two values. */
+#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
+#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
+
+/* Macro to check for equality of floating point values. We cannot
+compare bad values directory because of the danger of floating point
+exceptions, so bad values are dealt with explicitly. */
+#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
 /*
 *
@@ -279,6 +287,14 @@ static void Clear##attr( AstPcdMap *this, int axis, int *status ) { \
                 #attr " - it should be in the range 1 to %d.", status, \
                 "astClear" #attr, astGetClass( this ), \
                 axis + 1, nval ); \
+\
+/* Report an error if the object has been cloned (i.e. has a reference \
+   count that is greater than one). */ \
+   } else if( astGetRefCount( this ) > 1 ) { \
+      astError( AST__IMMUT, "astClear(%s): The " #attr "attribute of " \
+                "the supplied %s cannot be cleared because the %s has " \
+                "been cloned (programming error).", status, \
+                astGetClass(this), astGetClass(this), astGetClass(this) ); \
 \
 /* Assign the "clear" value. */ \
    } else { \
@@ -465,6 +481,14 @@ static void Set##attr( AstPcdMap *this, int axis, type value, int *status ) { \
                 #attr " - it should be in the range 1 to %d.", status, \
                 "astSet" #attr, astGetClass( this ), \
                 axis + 1, nval ); \
+\
+/* Report an error if the object has been cloned (i.e. has a reference \
+   count that is greater than one). */ \
+   } else if( astGetRefCount( this ) > 1 ) { \
+      astError( AST__IMMUT, "astSet(%s): The " #attr "attribute of " \
+                "the supplied %s cannot be changed because the %s has " \
+                "been cloned (programming error).", status, \
+                astGetClass(this), astGetClass(this), astGetClass(this) ); \
 \
 /* Store the new value in the structure component. */ \
    } else { \
@@ -673,13 +697,13 @@ static int CanMerge( AstMapping *map1, AstMapping *map2, int inv1, int inv2, int
          pcd2 = (AstPcdMap *) nopcd;
 
 /* Check the distortion coefficients are equal. */
-         if( astEQUAL( astGetDisco( pcd ), astGetDisco( pcd2 ) ) ){
+         if( EQUAL( astGetDisco( pcd ), astGetDisco( pcd2 ) ) ){
 
 /* Check the axis 0 centres are equal. */
-            if( astEQUAL( astGetPcdCen( pcd, 0 ), astGetPcdCen( pcd2, 0 ) ) ){
+            if( EQUAL( astGetPcdCen( pcd, 0 ), astGetPcdCen( pcd2, 0 ) ) ){
 
 /* Check the axis 1 centres are equal. */
-               if( astEQUAL( astGetPcdCen( pcd, 1 ), astGetPcdCen( pcd2, 1 ) ) ){
+               if( EQUAL( astGetPcdCen( pcd, 1 ), astGetPcdCen( pcd2, 1 ) ) ){
 
 /* Check the Invert flags are different. */
                   if( astGetInvert( pcd ) != astGetInvert( pcd2 ) ){
@@ -1383,7 +1407,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* ======================================================================*/
 /* If the distortion coefficient in the PcdMap is zero, the PcdMap can be
    replaced by a UnitMap. */
-   if( astEQUAL( astGetDisco( (AstPcdMap *) ( *map_list )[ where ] ), 0.0 ) ){
+   if( EQUAL( astGetDisco( (AstPcdMap *) ( *map_list )[ where ] ), 0.0 ) ){
 
 /* Annul the PcdMap pointer in the list and replace it with a UnitMap
    pointer, and indicate that the forward transformation of the returned
@@ -2527,6 +2551,14 @@ f     (e.g. using AST_INVERT), then the forward transformation will
 *     remove the distortion and the inverse transformation will apply
 *     it. The distortion itself will still be given by the same value of
 *     Disco.
+*
+*     Note, the value of this attribute may changed only if the PcdMap
+*     has no more than one reference. That is, an error is reported if the
+*     PcdMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     PcdMap
@@ -2536,10 +2568,10 @@ f     (e.g. using AST_INVERT), then the forward transformation will
 */
 /* This ia a double value with a value of AST__BAD when undefined but
    yielding a default of 0.0. */
-astMAKE_CLEAR(PcdMap,Disco,disco,AST__BAD)
+astMAKE_CLEAR1(PcdMap,Disco,disco,AST__BAD)
 astMAKE_GET(PcdMap,Disco,double,0.0,( ( this->disco == AST__BAD ) ?
                                       0.0 : this->disco ))
-astMAKE_SET(PcdMap,Disco,double,disco,value)
+astMAKE_SET1(PcdMap,Disco,double,disco,value)
 astMAKE_TEST(PcdMap,Disco,( this->disco != AST__BAD ))
 
 
@@ -2566,6 +2598,14 @@ astMAKE_TEST(PcdMap,Disco,( this->disco != AST__BAD ))
 *     respectively. This attribute is set when a PcdMap is created, but may
 *     later be modified. If the attribute is cleared, the default value for
 *     both axes is zero.
+*
+*     Note, the value of this attribute may changed only if the PcdMap
+*     has no more than one reference. That is, an error is reported if the
+*     PcdMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     PcdMap

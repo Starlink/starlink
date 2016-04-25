@@ -1771,6 +1771,14 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *     for any point which falls outside the bounds of the table. Linear
 *     interpolation results in an extrapolated value being returned based
 *     on the two end entries in the table.
+*
+*     Note, the value of this attribute may changed only if the LutMap
+*     has no more than one reference. That is, an error is reported if the
+*     LutMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     LutMap
@@ -1778,10 +1786,10 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 *att--
 */
-astMAKE_CLEAR(LutMap,LutInterp,lutinterp,-INT_MAX)
+astMAKE_CLEAR1(LutMap,LutInterp,lutinterp,-INT_MAX)
 astMAKE_GET(LutMap,LutInterp,int,LINEAR,( ( this->lutinterp == -INT_MAX ) ?
                                           LINEAR : this->lutinterp ))
-astMAKE_SET(LutMap,LutInterp,int,lutinterp,(( value == LINEAR ) ? LINEAR : NEAR ))
+astMAKE_SET1(LutMap,LutInterp,int,lutinterp,(( value == LINEAR ) ? LINEAR : NEAR ))
 astMAKE_TEST(LutMap,LutInterp,( this->lutinterp != -INT_MAX ))
 
 /*
@@ -1809,6 +1817,14 @@ astMAKE_TEST(LutMap,LutInterp,( this->lutinterp != -INT_MAX ))
 *     (typically around 1e-16 or 2E-16). If the values in the look-up
 *     table were derived from single precision data, it may be appropriate
 *     to set this attribute to a value around 1E-7.
+*
+*     Note, the value of this attribute may changed only if the LutMap
+*     has no more than one reference. That is, an error is reported if the
+*     LutMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     LutMap
@@ -1816,10 +1832,10 @@ astMAKE_TEST(LutMap,LutInterp,( this->lutinterp != -INT_MAX ))
 
 *att--
 */
-astMAKE_CLEAR(LutMap,LutEpsilon,lutepsilon,AST__BAD)
+astMAKE_CLEAR1(LutMap,LutEpsilon,lutepsilon,AST__BAD)
 astMAKE_GET(LutMap,LutEpsilon,double,DBL_EPSILON,( ( this->lutepsilon == AST__BAD ) ?
                                           DBL_EPSILON : this->lutepsilon ))
-astMAKE_SET(LutMap,LutEpsilon,double,lutepsilon,(value))
+astMAKE_SET1(LutMap,LutEpsilon,double,lutepsilon,(value))
 astMAKE_TEST(LutMap,LutEpsilon,( this->lutepsilon != AST__BAD ))
 
 /* Copy constructor. */

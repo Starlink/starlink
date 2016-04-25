@@ -41,12 +41,12 @@ f     The ZoomMap class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -1471,14 +1471,29 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *  Description:
 *     This attribute holds the ZoomMap scale factor, by which
 *     coordinate values are multiplied (by the forward transformation)
-*     or divided (by the inverse transformation). This factor is set
-*     when a ZoomMap is created, but may later be modified. The
-*     default value is unity.
+*     or divided (by the inverse transformation). The default value
+*     is unity.
 *
 c     Note that if a ZoomMap is inverted (e.g. by using astInvert),
 f     Note that if a ZoomMap is inverted (e.g. by using AST_INVERT),
 *     then the reciprocal of this zoom factor will, in effect, be
 *     used.
+*
+*     In general, Mapping attributes cannot be changed after the Mapping
+*     has been created (the exception to this is the Invert attribute,
+*     which can be changed at any time). However, several of the oldest
+*     Mapping classes - including the ZoomMap class - were introduced
+*     into the AST library before this restriction was enforced. To
+*     reduce the chances of breaking existing software, the attributes of
+*     such Mappings may still be changed, but only for Mapping instances
+*     that have exactly one active reference. In other words, an error will
+*     be reported if an attempt is made to set or clear an attribute of a
+*     Mapping (other than the Invert attribute) if that Mapping has been
+*     cloned. Mappings are cloned when they are incorporated into another
+*     object such as a CmpMap or FrameSet, or when the
+c     astClone
+f     AST_CLONE
+*     function is used.
 
 *  Applicability:
 *     ZoomMap
@@ -1491,13 +1506,13 @@ f     Note that if a ZoomMap is inverted (e.g. by using AST_INVERT),
 /* This ia a double value with a value of 0.0 when undefined but
    yielding a default of 1.0. Setting it explicitly to 0.0 is not
    permitted except via astClearZoom. */
-astMAKE_CLEAR(ZoomMap,Zoom,zoom,0.0)
+astMAKE_CLEAR1(ZoomMap,Zoom,zoom,0.0)
 astMAKE_GET(ZoomMap,Zoom,double,1.0,( ( this->zoom == 0.0 ) ?
                                       1.0 : this->zoom ))
 
 /* Check for an attempt to set a value of zero and report an error if
    necessary (leaving the Zoom value unchanged). */
-astMAKE_SET(ZoomMap,Zoom,double,zoom,(
+astMAKE_SET1(ZoomMap,Zoom,double,zoom,(
             ( value != 0.0 ) ?
             value :
             ( astError( AST__ZOOMI,

@@ -42,12 +42,12 @@ f     The PermMap class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -85,7 +85,7 @@ f     The PermMap class does not define any new routines beyond those
 *     22-NOV-2012 (DSB):
 *        When using a default inperm array (as indicated by a NULL pointer
 *        for inperm), ensure the array is padded with "-1" values if the
-*        number of inputs exceeds the number of outputs. Also do the 
+*        number of inputs exceeds the number of outputs. Also do the
 *        equivalent for default outperm arrays.
 *class--
 */
@@ -2025,16 +2025,21 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
 *     constant value for the input), or if more than one of the selected
 *     inputs are fed (by the inverse transformation) by the same output,
 *     then the PermMap cannot be split.
+*
+*     Note, the value of this attribute may changed only if the PermMap
+*     has no more than one reference. That is, an error is reported if the
+*     PermMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the astClone function.
 
 *  Applicability:
 *     PermMap
 *        All PermMaps have this attribute.
 *att-
 */
-astMAKE_CLEAR(PermMap,PermSplit,permsplit,-INT_MAX)
+astMAKE_CLEAR1(PermMap,PermSplit,permsplit,-INT_MAX)
 astMAKE_GET(PermMap,PermSplit,int,0,( this->permsplit != -INT_MAX ?
                                       this->permsplit : 0 ))
-astMAKE_SET(PermMap,PermSplit,int,permsplit,( value != 0 ))
+astMAKE_SET1(PermMap,PermSplit,int,permsplit,( value != 0 ))
 astMAKE_TEST(PermMap,PermSplit,( this->permsplit != -INT_MAX ))
 
 

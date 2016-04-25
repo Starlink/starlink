@@ -4445,6 +4445,29 @@ termed \emph{input} and \emph{output} coordinates. You can also go
 back the other way and transform output coordinates back into input
 coordinates, as we saw in \secref{ss:transforming}.
 
+\subsection{Changing Attributes of a Mapping}
+
+Many classes of Mapping have attributes that provide values for parameter
+used within the transformation. For instance, the ZoomMap class has an
+attribute called ``Zoom'' that gives the scalar value by which each
+coordinate is to be multiplied. These attribute values should be set when
+the Mapping is created and should not be changed afterwards. Indeed, the
+AST library will report an error if an attempt is made to change the
+value of a Mapping attribute. This is because, once created, Mappings are
+often later included within other objects such as FrameSets and CmpMaps.
+This means that in general there could be many active references to a single
+Mapping object within a program. Changing an attribute of the Mapping
+via one particular reference (i.e pointer) would cause all the other
+references to change too, with often undesirable or unpredictable
+consequences. To avoid this, Mappings are considered \emph{immutable} in
+most situations. The one exception is if the Mapping has not yet been
+cloned or included in another Object (\emph{i.e.} it has a reference
+couint of one) - changing the attributes of such a Mapping is allowed,
+and will not generate an error.
+
+Note, the Invert attribute of a Mapping is not subject to this rule and
+can be changed at any time.
+
 \subsection{Input and Output Coordinate Numbers}
 
 In general, the number of coordinates you feed into a Mapping to
@@ -21586,11 +21609,9 @@ the LutMap can be simplified to a straight line.
 \end{enumerate}
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V8.0.5}
-The following describes the most significant changes which have
-occurred in the AST library between versions V8.0.4 and V8.0.5 (the
-current version):
+\subsection{Changes Introduced in V8.0.5}
+The following describes the most significant changes which
+occurred in the AST library between versions V8.0.4 and V8.0.5:
 
 \begin{enumerate}
 
@@ -21613,6 +21634,39 @@ c-
 f+
 routine ``AST\_WARNINGS''.
 f-
+
+\subsection{Changes Introduced in V8.1.0}
+The following describes the most significant changes which
+occurred in the AST library between versions V8.0.5 and V8.1.0:
+
+\begin{enumerate}
+
+\item The configure script has a new option ``--without-fortran'' that allows
+AST to be built in situations where no Fortran compiler is available. The
+resulting library has no Fortran interface and so cannot be used within
+Fortran applications. Also, the link scripts do not attempt to include the
+fortran runtime libraries.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V8.2}
+The following describes the most significant changes which have
+occurred in the AST library between versions V8.1.0 and V8.2.0 (the
+current version):
+
+\begin{enumerate}
+
+\item The restriction that Mappings are immutable has been extended to all
+Mapping classes. This means that attributes representing parameters of
+a Mapping's forward or inverse transformation cannot be changed after
+the Mapping has been created. In order to minimise the risk to existing
+software, this rule does not apply to Mappings that have not yet been
+included in other objects such as CmpMaps or FrameSets, or which have not
+yet been cloned. In other words, an error is reported if an attempt is
+made to change the nature of a Mapping's transformation, but only if the
+reference count of the Mapping is greater than one. The Mapping classes
+affected include: GrismMap, LutMap, PcdMap, SphMap, WcsMap and ZoomMap.
 
 \end{enumerate}
 

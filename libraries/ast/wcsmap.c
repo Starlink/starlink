@@ -227,6 +227,15 @@ f     The WcsMap class does not define any new routines beyond those
    "protected" symbols available. */
 #define astCLASS WcsMap
 
+/* Macros which return the maximum and minimum of two values. */
+#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
+#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
+
+/* Macros to check for equality of floating point values. We cannot
+   compare bad values directory because of the danger of floating point
+   exceptions, so bad values are dealt with explicitly. */
+#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
+
 /*
 *
 *  Name:
@@ -880,7 +889,7 @@ static int CanMerge( AstMapping *map1, int inv1, AstMapping *map2, int inv2, int
    are not equal, the WcsMaps cannot merge. */
                   } else {
                      for( m = 0; m < GetNP( wcs1, i, status ); m++ ){
-                        if( !astEQUAL( astGetPV( wcs1, i, m ),
+                        if( !EQUAL( astGetPV( wcs1, i, m ),
                                     astGetPV( wcs2, i, m ) ) ){
                            ret = 0;
                            break;
@@ -1221,8 +1230,16 @@ static void ClearPV( AstWcsMap *this, int i, int m, int *status ) {
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Report an error if the object has been cloned (i.e. has a reference
+   count that is greater than one). */
+   if( astGetRefCount( this ) > 1 ) {
+      astError( AST__IMMUT, "astClear(%s): Projection parameter values "
+                "within the supplied %s cannot be cleared because the %s has "
+                "been cloned (programming error).", status,
+                astGetClass(this), astGetClass(this), astGetClass(this) );
+
 /* Validate the axis index. */
-   if( i < 0 || i >= astGetNin( this ) ){
+   } else if( i < 0 || i >= astGetNin( this ) ){
       astError( AST__AXIIN, "astClearPV(%s): Axis index (%d) is invalid in "
                 "attribute PV%d_%d  - it should be in the range 1 to %d.",
                 status, astGetClass( this ), i + 1, i + 1, m,
@@ -3796,8 +3813,16 @@ static void SetPV( AstWcsMap *this, int i, int m, double val, int *status ) {
 /* Find the number of axes in the WcsMap. */
    naxis = astGetNin( this );
 
+/* Report an error if the object has been cloned (i.e. has a reference
+   count that is greater than one). */
+   if( astGetRefCount( this ) > 1 ) {
+      astError( AST__IMMUT, "astSet(%s): Projection parameter values "
+                "within the supplied %s cannot be changed because the %s has "
+                "been cloned (programming error).", status,
+                astGetClass(this), astGetClass(this), astGetClass(this) );
+
 /* Validate the axis index. */
-   if( i < 0 || i >= naxis ){
+   } else if( i < 0 || i >= naxis ){
       astError( AST__AXIIN, "astSetPV(%s): Axis index (%d) is invalid in "
                 "attribute PV%d_%d  - it should be in the range 1 to %d.",
                 status, astGetClass( this ), i + 1, i + 1, m, naxis );
@@ -4648,10 +4673,10 @@ static void WcsPerm( AstMapping **maps, int *inverts, int iwm, int *status ){
 *     that is to be  converted into a set of FITS headers using the
 c     astWrite funtion,
 f     AST_WRITE routine,
-*     the WcsMap will be used to define the projection code appeneded to
+*     the WcsMap will be used to define the projection code appended to
 *     the FITS "CTYPEi" keywords if, and only if, the FITSProj attribute
 *     is set non-zero in the WcsMap. In order for the conversion to be
-*     successful, the compoound Mapping connecting the base and current
+*     successful, the compound Mapping connecting the base and current
 *     Frames in the FrameSet must contained one (and only one) WcsMap
 *     that has a non-zero value for its FITSProj attribute.
 *
@@ -4731,6 +4756,14 @@ astMAKE_TEST(WcsMap,TPNTan,( this->tpn_tan != -INT_MAX ))
 *     to PV<axlat>_9, where <axlat> is replaced by the index of the
 *     latitude axis (given by attribute WcsAxis(2)). See PV for further
 *     details.
+*
+*     Note, the value of this attribute may changed only if the WcsMap
+*     has no more than one reference. That is, an error is reported if the
+*     WcsMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     WcsMap
@@ -4810,6 +4843,13 @@ f     done using the OPTIONS argument of AST_WCSMAP (q.v.) when a WcsMap
 *        All WcsMaps have this attribute.
 
 *  Notes:
+*     - The value of this attribute may changed only if the WcsMap
+*     has no more than one reference. That is, an error is reported if the
+*     WcsMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 *     - If the projection parameter values given for a WcsMap do not
 *     satisfy all the required constraints (as defined in the FITS-WCS
 *     paper), then an error will result when the WcsMap is used to
