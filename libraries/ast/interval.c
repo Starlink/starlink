@@ -48,12 +48,12 @@ f     The Interval class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -73,8 +73,8 @@ f     The Interval class does not define any new routines beyond those
 *     26-JAN-2009 (DSB):
 *        Over-ride astMapMerge.
 *     4-NOV42-2013 (DSB):
-*        - Change RegCentre so that it does not report an error for an unbounded 
-*        Interval if the centre is merely being inquired rather than set. This is 
+*        - Change RegCentre so that it does not report an error for an unbounded
+*        Interval if the centre is merely being inquired rather than set. This is
 *        the documented behaviour of the astRegCentre method.
 *        - Modify RegPins so that it can handle uncertainty regions that straddle
 *        a discontinuity. Previously, such uncertainty Regions could have a huge
@@ -88,15 +88,6 @@ f     The Interval class does not define any new routines beyond those
    the header files that define class interfaces that they should make
    "protected" symbols available. */
 #define astCLASS Interval
-
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==(bb))?1:(((aa)==AST__BAD||(bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E9*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
 /* Include files. */
 /* ============== */
@@ -2036,7 +2027,7 @@ static int Overlap( AstRegion *this, AstRegion *that, int *status ){
 
 /* Are the lower limits from the two Intervals effectively equal? Take care
    about DBL_MAX values causing overflow. */
-                  lb_equal = EQUAL( lb_this, lb_that );
+                  lb_equal = astEQUALS( lb_this, lb_that, 1.0E9 );
 
                   if( !lb_equal && fabs(lb_this) != DBL_MAX &&
                                    fabs(lb_that) != DBL_MAX ) {
@@ -2044,7 +2035,7 @@ static int Overlap( AstRegion *this, AstRegion *that, int *status ){
                   }
 
 /* Are the upper limits from the two Intervals effectively equal? */
-                  ub_equal = EQUAL( ub_this, ub_that );
+                  ub_equal = astEQUALS( ub_this, ub_that, 1.0E9 );
                   if( !ub_equal && fabs(ub_this) != DBL_MAX &&
                                    fabs(ub_that) != DBL_MAX ) {
                      ub_equal = ( fabs( ub_this - ub_that) <= err );
@@ -3336,8 +3327,8 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
                if( lbnd[ ic ] == 0.0 && ubnd[ ic ] == 0.0 ) {
                   ubnd[ ic ] = 1.0;
 
-               } else if( EQUAL( lbnd[ ic ], ubnd[ ic ] ) ) {
-                  ubnd[ ic ] = MAX( ubnd[ ic ], lbnd[ ic ] )*( 1.0E6*DBL_EPSILON );
+               } else if( astEQUALS( lbnd[ ic ], ubnd[ ic ], 1.0E9 ) ) {
+                  ubnd[ ic ] = astMAX( ubnd[ ic ], lbnd[ ic ] )*( 1.0E6*DBL_EPSILON );
                }
             }
 

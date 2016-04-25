@@ -210,14 +210,6 @@ static void SetPcdCen( AstPcdMap *, int, double, int * );
 
 /* Function Macros */
 /* =============== */
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-compare bad values directory because of the danger of floating point
-exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
 /*
 *
@@ -681,13 +673,13 @@ static int CanMerge( AstMapping *map1, AstMapping *map2, int inv1, int inv2, int
          pcd2 = (AstPcdMap *) nopcd;
 
 /* Check the distortion coefficients are equal. */
-         if( EQUAL( astGetDisco( pcd ), astGetDisco( pcd2 ) ) ){
+         if( astEQUAL( astGetDisco( pcd ), astGetDisco( pcd2 ) ) ){
 
 /* Check the axis 0 centres are equal. */
-            if( EQUAL( astGetPcdCen( pcd, 0 ), astGetPcdCen( pcd2, 0 ) ) ){
+            if( astEQUAL( astGetPcdCen( pcd, 0 ), astGetPcdCen( pcd2, 0 ) ) ){
 
 /* Check the axis 1 centres are equal. */
-               if( EQUAL( astGetPcdCen( pcd, 1 ), astGetPcdCen( pcd2, 1 ) ) ){
+               if( astEQUAL( astGetPcdCen( pcd, 1 ), astGetPcdCen( pcd2, 1 ) ) ){
 
 /* Check the Invert flags are different. */
                   if( astGetInvert( pcd ) != astGetInvert( pcd2 ) ){
@@ -1391,7 +1383,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* ======================================================================*/
 /* If the distortion coefficient in the PcdMap is zero, the PcdMap can be
    replaced by a UnitMap. */
-   if( EQUAL( astGetDisco( (AstPcdMap *) ( *map_list )[ where ] ), 0.0 ) ){
+   if( astEQUAL( astGetDisco( (AstPcdMap *) ( *map_list )[ where ] ), 0.0 ) ){
 
 /* Annul the PcdMap pointer in the list and replace it with a UnitMap
    pointer, and indicate that the forward transformation of the returned

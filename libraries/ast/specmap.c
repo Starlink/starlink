@@ -70,12 +70,12 @@ f     - AST_SPECADD: Add a spectral coordinate conversion to an SpecMap
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -163,15 +163,6 @@ f     - AST_SPECADD: Add a spectral coordinate conversion to an SpecMap
 #define PIBY2 (PI/2.0)
 #define D2R (PI/180.0)
 #define R2D (180.0/PI)
-
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
 /* Include files. */
 /* ============== */
@@ -2457,7 +2448,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Now check for conversions which have a single user-supplied argument. */
                } else if( PAIR_CVT2( AST__FRTOVL, AST__VLTOFR ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ],
+                          astEQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2467,9 +2458,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                             PAIR_CVT2( AST__LDF2HL, AST__HLF2LD ) ||
                             PAIR_CVT2( AST__LGF2HL, AST__HLF2LG ) ||
                             PAIR_CVT2( AST__GLF2HL, AST__HLF2GL ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ],
+                          astEQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 1 ],
+                          astEQUAL( cvtargs[ istep ][ 1 ],
                                  cvtargs[ istep + 1 ][ 1 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2478,11 +2469,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                } else if( ( PAIR_CVT2( AST__GEF2HL, AST__HLF2GE ) ||
                             PAIR_CVT2( AST__BYF2HL, AST__HLF2BY ) ||
                             PAIR_CVT2( AST__USF2HL, AST__HLF2US ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ],
+                          astEQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 1 ],
+                          astEQUAL( cvtargs[ istep ][ 1 ],
                                  cvtargs[ istep + 1 ][ 1 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 2 ],
+                          astEQUAL( cvtargs[ istep ][ 2 ],
                                  cvtargs[ istep + 1 ][ 2 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2490,17 +2481,17 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Now check for conversions which have six user-supplied arguments (currently
    no conversions have four or five user-supplied arguments). */
                } else if( ( PAIR_CVT2( AST__TPF2HL, AST__HLF2TP ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ],
+                          astEQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 1 ],
+                          astEQUAL( cvtargs[ istep ][ 1 ],
                                  cvtargs[ istep + 1 ][ 1 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 2 ],
+                          astEQUAL( cvtargs[ istep ][ 2 ],
                                  cvtargs[ istep + 1 ][ 2 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 3 ],
+                          astEQUAL( cvtargs[ istep ][ 3 ],
                                  cvtargs[ istep + 1 ][ 3 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 4 ],
+                          astEQUAL( cvtargs[ istep ][ 4 ],
                                  cvtargs[ istep + 1 ][ 4 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 5 ],
+                          astEQUAL( cvtargs[ istep ][ 5 ],
                                  cvtargs[ istep + 1 ][ 5 ] ) ) {
                   istep++;
                   keep = 0;

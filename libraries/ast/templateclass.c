@@ -50,12 +50,12 @@ f     - AST_SETREFPOS: Set reference position in any celestial system
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -75,15 +75,6 @@ f     - AST_SETREFPOS: Set reference position in any celestial system
    the header files that define class interfaces that they should make
    "protected" symbols available. */
 #define astCLASS TemplateClass
-
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
 /* Header files. */
 /* ============= */

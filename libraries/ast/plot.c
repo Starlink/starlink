@@ -728,13 +728,6 @@ f     - Title: The Plot title drawn using AST_GRID
    symbols available. */
 #define astCLASS Plot
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macros to check for equality of floating point values. */
-#define EQUAL(aa,bb) (fabs((aa)-(bb))<=1.0E8*DBL_EPSILON*MAX(fabs(aa)+fabs(bb),DBL_EPSILON*1.0E-7))
-
 /* Values for constants used in this class. */
 #define CRV_NSEG       14 /* No. of curve segments drawn by function Crv */
 #define CRV_NPNT       15 /* CRV_NSEG plus one */
@@ -2378,7 +2371,7 @@ f     from 1.0E-7 to 1.0. By default, a value of 0.01 is used.
 default value of 0.01. Usable values are in the range 1.0E-7 to 1.0. */
 astMAKE_CLEAR(Plot,Tol,tol,-1.0)
 astMAKE_GET(Plot,Tol,double,0.01,(this->tol == -1.0 ? 0.01 : this->tol))
-astMAKE_SET(Plot,Tol,double,tol,MIN(MAX(value,1.0E-7),1.0))
+astMAKE_SET(Plot,Tol,double,tol,astMIN(astMAX(value,1.0E-7),1.0))
 astMAKE_TEST(Plot,Tol,( this->tol != -1.0 ))
 
 /* Grid. */
@@ -4491,10 +4484,10 @@ static void Apoly( AstPlot *this, float x, float y, int *status ){
    }
 
 /* Update the box containing all plotted lines. */
-   Box_lbnd[ 0 ] = MIN( x, Box_lbnd[ 0 ] );
-   Box_ubnd[ 0 ] = MAX( x, Box_ubnd[ 0 ] );
-   Box_lbnd[ 1 ] = MIN( y, Box_lbnd[ 1 ] );
-   Box_ubnd[ 1 ] = MAX( y, Box_ubnd[ 1 ] );
+   Box_lbnd[ 0 ] = astMIN( x, Box_lbnd[ 0 ] );
+   Box_ubnd[ 0 ] = astMAX( x, Box_ubnd[ 0 ] );
+   Box_lbnd[ 1 ] = astMIN( y, Box_lbnd[ 1 ] );
+   Box_ubnd[ 1 ] = astMAX( y, Box_ubnd[ 1 ] );
 
 }
 
@@ -4654,7 +4647,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
                   !IsASkyAxis( Map1_frame, 1, status );
 
 /* Convert the tolerance from relative to absolute graphics coordinates. */
-      tol = astGetTol( this )*MAX( this->xhi - this->xlo,
+      tol = astGetTol( this )*astMAX( this->xhi - this->xlo,
                                    this->yhi - this->ylo );
 
 /* Now set up the external variables used by the Crv and CrvLine function. */
@@ -5426,8 +5419,8 @@ static void Bpoly( AstPlot *this, float x, float y, int *status ){
    polyline. If so we assume the current polyline is to be re-started,
    rather than starting a new polyline. */
    if( Poly_n > 0 ) {
-      ignore = ( EQUAL( Poly_x[ Poly_n - 1 ], x ) &&
-                 EQUAL( Poly_y[ Poly_n - 1 ], y ) );
+      ignore = ( astEQUALS( Poly_x[ Poly_n - 1 ], x, 1.0E8 ) &&
+                 astEQUALS( Poly_y[ Poly_n - 1 ], y, 1.0E8 ) );
    } else {
       ignore = 0;
    }
@@ -8388,8 +8381,8 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
 
 /* If the line is within the plottable x range, indicate that all
    offsets are plottable (as far as the x range is concerned at least). */
-         if( ( xa > Crv_xlo || EQUAL( xa, Crv_xlo ) ) &&
-             ( xa < Crv_xhi || EQUAL( xa, Crv_xhi ) ) ){
+         if( ( xa > Crv_xlo || astEQUALS( xa, Crv_xlo, 1.0E8 ) ) &&
+             ( xa < Crv_xhi || astEQUALS( xa, Crv_xhi, 1.0E8 ) ) ){
             a1 = DBL_MAX;
             a2 = -DBL_MAX;
 
@@ -8420,8 +8413,8 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
 
 /* If the line is within the plottable y range, indicate that all
    offsets are plottable (as far as the y range is concerned at least). */
-         if( ( ya > Crv_ylo || EQUAL( ya, Crv_ylo ) ) &&
-             ( ya < Crv_yhi || EQUAL( ya, Crv_yhi ) ) ){
+         if( ( ya > Crv_ylo || astEQUALS( ya, Crv_ylo, 1.0E8 ) ) &&
+             ( ya < Crv_yhi || astEQUALS( ya, Crv_yhi, 1.0E8 ) ) ){
             a3 = DBL_MAX;
             a4 = -DBL_MAX;
 
@@ -8435,8 +8428,8 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
 
 /* Find the fractional distances from point A to point B at the ends
    of the plotable line. */
-      aamin = MIN( 1.0, MAX( 0.0, MAX( a2, a4 ) ) );
-      aamax = MAX( 0.0, MIN( 1.0, MIN( a1, a3 ) ) );
+      aamin = astMIN( 1.0, astMAX( 0.0, astMAX( a2, a4 ) ) );
+      aamax = astMAX( 0.0, astMIN( 1.0, astMIN( a1, a3 ) ) );
 
 /* Store the end coordinates of the line joining the plotable points. */
       if( aamax > aamin ){
@@ -8452,7 +8445,7 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
          dl = sqrt( dx*dx + dy*dy );
          dx /= dl;
          dy /= dl;
-         dl *= MAX( 0.0, aamax - aamin );
+         dl *= astMAX( 0.0, aamax - aamin );
 
 /* Clear the "plot" flag if the line does not intersect the plotting area. */
       } else {
@@ -8802,8 +8795,8 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
       Map3_scale = astDistance( Map3_frame, start, finish );
 
 /* Convert the tolerance from relative to absolute graphics coordinates. */
-      tol = astGetTol( this )*MAX( this->xhi - this->xlo,
-                                   this->yhi - this->ylo );
+      tol = astGetTol( this )*astMAX( this->xhi - this->xlo,
+                                      this->yhi - this->ylo );
 
 /* Now set up the external variables used by the Crv and CrvLine function. */
       Crv_scerr = ( astGetLogPlot( this, 0 ) ||
@@ -9574,8 +9567,8 @@ static int DrawRegion( AstPlot *this, AstFrame *frm, const char *method,
 /* Convert the tolerance from relative to absolute graphics coordinates.
    Make the tolerance smaller by a factor of 10 because Regions
    (specifically Polygonsd) can have very crinkly edges. */
-      tol = 0.1* astGetTol( this )*MAX( this->xhi - this->xlo,
-                                        this->yhi - this->ylo );
+      tol = 0.1* astGetTol( this )*astMAX( this->xhi - this->xlo,
+                                           this->yhi - this->ylo );
 
 /* Ensure the globals holding the scaling from graphics coords to equally
    scaled coords are available. */
@@ -10041,10 +10034,10 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
 /* If OK, update the box containing all drawn graphics primitives. */
    if( ink && astOK && !Boxp_freeze ) {
       for( i = 0; i < 4; i++ ){
-         Boxp_lbnd[ 0 ] = MIN( xbn[ i ], Boxp_lbnd[ 0 ] );
-         Boxp_ubnd[ 0 ] = MAX( xbn[ i ], Boxp_ubnd[ 0 ] );
-         Boxp_lbnd[ 1 ] = MIN( ybn[ i ], Boxp_lbnd[ 1 ] );
-         Boxp_ubnd[ 1 ] = MAX( ybn[ i ], Boxp_ubnd[ 1 ] );
+         Boxp_lbnd[ 0 ] = astMIN( xbn[ i ], Boxp_lbnd[ 0 ] );
+         Boxp_ubnd[ 0 ] = astMAX( xbn[ i ], Boxp_ubnd[ 0 ] );
+         Boxp_lbnd[ 1 ] = astMIN( ybn[ i ], Boxp_lbnd[ 1 ] );
+         Boxp_ubnd[ 1 ] = astMAX( ybn[ i ], Boxp_ubnd[ 1 ] );
       }
    }
 }
@@ -10204,7 +10197,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
    logticks = 0;
 
 /* Get the minimum dimension of the plotting ares. */
-   mindim = MIN( this->xhi - this->xlo, this->yhi - this->ylo );
+   mindim = astMIN( this->xhi - this->xlo, this->yhi - this->ylo );
 
 /* Information about the drawn tick marks is saved in the Plot structure.
    Reset this information now so that we are ready to store information
@@ -10924,7 +10917,7 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
    edgelabs = 0;
 
 /* Get the minimum dimension of the plotting ares. */
-   mindim = MIN( this->xhi - this->xlo, this->yhi - this->ylo );
+   mindim = astMIN( this->xhi - this->xlo, this->yhi - this->ylo );
 
 /* Set up the tolerance for curve breaks occuring on an edge of
    the plotting zone. */
@@ -12503,7 +12496,7 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
       r = ticks + 1;
       w = ticks;
       for( k = 1; k < nticks && astOK; k++ ){
-         if( *r != AST__BAD && !EQUAL( *r-centre, *w-centre ) ){
+         if( *r != AST__BAD && !astEQUALS( *r-centre, *w-centre, 1.0E8 ) ){
             w++;
             *w = *r;
          }
@@ -13363,7 +13356,7 @@ static void Fpoly( AstPlot *this, const char *method, const char *class,
                      jpoly = ekey[ imid ];
                      xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
                   }
-                  if( EQUAL( xmid, xt ) ) {
+                  if( astEQUALS( xmid, xt, 1.0E8 ) ) {
                      ikey = imid;
                      break;
                   } else if( xmid > xt ) {
@@ -13375,7 +13368,7 @@ static void Fpoly( AstPlot *this, const char *method, const char *class,
                            jpoly = ekey[ ilo ];
                            xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
                         }
-                        if( !EQUAL( xmid, xt ) ) jpoly = -1;
+                        if( !astEQUALS( xmid, xt, 1.0E8 ) ) jpoly = -1;
                         ikey = ilo;
                         break;
                      }
@@ -13389,7 +13382,7 @@ static void Fpoly( AstPlot *this, const char *method, const char *class,
                            jpoly = ekey[ ihi ];
                            xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
                         }
-                        if( !EQUAL( xmid, xt ) ) jpoly = -1;
+                        if( !astEQUALS( xmid, xt, 1.0E8 ) ) jpoly = -1;
                         ikey = ihi;
                         break;
                      }
@@ -13408,7 +13401,7 @@ static void Fpoly( AstPlot *this, const char *method, const char *class,
                   } else {
                      ymid = Poly_yp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
                   }
-                  if( EQUAL( ymid, yt ) && !drawn[ jpoly ] ) break;
+                  if( astEQUALS( ymid, yt, 1.0E8 ) && !drawn[ jpoly ] ) break;
                   jpoly = -1;
 
 /* Otherwise, search down the list, starting at the polyline found above. */
@@ -13423,8 +13416,8 @@ static void Fpoly( AstPlot *this, const char *method, const char *class,
                            xmid = Poly_xp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
                            ymid = Poly_yp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
                         }
-                        if( EQUAL( xmid, xt ) ) {
-                           if( EQUAL( ymid, yt ) && !drawn[ kpoly ] ) {
+                        if( astEQUALS( xmid, xt, 1.0E8 ) ) {
+                           if( astEQUALS( ymid, yt, 1.0E8 ) && !drawn[ kpoly ] ) {
                               jpoly = kpoly;
                               break;
                            }
@@ -13447,8 +13440,8 @@ static void Fpoly( AstPlot *this, const char *method, const char *class,
                            xmid = Poly_xp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
                            ymid = Poly_yp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
                         }
-                        if( EQUAL( xmid, xt ) ) {
-                           if( EQUAL( ymid, yt ) && !drawn[ kpoly ] ) {
+                        if( astEQUALS( xmid, xt, 1.0E8 ) ) {
+                           if( astEQUALS( ymid, yt, 1.0E8 ) && !drawn[ kpoly ] ) {
                               jpoly = kpoly;
                               break;
                            }
@@ -14468,8 +14461,8 @@ f        The global status.
       Map4_umap = map;
 
 /* Convert the tolerance from relative to absolute graphics coordinates. */
-      tol = astGetTol( this )*MAX( this->xhi - this->xlo,
-                                   this->yhi - this->ylo );
+      tol = astGetTol( this )*astMAX( this->xhi - this->xlo,
+                                      this->yhi - this->ylo );
 
 /* Now set up the external variables used by the Crv and CrvLine function. */
       Crv_scerr = ( astGetLogPlot( this, 0 ) ||
@@ -14963,10 +14956,10 @@ static void GLine( AstPlot *this, int n, const float *x,
 /* Otherwise, update the box containing all drawn graphics primitives. */
    } else if( !Boxp_freeze ){
       for( i = 0; i < n; i++ ) {
-         Boxp_lbnd[ 0 ] = MIN( x[ i ], Boxp_lbnd[ 0 ] );
-         Boxp_ubnd[ 0 ] = MAX( x[ i ], Boxp_ubnd[ 0 ] );
-         Boxp_lbnd[ 1 ] = MIN( y[ i ], Boxp_lbnd[ 1 ] );
-         Boxp_ubnd[ 1 ] = MAX( y[ i ], Boxp_ubnd[ 1 ] );
+         Boxp_lbnd[ 0 ] = astMIN( x[ i ], Boxp_lbnd[ 0 ] );
+         Boxp_ubnd[ 0 ] = astMAX( x[ i ], Boxp_ubnd[ 0 ] );
+         Boxp_lbnd[ 1 ] = astMIN( y[ i ], Boxp_lbnd[ 1 ] );
+         Boxp_ubnd[ 1 ] = astMAX( y[ i ], Boxp_ubnd[ 1 ] );
       }
    }
 
@@ -15069,10 +15062,10 @@ static void GMark( AstPlot *this, int n, const float *x,
 /* Otherwise, update the box containing all drawn graphics primitives. */
    } else if( !Boxp_freeze ){
       for( i = 0; i < n; i++ ) {
-         Boxp_lbnd[ 0 ] = MIN( x[ i ], Boxp_lbnd[ 0 ] );
-         Boxp_ubnd[ 0 ] = MAX( x[ i ], Boxp_ubnd[ 0 ] );
-         Boxp_lbnd[ 1 ] = MIN( y[ i ], Boxp_lbnd[ 1 ] );
-         Boxp_ubnd[ 1 ] = MAX( y[ i ], Boxp_ubnd[ 1 ] );
+         Boxp_lbnd[ 0 ] = astMIN( x[ i ], Boxp_lbnd[ 0 ] );
+         Boxp_ubnd[ 0 ] = astMAX( x[ i ], Boxp_ubnd[ 0 ] );
+         Boxp_lbnd[ 1 ] = astMIN( y[ i ], Boxp_lbnd[ 1 ] );
+         Boxp_ubnd[ 1 ] = astMAX( y[ i ], Boxp_ubnd[ 1 ] );
       }
    }
 
@@ -17011,8 +17004,8 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
 /* Find a new grid dimension which results in a cell size similar to
    the one used to create the grid, but covering only the region containing
    good physical coordinates. */
-         *dim *= MAX( (xmax - xmin)/(this->xhi - this->xlo),
-                      (ymax - ymin)/(this->yhi - this->ylo) );
+         *dim *= astMAX( (xmax - xmin)/(this->xhi - this->xlo),
+                         (ymax - ymin)/(this->yhi - this->ylo) );
          if( *dim < 32 ) *dim = 32;
 
 /* Annul the PointSet holding the current grid. */
@@ -18828,11 +18821,11 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
 /* The section starts one gap below the first tick, and ends one gap above
    the first tick. Limit both to the displayed range of the axis. */
                if( logticks[ 1 - j ] ) {
-                  starts[ 0 ] = MIN( top, MAX( bot, ticks[ 0 ]/gap[ 1 - j ] ) );
-                  end = MIN( top, MAX( bot, ticks[ nticks - 1 ]*gap[ 1 - j ] ) );
+                  starts[ 0 ] = astMIN( top, astMAX( bot, ticks[ 0 ]/gap[ 1 - j ] ) );
+                  end = astMIN( top, astMAX( bot, ticks[ nticks - 1 ]*gap[ 1 - j ] ) );
                } else {
-                  starts[ 0 ] = MIN( top, MAX( bot, ticks[ 0 ] - gap[ 1 - j ] ) );
-                  end = MIN( top, MAX( bot, ticks[ nticks - 1 ] + gap[ 1 - j ] ) );
+                  starts[ 0 ] = astMIN( top, astMAX( bot, ticks[ 0 ] - gap[ 1 - j ] ) );
+                  end = astMIN( top, astMAX( bot, ticks[ nticks - 1 ] + gap[ 1 - j ] ) );
                }
 
 /* Store the length of the section. */
@@ -18901,8 +18894,8 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
 
 /* Limit the start and end to the displayed range of the axis. */
                   end = starts[ k ] + lengths[ k ];
-                  starts[ k ] = MIN( top, MAX( bot, starts[ k ] ) );
-                  lengths[ k ] = MIN( top, MAX( bot, end ) ) - starts[ k ];
+                  starts[ k ] = astMIN( top, astMAX( bot, starts[ k ] ) );
+                  lengths[ k ] = astMIN( top, astMAX( bot, end ) ) - starts[ k ];
 
 /* Increment the number of sections. */
                   k++;
@@ -20915,7 +20908,7 @@ static void Labels( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
       GScales( this, &alpha, &beta, method, class, status );
 
 /* Get the minimum dimension of the plotting area in equal scaled coords. */
-      mindim = MIN( fabs( alpha*(this->xhi - this->xlo) ),
+      mindim = astMIN( fabs( alpha*(this->xhi - this->xlo) ),
                     fabs( beta*(this->yhi - this->ylo) ) );
 
 /* Store a value for the sine of 45 degrees. */
@@ -21277,7 +21270,7 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
       !cdata ) return;
 
 /* Convert the tolerance from relative to absolute graphics coordinates. */
-   tol = astGetTol( this )*MAX( this->xhi - this->xlo, this->yhi - this->ylo );
+   tol = astGetTol( this )*astMAX( this->xhi - this->xlo, this->yhi - this->ylo );
 
 /* Ensure the globals holding the scaling from graphics coords to equally
    scaled coords are available. */
@@ -21869,7 +21862,7 @@ static void Map1( int n, double *dist, double *x, double *y,
             for( j = 0; j < Map1_ncoord; j++) statics->work1[j] = statics->ptr1[j][i];
             astNorm( Map1_frame, statics->work1 );
             for( j = 0; j < Map1_ncoord; j++) {
-               if( !EQUAL( statics->work1[j], statics->ptr1[j][i] ) ) {
+               if( !astEQUALS( statics->work1[j], statics->ptr1[j][i], 1.0E8 ) ) {
                   statics->ptr2[0][i] = AST__BAD;
                   statics->ptr2[1][i] = AST__BAD;
                   break;
@@ -23364,10 +23357,10 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
 /* Extend the bounds of the global bounding box held externally to include
    the new box. */
          for( i = 0; i < 4; i++ ){
-            Box_lbnd[ 0 ] = MIN( xbn[ i ], Box_lbnd[ 0 ] );
-            Box_ubnd[ 0 ] = MAX( xbn[ i ], Box_ubnd[ 0 ] );
-            Box_lbnd[ 1 ] = MIN( ybn[ i ], Box_lbnd[ 1 ] );
-            Box_ubnd[ 1 ] = MAX( ybn[ i ], Box_ubnd[ 1 ] );
+            Box_lbnd[ 0 ] = astMIN( xbn[ i ], Box_lbnd[ 0 ] );
+            Box_ubnd[ 0 ] = astMAX( xbn[ i ], Box_ubnd[ 0 ] );
+            Box_lbnd[ 1 ] = astMIN( ybn[ i ], Box_lbnd[ 1 ] );
+            Box_ubnd[ 1 ] = astMAX( ybn[ i ], Box_ubnd[ 1 ] );
          }
       }
    }
@@ -24073,8 +24066,8 @@ f        The global status.
       Map3_map = astGetMapping( this, AST__BASE, AST__CURRENT );
 
 /* Convert the tolerance from relative to absolute graphics coordinates. */
-      tol = astGetTol( this )*MAX( this->xhi - this->xlo,
-                                   this->yhi - this->ylo );
+      tol = astGetTol( this )*astMAX( this->xhi - this->xlo,
+                                      this->yhi - this->ylo );
 
 /* Ensure the globals holding the scaling from graphics coords to equally
    scaled coords are available. */
@@ -25762,10 +25755,10 @@ static int swapEdges( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata, 
 
 /* Update the max and min graphics X and Y coords covered by the axis. */
       if( cdt->nbrk > 0 ) {
-         xmax = MAX( xmax, cdt->xbrk[0] );
-         xmin = MIN( xmin, cdt->xbrk[0] );
-         ymax = MAX( ymax, cdt->ybrk[0] );
-         ymin = MIN( ymin, cdt->ybrk[0] );
+         xmax = astMAX( xmax, cdt->xbrk[0] );
+         xmin = astMIN( xmin, cdt->xbrk[0] );
+         ymax = astMAX( ymax, cdt->ybrk[0] );
+         ymin = astMIN( ymin, cdt->ybrk[0] );
       }
 
 /* Get a pointer to the curve through the next major tick mark. */
@@ -26521,7 +26514,7 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 /* Get the minimum dimension of the plotting area. */
    xrange = this->xhi - this->xlo;
    yrange = this->yhi - this->ylo;
-   mindim = MIN( xrange, yrange );
+   mindim = astMIN( xrange, yrange );
 
 /* Take a copy of the bounding box which encloses all other parts of the
    annotated grid. If nothing has been plotted, use an area 20 % smaller
@@ -26636,8 +26629,8 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
             }
 
 /* The Y reference position is at the mid point vertically. */
-            yref = 0.5*( MIN( yhi, this->yhi ) +
-                         MAX( ylo, this->ylo ) );
+            yref = 0.5*( astMIN( yhi, this->yhi ) +
+                         astMAX( ylo, this->ylo ) );
 
 /* Do the same for the top edge. */
          } else if( edge == 1 ){
@@ -26649,8 +26642,8 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
             } else {
                yref = yhi + txtgap;
             }
-            xref = 0.5*( MIN( xhi, this->xhi ) +
-                         MAX( xlo, this->xlo ) );
+            xref = 0.5*( astMIN( xhi, this->xhi ) +
+                         astMAX( xlo, this->xlo ) );
 
 /* Do the same for the right-hand edge. */
          } else if( edge == 2 ){
@@ -26662,8 +26655,8 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
             } else {
                xref = xhi + txtgap;
             }
-            yref = 0.5*( MIN( yhi, this->yhi ) +
-                         MAX( ylo, this->ylo ) );
+            yref = 0.5*( astMIN( yhi, this->yhi ) +
+                         astMAX( ylo, this->ylo ) );
 
 /* Do the same for the bottom edge. */
          } else {
@@ -26675,8 +26668,8 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
             } else {
                yref = ylo - txtgap;
             }
-            xref = 0.5*( MIN( xhi, this->xhi ) +
-                         MAX( xlo, this->xlo ) );
+            xref = 0.5*( astMIN( xhi, this->xhi ) +
+                         astMAX( xlo, this->xlo ) );
          }
 
 /* Display the label. */
@@ -26732,8 +26725,8 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 /* Get the graphics coordinates of the bottom centre point of the title.
    The X centre is put at the mid point of the used x axis range
    (restricted to the range of the plotting area). */
-      xref = 0.5*( MIN( xhi, this->xhi ) +
-                   MAX( xlo, this->xlo ) );
+      xref = 0.5*( astMIN( xhi, this->xhi ) +
+                   astMAX( xlo, this->xlo ) );
 
 /* The Y centre is put a "TitleGap" distance outside the box containing
    the everything else. */
@@ -26759,10 +26752,10 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 /* Include the labels in the bounding box held in global variables
    Box_lbnd/ubnd. */
    if( Box_lbnd[ 0 ] != FLT_MAX ) {
-      Box_lbnd[ 0 ] = MIN( Box_lbnd[ 0 ], Boxp_lbnd[ 0 ] );
-      Box_ubnd[ 0 ] = MAX( Box_ubnd[ 0 ], Boxp_ubnd[ 0 ] );
-      Box_lbnd[ 1 ] = MIN( Box_lbnd[ 1 ], Boxp_lbnd[ 1 ] );
-      Box_ubnd[ 1 ] = MAX( Box_ubnd[ 1 ], Boxp_ubnd[ 1 ] );
+      Box_lbnd[ 0 ] = astMIN( Box_lbnd[ 0 ], Boxp_lbnd[ 0 ] );
+      Box_ubnd[ 0 ] = astMAX( Box_ubnd[ 0 ], Boxp_ubnd[ 0 ] );
+      Box_lbnd[ 1 ] = astMIN( Box_lbnd[ 1 ], Boxp_lbnd[ 1 ] );
+      Box_ubnd[ 1 ] = astMAX( Box_ubnd[ 1 ], Boxp_ubnd[ 1 ] );
    } else {
       Box_lbnd[ 0 ] = Boxp_lbnd[ 0 ];
       Box_ubnd[ 0 ] = Boxp_ubnd[ 0 ];

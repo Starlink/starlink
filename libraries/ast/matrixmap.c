@@ -174,15 +174,6 @@ f     The MatrixMap class does not define any new routines beyond those
 #define DIAGONAL   1
 #define UNIT       2
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-compare bad values directory because of the danger of floating point
-exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /* Include files. */
 /* ============== */
 /* Interface definitions. */
@@ -624,7 +615,7 @@ static void CompressMatrix( AstMatrixMap *this, int *status ){
    } else if( this->form == DIAGONAL ){
       new_form = UNIT;
       for( i = 0; i < ndiag; i++ ){
-         if( !EQUAL( (this->f_matrix)[ i ], 1.0 ) ){
+         if( !astEQUAL( (this->f_matrix)[ i ], 1.0 ) ){
             new_form = DIAGONAL;
             break;
          }
@@ -893,7 +884,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
          if( this_matrix && that_matrix ) {
             result = 1;
             for( i = 0; i < nin*nout; i++ ) {
-               if( !EQUAL( this_matrix[ i ], that_matrix[ i ] ) ){
+               if( !astEQUAL( this_matrix[ i ], that_matrix[ i ] ) ){
                   result = 0;
                   break;
                }
@@ -1696,7 +1687,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       zoom = 1;
       b = mm->f_matrix + 1;
       for( i = 1; i < nin; i++ ){
-         if( !EQUAL( *b, *( b - 1 ) ) ){
+         if( !astEQUAL( *b, *( b - 1 ) ) ){
             zoom = 0;
             break;
          }
@@ -4822,7 +4813,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
       nel = nin*nout;
 
    } else if( this->form == DIAGONAL ){
-      nel = MIN( nin, nout );
+      nel = astMIN( nin, nout );
 
    } else {
       nel = 0;
@@ -5437,7 +5428,7 @@ AstMatrixMap *astLoadMatrixMap_( void *mem, size_t size,
          nel = nin*nout;
 
       } else if( new->form == DIAGONAL ){
-         nel = MIN( nin, nout );
+         nel = astMIN( nin, nout );
 
       } else {
          nel = 0;

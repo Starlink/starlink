@@ -189,15 +189,6 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
           sys == AST__AIRWAVE || \
           sys == AST__FREQ ) ? 1 : 0 )
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /* Define other numerical constants for use in this module. */
 #define GETATTRIB_BUFF_LEN 50
 #define GETLABEL_BUFF_LEN 200
@@ -1045,14 +1036,14 @@ static int EqualSor( AstSpecFrame *this, AstSpecFrame *that, int *status ) {
    } else {
 
 /* The reference RA and Dec need to be equal */
-      if( !EQUAL( astGetRefRA( this ), astGetRefRA( that ) ) ||
-          !EQUAL( astGetRefDec( this ), astGetRefDec( that ) ) ) {
+      if( !astEQUAL( astGetRefRA( this ), astGetRefRA( that ) ) ||
+          !astEQUAL( astGetRefDec( this ), astGetRefDec( that ) ) ) {
          result = 0;
 
 /* For source rest frame, the source velocities, rest frames and systems must
    be equal */
       } else if( sor == AST__SCSOR ){
-         if( !EQUAL( astGetSourceVel( this ), astGetSourceVel( that ) ) ||
+         if( !astEQUAL( astGetSourceVel( this ), astGetSourceVel( that ) ) ||
                      astGetSourceVRF( this ) != astGetSourceVRF( that ) ||
                      astGetSourceSys( this ) != astGetSourceSys( that ) ) {
             result = 0;
@@ -1061,15 +1052,15 @@ static int EqualSor( AstSpecFrame *this, AstSpecFrame *that, int *status ) {
 /* For geocentric, barycentric and heliocentric rest frames, the epochs must
    be the same */
       } else if( sor == AST__GESOR || sor == AST__BYSOR || sor == AST__HLSOR ){
-         if( !EQUAL( astGetEpoch( this ), astGetEpoch( that ) ) ) result = 0;
+         if( !astEQUAL( astGetEpoch( this ), astGetEpoch( that ) ) ) result = 0;
 
 /* For topocentric rest frame, the epoch and position of the observer must be
    the same */
       } else if( sor == AST__TPSOR ){
-         if( !EQUAL( astGetEpoch( this ), astGetEpoch( that ) ) ||
-             !EQUAL( astGetObsAlt( this ), astGetObsAlt( that ) ) ||
-             !EQUAL( astGetObsLon( this ), astGetObsLon( that ) ) ||
-             !EQUAL( astGetObsLat( this ), astGetObsLat( that ) ) ) result = 0;
+         if( !astEQUAL( astGetEpoch( this ), astGetEpoch( that ) ) ||
+             !astEQUAL( astGetObsAlt( this ), astGetObsAlt( that ) ) ||
+             !astEQUAL( astGetObsLon( this ), astGetObsLon( that ) ) ||
+             !astEQUAL( astGetObsLat( this ), astGetObsLat( that ) ) ) result = 0;
 
       } else if( sor != AST__LKSOR && sor != AST__LDSOR &&
                  sor != AST__GLSOR && sor != AST__LGSOR && astOK ) {

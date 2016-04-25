@@ -238,17 +238,6 @@ static void WinPerm( AstMapping **, int *, int, int * );
 static void WinWcs( AstMapping **, int *, int, int * );
 static int *MapSplit( AstMapping *, int, const int *, AstMapping **, int * );
 
-/* Function Macros */
-/* =============== */
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-compare bad values directory because of the danger of floating point
-exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /* Member functions. */
 /* ================= */
 static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
@@ -557,8 +546,8 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 /* Compare the shift and scale terms from both WinMaps ignoring the
    setting of the Invert flag for the moment. */
          for( i = 0; i < nin; i++ ) {
-            if( !EQUAL( this->a[ i ], that->a[ i ] ) ||
-                !EQUAL( this->b[ i ], that->b[ i ] ) ) {
+            if( !astEQUAL( this->a[ i ], that->a[ i ] ) ||
+                !astEQUAL( this->b[ i ], that->b[ i ] ) ) {
                result = 0;
                break;
             }
@@ -581,8 +570,8 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
             result = 1;
 
             for( i = 0; i < nin; i++ ) {
-               if( !EQUAL( a_this[ i ], a_that[ i ] ) ||
-                   !EQUAL( b_this[ i ], b_that[ i ] ) ) {
+               if( !astEQUAL( a_this[ i ], a_that[ i ] ) ||
+                   !astEQUAL( b_this[ i ], b_that[ i ] ) ) {
                   result = 0;
                   break;
                }
@@ -1079,7 +1068,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    diag = 1;
    newwm = (AstWinMap *) ( *map_list )[ where ];
    for( i = 0; i < nin; i++ ){
-      if( !EQUAL( ( newwm->a )[ i ], 0.0 ) ){
+      if( !astEQUAL( ( newwm->a )[ i ], 0.0 ) ){
          diag = 0;
          break;
       }
@@ -3320,8 +3309,8 @@ static AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1,
          if( ( inv1 == 0 ) != ( inv2 == 0 ) ) {
             cancel = 1;
             for( i = 0; i < nin[ 0 ]; i++ ){
-               if( !EQUAL( (wm1->a)[ i ], (wm2->a)[ i ] ) ||
-                   !EQUAL( (wm1->b)[ i ], (wm2->b)[ i ] ) ) {
+               if( !astEQUAL( (wm1->a)[ i ], (wm2->a)[ i ] ) ||
+                   !astEQUAL( (wm1->b)[ i ], (wm2->b)[ i ] ) ) {
                   cancel = 0;
                   break;
                }

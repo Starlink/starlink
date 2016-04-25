@@ -53,12 +53,12 @@ f     The DssMap class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -108,10 +108,6 @@ f     The DssMap class does not define any new routines beyond those
 /* Macro which returns the nearest integer to a given floating point
    value. */
 #define NINT(x) (int)((x)+(((x)>0.0)?0.5:-0.5))
-
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
 
 /* Include files. */
 /* ============== */
@@ -1117,7 +1113,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Decrement the Mapping count and return the index of the first
    modified element. */
                      ( *nmap )--;
-                     result = MIN( wmi, where );
+                     result = astMIN( wmi, where );
 
                   }
 

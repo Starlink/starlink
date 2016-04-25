@@ -238,15 +238,6 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
    "protected" symbols available. */
 #define astCLASS Region
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /* Value for Ident attribute of of an encapsulated FrameSet which
    indicates that it is a dummy FrameSet (see astRegDummy). */
 #define DUMMY_FS "ASTREGION-DUMMY"
@@ -5738,8 +5729,8 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
       npixg = 1; \
       for ( idim = 0; idim < ndim; idim++ ) { \
          if( lbndgd[ idim ] != AST__BAD && ubndgd[ idim ] != AST__BAD ) { \
-            lbndg[ idim ] = MAX( lbnd[ idim ], (int)( lbndgd[ idim ] + 0.5 ) - 2 ); \
-            ubndg[ idim ] = MIN( ubnd[ idim ], (int)( ubndgd[ idim ] + 0.5 ) + 2 ); \
+            lbndg[ idim ] = astMAX( lbnd[ idim ], (int)( lbndgd[ idim ] + 0.5 ) - 2 ); \
+            ubndg[ idim ] = astMIN( ubnd[ idim ], (int)( ubndgd[ idim ] + 0.5 ) + 2 ); \
          } else { \
             lbndg[ idim ] = lbnd[ idim ]; \
             ubndg[ idim ] = ubnd[ idim ]; \

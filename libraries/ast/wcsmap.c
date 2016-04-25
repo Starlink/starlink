@@ -227,15 +227,6 @@ f     The WcsMap class does not define any new routines beyond those
    "protected" symbols available. */
 #define astCLASS WcsMap
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macros to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /*
 *
 *  Name:
@@ -889,7 +880,7 @@ static int CanMerge( AstMapping *map1, int inv1, AstMapping *map2, int inv2, int
    are not equal, the WcsMaps cannot merge. */
                   } else {
                      for( m = 0; m < GetNP( wcs1, i, status ); m++ ){
-                        if( !EQUAL( astGetPV( wcs1, i, m ),
+                        if( !astEQUAL( astGetPV( wcs1, i, m ),
                                     astGetPV( wcs2, i, m ) ) ){
                            ret = 0;
                            break;

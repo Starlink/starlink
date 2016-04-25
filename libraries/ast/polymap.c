@@ -98,10 +98,6 @@ f     - AST_POLYTRAN: Fit a PolyMap inverse or forward transformation
    "protected" symbols available. */
 #define astCLASS PolyMap
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
 /* Include files. */
 /* ============== */
 /* Interface definitions. */

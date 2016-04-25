@@ -42,12 +42,12 @@ f     - AST_ELLIPSEPARS: Get the geometric parameters of the Ellipse
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -63,7 +63,7 @@ f     - AST_ELLIPSEPARS: Get the geometric parameters of the Ellipse
 *        a discontinuity. Previously, such uncertainty Regions could have a huge
 *        bounding box resulting in matching region being far too big.
 *     6-JAN-2014 (DSB):
-*        Ensure cached information is available in RegCentre even if no new 
+*        Ensure cached information is available in RegCentre even if no new
 *        centre is supplied.
 *class--
 */
@@ -74,15 +74,6 @@ f     - AST_ELLIPSEPARS: Get the geometric parameters of the Ellipse
    the header files that define class interfaces that they should make
    "protected" symbols available. */
 #define astCLASS Ellipse
-
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E9*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
 /* Include files. */
 /* ============== */

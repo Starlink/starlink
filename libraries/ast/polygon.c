@@ -122,15 +122,6 @@ f     - AST_OUTLINE<X>: Create a Polygon outlining values in a pixel array
    "protected" symbols available. */
 #define astCLASS Polygon
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E9*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /* Define a macro for testing if a pixel value <V> satisfies the requirements
    specified by <Oper> and <Value>. Compiler optimisation should remove
    all the "if" testing from this expression. */

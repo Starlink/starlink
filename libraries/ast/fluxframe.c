@@ -46,12 +46,12 @@ f     The FluxFrame class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -96,15 +96,6 @@ f     The FluxFrame class does not define any new routines beyond those
 /* Define the first and last acceptable System values. */
 #define FIRST_SYSTEM AST__FLUXDEN
 #define LAST_SYSTEM AST__SBRIGHTW
-
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E8*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
 /* Define other numerical constants for use in this module. */
 #define GETATTRIB_BUFF_LEN 50
@@ -2212,7 +2203,7 @@ static int MakeFluxMapping( AstFluxFrame *target, AstFluxFrame *result,
          astTran1( smap_out, 1, &specval, 1, &specval_out );
 
 /* Check they are equal and good. */
-         if( EQUAL( specval_in, specval_out ) && specval_in != AST__BAD ) {
+         if( astEQUALS( specval_in, specval_out, 1.0E8 ) && specval_in != AST__BAD ) {
 
 /* If the siSimplified Mapping is a UnitMap the required rate of change
    factor is 1.0. If it resuts in a ZoomMap, the required factor is

@@ -172,15 +172,6 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 #define R2D (180.0/PI)
 #define AS2R (PI/648000.0)
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /* Include files. */
 /* ============== */
 /* Interface definitions. */
@@ -2903,7 +2894,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    note that it should not be kept. */
             if ( ( ( cvttype[ istep ] == AST__SLA_PREBN ) ||
                    ( cvttype[ istep ] == AST__SLA_PREC ) ) &&
-                 EQUAL( cvtargs[ istep ][ 0 ], cvtargs[ istep ][ 1 ] ) ) {
+                 astEQUAL( cvtargs[ istep ][ 0 ], cvtargs[ istep ][ 1 ] ) ) {
                keep = 0;
 
 /* The remaining simplifications act to combine adjacent
@@ -2924,7 +2915,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    by eliminating the common equinox. */
                if ( ( PAIR_CVT( AST__SLA_PREBN, AST__SLA_PREBN ) ||
                       PAIR_CVT( AST__SLA_PREC, AST__SLA_PREC ) ) &&
-                    EQUAL( cvtargs[ istep ][ 1 ], cvtargs[ istep + 1 ][ 0 ] ) ) {
+                    astEQUAL( cvtargs[ istep ][ 1 ], cvtargs[ istep + 1 ][ 0 ] ) ) {
 
 /* Retain the second correction, changing its first argument, and
    eliminate the first correction. */
@@ -2938,7 +2929,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    they will cancel, so eliminate them both. */
                } else if ( ( PAIR_CVT( AST__SLA_SUBET, AST__SLA_ADDET ) ||
                              PAIR_CVT( AST__SLA_ADDET, AST__SLA_SUBET ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2949,7 +2940,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    the same argument value and eliminate them both if possible. */
                } else if ( ( PAIR_CVT( AST__SLA_FK45Z, AST__SLA_FK54Z ) ||
                              PAIR_CVT( AST__SLA_FK54Z, AST__SLA_FK45Z ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2960,7 +2951,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    the same argument value and eliminate them both if possible. */
                } else if ( ( PAIR_CVT( AST__SLA_HFK5Z, AST__SLA_FK5HZ ) ||
                              PAIR_CVT( AST__SLA_FK5HZ, AST__SLA_HFK5Z ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2972,9 +2963,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    directions) and eliminate them if possible. */
                } else if ( ( PAIR_CVT( AST__SLA_AMP, AST__SLA_MAP ) ||
                              PAIR_CVT( AST__SLA_MAP, AST__SLA_AMP ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 1 ] ) &&
-                           EQUAL( cvtargs[ istep ][ 1 ],
+                           astEQUAL( cvtargs[ istep ][ 1 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2984,7 +2975,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* This is handled in the same way as the FK4/FK5 case. */
                } else if ( ( PAIR_CVT( AST__SLA_ECLEQ, AST__SLA_EQECL ) ||
                              PAIR_CVT( AST__SLA_EQECL, AST__SLA_ECLEQ ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2993,9 +2984,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* ------------------------------------------------ */
                } else if ( ( PAIR_CVT( AST__SLA_DH2E, AST__SLA_DE2H ) ||
                              PAIR_CVT( AST__SLA_DE2H, AST__SLA_DH2E ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) &&
-                           EQUAL( cvtargs[ istep ][ 1 ],
+                           astEQUAL( cvtargs[ istep ][ 1 ],
                                   cvtargs[ istep + 1 ][ 1 ] ) ) {
                   istep++;
                   keep = 0;
@@ -3021,13 +3012,13 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* --------------------------------------------------------------------- */
                } else if ( ( PAIR_CVT( AST__HPCEQ, AST__EQHPC ) ||
                              PAIR_CVT( AST__EQHPC, AST__HPCEQ ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                              cvtargs[ istep + 1 ][ 0 ] ) &&
-                           EQUAL( cvtargs[ istep ][ 1 ],
+                           astEQUAL( cvtargs[ istep ][ 1 ],
                              cvtargs[ istep + 1 ][ 1 ] ) &&
-                           EQUAL( cvtargs[ istep ][ 2 ],
+                           astEQUAL( cvtargs[ istep ][ 2 ],
                              cvtargs[ istep + 1 ][ 2 ] ) &&
-                           EQUAL( cvtargs[ istep ][ 3 ],
+                           astEQUAL( cvtargs[ istep ][ 3 ],
                              cvtargs[ istep + 1 ][ 3 ] ) ) {
                   istep++;
                   keep = 0;
@@ -3036,13 +3027,13 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* --------------------------------------------------------------------- */
                } else if ( ( PAIR_CVT( AST__HPREQ, AST__EQHPR ) ||
                              PAIR_CVT( AST__EQHPR, AST__HPREQ ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                              cvtargs[ istep + 1 ][ 0 ] ) &&
-                           EQUAL( cvtargs[ istep ][ 1 ],
+                           astEQUAL( cvtargs[ istep ][ 1 ],
                              cvtargs[ istep + 1 ][ 1 ] ) &&
-                           EQUAL( cvtargs[ istep ][ 2 ],
+                           astEQUAL( cvtargs[ istep ][ 2 ],
                              cvtargs[ istep + 1 ][ 2 ] ) &&
-                           EQUAL( cvtargs[ istep ][ 3 ],
+                           astEQUAL( cvtargs[ istep ][ 3 ],
                              cvtargs[ istep + 1 ][ 3 ] ) ) {
                   istep++;
                   keep = 0;
@@ -3051,7 +3042,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* ---------------------------------------------------------- */
                } else if ( ( PAIR_CVT( AST__EQHE, AST__HEEQ ) ||
                              PAIR_CVT( AST__HEEQ, AST__EQHE ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -3067,7 +3058,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* ------------------------------------------- */
                } else if ( ( PAIR_CVT( AST__R2H, AST__H2R ) ||
                              PAIR_CVT( AST__H2R, AST__R2H ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;

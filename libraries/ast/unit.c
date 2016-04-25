@@ -105,15 +105,6 @@
    value. */
 #define NINT(x) (int)((x)+(((x)>0.0)?0.5:-0.5))
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /* Macro identifying a character as lower or upper case letter, digit or
 + or -. */
 #define ISWORD(c) (isalnum(c)||((c)=='+')||((c)=='-'))
@@ -648,7 +639,7 @@ static int CmpTree( UnitNode *tree1, UnitNode *tree2, int exact, int *status ) {
 
 /* If both supplied nodes are constant nodes, compare the constant values. */
    } else if( tree1->con != AST__BAD ){
-      result = EQUAL( tree1->con, tree2->con ) ? 0 : (
+      result = astEQUAL( tree1->con, tree2->con ) ? 0 : (
                  ( tree1->con > tree2->con ) ? 1 : -1 );
 
 /* Otherwise, compare the arguments for the node. */
@@ -785,7 +776,7 @@ static UnitNode *CombineFactors( UnitNode **factors, double *powers,
       if( powers[ i ] != 0.0 ) {
 
 /* If the power of this factor is one, we use the factor directly. */
-         if( EQUAL( powers[ i ], 1.0 ) ) {
+         if( astEQUAL( powers[ i ], 1.0 ) ) {
             node2 = CopyTree( factors[ i ], status );
 
 /* Otherwise, for non-zero, non-unity powers, we create a POW node for
@@ -913,7 +904,7 @@ static int ComplicateTree( UnitNode **node, int *status ) {
       if( con != AST__BAD && (*node)->arg[ 1 ]->opcode == OP_LN ) {
          fk = 10.0*con*log( 10.0 );
          k = NINT(fk);
-         if( EQUAL(fk,((double)k)) ) {
+         if( astEQUAL(fk,((double)k)) ) {
             newnode = NewNode( NULL, OP_LOG, status );
             con = k/10.0;
          } else {
@@ -921,13 +912,13 @@ static int ComplicateTree( UnitNode **node, int *status ) {
          }
 
          node2 = CopyTree( (*node)->arg[ 1 ]->arg[ 0 ], status );
-         if( !EQUAL( con, 1.0 ) ){
+         if( !astEQUAL( con, 1.0 ) ){
             node1 = CopyTree( (*node)->arg[ 0 ], status );
             node3 = NewNode( NULL, OP_POW, status );
          }
 
          if( astOK ) {
-            if( !EQUAL( con, 1.0 ) ){
+            if( !astEQUAL( con, 1.0 ) ){
                node1->con = con;
                node3->arg[ 0 ] = node2;
                node3->arg[ 1 ] = node1;
@@ -939,7 +930,7 @@ static int ComplicateTree( UnitNode **node, int *status ) {
 
 /* Replace "(A**-1)*B" with "B/A" */
       } else if( (*node)->arg[ 0 ]->opcode == OP_POW &&
-                 EQUAL( (*node)->arg[ 0 ]->arg[ 1 ]->con, -1.0 )) {
+                 astEQUAL( (*node)->arg[ 0 ]->arg[ 1 ]->con, -1.0 )) {
          newnode = NewNode( NULL, OP_DIV, status );
          if( astOK ) {
             newnode->arg[ 0 ] = CopyTree( (*node)->arg[ 1 ], status );
@@ -948,7 +939,7 @@ static int ComplicateTree( UnitNode **node, int *status ) {
 
 /* Replace "B*(A**-1)" with "B/A" */
       } else if( (*node)->arg[ 1 ]->opcode == OP_POW &&
-                 EQUAL( (*node)->arg[ 1 ]->arg[ 1 ]->con, -1.0 )) {
+                 astEQUAL( (*node)->arg[ 1 ]->arg[ 1 ]->con, -1.0 )) {
          newnode = NewNode( NULL, OP_DIV, status );
          if( astOK ) {
             newnode->arg[ 0 ] = CopyTree( (*node)->arg[ 0 ], status );
@@ -958,7 +949,7 @@ static int ComplicateTree( UnitNode **node, int *status ) {
 /* Convert (x**k)*(y**k) to (x*y)**k. */
       } else if( (*node)->arg[ 0 ]->opcode == OP_POW &&
                  (*node)->arg[ 1 ]->opcode == OP_POW &&
-                 EQUAL( (*node)->arg[ 0 ]->arg[ 1 ]->con,
+                 astEQUAL( (*node)->arg[ 0 ]->arg[ 1 ]->con,
                         (*node)->arg[ 1 ]->arg[ 1 ]->con )) {
          newnode = NewNode( NULL, OP_POW, status );
          node1 = NewNode( NULL, OP_MULT, status );
@@ -985,7 +976,7 @@ static int ComplicateTree( UnitNode **node, int *status ) {
 
 /* If the head node is a POW node, replace "x**0.5" by sqrt(x) */
    } else if( (*node)->opcode == OP_POW ) {
-      if( EQUAL( (*node)->arg[ 1 ]->con, 0.5 ) ) {
+      if( astEQUAL( (*node)->arg[ 1 ]->con, 0.5 ) ) {
          newnode = NewNode( NULL, OP_SQRT, status );
          if( astOK ) {
             newnode->arg[ 0 ] = CopyTree( (*node)->arg[ 0 ], status );
@@ -4340,7 +4331,7 @@ static UnitNode *ModifyPrefix( UnitNode *old, int *status ) {
 /* The first argument (the numerator) should be the reciprocal of the constant
    found above. */
             ldcon->con = 1.0/ldcon->con;
-            if( !EQUAL( ldcon->con, old->arg[0]->con ) ) changed = 1;
+            if( !astEQUAL( ldcon->con, old->arg[0]->con ) ) changed = 1;
 
 /* Return the modified tree containing both LDVAR and LDCON nodes. */
             result = newtree;
@@ -4834,7 +4825,7 @@ static int SimplifyTree( UnitNode **node, int std, int *status ) {
          if( astOK ) newnode->con = 1.0;
 
 /* "x**1" can be replaced by x */
-      } else if( EQUAL( (*node)->arg[ 1 ]->con, 1.0 ) ) {
+      } else if( astEQUAL( (*node)->arg[ 1 ]->con, 1.0 ) ) {
          newnode = CopyTree( (*node)->arg[ 0 ], status );
 
 /* If the first argument is an OP_POW node, then change "(x**k1)**k2" into
@@ -4870,7 +4861,7 @@ static int SimplifyTree( UnitNode **node, int std, int *status ) {
    } else if( op == OP_DIV ) {
 
 /* Division by 1 is removed. */
-      if( EQUAL( (*node)->arg[ 1 ]->con, 1.0 ) ){
+      if( astEQUAL( (*node)->arg[ 1 ]->con, 1.0 ) ){
          newnode = CopyTree( (*node)->arg[ 0 ], status );
 
 /* Division by any other constant (except zero) is turned into a
@@ -4921,7 +4912,7 @@ static int SimplifyTree( UnitNode **node, int std, int *status ) {
          if( astOK ) newnode->con = 0.0;
 
 /* Multiplication by 1 is removed. */
-      } else if( EQUAL( (*node)->arg[ 0 ]->con, 1.0 ) ){
+      } else if( astEQUAL( (*node)->arg[ 0 ]->con, 1.0 ) ){
          newnode = CopyTree( (*node)->arg[ 1 ], status );
 
 /* For other MULT nodes, analyse the tree to find a list of all its

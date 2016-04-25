@@ -180,15 +180,6 @@ f     - AST_CURRENTTIME: Return the current system time
 #define FIRST_TS AST__TAI
 #define LAST_TS AST__LT
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E3*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /* The supported time scales fall into two groups. Time scales in the
    first group depend on the clock position. That is, transformation
    between a time scale in one group and a timescale in the other group
@@ -3584,7 +3575,7 @@ static AstMapping *MakeMap( AstTimeFrame *this, AstSystemType sys1,
       if( sys1 == sys2 ) {
 
 /* and the time offsets are equal... */
-         if( EQUAL( off1, off2 ) ) {
+         if( astEQUALS( off1, off2, 1.0E3 ) ) {
 
 /* and the units are equal, return a UnitMap. */
             if( !strcmp( unit1, unit2 ) ) {

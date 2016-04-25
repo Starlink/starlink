@@ -279,10 +279,6 @@ void astSet##attribute##_( Ast##class *this, type value, int *status ) { \
 #include <limits.h>
 #include <string.h>
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
 /* Module Variables. */
 /* ================= */
 

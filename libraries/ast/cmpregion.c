@@ -126,10 +126,6 @@ f     The CmpRegion class does not define any new routines beyond those
    "protected" symbols available. */
 #define astCLASS CmpRegion
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
 /* Include files. */
 /* ============== */
 /* Interface definitions. */
@@ -1682,8 +1678,8 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 
                if( inc1 ) {
                   if( inc2 ) {
-                     lbnd[ i ] = MAX( clbnd1[ i ], clbnd2[ i ] );
-                     ubnd[ i ] = MIN( cubnd1[ i ], cubnd2[ i ] );
+                     lbnd[ i ] = astMAX( clbnd1[ i ], clbnd2[ i ] );
+                     ubnd[ i ] = astMIN( cubnd1[ i ], cubnd2[ i ] );
                   } else {
                      lbnd[ i ] = clbnd1[ i ] < clbnd2[ i ] ? clbnd1[ i ] : cubnd2[ i ];
                      ubnd[ i ] = cubnd1[ i ] > cubnd2[ i ] ? cubnd1[ i ] : clbnd2[ i ];
@@ -1702,8 +1698,8 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
    the axis intervals. */
             } else {
                if( inc1 && inc2 ) {
-                  lbnd[ i ] = MIN( clbnd1[ i ], clbnd2[ i ] );
-                  ubnd[ i ] = MAX( cubnd1[ i ], cubnd2[ i ] );
+                  lbnd[ i ] = astMIN( clbnd1[ i ], clbnd2[ i ] );
+                  ubnd[ i ] = astMAX( cubnd1[ i ], cubnd2[ i ] );
                } else {
                   lbnd[ i ] = -DBL_MAX;
                   ubnd[ i ] = DBL_MAX;
@@ -1805,14 +1801,14 @@ static void RegBaseBox2( AstRegion *this_region, double *lbnd, double *ubnd, int
    bounding boxes. For other operators find the union. */
       if( this->oper == AST__AND ) {
          for( i = 0; i < nax; i++ ) {
-            lbnd[ i ]= MAX( clbnd1[ i ], clbnd2[ i ] );
-            ubnd[ i ]= MIN( cubnd1[ i ], cubnd2[ i ] );
+            lbnd[ i ]= astMAX( clbnd1[ i ], clbnd2[ i ] );
+            ubnd[ i ]= astMIN( cubnd1[ i ], cubnd2[ i ] );
          }
 
       } else {
          for( i = 0; i < nax; i++ ) {
-            lbnd[ i ]= MIN( clbnd1[ i ], clbnd2[ i ] );
-            ubnd[ i ]= MAX( cubnd1[ i ], cubnd2[ i ] );
+            lbnd[ i ]= astMIN( clbnd1[ i ], clbnd2[ i ] );
+            ubnd[ i ]= astMAX( cubnd1[ i ], cubnd2[ i ] );
          }
       }
    }

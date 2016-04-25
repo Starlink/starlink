@@ -1184,10 +1184,6 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
    sky (skyframes could be used for other purposes - eg a POLANAL Frame). */
 #define IsASkyFrame(frame) (astIsASkyFrame(frame)&&!strcmp("SKY",astGetDomain(frame)))
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
 /* Macro which takes a pointer to a FitsCard and returns non-zero if the
    card has been used and so should be ignored. */
 #define CARDUSED(card)  ( \
@@ -1206,16 +1202,11 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 /* A tolerance for equality between angular values in radians. */
 #define TOL2 1.0E-10
 
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /* Macro to check for equality of floating point angular values. We cannot
    compare bad values directory because of the danger of floating point
    exceptions, so bad values are dealt with explicitly. The smallest
    significant angle is assumed to be 1E-9 radians (0.0002 arc-seconds).*/
-#define EQUALANG(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=MAX(1.0E5*(fabs(aa)+fabs(bb))*DBL_EPSILON,1.0E-9))))
+#define EQUALANG(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=astMAX(1.0E5*(fabs(aa)+fabs(bb))*DBL_EPSILON,1.0E-9))))
 
 /* Macro to compare an angle in radians with zero, allowing some tolerance. */
 #define ZEROANG(aa) (fabs(aa)<1.0E-9)
@@ -8422,10 +8413,10 @@ static int DSSFromStore( AstFitsChan *this, FitsStore *store,
    if( pvx[ 20 ] != 0.0 || pvy[ 20 ] != 0.0 ) return ret;
 
 /* Check that other projection parameters are related correctly. */
-   if( !EQUAL( 2*pvx[ 17 ], pvx[ 19 ] ) ) return ret;
-   if( !EQUAL( pvx[ 17 ], pvx[ 21 ] ) ) return ret;
-   if( !EQUAL( 2*pvy[ 17 ], pvy[ 19 ] ) ) return ret;
-   if( !EQUAL( pvy[ 17 ], pvy[ 21 ] ) ) return ret;
+   if( !astEQUAL( 2*pvx[ 17 ], pvx[ 19 ] ) ) return ret;
+   if( !astEQUAL( pvx[ 17 ], pvx[ 21 ] ) ) return ret;
+   if( !astEQUAL( 2*pvy[ 17 ], pvy[ 19 ] ) ) return ret;
+   if( !astEQUAL( pvy[ 17 ], pvy[ 21 ] ) ) return ret;
 
 /* Initialise all polynomial co-efficients to zero. */
    for( m = 0; m < 20; m++ ){
@@ -14789,7 +14780,7 @@ static int SetFits( AstFitsChan *this, const char *keyname, void *value,
          if( overwrite && CnvValue( this, type, 0, &edval, "SetFits",
                                     status ) &&
              CardComm( this, status ) ) {
-            if( EQUAL( edval, dval ) ) comment = NULL;
+            if( astEQUAL( edval, dval ) ) comment = NULL;
          }
          astSetFitsF( this, keyname, dval, comment, overwrite );
       } else {
@@ -14839,8 +14830,8 @@ static int SetFits( AstFitsChan *this, const char *keyname, void *value,
          if( overwrite && CnvValue( this, type, 0, ecdval, "SetFits",
                                     status ) &&
              CardComm( this, status ) ) {
-            if( EQUAL( ecdval[ 0 ], ( (double *) value )[ 0 ] ) &&
-                EQUAL( ecdval[ 1 ], ( (double *) value )[ 1 ] ) ) comment = NULL;
+            if( astEQUAL( ecdval[ 0 ], ( (double *) value )[ 0 ] ) &&
+                astEQUAL( ecdval[ 1 ], ( (double *) value )[ 1 ] ) ) comment = NULL;
          }
          astSetFitsCF( this, keyname, (double *) value, comment, overwrite );
       } else {
@@ -18313,7 +18304,7 @@ static int IsMapLinear( AstMapping *smap, const double lbnd_in[],
    If so we cannot use them. In this case create new bounds. */
          } else {
             boxok = 1;
-            if( EQUAL( lbnd_out, ubnd_out ) ) {
+            if( astEQUAL( lbnd_out, ubnd_out ) ) {
                m = 0.5*( lbnd_out + ubnd_out );
                if( fabs( m ) > 1.0E-15 ) {
                   lbnd_out = 0.9*m;
@@ -18397,7 +18388,7 @@ static int IsMapLinear( AstMapping *smap, const double lbnd_in[],
             }
 
 /* Ignore input axes which are independant of the output axis. */
-            if( !EQUAL( in_lbnd, in_ubnd ) ) {
+            if( !astEQUAL( in_lbnd, in_ubnd ) ) {
 
 /* Calculate the constants "input coord = m*output coord + c" */
                d = ss*ss - sn*ss2;
@@ -21090,7 +21081,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
                      jj = wperm[ i ];
                      if( jj < nin ) {
                         cv = fullmat[ jj ][ ii ];
-                        if( !EQUAL( colvec[ i ], 0.0 ) && fabs( cv ) > mxcv ) {
+                        if( !astEQUAL( colvec[ i ], 0.0 ) && fabs( cv ) > mxcv ) {
                            mxcv = fabs( cv );
                            k = -cv/colvec[ i ];
                         }
@@ -21139,7 +21130,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
    and find which one it is. */
                jax = -1;
                for( j = 0; j < nout; j++ ) {
-                  if( !EQUAL( fullmat[ j ][ i ], 0.0 ) ) {
+                  if( !astEQUAL( fullmat[ j ][ i ], 0.0 ) ) {
                      if( jax == -1 ) {
                         jax = j;
                      } else {
@@ -21156,7 +21147,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
    currently being considered. */
                   for( ii = 0; ii < nout; ii++ ) {
                      if( ii != i ) {
-                        if( !EQUAL( fullmat[ jax ][ ii ], 0.0 ) ) {
+                        if( !astEQUAL( fullmat[ jax ][ ii ], 0.0 ) ) {
                            jax = -1;
                            break;
                         }
@@ -21198,9 +21189,9 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
          for( j = 0; j < nout; j++ ){
             val = *(c++);
             if( i == j ){
-               if( EQUAL( val, 1.0 ) ) val = AST__BAD;
+               if( astEQUAL( val, 1.0 ) ) val = AST__BAD;
             } else {
-               if( EQUAL( val, 0.0 ) ) val = AST__BAD;
+               if( astEQUAL( val, 0.0 ) ) val = AST__BAD;
             }
             if( val != AST__BAD ) SetItem( &(store->pc), i, j, s, val, status );
          }
@@ -23495,9 +23486,9 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
 /* Set the element bad if it takes its default value. */
                   val = *(c++);
                   if( i == j ){
-                     if( EQUAL( val, 1.0 ) ) val = AST__BAD;
+                     if( astEQUAL( val, 1.0 ) ) val = AST__BAD;
                   } else {
-                     if( EQUAL( val, 0.0 ) ) val = AST__BAD;
+                     if( astEQUAL( val, 0.0 ) ) val = AST__BAD;
                   }
 
 /* Only store elements which do not take their default values. */
@@ -23518,7 +23509,7 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
                d = primpc;
                for( i = 0; i < naxis; i++ ){
                   for( j = 0; j < naxis; j++ ){
-                     if( !EQUAL( *c, *d ) ){
+                     if( !astEQUAL( *c, *d ) ){
                         ok = 0;
                      } else {
                         c++;
@@ -23677,7 +23668,7 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
          primeq = val;
          if( val != AST__BAD ) SetValue( this, "EQUINOX", &val, AST__FLOAT,
                                          "Epoch of reference equinox", status );
-      } else if( !EQUAL( val, primeq ) ){
+      } else if( !astEQUAL( val, primeq ) ){
          ok = 0;
          goto next;
       }
@@ -23742,7 +23733,7 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
             SetValue( this, "DATE-OBS", &cval, AST__STRING,
                       "Date of observation", status );
          }
-      } else if( !EQUAL( val, primdt ) ){
+      } else if( !astEQUAL( val, primdt ) ){
          ok = 0;
          goto next;
       }
@@ -23784,7 +23775,7 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
                      if( i == axlat && m < 10 ) primpv[m] = val;
                   } else {
                      if( ( ( i != axlat || m >= 10 ) && val != AST__BAD ) ||
-                         ( i == axlat && m < 10 && !EQUAL( val, primpv[m] ) ) ){
+                         ( i == axlat && m < 10 && !astEQUAL( val, primpv[m] ) ) ){
                         ok = 0;
                         goto next;
                      }
@@ -27754,7 +27745,7 @@ static int SkySys( AstFitsChan *this, AstSkyFrame *skyfrm, int wcstype,
    producing FITS headers which say unlikely things like
    DATE-OBS = "01/01/50". Set a flag indicating if MJD-OBS and DATE-OBS
    can be defaulted. */
-   defdate = EQUAL( ep_utc, eq );
+   defdate = astEQUAL( ep_utc, eq );
 
 /* Convert the equinox to a Julian or Besselian epoch. Also get the
    reference frame and standard system. */
@@ -31183,7 +31174,7 @@ static int SplitMat( int naxis, double *matrix, double *cdelt, int *status ){
          a++;
       }
       if( !ok ) break;
-      cdlt = sqrt( MAX( 0.0, s2 ) );
+      cdlt = sqrt( astMAX( 0.0, s2 ) );
 
 /* If the diagonal term for this row of the matrix is negative, make
    the CDELT value negative instead. This means that the diagonal term in
@@ -35022,9 +35013,9 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
                val = GetItem( &(store->pc), i, j, s, NULL, method, class, status );
                if( val != AST__BAD ) {
                   if( i == j ) {
-                     if( EQUAL( val, 1.0 ) ) val = AST__BAD;
+                     if( astEQUAL( val, 1.0 ) ) val = AST__BAD;
                   } else {
-                     if( EQUAL( val, 0.0 ) ) val = AST__BAD;
+                     if( astEQUAL( val, 0.0 ) ) val = AST__BAD;
                   }
                }
                if( val != AST__BAD ) {
@@ -36282,14 +36273,14 @@ static int WcsNatPole( AstFitsChan *this, AstWcsMap *wcsmap, double alpha0,
    point. Tests for equality include some tolerance to allow for rounding
    errors. */
    sin_theta0 = sin( theta0 );
-   if( EQUAL( sin_theta0, 1.0 ) ){
+   if( astEQUAL( sin_theta0, 1.0 ) ){
       *alphap = alpha0;
       *deltap = delta0;
 
 /* If the fiducial point is concident with the Native South Pole, then the
    Native North Pole must have the coordinates of the point diametrically
    opposite the fiducial point. */
-   } else if( EQUAL( sin_theta0, -1.0 ) ){
+   } else if( astEQUAL( sin_theta0, -1.0 ) ){
       *alphap = alpha0 + AST__DPI;
       *deltap = -delta0;
 
@@ -37801,7 +37792,7 @@ static int WorldAxes( AstFitsChan *this, AstMapping *cmap, double *dim, int *per
                         wtmax = *nwt;
                         imin = i;
                         jmin = j;
-                     } else if( EQUAL( *ntn, tnmin ) && *nwt > wtmax ) {
+                     } else if( astEQUAL( *ntn, tnmin ) && *nwt > wtmax ) {
                         wtmax = *nwt;
                         imin = i;
                         jmin = j;

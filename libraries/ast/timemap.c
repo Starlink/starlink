@@ -154,15 +154,6 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 #define P0 6.55E-5
 #define TTOFF 32.184
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /* Include files. */
 /* ============== */
 /* Interface definitions. */
@@ -2201,7 +2192,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                      PAIR_CVT2( AST__TTTOTCG, AST__TCGTOTT ) ||
                      PAIR_CVT2( AST__UTTOUTC, AST__UTCTOUT ) ||
                      PAIR_CVT2( AST__LTTOUTC, AST__UTCTOLT ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ],
+                          astEQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2212,9 +2203,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                             PAIR_CVT2( AST__MJDTOMJD, AST__MJDTOMJD ) ||
                             PAIR_CVT2( AST__MJDTOBEP, AST__BEPTOMJD ) ||
                             PAIR_CVT2( AST__MJDTOJEP, AST__JEPTOMJD ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ],
+                          astEQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 1 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 1 ],
+                          astEQUAL( cvtargs[ istep ][ 1 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2223,24 +2214,24 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                } else if( ( PAIR_CVT2( AST__TDBTOTCB, AST__TCBTOTDB ) ||
                             PAIR_CVT2( AST__GMSTTOLMST, AST__LMSTTOGMST ) ||
                             PAIR_CVT2( AST__LASTTOLMST, AST__LMSTTOLAST ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ],
+                          astEQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 1 ],
+                          astEQUAL( cvtargs[ istep ][ 1 ],
                                  cvtargs[ istep + 1 ][ 1 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 2 ],
+                          astEQUAL( cvtargs[ istep ][ 2 ],
                                  cvtargs[ istep + 1 ][ 2 ] ) ) {
                   istep++;
                   keep = 0;
 
 /* Now check for conversions which have four user-supplied arguments. */
                } else if( ( PAIR_CVT2( AST__TTTOTDB, AST__TDBTOTT ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ],
+                          astEQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 1 ],
+                          astEQUAL( cvtargs[ istep ][ 1 ],
                                  cvtargs[ istep + 1 ][ 1 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 2 ],
+                          astEQUAL( cvtargs[ istep ][ 2 ],
                                  cvtargs[ istep + 1 ][ 2 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 3 ],
+                          astEQUAL( cvtargs[ istep ][ 3 ],
                                  cvtargs[ istep + 1 ][ 3 ] ) ) {
                   istep++;
                   keep = 0;
