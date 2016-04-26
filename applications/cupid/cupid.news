@@ -6,6 +6,19 @@
  and  analyse clumps of emission within 2- or 3- dimensional
  data arrays.
 
+Changes introduced at V2.2
+
+   - A bug has been fixed in the GaussCLumps algorithm that could cause
+   bright, clear clumps to be missed. This could occur if a few pixels
+   within the clump had unusually low variances, giving them unusually
+   high weights. The GaussClumps.wmin parameter could then cause the
+   majority of pixels to be excluded from the fit, causing the clump to
+   be missed. This bug has been fixed by changing the way in which the
+   weights are normalised prior to applying the cut specified by parameter
+   GaussClump.wmin - they are now normalised to a value of the mean plus
+   four standard deviations, rather than the maximum value as was done
+   previously. This reduces the effect of a few unusually high weights.
+
 Changes introduced at V2.1
 
    - The default value for the FellWalker.MinDip parameter has changed

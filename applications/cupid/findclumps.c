@@ -578,12 +578,16 @@ void findclumps( int *status ) {
 *        based on the local profile around the pixel with peak value. Only used
 *        for 3D data. []
 *     GaussClumps.Wmin:
-*        This parameter, together with GaussClumps.Wwidth,
-*        determines which input data values are used when fitting a Gaussian to
-*        a given peak in the data array. It specifies the minimum weight
-*        which is to be used (normalised to a maximum weight value of 1.0).
-*        Pixels with weight smaller than this value are not included in the
-*        fitting process. [0.05]
+*        This parameter, together with GaussClumps.Wwidth, determines which
+*        input data values are used when fitting a Gaussian to a given peak
+*        in the data array. It specifies the minimum normalised weight which
+*        is to be used. Pixels with normalised weight smaller than this value
+*        are not included in the fitting process. The absolute weight values
+*        are normalised by dividing them by a value equal to the mean of the
+*        absolute weights plus four standard deviations. An iterative sigma
+*        clipping algorithm is used when calculating this value in order to
+*        eliminate the effects of any pixel that have unusually low variance
+*        values, and thus unusually high absolute weights. [0.05]
 *     GaussClumps.Wwidth:
 *        This parameter, together with GaussClumps.Wmin,
 *        determines which input data values are used when fitting a Gaussian to

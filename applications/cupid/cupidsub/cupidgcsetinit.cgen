@@ -125,6 +125,13 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 *        Reduce the initial guess at the clump peak value by subtracting the
 *        RMS noise level (the noise will normally cause the peak data
 *        value to be larger than the peak clump value).
+*     26-APR-2016 (DSB):
+*        Use "mean_absweight+ 3*sigma(absweights)" as the absolute weight
+*        value corresponding to a normalised weight of 1.0. Previously, the
+*        maximum absolute weight was used, but this could result in nearly
+*        all normalised weights falling below wmin (and thus being set to
+*        zero), if the NDF variance array includes one or two values very
+*        close to zero (resulting in huge absolute weights).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -134,7 +141,6 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 */
 
 /* Local Variables: */
-
    double *pw;            /* Pointer to next weight value in work array */
    double *py;            /* Pointer to next data value in work array */
    double d2;             /* Sum of squared offsets */
@@ -146,9 +152,12 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    double off;            /* Base line offset for the data value */
    double peakfactor;     /* Smoothing factor for peak value */
    double sv;             /* Sum of variance reciprocals */
+   double sw;             /* Sum of absolute weights */
+   double sww;            /* Sum of squared absolute weights */
    double t;              /* Temporary value */
    double v;              /* Variance reciprocal */
-   double wmax;           /* Largest weight value */
+   double wmax;           /* Absolute weight used for normalisation */
+   double wmean;          /* Mean of the absolute weight values */
    double xx[ 3 ];        /* Internal coords of current pixel */
    double yy[ 3 ];        /* External coords of current pixel */
    int ax_max[ 3 ];       /* Peak posn on axis 0 */
@@ -157,6 +166,8 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    int j;                 /* Vector index within input array */
    int lbnd[ 3 ];         /* Externally ordered lower bounds */
    int nv;                /* Number of variances summed in "sv" */
+   int nw;                /* No. of absolute weights summed in sw and sww */
+   int nwl;               /* No. of weights summed in previous iteration */
    int rem;               /* Remaining count of pixels */
    int ubnd[ 3 ];         /* Externally ordered upper bounds */
 
@@ -165,7 +176,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    static double fbeam;   /* Ratio of observed clump size to beam width */
    static double fvel;    /* Ratio of observed clump velocity width to vel res */
    static double velres;  /* User supplied velocity resolution in pixels */
-   static double wmin;    /* Minimum weight value to use */
+   static double wmin;    /* Minimum weight value to use as fraction of wmax */
    static double wwidth;  /* Ratio of weight function FWHM to observed FWHM */
    static int fax[ 3 ];   /* The internal axis indices */
    static int npar;       /* Number of parameters in fit */
@@ -491,8 +502,10 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    nv = 0;
    sv = 0;
 
-/* Initialise the largest weight used so far to zero. */
-   wmax = 0.0;
+/* Initialise statistics of the weights used so far. */
+   sw = 0.0;
+   sww = 0.0;
+   nw = 0;
 
 /* Loop over all pixels in the section to be fitted. */
    for( i = 0; i < cupidGC.nel; i++ ) {
@@ -542,9 +555,10 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
             }
          }
 
-/* Record the largest weight value. */
-         if( *pw > wmax ) wmax = *pw;
-
+/* Update the weight statistics. */
+         sw += *pw;
+         sww += (*pw)*(*pw);
+         nw++;
       }
 
 /* Move the pointers on to the next pixel in the section of the data
@@ -564,8 +578,51 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       }
    }
 
-/* Normalise the weights to a maximum value of 1.0 and set to zero any weights
-   which are lower than the user supplied lower limit. */
+/* Find the mean and standard deviation of the weights, after sigma-clipping,
+   and then find the absolute weight (wmax) that corresponds to a normalised
+   weight of 1.0. Currently, this is the mean absolute weight plus four
+   standard deviations. In previous versions of CUPID, wmax was just the
+   maximum absolute weight, but this gave problems if the variance array
+   included any very small values (resulting in very large weights). In such
+   cases, the maximum absolute weight was very unrepresentative of the other
+   weights, and could cause the majority of the normalised weight values to
+   fall below the wmin value, and thus be set to zero. */
+   if( nw > 1 ) {
+      wmean = sw/nw;
+      wmax = wmean + 4.0*sqrt( sww/nw - wmean*wmean );
+
+      /* Perform sigma-clipping at 4 sigma until no more weight values
+         exceed the four sigma limit. */
+      nwl = nw + 1;
+      while( nw < nwl ) {
+         nwl = nw;
+
+         sw = 0.0;
+         sww = 0.0;
+         nw = 0;
+         pw = cupidGC.weight;
+         for( i = 0; i < cupidGC.nel; i++,pw++ ) {
+            if( *pw > 0.0 && *pw < wmax ){
+               sw += *pw;
+               sww += (*pw)*(*pw);
+               nw++;
+            }
+         }
+         if( nw > 1 ) {
+            wmean = sw/nw;
+            wmax = wmean + 4.0*sqrt( sww/nw - wmean*wmean );
+         } else {
+            wmax = 0.0;
+            break;
+         }
+      }
+
+   } else {
+      wmax = 0.0;
+   }
+
+/* Normalise the weights to a maximum value of 1.0 and set to zero any
+   normalised weights which are lower than the user supplied lower limit. */
    if( wmax > 0.0 ) {
       pw = cupidGC.weight;
       for( i = 0; i < cupidGC.nel; i++, pw++ ) {
