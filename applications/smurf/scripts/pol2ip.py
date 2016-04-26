@@ -277,14 +277,16 @@ def model2( el, x ):
 def objfun(x):
    global qlist, dqlist, ulist, dulist, elist
    res = 0.0
+   swgt = 0.0
    for i in range(len(elist)):
       (qfp,ufp) = model( i, x )
       qwgt = 1/(dqlist[i]*dqlist[i])
       dq = qfp - qlist[i]
       uwgt = 1/(dulist[i]*dulist[i])
       du = ufp - ulist[i]
-      res += (qwgt*dq*dq + uwgt*du*du)/(qwgt+uwgt)
-   return res
+      res += qwgt*dq*dq + uwgt*du*du
+      swgt += qwgt+uwgt
+   return res/swgt
 
 #  Find weighted RMS residual of Q or U from fit.
 def resid( useq, x ):
@@ -295,12 +297,12 @@ def resid( useq, x ):
       (qfp,ufp) = model( i, x )
       if useq:
          wgt = 1/(dqlist[i]*dqlist[i])
-         dqu = wgt*(qfp - qlist[i])
+         dqu = qfp - qlist[i]
       else:
          wgt = 1/(dulist[i]*dulist[i])
-         dqu = wgt*(ufp - ulist[i])
+         dqu = ufp - ulist[i]
       swgt += wgt
-      res += dqu*dqu
+      res += wgt*dqu*dqu
    return sqrt( res/swgt )
 
 #  Form new lists excluding outliers.
@@ -737,7 +739,7 @@ try:
             invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(umap,diam,xcen,ycen))
             ulist.append( get_task_par( "mean", "aperadd" ) )
 
-            qmasked = NDG( 1 )
+            umasked = NDG( 1 )
             invoke("$KAPPA_DIR/copybad in={0} out={1} ref={2}".
                     format(umap,umasked,mask))
             invoke("$KAPPA_DIR/stats ndf={0} comp=var".format(umasked))
@@ -784,7 +786,7 @@ try:
 #  Get the sum of the weighted values in the first clump.
             qw = NDG( 1 )
             invoke("$KAPPA_DIR/mult in1={0} in2={1}.more.cupid.clumps'(1)'.model out={2}".
-                   format( qmap, clumps, qw ))
+                   format( imap, clumps, qw ))
             invoke("$KAPPA_DIR/stats ndf={0}".format(qw))
             sqw = get_task_par( "total", "stats" )
 
@@ -807,7 +809,7 @@ try:
 
 #  If an input table was supplied, read its contents.
    else:
-      diam = 0.0
+      diam = -999.0
       ival = 0.0
       iref = 0.0
       actpixsize0 = 0.0
@@ -837,7 +839,7 @@ try:
            elif not line.startswith("#"):
               lines.append(line)
 
-      if diam == 0.0 or ival == 0.0 or bad:
+      if diam == -999.0 or ival == 0.0 or bad:
          raise UsageError( "TABLEIN file ('{0}') has unexpected structure.".
                            format(tablein))
       else:
