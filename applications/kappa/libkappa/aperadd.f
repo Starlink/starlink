@@ -97,10 +97,10 @@
 *        and is not intended for passing to other applications.  [!]
 *     MASK = NDF (Write)
 *        An output NDF containing the pixel mask used to evaluate the
-*        reported statistics. The NDF will contain the value +1 for
-*        pixels that are included in the statistics, and bad values
-*        for all other pixels. The pixel bounds of the NDF will be the
-*        smallest needed to encompass all used pixels. [!]
+*        reported statistics. The NDF will contain a positive integer
+*        value for pixels that are included in the statistics, and bad
+*        values for all other pixels. The pixel bounds of the NDF will
+*        be the smallest needed to encompass all used pixels. [!]
 *     MEAN = _DOUBLE (Write)
 *        The mean of the pixel values within the aperture.
 *     NDF = NDF (Read)
