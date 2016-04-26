@@ -160,3 +160,6 @@
 [submodule "thirdparty/perlsys/perlmods/perl-Pod-SST"]
 	path = thirdparty/perlsys/perlmods/perl-Pod-SST
 	url = ../perl-Pod-SST
+[submodule "libext/ast"]
+	path = libext/ast
+	url = ../ast.git
