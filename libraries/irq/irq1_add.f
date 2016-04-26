@@ -80,6 +80,11 @@
 *        Added a read-only flag to the QUAL structure.
 *     4-MAR-2008 (DSB):
 *        Added a "fixed bit" flag to the QUAL structure.
+*     24-APR-2016 (DSB):
+*        Ensure that the comment string passed to CMP_PUT0C is 
+*        not above the maximum allowed length. Truncate it if 
+*        it is to avoid an error being reported that would 
+*        usually cause the application to abort.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -111,6 +116,7 @@
                                  ! of free slots.
       INTEGER LUSED              ! Index of last used slot in QUAL.
       INTEGER NFREE              ! No. of free slots in QUAL.
+      CHARACTER * ( IRQ__SZCOM ) LCOMM ! Local copy of comment
       CHARACTER * ( IRQ__SZQNM ) OLDNAM ! Current NAME string stored in
                                  ! the specified slot of QUAL.
       CHARACTER * ( DAT__SZLOC ) QCLOC ! Locator to the requested cell
@@ -176,11 +182,15 @@
      :                 STATUS )
       END IF
 
+*  Ensure the comment is no longer than IRQ__SZCOM (CMP_PUT0C will report
+*  an error if it is).
+      LCOMM = COMMNT
+
 *  Store the new values.
       CALL CMP_PUT0C( QCLOC, IRQ__NMNAM, QNAME, STATUS )
       CALL CMP_PUT0L( QCLOC, IRQ__FXNAM, .TRUE., STATUS )
       CALL CMP_PUT0L( QCLOC, IRQ__VLNAM, DEFLT, STATUS )
-      CALL CMP_PUT0C( QCLOC, IRQ__CMNAM, COMMNT, STATUS )
+      CALL CMP_PUT0C( QCLOC, IRQ__CMNAM, LCOMM, STATUS )
       CALL CMP_PUT0I( QCLOC, IRQ__BTNAM, 0, STATUS )
       CALL CMP_PUT0L( QCLOC, IRQ__RONAM, .FALSE., STATUS )
       CALL CMP_PUT0L( QCLOC, IRQ__FBNAM, .FALSE., STATUS )
