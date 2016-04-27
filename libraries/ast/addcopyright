@@ -1,2 +1,0 @@
-sed -e 's/*     <COPYRIGHT_STATEMENT>/*     Copyright (C) 1997-'"`date +%Y`"' Council for the Central Laboratory of the\n*     Research Councils/' \
-    -e 's/<COPYRIGHT_STATEMENT>/Copyright (C) 1997-'"`date +%Y`"' Council for the Central Laboratory of the Research Councils/'

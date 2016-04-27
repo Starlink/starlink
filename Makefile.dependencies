@@ -109,7 +109,7 @@ $(MANIFESTS)/ast: \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/sst \
 		$(MANIFESTS)/star2html
-	cd libraries/ast \
+	cd libext/ast \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/astrom: \

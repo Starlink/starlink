@@ -1,4 +1,0 @@
-gcc -g -o simtest simtest.c -DTHREAD_SAFE -I$MYGIT/libraries/ast \
-            -L$GITSTAR/lib `chr_link` `ast_link -ems` `err_link`
-
-
