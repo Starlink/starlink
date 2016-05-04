@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="pcs" support="S">
-  <version>4.1-4</version>
+  <version>4.2-0</version>
   <path>libraries/pcs</path>
   <description>PCS -- Parameter and Communication Subsystems</description>
   <abstract>

@@ -16,9 +16,6 @@
 *     Start the ERR system (switches on message deferral).
 *     Enable MSG tuning by users.
 *     Tune the MAXWPL parameter of HDS
-*     Tune the SHELL parameter of HDS - Allow environment variable to
-*     override the ADAM default of C-shell (Note the HDS default is Bourne
-*     shell which will not translate ~)
 *     Determine if the task has been started from ICL (ie if the environment
 *     variable ICL_TASK_NAME has been defined) and call DTASK_DTASK
 *     or DTASK_DCLTASK as appropriate. ICL_TASK_NAME should be set by
@@ -35,6 +32,7 @@
 *     Copyright (C) 1996, 1998 Central Laboratory of the Research
 *     Councils.
 *     Copyright (C) 2011 Science & Technology Facilities Council.
+*     Copyright (C) 2016 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -56,6 +54,7 @@
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
 *     MJC: Malcolm J. Currie (JAC, Hawaii)
+*     DSB: David Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -76,6 +75,10 @@
 *       Indicate success or failure on exit (subject to ADAM_EXIT set).
 *     2011 October 18 (MJC):
 *       Added MSG_TUNE to permit user control of MSG tuning parameters.
+*     4-MAY-2016 (DSB):
+*       Remove the code that caused the default HDS shell to be changed
+*       to csh. The default HDS shell is now sh (modern sh derived
+*       shells support "~" expansion).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -118,16 +121,6 @@
 
 *  Increase HDS's maximum working page list size (MAXWPL) from the default
       CALL HDS_TUNE ( 'MAXWPL', PAGE_NUM, STATUS )
-
-*  If environment variable HDS_SHELL is not set, Select C-shell option for
-*  HDS file name translation
-      CALL EMS_MARK
-      CALL PSX_GETENV( 'HDS_SHELL', ICLID, STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN
-         CALL EMS_ANNUL( STATUS )
-         CALL HDS_TUNE( 'SHELL', 1, STATUS )
-      ENDIF
-      CALL EMS_RLSE
 
 *  Attempt to get the ICL environment variable
 *  Be prepared for 'normal' situation of failure
