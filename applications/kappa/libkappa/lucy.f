@@ -300,6 +300,11 @@
 *        Added propagation of the WCS component.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     5-MAY-2016 (DSB):
+*        Variable MEANB was being used uninitialised if a null value was
+*        supplied for parameter BACK. Fixed by putting the value of
+*        parameter BACKVAL into variable MEANB rather than into variable
+*        BCKVAL.
 *     {enter_further_changes_here}
 
 *-
@@ -326,7 +331,6 @@
       REAL AIM                   ! Required normalised chi-squared
       LOGICAL BAD2               ! Are any bad pixels present in NDF2?
       LOGICAL BAD5               ! Are any bad pixels present in NDF5?
-      REAL BCKVAL                ! Constant background data value
       REAL CHIFAC                ! Simulated data factor in chi-squared
       INTEGER DIMS1( NDIM )      ! Dimensions sizes in NDF1
       INTEGER DIMS2( NDIM )      ! Dimensions sizes in NDF1
@@ -638,10 +642,10 @@
          CALL ERR_ANNUL( STATUS )
 
 *  Get the background value to use.
-         CALL PAR_GET0R( 'BACKVAL', BCKVAL, STATUS )
+         CALL PAR_GET0R( 'BACKVAL', MEANB, STATUS )
 
 *  Fill internal file 6 with the supplied constant-background value.
-         CALL KPG1_FILLR( BCKVAL, N, %VAL( CNF_PVAL( IP6 ) ), STATUS )
+         CALL KPG1_FILLR( MEANB, N, %VAL( CNF_PVAL( IP6 ) ), STATUS )
 
 *  If an NDF background was supplied, get its bounds.
       ELSE
