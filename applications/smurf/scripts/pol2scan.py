@@ -46,7 +46,8 @@
 *        null (!) is supplied. [!]
 *     CONFIG = LITERAL (Read)
 *        The MAKEMAP configuration parameter values to use. If a null
-*        value (!) or "def" is supplied, the following defaults will be used:
+*        value (!) or "def" is supplied, the following defaults will be
+*        used:
 *
 *        ast.zero_snr=3
 *        ast.zero_snrlo=2
@@ -58,11 +59,10 @@
 *        spikebox=10
 *        spikethresh=5
 *
-*        Any values supplied via an external config file for these
-*        parameters override the above values (any of these parameters
-*        that are unspecified in the external config retain the above
-*        defaults). In addition, the following values are always appended
-*        to the end of the used config (whether external or defaulted):
+*        If a configuration is supplied, it is used in place of the above
+*        default configurations. In either case, the following values are 
+*        always appended to the end of the used config (whether external
+*        or defaulted):
 *
 *        flagslow = 0.01
 *        downsampscale = 0
@@ -215,6 +215,9 @@
 *        - Rename parameter IREF as IPREF.
 *        - Add parameters REF and ALIGN.
 *        - Remove parameters QREF and UREF.
+*     6-MAY-2016 (DSB):
+*        Do not add default values for optional parameters to a supplied
+*        config.
 *
 '''
 
@@ -420,21 +423,21 @@ try:
    conf = os.path.join(NDG.tempdir,"conf")
    fd = open(conf,"w")
 
-#  Start off with the default values.
-   fd.write("ast.zero_snr=3\n")
-   fd.write("ast.zero_snrlo=2\n")
-   fd.write("maptol=0.05\n")
-   fd.write("modelorder=(pca,ext,ast,noi)\n")
-   fd.write("noisecliphigh=3\n")
-   fd.write("numiter=-20\n")
-   fd.write("pca.pcathresh=4\n")
-   fd.write("spikebox=10\n")
-   fd.write("spikethresh=5\n")
-
-#  If a non-default config was supplied, append it to end of the above
-#  config.
+#  If a non-default config was supplied, use it.
    if config and config != "def":
       fd.write("{0}\n".format(config))
+
+#  Otherwise, use the default values.
+   else:
+      fd.write("ast.zero_snr=3\n")
+      fd.write("ast.zero_snrlo=2\n")
+      fd.write("maptol=0.05\n")
+      fd.write("modelorder=(pca,ext,ast,noi)\n")
+      fd.write("noisecliphigh=3\n")
+      fd.write("numiter=-20\n")
+      fd.write("pca.pcathresh=4\n")
+      fd.write("spikebox=10\n")
+      fd.write("spikethresh=5\n")
 
 #  Now put in values that are absolutely required by this script. These
 #  over-write any values in the user-supplied config.
