@@ -587,7 +587,7 @@ try:
 #  centred on the bump, with increasing percentage polarisation at larger
 #  radii. Y pixel axis is reference direction. First create the I map.
       if ipeak != 0.0:
-         invoke("$KAPPA_DIR/maths exp='ia*0+pa*exp(-pc*((xa-px)**2+(xb-py)**2)/(pf**2))' "
+         invoke("$KAPPA_DIR/maths exp=\"'ia*0+pa*exp(-pc*((xa-px)**2+(xb-py)**2)/(pf**2))'\" "
                 "pa={0} pc=1.66511 pf={1} out={2} px={3} py={4} "
                 "ia={5}'({6}:{7},{8}:{9})'".
                 format(ipeak,ifwhm,iart,xc,yc,junk,lx,ux,ly,uy))
@@ -597,7 +597,7 @@ try:
 
 #  Now create the fractional polarisation map.
          fp = NDG(1)
-         invoke("$KAPPA_DIR/maths exp='ia*0+pa' ia={0} out={1} pa={2}".
+         invoke("$KAPPA_DIR/maths exp=\"'ia*0+pa'\" ia={0} out={1} pa={2}".
                 format(iart,fp,pol) )
 
 #  Polarised intensity.
@@ -608,8 +608,8 @@ try:
          theta = NDG(1)
          invoke( "$KAPPA_DIR/maths exp=\"'ia*0+atan2(-(xa-px),(xb-py))'\" "
                  "ia={0} out={1} px={2} py={3}".format(iart,theta,xc,yc) )
-         invoke("$KAPPA_DIR/maths exp='-ia*cos(2*ib)' ia={0} ib={1} out={2}".format(pi,theta,qart) )
-         invoke("$KAPPA_DIR/maths exp='-ia*sin(2*ib)' ia={0} ib={1} out={2}".format(pi,theta,uart) )
+         invoke("$KAPPA_DIR/maths exp=\"'-ia*cos(2*ib)'\" ia={0} ib={1} out={2}".format(pi,theta,qart) )
+         invoke("$KAPPA_DIR/maths exp=\"'-ia*sin(2*ib)'\" ia={0} ib={1} out={2}".format(pi,theta,uart) )
 
 #  Fill I, Q and U images with zeros if IPEAK is zero.
       else:
@@ -695,7 +695,7 @@ try:
 
 #  Apply the CFACTOR expansion.
          tmpcom = NDG(1)
-         invoke("$KAPPA_DIR/maths exp='pa*(ia-pb)+pb' ia={0} pa={1} pb={2} out={3}".
+         invoke("$KAPPA_DIR/maths exp=\"'pa*(ia-pb)+pb'\" ia={0} pa={1} pb={2} out={3}".
                 format(fillcom,cfactor,mean,tmpcom) )
 
 #  Now split the COM signal up into individual files.
@@ -744,14 +744,14 @@ try:
 #  Create a map of the fractional instrumental polarisation across each
 #  array. Note, all subarrays are given the same IP pattern.
          ipi = NDG(1)
-         invoke("$KAPPA_DIR/maths exp='xa*(pa-pb)/31+pb+xb*0' type=_REAL "
+         invoke("$KAPPA_DIR/maths exp=\"'xa*(pa-pb)/31+pb+xb*0'\" type=_REAL "
                 "pa={0} pb={1} lbound=\[0,0\] ubound=\[31,39\] out={2}".
                 format(ipmax,ipmin,ipi))
 
 #  Create the corresponding normalised Q and U maps.
-         invoke("$KAPPA_DIR/maths exp='ip*cosd(2*pt)' ip={0} pt={1} out={2}".
+         invoke("$KAPPA_DIR/maths exp=\"'ip*cosd(2*pt)'\" ip={0} pt={1} out={2}".
                 format(ipi,iptheta,ipqu[0] ))
-         invoke("$KAPPA_DIR/maths exp='ip*sind(2*pt)' ip={0} pt={1} out={2}".
+         invoke("$KAPPA_DIR/maths exp=\"'ip*sind(2*pt)'\" ip={0} pt={1} out={2}".
                 format(ipi,iptheta,ipqu[1] ))
 
          ipqu.save( "IPQU" )
@@ -786,7 +786,7 @@ try:
 
 #  Apply the GFACTOR expansion.
          tmpgai = NDG(1)
-         invoke("$KAPPA_DIR/maths exp='pa*(ia-1)+1' ia={0} pa={1} out={2}".
+         invoke("$KAPPA_DIR/maths exp=\"'pa*(ia-1)+1'\" ia={0} pa={1} out={2}".
                 format(fillgai,cfactor,tmpgai) )
 
 #  Now split the GAI signal up into individual files.

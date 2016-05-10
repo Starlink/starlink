@@ -185,10 +185,10 @@
 *        - Calculate the error on the mean Q and U values, and use these
 *        errors to weight each data point in the fit.
 *     9-MAY-2016 (DSB):
-*        Generate quadratic fits to the beamfit geometric parameters.  
+*        Generate quadratic fits to the beamfit geometric parameters.
 *        These can be used later to calculate the expected IP beam shape
-*        at any elevation. These are only generated if DIAM is zero or 
-*        negative, and are stored in a file called "beamfit.asc". 
+*        at any elevation. These are only generated if DIAM is zero or
+*        negative, and are stored in a file called "beamfit.asc".
 *-
 '''
 
@@ -273,7 +273,7 @@ def cleanup():
 
 
 #  Functions related to fitting a single quadratic model to a set of
-#  (x,y) positions (x valuesin qxlist and yvalus in qylist).
+#  (x,y) positions (x values in qxlist and y values in qylist).
 #  ------------------------------------------------------------------
 
 #  Objective function used by minimisation routine. It returns the
@@ -357,10 +357,11 @@ def fitquad(text,a,b,c,xvals,yvals):
 
 #  Do a fit to find the optimum model parameters.
       res = minimize( objfunquad, x0, method='nelder-mead',
-                      options={'xtol': 1e-4, 'disp': True})
+                      options={'xtol': 1e-5, 'disp': True})
 
 #  Find RMS residual between data and fit.
       rms = residquad( res.x )
+      msg_out( "   Fit: {0}    RMS: {1}".format(res.x, rms) )
 
 #  Remove points more than 2 sigma from the fit.
       rejectquad( 2*rms, res.x )
@@ -636,12 +637,14 @@ try:
             msg_out("Re-using pre-calculated Q and U time streams for {0}.".format(obs))
 
 #  Make maps from the Q and U time streams. These Q and U values are with
-#  respect to the focal plane Y axis.
+#  respect to the focal plane Y axis, and use (az,el) as the WCS axes. Set
+#  CROTA to zero to ensure that the Y axis corresponds to elevation.
          mapfile = "{0}/qmap.sdf".format(obsdir)
          if not os.path.exists( mapfile ) or newpixsize:
             qts = NDG( "{0}/*_QT".format( obsdir ) )
             qmap = NDG( mapfile, False )
-            invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} {3}".format(qts,conf,qmap,pixsizepar))
+            invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} {3} "
+                   "system=azel crota=0".format(qts,conf,qmap,pixsizepar))
          else:
             qmap = NDG( mapfile, True )
             msg_out("Re-using pre-calculated Q map for {0}.".format(obs))
@@ -659,7 +662,8 @@ try:
          if not os.path.exists( mapfile ) or newpixsize:
             uts = NDG( "{0}/*_UT".format( obsdir ) )
             umap = NDG( mapfile, False )
-            invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} {3}".format(uts,conf,umap,pixsizepar))
+            invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} {3} "
+                   "system=azel crota=0".format(uts,conf,umap,pixsizepar))
          else:
             umap = NDG( mapfile, True )
             msg_out("Re-using pre-calculated U map for {0}.".format(obs))
@@ -687,7 +691,7 @@ try:
 #  Form the polarised intensity map (no de-biassing), and remove the
 #  spectral axis.
          tmp1 = NDG( 1 )
-         invoke( "$KAPPA_DIR/maths exp='sqrt(ia**2+ib**2)' ia={0} ib={1} out={2}"
+         invoke( "$KAPPA_DIR/maths exp=\"'sqrt(ia**2+ib**2)'\" ia={0} ib={1} out={2}"
                  .format(qmap,umap,tmp1) )
          pimap = NDG( 1 )
          invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(tmp1,pimap) )
@@ -769,9 +773,27 @@ try:
 #  intensity source and then get the weighted mean Q and U values value.
          if diam <= 0.0:
             try:
+               bresid2 = NDG(1)
+               invoke("$KAPPA_DIR/beamfit ndf={0}'(0~30,0~30)' pos=\"'{1},{2}'\" "
+                      "gauss=no mode=int resid={3}".format(pimap,xcen,ycen,bresid2) )
+
+#  Blank out residuals that are more than 3 sigma. The sidelobes should
+#  be blanked out by this process.
+               invoke("$KAPPA_DIR/stats ndf={0}".format(bresid2) )
+               lim = 3*get_task_par( "sigma", "stats" )
+
+               masked = NDG(1)
+               invoke("$KAPPA_DIR/maths exp=\"'qif((abs(ib)<pa),ia,<bad>)'\" "
+                      "ib={0} ia={1} out={2} pa={3}".
+                      format(bresid2,pimap,masked,lim) )
+
+#  Run beamfit again on the masked PI map to get a better fit on the
+#  central component.
                bresid = NDG(1)
                invoke("$KAPPA_DIR/beamfit ndf={0}'(0~30,0~30)' pos=\"'{1},{2}'\" "
-                      "gauss=no mode=int resid={3}".format(pimap,xcen,ycen,bresid) )
+                      "gauss=no mode=int resid={3}".format(masked,xcen,ycen,bresid) )
+
+#  Store the geometric parameters of the fit.
                fwhm1list.append( degrees( get_task_par( "majfwhm(1)", "beamfit" ))*3600 )
                fwhm2list.append( degrees( get_task_par( "minfwhm(1)", "beamfit" ))*3600 )
                orientlist.append( get_task_par( "orient(1)", "beamfit" ) )
@@ -795,7 +817,7 @@ try:
 
 #  Multiply the squared model by the Q variance values, and get the total sum of the product.
                qvw = NDG( 1 )
-               invoke("$KAPPA_DIR/maths exp='ib*ib*va' va={0} ib={1} out={2}".
+               invoke("$KAPPA_DIR/maths exp=\"'ib*ib*va'\" va={0} ib={1} out={2}".
                       format( qmap, bmodel, qvw ))
                invoke("$KAPPA_DIR/stats ndf={0}".format(qvw))
                wwqvsum = get_task_par( "total", "stats" )
@@ -808,7 +830,7 @@ try:
 
 #  Multiply the squared model by the U variance values, and get the total sum of the product.
                uvw = NDG( 1 )
-               invoke("$KAPPA_DIR/maths exp='ib*ib*va' va={0} ib={1} out={2}".
+               invoke("$KAPPA_DIR/maths exp=\"'ib*ib*va'\" va={0} ib={1} out={2}".
                       format( umap, bmodel, uvw ))
                invoke("$KAPPA_DIR/stats ndf={0}".format(uvw))
                wwuvsum = get_task_par( "total", "stats" )
@@ -1044,8 +1066,9 @@ try:
 
 #  If we have models for all beams, produce fits of FWHM1 and FWHM2 (in
 #  arc-seconds) against elevation (in degrees), shape parameter (gamma)
-#  against beam area (in square arc-seconds), and orientation (in degrees)
-#  against azimuth (in degrees).
+#  against beam area (in square arc-seconds), and orientation (in
+#  degrees, from elevation axis to azimuth axis) against azimuth
+#  (in degrees).
       if diam <= 0.0:
 
          (a1,b1,c1) = fitquad( "FWHM1 against elevation", 14.0, 0.0, 0.0, elist0, fwhm1list )

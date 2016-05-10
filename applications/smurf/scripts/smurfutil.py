@@ -106,11 +106,11 @@ def blanker( test, model, newtest ):
 #  Normalize them both to have a mean of zero and a standard deviation of
 #  unity.
    tnorm = "{0}/tnorm".format(NDG.tempdir)
-   invoke( "$KAPPA_DIR/maths exp='(ia-pa)/pb' ia={2} pa={0} pb={1} "
+   invoke( "$KAPPA_DIR/maths exp=\"'(ia-pa)/pb'\" ia={2} pa={0} pb={1} "
            "out={3}".format(tmean,tsigma,tmask,tnorm))
 
    mnorm = "{0}/mnorm".format(NDG.tempdir)
-   invoke( "$KAPPA_DIR/maths exp='(ia-pa)/pb' ia={2} pa={0} pb={1} "
+   invoke( "$KAPPA_DIR/maths exp=\"'(ia-pa)/pb'\" ia={2} pa={0} pb={1} "
            "out={3}".format(mmean,msigma,mmask,mnorm))
 
 #  Find the difference between them.

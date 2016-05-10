@@ -60,7 +60,7 @@
 *        spikethresh=5
 *
 *        If a configuration is supplied, it is used in place of the above
-*        default configurations. In either case, the following values are 
+*        default configurations. In either case, the following values are
 *        always appended to the end of the used config (whether external
 *        or defaulted):
 *
@@ -113,6 +113,12 @@
 *        by a previous run of SMURF:CALCQU (the LSQFIT parameter must be set
 *        to TRUE when running CALCQU). If not supplied, the IN parameter
 *        is used to get input NDFs holding POL-2 time series data. [!]
+*     IPBEAMFIX = _LOGICAL (Read)
+*        Should the supplied total intensity reference image (parameter
+*        IPREF) be modified so that its beam shape matches the expected
+*        IP beam shape at the elevation of the supplied POL2 data, before
+*        doing IP correction? This is currently an experimental feature.
+*        [FALSE]
 *     IPREF = NDF (Read)
 *        A 2D NDF holding a map of total intensity within the sky area
 *        covered by the input POL2 data, in units of pW. If supplied,
@@ -290,6 +296,10 @@ try:
    params.append(starutil.ParNDG("INQU", "NDFs containing previously calculated Q and U values",
                                  None,noprompt=True))
 
+   params.append(starutil.Par0L("IPBEAMFIX", "Convolve the IPREF map to "
+                                "the expected IP beam shape?", False,
+                                noprompt=True))
+
    params.append(starutil.Par0L("DEBIAS", "Remove statistical bias from P"
                                 "and IP?", False, noprompt=True))
 
@@ -342,6 +352,9 @@ try:
 
 #  See if statistical debiasing is to be performed.
    debias = parsys["DEBIAS"].value
+
+#  See if the beam is to be corrected in the IPREF map.
+   ipbeamfix = parsys["IPBEAMFIX"].value
 
 #  See if we should determine pointing corrections.
    align = parsys["ALIGN"].value
@@ -607,6 +620,102 @@ try:
                fd.write("54000 {0} {1}\n".format(dx,dy))
                fd.write("56000 {0} {1}\n".format(dx,dy))
                fd.close()
+
+
+
+
+
+#  Convolve the supplied ip reference map to give it a beam that matches
+#  the expected IP beam at the elevation of the supplied data.
+   if ipbeamfix and ipref != "!":
+      msg_out( "Convolving the I reference map to match the expected IP beam shape...")
+
+#  Get the azmimuth and elevation of the POL2 data.
+      el1 = float( starutil.get_fits_header( qts[0], "ELSTART" ) )
+      el2 = float( starutil.get_fits_header( qts[0], "ELEND" ) )
+      el = 0.5*( el1 + el2 )
+      az1 = float( starutil.get_fits_header( qts[0], "AZSTART" ) )
+      az2 = float( starutil.get_fits_header( qts[0], "AZEND" ) )
+      az = 0.5*( az1 + az2 )
+
+#  Get the pixel size in the input total intensity map.
+      invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(ipref) )
+      ipixsize = float( starutil.get_task_par( "fpixscale(1)", "ndftrace" ) )
+
+#  Generate an NDF holding the canonical total-intensity beam (circular).
+#  Parameters are: pg=shape exponent, pf=FWHM in arc-sec, pp=pixel size
+#  in arc-sec.
+      ibeam = NDG(1)
+      invoke("$KAPPA_DIR/maths exp=\"'exp(-0.69315*((4*((xa+0.5)**2+(xb+0.5)**2)/(fa*fa))**(pg/2)))'\" "
+             "fa=\"'pf/pp'\" lbound=\[-15,-15\] ubound=\[15,15\] type=_double "
+             "pf=14 pg=1.984 pp={1} out={0}".format(ibeam,ipixsize) )
+
+#  Get the parameters of the expected polarised-intensity beam, at the
+#  elevation of the data. FWHM values are in arc-seconds. Area is in square
+#  arc-seconds. Orientation is in degrees from the elevation axis towards
+#  the azimuth axis.
+      fwhm1 = 14.6914727284 + 0.0421973549002*el - 9.70079974113e-05*el*el
+      fwhm2 = 15.245386229 - 0.115624437578*el + 0.000763994058326*el*el
+      area = fwhm1*fwhm2
+      gamma = 4.65996074835 - 0.0340987643291*area + 0.000115483045339*area*area
+      orient = 118.639637086 - 0.472915017742*az +  0.00140620919736*az*az
+
+#  Get the angle from the Y pixel axis to the elevation axis in the supplied
+#  image. Positive rotation is from X pixel axis to Y pixel axis.
+      junk = NDG(1)
+      invoke("$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(ipref,junk))
+      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=skyrefis newval=origin".format(junk))
+      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=system newval=azel".format(junk))
+
+      junk2 = NDG(1)
+      invoke("$KAPPA_DIR/rotate in={0} out={1} angle=!".format(junk,junk2))
+      angrot = float( starutil.get_task_par( "angleused", "rotate" ) )
+
+#  Convert the major axis orientation from sky coords to pixel coords.
+      orient = angrot - orient
+
+#  Convert FWHM values to pixels.
+      fwhm1 = fwhm1/ipixsize
+      fwhm2 = fwhm2/ipixsize
+
+#  Generate an NDF holding the expected polarised-intensity IP beam, at the
+#  elevation of the data. This image has the same WCS axis orientation as the
+#  supplied total intensity image.
+      ipbeam = NDG(1)
+      invoke("$KAPPA_DIR/maths exp=\"'exp(-0.69315*((4*((fx/px)**2+(fy/py)**2))**(pg/2)))'\" "
+             "fx=\"'-(xa+0.5)*sind(po)+(xb+0.5)*cosd(po)'\" fy=\"'-(xa+0.5)*cosd(po)-(xb+0.5)*sind(po)'\" "
+             "lbound=\[-15,-15\] ubound=\[15,15\] type=_double po={4} "
+             "px={1} py={2} pg={3} out={0}".format(ipbeam,fwhm1,fwhm2,gamma,orient) )
+
+#  Deconvolve the IP beam using the total intensity beam as the PSF. This
+#  gives the required smoothing kernel.
+      tmp1 = NDG(1)
+      invoke("$KAPPA_DIR/wiener in={0} pmodel=1 pnoise=1E-5 psf={1} xcentre=0 ycentre=0 "
+             "out={2}".format(ipbeam,ibeam,tmp1))
+
+#  The results seem to have less ringing if the kernel is apodised. Use
+#  a Gaussian of FWHM 30 arc-seconds as the apodising function.
+      tmp2 = NDG(1)
+      invoke("$KAPPA_DIR/maths exp=\"'ia*exp(-((xa+0.5)**2+(xb+0.5)**2)/fa)'\" "
+             "fa=\"'30/pa'\" pa={1} ia={0} out={2}".format(tmp1,ipixsize,tmp2))
+
+#  Ensure the kernal has a total data value of unity. This means the
+#  input and output maps will have the same normalisation.
+      invoke("$KAPPA_DIR/stats ndf={0}".format(tmp2))
+      total = starutil.get_task_par( "total", "stats" )
+      bkernel = NDG(1)
+      invoke("$KAPPA_DIR/cdiv in={0} scalar={1} out={2}".format(tmp2,total,bkernel))
+
+#  Convolve the supplied total intensity map using this kernel. The
+#  output map should have a beam similar to the expected IP beam.
+      iprefbeam = NDG(1)
+      invoke("$KAPPA_DIR/convolve in={0} psf={1} xcentre=0 ycentre=0 "
+             "out={2}".format(ipref,bkernel,iprefbeam))
+      ipref = iprefbeam
+
+
+
+
 
 #  Make a map from the Q time series.
    msg_out( "Making a map from the Q time series...")
