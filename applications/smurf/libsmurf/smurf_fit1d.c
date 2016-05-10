@@ -1633,7 +1633,7 @@ static void copy_parameter_ndfs ( smfArray *pardata, int *status )
   kpg1Rgndf( "PARCOMP",  0, 0, "", &cgrp, &csize, status );
   if ( *status == PAR__NULL ) {
     csize = 0;
-    *status = SAI__OK;
+    errAnnul(status);
   }
 
   if ( *status != SAI__OK )
