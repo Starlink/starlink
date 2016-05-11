@@ -213,9 +213,9 @@ void smurf_fts2_phasecorrds(int* status)
     double* outDataWN_pntr    = NULL;               /* Pointer to output data Wave Numbers values array */
     smfData* outDataWT        = NULL;               /* Pointer to output data Weights DEBUG */
     double* outDataWT_pntr    = NULL;               /* Pointer to output data Weights values array */
-#endif
     smfData* outDataFPM       = NULL;               /* Pointer to output data fit coefficients */
     double* outDataFPM_pntr   = NULL;               /* Pointer to output data fit coefficients values array */
+#endif
     /*smfData* zpdData          = NULL;*/           /* Pointer to ZPD data */
     smfData* zpd              = NULL;               /* Pointer to ZPD index data */
     smfData* fpm              = NULL;               /* Pointer polynomial fit parameters */
@@ -250,8 +250,8 @@ void smurf_fts2_phasecorrds(int* status)
     double* FIT               = NULL;               /* Fitted phase */
 #if DEBUG
     double* FITS              = NULL;               /* DEBUG Fitted phase Saved */
-#endif
     double* FPM       = NULL;                       /* DC Offset, Slope, Chi^2 fit coefficients Saved */
+#endif
     double* COEFFS            = NULL;               /* Polynomial coefficients */
     double* TMPPHASE          = NULL;               /* Temporary phase */
     fftw_complex* DSIN        = NULL;               /* Double-Sided interferogram, FFT input */
@@ -499,7 +499,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataSIC->dims[2] = nFrames;
         outDataSIC_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSIC_pntr));
         outDataSIC->pntr[0] = outDataSIC_pntr;
-#endif
+
         /* Copy input data into output data chi^2 goodness of fit */
         outDataFPM = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataFPM->dtype   = SMF__DOUBLE;
@@ -509,6 +509,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataFPM->dims[2] = coeffLength;        /* DC offset, slope, chi^2 */
         outDataFPM_pntr = (double*) astMalloc((nPixels * coeffLength) * sizeof(*outDataFPM_pntr));
         outDataFPM->pntr[0] = outDataFPM_pntr;
+#endif
 
         /* MORE.FTS2.ZPD */
         zpd = smf_deepcopy_smfData( NULL, inData->fts->zpd, 0, SMF__NOCREATE_FTS, 0, 0, status);
@@ -605,8 +606,8 @@ void smurf_fts2_phasecorrds(int* status)
         FIT     = astCalloc((nFrames2 + 1), sizeof(*FIT));
 #if DEBUG
         FITS    = astCalloc((nFrames2 + 1), sizeof(*FITS));
-#endif
         FPM     = astCalloc((nWidth*nHeight*coeffLength + 1), sizeof(*FPM));
+#endif
         TMPPHASE= astCalloc((nFrames2 + 1), sizeof(*TMPPHASE));
         DSIN    = fftw_malloc(nFrames * sizeof(*DSIN));
         DSOUT   = fftw_malloc(nFrames * sizeof(*DSOUT));
@@ -665,10 +666,10 @@ void smurf_fts2_phasecorrds(int* status)
                             outDataWN_pntr[index] = VAL__BADD;  /* DEBUG */
                             outDataWT_pntr[index] = VAL__BADD;  /* DEBUG */
                         }
-#endif
                         if(k < coeffLength) {
                             outDataFPM_pntr[index] = VAL__BADD;
                         }
+#endif
                     }
                     continue;
                 }
@@ -817,11 +818,11 @@ void smurf_fts2_phasecorrds(int* status)
                 smf_fit_poly1d_chisq(pDegree, nFrames2, WN, TMPPHASE, WEIGHTS, NULL, COEFFS, NULL, FIT, &nUsed, &rchisq, status);
                 /*printf("%s DEBUG: smf__fit_poly1d: pDegree=%d, nelem=%d, COEFFS[0]=%f, COEFFS[1]=%f, rchisq=%f, i=%d, j=%d\n",
                        TASK_NAME, pDegree, (nFrames2+1), COEFFS[0], COEFFS[1], rchisq, i, j);*/
+#if DEBUG
                 for(k = 0; k < coeffLength-1; k++) {
                     FPM[bolIndex + nPixels * k] = COEFFS[k];
                 }
                 FPM[bolIndex + nPixels * (coeffLength-1)] = rchisq;           /* CHI^2 (goodness of fit) */
-#if DEBUG
                 for(k = 0; k <= nFrames2; k++) { FITS[k] = FIT[k]; }    /* DEBUG */
 #endif
 
@@ -897,10 +898,10 @@ void smurf_fts2_phasecorrds(int* status)
                         outDataWN_pntr[index] = WN[k];                     /* DEBUG */
                         outDataWT_pntr[index] = WEIGHTS[k];                /* DEBUG */
                     }
-#endif
                     if(k < coeffLength) {
                         outDataFPM_pntr[bolIndex + nPixels * k] = FPM[bolIndex + nPixels * k];    /* DC Offset, Slope, Chi^2 */
                     }
+#endif
                 }
             }
         }
@@ -919,8 +920,8 @@ void smurf_fts2_phasecorrds(int* status)
         if(FIT)      { FIT      = astFree(FIT); }
 #if DEBUG
         if(FITS)     { FITS     = astFree(FITS); }
-#endif
         if(FPM)      { FPM = astFree(FPM); }
+#endif
         if(DSIN)     { fftw_free(DSIN);           DSIN      = NULL; }
         if(DSOUT)    { fftw_free(DSOUT);          DSOUT     = NULL; }
         if(IFGDF)    { fftw_free(IFGDF);          IFGDF     = NULL; }
@@ -1193,7 +1194,6 @@ void smurf_fts2_phasecorrds(int* status)
             goto CLEANUP;
         }
 
-#endif
         /* Write output chi^2 goodness of fit */
         /* Append unique suffix to fileName */
         n = one_snprintf(outDataFPM->file->name, sizeof(fileName), "%sphs_%s", status, fileName, "FPM");
@@ -1212,6 +1212,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error closing outDataFPM file", status);
             goto CLEANUP;
         }
+#endif
 
         /* Write output */
         outData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, dead, a, b, c, d, phaseFit, cosmicRays, fluxJumps, status);
@@ -1249,8 +1250,8 @@ CLEANUP:
     if(FIT)      { FIT      = astFree(FIT); }
 #if DEBUG
     if(FITS)     { FITS     = astFree(FITS); }
-#endif
     if(FPM)      { FPM = astFree(FPM); }
+#endif
     if(DSIN)     { fftw_free(DSIN);   DSIN  = NULL; }
     if(DSOUT)    { fftw_free(DSOUT);  DSOUT = NULL; }
     if(IFGDF)    { fftw_free(IFGDF);  IFGDF = NULL; }
