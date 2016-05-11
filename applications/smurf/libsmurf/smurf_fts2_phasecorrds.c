@@ -1216,11 +1216,6 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* Write output */
         outData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, dead, a, b, c, d, phaseFit, cosmicRays, fluxJumps, status);
-        n = one_snprintf(outData->file->name, sizeof(fileName), "%sphs", status, fileName);
-        if(n < 0 || n >= SMF_PATH_MAX) {
-            errRepf(TASK_NAME, "Error creating outData->file->name", status);
-            goto CLEANUP;
-        }
         smf_write_smfData(NULL, outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB,
                           0, NULL, NULL, status);
         if(*status != SAI__OK) {
