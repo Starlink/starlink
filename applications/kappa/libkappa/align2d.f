@@ -4,7 +4,7 @@
 *     ALIGN2D
 
 *  Purpose:
-*     Aligns a pair of two-dimensional NDFs by minimising the residuals 
+*     Aligns a pair of two-dimensional NDFs by minimising the residuals
 *     between them.
 
 *  Language:
@@ -42,11 +42,22 @@
 *     create an output NDF (see Parameter OUT). It is possible to
 *     restrict the transformation in order to prevent shear, rotation,
 *     scaling, etc. (see Parameter FORM).
+*
+*     It is possible to exclude from the fitting process areas of the
+*     input NDF that are poorly correlated with the corresponding areas
+*     in the reference NDF (e.g. flat background areas that contain
+*     only noise). See parameter CORLIMIT.
 
 *  Usage:
 *     align2d in ref out
 
 *  ADAM Parameters:
+*     BOX = _INTEGER (Read)
+*        The box size, in pixels, over which to calculate the correlation
+*        coefficient between the input and reference images. This should
+*        be set to an estimate of the maximum expected shift between the
+*        two images, but should not be less than typical size of features
+*        within the two images. See also parameter CORLIMIT. [5]
 *     CONSERVE = _LOGICAL (Read)
 *        If set TRUE, then the output pixel values will be scaled in
 *        such a way as to preserve the total data value in a feature on
@@ -62,6 +73,19 @@
 *        and is assumed to be constant for all output pixels in the
 *        panel.  This parameter is ignored if the NORM parameter is set
 *        FALSE.  [TRUE]
+*     CORLIMIT = _REAL (Read)
+*        If CORLIMIT is not null (!), each pixel in the input image is
+*        checked to see if the pixel values in its locality are well
+*        correlated with the corresponding locality in the reference image.
+*        The input pixel is excluded from the fitting process if the
+*        local correlation is below CORLIMIT. The supplied value should
+*        be between zero and 1.0. The size of the locality used around
+*        each input pixel is given by parameter BOX.
+*
+*        In addition, if a value is supplied for CORLIMIT, the input and
+*        reference pixel values that pass the above check are scaled so
+*        that they have a mean value of zero and a standard deviation of
+*        unity before  being used in the fitting process. [!]
 *     FORM = _INTEGER (Read)
 *        The form of the affine transformation to use:
 *
@@ -233,7 +257,7 @@
 *     which is a unit transformation between IN and REF. If the actual
 *     transformation is very different, then it would be faster and more
 *     accurate to create a better first guess using an FFT approach,
-*     such as phase correlation.  See "Robust image registration using 
+*     such as phase correlation.  See "Robust image registration using
 *     log-polar transform" by George Wolberg and Siavash Zokai
 *     (http://www-cs.engr.ccny.cuny.edu/~wolberg/pub/icip00.pdf).
 
@@ -320,6 +344,15 @@
 *  History:
 *     2-FEB-2016 (DSB):
 *        Original version.
+*     11-MAY-2016 (DSB):
+*        - When doing the fit, exclude areas where there is low correlation
+*        between input and reference (as defined by new parameters CORLIMIT
+*        and BOX.
+*        - Ensure the input and reference values have a mean of zero and
+*        a standard deviation of unity when doing the fit. This is only done
+*        if a value is supplied for CORLIMIT, as otherwise the mean and
+*        standard deviation would be heavily dominated by background areas
+*        rather than source areas.
 *     {enter_further_changes_here}
 
 *-
@@ -334,6 +367,7 @@
       INCLUDE 'AST_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'CNF_PAR'
+      INCLUDE 'DAT_PAR'
 
 *  Status:
       INTEGER STATUS
@@ -349,6 +383,8 @@
       DOUBLE PRECISION C( 6 )
       DOUBLE PRECISION DLBNDI( 2 )
       DOUBLE PRECISION DUBNDI( 2 )
+      DOUBLE PRECISION IFAC
+      DOUBLE PRECISION IOFF
       DOUBLE PRECISION LPO
       DOUBLE PRECISION MATRIX( 4 )
       DOUBLE PRECISION PARAMS( 4 )
@@ -356,11 +392,14 @@
       DOUBLE PRECISION PT1O( 2 )
       DOUBLE PRECISION PT2I( 2 )
       DOUBLE PRECISION PT2O( 2 )
+      DOUBLE PRECISION RFAC
+      DOUBLE PRECISION ROFF
       DOUBLE PRECISION SHIFT( 2 )
       DOUBLE PRECISION TOL
       DOUBLE PRECISION UPO
       DOUBLE PRECISION XL( 2 )
       DOUBLE PRECISION XU( 2 )
+      INTEGER BOX
       INTEGER DIMS( 2 )
       INTEGER EL
       INTEGER ELI
@@ -373,6 +412,7 @@
       INTEGER INDF2
       INTEGER INDF3
       INTEGER INTERP
+      INTEGER IPCR
       INTEGER IPDATI
       INTEGER IPDATO
       INTEGER IPIN
@@ -397,6 +437,7 @@
       INTEGER NBAD
       INTEGER NDIM
       INTEGER NDIMI
+      INTEGER NREJ
       INTEGER NPARAM
       INTEGER SM
       INTEGER UBND( 2 )
@@ -411,7 +452,12 @@
       LOGICAL REBIN
       LOGICAL VIN
       LOGICAL VREF
+      REAL CORLIM
       REAL WLIM
+
+      integer IPT, place, indft
+
+
 *.
 
 *  Check inherited global status.
@@ -441,7 +487,7 @@
       END IF
 
 *  Trim the input pixel-index bounds to match. First clone the IN
-*  identifier in case we need it when crting an output NDF.
+*  identifier in case we need it when creating an output NDF.
       CALL NDF_CLONE( INDF1, INDF1A, STATUS )
       CALL NDF_MBND( 'TRIM', INDF1, INDF2, STATUS )
 
@@ -474,9 +520,67 @@
          IPVREF = IPREF
       END IF
 
+* If required, get a map holding the local correlation coefficient at each pixel.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+      CALL PAR_GDR0R( 'CORLIMIT', 0.7, 0.0, 1.0, .FALSE., CORLIM,
+     :                STATUS )
+
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         CORLIM = -1.0
+
+*  If we have not checked the correlation, leave the input and reference
+*  values unchanged.
+         IFAC = 1.0D0
+         RFAC = 1.0D0
+         IOFF = 0.0D0
+         ROFF = 0.0D0
+
+      ELSE
+         CALL PAR_GDR0I( 'BOX', 5, 3, 1E6, .FALSE., BOX, STATUS )
+         CALL PSX_CALLOC( EL, '_DOUBLE', IPCR, STATUS )
+
+         CALL KPG1_CRMAPD( DIMS( 1 ), DIMS( 2 ), %VAL( CNF_PVAL(IPIN) ),
+     :                     %VAL( CNF_PVAL(IPREF) ), BOX,
+     :                     %VAL( CNF_PVAL(IPCR) ), STATUS )
+
+*  Replace the correlation coefficient values with a copy of the input
+*  image in which pixel with low correlations are set bad. This also
+*  returns factors and offsets to be used with the remaining values in
+*  input and reference images in order to give them a mean of zero and a
+*  standard deviation of 1.0 .
+         CALL KPS1_ALIG0( DIMS( 1 ), DIMS( 2 ), %VAL( CNF_PVAL(IPIN) ),
+     :                    %VAL( CNF_PVAL(IPREF) ), CORLIM,
+     :                    %VAL( CNF_PVAL(IPCR) ), NREJ, IFAC, RFAC,
+     :                    IOFF, ROFF, STATUS )
+
+         IF( NREJ .EQ. 0 ) THEN
+            CALL MSG_OUT( ' ', 'No pixels rejected due to low '//
+     :                    'correlation', STATUS )
+
+         ELSE IF( NREJ .EQ. 1 ) THEN
+            CALL MSG_OUT( ' ', 'One pixel rejected due to low '//
+     :                    'correlation', STATUS )
+
+         ELSE
+            CALL MSG_SETI( 'N', NREJ )
+            CALL MSG_OUT( ' ', '^N pixels rejected due to low '//
+     :                    'correlation', STATUS )
+         END IF
+
+*  Use this copy in place of the original.
+         IPIN = IPCR
+
+      END IF
+
 *  Calculate the alignment transformation.
       CALL KPG1_ALIGN( DIMS( 1 ), DIMS( 2 ), IPIN, IPREF, VIN, VREF,
-     :                 IPVIN, IPVREF, FORM, C, STATUS )
+     :                 IPVIN, IPVREF, FORM, IFAC, RFAC, IOFF, ROFF, C,
+     :                 STATUS )
+
+*  If a local copy of the input array is in used, free it.
+      IF( CORLIM .GE. 0 ) CALL PSX_FREE( IPIN, STATUS )
 
 *  Get the pixel index bounds of the NDF sections used in the
 *  minimisation.

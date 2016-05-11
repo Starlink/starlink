@@ -202,7 +202,7 @@ void kpgStati( int, int, const int[], int, const float[], int *, int *,
                int *, int *, double *, int *, double *, double *, double *,
                double * , int * );
 
-
+void kpg1CrMapD( int, int, const double x[], const double y[], int, double *, int * );
 
 
 #endif

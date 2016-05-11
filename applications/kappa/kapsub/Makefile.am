@@ -8,7 +8,7 @@ libkapsub_tk_la_CFLAGS = $(X_CFLAGS)
 libkapsub_tk_la_SOURCES = $(TK_C_ROUTINES)
 
 F_ROUTINES = cnthlt.f curre.f ftsize.f ftsizt.f getv2.f hstdsp.f \
-hstlo.f hstrep.f imlst.f inpol.f inre.f inva.f \
+hstlo.f hstrep.f imlst.f inpol.f inre.f inva.f kps1_alig0.f \
 kps1_agnch.f kps1_agncm.f kps1_agncp.f kps1_agndl.f kps1_agndr.f \
 kps1_agndw.f kps1_agnls.f kps1_agnms.f kps1_agnst.f kps1_agnwc.f \
 kps1_bfcrf.f kps1_bffil.f kps1_bffn.f  kps1_bfft.f  \

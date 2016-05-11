@@ -1,5 +1,6 @@
       SUBROUTINE KPG1_ALIGN( NX, NY, IPIN, IPREF, VIN, VREF,
-     :                       IPVIN, IPVREF, FORM, C, STATUS )
+     :                       IPVIN, IPVREF, FORM, IFAC, RFAC,
+     :                       IOFF, ROFF, C, STATUS )
 *+
 *  Name:
 *     KPG1_ALIGN
@@ -12,7 +13,8 @@
 
 *  Invocation:
 *     CALL KPG1_ALIGN( NX, NY, IPIN, IPREF, VIN, VREF,
-*                      IPVIN, IPVREF, FORM, C, STATUS )
+*                      IPVIN, IPVREF, FORM, IFAC, RFAC,
+*                      IOFF, ROFF, C, STATUS )
 
 *  Description:
 *     This routine aligns  a pair of 2-dimensional arrays using a least
@@ -47,6 +49,20 @@
 *        - 1: Shift, rotation and a common X/Y scale but no shear.
 *        - 2: Shift and rotation but no scale or shear.
 *        - 3: Shift but not rotation, scale or shear.
+*     IFAC = DOUBLE PRECISION (Given)
+*        A factor by which the input values should be multipled before
+*        being used. Idealy, this should result in them having a standard
+*        deviation of unity.
+*     RFAC = DOUBLE PRECISION (Given)
+*        A factor by which the reference values should be multipled before
+*        being used. Idealy, this should result in them having a standard
+*        deviation of unity.
+*     IOFF = DOUBLE PRECISION (Given)
+*        An offset to subtract from the scaled input values before being used.
+*        Idealy, this should result in them having a mean of zero.
+*     ROFF = DOUBLE PRECISION (Given)
+*        An offset to subtract from the scaled reference values before being
+*        Used. Idealy, this should result in them having a mean of zero.
 *     C = DOUBLE PRECISION( 6 ) (Returned)
 *        The coefficients of the affine transformation:
 *
@@ -85,6 +101,8 @@
 *  History:
 *     8-FEB-2016 (DSB):
 *        Original version.
+*     11-MAY-2016 (DSB):
+*        Added arguments IFAC, RFAC, IOFF and ROFF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -112,9 +130,14 @@
       LOGICAL DEBUGC
       LOGICAL VINC
       LOGICAL VREFC
+      DOUBLE PRECISION IFACC
+      DOUBLE PRECISION RFACC
+      DOUBLE PRECISION IOFFC
+      DOUBLE PRECISION ROFFC
       COMMON /KPG1_ALIGN_COM1/ IPINC, IPREFC, IPVINC, IPVREFC, NXC, NYC,
      :                        IENTRY
       COMMON /KPG1_ALIGN_COM2/ DEBUGC, VINC, VREFC
+      COMMON /KPG1_ALIGN_COM3/ IFACC, RFACC, IOFFC, ROFFC
 
 *  External References:
       EXTERNAL KPG1_ALIGN2
@@ -129,6 +152,10 @@
       INTEGER IPVIN
       INTEGER IPVREF
       INTEGER FORM
+      DOUBLE PRECISION IFAC
+      DOUBLE PRECISION RFAC
+      DOUBLE PRECISION IOFF
+      DOUBLE PRECISION ROFF
 
 *  Arguments Returned:
       DOUBLE PRECISION C( 6 )
@@ -137,16 +164,12 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER JUNK*2
       DOUBLE PRECISION P( 6 )
-      DOUBLE PRECISION FC
       INTEGER FILTER
       INTEGER IPFVEC
       INTEGER INFO
       INTEGER IPW1
-      INTEGER I
       INTEGER IPW2
-      INTEGER J
       INTEGER LWA
       INTEGER M
       INTEGER NP
@@ -180,6 +203,10 @@
       NXC = NX
       NYC = NY
       IENTRY = 0
+      IFACC = IFAC
+      RFACC = RFAC
+      IOFFC = IOFF
+      ROFFC = ROFF
 
 *  See if debug information is to be created. If so, warn the user about
 *  the many NDFs that will be created.
@@ -310,9 +337,14 @@
       LOGICAL DEBUGC
       LOGICAL VINC
       LOGICAL VREFC
+      DOUBLE PRECISION IFACC
+      DOUBLE PRECISION RFACC
+      DOUBLE PRECISION IOFFC
+      DOUBLE PRECISION ROFFC
       COMMON /KPG1_ALIGN_COM1/ IPINC, IPREFC, IPVINC, IPVREFC, NXC, NYC,
      :                        IENTRY
       COMMON /KPG1_ALIGN_COM2/ DEBUGC, VINC, VREFC
+      COMMON /KPG1_ALIGN_COM3/ IFACC, RFACC, IOFFC, ROFFC
 
 *  Arguments Given:
       INTEGER M
@@ -346,7 +378,7 @@
      :                  %VAL( CNF_PVAL( IPREFC ) ), C,
      :                  VINC, %VAL( CNF_PVAL( IPVINC ) ),
      :                  VREFC, %VAL( CNF_PVAL( IPVREFC ) ),
-     :                  FVEC, FSUM, STATUS )
+     :                  IFACC, RFACC, IOFFC, ROFFC, FVEC, FSUM, STATUS )
 
 *  If required, dump the residuals to an NDF for debugging purposes, and
 *  display the current coefficients.
@@ -376,7 +408,8 @@
 
       SUBROUTINE KPG1_ALIGN3( NX, NY, IN, REF, C,
      :                        USEVIN, VIN, USEVREF, VREF,
-     :                        FVEC, FSUM, STATUS )
+     :                        IFAC, RFAC, IOFF, ROFF, FVEC, FSUM,
+     :                        STATUS )
 
 *  Name:
 *     KPG1_ALIGN3
@@ -387,7 +420,8 @@
 
 *  Invocation:
 *     CALL KPG1_ALIGN3(  NX, NY, IN, REF, C, USEVIN, VIN,
-*                        USEVREF, VREF, FVEC, FSUM, STATUS )
+*                        USEVREF, VREF, IFAC, RFAC, IOFF, ROFF,
+*                        FVEC, FSUM, STATUS )
 
 *  Description:
 *     The IN map is resampled using affine transformation with
@@ -417,6 +451,20 @@
 *     VREF( NX, NY ) = DOUBLE PRECISION (Given)
 *        The variances associated with the REF array. Only used if VREF is
 *        .TRUE.
+*     IFAC = DOUBLE PRECISION (Given)
+*        A factor by which the input values should be multipled before
+*        being used. Idealy, this should result in them having a standard
+*        deviation of unity.
+*     RFAC = DOUBLE PRECISION (Given)
+*        A factor by which the reference values should be multipled before
+*        being used. Idealy, this should result in them having a standard
+*        deviation of unity.
+*     IOFF = DOUBLE PRECISION (Given)
+*        An offset to subtract from the scaled input values before being used.
+*        Idealy, this should result in them having a mean of zero.
+*     ROFF = DOUBLE PRECISION (Given)
+*        An offset to subtract from the scaled reference values before being
+*        Used. Idealy, this should result in them having a mean of zero.
 *     FVEC( * ) = DOUBLE PRECISION (Returned)
 *        The residuals at all pixels.
 *     FSUM = DOUBLE PRECISION (Returned)
@@ -441,6 +489,10 @@
       DOUBLE PRECISION VIN( NX, NY )
       LOGICAL USEVREF
       DOUBLE PRECISION VREF( NX, NY )
+      DOUBLE PRECISION IFAC
+      DOUBLE PRECISION RFAC
+      DOUBLE PRECISION IOFF
+      DOUBLE PRECISION ROFF
 
 *  Arguments Returned:
       DOUBLE PRECISION FVEC( * )
@@ -450,7 +502,6 @@
       INTEGER STATUS
 
 *  Local Variables:
-      DOUBLE PRECISION DIFF
       DOUBLE PRECISION DREF
       DOUBLE PRECISION DX
       DOUBLE PRECISION DY
@@ -469,9 +520,7 @@
       DOUBLE PRECISION WGT
       DOUBLE PRECISION WSUM
       DOUBLE PRECISION XIN
-      DOUBLE PRECISION XREF
       DOUBLE PRECISION YIN
-      DOUBLE PRECISION YREF
       INTEGER IFVEC
       INTEGER IREF
       INTEGER IX
@@ -501,6 +550,7 @@
          DO IREF = 1, NX
             DREF = REF( IREF, JREF )
             IF( DREF .NE. VAL__BADD ) THEN
+               DREF = DREF * RFAC - ROFF
 
 *  Get the grid coords of the corresponding point in IN.
                XIN = KX + C( 2 )*DBLE( IREF )
@@ -547,6 +597,9 @@
 *  centred on the required interpolation point.
                      INTERP = V1*DX*DY + V2*DX*EY + V3*EX*DY + V4*EX*EY
 
+*  Scale it.
+                     INTERP = INTERP*IFAC - IOFF
+
 *  If we are using the IN variances as weights, find the associated
 *  variance.
                      IF( USEVIN ) THEN
@@ -560,6 +613,8 @@
      :                      V4 .NE. VAL__BADD ) THEN
                            VINTERP = V1*(DX*DY)**2 + V2*(DX*EY)**2 +
      :                               V3*(EX*DY)**2 + V4*(EX*EY)**2
+                           VINTERP = VINTERP*IFAC*IFAC
+
                         ELSE
                            INTERP = VAL__BADD
                         END IF
@@ -581,7 +636,7 @@
                   END IF
 
                   IF( USEVIN .AND. TOTVAR .NE. VAL__BADD ) THEN
-                     TOTVAR = TOTVAR + VINTERP
+                     TOTVAR = TOTVAR*RFAC*RFAC + VINTERP
                   END IF
 
                   IF( TOTVAR .NE. VAL__BADD .AND.

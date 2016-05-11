@@ -9679,11 +9679,25 @@ KAPPA: \htmlref{CADD}{CADD},
       an output NDF (see Parameter OUT). It is possible to restrict the
       transformation in order to prevent shear, rotation, scaling,
       \emph{etc}. (see Parameter FORM).
+
+      It is possible to exclude from the fitting process areas of the
+      input NDF that are poorly correlated with the corresponding areas
+      in the reference NDF (\emph{e.g.} flat background areas that contain
+      only noise). See Parameter CORLIMIT.
    }
    \sstusage{
       align2d in ref out
    }
    \sstparameters{
+      \sstsubsection{
+         BOX = \_INTEGER (Read)
+      }{
+         The box size, in pixels, over which to calculate the correlation
+         coefficient between the input and reference images. This should
+         be set to an estimate of the maximum expected shift between the
+         two images, but should not be less than typical size of features
+         within the two images. See also Parameter CORLIMIT. \texttt{[5]}
+      }
       \sstsubsection{
          CONSERVE = \_LOGICAL (Read)
       }{
@@ -9701,6 +9715,22 @@ KAPPA: \htmlref{CADD}{CADD},
          and is assumed to be constant for all output pixels in the
          panel.  This parameter is ignored if the NORM parameter is set
          FALSE.   \texttt{[TRUE]}
+      }
+      \sstsubsection{
+         CORLIMIT = \_REAL (Read)
+      }{
+         If CORLIMIT is not null (\texttt{!}), each pixel in the input image
+         is checked to see if the pixel values in its locality are well
+         correlated with the corresponding locality in the reference image.
+         The input pixel is excluded from the fitting process if the
+         local correlation is below CORLIMIT. The supplied value should
+         be between zero and 1.0. The size of the locality used around
+         each input pixel is given by parameter BOX. \texttt{[!]}
+
+         In addition, if a value is supplied for CORLIMIT, the input and
+         reference pixel values that pass the above check are scaled so
+         that they have a mean value of zero and a standard deviation of
+         unity before  being used in the fitting process. \texttt{[!]}
       }
       \sstsubsection{
          FORM = \_INTEGER (Read)

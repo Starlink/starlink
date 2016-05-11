@@ -7620,11 +7620,29 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+         parameter box {
+            type _integer
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Larger of maximum expected shift or feature size, in pixels}
+            default 5
+            helpkey *
+         }
+
          parameter conserve {
             type _LOGICAL
             vpath DYNAMIC
             ppath CURRENT DYNAMIC
             prompt {Conserve flux?}
+            helpkey *
+         }
+
+         parameter corlimit {
+            type _real
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Lower limit on local correlation for usable input pixels}
+            default !
             helpkey *
          }
 
