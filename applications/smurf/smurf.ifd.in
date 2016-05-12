@@ -2169,51 +2169,6 @@ package @PACKAGE@ {
             }
         }
 
-        action fts2split {
-
-            helplib {$SMURF_HELP}
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT}
-                ppath GLOBAL CURRENT
-                prompt {Input data files}
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT}
-                ppath GLOBAL CURRENT
-                prompt {Output data files}
-                helpkey *
-            }
-
-            parameter bandpass {
-                position 3
-                type _REAL
-                access READ
-                vpath DEFAULT
-                ppath DEFAULT
-                default 0.0
-                prompt {Distance to extract on either side of centre (mm)}
-                helpkey *
-            }
-
-            parameter outfiles {
-                type LITERAL
-                prompt {Text file in which to put the output NDF names}
-                default !
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                helpkey *
-            }
-        }
-
         action fts2init {
 
             helplib {$SMURF_HELP}
@@ -2616,6 +2571,51 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 prompt {Zero padding}
                 default 1
+                helpkey *
+            }
+        }
+
+        action fts2split {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Input data files}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Output data files}
+                helpkey *
+            }
+
+            parameter bandpass {
+                position 3
+                type _REAL
+                access READ
+                vpath DEFAULT
+                ppath DEFAULT
+                default 0.0
+                prompt {Distance to extract on either side of centre (mm)}
+                helpkey *
+            }
+
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 helpkey *
             }
         }
