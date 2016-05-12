@@ -25,6 +25,8 @@
 *     This is intended to be changed to just append a uniqe sub-scan number.
 
 *  ADAM Parameters:
+*     BANDPASS = REAL (Read)
+*          Distance to extract on either side of center (mm). [0.0]
 *     IN = NDF (Read)
 *          Input files to be transformed.
 *     OUT = NDF (Write)

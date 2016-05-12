@@ -24,6 +24,12 @@
 *     Corrects for the pixel-to-pixel variation in spectral responsivity,
 *     due to detector characteristics.
 
+*  ADAM Parameters:
+*      IN = NDF (Read)
+*          Input data files.
+*      OUT = NDF (Write)
+*          Output data files.
+
 *  Authors:
 *     COBA: Coskun Oba (UoL)
 

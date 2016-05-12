@@ -35,7 +35,7 @@
 *          Input files to be transformed.
 *     OUT = NDF (Write)
 *          Output files.
-*     PFHALFLENGTH = _INTEGER (Read)
+*     PCFHALFLENGTH = _INTEGER (Read)
 *          Phase Correction Function half-length.
 *     WNLBOUND = _DOUBLE (Read)
 *          The lower bound of the wavenumber range

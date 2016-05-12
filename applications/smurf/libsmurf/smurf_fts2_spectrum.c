@@ -34,6 +34,10 @@
 *          by factoring out its unique heat response deviation
 *          from the expected Planck curve response
 *          as measured through black body heated load scans
+*     WNSFPFIRST = DOUBLE (Read)
+*          Spectral filter profile wave number range starting from.
+*     WNSFPLAST = DOUBLE (Read)
+*          Spectral filter profile wave number range ending with.
 *     ZEROPAD = LOGICAL (Read)
 *          Determines whether to zeropad.
 *     RESOLUTION = _INTEGER (Read)

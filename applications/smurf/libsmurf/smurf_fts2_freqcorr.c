@@ -24,6 +24,14 @@
 *     to the different path difference that off-axis rays travel through the
 *     interferometer.
 
+*  ADAM Parameters:
+*      IN = NDF (Read)
+*          Input data files.
+*      OUT = NDF (Write)
+*          Output data files.
+*      THETA = NDF (Read)
+*          Theta file storing the off-axis angles.
+
 *  Authors:
 *     COBA: Coskun Oba (UoL)
 

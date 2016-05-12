@@ -24,6 +24,12 @@
 *     given the current PWV and elevation. Transmission data is stored in the
 *     form of a wet and dry Tau vs frequency table in the calibration database.
 
+*  ADAM Parameters:
+*      IN = NDF (Read)
+*          Input data files.
+*      OUT = NDF (Write)
+*          Output data files.
+
 *  Authors:
 *     COBA: Coskun Oba (UoL)
 

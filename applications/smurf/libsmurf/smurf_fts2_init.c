@@ -29,6 +29,8 @@
 *          Input files to be transformed.
 *     OUT = NDF (Write)
 *          Output files.
+*     RTSDELAY = REAL (Read)
+*          RTS delay (ms). [0.0]
 *     ZPD = NDF (Read)
 *          ZPD calibration file.
 *     FNYQUIST = DOUBLE (Read)
