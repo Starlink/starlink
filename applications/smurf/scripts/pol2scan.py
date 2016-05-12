@@ -224,6 +224,11 @@
 *     6-MAY-2016 (DSB):
 *        Do not add default values for optional parameters to a supplied
 *        config.
+*     12-MAY-2016 (DSB):
+*        - Improve pointing correction by using CORLIMIT option when 
+*        running kappa:align2d.
+*        - Use the Epoch of the POL2 observation rather than the Epoch of 
+*        the IP reference map when determining the expected IP beam shape.
 *
 '''
 
@@ -530,7 +535,8 @@ try:
 
 #  Find the pixel shift that aligns features in this masked, trimmed I map with
 #  corresponding features in the reference map.
-            invoke("$KAPPA_DIR/align2d ref={0} out=! in={1} form=3".format(ref,imap))
+            invoke("$KAPPA_DIR/align2d ref={0} out=! in={1} form=3 corlimit=0.7".
+                   format(ref,imap))
             dx = float( starutil.get_task_par( "TR(1)", "align2d" ) )
             dy = float( starutil.get_task_par( "TR(4)", "align2d" ) )
 
@@ -660,10 +666,26 @@ try:
       gamma = 4.65996074835 - 0.0340987643291*area + 0.000115483045339*area*area
       orient = 118.639637086 - 0.472915017742*az +  0.00140620919736*az*az
 
+#  Convert the array of TCS_TAI values within the JCMTSTATE extension of
+#  the first Q time series into an NDF, and then get the average TCS_TAI
+#  value (the epoch as an MJD).
+      tcstai = NDG(1)
+      invoke("$HDSTOOLS_DIR/hcreate type=image inp={0}".format(tcstai))
+      invoke("$HDSTOOLS_DIR/hcopy in={0}.more.jcmtstate.tcs_tai out={1}.data_array".
+             format(qts[0],tcstai))
+      invoke("$KAPPA_DIR/stats ndf={0}".format(tcstai))
+      epoch = float( starutil.get_task_par( "mean", "stats" ) )
+
 #  Get the angle from the Y pixel axis to the elevation axis in the supplied
-#  image. Positive rotation is from X pixel axis to Y pixel axis.
+#  IP reference image. Positive rotation is from X pixel axis to Y pixel axis.
+#  We need to set the WCS to AZEL offsets to do this, but we first need to
+#  set the Epoch in the image to that of the POL2 observation, in order to
+#  ensure that the AZEL axes are approriate to the time the POL2 dta was
+#  taken rather than the time of the image. And we to do this without
+#  adjusting the WCS Mappings. Take a copy to avoid changing the original.
       junk = NDG(1)
       invoke("$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(ipref,junk))
+      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=epoch newval=\"'MJD {1}'\" remap=no".format(junk,epoch))
       invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=skyrefis newval=origin".format(junk))
       invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=system newval=azel".format(junk))
 
