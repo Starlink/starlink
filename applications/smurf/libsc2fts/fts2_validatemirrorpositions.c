@@ -161,10 +161,16 @@ void fts2_validatemirrorpositions(double* positions, double* times, int count, i
     for(i=0,j=count-1; i < count; i++,j--) {
       /* Do a simple reversal on the positions */
       invertedP[i] = positions[j];
-      /* Set the first inverted time to the first original time of the reverse scan */
-      if(i==0) invertedT[i] = times[j];
-      /* Set subsequent inverted times to be equal to the previous value plus the original difference to the next value */
-      invertedT[i] = invertedT[i-1] + (times[j+1] - times[j]);
+      if (i==0) {
+        /* Set the first inverted time to the first original time of
+           the reverse scan */
+        invertedT[i] = times[j];
+      }
+      else {
+        /* Set subsequent inverted times to be equal to the previous value
+           plus the original difference to the next value */
+        invertedT[i] = invertedT[i-1] + (times[j+1] - times[j]);
+      }
       for(x = 0; x < nWidth; x++) {
         for(y = 0; y < nHeight; y++) {
           bolIndex = x + y * nWidth;
