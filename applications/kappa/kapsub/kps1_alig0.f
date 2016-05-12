@@ -140,8 +140,6 @@
       ISUM2 = 0.0D0
       NGOOD = 0
 
-      write(*,*) '# ix iy in'
-
       DO IY = 1, NY
          DO IX = 1, NX
 
@@ -162,12 +160,6 @@
                RSUM2 = RSUM2 + REF( IX, IY )**2
                NGOOD = NGOOD + 1
             END IF
-
-            IF( CR( IX, IY ) .NE. VAL__BADD ) then
-         write(*,*) ix, iy,  CR( IX, IY )
-            ELSE
-         write(*,*) ix, iy,  ' null'
-            ENDIF
 
          END DO
       END DO
