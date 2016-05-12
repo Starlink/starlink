@@ -27,6 +27,11 @@
 *          Input files to be transformed.
 *     OUT = NDF (Write)
 *          Output files.
+*     RESOLUTION = _INTEGER (Read)
+*          Spectral Grid Resolution.
+*          0 : Full Resolution
+*          Any other value : Custom Resolution
+*          Default behaviour is the Full Resolution
 *     SFP = NDF (Read)
 *          Spectral Filter Profile (optional)
 *          Supply this sub-array specific NDF calibration file
@@ -40,11 +45,6 @@
 *          Spectral filter profile wave number range ending with.
 *     ZEROPAD = LOGICAL (Read)
 *          Determines whether to zeropad.
-*     RESOLUTION = _INTEGER (Read)
-*          Spectral Grid Resolution.
-*          0 : Full Resolution
-*          Any other value : Custom Resolution
-*          Default behaviour is the Full Resolution
 
 *  Authors:
 *     COBA: Coskun Oba (UoL)

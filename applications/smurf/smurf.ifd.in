@@ -2183,17 +2183,17 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter rtsdelay {
-                type _REAL
+            parameter fnyquist {
+                type _DOUBLE
                 access READ
-                vpath DEFAULT
-                ppath DEFAULT
-                default 0.0
-                prompt {RTS delay (ms)}
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Override the default Nyquist frequency}
+                default 0
                 helpkey *
             }
 
-            parameter in {
+           parameter in {
                 position 1
                 type NDF
                 access READ
@@ -2213,6 +2213,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter rtsdelay {
+                type _REAL
+                access READ
+                vpath DEFAULT
+                ppath DEFAULT
+                default 0.0
+                prompt {RTS delay (ms)}
+                helpkey *
+            }
+
             parameter zpd {
                 position 3
                 type NDF
@@ -2220,16 +2230,6 @@ package @PACKAGE@ {
                 vpath {PROMPT}
                 ppath GLOBAL CURRENT
                 prompt {ZPD calibration file}
-                helpkey *
-            }
-
-            parameter fnyquist {
-                type _DOUBLE
-                access READ
-                vpath {PROMPT}
-                ppath CURRENT DEFAULT
-                prompt {Override the default Nyquist frequency}
-                default 0
                 helpkey *
             }
         }
@@ -2520,6 +2520,17 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter resolution {
+                type _DOUBLE
+
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Spectral Resolution: }
+                default 0.0
+                helpkey *
+            }
+
             parameter sfp {
                 position 3
                 type NDF
@@ -2553,17 +2564,6 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter resolution {
-                type _DOUBLE
-
-                access READ
-                vpath {PROMPT}
-                ppath CURRENT DEFAULT
-                prompt {Spectral Resolution: }
-                default 0.0
-                helpkey *
-            }
-
             parameter zeropad {
                 type _INTEGER
                 access READ
@@ -2578,6 +2578,17 @@ package @PACKAGE@ {
         action fts2split {
 
             helplib {$SMURF_HELP}
+
+            parameter bandpass {
+                position 3
+                type _REAL
+                access READ
+                vpath DEFAULT
+                ppath DEFAULT
+                default 0.0
+                prompt {Distance to extract on either side of centre (mm)}
+                helpkey *
+            }
 
             parameter in {
                 position 1
@@ -2596,17 +2607,6 @@ package @PACKAGE@ {
                 vpath {PROMPT}
                 ppath GLOBAL CURRENT
                 prompt {Output data files}
-                helpkey *
-            }
-
-            parameter bandpass {
-                position 3
-                type _REAL
-                access READ
-                vpath DEFAULT
-                ppath DEFAULT
-                default 0.0
-                prompt {Distance to extract on either side of centre (mm)}
                 helpkey *
             }
 

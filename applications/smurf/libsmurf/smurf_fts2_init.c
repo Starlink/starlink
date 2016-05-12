@@ -25,6 +25,9 @@
 *  ADAM Parameters:
 *     CENTRE = REAL (Read)
 *          Moving mirror position at centre of travel (mm).
+*     FNYQUIST = DOUBLE (Read)
+*          Override the default Nyquist frequency
+*          (default scalculated to be 50.0 at SCANVEL of 4.2 mm/sec) (Optional)
 *     IN = NDF (Read)
 *          Input files to be transformed.
 *     OUT = NDF (Write)
@@ -33,9 +36,6 @@
 *          RTS delay (ms). [0.0]
 *     ZPD = NDF (Read)
 *          ZPD calibration file.
-*     FNYQUIST = DOUBLE (Read)
-*          Override the default Nyquist frequency
-*          (default scalculated to be 50.0 at SCANVEL of 4.2 mm/sec) (Optional)
 
 *  Notes:
 *     - The CENTRE parameter should be the same value as was used when

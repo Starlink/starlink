@@ -27,6 +27,8 @@
 *     recommended that the FTS2PHASECORRDS task is utilized to process them.
 
 *  ADAM Parameters:
+*     APODIZATION
+*          Apodization Method
 *     DEGREE = _INTEGER (Read)
 *          Order of the fitting polynomial.
 *     DSHALFLENGTH = _INTEGER (Read)
@@ -41,8 +43,6 @@
 *          The lower bound of the wavenumber range
 *     WNUBOUND = _DOUBLE (Read)
 *          The upper bound of the wavenumber range
-*     APODIZATION
-*          Apodization Method
 
 *  Authors:
 *     COBA: Coskun Oba (UoL)

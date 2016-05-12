@@ -25,10 +25,10 @@
 *  ADAM Parameters:
 *     CCSIZE = _INTEGER (Read)
 *          Core cluster size.
-*     DSHALFLENGTH = _INTEGER (Read)
-*          Double-Sided interferogram half length.
 *     DEGLITCHMODE = _INTEGER (Read)
 *          Deglitching mode, 1=CORE, 2=TAIL and any other value means ALL
+*     DSHALFLENGTH = _INTEGER (Read)
+*          Double-Sided interferogram half length.
 *     IN = NDF (Read)
 *          Input files to be transformed.
 *     OUT = NDF (Write)

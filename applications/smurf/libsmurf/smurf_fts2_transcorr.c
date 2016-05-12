@@ -25,15 +25,15 @@
 *     form of a wet and dry Tau vs frequency table in the calibration database.
 
 *  ADAM Parameters:
+*     DEBUG = LOGICAL (Read)
+*          If debug, does NOT include the dry component of the atnoshpheric
+*          transmission in the computation
 *     IN = NDF (Read)
 *          Input files to be transformed.
 *     OUT = NDF (Write)
 *          Output files.
 *     TAU = NDF (Read)
 *          TAU files.
-*     DEBUG = LOGICAL (Read)
-*          If debug, does NOT include the dry component of the atnoshpheric
-*          transmission in the computation
 
 *  Authors:
 *     COBA: Coskun Oba (UoL)

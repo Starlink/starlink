@@ -27,12 +27,12 @@
 *     recommended that the FTS2PHASECORR task is utilized to process them.
 
 *  ADAM Parameters:
+*     DEGREE = _INTEGER (Read)
+*          Order of the fitting polynomial.
 *     IN = NDF (Read)
 *          Input files to be transformed.
 *     OUT = NDF (Write)
 *          Output files.
-*     DEGREE = _INTEGER (Read)
-*          Order of the fitting polynomial.
 *     WNLBOUND = _DOUBLE (Read)
 *          The lower bound of the wavenumber range
 *     WNUBOUND = _DOUBLE (Read)
