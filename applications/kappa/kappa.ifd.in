@@ -7646,6 +7646,15 @@ package kappa {
             helpkey *
          }
 
+         parameter fitvals {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Adjust pixel value scale and offset as part of the fitting process?}
+            default FALSE
+            helpkey *
+         }
+
          parameter form {
             type _integer
             vpath DEFAULT

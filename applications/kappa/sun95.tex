@@ -9733,6 +9733,14 @@ KAPPA: \htmlref{CADD}{CADD},
          unity before  being used in the fitting process. \texttt{[!]}
       }
       \sstsubsection{
+         FITVALS = \_LOGICAL (Read)
+      }{
+         If TRUE, the fitting process will adjust the scale and offset of
+         the input data values, in addition to the geometric position of
+         the the input values, in order to minimise the sum of the squared
+         residuals.  \texttt{[FALSE]}
+      }
+      \sstsubsection{
          FORM = \_INTEGER (Read)
       }{
          The form of the affine transformation to use:
@@ -9866,7 +9874,9 @@ KAPPA: \htmlref{CADD}{CADD},
          OUT = NDF (Writed)
       }{
          An optional output NDF to contain a copy of IN aligned with OUT.
-         No output is created if null (\texttt{!}) is supplied.
+         No output is created if null (\texttt{!}) is supplied. If FITVALS
+         is TRUE, the output data values will be scaled so that they have
+         the same normalisation as the reference values.
       }
       \sstsubsection{
          PARAMS( 2 ) = \_DOUBLE (Read)

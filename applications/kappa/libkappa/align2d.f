@@ -86,6 +86,11 @@
 *        reference pixel values that pass the above check are scaled so
 *        that they have a mean value of zero and a standard deviation of
 *        unity before  being used in the fitting process. [!]
+*     FITVALS = _LOGICAL (Read)
+*        If TRUE, the fitting process will adjust the scale and offset of
+*        the input data values, in addition to the geometric position of
+*        the the input values, in order to minimise the sum of the squared
+*        residuals. [FALSE]
 *     FORM = _INTEGER (Read)
 *        The form of the affine transformation to use:
 *
@@ -181,7 +186,9 @@
 *        also Parameter CONSERVE.  [TRUE]
 *     OUT = NDF (Writed)
 *        An optional output NDF to contain a copy of IN aligned with
-*        OUT.  No output is created if null (!) is supplied.
+*        OUT.  No output is created if null (!) is supplied. If FITVALS
+*        is TRUE, the output data values will be scaled so that they have
+*        the same normalisation as the reference values.
 *     PARAMS( 2 ) = _DOUBLE (Read)
 *        An optional array which consists of additional parameters
 *        required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
@@ -353,6 +360,7 @@
 *        if a value is supplied for CORLIMIT, as otherwise the mean and
 *        standard deviation would be heavily dominated by background areas
 *        rather than source areas.
+*        - Add parameter FITVALS.
 *     {enter_further_changes_here}
 
 *-
@@ -380,7 +388,7 @@
       CHARACTER DTYPE * ( NDF__SZFTP )
       CHARACTER ITYPE * ( NDF__SZTYP )
       CHARACTER METHOD * ( 16 )
-      DOUBLE PRECISION C( 6 )
+      DOUBLE PRECISION C( 8 )
       DOUBLE PRECISION DLBNDI( 2 )
       DOUBLE PRECISION DUBNDI( 2 )
       DOUBLE PRECISION IFAC
@@ -394,11 +402,14 @@
       DOUBLE PRECISION PT2O( 2 )
       DOUBLE PRECISION RFAC
       DOUBLE PRECISION ROFF
+      DOUBLE PRECISION SCALE
       DOUBLE PRECISION SHIFT( 2 )
       DOUBLE PRECISION TOL
       DOUBLE PRECISION UPO
+      DOUBLE PRECISION VSCALE
       DOUBLE PRECISION XL( 2 )
       DOUBLE PRECISION XU( 2 )
+      DOUBLE PRECISION ZERO
       INTEGER BOX
       INTEGER DIMS( 2 )
       INTEGER EL
@@ -449,6 +460,7 @@
       INTEGER*8 NUSED
       LOGICAL BAD
       LOGICAL CONSRV
+      LOGICAL FITVAL
       LOGICAL HASQUA
       LOGICAL MORE
       LOGICAL NORM
@@ -576,10 +588,13 @@
 
       END IF
 
+*  See if the data values are to be included in the fit.
+      CALL PAR_GET0L( 'FITVALS', FITVAL, STATUS )
+
 *  Calculate the alignment transformation.
       CALL KPG1_ALIGN( DIMS( 1 ), DIMS( 2 ), IPIN, IPREF, VIN, VREF,
-     :                 IPVIN, IPVREF, FORM, IFAC, RFAC, IOFF, ROFF, C,
-     :                 STATUS )
+     :                 IPVIN, IPVREF, FORM, IFAC, RFAC, IOFF, ROFF,
+     :                 FITVAL, C, STATUS )
 
 *  If a local copy of the input array is in used, free it.
       IF( CORLIM .GE. 0 ) CALL PSX_FREE( IPIN, STATUS )
@@ -609,6 +624,14 @@
       CALL MSG_SETR( 'C6', REAL( C( 6 ) ) )
       CALL MSG_OUT( ' ', '   Yin = (^C4) + (^C5)*Xref + (^C6)*Yref',
      :              STATUS )
+
+      IF( FITVAL ) THEN
+         CALL MSG_SETR( 'C7', REAL( C( 7 ) ) )
+         CALL MSG_SETR( 'C8', REAL( C( 8 ) ) )
+         CALL MSG_OUT( ' ', '   IN_value = (^C7)*REF_value + (^C8)',
+     :                 STATUS )
+      END IF
+
       CALL MSG_BLANK( STATUS )
 
 *  Write them to an output parameter.
@@ -1008,6 +1031,63 @@
      :                             UBNDO, %VAL( CNF_PVAL( IPQUAO )),
      :                             %VAL( CNF_PVAL( IPQUAO )),
      :                             STATUS )
+
+         END IF
+
+*  Apply the scale and offset.
+         IF( FITVAL ) THEN
+            SCALE = 1.0D0/C( 7 )
+            VSCALE = SCALE**2
+            ZERO = -C( 8 )/C( 7 )
+
+            IF ( ITYPE .EQ. '_BYTE' ) THEN
+               CALL KPS1_ALIG1B( SCALE, ZERO, ELO,
+     :                           %VAL( CNF_PVAL( IPDATO )), STATUS )
+               IF( VIN ) CALL KPS1_ALIG1B( VSCALE, 0.0D0, ELO,
+     :                           %VAL( CNF_PVAL( IPVARO )), STATUS )
+
+            ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+               CALL KPS1_ALIG1UB( SCALE, ZERO, ELO,
+     :                           %VAL( CNF_PVAL( IPDATO )), STATUS )
+               IF( VIN ) CALL KPS1_ALIG1UB( VSCALE, 0.0D0, ELO,
+     :                           %VAL( CNF_PVAL( IPVARO )), STATUS )
+
+            ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+               CALL KPS1_ALIG1W( SCALE, ZERO, ELO,
+     :                           %VAL( CNF_PVAL( IPDATO )), STATUS )
+               IF( VIN ) CALL KPS1_ALIG1W( VSCALE, 0.0D0, ELO,
+     :                           %VAL( CNF_PVAL( IPVARO )), STATUS )
+
+            ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+               CALL KPS1_ALIG1UW( SCALE, ZERO, ELO,
+     :                           %VAL( CNF_PVAL( IPDATO )), STATUS )
+               IF( VIN ) CALL KPS1_ALIG1UW( VSCALE, 0.0D0, ELO,
+     :                           %VAL( CNF_PVAL( IPVARO )), STATUS )
+
+            ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+               CALL KPS1_ALIG1I( SCALE, ZERO, ELO,
+     :                           %VAL( CNF_PVAL( IPDATO )), STATUS )
+               IF( VIN ) CALL KPS1_ALIG1I( VSCALE, 0.0D0, ELO,
+     :                           %VAL( CNF_PVAL( IPVARO )), STATUS )
+
+            ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+               CALL KPS1_ALIG1K( SCALE, ZERO, ELO,
+     :                           %VAL( CNF_PVAL( IPDATO )), STATUS )
+               IF( VIN ) CALL KPS1_ALIG1K( VSCALE, 0.0D0, ELO,
+     :                           %VAL( CNF_PVAL( IPVARO )), STATUS )
+
+            ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+               CALL KPS1_ALIG1R( SCALE, ZERO, ELO,
+     :                           %VAL( CNF_PVAL( IPDATO )), STATUS )
+               IF( VIN ) CALL KPS1_ALIG1R( VSCALE, 0.0D0, ELO,
+     :                           %VAL( CNF_PVAL( IPVARO )), STATUS )
+
+            ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+               CALL KPS1_ALIG1D( SCALE, ZERO, ELO,
+     :                           %VAL( CNF_PVAL( IPDATO )), STATUS )
+               IF( VIN ) CALL KPS1_ALIG1D( VSCALE, 0.0D0, ELO,
+     :                           %VAL( CNF_PVAL( IPVARO )), STATUS )
+            END IF
 
          END IF
 

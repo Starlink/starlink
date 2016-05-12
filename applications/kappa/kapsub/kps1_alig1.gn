@@ -1,0 +1,128 @@
+      SUBROUTINE KPS1_ALIG1<T>( SCALE, ZERO, NEL, ARRAY, STATUS )
+
+*+
+*  Name:
+*     KPS1_ALIG1
+
+*  Purpose:
+*     Apply a linear scaling to an array in situ.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_ALIG1x( SCALE, ZERO, NEL, ARRAY, STATUS )
+
+*  Description:
+*     This routine applies a linear scaling to the values in the supplied
+*     array.
+
+*  Arguments:
+*     SCALE = DOUBLE PRECISION
+*        The scale factor
+*     ZERO = DOUBLE PRECISION
+*        The offset.
+*     NEL = INTEGER
+*        Number of pixels in array.
+*     ARRAY( NEL ) = <TYPE> (Given and Returned)
+*        The array.
+*     STATUS  =  INTEGER (Given and Returned)
+*        Global status value.
+
+*  Copyright:
+*     Copyright (C) 2016 East Asian Observatory.
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     DSB: David Berry (EAO)
+*     {enter_new_authors_here}
+
+*  History:
+*     12-MAY-2016 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE parameters
+      INCLUDE 'PRM_PAR'          ! VAL_ constants
+
+*  Status:
+      INTEGER STATUS             ! Global status value
+
+*  Arguments Given:
+      DOUBLE PRECISION SCALE
+      DOUBLE PRECISION ZERO
+      INTEGER NEL
+
+*  Arguments Given and Returned:
+      <TYPE> ARRAY( NEL )
+
+*  Local Variables:
+      DOUBLE PRECISION DVALMN
+      DOUBLE PRECISION DVALMX
+      INTEGER I
+      <TYPE> INMAX
+      <TYPE> INMIN
+*.
+
+*  Check inherited status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Find the limits on the unscaled values that can fit into the available
+*  data range.
+      IF( SCALE .GT. 0.0D0 ) THEN
+         DVALMX = ( VAL__MAX<T> - ZERO )/SCALE
+         DVALMN = ( VAL__MIN<T> - ZERO )/SCALE
+      ELSE IF( SCALE .LT. 0.0D0 ) THEN
+         DVALMN = ( VAL__MAX<T> - ZERO )/SCALE
+         DVALMX = ( VAL__MIN<T> - ZERO )/SCALE
+      ELSE
+         DVALMX = VAL__MAX<T>
+         DVALMN = VAL__MIN<T>
+      END IF
+
+      IF( DVALMX .GT. VAL__MAX<T> ) THEN
+         INMAX = VAL__MAX<T>
+      ELSE
+         INMAX = DVALMX
+      END IF
+
+      IF( DVALMN .LT. VAL__MIN<T> ) THEN
+         INMIN = VAL__MIN<T>
+      ELSE
+         INMIN = DVALMN
+      END IF
+
+*  Do it.
+      DO I = 1, NEL
+         IF( ARRAY( I ) .NE. VAL__BAD<T> ) THEN
+            IF( ARRAY( I ) .GT. INMIN .AND. ARRAY( I ) .LT. INMAX ) THEN
+               ARRAY( I ) = ARRAY( I )*SCALE + ZERO
+            ELSE
+               ARRAY( I ) = VAL__BAD<T>
+            END IF
+         END IF
+      END DO
+
+      END

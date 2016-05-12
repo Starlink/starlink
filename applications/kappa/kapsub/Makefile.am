@@ -101,7 +101,7 @@ KPG_GN_GEN = kps1_clns.gn kps1_hsmo.gn kps1_inle.gn kps1_inli.gn \
              kps1_mspa.gn kps1_mssa.gn kps1_nom1.gn kps1_plcp.gn \
              kps1_put.gn  kps1_robl.gn kps1_ronn.gn kps1_rora.gn \
              kps1_rorb.gn kps1_rprf.gn kps1_slae.gn kps1_zprg.gn \
-             kps1_plrs.gn
+             kps1_plrs.gn kps1_alig1.gn
 
 KPG_R_GEN = kps1_pgft.gr
 

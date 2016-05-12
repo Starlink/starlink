@@ -1,6 +1,6 @@
       SUBROUTINE KPG1_ALIGN( NX, NY, IPIN, IPREF, VIN, VREF,
      :                       IPVIN, IPVREF, FORM, IFAC, RFAC,
-     :                       IOFF, ROFF, C, STATUS )
+     :                       IOFF, ROFF, FITVAL, C, STATUS )
 *+
 *  Name:
 *     KPG1_ALIGN
@@ -14,7 +14,7 @@
 *  Invocation:
 *     CALL KPG1_ALIGN( NX, NY, IPIN, IPREF, VIN, VREF,
 *                      IPVIN, IPVREF, FORM, IFAC, RFAC,
-*                      IOFF, ROFF, C, STATUS )
+*                      IOFF, ROFF, FITVAL, C, STATUS )
 
 *  Description:
 *     This routine aligns  a pair of 2-dimensional arrays using a least
@@ -63,14 +63,24 @@
 *     ROFF = DOUBLE PRECISION (Given)
 *        An offset to subtract from the scaled reference values before being
 *        Used. Idealy, this should result in them having a mean of zero.
-*     C = DOUBLE PRECISION( 6 ) (Returned)
+*     FITVAL = LOGICAL (Given)
+*        If TRUE, then the fit is extended to include the relative scale
+*        factor and zero point offset between the pixle values in the two
+*        arrays.
+*     C = DOUBLE PRECISION( * ) (Returned)
 *        The coefficients of the affine transformation:
 *
 *        - Xin = C1 + C2*Xref + C3*Yref
 *        - Yin = C4 + C5*Xref + C6*Yref
 *
 *        (Xin,Yin) are grid coordinates in IN, and (Xref,Yref) are grid
-*        coordinates in REF.
+*        coordinates in REF. If FITVAL is FALSE, this array should have
+*        at least 6 elements. Otherwise it should have at least 8
+*        elements. The last two elements give the relationship between
+*        the pixel values in the two arrays:
+*
+*        - in = C7*ref + C8
+*
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -103,6 +113,8 @@
 *        Original version.
 *     11-MAY-2016 (DSB):
 *        Added arguments IFAC, RFAC, IOFF and ROFF.
+*     12-MAY-2016 (DSB):
+*        Added argument FITVAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -130,13 +142,14 @@
       LOGICAL DEBUGC
       LOGICAL VINC
       LOGICAL VREFC
+      LOGICAL FITVALC
       DOUBLE PRECISION IFACC
       DOUBLE PRECISION RFACC
       DOUBLE PRECISION IOFFC
       DOUBLE PRECISION ROFFC
       COMMON /KPG1_ALIGN_COM1/ IPINC, IPREFC, IPVINC, IPVREFC, NXC, NYC,
      :                        IENTRY
-      COMMON /KPG1_ALIGN_COM2/ DEBUGC, VINC, VREFC
+      COMMON /KPG1_ALIGN_COM2/ DEBUGC, VINC, VREFC, FITVALC
       COMMON /KPG1_ALIGN_COM3/ IFACC, RFACC, IOFFC, ROFFC
 
 *  External References:
@@ -156,15 +169,16 @@
       DOUBLE PRECISION RFAC
       DOUBLE PRECISION IOFF
       DOUBLE PRECISION ROFF
+      LOGICAL FITVAL
 
 *  Arguments Returned:
-      DOUBLE PRECISION C( 6 )
+      DOUBLE PRECISION C( * )
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      DOUBLE PRECISION P( 6 )
+      DOUBLE PRECISION P( 8 )
       INTEGER FILTER
       INTEGER IPFVEC
       INTEGER INFO
@@ -207,6 +221,7 @@
       RFACC = RFAC
       IOFFC = IOFF
       ROFFC = ROFF
+      FITVALC = FITVAL
 
 *  See if debug information is to be created. If so, warn the user about
 *  the many NDFs that will be created.
@@ -236,6 +251,8 @@
      :                 'supplied - programming error.', status )
       END IF
 
+      IF( FITVAL ) NP = NP + 2
+
 *  Initial guess at solution - a unit transformation (in all FORMs). The
 *  minimisation could be made much quicker and better by using FFT phase
 *  correlation methods to produce a better first guess. See "Robust image
@@ -247,6 +264,8 @@
       P( 4 ) = 1.0D0
       P( 5 ) = 0.0D0
       P( 6 ) = 1.0D0
+      P( 7 ) = 1.0D0
+      P( 8 ) = 0.0D0
 
 *  Get workspace.
       LWA = M*NP + 5*NP + M
@@ -275,6 +294,13 @@
          CALL ERR_REP( ' ', 'KPG1_ALIGN: An error occurred within '//
      :                 'the PDA_LMDIF1 service routine.', STATUS )
 
+      END IF
+
+*  Store the returned data value scale and offset.
+      IF( FITVAL ) THEN
+         C( 7 ) = P( 7 )*RFAC/IFAC
+         C( 8 ) = ( IOFF - P( 7 )*ROFF + P( 8 ) )/IFAC
+         NP = NP - 2
       END IF
 
 *  Convert the minimised parameters into a full 6 coefficient affine
@@ -337,13 +363,14 @@
       LOGICAL DEBUGC
       LOGICAL VINC
       LOGICAL VREFC
+      LOGICAL FITVALC
       DOUBLE PRECISION IFACC
       DOUBLE PRECISION RFACC
       DOUBLE PRECISION IOFFC
       DOUBLE PRECISION ROFFC
       COMMON /KPG1_ALIGN_COM1/ IPINC, IPREFC, IPVINC, IPVREFC, NXC, NYC,
      :                        IENTRY
-      COMMON /KPG1_ALIGN_COM2/ DEBUGC, VINC, VREFC
+      COMMON /KPG1_ALIGN_COM2/ DEBUGC, VINC, VREFC, FITVALC
       COMMON /KPG1_ALIGN_COM3/ IFACC, RFACC, IOFFC, ROFFC
 
 *  Arguments Given:
@@ -359,8 +386,11 @@
       CHARACTER NAME*20
       DOUBLE PRECISION C( 6 )
       DOUBLE PRECISION FSUM
+      DOUBLE PRECISION RFAC
+      DOUBLE PRECISION ROFF
       INTEGER I
       INTEGER IAT
+      INTEGER NSP
       INTEGER STATUS
 
 *  Initialise the inherited status used in this routine.
@@ -370,7 +400,19 @@
       IENTRY = IENTRY + 1
 
 *  Get the co-efficients of the full unrestricted affine transformation.
-      CALL KPG1_ALIGN6( NP, P, C, STATUS )
+      NSP = NP
+      IF( FITVALC ) NSP = NSP - 2
+      CALL KPG1_ALIGN6( NSP, P, C, STATUS )
+
+*  Adjust the scale and offset for the reference data if we are including
+*  them in the fit.
+      IF( FITVALC ) THEN
+         RFAC = RFACC*P( 7 )
+         ROFF = ROFFC*P( 7 ) - P( 8 )
+      ELSE
+         RFAC = RFACC
+         ROFF = ROFFC
+      END IF
 
 *  Call a lower-level routine to do the work, passing the work arrays
 *  using %VAL so that their contents can be accessed.
@@ -378,7 +420,8 @@
      :                  %VAL( CNF_PVAL( IPREFC ) ), C,
      :                  VINC, %VAL( CNF_PVAL( IPVINC ) ),
      :                  VREFC, %VAL( CNF_PVAL( IPVREFC ) ),
-     :                  IFACC, RFACC, IOFFC, ROFFC, FVEC, FSUM, STATUS )
+     :                  IFACC, RFAC, IOFFC, ROFF,
+     :                  FVEC, FSUM, STATUS )
 
 *  If required, dump the residuals to an NDF for debugging purposes, and
 *  display the current coefficients.
@@ -395,6 +438,14 @@
             CALL MSG_SETC( 'C', ',' )
             CALL MSG_SETR( 'C', REAL( C( I ) ) )
          END DO
+
+         IF( FITVALC ) THEN
+            CALL MSG_SETC( 'C', ',' )
+            CALL MSG_SETR( 'C', REAL( P( 7 ) ) )
+            CALL MSG_SETC( 'C', ',' )
+            CALL MSG_SETR( 'C', REAL( P( 8 ) ) )
+         END IF
+
          CALL MSG_SETD( 'S', FSUM )
          CALL MSG_OUT( ' ', 'Entry ^N: Cost=^S Transform=(^C)', STATUS )
 
@@ -420,8 +471,8 @@
 
 *  Invocation:
 *     CALL KPG1_ALIGN3(  NX, NY, IN, REF, C, USEVIN, VIN,
-*                        USEVREF, VREF, IFAC, RFAC, IOFF, ROFF,
-*                        FVEC, FSUM, STATUS )
+*                        USEVREF, VREF, IFAC, RFAC, IOFF,
+*                        ROFF, FVEC, FSUM, STATUS )
 
 *  Description:
 *     The IN map is resampled using affine transformation with
