@@ -437,9 +437,12 @@
       INTEGER NBAD
       INTEGER NDIM
       INTEGER NDIMI
-      INTEGER NREJ
       INTEGER NPARAM
+      INTEGER NREJ
+      INTEGER SDIM( 2 )
+      INTEGER SLBND( 2 )
       INTEGER SM
+      INTEGER SUBND( 2 )
       INTEGER UBND( 2 )
       INTEGER UBNDI( 2 )
       INTEGER UBNDO( 2 )
@@ -454,9 +457,6 @@
       LOGICAL VREF
       REAL CORLIM
       REAL WLIM
-
-      integer IPT, place, indft
-
 
 *.
 
@@ -473,8 +473,10 @@
       CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
       CALL LPG_ASSOC( 'REF', 'READ', INDF2, STATUS )
 
-*  Get the WCS FrameSet from the reference NDF.
-      CALL NDF_GTWCS( INDF2, IWCS2, STATUS )
+*  Get the WCS FrameSet from the reference NDF, ensuring the base Frame
+*  is 2-dimensional.
+      CALL KPG1_ASGET( INDF2, 2, .FALSE., .FALSE., .FALSE., SDIM,
+     :                 SLBND, SUBND, IWCS2, STATUS )
 
 *  See if an output NDF is required. Propagate the shape and other
 *  properties from IN.
