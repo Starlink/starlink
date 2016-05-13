@@ -178,7 +178,6 @@ void smurf_fts2_phasecorrds(int* status)
 {
     if( *status != SAI__OK ) { return; }
 
-    double const DTOR         = AST__DPI / 180.0;   /* Degrees-to-Radians */
     Grp* gIn                  = NULL;               /* Input group */
     Grp* gOut                 = NULL;               /* Output group */
     smfData* inData           = NULL;               /* Pointer to input data */
@@ -237,7 +236,6 @@ void smurf_fts2_phasecorrds(int* status)
     double wnUpper            = 0.0;                /* Upper bound of wave number range */
     double fNyquist           = 0.0;                /* Nyquist frequency */
     double dz                 = 0.0;                /* Step size in evenly spaced OPD grid */
-    double CLIP               = 0.0;                /* Clipping param for the polynomial fit */
     double maxWeight          = NUM__MIND;          /* Max weighting factor */
     double* IFG               = NULL;               /* Interferogram */
     double* DS                = NULL;               /* Double-Sided interferogram */
@@ -275,7 +273,7 @@ void smurf_fts2_phasecorrds(int* status)
     size_t nPixels            = 0;                  /* Number of bolometers in the subarray */
     size_t wnL                = 0;
     size_t wnU                = 0;
-    double wnTrim             = WAVE_NUMBER_RANGE;  /* Trim the first wnTrim wave numbers (zero Real part of spectrum) */
+  /*double wnTrim             = WAVE_NUMBER_RANGE;*//* Trim the first wnTrim wave numbers (zero Real part of spectrum) */
 
     double dSigma             = 0;
     double sum                = 0;
@@ -288,8 +286,10 @@ void smurf_fts2_phasecorrds(int* status)
     int indexZPD              = 0;
     int W                     = 1;
 
+#if DEBUG
     char fileName[SMF_PATH_MAX+1];                /* DEBUG */
     int n                     = 0;
+#endif
 
     /* DF: Digital Filter */
     double peakIFG            = 0.0;              /* Value of interferogram peak */
@@ -929,7 +929,6 @@ void smurf_fts2_phasecorrds(int* status)
         if(SPEC)     { fftw_free(SPEC);           SPEC      = NULL; }
 #if DEBUG
         if(SPECS)    { fftw_free(SPECS);          SPECS     = NULL; }
-#endif
 
         /* Create a temporary base file name from input file name - DEBUG */
         one_strlcpy(fileName, inData->file->name,
@@ -937,6 +936,7 @@ void smurf_fts2_phasecorrds(int* status)
         if (*status == ONE__TRUNC) {
             errAnnul(status);
         }
+#endif
 
         /* Close the file */
         if(inData) { smf_close_file( NULL,&inData, status); }

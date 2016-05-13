@@ -165,7 +165,6 @@ void smurf_fts2_init(int* status)
   double fNyquist           = 0.0;      /* Nyquist frequency */
   double fNyquistOverride   = 0.0;      /* Nyquist frequency command line override */
   double dz                 = 0.0;      /* Step size in evenly spaced OPD grid */
-  double dx                 = 0.0;      /* Step size in evenly spaced mirror position grid */
   double* MIRPOS            = NULL;     /* Mirror positions */
   double* MIRRTS            = NULL;     /* Mirror times */
   double* IFG               = NULL;     /* Interferogram */
@@ -185,7 +184,6 @@ void smurf_fts2_init(int* status)
   size_t nHeight            = 0;        /* Data cube height */
   size_t nFrames            = 0;        /* Data cube depth */
   size_t nPixels            = 0;        /* Number of bolometers in the subarray */
-  smfSortInfo* SORTINFO     = NULL;
 
   char object[SZFITSTR];
   char subarray[SZFITSTR];

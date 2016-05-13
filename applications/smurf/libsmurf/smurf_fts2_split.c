@@ -126,7 +126,6 @@ void smurf_fts2_split(int* status)
 {
   if( *status != SAI__OK ) { return; }
 
-  const double STAGE_LENGTH = 450.0;    /* mm */
   int LR                    = 0;        /* Treat as Low Resolution scan */
   Grp* gIn                  = NULL;     /* Input group */
   Grp* gOut                 = NULL;     /* Output group */
@@ -134,7 +133,6 @@ void smurf_fts2_split(int* status)
   smfData* inData           = NULL;     /* Pointer to input data */
   smfData* outData          = NULL;     /* Pointer to output data */
   double* outData_pntr      = NULL;     /* Pointer to output data values array */
-  int nMirPos               = 0;        /* Number of frames where the mirror actually moves */
   int nStart                = 0;        /* Frame index where the mirror starts moving */
   int nStartNext            = 0;        /* Frame index where the mirror starts moving in the next scan */
   int nStop                 = 0;        /* Frame index where the mirror stops */
@@ -173,33 +171,14 @@ void smurf_fts2_split(int* status)
 
   double scanVel            = 0.0;      /* Mirror speed in mm/sec */
   double stepTime           = 0.0;      /* RTS step time, average sample rate */
-  double minOPD             = 0;        /* OPD minimum */
-  double maxOPD             = 0;        /* OPD maximum */
-  double ZPD                = 0;
   double lrmmBandPass       = 0.0;      /* low res mm +/- offset from centre */
   int lrBandPassFrames      = 0;        /* Number of low res band pass frames from centre +/- length of lrmmBandPass */
   int nTmp                  = 0;
-  int nMax                  = 0;
-  int nOPD                  = 0;
   int bolIndex              = 0;
-  int index                 = 0;
   int indexIn               = 0;
   int indexOut              = 0;
-  int badPixel              = 0;
-  int k0                    = 0;
-  int indexZPD              = 0;
   int done                  = 0;        /* Track completion of extracting multiple scans */
   int outDataCount          = 0;        /* The number of output data files being written */
-
-  double lenLeft,
-         lenRight,
-         minLenLeft,
-         minLenRight,
-         minLen,
-         minZPD,
-         maxZPD,
-         midZPD             = 0.0;      /* Mirror position half side measures */
-  int midZPDPos             = 0;        /* Middle ZPD position in mirror position array */
 
   double EPSILON            = 0.0;
   char fileName[SMF_PATH_MAX+1];

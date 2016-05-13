@@ -175,7 +175,7 @@ void smurf_fts2_spectrum(int* status)
     smfData* inData           = NULL;           /* Pointer to input data */
     smfData* outData          = NULL;           /* Pointer to output data */
     smfData* sfpData          = NULL;           /* Pointer to SFP data */
-    smfData* sfp              = NULL;           /* Pointer to SFP index data */
+  /*smfData* sfp              = NULL;*/         /* Pointer to SFP index data */
     int doSFP                 = 0;              /* Only apply SFP if given */
     int zeropad               = 1;              /* Determines whether to zeropad */
     double resolution         = 0.0;            /* Spectral Resolution */
@@ -214,7 +214,6 @@ void smurf_fts2_spectrum(int* status)
     fftw_complex* DSIN        = NULL;           /* Double-Sided interferogram, FFT input */
     fftw_complex* SPEC        = NULL;           /* Spectrum */
     fftw_plan plan            = NULL;           /* fftw plan */
-    int pland                 = 0;              /* fftw plan destroyed? */
     gsl_interp_accel* ACC     = NULL;           /* SFP interpolator */
     gsl_spline* SPLINE        = NULL;           /* SFP interpolation spline */
 
@@ -238,7 +237,6 @@ void smurf_fts2_spectrum(int* status)
     int bolIndex              = 0;
     int cubeIndex             = 0;
     int badPixel              = 0;
-    int index                 = 0;
     int indexZPD              = 0;
     int indexZPDin            = 0;
     int indexZPDzp            = 0;
