@@ -129,7 +129,7 @@ void smurf_fts2_split(int* status)
   int LR                    = 0;        /* Treat as Low Resolution scan */
   Grp* gIn                  = NULL;     /* Input group */
   Grp* gOut                 = NULL;     /* Output group */
-  Grp* gTmp                 = NULL;     /* Temporary group */
+  Grp* gScan                = NULL;     /* Group containing individual scan file names */
   smfData* inData           = NULL;     /* Pointer to input data */
   smfData* outData          = NULL;     /* Pointer to output data */
   double* outData_pntr      = NULL;     /* Pointer to output data values array */
@@ -196,10 +196,8 @@ void smurf_fts2_split(int* status)
       LR = 1;
   }
 
-  /* Eliminate the first record in the output group, since it will be replaced later */
-  gTmp = grpCopy(gOut, 1, 1, 1, status);
-  grpDelet(&gOut, status);
-  gOut = gTmp;
+  /* Create new group for output scan file names. */
+  gScan = grpNew("SCANS", status);
 
   /* BEGIN NDF */
   ndfBegin();
@@ -406,12 +404,12 @@ void smurf_fts2_split(int* status)
                 goto CLEANUP;
             }
             /* Update the list of output _scn file names */
-            grpPut1(gOut, outData->file->name, 0, status);
+            grpPut1(gScan, outData->file->name, 0, status);
             if(*status != SAI__OK) {
                 errRepf(TASK_NAME, "Error saving outData file name", status);
                 goto CLEANUP;
             }
-            smf_write_smfData(NULL, outData, NULL, outData->file->name, gOut, fIndex, 0, MSG__VERB, 0, NULL, NULL, status);
+            smf_write_smfData(NULL, outData, NULL, outData->file->name, NULL, 0, 0, MSG__VERB, 0, NULL, NULL, status);
             if(*status != SAI__OK) {
                 errRepf(TASK_NAME, "Error writing outData file", status);
                 goto CLEANUP;
@@ -459,8 +457,8 @@ void smurf_fts2_split(int* status)
 
   /* Write out the list of output NDF names, annulling the error if a null
      parameter value is supplied. */
-  if( *status == SAI__OK && gOut ) {
-      grpList( "OUTFILES", 0, 0, NULL, gOut, status );
+  if( *status == SAI__OK && gScan ) {
+      grpList( "OUTFILES", 0, 0, NULL, gScan, status );
           if( *status == PAR__NULL ) {
               errRep(FUNC_NAME, "Error writing OUTFILES!", status);
               errAnnul( status );
@@ -470,4 +468,5 @@ void smurf_fts2_split(int* status)
   /* Delete groups */
   if(gIn)     { grpDelet(&gIn, status);  }
   if(gOut)    { grpDelet(&gOut, status); }
+  if (gScan)   {grpDelet(&gScan, status);}
 }
