@@ -20,9 +20,11 @@
 *        Pointer to global status.
 
 *  Description:
-*     Split out multiple unidirectional scans from a single NDF file into separate single scan NDF files
-*     The filename scan numbers are temporarily derived from the concatenation file's scan number
-*     This is intended to be changed to just append a uniqe sub-scan number.
+*     Split NDF files containing multiple FTS-2 scans into separate
+*     files each containing a single (unidirectional) scan.
+*     The output file names are constructed by appending the number of
+*     the scan within each input file to the corresponding output
+*     base file name.
 
 *  ADAM Parameters:
 *     BANDPASS = REAL (Read)
@@ -30,7 +32,8 @@
 *     IN = NDF (Read)
 *          Input files to be transformed.
 *     OUT = NDF (Write)
-*          Output files.
+*          Base names for output files.  The actual files written will
+*          use these names plus a 3-digit integer identifier.
 *     OUTFILES = LITERAL (Write)
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
@@ -177,9 +180,7 @@ void smurf_fts2_split(int* status)
 
   double EPSILON            = 0.0;
   char fileName[SMF_PATH_MAX+1];
-  char scanNumStr[5+1];                 /* String form of scan number of the input file */
-  int scanNum               = 0;        /* Scan number of the input file */
-  int conNum                = 0;        /* Concatenation number of the input file (left shifted scanNum) */
+  char* pFileName = fileName;
   int scanDir               = 0;        /* Scan direction: 1 -> back to front (positive), -1 -> front to back (negative) */
   JCMTState *allState       = NULL;     /* Temporary buffer for reduced header allState array data */
 
@@ -212,6 +213,15 @@ void smurf_fts2_split(int* status)
       goto CLEANUP;
     }
 
+    /* Determine base file name for output scans. */
+    grpGet(gOut, fIndex, 1, &pFileName, sizeof(fileName), status);
+
+    if (*status != SAI__OK) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Unable to get output file name from group", status);
+      goto CLEANUP;
+    }
+
     smf_fits_getD(inData->hdr, "SCANVEL", &scanVel, status);
     smf_fits_getD(inData->hdr, "STEPTIME", &stepTime, status);
 
@@ -219,34 +229,6 @@ void smurf_fts2_split(int* status)
     fNyquist = 10.0 / (8.0 * scanVel * stepTime);
     dz = 1.0 / (2.0 * fNyquist);
     EPSILON = scanVel * stepTime / 2;
-
-    /* Extract the scan number from the input file to be incremented in the output files */
-    one_strlcpy(scanNumStr, &(inData->file->name[strlen(inData->file->name) - 8]),
-               astMIN(SMF_PATH_MAX + 1, 5), status);
-    if (*status == ONE__TRUNC) {
-        errRep(FUNC_NAME, "Error extracting scanNumStr!", status);
-        errAnnul(status);
-    }
-
-    /* Create a temporary base file name from input file name */
-    one_strlcpy(fileName, inData->file->name,
-                astMIN(SMF_PATH_MAX + 1, strlen(inData->file->name) - 7), status);
-    if (*status == ONE__TRUNC) {
-        errRep(FUNC_NAME, "Error extracting base fileName!", status);
-        errAnnul(status);
-    }
-    scanNum = (int) one_strtod(scanNumStr, status);
-    if (*status != SAI__OK) {
-        errRep(FUNC_NAME, "Error extracting scanNum!", status);
-        errAnnul(status);
-    }
-
-    /* Left shift scanNum to conNum as a prefix to make output scan number unique */
-    if(scanNum < 100) {
-      conNum = scanNum * 100;
-    } else if(scanNum < 1000) {
-      conNum = scanNum * 10;
-    }
 
     /*printf("%s: Processing file: %s, having basename: %s and scanNumStr: %s, scanNum: %04d\n",
            TASK_NAME, inData->file->name, fileName, scanNumStr, scanNum);*/
@@ -396,8 +378,7 @@ void smurf_fts2_split(int* status)
 
             /* Write output */
             /* Append unique suffix to fileName */
-            /* This must be modified by the concatenation file scan number to improve uniqueness */
-            n = one_snprintf(outData->file->name, SMF_PATH_MAX, "%s%04d_scn.sdf", status, fileName, conNum+outDataCount);
+            n = one_snprintf(outData->file->name, SMF_PATH_MAX, "%s%03d", status, fileName, outDataCount);
             /*printf("%s: Writing outData->file->name: %s\n", TASK_NAME, outData->file->name);*/
             if(n < 0 || n >= SMF_PATH_MAX) {
                 errRepf(TASK_NAME, "Error creating outData->file->name", status);
