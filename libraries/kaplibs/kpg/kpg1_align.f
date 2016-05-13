@@ -165,6 +165,7 @@
       INTEGER IPVIN
       INTEGER IPVREF
       INTEGER FORM
+      DOUBLE PRECISION F
       DOUBLE PRECISION IFAC
       DOUBLE PRECISION RFAC
       DOUBLE PRECISION IOFF
@@ -251,8 +252,6 @@
      :                 'supplied - programming error.', status )
       END IF
 
-      IF( FITVAL ) NP = NP + 2
-
 *  Initial guess at solution - a unit transformation (in all FORMs). The
 *  minimisation could be made much quicker and better by using FFT phase
 *  correlation methods to produce a better first guess. See "Robust image
@@ -264,8 +263,15 @@
       P( 4 ) = 1.0D0
       P( 5 ) = 0.0D0
       P( 6 ) = 1.0D0
-      P( 7 ) = 1.0D0
-      P( 8 ) = 0.0D0
+
+*  If we are including the pixel values themselves in the fit, append two
+*  extra parameters to the list of freeparameters - the scale and the
+*  offset between pixel values in the two arrays.
+      IF( FITVAL ) THEN
+         P( NP + 1 ) = 0.0D0
+         P( NP + 2 ) = 0.0D0
+         NP = NP + 2
+      END IF
 
 *  Get workspace.
       LWA = M*NP + 5*NP + M
@@ -296,10 +302,12 @@
 
       END IF
 
-*  Store the returned data value scale and offset.
+*  If we are including the pixel values themselves in the fit, calculate
+*  and store the returned data value scale and offset.
       IF( FITVAL ) THEN
-         C( 7 ) = P( 7 )*RFAC/IFAC
-         C( 8 ) = ( IOFF - P( 7 )*ROFF + P( 8 ) )/IFAC
+         F = EXP( P( NP - 1 ) )
+         C( 7 ) = F*RFAC/IFAC
+         C( 8 ) = ( IOFF - F*ROFF + P( NP ) )/IFAC
          NP = NP - 2
       END IF
 
@@ -385,6 +393,7 @@
 *  Local Variables
       CHARACTER NAME*20
       DOUBLE PRECISION C( 6 )
+      DOUBLE PRECISION F
       DOUBLE PRECISION FSUM
       DOUBLE PRECISION RFAC
       DOUBLE PRECISION ROFF
@@ -399,20 +408,21 @@
 *  Increment the number of times this function has been called.
       IENTRY = IENTRY + 1
 
-*  Get the co-efficients of the full unrestricted affine transformation.
-      NSP = NP
-      IF( FITVALC ) NSP = NSP - 2
-      CALL KPG1_ALIGN6( NSP, P, C, STATUS )
-
 *  Adjust the scale and offset for the reference data if we are including
 *  them in the fit.
       IF( FITVALC ) THEN
-         RFAC = RFACC*P( 7 )
-         ROFF = ROFFC*P( 7 ) - P( 8 )
+         F = EXP( P( NP - 1 ) )
+         RFAC = RFACC*F
+         ROFF = ROFFC*F - P( NP )
+         NSP = NP - 2
       ELSE
          RFAC = RFACC
          ROFF = ROFFC
+         NSP = NP
       END IF
+
+*  Get the co-efficients of the full unrestricted affine transformation.
+      CALL KPG1_ALIGN6( NSP, P, C, STATUS )
 
 *  Call a lower-level routine to do the work, passing the work arrays
 *  using %VAL so that their contents can be accessed.
