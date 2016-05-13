@@ -164,11 +164,6 @@ void smurf_fts2_split(int* status)
   size_t lrFramesOutPrev    = 0;        /* Data cube depth in previous low res output file */
   size_t nPixels            = 0;        /* Number of bolometers in the subarray */
 
-  char object[SZFITSTR];
-  char subarray[SZFITSTR];
-  char obsID[SZFITSTR];
-  char scanMode[SZFITSTR];
-
   double scanVel            = 0.0;      /* Mirror speed in mm/sec */
   double stepTime           = 0.0;      /* RTS step time, average sample rate */
   double lrmmBandPass       = 0.0;      /* low res mm +/- offset from centre */
@@ -219,10 +214,6 @@ void smurf_fts2_split(int* status)
       goto CLEANUP;
     }
 
-    smf_fits_getS(inData->hdr, "OBJECT", object, sizeof(object), status);
-    smf_fits_getS(inData->hdr, "SUBARRAY", subarray, sizeof(subarray), status);
-    smf_fits_getS(inData->hdr, "OBSID", obsID, sizeof(obsID), status);
-    smf_fits_getS(inData->hdr, "FTS_MODE", scanMode, sizeof(scanMode), status);
     smf_fits_getD(inData->hdr, "SCANVEL", &scanVel, status);
     smf_fits_getD(inData->hdr, "STEPTIME", &stepTime, status);
 
