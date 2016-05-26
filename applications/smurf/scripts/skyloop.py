@@ -42,8 +42,8 @@
 
 *  Usage:
 *     skyloop in out niter pixsize config [itermap] [ref] [mask2] [mask3]
-*             [extra] [retain] [msg_filter] [ilevel] [glevel] [logfile]
-*             [restart]
+*             [extra] [ipref] [retain] [msg_filter] [ilevel] [glevel]
+*             [logfile] [restart]
 
 *  Parameters:
 *     CONFIG = LITERAL (Read)
@@ -112,6 +112,9 @@
 *           downsampfreq=0
 *           fakemap=<undef>
 *
+*     EXTRA = LITERAL (Read)
+*        A string holding any extra command line options to be passed to
+*        MAKEMAP (all invocations). [!]
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
 *        Allowed values are as for "ILEVEL". The log file to create is
@@ -140,6 +143,26 @@
 *        ["PROGRESS"]
 *     IN = NDF (Read)
 *        The group of time series NDFs to include in the output map.
+*     IPREF = NDF (Read)
+*        An existing NDF that is to be used to define the correction
+*        to be made for instrumental polarisation (IP). It is only
+*        accessed if the input data contains POL2 Q or U time-series
+*        values, as created by SMURF:CALCQU. No IP correction is made
+*        if a null (!) value is supplied. If a non-null value is supplied,
+*        it should be an NDF that holds the total intensity (in pW)
+*        within the area of sky covered by the output map. The supplied
+*        NDF need not be pre-aligned with the output map - the WCS
+*        information in the NDF will be used to aligned them. For each Q
+*        or U value in the input time-streams, the corresponding total
+*        intensity (I) value is found by sampling the supplied IPREF map
+*        at the sky position of the Q/U value. This I value is multipled
+*        by a factor that depends on elevation and focal plane position,
+*        to get the IP correction. These Q and U corrections are
+*        rotated so that they use the same reference direction as the input
+*        Q/U data, corrected for extinction, and are then subtracted from
+*        the input Q or U value before going on to make a map from the
+*        corrected values. The factors are determined using the IP model
+*        specified by the "ipmodel" configuration parameter. [!]
 *     ITERMAP = NDF (Write)
 *        A 3D NDF to create holding the maps from all iterations. [!]
 *     LOGFILE = LITERAL (Read)
@@ -170,9 +193,6 @@
 *        parameters AST.ZERO_MASK, FLT.ZERO_MASK and COM.ZERO_MASK. Note,
 *        it is assumed that this image is aligned in pixel coordinate with
 *        the output map. [!]
-*     EXTRA = LITERAL (Read)
-*        A string holding any extra command line options to be passed to
-*        MAKEMAP (all invocations). [!]
 *     MSG_FILTER = LITERAL (Read)
 *        Controls the default level of information reported by Starlink
 *        atasks invoked within the executing script. The accepted values
@@ -287,6 +307,11 @@
 *        Abort if ast.skip is negative.
 *     11-JUN-2015 (DSB):
 *        Only add on any fakemap on the first iteration.
+*     19-MAY-2016 (DSB):
+*        Aded parameter IPREF. IP correction is performed only on the
+*        first iteration, as the effects of IP correction are incorporated
+*        into the cleaned data created by the first iteration, and passed
+*        on to subsequent iterations.
 *-
 '''
 
@@ -319,7 +344,7 @@ new_lut_ndfs = []
 new_noi_ndfs = []
 
 #  A function that converts a string to an int, handling cases where the
-#  string ends with ".0" (the python intrinsic "int" function moans in 
+#  string ends with ".0" (the python intrinsic "int" function moans in
 #  such cases).
 def myint( text ):
    return int( float( text ) + 0.5 )
@@ -390,6 +415,10 @@ try:
    params.append(starutil.Par0S("EXTRA", "Extra command-line options for MAKEMAP",
                                 default=None, noprompt=True ))
 
+   params.append(starutil.ParNDG("IPREF", "Total intensity map for IP "
+                                 "correction of POL2 data", default=None,
+                                 minsize=0, maxsize=1, noprompt=True ))
+
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
 
@@ -422,6 +451,7 @@ try:
    mask2 = parsys["MASK2"].value
    mask3 = parsys["MASK3"].value
    extra = parsys["EXTRA"].value
+   ipref = parsys["IPREF"].value
    itermap = parsys["ITERMAP"].value
 
 #  See if we are using pre-cleaned data, in which case there is no need
@@ -655,6 +685,8 @@ try:
          cmd += " mask3={0}".format(mask3)
       if extra:
          cmd += " "+extra
+      if ipref and not precleaned:
+         cmd += " ipref={0}".format(ipref)
       invoke(cmd)
 
 #  Get the pixel index bounds of the map.
