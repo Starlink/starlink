@@ -225,10 +225,13 @@
 *        Do not add default values for optional parameters to a supplied
 *        config.
 *     12-MAY-2016 (DSB):
-*        - Improve pointing correction by using CORLIMIT option when 
+*        - Improve pointing correction by using CORLIMIT option when
 *        running kappa:align2d.
-*        - Use the Epoch of the POL2 observation rather than the Epoch of 
+*        - Use the Epoch of the POL2 observation rather than the Epoch of
 *        the IP reference map when determining the expected IP beam shape.
+*     26-MAY-2016 (DSB):
+*        Do not use the AST mask when determining the pointing correction if 
+*        the AST mask contains very few pixels.
 *
 '''
 
@@ -514,7 +517,8 @@ try:
 #  See what translations (in pixels) are needed to align the imap with
 #  the reference map. The determination of the shift is more accurate if
 #  we first mask out background areas. Use the AST mask to define source
-#  pixels.
+#  pixels, but only if the mask contains a reasonable number of pixels
+#  (very faint sources will have very small or non-existant AST masks).
          invoke("$KAPPA_DIR/showqual ndf={0}".format(imap))
          if starutil.get_task_par( "QNAMES(1)", "showqual" ) == "AST":
             bb = 1
@@ -525,107 +529,109 @@ try:
          else:
             bb = 0
 
-         if bb == 0:
-            msg_out( "WARNING: The supplied makemap configuration does not "
-                     "include an AST mask, and so the source regions cannot "
-                     "be identified. Therefore the final Q and U maps cannot "
-                     "be corrected for pointing errors." )
-         else:
+         if bb > 0:
             invoke("$KAPPA_DIR/setbb ndf={0} bb={1}".format(imap,bb))
+
+#  Clear badbits to use the whole map if the above masking results in too
+#  few pixels.
+            invoke("$KAPPA_DIR/stats ndf={0}".format(imap))
+            nused = float( starutil.get_task_par( "numgood", "stats" ) )
+            if nused < 400:
+               invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(imap))
 
 #  Find the pixel shift that aligns features in this masked, trimmed I map with
 #  corresponding features in the reference map.
-            invoke("$KAPPA_DIR/align2d ref={0} out=! in={1} form=3 corlimit=0.7".
-                   format(ref,imap))
-            dx = float( starutil.get_task_par( "TR(1)", "align2d" ) )
-            dy = float( starutil.get_task_par( "TR(4)", "align2d" ) )
+         invoke("$KAPPA_DIR/align2d ref={0} out=! in={1} form=3 corlimit=0.7".
+                format(ref,imap))
+         dx = float( starutil.get_task_par( "TR(1)", "align2d" ) )
+         dy = float( starutil.get_task_par( "TR(4)", "align2d" ) )
 
 #  If the shifts are suspiciously high, we do not believe them. In which
 #  case we cannot do pointing ocorrection when creating the Q and U maps.
-            if abs(dx) > 5 or abs(dy) > 5:
-               msg_out( "WARNING: The I map created from the POL2 data cannot be aligned "
-                        "with the supplied IP reference map. Therefore the final "
-                        "Q and U maps cannot be corrected for pointing errors." )
+         if abs(dx) > 5 or abs(dy) > 5:
+            msg_out( "WARNING: The I map created from the POL2 data cannot be aligned "
+                     "with the supplied IP reference map. Therefore the final "
+                     "Q and U maps cannot be corrected for pointing errors." )
 
 #  Otherwise, convert the offset in pixels to (longitude,latitude) offsets
 #  in the sky system of the reference map, in arc-seconds....
-            else:
+         else:
 
 #  Strip the wavelength axis off the total intensity map created above.
-               imap2d = NDG( 1 )
-               invoke("$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(imap,imap2d))
+            imap2d = NDG( 1 )
+            invoke("$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(imap,imap2d))
 
 #  Get the pixel coords at the centre of the total intensity map.
-               invoke("$KAPPA_DIR/ndftrace ndf={0}".format(imap2d))
-               lbndx = float( starutil.get_task_par( "LBOUND(1)", "ndftrace" ) )
-               lbndy = float( starutil.get_task_par( "LBOUND(2)", "ndftrace" ) )
-               ubndx = float( starutil.get_task_par( "UBOUND(1)", "ndftrace" ) )
-               ubndy = float( starutil.get_task_par( "UBOUND(2)", "ndftrace" ) )
-               cenx = 0.5*( lbndx + ubndx )
-               ceny = 0.5*( lbndy + ubndy )
+            invoke("$KAPPA_DIR/ndftrace ndf={0}".format(imap2d))
+            lbndx = float( starutil.get_task_par( "LBOUND(1)", "ndftrace" ) )
+            lbndy = float( starutil.get_task_par( "LBOUND(2)", "ndftrace" ) )
+            ubndx = float( starutil.get_task_par( "UBOUND(1)", "ndftrace" ) )
+            ubndy = float( starutil.get_task_par( "UBOUND(2)", "ndftrace" ) )
+            cenx = 0.5*( lbndx + ubndx )
+            ceny = 0.5*( lbndy + ubndy )
 
 #  Convert to SKY coords, in radians. Use ATOOLS rather than pyast in
 #  order to avoid the need for people to install pyast. Also, ATOOLS
 #  integrates with NDFs more easily than pyast.
-               (cena,cenb) = invoke("$ATOOLS_DIR/asttran2 this={0} forward=yes "
-                                    "xin={1} yin={2}".format( imap2d,cenx,ceny)).split()
-               cena = float( cena )
-               cenb = float( cenb )
+            (cena,cenb) = invoke("$ATOOLS_DIR/asttran2 this={0} forward=yes "
+                                 "xin={1} yin={2}".format( imap2d,cenx,ceny)).split()
+            cena = float( cena )
+            cenb = float( cenb )
 
 #  Add on the pixel offsets, and convert to SKY coords, in radians.
-               offx = cenx + dx
-               offy = ceny + dy
-               (offa,offb) = invoke("$ATOOLS_DIR/asttran2 this={0} forward=yes "
-                                    "xin={1} yin={2}".format( imap2d,offx,offy)).split()
-               offa = float( offa )
-               offb = float( offb )
+            offx = cenx + dx
+            offy = ceny + dy
+            (offa,offb) = invoke("$ATOOLS_DIR/asttran2 this={0} forward=yes "
+                                 "xin={1} yin={2}".format( imap2d,offx,offy)).split()
+            offa = float( offa )
+            offb = float( offb )
 
 #   Now find the arc-distance parallel to the longitude axis, between the central
 #   and offset positions, and convert from radians to arc-seconds.
-               dx = invoke("$ATOOLS_DIR/astdistance this={0}, point1=\[{1},{2}\] "
-                           "point2=\[{3},{4}\]".format(imap2d,cena,cenb,offa,cenb))
-               dx = 3600.0*math.degrees( float( dx ) )
+            dx = invoke("$ATOOLS_DIR/astdistance this={0}, point1=\[{1},{2}\] "
+                        "point2=\[{3},{4}\]".format(imap2d,cena,cenb,offa,cenb))
+            dx = 3600.0*math.degrees( float( dx ) )
 
 #  The value returned by astDistance is always positive. Adjust the sign
 #  of dx so that it goes the right way.
-               da = offa - cena
-               while da > math.pi:
-                  da -= math.pi
-               while da < -math.pi:
-                  da += math.pi
-               if da < 0.0:
-                  dx = -dx
+            da = offa - cena
+            while da > math.pi:
+               da -= math.pi
+            while da < -math.pi:
+               da += math.pi
+            if da < 0.0:
+               dx = -dx
 
 #  Now find the arc-distance parallel to the latitude axis, between the central
 #  and offset positions, and convert from radians to arc-seconds.
-               dy = invoke("$ATOOLS_DIR/astdistance this={0}, point1=\[{1},{2}\] "
-                           "point2=\[{3},{4}\]".format(imap2d,cena,cenb,cena,offb))
-               dy = 3600.0*math.degrees( float( dy ) )
+            dy = invoke("$ATOOLS_DIR/astdistance this={0}, point1=\[{1},{2}\] "
+                        "point2=\[{3},{4}\]".format(imap2d,cena,cenb,cena,offb))
+            dy = 3600.0*math.degrees( float( dy ) )
 
 #  The value returned by astDistance is always positive. Adjust the sign
 #  of dx so that it goes the right way.
-               db = offb - cenb
-               if db < 0.0:
-                  dy = -dy
+            db = offb - cenb
+            if db < 0.0:
+               dy = -dy
 
 #  Create the pointing correction file to use with subsequent makemap
 #  calls. If a file is already in use (because of the data being old)
 #  append the new pointing correction to the end of the file, preceeded
 #  by an "end-of-table" Marker (two minus signs). Makemap will then apply
 #  both correction.
-               msg_out( "Using pointing corrections of ({0},{1}) arc-seconds".format(dx,dy) )
-               if pntfile == "!":
-                  pntfile = os.path.join(NDG.tempdir,"pointing")
-                  fd = open(pntfile,"w")
-               else:
-                  fd = open(pntfile,"a")
-                  fd.write("--\n")
+            msg_out( "Using pointing corrections of ({0},{1}) arc-seconds".format(dx,dy) )
+            if pntfile == "!":
+               pntfile = os.path.join(NDG.tempdir,"pointing")
+               fd = open(pntfile,"w")
+            else:
+               fd = open(pntfile,"a")
+               fd.write("--\n")
 
-               fd.write("# system=tracking\n")
-               fd.write("# tai dlon dlat\n")
-               fd.write("54000 {0} {1}\n".format(dx,dy))
-               fd.write("56000 {0} {1}\n".format(dx,dy))
-               fd.close()
+            fd.write("# system=tracking\n")
+            fd.write("# tai dlon dlat\n")
+            fd.write("54000 {0} {1}\n".format(dx,dy))
+            fd.write("56000 {0} {1}\n".format(dx,dy))
+            fd.close()
 
 
 
