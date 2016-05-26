@@ -494,7 +494,7 @@ static void smf1_qual_unmap( void *job_data_ptr, int *status ) {
           if ( *p1 & (SMF__Q_APOD|SMF__Q_PAD) ) {
             *p2 |= SMF__TCOMPQ_ENDS;
           }
-          if ( *p1 & (SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_FILT|SMF__Q_EXT|SMF__Q_LOWAP|SMF__Q_BADEF) ) {
+          if ( *p1 & (SMF__Q_JUMP|SMF__Q_IP|SMF__Q_SPIKE|SMF__Q_FILT|SMF__Q_EXT|SMF__Q_LOWAP|SMF__Q_BADEF) ) {
             *p2 |= SMF__TCOMPQ_BLIP;
           }
           if ( *p1 & (SMF__Q_COM|SMF__Q_SSN|SMF__Q_PCA) ) {

@@ -143,8 +143,13 @@
 *        boxes of samples are flagged (e.g. by COM) on the ifrst
 *        iteration. These unity values can then be treated literally
 *        if the flags are later cleared.
+*     2016-5-19 (DSB):
+*        Ensure dat->noi_boxsize is assigned a value even if the NOI model
+*        has been pre-calculated as part of the cleaning phase (i.e. if
+*        model_data[ 0 ] is not 1.0 on entry on the first iteration).
 
 *  Copyright:
+*     Copyright (C) 2016 East Asian Observatory.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2010 University of British Columbia.
 *     Copyright (C) 2010-2012 Science & Technology Facilities Council.
@@ -360,6 +365,47 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       smf_get_dims( model->sdata[idx], NULL, NULL, NULL, &mntslice, NULL,
                     &mbstride, &mtstride, status );
 
+      /* If not already done, set dat->noi_boxsize to the number of times each
+         NOI value is duplicated. This is used to determine the degree of
+         compression that can be used when exporting the NOI model. */
+      if( dat->noi_boxsize == 0 ) {
+
+         /* Handle cases where there is one constant noise value for
+            each bolometer (i.e. "ntslice" slices share the same noise
+            value). */
+         if( mntslice == 1 ) {
+            dat->noi_boxsize = ntslice;
+
+         /* Handle cases where the noise is estimated in boxes of samples
+            lasting "NOI.BOX_SIZE" seconds (the noise level in the box is
+            then assigned to all samples in the box). Get NOI.BOX_SIZE and
+            convert from seconds to samples. */
+         } else {
+            boxsize = 0;
+            smf_get_nsamp( kmap, "BOX_SIZE", res->sdata[0], &boxsize, status );
+
+            /* Find the indices of the first and last non-PAD sample. */
+            smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_PAD,
+                               &pstart, &pend, status );
+
+            /* How many whole boxes fit into this range? */
+            nbox = ( pend - pstart + 1 ) / boxsize;
+            if( nbox == 0 ) nbox = 1;
+
+            /* How many samples would be left over at the end if we used this
+               many boxes? */
+            nleft = ( pend - pstart + 1 ) - nbox*boxsize;
+
+            /* Increase "boxsize" to reduce this number as far as possible.
+               Any samples that are left over after this increase of boxsize
+               will not be used when calculating the noise levels in each
+               bolometer. */
+            boxsize += nleft/nbox;
+
+            dat->noi_boxsize = boxsize;
+         }
+      }
+
       /* Only estimate the white noise level once at the beginning - the
          reason for this is to make measurements of the convergence
          easier. We may have done it prior to the start of iterations (in which
@@ -397,11 +443,6 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
               }
 
             var = astFree( var );
-
-            /* Set dat->noi_boxsize to the number of times each NOI value is
-               duplicated. This is used to determine the degree of
-               compression that can be used when exporting the NOI model. */
-            dat->noi_boxsize = ntslice;
           }
 
 
@@ -410,36 +451,17 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
            noise level in the box is assigned to all samples in the box. */
         } else if( mntslice == ntslice ) {
 
-          /* If not already done, get NOI.BOX_SIZE and convert from seconds to
+          /* RecIf not already done, get NOI.BOX_SIZE and convert from seconds to
              samples. */
           if( idx == 0 ) {
-            boxsize = 0;
-            smf_get_nsamp( kmap, "BOX_SIZE", res->sdata[0], &boxsize, status );
+            boxsize = dat->noi_boxsize;
 
             /* More initialisation needed for the 2 to 10 Hz power method. */
             if( box_type == 0 ) {
+               boxsize = dat->noi_boxsize;
                msgOutf( "", FUNC_NAME ": Calculating a NOI variance for each "
                         "box of %d samples using 2-10 Hz noise.", status,
                         (int) boxsize );
-
-
-              /* Find the indices of the first and last non-PAD sample. */
-              smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_PAD,
-                                 &pstart, &pend, status );
-
-              /* How many whole boxes fit into this range? */
-              nbox = ( pend - pstart + 1 ) / boxsize;
-              if( nbox == 0 ) nbox = 1;
-
-              /* How many samples would be left over at the end if we used this
-                 many boxes? */
-              nleft = ( pend - pstart + 1 ) - nbox*boxsize;
-
-              /* Increase "boxsize" to reduce this number as far as possible.
-                 Any samples that are left over after this increase of boxsize
-                 will not be used when calculating the noise levels in each
-                 bolometer. */
-              boxsize += nleft/nbox;
 
               /* Create a smfData to hold one box-worth of input data. We
                  do not need to copy jcmtstate information. */
