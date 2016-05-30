@@ -815,6 +815,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter outf {
+                type NDF
+                access WRITE
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                prompt {Output fitted data NDFs}
+                helpkey *
+            }
+
             parameter outi {
                 type NDF
                 access WRITE

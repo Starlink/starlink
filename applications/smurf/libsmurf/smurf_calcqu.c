@@ -193,6 +193,10 @@
 *        plane system is used as the reference direction. Note, Stokes
 *        parameters created with LSQFIT=FALSE always use focal plane Y as
 *        the reference direction. ["TRACKING"]
+*     OUTF = LITERAL (Write)
+*        The output files to contain the fitted analysed intensity. Only
+*        used if LSQFIT is TRUE. It should be a group of time series NDFs.
+*        No fit data files are created if a null (!) value is supplied. [!]
 *     OUTI = LITERAL (Write)
 *        The output file to receive total intensity values. If LSQFIT is
 *        FALSE, this will be an HDS container file containing the I images.
@@ -337,6 +341,7 @@ void smurf_calcqu( int *status ) {
    AstKeyMap *sub_instruments;/* Indicates which instrument is being used */
    Grp *bgrp = NULL;          /* Group of base names for each chunk */
    Grp *igrp = NULL;          /* Group of input files */
+   Grp *ogrpf = NULL;         /* Group of output fit files  */
    Grp *ogrpi = NULL;         /* Group of output I files  */
    Grp *ogrpq = NULL;         /* Group of output Q files  */
    Grp *ogrpu = NULL;         /* Group of output U files  */
@@ -394,6 +399,7 @@ void smurf_calcqu( int *status ) {
    smfData *data = NULL;      /* Concatenated data for one subarray */
    smfData *dkdata = NULL;    /* Concatenated dark squid data for one subarray */
    smfData *indata = NULL;    /* One input data file */
+   smfData *odataf = NULL;    /* Output fit data for one subarray */
    smfData *odatai = NULL;    /* Output I data for one subarray */
    smfData *odataq = NULL;    /* Output Q data for one subarray */
    smfData *odatau = NULL;    /* Output U data for one subarray */
@@ -479,6 +485,11 @@ void smurf_calcqu( int *status ) {
          if( *status == SAI__OK ) {
             kpg1Wgndf( "OUTI", bgrp, bsize, bsize, "More output files required...",
                        &ogrpi, &osize, status );
+            if( *status == PAR__NULL ) errAnnul( status );
+         }
+         if( *status == SAI__OK ) {
+            kpg1Wgndf( "OUTF", bgrp, bsize, bsize, "More output files required...",
+                       &ogrpf, &osize, status );
             if( *status == PAR__NULL ) errAnnul( status );
          }
          kpg1Wgndf( "OUTQ", bgrp, bsize, bsize, "More output files required...",
@@ -753,8 +764,9 @@ void smurf_calcqu( int *status ) {
 
 /* Generate the I, Q and U time-streams for the current chunk. */
                smf_fit_qui( wf, data, &odataq, &odatau, ogrpi ? &odatai : NULL,
-                            (dim_t) polbox, ipolcrd, pasign, AST__DD2R*paoff,
-                            AST__DD2R*angrot, north, harmonic, status );
+                            ogrpf ? &odataf : NULL, (dim_t) polbox, ipolcrd,
+                            pasign, AST__DD2R*paoff, AST__DD2R*angrot, north,
+                            harmonic, status );
 
 /* Copy the smfData structures to the output NDFs. Store the output
    provenenance info at the same time. */
@@ -770,10 +782,17 @@ void smurf_calcqu( int *status ) {
                                       status );
                }
 
+               if( ogrpf ) {
+                  smf_write_smfData ( wf, odataf, NULL, NULL, ogrpf, gcount,
+                                      0, MSG__VERB, 0, smurf1__putprov, oprov,
+                                      status );
+               }
+
 /* Free the smfData structures. */
                smf_close_file( wf, &odataq, status );
                smf_close_file( wf, &odatau, status );
                if( ogrpi ) smf_close_file( wf, &odatai, status );
+               if( ogrpf ) smf_close_file( wf, &odataf, status );
 
 /* Increment the group index counter */
                gcount++;
@@ -951,6 +970,7 @@ L999:
    if( sgrp ) grpDelet( &sgrp, status);
    if( bgrp ) grpDelet( &bgrp, status );
    if( ogrpi ) grpDelet( &ogrpi, status );
+   if( ogrpf ) grpDelet( &ogrpf, status );
    if( ogrpq ) grpDelet( &ogrpq, status );
    if( ogrpu ) grpDelet( &ogrpu, status );
    if( sgroup ) smf_close_smfGroup( &sgroup, status );

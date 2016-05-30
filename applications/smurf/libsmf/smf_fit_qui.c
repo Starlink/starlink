@@ -15,9 +15,10 @@
 
 *  Invocation:
 *     smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
-*                  smfData **odatau, smfData **odatai, dim_t box,
-*                  int ipolcrd, int pasign, double paoff, double angrot,
-*                  const char *north, int harmonic, int *status )
+*                  smfData **odatau, smfData **odatai, smfData **odataf,
+*                  dim_t box, int ipolcrd, int pasign, double paoff,
+*                  double angrot, const char *north, int harmonic,
+*                  int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -32,6 +33,10 @@
 *     odatai = smfData ** (Given and Returned)
 *        Pointer to a newly created smfData struct holding the I time-streams.
 *        May be NULL.
+*     odataf = smfData ** (Given and Returned)
+*        Pointer to a newly created smfData struct holding the fit to the
+*        supplied analysed intensity time-streams (sampled at the same
+*        rate as "idata"). May be NULL.
 *     box = dim_t (Given)
 *        Length, in waveplate cycles, of a single fitting box.
 *     ipolcrd
@@ -142,10 +147,12 @@
 *        4040, the sample rate drops briefly from 178 Hz to 9 Hz.
 *     29-SEP-2015 (DSB):
 *        Added parameter "harmonic".
+*     30-MAY-2016 (DSB):
+*        Added parameter "odataf".
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2015 East Asian Observatory.
+*     Copyright (C) 2015,2016 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -201,6 +208,7 @@ typedef struct smfFitQUIJobData {
    dim_t ncol;
    double *dat;
    double *ipi;
+   double *ipf;
    double *ipq;
    double *ipu;
    double *ipv;
@@ -231,9 +239,10 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
 
 
 void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
-                  smfData **odatau, smfData **odatai, dim_t box, int ipolcrd,
-                  int pasign, double paoff, double angrot, const char *north,
-                  int harmonic, int *status ){
+                  smfData **odatau, smfData **odatai, smfData **odataf,
+                  dim_t box, int ipolcrd, int pasign, double paoff,
+                  double angrot, const char *north, int harmonic,
+                  int *status ){
 
 /* Local Variables: */
    AstFrameSet *wcs;        /* WCS FrameSet for current time slice */
@@ -357,6 +366,14 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
                                 SMF__NOCREATE_HEAD, 0, 0, status );
    }
 
+/* If created, the smfData to receive the fitted time-streams includes
+   the data and original header since it need not be down-sampled. */
+   if( odataf ) {
+      *odataf = smf_deepcopy_smfData( wf, idata, 0,
+                                SMF__NOCREATE_VARIANCE | SMF__NOCREATE_QUALITY,
+                                0, 0, status );
+   }
+
 /* Restore values in idata now that we're done */
    if( instate ) idata->hdr->allState = instate;
    if( indksquid ) idata->da->dksquid = indksquid;
@@ -462,6 +479,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
             pdata->allstates = hdr->allState + istart;
 
             pdata->ipi = odatai ? ( (double*) (*odatai)->pntr[0] ) + itime*nbolo : NULL;
+            pdata->ipf = odataf ? ( (double*) (*odataf)->pntr[0] ) + istart*nbolo : NULL;
             pdata->ipq = ( (double*) (*odataq)->pntr[0] ) + itime*nbolo;
             pdata->ipu = ( (double*) (*odatau)->pntr[0] ) + itime*nbolo;
             pdata->ipv = ( (double*) (*odataq)->pntr[1] ) + itime*nbolo;
@@ -659,14 +677,16 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    dim_t box_size;            /* NFirst time slice in box */
    dim_t ibolo;               /* Bolometer index */
    dim_t ibox;
-   dim_t ncol;
    dim_t nbolo;               /* Total number of bolometers */
+   dim_t ncol;
    double *dat;               /* Pointer to start of input data values */
    double *din;               /* Pointer to input data array for bolo/time */
+   double *ipf;               /* Pointer to output fit array */
    double *ipi;               /* Pointer to output I array */
    double *ipq;               /* Pointer to output Q array */
    double *ipu;               /* Pointer to output U array */
    double *ipv;               /* Pointer to output weights array */
+   double *pfit;              /* Pointer to output fit array */
    double *pm;
    double *ps;
    double angle;              /* Phase angle for FFT */
@@ -735,6 +755,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    dat = pdata->dat + b1;
    qua = pdata->qua + b1;
    allstates = pdata->allstates;
+   pfit = pdata->ipf ? pdata->ipf + b1 : NULL;
 
    ipi = pdata->ipi ? pdata->ipi + b1 : NULL;
    ipq = pdata->ipq + b1;
@@ -767,7 +788,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    if( b1 < nbolo && *status == SAI__OK ) {
 
 /* Loop round all bolometers to be processed by this thread. */
-      for( ibolo = b1; ibolo <= b2; ibolo++,qua++,dat++ ) {
+      for( ibolo = b1; ibolo <= b2; ibolo++,qua++,dat++,pfit++ ) {
 
 /* If the returned Stokes parameters are to be with respect to North, get
    the angle from north at the current bolometer to focal plane Y, measured
@@ -1150,6 +1171,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
                din = dat;
                qin = qua;
                state = allstates;
+               ipf = pfit;
 
                sum1 = 0.0;
                nsum1 = 0;
@@ -1191,11 +1213,16 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
                            solution[9]*c8;
 
                      res = *din - fit;
+                     if( ipf ) *ipf = fit;
 
                      sum1 += res*res;
                      nsum1++;
+
+                  } else if( ipf ) {
+                     *ipf = VAL__BADD;
                   }
 
+                  if( ipf ) ipf += nbolo;
                   din += nbolo;
                   qin += nbolo;
                }
@@ -1218,6 +1245,15 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
                *(ipq++) = VAL__BADD;
                *(ipu++) = VAL__BADD;
                *(ipv++) = VAL__BADD;
+
+               if( pfit ) {
+                  ipf = pfit;
+
+                  for( ibox = 0; ibox <  box_size; ibox++,state++ ) {
+                     *ipf = VAL__BADD;
+                     ipf += nbolo;
+                  }
+               }
             }
          }
       }
