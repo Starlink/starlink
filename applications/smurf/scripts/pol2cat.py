@@ -726,8 +726,8 @@ try:
       ucont.comment = "ucont"
 
       msg_out( "Calculating Q and U values for each bolometer...")
-      invoke("$SMURF_DIR/calcqu in={0} config=\"{1}\" outq={2} outu={3} "
-             "harmonic={4} fix".format(noext,starutil.shell_quote(config),
+      invoke("$SMURF_DIR/calcqu in={0} config=\"{1}\" outq={2} outu={3} fix=yes "
+             "harmonic={4} lsqfit=no".format(noext,starutil.shell_quote(config),
                                        qcont,ucont,harmonic) )
 
 #  The next stuff we do independently for each subarray.
