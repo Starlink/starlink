@@ -583,6 +583,13 @@ try:
       ly -= delta
       uy += delta
 
+#  Ensure they are integers so that they are interpreted as integer
+#  pixel indices rather than WCS axis values. 
+      lx = int( round( lx ) )
+      ux = int( round( ux ) )
+      ly = int( round( ly ) )
+      uy = int( round( uy ) )
+
 #  Generate Q,U and I for a single gaussian bump.  Tangential vectors
 #  centred on the bump, with increasing percentage polarisation at larger
 #  radii. Y pixel axis is reference direction. First create the I map.
