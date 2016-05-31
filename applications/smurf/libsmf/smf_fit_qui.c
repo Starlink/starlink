@@ -788,7 +788,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    if( b1 < nbolo && *status == SAI__OK ) {
 
 /* Loop round all bolometers to be processed by this thread. */
-      for( ibolo = b1; ibolo <= b2; ibolo++,qua++,dat++,pfit++ ) {
+      for( ibolo = b1; ibolo <= b2; ibolo++,qua++,dat++ ) {
 
 /* If the returned Stokes parameters are to be with respect to North, get
    the angle from north at the current bolometer to focal plane Y, measured
@@ -1213,16 +1213,16 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
                            solution[9]*c8;
 
                      res = *din - fit;
-                     if( ipf ) *ipf = fit;
+                     if( pfit ) *ipf = fit;
 
                      sum1 += res*res;
                      nsum1++;
 
-                  } else if( ipf ) {
+                  } else if( pfit ) {
                      *ipf = VAL__BADD;
                   }
 
-                  if( ipf ) ipf += nbolo;
+                  if( pfit ) ipf += nbolo;
                   din += nbolo;
                   qin += nbolo;
                }
@@ -1256,6 +1256,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
                }
             }
          }
+         if( pfit ) pfit++;
       }
    }
 
