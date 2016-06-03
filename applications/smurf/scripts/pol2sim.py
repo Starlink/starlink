@@ -72,15 +72,15 @@
 *     AMP2 = _DOUBLE (Read)
 *        Controls the amplitude of the 2 Hz signal. It gives the amplitude
 *        of the 2 Hz signal as a fraction of the total intensity. See
-*        also "PHASE2". Only used if ADDON is False. [0.0001]
+*        also "PHASE2". Only used if ADDON is False. [0.0003]
 *     AMP4 = _DOUBLE (Read)
 *        Controls the amplitude of the 4 Hz signal. It gives the amplitude
 *        of the 4 Hz signal as a fraction of the total intensity. See
-*        also "PHASE4". Only used if ADDON is False. [0.00027]
+*        also "PHASE4". Only used if ADDON is False. [0.009]
 *     AMP16 = _DOUBLE (Read)
 *        Controls the amplitude of the 16 Hz signal. It gives the amplitude
 *        of the 16 Hz signal as a fraction of the total intensity. See
-*        also "PHASE16". Only used if ADDON is False. [0.00005]
+*        also "PHASE16". Only used if ADDON is False. [0.0008]
 *     ARTI = NDF (Read or write)
 *        A 2D NDF holding the artificial total intensity map from which the
 *        returned time-stream data is derived. If the NEWART parameter
@@ -400,11 +400,11 @@ try:
    params.append(starutil.Par0F("CFACTOR", "Expansion factor for COM values",
                                 0.2, True ))
    params.append(starutil.Par0F("AMP2", "Amplitude for 2Hz signal",
-                                0.0001, True ))
+                                0.0003, True ))
    params.append(starutil.Par0F("AMP4", "Amplitude for 4Hz signal",
-                                0.00027, True ))
+                                0.009, True ))
    params.append(starutil.Par0F("AMP16", "Amplitude for 16Hz signal",
-                                0.00005, True ))
+                                0.0008, True ))
    params.append(starutil.Par0F("PHASE2", "Phase for 2Hz signal (deg.s)",
                                 0.0, True ))
    params.append(starutil.Par0F("PHASE4", "Phase for 4Hz signal (deg.s)",
