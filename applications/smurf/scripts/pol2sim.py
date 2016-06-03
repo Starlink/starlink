@@ -106,12 +106,23 @@
 *        value. Real POL2 data seems to have a much flatter common-mode
 *        than real non-POL2 data, so the default flattens the common-mode
 *        to some extent. Only used if ADDON is False. [0.2]
-*     COMVAL = _DOUBLE (Read)
-*        Only used if a null value is supplied for INCOM, in which case
-*        COMVAL should be the constant common-mode value in pW to be added
-*        on to all time slices (i.e. a perfectly flat common mode is used).
-*        If zero is supplied (and INCOM is null), no common-mode is included
-*        in the simulated POL2 data. Only used if ADDON is False. [0.0]
+*     COMVAL1 = _DOUBLE (Read)
+*        Only used if ADDON is False and INCOM is null (!). If supplied,
+*	 COMVAL1 should be a constant sky emission value in pW seen by all
+*        bolometers and time slices. The total common-mode signal added
+*        to the simulated data is the sum of COMVAL1 and COMVAL2, but
+*        only COMVAL1 is considered when determing the Q and U values
+*        caused by Instrumental Polarisation. Supplying null (!) is
+*        equivalent to supplying zero. [0.0]
+*     COMVAL2 = _DOUBLE (Read)
+*        Only used if ADDON is False and INCOM is null (!). If supplied,
+*	 COMVAL2 should be a constant offset to add to all bolometers and
+*        time slices representing an offset in the electronics (i.e. not
+*        caused by sky emission). The total common-mode signal added
+*        to the simulated data is the sum of COMVAL1 and COMVAL2, but
+*        only COMVAL1 is considered when determing the Q and U values
+*        caused by Instrumental Polarisation. Supplying null (!) is
+*        equivalent to supplying zero. [0.0]
 *     GFACTOR = _DOUBLE (Read)
 *        A factor by which to expand the GAI model values derived from
 *        the supplied time-series data. The expansion is centred on the
@@ -163,8 +174,8 @@
 *        simulated POL2 data. The number of NDFs supplied for INCOM must
 *        equal the number supplied for IN. Each INCOM file must be at least
 *        as long (in time) as the corresponding IN file. If null (!) is
-*        supplied, the common-mode is defined by parameter COMVAL instead.
-*        Only used if ADDON is False. [!]
+*        supplied, the common-mode is defined by parameters COMVAL1 and
+*        COMVAL2 instead. Only used if ADDON is False. [!]
 *     IPFORM = LITERAL (Read)
 *        The form of instrumental polarisation to use. Can be "JK" for the
 *        Johnstone/Kennedy model, "PL1" for the simplified planetary data model,
@@ -304,6 +315,8 @@
 *     3-DEC-2015 (DSB):
 *        - Add support for PL1 IP model.
 *        - Remove IPDATA parameter.
+*     2-JUN-2016 (DSB):
+*        Replaced parameter COMVAL with COMVAL1 and COMVAL2.
 *-
 '''
 
@@ -359,7 +372,9 @@ try:
    params.append(starutil.ParNDG("ARTU", "Artificial U map", maxsize=1 ))
    params.append(starutil.ParNDG("INCOM", "Non-POL2 data files to define COM",
                                  None, noprompt=True ))
-   params.append(starutil.Par0F("COMVAL", "Constant common mode value (pW)",
+   params.append(starutil.Par0F("COMVAL1", "Constant sky emission (pW)",
+                                 0.0, noprompt=True ))
+   params.append(starutil.Par0F("COMVAL2", "Constant electronic offset (pW)",
                                  0.0, noprompt=True ))
    params.append(starutil.Par0S("RESTART", "Restart using old files?", None,
                                  noprompt=True))
@@ -438,13 +453,16 @@ try:
 #  Common mode files.
    if addon:
       incom = None
-      comval = 0.0
+      comval1 = 0.0
+      comval2 = 0.0
    else:
       incom = parsys["INCOM"].value
       if not incom:
-         comval = parsys["COMVAL"].value
+         comval1 = parsys["COMVAL1"].value
+         comval2 = parsys["COMVAL2"].value
       else:
-         comval = 0.0
+         comval1 = 0.0
+         comval2 = 0.0
 
    if incom:
       if len(incom) < len(indata):
@@ -584,7 +602,7 @@ try:
       uy += delta
 
 #  Ensure they are integers so that they are interpreted as integer
-#  pixel indices rather than WCS axis values. 
+#  pixel indices rather than WCS axis values.
       lx = int( round( lx ) )
       ux = int( round( ux ) )
       ly = int( round( ly ) )
@@ -837,8 +855,8 @@ try:
 
    if com != "!":
       parlist = "{0} com={1} ".format(parlist,com)
-   elif comval != 0.0:
-      parlist = "{0} comval={1} ".format(parlist,comval)
+   elif comval1 != 0.0 or comval2 != 0.0:
+      parlist = "{0} comval='[{1},{2}]' ".format(parlist,comval1,comval2)
 
    if gai != "!":
       parlist = "{0} gai={1} ".format(parlist,gai)

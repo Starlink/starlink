@@ -5860,10 +5860,11 @@ package @PACKAGE@ {
 
             parameter comval {
                 type _DOUBLE
+                size *
                 vpath DEFAULT
                 ppath CURRENT, DEFAULT
                 prompt {Constant comon-mode value for all time slices (pW)}
-                default 0.0
+                default !
                 helpkey *
             }
 

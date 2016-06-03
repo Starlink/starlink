@@ -2038,7 +2038,7 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
                      double phase16, int ipmodel, const double *pl1data,
                      const double *qinst, const double *uinst,
                      const double *c0, const double *p0, const double *p1,
-                     const double *angc, int harmonic, int *status );
+                     const double *angc, int harmonic, double offset, int *status );
 
 void smf_update_quality( ThrWorkForce *wf, smfData *data, int syncbad,
                          const int *badmask, smf_qual_t addqual, double badfrac,

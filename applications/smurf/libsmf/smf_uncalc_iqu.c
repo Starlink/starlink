@@ -21,7 +21,8 @@
 *                          const double *pl1data, const double *qinst,
 *                          const double *uinst, const double *c0,
 *                          const double *p0, const double *p1,
-*                          const double *angc, int harmonic, int *status );
+*                          const double *angc, int harmonic, double offset,
+*                          int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -113,6 +114,12 @@
 *        and U values should be derived. This should normally be 4, but
 *        other values can be used to investigate the effects of asymetry in
 *        the half-wave plate, etc.
+*     offset = double (Given)
+*        The constant total intensity (in pW) caused by electronic
+*        offset rather than sky emission. This value is assumed to be the
+*        same for all bolometers and time-slices. It is subtracted off
+*        the supplied total intensity before calculating the returned
+*        analysed intensity values.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -145,6 +152,8 @@
 *        Check for bad c0, p0, p1 and angc values.
 *     3-DEC-2015 (DSB):
 *        Added support for PL1 IP model.
+*     2-JUN-2016 (DSB):
+*        Added argument "offset".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -204,6 +213,7 @@ typedef struct smfUncalcIQUJobData {
    double amp2;
    double amp4;
    double amp16;
+   double offset;
    double phase2;
    double phase4;
    double phase16;
@@ -233,7 +243,7 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
                      double phase16, int ipform, const double *pl1data,
                      const double *qinst, const double *uinst, const double *c0,
                      const double *p0, const double *p1, const double *angc,
-                     int harmonic, int *status ){
+                     int harmonic, double offset, int *status ){
 
 /* Local Variables: */
    const JCMTState *state;    /* JCMTState info for current time slice */
@@ -363,6 +373,7 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
          pdata->paoff = paoff;
          pdata->angrot = angrot;
          pdata->angfac = harmonic/4.0;
+         pdata->offset = offset;
          pdata->amp2 = amp2;
          pdata->amp4 = amp4;
          pdata->amp16 = amp16;
@@ -447,6 +458,7 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    double ip_qi;              /* normalised instrument Q for current bolo */
    double ip_ui;              /* normalised instrument U for current bolo */
    double ival;               /* I  value */
+   double offset;
    double p1;
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double phase16;
@@ -501,6 +513,7 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    ca = pdata->pl1data[0];
    cb = pdata->pl1data[1];
    cc = pdata->pl1data[2];
+   offset = pdata->offset;
 
 /* Check we have something to do. */
    if( b1 < nbolo ) {
@@ -612,10 +625,13 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
                   qval = (*qin)*cosval + (*uin)*sinval;
                   uval = (*uin)*cosval - (*qin)*sinval;
 
+/* Get the total intensity of the sky emission. This is the supplied total
+   intensity value minus the electronic offset. */
+                  ival = *iin - offset;
+
 /* Add in the instrumental polarisation. This is assumed to be fixed in
-   focal planee coords, which means it is also fixed with respect to the
+   focal plane coords, which means it is also fixed with respect to the
    analyser. */
-                  ival = *iin;
                   qval += ip_qi*ival;
                   uval += ip_ui*ival;
 
@@ -624,7 +640,7 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    reference direction). Allow the angle to be scaled by some user-specified
    factor. This is to allow the investigation of other harmonics. */
                   *iin = 0.5*( ival + qval*cos( 2*phi*angfac ) +
-                                      uval*sin( 2*phi*angfac ) );
+                                      uval*sin( 2*phi*angfac ) ) + offset;
 
 /* If producing the usuall 8Hz harmonic, optionally add in 2, 4 and 16 Hz
    components to the signal. */

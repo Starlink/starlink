@@ -76,11 +76,18 @@
 *          with length at least equal to the length of the time axis of the
 *          corresponding REF cube. If null (!) is supplied, the common
 *          mode is set to a constant value given by parameter COMVAL. [!]
-*     COMVAL = _DOUBLE (Read)
-*          A value in pW to be used as the common mode signal for all time
-*          slices. Only accessed if parameter "COM" is set to null (!).
-*          supplying zero or null results in no common mode being
-*          included in the output time series data. [0.0]
+*     COMVAL(2) = _DOUBLE (Read)
+*          One or two values in pW that determine the common mode signal
+*          for all time slices. Only accessed if parameter "COM" is set to
+*          null (!). If two values are supplied, the first is taken to be
+*          the emission from the sky and the second is taken to be an
+*          offset caused by the electronics. The total common-mode
+*          signal is the sum of the two. If only one value is supplied,
+*          it is assumed that the second value is zero (i.e. the entire
+*          common-mode is caused by sky signal). Note - when simulating
+*          POL-2 data, Instrumental Polarisation is based on just the sky
+*          emission. Supplying zero or null results in no common mode being
+*          included in the output time series data. [!]
 *     GAI = NDF (Read)
 *          A group of existing 2D NDFs that specify the gain of each
 *          bolometer for the corresponding IN file. If null (!) is
@@ -340,10 +347,14 @@
 *     3-DEC-2015 (DSB):
 *        Added support for PL1 IP model. The IP model to use is now
 *        specified by the new parameter "IPFORM".
+*     2-JUN-2016 (DSB):
+*        Allow common-mode to be specified as a sum of sky emission and
+*        electronic offset. IP correction is applied just to the sky
+*        emission. See parameter COMVAL.
 
 *  Copyright:
 *     Copyright (C) 2011 Science and Technology Facilities Council.
-*     Copyright (C) 2015 East Asian Observatory.
+*     Copyright (C) 2015,2016 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -443,7 +454,7 @@ void smurf_unmakemap( int *status ) {
    double amp2;               /* Amplitude of 2 Hz signal */
    double amp4;               /* Amplitude of 4 Hz signal */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
-   double comval;             /* Constant common mode value (pW) */
+   double comval[2];          /* Constant common mode values (pW) */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double params[ 4 ];        /* astResample parameters */
    double phase16;            /* Phase of 16 Hz signal */
@@ -485,6 +496,7 @@ void smurf_unmakemap( int *status ) {
    int nelqu;                 /* Number of elements in Q or U array */
    int ngood;                 /* No. of good values in putput cube */
    int nparam = 0;            /* No. of parameters required for interpolation scheme */
+   int nval;                  /* Number of values obtained for a parameter */
    int pasign;                /* Indicates sense of POL_ANG value */
    int sdim[ 2 ];             /* Array of significant pixel axes */
    int slbnd[ 2 ];            /* Array of lower bounds of input map */
@@ -887,15 +899,19 @@ void smurf_unmakemap( int *status ) {
 
 /* Otherwise see if a time-constant common  mode signal is to be used. */
       } else if( *status == SAI__OK ) {
-         parGet0d( "COMVAL", &comval, status );
+         parGet1d( "COMVAL", 2, comval, &nval, status );
          if( *status == PAR__NULL ) {
             errAnnul( status );
-            comval = 0.0;
+            comval[0] = 0.0;
+            comval[1] = 0.0;
+         } else if( nval == 1 ) {
+            comval[1] = 0.0;
          }
          indfcs = NDF__NOID;
          inc_data = NULL;
-         if( comval != 0.0 ) msgOutiff( MSG__DEBUG, "", "Using constant "
-                                        "COM value of %g\n", status, comval );
+         if( comval[0]+comval[1] != 0.0 ) msgOutiff( MSG__DEBUG, "",
+                                        "Using constant COM value of %g\n",
+                                        status, comval[0]+comval[1] );
       }
 
 /* Open any GAI files. */
@@ -937,8 +953,8 @@ void smurf_unmakemap( int *status ) {
                      interp, params, sigma, in_data, odata->pntr[ 0 ],
                      NULL, &ngood, status );
 
-/* Add on any COM data. */
-      smf_addcom( wf, odata, inc_data, comval, status );
+/* Add on any COM data - the sum of the sky emission and electronic offset. */
+      smf_addcom( wf, odata, inc_data, comval[0]+comval[1], status );
 
 /* Issue a wrning if there is no good data in the output cube. */
       if( ngood == 0 ) msgOutif( MSG__NORM, " ", "   Output contains no "
@@ -959,7 +975,7 @@ void smurf_unmakemap( int *status ) {
 /* Determine the harmonic to use. */
          parGet0i( "HARMONIC", &harmonic, status );
 
-/* If producing the normal 8 Hz harmonic, get the amplitude and phase of a
+/* If producing the normal 8 Hz harmonic, get the amplitude and phase of
    other signals to add onto the 8 Hz signal. */
          if( harmonic == 4 ) {
             parGet0d( "AMP2", &amp2, status );
@@ -999,7 +1015,7 @@ void smurf_unmakemap( int *status ) {
                          amp2, AST__DD2R*phase2, amp4, AST__DD2R*phase4,
                          amp16, AST__DD2R*phase16, ipform, pl1data,
                          qinst_data, uinst_data, c0_data, p0_data, p1_data,
-                         angc_data, harmonic, status );
+                         angc_data, harmonic, comval[1], status );
 
 /* Release work space. */
          outq_data = astFree( outq_data );
