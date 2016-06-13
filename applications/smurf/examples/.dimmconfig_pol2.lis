@@ -37,7 +37,6 @@
 
 #  Use PCA to model and remove the  background polarisation.
    modelorder=(pca,ext,ast,noi)
-   pca.pcathresh=4
 
 #  Time based despiking.
    spikebox=10
