@@ -329,7 +329,7 @@ itcl::class gaia::GaiaCube {
       #  Add tab window for choosing either the helper controls.
       itk_component add tabnotebook {
          iwidgets::tabnotebook $w_.tab -equaltabs 0 \
-            -angle 0 -tabpos n -width 420 -height 500
+            -angle 0 -tabpos n -width 460 -height 500
       }
       pack $itk_component(tabnotebook) -fill both -expand 1
 
@@ -360,9 +360,24 @@ itcl::class gaia::GaiaCube {
       }
       pack $itk_component(sruler) -side top -fill x
 
+      #  Scrolled frame for the specrum window. MJC complained.
+      itk_component add sf1 {
+         iwidgets::scrolledframe $spectrumTab.sf1 \
+            -width 400 \
+            -height 500 \
+            -scrollmargin 0 \
+            -relief flat \
+            -vscrollmode dynamic \
+            -hscrollmode dynamic
+      } {
+         #  Weird interaction with usual.
+         rename -labelfont -labelfont labelfont LabelFont
+      }
+      set sf1win [$itk_component(sf1) childsite]
+
       set ref_ids 1
       itk_component add spectrum {
-         GaiaCubeSpectrum $spectrumTab.spectrum \
+         GaiaCubeSpectrum $sf1win.spectrum \
             -gaiacube [code $this] \
             -gaia $itk_option(-gaia) \
             -ref_id $ref_ids \
@@ -379,6 +394,8 @@ itcl::class gaia::GaiaCube {
       }
       set ref_range_controls_($ref_ids) $itk_component(spectrum)
       pack $itk_component(spectrum) -side top -fill both -ipadx 1m -ipady 1m
+      pack $itk_component(sf1) -side top -fill both -ipadx 1m -ipady 1m
+      ::update idletasks
 
       #  Animation section.
 
