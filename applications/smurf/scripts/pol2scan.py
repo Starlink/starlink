@@ -3,7 +3,7 @@
 '''
 *+
 *  Name:
-*     pol2scan
+*     POL2SCAN
 
 *  Purpose:
 *     Create Q and U maps from a set of POL-2 "spin&scan" data
@@ -230,7 +230,7 @@
 *        - Use the Epoch of the POL2 observation rather than the Epoch of
 *        the IP reference map when determining the expected IP beam shape.
 *     26-MAY-2016 (DSB):
-*        Do not use the AST mask when determining the pointing correction if 
+*        Do not use the AST mask when determining the pointing correction if
 *        the AST mask contains very few pixels.
 *
 '''

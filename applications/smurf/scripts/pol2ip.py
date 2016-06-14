@@ -3,7 +3,7 @@
 '''
 *+
 *  Name:
-*     pol2ip
+*     POL2IP
 
 *  Purpose:
 *     Create an Instrumental Polarisation (IP) model from a set of POL2

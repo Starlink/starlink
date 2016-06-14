@@ -3,7 +3,7 @@
 '''
 *+
 *  Name:
-*     pol2sim
+*     POL2SIM
 
 *  Purpose:
 *     Create simulated POL2 data from known I, Q and U maps

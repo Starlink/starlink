@@ -3,7 +3,7 @@
 '''
 *+
 *  Name:
-*     pol2stack
+*     POL2STACK
 
 *  Purpose:
 *     Combine multiple Q, U and I images and create a vector catalogue
