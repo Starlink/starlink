@@ -1,0 +1,1544 @@
+#!/bin/tcsh
+
+#  Makes (most) of the figures for the pol2-dr.tex document.
+#  Env. variable SC2 should point to the root of the SCUBA-2
+#  raw data tree (e.g. /jcmtdata/raw/scuba2).
+#
+#  It takes a VERY long time to run... several hours.... and
+#  it's not the nicest bit of code ever written....
+
+source $SMURF_DIR/smurf.csh > /dev/null
+source $KAPPA_DIR/kappa.csh > /dev/null
+source $POLPACK_DIR/polpack.csh > /dev/null
+source $ATOOLS_DIR/atools.csh > /dev/null
+
+setenv PGPLOT_PS_FONT Helvetica
+gdset /avcps
+
+echo "colour=black" > sty
+echo "drawtitle=0" >> sty
+echo "width=3" >> sty
+
+
+#  ------------------ Raw data scection ------------------
+
+
+set testdata = $SC2/s8a/20160125/00031/s8a20160125_00031_0003.sdf
+set conf = "^/star/share/smurf/dimmconfig_pol2_extended.lis"
+set xb = 20
+set yb = 20
+
+
+
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=2 ypic=3
+picsel a3
+linplot $testdata\($xb,$yb,2800~1700\) style="'^sty,textlab=0'"
+picsel a4
+linplot $testdata\($xb,$yb,2800~200\) style="'^sty,textlab=0'"
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf rawdata.pdf
+
+
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=2 ypic=3
+sc2clean in=$testdata out=cleaned config=$conf
+sc2fft in=cleaned out=fft power=yes
+picsel a3
+linplot fft\(:20.0,$xb,$yb,1\) ybot=0 ytop=0.02 style="'^sty,Label(2)=Power spectral density'"
+picsel a4
+linplot fft\(:20.0,$xb,$yb,1\) ymap=log style="'^sty,Label(2)=Power spectral density'"
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf rawfft.pdf
+
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=2 ypic=3
+
+foreach ar (s8a s8b s8c s8d)
+   ls $SC2/${ar}/20151002/00115/* | grep -v "0001.sdf" | grep -v "0002.sdf" > ff
+   calcqu in=^ff outq=q${ar}calib1 outu=u${ar}calib1 north=! config="paoff=0.0"
+   maths exp="'0.5*atan2d(iu,iq)'" iu=u${ar}calib1 iq=q${ar}calib1 out=${ar}ang1
+end
+histogram s8aang1 ybot=0 style="'^sty,label(1)=Angle (degrees) 20151002 obs 115'" range=\'50,55\' numbin=400
+histogram s8bang1 ybot=0 clear=no style="'^sty,colour=red'" range=\'50,55\' numbin=400
+histogram s8cang1 ybot=0 clear=no style="'^sty,colour=blue'" range=\'50,55\' numbin=400
+histogram s8dang1 ybot=0 clear=no style="'^sty,colour=green'" range=\'50,55\' numbin=400
+
+foreach ar (s8a s8b s8c s8d)
+   ls $SC2/${ar}/20151003/00001/* | grep -v "0001.sdf" | grep -v "0002.sdf" > ff
+   calcqu in=^ff outq=q${ar}calib2 outu=u${ar}calib2 north=! config="paoff=0.0"
+   maths exp="'0.5*atan2d(iu,iq)'" iu=u${ar}calib2 iq=q${ar}calib2 out=${ar}ang2
+end
+picsel a2
+histogram s8aang2 ybot=0 style="'^sty,label(1)=Angle (degrees) 20151003 obs 1'" range=\'50,55\' numbin=400
+histogram s8bang2 ybot=0 clear=no style="'^sty,colour=red'" range=\'50,55\' numbin=400
+histogram s8cang2 ybot=0 clear=no style="'^sty,colour=blue'" range=\'50,55\' numbin=400
+histogram s8dang2 ybot=0 clear=no style="'^sty,colour=green'" range=\'50,55\' numbin=400
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf paoff.pdf
+
+
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=2 ypic=3
+
+foreach ar (s8a s8b s8c s8d)
+   ls $SC2/${ar}/20151002/00115/* | grep -v "0001.sdf" | grep -v "0002.sdf" > ff
+   calcqu in=^ff outq=q${ar}zcalib1 outu=u${ar}zcalib1 north=!
+   maths exp="'0.5*atan2d(iu,iq)'" iu=u${ar}zcalib1 iq=q${ar}zcalib1 out=fred
+   maths exp="'qif((ia<0),ia+180,ia)'" ia=fred out=${ar}zang1
+end
+
+histogram s8azang1 ybot=0 style="'^sty,label(1)=Angle (degrees) 20151002 obs 115'" range=\'87,92\' numbin=400
+histogram s8bzang1 ybot=0 clear=no style="'^sty,colour=red'" range=\'87,92\' numbin=400
+histogram s8czang1 ybot=0 clear=no style="'^sty,colour=blue'" range=\'87,92\' numbin=400
+histogram s8dzang1 ybot=0 clear=no style="'^sty,colour=green'" range=\'87,92\' numbin=400
+
+foreach ar (s8a s8b s8c s8d)
+   ls $SC2/${ar}/20151003/00001/* | grep -v "0001.sdf" | grep -v "0002.sdf" > ff
+   calcqu in=^ff outq=q${ar}zcalib2 outu=u${ar}zcalib2 north=!
+   maths exp="'0.5*atan2d(iu,iq)'" iu=u${ar}zcalib2 iq=q${ar}zcalib2 out=fred
+   maths exp="'qif((ia<0),ia+180,ia)'" ia=fred out=${ar}zang2
+end
+picsel a2
+histogram s8azang2 ybot=0 style="'^sty,label(1)=Angle (degrees) 20151003 obs 1'" range=\'87,92\' numbin=400
+histogram s8bzang2 ybot=0 clear=no style="'^sty,colour=red'" range=\'87,92\' numbin=400
+histogram s8czang2 ybot=0 clear=no style="'^sty,colour=blue'" range=\'87,92\' numbin=400
+histogram s8dzang2 ybot=0 clear=no style="'^sty,colour=green'" range=\'87,92\' numbin=400
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf paoff2.pdf
+
+
+
+# ------------------ Step fixing section ------------------
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=1 ypic=4
+sc2concat in=$SC2/s8a/20160125/00031/\* out=20160125_31
+linplot 20160125_31'(26,6,)' style=^sty
+picsel a2
+linplot 20160125_31'(26,6,2016-01-25T09:39:33~5000)' style=^sty
+sc2clean in=20160125_31 out=20160125_31_cln \
+   config="'^$STARLINK_DIR/share/smurf/dimmconfig_pol2_extended.lis,order=-1,spikethresh=0'"
+picsel a3
+linplot 20160125_31_cln'(26,6,2016-01-25T09:39:33~5000)' style=^sty
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf steps1.pdf
+
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=1 ypic=4
+calcqu in=20160125_31 outq=q20160125_31 outu=u20160125_31
+linplot q20160125_31'(26,6,)' style=^sty
+picsel a2
+linplot u20160125_31'(26,6,)' style=^sty
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf steps2.pdf
+
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=1 ypic=4
+linplot 20160125_31'(26,6,260000~600)' style=^sty
+picsel a2
+linplot 20160125_31'(26,6,261000~600)' style=^sty
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf steps3.pdf
+
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=1 ypic=4
+linplot q20160125_31'(26,6,)' style=^sty comp=err ytop=0.0015
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf steps4.pdf
+
+
+# ---------------------  triggering faults ---------------------------------
+
+
+$HDSTOOLS_DIR/hcreate polang image quiet
+$HDSTOOLS_DIR/hcopy $SC2/s8a/20160421/00053/s8a20160421_00053_0067.more.jcmtstate.pol_ang \
+                     polang.data_array  quiet
+
+$HDSTOOLS_DIR/hcreate rtsend image quiet
+$HDSTOOLS_DIR/hcopy $SC2/s8a/20160421/00053/s8a20160421_00053_0067.more.jcmtstate.rts_end \
+                     rtsend.data_array  quiet
+
+csub rtsend 57499.610106049 rtsend2
+
+scatter rtsend2'(2076~250)' polang'(2076~250)' \
+        style="'^sty,size(Markers)=3,Label(1)=Time (RTS_END offset in days),Label(2)=HWP angle (POL_ANG in radians)'"
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf polang.pdf
+
+# ---------------------  calcqu (stare & spin) ---------------------------------
+
+calcqu in=$SC2/s8a/20120926/00082/\* outq=fredq outu=fredu fix=yes \
+       harmonic=4 lsqfit=no \
+       config="'^$STARLINK_DIR/share/smurf/dimmconfig.lis'"
+gdclear
+rm pgplot.ps
+display orionA'(-57:115,-105:51)' mode=perc percentiles=\[5,99\] style=^sty
+set c = 1
+foreach n (`ndfecho fredq`)
+   echo "^sty" > s
+   echo "colour=$c" >> s
+   contour noclear labpos=! mode=bound $n style=^s
+   @ c = $c + 1
+   if( $c == 17 ) then
+      set c = 1
+   endif
+end
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf stare.pdf
+
+
+# ---------------------  calcqu (scan & spin) ---------------------------------
+echo "$SC2/s8a/20160118/00017/s8a*_0001.sdf" > infiles
+echo "$SC2/s8a/20160118/00017/s8a*_0002.sdf" >> infiles
+echo "$SC2/s8a/20160118/00017/s8a*_0003.sdf" >> infiles
+
+sc2clean in=^infiles out=conc2 config=^$STARLINK_DIR/share/smurf/.dimmconfig_pol2.lis
+calcqu in=conc2 outq=qt outu=ut outf=ft config='doclean=0'
+wcsattrib  conc2 set format'(3)' newval=iso.2
+wcsattrib  ft set format'(3)' newval=iso.2
+sub conc2 ft diff
+
+echo "^sty" > sty0
+echo "drawtitle=1" >> sty0
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=1 ypic=5
+
+linplot conc2'(20,10,2130~200)' style="'^sty0,title=Analysed intensity data'" ytop=0.1 ybot=-0.1
+picsel a2
+linplot ft'(20,10,2130~200)' style="'^sty0,numlab(1)=0,textlab(1)=0,title=Fit to analysed intensity'" ytop=0.1 ybot=-0.1
+picsel a3
+linplot diff'(20,10,2130~200)' style="'^sty0,numlab(1)=0,textlab(1)=0,title=Residuals between data and fit'" ytop=0.1 ybot=-0.1
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf fit.pdf
+
+sc2fft diff power=yes out=fft
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=1 ypic=5
+linplot fft'(:600,20,10,1)' style="'^sty0,title=Power spectrum of residuals'"
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf fitfft.pdf
+
+
+
+# ---------------------  simulations - method 1 ------------------------------
+
+
+
+mkdir sim
+cd sim
+
+
+mkdir ff
+flatfield in=$SC2/s8\?/20160112/00056/\* out=ff/\*
+
+mkdir qudir
+calcqu in=ff/\* outq=qudir/\*_QT outu=qudir/\*_UT \
+
+makemap in=qudir/\*_QT out=qmap_real config=^/star/share/smurf/dimmconfig_pol2_compact.lis
+makemap in=qudir/\*_UT out=umap_real config=^/star/share/smurf/dimmconfig_pol2_compact.lis
+maths exp="'sqrt(iq**2+iu**2)'" iq=qmap_real iu=umap_real out=pimap_real
+stats qmap_real'(3~7,-10~7)' quiet
+set noise_centre = `parget sigma stats`
+echo "noise_centre = $noise_centre"
+stats qmap_real'(66~7,-103~7)' quiet
+set noise_edge = `parget sigma stats`
+echo "noise_edge = $noise_edge"
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=2 ypic=3
+picsel a3
+display pimap_real mode=perc percentiles=\[2,98\] style=^../sty
+picsel a4
+display pimap_real.more.smurf.exp_time mode=perc percentiles=\[2,98\] style=^../sty
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf ../3c273.pdf
+
+rm -rf sim >& /dev/null
+mkdir sim
+pol2sim in=ff/\* newart=yes ipeak=0.01 arti=iart artq=qart artu=uart out=sim/\* sigma=0.003 comval1=6 comval2=58.5
+mkdir sim/qudir
+calcqu in=sim/\* outq=sim/qudir/\*_QT outu=sim/qudir/\*_UT
+makemap in=sim/qudir/\*_QT  out=sim/qmap ref=iart config=^/star/share/smurf/.dimmconfig_pol2.lis
+makemap in=sim/qudir/\*_UT  out=sim/umap ref=iart config=^/star/share/smurf/.dimmconfig_pol2.lis
+makemap in=sim/qudir/\*_QT  out=sim/qmap_ip ipref=iart config=^/star/share/smurf/.dimmconfig_pol2.lis
+makemap in=sim/qudir/\*_UT  out=sim/umap_ip ipref=iart config=^/star/share/smurf/.dimmconfig_pol2.lis
+
+paste in=sim/\?map_ip shift=\[0,0,1\] out=tcube
+histat tcube'(0~100,0~100,)' percentiles=\[5,95\] quiet
+set lo = `parget perval'(1)' histat`
+set hi = `parget perval'(2)' histat`
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=2 ypic=3 fill=0.9
+picsel a1
+display qart mode=sca low=$lo high=$hi axes=no key=no style=^../sty quiet
+drawnorth style="'^../sty,size=1'"
+
+
+picsel a2
+smurfcopy ff/s8b20160112_00056_0027 slice=3000 out=slice
+wcsframe slice fplane
+ndfcopy uart trim=yes uart2d
+astconvert from=uart2d to=slice domainlist=sky result=sky2fp
+astgetmapping sky2fp AST__BASE AST__CURRENT map
+astgetframe sky2fp AST__CURRENT frm
+astaddframe uart2d iframe=sky map=map frame=frm result=uart2d
+display uart2d mode=sca low=$lo high=$hi axes=no key=no style=^../sty quiet
+drawnorth style="'^../sty,size=1,symbol(1)=Fx,symbol(2)=Fy'" frame=fplane
+
+picsel a3
+maths exp="'sqrt(iq**2+iu**2)'" iq=qart iu=uart out=piart
+display piart'(0~30,0~30)' mode=cur low=-0.001 high=0.001 style=^../sty quiet
+
+maths exp="'0.5*atan2d(iu,iq)'" iq=qart iu=uart out=angart
+setunits piart5 pW
+vecplot piart'(0~30,0~30)' angart'(0~30,0~30)' vscale=0.002 axes=no \
+        key=no clear=no
+
+picsel a4
+display iart mode=cur low=-0.01 high=0.01 style=^../sty quiet
+
+div piart iart part
+stats part quiet
+set pmax = `parget maximum stats`
+echo "pmax = $pmax"
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf ../art.pdf
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=3 ypic=3
+picsel a2
+display sim/qmap_ip mode=perc percentiles=\[2,98\] quiet
+stats sim/qmap_ip'(0~20,-25~20)' quiet
+set sig = `parget sigma stats`
+echo "Q recon noise = $sig"
+picsel a1
+setbound qart like=sim/qmap_ip
+display qart mode=cur quiet
+picsel a3
+setbound qmap_real like=sim/qmap_ip
+display qmap_real mode=cur quiet
+stats qmap_real'(0~20,-25~20)' quiet
+set sig = `parget sigma stats`
+echo "Q real noise = $sig"
+
+picsel a5
+display sim/umap_ip mode=perc percentiles=\[2,98\] quiet
+stats sim/umap_ip'(0~20,-25~20)' quiet
+set sig = `parget sigma stats`
+echo "U recon noise = $sig"
+picsel a4
+setbound uart like=sim/umap_ip
+display uart mode=cur quiet
+picsel a6
+setbound umap_real like=sim/umap_ip
+display umap_real mode=cur quiet
+stats umap_real'(0~20,-25~20)' quiet
+set sig = `parget sigma stats`
+echo "U real noise = $sig"
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf ../recon1.pdf
+
+
+sub sim/qmap_ip qart qres
+sub sim/umap_ip uart ures
+
+thresh in=qart out=qartt thrlo=1E-5 newlo=bad  thrhi=-1E-5 newhi=bad
+thresh in=uart out=uartt thrlo=1E-5 newlo=bad  thrhi=-1E-5 newhi=bad
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=3 ypic=3 fill=0.8
+picsel a1
+display sim/qmap_ip'(0~30,0~30)' mode=perc percentiles=\[2,98\] quiet
+set qlo = `parget scalow display`
+set qhi = `parget scahigh display`
+picsel a2
+display qres'(0~30,0~30)' mode=cur quiet
+picsel a3
+scatter sim/qmap_ip'(0~30,0~30)' qartt'(0~30,0~30)' \
+        style="'^../sty,label(1)=Reconstructed Q,label(2)=Original Q'"
+normalize qart'(0~30,0~30)'  sim/qmap_ip'(0~30,0~30)' out=qtmp noclear \
+          pcrange=\[0,100\] style="'^../sty,colour=red'" \
+          drawmark=no drawwidth=no
+
+picsel a4
+display sim/umap_ip'(0~30,0~30)' mode=perc percentiles=\[2,98\] quiet
+set ulo = `parget scalow display`
+set uhi = `parget scahigh display`
+picsel a5
+display ures'(0~30,0~30)' mode=cur quiet
+picsel a6
+scatter sim/umap_ip'(0~30,0~30)' uartt'(0~30,0~30)' \
+        style="'^../sty,label(1)=Reconstructed U,label(2)=Original U'"
+normalize uart'(0~30,0~30)' sim/umap_ip'(0~30,0~30)' out=utmp noclear \
+          pcrange=\[0,100\] style="'^../sty,colour=red'" \
+          drawmark=no drawwidth=no
+
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf ../recon2.pdf
+
+
+sub sim/qmap_ip qtmp qres
+sub sim/umap_ip utmp ures
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=3 ypic=3 fill=0.8
+picsel a1
+display qres'(0~30,0~30)' mode=sca low=$qlo high=$qhi quiet
+picsel a2
+display ures'(0~30,0~30)' mode=sca low=$ulo high=$uhi quiet
+
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf ../recon3.pdf
+
+
+# ---------------------  simulations - method 2 ------------------------------
+
+mkdir sim2
+pol2sim addon=yes in=ff/\* xc=0 yc=-20 newart=yes ipeak=0.01 arti=iart2 \
+        artq=qart2 artu=uart2 out=sim2/\*
+mkdir sim2/qudir
+calcqu in=sim2/\* outq=sim2/qudir/\*_QT outu=sim2/qudir/\*_UT
+makemap in=sim2/qudir/\*_QT  out=sim2/qmap_ip ipref=iart2 config=^/star/share/smurf/.dimmconfig_pol2.lis
+makemap in=sim2/qudir/\*_UT  out=sim2/umap_ip ipref=iart2 config=^/star/share/smurf/.dimmconfig_pol2.lis
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=3 ypic=3
+picsel a2
+display sim2/qmap_ip mode=perc percentiles=\[2,98\] quiet
+stats sim2/qmap_ip'(-25~20,0~20)' quiet
+set sig = `parget sigma stats`
+echo "Q recon noise = $sig"
+picsel a1
+setbound qart2 like=sim2/qmap_ip
+display qart2 mode=cur quiet
+picsel a3
+setbound qmap_real like=sim2/qmap_ip
+display qmap_real mode=cur quiet
+stats qmap_real'(-25~20,0~20)' quiet
+set sig = `parget sigma stats`
+echo "Q real noise = $sig"
+
+picsel a5
+display sim2/umap_ip mode=perc percentiles=\[2,98\] quiet
+stats sim2/umap_ip'(-25~20,0~20)' quiet
+set sig = `parget sigma stats`
+echo "U recon noise = $sig"
+picsel a4
+setbound uart2 like=sim2/umap_ip
+display uart2 mode=cur quiet
+picsel a6
+setbound umap_real like=sim2/umap_ip
+display umap_real mode=cur quiet
+stats umap_real'(-25~20,0~20)' quiet
+set sig = `parget sigma stats`
+echo "U real noise = $sig"
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf ../recon1b.pdf
+
+
+sub sim2/qmap_ip qart2 qres
+sub sim2/umap_ip uart2 ures
+
+thresh in=qart2 out=qart2t thrlo=1E-5 newlo=bad  thrhi=-1E-5 newhi=bad
+thresh in=uart2 out=uart2t thrlo=1E-5 newlo=bad  thrhi=-1E-5 newhi=bad
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=3 ypic=3 fill=0.8
+picsel a1
+display sim2/qmap_ip'(0~30,-20~30)' quiet mode=sca low=$qlo high=$qhi
+picsel a2
+display qres'(0~30,-20~30)' mode=sca low=$qlo high=$qhi quiet
+picsel a3
+scatter sim2/qmap_ip'(0~30,-20~30)' qart2t'(0~30,-20~30)' \
+        style="'^../sty,label(1)=Reconstructed Q,label(2)=Original Q'"
+normalize qart2'(0~30,-20~30)'  sim2/qmap_ip'(0~30,-20~30)' out=qtmp noclear \
+          pcrange=\[0,100\] style="'^../sty,colour=red'" \
+          drawmark=no drawwidth=no
+
+picsel a4
+display sim2/umap_ip'(0~30,-20~30)' mode=sca low=$ulo high=$uhi quiet
+picsel a5
+display ures'(0~30,-20~30)' mode=sca low=$ulo high=$uhi quiet
+picsel a6
+scatter sim2/umap_ip'(0~30,-20~30)' uart2t'(0~30,-20~30)' \
+        style="'^../sty,label(1)=Reconstructed U,label(2)=Original U'"
+normalize uart2'(0~30,-20~30)' sim2/umap_ip'(0~30,-20~30)' out=utmp noclear \
+          pcrange=\[0,100\] style="'^../sty,colour=red'" \
+          drawmark=no drawwidth=no
+
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf ../recon2b.pdf
+
+
+sub sim2/qmap_ip qtmp qres
+sub sim2/umap_ip utmp ures
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=3 ypic=3 fill=0.8
+picsel a1
+display qres'(0~30,-20~30)' mode=sca low=$qlo high=$qhi quiet
+picsel a2
+display ures'(0~30,-20~30)' mode=sca low=$ulo high=$uhi quiet
+
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf ../recon3b.pdf
+
+cd ..
+
+
+# ---------------------  Mapping - 1/f noise ------------------------------
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=1 ypic=5 fill=0.9
+
+  Uranus
+calcqu in=$SC2/s8a/20151115/00039/s8a\*_000\? outq=qtmp outu=utmp
+sc2clean qtmp out=uranus_qt config=^$STARLINK_DIR/share/smurf/dimmconfig_pol2_compact.lis
+sc2clean utmp out=uranus_ut config=^$STARLINK_DIR/share/smurf/dimmconfig_pol2_compact.lis
+sc2fft uranus_qt power=yes out=uqfft
+sc2fft uranus_ut power=yes out=uufft
+sc2clean $SC2/s8a/20151115/00040/s8a\*_000\? out=nonpol_cln \
+         config=^$STARLINK_DIR/share/smurf/dimmconfig_bright_compact.lis
+sc2fft nonpol_cln power=yes out=unpfft
+
+ndftrace unpfft quiet
+set nt = `parget dims'(1)' ndftrace`
+reshape unpfft'(,,,1)' shape=\[$nt,1280\] out=unpfft_2d
+collapse unpfft_2d estimator=median axis=2 out=fred1
+ndfcopy unpfft'(,10,10,1)' trim=yes out=aa
+wcscopy ndf=fred1 like=aa ok=yes
+
+ndftrace uqfft quiet
+set nt = `parget dims'(1)' ndftrace`
+reshape uqfft'(,,,1)' shape=\[$nt,1280\] out=uqfft_2d
+collapse uqfft_2d estimator=median axis=2 out=fred1q
+ndfcopy uqfft'(,10,10,1)' trim=yes out=aa
+wcscopy ndf=fred1q like=aa ok=yes
+
+ndftrace uufft quiet
+set nt = `parget dims'(1)' ndftrace`
+reshape uufft'(,,,1)' shape=\[$nt,1280\] out=uufft_2d
+collapse uufft_2d estimator=median axis=2 out=fred1u
+ndfcopy uufft'(,10,10,1)' trim=yes out=aa
+wcscopy ndf=fred1u like=aa ok=yes
+
+set el = `fitsval fred1 elstart`
+set wvm = `fitsval fred1 wvmtaust`
+set tr = `calc "'0.01*nint(100*exp(-4.6*(pw-0.00435)/sind(pe)))'" pe=$el pw=$wvm`
+picsel a1
+echo "^sty,drawtitle=1" > tsty
+echo "title=Uranus 20151115 obs 39 (POL-2) and 40 (CV_DAISY) T850=$tr" >> tsty
+linplot fred1'(:1.0)' ymap=log ybot=1E-9 ytop=1 sty=^tsty
+linplot fred1q'(:1.0)' noclear style=\'+colour=red\' ymap=log
+linplot fred1u'(:1.0)' noclear style=\'+colour=blue\' ymap=log
+
+  3c273
+calcqu in=$SC2/s8a/20160125/00043/s8a\*_000\? outq=qtmp outu=utmp
+sc2clean qtmp out=uranus_qt config=^$STARLINK_DIR/share/smurf/dimmconfig_pol2_compact.lis
+sc2clean utmp out=uranus_ut config=^$STARLINK_DIR/share/smurf/dimmconfig_pol2_compact.lis
+sc2fft uranus_qt power=yes out=uqfft
+sc2fft uranus_ut power=yes out=uufft
+sc2clean $SC2/s8a/20160125/00042/s8a\*_000\? out=nonpol_cln \
+         config=^$STARLINK_DIR/share/smurf/dimmconfig_bright_compact.lis
+sc2fft nonpol_cln power=yes out=unpfft
+
+ndftrace unpfft quiet
+set nt = `parget dims'(1)' ndftrace`
+reshape unpfft'(,,,1)' shape=\[$nt,1280\] out=unpfft_2d
+collapse unpfft_2d estimator=median axis=2 out=fred2
+ndfcopy unpfft'(,10,10,1)' trim=yes out=aa
+wcscopy ndf=fred2 like=aa ok=yes
+
+ndftrace uqfft quiet
+set nt = `parget dims'(1)' ndftrace`
+reshape uqfft'(,,,1)' shape=\[$nt,1280\] out=uqfft_2d
+collapse uqfft_2d estimator=median axis=2 out=fred2q
+ndfcopy uqfft'(,10,10,1)' trim=yes out=aa
+wcscopy ndf=fred2q like=aa ok=yes
+
+ndftrace uufft quiet
+set nt = `parget dims'(1)' ndftrace`
+reshape uufft'(,,,1)' shape=\[$nt,1280\] out=uufft_2d
+collapse uufft_2d estimator=median axis=2 out=fred2u
+ndfcopy uufft'(,10,10,1)' trim=yes out=aa
+wcscopy ndf=fred2u like=aa ok=yes
+
+
+set el = `fitsval fred2 elstart`
+set wvm = `fitsval fred2 wvmtaust`
+set tr = `calc "'0.01*nint(100*exp(-4.6*(pw-0.00435)/sind(pe)))'" pe=$el pw=$wvm`
+picsel a2
+echo "^sty,drawtitle=1" > tsty
+echo "title=3C273 20160125 obs 43 (POL-2) and 42 (CV_DAISY)  T850=$tr" >> tsty
+linplot fred2'(:1.0)' ymap=log ybot=1E-9 ytop=1 sty=^tsty
+linplot fred2q'(:1.0)' noclear style=\'+colour=red\' ymap=log
+linplot fred2u'(:1.0)' noclear style=\'+colour=blue\' ymap=log
+
+  CB 68
+calcqu in=$SC2/s8a/20160419/00036/s8a\*_000\? outq=qtmp outu=utmp
+sc2clean qtmp out=uranus_qt config=^$STARLINK_DIR/share/smurf/dimmconfig_pol2_compact.lis
+sc2clean utmp out=uranus_ut config=^$STARLINK_DIR/share/smurf/dimmconfig_pol2_compact.lis
+sc2fft uranus_qt power=yes out=uqfft
+sc2fft uranus_ut power=yes out=uufft
+sc2clean $SC2/s8a/20160419/00035/s8a\*_000\? out=nonpol_cln \
+         config=^$STARLINK_DIR/share/smurf/dimmconfig_bright_compact.lis
+sc2fft nonpol_cln power=yes out=unpfft
+
+ndftrace unpfft quiet
+set nt = `parget dims'(1)' ndftrace`
+reshape unpfft'(,,,1)' shape=\[$nt,1280\] out=unpfft_2d
+collapse unpfft_2d estimator=median axis=2 out=fred3
+ndfcopy unpfft'(,10,10,1)' trim=yes out=aa
+wcscopy ndf=fred3 like=aa ok=yes
+
+ndftrace uqfft quiet
+set nt = `parget dims'(1)' ndftrace`
+reshape uqfft'(,,,1)' shape=\[$nt,1280\] out=uqfft_2d
+collapse uqfft_2d estimator=median axis=2 out=fred3q
+ndfcopy uqfft'(,10,10,1)' trim=yes out=aa
+wcscopy ndf=fred3q like=aa ok=yes
+
+ndftrace uufft quiet
+set nt = `parget dims'(1)' ndftrace`
+reshape uufft'(,,,1)' shape=\[$nt,1280\] out=uufft_2d
+collapse uufft_2d estimator=median axis=2 out=fred3u
+ndfcopy uufft'(,10,10,1)' trim=yes out=aa
+wcscopy ndf=fred3u like=aa ok=yes
+
+picsel a3
+set el = `fitsval fred3 elstart`
+set wvm = `fitsval fred3 wvmtaust`
+set tr = `calc "'0.01*nint(100*exp(-4.6*(pw-0.00435)/sind(pe)))'" pe=$el pw=$wvm`
+echo "^sty,drawtitle=1" > tsty
+echo "title=CB 68 20160419 obs 36 (POL-2) and 35 (CV_DAISY) T850=$tr" >> tsty
+linplot fred3'(:1.0)' ybot=1E-9 ytop=1 ymap=log sty=^tsty
+linplot fred3q'(:1.0)' noclear style=\'+colour=red\' ymap=log
+linplot fred3u'(:1.0)' noclear style=\'+colour=blue\' ymap=log
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf qunoise.pdf
+
+
+#  -----------------------  Background removal - effects on time-streams --------------------------
+
+calcqu in=$SC2/s8a/20151115/00064/s8a\* outq=qtmp outu=utmp
+sc2clean qtmp out=qctmp config=^$STARLINK_DIR/share/smurf/dimmconfig_pol2_compact.lis
+ndftrace qctmp quiet
+set nt = `parget dims'(3)' ndftrace`
+reshape qctmp shape=\[1280,$nt\] out=qctmp2d
+wcsadd qctmp2d pixel temp unit attrs=!
+wcsattrib qctmp2d set label'(1)' newval="'Bolometer index'"
+wcsattrib qctmp2d set label'(2)' newval="'Time-slice index'"
+
+sc2clean utmp out=uctmp config=^$STARLINK_DIR/share/smurf/dimmconfig_pol2_compact.lis
+ndftrace uctmp quiet
+set nt = `parget dims'(3)' ndftrace`
+reshape uctmp shape=\[1280,$nt\] out=uctmp2d
+wcsadd uctmp2d pixel temp unit attrs=!
+wcsattrib uctmp2d set label'(1)' newval="'Bolometer index'"
+wcsattrib uctmp2d set label'(2)' newval="'Time-slice index'"
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=1 ypic=4
+picsel a2
+display fill uctmp2d mode=percentiles percentiles=\[5,95] axes=yes \
+        style="'^sty,labelunits=0'"
+picsel a1
+display fill qctmp2d mode=percentiles percentiles=\[5,95] axes=yes \
+        style="'^sty,labelunits=0'"
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf common.pdf
+
+echo "^/star/share/smurf/.dimmconfig_pol2.lis,doclean=0" > conf
+echo "numiter=1" >> conf
+echo "modelorder=(com,gai,ext,ast,noi)" >> conf
+echo "diag.out=diag" >> conf
+echo "diag.bolo=none" >> conf
+echo "diag.cube=1" >> conf
+echo "diag.models=(com)" >> conf
+echo "diag.res_after=1" >> conf
+echo "diag.res_before=1" >> conf
+makemap in=qctmp out=juk config=^conf
+
+ndftrace diag.com.aft_0_cube_0 quiet
+set nt = `parget dims'(1)' ndftrace`
+reshape diag.com.aft_0_cube_0 shape=\[$nt,1280\] out=comaft
+wcsadd comaft pixel temp unit attrs=!
+wcsattrib comaft set label'(2)' newval="'Bolometer index'"
+wcsattrib comaft set label'(1)' newval="'Time-slice index'"
+permaxes in=comaft out=comaftp perm=\[2,1\]
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=1 ypic=4
+picsel a2
+display fill comaftp mode=cur style="'^sty,labelunits=0'"
+picsel a1
+display fill comaftp mode=percentiles percentiles=\[10,90]
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf common2.pdf
+
+
+echo "^/star/share/smurf/.dimmconfig_pol2.lis,doclean=0" > conf
+echo "numiter=1" >> conf
+echo "modelorder=(pca,ext,ast,noi)" >> conf
+echo "diag.out=diag2" >> conf
+echo "diag.bolo=none" >> conf
+echo "diag.cube=1" >> conf
+echo "diag.models=(pca)" >> conf
+echo "diag.res_after=1" >> conf
+echo "diag.res_before=1" >> conf
+makemap in=qctmp out=juk config=^conf
+
+ndftrace diag2.pca.aft_0_cube_0 quiet
+set nt = `parget dims'(1)' ndftrace`
+reshape diag2.pca.aft_0_cube_0 shape=\[$nt,1280\] out=pcaaft
+wcsadd pcaaft pixel temp unit attrs=!
+wcsattrib pcaaft set label'(2)' newval="'Bolometer index'"
+wcsattrib pcaaft set label'(1)' newval="'Time-slice index'"
+permaxes in=pcaaft out=pcaaftp perm=\[2,1\]
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=1 ypic=4
+picsel a1
+display fill pcaaftp mode=cur style="'^sty,labelunits=0'"
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf pca1.pdf
+
+
+#  -----------------------  Background removal - effects on maps --------------------------
+
+mkdir 20151115_00064
+cd 20151115_00064
+calcqu in=$SC2/s8\?/20151115/00064/\* outq=./\*_QT outu=./\*_UT
+
+echo "^/star/share/smurf/.dimmconfig_pol2.lis,numiter=5" > conf1
+echo "modelorder=(com,gai,ext,ast,noi)" >> conf1
+makemap in=\*_QT  out=qmap1 config=^conf1 | tee qlog1
+makemap in=\*_UT  out=umap1 config="'^conf1'" | tee ulog1
+
+echo "^/star/share/smurf/.dimmconfig_pol2.lis,numiter=5" > conf2
+echo "pca.pcathresh=4" >> conf2
+makemap in=\*_QT  out=qmap2 config=^conf2 | tee qlog2
+makemap in=\*_UT  out=umap2 config=^conf2 | tee ulog2
+
+echo "^/star/share/smurf/.dimmconfig_pol2.lis,numiter=5" > conf3
+echo "pca.pcathresh=2" >> conf3
+makemap in=\*_QT  out=qmap3 config=^conf3 | tee qlog3
+makemap in=\*_UT  out=umap3 config=^conf3 | tee ulog3
+
+echo "^/star/share/smurf/.dimmconfig_pol2.lis,numiter=5" > conf4
+echo "pca.pcathresh=6" >> conf4
+makemap in=\*_QT  out=qmap4 config=^conf4 | tee qlog4
+makemap in=\*_UT  out=umap4 config=^conf4 | tee ulog4
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=2 ypic=3
+echo "colour=white" > tsty
+echo "colour(title)=black" >> tsty
+
+picsel a1
+stats comp=err umap1'(0~20,-20~20)' quiet
+set sig = `parget sigma stats`
+set sig = `calc "'nint(pa*1E7)/1.0E7'" pa=$sig`
+echo "title=COM/GAI (noise=$sig pW)" >> tsty
+display umap1 mode=perc percentiles=\[2,98\] axes=yes style=^tsty
+
+picsel a2
+stats comp=err umap3'(0~20,-20~20)' quiet
+set sig = `parget sigma stats`
+set sig = `calc "'nint(pa*1E7)/1.0E7'" pa=$sig`
+echo "title=PCA (thresh=2) (noise=$sig pW)" >> tsty
+display umap3 mode=cur style=^tsty
+
+picsel a3
+stats comp=err umap2'(0~20,-20~20)' quiet
+set sig = `parget sigma stats`
+set sig = `calc "'nint(pa*1E7)/1.0E7'" pa=$sig`
+echo "title=PCA (thresh=4) (noise=$sig pW)" >> tsty
+display umap2 mode=cur style=^tsty
+
+picsel a4
+stats comp=err umap4'(0~20,-20~20)' quiet
+set sig = `parget sigma stats`
+set sig = `calc "'nint(pa*1E7)/1.0E7'" pa=$sig`
+echo "title=PCA (thresh=6) (noise=$sig pW)" >> tsty
+display umap4 mode=cur style=^tsty
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf ../pca2.pdf
+
+ffclean umap1'(0~20,0~20)'  box=9 clip=\[3,3,3,3\] out=aa quiet
+stats aa quiet
+set mean = `parget mean stats`
+csub umap1'(0~20,0~20)' $mean temp
+wcsframe temp pixel
+centroid temp mode=inter init="'0,0'" quiet
+set xc = `parget xcen centroid`
+set yc = `parget ycen centroid`
+aperadd temp centre=\'$xc,$yc\' diam=6 quiet
+set sum = `parget total aperadd`
+echo "COM/GAI U sum = $sum"
+
+ffclean umap2'(0~20,0~20)'  box=9 clip=\[3,3,3,3\] out=aa quiet
+stats aa quiet
+set mean = `parget mean stats`
+csub umap2'(0~20,0~20)' $mean temp
+wcsframe temp pixel
+centroid temp mode=inter init="'0,0'" quiet
+set xc = `parget xcen centroid`
+set yc = `parget ycen centroid`
+aperadd temp centre=\'$xc,$yc\' diam=6 quiet
+set sum = `parget total aperadd`
+echo "PCA (4) U sum = $sum"
+
+ffclean umap3'(0~20,0~20)'  box=9 clip=\[3,3,3,3\] out=aa quiet
+stats aa quiet
+set mean = `parget mean stats`
+csub umap3'(0~20,0~20)' $mean temp
+wcsframe temp pixel
+centroid temp mode=inter init="'0,0'" quiet
+set xc = `parget xcen centroid`
+set yc = `parget ycen centroid`
+aperadd temp centre=\'$xc,$yc\' diam=6 quiet
+set sum = `parget total aperadd`
+echo "PCA (2) U sum = $sum"
+
+ffclean umap4'(0~20,0~20)'  box=9 clip=\[3,3,3,3\] out=aa quiet
+stats aa quiet
+set mean = `parget mean stats`
+csub umap4'(0~20,0~20)' $mean temp
+wcsframe temp pixel
+centroid temp mode=inter init="'0,0'" quiet
+set xc = `parget xcen centroid`
+set yc = `parget ycen centroid`
+aperadd temp centre=\'$xc,$yc\' diam=6 quiet
+set sum = `parget total aperadd`
+echo "PCA (6) U sum = $sum"
+
+cd ..
+
+
+
+# --------------------------- table of PCA thresh v noise and sum ------------
+set pcavals = ( 0 2 4 6 1 3 5 )
+echo " pca ut obs el wvm pisum pisumrat qsigrat usigrat" > pca.asc
+echo "$pcavals[$n] $ut $obs $el $wvm $pisum $pisumrat $qsigrat $usigrat" >> ../pca.asc
+
+foreach n (20151115_00059 20151007_00067 20151007_00060 20151007_00026 \
+           20151007_00030 20151115_00026)
+   set a = `echo $n | sed -e 's/_/ /'`
+   set ut = $a[1]
+   set obs = $a[2]
+   mkdir $n
+   cd $n
+
+   calcqu in=$SC2/s8\?/$ut/$obs/\* outq=./\*_QT outu=./\*_UT
+
+   echo "^/star/share/smurf/.dimmconfig_pol2.lis,numiter=5" > conf1
+   echo "modelorder=(com,gai,ext,ast,noi)" >> conf1
+   makemap in=\*_UT  out=umap1 config="'^conf1'" | tee ulog1
+   makemap in=\*_QT  out=qmap1 config="'^conf1'" | tee qlog1
+
+   foreach i (2 3 4 5 6 7)
+   foreach i (5 6 7)
+      echo "^/star/share/smurf/.dimmconfig_pol2.lis,numiter=5" > conf${i}
+      echo "pca.pcathresh=$pcavals[$i]" >> conf${i}
+      makemap in=\*_UT  out=umap${i} config=^conf${i} | tee ulog${i}
+      makemap in=\*_QT  out=qmap${i} config=^conf${i} | tee qlog${i}
+   end
+
+   set el = `fitsval umap1 elstart`
+   set wvm = `fitsval umap1 wvmtaust`
+   set t = `fitsval umap1 elaptime`
+   set nb = `fitsval umap1 nboloeff`
+   set ap = 16
+   set f0 = 3.162E-6
+   set t850 = `calc "'exp(-4.6*(pw-0.00435)/sind(pe))'" pw=$wvm pe=$el`
+   set nefd = `calc "'(0.325/pt-0.0674)/pf'" pt=$t850 pf=725`
+   set rms = `calc "'pd/sqrt(pt*pn*pa*pf)'" pd=$nefd pt=$t pn=$nb pa=$ap pf=$f0`
+
+   foreach n (1 2 3 4 5 6 7)
+      stats comp=err qmap${n}'(0~20,-20~20)' quiet
+      set qsig = `parget sigma stats`
+      stats comp=err umap${n}'(0~20,-20~20)' quiet
+      set usig = `parget sigma stats`
+      if( $n == 1 ) then
+         set qs0 = $qsig
+         set us0 = $usig
+      endif
+      set qsigrat = `calc "'pa/pb'" pa=$qsig pb=$qs0`
+      set usigrat = `calc "'pa/pb'" pa=$usig pb=$us0`
+
+      ffclean qmap${n}'(0~20,0~20)'  box=9 clip=\[3,3,3,3\] out=aa quiet
+      stats aa quiet
+      set mean = `parget mean stats`
+      csub qmap${n}'(0~20,0~20)' $mean temp
+      wcsframe temp pixel
+      centroid temp mode=inter init="'0,0'" quiet
+      set xc = `parget xcen centroid`
+      set yc = `parget ycen centroid`
+      aperadd temp centre=\'$xc,$yc\' diam=6 quiet
+      set qsum = `parget total aperadd`
+      if( $n == 1 ) then
+         set qsm0 = $qsum
+      endif
+      set qsumrat = `calc "'pa/pb'" pa=$qsum pb=$qsm0`
+
+      ffclean umap${n}'(0~20,0~20)'  box=9 clip=\[3,3,3,3\] out=aa quiet
+      stats aa quiet
+      set mean = `parget mean stats`
+      csub umap${n}'(0~20,0~20)' $mean temp
+      wcsframe temp pixel
+      centroid temp mode=inter init="'0,0'" quiet
+      set xc = `parget xcen centroid`
+      set yc = `parget ycen centroid`
+      aperadd temp centre=\'$xc,$yc\' diam=6 quiet
+      set usum = `parget total aperadd`
+      if( $n == 1 ) then
+         set usm0 = $usum
+      endif
+      set usumrat = `calc "'pa/pb'" pa=$usum pb=$usm0`
+
+      set pism0 = `calc "'sqrt(pq**2+pu**2)'" pu=$usm0 pq=$qsm0`
+      set pisum = `calc "'sqrt(pq**2+pu**2)'" pu=$usum pq=$qsum`
+      set pisumrat = `calc "'pa/pb'" pa=$pisum pb=$pism0`
+
+      echo "$pcavals[$n] $ut $obs $el $wvm $pisum $pisumrat $qsigrat $usigrat" >> ../pca.asc
+   end
+
+
+   cd ..
+end
+
+stilts plot2d in1=pca.asc xdata1=pca ydata1=qsigrat ifmt1=ascii \
+              in2=pca.asc xdata2=pca ydata2=usigrat ifmt2=ascii \
+              out=pca3.pdf xlo=0.5 legend=false fontsize=10 \
+              ylabel="Ratio of PCA noise to COM/GAI noise" \
+              xlabel="PCA threshold"
+
+stilts plot2d in=pca.asc xdata=pca ydata=pisum ifmt=ascii \
+              out=pca4.pdf legend=false fontsize=10 \
+              ylabel="Total polarised intensity (pW)" \
+              xlabel="PCA threshold (0.0 = COM/GAI)"
+
+
+#   ------------- PCA v COM/GAI for Orion A ----------------------
+
+
+set pcavals = ( 0 2 4 6 1 3 5 )
+
+foreach n ( 20160113_00019 20160112_00048 20160111_00025 20160113_00026 \
+            20160111_00029 20160114_00027 )
+   set a = `echo $n | sed -e 's/_/ /'`
+   set ut = $a[1]
+   set obs = $a[2]
+   mkdir $n
+   cd $n
+
+   if( !( -e s8a${ut}_${obs}_0003_QT.sdf) ) then
+      calcqu in=$SC2/s8\?/$ut/$obs/\* outq=./\*_QT outu=./\*_UT
+   endif
+
+   echo "^/star/share/smurf/dimmconfig_pol2_extended.lis,itermap=2" > conf1
+   echo "modelorder=(com,gai,ext,ast,noi)" >> conf1
+   makemap in=\*_UT  out=umap1 itermaps=utiter config="'^conf1'" | tee ulog1
+   makemap in=\*_QT  out=qmap1 itermaps=qtiter config="'^conf1'" | tee qlog1
+   setbb utiter 0
+   setbb qtiter 0
+   paste in=utiter out=uitercube1 shift=\[0,0,1\]
+   paste in=qtiter out=qitercube1 shift=\[0,0,1\]
+
+   foreach i (2 3 4 5 6 7)
+      echo "^/star/share/smurf/dimmconfig_pol2_extended.lis,itermap=2" > conf${i}
+      echo "pca.pcathresh=$pcavals[$i]" >> conf${i}
+      makemap in=\*_UT  out=umap${i} itermaps=utiter config=^conf${i} | tee ulog${i}
+      makemap in=\*_QT  out=qmap${i} itermaps=qtiter config=^conf${i} | tee qlog${i}
+
+      setbb utiter 0
+      setbb qtiter 0
+      paste in=utiter out=uitercube${i} shift=\[0,0,1\]
+      paste in=qtiter out=qitercube${i} shift=\[0,0,1\]
+
+   end
+
+   cd ..
+end
+
+echo " ut obs pcavals nq nu" > nqu.asc
+
+foreach n ( 20160113_00019 20160112_00048 20160111_00025 20160113_00026 \
+            20160111_00029 20160114_00027 )
+   set a = `echo $n | sed -e 's/_/ /'`
+   set ut = $a[1]
+   set obs = $a[2]
+   cd $n
+
+   foreach i (1 2 3 4 5 6 7)
+      set nq = `grep NORMALIZED qlog${i} | wc`
+      set nu = `grep NORMALIZED ulog${i} | wc`
+      echo "$ut $obs $pcavals[$i] $nq[1] $nu[1]" >> ../nqu.asc
+   end
+
+   cd ..
+end
+
+
+stilts plot2d in1=nqu.asc xdata1=pcavals ydata1=nq ifmt1=ascii \
+              in2=nqu.asc xdata2=pcavals ydata2=nu ifmt2=ascii \
+              out=nqu.pdf legend=false fontsize=10 \
+              ylabel="Number of iterations for convergence" \
+              xlabel="PCA threshold (0.0 = COM/GAI)"
+
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=3 ypic=3
+
+set pcavals = ( 0 2 4 6 1 3 5 )
+
+picsel a1
+echo "^sty,drawtitle=1,numlab=0,textlab=0,colour=white,colour(title)=black" > tsty
+echo "title=COM/GAI" >> tsty
+display 20160113_00026/qmap1 mode=perc percentiles=\[1,99\]  margin=0.1 style=^tsty axes=yes
+setbb 20160113_00026/qmap1 1
+contour noclear mode=good labpos=! style="'colour=red,width=1'" accept
+setbb 20160113_00026/qmap1 0
+
+picsel a2
+echo "title=PCA threshold = $pcavals[5]" >> tsty
+display 20160113_00026/qmap5 mode=cur style=^tsty axes=yes
+setbb 20160113_00026/qmap5 1
+contour noclear mode=good labpos=! style="'colour=red,width=1'" accept
+setbb 20160113_00026/qmap5 0
+
+picsel a3
+echo "title=PCA threshold = $pcavals[2]" >> tsty
+display 20160113_00026/qmap2 mode=cur style=^tsty axes=yes
+setbb 20160113_00026/qmap2 1
+contour noclear mode=good labpos=! style="'colour=red,width=1'" accept
+setbb 20160113_00026/qmap2 0
+
+picsel a4
+echo "title=PCA threshold = $pcavals[6]" >> tsty
+display 20160113_00026/qmap6 mode=cur style=^tsty axes=yes
+setbb 20160113_00026/qmap6 1
+contour noclear mode=good labpos=! style="'colour=red,width=1'" accept
+setbb 20160113_00026/qmap6 0
+
+picsel a5
+echo "title=PCA threshold = $pcavals[3]" >> tsty
+display 20160113_00026/qmap3 mode=cur style=^tsty axes=yes
+setbb 20160113_00026/qmap3 1
+contour noclear mode=good labpos=! style="'colour=red,width=1'" accept
+setbb 20160113_00026/qmap3 0
+
+picsel a6
+echo "title=PCA threshold = $pcavals[4]" >> tsty
+display 20160113_00026/qmap4 mode=cur style=^tsty axes=yes
+setbb 20160113_00026/qmap4 1
+contour noclear mode=good labpos=! style="'colour=red,width=1'" accept
+setbb 20160113_00026/qmap4 0
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf pcawithast.pdf
+
+foreach n ( 20160113_00026 )
+   set a = `echo $n | sed -e 's/_/ /'`
+   set ut = $a[1]
+   set obs = $a[2]
+   cd $n
+
+   echo "^/star/share/smurf/.dimmconfig_pol2.lis,itermap=2,numiter=-40" > conf_noast1
+   echo "modelorder=(com,gai,ext,ast,noi)" >> conf_noast1
+   makemap in=\*_UT  out=umap_noast1 itermaps=utiter config="'^conf_noast1'" | tee ulog_noast1
+   makemap in=\*_QT  out=qmap_noast1 itermaps=qtiter config="'^conf_noast1'" | tee qlog_noast1
+   setbb utiter 0
+   setbb qtiter 0
+   paste in=utiter out=uitercube_noast1 shift=\[0,0,1\]
+   paste in=qtiter out=qitercube_noast1 shift=\[0,0,1\]
+
+   foreach i (2 3 4 5 6 7)
+      echo "^/star/share/smurf/.dimmconfig_pol2.lis,itermap=2,numiter=-40" > conf_noast${i}
+      echo "pca.pcathresh=$pcavals[$i]" >> conf_noast${i}
+      makemap in=\*_UT  out=umap_noast${i} itermaps=utiter config=^conf_noast${i} | tee ulog_noast${i}
+      makemap in=\*_QT  out=qmap_noast${i} itermaps=qtiter config=^conf_noast${i} | tee qlog_noast${i}
+
+      setbb utiter 0
+      setbb qtiter 0
+      paste in=utiter out=uitercube_noast${i} shift=\[0,0,1\]
+      paste in=qtiter out=qitercube_noast${i} shift=\[0,0,1\]
+
+   end
+
+   cd ..
+end
+
+
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=3 ypic=3
+
+picsel a1
+echo "title=COM/GAI" >> tsty
+display 20160113_00026/qmap_noast1 mode=cur style=^tsty
+
+picsel a2
+echo "title=PCA threshold = $pcavals[5]" >> tsty
+display 20160113_00026/qmap_noast5 mode=cur style=^tsty
+
+picsel a3
+echo "title=PCA threshold = $pcavals[2]" >> tsty
+display 20160113_00026/qmap_noast2 mode=cur style=^tsty
+
+picsel a4
+echo "title=PCA threshold = $pcavals[6]" >> tsty
+display 20160113_00026/qmap_noast6 mode=cur style=^tsty
+
+picsel a5
+echo "title=PCA threshold = $pcavals[3]" >> tsty
+display 20160113_00026/qmap_noast3 mode=cur style=^tsty
+
+picsel a6
+echo "title=PCA threshold = $pcavals[4]" >> tsty
+display 20160113_00026/qmap_noast4 mode=cur style=^tsty
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf pcanoast.pdf
+
+
+
+echo " ut obs pcavals nq nu" > nqu_noast.asc
+
+foreach n ( 20160113_00026 )
+   set a = `echo $n | sed -e 's/_/ /'`
+   set ut = $a[1]
+   set obs = $a[2]
+   cd $n
+
+   foreach i (1 2 3 4 5 6 7)
+      set nq = `grep NORMALIZED qlog_noast${i} | wc`
+      set nu = `grep NORMALIZED ulog_noast${i} | wc`
+      echo "$ut $obs $pcavals[$i] $nq[1] $nu[1]" >> ../nqu_noast.asc
+   end
+
+   cd ..
+end
+
+stilts plot2d in1=nqu_noast.asc xdata1=pcavals ydata1=nq ifmt1=ascii \
+              in2=nqu_noast.asc xdata2=pcavals ydata2=nu ifmt2=ascii \
+              out=nqu_noast.pdf legend=false fontsize=10 \
+              ylabel="No. of iterations for convergence (no AST masking)" \
+              xlabel="PCA threshold (0.0 = COM/GAI)"
+
+
+
+#  ---------------------  per bolometer background removal -----------------
+
+mkdir 20160508_00050
+cd 20160508_00050
+
+calcqu in=$SC2/s8a/20160508/00050/\* outq=./\*_QT outu=./\*_UT
+
+echo "^/star/share/smurf/.dimmconfig_pol2.lis" > conf
+makemap in=\*_QT  out=qmap_noflt config=^conf | tee log_noflt
+
+echo "modelorder=(pca,ext,flt,ast,noi)" >> conf
+makemap in=\*_QT  out=qmap_flt config=^conf | tee log_flt
+sub qmap_noflt qmap_flt diff
+cd ..
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=3 ypic=2
+
+echo "^sty,drawtitle=1,numlab=0,textlab=0,colour=white,colour(title)=black" > tsty
+echo "title=With FLT" >> tsty
+display 20160508_00050/qmap_flt mode=perc percentiles=\[2,98\] style=^tsty axes=yes
+
+picsel a2
+echo "title=Without FLT" >> tsty
+display 20160508_00050/qmap_noflt mode=cur style=^tsty axes=yes
+
+picsel a3
+echo "title=Difference" >> tsty
+display 20160508_00050/diff mode=cur style=^tsty axes=yes
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf flt.pdf
+
+stats 20160508_00050/qmap_noflt'(0~30,0~30)' quiet
+set sig = `parget sigma stats`
+echo "Noise without FLT = $sig"
+
+stats 20160508_00050/qmap_flt'(0~30,0~30)' quiet
+set sig = `parget sigma stats`
+echo "Noise with FLT = $sig"
+
+
+
+# ------------------- kappa and polpack catalogue display ----------------
+
+
+echo "drawtitle=0" > mysty
+echo "width=3" >> mysty
+
+gdclear
+rm pgplot.ps
+echo "colour=black" >> mysty
+echo "colour(ticks)=white" >> mysty
+echo "colour(border)=white" >> mysty
+echo "width(ticks)=1" >> mysty
+echo "width(border)=1" >> mysty
+
+picdef mode=a xpic=2 ypic=1 prefix=pic outline=no
+
+picsel pic1
+display imap'(-60:60,-60:40)' mode=percentiles percentiles=\[2,98\] style=^mysty
+polplot cat1.FIT clear=no axes=no vscale=40 style="'colour(vect)=blue'" \
+        keystyle="'width=3,Title=Vector scale:'" keyvec=20
+
+picsel pic2
+display imap'(-60:60,-60:40)' mode=current style="'^mysty,TextLab(2)=0'"
+polplot cat2.FIT clear=no axes=no vscale=40 key=no style="'colour(vect)=green'"
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf myplot.pdf
+
+
+
+# --------------------- ast masking -------------------------------
+
+mkdir astmask
+cd astmask
+
+echo "^/stardev/git/starlink/star/share/smurf/.dimmconfig_pol2.lis" > conf
+echo "itermap=1" >> conf
+echo "numiter=40" >> conf
+
+foreach dir (20160419_00023 20160419_00026 20160508_00038 20160508_00041 )
+   set a = `echo $dir | sed -e 's/_/ /'`
+   set ut = $a[1]
+   set obs = $a[2]
+
+   mkdir $dir >& /dev/null
+   cd $dir
+
+   set a = `ls ./*_qt.sdf | wc`
+   if( $a[1] < 4 ) then
+      calcqu in=$SC2/s8\?/${ut}/${obs}/\* outq=./\*_qt \
+                                          outu=./\*_ut
+   endif
+
+   foreach sv (q u)
+      if( !( -e ./${sv}map.sdf ) ) then
+         rm itermaps.sdf >& /dev/null
+         makemap in=./\*_${sv}t out=${sv}map config=^../conf itermaps=itermaps
+      endif
+
+      nomagic ${sv}map.more.smurf.exp_time out=exptime repval=0
+      wcsframe exptime pixel
+      beamfit exptime gauss=no resid=resid pos="'0,0'"
+      sub exptime resid model
+      stats model quiet
+      set mmax = `parget maximum stats`
+      cdiv model $mmax apod
+
+      rm ${sv}fft_*.sdf
+      set i = 0
+      foreach n (`ndfecho itermaps`)
+         @ i = $i + 1
+
+         nomagic $n out=tmp1 repval=0
+         mult tmp1 apod tmp0
+         stats tmp0 quiet
+         set mean = `parget mean stats`
+         csub tmp0 $mean tmp_$i
+
+         sc2mapfft in=tmp_$i azavpspec=yes out=${sv}fft_$i
+      end
+   end
+
+   cd ..
+
+end
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=2 ypic=3
+
+
+set a = 1
+foreach dir (20160419_00023 20160419_00026 20160508_00038 20160508_00041 )
+   picsel a$a
+   @ a = $a + 1
+   set w = `ls ${dir}/qfft_*.sdf | wc`
+   set nq = $w[1]
+   set w = `ls ${dir}/ufft_*.sdf | wc`
+   set nu = $w[1]
+
+   stats ${dir}/qfft_$nq quiet
+   set mxq = `parget maximum stats`
+   stats ${dir}/ufft_$nq quiet
+   set mxu = `parget maximum stats`
+   set mx = `calc "'max(pa,pb)'" pa=$mxq pb=$mxu`
+
+   echo "^../sty" > tsty
+   echo "drawtitle=1" >> tsty
+   echo "title=$dir" >> tsty
+   echo "Label(2)=Power" >> tsty
+   linplot ${dir}/qfft_1'(:0.02)' ytop=$mx style=^tsty
+   linplot "'${dir}/qfft_?,${dir}/qfft_??'" clear=no style="'^tsty,colour=green'"
+   linplot "'${dir}/ufft_?,${dir}/ufft_??'" clear=no style="'^tsty,colour=red'"
+
+end
+
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf ../astmask1.pdf
+
+
+echo "^/stardev/git/starlink/star/share/smurf/.dimmconfig_pol2.lis" > conf
+echo "modelorder=(com,gai,ext,ast,noi)" >> conf
+echo "itermap=1" >> conf
+echo "numiter=40" >> conf
+
+foreach dir (20160419_00023 20160419_00026 20160508_00038 20160508_00041 )
+   set a = `echo $dir | sed -e 's/_/ /'`
+   set ut = $a[1]
+   set obs = $a[2]
+
+   mkdir $dir >& /dev/null
+   cd $dir
+
+   foreach sv (q u)
+      if( !( -e ./${sv}map2.sdf ) ) then
+         rm itermaps.sdf >& /dev/null
+         makemap in=./\*_${sv}t out=${sv}map2 config=^../conf itermaps=itermaps
+      endif
+
+      nomagic ${sv}map2.more.smurf.exp_time out=exptime repval=0
+      wcsframe exptime pixel
+      beamfit exptime gauss=no resid=resid pos="'0,0'"
+      sub exptime resid model
+      stats model quiet
+      set mmax = `parget maximum stats`
+      cdiv model $mmax apod
+
+      rm ${sv}fft_*.sdf
+      set i = 0
+      foreach n (`ndfecho itermaps`)
+         @ i = $i + 1
+
+         nomagic $n out=tmp1 repval=0
+         mult tmp1 apod tmp0
+         stats tmp0 quiet
+         set mean = `parget mean stats`
+         csub tmp0 $mean tmp_$i
+
+         sc2mapfft in=tmp_$i azavpspec=yes out=${sv}fft2_$i
+      end
+   end
+
+   cd ..
+
+end
+
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=2 ypic=3
+
+
+set a = 1
+foreach dir (20160419_00023 20160419_00026 20160508_00038 20160508_00041 )
+   picsel a$a
+   @ a = $a + 1
+   set w = `ls ${dir}/qfft2_*.sdf | wc`
+   set nq = $w[1]
+   set w = `ls ${dir}/ufft2_*.sdf | wc`
+   set nu = $w[1]
+
+   stats ${dir}/qfft2_$nq quiet
+   set mxq = `parget maximum stats`
+   stats ${dir}/ufft2_$nq quiet
+   set mxu = `parget maximum stats`
+   set mx = `calc "'max(pa,pb)'" pa=$mxq pb=$mxu`
+
+   echo "^../sty" > tsty
+   echo "drawtitle=1" >> tsty
+   echo "title=$dir" >> tsty
+   echo "Label(2)=Power" >> tsty
+   linplot ${dir}/qfft2_1'(:0.02)' ytop=$mx style=^tsty
+   linplot "'${dir}/qfft2_?,${dir}/qfft2_??'" clear=no style="'^tsty,colour=green'"
+   linplot "'${dir}/ufft2_?,${dir}/ufft2_??'" clear=no style="'^tsty,colour=red'"
+
+end
+
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf ../astmask2.pdf
+
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=2 ypic=3
+
+picsel a1
+display 20160419_00026/qmap mode=perc percentiles=\[2,98\] noaxes style=^../sty
+picsel a2
+display 20160419_00026/umap mode=cur
+picsel a3
+display 20160419_00026/qmap2 mode=cur
+picsel a4
+display 20160419_00026/umap2 mode=cur
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf ../astmask3.pdf
+
+
+
+
+
+ echo "^/stardev/git/starlink/star/share/smurf/.dimmconfig_pol2.lis" > conf
+ echo "itermap=1" >> conf
+ echo "numiter=40" >> conf
+ echo "ast.filt_diff=300" >> conf
+
+ foreach dir (20160419_00023 20160419_00026 20160508_00038 20160508_00041 )
+    set a = `echo $dir | sed -e 's/_/ /'`
+    set ut = $a[1]
+    set obs = $a[2]
+
+    mkdir $dir >& /dev/null
+    cd $dir
+
+    foreach sv (q u)
+       if( !( -e ./${sv}map3.sdf ) ) then
+          rm itermaps.sdf >& /dev/null
+          makemap in=./\*_${sv}t out=${sv}map3 config=^../conf itermaps=itermaps
+       endif
+
+       nomagic ${sv}map3.more.smurf.exp_time out=exptime repval=0
+       wcsframe exptime pixel
+       beamfit exptime gauss=no resid=resid pos="'0,0'"
+       sub exptime resid model
+       stats model quiet
+       set mmax = `parget maximum stats`
+       cdiv model $mmax apod
+
+       rm ${sv}fft_*.sdf
+       set i = 0
+       foreach n (`ndfecho itermaps`)
+          @ i = $i + 1
+
+          nomagic $n out=tmp1 repval=0
+          mult tmp1 apod tmp0
+          stats tmp0 quiet
+          set mean = `parget mean stats`
+          csub tmp0 $mean tmp_$i
+
+          sc2mapfft in=tmp_$i azavpspec=yes out=${sv}fft3_$i
+       end
+    end
+
+    cd ..
+ end
+
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=2 ypic=3
+
+set a = 1
+foreach dir (20160419_00023 20160419_00026 20160508_00038 20160508_00041 )
+   picsel a$a
+   @ a = $a + 1
+   set w = `ls ${dir}/qfft3_*.sdf | wc`
+   set nq = $w[1]
+   set w = `ls ${dir}/ufft3_*.sdf | wc`
+   set nu = $w[1]
+
+   stats ${dir}/qfft3_$nq quiet
+   set mxq = `parget maximum stats`
+   stats ${dir}/ufft3_$nq quiet
+   set mxu = `parget maximum stats`
+   set mx = `calc "'max(pa,pb)'" pa=$mxq pb=$mxu`
+
+   echo "^../sty" > tsty
+   echo "drawtitle=1" >> tsty
+   echo "title=$dir" >> tsty
+   echo "Label(2)=Power" >> tsty
+   linplot ${dir}/qfft3_1'(:0.02)' ytop=$mx style=^tsty
+   linplot "'${dir}/qfft3_?,${dir}/qfft3_??'" clear=no style="'^tsty,colour=green'"
+   linplot "'${dir}/ufft3_?,${dir}/ufft3_??'" clear=no style="'^tsty,colour=red'"
+
+end
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf ../astmask4.pdf
+
+
+
+
+gdclear
+rm pgplot.ps
+picdef mode=a prefix=a outline=no xpic=2 ypic=3
+
+picsel a1
+display 20160419_00026/qmap mode=perc percentiles=\[2,98\] noaxes style=^../sty
+display 20160419_00026/qmap3 mode=cur
+picsel a2
+display 20160419_00026/umap3 mode=cur
+
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf ../astmask5.pdf
+
+
+
+cd ..
+
+
+
+
