@@ -189,6 +189,11 @@
 *        These can be used later to calculate the expected IP beam shape
 *        at any elevation. These are only generated if DIAM is zero or
 *        negative, and are stored in a file called "beamfit.asc".
+*     17-JUN-2016 (DSB):
+*        - Scale errors on Q and U so that the weights are of order unity.
+*        - Reduce maximize convergence criterion from 1E-4 to 1-E-5 as 
+*        otherwise the fit to the Uranus data terminates too early, and 
+*        produces a poor fit
 *-
 '''
 
@@ -1023,6 +1028,12 @@ try:
             else:
                hstlist.append( float( words[18] ) )
 
+#  Normalize dq and du values to a mean of unity. This is to ensure the
+#  weights (1/dq**2 and 1/du**2) are scaled nicely.
+   mean = np.array(dqlist).mean()
+   dqlist = [x / mean for x in dqlist]
+   dulist = [x / mean for x in dulist]
+
 #  Record original lists before we reject any points.
    qlist0 = qlist
    ulist0 = ulist
@@ -1043,7 +1054,7 @@ try:
 
 #  Do a fit to find the optimum model parameters.
          res = minimize( objfun, x0, method='nelder-mead',
-                         options={'xtol': 1e-4, 'disp': True})
+                         options={'xtol': 1e-5, 'disp': True})
 
 #  Find RMS Q residual between data and fit.
          qrms = resid( True, res.x )
