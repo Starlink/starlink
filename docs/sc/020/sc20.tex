@@ -8,7 +8,7 @@
 \stardoccopyright   {Copyright \copyright\ 2015-2016 Science and Technology Facilities Council}
 \stardocnumber      {20.1}
 \stardocauthors     {H.\ S.\ Thomas \& Malcolm J.\ Currie}
-\stardocdate        {2016 March 7}
+\stardocdate        {2016 June 17}
 \stardoctitle       {The Heterodyne Data Reduction Cookbook}
 \stardocversion     {1.1}
 \stardocmanual      {\ }
@@ -3908,10 +3908,17 @@ The parameters are classified for easier identification.
 \hline
 \textbf{Parameter} & \textbf{Description} \\
 \hline
+CLUMP\_METHOD & Method for identifying emission clumps: Clumpfind,
+                Fellwalker, or Thresh.\\
+\hline
 CUBE\_WCS & The co-ordinate system in which to regrid cubes.\\
 \hline
 FINAL\_LOWER\_VELOCITY & Lower velocity limit for all the cube products.\\
 FINAL\_UPPER\_VELOCITY & Upper velocity limit for all the cube products.\\
+\hline
+ITERATIONS & Number of iterations. Further iterations refine the
+             identification of emission to exclude from baseline subtraction.
+             One iteration is usually sufficient.\\
 \hline
 PIXEL\_SCALE & The pixel scale, in arcseconds, of cubes.\\
 \hline
@@ -4050,6 +4057,8 @@ MOMENTS\_UPPER\_VELOCITY & The upper velocity range from which the moments maps 
 \textbf{Parameter} & \textbf{Description} \\
 \hline
 FLATFIELD & Whether or not to perform flat-fielding.\\
+FLAT\_APPLY & Whether or not to apply the calculated flatfield.  If set false
+              the ratios are still calculated and logged.\\
 FLAT\_METHOD & Flatfield option to ratio voxel by voxel.\\
 FLAT\_LOWER & Sets the lower limit by which to restrict the velocity range where there is
               astronomical signal for FLAT\_METHOD.\\
@@ -4061,6 +4070,26 @@ MINSNR & Allow selection of higher signal-to-noise voxels for FLAT\_METHOD. \\
 \end{small}
 \caption{\label{tab:flat_params}
   The recipe parameters associated flat fielding.}
+\end{table}
+
+\begin{table}[h!]
+\begin{small}
+\begin{tabular}{|p{6.8cm}|p{8.6cm}|}
+\hline
+\textbf{Parameter} & \textbf{Description} \\
+\hline
+DESPIKE & Whether or not to perform despiking.\\
+DESPIKE\_BOX & The size, in pixels, of the box used to both find the "background" and
+               for cleaning spikes.\\
+DESPIKE\_CLIP & The clip standard deviations to use when finding spikes in the
+                background-subtracted RMS spectrum.\\
+DESPIKE\_PER\_DETECTOR & If a spike is not seen in all detectors, consider setting this
+                         value to 1.\\
+\hline
+\end{tabular}
+\end{small}
+\caption{\label{tab:despike_params}
+  The recipe parameters associated removal of noise spikes.}
 \end{table}
 
 \begin{table}[h!]
@@ -4137,6 +4166,10 @@ LOWFREQ\_INTERFERENCE\_EDGE\_CLIP & Used to reject spectra with low-frequency
                                     list will perform iterative sigma clipping of
                                     outliers, but standard deviations in the list
                                     should not decrease. \\
+LOWFREQ\_INTERFERENCE\_MAX\_THRESHOLD & Spectra are deemed to be non-linear if their
+                                        non-linearity exceeds this threshold.\\
+LOWFREQ\_INTERFERENCE\_MIN\_THRESHOLD & No spectra with non-linearity below this
+                                        threshold will be rejected.\\
 LOWFREQ\_INTERFERENCE\_THRESH\_CLIP & Used to reject spectra with low-frequency
                                       interference.  This is the number of
                                       standard deviations at which to threshold
