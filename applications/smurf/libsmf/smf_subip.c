@@ -269,7 +269,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    of the Q/U bolometer values. Set "trsys" to NULL if the focal plane Y axis
    is the reference direction. */
       if( !strcmp( polnorth, "TRACKING" ) ) {
-         cpntr = sc2ast_convert_system( data->hdr->state->tcs_tr_sys, status );
+         cpntr = sc2ast_convert_system( data->hdr->allState->tcs_tr_sys, status );
       } else if( !strcmp( polnorth, "FPLANE" ) ) {
          cpntr = NULL;
       } else {
