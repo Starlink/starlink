@@ -5,7 +5,7 @@
 \usepackage[font=footnotesize]{caption}
 
 \stardocauthors     {D.S. Berry }
-\stardocdate        {14th June 2016}
+\stardocdate        {21st June 2016}
 \stardoctitle       {POL-2 Data Reduction}
 \stardocversion     {V1.0}
 \stardocabstract    {POL-2 data reduction: a description and analysis of the methods used}
@@ -2109,7 +2109,7 @@ seen between the \texttt{calcqu} fit and the real data (see
 section~\ref{sec:fit}) is about 0.004 $pW$, but this includes not just
 random noise but also weak harmonics of the HWP that are not included in
 the fit). The smaller value of 0.003 results in the noise in the
-reconstructed maps being roughly similar to the noise in the genuine 3C273
+reconstructed maps being very roughly similar to the noise in the genuine 3C273
 maps.
 \end{enumerate}
 
@@ -2129,11 +2129,11 @@ The I, Q and U maps for the artificial source are left in files
 analysed intensity time-series data is left in files within the
 \texttt{sim} subdirectory. This simulated data was then processed using
 \texttt{calcqu} and \texttt{makemap} to create reconstructed maps of Q
-and U. The default POL-2 \texttt{makemap} configuration with no AST
-masking was used:
+and U. A modified form of the default POL-2 \texttt{makemap} configuration
+with no AST masking was used:
 
 \begin{verbatim}
-   modelorder = (pca,ext,ast,noi)
+   modelorder = (pca,ast,noi)
    pca.pcathresh = 4
    spikebox = 10
    spikethresh = 5
@@ -2142,6 +2142,11 @@ masking was used:
    downsampscale = 0
    noi.usevar = 1
 \end{verbatim}
+
+\textbf{The modification consists of removing the EXT model from the
+\texttt{modelorder} parameter. This is because the \texttt{pol2sim} does
+not include the effects of extinction, and so it would be inappropriate
+to correct for extinction when making the maps.}
 
 Within \texttt{makemap}, IP correction was performed based on the total
 intensity values in the original artificial I map. The Q and U values in
@@ -2165,33 +2170,19 @@ simulated data. The right column shows the Q and U maps made from the real
 \end{figure}
 
 Fig.~\ref{fig:recon2} shows the residuals between the original and
-reconstructed Q and U map within the central region. It is apparent that
-the reconstruction is significantly brighter than the original. The best
-fitting line through the scatter plot suggests that the reconstruction is
-about 1.5 times the original. Fig.~\ref{fig:recon3} shows the residuals
-that result if these factors are taken into account. The source of this
-scaling is not yet known and should be investigated. It may be necessary
-to take this gain into account when quoting polarised intensities.
+reconstructed Q and U map within the central region. The best
+fitting lines through the scatter plots have gradients close to unity
+(0.999 for Q and 1.06 for U) indivating that the reconstruction is
+a good representation of the original.
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{recon2}
 \caption{The left column shows the central region of the reconstructed Q
 and U maps. The middle column shows the residuals between the
 reconstructed and original Q and U maps. The right column shows
-scatter plots of original against reconstructed Q and U. The gradients of
-the best fitting lines are about 0.65. The reconstruction is brighter
-than the original in both cases.}
+scatter plots of original against reconstructed Q and U. }
 \label{fig:recon2}
 \end{figure}
-
-\begin{figure}
-\includegraphics[width=\columnwidth]{recon3}
-\caption{The residuals between original and reconstructed Q and U if the
-scaling factors determined from the scatter plots shown in
-Fig.~\ref{fig:recon2} are taken into account.}
-\label{fig:recon3}
-\end{figure}
-
 
 \subsection{An example of the second method}
 \label{sec:fakemap}
@@ -2227,45 +2218,24 @@ Q and U maps made from the real 3C273 data.}
 \end{figure}
 
 Fig.~\ref{fig:recon2b} shows the residuals between the original and
-reconstructed Q and U map within the central region. It is apparent that
-the reconstruction is still significantly brighter than the original. The best
-fitting line through the scatter plot again indicates a gain of about 1.5,
-as seen in Fig.~\ref{fig:recon2}. Fig.~\ref{fig:recon3b} shows the residuals
-that result if this gain is taken into account.
+reconstructed Q and U map within the central region. Again it can be seen
+that the reconstruction is a good representation of the original. The best
+fitting lines through the scatter plots are 0.962 (for Q) and 1.03
+(for U).
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{recon2b}
 \caption{The left column shows the central region of the ``fakemap''
 reconstructed Q and U maps. The middle column shows the residuals between
 the reconstructed and original Q and U maps. The right column shows
-scatter plots of original against reconstructed Q and U. The gradients of
-the best fitting lines are about 0.65 (the same as seen in
-Fig.~\ref{fig:recon2}).}
+scatter plots of original against reconstructed Q and U. }
 \label{fig:recon2b}
 \end{figure}
-
-\begin{figure}
-\includegraphics[width=\columnwidth]{recon3b}
-\caption{The residuals between original and ``fakemap'' reconstructed Q
-and U if the scaling factors determined from the scatter plots shown in
-Fig.~\ref{fig:recon2b} are taken into account.}
-\label{fig:recon3b}
-\end{figure}
-
-
-
-
 
 
 
 \section{Further work}
 \begin{enumerate}
-
-\item Determine why Q and U maps made from simulated data are brighter
-than the original maps by a factor of about 1.35. It may be that this
-means our quoted polarised intensity values (and consequently our
-percentage polarisation values) are too large by this factor.
-See section~\ref{sec:sim}.
 
 \item Investigate whether the spread of polarisation angles seen in
 section~\ref{sec:rawcal} when the calibrator is in-beam represents
