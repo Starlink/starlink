@@ -1743,7 +1743,12 @@ and occurs at a value of 1.0, indicating that the additional three observations
 are now not improving the errors on the angle.
 
 It is not clear why binning the catalogues should cause this change in
-the catalogue. Further investigation is needed.
+the catalogue. Further investigation is needed. Also, several people have
+commented that the error on percentage polarisation seem unrealistically
+low for vectors within the faint outer regions of extended source. For
+instance Jia-Wei Wang found this when looking at a vector catalogue
+produced for the BISTRO Ophiuchus L 1688 field1 (20160422\_00053,
+20160424\_00016, and 20160424\_00033).
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{error1}
@@ -2361,7 +2366,9 @@ polarised sources.  See section~\ref{sec:skyloop}.
 
 \item Investigate the reliability of the errors on polarisation and angle
 in the final vector catalogues. Especially look at whether binning of the
-vectors upsets the uncertainties in any way. See section~\ref{sec:vectors}.
+vectors upsets the uncertainties in any way, and why errors on P within faint
+regions of an extended object can be unrealistically low. See
+section~\ref{sec:vectors}.
 
 \item Modify GAIA so that the displayed vector map can be printed. The
 currently available print option within the File menu seems to produce an
