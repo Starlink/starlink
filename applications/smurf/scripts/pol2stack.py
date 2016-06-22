@@ -156,6 +156,8 @@
 
 import starutil
 from starutil import invoke
+from starutil import AtaskError
+from starutil import NoValueError
 from starutil import NDG
 from starutil import Parameter
 from starutil import ParSys
@@ -262,7 +264,12 @@ try:
 
 #  Determine the waveband and get the corresponding FCF values with and
 #  without POL2 in the beam.
-   filter = int( float( starutil.get_fits_header( qin[0], "FILTER", True )))
+   try:
+      filter = int( float( starutil.get_fits_header( qin[0], "FILTER", True )))
+   except NoValueError:
+      filter = 850
+      msg_out( "No value found for FITS header 'FILTER' in {0} - assuming 850".format(qin[0]))
+
    if filter == 450:
       fcf1 = 962.0
       fcf2 = 491.0
