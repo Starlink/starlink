@@ -911,6 +911,14 @@ class ParSys(object):
       msg_out( "Setting ADAM_USER to {0}\n".format(ParSys.adamdir), ATASK )
       os.environ["ADAM_USER"] = ParSys.adamdir
 
+      # Ensure that KAPPA is not in verbose mode and does not report NDF
+      # names as these features cause extra text to appear in standard output
+      # from things like "fitsmod" and so upsets get_fits_header.
+      if "KAPPA_REPORT_NAMES" in os.environ:
+         del os.environ["KAPPA_REPORT_NAMES"]
+      if "KAPPA_VERBOSE" in os.environ:
+         del os.environ["KAPPA_VERBOSE"]
+
    # Delete the temporary ADAM directory.
    @classmethod
    def cleanup(cls):
