@@ -32,7 +32,7 @@
 *     jsajoin tiles out [centre1] [centre2] [radius] [system] [region]
 *             [pixsize] [retain]
 
-*  Parameters:
+*  ADAM Parameters:
 *     CENTRE1 = LITERAL (Read)
 *        The formatted RA or Galactic longitude at the centre of a circle
 *        that defines the required extent of the output NDF. See also

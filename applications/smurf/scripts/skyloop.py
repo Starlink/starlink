@@ -45,7 +45,7 @@
 *             [extra] [ipref] [retain] [msg_filter] [ilevel] [glevel]
 *             [logfile] [restart]
 
-*  Parameters:
+*  ADAM Parameters:
 *     CONFIG = LITERAL (Read)
 *        The MAKEMAP configuration parameter values to use. Additions
 *        will be made as follows:

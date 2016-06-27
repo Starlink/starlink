@@ -19,7 +19,7 @@
 *  Usage:
 *     unimap in out [fakemap] [retain] [msg_filter] [ilevel] [glevel] [logfile]
 
-*  Parameters:
+*  ADAM Parameters:
 *     FAKEMAP = NDF (Read)
 *        An image to use as a fakemap. [!]
 *     GLEVEL = LITERAL (Read)

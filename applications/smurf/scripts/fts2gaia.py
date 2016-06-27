@@ -22,7 +22,7 @@
 *  Usage:
 *     fts2gaia in
 
-*  Parameters:
+*  ADAM Parameters:
 *     IN = NDF (Read)
 *        The NDF FTS-2 spectrum file to be displayed.
 

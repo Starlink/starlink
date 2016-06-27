@@ -21,7 +21,7 @@
 *  Usage:
 *     configmeld config1 config2 waveband defaults tool
 
-*  Parameters:
+*  ADAM Parameters:
 *     CONFIG1 = LITERAL (Read)
 *        The first configuration. This can be a normal config such as is
 *        supplied for the CONFIG parameter of MAKEMAP, or an NDF created

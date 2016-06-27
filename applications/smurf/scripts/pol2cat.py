@@ -57,7 +57,7 @@
 *             [config] [device] [nsigma] [extcor] [retain] [qui] [hits]
 *             [harmonic] [forcefile] [msg_filter] [ilevel] [glevel] [logfile]
 
-*  Parameters:
+*  ADAM Parameters:
 *     CAT = LITERAL (Read)
 *        The output FITS vector catalogue.
 *     CONFIG = LITERAL (Read)

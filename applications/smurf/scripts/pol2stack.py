@@ -20,7 +20,7 @@
 *     pol2stack inq inu ini cat pi [retain] [qui] [in] [msg_filter] [ilevel] [glevel]
 *               [logfile]
 
-*  Parameters:
+*  ADAM Parameters:
 *     CAT = LITERAL (Read)
 *        The output FITS vector catalogue.
 *     DEBIAS = LOGICAL (Given)

@@ -24,7 +24,7 @@
 *  Usage:
 *     pol2scan in q u [cat] [ipref] [config] [pixsize] [qudir] [retain] [msg_filter] [ilevel] [glevel] [logfile]
 
-*  Parameters:
+*  ADAM Parameters:
 *     ALIGN = LOGICAL (Read)
 *        If TRUE, and if a non-null value is supplied for parameter REF,
 *        then corrections to the telescope pointing are determined and

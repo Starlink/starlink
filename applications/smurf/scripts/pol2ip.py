@@ -47,7 +47,7 @@
 *  Usage:
 *     pol2ip obslist iref [diam] [pixsize]
 
-*  Parameters:
+*  ADAM Parameters:
 *     DIAM = _REAL (Read)
 *        The diameter of the circle (in arc-seconds), centred on the source,
 *        over which the mean Q, U and I values are found. If zero, or a

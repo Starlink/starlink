@@ -15,7 +15,7 @@
 *  Usage:
 *     jsatilemoc in out [maxorder]
 
-*  Parameters:
+*  ADAM Parameters:
 *     IN = NDF (Read)
 *        An NDF (or FITS) file containing a JSA tile.  It must have
 *        a TILENUM header indicating the JSA tile number accompanied

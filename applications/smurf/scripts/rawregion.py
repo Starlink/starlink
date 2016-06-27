@@ -22,7 +22,7 @@
 *  Usage:
 *     rawregion in region [tiles] [instrument] [retain]
 
-*  Parameters:
+*  ADAM Parameters:
 *     IN = NDF (Read)
 *        The input NDF. This should have the FITS header
 *     INSTRUMENT = LITERAL (Read)

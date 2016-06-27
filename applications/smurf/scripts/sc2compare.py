@@ -31,7 +31,7 @@
 *     sc2compare in1 in2 [report] [retain] [msg_filter] [ilevel]
 *                [glevel] [logfile]
 
-*  Parameters:
+*  ADAM Parameters:
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
 *        Allowed values are as for "ILEVEL". The log file to create is
