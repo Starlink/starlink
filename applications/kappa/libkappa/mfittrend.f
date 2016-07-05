@@ -715,8 +715,10 @@
 
 *  Get dimensions of NDF and fill maximum blocking size for unused
 *  dimensions.
+      EL = 1
       DO I = 1, NDF__MXDIM
          DIMS( I ) = UBND( I ) - LBND( I ) + 1
+         EL = EL * DIMS( I )
          MBDIMS( I ) = DIMS( I )
       END DO
 
