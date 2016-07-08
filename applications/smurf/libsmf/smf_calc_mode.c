@@ -181,7 +181,8 @@ void smf_calc_mode ( smfHead * hdr, int * status ) {
     type = smf__parse_obstype( obs_type, status );
     stype = smf__parse_obstype( seq_type, status );
 
-    /* in beam */
+    /* in beam (convert to upper case to make it case insensitive) */
+    astChrCase( NULL, inbeamstr, 1, 0 );
     if ( smf_pattern_extract( inbeamstr, "(POL)", NULL, NULL, 0, status ) ) {
       inbeam |= SMF__INBEAM_POL;
     }

@@ -272,6 +272,9 @@
 *     25-FEB-2016 (DSB):
 *        Correct badly mangled accumulating of output FITS headers and
 *        provenance in lsqfit mode
+*     8-JUL-2016 (DSB):
+*        Check that all input files hold POL2 analysed intensity data
+*        before accessing OUTQ or OUTU.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -429,6 +432,9 @@ void smurf_calcqu( int *status ) {
       msgOutif( MSG__NORM, " ", "All supplied input frames were DARK.",
                 status );
    } else {
+
+/* Check that all science files contain POL2 analysed intensoty data. */
+      smf_check_pol2( sgrp, ssize, 1, status );
 
 /* See if a correction should be made for the POL2 triggering issue. */
       parGet0l( "FIX", &fix, status );

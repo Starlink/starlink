@@ -733,6 +733,8 @@ int smf_check_detpos( smfData *data, int report, int *status );
 
 void smf_check_flat ( const smfData *data, int *status );
 
+void smf_check_pol2( Grp *igrp,  int size, int raw, int *status );
+
 size_t smf_check_quality( ThrWorkForce *wf, smfData *data, int showbad, int *status );
 
 void smf_check_smfDA ( const smfData *idata, smfData *odata, int *status );

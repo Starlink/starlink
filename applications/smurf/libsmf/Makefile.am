@@ -64,6 +64,7 @@ smf_calcmodel_two.c \
 smf_check_coords.c \
 smf_check_detpos.c \
 smf_check_flat.c \
+smf_check_pol2.c \
 smf_check_quality.c \
 smf_check_smfDA.c \
 smf_check_smfData.c \
