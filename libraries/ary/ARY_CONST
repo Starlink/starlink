@@ -58,6 +58,8 @@
 *        Increased control block size limits by a factor of 4.
 *     15-OCT-2010 (EC)
 *        Doubled ARY__MXACB, ARY__MXDCB, ARY__MXMCB
+*     18-JUL-2016 (SFG)
+*        Doubled ARY__MXACB, ARY__MXDCB, ARY__MXMCB
 *     {enter_further_changes_here}
 
 *-
@@ -69,15 +71,15 @@
 
 *  Maximum number of entries in the Access Control Block.
       INTEGER ARY__MXACB
-      PARAMETER ( ARY__MXACB = 8192 )
+      PARAMETER ( ARY__MXACB = 16384 )
 
 *  Maximum number of entries in the Data Control Block.
       INTEGER ARY__MXDCB
-      PARAMETER ( ARY__MXDCB = 4096)
+      PARAMETER ( ARY__MXDCB = 8192)
 
 *  Maximum number of entries in the Mapping Control Block.
       INTEGER ARY__MXMCB
-      PARAMETER ( ARY__MXMCB = 2048 )
+      PARAMETER ( ARY__MXMCB = 4092 )
 
 *  Maximum number of entries in the Placeholder Control Block.
       INTEGER ARY__MXPCB

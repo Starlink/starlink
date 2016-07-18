@@ -84,6 +84,8 @@
 *     11-MAR-2004 (DSB):
 *        Changed value of NDF__SZFID from 33 to 255 to allow for URLs being
 *        used as file identifiers.
+*     18-JUL-2016 (SFG):
+*        Doubled NDF__MXDCB and NDF__MXACB
 *     {enter_further_changes_here}
 
 *-
@@ -95,11 +97,11 @@
 
 *  Maximum number of entries in the Access Control Block.
       INTEGER NDF__MXACB
-      PARAMETER ( NDF__MXACB = 8192 )
+      PARAMETER ( NDF__MXACB = 16384 )
 
 *  Maximum number of entries in the Data Control Block.
       INTEGER NDF__MXDCB
-      PARAMETER ( NDF__MXDCB = 4096 )
+      PARAMETER ( NDF__MXDCB = 8192 )
 
 *  Maximum number of foreign data formats which can be recognised.
       INTEGER NDF__MXFMT
