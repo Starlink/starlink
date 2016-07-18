@@ -893,8 +893,7 @@ static void smf1_correct_extinction( void *job_data_ptr, int *status ) {
     } else if (quick) {
       /* we have an airmass, see if we need to provide per-pixel correction */
       if (adaptive) {
-        if (is_large_delta_atau( airmass, pdata->hdr->state->tcs_az_ac2,
-                                 pdata->tau, status) ) {
+        if (is_large_delta_atau( airmass, state_az_ac2, pdata->tau, status) ) {
           /* we need WCS if we disable fast mode */
           quick = 0;
           pdata->allquick = 0;
