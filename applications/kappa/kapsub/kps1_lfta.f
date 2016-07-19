@@ -95,7 +95,7 @@
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
 *     Council.
-*     Copyright (C) 2008, 2012 Science and Technology Facilities
+*     Copyright (C) 2008, 2012, 2016 Science and Technology Facilities
 *     Council.
 *     All Rights Reserved.
 
@@ -125,6 +125,9 @@
 *        Original version based upon KPS1_LFT.
 *     2012 May 11 (MJC):
 *        Add support for 64-bit integers.
+*     2016 July 18 (MJC):
+*        Fixed calls to KPS1_LFTQx where Argument AS was not being
+*        passed through.
 *     {enter_further_changes_here}
 
 *-
@@ -220,38 +223,38 @@
 *  the fastest method.
          IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL KPS1_LFTQB( ORDER, AXIS, NRANGE, RANGES, DIMS,
-     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2,
-     :                       STATUS )
+     :                       %VAL( CNF_PVAL( IPDAT ) ), AS, BS, WRK1,
+     :                       WRK2, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
            CALL KPS1_LFTQUB( ORDER, AXIS, NRANGE, RANGES, DIMS,
-     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2,
-     :                       STATUS )
+     :                       %VAL( CNF_PVAL( IPDAT ) ), AS, BS, WRK1,
+     :                       WRK2, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_LFTQD( ORDER, AXIS, NRANGE, RANGES, DIMS,
-     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2,
-     :                       STATUS )
+     :                       %VAL( CNF_PVAL( IPDAT ) ), AS, BS, WRK1,
+     :                       WRK2, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_LFTQI( ORDER, AXIS, NRANGE, RANGES, DIMS,
-     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2,
-     :                       STATUS )
+     :                       %VAL( CNF_PVAL( IPDAT ) ), AS, BS, WRK1,
+     :                       WRK2, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
             CALL KPS1_LFTQK( ORDER, AXIS, NRANGE, RANGES, DIMS,
-     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2,
-     :                       STATUS )
+     :                       %VAL( CNF_PVAL( IPDAT ) ), AS, BS, WRK1,
+     :                       WRK2, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_LFTQR( ORDER, AXIS, NRANGE, RANGES, DIMS,
-     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2,
-     :                       STATUS )
+     :                       %VAL( CNF_PVAL( IPDAT ) ), AS, BS, WRK1,
+     :                       WRK2, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL KPS1_LFTQW( ORDER, AXIS, NRANGE, RANGES, DIMS,
-     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2,
-     :                       STATUS )
+     :                       %VAL( CNF_PVAL( IPDAT ) ), AS, BS, WRK1,
+     :                       WRK2, STATUS )
 
         ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
             CALL KPS1_LFTQUW( ORDER, AXIS, NRANGE, RANGES, DIMS,
