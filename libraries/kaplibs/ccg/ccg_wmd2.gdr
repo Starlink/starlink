@@ -163,6 +163,15 @@
 
 *.
 
+*  Set and initilise returned variables.
+      NUSED = 0
+      XMODE = VAL__BADD
+      SIGMA = VAL__BADD
+
+      DO I = 1, EL
+         USED( I ) = .FALSE.
+      END DO
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -188,9 +197,6 @@
             SUM2 = SUM2 + DATA
             SUM3 = SUM3 + D * DATA
          END IF
-
-*  Intialise the used flags
-         USED( I ) = .FALSE.
 
       END DO
 
