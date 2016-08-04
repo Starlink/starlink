@@ -224,7 +224,7 @@
                   CALL NUM_CLEARERR()
                END IF
             END IF
-    2   CONTINUE
+    2    CONTINUE
 
 *  Continue if more than one good value.
          IF ( NGOOD .GT. 0 ) THEN
@@ -237,10 +237,10 @@
      :                       NSIGMA, COVEC( 1, NGOOD ), VAL, VAR,
      :                       USED, IGOOD, STATUS )
 
-*  If have any values left...
+*  If any good values remain...
             IF ( IGOOD .GT. 0 ) THEN
 
-*  Update line conributed counters.
+*  Update line contributed counters.
                DO 3 J = 1, NGOOD
                   IF ( USED ( J ) ) THEN
                      NCON( POINT( J ) ) = NCON( POINT( J ) ) + 1.0D0
@@ -253,7 +253,7 @@
             END IF
          END IF
 
-*  If there are sufficient good pixels output the result.
+*  If there are sufficient good pixels, output the result.
          IF ( NGOOD .GE. MINPIX ) THEN
             RESULT( I ) = NUM_DTO<T>( VAL )
             RESVAR( I ) = NUM_DTO<T>( VAR )
