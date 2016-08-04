@@ -43,7 +43,9 @@
 *     SIGMA = DOUBLE PRECISION (Returned)
 *        An estimate of the uncorrupted normalised standard deviation of
 *        the data points.  An estimate of the standard deviation of any
-*        one point is:  SIGMA / SQRT( W ) where W is its weight.
+*        one point is:  SIGMA / SQRT( W ) where W is its weight.  It is
+*        returned as the bad value should there be only one or no valid
+*        data values.
 *     USED( EL ) = LOGICAL (Returned)
 *        If a value is not rejected then its corresponding used element
 *        will be set true.
@@ -60,7 +62,7 @@
 
 *  Copyright:
 *     Copyright (C) 1981, 1990-1991 Science & Engineering Research
-*     Council. Copyright (C) 2009 Science & Technology Facilities
+*     Council. Copyright (C) 2009, 2016 Science & Technology Facilities
 *     Council. All Rights Reserved.
 
 *  Licence:
@@ -204,13 +206,13 @@
 *  estimate of the statistics.
       IF ( N .GT. 1 ) THEN
          XMODE = SUM2 / SUM1
-         VAR = ( SUM3 - ( SUM2 * SUM2 ) / SUM1 ) / REAL( N - 1 )
+         VAR = ( SUM3 - ( SUM2 * SUM2 ) / SUM1 ) / DBLE( N - 1 )
          VAR = MAX( VAR, 0.0 )
       ELSE
          STATUS = SAI__ERROR
          CALL ERR_REP( 'KPG1_WMODEX_INSDA',
      :     'Insufficient data points to compute a variance.', STATUS )
-         VAR = 0.0
+         SIGMA = VAL__BADD
          XMODE = SUM2
          GO TO 100
       END IF
@@ -269,10 +271,10 @@
 
 *  If the required accuracy has been met, return.
          DXMODE = SUMC / SUMB
+         SIGMA = SQRT( VAR )
          IF ( ABS( DXMODE ) .LE. TOLL ) GO TO 100
       END DO
 
   100 CONTINUE
-      SIGMA = SQRT( VAR )
 
       END
