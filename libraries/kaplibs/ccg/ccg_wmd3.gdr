@@ -17,14 +17,14 @@
 *                      COVEC, XMODE, FVAR, USED, NUSED, STATUS )
 
 *  Description:
-*      This routine is based on maximising the likelyhood function for
+*      This routine is based on maximising the likelihood function for
 *      a statistical model in which any of the data points has a
 *      constant probability of being corrupt. A weighted mean is formed
 *      with weights chosen according to the deviation of each data
 *      point from the current estimate of the mean. The weights are
 *      derived from the relative probability of being invalid or
 *      corrupt. A sequence of these iterations converges to a
-*      stationary point in the likelyhood function. The routine
+*      stationary point in the likelihood function. The routine
 *      approximates to a k-sigma clipping algorithm for a large number
 *      of points and to a mode estimating algorithm for fewer data
 *      points.  Different weighting for each data point are allowed to
@@ -229,7 +229,7 @@
          SUMB = SUMB + DATA
          SUMC = SUMC + D * DATA
 
-*  Intialise the used flags
+*  Initialise the used flags
          USED( I ) = .FALSE.
     1 CONTINUE
 
@@ -241,7 +241,7 @@
       VAR = ( SUMC - ( SUMB * SUMB ) / SUMA ) / DBLE( EL - 1 )
       VAR = MAX( VAR, 0.0D0 )
 
-*  Store initial variance for later modification.
+*  Store the initial variance for later modification.
       IVAR = 1.0D0 / SUMA
 
 *  Set bounds of summations; this will assume that input weights are
@@ -329,7 +329,7 @@
          END IF
     2 CONTINUE
 
-*  Exit point for tolerance criterioN met or number of iterations
+*  Exit point for tolerance criterion met or number of iterations
 *  exceeded.
   101 CONTINUE
 
