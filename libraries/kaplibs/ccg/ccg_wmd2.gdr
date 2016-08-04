@@ -152,7 +152,7 @@
       DOUBLE PRECISION SUM1      ! Sum zero-order moment (first pass)
       DOUBLE PRECISION SUM2      ! Sum first-order moment (first pass)
       DOUBLE PRECISION SUM3      ! Sum second-order moment (first pass)
-      REAL SUMA                  ! Sum zero-order  moment
+      REAL SUMA                  ! Sum zero-order moment
       REAL SUMB                  ! Sum weighted zero-order moment
       REAL SUMC                  ! Sum first-order moment
       REAL SUMD                  ! Sum second-order moment
@@ -190,7 +190,6 @@
 
 *  Form sums in double precision to reduce rounding errors giving large
 *  relative uncertainities in the statistics.
-
             N = N + 1
             DATA = NUM_<T>TOD( W( I ) )
             SUM1 = SUM1 + DATA
