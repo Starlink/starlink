@@ -220,11 +220,18 @@
 *  Continue if more than one good value.
          IF ( NGOOD .GT. 0 ) THEN
 
-*  Form mode.
+*  Form mode.  Cope with the error flagged when one or none elements
+*  are good.  IGOOD should be returned as zero, but add some security.
+            CALL ERR_MARK
             CALL CCG_WMD2<T>( NGOOD, WRK1, WRK2, PBAD, NITER, TOLL,
      :                       NSIGMA, VAL, SUM2, USED, IGOOD, STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+               CALL ERR_ANNUL( STATUS )
+               IGOOD = 0
+            END IF
+            CALL ERR_RLSE
 
-*  If have any values left, update counters
+*  If there are any values left, update the counters.
             IF ( IGOOD .GT. 0 ) THEN
                DO 3 J = 1, NGOOD
                   IF ( USED ( J ) ) THEN
