@@ -121,12 +121,12 @@
 *        [FALSE]
 *     IPREF = NDF (Read)
 *        A 2D NDF holding a map of total intensity within the sky area
-*        covered by the input POL2 data, in units of pW. If supplied,
-*        the returned Q and U maps will be corrected for instrumental
-*        polarisation, based on the total intensity values in IPREF.
-*        The supplied IPREF map need not be pre-aligned with the output
-*        Q and U maps - it will be resampled as necessary using a
-*        transformation derived form its WCS information. [!]
+*        covered by the input POL2 data, in units of pW, mJy/beam or 
+*        Jy/beam. If supplied, the returned Q and U maps will be corrected
+*        for instrumental polarisation, based on the total intensity values
+*        in IPREF. The supplied IPREF map need not be pre-aligned with the
+*        output Q and U maps - it will be resampled as necessary using a
+*        transformation derived from its WCS information. [!]
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -232,7 +232,8 @@
 *     26-MAY-2016 (DSB):
 *        Do not use the AST mask when determining the pointing correction if
 *        the AST mask contains very few pixels.
-*
+*     1-SEP-2016 (DSB):
+*        Allow IPREF maps in units of mJy/beam as well as pW.
 '''
 
 import os
@@ -388,6 +389,42 @@ try:
       parsys["REF"].default = None
    else:
       parsys["REF"].default = ipref
+
+#  If the IPREF map is in units of mJy/beam, convert it to pW using the FCF
+#  in the "FCF" FITS header if available, or the standard FCF for the
+#  wavelength otherwise.
+      invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(ipref) )
+      units = starutil.get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
+      if units == "mJy/beam" or units == "Jy/beam":
+         msg_out( "Converting IPREF map ({0}) from {1} to pW...".
+                  format(ipref,units))
+         try:
+            fcf = float( starutil.get_fits_header( ipref, "FCF", True ))
+         except NoValueError:
+            try:
+               filter = int( float( starutil.get_fits_header( ipref, "FILTER", True )))
+            except NoValueError:
+               filter = 850
+               msg_out( "No value found for FITS header 'FILTER' in {0} - assuming 850".format(ipref))
+
+               if filter == 450:
+                  fcf = 491000.0
+               elif filter == 850:
+                  fcf = 537000.0
+               else:
+                  raise starutil.InvalidParameterError("Invalid FILTER header value "
+                         "'{0} found in {1}.".format( filter, ipref ) )
+
+               if units == "Jy/beam":
+                  fcf = fcf/1000.0
+         iprefpw = NDG(1)
+         invoke("$KAPPA_DIR/cdiv in={0} scalar={1} out={2}".format(ipref,fcf,iprefpw) )
+         ipref=iprefpw
+      elif units != "pW":
+         raise starutil.InvalidParameterError("Units for IPREF map ({0}) "
+                       "is '{1}':  must be 'pW', 'mJy/beam' or 'Jy/beam'.".
+                       format(ipref, units) )
+
 
    ref = parsys["REF"].value
    if not ref:
