@@ -275,6 +275,9 @@
 *     8-JUL-2016 (DSB):
 *        Check that all input files hold POL2 analysed intensity data
 *        before accessing OUTQ or OUTU.
+*     2-SEP-2016 (DSB):
+*        Display UT date and observation number for each chunk (helps
+*        when raw data for more than one observation is supplied as input).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -522,6 +525,15 @@ void smurf_calcqu( int *status ) {
                               heateffmap, ichunk, 1, 1, NULL, 0, NULL, NULL,
                               NO_FTS, 0, 0, 0, &concat, NULL, status );
          if( *status != SAI__OK ) goto L999;
+
+/* Display the chunk observation details. */
+         if( nchunk > 1 ) {
+            int utdate, obsnum;
+            smf_fits_getI( concat->sdata[ 0 ]->hdr, "UTDATE", &utdate, status );
+            smf_fits_getI( concat->sdata[ 0 ]->hdr, "OBSNUM", &obsnum, status );
+            msgOutiff( MSG__VERB, "", "   Observation: %d   UT date: %d",
+                       status, utdate, obsnum );
+         }
 
 /* Get a KeyMap holding values for the configuration parameters. Since we
    sorted by wavelength when calling smf_grp_related, we know that all
