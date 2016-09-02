@@ -513,8 +513,8 @@ void smurf_calcqu( int *status ) {
 
 /* Display the chunk number. */
          if( nchunk > 1 ) {
-            msgOutiff( MSG__VERB, "", "   Doing chunk %d of %d.",
-                       status, (int) ichunk + 1, (int) nchunk );
+            msgOutf( "", "   Doing chunk %d of %d.",
+                     status, (int) ichunk + 1, (int) nchunk );
          }
 
 /* Concatenate the data within this contiguous chunk. This produces a
@@ -531,8 +531,8 @@ void smurf_calcqu( int *status ) {
             int utdate, obsnum;
             smf_fits_getI( concat->sdata[ 0 ]->hdr, "UTDATE", &utdate, status );
             smf_fits_getI( concat->sdata[ 0 ]->hdr, "OBSNUM", &obsnum, status );
-            msgOutiff( MSG__VERB, "", "   Observation: %d   UT date: %d",
-                       status, utdate, obsnum );
+            msgOutf( "", "   Observation: %d   UT date: %d",
+                     status, utdate, obsnum );
          }
 
 /* Get a KeyMap holding values for the configuration parameters. Since we
