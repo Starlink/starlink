@@ -1,6 +1,62 @@
                    Log of Changes Made to CFITSIO
 
-Version 3.38 - February 2015
+Version 3.39 - April 2016
+
+   - added 2 new routines suggested by Eric Mandel:
+      ffhisto3 is similar to ffhisto2, except that it does not close the
+         original file.
+      fits_open_extlist is similar to fits_open_data except that it opens
+         the FITS file and then moves to the first extension in the user-input
+	 list of 'good' extensions.
+
+   - in ffpsvc and ffprec, it is necessary to treat CONTINUE, COMMENT, HISTORY,
+     and blank name keywords as a special case which must be treated differently
+     from other keywords because they have no value field and, by definition,
+     have keyword names that are strictly limited in length.
+     
+   - added the Fortran wrapper routines for the 2 new string keyword reading
+     routines (FTGSKY and FTGKSL), and documented all the routines in the
+     FITSIO and CFITSIO users guides.
+
+   - in ffinttyp, added explicit initialization of the input 'negative' 
+     argument to 0.
+
+   - added new routine to return the length of the keyword value string:
+         fits_get_key_strlen / ffgksl.  
+     This is primarily intended for use with string keywords
+     that use the CONTINUE convention to continue the
+     value over multiple header records, but this routine can be used
+     to get the length of the value string for any type keyword.
+
+   - added new routine to read string-valued keywords:
+          fits_read_string_key / ffgsky
+     This routine supports normal string keywords as well as long string
+     keywords that use the CONTINUE convention. In many cases this routine
+     may be more convenient to use then the older fits_read_key_longstr
+     routine.
+
+   - changed the prototype of fits_register_driver in fitsio2.h so that the
+     pointer definition argument does not have the same name as the pointer
+     itself (to work around a bug in the pgcc compiler).
+     
+   - added the missing FTDTDM fortran wrapper definition to f77_wrap3.c.
+   
+   - modified Makefile.in and configure.in to add LDFLAGS_BIN for task linker
+     flages, which will be the same as LDFLAGS except on newer Mac OS X where
+     an rpath flag is added.
+
+   - modified Makefile.in to add a new "make utils" command which will build
+     fpack, funpack, cookbook, fitscopy, imcopy, smem, speed, and testprog.
+     These programs will be installed into $prfix/bin.
+
+   - fixed a bug when attempting to modify the values in a variable-length
+     bit ("X") column in a binary table.
+
+   - reinstated the ability to write HIERARCH keywords that contain characters
+     that would not be allowed in a normal 8-character keyword name, which had
+     been disabled in the previous release.
+
+Version 3.38 - February 2016
 
    - CRITICAL BUG FIX:
      The Intel 15 and 16 compilers (and potentially other compilers) may silently
