@@ -635,7 +635,9 @@ class ParSys(object):
 
    Creation of a new ParSys object also causes the creation of a new,
    empty, ADAM directory in the user's home directory. This ADAM
-   directory can be deleted using function ParSys.cleanup().
+   directory can be deleted using function ParSys.cleanup(). It also
+   sets the NDF_AUTO_HISTORY and AUTOPROV environment variables so that
+   newly created NDFs will contain history and provenance information.
 
    Three parameters controlling the level of information to display and
    log are created automatically when the ParSys constructor is called.
@@ -918,6 +920,10 @@ class ParSys(object):
          del os.environ["KAPPA_REPORT_NAMES"]
       if "KAPPA_VERBOSE" in os.environ:
          del os.environ["KAPPA_VERBOSE"]
+
+      # Ensure new NDFs contain history and provenance.
+      os.environ["NDF_AUTO_HISTORY"] = 1
+      os.environ["AUTOPROV"] = 1
 
    # Delete the temporary ADAM directory.
    @classmethod
