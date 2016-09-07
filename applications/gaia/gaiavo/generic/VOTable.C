@@ -521,7 +521,7 @@ namespace gaia {
     int VOTable::saveAsTST( int index, const char *file )
     {
         ofstream out( file, ios::out );
-        if ( out == NULL ) {
+        if ( !out ) {
             cerr << "Cannot open output file " << file << endl;
             return 0;
         }
