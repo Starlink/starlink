@@ -23,7 +23,7 @@
 
 *  Usage:
 *     pol2scan in q u [cat] [ipref] [config] [pixsize] [qudir] [mapdir]
-*              [retain] [msg_filter] [ilevel] [glevel] [logfile]
+*              [obstable] [retain] [msg_filter] [ilevel] [glevel] [logfile]
 
 *  ADAM Parameters:
 *     ALIGN = LOGICAL (Read)
@@ -120,6 +120,15 @@
 *        IP beam shape at the elevation of the supplied POL2 data, before
 *        doing IP correction? This is currently an experimental feature.
 *        [FALSE]
+*     IPFCF = _REAL (Read)
+*        The FCF that should be used to convert the supplied IP REF map
+*        to pW. This parameter is only used if the supplied IPREF map is
+*        not already in units of pW, and if the FCF is not stored in the
+*        FITS extension of the map. The suggested default is the standard
+*        FCF for the band concerned (450 or 840). Just press return at
+*        the prompt to use this default, or enter a new value if the
+*        suggested value is not the FCF that was actually used to create
+*        the map. []
 *     IPREF = NDF (Read)
 *        A 2D NDF holding a map of total intensity within the sky area
 *        covered by the input POL2 data, in units of pW, mJy/beam or
@@ -158,6 +167,12 @@
 *        is supplied, they use north in the tracking system - what ever
 *        that may be. Note, this parameter is only used if null (!) is
 *        supplied for parameter INQU. ["TRACKING"]
+*     OBSTABLE = LITERAL (Read)
+*        The path of a new text file to create, to which will be written
+*        statistics describined the Q and U maps made from each individual
+*        observation present in the list of raw data files specified by
+*        parameter IN (or INQU). No file is created if null (!) is
+*        supplied. [!]
 *     PIXSIZE = _REAL (Read)
 *        Pixel dimensions in the output Q and U maps, in arcsec. The default
 *        is 4 arc-sec for 850 um data and 2 arc-sec for 450 um data. []
@@ -252,6 +267,8 @@ from starutil import Parameter
 from starutil import ParSys
 from starutil import msg_out
 from starutil import AtaskError
+from starutil import get_fits_header
+from starutil import get_task_par
 
 #  Assume for the moment that we will not be retaining temporary files.
 retain = 0
@@ -268,6 +285,106 @@ def cleanup():
       NDG.cleanup()
 
 
+
+#  A function to calculate the following threee statistics from the
+#  supplied Q or U map:
+#     1 - The estimated noise level at the map centre in pW (based on the
+#         NDF Variance array).
+#     2 - The source size in square arc-seconds.
+#     3 - The RMS value of the source in pW.
+#  The source pixels are defined by the AST mask created by makemap and
+#  stored in the Quality array of the supplied NDF. The
+def calc_stats(ndf):
+
+#  We want the noise at the centre of the map because we want it to be
+#  comparable to the noise used in the expected NEFD calculations. But it
+#  is hard to calculate the noise at the centre because of the presence of
+#  potentially bright sources. So instead we calculate it in the background
+#  region, and then scale it down assuming that the noise goes as 1/root(exptime).
+#  To do this we measure the mean exptime in the background and the mean
+#  exptime in the source and base the scaling on their ratio. The background
+#  region used is defined as the outside of the AST mask, excluding a rim
+#  around the edge defined by exptime being lower than the mean. First get
+#  the mean exp_time value, then create a mask by the exp_time below the
+#  mean with bad values.
+   invoke("$KAPPA_DIR/stats ndf={0}.more.smurf.exp_time".format(ndf))
+   mean_exp_time = get_task_par( "mean", "stats" )
+   edgemask = NDG(1)
+   invoke("$KAPPA_DIR/thresh in={0}.more.smurf.exp_time out={1} "
+          "thrlo={2} newlo=bad thrhi=1E10 newhi=bad".
+          format(ndf,edgemask,mean_exp_time))
+
+#  Create another mask that is bad inside the source area defined by the
+#  AST mask (created by makemap), and unity everywhere else. First set
+#  the bad bits so that any flagged (i.e. background) pixels are treated as
+#  bad. Since POL2 DR only uses AST flagging (not FLT or COM), this is OK.
+#  Only the source pixels remain good after this.
+   invoke("$KAPPA_DIR/setbb ndf={0} bb=255".format(ndf))
+
+#  Find the count, mean value and standard deviation of the source pixels.
+   invoke("$KAPPA_DIR/stats ndf={0}".format(ndf))
+   source_size = get_task_par( "numgood", "stats" )
+   mean = get_task_par( "mean", "stats" )
+   sigma = get_task_par( "sigma", "stats" )
+   source_rms = math.sqrt( mean*mean + sigma*sigma )
+
+#  Convert the source size from pixels to square arc-seconds.
+   invoke("$KAPPA_DIR/ndftrace ndf={0}".format(ndf))
+   pixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ))
+   source_size *= (pixsize*pixsize)
+
+#  Create a map that is unity where ever the Q or U map is now bad, and is bad
+#  where ever the Q or U map is not bad (i.e. the source region). Also include
+#  the earlier mask that excludes the edge of the observation.
+   fullmask = NDG(1)
+   invoke( "$KAPPA_DIR/maths exp=\"'qif(((ia==<bad>).and.(ib!=<bad>)),1,<bad>)'\" "
+           "ia={0} ib={1} out={2}".format(ndf,edgemask,fullmask))
+
+#  Reset the bad bits mask in the map to its original state (zero). This
+#  brings back the original source region pixel values.
+   invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(ndf))
+
+#  Also reset the bad bits mask in the fullmask created above (it will have
+#  been inherited from "ndf").
+   invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(fullmask))
+
+#  Multiply the Q or U map by the fullmask, and find the mean variance value
+#  for the remaining pixels (the background pixels). Take it's square
+#  root to get the noise in the background region.
+   background = NDG(1)
+   invoke( "$KAPPA_DIR/mult in1={0} in2={1} out={2}".
+           format(ndf,fullmask,background))
+
+   invoke("$KAPPA_DIR/stats ndf={0} comp=var".format(background))
+   noise = math.sqrt( float( get_task_par( "mean", "stats" )))
+
+#  Now we need to reduce this noise value so that it represents an
+#  estimate of the noise in the centre of the map. Find the mean exp_time
+#  in the background region used above. First apply the mask to the
+#  exp_time array, and then find the stats of the remaining values.
+   masked_exptime = NDG(1)
+   invoke("$KAPPA_DIR/mult in1={0}.more.smurf.exp_time in2={1} out={2}".
+          format(ndf,fullmask,masked_exptime))
+   invoke("$KAPPA_DIR/stats ndf={0}".format(masked_exptime))
+   back_exptime = get_task_par( "mean", "stats" )
+
+#  Now find the mean exp_time within 3 arc-mins of the centre. The centre
+#  is at pixel coords (0,0), so define the circle in pixel coords. It's
+#  good enough...
+   ardfile = os.path.join(NDG.tempdir,"centre.ard")
+   fd = open(ardfile,"w")
+   fd.write("COFRAME(PIXEL)\n")
+   fd.write("CIRCLE(0.0,0.0,{0})\n".format((3*60)/pixsize))
+   fd.close()
+   invoke("$KAPPA_DIR/aperadd ndf={0}.more.smurf.exp_time ardfile={1}".
+          format(ndf,ardfile))
+   centre_exptime = get_task_par( "mean", "aperadd" )
+
+#  Correct the returned noise value.
+   noise *= math.sqrt(back_exptime/centre_exptime)
+
+   return ( noise, source_size, source_rms )
+
 #  Catch any exception so that we can always clean up, even if control-C
 #  is pressed.
 try:
@@ -283,7 +400,7 @@ try:
    params = []
 
    params.append(starutil.ParNDG("IN", "The input POL2 time series NDFs",
-                                 starutil.get_task_par("DATA_ARRAY","GLOBAL",
+                                 get_task_par("DATA_ARRAY","GLOBAL",
                                                        default=Parameter.UNSET)))
 
    params.append(starutil.ParNDG("Q", "The output Q intensity map",
@@ -311,6 +428,10 @@ try:
 
    params.append(starutil.Par0S("MAPDIR", "Directory in which to save the "
                                 "Q/U maps before they are co-added", None,
+                                noprompt=True))
+
+   params.append(starutil.Par0S("OBSTABLE", "Output text file holding "
+                                "info about individual observations", None,
                                 noprompt=True))
 
    params.append(starutil.ParNDG("INQU", "NDFs containing previously calculated Q and U values",
@@ -341,6 +462,9 @@ try:
                                      "ECLIPTIC"), "Celestial system to "
                                      "use as reference direction", "TRACKING",
                                      noprompt=True ))
+
+   params.append(starutil.Par0F("IPFCF", "FCF needed to convert IPREF map to pW"))
+
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
@@ -383,9 +507,9 @@ try:
    config = parsys["CONFIG"].value
    pixsize = parsys["PIXSIZE"].value
    if pixsize:
-      pixsize = "pixsize={0}".format(pixsize)
+      pixsize_par = "pixsize={0}".format(pixsize)
    else:
-      pixsize = ""
+      pixsize_par = ""
 
 #  See if temp files are to be retained.
    retain = parsys["RETAIN"].value
@@ -402,29 +526,33 @@ try:
 #  in the "FCF" FITS header if available, or the standard FCF for the
 #  wavelength otherwise.
       invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(ipref) )
-      units = starutil.get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
+      units = get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
       if units == "mJy/beam" or units == "Jy/beam":
-         msg_out( "Converting IPREF map ({0}) from {1} to pW...".
-                  format(ipref,units))
          try:
-            fcf = float( starutil.get_fits_header( ipref, "FCF", True ))
-         except NoValueError:
+            fcf = float( get_fits_header( ipref, "FCF", True ))
+         except starutil.NoValueError:
             try:
-               filter = int( float( starutil.get_fits_header( ipref, "FILTER", True )))
-            except NoValueError:
+               filter = int( float( get_fits_header( ipref, "FILTER", True )))
+            except starutil.NoValueError:
                filter = 850
                msg_out( "No value found for FITS header 'FILTER' in {0} - assuming 850".format(ipref))
 
-               if filter == 450:
-                  fcf = 491000.0
-               elif filter == 850:
-                  fcf = 537000.0
-               else:
-                  raise starutil.InvalidParameterError("Invalid FILTER header value "
-                         "'{0} found in {1}.".format( filter, ipref ) )
+            if filter == 450:
+               fcf = 491000.0
+            elif filter == 850:
+               fcf = 537000.0
+            else:
+               raise starutil.InvalidParameterError("Invalid FILTER header value "
+                      "'{0} found in {1}.".format( filter, ipref ) )
 
-               if units == "Jy/beam":
-                  fcf = fcf/1000.0
+            if units == "Jy/beam":
+               fcf = fcf/1000.0
+
+            parsys["IPFCF"].default = fcf
+            fcf = parsys["IPFCF"].value
+
+         msg_out( "Converting IPREF map ({0}) from {1} to pW using FCF={2}...".
+                  format(ipref,units,fcf))
          iprefpw = NDG(1)
          invoke("$KAPPA_DIR/cdiv in={0} scalar={1} out={2}".format(ipref,fcf,iprefpw) )
          ipref=iprefpw
@@ -450,6 +578,10 @@ try:
       mapdir = NDG.tempdir
    elif not os.path.exists(mapdir):
       os.makedirs(mapdir)
+
+#  See if a table holding info about individual observations is to be
+#  created.
+   obstable =  parsys["OBSTABLE"].value
 
 #  If no Q and U values were supplied, create a set of Q and U time
 #  streams from the supplied analysed intensity time streams. Put them in
@@ -482,7 +614,7 @@ try:
       indfs = []
       for ndf in inqu:
          invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(ndf) )
-         label = starutil.get_task_par( "LABEL", "ndftrace" )
+         label = get_task_par( "LABEL", "ndftrace" )
          if label == "Q":
             qndfs.append( ndf )
          elif label == "U":
@@ -527,42 +659,73 @@ try:
 
 #  Form lists of Q, U and I time series files, indexed using a key formed
 #  from the UT date, observation number and subscan number (i.e. chunk number).
+   msg_out( "Indexing Q files by UT date and observation number..." )
    qlist = {}
    for sdf in qts:
-      key = "{0}_{1}_{2}".format( int(starutil.get_fits_header( sdf, "UTDATE",
+      key = "{0}_{1}_{2}".format( int(get_fits_header( sdf, "UTDATE",
                                                             True )),
-                                 int(starutil.get_fits_header( sdf, "OBSNUM",
+                                 int(get_fits_header( sdf, "OBSNUM",
                                                             True )),
-                                 int(starutil.get_fits_header( sdf, "NSUBSCAN",
+                                 int(get_fits_header( sdf, "NSUBSCAN",
                                                             True )))
-      qlist[key] = sdf
+      if key in qlist:
+         qlist[key].append( sdf )
+      else:
+         qlist[key] = [ sdf ]
 
+   msg_out( "Indexing U files by UT date and observation number..." )
    ulist = {}
    for sdf in uts:
-      key = "{0}_{1}_{2}".format( int(starutil.get_fits_header( sdf, "UTDATE",
+      key = "{0}_{1}_{2}".format( int(get_fits_header( sdf, "UTDATE",
                                                             True )),
-                                 int(starutil.get_fits_header( sdf, "OBSNUM",
+                                 int(get_fits_header( sdf, "OBSNUM",
                                                             True )),
-                                 int(starutil.get_fits_header( sdf, "NSUBSCAN",
+                                 int(get_fits_header( sdf, "NSUBSCAN",
                                                             True )))
-      ulist[key] = sdf
+      if key in ulist:
+         ulist[key].append( sdf )
+      else:
+         ulist[key] = [ sdf ]
 
    if len(its) > 0:
+      msg_out( "Indexing I files by UT date and observation number..." )
       ilist = {}
       for sdf in its:
-         key = "{0}_{1}_{2}".format( int(starutil.get_fits_header( sdf, "UTDATE",
+         key = "{0}_{1}_{2}".format( int(get_fits_header( sdf, "UTDATE",
                                                                True )),
-                                    int(starutil.get_fits_header( sdf, "OBSNUM",
+                                    int(get_fits_header( sdf, "OBSNUM",
                                                                True )),
-                                    int(starutil.get_fits_header( sdf, "NSUBSCAN",
+                                    int(get_fits_header( sdf, "NSUBSCAN",
                                                                True )))
-         ilist[key] = sdf
+         if key in ilist:
+            ilist[key].append( sdf )
+         else:
+            ilist[key] = [ sdf ]
    else:
       ilist = None
+
+   if len(qlist) == 1:
+      msg_out( "Only one observation supplied"
 
 #  Dictionaries holding the Q and U maps for each observation chunk.
    qmaps = {}
    umaps = {}
+
+#  Dictionaries holding the stats for the Q and U maps made from each chunk.
+   wvm = {}
+   elapsed_time = {}
+   nbolo_used_q = {}
+   nbolo_used_u = {}
+   nefd_q = {}
+   nefd_u = {}
+   nefd_expected = {}
+   source_size_q = {}
+   source_rms_q = {}
+   noise_u = {}
+   source_size_u = {}
+   source_rms_u = {}
+   pointing_dx = {}
+   pointing_dy = {}
 
 #  Loop over all Q time series files. Each separate observation will
 #  usually have one Q time series file (although there may be more if the
@@ -572,15 +735,15 @@ try:
    for key in qlist:
 
 #  Get the Q, U and I time stream files for the current observation chunk.
-      qsdf = qlist[ key ]
+      qsdf = NDG( qlist[ key ] )
 
       if key in ulist:
-         usdf = ulist[ key ]
+         usdf = NDG( ulist[ key ] )
       else:
          usdf = None
 
       if ilist and ( key in ilist ):
-         isdf = ilist[ key ]
+         isdf = NDG( ilist[ key ] )
       else:
          isdf = None
 
@@ -589,7 +752,7 @@ try:
          msg_out("\n>>>>   Making Q and U maps from {0}...\n".format(key) )
 
 #  AZ/EL pointing correction, for data between 20150606 and 20150930.
-         ut = int(starutil.get_fits_header( qsdf, "UTDATE", True ))
+         ut = int(get_fits_header( qsdf[0], "UTDATE", True ))
          if ut >= 20150606 and ut <= 20150929:
             pntfile = os.path.join(NDG.tempdir,"pointing")
             fd = open(pntfile,"w")
@@ -637,11 +800,11 @@ try:
 #  pixels, but only if the mask contains a reasonable number of pixels
 #  (very faint sources will have very small or non-existant AST masks).
             invoke("$KAPPA_DIR/showqual ndf={0}".format(imap))
-            if starutil.get_task_par( "QNAMES(1)", "showqual" ) == "AST":
+            if get_task_par( "QNAMES(1)", "showqual" ) == "AST":
                bb = 1
-            elif starutil.get_task_par( "QNAMES(2)", "showqual" ) == "AST":
+            elif get_task_par( "QNAMES(2)", "showqual" ) == "AST":
                bb = 2
-            elif starutil.get_task_par( "QNAMES(3)", "showqual" ) == "AST":
+            elif get_task_par( "QNAMES(3)", "showqual" ) == "AST":
                bb = 4
             else:
                bb = 0
@@ -652,7 +815,7 @@ try:
 #  Clear badbits to use the whole map if the above masking results in too
 #  few pixels.
                invoke("$KAPPA_DIR/stats ndf={0}".format(imap))
-               nused = float( starutil.get_task_par( "numgood", "stats" ) )
+               nused = float( get_task_par( "numgood", "stats" ) )
                if nused < 400:
                   invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(imap))
 
@@ -660,8 +823,8 @@ try:
 #  corresponding features in the reference map.
             invoke("$KAPPA_DIR/align2d ref={0} out=! in={1} form=3 corlimit=0.7".
                    format(ref,imap))
-            dx = float( starutil.get_task_par( "TR(1)", "align2d" ) )
-            dy = float( starutil.get_task_par( "TR(4)", "align2d" ) )
+            dx = float( get_task_par( "TR(1)", "align2d" ) )
+            dy = float( get_task_par( "TR(4)", "align2d" ) )
 
 #  If the shifts are suspiciously high, we do not believe them. In which
 #  case we cannot do pointing ocorrection when creating the Q and U maps.
@@ -680,10 +843,10 @@ try:
 
 #  Get the pixel coords at the centre of the total intensity map.
                invoke("$KAPPA_DIR/ndftrace ndf={0}".format(imap2d))
-               lbndx = float( starutil.get_task_par( "LBOUND(1)", "ndftrace" ) )
-               lbndy = float( starutil.get_task_par( "LBOUND(2)", "ndftrace" ) )
-               ubndx = float( starutil.get_task_par( "UBOUND(1)", "ndftrace" ) )
-               ubndy = float( starutil.get_task_par( "UBOUND(2)", "ndftrace" ) )
+               lbndx = float( get_task_par( "LBOUND(1)", "ndftrace" ) )
+               lbndy = float( get_task_par( "LBOUND(2)", "ndftrace" ) )
+               ubndx = float( get_task_par( "UBOUND(1)", "ndftrace" ) )
+               ubndy = float( get_task_par( "UBOUND(2)", "ndftrace" ) )
                cenx = 0.5*( lbndx + ubndx )
                ceny = 0.5*( lbndy + ubndy )
 
@@ -750,26 +913,27 @@ try:
                fd.write("56000 {0} {1}\n".format(dx,dy))
                fd.close()
 
-
-
+#  Store the pointing corrections for inclusion in the obstable.
+               pointing_dx[key] = dx
+               pointing_dy[key] = dy
 
 #  Convolve the supplied ip reference map to give it a beam that matches
 #  the expected IP beam at the elevation of the supplied data.
          if ipbeamfix and ipref != "!":
 
 #  Get the azmimuth and elevation of the POL2 data.
-            el1 = float( starutil.get_fits_header( qsdf, "ELSTART" ) )
-            el2 = float( starutil.get_fits_header( qsdf, "ELEND" ) )
+            el1 = float( get_fits_header( qsdf[0], "ELSTART" ) )
+            el2 = float( get_fits_header( qsdf[0], "ELEND" ) )
             el = 0.5*( el1 + el2 )
-            az1 = float( starutil.get_fits_header( qsdf, "AZSTART" ) )
-            az2 = float( starutil.get_fits_header( qsdf, "AZEND" ) )
+            az1 = float( get_fits_header( qsdf[0], "AZSTART" ) )
+            az2 = float( get_fits_header( qsdf[0], "AZEND" ) )
             az = 0.5*( az1 + az2 )
 
             msg_out( "Convolving the I reference map to match the expected IP beam shape at elevation {0} degs...".format(el))
 
 #  Get the pixel size in the input total intensity map.
             invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(ipref) )
-            ipixsize = float( starutil.get_task_par( "fpixscale(1)", "ndftrace" ) )
+            ipixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
 
 #  Generate an NDF holding the canonical total-intensity beam (circular).
 #  Parameters are: pg=shape exponent, pf=FWHM in arc-sec, pp=pixel size
@@ -795,9 +959,9 @@ try:
             tcstai = NDG(1)
             invoke("$HDSTOOLS_DIR/hcreate type=image inp={0}".format(tcstai))
             invoke("$HDSTOOLS_DIR/hcopy in={0}.more.jcmtstate.tcs_tai out={1}.data_array".
-                   format(qsdf,tcstai))
+                   format(qsdf[0],tcstai))
             invoke("$KAPPA_DIR/stats ndf={0}".format(tcstai))
-            epoch = float( starutil.get_task_par( "mean", "stats" ) )
+            epoch = float( get_task_par( "mean", "stats" ) )
 
 #  Get the angle from the Y pixel axis to the elevation axis in the supplied
 #  IP reference image. Positive rotation is from X pixel axis to Y pixel axis.
@@ -814,7 +978,7 @@ try:
 
             junk2 = NDG(1)
             invoke("$KAPPA_DIR/rotate in={0} out={1} angle=!".format(junk,junk2))
-            angrot = float( starutil.get_task_par( "angleused", "rotate" ) )
+            angrot = float( get_task_par( "angleused", "rotate" ) )
 
 #  Convert the major axis orientation from sky coords to pixel coords.
             orient = angrot - orient
@@ -847,7 +1011,7 @@ try:
 #  Ensure the kernal has a total data value of unity. This means the
 #  input and output maps will have the same normalisation.
             invoke("$KAPPA_DIR/stats ndf={0}".format(tmp2))
-            total = starutil.get_task_par( "total", "stats" )
+            total = get_task_par( "total", "stats" )
             bkernel = NDG(1)
             invoke("$KAPPA_DIR/cdiv in={0} scalar={1} out={2}".format(tmp2,total,bkernel))
 
@@ -869,7 +1033,7 @@ try:
          msg_out( "Making a map from the Q time series...")
          try:
             invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
-                   "ipref={5} {6}".format(qsdf,conf,qmaps[key],ref,pntfile,ipref,pixsize))
+                   "ipref={5} {6}".format(qsdf,conf,qmaps[key],ref,pntfile,ipref,pixsize_par))
 
             if ref == "!":
                ref = qmaps[key]
@@ -878,7 +1042,56 @@ try:
             msg_out( "Making a map from the U time series..." )
             try:
                invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
-                   "ipref={5} {6}".format(usdf,conf,umaps[key],ref,pntfile,ipref,pixsize))
+                      "ipref={5} {6}".format(usdf,conf,umaps[key],ref,pntfile,ipref,pixsize_par))
+
+#  Store useful info about this pair of Q and U maps.
+#  FITS headers...
+               msg_out( "Calculating stats for the Q and U maps..." )
+               wvm[key] = 0.5*( float( get_fits_header( qmaps[key], "WVMTAUST" ) )
+                                + float( get_fits_header( qmaps[key], "WVMTAUEN" ) ) )
+               elapsed_time[key] = float( get_fits_header( qmaps[key], "ELAPTIME" ) )
+               nbolo_used_q[key] = float( get_fits_header( qmaps[key], "NBOLOEFF" ) )
+               nbolo_used_u[key] = float( get_fits_header( umaps[key], "NBOLOEFF" ) )
+
+#  Calculate the expected NEFD. See:
+#     www.eaobservatory.org/jcmt/instrumentation/continuum/scuba-2/pol-2/
+#     www.eaobservatory.org/jcmt/instrumentation/continuum/scuba-2/calibration/
+
+               elevation = 0.5*( float( get_fits_header( qmaps[key], "ELSTART" ) )
+                                + float( get_fits_header( qmaps[key], "ELEND" ) ) )
+               band = float( get_fits_header( qmaps[key], "FILTER" ) )
+               if band == 450:
+                  transmission = math.exp(-26*(wvm[key]-0.01196)/math.sin(math.radians(elevation)))
+                  nefd_expected[key] = 981.5/transmission - 87.3
+                  fcf = 962000
+                  c = 0.045
+               else:
+                  transmission = math.exp(-4.6*(wvm[key]-0.00435)/math.sin(math.radians(elevation)))
+                  nefd_expected[key] = 310/transmission - 26
+                  fcf = 725000
+                  c = 0.165
+
+#  Background noise, source size, mean source value...
+               (noise_q, source_size_q[key], source_rms_q[key] ) = calc_stats( qmaps[key] )
+               (noise_u, source_size_u[key], source_rms_u[key] ) = calc_stats( umaps[key] )
+
+#  Calculate the NEFDs based on the measured noises.
+               nefd_q[key] = fcf*noise_q*math.sqrt(elapsed_time[key]*c)
+               nefd_u[key] = fcf*noise_u*math.sqrt(elapsed_time[key]*c)
+
+#  Display all this info.
+               msg_out( " " )
+               msg_out( "  WVM tau = {0}".format(wvm[key]))
+               msg_out( "  Measured NEFD in Q = {0} mJy.sec^(0.5)".format(nefd_q[key]))
+               msg_out( "  Measured NEFD in U = {0} mJy.sec^(0.5)".format(nefd_u[key]))
+               msg_out( "  Expected NEFD = {0} mJy.sec^(0.5)".format(nefd_expected[key]))
+               msg_out( "  Elapsed observation time = {0} sec".format(elapsed_time[key]))
+               msg_out( "  Number of bolometers contributing to Q map = {0}".format(nbolo_used_q[key]))
+               msg_out( "  Number of bolometers contributing to U map = {0}".format(nbolo_used_u[key]))
+               msg_out( "  Source area in Q = {0} arc-sec^(2)".format(source_size_q[key]))
+               msg_out( "  Source area in U = {0} arc-sec^(2)".format(source_size_u[key]))
+               msg_out( "  RMS of Q within source area = {0} pW".format(source_rms_q[key]))
+               msg_out( "  RMS of U within source area = {0} pW".format(source_rms_u[key]))
 
             except starutil.AtaskError:
                if ref == qmaps[key]:
@@ -889,9 +1102,53 @@ try:
          except starutil.AtaskError:
             del qmaps[key]
 
+#  If required, dump the stats for the individual observations to a text
+#  file, formatted in topcat "ascii" format.
+   msg_out( " " )
+   if obstable:
+      msg_out( "Writing stats for individual observations to output text file {0}".format(obstable))
+      fd = open(obstable,"w")
+      fd.write("#\n")
+      fd.write("# UT - UT date of observation\n")
+      fd.write("# OBS - Observation number\n")
+      fd.write("# SUBSCAN - The first subscan included in the map\n")
+      fd.write("# WVM - The mean of the starting and ending WVM tau values\n")
+      fd.write("# NEFD_Q - The measured NEFD in the Q map (mJy.sec^(0.5))\n")
+      fd.write("# NEFD_U - The measured NEFD in the U map (mJy.sec^(0.5))\n")
+      fd.write("# NEFD_EXP - The expected NEFD based on WVM and elevation (mJy.sec^(0.5))\n")
+      fd.write("# TIME - The elapsed time of the data included in the maps (s)\n")
+      fd.write("# SIZE_Q - The total area of the source regions in the Q map (square arc-mins)\n")
+      fd.write("# SIZE_U - The total area of the source regions in the U map (square arc-mins)\n")
+      fd.write("# RMS_Q - The RMS Q value within the source regions (pW)\n")
+      fd.write("# RMS_U - The RMS U value within the source regions (pW)\n")
+      fd.write("# NBOLO_Q - Number of bolometers contributing to Q map\n")
+      fd.write("# NBOLO_U - Number of bolometers contributing to U map\n")
 
+      if len( pointing_dx ) > 0:
+         fd.write("# DX - Pointing correction in azimuth (arc-sec))\n")
+         fd.write("# DY - Pointing correction in elevation (arc-sec))\n")
 
+      fd.write("#\n")
+      fd.write("# UT OBS SUBSCAN WVM NEFD_Q NEFD_U NEFD_EXP TIME SIZE_Q SIZE_U RMS_Q RMS_U NBOLO_Q NBOLO_U")
+      if len( pointing_dx ) > 0:
+         fd.write(" DX DY")
+      fd.write("\n")
 
+      for key in umaps:
+         ( ut, obs, subscan ) = key.split("_")
+         fd.write("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13}".
+                  format( ut, obs, subscan, wvm[key],
+                          nefd_q[key], nefd_u[key], nefd_expected[key],
+                          elapsed_time[key],
+                          source_size_q[key], source_size_u[key],
+                          source_rms_q[key], source_rms_q[key],
+                          nbolo_used_q[key], nbolo_used_u[key] ))
+
+         if len( pointing_dx ) > 0:
+            fd.write(" {0} {1}".format( pointing_dx[key], pointing_dy[key] ))
+
+         fd.write("\n")
+      fd.close()
 
 #  All observation chunks have now been mapped, so we coadd them (if we have more than one).
    if len(qmaps) == 1:
@@ -899,7 +1156,8 @@ try:
       invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(qmaps[key],qmap))
       invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(umaps[key],umap))
 
-   else:
+   elif len(qmaps) > 1:
+      msg_out("Coadding Q and U maps from all observations")
       allmaps = NDG( qmaps.values() )
       invoke("$CCDPACK_DIR/makemos in={0} out={1} method=mean".format(allmaps,qmap))
       allmaps = NDG( umaps.values() )
@@ -994,4 +1252,8 @@ except starutil.StarUtilError as err:
 except:
    cleanup()
    raise
+
+
+
+
 
