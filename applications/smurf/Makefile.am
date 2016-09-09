@@ -65,6 +65,7 @@ jsapaster \
 makecube \
 makemap \
 nanten2acsis \
+pol2check \
 rawfixmeta \
 rawpress \
 rawrecreatewcs \

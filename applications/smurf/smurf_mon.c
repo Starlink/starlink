@@ -386,6 +386,8 @@ void smurf_mon( int * status ) {
     smurf_makemap( status );
   } else if (strcmp( taskname, "NANTEN2ACSIS" ) == 0 ) {
     smurf_nanten2acsis( status );
+  } else if (strcmp( taskname, "POL2CHECK" ) == 0 ) {
+    smurf_pol2check( status );
   } else if (strcmp( taskname, "RAWFIXMETA" ) == 0 ) {
     smurf_rawfixmeta( status );
   } else if (strcmp( taskname, "RAWPRESS" ) == 0 ) {

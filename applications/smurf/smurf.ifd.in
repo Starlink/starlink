@@ -4107,6 +4107,90 @@ package @PACKAGE@ {
 
         }
 
+        action pol2check {
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input NDFs}
+                helpkey *
+            }
+
+            parameter junkfile {
+                type LITERAL
+                prompt {File in which to put non-POL2 NDF paths}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                helpkey *
+            }
+
+            parameter junkfound {
+               type _LOGICAL
+               access WRITE
+               vpath DEFAULT
+               default FALSE
+               helpkey *
+            }
+
+            parameter mapfile {
+                type LITERAL
+                prompt {File in which to put POL-2 map NDF paths}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                helpkey *
+            }
+
+            parameter mapfound {
+               type _LOGICAL
+               access WRITE
+               vpath DEFAULT
+               default FALSE
+               helpkey *
+            }
+
+            parameter rawfile {
+                type LITERAL
+                prompt {File in which to put raw POL2 time-series NDF paths}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                helpkey *
+            }
+
+            parameter rawfound {
+               type _LOGICAL
+               access WRITE
+               vpath DEFAULT
+               default FALSE
+               helpkey *
+            }
+
+            parameter stokesfile {
+                type LITERAL
+                prompt {File in which to put Stokes POL2 time-series NDF paths}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                helpkey *
+            }
+
+            parameter stokesfound {
+               type _LOGICAL
+               access WRITE
+               vpath DEFAULT
+               default FALSE
+               helpkey *
+            }
+
+        }
+
         action rawfixmeta {
 
             helplib {$SMURF_HELP}

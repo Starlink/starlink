@@ -13,10 +13,23 @@
 *     python (2.7 or 3.*)
 
 *  Description:
-*     This script runs SMURF:CALCQU on the POL-2 data files specified by
-*     parameter IN, to create a set of down-sampled time series files
-*     holding Q and U values in each bolometer. These time series are
-*     then converted into separate Q and U maps using SMURF:MAKEMAP.
+*     This script runs SMURF:CALCQU on any raw POL-2 data files specified
+*     by parameter IN, to create a set of down-sampled time series files
+*     holding Q and U values in each bolometer. These are placed in the
+*     directory specified by parameter QUDIR. These time series, together
+*     with any Q,U time series files specified directly by parameter IN, are
+*     then converted into Q and U maps using SMURF:MAKEMAP. A separate pair
+*     of Q and U maps is created for each observation present in the supplied
+*     data. These maps, together with any Q,U maps specified by parameter IN,
+*     are then coadded to form a final pair of Q and U maps. In addition, a
+*     range of information derived from each pair of maps included in the
+*     coadd is displayed on the screen, and may also be written to an output
+*     text file (see parameter OBSTABLE).
+*
+*     The final Q and U maps, together with the supplied total intensity
+*     reference map (see parameter IPREF) are then used to create a
+*     vector catalogue and polarised intensity map (see parameters CAT,
+*     PI and DEBIAS).
 *
 *     Correction for instrumental polarisation is made only if a value
 *     is supplied for parameter IPREF.
@@ -29,19 +42,19 @@
 *     ALIGN = LOGICAL (Read)
 *        If TRUE, and if a non-null value is supplied for parameter REF,
 *        then corrections to the telescope pointing are determined and
-*        applied when creating the Q and U maps. To determine this pointing
-*        correction, a total intensity map is created from the supplied
-*        POL2 time-stream data using the supplied reference map (see
-*        parameter REF) to specify the pixel grid. Due to pointing errors,
-*        this total intensity map may not be aligned accurately with the
-*        reference map (errors of up to 8 arc-seconds have been seen). The
-*        positional shift required to minimise the residuals between the
-*        shifted total intensity map and the reference map is found, and
-*        used to correct the pointing when creating the Q and U map.
-*        Note, this option slows down the operation of pol2scan as it
-*        requires an extra invocation of smurf:makemap to create the
-*        total intensity map (which is not required if ALIGN is FALSE).
-*        [TRUE]
+*        applied when creating the Q and U maps for each observation. To
+*        determine this pointing correction for an observation, a total
+*        intensity map is created from the raw POL2 data for the observation
+*        using the supplied reference map (see parameter REF) to specify
+*        the pixel grid. Due to pointing errors, this total intensity map
+*        may not be aligned accurately with the reference map (errors of up
+*        to 8 arc-seconds have been seen). The positional shift required to
+*        minimise the residuals between the shifted total intensity map and
+*        the reference map is found, and used to correct the pointing when
+*        creating the Q and U map. Note, this option slows down the operation
+*        of pol2scan as it requires an extra invocation of smurf:makemap
+*        for each observation, to create the total intensity maps (which
+*        is not required if ALIGN is FALSE). [TRUE]
 *     CAT = LITERAL (Read)
 *        The output FITS vector catalogue. No catalogue is created if
 *        null (!) is supplied. [!]
@@ -70,7 +83,9 @@
 *        noi.usevar=1
 *     DEBIAS = LOGICAL (Given)
 *        TRUE if a correction for statistical bias is to be made to
-*        percentage polarization and polarized intensity. [FALSE]
+*        percentage polarization and polarized intensity in the output
+*        vector catalogue specified by parameter CAT and the polarised
+*        intensity map specified by parameter PI. [FALSE]
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
 *        Allowed values are as for "ILEVEL". The log file to create is
@@ -107,19 +122,18 @@
 *        starutil.PROGRESS, starutil.ATASK or starutil.DEBUG) to the module
 *        variable starutil.glevel. ["PROGRESS"]
 *     IN = NDF (Read)
-*        A group of POL-2 time series NDFs. Only used if a null (!) value is
-*        supplied for INQU.
-*     INQU = NDF (Read)
-*        A group of NDFs containing Q, U and (optionally) I time-series calculated
-*        by a previous run of SMURF:CALCQU (the LSQFIT parameter must be set
-*        to TRUE when running CALCQU). If not supplied, the IN parameter
-*        is used to get input NDFs holding POL-2 time series data. [!]
+*        A group of input files. Each specified file must be one of the
+*        following types:
+*        - a raw POL-2 data file
+*        - a time-series file holding Stokes Q, U or I values
+*        - a two-dimensional map holding Stokes Q or U values.
+*        Any combination of the above types can be supplied.
 *     IPBEAMFIX = _LOGICAL (Read)
 *        Should the supplied total intensity reference image (parameter
 *        IPREF) be modified so that its beam shape matches the expected
-*        IP beam shape at the elevation of the supplied POL2 data, before
-*        doing IP correction? This is currently an experimental feature.
-*        [FALSE]
+*        IP beam shape at the elevation of each supplied POL2 observation,
+*        before doing IP correction? This is currently an experimental
+*        feature. [FALSE]
 *     IPFCF = _REAL (Read)
 *        The FCF that should be used to convert the supplied IP REF map
 *        to pW. This parameter is only used if the supplied IPREF map is
@@ -135,8 +149,11 @@
 *        Jy/beam. If supplied, the returned Q and U maps will be corrected
 *        for instrumental polarisation, based on the total intensity values
 *        in IPREF. The supplied IPREF map need not be pre-aligned with the
-*        output Q and U maps - it will be resampled as necessary using a
-*        transformation derived from its WCS information. [!]
+*        output Q and U maps - it will be resampled as necessary using
+*        a transformation derived from its WCS information. The total
+*        intensity values in this map are also used to calculate the
+*        percentage polarisation values stored in the output vector catalogue
+*        specified by parameter CAT. [!]
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -148,10 +165,12 @@
 *        new one is opened. []
 *     MAPDIR = LITTERAL (Read)
 *        The name of a directory in which to put the Q and U maps made from
-*        each individual observation supplied via "IN", before coadding them.
-*        (the QMAP and UMAP parameters specify the coadded Q and U maps). If
-*        null is supplied, they are placed in the same temporary directory
-*        as all the other intermediate files. [!]
+*        each individual observation supplied via "IN", before coadding
+*        them (the QMAP and UMAP parameters specify the finaled coadded
+*        Q and U maps). If null is supplied, they are placed in the same
+*        temporary directory as all the other intermediate files and so
+*        will be deleted when the scrip exists (unless parameter RETAIN
+*        is set TRUE). [!]
 *     MSG_FILTER = LITERAL (Read)
 *        Controls the default level of information reported by Starlink
 *        atasks invoked within the executing script. This default can be
@@ -161,29 +180,49 @@
 *        "Normal", "Verbose", etc). ["Normal"]
 *     NORTH = LITERAL (Read)
 *        Specifies the celestial coordinate system to use as the reference
-*        direction in the created Q and U maps. For instance if NORTH="AZEL",
-*        then they use the elevation axis as the reference direction, and if
-*        "ICRS" is supplied, they use the ICRS Declination axis. If "TRACKING"
-*        is supplied, they use north in the tracking system - what ever
-*        that may be. Note, this parameter is only used if null (!) is
-*        supplied for parameter INQU. ["TRACKING"]
+*        direction in any newly created Q and U time series files. For
+*        instance if NORTH="AZEL", then they use the elevation axis as the
+*        reference direction, and if "ICRS" is supplied, they use the ICRS
+*        Declination axis. If "TRACKING" is supplied, they use north in the
+*        tracking system - what ever that may be. ["TRACKING"]
 *     OBSTABLE = LITERAL (Read)
 *        The path of a new text file to create, to which will be written
-*        statistics describined the Q and U maps made from each individual
-*        observation present in the list of raw data files specified by
-*        parameter IN (or INQU). No file is created if null (!) is
-*        supplied. [!]
+*        statistics describined the Q and U maps for each individual
+*        observation present in the list of files specified by parameter IN.
+*        No file is created if null (!) is supplied. The values are written
+*        in the form of a TOPCAT "ascii" table, with one row for each
+*        observation. The columns are:
+*         - UT: UT date of observation
+*         - OBS: Observation number
+*         - SUBSCAN: The first subscan included in the map
+*         - WVM: The mean of the starting and ending WVM tau values
+*         - NEFD_Q: The measured NEFD in the Q map (mJy.sec^(0.5))
+*         - NEFD_U: The measured NEFD in the U map (mJy.sec^(0.5))
+*         - NEFD_EXP: The expected NEFD based on WVM and elevation (mJy.sec^(0.5))
+*         - TIME: The elapsed time of the data included in the maps (s)
+*         - SIZE_Q: The total area of the source regions in the Q map (square arc-mins)
+*         - SIZE_U: The total area of the source regions in the U map (square arc-mins)
+*         - RMS_Q: The RMS Q value within the source regions (pW)
+*         - RMS_U: The RMS U value within the source regions (pW)
+*         - NBOLO_Q: Number of bolometers contributing to Q map
+*         - NBOLO_U: Number of bolometers contributing to U map
+*         - DX: Pointing correction in azimuth (arc-sec)
+*         - DY: Pointing correction in elevation (arc-sec)
+*        The last two columns (DX and DY) are only created if parameter
+*        ALIGN is TRUE. [!]
 *     PIXSIZE = _REAL (Read)
 *        Pixel dimensions in the output Q and U maps, in arcsec. The default
 *        is 4 arc-sec for 850 um data and 2 arc-sec for 450 um data. []
 *     Q = NDF (Read)
-*        The output NDF in which to return the Q intensity map.
+*        The output NDF in which to return the total Q intensity map including
+*        all supplied observations.
 *     QUDIR = LITTERAL (Read)
 *        The name of a directory in which to put the Q and U time series
-*        generated by calcqu. If null is supplied, they are placed in the
-*        same temporary direcory as all the other intermediate files. [!]
+*        generated by SMURF:CALCQU. If null (!) is supplied, they are placed
+*        in the same temporary direcory as all the other intermediate files. [!]
 *     U = NDF (Read)
-*        The output NDF in which to return the U intensity map.
+*        The output NDF in which to return the total U intensity map including
+*        all supplied observations.
 *     REF = NDF (Read)
 *        An optional map defining the pixel grid for the output maps. If
 *        no value is specified for REF on the command line, it defaults
@@ -399,15 +438,15 @@ try:
 #  constructor.
    params = []
 
-   params.append(starutil.ParNDG("IN", "The input POL2 time series NDFs",
+   params.append(starutil.ParNDG("IN", "The input POL2 data",
                                  get_task_par("DATA_ARRAY","GLOBAL",
-                                                       default=Parameter.UNSET)))
+                                              default=Parameter.UNSET)))
 
-   params.append(starutil.ParNDG("Q", "The output Q intensity map",
+   params.append(starutil.ParNDG("Q", "The total output Q intensity map",
                                  default=None, exists=False, minsize=1,
                                  maxsize=1 ))
 
-   params.append(starutil.ParNDG("U", "The output Q intensity map",
+   params.append(starutil.ParNDG("U", "The total output Q intensity map",
                                  default=None, exists=False, minsize=1,
                                  maxsize=1 ))
 
@@ -423,19 +462,16 @@ try:
    params.append(starutil.Par0F("PIXSIZE", "Pixel size (arcsec)", None,
                                  maxval=1000, minval=0.01, noprompt=True))
 
-   params.append(starutil.Par0S("QUDIR", "Directory in which to save the "
+   params.append(starutil.Par0S("QUDIR", "Directory in which to save new "
                                 "Q/U time series", None, noprompt=True))
 
-   params.append(starutil.Par0S("MAPDIR", "Directory in which to save the "
+   params.append(starutil.Par0S("MAPDIR", "Directory in which to save new "
                                 "Q/U maps before they are co-added", None,
                                 noprompt=True))
 
    params.append(starutil.Par0S("OBSTABLE", "Output text file holding "
                                 "info about individual observations", None,
                                 noprompt=True))
-
-   params.append(starutil.ParNDG("INQU", "NDFs containing previously calculated Q and U values",
-                                 None,noprompt=True))
 
    params.append(starutil.Par0L("IPBEAMFIX", "Convolve the IPREF map to "
                                 "the expected IP beam shape?", False,
@@ -474,18 +510,10 @@ try:
 #  the user goes off for a coffee whilst the script is running and does not
 #  see a later parameter propmpt or error...
 
-#  See if pre-calculated Q and U values have been supplied on the command
-#  line. If so, we use these in preference to any raw time-series files
-#  specified via parameter "IN".
-   inqu = parsys["INQU"].value
-
-#  Get the raw POL-2 data files. They should be supplied as the first item on
+#  Get the input POL-2 data files. They should be supplied as the first item on
 #  the command line, in the form of a Starlink "group expression" (i.e.
 #  the same way they are supplied to other SMURF commands such as makemap).
-   if inqu == None:
-      indata = parsys["IN"].value
-   else:
-      indata = None
+   indata = parsys["IN"].value
 
 #  Now get the Q and U values to use.
    qmap = parsys["Q"].value
@@ -571,28 +599,50 @@ try:
    else:
       align = parsys["ALIGN"].value
 
-
-#  See where to put individual Q and U maps, and ensure the directory exists.
+#  See where to put new Q and U maps for individual observations, and
+#  ensure the directory exists.
    mapdir =  parsys["MAPDIR"].value
    if not mapdir:
       mapdir = NDG.tempdir
    elif not os.path.exists(mapdir):
       os.makedirs(mapdir)
 
+#  See where to put new Q and U time series, and ensure the directory exists.
+   qudir =  parsys["QUDIR"].value
+   if not qudir:
+      qudir = NDG.tempdir
+   elif not os.path.exists(qudir):
+      os.makedirs(qudir)
+
 #  See if a table holding info about individual observations is to be
 #  created.
    obstable =  parsys["OBSTABLE"].value
+
+#  Get the reference direction.
+   north = parsys["NORTH"].value
+
+
+#  Classify each input data file as raw, QU time-series or QU map. Create
+#  three separate lists containing all input files of each type.
+   for ndf in indata:
+
+#  It is a time series file of some sort if it is three dimensional, and
+#  the first two pixel axes have dimensions (32,40).
+      invoke("$KAPPA_DIR/ndftrace in={0} quiet=yes".format(ndf))
+
+
+
+
+
+
+
+
+
 
 #  If no Q and U values were supplied, create a set of Q and U time
 #  streams from the supplied analysed intensity time streams. Put them in
 #  the QUDIR directory, or the temp directory if QUDIR is null.
    if inqu == None:
-      north = parsys["NORTH"].value
-      qudir =  parsys["QUDIR"].value
-      if not qudir:
-         qudir = NDG.tempdir
-      elif not os.path.exists(qudir):
-         os.makedirs(qudir)
 
       msg_out( "Calculating Q, U and I time streams for each bolometer...")
       invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config=def outq={1}/\*_QT "
@@ -1159,11 +1209,11 @@ try:
    elif len(qmaps) > 1:
       msg_out("Coadding Q and U maps from all observations")
       allmaps = NDG( qmaps.values() )
-      invoke("$CCDPACK_DIR/makemos in={0} out={1} method=mean".format(allmaps,qmap))
+      invoke("$KAPPA_DIR/wcsmosaic in={0} out={1} lbnd=! ref=! "
+             "conserve=no method=bilin variance=yes".format(allmaps,qmap))
       allmaps = NDG( umaps.values() )
-      invoke("$CCDPACK_DIR/makemos in={0} out={1} method=mean".format(allmaps,umap))
-
-
+      invoke("$KAPPA_DIR/wcsmosaic in={0} out={1} lbnd=! ref=! "
+             "conserve=no method=bilin variance=yes".format(allmaps,umap))
 
 
 

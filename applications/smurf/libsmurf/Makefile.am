@@ -45,6 +45,7 @@ smurf_jsatilelist.c \
 smurf_makecube.c \
 smurf_makemap.c \
 smurf_nanten2acsis.c \
+smurf_pol2check.c \
 smurf_rawpress.c \
 smurf_rawrecreatewcs.c \
 smurf_rawrewrtsc2wcs.c \
