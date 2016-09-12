@@ -4208,9 +4208,9 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter stokesids {
+            parameter stokesinfo {
                 type LITERAL
-                prompt {File in which to put Stokes NDF identifiers}
+                prompt {File in which to put Stokes NDF information}
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
                 default !

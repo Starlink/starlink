@@ -75,17 +75,19 @@
 *     STOKESFOUND = _LOGICAL (Write)
 *        Returned TRUE if one or more of the input NDFs holds Q, U or I
 *        POL-2 time-series data.
-*     STOKESIDS = LITERAL (Read)
+*     STOKESINFO = LITERAL (Read)
+*        The name of a text file to create containing a line of
+*        information for each input file listed in the STOKESFILE file (in
+*        the same order). Each line contains two space-sparated items:
+*        the first is a single letter Q, U or I indicating the Stokes
+*        parameter, and the second is an identifier of the form
+*        "<UT>_<OBS>_<SUBSCAN>", where <UT> is the 8 digit UT date, <OBS>
+*        is the 5 digit observation number and <SUBSCAN> is the four digit
+*        number for the first subscan in the chunk (usually "0003" except
+*        for observations made up of more than one discontiguous chunks).
+*        No file is created if null (!) is supplied. [!]
+*     STOKES = LITERAL (Read)
 *        The name of a text file to create containing the identifiers
-*        associated with each Stokes Q, U or I time-stream input NDF. If
-*        created, this file will contain an identifier for each input NDF
-*        listed in the STOKESFILE file (in the same order). Each identifier
-*        is of the form "<UT>_<OBS>_<SUBSCAN>", where <UT> is the 8 digit
-*        UT date, <OBS> is the 5 digit observation number and <SUBSCAN>
-*        is the four digit number for the first subscan in the chunk
-*        (usually "0003" except for observations made up of more than one
-*        discontiguous chunks). No file is created if null (!) is
-*        supplied. [!]
 
 *  Notes:
 *     - This application was written originally for use within the pol2scan.py
@@ -100,7 +102,7 @@
 *     9-SEP-2016 (DSB):
 *        Original version.
 *     12-SEP-2016 (DSB):
-*        Add parameter STOKESIDS.
+*        Add parameter STOKESINFO.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -166,6 +168,7 @@ void smurf_pol2check( int *status ) {
    char *pname;               /* Pointer to input filename */
    char buf[GRP__SZNAM+1];    /* Path to matching NDF */
    char filepath[GRP__SZNAM+1];/* NDF path, derived from GRP */
+   char label[GRP__SZNAM+1];  /* NDF label string */
    int dims[NDF__MXDIM];      /* No. of pixels along each axis of NDF */
    int indf;                  /* NDF identifier */
    int ndims;                 /* Number of dimensions in NDF */
@@ -225,8 +228,8 @@ void smurf_pol2check( int *status ) {
 
 /* For raw analysed intensity data check that the NDF Label component is
    "Signal". */
-                  ndfCget( indf, "Label", buf, sizeof(buf), status );
-                  if( !strcmp( buf, "Signal" ) ) {
+                  ndfCget( indf, "Label", label, sizeof(label), status );
+                  if( !strcmp( label, "Signal" ) ) {
                      astMapPutElemC( km, "RAW_TS", -1, filepath );
                      msgOutf( "", "   %s - raw analysed intensity time-series",
                               status, filepath );
@@ -234,30 +237,30 @@ void smurf_pol2check( int *status ) {
 
 /* For Stokes parameter data check that the NDF Label component is
    "Q", "U" or "I". */
-                  } else if( !strcmp( buf, "Q" ) ||
-                             !strcmp( buf, "U" ) ||
-                             !strcmp( buf, "I" ) ) {
+                  } else if( !strcmp( label, "Q" ) ||
+                             !strcmp( label, "U" ) ||
+                             !strcmp( label, "I" ) ) {
                      astMapPutElemC( km, "STOKES_TS", -1, filepath );
                      msgOutf( "", "   %s - Stokes parameter time-series",
                               status, filepath );
                      ok = 1;
 
-/* Also form and store the identifier. */
+/* Also form and store the line of extra information. */
                      astGetFitsI( fc, "UTDATE", &utdate );
                      astGetFitsI( fc, "OBSNUM", &obs );
                      astGetFitsI( fc, "NSUBSCAN", &subscan );
-                     sprintf( buf, "%8.8d_%5.5d_%4.4d", utdate, obs,
+                     sprintf( buf, "%s %8.8d_%5.5d_%4.4d", label, utdate, obs,
                               subscan );
-                     astMapPutElemC( km, "STOKES_ID", -1, buf );
+                     astMapPutElemC( km, "STOKES_INFO", -1, buf );
                   }
                }
 
 /* If the data is 2 dimensional, or 3 dimensional with a degenerate 3rd
    axis, it's a map. Check it has a Label of Q, U, or I. */
             } else if( ndims == 2 || ( ndims == 3 && dims[2] == 1 ) ) {
-               ndfCget( indf, "Label", buf, sizeof(buf), status );
-               if( !strcmp( buf, "Q" ) || !strcmp( buf, "U" ) ||
-                   !strcmp( buf, "I" ) ) {
+               ndfCget( indf, "Label", label, sizeof(label), status );
+               if( !strcmp( label, "Q" ) || !strcmp( label, "U" ) ||
+                   !strcmp( label, "I" ) ) {
                   astMapPutElemC( km, "MAP", -1, filepath );
                   msgOutf( "", "   %s - Stokes map", status, filepath );
                   ok = 1;
@@ -319,15 +322,15 @@ void smurf_pol2check( int *status ) {
       }
    }
 
-   veclen = astMapLength( km, "STOKES_ID" );
+   veclen = astMapLength( km, "STOKES_INFO" );
    if( veclen > 0 ) {
-      parGet0c( "STOKESIDS", filepath, sizeof(filepath), status );
+      parGet0c( "STOKESINFO", filepath, sizeof(filepath), status );
       if( *status == PAR__NULL ) {
          errAnnul( status );
       } else if ( *status == SAI__OK ) {
          fd = fopen( filepath, "w" );
          for( i = 0; (int) i < veclen; i++ ) {
-            astMapGetElemC( km, "STOKES_ID", sizeof(buf), i, buf );
+            astMapGetElemC( km, "STOKES_INFO", sizeof(buf), i, buf );
             fprintf( fd, "%s\n", buf );
          }
          fclose( fd );
