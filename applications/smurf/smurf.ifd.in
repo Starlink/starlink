@@ -825,6 +825,33 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter outfilesi {
+                type LITERAL
+                prompt {New text file holding list of output I NDFs}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
+            parameter outfilesq {
+                type LITERAL
+                prompt {New text file holding list of output Q NDFs}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
+            parameter outfilesu {
+                type LITERAL
+                prompt {New text file holding list of output U NDFs}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
             parameter outi {
                 type NDF
                 access WRITE

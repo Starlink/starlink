@@ -197,6 +197,21 @@
 *        The output files to contain the fitted analysed intensity. Only
 *        used if LSQFIT is TRUE. It should be a group of time series NDFs.
 *        No fit data files are created if a null (!) value is supplied. [!]
+*     OUTFILESI = LITERAL (Write)
+*        The name of text file to create, in which to put the names of
+*        all the output NDFs created by this application (one per
+*        line) that hold I data. If a null (!) value is supplied no file
+*        is created. [!]
+*     OUTFILESQ = LITERAL (Write)
+*        The name of text file to create, in which to put the names of
+*        all the output NDFs created by this application (one per
+*        line) that hold Q data. If a null (!) value is supplied no file
+*        is created. [!]
+*     OUTFILESU = LITERAL (Write)
+*        The name of text file to create, in which to put the names of
+*        all the output NDFs created by this application (one per
+*        line) that hold U data. If a null (!) value is supplied no file
+*        is created. [!]
 *     OUTI = LITERAL (Write)
 *        The output file to receive total intensity values. If LSQFIT is
 *        FALSE, this will be an HDS container file containing the I images.
@@ -278,6 +293,8 @@
 *     2-SEP-2016 (DSB):
 *        Display UT date and observation number for each chunk (helps
 *        when raw data for more than one observation is supplied as input).
+*     12-SEP-2016 (DSB):
+*        Added parameters OUTFILESI, OUTFILESQ and OUTFILESU.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -977,6 +994,21 @@ void smurf_calcqu( int *status ) {
          datCancl( "OUTU", status );
          datCancl( "OUTI", status );
       }
+   }
+
+/* Write out the list of output NDF names, annulling the error if a null
+   parameter value is supplied. */
+   if( *status == SAI__OK && ogrpi ) {
+      grpList( "OUTFILESI", 0, 0, NULL, ogrpi, status );
+      if( *status == PAR__NULL ) errAnnul( status );
+   }
+   if( *status == SAI__OK && ogrpq ) {
+      grpList( "OUTFILESQ", 0, 0, NULL, ogrpq, status );
+      if( *status == PAR__NULL ) errAnnul( status );
+   }
+   if( *status == SAI__OK && ogrpu ) {
+      grpList( "OUTFILESU", 0, 0, NULL, ogrpu, status );
+      if( *status == PAR__NULL ) errAnnul( status );
    }
 
 L999:
