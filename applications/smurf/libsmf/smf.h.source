@@ -1520,7 +1520,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      int moving, int *lbnd_out, int *ubnd_out, fts2Port fts_port, size_t maxmem,
                      double *map, int *hitsmap, double * exp_time,
                      double *mapvar, smf_qual_t *mapqual, double *weights,
-                     char data_units[], double * nboloeff,
+                     char data_units[], char data_label[], double * nboloeff,
                      size_t *numcontchunks,  size_t *ncontig, int *memlow,
                      size_t *numinsmp, size_t *numcnvg, int *iters,
                      double *totexp, int *status );
@@ -1984,7 +1984,8 @@ AstKeyMap *smf_subinst_keymap( smf_subinst_t subinst, const smfData * indata,
 
 const char * smf_subinst_str( smf_subinst_t subinst, int * status );
 
-void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap, int *status );
+void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
+                 int *ispol2, int *status );
 
 void smf_subtract_dark ( smfData * indata, const smfData * dark1,
                          const smfData * dark2, smf_dark_sub_meth method,
