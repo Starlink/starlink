@@ -4182,6 +4182,15 @@ package @PACKAGE@ {
                helpkey *
             }
 
+            parameter mapinfo {
+                type LITERAL
+                prompt {File in which to put Stokes map NDF information}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                helpkey *
+            }
+
             parameter rawfile {
                 type LITERAL
                 prompt {File in which to put raw POL2 time-series NDF paths}
@@ -4210,7 +4219,7 @@ package @PACKAGE@ {
 
             parameter stokesinfo {
                 type LITERAL
-                prompt {File in which to put Stokes NDF information}
+                prompt {File in which to put Stokes time-series NDF information}
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
                 default !

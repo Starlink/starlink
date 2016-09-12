@@ -57,6 +57,17 @@
 *     MAPFOUND = _LOGICAL (Write)
 *        Returned TRUE if one or more of the input NDFs holds 2-dimensonal
 *        maps of Q, U  or I from POL-2 data.
+*     MAPINFO = LITERAL (Read)
+*        The name of a text file to create containing a line of
+*        information for each input file listed in the MAPFILE file (in
+*        the same order). Each line contains two space-sparated items:
+*        the first is a single letter Q, U or I indicating the Stokes
+*        parameter, and the second is an identifier of the form
+*        "<UT>_<OBS>_<SUBSCAN>", where <UT> is the 8 digit UT date, <OBS>
+*        is the 5 digit observation number and <SUBSCAN> is the four digit
+*        number for the first subscan in the chunk (usually "0003" except
+*        for observations made up of more than one discontiguous chunks).
+*        No file is created if null (!) is supplied. [!]
 *     RAWFILE = LITERAL (Read)
 *        The name of a text file to create containing the paths to the
 *        input NDFs that hold raw analysed intensity POL-2 time-series
@@ -102,7 +113,7 @@
 *     9-SEP-2016 (DSB):
 *        Original version.
 *     12-SEP-2016 (DSB):
-*        Add parameter STOKESINFO.
+*        Add parameter STOKESINFO and MAPINFO
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -264,6 +275,14 @@ void smurf_pol2check( int *status ) {
                   astMapPutElemC( km, "MAP", -1, filepath );
                   msgOutf( "", "   %s - Stokes map", status, filepath );
                   ok = 1;
+
+/* Also form and store the line of extra information. */
+                  astGetFitsI( fc, "UTDATE", &utdate );
+                  astGetFitsI( fc, "OBSNUM", &obs );
+                  astGetFitsI( fc, "NSUBSCAN", &subscan );
+                  sprintf( buf, "%s %8.8d_%5.5d_%4.4d", label, utdate, obs,
+                           subscan );
+                  astMapPutElemC( km, "MAP_INFO", -1, buf );
                }
             }
          }
@@ -353,6 +372,22 @@ void smurf_pol2check( int *status ) {
          fclose( fd );
       }
    }
+
+   veclen = astMapLength( km, "MAP_INFO" );
+   if( veclen > 0 ) {
+      parGet0c( "MAPINFO", filepath, sizeof(filepath), status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+      } else if ( *status == SAI__OK ) {
+         fd = fopen( filepath, "w" );
+         for( i = 0; (int) i < veclen; i++ ) {
+            astMapGetElemC( km, "MAP_INFO", sizeof(buf), i, buf );
+            fprintf( fd, "%s\n", buf );
+         }
+         fclose( fd );
+      }
+   }
+
 
    veclen = astMapLength( km, "JUNK" );
    parPut0l( "JUNKFOUND", ( veclen > 0 ), status );
