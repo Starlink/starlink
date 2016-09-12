@@ -77,6 +77,13 @@
 *     RAWFOUND = _LOGICAL (Write)
 *        Returned TRUE if one or more of the input NDFs holds raw analysed
 *        intensity POL-2 time-series data.
+*     RAWINFO = LITERAL (Read)
+*        The name of a text file to create containing a line of
+*        information for each input file listed in the RAWFILE file (in
+*        the same order). Each line contains a key for the raw data file
+*        of the form ""<UT>_<OBS>", where <UT> is the 8 digit UT date, and
+*        <OBS> is the 5 digit observation number. No file is created if
+*        null (!) is supplied. [!]
 *     STOKESFILE = LITERAL (Read)
 *        The name of a text file to create containing the paths to the
 *        input NDFs that hold Q, U or I POL-2 time-series data. Only
@@ -113,7 +120,7 @@
 *     9-SEP-2016 (DSB):
 *        Original version.
 *     12-SEP-2016 (DSB):
-*        Add parameter STOKESINFO and MAPINFO
+*        Add parameter STOKESINFO, MAPINFO and RAWINFO.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -246,6 +253,12 @@ void smurf_pol2check( int *status ) {
                               status, filepath );
                      ok = 1;
 
+/* Also form and store the line of extra information. */
+                     astGetFitsI( fc, "UTDATE", &utdate );
+                     astGetFitsI( fc, "OBSNUM", &obs );
+                     sprintf( buf, "%8.8d_%5.5d", utdate, obs );
+                     astMapPutElemC( km, "RAW_INFO", -1, buf );
+
 /* For Stokes parameter data check that the NDF Label component is
    "Q", "U" or "I". */
                   } else if( !strcmp( label, "Q" ) ||
@@ -317,6 +330,21 @@ void smurf_pol2check( int *status ) {
          fd = fopen( filepath, "w" );
          for( i = 0; (int) i < veclen; i++ ) {
             astMapGetElemC( km, "RAW_TS", sizeof(buf), i, buf );
+            fprintf( fd, "%s\n", buf );
+         }
+         fclose( fd );
+      }
+   }
+
+   veclen = astMapLength( km, "RAW_INFO" );
+   if( veclen > 0 ) {
+      parGet0c( "RAWINFO", filepath, sizeof(filepath), status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+      } else if ( *status == SAI__OK ) {
+         fd = fopen( filepath, "w" );
+         for( i = 0; (int) i < veclen; i++ ) {
+            astMapGetElemC( km, "RAW_INFO", sizeof(buf), i, buf );
             fprintf( fd, "%s\n", buf );
          }
          fclose( fd );
