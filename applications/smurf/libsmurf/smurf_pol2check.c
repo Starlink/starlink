@@ -88,8 +88,8 @@
 *        supplied. [!]
 
 *  Notes:
-*     - This application was written originally for use within the pol2scan.py 
-*     script, as a means of speeding up operations that are very slow when 
+*     - This application was written originally for use within the pol2scan.py
+*     script, as a means of speeding up operations that are very slow when
 *     imlemented via multiple calls to KAPPA commands such as "fitsval", etc.
 
 *  Authors:
@@ -253,11 +253,15 @@ void smurf_pol2check( int *status ) {
                }
 
 /* If the data is 2 dimensional, or 3 dimensional with a degenerate 3rd
-   axis, it's a map. */
+   axis, it's a map. Check it has a Label of Q, U, or I. */
             } else if( ndims == 2 || ( ndims == 3 && dims[2] == 1 ) ) {
-               astMapPutElemC( km, "MAP", -1, filepath );
-               msgOutf( "", "   %s - Stokes map", status, filepath );
-               ok = 1;
+               ndfCget( indf, "Label", buf, sizeof(buf), status );
+               if( !strcmp( buf, "Q" ) || !strcmp( buf, "U" ) ||
+                   !strcmp( buf, "I" ) ) {
+                  astMapPutElemC( km, "MAP", -1, filepath );
+                  msgOutf( "", "   %s - Stokes map", status, filepath );
+                  ok = 1;
+               }
             }
          }
 
