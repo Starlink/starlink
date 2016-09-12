@@ -922,8 +922,8 @@ class ParSys(object):
          del os.environ["KAPPA_VERBOSE"]
 
       # Ensure new NDFs contain history and provenance.
-      os.environ["NDF_AUTO_HISTORY"] = 1
-      os.environ["AUTOPROV"] = 1
+      os.environ["NDF_AUTO_HISTORY"] = "1"
+      os.environ["AUTOPROV"] = "1"
 
    # Delete the temporary ADAM directory.
    @classmethod
