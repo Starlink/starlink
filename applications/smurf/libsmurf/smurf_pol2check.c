@@ -75,6 +75,22 @@
 *     STOKESFOUND = _LOGICAL (Write)
 *        Returned TRUE if one or more of the input NDFs holds Q, U or I
 *        POL-2 time-series data.
+*     STOKESIDS = LITERAL (Read)
+*        The name of a text file to create containing the identifiers
+*        associated with each Stokes Q, U or I time-stream input NDF. If
+*        created, this file will contain an identifier for each input NDF
+*        listed in the STOKESFILE file (in the same order). Each identifier
+*        is of the form "<UT>_<OBS>_<SUBSCAN>", where <UT> is the 8 digit
+*        UT date, <OBS> is the 5 digit observation number and <SUBSCAN>
+*        is the four digit number for the first subscan in the chunk
+*        (usually "0003" except for observations made up of more than one
+*        discontiguous chunks). No file is created if null (!) is
+*        supplied. [!]
+
+*  Notes:
+*     - This application was written originally for use within the pol2scan.py 
+*     script, as a means of speeding up operations that are very slow when 
+*     imlemented via multiple calls to KAPPA commands such as "fitsval", etc.
 
 *  Authors:
 *     David S Berry (EAO, Hawaii)
@@ -83,6 +99,8 @@
 *  History:
 *     9-SEP-2016 (DSB):
 *        Original version.
+*     12-SEP-2016 (DSB):
+*        Add parameter STOKESIDS.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -149,10 +167,13 @@ void smurf_pol2check( int *status ) {
    char buf[GRP__SZNAM+1];    /* Path to matching NDF */
    char filepath[GRP__SZNAM+1];/* NDF path, derived from GRP */
    int dims[NDF__MXDIM];      /* No. of pixels along each axis of NDF */
-   int ndims;                 /* Number of dimensions in NDF */
-   int ok;                    /* NDF holds POL-2 data ? */
    int indf;                  /* NDF identifier */
+   int ndims;                 /* Number of dimensions in NDF */
+   int obs;                   /* Observation number */
+   int ok;                    /* NDF holds POL-2 data ? */
+   int subscan;               /* Subscan number  at start of chunk */
    int there;                 /* Does it exist? */
+   int utdate;                /* UT date */
    int veclen;                /* No. of matching NDFs */
    size_t i;                  /* Index into group */
    size_t isize;              /* Number of input NDFs */
@@ -220,6 +241,14 @@ void smurf_pol2check( int *status ) {
                      msgOutf( "", "   %s - Stokes parameter time-series",
                               status, filepath );
                      ok = 1;
+
+/* Also form and store the identifier. */
+                     astGetFitsI( fc, "UTDATE", &utdate );
+                     astGetFitsI( fc, "OBSNUM", &obs );
+                     astGetFitsI( fc, "NSUBSCAN", &subscan );
+                     sprintf( buf, "%8.8d_%5.5d_%4.4d", utdate, obs,
+                              subscan );
+                     astMapPutElemC( km, "STOKES_ID", -1, buf );
                   }
                }
 
@@ -280,6 +309,21 @@ void smurf_pol2check( int *status ) {
          fd = fopen( filepath, "w" );
          for( i = 0; (int) i < veclen; i++ ) {
             astMapGetElemC( km, "STOKES_TS", sizeof(buf), i, buf );
+            fprintf( fd, "%s\n", buf );
+         }
+         fclose( fd );
+      }
+   }
+
+   veclen = astMapLength( km, "STOKES_ID" );
+   if( veclen > 0 ) {
+      parGet0c( "STOKESIDS", filepath, sizeof(filepath), status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+      } else if ( *status == SAI__OK ) {
+         fd = fopen( filepath, "w" );
+         for( i = 0; (int) i < veclen; i++ ) {
+            astMapGetElemC( km, "STOKES_ID", sizeof(buf), i, buf );
             fprintf( fd, "%s\n", buf );
          }
          fclose( fd );

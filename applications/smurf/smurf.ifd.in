@@ -4181,6 +4181,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter stokesids {
+                type LITERAL
+                prompt {File in which to put Stokes NDF identifiers}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                helpkey *
+            }
+
             parameter stokesfound {
                type _LOGICAL
                access WRITE
