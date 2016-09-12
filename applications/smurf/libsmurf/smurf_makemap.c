@@ -864,6 +864,7 @@ void smurf_makemap( int *status ) {
   smfArray *bbms = NULL;     /* Bad bolometer masks */
   smfArray *darks = NULL;   /* Dark data */
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
+  char data_label[SMF__CHARLABEL+1]; /* NDF label for output map */
   char data_units[SMF__CHARLABEL+1]; /* Units string */
   double *exp_time = NULL;    /* Exposure time array written to output file */
   AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
@@ -1767,7 +1768,7 @@ void smurf_makemap( int *status ) {
                       heateffmap, outfset, moving, lbnd_out, ubnd_out,
                       fts_port, maxmem-mapmem,
                       map, hitsmap, exp_time, variance, mapqual, weights, data_units,
-                      &nboloeff, &ncontchunks, &ncontig, &memlow, &ninsmp,
+                      data_label, &nboloeff, &ncontchunks, &ncontig, &memlow, &ninsmp,
                       &ncnvg, &iters, &totexp, status );
 
       /* If we have just run smf_iteratemap for the second time, free the
@@ -1889,7 +1890,7 @@ void smurf_makemap( int *status ) {
 
     /* write units - hack we do not have a smfHead */
     if (strlen(data_units)) ndfCput( data_units, ondf, "UNITS", status);
-    ndfCput("Flux Density", ondf, "LABEL", status);
+    ndfCput(data_label, ondf, "LABEL", status);
 
     /* Weights are related to data_units */
     one_strlcat(data_units, "**-2", sizeof(data_units), status);

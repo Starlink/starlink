@@ -22,7 +22,7 @@
 *                    int moving, int *lbnd_out, int *ubnd_out, fts2Port fts_port, size_t maxmem,
 *                    double *map, int *hitsmap, double *exp_time,
 *                    double *mapvar, smf_qual_t *mapqual, double *weights,
-*                    char data_units[], double *nboloeff,
+*                    char data_units[], char data_label[], double *nboloeff,
 *                    size_t *numcontchunks, size_t *ncontig, int *memlow,
 *                    size_t *numinsmp, size_t *numcnvg, int *iters,
 *                    int *masked, double *totexp, int *status );
@@ -89,6 +89,9 @@
 *        Data units read from the first chunk. These may be different from
 *        that read from raw data due to flatfielding. Should be a buffer
 *        of at least size SMF__CHARLABEL.
+*     data_label = char[] (Returned)
+*        The string to use as the Label component in the output NDF. Should
+*        be a buffer of at least size SMF__CHARLABEL.
 *     nboloeff = double * (Returned)
 *        If non-NULL, will contain the effective number of bolometers used
 *        to create the map.
@@ -613,7 +616,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      int moving, int *lbnd_out, int *ubnd_out, fts2Port fts_port, size_t maxmem,
                      double *map, int *hitsmap, double * exp_time,
                      double *mapvar, smf_qual_t *mapqual, double *weights,
-                     char data_units[], double * nboloeff,
+                     char data_units[], char data_label[], double * nboloeff,
                      size_t *numcontchunks,  size_t *ncontig, int *memlow,
                      size_t *numinsmp, size_t *numcnvg, int *iters,
                      double *totexp, int *status ) {
@@ -676,6 +679,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   size_t idx=0;                 /* index within subgroup */
   smfGroup *igroup=NULL;        /* smfGroup corresponding to igrp */
   int isize;                    /* Number of files in input group */
+  int ispol2;                   /* +1 if "Q" data, -1 if "U" data, 0 if non-pol2 */
   int iter;                     /* Iteration number */
   int itermap=0;                /* If set, produce maps each iteration */
   int itsdone;                  /* Number of previously completed iterations */
@@ -1928,11 +1932,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                                     msize*sizeof(*lastmap) );
 
       /* Do any required correction for instrumental polarisation. */
-      smf_subip( wf, &dat, keymap, status );
+      smf_subip( wf, &dat, keymap, &ispol2, status );
 
-
-
-
+      /* Return the NDF label for the output map. */
+      strcpy( data_label, ispol2 ? ( ( ispol2 > 0 ) ? "Q" : "U" ) : "Flux Density" );
 
 
 

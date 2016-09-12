@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     void smf_subip( ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
-*                     int *status )
+*                     int *ispol2, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -23,6 +23,9 @@
 *        Struct of pointers to information required by model calculation.
 *     keymap = AstKeyMap * (Given)
 *        A KeyMap holding all configuration parameters.
+*     ispol2 = int * (Given)
+*        Pointer to a returned value indicating if the data is POL-2 data or not.
+*        Returned zero for non-pol2, +1 for "Q" and -1 for "U".
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -149,7 +152,7 @@ typedef struct smfSubIPData {
 static pthread_mutex_t data_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
-                 int *status ) {
+                 int *ispol2, int *status ) {
 
 /* Local Variables: */
    HDSLoc *loc = NULL;
@@ -190,6 +193,8 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    smf_qual_t *qua_data;
    smfArray *res;
    smfArray *lut;
+
+   *ispol2 = 0;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -242,6 +247,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    value is supplied, annul the error and set "qu" NULL to indicate we
    should leave immediately. */
    } else if( qu && *status == SAI__OK ) {
+      *ispol2 = ( qu[0] == 'Q' ) ? +1 : -1;
       parGet0c( "IPREF", ipref, sizeof(ipref), status );
       if( *status == PAR__NULL ) {
          errAnnul( status );
