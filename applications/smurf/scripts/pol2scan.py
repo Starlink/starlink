@@ -755,7 +755,7 @@ try:
       ilist = None
 
    if len(qlist) == 1:
-      msg_out( "Only one observation supplied"
+      msg_out( "Only one observation supplied" )
 
 #  Dictionaries holding the Q and U maps for each observation chunk.
    qmaps = {}
