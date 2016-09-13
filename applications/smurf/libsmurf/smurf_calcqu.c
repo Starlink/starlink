@@ -294,7 +294,10 @@
 *        Display UT date and observation number for each chunk (helps
 *        when raw data for more than one observation is supplied as input).
 *     12-SEP-2016 (DSB):
-*        Added parameters OUTFILESI, OUTFILESQ and OUTFILESU.
+*        - Added parameters OUTFILESI, OUTFILESQ and OUTFILESU.
+*        - If an error occurs processing a chunk (LSQFIT mode only),
+*        delete the corresponding output NDFs and continue to process 
+*        any remaining chunks.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -364,6 +367,7 @@ void smurf_calcqu( int *status ) {
    AstKeyMap *sub_instruments;/* Indicates which instrument is being used */
    Grp *bgrp = NULL;          /* Group of base names for each chunk */
    Grp *igrp = NULL;          /* Group of input files */
+   Grp *newgrp = NULL;        /* Group without and BAD elements */
    Grp *ogrpf = NULL;         /* Group of output fit files  */
    Grp *ogrpi = NULL;         /* Group of output I files  */
    Grp *ogrpq = NULL;         /* Group of output Q files  */
@@ -392,6 +396,10 @@ void smurf_calcqu( int *status ) {
    int fix;                   /* Fix the POL-2 triggering issue? */
    int harmonic;              /* The requested harmonic */
    int iblock;                /* Index of current block */
+   int indff;                 /* Cloned NDF identifier for output F array */
+   int indfi;                 /* Cloned NDF identifier for output I array */
+   int indfq;                 /* Cloned NDF identifier for output Q array */
+   int indfu;                 /* Cloned NDF identifier for output U array */
    int iplace;                /* NDF placeholder for current block's I image */
    int ipolcrd;               /* Reference direction for waveplate angles */
    int lsqfit;                /* Use least squares approach ? */
@@ -823,11 +831,47 @@ void smurf_calcqu( int *status ) {
                                       status );
                }
 
-/* Free the smfData structures. */
+/* Free the smfData structures. If an error has occurred, first clone the
+   NDF identifiers so that we can delete the NDFs using the NDF library once
+   the smfDatas have been close (we need a new error reporting context
+   because ndfCls lone returns immediately if status is set bad). */
+               if( *status != SAI__OK && nchunk > 1) {
+                  errBegin( status );
+                  if( odataq && odataq->file ) ndfClone( odataq->file->ndfid,
+                                                          &indfq, status );
+                  if( odatau && odatau->file ) ndfClone( odatau->file->ndfid,
+                                                          &indfu, status );
+                  if( odatai && odatai->file ) ndfClone( odatai->file->ndfid,
+                                                          &indfi, status );
+                  if( odataf && odataf->file ) ndfClone( odataf->file->ndfid,
+                                                          &indff, status );
+                  errEnd( status );
+               } else {
+                  indfq = NDF__NOID;
+                  indfu = NDF__NOID;
+                  indfi = NDF__NOID;
+                  indff = NDF__NOID;
+               }
+
                smf_close_file( wf, &odataq, status );
                smf_close_file( wf, &odatau, status );
                if( ogrpi ) smf_close_file( wf, &odatai, status );
                if( ogrpf ) smf_close_file( wf, &odataf, status );
+
+/* If an error has occured and we are processing more than one chunk, flush
+   the error so that any remaining blocks can be produced. Also, replace
+   the item in the output NDF group with "BAD". */
+               if( *status != SAI__OK && nchunk > 1 ) {
+                  errFlush( status );
+                  if( indfq != NDF__NOID ) ndfDelet( &indfq, status );
+                  if( indfu != NDF__NOID ) ndfDelet( &indfu, status );
+                  if( indfi != NDF__NOID ) ndfDelet( &indfi, status );
+                  if( indff != NDF__NOID ) ndfDelet( &indff, status );
+                  grpPut1( ogrpq, "BAD", gcount, status );
+                  grpPut1( ogrpu, "BAD", gcount, status );
+                  if( ogrpi ) grpPut1( ogrpi, "BAD", gcount, status );
+                  if( ogrpf ) grpPut1( ogrpf, "BAD", gcount, status );
+               }
 
 /* Increment the group index counter */
                gcount++;
@@ -997,18 +1041,25 @@ void smurf_calcqu( int *status ) {
    }
 
 /* Write out the list of output NDF names, annulling the error if a null
-   parameter value is supplied. */
+   parameter value is supplied. Remove any "BAD" values from each group
+   first. */
    if( *status == SAI__OK && ogrpi ) {
-      grpList( "OUTFILESI", 0, 0, NULL, ogrpi, status );
+      newgrp = grpRemov( ogrpi, "BAD", status );
+      grpList( "OUTFILESI", 0, 0, NULL, newgrp, status );
       if( *status == PAR__NULL ) errAnnul( status );
+      grpDelet( &newgrp, status);
    }
    if( *status == SAI__OK && ogrpq ) {
-      grpList( "OUTFILESQ", 0, 0, NULL, ogrpq, status );
+      newgrp = grpRemov( ogrpq, "BAD", status );
+      grpList( "OUTFILESQ", 0, 0, NULL, newgrp, status );
       if( *status == PAR__NULL ) errAnnul( status );
+      grpDelet( &newgrp, status);
    }
    if( *status == SAI__OK && ogrpu ) {
-      grpList( "OUTFILESU", 0, 0, NULL, ogrpu, status );
+      newgrp = grpRemov( ogrpu, "BAD", status );
+      grpList( "OUTFILESU", 0, 0, NULL, newgrp, status );
       if( *status == PAR__NULL ) errAnnul( status );
+      grpDelet( &newgrp, status);
    }
 
 L999:
