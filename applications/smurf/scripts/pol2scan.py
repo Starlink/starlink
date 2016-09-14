@@ -959,10 +959,14 @@ try:
 
 #  Find the pixel shift that aligns features in this masked, trimmed I map with
 #  corresponding features in the reference map.
-               invoke("$KAPPA_DIR/align2d ref={0} out=! in={1} form=3 corlimit=0.7".
-                      format(ref,imap))
-               dx = float( get_task_par( "TR(1)", "align2d" ) )
-               dy = float( get_task_par( "TR(4)", "align2d" ) )
+               try:
+                  invoke("$KAPPA_DIR/align2d ref={0} out=! in={1} form=3 corlimit=0.7".
+                         format(ref,imap))
+                  dx = float( get_task_par( "TR(1)", "align2d" ) )
+                  dy = float( get_task_par( "TR(4)", "align2d" ) )
+               except starutil.AtaskError:
+                  dx = 1E6
+                  dy = 1E6
 
 #  If the shifts are suspiciously high, we do not believe them. In which
 #  case we cannot do pointing ocorrection when creating the Q and U maps.
@@ -1220,12 +1224,10 @@ try:
    for (path,info) in zip( paths, infos ):
       (stokes,id) = info.split()
       if stokes == "Q":
-         if path not in qmaps[id]:
-            qmaps[id] = path
+         qmaps[id] = path
 
       elif stokes == "U":
-         if path not in umaps[id]:
-            umaps[id] = path
+         umaps[id] = path
 
 #  Loop over all Q maps.
    badkeys = []
