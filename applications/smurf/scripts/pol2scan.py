@@ -296,8 +296,9 @@
 *     1-SEP-2016 (DSB):
 *        Allow IPREF maps in units of mJy/beam as well as pW.
 *     13-SEP-2016 (DSB):
-*        Allow the IN parameter to be used to specify raw data, Q/U 
+*        - Allow the IN parameter to be used to specify raw data, Q/U
 *        time-streams or Q/U maps.
+*        - Ignore duplicated input files specified within IN.
 '''
 
 import os
@@ -725,7 +726,8 @@ try:
       rawlist = {}
       for (path,id) in zip( paths, infos ):
          if id in rawlist:
-            rawlist[id].append( path )
+            if path not in rawlist[id]:
+               rawlist[id].append( path )
          else:
             rawlist[id] = [ path ]
 
@@ -810,19 +812,22 @@ try:
          (stokes,id) = info.split()
          if stokes == "Q":
             if id in qlist:
-               qlist[id].append( path )
+               if path not in qlist[id]:
+                  qlist[id].append( path )
             else:
                qlist[id] = [ path ]
 
          elif stokes == "U":
             if id in ulist:
-               ulist[id].append( path )
+               if path not in ulist[id]:
+                  ulist[id].append( path )
             else:
                ulist[id] = [ path ]
 
          else:
             if id in ilist:
-               ilist[id].append( path )
+               if path not in ilist[id]:
+                  ilist[id].append( path )
             else:
                ilist[id] = [ path ]
 
@@ -1215,10 +1220,12 @@ try:
    for (path,info) in zip( paths, infos ):
       (stokes,id) = info.split()
       if stokes == "Q":
-         qmaps[id] = path
+         if path not in qmaps[id]:
+            qmaps[id] = path
 
       elif stokes == "U":
-         umaps[id] = path
+         if path not in umaps[id]:
+            umaps[id] = path
 
 #  Loop over all Q maps.
    badkeys = []
