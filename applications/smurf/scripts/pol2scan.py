@@ -295,10 +295,14 @@
 *        the AST mask contains very few pixels.
 *     1-SEP-2016 (DSB):
 *        Allow IPREF maps in units of mJy/beam as well as pW.
+*     13-SEP-2016 (DSB):
+*        Allow the IN parameter to be used to specify raw data, Q/U 
+*        time-streams or Q/U maps.
 '''
 
 import os
 import math
+import shutil
 import starutil
 from starutil import invoke
 from starutil import NDG
@@ -328,7 +332,8 @@ def cleanup():
 #  A function to calculate the following threee statistics from the
 #  supplied Q or U map:
 #     1 - The estimated noise level at the map centre in pW (based on the
-#         NDF Variance array).
+#         NDF Variance array). Returned as zero if the map appears to be
+#         for a different source.
 #     2 - The source size in square arc-seconds.
 #     3 - The RMS value of the source in pW.
 #  The source pixels are defined by the AST mask created by makemap and
@@ -353,6 +358,10 @@ def calc_stats(ndf):
           "thrlo={2} newlo=bad thrhi=1E10 newhi=bad".
           format(ndf,edgemask,mean_exp_time))
 
+#  Note the pixel coords at the maximum exp_time value.
+   xcen = get_task_par( "maxpos(1)", "stats" )
+   ycen = get_task_par( "maxpos(2)", "stats" )
+
 #  Create another mask that is bad inside the source area defined by the
 #  AST mask (created by makemap), and unity everywhere else. First set
 #  the bad bits so that any flagged (i.e. background) pixels are treated as
@@ -363,14 +372,29 @@ def calc_stats(ndf):
 #  Find the count, mean value and standard deviation of the source pixels.
    invoke("$KAPPA_DIR/stats ndf={0}".format(ndf))
    source_size = get_task_par( "numgood", "stats" )
-   mean = get_task_par( "mean", "stats" )
-   sigma = get_task_par( "sigma", "stats" )
-   source_rms = math.sqrt( mean*mean + sigma*sigma )
+   if source_size > 1 :
+      mean = get_task_par( "mean", "stats" )
+      sigma = get_task_par( "sigma", "stats" )
+      source_rms = math.sqrt( mean*mean + sigma*sigma )
+   else:
+      source_rms = "undefined"
 
 #  Convert the source size from pixels to square arc-seconds.
    invoke("$KAPPA_DIR/ndftrace ndf={0}".format(ndf))
    pixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ))
    source_size *= (pixsize*pixsize)
+
+#  If any of the pixel axes do not encompass the origin, it probably means
+#  that the observation was for some other field other than the one covered
+#  by the reference IP map.
+   lbnd1 = int( get_task_par( "lbound(1)", "ndftrace" ) )
+   ubnd1 = int( get_task_par( "ubound(1)", "ndftrace" ) )
+   lbnd2 = int( get_task_par( "lbound(2)", "ndftrace" ) )
+   ubnd2 = int( get_task_par( "ubound(2)", "ndftrace" ) )
+   if lbnd1*ubnd1 > 0 or lbnd2*ubnd2 > 0:
+      bad = True
+   else:
+      bad= False
 
 #  Create a map that is unity where ever the Q or U map is now bad, and is bad
 #  where ever the Q or U map is not bad (i.e. the source region). Also include
@@ -408,22 +432,34 @@ def calc_stats(ndf):
    back_exptime = get_task_par( "mean", "stats" )
 
 #  Now find the mean exp_time within 3 arc-mins of the centre. The centre
-#  is at pixel coords (0,0), so define the circle in pixel coords. It's
+#  is defined as the point where the exp_time value is highest. We know
+#  this position in pixel coords, so define the circle in pixel coords. It's
 #  good enough...
-   ardfile = os.path.join(NDG.tempdir,"centre.ard")
-   fd = open(ardfile,"w")
-   fd.write("COFRAME(PIXEL)\n")
-   fd.write("CIRCLE(0.0,0.0,{0})\n".format((3*60)/pixsize))
-   fd.close()
-   invoke("$KAPPA_DIR/aperadd ndf={0}.more.smurf.exp_time ardfile={1}".
-          format(ndf,ardfile))
-   centre_exptime = get_task_par( "mean", "aperadd" )
+   if not bad:
+      ardfile = NDG.tempfile()
+      fd = open(ardfile,"w")
+      fd.write("COFRAME(PIXEL)\n")
+      fd.write("CIRCLE({0},{1},{2})\n".format(xcen,ycen,(3*60)/pixsize))
+      fd.close()
+      invoke("$KAPPA_DIR/aperadd ndf={0}.more.smurf.exp_time ardfile={1}".
+             format(ndf,ardfile))
+      centre_exptime = get_task_par( "mean", "aperadd" )
 
 #  Correct the returned noise value.
-   noise *= math.sqrt(back_exptime/centre_exptime)
+      noise *= math.sqrt(back_exptime/centre_exptime)
+   else:
+      noise = 0.0
 
    return ( noise, source_size, source_rms )
 
+
+
+
+
+
+
+
+#  Main entry...
 #  Catch any exception so that we can always clean up, even if control-C
 #  is pressed.
 try:
@@ -515,7 +551,7 @@ try:
 #  the same way they are supplied to other SMURF commands such as makemap).
    indata = parsys["IN"].value
 
-#  Now get the Q and U values to use.
+#  Now get the Q and U output maps.
    qmap = parsys["Q"].value
    umap = parsys["U"].value
 
@@ -622,144 +658,111 @@ try:
    north = parsys["NORTH"].value
 
 
+
+
+
+
+
+
+
+
+
+
 #  Classify each input data file as raw, QU time-series or QU map. Create
-#  three separate lists containing all input files of each type.
-   for ndf in indata:
+#  three separate text files containing all input NDFs of each type (plus
+#  a fourth holing non-POL2 data).
+   junks = NDG.tempfile()
+   inraws = NDG.tempfile()
+   inquis = NDG.tempfile()
+   inmaps = NDG.tempfile()
+   rawinfo = NDG.tempfile()
+   invoke("$SMURF_DIR/pol2check in={0} quiet=yes junkfile={1} mapfile={2} "
+          "rawfile={3} stokesfile={4} rawinfo={5}".
+          format(indata,junks,inmaps,inraws,inquis,rawinfo))
 
-#  It is a time series file of some sort if it is three dimensional, and
-#  the first two pixel axes have dimensions (32,40).
-      invoke("$KAPPA_DIR/ndftrace in={0} quiet=yes".format(ndf))
+#  Warn about any non-POL2 input data files that are being ignored.
+   if get_task_par( "JUNKFOUND", "pol2check" ):
+      msg_out( " ")
+      msg_out( "WARNING: The following inappropriate input data files are "
+               "being ignored: " )
+      with open( junks ) as f:
+         print f.read()
+      msg_out( " ")
 
+#  Initialise the list of all Stokes time-series files to be processed by
+#  makemap so that it holds any Stokes time-series files supplied by
+#  parameter IN.
+   allquis = NDG.tempfile()
+   if get_task_par( "STOKESFOUND", "pol2check" ):
+      shutil.copyfile( inquis, allquis )
 
-
-
-
-
-
-
-
-
-#  If no Q and U values were supplied, create a set of Q and U time
-#  streams from the supplied analysed intensity time streams. Put them in
-#  the QUDIR directory, or the temp directory if QUDIR is null.
-   if inqu == None:
-
-      msg_out( "Calculating Q, U and I time streams for each bolometer...")
-      invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config=def outq={1}/\*_QT "
-             "outu={1}/\*_UT outi={1}/\*_IT fix=yes north={2}".
-             format( indata, qudir, north ) )
-
-#  Get groups listing the time series files created by calcqu.
-      qts = NDG( "{0}/*_QT".format( qudir ) )
-      uts = NDG( "{0}/*_UT".format( qudir ) )
-      its = NDG( "{0}/*_IT".format( qudir ) )
-
-#  If pre-calculated Q and U values were supplied, identify the Q, U and I
-#  files.
+#  Initialise the list of all Stokes maps to be included in the final Q
+#  and U maps so that it holds any maps supplied by parameter IN.
+   allmaps = NDG.tempfile()
+   if get_task_par( "MAPFOUND", "pol2check" ):
+      shutil.copyfile( inmaps, allmaps )
    else:
-      msg_out( "Using pre-calculating Q, U and I values...")
+      open( allmaps, 'a').close()
 
-      qndfs = []
-      undfs = []
-      indfs = []
-      for ndf in inqu:
-         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(ndf) )
-         label = get_task_par( "LABEL", "ndftrace" )
-         if label == "Q":
-            qndfs.append( ndf )
-         elif label == "U":
-            undfs.append( ndf )
-         elif label == "I":
-            indfs.append( ndf )
+
+
+
+#  If any raw analysed intensity files were supplied, use smurf:calcqu to
+#  convert them into Stokes paramater time-series files.
+   if get_task_par( "RAWFOUND", "pol2check" ):
+      msg_out( "Calculating Q, U and I time streams from raw analysed intensity data...")
+
+#  Get a dict in which each key is an observation identifier of the form
+#  <UT>_<OBS>, and each value is a list of raw data files for the observation.
+      with open(inraws) as infile:
+         lines = infile.readlines()
+      paths = [line.strip() for line in lines]
+
+      with open(rawinfo) as infile:
+         lines = infile.readlines()
+      infos = [line.strip() for line in lines]
+
+      rawlist = {}
+      for (path,id) in zip( paths, infos ):
+         if id in rawlist:
+            rawlist[id].append( path )
          else:
-            raise starutil.InvalidParameterError("Q/U time-series {0} has "
-                    "an unknown Label {1} - must be 'Q', 'U' or 'I'.".
-                    format(ndf,label))
+            rawlist[id] = [ path ]
 
-      qts = NDG( qndfs )
-      uts = NDG( undfs )
-      its = NDG( indfs )
+#  Run calcqu separately on each observation.
+      nobs = len(rawlist)
+      iobs = 0
+      for id in rawlist:
+         iobs += 1
+         msg_out("   {0}/{1}: Processing {2} raw data files from observation {3} ... ".
+                 format(iobs,nobs,len(rawlist[ id ]), id ) )
 
-#  Create a config file to use with makemap.
-   conf = os.path.join(NDG.tempdir,"conf")
-   fd = open(conf,"w")
+#  Create an NDG object holding the raw POL2 files for the current
+#  observation.
+         rawdata = NDG( rawlist[ id ] )
 
-#  If a non-default config was supplied, use it.
-   if config and config != "def":
-      fd.write("{0}\n".format(config))
+#  Use CALCQU to create the new Q and U time streams from the supplied
+#  analysed intensity time streams. Put them in the QUDIR directory.
+         new_q = NDG.tempfile()
+         new_u = NDG.tempfile()
+         new_i = NDG.tempfile()
+         try:
+            invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config=def outq={1}/\*_QT "
+                   "outu={1}/\*_UT outi={1}/\*_IT fix=yes north={2} outfilesi={3} "
+                   "outfilesq={4} outfilesu={5}".
+                   format( rawdata, qudir, north, new_i, new_q, new_u ) )
 
-#  Otherwise, use the default values.
-   else:
-      fd.write("ast.zero_snr=3\n")
-      fd.write("ast.zero_snrlo=2\n")
-      fd.write("maptol=0.05\n")
-      fd.write("modelorder=(pca,ext,ast,noi)\n")
-      fd.write("noisecliphigh=3\n")
-      fd.write("numiter=-20\n")
-      fd.write("pca.pcathresh=4\n")
-      fd.write("spikebox=10\n")
-      fd.write("spikethresh=5\n")
+#  Append the new Stokes parameter time series files created above to the
+#  list of all Stokes parameter time series files.
+            with open(allquis, 'a') as outfile:
+               for fname in ( new_q, new_u, new_i ):
+                   if os.path.isfile( fname ):
+                       with open(fname) as infile:
+                          outfile.write(infile.read())
 
-#  Now put in values that are absolutely required by this script. These
-#  over-write any values in the user-supplied config.
-   fd.write("noi.usevar=1\n")
-   fd.write("flagslow=0.01\n")
-   fd.write("downsampscale=0\n")
-   fd.close()
-
-#  Form lists of Q, U and I time series files, indexed using a key formed
-#  from the UT date, observation number and subscan number (i.e. chunk number).
-   msg_out( "Indexing Q files by UT date and observation number..." )
-   qlist = {}
-   for sdf in qts:
-      key = "{0}_{1}_{2}".format( int(get_fits_header( sdf, "UTDATE",
-                                                            True )),
-                                 int(get_fits_header( sdf, "OBSNUM",
-                                                            True )),
-                                 int(get_fits_header( sdf, "NSUBSCAN",
-                                                            True )))
-      if key in qlist:
-         qlist[key].append( sdf )
-      else:
-         qlist[key] = [ sdf ]
-
-   msg_out( "Indexing U files by UT date and observation number..." )
-   ulist = {}
-   for sdf in uts:
-      key = "{0}_{1}_{2}".format( int(get_fits_header( sdf, "UTDATE",
-                                                            True )),
-                                 int(get_fits_header( sdf, "OBSNUM",
-                                                            True )),
-                                 int(get_fits_header( sdf, "NSUBSCAN",
-                                                            True )))
-      if key in ulist:
-         ulist[key].append( sdf )
-      else:
-         ulist[key] = [ sdf ]
-
-   if len(its) > 0:
-      msg_out( "Indexing I files by UT date and observation number..." )
-      ilist = {}
-      for sdf in its:
-         key = "{0}_{1}_{2}".format( int(get_fits_header( sdf, "UTDATE",
-                                                               True )),
-                                    int(get_fits_header( sdf, "OBSNUM",
-                                                               True )),
-                                    int(get_fits_header( sdf, "NSUBSCAN",
-                                                               True )))
-         if key in ilist:
-            ilist[key].append( sdf )
-         else:
-            ilist[key] = [ sdf ]
-   else:
-      ilist = None
-
-   if len(qlist) == 1:
-      msg_out( "Only one observation supplied" )
-
-#  Dictionaries holding the Q and U maps for each observation chunk.
-   qmaps = {}
-   umaps = {}
+         except starutil.AtaskError as err:
+            print( err )
+            print( "\nAn error occurred within CALCQU. The above observation will be ignored.\nContinuing to process any remaining observations...\n" )
 
 #  Dictionaries holding the stats for the Q and U maps made from each chunk.
    wvm = {}
@@ -777,50 +780,130 @@ try:
    pointing_dx = {}
    pointing_dy = {}
 
+#  If we have some  time-series files to process...
+   if os.path.isfile(allquis):
+
+#  Create a text file holding information about all the Stokes time-series
+#  files to be processed. For each one, get the Stokes parameter (Q, U or I)
+#  and a key that is unique for the chunk of data, of the form
+#  "<UT>_<OBS>_<SUBSCAN>".
+      stokesinfo = NDG.tempfile()
+      quindg = NDG("^{0}".format(allquis) )
+      invoke("$SMURF_DIR/pol2check in={0} quiet=yes stokesinfo={1}".
+             format(quindg,stokesinfo))
+
+#  Set up three dicts - one each for Q, U and I. Each key is as described
+#  above. Each value is a list of paths for NDFs holding data with the same
+#  key and the same Stokes parameter (Q, U or I).
+      with open(allquis) as infile:
+         lines = infile.readlines()
+      paths = [line.strip() for line in lines]
+
+      with open(stokesinfo) as infile:
+         lines = infile.readlines()
+      infos = [line.strip() for line in lines]
+
+      ilist = {}
+      qlist = {}
+      ulist = {}
+      for (path,info) in zip( paths, infos ):
+         (stokes,id) = info.split()
+         if stokes == "Q":
+            if id in qlist:
+               qlist[id].append( path )
+            else:
+               qlist[id] = [ path ]
+
+         elif stokes == "U":
+            if id in ulist:
+               ulist[id].append( path )
+            else:
+               ulist[id] = [ path ]
+
+         else:
+            if id in ilist:
+               ilist[id].append( path )
+            else:
+               ilist[id] = [ path ]
+
+#  Create a config file to use with makemap.
+      conf = NDG.tempfile()
+      fd = open(conf,"w")
+
+#  If a non-default config was supplied, use it.
+      if config and config != "def":
+         fd.write("{0}\n".format(config))
+
+#  Otherwise, use the default values.
+      else:
+         fd.write("ast.zero_snr=3\n")
+         fd.write("ast.zero_snrlo=2\n")
+         fd.write("maptol=0.05\n")
+         fd.write("modelorder=(pca,ext,ast,noi)\n")
+         fd.write("noisecliphigh=3\n")
+         fd.write("numiter=-20\n")
+         fd.write("pca.pcathresh=4\n")
+         fd.write("spikebox=10\n")
+         fd.write("spikethresh=5\n")
+
+#  Now put in values that are absolutely required by this script. These
+#  over-write any values in the user-supplied config.
+      fd.write("noi.usevar=1\n")
+      fd.write("flagslow=0.01\n")
+      fd.write("downsampscale=0\n")
+      fd.close()
+
+      if len(qlist) == 1:
+         msg_out( "Only one observation supplied" )
+
+#  Dictionaries holding the Q and U maps for each observation chunk.
+      qmaps = {}
+      umaps = {}
+
 #  Loop over all Q time series files. Each separate observation will
 #  usually have one Q time series file (although there may be more if the
 #  observation was split into two or more discontiguous chunks). We form
 #  Q and U maps separately for each observation chunk present in the supplied
 #  list of input raw data.
-   for key in qlist:
+      for key in qlist:
 
 #  Get the Q, U and I time stream files for the current observation chunk.
-      qsdf = NDG( qlist[ key ] )
+         qsdf = NDG( qlist[ key ] )
 
-      if key in ulist:
-         usdf = NDG( ulist[ key ] )
-      else:
-         usdf = None
+         if key in ulist:
+            usdf = NDG( ulist[ key ] )
+         else:
+            usdf = None
 
-      if ilist and ( key in ilist ):
-         isdf = NDG( ilist[ key ] )
-      else:
-         isdf = None
+         if ilist and ( key in ilist ):
+            isdf = NDG( ilist[ key ] )
+         else:
+            isdf = None
 
 #  Check that the corresponding U and I time series files exist.
-      if usdf and (not ilist or isdf):
-         msg_out("\n>>>>   Making Q and U maps from {0}...\n".format(key) )
+         if usdf and (not ilist or isdf):
+            msg_out("\n>>>>   Making Q and U maps from {0}...\n".format(key) )
 
 #  AZ/EL pointing correction, for data between 20150606 and 20150930.
-         ut = int(get_fits_header( qsdf[0], "UTDATE", True ))
-         if ut >= 20150606 and ut <= 20150929:
-            pntfile = os.path.join(NDG.tempdir,"pointing")
-            fd = open(pntfile,"w")
-            fd.write("# system=azel\n")
-            fd.write("# tai dlon dlat\n")
-            fd.write("54000 32.1 27.4\n")
-            fd.write("56000 32.1 27.4\n")
-            fd.close()
-         else:
-            pntfile = "!"
+            ut = int(get_fits_header( qsdf[0], "UTDATE", True ))
+            if ut >= 20150606 and ut <= 20150929:
+               pntfile = NDG.tempfile()
+               fd = open(pntfile,"w")
+               fd.write("# system=azel\n")
+               fd.write("# tai dlon dlat\n")
+               fd.write("54000 32.1 27.4\n")
+               fd.write("56000 32.1 27.4\n")
+               fd.close()
+            else:
+               pntfile = "!"
 
 #  If we are applying pointing correction to each observation, we create an
 #  I map and determine any extra pointing corrections that are needed to
 #  bring the I map into alignment with the reference map.
-         if align and isdf:
+            if align and isdf:
 
 #  Issue a warning if we have no I time-stream files.
-            msg_out( "Making a map from the I time series...")
+               msg_out( "Making a map from the I time series...")
 
 #  Create a config file to use when creating the I map. The I map needs an
 #  FLT model because  it is derived from the background level in the time
@@ -828,190 +911,190 @@ try:
 #  is insensitive to drift. Also mask out edge regions more aggresively since
 #  we do not want spurious structures round the edges to upset the alignment
 #  process in kappa:align2d.
-            iconf = os.path.join(NDG.tempdir,"iconf")
-            if not os.path.isfile(iconf):
-               fd = open(iconf,"w")
-               fd.write("^$STARLINK_DIR/share/smurf/dimmconfig_jsa_generic.lis\n")
-               fd.write("hitslimit=1\n")
-               fd.write("maptol=0.1\n")
-               fd.write("flagslow=0.01\n")
-               fd.write("downsampscale=0\n")
-               fd.write("noi.usevar=1\n")
-               fd.close()
+               iconf = NDG.tempfile()
+               if not os.path.isfile(iconf):
+                  fd = open(iconf,"w")
+                  fd.write("^$STARLINK_DIR/share/smurf/dimmconfig_jsa_generic.lis\n")
+                  fd.write("hitslimit=1\n")
+                  fd.write("maptol=0.1\n")
+                  fd.write("flagslow=0.01\n")
+                  fd.write("downsampscale=0\n")
+                  fd.write("noi.usevar=1\n")
+                  fd.close()
 
 #  Create the I map.
-            imap = NDG( 1 )
-            invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4}".
-                  format(isdf,iconf,imap,ref,pntfile))
+               imap = NDG( 1 )
+               invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4}".
+                     format(isdf,iconf,imap,ref,pntfile))
 
 #  See what translations (in pixels) are needed to align the imap with
 #  the reference map. The determination of the shift is more accurate if
 #  we first mask out background areas. Use the AST mask to define source
 #  pixels, but only if the mask contains a reasonable number of pixels
 #  (very faint sources will have very small or non-existant AST masks).
-            invoke("$KAPPA_DIR/showqual ndf={0}".format(imap))
-            if get_task_par( "QNAMES(1)", "showqual" ) == "AST":
-               bb = 1
-            elif get_task_par( "QNAMES(2)", "showqual" ) == "AST":
-               bb = 2
-            elif get_task_par( "QNAMES(3)", "showqual" ) == "AST":
-               bb = 4
-            else:
-               bb = 0
+               invoke("$KAPPA_DIR/showqual ndf={0}".format(imap))
+               if get_task_par( "QNAMES(1)", "showqual" ) == "AST":
+                  bb = 1
+               elif get_task_par( "QNAMES(2)", "showqual" ) == "AST":
+                  bb = 2
+               elif get_task_par( "QNAMES(3)", "showqual" ) == "AST":
+                  bb = 4
+               else:
+                  bb = 0
 
-            if bb > 0:
-               invoke("$KAPPA_DIR/setbb ndf={0} bb={1}".format(imap,bb))
+               if bb > 0:
+                  invoke("$KAPPA_DIR/setbb ndf={0} bb={1}".format(imap,bb))
 
 #  Clear badbits to use the whole map if the above masking results in too
 #  few pixels.
-               invoke("$KAPPA_DIR/stats ndf={0}".format(imap))
-               nused = float( get_task_par( "numgood", "stats" ) )
-               if nused < 400:
-                  invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(imap))
+                  invoke("$KAPPA_DIR/stats ndf={0}".format(imap))
+                  nused = float( get_task_par( "numgood", "stats" ) )
+                  if nused < 400:
+                     invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(imap))
 
 #  Find the pixel shift that aligns features in this masked, trimmed I map with
 #  corresponding features in the reference map.
-            invoke("$KAPPA_DIR/align2d ref={0} out=! in={1} form=3 corlimit=0.7".
-                   format(ref,imap))
-            dx = float( get_task_par( "TR(1)", "align2d" ) )
-            dy = float( get_task_par( "TR(4)", "align2d" ) )
+               invoke("$KAPPA_DIR/align2d ref={0} out=! in={1} form=3 corlimit=0.7".
+                      format(ref,imap))
+               dx = float( get_task_par( "TR(1)", "align2d" ) )
+               dy = float( get_task_par( "TR(4)", "align2d" ) )
 
 #  If the shifts are suspiciously high, we do not believe them. In which
 #  case we cannot do pointing ocorrection when creating the Q and U maps.
-            if abs(dx) > 5 or abs(dy) > 5:
-               msg_out( "WARNING: The I map created from the POL2 data cannot be aligned "
-                        "with the supplied IP reference map. Therefore the final "
-                        "Q and U maps cannot be corrected for pointing errors." )
+               if abs(dx) > 5 or abs(dy) > 5:
+                  msg_out( "WARNING: The I map created from the POL2 data cannot be aligned "
+                           "with the supplied IP reference map. Therefore the final "
+                           "Q and U maps cannot be corrected for pointing errors." )
 
 #  Otherwise, convert the offset in pixels to (longitude,latitude) offsets
 #  in the sky system of the reference map, in arc-seconds....
-            else:
+               else:
 
 #  Strip the wavelength axis off the total intensity map created above.
-               imap2d = NDG( 1 )
-               invoke("$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(imap,imap2d))
+                  imap2d = NDG( 1 )
+                  invoke("$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(imap,imap2d))
 
 #  Get the pixel coords at the centre of the total intensity map.
-               invoke("$KAPPA_DIR/ndftrace ndf={0}".format(imap2d))
-               lbndx = float( get_task_par( "LBOUND(1)", "ndftrace" ) )
-               lbndy = float( get_task_par( "LBOUND(2)", "ndftrace" ) )
-               ubndx = float( get_task_par( "UBOUND(1)", "ndftrace" ) )
-               ubndy = float( get_task_par( "UBOUND(2)", "ndftrace" ) )
-               cenx = 0.5*( lbndx + ubndx )
-               ceny = 0.5*( lbndy + ubndy )
+                  invoke("$KAPPA_DIR/ndftrace ndf={0}".format(imap2d))
+                  lbndx = float( get_task_par( "LBOUND(1)", "ndftrace" ) )
+                  lbndy = float( get_task_par( "LBOUND(2)", "ndftrace" ) )
+                  ubndx = float( get_task_par( "UBOUND(1)", "ndftrace" ) )
+                  ubndy = float( get_task_par( "UBOUND(2)", "ndftrace" ) )
+                  cenx = 0.5*( lbndx + ubndx )
+                  ceny = 0.5*( lbndy + ubndy )
 
 #  Convert to SKY coords, in radians. Use ATOOLS rather than pyast in
 #  order to avoid the need for people to install pyast. Also, ATOOLS
 #  integrates with NDFs more easily than pyast.
-               (cena,cenb) = invoke("$ATOOLS_DIR/asttran2 this={0} forward=yes "
-                                    "xin={1} yin={2}".format( imap2d,cenx,ceny)).split()
-               cena = float( cena )
-               cenb = float( cenb )
+                  (cena,cenb) = invoke("$ATOOLS_DIR/asttran2 this={0} forward=yes "
+                                       "xin={1} yin={2}".format( imap2d,cenx,ceny)).split()
+                  cena = float( cena )
+                  cenb = float( cenb )
 
 #  Add on the pixel offsets, and convert to SKY coords, in radians.
-               offx = cenx + dx
-               offy = ceny + dy
-               (offa,offb) = invoke("$ATOOLS_DIR/asttran2 this={0} forward=yes "
-                                    "xin={1} yin={2}".format( imap2d,offx,offy)).split()
-               offa = float( offa )
-               offb = float( offb )
+                  offx = cenx + dx
+                  offy = ceny + dy
+                  (offa,offb) = invoke("$ATOOLS_DIR/asttran2 this={0} forward=yes "
+                                       "xin={1} yin={2}".format( imap2d,offx,offy)).split()
+                  offa = float( offa )
+                  offb = float( offb )
 
 #   Now find the arc-distance parallel to the longitude axis, between the central
 #   and offset positions, and convert from radians to arc-seconds.
-               dx = invoke("$ATOOLS_DIR/astdistance this={0}, point1=\[{1},{2}\] "
-                           "point2=\[{3},{4}\]".format(imap2d,cena,cenb,offa,cenb))
-               dx = 3600.0*math.degrees( float( dx ) )
+                  dx = invoke("$ATOOLS_DIR/astdistance this={0}, point1=\[{1},{2}\] "
+                              "point2=\[{3},{4}\]".format(imap2d,cena,cenb,offa,cenb))
+                  dx = 3600.0*math.degrees( float( dx ) )
 
 #  The value returned by astDistance is always positive. Adjust the sign
 #  of dx so that it goes the right way.
-               da = offa - cena
-               while da > math.pi:
-                  da -= math.pi
-               while da < -math.pi:
-                  da += math.pi
-               if da < 0.0:
-                  dx = -dx
+                  da = offa - cena
+                  while da > math.pi:
+                     da -= math.pi
+                  while da < -math.pi:
+                     da += math.pi
+                  if da < 0.0:
+                     dx = -dx
 
 #  Now find the arc-distance parallel to the latitude axis, between the central
 #  and offset positions, and convert from radians to arc-seconds.
-               dy = invoke("$ATOOLS_DIR/astdistance this={0}, point1=\[{1},{2}\] "
-                           "point2=\[{3},{4}\]".format(imap2d,cena,cenb,cena,offb))
-               dy = 3600.0*math.degrees( float( dy ) )
+                  dy = invoke("$ATOOLS_DIR/astdistance this={0}, point1=\[{1},{2}\] "
+                              "point2=\[{3},{4}\]".format(imap2d,cena,cenb,cena,offb))
+                  dy = 3600.0*math.degrees( float( dy ) )
 
 #  The value returned by astDistance is always positive. Adjust the sign
 #  of dx so that it goes the right way.
-               db = offb - cenb
-               if db < 0.0:
-                  dy = -dy
+                  db = offb - cenb
+                  if db < 0.0:
+                     dy = -dy
 
 #  Create the pointing correction file to use with subsequent makemap
 #  calls. If a file is already in use (because of the data being old)
 #  append the new pointing correction to the end of the file, preceeded
 #  by an "end-of-table" Marker (two minus signs). Makemap will then apply
 #  both correction.
-               msg_out( "Using pointing corrections of ({0},{1}) arc-seconds".format(dx,dy) )
-               if pntfile == "!":
-                  pntfile = os.path.join(NDG.tempdir,"pointing")
-                  fd = open(pntfile,"w")
-               else:
-                  fd = open(pntfile,"a")
-                  fd.write("--\n")
+                  msg_out( "Using pointing corrections of ({0},{1}) arc-seconds".format(dx,dy) )
+                  if pntfile == "!":
+                     pntfile = NDG.tempfile()
+                     fd = open(pntfile,"w")
+                  else:
+                     fd = open(pntfile,"a")
+                     fd.write("--\n")
 
-               fd.write("# system=tracking\n")
-               fd.write("# tai dlon dlat\n")
-               fd.write("54000 {0} {1}\n".format(dx,dy))
-               fd.write("56000 {0} {1}\n".format(dx,dy))
-               fd.close()
+                  fd.write("# system=tracking\n")
+                  fd.write("# tai dlon dlat\n")
+                  fd.write("54000 {0} {1}\n".format(dx,dy))
+                  fd.write("56000 {0} {1}\n".format(dx,dy))
+                  fd.close()
 
 #  Store the pointing corrections for inclusion in the obstable.
-               pointing_dx[key] = dx
-               pointing_dy[key] = dy
+                  pointing_dx[key] = dx
+                  pointing_dy[key] = dy
 
 #  Convolve the supplied ip reference map to give it a beam that matches
 #  the expected IP beam at the elevation of the supplied data.
-         if ipbeamfix and ipref != "!":
+            if ipbeamfix and ipref != "!":
 
 #  Get the azmimuth and elevation of the POL2 data.
-            el1 = float( get_fits_header( qsdf[0], "ELSTART" ) )
-            el2 = float( get_fits_header( qsdf[0], "ELEND" ) )
-            el = 0.5*( el1 + el2 )
-            az1 = float( get_fits_header( qsdf[0], "AZSTART" ) )
-            az2 = float( get_fits_header( qsdf[0], "AZEND" ) )
-            az = 0.5*( az1 + az2 )
+               el1 = float( get_fits_header( qsdf[0], "ELSTART" ) )
+               el2 = float( get_fits_header( qsdf[0], "ELEND" ) )
+               el = 0.5*( el1 + el2 )
+               az1 = float( get_fits_header( qsdf[0], "AZSTART" ) )
+               az2 = float( get_fits_header( qsdf[0], "AZEND" ) )
+               az = 0.5*( az1 + az2 )
 
-            msg_out( "Convolving the I reference map to match the expected IP beam shape at elevation {0} degs...".format(el))
+               msg_out( "Convolving the I reference map to match the expected IP beam shape at elevation {0} degs...".format(el))
 
 #  Get the pixel size in the input total intensity map.
-            invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(ipref) )
-            ipixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
+               invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(ipref) )
+               ipixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
 
 #  Generate an NDF holding the canonical total-intensity beam (circular).
 #  Parameters are: pg=shape exponent, pf=FWHM in arc-sec, pp=pixel size
 #  in arc-sec.
-            ibeam = NDG(1)
-            invoke("$KAPPA_DIR/maths exp=\"'exp(-0.69315*((4*((xa+0.5)**2+(xb+0.5)**2)/(fa*fa))**(pg/2)))'\" "
-                   "fa=\"'pf/pp'\" lbound=\[-15,-15\] ubound=\[15,15\] type=_double "
-                   "pf=14 pg=1.984 pp={1} out={0}".format(ibeam,ipixsize) )
+               ibeam = NDG(1)
+               invoke("$KAPPA_DIR/maths exp=\"'exp(-0.69315*((4*((xa+0.5)**2+(xb+0.5)**2)/(fa*fa))**(pg/2)))'\" "
+                      "fa=\"'pf/pp'\" lbound=\[-15,-15\] ubound=\[15,15\] type=_double "
+                      "pf=14 pg=1.984 pp={1} out={0}".format(ibeam,ipixsize) )
 
 #  Get the parameters of the expected polarised-intensity beam, at the
 #  elevation of the data. FWHM values are in arc-seconds. Area is in square
 #  arc-seconds. Orientation is in degrees from the elevation axis towards
 #  the azimuth axis.
-            fwhm1 = 14.6914727284 + 0.0421973549002*el - 9.70079974113e-05*el*el
-            fwhm2 = 15.245386229 - 0.115624437578*el + 0.000763994058326*el*el
-            area = fwhm1*fwhm2
-            gamma = 4.65996074835 - 0.0340987643291*area + 0.000115483045339*area*area
-            orient = 118.639637086 - 0.472915017742*az +  0.00140620919736*az*az
+               fwhm1 = 14.6914727284 + 0.0421973549002*el - 9.70079974113e-05*el*el
+               fwhm2 = 15.245386229 - 0.115624437578*el + 0.000763994058326*el*el
+               area = fwhm1*fwhm2
+               gamma = 4.65996074835 - 0.0340987643291*area + 0.000115483045339*area*area
+               orient = 118.639637086 - 0.472915017742*az +  0.00140620919736*az*az
 
 #  Convert the array of TCS_TAI values within the JCMTSTATE extension of
 #  the first Q time series into an NDF, and then get the average TCS_TAI
 #  value (the epoch as an MJD).
-            tcstai = NDG(1)
-            invoke("$HDSTOOLS_DIR/hcreate type=image inp={0}".format(tcstai))
-            invoke("$HDSTOOLS_DIR/hcopy in={0}.more.jcmtstate.tcs_tai out={1}.data_array".
-                   format(qsdf[0],tcstai))
-            invoke("$KAPPA_DIR/stats ndf={0}".format(tcstai))
-            epoch = float( get_task_par( "mean", "stats" ) )
+               tcstai = NDG(1)
+               invoke("$HDSTOOLS_DIR/hcreate type=image inp={0}".format(tcstai))
+               invoke("$HDSTOOLS_DIR/hcopy in={0}.more.jcmtstate.tcs_tai out={1}.data_array".
+                      format(qsdf[0],tcstai))
+               invoke("$KAPPA_DIR/stats ndf={0}".format(tcstai))
+               epoch = float( get_task_par( "mean", "stats" ) )
 
 #  Get the angle from the Y pixel axis to the elevation axis in the supplied
 #  IP reference image. Positive rotation is from X pixel axis to Y pixel axis.
@@ -1020,137 +1103,203 @@ try:
 #  ensure that the AZEL axes are approriate to the time the POL2 dta was
 #  taken rather than the time of the image. And we to do this without
 #  adjusting the WCS Mappings. Take a copy to avoid changing the original.
-            junk = NDG(1)
-            invoke("$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(ipref,junk))
-            invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=epoch newval=\"'MJD {1}'\" remap=no".format(junk,epoch))
-            invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=skyrefis newval=origin".format(junk))
-            invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=system newval=azel".format(junk))
+               junk = NDG(1)
+               invoke("$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(ipref,junk))
+               invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=epoch newval=\"'MJD {1}'\" remap=no".format(junk,epoch))
+               invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=skyrefis newval=origin".format(junk))
+               invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=system newval=azel".format(junk))
 
-            junk2 = NDG(1)
-            invoke("$KAPPA_DIR/rotate in={0} out={1} angle=!".format(junk,junk2))
-            angrot = float( get_task_par( "angleused", "rotate" ) )
+               junk2 = NDG(1)
+               invoke("$KAPPA_DIR/rotate in={0} out={1} angle=!".format(junk,junk2))
+               angrot = float( get_task_par( "angleused", "rotate" ) )
 
 #  Convert the major axis orientation from sky coords to pixel coords.
-            orient = angrot - orient
+               orient = angrot - orient
 
 #  Convert FWHM values to pixels.
-            fwhm1 = fwhm1/ipixsize
-            fwhm2 = fwhm2/ipixsize
+               fwhm1 = fwhm1/ipixsize
+               fwhm2 = fwhm2/ipixsize
 
 #  Generate an NDF holding the expected polarised-intensity IP beam, at the
 #  elevation of the data. This image has the same WCS axis orientation as the
 #  supplied total intensity image.
-            ipbeam = NDG(1)
-            invoke("$KAPPA_DIR/maths exp=\"'exp(-0.69315*((4*((fx/px)**2+(fy/py)**2))**(pg/2)))'\" "
-                   "fx=\"'-(xa+0.5)*sind(po)+(xb+0.5)*cosd(po)'\" fy=\"'-(xa+0.5)*cosd(po)-(xb+0.5)*sind(po)'\" "
-                   "lbound=\[-15,-15\] ubound=\[15,15\] type=_double po={4} "
-                   "px={1} py={2} pg={3} out={0}".format(ipbeam,fwhm1,fwhm2,gamma,orient) )
+               ipbeam = NDG(1)
+               invoke("$KAPPA_DIR/maths exp=\"'exp(-0.69315*((4*((fx/px)**2+(fy/py)**2))**(pg/2)))'\" "
+                      "fx=\"'-(xa+0.5)*sind(po)+(xb+0.5)*cosd(po)'\" fy=\"'-(xa+0.5)*cosd(po)-(xb+0.5)*sind(po)'\" "
+                      "lbound=\[-15,-15\] ubound=\[15,15\] type=_double po={4} "
+                      "px={1} py={2} pg={3} out={0}".format(ipbeam,fwhm1,fwhm2,gamma,orient) )
 
 #  Deconvolve the IP beam using the total intensity beam as the PSF. This
 #  gives the required smoothing kernel.
-            tmp1 = NDG(1)
-            invoke("$KAPPA_DIR/wiener in={0} pmodel=1 pnoise=1E-5 psf={1} xcentre=0 ycentre=0 "
-                   "out={2}".format(ipbeam,ibeam,tmp1))
+               tmp1 = NDG(1)
+               invoke("$KAPPA_DIR/wiener in={0} pmodel=1 pnoise=1E-5 psf={1} xcentre=0 ycentre=0 "
+                      "out={2}".format(ipbeam,ibeam,tmp1))
 
 #  The results seem to have less ringing if the kernel is apodised. Use
 #  a Gaussian of FWHM 30 arc-seconds as the apodising function.
-            tmp2 = NDG(1)
-            invoke("$KAPPA_DIR/maths exp=\"'ia*exp(-((xa+0.5)**2+(xb+0.5)**2)/fa)'\" "
-                   "fa=\"'30/pa'\" pa={1} ia={0} out={2}".format(tmp1,ipixsize,tmp2))
+               tmp2 = NDG(1)
+               invoke("$KAPPA_DIR/maths exp=\"'ia*exp(-((xa+0.5)**2+(xb+0.5)**2)/fa)'\" "
+                      "fa=\"'30/pa'\" pa={1} ia={0} out={2}".format(tmp1,ipixsize,tmp2))
 
 #  Ensure the kernal has a total data value of unity. This means the
 #  input and output maps will have the same normalisation.
-            invoke("$KAPPA_DIR/stats ndf={0}".format(tmp2))
-            total = get_task_par( "total", "stats" )
-            bkernel = NDG(1)
-            invoke("$KAPPA_DIR/cdiv in={0} scalar={1} out={2}".format(tmp2,total,bkernel))
+               invoke("$KAPPA_DIR/stats ndf={0}".format(tmp2))
+               total = get_task_par( "total", "stats" )
+               bkernel = NDG(1)
+               invoke("$KAPPA_DIR/cdiv in={0} scalar={1} out={2}".format(tmp2,total,bkernel))
 
 #  Convolve the supplied total intensity map using this kernel. The
 #  output map should have a beam similar to the expected IP beam.
-            iprefbeam = NDG(1)
-            invoke("$KAPPA_DIR/convolve in={0} psf={1} xcentre=0 ycentre=0 "
-                   "out={2}".format(ipref,bkernel,iprefbeam))
-            ipref = iprefbeam
+               iprefbeam = NDG(1)
+               invoke("$KAPPA_DIR/convolve in={0} psf={1} xcentre=0 ycentre=0 "
+                      "out={2}".format(ipref,bkernel,iprefbeam))
+               ipref = iprefbeam
 
-
-
-
-
-#  Make maps from the Q and U time series. Ensure that we ignore both Q and U if
-#  either map cannot be made. Also ensure we continue to process any remaining
+#  Make maps from the Q and U time series. Ensure that we ignore both Q and U
+#  if either map cannot be made. Also ensure we continue to process any remaining
 #  observation chunks if the current chunk fails.
-         qmaps[key] = NDG("{0}/{1}_qmap".format(mapdir,key), False)
-         msg_out( "Making a map from the Q time series...")
-         try:
-            invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
-                   "ipref={5} {6}".format(qsdf,conf,qmaps[key],ref,pntfile,ipref,pixsize_par))
-
-            if ref == "!":
-               ref = qmaps[key]
-
-            umaps[key] = NDG("{0}/{1}_umap".format(mapdir,key), False)
-            msg_out( "Making a map from the U time series..." )
+            qmaps[key] = NDG("{0}/{1}_qmap".format(mapdir,key), False)
+            msg_out( "Making a map from the Q time series...")
             try:
                invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
-                      "ipref={5} {6}".format(usdf,conf,umaps[key],ref,pntfile,ipref,pixsize_par))
+                      "ipref={5} {6}".format(qsdf,conf,qmaps[key],ref,pntfile,ipref,pixsize_par))
+
+               if ref == "!":
+                  ref = qmaps[key]
+
+               umaps[key] = NDG("{0}/{1}_umap".format(mapdir,key), False)
+               msg_out( "Making a map from the U time series..." )
+               try:
+                  invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
+                         "ipref={5} {6}".format(usdf,conf,umaps[key],ref,pntfile,ipref,pixsize_par))
+
+#  Append these new Q and U maps to the text file listing all Stokes maps to
+#  be included in the final Q and U maps.
+                  with open(allmaps, 'a') as infile:
+                     infile.write( "{0}\n".format( qmaps[key] ) )
+                     infile.write( "{0}\n".format( umaps[key] ) )
+
+               except starutil.AtaskError:
+                  if ref == qmaps[key]:
+                     ref = "!"
+                  del umaps[key]
+                  del qmaps[key]
+
+            except starutil.AtaskError:
+               del qmaps[key]
+
+
+
+#  Create a text file holding information about all the Stokes maps to be
+#  processed. For each one, get the Stokes parameter (Q, U or I)
+#  and a key that is unique for the chunk of data, of the form
+#  "<UT>_<OBS>_<SUBSCAN>".
+   mapinfo = NDG.tempfile()
+   mapndg = NDG("^{0}".format(allmaps) )
+   invoke("$SMURF_DIR/pol2check in={0} quiet=yes mapinfo={1}".
+          format(mapndg,mapinfo))
+
+#  Set up two dicts - one for Q and one for U. Each key is as described
+#  above. Each value is the path to an NDF holding a map with the same
+#  key and the same Stokes parameter (Q, U or I).
+   with open(allmaps) as infile:
+      lines = infile.readlines()
+   paths = [line.strip() for line in lines]
+
+   with open(mapinfo) as infile:
+      lines = infile.readlines()
+   infos = [line.strip() for line in lines]
+
+   qmaps = {}
+   umaps = {}
+   for (path,info) in zip( paths, infos ):
+      (stokes,id) = info.split()
+      if stokes == "Q":
+         qmaps[id] = path
+
+      elif stokes == "U":
+         umaps[id] = path
+
+#  Loop over all Q maps.
+   badkeys = []
+   for key in qmaps:
+
+#  Get the Q and U maps for the current observation chunk.
+      qsdf = NDG( qmaps[ key ] )
+
+      if key in umaps:
+         usdf = NDG( umaps[ key ] )
+      else:
+         usdf = None
+
+      msg_out("\n>>>>   Analysing Q and U maps from {0}...\n".format(key) )
 
 #  Store useful info about this pair of Q and U maps.
 #  FITS headers...
-               msg_out( "Calculating stats for the Q and U maps..." )
-               wvm[key] = 0.5*( float( get_fits_header( qmaps[key], "WVMTAUST" ) )
-                                + float( get_fits_header( qmaps[key], "WVMTAUEN" ) ) )
-               elapsed_time[key] = float( get_fits_header( qmaps[key], "ELAPTIME" ) )
-               nbolo_used_q[key] = float( get_fits_header( qmaps[key], "NBOLOEFF" ) )
-               nbolo_used_u[key] = float( get_fits_header( umaps[key], "NBOLOEFF" ) )
+      wvm[key] = 0.5*( float( get_fits_header( qmaps[key], "WVMTAUST" ) )
+                       + float( get_fits_header( qmaps[key], "WVMTAUEN" ) ) )
+      elapsed_time[key] = float( get_fits_header( qmaps[key], "ELAPTIME" ) )
+      nbolo_used_q[key] = float( get_fits_header( qmaps[key], "NBOLOEFF" ) )
+      nbolo_used_u[key] = float( get_fits_header( umaps[key], "NBOLOEFF" ) )
+      obj = get_fits_header( qmaps[key], "OBJECT" )
 
 #  Calculate the expected NEFD. See:
 #     www.eaobservatory.org/jcmt/instrumentation/continuum/scuba-2/pol-2/
 #     www.eaobservatory.org/jcmt/instrumentation/continuum/scuba-2/calibration/
-
-               elevation = 0.5*( float( get_fits_header( qmaps[key], "ELSTART" ) )
-                                + float( get_fits_header( qmaps[key], "ELEND" ) ) )
-               band = float( get_fits_header( qmaps[key], "FILTER" ) )
-               if band == 450:
-                  transmission = math.exp(-26*(wvm[key]-0.01196)/math.sin(math.radians(elevation)))
-                  nefd_expected[key] = 981.5/transmission - 87.3
-                  fcf = 962000
-                  c = 0.045
-               else:
-                  transmission = math.exp(-4.6*(wvm[key]-0.00435)/math.sin(math.radians(elevation)))
-                  nefd_expected[key] = 310/transmission - 26
-                  fcf = 725000
-                  c = 0.165
+      elevation = 0.5*( float( get_fits_header( qmaps[key], "ELSTART" ) )
+                       + float( get_fits_header( qmaps[key], "ELEND" ) ) )
+      band = float( get_fits_header( qmaps[key], "FILTER" ) )
+      if band == 450:
+         transmission = math.exp(-26*(wvm[key]-0.01196)/math.sin(math.radians(elevation)))
+         nefd_expected[key] = 981.5/transmission - 87.3
+         fcf = 962000
+         c = 0.045
+      else:
+         transmission = math.exp(-4.6*(wvm[key]-0.00435)/math.sin(math.radians(elevation)))
+         nefd_expected[key] = 310/transmission - 26
+         fcf = 725000
+         c = 0.165
 
 #  Background noise, source size, mean source value...
-               (noise_q, source_size_q[key], source_rms_q[key] ) = calc_stats( qmaps[key] )
-               (noise_u, source_size_u[key], source_rms_u[key] ) = calc_stats( umaps[key] )
+      (noise_q, source_size_q[key], source_rms_q[key] ) = calc_stats( qmaps[key] )
+      (noise_u, source_size_u[key], source_rms_u[key] ) = calc_stats( umaps[key] )
+      if noise_q > 0.0 and noise_u > 0.0:
 
 #  Calculate the NEFDs based on the measured noises.
-               nefd_q[key] = fcf*noise_q*math.sqrt(elapsed_time[key]*c)
-               nefd_u[key] = fcf*noise_u*math.sqrt(elapsed_time[key]*c)
+         nefd_q[key] = fcf*noise_q*math.sqrt(elapsed_time[key]*c)
+         nefd_u[key] = fcf*noise_u*math.sqrt(elapsed_time[key]*c)
 
 #  Display all this info.
-               msg_out( " " )
-               msg_out( "  WVM tau = {0}".format(wvm[key]))
-               msg_out( "  Measured NEFD in Q = {0} mJy.sec^(0.5)".format(nefd_q[key]))
-               msg_out( "  Measured NEFD in U = {0} mJy.sec^(0.5)".format(nefd_u[key]))
-               msg_out( "  Expected NEFD = {0} mJy.sec^(0.5)".format(nefd_expected[key]))
-               msg_out( "  Elapsed observation time = {0} sec".format(elapsed_time[key]))
-               msg_out( "  Number of bolometers contributing to Q map = {0}".format(nbolo_used_q[key]))
-               msg_out( "  Number of bolometers contributing to U map = {0}".format(nbolo_used_u[key]))
-               msg_out( "  Source area in Q = {0} arc-sec^(2)".format(source_size_q[key]))
-               msg_out( "  Source area in U = {0} arc-sec^(2)".format(source_size_u[key]))
-               msg_out( "  RMS of Q within source area = {0} pW".format(source_rms_q[key]))
-               msg_out( "  RMS of U within source area = {0} pW".format(source_rms_u[key]))
+         msg_out( " " )
+         msg_out( "  Object = {0}".format(obj))
+         msg_out( "  WVM tau = {0}".format(wvm[key]))
+         msg_out( "  Measured NEFD in Q = {0} mJy.sec^(0.5)".format(nefd_q[key]))
+         msg_out( "  Measured NEFD in U = {0} mJy.sec^(0.5)".format(nefd_u[key]))
+         msg_out( "  Expected NEFD = {0} mJy.sec^(0.5)".format(nefd_expected[key]))
+         msg_out( "  Elapsed observation time = {0} sec".format(elapsed_time[key]))
+         msg_out( "  Number of bolometers contributing to Q map = {0}".format(nbolo_used_q[key]))
+         msg_out( "  Number of bolometers contributing to U map = {0}".format(nbolo_used_u[key]))
+         msg_out( "  Source area in Q = {0} arc-sec^(2)".format(source_size_q[key]))
+         msg_out( "  Source area in U = {0} arc-sec^(2)".format(source_size_u[key]))
+         if source_rms_q[key] != "undefined":
+            msg_out( "  RMS of Q within source area = {0} pW".format(source_rms_q[key]))
+         else:
+            msg_out( "  RMS of Q within source area = <undefined>")
 
-            except starutil.AtaskError:
-               if ref == qmaps[key]:
-                  ref = "!"
-               del umaps[key]
-               del qmaps[key]
+         if source_rms_u[key] != "undefined":
+            msg_out( "  RMS of U within source area = {0} pW".format(source_rms_u[key]))
+         else:
+            msg_out( "  RMS of U within source area = <undefined>")
 
-         except starutil.AtaskError:
-            del qmaps[key]
+      else:
+         msg_out( "  These maps appear to be for a far away object ({0}) "
+                  "and will not be included in the coadd.".format(obj))
+         badkeys.append( key )
+
+#  Remove any bad maps so they are not included in the coadd.
+   for key in badkeys:
+      del qmaps[key]
+      del umaps[key]
 
 #  If required, dump the stats for the individual observations to a text
 #  file, formatted in topcat "ascii" format.
@@ -1296,6 +1445,7 @@ try:
 except starutil.StarUtilError as err:
 #  raise
    print( err )
+   print( "See the end of the log file ({0}) for further details.".format(starutil.logfile) )
    cleanup()
 
 # This is to trap control-C etc, so that we can clean up temp files.
