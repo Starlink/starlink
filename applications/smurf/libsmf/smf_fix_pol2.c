@@ -50,6 +50,11 @@
 *        20150716/00021 when in fact there were none.
 *     3-FEB-2016 (DSB):
 *        Report error if HWP is not rotating.
+*     13-SEP-2016 (DSB):
+*        If unexpected featurs are found, issue a warning rather than
+*        reporting an error. Also set POLANG values bad that occur after the
+*        unexpected feature, so that the data prior to the unexpected
+*        feature can be used.
 
 *  Copyright:
 *     Copyright (C) 2012 Science and Technology Facilities Council.
@@ -102,6 +107,7 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
    dim_t ijump;
    dim_t next_jump;
    dim_t njump;
+   dim_t ntgood;
    double *agaps;
    double *angles;
    double *pa;
@@ -152,6 +158,9 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
       angles = astMalloc( hdr->nframes*sizeof(*angles) );
       tgaps = astMalloc( hdr->nframes*sizeof(*tgaps) );
       agaps = astMalloc( hdr->nframes*sizeof(*agaps) );
+
+/* Initially, assume all time slices are good. */
+      ntgood = hdr->nframes;
 
 /* Loop round all frames. The "langle" variable is used to record the angle
    for the previous frame. The "rts_origin" value is the RTS_END value at
@@ -268,20 +277,21 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
    else happens, it is either a bug in this function, or something very
    strange in the data, so report an error. */
          } else if( newlag != curlag && *status == SAI__OK ) {
-            *status = SAI__ERROR;
-            errRepf( "", "smf_fix_pol2: Unexpected features found in the "
-                    "JCMTSTATE.POL_ANG array at RTS_NUM=%d.",
-                    status, (int) hdr->allState[iframe].rts_num );
+            ntgood = iframe - 1;
+
+            msgOutf( "", "WARNING: Unexpected feature found in the JCMTSTATE.POL_ANG "
+                     "array at RTS_NUM=%d. The remaining %zu time-slices will be ignored",
+                     status, (int) hdr->allState[iframe].rts_num, hdr->nframes - iframe );
             break;
          }
       }
 
 /* Now shuffle the POL_ANG values down to remove the accepted bonus values. */
-      if( njump > 0 ) {
+      if( njump > 0 || ntgood < hdr->nframes ) {
          state = wstate = hdr->allState;
          ijump = 0;
-         next_jump = jumps[ ijump ];
-         for( iframe = 0; iframe < hdr->nframes; iframe++,state++ ) {
+         next_jump = jumps ? jumps[ ijump ] : hdr->nframes + 1;
+         for( iframe = 0; iframe < ntgood; iframe++,state++ ) {
             if( iframe < next_jump ) {
                (wstate++)->pol_ang = state->pol_ang;
             } else {

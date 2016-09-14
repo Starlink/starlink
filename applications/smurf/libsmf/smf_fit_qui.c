@@ -149,6 +149,8 @@
 *        Added parameter "harmonic".
 *     30-MAY-2016 (DSB):
 *        Added parameter "odataf".
+*     14-SEP-2016 (DSB):
+*        Check consistently for bad POL_ANG values.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -316,7 +318,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    instate = hdr->allState;
    ntime = ( intslice > 1000 ) ? 1000 : intslice;
    for( itime = 0; itime < ntime; itime++,instate++ ) {
-      if( instate->pol_ang > 20 ) {
+      if( instate->pol_ang != VAL__BADD && instate->pol_ang > 20 ) {
          *status = SAI__ERROR;
          errRep( " ","   POL2 data contains POL_ANG values in encoder "
                  "units - connot fit to such old data.", status );
@@ -1348,7 +1350,7 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
    itime = 0;
    state = allstates;
    more = 1;
-   while( more && state->pol_ang > ang0 ) {
+   while( more && ( state->pol_ang == VAL__BADD || state->pol_ang > ang0 ) ) {
       if( ++itime == intslice ) more = 0;
       state++;
    }
@@ -1357,7 +1359,7 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
    with some sudden steps. When the HWP angle reaches 2*PI it wraps
    back round to zero. Find the first time slice for which the HWP
    angle is greater than PI (a safe value in the middle of the range). */
-   while( more && state->pol_ang <= ang0 ) {
+   while( more && ( state->pol_ang == VAL__BADD || state->pol_ang <= ang0 ) ) {
       if( ++itime == intslice ) more = 0;
       state++;
    }
@@ -1375,13 +1377,13 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
    while( 1 ) {
 
 /* Move on until the HWP angle wraps round back to zero. */
-      while( more && state->pol_ang > ang0 ) {
+      while( more && ( state->pol_ang == VAL__BADD || state->pol_ang > ang0 ) ) {
          if( ++itime == intslice ) more = 0;
          state++;
       }
 
 /* Move on until the HWP angle again exceeds PI. */
-      while( more && state->pol_ang <= ang0 ) {
+      while( more && ( state->pol_ang == VAL__BADD || state->pol_ang <= ang0 ) ) {
          if( ++itime == intslice ) more = 0;
          state++;
       }
