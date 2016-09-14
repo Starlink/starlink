@@ -971,6 +971,8 @@ try:
 #  If the shifts are suspiciously high, we do not believe them. In which
 #  case we cannot do pointing ocorrection when creating the Q and U maps.
                if abs(dx) > 5 or abs(dy) > 5:
+                  pointing_dx[key] = "null"
+                  pointing_dy[key] = "null"
                   msg_out( "WARNING: The I map created from the POL2 data cannot be aligned "
                            "with the supplied IP reference map. Therefore the final "
                            "Q and U maps cannot be corrected for pointing errors." )
@@ -1058,9 +1060,6 @@ try:
 #  Store the pointing corrections for inclusion in the obstable.
                   pointing_dx[key] = dx
                   pointing_dy[key] = dy
-               else:
-                  pointing_dx[key] = "null"
-                  pointing_dy[key] = "null"
 
 
 #  Convolve the supplied ip reference map to give it a beam that matches
