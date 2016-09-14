@@ -378,7 +378,7 @@ def calc_stats(ndf):
       sigma = get_task_par( "sigma", "stats" )
       source_rms = math.sqrt( mean*mean + sigma*sigma )
    else:
-      source_rms = "undefined"
+      source_rms = "null"
 
 #  Convert the source size from pixels to square arc-seconds.
    invoke("$KAPPA_DIR/ndftrace ndf={0}".format(ndf))
@@ -1058,6 +1058,10 @@ try:
 #  Store the pointing corrections for inclusion in the obstable.
                   pointing_dx[key] = dx
                   pointing_dy[key] = dy
+               else:
+                  pointing_dx[key] = "null"
+                  pointing_dy[key] = "null"
+
 
 #  Convolve the supplied ip reference map to give it a beam that matches
 #  the expected IP beam at the elevation of the supplied data.
@@ -1290,12 +1294,12 @@ try:
          msg_out( "  Number of bolometers contributing to U map = {0}".format(nbolo_used_u[key]))
          msg_out( "  Source area in Q = {0} arc-sec^(2)".format(source_size_q[key]))
          msg_out( "  Source area in U = {0} arc-sec^(2)".format(source_size_u[key]))
-         if source_rms_q[key] != "undefined":
+         if source_rms_q[key] != "null":
             msg_out( "  RMS of Q within source area = {0} pW".format(source_rms_q[key]))
          else:
             msg_out( "  RMS of Q within source area = <undefined>")
 
-         if source_rms_u[key] != "undefined":
+         if source_rms_u[key] != "null":
             msg_out( "  RMS of U within source area = {0} pW".format(source_rms_u[key]))
          else:
             msg_out( "  RMS of U within source area = <undefined>")
