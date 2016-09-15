@@ -299,6 +299,8 @@
 *        - Allow the IN parameter to be used to specify raw data, Q/U
 *        time-streams or Q/U maps.
 *        - Ignore duplicated input files specified within IN.
+*     15-SEP-2016 (DSB):
+*        - Store pointing corrections in FITS extensions of Q and U maps.
 '''
 
 import os
@@ -1191,6 +1193,27 @@ try:
                      infile.write( "{0}\n".format( qmaps[key] ) )
                      infile.write( "{0}\n".format( umaps[key] ) )
 
+#  Store the pointing corrections (if any) as FITS headers within the maps.
+                  if key in pointing_dx and pointing_dx[key] != "null":
+                     sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(1)'".
+                                  format(qmaps[key]))
+                     invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=POINT_DX "
+                            "edit=w value={1} comment=\"'{2} pointing correction [arcsec]'\""
+                            " position=! mode=interface".format(qmaps[key],pointing_dx[key],sym))
+                     invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=POINT_DX "
+                            "edit=w value={1} comment=\"'{2} pointing correction [arcsec]'\""
+                            " position=! mode=interface".format(umaps[key],pointing_dx[key],sym))
+
+                  if key in pointing_dy and pointing_dy[key] != "null":
+                     sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(2)'".
+                                  format(qmaps[key]))
+                     invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=POINT_DY "
+                            "edit=w value={1} comment=\"'{2} pointing correction [arcsec]'\""
+                            " position=! mode=interface".format(qmaps[key],pointing_dy[key],sym))
+                     invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=POINT_DY "
+                            "edit=w value={1} comment=\"'{2} pointing correction [arcsec]'\""
+                            " position=! mode=interface".format(umaps[key],pointing_dy[key],sym))
+
                except starutil.AtaskError:
                   if ref == qmaps[key]:
                      ref = "!"
@@ -1255,6 +1278,15 @@ try:
       nbolo_used_u[key] = float( get_fits_header( umaps[key], "NBOLOEFF" ) )
       obj = get_fits_header( qmaps[key], "OBJECT" )
 
+      if key not in pointing_dx:
+         pointing_dx[key] = get_fits_header( qmaps[key], "POINT_DX" )
+         if pointing_dx[key] == None:
+            pointing_dx[key] = "null"
+      if key not in pointing_dy:
+         pointing_dy[key] = get_fits_header( qmaps[key], "POINT_DY" )
+         if pointing_dy[key] == None:
+            pointing_dy[key] = "null"
+
 #  Calculate the expected NEFD. See:
 #     www.eaobservatory.org/jcmt/instrumentation/continuum/scuba-2/pol-2/
 #     www.eaobservatory.org/jcmt/instrumentation/continuum/scuba-2/calibration/
@@ -1303,6 +1335,10 @@ try:
          else:
             msg_out( "  RMS of U within source area = <undefined>")
 
+         if key in pointing_dx and pointing_dx[key] != "null" and key in pointing_dy and pointing_dy[key] != "null":
+            msg_out( "  Pointing correction = ( {0}, {1} ) arc-sec".
+                     format(pointing_dx[key],pointing_dy[key]))
+
       else:
          msg_out( "  These maps appear to be for a far away object ({0}) "
                   "and will not be included in the coadd.".format(obj))
@@ -1336,8 +1372,8 @@ try:
       fd.write("# NBOLO_U - Number of bolometers contributing to U map\n")
 
       if len( pointing_dx ) > 0:
-         fd.write("# DX - Pointing correction in azimuth (arc-sec))\n")
-         fd.write("# DY - Pointing correction in elevation (arc-sec))\n")
+         fd.write("# DX - Pointing correction in tracking longitude (arc-sec))\n")
+         fd.write("# DY - Pointing correction in tracking latitude (arc-sec))\n")
 
       fd.write("#\n")
       fd.write("# UT OBS SUBSCAN WVM NEFD_Q NEFD_U NEFD_EXP TIME SIZE_Q SIZE_U RMS_Q RMS_U NBOLO_Q NBOLO_U")
