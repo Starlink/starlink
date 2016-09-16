@@ -302,7 +302,9 @@
 *        - Ignore duplicated input files specified within IN.
 *     15-SEP-2016 (DSB):
 *        - Store pointing corrections in FITS extensions of Q and U maps.
-*        - Support IP reference maps in units of mJy/arcsec**2 etc.
+*     16-SEP-2016 (DSB):
+*        Mosaic per-osevration EXP_TIME and WEIGHTS extension NDFs and
+*        store in final out Q and U maps.
 '''
 
 import os
@@ -636,9 +638,8 @@ try:
             raise starutil.InvalidParameterError("IPREF map {0} has unsupported units {1}".
                                                  format(ipref, units) )
 
-         fcfhead = get_fits_header( ipref, "FCF" )
+         fcfhead = float( get_fits_header( ipref, "FCF" ))
          if fcfhead != None:
-            fcfhead = float(fcfhead)
             ratio = fcfhead/fcf
             if ratio < 0.5 or ratio > 2.0:
                msg_out("WARNING: IPREF map {0} has units {1} but the FCF header is {2} "
@@ -646,7 +647,6 @@ try:
                        format(ipref, units, fcfhead, fcf) )
             fcf = fcfhead
 
-         parsys["IPFCF"].prompt = "FCF to convert IPREF map from {0} to pW".format(units)
          parsys["IPFCF"].default = fcf
          fcf = parsys["IPFCF"].value
 
@@ -1425,21 +1425,45 @@ try:
          fd.write("\n")
       fd.close()
 
-#  All observation chunks have now been mapped, so we coadd them (if we have more than one).
+#  All observation chunks have now been mapped. If we have only one
+#  observation just copy it to the output maps.
    if len(qmaps) == 1:
       key = qmaps.keys()[0]
       invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(qmaps[key],qmap))
       invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(umaps[key],umap))
 
+#  If we have more than one observation, coadd them. Also coadd the
+#  extension NDFs (EXP_TIMES and WEIGHTS), but without normalisation so
+#  that the coadd is the sum rather than the mean of the inputs.
    elif len(qmaps) > 1:
       msg_out("Coadding Q and U maps from all observations")
       allmaps = NDG( qmaps.values() )
       invoke("$KAPPA_DIR/wcsmosaic in={0} out={1} lbnd=! ref=! "
              "conserve=no method=bilin variance=yes".format(allmaps,qmap))
+
+      invoke("$KAPPA_DIR/erase object={{{0}}}.more.smurf.exp_time ok=yes".format(qmap))
+      invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.exp_time lbnd=! ref=! "
+             "out={{{1}}}.more.smurf.exp_time conserve=no method=bilin norm=no "
+             "variance=no".format(allmaps,qmap))
+
+      invoke("$KAPPA_DIR/erase object={{{0}}}.more.smurf.weights ok=yes".format(qmap))
+      invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.weights lbnd=! ref=! "
+             "out={{{1}}}.more.smurf.weights conserve=no method=bilin norm=no "
+             "variance=no".format(allmaps,qmap))
+
       allmaps = NDG( umaps.values() )
       invoke("$KAPPA_DIR/wcsmosaic in={0} out={1} lbnd=! ref=! "
              "conserve=no method=bilin variance=yes".format(allmaps,umap))
 
+      invoke("$KAPPA_DIR/erase object={{{0}}}.more.smurf.exp_time ok=yes".format(umap))
+      invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.exp_time lbnd=! ref=! "
+             "out={{{1}}}.more.smurf.exp_time conserve=no method=bilin norm=no "
+             "variance=no".format(allmaps,umap))
+
+      invoke("$KAPPA_DIR/erase object={{{0}}}.more.smurf.weights ok=yes".format(umap))
+      invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.weights lbnd=! ref=! "
+             "out={{{1}}}.more.smurf.weights conserve=no method=bilin norm=no "
+             "variance=no".format(allmaps,umap))
 
 
 #  Create the polarised intensity map if required.
