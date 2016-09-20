@@ -305,6 +305,8 @@
 *     16-SEP-2016 (DSB):
 *        Mosaic per-osevration EXP_TIME and WEIGHTS extension NDFs and
 *        store in final out Q and U maps.
+*     20-SEP-2016 (DSB):
+*        Report an error if any of the input maps has no quality array.
 '''
 
 import os
@@ -347,6 +349,19 @@ def cleanup():
 #  stored in the Quality array of the supplied NDF. The
 def calc_stats(ndf):
 
+#  Get info about the supplied NDF.
+   invoke("$KAPPA_DIR/ndftrace ndf={0}".format(ndf))
+   pixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ))
+   lbnd1 = int( get_task_par( "lbound(1)", "ndftrace" ) )
+   ubnd1 = int( get_task_par( "ubound(1)", "ndftrace" ) )
+   lbnd2 = int( get_task_par( "lbound(2)", "ndftrace" ) )
+   ubnd2 = int( get_task_par( "ubound(2)", "ndftrace" ) )
+
+#  Can't do this if no quality.
+   if not get_task_par( "quality", "ndftrace"):
+      raise starutil.InvalidParameterError("Supplied map {0} has no "
+               "Quality array.".format( ndf ) )
+
 #  We want the noise at the centre of the map because we want it to be
 #  comparable to the noise used in the expected NEFD calculations. But it
 #  is hard to calculate the noise at the centre because of the presence of
@@ -387,17 +402,11 @@ def calc_stats(ndf):
       source_rms = "null"
 
 #  Convert the source size from pixels to square arc-seconds.
-   invoke("$KAPPA_DIR/ndftrace ndf={0}".format(ndf))
-   pixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ))
    source_size *= (pixsize*pixsize)
 
 #  If any of the pixel axes do not encompass the origin, it probably means
 #  that the observation was for some other field other than the one covered
 #  by the reference IP map.
-   lbnd1 = int( get_task_par( "lbound(1)", "ndftrace" ) )
-   ubnd1 = int( get_task_par( "ubound(1)", "ndftrace" ) )
-   lbnd2 = int( get_task_par( "lbound(2)", "ndftrace" ) )
-   ubnd2 = int( get_task_par( "ubound(2)", "ndftrace" ) )
    if lbnd1*ubnd1 > 0 or lbnd2*ubnd2 > 0:
       bad = True
    else:
