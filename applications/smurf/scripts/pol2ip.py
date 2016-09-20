@@ -112,7 +112,8 @@
 *        The path to  a text file listing the POL2 observations to use.
 *        Each line should contain a string of the form "<ut>/<obs>", where
 *        <ut> is the 8 digit UT date (e.g. "20151009") and <obs> is the 5
-*        digit observation number (e.g. "00034"). The raw data for all
+*        digit observation number (e.g. "00034"). Blank lines and lines
+*        starting with "#" are ignored. The raw data for all
 *        observations is expected to reside in a directory given by
 *        environment variable "SC2", within subdirectories with paths
 *        of the form: $SC2/s8a/20150918/00056/ etc.
@@ -191,9 +192,11 @@
 *        negative, and are stored in a file called "beamfit.asc".
 *     17-JUN-2016 (DSB):
 *        - Scale errors on Q and U so that the weights are of order unity.
-*        - Reduce maximize convergence criterion from 1E-4 to 1-E-5 as 
-*        otherwise the fit to the Uranus data terminates too early, and 
+*        - Reduce maximize convergence criterion from 1E-4 to 1-E-5 as
+*        otherwise the fit to the Uranus data terminates too early, and
 *        produces a poor fit
+*     20-SEP-2016 (DSB):
+*        Ignore blank lines and comments in OBSLIST file.
 *-
 '''
 
@@ -533,8 +536,13 @@ try:
       if not os.path.isfile(obslist_file):
          raise UsageError("obslist file ({0}) does not exist.".
                format(obslist_file) )
+
+      obslist = []
       with open(obslist_file) as f:
-         obslist = f.read().splitlines()
+         for line in f:
+            line = line.strip()
+            if line and not line.startswith("#"):
+               obslist.append( line )
 
 #  Get the I reference map.
       iref = parsys["IREF"].value
