@@ -341,7 +341,7 @@ def cleanup():
 #  A function to calculate the following threee statistics from the
 #  supplied Q or U map:
 #     1 - The estimated noise level at the map centre in pW (based on the
-#         NDF Variance array). Returned as zero if the map appears to be
+#         NDF Variance array). Returned as -1.0 if the map appears to be
 #         for a different source.
 #     2 - The source size in square arc-seconds.
 #     3 - The RMS value of the source in pW.
@@ -464,7 +464,7 @@ def calc_stats(ndf):
 #  Correct the returned noise value.
       noise *= math.sqrt(back_exptime/centre_exptime)
    else:
-      noise = 0.0
+      noise = -1.0
 
    return ( noise, source_size, source_rms )
 
@@ -726,7 +726,7 @@ try:
       msg_out( "WARNING: The following inappropriate input data files are "
                "being ignored: " )
       with open( junks ) as f:
-         print f.read()
+         msg_out( f.read() )
       msg_out( " ")
 
 #  Initialise the list of all Stokes time-series files to be processed by
@@ -1344,7 +1344,7 @@ try:
 #  Background noise, source size, mean source value...
       (noise_q, source_size_q[key], source_rms_q[key] ) = calc_stats( qmaps[key] )
       (noise_u, source_size_u[key], source_rms_u[key] ) = calc_stats( umaps[key] )
-      if noise_q > 0.0 and noise_u > 0.0:
+      if noise_q >= 0.0 and noise_u >= 0.0:
 
 #  Calculate the NEFDs based on the measured noises.
          nefd_q[key] = fcf*noise_q*math.sqrt(elapsed_time[key]*c)
@@ -1377,7 +1377,7 @@ try:
                      format(pointing_dx[key],pointing_dy[key]))
 
       else:
-         msg_out( "  These maps appear to be for a far away object ({0}) "
+         msg_out( "  This observation appears to be for a far away object ({0}) "
                   "and will not be included in the coadd.".format(obj))
          badkeys.append( key )
 
