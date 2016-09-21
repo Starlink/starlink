@@ -17,6 +17,7 @@ Statistics::Descriptive
 Image::ExifTool
 Number::Interval
 Number::Range
+LWP::Protocol::https
 Astro::FITS::CFITSIO
 ExtUtils::F77
 Astro::SLA
