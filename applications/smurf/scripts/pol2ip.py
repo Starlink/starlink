@@ -33,16 +33,19 @@
 *     Q_original and U_original. All (Q,U) values use the focal plane Y
 *     axis as the reference direction.
 *
-*     The "PL1" IP model is as follows ("el" = elevation in radians):
+*     The "PL2" IP model is as follows ("el" = elevation in radians):
 *
 *        p1 = A + B*el + C*el*el
-*        Qn = I*p1*cos(-2*el)
-*        Un = I*p1*sin(-2*el)
+*        Qn = I*p1*cos(-2*(el-D))
+*        Un = I*p1*sin(-2*(el-D))
 *
-*     It is parameterised by three constants A, B and C, which are
+*     It is parameterised by four constants A, B, C and D, which are
 *     calculated by this script.  It represents an instrumental
 *     polarisation that varies in size with elevation but is always
-*     parallel to elevation.
+*     at a fixed angle (D radians) from the elevation axis.
+*
+*     The PL2 model replaces the earlier PL1 model. The difference is
+*     that the D constant was fixed at zero in the PL1 model.
 
 *  Usage:
 *     pol2ip obslist iref [diam] [pixsize]
@@ -197,6 +200,10 @@
 *        produces a poor fit
 *     20-SEP-2016 (DSB):
 *        Ignore blank lines and comments in OBSLIST file.
+*     21-SEP-2016 (DSB):
+*        Updated the model from PL1 to PL2. PL2 allows the IP to be at a
+*        fixed angle relative to the elavation axis. The PL1 model forced
+*        the IP to be parallel to the elevation axis.
 *-
 '''
 
@@ -405,11 +412,11 @@ def model( i, x ):
    return model2( elist[i], x )
 
 def model2( el, x ):
-   (a,b,c) = x
+   (a,b,c,d) = x
    elval = radians( el )
    pi = a + b*elval + c*elval*elval
-   qfp = ival*pi*cos( -2*elval )
-   ufp = ival*pi*sin( -2*elval )
+   qfp = ival*pi*cos( -2*( elval - d ) )
+   ufp = ival*pi*sin( -2*( elval - d ) )
    return (qfp, ufp)
 
 #  Objective function used by minimisation routine. It returns the
@@ -1058,7 +1065,7 @@ try:
 
 #  Initial guess at model parameters (a constant 1% IP parallel to
 #  elevation).
-         x0 = np.array([0.01,0.0,0.0])
+         x0 = np.array([0.01,0.0,0.0,0.0])
 
 #  Do a fit to find the optimum model parameters.
          res = minimize( objfun, x0, method='nelder-mead',
@@ -1077,8 +1084,8 @@ try:
          reject( False, 2*urms, res.x )
 
 #  Display results.
-      (a,b,c) = res.x
-      msg_out("\n\nA={0} B={1} C={2}".format(a,b,c))
+      (a,b,c,d) = res.x
+      msg_out("\n\nA={0} B={1} C={2} D={3} ({4} degrees)".format(a,b,c,d,degrees(d)))
       msg_out("Q RMS = {0} pW  U RMS = {1} pW\n".format(qrms,urms))
       msg_out("Qn RMS = {0}   Un RMS = {1} \n".format(qrms/ival,urms/ival))
 
@@ -1132,7 +1139,7 @@ try:
       fd.write("# Total intensity value = {0} pW\n".format(ival))
       fd.write("#\n")
       if dofit:
-         fd.write("# A={0} B={1} C={2}\n".format(a,b,c))
+         fd.write("# A={0} B={1} C={2} D={3} ({4} degrees)\n".format(a,b,c,d,degrees(d)))
          fd.write("# Q RMS = {0} pW  U RMS = {1} pW\n".format(qrms,urms))
          fd.write("# Qn RMS = {0}   Un RMS = {1} \n".format(qrms/ival,urms/ival))
          fd.write("#\n")
