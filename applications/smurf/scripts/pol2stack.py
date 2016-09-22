@@ -15,6 +15,10 @@
 *  Description:
 *     This script combines multiple Q, U and I images and creates a
 *     vector catalogue from them.
+*
+*     By default, the Q, U, I and PI catalogue values, together with the
+*     maps specified by parameters "QUI" and "PI", are in units of
+*     Jy/beam (see parameter Jy).
 
 *  Usage:
 *     pol2stack inq inu ini cat pi [retain] [qui] [in] [msg_filter] [ilevel] [glevel]
@@ -76,8 +80,10 @@
 *        A group of input U maps. Only used if a null value is supplied for
 *        parameter IN.
 *     JY = _LOGICAL (Read)
-*        If TRUE, the output catalogue, and the output Q, U and I maps,
-*        will be in units of Jy. Otherwise they will be in units of pW. [False]
+*        If TRUE, the output catalogue, and the output Q, U, PI and I maps
+*        will be in units of Jy/beam. Otherwise they will be in units of pW
+*        (in this case, the I values will be scaled to take account of the
+*        different FCFs for POL-2 and non-POL-2 observations). [True]
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -149,6 +155,9 @@
 *        Add parameters INQ, INU and INI.
 *     29-FEB-2016 (DSB):
 *        Add parameter JY.
+*     22-SEP-2016 (DSB):
+*        - Change default for JY from False to True.
+*        - Change units from "Jy" to "Jy/beam".
 
 *-
 '''
@@ -215,8 +224,8 @@ try:
    params.append(starutil.ParNDG("IN", "The input container files holding Q, U and I images",
                                  None,noprompt=True))
 
-   params.append(starutil.Par0L("Jy", "Should units be converted from pW to Jy?",
-                 False, noprompt=True))
+   params.append(starutil.Par0L("Jy", "Should units be converted from pW to Jy/beam?",
+                 True, noprompt=True))
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
@@ -259,7 +268,7 @@ try:
 #  See statistical debiasing is to be performed.
    debias = parsys["DEBIAS"].value
 
-#  See if we should convert pW to Jy.
+#  See if we should convert pW to Jy/beam.
    jy = parsys["JY"].value
 
 #  Determine the waveband and get the corresponding FCF values with and
@@ -326,17 +335,17 @@ try:
    if jy:
       temp = NDG(1)
       invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(qmos,fcf1,temp ))
-      invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy".format(temp ))
+      invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy/beam".format(temp ))
       qmos = temp
 
       temp = NDG(1)
       invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(umos,fcf1,temp ))
-      invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy".format(temp ))
+      invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy/beam".format(temp ))
       umos = temp
 
       temp = NDG(1)
       invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(imos,fcf2,temp ))
-      invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy".format(temp ))
+      invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy/beam".format(temp ))
       imos = temp
 
 #  If output PI values are in pW, scale the I map to take account of the
