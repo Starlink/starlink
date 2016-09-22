@@ -33,6 +33,10 @@
 *
 *     Correction for instrumental polarisation is made only if a value
 *     is supplied for parameter IPREF.
+*
+*     By default, the Q, U, I and PI catalogue values, together with the
+*     maps specified by parameters "Q", "U" and "PI", are in units of
+*     Jy/beam (see parameter Jy).
 
 *  Usage:
 *     pol2scan in q u [cat] [ipref] [config] [pixsize] [qudir] [mapdir]
@@ -155,6 +159,12 @@
 *        values in this map are also used to calculate the percentage
 *        polarisation values stored in the output vector catalogue
 *        specified by parameter CAT. [!]
+*     JY = _LOGICAL (Read)
+*        If TRUE, the output catalogue, and the output maps specified by
+*        parameters "Q", "U" and "PI", will be in units of Jy/beam. Otherwise
+*        they will be in units of pW (in this case, the I values in the output
+*        catalogue will be scaled to take account of the different FCFs
+*        for POL-2 and non-POL-2 observations). [True]
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -211,6 +221,10 @@
 *         - DY: Pointing correction in elevation (arc-sec)
 *        The last two columns (DX and DY) are only created if parameter
 *        ALIGN is TRUE. [!]
+*     PI = NDF (Read)
+*        An output NDF in which to return the polarised intensity map.
+*        No polarised intensity map will be created if null (!) is
+*        supplied. [!]
 *     PIXSIZE = _REAL (Read)
 *        Pixel dimensions in the output Q and U maps, in arcsec. The default
 *        is 4 arc-sec for 850 um data and 2 arc-sec for 450 um data. []
@@ -229,10 +243,6 @@
 *        no value is specified for REF on the command line, it defaults
 *        to the value supplied for parameter IPREF. See also parameter
 *        ALIGN. []
-*     PI = NDF (Read)
-*        An output NDF in which to return the polarised intensity map.
-*        No polarised intensity map will be created if null (!) is
-*        supplied. [!]
 *     RETAIN = _LOGICAL (Read)
 *        Should the temporary directory containing the intermediate files
 *        created by this script be retained? If not, it will be deleted
@@ -307,6 +317,10 @@
 *        store in final out Q and U maps.
 *     20-SEP-2016 (DSB):
 *        Report an error if any of the input maps has no quality array.
+*     22-SEP-2016 (DSB):
+*        - Take account of the difference in POL2 and non-POL2 FCFs when
+*        calculating percentage polarisation values.
+*        - Add parameter JY.
 '''
 
 import os
@@ -553,6 +567,9 @@ try:
 
    params.append(starutil.Par0F("IPFCF", "FCF needed to convert IPREF map to pW"))
 
+   params.append(starutil.Par0L("Jy", "Should outputs be converted from pW to Jy/beam?",
+                 True, noprompt=True))
+
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
@@ -647,8 +664,9 @@ try:
             raise starutil.InvalidParameterError("IPREF map {0} has unsupported units {1}".
                                                  format(ipref, units) )
 
-         fcfhead = float( get_fits_header( ipref, "FCF" ))
+         fcfhead = get_fits_header( ipref, "FCF" )
          if fcfhead != None:
+            fcfhead = float( fcfhead )
             ratio = fcfhead/fcf
             if ratio < 0.5 or ratio > 2.0:
                msg_out("WARNING: IPREF map {0} has units {1} but the FCF header is {2} "
@@ -664,6 +682,28 @@ try:
          iprefpw = NDG(1)
          invoke("$KAPPA_DIR/cdiv in={0} scalar={1} out={2}".format(ipref,fcf,iprefpw) )
          ipref=iprefpw
+
+#  See if we should convert pW to Jy/beam.
+   jy = parsys["JY"].value
+
+#  Determine the waveband and get the corresponding FCF values with and
+#  without POL2 in the beam.
+   try:
+      filter = int( float( starutil.get_fits_header( indata[0], "FILTER", True )))
+   except NoValueError:
+      filter = 850
+      msg_out( "No value found for FITS header 'FILTER' in {0} - assuming 850".format(indata[0]))
+
+   if filter == 450:
+      fcf1 = 962.0
+      fcf2 = 491.0
+   elif filter == 850:
+      fcf1 = 725.0
+      fcf2 = 537.0
+   else:
+      raise starutil.InvalidParameterError("Invalid FILTER header value "
+             "'{0} found in {1}.".format( filter, indata[0] ) )
+
 
 #  The reference map that defines the required pixel grid in the Q/U maps.
    ref = parsys["REF"].value
@@ -1435,11 +1475,20 @@ try:
       fd.close()
 
 #  All observation chunks have now been mapped. If we have only one
-#  observation just copy it to the output maps.
+#  observation just copy it to the output maps. If we will be converting
+#  to Jy/beam, we need to use intermediate NDFs for the mosaics. Otherwise,
+#  we can put the mosaics into their final destinations.
+   if jy:
+      qmos = NDG(1)
+      umos = NDG(1)
+   else:
+      qmos = qmap
+      umos = umap
+
    if len(qmaps) == 1:
       key = qmaps.keys()[0]
-      invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(qmaps[key],qmap))
-      invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(umaps[key],umap))
+      invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(qmaps[key],qmos))
+      invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(umaps[key],umos))
 
 #  If we have more than one observation, coadd them. Also coadd the
 #  extension NDFs (EXP_TIMES and WEIGHTS), but without normalisation so
@@ -1448,32 +1497,56 @@ try:
       msg_out("Coadding Q and U maps from all observations")
       allmaps = NDG( qmaps.values() )
       invoke("$KAPPA_DIR/wcsmosaic in={0} out={1} lbnd=! ref=! "
-             "conserve=no method=bilin variance=yes".format(allmaps,qmap))
+             "conserve=no method=bilin variance=yes".format(allmaps,qmos))
 
-      invoke("$KAPPA_DIR/erase object={{{0}}}.more.smurf.exp_time ok=yes".format(qmap))
+      invoke("$KAPPA_DIR/erase object={{{0}}}.more.smurf.exp_time ok=yes".format(qmos))
       invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.exp_time lbnd=! ref=! "
              "out={{{1}}}.more.smurf.exp_time conserve=no method=bilin norm=no "
-             "variance=no".format(allmaps,qmap))
+             "variance=no".format(allmaps,qmos))
 
-      invoke("$KAPPA_DIR/erase object={{{0}}}.more.smurf.weights ok=yes".format(qmap))
+      invoke("$KAPPA_DIR/erase object={{{0}}}.more.smurf.weights ok=yes".format(qmos))
       invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.weights lbnd=! ref=! "
              "out={{{1}}}.more.smurf.weights conserve=no method=bilin norm=no "
-             "variance=no".format(allmaps,qmap))
+             "variance=no".format(allmaps,qmos))
 
       allmaps = NDG( umaps.values() )
       invoke("$KAPPA_DIR/wcsmosaic in={0} out={1} lbnd=! ref=! "
-             "conserve=no method=bilin variance=yes".format(allmaps,umap))
+             "conserve=no method=bilin variance=yes".format(allmaps,umos))
 
-      invoke("$KAPPA_DIR/erase object={{{0}}}.more.smurf.exp_time ok=yes".format(umap))
+      invoke("$KAPPA_DIR/erase object={{{0}}}.more.smurf.exp_time ok=yes".format(umos))
       invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.exp_time lbnd=! ref=! "
              "out={{{1}}}.more.smurf.exp_time conserve=no method=bilin norm=no "
-             "variance=no".format(allmaps,umap))
+             "variance=no".format(allmaps,umos))
 
-      invoke("$KAPPA_DIR/erase object={{{0}}}.more.smurf.weights ok=yes".format(umap))
+      invoke("$KAPPA_DIR/erase object={{{0}}}.more.smurf.weights ok=yes".format(umos))
       invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.weights lbnd=! ref=! "
              "out={{{1}}}.more.smurf.weights conserve=no method=bilin norm=no "
-             "variance=no".format(allmaps,umap))
+             "variance=no".format(allmaps,umos))
 
+#  If output PI and I values are in Jy, convert the Q, U and I maps to Jy
+#  and store in their final destimnation.
+   if jy:
+      invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(qmos,fcf1,qmap))
+      invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy/beam".format(qmap))
+
+      invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(umos,fcf1,umap ))
+      invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy/beam".format(umap))
+
+      if ipref == "!":
+         imap = NDG(1)
+         invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(ipref,fcf2,imap))
+         invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy/beam".format(imap))
+      else:
+         imap = None
+
+#  If output values are in pW, scale the IPREF map to take account of the
+#  difference in FCF with and without POL2 in the beam.
+   else:
+      if ipref == "!":
+         imap = NDG(1)
+         invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format( ipref, fcf2/fcf1, imap ))
+      else:
+         imap = None
 
 #  Create the polarised intensity map if required.
    if pimap:
@@ -1493,19 +1566,19 @@ try:
 #  is just equal to the polarised intensity image. This is needed because
 #  polpack:polvec uses the I value to normalise the Q and U values prior to
 #  calculating the polarised intensity and angle.
-      if ipref == "!":
+      if imap == None:
          if pimap:
-            ipref = pimap
+            imap = pimap
          else:
-            ipref = NDG(1)
+            imap = NDG(1)
             msg_out( "Generating an artificial total intensity image...")
             if debias:
                invoke( "$KAPPA_DIR/maths exp=\"'sign(sqrt(abs(fa)),fa)'\" "
                        "fa=\"'ia**2+ib**2-(va+vb)/2'\" ia={0} ib={1} out={2}".
-                       format(qmap,umap,ipref))
+                       format(qmap,umap,imap))
             else:
                invoke( "$KAPPA_DIR/maths exp=\"'sqrt(ia**2+ib**2)'\" ia={0} "
-                       "ib={1} out={2}".format(qmap,umap,ipref))
+                       "ib={1} out={2}".format(qmap,umap,imap))
 
 #  Ensure the Q U and I images all have the same bounds, equal to the
 #  overlap region between them. To get the overlap region, use MATHS to
@@ -1513,13 +1586,13 @@ try:
 #  which match the overlap area.
       tmp = NDG( 1 )
       invoke( "$KAPPA_DIR/maths exp=\"'ia+ib+ic'\" ia={0} ib={1} ic={2} out={3}".
-              format(qmap,umap,ipref,tmp) )
+              format(qmap,umap,imap,tmp) )
       qtrim = NDG( 1 )
       invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(qmap,tmp,qtrim) )
       utrim = NDG( 1 )
       invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(umap,tmp,utrim) )
       itrim = NDG( 1 )
-      invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(ipref,tmp,itrim) )
+      invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(imap,tmp,itrim) )
 
 #  The polarisation vectors are calculated by the polpack:polvec command,
 #  which requires the input Stokes vectors in the form of a 3D cube. Paste
