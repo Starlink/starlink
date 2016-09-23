@@ -1846,16 +1846,18 @@ importsky = 0
 #-----------------------------------------------------------------
 #  Name: 	ipmodel
 #  Type: 	string
-#  Default: 	"pl1"
+#  Default: 	"pl2"
 #  Purpose: 	Selects the Instrumental Polarisation model to use.
 #  Description: This parameter is only used when processing POL2 Q or U
 #               time-streams as created by SMURF:CALCQU, and if a value
 #               is supplied for ADAM parameter IPREF. It specifies the
 #               model to be used for IP corection. It can be "JK" for the
 #               Johnstone-Kennedy model based on analysis skydip data (see
-#               parameter "jkdata"), or "PL1" for the simpler model based
-#               on analysis of planet data (see parameter "pl1data").
-ipmodel = pl1
+#               parameter "jkdata"), "PL1" for the first model based
+#               on analysis of planet data (see parameter "pl1data"),
+#               or "PL2" for the second model based on analysis of planet
+#               data (see parameter "pl2data").
+ipmodel = pl2
 
 #-----------------------------------------------------------------
 #  Name: 	itermap
@@ -2298,6 +2300,28 @@ pad = <undef>
 #               as created by SMURF:CALCQU, and if parameter "ipmodel" is set
 #               to "PL1".
 pl1data = ( 3.288E-3, 2.178E-2, -1.156E-2 )
+
+
+#-----------------------------------------------------------------
+#  Name: 	pl2data
+#  Type: 	float[4]
+#  Default: 	( 4.021E-3, 2.263E-2, -1.243E-2, -3.361E-2 )
+#  Purpose: 	The numerical parameters of the PL2 IP model for POL2 data.
+#  Description: This should be a vector of four values. The first three are
+#               the coefficients of a quadratic polynomial that gives the
+#               fractional polarisation produced by instrumental polarisation,
+#               as a function of elevation (in radians):
+#
+#               fractional IP = A + B*elev + C*elev*elev
+#
+#               where the vector (A,B,C,D) is given by "pl1data". The
+#               fourth value (D) gives the angle between the IP and the
+#               elevation axis, in radians. The PL2 model assumes that the
+#               IP is at a constant angle to the elevation axis at all
+#               elevations (given by D). Only used when processing POL2 Q or
+#               U time-streams as created by SMURF:CALCQU, and if parameter
+#               "ipmodel" is set to "PL2".
+pl2data = ( 4.021E-3, 2.263E-2, -1.243E-2, -3.361E-2 )
 
 #-----------------------------------------------------------------
 #  Name: 	pln.notfirst

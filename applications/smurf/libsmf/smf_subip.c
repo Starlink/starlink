@@ -37,16 +37,21 @@
 *     map are multiplied by factors determined from the current elevation
 *     in a manner specified by config parameter "ipmodel", which can be
 *     either "JK" for the Johnstone-Kennedy model based on analysis of
-*     skydip data, or "PL1" for a simpler model based on analysis of
+*     skydip data, or "PL1" for the first model based on analysis of
+*     planet data, or "PL2" for the second model based on analysis of
 *     planet data. If "ipmodel" is "JK", then config parameter "jkdata"
 *     should be the path to the NDF holding the parameter values of the
 *     JK model. If "ipmodel" is "PL1", then config parameter "pl1data"
 *     should be coefficients of a quadratic polynomial that gives the
 *     fractional polarisation caused by the instrument as a function of
 *     elevation (the polarisation angle is assumed parallel to the elevation
-*     axis). The instrumental Q and U values determined in this way are then
-*     rotated to use the same reference direction as the Q/U bolometer values.
-*     The rotated corrections are then subtracted off the extinction-corrected
+*     axis). If "ipmodel" is "PL2", then config parameter "pl2data"
+*     should be coefficients of a quadratic polynomial that gives the
+*     fractional polarisation caused by the instrument as a function of
+*     elevation, and the offset between IP and the elevation axis, in radians.
+*     The instrumental Q and U values determined in this way are then rotated
+*     to use the same reference direction as the Q/U bolometer values. The
+*     rotated corrections are then subtracted off the extinction-corrected
 *     bolometer data (the extinction correction is removed before returning).
 
 *  Authors:
@@ -72,10 +77,12 @@
 *        Multi-thread the angle calculations.
 *     17-MAR-2016 (DSB):
 *        Fix data ordering bug in smf1_calcang.
+*     21-SEP-2016 (DSB):
+*        Added PL2 model.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2015 East Asian Observatory.
+*     Copyright (C) 2015, 2016 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -111,6 +118,10 @@
 #include "libsmf/smf_typ.h"
 #include "libsmf/smf_err.h"
 
+#define JK 0
+#define PL1 1
+#define PL2 2
+
 /* Prototypes for local static functions. */
 static void smf1_subip( void *job_data_ptr, int *status );
 static double *smf1_calcang( ThrWorkForce *wf, smfData *data, const char *trsys,
@@ -137,10 +148,11 @@ typedef struct smfSubIPData {
    double *ipang;
    double *p0data;
    double *p1data;
-   double *pl1data;
+   double *pldata;
    double *res_data;
    double *result;
    int *lut_data;
+   int model;
    int oper;
    size_t bstride;
    size_t tstride;
@@ -176,11 +188,12 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    double *ipang;
    double *p0data;
    double *p1data;
-   double pl1data[3];
+   double pldata[4];
    int angcndf;
    int c0ndf;
    int imapndf;
    int iw;
+   int model;
    int nmap;
    int nval;
    int nw;
@@ -333,6 +346,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
 
 /* If we are using the "JK" model.... */
          if( loc ) {
+            model = JK;
 
 /* Get a locator for the structure holding the IP parameters for the
    current subarray */
@@ -383,13 +397,19 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
                errRep( "", "smf_subip: Bad dimensions for ^N - should be 32x40.", status );
             }
 
-/* If using the "PL1" model... */
+/* If using the "PL1" or "PL2" model... */
          } else {
             p0data = NULL;
             p1data = NULL;
             c0data = NULL;
             angcdata = NULL;
-            astMapGet1D( keymap, "PL1DATA", 3, &nval, pl1data );
+            if( astChrMatch( ipmodel, "PL1" ) ) {
+               model = PL1;
+               astMapGet1D( keymap, "PL1DATA", 3, &nval, pldata );
+            } else {
+               model = PL2;
+               astMapGet1D( keymap, "PL2DATA", 4, &nval, pldata );
+            }
          }
 
 /* Get a pointer to the quality array for the residuals. */
@@ -428,7 +448,8 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
             pdata->c0data = c0data;
             pdata->angcdata = angcdata;
             pdata->allstate = data->hdr->allState;
-            pdata->pl1data = pl1data;
+            pdata->pldata = pldata;
+            pdata->model = model;
             pdata->oper = 1;
 
 /* Submit the job for execution by the next available thread. */
@@ -501,11 +522,13 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    double *imapdata;
    double *pa;
    double *pr;
+   double angle;
    double angc;
    double c0;
    double ca;
    double cb;
    double cc;
+   double cd;
    double cosval;
    double ival;
    double p0;
@@ -568,13 +591,17 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
                   ca = p0*cos( 2*angc*AST__DD2R );
                   cb = p0*sin( 2*angc*AST__DD2R );
                   cc = 2*( c0 + angc )*AST__DD2R;
+                  cd = 0.0;
 
-            } else {         /* "PL1" model */
+            } else {         /* "PL1" or "PL2" model */
                p1 = VAL__BADD;
-               ca = pdata->pl1data[0];
-               cb = pdata->pl1data[1];
-               cc = pdata->pl1data[2];
-               bad = ( ca == VAL__BADD || cb == VAL__BADD || cc == VAL__BADD );
+               ca = pdata->pldata[0];
+               cb = pdata->pldata[1];
+               cc = pdata->pldata[2];
+               cd = ( pdata->model == PL2 ) ? pdata->pldata[3] : 0.0;
+               bad = ( ca == VAL__BADD || cb == VAL__BADD ||
+                       cc == VAL__BADD || cd == VAL__BADD );
+
             }
 
 /* If any parameter is bad, flag the whole bolometer as unusable. */
@@ -621,10 +648,13 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
                         if( pdata->p0data ) {       /* "JK" model */
                            qfp = ca + p1*cos( cc + 2*state->tcs_az_ac2 );
                            ufp = cb + p1*sin( cc + 2*state->tcs_az_ac2 );
-                        } else {                    /* "PL1" model */
+                        } else {                    /* "PL1" or "PL2" model */
                            p1 = ca + cb*state->tcs_az_ac2 + cc*state->tcs_az_ac2*state->tcs_az_ac2;
-                           qfp = p1*cos( -2*state->tcs_az_ac2 );
-                           ufp = p1*sin( -2*state->tcs_az_ac2 );
+                           angle = state->tcs_az_ac2;
+                           if( pdata->model == PL2 ) angle -= cd;
+                           angle *= -2;
+                           qfp = p1*cos( angle );
+                           ufp = p1*sin( angle );
                         }
 
 /* Rotate them to match the reference frame of the supplied Q and U
