@@ -1499,32 +1499,32 @@ try:
       invoke("$KAPPA_DIR/wcsmosaic in={0} out={1} lbnd=! ref=! "
              "conserve=no method=bilin variance=yes".format(allmaps,qmos))
 
-      invoke("$KAPPA_DIR/erase object={{{0}}}.more.smurf.exp_time ok=yes".format(qmos))
+      invoke("$KAPPA_DIR/erase object={0}.more.smurf.exp_time ok=yes".format(qmos))
       invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.exp_time lbnd=! ref=! "
-             "out={{{1}}}.more.smurf.exp_time conserve=no method=bilin norm=no "
+             "out={1}.more.smurf.exp_time conserve=no method=bilin norm=no "
              "variance=no".format(allmaps,qmos))
 
-      invoke("$KAPPA_DIR/erase object={{{0}}}.more.smurf.weights ok=yes".format(qmos))
+      invoke("$KAPPA_DIR/erase object={0}.more.smurf.weights ok=yes".format(qmos))
       invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.weights lbnd=! ref=! "
-             "out={{{1}}}.more.smurf.weights conserve=no method=bilin norm=no "
+             "out={1}.more.smurf.weights conserve=no method=bilin norm=no "
              "variance=no".format(allmaps,qmos))
 
       allmaps = NDG( umaps.values() )
       invoke("$KAPPA_DIR/wcsmosaic in={0} out={1} lbnd=! ref=! "
              "conserve=no method=bilin variance=yes".format(allmaps,umos))
 
-      invoke("$KAPPA_DIR/erase object={{{0}}}.more.smurf.exp_time ok=yes".format(umos))
+      invoke("$KAPPA_DIR/erase object={0}.more.smurf.exp_time ok=yes".format(umos))
       invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.exp_time lbnd=! ref=! "
-             "out={{{1}}}.more.smurf.exp_time conserve=no method=bilin norm=no "
+             "out={1}.more.smurf.exp_time conserve=no method=bilin norm=no "
              "variance=no".format(allmaps,umos))
 
-      invoke("$KAPPA_DIR/erase object={{{0}}}.more.smurf.weights ok=yes".format(umos))
+      invoke("$KAPPA_DIR/erase object={0}.more.smurf.weights ok=yes".format(umos))
       invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.weights lbnd=! ref=! "
-             "out={{{1}}}.more.smurf.weights conserve=no method=bilin norm=no "
+             "out={1}.more.smurf.weights conserve=no method=bilin norm=no "
              "variance=no".format(allmaps,umos))
 
 #  If output PI and I values are in Jy, convert the Q, U and I maps to Jy
-#  and store in their final destimnation.
+#  and store in their final destination.
    if jy:
       invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(qmos,fcf1,qmap))
       invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy/beam".format(qmap))
@@ -1532,7 +1532,7 @@ try:
       invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(umos,fcf1,umap ))
       invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy/beam".format(umap))
 
-      if ipref == "!":
+      if ipref != "!":
          imap = NDG(1)
          invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(ipref,fcf2,imap))
          invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy/beam".format(imap))
@@ -1542,7 +1542,7 @@ try:
 #  If output values are in pW, scale the IPREF map to take account of the
 #  difference in FCF with and without POL2 in the beam.
    else:
-      if ipref == "!":
+      if ipref != "!":
          imap = NDG(1)
          invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format( ipref, fcf2/fcf1, imap ))
       else:
