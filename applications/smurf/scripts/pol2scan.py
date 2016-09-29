@@ -321,6 +321,11 @@
 *        - Take account of the difference in POL2 and non-POL2 FCFs when
 *        calculating percentage polarisation values.
 *        - Add parameter JY.
+*     29-SEP-2016 (DSB):
+*        Relax the requirment for a "far away" object. An object is far
+*        away (and thus unusable) if its map has a pixel bound greater
+*        than 10000. This assumes that the required source is at the
+*        pixel origin.
 '''
 
 import os
@@ -418,10 +423,11 @@ def calc_stats(ndf):
 #  Convert the source size from pixels to square arc-seconds.
    source_size *= (pixsize*pixsize)
 
-#  If any of the pixel axes do not encompass the origin, it probably means
-#  that the observation was for some other field other than the one covered
-#  by the reference IP map.
-   if lbnd1*ubnd1 > 0 or lbnd2*ubnd2 > 0:
+#  If any of the pixel bounds look to be an unreasonably large way from
+#  the pixel origin, it probably means that the observation was for some
+#  other field other than the one covered by the reference IP map.
+   if ( abs(lbnd1) > 10000 or abs(lbnd2) > 10000 or
+        abs(ubnd1) > 10000 or abs(ubnd2) > 10000 ):
       bad = True
    else:
       bad= False
@@ -1425,6 +1431,10 @@ try:
    for key in badkeys:
       del qmaps[key]
       del umaps[key]
+
+#  Check some good maps remain to be processed.
+   if len(qmaps) == 0 or len(umaps) == 0:
+      raise starutil.InvalidParameterError("Do usable maps remains to be processed.")
 
 #  If required, dump the stats for the individual observations to a text
 #  file, formatted in topcat "ascii" format.
