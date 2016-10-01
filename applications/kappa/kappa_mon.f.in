@@ -35,8 +35,8 @@
 *     Copyright (C) 1992 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1997-1999, 2004 Central Laboratory of the
 *     Research Councils. Copyright (C) 2005-2006 Particle Physics &
-*     Astronomy Research Council.  Copyright (C) 2009 Science &
-*     Technology Facilities Council.  All Rights Reserved.
+*     Astronomy Research Council.  Copyright (C) 2009, 2012, 2016
+*     Science & Technology Facilities Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -124,6 +124,8 @@
 *        Use NDF_CANCL to cancel all newly active NDF parameters at the
 *        end of the monolith. This avoid such parameters causing warnings
 *        aboud dangling HDS locators.
+*     2016 September 30 (MJC):
+*        Invoke DSB's command-logging routine.
 *     {enter_further_changes_here}
 
 *-
@@ -673,6 +675,9 @@
 *  NDF itself).
          CALL NDG_ENDPV( 'KAPPA:'//NAME, STATUS )
 
+*  Log the task and its parameters to a log file specified by enviromnent
+*  variable KAPPA_LOG.
+         CALL KPS1_LGCMD( NAME, STATUS )
       END DO
 
 *  Note the current number of active GRP identifiers. Do this in a new

@@ -4,6 +4,14 @@
    changes are listed below.  For complete details of all
    changes, see the "Release Notes" appendix in SUN/95.
 
+2 General_changes
+   o  A log of KAPPA commands can now be written to a text file
+   specified by the environment variable KAPPA\_LOG.  The log lists
+   the application name and parameter values in separate headed lines.
+   Note that the format of the log may change to simple command lines
+   that could be replayed in a script.
+
+
 2 Modified_applications
 
    o CONTOUR
