@@ -1496,7 +1496,7 @@ try:
       umos = umap
 
    if len(qmaps) == 1:
-      key = qmaps.keys()[0]
+      key = list(qmaps)[0]
       invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(qmaps[key],qmos))
       invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(umaps[key],umos))
 
