@@ -3,6 +3,9 @@
 
   Show decimal degrees immediately when selected in the pick object toolbox.
 
+  The GAIA all source catalogue has been added to the standard Skycat
+  catalogues. Other versions are available using VO catalogues.
+
     Version 4.4-7
     =============
 
