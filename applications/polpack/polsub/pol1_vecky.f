@@ -287,6 +287,7 @@
 *  32 characters less the space and the value.
       IF ( UNITS .NE. ' ' ) THEN
          MXUNIT = 32 - KEYNC
+         CUNITS = CHR_LEN( UNITS )
 
 *  Append the data units to the key string.  Truncate the string if
 *  necessary, terminating with an ellipsis.  Otherwise just use the
