@@ -296,8 +296,11 @@
 *     12-SEP-2016 (DSB):
 *        - Added parameters OUTFILESI, OUTFILESQ and OUTFILESU.
 *        - If an error occurs processing a chunk (LSQFIT mode only),
-*        delete the corresponding output NDFs and continue to process 
+*        delete the corresponding output NDFs and continue to process
 *        any remaining chunks.
+*     6-OCT-2016 (DSB):
+*        Allow cleaned data to be exported by setting config parameter
+*        "exportclean", as for makemap.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -345,6 +348,7 @@
 #include "star/ndg.h"
 #include "star/atl.h"
 #include "star/hdspar.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -379,6 +383,7 @@ void smurf_calcqu( int *status ) {
    NdgProvenance *oprov;      /* Provenance to store in each output NDF */
    ThrWorkForce *wf;          /* Pointer to a pool of worker threads */
    char headval[ 81 ];        /* FITS header value */
+   char name[GRP__SZNAM+1];   /* Buffer for storing exported model names */
    char ndfname[ 30 ];        /* Name of output Q or U NDF */
    char northbuf[10];         /* Celestial system to use as ref. direction  */
    char polcrd[ 81 ];         /* FITS 'POL_CRD' header value */
@@ -635,7 +640,38 @@ void smurf_calcqu( int *status ) {
          }
 
 /* Now clean the bolometer data */
-         if( doclean ) smf_clean_smfArray( wf, concat, NULL, NULL, NULL, config, status );
+         if( doclean ) {
+            int exportclean;
+            smf_clean_smfArray( wf, concat, NULL, NULL, NULL, config, status );
+
+/* Export the cleaned data here if desired */
+            astMapGet0I( config, "EXPORTCLEAN", &exportclean );
+            if( exportclean ) {
+               msgOut( " ", "Writing out clean data prior to calculating "
+                       "Stokes parameters.", status );
+
+               for( idx=0; idx<concat->ndat; idx++ ) {
+                 int oldorder;
+                 data = concat->sdata[idx];
+
+                 /* create a file name with "_cln" suffix */
+                 smf_stripsuffix( concat->sdata[idx]->file->name,
+                                  SMF__DIMM_SUFFIX, name, status );
+                 one_strlcat( name, "_cln", SMF_PATH_MAX+1, status );
+
+                 /* Use the correct order */
+                 oldorder = concat->sdata[idx]->isTordered;
+                 smf_dataOrder( wf, concat->sdata[idx], 1, status );
+
+                 smf_write_smfData( wf, concat->sdata[idx], NULL,
+                                    name, NULL, 0, NDF__NOID,
+                                    MSG__VERB, 0, NULL, NULL, status );
+
+                 /* Revert the order */
+                 smf_dataOrder( wf, concat->sdata[idx], oldorder, status );
+               }
+            }
+         }
 
 /* If required correct for the POL2 triggering issue. */
          if( fix ) smf_fix_pol2( wf, concat, status );
