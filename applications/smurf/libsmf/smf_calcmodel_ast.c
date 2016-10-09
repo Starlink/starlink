@@ -154,6 +154,8 @@
 *     2014-8-20 (DSB):
 *        Move ast.filt_diff stuff into smf_iteratemap, so that it can be
 *        used by skyloop.
+*     2016-10-09 (DSB):
+*        Map based de-spiking was only being applied to the first sub-array. 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -297,12 +299,15 @@ void smf_calcmodel_ast( ThrWorkForce *wf,
   /* Despike if we have usable NOI values. */
   if( (mapspike > 0) && have_noi ) {
     size_t nflagged;
-    smf_map_spikes( wf, res->sdata[idx], noi->sdata[idx], lut->sdata[idx]->pntr[0],
-                    SMF__Q_GOOD, map, mapweight, hitsmap, mapvar, mapspike,
-                    &nflagged, status );
 
-    msgOutiff(MSG__VERB, "","   detected %zu new spikes relative to map\n",
-              status, nflagged);
+    for( idx=0; idx<res->ndat; idx++ ) {
+       nflagged = idx + 4*dat->iter + 32*dat->mdims[0];
+       smf_map_spikes( wf, res->sdata[idx], noi->sdata[idx], lut->sdata[idx]->pntr[0],
+                       SMF__Q_GOOD, map, mapweight, hitsmap, mapvar, mapspike,
+                       &nflagged, status );
+       msgOutiff(MSG__VERB, "","   subarray %zu: detected %zu new spikes relative to map\n",
+                 status, idx, nflagged);
+     }
   }
 
 
