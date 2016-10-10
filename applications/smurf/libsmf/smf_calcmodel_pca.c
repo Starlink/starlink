@@ -39,11 +39,6 @@
 *     strong components within the time streams that are correlated from
 *     bolometer to bolometer. It should usually be used as an alternative
 *     to the COM (common-mode) model.
-*
-*     Be warned - this model takes a long time to calculate.  Most of the
-*     time is spent doing the singular value decomposition. It may be
-*     possible to speed this up considerably by using the PLASMA project:
-*     see http://icl.cs.utk.edu/plasma/index.html.
 
 *  Authors:
 *     David Berry (JAC)
@@ -296,7 +291,7 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
 
 /* Obtain the required PCA components (i.e. the model values). */
             smf_clean_pca_chunks( wf, model->sdata[idx], pcalen, pcathresh,
-                                  0, kmap, status );
+                                  1, 0, kmap, status );
 
 /* Subtract the model from the original residuals. */
             for( iw = 0; iw < nw; iw++ ) {

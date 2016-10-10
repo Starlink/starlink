@@ -800,7 +800,8 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
                     int *status );
 
 void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
-                           double thresh, int sub, AstKeyMap *keymap, int *status );
+                           double thresh, int submean, int sub, AstKeyMap *keymap,
+                           int *status );
 
 void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
                          smfArray **noisemaps, smfArray **com, smfArray **gai,
