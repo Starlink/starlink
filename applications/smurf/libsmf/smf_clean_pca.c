@@ -97,6 +97,12 @@
 *        quality array
 *     2015-06-15 (DSB):
 *        Add argument "sub".
+*     2015-10-10 (DSB):
+*        Determine the PCA components from the left hand singular vectors 
+*        (U) found by smf_svd rather than the right hand (V). U and V should
+*        be the same (because the co-variance matrix is symetric), but U 
+*        seems to be less prone to changes as you change the number of 
+*        threads.
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
@@ -311,7 +317,8 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
 
       for( j=0; j<ngoodbolo; j++ ) { /* loop over bolo */
 
-        u = gsl_matrix_get( cov, j, i );
+        u = gsl_matrix_get( cov, i, j );  /* U should be equal to V, so
+                                             use (V^T)^T (i.e. cov^T) as U */
 
         /* Calculate the vector. Note that t1 and t2 are absolute time
            pointers into the master data array, but comp only contains a
@@ -433,7 +440,6 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   size_t step;            /* step size for job division */
   size_t tlen;            /* Length of the time-series used for PCA */
   size_t tstride;         /* time slice stride */
-  gsl_matrix *u=NULL;     /* orthogonal square matrix for SVD */
   gsl_vector *work=NULL;  /* workspace for SVD */
 
   if (*status != SAI__OK) return;
@@ -555,7 +561,6 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   comp = astCalloc( ngoodbolo*tlen, sizeof(*comp) );
   cov = gsl_matrix_alloc( ngoodbolo, ngoodbolo );
   s = gsl_vector_alloc( ngoodbolo );
-  u = gsl_matrix_alloc( ngoodbolo, ngoodbolo );
   work = gsl_vector_alloc( ngoodbolo );
 
   /* These strides will make comp time-ordered */
@@ -675,20 +680,20 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     }
   }
 
-  /* Factor cov = u s v^T, noting that the SVD routine calculates v in
+  /* Factor cov = u s v^T, noting that the SVD routine calculates v^T in
      in-place of cov. --------------------------------------------------------*/
 
   msgOutif( MSG__VERB, "", FUNC_NAME
             ": perfoming singular value decomposition...", status );
 
-  smf_svd( wf, ngoodbolo, cov->data, s->data, u->data, 10*VAL__EPSD,
+  smf_svd( wf, ngoodbolo, cov->data, s->data, NULL, 10*VAL__EPSD,
            1, status );
   if( CHECK ) {
     double check=0;
 
     for( i=0; i<ngoodbolo; i++ ) {
       for( j=0; j<ngoodbolo; j++ ) {
-        check += gsl_matrix_get( u, i, j );
+        check += gsl_matrix_get( cov, j, i );
       }
     }
 
@@ -708,7 +713,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   if( *status == SAI__OK ) {
     for( ii=0; ii<nw; ii++ ) {
       pdata = job_data + ii;
-      pdata->cov = u;
+      pdata->cov = cov;
       pdata->operation = 1;
       pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata, smfPCAParallel,
                                  0, NULL, status );
@@ -1113,7 +1118,6 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   goodbolo = astFree( goodbolo );
   if( cov ) gsl_matrix_free( cov );
   if( s ) gsl_vector_free( s );
-  if( u ) gsl_matrix_free( u );
   if( work ) gsl_vector_free( work );
 
   if( job_data ) {
