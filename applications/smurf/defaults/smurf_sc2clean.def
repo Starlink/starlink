@@ -68,7 +68,7 @@ cleandk.badfrac = 0.05
 cleandk.compreprocess = 0
 cleandk.dcfitbox = 30
 cleandk.dclimcorr = 10
-cleandk.dcmaxsteps = 10
+cleandk.dcmaxsteps = 4
 cleandk.dcsmooth = 50
 cleandk.dcthresh = 25.0
 cleandk.deconvmce = 0
@@ -490,15 +490,15 @@ dclimcorr = 0
 #-----------------------------------------------------------------
 #  Name: 	dcmaxsteps
 #  Type: 	integer
-#  Default: 	10
+#  Default: 	4
 #  Purpose: 	Control the cleaning of DC steps in bolometer time streams
 #  Description: The maximum number of steps that can be corrected in each
-#		minute of good data (i.e. per 12000 samples) from a bolometer
-#		before the entire bolometer is flagged as bad. A value of
-#		zero will cause a bolometer to be rejected if any steps are
-#		found in the bolometer data stream. Only used if parameter
-#		"dcfitbox" is non-zero.
-dcmaxsteps = 10
+#		minute of good data (taking any down-sampling into account)
+#               from a bolometer before the entire bolometer is flagged as
+#               bad. A value of zero will cause a bolometer to be rejected
+#               if any steps are found in the bolometer data stream. Only
+#               used if parameter "dcfitbox" is non-zero.
+dcmaxsteps = 4
 
 #-----------------------------------------------------------------
 #  Name: 	dcsmooth

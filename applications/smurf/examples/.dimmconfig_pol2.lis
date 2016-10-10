@@ -36,17 +36,17 @@
 
 
 #  Use PCA to model and remove the  background polarisation.
-   modelorder=(pca,ext,ast,noi)
+   modelorder = (pca,ext,ast,noi)
 
 #  Time based despiking.
-   spikebox=10
-   spikethresh=5
+   spikebox = 10
+   spikethresh = 5
 
 #  POL" scans are very slow, so avoid flagging slow samples.
    flagslow = 0.01
 
 #  Aggreive noise clipping.
-   noisecliphigh=3
+   noisecliphigh = 3
 
 #  The data has already been downsampled by CALCQU, so don't  do any more
 #  down sampling.
@@ -54,5 +54,9 @@
 
 #  Weight bolometers using the RMS residuals calculated by CALQU and
 #  stored i nthe variance component of the CALCQU output NDFs.
-   noi.usevar=1
+   noi.usevar = 1
 
+#  Use smaller boxes when finding DC steps because of the very low sample
+#  rate of POL2 Stokes vector time-series created by calcqu.
+   dcfitbox = 5
+   dcsmooth = 10

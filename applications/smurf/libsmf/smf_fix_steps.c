@@ -38,10 +38,10 @@
 *        smallish (say 40).
 *     dcmaxsteps = int (Given)
 *        The maximum number of steps that can be corrected in each minute
-*        of good data (i.e. per 12000 samples) from a bolometer before the
-*        entire bolometer is flagged as bad. A value of zero will cause a
-*        bolometer to be rejected if any steps are found in the bolometer
-*        data stream.
+*        of good data (taking into account the data step-time) from a
+*        bolometer before the entire bolometer is flagged as bad. A value
+*        of zero will cause a bolometer to be rejected if any steps are
+*        found in the bolometer data stream.
 *     dclimcorr = int (Given)
 *        The detection threshold for steps that occur at the same time in
 *        many bolometers. Set it to zero to suppress checks for correlated
@@ -215,10 +215,34 @@
 *        hundred samples) get handled better.
 *     9-DEC-2011 (DSB):
 *        Added mean shift filter option.
+*     7-OCT-2011 (DSB):
+*        Several of the constants used in this algorithm assume a fixed
+*        sample. In pratice, sample rates vary because of down-sampling
+*        etc. In particular, the sample rate for time-streams holding
+*        POL-2 Stokes parameters (produced by calcqu) is 2 Hz, very much
+*        lower than normal SCUBA-2 maps. The usual constant values are
+*        inappropriate for this is very low sample rate and cause lots of
+*        problems in the step-fixing algorithm. So we need to change the
+*        constants to take the actual sample rate into account. But such
+*        a change could cause potentially important changes to appear in
+*        normal SCUBA_2 maps, which would require a long investigation to
+*        evaluate. We should maybe do this some day, but at he moment the
+*        top priority is getting POL-2 working. So today's code change
+*        only changes the constants for data at sample rates below 20 Hz
+*        (corresponding to a scan speed of 80 arcsec/sec for 4 arcsec
+*        pixels). This should fix the problems for POL-2 but leave normal
+*        SCUBA-2 maps unchanged. The values affected are dcfill, dcmaxwidth,
+*        dcsmooth2, dcnlow, dcpeakoff, dcpeakwidth, dcpeakminwidth. In
+*        addition the dcmaxsteps value is also scaled, but this has to be
+*        applied at all sample rates since it is a configuration parameter
+*        and not defined locally. The scaling of dcmaxsteps leaves the
+*        value unchanged for a sample rate of 80 Hz (a scan speed of 320
+*        arcsec/sec at 4 arcsec pixels).
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2016 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -315,6 +339,9 @@ typedef struct Step {
 
 } Step;
 
+
+#define RECORDED_BOLO 1076
+
 #ifdef DEBUG_STEPS
 
 #ifdef RECORDED_BOLO
@@ -369,7 +396,8 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
                                size_t tstride, double *median, double *snr,
                                dim_t dcfitbox, double dcthresh2,
                                int nbstep, Step *bsteps, int ibolo,
-                               int meanshift, smfStepFix **steps, int *nsteps,
+                               int meanshift, double steptime,
+                               smfStepFix **steps, int *nsteps,
                                double *grad, double *off, int *bcount,
                                int *status );
 
@@ -465,6 +493,12 @@ void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
       *status = SAI__ERROR;
       errRep( "", "smf_fix_steps: smfData does not contain a DATA component",
               status );
+
+/* Report an error if no header is available. */
+   } else if( !data->hdr ) {
+      *status = SAI__ERROR;
+      errRep( "", "smf_fix_steps: smfData does not contain a header",
+              status );
    }
 
 /* Get the data dimensions and strides. */
@@ -486,6 +520,36 @@ void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
       msgSetd( "DCTHRESH", dcthresh );
       errRep( " ", "smf_fix_steps: Can't find jumps: dcthresh "
               "(^dcthresh) must be > 0", status );
+   }
+
+
+/* Scale algorithm parameters that are defind as a number of samples to
+   take account of the actual scan speed. The initial values set above
+   have been shown to be appropriate for "typcal" SCUBA-2 maps, but POL-2
+   uses a much lower scan speed and so the above values are inappropriate.
+   We scale the initalised values so that they are unchanged for  scan
+   speed of 320 arcsec/sec (a value representative of non-POL2 data).
+   This means that the scaling should have minimal effect on the
+   established behaviour of this function for normal SCUBA-2 maps.
+   To ensure that normal SCUBA-2 maps are left unchanged, we only do the
+   scaling for sample rates below 20 Hz (i.e. scan speeds below 80
+   arcsec/sec assuming 4 arcsec pixels). */
+   if( 1.0/data->hdr->steptime < 20.0 ) {
+
+/* The minimum number of samples between steps. Large differences that
+   are separated by less than "dcfill" samples are considered to be part of
+   the same jump. */
+      dcfill = (int)( 0.5 + dcfill/(320.0*data->hdr->steptime ) );
+      if( dcfill < 3 ) dcfill = 3;
+
+/* The maximum width of a step. Candidate steps that are wider than this
+   number of samples are left uncorrected. */
+      dcmaxwidth = 2*dcfill;
+
+/* The size of the median filter to use when estimating the local RMS at
+   each point. */
+      dcsmooth2 = (int)( 0.5 + dcsmooth2/(320.0*data->hdr->steptime ) );
+      if( dcsmooth2 < 40 ) dcsmooth2 = 40;
    }
 
 /* Allocate a work array to hold the noise level in each bolometer. */
@@ -1314,6 +1378,7 @@ if( RECORD_BOLO ) {
             mbstep = smf1_correct_steps( ntslice, dat + base, qua + base,
                                          tstride, w1, w3, dcfitbox, dcthresh2,
                                          nbstep, bsteps, ibolo, meanshift,
+                                         data->hdr->steptime,
                                          (pdata->nstep)?&steps:NULL,
                                          (pdata->nstep)?&nstep:NULL,
                                          w4, w5, bcount, status );
@@ -1347,7 +1412,7 @@ if( RECORD_BOLO ) {
 
 
 /* Reject the whole bolometer if too many steps were fixed. */
-            maxsteps = dcmaxsteps*nsum/12000.0;
+            maxsteps = dcmaxsteps*nsum*data->hdr->steptime/60.0;
             if( maxsteps < 4 ) maxsteps = 4;
 
             if( dcmaxsteps > 0 && mbstep > maxsteps ) {
@@ -1448,9 +1513,9 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
                                size_t tstride, double *median, double *snr,
                                dim_t dcfitbox, double dcthresh2, int nbstep,
                                Step *bsteps, int ibolo, int meanshift,
-                               smfStepFix **steps, int *nsteps,
-                               double *grad, double *off, int *bcount,
-                               int *status ){
+                               double steptime, smfStepFix **steps,
+                               int *nsteps, double *grad, double *off,
+                               int *bcount, int *status ){
 /*
 *  Name:
 *     smf1_correct_steps
@@ -1464,8 +1529,9 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 *                             size_t tstride, double *median, double *snr,
 *                             dim_t dcfitbox, double dcthresh2, int nbstep,
 *                             Step *bsteps, int ibolo, int meanshift,
-*                             smfStepFix **steps, int *nsteps, double *grad,
-*                             double *off, int *bcount, int *status )
+*                             double steptime, smfStepFix **steps,
+*                             int *nsteps, double *grad, double *off,
+*                             int *bcount, int *status )
 
 *  Arguments:
 *     ntslice = dim_t (Given)
@@ -1500,6 +1566,8 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 *        An array of structures describing each candidate step.
 *     ibolo = int (Given)
 *        The index of the bolometer being fixed.
+*     steptime = double (Given)
+*        The time between samples, in seconds.
 *     meanshift = int (Given)
 *        If non-zero, smooth each bolometer times stream using a mean-shift
 *        filter before doing anything else. A mean-shift filter is an
@@ -1606,6 +1674,7 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
    smf_qual_t *pq2;
 
 /* Provate configuration parameters */
+   double dcnbox = 3.5;
    int dcnlow = 5;
    double dcsiglow = 8.0;
    int dcpeakoff = 20;
@@ -1619,6 +1688,15 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 
 /* Check inherited status */
    if( *status != SAI__OK ) return result;
+
+/* Change private configuration parameters for very slow scan speeds. */
+   if( 1.0/steptime < 20.0 ) {
+      dcnlow = 3;
+      dcpeakoff = 5;
+      dcpeakwidth = 15;
+      dcpeakminwidth = 2;
+      dcnbox = 1.5;
+   }
 
 /* Initialise other things. */
    pd = dat;
@@ -1931,7 +2009,7 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 /* Perform linear least squares fits to the median-smoothed data for a
    range of adjacent samples prior to the start of the step found above. */
          jhi = step_start - dcfitbox;
-         jlo = jhi - 3.5*dcfitbox;
+         jlo = jhi - dcnbox*dcfitbox;
          if( jlo < jlolim ) jlo = jlolim;
          jlo += 0.5*dcfitbox;
          if( jlo < jhi - 2 ) {
@@ -1976,7 +2054,7 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 /* Perform linear least squares fits to the median-smoothed data for a
    range of adjacent samples after to the step. */
          jlo = step_end + dcfitbox;
-         jhi = jlo + 3.5*dcfitbox;
+         jhi = jlo + dcnbox*dcfitbox;
          if( jhi > jhilim ) jhi = jhilim;
          jhi -= 0.5*dcfitbox;
 
@@ -2473,7 +2551,7 @@ if( RECORD_BOLO ) {
             mbstep = smf1_correct_steps( ntslice, dat + base, qua + base,
                                          tstride, w1, NULL, dcfitbox,
                                          dcthresh2, nbstep, bsteps, ibolo,
-                                         meanshift,
+                                         meanshift, data->hdr->steptime,
                                          (pdata->nstep)?&steps:NULL,
                                          (pdata->nstep)?&nstep:NULL,
                                          w4, w5, bcount, status );
