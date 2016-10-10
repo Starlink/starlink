@@ -104,10 +104,14 @@
 *     2013-12-02 (DSB):
 *        Changed so that it can be used on a smfData with no Quality
 *        array (e.g. the COM model).
+*     2016-10-07 (DSB):
+*        Reduce BOX and MINBOX and don't add any noise for very slow
+*        scans (e.g. POL-2).
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
 *     Copyright (C) 2010-2013 Science & Technology Facilities Council.
+*     Copyright (C) 2016 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -149,7 +153,7 @@
 
 /* Define the width of the patch used to determine the mean level and
    noise adjacent to each flagged block. The current value is pretty well
-   arbitrary. */
+   arbitrary. These values are scaled down for very slow scans. */
 #define BOX 20
 
 /* Define the minimum box size for which noise can be calculated. */
@@ -166,6 +170,8 @@ typedef struct smfFillGapsData {
   size_t b2;                    /* Index of last bolometer to be filledd */
   size_t bstride;               /* bolo stride */
   size_t tstride;               /* time slice stride */
+  int box;
+  int minbox;
   int pend;                     /* Last non-PAD sample */
   int pstart;                   /* First non-PAD sample */
   smf_qual_t *qua;              /* Pointer to quality array */
@@ -176,9 +182,8 @@ typedef struct smfFillGapsData {
 /* Prototype for the function to be executed in each thread. */
 static void smfFillGapsParallel( void *job_data_ptr, int *status );
 static void smf1_fillgap( double *data, int pstart, int pend, size_t tstride,
-                          int jstart, int jend, gsl_rng *r, int *status );
-
-
+                          int jstart, int jend, gsl_rng *r, int box, int minbox,
+                          int *status );
 
 void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
                     smf_qual_t mask, int *status ) {
@@ -190,6 +195,8 @@ void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
   dim_t nbolo;                  /* Number of bolos */
   dim_t ntslice;                /* Number of time slices */
   double *dat=NULL;             /* Pointer to bolo data */
+  int box;
+  int minbox;
   int fillpad;                  /* Fill PAD samples? */
   size_t bstride;               /* bolo stride */
   size_t pend;                  /* Last non-PAD sample */
@@ -212,6 +219,12 @@ void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
   if( !dat ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": smfData does not contain a DATA component",status);
+    return;
+  }
+
+  if( !data->hdr ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": smfData does not contain a header",status);
     return;
   }
 
@@ -264,6 +277,19 @@ void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
      executed. */
   type = gsl_rng_default;
 
+  /* We use smaller boxes for very slow scans (sample rates under 20 Hz).
+     For instance, POL-2 Stokes parameter data created by calcqu. Also,
+     we do not add noise for very slow scans, so set the random number
+     generator type NULL. */
+  if( 1.0/data->hdr->steptime < 20 ) {
+    box = BOX/2;
+    minbox = MINBOX/2;
+    type = NULL;
+  } else {
+    box = BOX;
+    minbox = MINBOX;
+  }
+
   /* Begin a job context. */
   thrBeginJobContext( wf, status );
 
@@ -275,7 +301,7 @@ void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
        structure. */
     pdata->ntslice = ntslice;
     pdata->dat = dat;
-    pdata->r = gsl_rng_alloc( type );
+    pdata->r = type ? gsl_rng_alloc( type ) : NULL;
     pdata->b1 = i;
     pdata->b2 = i + bpt - 1;
     pdata->pend = pend;
@@ -286,6 +312,8 @@ void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
     pdata->tstride = tstride;
     pdata->qua = qua;
     pdata->mask = mask;
+    pdata->box = box;
+    pdata->minbox = minbox;
 
     /* Submit a job to the workforce to process this group of bolometers. */
     (void) thrAddJob( wf, 0, pdata, smfFillGapsParallel, 0, NULL, status );
@@ -343,6 +371,8 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   gsl_rng *r;                   /* GSL random number generator */
   int fillpad;                  /* Fill PAD samples ? */
   int good;                     /* Were any usable input values found? */
+  int box;
+  int minbox;
   int jj;                       /* Time-slice index */
   int jstart;                   /* Index of first flagged sample in block */
   int k;                        /* Loop count */
@@ -377,6 +407,10 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   pend = pdata->pend;
   pstart = pdata->pstart;
   fillpad = pdata->fillpad;
+  box = pdata->box;
+  minbox = pdata->minbox;
+
+
 
   /* Loop over bolometer */
   for( i = b1; i <= b2; i++ ) if( !qua || !(qua[ i*bstride ] & SMF__Q_BADB) ) {
@@ -410,7 +444,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
       if( *pd != VAL__BADD ) {
          if( jstart < j ) {
             smf1_fillgap( dat + i*bstride, pstart, pend, tstride, jstart,
-                          j - 1, r, status );
+                          j - 1, r, box, minbox, status );
          }
 
          /* Indicate the start of any subsequent gap is no sooner than the
@@ -426,16 +460,17 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
 
     /* If a gap extends to the last sample, fill it. */
     if( good && jstart <= pend )  smf1_fillgap( dat + i*bstride, pstart, pend,
-                                                tstride, jstart, pend, r, status );
+                                                tstride, jstart, pend, r,
+                                                box, minbox, status );
 
    /* Replace the padding at the start and end of the bolometer time series
       with a noisey curve that connects the first and last data samples
-      smoothly. First, fit a straight line to the 2*BOX samples at the end
+      smoothly. First, fit a straight line to the 2*box samples at the end
       of the time stream (i.e. the left end of the interpolated
       wrapped-around section). The above filling of gaps ensures the data
       values will not be bad, unless the whole bolometer is bad. */
     if( fillpad && good ) {
-      leftstart = pend - 2*BOX + 1;
+      leftstart = pend - 2*box + 1;
       leftend = pend;
       k = 0;
       for( jj = leftstart; jj <= leftend; jj++,k++ ) {
@@ -455,17 +490,17 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
 	 graient smoothly off to zero within a short length. The cubic
 	 curve then joins the ends of the rolled-off sections (i.e. the
 	 cubic has zero gardient at start and end). So roll the gradient
-	 off to zero over 2*BOX samples at the end of the data stream, so
+	 off to zero over 2*box samples at the end of the data stream, so
 	 long as the padding area is big enough (we omit this gradient
 	 roll off and just use the cubic interpolation otherwise). */
       meanl = ml*( pend + 1 ) + cl;
       leftstart = pend + 1;
-      leftend = leftstart + 2*BOX;
-      if( leftend < ntslice - 2*BOX ) {
-         dg = ml/(2*BOX);
+      leftend = leftstart + 2*box;
+      if( leftend < ntslice - 2*box ) {
+         dg = ml/(2*box);
          for( jj = leftstart; jj <= leftend; jj++ ) {
             dat[ i*bstride + jj*tstride ] = meanl +
-                                            gsl_ran_gaussian( r, sigmal );
+                                            (r?gsl_ran_gaussian( r,sigmal ):0.0);
             ml -= dg;
             meanl += ml;
          }
@@ -473,10 +508,10 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
          leftend = pend;
       }
 
-      /* If possible fit a straight line to the 2*BOX samples at the start of
+      /* If possible fit a straight line to the 2*box samples at the start of
          the time series. */
       rightstart = pstart;
-      rightend = pstart + 2*BOX - 1;
+      rightend = pstart + 2*box - 1;
       k = 0;
       for( jj = rightstart; jj <= rightend; jj++,k++ ) {
         x[ k ] = jj;
@@ -484,17 +519,17 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
       }
       kpg1Fit1d( 1, k, y, x, &mr, &cr, &sigmar, status );
 
-      /* Roll the gradient off to zero over 2*BOX samples at the start of the
+      /* Roll the gradient off to zero over 2*box samples at the start of the
          data stream, so long as the padding area is big enough (we omit this
          gradient roll off and just use the cubic interpolation otherwise). */
       meanr = mr*( pstart - 1 ) + cr;
       rightend = pstart - 1;
-      rightstart = rightend - 2*BOX;
-      if( rightstart > 2*BOX ) {
-         dg = mr/(2*BOX);
+      rightstart = rightend - 2*box;
+      if( rightstart > 2*box ) {
+         dg = mr/(2*box);
          for( jj = rightend; jj >= rightstart; jj-- ) {
             dat[ i*bstride + jj*tstride ] = meanr +
-                                            gsl_ran_gaussian( r, sigmar );
+                                            (r?gsl_ran_gaussian( r, sigmar ):0.0);
             mr -= dg;
             meanr -= mr;
          }
@@ -523,7 +558,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
          nx = ( jj - leftend )/dlen;
          nx2 = nx*nx;
          dat[ i*bstride + jj*tstride ] = a*nx2*nx + b*nx2 + c*nx + d +
-                                         gsl_ran_gaussian( r, e + nx*f );
+                                         (r?gsl_ran_gaussian( r, e + nx*f ):0.0);
       }
 
       /* Replace the padding at the start of the time stream. */
@@ -531,7 +566,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
          nx = ( jj - leftend + ntslice )/dlen;
          nx2 = nx*nx;
          dat[ i*bstride + jj*tstride ] = a*nx2*nx + b*nx2 + c*nx + d +
-                                         gsl_ran_gaussian( r, e + nx*f );
+                                         (r?gsl_ran_gaussian( r, e + nx*f ):0.0);
       }
 
 /* If no good samples were found, replace them all with zero. */
@@ -548,7 +583,8 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
 
 /* Fill a single gap in a single bolometer time-stream. */
 static void smf1_fillgap( double *data, int pstart, int pend, size_t tstride,
-                          int jstart, int jend, gsl_rng *r, int *status ){
+                          int jstart, int jend, gsl_rng *r, int box, int minbox,
+                          int *status ){
 
 
 /* Local Variables: */
@@ -603,16 +639,16 @@ static void smf1_fillgap( double *data, int pstart, int pend, size_t tstride,
       sigmal = VAL__BADD;
 
 /* The last sample in the box is the first sample before the gap. The first
-   sample in the box is BOX samples before that. */
+   sample in the box is box samples before that. */
       jhi = jstart - 1;
-      jlo = jstart - BOX;
+      jlo = jstart - box;
 
 /* If the lower end of the box is off the start of the array, set it to
    the start of the array. */
       if( jlo < pstart ) jlo = pstart;
 
 /* Check the box is large enough to fit. */
-      if( jhi - jlo + 1 >= MINBOX ) {
+      if( jhi - jlo + 1 >= minbox ) {
 
 /* Copy the box data values into two arrays suitable for kpg1Fit1d. */
          k = 0;
@@ -666,16 +702,16 @@ static void smf1_fillgap( double *data, int pstart, int pend, size_t tstride,
       sigmar = VAL__BADD;
 
 /* The first sample in the box is the first sample after the gap. The last
-   sample in the box is BOX samples after that. */
+   sample in the box is box samples after that. */
       jlo = jend + 1;
-      jhi = jend + BOX;
+      jhi = jend + box;
 
 /* If the upper end of the box is off the end of the array, set it to
    the end of the array. */
       if( jhi > pend ) jhi = pend;
 
 /* Check the box is large enough to fit. */
-      if( jhi - jlo + 1 >= MINBOX ) {
+      if( jhi - jlo + 1 >= minbox ) {
 
 /* Copy the box data values into two arrays suitable for kpg1Fit1d. */
          k = 0;
@@ -747,7 +783,7 @@ static void smf1_fillgap( double *data, int pstart, int pend, size_t tstride,
          pd = data + jstart*tstride;
          if( sigma > 0.0 ) {
             for( jj = jstart; jj <= jend; jj++ ) {
-               *pd = grad*jj + offset + gsl_ran_gaussian( r, sigma );
+               *pd = grad*jj + offset + (r?gsl_ran_gaussian( r, sigma ):0.0);
                pd += tstride;
             }
          } else {
