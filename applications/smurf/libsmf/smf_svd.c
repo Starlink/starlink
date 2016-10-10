@@ -47,7 +47,11 @@
 *        A = U . S . V'
 *
 *     (V' is V transposed). U and V are both orthogonal nxn matrices, and
-*     S is an nxn diagonal matrix.
+*     S is an nxn diagonal matrix. The signs of the values returned in U
+*     and V' are arbitrary and will depend on how many threads are
+*     available in "wf". However, the signs in U and V will be consistent
+*     with each other so that the result of calculating "U.S.V'" will accurately
+*     describe "A" with correct signs.
 *
 *     The algorithm used is multi-threaded, unlike the GSL SVD function.
 *     It is the "Block JRS Algorithm", as described in "A Block JRS
@@ -155,6 +159,7 @@ void smf_svd( ThrWorkForce *wf, dim_t n, double *a, double *sigma,
    int *dn = NULL;
    int *up = NULL;
    int converged;
+   int nsweep;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -214,7 +219,7 @@ void smf_svd( ThrWorkForce *wf, dim_t n, double *a, double *sigma,
    the number of threads). Distribute any left over rows evenly amongst the
    blocks so that some blocks have n/2p rows (small blocks), and some have
    n/2p+1 rows (big blocks). */
-      rpb = n/(2*p);        /* Nominal number of rows per block */
+      rpb = n/(2*p);        /* Number of rows per small block */
       nbig = n - 2*p*rpb;   /* Number of big blocks */
       nsmall = 2*p - nbig;  /* Number of small blocks */
 
@@ -295,9 +300,11 @@ void smf_svd( ThrWorkForce *wf, dim_t n, double *a, double *sigma,
          dn[ i ] = 2*i;
       }
 
+      nsweep = 0;
       converged = 0;
       while( !converged ) {
          converged = 1;
+         nsweep++;
 
          for( s = 0; s < 2*p; s++ ) {
             pdata = job_data + s;
@@ -335,6 +342,9 @@ void smf_svd( ThrWorkForce *wf, dim_t n, double *a, double *sigma,
             smf1_roundrobin( p, up, dn );
          }
       }
+
+      msgOutiff( MSG__DEBUG, "", "smf_svd: %d sweeps required for convergence.", status,
+               nsweep );
 
       nstep = n/p;
       for( i = 0; i < p; i++ ) {
@@ -448,7 +458,6 @@ static void smf1_svd( void *job_data_ptr, int *status ) {
    double *paorig;
    double *pi;
    double *pj;
-   double *ps;
    double *pu;
    double *s;
    double dii;
@@ -492,9 +501,9 @@ static void smf1_svd( void *job_data_ptr, int *status ) {
                djj = 0.0;
                dij = 0.0;
                for( k = 0; k < n; k++,pi++,pj++ ) {
-                  dii += *(pi)*(*pi);
-                  djj += *(pj)*(*pj);
-                  dij += *(pi)*(*pj);
+                  dii += (*pi)*(*pi);
+                  djj += (*pj)*(*pj);
+                  dij += (*pi)*(*pj);
                }
 
                if( fabs( dij) > pdata->delta ) pdata->converged = 0;
@@ -546,9 +555,9 @@ static void smf1_svd( void *job_data_ptr, int *status ) {
                djj = 0.0;
                dij = 0.0;
                for( k = 0; k < n; k++,pi++,pj++ ) {
-                  dii += *(pi)*(*pi);
-                  djj += *(pj)*(*pj);
-                  dij += *(pi)*(*pj);
+                  dii += (*pi)*(*pi);
+                  djj += (*pj)*(*pj);
+                  dij += (*pi)*(*pj);
                }
 
                if( fabs( dij) > pdata->delta ) pdata->converged = 0;
@@ -608,19 +617,16 @@ static void smf1_svd( void *job_data_ptr, int *status ) {
          irow = i/n;
          icol = i - n*irow;
 
-         paorig = pdata->aorig + irow*n;
-         pa = pdata->a + icol*n;
-         ps = pdata->sigma;
-
          sum = 0.0;
-         for( k = 0; k < n; k++ ) {
-            if( pdata->sigma[icol] != 0.0 ) {
-               sum += (*(paorig++))*(*(pa++))/pdata->sigma[icol];
-            } else {
-               paorig++;
-               pa++;
-               ps++;
+         if( pdata->sigma[icol] != 0.0 ) {
+
+            paorig = pdata->aorig + irow*n;
+            pa = pdata->a + icol*n;
+
+            for( k = 0; k < n; k++ ) {
+               sum += (*(paorig++))*(*(pa++));
             }
+            sum /= pdata->sigma[icol];
          }
 
          *(pu++) = sum;
