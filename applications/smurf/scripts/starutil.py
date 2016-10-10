@@ -2141,9 +2141,19 @@ class NDG(object):
       else:
          raise UsageError("\n\nArguments for NDG constructor are of inappropriate type '{0}...'.".format(p1.__class__.__name__))
 
-      # Ensure we know the size of the group
+      # Ensure we know the size of the group. Also strip and leading and
+      # trailing quotes from the path.
       if self.__ndfs != None:
-         nfile = len( self.__ndfs)
+         ndflist = []
+         for ndf in self.__ndfs:
+            while ndf.startswith("'") or ndf.startswith('"'):
+               ndf = ndf[1:]
+            while ndf.endswith("'") or ndf.endswith('"'):
+               ndf = ndf[:-1]
+            if not ndf.isspace():
+               ndflist.append(ndf)
+         self.__ndfs = ndflist
+         nfile = len( self.__ndfs )
 
       # If we are going to create a list file (i.e. if there is more than
       # one NDF in the group), or if we are going to place any NDFs in the
