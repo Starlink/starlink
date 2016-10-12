@@ -130,7 +130,8 @@
 *        following types:
 *        - a raw POL-2 data file
 *        - a time-series file holding Stokes Q, U or I values
-*        - a two-dimensional map holding Stokes Q or U values.
+*        - a two-dimensional map holding Stokes Q or U values (Q and U
+*        maps must be in units of pW).
 *        Any combination of the above types can be supplied.
 *     IPBEAMFIX = _LOGICAL (Read)
 *        Should the supplied total intensity reference image (parameter
@@ -326,6 +327,11 @@
 *        away (and thus unusable) if its map has a pixel bound greater
 *        than 10000. This assumes that the required source is at the
 *        pixel origin.
+*     12-OCT-2016 (DSB):
+*        - Report a warning if any raw data sub-scan are omitted from the
+*        list of input files.
+*        - Report an error if any supplied input Q or U maps are in units
+*        other than pW.
 '''
 
 import os
@@ -781,7 +787,7 @@ try:
    if os.path.isfile( missing ):
       msg_out( " ")
       msg_out( "WARNING: The raw data files for the following sub-scans seem "
-               "to be missing from the list of input files: " )
+               "to be missing from the supplied list of input files: " )
       with open( missing ) as f:
          msg_out( f.read() )
       msg_out( " ")
@@ -794,13 +800,24 @@ try:
       shutil.copyfile( inquis, allquis )
 
 #  Initialise the list of all Stokes maps to be included in the final Q
-#  and U maps so that it holds any maps supplied by parameter IN.
+#  and U maps so that it holds any maps supplied by parameter IN. Check
+#  that any supplied maps are in units of pW.
    allmaps = NDG.tempfile()
    if get_task_par( "MAPFOUND", "pol2check" ):
       shutil.copyfile( inmaps, allmaps )
+
+      with open(allmaps) as infile:
+         lines = infile.readlines()
+      paths = [line.strip() for line in lines]
+      for path in paths:
+         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(path) )
+         units = get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
+         if units != "pW":
+            raise starutil.InvalidParameterError("All supplied Q and U "
+                 "maps must be in units of 'pW', but '{0}' has units '{1}'.".
+                 format(path,units))
    else:
       open( allmaps, 'a').close()
-
 
 
 

@@ -71,14 +71,14 @@
 *        pol2cat script. Parameters INQ, INU and INI are used if a null
 *        (!) value is supplied for IN. [!]
 *     INI = Literal (Read)
-*        A group of input I maps. Only used if a null value is supplied for
-*        parameter IN.
+*        A group of input I maps in units of pW. Only used if a null value is
+*        supplied for parameter IN.
 *     INQ = Literal (Read)
-*        A group of input Q maps. Only used if a null value is supplied for
-*        parameter IN.
+*        A group of input Q maps in unts of pW. Only used if a null value is
+*        supplied for parameter IN.
 *     INU = Literal (Read)
-*        A group of input U maps. Only used if a null value is supplied for
-*        parameter IN.
+*        A group of input U maps in units of pW. Only used if a null value is
+*        supplied for parameter IN.
 *     JY = _LOGICAL (Read)
 *        If TRUE, the output catalogue, and the output Q, U, PI and I maps
 *        will be in units of Jy/beam. Otherwise they will be in units of pW
@@ -158,6 +158,8 @@
 *     22-SEP-2016 (DSB):
 *        - Change default for JY from False to True.
 *        - Change units from "Jy" to "Jy/beam".
+*     12-OCT-2016 (DSB):
+*        Ensure input INQ, INU and INI maps are in pW.
 
 *-
 '''
@@ -251,6 +253,15 @@ try:
       qin = parsys["INQ"].value
       uin = parsys["INU"].value
       iin = parsys["INI"].value
+
+#  Check they are all in units of pW.
+      for sdf in qin+uin+iin:
+         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(sdf) )
+         units = get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
+         if units != "pW":
+            raise starutil.InvalidParameterError("All supplied I, Q and U "
+                 "maps must be in units of 'pW', but '{0}' has units '{1}'.".
+                 format(sdf,units))
 
 #  Now get the PI value to use.
    pimap = parsys["PI"].value
