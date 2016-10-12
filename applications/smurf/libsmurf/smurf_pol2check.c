@@ -68,6 +68,16 @@
 *        number for the first subscan in the chunk (usually "0003" except
 *        for observations made up of more than one discontiguous chunks).
 *        No file is created if null (!) is supplied. [!]
+*     MISSING = LITERAL (Read)
+*        The name of a text file to create identifying any missing raw
+*        data sub-scans. No file is created if no sub-scans are missing
+*        or if no raw data is supplied. The largest expected sub-scan
+*        number for all sub-arrays is the largest sub-scan number for
+*        which any raw data was found for any sub-array. The text file
+*        will contain a line for each sub-array that has any missing
+*        sub-scans. Each line will start with the sub-array name and be
+*        followed by a space spearated list of sub-scan identifiers.
+*        For instance, "S8A: _0012 _0034".
 *     RAWFILE = LITERAL (Read)
 *        The name of a text file to create containing the paths to the
 *        input NDFs that hold raw analysed intensity POL-2 time-series
@@ -121,6 +131,8 @@
 *        Original version.
 *     12-SEP-2016 (DSB):
 *        Add parameter STOKESINFO, MAPINFO and RAWINFO.
+*     12-OCT-2016 (DSB):
+*        Add parameters MISSING.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -173,6 +185,9 @@
 #include "smurf_par.h"
 #include "smurflib.h"
 
+/* A value that is larger than the number of raw data sub-scans in any POL-2
+   observation. */
+#define MAX_SCAN 200
 
 /* Main entry */
 void smurf_pol2check( int *status ) {
@@ -187,8 +202,17 @@ void smurf_pol2check( int *status ) {
    char buf[GRP__SZNAM+1];    /* Path to matching NDF */
    char filepath[GRP__SZNAM+1];/* NDF path, derived from GRP */
    char label[GRP__SZNAM+1];  /* NDF label string */
+   char s8a_scans[ MAX_SCAN ];/* Flags showing the S8A subscans found */
+   char s8b_scans[ MAX_SCAN ];/* Flags showing the S8B subscans found */
+   char s8c_scans[ MAX_SCAN ];/* Flags showing the S8C subscans found */
+   char s8d_scans[ MAX_SCAN ];/* Flags showing the S8D subscans found */
    int dims[NDF__MXDIM];      /* No. of pixels along each axis of NDF */
+   int s8a_count=0;           /* Any S8A raw data files supplied? */
+   int s8b_count=0;           /* Any S8B raw data files supplied? */
+   int s8c_count=0;           /* Any S8C raw data files supplied? */
+   int s8d_count=0;           /* Any S8D raw data files supplied? */
    int indf;                  /* NDF identifier */
+   int maxscan;               /* Largest NSUBSCAN value for any subarray */
    int ndims;                 /* Number of dimensions in NDF */
    int obs;                   /* Observation number */
    int ok;                    /* NDF holds POL-2 data ? */
@@ -213,6 +237,7 @@ void smurf_pol2check( int *status ) {
    km = astKeyMap( " " );
 
 /* Loop round all NDFs. */
+   maxscan = -1;
    for( i = 1; i <= isize && *status == SAI__OK; i++ ) {
       ok = 0;
 
@@ -258,6 +283,40 @@ void smurf_pol2check( int *status ) {
                      astGetFitsI( fc, "OBSNUM", &obs );
                      sprintf( buf, "%8.8d_%5.5d", utdate, obs );
                      astMapPutElemC( km, "RAW_INFO", -1, buf );
+
+/* We want to check later that no sub-scans are missing from the
+   observations, so set falgs for each sub-array indicating which NSUBSCAN
+   header values have been found. If this is the first timne we've been
+   here, intialise the flag arrays to zero to indicate that no subscans
+   have been found. */
+                     if( maxscan == -1 ) {
+                        memset( s8a_scans, 0, sizeof(s8a_scans) );
+                        memset( s8b_scans, 0, sizeof(s8b_scans) );
+                        memset( s8c_scans, 0, sizeof(s8c_scans) );
+                        memset( s8d_scans, 0, sizeof(s8d_scans) );
+                     }
+
+                     astGetFitsI( fc, "NSUBSCAN", &subscan );
+                     if( subscan > maxscan ) maxscan = subscan;
+                     astGetFitsS( fc, "SUBARRAY", &cval );
+
+                     if( astChrMatch( cval, "s8a" ) ) {
+                        s8a_count++;
+                        s8a_scans[ subscan - 1 ] = 1;
+                     } else if( astChrMatch( cval, "s8b" ) ) {
+                        s8b_count++;
+                        s8b_scans[ subscan - 1 ] = 1;
+                     } else if( astChrMatch( cval, "s8c" ) ) {
+                        s8c_count++;
+                        s8c_scans[ subscan - 1 ] = 1;
+                     } else if( astChrMatch( cval, "s8d" ) ) {
+                        s8d_count++;
+                        s8d_scans[ subscan - 1 ] = 1;
+                     } else if( *status == SAI__OK ) {
+                        *status = SAI__ERROR;
+                        errRepf("","Unsupported SUBARRAY header value "
+                                "'%s' found in %s.", status, cval, filepath );
+                     }
 
 /* For Stokes parameter data check that the NDF Label component is
    "Q", "U" or "I". */
@@ -323,16 +382,90 @@ void smurf_pol2check( int *status ) {
    if( veclen > 0 ) {
       msgOutf( "", "   %d hold raw analysed POL-2 time-series data.",
                status, veclen );
+
       parGet0c( "RAWFILE", filepath, sizeof(filepath), status );
       if( *status == PAR__NULL ) {
          errAnnul( status );
       } else if ( *status == SAI__OK ) {
          fd = fopen( filepath, "w" );
-         for( i = 0; (int) i < veclen; i++ ) {
+         for( i = 0; (int) i < veclen && fd; i++ ) {
             astMapGetElemC( km, "RAW_TS", sizeof(buf), i, buf );
             fprintf( fd, "%s\n", buf );
          }
-         fclose( fd );
+         if( fd ) fclose( fd );
+      }
+
+/* Report any missing sub-scans. */
+      if( s8a_count ) s8a_count = maxscan - s8a_count;
+      if( s8b_count ) s8b_count = maxscan - s8b_count;
+      if( s8c_count ) s8c_count = maxscan - s8c_count;
+      if( s8d_count ) s8d_count = maxscan - s8d_count;
+
+      if( s8a_count || s8b_count || s8c_count || s8d_count ) {
+
+         fd = NULL;
+         parGet0c( "MISSING", filepath, sizeof(filepath), status );
+         if( *status == PAR__NULL ) {
+            errAnnul( status );
+         } else if( *status == SAI__OK ){
+            fd = fopen( filepath, "w" );
+         }
+         if( !fd ) fd = stdout;
+
+         msgBlank( status );
+         msgOutf( "", "WARNING: The raw data files for some sub-scans "
+                  "seem to be missing.", status );
+
+         if( s8a_count ) {
+            if( fd == stdout ) fprintf( fd, "   " );
+            fprintf( fd, "S8A: " );
+            for( subscan = 0; subscan < maxscan; subscan++ ) {
+               if( !s8a_scans[ subscan ] ) {
+                  fprintf( fd, "_%04d ", subscan + 1 );
+               }
+            }
+            fprintf( fd, "\n" );
+         }
+
+         if( s8b_count ) {
+            if( fd == stdout ) fprintf( fd, "   " );
+            fprintf( fd, "S8B: " );
+            for( subscan = 0; subscan < maxscan; subscan++ ) {
+               if( !s8b_scans[ subscan ] ) {
+                  fprintf( fd, "_%04d ", subscan + 1 );
+               }
+            }
+            fprintf( fd, "\n" );
+         }
+
+         if( s8c_count ) {
+            if( fd == stdout ) fprintf( fd, "   " );
+            fprintf( fd, "S8C: " );
+            for( subscan = 0; subscan < maxscan; subscan++ ) {
+               if( !s8c_scans[ subscan ] ) {
+                  fprintf( fd, "_%04d ", subscan + 1 );
+               }
+            }
+            fprintf( fd, "\n" );
+         }
+
+         if( s8d_count ) {
+            if( fd == stdout ) fprintf( fd, "   " );
+            fprintf( fd, "S8D: " );
+            for( subscan = 0; subscan < maxscan; subscan++ ) {
+               if( !s8d_scans[ subscan ] ) {
+                  fprintf( fd, "_%04d ", subscan + 1 );
+               }
+            }
+            fprintf( fd, "\n" );
+         }
+
+         if( fd != stdout ) {
+            fclose( fd );
+            msgOutf( "", "See file %s for details.", status, filepath );
+         }
+
+         msgBlank( status );
       }
    }
 

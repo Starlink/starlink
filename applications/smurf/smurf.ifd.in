@@ -4191,6 +4191,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter missing {
+                type LITERAL
+                prompt {File in which to put missing raw sub-scans}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                helpkey *
+            }
+
             parameter rawfile {
                 type LITERAL
                 prompt {File in which to put raw POL2 time-series NDF paths}

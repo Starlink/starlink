@@ -756,15 +756,17 @@ try:
 
 #  Classify each input data file as raw, QU time-series or QU map. Create
 #  three separate text files containing all input NDFs of each type (plus
-#  a fourth holing non-POL2 data).
+#  a fourth holing non-POL2 data). Also, create another text file
+#  containing a list of ony missing raw sub-scan files.
    junks = NDG.tempfile()
    inraws = NDG.tempfile()
    inquis = NDG.tempfile()
    inmaps = NDG.tempfile()
    rawinfo = NDG.tempfile()
+   missing = NDG.tempfile()
    invoke("$SMURF_DIR/pol2check in={0} quiet=yes junkfile={1} mapfile={2} "
-          "rawfile={3} stokesfile={4} rawinfo={5}".
-          format(indata,junks,inmaps,inraws,inquis,rawinfo))
+          "rawfile={3} stokesfile={4} rawinfo={5} missing={6}".
+          format(indata,junks,inmaps,inraws,inquis,rawinfo,missing))
 
 #  Warn about any non-POL2 input data files that are being ignored.
    if get_task_par( "JUNKFOUND", "pol2check" ):
@@ -772,6 +774,15 @@ try:
       msg_out( "WARNING: The following inappropriate input data files are "
                "being ignored: " )
       with open( junks ) as f:
+         msg_out( f.read() )
+      msg_out( " ")
+
+#  Warn about any missing raw data scub-scans.
+   if os.path.isfile( missing ):
+      msg_out( " ")
+      msg_out( "WARNING: The raw data files for the following sub-scans seem "
+               "to be missing from the list of input files: " )
+      with open( missing ) as f:
          msg_out( f.read() )
       msg_out( " ")
 
