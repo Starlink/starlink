@@ -165,7 +165,9 @@
 *        parameters "Q", "U" and "PI", will be in units of Jy/beam. Otherwise
 *        they will be in units of pW (in this case, the I values in the output
 *        catalogue will be scaled to take account of the different FCFs
-*        for POL-2 and non-POL-2 observations). [True]
+*        for POL-2 and non-POL-2 observations). Note, the Q and U maps
+*        made from individual observations (see parameter MAPDIR) are always
+*        in units of pW. [True]
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -178,11 +180,11 @@
 *     MAPDIR = LITTERAL (Read)
 *        The name of a directory in which to put the Q and U maps made from
 *        each individual observation supplied via "IN", before coadding
-*        them (the QMAP and UMAP parameters specify the finaled coadded
+*        them (the QMAP and UMAP parameters specify the final coadded
 *        Q and U maps). If null is supplied, they are placed in the same
 *        temporary directory as all the other intermediate files and so
 *        will be deleted when the scrip exists (unless parameter RETAIN
-*        is set TRUE). [!]
+*        is set TRUE). Note, these maps are always in units of pW. [!]
 *     MSG_FILTER = LITERAL (Read)
 *        Controls the default level of information reported by Starlink
 *        atasks invoked within the executing script. This default can be
