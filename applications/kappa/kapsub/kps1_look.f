@@ -128,6 +128,12 @@
 *        Added WGList format.
 *     2-SEP-2011 (DSB):
 *        Fix VLIST formating of BAD and OUT values.
+*     14-OCT-2016 (DSB):
+*        X and Y field widths in WLIST and WGLIST format were totally
+*        wrong. They assumes the current Frame was a SkyFrame, which it
+*        may not be. It was really wrong if the current Frame was in fact
+*        the PIXEL Frame - in that it gave a max field width of 3. They
+*        now just use twice the value of the axis Digits attribute.
 *     {enter_further_changes_here}
 
 *-
@@ -247,10 +253,8 @@
 
 *  Find the maximum field width for a pixel index or WCS coord value.
       IF( FORMAT .EQ. 'WLIST' .OR. FORMAT .EQ. 'WGLIST' ) THEN
-         CC = AST_FORMAT( IWCS, 1, AST__DPI, STATUS )
-         XWID = CHR_LEN( CC )
-         CC = AST_FORMAT( IWCS, 2, AST__DPI, STATUS )
-         YWID = CHR_LEN( CC )
+         XWID = 2*AST_GETI( IWCS, 'Digits(1)', STATUS )
+         YWID = 2*AST_GETI( IWCS, 'Digits(2)', STATUS )
 
       ELSE
          CALL CHR_ITOC( XLO, LINE, IAT )
