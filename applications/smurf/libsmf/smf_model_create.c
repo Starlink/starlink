@@ -74,7 +74,11 @@
 *        array must already be allocated (same number of elements as ngroups
 *        in igroup), but the individual smfArrays get allocated here.
 *     keymap = AstKeyMap* (Given)
-*        keymap containing parameters to control map-maker
+*        keymap containing parameters to control map-maker. The top-level
+*        configuration is usually supplied, but as a special case, if "mtype"
+*        is SMF__COM, the supplied keymap may be the sub-KeyMap containing
+*        the values to be used. This allows the PCA model to create a COM
+*        model (see smf_calcmodel_pca).
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -381,7 +385,13 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
 
   /* See if a separate COM model is to be created for each subarray on
      any iteration. */
-  astMapGet0A( keymap, "COM", &kmap );
+
+  if( astMapHasKey( keymap, "COM" ) ) {
+     astMapGet0A( keymap, "COM", &kmap );
+  } else {
+     kmap = astClone( keymap );
+  }
+
   astMapGet0I( kmap, "PERARRAY", &perarray );
   if( ! perarray ) astMapGet0I( kmap, "PERARRAY_LAST", &perarray );
   kmap = astAnnul( kmap );
@@ -750,7 +760,11 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                time series. Each box (except possibly the last one)
                contains "gain_box" time slices. */
 
-            astMapGet0A( keymap, "COM", &kmap );
+            if( astMapHasKey( keymap, "COM" ) ) {
+               astMapGet0A( keymap, "COM", &kmap );
+            } else {
+               kmap = astClone( keymap );
+            }
             smf_get_nsamp( kmap, "GAIN_BOX", idata, &gain_box, status );
             kmap = astAnnul( kmap );
 

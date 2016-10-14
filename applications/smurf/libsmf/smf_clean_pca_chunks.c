@@ -21,15 +21,16 @@
 *     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given)
-*        Pointer to the input smfData. See "submean".
+*        Pointer to the input smfData. Any bad or flagged samples are
+*        replaced by interpolated data before doing the PCA analysis (the
+*        interpolated values are included in the analysis). The mean
+*        bolometer values need not have been removed prior to calling
+*        this function, as the means are removed following gap-filling.
 *     chunklen = size_t (Given)
-*        Chunk length for the PCA cleaning in time slices.
+*        Chunk length for the PCA cleaning in time slices. If zero, a
+*        single chunk covering the whole time series is used.
 *     thresh = double (Given)
 *        Outlier threshold for amplitudes to remove from data for cleaning
-*     submean = double (Given)
-*        If non-zero, the mean of each bolometer time-stream is found and
-*        subtracted off before doing the PCA. Othersise, it is assumed
-*        that the mean has already been subtracted off.
 *     sub = int (Given)
 *        If non-zero, the values returned in "data" are the supplied data
 *        values minus the select PCA components. If zero, the values returned
@@ -47,10 +48,6 @@
 *     contain any left-over samples (i.e. it will process something in
 *     the range chunklen to 2*chunklen-1).
 
-*  Notes:
-*     The input bolometer time series are assumed to have had their
-*     means removed before entry.
-
 *  Authors:
 *     EC: Ed Chapin (UBC)
 *     DSB: David Berry (JAC, Hawaii)
@@ -64,8 +61,12 @@
 *        Add argument "sub".
 *     2016-09-28 (DSB):
 *        Add argument "submean".
+*     2016-10-12 (DSB):
+*        Remove argument "submean". Remove gap-filling and mean-removal
+*        (now both done in smf_clean_pca).
 
 *  Copyright:
+*     Copyright (C) 2016 East Asian Observatory.
 *     Copyright (C) 2011 University of British Columbia.
 *     All Rights Reserved.
 
@@ -110,42 +111,20 @@
    exclusive parts of data. */
 
 typedef struct smfPCAChunkData {
-  smfData *data;          /* The data to be processed */
-  int ijob;               /* Job identifier */
   AstKeyMap *keymap;      /* Keymap containing parameters */
-  size_t t1;              /* Index of first time slice for chunk */
-  size_t t2;              /* Index of last time slice */
-  size_t b1;              /* Index of first bolo for chunk */
-  size_t b2;              /* Index of last bolo */
   double thresh;          /* PCA threshold */
   int oper;               /* Operation to perform */
   int sub;                /* Return cleaned data? (return components otherwise) */
-  double *bmeans;         /* Pointer to array of bolo mean values */
+  size_t t1;              /* Index of first time slice for chunk */
+  size_t t2;              /* Index of last time slice */
+  smfData *data;          /* The data to be processed */
 } smfPCAChunkData;
-
-/* Function to be executed in thread: FFT all of the bolos from b1 to b2 */
 
 void smfPCAChunkParallel( void *job_data_ptr, int *status );
 
 void smfPCAChunkParallel( void *job_data_ptr, int *status ) {
-  dim_t ibolo;
-  dim_t itime;
   dim_t ntslice;
-  double *pd;
-  double *pb;
-  double *pd2;
-  double dsum2;
-  double dsum;
-  double hilim;
-  double lolim;
-  double sig;
-  double var;
-  int iter;
-  int nsum;
   size_t bstride;
-  size_t tstride;
-  smf_qual_t *pq;
-  smf_qual_t *pq2;
 
   smfPCAChunkData *pdata;
 
@@ -168,7 +147,7 @@ void smfPCAChunkParallel( void *job_data_ptr, int *status ) {
   }
 
   smf_get_dims( pdata->data, NULL, NULL, NULL, &ntslice, NULL, &bstride,
-                &tstride, status );
+                NULL, status );
 
   /* Do PCA cleaning */
   if( pdata->oper == 0 ) {
@@ -187,115 +166,13 @@ void smfPCAChunkParallel( void *job_data_ptr, int *status ) {
 
      /* PCA clean this chunk */
      smf_clean_pca( NULL, pdata->data, pdata->t1, pdata->t2, pdata->thresh,
-                    NULL, NULL, 0, pdata->sub, pdata->keymap, status );
+                    NULL, NULL, 0, pdata->sub, pdata->keymap, ~SMF__Q_BADB,
+                    status );
 
      /* Debugging message indicating thread finished work */
      msgOutiff( MSG__DEBUG, "",
                 "smfPCAChunkParallel: finished PCA cleaning time slices "
                 "%zu -- %zu", status, pdata->t1, pdata->t2 );
-
-  /* Evaluate the mean value in each bolometer and subtract them off the data. */
-  } else if( pdata->oper == 1 ) {
-
-      pd = (double *) pdata->data->pntr[0];
-      pq = smf_select_qualpntr( pdata->data, NULL, status );
-      pb = pdata->bmeans;
-
-      pd += pdata->b1*bstride;
-      pq += pdata->b1*bstride;
-      pb += pdata->b1;
-
-      for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++,pb++ ) {
-         if( !( *pq & SMF__Q_BADB ) ) {
-
-            lolim = VAL__MIND;
-            hilim = VAL__MAXD;
-
-            for( iter = 0; iter < 1; iter++ ) {
-
-               pd2 = pd;
-               pq2 = pq;
-
-               dsum = 0.0;
-               dsum2 = 0.0;
-               nsum = 0;
-
-               for( itime = 0; itime < ntslice; itime++ ) {
-                  if( !(*pq2 & SMF__Q_FIT) && *pd2 != VAL__BADD ) {
-                     if( *pd2 > lolim && *pd2 < hilim ) {
-                        dsum += *pd2;
-                        dsum2 += (*pd2)*(*pd2);
-                        nsum++;
-                     }
-                  }
-                  pd2 += tstride;
-                  pq2 += tstride;
-               }
-
-               if( nsum > 0 ) {
-                  *pb = dsum/nsum;
-                  var = dsum2/nsum - (*pb)*(*pb);
-                  if( var > 0.0 ) {
-                     sig = sqrt( var );
-                     lolim = *pb - 3*sig;
-                     hilim = *pb + 3*sig;
-                  } else {
-                     break;
-                  }
-
-               } else {
-                  *pb = VAL__BADD;
-                  break;
-               }
-            }
-
-            if( *pb != VAL__BADD ) {
-               pd2 = pd;
-               pq2 = pq;
-               for( itime = 0; itime < ntslice; itime++ ) {
-                  if( !(*pq2 & SMF__Q_MOD) && *pd2 != VAL__BADD ) {
-                     *pd2 -= *pb;
-                  }
-                  pd2 += tstride;
-                  pq2 += tstride;
-               }
-            }
-
-         } else {
-            *pb = VAL__BADD;
-         }
-
-         pd += bstride;
-         pq += bstride;
-      }
-
-  /* Add the mean value in each bolometer back onto the data. */
-  } else if( pdata->oper == 2 ) {
-      pd = (double *) pdata->data->pntr[0];
-      pq = smf_select_qualpntr( pdata->data, NULL, status );
-      pb = pdata->bmeans;
-
-      pd += pdata->b1*bstride;
-      pq += pdata->b1*bstride;
-      pb += pdata->b1;
-
-      for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++,pb++ ) {
-         if( !( *pq & SMF__Q_BADB ) ) {
-            pd2 = pd;
-            pq2 = pq;
-            for( itime = 0; itime < ntslice; itime++ ) {
-               if( !(*pq2 & SMF__Q_MOD) && *pd2 != VAL__BADD ) {
-                  *pd2 += *pb;
-               }
-               pd2 += tstride;
-               pq2 += tstride;
-            }
-         }
-
-         pd += bstride;
-         pq += bstride;
-      }
-
 
   } else if( *status == SAI__OK ) {
      *status = SAI__ERROR;
@@ -311,24 +188,15 @@ void smfPCAChunkParallel( void *job_data_ptr, int *status ) {
 #define FUNC_NAME "smf_clean_pca_chunks"
 
 void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
-                           double thresh, int submean, int sub, AstKeyMap *keymap, int *status ) {
+                           double thresh, int sub, AstKeyMap *keymap, int *status ) {
 
-  dim_t bstep;
-  dim_t nbolo;
-  dim_t ntslice;          /* number of time slices */
-  double *bolomeans = NULL;    /* Array holding mean value in each bolo */
-  int iw;                 /* Thread index */
-  int nw;                 /* total available worker threads */
-  size_t clen=0;          /* Local chunk length */
-  size_t i;               /* Loop counter */
-  size_t nchunks;         /* Number of chunks */
+  dim_t ntslice;                 /* Number of time slices */
+  size_t i;                      /* Loop counter */
+  size_t nchunks;                /* Number of chunks */
   smfPCAChunkData *job_data=NULL;/* job data */
-  smfPCAChunkData *pdata=NULL; /* Pointer to job data */
+  smfPCAChunkData *pdata=NULL;   /* Pointer to job data */
 
   if (*status != SAI__OK) return;
-
-  /* How many threads do we get to play with */
-  nw = wf ? wf->nworker : 1;
 
   /* Check for NULL smfData pointer */
   if( !data || !data->pntr[0]) {
@@ -345,22 +213,11 @@ void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
     return;
   }
 
-  smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, NULL, NULL, NULL, status );
-
-
   if( *status == SAI__OK ) {
-    if( !chunklen ) {
-      clen = ntslice;
-    } else {
-      clen = chunklen;
-    }
-
-    if( clen < 2 ) {
+    if( chunklen && chunklen < 2 ) {
       *status = SAI__ERROR;
-      errRep( " ", FUNC_NAME
-              ": chunklen must be >= 2", status );
+      errRep( " ", FUNC_NAME ": chunklen must be >= 2", status );
       return;
-
     }
   }
 
@@ -380,43 +237,12 @@ void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
     return;
   }
 
-  if( ntslice < clen ) {
+  smf_get_dims( data, NULL, NULL, NULL, &ntslice, NULL, NULL, NULL, status );
+
+  if( chunklen && ntslice < chunklen ) {
     *status = SAI__ERROR;
     errRepf( " ", FUNC_NAME ": smfData has length %zu < %zu (chunklen)",
-             status, ntslice, clen );
-  }
-
-  /* Fill any gaps or padding with interpolated data values plus noise. */
-  smf_fillgaps( wf, data, SMF__Q_PAD | SMF__Q_GAP, status );
-
-  /* If required, remove the mean value from each bolometer. */
-  if( submean ) {
-     bstep = nbolo/nw;
-     if( bstep == 0 ) bstep = 1;
-     job_data = astMalloc( nw*sizeof(*job_data) );
-     bolomeans = astMalloc( nbolo*sizeof(*bolomeans) );
-
-     if( *status == SAI__OK ) {
-        for( iw = 0; iw < nw; iw++ ) {
-           pdata = job_data + iw;
-           pdata->b1 = iw*bstep;
-           if( iw < nw - 1 ) {
-              pdata->b2 = pdata->b1 + bstep - 1;
-           } else {
-              pdata->b2 = nbolo - 1 ;
-           }
-
-           pdata->data = data;
-           pdata->bmeans = bolomeans;
-           pdata->oper = 1;
-           thrAddJob( wf, 0, pdata, smfPCAChunkParallel, 0, NULL, status );
-        }
-
-        thrWait( wf, status );
-
-     }
-     job_data = astFree( job_data );
-
+             status, ntslice, chunklen );
   }
 
   /* Set up the division of labour for threads: independent blocks of time.
@@ -426,13 +252,14 @@ void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
      chunk, let smf_clean_pca parallelize internally to make it go
      faster. */
 
-  nchunks = ntslice / clen;
+  nchunks = chunklen ? ntslice / chunklen : 1;
 
   if( nchunks == 1 ) {
     msgOutif( MSG__VERB, "", FUNC_NAME
              ": only 1 chunk, smf_clean_pca will parallelize internally",
              status );
-    smf_clean_pca( wf, data, 0, 0, thresh, NULL, NULL, 0, sub, keymap, status);
+    smf_clean_pca( wf, data, 0, 0, thresh, NULL, NULL, 0, sub, keymap,
+                   ~SMF__Q_BADB, status);
   } else {
     msgOutiff( MSG__VERB, "", FUNC_NAME
              ": will clean %zu separate time chunks", status, nchunks );
@@ -442,8 +269,8 @@ void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
       pdata = job_data + i;
 
       /* Blocks of time slices */
-      pdata->t1 = i*clen;
-      pdata->t2 = (i+1)*clen - 1;
+      pdata->t1 = i*chunklen;
+      pdata->t2 = (i+1)*chunklen - 1;
 
       /* Ensure that the last thread picks up any left-over tslices */
       if( (i==(nchunks-1)) && (pdata->t1<(ntslice-1)) ) {
@@ -456,8 +283,7 @@ void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
       pdata->sub = sub;
       pdata->oper = 0;
 
-      pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata, smfPCAChunkParallel,
-                               0, NULL, status );
+      thrAddJob( wf, 0, pdata, smfPCAChunkParallel, 0, NULL, status );
     }
 
     /* Wait until all of the submitted jobs have completed */
@@ -469,36 +295,6 @@ void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
       if( pdata->keymap ) pdata->keymap = astAnnul( pdata->keymap );
     }
     job_data = astFree( job_data );
-  }
-
-
-   /* If the returned data values hold the PCA model, then add the mean
-      values onto the model since they effectively form part of the model. */
-
-  if( !sub && bolomeans ) {
-
-     job_data = astMalloc( nw*sizeof(*job_data) );
-
-     if( *status == SAI__OK ) {
-        for( iw = 0; iw < nw; iw++ ) {
-           pdata = job_data + iw;
-           pdata->b1 = iw*bstep;
-           if( iw < nw - 1 ) {
-              pdata->b2 = pdata->b1 + bstep - 1;
-           } else {
-              pdata->b2 = nbolo - 1 ;
-           }
-
-           pdata->data = data;
-           pdata->bmeans = bolomeans;
-           pdata->oper = 2;
-        }
-
-        thrWait( wf, status );
-
-     }
-     job_data = astFree( job_data );
-
   }
 
 }

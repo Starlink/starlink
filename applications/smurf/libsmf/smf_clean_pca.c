@@ -16,19 +16,23 @@
 *     smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
 *                    size_t t_last, double thresh, smfData **components,
 *                    smfData **amplitudes, int flagbad, int sub,
-*                    AstKeyMap *keymap, int *status )
+*                    AstKeyMap *keymap, smf_qual_t mask, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given)
 *        Pointer to the input smfData (assume that bolometer means have been
-*        removed)
+*        removed). Any bad or flagged samples are replaced by interpolated
+*        data before doing the PCA analysis (the interpolated values are
+*        included in the analysis).
 *     t_first = size_t (Given)
-*        First time slice of the data to be analyzed.
+*        First time slice of the data to be analyzed. Ignored if t_last
+*        is zero.
 *     t_last = size_t (Given)
-*        Last time slice of the data to be cleaned. If set to 0, the last
-*        time slice of the smfData will be analyzed.
+*        Last time slice of the data to be cleaned. If set to zero, the full
+*        time axis in the supplied smfData is used, excluding the padding
+*        at start and end.
 *     thresh = double (Given)
 *        Outlier threshold for amplitudes to remove from data for cleaning
 *     components = smfData ** (Returned)
@@ -48,6 +52,9 @@
 *     keymap = AstKeyMap * (Given)
 *        Keymap containing parameters that control how flagbad works. See
 *        smf_find_gains for details.
+*     mask = smf_qual_t (Given)
+*        Define which bits in quality indicate locations of gaps to be filled
+*        prior to doing the PCA analysis.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -73,10 +80,6 @@
 *     bolometers (or portions) that are outliers, and their quality
 *     arrays are flagged accordingly.
 
-*  Notes:
-*     The input bolometer time series are assumed to have had their
-*     means removed before entry.
-
 *  Authors:
 *     EC: Ed Chapin (UBC)
 *     DSB: David Berry (EAO)
@@ -97,12 +100,25 @@
 *        quality array
 *     2015-06-15 (DSB):
 *        Add argument "sub".
-*     2015-10-10 (DSB):
-*        Determine the PCA components from the left hand singular vectors 
+*     2016-10-10 (DSB):
+*        Determine the PCA components from the left hand singular vectors
 *        (U) found by smf_svd rather than the right hand (V). U and V should
-*        be the same (because the co-variance matrix is symetric), but U 
-*        seems to be less prone to changes as you change the number of 
+*        be the same (because the co-variance matrix is symetric), but U
+*        seems to be less prone to changes as you change the number of
 *        threads.
+*     2016-10-13 (DSB):
+*        - Add argument mask.
+*        - Remove quality checking as it seems to result in less accurate
+*        analysis (the reconstructed input data seems to be much noisier
+*        if bad samples are ignored). Instead, fill all bad samples and
+*        samples flagged  by "mask" using smf_fillgaps before doing the analysis.
+*        - The padding included at start and end of each bolometer seems to
+*        cause problems for the PCA model. So now, if t_last is supplied as
+*        zero, t_first and t_last are set automatically to exclude padding.
+*        - The filling described above can change the mean value in each
+*        bolometer. So now we estimate and remove the mean value in each
+*        bolometer after doing the filling. Therefore the means no longer
+*        need to be removed before calling this function.
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
@@ -176,44 +192,43 @@ typedef struct smfPCAData {
   double *rms_amp;        /* VAL__BADD where modes need to be removed */
   size_t t1;              /* Index of first time slice for chunk */
   size_t t2;              /* Index of last time slice */
+  size_t b1;              /* Index of first bolo for chunk */
+  size_t b2;              /* Index of last bolo */
   size_t t_first;         /* First index for total data being analyzed */
   size_t t_last;          /* Last index for total data being analyzed */
   size_t tstride;         /* time slice stride */
-  smf_qual_t *qua;        /* Pointer to quality array */
 } smfPCAData;
-
-/* Function to be executed in thread: FFT all of the bolos from b1 to b2 */
 
 void smfPCAParallel( void *job_data_ptr, int *status );
 
 void smfPCAParallel( void *job_data_ptr, int *status ) {
+  dim_t tlen;             /* number of time slices */
   double *amp=NULL;       /* matrix of components amplitudes for each bolo */
+  double *comp=NULL;      /* data cube of components */
+  double *covwork=NULL;   /* goodbolo * 3 work array for covariance */
+  double *d=NULL;         /* Pointer to data array */
+  double *pd=NULL;        /* Pointer to next data value */
+  double *rms_amp=NULL;   /* VAL__BADD for components to remove */
+  double mean;            /* Mean of bolometer values */
+  double sum;             /* Sum of bolometer values */
+  double v1;              /* A data value */
+  double v2;              /* A data value */
+  gsl_matrix *cov=NULL;   /* bolo-bolo covariance matrix */
+  size_t *goodbolo;       /* Local copy of global goodbolo */
   size_t abstride;        /* bolo stride in amp array */
   size_t acompstride;     /* component stride in amp array */
   size_t bstride;         /* bolo stride */
   size_t ccompstride;     /* component stride in comp array */
   size_t ctstride;        /* time stride in comp array */
-  double *comp=NULL;      /* data cube of components */
-  gsl_matrix *cov=NULL;   /* bolo-bolo covariance matrix */
-  double *covwork=NULL;   /* goodbolo * 3 work array for covariance */
-  double *d=NULL;         /* Pointer to data array */
-  size_t *goodbolo;       /* Local copy of global goodbolo */
   size_t i;               /* Loop counter */
   size_t j;               /* Loop counter */
   size_t k;               /* Loop counter */
   size_t l;               /* Loop counter */
   size_t ngoodbolo;       /* number good bolos = number principal components */
-  dim_t tlen;             /* number of time slices */
-  smfPCAData *pdata=NULL; /* Pointer to job data */
-  smf_qual_t q1;          /* A quality value */
-  smf_qual_t q2;          /* A quality value */
-  smf_qual_t *qua=NULL;   /* Pointer to quality array */
-  double *rms_amp=NULL;   /* VAL__BADD for components to remove */
   size_t t_first;         /* First time slice being analyzed */
   size_t t_last;          /* First time slice being analyzed */
   size_t tstride;         /* time slice stride */
-  double v1;              /* A data value */
-  double v2;              /* A data value */
+  smfPCAData *pdata=NULL; /* Pointer to job data */
 
   double check=0;
 
@@ -222,23 +237,22 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   /* Pointer to the data that this thread will process */
   pdata = job_data_ptr;
 
-  qua = pdata->qua;
-  amp = pdata->amp;
   abstride = pdata->abstride;
   acompstride = pdata->acompstride;
+  amp = pdata->amp;
   bstride = pdata->bstride;
-  comp = pdata->comp;
   ccompstride = pdata->ccompstride;
-  ctstride = pdata->ctstride;
+  comp = pdata->comp;
   cov = pdata->cov;
   covwork = pdata->covwork;
+  ctstride = pdata->ctstride;
   d = pdata->data->pntr[0];
   goodbolo = pdata->goodbolo;
   ngoodbolo = pdata->ngoodbolo;
-  tlen = pdata->tlen;
   rms_amp = pdata->rms_amp;
   t_first = pdata->t_first;
   t_last = pdata->t_last;
+  tlen = pdata->tlen;
   tstride = pdata->tstride;
 
   /*
@@ -265,14 +279,36 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
 
 
   /* if t1 past end of the work, nothing to do so we return */
-  if( pdata->t1 >= (pdata->t_first+pdata->tlen) ) {
+  if( pdata->t1 >= (t_first + tlen) ) {
     msgOutif( SMF__TIMER_MSG, "",
               "smfPCAParallel: nothing for thread to do, returning",
               status);
     return;
   }
 
-  if( (pdata->operation == 0) && (*status==SAI__OK) ) {
+  if( (pdata->operation == -1) && (*status==SAI__OK) ) {
+
+    /* Operation -1: remove mean from each bolometer in a block of bolos ---- */
+
+    for( i=pdata->b1; i<=pdata->b2; i++ ) {
+       pd = d + goodbolo[i]*bstride + t_first*tstride;
+
+       sum = 0.0;
+       for( k = t_first; k <= t_last; k++ ) {
+          sum += *pd;
+          pd += tstride;
+       }
+
+       mean = sum/tlen;
+
+       pd = d+goodbolo[i]*bstride + t_first*tstride;
+       for( k = t_first; k <= t_last; k++ ) {
+          *pd -= mean;
+          pd += tstride;
+       }
+    }
+
+  } else if( (pdata->operation == 0) && (*status==SAI__OK) ) {
     /* Operation 0: accumulate sums for covariance calculation -------------- */
 
     check = 0;
@@ -287,12 +323,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
         for( k=pdata->t1; k<=pdata->t2; k++ ) {
           v1 = d[goodbolo[i]*bstride + k*tstride];
           v2 = d[goodbolo[j]*bstride + k*tstride];
-          q1 = qua[goodbolo[i]*bstride + k*tstride];
-          q2 = qua[goodbolo[j]*bstride + k*tstride];
-          if( v1 != VAL__BADD && v2 != VAL__BADD &&
-              !(q1 & SMF__Q_FIT) && !(q2 & SMF__Q_FIT) ) {
-             sum_xy += v1*v2;
-          }
+          sum_xy += v1*v2;
         }
 
         /* Store sums in work array and normalize once all threads finish */
@@ -327,11 +358,8 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
         for( k=pdata->t1; k<=pdata->t2; k++ ) {
           l = k - t_first;
           v2 = d[goodbolo[j]*bstride + k*tstride];
-          q2 = qua[goodbolo[j]*bstride + k*tstride];
-          if( v2 != VAL__BADD && !(q2 & SMF__Q_FIT) ) {
-             comp[i*ccompstride+l*ctstride] += v2 * u;
-             check += v2 * u;
-          }
+          comp[i*ccompstride+l*ctstride] += v2 * u;
+          check += v2 * u;
         }
       }
     }
@@ -350,12 +378,9 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
       for( j=0; j<ngoodbolo; j++ ) {  /* loop over component */
         for( k=pdata->t1; k<=pdata->t2; k++ ) {
           v1 = d[goodbolo[i]*bstride + k*tstride];
-          q1 = qua[goodbolo[i]*bstride + k*tstride];
-          if( v1 != VAL__BADD && !(q1 & SMF__Q_FIT) ) {
-             l = k - t_first;
-             amp[goodbolo[i]*abstride + j*acompstride] +=
-                    v1 * comp[j*ccompstride + l*ctstride];
-          }
+          l = k - t_first;
+          amp[goodbolo[i]*abstride + j*acompstride] +=
+                 v1 * comp[j*ccompstride + l*ctstride];
         }
       }
     }
@@ -381,12 +406,9 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
         for( i=0; i<ngoodbolo; i++ ) {    /* loop over bolometer */
           a =  factor*amp[goodbolo[i]*abstride + j*acompstride];
           for( k=pdata->t1; k<=pdata->t2; k++ ) {
-            if( ( d[goodbolo[i]*bstride + k*tstride] != VAL__BADD ) &&
-                !(SMF__Q_FIT & qua[goodbolo[i]*bstride + k*tstride]) ) {
-               l = k - t_first;
-               d[goodbolo[i]*bstride + k*tstride] -=
-                 a*comp[j*ccompstride + l*ctstride];
-            }
+            l = k - t_first;
+            d[goodbolo[i]*bstride + k*tstride] -=
+              a*comp[j*ccompstride + l*ctstride];
           }
         }
       }
@@ -412,7 +434,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
 void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
                     size_t t_last, double thresh, smfData **components,
                     smfData **amplitudes, int flagbad, int sub,
-                    AstKeyMap *keymap, int *status ) {
+                    AstKeyMap *keymap, smf_qual_t mask, int *status ) {
 
 
   double *amp=NULL;       /* matrix of components amplitudes for each bolo */
@@ -437,6 +459,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   smfPCAData *pdata=NULL; /* Pointer to job data */
   smf_qual_t *qua=NULL;   /* Pointer to quality array */
   gsl_vector *s=NULL;     /* singular values for SVD */
+  size_t bstep;           /* Bolo step size for job division */
   size_t step;            /* step size for job division */
   size_t tlen;            /* Length of the time-series used for PCA */
   size_t tstride;         /* time slice stride */
@@ -488,13 +511,16 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     goto CLEANUP;
   }
 
-  if( !t_last ) t_last = ntslice-1;
-
-  if( t_first > (ntslice-1) ) {
-    *status = SAI__ERROR;
-    errRep( " ", FUNC_NAME ": t_first is set past the last time slice!",
-            status );
-    goto CLEANUP;
+  /* If the range of time slices has not been specified, us the total
+     range excluding padding and apodizing. */
+  qua = smf_select_qualpntr( data, 0, status );
+  if( !t_last ) {
+     if( qua ) {
+        smf_get_goodrange( qua, ntslice, tstride, (SMF__Q_PAD | SMF__Q_APOD),
+                           &t_first, &t_last, status );
+     } else {
+        t_last = ntslice-1;
+     }
   }
 
   if( t_last > (ntslice-1) ) {
@@ -519,8 +545,6 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
             status );
     goto CLEANUP;
   }
-
-  qua = smf_select_qualpntr( data, 0, status );
 
   if( qua ) {
     /* If quality supplied, identify good bolometers */
@@ -556,6 +580,11 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     goto CLEANUP;
   }
 
+  /* Fill bad values and values flagged via "mask" (except entirely bad
+     bolometers) with interpolated data values. */
+  mask &= ~SMF__Q_BADB;
+  smf_fillgaps( wf, data, mask, status );
+
   /* Allocate arrays */
   amp = astCalloc( nbolo*ngoodbolo, sizeof(*amp) );
   comp = astCalloc( ngoodbolo*tlen, sizeof(*comp) );
@@ -583,6 +612,12 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     step = tlen/nw;
   }
 
+  if( nw > (int) ngoodbolo ) {
+    bstep = 1;
+  } else {
+    bstep = ngoodbolo/nw;
+  }
+
   for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
     pdata = job_data + ii;
 
@@ -590,9 +625,14 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     pdata->t1 = ii*step + t_first;
     pdata->t2 = (ii+1)*step + t_first - 1;
 
+    /* Blocks of bolometers. */
+    pdata->b1 = ii*bstep;
+    pdata->b2 = (ii+1)*bstep - 1;
+
     /* Ensure that the last thread picks up any left-over tslices */
-    if( (ii==(nw-1)) && (pdata->t1<(t_first+tlen-1)) ) {
-      pdata->t2 = t_first + tlen - 1;
+    if( (ii==(nw-1)) ) {
+       pdata->t2 = t_first + tlen - 1;
+       pdata->b2 = ngoodbolo - 1;
     }
 
     /* initialize work data */
@@ -615,7 +655,6 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     pdata->tlen = tlen;
     pdata->operation = 0;
     pdata->tstride = tstride;
-    pdata->qua = qua;
 
     /* Each thread will accumulate the projection of its own portion of
        the time-series. We'll add them to the master amp at the end */
@@ -636,6 +675,22 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   }
 
   if( *status == SAI__OK ) {
+
+    /* Remove the mean from each gap-filled bolometer time stream ---------------------*/
+
+    msgOutif( MSG__VERB, "", FUNC_NAME ": removing bolometer means...",
+              status );
+
+    for( ii=0; ii<nw; ii++ ) {
+      pdata = job_data + ii;
+      pdata->operation = -1;
+      thrAddJob( wf, 0, pdata, smfPCAParallel, 0, NULL, status );
+    }
+
+    /* Wait until all of the submitted jobs have completed */
+    thrWait( wf, status );
+
+
 
     /* Measure the covariance matrix using parallel code ---------------------*/
 

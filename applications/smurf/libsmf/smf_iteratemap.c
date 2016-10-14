@@ -714,6 +714,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   double maxlen=0;              /* Max length in seconds of cont. chunk */
   int memcheck=0;               /* Are we just doing a memory check? */
   size_t memneeded;             /* Memory required for map-maker */
+  smfArray **pcacom=NULL;       /* A COM model used within the PCA model */
+  smfArray **pcagai=NULL;       /* A GAI model used within the PCA model */
   smfArray ***model=NULL;       /* Array of pointers smfArrays for ea. model */
   char *modelname=NULL;         /* Name of current model component */
   char modelnames[SMF_MODEL_MAX*4]; /* Array of all model components names */
@@ -1816,9 +1818,31 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            AST values are calculated on-the-fly from the current map.  */
         if( (modeltyps[imodel] != SMF__LUT) && (modeltyps[imodel] != SMF__EXT) &&
             (modeltyps[imodel] != SMF__AST) ) {
+
           smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
                             noisemaps, 1, modeltyps[imodel], 0, NULL, 0, NULL, NULL,
                             NO_FTS, qua, NULL, model[imodel], keymap, status );
+
+          /* If PCA.COMFILL is non-zero, the PCA model makes use of COM and GAI
+             models internally. Create them now. Use the values in the "PCA.xxx"
+             config parameters rather than the "COM.xxx" parameters. */
+          if( modeltyps[imodel] != SMF__PCA ) {
+             int comfill;
+             astMapGet0A( keymap, "PCA", &kmap );
+             astMapGet0I( kmap, "COMFILL", &comfill );
+             if( comfill ) {
+                pcacom = astCalloc( 1, sizeof(*pcacom) );
+                smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
+                                  noisemaps, 1, SMF__COM, 0, NULL, 0, NULL, NULL,
+                                  NO_FTS, qua, NULL, pcacom, kmap, status );
+
+                pcagai = astCalloc( 1, sizeof(*pcagai) );
+                smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
+                                  noisemaps, 1, SMF__GAI, 0, NULL, 0, NULL, NULL,
+                                  NO_FTS, qua, NULL, pcagai, kmap, status );
+             }
+             kmap = astAnnul( kmap );
+          }
         }
 
         /* Associate quality with some models */
@@ -1924,6 +1948,13 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         dat.com = model[whichcom];
       } else {
         dat.com = NULL;
+      }
+      if( havepca ) {
+        dat.pcacom = pcacom;
+        dat.pcagai = pcagai;
+      } else {
+        dat.pcacom = NULL;
+        dat.pcagai = NULL;
       }
       dat.poldata = ( !strcmp( res[0]->sdata[0]->hdr->dlabel, "Q" ) ||
                       !strcmp( res[0]->sdata[0]->hdr->dlabel, "U" ) );
@@ -3446,6 +3477,16 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         }
       }
       model = astFree( model );
+    }
+
+    if( pcacom ) {
+       if( pcacom[0] ) smf_close_related( wf, &( pcacom[0] ), status );
+       pcacom = astFree( pcacom );
+    }
+
+    if( pcagai ) {
+       if( pcagai[0] ) smf_close_related( wf, &( pcagai[0] ), status );
+       pcagai = astFree( pcagai );
     }
 
     /* Keep track of total number of samples and total number of time slices */

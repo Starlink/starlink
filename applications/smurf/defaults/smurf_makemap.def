@@ -2840,8 +2840,10 @@ varmapmethod = 1
 #  model, which is primarily intended for use when reducing POL2 scan
 #  and spin data. They should be documented properly if use of a PCA
 #  model turns out to be a useful thing.
-pca.pcathresh=4
-pca.pcalen=0
+pca.pcathresh = 4
+pca.comfill = 1
+
+#  Following are PCA masking parameters that are common to all models.
 pca.zero_accum = 0
 pca.zero_circle = <undef>
 pca.zero_freeze = 0.0
@@ -2857,3 +2859,34 @@ pca.zero_snr_fwhm = 0
 pca.zero_snr_low = -1.1
 pca.zero_snrlo = 0
 pca.zero_union = 1
+
+#  Following are parameters of the COM model that are inherited by the
+#  PCA model (PCA uses COM internally).
+pca.boxcar = 0
+pca.boxcard = 0
+pca.boxfact = 0
+pca.boxmin = 0
+pca.corr_abstol = 0.2
+pca.corr_tol = 5
+pca.fill = 0
+pca.fit_box = <undef>
+pca.freeze_flags = 0
+pca.gain_abstol = 3
+pca.gain_box = -30.0
+pca.gain_fgood = 0.25
+pca.gain_is_one = 0
+pca.gain_positive = 1
+pca.gain_rat = 4
+pca.gain_tol = 10
+pca.niter = 1
+pca.noflag = 0
+pca.noremove = 0
+pca.notfirst = 0
+pca.nsigma = 3
+pca.offset_is_zero = 0
+pca.oldalg = 0
+pca.perarray = 1
+pca.perarray_last = <undef>
+pca.sig_limit = 0
+pca.sig_wing = 1.0
+pca.weight = 0

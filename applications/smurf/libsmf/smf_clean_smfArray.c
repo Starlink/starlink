@@ -527,7 +527,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
     for( idx=0; (idx<array->ndat)&&(*status==SAI__OK); idx++ ) {
       data = array->sdata[idx];
 
-      smf_clean_pca_chunks( wf, data, pcalen, pcathresh, 1, 1, keymap, status );
+      smf_clean_pca_chunks( wf, data, pcalen, pcathresh, 1, keymap, status );
     }
 
     /*** TIMER ***/

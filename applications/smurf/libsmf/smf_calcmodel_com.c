@@ -29,7 +29,7 @@
 *     allmodel = smfArray ** (Returned)
 *        Array of smfArrays (each time chunk) to hold result of model calc
 *     flags = int (Given )
-*        Control flags: not used
+*        Control flags.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -47,7 +47,7 @@
 *     be used by setting COM.OLDALG non-zero. When the new algorithm
 *     implemented in this function has been verified sufficiently,
 *     support for the old algorithm should probably be removed in order
-*     to avoid accumulatrion of historical clutter.
+*     to avoid accumulation of historical clutter.
 *     - In order to avoid accumulation of historical clutter, this version
 *     does not include facilities that are not likely to be used any
 *     more. The following keymap items are no longer used: com.boxcar,
@@ -95,8 +95,14 @@
 *        those bolo-blocks were bad or not. The effect was cumulative -
 *        any additional genuinely bad bolo-block rejected from the second
 *        subarray would be passed on to the third and fourth subarrays, etc.
+*     13-OCT-2016 (DSB):
+*        Provide facility (used by the PCA model) to fill gaps in the
+*        residuals using the COM model, rather than subtract the COM model
+*        off the residuals. This option is selected by setting the
+*        SMF__DIMM_PCACOM bit in "flags".
 
 *  Copyright:
+*     Copyright (C) 2016 East Asian Observatory.
 *     Copyright (C) 2012-2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -144,9 +150,9 @@ typedef struct smfCalcModelComData {
    dim_t nb;
    dim_t nbolo;
    dim_t ncol;
+   dim_t nointslice;
    dim_t nrow;
    dim_t ntslice;
-   dim_t nointslice;
    dim_t nvar;
    dim_t t1;
    dim_t t2;
@@ -160,8 +166,8 @@ typedef struct smfCalcModelComData {
    double svar;
    int fill;
    int flag;
-   int gain_box;
    int freeze_flags;
+   int gain_box;
    int icom;
    int nblock;
    int niter;
@@ -169,8 +175,9 @@ typedef struct smfCalcModelComData {
    smfArray *gai;
    smfArray *lut;
    smfArray *model;
-   smfArray *res;
    smfArray *noi;
+   smfArray *res;
+   smf_qual_t badqual;
    unsigned char *mask;
 } SmfCalcModelComData;
 
@@ -180,12 +187,13 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         int *status ){
 
 /* Local Variables: */
-   AstKeyMap *kfmap;
    AstKeyMap *kamap;
+   AstKeyMap *kfmap;
    AstKeyMap *kmap;
    AstObject *obj;
-   SmfCalcModelComData *job_data = NULL;
    SmfCalcModelComData *pdata;
+   SmfCalcModelComData *job_data = NULL;
+   const char *modelname;
    dim_t bolostep;
    dim_t gain_box;
    dim_t i;
@@ -196,9 +204,9 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    dim_t nb;
    dim_t nbolo;
    dim_t ncol;
+   dim_t nointslice;
    dim_t nrow;
    dim_t ntslice;
-   dim_t nointslice;
    dim_t nvar;
    dim_t timestep;
    double *com_datas[ 4 ];
@@ -229,6 +237,8 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    smfArray *noi;
    smfArray *res;
    smfFilter *filt=NULL;
+   smf_modeltype modeltype;
+   smf_qual_t badqual;
    unsigned char *mask;
    void *old_model;
 
@@ -236,8 +246,10 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    if( *status != SAI__OK ) return;
 
 /* Get a pointer to the KeyMap holding parameters controlling the
-   common-mode model. */
-   astMapGet0A( keymap, "COM", &obj );
+   common-mode model. If this function is being called as part of the PCA
+   model, then use "PCA.xxx" keymap values instead of "COM.xxx" values. */
+   modelname = ( flags & SMF__DIMM_PCACOM ) ? "PCA" : "COM";
+   astMapGet0A( keymap, modelname, &obj );
    kmap = (AstKeyMap *) obj;
 
 /* If the old algorithm is to be used, invoked it and return. */
@@ -293,8 +305,11 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    model = allmodel[ chunk ];
 
 /* See if a mask should be used to exclude bright source areas from
-   the COM model. Cannot mask if no LUT is available. */
-   mask = lut ? smf_get_mask( wf, SMF__COM, keymap, dat, flags, status ) : NULL;
+   the COM model. Cannot mask if no LUT is available. If this function
+   is being called as part of the PCA model, then use "PCA.xxx" keymap
+   values to define the mask instead of "COM.xxx" values. */
+   modeltype = ( flags & SMF__DIMM_PCACOM ) ? SMF__PCA : SMF__COM;
+   mask = lut ? smf_get_mask( wf, modeltype, keymap, dat, flags, status ) : NULL;
 
 /* If we have a mask, copy it into the quality array of the map.
    Also set map pixels that are not used (e.g. corner pixels, etc)
@@ -303,21 +318,26 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       double *map = dat->map;
       smf_qual_t *mapqual = dat->mapqual;
       double *mapvar = dat->mapvar;
+      smf_qual_t qval = ( flags & SMF__DIMM_PCACOM ) ? SMF__MAPQ_PCA : SMF__MAPQ_COM;
 
       for( i=0; i<dat->msize; i++ ) {
          if( mask[i] ) {
-            mapqual[i] |= SMF__MAPQ_COM;
+            mapqual[i] |= qval;
 
          } else if( dat->iter > 0 && ( map[i] == VAL__BADD ||
                     mapvar[i] == VAL__BADD || mapvar[i] <= 0.0 ) ) {
             mask[i] = 1;
-            mapqual[i] |= SMF__MAPQ_COM;
+            mapqual[i] |= qval;
 
          } else {
-            mapqual[i] &= ~SMF__MAPQ_COM;
+            mapqual[i] &= ~qval;
          }
       }
    }
+
+/* Select the quality value that this function should use to flag strange
+   bolometer blocks. */
+   badqual =  ( flags & SMF__DIMM_PCACOM ) ? SMF__Q_PCA : SMF__Q_COM;
 
 /* Get the number of adjacent time slices for which the same gain should
    be used. */
@@ -338,8 +358,8 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    on if freeze_flags is less than zero, saince this i show skylopp
    indicates that freezing is required. */
       if( dat->iter == freeze_flags + skip || freeze_flags < 0 ) {
-         msgOutif( MSG__VERB, "", "  COM flagging is now frozen due to "
-                   "COM.FREEZE_FLAGS setting.", status );
+         msgOutiff( MSG__VERB, "", "  %s flagging is now frozen due to "
+                   "%s.FREEZE_FLAGS setting.", status, modelname, modelname );
          freeze_flags = 1;
       } else if( dat->iter > freeze_flags + skip ) {
          freeze_flags = 1;
@@ -419,6 +439,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
          pdata->nsigma = nsigma;
          pdata->fill = fill;
          pdata->freeze_flags = freeze_flags;
+         pdata->badqual = badqual;
       }
    }
 
@@ -436,17 +457,22 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    The corresponding smfData is at position 0 in the model sdata. Store the
    number of COM models to undo. */
    if( perarray ) {
-      msgOutif( MSG__VERB, "", "  Undoing separate COM models for each array.",
-                status );
+      if( flags & SMF__DIMM_INVERT ) {
+         msgOutif( MSG__VERB, "", "  Undoing separate COM models for each array.",
+                   status );
+      }
       ncom = model->ndat;
       if( (int) res->ndat != ncom && *status == SAI__OK  ) {
          *status = SAI__ERROR;
-         errRep( "", "smf_calcmodel_com: COM model and residuals contain "
-                 "different number of data arrays!", status);
+         errRepf( "", "smf_calcmodel_com: COM model and residuals contain "
+                 "different number of data arrays (%d and %zu)!", status,
+                 ncom, res->ndat );
       }
    } else {
-      msgOutif( MSG__VERB, "", "  Undoing a single COM model for all arrays.",
-                status );
+      if( flags & SMF__DIMM_INVERT ) {
+         msgOutif( MSG__VERB, "", "  Undoing a single COM model for all arrays.",
+                   status );
+      }
       ncom = 1;
    }
 
@@ -577,7 +603,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
          thrWait( wf, status );
 
 /* Test if the following filtering has been requested. We do not do this
-   filtering if the COM flaggingis frozen. */
+   filtering if the COM flagging is frozen. */
          if( sig_limit > 0.0 && !freeze_flags ) {
 
 /* We now attempt to flag times slices in the above COM model that
@@ -707,12 +733,12 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                                lut ? lut->sdata[ icom ] : NULL,
                                model->sdata[ icom ]->pntr[0], kmap,
                                ( SMF__Q_GOOD & ~SMF__Q_RING ),
-                               SMF__Q_COM, gai->sdata[ icom ], NULL, status );
+                               badqual, gai->sdata[ icom ], NULL, status );
             } else {
                smf_find_gains_array( wf, gai_flags, res, mask, lut,
                                      model->sdata[ icom ]->pntr[0], kmap,
                                      ( SMF__Q_GOOD & ~SMF__Q_RING ),
-                                     SMF__Q_COM, gai, NULL, status );
+                                     badqual, gai, NULL, status );
             }
          }
 
@@ -726,13 +752,15 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
             idx_hi = res->ndat - 1;
          }
 
-/* Subtract the COM estimate from every bolometer. */
+/* Subtract the COM estimate from every bolometer (or if SMF__DIMM_PCACOM
+   flag is set, use the COM model to fill gaps in every bolometer). */
          for( iw = 0; iw < nw; iw++ ) {
             pdata = job_data + iw;
             pdata->icom = icom;
             pdata->idx_lo = idx_lo;
             pdata->idx_hi = idx_hi;
-            pdata->operation = 5;
+            pdata->operation = ( flags & SMF__DIMM_PCACOM ) ? 8 : 5;
+
             thrAddJob( wf, 0, pdata, smf1_calcmodel_com, 0, NULL, status );
          }
          thrWait( wf, status );
@@ -799,12 +827,15 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
    double *wg;
    double *wgtbuf = NULL;
    double *woff;
+   double modelvalue;
    double s1;
    double s2;
    double svar;
    double v;
+   int *lut_data;
    int *pl;
    int iblock;
+   int masked;
    int ns1;
    int state;
    size_t gbstride;
@@ -813,6 +844,7 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
    smf_qual_t *pq0[ 4 ];
    smf_qual_t *pq;
    smf_qual_t *qua_data;
+   smf_qual_t badqual;
    smf_qual_t qmask;
 
 /* Check inherited status */
@@ -822,9 +854,12 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
    supplied structure. */
    pdata = (SmfCalcModelComData *) job_data_ptr;
 
+   badqual = pdata->badqual;
+
 /* Add or remove the previous estimate of COM back to/from the residuals.
+   Or use the COM model to fill gaps in the residuals (operation 8).
    ================================================================== */
-   if( pdata->operation == 1 || pdata->operation == 5 ) {
+   if( pdata->operation == 1 || pdata->operation == 5 || pdata->operation == 8 ) {
 
 /* Allocate work space */
       wg = astMalloc( ( pdata->t2 - pdata->t1 + 1 )*sizeof( *wg ) );
@@ -859,6 +894,7 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
          res_data = pdata->res->sdata[ idx ]->pntr[ 0 ];
          qua_data = smf_select_qualpntr( pdata->res->sdata[ idx ], NULL, status );
          gai_data = pdata->gai ? pdata->gai->sdata[ idx ]->pntr[ 0 ] : NULL;
+         lut_data = pdata->lut ? pdata->lut->sdata[ idx ]->pntr[ 0 ] : NULL;
 
 /* Get the strides in the GAI model. */
          if( gai_data ) {
@@ -886,28 +922,41 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
    for the current bolometer. */
                pr = res_data + izero + pdata->t1;
                pq = qua_data + izero + pdata->t1;
+               pl = lut_data ? lut_data + izero + pdata->t1 : NULL;
                pm = model_data + pdata->t1;
                pwg = wg;
                pwoff = woff;
 
 /* Loop over the time slices to be processed by this thread. */
                for( itime = pdata->t1; itime <= pdata->t2;
-                    itime++,pr++,pq++,pm++,pwg++,pwoff++ ) {
+                    itime++,pr++,pq++,pm++,pwg++,pwoff++,pl++ ) {
 
 /* Scale the common mode using the gain and offset for the current
-   bolometer, and add it back onto the residuals. We include samples that
+   bolometer to get the COM model value. */
+                  if( (*pm) != VAL__BADD ) {
+                     modelvalue = (*pwg)*(*pm) + (*pwoff);
+
+/* If required, fill flagged residual samples using the COM model. */
+                     if( pdata->operation == 8 ) {
+                        masked = ( lut_data && *pl != VAL__BADI &&
+                                   pdata->mask && !pdata->mask[ *pl ] );
+                        if( *pq || masked ) (*pr) = modelvalue;
+
+/* Add the COM model value back onto the residuals. We include samples that
    have been flagged by this function as "unusual" on previous iterations.
    Note, SMF__Q_MOD does not include SMF__Q_COM). */
-                  if( !( (*pq) & SMF__Q_MOD ) && (*pm) != VAL__BADD ) {
-                     if( pdata->operation == 1 ) {
-                        (*pr) += (*pwg)*(*pm) + (*pwoff);
+                     } else if( !( (*pq) & SMF__Q_MOD ) ) {
+                        if( pdata->operation == 1 ) {
+                           (*pr) += modelvalue;
 
-/* If we have not yet passed the iteration at which COM flaggign is
+/* If we have not yet passed the iteration at which COM flagging is
    frozen, ensure no samples have the SMF__Q_COM flag. */
-                        if( !pdata->freeze_flags ) (*pq) &= ~SMF__Q_COM;
+                           if( !pdata->freeze_flags ) (*pq) &= ~badqual;
 
-                     } else {
-                        (*pr) -= (*pwg)*(*pm) + (*pwoff);
+/* Subtract the COM model value form the residuals. */
+                        } else {
+                           (*pr) -= modelvalue;
+                        }
                      }
                   }
                }
@@ -1234,7 +1283,7 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
                   for( idx = pdata->idx_lo; idx <= pdata->idx_hi; idx++ ) {
                      pq = pq0[ idx ] + jtime;
                      for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
-                        *pq |= SMF__Q_COM;
+                        *pq |= badqual;
                         pq += pdata->ntslice;
                      }
                   }
@@ -1254,7 +1303,7 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
                   for( idx = pdata->idx_lo; idx <= pdata->idx_hi; idx++ ) {
                      pq = pq0[ idx ] + jtime;
                      for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
-                        *pq |= SMF__Q_COM;
+                        *pq |= badqual;
                         pq += pdata->ntslice;
                      }
                   }
@@ -1266,7 +1315,7 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
                for( idx = pdata->idx_lo; idx <= pdata->idx_hi; idx++ ) {
                   pq = pq0[ idx ] + itime;
                   for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
-                     *pq |= SMF__Q_COM;
+                     *pq |= badqual;
                      pq += pdata->ntslice;
                   }
                }

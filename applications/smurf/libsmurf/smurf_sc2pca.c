@@ -241,7 +241,7 @@ void smurf_sc2pca( int *status ) {
 
     /* Calculate the PCA */
     smf_clean_pca( wf, data, 0, 0, 0, &components, &amplitudes, 0, 1, NULL,
-                   status );
+                   ~SMF__Q_BADB, status );
 
     /* Write out to the new files */
     smf_write_smfData( wf, amplitudes, NULL, NULL, outampgrp, i, 0, MSG__VERB,

@@ -105,8 +105,6 @@ typedef struct smfCalcModelPCAData {
    double *res_data;
    int *lut_data;
    int oper;
-   size_t bstride;
-   size_t tstride;
    smf_qual_t *qua_data;
    unsigned char *mask;
 } SmfCalcModelPCAData;
@@ -119,8 +117,8 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 /* Local Variables: */
    AstKeyMap *kmap;
    AstObject *obj;
-   SmfCalcModelPCAData *pdata;
    SmfCalcModelPCAData *job_data = NULL;
+   SmfCalcModelPCAData *pdata;
    dim_t bstep;
    dim_t idx;
    dim_t nbolo;
@@ -129,17 +127,17 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    double *model_data;
    double *res_data;
    double pcathresh;
+   int comfill;
    int iw;
-   dim_t ipix;
    int nw;
-   size_t bstride;
-   size_t pcalen;
-   size_t tstride;
+   size_t ipix;
+   smfArray **oldgai;
+   smfArray **oldres;
    smfArray *lut=NULL;
    smfArray *model;
    smfArray *res;
    smf_qual_t *qua_data;
-   unsigned char *mask;
+   unsigned char *mask = NULL;
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return;
@@ -152,10 +150,16 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
    this function. */
    astBegin;
 
+/* Ensure the data is bolo-ordered (i.e. adjacent values in memory are
+   adjacent time slices from the same bolometer, so tstride is 1 and
+   bstride is ntslice). This is the order required and enforced by the
+   call to smf_calcmodel_com below. */
+   smf_model_dataOrder( wf, dat, NULL, chunk, SMF__RES|SMF__QUA, 0, status );
+
 /* Obtain pointers to relevant smfArrays for this chunk */
    res = dat->res[ chunk ];
-   lut = dat->lut[ chunk ];
    model = allmodel[ chunk ];
+   lut = dat->lut[ chunk ];
 
 /* Get a pointer to the KeyMap holding parameters controlling the
    common-mode correction model. */
@@ -164,12 +168,10 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
 
 /* Get the required parameter values. */
    astMapGet0D( kmap, "PCATHRESH", &pcathresh );
-   astMapGet0I( kmap, "PCALEN", &iw );
-   pcalen = iw;
 
 /* Obtain dimensions of the data (assumed to be the same for all subarrays). */
    smf_get_dims( res->sdata[0],  NULL, NULL, &nbolo, &ntslice, NULL,
-                 &bstride, &tstride, status );
+                 NULL, NULL, status );
 
 /* How many threads do we get to play with */
    nw = wf ? wf->nworker : 1;
@@ -201,15 +203,14 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
          }
 
 /* Store other values common to all jobs. */
-         pdata->bstride = bstride;
-         pdata->tstride = tstride;
          pdata->ntslice = ntslice;
          pdata->nbolo = nbolo;
       }
    }
 
 /* If we are inverting the model, just add the model values onto the
-   residuals. */
+   residuals. This also clears any SMF__Q_PCA flags set on the previous
+   iteration. */
    if( flags & SMF__DIMM_INVERT ) {
 
 /* Process each sub-array in turn. */
@@ -234,77 +235,145 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
 /* If we are calculating a new model... */
    } else {
 
+/* Copy the supplied residuals into the current model arrays. The PCA
+   model shares the residuals' quality array. */
+      for( idx = 0; idx < res->ndat && *status == SAI__OK; idx++ ) {
+         res_data = (res->sdata[idx]->pntr)[0];
+         model_data = (model->sdata[idx]->pntr)[0];
+         if( *status == SAI__OK ) {
+            memcpy(  model_data, res_data, nbolo*ntslice*sizeof(*res_data) );
+         }
+      }
+
+/* Like FLT, PCA analysis requires all bad values and gaps to be filled
+   before doing the analysis. The smf_clean_pca routine will use smf_fillgaps
+   to fill gaps, but we seem to get a better PCA model if instead we fill
+   gaps using a COM/GAI-like model (i.e. a scaled common-mode). So call
+   smf_calcmodel_com to do this, filling the gaps in the PCA model arrays
+   initialised above, rather than the main residuals arrays. The
+   SMF__DIMM_PCACOM flag tells it to use the COM model to fill gaps in the
+   data, rather than subtracting the COM model from the data. It also
+   tells it apply any masking requested for the PCA model rather than the
+   COM model. Temporarily replace pointers in "dat" so that the PCA model
+   is used instead of the residuals, and so that the PCA GAI model is used
+   in stead of the COM GAI model.
+
+   Note, doing this is only a good idea if there is a strong common mode
+   present in the supplied residuals. This will usually only be the case
+   if PCA is the first model in the modelorder. So provide an option to
+   omit this COM-filling and instead rely on the usual linear interpolation
+   provided by smf_fillgaps. */
+      astMapGet0I( kmap, "COMFILL", &comfill );
+      if( comfill ) {
+         oldgai = dat->gai;
+         oldres = dat->res;
+         dat->gai = dat->pcagai;
+         dat->res = &model;
+
+         msgOutif( MSG__VERB, "", "  Evaluating a COM model as part of "
+                   "the PCA model...", status );
+         msgOutif( MSG__VERB, "", "  ---------------------------------",
+                   status );
+         smf_calcmodel_com( wf, dat, 0, keymap, dat->pcacom,
+                            flags | SMF__DIMM_PCACOM, status );
+         msgOutif( MSG__VERB, "", "  ---------------------------------",
+                   status );
+
+         dat->gai = oldgai;
+         dat->res = oldres;
+
+/* If "comfill" is non-zero, any requested PCA mask will have been
+   applied - and the consequent gaps filled - within smf_calcmodel_com.
+   Otherwise, we need to do any requested PCA masking in this function. */
+      } else {
+
 /* See if a mask should be used to exclude bright source areas from
    the PCA model. */
-      mask = smf_get_mask( wf, SMF__PCA, keymap, dat, flags, status );
+         mask = smf_get_mask( wf, SMF__PCA, keymap, dat, flags, status );
 
 /* If we have a mask, copy it into the quality array of the map.
    Also set map pixels that are not used (e.g. corner pixels, etc)
    to be background pixels in the mask. Do not do this on the first
    iteration as the map has not yet been determined.*/
-      if( mask ) {
-        double *map = dat->map;
-        smf_qual_t *mapqual = dat->mapqual;
-        double *mapvar = dat->mapvar;
+         if( mask ) {
+            double *map = dat->map;
+            smf_qual_t *mapqual = dat->mapqual;
+            double *mapvar = dat->mapvar;
 
-        for( ipix=0; ipix<dat->msize; ipix++ ) {
-          if( mask[ipix] ) {
-             mapqual[ipix] |= SMF__MAPQ_PCA;
+            for( ipix=0; ipix<dat->msize; ipix++ ) {
+               if( mask[ipix] ) {
+                  mapqual[ipix] |= SMF__MAPQ_PCA;
 
-          } else if( dat->iter > 0 && ( map[ipix] == VAL__BADD || mapvar[ipix] == VAL__BADD || mapvar[ipix] <= 0.0 ) ) {
-             mask[ipix] = 1;
-             mapqual[ipix] |= SMF__MAPQ_PCA;
+               } else if( dat->iter > 0 && ( map[ipix] == VAL__BADD || mapvar[ipix] == VAL__BADD || mapvar[ipix] <= 0.0 ) ) {
+                  mask[ipix] = 1;
+                  mapqual[ipix] |= SMF__MAPQ_PCA;
 
-          } else {
-             mapqual[ipix] &= ~SMF__MAPQ_PCA;
-          }
-        }
+               } else {
+                  mapqual[ipix] &= ~SMF__MAPQ_PCA;
+               }
+            }
+         }
       }
 
-/* Determine the PCA for each subarray in turn. */
+/* If comfill is specified, the above results in the PCA model arrays
+   containing a copy of the supplied residual data, but with no gaps.
+   In other words, all values in the PCA model - except for padding and
+   dead bolometers - are representative of the typical time-stream residual
+   values. The quality array however is unchanged, except that some samples
+   may have been flagged using SMF__Q_PCA - these are the samples where the
+   residuals are poorly correlated to the common-mode. We can now proceed
+   to do a PCA analysis of each sub-array. */
       for( idx = 0; idx < res->ndat && *status == SAI__OK; idx++ ) {
 
-/* Get pointers to data, quality and model for the current subarray. */
-         res_data = (res->sdata[idx]->pntr)[0];
-         model_data = (model->sdata[idx]->pntr)[0];
-         qua_data = smf_select_qualpntr( res->sdata[idx], NULL, status );
+/* If we are doing masking within this function, flag the residual values
+   that fall within the source regions. The gaps thus produced will be
+   filled within smf_clean_pca using linear interpolation. */
+         if( mask ) {
+            res_data = (res->sdata[idx]->pntr)[0];
+            model_data = (model->sdata[idx]->pntr)[0];
+            qua_data = smf_select_qualpntr( res->sdata[idx], NULL, status );
 
-/* Save the original residuals in the model. */
-         if( *status == SAI__OK ) {
-            memcpy(  model_data, res_data, nbolo*ntslice*sizeof(*res_data) );
-
-/* If we are using a mask, flag the residual values that fall within
-   the source regions. The gaps thus produced will be filled within
-   smf_clean_pca_chunks. */
-            if( mask ) {
-               for( iw = 0; iw < nw; iw++ ) {
-                  pdata = job_data + iw;
-                  pdata->model_data = model_data;
-                  pdata->qua_data = qua_data;
-                  pdata->mask = mask;
-                  pdata->lut_data = (lut->sdata[idx]->pntr)[0];
-                  pdata->oper = 3;
-                  thrAddJob( wf, 0, pdata, smf1_calcmodel_pca, 0, NULL, status );
-               }
-               thrWait( wf, status );
-            }
-
-/* Obtain the required PCA components (i.e. the model values). */
-            smf_clean_pca_chunks( wf, model->sdata[idx], pcalen, pcathresh,
-                                  1, 0, kmap, status );
-
-/* Subtract the model from the original residuals. */
             for( iw = 0; iw < nw; iw++ ) {
                pdata = job_data + iw;
                pdata->model_data = model_data;
-               pdata->res_data = res_data;
                pdata->qua_data = qua_data;
-               pdata->oper = 2;
+               pdata->mask = mask;
+               pdata->lut_data = (lut->sdata[idx]->pntr)[0];
+               pdata->oper = 3;
                thrAddJob( wf, 0, pdata, smf1_calcmodel_pca, 0, NULL, status );
             }
             thrWait( wf, status );
          }
+
+/* Do a PCA analysis of the values in the PCA model arrays. The model
+   arrays are returned containing time-stream values made up from the
+   strongest components in the data (as determined by pcathresh). These
+   are the required final PCA model values. If filling has already been
+   done using a COM model, tell smf_clean_pca to fill only gaps flagged
+   by smf_calcmodel_com above (using the SMF__Q_PCA bit) before doing the
+   analysis. All other gaps have been filled above using the COM model. */
+         smf_clean_pca( wf, model->sdata[idx], 0, 0, pcathresh, NULL,
+                        NULL, 0, 0, kmap, comfill ? SMF__Q_PCA : SMF__Q_GAP,
+                        status );
+
+/* Get pointers to data, quality and PCA model arrays for the current
+   subarray. */
+         res_data = (res->sdata[idx]->pntr)[0];
+         model_data = (model->sdata[idx]->pntr)[0];
+         qua_data = smf_select_qualpntr( res->sdata[idx], NULL, status );
+
+/* Subtract the PCA model from the original residuals. */
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->model_data = model_data;
+            pdata->res_data = res_data;
+            pdata->qua_data = qua_data;
+            pdata->oper = 2;
+            thrAddJob( wf, 0, pdata, smf1_calcmodel_pca, 0, NULL, status );
+         }
+         thrWait( wf, status );
       }
+
    }
 
 /* Free resources. */
@@ -322,7 +391,7 @@ static void smf1_calcmodel_pca( void *job_data_ptr, int *status ) {
 
 *  Purpose:
 *     Executed in a worker thread to do various calculations for
-*     smf_calmodel_com.
+*     smf_calmodel_pca.
 
 *  Invocation:
 *     smf1_calcmodel_pca( void *job_data_ptr, int *status )
@@ -342,16 +411,11 @@ static void smf1_calcmodel_pca( void *job_data_ptr, int *status ) {
    dim_t b2;
    dim_t ibolo;
    dim_t itime;
-   dim_t nbolo;
    dim_t ntslice;
-   dim_t t1;
-   dim_t t2;
    double *pm;
    double *pr;
    int *pl;
-   size_t bstride;
    size_t ibase;
-   size_t tstride;
    smf_qual_t *pq;
 
 /* Check inherited status */
@@ -365,74 +429,31 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
    supplied structure. */
    pdata = (SmfCalcModelPCAData *) job_data_ptr;
 
-   tstride = pdata->tstride;
-   bstride = pdata->bstride;
-   nbolo = pdata->nbolo;
    ntslice = pdata->ntslice;
    b1 = pdata->b1;
    b2 = pdata->b2;
-   t1 = pdata->t1;
-   t2 = pdata->t2;
 
 /* Add the PCA model onto the residuals.
    ==================================== */
    if( pdata->oper == 1 ) {
 
-/* For efficiency, choose the scheme that ensures that the fastest changing
-   axis is the inner loop. First case: time is the inner loop. */
-      if( tstride == 1 ) {
-
 /* Loop round all bolos to be processed by this thread, maintaining the
-   index of the first time slice for the current bolo. */
-         ibase = b1*bstride;
-         for( ibolo = b1; ibolo <= b2; ibolo++ ) {
+   index of the first time slice for the current bolo. We know tstride
+   is 1, and bstride is ntslice. */
+      ibase = b1*ntslice;
+      for( ibolo = b1; ibolo <= b2; ibolo++ ) {
 
 /* Check that the whole bolometer has not been flagged as bad. */
-            if( !( (pdata->qua_data)[ ibase ] & SMF__Q_BADB ) ) {
+         if( !( (pdata->qua_data)[ ibase ] & SMF__Q_BADB ) ) {
 
 /* Get a pointer to the first residual, quality and model value for the
    current bolo. */
-               pr = pdata->res_data + ibase;
-               pq = pdata->qua_data + ibase;
-               pm = pdata->model_data + ibase;
-
-/* Loop over all time slices. */
-               for( itime = 0; itime < ntslice; itime++ ) {
-
-/* Remove the SMF__Q_PCA flags. */
-                  *pq &= ~SMF__Q_PCA;
-
-/* Add the model back onto the residuals, if the sample is modifiable. */
-                  if( !(*pq & SMF__Q_MOD) ) *pr += *pm;
-
-/* Move pointers on to the next time sample. */
-                  pr++;
-                  pq++;
-                  pm++;
-               }
-            }
-
-/* Increment the index of the first value associated with the next
-   bolometer. */
-            ibase += bstride;
-         }
-
-/* Second case: bstride must be 1 so bolometer is the inner loop. */
-      } else {
-
-/* Loop round all time slices to be processed by this thread, maintaining
-   the index of the first bolometer value for the current time slice. */
-         ibase = t1*tstride;
-         for( itime = t1; itime <= t2; itime++ ) {
-
-/* Get a pointer to the residual, quality and model value for the
-   first bolo at the current time slice. */
             pr = pdata->res_data + ibase;
             pq = pdata->qua_data + ibase;
             pm = pdata->model_data + ibase;
 
-/* Loop over all bolometers. */
-            for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+/* Loop over all time slices. */
+            for( itime = 0; itime < ntslice; itime++ ) {
 
 /* Remove the SMF__Q_PCA flags. */
                *pq &= ~SMF__Q_PCA;
@@ -440,174 +461,94 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
 /* Add the model back onto the residuals, if the sample is modifiable. */
                if( !(*pq & SMF__Q_MOD) ) *pr += *pm;
 
-/* Move pointers on to the next bolometer. */
+/* Move pointers on to the next time sample. */
                pr++;
                pq++;
                pm++;
             }
-
-/* Increment the index of the first value associated with the next
-   time slice. */
-            ibase += tstride;
          }
-      }
-
-/* Form the model as the difference between the original residuals and
-   the cleaned residuals.
-   =================================================================== */
-   } else if( pdata->oper == 2 ) {
-
-/* For efficiency, choose the scheme that ensures that the fastest changing
-   axis is the inner loop. First case: time is the inner loop. */
-      if( tstride == 1 ) {
-
-/* Loop round all bolos to be processed by this thread, maintaining the
-   index of the first time slice for the current bolo. */
-         ibase = b1*bstride;
-         for( ibolo = b1; ibolo <= b2; ibolo++ ) {
-
-/* Check that the whole bolometer has not been flagged as bad. */
-            if( !( (pdata->qua_data)[ ibase ] & SMF__Q_BADB ) ) {
-
-/* Get a pointer to the first residual, quality and model value for the
-   current bolo. */
-               pr = pdata->res_data + ibase;
-               pq = pdata->qua_data + ibase;
-               pm = pdata->model_data + ibase;
-
-/* Loop over all time slices. */
-               for( itime = 0; itime < ntslice; itime++ ) {
-
-/* Subtract off the model value. */
-                  if( *pm != VAL__BADD && *pr != VAL__BADD ) {
-                     *pr -= *pm;
-                  }
-
-/* Move pointers on to the next time sample. */
-                  pr++;
-                  pq++;
-                  pm++;
-               }
-            }
 
 /* Increment the index of the first value associated with the next
    bolometer. */
-            ibase += bstride;
-         }
+         ibase += ntslice;
+      }
 
-/* Second case: bstride must be 1 so bolometer is the inner loop. */
-      } else {
+/* Subtract the model from the original residuals.
+   ============================================== */
+   } else if( pdata->oper == 2 ) {
 
-/* Loop round all time slices to be processed by this thread, maintaining
-   the index of the first bolometer value for the current time slice. */
-         ibase = t1*tstride;
-         for( itime = t1; itime <= t2; itime++ ) {
+/* Loop round all bolos to be processed by this thread, maintaining the
+   index of the first time slice for the current bolo. We know tstride
+   is 1 and bstride is ntslice. */
+      ibase = b1*ntslice;
+      for( ibolo = b1; ibolo <= b2; ibolo++ ) {
 
-/* Get a pointer to the residual, quality and model value for the
-   first bolo at the current time slice. */
+/* Check that the whole bolometer has not been flagged as bad. */
+         if( !( (pdata->qua_data)[ ibase ] & SMF__Q_BADB ) ) {
+
+/* Get a pointer to the first residual, quality and model value for the
+   current bolo. */
             pr = pdata->res_data + ibase;
             pq = pdata->qua_data + ibase;
             pm = pdata->model_data + ibase;
 
-/* Loop over all bolometers. */
-            for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+/* Loop over all time slices. */
+            for( itime = 0; itime < ntslice; itime++ ) {
 
 /* Subtract off the model value. */
-               if( !( *pq & SMF__Q_BADB ) &&
-                   *pm != VAL__BADD && *pr != VAL__BADD ) {
+               if( *pm != VAL__BADD && *pr != VAL__BADD ) {
                   *pr -= *pm;
                }
 
-/* Move pointers on to the next bolometer. */
+/* Move pointers on to the next time sample. */
                pr++;
                pq++;
                pm++;
             }
+          }
 
 /* Increment the index of the first value associated with the next
-   time slice. */
-            ibase += tstride;
-         }
+   bolometer. */
+         ibase += ntslice;
       }
 
 /* Mask out samples that fall within source regions.
    ================================================= */
    } else if( pdata->oper == 3 ) {
 
-/* For efficiency, choose the scheme that ensures that the fastest changing
-   axis is the inner loop. First case: time is the inner loop. */
-      if( tstride == 1 ) {
-
 /* Loop round all bolos to be processed by this thread, maintaining the
    index of the first time slice for the current bolo. */
-         ibase = b1*bstride;
-         for( ibolo = b1; ibolo <= b2; ibolo++ ) {
+      ibase = b1*ntslice;
+      for( ibolo = b1; ibolo <= b2; ibolo++ ) {
 
 /* Check that the whole bolometer has not been flagged as bad. */
-            if( !( (pdata->qua_data)[ ibase ] & SMF__Q_BADB ) ) {
+         if( !( (pdata->qua_data)[ ibase ] & SMF__Q_BADB ) ) {
 
 /* Get a pointer to the first LUT, quality and model value for the
    current bolo. */
-               pl = pdata->lut_data + ibase;
-               pq = pdata->qua_data + ibase;
-               pm = pdata->model_data + ibase;
-
-/* Loop over all time slices. */
-               for( itime = 0; itime < ntslice; itime++ ) {
-
-/* Set the model bad if it falls in the source region in the PCA mask. */
-                  if( *pl == VAL__BADI || !pdata->mask[ *pl ] ) {
-                     *pm = VAL__BADD;
-                  }
-
-/* Move pointers on to the next time sample. */
-                  pl++;
-                  pq++;
-                  pm++;
-               }
-            }
-
-/* Increment the index of the first value associated with the next
-   bolometer. */
-            ibase += bstride;
-         }
-
-/* Second case: bstride must be 1 so bolometer is the inner loop. */
-      } else {
-
-/* Loop round all time slices to be processed by this thread, maintaining
-   the index of the first bolometer value for the current time slice. */
-         ibase = t1*tstride;
-         for( itime = t1; itime <= t2; itime++ ) {
-
-/* Get a pointer to the LUT, quality and model value for the
-   first bolo at the current time slice. */
             pl = pdata->lut_data + ibase;
             pq = pdata->qua_data + ibase;
             pm = pdata->model_data + ibase;
 
-/* Loop over all bolometers. */
-            for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+/* Loop over all time slices. */
+            for( itime = 0; itime < ntslice; itime++ ) {
 
 /* Set the model bad if it falls in the source region in the PCA mask. */
-               if( !( *pq & SMF__Q_BADB ) ) {
-                  if( *pl == VAL__BADI || !pdata->mask[ *pl ] ) {
-                     *pm = VAL__BADD;
-                  }
+               if( *pl == VAL__BADI || !pdata->mask[ *pl ] ) {
+                  *pm = VAL__BADD;
                }
 
-/* Move pointers on to the next bolometer. */
+/* Move pointers on to the next time sample. */
                pl++;
                pq++;
                pm++;
             }
+         }
 
 /* Increment the index of the first value associated with the next
-   time slice. */
-            ibase += tstride;
-         }
+   bolometer. */
+         ibase += ntslice;
       }
-
 
 /* Report an error if the worker was to do an unknown job.
    ====================================================== */
