@@ -1545,7 +1545,7 @@ try:
 #  that the coadd is the sum rather than the mean of the inputs.
    elif len(qmaps) > 1:
       msg_out("Coadding Q and U maps from all observations")
-      allmaps = NDG( qmaps.values() )
+      allmaps = NDG( list( qmaps.values() ) )
       invoke("$KAPPA_DIR/wcsmosaic in={0} out={1} lbnd=! ref=! "
              "conserve=no method=bilin variance=yes".format(allmaps,qmos))
 
@@ -1559,7 +1559,7 @@ try:
              "out={1}.more.smurf.weights conserve=no method=bilin norm=no "
              "variance=no".format(allmaps,qmos))
 
-      allmaps = NDG( umaps.values() )
+      allmaps = NDG( list( umaps.values() ) )
       invoke("$KAPPA_DIR/wcsmosaic in={0} out={1} lbnd=! ref=! "
              "conserve=no method=bilin variance=yes".format(allmaps,umos))
 
