@@ -334,6 +334,10 @@
 *        list of input files.
 *        - Report an error if any supplied input Q or U maps are in units
 *        other than pW.
+*     15-OCT-2016 (DSB):
+*        - Allow Q and U maps creatd by previous run of pol2scan to be
+*        accepted as input. Such maps may have no quality array (because
+*        wcsmosaic does not propagate quality).
 '''
 
 import os
@@ -365,7 +369,7 @@ def cleanup():
 
 
 
-#  A function to calculate the following threee statistics from the
+#  A function to calculate the following three statistics from the
 #  supplied Q or U map:
 #     1 - The estimated noise level at the map centre in pW (based on the
 #         NDF Variance array). Returned as -1.0 if the map appears to be
@@ -386,8 +390,7 @@ def calc_stats(ndf):
 
 #  Can't do this if no quality.
    if not get_task_par( "quality", "ndftrace"):
-      raise starutil.InvalidParameterError("Supplied map {0} has no "
-               "Quality array.".format( ndf ) )
+      return (None, None, None)
 
 #  We want the noise at the centre of the map because we want it to be
 #  comparable to the noise used in the expected NEFD calculations. But it
@@ -1379,6 +1382,7 @@ try:
          umaps[id] = path
 
 #  Loop over all Q maps.
+   gotstats = False
    badkeys = []
    for key in qmaps:
 
@@ -1430,7 +1434,11 @@ try:
 #  Background noise, source size, mean source value...
       (noise_q, source_size_q[key], source_rms_q[key] ) = calc_stats( qmaps[key] )
       (noise_u, source_size_u[key], source_rms_u[key] ) = calc_stats( umaps[key] )
-      if noise_q >= 0.0 and noise_u >= 0.0:
+      if noise_q == None or noise_u == None:
+         msg_out( "  The Q and U maps supplied for this observation have "
+                  "no Quality array and so statistics cannot be produced." )
+
+      elif noise_q >= 0.0 and noise_u >= 0.0:
 
 #  Calculate the NEFDs based on the measured noises.
          nefd_q[key] = fcf*noise_q*math.sqrt(elapsed_time[key]*c)
@@ -1461,6 +1469,7 @@ try:
          if key in pointing_dx and pointing_dx[key] != "null" and key in pointing_dy and pointing_dy[key] != "null":
             msg_out( "  Pointing correction = ( {0}, {1} ) arc-sec".
                      format(pointing_dx[key],pointing_dy[key]))
+         gotstats = True
 
       else:
          msg_out( "  This observation appears to be for a far away object ({0}) "
@@ -1479,7 +1488,7 @@ try:
 #  If required, dump the stats for the individual observations to a text
 #  file, formatted in topcat "ascii" format.
    msg_out( " " )
-   if obstable:
+   if obstable and gotstats:
       msg_out( "Writing stats for individual observations to output text file {0}".format(obstable))
       fd = open(obstable,"w")
       fd.write("#\n")
@@ -1509,19 +1518,20 @@ try:
       fd.write("\n")
 
       for key in umaps:
-         ( ut, obs, subscan ) = key.split("_")
-         fd.write("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13}".
-                  format( ut, obs, subscan, wvm[key],
-                          nefd_q[key], nefd_u[key], nefd_expected[key],
-                          elapsed_time[key],
-                          source_size_q[key], source_size_u[key],
-                          source_rms_q[key], source_rms_q[key],
-                          nbolo_used_q[key], nbolo_used_u[key] ))
+         if source_size_u[key] != None:
+            ( ut, obs, subscan ) = key.split("_")
+            fd.write("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13}".
+                     format( ut, obs, subscan, wvm[key],
+                             nefd_q[key], nefd_u[key], nefd_expected[key],
+                             elapsed_time[key],
+                             source_size_q[key], source_size_u[key],
+                             source_rms_q[key], source_rms_q[key],
+                             nbolo_used_q[key], nbolo_used_u[key] ))
 
-         if len( pointing_dx ) > 0:
-            fd.write(" {0} {1}".format( pointing_dx[key], pointing_dy[key] ))
+            if len( pointing_dx ) > 0:
+               fd.write(" {0} {1}".format( pointing_dx[key], pointing_dy[key] ))
 
-         fd.write("\n")
+            fd.write("\n")
       fd.close()
 
 #  All observation chunks have now been mapped. If we have only one
