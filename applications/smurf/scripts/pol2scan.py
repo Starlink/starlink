@@ -1676,7 +1676,7 @@ try:
 
 #  Create a FITS catalogue containing the polarisation vectors.
       msg_out( "Creating the output catalogue: '{0}'...".format(outcat) )
-      msg = invoke( "$POLPACK_DIR/polvec {0} cat={1} debias={2}".format(cube,outcat,debias) )
+      msg = invoke( "$POLPACK_DIR/polvec {0} cat={1} debias={2} refupdate=no".format(cube,outcat,debias) )
       msg_out( "\n{0}\n".format(msg) )
 
 #  Remove temporary files.

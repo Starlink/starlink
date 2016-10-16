@@ -402,7 +402,7 @@ try:
    invoke( "$POLPACK_DIR/polext in={0} stokes=qui".format(cube) )
 
 #  Create a FITS catalogue containing the polarisation vectors.
-   command = "$POLPACK_DIR/polvec in={0} cat={1} debias={2}".format(cube,outcat,debias)
+   command = "$POLPACK_DIR/polvec in={0} cat={1} debias={2} refupdate=no".format(cube,outcat,debias)
    if pimap:
       command = "{0} ip={1}".format(command,pimap)
       msg_out( "Creating the output catalogue {0} and polarised intensity map {1}...".format(outcat,pimap) )
