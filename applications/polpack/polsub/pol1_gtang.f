@@ -66,6 +66,11 @@
 *        - Correct the "small distance" moved along the first axis of
 *        the reference frame. This was a potentially serious bug that
 *        could sometimes give spurious or bad returned values.
+*     16-OCT-2016 (DSB):
+*        Use the central pixel to determine the direction, rather than
+*        the first pixel. This matches what POL1_ANGRT does. Without this
+*        an unrequired small rotation of the reference direction can be
+*        introduced.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -100,6 +105,7 @@
 *  Local Variables:
       DOUBLE PRECISION OUT( 2, NDF__MXDIM )
       DOUBLE PRECISION IN( 2, NDF__MXDIM )
+      INTEGER DIMS( NDF__MXDIM )
       INTEGER FS
       INTEGER GANG
       INTEGER I
@@ -179,9 +185,13 @@
 *  Get the number of axes in it.
             NPOL = AST_GETI( FS, 'NAXES', STATUS )
 
-*  Transform the base frame origin into the POLANAL Frame.
+*  Get the pixel dimensions of the NDF.
+            CALL NDF_DIM( INDF, NDF__MXDIM, DIMS, NDIM, STATUS )
+
+*  Transform the central pixel from the base frame origin the POLANAL
+*  Frame.
             DO I = 1, NDIM
-               IN( 1, I ) = 0.0D0
+               IN( 1, I ) = 0.5*( 1.0 + DIMS( I ) )
             END DO
 
             CALL AST_TRANN( FS, 1, NDIM, 2, IN, .TRUE., NPOL, 2,

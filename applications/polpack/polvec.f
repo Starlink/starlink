@@ -26,6 +26,9 @@
 *     have been created by POLKA or POLCAL). These calculated values may
 *     be stored either in a series of output NDFs, or in a single
 *     catalogue.
+*
+*     The reference direction of the output catalogue and NDFs is
+*     determined by parameter REFUPDATE.
 
 *  Usage:
 *     polvec in cat [p] [ang] [i] [ip] [q] [u] [v]
@@ -134,6 +137,16 @@
 *        WCS information. If FALSE, no RA and DEC columns are written. For
 *        large catalogues, creating RA and DEC columns can cause a
 *        significant delay. [current value]
+*     REFUPDATE = _LOGICAL (Read)
+*        Determines the reference direction in the output catalogue and
+*        NDFs. If REFUPDATE is TRUE, the output reference direction will
+*        be north if the input NDF has a celestial co-ordinate Frame within
+*        its WCS component (teh direction of north is determined at the
+*        centre of the image). Otherwise, the reference direction will be
+*        the second pixel axis. The POLANAL Frame in the WCS information
+*        of the output catalogue or NDFs is updated to describe the new
+*        reference direction.  If REFUPDATE is FALSE, the output reference
+*        direction will be the same as the input reference direction. [TRUE]
 *     SIGMAS = _REAL (Read)
 *        Number of standard deviations to reject data at. Only used if
 *        METHOD is set to "SIGMA". [4.0]
@@ -166,12 +179,6 @@
 *  Notes:
 *     -  The output NDFs are deleted if there is an error during the
 *     formation of the polarization parameters.
-*     -  The reference direction for the Stokes vectors and polarization
-*     vectors in the output catalogue and NDFs will be north if the input NDF
-*     has a celestial co-ordinate Frame within its WCS component. Otherwise,
-*     the reference direction will be the second pixel axis. The POLANAL
-*     Frame in the WCS information of the output catalogue or NDFs is
-*     updated to describe the new reference direction.
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
@@ -204,6 +211,8 @@
 *        locator.
 *     20-SEP-2012 (DSB):
 *        Delete output catalogue if it contains no vectors.
+*     16-OCT-2016 (DSB):
+*        Added parameter REFUPDATE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -297,6 +306,7 @@
       LOGICAL MAKEU              ! U output required?
       LOGICAL MAKEV              ! V output required?
       LOGICAL RADEC              ! Are RA/DEC columns required?
+      LOGICAL REFUPD             ! Update output reference direction?
       LOGICAL VAR                ! Output variances required?
       REAL ANGROT                ! Input ref. direction
       REAL ANGRT                 ! Output ref. direction
@@ -474,9 +484,14 @@
 
 *  Get the reference direction for the output catalogue. This may be
 *  different to the reference direction for the input cube.
-      CALL POL1_ANGRT( IWCS, 0.5*REAL( LBND( 1 ) + UBND( 1 ) - 1 ),
-     :                 0.5*REAL( LBND( 2 ) + UBND( 2 ) - 1 ), ANGRT,
-     :                 STATUS )
+      CALL PAR_GET0L( 'REFUPDATE', REFUPD, STATUS )
+      IF( REFUPD ) THEN
+         CALL POL1_ANGRT( IWCS, 0.5*REAL( LBND( 1 ) + UBND( 1 ) - 1 ),
+     :                    0.5*REAL( LBND( 2 ) + UBND( 2 ) - 1 ), ANGRT,
+     :                    STATUS )
+      ELSE
+         ANGRT = ANGROT
+      END IF
 
 *  Add in a POLANAL Frame defining the output reference directon.
       CALL POL1_PTANG( ANGRT, IWCS, STATUS )

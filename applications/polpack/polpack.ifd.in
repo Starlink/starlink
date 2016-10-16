@@ -2082,6 +2082,15 @@ package polpack {
             helpkey *
           }
 
+         parameter refupdate {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Update the output reference direction?}
+            helpkey *
+          }
+
          parameter sigmas {
             type _REAL
             vpath PROMPT CURRENT {DEFAULT }
