@@ -1,9 +1,9 @@
       SUBROUTINE POL1_PLVEC( TR, EQMAP, NPIX, NROW, NZ, NSTOKE, NEL,
      :                       STOKE, VSTOKE, STKID, DEBIAS, VAR, ANGROT,
-     :			     ANGRT, NDIMO, MAKEI, MAKEP, MAKET,
-     :			     MAKEIP, MAKEQ, MAKEU, MAKEV, MAKECT, CI,
-     :			     AI, AP, AT, AIP, AQ, AU, AV, AIV, APV, ATV,
-     :			     AIPV, AQV, AUV, AVV, W, STATUS )
+     :                       ANGRT, NDIMO, MAKEI, MAKEP, MAKET,
+     :                       MAKEIP, MAKEQ, MAKEU, MAKEV, MAKECT, CI,
+     :                       AI, AP, AT, AIP, AQ, AU, AV, AIV, APV, ATV,
+     :                       AIPV, AQV, AUV, AVV, W, STATUS )
 
 *+
 *  Name:
@@ -128,6 +128,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 2016 East Asian Observatory.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -153,6 +154,14 @@
 *        negative I value causing the vector to rotate by 90 degs.
 *     14-JAN-2013 (DSB):
 *        Store bad output values if the total intensity is negative.
+*     16-OCT-2016 (DSB):
+*        Change calculation of output values and errors. They no longer
+*        start off by calculating normalised Q and U, and then deriving
+*        everything else from them. The corresponding error propagation
+*        formulae were complicated by the correlation between the
+*        normalised values. But this complication was ignored. and so
+*        the error values were wrong. Now base values on supplied Q and U
+*        without normalisation.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -229,37 +238,28 @@
       INTEGER Z                  ! Z plane index
       LOGICAL CIRC               ! Measure circular polarisation?
       REAL COS2D                 ! Cos( 2* change in ref direction )
-      REAL EPS2                  ! Mean variance on normalised Q and U
-      REAL FACT                  ! Commonly needed factor
       REAL I                     ! Total intensity from all inputs
       REAL IIN                   ! Input I value
       REAL IP                    ! Polarised intensity
+      REAL IP2                   ! Polarised intensity squared
       REAL P                     ! Percentage polarisation
-      REAL P2                    ! Fractional polarisation squared
-      REAL Q                     ! Normalised Q Stokes parameter
       REAL Q2                    ! Normalised Q Stokes parameter squared
       REAL QIN                   ! Input Q value
       REAL QN                    ! Q w.r.t. new ref direction
       REAL RTOD                  ! Conversion factor; radians to degrees
       REAL SIN2D                 ! Cos( 2* change in ref direction )
       REAL T                     ! Polarisation angle
-      REAL U                     ! Normalised U Stokes parameter
       REAL U2                    ! Normalised U Stokes parameter squared
       REAL UIN                   ! Input U value
       REAL UN                    ! U w.r.t. new ref direction
       REAL V                     ! Normalised V Stokes parameter
-      REAL V2                    ! Normalised V Stokes parameter squared
-      REAL VI                    ! Variance on tot. int. from all inputs
       REAL VIIN                  ! Input I variance
       REAL VIN                   ! Input V value
       REAL VIP                   ! Variance on polarised intensity
       REAL VP                    ! Variance on percentage polarisation
-      REAL VQ                    ! Variance on normalised Q Stokes par.
       REAL VQIN                  ! Input Q variance
       REAL VT                    ! Variance on Polarisation angle
-      REAL VU                    ! Variance on normalised U Stokes par.
       REAL VUIN                  ! Input U variance
-      REAL VV                    ! Variance on normalised V Stokes par.
       REAL VVIN                  ! Input V variance
       REAL VQN                   ! Rotated Q variance value
       REAL VUN                   ! Rotated U variance value
@@ -426,7 +426,6 @@
 
                      IF ( VAR ) THEN
                         VIP = VAL__BADR
-                        VI = VAL__BADR
                         VP = VAL__BADR
                         VT = VAL__BADR
                      END IF
@@ -441,7 +440,6 @@
 
                      IF ( VAR ) THEN
                         VIP = VAL__BADR
-                        VI = VIIN
                         VP = VAL__BADR
                         VT = VAL__BADR
                      END IF
@@ -462,38 +460,32 @@
                         UIN = UN
                      END IF
 
-*  Normalise theStokes parameters.
-                     Q = QIN / ABS( IIN )
-                     U = UIN / ABS( IIN )
-
 *  Get the squared Q and U values.
-                     Q2 = Q * Q
-                     U2 = U * U
+                     Q2 = QIN * QIN
+                     U2 = UIN * UIN
 
-*  Percentage polarisation.
-                     P2 = Q2 + U2
-                     P = 100.0 * SQRT( MAX( 0.0, P2 ) )
+*  Polarised intensity.
+                     IP2 = Q2 + U2
+                     IP = SQRT( MAX( 0.0, IP2 ) )
 
 *  Polarisation angle.
-                     IF( U .NE. 0.0 .OR. Q .NE. 0.0 ) THEN
-                        T = RTOD * 0.5 * ATAN2( U, Q )
+                     IF( UIN .NE. 0.0 .OR. QIN .NE. 0.0 ) THEN
+                        T = RTOD * 0.5 * ATAN2( UIN, QIN )
                      ELSE
                         T = VAL__BADR
                      END IF
 
-*  Polarised intensity.
-                     IP = 0.01 * P * I
+*  Percentage polarisation.
+                     P = 100 * IP / I
 
 *  Now produced variances if required.
                      IF ( VAR ) THEN
 
-*  Total intensity.
-                        VI = VIIN
-
 *  If any of the input variances are bad, or if the percentage polarisation
 *  is zero, store bad output variances.
                         IF( VIIN .EQ. VAL__BADR .OR. VQIN .EQ. VAL__BADR
-     :                  .OR. VUIN .EQ. VAL__BADR .OR. P2 .EQ. 0.0 ) THEN
+     :                      .OR. VUIN .EQ. VAL__BADR .OR. I .EQ. 0.0
+     :                      .OR. IP2 .EQ. 0.0 ) THEN
 
                            VIP = VAL__BADR
                            VP = VAL__BADR
@@ -510,28 +502,20 @@
                               VUIN = VUN
                            END IF
 
-*  Normalised Stokes parameter, Q and U.
-                           VQ = ( Q2 * VIIN + VQIN )/( I**2 )
-                           VU = ( U2 * VIIN + VUIN )/( I**2 )
-
-*  Fractional polarisation.
-                           EPS2 = ( Q2 * VQ + U2 * VU )/P2
+*  Polarised intensity
+                           VIP = ( Q2 * VQIN + U2 * VUIN )/IP2
 
 *  Percentage polarisation
-                           VP = 10000.0 * EPS2
-
-*  Polarized intensity.
-                           VIP = P2*VI + I*I*EPS2
+                           VP = 10000.0*( VIP/(I**2) + VIIN*IP2/(I**4) )
 
 *  Polarisation angle (degs).
-                           VT = RTOD * RTOD * ( Q2 * VU + U2 *VQ )/
-     :                                        ( 4.0*P2*P2 )
+                           VT = RTOD*RTOD*( Q2*VUIN + U2*VQIN )/
+     :                                    ( 4.0*IP2*IP2 )
 
 *  If any of the variances are negative store bad results.
-                           IF ( VIP .LT. 0.0 .OR. VI .LT. 0.0 .OR.
-     :                          VP .LT. 0.0 .OR. VT .LT. 0.0 ) THEN
+                           IF ( VIP .LT. 0.0 .OR. VP .LT. 0.0 .OR.
+     :                          VT .LT. 0.0 ) THEN
                               VIP = VAL__BADR
-                              VI = VAL__BADR
                               VP = VAL__BADR
                               VT = VAL__BADR
 
@@ -540,8 +524,8 @@
 *  distribution of P being non-symmetric.
                            ELSE
                               IF ( DEBIAS ) THEN
-                                 P = 100.0*SQRT( MAX( 0.0, P2 - EPS2 ) )
-                                 IP = 0.01 * I * P
+                                 IP = SQRT( MAX( 0.0, IP2 - VIP ) )
+                                 P = 100 * IP / I
                               END IF
 
                            END IF
@@ -569,7 +553,7 @@
                   IF ( MAKEU ) AU( PIX, ROW, Z ) = UIN
 
                   IF ( VAR ) THEN
-                     IF ( MAKEI ) AIV( PIX, ROW, Z ) = VI
+                     IF ( MAKEI ) AIV( PIX, ROW, Z ) = VIIN
                      IF ( MAKEP ) APV( PIX, ROW, Z ) = VP
                      IF ( MAKET ) ATV( PIX, ROW, Z ) = VT
                      IF ( MAKEIP ) AIPV( PIX, ROW, Z ) = VIP
@@ -625,8 +609,8 @@
                      END IF
 
                      IF( VAR ) THEN
-                        IF( VI .NE. VAL__BADR ) THEN
-                          CALL POL1_PUT0R( DICAT, SQRT( MAX(0.0,VI) ),
+                        IF( VIIN .NE. VAL__BADR ) THEN
+                          CALL POL1_PUT0R( DICAT, SQRT( MAX(0.0,VIIN) ),
      :                                     .FALSE., STATUS )
                         ELSE
                           CALL POL1_PUT0R( DICAT, VAL__BADR, .TRUE.,
@@ -718,7 +702,6 @@
 
                      IF ( VAR ) THEN
                         VIP = VAL__BADR
-                        VI = VAL__BADR
                         VP = VAL__BADR
                         VT = VAL__BADR
                      END IF
@@ -733,7 +716,6 @@
 
                      IF ( VAR ) THEN
                         VIP = VAL__BADR
-                        VI = VIIN
                         VP = VAL__BADR
                         VT = VAL__BADR
                      END IF
@@ -763,9 +745,6 @@
 *  Now produced variances if required.
                      IF ( VAR ) THEN
 
-*  Total intensity.
-                        VI = VIIN
-
 *  If any of the input variances are bad, store bad output variances.
                         IF( VIIN .EQ. VAL__BADR .OR.
      :                      VVIN .EQ. VAL__BADR ) THEN
@@ -785,13 +764,13 @@
                            VT = VAL__BADR
 
 *  Polarised intensity.
-                           VIP = 0.0001 * ( P*P*VI + I*I*VP )
+                           VIP = 0.0001 * ( P*P*VIIN + I*I*VP )
 
 *  If any of the variances are negative store bad results.
-                           IF ( VIP .LT. 0.0 .OR. VI .LT. 0.0 .OR.
+                           IF ( VIP .LT. 0.0 .OR. VIIN .LT. 0.0 .OR.
      :                          VP .LT. 0.0 ) THEN
                               VIP = VAL__BADR
-                              VI = VAL__BADR
+                              VIIN = VAL__BADR
                               VP = VAL__BADR
                            END IF
 
@@ -809,7 +788,7 @@
                   IF ( MAKEV ) AV( PIX, ROW, Z ) = VIN
 
                   IF ( VAR ) THEN
-                     IF ( MAKEI ) AIV( PIX, ROW, Z ) = VI
+                     IF ( MAKEI ) AIV( PIX, ROW, Z ) = VIIN
                      IF ( MAKEP ) APV( PIX, ROW, Z ) = VP
                      IF ( MAKET ) ATV( PIX, ROW, Z ) = VT
                      IF ( MAKEIP ) AIPV( PIX, ROW, Z ) = VIP
@@ -856,8 +835,8 @@
      :                               STATUS )
 
                      IF( VAR ) THEN
-                        IF( VI .NE. VAL__BADR ) THEN
-                          CALL POL1_PUT0R( DICAT, SQRT( MAX(0.0,VI) ),
+                        IF( VIIN .NE. VAL__BADR ) THEN
+                          CALL POL1_PUT0R( DICAT, SQRT( MAX(0.0,VIIN) ),
      :                                     .FALSE., STATUS )
                         ELSE
                           CALL POL1_PUT0R( DICAT, VAL__BADR, .TRUE.,
