@@ -4254,6 +4254,76 @@ package @PACKAGE@ {
 
         }
 
+        action qucovar {
+            helplib {$SMURF_HELP}
+
+            parameter qres {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input Q residuals time-stream NDF}
+                helpkey *
+            }
+
+            parameter ures {
+                position 2
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input U residuals time-stream NDF}
+                helpkey *
+            }
+
+            parameter qlut {
+                position 3
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input Q LUT time-stream NDF}
+                helpkey *
+            }
+
+            parameter ulut {
+                position 4
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input U LUT time-stream NDF}
+                helpkey *
+            }
+
+            parameter ref {
+                position 5
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input reference map}
+                helpkey *
+            }
+
+            parameter out {
+                position 6
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output Q/U co-variance map}
+                helpkey *
+            }
+
+        }
+
         action rawfixmeta {
 
             helplib {$SMURF_HELP}

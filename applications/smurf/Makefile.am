@@ -66,6 +66,7 @@ makecube \
 makemap \
 nanten2acsis \
 pol2check \
+qucovar \
 rawfixmeta \
 rawpress \
 rawrecreatewcs \

@@ -51,6 +51,7 @@
  *       SMF__NOCREATE_FTS: Do not allocate smfFts
  *       SMF__NOFIX_METADATA: Do not fix metadata using smf_fix_metadata
  *       SMF__NOTTSERIES: File is not a time series file even if 3d
+ *       SMF__ISFLAT: File should not be flat-fielded, even if it is _INTEGER.
 
  *  Authors:
  *     Andy Gibb (UBC)
@@ -251,6 +252,10 @@
  *        created by makemap when exporting cleaned time series data.
  *     2015-02-20 (MS)
  *        Added new smfFts fields for quality statistics
+ *     2016-10-17 (DSB)
+ *        Added SMF__ISFLAT flag to allow LUT models to be opened. These
+ *        are _INTEGER arrays holding pixel indices, and so should not be
+ *        flat-fielded.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -475,6 +480,9 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
       isFlat = 1;  /* Data have been flatfielded */
     }
     isTseries = ( flags & SMF__NOTTSERIES ? 0 : 1); /* Data are in time series format */
+    isFlat = ( flags & SMF__ISFLAT ? 1 : isFlat);   /* Data does not need flat-fielding */
+
+
   } else {
     /* Report a warning due to non-standard dimensions for file */
     if ( *status == SAI__OK) {

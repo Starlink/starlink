@@ -455,7 +455,8 @@ typedef enum {
   SMF__DIMM_FIRSTITER = BIT_TO_VAL(1),  /* First iteration */
   SMF__DIMM_INVERT    = BIT_TO_VAL(2),  /* Inverse of the model calculation */
   SMF__DIMM_LASTITER  = BIT_TO_VAL(3),  /* Is this the last iteration? */
-  SMF__DIMM_PREITER   = BIT_TO_VAL(4)   /* Before the first iteration */
+  SMF__DIMM_PREITER   = BIT_TO_VAL(4),  /* Before the first iteration */
+  SMF__DIMM_PCACOM    = BIT_TO_VAL(5)   /* COM model used withuin PCA model */
 } smf_calcmodel_flags;
 
 /* Flags for smf_create_smf*, smf_open_file and smf_concat_smfGroup
@@ -472,7 +473,8 @@ typedef enum {
   SMF__NOFIX_METADATA    = BIT_TO_VAL(7),  /* Do not fix up metadata */
   SMF__NOTTSERIES        = BIT_TO_VAL(8),  /* File is not time series data */
   SMF__NOCREATE_FTS      = BIT_TO_VAL(9),  /* Don't open FTS data */
-  SMF__NOFIX_DATA        = BIT_TO_VAL(10)  /* Do not fix up data */
+  SMF__NOFIX_DATA        = BIT_TO_VAL(10), /* Do not fix up data */
+  SMF__ISFLAT            = BIT_TO_VAL(11)  /* Do not do any flat fielding */
 } smf_open_file_flags;
 
 /* Flags for smf_open_newfile
@@ -791,6 +793,8 @@ typedef struct smfDIMMData {
   smfArray **ext;            /* array of smfArray's of extinction corrections */
   smfArray **gai;            /* array of smfArray's of bolo gain corrections */
   smfArray **com;            /* array of smfArray's of common mode signal */
+  smfArray **pcacom;         /* A COM model used within the PCA model */
+  smfArray **pcagai;         /* A GAI model used within the PCA model */
   double *map;               /* pointer to the current map estimate */
   double *lastmap;           /* pointer to the previous map estimate */
   int *hitsmap;              /* pointer to the current hits map */
