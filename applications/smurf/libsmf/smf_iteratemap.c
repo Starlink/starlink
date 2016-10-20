@@ -504,6 +504,11 @@
 *     2015-10-07 (DSB):
 *        - Move fakemap stuff into a separate function (smf_addfakemap).
 *        - Add IP correction for POL2 data.
+*     2016-10-20 (DSB):
+*        If the map stops changing during the ast.skip phase, jump
+*        forward to the end of the ast.skip phase to avoid wasting the
+*        time which would otherwise be spent doing the remaining ast.skip
+*        iterations.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -919,10 +924,13 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          "MAPTOL_RATE" between iterations. */
       astMapGet0D( keymap, "MAPTOL_RATE", &maptol_rate );
 
-      /* A negative AST.SKIP value over-rides NUMITER. */
+      /* Get the AST-specific parameters. */
       ast_skip = 0;
       ast_filt_diff = 0.0;
       if( astMapGet0A( keymap, "AST", &kmap ) ) {
+
+         /* The number of iterations on which to skip subtraction of the
+            AST model. */
          astMapGet0I( kmap, "SKIP", &ast_skip );
 
          /* Remove low spatial frequencies in map-change? If non-zero,
@@ -931,7 +939,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          kmap = astAnnul( kmap );
       }
 
-      /* Number of iterations */
+      /* Number of iterations. A negative AST.SKIP value over-rides NUMITER.
+         This means that the final returned map is the map created by the
+         initial AST.SKIP iterations. */
       if( ast_skip < 0 ) {
          numiter = ast_skip;
       } else {
@@ -2736,6 +2746,22 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 last_skipped ) && quit == -1 ) {
             /* Map hasn't converged yet */
             converged=0;
+          }
+
+          /* If we are currently in the initial ast.skip iterations, and
+             the map has more or less stopped changing (i.e. the change
+             between the previous two maps was less than maptol), then
+             there is little point in wasting time doing further ast.skip
+             iterations (since the map is not changing). So we can jump
+             forward to the end of the ast.skip phase, and start on the
+             real iterations. */
+          if( ast_skip > 0 && iter < ast_skip - 1 &&
+              maptol != VAL__BADD && tol < maptol ) {
+             msgOutiff( MSG__DEBUG, "", "The map change has dropped below "
+                        "MAPTOL, so jumping now to iteration %d (the first "
+                        "iteration to subtract the AST model).", status,
+                        ast_skip );
+             iter = ast_skip - 1;
           }
 
 
