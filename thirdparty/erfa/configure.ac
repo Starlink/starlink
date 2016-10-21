@@ -1,7 +1,7 @@
 dnl    Process this file with autoconf to produce a configure script
 
 dnl    This is not a package, so the first two arguments are fake.
-AC_INIT(erfa, 1.1, starlink@jiscmail.ac.uk)
+AC_INIT(erfa, 1.3.0, starlink@jiscmail.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
