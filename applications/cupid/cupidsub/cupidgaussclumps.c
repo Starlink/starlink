@@ -549,11 +549,12 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       if( iclump - nclump == 1 ) {
         msgOutif( MSG__NORM, "",
                   "1 clump rejected because it touches an edge of "
-                  "the data array.", status );
+                  "the data array or was below the threshold.", status );
       } else if( iclump - nclump > 1 ) {
         msgOutiff( MSG__NORM, "",
                    "%d clumps rejected because they touch an edge of "
-                   "the data array.", status, (int)( iclump - nclump ) );
+                   "the data array or were below the threshold.", status,
+                   (int)( iclump - nclump ) );
       }
 
 /* Tell the user how many iterations have been performed (i.e. how many
