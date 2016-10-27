@@ -6,7 +6,7 @@
 \stardocsource    {sun95.43}
 \stardocnumber    {95.43}
 \stardocauthors   {Malcolm J. Currie \& David S. Berry}
-\stardocdate      {2016 February 10}
+\stardocdate      {2016 May 12}
 \stardoctitle     {KAPPA --- Kernel Application Package}
 \stardocversion   {2.4}
 \stardocmanual    {User's Guide}
@@ -53577,11 +53577,39 @@ The following applications have been modified:
               aperture.
       \end{itemize}
 
+   \item [\htmlref{COLLAPSE}{COLLAPSE}]\mbox{}
+      \begin{itemize}
+        \item A warning that suggested that WLIM should b lowered even
+              when it had the minmum of zero no longer appears.
+      \end{itemize}
+
+   \item [\htmlref{LINPLOT}{LINPLOT}]\mbox{}
+      \begin{itemize}
+        \item Parameter TEMPSTYLE is withdrawn.  The \texttt{+} syntax
+        should be used to set temporary style changes.
+      \end{itemize}
+
+      \item [\htmlref{LUCY}{LUCY}]\mbox{}
+      \begin{itemize}
+        \item A bug that prevented correct background removal when
+               Parameter BACK was null was excised.
+      \end{itemize}
+
    \item [\htmlref{MFITTREND}{MFITTREND}]\mbox{}
       \begin{itemize}
         \item Has a new FOREST parameter, which improves spectral-line
               masking in line forests using a smoothed mode rather than
               the mean and a better estimate of the baseline noise.
+        \item A bug has been fixed preventing fits in the rare combination
+              of neither variance nor bad values being present, and without
+              masking of lines.  Bad variances are also now checked
+              before spline fitting.
+      \end{itemize}
+
+      \item [\htmlref{NDFCOPY}{NDFCOPY}}\mbox{}
+      \begin{itemize}
+        \item A bug has been fixed that prevented excess WCS axes from
+              being removed.
       \end{itemize}
 
       \item [\htmlref{NORMALIZE}{NORMALIZE}]\mbox{}
