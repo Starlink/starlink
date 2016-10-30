@@ -257,6 +257,7 @@ itcl::class gaia::GaiaStartup {
       set values_($this,labelfont) TkDefaultFont
       set values_($this,textfont) TkFixedFont
       set values_($this,font_scale) 0.0
+      set values_($this,unicoderadec) 1
 
       set values_($this,blank_color) black
       set values_($this,image_background) black
@@ -312,6 +313,10 @@ itcl::class gaia::GaiaStartup {
             $values_($this,blank_color)
          $itk_option(-gaia) configure -image_background \
             $values_($this,image_background)
+
+         $itk_option(-gaia) configure -unicoderadec \
+            $values_($this,unicoderadec)
+
       }
    }
 
@@ -810,6 +815,19 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(fontscale) \
          {Scale factor for non-pixel fonts, 0 for default}
       pack $itk_component(fontscale) -side top -fill x
+
+      #  Whether to use unicode RA and Dec labels. Sometimes these are not available.
+      #  Focus follows mouse
+      itk_component add unicoderadec {
+         StarLabelCheck $parent.unicoderadec \
+            -text "Use unicode RA and Dec symbols:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth_ \
+            -variable [scope values_($this,unicoderadec)]
+      }
+      add_short_help $itk_component(unicoderadec) \
+         {RA and Dec labels display unicode alpha and delta symbols}
+      pack $itk_component(unicoderadec) -side top -fill x
    }
 
    #  Check if an option is currently supported. Use to test if
@@ -892,6 +910,7 @@ itcl::class gaia::GaiaStartup {
       textfont
       transient_spectralplot
       transient_tools
+      unicoderadec
       with_colorramp
       with_pan_window
       with_zoom_window

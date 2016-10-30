@@ -258,7 +258,8 @@ itcl::class gaia::GaiaImageCtrl {
             -shorthelpwin $itk_option(-shorthelpwin) \
             -borderwidth 3 -relief groove \
             -ukirt_ql $itk_option(-ukirt_ql) \
-            -showpxy $itk_option(-pixel_indices)
+            -showpxy $itk_option(-pixel_indices) \
+            -unicoderadec $itk_option(-unicoderadec)
       }
       if { "$itk_option(-panel_orient)" == "vertical" } {
          pack $itk_component(info) -side top -fill both -expand 1
@@ -1589,6 +1590,9 @@ itcl::class gaia::GaiaImageCtrl {
 
    #  Whether to search NDF extension for additional related NDFs.
    itk_option define -deep_search deep_search Deep_Search 1
+
+   #  Display unicode RA and Dec labels.
+   itk_option define -unicoderadec unicoderadec UnicodeRaDec 1
 
    #  Protected variables:
    #  ====================

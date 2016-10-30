@@ -207,7 +207,7 @@ itcl::class gaia::GaiaImagePanel {
       if {$itk_option(-showwcs)} {
          itk_component add ra {
             util::LabelEntry $w_.ra \
-               -text "\u03b1:" \
+               -text $ra_represent_ \
                -textvariable ${var}(RA) \
                -labelfont $itk_option(-wcsfont) \
                -valuefont $itk_option(-valuefont) \
@@ -218,7 +218,7 @@ itcl::class gaia::GaiaImagePanel {
          }
          itk_component add dec {
             util::LabelEntry $w_.dec \
-               -text "\u03b4:" \
+               -text $dec_represent_ \
                -textvariable ${var}(DEC) \
                -labelfont $itk_option(-wcsfont) \
                -valuefont $itk_option(-valuefont) \
@@ -361,12 +361,12 @@ itcl::class gaia::GaiaImagePanel {
          }
          add_short_help $itk_component(autoscale) \
             {Select a quick color scale algorithm (more in View...Colors)}
-         foreach {name scale itt} { 
+         foreach {name scale itt} {
             {linear} linear ramp
             {logarithm} log ramp
-            {histogram equalize} histeq ramp 
+            {histogram equalize} histeq ramp
             {square root} sqrt ramp
-            {wrapped} linear lasritt 
+            {wrapped} linear lasritt
             {negative} linear neg
             {negative logarithm} log neg
             {negative histogram equalize} histeq neg
@@ -834,6 +834,19 @@ itcl::class gaia::GaiaImagePanel {
       color bgyrw
       heat heat
       pastel pastel}
+
+   #  Define whether to use the unicode representations for RA/Dec.
+   itk_option define -unicoderadec unicoderadec UnicodeRaDec 1 {
+      if { $itk_option(-unicoderadec) } {
+         set ra_represent_ "\u03b1:"
+         set dec_represent_ "\u03b4:"
+      } else {
+         set ra_represent_ "RA:"
+         set dec_represent_ "Dec:"
+      }
+   }
+   protected variable ra_represent_ {}
+   protected variable dec_represent_ {}
 
    #   Protected variable.
    protected variable make_now_ 0

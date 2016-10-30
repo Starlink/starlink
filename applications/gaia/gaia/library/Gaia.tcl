@@ -644,7 +644,8 @@ itcl::class gaia::Gaia {
             -show_hdu_chooser $itk_option(-show_hdu_chooser) \
             -default_cut $itk_option(-default_cut) \
             -ident $itk_option(-ident) \
-            -deep_search $itk_option(-deep_search)
+            -deep_search $itk_option(-deep_search) \
+            -unicoderadec $itk_option(-unicoderadec)
       }
 
       #  Keep a list of SkyCat/GAIA instances.
@@ -2940,6 +2941,11 @@ window gives you access to this."
       if { $itk_option(-font_scale) > 0.0 } {
          tk scaling -displayof $w_ $itk_option(-font_scale)
       }
+   }
+
+   #  Use unicode in the RA Dec labels.
+   itk_option define -unicoderadec unicoderadec UnicodeRaDec 1 {
+
    }
 
    #  Whether to search NDF extension for additional related NDFs.
