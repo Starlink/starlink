@@ -1,10 +1,19 @@
-  Development Version
-  ===================
+
+  Star-2016A Release
+  ==================
+
+    Version 4.4-8
+    =============
+
+  The RA and Dec labels shown in the main panel can now be forced
+  to display RA: and Dec: rather than unicode alpha and delta.
+  Use the command line option "-unicoderadec 0" to control this.
+  Also a File->Startup options... selected option under the Fonts tab.
 
   Show decimal degrees immediately when selected in the pick object toolbox.
 
-  The GAIA all source catalogue has been added to the standard Skycat
-  catalogues. Other versions are available using VO catalogues.
+  The GAIA Satellite all source catalogue has been added to the standard
+  Skycat catalogues. Other versions are available using VO catalogues.
 
     Version 4.4-7
     =============
