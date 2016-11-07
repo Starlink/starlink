@@ -72,7 +72,7 @@
 
 /* Timeout parameters */
 #define	MESSYS__TIMEOUTID 	10001
-#define	MESSYS__INIT_WAIT_TIME 	30000
+#define	MESSYS__INIT_WAIT_TIME 	120000
 #define	MESSYS__INFINITE 	-1
 
 /* Constants associated with networking */
