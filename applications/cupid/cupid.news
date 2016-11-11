@@ -6,6 +6,13 @@
  and  analyse clumps of emission within 2- or 3- dimensional
  data arrays.
 
+Changes introduced at V2.3
+
+   - A bug has been fixed in the determination of the WCS pixel scales,
+   which could cause the WCS volume reported for clumps on the sky to
+   be incorrect by up to 5-10%. This bug only affected the conversion
+   from pixel to WCS units - the clump masks themselves are unaffected.
+
 Changes introduced at V2.2
 
    - A bug has been fixed in the GaussCLumps algorithm that could cause
