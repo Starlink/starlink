@@ -362,7 +362,9 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
          model_data = (model->sdata[idx]->pntr)[0];
          qua_data = smf_select_qualpntr( res->sdata[idx], NULL, status );
 
-/* Subtract the PCA model from the original residuals. */
+/* Subtract the PCA model from the original residuals. This also adds a
+   polynomial baseline onto the model for each bolometer to flatten the 
+   residuals after subtraction of the PCA model. */
          for( iw = 0; iw < nw; iw++ ) {
             pdata = job_data + iw;
             pdata->model_data = model_data;
@@ -413,8 +415,12 @@ static void smf1_calcmodel_pca( void *job_data_ptr, int *status ) {
    dim_t itime;
    dim_t ntslice;
    double *pm;
+   double *polydata;
+   double *pp;
    double *pr;
+   double coeffs[3];
    int *pl;
+   int64_t nused;
    size_t ibase;
    smf_qual_t *pq;
 
@@ -477,6 +483,9 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
    ============================================== */
    } else if( pdata->oper == 2 ) {
 
+/* Allocate space to hold a bolometer baseline fit. */
+      polydata = astMalloc( ntslice*sizeof(*polydata) );
+
 /* Loop round all bolos to be processed by this thread, maintaining the
    index of the first time slice for the current bolo. We know tstride
    is 1 and bstride is ntslice. */
@@ -497,7 +506,7 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
 
 /* Subtract off the model value. */
                if( *pm != VAL__BADD && *pr != VAL__BADD ) {
-                  *pr -= *pm;
+                  if( !(*pq & SMF__Q_MOD) ) *pr -= *pm;
                }
 
 /* Move pointers on to the next time sample. */
@@ -505,12 +514,39 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
                pq++;
                pm++;
             }
-          }
+
+/* Fit a cubic quadratic baseline to the residuals, using sigma-clipping. */
+            smf_fit_poly1d( 2, ntslice, 2.0, NULL, pdata->res_data + ibase,
+                            NULL, pdata->qua_data + ibase, coeffs, NULL,
+                            polydata, &nused, status );
+
+/* Modify the model by adding on the above baseline. Reduce the residuals
+   correspondingly. This results in the residuals having a flat(ish)
+   background. */
+            pr = pdata->res_data + ibase;
+            pq = pdata->qua_data + ibase;
+            pm = pdata->model_data + ibase;
+            pp = polydata;
+            for( itime = 0; itime < ntslice; itime++ ) {
+
+               if( *pm != VAL__BADD ) *pm += *pp;
+               if( *pr != VAL__BADD && !(*pq & SMF__Q_MOD) ) *pr -= *pp;
+
+               pp++;
+               pr++;
+               pq++;
+               pm++;
+            }
+         }
 
 /* Increment the index of the first value associated with the next
    bolometer. */
          ibase += ntslice;
       }
+
+/* Free resources. */
+      polydata = astFree( polydata );
+
 
 /* Mask out samples that fall within source regions.
    ================================================= */
