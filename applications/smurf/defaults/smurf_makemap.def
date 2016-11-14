@@ -168,8 +168,11 @@ ast.zero_circle = <undef>
 #               count of iterations. If ast.zero_freeze is greater than
 #               zero but less than 1.0, the AST mask will be frozen when
 #               the normalized change in the map between iterations drops
-#               below the ast.zero_freeze value. A value less than or
-#               equal to zero means that the mask is never frozen.
+#               below the ast.zero_freeze value. A value less than zero
+#               means that the mask is frozen as soon as the initial
+#               iterations specified by parameter "ast.skip" have been
+#               done. A value equal to zero means that the mask is never
+#               frozen.
 ast.zero_freeze = 0.0
 
 #-----------------------------------------------------------------

@@ -142,6 +142,8 @@
 *     19-OCT-2016 (DSB):
 *        - ZERO_NITER can now be given as a fraction in the range 0.0 to 1.0
 *        to indicate a normalised map change at which to switch off masking.
+*        - If a negative value is supplied for ZERO_FREEZE, the mask is
+*        frozen as soon as the initial AST_SKIP iterations have been done.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -456,9 +458,10 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 
 /* If the mask is now frozen, we just return the existing mask. So leave the
    loop. */
-               if( zero_freeze > 0 && (
+               if( ( zero_freeze > 0 && (
                    ( zero_freeze < 1.0 && dat->mapchange < zero_freeze && dat->iter > skip + 1 ) ||
-                   ( zero_freeze >= 1.0 && dat->iter > (int)( zero_freeze + 0.5 ) + skip ) ) ) {
+                   ( zero_freeze >= 1.0 && dat->iter > (int)( zero_freeze + 0.5 ) + skip ) ) ) ||
+                   ( zero_freeze < 0 && dat->iter > skip ) ) {
                   msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s mask "
                              "is now frozen.", status, modname );
                   break;
