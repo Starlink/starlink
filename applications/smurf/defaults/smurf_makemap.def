@@ -2870,6 +2870,7 @@ varmapmethod = 1
 #  and spin data. They should be documented properly if use of a PCA
 #  model turns out to be a useful thing.
 pca.pcathresh = 4
+pca.pcathresh_freeze = 0.0
 pca.comfill = 1
 
 #  Following are PCA masking parameters that are common to all models.

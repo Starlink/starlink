@@ -127,9 +127,11 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    double *model_data;
    double *res_data;
    double pcathresh;
+   double pcathresh_freeze;
    int comfill;
    int iw;
    int nw;
+   int skip;
    size_t ipix;
    smfArray **oldgai;
    smfArray **oldres;
@@ -138,6 +140,9 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    smfArray *res;
    smf_qual_t *qua_data;
    unsigned char *mask = NULL;
+
+   static int lmask = 1;
+   static int ncomp[4] = {0,0,0,0};
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return;
@@ -168,6 +173,7 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
 
 /* Get the required parameter values. */
    astMapGet0D( kmap, "PCATHRESH", &pcathresh );
+   astMapGet0D( kmap, "PCATHRESH_FREEZE", &pcathresh_freeze );
 
 /* Obtain dimensions of the data (assumed to be the same for all subarrays). */
    smf_get_dims( res->sdata[0],  NULL, NULL, &nbolo, &ntslice, NULL,
@@ -235,6 +241,55 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
 /* If we are calculating a new model... */
    } else {
 
+/* Get the number of AST-skipped iteration. */
+      if( astMapGet0A( keymap, "AST", &obj ) ){
+         AstKeyMap *kastmap = (AstKeyMap *) obj;
+         astMapGet0I( kastmap, "SKIP", &skip );
+         kastmap = astAnnul( kastmap );
+      }
+
+/* See if a mask should be used to exclude bright source areas from
+   the PCA model. */
+      mask = smf_get_mask( wf, SMF__PCA, keymap, dat, flags, status );
+
+/* See if the number of PCA components to remove as the PCA model is now
+   frozen. If not, the number of components to remove as the PCA model is
+   determined by the "PCA.PCATHRESH" parameter, using a sigma-clipping
+   algorithm. It is frozen if it was frozen on a previous iteration
+   (indicated by pcathresh being -1.0), we do not need to check. */
+      if( pcathresh == -1 ) {
+
+/* Otherwise, if pcathresh_freeze is positive... */
+      } else if( ( pcathresh_freeze > 0 && (
+
+/* ... and pcathresh_freeze is below 1, it specifies a mapchange value. We
+   freeze when this mapchange value is first achieved, but only if no PCA
+   mask was used on the previous iteration. */
+             ( pcathresh_freeze < 1.0 && dat->mapchange < pcathresh_freeze && !lmask ) ||
+
+/* If pcathresh_freeze is above 1, it specifies an integer number of
+   iterations, in addition to the initial skip iterations. We freeze
+   when we have done this number of iterations. */
+             ( pcathresh_freeze >= 1.0 && dat->iter > (int)( pcathresh_freeze + 0.5 ) + skip ) ) )
+
+/* If pcathresh_freeze is negative, we freeze when all skipped iterations
+   have been done. */
+        ||  ( pcathresh_freeze < 0 && dat->iter > skip ) ) {
+
+/* We are not using the sigma-clipping algorithm. Ensure it is never used again,
+   in case the normalised change increases again. */
+         pcathresh = -1.0;
+         astMapPut0D( kmap, "PCATHRESH", -1.0, NULL );
+         msgOutiff(MSG__VERB, "","   No further changes in the number of "
+                   "PCA components removed as the PCA model will be made "
+                   "because PCA.PCATHRESH_FREEZE is set to %g.", status,
+                   pcathresh_freeze );
+      }
+
+/* Remember if a mask is being used on this iteration. This flag is
+   declared static and is used on the next iteration. */
+      lmask = ( mask != NULL );
+
 /* Copy the supplied residuals into the current model arrays. The PCA
    model shares the residuals' quality array. */
       for( idx = 0; idx < res->ndat && *status == SAI__OK; idx++ ) {
@@ -286,10 +341,6 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
    applied - and the consequent gaps filled - within smf_calcmodel_com.
    Otherwise, we need to do any requested PCA masking in this function. */
       } else {
-
-/* See if a mask should be used to exclude bright source areas from
-   the PCA model. */
-         mask = smf_get_mask( wf, SMF__PCA, keymap, dat, flags, status );
 
 /* If we have a mask, copy it into the quality array of the map.
    Also set map pixels that are not used (e.g. corner pixels, etc)
@@ -350,11 +401,17 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
    strongest components in the data (as determined by pcathresh). These
    are the required final PCA model values. If filling has already been
    done using a COM model, tell smf_clean_pca to fill only gaps flagged
-   by smf_calcmodel_com above (using the SMF__Q_PCA bit) before doing the
-   analysis. All other gaps have been filled above using the COM model. */
-         smf_clean_pca( wf, model->sdata[idx], 0, 0, pcathresh, NULL,
-                        NULL, 0, 0, kmap, comfill ? SMF__Q_PCA : SMF__Q_GAP,
-                        status );
+   as unusual by smf_calcmodel_com above (using the SMF__Q_PCA bit) before
+   doing the analysis. All other gaps have been filled above using the
+   COM model. If the number of components to remove is now frozen, use
+   the number from the previous iteration. Otherwise, pass the threshold
+   value to use in the sigma-clipping algorithm. The number of components
+   removed is returned. */
+         ncomp[idx] = smf_clean_pca( wf, model->sdata[idx], 0, 0,
+                                     pcathresh, ncomp[idx], NULL, NULL,
+                                     0, 0, kmap,
+                                     comfill ? SMF__Q_PCA : SMF__Q_GAP,
+                                     status );
 
 /* Get pointers to data, quality and PCA model arrays for the current
    subarray. */

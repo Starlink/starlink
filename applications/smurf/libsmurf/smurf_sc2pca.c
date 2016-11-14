@@ -240,7 +240,7 @@ void smurf_sc2pca( int *status ) {
     smf_update_quality( wf, data, 1, NULL, 0, 0.05, status );
 
     /* Calculate the PCA */
-    smf_clean_pca( wf, data, 0, 0, 0, &components, &amplitudes, 0, 1, NULL,
+    smf_clean_pca( wf, data, 0, 0, 0, 0, &components, &amplitudes, 0, 1, NULL,
                    ~SMF__Q_BADB, status );
 
     /* Write out to the new files */
