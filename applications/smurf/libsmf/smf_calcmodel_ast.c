@@ -156,6 +156,9 @@
 *        used by skyloop.
 *     2016-10-09 (DSB):
 *        Map based de-spiking was only being applied to the first sub-array.
+*     2016-11-08 (DSB):
+*        Allow map based de-spiking to be frozen after a specified number
+*        of iterations or map change.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -235,6 +238,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf,
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   double *map;                  /* Pointer to map data */
   double mapspike;              /* Threshold SNR to detect map spikes */
+  double mapspike_freeze;       /* Maptop at which to freeze map-based despiking */
   dim_t nbolo=0;                /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
@@ -277,11 +281,14 @@ void smf_calcmodel_ast( ThrWorkForce *wf,
   /* Allocate job data for threads. */
   job_data = astCalloc( nw, sizeof(*job_data) );
 
+  /* See how many iterations are to be skipped by the AST model. */
+  astMapGet0I( kmap, "SKIP", &skip );
+  if( skip < 0 ) skip = -skip;
+
   /* Before applying boundary conditions, removing AST signal from residuals
      etc., flag spikes using map */
 
   astMapGet0D( kmap, "MAPSPIKE", &mapspike );
-
   if( mapspike < 0 ) {
     msgOut("", FUNC_NAME
            ": WARNING: ignoring negative value for ast.mapspike", status );
@@ -304,21 +311,52 @@ void smf_calcmodel_ast( ThrWorkForce *wf,
   if( (mapspike > 0) && have_noi && !(flags&SMF__DIMM_PREITER) ) {
     size_t nflagged;
 
-    for( idx=0; idx<res->ndat; idx++ ) {
-       nflagged = idx + 4*dat->iter + 32*dat->mdims[0];
-       smf_map_spikes( wf, res->sdata[idx], noi->sdata[idx], lut->sdata[idx]->pntr[0],
-                       SMF__Q_GOOD, map, mapweight, hitsmap, mapvar, mapspike,
-                       &nflagged, status );
-       msgOutiff(MSG__VERB, "","   subarray %zu: detected %zu new spikes relative to map\n",
-                 status, idx, nflagged);
-     }
+/* See if the spikes are now frozen. If so, we do not do any de-spiking on
+   this iteration (but spikes from previous iterations remain flagged as
+   spikes). */
+    astMapGet0D( kmap, "MAPSPIKE_FREEZE", &mapspike_freeze );
+
+/* If mapspike_freeze is positive... */
+    if( ( mapspike_freeze > 0 && (
+
+/* ... and mapspike_freeze is below 1, it specifies a mapchange value. We
+   freeze when this mapchange value is first achieved, but only once all the
+   skip iterations have been done. */
+        ( mapspike_freeze < 1.0 && dat->mapchange < mapspike_freeze && dat->iter > skip + 1 ) ||
+
+
+/* If mapspike_freeze is above 1, it specifies an integer number of
+   iterations, in addition to the initial skip iterations. We freeze
+   when we have done this number of iterations. */
+        ( mapspike_freeze >= 1.0 && dat->iter > (int)( mapspike_freeze + 0.5 ) + skip ) ) )
+
+/* If mapspike_freeze is negative, we freeze when all skipped iterations
+   have been done. */
+        ||  ( mapspike_freeze < 0 && dat->iter > skip ) ) {
+
+/* We are not de-spiking. Ensure de-spiking is never used again, in case
+   normalise change increases again as a consequence of switching off the mask. */
+         astMapPut0D( kmap, "MAPSPIKE", 0.0, NULL );
+         msgOutiff(MSG__VERB, "","   No further map-based de-spiking will"
+                   "be performed because MAPSPIKE_FREEZE is set to %g.",
+                   status, mapspike_freeze );
+
+/* If we are de-spiking, do it. */
+    } else {
+      size_t nflagged;
+
+      for( idx=0; idx<res->ndat; idx++ ) {
+        smf_map_spikes( wf, res->sdata[idx], noi->sdata[idx], lut->sdata[idx]->pntr[0],
+                        SMF__Q_GOOD, map, mapweight, hitsmap, mapvar, mapspike,
+                        &nflagged, status );
+        msgOutiff(MSG__VERB, "","   subarray %zu: detected %zu new spikes relative to map\n",
+                  status, idx, nflagged);
+      }
+    }
   }
 
 
   /* We only do the rest if we are not skipping this iteration. */
-  astMapGet0I( kmap, "SKIP", &skip );
-  if( skip < 0 ) skip = -skip;
-
   if( dat->iter < skip ) {
     dat->ast_skipped = 1;
     msgOutf( " ","   skipping AST model on this iteration (AST.SKIP=%d)\n",

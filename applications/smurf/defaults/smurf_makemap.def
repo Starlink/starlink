@@ -88,7 +88,30 @@ ast.filt_diff = 0
 #		residual values that contribute to each map pixel. Any
 #		residuals that are above ast.mapspike standard deviations
 #		from the mean value in the pixel are flagged as spikes.
+#               Parameter "ast.mapspike_freeze" can be used to control
+#               the number of iterations for which this de-spiking is
+#               applied.
 ast.mapspike = 10
+
+#-----------------------------------------------------------------
+#  Name: 	ast.mapspike_freeze
+#  Type: 	real
+#  Default: 	0.0
+#  Purpose: 	Indicates when to stop flagging extra spikes in the map.
+#  Description: If ast.mapspike_freeze is non-zero, then the map-based
+#               de-spiking process (see parameter "ast.mapspike") is only
+#               applied for a limited number of iterations. No further
+#               spikes are then flagged, but spikes flagged on previous
+#               iterations remain flagged. The limit may be specified
+#               either as an integer number of iterations (in which case
+#               the supplied value is incremented by the value of
+#               parameter "ast.skip"), or as a normalised map-change
+#               value in the range 0.0 to 1.0 (not including the limits).
+#               In this case, the check on the normalised map-change will
+#               not be performed until the iterations specified by
+#               parameter "ast.skip" have been performed. If zero is
+#               supplied, spikes are flagged on all iterations.
+ast.mapspike_freeze = 0.0
 
 #-----------------------------------------------------------------
 #  Name: 	ast.skip
