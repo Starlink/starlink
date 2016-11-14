@@ -139,6 +139,9 @@
 *     9-SEP-2015 (DSB):
 *        Allow masks to be frozen when the convergence process reaches a
 *        specified mean map change per iteration.
+*     19-OCT-2016 (DSB):
+*        - ZERO_NITER can now be given as a fraction in the range 0.0 to 1.0
+*        to indicate a normalised map change at which to switch off masking.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -211,11 +214,13 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    double radius[ 1 ];        /* Radius of circle in radians */
    double zero_circle[ 3 ];   /* LON/LAT/Radius of circular mask */
    double zero_lowhits;       /* Fraction of mean hits at which to threshold */
+   double zero_niter;         /* Only mask for the first "niter" iterations. */
    double zero_snr;           /* Higher SNR at which to threshold */
    double zero_snr_hipass;    /* Size of box for high-pass smoothing SNR map */
    double zero_snrlo;         /* Lower SNR at which to threshold */
    int *ph;                   /* Pointer to next hits value */
    int abssnr;                /* Can sources be negative as well as positive? */
+   int domask;                /* Apply a mask? */
    int have_mask;             /* Did a mask already exist on entry? */
    int hipass;                /* mask filter size in pixels */
    int imask;                 /* Index of next mask type */
@@ -234,7 +239,6 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    int zero_accum;            /* Accumulate source pixels? */
    int zero_c_n;              /* Number of zero circle parameters read */
    int zero_mask;             /* Use the reference NDF as a mask? */
-   int zero_niter;            /* Only mask for the first "niter" iterations. */
    int zero_notlast;          /* Don't zero on last iteration? */
    int zero_snr_ffclean;      /* Define mask using ffclean algorithm? */
    int zero_snr_lopass;       /* Size of box for low-pass smoothing SNR map */
@@ -306,8 +310,28 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    means all. Return with no mask if this number of iterations has
    already been performed. */
    zero_niter = 0;
-   astMapGet0I( subkm, "ZERO_NITER", &zero_niter );
-   if( zero_niter == 0 || dat->iter < zero_niter + skip ) {
+   astMapGet0D( subkm, "ZERO_NITER", &zero_niter );
+
+   if( zero_niter == VAL__BADD ) {
+      domask = 0;
+   } else if( zero_niter <= 0.0 ) {
+      domask = 1;
+   } else if( zero_niter < 1.0 ) {
+      if( dat->mapchange >= zero_niter || dat->iter <= skip + 1 ) {
+         domask = 1;
+      } else {
+         domask = 0;
+
+/* Ensure masking is never used again, in case normalise change
+   increases again as a consequence of switching off the mask. */
+         astMapPut0D( subkm, "ZERO_NITER", VAL__BADD, NULL );
+      }
+
+   } else {
+      domask = (dat->iter < (int)( zero_niter + 0.5 ) + skip);
+   }
+
+   if( domask ) {
 
 /* Only return a mask if this is not the last iteration, or if ZERO_NOTLAST
    is unset. */
@@ -522,10 +546,14 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                                 0, 2, lbnd_grid, ubnd_grid, newmask, 1 );
 
 /* Report masking info. */
-                     if( zero_niter == 0 ) {
+                     if( zero_niter <= 0 ) {
                         sprintf( words, "on each iteration" );
+                     } else if( zero_niter < 1.0 ) {
+                        sprintf( words, "until normalised change reaches %g", zero_niter );
+                     } else if( zero_niter != VAL__BADD ){
+                        sprintf( words, "for %d iterations", (int)( zero_niter + 0.5 ) );
                      } else {
-                        sprintf( words, "for %d iterations", zero_niter );
+                        words[0] = 0;
                      }
 
                      msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s model will"
@@ -572,12 +600,18 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* Report masking info. */
                         ndfMsg( "N", indf2 );
                         msgSetc( "M", modname );
-                        if( zero_niter == 0 ) {
+                        if( zero_niter <= 0 ) {
                            msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The ^M "
                                       "model will be masked on each iteration "
                                       "using the bad pixels in NDF '^N'.",
                                       status );
-                        } else {
+                        } else if( zero_niter < 1.0 ) {
+                           msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The ^M "
+                                      "model will be masked on each iteration "
+                                      "until the normalised change reaches %g "
+                                      "using the bad pixels in NDF '^N'.",
+                                      status, zero_niter );
+                        } else if( zero_niter != VAL__BADD ) {
                            msgSeti( "I", zero_niter );
                            msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The ^M "
                                       "model will be masked for ^I iterations "
@@ -737,10 +771,15 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 
 /* Report masking info. */
                            if( !have_mask ) {
-                              if( zero_niter == 0 ) {
+                              if( zero_niter <= 0 ) {
                                  sprintf( words, "on each iteration" );
+                              } else if( zero_niter < 1.0 ) {
+                                 sprintf( words, "until normalised changes reaches %g",
+                                          zero_niter );
+                              } else if( zero_niter != VAL__BADD ) {
+                                 sprintf( words, "for %d iterations", (int)( zero_niter + 0.5 ) );
                               } else {
-                                 sprintf( words, "for %d iterations", zero_niter );
+                                 words[0] = 0;
                               }
                               msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s model "
                                          "will be masked %s using an SNR limit of %g.",
@@ -757,10 +796,15 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 
 /* Report masking info. */
                            if( !have_mask ) {
-                              if( zero_niter == 0 ) {
+                              if( zero_niter <= 0 ) {
                                  sprintf( words, "on each iteration" );
+                              } else if( zero_niter < 1.0 ) {
+                                 sprintf( words, "until normalised changes reaches %g",
+                                          zero_niter );
+                              } else if( zero_niter != VAL__BADD ) {
+                                 sprintf( words, "for %d iterations", (int)( zero_niter + 0.5 ));
                               } else {
-                                 sprintf( words, "for %d iterations", zero_niter );
+                                 words[0] = 0;
                               }
                               msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s model "
                                          "will be masked %s using an SNR limit of %g "
@@ -790,10 +834,15 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                      }
 
 /* Report masking info. */
-                     if( zero_niter == 0 ) {
+                     if( zero_niter <= 0 ) {
                         sprintf( words, "on each iteration" );
+                     } else if( zero_niter < 1.0 ) {
+                        sprintf( words, "until normalised changes reaches %g",
+                                 zero_niter );
+                     } else if( zero_niter != VAL__BADD ) {
+                        sprintf( words, "for %d iterations", (int)( zero_niter + 0.5 ) );
                      } else {
-                        sprintf( words, "for %d iterations", zero_niter );
+                        words[0] = 0;
                      }
                      msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s model "
                                 "will be masked %s using a smoothed form of "

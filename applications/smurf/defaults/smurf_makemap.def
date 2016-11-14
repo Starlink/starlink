@@ -211,12 +211,12 @@ ast.zero_mask = 0
 
 #-----------------------------------------------------------------
 #  Name: 	ast.zero_niter
-#  Type: 	int
-#  Default: 	0
+#  Type: 	real
+#  Default: 	0.0
 #  Purpose: 	Allows AST masking to be switched off after a given
 #		number of iterations.
-#  Description: If ast.zero_niter is non-zero, it gives the number of
-#		iterations for which the AST model should be masked.
+#  Description: If ast.zero_niter is non-zero, it determines the number
+#		of iterations for which the AST model should be masked.
 #		Subsequent iterations are not masked. A value of zero
 #		means "mask on all iterations". However, if parameter
 #		"ast.zero_notlast" is set, the mask will will not be
@@ -226,7 +226,10 @@ ast.zero_mask = 0
 #		is not as important, but keeping as much data around the
 #		edges of the map is. Note, any initial iterations
 #               specified by parameter "ast.skip" are not included in
-#               the count of iterations.
+#               the count of iterations. If ast.zero_niter is greater than
+#               zero but less than 1.0, the AST mask will be used until
+#               the normalized change in the map between iterations drops
+#               below the ast.zero_freeze value.
 ast.zero_niter = 0
 
 #-----------------------------------------------------------------
