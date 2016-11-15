@@ -2081,6 +2081,14 @@ iraf! {
             helpkey *
           }
 
+          parameter distance {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0.0
+            helpkey *
+          }
+
           parameter point1 {
             position 2
             type _DOUBLE

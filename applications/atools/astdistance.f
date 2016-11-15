@@ -42,6 +42,8 @@
 *        if the output object is written to a text file. An error is
 *        reported if the output object cannot be written using the
 *        requested format. ["AST"]
+*     DISTANCE = _DOUBLE (Write)
+*        The calculated distance.
 *     THIS = LITERAL (Read)
 *        An NDF, FITS file or text file holding the Frame. If an NDF is
 *        supplied, the current Frame of the WCS FrameSet will be used. If a
@@ -81,6 +83,8 @@
 *  History:
 *     16-APR-2008 (DSB):
 *        Original version.
+*     14-NOV-2016 (GSB):
+*        Added DISTANCE output parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -136,6 +140,8 @@
       END IF
 
       CALL MSG_OUT( ' ', '^D', STATUS )
+
+      CALL PAR_PUT0D( 'DISTANCE', DIST, STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )
