@@ -591,7 +591,7 @@ typedef enum {
    for declaring array sizes. */
 typedef enum {
   SMF__NQBITS_TSERIES = 16,
-  SMF__NQBITS_MAP     = 4,
+  SMF__NQBITS_MAP     = 5,
   SMF__NQBITS_TCOMP   = 6,
   SMF__NQBITS         = 16    /* Largest number of bits in a family */
 } smf_qfam_count_t;

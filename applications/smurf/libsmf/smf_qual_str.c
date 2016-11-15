@@ -240,6 +240,11 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
       ldescr = "Set iff COM model is blanked at the output pixel";
       break;
 
+    case SMF__MAPQ_PCA:
+      retval = "PCA";
+      ldescr = "Set iff PCA model is blanked at the output pixel";
+      break;
+
     default:
       retval = NULL;
     }
