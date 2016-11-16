@@ -133,6 +133,9 @@
 *        Add parameter STOKESINFO, MAPINFO and RAWINFO.
 *     12-OCT-2016 (DSB):
 *        Add parameters MISSING.
+*     16-NOV-2016 (DSB):
+*        Correct reporting of missing files. Previous scheme only worked
+*        if the input file list contained data for only one observation.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -189,31 +192,42 @@
    observation. */
 #define MAX_SCAN 200
 
+/* A structure that describes the raw data subscans that have been found
+   for a single observation. We allocate one such structure for each
+   observation. */
+typedef struct SubScanInfo {
+   int maxscan;            /* Largest NSUBSCAN value found for any subarray */
+   char s8a_scans[ MAX_SCAN ];/* Flags showing the S8A subscans found */
+   char s8b_scans[ MAX_SCAN ];/* Flags showing the S8B subscans found */
+   char s8c_scans[ MAX_SCAN ];/* Flags showing the S8C subscans found */
+   char s8d_scans[ MAX_SCAN ];/* Flags showing the S8D subscans found */
+   int s8a_count;             /* Any S8A raw data files supplied? */
+   int s8b_count;             /* Any S8B raw data files supplied? */
+   int s8c_count;             /* Any S8C raw data files supplied? */
+   int s8d_count;             /* Any S8D raw data files supplied? */
+} SubScanInfo;
+
 /* Main entry */
 void smurf_pol2check( int *status ) {
 
 /* Local Variables: */
    AstFitsChan *fc;           /* The contents of the NDF's FITS extension */
    AstKeyMap *km;             /* KeyMap holding lists of matching NDFs */
+   AstKeyMap *sskm;           /* KeyMap holding SubScan information */
    FILE *fd;                  /* File descriptor for output text file */
    Grp *igrp = NULL;          /* Group of input files */
+   SubScanInfo *ssptr;        /* Pointer to subscan info for current obs */
    char *cval;                /* Header value */
    char *pname;               /* Pointer to input filename */
    char buf[GRP__SZNAM+1];    /* Path to matching NDF */
    char filepath[GRP__SZNAM+1];/* NDF path, derived from GRP */
    char label[GRP__SZNAM+1];  /* NDF label string */
-   char s8a_scans[ MAX_SCAN ];/* Flags showing the S8A subscans found */
-   char s8b_scans[ MAX_SCAN ];/* Flags showing the S8B subscans found */
-   char s8c_scans[ MAX_SCAN ];/* Flags showing the S8C subscans found */
-   char s8d_scans[ MAX_SCAN ];/* Flags showing the S8D subscans found */
+   const char *key;           /* Pointer to KeyMap key string */
    int dims[NDF__MXDIM];      /* No. of pixels along each axis of NDF */
-   int s8a_count=0;           /* Any S8A raw data files supplied? */
-   int s8b_count=0;           /* Any S8B raw data files supplied? */
-   int s8c_count=0;           /* Any S8C raw data files supplied? */
-   int s8d_count=0;           /* Any S8D raw data files supplied? */
+   int ikey;                  /* Index of next key */
    int indf;                  /* NDF identifier */
-   int maxscan;               /* Largest NSUBSCAN value for any subarray */
    int ndims;                 /* Number of dimensions in NDF */
+   int nkey;                  /* Number of keys in KeyMap */
    int obs;                   /* Observation number */
    int ok;                    /* NDF holds POL-2 data ? */
    int subscan;               /* Subscan number  at start of chunk */
@@ -236,8 +250,11 @@ void smurf_pol2check( int *status ) {
 /* Create KeyMap to hold the classified lists of NDF paths. */
    km = astKeyMap( " " );
 
+/* Create KeyMap to hold information about which raw data subscans have
+   been found in each observation. */
+   sskm = astKeyMap( " " );
+
 /* Loop round all NDFs. */
-   maxscan = -1;
    for( i = 1; i <= isize && *status == SAI__OK; i++ ) {
       ok = 0;
 
@@ -285,33 +302,31 @@ void smurf_pol2check( int *status ) {
                      astMapPutElemC( km, "RAW_INFO", -1, buf );
 
 /* We want to check later that no sub-scans are missing from the
-   observations, so set falgs for each sub-array indicating which NSUBSCAN
-   header values have been found. If this is the first timne we've been
-   here, intialise the flag arrays to zero to indicate that no subscans
-   have been found. */
-                     if( maxscan == -1 ) {
-                        memset( s8a_scans, 0, sizeof(s8a_scans) );
-                        memset( s8b_scans, 0, sizeof(s8b_scans) );
-                        memset( s8c_scans, 0, sizeof(s8c_scans) );
-                        memset( s8d_scans, 0, sizeof(s8d_scans) );
+   observations, so set flags for each sub-array indicating which NSUBSCAN
+   header values have been found. If this is the first time we've been
+   here for the current observation, allocate and initialise a structure
+   holding flag arrays to indicate that no subscans have been found. */
+                     if( !astMapGet0P( sskm, buf, (void **) &ssptr ) ) {
+                        ssptr = astCalloc( 1, sizeof(*ssptr) );
+                        astMapPut0P( sskm, buf, ssptr, NULL );
                      }
 
                      astGetFitsI( fc, "NSUBSCAN", &subscan );
-                     if( subscan > maxscan ) maxscan = subscan;
+                     if( subscan > ssptr->maxscan ) ssptr->maxscan = subscan;
                      astGetFitsS( fc, "SUBARRAY", &cval );
 
                      if( astChrMatch( cval, "s8a" ) ) {
-                        s8a_count++;
-                        s8a_scans[ subscan - 1 ] = 1;
+                        ssptr->s8a_count++;
+                        ssptr->s8a_scans[ subscan - 1 ] = 1;
                      } else if( astChrMatch( cval, "s8b" ) ) {
-                        s8b_count++;
-                        s8b_scans[ subscan - 1 ] = 1;
+                        ssptr->s8b_count++;
+                        ssptr->s8b_scans[ subscan - 1 ] = 1;
                      } else if( astChrMatch( cval, "s8c" ) ) {
-                        s8c_count++;
-                        s8c_scans[ subscan - 1 ] = 1;
+                        ssptr->s8c_count++;
+                        ssptr->s8c_scans[ subscan - 1 ] = 1;
                      } else if( astChrMatch( cval, "s8d" ) ) {
-                        s8d_count++;
-                        s8d_scans[ subscan - 1 ] = 1;
+                        ssptr->s8d_count++;
+                        ssptr->s8d_scans[ subscan - 1 ] = 1;
                      } else if( *status == SAI__OK ) {
                         *status = SAI__ERROR;
                         errRepf("","Unsupported SUBARRAY header value "
@@ -396,75 +411,87 @@ void smurf_pol2check( int *status ) {
       }
 
 /* Report any missing sub-scans. */
-      if( s8a_count ) s8a_count = maxscan - s8a_count;
-      if( s8b_count ) s8b_count = maxscan - s8b_count;
-      if( s8c_count ) s8c_count = maxscan - s8c_count;
-      if( s8d_count ) s8d_count = maxscan - s8d_count;
+      fd = NULL;
+      nkey = astMapSize( sskm );
+      for( ikey = 0; ikey < nkey; ikey++ ) {
+         key = astMapKey( sskm, ikey );
+         astMapGet0P( sskm, key, (void **) &ssptr );
 
-      if( s8a_count || s8b_count || s8c_count || s8d_count ) {
+         if( ssptr->s8a_count ) ssptr->s8a_count = ssptr->maxscan - ssptr->s8a_count;
+         if( ssptr->s8b_count ) ssptr->s8b_count = ssptr->maxscan - ssptr->s8b_count;
+         if( ssptr->s8c_count ) ssptr->s8c_count = ssptr->maxscan - ssptr->s8c_count;
+         if( ssptr->s8d_count ) ssptr->s8d_count = ssptr->maxscan - ssptr->s8d_count;
 
-         fd = NULL;
-         parGet0c( "MISSING", filepath, sizeof(filepath), status );
-         if( *status == PAR__NULL ) {
-            errAnnul( status );
-         } else if( *status == SAI__OK ){
-            fd = fopen( filepath, "w" );
-         }
-         if( !fd ) fd = stdout;
+         if( ssptr->s8a_count || ssptr->s8b_count || ssptr->s8c_count || ssptr->s8d_count ) {
 
-         msgBlank( status );
-         msgOutf( "", "WARNING: The raw data files for some sub-scans "
-                  "seem to be missing.", status );
-
-         if( s8a_count ) {
-            if( fd == stdout ) fprintf( fd, "   " );
-            fprintf( fd, "S8A: " );
-            for( subscan = 0; subscan < maxscan; subscan++ ) {
-               if( !s8a_scans[ subscan ] ) {
-                  fprintf( fd, "_%04d ", subscan + 1 );
+            if( !fd ) {
+               parGet0c( "MISSING", filepath, sizeof(filepath), status );
+               if( *status == PAR__NULL ) {
+                  errAnnul( status );
+               } else if( *status == SAI__OK ){
+                  fd = fopen( filepath, "w" );
                }
-            }
-            fprintf( fd, "\n" );
-         }
+               if( !fd ) fd = stdout;
 
-         if( s8b_count ) {
+               msgBlank( status );
+               msgOutf( "", "WARNING: The raw data files for some sub-scans "
+                        "seem to be missing.", status );
+            }
+
             if( fd == stdout ) fprintf( fd, "   " );
-            fprintf( fd, "S8B: " );
-            for( subscan = 0; subscan < maxscan; subscan++ ) {
-               if( !s8b_scans[ subscan ] ) {
-                  fprintf( fd, "_%04d ", subscan + 1 );
+            fprintf( fd, "\nObservation %s:\n", key );
+
+            if( ssptr->s8a_count ) {
+               if( fd == stdout ) fprintf( fd, "   " );
+               fprintf( fd, "   S8A: " );
+               for( subscan = 0; subscan < ssptr->maxscan; subscan++ ) {
+                  if( !ssptr->s8a_scans[ subscan ] ) {
+                     fprintf( fd, "_%04d ", subscan + 1 );
+                  }
                }
+               fprintf( fd, "\n" );
             }
-            fprintf( fd, "\n" );
-         }
 
-         if( s8c_count ) {
-            if( fd == stdout ) fprintf( fd, "   " );
-            fprintf( fd, "S8C: " );
-            for( subscan = 0; subscan < maxscan; subscan++ ) {
-               if( !s8c_scans[ subscan ] ) {
-                  fprintf( fd, "_%04d ", subscan + 1 );
+            if( ssptr->s8b_count ) {
+               if( fd == stdout ) fprintf( fd, "   " );
+               fprintf( fd, "   S8B: " );
+               for( subscan = 0; subscan < ssptr->maxscan; subscan++ ) {
+                  if( !ssptr->s8b_scans[ subscan ] ) {
+                     fprintf( fd, "_%04d ", subscan + 1 );
+                  }
                }
+               fprintf( fd, "\n" );
             }
-            fprintf( fd, "\n" );
-         }
 
-         if( s8d_count ) {
-            if( fd == stdout ) fprintf( fd, "   " );
-            fprintf( fd, "S8D: " );
-            for( subscan = 0; subscan < maxscan; subscan++ ) {
-               if( !s8d_scans[ subscan ] ) {
-                  fprintf( fd, "_%04d ", subscan + 1 );
+            if( ssptr->s8c_count ) {
+               if( fd == stdout ) fprintf( fd, "   " );
+               fprintf( fd, "   S8C: " );
+               for( subscan = 0; subscan < ssptr->maxscan; subscan++ ) {
+                  if( !ssptr->s8c_scans[ subscan ] ) {
+                     fprintf( fd, "_%04d ", subscan + 1 );
+                  }
                }
+               fprintf( fd, "\n" );
             }
-            fprintf( fd, "\n" );
+
+            if( ssptr->s8d_count ) {
+               if( fd == stdout ) fprintf( fd, "   " );
+               fprintf( fd, "   S8D: " );
+               for( subscan = 0; subscan < ssptr->maxscan; subscan++ ) {
+                  if( !ssptr->s8d_scans[ subscan ] ) {
+                     fprintf( fd, "_%04d ", subscan + 1 );
+                  }
+               }
+               fprintf( fd, "\n" );
+            }
          }
 
-         if( fd != stdout ) {
-            fclose( fd );
-            msgOutf( "", "See file %s for details.", status, filepath );
-         }
+         ssptr = astFree( ssptr );
+      }
 
+      if( fd && fd != stdout ) {
+         fclose( fd );
+         msgOutf( "", "See file %s for details.", status, filepath );
          msgBlank( status );
       }
    }
