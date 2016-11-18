@@ -127,7 +127,7 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    double *model_data;
    double *res_data;
    double pcathresh;
-   double pcathresh_freeze;
+   double pcathresh_freeze = 0.0;
    int comfill;
    int iw;
    int nw;
@@ -171,9 +171,33 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
    astMapGet0A( keymap, "PCA", &obj );
    kmap = (AstKeyMap *) obj;
 
-/* Get the required parameter values. */
+/* Get the value that determines how many PCA components to include in
+   the model (i.e. how many components to remove from the residuals). */
    astMapGet0D( kmap, "PCATHRESH", &pcathresh );
-   astMapGet0D( kmap, "PCATHRESH_FREEZE", &pcathresh_freeze );
+
+/* If the pcathresh value is positive, it sepecifies a number of standard
+   deviations, and a sigma-clipping algorithm is used to identify the PCA
+   components that have amplitudes greater than the mean amplitude plus
+   "pcathresh" standard deviations. Each sub-array is processed separately.
+   This allows the number of PCA components remove to vary from iteration
+   to iteration. This can adversely affect convergence, so an option is
+   provided to specify a fixed number of components to remove. If
+   pcathresh is negative, then its absolute value, rounded to the nearest
+   integer, gives the absolute number of PCA components to remove at each
+   iteration. All subarays use the same value. The "ncomp" array holds
+   the fixed number of components to remove from each subarray. Set
+   "pcathresh" to -1 to indicate that he values in "ncomp" should be used,
+   rather than determining new values using the sigma-clipping algorithm.  */
+   if( pcathresh < -1.0 ) {
+      ncomp[0] = ncomp[1] = ncomp[2] = ncomp[3] = (int)( -pcathresh + 0.5 );
+      pcathresh = -1.0;
+
+/* If we are using the nsigma-clipping algorithm, get the value that
+   determines when (if at all) to freeze the number of PCA components
+   removed from the data. */
+   } else {
+      astMapGet0D( kmap, "PCATHRESH_FREEZE", &pcathresh_freeze );
+   }
 
 /* Obtain dimensions of the data (assumed to be the same for all subarrays). */
    smf_get_dims( res->sdata[0],  NULL, NULL, &nbolo, &ntslice, NULL,
@@ -379,7 +403,7 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
 /* If we are doing masking within this function, flag the residual values
    that fall within the source regions. The gaps thus produced will be
    filled within smf_clean_pca using linear interpolation. */
-         if( mask ) {
+         if( !comfill && mask ) {
             res_data = (res->sdata[idx]->pntr)[0];
             model_data = (model->sdata[idx]->pntr)[0];
             qua_data = smf_select_qualpntr( res->sdata[idx], NULL, status );
@@ -420,7 +444,7 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
          qua_data = smf_select_qualpntr( res->sdata[idx], NULL, status );
 
 /* Subtract the PCA model from the original residuals. This also adds a
-   polynomial baseline onto the model for each bolometer to flatten the 
+   polynomial baseline onto the model for each bolometer to flatten the
    residuals after subtraction of the PCA model. */
          for( iw = 0; iw < nw; iw++ ) {
             pdata = job_data + iw;
