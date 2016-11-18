@@ -232,9 +232,10 @@
 *        as a displacement in pixels of the input NDF.  A value of
 *        zero will ensure that no such approximation is done, at the
 *        expense of increasing execution time. [0.05]
-*     TR( 6 ) = _DOUBLE (Write)
+*     TR( 6 or 8 ) = _DOUBLE (Write)
 *        An output parameter to which are written the coefficients of
-*        the fit.
+*        the fit.  If FITVALS is true the this will include (as the
+*        7th and 8th entries) the scale and offset.
 *     WLIM = _REAL (Read)
 *        This parameter is only used if REBIN is set TRUE. It specifies
 *        the  minimum number of good pixels which must contribute to an
@@ -635,7 +636,11 @@
       CALL MSG_BLANK( STATUS )
 
 *  Write them to an output parameter.
-      CALL PAR_PUT1D( 'TR', 6, C, STATUS )
+      IF( FITVAL ) THEN
+         CALL PAR_PUT1D( 'TR', 8, C, STATUS )
+      ELSE
+         CALL PAR_PUT1D( 'TR', 6, C, STATUS )
+      END IF
 
 *  Annul the NDF section identifiers since they are no longer needed.
       CALL NDF_ANNUL( INDF1, STATUS )
