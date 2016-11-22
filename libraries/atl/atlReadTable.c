@@ -84,6 +84,9 @@ AstTable *atlReadTable( const char *fname, int *status ) {
 *        Original version.
 *     16-MAR-2016 (DSB):
 *        Added the SubTable facility.
+*     22-NOV-2016 (DSB):
+*        Report error if file has no column headers. Previously this 
+*        caused a seg fault.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -356,43 +359,52 @@ static AstTable *ReadNextTable( FILE *fd, const char *fname, int *iline,
 /* If this is the first non-blank non-comment line, get the column names from
    the previous non-blank comment line. */
             if( first ) {
-               first = 0;
-               cols = astChrSplit( last_com, &ncol );
+               if( last_com ) {
+                  first = 0;
+                  cols = astChrSplit( last_com, &ncol );
 
 /* Create an array to hold the data type for each colum, and initialise
    them to "integer". */
-               types = astMalloc( ncol*sizeof( int ) ) ;
-               for( iword = 0; iword < nword && astOK; iword++ ) {
-                  if( iword < ncol ) {
-                     types[ iword ] = AST__INTTYPE;
+                  types = astMalloc( ncol*sizeof( int ) ) ;
+                  for( iword = 0; iword < nword && astOK; iword++ ) {
+                     if( iword < ncol ) {
+                        types[ iword ] = AST__INTTYPE;
 
 /* The columns are stored initially using interim names which have "T_"
    prepended to the names given in the file. */
-                     tname = NULL;
-                     nc = 0;
-                     tname = astAppendString( tname, &nc, "T_" );
-                     tname = astAppendString( tname, &nc, cols[ iword ] );
-                     astFree( cols[ iword ] );
-                     cols[ iword ] = tname;
+                        tname = NULL;
+                        nc = 0;
+                        tname = astAppendString( tname, &nc, "T_" );
+                        tname = astAppendString( tname, &nc, cols[ iword ] );
+                        astFree( cols[ iword ] );
+                        cols[ iword ] = tname;
 
 /* Create the column definition within the returned Table. We store them
    initially as strings and then convert to the appropriate column data type
    later (once all rows have been read and the the data types are known). */
-                     astAddColumn( result, cols[ iword ], AST__STRINGTYPE,
-                                   0, NULL, " " );
+                        astAddColumn( result, cols[ iword ], AST__STRINGTYPE,
+                                      0, NULL, " " );
+                     }
                   }
+
+               } else if( *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  msgSetc( "F", fname );
+                  errRep( " ", "No column headers found in file ^F.", status );
                }
             }
 
 /* Report an error if the line has the wrong number of values. */
             if( nword != ncol ) {
-               *status = SAI__ERROR;
-               msgSeti( "N", nword );
-               msgSeti( "I", (*iline) );
-               msgSeti( "M", ncol );
-               msgSetc( "F", fname );
-               errRep( " ", "Wrong number of values (^N) at line ^I in "
-                       "file ^F (should be ^M).", status );
+               if( *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  msgSeti( "N", nword );
+                  msgSeti( "I", (*iline) );
+                  msgSeti( "M", ncol );
+                  msgSetc( "F", fname );
+                  errRep( " ", "Wrong number of values (^N) at line ^I in "
+                          "file ^F (should be ^M).", status );
+               }
 
 /* Otherwise increment the number of rows read. */
             } else {
