@@ -1979,12 +1979,26 @@ maplag = 0.0
 #               used if parameter "numiter" is negative. The normalised mean
 #               (or maximum) change between maps is defined as the mean (or
 #               maximum) of the absolute change in map pixel value, taken
-#               over all pixels within the region of the AST mask (if any,
-#               see parameter "ast.zero_mask", etc), and normalised by the RMS
-#               of the square root of the pixel variances. Compared to parameter
-#               "chitol", this is much more like a "by eye" test, that will stop
-#               the solution when the map stops changing.
+#               over all pixels within the region of the mask specified by
+#               parameter "maptol_mask", and normalised by the RMS of the
+#               square root of the pixel variances. Compared to parameter
+#               "chitol", this is much more like a "by eye" test, that will
+#               stop the solution when the map stops changing.
 maptol = 0.05
+
+#-----------------------------------------------------------------
+#  Name: 	maptol_mask
+#  Type: 	string
+#  Default: 	AST
+#  Purpose: 	Specifies when to stop iterating.
+#  Description: This parameter specifies the mask that defines the area
+#               over which the normalised map change should be calculated
+#               when determining the mean map change at the end of each
+#               iteration. See parameter "maptol". The supplied value can
+#               be "AST", "FLT", "COM" or "PCA". If the specifies mask
+#               is not defined, then the mean map change is determined
+#               over the entire map.
+maptol_mask = AST
 
 #-----------------------------------------------------------------
 #  Name: 	maptol_mean

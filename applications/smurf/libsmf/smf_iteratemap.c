@@ -709,6 +709,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   double mapchange_max=0;       /* Maximum change in the map */
   double maptol_rate=VAL__BADD; /* Min rate of change of mean map change */
   double maptol=VAL__BADD;      /* map change tolerance for stopping */
+  smf_qual_t maptol_mask=0;     /* Map quality for pixels to include in map change */
   int maptol_mean;              /* Use mean map change instead of max map change? */
   double *mapweights=NULL;      /* Weight for each pixel including chunk weight */
   double *mapweightsq=NULL;     /* Sum of bolometer weights squared */
@@ -919,6 +920,30 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Does maptol refer to mean map change or max map change? */
       astMapGet0I( keymap, "MAPTOL_MEAN", &maptol_mean );
+
+      /* Which mask should be used to define the area within which the
+         mean map change should be calculated? */
+      tempstr = NULL;
+      astMapGet0C( keymap, "MAPTOL_MASK", &tempstr );
+      if( tempstr ) {
+         if( astChrMatch( tempstr, "AST" ) ){
+            maptol_mask = SMF__MAPQ_AST;
+         } else if( astChrMatch( tempstr, "COM" ) ){
+            maptol_mask = SMF__MAPQ_COM;
+         } else if( astChrMatch( tempstr, "FLT" ) ){
+            maptol_mask = SMF__MAPQ_FLT;
+         } else if( astChrMatch( tempstr, "PCA" ) ){
+            maptol_mask = SMF__MAPQ_PCA;
+         } else {
+            *status = SAI__ERROR;
+            errRepf( "", "Bad value '%s' for config parameter 'MAPTOL_MASK'.",
+                     status, tempstr );
+         }
+         msgOutiff( MSG__VERB," ", FUNC_NAME ": Using the '%s' mask to mask "
+                    "the normalized map change value.", status, tempstr );
+      } else {
+         maptol_mask = 0;
+      }
 
       /* Abort if the "mean change in map value" changes by less than
          "MAPTOL_RATE" between iterations. */
@@ -2678,7 +2703,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               double vdiff = thismap[ipix] - lastmap[ipix];
               if( epsout) epsbuf3[ipix] = vdiff;
 
-              if( !(thisqual[ipix]&SMF__MAPQ_AST) && (thisvar[ipix] != VAL__BADD)
+              if( !(thisqual[ipix]&maptol_mask) && (thisvar[ipix] != VAL__BADD)
                   && (thisvar[ipix] > 0) && (thishits[ipix] > nhitslim) ) {
                 mapchange[ipix] = fabs( vdiff ) / sqrt(thisvar[ipix]);
 
