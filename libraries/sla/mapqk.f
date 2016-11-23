@@ -96,7 +96,7 @@
 
 *  Km/s to AU/year
       DOUBLE PRECISION VF
-      PARAMETER (VF=0.21094502D0)
+      PARAMETER (VF=0.210949528D0)
 
       INTEGER I
 
