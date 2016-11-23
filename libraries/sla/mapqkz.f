@@ -27,9 +27,9 @@
 *
 *       (1-4)    not used
 *       (5-7)    heliocentric direction of the Earth (unit vector)
-*       (8)      (grav rad Sun)*2/(Sun-Earth distance)
+*       (8)      (Schwarzschild radius of Sun)/(Sun-Earth distance)
 *       (9-11)   ABV: barycentric Earth velocity in units of c
-*       (12)     sqrt(1-v**2) where v=modulus(ABV)
+*       (12)     sqrt(1-v^2) where v=modulus(ABV)
 *       (13-21)  precession/nutation (3,3) matrix
 *
 *  Returned:
@@ -42,8 +42,8 @@
 *
 *  Notes:
 *
-*  1)  The vectors AMPRMS(2-4) and AMPRMS(5-7) are referred to the
-*      mean equinox and equator of epoch EQ.
+*  1)  The vector AMPRMS(5-7) is referred to the mean equinox and
+*      equator of epoch EQ.
 *
 *  2)  Strictly speaking, the routine is not valid for solar-system
 *      sources, though the error will usually be extremely small.
@@ -56,9 +56,10 @@
 *
 *  Called:  sla_DCS2C, sla_DVDV, sla_DMXV, sla_DCC2S, sla_DRANRM
 *
-*  P.T.Wallace   Starlink   18 March 1999
+*  Last revision:   23 November 2016
 *
 *  Copyright (C) 1999 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -73,8 +74,8 @@
 *
 *    You should have received a copy of the GNU General Public License
 *    along with this program (see SLA_CONDITIONS); if not, write to the
-*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-*    Boston, MA  02110-1301  USA
+*    Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+*    Boston, MA  02111-1307  USA
 *
 *-
 
@@ -92,8 +93,7 @@
 
 
 
-
-*  Unpack scalar and vector parameters
+*  Unpack scalar and vector parameters.
       GR2E = AMPRMS(8)
       AB1 = AMPRMS(12)
       DO I=1,3
@@ -101,10 +101,10 @@
          ABV(I) = AMPRMS(I+8)
       END DO
 
-*  Spherical to x,y,z
+*  Spherical to x,y,z.
       CALL sla_DCS2C(RM,DM,P)
 
-*  Light deflection
+*  Light deflection (restrained within the Sun's disc).
       PDE = sla_DVDV(P,EHN)
       PDEP1 = PDE+1D0
       W = GR2E/MAX(PDEP1,1D-5)
@@ -119,10 +119,10 @@
          P2(I) = AB1*P1(I)+W*ABV(I)
       END DO
 
-*  Precession and nutation
+*  Precession and nutation.
       CALL sla_DMXV(AMPRMS(13),P2,P3)
 
-*  Geocentric apparent RA,Dec
+*  Geocentric apparent RA,Dec.
       CALL sla_DCC2S(P3,RA,DA)
       RA = sla_DRANRM(RA)
 

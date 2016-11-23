@@ -30,9 +30,9 @@
 *       (1)      time interval for proper motion (Julian years)
 *       (2-4)    barycentric position of the Earth (AU)
 *       (5-7)    heliocentric direction of the Earth (unit vector)
-*       (8)      (grav rad Sun)*2/(Sun-Earth distance)
+*       (8)      (Schwarzschild radius of Sun)/(Sun-Earth distance)
 *       (9-11)   barycentric Earth velocity in units of c
-*       (12)     sqrt(1-v**2) where v=modulus(ABV)
+*       (12)     sqrt(1-v^2) where v=modulus(ABV)
 *       (13-21)  precession/nutation (3,3) matrix
 *
 *  Returned:
@@ -64,9 +64,10 @@
 *     sla_DCC2S       Cartesian to spherical
 *     sla_DRANRM      normalize angle 0-2Pi
 *
-*  P.T.Wallace   Starlink   15 January 2000
+*  Last revision:   23 November 2016
 *
 *  Copyright (C) 2000 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -81,8 +82,8 @@
 *
 *    You should have received a copy of the GNU General Public License
 *    along with this program (see SLA_CONDITIONS); if not, write to the
-*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-*    Boston, MA  02110-1301  USA
+*    Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+*    Boston, MA  02111-1307  USA
 *
 *-
 
@@ -108,7 +109,7 @@
 
 
 
-*  Unpack scalar and vector parameters
+*  Unpack scalar and vector parameters.
       PMT = AMPRMS(1)
       GR2E = AMPRMS(8)
       AB1 = AMPRMS(12)
@@ -118,17 +119,17 @@
          ABV(I) = AMPRMS(I+8)
       END DO
 
-*  Spherical to x,y,z
+*  Spherical to x,y,z.
       CALL sla_DCS2C(RM,DM,Q)
 
-*  Space motion (radians per year)
+*  Space motion (radians per year).
       PXR = PX*AS2R
       W = VF*RV*PXR
       EM(1) = -PR*Q(2)-PD*COS(RM)*SIN(DM)+W*Q(1)
       EM(2) =  PR*Q(1)-PD*SIN(RM)*SIN(DM)+W*Q(2)
       EM(3) =          PD*COS(DM)        +W*Q(3)
 
-*  Geocentric direction of star (normalized)
+*  Geocentric direction of star (normalized).
       DO I=1,3
          P(I) = Q(I)+PMT*EM(I)-PXR*EB(I)
       END DO
@@ -142,17 +143,17 @@
          P1(I) = PN(I)+W*(EHN(I)-PDE*PN(I))
       END DO
 
-*  Aberration (normalization omitted)
+*  Aberration (normalization omitted).
       P1DV = sla_DVDV(P1,ABV)
       W = 1D0+P1DV/(AB1+1D0)
       DO I=1,3
          P2(I) = AB1*P1(I)+W*ABV(I)
       END DO
 
-*  Precession and nutation
+*  Precession and nutation.
       CALL sla_DMXV(AMPRMS(13),P2,P3)
 
-*  Geocentric apparent RA,Dec
+*  Geocentric apparent RA,Dec.
       CALL sla_DCC2S(P3,RA,DA)
       RA = sla_DRANRM(RA)
 
