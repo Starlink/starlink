@@ -86,7 +86,7 @@
 
       DOUBLE PRECISION GR2E,AB1,EHN(3),ABV(3),
      :                 P(3),PDE,PDEP1,W,P1(3),P1DV,
-     :                 P1DVP1,P2(3),P3(3)
+     :                 P2(3),P3(3)
 
       DOUBLE PRECISION sla_DVDV,sla_DRANRM
 
@@ -112,12 +112,11 @@
          P1(I) = P(I)+W*(EHN(I)-PDE*P(I))
       END DO
 
-*  Aberration
+*  Aberration (normalization omitted).
       P1DV = sla_DVDV(P1,ABV)
-      P1DVP1 = P1DV+1D0
       W = 1D0+P1DV/(AB1+1D0)
       DO I=1,3
-         P2(I) = (AB1*P1(I)+W*ABV(I))/P1DVP1
+         P2(I) = AB1*P1(I)+W*ABV(I)
       END DO
 
 *  Precession and nutation
