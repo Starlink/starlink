@@ -53,7 +53,7 @@
 *        - First iteration:
 *           numiter=1
 *           noi.export=1
-*           exportNDF=(lut,ext)
+*           exportNDF=(lut,ext,res,qua)
 *           noexportsetbad=1
 *           exportclean=1
 *           ast.zero_notlast = 0
@@ -69,6 +69,7 @@
 *        - Subsequent iterations:
 *           numiter=1
 *           noi.import=1
+*           exportNDF=(res,qua)
 *           doclean=0
 *           importsky=ref
 *           importlut=1
@@ -312,6 +313,20 @@
 *        first iteration, as the effects of IP correction are incorporated
 *        into the cleaned data created by the first iteration, and passed
 *        on to subsequent iterations.
+*     10-NOV-2016 (DSB):
+*        Revert the 4-MAR-2014 change, so that the quality array in the
+*        cleaned time series data is again updated by each call to
+*        makemap. The 4-MAR-2014 change was made because the time-series
+*        quality data was mangled by being reduced to 8 bits in
+*        smf_qual_unmap, and consequently was useless for later iterations.
+*        But this means that spike flags are lost. Now, the new exportqbits
+*        config parameter is used to tell smf_qual_unmap to export the
+*        SPIKE flag. We also export the flags set by the initial cleaning
+*        process (BADDA,BADBOL,DCJUMP,STAT,NOISE,PAD), so that they are
+*        available to later iterations. Since this is only 7 bit, they can
+*        be exported without loss and so can be re-used on subsequent
+*        iterations. Things like COM and RING are recalculated from
+*        scratch on each iteration and so do not need to be exported.
 *-
 '''
 
@@ -366,6 +381,8 @@ def cleanup():
             os.remove( lut )
          for noi in new_noi_ndfs:
             os.remove( noi )
+         for res in qua:
+            os.remove( res )
    except:
       pass
 
@@ -616,8 +633,12 @@ try:
       fd.write("noi.export=1\n") # Export the NOI model. This forces the
                                  # NOI model to be created and exported after
                                  # the first iteration has completed.
-      fd.write("exportNDF=(lut,ext)\n")# Save the EXT, LUT model values to avoid
-                                 # re-calculation on each invocation of makemap.
+      fd.write("exportNDF=(lut,ext,res,qua)\n")# Save the EXT, LUT model values to
+                                 # avoid re-calculation on each invocation of makemap.
+                                 # Also need QUA to update time-series flags
+      fd.write("exportqbits=(BADBOL,BADDA,DCJUMP,STAT,NOISE,PAD,SPIKE)\n")# We only
+                                 # export quality flags that are not recalculated on
+                                 # each iteration (we must have fewer than 8 bits)
       fd.write("noexportsetbad=1\n")# Export good EXT values for bad bolometers
       if not precleaned:
          fd.write("exportclean=1\n")  # Likewise save the cleaned time-series data.
@@ -732,12 +753,16 @@ try:
             elif os.stat(ndf).st_atime > orig_noi_ndfs[ndf]:
                new_noi_ndfs.append(ndf)
 
-#  Get the paths to the the moved cleaned files.
+#  Get the paths to the the moved cleaned files. Also get the paths to the
+#  files holding the quality flags at the end of each invocation of
+#  makemap.
    if niter > 1:
       if not precleaned:
          cleaned = NDG( os.path.join( NDG.tempdir,"s*_con_res_cln.sdf"))
+         qua = NDG( cleaned, "./*|_cln||" )
       else:
          cleaned = indata
+         qua = None
 
 #  Now do the second and subsequent iterations. These use the cleaned
 #  time-series data created by the first iteration as their time-series
@@ -745,7 +770,7 @@ try:
 #  initial guess at the sky. First create a map holding things to add
 #  to the config for subsequent invocations.
       add = {}
-      add["exportNDF"] = 0     # Prevent EXT or LUT model being exported.
+      add["exportNDF"] = "(res,qua)" # Prevent EXT or LUT model being exported.
       add["exportclean"] = 0   # Prevent cleaned time-series data being exported.
       add["doclean"] = 0       # Do not clean the supplied data (it has
       add["importsky"] = "ref" # Get the initial sky estimate from the REF parameter.
@@ -865,6 +890,9 @@ try:
                add["com.perarray_last"] = com_perarray_last
                newcon = 1
 
+#  No need to export quality flags on the last iteration.
+            add["exportNDF"] = 0
+
 #  If this is not the last iteration, get the name of a temporary NDF that
 #  can be used to store the current iteration's map. This NDF is put in
 #  the NDG temp directory.
@@ -881,6 +909,11 @@ try:
             for key in add:
                fd.write("{0}={1}\n".format( key, add[key] ))
             fd.close()
+
+#  Update the quality flags in the cleaned time-series data to be the
+#  same as the flags exported at the end of the previous iteration.
+         if qua != None:
+            invoke( "$KAPPA_DIR/setqual ndf={0} like={1}".format(cleaned,qua) )
 
 #  See if the output NDF already exists.
          gotit = False
@@ -945,6 +978,10 @@ try:
 #  Append the output map name to the list of maps to be included in any
 #  itermap cube.
          maps.append(newmap)
+
+#  Update the NDF from which new quality info is to be read.
+         if qua:
+            qua = NDG( cleaned, "./*_con_res" )
 
 #  Increment the iteration number
          iter += 1
