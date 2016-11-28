@@ -784,6 +784,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int *whichthetabin=NULL;      /* Which scan angle bin each time slice */
   SmfIterateMapData *job_data = NULL;  /* Array of job descriptions */
   SmfIterateMapData *pdata;     /* Pointer to next job description */
+  int fcount;
+  int nflags;
+  char flagnames[SMF__NQBITS*SMF_QSTR_MAX];
+  char *flagname;
+  smf_qual_t exportqbits=SMF__Q_GOOD; /* Mask of quality bits to export */
 
   /* initalise */
   *iters = -1;
@@ -956,10 +961,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* Do iterations completely in memory - minimize disk I/O */
     if( *status == SAI__OK ) {
-      int fcount;
-      int nflags;
-      char flagnames[SMF__NQBITS*SMF_QSTR_MAX];
-      char *flagname;
 
       /* Are we going to produce single-bolo maps? */
       astMapGet0I( keymap, "BOLOMAP", &bolomap );
@@ -1231,8 +1232,20 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           /* If the model type is 'qua' handle it here */
           if( thismodel == SMF__QUA ) {
             exportNDF = 1;
+
             /* qua will be attached to any 3d model component */
             exportNDF_which[nmodels+1]=1;
+
+            /* Get the quality bits to export, as a list of flag names and
+               convert them to a single bit mask. */
+            if( astMapGet1C( keymap, "EXPORTQBITS", SMF_QSTR_MAX, SMF__NQBITS,
+                             &nflags, flagnames ) ) {
+               exportqbits = 0;
+               for( fcount=0; fcount<nflags; fcount++ ) {
+                  flagname = flagnames+fcount*SMF_QSTR_MAX;
+                  exportqbits |= smf_qual_str_to_val( flagname, NULL, status );
+               }
+            }
           }
 
           /* If the model type is 'res' handle it here */
@@ -3110,6 +3123,13 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   smf_update_valbad( res[0]->sdata[idx], SMF__NUL,
                                      NULL, 0, 0, SMF__Q_BADB, status );
                 }
+
+                /* Ensure only the quality bits requested by the
+                   EXPORTQBITS config parameter are written out to the
+                   NDF. This makes it possible for the user to limit the
+                   number of bits to 8 or fewer, and so avoid lossy
+                   compression of quality bits. */
+                res[0]->sdata[idx]->qbits = exportqbits;
 
                 smf_write_smfData( wf, res[0]->sdata[idx],
                                    (havenoi && exportNDF_which[whichnoi]) ?

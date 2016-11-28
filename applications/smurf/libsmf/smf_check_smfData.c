@@ -256,7 +256,7 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
     msgOutif(MSG__DEBUG, "", "Allocating memory for QUALITY array", status);
     odata->qual = smf_map_or_malloc( npts, SMF__QUALTYPE, 1, ondf, comps[2], status);
   }
-
+  odata->qbits = idata->qbits;
 
   /* Check scanfit polynomial coefficients */
   /* Is there an easy way of checking consistency? */

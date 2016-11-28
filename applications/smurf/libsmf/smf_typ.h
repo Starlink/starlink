@@ -745,6 +745,7 @@ typedef struct smfData {
   smf_qual_t * qual;         /* Pointer for quality information */
   struct smfData * sidequal; /* Override external quality not owned by this smfData */
   smf_qfam_t qfamily;        /* Quality family used in "qual" */
+  smf_qual_t qbits;          /* Quality bits to export to NDF */
   dim_t dims[NDF__MXDIM];    /* Dimensions of data array */
   int lbnd[NDF__MXDIM];      /* Lower PIXEL bounds of data array */
   int isFFT;                 /* -1=not fft,0=don't know,>0 if fft data*/

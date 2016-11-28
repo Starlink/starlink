@@ -117,6 +117,9 @@
 *        because the smfData has an assocuated NDF identifier. Now, an
 *        extra flag ("isdyn") is used to over-ride this to force the
 *        data pointers to be freed.
+*     2016-11-9 (DSB):
+*        The qbits field in the smfData structure now indicates the
+*        quality bits that are to be exported to the NDF.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -229,7 +232,8 @@ void smf_close_file( ThrWorkForce *wf, smfData ** data, int * status ) {
       /* Handle quality as a special case */
       if ( (*data)->qual) {
         (*data)->qual = smf_qual_unmap( wf, file->ndfid, (*data)->qfamily,
-                                        (*data)->qual, status );
+                                        (*data)->qual, (*data)->qbits,
+                                        status );
       }
 
       /* Annul the NDF (which will unmap things) */

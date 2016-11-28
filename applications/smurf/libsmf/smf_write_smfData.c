@@ -393,6 +393,7 @@ void smf_write_smfData ( ThrWorkForce *wf, const smfData *data, const smfData *v
       }
 
       /* Quality. Just copy from input to output */
+      outdata->qbits = data->qbits;
       outdata->qfamily = qfamily;
       if (qual) memcpy( outdata->qual, qual, nelem * sizeof(*qual) );
 
@@ -509,7 +510,8 @@ void smf_write_smfData ( ThrWorkForce *wf, const smfData *data, const smfData *v
           if( (*status==SAI__OK) && outdkqual ) {
             memcpy( outdkqual, da->dksquid->qual, nmap*sizeof(*outdkqual) );
           }
-          outdkqual = smf_qual_unmap( wf, id, da->dksquid->qfamily, outdkqual, status );
+          outdkqual = smf_qual_unmap( wf, id, da->dksquid->qfamily,
+                                      outdkqual, SMF__Q_GOOD, status );
         }
 
         ndfAnnul( &id, status );

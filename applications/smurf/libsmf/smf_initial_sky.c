@@ -275,7 +275,8 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
    the NDF to reflect the AST mask created by smf_calcmodel_ast above. */
       if( update ) {
          smf_qual_t *qarray = astStore( NULL, dat->mapqual, dat->msize*sizeof(*qarray) );
-         qarray = smf_qual_unmap( wf, indf2, SMF__QFAM_MAP, qarray, status );
+         qarray = smf_qual_unmap( wf, indf2, SMF__QFAM_MAP, qarray,
+                                  SMF__Q_GOOD, status );
       }
 
 /* End the NDF context. */

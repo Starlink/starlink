@@ -247,6 +247,7 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
         }
       }
       data->qual = qual;
+      data->qbits = SMF__Q_GOOD;
       data->qfamily = qfamily;
       data->sidequal = sidequal;
       data->ndims = ndims;

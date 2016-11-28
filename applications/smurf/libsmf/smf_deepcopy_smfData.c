@@ -425,5 +425,8 @@ smf_deepcopy_smfData( ThrWorkForce *wf, const smfData *old, const int rawconvert
                                lbnd, ndims, virtual, ncoeff, poly, history,
                                status);
 
+/* Copy the quality bits to export. */
+  if( new ) new->qbits = old->qbits;
+
   return new;
 }

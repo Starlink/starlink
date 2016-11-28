@@ -174,6 +174,7 @@ smf_create_smfData( int flags, int * status ) {
   }
   data->qual = NULL;
   data->isdyn = 0;
+  data->qbits = SMF__Q_GOOD;   /* Export all bits to the disk NDF */
   data->sidequal = NULL;
   data->qfamily = SMF__QFAM_NULL;
 

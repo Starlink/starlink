@@ -1027,8 +1027,40 @@ exportlonlat = 0
 #		component of the resulting NDF for RES. QUA will become the
 #		quality component of any full 3-dimensional model (e.g.
 #		RES, AST, FLT, EXT), but no quality will be written to model
-#		components with different dimensions.
+#		components with different dimensions. Note, since an NDF
+#               can only contain 8 quality flags, it may be necessary to
+#               compress quality information by combining flags with
+#               similar purposes together. To avoid this, it is possible
+#               to use parameter "exportqbits" to specify that only a
+#               subset of the quality flags be written out t the NDF.
 exportndf = 0
+
+#-----------------------------------------------------------------
+#  Name: 	exportqbits
+#  Type: 	list of strings
+#  Default: 	<undef>
+#  Purpose: 	Specifies the quality bits to be written out.
+#  Description: If the value of parameter "exportndf" includes" RES" or
+#               "QUA", then the final quality array is exported to an NDF.
+#		An NDF can only contain 8 quality flags, but makemap can
+#               sometimes use more than 8 flags internally. The default
+#               action in such cases is to combine flags with similar
+#               purposes into more general flags in order to reduce the
+#               number of used flags to 8 or fewer. This is a lossy
+#               process - it is impossible to undo the combination to
+#               recover the original flags. However, this can be avoided
+#               by using this parameter to specify a list of explicit
+#               quality flags to be exported, ensuring that the list
+#               contains no more than 8 entries. Any information for
+#               flags not in the list will simply be discarded, so choose
+#               the flags that you are pf particularly interest to you.
+#               If the parameter is left at "<undef>", all quality flags
+#               will be exported, with consequent possible lossy compression.
+#               Otherwise the parameter should be a comma-separated list
+#               of quality names, enclosed in parentheses. Valid quality
+#               names are: BADDA, BADB, SPIKE, JUMP, PAD, APOD, STAT, COM,
+#               FILT, NOISE, EXT, LOWAP, BADEF, RING, SSN, PCA, IP.
+exportqbits = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	ext.csotau

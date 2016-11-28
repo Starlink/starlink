@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_qual_t * smf_qual_unmap( ThrWorkForce *wf, int indf, smf_qfam_t family,
-*                                  smf_qual_t * qual, int * status );
+*                                  smf_qual_t * qual, smf_qual_t mask, int * status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -26,6 +26,9 @@
 *     qual = const smf_qual_t * (Given)
 *        Pointer to quality data to be unmapped or freed. Should not be used
 *        after calling this routine.
+*     mask = smf_qual_t (Given)
+*        A mask identifying the quality bits that are to be exported to
+*        the NDF. All others are ignored.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -82,6 +85,8 @@
 *        Multi-threaded.
 *     2014-2-28(DSB):
 *        Add SMF__Q_RING
+*     2016-11-09 (DSB):
+*        Added argument mask.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -139,7 +144,7 @@ typedef struct smfQualUnmapData {
 } SmfQualUnmapData;
 
 smf_qual_t * smf_qual_unmap( ThrWorkForce *wf, int indf, smf_qfam_t family,
-                             smf_qual_t * qual, int * status ) {
+                             smf_qual_t * qual, smf_qual_t mask, int * status ) {
   int canwrite = 0;   /* can we write to the file? */
   size_t nqbits = 0;  /* Number of quality bits in this family */
   SmfQualUnmapData *job_data = NULL;
@@ -263,6 +268,12 @@ smf_qual_t * smf_qual_unmap( ThrWorkForce *wf, int indf, smf_qfam_t family,
         for( k=0; k<nqbits; k++ ) {
           qcount[k] += pdata->qcount[k];
         }
+      }
+
+      /* Reset the counts to zero for any bits that are not required
+         (i.e. are not set in "mask").  */
+      for( k=0; k<nqbits; k++ ) {
+         if( ! (mask & (1<<k)) ) qcount[k] = 0;
       }
 
       /* see how many we got */
