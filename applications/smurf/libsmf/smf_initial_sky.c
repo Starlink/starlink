@@ -209,8 +209,40 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
    which gives the number of iterations that were completed before the
    map was created. Obtain and return this value, if it exists. */
       ndfXstat( indf1, SMURF__EXTNAME, &there, status );
-      if( there ) ndfXgt0i( indf1, SMURF__EXTNAME, "NUMITER", iters,
-                            status );
+      if( there ) {
+         double *tptr;
+         int tndf;
+         HDSLoc *xloc = NULL;
+         ndfXgt0i( indf1, SMURF__EXTNAME, "NUMITER", iters, status );
+
+/* Get a locator for the SMURF extension. */
+         ndfXloc( indf1, SMURF__EXTNAME, "READ", &xloc, status );
+
+/* Copy the WEIGHTS NDF from the SMURF extension to the mapweight buffer in "dat". */
+         ndfFind( xloc, "WEIGHTS", &tndf, status );
+         ndfMap( tndf, "DATA", "_DOUBLE", "READ", (void **) &tptr, &nel, status );
+         if( *status == SAI__OK ) {
+            memcpy( dat->mapweight, tptr, dat->msize*sizeof(*tptr));
+         }
+         ndfAnnul( &tndf, status );
+
+/* Copy the EXP_TIME NDF from the SMURF extension to the hitsmaps buffer in
+   "dat". Use the step time in the supplied smfData to convert from time
+   to hits. */
+         ndfFind( xloc, "EXP_TIME", &tndf, status );
+         ndfMap( tndf, "DATA", "_DOUBLE", "READ", (void **) &tptr, &nel, status );
+         if( *status == SAI__OK ) {
+            double steptime = dat->res[0]->sdata[0]->hdr->steptime;
+            for( i = 0; i < dat->msize; i++ ) {
+               dat->hitsmap[ i ] =  (int) ( tptr[ i ]/steptime + 0.5 );
+            }
+         }
+         ndfAnnul( &tndf, status );
+
+/* Annul the SMURF extension locator. */
+         datAnnul( &xloc, status );
+
+      }
 
 /* If the NDF has a Quality component, import it and create initial AST,
    FLT, PCA, SSN and COM masks from it. These will often be over-ridden by
