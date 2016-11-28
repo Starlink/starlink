@@ -327,6 +327,9 @@
 *        be exported without loss and so can be re-used on subsequent
 *        iterations. Things like COM and RING are recalculated from
 *        scratch on each iteration and so do not need to be exported.
+*     28-NOV-2016 (DSB):
+*        Take account of the value of ast.skip when determining whether to 
+*        freeze (xxx.zero_freeze) or apply (xxx.zero_niter) masks, etc.
 *-
 '''
 
@@ -520,8 +523,11 @@ try:
                                        "defaults=$SMURF_DIR/smurf_makemap.def "
                                        "select=\"\'450=0,850=1\'\"".format(model,config)))
 
-#  Similarly, we need to record com.freeze_flags.
+#  Similarly, we need to record com.freeze_flags and flt.ring_freeze.
    com_freeze_flags = myint( invoke( "$KAPPA_DIR/configecho name=com.freeze_flags config={0} "
+                                   "defaults=$SMURF_DIR/smurf_makemap.def "
+                                   "select=\"\'450=0,850=1\'\"".format(config)))
+   flt_ring_freeze = myint( invoke( "$KAPPA_DIR/configecho name=flt.ring_freeze config={0} "
                                    "defaults=$SMURF_DIR/smurf_makemap.def "
                                    "select=\"\'450=0,850=1\'\"".format(config)))
 
@@ -610,6 +616,24 @@ try:
    niter0 = 1 + ast_skip
    if niter0 > niter:
       niter0 = niter
+
+#  Adjust config parameters that count iterations excluding the initial
+#  "skip" iterations. The "iter" variable below starts at 1 for the first
+#  skipped iteration, so we need to include the skip iterations in these
+#  counts.
+   if ast_skip > 0:
+      for model in ["ast", "com", "flt"]:
+         if zero_niter[model] > 0:
+            zero_niter[model] += ast_skip;
+
+         if zero_freeze[model] > 0:
+            zero_freeze[model] += ast_skip;
+
+      if com_freeze_flags > 0:
+         com_freeze_flags += ast_skip
+
+      if flt_ring_freeze > 0:
+         flt_ring_freeze += ast_skip
 
 #  On the first invocation of makemap, we use the raw data files specified
 #  by the IN parameter to create an initial estimate of the sky. We also
@@ -843,6 +867,13 @@ try:
          if com_freeze_flags > 0 and iter > com_freeze_flags + 1:
             com_freeze_flags = 0
             add[ "com.freeze_flags" ] = -1
+            newcon = 1
+
+#  When "flt_ring_freeze" invocations have been performed, freeze the
+#  ringing flags (so long as flt_ring_freeze > 0).
+         if flt_ring_freeze > 0 and iter > flt_ring_freeze + 1:
+            flt_ring_freeze = 0
+            add[ "flt.ring_freeze" ] = -1
             newcon = 1
 
 #  If this is the last iteration, put the output map in the NDF specified
