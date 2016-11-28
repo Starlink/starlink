@@ -155,7 +155,7 @@
 *        Move ast.filt_diff stuff into smf_iteratemap, so that it can be
 *        used by skyloop.
 *     2016-10-09 (DSB):
-*        Map based de-spiking was only being applied to the first sub-array. 
+*        Map based de-spiking was only being applied to the first sub-array.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -296,8 +296,12 @@ void smf_calcmodel_ast( ThrWorkForce *wf,
      have_noi = ( ((double *) noi->sdata[idx]->pntr[0])[ 0 ] != 1.0 );
   }
 
-  /* Despike if we have usable NOI values. */
-  if( (mapspike > 0) && have_noi ) {
+  /* Despike if we have usable NOI values and this function was not
+     called as part of subtracting off an initial sky. During such a
+     pre-iteration, the time-series data is the original cleaned data that
+     includes the noise models (COPM,FLT,etc), and so will be far removed
+     from the data values implied by the map. */
+  if( (mapspike > 0) && have_noi && !(flags&SMF__DIMM_PREITER) ) {
     size_t nflagged;
 
     for( idx=0; idx<res->ndat; idx++ ) {
