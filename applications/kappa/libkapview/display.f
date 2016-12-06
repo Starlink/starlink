@@ -178,13 +178,15 @@
 *        Parameter KEYPOS.  If the key is required in a different
 *        location, set KEY=NO and use application LUTVIEW after
 *        displaying the image.  [TRUE]
-*     KEYPOS = _REAL (Read)
-*        A value giving the gap between the right-hand edge of the
-*        display and the left-hand edge of the key, given as a fraction
+*     KEYPOS( 2 ) = _REAL (Read)
+*        The first element gives the gap between the right-hand edge of
+*        the display and the left-hand edge of the key, as a fraction
 *        of the width of the current picture.  If a key is produced,
 *        then the right-hand margin specified by Parameter MARGIN is
 *        ignored, and the value supplied for KEYPOS is used instead.
-*        [current value]
+*        The second element gives the vertical position of the key as a
+*        fractional value in the range zero to one: zero puts the key as
+*        low as possible, one puts it as high as possible. [current value]
 *     KEYSTYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
 *        use for the key (see Parameter KEY).
@@ -666,6 +668,9 @@
 *        changes the Ident for the FrameSet itself, not for the current
 *        Frame. So now we need to extract a pointer to the current Frame
 *        before setting the Ident attribute.
+*     6-DEC-2016 (DSB):
+*        Modify parameter KEYPOS to allow it to set the vertical key
+*        position as well as the horizontal position.
 *     {enter_further_changes_here}
 
 *-
@@ -783,7 +788,7 @@
       REAL DEFMAR              ! Default MARGIN value
       REAL GLBND( NDIM )       ! Low grid co-ord bounds of PGPLOT window
       REAL GUBND( NDIM )       ! Hi grid co-ord bounds of PGPLOT window
-      REAL KEYPOS              ! Horizontal position of key
+      REAL KEYPOS( 2 )         ! Horizontal and vertical position of key
       REAL KWID                ! Width to reserve for the KEY (if any)
       REAL MARGIN( 4 )         ! Width of margins round DATA picture
       REAL OPLBND( NDIM )      ! Low pixel co-ord bounds of NDF overlap
@@ -1026,12 +1031,18 @@
 *  If so, see how large a gap is required between the DATA picture and
 *  the key. This replaces the MARGIN value for the right hand edge.
       IF( KEY ) THEN
-         CALL PAR_GDR0R( 'KEYPOS', 0.0, -1.0, 0.99 - MARGIN( 4 ) - KW,
-     :                   .FALSE., KEYPOS, STATUS )
-         IF( KEYPOS .GE. 0.0 ) THEN
-            MARGIN( 2 ) = KEYPOS
+         KEYPOS( 1 ) = 0.0
+         KEYPOS( 2 ) = 0.5
+         CALL PAR_GDR1R( 'KEYPOS', 2, KEYPOS, -1.0, 1.0, .FALSE.,
+     :                   KEYPOS, STATUS )
+
+         KEYPOS( 1 ) = MIN( KEYPOS( 1 ), 0.99 - MARGIN( 4 ) - KW )
+         KEYPOS( 2 ) = MAX( KEYPOS( 2 ), 0.0 )
+
+         IF( KEYPOS( 1 ) .GE. 0.0 ) THEN
+            MARGIN( 2 ) = KEYPOS( 1 )
          ELSE
-            MARGIN( 2 ) = KEYPOS - KW
+            MARGIN( 2 ) = KEYPOS( 1 ) - KW
          END IF
          KWID = KW
       ELSE
@@ -1571,8 +1582,9 @@
 *  temporary attributes be recognised.
          CALL KPG1_LUTKY( IPICK, '+KEYSTYLE', REAL( DHI ), REAL( DLO ),
      :                    LABEL( : NC ), 'KAPPA_DISPLAY', LP, UP, 0.1,
-     :                    ( Y2 - Y1 ) * 0.1, ( Y2 - Y1 ) * 0.1, 'CL',
-     :                    NX*NY, %VAL( CNF_PVAL( IPCOL ) ), STATUS )
+     :                    ( Y2 - Y1 ) * 0.1, ( Y2 - Y1 ) * 0.1, ' L',
+     :                    KEYPOS(2), NX*NY, %VAL( CNF_PVAL( IPCOL ) ),
+     :                    STATUS )
 
 *  Report a context message if anything went wrong.
          IF( STATUS .NE. SAI__OK ) THEN

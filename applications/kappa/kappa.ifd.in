@@ -5166,12 +5166,13 @@ package kappa {
          }
 
          parameter keypos {
+            size *
             type _REAL
             prompt {Horizontal position of key}
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             helpkey *
-            default 0.05
+            default {0.05, 0.5}
          }
 
          parameter keystyle {

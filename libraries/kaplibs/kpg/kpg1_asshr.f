@@ -1,5 +1,5 @@
-      SUBROUTINE KPG1_ASSHR( ASP, F, X1, X2, Y1, Y2, JUST, IPLOT, OK,
-     :                       STATUS )
+      SUBROUTINE KPG1_ASSHR( ASP, F, X1, X2, Y1, Y2, JUST, RJUST, IPLOT,
+     :                       OK, STATUS )
 *+
 *  Name:
 *     KPG1_ASSHR
@@ -12,11 +12,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASSHR( ASP, F, X1, X2, Y1, Y2, JUST, IPLOT, OK, STATUS )
+*     CALL KPG1_ASSHR( ASP, F, X1, X2, Y1, Y2, JUST, RJUST, IPLOT, OK,
+*                      STATUS )
 
 *  Description:
 *     This routine creates a new Plot covering the same window as the
-*     current PGPLOT window, but thw window is shrunk in GRAPHICS space
+*     current PGPLOT window, but the window is shrunk in GRAPHICS space
 *     so that all the annotation produced by AST_GRID falls within the PGPLOT
 *     viewport which is current on entry. The sizes of annotations, gaps,
 *     etc. are shrunk if this is necessary in order to fit the annotations
@@ -50,8 +51,17 @@
 *        Indicates the justification of the new plot within the specified
 *        area.  'BL', 'BC', 'BR', 'CL', 'CC', 'CR', 'TL', 'TC' or 'TR',
 *        where B is Bottom, C is Centre, T is Top, L is Left and R is
-*        Right. Only used if ASP > 0. Must be upper case. Unrecognised
-*        values are treated as "C".
+*        Right. Only used if ASP > 0. Must be upper case. If either
+*        character is a space, then the corresponding value from RJUST is
+*        used instead. Other unrecognised values are treated as "C".
+*     RJUST( 2 ) = REAL (Given)
+*        Each element is used only if the corresponding element in JUST
+*        is a apce. The first element gives the fractional vertical position
+*        of the new plot: 0.0 means put the new plot as low as possible, 1.0
+*        means put it as high as possible. The second element gives the
+*        fractional horizontal position of the new plot: 0.0 means put the
+*        new plot as far to the left as possible, 1.0 means put it as far
+*        to the right as possible.
 *     IPLOT = INTEGER (Given and Returned)
 *        The Plot. The supplied Plot is annulled and a new one is
 *        returned in its place. The new Plot contains all the Frames of
@@ -91,6 +101,8 @@
 *  History:
 *     12-OCT-1999 (DSB):
 *        Original version.
+*     6-DEC-2016 (DSB):
+*        Added argument RJUST.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -113,6 +125,7 @@
       REAL Y1
       REAL Y2
       CHARACTER JUST*2
+      REAL RJUST( 2 )
 
 *  Arguments Given and Returned:
       INTEGER IPLOT
@@ -178,6 +191,7 @@
       REAL NLSIZE                ! Character size for numerical labels
       REAL OBOX( 4 )             ! Bounds of old window
       REAL RF                    ! Reduction factor to fit in available area
+      REAL RJ                    ! Limited real justification value
       REAL TBOX( 4 )             ! Bounds of total box including annotation
       REAL TKLEN                 ! Max (-ve) length of tick marks
       REAL TKLEN1                ! Longest exterior tick length for Axis 1
@@ -281,7 +295,11 @@
       END IF
 
 *  Anchor the required corner.
-      IF( JUST( 1:1 ) .EQ. 'B' ) THEN
+      IF( JUST( 1:1 ) .EQ. ' ' ) then
+         RJ = MAX( 0.0, MIN( 1.0, RJUST( 1 ) ) )
+         GBOX( 2 ) = Y1*( 1.0 - RJ ) + ( Y2 - HGT )*RJ
+         GBOX( 4 ) = GBOX( 2 ) + HGT
+      ELSE IF( JUST( 1:1 ) .EQ. 'B' ) THEN
          GBOX( 2 ) = Y1
          GBOX( 4 ) = Y1 + HGT
       ELSE IF( JUST( 1:1 ) .EQ. 'T' ) THEN
@@ -293,7 +311,11 @@
          GBOX( 4 ) = CEN + 0.5*HGT
       END IF
 
-      IF( JUST( 2:2 ) .EQ. 'L' ) THEN
+      IF( JUST( 2:2 ) .EQ. ' ' ) then
+         RJ = MAX( 0.0, MIN( 1.0, RJUST( 2 ) ) )
+         GBOX( 1 ) = X1*( 1.0 - RJ ) + ( X2 - WID)*RJ
+         GBOX( 3 ) = GBOX( 1 ) + WID
+      ELSE IF( JUST( 2:2 ) .EQ. 'L' ) THEN
          GBOX( 1 ) = X1
          GBOX( 3 ) = X1 + WID
       ELSE IF( JUST( 2:2 ) .EQ. 'R' ) THEN
@@ -510,7 +532,11 @@
 
 *  Anchor the required corner. TBOX is the box enclosing the plotting
 *  area and the annotation.
-         IF( JUST( 1:1 ) .EQ. 'B' ) THEN
+         IF( JUST( 1:1 ) .EQ. ' ' ) then
+            RJ = MAX( 0.0, MIN( 1.0, RJUST( 1 ) ) )
+            TBOX( 2 ) = Y1*( 1.0 - RJ ) + ( Y2 - HGT )*RJ
+            TBOX( 4 ) = TBOX( 2 ) + HGT
+         ELSE IF( JUST( 1:1 ) .EQ. 'B' ) THEN
             TBOX( 2 ) = Y1
             TBOX( 4 ) = Y1 + HGT
          ELSE IF( JUST( 1:1 ) .EQ. 'T' ) THEN
@@ -522,7 +548,11 @@
             TBOX( 4 ) = CEN + 0.5*HGT
          END IF
 
-         IF( JUST( 2:2 ) .EQ. 'L' ) THEN
+         IF( JUST( 2:2 ) .EQ. ' ' ) then
+            RJ = MAX( 0.0, MIN( 1.0, RJUST( 2 ) ) )
+            TBOX( 1 ) = X1*( 1.0 - RJ ) + ( X2 - WID)*RJ
+            TBOX( 3 ) = TBOX( 1 ) + WID
+         ELSE IF( JUST( 2:2 ) .EQ. 'L' ) THEN
             TBOX( 1 ) = X1
             TBOX( 3 ) = X1 + WID
          ELSE IF( JUST( 2:2 ) .EQ. 'R' ) THEN

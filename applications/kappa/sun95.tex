@@ -18207,13 +18207,16 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          \htmlref{LUTVIEW}{LUTVIEW} after displaying the image.  \texttt{[TRUE]}
       }
       \sstsubsection{
-         KEYPOS = \_REAL (Read)
+         KEYPOS( 2 ) = \_REAL (Read)
       }{
-         A value giving the gap between the right-hand edge of the display
-         and the left-hand edge of the key, given as a fraction of the
-         width of the current picture.  If a key is produced, then the
-         right-hand margin specified by Parameter MARGIN is ignored, and
-         the value supplied for KEYPOS is used instead.  \texttt{[}current value\texttt{{]}}
+        The first element gives the gap between the right-hand edge of
+        the display and the left-hand edge of the key, as a fraction
+        of the width of the current picture.  If a key is produced,
+        then the right-hand margin specified by Parameter MARGIN is
+        ignored, and the value supplied for KEYPOS is used instead.
+        The second element gives the vertical position of the key as a
+        fractional value in the range zero to one: zero puts the key as
+        low as possible, one puts it as high as possible. \texttt{[}current value\texttt{{]}}
       }
       \sstsubsection{
          KEYSTYLE = \htmlref{GROUP}{se:groups} (Read)

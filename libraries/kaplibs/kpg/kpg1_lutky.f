@@ -1,6 +1,6 @@
       SUBROUTINE KPG1_LUTKY( IPIC, PARAM, HIGH, LOW, LABEL, APP,
-     :                       LP, UP, F, GAP1, GAP2, JUST, NEL, COLDAT,
-     :                       STATUS )
+     :                       LP, UP, F, GAP1, GAP2, JUST, RJUST, NEL,
+     :                       COLDAT, STATUS )
 *+
 *  Name:
 *     KPG1_LUTKY
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL KPG1_LUTKY( IPIC, PARAM, HIGH, LOW, LABEL, APP, LP, UP, F,
-*                      GAP1, GAP2, JUST, NEL, COLDAT, STATUS )
+*                      GAP1, GAP2, JUST, RJUST, NEL, COLDAT, STATUS )
 
 *  Description:
 *     The key consists of a ramp of colour covering the specified range
@@ -59,11 +59,20 @@
 *        of the supplied picture, and the nearest edge of the colour
 *        ramp.
 *     JUST = CHARACTER*2 (Given)
-*        Indicates the justification of the new plot within the
-*        specified area.  'BL', 'BC', 'BR', 'CL', 'CC', 'CR', 'TL',
-*        'TC', or 'TR', where B is Bottom, C is Centre, T is Top, L is
-*        Left and R is Right.  Must be uppercase.  Unrecognised values
-*        are treated as "C".
+*        Indicates the justification of the new plot within the specified
+*        area.  'BL', 'BC', 'BR', 'CL', 'CC', 'CR', 'TL', 'TC' or 'TR',
+*        where B is Bottom, C is Centre, T is Top, L is Left and R is
+*        Right. Must be upper case. If either character is a space, then
+*        the corresponding value from RJUST is used instead. Other
+*        unrecognised values are treated as "C".
+*     RJUST( 2 ) = REAL (Given)
+*        Each element is used only if the corresponding element in JUST
+*        is a apce. The first element gives the fractional vertical position
+*        of the new plot: 0.0 means put the new plot as low as possible, 1.0
+*        means put it as high as possible. The second element gives the
+*        fractional horizontal position of the new plot: 0.0 means put the
+*        new plot as far to the left as possible, 1.0 means put it as far
+*        to the right as possible.
 *     NEL = INTEGER (Given)
 *        The size of the vector COLDAT. If this is zero, COLDAT is not
 *        accessed, and requested for keys in the form of a histogram
@@ -111,6 +120,8 @@
 *        Use CNF_PVAL.
 *     2006 February 24 (MJC):
 *        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx call.
+*     6-DEC-2016 (DSB):
+*        Added argument RJUST.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -139,6 +150,7 @@
       REAL GAP1
       REAL GAP2
       CHARACTER JUST*2
+      REAL RJUST( 2 )
       INTEGER NEL
       INTEGER COLDAT( NEL )
 
@@ -621,8 +633,8 @@
 
 *  Replace the current Plot with a new Plot covering a smaller area so
 *  that there is room for the annotation within the current viewport.
-      CALL KPG1_ASSHR( ASPRAT, F, X1, X2, Y1, Y2, JUST, IPLOT, OK,
-     :                 STATUS )
+      CALL KPG1_ASSHR( ASPRAT, F, X1, X2, Y1, Y2, JUST, RJUST, IPLOT,
+     :                 OK, STATUS )
 
 *  Report an error if there was insufficient room to create the shrunken
 *  Plot.

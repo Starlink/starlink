@@ -683,7 +683,7 @@
 *  that temporary attributes be recognised.
       CALL KPG1_LUTKY( IPICK, '+STYLE', HIGH, LOW, LABEL,
      :                 'KAPPA_LUTVIEW', LP, UP, 0.0, 0.0, 0.0, 'CC',
-     :                 NCOL, %VAL( CNF_PVAL( IPCOL ) ), STATUS )
+     :                 0.0, NCOL, %VAL( CNF_PVAL( IPCOL ) ), STATUS )
 
 *  Tidy up
  999  CONTINUE
