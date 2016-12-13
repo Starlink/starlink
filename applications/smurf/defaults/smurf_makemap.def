@@ -367,17 +367,17 @@ ast.zero_snr_low = -1.1
 #-----------------------------------------------------------------
 #  Name: 	ast.zero_snrlo
 #  Type: 	real
-#  Default: 	0
+#  Default: 	<undef>
 #  Purpose: 	Can help to remove bowls around sources by increasing the
 #		size of the SNR mask without introducing noise.
-#  Description: If non-zero values are supplied for ast.zero_snrlo and
+#  Description: If values are supplied for ast.zero_snrlo and
 #		parameter "ast.zero_snr", then the basic mask created by
 #		thresholding at the SNR value specified by ast.zero_snr is
 #		modified by expanding each un-masked "source" area down to
 #		an SNR equal to ast.zero_snrlo, without introducing any new
 #		isolated source areas. The ast.zero_snrlo should be lower
 #		than the ast.zero_snr value.
-ast.zero_snrlo = 0
+ast.zero_snrlo = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	ast.zero_union
@@ -634,14 +634,14 @@ com.zero_snr_lopass = 0.0
 #  Default: 	0
 #  Purpose: 	Improve estimate of the common-mode by increasing the size
 #               of the SNR mask without introducing noise.
-#  Description: If non-zero values are supplied for com.zero_snrlo and
+#  Description: If values are supplied for com.zero_snrlo and
 #		parameter "com.zero_snr", then the basic mask created by
 #		thresholding at the SNR value specified by com.zero_snr is
 #		modified by expanding each un-masked "source" area down to
 #		an SNR equal to com.zero_snrlo, without introducing any new
 #		isolated source areas. The com.zero_snrlo should be lower than
 #		the com.zero_snr value.
-com.zero_snrlo = 0
+com.zero_snrlo = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	com.zero_union
@@ -1802,14 +1802,14 @@ flt.zero_snr_lopass = 0.0
 #  Default: 	0
 #  Purpose: 	Speeds up convergences and reduces ringing by increasing the
 #               size of the SNR mask without introducing noise.
-#  Description: If non-zero values are supplied for flt.zero_snrlo and
+#  Description: If values are supplied for flt.zero_snrlo and
 #		parameter "flt.zero_snr", then the basic mask created by
 #		thresholding at the SNR value specified by flt.zero_snr is
 #		modified by expanding each un-masked "source" area down to
 #		an SNR equal to flt.zero_snrlo, without introducing any new
 #		isolated source areas. The flt.zero_snrlo should be lower than
 #		the flt.zero_snr value.
-flt.zero_snrlo = 0
+flt.zero_snrlo = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	flt.zero_union
@@ -2738,14 +2738,14 @@ ssn.zero_snr_lopass = 0.0
 #  Default: 	0
 #  Purpose: 	May speed up convergences by increasing the size of the
 #               SNR mask without introducing noise.
-#  Description: If non-zero values are supplied for ssn.zero_snrlo and
+#  Description: If values are supplied for ssn.zero_snrlo and
 #		parameter "ssn.zero_snr", then the basic mask created by
 #		thresholding at the SNR value specified by ssn.zero_snr is
 #		modified by expanding each un-masked "source" area down to
 #		an SNR equal to ssn.zero_snrlo, without introducing any new
 #		isolated source areas. The ssn.zero_snrlo should be lower than
 #		the ssn.zero_snr value.
-ssn.zero_snrlo = 0
+ssn.zero_snrlo = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	ssn.zero_union
@@ -2901,7 +2901,7 @@ pca.zero_snr_hipass = 0.0
 pca.zero_snr_lopass = 0.0
 pca.zero_snr_fwhm = 0
 pca.zero_snr_low = -1.1
-pca.zero_snrlo = 0
+pca.zero_snrlo = <undef>
 pca.zero_union = 1
 
 #  Following are parameters of the COM model that are inherited by the

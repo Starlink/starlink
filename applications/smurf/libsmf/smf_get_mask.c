@@ -144,6 +144,9 @@
 *        to indicate a normalised map change at which to switch off masking.
 *        - If a negative value is supplied for ZERO_FREEZE, the mask is
 *        frozen as soon as the initial AST_SKIP iterations have been done.
+*     9-DEC-2016 (DSB):
+*        - Allow ZERO_SNRLO to be less than or equal to zero (i.e. now set
+*        it to <undef> rather than zero to prevent it being used).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -295,7 +298,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    absolute value of the SNR. */
    abssnr = ( mtype == SMF__SSN || dat->poldata );
 
-/* See if the source pixels should be acculated from iteration to
+/* See if the source pixels should be accumulated from iteration to
    iteration, rather than being replaced. */
    astMapGet0I( subkm, "ZERO_ACCUM", &zero_accum );
 
@@ -710,24 +713,23 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                         }
 
 /* Get the lower SNR limit. */
-                        zero_snrlo = 0.0;
-                        astMapGet0D( subkm, "ZERO_SNRLO", &zero_snrlo );
-                        if( zero_snrlo <= 0.0 ) {
-                           zero_snrlo = zero_snr;
-                        } else if( zero_snrlo > zero_snr && *status == SAI__OK ) {
-                           *status = SAI__ERROR;
-                           errRepf( " ", "Bad value for config parameter "
-                                    "%s.ZERO_SNRLO (%g) - it must not be higher "
-                                    "than %s.ZERO_SNR (%g).", status, modname,
-                                    zero_snrlo, modname, zero_snr );
+                        zero_snrlo = VAL__BADD;
+                        if( astMapGet0D( subkm, "ZERO_SNRLO", &zero_snrlo ) ) {
+                           if( zero_snrlo > zero_snr && *status == SAI__OK ) {
+                              *status = SAI__ERROR;
+                              errRepf( " ", "Bad value for config parameter "
+                                       "%s.ZERO_SNRLO (%g) - it must not be higher "
+                                       "than %s.ZERO_SNR (%g).", status, modname,
+                                       zero_snrlo, modname, zero_snr );
+                           }
                         }
 
-/* If the higher and lower SNR limits are equal, just do a simple
+/* If no lower SNR limit was supplied, just do a simple
    threshold on the SNR values to get the mask. In cases where the signal
    can be positive or negative (e.g. when masking Q/U values or using
    the SSNmodel), treat large negative SNR values in the same way as
    large positive SNR values.  */
-                        if( zero_snr == zero_snrlo ) {
+                        if( zero_snrlo == VAL__BADD ) {
                            pd = mapuse;
                            pn = newmask;
 
@@ -789,7 +791,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                                          status, modname, words, zero_snr );
                            }
 
-/* If the higher and lower SNR limits are different, create an initial
+/* If a lower SNR limit was supplied, create an initial
    mask by thresholding at the ZERO_SNR value, and then extend the source
    areas within the mask down to an SNR limit of ZERO_SNRLO. */
                         } else {
