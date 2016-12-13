@@ -707,10 +707,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   double mapchange_l2;          /* Mean change from previous iteration */
   double mapchange_l3;          /* Mean change from previous iteration */
   double mapchange_max=0;       /* Maximum change in the map */
-  double maptol_rate=VAL__BADD; /* Min rate of change of mean map change */
   double maptol=VAL__BADD;      /* map change tolerance for stopping */
+  double maptol_box=0.0;        /* Box size to use when smoothing map change */
+  double maptol_hits=0;         /* Fractional hits limit ot use when creating map change */
   smf_qual_t maptol_mask=0;     /* Map quality for pixels to include in map change */
   int maptol_mean;              /* Use mean map change instead of max map change? */
+  double maptol_rate=VAL__BADD; /* Min rate of change of mean map change */
   double *mapweights=NULL;      /* Weight for each pixel including chunk weight */
   double *mapweightsq=NULL;     /* Sum of bolometer weights squared */
   dim_t maxconcat;              /* Longest continuous chunk that fits in mem.*/
@@ -880,6 +882,20 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   if( *status == SAI__OK ) {
     if( *status == SAI__OK ) {
 
+      /* Get the pixel size from the map header. We fudge a local map
+         smfData so that we can call smf_map_getpixsize */
+      localmap = smf_create_smfData( 0, status );
+      if( localmap && (localmap->hdr) ) {
+        localmap->hdr->wcs = outfset;
+        memcpy( localmap->lbnd, lbnd_out, sizeof(localmap->lbnd) );
+        pixsize = smf_map_getpixsize( localmap, status );
+
+        /* Set the WCS to null again to avoid freeing the memory */
+        localmap->hdr->wcs = NULL;
+      }
+
+      if( localmap ) smf_close_file( wf, &localmap, status );
+
       /* See if the NOI model is to be derived from the Variance
          components of the input data files. */
       if( astMapGet0A( keymap, "NOI", &kmap ) ) {
@@ -908,6 +924,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                FUNC_NAME ": CHITOL is ^CHITOL, must be > 0", status);
       }
 
+      /* Lower limit for acceptable hits per pixel, expressed as a
+         fraction of the mean hits per pixel over the map (excluding
+         pixels that get no hits). */
+      astMapGet0D( keymap, "HITSLIMIT", &hitslim );
+
       /* Normalized map pixel change tolerance for stopping */
       astMapGet0D( keymap, "MAPTOL", &maptol );
 
@@ -920,6 +941,17 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Does maptol refer to mean map change or max map change? */
       astMapGet0I( keymap, "MAPTOL_MEAN", &maptol_mean );
+
+      /* The size of the smoothing box (in arc-sec) to be used to smooth the
+         mapchange values before estimating the mean or max map change.
+         Convert the supplied value to pixels. */
+      astMapGet0D( keymap, "MAPTOL_BOX", &maptol_box );
+      maptol_box /= pixsize;
+
+      /* The hits limit to be applied to the mapchange values before estimating
+         the mean or max map change, expressed as a fraction of the mean hits. */
+      maptol_hits = hitslim;
+      astMapGet0D( keymap, "MAPTOL_HITS", &maptol_hits );
 
       /* Which mask should be used to define the area within which the
          mean map change should be calculated? */
@@ -990,10 +1022,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         }
       }
 
-      /* Lower limit for acceptable hits per pixel, expressed as a
-         fraction of the mean hits per pixel over the map (excluding
-         pixels that get no hits). */
-      astMapGet0D( keymap, "HITSLIMIT", &hitslim );
     }
 
     /* Do iterations completely in memory - minimize disk I/O */
@@ -1062,20 +1090,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                  FUNC_NAME ": Will use error propagation to estimate"
                  " variance map", status );
       }
-
-      /* Get the pixel size from the map header. We fudge a local map
-         smfData so that we can call smf_map_getpixsize */
-      localmap = smf_create_smfData( 0, status );
-      if( localmap && (localmap->hdr) ) {
-        localmap->hdr->wcs = outfset;
-        memcpy( localmap->lbnd, lbnd_out, sizeof(localmap->lbnd) );
-        pixsize = smf_map_getpixsize( localmap, status );
-
-        /* Set the WCS to null again to avoid freeing the memory */
-        localmap->hdr->wcs = NULL;
-      }
-
-      if( localmap ) smf_close_file( wf, &localmap, status );
 
       /* Are we downsampling the data? If the user specified a value
          less than 0, the scale is a multiple of PIXSIZE. */
@@ -2422,7 +2436,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           if( ast_filt_diff > 0.0 && !dat.ast_skipped ) {
 
              /* Can only do this if we have a map from the previous
-                iteration (i.e. this is not the ifrst iter). */
+                iteration (i.e. this is not the first iter). */
              if( importsky || iter > 1 ) {
 
                 /* Do not do it on the final iteration since we want the
@@ -2669,11 +2683,20 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            map. Ignore bad and zero-constrained pixels. */
 
         if( *status == SAI__OK ) {
+          int maptol_nhitslim;
+          double *usemap;
 
           /* Pixels with very low hits will have unreliable variances. So
              exclude pixels with hits below "hitslim" times the mean from
-             the mapchange estimate. */
-          if( hitslim > 0.0 ) {
+             the mapchange estimate. The "hitslim" value is used when to
+             set pixels bad in the final map.  The "maptol_hits" value
+             is used to determine which pixels to include in the map change
+             estimater.  */
+          nhitslim = 0;
+          maptol_nhitslim = 0;
+
+          if( hitslim > 0.0 || maptol_hits > 0.0 ) {
+            double meanhits;
             int *ph = thishits;
             int ngood = 0;
             nhitslim = 0;
@@ -2683,9 +2706,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   ngood++;
                }
             }
-            nhitslim *= hitslim/ngood;
-          } else {
-            nhitslim = 0;
+            meanhits = ((double)nhitslim)/ngood;
+            if(  hitslim > 0.0 ) nhitslim = hitslim*meanhits;
+            if(  maptol_hits > 0.0 ) maptol_nhitslim = maptol_hits*meanhits;
           }
 
           /* If we will be dumping the final error map, we need to retain
@@ -2704,7 +2727,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               if( epsout) epsbuf3[ipix] = vdiff;
 
               if( !(thisqual[ipix]&maptol_mask) && (thisvar[ipix] != VAL__BADD)
-                  && (thisvar[ipix] > 0) && (thishits[ipix] > nhitslim) ) {
+                  && (thisvar[ipix] > 0) && (thishits[ipix] > maptol_nhitslim) ) {
                 mapchange[ipix] = fabs( vdiff ) / sqrt(thisvar[ipix]);
 
                 /* Update max */
@@ -2719,9 +2742,42 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             }
           }
 
-          /* Calculate the mean change */
-          smf_stats1D( mapchange, 1, msize, NULL, 0, 0, &mapchange_mean, NULL,
+          /* If required, smooth the map change array using a box filter
+             of size specified by MAPTOL_BOX. */
+          if( maptol_box > 1.0 ) {
+             dim_t ibox = (dim_t)( maptol_box + 0.5 );
+             msgOutiff( MSG__VERB, "", FUNC_NAME ":     Smoothing map change "
+                        "using a box filter of %zu pixels.", status, ibox );
+
+             usemap = smf_tophat2( wf, mapchange, mdims, ibox, 0, 0.0, 1, status );
+
+             /* Calculate the max of the smoothed map change values. */
+             mapchange_max = 0;
+             int maxat = -1;
+             for( ipix = 0; ipix < msize; ipix++ ) {
+                if( usemap[ipix] != VAL__BADD ){
+                   if( usemap[ipix] > mapchange_max ) {
+                      mapchange_max = usemap[ipix];
+                      maxat = ipix;
+                   }
+                }
+             }
+
+             msgOutiff( MSG__VERB, "", FUNC_NAME ":     Maximum map change is "
+                        "at pixel (%d,%d).", status,
+                        ( maxat % (int)mdims[0] ) + lbnd_out[0],
+                        ( maxat / (int)mdims[0] ) + lbnd_out[1] );
+
+          } else {
+             usemap = mapchange;
+          }
+
+          /* Calculate the mean map change */
+          smf_stats1D( usemap, 1, msize, NULL, 0, 0, &mapchange_mean, NULL,
                        NULL, NULL, status );
+
+          /* Free the smoothed array, if it exists. */
+          if( usemap != mapchange ) usemap = astFree( usemap );
 
           /* If there were insufficient samples in the masked area, then
              just annul the error since it just means that there are no
@@ -2757,7 +2813,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
           msgOutf( "", FUNC_NAME ": *** NORMALIZED MAP CHANGE: %lg (mean) "
                    "%lg (max)", status, mapchange_mean, mapchange_max );
-          dat.mapchange = mapchange_mean;
+          tol = maptol_mean ? mapchange_mean : mapchange_max;
+          dat.mapchange = tol;
 
           /* Check for the map change stopping criterion. Do not modify
              the converged flag on the extra iteration that is done after
@@ -2765,8 +2822,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              allow convergence to be reached until we have done at least
              one iteration in which the AST model was not skipped. */
 
-          tol = maptol_mean ? mapchange_mean : mapchange_max;
-          if( untilconverge &&
+            if( untilconverge &&
               ( ( (maptol!=VAL__BADD) && (tol > maptol) ) ||
                 last_skipped ) && quit == -1 ) {
             /* Map hasn't converged yet */

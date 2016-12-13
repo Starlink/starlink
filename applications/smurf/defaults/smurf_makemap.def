@@ -1987,17 +1987,47 @@ maplag = 0.0
 maptol = 0.05
 
 #-----------------------------------------------------------------
+#  Name: 	maptol_box
+#  Type: 	real
+#  Default: 	0.0
+#  Purpose: 	Specifies when to stop iterating.
+#  Description: If greater than zero, the array holding the normalised change
+#               at each map pixel is smoothed using a box filter before
+#               estimating the mean or max value (as determined by parameter
+#               "maptol_mean"). The box size is specified in arc-seconds.
+#               This will have little effect if "maptol_mean" is non-zero
+#               (i.e. if the mean map change is being used as the stopping
+#               criterion), but will tend to produce smoother convergence
+#               if "maptol_mean" is zero (i.e. if the maximum map change
+#               is being used as the stopping criterion).
+maptol_box = 0.0
+
+#-----------------------------------------------------------------
+#  Name: 	maptol_hits
+#  Type: 	real
+#  Default: 	[hitslimit]
+#  Purpose: 	Specifies when to stop iterating.
+#  Description: If non-zero, pixels that receive very few bolometer samples
+#               are not included in the estimate of the mean or max map
+#               change between iterations. The limiting number of
+#               bolometer samples is equal to "maptol_hits" times the mean
+#               number of hits per pixel, averaged over the map pixels
+#               that recieve at least one bolometer sample. The default
+#               value for "maptol_hits" is the value of parameter "hitslimit".
+maptol_hits = <undef>
+
+#-----------------------------------------------------------------
 #  Name: 	maptol_mask
 #  Type: 	string
 #  Default: 	AST
 #  Purpose: 	Specifies when to stop iterating.
 #  Description: This parameter specifies the mask that defines the area
 #               over which the normalised map change should be calculated
-#               when determining the mean map change at the end of each
-#               iteration. See parameter "maptol". The supplied value can
-#               be "AST", "FLT", "COM" or "PCA". If the specifies mask
-#               is not defined, then the mean map change is determined
-#               over the entire map.
+#               when determining the mean or maximum map change at the end of
+#               each iteration. See parameter "maptol". The supplied value can
+#               be "AST", "FLT", "COM", "PCA" or "<undef>". If the specifies
+#               mask is not defined, or if "<undef>" is supplied, then the
+#               map change is determined over the entire map.
 maptol_mask = AST
 
 #-----------------------------------------------------------------
