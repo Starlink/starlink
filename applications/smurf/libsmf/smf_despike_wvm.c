@@ -34,6 +34,21 @@
 *
 *     Points determined to comprise spikes are replaced with the bad value.
 
+*  Authors:
+*     GSB: Graham Bell (EAO)
+*     DSB: David S Berry (EAO)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-JAN-2016 (GSB):
+*        Original version.
+*     8-DEC-2016 (DSB):
+*        - Add Authors and History sections to prologue.
+*        - Check data is not bad before comparing it to the median. This
+*        should not alter the results of this routine, but helps to avoid
+*        unneccesary floating point exceptions when using feenableexcept to
+*        track down other NaNs.
+
 *  Copyright:
 *     Copyright (C) 2016 East Asian Observatory.
 *     All Rights Reserved.
@@ -138,7 +153,7 @@ int smf_despike_wvm(double* data, int n, int width, double tol, int* status) {
 
 
         /* If we've got a valid median, compare the value to it. */
-        if (median) {
+        if (median && data[i] != VAL__BADD) {
             if (fabs(data[i] - median) / median > tol) {
                 data[i] = VAL__BADD;
                 removed ++;
