@@ -128,10 +128,16 @@
 *     2016-11-08 (DSB):
 *        - Added argument ncomp.
 *        - Return the number of components removed as the function value.
+*     2016-12-09 (DSB):
+*        Check for components that are constant (i.e. have zero standard
+*        deviation). Such components cannot be normalised by their
+*        standard deviation. They are now set bad and excluded form all
+*        further use. In fact all components that have very small sigma
+*        compared to the other components are set bad.
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
-*     Copyright (C) 2015 East Asian Observatory.
+*     Copyright (C) 2015, 2016 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -385,11 +391,13 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
     for( i=0; i<ngoodbolo; i++ ) {    /* loop over bolometer */
       /*msgOutiff( MSG__DEBUG, "", "   bolo %zu", status, goodbolo[i] );*/
       for( j=0; j<ngoodbolo; j++ ) {  /* loop over component */
-        for( k=pdata->t1; k<=pdata->t2; k++ ) {
-          v1 = d[goodbolo[i]*bstride + k*tstride];
-          l = k - t_first;
-          amp[goodbolo[i]*abstride + j*acompstride] +=
-                 v1 * comp[j*ccompstride + l*ctstride];
+        if( comp[j*ccompstride] != VAL__BADD ) {
+          for( k=pdata->t1; k<=pdata->t2; k++ ) {
+            v1 = d[goodbolo[i]*bstride + k*tstride];
+            l = k - t_first;
+            amp[goodbolo[i]*abstride + j*acompstride] +=
+                   v1 * comp[j*ccompstride + l*ctstride];
+          }
         }
       }
     }
@@ -406,7 +414,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
     double factor = pdata->sub ? 1 : -1;
 
     for( j=0; j<ngoodbolo; j++ ) {        /* loop over component */
-      if( rms_amp[j] == VAL__BADD ) {
+      if( rms_amp[j] == VAL__BADD && comp[j*ccompstride] != VAL__BADD ) {
 
         /* Bad values in rms_amp indicate components that we are
            removing. Subtract the component scaled by the amplitude for
@@ -414,10 +422,12 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
 
         for( i=0; i<ngoodbolo; i++ ) {    /* loop over bolometer */
           a =  factor*amp[goodbolo[i]*abstride + j*acompstride];
-          for( k=pdata->t1; k<=pdata->t2; k++ ) {
-            l = k - t_first;
-            d[goodbolo[i]*bstride + k*tstride] -=
-              a*comp[j*ccompstride + l*ctstride];
+          if( a != 0.0 ) {
+            for( k=pdata->t1; k<=pdata->t2; k++ ) {
+              l = k - t_first;
+              d[goodbolo[i]*bstride + k*tstride] -=
+                a*comp[j*ccompstride + l*ctstride];
+            }
           }
         }
       }
@@ -779,9 +789,18 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   /* Wait until all of the submitted jobs have completed */
   thrWait( wf, status );
 
-  /* Then normalize */
+  /* Then normalize. Some of the components may have zero amplitude and
+     so cannot be used (i.e. we are trying to use more components than
+     there is evidence for in the data). So we check for zero sigma. In
+     fact, we check for silly small sigma, not just zero sigma. Any
+     component for which the sigma is less than 1E-10 of the log-mean
+     sigma is excluded. */
   {
+    double *sigmas = astMalloc( ngoodbolo*sizeof( *sigmas ) );
     double check = 0;
+    double s1 = 0.0;
+    int s2 = 0;
+    int nlow = 0;
 
     for( i=0; (*status==SAI__OK)&&(i<ngoodbolo); i++ ) {
       double sigma;
@@ -793,15 +812,46 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
       sigma *= sqrt((double) tlen);
 
       if( *status == SAI__OK ) {
-        for( k=0; k<tlen; k++ ) {
-          comp[i*ccompstride + k*ctstride] /= sigma;
+        if( sigma > 0.0 ) {
+           for( k=0; k<tlen; k++ ) {
+             comp[i*ccompstride + k*ctstride] /= sigma;
+             sigmas[ i ] = sigma;
+             s1 += log10( sigma );
+             s2++;
+           }
+        } else {
+           for( k=0; k<tlen; k++ ) {
+             comp[i*ccompstride + k*ctstride] = VAL__BADD;
+             sigmas[ i ] = VAL__BADD;
+           }
+           nlow++;
         }
       }
     }
 
-    for( i=0; i<ngoodbolo*tlen; i++ ) {
-      check += comp[i];
+    /* Exclude any components that have a silly small standard deviation
+       (less that 1E-10 of the logmean of all components). Any with zero
+       standard deviation will already have been excluded. */
+    if( s2 > 0 ) {
+       double logmean = s1/s2;
+       for( i=0; i<ngoodbolo; i++ ) {
+          if( sigmas[ i ] != VAL__BADD && sigmas[ i ] < 1E-10*logmean ) {
+             for( k=0; k<tlen; k++ ) {
+                comp[i*ccompstride + k*ctstride] = VAL__BADD;
+                nlow++;
+             }
+          }
+       }
     }
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": rejecting %d (out of %zu) components"
+               " because they are too weak to normalise", status, nlow, ngoodbolo );
+
+    for( i=0; i<ngoodbolo*tlen; i++ ) {
+      if( comp[i] != VAL__BADD ) check += comp[i];
+    }
+
+    sigmas = astFree( sigmas );
 
     //printf("--- check component: %lf\n", check);
   }
@@ -853,7 +903,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   if( CHECK ){
     double check=0;
     for( i=0; i<ngoodbolo*tlen; i++ ) {
-      check += comp[i];
+      if( comp[i] != VAL__BADD ) check += comp[i];
     }
 
     printf("--- check component A: %lf\n", check);
@@ -879,8 +929,9 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
 
         /* Flip sign of the component */
         for( k=0; k<tlen; k++ ) {
-           comp[j*ccompstride + k*ctstride] =
-             -comp[j*ccompstride + k*ctstride];
+           if(  comp[j*ccompstride + k*ctstride] != VAL__BADD ) {
+              comp[j*ccompstride + k*ctstride] *= -1;
+           }
         }
       }
     }
@@ -898,7 +949,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   if( CHECK ){
     double check=0;
     for( i=0; i<ngoodbolo*tlen; i++ ) {
-      check += comp[i];
+      if( comp[i] != VAL__BADD ) check += comp[i];
     }
 
     printf("--- check component B: %lf\n", check);
@@ -967,6 +1018,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     double sum_sq;
     size_t iter=0;
     double x;
+    int nsum;
 
     rms_amp = astCalloc( ngoodbolo, sizeof(*rms_amp) );
 
@@ -988,18 +1040,25 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
 
 
        if( *status == SAI__OK ) {
-      for( i=0; i<ngoodbolo; i++ ) {        /* Loop over component */
-
+         for( i=0; i<ngoodbolo; i++ ) {        /* Loop over component */
            sum = 0;
            sum_sq = 0;
+           nsum = 0;
 
-        for( j=0; j<ngoodbolo; j++ ) {      /* Loop over bolo */
+           for( j=0; j<ngoodbolo; j++ ) {      /* Loop over bolo */
              x = amp[i*acompstride + goodbolo[j]*abstride];
-             sum += x;
-             sum_sq += x*x;
+             if( x != 0.0 ) {
+                sum += x;
+                sum_sq += x*x;
+                nsum++;
+             }
            }
 
-           rms_amp[i] = sqrt( sum_sq / ((double)ngoodbolo) );
+           if( nsum > 0 ) {
+              rms_amp[i] = sqrt( sum_sq / ((double)nsum) );
+           } else {
+              rms_amp[i] = VAL__BADD;
+           }
          }
        }
 
@@ -1012,9 +1071,9 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
        rms_amp[0] = VAL__BADD;
 
        while( !converge && (*status==SAI__OK) ) {
-      double m;                   /* mean */
-      int new;                    /* Set if new values flagged */
-      double sig;                 /* standard deviation */
+         double m;                   /* mean */
+         int new;                    /* Set if new values flagged */
+         double sig;                 /* standard deviation */
 
          /* Update interation counter */
          iter ++;
@@ -1179,7 +1238,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   if( comp && CHECK ) {
     double check=0;
     for( i=0; i<ngoodbolo*tlen; i++ ) {
-      check += comp[i];
+      if( comp[i] != VAL__BADD ) check += comp[i];
     }
 
     printf("--- check component again: %lf\n", check);
