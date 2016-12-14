@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     void smf_subip( ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
-*                     int *ispol2, int *status )
+*                     int *qui, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -23,9 +23,9 @@
 *        Struct of pointers to information required by model calculation.
 *     keymap = AstKeyMap * (Given)
 *        A KeyMap holding all configuration parameters.
-*     ispol2 = int * (Given)
+*     qui = int * (Given)
 *        Pointer to a returned value indicating if the data is POL-2 data or not.
-*        Returned zero for non-pol2, +1 for "Q" and -1 for "U".
+*        Returned VAL__BADI for non-pol2, +1 for "Q", 0 for "I" and -1 for "U".
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -79,6 +79,10 @@
 *        Fix data ordering bug in smf1_calcang.
 *     21-SEP-2016 (DSB):
 *        Added PL2 model.
+*     14-DEC-2016 (DSB):
+*        Changed "ispol2" to "qui" and use VAL__BADI to indicate non-POL2
+*        so that we can user zero to indicate "I" (i.e. total intensity
+*        from a POL2 observation).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -164,7 +168,7 @@ typedef struct smfSubIPData {
 static pthread_mutex_t data_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
-                 int *ispol2, int *status ) {
+                 int *qui, int *status ) {
 
 /* Local Variables: */
    HDSLoc *loc = NULL;
@@ -202,12 +206,12 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    size_t bstride;
    size_t idx;
    size_t tstride;
-   smfData *data;
+   smfData *data = NULL;
    smf_qual_t *qua_data;
    smfArray *res;
    smfArray *lut;
 
-   *ispol2 = 0;
+   *qui = VAL__BADI;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -237,6 +241,14 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
             break;
          }
 
+      } else if( !strcmp( data->hdr->dlabel, "I" ) ) {
+         if( !qu ) {
+            qu = "I";
+         } else if( strcmp( qu, "I" ) ) {
+            *status = SAI__ERROR;
+            break;
+         }
+
       } else if( qu ) {
          *status = SAI__ERROR;
          qu = NULL;
@@ -260,7 +272,13 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    value is supplied, annul the error and set "qu" NULL to indicate we
    should leave immediately. */
    } else if( qu && *status == SAI__OK ) {
-      *ispol2 = ( qu[0] == 'Q' ) ? +1 : -1;
+      if( qu[0] == 'Q' ) {
+         *qui = 1;
+      } else if( qu[0] == 'U' ) {
+         *qui = -1;
+      } else if( qu[0] == 'I' ) {
+         *qui = 0;
+      }
       parGet0c( "IPREF", ipref, sizeof(ipref), status );
       if( *status == PAR__NULL ) {
          errAnnul( status );
@@ -272,7 +290,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    astMapGet0C( keymap, "IPMODEL", &ipmodel );
 
 /* If we are applying IP correction... */
-   if( qu && *status == SAI__OK ) {
+   if( ( *qui == 1 || *qui == -1 ) && *status == SAI__OK ) {
       msgOutf( "", "smf_subip: applying instrumental polarisation %s "
                "correction based on total intensity map `%s' and IP model '%s'.",
                status, qu, ipref, ipmodel );

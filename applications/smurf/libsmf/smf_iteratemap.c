@@ -684,7 +684,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   size_t idx=0;                 /* index within subgroup */
   smfGroup *igroup=NULL;        /* smfGroup corresponding to igrp */
   int isize;                    /* Number of files in input group */
-  int ispol2;                   /* +1 if "Q" data, -1 if "U" data, 0 if non-pol2 */
+  int qui;                      /* +1 if "Q", -1 if "U", 0 if "I", VAL__BADI if non-pol2 */
   int iter;                     /* Iteration number */
   int itermap=0;                /* If set, produce maps each iteration */
   int itsdone;                  /* Number of previously completed iterations */
@@ -2025,10 +2025,18 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                                     msize*sizeof(*lastmap) );
 
       /* Do any required correction for instrumental polarisation. */
-      smf_subip( wf, &dat, keymap, &ispol2, status );
+      smf_subip( wf, &dat, keymap, &qui, status );
 
       /* Return the NDF label for the output map. */
-      strcpy( data_label, ispol2 ? ( ( ispol2 > 0 ) ? "Q" : "U" ) : "Flux Density" );
+      if( qui == VAL__BADI ) {
+         strcpy( data_label, "Flux Density" );
+      } else if( qui > 0 ) {
+         strcpy( data_label, "Q" );
+      } else if( qui < 0 ) {
+         strcpy( data_label, "U" );
+      } else {
+         strcpy( data_label, "I" );
+      }
 
 
 
