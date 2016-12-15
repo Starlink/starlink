@@ -290,7 +290,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    astMapGet0C( keymap, "IPMODEL", &ipmodel );
 
 /* If we are applying IP correction... */
-   if( ( *qui == 1 || *qui == -1 ) && *status == SAI__OK ) {
+   if( qu && ( *qui == 1 || *qui == -1 ) && *status == SAI__OK ) {
       msgOutf( "", "smf_subip: applying instrumental polarisation %s "
                "correction based on total intensity map `%s' and IP model '%s'.",
                status, qu, ipref, ipmodel );
