@@ -6356,6 +6356,10 @@ package @PACKAGE@ {
         obey {python $SMURF_DIR/pol2scan.py}
     }
 
+    command pol2imap {
+        obey {python $SMURF_DIR/pol2imap.py}
+    }
+
     command pol2sim {
         obey {python $SMURF_DIR/pol2sim.py}
     }
