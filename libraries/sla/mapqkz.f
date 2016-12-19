@@ -42,8 +42,11 @@
 *
 *  Notes:
 *
-*  1)  The vector AMPRMS(5-7) is referred to the mean equinox and
-*      equator of epoch EQ.
+*  1)  The mean place RM,DM and the vectors AMPRMS(2-4) and AMPRMS(5-7)
+*      are referred to the mean equinox and equator of the epoch
+*      specified when generating the precession/nutation matrix
+*      AMPRMS(13-21).  In the call to sla_MAPPA (q.v.) normally used
+*      to populate AMPRMS, this epoch is the first argument (EQ).
 *
 *  2)  Strictly speaking, the routine is not valid for solar-system
 *      sources, though the error will usually be extremely small.
@@ -56,9 +59,8 @@
 *
 *  Called:  sla_DCS2C, sla_DVDV, sla_DMXV, sla_DCC2S, sla_DRANRM
 *
-*  Last revision:   23 November 2016
+*  Last revision:   17 December 2016
 *
-*  Copyright (C) 1999 Rutherford Appleton Laboratory
 *  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
