@@ -122,6 +122,7 @@
 
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
+*     DSB: David S Berry (EAO)
 *  History:
 *     2/7/93  (ACD): Original version.
 *     23/1/94 (ACD): Modified error reporting.
@@ -137,6 +138,7 @@
 *     29/5/98 (ACD): Re-written from scratch.
 *     15/6/99 (ACD): Added the tab-separated table (TST) file type ('.TST').
 *     22/6/99 (ACD): Changed the TST file type to '.TAB'.
+*     17/1/17 (DSB): Remove alphanumeric check on file name characters.
 *  Bugs:
 *     None known
 *-
@@ -160,7 +162,6 @@
       INTEGER STATUS             ! Global status
 *  External References:
       INTEGER CHR_LEN
-      LOGICAL CHR_ISALM
 *  Local Variables:
       LOGICAL
      :  FNDDIR,  ! Flag: found directory?
@@ -283,16 +284,6 @@
 
             IF (POSNAM .LE. STOP) THEN
                CATNAM = CNAMEC(POSNAM : STOP)
-
-               LCATNM = CHR_LEN(CATNAM)
-
-               DO LOOP = 1, LCATNM
-                  CNMALM = CHR_ISALM(CATNAM(LOOP : LOOP))
-
-                  IF (.NOT. CNMALM) THEN
-                     STATUS = CAT__INVCN
-                  END IF
-               END DO
             ELSE
                STATUS = CAT__INVCN
             END IF

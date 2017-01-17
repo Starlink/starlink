@@ -46,9 +46,9 @@
 \stardoccopyright
 {Copyright \copyright\ 2001 Council for the Central Laboratory of the Research Councils}
 
-\stardocnumber      {181.11}
+\stardocnumber      {181.12}
 \stardocauthors     {A.C.~Davenhall \& D.S.~Berry}
-\stardocdate        {11th November 2013}
+\stardocdate        {17th January 2017}
 \stardoctitle       {CAT \\ [\latex{1ex}]
                               Catalogue and Table Manipulation Library}
 \stardocversion     {Version \CATversion\ }
@@ -230,6 +230,10 @@ Saint Edmund's Day 1994}
    CAT library.  Support for the CHI/HDS catalogue format has been removed
    from this version of the library.  There are also a few bug fixes and
    some minor revisions to the document (ACD).
+
+  \item 17th January 2017: Modified for release 8.4 of the CAT library.
+   Catalogues can now be stored in files with names that include
+   non-alphanumeric characters. (DSB)
 
 \end{enumerate}
 
@@ -1800,10 +1804,7 @@ file name is:
 
 The file type corresponds to the format of the catalogue (FITS table,
 Small Text List etc). The various options are described in
-Appendix~\ref{FORMAT}.  The catalogue name, and hence the catalogue part
-of the file name, are restricted to contain only: upper or lower case
-alphabetic characters (a-z, A-Z), numeric characters (0-9) and the
-underscore character (`\_').
+Appendix~\ref{FORMAT}.
 
 \paragraph{DATE}
 (data type: \_DOUBLE)
