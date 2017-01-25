@@ -82,8 +82,8 @@
 *     JY = _LOGICAL (Read)
 *        If TRUE, the output catalogue, and the output Q, U, PI and I maps
 *        will be in units of Jy/beam. Otherwise they will be in units of pW
-*        (in this case, the I values will be scaled to take account of the
-*        different FCFs for POL-2 and non-POL-2 observations). [True]
+*        (in this case, the I values will be scaled to take account of any
+*        difference in FCFs for POL-2 and non-POL-2 observations). [True]
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -160,6 +160,9 @@
 *        - Change units from "Jy" to "Jy/beam".
 *     12-OCT-2016 (DSB):
 *        Ensure input INQ, INU and INI maps are in pW.
+*     25-JAN-2017 (DSB):
+*        Check if the I map was created from a POL2 observation and use
+*        an appropriate FCF if it was.
 
 *-
 '''
@@ -255,13 +258,14 @@ try:
       iin = parsys["INI"].value
 
 #  Check they are all in units of pW.
-      for sdf in qin+uin+iin:
-         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(sdf) )
-         units = get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
-         if units != "pW":
-            raise starutil.InvalidParameterError("All supplied I, Q and U "
-                 "maps must be in units of 'pW', but '{0}' has units '{1}'.".
-                 format(sdf,units))
+      for quilist in (qin,uin,iin):
+         for sdf in quilist:
+            invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(sdf) )
+            units = starutil.get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
+            if units != "pW":
+               raise starutil.InvalidParameterError("All supplied I, Q and U "
+                    "maps must be in units of 'pW', but '{0}' has units '{1}'.".
+                    format(sdf,units))
 
 #  Now get the PI value to use.
    pimap = parsys["PI"].value
@@ -282,6 +286,30 @@ try:
 #  See if we should convert pW to Jy/beam.
    jy = parsys["JY"].value
 
+#  See if the I maps were made from POL2 data.
+   ipol2 = None
+   for sdf in iin:
+      if "pol" in starutil.get_fits_header( sdf, "INBEAM" ):
+         if ipol2 == None:
+            ipol2 = True
+         elif not ipol2:
+            ipol2 = None
+            break
+      else:
+         if ipol2 == None:
+            ipol2 = False
+         elif ipol2:
+            ipol2 = None
+            break
+
+   if ipol2 == None:
+      raise starutil.InvalidParameterError("Mixture of POL2 and non-POL2 "
+                      "I maps supplied - all I maps must be the same.")
+   if ipol2:
+      msg_out("Input I maps were created from POL2 data")
+   else:
+      msg_out("Input I maps were created from non-POL2 data")
+
 #  Determine the waveband and get the corresponding FCF values with and
 #  without POL2 in the beam.
    try:
@@ -291,11 +319,19 @@ try:
       msg_out( "No value found for FITS header 'FILTER' in {0} - assuming 850".format(qin[0]))
 
    if filter == 450:
-      fcf1 = 962.0
-      fcf2 = 491.0
+      fcf_qu = 962.0
+      if ipol2:
+         fcf_i = 962.0
+      else:
+         fcf_i = 491.0
+
    elif filter == 850:
-      fcf1 = 725.0
-      fcf2 = 537.0
+      fcf_qu = 725.0
+      if ipol2:
+         fcf_i = 725.0
+      else:
+         fcf_i = 537.0
+
    else:
       raise starutil.InvalidParameterError("Invalid FILTER header value "
              "'{0} found in {1}.".format( filter, qin[0] ) )
@@ -345,17 +381,17 @@ try:
 #  If output PI and I values are in Jy, convert the Q, U and I maps to Jy.
    if jy:
       temp = NDG(1)
-      invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(qmos,fcf1,temp ))
+      invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(qmos,fcf_qu,temp ))
       invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy/beam".format(temp ))
       qmos = temp
 
       temp = NDG(1)
-      invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(umos,fcf1,temp ))
+      invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(umos,fcf_qu,temp ))
       invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy/beam".format(temp ))
       umos = temp
 
       temp = NDG(1)
-      invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(imos,fcf2,temp ))
+      invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(imos,fcf_i,temp ))
       invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy/beam".format(temp ))
       imos = temp
 
@@ -363,7 +399,7 @@ try:
 #  difference in FCF with and without POL2 in the beam.
    else:
       temp = NDG(1)
-      invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format( imos, fcf2/fcf1, temp ))
+      invoke( "$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format( imos, fcf_i/fcf_qu, temp ))
       imos = temp
 
 #  If required, save the Q, U and I images.
