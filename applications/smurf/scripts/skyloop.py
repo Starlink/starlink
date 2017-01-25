@@ -454,7 +454,7 @@ try:
 #  the user goes off for a coffee whilst the script is running and does not
 #  see a later parameter prompt or error.
    restart = parsys["RESTART"].value
-   if restart == None:
+   if restart is None:
       retain = parsys["RETAIN"].value
    else:
       retain = True
@@ -702,7 +702,7 @@ try:
 #  If so, we do not re-create it.
    msg_out( "Iteration 1...")
    gotit = False
-   if restart != None:
+   if restart is not None:
       try:
          invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(newmap))
          msg_out( "Re-using existing map {0}".format(newmap) )
@@ -943,12 +943,12 @@ try:
 
 #  Update the quality flags in the cleaned time-series data to be the
 #  same as the flags exported at the end of the previous iteration.
-         if qua != None:
+         if qua is not None:
             invoke( "$KAPPA_DIR/setqual ndf={0} like={1}".format(cleaned,qua) )
 
 #  See if the output NDF already exists.
          gotit = False
-         if restart != None:
+         if restart is not None:
             try:
                invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(newmap))
                msg_out( "Re-using existing map {0}".format(newmap) )
@@ -980,7 +980,7 @@ try:
 #  the previous map to the new map, and use that instead (this mask was
 #  created when the previous map was read into makemap). This also helps
 #  if the mask is frozen by one of the xxx.zero_freeze config parameters.
-            if prevmap != None:
+            if prevmap is not None:
                try:
                   invoke("$KAPPA_DIR/setqual ndf={0} like={1}".format(newmap,prevmap) )
                except starutil.StarUtilError as err:

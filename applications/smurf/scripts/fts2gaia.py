@@ -85,7 +85,7 @@ if os.path.exists(indata) == False:
 # which sets the ORAC_INSTRUMENT environment variable to 'SCUBA2_450' or 'SCUBA2_850'
 # else default to 850 band
 band = os.getenv('ORAC_INSTRUMENT')
-if band == None:
+if band is None:
     print "ORAC_INSTRUMENT environment variable not set!"
     print "This program expects to be run from a shell"
     print "prepared with the command: oracdr_scuba2_<band> <observation-date>"

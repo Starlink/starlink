@@ -290,19 +290,19 @@ try:
    ipol2 = None
    for sdf in iin:
       if "pol" in starutil.get_fits_header( sdf, "INBEAM" ):
-         if ipol2 == None:
+         if ipol2 is None:
             ipol2 = True
          elif not ipol2:
             ipol2 = None
             break
       else:
-         if ipol2 == None:
+         if ipol2 is None:
             ipol2 = False
          elif ipol2:
             ipol2 = None
             break
 
-   if ipol2 == None:
+   if ipol2 is None:
       raise starutil.InvalidParameterError("Mixture of POL2 and non-POL2 "
                       "I maps supplied - all I maps must be the same.")
    if ipol2:
@@ -403,7 +403,7 @@ try:
       imos = temp
 
 #  If required, save the Q, U and I images.
-   if qui != None:
+   if qui is not None:
       invoke( "$KAPPA_DIR/ndfcopy in={0} out={1}.Q".format(qmos,qui) )
       invoke( "$KAPPA_DIR/ndfcopy in={0} out={1}.U".format(umos,qui) )
       invoke( "$KAPPA_DIR/ndfcopy in={0} out={1}.I".format(imos,qui) )

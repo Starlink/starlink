@@ -201,7 +201,7 @@ try:
 #  Get the name of the output NDF. If not supplied, use the name of hte
 #  input NDF.
    outndf = parsys["OUT"].value
-   if outndf == None:
+   if outndf is None:
       outndf = inndf
 
 #  See how the output NDFs are to be trimmed.
@@ -234,7 +234,7 @@ try:
 
 #  If so, set the default for the INSTRUMENT parameter and prevent the
 #  user being prompted for a value.
-   if instrument != None:
+   if instrument is not None:
       parsys["INSTRUMENT"].default = instrument
       parsys["INSTRUMENT"].noprompt = True
 

@@ -684,7 +684,7 @@ try:
                                                  format(ipref, units) )
 
          fcfhead = get_fits_header( ipref, "FCF" )
-         if fcfhead != None:
+         if fcfhead is not None:
             fcfhead = float( fcfhead )
             ratio = fcfhead/fcf
             if ratio < 0.5 or ratio > 2.0:
@@ -1409,11 +1409,11 @@ try:
 
       if key not in pointing_dx:
          pointing_dx[key] = get_fits_header( qmaps[key], "POINT_DX" )
-         if pointing_dx[key] == None:
+         if pointing_dx[key] is None:
             pointing_dx[key] = "null"
       if key not in pointing_dy:
          pointing_dy[key] = get_fits_header( qmaps[key], "POINT_DY" )
-         if pointing_dy[key] == None:
+         if pointing_dy[key] is None:
             pointing_dy[key] = "null"
 
 #  Calculate the expected NEFD. See:
@@ -1436,7 +1436,7 @@ try:
 #  Background noise, source size, mean source value...
       (noise_q, source_size_q[key], source_rms_q[key] ) = calc_stats( qmaps[key] )
       (noise_u, source_size_u[key], source_rms_u[key] ) = calc_stats( umaps[key] )
-      if noise_q == None or noise_u == None:
+      if noise_q is None or noise_u is None:
          msg_out( "  The Q and U maps supplied for this observation have "
                   "no Quality array and so statistics cannot be produced." )
 
@@ -1520,7 +1520,7 @@ try:
       fd.write("\n")
 
       for key in umaps:
-         if source_size_u[key] != None:
+         if source_size_u[key] is not None:
             ( ut, obs, subscan ) = key.split("_")
             fd.write("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13}".
                      format( ut, obs, subscan, wvm[key],
@@ -1627,7 +1627,7 @@ try:
 #  is just equal to the polarised intensity image. This is needed because
 #  polpack:polvec uses the I value to normalise the Q and U values prior to
 #  calculating the polarised intensity and angle.
-      if imap == None:
+      if imap is None:
          if pimap:
             imap = pimap
          else:

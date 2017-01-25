@@ -248,7 +248,7 @@ try:
    except:
       deflt = None
 
-   if deflt != None:
+   if deflt is not None:
       parsys["INSTRUMENT"].default = deflt
       parsys["INSTRUMENT"].noprompt = True
 
@@ -321,7 +321,7 @@ try:
 #  before coadding the new and old data. We only need do this for the
 #  first tile for each input NDF, since all tiles are aligned on the same
 #  pixel grid.
-         if aligned == None:
+         if aligned is None:
             if not jsa:
                aligned = NDG( 1 )[ 0 ]
                invoke("$KAPPA_DIR/wcsalign in={0} ref={1} out={2} lbnd=! "

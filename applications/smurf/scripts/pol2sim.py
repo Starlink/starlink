@@ -527,7 +527,7 @@ try:
 
 #  See if old temp files are to be re-used.
    restart = parsys["RESTART"].value
-   if restart == None:
+   if restart is None:
       retain = parsys["RETAIN"].value
       indata.save( "IN" )
 

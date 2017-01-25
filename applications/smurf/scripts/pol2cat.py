@@ -498,7 +498,7 @@ try:
 #  the same way they are supplied to other SMURF commands such as makemap).
 #  Quote the string so that it can be used as command line argument when
 #  running an atask from the shell.
-   if inqu == None:
+   if inqu is None:
       indata = parsys["IN"].value
    else:
       indata = None
@@ -590,7 +590,7 @@ try:
 #  Get the graphics device for graphical output. Normalisation plots will
 #  only be produced if at least one of ILEVEL and GLEVEL is DEBUG.
    device = parsys["DEVICE"].value
-   if device != None:
+   if device is not None:
       device = starutil.shell_quote( device )
       if starutil.ilevel >= starutil.DEBUG or starutil.glevel >= starutil.DEBUG:
          ndevice = device
@@ -605,7 +605,7 @@ try:
 
 #  If any vectors are to be plotted, get the SNR limit for the plotted
 #  vectors.
-   if plot != None:
+   if plot is not None:
       snr = parsys["SNR"].value
       maxlen = parsys["MAXLEN"].value
 
@@ -615,7 +615,7 @@ try:
 #  See if backgrounds refinements are to be performed.
    refine = parsys["REFINE"].value
    if refine:
-      if mask == None:
+      if mask is None:
          raise starutil.InvalidParameterError("REFINE is True but no mask "
                                               "was supplied.")
 
@@ -653,7 +653,7 @@ try:
 
 #  Open a new file to receive diagnostic info
    diagfile = parsys["DIAGFILE"].value
-   if diagfile != None:
+   if diagfile is not None:
       diagfd = open( diagfile, "w" )
       diagfd.write("# QU block array chunk slope offset\n")
    else:
@@ -661,22 +661,22 @@ try:
 
 #  If required, ensure the stare data directory exists.
    staredir = parsys["STAREDIR"].value
-   if staredir != None:
+   if staredir is not None:
       if not os.path.exists( staredir ):
          os.makedirs( staredir )
 
 #  If Q and U values were supplied, use them:
-   if inqu != None:
+   if inqu is not None:
       msg_out( "Using pre-calculating Q and U values...")
       qcont = inqu.filter( "'Q\d'" )
-      if qcont == None:
+      if qcont is None:
          raise starutil.InvalidParameterError("Supplied QU files ({0}) "
                      "do not contain any Q data.".format(inqu))
       else:
          qcont.comment = "qcont"
 
       ucont = inqu.filter( "'U\d'" )
-      if ucont == None:
+      if ucont is None:
          raise starutil.InvalidParameterError("Supplied QU files ({0}) "
                      "do not contain any U data.".format(inqu))
       else:
@@ -740,7 +740,7 @@ try:
       uarray = ucont.filter(a)
 
 #  If any data was found for the current subarray...
-      if qarray != None and uarray != None:
+      if qarray is not None and uarray is not None:
 
 #  Checking if IP correction is set for 450 um data. If so, throw an error
          if (doip) and (a in ['S4A','S4B','S4C','S4D']):
@@ -757,7 +757,7 @@ try:
                  .format(qarray,qff,clip) )
 
 #  Create a set of Q images in which source pixels are blanked out.
-         if mask != None:
+         if mask is not None:
             msg_out( "Blanking source pixels in {0} Q values...".format(a))
             method = "mean"
             qmasked = NDG(qff)
@@ -824,7 +824,7 @@ try:
                     format(qcom,qm,qout,ndevice), buffer=True )
 
 #  If required, store the slope and offset in the diagnostics file.
-            if diagfd != None:
+            if diagfd is not None:
                slope = starutil.get_task_par( "slope", "normalize" )
                offset = starutil.get_task_par( "offset", "normalize" )
                ichunk = starutil.get_fits_header( qin, "POLCHUNK" )
@@ -852,7 +852,7 @@ try:
                  format(qffb,qcube) )
 
 #  Blank out the source pixel in the cube.
-         if mask != None:
+         if mask is not None:
             qcubem = NDG(1)
             qcube2 = NDG(1)
             invoke( "$KAPPA_DIR/paste in={0} out={1} shift=\[0,0,1\]".
@@ -918,7 +918,7 @@ try:
          invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[{2}\]"
                  .format(uarray,uff,clip) )
 
-         if mask != None:
+         if mask is not None:
             msg_out( "Blanking source pixels in {0} U values...".format(a))
             method = "mean"
             umasked = NDG(uff)
@@ -963,7 +963,7 @@ try:
             invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out={2} device={3}".
                     format(ucom,um,uout,ndevice), buffer=True )
 
-            if diagfd != None:
+            if diagfd is not None:
                slope = starutil.get_task_par( "slope", "normalize" )
                offset = starutil.get_task_par( "offset", "normalize" )
                ichunk = starutil.get_fits_header( uin, "POLCHUNK" )
@@ -983,7 +983,7 @@ try:
          invoke( "$KAPPA_DIR/paste in={0} out={1} shift=\[0,0,1\]".
                  format(uffb,ucube) )
 
-         if mask != None:
+         if mask is not None:
             ucubem = NDG(1)
             ucube2 = NDG(1)
             invoke( "$KAPPA_DIR/paste in={0} out={1} shift=\[0,0,1\]".
@@ -1031,7 +1031,7 @@ try:
 
 #  If required, dump the angles and polarised intensities for each stare
 #  position.
-         if staredir != None:
+         if staredir is not None:
             for mm in range(len( uff2 )):
                qin = qff2[ mm ];
                uin = uff2[ mm ];
@@ -1093,7 +1093,7 @@ try:
 #  intensity map that are aligned in pixel coords with each of the 25
 #  Q and U images. Also, if a mask was supplied, mask these cut-out by
 #  setting background regions to zero.
-            if icuts == None:
+            if icuts is None:
 
 #  If a mask was supplied, align it with the iref image, and then use it
 #  to create a copy of iref in which all non-source pixels are bad, then
@@ -1210,7 +1210,7 @@ try:
 #  is just equal to the polarised intensity image. This is needed because
 #  polpack:polvec uses the I value to normalise the Q and U values prior to
 #  calculating the polarised intensity and angle.
-   if iref == None:
+   if iref is None:
       iref = NDG(1)
       msg_out( "Generating an artificial total intensity image...")
       invoke( "$KAPPA_DIR/maths exp='sqrt(ia**2+ib**2)' ia={0} ib={1} out={2}".format(qtotal,utotal,iref))
@@ -1238,7 +1238,7 @@ try:
    invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(iref,tmp,itrim) )
 
 #  If required, save the Q, U and I images.
-   if qui != None:
+   if qui is not None:
       invoke( "$KAPPA_DIR/ndfcopy in={0} out={1}.Q".format(qtrim,qui) )
       invoke( "$KAPPA_DIR/ndfcopy in={0} out={1}.U".format(utrim,qui) )
       invoke( "$KAPPA_DIR/ndfcopy in={0} out={1}.I".format(itrim,qui) )
@@ -1281,14 +1281,14 @@ try:
    msg_out( "\n{0}\n".format(msg) )
 
 #  If required, produce a vector plot.
-   if plot != None:
+   if plot is not None:
       msg_out( "Plotting the '{0}' vectors ...".format(plot) )
 
 #  Select vectors where the signal to noise ratio for the Polarised
 #  Intentisy value is more than 3. The catalogue is stored in the NDG
 #  temporary directory.
       exp = "pi>{0}*dpi".format(snr)
-      if maxlen != None:
+      if maxlen is not None:
          exp += "&{0}<{1}".format(plot,maxlen)
       selcat = "{0}/selcat".format(NDG.tempdir)
       invoke( "$CURSA_DIR/catselect catin={0} catout={1} norejcat seltyp=e expr='{2}'".format(outcat,selcat,exp))
@@ -1308,7 +1308,7 @@ try:
    cleanup()
 
 #  close any diagnostics file
-   if diagfd != None:
+   if diagfd is not None:
       diagfd.close()
 
 #  If an StarUtilError of any kind occurred, display the message but hide the

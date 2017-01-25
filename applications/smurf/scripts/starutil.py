@@ -37,7 +37,7 @@ __adam_user = None
 __cmd = None
 def cmd():
    global __cmd
-   if __cmd == None:
+   if __cmd is None:
       __cmd = os.path.basename(sys.argv[0])
    if __cmd[-3:] == ".py":
       __cmd = __cmd[:-3]
@@ -123,16 +123,16 @@ def __open_log_file():
 
    # If a log file is currently open, close it if the user has assigned a
    # different value to the module "logfile" variable.
-   if __logfd != None:
+   if __logfd is not None:
       if logfile != __logfile:
          print( "Closing log file {0}".format(__logfile) )
          __logfd.close()
          __logfd = None
-         __logfile == None
+         __logfile is None
 
    # If no log file is currently open, open one now.
-   if __logfd == None:
-      if logfile == None:
+   if __logfd is None:
+      if logfile is None:
          logfile = "{0}.log".format(cmd())
       print( "Logging to file {0} ".format(logfile) )
 
@@ -342,7 +342,7 @@ def invoke(command,aslist=False,buffer=None,annul=False):
 
    msg_out( "\n>>> {0}\n".format(command), ATASK )
 
-   if buffer == None:
+   if buffer is None:
       buffer = ( ilevel < ATASK )
 
    #  The original scheme used subprocess.check_output to invoke the
@@ -391,7 +391,7 @@ def invoke(command,aslist=False,buffer=None,annul=False):
       while True:
 
          line = proc.stdout.readline()
-         while line != None and len(line) > 0:
+         while line is not None and len(line) > 0:
             if isinstance( line, bytes ):
                line = line.decode("ascii","ignore")
             line = line.rstrip()
@@ -403,7 +403,7 @@ def invoke(command,aslist=False,buffer=None,annul=False):
             line = proc.stdout.readline()
 
          status = proc.poll()
-         if status != None:
+         if status is not None:
             break
 
          time.sleep(1.0)
@@ -446,7 +446,7 @@ def get_fits_header( ndf, keyword, report=False ):
    if report:
       if value == "":
          raise NoValueError("{0} contains a null value for FITS header'{1}'.".format(ndf,keyword))
-      elif value == None:
+      elif value is None:
          raise NoValueError("{0} contains no value for FITS header'{1}'.".format(ndf,keyword))
 
    return value
@@ -577,7 +577,7 @@ def shell_quote(text,remove=False):
 
    """
 
-   if text != None:
+   if text is not None:
 
       if remove:
          match = re.search( "^\s*\'(.*)\'\s*$",text)
@@ -851,7 +851,7 @@ class ParSys(object):
                if value[0] == value[-1]:
                   value = value[1:-1]
 
-            if name == None:
+            if name is None:
                byPosition.append(value)
             else:
                byName[name] = value
@@ -885,14 +885,14 @@ class ParSys(object):
       else:
          text = None
 
-      if text != None:
+      if text is not None:
          text += "\n{0}\n\n{1}\n".format(self.cmdline,self.usage)
          raise UnknownParameterError(text)
 
       #  Set the default MSG_FILTER value for all atasks by setting the
       #  MSG_FILTER environment variable.
       msg_filter = self.params["MSG_FILTER"].value
-      if msg_filter != None:
+      if msg_filter is not None:
          os.environ["MSG_FILTER"] = msg_filter
 
       #  Set the logfile name.
@@ -907,7 +907,7 @@ class ParSys(object):
       get_adam_user()
 
       #  Create a new ADAM directory in the NDG temp directory.
-      if ParSys.adamdir == None:
+      if ParSys.adamdir is None:
          ParSys.adamdir = tempfile.mkdtemp( prefix="adam_", suffix="_py",
                                             dir=NDG._gettmpdir() )
       msg_out( "Setting ADAM_USER to {0}\n".format(ParSys.adamdir), ATASK )
@@ -928,7 +928,7 @@ class ParSys(object):
    # Delete the temporary ADAM directory.
    @classmethod
    def cleanup(cls):
-      if ParSys.adamdir != None:
+      if ParSys.adamdir is not None:
          shutil.rmtree( ParSys.adamdir )
 
 #  Allow the ParSys to be indexed by parameter name (returns the
@@ -1250,7 +1250,7 @@ class Parameter(object):
          if not self._testValue():
             raise InvalidParameterError("\n{0}Unset value not valid for parameter '{1}'.".format(_cmd_token(),self._getName()))
 
-         elif self._getValue() == None and self._getDefault() == None:
+         elif self._getValue() is None and self._getDefault() is None:
             self.__validated = True
 
          else:
@@ -1291,7 +1291,7 @@ class Parameter(object):
          pmt += "- "+prompt+" "
 
       default = self._getDefault()
-      if default == None:
+      if default is None:
          pmt += "/!/ "
       elif default != Parameter.UNSET:
          pmt += "/{0}/ ".format(default)
@@ -1429,11 +1429,11 @@ class Par0F(Parameter):
    def _getMaxVal(self):
       return self.__maxval
    def _setMaxVal(self,val):
-      self.__maxval = float(val) if  val != None else None
+      self.__maxval = float(val) if  val is not None else None
    def _getMinVal(self):
       return self.__minval
    def _setMinVal(self,val):
-      self.__minval = float(val) if  val != None else None
+      self.__minval = float(val) if  val is not None else None
 
    minval = property(_getMinVal, _setMinVal, None, "The minimum parameter value")
    maxval = property(_getMaxVal, _setMaxVal, None, "The maximum parameter value")
@@ -1446,10 +1446,10 @@ class Par0F(Parameter):
          minv = self._getMinVal()
          maxv = self._getMaxVal()
 
-         big = (val > maxv) if maxv != None else False
-         small = (val < minv) if minv != None else False
+         big = (val > maxv) if maxv is not None else False
+         small = (val < minv) if minv is not None else False
 
-         if (maxv != None) and (minv != None):
+         if (maxv is not None) and (minv is not None):
             if (maxv > minv) and (big or small):
                   raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be between {3} and {4}.".format(_cmd_token(),val,self._getName(),minv,maxv))
             elif (maxv <= minv) and (big and small):
@@ -1527,11 +1527,11 @@ class Par0I(Parameter):
    def _getMaxVal(self):
       return self.__maxval
    def _setMaxVal(self,val):
-      self.__maxval = int(round(float(val))) if  val != None else None
+      self.__maxval = int(round(float(val))) if  val is not None else None
    def _getMinVal(self):
       return self.__minval
    def _setMinVal(self,val):
-      self.__minval = int(round(float(val))) if  val != None else None
+      self.__minval = int(round(float(val))) if  val is not None else None
 
    minval = property(_getMinVal, _setMinVal, None, "The minimum parameter value")
    maxval = property(_getMaxVal, _setMaxVal, None, "The maximum parameter value")
@@ -1544,10 +1544,10 @@ class Par0I(Parameter):
          minv = self._getMinVal()
          maxv = self._getMaxVal()
 
-         big = (val > maxv) if maxv != None else False
-         small = (val < minv) if minv != None else False
+         big = (val > maxv) if maxv is not None else False
+         small = (val < minv) if minv is not None else False
 
-         if (maxv != None) and (minv != None):
+         if (maxv is not None) and (minv is not None):
             if (maxv > minv) and (big or small):
                   raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be between {3} and {4}.".format(_cmd_token(),val,self._getName(),minv,maxv))
             elif (maxv <= minv) and (big and small):
@@ -1671,7 +1671,7 @@ class ParChoice(Parameter):
    def _getChoices(self):
       return self.__choices
    def _setChoices(self,val):
-      if val == None:
+      if val is None:
          self.__choices = None
       else:
          self.__choices = []
@@ -1795,7 +1795,7 @@ class ParNDG(Parameter):
    def _getMaxSize(self):
       return self.__maxsize
    def _setMaxSize(self,size):
-      if size == None:
+      if size is None:
          self.__maxsize = None
       else:
          size = int(size)
@@ -1806,7 +1806,7 @@ class ParNDG(Parameter):
    def _getMinSize(self):
       return self.__minsize
    def _setMinSize(self,size):
-      if size == None:
+      if size is None:
          self.__minsize = 1
       else:
          size = int(size)
@@ -1820,7 +1820,7 @@ class ParNDG(Parameter):
 
    def _isValid(self):
       val = Parameter._getValue(self)
-      if val == None:
+      if val is None:
          size = 0
       else:
          try:
@@ -1831,7 +1831,7 @@ class ParNDG(Parameter):
 
       if size < self.minsize:
          raise InvalidParameterError( "\n{0}Too few NDFs ({1}) given for parameter '{2}' - at least {3} must be supplied.".format(_cmd_token(),size,Parameter._getName(self), self._getMinSize()) )
-      elif self.maxsize != None and size > self.maxsize:
+      elif self.maxsize is not None and size > self.maxsize:
          raise InvalidParameterError( "\n{0}Too many NDFs ({1}) given for parameter '{2}' - no more than {3} can be supplied.".format(_cmd_token(),size,Parameter._getName(self), self._getMaxSize()) )
       Parameter._setValue(self,val)
 
@@ -2007,7 +2007,7 @@ class NDG(object):
    # create it.
    @classmethod
    def _gettmpdir(cls):
-      if NDG.tempdir == None:
+      if NDG.tempdir is None:
          dir = os.environ["STAR_TEMP"] if "STAR_TEMP" in os.environ else None
          NDG.tempdir = tempfile.mkdtemp( prefix='NDG_', dir=dir )
       elif not os.path.isdir(NDG.tempdir):
@@ -2065,7 +2065,7 @@ class NDG(object):
       # Find out how many NDFs there will be in the group.
       if isinstance(p1,str):
          gexp = shell_quote(p1)
-         if p2 != None:
+         if p2 is not None:
             if p2:
                exists = True
             else:
@@ -2087,7 +2087,7 @@ class NDG(object):
       # If the first argument is a list or tuple, create a group containing
       # the contents of the list or tuple as NDF names. Flag that we do not
       # know these to be absolute.
-      elif ( isinstance(p1,list) or isinstance(p1,tuple) ) and p2 == None:
+      elif ( isinstance(p1,list) or isinstance(p1,tuple) ) and p2 is None:
          isabs = False
          self.__ndfs = []
          for ndf in p1:
@@ -2102,7 +2102,7 @@ class NDG(object):
       # If the first argument is an integer, the group will contain the
       # specified number of NDFs. We cannot determine their paths as
       # yet since we have not yet decided on a tempdir.
-      elif isinstance(p1,int) and p2 == None:
+      elif isinstance(p1,int) and p2 is None:
          nfile = int(p1)
          intemp = True
 
@@ -2114,7 +2114,7 @@ class NDG(object):
       # this first assuming the NDFs exist in order to get full expansion
       # of container files, and then try again without this assumption if
       # an error occurs.
-      elif isinstance(p1,NDG) and p2 == None:
+      elif isinstance(p1,NDG) and p2 is None:
          try:
             invoke("$KAPPA_DIR/ndfecho ndf=\"{0}\" quiet".format(p1))
             nfile = get_task_par( "size", "ndfecho" )
@@ -2143,7 +2143,7 @@ class NDG(object):
 
       # Ensure we know the size of the group. Also strip and leading and
       # trailing quotes from the path.
-      if self.__ndfs != None:
+      if self.__ndfs is not None:
          ndflist = []
          for ndf in self.__ndfs:
             while ndf.startswith("'") or ndf.startswith('"'):
@@ -2171,7 +2171,7 @@ class NDG(object):
       # Now ensure we have a list of NDFs. Create the specified number
       # of names for new (currently non-existent) NDFs within the temp
       # directory.
-      if self.__ndfs == None:
+      if self.__ndfs is None:
          self.__nobj = NDG.__nobj
          self.__ndfs = []
          for i in range(nfile):
@@ -2193,7 +2193,7 @@ class NDG(object):
                self.__file = NDG.__getfile(self.__tmpdir)
             self.__writeFile()
 
-         elif self.__file != None:
+         elif self.__file is not None:
             os.remove(self.__file)
             self.__file = None
 
@@ -2211,7 +2211,7 @@ class NDG(object):
 
       for ndf in self.__ndfs:
          invoke("$KAPPA_DIR/erase object=\"{0}\" ok=yes".format(ndf),annul=True)
-      if self.__file != None:
+      if self.__file is not None:
          try:
             os.remove( self.__file )
          except:
@@ -2308,7 +2308,7 @@ class NDG(object):
    # Write the contents of the group to the list file.
    def __writeFile(self):
       global DEBUG
-      if self.__file != None:
+      if self.__file is not None:
          msg_out( "Writing NDG list file: {0}".format(self.__file), DEBUG )
          fd = open(self.__file,"w")
          if self.__comment:
@@ -2341,11 +2341,11 @@ class NDG(object):
    @classmethod
    def cleanup(cls):
       for ndg in NDG.instances:
-         if ndg.__tmpdir != None and ndg.__tmpdir == NDG.tempdir:
+         if ndg.__tmpdir is not None and ndg.__tmpdir == NDG.tempdir:
             ndg.__file = None
             ndg.__ndfs = []
             ndg.__tmpdir = None
-      if NDG.tempdir != None:
+      if NDG.tempdir is not None:
          shutil.rmtree( NDG.tempdir )
 
    # Return the path to a new temporary file.

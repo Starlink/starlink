@@ -157,18 +157,18 @@ try:
    param = parsys["PARAM"].value
 
 #  If not, get the comparison tool to use.
-   if param == None:
+   if param is None:
       tool = parsys["TOOL"].value
-      if tool == None:
+      if tool is None:
          for trytool in ( "meld", "opendiff", "diffmerge", "kdiff3", "tkdiff", "diffuse" ):
-            if starutil.which( trytool ) != None:
+            if starutil.which( trytool ) is not None:
                tool = trytool
                break
-         if tool == None:
+         if tool is None:
             print( "\n!! Could not find a usable file comparison tool")
             os._exit(1)
       else:
-         if starutil.which( tool ) == None:
+         if starutil.which( tool ) is None:
             print( "\n!! Could not find the requested file comparison tool: '{0}'.".format(tool) )
             os._exit(1)
 
@@ -187,7 +187,7 @@ try:
 
 #  Get the first config string.
    config1 = parsys["CONFIG1"].value
-   if config1 == None:
+   if config1 is None:
       print( "\n!! No value supplied for CONFIG1" )
       os._exit(1)
 
@@ -205,7 +205,7 @@ try:
    if isndf1:
       try:
          subarray = starutil.get_fits_header( config1, "SUBARRAY" )
-         if subarray == None:
+         if subarray is None:
             text = starutil.invoke( "$KAPPA_DIR/provshow {0}".format(config1) )
             if "s4a" in text or "s4b" in text or "s4c" in text or "s4d" in text:
                subarray = "s4"
@@ -219,7 +219,7 @@ try:
          os._exit(1)
 
    if isndf1:
-      if subarray == None:
+      if subarray is None:
          msg_out("Cannot determine the SCUBA-2 waveband for NDF '{0}' "
                  "- was it really created by MAKEMAP?".format(config1), starutil.CRITICAL )
          waveband1 = None
@@ -235,8 +235,8 @@ try:
 
 #  Get the second config string.
    config2 = parsys["CONFIG2"].value
-   if config2 == None:
-      if param == None:
+   if config2 is None:
+      if param is None:
          print( "\n!! No value supplied for CONFIG2" )
          os._exit(1)
       waveband2 = waveband1
@@ -254,7 +254,7 @@ try:
          try:
             subarray = starutil.get_fits_header( config2, "SUBARRAY" )
             isndf2 = True
-            if subarray == None:
+            if subarray is None:
                text = starutil.invoke( "$KAPPA_DIR/provshow {0}".format(config2) )
                if "s4a" in text or "s4b" in text or "s4c" in text or "s4d" in text:
                   subarray = "s4"
@@ -268,7 +268,7 @@ try:
             os._exit(1)
 
       if isndf2:
-         if subarray == None:
+         if subarray is None:
             msg_out("Cannot determine the SCUBA-2 waveband for NDF '{0}' "
                     "- was it really created by MAKEMAP?".format(config2), starutil.CRITICAL )
             waveband2 = None
@@ -283,15 +283,15 @@ try:
          waveband2 = None
 
 #  If config1 is an ndf but config2 is not, use the waveband from config1.
-   if waveband1 != None and waveband2 == None:
+   if waveband1 is not None and waveband2 is None:
       waveband2 = waveband1
 
 #  If config2 is an ndf but config1 is not, use the waveband from config2.
-   elif waveband1 == None and waveband2 != None:
+   elif waveband1 is None and waveband2 is not None:
       waveband1 = waveband2
 
 #  If neither are ndfs, use the WAVEBAND parameter value for both.
-   elif waveband1 == None and waveband2 == None:
+   elif waveband1 is None and waveband2 is None:
       waveband2 = parsys["WAVEBAND"].value
       waveband1 = waveband2
 
@@ -316,7 +316,7 @@ try:
       select = starutil.shell_quote( '"850=1,450=0"' )
 
 #  Deal with cases where we are comparing two whole configs...
-   if param == None:
+   if param is None:
 
 #  List the configuration parameters in alphabetical order to a text file.
       if isndf1:
@@ -376,7 +376,7 @@ try:
                         format(config1,defs,select,param) )
 
 #  Get the value of the requested parameter fro config2 (if supplied).
-      if config2 != None:
+      if config2 is not None:
          if isndf2:
             value2 = invoke("$KAPPA_DIR/configecho ndf={0} application=makemap "
                            "config=! name={3} defaults={1} select={2}".
@@ -390,7 +390,7 @@ try:
          value2 = None
 
 #  Display them.
-      if value2 == None:
+      if value2 is None:
          msg_out( "\n  {0} = {1}".format(param,value1), starutil.CRITICAL)
       else:
          msg_out( "\n  {0} = {1} (config1)".format(param,value1), starutil.CRITICAL)

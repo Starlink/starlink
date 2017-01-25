@@ -569,7 +569,7 @@ try:
 
 #  See if old temp files are to be re-used.
       restart = parsys["RESTART"].value
-      if restart == None:
+      if restart is None:
          retain = parsys["RETAIN"].value
 
       else:
@@ -671,7 +671,7 @@ try:
 
          invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(qmap) )
          actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
-         if actpixsize0 == None:
+         if actpixsize0 is None:
             actpixsize0 = actpixsize
          elif actpixsize != actpixsize0:
             raise UsageError( "{0} had pixel size {1} - was expecting {2}".

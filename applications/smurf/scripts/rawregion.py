@@ -179,7 +179,7 @@ try:
    invoke( "$ATOOLS_DIR/astskyframe \"'system={0}'\" {1}".format(sys,frame) )
 
 #  Create a Circle describing the map.
-   if region == None:
+   if region is None:
       region = NDG.tempfile()
       display = True
    else:
@@ -220,7 +220,7 @@ try:
 
 #  If so, set the default for the INSTRUMENT parameter and prevent the
 #  user being prompted for a value.
-      if instrument != None:
+      if instrument is not None:
          parsys["INSTRUMENT"].default = instrument
          parsys["INSTRUMENT"].noprompt = True
 

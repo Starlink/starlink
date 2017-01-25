@@ -244,14 +244,14 @@ try:
          elif cval == "DAS":
             instrument = "DAS"
 
-      if instrument0 == None:
-         if instrument != None:
+      if instrument0 is None:
+         if instrument is not None:
             parsys["INSTRUMENT"].default = instrument
             parsys["INSTRUMENT"].noprompt = True
          instrument = parsys["INSTRUMENT"].value
          instrument0 = instrument
 
-      elif instrument != None:
+      elif instrument is not None:
          if instrument0 != instrument:
             raise starutil.InvalidParameterError("Tile {0} is for instrument "
                      "{1} - others are for {2}.".format(tile,instrument,instrument0) )
@@ -269,7 +269,7 @@ try:
 #  area on the sky, and create an AST Region from them.
    cen1 = None
    cen2 = None
-   if region == None :
+   if region is None :
       system = parsys["SYSTEM"].value
       if system == "ICRS" :
          parsys["CENTRE1"].prompt = "RA at centre of required circle"
@@ -279,7 +279,7 @@ try:
          parsys["CENTRE2"].prompt = "Galactic latitude at centre of required circle"
 
       centre1 = parsys["CENTRE1"].value
-      if centre1 != None:
+      if centre1 is not None:
          centre2 = parsys["CENTRE2"].value
          radius = parsys["RADIUS"].value
 
@@ -315,7 +315,7 @@ try:
 #  Get a list of indices for the JSA tiles that intersect the required
 #  region. If region is none, we are pasting all tiles into the output
 #  NDF.
-   if region != None:
+   if region is not None:
       invoke( "$SMURF_DIR/jsatilelist in={0} instrument={1}".
               format(region,instrument) )
       jsatile_list = starutil.get_task_par( "TILES", "jsatilelist" )
@@ -325,7 +325,7 @@ try:
       tile_dict = {}
       for tile in tiles:
          jsatile = starutil.get_fits_header( tile, "TILENUM" )
-         if jsatile == None:
+         if jsatile is None:
             raise starutil.InvalidParameterError("Supplied tile '{0}' has no value for "
                                                  "the TILENUM header.".format(tile) )
          else:
@@ -394,7 +394,7 @@ try:
 #  Choose the celestial reference position. Use the circle centre if
 #  supplied. Otherwise use the centre of the middle tile, converted into
 #  the requested system.
-      if cen1 == None:
+      if cen1 is None:
          if system == "ICRS":
             invoke( "$SMURF_DIR/jsatileinfo itile={0} instrument={1}".
                     format(jsatile,instrument) )
@@ -459,7 +459,7 @@ try:
 #  supplied Region into the pixel coords of the reference image. If no
 #  region was supplied, use the full JSA tile montage. e need to pick the
 #  spatial axes of the region first.
-      if region != None:
+      if region is not None:
          this_reg = region
       else:
          this_reg = jsa_montage
@@ -542,7 +542,7 @@ try:
 
 #  Create the output NDF by resampling the combined NDF holding all
 #  tiles. Do 2D and 3D separately.
-   if lz == None:
+   if lz is None:
       invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} lbnd=\[{3},{4}\] "
               "ubnd=\[{5},{6}\] method={7} params=\[0,{8}\]".
               format(ndfstoresample,resampledndfs,ref,lx,ly,ux,uy,method,width) )
@@ -552,7 +552,7 @@ try:
               format(ndfstoresample,resampledndfs,ref,lx,ly,lz,ux,uy,uz,method,width) )
 
 #  If using all input tiles, strip any bad border from the output.
-   if region == None:
+   if region is None:
       invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trimbad exten=yes".format(out,outdata) )
 
 #  Remove temporary files.
