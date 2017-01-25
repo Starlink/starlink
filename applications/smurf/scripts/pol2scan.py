@@ -336,6 +336,10 @@
 *        - Allow Q and U maps creatd by previous run of pol2scan to be
 *        accepted as input. Such maps may have no quality array (because
 *        wcsmosaic does not propagate quality).
+*     25-JAN-2017 (DSB):
+*        When creating a PI map with de-biasing, set the corrected value 
+*        to zero if the noise is greater than the signal. This make this 
+*        script consistent with polpack.
 '''
 
 import os
@@ -1608,11 +1612,10 @@ try:
 
 #  Create the polarised intensity map if required.
    if pimap:
-      msg_out( "Generating an polarised intensity image...")
+      msg_out( "Generating a polarised intensity image...")
       if debias:
-         invoke( "$KAPPA_DIR/maths exp=\"'sign(sqrt(abs(fa)),fa)'\" "
-                 "fa=\"'ia**2+ib**2-(va+vb)/2'\" ia={0} ib={1} out={2}".
-                 format(qmap,umap,pimap))
+         invoke( "$KAPPA_DIR/maths exp=\"'sqrt(max(0.0,ia**2+ib**2-(va+vb)/2))'\" "
+                 "ia={0} ib={1} out={2}".format(qmap,umap,pimap))
       else:
          invoke( "$KAPPA_DIR/maths exp=\"'sqrt(ia**2+ib**2)'\" ia={0} "
                  "ib={1} out={2}".format(qmap,umap,pimap))
