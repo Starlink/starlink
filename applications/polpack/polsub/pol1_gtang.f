@@ -71,6 +71,9 @@
 *        the first pixel. This matches what POL1_ANGRT does. Without this
 *        an unrequired small rotation of the reference direction can be
 *        introduced.
+*     23-JAN-2017 (DSB):
+*        If no NDF is supplied, use typical NDF dimensions of 500x500
+*        pixels, instead of allowing an error to be reported.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -185,8 +188,14 @@
 *  Get the number of axes in it.
             NPOL = AST_GETI( FS, 'NAXES', STATUS )
 
-*  Get the pixel dimensions of the NDF.
-            CALL NDF_DIM( INDF, NDF__MXDIM, DIMS, NDIM, STATUS )
+*  If an NDF was supplied, get its pixel dimensions. Otherwise, assume
+*  "typical" dimensions of 500x500 pixels.
+            IF( INDF .NE. NDF__NOID ) THEN
+               CALL NDF_DIM( INDF, NDF__MXDIM, DIMS, NDIM, STATUS )
+            ELSE
+               DIMS( 1 ) = 500
+               DIMS( 2 ) = 500
+            END IF
 
 *  Transform the central pixel from the base frame origin the POLANAL
 *  Frame.
