@@ -134,6 +134,9 @@
 *        standard deviation. They are now set bad and excluded form all
 *        further use. In fact all components that have very small sigma
 *        compared to the other components are set bad.
+*     2017-1-27 (DSB):
+*        Correct calculation and use of log mean of the component sigma
+*        values.
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
@@ -833,9 +836,9 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
        (less that 1E-10 of the logmean of all components). Any with zero
        standard deviation will already have been excluded. */
     if( s2 > 0 ) {
-       double logmean = s1/s2;
+       double thresh = 1E-10*pow( 10.0, s1/s2 );
        for( i=0; i<ngoodbolo; i++ ) {
-          if( sigmas[ i ] != VAL__BADD && sigmas[ i ] < 1E-10*logmean ) {
+          if( sigmas[ i ] != VAL__BADD && sigmas[ i ] < thresh ) {
              for( k=0; k<tlen; k++ ) {
                 comp[i*ccompstride + k*ctstride] = VAL__BADD;
                 nlow++;
