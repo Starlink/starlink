@@ -83,10 +83,16 @@
 *        Changed "ispol2" to "qui" and use VAL__BADI to indicate non-POL2
 *        so that we can user zero to indicate "I" (i.e. total intensity
 *        from a POL2 observation).
+*     27-JAN-2017 (DSB):
+*        - The existing PL1 and PL2 models were derived using I maps created
+*        without POL2 in the beam. So if the supplied I map was created
+*        with POL2 in the beam it needs to be corrected for the expected POL2
+*        degradation factor (1.35 at 850 um) before being used.
+*        - Report an error if 450 um data supplied.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2015, 2016 East Asian Observatory.
+*     Copyright (C) 2015-2017 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -155,6 +161,7 @@ typedef struct smfSubIPData {
    double *pldata;
    double *res_data;
    double *result;
+   double degfac;
    int *lut_data;
    int model;
    int oper;
@@ -171,6 +178,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
                  int *qui, int *status ) {
 
 /* Local Variables: */
+   AstFitsChan *fc;
    HDSLoc *loc = NULL;
    HDSLoc *sloc = NULL;
    SmfSubIPData *job_data = NULL;
@@ -192,6 +200,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    double *ipang;
    double *p0data;
    double *p1data;
+   double degfac;
    double pldata[4];
    int angcndf;
    int c0ndf;
@@ -203,6 +212,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    int nw;
    int p0ndf;
    int p1ndf;
+   int polref;
    size_t bstride;
    size_t idx;
    size_t tstride;
@@ -210,6 +220,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    smf_qual_t *qua_data;
    smfArray *res;
    smfArray *lut;
+   smf_subinst_t waveband;
 
    *qui = VAL__BADI;
 
@@ -219,6 +230,20 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
 /* Get convenience pointers. */
    res = dat->res[0];
    lut = dat->lut[0];
+
+/* Get the waveband (850 or 450) and report an error if 450 data is
+   supplied, and note the POL2 degradation factor. */
+   waveband = smf_calc_subinst( res->sdata[0]->hdr, status );
+   if( waveband == SMF__SUBINST_850 ) {
+      degfac = 1.35;
+   } else {
+      degfac = 1.96;
+      *status = SAI__ERROR;
+      errRep("","Cannot currently correct 450 um POL2 data for "
+             "instrumental polarisation as the 450 um IP model "
+             "has not yet been determined.", status );
+      return;
+   }
 
 /* Check if we have pol2 data, and see if it is Q or U. */
    qu = NULL;
@@ -323,6 +348,16 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
 /* Resample the NDFs data values onto the output map grid. */
       imapdata = smf_alignndf( imapndf, dat->outfset, dat->lbnd_out, dat->ubnd_out,
                                status );
+
+/* See if the reference NDF was created from POL2 data. */
+      polref = 0;
+      kpgGtfts( imapndf, &fc, status );
+      if( astTestFits( fc, "INBEAM", NULL ) ) {
+         char *cval = NULL;
+         astGetFitsS( fc, "INBEAM", &cval );
+         if( cval && strstr( cval, "pol" ) ) polref = 1;
+      }
+      fc = astAnnul( fc );
 
 /* Annul the NDF identifier. */
       ndfAnnul( &imapndf, status );
@@ -469,6 +504,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
             pdata->pldata = pldata;
             pdata->model = model;
             pdata->oper = 1;
+            pdata->degfac = polref ? degfac : 1.0;
 
 /* Submit the job for execution by the next available thread. */
             thrAddJob( wf, 0, pdata, smf1_subip, 0, NULL, status );
@@ -548,6 +584,7 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    double cc;
    double cd;
    double cosval;
+   double degfac;
    double ival;
    double p0;
    double p1;
@@ -583,6 +620,7 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    gy = pdata->gy;
    fx = pdata->fx;
    fy = pdata->fy;
+   degfac = pdata->degfac;
 
 /* Subtract the IP from a range of bolometers. */
    if( pdata->oper == 1 ) {
@@ -688,11 +726,15 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
                            utr = ufp;
                         }
 
-/* Correct the residual Q or U value. */
+
+/* Correct the residual Q or U value. If the total intensity was derived from
+   a POL2 observation but the IP model assumes non-POL2 total intensity values,
+   then we need to correct the total intensity for the POL2 degradation
+   factor. */
                         if( *qu == 'Q' ) {
-                           *pr -= ival*qtr;
+                           *pr -= degfac*ival*qtr;
                         } else {
-                           *pr -= ival*utr;
+                           *pr -= degfac*ival*utr;
                         }
                      }
                   }
