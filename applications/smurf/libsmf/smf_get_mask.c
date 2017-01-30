@@ -324,6 +324,8 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    } else if( zero_niter < 1.0 ) {
       if( dat->mapchange >= zero_niter || dat->iter <= skip + 1 ) {
          domask = 1;
+         dat->allow_convergence = 0; /* We've not yet reached the limit
+                                        so we must do more iterations */
       } else {
          domask = 0;
 
@@ -334,6 +336,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 
    } else {
       domask = (dat->iter < (int)( zero_niter + 0.5 ) + skip);
+      if( domask ) dat->allow_convergence = 0;
    }
 
    if( domask ) {

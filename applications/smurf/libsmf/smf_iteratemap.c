@@ -2096,11 +2096,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            store it now. */
         dat.iter = iter;
 
-
-
-
-
-
+        /* Indicate that we are allowed to converge on this iteration.
+           Other functions may set this flag to zero to prevent convergence
+           being reached on this iteration. For instance, see msf_get_mask. */
+        dat.allow_convergence = 1;
 
 
 
@@ -2830,12 +2829,17 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              allow convergence to be reached until we have done at least
              one iteration in which the AST model was not skipped. */
 
-            if( untilconverge &&
-              ( ( (maptol!=VAL__BADD) && (tol > maptol) ) ||
+          if( untilconverge &&
+            ( ( (maptol!=VAL__BADD) && (tol > maptol) ) ||
                 last_skipped ) && quit == -1 ) {
             /* Map hasn't converged yet */
             converged=0;
           }
+
+          /* Do not allow the loop to leave until the conditions required 
+             for convergence by other functions are all met. For instance, 
+             see smf_get_mask. */
+          if( converged && !dat.allow_convergence ) converged=0;
 
           /* If we are currently in the initial ast.skip iterations, and
              the map has more or less stopped changing (i.e. the change

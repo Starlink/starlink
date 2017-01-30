@@ -822,6 +822,7 @@ typedef struct smfDIMMData {
   double pixsize;            /* Nominal map pixel size in arc-seconds */
   int poldata;               /* Are we mapping polarimetric Q or U values? */
   double mapchange;          /* Normalised change in map caused by previous iteration */
+  int allow_convergence;     /* Is the iteration loop allowed to quit yet? */
 } smfDIMMData;
 
 

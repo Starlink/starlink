@@ -255,7 +255,12 @@ ast.zero_mask = 0
 #               the count of iterations. If ast.zero_niter is greater than
 #               zero but less than 1.0, the AST mask will be used until
 #               the normalized change in the map between iterations drops
-#               below the ast.zero_freeze value.
+#               below the ast.zero_freeze value. If a value is set for
+#               "ast.zero_niter", the iterative map-making process will
+#               not terminate until the number of iterations required by
+#               the supplied "ast.zero_niter" value have occurred, regardless
+#               of whether the condition specified by parameter "maptol"
+#               is achieved earlier.
 ast.zero_niter = 0
 
 #-----------------------------------------------------------------
