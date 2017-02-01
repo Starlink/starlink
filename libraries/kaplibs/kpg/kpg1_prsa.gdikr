@@ -32,6 +32,8 @@
 *        The global status.
 
 *  Notes:
+*     -  An appropriate bad value is returned for any word equal to
+*     "BAD" (case insensitive).
 *     -  There is a routine for four numeric data type: replace "x"
 *     in the routine name by D, I, K, or R as appropriate.  The array
 *     returned from the routine must have the data type specified.  The
@@ -41,6 +43,7 @@
 *  Copyright:
 *     Copyright (C) 1990 Science & Engineering Research Council.
 *     Copyright (C) 2012 Science & Technology Facilities Council.
+*     Copyright (C) 2017 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -61,6 +64,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -68,6 +72,8 @@
 *        Original version.
 *     2012 April 30 (MJC):
 *        Add 64-bit integers.
+*     1-FEB-2017 (DSB):
+*        Check for BAD values.
 *     {enter_further_changes_here}
 
 *-
@@ -78,6 +84,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CHR_ERR'          ! CHR error codes
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
       INTEGER MAXVAL
@@ -93,6 +100,7 @@
 *  External References:
       INTEGER CHR_LEN            ! Length of the string less trailing
                                  ! blanks
+      LOGICAL CHR_SIMLR          ! Case-insensitive string comparison
 
 *  Local Variables:
       INTEGER INDEXE             ! Location within the string of the end
@@ -133,8 +141,12 @@
 
 *  Extract the value required and convert to <COMM> type.
          NVAL = NVAL + 1
-         CALL CHR_CTO<T>( BUFFER( INDEXS:INDEXE ), VALUES( NVAL ),
-     :                    STATUS )
+         IF( CHR_SIMLR( BUFFER( INDEXS:INDEXE ), 'BAD' ) ) THEN
+            VALUES( NVAL ) = VAL__BAD<T>
+         ELSE
+            CALL CHR_CTO<T>( BUFFER( INDEXS:INDEXE ), VALUES( NVAL ),
+     :                       STATUS )
+         END IF
       END DO
 
 *  Should an error have occurred in extracting the data values, it

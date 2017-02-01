@@ -33,9 +33,11 @@
 *        The global status.
 
 *  Notes:
+*     -  Appropriate bad values are created for any words equal to "BAD"
+*     (case-insensitive).
 *     -  There is a routine for integer and floating-point data types:
 *     replace "x" in the routine name by I, D, or R as appropriate.
-*     The ARRAY argument of the routine must have the data type 
+*     The ARRAY argument of the routine must have the data type
 *     specified.
 *     -  A warning is reported if the shape does not use all the data
 *     points in the file.
@@ -73,7 +75,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -141,7 +143,7 @@
          SHRIEK = INDEX( BUFFER, '!' )
          HASH = INDEX( BUFFER, '#' )
 
-*  We can skip the line if the first character is a comment indicator. 
+*  We can skip the line if the first character is a comment indicator.
 *  If there is a trailing comment it should be removed before extraction
 *  of the data occurs.  Find the leftmost comment character.
          IF ( SHRIEK .GT. 1 .OR. HASH .GT. 1 ) THEN

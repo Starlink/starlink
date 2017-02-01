@@ -65,6 +65,8 @@
 *        The global status.
 
 *  Notes:
+*     -  Appropriate bad values are generated for any "BAD" strings
+*        (case-insensitive) in the data value column.
 *     -  This is a server subroutine for TRANDAT.  The code would be at
 *        the top level (i.e. TRANDAT) but for the requirement to
 *        transfer ASCII-file data into mapped work arrays.
@@ -115,6 +117,8 @@
 *     6-MAY-2011 (DSB):
 *        Correct sorting of columns (PDA_QSIAx does not modify the
 *        supplied array).
+*     1-FEB-2017 (DSB):
+*        Check for "BAD" strings.
 *     {enter_further_changes_here}
 
 *-
@@ -127,6 +131,7 @@
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'FIO_ERR'          ! Fortran-I/O-system errors
       INCLUDE 'CHR_ERR'          ! CHR error codes
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
       INTEGER FD
@@ -150,6 +155,7 @@
 *  External References:
       INTEGER CHR_LEN            ! Length of the string less trailing
                                  ! blanks
+      LOGICAL CHR_SIMLR          ! Case insensitive string comparison
 
 *  Local Constants:
       INTEGER NCHLIN             ! Maximum number of characters in an
@@ -281,11 +287,16 @@
                END IF
 
 *  Extract the value required and convert to <COMM> type for the data
-*  value, or to real for the co-ordinates.
+*  value (and check for "BAD" values), or to real for the co-ordinates.
                NVAL = NVAL + 1
                IF ( INDPOS( NVAL ) .EQ. DIM1 + 1 ) THEN
-                  CALL CHR_CTO<T>( BUFFER( INDEXS:INDEXE ),
-     :                             VADATA( COUNT ), STATUS )
+                  IF( CHR_SIMLR( BUFFER( INDEXS:INDEXE ), 'BAD' ) ) THEN
+                     VADATA( COUNT ) = VAL__BAD<T>
+                  ELSE
+                     CALL CHR_CTO<T>( BUFFER( INDEXS:INDEXE ),
+     :                                VADATA( COUNT ), STATUS )
+                  END IF
+
                ELSE
                   J = INDPOS( NVAL )
                   CALL CHR_CTOR( BUFFER( INDEXS:INDEXE ),

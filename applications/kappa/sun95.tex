@@ -6,9 +6,9 @@
 \stardocsource    {sun95.43}
 \stardocnumber    {95.43}
 \stardocauthors   {Malcolm J. Currie \& David S. Berry}
-\stardocdate      {2016 May 12}
+\stardocdate      {2017 February 1}
 \stardoctitle     {KAPPA --- Kernel Application Package}
-\stardocversion   {2.4}
+\stardocversion   {2.5}
 \stardocmanual    {User's Guide}
 % -----------------------------------------------------------------------------
 \stardocabstract{
@@ -46097,6 +46097,10 @@ KAPPA: \htmlref{HISTEQ}{HISTEQ},
       \sstitemlist{
 
          \sstitem
+         Bad data values may be represented by the string ``BAD'' (case
+         insensitive) within the input text file.
+
+         \sstitem
          All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.  However,
          byte, unsigned byte, word and unsigned word require data
          conversion, and therefore involve additional processing.
@@ -53559,84 +53563,17 @@ and HDS data types is as follows:
 
 \newpage
 
-\section{\xlabel{se_changes}Release Notes---V2.4\label{se:changes}}
-
-\subsubsection{New Commands}
-The following new application have been added:
-
-\begin{description}
-   \item [\htmlref{ALIGN2D}{ALIGN2D}] \mbox{}
-   Aligns a pair of two-dimensional NDFs by minimising the residuals between them.
-\end{description}
+\section{\xlabel{se_changes}Release Notes---V2.5\label{se:changes}}
 
 \subsection{Modified Commands}
 The following applications have been modified:
 \begin{description}[style=nextline]
 
-   \item [\htmlref{APERADD}{APERADD}]\mbox{}
+   \item [\htmlref{TRANDAT}{TRANDAT}]\mbox{}
       \begin{itemize}
-        \item Has a new parameter MASK, which can be used to save an NDF
-              containing a mask showing which pixels were included in the
-              aperture.
-      \end{itemize}
-
-   \item [\htmlref{COLLAPSE}{COLLAPSE}]\mbox{}
-      \begin{itemize}
-        \item A warning that suggested that WLIM should b lowered even
-              when it had the minmum of zero no longer appears.
-      \end{itemize}
-
-   \item [\htmlref{LINPLOT}{LINPLOT}]\mbox{}
-      \begin{itemize}
-        \item Parameter TEMPSTYLE is withdrawn.  The \texttt{+} syntax
-        should be used to set temporary style changes.
-      \end{itemize}
-
-      \item [\htmlref{LUCY}{LUCY}]\mbox{}
-      \begin{itemize}
-        \item A bug that prevented correct background removal when
-               Parameter BACK was null was excised.
-      \end{itemize}
-
-   \item [\htmlref{MFITTREND}{MFITTREND}]\mbox{}
-      \begin{itemize}
-        \item Has a new FOREST parameter, which improves spectral-line
-              masking in line forests using a smoothed mode rather than
-              the mean and a better estimate of the baseline noise.
-        \item A bug has been fixed preventing fits in the rare combination
-              of neither variance nor bad values being present, and without
-              masking of lines.  Bad variances are also now checked
-              before spline fitting.
-      \end{itemize}
-
-      \item [\htmlref{NDFCOPY}{NDFCOPY}]\mbox{}
-      \begin{itemize}
-        \item A bug has been fixed that prevented excess WCS axes from
-              being removed.
-      \end{itemize}
-
-      \item [\htmlref{NORMALIZE}{NORMALIZE}]\mbox{}
-      \begin{itemize}
-        \item Has two new parameters DRAWMARK and DRAWWIDTH that can be
-              used to exclude central markers and width indicator from
-              the plot.
-      \end{itemize}
-
-   \item [\htmlref{PROVSHOW}{PROVSHOW}]\mbox{}
-      \begin{itemize}
-        \item Has a new option SHOW=TREE, which allows the family tree to
-              be stepped through in an interactive manner, with the user
-              choosing which parent is to be displayed next.
-      \end{itemize}
-
-   \item [\htmlref{WCSADD}{WCSADD}]\mbox{}
-      \begin{itemize}
-        \item Has a new option MAPTYPE=REFNDF, which causes a copy of a
-              co-ordinate Frame read from a reference NDF to be added
-              into the modified NDF.
-        \item New parameter RETAIN allows control over whether or not the
-              new Frame becomes the current Frame in the modified NDF on
-              exit.
+        \item Will now recognised the string ``BAD'' (case insensitive) within
+              the input text file and generate appropriate bad values in the output
+              NDF.
       \end{itemize}
 
 \end{description}
@@ -54076,7 +54013,7 @@ The following applications have been modified:
 
 \subsection{Release Notes---V2.3}
 
-\subsection{New Commands}
+\subsubsection{New Commands}
 The following new applications have been added:
 
 \begin{description}
@@ -54085,7 +54022,7 @@ The following new applications have been added:
    on a range of different tests.
 \end{description}
 
-\subsection{Modified Commands}
+\subsubsection{Modified Commands}
 The following applications have been modified:
 \begin{description}[style=nextline]
 
@@ -54125,6 +54062,90 @@ The following applications have been modified:
    \item [\htmlref{SQORST}{SQORST}]\mbox{}
       \begin{itemize}
          \item Propagates UNITS as it used to in the IMAGE-format version.
+      \end{itemize}
+
+\end{description}
+
+
+
+\subsection{Release Notes---V2.4}
+
+\subsubsection{New Commands}
+The following new application have been added:
+
+\begin{description}
+   \item [\htmlref{ALIGN2D}{ALIGN2D}] \mbox{}
+   Aligns a pair of two-dimensional NDFs by minimising the residuals between them.
+\end{description}
+
+\subsubsection{Modified Commands}
+The following applications have been modified:
+\begin{description}[style=nextline]
+
+   \item [\htmlref{APERADD}{APERADD}]\mbox{}
+      \begin{itemize}
+        \item Has a new parameter MASK, which can be used to save an NDF
+              containing a mask showing which pixels were included in the
+              aperture.
+      \end{itemize}
+
+   \item [\htmlref{COLLAPSE}{COLLAPSE}]\mbox{}
+      \begin{itemize}
+        \item A warning that suggested that WLIM should b lowered even
+              when it had the minmum of zero no longer appears.
+      \end{itemize}
+
+   \item [\htmlref{LINPLOT}{LINPLOT}]\mbox{}
+      \begin{itemize}
+        \item Parameter TEMPSTYLE is withdrawn.  The \texttt{+} syntax
+        should be used to set temporary style changes.
+      \end{itemize}
+
+      \item [\htmlref{LUCY}{LUCY}]\mbox{}
+      \begin{itemize}
+        \item A bug that prevented correct background removal when
+               Parameter BACK was null was excised.
+      \end{itemize}
+
+   \item [\htmlref{MFITTREND}{MFITTREND}]\mbox{}
+      \begin{itemize}
+        \item Has a new FOREST parameter, which improves spectral-line
+              masking in line forests using a smoothed mode rather than
+              the mean and a better estimate of the baseline noise.
+        \item A bug has been fixed preventing fits in the rare combination
+              of neither variance nor bad values being present, and without
+              masking of lines.  Bad variances are also now checked
+              before spline fitting.
+      \end{itemize}
+
+      \item [\htmlref{NDFCOPY}{NDFCOPY}]\mbox{}
+      \begin{itemize}
+        \item A bug has been fixed that prevented excess WCS axes from
+              being removed.
+      \end{itemize}
+
+      \item [\htmlref{NORMALIZE}{NORMALIZE}]\mbox{}
+      \begin{itemize}
+        \item Has two new parameters DRAWMARK and DRAWWIDTH that can be
+              used to exclude central markers and width indicator from
+              the plot.
+      \end{itemize}
+
+   \item [\htmlref{PROVSHOW}{PROVSHOW}]\mbox{}
+      \begin{itemize}
+        \item Has a new option SHOW=TREE, which allows the family tree to
+              be stepped through in an interactive manner, with the user
+              choosing which parent is to be displayed next.
+      \end{itemize}
+
+   \item [\htmlref{WCSADD}{WCSADD}]\mbox{}
+      \begin{itemize}
+        \item Has a new option MAPTYPE=REFNDF, which causes a copy of a
+              co-ordinate Frame read from a reference NDF to be added
+              into the modified NDF.
+        \item New parameter RETAIN allows control over whether or not the
+              new Frame becomes the current Frame in the modified NDF on
+              exit.
       \end{itemize}
 
 \end{description}

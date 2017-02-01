@@ -1,3 +1,18 @@
+1 KAPPA_Version_2.5
+
+   A new release of KAPPA is available in Starlink 2016A.  The main
+   changes are listed below.  For complete details of all
+   changes, see the "Release Notes" appendix in SUN/95.
+
+2 Modified_applications
+
+   o TRANDAT
+
+      -  Will now recognised the string "BAD" (case insensitive) within
+      the input text file and generate appropriate bad values in the output
+      NDF.
+
+
 1 KAPPA_Version_2.4
 
    A new release of KAPPA is available in Starlink 2016A.  The main
