@@ -1129,12 +1129,16 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
             }
 
 /* Find the mean and sigma of the samples now in the buffer. */
-            *pm = smf_sigmaclipD( (int)( pb - resbuf ), resbuf, wgtbuf, 0.0,
-                                  1, &sigma, status );
+            if( pb > resbuf ) {
+               *pm = smf_sigmaclipD( (int)( pb - resbuf ), resbuf, wgtbuf, 0.0,
+                                     1, &sigma, status );
 
 /* Update the thresholds for the next iteration. */
-            thr_lo = *pm - pdata->nsigma*sigma;
-            thr_hi = *pm + pdata->nsigma*sigma;
+               thr_lo = *pm - pdata->nsigma*sigma;
+               thr_hi = *pm + pdata->nsigma*sigma;
+            } else {
+                break;
+            }
          }
       }
 
