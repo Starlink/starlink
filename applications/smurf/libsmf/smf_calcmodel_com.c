@@ -1137,6 +1137,7 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
                thr_lo = *pm - pdata->nsigma*sigma;
                thr_hi = *pm + pdata->nsigma*sigma;
             } else {
+                *pm = VAL__BADD;
                 break;
             }
          }
