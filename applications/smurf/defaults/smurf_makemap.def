@@ -1912,18 +1912,21 @@ importsky = 0
 #-----------------------------------------------------------------
 #  Name: 	ipmodel
 #  Type: 	string
-#  Default: 	"pl2"
+#  Default: 	<undef>
 #  Purpose: 	Selects the Instrumental Polarisation model to use.
 #  Description: This parameter is only used when processing POL2 Q or U
 #               time-streams as created by SMURF:CALCQU, and if a value
 #               is supplied for ADAM parameter IPREF. It specifies the
 #               model to be used for IP corection. It can be "JK" for the
 #               Johnstone-Kennedy model based on analysis skydip data (see
-#               parameter "jkdata"), "PL1" for the first model based
-#               on analysis of planet data (see parameter "pl1data"),
-#               or "PL2" for the second model based on analysis of planet
-#               data (see parameter "pl2data").
-ipmodel = pl2
+#               parameter "jkdata"), or "PL1", "PL2" or "PL3" for the first,
+#               second or third model based on analysis of planet data
+#               (see the corresponding parameter "pl1data", "pl2data" or
+#               "pl3data"). If "ipmodel" is <undef>, the appropriate
+#               planetary model ("PL3" or "PL2") will be used depending
+#               on whether the supplied IP reference map was created from
+#               POL2 data, or non-POL2 data.
+ipmodel = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	itermap
@@ -2428,10 +2431,26 @@ pl1data = ( 3.288E-3, 2.178E-2, -1.156E-2 )
 #               fourth value (D) gives the angle between the IP and the
 #               elevation axis, in radians. The PL2 model assumes that the
 #               IP is at a constant angle to the elevation axis at all
-#               elevations (given by D). Only used when processing POL2 Q or
-#               U time-streams as created by SMURF:CALCQU, and if parameter
-#               "ipmodel" is set to "PL2".
+#               elevations (given by D). The values of the "PL2" model should
+#               be used if the IP reference map was created from non-POL2 data.
+#               Otherwise, the "PL3" model should be used. Only used when
+#               processing POL2 Q or U time-streams as created by SMURF:CALCQU,
+#               and if parameter "ipmodel" is set to "PL2".
 pl2data = ( 4.021E-3, 2.263E-2, -1.243E-2, -3.361E-2 )
+
+#-----------------------------------------------------------------
+#  Name: 	pl3data
+#  Type: 	float[4]
+#  Default: 	( 2.624E-3, 4.216E-2, -2.410E-2, -3,400E-2 )
+#  Purpose: 	The numerical parameters of the PL3 IP model for POL2 data.
+#  Description: This should be a vector of four values. See parameter
+#               "pl2data" for the meaning of these values. The values of
+#               the "PL3" model should be used if the IP reference map
+#               was created from POL2 data. Otherwise, the "PL2" model
+#               should be used. This parameter is only used when processing
+#               POL2 Q or U time-streams as created by SMURF:CALCQU, and if
+#               parameter "ipmodel" is set to "PL3".
+pl3data = ( 2.624E-3, 4.216E-2, -2.410E-2, -3,400E-2 )
 
 #-----------------------------------------------------------------
 #  Name: 	pln.notfirst

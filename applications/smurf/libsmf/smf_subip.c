@@ -89,6 +89,10 @@
 *        with POL2 in the beam it needs to be corrected for the expected POL2
 *        degradation factor (1.35 at 850 um) before being used.
 *        - Report an error if 450 um data supplied.
+*     8-FEB-2017 (DSB):
+*        Added model PL3 for use with IP reference maps that are created
+*        from POL2 data and thus have the same FCF as the Q and U data
+*        being corrected.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -131,6 +135,7 @@
 #define JK 0
 #define PL1 1
 #define PL2 2
+#define PL3 3
 
 /* Prototypes for local static functions. */
 static void smf1_subip( void *job_data_ptr, int *status );
@@ -311,14 +316,8 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
       }
    }
 
-/* See what form of IP model to use. */
-   astMapGet0C( keymap, "IPMODEL", &ipmodel );
-
 /* If we are applying IP correction... */
    if( qu && ( *qui == 1 || *qui == -1 ) && *status == SAI__OK ) {
-      msgOutf( "", "smf_subip: applying instrumental polarisation %s "
-               "correction based on total intensity map `%s' and IP model '%s'.",
-               status, qu, ipref, ipmodel );
 
 /* Get the value of the POLNORTH FITS keyword from the supplied header. */
       if( !astGetFitsS( data->hdr->fitshdr, "POLNORTH", &polnorth ) &&
@@ -361,6 +360,16 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
 
 /* Annul the NDF identifier. */
       ndfAnnul( &imapndf, status );
+
+/* See what form of IP model to use, and tell the user. If the user does
+   not specify an IP model, use "PL2" if the IP reference as created from
+   non-POL2 data and "PL3" otherwise. */
+      if( !astMapGet0C( keymap, "IPMODEL", &ipmodel ) ) {
+         ipmodel = polref ? "PL3" : "PL2";
+      }
+      msgOutf( "", "smf_subip: applying instrumental polarisation %s "
+               "correction based on total intensity map `%s' and IP model '%s'.",
+               status, qu, ipref, ipmodel );
 
 /* Create structures used to pass information to the worker threads. */
       nw = wf ? wf->nworker : 1;
@@ -450,7 +459,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
                errRep( "", "smf_subip: Bad dimensions for ^N - should be 32x40.", status );
             }
 
-/* If using the "PL1" or "PL2" model... */
+/* If using the "PL1", "PL2" or "PL3" model... */
          } else {
             p0data = NULL;
             p1data = NULL;
@@ -459,9 +468,22 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
             if( astChrMatch( ipmodel, "PL1" ) ) {
                model = PL1;
                astMapGet1D( keymap, "PL1DATA", 3, &nval, pldata );
-            } else {
+            } else if( astChrMatch( ipmodel, "PL2" ) ) {
                model = PL2;
                astMapGet1D( keymap, "PL2DATA", 4, &nval, pldata );
+            } else {
+               model = PL3;
+               astMapGet1D( keymap, "PL3DATA", 4, &nval, pldata );
+            }
+
+/* If the PL model is appropriate for the IP reference data (i.e. "PL2" with
+   non-POL2 IP map or "PL3" with POL2 IP map), then we use a degradation factor
+   of 1.0 since any required degradation is already included in the model
+   coefficients. */
+            if( ( polref && model == PL3 ) || ( !polref && model == PL2 ) ) {
+               degfac = 1.0;
+            } else if( !polref && model == PL3 ) {
+               degfac = 1.0/degfac;
             }
          }
 
@@ -504,7 +526,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
             pdata->pldata = pldata;
             pdata->model = model;
             pdata->oper = 1;
-            pdata->degfac = polref ? degfac : 1.0;
+            pdata->degfac = degfac;
 
 /* Submit the job for execution by the next available thread. */
             thrAddJob( wf, 0, pdata, smf1_subip, 0, NULL, status );
@@ -649,12 +671,12 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
                   cc = 2*( c0 + angc )*AST__DD2R;
                   cd = 0.0;
 
-            } else {         /* "PL1" or "PL2" model */
+            } else {         /* "PL1", "PL2" or "PL3" model */
                p1 = VAL__BADD;
                ca = pdata->pldata[0];
                cb = pdata->pldata[1];
                cc = pdata->pldata[2];
-               cd = ( pdata->model == PL2 ) ? pdata->pldata[3] : 0.0;
+               cd = ( pdata->model != PL1 ) ? pdata->pldata[3] : 0.0;
                bad = ( ca == VAL__BADD || cb == VAL__BADD ||
                        cc == VAL__BADD || cd == VAL__BADD );
 
@@ -701,13 +723,13 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
 
 /* Find the normalised instrumental Q and U. These are with respect to the
    focal plane Y axis. */
-                        if( pdata->p0data ) {       /* "JK" model */
+                        if( pdata->p0data ) {       /* JK model */
                            qfp = ca + p1*cos( cc + 2*state->tcs_az_ac2 );
                            ufp = cb + p1*sin( cc + 2*state->tcs_az_ac2 );
-                        } else {                    /* "PL1" or "PL2" model */
+                        } else {                    /* PL1, PL2 or PL3 model */
                            p1 = ca + cb*state->tcs_az_ac2 + cc*state->tcs_az_ac2*state->tcs_az_ac2;
                            angle = state->tcs_az_ac2;
-                           if( pdata->model == PL2 ) angle -= cd;
+                           if( pdata->model != PL1 ) angle -= cd;
                            angle *= -2;
                            qfp = p1*cos( angle );
                            ufp = p1*sin( angle );
