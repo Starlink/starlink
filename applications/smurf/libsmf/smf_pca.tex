@@ -1,0 +1,148 @@
+\documentclass{article}
+\usepackage{amsmath}
+\renewcommand{\vec}[1]{\underline{#1}}
+
+\begin{document}
+\title{Description of the algorithm used by \texttt{smf\_pca}}
+\author{David S Berry}
+\maketitle
+
+If we have $N_b$ usable bolometers, each with $N_t$ time slices, first form
+the correlation matrix, $C$ - a square symmetric $(N_b,N_b)$ matrix in which element
+$(i,j)$ is the coefficient of correlation between bolometers $i$ and $j$.
+To do this we first \emph{standardise} the bolometer data values so that each
+bolometer has mean zero and standard deviation 1.0:
+
+\begin{equation*}
+d_{standardised}^{tb} = \frac{( d^{tb} - mean^b )}{\sigma^b}
+\end{equation*}
+
+where $d^{tb}$ is the value of bolometer $b$ at time slice $t$, $mean^b$ is
+the mean of the data values for bolometer $b$ and $\sigma^b$ is the
+standard deviation of the data values for bolometer $b$. Note, when
+finding these mean and standard deviation values, samples that fall
+within source regions are ignored. Element $i,j$ of the correlation matrix
+is then given by:
+
+\begin{equation*}
+C_{ij} = \frac{1}{N'_t-1}.\sum_{t=0}^{N_t} d_{standardised}^{ti}.d_{standardised}^{tj}
+\end{equation*}
+
+Again, samples that fall within source regions are excluded from the
+above sum, and $N'_t$ is the number of time slices that do \emph{not}
+fall within source regions.
+
+
+Singular Value Decomposition (function \texttt{smf\_svd}) is then used to find the
+eigenvalues ($L$) and eigenvectors ($V$) of matrix $C$:
+
+\begin{equation*}
+C = V.L.V^T
+\end{equation*}
+
+The eigenvectors returned by \texttt{smf\_svd} are of unit length and are
+sorted so that the corresponding eigenvalues are monotonic decreasing. So
+the first eigenvector holds the ratios of the standardised bolometer values
+corresponding to the strongest correlation in the data. Each eigenvector
+is returned by \texttt{smf\_svd} in a single row (i.e. a contiguous group
+of elements) of array ``\texttt{c}''. Thus if there are three bolometers,
+$b$ is the bolometer index and $k$ is the eigenvector (i.e. component)
+index, then the elements $V_b^k$ of the eigenvector matrix $\vec{V}$ are
+returned by \texttt{smf\_svd} in an array in the following order:
+
+\begin{equation*}
+[ V_0^0, V_1^0, V_2^0, V_0^1, V_1^1, V_2^1, V_0^2, V_1^2, V_2^2 ]
+\end{equation*}
+
+An eigenvector corresponds to a ``principal axis'' in PCA. If you imagine
+an $N_b$-dimensional space where each axis corresponds to the standardised
+value of a single bolometer then a principal axis is a unit vector within this space,
+indicating the relative standardised bolometer values corresponding to a principal
+component. A ``principal component'' is the projection of the $N_t$ time slices
+(each of which can be thought of as a single position in the $N_b$-space) onto the
+principal axis. Thus a principal component is a time-stream containing $N_t$
+standardised values for a notional ``bolometer'' corresponding to the principal axis.
+
+The eigenvalue associated with an eigenvector indicates the degree to
+which the bolometer time streams are correlated to the corresponding
+principal component. In fact, from empirical experiment, it seems that if
+$c_i$ is the coefficient of correlation between the time-stream for bolometer
+$i$ and a specific principal component, then the eigenvalue $ev$ is:
+
+\begin{equation*}
+ev = \sum_{i=0}^{N_b}c_i^2
+\end{equation*}
+
+So if $c_{rms}$ is the RMS of the $c_i$ values,
+$c_{rms} = \sqrt{\frac{\sum_{i=0}^{N_b}c_i^2}{N_b}}$ then
+
+\begin{equation*}
+ev = N_b.c_{rms}^2
+\end{equation*}
+
+The $c_{rms}$ value represents a ``typical'' correlation between the
+principal component and the $N_b$ bolometer time-streams, in the range
+$0.0$ to $1.0$. Thus if the user supplies a $c_{rms}$ value, it can be
+converted to an $ev$ value and used to identify the principal components
+that are to be removed (all principal components with corresponding
+eigenvalues above $ev$ are removed).
+
+To remove a correlated component from all bolometer time streams, we
+would do the following:
+
+\begin{verbatim}
+- loop round all time slices:
+   - Form a vector from the usable bolometer standardised values at
+     the current time slice
+   - Find the dot product of this vector with the eigenvector
+     representing the strongest correlation. This gives you the
+     length of the projection of the bolometer value vector in
+     the direction of the eigenvector.
+   - Multiply the eigenvector by the value of this dot product
+   - Loop round all elements of the eigenvector:
+     - Multiply the vector element (a standardised bolometer value)
+       by the $\sigma_b$ value for the bolometer to un-standardise it
+     - Subtract the un-standardised value from the original bolometer
+       value
+\end{verbatim}
+
+Other components of the data  (i.e. correlations) can be removed in the same way,
+using a different vector $V^k$ in place of the first vector $V^0$. The process
+can be described by the following equation:
+
+\begin{equation*}
+\vec{D_t} = \vec{d_t} - \vec{\sigma}.(\vec{d'_t}.\vec{V_k}).\vec{V_k}
+\end{equation*}
+
+where $\vec{d_t}$ is the vector of $N_b$ bolometer values at time slice
+$t$ before correction, $\vec{D_t}$ is the equivalent vector of corrected
+bolometer values, $k$ is the component index (in the range 0 to
+$N_b-1$), and $\vec{\sigma}$ is a diagonal $(N_b,N_b)$ matrix containing
+the $\sigma_b$ values on the diagonal. To remove the strongest $N_k$ components,
+this becomes:
+
+\begin{equation}
+\label{eq:1}
+\vec{D_t} = \vec{d_t} - \vec{\sigma}.\sum_{k=0}^{N_k-1}( (\vec{d'_t}.\vec{V_k}).\vec{V_k} )
+\end{equation}
+
+Flux from astronomical sources will confuse things because such flux is
+not well correlated across bolometers, since different bolometers will
+see the source at different times. For strong sources this will make it
+difficult the measure the underlying genuine correlations. One way to
+reduce this problem is to exclude source samples when evaluating the
+correlation matrix, $C$. The resulting gaps in the bolometer time streams
+do not need to be filled with artificial interpolated data values, since
+the values in the correlation matrix do not depend on the relative
+position in time or space of the bolometer samples. However, the gaps
+\emph{should} be filled when using the time streams to form the dot
+products in the above equation. This is because forming the dot product
+requires a full set of $N_b$ bolometer samples (since the $V$ vectors all
+contain $N_b$ elements). Using the original unmasked data values would be
+inappropriate since the strong source flux would bias the value of the
+dot product. A prime is used ($\vec{d'_t}$) above to indicate the
+time-streams that are are masked and gap-filled to remove astronomical
+flux. Having found the correction, it should be removed from the original,
+non-masked, time-stream ($\vec{d_t}$).
+
+\end{document}
