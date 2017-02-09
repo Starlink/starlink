@@ -1,0 +1,319 @@
+\documentclass[twoside,11pt]{starlink}
+\usepackage{graphicx}
+\usepackage{pdfpages}
+\usepackage{float}
+\usepackage[labelformat=empty]{subfig}
+\usepackage[font=footnotesize]{caption}
+
+\stardocauthors     {D.S. Berry }
+\stardocdate        {26th January 2017}
+\stardoctitle       {POL-2 data reduction using POL2MAP}
+\stardocversion     {V1.0}
+\stardocabstract    {CURENTLY UNDER CONSTRUCTION \\ A description and analysis of the SMURF:POL2MAP command}
+
+\begin{document}
+\scfrontmatter
+
+\section{Introduction}
+The \texttt{pol2map} command within the Starlink SMURF package creates a
+vector catalogue from one or more POL2 observations.  In addition, it can
+also create maps of Q, U and I --- both for individual observations and for
+the co-add of all supplied observations. It accepts either raw data or
+partially processed data (\emph{i.e.} Q/U/I time-streams or maps for
+individual observations) as input, and will apply the required processing
+to each input file to create the final catalogue.
+
+Processing of POL2 data requires a total intensity (I) map for two reasons:
+
+\begin{enumerate}
+\item To define the level of Instrumental Polarisation (IP) expected at
+each point on the sky. By default, \texttt{pol2map} evaluates and removes
+this IP from
+the Q and U data before creating Q and U map for each individual observation.
+\item To normalise the polarised intensity values determined from the Q
+and U maps to create fractional polarisation values.
+\end{enumerate}
+
+Previous methods for reducing POL2 data have usually used a total
+intensity map created from one or more standard SCUBA-2 observations
+(\emph{i.e.} without POL2 in the beam). However, maps created from
+such observations have markedly different characteristics to maps created
+from POL2 observations, due to the use of very different scanning
+strategies and data reduction methods. For instance, the spatial
+frequencies present in the maps are notably different, with POL2 maps
+typically containing far less extended structure. Also, the Flux
+Conversion Factor (FCF) used to convert power in pW into flux in Jy are
+different, leading to the flux within a POL2 map being underestimated
+compared to a standard SCUBA-2 map\footnote{In previous POL2 data
+reduction, an attempt to correct for this difference in FCF was made
+based on a fixed \emph{degradation} factor. This factor was determined
+by making maps from standard SCUBA-2 observations both with and without
+POL2 in the beam (but not spinning), and comparing the flux levels seen
+in these maps. However, this method does not take into account any change
+in FCF caused by the difference in data reduction for POL2 and non-POL2
+observations, or the difference in scanning speed, and so is not
+necessarily accurate.}.
+
+To avoid these issues, the \texttt{pol2map} command uses an I map created
+directly from the supplied POL2 observations themselves. It uses exactly
+the same map-making procedure to create all three maps --- I, Q and U --- and
+so ensures that the FCFs and spatial frequencies present in the three maps are
+all consistent.
+
+In addition, the \texttt{pol2map} command uses different filtering and
+masking within the map-making process compared to previous POL2 data reduction
+methods, which results in a roughly 20 \% drop in noise within the Q and U
+maps and noticeably flatter backgrounds.
+
+The extended functionality and improved results provided by
+\texttt{pol2map} are bought at the cost of much greater run time. It can
+take anywhere up to 3 hours per observation to run \texttt{pol2map} on a
+typical SCUBA-2 capable personal computer, depending on the nature of the
+observation.
+
+\section{How to use \texttt{pol2map}}
+
+\subsection{Getting more information about \texttt{pol2map} parameters}
+As with the other Python scripts in SMURF, you can get more information
+about the available parameters by doing either:
+
+\begin{quote}
+\begin{verbatim}
+% pol2map --help
+\end{verbatim}
+\end{quote}
+
+or
+
+\begin{quote}
+\begin{verbatim}
+% smurfhelp pol2map
+\end{verbatim}
+\end{quote}
+
+
+
+\subsection{Starting from raw data - extended sources\label{se1}}
+This section describes how to use \texttt{pol2map} to create I, Q and U
+maps, plus a vector catalogue, from the raw data files for a set of one
+or more POL2 observations of an extended source.
+
+\begin{description}
+\item[Step 1]:  Create a text file listing all the raw data files for all
+the observations to be included in the catalogue. Each line in the file
+should contain the path to a single file, or wild-card template - the
+wild-cards $*$ and $?$ are accepted. For instance:
+\begin{quote}
+\begin{verbatim}
+% more infiles
+/data/scuba2/s8?/20150716/00021/*
+/data/scuba2/s8?/20150716/00023/*
+/data/scuba2/s8?/20150914/00022/*
+\end{verbatim}
+\end{quote}
+
+\item[Step 2]:  Run \texttt{pol2map} to create an initial I map from
+the raw data files listed in your text file. The analysed intensity
+values in the raw data time-streams are first converted into Q, U and I
+time-streams using \texttt{smurf:calcqu} (these are stored for future use
+in the directory \texttt{qudata}, specified by the \texttt{qudir}
+parameter in the example command below). The \texttt{smurf:makemap} command is then used to create a
+separate map from the I time-stream for each observation, using SNR-based
+``auto-masking'' to define the background regions that are to be set to
+zero at the end of each iteration. These maps are stored for future use
+in the directory \texttt{maps}, specified by the
+\texttt{mapdir} parameter in the example command below. Each map has a name of the form
+\texttt{<UT\_DATE>\_<OBS\_NUM>\_<CHUNK\_NUM>\_imap.sdf}, where
+\texttt{<CHUNK\_NUM>} indicates the raw data file at the start of the
+contiguous chunk of data used to create the map, and is usually \texttt{0003}.
+Each of these maps is compared to the specified reference map (if any)
+to determine a pointing correction to be applied to the observation in
+future\footnote{These pointing corrections are stored in the FITS header of
+the maps created by \texttt{pol2map}.}. If no reference map is supplied, the I map created from the
+first observation defines the expected source position, and is compared
+with later maps to determine their pointing corrections. The reference map also
+defines the output pixel grid, allowing direct pixel-by-pixel comparison between
+each map created by \texttt{pol2map} and the reference map. If supplied,
+the reference map should usually be a standard SCUBA-2 map of the region,
+but little is lost by omitting the reference map parameter (REF).
+Finally, all the individual observation I maps are co-added to form the returned
+total I map, \texttt{iauto.sdf}, specified by parameter \texttt{iout}.
+\begin{quote}
+\begin{verbatim}
+% smurf
+% pol2map in=^infiles iout=iauto qout=! uout=! mapdir=maps qudir=qudata
+...
+...
+% ls
+iauto.sdf infiles maps/ pol2map.log qudata/
+
+% ls maps
+20150716_00021_0003_imap.sdf  20150716_00023_0003_imap.sdf
+20150914_00022_0003_imap.sdf
+
+% ls qudata
+s8a20150716_00021_0003_IT.sdf s8a20150716_00021_0003_QT.sdf
+s8a20150716_00021_0003_UT.sdf s8a20150716_00023_0003_IT.sdf
+s8a20150716_00023_0003_QT.sdf s8a20150716_00023_0003_UT.sdf
+s8a20150914_00022_0003_IT.sdf s8a20150914_00022_0003_QT.sdf
+s8a20150914_00022_0003_UT.sdf
+\end{verbatim}
+\end{quote}
+
+\item[Step 3]:  Re-run \texttt{pol2map} again, this time creating an
+improved I map. The I time-streams created by the previous step, and stored
+in directory \texttt{qudata}, are supplied as input instead of the raw data
+files, thus avoiding the need to re-run \texttt{calcqu}. A new I map is
+created from each observation, using the initial ``auto-masked'' map created
+above (\texttt{iauto.sdf}) to define the background regions that are to be set
+to zero at the end of each iteration. In addition, the pointing corrections
+determined from the maps created in step 1 are applied during the map-making
+process, resulting in better alignment of the resulting new maps. The
+background estimation is done more slowly, with smaller iterative steps,
+in order to achieve lower noise than the ``auto-masked'' I map - this
+results in this step taking significantly longer to run than step 2. The new
+I maps are placed in the same directory (\texttt{maps}) as the old I
+maps, but are distinguished from them by using an upper case ``I'' in
+their names (\emph{e.g.} \texttt{20150716\_00021\_0003\_Imap.sdf}). Finally,
+all these individual I maps are co-added to form the improved total I map,
+\texttt{iext.sdf} (the ``externally-masked'' map), specified by parameter
+\texttt{iout}.
+
+\begin{quote}
+\begin{verbatim}
+% pol2map in=qudata/\* iout=iext qout=! uout=! mapdir=maps mask=iauto
+...
+...
+% ls
+iauto.sdf iext.sdf infiles maps/ pol2map.log pol2map.log.1 qudata/
+
+% ls maps
+20150716_00021_0003_imap.sdf  20150716_00023_0003_imap.sdf
+20150914_00022_0003_imap.sdf  20150716_00021_0003_Imap.sdf
+20150716_00023_0003_Imap.sdf  20150914_00022_0003_Imap.sdf
+
+\end{verbatim}
+\end{quote}
+
+\item[Step 4]:  Re-run \texttt{pol2map} again, this time creating Q and U
+maps and the final vector catalogue. This process again starts from the
+time-streams created by step 1, and stored in directory \texttt{qudata}.
+It uses the same auto-masked map, \texttt{iauto.sdf}, to define the
+background regions that are to be set to zero at the end of each
+iteration. Thus the final I, Q and U maps are all created with the same
+zeroed background regions. In addition, the same slower estimate of the
+background is used as in step 3, and the same pointing corrections are
+also re-used. Correction for instrumental polarisation is performed,
+based on the total intensity map created by step 3 (\texttt{iext.sdf}).
+The Q and U maps for individual observations are placed in the same
+directory (\texttt{maps}) as the I maps, and have names of the same form
+as the I maps except that ``I'' is replaced by ``Q'' or ``U''. Finally,
+all the individual Q and U maps are co-added to form the final Q and U
+maps, \texttt{qext.sdf} and \texttt{uext.sdf}, specified by parameters
+\texttt{qout} and \texttt{uout}. The three equivalent maps -
+\texttt{iext.sdf}, \texttt{qext.sdf} and \texttt{uext.sdf} are then used
+to create the final vector catalogue, which is placed in file
+\texttt{mycat.FIT}. The vectors are de-biased to remove statistical
+biasing in low SNR regions.
+
+\begin{quote}
+\begin{verbatim}
+% pol2map in=qudata/\* iout=! qout=qext uout=uext mapdir=maps mask=iauto \
+          ipref=iext cat=mycat debias=yes
+...
+...
+% ls
+iauto.sdf iext.sdf infiles maps/ mycat.FIT pol2map.log pol2map.log.1
+pol2map.log.2 qext.sdf qudata/ uext.sdf
+
+% ls maps
+20150716_00021_0003_Imap.sdf 20150716_00021_0003_Qmap.sdf
+20150716_00021_0003_Umap.sdf 20150716_00021_0003_imap.sdf
+20150716_00023_0003_Imap.sdf 20150716_00023_0003_Qmap.sdf
+20150716_00023_0003_Umap.sdf 20150716_00023_0003_imap.sdf
+20150914_00022_0003_Imap.sdf 20150914_00022_0003_Qmap.sdf
+20150914_00022_0003_Umap.sdf 20150914_00022_0003_imap.sdf
+
+\end{verbatim}
+\end{quote}
+
+
+\end{description}
+
+\subsection{Starting from pre-calculated I, Q and U time-streams}
+If you have a set of pre-calculated I, Q and U time-streams for one or
+more observations in a directory called \texttt{qudata}, you can use them
+to create co-added  I, Q and U maps, plus a vector catalogue, by
+following the procedure described in section \ref{se1} starting at step
+2, but specifying the files in \texttt{qudata} as input, instead of the
+raw data files:
+\begin{quote}
+\begin{verbatim}
+% smurf
+% pol2map in=qudata/\* iout=iauto qout=! uout=! mapdir=maps
+\end{verbatim}
+\end{quote}
+Subsequent steps are as described in section \ref{se1}.
+
+
+\subsection{Continuing an interupted run of \texttt{pol2map}}
+If for any reason a run of \texttt{pol2map} is interupted, you can
+continue it from where it left off, rather than starting again at the
+beginning. To do this, first identify and delete any output files that were
+created by the previous run of \texttt{pol2map} but which are unusable
+for any reason. Output files are placed the directories specified by the
+two parameters \texttt{mapdir} and \texttt{qudir}. To check if they are
+usable, try accessing them in some simple way such as getting their
+statistics:
+\begin{quote}
+\begin{verbatim}
+% kappa
+% stats qudata/\*
+% stats maps/\*
+\end{verbatim}
+\end{quote}
+
+An error wiull be reported by the \texttt{stats} command for any NDFs
+that are corrupt (\emph{e.g.} because \texttt{makemap} or \texttt{calcqu}
+terminated mid-way). Any such NDFs should be deleted.
+
+The next step depends on the value you supply for the boolean parameter
+\texttt{reuse} when re-running \texttt{pol2map}. If you accept the
+default value (\texttt{yes}), then you can re-run \texttt{pol2map} with the
+same list of input data files as before. In this case, the script will
+identify any output files that already exist in the two output directories
+and use the existing files directly rather than re-creating them from the
+corresponding input files. If you set the \texttt{reuse} parameter to
+\texttt{no} when re-running \texttt{pol2map}, any pre-existing output files
+will be ignored and new output files will be created from the
+corresponding input files using \texttt{makemap} or \texttt{qudir}.
+them in the list of input files assigned to parameter \texttt{in}.
+
+\subsection{Adding in new observations}
+This section describes how to add data for one or more new POL2
+observations into existing I, Q and U maps and vector catalogue created
+by an earlier run of \texttt{pol2map}.
+
+
+\subsection{Compact sources}
+This section describes how to use \texttt{pol2map} to create maps of compact
+sources.
+
+\subsection{Checking individual observations}
+This section describes how to examine and verify maps made from individual POL2
+observations, and how to re-make the co-added I, Q U maps and vector catalogue to
+exclude any bad observations.
+
+
+
+
+
+
+
+\section{A description of the processing performed by \texttt{pol2map}}
+
+
+\section{Example results from \texttt{pol2map} compared to \texttt{pol2scan}}
+%\includepdf[pages={-}]{all.pdf}
+
+\end{document}
