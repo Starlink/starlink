@@ -94,7 +94,8 @@
 *        covered by the observations in OBSLIST. It is assumed that the
 *        object is centred at the reference point in the map. The
 *        supplied map is resampled to to give it the pixel size specified
-*        by parameter PIXSIZE.
+*        by parameter PIXSIZE. If a null value(!) is supplied, the total
+*        intensity is determined from the POL2  data itself.
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -204,6 +205,11 @@
 *        Updated the model from PL1 to PL2. PL2 allows the IP to be at a
 *        fixed angle relative to the elavation axis. The PL1 model forced
 *        the IP to be parallel to the elevation axis.
+*     8-FEB-2017 (DSB):
+*        - Use the pol2map circle-masked config when creating the maps,
+*        except that no COM model is used.
+*        - Add option to base the total intensity values on the POL2 data
+*        instead of an external map.
 *-
 '''
 
@@ -248,8 +254,10 @@ elist = []
 alist = []
 qlist = []
 ulist = []
+ilist = []
 dqlist = []
 dulist = []
+dilist = []
 utlist = []
 obsnumlist = []
 wvmlist = []
@@ -428,9 +436,9 @@ def objfun(x):
    swgt = 0.0
    for i in range(len(elist)):
       (qfp,ufp) = model( i, x )
-      qwgt = 1/(dqlist[i]*dqlist[i])
+      qwgt = 1/(dqlist[i]*dqlist[i]*wvmlist[i])
       dq = qfp - qlist[i]
-      uwgt = 1/(dulist[i]*dulist[i])
+      uwgt = 1/(dulist[i]*dulist[i]*wvmlist[i])
       du = ufp - ulist[i]
       res += qwgt*dq*dq + uwgt*du*du
       swgt += qwgt+uwgt
@@ -444,10 +452,10 @@ def resid( useq, x ):
    for i in range(len(elist)):
       (qfp,ufp) = model( i, x )
       if useq:
-         wgt = 1/(dqlist[i]*dqlist[i])
+         wgt = 1/(dqlist[i]*dqlist[i]*wvmlist[i])
          dqu = qfp - qlist[i]
       else:
-         wgt = 1/(dulist[i]*dulist[i])
+         wgt = 1/(dulist[i]*dulist[i]*wvmlist[i])
          dqu = ufp - ulist[i]
       swgt += wgt
       res += wgt*dqu*dqu
@@ -505,7 +513,7 @@ try:
    params = []
 
    params.append(starutil.Par0S("OBSLIST", "List of POL2 observations"))
-   params.append(starutil.ParNDG("IREF", "The reference I map",
+   params.append(starutil.ParNDG("IREF", "The reference I map", None,
                                  minsize=0, maxsize=1 ))
    params.append(starutil.Par0F("DIAM", "Aperture diameter (arc-sec)",
                                  40.0, noprompt=True ))
@@ -517,6 +525,8 @@ try:
                                  noprompt=True))
    params.append(starutil.Par0S("QUDIR", "Directory containing "
                                 "pre-existing Q/U data", None, noprompt=True))
+   params.append(starutil.Par0S("MAPDIR", "Directory containing "
+                                "pre-existing Q/U maps", None, noprompt=True))
    params.append(starutil.Par0S("TABLE", "Output table holding raw and fitted "
                                 "Q/U values", None, noprompt=True))
    params.append(starutil.Par0S("TABLEIN", "Input table holding raw "
@@ -559,6 +569,7 @@ try:
 
 #  Get the directory to store Q/U files.
       qudir = parsys["QUDIR"].value
+      mapdir = parsys["MAPDIR"].value
 
 #  The user-supplied pixel size.
       pixsize = parsys["PIXSIZE"].value
@@ -591,15 +602,42 @@ try:
          raise UsageError( "Environment variable STARLINK_DIR is undefined.")
       star = os.environ["STARLINK_DIR"]
 
-#  Create a config file to use with makemap. We use the standard POL2
-#  compact source condif, except we include "pol2fp=1". This is because
+#  Create a config file to use with makemap. We use the same circle-masked
+#  config used by pol2map, except we include "pol2fp=1". This is because
 #  calcqu creates the Q and U values in focal plane coords. makemap
 #  normally reports an error when supplied with Q/U values in focal plane
-#  coords - including "pol2fp=1" prevents this.
+#  coords - including "pol2fp=1" prevents this. We also omit the COM
+#  model (used by pol2map), since its inclusion here seems to increase
+#  the noise in the fit.
       conf = os.path.join(NDG.tempdir,"conf")
       fd = open(conf,"w")
-      fd.write("^{0}/share/smurf/dimmconfig_pol2_compact.lis\n".format(star))
+      fd.write("^{0}/share/smurf/.dimmconfig_pol2.lis\n".format(star))
       fd.write("pol2fp=1\n")
+
+      fd.write("numiter = -100\n")
+      fd.write("modelorder = (pca,ext,flt,ast,noi)\n")
+
+      fd.write("maptol = 0.04\n")
+      fd.write("maptol_mask = <undef>\n")
+      fd.write("maptol_mean = 0\n")
+      fd.write("maptol_box = 60\n")
+      fd.write("maptol_hits = 1\n")
+
+      fd.write("pca.pcathresh = 0.04\n")
+      fd.write("pca.pcathresh_freeze=0.1\n")
+      fd.write("ast.mapspike_freeze = 5\n")
+      fd.write("pca.zero_niter = 0.2\n")
+      fd.write("com.zero_niter = 0.2\n")
+      fd.write("flt.zero_niter = 0.2\n")
+
+      fd.write("ast.zero_circle = (0.0083)\n")
+      fd.write("pca.zero_circle = (0.0083)\n")
+      fd.write("com.zero_circle = (0.0083)\n")
+      fd.write("flt.zero_circle = (0.0083)\n")
+
+      if os.path.isfile("pol2ip_conf"):
+         fd.write("^pol2ip_conf\n")
+
       fd.close()
 
 #  If restarting, load the parameter values used by this script in the
@@ -637,36 +675,54 @@ try:
          except starutil.StarUtilError:
             raw = None
 
-#  Create Q and U time streams from the raw analysed intensity time
+#  Get the directory containing any pre-existing maps. New maps are also
+#  placed here.
+         if mapdir:
+            mappath = "{0}/{1}".format( mapdir, obs )
+         else:
+            mappath = "{0}/{1}".format( NDG.tempdir, obs )
+
+         if not os.path.isdir(mappath):
+            os.makedirs(mappath)
+
+#  We do not need to run calcqu or makemap if we already have the maps.
+         qmapfile = "{0}/qmap.sdf".format(mappath)
+         umapfile = "{0}/umap.sdf".format(mappath)
+         imapfile = "{0}/imap.sdf".format(mappath)
+         if ( ( iref is None and not os.path.exists( imapfile ) ) or
+              not os.path.exists( qmapfile ) or
+              not os.path.exists( umapfile ) or newpixsize ):
+
+#  Create Q, U and I time streams from the raw analysed intensity time
 #  streams. These Q and U values use the focal plane Y axis as the reference
-#  direction. The Q and U files are placed into a subdirectory of the NDG
+#  direction. The Q , U and I files are placed into a subdirectory of the NDG
 #  temp directory. If the directory already exists, then re-use the files
 #  in it rather than calculating them again.
-         if qudir:
-            obsdir = "{0}/{1}".format( qudir, obs )
-         else:
-            obsdir = "{0}/{1}".format( NDG.tempdir, obs )
+            if qudir:
+               obsdir = "{0}/{1}".format( qudir, obs )
+            else:
+               obsdir = "{0}/{1}".format( NDG.tempdir, obs )
 
-         if not os.path.isdir(obsdir):
-            if not raw:
-               raise UsageError( "Cannot find raw SCUBA-2 data.")
-            os.makedirs(obsdir)
-            invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config=def outq={1}/\*_QT "
-                   "outu={1}/\*_UT fix=yes north=!".format( raw, obsdir ) )
-         else:
-            msg_out("Re-using pre-calculated Q and U time streams for {0}.".format(obs))
+            if not os.path.isdir(obsdir):
+               if not raw:
+                  raise UsageError( "Cannot find raw SCUBA-2 data.")
+               os.makedirs(obsdir)
+               invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config=def outq={1}/\*_QT "
+                      "outu={1}/\*_UT outi={1}/\*_IT fix=yes north=!".
+                       format( raw, obsdir ) )
+            else:
+               msg_out("Re-using pre-calculated Q, U and I time streams for {0}.".format(obs))
 
-#  Make maps from the Q and U time streams. These Q and U values are with
-#  respect to the focal plane Y axis, and use (az,el) as the WCS axes. Set
+#  Make maps from the Q, U and (if required) I time streams. These Q and U values are
+#  with respect to the focal plane Y axis, and use (az,el) as the WCS axes. Set
 #  CROTA to zero to ensure that the Y axis corresponds to elevation.
-         mapfile = "{0}/qmap.sdf".format(obsdir)
-         if not os.path.exists( mapfile ) or newpixsize:
+         if not os.path.exists( qmapfile ) or newpixsize:
             qts = NDG( "{0}/*_QT".format( obsdir ) )
-            qmap = NDG( mapfile, False )
+            qmap = NDG( qmapfile, False )
             invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} {3} "
                    "system=azel crota=0".format(qts,conf,qmap,pixsizepar))
          else:
-            qmap = NDG( mapfile, True )
+            qmap = NDG( qmapfile, True )
             msg_out("Re-using pre-calculated Q map for {0}.".format(obs))
 
          invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(qmap) )
@@ -678,14 +734,13 @@ try:
                               format(qmap,actpixsize,actpixsize0))
 
 
-         mapfile = "{0}/umap.sdf".format(obsdir)
-         if not os.path.exists( mapfile ) or newpixsize:
+         if not os.path.exists( umapfile ) or newpixsize:
             uts = NDG( "{0}/*_UT".format( obsdir ) )
-            umap = NDG( mapfile, False )
+            umap = NDG( umapfile, False )
             invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} {3} "
                    "system=azel crota=0".format(uts,conf,umap,pixsizepar))
          else:
-            umap = NDG( mapfile, True )
+            umap = NDG( umapfile, True )
             msg_out("Re-using pre-calculated U map for {0}.".format(obs))
 
          invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(umap) )
@@ -694,6 +749,24 @@ try:
             raise UsageError( "{0} had pixel size {1} - was expecting {2}".
                               format(qmap,actpixsize,actpixsize0))
 
+
+         if iref is None:
+            if not os.path.exists( imapfile ) or newpixsize:
+               its = NDG( "{0}/*_IT".format( obsdir ) )
+               imap = NDG( imapfile, False )
+               invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} {3} "
+                      "system=azel crota=0".format(its,conf,imap,pixsizepar))
+            else:
+               imap = NDG( imapfile, True )
+               msg_out("Re-using pre-calculated I map for {0}.".format(obs))
+
+            invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(imap) )
+            actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
+            if actpixsize != actpixsize0:
+               raise UsageError( "{0} had pixel size {1} - was expecting {2}".
+                                 format(imap,actpixsize,actpixsize0))
+
+
 #  Ensure the maps use offset coordinates so that we can assume the
 #  source is centred at (0,0). This should already be the case for
 #  planets, but will not be the case for non-moving objects.
@@ -701,12 +774,18 @@ try:
                  "newval=origin".format(qmap) )
          invoke( "$KAPPA_DIR/wcsattrib ndf={0} mode=set name=skyrefis "
                  "newval=origin".format(umap) )
+         if iref is None:
+            invoke( "$KAPPA_DIR/wcsattrib ndf={0} mode=set name=skyrefis "
+                    "newval=origin".format(imap) )
 
 #  Ensure sky offset values are formatted as decimal seconds.
          invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(qmap) )
          invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(qmap) )
          invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(umap) )
          invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(umap) )
+         if iref is None:
+            invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(imap) )
+            invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(imap) )
 
 #  Form the polarised intensity map (no de-biassing), and remove the
 #  spectral axis.
@@ -790,7 +869,7 @@ try:
          obsnumlist.append( int( float( get_fits_header( qmap, "OBSNUM" ) ) ) )
 
 #  If we are using the weighted mean, use beamfit to fit a beam to the polarised
-#  intensity source and then get the weighted mean Q and U values value.
+#  intensity source and then get the weighted mean Q, U and (if required) I values.
          if diam <= 0.0:
             try:
                bresid2 = NDG(1)
@@ -855,18 +934,36 @@ try:
                invoke("$KAPPA_DIR/stats ndf={0}".format(uvw))
                wwuvsum = get_task_par( "total", "stats" )
 
+#  Multiply the model by the I data, and get the total sum of the product.
+               if iref is None:
+                  tmp = NDG(1)
+                  invoke("$KAPPA_DIR/mult in1={0} in2={1} out={2}".format(imap,bmodel,tmp) )
+                  invoke("$KAPPA_DIR/stats ndf={0}".format(tmp) )
+                  wisum = get_task_par( "total", "stats" )
+
+#  Multiply the squared model by the I variance values, and get the total sum of the product.
+                  ivw = NDG( 1 )
+                  invoke("$KAPPA_DIR/maths exp=\"'ib*ib*va'\" va={0} ib={1} out={2}".
+                         format( imap, bmodel, ivw ))
+                  invoke("$KAPPA_DIR/stats ndf={0}".format(ivw))
+                  wwivsum = get_task_par( "total", "stats" )
+
 #  Get the total sum of the model.
                invoke("$KAPPA_DIR/stats ndf={0}".format(bmodel) )
                wsum = get_task_par( "total", "stats" )
 
-#  Get the weighted mean Q and U values and append them to the end of the list of Q
-#  and U values.
+#  Get the weighted mean Q, U and I values and append them to the end of the list of
+#  values.
                qlist.append( wqsum/wsum )
                ulist.append( wusum/wsum )
+               if iref is None:
+                  ilist.append( wisum/wsum )
 
 #  Get the error on the weighted means and append them to the end of the lists.
                dqlist.append( sqrt(wwqvsum)/wsum )
                dulist.append( sqrt(wwuvsum)/wsum )
+               if iref is None:
+                  dilist.append( sqrt(wwivsum)/wsum )
 
 #  If beamfit failed, we cannot store q and u values, so remove the
 #  corresponding item from the other arrays (i.e the last element of each
@@ -919,67 +1016,95 @@ try:
             vnum = get_task_par( "numgood", "stats" )
             dulist.append( sqrt(vmean)/vnum )
 
-#  Now all observations are done, get the corresponding I value. First get rid
-#  of any spectral axis and resample the supplied I map onto the same pixel
-#  size as the Q an U maps.
-      junk = NDG(1)
-      invoke("$KAPPA_DIR/ndfcopy in={0} trim=yes out={1}".format(iref,junk) )
-      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=skyrefis "
-             "newval=origin".format(junk) )
-      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(junk) )
-      invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(junk) )
-      if pixsize:
-         imap = NDG(1)
-         invoke("$KAPPA_DIR/sqorst in={0} mode=pix pixscale=\\\"{1},{1}\\\" out={2}".
-                format(junk,pixsize,imap) )
-      else:
-         imap = junk
-      invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(imap) )
-      actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
-      if actpixsize != actpixsize0:
-         raise UsageError( "IREF map had pixel size {0} - was expecting {1}".
-                           format(actpixsize,actpixsize0))
+#  Likewise, store the mean I value in the same circle, and the
+#  associated error on the mean.
+            if iref is None:
+               invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(imap,diam,xcen,ycen))
+               ilist.append( get_task_par( "mean", "aperadd" ) )
+
+               imasked = NDG( 1 )
+               invoke("$KAPPA_DIR/copybad in={0} out={1} ref={2}".
+                       format(imap,imasked,mask))
+               invoke("$KAPPA_DIR/stats ndf={0} comp=var".format(imasked))
+               vmean = get_task_par( "mean", "stats" )
+               vnum = get_task_par( "numgood", "stats" )
+               dilist.append( sqrt(vmean)/vnum )
+
+
+
+#  Now all observations are done, get the corresponding I value. If an
+#  external reference map was supplied, get rid of any spectral axis and
+#  resample the supplied I map onto the same pixel size as the Q an U maps.
+      if iref:
+         junk = NDG(1)
+         invoke("$KAPPA_DIR/ndfcopy in={0} trim=yes out={1}".format(iref,junk) )
+         invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=skyrefis "
+                "newval=origin".format(junk) )
+         invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(junk) )
+         invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(junk) )
+         if pixsize:
+            imap = NDG(1)
+            invoke("$KAPPA_DIR/sqorst in={0} mode=pix pixscale=\\\"{1},{1}\\\" out={2}".
+                   format(junk,pixsize,imap) )
+         else:
+            imap = junk
+         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(imap) )
+         actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
+         if actpixsize != actpixsize0:
+            raise UsageError( "IREF map had pixel size {0} - was expecting {1}".
+                              format(actpixsize,actpixsize0))
 
 #  Find the position of the source centre in sky offsets within the total intensity map.
-      invoke("$KAPPA_DIR/centroid ndf={0} mode=int init=\"'0,0'\"".format(imap) )
-      xcen = get_task_par( "xcen", "centroid" )
-      ycen = get_task_par( "ycen", "centroid" )
+         invoke("$KAPPA_DIR/centroid ndf={0} mode=int init=\"'0,0'\"".format(imap) )
+         xcen = get_task_par( "xcen", "centroid" )
+         ycen = get_task_par( "ycen", "centroid" )
 
 #  If we are using weighted mean values, use beamfit to fit a beam to the total
 #  intensity source.
-      if diam <= 0.0:
-         bresid = NDG(1)
-         invoke("$KAPPA_DIR/beamfit ndf={0}'(0~30,0~30)' pos=\"'{1},{2}'\" "
-                "gauss=no mode=int resid={3}".format( imap,xcen,ycen,bresid) )
+         if diam <= 0.0:
+            bresid = NDG(1)
+            invoke("$KAPPA_DIR/beamfit ndf={0}'(0~30,0~30)' pos=\"'{1},{2}'\" "
+                   "gauss=no mode=int resid={3}".format( imap,xcen,ycen,bresid) )
 
 #  Subtract the residuals from the data to get the beam model.
-         tmodel = NDG(1)
-         invoke("$KAPPA_DIR/sub in1={0} in2={1} out={2}".format(imap,bresid,tmodel) )
+            tmodel = NDG(1)
+            invoke("$KAPPA_DIR/sub in1={0} in2={1} out={2}".format(imap,bresid,tmodel) )
 
 #  Modify the model so that is has a minimum value of zero.
-         invoke("$KAPPA_DIR/stats ndf={0}".format(tmodel) )
-         vmin = get_task_par( "minimum", "stats" )
-         bmodel = NDG(1)
-         invoke("$KAPPA_DIR/csub in={0} scalar={1} out={2}".format(tmodel,vmin,bmodel) )
+            invoke("$KAPPA_DIR/stats ndf={0}".format(tmodel) )
+            vmin = get_task_par( "minimum", "stats" )
+            bmodel = NDG(1)
+            invoke("$KAPPA_DIR/csub in={0} scalar={1} out={2}".format(tmodel,vmin,bmodel) )
 
 #  Multiply the model by the I data, and get the total sum of the product.
-         tmp = NDG(1)
-         invoke("$KAPPA_DIR/mult in1={0} in2={1} out={2}".format(imap,bmodel,tmp) )
-         invoke("$KAPPA_DIR/stats ndf={0}".format(tmp) )
-         wisum = get_task_par( "total", "stats" )
+            tmp = NDG(1)
+            invoke("$KAPPA_DIR/mult in1={0} in2={1} out={2}".format(imap,bmodel,tmp) )
+            invoke("$KAPPA_DIR/stats ndf={0}".format(tmp) )
+            wisum = get_task_par( "total", "stats" )
 
 #  Get the total sum of the model.
-         invoke("$KAPPA_DIR/stats ndf={0}".format(bmodel) )
-         wsum = get_task_par( "total", "stats" )
+            invoke("$KAPPA_DIR/stats ndf={0}".format(bmodel) )
+            wsum = get_task_par( "total", "stats" )
 
 #  Get the weighted mean I value.
-         ival = wisum/wsum
+            ival = wisum/wsum
 
 #  Otherwise, find the mean I value in the aperture centred on the
 #  accurate source centre.
+         else:
+            invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(imap,diam,xcen,ycen))
+            ival = get_task_par( "mean", "aperadd" )
+
+#  If no external reference map was supplied, use the weighted mean of the
+#  I values determined from the individual POL2 observations.
       else:
-         invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(imap,diam,xcen,ycen))
-         ival = get_task_par( "mean", "aperadd" )
+         s1 = 0.0
+         s2 = 0.0
+         for (ival,dival,tau) in zip( ilist, dilist, wvmlist ):
+            w = 1.0/(dival*dival*tau)
+            s1 += ival*w
+            s2 += w
+         ival = s1/s2
 
 #  If an input table was supplied, read its contents.
    else:
@@ -1007,7 +1132,7 @@ try:
            if m:
               iref = m.group(1)
 
-           if line.startswith("# ut obs az el q dq u du pi ang p qfit ufit "
+           if line.startswith("# ut obs az el q dq u du i di pi ang p qfit ufit "
                "pifit pfit tau tran rej hst at hum bp wndspd wnddir frleg bkleg"):
               bad = False
            elif not line.startswith("#"):
@@ -1027,14 +1152,16 @@ try:
             dqlist.append( float( words[5] ) )
             ulist.append( float( words[6] ) )
             dulist.append( float( words[7] ) )
-            wvmlist.append( float( words[15] ) )
-            atlist.append( float( words[19] ) )
-            humlist.append( float( words[20] ) )
-            bplist.append( float( words[21] ) )
-            wndspdlist.append( float( words[22] ) )
-            wnddirlist.append( float( words[23] ) )
-            frleglist.append( float( words[24] ) )
-            bkleglist.append( float( words[25] ) )
+            ilist.append( float( words[8] ) )
+            dilist.append( float( words[9] ) )
+            wvmlist.append( float( words[17] ) )
+            atlist.append( float( words[21] ) )
+            humlist.append( float( words[22] ) )
+            bplist.append( float( words[23] ) )
+            wndspdlist.append( float( words[24] ) )
+            wnddirlist.append( float( words[25] ) )
+            frleglist.append( float( words[26] ) )
+            bkleglist.append( float( words[27] ) )
 
             m = re.compile("T(\d\d):(\d\d):(\d\d)").search(words[18])
             if m:
@@ -1048,12 +1175,16 @@ try:
    mean = np.array(dqlist).mean()
    dqlist = [x / mean for x in dqlist]
    dulist = [x / mean for x in dulist]
+   mean = np.array(dilist).mean()
+   dilist = [x / mean for x in dilist]
 
 #  Record original lists before we reject any points.
    qlist0 = qlist
    ulist0 = ulist
+   ilist0 = ilist
    dqlist0 = dqlist
    dulist0 = dulist
+   dilist0 = dilist
    elist0 = elist
 
 #  We now do the fit. Loop doing succesive fits, rejecting outliers on
@@ -1144,7 +1275,7 @@ try:
          fd.write("# Qn RMS = {0}   Un RMS = {1} \n".format(qrms/ival,urms/ival))
          fd.write("#\n")
 
-      fd.write("# ut obs az el q dq u du pi ang p qfit ufit pifit pfit tau tran rej "
+      fd.write("# ut obs az el q dq u du i di pi ang p qfit ufit pifit pfit tau tran rej "
                "hst at hum bp wndspd wnddir frleg bkleg" )
       if diam <= 0.0:
          fd.write(" fwhm1 fwhm2 orient gamma" )
@@ -1173,15 +1304,23 @@ try:
          u = ulist0[i]
          dq = dqlist0[i]
          du = dulist0[i]
+
+         if iref is None:
+            ii = ilist0[i]
+            di = dilist0[i]
+         else:
+            ii = ival
+            di = 0
+
          pi = sqrt( q*q + u*u )
          ang = degrees( 0.5*atan2( u, q ) )
          p = pi/ival
 
          fd.write("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} "
                   "{13} {14} {15} {16} {17} {18} {19} {20} {21} {22} {23} "
-                  "{24} {25}"
+                  "{24} {25} {26} {27}"
                   .format(utlist[i], obsnumlist[i],
-                  alist[i], el, q, dq, u, du, pi, ang, p, qfp, ufp, pifit, pfit,
+                  alist[i], el, q, dq, u, du, ii, di, pi, ang, p, qfp, ufp, pifit, pfit,
                   tau, tran, rej, hstlist[i], atlist[i], humlist[i],
                   bplist[i], wndspdlist[i], wnddirlist[i], frleglist[i],
                   bkleglist[i] ))
