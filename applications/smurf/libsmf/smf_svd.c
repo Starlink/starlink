@@ -26,11 +26,11 @@
 *        All the elements of row 1 come first, followed by all the elements
 *        of row 2, etc.
 *     sigma = double * (Returned)
-*        The vector of N singular values. These are *not* sorted into
-*        descending order. These are the diagonal elements of the S
-*        matrix (see below).
+*        The vector of N singular values. These are only sorted into
+*        descending order if parameter "sort" is non-zero. These are the
+*        diagonal elements of the S matrix (see below).
 *     u = double * (Returned)
-*        The U matrixt. All the elements of row 1 come first, followed by
+*        The U matrix. All the elements of row 1 come first, followed by
 *        all the elements of row 2, etc. May be NULL if the U matrix is
 *        not required.
 *     eps = double (Given)
@@ -42,7 +42,7 @@
 *        Pointer to the inherited status value.
 
 *  Description:
-*     Finds U and S, given A where:
+*     Finds U, V and S, given A where:
 *
 *        A = U . S . V'
 *

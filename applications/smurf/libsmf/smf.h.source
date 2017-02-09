@@ -1711,6 +1711,9 @@ FILE *smf_open_textfile( const char *param, const char *mode, const char *def,
 int smf_pattern_extract ( const char * sourcestr, const char * pattern,
                           double *dresult, char * sresult, size_t szstr, int * status );
 
+size_t smf_pca( ThrWorkForce *wf, smfData *data, smfData *lut,
+                unsigned char *mask, double corlim, int *status );
+
 void smf_pcorr( smfHead *head, const Grp *igrp, int *status );
 
 void smf_polext( int ondf, int store_angle, double angle, const char *domain, int axis, int *status );

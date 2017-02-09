@@ -358,6 +358,7 @@ smf_open_related.c \
 smf_open_related_model.c \
 smf_open_textfile.c \
 smf_pattern_extract.c \
+smf_pca.c \
 smf_pcorr.c \
 smf_polext.c \
 smf_pread.c \
