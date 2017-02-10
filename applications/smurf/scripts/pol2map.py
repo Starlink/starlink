@@ -48,8 +48,7 @@
 *           maptol_hits = 1
 *
 *           ast.mapspike_freeze = 5
-*           pca.pcathresh = 0.04
-*           pca.pcathresh_freeze = 0.1
+*           pca.pcathresh = -150
 *           pca.zero_niter = 0.2
 *           com.zero_niter = 0.2
 *           flt.zero_niter = 0.2
@@ -63,7 +62,8 @@
 *           ast.zero_snrlo = 2
 *           ast.zero_freeze = 0.2
 *
-*           pca.pcathresh = 0.1
+*           pca.pcathresh = -50
+*           pca.pcathresh_freeze = 0.1
 *           pca.zero_snr = 5
 *           pca.zero_snrlo = 3
 *           pca.zero_freeze = -1
@@ -96,7 +96,14 @@
 *        The above "ref" mask consists of clumps of pixel with SNR greater
 *        than 3, extended down to an SNR level of 2. The "mask2" mask
 *        consists of clumps of pixel with SNR greater than 5, extended
-*        down to an SNR level of 3.
+*        down to an SNR level of 3. However, the above SNR levels are
+*        raised if necessary to ensure that the source occupies no more
+*        than 20% of the pixels within the "ref" mask, and 10% of the
+*        pixels within the "mask2" mask.
+*
+*        The same configuration is used for all three Stokes parameters -
+*        I, Q and U with the exception that "com.noflag=1" is added to
+*        the configuration when creating maps for Q and U.
 *
 *        If a configuration is supplied using parameter CONFIG, values
 *        supplied for any of the above parameters will over-write the
@@ -722,8 +729,6 @@ try:
       iobs = 0
       for id in rawlist:
          iobs += 1
-         msg_out("   {0}/{1}: Processing {2} raw data files from observation {3} ... ".
-                 format(iobs,nobs,len(rawlist[ id ]), id ) )
 
 #  Create an NDG object holding the raw POL2 files for the current
 #  observation.
@@ -739,35 +744,67 @@ try:
 #  If REUSE is TRUE and old Q, U and I time-streams exists, re-use them.
             try:
                if reuse:
-                  qts = NDG("{0}/\*_QT".format(qudir, True)
-                  uts = NDG("{0}/\*_UT".format(qudir, True)
-                  its = NDG("{0}/\*_IT".format(qudir, True)
-
-                  nq = len( qts )
-                  nu = len( uts )
-                  ni = len( its )
-                  if nq == nu and nq == ni:
-                     msg_out("   Re-using previously created Q, U and I "
-                             "time-streams for observation {0}".format(id))
-
-                     with open(new_q) as outfile:
-                        for ndf in qts:
-                          outfile.write(ndf)
-
-                     with open(new_u) as outfile:
-                        for ndf in uts:
-                          outfile.write(ndf)
-
-                     with open(new_i) as outfile:
-                        for ndf in its:
-                          outfile.write(ndf)
-                  else:
+                  aqts = NDG("{0}/s8a\*_QT".format(qudir, True))
+                  auts = NDG("{0}/s8a\*_UT".format(qudir, True))
+                  aits = NDG("{0}/s8a\*_IT".format(qudir, True))
+                  anq = len( aqts )
+                  anu = len( auts )
+                  ani = len( aits )
+                  if anq != anu or anq != ani:
                      raise starutil.NoNdfError("Ignoring pre-existing data")
+
+                  bqts = NDG("{0}/s8b\*_QT".format(qudir, True))
+                  buts = NDG("{0}/s8b\*_UT".format(qudir, True))
+                  bits = NDG("{0}/s8b\*_IT".format(qudir, True))
+                  bnq = len( bqts )
+                  bnu = len( buts )
+                  bni = len( bits )
+                  if bnq != anq or bnu != anu or bni != ani:
+                     raise starutil.NoNdfError("Ignoring pre-existing data")
+
+                  cqts = NDG("{0}/s8c\*_QT".format(qudir, True))
+                  cuts = NDG("{0}/s8c\*_UT".format(qudir, True))
+                  cits = NDG("{0}/s8c\*_IT".format(qudir, True))
+                  cnq = len( cqts )
+                  cnu = len( cuts )
+                  cni = len( cits )
+                  if cnq != anq or cnu != anu or cni != ani:
+                     raise starutil.NoNdfError("Ignoring pre-existing data")
+
+                  dqts = NDG("{0}/s8d\*_QT".format(qudir, True))
+                  duts = NDG("{0}/s8d\*_UT".format(qudir, True))
+                  dits = NDG("{0}/s8d\*_IT".format(qudir, True))
+                  dnq = len( dqts )
+                  dnu = len( duts )
+                  dni = len( dits )
+                  if dnq != anq or dnu != anu or dni != ani:
+                     raise starutil.NoNdfError("Ignoring pre-existing data")
+
+                  msg_out("   Re-using previously created Q, U and I "
+                          "time-streams for observation {0}".format(id))
+
+                  with open(new_q) as outfile:
+                     for ndg in (aqts,bqts,cqts,dqts):
+                        for ndf in ndg:
+                           outfile.write(ndf)
+
+                  with open(new_u) as outfile:
+                     for ndg in (auts,buts,cuts,duts):
+                        for ndf in ndg:
+                           outfile.write(ndf)
+
+                  with open(new_i) as outfile:
+                     for ndg in (aits,bits,cits,dits):
+                        for ndf in ndg:
+                           outfile.write(ndf)
+
                else:
-                  raise starutil.NoNdfError("Ignoring pre-existing data")
+                  raise starutil.NoNdfError("Ignoring any pre-existing data")
 
 #  Otherwise create new time-streams.
             except starutil.NoNdfError:
+               msg_out("   {0}/{1}: Processing {2} raw data files from observation {3} ... ".
+                       format(iobs,nobs,len(rawlist[ id ]), id ) )
                invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config=def outq={1}/\*_QT "
                       "outu={1}/\*_UT outi={1}/\*_IT fix=yes north={2} outfilesi={3} "
                       "outfilesq={4} outfilesu={5}".
@@ -845,8 +882,8 @@ try:
                ilist[id] = [ path ]
 
 #  Create a config file to use with makemap.
-      conf = NDG.tempfile()
-      fd = open(conf,"w")
+      iconf = NDG.tempfile()
+      fd = open(iconf,"w")
 
 #  Store the default set of config parameters in the config file.
       fd.write("^$STARLINK_DIR/share/smurf/.dimmconfig_pol2.lis\n")
@@ -859,8 +896,7 @@ try:
       fd.write("maptol_box = 60\n")
       fd.write("maptol_hits = 1\n")
 
-      fd.write("pca.pcathresh = 0.04\n")
-      fd.write("pca.pcathresh_freeze=0.1\n")
+      fd.write("pca.pcathresh = -150\n")
       fd.write("ast.mapspike_freeze = 5\n")
       fd.write("pca.zero_niter = 0.2\n")
       fd.write("com.zero_niter = 0.2\n")
@@ -873,7 +909,8 @@ try:
          fd.write("ast.zero_snrlo = 2\n")
          fd.write("ast.zero_freeze = 0.2\n")
 
-         fd.write("pca.pcathresh = 0.1\n")
+         fd.write("pca.pcathresh = -50\n")
+         fd.write("pca.pcathresh_freeze=0.1\n")
          fd.write("pca.zero_snr = 5\n")
          fd.write("pca.zero_snrlo = 3\n")
          fd.write("pca.zero_freeze = -1\n")
@@ -908,6 +945,17 @@ try:
       fd.write("noi.usevar=1\n")
       fd.write("flagslow=0.01\n")
       fd.write("downsampscale=0\n")
+      fd.close()
+
+#  The above config is used when creating I maps. For Q and U maps, the
+#  astronomical signal is much weaker and the common mode is much less
+#  well defined. This can cause the COM model to throw out huge amounts
+#  of data. To prevent this, create a second config file for use with Q
+#  and U data, which disables common-mode flagging.
+      quconf = NDG.tempfile()
+      fd = open(quconf,"w")
+      fd.write("com.noflag=1\n")
+      fd.write("^{0}\n".format(iconf))
       fd.close()
 
 #  If required, generate the AST and PCA masks from the supplied MASK
@@ -991,6 +1039,7 @@ try:
                imaps = {}
                qui_maps = imaps
                qui_list = ilist
+               conf = iconf
             else:
                continue
 
@@ -999,6 +1048,7 @@ try:
                qmaps = {}
                qui_maps = qmaps
                qui_list = qlist
+               conf = quconf
             else:
                continue
 
@@ -1007,6 +1057,7 @@ try:
                umaps = {}
                qui_maps = umaps
                qui_list = ulist
+               conf = quconf
             else:
                continue
 

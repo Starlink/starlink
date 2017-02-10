@@ -9,6 +9,7 @@ jsajoin.py \
 jsasplit.py \
 jsatilemoc.py \
 skyloop.py \
+pol2map.py \
 pol2sim.py \
 pol2ip.py \
 pol2stack.py \

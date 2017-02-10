@@ -860,7 +860,13 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   }
   /* Now project the data along each of these normalized basis vectors
      to figure out the amplitudes of the components in each bolometer
-     time series. ------------------------------------------------------------*/
+     time series. In fact, empirically, it seems that these amplitudes
+     are proportional to the square root of the associated eigenvalues
+     calculated by smf_svd above. The constant of proportionality
+     depends on the number of good bolometers, but probably also on the
+     overall strength of the signal in the data, and so is not easy to
+     calculate.
+   ------------------------------------------------------------*/
 
   msgOutif( MSG__VERB, "", FUNC_NAME
               ": calculating component amplitudes in each bolo...", status );
