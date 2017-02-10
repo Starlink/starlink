@@ -744,36 +744,36 @@ try:
 #  If REUSE is TRUE and old Q, U and I time-streams exists, re-use them.
             try:
                if reuse:
-                  aqts = NDG("{0}/s8a\*_QT".format(qudir, True))
-                  auts = NDG("{0}/s8a\*_UT".format(qudir, True))
-                  aits = NDG("{0}/s8a\*_IT".format(qudir, True))
+                  aqts = NDG("{0}/s8a{1}\*_QT".format(qudir, id), True)
+                  auts = NDG("{0}/s8a{1}\*_UT".format(qudir, id), True)
+                  aits = NDG("{0}/s8a{1}\*_IT".format(qudir, id), True)
                   anq = len( aqts )
                   anu = len( auts )
                   ani = len( aits )
                   if anq != anu or anq != ani:
                      raise starutil.NoNdfError("Ignoring pre-existing data")
 
-                  bqts = NDG("{0}/s8b\*_QT".format(qudir, True))
-                  buts = NDG("{0}/s8b\*_UT".format(qudir, True))
-                  bits = NDG("{0}/s8b\*_IT".format(qudir, True))
+                  bqts = NDG("{0}/s8b{1}\*_QT".format(qudir, id), True)
+                  buts = NDG("{0}/s8b{1}\*_UT".format(qudir, id), True)
+                  bits = NDG("{0}/s8b{1}\*_IT".format(qudir, id), True)
                   bnq = len( bqts )
                   bnu = len( buts )
                   bni = len( bits )
                   if bnq != anq or bnu != anu or bni != ani:
                      raise starutil.NoNdfError("Ignoring pre-existing data")
 
-                  cqts = NDG("{0}/s8c\*_QT".format(qudir, True))
-                  cuts = NDG("{0}/s8c\*_UT".format(qudir, True))
-                  cits = NDG("{0}/s8c\*_IT".format(qudir, True))
+                  cqts = NDG("{0}/s8c{1}\*_QT".format(qudir, id), True)
+                  cuts = NDG("{0}/s8c{1}\*_UT".format(qudir, id), True)
+                  cits = NDG("{0}/s8c{1}\*_IT".format(qudir, id), True)
                   cnq = len( cqts )
                   cnu = len( cuts )
                   cni = len( cits )
                   if cnq != anq or cnu != anu or cni != ani:
                      raise starutil.NoNdfError("Ignoring pre-existing data")
 
-                  dqts = NDG("{0}/s8d\*_QT".format(qudir, True))
-                  duts = NDG("{0}/s8d\*_UT".format(qudir, True))
-                  dits = NDG("{0}/s8d\*_IT".format(qudir, True))
+                  dqts = NDG("{0}/s8d{1}\*_QT".format(qudir, id), True)
+                  duts = NDG("{0}/s8d{1}\*_UT".format(qudir, id), True)
+                  dits = NDG("{0}/s8d{1}\*_IT".format(qudir, id), True)
                   dnq = len( dqts )
                   dnu = len( duts )
                   dni = len( dits )
@@ -783,20 +783,20 @@ try:
                   msg_out("   Re-using previously created Q, U and I "
                           "time-streams for observation {0}".format(id))
 
-                  with open(new_q) as outfile:
+                  with open(new_q, "w") as outfile:
                      for ndg in (aqts,bqts,cqts,dqts):
                         for ndf in ndg:
-                           outfile.write(ndf)
+                           outfile.write(ndf+"\n")
 
-                  with open(new_u) as outfile:
+                  with open(new_u, "w") as outfile:
                      for ndg in (auts,buts,cuts,duts):
                         for ndf in ndg:
-                           outfile.write(ndf)
+                           outfile.write(ndf+"\n")
 
-                  with open(new_i) as outfile:
+                  with open(new_i, "w") as outfile:
                      for ndg in (aits,bits,cits,dits):
                         for ndf in ndg:
-                           outfile.write(ndf)
+                           outfile.write(ndf+"\n")
 
                else:
                   raise starutil.NoNdfError("Ignoring any pre-existing data")
