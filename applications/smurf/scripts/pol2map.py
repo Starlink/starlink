@@ -25,7 +25,8 @@
 *  Usage:
 *     pol2map in iout qout uout [cat] [config] [pixsize] [qudir] [mapdir]
 *             [mask] [ipcor] [ipref] [reuse] [ref] [north] [reffcf]
-*             [debias] [retain] [msg_filter] [ilevel] [glevel] [logfile]
+*             [debias] [retain] [maskout1] [maskout2] [msg_filter] [ilevel]
+*             [glevel] [logfile]
 
 *  ADAM Parameters:
 *     CAT = LITERAL (Read)
@@ -237,7 +238,19 @@
 *        an SNR limit, and then extending these clumps down to a lower
 *        SNR limit. For the AST model, the upper and lower SNR limits
 *        are of 3.0 and 2.0. For the PCA mask, the limits are 5.0 and
-*        3.0. ["AUTO"]
+*        3.0. The AST mask created in this way can be saved using
+*        parameter MASKOUT1 and the PCA mask using parameter MASKOUT2.
+*        ["AUTO"]
+*     MASKOUT1 = LITERAL (Write)
+*        If a non-null value is supplied for MASKOUT, it specifies the NDF
+*        in which to store the AST mask created from the NDF specified by
+*        parameter MASK. Only used if an NDF is supplied for parameter
+*        MASK. [!]
+*     MASKOUT2 = LITERAL (Write)
+*        If a non-null value is supplied for MASKOUT, it specifies the NDF
+*        in which to store the PCA mask created from the NDF specified by
+*        parameter MASK. Only used if an NDF is supplied for parameter
+*        MASK. [!]
 *     MSG_FILTER = LITERAL (Read)
 *        Controls the default level of information reported by Starlink
 *        atasks invoked within the executing script. This default can be
@@ -435,7 +448,13 @@ try:
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
 
+   params.append(starutil.ParNDG("MASKOUT1", "The output AST mask",
+                                 default=None, exists=False, minsize=0,
+                                 maxsize=1, noprompt=True ))
 
+   params.append(starutil.ParNDG("MASKOUT2", "The output PCA mask",
+                                 default=None, exists=False, minsize=0,
+                                 maxsize=1, noprompt=True ))
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
@@ -495,6 +514,14 @@ try:
       automask = False
       circlemask = False
       msg_out("Masking will be based on {0}.".format(maskmap))
+
+#  See where (if at all) the masks are to be saved.
+      astmask = parsys["MASKOUT1"].value
+      if astmask is None:
+         astmask = NDG(1)
+      pcamask = parsys["MASKOUT2"].value
+      if pcamask is None:
+         pcamask = NDG(1)
 
    except starutil.NoNdfError:
       if "AUTO".startswith(mask.upper()):
@@ -675,6 +702,7 @@ try:
 #  final coadded maps so that it holds any maps supplied by parameter IN.
 #  Check that any supplied maps are in units of pW.
    allmaps = NDG.tempfile()
+   haveSomeMaps = False
    if get_task_par( "MAPFOUND", "pol2check" ):
       shutil.copyfile( inmaps, allmaps )
 
@@ -682,6 +710,7 @@ try:
          lines = infile.readlines()
       paths = [line.strip() for line in lines]
       for path in paths:
+         haveSomeMaps = True
          invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(path) )
          units = get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
          if units != "pW":
@@ -976,7 +1005,6 @@ try:
          noise = 2
          minheight = 3
          aconf = NDG.tempfile()
-         astmask = NDG(1)
 
          while True:
             fd = open(aconf,"w")
@@ -1005,7 +1033,6 @@ try:
          noise = 3
          minheight = 5
          pconf = NDG.tempfile()
-         pcamask = NDG(1)
 
          while True:
             fd = open(pconf,"w")
@@ -1160,6 +1187,7 @@ try:
 #  coadds.
                with open(allmaps, 'a') as infile:
                   infile.write( "{0}\n".format( qui_maps[key] ) )
+                  haveSomeMaps = True
 
 #  If the pointing correction is not already known, and we have just
 #  created an I map, see what translations (in pixels) are needed to align
@@ -1313,101 +1341,103 @@ try:
 
 #  -----------  CREATE THE COADDED MAPS ------------------------
 
+#  No need to do this if we have no maps to coadd.
+   if haveSomeMaps:
 
 #  Create a text file holding information about all the Stokes maps. For each one,
 #  get the Stokes parameter (Q, U or I) and a key that is unique for the chunk of
 #  data, of the form "<UT>_<OBS>_<SUBSCAN>".
-   mapinfo = NDG.tempfile()
-   mapndg = NDG("^{0}".format(allmaps) )
-   invoke("$SMURF_DIR/pol2check in={0} quiet=yes mapinfo={1}".
-          format(mapndg,mapinfo))
+      mapinfo = NDG.tempfile()
+      mapndg = NDG("^{0}".format(allmaps) )
+      invoke("$SMURF_DIR/pol2check in={0} quiet=yes mapinfo={1}".
+             format(mapndg,mapinfo))
 
-   if not get_task_par( "MAPFOUND", "pol2check" ):
-      raise starutil.InvalidParameterError("No usable maps remains to be processed.")
+      if not get_task_par( "MAPFOUND", "pol2check" ):
+         raise starutil.InvalidParameterError("No usable maps remains to be processed.")
 
 #  Set up a dict. Each key is as described above. Each value is path to an
 #  NDF holding a map with the same key and I, Q or U Stokes parameter.
-   with open(allmaps) as infile:
-      lines = infile.readlines()
-   paths = [line.strip() for line in lines]
+      with open(allmaps) as infile:
+         lines = infile.readlines()
+      paths = [line.strip() for line in lines]
 
-   with open(mapinfo) as infile:
-      lines = infile.readlines()
-   infos = [line.strip() for line in lines]
+      with open(mapinfo) as infile:
+         lines = infile.readlines()
+      infos = [line.strip() for line in lines]
 
-   imaps = {}
-   qmaps = {}
-   umaps = {}
-   for (path,info) in zip( paths, infos ):
-      (stokes,id) = info.split()
-      if stokes == "I":
-         imaps[id] = path
-      elif stokes == "Q":
-         qmaps[id] = path
-      else:
-         umaps[id] = path
+      imaps = {}
+      qmaps = {}
+      umaps = {}
+      for (path,info) in zip( paths, infos ):
+         (stokes,id) = info.split()
+         if stokes == "I":
+            imaps[id] = path
+         elif stokes == "Q":
+            qmaps[id] = path
+         else:
+            umaps[id] = path
 
-      if "pol" not in get_fits_header( NDG(path), "INBEAM" ):
-         raise starutil.InvalidParameterError("One of the {0} maps ({1}) "
-                                          "was not created from POL2 data".
-                                          format(stokes,path))
+         if "pol" not in get_fits_header( NDG(path), "INBEAM" ):
+            raise starutil.InvalidParameterError("One of the {0} maps ({1}) "
+                                             "was not created from POL2 data".
+                                             format(stokes,path))
 
 #  Loop over each Stokes parameter, creating a coadd for each required
 #  parameter.
-   for qui in ('I', 'Q', 'U'):
+      for qui in ('I', 'Q', 'U'):
 
 #  Pass on to the next parameter if we are not creating a map for the
 #  current parameter. Also create dictionaries holding the I, Q or U map
 #  for each observation chunk.
-      if qui == 'I':
-         if imap:
-            qui_maps = imaps
-            coadd = imap
-         else:
-            continue
+         if qui == 'I':
+            if imap:
+               qui_maps = imaps
+               coadd = imap
+            else:
+               continue
 
-      elif qui == 'Q':
-         if qmap:
-            qui_maps = qmaps
-            coadd = qmap
-         else:
-            continue
+         elif qui == 'Q':
+            if qmap:
+               qui_maps = qmaps
+               coadd = qmap
+            else:
+               continue
 
-      else:
-         if umap:
-            qui_maps = umaps
-            coadd = umap
          else:
-            continue
+            if umap:
+               qui_maps = umaps
+               coadd = umap
+            else:
+               continue
 
 #  Check some good maps remain to be processed.
-      if len(qui_maps) == 0:
-         raise starutil.InvalidParameterError("No usable {0} maps remains "
-                                              "to be coadded.".format(qui))
+         if len(qui_maps) == 0:
+            raise starutil.InvalidParameterError("No usable {0} maps remains "
+                                                 "to be coadded.".format(qui))
 
 #  If we have only one observation just copy it to the output maps.
-      if len(qui_maps) == 1:
-         key = list(qui_maps)[0]
-         invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(qui_maps[key],coadd))
+         if len(qui_maps) == 1:
+            key = list(qui_maps)[0]
+            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(qui_maps[key],coadd))
 
 #  If we have more than one observation, coadd them. Also coadd the
 #  extension NDFs (EXP_TIMES and WEIGHTS), but without normalisation so
 #  that the coadd is the sum rather than the mean of the inputs.
-      elif len(qui_maps) > 1:
+         elif len(qui_maps) > 1:
 
-         msg_out("Coadding {0} maps from all observations:".format(qui))
-         allmaps = NDG( list( qui_maps.values() ) )
-         invoke("$CCDPACK_DIR/makemos in={0} out={1} method=mean".format(allmaps,coadd))
+            msg_out("Coadding {0} maps from all observations:".format(qui))
+            allmaps = NDG( list( qui_maps.values() ) )
+            invoke("$CCDPACK_DIR/makemos in={0} out={1} method=mean".format(allmaps,coadd))
 
-         invoke("$KAPPA_DIR/erase object={0}.more.smurf.exp_time ok=yes".format(coadd))
-         invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.exp_time lbnd=! ref=! "
-                "out={1}.more.smurf.exp_time conserve=no method=bilin norm=no "
-                "variance=no".format(allmaps,coadd))
+            invoke("$KAPPA_DIR/erase object={0}.more.smurf.exp_time ok=yes".format(coadd))
+            invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.exp_time lbnd=! ref=! "
+                   "out={1}.more.smurf.exp_time conserve=no method=bilin norm=no "
+                   "variance=no".format(allmaps,coadd))
 
-         invoke("$KAPPA_DIR/erase object={0}.more.smurf.weights ok=yes".format(coadd))
-         invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.weights lbnd=! ref=! "
-                "out={1}.more.smurf.weights conserve=no method=bilin norm=no "
-                "variance=no".format(allmaps,coadd))
+            invoke("$KAPPA_DIR/erase object={0}.more.smurf.weights ok=yes".format(coadd))
+            invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.weights lbnd=! ref=! "
+                   "out={1}.more.smurf.weights conserve=no method=bilin norm=no "
+                   "variance=no".format(allmaps,coadd))
 
 
 
