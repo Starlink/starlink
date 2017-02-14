@@ -115,7 +115,8 @@ wild-cards $*$ and $?$ are accepted. For instance:
 \end{quote}
 
 \item[Step 2]:  Run \texttt{pol2map} to create an initial I map from
-the raw data files listed in your text file. The analysed intensity
+the raw data files listed in your text file. This corresponds to the box
+labelled ``Run 1'' in Fig.~\ref{fig:flow}. The analysed intensity
 values in the raw data time-streams are first converted into Q, U and I
 time-streams using \texttt{smurf:calcqu} (these are stored for future use
 in the directory \texttt{qudata}, specified by the \texttt{qudir}
@@ -163,7 +164,8 @@ s8a20150914_00022_0003_UT.sdf
 \end{quote}
 
 \item[Step 3]:  Re-run \texttt{pol2map} again, this time creating an
-improved I map. The I time-streams created by the previous step, and stored
+improved I map. This corresponds to the box
+labelled ``Run 2'' in Fig.~\ref{fig:flow}. The I time-streams created by the previous step, and stored
 in directory \texttt{qudata}, are supplied as input instead of the raw data
 files, thus avoiding the need to re-run \texttt{calcqu}. A new I map is
 created from each observation, using the initial ``auto-masked'' map created
@@ -209,7 +211,8 @@ FLT) within \texttt{makemap}. These masks can come in useful when adding
 in new data to a pre-existing reduction - see section~\ref{sec:addin}.
 
 \item[Step 4]:  Re-run \texttt{pol2map} again, this time creating Q and U
-maps and the final vector catalogue. This process again starts from the
+maps and the final vector catalogue. This corresponds to the box
+labelled ``Run 3'' in Fig.~\ref{fig:flow}, and starts from the
 time-streams created by step 1, and stored in directory \texttt{qudata}.
 It uses the same auto-masked map, \texttt{iauto.sdf}, to define the
 background regions that are to be set to zero at the end of each
@@ -463,6 +466,37 @@ re-run step 4 from section~\ref{se1}.
 
 \section{A detailed description of the processing performed by \texttt{pol2map}}
 
+The data flow within \texttt{pol2map} is illustrated graphically in
+Fig.~\ref{fig:flow} for a specific case where three observations are
+being processed. The grey box labelled ``Run 1'' contains the processing
+performed by the first invocation of \texttt{pol2map} described in step 2
+of section~\ref{se1}. Similarly the grey boxes labelled ``Run 2'' and ``Run
+3'' contains the processing performed by the second and third invocations
+of \texttt{pol2map} described in steps 3 and 4 of section~\ref{se1}.
+
+\begin{figure}
+\includegraphics[width=.99\linewidth]{pol2map_flow.pdf}
+\caption{The \texttt{pol2map} data flow for the case of three
+observations being processed. Each grey box refers to a single invocation
+of \texttt{pol2map}.}
+\label{fig:flow}
+\end{figure}
+
+The main themes of the processing are:
+
+\begin{itemize}
+\item The \texttt{makemap} configuration has been tailored to ensure that
+usable maps are created from the I time-streams created by \texttt{calcqu}.
+\item The same configuration is also used to create maps from the Q and U
+time-streams. This is to ensure consistency between the I, Q and U maps.
+\item The IP corrections applied to the Q and U data are based on the I
+map made from the same POL2 data, and in the same way, as the Q and U maps.
+\item The same masks used to create the I maps are also used to create
+the Q and U maps.
+\item The calculation of fractional polarisation values are based on I, Q
+and U maps made from the same data and made in the same way.
+\end{itemize}
+
 As with the older \texttt{pol2scan} script, the processing performed by
 \texttt{pol2map} can be divided into two section:
 
@@ -530,19 +564,145 @@ This is significant as the AST mask defines the region in which
 significant emission is allowed to grow, and so using different masks can
 result in non-uniform processing of multiple observations of the same
 region. It is thus beneficial to process all observations of a single
-object using the same mask. This suggests a two stage process in which all
-available observations are processed initially using the auto-masking
-method. These initial ``auto-masked'' maps are then co-added to produce a
-map with higher signal-to-noise. A new mask is then defined by applying an
-SNR cut to this co-add. All observations are then re-processed by
-\texttt{makemap} a second time using this
-static mask to define the source regions for all observations. The
-resulting ``externally-masked'' maps are then co-added to produce the
-final co-add.
+object using the same mask. This suggests a two stage process in which
+the I time-streams for all available observations are processed initially
+using the auto-masking method. These initial ``auto-masked'' maps are
+then co-added to produce an I map with higher signal-to-noise. A new mask
+is then defined by applying an SNR cut to this I co-add. All I
+time-streams are then re-processed by \texttt{makemap} a second time
+using this static mask to define the source regions for all observations.
+The resulting ``externally-masked'' I maps are then co-added to produce
+the final I co-add.
 
+The Q time-streams are then processed by \texttt{makemap}, using the same
+external static mask that was used to produce the final I maps. In
+addition, the final co-added I map is used to define the expected levels
+of Instrumental Polarisation when doing IP correction. The Q maps for
+individual observations are co-added to form the final Q map. The U
+time-streams are then processed in exactly the same way to produce the
+final U map. The final I, Q and U maps are then combined to form the
+vector catalogue. This entire process is illustrated in
+Fig.\ref{fig:flow}.
 
+\subsubsection{Mask creation}
+The AST and PCA masks are derived from the signal-to-noise map
+($Data/\sqrt(Variance)$) created from the co-add of the auto-masked I
+maps from all observations.  The \emph{FellWalker} algorithm provided by the
+\texttt{cupid:findclumps} program is used to define the source regions within
+the SNR map. Each source region within the AST mask consists of a contiguous
+group of pixels above an SNR of 2.0, with at least one pixel having an SNR
+above an SNR of 3.0. The following configuration is used with
+\texttt{findclumps}:
 
-To be continued...
+\begin{quote}
+\begin{verbatim}
+FellWalker.FlatSlope=0
+FellWalker.MinDip=1.0E30
+FellWalker.Noise=2.0
+FellWalker.MinHeight=3.0
+\end{verbatim}
+\end{quote}
+
+The PCA mask is formed in the same way but the SNR limits are changed so
+that each source region consists of a contiguous group of pixels above an
+SNR of 3.0, with at least one pixel having an SNR above an SNR of 5.0.
+
+For some very bright astronomical sources such as Orion A, the resulting
+source areas can occupy the majority of the map. This causes problems
+within \texttt{makemap}, because such large source regions applies little
+constraint on the development of gradients and other large scale
+structures. In addition, blanking out such large areas of sky when
+forming the noise models can result in the noise models being poorly
+defined.
+
+To avoid these problems, a check is made on the AST mask to ensure it is
+not too large. If the source regions in the AST mask occupy more than
+20\% of the map, then a new mask is formed using slightly higher SNR
+limits. This process repeats until an SNR limits are found which result
+in no more than 20\% of the map pixels being designated as source pixels.
+
+A similar process is applied to the PCA mask, but here the restriction is
+that the source regions occupy no more than 10\% of the map.
+
+The masks actually used can be saved to disk by assigning values to the
+MASKOUT1 and MASKOUT2 parameters when running \texttt{pol2map}.
+
+\subsubsection{Mask usage}
+
+When \texttt{pol2map} is run with parameter MASK set to ``AUTO'', new
+AST and PCA masks are created automatically at the end of each iteration.
+Under certain circumstances this can prevent convergence of the
+\texttt{makemap} iterative process, due to marginal pixels at the edge of
+a source repeatedly entering then leaving the mask. To avoid this, the AST
+mask is frozen when the normalised change in the map between iterations
+falls below 0.2 (\texttt{ast.zero\_freeze = 0.2}).
+
+In addition, when using auto-masking, an initial set of ten iterations
+are performed in which the astronomical signal is \emph{not} removed at
+the end of the iteration (\texttt{ast.skip = 10}). This allows initial PCA
+and AST masks to be created before the genuine iterative process begins,
+which speeds up convergence significantly.
+
+When using either auto-masking or external-masking, the masking of noise
+models using the PCA mask is only performed up to the point where the
+normalised map change between iterations falls below 0.2
+(\texttt{pca.zero\_niter = 0.2}, \texttt{com.zero\_niter = 0.2},
+\texttt{flt.zero\_niter = 0.2}). By this point, most of the astronomical
+signal should have been moved out of the time-streams and into the map,
+resulting in there being little point in masking the time-streams.
+
+\subsection{Convergence testing}
+
+Each invocation of \texttt{makemap} continues to converge until the
+maximum normalised change between iterations in any map pixel is less
+than 0.05 (\texttt{maptol = 0.05},\texttt{maptol\_mean = 0}). The map
+change is first smoothed using a  box filter of size 60 arc-seconds before
+finding the maximum map change value (\texttt{maptol\_box = 60}). Edge pixels
+(\emph{i.e.} pixels that contain fewer than the mean number of bolometer
+samples) are not included in the check - \texttt{maptol\_hits = 1.0}.
+
+This scheme ensures that convergence is not affected by the size of the
+source regions. For instance, using the usual scheme based on the mean
+map change within the source region (\texttt{maptol\_mean = 1}), no further
+iterations are performed if no pixels reach the SNR limit for the AST mask
+(\texttt{ast.zero\_snr}) at the end of the first iteration. This
+is inappropriate given the use of the PCA model within \texttt{pol2map},
+since (unlike other models such as COM or FLT) the PCA model only passes
+through a fraction of the astronomical signal on each iteration. Thus,
+curtailing the iterative process after only one iteration would mean loosing
+astronomical flux that might make it through into the map if further
+iterations were performed.
+
+\subsection{Iterative models}
+
+The old \texttt{pol2scan} script used just the PCA (Principal Component
+Analysis) model to identify and remove sky and electronic background
+signals from the I, Q and U time-stream values when running
+\texttt{makemap}. Improved results seem possible --- particularly when
+processing I time-streams, which usually have much stronger signals than the
+Q or U time-streams --- if the PCA model is preceded by a COM
+(common-mode) model, and followed by a FLT (high-pass filter) model. This
+the model order used is \texttt{modelorder=(com,gai,pca,ext,flt,ast,noi)}
+
+The PCA model identifies and removes a specified number of template
+time-stream backgrounds from the data, where the strength of the template
+can change from bolometer to bolometer. It choose the templates to be the
+time-streams that are most correlated with the existing bolometer data.
+The more components (i.e. background time-streams) that are removed, the
+less background noise there is in the final map, but the longer the map
+takes to produce. This is because removing many components usually
+results in some of the astronomical signal being removed from the data, in
+addition to the correlated background noise. This in turn means that more
+iterations are required to recover the full astronomical signal. This is
+different to the COM or FLT components, which pass the full astronomical
+signal on each iteration.
+
+If auto-masking is used, the strongest 50 PCA components are removed on
+each iteration. If external-masking is used, the strongest 150 PCA components
+are removed on each iteration. The reasoning for this difference is that speed
+is more important than accuracy when forming the initial auto-masked map, since
+the auto-masked map is only used to create the masks used to create subsequent
+external-masked maps.
 
 
 \section{IP correction}
