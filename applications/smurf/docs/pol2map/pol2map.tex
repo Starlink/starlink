@@ -462,7 +462,88 @@ from the list of input files if you are using a list file, and then
 re-run step 4 from section~\ref{se1}.
 
 \section{A detailed description of the processing performed by \texttt{pol2map}}
-To be written.
+
+As with the older \texttt{pol2scan} script, the processing performed by
+\texttt{pol2map} can be divided into two section:
+
+\begin{itemize}
+\item The creation of time-stream files holding Q, U and I values from
+the raw data holding analysed intensity time-streams for each bolometer.
+This stage is performed by the \texttt{smurf:calcqu} command. The
+resulting Q, U and I time-streams are sampled at 2 Hz.
+\item The creation of two-dimensional maps from these Q, U and I
+time-streams. This stage is performed by the \texttt{smurf:makemap} command.
+Note, unlike \texttt{pol2scan}, \texttt{pol2map} creates maps from the I
+time-streams as well as the Q and U time-streams.
+\end{itemize}
+
+Most of the differences between \texttt{pol2scan} and \texttt{pol2map}
+relate to the second section, specifically the configuration parameters
+and masking options that are used when running \texttt{makemap}. The most
+significant difference from the point of view of using the script is the manner
+in which masks are defined and used.
+
+\subsection{Masking}
+A mask is a two-dimensional array which has the same shape and size as
+the final map, and which is used to indicate where the source is expected
+to fall within the map. Bad pixel values within a mask indicate
+background pixels, and good pixels values indicate source pixels. Masks
+are used for two main purposes:
+
+\begin{enumerate}
+\item To prevent the growth of gradients and other artificial large scale
+structures within the map. For this purpose, the astronomical signal at
+all background pixels defined by the mask is forced to zero at
+the end of each iteration within \texttt{makemap} (except for the final
+iteration).
+\item To prevent bright sources polluting the evaluation of the various
+noise models (PCA, COM, FLT) used within \texttt{makemap}. Source pixels
+are excluded from the calculation of these models.
+\end{enumerate}
+
+The \texttt{pol2map} script uses different masks for these two purposes -
+the ``AST'' mask and the ``PCA'' mask\footnote{The PCA mask is also used
+to mask the COM and FLT models.}. The PCA mask is in general less
+extensive than the AST mask, with the source areas being restricted to
+the brighter inner regions.
+
+Each of these two masks can either be generated automatically within
+\texttt{makemap}, or be specified by a fixed external NDF. In addition,
+the masks can be defined as a circle of known radius centred on the
+expected source position. If the mask is generated automatically within
+\texttt{makemap}, it is created by applying a cut to the signal-to-noise map
+at the end of each iteration. The ``auto-mask'' cut levels used by
+\texttt{pol2map} are:
+
+\begin{description}
+\item[AST]: An initial cut is made at an SNR of 3.0 but each resulting
+contiguous source region is then extended down to an SNR of 2.0.
+\item[PCA]: An initial cut is made at an SNR of 5.0 but each resulting
+contiguous source region is then extended down to an SNR of 3.0.
+\end{description}
+
+A new mask is created at the end of each iteration, and so the mask can
+change from iteration to iteration. The benefit of using auto-masking is
+that no previous map of the sky is required. The disadvantage is that
+different maps of the same region can be processed with different masks.
+This is significant as the AST mask defines the region in which
+significant emission is allowed to grow, and so using different masks can
+result in non-uniform processing of multiple observations of the same
+region. It is thus beneficial to process all observations of a single
+object using the same mask. This suggests a two stage process in which all
+available observations are processed initially using the auto-masking
+method. These initial ``auto-masked'' maps are then co-added to produce a
+map with higher signal-to-noise. A new mask is then defined by applying an
+SNR cut to this co-add. All observations are then re-processed by
+\texttt{makemap} a second time using this
+static mask to define the source regions for all observations. The
+resulting ``externally-masked'' maps are then co-added to produce the
+final co-add.
+
+
+
+To be continued...
+
 
 \section{IP correction}
 The existing IP correction (referred to as ``PL2'') is based on the mean I, Q
