@@ -64,7 +64,6 @@
 *           ast.zero_freeze = 0.2
 *
 *           pca.pcathresh = -50
-*           pca.pcathresh_freeze = 0.1
 *           pca.zero_snr = 5
 *           pca.zero_snrlo = 3
 *           pca.zero_freeze = -1
@@ -939,7 +938,6 @@ try:
          fd.write("ast.zero_freeze = 0.2\n")
 
          fd.write("pca.pcathresh = -50\n")
-         fd.write("pca.pcathresh_freeze=0.1\n")
          fd.write("pca.zero_snr = 5\n")
          fd.write("pca.zero_snrlo = 3\n")
          fd.write("pca.zero_freeze = -1\n")
