@@ -53569,6 +53569,14 @@ and HDS data types is as follows:
 The following applications have been modified:
 \begin{description}[style=nextline]
 
+   \item [\htmlref{CONTOUR}{CONTOUR}]\mbox{}
+      \begin{itemize}
+        \item The dynamic default for parameter LABPOS is now \texttt{{!}}
+              (\emph{i.e.} a null value), so no label is now drawn in
+              ``Bounds'' or ``Good'' mode unless a value is supplied
+              explicitly for LABPOS.
+      \end{itemize}
+
    \item [\htmlref{TRANDAT}{TRANDAT}]\mbox{}
       \begin{itemize}
         \item Will now recognised the string ``BAD'' (case insensitive) within

@@ -4489,9 +4489,9 @@ package kappa {
          parameter labpos {
             type _REAL
             prompt {Position for label in Good and Bounds modes}
-            vpath CURRENT DEFAULT
+            vpath DEFAULT
             ppath CURRENT DEFAULT
-            default 4,0.75
+            default !
             helpkey *
          }
 
