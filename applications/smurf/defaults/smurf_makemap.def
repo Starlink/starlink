@@ -2450,7 +2450,7 @@ pl2data = ( 4.021E-3, 2.263E-2, -1.243E-2, -3.361E-2 )
 #               should be used. This parameter is only used when processing
 #               POL2 Q or U time-streams as created by SMURF:CALCQU, and if
 #               parameter "ipmodel" is set to "PL3".
-pl3data = ( 2.624E-3, 4.216E-2, -2.410E-2, -3,400E-2 )
+pl3data = ( 2.624E-3, 4.216E-2, -2.410E-2, -3.400E-2 )
 
 #-----------------------------------------------------------------
 #  Name: 	pln.notfirst
