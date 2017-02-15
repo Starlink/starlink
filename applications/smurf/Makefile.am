@@ -208,7 +208,7 @@ scripts/cbas scripts/bolcoords scripts/matched-filter scripts/smas scripts/canfa
 scripts/sc2tsnoise scripts/canfar_sc2noise scripts/configmeld.py \
 scripts/fts2gaia.py scripts/tilepaste.py scripts/tilecutout.py scripts/smurfutil.py \
 scripts/jsajoin.py scripts/jsasplit.py scripts/jsatilemoc.py scripts/pol2sim.py \
-scripts/pol2scan.py scripts/pol2imap.py scripts/pol2map.py scripts/pol2ip.py scripts/sc2compare.py scripts/startester.py
+scripts/pol2scan.py scripts/pol2map.py scripts/pol2ip.py scripts/sc2compare.py scripts/startester.py
 
 # IFL files
 IFL_FILES = $(smurf_mon_TASKS:=.ifl) smurf_mon.ifl
