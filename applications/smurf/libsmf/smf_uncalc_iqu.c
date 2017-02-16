@@ -18,7 +18,7 @@
 *                          int pasign, double paoff, double angrot, double amp2,
 *                          double phase2, double amp4, double phase4,
 *                          double amp16, double phase16, int ipform,
-*                          const double *pl1data, const double *qinst,
+*                          const double *pldata, const double *qinst,
 *                          const double *uinst, const double *c0,
 *                          const double *p0, const double *p1,
 *                          const double *angc, int harmonic, double offset,
@@ -31,11 +31,14 @@
 *        Pointer to the time series data.
 *     idata = double * (Given and Returned)
 *        On entry an array of I values. On exit, an array of analysed
-*        intensity values.
+*        intensity values. These are assumed to incorporate the POL2
+*        degradation factor of 1.35.
 *     qdata = double * (Given)
-*        An array of Q values.
+*        An array of Q values. These are assumed to incorporate the POL2
+*        degradation factor of 1.35.
 *     udata = double * (Given)
-*        An array of U values.
+*        An array of U values. These are assumed to incorporate the POL2
+*        degradation factor of 1.35.
 *     angdata = double * (Given)
 *        An array holding the angle from the reference direction used by
 *        the supplied Q and U values, to the focal plane Y axis, in radians,
@@ -80,9 +83,12 @@
 *        Ignored if "harmonic" is not 4. It gives the phase offset for the
 *        16Hz signal to include in the returned Q and U signal, in radians.
 *     ipform = int (Given):
-*        Indicates the IP model to use: 0="NONE, 1 ="PL1", 2="JK", 3="USER".
-*     pl1data = const double * (Given):
-*        The parameters of the PL1 IP model. Only used if "ipform" is 1.
+*        Indicates the IP model to use: 0="NONE, 1 ="PL1", 2="JK", 3="USER",
+*        4="PL2", 5 = "PL3".
+*     pldata = const double * (Given):
+*        The parameters of the PL1, PL2 or PL3 IP model. Only used if
+*        "ipform" is 1, 4 or 5. The length of this array should be 3 for PL1
+*        and 4 for PL2/PL3.
 *     qinst = const double * (Given)
 *        Only used if "ipform" is 3. An array of normalised Q values
 *        for each bolometer. The instrumental Q seen by each bolometer is
@@ -154,10 +160,13 @@
 *        Added support for PL1 IP model.
 *     2-JUN-2016 (DSB):
 *        Added argument "offset".
+*     15-FEB-2017 (DSB):
+*        Added support for PL2 and PL3 IP model.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2012 Science and Technology Facilities Council.
+*     Copyright (C) 2017 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -197,7 +206,7 @@ typedef struct smfUncalcIQUJobData {
    const double *c0;
    const double *p0;
    const double *p1;
-   const double *pl1data;
+   const double *pldata;
    const double *qinst;
    const double *uinst;
    dim_t b1;
@@ -240,7 +249,7 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
                      double *qdata, double *udata, double *angdata,
                      int pasign, double paoff, double angrot, double amp2,
                      double phase2, double amp4, double phase4, double amp16,
-                     double phase16, int ipform, const double *pl1data,
+                     double phase16, int ipform, const double *pldata,
                      const double *qinst, const double *uinst, const double *c0,
                      const double *p0, const double *p1, const double *angc,
                      int harmonic, double offset, int *status ){
@@ -381,7 +390,7 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
          pdata->phase4 = phase4;
          pdata->phase16 = phase16;
          pdata->ipform = ipform;
-         pdata->pl1data = pl1data;
+         pdata->pldata = pldata;
          pdata->qinst = qinst;
          pdata->uinst = uinst;
          pdata->c0 = c0;
@@ -454,10 +463,12 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    double ca;
    double cb;
    double cc;
+   double cd;
    double cosval;             /* Cos of twice reference rotation angle */
    double ip_qi;              /* normalised instrument Q for current bolo */
    double ip_ui;              /* normalised instrument U for current bolo */
    double ival;               /* I  value */
+   double k;
    double offset;
    double p1;
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
@@ -510,9 +521,10 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    amp16 = pdata->amp16;
    phase16 = pdata->phase16;
    ipform = pdata->ipform;
-   ca = pdata->pl1data[0];
-   cb = pdata->pl1data[1];
-   cc = pdata->pl1data[2];
+   ca = pdata->pldata[0];
+   cb = pdata->pldata[1];
+   cc = pdata->pldata[2];
+   cd = pdata->pldata[3];
    offset = pdata->offset;
 
 /* Check we have something to do. */
@@ -577,6 +589,11 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
                   ip_qi = p1*cos( -2*state->tcs_az_ac2 );
                   ip_ui = p1*sin( -2*state->tcs_az_ac2 );
 
+               } else if( ipform == 4 || ipform == 5 ) {
+                  p1 = ca + cb*state->tcs_az_ac2 + cc*state->tcs_az_ac2*state->tcs_az_ac2;
+                  ip_qi = p1*cos( -2*( state->tcs_az_ac2 - cd ) );
+                  ip_ui = p1*sin( -2*( state->tcs_az_ac2 - cd ) );
+
                } else {
                   ip_qi = 0.0;
                   ip_ui = 0.0;
@@ -629,11 +646,24 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    intensity value minus the electronic offset. */
                   ival = *iin - offset;
 
+/* POL2 introduces a loss of about 1.35 in the analysed signal strength
+   measured by SCUBA-2. The input I, Q and U values supplied to unmakemap
+   are assumed to include this degradation, and so no further degradation
+   is applied here. However, some IP models incorporate the degradation
+   into their parameter values and some do not. If the IP model is *not*
+   PL3, the IP model gives the Q/U to subtract from the *degraded* Q and
+   U signals, as a function of the NON-degraded I signal. This means we
+   need to boost the supplied I values (which are assumed to be degraded)
+   to get the non-degraded I values before using the IP model. The PL3
+   IP model gives the Q/U to subtract from the degraded Q and U signals,
+   as a function of the degraded I signal, and so no change is needed. */
+                  k = ( ipform != 5 ) ? 1.35 : 1.0;
+
 /* Add in the instrumental polarisation. This is assumed to be fixed in
    focal plane coords, which means it is also fixed with respect to the
    analyser. */
-                  qval += ip_qi*ival;
-                  uval += ip_ui*ival;
+                  qval += ip_qi*ival*k;
+                  uval += ip_ui*ival*k;
 
 /* Calculate the analysed intensity and store it in place of the I value.
    A phi value of zero corresponds to the fixed analyser (i.e. the new Q/U

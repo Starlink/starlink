@@ -87,19 +87,25 @@
 *        is True, then a new artificial I map is created and stored in
 *        a new NDF with name specified by ARTI. If NEWART is False, then
 *        ARTI should specify an existing NDF on entry, which is used as
-*        the artificial I map.
+*        the artificial I map. The values in this NDF include the effects
+*        of the degradation caused by placing POL2 into the beam, (a factor
+*        of 1.35).
 *     ARTQ = NDF (Read or write)
 *        A 2D NDF holding the artificial Q map from which the returned
 *        time-stream data is derived. If the NEWART parameter is True, then
 *        a new artificial Q map is created and stored in a new NDF with name
 *        specified by ARTQ. If NEWART is False, then ARTQ should specify an
-*        existing NDF on entry, which is used as the artificial Q map.
+*        existing NDF on entry, which is used as the artificial Q map. The
+*        values in this NDF include the effects of the degradation caused by
+*        placing POL2 into the beam, (a factor of 1.35).
 *     ARTU = NDF (Read or write)
 *        A 2D NDF holding the artificial U map from which the returned
 *        time-stream data is derived. If the NEWART parameter is True, then
 *        a new artificial U map is created and stored in a new NDF with name
 *        specified by ARTU. If NEWART is False, then ARTU should specify an
-*        existing NDF on entry, which is used as the artificial U map.
+*        existing NDF on entry, which is used as the artificial U map. The
+*        values in this NDF include the effects of the degradation caused by
+*        placing POL2 into the beam, (a factor of 1.35).
 *     CFACTOR = _DOUBLE (Read)
 *        A factor by which to expand the COM model values derived from
 *        the supplied INCOM data. The expansion is centred on the mean
@@ -178,10 +184,11 @@
 *        COMVAL2 instead. Only used if ADDON is False. [!]
 *     IPFORM = LITERAL (Read)
 *        The form of instrumental polarisation to use. Can be "JK" for the
-*        Johnstone/Kennedy model, "PL1" for the simplified planetary data model,
-*        "User" for a user-defined model (see parameters IPMAX, IPMIN and
-*        IPTHETA), or "None" if no instrumental polarisation is to be added
-*        to the simulated data. ["PL1"]
+*        Johnstone/Kennedy model, "PL1", "PL2" or "PL3" for one of the
+*        simplified planetary data models, "User" for a user-defined model
+*        (see parameters IPMAX, IPMIN and IPTHETA), or "None" if no
+*        instrumental polarisation is to be added to the simulated data.
+*        ["PL3"]
 *     IPEAK = _DOUBLE (Read)
 *        Peak intensity for new artificial total instensity map, in pW. [0.08]
 *     IPMIN = _DOUBLE (Read)
@@ -386,9 +393,9 @@ try:
                                 "map (pixels)", 8, True ))
    params.append(starutil.Par0F("POL", "Fractional polarisation in "
                                 "artificial Q/U maps", 0.05, True ))
-   params.append(starutil.ParChoice("IPFORM", ['JK', 'PL1', 'User', 'None'],
+   params.append(starutil.ParChoice("IPFORM", ['JK', 'PL1', 'PL2', 'PL3', 'User', 'None'],
                                 "The form of instrumental polarisation "
-                                "to add to the simulated data", "PL1", True ))
+                                "to add to the simulated data", "PL3", True ))
    params.append(starutil.Par0F("IPMAX", "Maximum fractional instrumental "
                                 "polarisation", 0.0008, True ))
    params.append(starutil.Par0F("IPMIN", "Minimum fractional instrumental "
@@ -650,6 +657,12 @@ try:
 
    else:
       msg_out( "Using supplied artificial I, Q and U maps...")
+
+#  The IART map may be used as an IP reference map at some point
+#  in the future, so make sure it is understood to include the effects of
+#  the 1.35 degradation factor caused by placing POL2 in the beam.
+   invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=INBEAM edit=w value=pol "
+          "comment=! position=! mode=interface".format(iart))
 
 #  Ensure the artificial maps have a defined polarimetric reference
 #  direction parallel to the pixel Y axis, and ensure they are in units

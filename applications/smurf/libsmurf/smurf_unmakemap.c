@@ -106,7 +106,10 @@
 *          harmonic signal. [4]
 *     IN = NDF (Read)
 *          The input 2D image of the sky. If NDFs are supplied for the
-*          QIN and UIN parameters, then IN should hold I values.
+*          QIN and UIN parameters, then IN should hold I values. For POL2
+*          data, the input I, Q and U pixel values are assumed to
+*          incorporate the effect of the 1.35 loss caused by placing POL2
+*          in the beam.
 *     INSTQ = NDF (Read)
 *          An optional 2D input NDF holding the instrumental normalised
 *          Q value for each bolometer, with respect to fixed analyser
@@ -182,15 +185,18 @@
 *
 *          - "JK": The Johnstone-Kennedy model based on analysis of skydip
 *          data.
-*
 *          - "PL1": A simpler model based on analysis of planetary data.
-*
+*          - "PL2": A simpler model based on analysis of planetary data.
+*          - "PL3": A simpler model based on analysis of planetary data.
 *          - "USER": IP is based on the values supplied for parameters
 *          INSTQ and INSTU.
-*
 *          - "NONE": No IP is added.
 *
-*          Supplying a null value (!) value is equivalent to "NONE".  ["PL1"]
+*          Note, if the PL1 or PL2 model is used, suitable values also need
+*          to be supplied for parameter PLDATA (the default values for PLDATA
+*          are appropriate for PL3).
+*
+*          Supplying a null value (!) value is equivalent to "NONE".  ["PL3"]
 *     JKDATA = LITERAL (Read)
 *          The path to an HDS container file holding data defining the
 *          parameters of the Johnstone/Kennedy model of POL2 instrumental
@@ -202,7 +208,9 @@
 *          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
 *          A group of output NDFs into which the simulated time series data
-*          will be written. These will hold _DOUBLE data vlues.
+*          will be written. These will hold _DOUBLE data values. For POL2
+*          data, the values should be considered to incorporate the 1.35 loss
+*          caused by POL2 .
 *     PARAMS( 2 ) = _DOUBLE (Read)
 *          An optional array which consists of additional parameters
 *          required by the Sinc, SincSinc, SincCos, SincGauss, Somb and
@@ -245,19 +253,23 @@
 *     PHASE16 = _DOUBLE (Read)
 *          The phase offset to apply to the 16 Hz signal specified via
 *          parameter AMP16, in degrees. [0.0]
-*     PL1DATA() = DOUBLE (Read)
-*          The numerical parameters of the PL1 IP model for POL2 data.
-*          This parameter is only used if parameter IPFORM is set to "PL1".
-*          This should be a vector of three values, being the coefficients
-*          of a quadratic polynomial that gives the fractional polarisation
-*          produced by instrumental polarisation, as a function of elevation
-*          (in radians):
+*     PLDATA() = DOUBLE (Read)
+*          The numerical parameters of the PL1, PL2 or PL3 IP model for POL2
+*          data. This parameter is only used if parameter IPFORM is set to
+*          "PL1", "PL2" or "PL3". This should be a vector of three (PL1)
+*          or four (PL2 and PL3) values, being the coefficients of a quadratic
+*          polynomial that gives the fractional polarisation produced by
+*          instrumental polarisation, as a function of elevation (in radians):
 *
 *          fractional IP = A + B*elev + C*elev*elev
 *
-*          where the vector (A,B,C) is given by parameter PL1DATA. The PL1
-*          model assumes that the IP is parallel to the elevation axis at all
-*         elevations. [ 3.288E-3, 2.178E-2, -1.156E-2 ]
+*          where the vector (A,B,C) are given by the first three elements
+*          of parameter PLDATA. The PL1 model assumes that the IP is parallel
+*          to the elevation axis at all elevations. The PL2 and PL3
+*          require a fourth value to indicate the offset between the IP and the
+*          elevation axis.
+*
+*          The default values are appropriate for PL3. [2.624E-3,4.216E-2,-2.410E-2,-3.400E-2]
 *     POINTING = LITERAL (Read)
 *          The name of a text file containing corrections to the pointing
 *          read from the reference data files. If null (!) is supplied, no
@@ -285,7 +297,9 @@
 *          polarisation angles are in the same sense as rotation from
 *          the pixel X axis to the pixel Y axis. If QIN and UIN are
 *          both supplied, then the time series specified by the REF
-*          parameter should contain flat-fielded POL2 data. [!]
+*          parameter should contain flat-fielded POL2 data. These
+*          values are assumed to incorporate the effect of the 1.35
+*          loss caused by placing POL2 in the beam. [!]
 *     REF = NDF (Read)
 *          A group of existing time series data cubes. These act as templates
 *          for the new time series cubes created by this application, and
@@ -300,7 +314,9 @@
 *          polarisation angles are in the same sense as rotation from
 *          the pixel X axis to the pixel Y axis. If QIN and UIN are
 *          both supplied, then the time series specified by the REF
-*          parameter should contain flat-fielded POL2 data. [!]
+*          parameter should contain flat-fielded POL2 data. These
+*          values are assumed to incorporate the effect of the 1.35
+*          loss caused by placing POL2 in the beam. [!]
 *     USEAXIS = LITERAL (Read)
 *          A set of 2 axes to be selected from the Current Frame in the sky
 *          map. Each axis can be specified either by giving its index within
@@ -460,7 +476,7 @@ void smurf_unmakemap( int *status ) {
    double phase16;            /* Phase of 16 Hz signal */
    double phase2;             /* Phase of 2 Hz signal */
    double phase4;             /* Phase of 4 Hz signal */
-   double pl1data[3];         /* Parameters of the PL1 IP model */
+   double pldata[4];          /* Parameters of the PL1 PL2 or PL3 IP model */
    double sigma;              /* Standard deviation of noise to add to output */
    int alignsys;              /* Align data in the map's system? */
    int cdims[ 3 ];            /* Common-mode NDF dimensions */
@@ -688,7 +704,7 @@ void smurf_unmakemap( int *status ) {
    if( *status == SAI__OK && inq_data && inu_data ) {
 
 /* Get the IP model to use. */
-      parChoic( "IPFORM", "PL1", "PL1,JK,USER,NONE", 0, pabuf,
+      parChoic( "IPFORM", "PL3", "PL1,PL2,PL3,JK,USER,NONE", 0, pabuf,
                 sizeof(pabuf), status );
 
       if( *status == PAR__NULL ) {
@@ -697,7 +713,17 @@ void smurf_unmakemap( int *status ) {
       } else if( !strcmp( pabuf, "PL1" ) ) {
          ipform = 1;
          msgOut( " ", "Using PL1 IP model", status );
-         parExacd( "PL1DATA", 3, pl1data, status );
+         parExacd( "PLDATA", 3, pldata, status );
+
+      } else if( !strcmp( pabuf, "PL2" ) ) {
+         ipform = 4;
+         msgOut( " ", "Using PL2 IP model", status );
+         parExacd( "PLDATA", 4, pldata, status );
+
+      } else if( !strcmp( pabuf, "PL3" ) ) {
+         ipform = 5;
+         msgOut( " ", "Using PL3 IP model", status );
+         parExacd( "PLDATA", 4, pldata, status );
 
       } else if( !strcmp( pabuf, "JK" ) ) {
          ipform = 2;
@@ -1013,7 +1039,7 @@ void smurf_unmakemap( int *status ) {
          smf_uncalc_iqu( wf, odata, odata->pntr[ 0 ], outq_data, outu_data,
                          ang_data, pasign, AST__DD2R*paoff, AST__DD2R*angrot,
                          amp2, AST__DD2R*phase2, amp4, AST__DD2R*phase4,
-                         amp16, AST__DD2R*phase16, ipform, pl1data,
+                         amp16, AST__DD2R*phase16, ipform, pldata,
                          qinst_data, uinst_data, c0_data, p0_data, p1_data,
                          angc_data, harmonic, comval[1], status );
 

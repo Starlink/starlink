@@ -6146,7 +6146,7 @@ package @PACKAGE@ {
                 ppath CURRENT, DEFAULT
                 prompt {Instrumental polarisation model to use}
                 helpkey *
-                default {PL1}
+                default {PL3}
             }
 
             parameter jkdata {
@@ -6222,13 +6222,13 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter pl1data {
+            parameter pldata {
                size *
                type _DOUBLE
                vpath DEFAULT
                ppath DEFAULT
-               prompt {Parameter values for PL1 IP model}
-               default 3.288E-3 2.178E-2 -1.156E-2
+               prompt {Parameter values for PL1 PL2 or PL3  IP model}
+               default 2.624E-3 4.216E-2 -2.410E-2 -3.400E-2
                helpkey *
             }
 
