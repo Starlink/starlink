@@ -1307,7 +1307,7 @@ class Parameter(object):
 
          if result == "" or result.isspace():
             if default != Parameter.UNSET:
-               result = default
+               result = "{0}".format(default)
                break
 
          else:
@@ -1326,6 +1326,143 @@ class Parameter(object):
       else:
          return "{0} = <unset>".format(self._getName())
 
+
+
+class Par1(Parameter):
+   __metaclass__ = abc.ABCMeta
+   '''
+
+   An abstract base class describing a generic vector-valued parameter.
+
+   Properties:
+      This class defines the following properties in addition to those of
+      the Parameter class:
+
+      maxsize = int
+         The largest number of values allowed in the vector. Unlimited if
+         maxsize=None.
+      minsize = int
+         The smallest number of values allowed in the vector. May be zero.
+
+   Methods:
+      This class has no extra methods over and above those of
+      the Parameter class:
+
+   '''
+
+   def __init__(self, name, prompt=None, default=Parameter.UNSET,
+                noprompt=False, help=None, maxsize=None, minsize=1 ):
+      Parameter.__init__(self, name, prompt, default, noprompt, help )
+      self.__maxsize = None
+      self.__minsize = None
+      self._setMaxSize(maxsize)
+      self._setMinSize(minsize)
+
+   def _getMaxSize(self):
+      return self.__maxsize
+   def _setMaxSize(self,size):
+      if size is None:
+         self.__maxsize = None
+      else:
+         size = int(size)
+         if size < 1 :
+            size = 1
+         self.__maxsize = size
+
+   def _getMinSize(self):
+      return self.__minsize
+   def _setMinSize(self,size):
+      if size is None:
+         self.__minsize = 1
+      else:
+         size = int(size)
+         if size < 0 :
+            size = 0
+         self.__minsize = size
+
+   minsize = property(_getMinSize, _setMinSize, None, "The minimum number of values")
+   maxsize = property(_getMaxSize, _setMaxSize, None, "The maximum number of values")
+
+   def _isValid(self):
+      val = Parameter._getValue(self)
+      name = Parameter._getName(self)
+      if val is None:
+         size = 0
+      else:
+         try:
+            val = self._splitString(format(val).strip(),name)
+            size = len(val)
+         except AtaskError:
+            raise InvalidParameterError( "\n{0}Cannot access a group of existing NDFs using parameter '{1}' ('{2}').".format(_cmd_token(),name,val) )
+
+      if size < self.minsize:
+         raise InvalidParameterError( "\n{0}Too few values ({1}) given for parameter '{2}' - at least {3} must be supplied.".format(_cmd_token(),size,name, self._getMinSize()) )
+      elif self.maxsize is not None and size > self.maxsize:
+         raise InvalidParameterError( "\n{0}Too many values ({1}) given for parameter '{2}' - no more than {3} can be supplied.".format(_cmd_token(),size,name,self._getMaxSize()) )
+      Parameter._setValue(self,val)
+
+   def _splitString(self,string,name):
+
+      if string.startswith("[") and string.endswith("]"):
+         string = string[1:-1]
+
+      result = []
+      slen = len(string)
+      startAt = 0
+
+
+      while startAt < slen:
+
+         iAt = startAt
+         while iAt < slen and string[ iAt ].isspace():
+            iAt += 1
+
+         if iAt == slen:
+            break;
+
+         if string[iAt] == '"':
+            quot = '"'
+            startAt = iAt
+         elif string[iAt] == "'":
+            quot = "'"
+            startAt = iAt
+         else:
+            quot = None
+
+         if quot:
+            endAt = string.find( quot, startAt + 1 )
+            while endAt >= 0:
+               if string[endAt-1] == '\\':
+                  endAt = string.find( quot, endAt + 1 )
+               else:
+                  break
+            if endAt < 0:
+               raise InvalidParameterError( "\n{0}Missing end-quote in value ({1}) given for parameter '{2}'.".format(_cmd_token(),string,name) )
+
+            result.append( string[ startAt+1:endAt ] )
+
+            iAt = endAt + 1
+            while iAt < slen and string[ iAt ].isspace():
+               iAt += 1
+            if iAt < slen and string[ iAt ] != ',':
+               raise InvalidParameterError( "\n{0}Missing comma after closing quote in value ({1}) given for parameter '{2}'.".format(_cmd_token(),string,name) )
+            startAt = iAt + 1
+
+         else:
+            endAt = string.find( ',', startAt + 1 )
+            while endAt >= 0:
+               if string[endAt-1] == '\\':
+                  endAt = string.find( ',', endAt + 1 )
+               else:
+                  break
+            if endAt < 0:
+               result.append( string[ startAt:].strip() )
+               break
+            else:
+               result.append( string[ startAt:endAt ].strip() )
+            startAt = endAt + 1
+
+      return result
 
 
 
@@ -1369,6 +1506,49 @@ class Par0S(Parameter):
       value = Parameter._getValue(self)
       Parameter._setValue(self,"{0}".format(value))
 
+
+
+class Par1S(Par1):
+   '''
+
+   Describes a vector string-valued parameter. The parameter is initially
+   in an unset state.
+
+   Constructor:
+      param = Par1S( name, prompt=None, default=Parameter.UNSET,
+                     noprompt=False, help=None, maxsize=None, minsize=1 )
+         name = string
+            The parameter name. The supplied string is converted to upper case.
+         prompt = string
+            The prompt string.
+         default = string
+            The initial default value.
+         noprompt = boolean
+            If True, then the user will not be prompted for a parameter value
+            if none was supplied on the command line. Instead, the default
+            value will be used if set (a NoValueError will be raised otherwise).
+         help = string
+            The help string
+         maxsize = int
+            The largest number of values allowed in the vector. Unlimited if
+            maxsize=None.
+         minsize = int
+            The smallest number of values allowed in the vector. May be zero.
+
+   Properties:
+      This class has no extra properties over and above those of
+      the Par1 class:
+
+   Methods:
+      This class has no extra methods over and above those of
+      the Par1 class:
+
+   '''
+
+   def __init__(self, name, prompt=None, default=Parameter.UNSET,
+                noprompt=False, help=None, maxsize=None, minsize=1 ):
+      Par1.__init__(self, name, prompt, default, noprompt, help, maxsize,
+                    minsize )
 
 
 
@@ -1468,6 +1648,101 @@ class Par0F(Parameter):
 
 
 
+class Par1F(Par1):
+   '''
+
+   Describes a vector floating-point parameter. The parameter is initially
+   in an unset state.
+
+   Constructor:
+      param = Par1F( name, prompt=None, default=Parameter.UNSET,
+                     noprompt=False, help=None, maxval=None,
+                     minval=None, maxsize=None, minsize=1  )
+         name = string
+            The parameter name. The supplied string is converted to upper case.
+         prompt = string
+            The prompt string.
+         default = float
+            The initial default value.
+         noprompt = boolean
+            If True, then the user will not be prompted for a parameter value
+            if none was supplied on the command line. Instead, the default
+            value will be used if set (a NoValueError will be raised otherwise).
+         help = string
+            The help string
+         maxval = float
+            The maximum acceptable value for the parameter.
+         minval = float
+            The minimum acceptable value for the parameter.
+         maxsize = int
+            The largest number of values allowed in the vector. Unlimited if
+            maxsize=None.
+         minsize = int
+            The smallest number of values allowed in the vector. May be zero.
+
+   Properties:
+      This class has no extra properties over and above those of
+      the Par1 and Par0F classes:
+
+   Methods:
+      This class has no extra methods over and above those of
+      the Par1 and Par0F classes:
+
+   '''
+
+   def __init__(self, name, prompt=None, default=Parameter.UNSET,
+                noprompt=False, help=None, maxval=None, minval=None,
+                maxsize=None, minsize=1 ):
+      Par1.__init__(self, name, prompt, default, noprompt, help, maxsize,
+                    minsize )
+      self.__maxval = None
+      self.__minval = None
+      self._setMaxVal(maxval)
+      self._setMinVal(minval)
+
+   def _getMaxVal(self):
+      return self.__maxval
+   def _setMaxVal(self,val):
+      self.__maxval = float(val) if  val is not None else None
+   def _getMinVal(self):
+      return self.__minval
+   def _setMinVal(self,val):
+      self.__minval = float(val) if  val is not None else None
+
+   minval = property(_getMinVal, _setMinVal, None, "The minimum parameter value")
+   maxval = property(_getMaxVal, _setMaxVal, None, "The maximum parameter value")
+
+   def _isValid(self):
+      Par1._isValid(self)
+
+      result = []
+      minv = self._getMinVal()
+      maxv = self._getMaxVal()
+
+      for val in Parameter._getValue(self):
+         try:
+            val = float(val)
+         except ValueError:
+            raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be numerical value.".format(_cmd_token(),val,self.name))
+
+         big = (val > maxv) if maxv is not None else False
+         small = (val < minv) if minv is not None else False
+
+         if (maxv is not None) and (minv is not None):
+            if (maxv > minv) and (big or small):
+                  raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be between {3} and {4}.".format(_cmd_token(),val,self._getName(),minv,maxv))
+            elif (maxv <= minv) and (big and small):
+                  raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must not be between {3} and {4}.".format(_cmd_token(),val,self._getName(),maxv,minv))
+
+         elif big:
+            raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be no more than {3}.".format(_cmd_token(),val,self._getName(),maxv))
+
+         elif small:
+            raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be no less than {3}.".format(_cmd_token(),val,self._getName(),minv))
+
+         result.append(val)
+
+      Parameter._setValue(self,result)
 
 
 
@@ -1565,6 +1840,101 @@ class Par0I(Parameter):
          raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be an integer value.".format(_cmd_token(),val,self.name))
 
 
+class Par1I(Par1):
+   '''
+
+   Describes a vector integer parameter. The parameter is initially
+   in an unset state.
+
+   Constructor:
+      param = Par1I( name, prompt=None, default=Parameter.UNSET,
+                     noprompt=False, help=None, maxval=None, minval=None,
+                     maxsize=None, minsize=1 )
+         name = string
+            The parameter name. The supplied string is converted to upper case.
+         prompt = string
+            The prompt string.
+         default = float
+            The initial default value.
+         noprompt = boolean
+            If True, then the user will not be prompted for a parameter value
+            if none was supplied on the command line. Instead, the default
+            value will be used if set (a NoValueError will be raised otherwise).
+         help = string
+            The help string
+         maxval = int
+            The maximum acceptable value for the parameter.
+         minval = int
+            The minimum acceptable value for the parameter.
+         maxsize = int
+            The largest number of values allowed in the vector. Unlimited if
+            maxsize=None.
+         minsize = int
+            The smallest number of values allowed in the vector. May be zero.
+
+   Properties:
+      This class has no extra properties over and above those of
+      the Par1 and Par0I classes:
+
+   Methods:
+      This class has no extra methods over and above those of
+      the Par1 and Par0I classes:
+
+   '''
+
+   def __init__(self, name, prompt=None, default=Parameter.UNSET,
+                noprompt=False, help=None, maxval=None, minval=None,
+                maxsize=None, minsize=1 ):
+      Par1.__init__(self, name, prompt, default, noprompt, help, maxsize,
+                    minsize )
+      self.__maxval = None
+      self.__minval = None
+      self._setMaxVal(maxval)
+      self._setMinVal(minval)
+
+   def _getMaxVal(self):
+      return self.__maxval
+   def _setMaxVal(self,val):
+      self.__maxval = int(round(float(val))) if  val is not None else None
+   def _getMinVal(self):
+      return self.__minval
+   def _setMinVal(self,val):
+      self.__minval = int(round(float(val))) if  val is not None else None
+
+   minval = property(_getMinVal, _setMinVal, None, "The minimum parameter value")
+   maxval = property(_getMaxVal, _setMaxVal, None, "The maximum parameter value")
+
+   def _isValid(self):
+      Par1._isValid(self)
+
+      result = []
+      minv = self._getMinVal()
+      maxv = self._getMaxVal()
+
+      for val in Parameter._getValue(self):
+         try:
+            val = int(val)
+         except ValueError:
+            raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be integer value.".format(_cmd_token(),val,self.name))
+
+         big = (val > maxv) if maxv is not None else False
+         small = (val < minv) if minv is not None else False
+
+         if (maxv is not None) and (minv is not None):
+            if (maxv > minv) and (big or small):
+                  raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be between {3} and {4}.".format(_cmd_token(),val,self._getName(),minv,maxv))
+            elif (maxv <= minv) and (big and small):
+                  raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must not be between {3} and {4}.".format(_cmd_token(),val,self._getName(),maxv,minv))
+
+         elif big:
+            raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be no more than {3}.".format(_cmd_token(),val,self._getName(),maxv))
+
+         elif small:
+            raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be no less than {3}.".format(_cmd_token(),val,self._getName(),minv))
+
+         result.append(val)
+
+      Parameter._setValue(self,result)
 
 
 
