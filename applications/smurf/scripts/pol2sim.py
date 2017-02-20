@@ -81,6 +81,22 @@
 *        Controls the amplitude of the 16 Hz signal. It gives the amplitude
 *        of the 16 Hz signal as a fraction of the total intensity. See
 *        also "PHASE16". Only used if ADDON is False. [0.0008]
+*     ARTFORM = _INTEGER (Read)
+*        Indicates the form of polarisation pattern created if parameter
+*        NEWART is set True:
+*
+*        0 - A single Gaussian source centred at pixel coordinates given
+*        by parameters XC and YC (default is (0,0)), with peak total
+*        intensity given by parameter IPEAK and width given by parameter
+*        IFWHM. The polarisation vectors are tangential, centred on the
+*        source. The fractional polarisation is constant at the value
+*        given by POL.
+*
+*        1 - Exactly like "1" except that the vectors are parallel across
+*        the whole Gaussian blob, rather than being tangential. The
+*        vectors are parallel to the Y pixel axis.
+*
+*        [0]
 *     ARTI = NDF (Read or write)
 *        A 2D NDF holding the artificial total intensity map from which the
 *        returned time-stream data is derived. If the NEWART parameter
@@ -236,15 +252,11 @@
 *        assumed to be the polarimetric reference direction.
 *
 *        If NEWART is True, then new artificial I, Q and U data is
-*        created representing a single Gaussian source centred at pixel
-*        coordinates given by parameters XC and YC (default is (0,0)), with
-*        peak total intensity given by parameter IPEAK and width given by
-*        parameter IFWHM. The polarisation vectors are tangential, centred on
-*        the source. The fractional polarisation is constant at the value
-*        given by POL. The Y pixel axis is reference direction (suitable
+*        created containing data of the form indicated by parameter
+*        ARTFORM. The Y pixel axis is reference direction (suitable
 *        POLANAL Frames are included in the WCS to indicate this, as
 *        required by POLPACK).
-*     OUT = NDF (Write)
+     OUT = NDF (Write)
 *        A group of output NDFs to hold the simulated POL2 time series
 *        data. Equal in number to the files in "IN".
 *     PHASE2 = _DOUBLE (Read)
@@ -324,6 +336,8 @@
 *        - Remove IPDATA parameter.
 *     2-JUN-2016 (DSB):
 *        Replaced parameter COMVAL with COMVAL1 and COMVAL2.
+*     17-FEB-2017 (DSB):
+*        Added parameter ARTFORM.
 *-
 '''
 
@@ -374,6 +388,9 @@ try:
                                                        default=Parameter.UNSET)))
    params.append(starutil.Par0S("OUT", "Output simulated POL2 data"))
    params.append(starutil.Par0L("NEWART", "Create new artificial I, Q and U maps?" ))
+   params.append(starutil.ParChoice("ARTFORM", ("0","1"),
+                                    "Form of artificial I, Q and U to create",
+                                    "0", noprompt=True ))
    params.append(starutil.ParNDG("ARTI", "Artificial I map", maxsize=1 ))
    params.append(starutil.ParNDG("ARTQ", "Artificial Q map", maxsize=1 ))
    params.append(starutil.ParNDG("ARTU", "Artificial U map", maxsize=1 ))
@@ -554,16 +571,28 @@ try:
 #  results are repeatable.
    os.environ["STAR_SEED"] = "65"
 
+
+#  Has the indput data been flatfielded? Test the first supplied input NDF.
+   ff = None
+   try:
+      if "smf_flatfield" in invoke("$HDSTRACE_DIR/hdstrace {0}.more.smurf.smurfhist".format(indata[0])):
+         msg_out( "Input data has already been flatfielded.")
+         ff = indata
+   except starutil.StarUtilError:
+      pass
+
 #  Flat field the supplied template data
-   ff = NDG.load( "FF" )
+   if not ff:
+      ff = NDG.load( "FF" )
+      if ff:
+         msg_out( "Re-using old flatfielded template data...")
+
    if not ff:
       ffdir = NDG.subdir()
       msg_out( "Flatfielding template data...")
       invoke("$SMURF_DIR/flatfield in={0} out=\"{1}/*\"".format(indata,ffdir) )
       ff = NDG("{0}/\*".format(ffdir))
       ff.save( "FF" )
-   else:
-      msg_out( "Re-using old flatfielded template data...")
 
 #  Output files. Base the modification on "ff" rather than "indata",
 #  since "indata" may include non-science files (flatfields, darks etc)
@@ -576,6 +605,7 @@ try:
       msg_out( "Creating new artificial I, Q and U maps...")
 
 #  Get the parameters defining the artificial data
+      artform = parsys["ARTFORM"].value
       ipeak = parsys["IPEAK"].value
       ifwhm = parsys["IFWHM"].value
       xc = parsys["XC"].value
@@ -615,9 +645,10 @@ try:
       ly = int( round( ly ) )
       uy = int( round( uy ) )
 
-#  Generate Q,U and I for a single gaussian bump.  Tangential vectors
-#  centred on the bump, with increasing percentage polarisation at larger
-#  radii. Y pixel axis is reference direction. First create the I map.
+#  Generate Q,U and I for a single gaussian bump.  Either parallel
+#  vectors, or tangential vectors centred on the bump, with fixed percentage
+#  polarisation at all radii. Y pixel axis is reference direction. First
+#  create the I map.
       if ipeak != 0.0:
          invoke("$KAPPA_DIR/maths exp=\"'ia*0+pa*exp(-pc*((xa-px)**2+(xb-py)**2)/(pf**2))'\" "
                 "pa={0} pc=1.66511 pf={1} out={2} px={3} py={4} "
@@ -636,12 +667,18 @@ try:
          pi = NDG(1)
          invoke( "$KAPPA_DIR/mult in1={0} in2={1} out={2}".format(iart,fp,pi) )
 
-#  Get q and u values that give radial vectors.
-         theta = NDG(1)
-         invoke( "$KAPPA_DIR/maths exp=\"'ia*0+atan2(-(xa-px),(xb-py))'\" "
-                 "ia={0} out={1} px={2} py={3}".format(iart,theta,xc,yc) )
-         invoke("$KAPPA_DIR/maths exp=\"'-ia*cos(2*ib)'\" ia={0} ib={1} out={2}".format(pi,theta,qart) )
-         invoke("$KAPPA_DIR/maths exp=\"'-ia*sin(2*ib)'\" ia={0} ib={1} out={2}".format(pi,theta,uart) )
+#  If ARTFORM is zero, get q and u values that give radial vectors.
+         if artform == "0":
+            theta = NDG(1)
+            invoke( "$KAPPA_DIR/maths exp=\"'ia*0+atan2(-(xa-px),(xb-py))'\" "
+                    "ia={0} out={1} px={2} py={3}".format(iart,theta,xc,yc) )
+            invoke("$KAPPA_DIR/maths exp=\"'-ia*cos(2*ib)'\" ia={0} ib={1} out={2}".format(pi,theta,qart) )
+            invoke("$KAPPA_DIR/maths exp=\"'-ia*sin(2*ib)'\" ia={0} ib={1} out={2}".format(pi,theta,uart) )
+
+#  Otherwise, get q and u values that give vectors parallel to the Y axis.
+         else:
+            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(pi,qart) )
+            invoke("$KAPPA_DIR/cmult in={0} out={1} scalar=0".format(pi,uart) )
 
 #  Fill I, Q and U images with zeros if IPEAK is zero.
       else:
