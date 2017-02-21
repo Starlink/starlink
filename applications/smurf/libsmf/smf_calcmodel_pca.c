@@ -128,10 +128,12 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    double *res_data;
    double pcathresh;
    double pcathresh_freeze = 0.0;
+   double skip;
+   int astskip;
    int comfill;
    int iw;
    int nw;
-   int skip;
+   int proceed;
    size_t ipix;
    smfArray **oldgai;
    smfArray **oldres;
@@ -153,27 +155,102 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    this function. */
    astBegin;
 
+/* Get the "ast.skip" value - when considering "pca.skip" we only count
+   iterations for which the AST model is subtracted (i.e. the ones
+   following the initial "ast.skip" iterations). */
+   astMapGet0A( keymap, "AST", &obj );
+   kmap = (AstKeyMap *) obj;
+   astMapGet0I( kmap, "SKIP", &astskip );
+   kmap = astAnnul( kmap );
+   if( astskip < 0 ) astskip = -astskip;
+
+/* Get a pointer to the KeyMap holding parameters controlling the
+   PCA model. */
+   astMapGet0A( keymap, "PCA", &obj );
+   kmap = (AstKeyMap *) obj;
+
+/* Get the number of initial iterations for which the PCA model is to be
+   skipped. Zero means use the PCA model on all iterations. A fractional
+   value between 0.0 and 1.0 is a normalised map change value at which
+   to start using the PCA model. A positive integer is the number of
+   iterations to skip. A negative value means "only use the PCA model
+   on the very last iteration". A bad value is stored in the KeyMap in
+   place of the origiunal value when the specified cvriterion is reached. */
+   skip = 0.0;
+   astMapGet0D( kmap, "SKIP", &skip );
+
+/* If the stored value is bad, the criterion has been reached so proceed
+   to use the PCA model. */
+   if( skip == VAL__BADD ) {
+      proceed = 1;
+
+/* If the stored value is zero, we use PCA on all iterations. */
+   } else if( skip == 0.0 ) {
+      proceed = 1;
+
+/* If the stored value is negative, only use PCA if this is the last
+   iteration. */
+   } else if( skip < 0.0 ) {
+      proceed = ( flags & SMF__DIMM_LASTITER );
+
+/* If the stored value is a fractional value between 0.0 and 1.0, only use
+   PCA once the normalised map change between iterations has dropped to
+   the value of PCA.SKIP. Ignored initial iterations for which the AST
+   model is skipped. */
+   } else if( skip < 1.0 ) {
+      if( dat->mapchange >= skip || dat->iter <= astskip + 1 ) {
+         proceed = 0;
+         dat->allow_convergence = 0; /* We've not yet reached the specified
+                                        limit so we must do more iterations */
+
+/* If we have reached the limit, ensure we apply the PCA model on all future
+   iterations, regardless of what the normalized map change may do in future.
+   To do this, we stored a bad value in place of the original PCA.SKIP value. */
+      } else {
+         proceed = 1;
+         astMapPut0D( kmap, "SKIP", VAL__BADD, NULL );
+      }
+
+/* Any other PCA.SKIP value is treated as a number of iterations to skip.
+   The initial iterations for which the AST model is skipped are not
+   included in this count. */
+   } else {
+      proceed = (dat->iter >= (int)( skip + 0.5 ) + astskip);
+      if( !proceed ) dat->allow_convergence = 0;
+   }
+
+/* Tell the user if we are skipping the PCA model on this iteration.
+   Ensure we only get the message once per iteration */
+   if( !proceed ) {
+      if( !( flags & SMF__DIMM_INVERT ) ) {
+         msgOutf( " ","   skipping PCA model on this iteration (PCA.SKIP=%g)\n",
+                  status, skip );
+      }
+
+/* If we are proceeding with the PCA model... Note, on the first
+   iteration for which the PCA model is used, the first invocation of this
+   function will be to invert the PCA model (i.e. put it back into the
+   residuals). But the contents of the model are initialised to zero in
+   smf_model_create, and so adding the mdel back into the residuals has
+   no effect. */
+   } else {
+
 /* Ensure the data is bolo-ordered (i.e. adjacent values in memory are
    adjacent time slices from the same bolometer, so tstride is 1 and
    bstride is ntslice). This is the order required and enforced by the
    call to smf_calcmodel_com below. */
-   smf_model_dataOrder( wf, dat, NULL, chunk, SMF__RES|SMF__QUA, 0, status );
+      smf_model_dataOrder( wf, dat, NULL, chunk, SMF__RES|SMF__QUA, 0, status );
 
 /* Obtain pointers to relevant smfArrays for this chunk */
-   res = dat->res[ chunk ];
-   model = allmodel[ chunk ];
-   lut = dat->lut[ chunk ];
-
-/* Get a pointer to the KeyMap holding parameters controlling the
-   common-mode correction model. */
-   astMapGet0A( keymap, "PCA", &obj );
-   kmap = (AstKeyMap *) obj;
+      res = dat->res[ chunk ];
+      model = allmodel[ chunk ];
+      lut = dat->lut[ chunk ];
 
 /* Get the value that determines how many PCA components to include in
    the model (i.e. how many components to remove from the residuals). */
-   astMapGet0D( kmap, "PCATHRESH", &pcathresh );
+      astMapGet0D( kmap, "PCATHRESH", &pcathresh );
 
-/* If the pcathresh value is positive, it sepecifies a number of standard
+/* If the pcathresh value is positive, it specifies a number of standard
    deviations, and a sigma-clipping algorithm is used to identify the PCA
    components that have amplitudes greater than the mean amplitude plus
    "pcathresh" standard deviations. Each sub-array is processed separately.
@@ -186,141 +263,134 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    the fixed number of components to remove from each subarray. Set
    "pcathresh" to -1 to indicate that he values in "ncomp" should be used,
    rather than determining new values using the sigma-clipping algorithm.  */
-   if( pcathresh < -1.0 ) {
-      ncomp[0] = ncomp[1] = ncomp[2] = ncomp[3] = (int)( -pcathresh + 0.5 );
-      pcathresh = -1.0;
+      if( pcathresh < -1.0 ) {
+         ncomp[0] = ncomp[1] = ncomp[2] = ncomp[3] = (int)( -pcathresh + 0.5 );
+         pcathresh = -1.0;
 
 /* If we are using the nsigma-clipping algorithm, get the value that
    determines when (if at all) to freeze the number of PCA components
    removed from the data. */
-   } else {
-      astMapGet0D( kmap, "PCATHRESH_FREEZE", &pcathresh_freeze );
-   }
+      } else {
+         astMapGet0D( kmap, "PCATHRESH_FREEZE", &pcathresh_freeze );
+      }
 
 /* Obtain dimensions of the data (assumed to be the same for all subarrays). */
-   smf_get_dims( res->sdata[0],  NULL, NULL, &nbolo, &ntslice, NULL,
-                 NULL, NULL, status );
+      smf_get_dims( res->sdata[0],  NULL, NULL, &nbolo, &ntslice, NULL,
+                    NULL, NULL, status );
 
 /* How many threads do we get to play with */
-   nw = wf ? wf->nworker : 1;
+      nw = wf ? wf->nworker : 1;
 
 /* Find how many bolometers or time slices to process in each worker thread. */
-   bstep = nbolo/nw;
-   if( bstep == 0 ) bstep = 1;
+      bstep = nbolo/nw;
+      if( bstep == 0 ) bstep = 1;
 
-   tstep = ntslice/nw;
-   if( tstep == 0 ) tstep = 1;
+      tstep = ntslice/nw;
+      if( tstep == 0 ) tstep = 1;
 
 /* Allocate job data for threads. */
-   job_data = astMalloc( nw*sizeof(*job_data) );
+      job_data = astMalloc( nw*sizeof(*job_data) );
 
 /* Store the range of bolos to be processed by each one. Ensure that the
    last thread picks up any left-over bolos. Also store other stuff
    needed by the threads that is the same for all subarrays. */
-   if( *status == SAI__OK ) {
-      for( iw = 0; iw < nw; iw++ ) {
-         pdata = job_data + iw;
-         pdata->b1 = iw*bstep;
-         pdata->t1 = iw*tstep;
-         if( iw < nw - 1 ) {
-            pdata->b2 = pdata->b1 + bstep - 1;
-            pdata->t2 = pdata->t1 + tstep - 1;
-         } else {
-            pdata->b2 = nbolo - 1 ;
-            pdata->t2 = ntslice - 1 ;
-         }
+      if( *status == SAI__OK ) {
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->b1 = iw*bstep;
+            pdata->t1 = iw*tstep;
+            if( iw < nw - 1 ) {
+               pdata->b2 = pdata->b1 + bstep - 1;
+               pdata->t2 = pdata->t1 + tstep - 1;
+            } else {
+               pdata->b2 = nbolo - 1 ;
+               pdata->t2 = ntslice - 1 ;
+            }
 
 /* Store other values common to all jobs. */
-         pdata->ntslice = ntslice;
-         pdata->nbolo = nbolo;
+            pdata->ntslice = ntslice;
+            pdata->nbolo = nbolo;
+         }
       }
-   }
 
 /* If we are inverting the model, just add the model values onto the
    residuals. This also clears any SMF__Q_PCA flags set on the previous
    iteration. */
-   if( flags & SMF__DIMM_INVERT ) {
+      if( flags & SMF__DIMM_INVERT ) {
 
 /* Process each sub-array in turn. */
-      for( idx = 0; idx < res->ndat && *status == SAI__OK; idx++ ) {
+         for( idx = 0; idx < res->ndat && *status == SAI__OK; idx++ ) {
 
-         res_data = (res->sdata[idx]->pntr)[0];
-         qua_data = smf_select_qualpntr( res->sdata[idx], NULL, status );
-         model_data = (model->sdata[idx]->pntr)[0];
+            res_data = (res->sdata[idx]->pntr)[0];
+            qua_data = smf_select_qualpntr( res->sdata[idx], NULL, status );
+            model_data = (model->sdata[idx]->pntr)[0];
 
-         for( iw = 0; iw < nw; iw++ ) {
-           pdata = job_data + iw;
-           pdata->qua_data = qua_data;
-           pdata->model_data = model_data;
-           pdata->res_data = res_data;
-           pdata->oper = 1;
-           thrAddJob( wf, 0, pdata, smf1_calcmodel_pca, 0, NULL, status );
+            for( iw = 0; iw < nw; iw++ ) {
+              pdata = job_data + iw;
+              pdata->qua_data = qua_data;
+              pdata->model_data = model_data;
+              pdata->res_data = res_data;
+              pdata->oper = 1;
+              thrAddJob( wf, 0, pdata, smf1_calcmodel_pca, 0, NULL, status );
+            }
+            thrWait( wf, status );
+
          }
-         thrWait( wf, status );
-
-      }
 
 /* If we are calculating a new model... */
-   } else {
-
-/* Get the number of AST-skipped iteration. */
-      if( astMapGet0A( keymap, "AST", &obj ) ){
-         AstKeyMap *kastmap = (AstKeyMap *) obj;
-         astMapGet0I( kastmap, "SKIP", &skip );
-         kastmap = astAnnul( kastmap );
-      }
+      } else {
 
 /* See if a mask should be used to exclude bright source areas from
    the PCA model. */
-      mask = smf_get_mask( wf, SMF__PCA, keymap, dat, flags, status );
+         mask = smf_get_mask( wf, SMF__PCA, keymap, dat, flags, status );
 
 /* See if the number of PCA components to remove as the PCA model is now
    frozen. If not, the number of components to remove as the PCA model is
    determined by the "PCA.PCATHRESH" parameter, using a sigma-clipping
    algorithm. It is frozen if it was frozen on a previous iteration
    (indicated by pcathresh being -1.0), we do not need to check. */
-      if( pcathresh == -1 ) {
+         if( pcathresh == -1 ) {
 
 /* Otherwise, if pcathresh_freeze is positive... */
-      } else if( ( pcathresh_freeze > 0 && (
+         } else if( ( pcathresh_freeze > 0 && (
 
 /* ... and pcathresh_freeze is below 1, it specifies a mapchange value. We
    freeze when this mapchange value is first achieved, but only if no PCA
    mask was used on the previous iteration. */
-             ( pcathresh_freeze < 1.0 && dat->mapchange < pcathresh_freeze && !lmask ) ||
+                ( pcathresh_freeze < 1.0 && dat->mapchange < pcathresh_freeze && !lmask ) ||
 
 /* If pcathresh_freeze is above 1, it specifies an integer number of
-   iterations, in addition to the initial skip iterations. We freeze
+   iterations, in addition to the initial AST-skip iterations. We freeze
    when we have done this number of iterations. */
-             ( pcathresh_freeze >= 1.0 && dat->iter > (int)( pcathresh_freeze + 0.5 ) + skip ) ) )
+                ( pcathresh_freeze >= 1.0 && dat->iter > (int)( pcathresh_freeze + 0.5 ) + astskip ) ) )
 
-/* If pcathresh_freeze is negative, we freeze when all skipped iterations
+/* If pcathresh_freeze is negative, we freeze when all AST-skipped iterations
    have been done. */
-        ||  ( pcathresh_freeze < 0 && dat->iter > skip ) ) {
+           ||  ( pcathresh_freeze < 0 && dat->iter > astskip ) ) {
 
 /* We are not using the sigma-clipping algorithm. Ensure it is never used again,
    in case the normalised change increases again. */
-         pcathresh = -1.0;
-         astMapPut0D( kmap, "PCATHRESH", -1.0, NULL );
-         msgOutiff(MSG__VERB, "","   No further changes in the number of "
-                   "PCA components removed as the PCA model will be made "
-                   "because PCA.PCATHRESH_FREEZE is set to %g.", status,
-                   pcathresh_freeze );
-      }
+            pcathresh = -1.0;
+            astMapPut0D( kmap, "PCATHRESH", -1.0, NULL );
+            msgOutiff(MSG__VERB, "","   No further changes in the number of "
+                      "PCA components removed as the PCA model will be made "
+                      "because PCA.PCATHRESH_FREEZE is set to %g.", status,
+                      pcathresh_freeze );
+         }
 
 /* Remember if a mask is being used on this iteration. This flag is
    declared static and is used on the next iteration. */
-      lmask = ( mask != NULL );
+         lmask = ( mask != NULL );
 
 /* Copy the supplied residuals into the current model arrays. The PCA
    model shares the residuals' quality array. */
-      for( idx = 0; idx < res->ndat && *status == SAI__OK; idx++ ) {
-         res_data = (res->sdata[idx]->pntr)[0];
-         model_data = (model->sdata[idx]->pntr)[0];
-         if( *status == SAI__OK ) {
-            memcpy(  model_data, res_data, nbolo*ntslice*sizeof(*res_data) );
+         for( idx = 0; idx < res->ndat && *status == SAI__OK; idx++ ) {
+            res_data = (res->sdata[idx]->pntr)[0];
+            model_data = (model->sdata[idx]->pntr)[0];
+            if( *status == SAI__OK ) {
+               memcpy(  model_data, res_data, nbolo*ntslice*sizeof(*res_data) );
+            }
          }
-      }
 
 /* Like FLT, PCA analysis requires all bad values and gaps to be filled
    before doing the analysis. The smf_clean_pca routine will use smf_fillgaps
@@ -340,53 +410,53 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    if PCA is the first model in the modelorder. So provide an option to
    omit this COM-filling and instead rely on the usual linear interpolation
    provided by smf_fillgaps. */
-      astMapGet0I( kmap, "COMFILL", &comfill );
-      if( comfill ) {
-         oldgai = dat->gai;
-         oldres = dat->res;
-         dat->gai = dat->pcagai;
-         dat->res = &model;
+         astMapGet0I( kmap, "COMFILL", &comfill );
+         if( comfill ) {
+            oldgai = dat->gai;
+            oldres = dat->res;
+            dat->gai = dat->pcagai;
+            dat->res = &model;
 
-         msgOutif( MSG__VERB, "", "  Evaluating a COM model as part of "
-                   "the PCA model...", status );
-         msgOutif( MSG__VERB, "", "  ---------------------------------",
-                   status );
-         smf_calcmodel_com( wf, dat, 0, keymap, dat->pcacom,
-                            flags | SMF__DIMM_PCACOM, status );
-         msgOutif( MSG__VERB, "", "  ---------------------------------",
-                   status );
+            msgOutif( MSG__VERB, "", "  Evaluating a COM model as part of "
+                      "the PCA model...", status );
+            msgOutif( MSG__VERB, "", "  ---------------------------------",
+                      status );
+            smf_calcmodel_com( wf, dat, 0, keymap, dat->pcacom,
+                               flags | SMF__DIMM_PCACOM, status );
+            msgOutif( MSG__VERB, "", "  ---------------------------------",
+                      status );
 
-         dat->gai = oldgai;
-         dat->res = oldres;
+            dat->gai = oldgai;
+            dat->res = oldres;
 
 /* If "comfill" is non-zero, any requested PCA mask will have been
    applied - and the consequent gaps filled - within smf_calcmodel_com.
    Otherwise, we need to do any requested PCA masking in this function. */
-      } else {
+         } else {
 
 /* If we have a mask, copy it into the quality array of the map.
    Also set map pixels that are not used (e.g. corner pixels, etc)
    to be background pixels in the mask. Do not do this on the first
    iteration as the map has not yet been determined.*/
-         if( mask ) {
-            double *map = dat->map;
-            smf_qual_t *mapqual = dat->mapqual;
-            double *mapvar = dat->mapvar;
+            if( mask ) {
+               double *map = dat->map;
+               smf_qual_t *mapqual = dat->mapqual;
+               double *mapvar = dat->mapvar;
 
-            for( ipix=0; ipix<dat->msize; ipix++ ) {
-               if( mask[ipix] ) {
-                  mapqual[ipix] |= SMF__MAPQ_PCA;
+               for( ipix=0; ipix<dat->msize; ipix++ ) {
+                  if( mask[ipix] ) {
+                     mapqual[ipix] |= SMF__MAPQ_PCA;
 
-               } else if( dat->iter > 0 && ( map[ipix] == VAL__BADD || mapvar[ipix] == VAL__BADD || mapvar[ipix] <= 0.0 ) ) {
-                  mask[ipix] = 1;
-                  mapqual[ipix] |= SMF__MAPQ_PCA;
+                  } else if( dat->iter > 0 && ( map[ipix] == VAL__BADD || mapvar[ipix] == VAL__BADD || mapvar[ipix] <= 0.0 ) ) {
+                     mask[ipix] = 1;
+                     mapqual[ipix] |= SMF__MAPQ_PCA;
 
-               } else {
-                  mapqual[ipix] &= ~SMF__MAPQ_PCA;
+                  } else {
+                     mapqual[ipix] &= ~SMF__MAPQ_PCA;
+                  }
                }
             }
          }
-      }
 
 /* If comfill is specified, the above results in the PCA model arrays
    containing a copy of the supplied residual data, but with no gaps.
@@ -396,27 +466,27 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    may have been flagged using SMF__Q_PCA - these are the samples where the
    residuals are poorly correlated to the common-mode. We can now proceed
    to do a PCA analysis of each sub-array. */
-      for( idx = 0; idx < res->ndat && *status == SAI__OK; idx++ ) {
+         for( idx = 0; idx < res->ndat && *status == SAI__OK; idx++ ) {
 
 /* If we are doing masking within this function, flag the residual values
    that fall within the source regions. The gaps thus produced will be
    filled within smf_clean_pca using linear interpolation. */
-         if( !comfill && mask ) {
-            res_data = (res->sdata[idx]->pntr)[0];
-            model_data = (model->sdata[idx]->pntr)[0];
-            qua_data = smf_select_qualpntr( res->sdata[idx], NULL, status );
+            if( !comfill && mask ) {
+               res_data = (res->sdata[idx]->pntr)[0];
+               model_data = (model->sdata[idx]->pntr)[0];
+               qua_data = smf_select_qualpntr( res->sdata[idx], NULL, status );
 
-            for( iw = 0; iw < nw; iw++ ) {
-               pdata = job_data + iw;
-               pdata->model_data = model_data;
-               pdata->qua_data = qua_data;
-               pdata->mask = mask;
-               pdata->lut_data = (lut->sdata[idx]->pntr)[0];
-               pdata->oper = 3;
-               thrAddJob( wf, 0, pdata, smf1_calcmodel_pca, 0, NULL, status );
+               for( iw = 0; iw < nw; iw++ ) {
+                  pdata = job_data + iw;
+                  pdata->model_data = model_data;
+                  pdata->qua_data = qua_data;
+                  pdata->mask = mask;
+                  pdata->lut_data = (lut->sdata[idx]->pntr)[0];
+                  pdata->oper = 3;
+                  thrAddJob( wf, 0, pdata, smf1_calcmodel_pca, 0, NULL, status );
+               }
+               thrWait( wf, status );
             }
-            thrWait( wf, status );
-         }
 
 /* Do a PCA analysis of the values in the PCA model arrays. The model
    arrays are returned containing time-stream values made up from the
@@ -429,36 +499,37 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    the number from the previous iteration. Otherwise, pass the threshold
    value to use in the sigma-clipping algorithm. The number of components
    removed is returned. */
-         ncomp[idx] = smf_clean_pca( wf, model->sdata[idx], 0, 0,
-                                     pcathresh, ncomp[idx], NULL, NULL,
-                                     0, 0, kmap,
-                                     comfill ? SMF__Q_PCA : SMF__Q_GAP,
-                                     status );
+            ncomp[idx] = smf_clean_pca( wf, model->sdata[idx], 0, 0,
+                                        pcathresh, ncomp[idx], NULL, NULL,
+                                        0, 0, kmap,
+                                        comfill ? SMF__Q_PCA : SMF__Q_GAP,
+                                        status );
 
 /* Get pointers to data, quality and PCA model arrays for the current
    subarray. */
-         res_data = (res->sdata[idx]->pntr)[0];
-         model_data = (model->sdata[idx]->pntr)[0];
-         qua_data = smf_select_qualpntr( res->sdata[idx], NULL, status );
+            res_data = (res->sdata[idx]->pntr)[0];
+            model_data = (model->sdata[idx]->pntr)[0];
+            qua_data = smf_select_qualpntr( res->sdata[idx], NULL, status );
 
 /* Subtract the PCA model from the original residuals. This also adds a
    polynomial baseline onto the model for each bolometer to flatten the
    residuals after subtraction of the PCA model. */
-         for( iw = 0; iw < nw; iw++ ) {
-            pdata = job_data + iw;
-            pdata->model_data = model_data;
-            pdata->res_data = res_data;
-            pdata->qua_data = qua_data;
-            pdata->oper = 2;
-            thrAddJob( wf, 0, pdata, smf1_calcmodel_pca, 0, NULL, status );
+            for( iw = 0; iw < nw; iw++ ) {
+               pdata = job_data + iw;
+               pdata->model_data = model_data;
+               pdata->res_data = res_data;
+               pdata->qua_data = qua_data;
+               pdata->oper = 2;
+               thrAddJob( wf, 0, pdata, smf1_calcmodel_pca, 0, NULL, status );
+            }
+            thrWait( wf, status );
          }
-         thrWait( wf, status );
+
       }
 
-   }
-
 /* Free resources. */
-   job_data = astFree( job_data );
+      job_data = astFree( job_data );
+   }
 
 /* End the AST context, thus deleting any AST objects created in this
    function. */
