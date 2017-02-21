@@ -1918,7 +1918,7 @@ void smf_resampcube_nn( smfData *data, dim_t nchan,
 void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
                     AstMapping *sky2map, int moving, int slbnd[ 2 ],
                     int subnd[ 2 ], int interp, const double params[],
-                    double sigma, double *in_data, double *out_data,
+                    double sigma, double perror, double *in_data, double *out_data,
                     double *ang_data, int *ngood, int *status );
 
 void smf_reshapendf( smfData **data, smfTile *tile, int *status );

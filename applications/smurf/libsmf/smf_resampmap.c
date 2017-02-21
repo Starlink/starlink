@@ -16,9 +16,9 @@
 *     smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
 *                     AstMapping *sky2map, int moving,
 *                     int slbnd[ 2 ], int subnd[ 2 ], int interp,
-*                     const double params[], double sigma, double *in_data,
-*                     double *out_data, double *ang_data, int *ngood,
-*                     int *status );
+*                     const double params[], double sigma, double perror,
+*                     double *in_data, double *out_data, double *ang_data,
+*                     int *ngood, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -56,6 +56,8 @@
 *     sigma = double (Given)
 *        Standard deviation of Gaussian noise to add to returned data.
 *        Ignored if zero.
+*     perror = double (Given)
+*        Standard deviation of the pointing errors, in pixels. Ignored if zero.
 *     in_data = double * (Given)
 *        The 2D data array for the input sky map.
 *     out_data = double * (Returned)
@@ -141,6 +143,7 @@ typedef struct smfResampMapData {
    double *in;
    double *out;
    double *ang;
+   double perror;
    double sigma;
    int interp;
    int moving;
@@ -159,7 +162,7 @@ static void smf1ResampMap( void *job_data_ptr, int *status );
 void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
                     AstMapping *sky2map, int moving, int slbnd[ 2 ],
                     int subnd[ 2 ], int interp, const double params[],
-                    double sigma, double *in_data, double *out_data,
+                    double sigma, double perror, double *in_data, double *out_data,
                     double *ang_data, int *ngood, int *status ){
 
 /* Local Variables */
@@ -195,7 +198,7 @@ void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
    if( *status == SAI__OK ) {
 
 /* Create a default GSL random number generator. */
-      if( sigma > 0.0 ) {
+      if( sigma > 0.0 || perror > 0.0 ) {
          type = gsl_rng_default;
          r = gsl_rng_alloc (type);
       } else {
@@ -273,6 +276,7 @@ void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
          pdata->sky_dim[ 1 ] = subnd[ 1 ] - slbnd[ 1 ] + 1;
          pdata->r = r;
          pdata->sigma = sigma;
+         pdata->perror = perror;
          pdata->ngood = 0;
 
       }
@@ -328,11 +332,13 @@ void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
 static void smf1ResampMap( void *job_data_ptr, int *status ) {
 
 /* Local Variables: */
+   AstCmpMap *newmap;
+   AstCmpMap *tmap2;
    AstMapping *fpmap;
    AstMapping *fullmap;
    AstMapping *sky2map;
    AstMapping *tmap;
-   AstCmpMap *tmap2;
+   AstShiftMap *sm;
    AstSkyFrame *abskyfrm;
    const double *params;
    dim_t ibolo;
@@ -342,6 +348,8 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
    dim_t t2;
    double *in;
    double *out;
+   double perror;
+   double shift[ 2 ];
    double sigma;
    double xin[ 2 ];
    double xout[ 2 ];
@@ -373,6 +381,7 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
    sky2map = pdata->sky2map;
    r = pdata->r;
    sigma = pdata->sigma;
+   perror = pdata->perror;
    t1 = pdata->t1;
    t2 = pdata->t2;
    ubnd_sky[ 0 ] = pdata->sky_dim[ 0 ];
@@ -410,6 +419,18 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
 
 /* Invert it as required by astResample. */
       astInvert( fullmap );
+
+/* Add on a ShiftMap that shifts skymap pixel positions by a random
+   small amount to simulate pointing error. */
+   if( r && perror > 0.0 ) {
+      shift[ 0 ] = gsl_ran_gaussian( r, perror );
+      shift[ 1 ] = gsl_ran_gaussian( r, perror );
+      sm = astShiftMap( 2, shift, " " );
+      newmap = astCmpMap( sm, fullmap, 1, " " );
+      sm = astAnnul( sm );
+      (void) astAnnul( fullmap );
+      fullmap = (AstMapping *) newmap;
+   }
 
 /* Resample the sky map at the positions of the bolometer samples in the
    current time slice, and store in the output array. */
@@ -461,7 +482,7 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
       pdata->ngood = nbolo - nbad;
 
 /* Add Gaussian noise to the output values. */
-      if( r ) {
+      if( r && sigma > 0.0 ) {
          for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
             out[ ibolo ] += gsl_ran_gaussian( r, sigma );
          }

@@ -6195,6 +6195,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter perror {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Sigma of random pointing errors to add, in arc-seconds}
+                default 0.0
+                helpkey *
+            }
+
             parameter phase2 {
                 type _DOUBLE
                 vpath DEFAULT

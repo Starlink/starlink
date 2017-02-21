@@ -256,9 +256,12 @@
 *        ARTFORM. The Y pixel axis is reference direction (suitable
 *        POLANAL Frames are included in the WCS to indicate this, as
 *        required by POLPACK).
-     OUT = NDF (Write)
+*     OUT = NDF (Write)
 *        A group of output NDFs to hold the simulated POL2 time series
 *        data. Equal in number to the files in "IN".
+*     PERROR = _DOUBLE (Read)
+*        Standard deviation of pointing errors to include in the simulated
+*        data, in arc-seconds. [0.0]
 *     PHASE2 = _DOUBLE (Read)
 *        The phase offset to apply to the 2 Hz signal specified via
 *        parameter AMP2, in degrees. Only used if ADDON is False. [0.0]
@@ -436,6 +439,7 @@ try:
    params.append(starutil.Par0F("PHASE16", "Phase for 16Hz signal (deg.s)",
                                 0.0, True ))
    params.append(starutil.Par0F("SIGMA", "Noise level in pW", 0.004, True ))
+   params.append(starutil.Par0F("PERROR", "Pointing errors, in arc-seconds", 0.0, True ))
    params.append(starutil.Par0L("ADDON", "Add artificial and real time-stream data?",
                                 False, noprompt=True))
    params.append(starutil.Par0F("XC", "X pixel coord at blob centre",
@@ -530,6 +534,10 @@ try:
    iart = parsys["ARTI"].value
    qart = parsys["ARTQ"].value
    uart = parsys["ARTU"].value
+
+#  Get the standard deviation of the pointing errors to includei nthe
+#  simulated data.
+   perror = parsys["PERROR"].value
 
 #  Other required params
    if not addon:
@@ -919,6 +927,9 @@ try:
 
    if amp16 != 0.0:
       parlist = "{0} amp16={1} phase16={2}".format(parlist,amp16,phase16)
+
+   if perror != 0.0:
+      parlist = "{0} perror={1}".format(parlist,perror)
 
    invoke("$SMURF_DIR/unmakemap in={0} qin={1} uin={2} ref={3} "
           "sigma={4} out={5} interp=sincsinc params=\[0,3\] "

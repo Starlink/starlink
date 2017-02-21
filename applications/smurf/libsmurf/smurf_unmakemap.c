@@ -27,7 +27,8 @@
 *     The output time series bolometer samples are created by interpolating the
 *     supplied input sky image at the position of the reference time series
 *     sample centre. Various interpolation methods can be used (see parameter
-*     INTERP). Gaussian noise may also be added (see parameter SIGMA).
+*     INTERP). Gaussian noise and pointing errors may also be added (see
+*     parameters SIGMA and PERROR).
 *
 *     The output time series cubes inherit all meta-data from the
 *     corresponding input reference time series. The only thing modified
@@ -291,6 +292,9 @@
 *          stored in the JCMTSTATE extension of the reference NDFs. DLON
 *          and DLAT values for non-tabulated times are determined by
 *          interpolation. [!]
+*     PERROR = _DOUBLE (Read)
+*          The standard deviation of the pointing errors to include in the
+*          output data, in arc-seconds. [0.0]
 *     QIN = NDF (Read)
 *          The input 2D image of the sky Q values, with respect to
 *          the second pixel axis (i.e. the pixel Y axis). Positive
@@ -367,10 +371,12 @@
 *        Allow common-mode to be specified as a sum of sky emission and
 *        electronic offset. IP correction is applied just to the sky
 *        emission. See parameter COMVAL.
+*     21-FEB-2017 (DSB):
+*        Add parameter PERROR.
 
 *  Copyright:
 *     Copyright (C) 2011 Science and Technology Facilities Council.
-*     Copyright (C) 2015,2016 East Asian Observatory.
+*     Copyright (C) 2015-2017 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -470,12 +476,15 @@ void smurf_unmakemap( int *status ) {
    double amp2;               /* Amplitude of 2 Hz signal */
    double amp4;               /* Amplitude of 4 Hz signal */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
+   double at[2];              /* GRID position to measure pixel scale */
    double comval[2];          /* Constant common mode values (pW) */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double params[ 4 ];        /* astResample parameters */
+   double perror;             /* Standard deviation of pointing errors */
    double phase16;            /* Phase of 16 Hz signal */
    double phase2;             /* Phase of 2 Hz signal */
    double phase4;             /* Phase of 4 Hz signal */
+   double pixscl[2];          /* Pixel scales (rads) */
    double pldata[4];          /* Parameters of the PL1 PL2 or PL3 IP model */
    double sigma;              /* Standard deviation of noise to add to output */
    int alignsys;              /* Align data in the map's system? */
@@ -636,11 +645,22 @@ void smurf_unmakemap( int *status ) {
 /* Get the noise level to add to the output data. */
    parGet0d( "SIGMA", &sigma, status );
 
+/* Get the standard deviation of the random pointing errors to include in
+   the output data, in arc-seconds. */
+   parGet0d( "PERROR", &perror, status );
+
+/* Get the pixel size at the centre of the map and use it to convert the
+   pointing error from arc-seconds to pixels. */
+   at[ 0 ] = 1.0 + 0.5*( subnd[ 0 ] - slbnd[ 0 ] );
+   at[ 1 ] = 1.0 + 0.5*( subnd[ 1 ] - slbnd[ 1 ] );
+   kpgPixsc( wcsin, at, pixscl, NULL, NULL, 0, status );
+   perror /= 0.5*( pixscl[ 0 ] + pixscl[ 1 ] )*AST__DR2D*3600.0;
+
 /* Allow the user to specify a text file containing a table of pointing
-   corrections. Corresponding Mappings are created from the column data
-   and stored in the "ogrp" group as items of metadata. This information
-   is read by smf_pcorr, called from within smf_open_file when each output
-   file is opened. */
+   corrections to apply to the input reference time-series. Corresponding
+   Mappings are created from the column data and stored in the "ogrp" group
+   as items of metadata. This information is read by smf_pcorr, called from
+   within smf_open_file when each output file is opened. */
    smf_pread( ogrp, "POINTING", status );
 
 /* Get any Q and U input maps. */
@@ -976,7 +996,7 @@ void smurf_unmakemap( int *status ) {
 
 /* Resample the sky map data into the output time series. */
       smf_resampmap( wf, odata, abskyfrm, skymap, moving, slbnd, subnd,
-                     interp, params, sigma, in_data, odata->pntr[ 0 ],
+                     interp, params, sigma, perror, in_data, odata->pntr[ 0 ],
                      NULL, &ngood, status );
 
 /* Add on any COM data - the sum of the sky emission and electronic offset. */
@@ -1028,10 +1048,10 @@ void smurf_unmakemap( int *status ) {
 /* Resample them both into 3D time series. These Q/U values are with
    respect to the sky image Y axis. */
          smf_resampmap( wf, odata, abskyfrm, skymap, moving, slbnd, subnd,
-                        interp, params, sigma, inq_data, outq_data,
+                        interp, params, sigma, perror, inq_data, outq_data,
                         ang_data, &ngood, status );
          smf_resampmap( wf, odata, abskyfrm, skymap, moving, slbnd, subnd,
-                        interp, params, sigma, inu_data, outu_data,
+                        interp, params, sigma, perror, inu_data, outu_data,
                         NULL, &ngood, status );
 
 /* Combine these time series with the main output time series so that the
