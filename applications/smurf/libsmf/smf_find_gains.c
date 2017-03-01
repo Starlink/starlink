@@ -216,6 +216,11 @@
 *        If NOFLAG is set, we still need to ensure that there are no BAD
 *        or NOFIT values in the returned GAI data, so that smf_gandoff can
 *        interpolate them.
+*     24-FEB-2017 (DSB):
+*        If bit 0 of the supplied flags is set (i.e. do not flag bad
+*        bolo-blocks), then ensure bad bolo blocks are not flagged (i.e.
+*        make sure the behaviour is the same as if the NOFLAG config 
+*        parameter is set).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -583,7 +588,7 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
 /* We now reject bolo-blocks that have unusual gains or correlation
    coefficients compared to the other bolo-blocks in the same block.
    Do each block in turn. We skip this if noflag has been set. */
-      if( !noflag ) {
+      if( !noflag && !( flags & 1 ) ) {
         for( iblock = 0; iblock < nblock && *status == SAI__OK; iblock++ ) {
 
 /* Determine the number of time slices in the current block. The final
@@ -895,7 +900,7 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
                     status );
         }
 
-      } else {
+      } else if( !( flags & 1 ) ) {
         msgOutif( MSG__VERB, "",
                   "    NOFLAG is set, template will not be used to flag outlier"
                   " bolometers", status );

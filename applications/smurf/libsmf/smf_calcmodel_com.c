@@ -100,6 +100,9 @@
 *        residuals using the COM model, rather than subtract the COM model
 *        off the residuals. This option is selected by setting the
 *        SMF__DIMM_PCACOM bit in "flags".
+*     1-MAR-2017 (DSB):
+*        Fix bug in usage of freeze_flags parameter that caused flags 
+*        always to be frozen on iteration 1 (if freeze_flags was set).
 
 *  Copyright:
 *     Copyright (C) 2016 East Asian Observatory.
@@ -355,7 +358,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
 /* Convert "freeze_flags" from an iteration count into a boolean flag
    indicating if the COM flags are now frozen. We always switch freezing
-   on if freeze_flags is less than zero, saince this i show skylopp
+   on if freeze_flags is less than zero, since this is how skyloop
    indicates that freezing is required. */
       if( dat->iter == freeze_flags + skip || freeze_flags < 0 ) {
          msgOutiff( MSG__VERB, "", "  %s flagging is now frozen due to "
@@ -363,6 +366,8 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
          freeze_flags = 1;
       } else if( dat->iter > freeze_flags + skip ) {
          freeze_flags = 1;
+      } else {
+         freeze_flags = 0;
       }
    }
 
