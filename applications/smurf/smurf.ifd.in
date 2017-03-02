@@ -3606,6 +3606,23 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter abortedat {
+                type _INTEGER
+                access WRITE
+                vpath DEFAULT
+                default 0
+                helpkey *
+            }
+
+            parameter abortsoon {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath CURRENT
+                prompt {Abort as soon as convergence seems unlikely?}
+                default FALSE
+                helpkey *
+            }
+
             parameter alignsys {
                 type _LOGICAL
                 vpath DEFAULT

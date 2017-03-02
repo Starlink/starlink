@@ -727,6 +727,9 @@ void smf_calcmodel_two( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status );
 
+void smf_check_convergence( smfDIMMData *dat, int maxiter, double maptol,
+                            int *abortedat, int *status );
+
 void smf_check_coords( smfData *data, int *status );
 
 int smf_check_detpos( smfData *data, int report, int *status );
@@ -1519,7 +1522,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const smfArray *darks, const smfArray *bbms,
                      const smfArray * flatramps, AstKeyMap * heateffmap, AstFrameSet *outfset,
                      int moving, int *lbnd_out, int *ubnd_out, fts2Port fts_port, size_t maxmem,
-                     double *map, int *hitsmap, double * exp_time,
+                     int abortsoon, int *abortedat, double *map, int *hitsmap, double * exp_time,
                      double *mapvar, smf_qual_t *mapqual, double *weights,
                      char data_units[], char data_label[], double * nboloeff,
                      size_t *numcontchunks,  size_t *ncontig, int *memlow,

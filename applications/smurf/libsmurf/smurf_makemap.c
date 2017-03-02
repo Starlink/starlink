@@ -38,6 +38,18 @@
 *     can be controlled using the CONFIG parameter.
 
 *  ADAM Parameters:
+*     ABORTEDAT = _INTEGER (Write)
+*          Set to a non-zero value on exit if the iterative process was
+*          aborted because of the ABORTSOON parameter being set TRUE.
+*          The specific non-zero value returned is the number of iterations
+*          that had been completed when the iterative process was aborted.
+*          Always set to zero if ABORTSOON is FALSE.
+*     ABORTSOON = _LOGICAL (Read)
+*          If TRUE, then the iterative process will exit as soon as it
+*          becomes likely that the convergence criterion (specified by
+*          configuration parameter MAPTOL) will not be reached within
+*          the number of iterations allowed by configuration parameter
+*          NUMITER.  [FALSE]
 *     ALIGNSYS = _LOGICAL (Read)
 *          If TRUE, then the spatial positions of the input data are
 *          aligned in the co-ordinate system specified by parameter
@@ -778,12 +790,15 @@
 *        the JSA all-sky pixel grid.
 *     2016-01-13 (DSB):
 *        Store total expsoure time in map FITS extension.
+*     2017-03-2 (DSB):
+*        Added parameters ABORTSOON and ABORTEDAT.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2010,2013 University of British Columbia.
 *     Copyright (C) 2007-2012 Science and Technology Facilities Council.
+*     Copyright (C) 2017 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -857,6 +872,8 @@
 void smurf_makemap( int *status ) {
 
   /* Local Variables */
+  int abortedat;             /* Value for parameter ABORTEDAT */
+  int abortsoon;             /* Value of parameter ABORTSOON */
   int alignsys;              /* Align data in the output system? */
   char basename[ GRP__SZNAM + 1 ]; /* Output base file name */
   int blank=0;                 /* Was a blank line just output? */
@@ -1755,6 +1772,11 @@ void smurf_makemap( int *status ) {
     astMapGet0D( astkmap, "ZERO_SNR", &zero_snr );
     astMapGet0D( astkmap, "ZERO_SNR_LOW", &zero_snr_low );
 
+    /* See if the iterative process should be aborted as soon as it
+       becomes likely that convergence will not be achieved within the
+       allowed number of iterations. */
+    parGet0l( "ABORTSOON", &abortsoon, status );
+
     /* Perform the required number of calls to smf_iteratemap - one
     normally, but two if we want to re-run with a smoothed SNR mask. */
     int nrun = ( zero_snr > 0.0 && zero_snr_fwhm > 0.0 ) ? 2 : 1;
@@ -1766,7 +1788,7 @@ void smurf_makemap( int *status ) {
       smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, shortrootgrp,
                       flagrootgrp, samprootgrp, keymap, NULL, bbms, flatramps,
                       heateffmap, outfset, moving, lbnd_out, ubnd_out,
-                      fts_port, maxmem-mapmem,
+                      fts_port, maxmem-mapmem, abortsoon, &abortedat,
                       map, hitsmap, exp_time, variance, mapqual, weights, data_units,
                       data_label, &nboloeff, &ncontchunks, &ncontig, &memlow, &ninsmp,
                       &ncnvg, &iters, &totexp, status );
@@ -1840,6 +1862,7 @@ void smurf_makemap( int *status ) {
                status, smf_timerupdate(&tv1,&tv2,status) );
 
     /* Write ADAM parameters */
+    parPut0i( "ABORTEDAT", abortedat, status );
     parPut0d( "NBOLOEFF", nboloeff, status );
     parPut0i( "NCONTCHUNK", (int) ncontchunks, status );
     parPut0i( "NMINSMP", (int) ninsmp, status );

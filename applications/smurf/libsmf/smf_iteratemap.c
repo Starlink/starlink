@@ -20,7 +20,7 @@
 *                    const smfArray * darks, const smfArray *bbms,
 *                    const smfArray * flatramps, AstKeyMap * heateffmap, AstFrameSet *outfset,
 *                    int moving, int *lbnd_out, int *ubnd_out, fts2Port fts_port, size_t maxmem,
-*                    double *map, int *hitsmap, double *exp_time,
+*                    int abortsoon, int *abortedat, double *map, int *hitsmap, double *exp_time,
 *                    double *mapvar, smf_qual_t *mapqual, double *weights,
 *                    char data_units[], char data_label[], double *nboloeff,
 *                    size_t *numcontchunks, size_t *ncontig, int *memlow,
@@ -73,6 +73,19 @@
 *        FTS-2 port.
 *     maxmem = size_t (Given)
 *        Maximum memory that me be used by smf_iteratemap (bytes)
+*     abortsoon = int (Given)
+*        If non-zero, then the iterative process will exit as soon as it
+*        becomes likely that the convergence criterion (maptol) will not be
+*        reached within the number of iterations specified by NUMITER. If
+*        "abortedat" is NULL, the supplied value is ignored and zero is
+*        assumed.
+*     abortedat = int * (Given)
+*        Returned non-zero if the iterative process was aborted because
+*        of the "abortsoon" argument. The specific non-zero value returned
+*        is the number of iterations which had been completed when the
+*        iterative process was aborted. Always returned set to zero if
+*        "abortsoon" is zero. Supplying a NULL pointer is equivalent to
+*        setting "abortsoon" to zero.
 *     map = double* (Returned)
 *        The output map array
 *     hitsmap = int* (Returned)
@@ -623,7 +636,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const smfArray *darks, const smfArray *bbms,
                      const smfArray * flatramps, AstKeyMap * heateffmap, AstFrameSet *outfset,
                      int moving, int *lbnd_out, int *ubnd_out, fts2Port fts_port, size_t maxmem,
-                     double *map, int *hitsmap, double * exp_time,
+                     int abortsoon, int *abortedat, double *map, int *hitsmap, double * exp_time,
                      double *mapvar, smf_qual_t *mapqual, double *weights,
                      char data_units[], char data_label[], double * nboloeff,
                      size_t *numcontchunks,  size_t *ncontig, int *memlow,
@@ -808,6 +821,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   *iters = -1;
   if( memlow ) *memlow = 0;
   if( ncontig ) *ncontig = 0;
+  if( abortedat ) *abortedat = 0;
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -2843,6 +2857,16 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 last_skipped ) && quit == -1 ) {
             /* Map hasn't converged yet */
             converged=0;
+          }
+
+          /* If required, make an estimate of the iteration number at
+             which convergence will occur, and if this number exceeds the
+             maximum  number of iterations allowed, set "*abortedat"
+             non-zero and set "quit" to 1 to indicate that we should leave 
+             the iteration loop immediately. */
+          if( abortsoon && abortedat ) {
+             smf_check_convergence( &dat, maxiter, maptol, abortedat, status );
+             if( *abortedat ) quit = 1;
           }
 
           /* Do not allow the loop to leave until the conditions required
