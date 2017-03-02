@@ -509,6 +509,10 @@
 *        forward to the end of the ast.skip phase to avoid wasting the
 *        time which would otherwise be spent doing the remaining ast.skip
 *        iterations.
+*     2017-03-02 (DSB):
+*        If the max number of iterations was hit before convergence was
+*        reached, report no convergence, rather than reporting "Solution
+*        CONVERGED", which was mis-leading.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -2081,16 +2085,21 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                FUNC_NAME ": Iteration ^ITER / ^MAXITER ---------------",
                status);
 
-        /* Assume we've converged until we find a filegroup that hasn't */
-        if( iter > 0 ) {
-          converged = 1;
-        } else {
-          converged = 0;
-        }
-
         /* If we have reached the last possible iteration, we will quit
            after this iteration. */
         if( iter + 1 >= maxiter ) quit = 0;
+
+        /* Assume we've converged until we find a filegroup that hasn't.
+	   On the last iteration (quit==0) leave the converged flag
+           unchanged (without this, converged ends up as 1 even if we
+           hit the iteration limit). */
+        if( quit < 0 ) {
+           if( iter > 0 ) {
+             converged = 1;
+           } else {
+             converged = 0;
+           }
+        }
 
         /* Some models (e.g. AST) need to know the iteration number, so
            store it now. */
@@ -2836,8 +2845,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             converged=0;
           }
 
-          /* Do not allow the loop to leave until the conditions required 
-             for convergence by other functions are all met. For instance, 
+          /* Do not allow the loop to leave until the conditions required
+             for convergence by other functions are all met. For instance,
              see smf_get_mask. */
           if( converged && !dat.allow_convergence ) converged=0;
 
