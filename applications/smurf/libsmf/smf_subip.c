@@ -93,6 +93,9 @@
 *        Added model PL3 for use with IP reference maps that are created
 *        from POL2 data and thus have the same FCF as the Q and U data
 *        being corrected.
+*     3-MAR-2017 (DSB):
+*        Fix bug that caused makemap to abort when producing maps from
+*        450 um non-POL2 data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -236,20 +239,6 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    res = dat->res[0];
    lut = dat->lut[0];
 
-/* Get the waveband (850 or 450) and report an error if 450 data is
-   supplied, and note the POL2 degradation factor. */
-   waveband = smf_calc_subinst( res->sdata[0]->hdr, status );
-   if( waveband == SMF__SUBINST_850 ) {
-      degfac = 1.35;
-   } else {
-      degfac = 1.96;
-      *status = SAI__ERROR;
-      errRep("","Cannot currently correct 450 um POL2 data for "
-             "instrumental polarisation as the 450 um IP model "
-             "has not yet been determined.", status );
-      return;
-   }
-
 /* Check if we have pol2 data, and see if it is Q or U. */
    qu = NULL;
    for( idx = 0; idx < res->ndat; idx++ ) {
@@ -318,6 +307,20 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
 
 /* If we are applying IP correction... */
    if( qu && ( *qui == 1 || *qui == -1 ) && *status == SAI__OK ) {
+
+/* Get the waveband (850 or 450) and report an error if 450 data is
+   supplied, and note the POL2 degradation factor. */
+      waveband = smf_calc_subinst( res->sdata[0]->hdr, status );
+      if( waveband == SMF__SUBINST_850 ) {
+         degfac = 1.35;
+      } else {
+         degfac = 1.96;
+         *status = SAI__ERROR;
+         errRep("","Cannot currently correct 450 um POL2 data for "
+                "instrumental polarisation as the 450 um IP model "
+                "has not yet been determined.", status );
+         return;
+      }
 
 /* Get the value of the POLNORTH FITS keyword from the supplied header. */
       if( !astGetFitsS( data->hdr->fitshdr, "POLNORTH", &polnorth ) &&
