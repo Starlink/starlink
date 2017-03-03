@@ -104,10 +104,12 @@ void smf_check_convergence( smfDIMMData *dat, int maxiter, double maptol, int *a
    double logit;
    gsl_matrix *cov;
    gsl_matrix *X;
+   gsl_multifit_robust_stats stats;
    gsl_multifit_robust_workspace *work;
    gsl_vector *x;
    gsl_vector *c;
    gsl_vector *y;
+   int gsl_stat;
    int i;
    int it;
    int j;
@@ -184,7 +186,8 @@ void smf_check_convergence( smfDIMMData *dat, int maxiter, double maptol, int *a
 /* Perform robust fit */
       gsl_set_error_handler_off();
       work = gsl_multifit_robust_alloc( gsl_multifit_robust_bisquare, X->size1, X->size2 );
-      (void) gsl_multifit_robust( X, y, c, cov, work );
+      gsl_stat = gsl_multifit_robust( X, y, c, cov, work );
+      stats = gsl_multifit_robust_statistics( work );
       gsl_multifit_robust_free( work );
 
 /* Get estimated iteration number at target map change. */
@@ -197,31 +200,39 @@ void smf_check_convergence( smfDIMMData *dat, int maxiter, double maptol, int *a
       gsl_vector_free( c );
       gsl_matrix_free( cov );
 
+/* If the GSL robust linear regression function failed, or if the RMS
+   residual is too large to be reliable, assume nothing has changed. */
+      if( gsl_stat || stats.sigma > 0.1 ) {
+         msgOutiff( MSG__DEBUG, "", "*** Convergence expected at "
+                    "iteration: <unknown>.", status );
+
 /* Issue a debug message indicated the expected iteration number at
    convergence. */
-      msgOutiff( MSG__DEBUG, "", "*** Convergence expected at iteration %d.",
-                 status, nexp );
+      } else {
+         msgOutiff( MSG__DEBUG, "", "*** Convergence expected at iteration: %d (sigma=%g).",
+                    status, nexp, stats.sigma );
 
 /* If the expected number of iterations rises above the maximum allowed
    value for three succesive iterations, issue a warning and return *abortat
    non-zero. */
-      if( nexp > maxiter ) {
-         if( ++nhi == 3 ) {
-            *abortedat = dat->iter;
+         if( nexp > maxiter ) {
+            if( ++nhi == 3 ) {
+               *abortedat = dat->iter;
 
 /* Tell the user what has happened. */
-            msgBlank( status );
-            msgOutf( "", "*********************************", status );
-            msgOutf( "", "WARNING: Convergence is too slow!", status );
-            msgOutf( "", "It looks like convergence will not occur "
-                     "until iteration %d.", status, nexp );
-            msgOutf( "", "So I am aborting now.", status );
-            msgOutf( "", "*********************************", status );
-            msgBlank( status );
+               msgBlank( status );
+               msgOutf( "", "*********************************", status );
+               msgOutf( "", "WARNING: Convergence is too slow!", status );
+               msgOutf( "", "It looks like convergence will not occur "
+                        "until iteration %d.", status, nexp );
+               msgOutf( "", "So I am aborting now.", status );
+               msgOutf( "", "*********************************", status );
+               msgBlank( status );
 
+            }
+         } else {
+            nhi = 0;
          }
-      } else {
-         nhi = 0;
       }
    }
 }
