@@ -119,6 +119,7 @@ void smf_check_convergence( smfDIMMData *dat, int maxiter, double maptol, int *a
    static int imapchange = 0;
    static int nhi = 0;
    static int nmapchange = 0;
+   static int lnexp = 0;
 
 /* Initialise */
    *abortedat = 0;
@@ -132,6 +133,7 @@ void smf_check_convergence( smfDIMMData *dat, int maxiter, double maptol, int *a
       nmapchange = 0;
       imapchange = 0;
       nhi = 0;
+      lnexp = VAL__MAXI;
    }
 
 /* Do not make any estimate until we have got past any initial iterations
@@ -212,10 +214,15 @@ void smf_check_convergence( smfDIMMData *dat, int maxiter, double maptol, int *a
          msgOutiff( MSG__DEBUG, "", "*** Convergence expected at iteration: %d (sigma=%g).",
                     status, nexp, stats.sigma );
 
+/* If we have not yet reached iteration 20, or if the expected number of
+   iterations is falling, do not abort. */
+         if( dat->iter < 20 || nexp < lnexp ) {
+            nhi = 0;
+
 /* If the expected number of iterations rises above the maximum allowed
    value for three succesive iterations, issue a warning and return *abortat
    non-zero. */
-         if( nexp > maxiter ) {
+         } else if( nexp > maxiter ) {
             if( ++nhi == 3 ) {
                *abortedat = dat->iter;
 
@@ -234,6 +241,9 @@ void smf_check_convergence( smfDIMMData *dat, int maxiter, double maptol, int *a
             nhi = 0;
          }
       }
+
+/* Save the expected number of iterations for future use. */
+      lnexp = nexp;
    }
 }
 

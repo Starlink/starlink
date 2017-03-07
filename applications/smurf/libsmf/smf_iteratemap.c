@@ -2862,7 +2862,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           /* If required, make an estimate of the iteration number at
              which convergence will occur, and if this number exceeds the
              maximum  number of iterations allowed, set "*abortedat"
-             non-zero and set "quit" to 1 to indicate that we should leave 
+             non-zero and set "quit" to 1 to indicate that we should leave
              the iteration loop immediately. */
           if( abortsoon && abortedat ) {
              smf_check_convergence( &dat, maxiter, maptol, abortedat, status );
@@ -3042,6 +3042,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   FUNC_NAME ": ****** Solution CONVERGED",
                   status);
         } else {
+          *abortedat = maxiter;
           msgOut( " ",
                   FUNC_NAME ": ****** Solution did NOT converge",
                   status);
