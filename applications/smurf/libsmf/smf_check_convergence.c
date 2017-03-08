@@ -220,10 +220,10 @@ void smf_check_convergence( smfDIMMData *dat, int maxiter, double maptol, int *a
             nhi = 0;
 
 /* If the expected number of iterations rises above the maximum allowed
-   value for three succesive iterations, issue a warning and return *abortat
+   value for 6 succesive iterations, issue a warning and return *abortat
    non-zero. */
          } else if( nexp > maxiter ) {
-            if( ++nhi == 3 ) {
+            if( ++nhi == 6 ) {
                *abortedat = dat->iter;
 
 /* Tell the user what has happened. */

@@ -39,7 +39,7 @@
 *        set of parameters:
 *
 *           ^$STARLINK_DIR/share/smurf/.dimmconfig_pol2.lis
-*           numiter = -100
+*           numiter = -200
 *           modelorder=(com,gai,pca,ext,flt,ast,noi)
 *
 *           maptol = 0.05
@@ -50,9 +50,10 @@
 *
 *           ast.mapspike_freeze = 5
 *           pca.pcathresh = -150
-*           pca.zero_niter = 0.2
-*           com.zero_niter = 0.2
-*           flt.zero_niter = 0.2
+*           pca.zero_niter = 0.5
+*           com.zero_niter = 0.5
+*           flt.zero_niter = 0.5
+*           com.freeze_flags = 30
 *
 *        Additional parameters are also set, depending on the value of
 *        parameter MASK. If MASK is set to "AUTO", the following
@@ -83,6 +84,10 @@
 *           pca.zero_circle = 0.0038
 *           com.zero_circle = 0.0083
 *           flt.zero_circle = 0.0083
+*
+*        The default value for pca.pcathresh indicated above will be
+*        changed if it is too high to allow convergence of the I maps
+*        within the number of iterations allowed by numiter.
 *
 *        If MASK is set to the name of an NDF, this script creates fixed
 *        masks from the NDF, and the following parameters are added
@@ -356,6 +361,7 @@
 *        If makemap fails, ensure any resulting map is deleted.
 '''
 
+import glob
 import os
 import math
 import shutil
@@ -372,6 +378,30 @@ from starutil import get_task_par
 
 #  Assume for the moment that we will not be retaining temporary files.
 retain = 0
+
+#  A function to find the PCA.PCATHRESH value used to create the most
+#  recent auto-masked or ext-masked map.
+def getPcaThresh( mapdir, automask ):
+   if automask:
+      base = "[iqu]map"
+   else:
+      base = "[IQU]map"
+
+   pcathresh = 0
+   this_map = None
+   nsecmin = 1E30
+   for tmap in glob.glob("{0}/*{1}.sdf".format(mapdir, base )):
+      nsec = os.path.getmtime( tmap )
+      if nsec < nsecmin:
+         nsecmin = nsec
+         this_map = tmap
+         pcathresh = float( invoke("$KAPPA_DIR/configecho name=pca.pcathresh "
+                                   "ndf={0} config=! application=makemap "
+                                   "defaults=$SMURF_DIR/smurf_makemap.def"
+                                   .format(tmap)))
+   return (pcathresh,this_map)
+
+
 
 #  A function to clean up before exiting. Delete all temporary NDFs etc,
 #  unless the script's RETAIN parameter indicates that they are to be
@@ -390,6 +420,10 @@ def cleanup():
 #  Catch any exception so that we can always clean up, even if control-C
 #  is pressed.
 try:
+
+#  Constants.
+   pcathresh_def1 = -50    # Default value for auto-masking
+   pcathresh_def2 = -150   # Default value for external-masking
 
 #  Declare the script parameters. Their positions in this list define
 #  their expected position on the script command line. They can also be
@@ -946,13 +980,61 @@ try:
             else:
                ilist[id] = [ path ]
 
+#  We need to decide on the value to use for the PCA.PCATHRESH config
+#  parameter when running makemap below. If a value is given in the
+#  user-supplied config, use it.
+      try:
+         pcathresh = float( invoke("$KAPPA_DIR/configecho name=pca.pcathresh "
+                                   "config={0}".format(config)) )
+      except:
+         pcathresh = 0
+
+#  If no value is supplied in the config, the default values are -50
+#  (pcathresh_def1) for auto-masked maps and -150 (pcathresh_def2) for
+#  external-masked maps. However, for bright sources these default are
+#  too high to allow convergence to be reached within a reasonable
+#  number of iterations when creating the I maps (the Q and U maps
+#  are easier since they are fainter, but for consistency we should
+#  use the same value for Q and U as for I, even if convergence could
+#  be achieved with a higher value of PCATHRESH). We look for any
+#  existing maps in the mapdir, and re-use the same PCA.PCATHRESH value
+#  if any are found.
+      if pcathresh == 0:
+
+#  Get the PCA.PCATHRESH value from the most recently created map (if any)
+#  of the same type (auto or external mask) as the ones we are currently
+#  creating.
+         (pcathresh,tmap) = getPcaThresh( mapdir, automask )
+
+#  If an existing map of the correct type was found, we use its PCATHRESH
+#  value when creating maps below. Tell the user.
+         if pcathresh != 0:
+            msg_out("Will use PCA.PCATHRESH value of {0} inherited from existing "
+                    "map {1}.".format(pcathresh,tmap))
+
+#  If we are creating externally-masked maps, but no existing externally-masked
+#  maps were found, see if any existing auto-masked maps can be found.
+         elif not automask:
+            (pcathresh,tmap) = getPcaThresh( mapdir, True )
+
+#  If the PCATHRESH value used to create any auto-masked map was not equal
+#  to the default value, then we use the same non-default value to create
+#  the externally masked maps. Otherwise, we leave pcathresh set to zero to
+#  indicate that makemap should determine a value for PCATHRESH itself by
+#  repeatedly re-running with lower PCATHRESH values until a map converges.
+            if pcathresh == pcathresh_def1:
+               pcathresh = 0
+            elif pcathresh != 0:
+               msg_out("Will use PCA.PCATHRESH value of {0} inherited from existing "
+                       "map {1}.".format(pcathresh,tmap))
+
 #  Create a config file to use with makemap.
       iconf = NDG.tempfile()
       fd = open(iconf,"w")
 
 #  Store the default set of config parameters in the config file.
       fd.write("^$STARLINK_DIR/share/smurf/.dimmconfig_pol2.lis\n")
-      fd.write("numiter = -100\n")
+      fd.write("numiter = -200\n")
       fd.write("modelorder = (com,gai,pca,ext,flt,ast,noi)\n")
 
       fd.write("maptol = 0.05\n")
@@ -961,11 +1043,12 @@ try:
       fd.write("maptol_box = 60\n")
       fd.write("maptol_hits = 1\n")
 
-      fd.write("pca.pcathresh = -150\n")
+      fd.write("pca.pcathresh = {0}\n".format( pcathresh_def2 if (pcathresh==0) else pcathresh))
       fd.write("ast.mapspike_freeze = 5\n")
-      fd.write("pca.zero_niter = 0.2\n")
-      fd.write("com.zero_niter = 0.2\n")
-      fd.write("flt.zero_niter = 0.2\n")
+      fd.write("pca.zero_niter = 0.5\n")
+      fd.write("com.zero_niter = 0.5\n")
+      fd.write("flt.zero_niter = 0.5\n")
+      fd.write("com.freeze_flags = 30\n")
 
 #  Some depend on the masking type.
       if automask:
@@ -974,7 +1057,7 @@ try:
          fd.write("ast.zero_snrlo = 2\n")
          fd.write("ast.zero_freeze = 0.2\n")
 
-         fd.write("pca.pcathresh = -50\n")
+         fd.write("pca.pcathresh = {0}\n".format( pcathresh_def1 if (pcathresh==0) else pcathresh))
          fd.write("pca.zero_snr = 5\n")
          fd.write("pca.zero_snrlo = 3\n")
          fd.write("pca.zero_freeze = -1\n")
@@ -1205,13 +1288,85 @@ try:
             except starutil.NoNdfError:
                qui_maps[key] = NDG(mapname, False)
                try:
-                  if not maskmap:
-                     invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
-                         "{5} {6}".format(isdf,conf,qui_maps[key],ref,pntfile,pixsize_par,ip))
+
+#  If we are using the default value for PCA.PCATHRESH (as indicated by
+#  pcathresh being zero), we need to look out for makemap not converging.
+#  This can happen for very bright sources. If makemap fails to converge, we
+#  try again using a smaller value for the PCA.PCATHRESH parameter. Once we
+#  have found a value for PCA.PCATHRESH that allows convergence to be reached,
+#  we use this same value for all subsequent maps. Set ABORTSOON=YES so that
+#  makemap aborts as soon as it becomes clear that convergence will not be
+#  reached in the allowed number of iterations. We only do this if variable
+#  "pcathresh" is zero, indicating that no value has yet been determined for
+#  PCA.PCATHRESH. We also require the NUMITER config parameter is negative
+#  - i.e. MAPTOL defines convergence.
+                  numiter = float( invoke("$KAPPA_DIR/configecho name=numiter config=^{0} "
+                                          "defaults=$SMURF_DIR/smurf_makemap.def "
+                                          "select=\"\'450=0,850=1\'\"".format(conf)))
+                  if pcathresh == 0 and numiter < 0:
+                     pcathresh = pcathresh_def1 if automask else pcathresh_def2
+                     abpar = "abortsoon=yes"
                   else:
-                     invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
-                         "{5} {6} mask2={7}".format(isdf,conf,qui_maps[key],astmask,pntfile,
-                                                    pixsize_par,ip,pcamask))
+                     abpar = ""
+
+                  attempt = 0
+                  again = True
+                  while again:
+                     attempt += 1
+
+                     if not maskmap:
+                        invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
+                            "{5} {6} {7}".format(isdf,conf,qui_maps[key],ref,pntfile,pixsize_par,ip,abpar))
+                     else:
+                        invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
+                            "{5} {6} mask2={7} {8}".format(isdf,conf,qui_maps[key],astmask,pntfile,
+                                                           pixsize_par,ip,pcamask,abpar))
+
+#  If we do not yet know what pcathresh value to use, see if makemap aborted
+#  due to slow convergence. If so, reduce the number of PCA components
+#  removed on each iteration by 25% and re-run makemap.
+                     if abpar != "":
+                        abortedat = int( float( get_task_par( "abortedat", "makemap" ) ) )
+                        if abortedat == 0:
+                           again = False
+                           if attempt > 1:
+                              msg_out( ">>>> MAKEMAP converged succesfully, so all further "
+                                       "maps will be created using PCA.PCATHRESH={0}.".
+                                       format( pcathresh ) )
+
+                        elif attempt < 20:
+                           reduction = int( -pcathresh * 0.25 )
+                           if reduction < 2:
+                              reduction = 2
+                           pcathresh_old = pcathresh
+                           pcathresh = -( -pcathresh - reduction )
+                           if pcathresh > -5:
+                              pcathresh = -5
+
+                           if pcathresh <= pcathresh_old:
+                              again = False
+                              msg_out(">>>> MAKEMAP failed to converge but we have "
+                                      "reached the lower limit for PCA.PCATHRESH, so "
+                                      "all further maps will be created using "
+                                      "PCA.PCATHRESH={0}.".format( pcathresh ) )
+                           else:
+                              msg_out(">>>> MAKEMAP failed to converge - trying "
+                                      "the current observation again with "
+                                      "PCA.PCATHRESH set to {0} (it was {1}).".
+                                      format(pcathresh,pcathresh_old))
+                              fd = open( conf, "a" )
+                              fd.write( "pca.pcathresh = {0}\n".format( pcathresh ) )
+                              fd.close()
+                        else:
+                           again = False
+                           msg_out( ">>>> MAKEMAP failed to converge again - "
+                                    "giving up and using PCA.PCATHRESH={0}.".
+                                    format( pcathresh ) )
+
+#  If we already knew the value to use for PCA.PCATHRESH, just proceeed without
+#  checking convergence.
+                     else:
+                        again = False
 
 #  If makemap failed, warn the user and delete any map that was created,
 #  and pass on to the next observation chunk.
@@ -1225,6 +1380,8 @@ try:
                   except starutil.AtaskError:
                      pass
                   del qui_maps[key]
+                  if abpar != "":
+                     pcathresh = 0
                   continue
 
 #  If no ref map was supplied, use the first map for the first observation as

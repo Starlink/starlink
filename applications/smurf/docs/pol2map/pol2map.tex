@@ -6,9 +6,9 @@
 \usepackage[font=footnotesize]{caption}
 
 \stardocauthors     {D.S. Berry }
-\stardocdate        {12th February 2017}
+\stardocdate        {7th March 2017}
 \stardoctitle       {POL-2 data reduction using POL2MAP}
-\stardocversion     {V1.0}
+\stardocversion     {V1.1}
 \stardocabstract    {A description and analysis of the SMURF:POL2MAP
 command, including some preliminary results for a range of different
 extended astronomical objects.}
@@ -645,9 +645,9 @@ which speeds up convergence significantly.
 
 When using either auto-masking or external-masking, the masking of noise
 models using the PCA mask is only performed up to the point where the
-normalised map change between iterations falls below 0.2
-(\texttt{pca.zero\_niter = 0.2}, \texttt{com.zero\_niter = 0.2},
-\texttt{flt.zero\_niter = 0.2}). By this point, most of the astronomical
+normalised map change between iterations falls below 0.5
+(\texttt{pca.zero\_niter = 0.5}, \texttt{com.zero\_niter = 0.5},
+\texttt{flt.zero\_niter = 0.5}). By this point, most of the astronomical
 signal should have been moved out of the time-streams and into the map,
 resulting in there being little point in masking the time-streams.
 
@@ -697,13 +697,105 @@ iterations are required to recover the full astronomical signal. This is
 different to the COM or FLT components, which pass the full astronomical
 signal on each iteration.
 
-If auto-masking is used, the strongest 50 PCA components are removed on
-each iteration. If external-masking is used, the strongest 150 PCA components
-are removed on each iteration. The reasoning for this difference is that speed
-is more important than accuracy when forming the initial auto-masked map, since
-the auto-masked map is only used to create the masks used to create subsequent
-external-masked maps.
+By default, if auto-masking is used, the strongest 50 PCA components are
+removed on each iteration. If external-masking is used, the strongest 150
+PCA components are removed by default on each iteration. The reasoning
+for this difference is that speed is more important than accuracy when
+forming the initial auto-masked map, since the auto-masked map is only
+used to create the masks used to create subsequent external-masked maps.
+These defaults may be lowered if the high initial values prevent maps
+from converging - see the next section.
 
+\subsection{Convergence}
+An upper limit of 200 is placed on the number of iterations to be
+performed. If a map has not converged to the required MAPTOL (0.05 by
+default) within this number of iterations, the resulting map may not
+accurately represent the bright emission in the field. The level of
+inaccuracy is very hard to quantify but will depend on how far from
+convergence the map was when the limit of 200 iterations was reached. It
+is therefore a good idea to check that maps did in fact converge. This
+can be done by searching the \texttt{pol2map} log file for the string
+``\texttt{Solution did NOT converge}''. If this string is found within
+the log file, the level of convergence achieved before \texttt{makemap}
+exited can be found by searching backwards through the log file for the
+previous occurrence of the string ``\texttt{NORMALIZED MAP CHANGE:}''. For
+instance:
+
+\begin{quote}
+\begin{verbatim}
+smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.0501144 (mean) 0.3485134 (max)
+\end{verbatim}
+\end{quote}
+
+The second value (0.3485134 in the above example) shows the level of
+convergence that was achieved. This number should be compared to the
+MAPTOL value (0.05 by default) to determine how far the solution is from
+convergence.
+
+Achieving convergence takes longer for bright sources than for faint
+sources. This is mainly because of the PCA model that is used within
+\texttt{pol2map}. The number of iterations required for convergence goes
+up as the number of PCA components removed on each iteration goes up. For
+very bright sources, the default values of PCA.PCATHRESH may be too high
+too allow convergence to be reached within 200 iterations\footnote{This
+is only usually a problem for I maps, since the source is much fainter in
+Q and U maps.}. Increasing the maximum number of iterations is possibly
+one way to correct this. However, in some cases it may be necessary to
+perform many hundreds or even thousands of iterations to achieve
+convergence, which could take days or weeks to run on a typical SCUBA-2
+PC. This is usually impractical and so the alternative solution of
+reducing the number of removed PCA components when creating new maps is
+implemented within \texttt{pol2map} using the following scheme:
+
+\begin{enumerate}
+\item If the user specifies a value for PCA.PCATHRESH using the CONFIG
+parameter, that value is always used. Note, the number of iterations to
+remove must be given as a negative value. Thus a value of -150 means
+``remove 150 PCA components''.
+\item Otherwise, if any previously created maps of the same kind (\emph{i.e.}
+auto-masked or externally-masked) already exist in the output maps directory,
+then the PCA.PCATHRESH value used to create the most recent of those maps is
+re-used to create the new maps.
+\item Otherwise, if we are creating new externally-masked maps, and the
+output maps directory contain some previously created auto-masked maps,
+then the PCA.PCATHRESH value used to create the most recent of those
+auto-masked maps is re-used to create the new externally-masked maps,
+\emph{but only if that value is less than the default auto-mask value of
+50}. The rationale for this is that if it was found necessary to reduce
+the number of removed PCA components when creating the auto-masked maps,
+then it will also be necessary to do the same with the externally-masked
+maps. But on the other hand, if the auto-masked maps were created successfully with the default
+value of PCA.PCATHRESH, then it may be possible to increase the number of
+removed PCA components and still achieve convergence. This is one of the
+goals when using external-masking, in order to achieve lower noise maps.
+\item Otherwise (\emph{i.e.} if we cannot determine a PCA.PCATHRESH value
+from any previously created maps), we initially use the default value for
+PCA.PCATHRESH (-50 for auto-masking and -150 for external-masking) but
+include a check on convergence when \texttt{makemap} is run to create a
+map from the first supplied observation. If \texttt{makemap} fails to
+converge within 200 iterations using the default PCA.PCATHRESH value, the
+value is reduced by $25\%$ and \texttt{makemap} is re-run. The same check
+is performed again and \texttt{makemap} re-run with a reduced
+PCA.PCATHRESH if convergence has still not been achieved. This process
+continues until convergence is achieved, or a lower limit (-5) is reached
+for PCA.PCATHRESH. Messages displayed on standard output indicate the
+success or failure of each used PCA.PCATHRESH value. Having determined a
+value for PCA.PCATHRESH that allows convergence to be reached for the
+first supplied observation, the same value is used for all subsequent
+observations. This process is speeded up by allowing \texttt{makemap} to
+abort early (\emph{i.e.} before 200 iterations have been completed) as
+soon as it becomes likely that convergence will not be reached within 200
+iterations. This decision is taken on the basis of the fall in the
+normalised map change seen over the initial iterations. This fall is
+assumed to be exponential in form, allowing the curve of ``map change''
+versus ``iteration number'' to be modelled and extrapolated. This allows
+\texttt{makemap} to form an estimate of the iteration number at which the
+required MAPTOL value will be reached.
+\end{enumerate}
+
+The disadvantage of achieving convergence by reducing the PCA.PCATHRESH
+value is that the resulting maps will have a noisier background with more
+bowling around bright sources.
 
 \section{IP correction}
 The existing IP correction (referred to as ``PL2'') is based on the mean I, Q

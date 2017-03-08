@@ -3042,7 +3042,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   FUNC_NAME ": ****** Solution CONVERGED",
                   status);
         } else {
-          *abortedat = maxiter;
+          if( abortedat && *abortedat == 0 ) *abortedat = maxiter;
           msgOut( " ",
                   FUNC_NAME ": ****** Solution did NOT converge",
                   status);
