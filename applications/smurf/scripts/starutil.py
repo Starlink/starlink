@@ -2571,6 +2571,17 @@ class NDG(object):
       #  variables so that the NDG.cleanup() method can empty it.
       NDG.instances.append(self)
 
+   #  Two NDG objects are equivalent if they contain the same NDF paths.
+   def __eq__(self, other):
+      if isinstance(other, self.__class__):
+         return self.__ndfs == other.__ndfs
+      return NotImplemented
+
+   #  Two NDG objects are not equivalent if they contain different NDF paths.
+   def __ne__(self, other):
+      if isinstance(other, self.__class__):
+         return not self.__eq__(other)
+      return NotImplemented
 
    # The files associated with the NDG are deleted, and the NDG structure
    # itself is reset to represent an empty group. Use kappa:erase to

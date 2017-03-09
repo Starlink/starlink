@@ -190,8 +190,9 @@
 *        The output NDF in which to return the total intensity (I) map
 *        including all supplied observations. This will be in units of pW.
 *        Supply null (!) if the I map is not to be retained on exit. In
-*        this case, the I map will not be created unless it is needed for
-*        IP correction (see parameters IPCOR and IPREF).
+*        this case, the I map will only be created if it is needed
+*        to create the output vector catalogue (see parameter CAT) and
+*        will be deleted on exit.
 *     IPCOR = _LOGICAL NDF (Read)
 *        If TRUE, then IP correction is used when creating Q and U maps,
 *        based on the values in the total intensity map specified by
@@ -200,7 +201,8 @@
 *        The total intensity map to be used for IP correction. Only
 *        accessed if parameter IPCOR is set TRUE. If null (!) is supplied
 *        for IPREF, the map supplied for parameter REF is used. The map must
-*        be in units of pW. [!]
+*        be in units of pW. If the same value is supplied for both IOUT
+*        and IPREF, the output I map will be used for IP correction. [!]
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -480,7 +482,7 @@ try:
                                  noprompt=True))
 
    params.append(starutil.ParNDG("IPREF", "The total intensity map to use "
-                                 "for IP correction", default=None,
+                                 "for IP correction", default=None, exists=False,
                                  noprompt=True, minsize=0, maxsize=1 ))
 
    params.append(starutil.Par0L("REUSE", "Re-use existing time-streams and maps?", True,
@@ -690,12 +692,14 @@ try:
             raise starutil.InvalidParameterError("IP correction requested "
                                         "but no IP reference map supplied.")
          ipref = ref
+
       else:
-         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(ipref) )
-         units = get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
-         if units != "pW":
-            raise starutil.InvalidParameterError("IP reference map {0} is"
-                 " has units {1} - units must be pW".format(ipref,units))
+         if ipref != imap:
+            invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(ipref) )
+            units = get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
+            if units != "pW":
+               raise starutil.InvalidParameterError("IP reference map {0} is"
+                    " has units {1} - units must be pW".format(ipref,units))
 
       ip = "ipref={0}".format(ipref)
    else:
@@ -739,9 +743,10 @@ try:
    inmaps = NDG.tempfile()
    rawinfo = NDG.tempfile()
    missing = NDG.tempfile()
+   mapinfo = NDG.tempfile()
    invoke("$SMURF_DIR/pol2check in={0} quiet=yes junkfile={1} mapfile={2} "
-          "rawfile={3} stokesfile={4} rawinfo={5} missing={6}".
-          format(indata,junks,inmaps,inraws,inquis,rawinfo,missing))
+          "rawfile={3} stokesfile={4} rawinfo={5} missing={6} mapinfo={7}".
+          format(indata,junks,inmaps,inraws,inquis,rawinfo,missing,mapinfo))
 
 #  Warn about any non-POL2 input data files that are being ignored.
    if get_task_par( "JUNKFOUND", "pol2check" ):
@@ -768,32 +773,44 @@ try:
    if get_task_par( "STOKESFOUND", "pol2check" ):
       shutil.copyfile( inquis, allquis )
 
-#  Initialise the list of all individual Stokes maps to be included in the
-#  final coadded maps so that it holds any maps supplied by parameter IN.
-#  Check that any supplied maps are in units of pW.
-   allmaps = NDG.tempfile()
-   haveSomeMaps = False
-   if get_task_par( "MAPFOUND", "pol2check" ):
-      shutil.copyfile( inmaps, allmaps )
+#  Set up a dict for each Stokes parameter holding paths to any supplied maps
+#  for that Stokes parameter. The keys are of the form "<UT>_<OBS>_<SUBSCAN>".
+#  Check that any supplied maps are in units of pW and are created from
+#  POL2 data.
+   imaps = {}
+   qmaps = {}
+   umaps = {}
 
-      with open(allmaps) as infile:
+   if get_task_par( "MAPFOUND", "pol2check" ):
+
+      with open(inmaps) as infile:
          lines = infile.readlines()
       paths = [line.strip() for line in lines]
-      for path in paths:
-         haveSomeMaps = True
+
+      with open(mapinfo) as infile:
+         lines = infile.readlines()
+      infos = [line.strip() for line in lines]
+
+      for (path,info) in zip( paths, infos ):
+         (stokes,id) = info.split()
+         if stokes == "I":
+            imaps[id] = path
+         elif stokes == "Q":
+            qmaps[id] = path
+         else:
+            umaps[id] = path
+
+         if "pol" not in get_fits_header( NDG(path), "INBEAM" ):
+            raise starutil.InvalidParameterError("One of the {0} maps ({1}) "
+                                             "was not created from POL2 data".
+                                             format(stokes,path))
+
          invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(path) )
          units = get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
          if units != "pW":
             raise starutil.InvalidParameterError("All supplied "
                  "maps must be in units of 'pW', but '{0}' has units '{1}'.".
                  format(path,units))
-   else:
-      open( allmaps, 'a').close()
-
-
-
-
-
 
 
 
@@ -1177,32 +1194,32 @@ try:
       for qui in ('I', 'Q', 'U'):
 
 #  Pass on to the next parameter if we are not creating a map for the
-#  current parameter. Also create dictionaries holding the I, Q or U map
-#  for each observation chunk.
+#  current parameter. Also set up pointers to the arrays etc to use for
+#  the current Stokes parameter.
          if qui == 'I':
             if imap:
-               imaps = {}
                qui_maps = imaps
                qui_list = ilist
                conf = iconf
+               coadd = imap
             else:
                continue
 
          elif qui == 'Q':
             if qmap:
-               qmaps = {}
                qui_maps = qmaps
                qui_list = qlist
                conf = quconf
+               coadd = qmap
             else:
                continue
 
          else:
             if umap:
-               umaps = {}
                qui_maps = umaps
                qui_list = ulist
                conf = quconf
+               coadd = umap
             else:
                continue
 
@@ -1389,12 +1406,6 @@ try:
             if ref == "!":
                ref = qui_maps[key]
 
-#  Append this map to the text file listing all maps to be included in the final
-#  coadds.
-            with open(allmaps, 'a') as infile:
-               infile.write( "{0}\n".format( qui_maps[key] ) )
-               haveSomeMaps = True
-
 #  If the pointing correction is not already known, and we have just
 #  created an I map, see what translations (in pixels) are needed to align
 #  the new I map with the reference map. The determination of the shift is
@@ -1532,80 +1543,8 @@ try:
 
 
 
+#  -----------  CREATE THE COADDED MAP FOR THE CURRENT STOKES PARAMETER -------------
 
-
-
-
-#  -----------  CREATE THE COADDED MAPS ------------------------
-
-#  No need to do this if we have no maps to coadd.
-   if haveSomeMaps:
-
-#  Create a text file holding information about all the Stokes maps. For each one,
-#  get the Stokes parameter (Q, U or I) and a key that is unique for the chunk of
-#  data, of the form "<UT>_<OBS>_<SUBSCAN>".
-      mapinfo = NDG.tempfile()
-      mapndg = NDG("^{0}".format(allmaps) )
-      invoke("$SMURF_DIR/pol2check in={0} quiet=yes mapinfo={1}".
-             format(mapndg,mapinfo))
-
-      if not get_task_par( "MAPFOUND", "pol2check" ):
-         raise starutil.InvalidParameterError("No usable maps remains to be processed.")
-
-#  Set up a dict. Each key is as described above. Each value is path to an
-#  NDF holding a map with the same key and I, Q or U Stokes parameter.
-      with open(allmaps) as infile:
-         lines = infile.readlines()
-      paths = [line.strip() for line in lines]
-
-      with open(mapinfo) as infile:
-         lines = infile.readlines()
-      infos = [line.strip() for line in lines]
-
-      imaps = {}
-      qmaps = {}
-      umaps = {}
-      for (path,info) in zip( paths, infos ):
-         (stokes,id) = info.split()
-         if stokes == "I":
-            imaps[id] = path
-         elif stokes == "Q":
-            qmaps[id] = path
-         else:
-            umaps[id] = path
-
-         if "pol" not in get_fits_header( NDG(path), "INBEAM" ):
-            raise starutil.InvalidParameterError("One of the {0} maps ({1}) "
-                                             "was not created from POL2 data".
-                                             format(stokes,path))
-
-#  Loop over each Stokes parameter, creating a coadd for each required
-#  parameter.
-      for qui in ('I', 'Q', 'U'):
-
-#  Pass on to the next parameter if we are not creating a map for the
-#  current parameter. Also create dictionaries holding the I, Q or U map
-#  for each observation chunk.
-         if qui == 'I':
-            if imap:
-               qui_maps = imaps
-               coadd = imap
-            else:
-               continue
-
-         elif qui == 'Q':
-            if qmap:
-               qui_maps = qmaps
-               coadd = qmap
-            else:
-               continue
-
-         else:
-            if umap:
-               qui_maps = umaps
-               coadd = umap
-            else:
-               continue
 
 #  Check some good maps remain to be processed.
          if len(qui_maps) == 0:
