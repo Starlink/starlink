@@ -659,7 +659,7 @@ try:
 #  create the I map.
       if ipeak != 0.0:
          invoke("$KAPPA_DIR/maths exp=\"'ia*0+pa*exp(-pc*((xa-px)**2+(xb-py)**2)/(pf**2))'\" "
-                "pa={0} pc=1.66511 pf={1} out={2} px={3} py={4} "
+                "pa={0} pc=2.77259 pf={1} out={2} px={3} py={4} "
                 "ia={5}'({6}:{7},{8}:{9})'".
                 format(ipeak,ifwhm,iart,xc,yc,junk,lx,ux,ly,uy))
 
