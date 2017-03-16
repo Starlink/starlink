@@ -220,6 +220,10 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        component.
 *     23-SEP-2014 (DSB):
 *        Added parameter LOGFILE.
+*     16-MAR-2017 (DSB):
+*        Previously, echoing a vector-valued parameter such as makemap's
+*        "modelorder" parameter only displayed the first element. The use
+*        of astMapGet0C has been changed to astMapGetC to fix this bug.
 *     {enter_further_changes_here}
 
 *-
@@ -410,12 +414,12 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
             astClear( keymap, "KeyError" );
 
 /* Get the parameter value as a string. */
-            astMapGet0C( keymap, pname, &value );
+            astMapGetC( keymap, pname, &value );
          }
 
          if (historyConfig) {
             astClear(historyConfig, "KeyError");
-            astMapGet0C(historyConfig, pname, &historyValue);
+            astMapGetC(historyConfig, pname, &historyValue);
 
 /* In NDF history mode we only want to return a value if it
    was found in the configuration from the history. */
@@ -568,17 +572,18 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
 /* Get the vector length of the entry. */
          nval = astMapLength( km, key );
 
-/* If it is a scalar, just get its value as a character string using
-   the automatic type conversion provided by the KeyMap class, and
-   format it, putting the supplied prefix at the start of the key. */
+/* Get its value as a character string using the automatic type conversion
+   provided by the KeyMap class, and format it, putting the supplied prefix
+   at the start of the key. Note, the astMapGetC function formats a vector
+   KeyMap entry as a comma-separated list enclosed in parentheses. */
          if( nval <= 1 ) {
             text = NULL;
             nc = 0;
             cvalue = "<undef>";
-            astMapGet0C( km, key, &cvalue );
+            astMapGetC( km, key, &cvalue );
             if( refkm ) {
                refcvalue = "<undef>";
-               if( astMapGet0C( refkm, key, &refcvalue ) &&
+               if( astMapGetC( refkm, key, &refcvalue ) &&
                    !strcmp( cvalue, refcvalue ) ) {
                   text = astAppendString( text, &nc, "- " );
                } else {
@@ -586,56 +591,6 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
                }
             }
             text = astAppendStringf( text, &nc, "%s%s = %s", prefix, key, cvalue );
-
-/* If it is a vector, we construct a string containing a comma-separated
-   list of elements, enclosed in parentheses. */
-         } else {
-            nc = 0;
-            cvalue = astAppendString( NULL, &nc, "(" );
-            for( ival = 0; ival < nval; ival++ ) {
-               if( astMapGetElemC( km, key, sizeof( cbuffer) - 1, ival,
-                                   cbuffer ) ) {
-                  cvalue = astAppendString( (char *) cvalue, &nc, cbuffer );
-               }
-               if( ival < nval - 1 ) cvalue = astAppendString( (char *) cvalue,
-                                                                &nc, "," );
-            }
-            cvalue = astAppendString( (char *) cvalue, &nc, ")" );
-
-/* Do the same for the reference KeyMap. */
-            if (refkm && (nval = astMapLength(refkm, key))) {
-               nc = 0;
-               refcvalue = astAppendString(NULL, &nc, "(");
-               for (ival = 0; ival < nval; ival++) {
-                  if (ival) {
-                     refcvalue = astAppendString((char*) refcvalue, &nc, "," );
-                  }
-
-                  if (astMapGetElemC(refkm, key, sizeof(cbuffer) - 1, ival,
-                                      cbuffer)) {
-                     refcvalue = astAppendString((char*) refcvalue, &nc,
-                                                 cbuffer);
-                  }
-               }
-               refcvalue = astAppendString((char*) refcvalue, &nc, ")");
-            } else {
-               refcvalue = NULL;
-            }
-
-/* Format the total string, with the current key prefix, and free the memory
-   used to store it. */
-            text = NULL;
-            nc = 0;
-            if (refkm) {
-               if (refcvalue && ! strcmp(cvalue, refcvalue)) {
-                  text = astAppendString( text, &nc, "- " );
-               } else {
-                  text = astAppendString( text, &nc, "+ " );
-               }
-            }
-            text = astAppendStringf( text, &nc, "%s%s = %s", prefix, key, cvalue );
-            cvalue = astFree( (void *) cvalue );
-            if (refcvalue) refcvalue = astFree((void*) refcvalue);
          }
 
 /* Display the total text on standard output. */
