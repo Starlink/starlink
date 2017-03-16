@@ -1045,6 +1045,20 @@ try:
                msg_out("Will use PCA.PCATHRESH value of {0} inherited from existing "
                        "map {1}.".format(pcathresh,tmap))
 
+#  If the modelorder does not include PCA, we set "pcathresh" to a
+#  non-zero value to indicate that the ABORTSOON parameter should not be set
+#  when running makemap. The specific non-zero value used does not matter
+#  as makemap will not be using it anyway (since modelorder order does
+#  include PCA), but we choose to use the appropriate default value.
+      if pcathresh == 0:
+         try:
+            models = float( invoke("$KAPPA_DIR/configecho name=modelorder "
+                                   "config={0}".format(config)) )
+            if "pca" not in models.lower():
+               pcathresh = (pcathresh_def1 if automask else pcathresh_def2)
+         except:
+            pass
+
 #  Create a config file to use with makemap.
       iconf = NDG.tempfile()
       fd = open(iconf,"w")
