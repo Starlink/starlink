@@ -1052,8 +1052,8 @@ try:
 #  include PCA), but we choose to use the appropriate default value.
       if pcathresh == 0:
          try:
-            models = float( invoke("$KAPPA_DIR/configecho name=modelorder "
-                                   "config={0}".format(config)) )
+            models = invoke("$KAPPA_DIR/configecho name=modelorder "
+                            "config={0}".format(config))
             if "pca" not in models.lower():
                pcathresh = (pcathresh_def1 if automask else pcathresh_def2)
          except:
