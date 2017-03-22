@@ -1034,6 +1034,10 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     /* If we know how many components to remove, flag them by setting
        them bad in the above array. */
     if( thresh < 0.0 ) {
+
+      /* Ensure we do not try to remove more components than we have. */
+      if( ncomp > ngoodbolo ) ncomp = ngoodbolo;
+
       for( i=0; i<ncomp; i++ ) rms_amp[i] = VAL__BADD;
       msgOutiff( MSG__VERB, "", FUNC_NAME ": will remove %zu / %zu components...",
                  status, ncomp, ngoodbolo );
