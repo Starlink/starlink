@@ -100,9 +100,13 @@
 *     2014-12-16 (DSB):
 *        Do an explicit check to see if the supplied scan goes crazy,
 *        rather than using a blacklist of known crazy scans.
+*     2017-03-27 (DSB):
+*        Modify smf__validate_scan to take account of any map offset
+*        specified by the MAP_X and MAP_Y FITS headers.
 
 *  Copyright:
 *     Copyright (C) 2009-2014 Science & Technology Facilities Council.
+*     Copyright (C) 2017 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -619,12 +623,14 @@ static int smf__validate_scan( smfHead *hdr, int *status ) {
    dim_t iframe;
    dim_t maxbad;
    dim_t nbad;
-   double az0;
-   double az;
-   double el0;
-   double el;
+   double lat0;
+   double lat;
+   double lon0;
+   double lon;
    double map_hght;
    double map_wdth;
+   double mapx;
+   double mapy;
    double rad;
    double sep;
    int result = 1;
@@ -639,11 +645,21 @@ static int smf__validate_scan( smfHead *hdr, int *status ) {
    map_wdth = 0.0;
    smf_getfitsd( hdr, "MAP_WDTH", &map_wdth, status );
 
+/* Get the requested map offset (in tracking coords) from the 
+   boresight, in arc-seconds. Convert to radians. */
+   mapx = 0.0;
+   smf_getfitsd( hdr, "MAP_X", &mapx, status );
+   mapx *= AST__DD2R/3600.0;
+
+   mapy = 0.0;
+   smf_getfitsd( hdr, "MAP_Y", &mapy, status );
+   mapy *= AST__DD2R/3600.0;
+
 /* If the above keywords do not have usable values, we cannot do this
    check, so play safe and assume all is well. */
    if( map_hght > 0.0 && map_wdth > 0.0 ) {
 
-/* Get the maximum expected distance of the boresight from the tracking
+/* Get the maximum expected distance of the boresight from the map
    centre, and convert from arc-seconds to radians. */
       rad = AST__DD2R*sqrt( map_hght*map_hght + map_hght*map_hght )/3600.0;
 
@@ -656,17 +672,17 @@ static int smf__validate_scan( smfHead *hdr, int *status ) {
       state = hdr->allState;
       for( iframe = 0; iframe < hdr->nframes; iframe++,state++ ) {
 
-/* Check the boresight az and el values are good in the header. */
-         az = state->tcs_az_ac1;
-         el = state->tcs_az_ac2;
-         az0 = state->tcs_az_bc1;
-         el0 = state->tcs_az_bc2;
-         if( az != VAL__BADD && el != VAL__BADD &&
-             az0 != VAL__BADD && el0 != VAL__BADD ) {
+/* Check the boresight tracking values are good in the header. */
+         lon = state->tcs_tr_ac1;
+         lat = state->tcs_tr_ac2;
+         lon0 = state->tcs_tr_bc1;
+         lat0 = state->tcs_tr_bc2;
+         if( lon != VAL__BADD && lat != VAL__BADD &&
+             lon0 != VAL__BADD && lat0 != VAL__BADD ) {
 
-/* Get the arc-distance from the boresight to the tracking centre at
+/* Get the arc-distance from the boresight to the map centre at
    the current time slice. */
-            sep = palDsep( az, el, az0, el0 );
+            sep = palDsep( lon, lat, lon0 + mapx, lat0 + mapy );
 
 /* If it is greater than the expected radius of the map, increment the
    count of such time slices. If the number of bad slices exceeds the
