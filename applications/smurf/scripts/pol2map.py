@@ -569,6 +569,10 @@ try:
 #  masking.
    mask = parsys["MASK"].value
    upmask = mask.upper()
+
+   pcamask = None
+   pcamaskpar = ""
+
    if upmask == "AUTO":
       automask = True
       circlemask = False
@@ -997,6 +1001,84 @@ try:
             else:
                ilist[id] = [ path ]
 
+#  If required, generate the AST and PCA masks from the supplied MASK
+#  map.
+      if maskmap and masktype == "SIGNAL":
+         snr = NDG(1)
+         invoke("$KAPPA_DIR/makesnr in={0} out={1} minvar=0".format(maskmap,snr))
+
+#  Very strong sources such as Orion A can create masks in which there
+#  are insufficient background pixels to allow future invocations of
+#  makemap to succeed. We therefore loop round raising the SNR limits for
+#  the mask until no more than 20% of the originally good pixels are
+#  designated as source pixels.
+         invoke("$KAPPA_DIR/stats ndf={0}".format(snr))
+         ngood = float( get_task_par( "numgood", "stats" ) )
+         maxgood = ngood / 5
+
+         noise = 2
+         minheight = 3
+         aconf = NDG.tempfile()
+
+         while True:
+            fd = open(aconf,"w")
+            fd.write("FellWalker.FlatSlope=0\n")
+            fd.write("FellWalker.MinDip=1.0E30\n")
+            fd.write("FellWalker.Noise={0}\n".format(noise))
+            fd.write("FellWalker.MinHeight={0}\n".format(minheight))
+            fd.close()
+            invoke("$CUPID_DIR/findclumps in={0} method=fellwalker rms=1 "
+                   "outcat=! out={1} config=^{2}".format(snr,astmask,aconf))
+
+            try:
+               invoke("$KAPPA_DIR/stats ndf={0}".format(astmask))
+               ngood = float( get_task_par( "numgood", "stats" ) )
+            except starutil.AtaskError:
+               raise starutil.InvalidParameterError( "No significant emission "
+                               "found in total intensity map {0} supplied for "
+                               "parameter MASK".format(maskmap))
+
+            if ngood < maxgood:
+               break
+            else:
+               if noise == minheight:
+                  minheight *= 1.2
+               noise = minheight
+
+#  The source regions within the PCA mask need to be smaller than in the
+#  AST mask. Make sure it uses no more than 10% of the original good
+#  pixels.
+         maxgood = ngood / 2
+
+         noise = 3
+         minheight = 5
+         pconf = NDG.tempfile()
+
+         while True:
+            fd = open(pconf,"w")
+            fd.write("FellWalker.FlatSlope=0\n")
+            fd.write("FellWalker.MinDip=1.0E30\n")
+            fd.write("FellWalker.Noise={0}\n".format(noise))
+            fd.write("FellWalker.MinHeight={0}\n".format(minheight))
+            fd.close()
+            invoke("$CUPID_DIR/findclumps in={0} method=fellwalker rms=1 "
+                   "outcat=! out={1} config=^{2}".format(snr,pcamask,pconf))
+
+            try:
+               invoke("$KAPPA_DIR/stats ndf={0}".format(pcamask))
+               ngood = float( get_task_par( "numgood", "stats" ) )
+            except starutil.AtaskError:
+               ngood = 0
+               pcamask = None
+
+            if ngood < maxgood:
+               break
+            else:
+               if noise == minheight:
+                  minheight *= 1.2
+               noise = minheight
+
+
 #  We need to decide on the value to use for the PCA.PCATHRESH config
 #  parameter when running makemap below. If a value is given in the
 #  user-supplied config, use it.
@@ -1109,9 +1191,11 @@ try:
 
       else:
          fd.write("ast.zero_mask = ref\n")
-         fd.write("pca.zero_mask = mask2\n")
-         fd.write("com.zero_mask = mask2\n")
-         fd.write("flt.zero_mask = mask2\n")
+         if pcamask:
+            pcamaskpar = "mask2={0}".format(pcamask)
+            fd.write("pca.zero_mask = mask2\n")
+            fd.write("com.zero_mask = mask2\n")
+            fd.write("flt.zero_mask = mask2\n")
 
 #  If the user supplied extra config parameters, append them to the
 #  config file.
@@ -1135,73 +1219,6 @@ try:
       fd.write("com.noflag=1\n")
       fd.write("^{0}\n".format(iconf))
       fd.close()
-
-#  If required, generate the AST and PCA masks from the supplied MASK
-#  map.
-      if maskmap and masktype == "SIGNAL":
-         snr = NDG(1)
-         invoke("$KAPPA_DIR/makesnr in={0} out={1} minvar=0".format(maskmap,snr))
-
-#  Very strong sources such as Orion A can create masks in which there
-#  are insufficient background pixels to allow future invocations of
-#  makemap to succeed. We therefore loop round raising the SNR limits for
-#  the mask until no more than 20% of the originally good pixels are
-#  designated as source pixels.
-         invoke("$KAPPA_DIR/stats ndf={0}".format(snr))
-         ngood = float( get_task_par( "numgood", "stats" ) )
-         maxgood = ngood / 5
-
-         noise = 2
-         minheight = 3
-         aconf = NDG.tempfile()
-
-         while True:
-            fd = open(aconf,"w")
-            fd.write("FellWalker.FlatSlope=0\n")
-            fd.write("FellWalker.MinDip=1.0E30\n")
-            fd.write("FellWalker.Noise={0}\n".format(noise))
-            fd.write("FellWalker.MinHeight={0}\n".format(minheight))
-            fd.close()
-            invoke("$CUPID_DIR/findclumps in={0} method=fellwalker rms=1 "
-                   "outcat=! out={1} config=^{2}".format(snr,astmask,aconf))
-
-            invoke("$KAPPA_DIR/stats ndf={0}".format(astmask))
-            ngood = float( get_task_par( "numgood", "stats" ) )
-            if ngood < maxgood:
-               break
-            else:
-               if noise == minheight:
-                  minheight *= 1.2
-               noise = minheight
-
-#  The source regions within the PCA mask need to be smaller than in the
-#  AST mask. Make sure it uses no more than 10% of the original good
-#  pixels.
-         maxgood = ngood / 2
-
-         noise = 3
-         minheight = 5
-         pconf = NDG.tempfile()
-
-         while True:
-            fd = open(pconf,"w")
-            fd.write("FellWalker.FlatSlope=0\n")
-            fd.write("FellWalker.MinDip=1.0E30\n")
-            fd.write("FellWalker.Noise={0}\n".format(noise))
-            fd.write("FellWalker.MinHeight={0}\n".format(minheight))
-            fd.close()
-            invoke("$CUPID_DIR/findclumps in={0} method=fellwalker rms=1 "
-                   "outcat=! out={1} config=^{2}".format(snr,pcamask,pconf))
-
-            invoke("$KAPPA_DIR/stats ndf={0}".format(pcamask))
-            ngood = float( get_task_par( "numgood", "stats" ) )
-            if ngood < maxgood:
-               break
-            else:
-               if noise == minheight:
-                  minheight *= 1.2
-               noise = minheight
-
 
 #  Loop over each Stokes parameter, creating maps from each observation
 #  if reqired.
@@ -1350,8 +1367,8 @@ try:
                             "{5} {6} {7}".format(isdf,conf,qui_maps[key],ref,pntfile,pixsize_par,ip,abpar))
                      else:
                         invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
-                            "{5} {6} mask2={7} {8}".format(isdf,conf,qui_maps[key],astmask,pntfile,
-                                                           pixsize_par,ip,pcamask,abpar))
+                            "{5} {6} {7} {8}".format(isdf,conf,qui_maps[key],astmask,pntfile,
+                                                           pixsize_par,ip,pcamaskpar,abpar))
 
 #  If we do not yet know what pcathresh value to use, see if makemap aborted
 #  due to slow convergence. If so, reduce the number of PCA components
