@@ -10,6 +10,8 @@
 
 #include <time.h>
 
+#include "prm_par.h"
+
 /* Local definition of timegm */
 static time_t my_timegm (struct tm *tm );
 
@@ -111,7 +113,7 @@ double csofit2_calc(csofit2_t * fits, double t)
 {
     if(!fits || fits->npolys <= 0)
     {
-        return 0.0;  /* an improbable value */
+        return VAL__BADD;
     }
     double w = 0.0;
     double y = 0.0;
@@ -142,7 +144,7 @@ double csofit2_calc(csofit2_t * fits, double t)
     }
     if(w == 0.0)
     {
-        return 0.0;
+        return VAL__BADD;
     }
     else
     {

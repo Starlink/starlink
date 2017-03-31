@@ -87,8 +87,9 @@ double smf_cso2filt_applycoeff( double csotau, const double coeffs[2],
 
   if (*status != SAI__OK) return tau;
 
-  /* Trap a CSO tau of 0 and just return 0 */
-  if (csotau == 0.0) return 0.0;
+  if (csotau == VAL__BADD) {
+    return VAL__BADD;
+  }
 
   tau = coeffs[0] * ( csotau + coeffs[1] );
 
