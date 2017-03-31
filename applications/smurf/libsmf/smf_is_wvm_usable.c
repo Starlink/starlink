@@ -125,6 +125,7 @@ smf_is_wvm_usable( const smfHead * hdr, int *status ) {
     20140827,
     20140829,
     20140830,
+    20170329, /* Spikes & alternating: see fault 20170329.003 */
     0    /* Sentinenl */
   };
 
