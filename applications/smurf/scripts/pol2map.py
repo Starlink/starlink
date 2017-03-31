@@ -804,8 +804,8 @@ try:
          else:
             umaps[id] = path
 
-         inbeam = get_fits_header( NDG(path), "INBEAM" ):
-         if not inbeam or ("pol" not in get_fits_header( NDG(path), "INBEAM" )):
+         inbeam = get_fits_header( NDG(path), "INBEAM" )
+         if not inbeam or ("pol" not in inbeam):
             raise starutil.InvalidParameterError("One of the {0} maps ({1}) "
                                           "was not created from POL2 data or "
                                           "is corrupt.".format(stokes,path))
