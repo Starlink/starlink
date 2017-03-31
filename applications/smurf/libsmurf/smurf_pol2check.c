@@ -35,6 +35,9 @@
 *     possible that an NDF could pass these checks and yet fail to open
 *     in other smurf task if any of the additional meta-data required by
 *     those tasks has been corrupted or is otherwise inappropriate.
+*
+*     An error is reported if POL2 data from more than one waveband (450
+*     or 850) is present in the list of supplied data files.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -136,10 +139,12 @@
 *     16-NOV-2016 (DSB):
 *        Correct reporting of missing files. Previous scheme only worked
 *        if the input file list contained data for only one observation.
+*     31-MAR-2017 (DSB):
+*        Add support for 450 um data.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2016 East Asian Observatory
+*     Copyright (C) 2016-2017 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -197,14 +202,14 @@
    observation. */
 typedef struct SubScanInfo {
    int maxscan;            /* Largest NSUBSCAN value found for any subarray */
-   char s8a_scans[ MAX_SCAN ];/* Flags showing the S8A subscans found */
-   char s8b_scans[ MAX_SCAN ];/* Flags showing the S8B subscans found */
-   char s8c_scans[ MAX_SCAN ];/* Flags showing the S8C subscans found */
-   char s8d_scans[ MAX_SCAN ];/* Flags showing the S8D subscans found */
-   int s8a_count;             /* Any S8A raw data files supplied? */
-   int s8b_count;             /* Any S8B raw data files supplied? */
-   int s8c_count;             /* Any S8C raw data files supplied? */
-   int s8d_count;             /* Any S8D raw data files supplied? */
+   char sa_scans[ MAX_SCAN ];/* Flags showing the S4/8A subscans found */
+   char sb_scans[ MAX_SCAN ];/* Flags showing the S4/8B subscans found */
+   char sc_scans[ MAX_SCAN ];/* Flags showing the S4/8C subscans found */
+   char sd_scans[ MAX_SCAN ];/* Flags showing the S4/8D subscans found */
+   int sa_count;             /* Any S4/8A raw data files supplied? */
+   int sb_count;             /* Any S4/8B raw data files supplied? */
+   int sc_count;             /* Any S4/8C raw data files supplied? */
+   int sd_count;             /* Any S4/8D raw data files supplied? */
 } SubScanInfo;
 
 /* Main entry */
@@ -223,6 +228,8 @@ void smurf_pol2check( int *status ) {
    char filepath[GRP__SZNAM+1];/* NDF path, derived from GRP */
    char label[GRP__SZNAM+1];  /* NDF label string */
    const char *key;           /* Pointer to KeyMap key string */
+   const char *wave0;         /* Pointer to waveband for first POL2 file */
+   const char *wave;          /* Pointer to waveband for current POL2 file */
    int dims[NDF__MXDIM];      /* No. of pixels along each axis of NDF */
    int ikey;                  /* Index of next key */
    int indf;                  /* NDF identifier */
@@ -255,6 +262,7 @@ void smurf_pol2check( int *status ) {
    sskm = astKeyMap( " " );
 
 /* Loop round all NDFs. */
+   wave0 = NULL;
    for( i = 1; i <= isize && *status == SAI__OK; i++ ) {
       ok = 0;
 
@@ -274,6 +282,7 @@ void smurf_pol2check( int *status ) {
          if( astTestFits( fc, "INBEAM", NULL ) &&
              astGetFitsS( fc, "INBEAM", &cval ) &&
              !strncmp( cval, "pol", 3 ) ) {
+            wave = NULL;
 
 /* Get the pixel dimensions of the NDF. */
             ndfDim( indf, NDF__MXDIM, dims, &ndims, status );
@@ -315,23 +324,27 @@ void smurf_pol2check( int *status ) {
                      if( subscan > ssptr->maxscan ) ssptr->maxscan = subscan;
                      astGetFitsS( fc, "SUBARRAY", &cval );
 
-                     if( astChrMatch( cval, "s8a" ) ) {
-                        ssptr->s8a_count++;
-                        ssptr->s8a_scans[ subscan - 1 ] = 1;
-                     } else if( astChrMatch( cval, "s8b" ) ) {
-                        ssptr->s8b_count++;
-                        ssptr->s8b_scans[ subscan - 1 ] = 1;
-                     } else if( astChrMatch( cval, "s8c" ) ) {
-                        ssptr->s8c_count++;
-                        ssptr->s8c_scans[ subscan - 1 ] = 1;
-                     } else if( astChrMatch( cval, "s8d" ) ) {
-                        ssptr->s8d_count++;
-                        ssptr->s8d_scans[ subscan - 1 ] = 1;
+                     if( astChrMatch( cval, "s8a" ) || astChrMatch( cval, "s4a" ) ) {
+                        ssptr->sa_count++;
+                        ssptr->sa_scans[ subscan - 1 ] = 1;
+                     } else if( astChrMatch( cval, "s8b" ) || astChrMatch( cval, "s4b" ) ) {
+                        ssptr->sb_count++;
+                        ssptr->sb_scans[ subscan - 1 ] = 1;
+                     } else if( astChrMatch( cval, "s8c" ) || astChrMatch( cval, "s4c" ) ) {
+                        ssptr->sc_count++;
+                        ssptr->sc_scans[ subscan - 1 ] = 1;
+                     } else if( astChrMatch( cval, "s8d" ) || astChrMatch( cval, "s4d" ) ) {
+                        ssptr->sd_count++;
+                        ssptr->sd_scans[ subscan - 1 ] = 1;
                      } else if( *status == SAI__OK ) {
                         *status = SAI__ERROR;
                         errRepf("","Unsupported SUBARRAY header value "
                                 "'%s' found in %s.", status, cval, filepath );
                      }
+
+
+/* Get the waveband. */
+                     wave = (cval[1] == '8') ? "S8" : "S4";
 
 /* For Stokes parameter data check that the NDF Label component is
    "Q", "U" or "I". */
@@ -350,6 +363,10 @@ void smurf_pol2check( int *status ) {
                      sprintf( buf, "%s %8.8d_%5.5d_%4.4d", label, utdate, obs,
                               subscan );
                      astMapPutElemC( km, "STOKES_INFO", -1, buf );
+
+/* Get the waveband. */
+                     astGetFitsS( fc, "SUBARRAY", &cval );
+                     wave = (cval[1] == '8') ? "S8" : "S4";
                   }
                }
 
@@ -370,6 +387,25 @@ void smurf_pol2check( int *status ) {
                   sprintf( buf, "%s %8.8d_%5.5d_%4.4d", label, utdate, obs,
                            subscan );
                   astMapPutElemC( km, "MAP_INFO", -1, buf );
+
+/* Get the waveband. */
+                  astGetFitsS( fc, "SUBARRAY", &cval );
+                  wave = (cval[1] == '8') ? "S8" : "S4";
+               }
+            }
+
+/* Check the waveband of this POL2 file is the same as the waveband for
+   all previous POL2 files. */
+            if( wave ) {
+               if( wave0 ) {
+                  if( strcmp( wave, wave0 ) && *status == SAI__OK ) {
+                     *status = SAI__ERROR;
+                     errRepf(" ","Both 450 um and 850 um POL2 data "
+                             "supplied - only one waveband should "
+                             "be supplied.", status );
+                  }
+               } else {
+                  wave0 = wave;
                }
             }
          }
@@ -417,12 +453,12 @@ void smurf_pol2check( int *status ) {
          key = astMapKey( sskm, ikey );
          astMapGet0P( sskm, key, (void **) &ssptr );
 
-         if( ssptr->s8a_count ) ssptr->s8a_count = ssptr->maxscan - ssptr->s8a_count;
-         if( ssptr->s8b_count ) ssptr->s8b_count = ssptr->maxscan - ssptr->s8b_count;
-         if( ssptr->s8c_count ) ssptr->s8c_count = ssptr->maxscan - ssptr->s8c_count;
-         if( ssptr->s8d_count ) ssptr->s8d_count = ssptr->maxscan - ssptr->s8d_count;
+         if( ssptr->sa_count ) ssptr->sa_count = ssptr->maxscan - ssptr->sa_count;
+         if( ssptr->sb_count ) ssptr->sb_count = ssptr->maxscan - ssptr->sb_count;
+         if( ssptr->sc_count ) ssptr->sc_count = ssptr->maxscan - ssptr->sc_count;
+         if( ssptr->sd_count ) ssptr->sd_count = ssptr->maxscan - ssptr->sd_count;
 
-         if( ssptr->s8a_count || ssptr->s8b_count || ssptr->s8c_count || ssptr->s8d_count ) {
+         if( ssptr->sa_count || ssptr->sb_count || ssptr->sc_count || ssptr->sd_count ) {
 
             if( !fd ) {
                parGet0c( "MISSING", filepath, sizeof(filepath), status );
@@ -441,44 +477,44 @@ void smurf_pol2check( int *status ) {
             if( fd == stdout ) fprintf( fd, "   " );
             fprintf( fd, "\nObservation %s:\n", key );
 
-            if( ssptr->s8a_count ) {
+            if( ssptr->sa_count ) {
                if( fd == stdout ) fprintf( fd, "   " );
-               fprintf( fd, "   S8A: " );
+               fprintf( fd, "   %sA: ", wave0 );
                for( subscan = 0; subscan < ssptr->maxscan; subscan++ ) {
-                  if( !ssptr->s8a_scans[ subscan ] ) {
+                  if( !ssptr->sa_scans[ subscan ] ) {
                      fprintf( fd, "_%04d ", subscan + 1 );
                   }
                }
                fprintf( fd, "\n" );
             }
 
-            if( ssptr->s8b_count ) {
+            if( ssptr->sb_count ) {
                if( fd == stdout ) fprintf( fd, "   " );
-               fprintf( fd, "   S8B: " );
+               fprintf( fd, "   %sB: ", wave0 );
                for( subscan = 0; subscan < ssptr->maxscan; subscan++ ) {
-                  if( !ssptr->s8b_scans[ subscan ] ) {
+                  if( !ssptr->sb_scans[ subscan ] ) {
                      fprintf( fd, "_%04d ", subscan + 1 );
                   }
                }
                fprintf( fd, "\n" );
             }
 
-            if( ssptr->s8c_count ) {
+            if( ssptr->sc_count ) {
                if( fd == stdout ) fprintf( fd, "   " );
-               fprintf( fd, "   S8C: " );
+               fprintf( fd, "   %sC: ", wave0 );
                for( subscan = 0; subscan < ssptr->maxscan; subscan++ ) {
-                  if( !ssptr->s8c_scans[ subscan ] ) {
+                  if( !ssptr->sc_scans[ subscan ] ) {
                      fprintf( fd, "_%04d ", subscan + 1 );
                   }
                }
                fprintf( fd, "\n" );
             }
 
-            if( ssptr->s8d_count ) {
+            if( ssptr->sd_count ) {
                if( fd == stdout ) fprintf( fd, "   " );
-               fprintf( fd, "   S8D: " );
+               fprintf( fd, "   %sD: ", wave0 );
                for( subscan = 0; subscan < ssptr->maxscan; subscan++ ) {
-                  if( !ssptr->s8d_scans[ subscan ] ) {
+                  if( !ssptr->sd_scans[ subscan ] ) {
                      fprintf( fd, "_%04d ", subscan + 1 );
                   }
                }
