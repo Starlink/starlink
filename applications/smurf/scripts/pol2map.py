@@ -692,7 +692,7 @@ try:
    if parsys["IPCOR"].value:
       ipref = parsys["IPREF"].value
       if not ipref:
-         if not ref:
+         if not ref or ref == "!":
             raise starutil.InvalidParameterError("IP correction requested "
                                         "but no IP reference map supplied.")
          ipref = ref
