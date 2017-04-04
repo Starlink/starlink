@@ -99,7 +99,8 @@ or
 This section describes how to use \texttt{pol2map} to create I, Q and U
 maps, plus a vector catalogue, from the raw data files for a set of two
 or more POL2 observations of an extended source. If you want to create
-maps from a single observations, see section~\ref{sec:oneobs}.
+maps from a single observations, follow the same procedure but include
+only one observation at step 1.
 
 \begin{description}
 \item[Step 1]:  Create a text file listing all the raw data files for all
@@ -464,31 +465,6 @@ observations, then delete all files relating to the bad observations from
 both output directories (\texttt{qudir} and \texttt{mapdir}), and also
 from the list of input files if you are using a list file, and then
 re-run step 4 from section~\ref{se1}.
-
-\subsection{\label{sec:oneobs}Creating maps from a single observation}
-If you have only one observation of your source, the process described
-above can be simplified since there is no benefit in forming an external
-mask. The entire process can then be performed in a single invocation of
-\texttt{pol2map}:
-
-\begin{quote}
-\begin{verbatim}
-% pol2map in=^infiles iout=iauto qout=qauto uout=uauto qudir=qudata \
-          ipref=iauto cat=mycat debias=yes config='pca.pcathresh=-150'
-\end{verbatim}
-\end{quote}
-
-Here is is assumed that the file \texttt{infiles} contains paths to all
-the raw data files for the observation. The default auto-masking is
-used (since no value is assigned to the MASK parameter), but the
-PCA.PCATHRESH configuration parameter is changed so that 150 PCA
-components are removed on each iteration\footnote{This should produce a
-flatter background with lower noise than the default value of -50.}. IP
-correction for the Q and U maps is based on the I map generated from the
-POL2 data (\texttt{iauto.sdf}).
-
-If the observation is of a compact source, add ``\texttt{mask=circle}''
-to the command line.
 
 \section{A detailed description of the processing performed by \texttt{pol2map}}
 
