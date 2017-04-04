@@ -432,7 +432,7 @@ single command:
 \begin{quote}
 \begin{verbatim}
 % pol2map in=^infiles iout=imap qout=qmap uout=umap mapdir=maps \
-          mask=circle cat=mycat debias=yes
+          ipref=imap mask=circle cat=mycat debias=yes
 ...
 \end{verbatim}
 \end{quote}
@@ -487,7 +487,7 @@ flatter background with lower noise than the default value of -50.}. IP
 correction for the Q and U maps is based on the I map generated from the
 POL2 data (\texttt{iauto.sdf}).
 
-If the observation is of a compact source, add ``\texttt{mask=circle}'' 
+If the observation is of a compact source, add ``\texttt{mask=circle}''
 to the command line.
 
 \section{A detailed description of the processing performed by \texttt{pol2map}}
