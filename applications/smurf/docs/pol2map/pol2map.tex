@@ -97,10 +97,10 @@ or
 
 \subsection{Starting from raw data - extended sources\label{se1}}
 This section describes how to use \texttt{pol2map} to create I, Q and U
-maps, plus a vector catalogue, from the raw data files for a set of two
-or more POL2 observations of an extended source. If you want to create
-maps from a single observations, follow the same procedure but include
-only one observation at step 1.
+maps, plus a vector catalogue, from the raw data files for a set of one
+or more POL2 observations of an extended source. This same procedure
+should be used whether you have only one observation to reduce, or
+multiple observations.
 
 \begin{description}
 \item[Step 1]:  Create a text file listing all the raw data files for all
@@ -254,6 +254,17 @@ pol2map.log.2 qext.sdf qudata/ uext.sdf
 
 \end{verbatim}
 \end{quote}
+
+Note, it is possible to combine steps 3 and 4 into a single invocation of
+\texttt{pol2map} as follows:
+
+\begin{quote}
+\begin{verbatim}
+% pol2map in=qudata/\* iout=iext qout=qext uout=uext mapdir=maps mask=iauto \
+          maskout1=astmask maskout2=pcamask ipref=iext cat=mycat debias=yes
+\end{verbatim}
+\end{quote}
+
 
 
 \end{description}
