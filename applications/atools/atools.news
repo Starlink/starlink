@@ -1,6 +1,6 @@
 1 ATOOLS
 
- Version 1.9-12 of ATOOLS is now available. It is fully documented in SUN/???.
+ Version 1.9-15 of ATOOLS is now available. It is fully documented in SUN/???.
 
  ATOOLS is a package of applications which manipulate descriptions
  of coordinate frames, mappings, etc, in the form of AST Objects (see
@@ -8,6 +8,10 @@
  to one of the functions within the AST library. ATOOLS thus provides a
  high-level interface to the AST library.
 
+
+  Changes in V1.9-15
+
+  - New commands astchebymap, astchebydomain.
 
   Changes in V1.9-14
 

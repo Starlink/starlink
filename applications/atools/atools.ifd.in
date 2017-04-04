@@ -4705,6 +4705,147 @@ iraf! {
 
       }
 
+      action astchebymap {
+         helplib {$ATOOLS_HELP}
+
+         parameter fmt {
+            type LITERAL
+            prompt {Format for output text file}
+            ppath DEFAULT
+            vpath DEFAULT
+            default AST
+            helpkey *
+          }
+
+         parameter coeff_f {
+            position 3
+            type LITERAL
+            prompt {Group of coefficients for the forward transformation}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter coeff_i {
+            position 4
+            type LITERAL
+            prompt {Group of coefficients for the inverse transformation}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter lbndf {
+            position 5
+            type _DOUBLE
+            prompt {Lower bounds of input box}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter lbndi {
+            position 7
+            type _DOUBLE
+            prompt {Lower bounds of output box}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter nin {
+            position 1
+            type _INTEGER
+            prompt {Number of input coordinates}
+            ppath CURRENT DEFAULT
+            default 1
+            helpkey *
+          }
+
+         parameter nout {
+            position 2
+            type _INTEGER
+            prompt {Number of output coordinates}
+            ppath CURRENT DEFAULT
+            default 1
+            helpkey *
+          }
+
+         parameter options {
+            position 9
+            type LITERAL
+            prompt {Options for the ChebyMap}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 10
+            type LITERAL
+            prompt {Name of file in which to store the ChebyMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter ubndf {
+            position 6
+            type _DOUBLE
+            prompt {Upper bounds of input box}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter ubndi {
+            position 8
+            type _DOUBLE
+            prompt {Upper bounds of output box}
+            ppath CURRENT
+            helpkey *
+          }
+
+      }
+
+      action astchebydomain {
+         helplib {$ATOOLS_HELP}
+         parameter fmt {
+            type LITERAL
+            prompt {Format for output text file}
+            ppath DEFAULT
+            vpath DEFAULT
+            default AST
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input ChebyMap}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter forward {
+            position 2
+            type _LOGICAL
+            access READ
+            prompt {Use the forward transformation?}
+            ppath CURRENT DEFAULT
+            default TRUE
+            helpkey *
+          }
+
+         parameter lbnd {
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+         parameter ubnd {
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+      }
+
    }
 
    command astshow {

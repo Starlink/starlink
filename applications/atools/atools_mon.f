@@ -334,6 +334,12 @@
       ELSE IF ( NAME .EQ. 'ASTGETUNC' ) THEN
          CALL ASTGETUNC( STATUS )
 
+      ELSE IF ( NAME .EQ. 'ASTCHEBYMAP' ) THEN
+         CALL ASTCHEBYMAP( STATUS )
+
+      ELSE IF ( NAME .EQ. 'ASTCHEBYDOMAIN' ) THEN
+         CALL ASTCHEBYDOMAIN( STATUS )
+
 *  If the action name is not recognised, then report an error.
       ELSE
          STATUS = SAI__ERROR
