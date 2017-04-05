@@ -246,6 +246,8 @@ smf__addto_durations( const smfData *indata, double * duration,
 static void smf__calc_flatobskey( smfHead *hdr, char * keystr, size_t keylen,
                                   int *status );
 
+static int smf__is_file_junk(smfData* data, int* status);
+
 void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int reverttodark,
                       Grp **darkgrp, Grp **flatgrp, int reducedark,
                       int calcflat, smf_dtype darktype, smfArray ** darks,
@@ -271,6 +273,7 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
   AstKeyMap * scimap = NULL; /* All non-flat obs indexed by unique key */
   Grp *ogrp = NULL;   /* local copy of output group */
   size_t sccount = 0; /* Number of accepted science files */
+  size_t junkcount = 0;
   struct timeval tv1;  /* Timer */
   struct timeval tv2;  /* Timer */
 
@@ -335,9 +338,12 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
     /* Fill in the keymap with observation details */
     smf_obsmap_fill( infile, obsmap, objmap, status );
 
+    if (smf__is_file_junk(infile, status)) {
+      junkcount ++;
+
     /* If this is a HARP/ACSIS file it must be a science file, so store it
        in the output group. */
-    if( infile->hdr->instrument == INST__ACSIS) {
+    } else if( infile->hdr->instrument == INST__ACSIS) {
       smf_smfFile_msg( infile->file, "F", 1, "<unknown file>");
       ndgCpsup( ingrp, i, ogrp, status );
       msgOutif( MSG__DEBUG, " ", "Found ACSIS file ^F",status);
@@ -916,6 +922,7 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
   msgSeti( "ND", sccount );
   msgSeti( "DK", dkcount );
   msgSeti( "FF", ffcount );
+  msgSeti( "JK", junkcount );
   msgSeti( "TOT", insize );
   if ( insize == 1 ) {
     if (dkcount == 1) {
@@ -948,10 +955,15 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
     } else {
       msgSetc( "NDTXT", "were science");
     }
+    if (junkcount == 1) {
+      msgSetc("JKTXT", "was junk");
+    } else {
+      msgSetc("JKTXT", "were junk");
+    }
 
     /* This might be a useful message */
-    msgOutif( MSG__NORM, " ", "Out of ^TOT input files, ^DK ^DKTXT, ^FF ^FFTXT "
-              "and ^ND ^NDTXT", status );
+    msgOutif( MSG__NORM, " ", "Out of ^TOT input files, ^DK ^DKTXT, ^FF ^FFTXT, "
+              "^ND ^NDTXT and ^JK ^JKTXT", status );
   }
 
   if (meanstep && *meanstep != VAL__BADD) {
@@ -1064,4 +1076,50 @@ static void smf__calc_flatobskey( smfHead *hdr, char * keystr, size_t keylen,
            status );
   }
 
+}
+
+
+/* Check whether the given file is known to be junk. */
+static int smf__is_file_junk(smfData* data, int* status) {
+    if (SAI__OK != *status) {
+        return 0;
+    }
+
+    char obsidss[81];
+    smf_getobsidss(data->hdr->fitshdr, 0, 0, obsidss, sizeof(obsidss), status);
+
+    int subscan;
+    smf_getfitsi(data->hdr, "NSUBSCAN", &subscan, status);
+
+    if (SAI__OK != *status) {
+        errAnnul(status);
+        return 0;
+    }
+
+    static const struct {
+        const char* obsidss;
+        int ss_start;
+        int ss_end;
+    } junk[] = {
+        /* TSS inadvertently closed shutter in the middle of
+           20170401 observation 10: see fault 20170401.003. */
+        {"scuba2_10_20170401T040818_850", 35, 38},
+        {"scuba2_10_20170401T040818_450", 35, 38},
+
+        /* End marker. */
+        {0, 0, 0},
+    };
+
+    for (size_t i = 0; junk[i].obsidss; i ++) {
+        if ((subscan >= junk[i].ss_start)
+                && (subscan <= junk[i].ss_end)
+                && ! strcmp(junk[i].obsidss, obsidss)) {
+            smf_smfFile_msg(data->file, "F", 1, "<unknown file>");
+            msgOut("", "File ^F identified as junk", status);
+
+            return 1;
+        }
+    }
+
+    return 0;
 }
