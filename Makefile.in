@@ -180,7 +180,7 @@ all: all-recursive
 # but other names for release branches are possible), the sha1 of the
 # last commit which reflects the current state of the checkout and the
 # date and time in of that commit in ISO8601 format.
-world: componentset.html $(ALL_TARGETS)
+world: $(ALL_TARGETS)
 	- if test -d $(prefix)/starjava/docs; then \
 	  test -f $(prefix)/bin/hlink \
 	    && test -d $(prefix)/docs \
@@ -189,10 +189,6 @@ world: componentset.html $(ALL_TARGETS)
 	  test -f $(prefix)/bin/hlink \
 	    && test -d $(prefix)/docs \
 	    && $(prefix)/bin/hlink $(prefix)/docs $(prefix)/help ; \
-	fi
-	- if test -d $(prefix)/docs; then  \
-		cp componentset.html $(prefix)/docs/starlinksummary.html && \
-		cp buildsupport/misc/starlinksummary.css $(prefix)/docs/starlinksummary.css; \
 	fi
 	rm -f world-stamp
 	date >world-stamp
@@ -261,7 +257,7 @@ world: componentset.html $(ALL_TARGETS)
 # silly-buggers, and we're stuck.  The error message should cover
 # that case, too.
 #
-Makefile.dependencies componentset-extrainfo.xml:
+Makefile.dependencies componentset-extrainfo.xml componentset.xml:
 	rm -f componentset.xml Makefile.dependencies Makefile.dependencies.tmp
 	exec 5>componentset.xml; \
 	  echo '<?xml version="1.0"?>' >&5; \
@@ -295,11 +291,16 @@ Makefile.dependencies componentset-extrainfo.xml:
 # Create the componentset.html summary of the componentset.xml file.
 # Depends on Makefile.dependencies => componentset.xml.
 # Probably only used by USSC maintainer, so limited error recovery.
-componentset.html: Makefile.dependencies
+componentset.html: componentset.xml
 	test $(JAVA) != NOJAVA -a -f componentset.xml
 	$(JAVA) -classpath $(BUILDSUPPORTCP) \
 	  Transformer componentset.xml \
 	    buildsupport/misc/summarise-components.xslt $@
+	if test -d $(prefix)/docs; then \
+		cp componentset.html $(prefix)/docs/starlinksummary.html && \
+		cp buildsupport/misc/starlinksummary.css $(prefix)/docs/starlinksummary.css; \
+	fi
+
 
 # Make a link to an installed componentinfo.dtd file.  This will not
 # work at bootstrap time (so the bootstrap file takes care of this
