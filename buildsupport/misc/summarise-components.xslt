@@ -103,6 +103,31 @@
 	  </xsl:with-param>
 
 	</xsl:call-template>
+
+        <h2 id="extlibs"> External libraries (from /libext)</h2>
+        <p> This lists the various libraries from /libext
+        in this Starlink build.</p>
+        <xsl:call-template name="create-table">
+	  <xsl:with-param name="typeofpackage">
+	    <xsl:value-of select="'libext'"/>
+	  </xsl:with-param>
+	  <xsl:with-param name="withabs">
+	    <xsl:value-of select="'true'"/>
+	  </xsl:with-param>
+        </xsl:call-template>
+
+        <h2 id="thirdparty"> External programs libraries (from /thirdparty)</h2>
+        <p> List of installed thirdparty libraries from /thirdparty in
+        this Starlink build.</p>
+        <xsl:call-template name="create-table">
+	  <xsl:with-param name="typeofpackage">
+	    <xsl:value-of select="'thirdparty'"/>
+	  </xsl:with-param>
+	  <xsl:with-param name="withabs">
+	    <xsl:value-of select="'true'"/>
+	  </xsl:with-param>
+        </xsl:call-template>
+
       </body>
     </html>
   </xsl:template>
