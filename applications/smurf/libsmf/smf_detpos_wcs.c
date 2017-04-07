@@ -15,8 +15,9 @@
 
 *  Invocation:
 *     smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
-*                                 const double telpos[3], AstFrameSet **fset,
-*                                 smfDetposWcsCache *cache, int *status );
+*                                 double dtai, const double telpos[3],
+*                                 AstFrameSet **fset, smfDetposWcsCache *cache,
+*                                 int *status );
 
 *  Arguments:
 *     hdr = smfHead * (Given & Returned)
@@ -27,6 +28,8 @@
 *        will then be returned as the function value).
 *     dut1 = double (Given)
 *        DUT1 correction in seconds.
+*     dtai = double (Given)
+*        DTAI correction in seconds.
 *     telpos = double[ 3 ] (Given)
 *        Geodetic lon / lat / altitude of the telscope (deg/deg/metres)
 *     fset = AstFrameSet ** (Given)
@@ -81,11 +84,16 @@
 *     7-JUL-2015 (DSB):
 *        Indicate that sky separations below 0.05 arc-seconds (SC2AST__SKYTOL)
 *        are insignificant.
+*     10-JAN-2017 (GSB):
+*        Add "dtai" argument.
+*     06-APR-2017 (GSB):
+*        Set dtai in skyframe if present.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2015-2017 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -127,7 +135,7 @@
 #define SPD 86400.0
 
 smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
-                                   const double telpos[3],
+                                   double dtai, const double telpos[3],
                                    AstFrameSet **fset, smfDetposWcsCache *cache,
                                    int *status ) {
 
@@ -274,6 +282,10 @@ smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
    astSet( csky, "Epoch=MJD %.*g, dut1=%.*g",
            DBL_DIG, hdr->state->tcs_tai + 32.184/SPD,
            DBL_DIG, dut1 );
+   if (dtai != VAL__BADD) {
+     astSetD(csky, "Dtai", dtai);
+   }
+
 
 /* Create the FrameSet */
    *fset = astFrameSet( cache->grid, " " );

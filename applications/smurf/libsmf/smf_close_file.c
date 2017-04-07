@@ -120,11 +120,14 @@
 *     2016-11-9 (DSB):
 *        The qbits field in the smfData structure now indicates the
 *        quality bits that are to be exported to the NDF.
+*     2017-01-10 (GSB):
+*        Pass dtai=VAL__BADD to WCS functions.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2016-2017 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -296,11 +299,11 @@ void smf_close_file( ThrWorkForce *wf, smfData ** data, int * status ) {
     if (hdr->tswcs != NULL) hdr->tswcs = astAnnul( hdr->tswcs );
     if (hdr->fitshdr != NULL) hdr->fitshdr = astAnnul( hdr->fitshdr );
 
-    if( hdr->cache1 ) hdr->cache1 = sc2ast_createwcs2( SC2AST__NULLSUB, NULL, 0.0, NULL, NULL, NO_FTS, NULL,
+    if( hdr->cache1 ) hdr->cache1 = sc2ast_createwcs2( SC2AST__NULLSUB, NULL, 0.0, VAL__BADD, NULL, NULL, NO_FTS, NULL,
                                                        hdr->cache1, status );
-    if( hdr->cache2 ) hdr->cache2 = smf_create_lutwcs( 1, NULL, NULL, 0, NULL, 0.0, NULL,
+    if( hdr->cache2 ) hdr->cache2 = smf_create_lutwcs( 1, NULL, NULL, 0, NULL, 0.0, VAL__BADD, NULL,
                                                        NULL, NULL, hdr->cache2, status );
-    if( hdr->cache3 ) hdr->cache3 = smf_detpos_wcs( NULL, -1, 0.0, NULL, NULL, hdr->cache3,
+    if( hdr->cache3 ) hdr->cache3 = smf_detpos_wcs( NULL, -1, 0.0, VAL__BADD, NULL, NULL, hdr->cache3,
                                                     status );
 
     if (!hdr->isCloned) {

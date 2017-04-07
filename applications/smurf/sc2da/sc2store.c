@@ -23,6 +23,7 @@
     11Jan2011 : Compress JCMTSTATE using simple compression scheme (timj)
     23Feb2012 : Add sc2_1kntdtemp (timj)
     13Dec2012 : Use kpg1Hsect to get a section of an HDS array (dsb)
+    06Apr2017 : Add telpar dtai to time series frameset (gsb)
 */
 
 #define _POSIX_C_SOURCE 200112L
@@ -4053,6 +4054,9 @@ AstFrameSet *sc2store_timeWcs
    /* If telpar is defined, add additional info */
    if (telpar) {
      astSetD(timefrm, "dut1", telpar->dut1);
+     if (telpar->dtai != VAL__BADD) {
+       astSetD(timefrm, "dtai", telpar->dtai);
+     }
      astSetD(timefrm, "obslat", telpar->latdeg);
      astSetD(timefrm, "obslon", telpar->longdeg);
 

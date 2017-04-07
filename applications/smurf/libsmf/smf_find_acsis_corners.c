@@ -116,9 +116,9 @@ void smf_find_acsis_corners( smfData *data, double xc[4], double yc[4],
    Frame is focal plane offsets in radians. */
    hdr = data->hdr;
    hdr->cache2 = smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney,
-                                    hdr->ndet, NULL, 0.0, hdr->instap,
-                                    hdr->telpos, &wcs, hdr->cache2,
-                                    status );
+                                    hdr->ndet, NULL, 0.0, VAL__BADD,
+                                    hdr->instap, hdr->telpos, &wcs,
+                                    hdr->cache2, status );
 
 /* The X axis in GRID coords represents detector index, The Y axis in GRID
    coords is just a degenerate axis needed to ensure we have 2 axes (it

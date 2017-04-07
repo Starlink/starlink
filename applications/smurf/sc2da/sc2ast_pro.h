@@ -24,6 +24,7 @@ sc2ast_subarray_t subnum,  /* subarray number, 0-7 (given). If SC2AST__NULLSUB i
                            supplied the cached AST objects will be freed. */
 const JCMTState *state, /* Current telescope state (time, pointing etc.) */
 double dut1,            /* UT1-UTC (seconds) */
+double dtai,            /* TAI-UTC (seconds) */
 const double instap[2], /* Offset of subarray in the focal plane */
 const double telpos[3], /* Geodetic W Lon/Lat/Alt of telescope (deg/deg/ign.)*/
 const fts2Port fts_port,/* Whether to apply FTS-2 corrections */

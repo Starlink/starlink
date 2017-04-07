@@ -420,12 +420,15 @@
  *        Add smf_fit_poly1d_chisq
  *     2015-02-20 (MS)
  *       Added new smfFts fields for quality statistics
+ *     2017-01-10 (GSB)
+ *       Add "dtai" argument to some functions.
  *     {enter_further_changes_here}
 
  *  Copyright:
  *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
  *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2010 University of British Columbia.
+ *     Copyright (C) 2015-2017 East Asian Observatory.
  *     All Rights Reserved.
 
  *  Licence:
@@ -924,7 +927,9 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache,
                                          const double *fplane_x,
                                          const double *fplane_y,
                                          const int n_pix,
-                                         const JCMTState *state, double dut1,
+                                         const JCMTState *state,
+                                         double dut1,
+                                         double dtai,
                                          const double instap[2],
                                          const double telpos[3],
                                          AstFrameSet **fset,
@@ -1007,7 +1012,7 @@ void smf_detmaskc( const char *in, int len, int ndim, const int *dims_in,
                    int maxis, const int *mask, char *out, int *status );
 
 smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
-                                   const double telpos[3],
+                                   double dtai, const double telpos[3],
                                    AstFrameSet **fset,
                                    smfDetposWcsCache *cache, int *status );
 

@@ -153,8 +153,8 @@ int *status             /* global status (given and returned) */
 */
 {
    static sc2astCache *cache = NULL;
-   cache = sc2ast_createwcs2( subnum, state, 0.0, instap, telpos, fts_port,
-                              fset, cache, status );
+   cache = sc2ast_createwcs2( subnum, state, 0.0, VAL__BADD, instap, telpos,
+                              fts_port, fset, cache, status );
 }
 
 
@@ -167,6 +167,7 @@ sc2ast_subarray_t subnum, /* subarray number, 0-7 (given). If SC2AST__NULLSUB is
                            supplied the cached AST objects will be freed. */
 const JCMTState *state, /* Current telescope state (time, pointing etc.) */
 double dut1,            /* UT1-UTC (seconds) */
+double dtai,            /* TAU-UTC (seconds) */
 const double instap[2], /* Offset of subarray in the focal plane */
 const double telpos[3], /* Geodetic W Lon/Lat/Alt of telescope (deg/deg/ign.)*/
 const fts2Port fts_port,/* Whether to apply FTS-2 corrections */
@@ -346,6 +347,8 @@ int *status             /* global status (given and returned) */
      10Jun2014:  Store the telescope altitude in the returned skyframe.
      07Jul2015:  Indicate that sky distances of less than 0.05 arc-seconds
                  are insignificatnt.
+     10Jan2017:  Add "dtai" argument. (GSB)
+     06Apr2017:  Set dtai in skyframe if present. (GSB)
 */
 {
 
@@ -1766,6 +1769,10 @@ int *status             /* global status (given and returned) */
                  DBL_DIG, state->tcs_az_bc1,
                  DBL_DIG, state->tcs_az_bc2,
                  DBL_DIG, dut1 );
+         if (dtai != VAL__BADD) {
+           astSetD(cache->skyframe, "Dtai", dtai);
+         }
+
 
 /* If the telescope base position is undefined for this time slice, indicate
    we should return a NULL FrameSet pointer. */

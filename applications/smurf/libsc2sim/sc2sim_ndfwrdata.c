@@ -238,6 +238,8 @@
  *        Write BASETEMP, SEQSTART and SEQEND to the FITS header for SCAN obs
  *     2010-03-16 (TIMJ):
  *        Use one_strlcat not strncat
+ *     2017-04-06 (GSB):
+ *        Set dtai=VAL__BADD in telpar
 
  *  Copyright:
  *     Copyright (C) 2007-2010 Science and Technology Facilities Council.
@@ -722,6 +724,7 @@ void sc2sim_ndfwrdata
   telpar.latdeg = (sinx->telpos)[1];
   telpar.longdeg = -(sinx->telpos)[0];
   telpar.dut1 = SPD * inx->dut1;
+  telpar.dtai = VAL__BADD;
 
   /* Store the timestream data */
   sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->colsize,

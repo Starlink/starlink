@@ -108,13 +108,16 @@
 *        Use sc2store_writejcmtstate
 *     2011-05-12 (TIMJ):
 *        Use one_strtod
+*     2017-01-11 (GSB):
+*        Pass dtai=VAL__BADD to smf_create_lutwcs.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2007-2008,2011 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2008 Univeristy of British Columbia.
-*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
-*     Council. All Rights Reserved.
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2017 East Asian Observatory.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -704,8 +707,9 @@ void smurf_impaztec( int *status ) {
         /* Create frameset */
 
         hdr.cache2 = smf_create_lutwcs( 0, hdr.fplanex, hdr.fplaney, hdr.ndet,
-                                        &(head[i_good]), dut1, hdr.instap, telpos,
-                                        &(hdr.wcs), hdr.cache2, status );
+                                        &(head[i_good]), dut1, VAL__BADD,
+                                        hdr.instap, telpos, &(hdr.wcs),
+                                        hdr.cache2, status );
 
         if (i_good == 0) {
           double radiff;

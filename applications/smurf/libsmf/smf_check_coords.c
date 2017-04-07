@@ -38,10 +38,15 @@
 *     7-JUL-2015 (DSB):
 *        Indicate that sky separations below 0.05 arc-seconds (SC2AST__SKYTOL)
 *        are insignificant.
+*     10-JAN-2017 (GSB):
+*        Read DTAI from header.
+*     6-APR-2017 (GSB):
+*        Set DTAI in skyframe if present.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2013 Science & Technology Facilities Council.
+*     Copyright (C) 2015-2017 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -97,6 +102,7 @@ void smf_check_coords( smfData *data, int *status ) {
    double cvar;
    double d;
    double dut1;
+   double dtai = VAL__BADD;
    double epoch;
    double maxd;
    double mean;
@@ -144,12 +150,18 @@ void smf_check_coords( smfData *data, int *status ) {
       dut1 = 0.0;
    }
 
-/* Create an (az,el)  SkyFrame with the correct telescope position and
-   DUT1 value. */
+/* Read DTAI from the header */
+   astGetFitsF(hdr->fitshdr, "DTAI", &dtai);
+
+/* Create an (az,el)  SkyFrame with the correct telescope position,
+   DUT1 and DTAI value. */
    azel = astSkyFrame( "System=AzEl" );
    astSetD( azel, "ObsLon", -hdr->telpos[ 0 ] );
    astSetD( azel, "ObsLat", hdr->telpos[ 1 ] );
    astSetD( azel, "Dut1", dut1 );
+   if (dtai != VAL__BADD) {
+       astSetD( azel, "Dtai", dtai );
+   }
    astSetD( azel, "SkyTol", SC2AST__SKYTOL );
 
 /* Take a copy of this SkyFrame, and set the System of the copy to the

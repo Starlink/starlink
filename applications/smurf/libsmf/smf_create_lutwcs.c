@@ -16,8 +16,9 @@
 *  Invocation:
 *     result = smf_create_lutwcs( int clearcache, const double *fplane_x,
 *                                 const double *fplane_y, const int n_pix,
-*        		          const JCMTState *state, double dut1, const double instap[2],
-*                   	          const double telpos[3], AstFrameSet **fset,
+*                                 const JCMTState *state, double dut1,
+*                                 double dtai, const double instap[2],
+*                                 const double telpos[3], AstFrameSet **fset,
 *                                 CreateLutwcsCache *cache, int *status )
 
 *  Arguments:
@@ -129,6 +130,10 @@
 *     2015-07-07 (DSB):
 *        Indicate that sky separations below 0.05 arc-seconds (SC2AST__SKYTOL)
 *        are insignificant.
+*     2017-01-10 (GSB):
+*        Add "dtai" argument.
+*     2017-04-06 (GSB):
+*        Set dtai in skyframe if present.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -137,6 +142,7 @@
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2006 University of British Columbia.
+*     Copyright (C) 2015-2017 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -186,7 +192,7 @@
 smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
                                          const double *fplane_y, const int n_pix,
                                          const JCMTState *state, double dut1,
-                                         const double instap[2],
+                                         double dtai, const double instap[2],
                                          const double telpos[3], AstFrameSet **fset,
                                          smfCreateLutwcsCache *cache, int *status ) {
 
@@ -505,6 +511,9 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
       astSet( cache->skyframe, "Epoch=MJD %.*g, dut1=%.*g",
               DBL_DIG, state->tcs_tai + 32.184/SPD,
               DBL_DIG, dut1 );
+      if (dtai != VAL__BADD) {
+        astSetD(cache->skyframe, "Dtai", dtai);
+      }
 
       /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
          First remove the existing current Frame and then add in the new one.

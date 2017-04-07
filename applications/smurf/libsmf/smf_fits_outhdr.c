@@ -80,12 +80,14 @@
 *        the group.
 *     2016-02-25 (DSB):
 *        Add SEQSTART/SEQEND to the list of START and END FITS headers.
+*     2017-01-10 (GSB):
+*        Add DTAI to begin headers list (for consistency with DUT1).
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2007-2010 Science & Technology Facilities Council.
-*     Copyright (C) 2016 East Asian Observatory.
+*     Copyright (C) 2016-2017 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -130,6 +132,7 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
    const char * begin_items[] = {
      "DATE-OBS",
      "DUT1",
+     "DTAI",
      "LOFREQS",
      "AMSTART",
      "AZSTART",

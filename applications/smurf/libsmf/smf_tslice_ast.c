@@ -104,6 +104,8 @@
 *        DUT1 setting moved to WCS routines.
 *     2009-12-09 (TIMJ):
 *        Trap bad telescope position.
+*     2017-01-10 (GSB):
+*        Attempt to read DTAI header.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -114,6 +116,7 @@
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2017 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -162,7 +165,8 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs,
   smfHead *hdr;              /* Local copy of the header structure */
   dim_t ntslice;             /* Number of time-slices in data */
   const JCMTState *tmpState; /* Local pointer to STATE */
-  double dut1=0.0;           /* UT1-UTC correction, in days */
+  double dut1=0.0;           /* UT1-UTC correction, in seconds */
+  double dtai = VAL__BADD;   /* TAI-UTC correction, in seconds */
   int subsysnum;             /* Subsystem numeric id. 0 - 8 */
 
   if (*status != SAI__OK) return;
@@ -207,6 +211,9 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs,
       dut1 = 0.0;
     }
 
+    /* Read DTAI from the header */
+    astGetFitsF(hdr->fitshdr, "DTAI", &dtai);
+
     /* Ideally we want to modify in place to reduce malloc/free */
     /* For now take the inefficient and simpler approach and annul
        the previous calculation of the wcs before creating a new one */
@@ -225,16 +232,17 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs,
            !(tmpState->jos_drcontrol & DRCNTRL__POSITION) ) {
         /* Need to get the subarray number */
         smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
-        hdr->cache1 = sc2ast_createwcs2( subsysnum, tmpState, dut1, hdr->instap,
-                                         hdr->telpos, fts_port, &(hdr->wcs),
-                                         hdr->cache1, status );
+        hdr->cache1 = sc2ast_createwcs2( subsysnum, tmpState, dut1, dtai,
+                                         hdr->instap, hdr->telpos, fts_port,
+                                         &(hdr->wcs), hdr->cache1, status );
       }
       break;
 
     case INST__AZTEC:
       hdr->cache2 = smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, hdr->ndet,
-                                       tmpState, dut1, hdr->instap, hdr->telpos,
-                                       &(hdr->wcs), hdr->cache2, status );
+                                       tmpState, dut1, dtai, hdr->instap,
+                                       hdr->telpos, &(hdr->wcs), hdr->cache2,
+                                       status );
       break;
 
     case INST__ACSIS:
@@ -242,14 +250,14 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs,
          still available in the smfHead. Otherwise, use the FPLANEX/Y values. */
 
       if( hdr->detpos ) {
-        hdr->cache3 = smf_detpos_wcs( hdr, index, dut1, hdr->telpos,
+        hdr->cache3 = smf_detpos_wcs( hdr, index, dut1, dtai, hdr->telpos,
                                       &(hdr->wcs), hdr->cache3, status );
 
       } else {
         hdr->cache2 = smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney,
-                                         hdr->ndet, tmpState, dut1, hdr->instap,
-                                         hdr->telpos, &(hdr->wcs), hdr->cache2,
-                                         status );
+                                         hdr->ndet, tmpState, dut1, dtai,
+                                         hdr->instap, hdr->telpos, &(hdr->wcs),
+                                         hdr->cache2, status );
       }
 
       break;

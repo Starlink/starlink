@@ -47,11 +47,16 @@
 *        Missing DUT1 is not fatal.
 *     2014-01-28 (DSB):
 *        Allow the required axis order to be specified.
+*     2017-01-10 (GSB):
+*        Read DTAI from header.
+*     2017-04-06 (GSB):
+*        Set dtai in telpar parameters passed to sc2store_timeWcs.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
 *     Copyright (C) 2014 Science & Technology Facilities Council.
+*     Copyright (C) 2017 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -94,6 +99,7 @@ void smf_create_tswcs( smfHead *hdr, int isTordered, AstFrameSet **frameset, int
   /* Local Variables */
   JCMTState *allState=NULL;     /* Full array of JCMTState for time series */
   double dut1;                  /* UT1-UTC (seconds) */
+  double dtai = VAL__BADD;      /* TAI-UTC (seconds) */
   int i;                        /* loop counter */
   double *instap=NULL;          /* pointer to 2-element instrument aperture */
   int ntime;                    /* number of time slices */
@@ -136,6 +142,8 @@ void smf_create_tswcs( smfHead *hdr, int isTordered, AstFrameSet **frameset, int
   smf_getfitsd( hdr, "DUT1", &dut1, status );
   dut1 *= SPD;
 
+  smf_getfitsd(hdr, "DTAI", &dtai, status);
+
   /* Return here if an error encountered */
   if( *status != SAI__OK ) return;
 
@@ -146,6 +154,7 @@ void smf_create_tswcs( smfHead *hdr, int isTordered, AstFrameSet **frameset, int
 
   if( *status == SAI__OK ) {
     telpar.dut1 = dut1;
+    telpar.dtai = dtai;
     telpar.longdeg = -telpos[0];
     telpar.latdeg = telpos[1];
     telpar.instap_x = 0;

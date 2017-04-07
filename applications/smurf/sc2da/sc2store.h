@@ -30,6 +30,7 @@
 *     2008-05-15 (BDK) add SC2STORETelpar structure.
 *     2008-05-28 (BDK) add sc2store_par.h.
 *     2008-07-24 (TIMJ) add instap to Telpar struct.
+*     2017-04-06 (GSB) add dtai to SC2STORETelpar.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -77,6 +78,7 @@ typedef enum sc2store_cmptype {
 struct SC2STORETelpar
 {
      double dut1;       /* difference UT1-UTC */
+     double dtai;       /* difference TAI-UTC */
      double latdeg;     /* telescope latitude in degrees */
      double longdeg;    /* telescope east longitude in degrees */
      double instap_x; /* telescope aperture X offset in radians */

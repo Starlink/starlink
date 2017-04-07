@@ -141,6 +141,7 @@ void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status ){
          }
 
          OVERLAY( "Dut1" );
+         OVERLAY( "Dtai" );
          OVERLAY( "Epoch" );
          OVERLAY( "ObsAlt" );
          OVERLAY( "ObsLat" );
