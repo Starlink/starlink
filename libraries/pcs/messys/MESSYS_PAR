@@ -48,6 +48,9 @@
 *        Add MESSYS__NETNAME
 *     08-MAR-1993 (RLVAD::AJC):
 *        Add MESSYS__VAL_LEN
+*     04-APR-2017 (DSB):
+*        Increase MESSYS__VAL_LEN from 444 to 2000 in order to make it
+*        possible to use longer command lines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -93,7 +96,7 @@
 *   used in preference to MSG_VAL_LEN now.
 *
       INTEGER MESSYS__VAL_LEN     ! maximum size of a message 'value'
-      PARAMETER ( MESSYS__VAL_LEN = 444 )
+      PARAMETER ( MESSYS__VAL_LEN = 2000 )
 *
 *   The valid values of MSG_FUNCTION
 *
