@@ -5249,6 +5249,16 @@ package kappa {
             default !
          }
 
+         parameter penrange {
+            type _REAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default 0.0 1.0
+            prompt {Range of pens to use}
+            helpkey *
+            size *
+         }
+
          parameter percentiles {
             type _REAL
             vpath PROMPT

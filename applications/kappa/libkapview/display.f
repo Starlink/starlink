@@ -323,6 +323,14 @@
 *        conjunction with SCALE=FALSE.  If a null value (!) is supplied,
 *        no output NDF will be created.  This parameter is not accessed
 *        when SCALE=FALSE.  [!]
+*     PENRANGE( 2 ) = _REAL (Read)
+*        The range of colour indices ("pens") to use. The supplied values
+*        are fractional values where zero corresponds to the lowest available
+*        colour index and 1.0 corresponds to the highest available colour
+*        index. The default value of [0.0,1.0] thus causes the full range
+*        of colour indicies to be used. Note, if parameter LUT is null
+*        (!) or parameter SCALE is FALSE then this parameter is ignored
+*        and the fill range of pens is used. [0.0,1.0]
 *     PERCENTILES( 2 ) = _REAL (Read)
 *        The percentiles that define the scaling limits. For example,
 *        [25,75] would scale between the quartile values. (Percentile
@@ -671,6 +679,8 @@
 *     6-DEC-2016 (DSB):
 *        Modify parameter KEYPOS to allow it to set the vertical key
 *        position as well as the horizontal position.
+*     12-DEC-2017 (DSB):
+*        Add parameter PENRANGE.
 *     {enter_further_changes_here}
 
 *-
@@ -752,6 +762,7 @@
       INTEGER LDIMS( NDIM )    ! Dimensions of LUT arrays
       INTEGER LEL              ! No. of elements in i/p and o/p LUTs
       INTEGER LP               ! Lowest pen with which to display image
+      INTEGER LPNEW            ! Modified low pen index
       INTEGER LPNTR( 1 )       ! Pointer to input colour table
       INTEGER NC               ! Number of characters in NDFNAM
       INTEGER NCUR             ! No. of current Frame axes
@@ -769,6 +780,7 @@
       INTEGER SUBND( NDIM )    ! Significant upper bounds of the image
       INTEGER UBND( NDF__MXDIM )! Upper pixel-index bounds of the image
       INTEGER UP               ! Highest pen with which to display image
+      INTEGER UPNEW            ! Modified high pen index
       INTEGER WDIM( NDIM )     ! Dimensions in pixels of PGPLOT window
       INTEGER WILBND( NDIM )   ! Lower pixel-index bounds of NDF section
       INTEGER WIUBND( NDIM )   ! Upper pixel-index bounds of NDF section
@@ -795,6 +807,7 @@
       REAL OPUBND( NDIM )      ! High pixel co-ord bounds of NDF overlap
       REAL PCLBND( NDIM )      ! Lo pixel co-ord bounds of PGPLOT window
       REAL PCUBND( NDIM )      ! Hi pixel co-ord bounds of PGPLOT window
+      REAL PENRNG( 2 )         ! Fractional range of pens to use
       REAL PIXRAT              ! Used pixel aspect ratio
       REAL PRAT                ! Pixel aspect ratio
       REAL WPLBND( NDIM )      ! Low pixel co-ord bounds of NDF section
@@ -1450,8 +1463,19 @@
          DLO = LP + SLBND( 2 ) - 1
          DHI = LP + SUBND( 2 ) - 1
 
-*  Otherwise, scale the supplied data to produce colour indices.
+*  Otherwise, get the range of pens to use and then scale the supplied
+*  data to produce colour indices.
       ELSE
+         PENRNG( 1 ) = 0.0
+         PENRNG( 2 ) = 1.0
+         CALL PAR_GDR1R( 'PENRANGE', 2, PENRNG, 0.0, 1.0, .TRUE.,
+     :                   PENRNG, STATUS )
+
+         LPNEW = NINT( LP*( 1.0 - PENRNG( 1 ) ) + UP*PENRNG( 1 ) )
+         UPNEW = NINT( LP*( 1.0 - PENRNG( 2 ) ) + UP*PENRNG( 2 ) )
+         LP = LPNEW
+         UP = UPNEW
+
          CALL KPS1_DISCL( INDF2, WDIM, MCOMP, LP, UP, BPCI, WPLBND,
      :                    WPUBND, IPCOL, NX, NY, DLO, DHI, STATUS )
 

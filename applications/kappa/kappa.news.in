@@ -7,13 +7,15 @@
 2 Modified_applications
 
    o CONTOUR
-
       -  The dynamic default for parameter LABPOS is now "!" (ie. a null
       value), so no label is now drawn in "Bounds" or "Good" mode unless a
       value is supplied explicitly for LABPOS.
 
-   o TRANDAT
+   o DISPLAY
+      - New parameter PENRANGE can be used to restrict the range fo pens
+      (i.e. colour indices) used by the image.
 
+   o TRANDAT
       -  Will now recognised the string "BAD" (case insensitive) within
       the input text file and generate appropriate bad values in the output
       NDF.
