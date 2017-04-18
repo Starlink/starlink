@@ -121,6 +121,7 @@ void smf_find_dateobs( const smfHead* hdr, double *dateobs, double *dateend,
 
 /* private routine for scanning a JCMTSTATE TAI or date FITS header */
 static double smf__find_utc( const smfHead *hdr, int first, int *status) {
+  double dtai = VAL__BADD;
   double utc = VAL__BADD;
   AstTimeFrame *tf = NULL;
 
@@ -135,6 +136,12 @@ static double smf__find_utc( const smfHead *hdr, int first, int *status) {
       } else {
         index = hdr->nframes;
       }
+
+      astGetFitsF(hdr->fitshdr, "DTAI", &dtai);
+      if (dtai != VAL__BADD) {
+        astSetD( tf, "Dtai", dtai );
+      }
+
       astSet( tf, "TimeScale=TAI" );
       astSet( tf, "TimeOrigin=MJD %.*g", DBL_DIG, (hdr->allState)[index].rts_end);
       astSet( tf, "TimeScale=UTC" ); /* we need UTC */
