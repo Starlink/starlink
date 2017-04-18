@@ -284,6 +284,11 @@
 *        within the command string passed to the "invoke" function. The
 *        accepted values are the list defined in SUN/104 ("None", "Quiet",
 *        "Normal", "Verbose", etc). ["Normal"]
+*     NEWMAPS = LITERAL (Read)
+*        The name of a text file to create, in which to put the paths of
+*        all the new maps written to the directory specified by parameter
+*        MAPDIR (one per line). If a null (!) value is supplied no file is
+*        created. [!]
 *     NORTH = LITERAL (Read)
 *        Specifies the celestial coordinate system to use as the reference
 *        direction in any newly created Q and U time series files. For
@@ -517,6 +522,9 @@ try:
                                  default=None, exists=False, minsize=0,
                                  maxsize=1, noprompt=True ))
 
+   params.append(starutil.Par0S("NEWMAPS", "Text file to hold list of new map",
+                                 default=None, noprompt=True))
+
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
    parsys = ParSys( params )
@@ -731,6 +739,11 @@ try:
 #  Get the reference direction.
    north = parsys["NORTH"].value
 
+#  The name of the output text file to create in which to store the paths
+#  to the new individual observation maps created by the current
+#  invocation of this script.
+   newmaps = parsys["NEWMAPS"].value
+
 
 
 
@@ -779,6 +792,9 @@ try:
    allquis = NDG.tempfile()
    if get_task_par( "STOKESFOUND", "pol2check" ):
       shutil.copyfile( inquis, allquis )
+
+#  Initialise a list of new maps created by this run of pol2map.
+   new_maps = {}
 
 #  Set up a dict for each Stokes parameter holding paths to any supplied maps
 #  for that Stokes parameter. The keys are of the form "<UT>_<OBS>_<SUBSCAN>".
@@ -1436,6 +1452,10 @@ try:
                      pcathresh = 0
                   continue
 
+#  A new map was created successfully. Add it to the list of new maps in
+#  mapdir.
+            new_maps.append( qui_maps[key] )
+
 #  If no ref map was supplied, use the first map for the first observation as
 #  the ref map so that all maps are aligned.
             if ref == "!":
@@ -1667,6 +1687,11 @@ try:
 
 #  -----------  TIDY UP ------------------------
 
+#  Save the paths to any new single observation maps created above.
+   if newmaps:
+      with open(newmaps, "w") as fd:
+         for path in new_maps:
+            fd.write("{0}\n".format(path))
 
 #  Remove temporary files.
    cleanup()
