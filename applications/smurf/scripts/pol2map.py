@@ -196,7 +196,9 @@
 *     IPCOR = _LOGICAL NDF (Read)
 *        If TRUE, then IP correction is used when creating Q and U maps,
 *        based on the values in the total intensity map specified by
-*        parameter IPREF. If FALSE, then no IP correction is performed. [TRUE]
+*        parameter IPREF. If FALSE, then no IP correction is performed.
+*        The default is TRUE if any Q or U output maps are being created,
+*        and FALSE otherwise. []
 *     IPREF = NDF (Read)
 *        The total intensity map to be used for IP correction. Only
 *        accessed if parameter IPCOR is set TRUE. If null (!) is supplied
@@ -478,7 +480,7 @@ try:
                                     "Type of map supplied for parameter MASK",
                                     "SIGNAL", noprompt=True ))
 
-   params.append(starutil.Par0L("IPCOR", "Perform IP correction?", True,
+   params.append(starutil.Par0L("IPCOR", "Perform IP correction?", None,
                                  noprompt=True))
 
    params.append(starutil.ParNDG("IPREF", "The total intensity map to use "
@@ -689,6 +691,7 @@ try:
 
 #  If IP correction is to be performed, get the map to be used to define
 #  the IP correction.
+   parsys["IPCOR"].default = ( qmap is not None or umap is not None )
    if parsys["IPCOR"].value:
       ipref = parsys["IPREF"].value
       if not ipref:
