@@ -49,6 +49,7 @@
  *        is printed.
  *     18-APR-2017 (GSB):
  *        Check return values from strtok calls are not NULL.
+ *        Check output file is open before terminating and closing.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -80,7 +81,7 @@ process_file(char *filename)
 /*
  * Process an error include file.
  */
-    FILE *fp, *fp0;
+    FILE *fp, *fp0 = NULL;
     char buffer[MAXLINE], message[MAXLINE];
     char out_file[20];
     char *p;
@@ -265,12 +266,14 @@ process_file(char *filename)
 
     } /* End of while */
 /* End of file - write .END and close */
-    fprintf( fp0, ".END\n");
+    if (fp0 != NULL) {
+       fprintf( fp0, ".END\n");
+       fclose( fp0 );
+    }
     if ( verify ) {
        printf( ".END\n");
     }
     fclose( fp );
-    fclose( fp0 );
 }
 
 
