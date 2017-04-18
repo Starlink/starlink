@@ -47,6 +47,8 @@
  *     24-MAR-2004 (TIMJ):
  *        Make -Wall clean. Tidy up -v output so that correct errcode
  *        is printed.
+ *     18-APR-2017 (GSB):
+ *        Check return values from strtok calls are not NULL.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -104,14 +106,30 @@ process_file(char *filename)
         break;
     default:
         p = strtok( buffer, " \t(" );
+        if (p == NULL) {
+          fprintf(stderr, "Error parsing line %d\n", line_num);
+          return;
+        }
 
         if ( ! strncmp( p, "PARAMETER", 9 ) ) {
 /*      It's a PARAMETER definition line */
 /*      Get the prefix */
-           strcpy( mess_prefix, strtok( NULL, " \t(_" ) );
+           p = strtok( NULL, " \t(_" );
+           if (p == NULL) {
+             fprintf(stderr, "Error extracting prefix from line %d\n",
+                     line_num);
+             return;
+           }
+           strcpy( mess_prefix, p );
 
 /*      Get the ident */
-           strcpy( mess_id, strtok( NULL, " \t_=" ) );
+           p = strtok( NULL, " \t_=" );
+           if (p == NULL) {
+             fprintf(stderr, "Error extracting message ID from line %d\n",
+                     line_num);
+             return;
+           }
+           strcpy( mess_id, p );
 
 /*      Get the error value */
            p = strtok( NULL, " \t=)" );
