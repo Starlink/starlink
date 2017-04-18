@@ -734,7 +734,7 @@ sub scuba_header {
 
     do {foreach (keys %$fitsitem) { print "$_\n";}} if (defined $debug && $debug >1);
 
-    my $projid = lc($fitsitem->{PROJ_ID});
+    my $projid = uc($fitsitem->{PROJ_ID});
     my $run    = lc($fitsitem->{RUN});
     my ($yy,$mm,$dd,$rest) = split(/\:/, $fitsitem->{UTDATE}, 4);
     if ($mm < 10) {$mm = "0$mm"};
@@ -747,7 +747,7 @@ sub scuba_header {
     if ($s < 10) {$s = "0$s"};
     my $ut = "${h}:${m}:${s}";
     my $mode   = uc($fitsitem->{MODE});
-    my $object = lc($fitsitem->{OBJECT});
+    my $object = "$fitsitem->{OBJECT}";
     my $rx     = "SCUBA";
     my $n_meas = lc($fitsitem->{N_MEASUR});
     my $n_int  = lc($fitsitem->{N_INT});
@@ -1055,14 +1055,14 @@ sub calc_shared_scuba2_acsis {
 
   my %results;
 
-  $results{PROJECT} = lc($fitsitem->{PROJECT});
+  $results{PROJECT} = uc($fitsitem->{PROJECT});
   $results{OCSCFG} = $fitsitem->{OCSCFG};
   $results{RUN}    = lc($fitsitem->{OBSNUM});
   (my $date, $results{UT}) = split(/T/, $fitsitem->{'DATE-OBS'});
   $date =~ s/\-/\//g;
   $results{DATETIME} = "$date $results{UT}";
   $results{OBSTYPE}  = uc($fitsitem->{OBS_TYPE});
-  $results{OBJECT}   = (defined $fitsitem->{OBJECT} ? lc($fitsitem->{OBJECT}) : "");
+  $results{OBJECT}   = (defined $fitsitem->{OBJECT} ? "$fitsitem->{OBJECT}" : "");
   $results{OBJECT} =~ s/\s+//g;
 
   my $az     = (defined $fitsitem->{AZSTART} ?
