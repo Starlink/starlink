@@ -2511,15 +2511,18 @@ class NDG(object):
       else:
          raise UsageError("\n\nArguments for NDG constructor are of inappropriate type '{0}...'.".format(p1.__class__.__name__))
 
-      # Ensure we know the size of the group. Also strip and leading and
-      # trailing quotes from the path.
+      # Ensure we know the size of the group. Also strip any leading and
+      # trailing quotes and spaces from the path, and ensure there is no
+      # ".sdf" on the end of the path.
       if self.__ndfs is not None:
          ndflist = []
          for ndf in self.__ndfs:
-            while ndf.startswith("'") or ndf.startswith('"'):
+            while ndf.startswith("'") or ndf.startswith('"') or ndf.startswith(' '):
                ndf = ndf[1:]
-            while ndf.endswith("'") or ndf.endswith('"'):
+            while ndf.endswith("'") or ndf.endswith('"') or ndf.endswith(' '):
                ndf = ndf[:-1]
+            if ndf.endswith(".sdf"):
+               ndf = ndf[:-4]
             if not ndf.isspace():
                ndflist.append(ndf)
          self.__ndfs = ndflist
@@ -2570,18 +2573,6 @@ class NDG(object):
       #  Record a reference to this instance in the class "instances"
       #  variables so that the NDG.cleanup() method can empty it.
       NDG.instances.append(self)
-
-   #  Two NDG objects are equivalent if they contain the same NDF paths.
-   def __eq__(self, other):
-      if isinstance(other, self.__class__):
-         return self.__ndfs == other.__ndfs
-      return NotImplemented
-
-   #  Two NDG objects are not equivalent if they contain different NDF paths.
-   def __ne__(self, other):
-      if isinstance(other, self.__class__):
-         return not self.__eq__(other)
-      return NotImplemented
 
    # The files associated with the NDG are deleted, and the NDG structure
    # itself is reset to represent an empty group. Use kappa:erase to
@@ -2765,8 +2756,10 @@ class NDG(object):
          return False
 
    def __ne__(self, other):
-      return not (self == other)
-
+      if isinstance(other, self.__class__):
+         return not self.__eq__(other)
+      else:
+         return True
 
 #  -------------------  Exceptions ---------------------------
 
