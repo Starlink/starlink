@@ -401,6 +401,7 @@ sub sdf_header {
       if ( $fitsitem->{OBS_TYPE} =~ /^ramp$/i or
            $fitsitem->{OBS_TYPE} =~ /^setup$/i or
            ($fitsitem->{OBS_TYPE} =~ /^noise$/i and
+            defined $fitsitem->{'OBJECT'} and
             $fitsitem->{OBJECT} =~ /^dark$/i ) ) {
 
         print "Read header non-science file: $sdffile\n" if ($debug);
