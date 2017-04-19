@@ -10,7 +10,7 @@ libsock_la_SOURCES = \
 	$(include_MESSAGES)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
-include_MESSAGES = sock_err.h
+include_MESSAGES = SOCK_ERR sock_err.h
 
 C_ROUTINES = sock.c
 

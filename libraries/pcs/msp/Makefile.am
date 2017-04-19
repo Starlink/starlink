@@ -13,7 +13,7 @@ AM_CFLAGS = -I../sock
 
 ## List headers which are to be installed -- these are built first if necessary
 include_HEADERS = $(PUBLIC_INCLUDES)
-include_MESSAGES = msp_err.h
+include_MESSAGES = MSP_ERR msp_err.h
 
 C_ROUTINES = msp.c
 

@@ -12,7 +12,7 @@ libatimer_la_SOURCES = \
 
 ## List headers which are to be installed -- these are built first if necessary
 include_HEADERS = $(PUBLIC_INCLUDES)
-include_MESSAGES = atimer_err.h
+include_MESSAGES = ATIMER_ERR atimer_err.h
 
 C_ROUTINES = atimer.c fatimer.c
 
