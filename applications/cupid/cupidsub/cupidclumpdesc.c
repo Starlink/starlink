@@ -224,6 +224,9 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *        Provide facility for cleaning up static resources.
 *     11-NOV-2016 (DSB):
 *        For consistency, use KPG to determine pixel scales.
+*     18-APR-2017 (DSB):
+*        Change centroid position from pixel indices to pixel coords.
+*        This makes it consistent with the peak position.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -669,7 +672,7 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 
 /* Calculate and store the clump parameters, using pixel units initially. */
       if( s != 0 ) {
-         ret[ 0 ] = px - 0.5;
+         ret[ 0 ] = px;
          ret[ ndim ] = sx/sd;
 
          v0 = sx2/sd - ret[ ndim ]*ret[ ndim ];
@@ -685,8 +688,11 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
          }
          ret[ 2*ndim ] = ( *ok > 0 ) ? sqrt( v ) : 0.0;
 
+         ret[ 0 ] -= 0.5;
+         ret[ ndim ] -= 0.5;
+
          if( ndim > 1 ) {
-            ret[ 1 ] = py - 0.5;
+            ret[ 1 ] = py;
             ret[ 1 + ndim ] = sy/sd;
 
             v0 = sy2/sd - ret[ 1 + ndim ]*ret[ 1 + ndim ];
@@ -705,8 +711,11 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
                *ok = 0;
             }
 
+            ret[ 1 ] -= 0.5;
+            ret[ 1 + ndim ] -= 0.5;
+
             if( ndim > 2 ) {
-               ret[ 2 ] = pz - 0.5;
+               ret[ 2 ] = pz;
                ret[ 2 + ndim ] = sz/sd;
 
                v0 = sz2/sd - ret[ 2 + ndim ]*ret[ 2 + ndim ];
@@ -726,6 +735,10 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
                   ret[ 2 + 2*ndim ] = 0.0;
                   *ok = -1;
                }
+
+               ret[ 2 ] -= 0.5;
+               ret[ 2 + ndim ] -= 0.5;
+
             }
          }
 
