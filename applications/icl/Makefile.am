@@ -27,7 +27,7 @@ AM_LFLAGS = @icl_AM_LFLAGS@
 icl_io_SOURCES = icl_io.c
 icl_io_LDADD = `ams_link_adam`
 
-noinst_MESSAGES = UFACE_ERR
+include_MESSAGES = UFACE_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -80,10 +80,9 @@ PRIVATE_INCLUDES = $(ICL_INCLUDES) \
                    adam.h \
                    adam_functions.h \
                    uface_functions.h \
-                   $(noinst_MESSAGES) \
                    UFACE_CMN
 
-BUILT_SOURCES = $(noinst_MESSAGES)
+BUILT_SOURCES = $(include_MESSAGES)
 HELP_SOURCES = iclhelp.hlp
 
 #  List yacc source
