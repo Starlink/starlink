@@ -52,6 +52,7 @@
  *        Check output file is open before terminating and closing.
  *        Skip zero and non-numeric message codes.
  *        Stop at "Non-MESSGEN error codes" marker.
+ *        Use strncpy to write mess_id and mess_prefix.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -127,7 +128,8 @@ process_file(char *filename)
                      line_num);
              return;
            }
-           strcpy( mess_prefix, p );
+           strncpy( mess_prefix, p, sizeof(mess_prefix) );
+           mess_prefix[sizeof(mess_prefix) - 1] = '\0';
 
 /*      Get the ident */
            p = strtok( NULL, " \t_=" );
@@ -136,7 +138,8 @@ process_file(char *filename)
                      line_num);
              return;
            }
-           strcpy( mess_id, p );
+           strncpy( mess_id, p, sizeof(mess_id) );
+           mess_id[sizeof(mess_id) - 1] = '\0';
 
 /*      Get the error value */
            p = strtok( NULL, " \t=)" );
