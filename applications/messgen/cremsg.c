@@ -51,6 +51,7 @@
  *        Check return values from strtok calls are not NULL.
  *        Check output file is open before terminating and closing.
  *        Skip zero and non-numeric message codes.
+ *        Stop at "Non-MESSGEN error codes" marker.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -102,11 +103,15 @@ process_file(char *filename)
 
     while ( fgets(buffer, MAXLINE, fp) != NULL) {
     line_num++;
-    switch (buffer[0]) {
-    case '*':
+    if (buffer[0] == '*') {
+        if (strstr(buffer, "Non-MESSGEN error codes")) {
+          fprintf(stderr, "Non-MESSGEN marker found at line %d, stopping!\n",
+                  line_num);
+          break;
+        }
         strcpy( message, buffer );
-        break;
-    default:
+    }
+    else {
         p = strtok( buffer, " \t(" );
         if (p == NULL) {
           fprintf(stderr, "Error parsing line %d\n", line_num);
@@ -276,7 +281,7 @@ process_file(char *filename)
               message[0] = ' ';
            }
          }
-    } /* End of switch */
+    } /* End of if-else */
 
     } /* End of while */
 /* End of file - write .END and close */
