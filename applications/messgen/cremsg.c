@@ -50,6 +50,7 @@
  *     18-APR-2017 (GSB):
  *        Check return values from strtok calls are not NULL.
  *        Check output file is open before terminating and closing.
+ *        Skip zero and non-numeric message codes.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -140,7 +141,20 @@ process_file(char *filename)
 	     return;
 	   }
 
+           if (! strcmp(p, "0")) {
+             fprintf(stderr, "Error code is zero at line %d, skipping...\n",
+                     line_num);
+             continue;
+           }
+
            errcode = strtol( p, (char**)NULL, 10 );
+           if (errcode == 0) {
+             fprintf(
+                stderr,
+                "Could not parse code [%s] from line %d, skipping...\n",
+                p, line_num);
+             continue;
+           }
 	   original_errcode = errcode; /* cache it */
 /*      and extract the required sub-values */
            mess_severity = errcode & 0x7;
