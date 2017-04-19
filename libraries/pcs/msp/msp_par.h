@@ -40,6 +40,11 @@
 *        Add definition of null send and receive queues
 *     25-MAR-1994 (BDK):
 *        Add MSP__MXMSGSZ
+*     19-APR-2017 (DSB):
+*        Increase MSP__MXMSGSZ from 2036 to 3536. The increase (1500)
+*        is the same as the corresponding increases made to
+*        MESSYS__VAL_LEN and MSG_VAL_LEN, in order to allow longer
+*        command lines to be used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -50,7 +55,7 @@
 
 /*   Maximum message size */
 
-#define MSP__MXMSGSZ 2036
+#define MSP__MXMSGSZ 3536
 
 /*   definition of queue identifier for sending messages */
 

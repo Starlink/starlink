@@ -51,6 +51,8 @@
 *     04-APR-2017 (DSB):
 *        Increase MESSYS__VAL_LEN from 444 to 2000 in order to make it
 *        possible to use longer command lines.
+*     19-APR-2017 (DSB):
+*        Change MESSYS__VAL_LEN from 2000 to 1944 (see messys/messys_len.h).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -96,7 +98,7 @@
 *   used in preference to MSG_VAL_LEN now.
 *
       INTEGER MESSYS__VAL_LEN     ! maximum size of a message 'value'
-      PARAMETER ( MESSYS__VAL_LEN = 2000 )
+      PARAMETER ( MESSYS__VAL_LEN = 1944 )
 *
 *   The valid values of MSG_FUNCTION
 *

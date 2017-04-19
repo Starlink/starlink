@@ -39,6 +39,11 @@
 *        Remove structure definitions
 *     07-JUL-1994 (AJC):
 *        Renamed from MESSYS_DD
+*     19-APR-2017 (DSB):
+*        Increase MSG_LEN from 500 to 2000. This is so that we can use
+*        longer command lines. The value of MESSYS__VAL_LEN in
+*        messys/MESSYS_PAR should be changed to be ( 2000 - MSG_FIX_LEN )
+*        (i.e. so that it is the same as MSG_VAL_LEN defined below).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -50,7 +55,7 @@
 #ifndef INT_BYTE_SIZE
 
 #define INT_BYTE_SIZE	(sizeof(int))
-#define MSG_LEN 500		/* length of message in bytes (from DDPATH) */
+#define MSG_LEN 2000		/* length of message in bytes (from DDPATH) */
 				/* Must be divisible by INT_BYTE_SIZE       */
 				/* If this is changed, MESSDEFN must also be */
 				/* changed */
