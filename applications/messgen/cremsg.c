@@ -53,6 +53,7 @@
  *        Skip zero and non-numeric message codes.
  *        Stop at "Non-MESSGEN error codes" marker.
  *        Use strncpy to write mess_id and mess_prefix.
+ *        Increase length of mess_id array.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -73,7 +74,7 @@ unsigned int fac_code=0, fac_severity=0, fac_messno=0;
 unsigned int mess_code, mess_severity=0, mess_number=1;
 char severity[14];
 char fac_name[10]="          ", fac_prefix[10];
-char mess_id [10], mess_prefix[10];
+char mess_id [40], mess_prefix[10];
 
 int verify=0;
 
