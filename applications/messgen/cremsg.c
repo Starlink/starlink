@@ -54,6 +54,7 @@
  *        Stop at "Non-MESSGEN error codes" marker.
  *        Use strncpy to write mess_id and mess_prefix.
  *        Increase length of mess_id array.
+ *        Remove "_" from strtok search for end of identifier.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -133,13 +134,13 @@ process_file(char *filename)
            mess_prefix[sizeof(mess_prefix) - 1] = '\0';
 
 /*      Get the ident */
-           p = strtok( NULL, " \t_=" );
+           p = strtok( NULL, " \t=" );
            if (p == NULL) {
              fprintf(stderr, "Error extracting message ID from line %d\n",
                      line_num);
              return;
            }
-           strncpy( mess_id, p, sizeof(mess_id) );
+           strncpy( mess_id, p + (*p == '_' ? 1 : 0), sizeof(mess_id) );
            mess_id[sizeof(mess_id) - 1] = '\0';
 
 /*      Get the error value */
