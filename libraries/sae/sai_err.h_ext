@@ -1,0 +1,2 @@
+/* OK Status. */
+enum { SAI__OK = 0 };

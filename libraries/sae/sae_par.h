@@ -47,6 +47,8 @@
  *     25-SEP-2005 (TIMJ):
  *        Prevent the constants being defined multiple times if
  *        the file is included multiple times.
+ *     20-APR-2017 (GSB):
+ *        Include messgen-generated definitions.
 
  *  Bugs:
 
@@ -55,13 +57,6 @@
 #ifndef SAE_PAR_DEFINED
 #define SAE_PAR_DEFINED
 
-/* OK Status. */
-enum     { SAI__OK = 0 };
-
-/* Warning. */
-enum     { SAI__WARN  = 148013859 };
-
-/* Error. */
-enum     { SAI__ERROR = 148013867 };
+#include "sai_err.h"
 
 #endif  /* SAE_PAR_DEFINED */
