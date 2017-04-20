@@ -79,6 +79,9 @@
  *     23-SEP-2005 (TIMJ):
  *        C header files now write enum constants rather than
  *        CPP defines.
+ *     20-APR-2017 (GSB):
+ *        Write end marker before including external data files to
+ *        assist cremsg in parsing the generated include files.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -101,7 +104,7 @@ int f77_include=0, f77_INCLUDE=0, c_header=0, c_error=0;
 int verify=0, write_filenames=0;
 
 /* prototypes */
-void write_external(char *, FILE * );
+void write_external(char *, FILE *, char* );
 
 static int
 parse_facility(char buffer[MAXLINE])
@@ -380,9 +383,9 @@ process_file(char *filename)
 	fprintf(fp_c, "#endif	/* %s_ERROR_DEFINED */\n", fac_name);
 
     /* Append the _ext file contents */
-    write_external(c_inc_outfile, fp_c);
-    write_external(f_inc_outfile, fp_f);
-    write_external(F_INC_outfile, fp_F);
+    write_external(c_inc_outfile, fp_c, "\n/* %s */\n\n");
+    write_external(f_inc_outfile, fp_f, "\n*  %s\n\n");
+    write_external(F_INC_outfile, fp_F, "\n*  %s\n\n");
 
     if (verify)
 	printf("MESSAGE file converted successfully\n");
@@ -408,7 +411,7 @@ process_file(char *filename)
 */
 
 void
-write_external( char * file_name, FILE * fileptr ) {
+write_external( char * file_name, FILE * fileptr, char* end_marker_format) {
   const char suffix[5] = "_ext";
   char extdata[MAXLINE + 4];  /* include space for _ext */
   char buffer[MAXLINE];
@@ -423,6 +426,8 @@ write_external( char * file_name, FILE * fileptr ) {
   /* Try to open the file */
   fp_ext = fopen( extdata, "r");
   if (fp_ext == NULL) return;
+
+  fprintf(fileptr, end_marker_format, "Non-MESSGEN error codes.");
 
   /* copy data to output handle */
   while (fgets(buffer, MAXLINE, fp_ext) != NULL) {

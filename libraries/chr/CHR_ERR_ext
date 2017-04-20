@@ -1,6 +1,3 @@
-*
-*  Non-MESSGEN error codes.
-*
 *  CHR__ERROR = 1 is a special case.
 
 *  CHR__WRDNOTFND and CHR__ENDOFSENT are aliases provided for backwards
