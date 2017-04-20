@@ -82,6 +82,7 @@
  *     20-APR-2017 (GSB):
  *        Write end marker before including external data files to
  *        assist cremsg in parsing the generated include files.
+ *        Move end of #ifndef block after the included external data file.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -379,13 +380,15 @@ process_file(char *filename)
 	    message_number++;
 	}
     }
-    if (fp_c)
-	fprintf(fp_c, "#endif	/* %s_ERROR_DEFINED */\n", fac_name);
 
     /* Append the _ext file contents */
     write_external(c_inc_outfile, fp_c, "\n/* %s */\n\n");
     write_external(f_inc_outfile, fp_f, "\n*  %s\n\n");
     write_external(F_INC_outfile, fp_F, "\n*  %s\n\n");
+
+    if (fp_c) {
+        fprintf(fp_c, "\n#endif	/* %s_ERROR_DEFINED */\n", fac_name);
+    }
 
     if (verify)
 	printf("MESSAGE file converted successfully\n");
