@@ -1,7 +1,7 @@
 ! IRQ now uses a different facility code to IRA
 ! This allows us to use messgen
 .TITLE        IRQ
-.FACILITY     IRQ,1507/PREFIX=IRQ__
+.FACILITY     IRQ,1517/PREFIX=IRQ__
 
 .SEVERITY     ERROR
 
