@@ -4,6 +4,7 @@ lib_LTLIBRARIES = libira.la libira_adam.la
 
 libira_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
 	$(PRIVATE_INCLUDES) \
 	$(BLOCK_DATA_FILES) \
 	$(F_ROUTINES) 
@@ -11,10 +12,13 @@ libira_la_SOURCES = \
 libira_adam_la_SOURCES = $(ADAM_F_ROUTINES)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = IRA_ERR
 
-PUBLIC_INCLUDES = IRA_ERR IRA_PAR
+PUBLIC_INCLUDES = IRA_PAR
 PRIVATE_INCLUDES = IRA_COM
 BLOCK_DATA_FILES = ira1_init.f
+
+BUILT_SOURCES = $(include_MESSAGES)
 
 F_ROUTINES = \
 ira1_aito.f ira1_ascre.f ira1_asdef.f ira1_asndf.f ira1_asres.f \
