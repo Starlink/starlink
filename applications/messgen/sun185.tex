@@ -91,7 +91,7 @@ are allowed.
 The severity value has no meaning on UNIX, or in most cases on VAX/VMS, but
 it does affect the error value generated for subsequent errors in the file.
 There may be more than one .SEVERITY directive in the file or it may be omitted,
-in which case ERROR is assumed.
+in which case WARNING is assumed.
 \item The .BASE directive specifies a message number to be associated with
 the next message and is optional.
 In the absence of any .BASE directives, message numbering is sequential
@@ -101,7 +101,7 @@ In the absence of any .BASE directives, message numbering is sequential
 \item
 \xref{SUN/104}{sun104}{calculating_globally_unique_error_codes}
 gives a formula for calculating unique error numbers. This formula
-corresponds with .SEVERITY ERROR.
+corresponds with .SEVERITY WARNING.
 \item The .END directive is optional and has no effect.
 \item If the VAX/VMS MESSAGE facility was used to generate facility INCLUDE
 files which were subsequently ported to UNIX, the original
