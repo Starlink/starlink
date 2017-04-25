@@ -794,7 +794,7 @@ try:
       shutil.copyfile( inquis, allquis )
 
 #  Initialise a list of new maps created by this run of pol2map.
-   new_maps = {}
+   new_maps = []
 
 #  Set up a dict for each Stokes parameter holding paths to any supplied maps
 #  for that Stokes parameter. The keys are of the form "<UT>_<OBS>_<SUBSCAN>".
