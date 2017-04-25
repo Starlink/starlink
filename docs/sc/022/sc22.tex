@@ -1,0 +1,181 @@
+\documentclass[11pt,oneside,chapters]{starlink}
+
+\usepackage{amsfonts}
+\usepackage{longtable}
+
+\stardoccategory {Starlink Cookbook}
+\stardocinitials {SC}
+\stardoccopyright{Copyright \copyright\ 2014-2015 Science and Technology Facilities Council,\\
+                  East Asian Observatory}
+\stardocnumber   {22.1}
+\stardoctitle    {The POL-2 Data Reduction Cookbook}
+\stardocversion  {1.1}
+\stardocabstract {
+   This cookbook provides an introduction to Starlink facilities,
+   \textsc{smurf} , the Sub-Millimetre User Reduction Facility,
+   and in particular \textsc{POL2MAP} the command for reducing
+   POL-2 data. This cookbook illustrates the various steps required to
+   reduce the data; and gives an overview of the method and 
+   describes how to calibrate and display data and POL-2 vactors}
+\stardocauthors{Berry, H.\ A.\ Parsons, Rawlings, Graves, Bell, }
+\stardocdate{2017 April 17}
+
+\newcommand{\minipageclear}{%
+\begin{minipage}[c]{1.0\linewidth}\end{minipage}}
+
+\begin{document}
+\scfrontmatter
+
+\newcommand{\xparam}[2]{\hyperref[#1]{\param{#2}}}
+\newcommand{\setparam}[3]{\xparam{#1}{#2}\param{~=~#3}}
+
+\newcommand{\jsageneric}{\htmladdnormallink{\file{dimmconfig\_jsa\_generic}}
+{https://raw.githubusercontent.com/Starlink/starlink/master/applications/smurf/examples/dimmconfig_jsa_generic.lis}}
+
+
+
+% Acronyms section
+\Acronyms
+
+\begin{table}[h!]
+\begin{tabular}{ll}
+\textbf{CADC}   & Canadian Astronomy Data Centre\\
+\textbf{CSO}    & Caltech Submillimetre Observatory\\
+\textbf{DIMM}   & Dynamic Iterative Map-Maker\\
+\textbf{FCF}    & Flux Conversion Factor\\
+\textbf{FITS}   & Flexible Image Transport System\\
+\textbf{FWHM}   & Full-Width at Half-Maximum\\
+\textbf{GAIA}   & Graphical Astronomy and Image Analysis Tool\\
+\textbf{ITC}    & Integration Time Calculator\\
+\textbf{I}        & Total Intensity \\
+\textbf{IP}     & Instrument Polarization \\
+\textbf{JCMT}   & James Clerk Maxwell Telescope\\
+\textbf{MSB}    & Minimum Schedulable Block\\
+\textbf{NDF}    & Extensible N-Dimensional Data Format\\
+\textbf{NEP}    & Noise Equivalent Power\\
+\textbf{NEFD}   & Noise Equivalent Flux Density\\
+\textbf{PI}     & Polarized Intensity \\
+\textbf{PSF}    & Point Spread Function\\
+\textbf{PWV}    & Precipitable Water Vapour\\
+\textbf{RMS}    & Root Mean Square\\
+\textbf{SCUBA-2}& Submillimetre Common User Bolometer Array-2\\
+\textbf{SMURF}  & Sub-Millimetre User Reduction Facility\\
+\textbf{S/N}    & Signal-to-Noise ratio\\
+\textbf{SQUID}  & Superconducting QUantum Interference Device\\
+\textbf{STC-S}  & Space-Time Coordinate Metadata String Implementation\\
+\textbf{SUN}    & Starlink User Note\\
+\textbf{TES}    & Transition Edge Sensor\\
+\textbf{WVM}    & Water Vapour radioMeter\\
+\end{tabular}
+\end{table}
+
+
+\newpage
+\input{sc22_intro.tex}
+\newpage
+\input{sc22_pol2_overview.tex}
+\newpage
+\input{sc22_pol2_pol2map.tex}
+
+\begin{thebibliography}{}
+\addcontentsline{toc}{section}{References}
+
+
+
+
+\bibitem{archibald}
+Archibald,~E.~N., et~al, 2002, \htmladdnormallink{\textit{On the atmospheric limitations
+of ground-based submillimetre astronomy using array receivers}}{http://dx.doi.org/10.1046/j.1365-8711.2002.05582.x}, MNRAS, 336, 1-13
+(DOI:10.1046/j.1365-8711.2002.05582.x)
+
+\bibitem{fellwalker}
+Berry~D.~S.,  2015,
+\htmladdnormallink{\textit{FellWalker - a Clump Identification Algorithm}}
+{http://dx.doi.org/10.1016/j.ascom.2014.11.004},
+Ast. \& Comp., 10, 22-31 (DOI:10.1016/j.ascom.2014.11.004)
+
+\bibitem{oracdr}
+Cavanagh~B., Jenness~T., Economou~F., Currie~M.~J., 2008,
+\htmladdnormallink{\textit{The ORAC-DR data reduction
+pipeline}}{http://dx.doi.org/10.1002/asna.200710944}, Astron. Nactr., 329, 295
+(DOI:10.1002/asna.200710944)
+
+\bibitem{smurf}
+Chapin~E.~L., et~al., 2013, \textit{SMURF -- Sub-Millimetre User Reduction
+Facility}, \xref{Starlink User Note 258}{sun258}{}
+
+\bibitem{mapmaker}
+Chapin~E.~L., et~al., 2013,
+\htmladdnormallink{\textit{SCUBA-2: iterative map-making with the
+Sub-Millimetre User Reduction Facility}}{http://dx.doi.org/10.1093/mnras/stt052},
+MNRAS, 430, 2545 (DOI:10.1093/mnras/stt052)
+
+\bibitem{ssds}
+Currie~M.~J., Wallace~P.~T., Warren-Smith~R.~F., 1989,
+\textit{Starlink Standard Data Structures}, \xref{Starlink General
+Paper 38.2}{sgp38}{}
+
+\bibitem{kappa}
+Currie~M.~J., Berry~D.~S, 2013, \textit{KAPPA -- Kernel Application Package},
+\xref{Starlink User Note 95}{sun95}{}
+
+\bibitem{dempsey12}
+Dempsey~J.~T. et al., 2013, \htmladdnormallink{\textit{SCUBA-2: on-sky calibration using
+submillimetre standard sources}}{http://dx.doi.org/10.1093/mnras/stt090},
+MNRAS, 430, 2534 (DOI:10.1093/mnras/stt090)
+
+\bibitem{dempsey-spie}
+Dempsey~J.~T., Friberg~P., Jenness~T., Bintley~D., Holland~W.~S., 2010
+\htmladdnormallink{\textit{Extinction correction and on-sky calibration of
+SCUBA-2}}{http://dx.doi.org/10.1117/12.856476},
+Proc.\ SPIE, 7741 (DOI:10.1117/12.856476)
+
+\bibitem{gaia}
+Draper~P.~W., Gray~N., Berry~D.~S., Taylor~M., 2012,
+\textit{GAIA -- Graphical Astronomy and Image Analysis Tool},
+\xref{Starlink User Note 214}{sun214}{}
+
+\bibitem{picard}
+Gibb~A.~G., Jenness~T., Economou~F., 2012, \textit{PICARD --- a
+PIpeline for Combining and Analyzing Reduced Data}
+\xref{Starlink User Note 265}{sun265}{}
+
+\bibitem{s2main}
+Holland, W. S., et~al, 2013, \htmladdnormallink{\textit{SCUBA-2: The
+10,000 pixel bolometer camera on the James Clerk Maxwell Telescope}}
+{http://dx.doi.org/10.1093/mnras/sts612}, MNRAS, 430, 2513
+(DOI:10.1093/mnras/sts612)
+
+\bibitem{flux1}
+Jenness~T., et~al, 2002, \htmladdnormallink{\textit{Towards the automated
+reduction and calibration of SCUBA data from the James Clerk Maxwell
+Telescope}}{http://dx.doi.org/10.1046/j.1365-8711.2002.05604.x},
+MNRAS, 336, 14-21 (DOI:10.1046/j.1365-8711.2002.05604.x)
+
+\bibitem{ndf}
+Jenness~T., et~al, 2014,
+\htmladdnormallink{\textit{Learning from 25 years of the extensible
+N-Dimensional Data Format}} {http://dx.doi.org/10.1016/j.ascom.2014.11.001},
+Ast. \& Comp., in press, (DOI:10.1016/j.ascom.2014.11.001)
+
+\bibitem{Friberg}
+Friberg,~P., et~al, 2016 \htmladdnormallink{\textit{POL-2: a polarimeter 
+for the James-Clerk-Maxwell telescope}}{http://proceedings.spiedigitallibrary.org/proceeding.aspx?articleid=2536885},
+SPIE, Volume 9914, id. 991403
+(DOI: 10.1117/12.2231943)
+
+\bibitem{sc2ana005}
+Scott~D., Van Engelen~A., 2005, \htmladdnormallink{\textit{Scan Mode Strategies for
+SCUBA-2}}{http://docs.eao.hawaii.edu/JCMT/SC2/ANA/S210/005/sc2_ana_s210_005.ps},
+SCUBA-2 Data Reduction document SC2/ANA/S210/005
+
+\end{thebibliography}
+
+\newpage
+\appendix
+\input{sc22_no_pca_scuba2.tex}
+
+
+
+\end{document}
+
