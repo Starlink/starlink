@@ -2,6 +2,8 @@
 
 \usepackage{amsfonts}
 \usepackage{longtable}
+\usepackage{amsmath}
+\usepackage{siunitx}
 
 \stardoccategory {Starlink Cookbook}
 \stardocinitials {SC}
@@ -17,7 +19,7 @@
    POL-2 data. This cookbook illustrates the various steps required to
    reduce the data; and gives an overview of the method and 
    describes how to calibrate and display data and POL-2 vactors}
-\stardocauthors{Berry, H.\ A.\ Parsons, Rawlings, Graves, Bell, }
+\stardocauthors{D.\ S.\ Berry, H.\ A.\ Parsons, M.\ G.\ Rawlings, and S.\ Graves}
 \stardocdate{2017 April 17}
 
 \newcommand{\minipageclear}{%
@@ -46,8 +48,9 @@
 \textbf{FITS}   & Flexible Image Transport System\\
 \textbf{FWHM}   & Full-Width at Half-Maximum\\
 \textbf{GAIA}   & Graphical Astronomy and Image Analysis Tool\\
+\textbf{HWP}    & Half-Wave Plate\\
 \textbf{ITC}    & Integration Time Calculator\\
-\textbf{I}        & Total Intensity \\
+\textbf{I}      & Total Astronomical Intensity \\
 \textbf{IP}     & Instrument Polarization \\
 \textbf{JCMT}   & James Clerk Maxwell Telescope\\
 \textbf{MSB}    & Minimum Schedulable Block\\
@@ -58,7 +61,7 @@
 \textbf{PSF}    & Point Spread Function\\
 \textbf{PWV}    & Precipitable Water Vapour\\
 \textbf{RMS}    & Root Mean Square\\
-\textbf{SCUBA-2}& Submillimetre Common User Bolometer Array-2\\
+\textbf{SCUBA-2}& Submillimetre Common User Bolometerq Array-2\\
 \textbf{SMURF}  & Sub-Millimetre User Reduction Facility\\
 \textbf{S/N}    & Signal-to-Noise ratio\\
 \textbf{SQUID}  & Superconducting QUantum Interference Device\\
@@ -76,10 +79,14 @@
 \input{sc22_pol2_overview.tex}
 \newpage
 \input{sc22_pol2_pol2map.tex}
+\newpage
+\input{sc22_run_pol2map.tex}
+\newpage
+\input{sc22_pol2_image_display.tex}
+
 
 \begin{thebibliography}{}
 \addcontentsline{toc}{section}{References}
-
 
 
 
