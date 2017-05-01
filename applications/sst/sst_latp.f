@@ -66,6 +66,8 @@
 *        Added double \ for UNIX port.
 *     14-APR-2005 (PDRAPER):
 *        Converted to use pre-defined backslash character.
+*     1-MAY-2017 (DSB):
+*        Preserve line breaks in the input when between "---" lines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -96,8 +98,11 @@
       INTEGER F                  ! First character of line to be output
       INTEGER I                  ! Loop counter for output lines
       INTEGER IND                ! Current output indentation
+      INTEGER L                  ! Last character of line to be output
       LOGICAL ITEMS              ! Whether within an item list
       LOGICAL PREVBL             ! Previous output line was blank?
+      LOGICAL PRLBRK             ! Preserve line breaks?
+      LOGICAL USE                ! Include line in output ?
 
 *  Internal References:
       LOGICAL BLANK              ! Whether line is blank
@@ -122,27 +127,48 @@
          END IF
 1     CONTINUE
 
-*  Initialise flags indicating whether the previous line was blank and
-*  whether we are within an itemised list.
+*  Initialise flags indicating whether the previous line was blank,
+*  whether we are within an itemised list, and whether we are preserving
+*  line breaks.
       PREVBL = .TRUE.
       ITEMS = .FALSE.
+      PRLBRK = .FALSE.
 
-*  Loop to output the lines in the section.  A blank input line simply
-*  causes a blank output line (unless the previous line was also
-*  blank).
+*  Loop to output the lines in the section.
       DO 2 I = FIRST, LAST
+
+*  If we are preserving line-breaks, a blank input line simply
+*  causes a newline command. Otherwise, it causes a blank output
+*  line (unless the previous line was also blank).
          IF ( BLANK( I ) ) THEN
-            IF ( .NOT. PREVBL ) THEN
+            IF ( PRLBRK ) THEN
+               CALL SST_PUT( IND, SST__BKSLH // 'newline', STATUS )
+            ELSE IF ( .NOT. PREVBL ) THEN
                CALL SST_PUT( 0, ' ', STATUS )
                PREVBL = .TRUE.
             END IF
 
+* Otherwise, get the indices of the first and last non-blank characters.
+         ELSE
+            F = SCB_FC( I )
+            L = SCB_LC( I )
+
+*  Assume the line should be included in the output.
+            USE = .TRUE.
+
+*  If the line consists entirely of the string "---" then toggle the flag
+*  that indicates if we are preserving line breaks.
+            IF( SCB_LINE( I )( F : L ) .EQ. '---' ) THEN
+               PRLBRK = .NOT. PRLBRK
+               CALL SST_PUT( IND, SST__BKSLH // 'newline', STATUS )
+               IF( PRLBRK )
+     :             CALL SST_PUT( IND, SST__BKSLH // 'newline', STATUS )
+               USE = .FALSE.
+
 *  If the line begins with a '-', then this is the start of an item
 *  within an itemised list. Start this list if it has not already been
 *  started and increase the output indentation level.
-         ELSE
-            F = SCB_FC( I )
-            IF ( ( SCB_LINE( I )( F : F ) .EQ. '-' ) ) THEN
+            ELSE IF ( ( SCB_LINE( I )( F : F ) .EQ. '-' ) ) THEN
                IF ( .NOT. ITEMS ) THEN
                   ITEMS = .TRUE.
                   CALL SST_PUT( IND, SST__BKSLH // 'sstitemlist{',
@@ -169,11 +195,16 @@
                CALL SST_PUT( IND, '}', STATUS )
             END IF
 
-*  Output lines with the base level of indentation adjusted to equal
-*  IND.
-            IF ( F .LE. SCB_LC( I ) ) THEN
-               CALL SST_LAT( IND + SCB_FC( I ) - BASE,
-     :                       SCB_LINE( I )( F : SCB_LC( I ) ), STATUS )
+*  Output usable lines with the base level of indentation adjusted
+*  to equal IND.
+            IF ( USE .AND. F .LE. L ) THEN
+               CALL SST_LAT( IND + F - BASE, SCB_LINE( I )( F : L ),
+     :                       STATUS )
+
+*  If we are preserving line breaks, output a latex newline command.
+               IF( PRLBRK )
+     :            CALL SST_PUT( IND, SST__BKSLH // 'newline', STATUS )
+
             END IF
             PREVBL = .FALSE.
          END IF
