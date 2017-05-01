@@ -66,25 +66,26 @@
 *        The MAKEMAP configuration parameter values to use. If a null
 *        value (!) or "def" is supplied, the following defaults will be
 *        used:
-*
-*        ast.zero_snr=3
-*        ast.zero_snrlo=2
-*        maptol=0.05
-*        modelorder=(pca,ext,ast,noi)
-*        noisecliphigh=3
-*        numiter=-20
-*        pca.pcathresh=4
-*        spikebox=10
-*        spikethresh=5
-*
+*        ---
+*           ast.zero_snr=3
+*           ast.zero_snrlo=2
+*           maptol=0.05
+*           modelorder=(pca,ext,ast,noi)
+*           noisecliphigh=3
+*           numiter=-20
+*           pca.pcathresh=4
+*           spikebox=10
+*           spikethresh=5
+*        ---
 *        If a configuration is supplied, it is used in place of the above
 *        default configurations. In either case, the following values are
 *        always appended to the end of the used config (whether external
 *        or defaulted):
-*
-*        flagslow = 0.01
-*        downsampscale = 0
-*        noi.usevar=1
+*        ---
+*           flagslow = 0.01
+*           downsampscale = 0
+*           noi.usevar=1
+*        ---
 *     DEBIAS = LOGICAL (Given)
 *        TRUE if a correction for statistical bias is to be made to
 *        percentage polarization and polarized intensity in the output
@@ -337,8 +338,8 @@
 *        accepted as input. Such maps may have no quality array (because
 *        wcsmosaic does not propagate quality).
 *     25-JAN-2017 (DSB):
-*        When creating a PI map with de-biasing, set the corrected value 
-*        to zero if the noise is greater than the signal. This make this 
+*        When creating a PI map with de-biasing, set the corrected value
+*        to zero if the noise is greater than the signal. This make this
 *        script consistent with polpack.
 '''
 

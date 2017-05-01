@@ -51,6 +51,7 @@
 *        will be made as follows:
 *
 *        - First iteration:
+*           ---
 *           numiter=1
 *           noi.export=1
 *           exportNDF=(lut,ext,res,qua)
@@ -65,8 +66,9 @@
 *           flagmap=<undef>
 *           sampcube=0
 *           diag.append=0
-*
+*           ---
 *        - Subsequent iterations:
+*           ---
 *           numiter=1
 *           noi.import=1
 *           exportNDF=(res,qua)
@@ -89,8 +91,9 @@
 *           downsampscale=0
 *           downsampfreq=0
 *           fakemap=<undef>
-*
+*           ---
 *        - Last iteration:
+*           ---
 *           numiter=1
 *           noi.import=1
 *           doclean=0
@@ -112,7 +115,7 @@
 *           downsampscale=0
 *           downsampfreq=0
 *           fakemap=<undef>
-*
+*           ---
 *     EXTRA = LITERAL (Read)
 *        A string holding any extra command line options to be passed to
 *        MAKEMAP (all invocations). [!]
@@ -328,7 +331,7 @@
 *        iterations. Things like COM and RING are recalculated from
 *        scratch on each iteration and so do not need to be exported.
 *     28-NOV-2016 (DSB):
-*        Take account of the value of ast.skip when determining whether to 
+*        Take account of the value of ast.skip when determining whether to
 *        freeze (xxx.zero_freeze) or apply (xxx.zero_niter) masks, etc.
 *-
 '''

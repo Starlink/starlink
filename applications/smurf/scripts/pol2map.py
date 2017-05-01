@@ -37,7 +37,7 @@
 *        Extra parameter values to include in the MAKEMAP configuration.
 *        The supplied configuration is applied on top of the following
 *        set of parameters:
-*
+*        ---
 *           ^$STARLINK_DIR/share/smurf/.dimmconfig_pol2.lis
 *           numiter = -200
 *           modelorder=(com,gai,pca,ext,flt,ast,noi)
@@ -54,11 +54,11 @@
 *           com.zero_niter = 0.5
 *           flt.zero_niter = 0.5
 *           com.freeze_flags = 30
-*
+*        ---
 *        Additional parameters are also set, depending on the value of
 *        parameter MASK. If MASK is set to "AUTO", the following
 *        parameters are added to the above default config:
-*
+*        ---
 *           ast.skip = 10
 *           ast.zero_snr = 3
 *           ast.zero_snrlo = 2
@@ -76,15 +76,15 @@
 *           flt.zero_snr = 5
 *           flt.zero_snrlo = 3
 *           flt.zero_freeze = -1
-*
+*        ---
 *        If MASK is set to "CIRCLE", the following parameters are added
 *        to the above default config:
-*
+*        ---
 *           ast.zero_circle = 0.0083  (degrees, i.e. 30 arc-seconds)
 *           pca.zero_circle = 0.0038
 *           com.zero_circle = 0.0083
 *           flt.zero_circle = 0.0083
-*
+*        ---
 *        The default value for pca.pcathresh indicated above will be
 *        changed if it is too high to allow convergence of the I maps
 *        within the number of iterations allowed by numiter.
@@ -92,12 +92,12 @@
 *        If MASK is set to the name of an NDF, this script creates fixed
 *        masks from the NDF, and the following parameters are added
 *        to the above default config:
-*
+*        ---
 *           ast.zero_mask = ref
 *           pca.zero_mask = mask2
 *           com.zero_mask = mask2
 *           flt.zero_mask = mask2
-*
+*        ---
 *        The above "ref" mask consists of clumps of pixel with SNR greater
 *        than 3, extended down to an SNR level of 2. The "mask2" mask
 *        consists of clumps of pixel with SNR greater than 5, extended
@@ -114,11 +114,11 @@
 *        supplied for any of the above parameters will over-write the
 *        values specified above. In addition, the following mandatory
 *        values are always appended to the end of the used configuration:
-*
-*        flagslow = 0.01
-*        downsampscale = 0
-*        noi.usevar=1
-*
+*        ---
+*           flagslow = 0.01
+*           downsampscale = 0
+*           noi.usevar=1
+*        ---
 *        If null (!) or "def" is supplied, the above set of default
 *        configuration parameters are used without change. ["def"]
 *     DEBIAS = LOGICAL (Given)
