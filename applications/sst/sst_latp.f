@@ -68,6 +68,8 @@
 *        Converted to use pre-defined backslash character.
 *     1-MAY-2017 (DSB):
 *        Preserve line breaks in the input when between "---" lines.
+*        Indentation of the subsequent lines relative to the "---" marker
+*        is retain by inserting appropriate horizontal space commands.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -94,11 +96,15 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER * ( 3 * SST__SZLIN ) BUF ! Output buffer
       INTEGER BASE               ! Base level of indentation
+      INTEGER BINDLB             ! Base level of indent for line-breaking
       INTEGER F                  ! First character of line to be output
       INTEGER I                  ! Loop counter for output lines
       INTEGER IND                ! Current output indentation
       INTEGER L                  ! Last character of line to be output
+      INTEGER NC                 ! No. of characters in buffer
+      INTEGER NSP                ! No. of leading spaces required
       LOGICAL ITEMS              ! Whether within an item list
       LOGICAL PREVBL             ! Previous output line was blank?
       LOGICAL PRLBRK             ! Preserve line breaks?
@@ -160,6 +166,7 @@
 *  that indicates if we are preserving line breaks.
             IF( SCB_LINE( I )( F : L ) .EQ. '---' ) THEN
                PRLBRK = .NOT. PRLBRK
+               BINDLB = F
                CALL SST_PUT( IND, SST__BKSLH // 'newline', STATUS )
                IF( PRLBRK )
      :             CALL SST_PUT( IND, SST__BKSLH // 'newline', STATUS )
@@ -195,9 +202,23 @@
                CALL SST_PUT( IND, '}', STATUS )
             END IF
 
-*  Output usable lines with the base level of indentation adjusted
-*  to equal IND.
+
+*  Output usable lines.
             IF ( USE .AND. F .LE. L ) THEN
+
+*  If we are preserving linebreaks also preserve leading spaces by
+*  converting the leading spaces into a latex horizontal space.
+               NSP = F - BINDLB
+               IF( PRLBRK .AND. NSP .GT. 0 ) THEN
+                  NC = 0
+                  CALL CHR_APPND( SST__BKSLH // 'hspace*{', BUF, NC )
+                  CALL CHR_PUTR( NSP/2.0, BUF, NC )
+                  CALL CHR_APPND( ' em}', BUF, NC )
+                  CALL SST_PUT( IND, BUF( : NC ), STATUS )
+               END IF
+
+*  Output the text with the base level of indentation adjusted
+*  to equal IND.
                CALL SST_LAT( IND + F - BASE, SCB_LINE( I )( F : L ),
      :                       STATUS )
 
