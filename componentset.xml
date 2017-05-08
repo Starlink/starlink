@@ -3191,6 +3191,91 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
+<component id="hds-v4" support="S">
+  <version>5.2-1</version>
+  <path>libext/hds-v4</path>
+  <description>Hierarchical Data System Version 4</description>
+  <abstract>
+    <p>HDS is a file-based hierarchical data system designed for the
+      storage of a wide variety of information. It is particularly
+      suited to the storage of large multi-dimensional arrays (with
+      their ancillary data) where efficient access is needed.</p>
+    <p>HDS organises data into hierarchies, broadly similar to the
+      directory structure of a hierarchical filing system, but
+      contained within a single HDS container file.  The
+      structures stored in these files are self-describing and
+      flexible; HDS supports modification and extension of structures
+      previously created, as well as deletion, copying, renaming, etc..</p>
+    <p>All information stored in HDS files is portable between the
+      machines on which HDS is implemented. Thus, there are no format
+      conversion problems when moving between machines.</p>
+    <p>The routines in this package may be used to perform operations
+      on any HDS data. In addition, HDS forms a toolkit for the
+      construction of higher level (more specialised) data structures
+      and the software which accesses them.  HDS routines are
+      therefore invoked indirectly by many other items of Starlink
+      software.</p>
+    <p>This library handles HDS files version 4 and below.</p>
+  </abstract>
+  <dependencies >
+    <build>sae</build><build>chr</build><build>cnf</build><build>ems</build><build>starmem</build><link>chr</link><link>cnf</link><link>ems</link><link>starmem</link><test>chr</test><test>cnf</test><test>ems</test><test>prm</test><test>starmem</test><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>R. F. Warren-Smith</name>
+    </person>
+    <person>
+      <name>M. D. Lawden</name>
+    </person>
+    <person>
+      <name>Brian McIlwrath</name>
+      <uname>bkm</uname>
+      <email>B.K.McIlwrath@rl.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+</component>
+
+<component id="hds-v5" support="S">
+  <version>1.0-1</version>
+  <path>libext/hds-v5</path>
+  <description>Hierarchical Data System layered on HDF5</description>
+  <abstract>
+    <p>HDS is a file-based hierarchical data system designed for the
+      storage of a wide variety of information. It is particularly
+      suited to the storage of large multi-dimensional arrays (with
+      their ancillary data) where efficient access is needed.</p>
+    <p>HDS organises data into hierarchies, broadly similar to the
+      directory structure of a hierarchical filing system, but
+      contained within a single HDS container file.  The
+      structures stored in these files are self-describing and
+      flexible; HDS supports modification and extension of structures
+      previously created, as well as deletion, copying, renaming, etc..</p>
+    <p>All information stored in HDS files is portable between the
+      machines on which HDS is implemented. Thus, there are no format
+      conversion problems when moving between machines.</p>
+    <p>The routines in this package may be used to perform operations
+      on any HDS data. In addition, HDS forms a toolkit for the
+      construction of higher level (more specialised) data structures
+      and the software which accesses them.  HDS routines are
+      therefore invoked indirectly by many other items of Starlink
+      software.</p>
+  </abstract>
+  <dependencies >
+    <build>sae</build><build>chr</build><build>cnf</build><build>ems</build><build>one</build><build>prm</build><build>starmem</build><link>chr</link><link>cnf</link><link>ems</link><link>one</link><link>starmem</link><link>one</link><test>chr</test><test>cnf</test><test>ems</test><test>prm</test><test>starmem</test><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Tim Jenness</name>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+</component>
+
 <component id="pal" support="S">
   <version>0.9.7</version>
   <path>libext/pal</path>
@@ -3760,7 +3845,7 @@ No longer under active control.
 </component>
 
 <component id="hds" support="S">
-  <version>5.1-1</version>
+  <version>6.0-1</version>
   <path>libraries/hds</path>
   <description>Hierarchical Data System</description>
   <abstract>
@@ -3785,7 +3870,7 @@ No longer under active control.
       software.</p>
   </abstract>
   <dependencies >
-    <build>sae</build><build>chr</build><build>cnf</build><build>ems</build><build>starmem</build><link>chr</link><link>cnf</link><link>ems</link><link>starmem</link><test>chr</test><test>cnf</test><test>ems</test><test>prm</test><test>starmem</test><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>chr</build><build>cnf</build><build>ems</build><build>starmem</build><build>one</build><build>hds-v4</build><build>hds-v5</build><link>chr</link><link>cnf</link><link>ems</link><link>starmem</link><link>one</link><link>hds-v4</link><link>hds-v5</link><test>chr</test><test>cnf</test><test>ems</test><test>prm</test><test>starmem</test><test>one</test><test>hds-v4</test><test>hds-v5</test><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
