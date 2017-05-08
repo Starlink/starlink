@@ -224,6 +224,8 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        Previously, echoing a vector-valued parameter such as makemap's
 *        "modelorder" parameter only displayed the first element. The use
 *        of astMapGet0C has been changed to astMapGetC to fix this bug.
+*     8-MAY-2017 (DSB):
+*        Fix bug that prevented vector values being displayed.
 *     {enter_further_changes_here}
 
 *-
@@ -533,7 +535,6 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
    int ival;
    int nc;
    int nkey;
-   int nval;
 
 /* Check the inherited status */
    if( *status != SAI__OK ) return;
@@ -569,29 +570,25 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
 /* If the current entry is not a nested keymap, we display it now. */
       } else {
 
-/* Get the vector length of the entry. */
-         nval = astMapLength( km, key );
 
 /* Get its value as a character string using the automatic type conversion
    provided by the KeyMap class, and format it, putting the supplied prefix
    at the start of the key. Note, the astMapGetC function formats a vector
    KeyMap entry as a comma-separated list enclosed in parentheses. */
-         if( nval <= 1 ) {
-            text = NULL;
-            nc = 0;
-            cvalue = "<undef>";
-            astMapGetC( km, key, &cvalue );
-            if( refkm ) {
-               refcvalue = "<undef>";
-               if( astMapGetC( refkm, key, &refcvalue ) &&
-                   !strcmp( cvalue, refcvalue ) ) {
-                  text = astAppendString( text, &nc, "- " );
-               } else {
-                  text = astAppendString( text, &nc, "+ " );
-               }
+         text = NULL;
+         nc = 0;
+         cvalue = "<undef>";
+         astMapGetC( km, key, &cvalue );
+         if( refkm ) {
+            refcvalue = "<undef>";
+            if( astMapGetC( refkm, key, &refcvalue ) &&
+                !strcmp( cvalue, refcvalue ) ) {
+               text = astAppendString( text, &nc, "- " );
+            } else {
+               text = astAppendString( text, &nc, "+ " );
             }
-            text = astAppendStringf( text, &nc, "%s%s = %s", prefix, key, cvalue );
          }
+         text = astAppendStringf( text, &nc, "%s%s = %s", prefix, key, cvalue );
 
 /* Display the total text on standard output. */
          msgOut( "", text, status );
