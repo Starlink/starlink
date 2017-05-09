@@ -13,7 +13,7 @@ AC_PROG_MAKE_SET
 dnl    The following list must be kept up-to-date by hand.
 dnl    The list is available as the substitution variable @subdirs@.
 dnl    (must be kept on one line)
-AC_CONFIG_SUBDIRS(ast pal hds-v4)
+AC_CONFIG_SUBDIRS(ast pal hds-v4 hds-v5)
 
 AC_CONFIG_FILES(Makefile)
 
