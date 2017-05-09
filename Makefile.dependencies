@@ -34,6 +34,7 @@ $(MANIFESTS)/acsisio: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -56,6 +57,7 @@ $(MANIFESTS)/agi: \
 		$(MANIFESTS)/gks \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -83,6 +85,7 @@ $(MANIFESTS)/ard: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/grp \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -106,6 +109,7 @@ $(MANIFESTS)/ary: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -144,6 +148,7 @@ $(MANIFESTS)/atl: \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/grp \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -180,6 +185,7 @@ $(MANIFESTS)/atools: \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -270,6 +276,7 @@ $(MANIFESTS)/cat: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -309,6 +316,7 @@ $(MANIFESTS)/ccdbig: \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -364,6 +372,7 @@ $(MANIFESTS)/ccdpack: \
 		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -415,6 +424,7 @@ $(MANIFESTS)/cgs3dr: \
 		$(MANIFESTS)/figaro \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -444,6 +454,7 @@ $(MANIFESTS)/chart: \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -507,6 +518,7 @@ $(MANIFESTS)/convert: \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -551,6 +563,7 @@ $(MANIFESTS)/ctg: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/grp \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -591,6 +604,7 @@ $(MANIFESTS)/cupid: \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -647,6 +661,7 @@ $(MANIFESTS)/cursa: \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -683,6 +698,7 @@ $(MANIFESTS)/cvg: \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/grp \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -714,6 +730,7 @@ $(MANIFESTS)/daophot: \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -746,6 +763,7 @@ $(MANIFESTS)/datacube: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -782,6 +800,7 @@ $(MANIFESTS)/dipso: \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -843,6 +862,7 @@ $(MANIFESTS)/echomop: \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -935,6 +955,7 @@ $(MANIFESTS)/esp: \
 		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -973,6 +994,7 @@ $(MANIFESTS)/extractor: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/grp \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1016,6 +1038,7 @@ $(MANIFESTS)/figaro: \
 		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1061,6 +1084,7 @@ $(MANIFESTS)/findcoords: \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1093,6 +1117,7 @@ $(MANIFESTS)/fio: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1117,6 +1142,7 @@ $(MANIFESTS)/fluxes: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1152,6 +1178,7 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gsl \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1221,6 +1248,7 @@ $(MANIFESTS)/graphpar: \
 		$(MANIFESTS)/gks \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1246,6 +1274,7 @@ $(MANIFESTS)/grp: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1297,6 +1326,7 @@ $(MANIFESTS)/hds: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
 		$(MANIFESTS)/messgen \
@@ -1325,6 +1355,7 @@ $(MANIFESTS)/hds-v5: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/one \
 		$(MANIFESTS)/prm \
@@ -1342,6 +1373,7 @@ $(MANIFESTS)/hdstools: \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/grp \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1369,6 +1401,7 @@ $(MANIFESTS)/hdstrace: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1402,6 +1435,7 @@ $(MANIFESTS)/icl: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1427,6 +1461,7 @@ $(MANIFESTS)/idi: \
 		$(MANIFESTS)/gks \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1461,6 +1496,7 @@ $(MANIFESTS)/img: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1507,6 +1543,7 @@ $(MANIFESTS)/iras90: \
 		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1553,6 +1590,7 @@ $(MANIFESTS)/ircamdr: \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1591,6 +1629,7 @@ $(MANIFESTS)/irq: \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1649,6 +1688,7 @@ $(MANIFESTS)/jcmtdr: \
 		$(MANIFESTS)/gsd \
 		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1712,6 +1752,7 @@ $(MANIFESTS)/kaplibs: \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1761,6 +1802,7 @@ $(MANIFESTS)/kappa: \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1821,6 +1863,7 @@ $(MANIFESTS)/kaprh: \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1890,6 +1933,7 @@ $(MANIFESTS)/lpg: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/grp \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -1934,6 +1978,7 @@ $(MANIFESTS)/mag: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2004,6 +2049,7 @@ $(MANIFESTS)/ndf: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2026,6 +2072,7 @@ $(MANIFESTS)/ndg: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/grp \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2062,6 +2109,7 @@ $(MANIFESTS)/observe: \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2109,6 +2157,7 @@ $(MANIFESTS)/pamela: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2130,6 +2179,7 @@ $(MANIFESTS)/par: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2152,6 +2202,7 @@ $(MANIFESTS)/pcs: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2188,6 +2239,7 @@ $(MANIFESTS)/period: \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2253,6 +2305,7 @@ $(MANIFESTS)/photom: \
 		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2296,6 +2349,7 @@ $(MANIFESTS)/pisa: \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2334,6 +2388,7 @@ $(MANIFESTS)/polmap: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2374,6 +2429,7 @@ $(MANIFESTS)/polpack: \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2426,6 +2482,7 @@ $(MANIFESTS)/pongo: \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2481,6 +2538,7 @@ $(MANIFESTS)/ref: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2650,6 +2708,7 @@ $(MANIFESTS)/shl: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2706,6 +2765,7 @@ $(MANIFESTS)/smurf: \
 		$(MANIFESTS)/gsd \
 		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2778,6 +2838,7 @@ $(MANIFESTS)/specx: \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gsd \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2849,6 +2910,7 @@ $(MANIFESTS)/sst: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2886,6 +2948,7 @@ $(MANIFESTS)/starbench: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2935,6 +2998,7 @@ $(MANIFESTS)/starman: \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -2967,6 +3031,7 @@ $(MANIFESTS)/startcl: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -3118,6 +3183,7 @@ $(MANIFESTS)/trn: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
@@ -3143,6 +3209,7 @@ $(MANIFESTS)/tsp: \
 		$(MANIFESTS)/gks \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \

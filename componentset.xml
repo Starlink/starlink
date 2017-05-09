@@ -3264,7 +3264,7 @@ to handle data from a variety of different instruments.
       software.</p>
   </abstract>
   <dependencies >
-    <build>sae</build><build>chr</build><build>cnf</build><build>ems</build><build>one</build><build>prm</build><build>starmem</build><link>chr</link><link>cnf</link><link>ems</link><link>one</link><link>starmem</link><link>one</link><test>chr</test><test>cnf</test><test>ems</test><test>prm</test><test>starmem</test><sourceset>messgen</sourceset>
+    <build>sae</build><build>chr</build><build>cnf</build><build>ems</build><build>one</build><build>prm</build><build>starmem</build><build>hdf5</build><link>chr</link><link>cnf</link><link>ems</link><link>one</link><link>starmem</link><link>one</link><link>hdf5</link><test>chr</test><test>cnf</test><test>ems</test><test>prm</test><test>starmem</test><test>hdf5</test><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
