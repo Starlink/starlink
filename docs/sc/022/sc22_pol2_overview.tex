@@ -4,9 +4,9 @@
 
 The POL-2 instrument is a linear polarimiter for the 
 Submillimetre Common User Bolometer Array-2 (SCUBA-2), a 10,000 
-bolomtere camera on the JCMT \cite{Friberg}.
-
-\subsection*{}
+bolomtere camera on the JCMT \cite{Friberg}\cite{Bastien2011}. SCUBA-2 operates
+simultaneously at both 850 and \SI{450}{\micro\metre}. The POL-2
+instrument is currently commissioned at \SI{850}{\micro\metre} only.
 
 
 \subsection*{Polarization}
@@ -14,6 +14,14 @@ bolomtere camera on the JCMT \cite{Friberg}.
 A quick flick through any text book on optics will yield a section
 on the scattering of light and its description. Conventionally light
 is described in terms of the four Stokes parameters: I, Q, U and V.
+
+%\begin{equation}
+%\left( \begin{array}{c}
+%I\\
+%Q \\
+%U\\
+%V  \end{array} \right)
+%\end{equation}
 
 I is the total intensity, Q, is the radiation linearly polarized in the
 direction parallel or perpendicular to the reference plane. U, is the
@@ -47,9 +55,13 @@ IP is the instrument polarization. The IP affects both Q
 
 \subsection*{How POL-2 works}
 
-As described in the POL-2 commissioning document 
-the POL-2 polarimeter for SCUBA-2 is a single beam polarimeter. 
-The POL-2 polarimeter utilizes three optical components
+POL-2 sits in front of the window to the SCUBA-2 instrument
+as is seen in Figure \ref{fig:pol2sc2}. POL-2 covers the full
+field of view of SCUBA-2.
+
+POL-2 in itself is not a detector - thus requiring SCUBA-2 
+and its detectors for operation. The POL-2 polarimeter
+utilizes three optical components
 that cover the full field of SCUBA-2: 
 
 \begin{enumerate}\itemsep-0.2em
@@ -65,7 +77,6 @@ radiation. The rotating linear polarised component is
 transmitted or reflected by the grid causing a modulation in the transmitted
 intensity. 
 
-
 The total radiation passing through the polarimeter is detected by
 SCUBA-2. The polarimeter detects an intensity (I$_{detected}$) that is a
 combination of \emph{both} the unploarized intensity (I$_{unpolarised}$)
@@ -79,7 +90,43 @@ I_{detected} = \frac{I_{unpolarised}}{2}+ PI\cdot\left(\frac{1+\cos(4\phi)}{2} \
 
 where $\phi$ is the angle of the HWP.
 
-...
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=0.4\linewidth]{pol2-out-of-beam.png}
+\includegraphics[width=0.4\linewidth]{pol2-in-beam.png}
+\label{fig:pol2sc2}
+\caption [POL-2 mounted on SCUBA-2]{
+  \small POL-2 mounted on the front of SCUBA-2. 
+  The left image shows the SCUBA-2
+  window. The right image shows the components of POL-2 inserted
+  in front of the SCUBA-2 window: the calibrator grid, rotating HWP
+  and the analyzer grid. The calibrator grid is only inserted
+  for test purposes.
+}
+\end{center}
+\end{figure}
+
+
+
+
+\subsection*{The Half Wave Plate:}
+
+As described in the POL-2 commissioning document 
+the HWP is made out of five individual sapphire layers approximately 0.9
+mm thick and 200 mm in diameter. The transmission of sapphire is good at
+\SI{850}{\micro\metre} and absorbs somewhat at \SI{450}{\micro\metre}, depending on the thickness and ambient
+temperature. The total transmission of the HWP integrated across the 850
+and \SI{450}{\micro\metre} filter bands are about 86\% and 57\% respectively 
+(Savini et al. 2009 - insert full reference).
+
+
+
+
+Rotating the HWP rotates any linear polarised component of incoming radiation.
+
+
+
+
 
 
 \begin{figure}[t!]
@@ -100,44 +147,7 @@ where $\phi$ is the angle of the HWP.
 \end{figure}
 
 
-\subsection*{The Half Wave Plate:}
 
-As described in the POL-2 commissioning document 
-the HWP is made out of five individual sapphire layers approximately 0.9
-mm thick and 200 mm in diameter. The transmission of sapphire is good at
-850μm and absorbs somewhat at 450μm, depending on the thickness and ambient
-temperature. The total transmission of the HWP integrated across the 850
-and 450μm filter bands are about 86\% and 57\% respectively 
-(Savini et al. 2009 - insert full reference).
-
-
-
-
-Rotating the HWP rotates any linear polarised component of incoming radiation.
-
-
-
-
-
-
-\end{center}
-\end{figure}
-
-
-\begin{figure}[t!]
-\begin{center}
-\includegraphics[width=0.4\linewidth]{pol2-out-of-beam.png}
-\includegraphics[width=0.4\linewidth]{pol2-in-beam.png}
-\label{fig:pol2sc2}
-\caption [POL-2 mounted on SCUBA-2]{
-  \small POL-2 mounted on SCUBA-2. The left image shows the SCUBA-2
-  window. The right image shows the components of POL-2 inserted
-  in front of the SCUBA-2 window: the calibrator grid, rotating HWP
-  and the analyzer grid. The calibrator grid is only inserted
-  for test purposes.
-}
-\end{center}
-\end{figure}
 
 
 \section{Instrument Polarization}
@@ -160,6 +170,20 @@ The POLCV\_DAISY scan mode is similar to the established Daisy scan mode
 routinely used for non-polarimetric SCUBA-2 observations of point-like or compact
 sources. However it is slightly altered to allow for a slower telescope scanning
 speed.
+
+
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=0.6\linewidth]{scan_pattern_daisy_comparison.png}
+\label{fig:scancompsrison}
+\caption [Scan Pattern Comparison]{
+  \small
+}
+\end{center}
+\end{figure}
+
+
+
 
 The telescope must scan slowly enough to obtain sufficient data at each 
 point on the sky that good $Q$ and $U$ values may be determined. The current 
@@ -200,6 +224,15 @@ Half-wave plate rotation frequency& \SI{2}{Hz}\\
 \end{table}
 
 
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=0.6\linewidth]{POLCV_DAISY_schematic_detailed.png}
+\label{fig:scandetail}
+\caption [Detail of POL-2 Scan Pattern]{
+  \small
+}
+\end{center}
+\end{figure}
 
 
 \section{The raw data}

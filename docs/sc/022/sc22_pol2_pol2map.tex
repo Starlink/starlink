@@ -46,4 +46,36 @@ The POL-2 data reduction builds upon the SCUBA-2 data reduction
 
 \section{\xlabel{tailoredDR}Tailoring your reduction}
 
+\subsection*{variances between POL-2 maps}
+
+MAPVAR is a parameter that controls the variances in the coadded 
+I, Q and U maps are formed.
+
+If  MAPVAR is set TRUE, the variances in the coadded I, Q and U maps
+are formed from the spread of pixel data values in the individual
+observation maps. If MAPVAR is FALSE (the default), the variances in
+the coadded maps are formed (as in previous versions of pol2map) by
+propagating the pixel variance values created by makemap from the
+individual observation maps.
+
+Only use MAPVAR=TRUE if you have enough observations to
+make the variances between them meaningful. It's hard to put a lower
+limit on it, but it is advised that at a minimum 10 observations.
+
+
+If you want to test the effect of this option on a field for which you
+already have the I, Q and U maps from a set of individual
+observations, you can do the following:
+
+\begin{terminalv}
+% pol2map in=maps/\* iout=imapvar qout=qmapvar uout=umapvar mapvar=yes \
+                   ipcor=no cat=cat_mapvar debias=yes
+\end{terminalv}
+
+assuming your I, Q and U maps are in directory "maps". The variances
+in imapvar.sdf qmapvar.sdf and umapvar.sdf will be calculated using
+the new method, and these variances will then be used to form the
+errors in the cat_mapvar.FIT catalogue.
+
+
 
