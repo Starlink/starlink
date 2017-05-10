@@ -45,6 +45,8 @@
 #        Use link scripts
 #     05-SEP-2008 (TIMJ):
 #        Use starutil_link
+#     10-MAY-2017 (DSB):
+#        Include PSX is list of required libraries.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -52,7 +54,7 @@
 
 #-
 
-      echo -lone `ems_link` `cnf_link` `starutil_link` \
+      echo -lone `psx_link` `ems_link` `cnf_link` `starutil_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

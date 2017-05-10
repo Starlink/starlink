@@ -45,6 +45,8 @@
 #        ADAM version of one_link
 #     5-SEP-2008 (TIMJ):
 #        Add starutil
+#     10-MAY-2017 (DSB):
+#        Include PSX is list of required libraries.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -52,7 +54,7 @@
 
 #-
 
-      echo -lone `ems_link_adam` `cnf_link_adam` `starutil_link` \
+      echo -lone `psx_link_adam` `ems_link_adam` `cnf_link_adam` `starutil_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
