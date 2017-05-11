@@ -36,7 +36,7 @@
 </component>
 
 <component id="atools" support="S">
-  <version>1.9-14</version>
+  <version>1.9-15</version>
   <path>applications/atools</path>
   <description>ATOOLS - AST applications</description>
   <abstract><p>
@@ -172,7 +172,7 @@ including FITS.
 </component>
 
 <component id="cupid" support="S">
-  <version>2.2</version>
+  <version>2.3</version>
   <path>applications/cupid</path>
   <description>CUPID - AST applications</description>
   <abstract><p>
@@ -632,7 +632,7 @@ JCMT telescope based on Mauna Kea, Hawaii.
 </component>
 
 <component id="gaia" support="S">
-  <version>4.4-7</version>
+  <version>4.4-8</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
@@ -835,7 +835,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>2.4-4</version>
+  <version>2.5-0</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -3113,7 +3113,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>8.3.0</version>
+  <version>8.5.1</version>
   <path>libext/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -3155,7 +3155,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="pal" support="S">
-  <version>0.9.1</version>
+  <version>0.9.7</version>
   <path>libext/pal</path>
   <description>Positional Astronomy Library</description>
   <abstract><p>
@@ -3299,7 +3299,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="cat" support="S">
-  <version>8.3</version>
+  <version>8.4</version>
   <path>libraries/cat</path>
   <description>CAT -- Catalogue and Table Manipulation Library</description>
   <abstract><p>
@@ -4136,7 +4136,7 @@ Ultrix and for SunOS and may still work for them.
   in other more focussed Starlink libraries.
     </p></abstract>
   <dependencies >
-    <build>sae</build><build>ems</build><build>cnf</build><build>prm</build><build>starutil</build><link>ems</link><link>cnf</link><link>psx</link><link>starutil</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>ems</build><build>cnf</build><build>psx</build><build>prm</build><build>starutil</build><link>ems</link><link>cnf</link><link>psx</link><link>starutil</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

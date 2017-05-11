@@ -1909,6 +1909,7 @@ $(MANIFESTS)/one: \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/prm \
+		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
