@@ -413,7 +413,12 @@
 *          between the detector positions array (RECEPPOS) and positions
 *          implied by the FPLANEX/Y arrays. If a false value is supplied,
 *          a warning is issued but the application proceeds. See also
-*          parameter USEDETPOS. [FALSE]
+*          parameters POSERRMAX and USEDETPOS. [FALSE]
+*     POSERRMAX = _REAL (Read)
+*          Defines the maximum insignificant discrepancy between the
+*          detector positions array (RECEPPOS) and positions implied by
+*          the FPLANEX/Y arrays, in units of arc-seconds. See parameter
+*          POSERRFATAL. [3.0]
 *     REF = NDF (Read)
 *          An existing NDF that is to be used to define the output grid,
 *          or the string "JSA". If an NDF is supplied, the output grid will
@@ -894,11 +899,14 @@
 *     14-OCT-2014 (DSB):
 *        Handle cases where the target is moving but the output cube has
 *        absolute sky coords (e.g. when creating JSA tiles for moving targets).
+*     11-MAY-2017 (DSB):
+*        Add parameter POSERRMAX.
 
 *  Copyright:
+*     Copyright (C) 2017 East Asian Observatory.
 *     Copyright (C) 2007-2014 Science and Technology Facilities Council.
-*     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
-*     Council. Copyright (C) 2006-2008,2013 University of British Columbia.
+*     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2006-2008,2013 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -1007,6 +1015,7 @@ void smurf_makecube( int *status ) {
    float median;              /* Median data value */
    float polbinsize;          /* Angular size of polarisation bins */
    float polbinzero;          /* Angle at centre of first polarisation bin */
+   float poserrmax;           /* Max error between RECEPPOS and FPLANEX/Y, arcsec */
    float teff;                /* Effective integration time */
    float var;                 /* Variance value */
    int ***ptime;              /* Holds time slice indices for each bol bin */
@@ -1180,13 +1189,17 @@ void smurf_makecube( int *status ) {
    should trigger a fatal error. */
    parGet0l( "POSERRFATAL", &poserrfatal, status );
 
+/* Get the max allowed discrepancy between  RECEPPOS and FPLANEX/Y, in
+   arc-seconds. */
+   parGet0r( "POSERRMAX", &poserrmax, status );
+
 /* Calculate the default grid parameters (these are only used if no
    reference spatial WCS was obtained). This also modifies the contents
    of "detgrp" if needed so that it always holds a list of detectors to be
    included (not excluded). */
    smf_cubegrid( igrp,  size, system, usedetpos, autogrid, alignsys,
-                 detgrp, spacerefwcs ? NULL : par, poserrfatal, &moving,
-                 &oskyfrm, &sparse, &hastsys, status );
+                 detgrp, spacerefwcs ? NULL : par, poserrfatal, poserrmax,
+                 &moving, &oskyfrm, &sparse, &hastsys, status );
 
 /* If we have spatial reference WCS, use the SkyFrame from the spatial
    reference WCS. */

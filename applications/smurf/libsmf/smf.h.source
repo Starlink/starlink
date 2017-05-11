@@ -735,7 +735,7 @@ void smf_check_convergence( smfDIMMData *dat, int maxiter, double maptol,
 
 void smf_check_coords( smfData *data, int *status );
 
-int smf_check_detpos( smfData *data, int report, int *status );
+int smf_check_detpos( smfData *data, float mxerr, int report, int *status );
 
 void smf_check_flat ( const smfData *data, int *status );
 
@@ -975,8 +975,8 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                    int autogrid, int alignsys, Grp *detgrp, double par[ 7 ],
-                   int isjsa, int *moving, AstSkyFrame **skyframe, int *sparse,
-                   int *gottsys, int *status );
+                   int poserrfatal, float poserrmax, int *moving,
+                   AstSkyFrame **skyframe, int *sparse, int *gottsys, int *status );
 
 int smf_dataOrder( ThrWorkForce *wf, smfData *data, int isTordered, int *status );
 

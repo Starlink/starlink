@@ -3434,6 +3434,14 @@ package @PACKAGE@ {
                 default FALSE
                 helpkey *
             }
+            parameter poserrmax {
+                type _REAL
+                vpath DEFAULT
+                ppath DEFAULT
+                prompt {Max error between RECEPPOS and FPLANEX/Y (arcsec)}
+                default 3.0
+                helpkey *
+            }
             parameter ref {
                 type NDF
                 access READ

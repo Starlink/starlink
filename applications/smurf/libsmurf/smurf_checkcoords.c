@@ -28,6 +28,8 @@
 *     the arc-distance from this converted position to the corresponding
 *     TCS_TR_AC1/2 position. This is done for every time slice, and the
 *     statistics of the resulting separations are displayed, in arc-seconds.
+*     A warning message is reported if any separations larger than 3
+*     arc-seconds are found.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -42,8 +44,11 @@
 *        Initial version.
 *     27-NOV-2013 (DSB):
 *        Also check the detector positions for ACSIS data.
+*     11-MAY-2017 (DSB):
+*        Set the max expected discrepancy at 3 arc-seconds.
 
 *  Copyright:
+*     Copyright (C) 2017 East Asian Observatory.
 *     Copyright (C) 2013 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -120,7 +125,7 @@ void smurf_checkcoords( int *status ) {
 
 /* Check the detector positions (for ACSIS data). */
       msgBlank( status );
-      smf_check_detpos( data, 1, status );
+      smf_check_detpos( data, 3.0, 1, status );
 
 /* Calculate and display statistics of the AZEL <> TRACKING separations
    in the current file. */

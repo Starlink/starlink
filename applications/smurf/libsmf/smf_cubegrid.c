@@ -15,8 +15,9 @@
 *  Invocation:
 *     smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 *                   int autogrid, int alignsys, Grp *detgrp, double par[ 7 ],
-*                   int poserrfatal, int *moving, AstSkyFrame **skyframe,
-*                   int *sparse, int *gottsys, int *status );
+*                   int poserrfatal, float poserrmax, int *moving,
+*                   AstSkyFrame **skyframe, int *sparse, int *gottsys,
+*                   int *status );
 
 *  Arguments:
 *     igrp = Grp* (Given)
@@ -69,6 +70,9 @@
 *        disagreement between the detector positions implied by the RECEPPOS
 *        and FPLANEX/Y components of the ACSIS extension (otherwise, a mere
 *        warning is issued).
+*     poserrmax = float (Given)
+*        The maximum separation allowed between RECEPPOS and FPLANEX/Y, in
+*        arc-seconds.
 *     moving = int* (Returned)
 *        Address of an int in which to return a flag indicating if the
 *        telescope is tracking a moving object. If so, the returned
@@ -203,11 +207,14 @@
 *        Use smf_set_moving to assign attributes for a moving target,
 *        rather than just setting SkyRefIs (smf_set_moving also sets
 *        AlignOffset).
+*     11-MAY-2017 (DSB):
+*        Add argument poserrmax.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006,2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2008-2013 Science & Technology Facilities Council.
+*     Copyright (C) 2017 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -255,8 +262,9 @@
 
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                    int autogrid, int alignsys, Grp *detgrp, double par[ 7 ],
-                   int poserrfatal, int *moving, AstSkyFrame **skyframe, int *sparse,
-                   int *gottsys, int *status ){
+                   int poserrfatal, float poserrmax, int *moving,
+                   AstSkyFrame **skyframe, int *sparse, int *gottsys,
+                   int *status ){
 
 /* Local Variables */
    AstFrame *sf1 = NULL;      /* Spatial Frame representing AZEL system */
@@ -388,7 +396,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 /* Check that the detector sky positions implied by the RECEPPOS and FPLANEX/Y
    values in the file are consistent. Issue a warning message if not, but
    then continue. */
-      (void) smf_check_detpos( data, poserrfatal ? -1 : 1, status );
+      (void) smf_check_detpos( data, poserrmax, poserrfatal ? -1 : 1, status );
 
 /* Get some convenient pointers. */
       file = data->file;

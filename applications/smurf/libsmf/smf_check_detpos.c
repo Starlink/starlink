@@ -13,17 +13,21 @@
 *     C function
 
 *  Invocation:
-*     result = smf_check_detpos( smfData *data, int report, int *status );
+*     result = smf_check_detpos( smfData *data, float mxerr, int report,
+*                                int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
 *        Pointer to the smfData structure holding the data to be
 *        checked.
+*     mxerr = float (Given)
+*        The maximum separation allowed, in arc-seconds.
 *     report = int (Given)
 *        If greater than zero, then a warning message is reported if the
-*        RECEPPOS and FPLANEX/Y positions are not consistent. If less than
-*        zero, then an error is reported if the RECEPPOS and FPLANEX/Y
-*        positions are not consistent.
+*        RECEPPOS and FPLANEX/Y positions are not consistent (i.e. have a
+*        separataion larger than "mxerr"). If less than zero, then an
+*        error is reported if the RECEPPOS and FPLANEX/Y positions are
+*        not consistent.
 *     status = int* (Given and Returned)
 *        Pointer to inherited status.
 
@@ -36,9 +40,9 @@
 *     RECEPPOS and FLPANEX/Y values in the supplied data structure are
 *     consistent. It converts the detector positions in the first time
 *     slice into sky positions using the RECEPPOS values, and then does
-*     the same again using the FPLANEX/Y values. It then finds the
-*     maximum discrepancy on the sky between the converted detector
-*     positions. If this discrepancy is more than 1 arc-second, a warning
+*     the same again using the FPLANEX/Y values. It then finds the maximum
+*     discrepancy on the sky between the converted detector positions.
+*     If this discrepancy is more than "mxerr" arc-seconds, a warning
 *     message or error is issued (if "report" is non-zero), and a zero value
 *     is returned as the function value. If the detector positions in the
 *     first time slice cannot be determined, subsequent time slices are
@@ -55,10 +59,14 @@
 *        Avoid problems caused by breaking out of time slice loop.
 *     25-NOV-2013 (DSB):
 *        Allow an error to be reported instead of a warning.
+*     11-MAY-2017 (DSB):
+*        Add argument "mxerr". Previously the max error was hard-wired at
+*        1 arc-second.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2009,2013 Science & Technology Facilities Council.
+*     Copyright (C) 2017 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -93,7 +101,7 @@
 #include "smf_err.h"
 #include "smf.h"
 
-int smf_check_detpos( smfData *data, int report, int *status ){
+int smf_check_detpos( smfData *data, float mxerr, int report, int *status ){
 
 /* Local Variables */
    AstFrame *frm = NULL;      /* Sky Frame from input WCS FrameSet */
@@ -226,9 +234,9 @@ int smf_check_detpos( smfData *data, int report, int *status ){
                      if( dist != AST__BAD && dist > max_dist ) max_dist = dist;
                   }
 
-/* If this distance is more than 1 arc-second, report a warning or error. */
+/* If this distance is more than "mxerr" arc-seconds, report a warning or error. */
                   if( max_dist != VAL__MIND ) {
-                     result = ( max_dist*AST__DR2D <= 1.0/3600 );
+                     result = ( max_dist*AST__DR2D <= mxerr/3600.0 );
                      if( ! result && report ) {
                         smf_smfFile_msg( data->file, "FILE", 1, "<unknown file>" );
                         msgSetr( "MAX", (float)( max_dist*AST__DR2D*3600.0) );
