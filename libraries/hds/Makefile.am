@@ -25,12 +25,15 @@ libhdsf_la_SOURCES = \
 
 libhdsf_la_LIBADD = libhds.la `ems_link` `one_link` `chr_link`
 
+libhds_la_CFLAGS = $(AM_CFLAGS) -DHDS_INTERNAL_INCLUDES
+libhdsf_la_CFLAGS = $(AM_CFLAGS) -DHDS_INTERNAL_INCLUDES
+
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).
 if !NOPIC
-libhds_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+libhds_la_CFLAGS = $(libhds_la_CFLAGS) -prefer-pic
 libhds_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
-libhdsf_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+libhdsf_la_CFLAGS = $(libhdsf_la_CFLAGS) -prefer-pic
 libhdsf_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 endif
 
