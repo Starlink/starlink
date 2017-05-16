@@ -3410,7 +3410,6 @@ F77_SUBROUTINE(hds_infoi)( CHARACTER(locator),
    char *topic_c;
    char *extra_c;
    HDSLoc * locator_c = NULL;
-   HDSLoc * locp = NULL;
 
 /* Enter routine.	*/
 
@@ -3421,14 +3420,13 @@ F77_SUBROUTINE(hds_infoi)( CHARACTER(locator),
    /* Import locator - NOLOC is valid but datImportFloc
       will get upset with NOLOC */
    if (strncmp(DAT__NOLOC, locator, locator_length) == 0) {
-     locp = NULL;
+     locator_c = NULL;
    } else {
-     locp = locator_c;
      datImportFloc( locator, locator_length, &locator_c, status );
    }
 
 /* Call pure C routine                                       */
-   hdsInfoI( locp, topic_c, extra_c, result, status);
+   hdsInfoI( locator_c, topic_c, extra_c, result, status);
 
 /* Free allocated string memory.                             */
    cnfFree( topic_c );
