@@ -389,8 +389,16 @@ void smurf_pol2check( int *status ) {
                   astMapPutElemC( km, "MAP_INFO", -1, buf );
 
 /* Get the waveband. */
-                  astGetFitsS( fc, "SUBARRAY", &cval );
-                  wave = (cval[1] == '8') ? "S8" : "S4";
+                  astGetFitsS( fc, "FILTER", &cval );
+                  if( !strncmp( cval, "850", 3 ) ) {
+                     wave = "S8";
+                  } else if( !strncmp( cval, "450", 3 ) ) {
+                     wave = "S4";
+                  } else if( *status == SAI__OK ) {
+                     *status = SAI__ERROR;
+                     errRepf("","Unsupported FILTER header value "
+                                "'%s' found in %s.", status, cval, filepath );
+                  }
                }
             }
 
