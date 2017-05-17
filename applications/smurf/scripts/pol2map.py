@@ -21,6 +21,9 @@
 *     Masking of models within makemap (AST, etc) can be based either on the
 *     SNR of the map created as the end of each iteration, or on an external
 *     map, or on a fixed circle centred on the origin - see parameter MASK.
+*
+*     By default, the Q, U, I and PI catalogue values are in units of
+*     Jy/beam (see parameter Jy).
 
 *  Usage:
 *     pol2map in iout qout uout [cat] [config] [pixsize] [qudir] [mapdir]
@@ -125,6 +128,11 @@
 *        TRUE if a correction for statistical bias is to be made to
 *        percentage polarization and polarized intensity in the output
 *        vector catalogue specified by parameter CAT. [FALSE]
+*     FCF = _REAL (Read)
+*        The FCF value that is used to convert I, Q and U values from pW
+*        to Jy/Beam. If a null (!) value is supplied a default value is
+*        used that depends on the waveband in use - 725.0 for 850 um and
+*        962.0 for 450 um. [!]
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
 *        Allowed values are as for "ILEVEL". The log file to create is
@@ -172,7 +180,7 @@
 *        time-series files will be converted into individual maps (one for
 *        each file) using SMURF:MAKEMAP, and placed in the directory
 *        specified by parameter MAPDIR. These maps are created only for
-*        the required Stokes parameters - as indiciated by parameters
+*        the required Stokes parameters - as indicated by parameters
 *        IOUT, QOUT and UOUT.
 *
 *        - a two-dimensional map holding Stokes Q, U or I values. Any
@@ -205,6 +213,12 @@
 *        for IPREF, the map supplied for parameter REF is used. The map must
 *        be in units of pW. If the same value is supplied for both IOUT
 *        and IPREF, the output I map will be used for IP correction. [!]
+*     JY = _LOGICAL (Read)
+*        If TRUE, the I, Q and U values in the output catalogue will be
+*        in units of Jy/beam. Otherwise they will be in units of pW. Note,
+*        the Q, U and I maps are always in units of pW. The same FCF value
+*        is used to convert all three Stokes parameters from pW to Jy/beam.
+*        See parameter FCF. [TRUE]
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -236,13 +250,13 @@
 *        map.
 *
 *        If MAPVAR is TRUE, the variances in the coadded maps are
-*        determined from the spread of input values (i.e. the pixel 
+*        determined from the spread of input values (i.e. the pixel
 *        values from the individual observation maps) that fall in each
-*        pixel of the coadd. 
+*        pixel of the coadd.
 *
 *        The two methods produce similar variance estimates in the
-*        background regions, but MAPDIR=TRUE usually creates much higher 
-*        on-source errors than MAPDIR=FALSE. Only use MAPDIR=TRUE if you 
+*        background regions, but MAPDIR=TRUE usually creates much higher
+*        on-source errors than MAPDIR=FALSE. Only use MAPDIR=TRUE if you
 *        have enough input observations to make the variance between the
 *        individual observation maps statistically meaningful. [FALSE]
 *     MASK = LITERAL (Read)
@@ -558,6 +572,12 @@ try:
    params.append(starutil.Par0L("MAPVAR", "Use variance between observation maps?",
                                  False, noprompt=True))
 
+   params.append(starutil.Par0L("Jy", "Should outputs be converted from pW to Jy/beam?",
+                                True, noprompt=True))
+
+   params.append(starutil.Par0F("FCF", "pW to Jy/beam conversion factor",
+                                None, noprompt=True ))
+
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
    parsys = ParSys( params )
@@ -735,6 +755,32 @@ try:
          refpw = NDG(1)
          invoke("$KAPPA_DIR/cdiv in={0} scalar={1} out={2}".format(ref,ref_fcf,refpw) )
          ref = refpw
+
+#  See if we should store I, Q and U values in Jy/beam in the output
+#  calatlogue.
+   jy = parsys["JY"].value
+
+#  If we are converting to Jy/beam, get the FCF.
+   if jy:
+      fcf = parsys["FCF"].value
+
+#  If no FCF supplied, get the waveband and get the corresponding default
+#  FCF value.
+      if fcf is None:
+         try:
+            filter = int( float( starutil.get_fits_header( indata[0], "FILTER", True )))
+         except NoValueError:
+            filter = 850
+            msg_out( "No value found for FITS header 'FILTER' in {0} - assuming 850".format(indata[0]))
+
+         if filter == 450:
+            fcf = 962.0
+         elif filter == 850:
+            fcf = 725.0
+         else:
+            raise starutil.InvalidParameterError("Invalid FILTER header value "
+                   "'{0} found in {1}.".format( filter, indata[0] ) )
+
 
 #  If IP correction is to be performed, get the map to be used to define
 #  the IP correction.
@@ -1724,6 +1770,14 @@ try:
 #  POLPACK needs to know the order of I, Q and U in the 3D cube. Store
 #  this information in the POLPACK enstension within "cube.sdf".
          invoke( "$POLPACK_DIR/polext in={0} stokes=qui".format(cube) )
+
+#  If required, scale the I, Q and U values from pW to Jy/beam.
+         if jy:
+            tcube = NDG( 1 )
+            invoke( "$KAPPA_DIR/cmult in={0} out={1} scalar={2}".
+                    format(cube,tcube,fcf) )
+            invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy/beam".format(tcube))
+            cube = tcube
 
 #  Create a FITS catalogue containing the polarisation vectors.
          msg_out( "Creating the output catalogue: '{0}'...".format(outcat) )
