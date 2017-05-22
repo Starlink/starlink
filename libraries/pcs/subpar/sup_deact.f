@@ -146,7 +146,7 @@
 *        locator in PAR tables was the correct thing to copy to GLOBAL.)
 *     20-MAR-2008 (DSB):
 *        When copying a parameter value from the application parameter
-*        file to the global parameter file, check that he application
+*        file to the global parameter file, check that the application
 *        parameter exists before accesing it. If a parameter (such as an
 *        output NDF) is specified on the command line, it becomes active.
 *        But if the application never accesses the parameter (because it
@@ -154,6 +154,10 @@
 *        exist in the application parameter file. The old system was to
 *        report an error in this situation. The new system just ignores
 *        the parameter.
+*     22-MAY-2017 (DSB):
+*        Use EMS error reporting environments rather than just using a
+*        local status variable. This guards against accidentally anulling
+*        any pre-existing error messages.
 *     {enter_further_changes_here}
 
 *  Deficiencies:
@@ -205,7 +209,6 @@
                                        ! locator exists
       LOGICAL ACTGOT                   ! .TRUE. if action parameter store
                                        ! locator already obtained
-      INTEGER ISTAT                    ! temporary status
       CHARACTER*15 STRINGTYPE(0:5)     ! possible HDS type strings
 
 *  Local Data:
@@ -412,22 +415,22 @@
             ENDIF
 
 *         Even if the STATUS is not OK,
-            ISTAT = SAI__OK
+            CALL EMS_BEGIN( STATUS )
 
 *         If the task type is not 'I', or the parameter is not active
 *         or null, reset it back to the ground state;
             IF ( (TTYPE .NE. 'I') .OR.
      :         ( ( PARSTATE(J) .NE. SUBPAR__ACTIVE ) .AND.
      :         ( PARSTATE(J) .NE. SUBPAR__NULL ) ) ) THEN
-               CALL SUBPAR_CANCL ( J, ISTAT )
+               CALL SUBPAR_CANCL ( J, STATUS )
                PARSTATE(J) = SUBPAR__GROUND
 
 *         otherwise just ensure that associated HDS files are freed for
 *         use by others.
             ELSE IF ( PARTYPE(J) .GE. 20 ) THEN
-               CALL SUBPAR_GETFLOC ( J, VALID, FILOC, ISTAT )
+               CALL SUBPAR_GETFLOC ( J, VALID, FILOC, STATUS )
                IF ( VALID ) THEN
-                  CALL HDS_FREE ( FILOC, ISTAT )
+                  CALL HDS_FREE ( FILOC, STATUS )
                ENDIF
             ENDIF
 
@@ -435,6 +438,9 @@
             PARDYN(1,J) = 0
             PARMIN(1,J) = 0
             PARMAX(1,J) = 0
+
+*         Restore the original error reporting environment.
+            CALL EMS_END( STATUS )
 
 *      End of parameter loop
          ENDDO
@@ -460,12 +466,14 @@
 *   If SUBPAR_DEACT is called via a RESET message, these locators will
 *   not be valid, having been annulled previously.
       IF ( MONOLITH ) THEN
-         ISTAT = SAI__OK
-         CALL HDS_FLUSH( 'PROGRAM', ISTAT )
+         CALL EMS_BEGIN( STATUS )
+         CALL HDS_FLUSH( 'PROGRAM', STATUS )
+         CALL EMS_END( STATUS )
       ENDIF
 
 *   Force the parameter SDF file to be updated on disk
-      ISTAT = SAI__OK
-      CALL HDS_FREE ( EXTTOP, ISTAT )
+      CALL EMS_BEGIN( STATUS )
+      CALL HDS_FREE ( EXTTOP, STATUS )
+      CALL EMS_END( STATUS )
 
       END

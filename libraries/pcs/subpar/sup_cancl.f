@@ -69,6 +69,11 @@
 *        Add INCLUDE DAT_PAR
 *      3-FRB-2000 (AJC):
 *        Use SUBPAR_PARGP to get the HDS group name for the parameter
+*     22-MAY-2017 (DSB):
+*        Use an error reporting environment instead of just saving the
+*        status value. The old code causes any pre-existing error
+*        messages to be lost if emsAnnul was called within (or below)
+*        this routine.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -113,17 +118,14 @@
       LOGICAL VALID                  ! .TRUE. => a locator exists for
                                      ! the named parameter
 
-      INTEGER ISTAT
-
-
 *.
 
 
 *
-*   preserve the entry status
+*   Use a new error reporting context.
 *
-      ISTAT = STATUS
-      STATUS = SAI__OK
+      CALL EMS_BEGIN( STATUS )
+
 *
 *   Get the locator to the parameter's associated data.
 *
@@ -155,10 +157,10 @@
       PARSTATE(NAMECODE) = SUBPAR__CANCEL
       PARTYPE(NAMECODE) = MOD ( PARTYPE(NAMECODE), 10 )
 *
-*   Restore the status
+*   End the current error reporting environment, thus restoring any
+*   original bad status, or retaing any new bad status if the original
+*   status was good.
 *
-      IF ( ISTAT .NE. SAI__OK ) THEN
-         STATUS = ISTAT
-      ENDIF
+      CALL EMS_END( STATUS )
 
       END
