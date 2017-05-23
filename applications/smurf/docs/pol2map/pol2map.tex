@@ -1,12 +1,12 @@
+\PassOptionsToPackage{font=footnotesize}{caption}
 \documentclass[twoside,11pt]{starlink}
 \usepackage{graphicx}
 \usepackage{pdfpages}
 \usepackage{float}
 \usepackage[labelformat=empty]{subfig}
-\usepackage[font=footnotesize]{caption}
 
 \stardocauthors     {D.S. Berry }
-\stardocdate        {4th April 2017}
+\stardocdate        {12th April 2017}
 \stardoctitle       {POL-2 data reduction using POL2MAP}
 \stardocversion     {V1.1}
 \stardocabstract    {A description and analysis of the SMURF:POL2MAP
@@ -488,7 +488,7 @@ of section~\ref{se1}. Similarly the grey boxes labelled ``Run 2'' and ``Run
 of \texttt{pol2map} described in steps 3 and 4 of section~\ref{se1}.
 
 \begin{figure}
-\includegraphics[width=.99\linewidth]{pol2map_flow.pdf}
+\includegraphics[width=.99\linewidth]{figs/pol2map_flow.eps}
 \caption{The \texttt{pol2map} data flow for the case of three
 observations being processed. Each grey box refers to a single invocation
 of \texttt{pol2map}.}
@@ -1054,17 +1054,435 @@ and 20160125.
 
 \begin{itemize}
 \item Further verification of the results presented in section~/ref{sec:results}.
-\item \texttt{pol2map} should be used to process some simulated data, so that
-we can check that we get out what we put in with sufficient accuracy.
 \item As yet no attempt has been made to determine whether these results are
 consistent with the canonical value of 1.35 for the POL2 degradation factor at 850
 $\mu m$. This could be done by comparing I maps of points sources
 created from POL2 observations using \texttt{pol2map}, with maps made
 from non-POL2 data using \texttt{makemap} directly. Point sources need to
-be used rather than extended sources to avoid complexities caused by the different spatial frequencies
-present in POL2 and non-POL2 observations.
+be used rather than extended sources to avoid complexities caused by the
+different spatial frequencies present in POL2 and non-POL2 observations.
 \item A more extensive investigation of the NEFD present within POL2 I
 maps needs to be performed.
+\end{itemize}
+
+\appendix
+\section{Using \texttt{pol2map} on simulated POL2 data}
+
+This section compares maps made by \texttt{pol2map} from simulated POL2
+data, with the known astronomical I, Q and U maps from which the
+simulated data were generated. The main purpose is to investigate the
+following questions:
+
+\begin{itemize}
+\item Are the FCFs for the reconstructed I maps the same as those for the
+reconstructed Q and U maps? If so, the FCF will cancel out when forming
+fractional polarisations and angles, and so becomes unnecessary for most
+purposes\footnote{The exception is if the polarised intensity, in Jy, is
+the quantity of scientific interest.}.
+\item Do the reconstructed I, Q and U maps contain the same spatial
+frequencies? This is desirable if the I maps are used to perform IP
+correction on the Q and U maps.
+\item How does the noise, FCF and spatial frequency response change as you
+change the PCA.PCATHRESH value?
+\end{itemize}
+
+The final conclusions section in this appendix contains a summary of the
+answers to these questions.
+
+\subsection{The simulated data}
+The known I map from which the simulated POL-2 values are generated contains
+a single Gaussian blob of emission. Many separate simulations were
+performed in which the size and brightness of the blob were varied. The
+known Q and U maps were generated from the known I map assuming a
+constant polarisation of 5\% parallel to the reference
+direction\footnote{Thus the known U value is always zero.}.
+
+The simulated data is created using a real POL2 observation as a template
+to define the half-wave plate position and sky position associated with
+each bolometer sample. The observation used was observation 50 from
+20160508 - a POL2 observation of CB 68. This is not quite  a blank field,
+but the levels of astronomical Q and U seen in this observation are
+barely significant. However, care is taken to exclude the real astronomical
+signal present in the template observation when comparing the
+reconstructed I, Q and U maps with the known I , Q and U maps described
+above.
+
+Multiple simulations were performed in which the size and strength of the
+Gaussian blob were varied\footnote{The noise is constant across all
+simulations since it is defined by the template observation.}. In addition,
+for each size and strength
+combination, \texttt{pol2map} was run five times using different values
+for the PCA.PCATHRESH parameter\footnote{A notional value of zero for PCA.PCATHRESH
+is used to indicate that no PCA model was used.}. The following values were used:
+
+\begin{description}
+\item[Source FWHM (arc-seconds):] 16, 32, 48, 64, 80, 96, 112, 128
+\item[Source strength (SNR):] 10, 30, 100, 300, 1000, 3000, 10000
+\item[PCA.PCATHRESH:] 0, 10, 50, 100, 150
+\end{description}
+
+Note, the source strengths above were converted from SNR to pW assuming a
+noise value of 2E-5 pW - the noise measured in maps made from the
+template observation alone. A pixel size of 4 arc-sec was used for all
+maps. A simulation was performed for each combination of the above values,
+resulting in a total of $8\times7\times5 = 280$ simulations.
+
+For each simulation, the following procedure was followed:
+
+\begin{enumerate}
+\item Select the combination of source size, source strength and
+PCA.PCATHRESH values to use in the simulation.
+\item Use \texttt{pol2map} twice to create maps of the real I, Q and U present
+in the template observation alone. These maps are created using a 2-step
+process: firstly, an auto-masked I map is created using the default value
+for PCA.PCATHRESH provided by \texttt{pol2map} (-50), secondly,
+externally-masked I, Q and U maps are created using the auto-masked I map
+to define the AST mask used by all three maps. The Q and U maps have IP
+correction based on the externally-masked I map. These externally masked
+maps are created using the PCA.PCATHRESH value associated with the
+current simulation. No extinction
+correction is used. This is so that the resulting maps can be compared
+directly with the maps generated later from the simulated data, which do
+not include extinction correction.
+\item Generate an artificial I map holding a noise free Gaussian blob with
+the current value for source size (FWHM) and source strength. This blob
+is centred at the expected  position of CB 68 in the I map created in the
+previous step.
+\item Generate maps of artificial Q and U from the above artificial I map,
+assuming a polarisation of 5\% parallel to the reference direction (the pixel
+Y axis).
+\item For each bolometer sample in the template observation, get
+the I, Q and U values from the corresponding pixel in the above
+artificial maps using \texttt{sincsinc} interpolation \footnote{Random
+pointing errors of 1.0 arc-second are introduced here.}. Combine these
+three values into an analysed intensity value using the half-wave
+plate position associated with the bolometer sample. A perfect polarimeter
+is assumed:
+
+\[ I_{rec} = \frac{1}{2}( I + Q.\cos 2\phi + U.\sin 2\phi ) \]
+
+where $I_{rec}$ is the recorded analysed intensity and $\phi$ is the
+angle between the rotated plane of polarisation and the HWP fast axis
+(i.e. $\phi = 2.WPLATE$). Instrumental
+Polarisation is added based on the ``PL3'' IP model and the I values. Add
+this artificial analysed intensity value onto the existing real bolometer
+value in the template observation. Note, the artificial data value is
+\emph{not} modified to take account of atmospheric extinction.
+
+\item Use the \texttt{pol2map} command twice to generate I, Q and U
+maps from the analysed intensity time-streams generated in the previous
+step (\emph{i.e.} these maps include both the real CB 68 signal, plus the
+signal from the artificial source). The same two-step map-making process is
+used as described for the real data in step 2.
+
+\item The real I map generated at step 2 from the template data alone is
+subtracted from the I map created in the previous step. This leaves the I
+map holding data purely from the artificial Gaussian blob alone (see
+Fig.~\ref{fig:icor}). Likewise the real Q and U data are removed from the
+Q and U maps.
+
+\begin{figure}
+\includegraphics[width=0.9\columnwidth]{figs/icor}
+\caption{Total intensity maps from the simulation for FWHM=16 SNR=30
+PCATHRESH=150. Bottom left map is the template observation alone. Bottom
+right map is the original simulated source. Top left is the reconstructed
+map made from the template observation and the simulated data. Top right
+is the residual map left after the bottom left map is subtracted from the
+top left map (\emph{i.e.} the reconstructed simulated source). }
+\label{fig:icor}
+\end{figure}
+
+\item The total source signal in the reconstructed I, Q and U maps generated by the
+previous step are found by summing the pW pixel values within a circle of
+diameter twice the source FWHM, centred on the expected source centre.
+Likewise, the  total source signal in the artificial  I, Q and U maps are
+found using the same aperture. These value allow the I, Q and U gains to
+be found. For instance, the I gain is the total value within the aperture
+in the reconstructed I map divided by the  total value within the same aperture
+in the artificial I map.
+
+\item The pol2map log files are parsed to discover the number of
+iterations that were performed when creating the reconstructed I map,
+and the normalized map change on the penultimate iteration.
+
+\end{enumerate}
+
+The end result is a table in which the columns are:
+
+\begin{itemize}
+\item Original source size (FWHM in pixels)
+\item Original source strength (SNR)
+\item PCA.PCATHRESH used to create the externally-masked reconstructed maps
+\item I gain (total source I in reconstructed map divided by total source I in artificial map)
+\item Q gain (total source Q in reconstructed map divided by total source Q in artificial map)
+\item Number of iterations
+\item Final normalized map change
+\end{itemize}
+
+No U gain column is created because the U values in the artificial maps
+are always zero, due to the choice of polarisation angle in the artificial
+data. The table contains one row for each combination of original source size,
+strength and PCATHRESH value - a total of 280 rows. This table may be
+downloaded from
+\htmladdnormallink{http://www.eao.hawaii.edu/~dberry/pol2sim.asc}
+{http://www.eao.hawaii.edu/~dberry/pol2sim.asc}, and explored using:
+
+\begin{verbatim}
+% topcat -f ascii pol2sim.asc
+\end{verbatim}
+
+\subsection{Results and Analysis}
+
+The first step in the analysis is to identify and remove the simulations
+in which the reconstructed I map did not reach convergence within 200 iterations (there
+were 54 such simulations - see Fig.~\ref{fig:converged}. The un-converged
+simulations are predominantly at the bright end of the source strength
+axis, with larger sources taking longer to converge than smaller sources.
+Also, higher values of PCA.PCATHRESH take longer to converge.
+
+\begin{figure}
+\includegraphics[width=0.9\columnwidth]{figs/converged}
+\caption{Simulations that failed to converge in 200 iterations (red dots
+are converged, blue dots are un-converged). The left-right axis is source
+strength (logarithmic), the up-down axis is PCA.PCATHRESH and the in-out axis is source
+size.}
+\label{fig:converged}
+\end{figure}
+
+One of the assumptions behind \texttt{pol2map} is that the FCF in the I,
+Q and U maps are all the same and so can be discounted when calculating
+the fractional polarisation. To test this assumption.
+Fig.~\ref{fig:iqgain} shows a scatter plot of the Q gain against the I
+gain in the table described above. It can be seen that the I and Q gains
+are approximately equal, except for noise, with a strong tendency
+to cluster around unity. However, the scatter in this plot is surprisingly
+high. The cause of this scatter is currently unknown.
+
+Figures~\ref{fig:iqgain-snr}, \ref{fig:iqgain-ssize} and
+\ref{fig:iqgain-pt} show the same data, but use colour to indicate the
+source SNR, source size and PCA threshold used. They show that large,
+faint sources have a low gain. This is confirmed in figures~\ref{fig:igain}
+and \ref{fig:qgain}. Fig.~\ref{fig:iqgain-pt} may suggest that the Q gain
+tends to be lower than the I gain for low PCA thresholds - particularly
+if no PCA model is used at all (i.e. zero threshold).
+
+So the answer to the first question posed as the start of this appendix -
+``are the FCFs for the reconstructed I maps the same as those for the
+reconstructed Q and U maps?'' - is yes, to within a certain degree.
+Fig.~\ref{fig:ratio} quantifies this by showing a histogram of the ratio
+of the Q gain to the I gain. After removal of out-liers, this
+distribution has a mean of 1.05 and a standard deviation of 0.13.
+Fig.~\ref{fig:ratio-pt} plots the mean ratio (averaged over all source
+sizes and strengths) at each PCA threshold, together with one sigma error
+bars. This plot suggests that the ratio deviates from unity significantly
+at higher PCA thresholds, and also that the ratio has greater noise at
+higher PCA thresholds. This result may suggest that a PCA threshold of 50
+would produce more consistent and accurate results than the current
+default value of 150\footnote{However, making this change would increase
+the background noise level.}. For PCA threshold of 50, the mean ratio
+(after removal of out-liers) is 1.03 and the standard deviation is 0.09.
+
+Since the map-making process within pol2map produces seemingly random
+changes in FCF for simulated data, it is likely that it will also produce
+similar changes for real data, which will lead to errors in the
+fractional polarisation created by pol2map. If
+
+\[ r = \frac{Gain_{Q}}{Gain_{I}} \]
+
+then
+
+\[ P_{measured} = P_{actual} . r \]
+
+So the variance on the measure polarisation is increased by the variance
+in $r$:
+
+\[ \sigma^2_{Pm} = \sigma^2_{Pa}.r^2 + \sigma^2_r.P^2_{actual} \]
+
+Approximating the mean ratio by 1.0, and noting that $\sigma_r$ is 0.13,
+this means that the error in the fractional polarisation should be
+increased from $dP$ to $dp'$, where:
+
+\[ dP'  = \sqrt{ dP^2 + 0.017.P^2 } \]
+
+For instance, a 5\% vector that has an original error of 1\% should have
+its error increased to 1.2\%. If we swapped to using a PCA
+threshold of 50, for which $\sigma_r$ is 0.09, the above equation becomes:
+
+\[ dP'  = \sqrt{ dP^2 + 0.008.P^2 } \]
+
+and the increased error for the 5\% example vector would become  1.1\%.
+
+However, this increase in the error should only be done within
+pol2map if the MAPVAR parameter is set False (\emph{i.e.} output
+variances are derived by propagating the variances calculated by
+\texttt{makemap}). If MAPVAR is True, then the output variances are derived from
+the spread of values from all observations at each point on the sky, and
+thus the random fluctuations in FCF described above will already be taken
+into account.
+
+
+
+
+\begin{figure}
+\includegraphics[width=0.9\columnwidth]{figs/iqgain}
+\caption{The gain seen in the reconstructed I and Q source strengths. A
+value of 1.0 means that the source has the same strength in the
+reconstructed map as in the original artificial source map. The
+reconstructions that failed to converge are omitted from this plot. The
+line of grey dots indicate the desired one-to-one line}
+\label{fig:iqgain}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[width=0.9\columnwidth]{figs/iqgain-snr}
+\caption{The gain seen in the reconstructed I and Q source strengths,
+coloured by source strength.}
+\label{fig:iqgain-snr}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[width=0.9\columnwidth]{figs/iqgain-ssize}
+\caption{The gain seen in the reconstructed I and Q source strengths,
+coloured by source size.}
+\label{fig:iqgain-ssize}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=0.9\columnwidth]{figs/iqgain-pt}
+\caption{The gain seen in the reconstructed I and Q source strengths,
+coloured by PCA threshold.}
+\label{fig:iqgain-pt}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=0.9\columnwidth]{figs/ratio}
+\caption{A histogram of the ratio of Q gain to I gain.}
+\label{fig:ratio}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=0.9\columnwidth]{figs/ratio-pt}
+\caption{The mean ratio of Q gain to I gain, at different PCA thresholds,
+with a-sigma error bars.}
+\label{fig:ratio-pt}
+\end{figure}
+
+
+
+Fig.~\ref{fig:igain} shows the I gain (shown by colour) as a function of source strength,
+source size and PCA.PCATHRESH value. It can be seen that:
+
+\begin{itemize}
+\item the I gain becomes smaller at larger source sizes and smaller
+source strengths.
+\item there is no clear dependence on PCA.PCATHRESH.
+\end{itemize}
+
+\begin{figure}
+\includegraphics[width=0.9\columnwidth]{figs/igain}
+\caption{The I gain (shown by colour) as a function of source strength, size and
+PCA.PCATHRESH.}
+\label{fig:igain}
+\end{figure}
+
+Figure~\ref{fig:qgain} shows the same thing for the Q gain.
+
+\begin{figure}
+\includegraphics[width=0.9\columnwidth]{figs/qgain}
+\caption{The Q gain as a function of source strength, size and
+PCA.PCATHRESH.}
+\label{fig:qgain}
+\end{figure}
+
+The fractional polarisation of the artificial source is known to be 5\%.
+Fig.~\ref{fig:polhist} shows a histogram of the polarisations in the
+reconstructed maps, and Fig.~\ref{fig:polsnr} shows a scatter plot of
+polarisation against source strength. The expected 5\% is the most common
+value but there is significant spread of other values on either side. The
+spread is much greater for smaller source strengths.
+
+\begin{figure}
+\includegraphics[width=0.9\columnwidth]{figs/polhist}
+\caption{Histogram of measured polarisations.}
+\label{fig:polhist}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=0.9\columnwidth]{figs/polsnr}
+\caption{Measured polarisation against source strength.}
+\label{fig:polsnr}
+\end{figure}
+
+
+Next we look at the question of whether the I and Q maps display the same
+spatial frequencies. This is assessed by comparing the Q and I gains at a
+range of different source sizes. The following figures (\ref{fig:snr10}
+to \ref{fig:snr10000}) each show how the I and Q gains vary with source
+size, for a specific source strength. It can be seen that the I and Q
+gains vary together in the same way in each plot, suggesting that the I
+and Q maps have the same sensitivity to sources of specific sizes.
+
+
+\begin{figure}
+\includegraphics[width=0.9\columnwidth]{figs/snr10}
+\caption{I gain (blue) and Q gain (red) as a function of source size, for
+sources with SNR = 10.}
+\label{fig:snr10}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[width=0.9\columnwidth]{figs/snr100}
+\caption{I gain (blue) and Q gain (red) as a function of source size, for
+sources with SNR = 100.}
+\label{fig:snr100}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[width=0.9\columnwidth]{figs/snr1000}
+\caption{I gain (blue) and Q gain (red) as a function of source size, for
+sources with SNR = 1000.}
+\label{fig:snr1000}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[width=0.9\columnwidth]{figs/snr10000}
+\caption{I gain (blue) and Q gain (red) as a function of source size, for
+sources with SNR = 10000.}
+\label{fig:snr10000}
+\end{figure}
+
+
+\subsection{Conclusions}
+In answer to the original questions set out at the start of this
+appendix:
+
+\begin{itemize}
+
+\item The map-making efficiency for I and Q/U are equal on average, and
+so the FCFs will also be equal on average. However, the map-making
+efficiency show random fluctuations. This means that a vector with
+fractional polarisation $p$ and error $dp$ should have its error
+increased to $\sqrt{ dp^2 + 0.017.p^2 }$, but only if the original $dp$
+value does not already take these fluctuations into account. See
+Fig.~\ref{fig:ratio}.
+
+\item The I and Q/U maps seem to show the same relationship between gain
+and source size, implying that they contain the same spatial frequencies.
+Brighter sources retain more extended structure than fainter sources. See
+Fig.s~\ref{fig:snr10} to \ref{fig:snr10000}.
+
+
+\item The I and Q/U FCFs seem be more nearly equal, and the random
+fluctuations in FCF smaller, if the number of PCA components removed on
+each iteration within \texttt{makemap} is dropped from 150 to 50.
+See Fig.~\ref{fig:ratio-pt}. If this is done, the error increase in the
+bullet point above becomes $\sqrt{ dp^2 + 0.008.p^2 }$.
+
 \end{itemize}
 
 \end{document}
