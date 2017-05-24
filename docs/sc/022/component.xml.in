@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@" support="S">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sc/022</path>
+  <description>The POL-2 Data Reduction Cookbook</description>
+  <abstract><p>'
+      This cookbook provides an introduction to Starlink facilities,
+      SMURF--the Sub-Millimetre User Reduction Facility, and in particular
+      POL2MAP the command for reducing POL-2 data. This cookbook illustrates 
+      the various steps required to reduce the data; and gives an overview
+      of the method and describes how to calibrate and display data and
+      POL-2 vectors.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>D.S. Berry</name>
+      <name>H.A. Parsons</name>
+      <name>M.G. Rawlings</name>
+      <name>S. Graves</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>2017</year>
+    <name>EAO</name>
+  </copyright>
+</component>
