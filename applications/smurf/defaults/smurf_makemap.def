@@ -1929,6 +1929,25 @@ importsky = 0
 ipmodel = <undef>
 
 #-----------------------------------------------------------------
+#  Name: 	ipoffset
+#  Type: 	float
+#  Default: 	0.0
+#  Purpose: 	Modify the level of Instrumental Polarisation correction.
+#  Description: This parameter is only used when processing POL2 Q or U
+#               time-streams as created by SMURF:CALCQU, and if a value
+#               is supplied for ADAM parameter IPREF. It specifies an
+#               offset to be added onto the expected level of IP predicted
+#               by the selected IP model (see parameter "ipmodel"). The
+#               value should be supplied as a percentage. Thus, setting
+#               ipoffset to (say) 0.3 will cause the expected level of IP
+#               to be increased by 0.3% (typical IP levels are in the
+#               range 1-2%, and vary with elevation). Creating maps with
+#               different values of ipoffset provides a handle on how
+#               sensitive the map is to the details of the IP correction.
+#               The PL3 IP model is roughly accurate to about +/- 0.3%.
+ipoffset = 0.0
+
+#-----------------------------------------------------------------
 #  Name: 	itermap
 #  Type: 	integer
 #  Default: 	0

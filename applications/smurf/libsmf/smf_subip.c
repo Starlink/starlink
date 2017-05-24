@@ -96,6 +96,8 @@
 *     3-MAR-2017 (DSB):
 *        Fix bug that caused makemap to abort when producing maps from
 *        450 um non-POL2 data.
+*     24-MAY-2017 (DSB):
+*        Add IPOFFSET configuration parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -170,6 +172,7 @@ typedef struct smfSubIPData {
    double *res_data;
    double *result;
    double degfac;
+   double ipoffset;
    int *lut_data;
    int model;
    int oper;
@@ -209,6 +212,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    double *p0data;
    double *p1data;
    double degfac;
+   double ipoffset;
    double pldata[4];
    int angcndf;
    int c0ndf;
@@ -328,6 +332,17 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
          errRep( "", "smf_subip: Input POL2 data contains no POLNORTH "
                  "keyword in the FITS header.", status );
       }
+
+/* Get an offset to add on to the polarisation level predicted by the IP
+   model. This can be used to investigate the effects on the final maps of
+   changing the IP level. The IP model is uncertain to about +/- 0.3%, so
+   creating two maps with offsets of +0.3 and -0.3 and then comparing
+   the two maps could give a handle on the significance of the IP
+   uncertainty. The offset value is obtained as a percentage. */
+      astMapGet0D( keymap, "IPOFFSET", &ipoffset );
+
+/* Convert from perenctage to fraction. */
+      ipoffset /= 100.0;
 
 /* Determine the AST system corresponding to polarimetric reference direction
    of the Q/U bolometer values. Set "trsys" to NULL if the focal plane Y axis
@@ -530,6 +545,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
             pdata->model = model;
             pdata->oper = 1;
             pdata->degfac = degfac;
+            pdata->ipoffset = ipoffset;
 
 /* Submit the job for execution by the next available thread. */
             thrAddJob( wf, 0, pdata, smf1_subip, 0, NULL, status );
@@ -610,6 +626,7 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    double cd;
    double cosval;
    double degfac;
+   double ipoffset;
    double ival;
    double p0;
    double p1;
@@ -646,6 +663,7 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    fx = pdata->fx;
    fy = pdata->fy;
    degfac = pdata->degfac;
+   ipoffset = pdata->ipoffset;
 
 /* Subtract the IP from a range of bolometers. */
    if( pdata->oper == 1 ) {
@@ -727,10 +745,12 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
 /* Find the normalised instrumental Q and U. These are with respect to the
    focal plane Y axis. */
                         if( pdata->p0data ) {       /* JK model */
+                           p1 += ipoffset;
                            qfp = ca + p1*cos( cc + 2*state->tcs_az_ac2 );
                            ufp = cb + p1*sin( cc + 2*state->tcs_az_ac2 );
                         } else {                    /* PL1, PL2 or PL3 model */
                            p1 = ca + cb*state->tcs_az_ac2 + cc*state->tcs_az_ac2*state->tcs_az_ac2;
+                           p1 += ipoffset;
                            angle = state->tcs_az_ac2;
                            if( pdata->model != PL1 ) angle -= cd;
                            angle *= -2;
