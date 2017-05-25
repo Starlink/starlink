@@ -4,6 +4,7 @@
 #include "ndf.h"
 #include "ast.h"
 #include "star/hds.h"
+#include "star/ndg.h"
 #include <stdio.h>
 
 
@@ -144,6 +145,10 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 *        is off the edge of the NDF. Previously, this bug caused a stripey
 *        "aliasing" type effect if the supplied model data extends outside the
 *        bounds of the NDF.
+*     25-MAY-2017 (DSB):
+*        Switch off group history and provenance recording during this
+*        function. This is because it can inflate the time taken to run
+*        findclumps enormously if there are many thousands of clumps.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -180,6 +185,8 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
    int lb[ 3 ];                 /* Lower pixel index bounds of NDF */
    int nex;                     /* No. of extra items of information */
    int ok;                      /* Pixel within clump NDF? */
+   int old_ghstate;             /* Non-zero if group history recording is switched on */
+   int old_pvstate;             /* Non-zero if provenance recording is switched on */
    int place;                   /* NDF place holder */
    int pv;                      /* Pixel offset */
    size_t oldsize;              /* Size of original NDF */
@@ -209,6 +216,11 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 
 /* Begin an NDF context */
    ndfBegin();
+
+/* Temporaily switch off group history and provenance recording since there
+   can be thousands of clump NDFs. */
+   ndgHltgh( 0, &old_ghstate, status );
+   ndgHltpv( 0, &old_pvstate, status );
 
 /* Find the pixel index bounds of the NDF and the step between adjacent
    pixels on each axis. */
@@ -380,6 +392,11 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 
 /* If required set the Unit component to "BAD". */
    if( bad ) ndfCput( "BAD", indf, "Unit", status );
+
+/* Switch group history and provenance recording back to their original
+   states. */
+   ndgHltgh( old_ghstate, NULL, status );
+   ndgHltpv( old_pvstate, NULL, status );
 
 /* End the NDF context */
    ndfEnd( status );

@@ -424,7 +424,7 @@ void ndgHltgh( int new, int *old, int *status ){
    F77_LOCK( F77_CALL(ndg_hltgh)( LOGICAL_ARG(&NEW), LOGICAL_ARG(&OLD),
                         INTEGER_ARG(&STATUS) ); )
 
-   F77_IMPORT_LOGICAL( OLD, *old );
+   if( old ) F77_IMPORT_LOGICAL( OLD, *old );
    F77_IMPORT_INTEGER( STATUS, *status );
 }
 
@@ -443,7 +443,7 @@ void ndgHltpv( int new, int *old, int *status ){
    F77_LOCK( F77_CALL(ndg_hltpv)( LOGICAL_ARG(&NEW), LOGICAL_ARG(&OLD),
                         INTEGER_ARG(&STATUS) ); )
 
-   F77_IMPORT_LOGICAL( OLD, *old );
+   if( old ) F77_IMPORT_LOGICAL( OLD, *old );
    F77_IMPORT_INTEGER( STATUS, *status );
 }
 

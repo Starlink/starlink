@@ -3,6 +3,7 @@
 #include "cupid.h"
 #include "ast.h"
 #include "star/hds.h"
+#include "star/ndg.h"
 #include "prm_par.h"
 #include <stdio.h>
 #include <math.h>
@@ -129,6 +130,10 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     20-NOV-2013 (DSB):
 *        Supplied config KeyMap now holds the method parameters directly,
 *        rather than holding them in a sub-KeyMap.
+*     25-MAY-2017 (DSB):
+*        Switch off group history and provenance recording whilst creating
+*        clump NDFs. This is because it can inflate the time taken to run
+*        findclumps enormously if there are many thousands of clumps.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -168,6 +173,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int nthin;           /* Number of clumps that span only a single pixel */
    int nlevels;         /* Number of values in "levels" */
    int nminpix;         /* Number of clumps with < MinPix pixels */
+   int old_ghstate;     /* Non-zero if group history recording is switched on */
+   int old_pvstate;     /* Non-zero if provenance recording is switched on */
    int skip[3];         /* Pointer to array of axis skips */
 
 /* Initialise */
@@ -446,7 +453,11 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       }
 
 /* Loop round each clump, creating an NDF to describe the clump. These are
-   stored in the returned HDS object. */
+   stored in the returned HDS object. Temporarily switch off group history
+   and provenance recording since there can be thousands of these NDFs. */
+      ndgHltgh( 0, &old_ghstate, status );
+      ndgHltpv( 0, &old_pvstate, status );
+
       for( ii = 0; ii < nclump; ii++ ) {
          ps = clumps[ ii ];
          ret = cupidNdfClump( type, ipd, ipa, el, ndim, dims,
@@ -455,6 +466,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                               cupidConfigD( config, "MAXBAD", 0.05, status ),
                               status );
       }
+      ndgHltgh( old_ghstate, NULL, status );
+      ndgHltpv( old_pvstate, NULL, status );
 
 /* Free resources */
       for( i = 0; i < index; i++ ) {

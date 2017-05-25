@@ -5,6 +5,7 @@
 #include "prm_par.h"
 #include "ndf.h"
 #include "star/hds.h"
+#include "star/ndg.h"
 #include <math.h>
 
 HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
@@ -111,6 +112,10 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     20-NOV-2013 (DSB):
 *        Supplied config KeyMap now holds the method parameters directly,
 *        rather than holding them in a sub-KeyMap.
+*     25-MAY-2017 (DSB):
+*        Switch off group history and provenance recording whilst creating
+*        clump NDFs. This is because it can inflate the time taken to run
+*        findclumps enormously if there are many thousands of clumps.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -157,6 +162,8 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int ngood;           /* Number of good clumps */
    int nsmall;          /* Number of clumps that are too small */
    int nthin;           /* Number of clumps that span only a single pixel */
+   int old_ghstate;     /* Non-zero if group history recording is switched on */
+   int old_pvstate;     /* Non-zero if provenance recording is switched on */
    int peakval;         /* Minimum value used to flag peaks */
    int skip[3];         /* Pointer to array of axis skips */
 
@@ -414,7 +421,11 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          }
       }
 
-/* Loop round creating an NDF describing each usable clump. */
+/* Loop round creating an NDF describing each usable clump. Temporarily
+   switch off group history and provenance recording since there can be
+   thousands of these NDFs. */
+      ndgHltgh( 0, &old_ghstate, status );
+      ndgHltpv( 0, &old_pvstate, status );
       for( j = 0; j < ngood; j++ ) {
          i = igood[ j ];
          ret = cupidNdfClump( type, ipd, m1, el, ndim, dims, skip, slbnd,
@@ -422,6 +433,8 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                               cupidConfigD( config, "MAXBAD", 0.05, status ),
                               status );
       }
+      ndgHltgh( old_ghstate, NULL, status );
+      ndgHltpv( old_pvstate, NULL, status );
 
 /* Free resources */
       clbnd = astFree( clbnd );

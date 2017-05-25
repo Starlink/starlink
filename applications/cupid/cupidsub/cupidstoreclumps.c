@@ -189,6 +189,10 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 *        from the STC KeyMap, when writing JSA catalogues. The names are
 *        of the form "Shape_%d", where the integer value "%d" is one-based,
 *        not zero-based.
+*     25-MAY-2017 (DSB):
+*        Switch off group history and provenance recording during this
+*        function. This is because it can inflate the time taken to run
+*        findclumps enormously if there are many thousands of clumps.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -249,6 +253,8 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
    int nsmall1;             /* No. of clumps smaller than the spatial beam size */
    int nsmall2;             /* No. of clumps smaller than the spectral resolution */
    int ok;                  /* Is the clump usable? */
+   int old_ghstate;         /* Non-zero if group history recording is switched on */
+   int old_pvstate;         /* Non-zero if provenance recording is switched on */
    int pixfrm;              /* Index of PIXEL Frame */
    int place;               /* Place holder for copied NDF */
    int there;               /* Does component exist?*/
@@ -264,6 +270,11 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 
 /* Begin an AST context. */
    astBegin;
+
+/* Temporaily switch off group history and provenance recording since there
+   can be thousands of clump NDFs. */
+   ndgHltgh( 0, &old_ghstate, status );
+   ndgHltpv( 0, &old_pvstate, status );
 
 /* Get the total number of NDFs supplied. */
    datSize( obj, &nndf, status );
@@ -823,6 +834,11 @@ L999:
    if( line ) line = astFree( line );
    tab = astFree( tab );
    cpars = astFree( cpars );
+
+/* Switch group history and provenance recording back to their original
+   states. */
+   ndgHltgh( old_ghstate, NULL, status );
+   ndgHltpv( old_pvstate, NULL, status );
 
 /* End the AST context. */
    astEnd;
