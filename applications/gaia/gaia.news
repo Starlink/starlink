@@ -1,3 +1,7 @@
+  Following hyperlinks in the help system should be working again.
+  Previously clicking on a hyperlink could result in a mangled URL
+  causing a failure.
+
 
   Star-2016A Release
   ==================

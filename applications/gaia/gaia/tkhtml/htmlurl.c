@@ -47,6 +47,12 @@ struct HtmlUri {
 };
 #endif
 
+char * StringMove(char *s1, const char *s2) {
+   size_t n = strlen(s2);
+   memmove(s1, s2, n+1);
+   return s1;
+}
+
 /*
 ** Return the length of the next component of the URL in z[] given
 ** that the component starts at z[0].  The initial sequence of the
@@ -312,7 +318,7 @@ int HtmlCallResolver(
           strcat(zBuf, term->zPath);
           for(i=0; zBuf[i]; i++){
             if( zBuf[i]=='/' && zBuf[i+1]=='.' && zBuf[i+2]=='/' ){
-              strcpy(&zBuf[i+1], &zBuf[i+3]);
+              StringMove(&zBuf[i+1], &zBuf[i+3]);
               i--;
               continue;
             }
@@ -324,7 +330,7 @@ int HtmlCallResolver(
                    && (zBuf[i+3]=='/' || zBuf[i+3]==0) ){
               for(j=i-1; j>=0 && zBuf[j]!='/'; j--){}
               if( zBuf[i+3] ){
-                strcpy(&zBuf[j+1], &zBuf[i+4]);
+                StringMove(&zBuf[j+1], &zBuf[i+4]);
               }else{
                 zBuf[j+1] = 0;
               }
