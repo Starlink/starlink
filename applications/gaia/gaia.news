@@ -2,6 +2,8 @@
   Previously clicking on a hyperlink could result in a mangled URL
   causing a failure.
 
+  Added the APASS DR9 CDS catalogue to the standard list.
+
 
   Star-2016A Release
   ==================
