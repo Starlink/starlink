@@ -51,6 +51,9 @@
 *        Read DTAI from header.
 *     2017-04-06 (GSB):
 *        Set dtai in telpar parameters passed to sc2store_timeWcs.
+*     2017-06-07 (DSB):
+*        If the DUT1 or DTAI keyword is not found, annul the resulting
+*        error and continue using the default value.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -90,6 +93,7 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "libsmf/smf_err.h"
 #include "sc2da/sc2store.h"
 
 #define FUNC_NAME "smf_create_tswcs"
@@ -137,12 +141,18 @@ void smf_create_tswcs( smfHead *hdr, int isTordered, AstFrameSet **frameset, int
     return;
   }
 
-  /* do not get concerned if DUT1 is missing */
+  /* do not get concerned if DUT1 or DTAI is missing */
   dut1 = 0.0;
-  smf_getfitsd( hdr, "DUT1", &dut1, status );
+  if( *status == SAI__OK ) {
+     smf_getfitsd( hdr, "DUT1", &dut1, status );
+     if( *status == SMF__NOKWRD ) errAnnul( status );
+  }
   dut1 *= SPD;
 
-  smf_getfitsd(hdr, "DTAI", &dtai, status);
+  if( *status == SAI__OK ) {
+     smf_getfitsd(hdr, "DTAI", &dtai, status);
+     if( *status == SMF__NOKWRD ) errAnnul( status );
+  }
 
   /* Return here if an error encountered */
   if( *status != SAI__OK ) return;
