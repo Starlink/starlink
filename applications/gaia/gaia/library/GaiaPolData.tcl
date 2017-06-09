@@ -90,14 +90,14 @@ itcl::class gaia::GaiaPolData {
 #  level window, and $tclfile is the name of a text file created by
 #  polpack:polwrtcl containing the row/column data. If not supplied,
 #  a new file is created.
-   constructor { file w pbar {tclfile ""} } {
+   constructor { file rtdimage w pbar {tclfile ""} } {
 
 #  Now initialize the class data. If this constructor has been invoked
 #  to construct the base class part of some super class, do not
 #  initialize the data since this will be done as a consequence of
 #  initializeing the super class data.
       if { [$this info class] == "::gaia::GaiaPolData" } {
-         init $file $w $pbar $tclfile
+         init $file $rtdimage $w $pbar $tclfile
       }
 
    }
@@ -145,7 +145,7 @@ itcl::class gaia::GaiaPolData {
 #  Override the parent Init method to initialise the contents of the
 #  memory allocated by the GaiaPolData constructor using a user-supplied
 #  argument list.
-   protected method init { file w pbar tclfile } {
+   protected method init { file rtdimage w pbar tclfile } {
 
 #  First initialize the parent class data
       gaia::GaiaPolObject::init
@@ -156,6 +156,7 @@ itcl::class gaia::GaiaPolData {
       set asleep_ 1
       set file_ $file
       set pbar_ $pbar
+      set rtdimage_ $rtdimage
       set warned_ 0
 
 #  Save the absolute path for the polpack disk file.
@@ -431,22 +432,22 @@ itcl::class gaia::GaiaPolData {
 
 #  Create a blank image with a Wcs system using the supplied rtdimage.
 #  ----------------------------------------------------------------
-   public method mkImage { rtdimage } {
+   public method mkImage { } {
       wake
 
 #  First deal with cases where the catalogue has WCS info.
       if { $gotwcs_ && $ra_ != "" && $dec_ != "" && $equinox_ != "" } {
 
 #  Create the blank image.
-         $rtdimage clear -reuse 1 -width $nxpix_ -height $nypix_
+         $rtdimage_ clear -reuse 1 -width $nxpix_ -height $nypix_
 
 #  Now set the correct WCS values.
-         $rtdimage wcsset $ra_ $dec_ $secpix_ $xrefpix_ $yrefpix_ $nxpix_ \
+         $rtdimage_ wcsset $ra_ $dec_ $secpix_ $xrefpix_ $yrefpix_ $nxpix_ \
                                         $nypix_ 0 $equinox_ 0 TAN
 
 #  If no WCS, just create the image with no wcs.
       } else {
-         $rtdimage clear -reuse 1 -width $nxpix_ -height $nypix_
+         $rtdimage_ clear -reuse 1 -width $nxpix_ -height $nypix_
       }
    }
 
@@ -798,10 +799,13 @@ itcl::class gaia::GaiaPolData {
 #  name of the Tcl file used to communicate with polpack:polwrtcl is unknown.
       if { $tclfile_ != "" && $asleep_ } {
 
+#  Get the AST system of displayed image.
+         set sys [rtdSystem]
+
 #  If the Tcl file doesn't exist, use polwrtcl to re-create it.
          if { ![file exists $tclfile_] } {
             $pbar_ config -text "Reading $polfile_ ..."
-            catch {tclLoad $polfile_ $tclfile_} msg
+            catch {tclLoad $polfile_ $tclfile_ $sys } msg
          } else {
             $pbar_ config -text "Re-reading $polfile_ ..."
          }
@@ -854,8 +858,10 @@ itcl::class gaia::GaiaPolData {
 #  Use polpack:polwrtcl to create a text file holding a Tcl script which
 #  will (when sourced) assign values to the data members of this class
 #  which describe the contents of the requested polpack catalogue.
+#  "system" is the AST System value in which any sky coords should be
+#  stored (or "!" if their system is to be left unchanged).
 #  ----------------------------------------------------------------
-   protected method tclLoad { polfile tclfile } {
+   protected method tclLoad { polfile tclfile system } {
       global ::env
 
 #  Get the GaiaApp which provides access to the Polpack "polwrtcl" command.
@@ -866,7 +872,18 @@ itcl::class gaia::GaiaPolData {
 
 #  Run polwrtcl on the supplied catalogue, putting the results in the
 #  Tcl file.
-         run $polwrtcl "in=$polfile out=$tclfile accept"
+         run $polwrtcl "in=$polfile out=$tclfile system=$system accept"
+      }
+   }
+
+#  Return the AST System value from the displayed image, if celestial,
+#  and "!" otherwise.
+#  ----------------------------------------------------------------
+   protected method rtdSystem { } {
+      if { [$rtdimage_ astcelestial] == "1" } {
+         return [$rtdimage_ astget "System"]
+      } else {
+         return "!"
       }
    }
 
@@ -1003,6 +1020,9 @@ itcl::class gaia::GaiaPolData {
 
 #  Progress bar.
       variable pbar_ ""
+
+#  rtdimage showing displayed image.
+      variable rtdimage_ ""
 
 #  A description of the operation which created the catalogue.
       variable desc_ ""

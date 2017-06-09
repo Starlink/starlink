@@ -615,7 +615,7 @@ itcl::class gaia::GaiaPolarimetry {
 
 #  Create a new Catalogue object describing the catalogue, and its
 #  selection history.
-            set newcat_ [code [::gaia::GaiaPolCat cat#auto $file $w_ [code $pbar_] ] ]
+            set newcat_ [code [::gaia::GaiaPolCat cat#auto $file $itk_option(-rtdimage) $w_ [code $pbar_] ] ]
 
 #  If unsuccesfull, reset newcat_
             if { [catch {$newcat_ info class} ] } {
