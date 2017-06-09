@@ -71,6 +71,10 @@
 *                 the catalogue does not have a Z axis.
 *      zcunit_  : The units associated with the Z column in the catalogue.
 *                 Not written if the catalogue does not have a Z column.
+*
+*     Note, in the above "RA" and "Dec" are generic labels that are used
+*     to represent celestial longitude and latitude in any system. The
+*     actual system used is specified by the SYSTEM parameter.
 
 *  Usage:
 *     polwrtcl in out
@@ -81,6 +85,13 @@
 *        if none is provided.
 *     OUT = LITERAL (Read)
 *        The name of the output text file.
+*     SYSTEM = LITERAL (Read)
+*        The AST system in which celestial positions are required. For 
+*        historical reasons, the longitude and latitude values in this 
+*        system are referred to generically as "RA" and "Dec" below, but 
+*        they will not actually be RA and Dec if SYSTEM specified some 
+*        non-equatorial system. If a null (!) value is supplied, a 
+*        default of FK5 is used.
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
@@ -102,6 +113,8 @@
 *        Use CNF_PVAL
 *     15-APR-2005 (PWD):
 *        Parameterize use of backslashes to improve portability.
+*     9-JUN-2017 (DSB):
+*        Added parameter SYSTEM.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -116,6 +129,7 @@
       INCLUDE 'AST_PAR'          ! AST_ constants and function declarations
       INCLUDE 'CAT_PAR'          ! CAT_ constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'CAT_ERR'          ! CAT_ error constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
@@ -135,9 +149,6 @@
 
       INTEGER MXBAT
       PARAMETER ( MXBAT = 40000 )
-
-      CHARACTER SYSTEM*3
-      PARAMETER ( SYSTEM = 'FK5' )
 
       CHARACTER EQUINOX*5
       PARAMETER ( EQUINOX = 'J2000' )
@@ -177,6 +188,7 @@
       CHARACTER IDCNM*20         ! Name of the ID column
       CHARACTER QUANT*10         ! Name of the column quantity
       CHARACTER RACNM*20         ! Name of the RA column
+      CHARACTER SYSTEM*20        ! Required WCS system
       CHARACTER TEXT*512         ! O/p text buffer
       CHARACTER XCNM*20          ! Name of the X column
       CHARACTER YCNM*20          ! Name of the Y column
@@ -216,6 +228,7 @@
       INTEGER RACOL              ! Index of RA column within output catalogue
       INTEGER SKYFRM             ! An AST SkyFrame pointer
       INTEGER SZBAT              ! Size of each batch
+      INTEGER TEMPLT             ! An AST SkyFrame pointer
       INTEGER XCOL               ! Index of X column within output catalogue
       INTEGER YCOL               ! Index of Y column within output catalogue
       INTEGER ZCOL               ! Index of Z column within output catalogue
@@ -264,6 +277,14 @@
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Get the required WCS system for the celestial longitude and latitude
+*  columns (generically labelled "RA" and "Dec").
+      CALL PAR_GET0C( 'SYSTEM', SYSTEM, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         SYSTEM = 'FK5'
+      END IF
 
 *  Get a list of column identifiers and headings from the input catalogue.
 *  Note, the indices of the X, Y, RA, DEC and ID columns.
@@ -461,7 +482,7 @@
 *  Extract the numerical value.
                CALL CHR_CTOD( EQN, DEQN, STATUS )
 
-*  Assume default if the numerical EQUNOX string was bad.
+*  Assume default if the numerical EQUiNOX string was bad.
                IF( STATUS .NE. SAI__OK ) THEN
                   CALL MSG_SETC( 'EQ', EQUINOX )
                   CALL ERR_REP( 'POLWRTCL_ERR3', 'Bad EQUINOX value '//
@@ -482,9 +503,10 @@
                   END IF
 
 *  The existing RA/DEC values are only directly usable if they have the
-*  required equinox.  Otherwise we create new RA/DEC columns by mapping the
-*  existing RA/DEC columns. Set flags to indicate this.
-                  IF( BJ .NE. 'J' .OR. DEQN .NE. DEQNOX ) THEN
+*  required equinox and system.  Otherwise we create new RA/DEC columns by
+*  mapping the existing RA/DEC columns. Set flags to indicate this.
+                  IF( BJ .NE. 'J' .OR. DEQN .NE. DEQNOX .OR.
+     :                SYSTEM .NE. 'FK5') THEN
                      MAKERD = .TRUE.
 
 *  Save identifiers for the columns within the input catalogue from which
@@ -516,10 +538,10 @@
                      END IF
 
 *  Find a Mapping from the supplied system to the required system.
-                     FS = AST_FINDFRAME( SKYFRM, AST_SKYFRAME(
-     :                                   'System='//SYSTEM//
-     :                                   ',Equinox='//EQUINOX,
-     :                                   STATUS ), ' ', STATUS )
+                     TEMPLT = AST_SKYFRAME( ' ', STATUS )
+                     CALL AST_SETC( TEMPLT, 'SYSTEM', SYSTEM, STATUS )
+                     CALL AST_SETC( TEMPLT, 'EQUINOX', EQUINOX, STATUS )
+                     FS = AST_FINDFRAME( SKYFRM, TEMPLT, ' ', STATUS )
 
                      MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT,
      :                                     STATUS )
@@ -549,9 +571,11 @@
             CALL AST_SETI( IWCS, 'CURRENT',
      :                     AST_GETI( IWCS, 'BASE', STATUS ),
      :                     STATUS )
-            FS = AST_CONVERT( IWCS, AST_SKYFRAME(
-     :                        'System='//SYSTEM//',Equinox='//EQUINOX,
-     :                        STATUS ), ' ', STATUS )
+
+            TEMPLT = AST_SKYFRAME( ' ', STATUS )
+            CALL AST_SETC( TEMPLT, 'SYSTEM', SYSTEM, STATUS )
+            CALL AST_SETC( TEMPLT, 'EQUINOX', EQUINOX, STATUS )
+            FS = AST_CONVERT( IWCS, TEMPLT, ' ', STATUS )
 
 *  If succesfull...
             IF( FS .NE. AST__NULL ) THEN

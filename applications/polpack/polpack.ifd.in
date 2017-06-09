@@ -2201,6 +2201,13 @@ package polpack {
             helpkey *
           }
 
+         parameter system {
+            position 3
+            type LITERAL
+            prompt {Required WCS system}
+            helpkey *
+          }
+
       }
 #  Name:
 #     POLZCONV.IFL
