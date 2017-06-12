@@ -86,18 +86,17 @@ itcl::class gaia::GaiaPolCat {
 #  ===========
 
 #  $file = path for a disk file holding a vector catalogue readable by polpack.
-#  $rtdimage = rtdimage showing displayed image.
 #  $w = path for the top-level window associated with $this.
 #  $pbar = the ProgressBar object associated with this $this.
 
-   constructor { file rtdimage w pbar {data ""} } {
+   constructor { file w pbar {data ""} } {
 
 #  Now initialize the class data. If this constructor has been invoked
 #  to construct the base class part of some super class, do not
 #  initialize the data since this will be done as a consequence of
 #  initializeing the super class data.
       if { [$this info class] == "::gaia::GaiaPolCat" } {
-         init $file $rtdimage $w $pbar $data
+         init $file $w $pbar $data
       }
    }
 
@@ -125,7 +124,7 @@ itcl::class gaia::GaiaPolCat {
 #  Override the parent Init method to initialise the contents of the
 #  memory allocated by the GaiaPolCat constructor using a user-supplied
 #  argument list.
-   protected method init { file rtdimage w pbar data } {
+   protected method init { file w pbar data } {
 
 #  First initialize the parent class data
       gaia::GaiaPolObject::init
@@ -133,12 +132,11 @@ itcl::class gaia::GaiaPolCat {
 #  Now initialize this class.
       set w_ $w
       set pbar_ $pbar
-      set rtdimage_ $rtdimage
 
 #  If not supplied, create a GaiaPolData object to store an immutable
 #  description of the catalogue, including the main data array.
       if { $data == "" } {
-         set data_ [::gaia::GaiaPolData data#auto $file $rtdimage $w $pbar]
+         set data_ [::gaia::GaiaPolData data#auto $file $w $pbar]
       } else {
          set data_ [$data clone]
       }
@@ -180,7 +178,7 @@ itcl::class gaia::GaiaPolCat {
 
 #  If succesful, create a new GaiaPolCat for this polpack catalogue.
          if { $bincat != "" } {
-            set ret [code [::gaia::GaiaPolCat PolCat#auto $bincat $rtdimage_ $w_ $pbar_] ]
+            set ret [code [::gaia::GaiaPolCat PolCat#auto $bincat $w_ $pbar_] ]
             if { $ret != "" } {
                $ret setChanged 1
                $ret setWarned [$data_ getWarned]
@@ -463,7 +461,7 @@ itcl::class gaia::GaiaPolCat {
 #  the same GaiaPolData (which stores the data) as $this.
 #  -----------------------------------------------------------------
    public method copy {} {
-      if { [catch {set ret [::gaia::GaiaPolCat PolCat#auto [$data_ getFile] $rtdimage_ $w_ $pbar_ $data_] } mess ] } {
+      if { [catch {set ret [::gaia::GaiaPolCat PolCat#auto [$data_ getFile] $w_ $pbar_ $data_] } mess ] } {
          error_dialog "Failed to copy data: $mess"
          set ret ""
       } else {
@@ -589,7 +587,7 @@ itcl::class gaia::GaiaPolCat {
    public method getColNam {q} { return [$data_ getColNam $q] }
 
    public method zConv {z type} { return [$data_ zConv $z $type] }
-   public method mkImage { } { return [$data_ mkImage] }
+   public method mkImage { rtdimage } { return [$data_ mkImage $rtdimage] }
 
 #  Return the fully qualified name of a protected data member holding the
 #  current state flags without Z filtering. This data member is an array
@@ -997,9 +995,6 @@ itcl::class gaia::GaiaPolCat {
 #  value). If $zvals_ is blank, then no such Z filtering occurs. The second
 #  element in the list is the corresponding Z axis value.
       variable zvals_ ""
-
-#  rtdimage containing displayed image
-      variable rtdimage_ ""
 
 #  Top level window
       variable w_ ""

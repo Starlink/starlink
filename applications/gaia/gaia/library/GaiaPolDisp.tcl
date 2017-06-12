@@ -834,7 +834,7 @@ itcl::class gaia::GaiaPolDisp {
 
 #  Create the blank image large enough for the area covered by the
 #  catalogue and with a suitable WCS system.
-         if { ![catch {$cat mkImage} mess] } {
+         if { ![catch {$cat mkImage $rtdimage_} mess] } {
 
 #  Zoom the image to fill the screen.
             zoom_to_image
@@ -1264,9 +1264,6 @@ itcl::class gaia::GaiaPolDisp {
       set ox_ [expr $xo - 1.5]
       set oy_ [expr $yo - 1.5]
 
-#  Initialise afac
-      set afac 1.0
-
 #  If both the catalogue and the image have WCS, align in ra/dec.
       if { [$cat gotWcs] && [$rtdimage_ astcelestial] == "1" } {
 
@@ -1297,14 +1294,6 @@ itcl::class gaia::GaiaPolDisp {
 #  Store zero offsets
             set ox 0
             set oy 0
-
-#  Set the factor needed to convert RTD longitude values to degrees. This
-#  is 15 for RA axes and 1 for other type of longitude axis.
-            set sys [$rtdimage_ astget "System"]
-            if { $sys != "FK5" && $sys != "FK4" && $sys != "ICRS" &&
-                 $sys != "GAPPT" } {
-               set afac 15.0
-            }
 
          } else {
             error_dialog "RA and DEC columns are not available.\nSee the\"Column names\" panel."
@@ -1444,13 +1433,6 @@ itcl::class gaia::GaiaPolDisp {
 #  Get the required vector centre position.
                   set a1 [expr [lindex $rowdata $col1] - $ox]
                   set a2 [expr [lindex $rowdata $col2] - $oy]
-
-#  If a1 is a celestial longitude, but it is not an RA, multiply it
-#  by 15 (i.e. convert from hours to degree) to get round an issue somewhere
-#  (not sure where) in the RTD WCS system.
-                  if { $afac != 1.0 } {
-                     set a1 [expr $a1*$afac]
-                  }
 
 #  Get the canvas coords at the end points of the vector.
                   $draw $rtdimage_ $a1 $a2 $units $xsz $ysz $len $ang \
