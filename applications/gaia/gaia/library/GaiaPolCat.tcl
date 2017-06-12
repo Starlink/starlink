@@ -565,6 +565,7 @@ itcl::class gaia::GaiaPolCat {
    public method getIDCol {} { return [$data_ getIdCol] }
    public method getCol {x} { return [$data_ getCol $x] }
    public method getHeadings {} { return [$data_ getHeadings] }
+   public method getRefRot {} { return [$data_ getRefRot] }
    public method getNcol {} { return [$data_ getNcol] }
    public method getNrow {} { return [$data_ getNrow] }
    public method getEquinox {} { return [$data_ getEquinox] }

@@ -113,6 +113,12 @@ itcl::class gaia::GaiaPolDisp {
          set var [$m entrycget 0 -variable]
          global ::$var
          trace vdelete $var w [code $this newZoom]
+         if { $radecMap1_ != "" && $radecMap1_ != $unitmap_ } {
+            gaiautils::astannul $radecMap1_
+         }
+         if { $radecMap2_ != "" && $radecMap2_ != $unitmap_ } {
+            gaiautils::astannul $radecMap2_
+         }
 
 #  Clear the data.
          catch {clear}
@@ -310,6 +316,7 @@ itcl::class gaia::GaiaPolDisp {
                set ssty "-fill \"[$style getSclr]\" -width [$style getSwidd] -flash [$style getSflash]"
             }
          }
+
 #  Create or reconfigure the required vectors. The number of new vectors
 #  created is returned.
          set new [plot $cat $style $rows $usty $ssty]
@@ -901,12 +908,156 @@ itcl::class gaia::GaiaPolDisp {
 
    }
 
-#  Convert the given input coordinates in the given input units to the
-#  given output units and return a list {x y} with the new values.
-#  The units may be one of {canvas image wcs deg "wcs $equinox", "deg $equinox"}
-#  ----------------------------------------------------------------------
-   protected method convert_coords {in_x in_y in_units out_units} {
-       return [$rtdimage_ convert coords $in_x $in_y $in_units {} {} $out_units]
+# Convert inx,iny in the given coord system to outx,outy in the given
+# output coord system. The coord types are:
+#
+#      canvas     - canvas coordinates (canvas scroll area)
+#      screen     - canvas window coords (visible area)
+#      image      - basic image pixel coords (at mag 1, no transformations)
+#      chip       - detector chip or CCD coordinates
+#      wcs        - world coordinates of the supplied RtdImage in H:M:S
+#      deg        - world coordinates of the supplied RtdImage in degrees
+#      radec      - RA/Dec in degrees
+#
+#  The world coordinate types: "wcs", "deg" and "radec" may also include the
+#  equinox, for example: "wcs 1950" or "deg 2000". The default equinox is 2000.
+#------------------------------------------------------------------------
+   protected method convert_coords {in_x in_y in_type in_equ out_x out_y
+                                    out_type out_equ} {
+
+#  Get the equinox associated with any "radec" position (input or output).
+      if { $in_type == "radec" } {
+         set radec_equ [expr $in_equ]
+      } elseif { $out_type == "radec" } {
+         set radec_equ [expr $out_equ]
+      } else {
+         set radec_equ ""
+      }
+
+#  If the input or output is "radec", we need to convert between RA/Dec and
+#  the system of the displayed image. To do this we need a Mapping from RA/Dec
+#  to the system of the displayed image. Since this takes some time to create,
+#  we cache it in the GaiaPolDisp structure. If it does not currently exist,
+#  create the Mapping now.
+      if { $radec_equ != "" && $radecMap1_ == "" } {
+
+#  Get the WCS FrameSet from the displayed image.
+         set wcs [$rtdimage_ astgetclone]
+
+#  If the displayed image WCS matches the catalogue WCS, we do not need a
+#  Mapping. Flag this by storing "UnitMap" in the radecMap1/2_ variables.
+         set imsys [gaiautils::astget $wcs "system"]
+         set imequ [expr [gaiautils::astget $wcs "equinox"]]
+         if { ( $imsys == "FK5" && $imequ == $radec_equ ) ||
+              ( $imsys == "ICRS" && 2000.0 == $radec_equ ) } {
+            set radecMap1_ $unitmap_
+            set radecMap2_ $unitmap_
+
+#  If we need the Mapping, get a pointer to the current Frame (assumed to
+#  be a SkyFrame).
+         } else {
+            set imageFrame [gaiautils::getframe $wcs "current"]
+
+#  Take a deep copy so that we pick up things like observer's position,etc,
+#  then set its attributes to represent RA/Dec.
+            set catFrame [gaiautils::astcopy $imageFrame]
+            gaiautils::astset $catFrame "System=FK5"
+            gaiautils::astset $catFrame "Equinox=$radec_equ"
+
+#  Find the Mapping (actually a FrameSet) from catalogue WCS to image WCS.
+            set radecMap1_ [gaiautils::astconvert $catFrame $imageFrame "SKY"]
+
+#  Since the gaia asttran2 method does not allow the inverse
+#  transformation to be used, we need also to create an inverted copy.
+            set radecMap2_ [gaiautils::astcopy $radecMap1_]
+            set invert [expr 1-[gaiautils::astget $radecMap2_ "Invert"] ]
+            gaiautils::astset $radecMap2_ "Invert=$invert"
+
+#  Set the factor needed to convert RTD longitude values to degrees. This
+#  is 15 for RA axes and 1 for other type of longitude axis.
+            if { $imsys != "FK5" && $imsys != "FK4" && $imsys != "ICRS" &&
+                 $imsys != "GAPPT" } {
+            }
+
+#  Free AST resources.
+            gaiautils::astannul $imageFrame
+            gaiautils::astannul $catFrame
+         }
+         gaiautils::astannul $wcs
+
+#  Store the rtdimage "type" string that describes the image wcs. Also
+#  set the factor needed to convert RTD longitude values to degrees.
+         if { $imsys == "FK5" || $imsys == "FK4" ||
+              $imsys == "ICRS" || $imsys == "GAPPT" } {
+            set imtype_ "deg $imequ"
+            set lonFactor_ 1.0
+         } else {
+            set imtype_ "deg "
+            set lonFactor_ 15.0
+         }
+      }
+
+#  If converting from catalogue ra/dec, first transform the supplied
+#  position to the WCS system of the image. We do not need to do this if
+#  the Mapping is a UnitMap.
+      if { $in_type == "radec" } {
+         if { $radecMap1_ != $unitmap_ } {
+            set rcx [expr $in_x*$d2r_]
+            set rcy [expr $in_y*$d2r_]
+            lassign [gaiautils::asttran2 $radecMap1_ $rcx $rcy] rix riy
+            set xin [expr ($rix/$d2r_)*$lonFactor_]
+            set yin [expr $riy/$d2r_]
+         } else {
+            set xin $in_x
+            set yin $in_y
+         }
+         set intype $imtype_
+      } else {
+         set xin $in_x
+         set yin $in_y
+         if { $in_equ != 0 } {
+            set intype "$in_type $in_equ"
+         } else {
+            set intype $in_type
+         }
+      }
+
+#  If converting to catalogue ra/dec, set the required output type.
+      if { $out_type == "radec" } {
+         set outtype $imtype_
+      } else {
+         if { $out_equ != 0 } {
+            set outtype "$out_type $out_equ"
+         } else {
+            set outtype $out_type
+         }
+      }
+
+#  Use the rtdimage to convert the input position to the required output system.
+       $rtdimage_ convert coords $xin $yin $intype xout yout $outtype
+
+#  If the returned position is to be in catalogue ra/dec, convert the
+#  position created above from image WCS to catalogue RA/Dec.
+      if { $out_type == "radec" } {
+         if { $radecMap2_ != $unitmap_ } {
+            set rix [expr ($xout*$d2r_)/$lonFactor_]
+            set riy [expr $yout*$d2r_]
+            lassign [gaiautils::asttran2 $radecMap2_ $rix $riy] rcx rcy
+            set xout [expr $rcx/$d2r_]
+            set yout [expr $rcy/$d2r_]
+         }
+      }
+
+#  Store and return the results.
+      if { $out_x != {} } {
+         upvar $out_x ox
+         set ox $xout
+      }
+      if { $out_y != {} } {
+         upvar $out_y oy
+         set oy $yout
+      }
+      return [list $xout $yout]
    }
 
 #  Flash vectors by changing the colour of them. This method reschedules itself
@@ -952,17 +1103,19 @@ itcl::class gaia::GaiaPolDisp {
 #  ---------------------------------------------------------------------
    protected method fndNth {x y equ} {
 
-#  Convert the supplied canvas position to ra and dec.
-      set pos1 [convert_coords $x $y "image" "deg $equ" ]
+#  Convert the supplied canvas position to catalogue WCS (i.e RA/Dec in
+#  degrees). The displayed image may be in some other system (e.g. galactic).
+      set pos1 [convert_coords $x $y "image" 0 {} {} "radec" $equ ]
 
 #  Convert the pixel above the supplied canvas position to ra and dec.
-      set pos2 [convert_coords $x [expr $y - 1] "image" "deg $equ" ]
+      set pos2 [convert_coords $x [expr $y - 1] "image" 0 {} {} "radec" $equ ]
 
-#  Extract ra and dec values from these positions.
-      set a1 [expr [lindex $pos1 0]*0.017453293 ]
-      set b1 [expr [lindex $pos1 1]*0.017453293 ]
-      set a2 [expr [lindex $pos2 0]*0.017453293 ]
-      set b2 [expr [lindex $pos2 1]*0.017453293 ]
+#  Extract ra and dec values from these positions, and convert from degs
+#  to rads.
+      set a1 [expr [lindex $pos1 0]*$d2r_ ]
+      set b1 [expr [lindex $pos1 1]*$d2r_ ]
+      set a2 [expr [lindex $pos2 0]*$d2r_ ]
+      set b2 [expr [lindex $pos2 1]*$d2r_ ]
 
 #  Do the calculation (see SLALIB routine sla_bear).
       set da [expr $a2-$a1]
@@ -1141,7 +1294,7 @@ itcl::class gaia::GaiaPolDisp {
 #  Otherwise return a blank string indicating that the direction of north
 #  varies across the image.
          if { $mn > 0.9998477 } {
-            set ret [expr 57.29578*atan2( $mnsn, $mncs ) ]
+            set ret [expr atan2( $mnsn, $mncs )/$d2r_ ]
          } else {
             set ret ""
          }
@@ -1250,6 +1403,14 @@ itcl::class gaia::GaiaPolDisp {
 #  Get the angle to add on to the angle column values (degrees).
       set rot [$style getArot]
 
+#  The reference direction for the ANG, Q and U values in the catalogue
+#  may not be parallel to Dec (e.g. if the orignal NDFs form which the
+#  catalogue was created use galactic coords). So add on the rotation
+#  required to change the ref. direction to Dec. This is assumed ot be
+#  constant over the whole map (!).
+      set refrot [$cat getRefRot]
+      set rot [expr $rot + $refrot]
+
 #  Get the pixel origin of the displayed image. If the vectors are
 #  displayed over a blank image use the lower pixel bounds stored with
 #  the catalogue. Otherwise, use the origin of the displayed ndf.
@@ -1288,8 +1449,9 @@ itcl::class gaia::GaiaPolDisp {
                set draw draw2
             }
 
-#  Store units.
-            set units "deg $equ"
+#  Store units - the catalogue WCS info is always RA/Dec in degrees. The
+#  displayed image may be in some other system (e.g. galactic).
+            set units "radec"
 
 #  Store zero offsets
             set ox 0
@@ -1329,6 +1491,7 @@ itcl::class gaia::GaiaPolDisp {
 
 #  Store units.
             set units "image"
+            set equ 0
 
          } else {
             error_dialog "X and Y columns are not available.\nSee the\"Column names\" panel."
@@ -1428,14 +1591,14 @@ itcl::class gaia::GaiaPolDisp {
                   set len [expr $lval*$mag ]
 
 #  Get the required vector angle.
-                  set ang [expr 0.017453293*([lindex $rowdata $acol] + $rot) ]
+                  set ang [expr $d2r_*([lindex $rowdata $acol] + $rot) ]
 
 #  Get the required vector centre position.
                   set a1 [expr [lindex $rowdata $col1] - $ox]
                   set a2 [expr [lindex $rowdata $col2] - $oy]
 
 #  Get the canvas coords at the end points of the vector.
-                  $draw $rtdimage_ $a1 $a2 $units $xsz $ysz $len $ang \
+                  $draw $rtdimage_ $a1 $a2 $units $equ $xsz $ysz $len $ang \
                                    cx cy ex ey px py
 
 #  Create the vector, if draw succeeded.
@@ -1842,6 +2005,118 @@ itcl::class gaia::GaiaPolDisp {
       }
    }
 
+#  Returns the canvas coords of the two ends of a vector (angles
+#  specified relative to -ve canvas Y axis ("upwards") ).
+#
+#     rtdim - The rtdimage on which the vector is to be drawn
+#     a1 a2 - The vector position
+#     units - The units of a1 and a2 ("image" or "deg $equ")
+#     xsz   - Width of an image pixel in canvas units
+#     ysz   - Height of an image pixel in canvas units
+#     len   - length of the vector in image pixels
+#     ang   - anticlockwise angle from upwards (-ve canvas Y) to the vector,
+#             in radians.
+#     ncx ncy - Names of variables to receive the canvas X,Y at one end
+#               of the vector.
+#     nex ney - Names of variables to receive the canvas X,Y at the other
+#               end of the vector.
+#     npx npy - Names of variables to receive the canvas X,Y at the centre
+#               of the vector.
+#
+#------------------------------------------------------------------------
+   protected method draw1 { rtdim a1 a2 units equ xsz ysz len ang ncx ncy nex ney npx npy} {
+      upvar $ncx cx
+      upvar $ncy cy
+      upvar $nex ex
+      upvar $ney ey
+      upvar $npx px
+      upvar $npy py
+
+#  Convert the given position to canvas coords.
+      convert_coords $a1 $a2 $units $equ px py "canvas" 0
+
+#  Correct by adding 0.5 onto each (why is this necessary? without it
+#  vectors are plotted half a pixel out when plotted over an existing
+#  image). Catch errors caused by non-numeric pos values (eg "-inf").
+      if { ![catch {set px [expr $px + 0.5]}] &&
+           ![catch {set py [expr $py + 0.5]}] } {
+
+#  Check for very large values (eg AST__BAD "-1.79769313486231571D+308").
+         if { ![catch {set ss [expr abs( $px ) + abs( $py ) ]}] &&
+              $ss < 1.0E20 } {
+
+#  Get canvas coords at the two ends of the vector.
+            set dx [expr $xsz*$len*0.5*sin( $ang )]
+            set dy [expr $ysz*$len*0.5*cos( $ang )]
+            set cx [expr $px + $dx]
+            set cy [expr $py + $dy]
+            set ex [expr $px - $dx]
+            set ey [expr $py - $dy]
+         }
+      }
+   }
+
+#  Returns the canvas coords of the two ends of a vector (angles
+#  specified relative to north).
+#
+#     rtdim - The rtdimage on which the vector is to be drawn
+#     a1 a2 - The vector ra and dec
+#     units - The units of a1 and a2 (must be "deg $equ")
+#     xsz   - Width of an image pixel in canvas units
+#     ysz   - Height of an image pixel in canvas units
+#     len   - length of the vector in image pixels
+#     ang   - anticlockwise angle from north to the vector, in radians.
+#     ncx ncy - Names of variables to receive the canvas X,Y at one end
+#               of the vector.
+#     nex ney - Names of variables to receive the canvas X,Y at the other
+#               end of the vector.
+#     npx npy - Names of variables to receive the canvas X,Y at the centre
+#               of the vector.
+#
+#------------------------------------------------------------------------
+   protected method draw2 { rtdim a1 a2 units equ xsz ysz len ang ncx ncy nex ney npx npy} {
+      upvar $ncx cx
+      upvar $ncy cy
+      upvar $nex ex
+      upvar $ney ey
+      upvar $npx px
+      upvar $npy py
+
+#  Convert the supplied position to canvas coords.
+      convert_coords $a1 $a2 $units $equ px py "canvas" 0
+
+#  Convert a second position about 1 arcsec to the north of the supplied
+#  position.
+      convert_coords $a1 [expr $a2 + 0.0003 ] $units $equ px2 py2 "canvas" 0
+
+#  Correct by adding 0.5 onto each (why is this necessary? without it
+#  vectors are plotted half a pixel out when plotted over an existing
+#  image). Catch errors caused by non-numeric pos values (eg "-inf").
+      if { ![catch {set px [expr $px + 0.5]}] &&
+           ![catch {set py [expr $py + 0.5]}] &&
+           ![catch {set px2 [expr $px2 + 0.5]}] &&
+           ![catch {set py2 [expr $py2 + 0.5]}] } {
+
+#  Check for very large values (eg AST__BAD "-1.79769313486231571D+308").
+         if { ![catch {set ss [expr abs( $px ) + abs( $py ) + abs( $px2 ) + abs( $py2 )]}] &&
+                       $ss < 1.0E20 } {
+
+#  Get canvas coords at the two ends of the vector.
+            set cos [expr cos( $ang )]
+            set sin [expr sin( $ang )]
+            set ofx [expr $px - $px2]
+            set ofy [expr $py - $py2]
+            set amp [expr 0.5*$len/sqrt( $ofx*$ofx + $ofy*$ofy )]
+            set dx [expr $xsz*$amp*( $ofy*$sin + $ofx*$cos )]
+            set dy [expr $ysz*$amp*( $ofy*$cos - $ofx*$sin )]
+            set cx [expr $px + $dx]
+            set cy [expr $py + $dy]
+            set ex [expr $px - $dx]
+            set ey [expr $py - $dy]
+         }
+      }
+   }
+
 #  Static methods (procs)
 #  ======================
 
@@ -1978,118 +2253,6 @@ itcl::class gaia::GaiaPolDisp {
    proc random {} {
       set r_ [expr fmod( $r_*41475557.0, 1.0 )]
       return $r_
-   }
-
-#  Returns the canvas coords of the two ends of a vector (angles
-#  specified relative to -ve canvas Y axis ("upwards") ).
-#
-#     rtdim - The rtdimage on which the vector is to be drawn
-#     a1 a2 - The vector position
-#     units - The units of a1 and a2 ("image" or "deg $equ")
-#     xsz   - Width of an image pixel in canvas units
-#     ysz   - Height of an image pixel in canvas units
-#     len   - length of the vector in image pixels
-#     ang   - anticlockwise angle from upwards (-ve canvas Y) to the vector,
-#             in radians.
-#     ncx ncy - Names of variables to receive the canvas X,Y at one end
-#               of the vector.
-#     nex ney - Names of variables to receive the canvas X,Y at the other
-#               end of the vector.
-#     npx npy - Names of variables to receive the canvas X,Y at the centre
-#               of the vector.
-#
-#------------------------------------------------------------------------
-   proc draw1 { rtdim a1 a2 units xsz ysz len ang ncx ncy nex ney npx npy} {
-      upvar $ncx cx
-      upvar $ncy cy
-      upvar $nex ex
-      upvar $ney ey
-      upvar $npx px
-      upvar $npy py
-
-#  Convert the given position to canvas coords.
-      $rtdim convert coords $a1 $a2 $units px py "canvas"
-
-#  Correct by adding 0.5 onto each (why is this necessary? without it
-#  vectors are plotted half a pixel out when plotted over an existing
-#  image). Catch errors caused by non-numeric pos values (eg "-inf").
-      if { ![catch {set px [expr $px + 0.5]}] &&
-           ![catch {set py [expr $py + 0.5]}] } {
-
-#  Check for very large values (eg AST__BAD "-1.79769313486231571D+308").
-         if { ![catch {set ss [expr abs( $px ) + abs( $py ) ]}] &&
-              $ss < 1.0E20 } {
-
-#  Get canvas coords at the two ends of the vector.
-            set dx [expr $xsz*$len*0.5*sin( $ang )]
-            set dy [expr $ysz*$len*0.5*cos( $ang )]
-            set cx [expr $px + $dx]
-            set cy [expr $py + $dy]
-            set ex [expr $px - $dx]
-            set ey [expr $py - $dy]
-         }
-      }
-   }
-
-#  Returns the canvas coords of the two ends of a vector (angles
-#  specified relative to north).
-#
-#     rtdim - The rtdimage on which the vector is to be drawn
-#     a1 a2 - The vector ra and dec
-#     units - The units of a1 and a2 (must be "deg $equ")
-#     xsz   - Width of an image pixel in canvas units
-#     ysz   - Height of an image pixel in canvas units
-#     len   - length of the vector in image pixels
-#     ang   - anticlockwise angle from north to the vector, in radians.
-#     ncx ncy - Names of variables to receive the canvas X,Y at one end
-#               of the vector.
-#     nex ney - Names of variables to receive the canvas X,Y at the other
-#               end of the vector.
-#     npx npy - Names of variables to receive the canvas X,Y at the centre
-#               of the vector.
-#
-#------------------------------------------------------------------------
-   proc draw2 { rtdim a1 a2 units xsz ysz len ang ncx ncy nex ney npx npy} {
-      upvar $ncx cx
-      upvar $ncy cy
-      upvar $nex ex
-      upvar $ney ey
-      upvar $npx px
-      upvar $npy py
-
-#  Convert the supplied position to canvas coords.
-      $rtdim convert coords $a1 $a2 $units px py "canvas"
-
-#  Convert a second position about 1 arcsec to the north of the supplied
-#  position.
-      $rtdim convert coords $a1 [expr $a2 + 0.0003 ] $units px2 py2 "canvas"
-
-#  Correct by adding 0.5 onto each (why is this necessary? without it
-#  vectors are plotted half a pixel out when plotted over an existing
-#  image). Catch errors caused by non-numeric pos values (eg "-inf").
-      if { ![catch {set px [expr $px + 0.5]}] &&
-           ![catch {set py [expr $py + 0.5]}] &&
-           ![catch {set px2 [expr $px2 + 0.5]}] &&
-           ![catch {set py2 [expr $py2 + 0.5]}] } {
-
-#  Check for very large values (eg AST__BAD "-1.79769313486231571D+308").
-         if { ![catch {set ss [expr abs( $px ) + abs( $py ) + abs( $px2 ) + abs( $py2 )]}] &&
-                       $ss < 1.0E20 } {
-
-#  Get canvas coords at the two ends of the vector.
-            set cos [expr cos( $ang )]
-            set sin [expr sin( $ang )]
-            set ofx [expr $px - $px2]
-            set ofy [expr $py - $py2]
-            set amp [expr 0.5*$len/sqrt( $ofx*$ofx + $ofy*$ofy )]
-            set dx [expr $xsz*$amp*( $ofy*$sin + $ofx*$cos )]
-            set dy [expr $ysz*$amp*( $ofy*$cos - $ofx*$sin )]
-            set cx [expr $px + $dx]
-            set cy [expr $py + $dy]
-            set ex [expr $px - $dx]
-            set ey [expr $py - $dy]
-         }
-      }
    }
 
    proc StackDump {} {
@@ -2240,6 +2403,20 @@ itcl::class gaia::GaiaPolDisp {
 #  Top level window.
       variable w_ ""
 
+#  Mapping from catalogue RA/Dec values (rads) to the WCS system fo the
+#  displayed image (rads).
+      variable radecMap1_ ""
+
+#  Mapping from WCS system of the displayed image (rads) to catalogue RA/Dec
+#  values (rads).
+      variable radecMap2_ ""
+
+#  The rtdimage "type" string that describes the image wcs.
+      variable imtype_ "deg "
+
+#  The factor needed to convert RTD longitude values to degrees. This
+#  is 15 for RA axes and 1 for other type of longitude axis.
+      variable lonFactor_ 1.0
    }
 
 
@@ -2276,6 +2453,12 @@ itcl::class gaia::GaiaPolDisp {
 
 #  Shape of selection region.
    common selshape_ "box"
+
+#  String representing a UNitMap.
+   common unitmap_ "UnitMap"
+
+#  Factor to convert degrees to radians.
+   common d2r_ 0.017453293
 
 #  End of class definition.
 }

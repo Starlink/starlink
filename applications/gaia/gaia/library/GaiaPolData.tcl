@@ -480,6 +480,7 @@ itcl::class gaia::GaiaPolData {
       set zaunit_   ""
       set zcunit_   ""
       set data_     ""
+      set refrot_   ""
 
 #  Indicate the PolData is now asleep.
       set asleep_ 1
@@ -515,6 +516,7 @@ itcl::class gaia::GaiaPolData {
    public method getZhi {} { wake; return $zhi_ }
    public method getZcunit {} { wake; return $zcunit_ }
    public method getZaunit {} { wake; return $zaunit_ }
+   public method getRefRot {} { wake; return $refrot_ }
    public method getWarned {} { wake; return $warned_}
    public method setWarned { {x 1} } { wake; set warned_ $x}
 
@@ -593,6 +595,7 @@ itcl::class gaia::GaiaPolData {
       puts $fd "set hfmts_    \"[blanks $hfmts_]\""
       puts $fd "set zcunit_   \"[blanks $zcunit_]\""
       puts $fd "set zaunit_   \"[blanks $zaunit_]\""
+      puts $fd "set refrot_   \"[blanks $refrot_]\""
 
 #  Write out the supplied data array
       puts $fd "set data_ \{ \\"
@@ -815,7 +818,7 @@ itcl::class gaia::GaiaPolData {
 
 #  Check that critical class data members now have non-null values.
                if { $gotwcs_ != "" && $uses_ != "" && $headings_ != ""
-                    && $xlo_ != "" && $ylo_ != "" &&
+                    && $refrot_ != "" && $xlo_ != "" && $ylo_ != "" &&
                     $xhi_ != "" && $yhi_ != "" && $ncol_ != "" &&
                     $nrow_ != "" && $data_ != ""  } {
 
@@ -1006,6 +1009,10 @@ itcl::class gaia::GaiaPolData {
 
 #  A description of the operation which created the catalogue.
       variable desc_ ""
+
+#  The position angle of the reference direction (angle from Dec to ref,
+#  through RA  in degs).
+      variable refrot_ ""
 
    }
 

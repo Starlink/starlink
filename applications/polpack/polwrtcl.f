@@ -71,10 +71,10 @@
 *                 the catalogue does not have a Z axis.
 *      zcunit_  : The units associated with the Z column in the catalogue.
 *                 Not written if the catalogue does not have a Z column.
-*
-*     Note, in the above "RA" and "Dec" are generic labels that are used
-*     to represent celestial longitude and latitude in any system. The
-*     actual system used is specified by the SYSTEM parameter.
+*      refrot_  : The angle in degrees, from the Declination axis (FK5
+*                 J2000) through the RA axis, to the referene direction.
+*                 Assumed to be constant across the map.
+
 
 *  Usage:
 *     polwrtcl in out
@@ -85,13 +85,6 @@
 *        if none is provided.
 *     OUT = LITERAL (Read)
 *        The name of the output text file.
-*     SYSTEM = LITERAL (Read)
-*        The AST system in which celestial positions are required. For 
-*        historical reasons, the longitude and latitude values in this 
-*        system are referred to generically as "RA" and "Dec" below, but 
-*        they will not actually be RA and Dec if SYSTEM specified some 
-*        non-equatorial system. If a null (!) value is supplied, a 
-*        default of FK5 is used.
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
@@ -113,8 +106,9 @@
 *        Use CNF_PVAL
 *     15-APR-2005 (PWD):
 *        Parameterize use of backslashes to improve portability.
-*     9-JUN-2017 (DSB):
-*        Added parameter SYSTEM.
+*     12-JUN-2017 (DSB):
+*        Added the position angle of the reference direction ("refrot_") to the
+*        output TCL file.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -129,7 +123,6 @@
       INCLUDE 'AST_PAR'          ! AST_ constants and function declarations
       INCLUDE 'CAT_PAR'          ! CAT_ constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
-      INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'CAT_ERR'          ! CAT_ error constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
@@ -140,6 +133,9 @@
 *  needed.
       PARAMETER( CONTIN = '\\' )
 
+*  External References:
+      DOUBLE PRECISION SLA_DBEAR
+
 *  Status:
       INTEGER STATUS
 
@@ -149,6 +145,9 @@
 
       INTEGER MXBAT
       PARAMETER ( MXBAT = 40000 )
+
+      CHARACTER SYSTEM*3
+      PARAMETER ( SYSTEM = 'FK5' )
 
       CHARACTER EQUINOX*5
       PARAMETER ( EQUINOX = 'J2000' )
@@ -188,7 +187,6 @@
       CHARACTER IDCNM*20         ! Name of the ID column
       CHARACTER QUANT*10         ! Name of the column quantity
       CHARACTER RACNM*20         ! Name of the RA column
-      CHARACTER SYSTEM*20        ! Required WCS system
       CHARACTER TEXT*512         ! O/p text buffer
       CHARACTER XCNM*20          ! Name of the X column
       CHARACTER YCNM*20          ! Name of the Y column
@@ -196,7 +194,15 @@
       CHARACTER ZCNM*20          ! Name of the Z column
       CHARACTER ZCUNIT*20        ! Units for Z column
       DOUBLE PRECISION DEQN      ! Input equinox
+      DOUBLE PRECISION P1( 3 )   ! PIXEL coords at pixel origin
+      DOUBLE PRECISION P2( 3 )   ! POLANAL coords at pixel origin
+      DOUBLE PRECISION P3( 3 )   ! (RA,Dec) coords at pixel origin
+      DOUBLE PRECISION P4( 3 )   ! (RA,Dec) coords at northern position
+      DOUBLE PRECISION P5( 3 )   ! POLANAL coords at northern position
+      DOUBLE PRECISION P6( 3 )   ! (RA,Dec) coords at projected northern position
+      DOUBLE PRECISION REFROT    ! Angle form north to ref direction
       INTEGER BFRM               ! Base Frame from input WCS FrameSet
+      INTEGER CATFRM             ! Frame describe catalogue RA/Dec columns
       INTEGER CI                 ! CAT identifier for input catalogue
       INTEGER DECCOL             ! Index of DEC column within output catalogue
       INTEGER FD                 ! FIO identifier for output file
@@ -206,10 +212,14 @@
       INTEGER GI                 ! A CAT component identifier
       INTEGER I                  ! Loop count
       INTEGER IAT                ! Used length of TEXT
+      INTEGER IBASE              ! Original index of WCS Base Frame
+      INTEGER ICURR              ! Original index of WCS Current Frame
       INTEGER ICOL               ! Column index
       INTEGER IDCOL              ! Column index of ID column
       INTEGER IDLEN              ! Length of identifier strings
       INTEGER IDTYPE             ! Data type of ID column
+      INTEGER IFRMPA             ! Index of POLANAL Frame
+      INTEGER IFRMPX             ! Index of PIXEL Frame
       INTEGER IFRM               ! Index of SkyFrame
       INTEGER IPW1               ! Pointer to work space
       INTEGER IPW2               ! Pointer to work space
@@ -225,10 +235,10 @@
       INTEGER NDIM               ! No. of dimensions in WCS Base Frame
       INTEGER NROW               ! No. of rows in input catalogue
       INTEGER NROWGD             ! No. of rows in output catalogue
+      INTEGER PXAMAP             ! Mapping from PIXEL to POLANAL
       INTEGER RACOL              ! Index of RA column within output catalogue
       INTEGER SKYFRM             ! An AST SkyFrame pointer
       INTEGER SZBAT              ! Size of each batch
-      INTEGER TEMPLT             ! An AST SkyFrame pointer
       INTEGER XCOL               ! Index of X column within output catalogue
       INTEGER YCOL               ! Index of Y column within output catalogue
       INTEGER ZCOL               ! Index of Z column within output catalogue
@@ -277,14 +287,6 @@
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
-
-*  Get the required WCS system for the celestial longitude and latitude
-*  columns (generically labelled "RA" and "Dec").
-      CALL PAR_GET0C( 'SYSTEM', SYSTEM, STATUS )
-      IF( STATUS .EQ. PAR__NULL ) THEN
-         CALL ERR_ANNUL( STATUS )
-         SYSTEM = 'FK5'
-      END IF
 
 *  Get a list of column identifiers and headings from the input catalogue.
 *  Note, the indices of the X, Y, RA, DEC and ID columns.
@@ -426,6 +428,88 @@
 
       END IF
 
+*  Record the index of the original current and Base Frames in the WCS
+*  FrameSet.
+      IBASE = AST_GETI( IWCS, 'Base', STATUS )
+      ICURR = AST_GETI( IWCS, 'Current', STATUS )
+
+*  Find the indices of the POLANAL and PIXEL Frames in the WCA FrameSet.
+      CALL KPG1_ASFFR( IWCS, 'POLANAL', IFRMPA, STATUS )
+      IF( IFRMPA .NE. AST__NOFRAME ) THEN
+         CALL AST_SETI( IWCS, 'Current', IFRMPA, STATUS )
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( ' ', 'Cannot find a POLANAL Frame in the WCS '//
+     :                 'FrameSet of catalogue ''$IN''. The reference '//
+     :                 'direction is undefined.',  STATUS )
+      END IF
+
+      CALL KPG1_ASFFR( IWCS, 'PIXEL', IFRMPX, STATUS )
+      IF( IFRMPX .NE. AST__NOFRAME ) THEN
+         CALL AST_SETI( IWCS, 'Current', IFRMPX, STATUS )
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( ' ', 'Cannot find a PIXEL Frame in the WCS '//
+     :                 'FrameSet of catalogue ''$IN''.', STATUS )
+      END IF
+
+*  Get the Mapping from PIXEL to POLANAL.
+      PXAMAP = AST_GETMAPPING( IWCS, IFRMPA, IFRMPX, STATUS )
+
+*  Create a SkyFrame describing the system of the RA/Dec columns in the
+*  output catalogue.
+      CATFRM = AST_SKYFRAME( 'System='//SYSTEM//',Equinox='//EQUINOX,
+     :                       STATUS )
+
+*  Find a FrameSet that converts from POLANAL to RA/Dec.
+      CALL AST_SETI( IWCS, 'Current', IFRMPA, STATUS )
+      FS = AST_CONVERT( IWCS, CATFRM, 'SKY', STATUS )
+      IF( FS .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( ' ', 'Cannot find Mapping from POLANAL Frame '//
+     :                 'to RA/De in catalogue ''$IN''.',  STATUS )
+
+*  Use this FrameSet to find the angle from the Dec axis to the reference
+*  direction, in the sense of rotation from Dec to RA.
+      ELSE
+
+*  Get the POLANAL positions corresponding to the pixel origin.
+         DO I = 1, NAXB
+            P1( I ) = 0.0D0
+         END DO
+         CALL AST_TRANN( PXAMAP, 1, NAXB, 1, P1, .TRUE., NAXB, 1, P2,
+     :                   STATUS )
+
+*  Convert this position to (RA,Dec)
+         CALL AST_TRANN( FS, 1, NAXB, 1, P2, .TRUE., 2, 1, P3,
+     :                   STATUS )
+
+*  Get the POLANAL coords of a position 1 arc-min to the north of the
+*  pixel origin.
+         P4( 1 ) = P3( 1 )
+         P4( 2 ) = P3( 2 ) + AST__DD2R/60.0D0
+         P4( 3 ) = P3( 3 )
+         CALL AST_TRANN( FS, 1, 2, 1, P4, .FALSE., NAXB, 1, P5,
+     :                   STATUS )
+
+*  The first POLANAL axis defines the reference direction. Set the values
+*  on the other POLANAL axes back to their original values.
+         P5( 2 ) = P2( 2 )
+         P5( 3 ) = P2( 3 )
+
+*  Convert this position to (RA,Dec).
+         CALL AST_TRANN( FS, 1, NAXB, 1, P5, .TRUE., 2, 1, P6,
+     :                   STATUS )
+
+*  Get the position angle of P6 as seen from P3. This is the angle from Dec to the
+*  reference direction (the first polanal axis), going through RA.
+         REFROT = SLA_DBEAR( P3(1), P3(2), P6(1), P6(2) )*AST__DR2D
+      END IF
+
+*  Re-instate the original Base and current Frames in the WCS FrameSet.
+      CALL AST_SETI( IWCS, 'Base', IBASE, STATUS )
+      CALL AST_SETI( IWCS, 'Current', ICURR, STATUS )
+
 *  Assume for the moment that the output catalogue will contain RA/DEC
 *  columns.
       GOTRD = .TRUE.
@@ -482,7 +566,7 @@
 *  Extract the numerical value.
                CALL CHR_CTOD( EQN, DEQN, STATUS )
 
-*  Assume default if the numerical EQUiNOX string was bad.
+*  Assume default if the numerical EQUNOX string was bad.
                IF( STATUS .NE. SAI__OK ) THEN
                   CALL MSG_SETC( 'EQ', EQUINOX )
                   CALL ERR_REP( 'POLWRTCL_ERR3', 'Bad EQUINOX value '//
@@ -503,10 +587,9 @@
                   END IF
 
 *  The existing RA/DEC values are only directly usable if they have the
-*  required equinox and system.  Otherwise we create new RA/DEC columns by
-*  mapping the existing RA/DEC columns. Set flags to indicate this.
-                  IF( BJ .NE. 'J' .OR. DEQN .NE. DEQNOX .OR.
-     :                SYSTEM .NE. 'FK5') THEN
+*  required equinox.  Otherwise we create new RA/DEC columns by mapping the
+*  existing RA/DEC columns. Set flags to indicate this.
+                  IF( BJ .NE. 'J' .OR. DEQN .NE. DEQNOX ) THEN
                      MAKERD = .TRUE.
 
 *  Save identifiers for the columns within the input catalogue from which
@@ -538,11 +621,7 @@
                      END IF
 
 *  Find a Mapping from the supplied system to the required system.
-                     TEMPLT = AST_SKYFRAME( ' ', STATUS )
-                     CALL AST_SETC( TEMPLT, 'SYSTEM', SYSTEM, STATUS )
-                     CALL AST_SETC( TEMPLT, 'EQUINOX', EQUINOX, STATUS )
-                     FS = AST_FINDFRAME( SKYFRM, TEMPLT, ' ', STATUS )
-
+                     FS = AST_FINDFRAME( SKYFRM, CATFRM, ' ', STATUS )
                      MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT,
      :                                     STATUS )
 
@@ -571,11 +650,7 @@
             CALL AST_SETI( IWCS, 'CURRENT',
      :                     AST_GETI( IWCS, 'BASE', STATUS ),
      :                     STATUS )
-
-            TEMPLT = AST_SKYFRAME( ' ', STATUS )
-            CALL AST_SETC( TEMPLT, 'SYSTEM', SYSTEM, STATUS )
-            CALL AST_SETC( TEMPLT, 'EQUINOX', EQUINOX, STATUS )
-            FS = AST_CONVERT( IWCS, TEMPLT, ' ', STATUS )
+            FS = AST_CONVERT( IWCS, CATFRM, ' ', STATUS )
 
 *  If succesfull...
             IF( FS .NE. AST__NULL ) THEN
@@ -776,6 +851,12 @@
       TEXT = 'set ncol_ '
       IAT = 10
       CALL CHR_PUTI( NCOL, TEXT, IAT )
+      CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
+
+*  Write out the position angle of the reference direction within (RA,Dec).
+      TEXT = 'set refrot_ '
+      IAT = 12
+      CALL CHR_PUTD( REFROT, TEXT, IAT )
       CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
 *  Free the work space.
