@@ -135,9 +135,12 @@
 *        of the required new pixel scales.  In this context, a pixel
 *        scale for a WCS axis is the increment in WCS axis value caused
 *        by a movement of one pixel along the WCS axis, and are measured
-*        at the first pixel in the array.  The suggested default value
-*        are the current pixel scales.  If no value has been supplied
-*        for Parameter AXIS, the number of values supplied for PIXSCALE
+*        at the first pixel in the array.  Pixel scales for celestial axes
+*        should be given in arc-seconds. An asterisk, "*", can be used
+*        instead of a numerical value to indicate that an axis should
+*        retain its current scale. The suggested default value are the
+*        current pixel scales.  If no value has been supplied for
+*        Parameter AXIS, the number of values supplied for PIXSCALE
 *        must be the same as the number of WCS axes in the NDF.  If a
 *        non-null value has been supplied for Parameter AXIS, then only
 *        a single value should be supplied for PIXSCALE and that value
@@ -273,6 +276,10 @@
 *        Added parameter CONSERVE.
 *     2015 April 23 (MJC):
 *        Propagate the UNITS component as documented.
+*     13-JUN-2017 (DSB):
+*        Allow an asterisk to be supplied instead of a numerical value in
+*        parameter PIXSCALE, to indicate that the axis should retain its
+*        current scale.
 *     {enter_further_changes_here}
 
 *-
@@ -322,6 +329,7 @@
       INTEGER DIMO( NDF__MXDIM ) ! Dimensions of output NDF
       INTEGER EL                 ! Number of elements in array
       INTEGER EL2                ! Number of elements in output array
+      INTEGER F                  ! Index of first non-nlank character
       INTEGER I                  ! Loop variable
       INTEGER IAT                ! String length
       INTEGER INTERP             ! Resampling scheme identifier
@@ -347,6 +355,7 @@
       INTEGER IPWV2              ! Pointer to workspace
       INTEGER IWCS               ! WCS FrameSet from input NDF
       INTEGER J                  ! Loop variable
+      INTEGER L                  ! Index of last non-nlank character
       INTEGER LASTDM             ! Index of last dimension needing resampling
       INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF
       INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
@@ -573,36 +582,45 @@
 *  each pair of numerical values in the string).
                COMMA = ( TEXT( IAT : IAT ) .EQ. ',' )
 
-*  Read a floating point value from the beginning of the remainder of
-*  the pixscale string, up to the first comma or space.
-               CALL CHR_CTOD( TEXT( START : IAT - 1 ), NEWSCL( I ),
-     :                        STATUS )
-               IF ( STATUS .NE. SAI__OK ) THEN
-                  CALL MSG_SETI( 'I', I )
-                  CALL ERR_REP( ' ', 'Ill-formed pixel scale value '//
-     :                          'supplied for WCS axis ^I.', STATUS )
-                  CALL MSG_SETC( 'T', TEXT )
-                  CALL ERR_REP( ' ', 'Parameter PIXSCALE was set to '//
-     :                          '"^T".', STATUS )
-                  GO TO 999
-               END IF
+*  If the next field contains a single asterisk, retain the current axis
+*  scale.
+               CALL CHR_FANDL( TEXT( START : IAT - 1 ), F, L )
+               IF( TEXT( START + F - 1 : START + L - 1 ) .EQ. '*' ) THEN
+                  NEWSCL( I ) = PIXSC( I )
 
-*  Report an error if the piel scale is zero.
-               IF ( NEWSCL( I ) .EQ. 0.0 ) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI( 'I', I )
-                  CALL ERR_REP( ' ', 'Zero pixel scale value '//
-     :                          'supplied for WCS axis ^I.', STATUS )
-                  CALL MSG_SETC( 'T', TEXT )
-                  CALL ERR_REP( ' ', 'Parameter PIXSCALE was set to '//
-     :                          '"^T".', STATUS )
-                  GO TO 999
-               END IF
+*  Otherwise, read a floating point value from the beginning of the remainder
+*  of the pixscale string, up to the first comma or space.
+               ELSE
+                  CALL CHR_CTOD( TEXT( START : IAT - 1 ), NEWSCL( I ),
+     :                           STATUS )
+                  IF ( STATUS .NE. SAI__OK ) THEN
+                     CALL MSG_SETI( 'I', I )
+                     CALL ERR_REP( ' ', 'Ill-formed pixel scale '//
+     :                             'value supplied for WCS axis ^I.',
+     :                             STATUS )
+                     CALL MSG_SETC( 'T', TEXT )
+                     CALL ERR_REP( ' ', 'Parameter PIXSCALE was set '//
+     :                             'to "^T".', STATUS )
+                     GO TO 999
+                  END IF
+
+*  Report an error if the pixel scale is zero.
+                  IF ( NEWSCL( I ) .EQ. 0.0 ) THEN
+                     STATUS = SAI__ERROR
+                     CALL MSG_SETI( 'I', I )
+                     CALL ERR_REP( ' ', 'Zero pixel scale value '//
+     :                             'supplied for WCS axis ^I.', STATUS )
+                     CALL MSG_SETC( 'T', TEXT )
+                     CALL ERR_REP( ' ', 'Parameter PIXSCALE was set '//
+     :                             'to "^T".', STATUS )
+                     GO TO 999
+                  END IF
 
 *  If the scale units are arc-seconds, scale the new scale from
 *  arc-seconds to radians.
-               IF ( UPIXSC( I ) .EQ. 'arc-sec' ) THEN
-                  NEWSCL( I ) = AST__DD2R*NEWSCL( I )/3600.0D0
+                  IF ( UPIXSC( I ) .EQ. 'arc-sec' ) THEN
+                     NEWSCL( I ) = AST__DD2R*NEWSCL( I )/3600.0D0
+                  END IF
                END IF
 
 *  Move the start position on to the next character following the
