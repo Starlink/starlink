@@ -485,7 +485,10 @@ endif
 
 if ( ! -e ${orac_dir}/etc/cshrc ) then
    alias oracdr_acsis      ${staretcdir}/notinst oracdr_acsis
+   alias oracdr_acsis_ql   ${staretcdir}/notinst oracdr_acsis_ql
+   alias oracdr_acsis_summit ${staretcdir}/notinst oracdr_acsis_summit
    alias oracdr_cgs4       ${staretcdir}/notinst oracdr_cgs4
+   alias oracdr_cgs4_old   ${staretcdir}/notinst oracdr_cgs4_old
    alias oracdr_classiccam ${staretcdir}/notinst oracdr_classiccam
    alias oracdr_gmos       ${staretcdir}/notinst oracdr_gmos
    alias oracdr_ingrid     ${staretcdir}/notinst oracdr_ingrid
@@ -497,21 +500,26 @@ if ( ! -e ${orac_dir}/etc/cshrc ) then
    alias oracdr_naco       ${staretcdir}/notinst oracdr_naco
    alias oracdr_niri       ${staretcdir}/notinst oracdr_niri
    alias oracdr_scuba      ${staretcdir}/notinst oracdr_scuba
-   alias oracdr_scuba2l    ${staretcdir}/notinst oracdr_scuba2l
-   alias oracdr_scuba2s    ${staretcdir}/notinst oracdr_scuba2s
-   alias oracdr_scuba2lq   ${staretcdir}/notinst oracdr_scuba2lq
-   alias oracdr_scuba2sq   ${staretcdir}/notinst oracdr_scuba2sq
+   alias oracdr_scuba2_850 ${staretcdir}/notinst oracdr_scuba2_850
+   alias oracdr_scuba2_450 ${staretcdir}/notinst oracdr_scuba2_450
+   alias oracdr_scuba2_850_ql ${staretcdir}/notinst oracdr_scuba2_850_ql
+   alias oracdr_scuba2_450_ql ${staretcdir}/notinst oracdr_scuba2_450_ql
+   alias oracdr_scuba2_850_summit ${staretcdir}/notinst oracdr_scuba2_850_summit
+   alias oracdr_scuba2_450_summit ${staretcdir}/notinst oracdr_scuba2_450_summit
    alias oracdr_sofi       ${staretcdir}/notinst oracdr_sofi
-   alias oracdr_spex       ${staretcdir}/notinst oracdr_spex
-   alias oracdr_swfcam     ${staretcdir}/notinst oracdr_swfcam
-   alias oracdr_swfcam1    ${staretcdir}/notinst oracdr_swfcam1
-   alias oracdr_swfcam2    ${staretcdir}/notinst oracdr_swfcam2
-   alias oracdr_swfcam3    ${staretcdir}/notinst oracdr_swfcam3
-   alias oracdr_swfcam4    ${staretcdir}/notinst oracdr_swfcam4
+   alias oracdr_wfcam      ${staretcdir}/notinst oracdr_wfcam
+   alias oracdr_wfcam1     ${staretcdir}/notinst oracdr_wfcam1
+   alias oracdr_wfcam2     ${staretcdir}/notinst oracdr_wfcam2
+   alias oracdr_wfcam3     ${staretcdir}/notinst oracdr_wfcam3
+   alias oracdr_wfcam4     ${staretcdir}/notinst oracdr_wfcam4
+   alias oracdr_wfcam5     ${staretcdir}/notinst oracdr_wfcam5
    alias oracdr_ufti       ${staretcdir}/notinst oracdr_ufti
+   alias oracdr_ufti_casu  ${staretcdir}/notinst oracdr_ufti_casu
    alias oracdr_ufti_old   ${staretcdir}/notinst oracdr_ufti_old
    alias oracdr_uist       ${staretcdir}/notinst oracdr_uist
    alias xoracdr           ${staretcdir}/notinst xoracdr
+   alias picard            ${staretcdir}/notinst picard
+   alias fitseditor        ${staretcdir}/notinst fitseditor
 else
    source ${orac_dir}/etc/cshrc
 endif

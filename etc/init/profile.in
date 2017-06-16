@@ -733,7 +733,10 @@ else
     source ${bindir}/oracdr/etc/profile
   else
     oracdr_acsis () { ${STARLINK_DIR}/etc/notinst oracdr_acsis; }
+    oracdr_acsis_ql () { ${STARLINK_DIR}/etc/notinst oracdr_acsis_ql; }
+    oracdr_acsis_summit () { ${STARLINK_DIR}/etc/notinst oracdr_acsis_summit; }
     oracdr_cgs4 () { ${STARLINK_DIR}/etc/notinst oracdr_cgs4; }
+    oracdr_cgs4_old () { ${STARLINK_DIR}/etc/notinst oracdr_cgs4_old; }
     oracdr_classiccam () { ${STARLINK_DIR}/etc/notinst oracdr_classiccam; }
     oracdr_gmos () { ${STARLINK_DIR}/etc/notinst oracdr_gmos; }
     oracdr_ingrid () { ${STARLINK_DIR}/etc/notinst oracdr_ingrid; }
@@ -745,21 +748,26 @@ else
     oracdr_naco () { ${STARLINK_DIR}/etc/notinst oracdr_naco; }
     oracdr_niri () { ${STARLINK_DIR}/etc/notinst oracdr_niri; }
     oracdr_scuba () { ${STARLINK_DIR}/etc/notinst oracdr_scuba; }
-    oracdr_scuba2l () { ${STARLINK_DIR}/etc/notinst oracdr_scuba2l; }
-    oracdr_scuba2s () { ${STARLINK_DIR}/etc/notinst oracdr_scuba2s; }
-    oracdr_scuba2lq () { ${STARLINK_DIR}/etc/notinst oracdr_scuba2lq; }
-    oracdr_scuba2sq () { ${STARLINK_DIR}/etc/notinst oracdr_scuba2sq; }
+    oracdr_scuba2_850 () { ${STARLINK_DIR}/etc/notinst oracdr_scuba2_850; }
+    oracdr_scuba2_450 () { ${STARLINK_DIR}/etc/notinst oracdr_scuba2_450; }
+    oracdr_scuba2_850_ql () { ${STARLINK_DIR}/etc/notinst oracdr_scuba2_850_ql; }
+    oracdr_scuba2_450_ql () { ${STARLINK_DIR}/etc/notinst oracdr_scuba2_450_ql; }
+    oracdr_scuba2_850_summit () { ${STARLINK_DIR}/etc/notinst oracdr_scuba2_850_summit; }
+    oracdr_scuba2_450_summit () { ${STARLINK_DIR}/etc/notinst oracdr_scuba2_450_summit; }
     oracdr_sofi () { ${STARLINK_DIR}/etc/notinst oracdr_sofi; }
-    oracdr_spex () { ${STARLINK_DIR}/etc/notinst oracdr_spex; }
-    oracdr_swfcam () { ${STARLINK_DIR}/etc/notinst oracdr_swfcam; }
-    oracdr_swfcam1 () { ${STARLINK_DIR}/etc/notinst oracdr_swfcam1; }
-    oracdr_swfcam2 () { ${STARLINK_DIR}/etc/notinst oracdr_swfcam2; }
-    oracdr_swfcam3 () { ${STARLINK_DIR}/etc/notinst oracdr_swfcam3; }
-    oracdr_swfcam4 () { ${STARLINK_DIR}/etc/notinst oracdr_swfcam4; }
+    oracdr_wfcam () { ${STARLINK_DIR}/etc/notinst oracdr_wfcam; }
+    oracdr_wfcam1 () { ${STARLINK_DIR}/etc/notinst oracdr_wfcam1; }
+    oracdr_wfcam2 () { ${STARLINK_DIR}/etc/notinst oracdr_wfcam2; }
+    oracdr_wfcam3 () { ${STARLINK_DIR}/etc/notinst oracdr_wfcam3; }
+    oracdr_wfcam4 () { ${STARLINK_DIR}/etc/notinst oracdr_wfcam4; }
+    oracdr_wfcam5 () { ${STARLINK_DIR}/etc/notinst oracdr_wfcam5; }
     oracdr_ufti () { ${STARLINK_DIR}/etc/notinst oracdr_ufti; }
+    oracdr_ufti_casu () { ${STARLINK_DIR}/etc/notinst oracdr_ufti_casu; }
     oracdr_ufti_old () { ${STARLINK_DIR}/etc/notinst oracdr_ufti_old; }
     oracdr_uist () { ${STARLINK_DIR}/etc/notinst oracdr_uist; }
     xoracdr () { ${STARLINK_DIR}/etc/notinst xoracdr; }
+    picard () { ${STARLINK_DIR}/etc/notinst picard; }
+    fitseditor () { ${STARLINK_DIR}/etc/notinst fitseditor; }
   fi
 fi
 
