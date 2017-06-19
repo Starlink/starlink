@@ -426,17 +426,20 @@ hds1_get_subs(int ndim, HDS_PTYPE *dims, INT_BIG offset, HDS_PTYPE *subs)
  */
 
 {
-   int disp;
+   INT_BIG disp;
    int i;
+   INT_BIG strides[ DAT__MXDIM ];
 
    disp = offset;
-   subs[0] = dims[0];
+
+   strides[0] = dims[0];
    for (i=1; i<ndim; i++)
-      subs[i] = subs[i-1] * dims[i];
+      strides[i] = strides[i-1] * dims[i];
+
    for (i=ndim-1; i>=1; i--)
    {
-      subs[i] = disp / subs[i-1];
-      disp   -= subs[i-1] * subs[i];
+      subs[i] = disp / strides[i-1];
+      disp   -= strides[i-1] * subs[i];
       ++subs[i];
    }
    subs[0] = disp + 1;
