@@ -109,6 +109,9 @@
 *     12-JUN-2017 (DSB):
 *        Added the position angle of the reference direction ("refrot_") to the
 *        output TCL file.
+*     19-JUN-2017 (DSB):
+*        Ensure double precision values are written out with an E exponent,
+*        rather than a D exponent (TCL does not understand D exponents).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -806,7 +809,7 @@
 *  Write out the equinox.
       TEXT = 'set equinox_ '
       IAT = 13
-      CALL CHR_PUTD( DEQNOX, TEXT, IAT )
+      CALL POL1_PUTD( DEQNOX, TEXT, IAT )
       CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
 *  Write out the epoch.
@@ -856,7 +859,7 @@
 *  Write out the position angle of the reference direction within (RA,Dec).
       TEXT = 'set refrot_ '
       IAT = 12
-      CALL CHR_PUTD( REFROT, TEXT, IAT )
+      CALL POL1_PUTD( REFROT, TEXT, IAT )
       CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
 *  Free the work space.

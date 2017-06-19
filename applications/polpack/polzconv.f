@@ -112,6 +112,9 @@
 *        Original version.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     19-JUN-2017 (DSB):
+*        Ensure double precision values are written out with an E exponent,
+*        rather than a D exponent (TCL does not understand D exponents).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -336,7 +339,7 @@
 *  parameter.
       IF( ZCOL .NE. AST__BAD ) THEN
          IAT = 0
-         CALL CHR_PUTD( ZCOL, ZTEXT, IAT )
+         CALL POL1_PUTD( ZCOL, ZTEXT, IAT )
       ELSE
          IAT = 3
          ZTEXT = '***'
