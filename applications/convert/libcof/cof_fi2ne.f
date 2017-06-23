@@ -112,6 +112,7 @@
       INTEGER END( MAXWRD )      ! End columns of words (not used)
       CHARACTER * ( ( MAXWRD+1 ) * DAT__SZNAM ) EXPATH ! Extension path
       CHARACTER * ( DAT__SZTYP ) EXTYPE ! Extension data type
+      CHARACTER * ( DAT__SZTYP ) EXTYPEM ! Extension data type, modified
       LOGICAL GOMORE             ! Look for the top MORE component?
       INTEGER INDICE( MAXWRD - 2 ) ! Indices of the structure's cell
       INTEGER LEVEL              ! Extension level
@@ -215,11 +216,17 @@
 *  Otherwise create a new extension of the appropriate shape.  Obtain a
 *  locator to the current array element for an array of extensions.
       ELSE
+         IF ( NAME .EQ. 'SMURF' ) THEN
+           EXTYPEM = 'SMURF_EXT'
+         ELSE
+           EXTYPEM = EXTYPE
+         END IF
+
          IF ( NDIM .EQ. 0 ) THEN
-            CALL NDF_XNEW( NDF, NAME, EXTYPE, 0, 0,
+            CALL NDF_XNEW( NDF, NAME, EXTYPEM, 0, 0,
      :                     SXLOC( ELEVEL - 2 ), STATUS )
          ELSE
-            CALL NDF_XNEW( NDF, NAME, EXTYPE, NDIM, DIMS, LOC, STATUS )
+            CALL NDF_XNEW( NDF, NAME, EXTYPEM, NDIM, DIMS, LOC, STATUS )
             CALL DAT_CELL( LOC, NDIM, INDICE,
      :                     SXLOC( ELEVEL - 2 ), STATUS )
             CALL DAT_ANNUL( LOC, STATUS )
