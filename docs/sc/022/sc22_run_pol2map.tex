@@ -80,7 +80,7 @@ script exists (unless parameter RETAIN is set TRUE). [!]
 
 \end{aligndesc}
 
-\section{\xlabel{how-step1}Running pol2map - step 1}
+\section{\xlabel{how-step1}pol2map - step 1}
 
 As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction - The Theory} we must first run pol2map on the raw data to produce an mask for our second and third pol2map reduction steps.
 
@@ -89,6 +89,7 @@ In this first step we run:
 \begin{terminalv}
 % pol2map in=^myfiles.list iout=iauto qout=! uout=! mapdir=maps qudir=qudata
 \end{terminalv}
+
 
 Here, the file \texttt{myfiles.lis} contains a list of the raw data
 files to be included in the map, and could for instance look like this:
@@ -107,22 +108,84 @@ for a single waveband and a single observation from a POL-2 observation --- do n
 different wavebands and/or astronomical regions}. In addition the data used in this example also
 comes from observation 56 and 59 taken on January 11th 2016
 
+\begin{tip}
+An up-caret ( ^ ) is required any time you are reading in a group text file in Starlink. For the map-maker this includes the configuration file (a group of configuration parameters) and the list of input files (a group of NDFs e.g. in=^myfiles.lis). 
+\end{tip}
+
+Note qout and uout are set no null values as no Q or U maps are required to be produced from this initial step 1 reduction stage.
+
+The following shows the output from running this initial pol2map command:
 
 \begin{terminalv}
 Logging to file pol2map.log
 Calculating Q, U and I time streams from raw analysed intensity data...
-   1/1: Processing 116 raw data files from observation 20160125_00043 ...
+   1/3: Processing 116 raw data files from observation 20160125_00043 ...
+   2/3: Processing 116 raw data files from observation 20160112_00059 ...
+   3/3: Processing 116 raw data files from observation 20160112_00056 ...
 
 >>>>   Making I map from 20160125_00043_0003...
 
-Storing pointing corrections of (0.0,0.0) arc-seconds for future use
+   Using pre-calculated pointing corrections of (0.0,0.0) arc-seconds
+   Re-using previously created map 'maps/20160125_00043_0003_imap'
+
+>>>>   Making I map from 20160112_00056_0003...
+
+Storing pointing corrections of (1.889022181,2.8085505485) arc-seconds for future use
+
+>>>>   Making I map from 20160112_00059_0003...
+
+Storing pointing corrections of (2.13319187001,2.40199783004) arc-seconds for future use
+Coadding I maps from all observations:
+\end{terminalv}
+
+The files produced in this reduction are:
+
+
 \begin{terminalv}
+CCDPACK.LOG  iauto.sdf  maps/  myfiles.list  pol2map.log  qudata/
+\end{terminalv}
+
+The output I map, iauto.sdf, can be opened up and viewed in GAIA.
+
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=0.8\linewidth]{sc22-gaia-view-iauto.png}
+\label{fig:gaia-iauto}
+\caption [I map in GAIA]{
+  \small The I map, iauto.sdf, as viewed with GAIA. 
+}
+\end{center}
+\end{figure}
+
+The maps folder contains the individual I maps from each separate observation:
+
+\begin{terminalv}
+20160112_00056_0003_imap.sdf  20160112_00059_0003_imap.sdf  20160125_00043_0003_imap.sdf
+\end{terminalv}
+
+and the qudata folder contains:
+
+\begin{terminalv}
+s8a20160112_00056_0003_IT.sdf  s8b20160112_00059_0003_IT.sdf  s8c20160125_00043_0003_IT.sdf
+s8a20160112_00056_0003_QT.sdf  s8b20160112_00059_0003_QT.sdf  s8c20160125_00043_0003_QT.sdf
+s8a20160112_00056_0003_UT.sdf  s8b20160112_00059_0003_UT.sdf  s8c20160125_00043_0003_UT.sdf
+s8a20160112_00059_0003_IT.sdf  s8b20160125_00043_0003_IT.sdf  s8d20160112_00056_0003_IT.sdf
+s8a20160112_00059_0003_QT.sdf  s8b20160125_00043_0003_QT.sdf  s8d20160112_00056_0003_QT.sdf
+s8a20160112_00059_0003_UT.sdf  s8b20160125_00043_0003_UT.sdf  s8d20160112_00056_0003_UT.sdf
+s8a20160125_00043_0003_IT.sdf  s8c20160112_00056_0003_IT.sdf  s8d20160112_00059_0003_IT.sdf
+s8a20160125_00043_0003_QT.sdf  s8c20160112_00056_0003_QT.sdf  s8d20160112_00059_0003_QT.sdf
+s8a20160125_00043_0003_UT.sdf  s8c20160112_00056_0003_UT.sdf  s8d20160112_00059_0003_UT.sdf
+s8b20160112_00056_0003_IT.sdf  s8c20160112_00059_0003_IT.sdf  s8d20160125_00043_0003_IT.sdf
+s8b20160112_00056_0003_QT.sdf  s8c20160112_00059_0003_QT.sdf  s8d20160125_00043_0003_QT.sdf
+s8b20160112_00056_0003_UT.sdf  s8c20160112_00059_0003_UT.sdf  s8d20160125_00043_0003_UT.sdf
+\end{terminalv}
 
 
-\section{\xlabel{how-step23}Running pol2map - steps 2 \& 3}
+\section{\xlabel{how-step23}pol2map - steps 2 \& 3}
 
 
-As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction - The Theory} we take the output from the initial run of pol2map  
+As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction - The Theory} we take the output from the initial run of pol2map 
+and use this to produce the final I, Q and U maps. If requested a vector catalogue is also produced.
 
 The second and third steps of the POL-2 data reduction process,  can be run in a single command
 
@@ -131,13 +194,95 @@ The second and third steps of the POL-2 data reduction process,  can be run in a
           maskout1=astmask maskout2=pcamask ipref=iext cat=mycat debias=yes
 \end{terminalv}
 
+The following shows the output from running this second pol2map command. First we see pol2map producing
+new I maps
 
 \begin{terminalv}
-%
+Logging to file pol2map.log
+(existing file pol2map.log moved to pol2map.log.1)
+
+Masking will be based on SNR values in 'iauto'.
+
+>>>>   Making I map from 20160112_00056_0003...
+
+   Using pre-calculated pointing corrections of (1.889022181,2.8085505485) arc-seconds
+
+>>>>   Making I map from 20160125_00043_0003...
+
+   Using pre-calculated pointing corrections of (0.0,0.0) arc-seconds
+
+>>>>   Making I map from 20160112_00059_0003...
+
+   Using pre-calculated pointing corrections of (2.13319187001,2.40199783004) arc-seconds
+Coadding I maps from all observations:
+\end{terminalv}
+
+we see as pol2map continues the Q and U maps are the produced. This is followed by the creation of
+the output vector catalogue:
+
+\begin{terminalv}
+>>>>   Making Q map from 20160112_00056_0003...
+
+   Using pre-calculated pointing corrections of (1.889022181,2.8085505485) arc-seconds
+
+>>>>   Making Q map from 20160125_00043_0003...
+
+   Using pre-calculated pointing corrections of (0.0,0.0) arc-seconds
+
+>>>>   Making Q map from 20160112_00059_0003...
+
+   Using pre-calculated pointing corrections of (2.13319187001,2.40199783004) arc-seconds
+Coadding Q maps from all observations:
+
+>>>>   Making U map from 20160112_00056_0003...
+
+   Using pre-calculated pointing corrections of (1.889022181,2.8085505485) arc-seconds
+
+>>>>   Making U map from 20160125_00043_0003...
+
+   Using pre-calculated pointing corrections of (0.0,0.0) arc-seconds
+
+>>>>   Making U map from 20160112_00059_0003...
+
+   Using pre-calculated pointing corrections of (2.13319187001,2.40199783004) arc-seconds
+Coadding U maps from all observations:
+Creating the output catalogue: 'mycat'...
+
+45604 vectors written to the output catalogue.
 \end{terminalv}
 
 
+The output of this Final pol2map
+
+
 \begin{terminalv}
-%
+astmask.sdf
+pcamask.sdf
+iext.sdf
+qext.sdf
+uext.sdf
+mycat.FIT
+
+\end{terminalv}
+
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=0.46\linewidth]{sc22-gaia-view-qext.png}
+\includegraphics[width=0.46\linewidth]{sc22-gaia-view-uext.png}
+\label{fig:gaia-qext-uext}
+\caption [Q and U maps in GAIA]{
+  \small Left: Q map, qext.sdf, Right: U map uext.sdf, as viewed with GAIA. 
+}
+\end{center}
+\end{figure}
+
+
+
+The maps folder now contains individual Q and U maps alongside the existing I maps:
+
+\begin{terminalv}
+20160112_00056_0003_Imap.sdf  20160112_00056_0003_imap.sdf  20160112_00059_0003_Umap.sdf  20160125_00043_0003_Qmap.sdf
+20160112_00056_0003_Qmap.sdf  20160112_00059_0003_Imap.sdf  20160112_00059_0003_imap.sdf  20160125_00043_0003_Umap.sdf
+20160112_00056_0003_Umap.sdf  20160112_00059_0003_Qmap.sdf  20160125_00043_0003_Imap.sdf  20160125_00043_0003_imap.sdf
 \end{terminalv}
 
