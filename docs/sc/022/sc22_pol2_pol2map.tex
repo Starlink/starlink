@@ -2,10 +2,11 @@
 \label{sec:dr}
 \section{\xlabel{dataflow}The Data Flow}
 
-POL-2 data reduction is a complex and involved process
-for which a broad overview is presented first before
-the specific details are discussed.
+POL-2 data reduction is a complex and involved process for which a broad overview is presented first before
+the specific details are discussed. It is noted that this same procedure is used whether there is one or 
+multiple observation to reduce.
 
+The data reduction process can be broken down into three main steps as shown in Figure \ref{fig:pol2drflow}.
 
 \begin{figure}[t!]
 \begin{center}
@@ -20,9 +21,32 @@ the specific details are discussed.
 \end{center}
 \end{figure}
 
+
 \subsection*{Step 1}
 
+The inital step of the process (see Run 1 in Figure \cite{fig:pol2drflow}) creates 
+an intensity, I, map from the raw data files provided to the reduction routine (see \cref{Chapter}{sec:rundr}). 
+
+
+\subsubsection*{The process}
+The  analysed  intensity values in the raw data time-streams are first converted into Q, U and I time-streams
+using smurf:calcqu (these are stored for future use in the directory qudata, specified by the qudir parameter in the example command below). 
+
+The smurf:makemap command is then used to create a separate map from the I time-stream for each observation, using SNR-based “auto-masking” to define the background regions that are to be set to zero at the end of each iteration.  
+
+These maps are stored for future use in the directory maps, specified by the mapdir parameter. Each map has a name of the form:
+
+<UT_DATE>_<OBS_NUM>_<CHUNK_NUM>_imap.sdf
+
+where <CHUNK_NUM> indicates the raw data file at the start of the contiguous chunk of data used to create the map, and is
+usually 0003. Each of these maps is compared to the specified reference map (if any) to determine a pointing correction to be applied to the observation in future
+2 . If no reference map is supplied, the I map created from the first observation defines the expected source position, and is compared with later maps to determine their pointing corrections.
+
+
 \subsection*{Step 2}
+
+In the second step of the process (see Run 2 in Figure \cite{fig:pol2drflow}) an improved I map is produced. This improvements come from i) applied relative pointing corrections 
+
 
 \subsection*{Step 3}
 
@@ -32,13 +56,32 @@ the specific details are discussed.
 
 The POL-2 data reduction builds upon the SCUBA-2 make-map data reduction. The Dynamic Iterative Map-Maker, hereafter just referred to as the map-maker is the tool you will use to produce SCUBA-2 maps, and is implemented by the Smurf makemap command. It performs all pre-processing steps to clean the data, followed by solving for multiple signal components using an iterative algorithm, and binning the resulting time-series data to produce a final science map. 
 
+
+
 \cite{smurf}
 
 \section{\xlabel{pca}PCA}
 
 
 \section{\xlabel{masking}Masking}
+A mask is a two-dimensional array which has the same shape and size as the final map, and
+which is used to indicate where the source is expected to fall within the map. Bad pixel values
+within a mask indicate background pixels, and good pixels values indicate source pixels. Masks
+are used for two main purposes:
 
+\begin{enumerate}\itemsep-0.2em
+\item To prevent the growth of gradients and other artificial large scale structures within the
+map.  For this purpose, the astronomical signal at all background pixels defined by the
+mask is forced to zero at the end of each iteration within makemap (except for the final iteration).
+\item To prevent bright sources polluting the evaluation of the various noise models (PCA, COM, FLT) used within
+makemap. Source pixels are excluded from the calculation of these models.
+\end{enumerate}
+
+
+The pol2map script uses different masks for these two purposes - the “AST” mask and the “PCA” mask. 
+The PCA mask is in general less extensive than the AST mask, with the source areas being restricted to the brighter inner regions.
+Each of these two masks can either be generated automatically within makemap, or be specified by
+a fixed external NDF. 
 
 \section{\xlabel{addingdata}Adding new observations}
 
