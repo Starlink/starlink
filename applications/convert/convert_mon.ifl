@@ -891,6 +891,8 @@ endinterface
 #        Added USEAXIS.
 #     2013 November 15 (MJC):
 #        Added ALLOWTAB.
+#     2017 June 23 (GSB):
+#        Added PROPROV.
 #     {enter_further_changes_here}
 
 #-
@@ -1041,6 +1043,14 @@ interface NDF2FITS
    parameter      PROHIS         # Propagate the NDF's HISTORY information
       type        '_LOGICAL'
       prompt      'Relay any NDF history information to the FITS header?'
+      vpath       'DEFAULT'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
+   parameter      PROPROV        # Propagate the provenance information
+      type        '_LOGICAL'
+      prompt      'Propagate provenance as extra FITS extensions?'
       vpath       'DEFAULT'
       default     TRUE
       helpkey     '*'

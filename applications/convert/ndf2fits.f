@@ -220,6 +220,9 @@
 *        FITS header as HISTORY cards.  These follow the mandatory
 *        headers and any merged FITS-extension headers (see Parameter
 *        PROFITS).  [TRUE]
+*     PROPROV = _LOGICAL (Read)
+*        If TRUE, include PROVENANCE amongst extensions directly exported
+*        to FITS files.  See also PROEXTS and PROVENANCE. [TRUE]
 *     PROVENANCE = LITERAL (Read)
 *        This controls the export of NDF provenance information to the
 *        FITS file.  Allowed values are as follows.
@@ -741,6 +744,8 @@
 *        Add Parameter ALLOWTAB.
 *     9-JUL-2014 (DSB):
 *        Added Parameter AXISORDER.
+*     23-JUN-2017 (GSB):
+*        Added PROPROV parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -838,6 +843,7 @@
       LOGICAL PROEXT             ! Propagated other extensions?
       LOGICAL PROFIT             ! Is FITS extension propagated?
       LOGICAL PROHIS             ! Propagated history information?
+      LOGICAL PROPROV            ! Propagate provenance information?
       CHARACTER*7 PROVEX         ! Provenance export option
       LOGICAL QUAPRE             ! Is QUALITY component present?
       LOGICAL QUASEL             ! Was QUALITY selected?
@@ -1245,6 +1251,9 @@
 *  Determine whether or not the HISTORY component is to be propagated.
       CALL PAR_GET0L( 'PROHIS', PROHIS, STATUS )
 
+*  Determine whether or not the provenance is to be propagated directly.
+      CALL PAR_GET0L( 'PROPROV', PROPROV, STATUS )
+
 *  Determine how the PROVENANCE component is to be handled.
       CALL PAR_CHOIC( 'PROVENANCE', 'None', 'None,CADC,Generic', .TRUE.,
      :                PROVEX, STATUS )
@@ -1585,8 +1594,8 @@
 *  Finally convert the NDF to the FITS file, as best we can.
                CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX,
      :                         BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT,
-     :                         PROHIS, PROVEX, CHECKS, ENCOD, NATIVE,
-     :                         FOPEN, FCLOSE, USEAXS, ALWTAB,
+     :                         PROHIS, PROPROV, PROVEX, CHECKS, ENCOD,
+     :                         NATIVE, FOPEN, FCLOSE, USEAXS, ALWTAB,
      :                         AXORD, STATUS )
 
 *  There are no arrays to transfer to the FITS file for the .HEADER
@@ -1602,16 +1611,16 @@
 *  Convert the NDF to the FITS file.
                CALL COF_NDF2F( NDF, FILNAM, 1, 'HEADER', -32, BLOCKF,
      :                         ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS,
-     :                         PROVEX, CHECKS, ENCOD, NATIVE, FOPEN,
-     :                         FCLOSE, USEAXS, ALWTAB,
+     :                         PROPROV, PROVEX, CHECKS, ENCOD, NATIVE,
+     :                         FOPEN, FCLOSE, USEAXS, ALWTAB,
      :                         AXORD, STATUS )
             ELSE
 
 *  Convert the NDF to the FITS file.
                CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX,
      :                         BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT,
-     :                         PROHIS, PROVEX, CHECKS, ENCOD, NATIVE,
-     :                         FOPEN, FCLOSE, USEAXS, ALWTAB,
+     :                         PROHIS, PROPROV, PROVEX, CHECKS, ENCOD,
+     :                         NATIVE, FOPEN, FCLOSE, USEAXS, ALWTAB,
      :                         AXORD, STATUS )
             END IF
 
