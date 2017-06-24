@@ -1,7 +1,8 @@
       SUBROUTINE COF_SMURF( SNAME, LOC, FUNIT, NDF, FILNAM, NOARR,
      :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT,
-     :                      DUPLEX, PROEXT, PROHIS, SUMS, ENCOD,
-     :                      NATIVE, USEAXS, ALWTAB, AXORD, STATUS )
+     :                      DUPLEX, PROEXT, PROHIS, PROPROV,
+     :                      SUMS, ENCOD, NATIVE, USEAXS, ALWTAB,
+     :                      AXORD, STATUS )
 *+
 *  Name:
 *     COF_SMURF
@@ -15,8 +16,8 @@
 *  Invocation:
 *     CALL COF_SMURF( SNAME, LOC, FUNIT, NDF, FILNAM, NOARR, ARRNAM,
 *                     BITPIX, BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT,
-*                     PROHIS, ENCOD, NATIVE, USEAXS, ALWTAB, AXORD,
-*                     STATUS )
+*                     PROHIS, PROPROV, ENCOD, NATIVE, USEAXS, ALWTAB,
+*                     AXORD, STATUS )
 
 *  Description:
 *     This routine converts contents of a SMURF extension to FITS.  Each
@@ -89,6 +90,8 @@
 *        If .TRUE., any NDF history records are written to the primary
 *        FITS header as HISTORY cards.  These follow the mandatory
 *        headers and any merged FITS-extension headers (see PROFIT).
+*     PROPROV = LOGICAL (Given)
+*        If .TRUE., include the provenance extension.
 *     SUMS = LOGICAL (Given)
 *        If .TRUE., DATASUM and CHECKSUM headers are written to each
 *        HDU.
@@ -167,6 +170,8 @@
 *        it.
 *     9-JUL-2014 (DSB):
 *        Added argument AXORD.
+*     23-JUN-2017 (GSB):
+*        Added argument PROPROV.
 *     {enter_further_changes_here}
 
 *-
@@ -194,6 +199,7 @@
       LOGICAL DUPLEX
       LOGICAL PROEXT
       LOGICAL PROHIS
+      LOGICAL PROPROV
       LOGICAL SUMS
       CHARACTER * ( * ) ENCOD
       LOGICAL NATIVE
@@ -226,6 +232,8 @@
       LOGICAL WRITTN             ! Dummy structure is written?
       CHARACTER * ( DAT__SZLOC ) XLOC ! Locator to an NDF extension
       CHARACTER * ( NDF__SZXNM ) XNAME ! Name of NDF extension
+      CHARACTER * ( DAT__SZTYP ) XTYPE ! Type of NDF extension
+      LOGICAL UNWNTD             ! Extension is unwatned
 
 *.
 
@@ -349,8 +357,19 @@
                         CALL NDF_XLOC( NDFE, XNAME, 'READ', XLOC,
      :                                 STATUS )
 
+*  Obtain the data type of the extension.
+                        CALL DAT_TYPE( XLOC, XTYPE, STATUS )
+
+*  Do we not want this extension?
+                        UNWNTD = ( ( XTYPE .EQ. 'PROVENANCE' )
+     :                             .AND. .NOT. PROPROV )
+
+                        IF ( .NOT. UNWNTD ) THEN
+
 *  Process the extension into a hierarchy.
-                        CALL COF_THIER( XNAME, XLOC, FUNIT, STATUS )
+                           CALL COF_THIER( XNAME, XLOC, FUNIT, STATUS )
+
+                        END IF
 
 *  Write integrity-check headers.
                         IF ( SUMS ) CALL FTPCKS( FUNIT, STATUS )

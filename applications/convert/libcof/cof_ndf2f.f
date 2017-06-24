@@ -1,7 +1,7 @@
       SUBROUTINE COF_NDF2F( NDF, FILNAM, NOARR, ARRNAM, BITPIX, BLOCKF,
      :                      ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS,
-     :                      PROVEN, SUMS, ENCOD, NATIVE, FOPEN, FCLOSE,
-     :                      USEAXS, ALWTAB, AXORD, STATUS )
+     :                      PROPROV, PROVEN, SUMS, ENCOD, NATIVE, FOPEN,
+     :                      FCLOSE, USEAXS, ALWTAB, AXORD, STATUS )
 *+
 *  Name:
 *     COF_NDF2F
@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     CALL COF_NDF2F( NDF, FILNAM, NOARR, ARRNAM, BITPIX, BLOCKF,
-*                     ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS, PROVEN,
-*                     SUMS, ENCOD, NATIVE, USEAXS, ALWTAB, AXORD,
+*                     ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS, PROPROV,
+*                     PROVEN, SUMS, ENCOD, NATIVE, USEAXS, ALWTAB, AXORD,
 *                     STATUS )
 
 *  Description:
@@ -76,6 +76,8 @@
 *        If .TRUE., any NDF history records are written to the primary
 *        FITS header as HISTORY cards.  These follow the mandatory
 *        headers and any merged FITS-extension headers (see PROFIT).
+*     PROPROV = LOGICAL (Given)
+*        If not .TRUE., exclude PROVENANCE from extensions being propagated.
 *     PROVEN = CHARACTER * ( * ) (Given)
 *        This controls the export of NDF provenance information to the
 *        FITS file.  Allowed values are as follows.
@@ -400,6 +402,8 @@
 *        Re-structured to use CVG provenance writing routines.
 *     9-JUL-2014 (DSB):
 *        Added argument AXORD.
+*     23-JUN-2017 (GSB):
+*        Added argument PROPROV.
 *     {enter_further_changes_here}
 
 *-
@@ -427,6 +431,7 @@
       LOGICAL DUPLEX
       LOGICAL PROEXT
       LOGICAL PROHIS
+      LOGICAL PROPROV
       CHARACTER * ( * ) PROVEN
       LOGICAL SUMS
       CHARACTER * ( * ) ENCOD
@@ -516,6 +521,7 @@
       CHARACTER*( DAT__SZTYP ) SCTYPE ! Data type for scaled arrays
       LOGICAL SHIFT              ! A BZERO offset is required?
       LOGICAL SMURF              ! Extension is from SMURF package?
+      LOGICAL UNWNTD             ! Extension is unwatned
       LOGICAL THERE              ! BITPIX FITS header card ! is present?
       CHARACTER*( NDF__SZTYP ) TYPE ! NDF array's data type
       LOGICAL VALID              ! The NDF identifier is valid?
@@ -1301,9 +1307,13 @@
                   SMURF = XTYPE .EQ. 'SMURF' .OR.
      :                    XTYPE .EQ. 'SMURF_EXT'
 
+*  Is the extension otherwise unwanted?
+                  UNWNTD = ( ( XTYPE .EQ. 'PROVENANCE' )
+     :                       .AND. .NOT. PROPROV )
+
 *  Skip over the FITS extension.
                   IF ( XNAME .NE. 'FITS' .AND. .NOT. E2DF .AND.
-     :                 .NOT. SMURF ) THEN
+     :                 .NOT. SMURF .AND. .NOT. UNWNTD ) THEN
 
 *  Process the extension into a hierarchy.
                      CALL COF_THIER( XNAME, XLOC, FUNIT, STATUS )
@@ -1320,8 +1330,9 @@
                      CALL COF_SMURF( XNAME, XLOC, FUNIT, NDF, FILNAM,
      :                               NOARR, ARRNAM, BITPIX, BLOCKF,
      :                               ORIGIN, PROFIT, DUPLEX, PROEXT,
-     :                               PROHIS, SUMS, ENCOD, NATIVE,
-     :                               USEAXS, ALWTAB, AXORD, STATUS )
+     :                               PROHIS, PROPROV, SUMS, ENCOD,
+     :                               NATIVE, USEAXS, ALWTAB, AXORD,
+     :                               STATUS )
                   END IF
 
 *  Write integrity-check headers.
