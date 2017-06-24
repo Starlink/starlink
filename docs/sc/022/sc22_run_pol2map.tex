@@ -1,8 +1,8 @@
 \chapter{\xlabel{pol2_dr}POL-2 Data Reduction - Running pol2map}
 \label{sec:rundr}
 
-The previous chapter, \cref{Chapter}{pol2_dr} described how pol2 map produces I Q and U maps from raw POL-2 data. 
-This chapter describes how to use the command. 
+The previous chapter, \cref{Chapter}{sec:dr}{POL-2 Data Reduction - The Theory}, described how pol2 map produces I Q and U maps from raw POL-2 data. 
+It showed that this reduction process - which uses pol2map - is a three step process.  
 
 As with the other Python scripts in SMURF, you can get more information about the available
 parameters by doing either:
@@ -16,8 +16,8 @@ or
 
 \section{\xlabel{how-pol2map}How to use pol2map}
 
-Before running pol2map directly, you need to ensure that the Starlink environment has been 
-initialised and the Smurf package started (see
+Before running pol2map directly, you need to ensure that the \starlink\ environment has been 
+initialised and the \smurf\ package started (see
 \cref{Section}{sec:starinit}{Initialising Starlink} and
 \cref{Section}{sec:packinit}{KAPPA and SMURF for data processing}).
 To run pol2map you need to supply values for the 
@@ -80,9 +80,9 @@ script exists (unless parameter RETAIN is set TRUE). [!]
 
 \end{aligndesc}
 
-\section{\xlabel{how-step1}pol2map - step 1}
+\section{\xlabel{how-step1}pol2map - producing the initial I map.}
 
-As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction - The Theory} we must first run pol2map on the raw data to produce an mask for our second and third pol2map reduction steps.
+As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction - The Theory} we must first run pol2map on the raw data to produce an initial I map.
 
 In this first step we run:
 
@@ -181,10 +181,10 @@ s8b20160112_00056_0003_UT.sdf  s8c20160112_00059_0003_UT.sdf  s8d20160125_00043_
 \end{terminalv}
 
 
-\section{\xlabel{how-step23}pol2map - steps 2 \& 3}
+\section{\xlabel{how-step23}pol2map - producing the I, Q, U maps and catalogue}
 
 
-As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction - The Theory} we take the output from the initial run of pol2map 
+As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction - The Theory} we need to take the I map output from the initial run of pol2map 
 and use this to produce the final I, Q and U maps. If requested a vector catalogue is also produced.
 
 The second and third steps of the POL-2 data reduction process,  can be run in a single command
@@ -195,7 +195,7 @@ The second and third steps of the POL-2 data reduction process,  can be run in a
 \end{terminalv}
 
 The following shows the output from running this second pol2map command. First we see pol2map producing
-new I maps
+new I maps for each map, correcting the position using from the intensity map provided by mask (in this case iauto.sdf)and then coadding all observations. 
 
 \begin{terminalv}
 Logging to file pol2map.log
@@ -217,7 +217,7 @@ Masking will be based on SNR values in 'iauto'.
 Coadding I maps from all observations:
 \end{terminalv}
 
-we see as pol2map continues the Q and U maps are the produced. This is followed by the creation of
+we see as pol2map continues the Q and U maps are then produced, again with pointing corrections. This is followed by the creation of
 the output vector catalogue:
 
 \begin{terminalv}
@@ -265,6 +265,19 @@ mycat.FIT
 
 \end{terminalv}
 
+
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=0.46\linewidth]{sc22-gaia-view-iauto.png}
+\includegraphics[width=0.46\linewidth]{sc22-gaia-view-iext.png}
+\label{fig:gaia-iext}
+\caption [Final I map in GAIA]{
+  \small Left: I map, iauto, as produced by the automoask on the first pass of pol2map. Right: Final I map, iext, as viewed in GAIA.
+}
+\end{center}
+\end{figure}
+
+
 \begin{figure}[t!]
 \begin{center}
 \includegraphics[width=0.46\linewidth]{sc22-gaia-view-qext.png}
@@ -281,8 +294,38 @@ mycat.FIT
 The maps folder now contains individual Q and U maps alongside the existing I maps:
 
 \begin{terminalv}
-20160112_00056_0003_Imap.sdf  20160112_00056_0003_imap.sdf  20160112_00059_0003_Umap.sdf  20160125_00043_0003_Qmap.sdf
-20160112_00056_0003_Qmap.sdf  20160112_00059_0003_Imap.sdf  20160112_00059_0003_imap.sdf  20160125_00043_0003_Umap.sdf
-20160112_00056_0003_Umap.sdf  20160112_00059_0003_Qmap.sdf  20160125_00043_0003_Imap.sdf  20160125_00043_0003_imap.sdf
+20160112_00056_0003_Imap.sdf  20160112_00059_0003_Imap.sdf  20160125_00043_0003_Imap.sdf
+20160112_00056_0003_Qmap.sdf  20160112_00059_0003_Qmap.sdf  20160125_00043_0003_Qmap.sdf
+20160112_00056_0003_Umap.sdf  20160112_00059_0003_Umap.sdf  20160125_00043_0003_Umap.sdf
+20160112_00056_0003_imap.sdf  20160112_00059_0003_imap.sdf  20160125_00043_0003_imap.sdf
 \end{terminalv}
+
+
+\section{\xlabel{vector-cat}Output vectors from pol2map}
+
+
+
+The output vector catalogue, contains a range of values derived by pol2map for each pixel contained within the I map. 
+
+The values are:
+
+\begin{aligndesc}
+\item[\texttt{X}] pixel coordinate
+\item[\texttt{Y}] pixel coordinate
+\item[\texttt{RA}] RA coordinate 
+\item[\texttt{Dec}] Dec coordinate
+\item[\texttt{I}] Intensity
+\item[\texttt{DI}] error in I
+\item[\texttt{Q}] stokes Q parameter
+\item[\texttt{DQ}] error in Q
+\item[\texttt{U}] stokes U parameter
+\item[\texttt{DU}] error in U
+\item[\texttt{P}]  
+\item[\texttt{DP}] error in P
+\item[\texttt{ANG}] angle of polarization
+\item[\texttt{DANG}] error in ANG
+\item[\texttt{PI}] Polarized Intensity
+\item[\texttt{DPI}] error in PI
+\end{aligndesc}
+
 
