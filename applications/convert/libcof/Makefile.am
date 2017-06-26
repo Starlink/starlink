@@ -21,7 +21,7 @@ F_ROUTINES = \
  cof_wcsax.f cof_wcsdf.f cof_wcsex.f cof_wcsim.f cof_wcsut.f cof_mghdr.f \
  cof_getfc.f cof_getyp.f cof_stscl.f cof_smurf.f cof_nex2f.f \
  cof_fi2ne.f cof_wstr.f cof_smfim.f cof_genam.f cof_wenam.f cof_tbsrc.f \
- cof_mhisr.f
+ cof_mhisr.f cof_issmf.f
 
 GEN_ROUTINES = $(DIRW_GEN_ROUTINES) $(CDILR_GEN_ROUTINES)
 

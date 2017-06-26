@@ -106,6 +106,9 @@
 *        for data produced by new instruments on non AAO telescopes.
 *     2008 February 12 (MJC):
 *        Added support for SMURF.
+*     26-JUN-2017 (DSB):
+*        Modify SMURF test to include SCUBA2 maps. Previous version of 
+*        the test only worked for HARP data.
 *     {enter_further_changes_here}
 
 *-
@@ -142,6 +145,7 @@
                                  ! binary table)
       LOGICAL INSPRE             ! INSTRUME keyword is present?
       CHARACTER * ( 20 ) INSTRU  ! Value of INSTRUME keyword
+      LOGICAL ISSMF              ! Was a SMURF extension found?
       INTEGER NHDU               ! Number of the current HDU
       LOGICAL ORIPRE             ! ORIGIN keyword is present?
       CHARACTER * ( 20 ) ORIGIN  ! Value of ORIGIN keyword
@@ -308,11 +312,11 @@
 *  Test for SMURF data.
 *  ====================
 
-*  Preliminary test.  May need to search through the extensions
-*  looking for an EXTNAME containing 'MORE.SMURF'.
-      ELSE IF ( TELPRE .AND. TELESC .EQ. 'JCMT' .AND.
-     :          INSPRE .AND. INSTRU .EQ. 'HARP'  ) THEN
-         NAME = 'SMURF'
+*  Search through the extensions looking for an EXTNAME containing
+*  'MORE.SMURF'.
+      ELSE
+         CALL COF_ISSMF( FUNIT, ISSMF, STATUS )
+         IF ( ISSMF ) NAME = 'SMURF'
       END IF
 
   999 CONTINUE
