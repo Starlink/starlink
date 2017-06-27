@@ -61,12 +61,17 @@ The POL-2 data reduction builds upon the SCUBA-2 make-map data reduction. The Dy
 
 \section{\xlabel{pca}PCA}
 
-One difference in the reduction of SCUBA-2 data and POL-2 data is the removal of the sky - in this case the polarized sky - background. For those familiar with SCUBA-2 reductions this is done using the COM/GAI model. 
+One difference in the reduction of SCUBA-2 data and POL-2 data is the method for sky removal. 
+In the case of POl-2 this must also include the polarized sky background. 
+For those familiar with SCUBA-2 reductions this is done using the COM/GAI model. 
 
 The COM/GAI model assumes the background is common to all bolometers (after gain variations between bolometers). This would be the case if both the sky brightness and the instrumental polarization was constant across the focal plane. 
 
-By contrast the PCA approach allows there to be multiple correlated components with different amplitudes at different points in the focal plane.
+In pol2map, the reduction command for POL-2 data, the sky removal is done using PCA, Principle Component Analysis.
+The PCA approach allows there to be multiple correlated components with different amplitudes at different points in the focal plane.
 
+
+It \emph{is} possible to run PCA on SCUBA-2 data but the return is minimal. 
 
 
 
