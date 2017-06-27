@@ -262,7 +262,6 @@ iext.sdf
 qext.sdf
 uext.sdf
 mycat.FIT
-
 \end{terminalv}
 
 
@@ -301,6 +300,8 @@ The maps folder now contains individual Q and U maps alongside the existing I ma
 \end{terminalv}
 
 
+
+
 \section{\xlabel{vector-cat}Output vectors from pol2map}
 
 
@@ -327,5 +328,94 @@ The values are:
 \item[\texttt{PI}] Polarized Intensity
 \item[\texttt{DPI}] error in PI
 \end{aligndesc}
+
+
+
+
+\section{\xlabel{tweaking}Tweaking pol2map}
+\label{sec:pol2map-tweaks}
+
+Inevitably, as with SCUBA-2 data reduction, it will likely be necessary for a user to 
+tweak the pol2map reduction for specific situations.
+
+The pixel size of the final map produced is controlled by the pixsize
+parameter in the the \smurf\ pol2map command:
+
+\begin{terminalv}
+% pol2map pixsize=12
+\end{terminalv}
+
+
+
+\section{\xlabel{config}The dimmconfig files for POL-2 reduction}
+\label{sec:config}
+
+When pol2map is run the reduction relies on a set of parameters 
+
+\subsection*{.dimmconfig\_pol2.lis}
+
+not to be directly used (hence hidden) .dimmconfig\_pol2.lis
+
+numiter = -5
+
+
+
+
+\begin{terminalv}
+#  Use PCA to model and remove the  background polarisation.
+   modelorder = (pca,ext,ast,noi)
+
+#  Time based despiking.
+   spikebox = 10
+   spikethresh = 5
+
+#  POL" scans are very slow, so avoid flagging slow samples.
+   flagslow = 0.01
+
+#  Aggreive noise clipping.
+   noisecliphigh = 3
+
+#  The data has already been downsampled by CALCQU, so don't  do any more
+#  down sampling.
+   downsampscale = 0
+
+#  Weight bolometers using the RMS residuals calculated by CALQU and
+#  stored i nthe variance component of the CALCQU output NDFs.
+   noi.usevar = 1
+
+#  Use smaller boxes when finding DC steps because of the very low sample
+#  rate of POL2 Stokes vector time-series created by calcqu.
+   dcfitbox = 5
+   dcsmooth = 10
+\end{terminalv}
+
+
+\subsection*{dimmconfig\_pol2\_compact.lis}
+
+This reduction builds on the default dimmconfig\_pol2.lis configuration file but uses boundary 
+constraints for an initial ast mask since the source is assumed to be isolated.
+
+
+\begin{terminalv}
+   ast.zero_circle = (0.016666)
+\end{terminalv}
+
+
+\subsection*{dimmconfig\_pol2\_extended.lis}
+
+
+This reduction builds on the default dimmconfig\_pol2.lis configuration file but
+
+\begin{terminalv}
+   numiter=-40
+   ast.zero_snr = 3
+   ast.zero_snrlo = 2
+\end{terminalv}
+
+
+ 
+
+
+
 
 

@@ -42,10 +42,15 @@ where <CHUNK_NUM> indicates the raw data file at the start of the contiguous chu
 usually 0003. Each of these maps is compared to the specified reference map (if any) to determine a pointing correction to be applied to the observation in future
 2 . If no reference map is supplied, the I map created from the first observation defines the expected source position, and is compared with later maps to determine their pointing corrections.
 
+pca.pcathresh = -50
+
+
 
 \subsection*{Step 2}
 
-In the second step of the process (see Run 2 in Figure \ref{fig:pol2drflow}) an improved I map is produced. This improvements come from i) applied relative pointing corrections 
+In the second step of the process (see Run 2 in Figure \ref{fig:pol2drflow}) an improved I map is produced. This improvements come from i) applied relative pointing corrections ii) increased number of PCA components
+
+pca.pcathresh=-150
 
 
 \subsection*{Step 3}
@@ -54,7 +59,7 @@ In the third step of the reduction process (see Run 3 in Figure \ref{fig:pol2drf
 
 \section{\xlabel{makemap}Makemap}
 
-The POL-2 data reduction builds upon the SCUBA-2 make-map data reduction. The Dynamic Iterative Map-Maker, hereafter just referred to as the map-maker is the tool you will use to produce SCUBA-2 maps, and is implemented by the Smurf makemap command. It performs all pre-processing steps to clean the data, followed by solving for multiple signal components using an iterative algorithm, and binning the resulting time-series data to produce a final science map. 
+The POL-2 data reduction builds upon the SCUBA-2 make-map data reduction. The Dynamic Iterative Map-Maker, hereafter just referred to as the map-maker is the tool used to produce SCUBA-2 maps, and is implemented by the \smurf\ makemap command. It performs all pre-processing steps to clean the data, followed by solving for multiple signal components using an iterative algorithm, and binning the resulting time-series data to produce a final science map. 
 
 
 
@@ -64,6 +69,7 @@ The POL-2 data reduction builds upon the SCUBA-2 make-map data reduction. The Dy
 One difference in the reduction of SCUBA-2 data and POL-2 data is the method for sky removal. 
 In the case of POl-2 this must also include the polarized sky background. 
 For those familiar with SCUBA-2 reductions this is done using the COM/GAI model. 
+For a discussion of why PCA is not run on SCUBA-2 data see \cref{Appendix}{app:pca}. 
 
 The COM/GAI model assumes the background is common to all bolometers (after gain variations between bolometers). This would be the case if both the sky brightness and the instrumental polarization was constant across the focal plane. 
 
@@ -71,7 +77,14 @@ In pol2map, the reduction command for POL-2 data, the sky removal is done using 
 The PCA approach allows there to be multiple correlated components with different amplitudes at different points in the focal plane.
 
 
-It \emph{is} possible to run PCA on SCUBA-2 data but the return is minimal. 
+
+
+first stage uses pca.pcathresh = -50
+
+second stage uses pca.pcathresh = -150
+
+
+PCA reduces both the noise and the astronomical signal within the map. As a result more iterations are required to recover the astronomical signal when the number of pca components are higher. 
 
 
 
@@ -94,70 +107,6 @@ The pol2map script uses different masks for these two purposes - the “AST” m
 The PCA mask is in general less extensive than the AST mask, with the source areas being restricted to the brighter inner regions.
 Each of these two masks can either be generated automatically within makemap, or be specified by
 a fixed external NDF. 
-
-
-\section{\xlabel{config}The pol2 dimmconfig file}
-\label{sec:config}
-
-
-
-not to be directly used (hence hidden) .dimmconfig\_pol2.lis
-numiter = -5
-
-
-
-
-\begin{terminalv}
-#  Use PCA to model and remove the  background polarisation.
-   modelorder = (pca,ext,ast,noi)
-
-#  Time based despiking.
-   spikebox = 10
-   spikethresh = 5
-
-#  POL" scans are very slow, so avoid flagging slow samples.
-   flagslow = 0.01
-
-#  Aggreive noise clipping.
-   noisecliphigh = 3
-
-#  The data has already been downsampled by CALCQU, so don't  do any more
-#  down sampling.
-   downsampscale = 0
-
-#  Weight bolometers using the RMS residuals calculated by CALQU and
-#  stored i nthe variance component of the CALCQU output NDFs.
-   noi.usevar = 1
-
-#  Use smaller boxes when finding DC steps because of the very low sample
-#  rate of POL2 Stokes vector time-series created by calcqu.
-   dcfitbox = 5
-   dcsmooth = 10
-\end{terminalv}
-
-
-\subsection{dimmconfig\_pol2\_compact.lis}
-
-This reduction builds on the default dimmconfig\_pol2.lis configuration file but uses boundary 
-constraints for an initial ast mask since the source is assumed to be isolated.
-
-
-\begin{terminalv}
-   ast.zero_circle = (0.016666)
-\end{terminalv}
-
-
-\subsection{dimmconfig\_pol2\_extended.lis}
-
-
-This reduction builds on the default dimmconfig\_pol2.lis configuration file but
-
-\begin{terminalv}
-   numiter=-40
-   ast.zero_snr = 3
-   ast.zero_snrlo = 2
-\end{terminalv}
-
 
 \section{\xlabel{addingdata}Adding new observations}
 
