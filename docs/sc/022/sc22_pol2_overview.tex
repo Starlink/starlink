@@ -4,7 +4,9 @@
 
 The POL-2 instrument is a linear polarimiter for the 
 Submillimetre Common User Bolometer Array-2 (SCUBA-2), a 10,000 
-bolomtere camera on the JCMT \cite{Friberg}\cite{Bastien2011}. SCUBA-2 operates
+bolomtere camera on the JCMT \cite{Friberg}\cite{Bastien2011}. 
+POL-2 in itself is not a detector - thus requiring SCUBA-2 
+and its detectors for operation. SCUBA-2 operates
 simultaneously at both 850 and \SI{450}{\micro\metre}. The POL-2
 instrument is currently commissioned at \SI{850}{\micro\metre} only.
 
@@ -50,10 +52,7 @@ IP is the instrument polarization. The IP affects both Q
 
 POL-2 sits in front of the window to the SCUBA-2 instrument
 as is seen in Figure \ref{fig:pol2sc2}. POL-2 covers the full
-field of view of SCUBA-2.
-
-POL-2 in itself is not a detector - thus requiring SCUBA-2 
-and its detectors for operation. The POL-2 polarimeter
+field of view of SCUBA-2. The POL-2 polarimeter
 utilizes three optical components
 that cover the full field of SCUBA-2: 
 
@@ -225,26 +224,39 @@ Half-wave plate rotation frequency& \SI{2}{Hz}\\
 
 \section{The raw data}
 \label{sec:rawdata}
-A normal science observation will follow the following sequence.
+SCUBA-2 in the detector for POL-2 and as such the raw data format of POL-2 data is
+the same as a typical SCUBA-2 observation. The sequence for both observations is:
 
 \begin{enumerate}\itemsep-0.2em
+\item Dark noise
 \item Flat-field
 \item Science scans
 \item Flat-field
 \end{enumerate}
 
-The \param{POL2INBEAM} keyword in the FITS header may be used to
-identify if POL-2 is in the beam (see
+The \param{SEQ_TYPE} keyword in the FITS header may be used to identify the nature of each scan (see
 \cref{Section}{sec:fitsheader}{Headers and file structure}).  When you
 access raw from the \htmladdnormallink{Science
   Archive}{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/} you
-will get all of the files listed above. Later when you reduce your
-data using the map-maker you must include all the science files
-\emph{and} the first flat-field.  The final flat-field is not
-currently used.
+will get all of the files listed above. 
 
-Shown below is a list of the raw files for a single sub-array (in this
-case s8a) for a short calibration observation. The first and last
+
+Critically the \param{INBEAM} keyword in the FITS header may be used to
+identify if POL-2 is in the beam, and hence differentiate between SCUBA-2 
+and POL-2 observations.
+
+
+\begin{tip}
+Use the  \Kappa\ comand fitslist to see all fits information for a particular ndf file. 
+To obtain a specific parameter within simply use the command fitsval:
+\begin{terminalv}
+% fitsval s8a20160112_00056_0001.sdf INBEAM
+pol
+\end{terminalv}
+\end{tip}
+
+Shown below is an incomplete list of the raw files for a single sub-array (in this
+case s8a) for a short pol2 observation. The first and last
 scans are the flat-field observations,which occur after the shutter
 opens to the sky at the start of the observation and closes at the end
 (note the identical file size); all of the scans in between are
@@ -252,17 +264,21 @@ science.
 
 
 \begin{terminalv}
-% ls -lh /jcmtdata/raw/scuba2/s8a/20131227/00034
+% ls -lh /jcmtdata/raw/scuba2/s8a/20160112/00056
 \end{terminalv}
 
 \begin{terminalv}
--rw-r--r-- 1 jcmtarch jcmt 8.0M Dec 27 03:00 s8a20131227_00034_0001.sdf
--rw-r--r-- 1 jcmtarch jcmt  22M Dec 27 03:00 s8a20131227_00034_0002.sdf
--rw-r--r-- 1 jcmtarch jcmt  22M Dec 27 03:01 s8a20131227_00034_0003.sdf
--rw-r--r-- 1 jcmtarch jcmt  22M Dec 27 03:02 s8a20131227_00034_0004.sdf
--rw-r--r-- 1 jcmtarch jcmt  22M Dec 27 03:02 s8a20131227_00034_0005.sdf
--rw-r--r-- 1 jcmtarch jcmt 6.8M Dec 27 03:02 s8a20131227_00034_0006.sdf
--rw-r--r-- 1 jcmtarch jcmt 8.0M Dec 27 03:03 s8a20131227_00034_0007.sdf
+-rw-r--r-- 1 jcmtarch jcmt 5.6M Jan 12  2016 s8a20160112_00056_0001.sdf
+-rw-r--r-- 1 jcmtarch jcmt 7.9M Jan 12  2016 s8a20160112_00056_0002.sdf
+-rw-r--r-- 1 jcmtarch jcmt  25M Jan 12  2016 s8a20160112_00056_0003.sdf
+-rw-r--r-- 1 jcmtarch jcmt  25M Jan 12  2016 s8a20160112_00056_0004.sdf
+-rw-r--r-- 1 jcmtarch jcmt  25M Jan 12  2016 s8a20160112_00056_0005.sdf
+...
+-rw-r--r-- 1 jcmtarch jcmt  25M Jan 12  2016 s8a20160112_00056_0025.sdf
+-rw-r--r-- 1 jcmtarch jcmt  25M Jan 12  2016 s8a20160112_00056_0026.sdf
+-rw-r--r-- 1 jcmtarch jcmt  25M Jan 12  2016 s8a20160112_00056_0027.sdf
+-rw-r--r-- 1 jcmtarch jcmt  22M Jan 12  2016 s8a20160112_00056_0028.sdf
+-rw-r--r-- 1 jcmtarch jcmt 7.9M Jan 12  2016 s8a20160112_00056_0029.sdf
 \end{terminalv}
 
 The SCUBA-2 data acquisition (DA) system writes out a data file every
@@ -272,7 +288,8 @@ the example above), typically requiring less than 30 seconds of data
 to complete the observation.
 
 \textbf{Note:} All of these files are written out eight times, once
-for each of the eight sub-arrays.
+for each of the eight sub-arrays. It should also be noted that the POL-2 instrument has not 
+been released from comissioing at 450 microns.
 
 The main data arrays of each file are cubes, with the first two
 dimensions enumerating bolometer columns and rows within a sub-array,
@@ -284,7 +301,7 @@ the format \texttt{yyyymmdd}, followed by a five-digit observation
 number, followed by the scub-scan number. The name ends with the standard
 suffix \texttt{.sdf} used by all Starlink data files. For instance, the files
 listed above hold data from the s8a sub-array for observation 34 taken on
-27th December 2013.
+12th January 2016.
 
 
 
