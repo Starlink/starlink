@@ -1,0 +1,164 @@
+\chapter{\xlabel{pol2_advanced}POL-2 - Advanced Data Reduction}
+\label{sec:advanced}
+
+
+The pol2map tool for reducing POL-2 data was released to the science
+community for the start of 17B observing. As with all newly commissioned
+instrumentation the "ideal" reduction has yet to be finalised. This advanced 
+section of the POL-2 data reduction documentation aims to provide the interested
+astronomer with tools for expanding and examining the POL-2 reduction process further and 
+in more detail.
+
+
+\section{\xlabel{addingdata}Adding new observations}
+
+This section describes the six step process of how to add 
+data for one or more new POL2 observations into existing I,
+Q and U maps and vector catalogue created by an earlier run of pol2map.
+
+1) Create a text file listing all the existing auto-masked I maps for individual observations
+stored in the directory specified by parameter mapdir, and then add in the raw data files
+for the new observations. The auto-masked I maps have names that end in "_imap.sdf".
+
+\begin{terminalv}
+% ls maps/*imap.sdf > infiles.list
+% ls rawdata/*.sdf  >> infiles.list
+\end{terminalv}
+
+
+2) Create a new auto-masked co-added I map including the new observation. The
+calcqu  and makemap
+commands will be run on the new data and the resulting maps co-added
+with the existing maps for the older observations to create the new map:
+
+\begin{terminalv}
+% pol2map in=^infiles iout=iauto_new qout=! uout=! mapdir=maps qudir=qudata
+\end{terminalv}
+
+
+3) You will need to decide whether to re-create all the externally masked maps using
+external masks defined by the new auto-masked map. This is the case if the auto-masked
+map has been changed significantly by the addition of the new observation. To do this it is
+necessary to compare the old and new mask.  The old masks should have been created
+earlier using the MASKOUT1 and MASKOUT2 parameters (see step 3 in section 2.2). So
+now create the new masks that would be generated from the new auto-masked map.
+
+\begin{terminalv}
+% pol2map  in=^infiles iout=! qout=! uout=! mapdir=maps mask=iauto_new \
+maskout1=astmask_new           maskout2=pcamask_new
+\end{terminalv}
+
+
+4) Decide if the addition of the new data has changed the masks significantly. This involves
+comparing astmask.sdf and astmask_new.sdf (and also pcamask.sdf and pcamask_new.sdf).
+
+
+5) If you decide that the mask has changed significantly and you therefore want to
+reprocess all observations using the new mask, remove the existing externally-masked 
+maps so that they will be re-created by the next invocation of pol2map.  Note - this will
+increase the length of time taken by step 6 enormously! Also, ensure the new auto-masked
+co-add is used in place of the old one to define the masks in future.
+
+\begin{terminalv}
+% rm mapdir/*Qmap.sdf mapdir/*Umap.sdf mapdir/*Imap.sdf
+% mv iauto.sdf iauto_old.sdf
+% mv iauto_new.sdf iauto.sdf
+\end{terminalv}
+
+6) Re-create the necessary externally masked maps and co-adds, and then create the new
+vector catalogue:
+
+\begin{terminalv}
+% pol2map in=qudata/\* iout=iext_new qout=! uout=! mapdir=maps \
+     mask=iauto
+% pol2map in=qudata/\* iout=! qout=qext_new uout=uext_new mapdir=maps \
+     mask=iauto ipref=iext_new cat=mycat_new debias=yes
+\end{terminalv}
+
+\section{\xlabel{pixelsize}Experimenting with Pixel sizes}
+
+Currently, as with SCUBA-2 reductions, the default reduction pixel size is 4".
+The pixel size is controlled by the pixsize parameter in the the \smurf\ pol2map:
+
+\begin{terminalv}
+% pol2map pixsize=12
+\end{terminalv}
+
+
+The following four step example shows how to investigate the impact of changing pixel size.
+In this example we compare 12" pixels and 7" pixels.
+
+
+1) Begin with an auto-masked total intensity map from the raw data. For instance:
+
+\begin{terminalv}
+% pol2map in=^myfiles.list iout=iauto12 pixsize=12 qout=! uout=! mapdir=maps12 \
+                    qudir=qudata
+\end{terminalv}
+
+
+2) Create AST and PCA masks with 12" pixels from the iauto12.sdf file:
+
+
+\begin{terminalv}
+% pol2map in=qudata/\* iout=! qout=! uout=! mapdir=maps12 mask=iauto12 \
+                   maskout1=astmask12 maskout2=pcamask12
+\end{terminalv}
+
+3) Create masks with 7" pixels by resampling the 12" masks created at
+step 2. This is done using the \Kappa\ sqorst command:
+
+\begin{terminalv}
+% sqorst  mode=pixelscale pixscale=\'7,7,7E-05\' in=astmask12 out=astmask7
+% sqorst  mode=pixelscale pixscale=\'7,7,7E-05\' in=pcamask12 out=pcamask7
+\end{terminalv}
+
+4) Create the 7" externally masked I, Q and U maps using the above 7"
+masks (note the "mask" parameter value  is enclosed in single AND
+double quotes):
+
+\begin{terminalv}
+% pol2map in=qudata/\* iout=iext7 qout=qext7 uout=uext7 masktype=mask \
+                  mask="'astmask7,pcamask7'" mapdir=maps7 ipref=iext7  \
+                  cat=cat7 debias=yes
+\end{terminalv}
+
+
+\begin{tip}
+Using larger pixels usually produces slower convergence, so the
+above process will take longer than usual - be patient!.
+
+Using larger pixels can sometimes encourage smooth blobs and other
+artificial features to appear in the map. You should display the
+iauto12.sdf file to check that it does not have such artificial
+features.
+
+Check the masks (astmask12.sdf and pcamask12.sdf) to make sure
+they look reasonable.
+\end{tip}
+
+\section{\xlabel{IPerror}Investigating systematic error in IP}
+
+
+The error on the IP is reported to be on the order of 0.5\%.
+It is possible to investigate the effects of the systematic
+error in IP by creating maps using the upper and lower limits on the
+IP value. To do this it is needed to add "ipoffset" a configuration 
+parameter in makemap which can be used to do such an investigation. To
+use it, tun pol2map twice as follows:
+
+\begin{terminalv}
+% pol2map config="ipoffset=-0.25"
+% pol2map config="ipoffset=0.25"
+\end{terminalv}
+
+This produces maps using the upper and lower IP limits (a range of
+0.5\%). If pol2map has already been run on POL-2 data then a file 
+will already exist that was created using the 
+mean IP (the mean IP is used if you omit ipoffset from the config
+value, or omit the  config parameter completely). 
+
+%\section{\xlabel{simulations}Simulated data}
+
+
+
