@@ -110,6 +110,11 @@ comes from observation 56 and 59 taken on January 11th 2016
 
 \begin{tip}
 An up-caret ( ^ ) is required any time you are reading in a group text file in Starlink. For the map-maker this includes the configuration file (a group of configuration parameters) and the list of input files (a group of NDFs e.g. in=^myfiles.lis). 
+
+To check if the files are POL-2 files run the \smurf\ command pol2check
+\begin{terminalv}
+%pol2check ^myfiles.list
+\end{terminalv}
 \end{tip}
 
 Note qout and uout are set no null values as no Q or U maps are required to be produced from this initial step 1 reduction stage.
@@ -306,8 +311,8 @@ The maps folder now contains individual Q and U maps alongside the existing I ma
 
 
 
-The output vector catalogue, contains a range of values derived by pol2map for each pixel contained within the I map. 
-
+The output vector catalogue, contains a range of values derived by pol2map for each pixel
+contained within the I map. Values in the catalogue are in units of Jy/beam. 
 The values are:
 
 \begin{aligndesc}

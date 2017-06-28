@@ -133,15 +133,59 @@ Rotating the HWP rotates any linear polarised component of incoming radiation.
 \end{center}
 \end{figure}
 
+Th waveplate is typically rotated at 2Hz, providing a fast modulation of any linear polarization by 8Hz.
+The data acquisition rate is ~175Hz giving about 20 samples per cycle. 
+
 
 
 \section{Instrument Polarization}
+
+At the resolution of JCMT, Planets such as Uranus should appear as unploarized point sources
+In practice POL-2 observation of such sources show a significant polarisation - typically less 
+than 1.5\% at 850 microns. This is evidence that some part of the incoming astronomical radiation 
+is being partially poralised by one or more of the components of the telescope/POL-2/SCUBA-2 
+that are in the light path. This polarisation is referred to as "Instrument Polarisation" (IP).
+
+In order to determine the true Q and U from an astronomical source it is necessary to correct
+for this effect. Fro the case of a low degree of polarisation in the incoming radiation and a low 
+degree of IP the following is a good approximation for correcting the measurement for the IP:
+
+\begin{equation}
+Q = Q_{m} - I. ip_{q}
+\end{equation}
+
+\begin{equation}
+U = U_{m} - I. ip_{u}
+\end{equation}
+
+where $Q_{m}$ and $U_{m}$ are the measured values for a single bolometer sample at 
+some point on the sky. Q and U are the true (corrected) values, I is the astronomical 
+total intensity at the same poitn on the sky (i.e. the total intensity after removal of 
+the sky and electronic backgrounds) and $ip_{q}$  and$ip_{u}$  are factors that may vary 
+slowly with focal plane position and or azimuth and elevation.
+
+Thus to perform IP correction on POL2 map requires a total intensity map of the same area
+of the sky to be available. This total intensity map is referred to as the IP reference map. 
+
+Where flat mirrors or surfaces will produce a small, constant polarization across the beam, 
+curved mirrors and other structures (for example the secondary mirror supports) will 
+produce more complex plarization effects - and these may distort the beam shape. 
+Side-lobes can often show up strong (typically 10-20\%) polarization but these 
+effects are usually far from the main-beam. Typical calculations of antenna patterns 
+for symmetrical Cassegrain antennas have not predicted strong polarization in the main beam.
+
+The JCMT IP footprint is stronger than expected (though typically less than 1.5\% of 
+the total intensity), and has the following distinctive features:
 
 \begin{enumerate}\itemsep-0.2em
 \item The polarisation intensity is elevation dependent
 \item There is ellipticity of the beam and it is elevation dependent
 \item The beam is elongated in the horizontal direction.
 \end{enumerate}
+
+The dominant source of IP at the JCMT is the Goretex membrane, used as a wind blind. 
+This membrane introducing both losses and polarization. Due to SCUBA-2's location
+on the Nasmyth platform this polarization effect is elevation dependent.
 
 
 \section{\xlabel{obs_modes}Observing mode}
@@ -324,4 +368,8 @@ of a region then a handle on the flux conversion factor (FCF) is required.
 The resulting map may have the FCF applied to give units of janskys. As is 
 recommended with SCUBA-2 observing it is good to check that the FCF value 
 applied to your data is sensible (and must be done manually).
+
+
+
+
 
