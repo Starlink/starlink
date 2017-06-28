@@ -87,6 +87,233 @@ vectors all that remains are the vectors on the regions where \$I/\$DI$>$10.
 \end{figure}
 
 
-\section{\xlabel{kappa}kappa}
+\section{\xlabel{kappa}kappa and polpack}
+
+It is possible to use \Kappa\ and polpack to create POL-2 plots. 
+
+\begin{terminalv}
+% kappa
+% polpack
+\end{terminalv}
+
+Note that in the following examples you will need to ensure that only the 
+vectors you intend to plot are included in the file mycat.FIT.
+
+\begin{tip}
+For a better font on pgplot postscript devices, set the
+following environment variable. For more info, see
+
+http://pipelinesandarchives.blogspot.com/2015/02/better-fonts-in-postscript-output-from.html
+
+\begin{terminalv}
+setenv PGPLOT_PS_FONT Times
+\end{terminalv}
+
+Graphics-related attributes that can be set are described at:
+http://starlink.eao.hawaii.edu/docs/sun95.htx/sun95se28.html
+
+and the coordinate system attributes that can be set are
+described at:
+
+http://starlink.eao.hawaii.edu/docs/sun95.htx/sun95se27.html
+\end{tip}
 
 
+
+\subsection{\xlabel{kappa-example1} Example 1 - a vector map with no background}
+\label{section:kappa-example1}
+
+In this section we crate an output file: plo1.pdf from the input catalogue mycat.FIT
+
+Select postscript graphics device, writing to file plot1.ps
+
+\begin{terminalv}
+gdset plot1.ps/acps
+\end{terminalv}
+
+For convenience, create a text file holding the main plotting style for polplot. 
+
+\begin{terminalv}
+% cat <<EOF > sty
+?   colour = black     
+?   drawtitle=0        
+?   format(1)=hms      
+?   format(2)=dms      
+? EOF  
+\end{terminalv}
+
+Likewise, create a text file holding the style for the vector length key
+
+\begin{terminalv}
+% cat <<EOF > ksty
+?   colour = black
+?   drawtitle=0
+? EOF
+\end{terminalv}
+
+
+Plot the vector map
+
+\begin{terminalv}
+% polplot mycat.FIT  style=^sty keystyle=^ksty vscale=20 keyvec=20
+\end{terminalv}
+
+Convert to PDF and remove blank margins (if required).
+
+\begin{terminalv}
+% ps2pdf plot1.ps temp.pdf
+% pdfcrop temp.pdf plot1.pdf
+\end{terminalv}
+
+
+\subsection{\xlabel{kappa-example2} Example 2 - a vector map over a contour map}
+\label{section:kappa-example2}
+
+
+In this section we crate an output file: plot2.pdf from the input catalogue mycat.FIT
+
+\begin{terminalv}
+% gdset plot2.ps/acps
+\end{terminalv}
+
+Setting up the main plotting style for contour and polplot
+
+\begin{terminalv}
+% cat <<EOF > sty
+?   colour = black
+?   colour(curves)=red
+?   width(curves)=3
+?   drawtitle=0
+?   format(1)=hms
+?   format(2)=dms
+? EOF
+\end{terminalv}
+
+
+Produce the contour map
+
+\begin{terminalv}
+% contour iext\(0~150,0~200\) mode=perc percentiles=\[88,90,92,94,96,98\] style=^sty key=no
+\end{terminalv}
+
+
+Modify the above style for the vector map to produce black vectors
+
+\begin{terminalv}
+% cat <<EOF > vsty
+?   ^sty
+?   colour(curves)=black
+? EOF
+\end{terminalv}
+
+
+The style for the vector length key
+
+
+\begin{terminalv}
+% cat <<EOF > ksty
+?   colour=black
+?   width=3
+?   drawtitle=0
+? EOF
+\end{terminalv}
+
+Plot the vector map over the contour map. The vectors and
+contours are aligned automatically in sky coordinates.
+
+
+\begin{terminalv}
+polplot mycat.FIT axes=no clear=no style=^vsty keystyle=^ksty vscale=20 keyvec=20
+\end{terminalv}
+
+Convert to PDF and remove blank margins (if required).
+
+\begin{terminalv}
+ps2pdf plot2.ps temp.pdf
+pdfcrop temp.pdf plot2.pdf
+\end{terminalv}
+
+\subsection{\xlabel{kappa-example2} Example 3 - a vector map over a negative image}
+\label{section:kappa-example3}
+
+
+In this section we crate an output file: plot2.pdf from the input catalogue mycat.FIT
+
+\begin{terminalv}
+% gdset plot2.ps/acps
+\end{terminalv}
+
+
+Ensure we use a monochrome colour table for the image
+
+\begin{terminalv}
+% lutgrey
+\end{terminalv}
+
+
+#  The main plotting style for display and polplot
+
+\begin{terminalv}
+% cat <<EOF > sty
+?   colour = black
+?   drawtitle=0
+?   format(1)=hms
+?   format(2)=dms
+? EOF
+\end{terminalv}
+
+
+Use a square root-ish function to reduce the dynamic
+range in the map (so that we can see structure in the
+faint bits without blowing out the bright bits).
+
+\begin{terminalv}
+maths "'((ia+0.0003)/0.14)**0.2'" ia=iext out=tmp1
+\end{terminalv}
+
+
+Display the negative image, using a reduced range of colours
+(pens) so that the brightest regions are grey rather than black.
+This means the black vectors can still be seen over the bright
+regions.
+
+\begin{terminalv}
+% display tmp1\(5~150,0~200\) mode=perc percentiles=\[2,98\] style=^sty \
+        penrange=\[0.4,1.0\]
+\end{terminalv}
+
+
+Modify the above style for the vector map to produce black vectors
+
+\begin{terminalv}
+% cat <<EOF > vsty
+?   ^sty
+?   width(curves)=3
+? EOF
+\end{terminalv}
+
+
+The style for the vector length key
+
+\begin{terminalv}
+% cat <<EOF > ksty
+?   colour=black
+?   width=3
+?   drawtitle=0
+? EOF
+\end{terminalv}
+
+
+Plot the vector map over the contour map. They are aligned automatically with the map.
+
+\begin{terminalv}
+% polplot cat.FIT axes=no clear=no style=^vsty keystyle=^ksty vscale=20 keyvec=20
+\end{terminalv}
+
+
+Convert to PDF and remove blank margins (if required).
+
+\begin{terminalv}
+% ps2pdf plot3.ps temp.pdf
+% pdfcrop temp.pdf plot3.pdf
+\end{terminalv}

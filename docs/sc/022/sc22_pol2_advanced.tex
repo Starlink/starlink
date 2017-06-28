@@ -56,8 +56,9 @@ comparing astmask.sdf and astmask_new.sdf (and also pcamask.sdf and pcamask_new.
 5) If you decide that the mask has changed significantly and you therefore want to
 reprocess all observations using the new mask, remove the existing externally-masked 
 maps so that they will be re-created by the next invocation of pol2map.  Note - this will
-increase the length of time taken by step 6 enormously! Also, ensure the new auto-masked
-co-add is used in place of the old one to define the masks in future.
+increase the length of time taken by step 6 enormously.
+
+Ensure the new auto-masked co-add is used in place of the old one to define the masks in future.
 
 \begin{terminalv}
 % rm mapdir/*Qmap.sdf mapdir/*Umap.sdf mapdir/*Imap.sdf
