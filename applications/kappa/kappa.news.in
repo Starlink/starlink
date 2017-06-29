@@ -14,16 +14,30 @@
 
 2 Modified_applications
 
-   o CONTOUR
-      -  The dynamic default for parameter LABPOS is now "!" (ie. a null
+   o  ALIGN2D
+      -  Parameter TR may also include the scale and offset in its seventh
+      and eight elements.
+
+   o  CONFIGMELD
+      -  This now reports all elements in an array, not just the first
+      element.
+
+   o  CONTOUR
+      -  The dynamic default for Parameter LABPOS is now "!" (i.e. a null
       value), so no label is now drawn in "Bounds" or "Good" mode unless a
       value is supplied explicitly for LABPOS.
 
-   o DISPLAY
-      - New parameter PENRANGE can be used to restrict the range fo pens
+   o  DISPLAY
+      -  New Parameter PENRANGE can be used to restrict the range for pens
       (i.e. colour indices) used by the image.
+      -  The vertical position of the key can now be controlled through
+      Parameter KEYPOS.
 
-   o TRANDAT
+   o  SQORST
+      -  Permit an axis scale to be retained by using an asterisk
+      in Parameter PIXSCALE.
+
+   o  TRANDAT
       -  Will now recognised the string "BAD" (case insensitive) within
       the input text file and generate appropriate bad values in the output
       NDF.
