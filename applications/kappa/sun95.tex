@@ -9725,7 +9725,7 @@ KAPPA: \htmlref{CADD}{CADD},
          The input pixel is excluded from the fitting process if the
          local correlation is below CORLIMIT. The supplied value should
          be between zero and 1.0. The size of the locality used around
-         each input pixel is given by parameter BOX. \texttt{[!]}
+         each input pixel is given by Parameter BOX. \texttt{[!]}
 
          In addition, if a value is supplied for CORLIMIT, the input and
          reference pixel values that pass the above check are scaled so
@@ -9735,8 +9735,8 @@ KAPPA: \htmlref{CADD}{CADD},
       \sstsubsection{
          FITVALS = \_LOGICAL (Read)
       }{
-         If TRUE, the fitting process will adjust the scale and offset of
-         the input data values, in addition to the geometric position of
+         If \texttt{TRUE}, the fitting process will adjust the scale and offset
+         of the input data values, in addition to the geometric position of
          the the input values, in order to minimise the sum of the squared
          residuals.  \texttt{[FALSE]}
       }
@@ -9748,16 +9748,16 @@ KAPPA: \htmlref{CADD}{CADD},
          \sstitemlist{
 
             \sstitem
-            0 --- full unrestricted six-coefficient fit;
+            \texttt{0} --- full unrestricted six-coefficient fit;
 
             \sstitem
-            1 --- shift, rotation and a common X/Y scale but no shear;
+            \texttt{1} --- shift, rotation and a common X/Y scale but no shear;
 
             \sstitem
-            2 --- shift and rotation but no scale or shear; or
+            \texttt{2} --- shift and rotation but no scale or shear; or
 
             \sstitem
-            3 --- shift but not rotation, scale or shear.
+            \texttt{3} --- shift but not rotation, scale or shear.
          }
          \texttt{[0]}
       }
@@ -9904,7 +9904,7 @@ KAPPA: \htmlref{CADD}{CADD},
          The minimum value is \texttt{0.1}, and the run-time default is
          \texttt{1.0}.  On astronomical images and spectra, good results are
          often obtained by approximately matching the FWHM of the envelope
-         function, given by PARAMS(2), to the point-spread function of
+         function, given by PARAMS( 2 ), to the point-spread function of
          the input data.  []
       }
       \sstsubsection{
@@ -9950,8 +9950,10 @@ KAPPA: \htmlref{CADD}{CADD},
       \sstsubsection{
          TR( 6 ) = \_DOUBLE (Write)
       }{
-         An output parameter to which are written the coefficients of the
-         fit.
+         An output parameter to which are written the coefficients of
+         the fit.  If FITVALS is \texttt{TRUE}, then this will include
+         the scale and offset (written to the seventh and eighth
+         entries).
       }
    }
    \sstexamples{
@@ -44747,9 +44749,9 @@ KAPPA: \htmlref{REGRID}{REGRID},
          scale for a WCS axis is the increment in WCS axis value caused
          by a movement of one pixel along the WCS axis, and are measured
          at the first pixel in the array.  Pixel scales for celestial axes
-         should be given in arc-seconds. An asterisk, ``$*$'', can be used
+         should be given in arcseconds. An asterisk, \texttt{"$*$"}, can be used
          instead of a numerical value to indicate that an axis should
-         retain its current scale. The suggested default value are the
+         retain its current scale. The suggested default values are the
          current pixel scales.  If no value has been supplied for
          Parameter AXIS, the number of values supplied for PIXSCALE
          must be the same as the number of WCS axes in the NDF.  If a
@@ -53592,26 +53594,47 @@ and HDS data types is as follows:
 The following applications have been modified:
 \begin{description}[style=nextline]
 
+   \item [\htmlref{ALIGN2D}{ALIGN2D}]\mbox{}
+      \begin{itemize}
+        \item Parameter TR may also include the scale and offset in
+        its seventh and eight elements.
+      \end{itemize}
+
+   \item [\htmlref{CONFIGMELD}{CONFIGMELD}]\mbox{}
+      \begin{itemize}
+        \item This now reports all elements in an array, not just the
+        first element.
+      \end{itemize}
+
+
    \item [\htmlref{CONTOUR}{CONTOUR}]\mbox{}
       \begin{itemize}
         \item The dynamic default for parameter LABPOS is now \texttt{{!}}
-              (\emph{i.e.} a null value), so no label is now drawn in
-              ``Bounds'' or ``Good'' mode unless a value is supplied
-              explicitly for LABPOS.
+        (\emph{i.e.} a null value), so no label is now drawn in
+        \texttt{"Bounds"} or \texttt"{Good"} mode unless a value is supplied
+        explicitly for LABPOS.
       \end{itemize}
 
    \item [\htmlref{DISPLAY}{DISPLAY}]\mbox{}
       \begin{itemize}
-        \item Has a new parameter PENRANGE, which can be used to restric
-              the range of pens (i.e. colour indices) used. The default
-              is to use the full range of available pens.
+        \item Has a new Parameter PENRANGE, which can be used to restrict
+        the range of pens (i.e. colour indices) used. The default
+        is to use the full range of available pens.
+        \item The vertical position of the key can now be controlled
+        through Parameter KEYPOS.
+      \end{itemize}
+
+   \item [\htmlref{SQORTST}{SQORST}]\mbox{}
+      \begin{itemize}
+        \item Permit an axis scale to be retained by using an asterisk
+         in Param ter PIXSCALE.
       \end{itemize}
 
    \item [\htmlref{TRANDAT}{TRANDAT}]\mbox{}
       \begin{itemize}
-        \item Will now recognised the string ``BAD'' (case insensitive) within
-              the input text file and generate appropriate bad values in the output
-              NDF.
+        \item Will now recognise the string \texttt{"BAD"} (case
+        insensitive) within the input text file and generate appropriate
+        bad values in the output NDF.
       \end{itemize}
 
 \end{description}
@@ -53642,8 +53665,8 @@ The following applications have been modified:
    \item [\htmlref{ARDMASK}{ARDMASK}]\mbox{}
       \begin{itemize}
         \item The VARIANCE and DATA arrays in the NDF can now be masked
-         simultaneously by setting the COMP parameter to ``All'', which is
-         now the default value for COMP.
+        simultaneously by setting the COMP parameter to \texttt{"All"}, which is
+        now the default value for COMP.
       \end{itemize}
 
    \item [\htmlref{FITSMOD}{FITSMOD}]\mbox{}

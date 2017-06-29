@@ -80,7 +80,7 @@
 *        The input pixel is excluded from the fitting process if the
 *        local correlation is below CORLIMIT. The supplied value should
 *        be between zero and 1.0. The size of the locality used around
-*        each input pixel is given by parameter BOX.
+*        each input pixel is given by Parameter BOX.
 *
 *        In addition, if a value is supplied for CORLIMIT, the input and
 *        reference pixel values that pass the above check are scaled so
@@ -234,8 +234,8 @@
 *        expense of increasing execution time. [0.05]
 *     TR( 6 or 8 ) = _DOUBLE (Write)
 *        An output parameter to which are written the coefficients of
-*        the fit.  If FITVALS is true the this will include (as the
-*        7th and 8th entries) the scale and offset.
+*        the fit.  If FITVALS is TRUE, then this will include the scale
+*        and offset (written to the seventh and eighth entries).
 *     WLIM = _REAL (Read)
 *        This parameter is only used if REBIN is set TRUE. It specifies
 *        the  minimum number of good pixels which must contribute to an

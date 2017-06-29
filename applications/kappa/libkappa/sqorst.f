@@ -41,9 +41,9 @@
 *        for each axis in the manner indicated by the MODE parameter.
 *        If a non-null value is supplied for AXIS, it should be the
 *        integer index of the axis to be squashed or stretched (the
-*        first axis has index 1).  In this case, only a single squash or
-*        stretch factor should be supplied, and all other axes will be
-*        left unchanged.  If MODE is set to "PixelScale" then the
+*        first axis has index 1).  In this case, only a single squash
+*        or stretch factor should be supplied, and all other axes will
+*        be left unchanged.  If MODE is set to "PixelScale" then the
 *        supplied value should be the index of a WCS axis.  Otherwise
 *        it should be the index of a pixel axis.  [!]
 *     CONSERVE = _LOGICAL (Read)
@@ -51,9 +51,9 @@
 *        such a way as to preserve the total data value in a feature on
 *        the sky. The scaling factor is the ratio of the output pixel
 *        size to the input pixel size. This ratio is evaluated once for
-*        each panel of a piece-wise linear approximation to the Mapping,
-*        and is assumed to be constant for all output pixels in the
-*        panel. [FALSE]
+*        each panel of a piece-wise linear approximation to the
+*        Mapping, and is assumed to be constant for all output pixels in
+*        the panel. [FALSE]
 *     FACTORS( ) = _DOUBLE (Read)
 *        This parameter is only used if MODE="Factors".  It defines the
 *        factor by which each dimension will be distorted to produce the
@@ -135,12 +135,12 @@
 *        of the required new pixel scales.  In this context, a pixel
 *        scale for a WCS axis is the increment in WCS axis value caused
 *        by a movement of one pixel along the WCS axis, and are measured
-*        at the first pixel in the array.  Pixel scales for celestial axes
-*        should be given in arc-seconds. An asterisk, "*", can be used
-*        instead of a numerical value to indicate that an axis should
-*        retain its current scale. The suggested default value are the
-*        current pixel scales.  If no value has been supplied for
-*        Parameter AXIS, the number of values supplied for PIXSCALE
+*        at the first pixel in the array.  Pixel scales for celestial
+*        axes should be given in arcseconds. An asterisk, "*", can be
+*        used instead of a numerical value to indicate that an axis
+*        should retain its current scale. The suggested default values
+*        are the current pixel scales.  If no value has been supplied
+*        for Parameter AXIS, the number of values supplied for PIXSCALE
 *        must be the same as the number of WCS axes in the NDF.  If a
 *        non-null value has been supplied for Parameter AXIS, then only
 *        a single value should be supplied for PIXSCALE and that value
@@ -277,9 +277,9 @@
 *     2015 April 23 (MJC):
 *        Propagate the UNITS component as documented.
 *     13-JUN-2017 (DSB):
-*        Allow an asterisk to be supplied instead of a numerical value in
-*        parameter PIXSCALE, to indicate that the axis should retain its
-*        current scale.
+*        Allow an asterisk to be supplied instead of a numerical value
+*        in Parameter PIXSCALE, to indicate that the axis should retain
+*        its current scale.
 *     {enter_further_changes_here}
 
 *-
@@ -588,8 +588,8 @@
                IF( TEXT( START + F - 1 : START + L - 1 ) .EQ. '*' ) THEN
                   NEWSCL( I ) = PIXSC( I )
 
-*  Otherwise, read a floating point value from the beginning of the remainder
-*  of the pixscale string, up to the first comma or space.
+*  Otherwise, read a floating point value from the beginning of the
+*  remainder of the pixscale string, up to the first comma or space.
                ELSE
                   CALL CHR_CTOD( TEXT( START : IAT - 1 ), NEWSCL( I ),
      :                           STATUS )
