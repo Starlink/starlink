@@ -9,7 +9,8 @@
 
 This guide is designed to instruct POL-2 users on the best ways to
 reduce and visualise their data using \starlink\ packages:
-\smurf \cite{smurf}, \Kappa \cite{kappa}, polpack and \gaia \cite{gaia}.
+\smurf \cite{smurf}, \Kappa \cite{kappa}, \polpack \cite{polpack}
+and \gaia \cite{gaia}.
 
 This guide covers the following topics.
 \begin{itemize}
@@ -19,7 +20,7 @@ This guide covers the following topics.
 \item \cref{Chapter}{sec:dr}{Chapter 3} -- POL-2 Data Reduction - The Theory
 \item \cref{Chapter}{sec:rundr}{Chapter 4} -- POL-2 Data Reduction - Running pol2map
 \item \cref{Chapter}{sec:display}{Chapter 5} -- POL-2 Image Display
-\item \cref{Chapter}{sec:advanced}{Chapter 6} -- POL-2 Advanced Data Reduction 
+\item \cref{Chapter}{sec:advanced}{Chapter 6} -- POL-2 Advanced Data Reduction
 
 \end{itemize}
 
@@ -30,27 +31,27 @@ the text that should be typed by the user to initiate the described action.
 \section{\xlabel{computing} Before you start: computing resources}
 \label{sec:computing}
 
-Unlike SCUBA-2 observations, POL-2 observations are far less memory intensive to reduce. 
-Maps are down sampled to 2Hz within the reduction process. Assuming a typical 35 
+Compared to SCUBA-2 observations, POL-2 observations are far less memory intensive to reduce.
+POL-2 time-series data is down-sampled to 2Hz within the reduction process. Assuming a typical 35
 minute POL-2 observation, the reduction requires 35 GB of memory (in comparison to SCUBA-2
 maps that may require up to 96 GB of memory).
 
 The main consideration for POL-2 reductions is processing power. PCA calculations in
-makemap can be lengthy so a fast processors with lots of cores is advised.
+makemap can be lengthy so fast processors with lots of cores are advised.
 
 
 \section{\xlabel{software}Before you start: software}
 
-This manual uses software from the \starlink\ packages: \smurf\
-\cite{smurf}, \Kappa\ \cite{kappa}, polpack and \gaia\ \cite{gaia}. 
-Starlink software must be installed on your system, and Starlink 
-aliases and environment variables must be defined before attempting 
-to reduce any SCUBA-2 data.
+This manual uses software from \starlink\ packages: \smurf\
+\cite{smurf}, \Kappa\ \cite{kappa}, \polpack \cite{polpack} and \gaia\ \cite{gaia}.
+Starlink software must be installed on your system, and Starlink
+aliases and environment variables must be defined before attempting
+to reduce any SCUBA-2 data (see section \ref{sec:starinit}).
 
 \subsection{Data formats}
 \label{sec:ndf}
 
-Data files for POL-2 are the same as for SCUBA-2 and use 
+Data files for POL-2 are the same as for SCUBA-2 and use
 the Starlink N-dimensional Data Format (NDF,
 see Jenness et al.\ 2014\cite{ndf}), a hierarchical format which allows
 additional data and metadata to be stored within a single file. \Kappa\
@@ -84,7 +85,7 @@ flags'') for each pixel;
 \item Data units
 \item Other extensions items. These are defined by particular packages,
 but usually include a list of FITS-like headers together with provenance
-information that indicates how the NDF was created. Raw JCMT file also
+information that indicates how the NDF was created. Raw JCMT files also
 include extensions that define the state of the telescope and instrument
 at each time slice within the observation.
 \end{itemize}
@@ -117,8 +118,8 @@ before using any Starlink commands. For Bourne shells (sh, bash, zsh), do:
 \label{sec:packinit}
 
 The Sub-Millimetre User Reduction Facility, or \textsc{Smurf},
-contains the Dynamic Iterative Map-Maker, which will process raw
-SCUBA-2 data into images (see \smurfsun). \textsc{Kappa} meanwhile is
+contains the Dynamic Iterative Map-Maker, which will process
+SCUBA-2 time-series data into images (see \smurfsun). \textsc{Kappa} meanwhile is
 an application package comprising general-purpose commands mostly for
 manipulating and visualising NDF data (see \kappasun). Before starting
 any data reduction you will want to initiate both \textsc{Smurf} and
@@ -143,13 +144,11 @@ Starlink commands (the exception is \picard).
 \end{tip}
 
 
-\subsection{GAIA for viewing your map}
-
-Image visualisation can be done with \gaia\ (see
-\gaiasun). \textsc{Gaia} is a GUI-driven image and data-cube display and
-analysis tool, which incorporates facilities such as source detection,
-three-dimensional visualisation, photometry and the ability to query
-and overlay on-line or local catalogues.
+\subsection{GAIA for viewing your images and vector maps}
+Images and vector maps can be displayed and analysed using \gaia\ (see
+\gaiasun) - an interactive GUI-driven tool that incorporates facilities
+such as vector selection, vector binning, source detection, photometry
+and the ability to query and overlay on-line or local catalogues.
 \begin{terminalv}
 % gaia map.sdf
 \end{terminalv}

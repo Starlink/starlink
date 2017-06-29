@@ -4,21 +4,21 @@
 
 The pol2map tool for reducing POL-2 data was released to the science
 community for the start of 17B observing. As with all newly commissioned
-instrumentation the "ideal" reduction has yet to be finalised. This advanced 
+instrumentation the ``ideal'' reduction has yet to be finalised. This advanced
 section of the POL-2 data reduction documentation aims to provide the interested
-astronomer with tools for expanding and examining the POL-2 reduction process further and 
+astronomer with tools for expanding and examining the POL-2 reduction process further and
 in more detail.
 
 
 \section{\xlabel{addingdata}Adding new observations}
 
-This section describes the six step process of how to add 
+This section describes the six step process of how to add
 data for one or more new POL2 observations into existing I,
 Q and U maps and vector catalogue created by an earlier run of pol2map.
 
 1) Create a text file listing all the existing auto-masked I maps for individual observations
 stored in the directory specified by parameter mapdir, and then add in the raw data files
-for the new observations. The auto-masked I maps have names that end in "_imap.sdf".
+for the new observations. The auto-masked I maps have names that end in \texttt{_imap.sdf}.
 
 \begin{terminalv}
 % ls maps/*imap.sdf > infiles.list
@@ -50,11 +50,12 @@ maskout1=astmask_new           maskout2=pcamask_new
 
 
 4) Decide if the addition of the new data has changed the masks significantly. This involves
-comparing astmask.sdf and astmask_new.sdf (and also pcamask.sdf and pcamask_new.sdf).
+comparing astmask.sdf and astmask\_new.sdf (and also pcamask.sdf and
+pcamask\_new.sdf).
 
 
 5) If you decide that the mask has changed significantly and you therefore want to
-reprocess all observations using the new mask, remove the existing externally-masked 
+reprocess all observations using the new mask, remove the existing externally-masked
 maps so that they will be re-created by the next invocation of pol2map.  Note - this will
 increase the length of time taken by step 6 enormously.
 
@@ -115,7 +116,7 @@ step 2. This is done using the \Kappa\ sqorst command:
 \end{terminalv}
 
 4) Create the 7" externally masked I, Q and U maps using the above 7"
-masks (note the "mask" parameter value  is enclosed in single AND
+masks (note the \texttt{mask} parameter value  is enclosed in single AND
 double quotes):
 
 \begin{terminalv}
@@ -127,7 +128,7 @@ double quotes):
 
 \begin{tip}
 Using larger pixels usually produces slower convergence, so the
-above process will take longer than usual - be patient!.
+above process will take longer than usual - be patient!
 
 Using larger pixels can sometimes encourage smooth blobs and other
 artificial features to appear in the map. You should display the
@@ -141,12 +142,11 @@ they look reasonable.
 \section{\xlabel{IPerror}Investigating systematic error in IP}
 
 
-The error on the IP is reported to be on the order of 0.5\%.
+The error on the IP is reported to be of the order of 0.5\%.
 It is possible to investigate the effects of the systematic
 error in IP by creating maps using the upper and lower limits on the
-IP value. To do this it is needed to add "ipoffset" a configuration 
-parameter in makemap which can be used to do such an investigation. To
-use it, tun pol2map twice as follows:
+IP value. The makemap configuration parameter ``ipoffset'' can be
+used to do such an investigation. To use it, run pol2map twice as follows:
 
 \begin{terminalv}
 % pol2map config="ipoffset=-0.25"
@@ -154,10 +154,10 @@ use it, tun pol2map twice as follows:
 \end{terminalv}
 
 This produces maps using the upper and lower IP limits (a range of
-0.5\%). If pol2map has already been run on POL-2 data then a file 
-will already exist that was created using the 
+0.5\%). If pol2map has already been run on POL-2 data then a file
+will already exist that was created using the
 mean IP (the mean IP is used if you omit ipoffset from the config
-value, or omit the  config parameter completely). 
+value, or omit the  config parameter completely).
 
 %\section{\xlabel{simulations}Simulated data}
 

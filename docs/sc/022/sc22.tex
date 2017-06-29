@@ -15,10 +15,11 @@
 \stardocabstract {
    This cookbook provides an introduction to Starlink facilities,
    \textsc{smurf} , the Sub-Millimetre User Reduction Facility,
-   and in particular \textsc{POL2MAP} the command for reducing
+   and in particular \textsc{POL2MAP} - the command for reducing
    POL-2 data. This cookbook illustrates the various steps required to
-   reduce the data; and gives an overview of the method and 
-   describes how to calibrate and display data and POL-2 vactors}
+   reduce the data, including an overview of the method. It also
+   describes how to calibrate and display the data as images or
+   vector maps.}
 \stardocauthors{D.\ S.\ Berry, H.\ A.\ Parsons, M.\ G.\ Rawlings, and S.\ Graves}
 \stardocdate{2017 June 27}
 
@@ -57,6 +58,7 @@
 \textbf{NEP}    & Noise Equivalent Power\\
 \textbf{NEFD}   & Noise Equivalent Flux Density\\
 \textbf{P}      & Percentage Polarized Intensity \\
+\textbf{PCA}    & Principal Component Analysis \\
 \textbf{PI}     & Polarized Intensity \\
 \textbf{PSF}    & Point Spread Function\\
 \textbf{PWV}    & Precipitable Water Vapour\\
@@ -97,7 +99,7 @@ of ground-based submillimetre astronomy using array receivers}}{http://dx.doi.or
 (DOI:10.1046/j.1365-8711.2002.05582.x)
 
 \bibitem{Bastien2011}
-Bastien,~P.,et~al., 2011  \htmladdnormallink{\textit{POL-2: The SCUBA-2 Polarimeter}}{http://aspbooks.org/custom/publications/paper/449-0068.html} ASP, 449, 68B 
+Bastien,~P.,et~al., 2011  \htmladdnormallink{\textit{POL-2: The SCUBA-2 Polarimeter}}{http://aspbooks.org/custom/publications/paper/449-0068.html} ASP, 449, 68B
 
 \bibitem{fellwalker}
 Berry~D.~S.,  2015,
@@ -129,6 +131,10 @@ Paper 38.2}{sgp38}{}
 \bibitem{kappa}
 Currie~M.~J., Berry~D.~S, 2013, \textit{KAPPA -- Kernel Application Package},
 \xref{Starlink User Note 95}{sun95}{}
+
+\bibitem{polpack}
+Berry~D.~S, Gledhill~T.~M, 2015, \textit{POLPACK -- An Imaging Polarimetry Reduction Package},
+\xref{Starlink User Note 223}{sun223}{}
 
 \bibitem{dempsey12}
 Dempsey~J.~T. et al., 2013, \htmladdnormallink{\textit{SCUBA-2: on-sky calibration using
@@ -170,7 +176,7 @@ N-Dimensional Data Format}} {http://dx.doi.org/10.1016/j.ascom.2014.11.001},
 Ast. \& Comp., in press, (DOI:10.1016/j.ascom.2014.11.001)
 
 \bibitem{Friberg}
-Friberg,~P., et~al, 2016 \htmladdnormallink{\textit{POL-2: a polarimeter 
+Friberg,~P., et~al, 2016 \htmladdnormallink{\textit{POL-2: a polarimeter
 for the James-Clerk-Maxwell telescope}}{http://proceedings.spiedigitallibrary.org/proceeding.aspx?articleid=2536885},
 SPIE, Volume 9914, id. 991403
 (DOI: 10.1117/12.2231943)
