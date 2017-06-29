@@ -51,30 +51,30 @@
 
 2 New_applications
 
-   o ALIGN2D
+   o  ALIGN2D
 
       -  Aligns a pair of two-dimensional NDFs by minimising the
          residuals between them.
 
 2 Modified_applications
 
-   o APERADD
+   o  APERADD
 
       -  Has a new parameter MASK, which can be used to save an NDF
          containing a mask showing which pixels were included in the
          aperture.
 
-   o MFITTREND
+   o  MFITTREND
       -  Has a new FOREST parameter, which improves spectral-line
          masking in line forests using a smoothed mode rather than
          the mean and a better estimate of the baseline noise.
 
-   o NORMALIZE
+   o  NORMALIZE
 
       - Has two new parameters DRAWMARK and DRAWWIDTH that can be used
         to exclude central markers and width indicator from the plot.
 
-   o PROVSHOW
+   o  PROVSHOW
 
       -  Has a new option SHOW=TREE, which allows the family tree to
          be stepped through in an interactive manner, with the user
