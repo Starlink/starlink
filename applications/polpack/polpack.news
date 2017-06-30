@@ -9,6 +9,13 @@
  bad values.  This means that literal bad values (-0.340282E+39) are no
  longer passed onto the GAIA polarimetry toolbox.
 
+ o A new command called POLWCSCOPY has been added that copies WCS
+ information form one catalogue to another. It is useful for adding WCS
+ information back into catalogues that have had the WCS information
+ stripped out - for instance by being processed using TOPCAT or STILTS.
+
+
+
 
  The main changes between V3.3. and V3.4 were:
 

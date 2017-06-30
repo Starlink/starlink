@@ -10,10 +10,10 @@
 \stardocsource      {sun\stardocnumber}
 \stardocnumber      {223.7}
 \stardocauthors     {D.S. Berry \& T.M. Gledhill }
-\stardocdate        {22nd JUne 2015}
+\stardocdate        {30th June 2017}
 \stardoctitle       {POLPACK \\
                             An Imaging Polarimetry Reduction Package}
-\stardocversion     {Version 3.4-0}
+\stardocversion     {Version 3.5-0}
 \stardocmanual      {Users' Manual}
 \startitlepic {\includegraphics[clip,width=0.75\textwidth]{sun223_figures/fig}}
 \stardocabstract  {POLPACK is a package of applications for
@@ -1228,6 +1228,13 @@ less than 5\%:
 % stilts tpipe in=bincat.FIT out=selcat.FIT cmd='select "p<50 && dp<5"'
 \end{terminalv}
 
+\item Re-instate the WCS (stilts does not copy the POLPACK WCS information
+from input to output):
+
+\begin{terminalv}
+% polwcscopy in=selcat ref=bincat out=selcat2
+\end{terminalv}
+
 \item \label{STEP:DEVICE} Start up KAPPA, and then select the graphics
 device (set to an X windows display in this example):
 \begin{terminalv}
@@ -1275,7 +1282,7 @@ image. The vectors are drawn in blue. A default scale will be used for the
 vectors, but this can be over-ridden if necessary by specifying a value for
 parameter \htmlref{VSCALE}{POLPLOT}:
 \begin{terminalv}
-% polplot selcat noclear "style='colour(vect)=blue'"
+% polplot selcat2 noclear "style='colour(vect)=blue'"
 \end{terminalv}
 
 \end{enumerate}
@@ -1319,7 +1326,7 @@ a contour map with overlaid vectors, do:
 % gdset \acps
 % gdclear
 % contour "cube(,,1)" mode=per percentiles="[90,93,96,99]" noaxes nokey
-% polplot selcat noclear
+% polplot selcat2 noclear
 \end{terminalv}
 
 The file \verb+pgplot.ps+ then contains the combined PostScript data
@@ -1529,6 +1536,30 @@ out for is that both DISPLAY and POLPLOT draw annotated axes, potentially
 resulting in a bit of a mess! You should normally disable the production of
 one set of axes by setting parameter AXES to ``NO'' when running either
 DISPLAY or POLPLOT.
+
+\subsubsection {Re-instating Lost WCS Information in a Catalogue}
+If you modify a POLPACK catalogue using other software (\emph{e.g.} TOPCAT
+or STILTS) it is likely that the WCS information will be removed from the
+resulting output catalogue, resulting in annotated axes that look wrong
+and/or incorrect alignment with other data. To correct this, the WCS
+information can be added back into the catalogue using the
+\htmlref{POLWCSCOPY}{POLWCSCOPY} command. Say for instance you create
+catalogue \texttt{mycat.FIT} using POLPACK, and then use STILTS to remove
+low signal-to-noise vectors, creating a new catalogue \texttt{selcat.FIT}:
+
+\begin{terminalv}
+% stilts tpipe in=mycat.FIT out=selcat.FIT cmd='select "i>10*di"'
+\end{terminalv}
+
+The WCS information will be missing from \texttt{selcat.FIT}, and so we
+need to copy it back again from the original catalogue \texttt{mycat.FIT}:
+
+\begin{terminalv}
+% polwcscopy in=selcat ref=mycat out=selcat2
+\end{terminalv}
+
+This creates a third catalogue \texttt{selcat2.FIT}, which is a copy of
+\texttt{selcat.FIT} but with WCS inherited from \texttt{mycat.FIT}.
 
 \section{Running from the C-shell}
 When using POLPACK from the C-shell (or any other shell) care needs to be
@@ -1904,6 +1935,9 @@ vectors.}{POLSIM}
 
 \quickdes{POLVEC}{Converts a Stokes vector cube into a catalogue of
 polarization vectors.}{POLVEC}
+
+\quickdes{POLWCSCOPY}{Copies WCS information from one catalogue to
+another.}{POLWCSCOPY}
 
 \subsection{Complete routine descriptions \label{descriptions}}
 
@@ -5149,6 +5183,52 @@ for NDF applications.
       Copyright (C) 1999 Central Laboratory of the Research Councils
    }
 }
+\sstroutine{
+   POLWCSCOPY
+}{
+   Copies WCS from one catalogue to another
+}{
+   \sstdescription{
+      This application creates a copy of the specified input catalogue.
+      If the input catalogue does not include any WCS information, then
+      the WCS information from a specified reference catalogue is
+      included in the output catalogue.
+
+      A typical use is to add WCS information back into a catalogue that
+      has been modified using STILTS or TOPCAT. For instance, if STILTS or
+      TOPCAT is used to create a new catalogue containing vectors selected
+      from an input POLPACK catalogue, then the new catalogue created by
+      STILTS or TOPCAT will not contain WCS information in a form that can
+      be used by POLPACK, KAPPA or GAIA. This application can then be used
+      to add WCS information back into the catalogue created by STILTS or
+      TOPCAT, copying the WCS from the original POLPACK catalogue.
+   }
+   \sstusage{
+      polwcscopy in out ref
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = LITERAL (Read)
+      }{
+         The name of the input catalogue. A file type of .FIT is
+         assumed if none is provided.
+      }
+      \sstsubsection{
+         OUT = LITERAL (Write)
+      }{
+         The name of the output catalogue. A file type of .FIT is
+         assumed if none is provided. This will be a copy of IN. If IN
+         contains no WCS, then the WCS in OUT will be copied from REF.
+      }
+      \sstsubsection{
+         REF = LITERAL (Read)
+      }{
+         The name of the input catalogue from which WCS is to be read. A
+         file type of .FIT is assumed if none is provided. An error is
+         reported if this catalogue does not contain any WCS information.
+      }
+   }
+}
 
 \newpage
 
@@ -5955,6 +6035,10 @@ POLPACK.
  \item The POLWRTCL command now excludes any rows that contain one or more
  bad values.  This means that literal bad values (-0.340282E+39) are no
  longer passed onto the GAIA polarimetry toolbox.
+ \item A new command called POLWCSCOPY has been added that copies WCS
+ information form one catalogue to another. It is useful for adding WCS
+ information back into catalogues that have had the WCS information
+ stripped out - for instance by being processed using TOPCAT or STILTS.
 \end{itemize}
 
 \subsection{V3.4-0}
@@ -6334,6 +6418,8 @@ the vector map.
 \quickdes{POLSTACK}{Stack a set of intensity images.}{POLSTACK}
 
 \quickdes{POLVEC}{Converts a Stokes vector cube into a catalogue of polarization vectors.}{POLVEC}
+
+\quickdes{POLWCSCOPY}{Copies WCS information from one catalogue to another.}{POLWCSCOPY}
 
 \end{latexonly}
 

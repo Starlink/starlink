@@ -232,6 +232,9 @@
          ELSE IF ( NAME .EQ. 'POLVERSION' ) THEN
             CALL POLVERSION( STATUS )
 
+         ELSE IF ( NAME .EQ. 'POLWCSCOPY' ) THEN
+            CALL POLWCSCOPY( STATUS )
+
          ELSE IF ( NAME .EQ. 'POLWRTCL' ) THEN
             CALL POLWRTCL( STATUS )
 

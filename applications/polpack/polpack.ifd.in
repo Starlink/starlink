@@ -2387,7 +2387,38 @@ package polpack {
             prompt {The WCS axes spanning the spatial plane}
             helpkey *
          }
-       }
+      }
+
+      action polwcscopy {
+
+         helplib {$POLPACK_HELP}
+
+         parameter in {
+            position 1
+            type LITERAL
+            ppath GLOBAL
+            association <-GLOBAL.CATALOGUE
+            prompt {Input catalogue}
+            helpkey *
+          }
+
+         parameter out {
+            position 2
+            type LITERAL
+            ppath GLOBAL
+            association ->GLOBAL.CATALOGUE
+            prompt {Output catalogue}
+            helpkey *
+          }
+
+         parameter ref {
+            position 3
+            type LITERAL
+            ppath CURRENT
+            prompt {Reference catalogue}
+            helpkey *
+          }
+      }
    }
 
    command makecube {
