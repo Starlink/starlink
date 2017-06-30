@@ -23,7 +23,7 @@
 *     map, or on a fixed circle centred on the origin - see parameter MASK.
 *
 *     By default, the Q, U, I and PI catalogue values are in units of
-*     Jy/beam (see parameter Jy).
+*     mJy/beam (see parameter Jy).
 
 *  Usage:
 *     pol2map in iout qout uout [cat] [config] [pixsize] [qudir] [mapdir]
@@ -215,10 +215,10 @@
 *        and IPREF, the output I map will be used for IP correction. [!]
 *     JY = _LOGICAL (Read)
 *        If TRUE, the I, Q and U values in the output catalogue will be
-*        in units of Jy/beam. Otherwise they will be in units of pW. Note,
+*        in units of mJy/beam. Otherwise they will be in units of pW. Note,
 *        the Q, U and I maps are always in units of pW. The same FCF value
-*        is used to convert all three Stokes parameters from pW to Jy/beam.
-*        See parameter FCF. [TRUE]
+*        is used to convert all three Stokes parameters from pW to mJy/beam,
+*        derived from the value supplied for parameter FCF. [TRUE]
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -412,6 +412,9 @@
 *        to be used for weighting, whilst  generating output variances from
 *        the spread of the input values. makemos does not allow this
 *        combination.
+*     20-JUN-2017 (DSB):
+*        - If parameter JY is true, create output values in mJy/beam,
+*        rather than Jy/beam.
 '''
 
 import glob
@@ -572,7 +575,7 @@ try:
    params.append(starutil.Par0L("MAPVAR", "Use variance between observation maps?",
                                  False, noprompt=True))
 
-   params.append(starutil.Par0L("Jy", "Should outputs be converted from pW to Jy/beam?",
+   params.append(starutil.Par0L("Jy", "Should outputs be converted from pW to mJy/beam?",
                                 True, noprompt=True))
 
    params.append(starutil.Par0F("FCF", "pW to Jy/beam conversion factor",
@@ -756,11 +759,11 @@ try:
          invoke("$KAPPA_DIR/cdiv in={0} scalar={1} out={2}".format(ref,ref_fcf,refpw) )
          ref = refpw
 
-#  See if we should store I, Q and U values in Jy/beam in the output
+#  See if we should store I, Q and U values in mJy/beam in the output
 #  calatlogue.
    jy = parsys["JY"].value
 
-#  If we are converting to Jy/beam, get the FCF.
+#  If we are converting to mJy/beam, get the FCF (Jy/pw).
    if jy:
       fcf = parsys["FCF"].value
 
@@ -1771,12 +1774,12 @@ try:
 #  this information in the POLPACK enstension within "cube.sdf".
          invoke( "$POLPACK_DIR/polext in={0} stokes=qui".format(cube) )
 
-#  If required, scale the I, Q and U values from pW to Jy/beam.
+#  If required, scale the I, Q and U values from pW to mJy/beam.
          if jy:
             tcube = NDG( 1 )
             invoke( "$KAPPA_DIR/cmult in={0} out={1} scalar={2}".
-                    format(cube,tcube,fcf) )
-            invoke( "$KAPPA_DIR/setunits ndf={0} units=Jy/beam".format(tcube))
+                    format(cube,tcube,1000*fcf) )
+            invoke( "$KAPPA_DIR/setunits ndf={0} units=mJy/beam".format(tcube))
             cube = tcube
 
 #  Create a FITS catalogue containing the polarisation vectors.
