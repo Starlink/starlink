@@ -2,7 +2,7 @@
 \label{sec:pol2}
 \section{\xlabel{pol2}The instrument}
 
-The POL-2 instrument is a linear polarimiter for the
+The POL-2 instrument is a linear polarimetry module for the
 Submillimetre Common User Bolometer Array-2 (SCUBA-2), a 10,000
 bolomtere camera on the JCMT \cite{Friberg}\cite{Bastien2011}.
 POL-2 in itself is not a detector - thus requiring SCUBA-2
@@ -13,9 +13,8 @@ instrument is currently commissioned at \SI{850}{\micro\metre} only.
 
 \subsection*{Polarization}
 
-A quick flick through any text book on optics will yield a section
-on the scattering of light and its description. Conventionally light
-is described in terms of the four Stokes parameters: I, Q, U and V.
+In polarimetric terms light is conventionally 
+described by the four Stokes parameters: I, Q, U and V.
 
 
 I is the total intensity, Q, is the radiation linearly polarized in the
@@ -23,14 +22,14 @@ direction parallel or perpendicular to the reference plane. U, is the
 radiation linearly polarized in the directions 45$^{\circ }$ to the
 reference plane, and V, is the circularly polarized radiation.
 
-POL-2 only handles linear polrization. As a result we do not use
-the V parameter in this document from this point and only focus
-on I, Q and U.
+POL-2 is designed to charecterise linear polarisation. 
+The V parameter, consequently, is not discussed further
+with the focus on I, Q and U.
 
 The linear Polarized intensity can be described as:
 
 \begin{equation}
-PI = \sqrt{Q^{2}+U^{2}}
+P = \sqrt{Q^{2}+U^{2}}
 \end{equation}
 
 where
@@ -50,30 +49,30 @@ IP is the instrument polarization. The IP affects both Q
 
 \subsection*{How POL-2 works}
 
-POL-2 sits in front of the window to the SCUBA-2 instrument
-as is seen in Figure \ref{fig:pol2sc2}. POL-2 covers the full
+POL-2 is located in front of the window to the SCUBA-2 instrument
+(as is seen in Figure \ref{fig:pol2sc2}), and covers the full
 field of view of SCUBA-2. The POL-2 polarimeter
-utilizes three optical components
+utilises three optical components
 that cover the full field of SCUBA-2:
 
 \begin{enumerate}\itemsep-0.2em
 \item a wire-grid polarizer used as a calibrator (only included in the
 beam for test purposes)
-\item the Half-Wave Plate
+\item a Half-Wave Plate
 \item a second wire-grid polarizer used as an analyzer
 \end{enumerate}
 
 
 these components can be seen in Figure \ref{fig:pol2components}.
-Rotating the HWP rotates any linear polarised component of incoming
-radiation. The rotating linear polarised component is
-transmitted or reflected by the grid causing a modulation in the transmitted
+Rotating the HWP rotates any linearly polarised component of incoming
+radiation. The rotating linearly polarised component is
+transmitted or reflected by the grid, causing a modulation in the transmitted
 intensity.
 
-The total radiation passing through the polarimeter is detected by
-SCUBA-2. The polarimeter detects an intensity (I$_{detected}$) that is a
-combination of \emph{both} the unploarized intensity (I$_{unpolarised}$)
-and the linear polarised intensity (PI). This detected intensity can be
+The radiation passing through the polarimeter is detected by
+SCUBA-2. The detected intensity (I$_{detected}$) is a
+combination of \emph{both} the unpolarised intensity (I$_{unpolarised}$)
+and the linearly polarised intensity (P). This detected intensity can be
 described by:
 
 
@@ -102,18 +101,18 @@ where $\phi$ is the angle of the HWP.
 
 
 
-\subsection*{The Half Wave Plate:}
+\subsection*{The Half-Wave Plate:}
 
 As described in the POL-2 commissioning document
-the HWP is made out of five individual sapphire layers approximately 0.9
-mm thick and 200 mm in diameter. The transmission of sapphire is good at
-\SI{850}{\micro\metre} and absorbs somewhat at \SI{450}{\micro\metre}, depending on the thickness and ambient
-temperature. The total transmission of the HWP integrated across the 850
+the HWP is constructed from five individual synthetic sapphire layers approximately 0.9
+mm thick and 200 mm in diameter. The transmission properties of sapphire
+are generally good at the SCUBA-2 wavelengths but are dependent on the thickness and ambient
+temperature. The total effective transmission of the HWP integrated across the 850
 and \SI{450}{\micro\metre} filter bands are about 86\% and 57\% respectively
 (Savini et al. 2009 - insert full reference).
 
 
-Rotating the HWP rotates any linear polarised component of incoming radiation.
+Rotation of the HWP results in the rotation of any linear polarised component of incoming radiation.
 
 
 
@@ -135,21 +134,21 @@ Rotating the HWP rotates any linear polarised component of incoming radiation.
 \end{figure}
 
 The waveplate is typically rotated at 2Hz, providing a fast modulation of any linear polarization by 8Hz.
-The data acquisition rate is ~175Hz giving about 20 samples per cycle.
+The data acquisition rate is ~175Hz, yielding 20 samples per cycle.
 
 
 
 \section{Instrument Polarization}
 
-At the resolution of JCMT, planets such as Uranus should appear as unpolarized point sources.
-In practice POL-2 observation of such sources show a significant polarisation - typically less
+At the angular resolution of JCMT, planets such as Uranus should appear as unpolarised point sources.
+In practice, however, POL-2 observations of such sources exhibit a measurable level of polarisation - albeit typically less
 than 1.5\% at 850 microns. This is evidence that some part of the incoming astronomical radiation
-is being partially poralised by one or more of the components of the telescope/POL-2/SCUBA-2
-that are in the light path. This polarisation is referred to as "Instrument Polarisation" (IP).
+is being partially polarised by one or more of the components of the telescope/POL-2/SCUBA-2
+that are in the light path. This polarisation is referred to as "Instrumental Polarisation" (IP).
 
-In order to determine the true Q and U from an astronomical source it is necessary to correct
+In order to establish the true Q and U from an astronomical source, it is necessary to correct
 for this effect. For the case of a low degree of polarisation in the incoming radiation and a low
-degree of IP the following is a good approximation for correcting the measurement for the IP:
+degree of IP, the following is a good approximation for correcting the measurement for the effects of the IP:
 
 \begin{equation}
 Q = Q_{m} - I. ip_{q}
@@ -165,8 +164,8 @@ total intensity at the same point on the sky (i.e. the total intensity after rem
 the sky and electronic backgrounds) and $ip_{q}$  and $ip_{u}$  are factors that may vary
 slowly with focal plane position and/or azimuth and elevation.
 
-Thus to perform IP correction on a POL-2 map requires a total intensity map of the same area
-of the sky to be available. This total intensity map is referred to as the IP reference map.
+IP correction of a POL-2 map therefore requires the use of a total intensity map of the same area
+of the sky to be available. This total intensity map is referred to as the \emhp{IP reference map}.
 
 Where flat mirrors or surfaces will produce a small, constant polarization across the beam,
 curved mirrors and other structures (for example the secondary mirror supports) will

@@ -15,7 +15,7 @@ and \gaia \cite{gaia}.
 This guide covers the following topics.
 \begin{itemize}
 \itemsep0em
-\item \cref{Chapter}{sec:intro}{Chapter 1} -- Computer resources you'll need before getting started.
+\item \cref{Chapter}{sec:intro}{Chapter 1} -- Computer resources needed before getting started.
 \item \cref{Chapter}{sec:pol2}{Chapter 2} -- A description of POL-2 and its observing modes.
 \item \cref{Chapter}{sec:dr}{Chapter 3} -- POL-2 Data Reduction - The Theory
 \item \cref{Chapter}{sec:rundr}{Chapter 4} -- POL-2 Data Reduction - Running pol2map
@@ -31,13 +31,13 @@ the text that should be typed by the user to initiate the described action.
 \section{\xlabel{computing} Before you start: computing resources}
 \label{sec:computing}
 
-Compared to SCUBA-2 observations, POL-2 observations are far less memory intensive to reduce.
-POL-2 time-series data is down-sampled to 2Hz within the reduction process. Assuming a typical 35
+Compared to SCUBA-2 observations, POL-2 observations are far less memory-intensive to reduce.
+POL-2 time-series data is down-sampled to 2Hz as a part of the reduction process. Assuming a typical 35
 minute POL-2 observation, the reduction requires 35 GB of memory (in comparison to SCUBA-2
 maps that may require up to 96 GB of memory).
 
 The main consideration for POL-2 reductions is processing power. PCA calculations in
-makemap can be lengthy so fast processors with lots of cores are advised.
+\makemap\ can be lengthy so fast processors with lots of cores are advised.
 
 
 \section{\xlabel{software}Before you start: software}
@@ -51,7 +51,7 @@ to reduce any SCUBA-2 data (see section \ref{sec:starinit}).
 \subsection{Data formats}
 \label{sec:ndf}
 
-Data files for POL-2 are the same as for SCUBA-2 and use
+Data files for POL-2 are structurally the same as for SCUBA-2, and use
 the Starlink N-dimensional Data Format (NDF,
 see Jenness et al.\ 2014\cite{ndf}), a hierarchical format which allows
 additional data and metadata to be stored within a single file. \Kappa\
@@ -74,15 +74,15 @@ JCMT data on disk is also known as a `sub-scan'.
 
 The main components of any NDF structure are:
 \begin{itemize}
-\item An array of numerical data (may have up to seven
+\item An array of numerical data (which may have up to seven
 dimensions---usually three for JCMT data);
 \item An array of variance values corresponding to the numerical data
 values;
-\item An array holding up to eight boolean flags (known as ``quality
+\item An array holding up to eight Boolean flags (known as ``quality
 flags'') for each pixel;
-\item World Coordinate System information;
+\item World Co-ordinate System information;
 \item History;
-\item Data units
+\item Data units;
 \item Other extensions items. These are defined by particular packages,
 but usually include a list of FITS-like headers together with provenance
 information that indicates how the NDF was created. Raw JCMT files also
@@ -90,7 +90,7 @@ include extensions that define the state of the telescope and instrument
 at each time slice within the observation.
 \end{itemize}
 
-The \convert\ package contains commands \xref{\task{fits2ndf}}{sun55}{FITS2NDF} and
+The \starlink\ \convert\ package contains commands \xref{\task{fits2ndf}}{sun55}{FITS2NDF} and
 \xref{\task{ndf2fits}}{sun55}{NDF2FITS} that allow interchange between FITS
 and NDF format.
 
@@ -99,7 +99,7 @@ and NDF format.
 
 The commands and environment variables needed to start up the required
 Starlink packages (\smurf \cite{smurf}, \Kappa, \emph{etc.}) must first
-be defined. For C shells (csh, tcsh), do:
+be defined. For C shells (csh, tcsh), the commands are:
 
 \begin{terminalv}
 % setenv STARLINK_DIR <path to the starlink installation>
@@ -107,7 +107,7 @@ be defined. For C shells (csh, tcsh), do:
 % source $STARLINK_DIR/etc/cshrc
 \end{terminalv}
 
-before using any Starlink commands. For Bourne shells (sh, bash, zsh), do:
+before using any Starlink commands. For Bourne shells (sh, bash, zsh), the commands are:
 
 \begin{terminalv}
 % export STARLINK_DIR=<path to the starlink installation>
@@ -117,12 +117,12 @@ before using any Starlink commands. For Bourne shells (sh, bash, zsh), do:
 \subsection{KAPPA and SMURF for data processing}
 \label{sec:packinit}
 
-The Sub-Millimetre User Reduction Facility, or \textsc{Smurf},
+The \starlink\ Sub-Millimetre User Reduction Facility package, or \textsc{Smurf},
 contains the Dynamic Iterative Map-Maker, which will process
-SCUBA-2 time-series data into images (see \smurfsun). \textsc{Kappa} meanwhile is
+SCUBA-2 time-series data into images (see \smurfsun). \textsc{Kappa}, meanwhile, is
 an application package comprising general-purpose commands mostly for
 manipulating and visualising NDF data (see \kappasun). Before starting
-any data reduction you will want to initiate both \textsc{Smurf} and
+any data reduction it is necessary to initiate both \textsc{Smurf} and
 \textsc{Kappa}.
 
 \begin{terminalv}
@@ -130,8 +130,8 @@ any data reduction you will want to initiate both \textsc{Smurf} and
 % kappa
 \end{terminalv}
 
-After entering the above commands, you can access the help information
-for either package by typing \texttt{smurfhelp} or
+After entering the above commands, the help information
+for the two packages can be accessed by typing \texttt{smurfhelp} or
 \texttt{kaphelp} respectively in a terminal, or by using the
 \task{showme} facility to access the hypertext documentation. See
 \cref{Section}{sec:help}{How to get help} for more information.
@@ -148,7 +148,7 @@ Starlink commands (the exception is \picard).
 Images and vector maps can be displayed and analysed using \gaia\ (see
 \gaiasun) - an interactive GUI-driven tool that incorporates facilities
 such as vector selection, vector binning, source detection, photometry
-and the ability to query and overlay on-line or local catalogues.
+and the ability to query and overlay on-line or local catalogue data.
 \begin{terminalv}
 % gaia map.sdf
 \end{terminalv}
