@@ -169,23 +169,23 @@ of the sky to be available. This total intensity map is referred to as the \emhp
 
 Where flat mirrors or surfaces will produce a small, constant polarization across the beam,
 curved mirrors and other structures (for example the secondary mirror supports) will
-produce more complex polarization effects - and these may distort the beam shape.
+produce more complex polarization effects, and these may distort the beam shape.
 Side-lobes can often show up with strong (typically 10-20\%) polarization but these
-effects are usually far from the main-beam. Typical calculations of antenna patterns
+effects are usually far from the main-beam. Calculations of typical antenna patterns
 for symmetrical Cassegrain antennas have not predicted strong polarization in the main beam.
 
-The JCMT IP footprint is stronger than expected (though typically less than 1.5\% of
+The JCMT IP footprint is stronger than might be expected from the above considerations above (though typically less than 1.5\% of
 the total intensity), and has the following distinctive features:
 
 \begin{enumerate}\itemsep-0.2em
-\item The polarisation intensity is elevation dependent
-\item There is ellipticity of the beam and it is elevation dependent
+\item The polarisation intensity is elevation dependent;
+\item There is ellipticity of the beam and it is elevation dependent;
 \item The beam is elongated in the horizontal direction.
 \end{enumerate}
 
 The dominant source of IP at the JCMT is the Goretex membrane, used as a wind blind.
-This membrane introducing both losses and polarization. Due to SCUBA-2's location
-on the Nasmyth platform this polarization effect is elevation dependent.
+This membrane introduces both losses and polarization. Due to SCUBA-2's location
+on the Nasmyth platform, this polarization effect is elevation dependent.
 
 
 \section{\xlabel{obs_modes}Observing mode}
@@ -205,7 +205,7 @@ speed.
 \begin{center}
 \includegraphics[width=0.9\linewidth]{scan_pattern_daisy_comparison.png}
 \label{fig:scancompsrison}
-\caption [Scan Pattern Comparison]{Left: Scan pattern from a typical SCUBA-2 CV_Daisy
+\caption [Scan Pattern Comparison]{Left: Scan pattern from a typical SCUBA-2 CV\_Daisy
 observation. Right: Scan pattern from a POL-2 Daisy. The standard POLCV\_DAISY scan
 parameters are given in Table~\ref{tab:scanpar}
   \small
@@ -218,7 +218,7 @@ parameters are given in Table~\ref{tab:scanpar}
 
 The telescope must scan slowly enough to obtain sufficient data at each
 point on the sky to allow good $Q$ and $U$ values to be determined. The current
-commissioned scan pattern has a size of 200\arcs{} and a scan speed of
+commissioned scan pattern has a size of 200\si{\arcsecond} and a scan speed of
 8\si{\arcsecond}/s. The data reduction splits the data stream into short
 segments and determines a pair of $Q$ and $U$ values from each segment.
 
@@ -245,11 +245,8 @@ Half-wave plate rotation frequency& \SI{2}{Hz}\\
  $R_a$ (nominal avoidance radius) & 77\arcs\\
 \hline
 \end{tabular}
-\begin{tablenotes}
-\small \textdagger Note this radius is \emph{not} the size of the resulting map
-\end{tablenotes}
 \end{threeparttable}
-\caption{The scan parameters used in the POLCV\_DAISY mode.\label{tab:scanpar}}
+\caption{The scan parameters used in the POLCV\_DAISY mode. \textdagger this radius is \emph{not} the size of the resulting map. \label{tab:scanpar}}
 \end{center}
 \end{table}
 
@@ -267,7 +264,7 @@ Half-wave plate rotation frequency& \SI{2}{Hz}\\
 
 \section{The raw data}
 \label{sec:rawdata}
-SCUBA-2 is the detector for POL-2 and as such the raw data format of POL-2 data is
+SCUBA-2 is the detector for POL-2, and as such, the raw data format of POL-2 data is
 the same as a typical SCUBA-2 observation. The sequence for both observations is:
 
 \begin{enumerate}\itemsep-0.2em
@@ -277,16 +274,10 @@ the same as a typical SCUBA-2 observation. The sequence for both observations is
 \item Flat-field
 \end{enumerate}
 
-<<<<<<< 8ee5bbbfbe34a3a8fc3d0b20aa99041d1b6923b7
-The \param{SEQ\_TYPE} keyword in the FITS header may be used to identify the nature of each scan.
-When you access raw data from the \htmladdnormallink{Science
-=======
-The \param{SEQ\_TYPE}\ keyword in the FITS header may be used to identify the nature of each scan (see
-\cref{Section}{sec:fitsheader}{Headers and file structure}).  When you
-access raw from the \htmladdnormallink{Science
->>>>>>> SC/22: Escape underscore to prevent most of the text appearing in tt.
-  Archive}{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/} you
-will get all of the files listed above.
+
+The \param{SEQ$\_$TYPE} keyword in the FITS header may be used to identify the nature of each scan.
+When you access raw data from the CADC archive \htmladdnormallink{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}\
+ you will get all of the files listed above.
 
 
 Critically the \param{INBEAM} keyword in the FITS header may be used to
@@ -301,6 +292,9 @@ NDF. To obtain a specific header simply use the command fitsval:
 % fitsval s8a20160112_00056_0001.sdf INBEAM
 pol
 \end{terminalv}
+The FITS header information may also be viewed via the \gaia\ View / FITS header 
+drop-down menu option.
+
 \end{tip}
 
 Shown below is an incomplete list of the raw files for a single sub-array (in this
@@ -308,7 +302,7 @@ case s8a) for a short POL-2 observation. The first and last
 scans are the flat-field observations,which occur after the shutter
 opens to the sky at the start of the observation and closes at the end
 (note the identical file size); all of the scans in between are
-science.
+science scans.
 
 
 \begin{terminalv}
@@ -331,7 +325,7 @@ science.
 
 The SCUBA-2 data acquisition (DA) system writes out a data file every
 30 seconds; each of which contains 22\,MB of data. The only exception
-is the final science scan which will usually be smaller (6.8\,MB in
+is the final science scan which will usually be smaller (7.9\,MB in
 the example above), typically requiring less than 30 seconds of data
 to complete the observation.
 
@@ -346,7 +340,7 @@ and the third dimension corresponding to time slice index (sampled at roughly 20
 A standardised file naming scheme is used in which each file name starts
 with the sub-array name, followed by the UT date of the observation in
 the format \texttt{yyyymmdd}, followed by a five-digit observation
-number, followed by the scub-scan number. The name ends with the standard
+number, followed by the sub-scan number. The name ends with the standard
 suffix \texttt{.sdf} used by all Starlink NDF data files. For instance, the files
 listed above hold data from the s8a sub-array for observation 34 taken on
 12th January 2016.
@@ -357,21 +351,21 @@ listed above hold data from the s8a sub-array for observation 34 taken on
 \subsubsection*{Units/Calibration}
 
 Raw POL-2 data come in uncalibrated units. The first calibration
-step is to scale the raw data to units of picowatts (pW)
+step is to scale the raw data to units of pico Watts (pW)
 by applying the flat-field solution. This step is performed internally
 by the SMURF command calcqu - used to calculate I, Q and U time-streams from
 the raw data - but can be done manually when examining the raw
 data.
 
-If the purpose of a POL-2 observation is to measure the percentage
+If the purpose of a given POL-2 observation is to determine the percentage
 polarizations or vector angles within a source/region of interest then
 the data may remain in pW. On the other hand, if the purpose is to
-measure the absolute polarized intensities then a value for the flux
-conversion factor (FCF) is required.
+establish the absolute polarized intensities then a value for the Flux
+Conversion Factor (FCF) is required.
 
-The resulting map may have the FCF applied to give units of janskys. As is
-recommended with SCUBA-2 observing it is good to check that the FCF value
-applied to your data is sensible (and must be done manually).
+The resulting map may have the FCF applied to convert it into units of Janskys. As is
+recommended with SCUBA-2 observing, it is advisable to check that the FCF value
+applied to the data is sensible (and must be done manually).
 
 
 
