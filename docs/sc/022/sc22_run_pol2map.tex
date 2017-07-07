@@ -1,8 +1,8 @@
 \chapter{\xlabel{pol2_dr}POL-2 Data Reduction - Running pol2map}
 \label{sec:rundr}
 
-The previous chapter, \cref{Chapter}{sec:dr}{POL-2 Data Reduction - The Theory}, described how pol2 map produces I Q and U maps from raw POL-2 data.
-It showed that this reduction process - which uses pol2map - is a three step process.
+The previous chapter, \cref{Chapter}{sec:dr}{POL-2 Data Reduction - The Theory}, described how pol2map produces I, Q and U maps from raw POL-2 data.
+It showed that this reduction process - which uses pol2map - is a three-step process.
 
 As with the other Python scripts in SMURF, you can get more information about the available
 parameters by doing either:
@@ -16,11 +16,11 @@ or
 
 \section{\xlabel{how-pol2map}How to use pol2map}
 
-Before running pol2map directly, you need to ensure that the \starlink\ environment has been
+Before running pol2map directly, it is neccesarry need to ensure that the \starlink\ environment has been
 initialised and the \smurf\ package started (see
 \cref{Section}{sec:starinit}{Initialising Starlink} and
 \cref{Section}{sec:packinit}{KAPPA and SMURF for data processing}).
-To run pol2map you need to supply values for the
+To run pol2map values need to be supplied for the
 following command-line parameters\footnote{Note the distinction between
 ``command-line parameters'' that are
 supplied on the \texttt{pol2map} command line, and ``configuration parameters''
@@ -42,20 +42,20 @@ the raw data files can contain wild-cards such as ``$*$'' and ``?''.
 
 \item[\texttt{IOUT}]
 The name of the NDF in which to store the the total intensity (I) map
-including all supplied observations. The supplied file name should either have a file type of
+incorporating all supplied observations. The supplied file name should either have a file type of
 ``\texttt{.sdf}'', or no file type at all (in which case \texttt{.sdf}
 will be appended to the supplied value). Any existing file with the same
 name will be over-written.
 
 \item[\texttt{QOUT}]
 The output NDF in which to return the Q map including all supplied
-observations. This will be in units of pW. Supply null (!) if no Q
+observations. This will be in units of pW. Null (!) should be supplied if no Q
 map is required.
 
 
 \item[\texttt{UOUT}]
 The output NDF in which to return the U map including all supplied
-observations. This will be in units of pW. Supply null (!) if no U
+observations. This will be in units of pW. Null (!) should be supplied if no U
 map is required.
 
 \item[\texttt{MAPDIR}]
