@@ -12,10 +12,10 @@ first open up the I map in gaia:
 \end{terminalv}
 
 
-Then in the main Gaia window, select the drop-down menu option Image Analysis /
-Polarimetry toolbox…. This should launch a new toolbox window entitled
+In the main Gaia window, select the drop-down menu option \texttt{Image Analysis /
+Polarimetry toolbox…}. This should launch a new toolbox window entitled
 GAIA: Polarimetry. From this window, use the drop-down menu option
-File / Open to load the file mycat.FIT. This should then populate the lower part of the
+\texttt{File / Open} to load the file mycat.FIT. This should then populate the lower part of the
 window with the contents of this polarimetry catalogue file.
 Each of the vectors in this file will be automatically overlaid on the main image window
 (see figure \ref{fig:gaia-plot-vectors1}).
@@ -26,14 +26,14 @@ Each of the vectors in this file will be automatically overlaid on the main imag
 \includegraphics[width=0.46\linewidth]{sc22-gaia-plot-vectors-3.png}
 \label{fig:gaia-plot-vectors1}
 \caption [Over Plotting Vectors in GAIA]{
-  \small Left: Opening up the polarimetry tool box in GAIA. Right: The initial POL-2
+  \small Left: Opening up the polarimetry toolbox in GAIA. Right: The initial POL-2
 vectors overplotted in GAIA.
 }
 \end{center}
 \end{figure}
 
 In order to filter the number of overlaid vectors down to a more useful number and size,
-various options in the GAIA: Polarimetry window can be used. First, select the Rendering
+various options in the GAIA: Polarimetry window can be used. First, select the \texttt{Rendering}
 tab on the left hand side. This will reveal a panel that will indicate which quantities
 are currently being used for the vector overlays. In this case, the Vector length is taken
 from the P column of the table, and the Vector angles are taken from the ANG column.
@@ -51,7 +51,7 @@ $I/$DI<10
 The above expression selects the data points in the polarimetry table which have an
 associated total intensity (column I) less than 10 times the
 associated error value for that intensity (column DI). To remove all of these
-extraneous vectors, either press control-X or use the drop-down menu option Edit / Cut.
+extraneous vectors, either press control-X or use the drop-down menu option \texttt{Edit / Cut}.
 This should leave just a small number of vectors clustering around the target object.
 
 \begin{figure}[t!]
@@ -61,7 +61,7 @@ This should leave just a small number of vectors clustering around the target ob
 \label{fig:gaia-plot-vectors2}
 \caption [Selecting Vectors in GAIA]{
   \small Left: specifying vectors to display via the expression \$I/\$DI$>$10. This will only plot
-vectors with an 850 micron intensity signal-to-noise ratio grater than 10 in GAIA. To ensure this is selected
+vectors with an 850 micron intensity signal-to-noise ratio grater than 10 in GAIA. To ensure thatthis is specified,
 ensure you press the carriage return after entering the expression.
 }
 \end{center}
@@ -80,14 +80,14 @@ window, and increasing the vector scale.
 \label{fig:gaia-plot-vectors3}
 \caption [Over Plotting Vectors in GAIA]{
   \small Left: Selected vectors are marked in blue in this example, Right: after removal of selected
-vectors all that remains are the vectors on the regions where \$I/\$DI$>$10.
+vectors all that remains are the vectors on the (zoomed) regions where \$I/\$DI$>$10.
 }
 \end{center}
 \end{figure}
 
 
 Finally it is useful for future use (as in the examples inthe following sections) to 
-save the final selection of vectors. To save use the drop-down menue File / Save in 
+save the final selection of vectors. To save use the drop-down menue \texttt{File / Save} in 
 the polarimetry toolbox.
 
 \section{\xlabel{kappa}KAPPA and polpack}
@@ -99,11 +99,11 @@ It is possible to use \Kappa\ and polpack to create POL-2 plots.
 % polpack
 \end{terminalv}
 
-Note that in the following examples you will need to ensure that only the
-vectors you intend to plot are included in the file mycat.FIT.
+Note that in the following examples, it will be necessary to ensure that only the
+vectors to be plotted are included in the file mycat.FIT.
 
 There are two main ways to do this - either by saving the output catalogue
-from GAIA or using the starlink package \cursa to manipulate the catalogue you produced.
+from GAIA or using the starlink package cursa to manipulate the catalogue you produced.
 To use cursa simply run:
 
 \begin{terminalv}
@@ -128,15 +128,18 @@ In this example we use only pixels above -10 on the y axis.
 
 \begin{tip}
 For a better font on pgplot postscript devices, set the
-following environment variable. For more info, see
-
-http://pipelinesandarchives.blogspot.com/2015/02/better-fonts-in-postscript-output-from.html
+following environment variable. 
 
 \begin{terminalv}
 setenv PGPLOT_PS_FONT Times
 \end{terminalv}
 
+For more info, see
+
+http://pipelinesandarchives.blogspot.com/2015/02/better-fonts-in-postscript-output-from.html
+
 Graphics-related attributes that can be set are described at:
+
 http://starlink.eao.hawaii.edu/docs/sun95.htx/sun95se28.html
 
 and the coordinate system attributes that can be set are
@@ -152,7 +155,7 @@ http://starlink.eao.hawaii.edu/docs/sun95.htx/sun95se27.html
 \subsection{\xlabel{kappa-example1} Example 1 - a vector map with no background}
 \label{section:kappa-example1}
 
-In this section we create an output file: plot1.pdf from the input catalogue mycat.FIT
+In this section an output file: plot1.pdf is created from the input catalogue mycat.FIT
 
 Select postscript graphics device, writing to file plot1.ps
 
@@ -160,7 +163,7 @@ Select postscript graphics device, writing to file plot1.ps
 gdset plot1.ps/acps
 \end{terminalv}
 
-For convenience, create a text file holding the main plotting style for polplot.
+For convenience, create a text file holding the main plotting style for polplot:
 
 \begin{terminalv}
 % cat sty
@@ -170,7 +173,7 @@ format(1)=hms
 format(2)=dms
 \end{terminalv}
 
-Likewise, create a text file holding the style for the vector length key
+Likewise, create a text file holding the style for the vector length key:
 
 \begin{terminalv}
 % cat ksty
@@ -188,7 +191,7 @@ to control the behaviour of \texttt{polplot} - see the \polpack manual - SUN/223
 % polplot selcat.FIT  style=^sty keystyle=^ksty vscale=20 keyvec=20
 \end{terminalv}
 
-Convert to PDF and remove blank margins (if required).
+Convert the map into PDF file and remove blank margins (if required):
 
 \begin{terminalv}
 % ps2pdf plot1.ps temp.pdf
@@ -216,7 +219,7 @@ In this section we create an output file: plot2.pdf from the input catalogue myc
 % gdset plot2.ps/acps
 \end{terminalv}
 
-Setting up the main plotting style for contour and polplot
+Setting up the main plotting style for contour and polplot:
 
 \begin{terminalv}
 % cat sty
@@ -245,7 +248,7 @@ colour(curves)=black
 \end{terminalv}
 
 
-The style for the vector length key
+Set the style for the vector length key:
 
 
 \begin{terminalv}
@@ -256,14 +259,14 @@ drawtitle=0
 \end{terminalv}
 
 Plot the vector map over the contour map. The vectors and
-contours are aligned automatically in sky coordinates.
+contours are aligned automatically in sky coordinates:
 
 
 \begin{terminalv}
 % polplot selcat.FIT axes=no clear=no style=^vsty keystyle=^ksty vscale=20 keyvec=20
 \end{terminalv}
 
-Convert to PDF and remove blank margins (if required).
+Convert into a PDF file and remove blank margins (if required):
 
 \begin{terminalv}
 % ps2pdf plot2.ps temp.pdf
@@ -291,14 +294,14 @@ In this section we create an output file: plot3.pdf from the input catalogue myc
 \end{terminalv}
 
 
-Ensure we use a monochrome colour table for the image
+To ensure a monochrome colour table is used for the image:
 
 \begin{terminalv}
 % lutgrey
 \end{terminalv}
 
 
-#  The main plotting style for display and polplot
+Set the main plotting style for display and polplot:
 
 \begin{terminalv}
 % cat sty
@@ -309,9 +312,9 @@ format(2)=dms
 \end{terminalv}
 
 
-Use a square root-ish function to reduce the dynamic range in the map (so
-that we can see structure in the faint bits without blowing out the
-bright bits).
+The following function is used to reduce the dynamic range in the map (so
+that we can see structure in the faint bits without saturating the
+brightest regions).
 
 \begin{terminalv}
 maths "'((ia+0.0003)/0.14)**0.2'" ia=iext out=tmp1
@@ -320,8 +323,8 @@ maths "'((ia+0.0003)/0.14)**0.2'" ia=iext out=tmp1
 
 Display the negative image, using a reduced range of colours
 (pens) so that the brightest regions are grey rather than black.
-This means the black vectors can still be seen over the bright
-regions.
+This means the black vectors can still be seen over the brightest
+regions:
 
 \begin{terminalv}
 % display tmp1\(5~150,0~200\) mode=perc percentiles=\[2,98\] style=^sty \
@@ -330,7 +333,7 @@ regions.
 \end{terminalv}
 
 
-Modify the above style for the vector map to produce wider vectors
+Modify the above style for the vector map to produce wider vectors:
 
 \begin{terminalv}
 % cat vsty
@@ -339,7 +342,7 @@ width(curves)=3
 \end{terminalv}
 
 
-The style for the vector length key
+Set the style for the vector length key:
 
 \begin{terminalv}
 % cat ksty
@@ -349,14 +352,14 @@ drawtitle=0
 \end{terminalv}
 
 
-Plot the vector map over the contour map. They are aligned automatically with the map.
+Plot the vector map over the contour map. The vectors are aligned automatically with the map.
 
 \begin{terminalv}
 % polplot selcat.FIT axes=no clear=no style=^vsty keystyle=^ksty vscale=20 keyvec=20
 \end{terminalv}
 
 
-Convert to PDF and remove blank margins (if required).
+Convert into a PDF file and remove blank margins (if required).
 
 \begin{terminalv}
 % ps2pdf plot3.ps temp.pdf
