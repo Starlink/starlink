@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
-<!-- @configure_input@ -->
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="@PACKAGE@" support="S">
-  <version>@PACKAGE_VERSION@</version>
+<component id="sc22" support="S">
+  <version>1.0</version>
   <path>docs/sc/022</path>
   <description>The POL-2 Data Reduction Cookbook</description>
   <abstract><p> This cookbook provides an introduction to Starlink
@@ -13,8 +13,8 @@
   required to reduce the data, including an overview of the method. It
   also describes how to calibrate and display the data as images or
   vector maps.  </p></abstract>
-  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
-    @STAR_DEPENDENCIES_CHILDREN@
+  <dependencies >
+    <sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -30,8 +30,8 @@
       <name>S.F. Graves</name>
     </person>
   </developers>
-  <documentation>@STAR_DOCUMENTATION@</documentation>
-  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <documentation> sc22</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>2017</year>
     <name>EAO</name>
