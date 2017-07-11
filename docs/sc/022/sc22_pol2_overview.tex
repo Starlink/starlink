@@ -10,6 +10,20 @@ and its detectors for operation. SCUBA-2 operates
 simultaneously at both 850 and \SI{450}{\micro\metre}. The POL-2
 instrument is currently commissioned at \SI{850}{\micro\metre} only.
 
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=0.45\linewidth]{pol2-out-of-beam.png}
+\includegraphics[width=0.45\linewidth]{pol2-in-beam.png}
+\label{fig:pol2sc2}
+\caption [POL-2 mounted on SCUBA-2]{
+  \small POL-2 mounted on the front of SCUBA-2.
+  The left image shows the SCUBA-2
+  window. The right image shows the components of POL-2 inserted
+  in front of the SCUBA-2 window: the calibrator grid, rotating HWP
+  and the analyzer grid. The calibrator grid is only inserted
+  for test purposes.}
+\end{center}
+\end{figure}
 
 \subsection*{Polarization}
 
@@ -68,37 +82,40 @@ A schematic of POL-2 is given in Figure \ref{fig:pol2sc2diagram}.
 
 
 Rotating the HWP rotates any linearly polarised component of incoming
-radiation. The rotating linearly polarised component is
+radiation. The HWP rotates this incoming linear polarization with twice 
+the speed of the HWP angle ($\theta$) producing the \emph{effective 
+analyser} position ($\phi$), such that:
+
+
+\begin{equation}
+\phi = 2 \theta
+\end{equation}
+
+
+The rotating linearly polarised component is
 transmitted or reflected by the grid, causing a modulation in the transmitted
 intensity.
 
 The radiation passing through the polarimeter is detected by
 SCUBA-2. The detected intensity (I$_{detected}$) is a
 combination of \emph{both} the unpolarised intensity (I$_{unpolarised}$)
-and the linearly polarised intensity (P). This detected intensity can be
+and the linearly polarised intensity (I$_{p}$. This detected intensity can be
 described by:
 
 
 \begin{equation}
-I_{detected} = \frac{I_{unpolarised}}{2}+ I_{p}\cdot\left(\frac{1+\cos(4\phi - \delta)}{2} \right)
+I_{detected} = \frac{I_{unpolarised}}{2}+ I_{p}\cdot\left(\frac{1+\cos(4\theta - \delta)}{2} \right)
 \end{equation}
 
-where $\phi$ is the angle of the HWP and $\delta$ is the angle of the polarised signal.
+with the above equation being in terms of the HWP angle. This can also be expressed in terms 
+of the effective analyser angle (as is provided in the POLPACK documentation):
 
-\begin{figure}[t!]
-\begin{center}
-\includegraphics[width=0.45\linewidth]{pol2-out-of-beam.png}
-\includegraphics[width=0.45\linewidth]{pol2-in-beam.png}
-\label{fig:pol2sc2}
-\caption [POL-2 mounted on SCUBA-2]{
-  \small POL-2 mounted on the front of SCUBA-2.
-  The left image shows the SCUBA-2
-  window. The right image shows the components of POL-2 inserted
-  in front of the SCUBA-2 window: the calibrator grid, rotating HWP
-  and the analyzer grid. The calibrator grid is only inserted
-  for test purposes.}
-\end{center}
-\end{figure}
+
+\begin{equation}
+I_{detected} = \frac{I_{unpolarised}}{2}+ I_{p}\cdot\left(\frac{1+\cos(2\phi - \delta)}{2} \right)
+\end{equation}
+
+where $\delta$ is the angle of the polarised signal.
 
 
 \begin{figure}[t!]
@@ -120,9 +137,23 @@ temperature. The total effective transmission of the HWP integrated across the 8
 and \SI{450}{\micro\metre} filter bands are about 86\% and 57\% respectively
 (Savini et al. 2009 - insert full reference).
 
+The HWP rotates the incoming linear polarization with twice the speed of the wave plate angle. 
+The HWP is typically rotated at 2Hz, providing a fast modulation of any linear polarization by 8Hz.
+The data acquisition rate is ~175Hz, yielding 20 samples per cycle.
+The atmosphere is stable on the order of 2Hz and can be removed.
 
-Rotation of the HWP results in the rotation of any linear polarised component of incoming radiation.
 
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{hwp-modulation.png}
+\label{fig:hwpmodulation}
+\caption [Attenuation of signal by HWP]{
+  \small The incoming polarised radiation (with a  polarised angle, $\delta$, of zero) is attenuated by the HWP.
+The HWP Rotates at 2Hz (through $2\pi$) so we see the signal is modulated at 8Hz as the instrument 
+scans at 8\si{\arcsecond}/s.
+}
+\end{center}
+\end{figure}
 
 
 \begin{figure}[t!]
@@ -142,8 +173,6 @@ Rotation of the HWP results in the rotation of any linear polarised component of
 \end{center}
 \end{figure}
 
-The waveplate is typically rotated at 2Hz, providing a fast modulation of any linear polarization by 8Hz.
-The data acquisition rate is ~175Hz, yielding 20 samples per cycle.
 
 
 
