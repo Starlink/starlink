@@ -89,7 +89,7 @@ maps and vector catalogues additional command-line parameters are required:
 
 \item[\texttt{CAT}]
 The output FITS vector catalogue. No catalogue is created if
-null (!) is supplied. Note - currently, the Q, U  and PI values
+null (!) is supplied. Note - currently, the Q, U  and I$_{p}$ values
 in this catalogue will be in units of pW. [!]
 
 
@@ -413,7 +413,8 @@ The maps folder now contains individual Q and U maps alongside the existing I ma
 
 
 The output vector catalogue contains a range of values derived by pol2map for each pixel
-contained within the I map. Values in the catalogue are expressed in units of Jy/beam.
+contained within the I map. Values in the catalogue are expressed in units of mJy/beam.
+If desired is possible to switch the catalogue to units of pW by using "Jy=no" on the pol2map command line.
 The values are:
 
 \begin{aligndesc}
@@ -431,15 +432,23 @@ The values are:
 \item[\texttt{DP}] error in P
 \item[\texttt{ANG}] angle of polarization
 \item[\texttt{DANG}] error in ANG
-\item[\texttt{PI}] Polarized Intensity
-\item[\texttt{DPI}] error in PI
+\item[\texttt{PI}] Polarized Intensity (I$_{p}$)
+\item[\texttt{DPI}] error in Polarized Intensity
 \end{aligndesc}
 
 
+\section{\xlabel{pol2fcf}POL-2 FCFs}
+\label{sec:pol2map-fcf}
+
+Inserting POL-2 in front of SCUBA-2 reduces the throughput to SCUBA-2. 
+To convert to astronomical units such as mJy/beam an efficency must be applied to the SCUBA-2 FCFs. 
+
+At \SI{850}{\micro\metre} and \SI{450}{\micro\metre} the FCF for POL-2 is found to be a factor of 1.35
+and 1.96 times higher than the standard SCUBA-2 FCF.
 
 
-\section{\xlabel{tweaking}Tweaking pol2map}
-\label{sec:pol2map-tweaks}
+\section{\xlabel{tweaking}Changing pixel size in pol2map}
+\label{sec:pol2map-pixelsize}
 
 Inevitably, as with unpolarised SCUBA-2 data reduction, it will probably be necessary for a user to
 tweak the pol2map reduction for specific situations.

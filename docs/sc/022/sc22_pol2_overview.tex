@@ -26,10 +26,10 @@ POL-2 is designed to charecterise linear polarisation.
 The V parameter, consequently, is not discussed further
 with the focus on I, Q and U.
 
-The linear Polarized Intensity (PI) can be described as:
+The linear Polarized Intensity (I$_{p}$) can be described as:
 
 \begin{equation}
-PI = \sqrt{Q^{2}+U^{2}}
+I_{p} = \sqrt{Q^{2}+U^{2}}
 \end{equation}
 
 where
@@ -63,7 +63,10 @@ beam for test purposes)
 \end{enumerate}
 
 
-these components can be seen in Figure \ref{fig:pol2components}.
+these components can be seen in Figure \ref{fig:pol2sc2}. 
+A schematic of POL-2 is given in Figure \ref{fig:pol2sc2diagram}.
+
+
 Rotating the HWP rotates any linearly polarised component of incoming
 radiation. The rotating linearly polarised component is
 transmitted or reflected by the grid, causing a modulation in the transmitted
@@ -77,10 +80,10 @@ described by:
 
 
 \begin{equation}
-I_{detected} = \frac{I_{unpolarised}}{2}+ PI\cdot\left(\frac{1+\cos(4\phi)}{2} \right)
+I_{detected} = \frac{I_{unpolarised}}{2}+ I_{p}\cdot\left(\frac{1+\cos(4\phi - \delta)}{2} \right)
 \end{equation}
 
-where $\phi$ is the angle of the HWP.
+where $\phi$ is the angle of the HWP and $\delta$ is the angle of the polarised signal.
 
 \begin{figure}[t!]
 \begin{center}
@@ -98,7 +101,14 @@ where $\phi$ is the angle of the HWP.
 \end{figure}
 
 
-
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=0.8\linewidth]{singopt.png}
+\label{fig:pol2sc2diagram}
+\caption [POL-2 optical components]{
+  \small The main optical components in a typical single-beam imaging polarimeter such as POL-2 (taken from sun233.}
+\end{center}
+\end{figure}
 
 \subsection*{The Half-Wave Plate:}
 
@@ -183,8 +193,7 @@ the total intensity), and has the following distinctive features:
 \end{enumerate}
 
 The dominant source of IP at the JCMT is the Goretex membrane, used as a wind blind.
-This membrane introduces both losses and polarization. Due to SCUBA-2's location
-on the Nasmyth platform, this polarization effect is elevation dependent.
+This membrane introduces both losses and polarization. This effect is elevation dependent.
 
 
 \section{\xlabel{obs_modes}Observing mode}
@@ -211,8 +220,6 @@ parameters are given in Table \ref{tab:scanpar}
 }
 \end{center}
 \end{figure}
-
-
 
 
 The telescope must scan slowly enough to obtain sufficient data at each
