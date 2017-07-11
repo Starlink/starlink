@@ -4,43 +4,42 @@
 
 The POL-2 instrument is a linear polarimetry module for the
 Submillimetre Common User Bolometer Array-2 (SCUBA-2), a 10,000
-bolomtere camera on the JCMT \cite{Friberg}\cite{Bastien2011}.
-POL-2 in itself is not a detector - thus requiring SCUBA-2
-and its detectors for operation. SCUBA-2 operates
-simultaneously at both 850 and \SI{450}{\micro\metre}. The POL-2
-instrument is currently commissioned at \SI{850}{\micro\metre} only.
+bolometer camera on the JCMT \cite{Friberg} \cite{Bastien2011}.  POL-2
+in itself is not a detector - thus requiring SCUBA-2 and its detectors
+for operation. SCUBA-2 operates simultaneously at both 850 and
+\SI{450}{\micro\metre}. The POL-2 instrument is currently commissioned
+at \SI{850}{\micro\metre} only.
 
 \begin{figure}[t!]
 \begin{center}
 \includegraphics[width=0.45\linewidth]{pol2-out-of-beam.png}
 \includegraphics[width=0.45\linewidth]{pol2-in-beam.png}
 \label{fig:pol2sc2}
-\caption [POL-2 mounted on SCUBA-2]{
-  \small POL-2 mounted on the front of SCUBA-2.
-  The left image shows the SCUBA-2
-  window. The right image shows the components of POL-2 inserted
-  in front of the SCUBA-2 window: the calibrator grid, rotating HWP
-  and the analyzer grid. The calibrator grid is only inserted
-  for test purposes.}
+\caption [POL-2 mounted on SCUBA-2]{POL-2 mounted on the front of
+  SCUBA-2.  The left image shows the SCUBA-2 window. The right image
+  shows the components of POL-2 inserted in front of the SCUBA-2
+  window: the calibrator grid, rotating half-wave-plate (HWP) and the
+  analyzer grid. The calibrator grid is only inserted for test
+  purposes.}
 \end{center}
 \end{figure}
 
-\subsection*{Polarization}
+\subsection*{Polarisation}
 
-In polarimetric terms light is conventionally 
-described by the four Stokes parameters: I, Q, U and V.
+In polarimetric terms light is conventionally described by the four
+Stokes parameters: $I$, $Q$, $U$ and $V$.
 
 
-I is the total intensity, Q, is the radiation linearly polarized in the
-direction parallel or perpendicular to the reference plane. U, is the
-radiation linearly polarized in the directions 45$^{\circ }$ to the
-reference plane, and V, is the circularly polarized radiation.
+$I$ is the total intensity; $Q$ is the radiation linearly polarised in
+the direction parallel or perpendicular to the reference plane. $U$ is
+the radiation linearly polarised in the directions 45$^{\circ }$ to
+the reference plane; and $V$ is the circularly polarised radiation.
 
-POL-2 is designed to charecterise linear polarisation. 
-The V parameter, consequently, is not discussed further
-with the focus on I, Q and U.
+POL-2 is designed to characterize linear polarisation.  The $V$
+parameter, consequently, is not discussed further with the focus on $I$,
+$Q$ and $U$.
 
-The linear Polarized Intensity (I$_{p}$) can be described as:
+The linear Polarised Intensity (I$_{p}$) can be described as:
 
 \begin{equation}
 I_{p} = \sqrt{Q^{2}+U^{2}}
@@ -55,36 +54,34 @@ Q = Q_{m} - I . IP_{q}
 U = U_{m} - I . IP_{u}
 \end{equation}
 
-where Q$_{m}$ and U$_{m}$ are the measured values of Q and U.
-I is the astronomical total intensity.
-IP is the instrument polarization. The IP affects both Q
-(IP$_{q}$) and U (IP$_{u}$).
+where Q$_{m}$ and U$_{m}$ are the measured values of Q and U.  I is
+the astronomical total intensity.  IP is the instrument
+polarisation. The IP affects both Q (IP$_{q}$) and U (IP$_{u}$).
 
 
 \subsection*{How POL-2 works}
 
-POL-2 is located in front of the window to the SCUBA-2 instrument
-(as is seen in Figure \ref{fig:pol2sc2}), and covers the full
-field of view of SCUBA-2. The POL-2 polarimeter
-utilises three optical components
+POL-2 is located in front of the window to the SCUBA-2 instrument (as
+is seen in Figure \ref{fig:pol2sc2}), and covers the full field of
+view of SCUBA-2. The POL-2 polarimeter uses three optical components
 that cover the full field of SCUBA-2:
 
-\begin{enumerate}\itemsep-0.2em
-\item a wire-grid polarizer used as a calibrator (only included in the
-beam for test purposes)
+\begin{enumerate}
+\item a wire-grid polariser used as a calibrator (only included in the
+  beam for test purposes)
 \item a Half-Wave Plate
-\item a second wire-grid polarizer used as an analyzer
+\item a second wire-grid polariser used as an analyzer
 \end{enumerate}
 
 
-these components can be seen in Figure \ref{fig:pol2sc2}. 
-A schematic of POL-2 is given in Figure \ref{fig:pol2sc2diagram}.
+These components can be seen in Figure \ref{fig:pol2sc2}.  A schematic
+of POL-2 is given in Figure \ref{fig:pol2sc2diagram}.
 
 
 Rotating the HWP rotates any linearly polarised component of incoming
-radiation. The HWP rotates this incoming linear polarization with twice 
-the speed of the HWP angle ($\theta$) producing the \emph{effective 
-analyser} position ($\phi$), such that:
+radiation. The HWP rotates this incoming linear polarisation with
+twice the speed of the HWP angle ($\theta$) producing the
+\emph{effective analyzer} position ($\phi$), such that:
 
 
 \begin{equation}
@@ -92,14 +89,13 @@ analyser} position ($\phi$), such that:
 \end{equation}
 
 
-The rotating linearly polarised component is
-transmitted or reflected by the grid, causing a modulation in the transmitted
-intensity.
+The rotating linearly polarised component is transmitted or reflected
+by the grid, causing a modulation in the transmitted intensity.
 
 The radiation passing through the polarimeter is detected by
-SCUBA-2. The detected intensity (I$_{detected}$) is a
-combination of \emph{both} the unpolarised intensity (I$_{unpolarised}$)
-and the linearly polarised intensity (I$_{p}$. This detected intensity can be
+SCUBA-2. The detected intensity (I$_{detected}$) is a combination of
+\emph{both} the unpolarised intensity (I$_{unpolarised}$) and the
+linearly polarised intensity (I$_{p}$). This detected intensity can be
 described by:
 
 
@@ -107,8 +103,9 @@ described by:
 I_{detected} = \frac{I_{unpolarised}}{2}+ I_{p}\cdot\left(\frac{1+\cos(4\theta - \delta)}{2} \right)
 \end{equation}
 
-with the above equation being in terms of the HWP angle. This can also be expressed in terms 
-of the effective analyser angle (as is provided in the POLPACK documentation):
+with the above equation being in terms of the HWP angle. This can also
+be expressed in terms of the effective analyzer angle (as is provided
+in the POLPACK documentation):
 
 
 \begin{equation}
@@ -122,36 +119,39 @@ where $\delta$ is the angle of the polarised signal.
 \begin{center}
 \includegraphics[width=0.8\linewidth]{singopt.png}
 \label{fig:pol2sc2diagram}
-\caption [POL-2 optical components]{
-  \small The main optical components in a typical single-beam imaging polarimeter such as POL-2 (taken from sun233.}
+\caption [POL-2 optical components]{ The main optical components in a
+  typical single-beam imaging polarimeter such as POL-2 (taken from
+  sun233.}
 \end{center}
 \end{figure}
 
-\subsection*{The Half-Wave Plate:}
+\subsection*{The Half-Wave Plate}
 
-As described in the POL-2 commissioning document
-the HWP is constructed from five individual synthetic sapphire layers approximately 0.9
-mm thick and 200 mm in diameter. The transmission properties of sapphire
-are generally good at the SCUBA-2 wavelengths but are dependent on the thickness and ambient
-temperature. The total effective transmission of the HWP integrated across the 850
-and \SI{450}{\micro\metre} filter bands are about 86\% and 57\% respectively
-(Savini et al. 2009 - insert full reference).
+As described in the POL-2 commissioning document the HWP is
+constructed from five individual synthetic sapphire layers
+approximately 0.9 mm thick and 200 mm in diameter. The transmission
+properties of sapphire are generally good at the SCUBA-2 wavelengths
+but are dependent on the thickness and ambient temperature. The total
+effective transmission of the HWP integrated across the 850 and
+\SI{450}{\micro\metre} filter bands are about 86\% and 57\%
+respectively (Savini et al. 2009 - insert full reference).
 
-The HWP rotates the incoming linear polarization with twice the speed of the wave plate angle. 
-The HWP is typically rotated at 2Hz, providing a fast modulation of any linear polarization by 8Hz.
-The data acquisition rate is ~175Hz, yielding 20 samples per cycle.
-The atmosphere is stable on the order of 2Hz and can be removed.
+The HWP rotates the incoming linear polarisation with twice the speed
+of the wave plate angle.  The HWP is typically rotated at 2Hz,
+providing a fast modulation of any linear polarisation by 8Hz.  The
+data acquisition rate is ~175Hz, yielding 20 samples per cycle.  The
+atmosphere is stable on the order of 2Hz and can be removed.
 
 
 \begin{figure}[t!]
 \begin{center}
 \includegraphics[width=0.7\linewidth]{hwp-modulation.png}
 \label{fig:hwpmodulation}
-\caption [Attenuation of signal by HWP]{
-  \small The incoming polarised radiation (with a  polarised angle, $\delta$, of zero) is attenuated by the HWP.
-The HWP Rotates at 2Hz (through $2\pi$) so we see the signal is modulated at 8Hz as the instrument 
-scans at 8\si{\arcsecond}/s.
-}
+\caption [Attenuation of signal by HWP]{The incoming polarised
+  radiation (with a polarised angle, $\delta$, of zero) is attenuated
+  by the HWP.  The HWP Rotates at 2Hz (through $2\pi$) so we see the
+  signal is modulated at 8Hz as the instrument scans at
+  8\si{\arcsecond}/s. }
 \end{center}
 \end{figure}
 
@@ -161,7 +161,7 @@ scans at 8\si{\arcsecond}/s.
 \includegraphics[width=0.7\linewidth]{pol2-three-components.png}
 \label{fig:pol2components}
 \caption [POL-2 components]{
-  \small The three blades that combine to form POL-2 are partially
+  The three blades that combine to form POL-2 are partially
   extended showing the two wire grids and the achromatic HWP.
   The two wire grids are the calibrator grid and the analyzer grid.
   The rotating HWP is located between these two fixed grids.
@@ -176,17 +176,22 @@ scans at 8\si{\arcsecond}/s.
 
 
 
-\section{Instrument Polarization}
+\section{Instrument Polarisation}
 
-At the angular resolution of JCMT, planets such as Uranus should appear as unpolarised point sources.
-In practice, however, POL-2 observations of such sources exhibit a measurable level of polarisation - albeit typically less
-than 1.5\% at 850 microns. This is evidence that some part of the incoming astronomical radiation
-is being partially polarised by one or more of the components of the telescope/POL-2/SCUBA-2
-that are in the light path. This polarisation is referred to as "Instrumental Polarisation" (IP).
+At the angular resolution of JCMT, planets such as Uranus should
+appear as unpolarised point sources.  In practice, however, POL-2
+observations of such sources exhibit a measurable level of
+polarisation - albeit typically less than 1.5\% at 850 microns. This
+is evidence that some part of the incoming astronomical radiation is
+being partially polarised by one or more of the components of the
+telescope/POL-2/SCUBA-2 that are in the light path. This polarisation
+is referred to as "Instrumental Polarisation" (IP).
 
-In order to establish the true Q and U from an astronomical source, it is necessary to correct
-for this effect. For the case of a low degree of polarisation in the incoming radiation and a low
-degree of IP, the following is a good approximation for correcting the measurement for the effects of the IP:
+In order to establish the true Q and U from an astronomical source, it
+is necessary to correct for this effect. For the case of a low degree
+of polarisation in the incoming radiation and a low degree of IP, the
+following is a good approximation for correcting the measurement for
+the effects of the IP:
 
 \begin{equation}
 Q = Q_{m} - I. ip_{q}
@@ -196,74 +201,83 @@ Q = Q_{m} - I. ip_{q}
 U = U_{m} - I. ip_{u}
 \end{equation}
 
-where $Q_{m}$ and $U_{m}$ are the measured values for a single bolometer sample at
-some point on the sky. Q and U are the true (corrected) values, I is the astronomical
-total intensity at the same point on the sky (i.e. the total intensity after removal of
-the sky and electronic backgrounds) and $ip_{q}$  and $ip_{u}$  are factors that may vary
-slowly with focal plane position and/or azimuth and elevation.
+where $Q_{m}$ and $U_{m}$ are the measured values for a single
+bolometer sample at some point on the sky. $Q$ and $U$ are the true
+(corrected) values, $I$ is the astronomical total intensity at the same
+point on the sky (i.e. the total intensity after removal of the sky
+and electronic backgrounds) and $ip_{q}$ and $ip_{u}$ are factors that
+may vary slowly with focal plane position and/or azimuth and
+elevation.
 
-IP correction of a POL-2 map therefore requires the use of a total intensity map of the same area
-of the sky to be available. This total intensity map is referred to as the IP reference map.
+IP correction of a POL-2 map therefore requires the use of a total
+intensity map of the same area of the sky to be available. This total
+intensity map is referred to as the IP reference map.
 
-Where flat mirrors or surfaces will produce a small, constant polarization across the beam,
-curved mirrors and other structures (for example the secondary mirror supports) will
-produce more complex polarization effects, and these may distort the beam shape.
-Side-lobes can often show up with strong (typically 10-20\%) polarization but these
-effects are usually far from the main-beam. Calculations of typical antenna patterns
-for symmetrical Cassegrain antennas have not predicted strong polarization in the main beam.
+Where flat mirrors or surfaces will produce a small, constant
+polarisation across the beam, curved mirrors and other structures (for
+example the secondary mirror supports) will produce more complex
+polarisation effects, and these may distort the beam shape.
+Side-lobes can often show up with strong (typically 10-20\%)
+polarisation but these effects are usually far from the
+main-beam. Calculations of typical antenna patterns for symmetrical
+Cassegrain antennas have not predicted strong polarisation in the main
+beam.
 
-The JCMT IP footprint is stronger than might be expected from the above considerations above (though typically less than 1.5\% of
-the total intensity), and has the following distinctive features:
+The JCMT IP footprint is stronger than might be expected from the
+above considerations above (though typically less than 1.5\% of the
+total intensity), and has the following distinctive features:
 
-\begin{enumerate}\itemsep-0.2em
+\begin{enumerate}
 \item The polarisation intensity is elevation dependent;
 \item There is ellipticity of the beam and it is elevation dependent;
 \item The beam is elongated in the horizontal direction.
 \end{enumerate}
 
-The dominant source of IP at the JCMT is the Goretex membrane, used as a wind blind.
-This membrane introduces both losses and polarization. This effect is elevation dependent.
+The dominant source of IP at the JCMT is the woven Goretex membrane,
+used as a wind blind.  This membrane introduces both losses and
+polarisation. This effect is elevation dependent.
 
 
 \section{\xlabel{obs_modes}Observing mode}
 \label{sec:mmodes}
 
-The standard POL-2 observing mode, POLCV\_DAISY, is a “scan and spin” mode,
-in which the telescope is moving continuously in a Daisy-type pattern while the
-HWP spins.
+The standard POL-2 observing mode, POLCV\_DAISY, is a “scan and spin”
+mode, in which the telescope is moving continuously in a Daisy-type
+pattern while the HWP spins.
 
-The POLCV\_DAISY scan mode is similar to the established Daisy scan mode
-routinely used for non-polarimetric SCUBA-2 observations of point-like or compact
-sources. However it is slightly altered to allow for a slower telescope scanning
-speed.
+The POLCV\_DAISY scan mode is similar to the established Daisy scan
+mode routinely used for non-polarimetric SCUBA-2 observations of
+point-like or compact sources. However it is slightly altered to allow
+for a slower telescope scanning speed.
 
 
 \begin{figure}[t!]
 \begin{center}
 \includegraphics[width=0.9\linewidth]{scan_pattern_daisy_comparison.png}
 \label{fig:scancompsrison}
-\caption [Scan Pattern Comparison]{Left: Scan pattern from a typical SCUBA-2 CV\_Daisy
-observation. Right: Scan pattern from a POL-2 Daisy. The standard POLCV\_DAISY scan
-parameters are given in Table \ref{tab:scanpar}
-  \small
-}
+\caption [Scan Pattern Comparison]{Left: Scan pattern from a typical
+  SCUBA-2 CV\_Daisy observation. Right: Scan pattern from a POL-2
+  Daisy. The standard POLCV\_DAISY scan parameters are given in Table
+  \ref{tab:scanpar} }
 \end{center}
 \end{figure}
 
 
-The telescope must scan slowly enough to obtain sufficient data at each
-point on the sky to allow good $Q$ and $U$ values to be determined. The current
-commissioned scan pattern has a size of 200\si{\arcsecond} and a scan speed of
-8\si{\arcsecond}/s. The data reduction splits the data stream into short
-segments and determines a pair of $Q$ and $U$ values from each segment.
+The telescope must scan slowly enough to obtain sufficient data at
+each point on the sky to allow good $Q$ and $U$ values to be
+determined. The current commissioned scan pattern has a size of
+200\si{\arcsecond} and a scan speed of 8\si{\arcsecond}/s. The data
+reduction splits the data stream into short segments and determines a
+pair of $Q$ and $U$ values from each segment.
 
-The length of each such data segment is the time it takes the telescope to traverse
-a pixel in the generated map. With the current scanning parameters this is 0.5 and
-0.25 seconds for 850 and \SI{450}{\micro\metre}, respectively. The modulation
-generated by any polarisation is 8 Hz at the current HWP rotation speed
-(2 Hz).
+The length of each such data segment is the time it takes the
+telescope to traverse a pixel in the generated map. With the current
+scanning parameters this is 0.5 and 0.25 seconds for 850 and
+\SI{450}{\micro\metre}, respectively. The modulation generated by any
+polarisation is 8 Hz at the current HWP rotation speed (2 Hz).
 
-The standard POLCV\_DAISY scan parameters are given in Table \ref{tab:scanpar} and show in Figure \ref{fig:scandetail}.
+The standard POLCV\_DAISY scan parameters are given in Table
+\ref{tab:scanpar} and show in Figure \ref{fig:scandetail}.
 
 \begin{table}[h!]
 \begin{center}
@@ -280,7 +294,9 @@ Half-wave plate rotation frequency& \SI{2}{Hz}\\
 \hline
 \label{tab:scanpar}
 \end{tabular}
-\caption{The scan parameters used in the POLCV\_DAISY mode. \textdagger This radius is \emph{not} the size of the resulting map. }
+\caption{The scan parameters used in the POLCV\_DAISY
+  mode. \textdagger This radius is \emph{not} the size of the
+  resulting map. }
 \end{center}
 \end{table}
 
@@ -289,17 +305,19 @@ Half-wave plate rotation frequency& \SI{2}{Hz}\\
 \begin{center}
 \includegraphics[width=0.6\linewidth]{POLCV_DAISY_schematic_detailed.png}
 \label{fig:scandetail}
-\caption [Detail of POL-2 Scan Pattern]{Detail of POLCV\_DAISY. $R_{0}$ is the map pattern radius, $R_{t}$ the turn radius, and $R_{a}$ is the nominal avoidance radius. For more details see Table \ref{tab:scanpar}.
-  \small
-}
+\caption [Detail of POL-2 Scan Pattern]{Detail of
+  POLCV\_DAISY. $R_{0}$ is the map pattern radius, $R_{t}$ the turn
+  radius, and $R_{a}$ is the nominal avoidance radius. For more
+  details see Table \ref{tab:scanpar}.}
 \end{center}
 \end{figure}
 
 
 \section{The raw data}
 \label{sec:rawdata}
-SCUBA-2 is the detector for POL-2, and as such, the raw data format of POL-2 data is
-the same as a typical SCUBA-2 observation. The sequence for both observations is:
+SCUBA-2 is the detector for POL-2, and as such, the raw data format of
+POL-2 data is the same as a typical SCUBA-2 observation. The sequence
+for both observations is:
 
 \begin{enumerate}\itemsep-0.2em
 \item Dark noise
@@ -309,34 +327,36 @@ the same as a typical SCUBA-2 observation. The sequence for both observations is
 \end{enumerate}
 
 
-The \param{SEQ$\_$TYPE} keyword in the FITS header may be used to identify the nature of each scan.
-When you access raw data from the CADC archive \htmladdnormallink{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}\
- you will get all of the files listed above.
+The \param{SEQ$\_$TYPE} keyword in the FITS header may be used to
+identify the nature of each scan.  When you access raw data from the
+CADC archive
+\htmladdnormallink{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}\
+you will get all of the files listed above.
 
 
-Critically the \param{INBEAM} keyword in the FITS header may be used to
-identify if POL-2 is in the beam, and hence differentiate between SCUBA-2
-and POL-2 observations.
+Critically the \param{INBEAM} keyword in the FITS header may be used
+to identify if POL-2 is in the beam, and hence differentiate between
+SCUBA-2 and POL-2 observations.
 
 
 \begin{tip}
-Use the  \Kappa\ command fitslist to see all FITS headers in a particular
-NDF. To obtain a specific header simply use the command fitsval:
-\begin{terminalv}
+  Use the \Kappa\ command fitslist to see all FITS headers in a
+  particular NDF. To obtain a specific header simply use the command
+  fitsval:
+  \begin{terminalv}
 % fitsval s8a20160112_00056_0001.sdf INBEAM
 pol
 \end{terminalv}
-The FITS header information may also be viewed via the \gaia\ View / FITS header 
-drop-down menu option.
-
+The FITS header information may also be viewed via the \gaia\ View /
+FITS header drop-down menu option.
 \end{tip}
 
-Shown below is an incomplete list of the raw files for a single sub-array (in this
-case s8a) for a short POL-2 observation. The first and last
-scans are the flat-field observations,which occur after the shutter
-opens to the sky at the start of the observation and closes at the end
-(note the identical file size); all of the scans in between are
-science scans.
+Shown below is an incomplete list of the raw files for a single
+sub-array (in this case s8a) for a short POL-2 observation. The first
+and last scans are the flat-field observations,which occur after the
+shutter opens to the sky at the start of the observation and closes at
+the end (note the identical file size); all of the scans in between
+are science scans.
 
 
 \begin{terminalv}
@@ -364,42 +384,45 @@ the example above), typically requiring less than 30 seconds of data
 to complete the observation.
 
 \textbf{Note:} All of these files are written out eight times, once
-for each of the eight sub-arrays. It should also be noted that the POL-2 instrument has not
-been released from commissioning at 450 microns.
+for each of the eight sub-arrays. It should also be noted that the
+POL-2 instrument has not been released from commissioning at 450
+microns.
 
 The main data array in each NDF is a cube, with the first two
-dimensions corresponding to bolometer columns and rows within a sub-array,
-and the third dimension corresponding to time slice index (sampled at roughly 200\,Hz).
+dimensions corresponding to bolometer columns and rows within a
+sub-array, and the third dimension corresponding to time slice index
+(sampled at roughly 200\,Hz).
 
-A standardised file naming scheme is used in which each file name starts
-with the sub-array name, followed by the UT date of the observation in
-the format \texttt{yyyymmdd}, followed by a five-digit observation
-number, followed by the sub-scan number. The name ends with the standard
-suffix \texttt{.sdf} used by all Starlink NDF data files. For instance, the files
-listed above hold data from the s8a sub-array for observation 34 taken on
-12th January 2016.
+A standardised file naming scheme is used in which each file name
+starts with the sub-array name, followed by the UT date of the
+observation in the format \texttt{yyyymmdd}, followed by a five-digit
+observation number, followed by the sub-scan number. The name ends
+with the standard suffix \texttt{.sdf} used by all Starlink NDF data
+files. For instance, the files listed above hold data from the s8a
+sub-array for observation 34 taken on 12\textsuperscript{th} January
+2016.
 
 
 
 
 \subsubsection*{Units/Calibration}
 
-Raw POL-2 data come in uncalibrated units. The first calibration
-step is to scale the raw data to units of pico Watts (pW)
-by applying the flat-field solution. This step is performed internally
-by the SMURF command calcqu - used to calculate I, Q and U time-streams from
-the raw data - but can be done manually when examining the raw
-data.
+Raw POL-2 data come in uncalibrated units. The first calibration step
+is to scale the raw data to units of pico Watts (pW) by applying the
+flat-field solution. This step is performed internally by the SMURF
+command calcqu - used to calculate I, Q and U time-streams from the
+raw data - but can be done manually when examining the raw data.
 
-If the purpose of a given POL-2 observation is to determine the percentage
-polarizations or vector angles within a source/region of interest then
-the data may remain in pW. On the other hand, if the purpose is to
-establish the absolute polarized intensities then a value for the Flux
-Conversion Factor (FCF) is required.
+If the purpose of a given POL-2 observation is to determine the
+percentage polarisations or vector angles within a source/region of
+interest then the data may remain in pW. On the other hand, if the
+purpose is to establish the absolute polarised intensities then a
+value for the Flux Conversion Factor (FCF) is required.
 
-The resulting map may have the FCF applied to convert it into units of Janskys. As is
-recommended with SCUBA-2 observing, it is advisable to check that the FCF value
-applied to the data is sensible (and must be done manually).
+The resulting map may have the FCF applied to convert it into units of
+Janskys. As is recommended with SCUBA-2 observing, it is advisable to
+check that the FCF value applied to the data is sensible (and must be
+done manually).
 
 
 

@@ -1,5 +1,7 @@
 \documentclass[11pt,oneside,chapters]{starlink}
 
+\newcommand{\polpack}{\xref{\textsc{POLPACK}}{sun233}{}}
+
 \usepackage{amsfonts}
 \usepackage{longtable}
 \usepackage{amsmath}
@@ -8,31 +10,30 @@
 \stardoccategory {Starlink Cookbook}
 \stardocinitials {SC}
 \stardoccopyright{Copyright \copyright\ 2017 East Asian Observatory}
-\stardocnumber   {22.1}
+\stardocnumber   {22}
 \stardoctitle    {The POL-2 Data Reduction Cookbook}
-\stardocversion  {1.1}
-\stardocabstract {
-   This cookbook provides an introduction to Starlink facilities,
-   \textsc{smurf} , the Sub-Millimetre User Reduction Facility,
-   and in particular \textsc{POL2MAP} - the command for reducing
-   POL-2 data. This cookbook illustrates the various steps required to
-   reduce the data, including an overview of the method. It also
-   describes how to calibrate and display the data as images or
-   vector maps.}
-\stardocauthors{H.\ A.\ L.\ Parsons, D.\ S.\ Berry, M.\ G.\ Rawlings, and S.\ F.\ Graves}
-\stardocdate{2017 June 27}
+\stardocversion  {1.0}
 
-\newcommand{\minipageclear}{%
-\begin{minipage}[c]{1.0\linewidth}\end{minipage}}
+
+\stardocabstract {
+  This cookbook provides an introduction to POL-2 data reduction,
+  using the Starlink facilities \smurf (the Sub-Millimetre
+  User Reduction Facility) and in particular its command
+  \xref{POL2MAP}{sun258}{POL2MAP}. This cookbook illustrates the various steps
+  required to reduce the data, including an overview of the method. It
+  also describes how to calibrate and display the data as images or
+  vector maps.}
+
+\stardocauthors{H.\ A.\ L.\ Parsons, D.\ S.\ Berry,
+  M.\ G.\ Rawlings, and S.\ F.\ Graves}
+
+\stardocdate{2017 July 27}
+
 
 \begin{document}
 \scfrontmatter
 
-\newcommand{\xparam}[2]{\hyperref[#1]{\param{#2}}}
-\newcommand{\setparam}[3]{\xparam{#1}{#2}\param{~=~#3}}
 
-\newcommand{\jsageneric}{\htmladdnormallink{\file{dimmconfig\_jsa\_generic}}
-{https://raw.githubusercontent.com/Starlink/starlink/master/applications/smurf/examples/dimmconfig_jsa_generic.lis}}
 
 
 
@@ -42,34 +43,21 @@
 \begin{table}[h!]
 \begin{tabular}{ll}
 \textbf{CADC}   & Canadian Astronomy Data Centre\\
-\textbf{DIMM}   & Dynamic Iterative Map-Maker\\
 \textbf{FCF}    & Flux Conversion Factor\\
 \textbf{FITS}   & Flexible Image Transport System\\
-\textbf{FWHM}   & Full-Width at Half-Maximum\\
 \textbf{GAIA}   & Graphical Astronomy and Image Analysis Tool\\
 \textbf{HWP}    & Half-Wave Plate\\
 \textbf{ITC}    & Integration Time Calculator\\
 \textbf{I}      & Total Astronomical Intensity \\
 \textbf{IP}     & Instrument Polarization \\
 \textbf{JCMT}   & James Clerk Maxwell Telescope\\
-\textbf{MSB}    & Minimum Schedulable Block\\
 \textbf{NDF}    & Extensible N-Dimensional Data Format\\
-\textbf{NEP}    & Noise Equivalent Power\\
-\textbf{NEFD}   & Noise Equivalent Flux Density\\
 \textbf{P}      & Percentage Polarized Intensity \\
 \textbf{PCA}    & Principal Component Analysis \\
 \textbf{I$_{p}$}     & Polarized Intensity \\
-\textbf{PSF}    & Point Spread Function\\
-\textbf{PWV}    & Precipitable Water Vapour\\
-\textbf{RMS}    & Root Mean Square\\
-\textbf{SCUBA-2}& Submillimetre Common User Bolometerq Array-2\\
+\textbf{SCUBA-2}& Submillimetre Common User Bolometer Array-2\\
 \textbf{SMURF}  & Sub-Millimetre User Reduction Facility\\
-\textbf{S/N}    & Signal-to-Noise ratio\\
-\textbf{SQUID}  & Superconducting QUantum Interference Device\\
-\textbf{STC-S}  & Space-Time Coordinate Metadata String Implementation\\
 \textbf{SUN}    & Starlink User Note\\
-\textbf{TES}    & Transition Edge Sensor\\
-\textbf{WVM}    & Water Vapour radioMeter\\
 \end{tabular}
 \end{table}
 

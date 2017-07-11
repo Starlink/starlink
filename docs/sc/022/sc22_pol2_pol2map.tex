@@ -1,58 +1,61 @@
-\chapter{\xlabel{pol2_dr}POL-2 Data Reduction - The Theory}
+\chapter{\xlabel{pol2_dr_theory}POL-2 Data Reduction - The Theory}
 \label{sec:dr}
 \section{\xlabel{dataflow}The Data Flow}
 
-POL-2 data reduction is an involved process for which a broad overview is first presented here before
-the specific details are discussed. It is noted that this same procedure is used irrespective of 
-whether a single or multiple observations are to be reduced.
+POL-2 data reduction is an involved process for which a broad overview
+is first presented here before the specific details are discussed. It
+is noted that this same procedure is used irrespective of whether a
+single or multiple observations are to be reduced.
 
 The data reduction process can be broken down into three main stages -
-referred to as ``Run 1'', ``Run 2'' and ``Run 3'' in Figure \ref{fig:pol2drflow}.
+referred to as ``Run 1'', ``Run 2'' and ``Run 3'' in Figure
+\ref{fig:pol2drflow}.
 
 \begin{figure}[t!]
 \begin{center}
-\includegraphics[width=0.95\linewidth]{pol2map_flow.eps}
+\includegraphics[width=1.5\linewidth]{pol2map_flow.eps}
 \label{fig:pol2drflow}
-\caption [POL-2 Data Flow]{
-  \small The data flow of the POL-2 data reduction method is
-  presented. In this example, three POL-2 observations are
-  reduced and combined in various stages and combination to
-  produce I, Q and U maps and a vector catalogue.
-}
+\caption [POL-2 Data Flow]{ The data flow of the POL-2 data reduction
+  method is presented. In this example, three POL-2 observations are
+  reduced and combined in various stages and combination to produce I,
+  Q and U maps and a vector catalogue.  }
 \end{center}
 \end{figure}
 
 
 \subsection*{Step 1}
 
-The initial step of the process (see Run 1 in Figure \ref{fig:pol2drflow}) creates
-a preliminary co-added total intensity (I) map from the raw data files for all
-observations provided to the reduction routine (see \cref{Chapter}{sec:rundr}\ ).
+The initial step of the process (see Run 1 in Figure
+\ref{fig:pol2drflow}) creates a preliminary co-added total intensity
+(I) map from the raw data files for all observations provided to the
+reduction routine (see \cref{Chapter}{sec:rundr}{}).
 
 
 \subsubsection*{The process}
 The analysed intensity values in the raw data time-streams are first
-converted into Q, U and I time-streams using the smurf:calcqu command (these are
-stored for future use in the directory \texttt{qudata}, specified by the qudir
-parameter in the example command below).
+converted into Q, U and I time-streams using the
+\xref{SMURF:\task{calcqu}}{sun258}{calcqu} command (these are stored
+for future use in the directory \texttt{qudata}, specified by the
+qudir parameter in the example command below).
 
-The smurf:makemap command is then used to create a separate map from the
-I time-stream for each observation, using SNR-based ``auto-masking'' to
-define the background regions that are to be set to zero at the end of
-each iteration.
+The \xref{smurf:makemap}{sun258}{makemap} command is then used to
+create a separate map from the I time-stream for each observation,
+using SNR-based ``auto-masking'' to define the background regions that
+are to be set to zero at the end of each iteration.
 
 These maps are stored for future use in the directory \texttt{maps},
 specified by the mapdir parameter. Each map has a name of the form:
 
 \texttt{<UT$\_$DATE>$\_$<OBS$\_$NUM>$\_$<CHUNK$\_$NUM>$\_$imap.sdf}
 
-where \texttt{<CHUNK$\_$NUM>} indicates the raw data file at the start of
-the contiguous chunk of data used to create the map, and is usually 0003.
-Each of these maps is compared to the specified reference map (if any) to
-determine a pointing correction to be applied to the observation in
-future. If no reference map is supplied, the I map created from the
-first observation defines the expected source position, and is compared
-with later maps to determine their pointing corrections.
+where \texttt{<CHUNK$\_$NUM>} indicates the raw data file at the start
+of the contiguous chunk of data used to create the map, and is usually
+0003.  Each of these maps is compared to the specified reference map
+(if any) to determine a pointing correction to be applied to the
+observation in future. If no reference map is supplied, the I map
+created from the first observation defines the expected source
+position, and is compared with later maps to determine their pointing
+corrections.
 
 pca.pcathresh = -50
 
@@ -61,17 +64,16 @@ pca.pcathresh = -50
 \subsection*{Step 2}
 
 In the second step of the process (see Run 2 in Figure
-\ref{fig:pol2drflow}) an improved I map is produced. These improvements
-come from
+\ref{fig:pol2drflow}) an improved I map is produced. These
+improvements come from
 \begin{enumerate}
 \item applied relative pointing corrections
 \item the use of an increased number of PCA components
-
-pca.pcathresh=-150
+  (\texttt{pca.pcathresh=-150})
 \item using a single fixed mask for all observations. The mask is
-determined from the preliminary co-add I map and thus includes
-fainter structure than would be used if the mask was based on only
-one observation.
+  determined from the preliminary co-add I map and thus includes
+  fainter structure than would be used if the mask was based on only
+  one observation.
 \end{enumerate}
 
 \subsection*{Step 3}
@@ -84,28 +86,35 @@ the Q and U maps are produced a final vector catalogue is created.
 
 \section{\xlabel{makemap}Makemap}
 
-The POL-2 data reduction builds upon the existing SCUBA-2 Dynamic Iterative
-Map-Maker, hereafter just referred to as the map-maker. This is the tool used
-to produce SCUBA-2 maps, and is invoked by
-the \smurf\ makemap command. It performs some pre-processing steps to
-clean the data, solves for multiple signal components using
-an iterative algorithm, and binns the resulting time-series data to
-produce a final science map.
+The POL-2 data reduction builds upon the existing SCUBA-2 Dynamic
+Iterative Map-Maker, hereafter just referred to as the map-maker. This
+is the tool used to produce SCUBA-2 maps, and is invoked by the
+\xref{SMURF:makemap}{sun258}{makemap} command. It performs some
+pre-processing steps to clean the data, solves for multiple signal
+components using an iterative algorithm, and binns the resulting
+time-series data to produce a final science map.
 
 
 
 
 \section{\xlabel{pca}PCA}
 
-One difference in the reduction of SCUBA-2 data and POL-2 data is the method for sky removal.
-In the case of POL-2, this must also include the polarized sky background.
-This is done using the COM/GAI model, used in the standard data reduction process.
-For a discussion of why PCA, Principle Component Analysis, is not routinely run on non-polarimetric SCUBA-2 data, see \cref{Appendix}{app:pca}\.
+One difference in the reduction of SCUBA-2 data and POL-2 data is the
+method for sky removal.  In the case of POL-2, this must also include
+the polarized sky background.  This is done using the COM/GAI model,
+used in the standard data reduction process.  For a discussion of why
+PCA, Principle Component Analysis, is not routinely run on
+non-polarimetric SCUBA-2 data, see \cref{Appendix}{app:pca}{}.
 
-The COM/GAI model assumes that the background is common to all bolometers (after gain variations between bolometers). This would be the case if both the sky brightness and the instrumental polarization was constant across the focal plane.
+The COM/GAI model assumes that the background is common to all
+bolometers (after gain variations between bolometers). This would be
+the case if both the sky brightness and the instrumental polarization
+was constant across the focal plane.
 
-In pol2map, the reduction command for POL-2 data, the sky removal is done using PCA.
-The PCA approach accomodates multiple correlated components with different amplitudes at different points in the focal plane.
+In \xref{\task{pol2map}}{sun258}{pol2map}, the reduction command for
+POL-2 data, the sky removal is done using PCA.  The PCA approach
+accomodates multiple correlated components with different amplitudes
+at different points in the focal plane.
 
 
 
@@ -115,31 +124,37 @@ first stage uses pca.pcathresh = -50
 second stage uses pca.pcathresh = -150
 
 
-PCA reduces both the noise and the astronomical signal within the map. As
-a result more iterations are required to recover the astronomical signal
-when the number of components are higher.
+PCA reduces both the noise and the astronomical signal within the
+map. As a result more iterations are required to recover the
+astronomical signal when the number of components are higher.
 
 
 
 \section{\xlabel{masking}Masking}
-A mask is a two-dimensional array which has the same shape and size as the final map, and
-which is used to indicate where the source is expected to fall within the map. `Bad' pixel values
-within a mask indicate background pixels, and `good' pixel values indicate source pixels. Masks
-are used for two main purposes:
+A mask is a two-dimensional array which has the same shape and size as
+the final map, and which is used to indicate where the source is
+expected to fall within the map. `Bad' pixel values within a mask
+indicate background pixels, and `good' pixel values indicate source
+pixels. Masks are used for two main purposes:
 
-\begin{enumerate}\itemsep-0.2em
-\item To prevent the growth of gradients and other artificial large scale structures within the
-map.  For this purpose, the astronomical signal at all background pixels defined by the
-mask is forced to zero at the end of each iteration within makemap (except for the final iteration).
-\item To prevent bright sources polluting the evaluation of the various noise models (PCA, COM, FLT) used within
-makemap. Source pixels are excluded from the calculation of these models.
+\begin{enumerate}
+\item To prevent the growth of gradients and other artificial large
+  scale structures within the map.  For this purpose, the astronomical
+  signal at all background pixels defined by the mask is forced to
+  zero at the end of each iteration within makemap (except for the
+  final iteration).
+\item To prevent bright sources polluting the evaluation of the
+  various noise models (PCA, COM, FLT) used within makemap. Source
+  pixels are excluded from the calculation of these models.
 \end{enumerate}
 
 
-The pol2map script uses different masks for these two purposes - the “AST” mask and the “PCA” mask.
-The PCA mask is in general less extensive than the AST mask, with the source areas being restricted to the brighter inner regions.
-Each of these two masks can either be generated automatically within pol2map, or be specified by
-a fixed external NDF.
+The pol2map script uses different masks for these two purposes - the
+“AST” mask and the “PCA” mask.  The PCA mask is in general less
+extensive than the AST mask, with the source areas being restricted to
+the brighter inner regions.  Each of these two masks can either be
+generated automatically within pol2map, or be specified by a fixed
+external NDF.
 
 
 
@@ -147,23 +162,24 @@ a fixed external NDF.
 
 \subsection*{Variances between POL-2 maps}
 
-MAPVAR is a pol2map parameter that controls how the variances in the coadded
-I, Q and U maps are formed.
+MAPVAR is a pol2map parameter that controls how the variances in the
+coadded I, Q and U maps are formed.
 
-If MAPVAR is set TRUE, the variances in the coadded I, Q and U maps are
-formed from the spread of pixel data values between the individual
-observation maps. If MAPVAR is FALSE (the default), the variances in the
-coadded maps are formed by propagating the pixel variance values created
-by makemap from the individual observation maps (these are based on the
-spread of I, Q or U values that fall in each pixel).
+If MAPVAR is set TRUE, the variances in the coadded I, Q and U maps
+are formed from the spread of pixel data values between the individual
+observation maps. If MAPVAR is FALSE (the default), the variances in
+the coadded maps are formed by propagating the pixel variance values
+created by makemap from the individual observation maps (these are
+based on the spread of I, Q or U values that fall in each pixel).
 
-Use MAPVAR=TRUE only if enough observations are avaliable to
-make the variances between them meaningful.A general lower
-limit on its value is difficult to define, but is advised a minimum of 10 observations.
+Use MAPVAR=TRUE only if enough observations are avaliable to make the
+variances between them meaningful.A general lower limit on its value
+is difficult to define, but is advised a minimum of 10 observations.
 
 
-If a test of the effect of this option on a field for which the I, Q and U maps from a set of individual
-observations are already avaliable, the following may be done:
+If a test of the effect of this option on a field for which the I, Q
+and U maps from a set of individual observations are already
+avaliable, the following may be done:
 
 \begin{terminalv}
 % pol2map in=maps/\* iout=imapvar qout=qmapvar uout=umapvar mapvar=yes \
@@ -172,8 +188,8 @@ observations are already avaliable, the following may be done:
 
 assuming that the I, Q and U maps are in directory \texttt{maps}. The
 variances in \texttt{imapvar.sdf}, \texttt{qmapvar.sdf} and
-\texttt{umapvar.sdf} will be calculated using the new method, and these
-variances will then be used to form the errors in the
+\texttt{umapvar.sdf} will be calculated using the new method, and
+these variances will then be used to form the errors in the
 \texttt{cat$\_$mapvar.FIT} catalogue.
 
 

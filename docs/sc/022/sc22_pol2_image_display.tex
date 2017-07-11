@@ -3,21 +3,22 @@
 
 \section{\xlabel{gaia}GAIA}
 
-The \starlink\ package \gaia\ can be used to inspect the results of the data reduction.
-To plot the output vector catalogue onto the final total intensity map
-first open up the I map in gaia:
+The \starlink\ package \gaia\ can be used to inspect the results of
+the data reduction.  To plot the output vector catalogue onto the
+final total intensity map first open up the I map in gaia:
 
 \begin{terminalv}
 % gaia iext.sdf
 \end{terminalv}
 
 
-In the main Gaia window, select the drop-down menu option \texttt{Image Analysis /
-Polarimetry toolbox…}. This should launch a new toolbox window entitled
-GAIA: Polarimetry. From this window, use the drop-down menu option
-\texttt{File / Open} to load the file mycat.FIT. This should then populate the lower part of the
-window with the contents of this polarimetry catalogue file.
-Each of the vectors in this file will be automatically overlaid on the main image window
+In the main Gaia window, select the drop-down menu option
+\texttt{Image Analysis / Polarimetry toolbox…}. This should launch a
+new toolbox window entitled GAIA: Polarimetry. From this window, use
+the drop-down menu option \texttt{File / Open} to load the file
+mycat.FIT. This should then populate the lower part of the window with
+the contents of this polarimetry catalogue file.  Each of the vectors
+in this file will be automatically overlaid on the main image window
 (see figure \ref{fig:gaia-plot-vectors1}).
 
 \begin{figure}[t!]
@@ -32,15 +33,17 @@ vectors overplotted in GAIA.
 \end{center}
 \end{figure}
 
-In order to filter the number of overlaid vectors down to a more useful number and size,
-various options in the GAIA: Polarimetry window can be used. First, select the \texttt{Rendering}
-tab on the left hand side. This will reveal a panel that will indicate which quantities
-are currently being used for the vector overlays. In this case, the Vector length is taken
-from the P column of the table, and the Vector angles are taken from the ANG column.
+In order to filter the number of overlaid vectors down to a more
+useful number and size, various options in the GAIA: Polarimetry
+window can be used. First, select the \texttt{Rendering} tab on the
+left hand side. This will reveal a panel that will indicate which
+quantities are currently being used for the vector overlays. In this
+case, the Vector length is taken from the P column of the table, and
+the Vector angles are taken from the ANG column.
 
-Currently the figure has too many vectors to be scientifically meaningful. To filter
-out most of the extraneous vectors, click on the Selecting tab, and set the Expression
-field to be the following:
+Currently the figure has too many vectors to be scientifically
+meaningful. To filter out most of the extraneous vectors, click on the
+Selecting tab, and set the Expression field to be the following:
 
 \begin{terminalv}
 $I/$DI<10
@@ -48,29 +51,32 @@ $I/$DI<10
 
 \emph{Ensure you press return after entering in the above expression}.
 
-The above expression selects the data points in the polarimetry table which have an
-associated total intensity (column I) less than 10 times the
-associated error value for that intensity (column DI). To remove all of these
-extraneous vectors, either press control-X or use the drop-down menu option \texttt{Edit / Cut}.
-This should leave just a small number of vectors clustering around the target object.
+The above expression selects the data points in the polarimetry table
+which have an associated total intensity (column I) less than 10 times
+the associated error value for that intensity (column DI). To remove
+all of these extraneous vectors, either press control-X or use the
+drop-down menu option \texttt{Edit / Cut}.  This should leave just a
+small number of vectors clustering around the target object.
 
 \begin{figure}[t!]
 \begin{center}
 \includegraphics[width=0.46\linewidth]{sc22-gaia-plot-vectors-4.png}
 \includegraphics[width=0.46\linewidth]{sc22-gaia-plot-vectors-6.png}
 \label{fig:gaia-plot-vectors2}
-\caption [Selecting Vectors in GAIA]{
-  \small Left: specifying vectors to display via the expression \$I/\$DI$>$10. This will only plot
-vectors with an \SI{850}{\micro\metre} intensity signal-to-noise ratio grater than 10 in GAIA. To ensure thatthis is specified,
-ensure you press the carriage return after entering the expression.
+\caption [Selecting Vectors in GAIA]{Left: specifying vectors
+  to display via the expression \$I/\$DI$>$10. This will only plot
+  vectors with an \SI{850}{\micro\metre} intensity signal-to-noise
+  ratio grater than 10 in GAIA. To ensure thatthis is specified,
+  ensure you press the carriage return after entering the expression.
 }
 \end{center}
 \end{figure}
 
-Zooming in on the central region of the map, it can already be seen that the level of vector ordering
-(and hence polarization) is quite low (see figure \ref{fig:gaia-plot-vectors3}). If needed it is
-possible to change the scaling by selecting the Rendering tab in the GAIA: Polarimetry
-window, and increasing the vector scale.
+Zooming in on the central region of the map, it can already be seen
+that the level of vector ordering (and hence polarization) is quite
+low (see figure \ref{fig:gaia-plot-vectors3}). If needed it is
+possible to change the scaling by selecting the Rendering tab in the
+GAIA: Polarimetry window, and increasing the vector scale.
 
 
 \begin{figure}[t!]
@@ -78,17 +84,18 @@ window, and increasing the vector scale.
 \includegraphics[width=0.44\linewidth]{sc22-gaia-plot-vectors-5.png}
 \includegraphics[width=0.52\linewidth]{sc22-gaia-plot-vectors-7.png}
 \label{fig:gaia-plot-vectors3}
-\caption [Over Plotting Vectors in GAIA]{
-  \small Left: Selected vectors are marked in blue in this example, Right: after removal of selected
-vectors all that remains are the vectors on the (zoomed) regions where \$I/\$DI$>$10.
-}
+\caption [Over Plotting Vectors in GAIA]{ Left: Selected vectors are
+  marked in blue in this example, Right: after removal of selected
+  vectors all that remains are the vectors on the (zoomed) regions
+  where \$I/\$DI$>$10.  }
 \end{center}
 \end{figure}
 
 
-Finally it is useful for future use (as in the examples inthe following sections) to 
-save the final selection of vectors. To save use the drop-down menue \texttt{File / Save} in 
-the polarimetry toolbox.
+Finally it is useful for future use (as in the examples inthe
+following sections) to save the final selection of vectors. To save
+use the drop-down menue \texttt{File / Save} in the polarimetry
+toolbox.
 
 \section{\xlabel{kappa}KAPPA and polpack}
 
@@ -99,12 +106,13 @@ It is possible to use \Kappa\ and polpack to create POL-2 plots.
 % polpack
 \end{terminalv}
 
-Note that in the following examples, it will be necessary to ensure that only the
-vectors to be plotted are included in the file mycat.FIT.
+Note that in the following examples, it will be necessary to ensure
+that only the vectors to be plotted are included in the file
+mycat.FIT.
 
-There are two main ways to do this - either by saving the output catalogue
-from GAIA or using the starlink package cursa to manipulate the catalogue you produced.
-To use cursa simply run:
+There are two main ways to do this - either by saving the output
+catalogue from GAIA or using the starlink package cursa to manipulate
+the catalogue you produced.  To use cursa simply run:
 
 \begin{terminalv}
 % cursa
@@ -116,8 +124,9 @@ then to select the vectors of interest:
 % catselect catin=mycat.FIT catout=selcat.FIT norejcat seltyp=e "expr='i>10*di'"
 \end{terminalv}
 
-it is also possible to crop images using catselect, by using the expression command. 
-In this example we use only pixels above -10 on the y axis.
+it is also possible to crop images using catselect, by using the
+expression command.  In this example we use only pixels above -10 on
+the y axis.
 
 \begin{terminalv}
 % catselect catin=mycat.FIT catout=selcat.FIT norejcat seltyp=e "expr='i>10*di and y>-10'"
@@ -127,25 +136,20 @@ In this example we use only pixels above -10 on the y axis.
 
 
 \begin{tip}
-For a better font on pgplot postscript devices, set the
-following environment variable. 
+  For a better font on pgplot postscript devices, set the following
+  environment variable.
 
 \begin{terminalv}
 setenv PGPLOT_PS_FONT Times
 \end{terminalv}
 
 For more info, see
+\url{http://pipelinesandarchives.blogspot.com/2015/02/better-fonts-in-postscript-output-from.html}
 
-http://pipelinesandarchives.blogspot.com/2015/02/better-fonts-in-postscript-output-from.html
-
-Graphics-related attributes that can be set are described at:
-
-http://starlink.eao.hawaii.edu/docs/sun95.htx/sun95se28.html
-
-and the coordinate system attributes that can be set are
-described at:
-
-http://starlink.eao.hawaii.edu/docs/sun95.htx/sun95se27.html
+Graphics-related attributes that can be set are described in
+\xref{SUN95: Descriptions of Plotting
+  Attributes}{sun95}{ap_plotting_attr}, and the coordinate system attributes that can be set are
+described in \xref{SUN/95: Descriptions of Frame Attributes}{sun95}{ap_frmatt}.
 \end{tip}
 
 
@@ -155,9 +159,10 @@ http://starlink.eao.hawaii.edu/docs/sun95.htx/sun95se27.html
 \subsection{\xlabel{kappa-example1} Example 1 - a vector map with no background}
 \label{section:kappa-example1}
 
-In this section an output file: plot1.pdf is created from the input catalogue mycat.FIT
+In this section an output file: \file{plot1.pdf} is created from the input
+catalogue \file{mycat.FIT}
 
-Select postscript graphics device, writing to file plot1.ps
+Select postscript graphics device, writing to file \file{plot1.ps}
 
 \begin{terminalv}
 gdset plot1.ps/acps
@@ -182,10 +187,11 @@ drawtitle=0
 \end{terminalv}
 
 
-Plot the vector map (the \texttt{vscale} arameter controlls the vector
+Plot the vector map (the \texttt{vscale} parameter controls the vector
 scale, and the \texttt{keyvec} parameter controls the length of the
-vector used as the key. There are many other parameters that can be used
-to control the behaviour of \texttt{polplot} - see the \polpack manual - SUN/223.
+vector used as the key. There are many other parameters that can be
+used to control the behaviour of \texttt{polplot} -- see the \polpack
+manual (SUN/223).
 
 \begin{terminalv}
 % polplot selcat.FIT  style=^sty keystyle=^ksty vscale=20 keyvec=20
@@ -203,9 +209,8 @@ Convert the map into PDF file and remove blank margins (if required):
 \begin{center}
 \includegraphics[width=0.75\linewidth]{sc22-kappa-plots-plot1.png}
 \label{fig:kappa-plot1}
-\caption [Vector map with polplot]{
-  \small Result from Example 1: Producing a vector map with no background using polplot. 
-}
+\caption [Vector map with polplot]{ Result from Example 1: Producing a
+  vector map with no background using polplot.}
 \end{center}
 \end{figure}
 
@@ -213,7 +218,8 @@ Convert the map into PDF file and remove blank margins (if required):
 \label{section:kappa-example2}
 
 
-In this section we create an output file: plot2.pdf from the input catalogue mycat.FIT
+In this section we create an output file: plot2.pdf from the input
+catalogue mycat.FIT
 
 \begin{terminalv}
 % gdset plot2.ps/acps
@@ -258,8 +264,8 @@ width=3
 drawtitle=0
 \end{terminalv}
 
-Plot the vector map over the contour map. The vectors and
-contours are aligned automatically in sky coordinates:
+Plot the vector map over the contour map. The vectors and contours are
+aligned automatically in sky coordinates:
 
 
 \begin{terminalv}
@@ -276,18 +282,18 @@ Convert into a PDF file and remove blank margins (if required):
 \begin{figure}[t!]
 \begin{center}
 \includegraphics[width=0.75\linewidth]{sc22-kappa-plots-plot2.png}
-\label{fig:kappa-plot2}
-\caption [Vector map with contour map in polplot]{
-  \small Result from Example 1: Producing a vector map over a contour map. 
-}
+
+\caption [Vector map with contour map in polplot]{Result from Example
+  1: Producing a vector map over a contour map.\label{fig:kappa-plot2}}
 \end{center}
 \end{figure}
 
-\subsection{\xlabel{kappa-example2} Example 3 - a vector map over a negative image}
+\subsection{\xlabel{kappa-example3} Example 3 - a vector map over a negative image}
 \label{section:kappa-example3}
 
 
-In this section we create an output file: plot3.pdf from the input catalogue mycat.FIT
+In this section we create an output file: \file{plot3.pdf} from the input
+catalogue \file{mycat.FIT}
 
 \begin{terminalv}
 % gdset plot3.ps/acps
@@ -321,10 +327,9 @@ maths "'((ia+0.0003)/0.14)**0.2'" ia=iext out=tmp1
 \end{terminalv}
 
 
-Display the negative image, using a reduced range of colours
-(pens) so that the brightest regions are grey rather than black.
-This means the black vectors can still be seen over the brightest
-regions:
+Display the negative image, using a reduced range of colours (pens) so
+that the brightest regions are grey rather than black.  This means the
+black vectors can still be seen over the brightest regions:
 
 \begin{terminalv}
 % display tmp1\(5~150,0~200\) mode=perc percentiles=\[2,98\] style=^sty \
@@ -370,10 +375,8 @@ Convert into a PDF file and remove blank margins (if required).
 \begin{figure}[t!]
 \begin{center}
 \includegraphics[width=0.75\linewidth]{sc22-kappa-plots-plot3.png}
-\label{fig:kappa-plot3}
-\caption [Vector map with negative image in polplot]{
-  \small Result from Example 1: Producing a vector map over a negative image. 
-}
+\caption [Vector map with negative image in polplot]{Result from
+  Example 1: Producing a vector map over a negative image.\label{fig:kappa-plot3}}
 \end{center}
 \end{figure}
 
