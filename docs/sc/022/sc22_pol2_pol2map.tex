@@ -34,11 +34,11 @@ reduction routine (see \cref{Chapter}{sec:rundr}{}).
 \subsubsection*{The process}
 The analysed intensity values in the raw data time-streams are first
 converted into Q, U and I time-streams using the
-\xref{SMURF:\task{calcqu}}{sun258}{calcqu} command (these are stored
+\xref{SMURF:\task{calcqu}}{sun258}{CALCQU} command (these are stored
 for future use in the directory \texttt{qudata}, specified by the
 qudir parameter in the example command below).
 
-The \xref{smurf:makemap}{sun258}{makemap} command is then used to
+The \xref{SMURF:makemap}{sun258}{MAKEMAP} command is then used to
 create a separate map from the I time-stream for each observation,
 using SNR-based ``auto-masking'' to define the background regions that
 are to be set to zero at the end of each iteration.
@@ -89,7 +89,7 @@ the Q and U maps are produced a final vector catalogue is created.
 The POL-2 data reduction builds upon the existing SCUBA-2 Dynamic
 Iterative Map-Maker, hereafter just referred to as the map-maker. This
 is the tool used to produce SCUBA-2 maps, and is invoked by the
-\xref{SMURF:makemap}{sun258}{makemap} command. It performs some
+\xref{SMURF:makemap}{sun258}{MAKEMAP} command. It performs some
 pre-processing steps to clean the data, solves for multiple signal
 components using an iterative algorithm, and binns the resulting
 time-series data to produce a final science map.
@@ -111,7 +111,7 @@ bolometers (after gain variations between bolometers). This would be
 the case if both the sky brightness and the instrumental polarization
 was constant across the focal plane.
 
-In \xref{\task{pol2map}}{sun258}{pol2map}, the reduction command for
+In \xref{\task{pol2map}}{sun258}{POL2MAP}, the reduction command for
 POL-2 data, the sky removal is done using PCA.  The PCA approach
 accomodates multiple correlated components with different amplitudes
 at different points in the focal plane.
