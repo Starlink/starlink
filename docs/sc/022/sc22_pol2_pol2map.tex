@@ -57,7 +57,7 @@ created from the first observation defines the expected source
 position, and is compared with later maps to determine their pointing
 corrections.
 
-pca.pcathresh = -50
+\texttt{pca.pcathresh = -50}
 
 
 
@@ -80,9 +80,10 @@ improvements come from
 
 In the third step of the reduction process (see Run 3 in Figure
 \ref{fig:pol2drflow}), both the Q and U maps are produced. The production
-of the Q and U maps requires the raw Q and U data, the final I map
-(produced in step 2) and the output masks (also produced in step 2). Once
-the Q and U maps are produced a final vector catalogue is created.
+of the Q and U maps requires the Q and U time-series data (produced in
+step 1), the final I map (produced in step 2) and the output masks (also
+produced in step 2). Once the Q and U maps are produced a final vector
+catalogue is created.
 
 \section{\xlabel{makemap}Makemap}
 
@@ -91,7 +92,7 @@ Iterative Map-Maker, hereafter just referred to as the map-maker. This
 is the tool used to produce SCUBA-2 maps, and is invoked by the
 \xref{SMURF:makemap}{sun258}{MAKEMAP} command. It performs some
 pre-processing steps to clean the data, solves for multiple signal
-components using an iterative algorithm, and binns the resulting
+components using an iterative algorithm, and bins the resulting
 time-series data to produce a final science map.
 
 
@@ -100,33 +101,52 @@ time-series data to produce a final science map.
 \section{\xlabel{pca}PCA}
 
 One difference in the reduction of SCUBA-2 data and POL-2 data is the
-method for sky removal.  In the case of POL-2, this must also include
-the polarized sky background.  This is done using the COM/GAI model,
-used in the standard data reduction process.  For a discussion of why
-PCA, Principle Component Analysis, is not routinely run on
-non-polarimetric SCUBA-2 data, see \cref{Appendix}{app:pca}{}.
+method used to remove the sky background.  The sky background is usually
+very large compared to the astronomical signal, and both are subject to
+instrumental polarisation (IP) in the same way (see~\ref{sec:ip}). This
+IP acting on the high sky background values causes high background values
+in the Q and U maps. However, there is evidence that the IP is not
+constant across the focal plane, resulting in spatial variations in the
+background of the Q and U maps.
 
-The COM/GAI model assumes that the background is common to all
-bolometers (after gain variations between bolometers). This would be
-the case if both the sky brightness and the instrumental polarization
-was constant across the focal plane.
+For non-POL-2 data, the background is removing using a simple common-mode
+model, in which the mean of the bolometer values is found at each time
+slice and is then removed from the individual bolometer values. This
+ignores any spatial variations in the background and so fails to remove
+the background properly in POL-2 Q and U maps.
 
-In \xref{\task{pol2map}}{sun258}{POL2MAP}, the reduction command for
-POL-2 data, the sky removal is done using PCA.  The PCA approach
-accomodates multiple correlated components with different amplitudes
-at different points in the focal plane.
+To fix this, a second stage of background removal is used when processing
+POL-2 data, following the initial common-mode removal. This second stage
+is based upon a Principal Component Analysis (PCA) of the 1280
+time-streams in each sub-array (the Q and U data are processed
+separately). The PCA process identifies the strongest time-dependent
+components that are present within multiple bolometers. These components
+are assumed to represent the spatially varying background signal and are
+removed, leaving just the astronomical signal. The number of components
+to remove can be specified by the user, via a MAKEMAP configuration
+parameter called ``\texttt{pca.pcathresh}'' although
+\xref{\task{pol2map}}{sun258}{POL2MAP}, the reduction command for POL-2
+data, provides suitable defaults for this parameter:
 
+\begin{itemize}
+\item first stage uses \texttt{pca.pcathresh} = -50
+\item second stage uses \texttt{pca.pcathresh} = -150
+\end{itemize}
 
+On each MAKEMAP iteration, the PCA process removes the background (thus
+reducing the noise in the map) but also removes some of the astronomical
+signal. The amount of astronomical signal removed will be greater for
+larger values of \texttt{pca.pcathresh}. However, this astronomical
+signal is still present in the original time-series data and so can be
+recovered if sufficient MAKEMAP iterations are performed. In other words,
+using larger values of \texttt{pca.pcathresh} slows down the rate at
+which astronomical signal is transferred from the time-series data to the
+map, thus increasing the number of iterations required to recover the
+full astronomical signal in the map.
 
-
-first stage uses pca.pcathresh = -50
-
-second stage uses pca.pcathresh = -150
-
-
-PCA reduces both the noise and the astronomical signal within the
-map. As a result more iterations are required to recover the
-astronomical signal when the number of components are higher.
+Spatial variations in the sky background may also be present in non-POL-2
+data, but at a lower level. For a discussion of why PCA is not routinely
+run on non-polarimetric SCUBA-2 data, see \cref{Appendix}{app:pca}{}.
 
 
 
@@ -141,16 +161,16 @@ pixels. Masks are used for two main purposes:
 \item To prevent the growth of gradients and other artificial large
   scale structures within the map.  For this purpose, the astronomical
   signal at all background pixels defined by the mask is forced to
-  zero at the end of each iteration within makemap (except for the
+  zero at the end of each iteration within MAKEMAP (except for the
   final iteration).
 \item To prevent bright sources polluting the evaluation of the
-  various noise models (PCA, COM, FLT) used within makemap. Source
+  various noise models (PCA, COM, FLT) used within MAKEMAP. Source
   pixels are excluded from the calculation of these models.
 \end{enumerate}
 
 
 The pol2map script uses different masks for these two purposes - the
-“AST” mask and the “PCA” mask.  The PCA mask is in general less
+``AST'' mask and the ``PCA'' mask.  The PCA mask is in general less
 extensive than the AST mask, with the source areas being restricted to
 the brighter inner regions.  Each of these two masks can either be
 generated automatically within pol2map, or be specified by a fixed
@@ -169,7 +189,7 @@ If MAPVAR is set TRUE, the variances in the coadded I, Q and U maps
 are formed from the spread of pixel data values between the individual
 observation maps. If MAPVAR is FALSE (the default), the variances in
 the coadded maps are formed by propagating the pixel variance values
-created by makemap from the individual observation maps (these are
+created by MAKEMAP from the individual observation maps (these are
 based on the spread of I, Q or U values that fall in each pixel).
 
 Use MAPVAR=TRUE only if enough observations are avaliable to make the
@@ -177,8 +197,8 @@ variances between them meaningful.A general lower limit on its value
 is difficult to define, but is advised a minimum of 10 observations.
 
 
-If a test of the effect of this option on a field for which the I, Q
-and U maps from a set of individual observations are already
+If a test of the effect of this option is required on a field for which
+the I, Q and U maps from a set of individual observations are already
 avaliable, the following may be done:
 
 \begin{terminalv}

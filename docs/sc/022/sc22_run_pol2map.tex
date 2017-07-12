@@ -19,7 +19,7 @@ or
 
 \section{\xlabel{how-pol2map}How to use pol2map}
 
-Before running pol2map directly, it is necessary need to ensure that
+Before running pol2map directly, it is necessary to ensure that
 the \starlink\ environment has been initialised and the \smurf\
 package started (see \cref{Section}{sec:starinit}{Initialising
   Starlink} and \cref{Section}{sec:packinit}{KAPPA and SMURF for data
@@ -29,16 +29,16 @@ This chapter describes how to run the pol2map to first produce an
 initial I map and then again to produce the final I, Q, U maps and
 vector catalogue.
 
-To run pol2map values need to be supplied for the following
+To run pol2map, values should normally be supplied for the following
 command-line parameters\footnote{Note the distinction between
   ``command-line parameters'' that are supplied on the
   \texttt{pol2map} command line, and ``configuration parameters'' that
   are specified within a configuration file. Values for all
   \emph{configuration} parameters are obtained using a single
   \emph{command-line} parameter called \texttt{CONFIG}.} to produce
-the initial intensity image:
-
-
+the initial intensity image (if a parameter description ends with a value
+in square brackets, it is the default value that will be used for
+the parameter if no value is supplied on the command line):
 
 \begin{aligndesc}
 \item[\texttt{IN}] A list of input NDFs containing raw POL-2 data.
@@ -52,8 +52,8 @@ the initial intensity image:
   files can contain wildcards such as ``$*$'' and ``?''.
 
 \item[\texttt{IOUT}] The name of the NDF in which to store the the
-  total intensity (I) map incorporating all supplied observations. The
-  supplied filename should either have a file type of
+  total intensity (I) map (in pW) incorporating all supplied observations.
+  The supplied filename should either have a file type of
   ``\texttt{.sdf}'', or no file type at all (in which case
   \texttt{.sdf} will be appended to the supplied value). Any existing
   file with the same name will be overwritten.
@@ -69,11 +69,11 @@ the initial intensity image:
 
 \item[\texttt{MAPDIR}] The name of a directory in which to put the Q,
   U and I maps made from each individual observation supplied via
-  ``IN'', before coadding them. If null is supplied, the new maps are
-  placed in the same temporary directory as all the other intermediate
-  files and so will be deleted when the script exists (unless
-  parameter RETAIN is set TRUE). Note, these maps are always in units
-  of pW. Each one will contain FITS headers specifying the pointing
+  ``IN'', before coadding them. If null (!) is supplied, the new maps are
+  placed in the same temporary directory (chosen automatically) as all the
+  other intermediate files and so will be deleted when the script exists
+  (unless parameter RETAIN is set TRUE). Note, these maps are always in
+  units of pW. Each one will contain FITS headers specifying the pointing
   corrections needed to align the map with the reference map. [!]
 
 
@@ -92,8 +92,8 @@ required:
 \begin{aligndesc}
 
 \item[\texttt{CAT}] The output FITS vector catalogue. No catalogue is
-  created if null (!) is supplied. Note - currently, the Q, U and
-  I$_{p}$ values in this catalogue will be in units of pW. [!]
+  created if null (!) is supplied. Note - by default the Q, U and
+  I$_{p}$ values in this catalogue will be in units of mJy/beam. [!]
 
 
 \item[\texttt{MASK}] Specifies the type of masking to be used within
@@ -101,13 +101,13 @@ required:
   I, Q and U).
 
 
-\item[\texttt{MASKOUT1}] If a non-null value is supplied for MASKOUT,
+\item[\texttt{MASKOUT1}] If a non-null value is supplied for MASKOUT1,
   it specifies the NDF in which to store the AST mask created from the
   NDF specified by parameter MASK. Only used if an NDF is supplied for
   parameter MASK. [!]
 
 
-\item[\texttt{MASKOUT2}] If a non-null value is supplied for MASKOUT,
+\item[\texttt{MASKOUT2}] If a non-null value is supplied for MASKOUT2,
   it specifies the NDF in which to store the PCA mask created from the
   NDF specified by parameter MASK. Only used if an NDF is supplied for
   parameter MASK. [!]
@@ -123,6 +123,12 @@ required:
   output vector catalogue specified by parameter CAT. [FALSE]
 \end{aligndesc}
 
+The pol2map provides many other parameters that can be used to modify its
+behaviour in various ways. To see a full list, do:
+
+\begin{terminalv}
+% pol2map --help
+\end{terminalv}
 
 
 \section{\xlabel{how-step1}pol2map - producing the initial I map.}
@@ -203,9 +209,11 @@ The files and folders produced in this reduction are:
 
 \begin{aligndesc}
 \item[\texttt{pol2map.log}] A log file containing the output from the
-  pol2map command.
+  various smurf, kappa and polpack commands run as part of the pol2map
+  command. In fact, pol2map is a python script, which runs various other
+  starlink tasks behind the scenes to perform the bulk of the work.
 
-\item[\texttt{qudata/}] A folder containing the raw I, Q and U data
+\item[\texttt{qudata/}] A folder containing the I, Q and U time-series data
   for each sub array for each observation.
 
 \item[\texttt{maps/}] A folder containing the individual I maps from
@@ -276,8 +284,10 @@ run via a single command:
 
 The following shows the output from running this second pol2map
 command. First, pol2map produces new I maps for each map, correcting
-the position using from the intensity map provided by mask (in this
-case iauto.sdf)and then coadds all the observations.
+the position using the correction stored in the old I
+map\footnote{This correction is found by aligning the old I map with the
+supplied reference map, or the first observation if no reference map was
+supplied.}, and then coadds all the observations.
 
 \begin{terminalv}
 Logging to file pol2map.log
@@ -299,7 +309,7 @@ Masking will be based on SNR values in 'iauto'.
 Coadding I maps from all observations:
 \end{terminalv}
 
-as pol2map continues, the Q and U maps are then produced, again with
+As pol2map continues, the Q and U maps are produced, again with
 pointing corrections. This is followed by the creation of the output
 vector catalogue:
 
@@ -342,18 +352,18 @@ The output of this final run of pol2map is as follows:
   pol2map command. Note previous log files are moved to a new name
   such as \texttt{pol2map.log.1}.
 
-\item[\texttt{astmask.sdf}] The astronomical mask used in the creation
+\item[\texttt{astmask.sdf}] The AST mask used in the creation
   of the final I, Q and U maps.
 
-\item[\texttt{pcamask.sdf}] The pca mask used in the creation of the
+\item[\texttt{pcamask.sdf}] The PCA mask used in the creation of the
   final I, Q and U maps.
 
-\item[\texttt{iext.sdf}] The total intensity image, created using an
-  external ast and pca mask.
+\item[\texttt{iext.sdf}] The total intensity image, created using the
+  external AST and PCA mask described above.
 
 \item[\texttt{qext.sdf}] The intensity of the radiation linearly
   polarised in the direction parallel or perpendicular to the
-  reference plane, created using an external ast and pca mask.
+  reference plane, created using an external AST and PCA mask.
 
 \item[\texttt{maps/}] A folder containing the individual I, Q and U
   maps from each separate observation \texttt{$\_$Imap.sdf},
@@ -385,7 +395,8 @@ The output of this final run of pol2map is as follows:
 \includegraphics[width=0.46\linewidth]{sc22-gaia-view-iext.png}
 \label{fig:gaia-iext}
 \caption [Final I map in GAIA]{
-  \small Left: I map, iauto, as produced by the automoask on the first pass of pol2map. Right: Final I map, iext, as viewed in GAIA.
+  \small Left: I map, iauto, as produced by the automask on the first pass of pol2map. Right: Final I map, iext, as viewed in GAIA.
+         The flatter background is due to the increase in \texttt{pca.pcathresh}.
 }
 \end{center}
 \end{figure}
@@ -422,28 +433,29 @@ existing I maps:
 
 
 The output vector catalogue contains a range of values derived by
-pol2map for each pixel contained within the I map. Values in the
-catalogue are expressed in units of mJy/beam.  If desired is possible
+pol2map for each pixel contained within the I map. Intensity values and
+errors in the
+catalogue are expressed in units of mJy/beam.  If desired it is possible
 to switch the catalogue to units of pW by using "Jy=no" on the pol2map
 command line.  The values are:
 
 \begin{aligndesc}
-\item[\texttt{X}] pixel coordinate
-\item[\texttt{Y}] pixel coordinate
+\item[\texttt{X}] Pixel coordinate
+\item[\texttt{Y}] Pixel coordinate
 \item[\texttt{RA}] RA coordinate
 \item[\texttt{Dec}] Dec coordinate
-\item[\texttt{I}] Intensity
-\item[\texttt{DI}] error in I
-\item[\texttt{Q}] stokes Q parameter
-\item[\texttt{DQ}] error in Q
-\item[\texttt{U}] stokes U parameter
-\item[\texttt{DU}] error in U
-\item[\texttt{P}] Percentage Polarization
-\item[\texttt{DP}] error in P
-\item[\texttt{ANG}] angle of polarization
-\item[\texttt{DANG}] error in ANG
-\item[\texttt{PI}] Polarized Intensity (I$_{p}$)
-\item[\texttt{DPI}] error in Polarized Intensity
+\item[\texttt{I}] Total intensity
+\item[\texttt{DI}] Error in I
+\item[\texttt{Q}] Stokes Q parameter
+\item[\texttt{DQ}] Error in Q
+\item[\texttt{U}] Stokes U parameter
+\item[\texttt{DU}] Error in U
+\item[\texttt{P}] Percentage polarization
+\item[\texttt{DP}] Error in P
+\item[\texttt{ANG}] Angle of polarization
+\item[\texttt{DANG}] Error in ANG
+\item[\texttt{PI}] Polarized intensity (I$_{p}$)
+\item[\texttt{DPI}] Error in polarized intensity
 \end{aligndesc}
 
 

@@ -69,7 +69,7 @@ that cover the full field of SCUBA-2:
 \begin{enumerate}
 \item a wire-grid polariser used as a calibrator (only included in the
   beam for test purposes)
-\item a Half-Wave Plate
+\item a Half-Wave Plate (HWP)
 \item a second wire-grid polariser used as an analyzer
 \end{enumerate}
 
@@ -121,7 +121,7 @@ where $\delta$ is the angle of the polarised signal.
 \label{fig:pol2sc2diagram}
 \caption [POL-2 optical components]{ The main optical components in a
   typical single-beam imaging polarimeter such as POL-2 (taken from
-  sun233.}
+  sun233).}
 \end{center}
 \end{figure}
 
@@ -149,7 +149,7 @@ atmosphere is stable on the order of 2Hz and can be removed.
 \label{fig:hwpmodulation}
 \caption [Attenuation of signal by HWP]{The incoming polarised
   radiation (with a polarised angle, $\delta$, of zero) is attenuated
-  by the HWP.  The HWP Rotates at 2Hz (through $2\pi$) so we see the
+  by the HWP.  The HWP rotates at 2Hz (through $2\pi$) so we see the
   signal is modulated at 8Hz as the instrument scans at
   8\si{\arcsecond}/s. }
 \end{center}
@@ -176,7 +176,8 @@ atmosphere is stable on the order of 2Hz and can be removed.
 
 
 
-\section{Instrument Polarisation}
+\section{Instrumental Polarisation}
+\label{sec:ip}
 
 At the angular resolution of JCMT, planets such as Uranus should
 appear as unpolarised point sources.  In practice, however, POL-2
@@ -209,11 +210,11 @@ and electronic backgrounds) and $ip_{q}$ and $ip_{u}$ are factors that
 may vary slowly with focal plane position and/or azimuth and
 elevation.
 
-IP correction of a POL-2 map therefore requires the use of a total
+IP correction of a POL-2 map therefore requires a total
 intensity map of the same area of the sky to be available. This total
 intensity map is referred to as the IP reference map.
 
-Where flat mirrors or surfaces will produce a small, constant
+Whilst flat mirrors or surfaces will produce a small, constant
 polarisation across the beam, curved mirrors and other structures (for
 example the secondary mirror supports) will produce more complex
 polarisation effects, and these may distort the beam shape.
