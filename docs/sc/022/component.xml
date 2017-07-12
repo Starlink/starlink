@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="sc22" support="S">
-  <version>1.0</version>
+  <version>1</version>
   <path>docs/sc/022</path>
   <description>The POL-2 Data Reduction Cookbook</description>
   <abstract><p> This cookbook provides an introduction to Starlink
