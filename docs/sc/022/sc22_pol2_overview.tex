@@ -45,6 +45,16 @@ The linear Polarised Intensity (I$_{p}$) can be described as:
 I_{p} = \sqrt{Q^{2}+U^{2}}
 \end{equation}
 
+with Q and U related to the polarisation angle ($\theta$) 
+and the the Polarised intensity by:
+
+\begin{equation}
+Q = I_{p} \text{cos}(\theta)
+\end{equation}
+\begin{equation}
+U = I_{p} \text{sin}(\theta)
+\end{equation}
+
 where
 
 \begin{equation}
@@ -73,24 +83,48 @@ that cover the full field of SCUBA-2:
 \item a second wire-grid polariser used as an analyzer
 \end{enumerate}
 
-
 These components can be seen in Figure~\ref{fig:pol2sc2}.  A schematic
 of POL-2 is given in Figure~\ref{fig:pol2sc2diagram}.
 
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=0.8\linewidth]{singopt.png}
+\caption [POL-2 optical components]{ The main optical components in a
+  typical single-beam imaging polarimeter such as POL-2 (taken from
+  sun233).}
+\label{fig:pol2sc2diagram}
+\end{center}
+\end{figure}
 
 Rotating the HWP rotates any linearly polarised component of incoming
 radiation. The HWP rotates this incoming linear polarisation with
-twice the speed of the HWP angle ($\theta$) producing the
+twice the speed of the HWP angle ($\delta$) producing the
 \emph{effective analyzer} position ($\phi$), such that:
 
 
 \begin{equation}
-\phi = 2 \theta
+\phi = 2 \delta
 \end{equation}
 
 
 The rotating linearly polarised component is transmitted or reflected
 by the grid, causing a modulation in the transmitted intensity.
+The amplitude of the polarised component transmitted by the polariser is
+$\sim$cos(2$\phi$) while the power is cos$^{2}$(2$\phi$).
+
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=0.95\linewidth]{hwp-modulation-basic.png}
+\label{fig:hwp-modulation-basic}
+\caption [Modulation by the HWP - basic description]{ Left: If there
+  was a single rotating analyser this would be the resulting curve of 
+  the power transmitted of the linearly polarised component. 
+  Right: With the HWP the linearly polarised component is
+  rotated at twice the speed. It may be useful to remind the reader of 
+  the trigonometric identity: \\ cos$^{2}$x = 1/2(1+cos(2x))}
+\end{center}
+\end{figure}
+
 
 The radiation passing through the polarimeter is detected by
 SCUBA-2. The detected intensity (I$_{detected}$) is a combination of
@@ -98,32 +132,21 @@ SCUBA-2. The detected intensity (I$_{detected}$) is a combination of
 linearly polarised intensity (I$_{p}$). This detected intensity can be
 described by:
 
-
 \begin{equation}
-I_{detected} = \frac{I_{unpolarised}}{2}+ I_{p}\cdot\left(\frac{1+\cos(4\theta - \delta)}{2} \right)
+I_{detected} = \frac{I_{unpolarised}}{2}+ I_{p}\cdot\left(\frac{1+\cos(4\phi - \theta)}{2} \right)
 \end{equation}
 
-with the above equation being in terms of the HWP angle. This can also
-be expressed in terms of the effective analyzer angle (as is provided
-in the POLPACK documentation):
-
+with the above equation being in terms of the effective analyzer 
+angle, $\phi$ (as is provided in the POLPACK documentation) and 
+the angle of the polarisation ($\theta)$. 
+This can also be expressed in terms of the  the HWP angle ($\delta$). 
 
 \begin{equation}
-I_{detected} = \frac{I_{unpolarised}}{2}+ I_{p}\cdot\left(\frac{1+\cos(2\phi - \delta)}{2} \right)
+I_{detected} = \frac{I_{unpolarised}}{2}+ I_{p}\cdot\left(\frac{1+\cos(8\delta - \theta)}{2} \right)
 \end{equation}
 
-where $\delta$ is the angle of the polarised signal.
 
 
-\begin{figure}[t!]
-\begin{center}
-\includegraphics[width=0.8\linewidth]{singopt.png}
-\label{fig:pol2sc2diagram}
-\caption [POL-2 optical components]{ The main optical components in a
-  typical single-beam imaging polarimeter such as POL-2 (taken from
-  sun233).}
-\end{center}
-\end{figure}
 
 \subsection*{The Half-Wave Plate}
 
@@ -148,7 +171,7 @@ atmosphere is stable on the order of 2Hz and can be removed.
 \includegraphics[width=0.7\linewidth]{hwp-modulation.png}
 \label{fig:hwpmodulation}
 \caption [Attenuation of signal by HWP]{The incoming polarised
-  radiation (with a polarised angle, $\delta$, of zero) is attenuated
+  radiation (with a polarised angle, $\theta$, of zero) is attenuated
   by the HWP.  The HWP rotates at 2Hz (through $2\pi$) so we see the
   signal is modulated at 8Hz as the instrument scans at
   8\si{\arcsecond}/s. }
@@ -293,11 +316,11 @@ Half-wave plate rotation frequency& \SI{2}{Hz}\\
  R$_{t}$ (turn radius) & 99\si{\arcsecond}\\
  R$_{a}$ (nominal avoidance radius) & 77\si{\arcsecond}\\
 \hline
-\label{tab:scanpar}
 \end{tabular}
 \caption{The scan parameters used in the POLCV\_DAISY
   mode. \textdagger This radius is \emph{not} the size of the
   resulting map. }
+\label{tab:scanpar}
 \end{center}
 \end{table}
 
@@ -305,11 +328,11 @@ Half-wave plate rotation frequency& \SI{2}{Hz}\\
 \begin{figure}[t!]
 \begin{center}
 \includegraphics[width=0.6\linewidth]{POLCV_DAISY_schematic_detailed.png}
-\label{fig:scandetail}
 \caption [Detail of POL-2 Scan Pattern]{Detail of
   POLCV\_DAISY. $R_{0}$ is the map pattern radius, $R_{t}$ the turn
   radius, and $R_{a}$ is the nominal avoidance radius. For more
   details see Table~\ref{tab:scanpar}.}
+\label{fig:scandetail}
 \end{center}
 \end{figure}
 
@@ -423,7 +446,8 @@ value for the Flux Conversion Factor (FCF) is required.
 The resulting map may have the FCF applied to convert it into units of
 Janskys. As is recommended with SCUBA-2 observing, it is advisable to
 check that the FCF value applied to the data is sensible (and must be
-done manually).
+done manually). For more details see 
+\cref{Chapter}{sec:pol2map-fcf}{POL-2 FCFs}.
 
 
 

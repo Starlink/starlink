@@ -27,7 +27,8 @@ package started (see \cref{Section}{sec:starinit}{Initialising
 
 This chapter describes how to run the pol2map to first produce an
 initial I map and then again to produce the final I, Q, U maps and
-vector catalogue.
+vector catalogue as described in Section \ref{sec:how-step1}
+(this is refered to as ``run 1'' in Figure \ref{fig:pol2drflow}).
 
 To run pol2map, values should normally be supplied for the following
 command-line parameters\footnote{Note the distinction between
@@ -85,7 +86,9 @@ the parameter if no value is supplied on the command line):
   TRUE). [!]
 \end{aligndesc}
 
-when the output intensity image is used to produce the final I, Q, U
+when the pol2map is used for a secon time, as discussed in section 
+\ref{sec:how-step23} (this is refered to as ``run 2'' and ``run 3''
+in Figure \ref{fig:pol2drflow}), to sproduce the final I, Q, U
 maps and vector catalogues additional command-line parameters are
 required:
 
@@ -132,6 +135,7 @@ behaviour in various ways. To see a full list, do:
 
 
 \section{\xlabel{how-step1}pol2map - producing the initial I map.}
+\label{sec:how-step1}
 
 As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction - The
   Theory} pol2map must first be run on the raw data to produce an
@@ -191,8 +195,7 @@ Calculating Q, U and I time streams from raw analysed intensity data...
 
 >>>>   Making I map from 20160125_00043_0003...
 
-   Using pre-calculated pointing corrections of (0.0,0.0) arc-seconds
-   Re-using previously created map 'maps/20160125_00043_0003_imap'
+Storing pointing corrections of (0.0,0.0) arc-seconds for future use
 
 >>>>   Making I map from 20160112_00056_0003...
 
@@ -214,7 +217,8 @@ The files and folders produced in this reduction are:
   starlink tasks behind the scenes to perform the bulk of the work.
 
 \item[\texttt{qudata/}] A folder containing the I, Q and U time-series data
-  for each sub array for each observation.
+  for each sub array for each observation (these are produced by 
+  calcqu see Section \cref{Chapter}{sec:calcqu}{CALCQU}.
 
 \item[\texttt{maps/}] A folder containing the individual I maps from
   each separate observation \texttt{$\_$imap.sdf}.
@@ -267,7 +271,7 @@ s8b20160112_00056_0003_UT.sdf  s8c20160112_00059_0003_UT.sdf  s8d20160125_00043_
 
 
 \section{\xlabel{how-step23}pol2map - producing the I, Q, U maps and catalogue}
-
+\label{sec:how-step23}
 
 As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction - The
   Theory}, the I map output from the initial run of pol2map is used to
@@ -369,9 +373,9 @@ The output of this final run of pol2map is as follows:
   maps from each separate observation \texttt{$\_$Imap.sdf},
   \texttt{$\_$Qmap.sdf} and \texttt{$\_$Umap.sdf}.
 
-\item[\texttt{CCDPACK.LOG}] Output log containing information produced
-  as pol2map relies on the CCDPACK command MAKEMOS to combine POL-2
-  data.
+%\item[\texttt{CCDPACK.LOG}] Output log containing information produced
+%  as pol2map relies on the CCDPACK command MAKEMOS to combine POL-2
+%  data.
 
 \item[\texttt{uext.sdf}] The intensity of the radiation linearly
   polarised in the direction 45$^{\circ }$ to the reference plane,
@@ -382,11 +386,6 @@ The output of this final run of pol2map is as follows:
   the I map.
 
 \end{aligndesc}
-
-
-
-
-
 
 
 \begin{figure}[t!]
