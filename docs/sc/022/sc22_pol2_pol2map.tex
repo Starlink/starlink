@@ -12,7 +12,7 @@ referred to as ``Run 1'', ``Run 2'' and ``Run 3'' in Figure~\ref{fig:pol2drflow}
 
 \begin{figure}[t!]
 \begin{center}
-\includegraphics[width=1.0\linewidth]{pol2map_flow}
+\includegraphics[width=0.85\linewidth]{pol2map_flow}
 \caption [POL-2 Data Flow]{ The data flow of the POL-2 data reduction
   method is presented. In this example, three POL-2 observations are
   reduced and combined in various stages and combination to produce I,
@@ -96,20 +96,20 @@ pre-processing steps to clean the data, solves for multiple signal
 components using an iterative algorithm, and bins the resulting
 time-series data to produce a final science map.
 
-In pol2map the map-maker is used in conjunction with CALCQU (see 
+In pol2map the map-maker is used in conjunction with CALCQU (see
 section \ref{sec:calcqu}) to produce maps of Q and U, as well as I.
 
 \section{\xlabel{calcqu}CALCQU}
 \label{sec:calcqu}
 
 In addition to the POl-2 data reduction beulding on the
-existing SCUBA-2 map-maker, pol2map also relises on the command 
+existing SCUBA-2 map-maker, pol2map also relises on the command
 SMURF:CALQU.
 
-This CALCQU tool creates Q and U values from a set of POL-2 time 
-series data files. The supplied time series data files are first 
-flat-fielded, cleaned and concatenated, before being used to create 
-the Q and U values. 
+This CALCQU tool creates Q and U values from a set of POL-2 time
+series data files. The supplied time series data files are first
+flat-fielded, cleaned and concatenated, before being used to create
+the Q and U values.
 
 
 \section{\xlabel{pca}PCA}
