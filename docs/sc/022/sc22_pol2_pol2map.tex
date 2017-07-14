@@ -86,7 +86,7 @@ Step~1), the final I map (produced in Step~2) and the output masks (also
 produced in Step~2). Once the Q and U maps are produced a final vector
 catalogue is created.
 
-\section{\xlabel{makemap}Makemap}
+\section{\xlabel{makemap}MAKEMAP}
 
 The POL-2 data reduction builds upon the existing SCUBA-2 Dynamic
 Iterative Map-Maker, hereafter just referred to as the map-maker. This
@@ -102,8 +102,8 @@ section \ref{sec:calcqu}) to produce maps of Q and U, as well as I.
 \section{\xlabel{calcqu}CALCQU}
 \label{sec:calcqu}
 
-In addition to the POl-2 data reduction beulding on the
-existing SCUBA-2 map-maker, pol2map also relises on the command
+In addition to the POL-2 data reduction building on the
+existing SCUBA-2 map-maker, pol2map also relies on the command
 SMURF:CALQU.
 
 This CALCQU tool creates Q and U values from a set of POL-2 time
@@ -115,10 +115,11 @@ the Q and U values.
 \section{\xlabel{pca}PCA}
 \label{sec:pca}
 
-One difference in the reduction of SCUBA-2 data and POL-2 data is the
+One difference between the reduction of SCUBA-2 data and POL-2 data is the
 method used to remove the sky background.  The sky background is usually
 very large compared to the astronomical signal, and both are subject to
-instrumental polarisation (IP) in the same way (see Section~\ref{sec:ip}). This
+the same form of instrumental polarisation (IP - see Section~\ref{sec:ip}).
+This
 IP acting on the high sky background values causes high background values
 in the Q and U maps. However, there is evidence that the IP is not
 constant across the focal plane, resulting in spatial variations in the

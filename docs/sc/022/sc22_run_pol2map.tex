@@ -25,7 +25,7 @@ package started (see \cref{Section}{sec:starinit}{Initialising
   Starlink} and \cref{Section}{sec:packinit}{KAPPA and SMURF for data
   processing}).
 
-This chapter describes how to run the pol2map to first produce an
+This chapter describes how to run pol2map firstly to produce an
 initial I map and then again to produce the final I, Q, U maps and
 vector catalogue as described in Section \ref{sec:how-step1}
 (this is refered to as ``run 1'' in Figure \ref{fig:pol2drflow}).
@@ -52,7 +52,7 @@ the parameter if no value is supplied on the command line):
   the value for parameter \texttt{IN}. Note, the names of the raw data
   files can contain wildcards such as ``$*$'' and ``?''.
 
-\item[\texttt{IOUT}] The name of the NDF in which to store the the
+\item[\texttt{IOUT}] The name of the NDF in which to store the
   total intensity (I) map (in pW) incorporating all supplied observations.
   The supplied filename should either have a file type of
   ``\texttt{.sdf}'', or no file type at all (in which case
@@ -86,11 +86,11 @@ the parameter if no value is supplied on the command line):
   TRUE). [!]
 \end{aligndesc}
 
-when the pol2map is used for a secon time, as discussed in section 
-\ref{sec:how-step23} (this is refered to as ``run 2'' and ``run 3''
-in Figure \ref{fig:pol2drflow}), to sproduce the final I, Q, U
-maps and vector catalogues additional command-line parameters are
-required:
+Some additional command-line parameters are required when pol2map is
+used for the second time --- as discussed in section \ref{sec:how-step23}
+--- to produce the final I, Q, U maps and vector catalogue\footnote{This
+second usage of pol2map includes both ``run 2'' and ``run 3'' in Figure
+\ref{fig:pol2drflow}.}:
 
 \begin{aligndesc}
 
@@ -126,8 +126,8 @@ required:
   output vector catalogue specified by parameter CAT. [FALSE]
 \end{aligndesc}
 
-The pol2map provides many other parameters that can be used to modify its
-behaviour in various ways. To see a full list, do:
+The pol2map command provides many other parameters that can be used to
+modify its behaviour in various ways. To see a full list, do:
 
 \begin{terminalv}
 % pol2map --help
@@ -217,7 +217,7 @@ The files and folders produced in this reduction are:
   starlink tasks behind the scenes to perform the bulk of the work.
 
 \item[\texttt{qudata/}] A folder containing the I, Q and U time-series data
-  for each sub array for each observation (these are produced by 
+  for each sub array for each observation (these are produced by
   calcqu see Section \cref{Chapter}{sec:calcqu}{CALCQU}.
 
 \item[\texttt{maps/}] A folder containing the individual I maps from
@@ -478,7 +478,7 @@ probably be necessary for a user to tweak the pol2map reduction for
 specific situations.
 
 The pixel size of the final map produced is controlled by the pixsize
-parameter in the the \smurf\ pol2map command:
+parameter in the \smurf\ pol2map command:
 
 \begin{terminalv}
 % pol2map pixsize=12

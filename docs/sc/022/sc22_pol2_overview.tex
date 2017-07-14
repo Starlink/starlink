@@ -45,8 +45,8 @@ The linear Polarised Intensity (I$_{p}$) can be described as:
 I_{p} = \sqrt{Q^{2}+U^{2}}
 \end{equation}
 
-with Q and U related to the polarisation angle ($\theta$) 
-and the the Polarised intensity by:
+with Q and U related to the polarisation angle ($\theta$)
+and the polarised intensity by:
 
 \begin{equation}
 Q = I_{p} \text{cos}(\theta)
@@ -65,8 +65,9 @@ U = U_{m} - I . IP_{u}
 \end{equation}
 
 where Q$_{m}$ and U$_{m}$ are the measured values of Q and U.  I is
-the astronomical total intensity.  IP is the instrument
-polarisation. The IP affects both Q (IP$_{q}$) and U (IP$_{u}$).
+the astronomical total intensity.  IP is the instrumental
+polarisation. The IP affects both Q (\emph{via} IP$_{q}$) and U
+(\emph{via} IP$_{u}$).
 
 
 \subsection*{How POL-2 works}
@@ -91,7 +92,7 @@ of POL-2 is given in Figure~\ref{fig:pol2sc2diagram}.
 \includegraphics[width=0.8\linewidth]{singopt.png}
 \caption [POL-2 optical components]{ The main optical components in a
   typical single-beam imaging polarimeter such as POL-2 (taken from
-  sun233).}
+  SUN/223).}
 \label{fig:pol2sc2diagram}
 \end{center}
 \end{figure}
@@ -117,10 +118,10 @@ $\sim$cos(2$\phi$) while the power is cos$^{2}$(2$\phi$).
 \includegraphics[width=0.95\linewidth]{hwp-modulation-basic.png}
 \label{fig:hwp-modulation-basic}
 \caption [Modulation by the HWP - basic description]{ Left: If there
-  was a single rotating analyser this would be the resulting curve of 
-  the power transmitted of the linearly polarised component. 
+  was a single rotating analyser this would be the resulting curve of
+  the power transmitted of the linearly polarised component.
   Right: With the HWP the linearly polarised component is
-  rotated at twice the speed. It may be useful to remind the reader of 
+  rotated at twice the speed. It may be useful to remind the reader of
   the trigonometric identity: \\ cos$^{2}$x = 1/2(1+cos(2x))}
 \end{center}
 \end{figure}
@@ -136,10 +137,10 @@ described by:
 I_{detected} = \frac{I_{unpolarised}}{2}+ I_{p}\cdot\left(\frac{1+\cos(4\phi - \theta)}{2} \right)
 \end{equation}
 
-with the above equation being in terms of the effective analyzer 
-angle, $\phi$ (as is provided in the POLPACK documentation) and 
-the angle of the polarisation ($\theta)$. 
-This can also be expressed in terms of the  the HWP angle ($\delta$). 
+with the above equation being in terms of the effective analyzer
+angle, $\phi$ (as is provided in the POLPACK documentation) and
+the angle of the polarisation ($\theta)$.
+This can also be expressed in terms of the  the HWP angle ($\delta$).
 
 \begin{equation}
 I_{detected} = \frac{I_{unpolarised}}{2}+ I_{p}\cdot\left(\frac{1+\cos(8\delta - \theta)}{2} \right)
@@ -446,7 +447,7 @@ value for the Flux Conversion Factor (FCF) is required.
 The resulting map may have the FCF applied to convert it into units of
 Janskys. As is recommended with SCUBA-2 observing, it is advisable to
 check that the FCF value applied to the data is sensible (and must be
-done manually). For more details see 
+done manually). For more details see
 \cref{Chapter}{sec:pol2map-fcf}{POL-2 FCFs}.
 
 
