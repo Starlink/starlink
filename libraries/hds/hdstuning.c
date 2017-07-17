@@ -1,3 +1,4 @@
+#include <pthread.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -17,14 +18,24 @@ static hdsbool_t HAVE_INITIALIZED_TUNING = 0;
    use version 4 */
 static int USE_VERSION5 = 0;
 
+
+/* A mutex used to serialise access to the getters and setters so that
+   multiple threads do not try to access the global data simultaneously. */
+static pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX pthread_mutex_lock( &mutex1 );
+#define UNLOCK_MUTEX pthread_mutex_unlock( &mutex1 );
+
+
 /* Parse tuning environment variables. Should only be called once the
    first time a tuning parameter is required */
 
 static void hds1ReadTuneEnvironment () {
-
-  if (HAVE_INITIALIZED_TUNING) return;
-  dat1Getenv( "HDS_VERSION5", USE_VERSION5, &USE_VERSION5 );
-  HAVE_INITIALIZED_TUNING = 1;
+  LOCK_MUTEX;
+  if(!HAVE_INITIALIZED_TUNING) {
+    dat1Getenv( "HDS_VERSION5", USE_VERSION5, &USE_VERSION5 );
+    HAVE_INITIALIZED_TUNING = 1;
+  }
+  UNLOCK_MUTEX;
 }
 
 /*
@@ -97,7 +108,9 @@ int hds1TuneWrapper( const char * param_str, int value, int *status ) {
   if (*status != SAI__OK) return *status;
 
   if (strncmp( param_str, "VERSION5", 8) == 0 ) {
+    LOCK_MUTEX;
     USE_VERSION5 = ( value == 0 ? 0 : 1 );
+    UNLOCK_MUTEX;
   } else {
     *status = DAT__NAMIN;
     emsRepf("hdsTune_1", "hdsTune: Unknown tuning parameter '%s'",
@@ -181,7 +194,9 @@ hds1GtuneWrapper(const char *param_str, int *value, int *status) {
   hds1ReadTuneEnvironment();
 
   if (strncasecmp( param_str, "VERSION5", 8 ) ) {
+    LOCK_MUTEX;
     *value = ( USE_VERSION5 ? 1 : 0 );
+    UNLOCK_MUTEX;
   } else {
     *status = DAT__NAMIN;
     emsRepf("hdsGtune", "hdsGtune: Do not know how to report on parameter %s",
