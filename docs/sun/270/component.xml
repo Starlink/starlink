@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sun270" support="U">
+<component id="sun270" support="S">
   <version>0.1</version>
   <path>docs/sun/270</path>
   <description>Starlink Latex Support for pdf and html</description>
