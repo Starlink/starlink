@@ -2989,7 +2989,7 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/sc2 \
 	$(MANIFESTS)/sc20 \
 	$(MANIFESTS)/sc21 \
-        $(MANIFESTS)/sc22 \
+	$(MANIFESTS)/sc22 \
 	$(MANIFESTS)/sc3 \
 	$(MANIFESTS)/sc4 \
 	$(MANIFESTS)/sc5 \

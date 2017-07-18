@@ -835,7 +835,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>2.5-0</version>
+  <version>2.5-5</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -2467,6 +2467,43 @@ to handle data from a variety of different instruments.
   <copyright>
     <year>2012</year>
     <name>STFC</name>
+  </copyright>
+</component>
+
+<component id="sc22" support="S">
+  <version>1</version>
+  <path>docs/sc/022</path>
+  <description>The POL-2 Data Reduction Cookbook</description>
+  <abstract><p>
+     This cookbook provides an introduction to Starlink facilities,
+     SMURF, the Sub-Millimetre User Reduction Facility, and in
+     particular POL2MAP -- the command for reducing POL-2 data. This
+     cookbook illustrates the various steps required to reduce the
+     data, including an overview of the method. It also describes how
+     to calibrate and display the data as images or vector maps.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>H.A.L. Parsons</name>
+    </person>
+    <person>
+      <name>D.S. Berry</name>
+    </person>
+    <person>
+      <name>M.G. Rawlings</name>
+    </person>
+    <person>
+      <name>S.F. Graves</name>
+    </person>
+  </developers>
+  <documentation> sc22</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <copyright>
+    <year>2017</year>
+    <name>EAO</name>
   </copyright>
 </component>
 
