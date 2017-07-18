@@ -36,7 +36,7 @@ The analysed intensity values in the raw data time-streams are first
 converted into Q, U and I time-streams using the
 \xref{SMURF:\task{calcqu}}{sun258}{CALCQU} command (these are stored
 for future use in the directory \texttt{qudata}, specified by the
-qudir parameter in the example command below).
+\param{QUDIR} parameter in the example command below).
 
 The \xref{SMURF:makemap}{sun258}{MAKEMAP} command is then used to
 create a separate map from the I time-stream for each observation,
@@ -44,7 +44,7 @@ using SNR-based ``auto-masking'' to define the background regions that
 are to be set to zero at the end of each iteration.
 
 These maps are stored for future use in the directory \texttt{maps},
-specified by the mapdir parameter. Each map has a name of the form:
+specified by the \param{MAPDIR} parameter. Each map has a name of the form:
 
 \texttt{<UT$\_$DATE>$\_$<OBS$\_$NUM>$\_$<CHUNK$\_$NUM>$\_$imap.sdf}
 
@@ -145,13 +145,13 @@ components that are present within multiple bolometers. These components
 are assumed to represent the spatially varying background signal and are
 removed, leaving just the astronomical signal. The number of components
 to remove can be specified by the user, via a MAKEMAP configuration
-parameter called ``\texttt{pca.pcathresh}'' although \poltwomap,
+parameter called `\xparam(PCA.PCATHRESH}{pca.pcathresh} although \poltwomap,
 the reduction command for POL-2
 data, provides suitable defaults for this parameter.
 
 \begin{itemize}
-\item first stage uses \texttt{pca.pcathresh} = -50
-\item second stage uses \texttt{pca.pcathresh} = -150
+\item first stage uses \param{pca.pcathresh} = -50
+\item second stage uses \param{pca.pcathresh} = -150
 \end{itemize}
 
 On each MAKEMAP iteration, the PCA process removes the background (thus
@@ -160,7 +160,7 @@ signal. The amount of astronomical signal removed will be greater for
 larger values of \texttt{pca.pcathresh}. However, this astronomical
 signal is still present in the original time-series data and so can be
 recovered if sufficient MAKEMAP iterations are performed. In other words,
-using larger values of \texttt{pca.pcathresh} slows down the rate at
+using larger values of \param{pca.pcathresh} slows down the rate at
 which astronomical signal is transferred from the time-series data to the
 map, thus increasing the number of iterations required to recover the
 full astronomical signal in the map.
@@ -203,7 +203,7 @@ external NDF.
 
 \subsection*{Variances between POL-2 maps}
 
-MAPVAR is a \poltwomap\ parameter that controls how the variances in the
+\param{MAPVAR} is a \poltwomap\ parameter that controls how the variances in the
 coadded I, Q and U maps are formed.
 
 If MAPVAR is set TRUE, the variances in the coadded I, Q and U maps

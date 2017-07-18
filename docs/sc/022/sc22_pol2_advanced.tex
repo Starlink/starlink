@@ -21,7 +21,7 @@ catalogue created by an earlier run of \task{pol2map}.
 
 \item Create a text file listing all the existing auto-masked I maps
   for individual observations stored in the directory specified by
-  parameter mapdir, and then add in the raw data files for the new
+  Parameter \param{MAPDIR}, and then add in the raw data files for the new
   observations. The auto-masked I maps have names that end in
   \file{$\_$imap.sdf}.
 
@@ -48,7 +48,7 @@ catalogue created by an earlier run of \task{pol2map}.
   been changed significantly by the addition of the new
   observation. To do this, it is necessary to compare the old and new
   masks. The old masks should have been created earlier using the
-  MASKOUT1 and MASKOUT2 parameters (see step 3 in section 2.2). To
+  \param{MASKOUT1} and \param{MASKOUT2} parameters (see Step~3 in Section~\ref{sec:dr}). To
   create the new masks that would be generated from the new
   auto-masked map, use this command.
 
@@ -95,7 +95,7 @@ maskout1=astmask_new           maskout2=pcamask_new
 
 Currently, as with unpolarised SCUBA-2 reductions, the default
 reduction pixel size is 4\si{\arcsecond}.  The pixel size is controlled by the
-pixsize parameter in the \smurf\ \poltwomap\ command:
+\param{PIXSIZE} parameter in the \smurf\ \poltwomap\ command:
 
 \begin{terminalv}
 % pol2map pixsize=12
@@ -164,7 +164,7 @@ pixels and 7\si{\arcsecond} pixels.
 The error on the IP is reported to be of the order of 0.5\%.  It is
 possible to investigate the effects of the systematic error in IP by
 creating maps using the upper and lower limits on the IP value. The
-\task{makemap} configuration parameter \xparam{IPOFFSET}{ipoffset}
+\task{makemap} configuration parameter called \xparam{IPOFFSET}{ipoffset}
 can be used to do such an
 investigation. To use it, run \task{pol2map} twice as follows:
 
@@ -176,8 +176,8 @@ investigation. To use it, run \task{pol2map} twice as follows:
 to produce maps using the upper and lower IP limits (a range of
 0.5\%). If \task{pol2map} has already been run on POL-2 data then a file will
 already exist that was created using the mean IP (the mean IP is used
-if ipoffset is omitted from the config value, or the configur parameter
-is omitted completely).
+if \param{ipoffset} is omitted from the configuration value, or the
+configuration parameter itself is omitted).
 
 %\section{\xlabel{simulations}Simulated data}
 

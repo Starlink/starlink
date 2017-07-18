@@ -37,7 +37,7 @@ command-line parameters\footnote{Note the distinction between
   \texttt{pol2map} command line, and ``configuration parameters'' that
   are specified within a configuration file. Values for all
   \emph{configuration} parameters are obtained using a single
-  \emph{command-line} parameter called \texttt{CONFIG}.} to produce
+  \emph{command-line} parameter called \param{CONFIG}.} to produce
 the initial intensity image (if a parameter description ends with a value
 in square brackets, it is the default value that will be used for
 the parameter if no value is supplied on the command line).
@@ -50,8 +50,8 @@ the parameter if no value is supplied on the command line).
   easiest is to create a simple text file containing the names of the
   raw data files -- one per line --- and then supply the name of the
   text file, preceded by an up-caret character (\,\texttt{\^{}}\,), as
-  the value for parameter \texttt{IN}. Note, the names of the raw data
-  files can contain wild-cards such as ``$*$'' and ``?''.
+  the value for parameter \param{IN}. Note, the names of the raw data
+  files can contain wildcards such as ``$*$'' and ``?''.
 
 \item[\texttt{IOUT}] The name of the NDF in which to store the
   total intensity (I) map (in pW) incorporating all supplied observations.
@@ -107,24 +107,24 @@ Figure~\ref{fig:pol2drflow}.}.
 
 \item[\texttt{MASKOUT1}] If a non-null value is supplied for MASKOUT1,
   it specifies the NDF in which to store the AST mask created from the
-  NDF specified by parameter MASK. Only used if an NDF is supplied for
-  parameter MASK. [!]
+  NDF specified by Parameter \param{MASK}. Only used if an NDF is supplied for
+  Parameter \param{MASK}. [!]
 
 
 \item[\texttt{MASKOUT2}] If a non-null value is supplied for MASKOUT2,
   it specifies the NDF in which to store the PCA mask created from the
-  NDF specified by parameter MASK. Only used if an NDF is supplied for
-  parameter MASK. [!]
+  NDF specified by Parameter \param{MASK}. Only used if an NDF is supplied for
+  Parameter \param{MASK}. [!]
 
 
 \item[\texttt{IPREF}] The total intensity map to be used for IP
   correction. The map must be in units of pW. If the same value is
-  supplied for both IOUT and IPREF, the output I map will be used for
+  supplied for both \param{IOUT} and \param{IPREF}, the output I map will be used for
   IP correction. [!]
 
 \item[\texttt{DEBIAS}] TRUE if a correction for statistical bias is to
   be made to percentage polarisation and polarised intensity in the
-  output vector catalogue specified by parameter CAT. [FALSE]
+  output vector catalogue specified by Parameter \param{CAT}. [FALSE]
 \end{aligndesc}
 
 The \task{pol2map} command provides many other parameters that can be used to
