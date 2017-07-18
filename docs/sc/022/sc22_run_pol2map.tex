@@ -1,4 +1,4 @@
-\chapter{\xlabel{pol2_dr_running}POL-2 Data Reduction - Running
+\chapter{\xlabel{pol2_dr_running}POL-2 Data Reduction -- Running
   pol2map}
 \label{sec:rundr}
 
@@ -96,12 +96,12 @@ Figure~\ref{fig:pol2drflow}.}.
 \begin{aligndesc}
 
 \item[\texttt{CAT}] The output FITS vector catalogue. No catalogue is
-  created if null (!) is supplied. Note - by default the Q, U and
+  created if null (!) is supplied. Note -- by default the Q, U and
   I$_{p}$ values in this catalogue will be in units of mJy/beam. [!]
 
 
 \item[\texttt{MASK}] Specifies the type of masking to be used within
-  makemap (the same type of masking is used to create all three maps -
+  \makemap\ (the same type of masking is used to create all three maps --
   I, Q and U).
 
 
@@ -135,10 +135,10 @@ modify its behaviour in various ways. To see a full list, do this.
 \end{terminalv}
 
 
-\section{\xlabel{how-step1}pol2map - producing the initial I map.}
+\section{\xlabel{how-step1}pol2map -- producing the initial I map.}
 \label{sec:how-step1}
 
-As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction - The
+As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction -- The
   Theory} \poltwomap\ must first be run on the raw data to produce an
 initial I map.  In this first step:
 
@@ -161,7 +161,7 @@ this.
 This uses all available data for all four 850\,$\mu$m sub-arrays, for
 observation 43 taken on 25th January 2016\footnote{The input files
   should all be for a single waveband from one or more POL-2
-  observations --- do not mix files from different wavebands and/or
+  observations -- do not mix files from different wavebands and/or
   astronomical regions}. In addition, the data used in this example
 also comes from observation 56 and 59 taken on January 11th 2016 (UT).
 
@@ -264,10 +264,10 @@ s8b20160112_00056_0003_UT.sdf  s8c20160112_00059_0003_UT.sdf  s8d20160125_00043_
 \end{terminalv}
 
 
-\section{\xlabel{how-step23}pol2map - producing the I, Q, U maps and catalogue}
+\section{\xlabel{how-step23}pol2map -- producing the I, Q, U maps and catalogue}
 \label{sec:how-step23}
 
-As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction - The
+As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction -- The
   Theory}, the I map output from the initial run of pol2map is used to
 derive the final I, Q and U maps. If requested, a vector catalogue is
 also produced.
