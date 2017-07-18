@@ -179,4 +179,55 @@ is omitted completely).
 %\section{\xlabel{simulations}Simulated data}
 
 
+\section{\label{sec:wcscopy}Adding WCS information back into a vector catalogue}
+Vector catalogues produced by pol2map contain information about World Coordinate
+Systems (WCS) in two different forms:
+
+\begin{enumerate}
+\item The catalogue contains ``RA'' and ``Dec'' columns that hold the sky position
+(FK5, J2000) of each vector, in radians.
+\item The catalogue header contains a Starlink ``WCS FrameSet'' which defines
+(amongst other things) the projection from pixel coordinates within the I, Q and
+U mosaics, to RA and Dec. This FrameSet is used by Starlink software, together
+with the pixels coordinates stored in the ``X'' and ``Y'' columns, to determine
+the RA and Dec of each vector. The WCS FrameSet also defines the polarimetric
+reference direction used by the Q, U and ANG values. See
+``\xref{Using World Co-ordinate Systems}{sun95}{se_wcsuse}''
+within \xref{SUN/95}{sun95}{} (the KAPPA manual) for more information on
+the ways in which Starlink software handles WCS information.
+\end{enumerate}
+
+Starlink software such as \polpack, \Kappa\ and \gaia\ rely on the WCS
+FrameSet for all WCS-related operations (drawing annotated axes, aligning
+data sets, \emph{etc}). Thus problems are likely if the WCS FrameSet is
+removed from the vector catalogue. This could happen for instance if you
+use inappropriate software to process an existing catalogue, creating a
+new output catalogue --- the WCS FrameSet may not be copied to the output
+catalogue, causing subsequent WCS-related operations to fail. It is safe
+to use Polpack, Kappa, Gaia and Cursa (see \xref{SUN/190}{sun190}{}) as
+all these packages copy the WCS FrameSet to any new output catalogues.
+Unfortunately, the popular TOPCAT catalogue browser (see
+\url{http://www.starlink.ac.uk/topcat/}) and the STILTS package
+(\url{http://www.starlink.ac.uk/stilts/}) upon which it is based, do
+\emph{not} copy the WCS FrameSet to any output catalogues.
+
+For this reason, Polpack contains a command that can be used to copy the
+WCS FrameSet from one catalogue to another.  Say for instance you create
+catalogue \texttt{mycat.FIT} using pol2map, and then use TOPCAT to remove
+low signal-to-noise vectors, saving the results to a new catalogue called
+\texttt{selcat.FIT}. The WCS FrameSet will be missing from \texttt{selcat.FIT},
+and so we need to copy it back again from the original catalogue \texttt{mycat.FIT}.
+To do this we use the ``\xref{polwcscopy}{sun223}{POLWCSCOPY}'' command:
+
+\begin{terminalv}
+% polwcscopy in=selcat ref=mycat out=selcat2
+\end{terminalv}
+
+This creates a third catalogue \texttt{selcat2.FIT}, which is a copy of
+\texttt{selcat.FIT} but with WCS inherited from \texttt{mycat.FIT}.
+
+
+
+
+
 

@@ -383,3 +383,37 @@ Convert into a PDF file and remove blank margins (if required).
 \end{figure}
 
 
+\section{TOPCAT}
+
+Catalogues produced by pol2map can be explored using the popular TOPCAT
+catalogue browser (see \url{http://www.starlink.ac.uk/topcat/}). For
+instance:
+
+\begin{terminalv}
+% topcat -f fits mycat.FIT
+\end{terminalv}
+
+Unlike the other tools described above, TOPCAT cannot visualise the
+catalogue as a set of vectors. However, it goes well beyond the
+facilities of the other tools in allowing you to explore correlations
+between different quantities in the catalogue via 2- and 3-dimensional
+scatter plots - see Figure~ \ref{fig:topcat}. It can also be used to
+cross-correlate two diffferent
+catalogues, create subsets of the catalogue, create new columns
+containing related quantities, \emph{etc}. It also allows the modified
+catalogue to be saved to a new catalogue file on disk. However, beware
+that any new catalogue will not contain the WCS information required
+by other Starlink applications to perform WCS-related operations such as
+displaying annotated axes and aligning data-sets. However, this WCS
+information can be copied back into the new catalogue using the
+``\xref{polwcscopy}{sun223}{POLWCSCOPY}'' command. See Section~\ref{sec:wcscopy}.
+
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=0.75\linewidth]{sc22-topcat}
+\caption [A TOPCAT scatter plot]{A scatter plot of fractional polarisation (P)
+against total intensity (I) produced by TOPCAT. High signal-to-noise points
+(I>10.DI) are shown in blue.\label{fig:topcat}}
+\end{center}
+\end{figure}
+
