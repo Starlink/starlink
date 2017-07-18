@@ -92,7 +92,7 @@ catalogue is created.
 The POL-2 data reduction builds upon the existing SCUBA-2 Dynamic
 Iterative Map-Maker, hereafter just referred to as the map-maker. This
 is the tool used to produce SCUBA-2 maps, and is invoked by the
-\xref{SMURF:makemap}{sun258}{MAKEMAP} command. It performs some
+\SMURF\ \makemap\ command. It performs some
 pre-processing steps to clean the data, solves for multiple signal
 components using an iterative algorithm, and bins the resulting
 time-series data to produce a final science map.
@@ -105,8 +105,8 @@ Section~\ref{sec:calcqu}) to produce maps of Q and U, as well as I.
 \label{sec:calcqu}
 
 In addition to the POL-2 data reduction building on the
-existing SCUBA-2 map-maker, \poltwomap\ also relies on the command
-SMURF:CALQU.
+existing SCUBA-2 map-maker, \poltwomap\ also relies on the \SMURF\
+command \task{CALQU}.
 
 This \xref{calcqu}{sun258}{CALCQU} tool creates time series holding Q and U values from a set of POL-2
 time series holding raw data values. The supplied time-series data files are first
@@ -122,8 +122,8 @@ raw data values and the expected values given by equation~\ref{eqn:idet}.
 
 One difference between the reduction of SCUBA-2 data and POL-2 data is the
 method used to remove the sky background.  The sky background is usually
-very large compared to the astronomical signal, and both are subject to
 the same form of instrumental polarisation (IP - see Section~\ref{sec:ip}).
+very large compared with the astronomical signal, and both are subject to
 This
 IP acting on the high sky background values causes high background values
 in the Q and U maps. However, there is evidence that the IP is not
@@ -182,10 +182,10 @@ pixels. Masks are used for two main purposes:
 \item To prevent the growth of gradients and other artificial large
   scale structures within the map.  For this purpose, the astronomical
   signal at all background pixels defined by the mask is forced to
-  zero at the end of each iteration within MAKEMAP (except for the
+  zero at the end of each iteration within \makemap\ (except for the
   final iteration).
-\item To prevent bright sources polluting the evaluation of the
-  various noise models (PCA, COM, FLT) used within MAKEMAP. Source
+\item They prevent bright sources polluting the evaluation of the
+  various noise models (PCA, COM, FLT) used within \makemap. Source
   pixels are excluded from the calculation of these models.
 \end{enumerate}
 

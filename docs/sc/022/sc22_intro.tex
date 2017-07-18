@@ -30,10 +30,11 @@ the text that should be typed by the user to initiate the described action.
 \section{\xlabel{computing} Before you start: computing resources}
 \label{sec:computing}
 
-Compared to SCUBA-2 observations, POL-2 observations are far less memory-intensive to reduce.
-POL-2 time-series data is down-sampled to 2Hz as a part of the reduction process. Assuming a typical 35
-minute POL-2 observation, the reduction requires 35 GB of memory (in comparison to SCUBA-2
-maps that may require up to 96 GB of memory).
+Compared with SCUBA-2 observations, POL-2 observations are far less
+memory-intensive to reduce. POL-2 time-series data is down-sampled to
+2~Hz as a part of the reduction process. Assuming a typical 35-minute
+POL-2 observation, the reduction requires 35~GB of memory (in
+comparison with SCUBA-2 maps that may require up to 96~GB of memory).
 
 The main consideration for POL-2 reductions is processing power. PCA calculations in
 \makemap\ can be lengthy so fast processors with lots of cores are advised.
@@ -52,10 +53,10 @@ to reduce any SCUBA-2 data (see Section~\ref{sec:starinit}).
 \label{sec:ndf}
 
 Data files for POL-2 are structurally the same as for SCUBA-2, and use
-the Starlink N-dimensional Data Format (NDF,
+the Starlink $N$-dimensional Data Format (NDF,
 see Jenness et al.\ 2014\cite{ndf}), a hierarchical format which allows
 additional data and metadata to be stored within a single file. \Kappa\
-contains \xref{many commands}{sun95} {ap_classified}\ for examining and
+contains \xref{many commands}{sun95}{ap_classified}\ for examining and
 manipulating NDF structures. The introductory sections of the \Kappa\
 document (\xref{SUN/95}{sun95}{}) contain much useful information on
 the contents of an NDF structure and how to manipulate them.

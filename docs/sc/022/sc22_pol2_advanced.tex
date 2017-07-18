@@ -54,9 +54,8 @@ catalogue created by an earlier run of \task{pol2map}.
 
 \begin{terminalv}
 % pol2map  in=^infiles iout=! qout=! uout=! mapdir=maps mask=iauto_new \
-maskout1=astmask_new           maskout2=pcamask_new
+maskout1=astmask_new  maskout2=pcamask_new
 \end{terminalv}
-
 
 \item Decide if the addition of the new data has changed the masks
   significantly. This involves comparing \file{astmask.sdf} and
@@ -107,7 +106,7 @@ changing pixel size.  In this example, we compare 12\si{\arcsecond}
 pixels and 7\si{\arcsecond} pixels.
 
 \begin{enumerate}
-\item Begin with an auto-masked total intensity map from the raw
+\item Begin with an auto-masked total-intensity map from the raw
   data. For instance:
 
 \begin{terminalv}

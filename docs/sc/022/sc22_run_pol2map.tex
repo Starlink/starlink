@@ -7,7 +7,7 @@ The previous chapter, \cref{Chapter}{sec:dr}{POL-2 Data Reduction --
 POL-2 data.  It showed that this reduction process -- which uses
 \task{pol2map} -- is a three-step process.
 
-As with the other Python scripts in SMURF, you can get more
+As with the other Python scripts in \SMURF, you can get more
 information about the available parameters by doing either:
 \begin{terminalv}
 % pol2map --help
@@ -28,13 +28,13 @@ package started (see \cref{Section}{sec:starinit}{Initialising
 
 This chapter describes how to run \task{pol2map} firstly to produce an
 initial I map and then again to produce the final I, Q, U maps and
-vector catalogue as described in Section \ref{sec:how-step1}
-(this is referred to as ``run 1'' in Figure \ref{fig:pol2drflow}).
+vector catalogue as described in Section~\ref{sec:how-step1}
+(this is referred to as ``Run 1'' in Figure~\ref{fig:pol2drflow}).
 
 To run \task{pol2map}, values should normally be supplied for the following
 command-line parameters\footnote{Note the distinction between
   ``command-line parameters'' that are supplied on the
-  \texttt{pol2map} command line, and ``configuration parameters'' that
+  \task{pol2map} command line, and ``configuration parameters'' that
   are specified within a configuration file. Values for all
   \emph{configuration} parameters are obtained using a single
   \emph{command-line} parameter called \param{CONFIG}.} to produce
@@ -48,7 +48,7 @@ the parameter if no value is supplied on the command line).
   described in Section ``\xref{Specifying Groups of
     Objects}{sun95}{se_groups}'' in \xref{SUN/95}{sun95}{}. The
   easiest is to create a simple text file containing the names of the
-  raw data files -- one per line --- and then supply the name of the
+  raw data files -- one per line -- and then supply the name of the
   text file, preceded by an up-caret character (\,\texttt{\^{}}\,), as
   the value for parameter \param{IN}. Note, the names of the raw data
   files can contain wildcards such as ``$*$'' and ``?''.
@@ -211,13 +211,13 @@ The files and folders produced in this reduction are described below.
 
 \begin{aligndesc}
 \item[\file{pol2map.log}] A log file containing the output from the
-  various smurf, kappa and polpack commands run as part of the \task{pol2map}
+  various \SMURF, \KAPPA\ and \POLPACK\ commands run as part of the \task{pol2map}
   command. In fact, \task{pol2map} is a Python script, which runs various other
   Starlink tasks behind the scenes to perform the bulk of the work.
 
 \item[\file{qudata/}] A folder containing the I, Q and U time-series data
   for each sub array for each observation (these are produced by
-  \task{calcqu} see Section~\cref{Chapter}{sec:calcqu}{CALCQU}.
+  \task{calcqu} (see Section~\cref{Chapter}{sec:calcqu}{CALCQU}).
 
 \item[\file{maps/}] A folder containing the individual I maps from
   each separate observation \texttt{$\_$imap.sdf}.
