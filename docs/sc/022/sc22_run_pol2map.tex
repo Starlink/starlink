@@ -28,7 +28,7 @@ package started (see \cref{Section}{sec:starinit}{Initialising
 This chapter describes how to run pol2map firstly to produce an
 initial I map and then again to produce the final I, Q, U maps and
 vector catalogue as described in Section \ref{sec:how-step1}
-(this is refered to as ``run 1'' in Figure \ref{fig:pol2drflow}).
+(this is referred to as ``run 1'' in Figure \ref{fig:pol2drflow}).
 
 To run pol2map, values should normally be supplied for the following
 command-line parameters\footnote{Note the distinction between
@@ -50,11 +50,11 @@ the parameter if no value is supplied on the command line):
   raw data files -- one per line --- and then supply the name of the
   text file, preceded by an up-caret character (\,\texttt{\^{}}\,), as
   the value for parameter \texttt{IN}. Note, the names of the raw data
-  files can contain wildcards such as ``$*$'' and ``?''.
+  files can contain wild-cards such as ``$*$'' and ``?''.
 
 \item[\texttt{IOUT}] The name of the NDF in which to store the
   total intensity (I) map (in pW) incorporating all supplied observations.
-  The supplied filename should either have a file type of
+  The supplied file name should either have a file type of
   ``\texttt{.sdf}'', or no file type at all (in which case
   \texttt{.sdf} will be appended to the supplied value). Any existing
   file with the same name will be overwritten.
@@ -454,7 +454,7 @@ command line.  The values are:
 \label{sec:pol2map-fcf}
 
 Inserting POL-2 in front of SCUBA-2 reduces the throughput to SCUBA-2.
-To convert to astronomical units such as mJy/beam an efficency must be
+To convert to astronomical units such as mJy/beam an efficiency must be
 applied to the SCUBA-2 FCFs.
 
 At \SI{850}{\micro\metre} and \SI{450}{\micro\metre} the FCF for POL-2
