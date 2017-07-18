@@ -39,20 +39,23 @@ POL-2 is designed to characterize linear polarisation.  The $V$
 parameter, consequently, is not discussed further with the focus on $I$,
 $Q$ and $U$.
 
-The linear Polarised Intensity (I$_{p}$) can be described as:
+The linear Polarised Intensity (I$_{p}$) and  polarisation angle
+($\theta$) can be described as:
 
 \begin{equation}
 I_{p} = \sqrt{Q^{2}+U^{2}}
 \end{equation}
+\begin{equation}
+\theta = 0.5\arctan(U/Q)
+\end{equation}
 
-with Q and U related to the polarisation angle ($\theta$)
-and the polarised intensity by:
+with Q and U related to the polarisation angle and the polarised intensity by:
 
 \begin{equation}
-Q = I_{p} \text{cos}(\theta)
+Q = I_{p} \text{cos}(2\theta)
 \end{equation}
 \begin{equation}
-U = I_{p} \text{sin}(\theta)
+U = I_{p} \text{sin}(2\theta)
 \end{equation}
 
 where
@@ -100,7 +103,8 @@ of POL-2 is given in Figure~\ref{fig:pol2sc2diagram}.
 Rotating the HWP rotates any linearly polarised component of incoming
 radiation. The HWP rotates this incoming linear polarisation with
 twice the speed of the HWP angle ($\delta$) producing the
-\emph{effective analyser} position ($\phi$), such that:
+\emph{effective analyser} position ($\phi$ - as defined in
+\xref{the POLPACK documentation}{sun223} {thepolarimeter}), such that:
 
 
 \begin{equation}
@@ -111,7 +115,7 @@ twice the speed of the HWP angle ($\delta$) producing the
 The rotating linearly polarised component is transmitted or reflected
 by the grid, causing a modulation in the transmitted intensity.
 The amplitude of the polarised component transmitted by the polariser is
-$\sim$cos(2$\phi$) while the power is cos$^{2}$(2$\phi$).
+$\sim$cos($\phi$) while the power is $\sim$cos$^{2}$($\phi$).
 
 \begin{figure}[t!]
 \begin{center}
@@ -122,7 +126,7 @@ $\sim$cos(2$\phi$) while the power is cos$^{2}$(2$\phi$).
   the power transmitted of the linearly polarised component.
   Right: With the HWP the linearly polarised component is
   rotated at twice the speed. It may be useful to remind the reader of
-  the trigonometric identity: \\ cos$^{2}$x = 1/2(1+cos(2x))}
+  the trigonometric identity: \\ cos$^{2}$x = 0.5(1+cos(2x))}
 \end{center}
 \end{figure}
 
@@ -130,20 +134,21 @@ $\sim$cos(2$\phi$) while the power is cos$^{2}$(2$\phi$).
 The radiation passing through the polarimeter is detected by
 SCUBA-2. The detected intensity (I$_{detected}$) is a combination of
 \emph{both} the unpolarised intensity (I$_{unpolarised}$) and the
-linearly polarised intensity (I$_{p}$). This detected intensity can be
+linearly polarised intensity (I$_{p}$)\footnote{The total intensity of
+the source, $I$, is $I_{unpolarised} + I_{p}$.}. This detected intensity can be
 described by:
 
 \begin{equation}
-I_{detected} = \frac{I_{unpolarised}}{2}+ I_{p}\cdot\left(\frac{1+\cos(4\phi - \theta)}{2} \right)
+I_{detected} = \frac{I_{unpolarised}}{2}+ I_{p}\cdot\left(\frac{1+\cos(2\phi - 2\theta)}{2} \right)
 \end{equation}
 
 with the above equation being in terms of the effective analyser
-angle, $\phi$ (as is provided in the POLPACK documentation) and
-the angle of the polarisation ($\theta)$.
+angle, $\phi$ and the angle of the polarisation ($\theta)$.
 This can also be expressed in terms of the  the HWP angle ($\delta$).
 
 \begin{equation}
-I_{detected} = \frac{I_{unpolarised}}{2}+ I_{p}\cdot\left(\frac{1+\cos(8\delta - \theta)}{2} \right)
+\label{eqn:idet}
+I_{detected} = \frac{I_{unpolarised}}{2}+I_{p}\cdot\left(\frac{1+\cos(4\delta - 2\theta)}{2} \right)
 \end{equation}
 
 
@@ -162,9 +167,10 @@ respectively (Savini et al. 2009 - insert full reference).
 
 The HWP rotates the incoming linear polarisation with twice the speed
 of the wave plate angle.  The HWP is typically rotated at 2Hz,
-providing a fast modulation of any linear polarisation by 8Hz.  The
-data acquisition rate is ~175Hz, yielding 20 samples per cycle.  The
-atmosphere is stable on the order of 2Hz and can be removed.
+providing a fast modulation of any linear polarisation by 8Hz (see
+equation~\ref{eqn:idet}).  The data acquisition rate is ~175Hz, yielding
+20 samples per cycle.  The atmosphere is stable on the order of 2Hz and
+can be removed.
 
 
 \begin{figure}[t!]
