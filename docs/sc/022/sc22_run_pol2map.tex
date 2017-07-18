@@ -361,20 +361,16 @@ The output of this final run of pol2map is as follows:
 \item[\texttt{iext.sdf}] The total intensity image, created using the
   external AST and PCA mask described above.
 
-\item[\texttt{qext.sdf}] The intensity of the radiation linearly
-  polarised in the direction parallel or perpendicular to the
-  reference plane, created using an external AST and PCA mask.
+\item[\texttt{qext.sdf}] The Q map (\emph{i.e} the intensity of the radiation
+  linearly polarised in the direction parallel or perpendicular to the
+  reference plane), created using an external AST and PCA mask.
 
 \item[\texttt{maps/}] A folder containing the individual I, Q and U
   maps from each separate observation \texttt{$\_$Imap.sdf},
   \texttt{$\_$Qmap.sdf} and \texttt{$\_$Umap.sdf}.
 
-%\item[\texttt{CCDPACK.LOG}] Output log containing information produced
-%  as pol2map relies on the CCDPACK command MAKEMOS to combine POL-2
-%  data.
-
-\item[\texttt{uext.sdf}] The intensity of the radiation linearly
-  polarised in the direction 45$^{\circ }$ to the reference plane,
+\item[\texttt{uext.sdf}] The U map (\emph{i.e.} the intensity of the radiation
+  linearly polarised in the direction $\pm45^{\circ }$ to the reference plane),
   created using an external ast and pca mask.
 
 \item[\texttt{mycat.FIT}] The output vector catalogue containing a
