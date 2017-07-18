@@ -86,6 +86,7 @@
  *     18-JUL-2017 (GSB):
  *        Correctly null-terminate facility name while parsing facility line.
  *        Null-terminate facility prefix while parsing facility line.
+ *        Initialize error number and severity for each file.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -101,7 +102,7 @@
 
 #define MAXLINE 101
 
-unsigned int errcode, fac_code=0, message_number=1, severity=0;
+unsigned int fac_code=0;
 char fac_name[10], fac_prefix[10];
 
 int f77_include=0, f77_INCLUDE=0, c_header=0, c_error=0;
@@ -183,6 +184,8 @@ process_file(char *filename)
 /*
  * Process a message file.
  */
+    unsigned int errcode, message_number=1, severity=0;
+
     FILE *fp; /* , *fp0, *fp1, *fp2; */
     FILE *fp_c = NULL;
     FILE *fp_f = NULL;
