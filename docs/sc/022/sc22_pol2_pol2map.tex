@@ -176,10 +176,10 @@ A mask is a two-dimensional array which has the same shape and size as
 the final map, and which is used to indicate where the source is
 expected to fall within the map. `Bad' pixel values within a mask
 indicate background pixels, and `good' pixel values indicate source
-pixels. Masks are used for two main purposes:
+pixels. Masks are used for two main purposes.
 
 \begin{enumerate}
-\item To prevent the growth of gradients and other artificial large
+\item They prevent the growth of gradients and other artificial large
   scale structures within the map.  For this purpose, the astronomical
   signal at all background pixels defined by the mask is forced to
   zero at the end of each iteration within \makemap\ (except for the
