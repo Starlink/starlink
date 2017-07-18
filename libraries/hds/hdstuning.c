@@ -21,9 +21,9 @@ static int USE_VERSION5 = 0;
 
 /* A mutex used to serialise access to the getters and setters so that
    multiple threads do not try to access the global data simultaneously. */
-static pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_MUTEX pthread_mutex_lock( &mutex1 );
-#define UNLOCK_MUTEX pthread_mutex_unlock( &mutex1 );
+static pthread_mutex_t hdstuning_mutex = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX pthread_mutex_lock( &hdstuning_mutex );
+#define UNLOCK_MUTEX pthread_mutex_unlock( &hdstuning_mutex );
 
 
 /* Parse tuning environment variables. Should only be called once the

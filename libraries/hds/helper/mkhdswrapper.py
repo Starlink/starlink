@@ -83,7 +83,9 @@ def func_simple(func,line):
   if (isv5) {{
     retval = {1}
   }} else {{
+    LOCK_MUTEX;
     retval = {2}
+    UNLOCK_MUTEX;
   }}
   HDS_CHECK_STATUS(\"{3}\",(isv5 ? "(v5)" : "(v4)"));
   return retval;""".format(locvar, v5, v4, func))
@@ -103,7 +105,9 @@ def func_both(func,line):
   EnterCheck(\"{2}\",*status);
   if (*status != SAI__OK) return *status;
   retval = {0}
+  LOCK_MUTEX;
   retval = {1}
+  UNLOCK_MUTEX;
   HDS_CHECK_STATUS(\"{2}\", "(both)");
   return retval;""".format(v5,v4,func))
 
@@ -118,7 +122,9 @@ def func_versioned(func,line):
     retval = {0}
     used = "(v5)";
   }} else {{
+    LOCK_MUTEX;
     retval = {1}
+    UNLOCK_MUTEX;
     used = "(v4)";
   }}
   HDS_CHECK_STATUS(\"{2}\", used);
@@ -130,7 +136,9 @@ def func_void(func, line):
   if (ISHDSv5({0})) {{
     {1}
   }} else {{
+    LOCK_MUTEX;
     {2}
+    UNLOCK_MUTEX;
   }}
   return;""".format("locator", v5, v4,func))
 
@@ -176,7 +184,9 @@ def func_copy(func,line):
     {1}
   }} else if ( !loc1isv5 && !loc2isv5 ) {{
     isv5 = 0;
+    LOCK_MUTEX;
     {2}
+    UNLOCK_MUTEX;
   }} else {{
     /* Manual copy of X to Y */
     if (loc1isv5) {{
@@ -184,7 +194,9 @@ def func_copy(func,line):
     }} else {{
       isv5 = -2;
     }}
+    LOCK_MUTEX;
     {4}
+    UNLOCK_MUTEX;
   }}
   {{
     const char *helptxt = "(unexpected)";
@@ -218,7 +230,9 @@ def func_datMove(func,line):
     {0}
   }} else if ( !loc1isv5 && !loc2isv5 ) {{
     isv5 = 0;
+    LOCK_MUTEX;
     {1}
+    UNLOCK_MUTEX;
   }} else {{
     HDSLoc * parenloc = NULL;
     char namestr[DAT__SZNAM+1];
@@ -241,7 +255,9 @@ def func_hdsOpen(func,line):
   if (*status != SAI__OK) return *status;
   /* HDSv4 can reliably spot when a file is not v4
      format so for now we open in v4 and catch that specific error */
+  LOCK_MUTEX;
   hdsOpen_v4(file_str, mode_str, locator, status);
+  UNLOCK_MUTEX;
   if (*status == DAT__INCHK || *status == DAT__FILIN) {
     emsAnnul(status);
     hdsOpen_v5(file_str, mode_str, locator, status);
@@ -259,7 +275,9 @@ def func_hdsGtune(func,line):
     used = "(wrapper)";
   } else {
     hdsGtune_v5(param_str, value, status);
+    LOCK_MUTEX;
     hdsGtune_v4(param_str, value, status);
+    UNLOCK_MUTEX;
     used = "(both)";
   }
   if (*status != SAI__OK) {
@@ -279,7 +297,9 @@ def func_hdsTune(func,line):
     used = "(wrapper)";
   } else {
     hdsTune_v5(param_str, value, status);
+    LOCK_MUTEX;
     hdsTune_v4(param_str, value, status);
+    UNLOCK_MUTEX;
     used = "(both)";
   }
   if (*status != SAI__OK) {
@@ -301,7 +321,9 @@ def func_hdsInfoI(func,line):
   if (!locator) {
     int res_v4 = 0;
     int res_v5 = 0;
+    LOCK_MUTEX;
     hdsInfoI_v4(locator, topic_str, extra, &res_v4, status);
+    UNLOCK_MUTEX;
     hdsInfoI_v5(locator, topic_str, extra, &res_v5, status);
     retval = *status;
     *result = res_v4 + res_v5;
@@ -310,7 +332,9 @@ def func_hdsInfoI(func,line):
     used = "(v5)";
   } else {
     used = "(v4)";
+    LOCK_MUTEX;
     retval = hdsInfoI_v4(locator, topic_str, extra, result, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("hdsInfoI", used);
   return retval;""")
@@ -328,7 +352,9 @@ def func_hdsFlush(func,line):
      v4 will deal with it. */
   hdsFlush_v5(group_str, status);
   if (*status == DAT__GRPIN) emsAnnul(status);
+  LOCK_MUTEX;
   hdsFlush_v4(group_str, status);
+  UNLOCK_MUTEX;
   HDS_CHECK_STATUS("hdsFlush", "(both)");
   return *status;""")
 
@@ -355,11 +381,13 @@ def func_hdsCopy(func,line):
   /* So we need to walk through and can not simply use datCopy
     - we can use two routines used by dat1CopyXtoY though. */
   datStruc(locator, &struc, status);
+  LOCK_MUTEX;
   if (struc) {
     dat1CopyStrucXtoY( locator, outloc, status );
   } else {
     dat1CopyPrimXtoY( locator, outloc, status );
   }
+  UNLOCK_MUTEX;
   datAnnul(&outloc, status);
   HDS_CHECK_STATUS("hdsCopy", (ISHDSv5(locator) ? "(v5)" : "(v4)"));
   return *status;""")
@@ -428,6 +456,7 @@ for line in open("hds.h"):
             print('#include <stdlib.h>')  # For abort()
             print('#include <stdio.h>')  # For printf()
             print('#include <string.h>')
+            print('#include <pthread.h>')
             print('#include "sae_par.h"')
             print('#include "dat_par.h"')
             print('#include "dat1.h"')
@@ -445,6 +474,12 @@ for line in open("hds.h"):
             print('#  define HDS_CHECK_STATUS(func,txt) if (*status != instat && *status != SAI__OK) { emsRepf("wrap_" func, func ": Error in call to HDS %s", status, txt);}')
             print("#  define EnterCheck(A,B) ;")
             print('#endif')
+            print("")
+            print('/* HDS V5 is thread-safe, but V4 is not. So we use a ')
+            print('   mutex to serialise all calls to V4 functions. */')
+            print('static pthread_mutex_t hdsv4_mutex = PTHREAD_MUTEX_INITIALIZER;')
+            print('#define LOCK_MUTEX pthread_mutex_lock( &hdsv4_mutex );')
+            print('#define UNLOCK_MUTEX pthread_mutex_unlock( &hdsv4_mutex );')
             print("")
             print(line)
             in_prologue = 0

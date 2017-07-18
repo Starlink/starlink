@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <pthread.h>
 #include "sae_par.h"
 #include "dat_par.h"
 #include "dat1.h"
@@ -22,6 +23,12 @@ static void EnterCheck( const char * func, int status ) { printf("Enter HDS rout
 #  define EnterCheck(A,B) ;
 #endif
 
+/* HDS V5 is thread-safe, but V4 is not. So we use a 
+   mutex to serialise all calls to V4 functions. */
+static pthread_mutex_t hdsv4_mutex = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX pthread_mutex_lock( &hdsv4_mutex );
+#define UNLOCK_MUTEX pthread_mutex_unlock( &hdsv4_mutex );
+
 /*=================================*/
 /* datAlter - Alter size of object */
 /*=================================*/
@@ -36,7 +43,9 @@ datAlter(HDSLoc *locator, int ndim, const hdsdim dims[], int *status) {
   if (isv5) {
     retval = datAlter_v5(locator, ndim, dims, status);
   } else {
+    LOCK_MUTEX;
     retval = datAlter_v4(locator, ndim, dims, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datAlter",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -56,7 +65,9 @@ datAnnul(HDSLoc **locator, int *status) {
   if (isv5) {
     retval = datAnnul_v5(locator, status);
   } else {
+    LOCK_MUTEX;
     retval = datAnnul_v4(locator, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datAnnul",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -76,7 +87,9 @@ datBasic(const HDSLoc *locator, const char *mode_c, unsigned char **pntr, size_t
   if (isv5) {
     retval = datBasic_v5(locator, mode_c, pntr, len, status);
   } else {
+    LOCK_MUTEX;
     retval = datBasic_v4(locator, mode_c, pntr, len, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datBasic",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -103,7 +116,9 @@ datCcopy(const HDSLoc *locator1, const HDSLoc *locator2, const char *name, HDSLo
     datCcopy_v5(locator1, locator2, name, locator3, status);
   } else if ( !loc1isv5 && !loc2isv5 ) {
     isv5 = 0;
+    LOCK_MUTEX;
     datCcopy_v4(locator1, locator2, name, locator3, status);
+    UNLOCK_MUTEX;
   } else {
     /* Manual copy of X to Y */
     if (loc1isv5) {
@@ -111,7 +126,9 @@ datCcopy(const HDSLoc *locator1, const HDSLoc *locator2, const char *name, HDSLo
     } else {
       isv5 = -2;
     }
+    LOCK_MUTEX;
     dat1CcopyXtoY(locator1, locator2, name, locator3, status);
+    UNLOCK_MUTEX;
   }
   {
     const char *helptxt = "(unexpected)";
@@ -155,7 +172,9 @@ datCell(const HDSLoc *locator1, int ndim, const hdsdim subs[], HDSLoc **locator2
   if (isv5) {
     retval = datCell_v5(locator1, ndim, subs, locator2, status);
   } else {
+    LOCK_MUTEX;
     retval = datCell_v4(locator1, ndim, subs, locator2, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datCell",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -190,7 +209,9 @@ datClen(const HDSLoc *locator, size_t *clen, int *status) {
   if (isv5) {
     retval = datClen_v5(locator, clen, status);
   } else {
+    LOCK_MUTEX;
     retval = datClen_v4(locator, clen, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datClen",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -210,7 +231,9 @@ datClone(const HDSLoc *locator1, HDSLoc **locator2, int *status) {
   if (isv5) {
     retval = datClone_v5(locator1, locator2, status);
   } else {
+    LOCK_MUTEX;
     retval = datClone_v4(locator1, locator2, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datClone",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -230,7 +253,9 @@ datCoerc(const HDSLoc *locator1, int ndim, HDSLoc **locator2, int *status) {
   if (isv5) {
     retval = datCoerc_v5(locator1, ndim, locator2, status);
   } else {
+    LOCK_MUTEX;
     retval = datCoerc_v4(locator1, ndim, locator2, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datCoerc",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -257,7 +282,9 @@ datCopy(const HDSLoc *locator1, const HDSLoc *locator2, const char *name_c, int 
     datCopy_v5(locator1, locator2, name_c, status);
   } else if ( !loc1isv5 && !loc2isv5 ) {
     isv5 = 0;
+    LOCK_MUTEX;
     datCopy_v4(locator1, locator2, name_c, status);
+    UNLOCK_MUTEX;
   } else {
     /* Manual copy of X to Y */
     if (loc1isv5) {
@@ -265,7 +292,9 @@ datCopy(const HDSLoc *locator1, const HDSLoc *locator2, const char *name_c, int 
     } else {
       isv5 = -2;
     }
+    LOCK_MUTEX;
     dat1CopyXtoY(locator1, locator2, name_c, status);
+    UNLOCK_MUTEX;
   }
   {
     const char *helptxt = "(unexpected)";
@@ -297,7 +326,9 @@ datDrep(const HDSLoc *locator, char **format_str, char **order_str, int *status)
   if (isv5) {
     retval = datDrep_v5(locator, format_str, order_str, status);
   } else {
+    LOCK_MUTEX;
     retval = datDrep_v4(locator, format_str, order_str, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datDrep",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -317,7 +348,9 @@ datErase(const HDSLoc *locator, const char *name_str, int *status) {
   if (isv5) {
     retval = datErase_v5(locator, name_str, status);
   } else {
+    LOCK_MUTEX;
     retval = datErase_v4(locator, name_str, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datErase",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -347,7 +380,9 @@ datFind(const HDSLoc *locator1, const char *name_str, HDSLoc **locator2, int *st
   if (isv5) {
     retval = datFind_v5(locator1, name_str, locator2, status);
   } else {
+    LOCK_MUTEX;
     retval = datFind_v4(locator1, name_str, locator2, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datFind",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -367,7 +402,9 @@ datGet(const HDSLoc *locator, const char *type_str, int ndim, const hdsdim dims[
   if (isv5) {
     retval = datGet_v5(locator, type_str, ndim, dims, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datGet_v4(locator, type_str, ndim, dims, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGet",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -387,7 +424,9 @@ datGetC(const HDSLoc *locator, const int ndim, const hdsdim dims[], char values[
   if (isv5) {
     retval = datGetC_v5(locator, ndim, dims, values, char_len, status);
   } else {
+    LOCK_MUTEX;
     retval = datGetC_v4(locator, ndim, dims, values, char_len, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGetC",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -407,7 +446,9 @@ datGetD(const HDSLoc *locator, int ndim, const hdsdim dims[], double values[], i
   if (isv5) {
     retval = datGetD_v5(locator, ndim, dims, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datGetD_v4(locator, ndim, dims, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGetD",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -427,7 +468,9 @@ datGetI(const HDSLoc *locator, int ndim, const hdsdim dims[], int values[], int 
   if (isv5) {
     retval = datGetI_v5(locator, ndim, dims, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datGetI_v4(locator, ndim, dims, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGetI",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -447,7 +490,9 @@ datGetK(const HDSLoc *locator, int ndim, const hdsdim dims[], int64_t values[], 
   if (isv5) {
     retval = datGetK_v5(locator, ndim, dims, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datGetK_v4(locator, ndim, dims, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGetK",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -467,7 +512,9 @@ datGetW(const HDSLoc *locator, int ndim, const hdsdim dims[], short values[], in
   if (isv5) {
     retval = datGetW_v5(locator, ndim, dims, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datGetW_v4(locator, ndim, dims, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGetW",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -487,7 +534,9 @@ datGetUW(const HDSLoc *locator, int ndim, const hdsdim dims[], unsigned short va
   if (isv5) {
     retval = datGetUW_v5(locator, ndim, dims, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datGetUW_v4(locator, ndim, dims, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGetUW",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -507,7 +556,9 @@ datGetL(const HDSLoc *locator, int ndim, const hdsdim dims[], hdsbool_t values[]
   if (isv5) {
     retval = datGetL_v5(locator, ndim, dims, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datGetL_v4(locator, ndim, dims, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGetL",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -527,7 +578,9 @@ datGetR(const HDSLoc *locator, int ndim, const hdsdim dims[], float values[], in
   if (isv5) {
     retval = datGetR_v5(locator, ndim, dims, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datGetR_v4(locator, ndim, dims, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGetR",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -547,7 +600,9 @@ datGet0C(const HDSLoc * locator, char * value, size_t len, int * status) {
   if (isv5) {
     retval = datGet0C_v5(locator, value, len, status);
   } else {
+    LOCK_MUTEX;
     retval = datGet0C_v4(locator, value, len, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGet0C",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -567,7 +622,9 @@ datGet0D(const HDSLoc * locator, double * value, int * status) {
   if (isv5) {
     retval = datGet0D_v5(locator, value, status);
   } else {
+    LOCK_MUTEX;
     retval = datGet0D_v4(locator, value, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGet0D",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -587,7 +644,9 @@ datGet0R(const HDSLoc * locator, float * value, int * status) {
   if (isv5) {
     retval = datGet0R_v5(locator, value, status);
   } else {
+    LOCK_MUTEX;
     retval = datGet0R_v4(locator, value, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGet0R",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -607,7 +666,9 @@ datGet0I(const HDSLoc * locator, int * value, int * status) {
   if (isv5) {
     retval = datGet0I_v5(locator, value, status);
   } else {
+    LOCK_MUTEX;
     retval = datGet0I_v4(locator, value, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGet0I",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -627,7 +688,9 @@ datGet0K(const HDSLoc * locator, int64_t * value, int * status) {
   if (isv5) {
     retval = datGet0K_v5(locator, value, status);
   } else {
+    LOCK_MUTEX;
     retval = datGet0K_v4(locator, value, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGet0K",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -647,7 +710,9 @@ datGet0W(const HDSLoc * locator, short * value, int * status) {
   if (isv5) {
     retval = datGet0W_v5(locator, value, status);
   } else {
+    LOCK_MUTEX;
     retval = datGet0W_v4(locator, value, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGet0W",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -667,7 +732,9 @@ datGet0UW(const HDSLoc * locator, unsigned short * value, int * status) {
   if (isv5) {
     retval = datGet0UW_v5(locator, value, status);
   } else {
+    LOCK_MUTEX;
     retval = datGet0UW_v4(locator, value, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGet0UW",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -687,7 +754,9 @@ datGet0L(const HDSLoc * locator, hdsbool_t * value, int * status) {
   if (isv5) {
     retval = datGet0L_v5(locator, value, status);
   } else {
+    LOCK_MUTEX;
     retval = datGet0L_v4(locator, value, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGet0L",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -707,7 +776,9 @@ datGet1C(const HDSLoc * locator, size_t maxval, size_t bufsize, char *buffer, ch
   if (isv5) {
     retval = datGet1C_v5(locator, maxval, bufsize, buffer, pntrs, actval, status);
   } else {
+    LOCK_MUTEX;
     retval = datGet1C_v4(locator, maxval, bufsize, buffer, pntrs, actval, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGet1C",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -727,7 +798,9 @@ datGet1D(const HDSLoc * locator, size_t maxval, double values[], size_t *actval,
   if (isv5) {
     retval = datGet1D_v5(locator, maxval, values, actval, status);
   } else {
+    LOCK_MUTEX;
     retval = datGet1D_v4(locator, maxval, values, actval, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGet1D",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -747,7 +820,9 @@ datGet1I(const HDSLoc * locator, size_t maxval, int values[], size_t *actval, in
   if (isv5) {
     retval = datGet1I_v5(locator, maxval, values, actval, status);
   } else {
+    LOCK_MUTEX;
     retval = datGet1I_v4(locator, maxval, values, actval, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGet1I",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -767,7 +842,9 @@ datGet1K(const HDSLoc * locator, size_t maxval, int64_t values[], size_t *actval
   if (isv5) {
     retval = datGet1K_v5(locator, maxval, values, actval, status);
   } else {
+    LOCK_MUTEX;
     retval = datGet1K_v4(locator, maxval, values, actval, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGet1K",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -787,7 +864,9 @@ datGet1W(const HDSLoc * locator, size_t maxval, short values[], size_t *actval, 
   if (isv5) {
     retval = datGet1W_v5(locator, maxval, values, actval, status);
   } else {
+    LOCK_MUTEX;
     retval = datGet1W_v4(locator, maxval, values, actval, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGet1W",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -807,7 +886,9 @@ datGet1UW(const HDSLoc * locator, size_t maxval, unsigned short values[], size_t
   if (isv5) {
     retval = datGet1UW_v5(locator, maxval, values, actval, status);
   } else {
+    LOCK_MUTEX;
     retval = datGet1UW_v4(locator, maxval, values, actval, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGet1UW",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -827,7 +908,9 @@ datGet1R(const HDSLoc * locator, size_t maxval, float values[], size_t *actval, 
   if (isv5) {
     retval = datGet1R_v5(locator, maxval, values, actval, status);
   } else {
+    LOCK_MUTEX;
     retval = datGet1R_v4(locator, maxval, values, actval, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGet1R",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -847,7 +930,9 @@ datGet1L(const HDSLoc * locator, size_t maxval, hdsbool_t values[], size_t *actv
   if (isv5) {
     retval = datGet1L_v5(locator, maxval, values, actval, status);
   } else {
+    LOCK_MUTEX;
     retval = datGet1L_v4(locator, maxval, values, actval, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGet1L",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -867,7 +952,9 @@ datGetVC(const HDSLoc * locator, size_t maxval, size_t bufsize, char *buffer, ch
   if (isv5) {
     retval = datGetVC_v5(locator, maxval, bufsize, buffer, pntrs, actval, status);
   } else {
+    LOCK_MUTEX;
     retval = datGetVC_v4(locator, maxval, bufsize, buffer, pntrs, actval, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGetVC",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -888,7 +975,9 @@ datGetVD(const HDSLoc * locator, size_t maxval, double values[], size_t *actval,
   if (isv5) {
     retval = datGetVD_v5(locator, maxval, values, actval, status);
   } else {
+    LOCK_MUTEX;
     retval = datGetVD_v4(locator, maxval, values, actval, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGetVD",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -908,7 +997,9 @@ datGetVI(const HDSLoc * locator, size_t maxval, int values[], size_t *actval, in
   if (isv5) {
     retval = datGetVI_v5(locator, maxval, values, actval, status);
   } else {
+    LOCK_MUTEX;
     retval = datGetVI_v4(locator, maxval, values, actval, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGetVI",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -928,7 +1019,9 @@ datGetVK(const HDSLoc * locator, size_t maxval, int64_t values[], size_t *actval
   if (isv5) {
     retval = datGetVK_v5(locator, maxval, values, actval, status);
   } else {
+    LOCK_MUTEX;
     retval = datGetVK_v4(locator, maxval, values, actval, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGetVK",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -948,7 +1041,9 @@ datGetVR(const HDSLoc * locator, size_t maxval, float values[], size_t *actval, 
   if (isv5) {
     retval = datGetVR_v5(locator, maxval, values, actval, status);
   } else {
+    LOCK_MUTEX;
     retval = datGetVR_v4(locator, maxval, values, actval, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGetVR",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -968,7 +1063,9 @@ datGetVL(const HDSLoc * locator, size_t maxval, hdsbool_t values[], size_t *actv
   if (isv5) {
     retval = datGetVL_v5(locator, maxval, values, actval, status);
   } else {
+    LOCK_MUTEX;
     retval = datGetVL_v4(locator, maxval, values, actval, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datGetVL",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -989,7 +1086,9 @@ datIndex(const HDSLoc *locator1, int index, HDSLoc **locator2, int *status) {
   if (isv5) {
     retval = datIndex_v5(locator1, index, locator2, status);
   } else {
+    LOCK_MUTEX;
     retval = datIndex_v4(locator1, index, locator2, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datIndex",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1009,7 +1108,9 @@ datLen(const HDSLoc *locator, size_t *len, int *status) {
   if (isv5) {
     retval = datLen_v5(locator, len, status);
   } else {
+    LOCK_MUTEX;
     retval = datLen_v4(locator, len, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datLen",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1029,7 +1130,9 @@ datMap(HDSLoc *locator, const char *type_str, const char *mode_str, int ndim, co
   if (isv5) {
     retval = datMap_v5(locator, type_str, mode_str, ndim, dims, pntr, status);
   } else {
+    LOCK_MUTEX;
     retval = datMap_v4(locator, type_str, mode_str, ndim, dims, pntr, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datMap",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1049,7 +1152,9 @@ datMapC(HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], un
   if (isv5) {
     retval = datMapC_v5(locator, mode_str, ndim, dims, pntr, status);
   } else {
+    LOCK_MUTEX;
     retval = datMapC_v4(locator, mode_str, ndim, dims, pntr, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datMapC",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1069,7 +1174,9 @@ datMapD(HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], do
   if (isv5) {
     retval = datMapD_v5(locator, mode_str, ndim, dims, pntr, status);
   } else {
+    LOCK_MUTEX;
     retval = datMapD_v4(locator, mode_str, ndim, dims, pntr, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datMapD",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1089,7 +1196,9 @@ datMapI(HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], in
   if (isv5) {
     retval = datMapI_v5(locator, mode_str, ndim, dims, pntr, status);
   } else {
+    LOCK_MUTEX;
     retval = datMapI_v4(locator, mode_str, ndim, dims, pntr, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datMapI",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1109,7 +1218,9 @@ datMapK(HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], in
   if (isv5) {
     retval = datMapK_v5(locator, mode_str, ndim, dims, pntr, status);
   } else {
+    LOCK_MUTEX;
     retval = datMapK_v4(locator, mode_str, ndim, dims, pntr, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datMapK",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1129,7 +1240,9 @@ datMapL(HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], hd
   if (isv5) {
     retval = datMapL_v5(locator, mode_str, ndim, dims, pntr, status);
   } else {
+    LOCK_MUTEX;
     retval = datMapL_v4(locator, mode_str, ndim, dims, pntr, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datMapL",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1149,7 +1262,9 @@ datMapR(HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], fl
   if (isv5) {
     retval = datMapR_v5(locator, mode_str, ndim, dims, pntr, status);
   } else {
+    LOCK_MUTEX;
     retval = datMapR_v4(locator, mode_str, ndim, dims, pntr, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datMapR",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1170,7 +1285,9 @@ datMapN(HDSLoc *locator, const char *type_str, const char *mode_str, int ndim, v
   if (isv5) {
     retval = datMapN_v5(locator, type_str, mode_str, ndim, pntr, dims, status);
   } else {
+    LOCK_MUTEX;
     retval = datMapN_v4(locator, type_str, mode_str, ndim, pntr, dims, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datMapN",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1190,7 +1307,9 @@ datMapV(HDSLoc *locator, const char *type_str, const char *mode_str, void **pntr
   if (isv5) {
     retval = datMapV_v5(locator, type_str, mode_str, pntr, actval, status);
   } else {
+    LOCK_MUTEX;
     retval = datMapV_v4(locator, type_str, mode_str, pntr, actval, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datMapV",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1211,7 +1330,9 @@ datMould(HDSLoc *locator, int ndim, const hdsdim dims[], int *status) {
   if (isv5) {
     retval = datMould_v5(locator, ndim, dims, status);
   } else {
+    LOCK_MUTEX;
     retval = datMould_v4(locator, ndim, dims, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datMould",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1238,7 +1359,9 @@ datMove(HDSLoc **locator1, const HDSLoc *locator2, const char *name_str, int *st
     datMove_v5(locator1, locator2, name_str, status);
   } else if ( !loc1isv5 && !loc2isv5 ) {
     isv5 = 0;
+    LOCK_MUTEX;
     datMove_v4(locator1, locator2, name_str, status);
+    UNLOCK_MUTEX;
   } else {
     HDSLoc * parenloc = NULL;
     char namestr[DAT__SZNAM+1];
@@ -1266,7 +1389,9 @@ datMsg(const char * token, const HDSLoc * locator) {
   if (ISHDSv5(locator)) {
     datMsg_v5(token, locator);
   } else {
+    LOCK_MUTEX;
     datMsg_v4(token, locator);
+    UNLOCK_MUTEX;
   }
   return;
 }
@@ -1285,7 +1410,9 @@ datName(const HDSLoc *locator, char name_str[DAT__SZNAM+1], int *status) {
   if (isv5) {
     retval = datName_v5(locator, name_str, status);
   } else {
+    LOCK_MUTEX;
     retval = datName_v4(locator, name_str, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datName",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1305,7 +1432,9 @@ datNcomp(const HDSLoc *locator, int *ncomp, int *status) {
   if (isv5) {
     retval = datNcomp_v5(locator, ncomp, status);
   } else {
+    LOCK_MUTEX;
     retval = datNcomp_v4(locator, ncomp, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNcomp",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1325,7 +1454,9 @@ datNew(const HDSLoc *locator, const char *name_str, const char *type_str, int nd
   if (isv5) {
     retval = datNew_v5(locator, name_str, type_str, ndim, dims, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew_v4(locator, name_str, type_str, ndim, dims, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1345,7 +1476,9 @@ datNewC(const HDSLoc *locator, const char *name_str, size_t len, int ndim, const
   if (isv5) {
     retval = datNewC_v5(locator, name_str, len, ndim, dims, status);
   } else {
+    LOCK_MUTEX;
     retval = datNewC_v4(locator, name_str, len, ndim, dims, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNewC",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1365,7 +1498,9 @@ datNew0(const HDSLoc *locator, const char *name_str, const char *type_str, int *
   if (isv5) {
     retval = datNew0_v5(locator, name_str, type_str, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew0_v4(locator, name_str, type_str, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew0",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1385,7 +1520,9 @@ datNew0D(const HDSLoc *locator, const char *name_str, int *status) {
   if (isv5) {
     retval = datNew0D_v5(locator, name_str, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew0D_v4(locator, name_str, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew0D",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1405,7 +1542,9 @@ datNew0I(const HDSLoc *locator, const char *name_str, int *status) {
   if (isv5) {
     retval = datNew0I_v5(locator, name_str, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew0I_v4(locator, name_str, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew0I",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1425,7 +1564,9 @@ datNew0K(const HDSLoc *locator, const char *name_str, int *status) {
   if (isv5) {
     retval = datNew0K_v5(locator, name_str, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew0K_v4(locator, name_str, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew0K",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1445,7 +1586,9 @@ datNew0W(const HDSLoc *locator, const char *name_str, int *status) {
   if (isv5) {
     retval = datNew0W_v5(locator, name_str, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew0W_v4(locator, name_str, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew0W",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1465,7 +1608,9 @@ datNew0UW(const HDSLoc *locator, const char *name_str, int *status) {
   if (isv5) {
     retval = datNew0UW_v5(locator, name_str, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew0UW_v4(locator, name_str, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew0UW",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1485,7 +1630,9 @@ datNew0R(const HDSLoc *locator, const char *name_str, int *status) {
   if (isv5) {
     retval = datNew0R_v5(locator, name_str, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew0R_v4(locator, name_str, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew0R",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1505,7 +1652,9 @@ datNew0L(const HDSLoc *locator, const char *name_str, int *status) {
   if (isv5) {
     retval = datNew0L_v5(locator, name_str, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew0L_v4(locator, name_str, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew0L",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1525,7 +1674,9 @@ datNew0C(const HDSLoc *locator, const char *name_str, size_t len, int *status) {
   if (isv5) {
     retval = datNew0C_v5(locator, name_str, len, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew0C_v4(locator, name_str, len, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew0C",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1547,7 +1698,9 @@ datNew1(const HDSLoc *locator, const char *name_str, const char *type_str, size_
   if (isv5) {
     retval = datNew1_v5(locator, name_str, type_str, len, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew1_v4(locator, name_str, type_str, len, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew1",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1567,7 +1720,9 @@ datNew1C(const HDSLoc *locator, const char *name_str, size_t len, size_t nelem, 
   if (isv5) {
     retval = datNew1C_v5(locator, name_str, len, nelem, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew1C_v4(locator, name_str, len, nelem, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew1C",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1587,7 +1742,9 @@ datNew1D(const HDSLoc *locator, const char *name_str, size_t len, int *status) {
   if (isv5) {
     retval = datNew1D_v5(locator, name_str, len, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew1D_v4(locator, name_str, len, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew1D",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1607,7 +1764,9 @@ datNew1I(const HDSLoc *locator, const char *name_str, size_t len, int *status) {
   if (isv5) {
     retval = datNew1I_v5(locator, name_str, len, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew1I_v4(locator, name_str, len, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew1I",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1627,7 +1786,9 @@ datNew1K(const HDSLoc *locator, const char *name_str, size_t len, int *status) {
   if (isv5) {
     retval = datNew1K_v5(locator, name_str, len, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew1K_v4(locator, name_str, len, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew1K",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1647,7 +1808,9 @@ datNew1W(const HDSLoc *locator, const char *name_str, size_t len, int *status) {
   if (isv5) {
     retval = datNew1W_v5(locator, name_str, len, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew1W_v4(locator, name_str, len, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew1W",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1667,7 +1830,9 @@ datNew1UW(const HDSLoc *locator, const char *name_str, size_t len, int *status) 
   if (isv5) {
     retval = datNew1UW_v5(locator, name_str, len, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew1UW_v4(locator, name_str, len, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew1UW",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1687,7 +1852,9 @@ datNew1L(const HDSLoc *locator, const char *name_str, size_t len, int *status) {
   if (isv5) {
     retval = datNew1L_v5(locator, name_str, len, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew1L_v4(locator, name_str, len, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew1L",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1707,7 +1874,9 @@ datNew1R(const HDSLoc *locator, const char *name_str, size_t len, int *status) {
   if (isv5) {
     retval = datNew1R_v5(locator, name_str, len, status);
   } else {
+    LOCK_MUTEX;
     retval = datNew1R_v4(locator, name_str, len, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datNew1R",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1727,7 +1896,9 @@ datParen(const HDSLoc *locator1, HDSLoc **locator2, int *status) {
   if (isv5) {
     retval = datParen_v5(locator1, locator2, status);
   } else {
+    LOCK_MUTEX;
     retval = datParen_v4(locator1, locator2, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datParen",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1748,7 +1919,9 @@ datPrec(const HDSLoc *locator, size_t *nbytes, int *status) {
   if (isv5) {
     retval = datPrec_v5(locator, nbytes, status);
   } else {
+    LOCK_MUTEX;
     retval = datPrec_v4(locator, nbytes, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPrec",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1768,7 +1941,9 @@ datPrim(const HDSLoc *locator, hdsbool_t *prim, int *status) {
   if (isv5) {
     retval = datPrim_v5(locator, prim, status);
   } else {
+    LOCK_MUTEX;
     retval = datPrim_v4(locator, prim, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPrim",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1788,7 +1963,9 @@ datPrmry(hdsbool_t set, HDSLoc **locator, hdsbool_t *prmry, int *status) {
   if (isv5) {
     retval = datPrmry_v5(set, locator, prmry, status);
   } else {
+    LOCK_MUTEX;
     retval = datPrmry_v4(set, locator, prmry, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPrmry",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1808,7 +1985,9 @@ datPutC(const HDSLoc *locator, int ndim, const hdsdim dims[], const char string[
   if (isv5) {
     retval = datPutC_v5(locator, ndim, dims, string, string_length, status);
   } else {
+    LOCK_MUTEX;
     retval = datPutC_v4(locator, ndim, dims, string, string_length, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPutC",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1828,7 +2007,9 @@ datPutD(const HDSLoc *locator, int ndim, const hdsdim dims[], const double value
   if (isv5) {
     retval = datPutD_v5(locator, ndim, dims, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPutD_v4(locator, ndim, dims, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPutD",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1848,7 +2029,9 @@ datPutI(const HDSLoc *locator, int ndim, const hdsdim dims[], const int values[]
   if (isv5) {
     retval = datPutI_v5(locator, ndim, dims, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPutI_v4(locator, ndim, dims, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPutI",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1868,7 +2051,9 @@ datPutK(const HDSLoc *locator, int ndim, const hdsdim dims[], const int64_t valu
   if (isv5) {
     retval = datPutK_v5(locator, ndim, dims, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPutK_v4(locator, ndim, dims, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPutK",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1888,7 +2073,9 @@ datPutW(const HDSLoc *locator, int ndim, const hdsdim dims[], const short values
   if (isv5) {
     retval = datPutW_v5(locator, ndim, dims, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPutW_v4(locator, ndim, dims, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPutW",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1908,7 +2095,9 @@ datPutUW(const HDSLoc *locator, int ndim, const hdsdim dims[], const unsigned sh
   if (isv5) {
     retval = datPutUW_v5(locator, ndim, dims, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPutUW_v4(locator, ndim, dims, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPutUW",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1928,7 +2117,9 @@ datPutR(const HDSLoc *locator, int ndim, const hdsdim dims[], const float values
   if (isv5) {
     retval = datPutR_v5(locator, ndim, dims, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPutR_v4(locator, ndim, dims, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPutR",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1948,7 +2139,9 @@ datPutL(const HDSLoc *locator, int ndim, const hdsdim dims[], const hdsbool_t va
   if (isv5) {
     retval = datPutL_v5(locator, ndim, dims, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPutL_v4(locator, ndim, dims, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPutL",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1968,7 +2161,9 @@ datPut(const HDSLoc *locator, const char *type_str, int ndim, const hdsdim dims[
   if (isv5) {
     retval = datPut_v5(locator, type_str, ndim, dims, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPut_v4(locator, type_str, ndim, dims, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPut",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -1988,7 +2183,9 @@ datPut0C(const HDSLoc * locator, const char * value, int * status) {
   if (isv5) {
     retval = datPut0C_v5(locator, value, status);
   } else {
+    LOCK_MUTEX;
     retval = datPut0C_v4(locator, value, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPut0C",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2008,7 +2205,9 @@ datPut0D(const HDSLoc * locator, double value, int * status) {
   if (isv5) {
     retval = datPut0D_v5(locator, value, status);
   } else {
+    LOCK_MUTEX;
     retval = datPut0D_v4(locator, value, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPut0D",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2028,7 +2227,9 @@ datPut0R(const HDSLoc * locator, float value, int * status) {
   if (isv5) {
     retval = datPut0R_v5(locator, value, status);
   } else {
+    LOCK_MUTEX;
     retval = datPut0R_v4(locator, value, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPut0R",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2048,7 +2249,9 @@ datPut0I(const HDSLoc * locator, int value, int * status) {
   if (isv5) {
     retval = datPut0I_v5(locator, value, status);
   } else {
+    LOCK_MUTEX;
     retval = datPut0I_v4(locator, value, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPut0I",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2068,7 +2271,9 @@ datPut0K(const HDSLoc * locator, int64_t value, int * status) {
   if (isv5) {
     retval = datPut0K_v5(locator, value, status);
   } else {
+    LOCK_MUTEX;
     retval = datPut0K_v4(locator, value, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPut0K",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2088,7 +2293,9 @@ datPut0W(const HDSLoc * locator, short value, int * status) {
   if (isv5) {
     retval = datPut0W_v5(locator, value, status);
   } else {
+    LOCK_MUTEX;
     retval = datPut0W_v4(locator, value, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPut0W",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2108,7 +2315,9 @@ datPut0UW(const HDSLoc * locator, unsigned short value, int * status) {
   if (isv5) {
     retval = datPut0UW_v5(locator, value, status);
   } else {
+    LOCK_MUTEX;
     retval = datPut0UW_v4(locator, value, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPut0UW",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2128,7 +2337,9 @@ datPut0L(const HDSLoc * locator, hdsbool_t value, int * status) {
   if (isv5) {
     retval = datPut0L_v5(locator, value, status);
   } else {
+    LOCK_MUTEX;
     retval = datPut0L_v4(locator, value, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPut0L",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2148,7 +2359,9 @@ datPut1C(const HDSLoc * locator, size_t nval, const char *values[], int * status
   if (isv5) {
     retval = datPut1C_v5(locator, nval, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPut1C_v4(locator, nval, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPut1C",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2168,7 +2381,9 @@ datPut1D(const HDSLoc * locator, size_t nval, const double values[], int * statu
   if (isv5) {
     retval = datPut1D_v5(locator, nval, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPut1D_v4(locator, nval, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPut1D",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2188,7 +2403,9 @@ datPut1I(const HDSLoc * locator, size_t nval, const int values[], int * status) 
   if (isv5) {
     retval = datPut1I_v5(locator, nval, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPut1I_v4(locator, nval, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPut1I",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2208,7 +2425,9 @@ datPut1K(const HDSLoc * locator, size_t nval, const int64_t values[], int * stat
   if (isv5) {
     retval = datPut1K_v5(locator, nval, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPut1K_v4(locator, nval, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPut1K",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2228,7 +2447,9 @@ datPut1W(const HDSLoc * locator, size_t nval, const short values[], int * status
   if (isv5) {
     retval = datPut1W_v5(locator, nval, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPut1W_v4(locator, nval, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPut1W",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2248,7 +2469,9 @@ datPut1UW(const HDSLoc * locator, size_t nval, const unsigned short values[], in
   if (isv5) {
     retval = datPut1UW_v5(locator, nval, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPut1UW_v4(locator, nval, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPut1UW",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2268,7 +2491,9 @@ datPut1R(const HDSLoc * locator, size_t nval, const float values[], int * status
   if (isv5) {
     retval = datPut1R_v5(locator, nval, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPut1R_v4(locator, nval, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPut1R",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2288,7 +2513,9 @@ datPut1L(const HDSLoc * locator, size_t nval, const hdsbool_t values[], int * st
   if (isv5) {
     retval = datPut1L_v5(locator, nval, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPut1L_v4(locator, nval, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPut1L",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2308,7 +2535,9 @@ datPutVD(const HDSLoc * locator, size_t nval, const double values[], int * statu
   if (isv5) {
     retval = datPutVD_v5(locator, nval, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPutVD_v4(locator, nval, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPutVD",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2328,7 +2557,9 @@ datPutVI(const HDSLoc * locator, size_t nval, const int values[], int * status) 
   if (isv5) {
     retval = datPutVI_v5(locator, nval, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPutVI_v4(locator, nval, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPutVI",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2348,7 +2579,9 @@ datPutVK(const HDSLoc * locator, size_t nval, const int64_t values[], int * stat
   if (isv5) {
     retval = datPutVK_v5(locator, nval, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPutVK_v4(locator, nval, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPutVK",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2368,7 +2601,9 @@ datPutVR(const HDSLoc * locator, size_t nval, const float values[], int * status
   if (isv5) {
     retval = datPutVR_v5(locator, nval, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPutVR_v4(locator, nval, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPutVR",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2388,7 +2623,9 @@ datPutVL(const HDSLoc * locator, size_t nval, const hdsbool_t values[], int * st
   if (isv5) {
     retval = datPutVL_v5(locator, nval, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPutVL_v4(locator, nval, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPutVL",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2408,7 +2645,9 @@ datPutVC(const HDSLoc * locator, size_t nval, const char *values[], int * status
   if (isv5) {
     retval = datPutVC_v5(locator, nval, values, status);
   } else {
+    LOCK_MUTEX;
     retval = datPutVC_v4(locator, nval, values, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datPutVC",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2429,7 +2668,9 @@ datRef(const HDSLoc * locator, char * ref, size_t reflen, int *status) {
   if (isv5) {
     retval = datRef_v5(locator, ref, reflen, status);
   } else {
+    LOCK_MUTEX;
     retval = datRef_v4(locator, ref, reflen, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datRef",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2449,7 +2690,9 @@ datRefct(const HDSLoc *locator, int *refct, int *status) {
   if (isv5) {
     retval = datRefct_v5(locator, refct, status);
   } else {
+    LOCK_MUTEX;
     retval = datRefct_v4(locator, refct, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datRefct",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2469,7 +2712,9 @@ datRenam(HDSLoc *locator, const char *name_str, int *status) {
   if (isv5) {
     retval = datRenam_v5(locator, name_str, status);
   } else {
+    LOCK_MUTEX;
     retval = datRenam_v4(locator, name_str, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datRenam",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2489,7 +2734,9 @@ datReset(const HDSLoc *locator, int *status) {
   if (isv5) {
     retval = datReset_v5(locator, status);
   } else {
+    LOCK_MUTEX;
     retval = datReset_v4(locator, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datReset",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2509,7 +2756,9 @@ datRetyp(const HDSLoc *locator, const char *type_str, int *status) {
   if (isv5) {
     retval = datRetyp_v5(locator, type_str, status);
   } else {
+    LOCK_MUTEX;
     retval = datRetyp_v4(locator, type_str, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datRetyp",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2529,7 +2778,9 @@ datShape(const HDSLoc *locator, int maxdim, hdsdim dims[], int *actdim, int *sta
   if (isv5) {
     retval = datShape_v5(locator, maxdim, dims, actdim, status);
   } else {
+    LOCK_MUTEX;
     retval = datShape_v4(locator, maxdim, dims, actdim, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datShape",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2549,7 +2800,9 @@ datSize(const HDSLoc *locator, size_t *size, int *status) {
   if (isv5) {
     retval = datSize_v5(locator, size, status);
   } else {
+    LOCK_MUTEX;
     retval = datSize_v4(locator, size, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datSize",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2569,7 +2822,9 @@ datSlice(const HDSLoc *locator1, int ndim, const hdsdim lower[], const hdsdim up
   if (isv5) {
     retval = datSlice_v5(locator1, ndim, lower, upper, locator2, status);
   } else {
+    LOCK_MUTEX;
     retval = datSlice_v4(locator1, ndim, lower, upper, locator2, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datSlice",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2589,7 +2844,9 @@ datState(const HDSLoc *locator, hdsbool_t *state, int *status) {
   if (isv5) {
     retval = datState_v5(locator, state, status);
   } else {
+    LOCK_MUTEX;
     retval = datState_v4(locator, state, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datState",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2609,7 +2866,9 @@ datStruc(const HDSLoc *locator, hdsbool_t *struc, int *status) {
   if (isv5) {
     retval = datStruc_v5(locator, struc, status);
   } else {
+    LOCK_MUTEX;
     retval = datStruc_v4(locator, struc, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datStruc",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2630,7 +2889,9 @@ datTemp(const char *type_str, int ndim, const hdsdim dims[], HDSLoc **locator, i
     retval = datTemp_v5(type_str, ndim, dims, locator, status);
     used = "(v5)";
   } else {
+    LOCK_MUTEX;
     retval = datTemp_v4(type_str, ndim, dims, locator, status);
+    UNLOCK_MUTEX;
     used = "(v4)";
   }
   HDS_CHECK_STATUS("datTemp", used);
@@ -2651,7 +2912,9 @@ datThere(const HDSLoc *locator, const char *name_c, hdsbool_t *there, int *statu
   if (isv5) {
     retval = datThere_v5(locator, name_c, there, status);
   } else {
+    LOCK_MUTEX;
     retval = datThere_v4(locator, name_c, there, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datThere",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2671,7 +2934,9 @@ datType(const HDSLoc *locator, char type_str[DAT__SZTYP + 1], int *status) {
   if (isv5) {
     retval = datType_v5(locator, type_str, status);
   } else {
+    LOCK_MUTEX;
     retval = datType_v4(locator, type_str, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datType",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2691,7 +2956,9 @@ datUnmap(HDSLoc *locator, int *status) {
   if (isv5) {
     retval = datUnmap_v5(locator, status);
   } else {
+    LOCK_MUTEX;
     retval = datUnmap_v4(locator, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datUnmap",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2711,7 +2978,9 @@ datValid(const HDSLoc *locator, hdsbool_t *valid, int *status) {
   if (isv5) {
     retval = datValid_v5(locator, valid, status);
   } else {
+    LOCK_MUTEX;
     retval = datValid_v4(locator, valid, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datValid",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2731,7 +3000,9 @@ datVec(const HDSLoc *locator1, HDSLoc **locator2, int *status) {
   if (isv5) {
     retval = datVec_v5(locator1, locator2, status);
   } else {
+    LOCK_MUTEX;
     retval = datVec_v4(locator1, locator2, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datVec",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2771,11 +3042,13 @@ hdsCopy(const HDSLoc *locator, const char *file_str, const char name_str[DAT__SZ
   /* So we need to walk through and can not simply use datCopy
     - we can use two routines used by dat1CopyXtoY though. */
   datStruc(locator, &struc, status);
+  LOCK_MUTEX;
   if (struc) {
     dat1CopyStrucXtoY( locator, outloc, status );
   } else {
     dat1CopyPrimXtoY( locator, outloc, status );
   }
+  UNLOCK_MUTEX;
   datAnnul(&outloc, status);
   HDS_CHECK_STATUS("hdsCopy", (ISHDSv5(locator) ? "(v5)" : "(v4)"));
   return *status;
@@ -2795,7 +3068,9 @@ hdsErase(HDSLoc **locator, int *status) {
   if (isv5) {
     retval = hdsErase_v5(locator, status);
   } else {
+    LOCK_MUTEX;
     retval = hdsErase_v4(locator, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("hdsErase",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2831,7 +3106,9 @@ hdsFlush(const char *group_str, int *status) {
      v4 will deal with it. */
   hdsFlush_v5(group_str, status);
   if (*status == DAT__GRPIN) emsAnnul(status);
+  LOCK_MUTEX;
   hdsFlush_v4(group_str, status);
+  UNLOCK_MUTEX;
   HDS_CHECK_STATUS("hdsFlush", "(both)");
   return *status;
 }
@@ -2850,7 +3127,9 @@ hdsFree(const HDSLoc *locator, int *status) {
   if (isv5) {
     retval = hdsFree_v5(locator, status);
   } else {
+    LOCK_MUTEX;
     retval = hdsFree_v4(locator, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("hdsFree",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2870,7 +3149,9 @@ hdsGroup(const HDSLoc *locator, char group_str[DAT__SZGRP+1], int *status) {
   if (isv5) {
     retval = hdsGroup_v5(locator, group_str, status);
   } else {
+    LOCK_MUTEX;
     retval = hdsGroup_v4(locator, group_str, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("hdsGroup",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2891,7 +3172,9 @@ hdsGtune(const char *param_str, int *value, int *status) {
     used = "(wrapper)";
   } else {
     hdsGtune_v5(param_str, value, status);
+    LOCK_MUTEX;
     hdsGtune_v4(param_str, value, status);
+    UNLOCK_MUTEX;
     used = "(both)";
   }
   if (*status != SAI__OK) {
@@ -2919,7 +3202,9 @@ hdsInfoI(const HDSLoc* locator, const char *topic_str, const char *extra, int *r
   if (!locator) {
     int res_v4 = 0;
     int res_v5 = 0;
+    LOCK_MUTEX;
     hdsInfoI_v4(locator, topic_str, extra, &res_v4, status);
+    UNLOCK_MUTEX;
     hdsInfoI_v5(locator, topic_str, extra, &res_v5, status);
     retval = *status;
     *result = res_v4 + res_v5;
@@ -2928,7 +3213,9 @@ hdsInfoI(const HDSLoc* locator, const char *topic_str, const char *extra, int *r
     used = "(v5)";
   } else {
     used = "(v4)";
+    LOCK_MUTEX;
     retval = hdsInfoI_v4(locator, topic_str, extra, result, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("hdsInfoI", used);
   return retval;
@@ -2948,7 +3235,9 @@ hdsLink(HDSLoc *locator, const char *group_str, int *status) {
   if (isv5) {
     retval = hdsLink_v5(locator, group_str, status);
   } else {
+    LOCK_MUTEX;
     retval = hdsLink_v4(locator, group_str, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("hdsLink",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2968,7 +3257,9 @@ hdsLock(const HDSLoc *locator, int *status) {
   if (isv5) {
     retval = hdsLock_v5(locator, status);
   } else {
+    LOCK_MUTEX;
     retval = hdsLock_v4(locator, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("hdsLock",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -2989,7 +3280,9 @@ hdsNew(const char *file_str, const char *name_str, const char *type_str, int ndi
     retval = hdsNew_v5(file_str, name_str, type_str, ndim, dims, locator, status);
     used = "(v5)";
   } else {
+    LOCK_MUTEX;
     retval = hdsNew_v4(file_str, name_str, type_str, ndim, dims, locator, status);
+    UNLOCK_MUTEX;
     used = "(v4)";
   }
   HDS_CHECK_STATUS("hdsNew", used);
@@ -3007,7 +3300,9 @@ hdsOpen(const char *file_str, const char *mode_str, HDSLoc **locator, int *statu
   if (*status != SAI__OK) return *status;
   /* HDSv4 can reliably spot when a file is not v4
      format so for now we open in v4 and catch that specific error */
+  LOCK_MUTEX;
   hdsOpen_v4(file_str, mode_str, locator, status);
+  UNLOCK_MUTEX;
   if (*status == DAT__INCHK || *status == DAT__FILIN) {
     emsAnnul(status);
     hdsOpen_v5(file_str, mode_str, locator, status);
@@ -3027,7 +3322,9 @@ hdsShow(const char *topic_str, int *status) {
   EnterCheck("hdsShow",*status);
   if (*status != SAI__OK) return *status;
   retval = hdsShow_v5(topic_str, status);
+  LOCK_MUTEX;
   retval = hdsShow_v4(topic_str, status);
+  UNLOCK_MUTEX;
   HDS_CHECK_STATUS("hdsShow", "(both)");
   return retval;
 }
@@ -3043,7 +3340,9 @@ hdsState(hdsbool_t *state, int *status) {
   EnterCheck("hdsState",*status);
   if (*status != SAI__OK) return *status;
   retval = hdsState_v5(state, status);
+  LOCK_MUTEX;
   retval = hdsState_v4(state, status);
+  UNLOCK_MUTEX;
   HDS_CHECK_STATUS("hdsState", "(both)");
   return retval;
 }
@@ -3059,7 +3358,9 @@ hdsStop(int *status) {
   EnterCheck("hdsStop",*status);
   if (*status != SAI__OK) return *status;
   retval = hdsStop_v5(status);
+  LOCK_MUTEX;
   retval = hdsStop_v4(status);
+  UNLOCK_MUTEX;
   HDS_CHECK_STATUS("hdsStop", "(both)");
   return retval;
 }
@@ -3078,7 +3379,9 @@ hdsTrace(const HDSLoc *locator, int *nlev, char *path_str, char *file_str, int *
   if (isv5) {
     retval = hdsTrace_v5(locator, nlev, path_str, file_str, status, path_length, file_length);
   } else {
+    LOCK_MUTEX;
     retval = hdsTrace_v4(locator, nlev, path_str, file_str, status, path_length, file_length);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("hdsTrace",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -3099,7 +3402,9 @@ hdsTune(const char *param_str, int value, int *status) {
     used = "(wrapper)";
   } else {
     hdsTune_v5(param_str, value, status);
+    LOCK_MUTEX;
     hdsTune_v4(param_str, value, status);
+    UNLOCK_MUTEX;
     used = "(both)";
   }
   if (*status != SAI__OK) {
@@ -3140,7 +3445,9 @@ datConv(const HDSLoc *locator, const char *type_str, hdsbool_t *conv, int *statu
   if (isv5) {
     retval = datConv_v5(locator, type_str, conv, status);
   } else {
+    LOCK_MUTEX;
     retval = datConv_v4(locator, type_str, conv, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datConv",(isv5 ? "(v5)" : "(v4)"));
   return retval;
@@ -3160,7 +3467,9 @@ hdsClose(HDSLoc **locator, int *status) {
   if (isv5) {
     retval = hdsClose_v5(locator, status);
   } else {
+    LOCK_MUTEX;
     retval = hdsClose_v4(locator, status);
+    UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("hdsClose",(isv5 ? "(v5)" : "(v4)"));
   return retval;
