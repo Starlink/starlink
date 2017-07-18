@@ -144,8 +144,8 @@ components that are present within multiple bolometers. These components
 are assumed to represent the spatially varying background signal and are
 removed, leaving just the astronomical signal. The number of components
 to remove can be specified by the user, via a MAKEMAP configuration
-parameter called ``\texttt{pca.pcathresh}'' although
-\xref{\task{pol2map}}{sun258}{POL2MAP}, the reduction command for POL-2
+parameter called ``\texttt{pca.pcathresh}'' although \poltwomap,
+the reduction command for POL-2
 data, provides suitable defaults for this parameter:
 
 \begin{itemize}
@@ -189,11 +189,11 @@ pixels. Masks are used for two main purposes:
 \end{enumerate}
 
 
-The pol2map script uses different masks for these two purposes - the
+The \poltwomap\ script uses different masks for these two purposes - the
 ``AST'' mask and the ``PCA'' mask.  The PCA mask is in general less
 extensive than the AST mask, with the source areas being restricted to
 the brighter inner regions.  Each of these two masks can either be
-generated automatically within pol2map, or be specified by a fixed
+generated automatically within \task{pol2map}, or be specified by a fixed
 external NDF.
 
 
@@ -202,7 +202,7 @@ external NDF.
 
 \subsection*{Variances between POL-2 maps}
 
-MAPVAR is a pol2map parameter that controls how the variances in the
+MAPVAR is a \poltwomap\ parameter that controls how the variances in the
 coadded I, Q and U maps are formed.
 
 If MAPVAR is set TRUE, the variances in the coadded I, Q and U maps

@@ -2,7 +2,7 @@
 \label{sec:advanced}
 
 
-The pol2map tool for reducing POL-2 data was released to the science
+The \poltwomap\ tool for reducing POL-2 data was released to the science
 community for the start of 17B observing. As with all newly
 commissioned instrumentation the ``ideal'' reduction has yet to be
 finalised. This advanced section of the POL-2 data reduction
@@ -15,7 +15,7 @@ more detail.
 
 This section describes the six-step process of combining data for one
 or more new POL-2 observations into existing I, Q and U maps and vector
-catalogue created by an earlier run of pol2map.
+catalogue created by an earlier run of \task{pol2map}.
 
 \begin{enumerate}
 
@@ -66,8 +66,8 @@ maskout1=astmask_new           maskout2=pcamask_new
 \item If the mask has changed significantly and all observations need
   to be reprocessed using the new mask, remove the existing
   externally-masked maps so that they will be re-created by the next
-  invocation of pol2map.  Note - this will increase the length of time
-  taken by step 6 enormously.
+  invocation of \task{pol2map}.  Note -- this will increase the length of time
+  taken by Step~6 enormously.
 
   Ensure the new auto-masked co-add is used in place of the old one to
   define any new masks needed in future.
@@ -93,8 +93,8 @@ maskout1=astmask_new           maskout2=pcamask_new
 \section{\xlabel{pixelsize}Experimenting with pixel sizes}
 
 Currently, as with unpolarised SCUBA-2 reductions, the default
-reduction pixel size is 4".  The pixel size is controlled by the
-pixsize parameter in the \smurf\ pol2map command:
+reduction pixel size is 4\si{\arcsecond}.  The pixel size is controlled by the
+pixsize parameter in the \smurf\ \poltwomap\ command:
 
 \begin{terminalv}
 % pol2map pixsize=12
@@ -163,25 +163,26 @@ pixels and 7\si{\arcsecond} pixels.
 The error on the IP is reported to be of the order of 0.5\%.  It is
 possible to investigate the effects of the systematic error in IP by
 creating maps using the upper and lower limits on the IP value. The
-makemap configuration parameter ``ipoffset'' can be used to do such an
-investigation. To use it, run pol2map twice as follows:
+\task{makemap} configuration parameter \xparam{IPOFFSET}{ipoffset}
+can be used to do such an
+investigation. To use it, run \task{pol2map} twice as follows:
 
 \begin{terminalv}
 % pol2map config="ipoffset=-0.25"
 % pol2map config="ipoffset=0.25"
 \end{terminalv}
 
-This produces maps using the upper and lower IP limits (a range of
-0.5\%). If pol2map has already been run on POL-2 data then a file will
+to produce maps using the upper and lower IP limits (a range of
+0.5\%). If \task{pol2map} has already been run on POL-2 data then a file will
 already exist that was created using the mean IP (the mean IP is used
-if ipoffset is omitted from the config value, or the config parameter
+if ipoffset is omitted from the config value, or the configur parameter
 is omitted completely).
 
 %\section{\xlabel{simulations}Simulated data}
 
 
 \section{\label{sec:wcscopy}Adding WCS information back into a vector catalogue}
-Vector catalogues produced by pol2map contain information about World Coordinate
+Vector catalogues produced by \task{pol2map} contain information about World Coordinate
 Systems (WCS) in two different forms:
 
 \begin{enumerate}
