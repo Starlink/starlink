@@ -303,6 +303,7 @@ public class GenerateDependencies {
 
         for (Iterator ci = Component.allComponents(); ci.hasNext(); ) {
             Component c = (Component) ci.next();
+            boolean is_obsolete = false;
 
             // For each component in the list, extract all the
             // SOURCESET and BUILD dependencies and emit them as
@@ -374,6 +375,7 @@ public class GenerateDependencies {
             if (c.getStatus() == Component.STATUS_OBSOLETE) {
                 makefile.println("# Component " + c
                                    + " is OBSOLETE -- do not build");
+                is_obsolete = true;
             }
 
             // Emit the target
@@ -392,7 +394,8 @@ public class GenerateDependencies {
                     lastComponent = cpt;
                 }
 
-                if (cpt.getStatus() == Component.STATUS_OBSOLETE) {
+                if ((cpt.getStatus() == Component.STATUS_OBSOLETE)
+                        && ! is_obsolete) {
                     System.err.println("Component " + c.getName()
                                        + " depends on obsolete component "
                                        + cpt.getName());
