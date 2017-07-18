@@ -85,6 +85,7 @@
  *        Move end of #ifndef block after the included external data file.
  *     18-JUL-2017 (GSB):
  *        Correctly null-terminate facility name while parsing facility line.
+ *        Null-terminate facility prefix while parsing facility line.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -166,6 +167,7 @@ parse_facility(char buffer[MAXLINE])
 	    fac_prefix[p1-p] = *p1;
 	    p1++;
 	}
+        fac_prefix[p1-p] = '\0';
         while( strchr(" \t", *p1) != NULL)
    	  p1++;
 	if ( ((int)strlen(fac_prefix) > 9) || ((*p1 != '\n') && (*p1 != '!')) )
