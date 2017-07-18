@@ -23,7 +23,7 @@ catalogue created by an earlier run of pol2map.
   for individual observations stored in the directory specified by
   parameter mapdir, and then add in the raw data files for the new
   observations. The auto-masked I maps have names that end in
-  \texttt{$\_$imap.sdf}.
+  \file{$\_$imap.sdf}.
 
 \begin{terminalv}
 % ls maps/*imap.sdf > infiles.list
@@ -58,8 +58,9 @@ maskout1=astmask_new           maskout2=pcamask_new
 
 
 \item Decide if the addition of the new data has changed the masks
-  significantly. This involves comparing astmask.sdf and
-  astmask$\_$new.sdf (and also pcamask.sdf and pcamask$\_$new.sdf).
+  significantly. This involves comparing \file{astmask.sdf} and
+  \file{astmask$\_$new.sdf} (and also \file{pcamask.sdf} and
+  \file{pcamask$\_$new.sdf}).
 
 
 \item If the mask has changed significantly and all observations need
@@ -115,7 +116,7 @@ pixels and 7\si{\arcsecond} pixels.
 
 
 \item Create AST and PCA masks with 12\si{\arcsecond} pixels from the
-  iauto12.sdf file:
+  \file{iauto12.sdf} file.
 
 
 \begin{terminalv}
@@ -152,7 +153,7 @@ pixels and 7\si{\arcsecond} pixels.
   should be examined to check that it does not have such artificial
   features.
 
-  Check the masks (astmask12.sdf and pcamask12.sdf) to make sure they
+  Check the masks (\file{astmask12.sdf} and \file{pcamask12.sdf}) to make sure they
   look reasonable.
 \end{tip}
 
@@ -213,18 +214,18 @@ Unfortunately, the popular TOPCAT catalogue browser (see
 
 For this reason, Polpack contains a command that can be used to copy the
 WCS FrameSet from one catalogue to another.  Say for instance you create
-catalogue \texttt{mycat.FIT} using pol2map, and then use TOPCAT to remove
+catalogue \file{mycat.FIT} using \task{pol2map}, and then use \textsc{Topcat} to remove
 low signal-to-noise vectors, saving the results to a new catalogue called
-\texttt{selcat.FIT}. The WCS FrameSet will be missing from \texttt{selcat.FIT},
-and so we need to copy it back again from the original catalogue \texttt{mycat.FIT}.
+\file{selcat.FIT}. The WCS FrameSet will be missing from \file{selcat.FIT},
+and so we need to copy it back again from the original catalogue \file{mycat.FIT}.
 To do this we use the ``\xref{polwcscopy}{sun223}{POLWCSCOPY}'' command:
 
 \begin{terminalv}
 % polwcscopy in=selcat ref=mycat out=selcat2
 \end{terminalv}
 
-This creates a third catalogue \texttt{selcat2.FIT}, which is a copy of
-\texttt{selcat.FIT} but with WCS inherited from \texttt{mycat.FIT}.
+This creates a third catalogue \file{selcat2.FIT}, which is a copy of
+\file{selcat.FIT} but with WCS inherited from \file{mycat.FIT}.
 
 
 

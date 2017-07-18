@@ -61,10 +61,10 @@ document (\xref{SUN/95}{sun95}{}) contain much useful information on
 the contents of an NDF structure and how to manipulate them.
 
 A single NDF structure describes a single data array with associated
-meta-data. NDFs are usually stored within files of type ``\verb+.sdf+''.
-In most cases (but not all), a single \verb+.sdf+ file will contain just
+meta-data. NDFs are usually stored within files of type \file{.sdf}.
+In most cases (but not all), a single \file{.sdf} file will contain just
 one top-level NDF structure, and the NDF can be referred to simply by
-giving the name of the file (with or without the ``\verb+.sdf+'' prefix).
+giving the name of the file (with or without the \file{.sdf} suffix).
 In many cases, a top-level NDF containing JCMT data will contain other
 ``extension'' NDFs buried inside them at a lower level. For instance, raw
 files contain a number of NDF components which store observation-specific
@@ -139,7 +139,7 @@ for the two packages can be accessed by typing \texttt{smurfhelp} or
 
 
 \begin{tip}
-The .sdf extension on file names need not be specified when running most
+The \file{.sdf} extension on file names need not be specified when running most
 Starlink commands (the exception is \picard).
 \end{tip}
 
