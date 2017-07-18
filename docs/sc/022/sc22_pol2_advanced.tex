@@ -35,7 +35,7 @@ catalogue created by an earlier run of \task{pol2map}.
   observation. The \xref{calcqu}{sun258}{CALCQU} and \makemap\ commands
   will be run on the new
   data and the resulting maps combined with the existing maps derived
-  from the older observations to create the new map:
+  from the older observations to create the new map.
 
 \begin{terminalv}
 % pol2map in=^infiles iout=iauto_new qout=! uout=! mapdir=maps qudir=qudata
@@ -50,7 +50,7 @@ catalogue created by an earlier run of \task{pol2map}.
   masks. The old masks should have been created earlier using the
   MASKOUT1 and MASKOUT2 parameters (see step 3 in section 2.2). To
   create the new masks that would be generated from the new
-  auto-masked map, use:
+  auto-masked map, use this command.
 
 \begin{terminalv}
 % pol2map  in=^infiles iout=! qout=! uout=! mapdir=maps mask=iauto_new \
@@ -80,7 +80,7 @@ maskout1=astmask_new           maskout2=pcamask_new
 \end{terminalv}
 
 \item Re-create the necessary externally masked maps and co-adds, and
-  then create the new vector catalogue:
+  then create the new vector catalogue.
 
 \begin{terminalv}
 % pol2map in=qudata/\* iout=iext_new qout=! uout=! mapdir=maps \
@@ -136,7 +136,7 @@ pixels and 7\si{\arcsecond} pixels.
 
 \item Create the 7\si{\arcsecond} externally masked I, Q and U maps
   using the above 7\si{\arcsecond} masks (note the \texttt{mask}
-  parameter value is enclosed in single AND double quotes):
+  parameter value is enclosed in single \emph{and} double quotes).
 
 \begin{terminalv}
 % pol2map in=qudata/\* iout=iext7 qout=qext7 uout=uext7 masktype=mask \

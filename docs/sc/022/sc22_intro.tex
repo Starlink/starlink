@@ -66,24 +66,24 @@ In most cases (but not all), a single \file{.sdf} file will contain just
 one top-level NDF structure, and the NDF can be referred to simply by
 giving the name of the file (with or without the \file{.sdf} suffix).
 In many cases, a top-level NDF containing JCMT data will contain other
-``extension'' NDFs buried inside them at a lower level. For instance, raw
-files contain a number of NDF components which store observation-specific
+`extension' NDFs buried inside them at a lower level. For instance, raw
+files contain a number of NDF components, which store observation-specific
 data necessary for subsequent processing. The contents of these (and
 other NDF) files may be listed with \HDSTRACEref. Each file holding raw
 JCMT data on disk is also known as a `sub-scan'.
 
 The main components of any NDF structure are:
 \begin{itemize}
-\item An array of numerical data (which may have up to seven
+\item an array of numerical data (which may have up to seven
 dimensions---usually three for JCMT data);
-\item An array of variance values corresponding to the numerical data
+\item an array of variance values corresponding to the numerical data
 values;
-\item An array holding up to eight Boolean flags (known as ``quality
-flags'') for each pixel;
+\item an array holding up to eight Boolean flags (known as `quality
+flags') for each pixel;
 \item World Co-ordinate System information;
-\item History;
-\item Data units;
-\item Other extensions items. These are defined by particular packages,
+\item history;
+\item data units; and
+\item other extensions items. These are defined by particular packages,
 but usually include a list of FITS-like headers together with provenance
 information that indicates how the NDF was created. Raw JCMT files also
 include extensions that define the state of the telescope and instrument
@@ -107,7 +107,8 @@ be defined. For C shells (csh, tcsh), the commands are:
 % source $STARLINK_DIR/etc/cshrc
 \end{terminalv}
 
-before using any Starlink commands. For Bourne shells (sh, bash, zsh), the commands are:
+before using any Starlink commands. For Bourne shells (sh, bash, zsh), the commands are
+as follows.
 
 \begin{terminalv}
 % export STARLINK_DIR=<path to the starlink installation>

@@ -182,7 +182,8 @@ format(1)=hms
 format(2)=dms
 \end{terminalv}
 
-Likewise, create a text file holding the style for the vector length key:
+Likewise, create a text file holding the style for the vector length
+key.
 
 \begin{terminalv}
 % cat ksty
@@ -194,14 +195,14 @@ drawtitle=0
 Plot the vector map (the \texttt{vscale} parameter controls the vector
 scale, and the \texttt{keyvec} parameter controls the length of the
 vector used as the key. There are many other parameters that can be
-used to control the behaviour of \texttt{polplot} -- see the \polpack
-manual (SUN/223).
+used to control the behaviour of \task{polplot} -- see the \polpack\
+manual (\xref{SUN/223}{sun223}{}).
 
 \begin{terminalv}
 % polplot selcat.FIT  style=^sty keystyle=^ksty vscale=20 keyvec=20
 \end{terminalv}
 
-Convert the map into PDF file and remove blank margins (if required):
+Convert the map into a PDF file and remove blank margins (if required).
 
 \begin{terminalv}
 % ps2pdf plot1.ps temp.pdf
@@ -242,14 +243,14 @@ format(2)=dms
 \end{terminalv}
 
 
-Produce the contour map
+Produce the contour map as follows.
 
 \begin{terminalv}
 % contour iext\(0~150,0~200\) mode=perc percentiles=\[88,90,92,94,96,98\] style=^sty key=no
 \end{terminalv}
 
 
-Modify the above style for the vector map to produce black vectors
+Modify the above style for the vector map to produce black vectors.
 
 \begin{terminalv}
 % cat vsty
@@ -258,7 +259,7 @@ colour(curves)=black
 \end{terminalv}
 
 
-Set the style for the vector length key:
+Set the style for the vector length key.
 
 
 \begin{terminalv}
@@ -269,14 +270,14 @@ drawtitle=0
 \end{terminalv}
 
 Plot the vector map over the contour map. The vectors and contours are
-aligned automatically in sky coordinates:
-
+aligned automatically in sky coordinates.
 
 \begin{terminalv}
 % polplot selcat.FIT axes=no clear=no style=^vsty keystyle=^ksty vscale=20 keyvec=20
 \end{terminalv}
 
-Convert into a PDF file and remove blank margins (if required):
+
+Convert into a PDF file and remove blank margins (if required).
 
 \begin{terminalv}
 % ps2pdf plot2.ps temp.pdf
@@ -335,7 +336,7 @@ maths "'((ia+0.0003)/0.14)**0.2'" ia=iext out=tmp1
 
 Display the negative image, using a reduced range of colours (pens) so
 that the brightest regions are grey rather than black.  This means the
-black vectors can still be seen over the brightest regions:
+black vectors can still be seen over the brightest regions.
 
 \begin{terminalv}
 % display tmp1\(5~150,0~200\) mode=perc percentiles=\[2,98\] style=^sty \
@@ -344,7 +345,7 @@ black vectors can still be seen over the brightest regions:
 \end{terminalv}
 
 
-Modify the above style for the vector map to produce wider vectors:
+Modify the above style for the vector map to produce wider vectors.
 
 \begin{terminalv}
 % cat vsty
@@ -353,7 +354,7 @@ width(curves)=3
 \end{terminalv}
 
 
-Set the style for the vector length key:
+Set the style for the vector length key.
 
 \begin{terminalv}
 % cat ksty
