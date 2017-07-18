@@ -97,18 +97,19 @@ pre-processing steps to clean the data, solves for multiple signal
 components using an iterative algorithm, and bins the resulting
 time-series data to produce a final science map.
 
-In pol2map the map-maker is used in conjunction with CALCQU (see
-section \ref{sec:calcqu}) to produce maps of Q and U, as well as I.
+In \poltwomap\ the map-maker is used in conjunction with
+\xref{calcqu}{sun258}{CALCQU} (see
+Section~\ref{sec:calcqu}) to produce maps of Q and U, as well as I.
 
 \section{\xlabel{calcqu}CALCQU}
 \label{sec:calcqu}
 
 In addition to the POL-2 data reduction building on the
-existing SCUBA-2 map-maker, pol2map also relies on the command
+existing SCUBA-2 map-maker, \poltwomap\ also relies on the command
 SMURF:CALQU.
 
-This CALCQU tool creates time series holding Q and U values from a set of POL-2
-time series holding raw data values. The supplied time series data files are first
+This \xref{calcqu}{sun258}{CALCQU} tool creates time series holding Q and U values from a set of POL-2
+time series holding raw data values. The supplied time-series data files are first
 flat-fielded, cleaned and concatenated, before being used to create
 the Q and U values. The Q and U time-series are down-sampled to 2Hz
 (\emph{i.e.} they contain two Q or U samples per second), and are 

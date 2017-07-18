@@ -32,7 +32,8 @@ catalogue created by an earlier run of \task{pol2map}.
 
 
 \item Create a new auto-masked, co-added I map including the new
-  observation. The calcqu and makemap commands will be run on the new
+  observation. The \xref{calcqu}{sun258}{CALCQU} and \makemap\ commands
+  will be run on the new
   data and the resulting maps combined with the existing maps derived
   from the older observations to create the new map:
 
@@ -126,7 +127,7 @@ pixels and 7\si{\arcsecond} pixels.
 
 \item Create masks with 7\si{\arcsecond} pixels by resampling the
   12\si{\arcsecond} masks created at step 2. This is done using the
-  \Kappa\ sqorst command:
+  \Kappa\ \xref{\task{sqorst}}{sun95}{SQORST} command:
 
 \begin{terminalv}
 % sqorst  mode=pixelscale pixscale=\'7,7,7E-05\' in=astmask12 out=astmask7
@@ -206,14 +207,14 @@ removed from the vector catalogue. This could happen for instance if you
 use inappropriate software to process an existing catalogue, creating a
 new output catalogue --- the WCS FrameSet may not be copied to the output
 catalogue, causing subsequent WCS-related operations to fail. It is safe
-to use Polpack, Kappa, Gaia and Cursa (see \xref{SUN/190}{sun190}{}) as
+to use \POLPACK, \Kappa, \GAIA\ and \xref{\textsc{Cursa}}{sun190}{}) as
 all these packages copy the WCS FrameSet to any new output catalogues.
-Unfortunately, the popular TOPCAT catalogue browser (see
+Unfortunately, the popular \topcat\ catalogue browser (see
 \url{http://www.starlink.ac.uk/topcat/}) and the STILTS package
 (\url{http://www.starlink.ac.uk/stilts/}) upon which it is based, do
 \emph{not} copy the WCS FrameSet to any output catalogues.
 
-For this reason, Polpack contains a command that can be used to copy the
+For this reason, \POLPACK\ contains a command that can be used to copy the
 WCS FrameSet from one catalogue to another.  Say for instance you create
 catalogue \file{mycat.FIT} using \task{pol2map}, and then use \textsc{Topcat} to remove
 low signal-to-noise vectors, saving the results to a new catalogue called
