@@ -142,7 +142,8 @@ ALL_TARGETS = \
 	$(MANIFESTS)/sun101 \
 	$(MANIFESTS)/sun202 \
 	$(MANIFESTS)/sun242 \
-	$(MANIFESTS)/sun249
+	$(MANIFESTS)/sun249 \
+	$(MANIFESTS)/sun270
 
 
 # The other important target is `buildsupport', the dependencies of
