@@ -83,6 +83,8 @@
  *        Write end marker before including external data files to
  *        assist cremsg in parsing the generated include files.
  *        Move end of #ifndef block after the included external data file.
+ *     18-JUL-2017 (GSB):
+ *        Correctly null-terminate facility name while parsing facility line.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -128,7 +130,7 @@ parse_facility(char buffer[MAXLINE])
 	fac_name[p1-p] = *p1;
 	p1++;
     }
-    fac_name[p1-p+1] = '\0';
+    fac_name[p1-p] = '\0';
     if ((int)strlen(fac_name) > 9 || *p1 != ',')
 	return 0;
     if ( (fac_code = strtol( p1+1, &p, 10)) == 0 )
