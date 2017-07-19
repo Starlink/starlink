@@ -132,14 +132,14 @@ $\sim$cos($\phi$) while the power is $\sim$cos$^{2}$($\phi$).
 
 
 The radiation passing through the polarimeter is detected by
-SCUBA-2. The detected intensity (I$_{detected}$) is a combination of
-\emph{both} the unpolarised intensity (I$_{unpolarised}$) and the
-linearly polarised intensity (I$_{p}$)\footnote{The total intensity of
-the source, $I$, is $I_{unpolarised} + I_{p}$.}. This detected intensity can be
+SCUBA-2. The detected intensity (I$_{\textnormal{detected}}$) is a combination of
+\emph{both} the unpolarised intensity (I$_{\textnormal{unpolarised}}$) and the
+linearly polarised intensity (I$_{\textnormal{p}}$)\footnote{The total intensity of
+the source, $I$, is $I_{\textnormal{unpolarised}} + I_{\textnormal{p}}$.}. This detected intensity can be
 described by:
 
 \begin{equation}
-I_{detected} = \frac{I_{unpolarised}}{2}+ I_{p}\cdot\left(\frac{1+\cos(2\phi - 2\theta)}{2} \right)
+I_{\textnormal{detected}} = \frac{I_{\textnormal{unpolarised}}}{2}+ I_{\textnormal{p}}\cdot\left(\frac{1+\cos(2\phi - 2\theta)}{2} \right)
 \end{equation}
 
 with the above equation being in terms of the effective analyser
@@ -148,7 +148,7 @@ This can also be expressed in terms of the  the HWP angle ($\delta$).
 
 \begin{equation}
 \label{eqn:idet}
-I_{detected} = \frac{I_{unpolarised}}{2}+I_{p}\cdot\left(\frac{1+\cos(4\delta - 2\theta)}{2} \right)
+I_{\textnormal{detected}} = \frac{I_{\textnormal{unpolarised}}}{2}+I_{p}\cdot\left(\frac{1+\cos(4\delta - 2\theta)}{2} \right)
 \end{equation}
 
 
@@ -225,19 +225,19 @@ following is a good approximation for correcting the measurement for
 the effects of the IP:
 
 \begin{equation}
-Q = Q_{m} - I. ip_{q}
+Q = Q_{\textnormal{m}} - I. ip_{\textnormal{q}}
 \end{equation}
 
 \begin{equation}
-U = U_{m} - I. ip_{u}
+U = U_{\textnormal{m}} - I. ip_{\textnormal{u}}
 \end{equation}
 
-where $Q_{m}$ and $U_{m}$ are the measured values for a single
+where $Q_{\textnormal{m}}$ and $U_{\textnormal{m}}$ are the measured values for a single
 bolometer sample at some point on the sky. $Q$ and $U$ are the true
 (corrected) values, $I$ is the astronomical total intensity at the same
 point on the sky (i.e. the total intensity after removal of the sky
-and electronic backgrounds) and $ip_{q}$ and $ip_{u}$ are factors that
-may vary slowly with focal plane position and/or azimuth and
+and electronic backgrounds) and $ip_{\textnormal{q}}$ and $ip_{\textnormal{u}}$
+are factors that may vary slowly with focal plane position and/or azimuth and
 elevation.
 
 IP correction of a POL-2 map therefore requires a total
@@ -336,8 +336,8 @@ Half-wave plate rotation frequency& \SI{2}{Hz}\\
 \begin{center}
 \includegraphics[width=0.6\linewidth]{POLCV_DAISY_schematic_detailed.png}
 \caption [Detail of POL-2 Scan Pattern]{Detail of
-  POLCV\_DAISY. $R_{0}$ is the map pattern radius, $R_{t}$ the turn
-  radius, and $R_{a}$ is the nominal avoidance radius. For more
+  POLCV\_DAISY. $R_{0}$ is the map pattern radius, $R_{\textnormal{t}}$ the turn
+  radius, and $R_{\textnormal{a}}$ is the nominal avoidance radius. For more
   details see Table~\ref{tab:scanpar}.}
 \label{fig:scandetail}
 \end{center}
