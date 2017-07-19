@@ -95,7 +95,7 @@ of POL-2 is given in Figure~\ref{fig:pol2sc2diagram}.
 \includegraphics[width=0.8\linewidth]{singopt.png}
 \caption [POL-2 optical components]{ The main optical components in a
   typical single-beam imaging polarimeter such as POL-2 (taken from
-  SUN/223).}
+  \xref{SUN/223}{sun223}{}).}
 \label{fig:pol2sc2diagram}
 \end{center}
 \end{figure}
@@ -104,7 +104,7 @@ Rotating the HWP rotates any linearly polarised component of incoming
 radiation. The HWP rotates this incoming linear polarisation with
 twice the speed of the HWP angle ($\delta$) producing the
 \emph{effective analyser} position ($\phi$ - as defined in
-\xref{the POLPACK documentation}{sun223} {thepolarimeter}), such that:
+\xref{the POLPACK documentation}{sun223}{thepolarimeter}), such that:
 
 
 \begin{equation}
@@ -440,8 +440,8 @@ sub-array for observation 34 taken on 12\textsuperscript{th} January
 
 Raw POL-2 data come in uncalibrated units. The first calibration step
 is to scale the raw data to units of pico Watts (pW) by applying the
-flat-field solution. This step is performed internally by the SMURF
-command \xref{\task{calcqu}}{sun258}{} -- used to calculate
+flat-field solution. This step is performed internally by the \SMURF\
+command \xref{\task{calcqu}}{sun258}{CALCQU} -- used to calculate
 I, Q and U time-streams from the
 raw data -- but can be done manually when examining the raw data.
 
