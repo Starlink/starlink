@@ -83,6 +83,10 @@
  *        Write end marker before including external data files to
  *        assist cremsg in parsing the generated include files.
  *        Move end of #ifndef block after the included external data file.
+ *     18-JUL-2017 (GSB):
+ *        Correctly null-terminate facility name while parsing facility line.
+ *        Null-terminate facility prefix while parsing facility line.
+ *        Initialize error number and severity for each file.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -98,7 +102,7 @@
 
 #define MAXLINE 101
 
-unsigned int errcode, fac_code=0, message_number=1, severity=0;
+unsigned int fac_code=0;
 char fac_name[10], fac_prefix[10];
 
 int f77_include=0, f77_INCLUDE=0, c_header=0, c_error=0;
@@ -128,7 +132,7 @@ parse_facility(char buffer[MAXLINE])
 	fac_name[p1-p] = *p1;
 	p1++;
     }
-    fac_name[p1-p+1] = '\0';
+    fac_name[p1-p] = '\0';
     if ((int)strlen(fac_name) > 9 || *p1 != ',')
 	return 0;
     if ( (fac_code = strtol( p1+1, &p, 10)) == 0 )
@@ -164,6 +168,7 @@ parse_facility(char buffer[MAXLINE])
 	    fac_prefix[p1-p] = *p1;
 	    p1++;
 	}
+        fac_prefix[p1-p] = '\0';
         while( strchr(" \t", *p1) != NULL)
    	  p1++;
 	if ( ((int)strlen(fac_prefix) > 9) || ((*p1 != '\n') && (*p1 != '!')) )
@@ -179,6 +184,8 @@ process_file(char *filename)
 /*
  * Process a message file.
  */
+    unsigned int errcode, message_number=1, severity=0;
+
     FILE *fp; /* , *fp0, *fp1, *fp2; */
     FILE *fp_c = NULL;
     FILE *fp_f = NULL;
