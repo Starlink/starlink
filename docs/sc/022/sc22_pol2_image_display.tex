@@ -165,6 +165,12 @@ described in \xref{SUN/95: Descriptions of Frame Attributes}{sun95}{ap_frmatt}.
 In this section an output file: \file{plot1.pdf} is created from the input
 catalogue \file{mycat.FIT}
 
+Select a higher quality PostScript font (Times New Roman in this case).
+
+\begin{terminalv}
+setenv PGPLOT_PS_FONT Times
+\end{terminalv}
+
 Select the PostScript graphics device, writing to file \file{plot1.ps}.
 
 \begin{terminalv}
@@ -172,11 +178,11 @@ gdset plot1.ps/acps
 \end{terminalv}
 
 For convenience, create a text file holding the main plotting style for
-\task{polplot}.
+\xref{polplot}{sun223}{POLPLOT}.
 
 \begin{terminalv}
 % cat sty
-colour = black
+colour=black
 drawtitle=0
 format(1)=hms
 format(2)=dms
@@ -187,7 +193,7 @@ key.
 
 \begin{terminalv}
 % cat ksty
-colour = black
+colour=black
 drawtitle=0
 \end{terminalv}
 
@@ -226,15 +232,17 @@ Convert the map into a PDF file and remove blank margins (if required).
 In this section we create an output file: \file{plot2.pdf} from the input
 catalogue \file{mycat.FIT}.
 
+Select the PostScript graphics device, writing to file \file{plot2.ps}.
+
 \begin{terminalv}
 % gdset plot2.ps/acps
 \end{terminalv}
 
-Setting up the main plotting style for \contour\ and \task{polplot}:
+Set up the main plotting style for \contour\ and \task{polplot}:
 
 \begin{terminalv}
 % cat sty
-colour = black
+colour=black
 colour(curves)=red
 width(curves)=3
 drawtitle=0
@@ -318,7 +326,7 @@ Set the main plotting style for \xref{\task{display}}{sun95}{DISPLAY} and
 
 \begin{terminalv}
 % cat sty
-colour = black
+colour=black
 drawtitle=0
 format(1)=hms
 format(2)=dms
