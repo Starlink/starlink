@@ -2954,12 +2954,146 @@ varmapmethod = 1
 
 #  The following parameters control the experimental PCA iterative
 #  model, which is primarily intended for use when reducing POL2 scan
-#  and spin data. They should be documented properly if use of a PCA
-#  model turns out to be a useful thing.
-pca.pcathresh = 4
+#  and spin data.
+
+#-----------------------------------------------------------------
+#  Name: 	pca.pcathresh
+#  Type: 	float
+#  Default: 	4.0
+#  Purpose: 	Controls the determination of multiple background signals
+#  Description: An alternative to modelling the background in each
+#               bolometer using a simple common-mode (the COM model) is to
+#               use principal component analysis (the PCA model). The PCA
+#		model calculates a new set of basis vectors (components)
+#		from the bolometer time-series such that the components
+#		have zero covariances. The amplitudes of these new correlated
+# 		signals are then calculated, and the largest amplitude
+#		components can be removed. Whereas the COM model assumes
+#               a single background signal that is the same for all
+#               bolometers, the PCA model is capable of detecting multiple
+#               background signals with different correlation patterns across
+#               the array.
+#
+#               As with the common-mode, PCA can be used either as a
+#               distinct model within the iterative map-making process
+#               (in which case "PCA" should be included in the string supplied
+#               for parameter "modelorder"), or as a step in the cleaning
+#               performed prior to the start of the iterative map-making loop
+#               (see parameter "pcathresh").
+#
+# 		The main parameter for the PCA model is the number of
+#               components to remove, specified by "pca.pcathresh". If a
+#               positive value is supplied, a sigma-clipping algorithm is
+#               used to determine the number of components to remove (see
+#               below). If a negative value is supplied, the nearest
+#               integer (after removal of the minus sign) is found and
+#               used as the absolute number of components to remove. Thus
+#               if pca.pcathresh is set to -10, the 10 strongest components
+#               are removed.
+#
+#               If a positive value is supplied for pca.pcathresh, the RMS
+#               amplitude across all bolometers is calculated for each
+#               component -- a single positive number related to the average
+#               strength of the component. An iterative sigma clipper is then
+#               used to flag components that are more than pcathresh*RMS away
+#               from the mean value. This approach is quite arbitrary, but a
+#               value of about 4 seems reasonable for some test data.
+#
+#               Be warned that this statistical black box will remove real
+#               correlated astronomical signals as well, thus slowing down the
+#               rate of convergence of iterative map-making algorithm. As with
+#               common-mode removal, the actual impact on science will need to
+#               be calibrated with simulations.
+#
+#               The PCA model can be masked in the same way as other models
+#               to reduce the influence of bright sources on the model. A set
+#               of parameters "pca.xxx" can be used for this purpose, where
+#               "xxx" is any of  "zero_accum", "zero_circle", "zero_freeze",
+#               "zero_lowhits", "zero_mask", "zero_niter", "zero_notlast",
+#               "zero_snr", "zero_snr_ffclean", "zero_snr_hipass",
+#               "zero_snr_lopass", "zero_snr_fwhm", "zero_snr_low",
+#               "zero_snrlo" or "zero_union". See the documentation for the
+#               equivalent "com.xxx" parameters for details.
+
+
+#-----------------------------------------------------------------
+#  Name: 	pca.pcathresh_freeze
+#  Type: 	float
+#  Default: 	0.0
+#  Purpose: 	Controls the determination of multiple background signals
+#  Description: If a positive value is supplied for parameter
+#               "pca.pcathresh" (and the PCA model is included in
+#               parameter "modelorder"), then the number of PCA components
+#               to remove on each iteration is determined dynamically
+#               using a sigma-clipping algorithm, and the number of
+#               components removed can change between iterations. A
+#               potential problem with this is that the number of
+#               components removed may not settle down to a fixed value
+#               but may continue to change, thus slowing convergence.
+#               To prevent this, a non-zero value may be specified for
+#               "pca.pcathresh_freeze", which prevents any further change
+#               to the number of components removed. If the value of
+#               pca.pcathresh_freeze is between zero and 1.0, it specifies
+#               the normalised mapchange value at which to freeze the
+#               number of removed components. If the pca.pcathresh_freeze
+#               value is greater than 1 it specifies an integer number of
+#               iterations, in addition to the initial AST-skip
+#               iterations, after which the number of removed components
+#               should be frozen. If pca.pcathresh_freeze is negative, the
+#               number of components to remove is frozen as soon as any
+#               initial AST-skip iterations have been performed.
 pca.pcathresh_freeze = 0.0
+
+#-----------------------------------------------------------------
+#  Name: 	pca.comfill
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls the determination of multiple background signals
+#  Description: This parameter controls how missing bolometer values are
+#               handled by the PCA model (see parameter "pca.pcathresh").
+#               Such missing values, whether caused by rejection of bad
+#               data or masking of sources, are replaced by artificial
+#               data values representative of the surrounding data prior
+#               to the calculation of the PCA model. If the pca.comfill
+#               parameter is false (i.e. zero) then such gaps in the data
+#               are filled using linear interpolation between the
+#               neighbouring good values in the time-stream. if
+#               pca.comfill is true (i.e. non-zero) then gaps are filled
+#               using the common-mode signal (i.e. the mean of the
+#               remaining good values at each time-slice), together with
+#               corresponding bolometer gains. This can in some case
+#               produce a more reliable PCA model. However, using this
+#               option is only a good idea if there is a strong common
+#               mode present in the bolometer data. This will usually only
+#               be the case if PCA is the first model specified in
+#               parameter "modelorder".
+#
+#               If pca.comfill is non-zero, gaps are filled using a COM
+#               and GAI model determined using a set of parameters
+#               equivalent to those by the "normal" COM and GAI models,
+#               except that the name of each parameter is changed from
+#               "com.xxx" to "pca.xxx". Thus "pca.perarray" is used in
+#               place of the normal parameter "com.perarray".
 pca.comfill = 0
+
+
+#-----------------------------------------------------------------
+#  Name: 	pca.skip
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls the determination of multiple background signals
+#  Description: This parameter allows the PCA model (see parameter
+#               "pca.pcathresh") to be skipped on a specified number of
+#               initial iterations A fractional value between 0.0 and 1.0
+#               specifies the normalised map change value at which to
+#               start using the PCA model. A positive integer specifies
+#               the number of initial iterations for which no PCA model
+#               should be used. A negative value causes the PCA model to
+#               be used only on the very last iteration".
 pca.skip = 0
+
+
+
 
 #  Following are PCA masking parameters that are common to all models.
 pca.zero_accum = 0
