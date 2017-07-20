@@ -38,7 +38,8 @@ catalogue created by an earlier run of \task{pol2map}.
   from the older observations to create the new map.
 
 \begin{terminalv}
-% pol2map in=^infiles iout=iauto_new qout=! uout=! mapdir=maps qudir=qudata
+% pol2map in=^infiles iout=iauto_new qout=! uout=! mapdir=maps \
+     qudir=qudata
 \end{terminalv}
 
 
@@ -54,7 +55,7 @@ catalogue created by an earlier run of \task{pol2map}.
 
 \begin{terminalv}
 % pol2map  in=^infiles iout=! qout=! uout=! mapdir=maps mask=iauto_new \
-maskout1=astmask_new  maskout2=pcamask_new
+     maskout1=astmask_new  maskout2=pcamask_new
 \end{terminalv}
 
 \item Decide if the addition of the new data has changed the masks
@@ -110,8 +111,8 @@ pixels and 7\si{\arcsecond} pixels.
   data. For instance:
 
 \begin{terminalv}
-% pol2map in=^myfiles.list iout=iauto12 pixsize=12 qout=! uout=! mapdir=maps12 \
-                    qudir=qudata
+% pol2map in=^myfiles.list iout=iauto12 pixsize=12 qout=! uout=! \
+     mapdir=maps12 qudir=qudata
 \end{terminalv}
 
 
@@ -121,7 +122,7 @@ pixels and 7\si{\arcsecond} pixels.
 
 \begin{terminalv}
 % pol2map in=qudata/\* iout=! qout=! uout=! mapdir=maps12 mask=iauto12 \
-                   maskout1=astmask12 maskout2=pcamask12
+     maskout1=astmask12 maskout2=pcamask12
 \end{terminalv}
 
 \item Create masks with 7\si{\arcsecond} pixels by resampling the
