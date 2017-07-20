@@ -293,7 +293,7 @@ Convert into a PDF file and remove blank margins (if required).
 \end{center}
 \end{figure}
 
-\subsection{\xlabel{kappa-example3} Example 3 -- a vector map over a negative image}
+\subsection{\xlabel{kappa-example3} Example 3 -- a vector map over an image}
 \label{section:kappa-example3}
 
 
@@ -334,13 +334,12 @@ maths "'((ia+0.0003)/0.14)**0.2'" ia=iext out=tmp1
 \end{terminalv}
 
 
-Display the negative image, using a reduced range of colours (pens) so
-that the brightest regions are grey rather than black.  This means the
-black vectors can still be seen over the brightest regions.
+Display the image, using a reduced range of colours (pens) so
+that the darkest regions are grey rather than black.  This means the
+black vectors can still be seen within the dark regions.
 
 \begin{terminalv}
 % display tmp1\(0~50,0~50\) mode=perc percentiles=\[2,98\] style=^sty \
-        low=0.4 high=1.0 \
         penrange=\[0.4,1.0\]
 \end{terminalv}
 
