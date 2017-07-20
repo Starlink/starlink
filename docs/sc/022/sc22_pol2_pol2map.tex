@@ -144,8 +144,8 @@ separately). The PCA process identifies the strongest time-dependent
 components that are present within multiple bolometers. These components
 are assumed to represent the spatially varying background signal and are
 removed, leaving just the astronomical signal. The number of components
-to remove can be specified by the user, via a MAKEMAP configuration
-parameter called `\xparam{PCA.PCATHRESH}{pca.pcathresh} although \poltwomap,
+to remove can be specified by the user, via a \task{makemap} configuration
+parameter called \xparam{PCA.PCATHRESH}{pca.pcathresh} although \poltwomap,
 the reduction command for POL-2
 data, provides suitable defaults for this parameter.
 
@@ -154,12 +154,12 @@ data, provides suitable defaults for this parameter.
 \item second stage uses \param{pca.pcathresh} = -150
 \end{itemize}
 
-On each MAKEMAP iteration, the PCA process removes the background (thus
+On each \task{makemap} iteration, the PCA process removes the background (thus
 reducing the noise in the map) but also removes some of the astronomical
 signal. The amount of astronomical signal removed will be greater for
 larger values of \texttt{pca.pcathresh}. However, this astronomical
 signal is still present in the original time-series data and so can be
-recovered if sufficient MAKEMAP iterations are performed. In other words,
+recovered if sufficient \task{makemap} iterations are performed. In other words,
 using larger values of \param{pca.pcathresh} slows down the rate at
 which astronomical signal is transferred from the time-series data to the
 map, thus increasing the number of iterations required to recover the
@@ -185,7 +185,7 @@ pixels. Masks are used for two main purposes.
   zero at the end of each iteration within \makemap\ (except for the
   final iteration).
 \item They prevent bright sources polluting the evaluation of the
-  various noise models (PCA, COM, FLT) used within \makemap. Source
+  various noise models (PCA, COM, FLT) used within \task{makemap}. Source
   pixels are excluded from the calculation of these models.
 \end{enumerate}
 
