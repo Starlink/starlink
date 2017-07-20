@@ -452,12 +452,21 @@ command line.  The values are tabulated below.
 \label{sec:pol2map-fcf}
 
 Inserting POL-2 in front of SCUBA-2 reduces the throughput to SCUBA-2.
-To convert to astronomical units such as mJy/beam an efficiency must be
-applied to the SCUBA-2 FCFs.
+POL-2 is not a prefect polarimiter. Its wire grid absorbs and scatters incoming 
+signal so the modulation amplitude is lower than for a perfect polarimeter. 
+In addition cross polarization and depolarization decreases the modulation 
+amplitude without decreasing the power in the transmitted signal. The first 
+type of inefficiencies can be measured by comparing normal SCUBA-2 maps with 
+and without the polarimeter inserted. Such observations have been done on Uranus, 
+Mars and Jupiter. The second type of losses can be measured with a source of know polarization. 
 
-At \SI{850}{\micro\metre} and \SI{450}{\micro\metre} the FCF for POL-2
-is found to be a factor of 1.35 and 1.96 times higher than the
-standard SCUBA-2 FCF.
+To convert POL-2 data to astronomical units such as mJy/beam a Flux Conversion 
+Factor, FCF, must be applied to the data. For POL-2 the FCFs are quoted in terms of
+the SCUBA-2 FCF.
+
+At \SI{850}{\micro\metre} and \SI{450}{\micro\metre} the FCFs for POL-2
+are found to be a factor of 1.35 and 1.96 times higher than the
+standard SCUBA-2 FCF for \SI{850}{\micro\metre} and \SI{450}{\micro\metre}, respectively.
 
 
 \section{\xlabel{tweaking}Changing pixel size in pol2map}
