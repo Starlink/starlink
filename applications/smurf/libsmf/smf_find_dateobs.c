@@ -48,6 +48,8 @@
 *        Initial version.
 *     2009-05-19 (TIMJ):
 *        Fix end date calculation from JCMTSTATE.
+*     2017-07-21 (GSB):
+*        Annul error if DTAI header is undefined.
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -138,7 +140,11 @@ static double smf__find_utc( const smfHead *hdr, int first, int *status) {
       }
 
       astGetFitsF(hdr->fitshdr, "DTAI", &dtai);
-      if (dtai != VAL__BADD) {
+      if (*status == AST__FUNDEF) {
+        /* DTAI present but undefined. */
+        errAnnul( status );
+      }
+      else if (dtai != VAL__BADD) {
         astSetD( tf, "Dtai", dtai );
       }
 

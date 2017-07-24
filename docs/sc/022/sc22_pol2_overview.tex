@@ -39,11 +39,11 @@ POL-2 is designed to characterise linear polarisation.  The $V$
 parameter, consequently, is not discussed further with the focus on $I$,
 $Q$ and $U$.
 
-The linear Polarised Intensity (I$_{p}$) and  polarisation angle
+The linear Polarised Intensity (I$_{\textnormal{p}}$) and  polarisation angle
 ($\theta$) can be described as:
 
 \begin{equation}
-I_{p} = \sqrt{Q^{2}+U^{2}}
+I_{\textnormal{p}} = \sqrt{Q^{2}+U^{2}}
 \end{equation}
 \begin{equation}
 \theta = 0.5\arctan(U/Q)
@@ -52,10 +52,10 @@ I_{p} = \sqrt{Q^{2}+U^{2}}
 with Q and U related to the polarisation angle and the polarised intensity by:
 
 \begin{equation}
-Q = I_{p} \text{cos}(2\theta)
+Q = I_{\textnormal{p}} \text{cos}(2\theta)
 \end{equation}
 \begin{equation}
-U = I_{p} \text{sin}(2\theta)
+U = I_{\textnormal{p}} \text{sin}(2\theta)
 \end{equation}
 
 where
@@ -148,7 +148,8 @@ This can also be expressed in terms of the  the HWP angle ($\delta$).
 
 \begin{equation}
 \label{eqn:idet}
-I_{\textnormal{detected}} = \frac{I_{\textnormal{unpolarised}}}{2}+I_{p}\cdot\left(\frac{1+\cos(4\delta - 2\theta)}{2} \right)
+I_{\textnormal{detected}} =
+\frac{I_{\textnormal{unpolarised}}}{2}+I_{\textnormal{p}}\cdot\left(\frac{1+\cos(4\delta - 2\theta)}{2} \right)
 \end{equation}
 
 
@@ -430,7 +431,7 @@ observation in the format \texttt{yyyymmdd}, followed by a five-digit
 observation number, followed by the sub-scan number. The name ends
 with the standard suffix \file{.sdf} used by all Starlink NDF data
 files. For instance, the files listed above hold data from the s8a
-sub-array for observation 34 taken on 12\textsuperscript{th} January
+sub-array for Observation 34 taken on 12\textsuperscript{th} January
 2016.
 
 
@@ -452,7 +453,7 @@ purpose is to establish the absolute polarised intensities then a
 value for the Flux Conversion Factor (FCF) is required.
 
 The resulting map may have the FCF applied to convert it into units of
-Janskys. As is recommended with SCUBA-2 observing, it is advisable to
+janskys. As is recommended with SCUBA-2 observing, it is advisable to
 check that the FCF value applied to the data is sensible (and must be
 done manually). For more details see
 \cref{Chapter}{sec:pol2map-fcf}{POL-2 FCFs}.

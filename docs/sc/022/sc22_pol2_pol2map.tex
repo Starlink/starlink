@@ -143,8 +143,8 @@ time-streams in each sub-array (the Q and U data are processed
 separately). The PCA process identifies the strongest time-dependent
 components that are present within multiple bolometers. These components
 are assumed to represent the spatially varying background signal and are
-removed, leaving just the astronomical signal. The number of components
-to remove can be specified by the user, via a \task{makemap} configuration
+removed, leaving just the astronomical signal. You may specify the number of
+components to remove, via a \task{makemap} configuration
 parameter called \xparam{PCA.PCATHRESH}{pca.pcathresh} although \poltwomap,
 the reduction command for POL-2
 data, provides suitable defaults for this parameter.
@@ -206,15 +206,15 @@ external NDF.
 \param{MAPVAR} is a \poltwomap\ parameter that controls how the variances in the
 coadded I, Q and U maps are formed.
 
-If MAPVAR is set TRUE, the variances in the coadded I, Q and U maps
+If \param{MAPVAR} is set \texttt{TRUE}, the variances in the coadded I, Q and U maps
 are formed from the spread of pixel data values between the individual
-observation maps. If MAPVAR is FALSE (the default), the variances in
+observation maps. If \param{MAPVAR} is \texttt{FALSE} (the default), the variances in
 the coadded maps are formed by propagating the pixel variance values
-created by MAKEMAP from the individual observation maps (these are
+created by \makemap\ from the individual observation maps (these are
 based on the spread of I, Q or U values that fall in each pixel).
 
-Use MAPVAR=TRUE only if enough observations are available to make the
-variances between them meaningful.A general lower limit on its value
+Use \param{MAPVAR}=\texttt{TRUE} only if enough observations are available to make the
+variances between them meaningful. A general lower limit on its value
 is difficult to define, but is advised a minimum of 10 observations.
 
 
