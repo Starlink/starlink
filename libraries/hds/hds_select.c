@@ -23,7 +23,7 @@ static void EnterCheck( const char * func, int status ) { printf("Enter HDS rout
 #  define EnterCheck(A,B) ;
 #endif
 
-/* HDS V5 is thread-safe, but V4 is not. So we use a 
+/* HDS V5 is thread-safe, but V4 is not. So we use a
    mutex to serialise all calls to V4 functions. */
 static pthread_mutex_t hdsv4_mutex = PTHREAD_MUTEX_INITIALIZER;
 #define LOCK_MUTEX pthread_mutex_lock( &hdsv4_mutex );
@@ -1113,6 +1113,53 @@ datLen(const HDSLoc *locator, size_t *len, int *status) {
     UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datLen",(isv5 ? "(v5)" : "(v4)"));
+  return retval;
+}
+
+/*=========================================================*/
+/* datLock - Lock an object for use by the current thread. */
+/*=========================================================*/
+
+int
+datLock( HDSLoc *locator, int recurs, int readonly, int *status) {
+  int retval = 0;
+  int instat = *status;
+  int isv5 = ISHDSv5(locator);
+  EnterCheck("datLock",*status);
+  if (isv5) {
+    retval = datLock_v5(locator, recurs, readonly, status);
+  } else if( *status == SAI__OK ){
+    *status = DAT__VERMM;
+    datMsg( "O", locator );
+    emsRepf("","datLock: supplied HDS object (^O) uses V4 data format", status );
+    emsRepf("","The running application is multi-threaded and so requires V5 data files.",
+            status );
+  }
+  HDS_CHECK_STATUS("datLock","(v5)");
+  return retval;
+}
+
+
+/*=======================================================================*/
+/* datLocked - See of an object is locked for use by the current thread. */
+/*=======================================================================*/
+
+int
+datLocked( const HDSLoc *locator, int *status) {
+  int retval = 0;
+  int instat = *status;
+  int isv5 = ISHDSv5(locator);
+  EnterCheck("datLocked",*status);
+  if (isv5) {
+    retval = datLocked_v5(locator, status);
+  } else if( *status == SAI__OK ){
+    *status = DAT__VERMM;
+    datMsg( "O", locator );
+    emsRepf("","datLocked: supplied HDS object (^O) uses V4 data format", status );
+    emsRepf("","The running application is multi-threaded and so requires V5 data files.",
+            status );
+  }
+  HDS_CHECK_STATUS("datLocked","(v5)");
   return retval;
 }
 
@@ -2939,6 +2986,29 @@ datType(const HDSLoc *locator, char type_str[DAT__SZTYP + 1], int *status) {
     UNLOCK_MUTEX;
   }
   HDS_CHECK_STATUS("datType",(isv5 ? "(v5)" : "(v4)"));
+  return retval;
+}
+
+/*=============================================================*/
+/* datUnlock - Unlock an object so another thread can lock it. */
+/*=============================================================*/
+
+int
+datUnlock( HDSLoc *locator, int recurs, int *status) {
+  int retval = 0;
+  int instat = *status;
+  int isv5 = ISHDSv5(locator);
+  EnterCheck("datUnlock",*status);
+  if (isv5) {
+    retval = datUnlock_v5(locator, recurs, status);
+  } else if( *status == SAI__OK ){
+    *status = DAT__VERMM;
+    datMsg( "O", locator );
+    emsRepf("","datUnlock: supplied HDS object (^O) uses V4 data format", status );
+    emsRepf("","The running application is multi-threaded and so requires V5 data files.",
+            status );
+  }
+  HDS_CHECK_STATUS("datUnlock","(v5)");
   return retval;
 }
 
