@@ -18,6 +18,11 @@ static hdsbool_t HAVE_INITIALIZED_TUNING = 0;
    use version 4 */
 static int USE_VERSION5 = 0;
 
+/* Report an error if a thread lock function is used on a V4 locator?
+   Otherwise, the function returns without action. Default is to return
+   without action. Switch V4LOCK_ERROR on for debugging. */
+static int V4LOCK_ERROR = 0;
+
 
 /* A mutex used to serialise access to the getters and setters so that
    multiple threads do not try to access the global data simultaneously. */
@@ -33,6 +38,7 @@ static void hds1ReadTuneEnvironment () {
   LOCK_MUTEX;
   if(!HAVE_INITIALIZED_TUNING) {
     dat1Getenv( "HDS_VERSION5", USE_VERSION5, &USE_VERSION5 );
+    dat1Getenv( "HDS_V4LOCKERROR", V4LOCK_ERROR, &V4LOCK_ERROR );
     HAVE_INITIALIZED_TUNING = 1;
   }
   UNLOCK_MUTEX;
@@ -60,6 +66,8 @@ static void hds1ReadTuneEnvironment () {
 *        Name of the tuning parameter. Allowed values are:
 *        - VERSION5: Positive value and v5 will be called for new files,
 *                    zero, v4 will be used to create new files.
+*        - V4LOCKERROR: Report an error if a thread lock function is used on
+*                       a V4 locator (otherwise, do nothing).
 *     value = int (Given)
 *        New parameter value.
 *     status = int* (Given and Returned)
@@ -111,6 +119,10 @@ int hds1TuneWrapper( const char * param_str, int value, int *status ) {
     LOCK_MUTEX;
     USE_VERSION5 = ( value == 0 ? 0 : 1 );
     UNLOCK_MUTEX;
+  } else if (strncmp( param_str, "V4LOCKERROR", 11) == 0 ) {
+    LOCK_MUTEX;
+    V4LOCK_ERROR = ( value == 0 ? 0 : 1 );
+    UNLOCK_MUTEX;
   } else {
     *status = DAT__NAMIN;
     emsRepf("hdsTune_1", "hdsTune: Unknown tuning parameter '%s'",
@@ -142,6 +154,8 @@ int hds1TuneWrapper( const char * param_str, int value, int *status ) {
 *        Name of the tuning parameter whose value is required (case insensitive).
 *        Supported parameter names are:
 *        - VERSION5: Wrapper is using v5 for file creation if non-zero.
+*        - V4LOCKERROR: Report an error if a thread lock function is used on
+*                       a V4 locator (otherwise, do nothing).
 *     value = int * (Returned)
 *        Current value of the parameter.
 *     status = int* (Given and Returned)
@@ -197,6 +211,10 @@ hds1GtuneWrapper(const char *param_str, int *value, int *status) {
     LOCK_MUTEX;
     *value = ( USE_VERSION5 ? 1 : 0 );
     UNLOCK_MUTEX;
+  } else if (strncasecmp( param_str, "V4LOCKERROR", 11 ) ) {
+    LOCK_MUTEX;
+    *value = ( V4LOCK_ERROR ? 1 : 0 );
+    UNLOCK_MUTEX;
   } else {
     *status = DAT__NAMIN;
     emsRepf("hdsGtune", "hdsGtune: Do not know how to report on parameter %s",
@@ -213,4 +231,10 @@ hdsbool_t hds1UseVersion5() {
   /* Ensure that defaults have been read */
   hds1ReadTuneEnvironment();
   return USE_VERSION5;
+}
+
+hdsbool_t hds1V4LockError() {
+  /* Ensure that defaults have been read */
+  hds1ReadTuneEnvironment();
+  return V4LOCK_ERROR;
 }

@@ -1128,7 +1128,7 @@ datLock( HDSLoc *locator, int recurs, int readonly, int *status) {
   EnterCheck("datLock",*status);
   if (isv5) {
     retval = datLock_v5(locator, recurs, readonly, status);
-  } else if( *status == SAI__OK ){
+  } else if( *status == SAI__OK && hds1V4LockError() ){
     *status = DAT__VERMM;
     datMsg( "O", locator );
     emsRepf("","datLock: supplied HDS object (^O) uses V4 data format", status );
@@ -1152,7 +1152,7 @@ datLocked( const HDSLoc *locator, int *status) {
   EnterCheck("datLocked",*status);
   if (isv5) {
     retval = datLocked_v5(locator, status);
-  } else if( *status == SAI__OK ){
+  } else if( *status == SAI__OK && hds1V4LockError() ){
     *status = DAT__VERMM;
     datMsg( "O", locator );
     emsRepf("","datLocked: supplied HDS object (^O) uses V4 data format", status );
@@ -3001,7 +3001,7 @@ datUnlock( HDSLoc *locator, int recurs, int *status) {
   EnterCheck("datUnlock",*status);
   if (isv5) {
     retval = datUnlock_v5(locator, recurs, status);
-  } else if( *status == SAI__OK ){
+  } else if( *status == SAI__OK && hds1V4LockError() ){
     *status = DAT__VERMM;
     datMsg( "O", locator );
     emsRepf("","datUnlock: supplied HDS object (^O) uses V4 data format", status );
