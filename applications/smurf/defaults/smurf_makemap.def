@@ -3014,7 +3014,7 @@ varmapmethod = 1
 #               "zero_snr_lopass", "zero_snr_fwhm", "zero_snr_low",
 #               "zero_snrlo" or "zero_union". See the documentation for the
 #               equivalent "com.xxx" parameters for details.
-
+pca.pcathresh = 4.0
 
 #-----------------------------------------------------------------
 #  Name: 	pca.pcathresh_freeze
