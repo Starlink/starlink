@@ -6454,7 +6454,9 @@ package @PACKAGE@ {
 
         Type smurfhelp for help on @PACKAGE_UPCASE@ commands.
         Type "showme sun258" to browse the hypertext documentation.
-        Type "showme sc21" to view the SCUBA-2 map-making cookbook.
+        Type "showme sc20" to view the Heterodyne DR cookbook.
+        Type "showme sc21" to view the SCUBA-2 DR cookbook.
+        Type "showme sc22" to view the POL-2 DR cookbook.
 
     }
 
