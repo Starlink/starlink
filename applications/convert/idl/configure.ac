@@ -42,12 +42,14 @@ AC_FC_LIBRARY_LDFLAGS
 FCLIBS=`echo $FCLIBS | sed 's:\ \-l.*begin\ : :g'`
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [mers cnf sae ndf])
+STAR_DECLARE_DEPENDENCIES(build, [mers cnf sae ndf perl])
 STAR_DECLARE_DEPENDENCIES(link, [ndf])
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES([Makefile])
+
+STAR_CHECK_PROGS(perl)
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT

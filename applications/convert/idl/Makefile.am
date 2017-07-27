@@ -80,4 +80,4 @@ install-exec-hook: convert_idl.la
 	if test -f "$$DLNAME"; then \
 	   rm -f $$DLNAME ;\
 	fi ;\
-	$(LN_S) $(libdir)/$$DLNAME $$DLNAME
+	$(LN_S) `$(PERL) -MFile::Spec -e "print File::Spec->abs2rel('$(libdir)/$$DLNAME')"` $$DLNAME
