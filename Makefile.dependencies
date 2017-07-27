@@ -738,6 +738,7 @@ $(MANIFESTS)/dipso: \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pda \
+		$(MANIFESTS)/perl \
 		$(MANIFESTS)/pgp \
 		$(MANIFESTS)/pgplot \
 		$(MANIFESTS)/prm \
