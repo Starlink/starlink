@@ -19,7 +19,7 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS(per-package-dirs)
 
 dnl    Build dependencies for this package.
-STAR_DECLARE_DEPENDENCIES(build, [ast cat kaplibs snx pda ndf sae], link)
+STAR_DECLARE_DEPENDENCIES(build, [ast cat kaplibs snx pda ndf sae perl], link)
 STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 
 dnl    Find required versions of the programs we need for configuration
@@ -46,6 +46,8 @@ STAR_LATEX_DOCUMENTATION(sun50)
 
 dnl    Pick the best awk command, the _link script is quite demanding
 AC_PROG_AWK
+
+STAR_CHECK_PROGS(perl)
 
 AC_CONFIG_HEADERS(config.h)
 

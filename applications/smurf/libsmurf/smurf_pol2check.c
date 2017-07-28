@@ -296,7 +296,9 @@ void smurf_pol2check( int *status ) {
                if( there ) {
 
 /* For raw analysed intensity data check that the NDF Label component is
-   "Signal". */
+   "Signal". The initial contents of "label;" are used as the default, so
+   ensure that the initial value of "label" is a properly terminated string. */
+                  *label = 0;
                   ndfCget( indf, "Label", label, sizeof(label), status );
                   if( !strcmp( label, "Signal" ) ) {
                      astMapPutElemC( km, "RAW_TS", -1, filepath );

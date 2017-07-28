@@ -63,7 +63,7 @@ install-data-local:
 	fi
 	(cd $(DESTDIR)$(bindir) && \
 	rm -f libdipso.a ;\
-	@LN_S@ $(DESTDIR)$(libdir)/libdipso.a .)
+	@LN_S@ `$(PERL) -MFile::Spec -e "print File::Spec->abs2rel('$(DESTDIR)$(libdir)/libdipso.a')"` .)
 
 PUBLIC_INCLUDES = DECLARE_STKS DECLARE_LBLS DECLARE_PLTS DECLARE_DATA
 

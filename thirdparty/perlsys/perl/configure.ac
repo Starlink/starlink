@@ -50,12 +50,12 @@ dnl    push it through as part of optimize.
 
    ldflags=
    if test -n "$LDFLAGS"; then
-      ldflags="-Dldflags=$LDFLAGS"
+      ldflags="\"-Dldflags=$LDFLAGS\""
    fi
 
    cd perl; \
    rm -f config.sh ; \
-   sh ./Configure -des -Dprefix=${prefix}/Perl $cc "$ldflags" -Doptimize="$args"
+   eval "sh ./Configure -des -Dprefix=${prefix}/Perl $cc $ldflags -Doptimize=\"$args\""
 )
  
 dnl    Install Perl using a staging area to get all files listed in 

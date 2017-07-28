@@ -81,6 +81,9 @@
 *        Do not annul the error caused by hitting the end of string
 *        (LEX__ENDPARSE) as this indicates that the end of the array has
 *        not been located correctly.
+*     28-JUL-2017 (DSB):
+*        Use MESSYS__VAL_LEN (now 1944) to define the max length of a
+*        command line, instead of the local parameter MCLENGTH (was 444).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -98,6 +101,7 @@
       INCLUDE 'SUBPAR_PAR'
       INCLUDE 'LEX_ERR'
       INCLUDE 'LEX_PAR'
+      INCLUDE 'MESSYS_PAR'
 
 *  Arguments Given:
       INTEGER NAMECODE
@@ -116,8 +120,6 @@
       INCLUDE 'SUBPAR_CMN'
 
 *  Local Constants:
-      INTEGER MCLENGTH           ! maximum length of command line string
-      PARAMETER (MCLENGTH=444)
       INTEGER MAXCOMPS           ! maximum number of array components on
       PARAMETER (MAXCOMPS=100)   ! a command line
       INTEGER MAXDIMS            ! maximum number of array dimensions
@@ -125,7 +127,7 @@
 
 *  Local Variables:
       INTEGER ACTION              ! Action code from parser
-      CHARACTER*(MCLENGTH) STRING ! Parameter string from parser
+      CHARACTER*(MESSYS__VAL_LEN) STRING ! Parameter string from parser
       INTEGER SLEN                ! length of above
       INTEGER I, J                ! Loop counters
       INTEGER TYPE                ! type code for parameter

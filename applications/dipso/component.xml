@@ -13,7 +13,7 @@
   interface permits personal functions to be easily integrated.
   </p></abstract>
   <dependencies >
-    <build option='link'>ast</build><build option='link'>cat</build><build option='link'>kaplibs</build><build option='link'>snx</build><build option='link'>pda</build><build option='link'>ndf</build><build option='link'>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
+    <build option='link'>ast</build><build option='link'>cat</build><build option='link'>kaplibs</build><build option='link'>snx</build><build option='link'>pda</build><build option='link'>ndf</build><build option='link'>sae</build><build option='link'>perl</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

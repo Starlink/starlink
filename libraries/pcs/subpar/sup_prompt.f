@@ -86,6 +86,7 @@
 *     BDK: B D Kelly (ROE)
 *     AJC: A J Chipperfield (STARLINK)
 *     JAB: J A Bailey (JACH)
+*     DSB: D S Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -122,6 +123,9 @@
 *        Ensure DEFLEN set even when 0
 *     17-AUG-2001 (AJC)
 *        Make env var ADAM_NOPROMPT prevent prompting
+*     28-JUL-2017 (DSB):
+*        Use MESSYS__VAL_LEN (now 1944) to define the max length of a
+*        command line, instead of the local parameter MCLENGTH (was 444).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -136,10 +140,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_PARERR'
-
-*  Local Constants:
-      INTEGER MCLENGTH
-      PARAMETER ( MCLENGTH = 444 )
+      INCLUDE 'MESSYS_PAR'
 
 *  Arguments Given:
       CHARACTER*(*) PARAM               ! Name of parameter
@@ -169,8 +170,8 @@
 
 
 *  Local Variables:
-      CHARACTER*(MCLENGTH) PRTEXT           ! generated prompt string
-      CHARACTER*(MCLENGTH) P2STR            ! alternative prompt string
+      CHARACTER*(MESSYS__VAL_LEN) PRTEXT ! generated prompt string
+      CHARACTER*(MESSYS__VAL_LEN) P2STR  ! alternative prompt string
       INTEGER LENGTH                 ! length of generated prompt string
       INTEGER PARLEN                 ! length of parameter name
       INTEGER PRLEN                  ! length of prompt string

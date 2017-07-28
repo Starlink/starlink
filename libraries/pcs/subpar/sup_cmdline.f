@@ -62,6 +62,7 @@
 *     AJC: A J Chipperfield (STARLINK)
 *     TJF: T J Farrell (AAO)
 *     PWD: P W Draper (STARLINK)
+*     DSB: D S Berry (EAO)
 
 *  History:
 *     08-JAN-1987 (JAB):
@@ -184,6 +185,9 @@
 *     30-SEP-2004 (PWD):
 *        Stop USTRING being indexed by greater than SUBPAR__NAMELEN.
 *        It is often indexed by SLEN, which can be up to MCLENGTH.
+*     28-JUL-2017 (DSB):
+*        Use MESSYS__VAL_LEN (now 1944) to define the max length of a
+*        command line, instead of the local parameter MCLENGTH (was 444).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -202,6 +206,7 @@
       INCLUDE 'ADAM_DEFNS'
       INCLUDE 'LEX_ERR'
       INCLUDE 'LEX_PAR'
+      INCLUDE 'MESSYS_PAR'
 
 *  Arguments Given:
       INTEGER ACTCODE
@@ -218,18 +223,16 @@
       INTEGER CHR_LEN            ! Used length of string
 
 *  Local Constants:
-      INTEGER MCLENGTH           ! maximum length of command line
-      PARAMETER (MCLENGTH=444)
       INTEGER MAXPARS            ! maximum number of command line parame
       PARAMETER (MAXPARS=50)
       CHARACTER*15 POSTYPES(5)   ! Possible primitive data types
 
 *  Local Variables:
-      CHARACTER*(MCLENGTH+2) COMMAND  ! Command line with spaceCR added
+      CHARACTER*(MESSYS__VAL_LEN+2) COMMAND  ! Command line with spaceCR added
       INTEGER ENDLINE             ! Position of end of command line
       INTEGER ACTION              ! Action code from parser
       INTEGER NUMPARS             ! Number of parameters
-      CHARACTER*(MCLENGTH) STRING ! Parameter string from parser
+      CHARACTER*(MESSYS__VAL_LEN) STRING ! Parameter string from parser
       INTEGER SLEN                ! length of above
       INTEGER ISLEN               ! SLEN index into USTRING.
       CHARACTER*(SUBPAR__NAMELEN) USTRING  ! upper case STRING
@@ -259,7 +262,7 @@
       CALL EMS_MARK
 
 *  Find length of command line (+2 for termination)
-      ENDLINE = MIN(MCLENGTH, CHR_LEN(CMDLINE)) + 2
+      ENDLINE = MIN(MESSYS__VAL_LEN, CHR_LEN(CMDLINE)) + 2
 
 *  If there is anything on the command line, process it
       IF ( ENDLINE.GT.2 ) THEN
