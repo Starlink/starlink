@@ -59,6 +59,7 @@
 *     BDK: B D Kelly (ROE)
 *     JAB: J A Bailey (AAO)
 *     AJC: A J Chipperfield (STARLINK)
+*     DSB: D S Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -142,6 +143,9 @@
 *     21-MAR-2000 (AJC):
 *        Remove the trapping of directories in [] - VMS requirement
 *        causes problems with GRP
+*     28-JUL-2017 (DSB):
+*        Use MESSYS__VAL_LEN (now 1944) to define the max length of a
+*        command line, instead of the local parameter MCLENGTH (was 444).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -158,6 +162,7 @@
       INCLUDE 'SUBPAR_PAR'
       INCLUDE 'LEX_ERR'
       INCLUDE 'LEX_PAR'
+      INCLUDE 'MESSYS_PAR'
 
 *  Arguments Given:
       INTEGER NAMECODE          ! pointer to a parameter
@@ -176,8 +181,6 @@
       INTEGER CHR_LEN
 
 *  Local Constants:
-      INTEGER MCLENGTH           ! maximum length of string
-      PARAMETER (MCLENGTH=444)
       CHARACTER*15 POSTYPES(5)   ! Possible primitive data types
 
 *  External Functions:
@@ -186,11 +189,11 @@
 
 
 *  Local Variables:
-      CHARACTER*(MCLENGTH) VALUE  ! Returned string
-      CHARACTER*(MCLENGTH+3) COMMAND  ! Returned string with SPACE CR added
+      CHARACTER*(MESSYS__VAL_LEN) VALUE  ! Returned string
+      CHARACTER*(MESSYS__VAL_LEN+3) COMMAND  ! Returned string with SPACE CR added
       INTEGER ENDLINE             ! Length of command line
       INTEGER ACTION              ! Action code from parser
-      CHARACTER*(MCLENGTH) STRING ! Parameter string from parser
+      CHARACTER*(MESSYS__VAL_LEN) STRING ! Parameter string from parser
       CHARACTER*(SUBPAR__NAMELEN) USTRING ! Upper case of STRING
       INTEGER SLEN                ! length of above
       INTEGER J                   ! Loop counters

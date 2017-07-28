@@ -49,6 +49,7 @@
 
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
+*     DSB: D S Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -58,6 +59,9 @@
 *        Space fill remainder of line
 *     02-JUN-1992 (AJC):
 *        Prefix command too long message
+*     28-JUL-2017 (DSB):
+*        Use MESSYS__VAL_LEN (now 1944) to define the max length of a
+*        command line, instead of the local parameter MCLEN (was 444).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -70,8 +74,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INTEGER MCLEN              ! Max length of command line
-      PARAMETER ( MCLEN = 444 )
+      INCLUDE 'MESSYS_PAR'
 
 *  Arguments Returned:
       CHARACTER*(*) CMDLIN
@@ -88,7 +91,7 @@
       INTEGER OLDPTR             ! Saved pointer
       INTEGER I                  ! Loop counter
       INTEGER ARGLEN             ! Used length of ARG
-      CHARACTER*(MCLEN) ARG      ! Individual argument
+      CHARACTER*(MESSYS__VAL_LEN) ARG ! Individual argument
 *.
 
 *  Check inherited global status.
