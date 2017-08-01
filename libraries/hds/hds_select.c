@@ -1153,11 +1153,8 @@ datLocked( const HDSLoc *locator, int *status) {
   if (isv5) {
     retval = datLocked_v5(locator, status);
   } else if( *status == SAI__OK && hds1V4LockError() ){
-    *status = DAT__VERMM;
-    datMsg( "O", locator );
-    emsRepf("","datLocked: supplied HDS object (^O) uses V4 data format", status );
-    emsRepf("","The running application is multi-threaded and so requires V5 data files.",
-            status );
+    retval = 1;  /* In V4, all HDS objects are considered to be locked by
+                    the current thread for read-write. */
   }
   HDS_CHECK_STATUS("datLocked","(v5)");
   return retval;
