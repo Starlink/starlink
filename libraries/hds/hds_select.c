@@ -1152,7 +1152,7 @@ datLocked( const HDSLoc *locator, int *status) {
   EnterCheck("datLocked",*status);
   if (isv5) {
     retval = datLocked_v5(locator, status);
-  } else if( *status == SAI__OK && hds1V4LockError() ){
+  } else {
     retval = 1;  /* In V4, all HDS objects are considered to be locked by
                     the current thread for read-write. */
   }
