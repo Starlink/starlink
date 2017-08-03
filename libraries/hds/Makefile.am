@@ -68,7 +68,7 @@ include_MESSAGES = CMP_ERR DAT_ERR dat_err.h
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 # dat_par.h was previously released so must go in the root include dir
-PUBLIC_CINCLUDES = hds.h hds_types.h hds_fortran.h
+PUBLIC_CINCLUDES = hds.h hds_types.h hds_fortran.h cmp.h
 PUBLIC_INCLUDES = DAT_PAR dat_par.h
 
 PRIVATE_INCLUDES = \
@@ -94,7 +94,9 @@ F_C_ROUTINES = hds_run.c fortran_interface.c hdsFind.c
 #  List of Fortran BLOCK DATA routines.
 BLOCK_DATA_FILES = cmp_blk.f
 
-C_ROUTINES = \
+CMP_C_ROUTINES = cmpMod.c cmpPut0x.c
+
+C_ROUTINES = $(CMP_C_ROUTINES) \
 	dat1_alloc_lcp.c dat1_annul_lcp.c dat1_check_mode.c \
 	dat1_check_type.c dat1_cvt_format.c dat1_cvt_order.c \
 	dat1_decoy.c dat1_get_ncomp.c dat1_get_odl.c dat1_getenv.c \
