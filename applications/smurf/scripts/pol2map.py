@@ -441,6 +441,11 @@
 *        rather than Jy/beam.
 *     12-JUL-2017 (DSB):
 *        Added parameters ICONFIG and QUCONFIG.
+*     24-AUG-2017 (DSB):
+*        When checking whether "modelorder" contains PCA in the user
+*        supplied config, allow for the possibility that the config may contain
+*        no modelorder value at all. This bug prevented the abortsoon
+*        parameter being used with makemap in the majority of cases.
 '''
 
 import glob
@@ -1277,16 +1282,22 @@ try:
                msg_out("Will use PCA.PCATHRESH value of {0} inherited from existing "
                        "map {1}.".format(pcathresh,tmap))
 
-#  If the modelorder does not include PCA, we set "pcathresh" to a
-#  non-zero value to indicate that the ABORTSOON parameter should not be set
+#  If the user-supplied config includes a value for "modelorder", but
+#  that value does not include PCA, we set "pcathresh" to a non-zero
+#  value to indicate that the ABORTSOON parameter should not be set
 #  when running makemap. The specific non-zero value used does not matter
 #  as makemap will not be using it anyway (since modelorder order does
-#  include PCA), but we choose to use the appropriate default value.
+#  include PCA), but we choose to use the appropriate default value. Note,
+#  if the user-supplied config does not include  a value for modelorder,
+#  (i.e. configecho returns "<***>") then the default modelorder value
+#  defined below (which includes PCA) will be used. In this case we want
+#  to retain pcathresh at zero, so that ABORTSOON is used when running
+#  makemap.
       if pcathresh == 0:
          try:
             models = invoke("$KAPPA_DIR/configecho name=modelorder "
                             "config={0}".format(config))
-            if "pca" not in models.lower():
+            if "<***>" not in models and "pca" not in models.lower():
                pcathresh = (pcathresh_def1 if automask else pcathresh_def2)
          except:
             pass
@@ -1362,8 +1373,8 @@ try:
             fd.write("flt.zero_mask = mask2\n")
 
 #  If the user supplied extra config parameters, append them to the
-#  config file. Note, "config" will include any required "^" character and 
-#  so the format string below does not need to include an explicit "^" 
+#  config file. Note, "config" will include any required "^" character and
+#  so the format string below does not need to include an explicit "^"
 #  character.
       if config and config != "def":
          fd.write("{0}\n".format(config))
@@ -1378,14 +1389,14 @@ try:
 #  for ICONFIG or QUCONFIG. First create the I config file.
       fd = open(iconf,"w")
 
-#  Include the common config created above. Note, "conf" is a simple file 
+#  Include the common config created above. Note, "conf" is a simple file
 #  name - not a configuration - and so we need to include the "^" explicitly
 #  in the format string.
       fd.write("^{0}\n".format(conf))
 
 #  If the user has supplied any I-specific config parameters, include them
-#  now so that they over-ride values in the common config. Note, "iconfig" 
-#  is a complete configuration, and so will already include any required "^" 
+#  now so that they over-ride values in the common config. Note, "iconfig"
+#  is a complete configuration, and so will already include any required "^"
 #  character. So do not include a "^" in the format string.
       if iconfig and iconfig != "def":
          fd.write("{0}\n".format(iconfig))
