@@ -1099,6 +1099,10 @@ try:
 
 #  -----------  CREATE INDIVIDUAL MAPS FROM STOKES TIME SERIES DATA ---------
 
+#  Do some initialisation in case no time-series data is supplied.
+   pcathresh_i = 0.0;
+   pcathresh_qu = 0.0;
+
 #  Initialise three dicts - one each for Q, U and I - holding Stokes
 #  time-stream files to be processed.
    ilist = {}
