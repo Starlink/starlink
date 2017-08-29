@@ -6,7 +6,7 @@ void CGEN_FUNCTION(vecIto)( char bad, size_t n, const int *argv, CGEN_TYPE *resv
 void CGEN_FUNCTION(vecBto)( char bad, size_t n, const char *argv, CGEN_TYPE *resv, size_t *ierr, size_t *nerr, int *status );
 void CGEN_FUNCTION(vecDto)( char bad, size_t n, const double *argv, CGEN_TYPE *resv, size_t *ierr, size_t *nerr, int *status );
 void CGEN_FUNCTION(vecKto)( char bad, size_t n, const int64_t *argv, CGEN_TYPE *resv, size_t *ierr, size_t *nerr, int *status );
-void CGEN_FUNCTION(vecRto)( char bad, size_t n, const float *argv, CGEN_TYPE *resv, size_t *ierr, size_t *nerr, int *status );
+void CGEN_FUNCTION(vecFto)( char bad, size_t n, const float *argv, CGEN_TYPE *resv, size_t *ierr, size_t *nerr, int *status );
 void CGEN_FUNCTION(vecUBto)( char bad, size_t n, const unsigned char *argv, CGEN_TYPE *resv, size_t *ierr, size_t *nerr, int *status );
 void CGEN_FUNCTION(vecUWto)( char bad, size_t n, const unsigned short int *argv, CGEN_TYPE *resv, size_t *ierr, size_t *nerr, int *status );
 void CGEN_FUNCTION(vecWto)( char bad, size_t n, const short int *argv, CGEN_TYPE *resv, size_t *ierr, size_t *nerr, int *status );

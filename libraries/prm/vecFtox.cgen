@@ -8,19 +8,19 @@
 #define NUM_MIN(t) JOIN2(NUM__MIN,t)
 #define NUM_MAX(t) JOIN2(NUM__MAX,t)
 
-void CGEN_FUNCTION(vecRto)( char bad, size_t n, const float *argv,
+void CGEN_FUNCTION(vecFto)( char bad, size_t n, const float *argv,
                             CGEN_TYPE *resv, size_t *ierr, size_t *nerr,
                             int *status ){
 /*
 *+
 *  Name:
-*     vecRto<t>
+*     vecFto<t>
 
 *  Purpose:
 *     Convert vectorised _REAL values to another data type.
 
 *  Synopsis:
-*     void vecRto<T>( char bad, size_t n, const float *argv,
+*     void vecFto<T>( char bad, size_t n, const float *argv,
 *                     CGEN_TYPE *resv, size_t *ierr, size_t *nerr,
 *                     int *status )
 
