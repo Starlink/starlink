@@ -1,0 +1,106 @@
+#include "sae_par.h"
+#include "ary1.h"
+#include "star/hds.h"
+#include <string.h>
+
+void CGEN_FUNCTION(ary1Pt1)( char bad, size_t el, const CGEN_TYPE *array,
+                             const char *type, HDSLoc *loc, char *dce,
+                             int *status ) {
+/*
+*+
+*  Name:
+*     ary1Pt1<T>
+
+*  Purpose:
+*     Write a 1-dimensional array of values to an HDS object.
+
+*  Synopsis:
+*     void ary1Pt1<T>( char bad, size_t el, const CGEN_TYPE *array,
+*                      const char *type, HDSLoc *loc, char *dce,
+*                      int *status )
+
+*  Description:
+*     The routine writes a 1-dimensional array of values to an
+*     HDS object. The object must be 1-dimensional and must contain
+*     exactly the number of elements to be written. Data type
+*     conversion to any numeric data type is performed if necessary,
+*     with optional testing for bad pixel values.
+
+*  Parameters:
+*     bad
+*        Whether to test for bad pixel values.
+*     el
+*        Number of array elements to be written.
+*     array
+*        The array of values.
+*     type
+*        HDS data type of the object to be written. This must be in
+*        upper case.
+*     loc
+*        Locator to 1-dimensional HDS object to receive the data.
+*     dce
+*        Returned holding a flag that indicates whether any data type
+*        conversion errors occurred (the affected elements of the data
+*        object are set to bad values if this happens).
+*     status
+*        The global status.
+
+*  Copyright:
+*      Copyright (C) 2017 East Asian Observatory
+*      All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     28-AUG-2017 (DSB):
+*        Original version, based on equivalent Fortran routine by RFWS.
+
+*-
+*/
+
+/* Local variables: */
+   hdsdim dim;                /* Object dimension array */
+   void *pntr;                /* Pointer to mapped data */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Initialise. */
+   dim = el;
+
+/* If no data type conversion is required, then write the data values
+   directly. */
+   if( !strcasecmp( type, CGEN_HDS_TYPE ) ){
+      *dce = 0;
+      datPut( loc, CGEN_HDS_TYPE, 1, &dim, array, status );
+
+/* If type conversion is required, then map the data without type
+   conversion, perform the type conversion explicitly and unmap the data. */
+   } else {
+      datMap( loc, type, "WRITE", 1, &dim, &pntr, status );
+      CGEN_FUNCTION(ary1Cvf)( bad, el, array, type, pntr, dce, status );
+      ary1Hunmp( loc, status );
+   }
+
+/* Call error tracing routine and exit. */
+   if( *status != SAI__OK ) ary1Trace( "ary1Pt1x", status );
+
+}

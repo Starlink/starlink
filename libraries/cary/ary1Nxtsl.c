@@ -1,0 +1,173 @@
+#include <pthread.h>
+#include "sae_par.h"
+#include "ary1.h"
+#include "mers.h"
+#include "ary_err.h"
+
+/* These global variables are declared in file ary1Ffs.c */
+extern AryDCB **Ary_DCB;  /* Pointer to array of all DCB pointers */
+extern AryACB **Ary_ACB;  /* Pointer to array of all ACB pointers */
+extern AryMCB **Ary_MCB;  /* Pointer to array of all MCB pointers */
+extern AryPCB **Ary_PCB;  /* Pointer to array of all PCB pointers */
+
+extern int Ary_NDCB;    /* Number of DCBs in above array */
+extern int Ary_NACB;    /* Number of ACBs in above array */
+extern int Ary_NMCB;    /* Number of MCBs in above array */
+extern int Ary_NPCB;    /* Number of PCBs in above array */
+
+extern pthread_mutex_t Ary_DCB_mutex;
+extern pthread_mutex_t Ary_ACB_mutex;
+extern pthread_mutex_t Ary_MCB_mutex;
+extern pthread_mutex_t Ary_PCB_mutex;
+
+
+void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status ) {
+/*
+*+
+*  Name:
+*     ary1Nxtsl
+
+*  Purpose:
+*     Find the next slot which has been used in a specified common
+*     block.
+
+*  Synopsis:
+*     void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status )
+
+*  Description:
+*     The routine finds the next used slot in an array following
+*     the one supplied via the "slot" argument. It is intended to allow
+*     the caller to obtain a list of all slots currently in use. The
+*     first slot is obtained by supplying a value of zero for the "slot"
+*     argument. A value of zero is returned for the "next" argument if
+*     there are no further slots in use.
+
+*  Parameters:
+*     type
+*        The array to search. The integer symbolic constants ARY__DCBTYPE,
+*        ARY__ACBTYPE and ARY__MCBTYPE are available to identify these.
+*     slot
+*        The search starts from the slot with index "slot + 1". A value of
+*        -1 should be supplied to search for the first slot in use.
+*     next
+*        The zero-based index of the slot found. A value of -1 is
+*        returned if there are no more slots in use.
+*     status
+*        The global status.
+
+*  Returned function value:
+*     A pointer to the object (DCB, ACB, MCB or PCB) in the slot
+*     specified by the returned "next" value. The returned pointer should
+*     be cast to the appropriate type (ArcDCB, AryACB, etc).
+
+*  Notes:
+*     -  This interface is provided so that a more efficient implementation
+*     (e.g. using linked lists) might be added later.
+
+*  Copyright:
+*      Copyright (C) 2017 East Asian Observatory
+*      All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     03-JUL-2017 (DSB):
+*        Original version, based on equivalent Fortran routine by RFWS.
+
+*-
+*/
+
+/* Local variables: */
+   pthread_mutex_t *mutex;
+   void *result = NULL;
+   AryObject **start;
+   int nel;
+   int i;
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return result;
+
+/* Initialise. */
+   *next = -1;
+
+/* Increment "slot" so that it becomes the index of the first slot to
+   check. */
+   slot++;
+
+/* Check the supplied type, and save info about the type. */
+   if( type == ARY__DCBTYPE ){
+      mutex = &Ary_DCB_mutex;
+      start = (AryObject **) Ary_DCB;
+      nel = Ary_NDCB;
+
+   } else if( type == ARY__ACBTYPE ){
+      mutex = &Ary_ACB_mutex;
+      start = (AryObject **) Ary_ACB;
+      nel = Ary_NACB;
+
+   } else if( type == ARY__MCBTYPE ){
+      mutex = &Ary_MCB_mutex;
+      start = (AryObject **) Ary_MCB;
+      nel = Ary_NMCB;
+
+/* If the common block specified is not valid, then report an error. */
+   } else {
+      *status = ARY__FATIN;
+      msgSeti( "B", (int) type );
+      errRep( "ARY1_NXTSL_BBLK", "Function ary1Nxtsl called with an "
+              "invalid 'type' argument of ^B (internal programming error).",
+              status );
+   }
+
+
+
+/* If all is OK... */
+   if( *status == SAI__OK ){
+
+/* Lock the mutex so that this thread has exclusive access to the array
+   holding pointers to all the allocated structures of the requested type. */
+      pthread_mutex_lock( mutex );
+
+/* Get a pointer to the first slot to be checked. Each slot in the array
+   holds a pointer to an object of the requested type. All types begin with
+   a component of type AryObject, and so can be cast to that type. */
+      AryObject **object = start + slot;
+
+/* Loop through the array starting at element "slot" looking for an element
+   that is not currently in use. */
+      for( i = slot; i < nel; i++,object++ ){
+         if( !(*object)->used ){
+            *next = slot;
+            result = *object;
+            break;
+         }
+      }
+
+/* Unlock the mutex. */
+      pthread_mutex_unlock( mutex );
+   }
+
+/* Call error tracing routine and exit. */
+   if( *status != SAI__OK ) ary1Trace( "ary1Nxtsl", status );
+
+/* Return the result. */
+   return result;
+}
