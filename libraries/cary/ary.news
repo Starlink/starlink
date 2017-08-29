@@ -1,0 +1,6 @@
+1 ARY - ARRAY data structure access routines
+
+ A new release (v2.0) of the ARY library is now available.
+
+ V2.0 is a complete re-write of ARY in C (all previous versions were
+ written in Fortran).

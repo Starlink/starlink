@@ -1,0 +1,146 @@
+#include "sae_par.h"
+#include "ary1.h"
+#include "mers.h"
+#include "ary_err.h"
+#include <string.h>
+
+#define JOIN4(a,b,c,d) a##b##c##d
+#define NAME(tin,tout) JOIN4(vec,tin,to,tout)
+
+void CGEN_FUNCTION(ary1Cvf)( char bad, size_t n, const CGEN_TYPE *array,
+                             const char *type, void *pntr, char *dce,
+                             int *status ) {
+/*
+*+
+*  Name:
+*     ary1Cvf<T>
+
+*  Purpose:
+*     Convert a vectorised array from one data type to another.
+
+*  Synopsis:
+*     void CGEN_FUNCTION(ary1Cvf)( char bad, size_t n, const CGEN_TYPE *array,
+*                                  const char *type, void *pntr, char *dce,
+*                                  int *status )
+
+*  Description:
+*     The routine converts a vectorised array from the supplied data type to
+*     any primitive numeric type, checking for the presence of bad pixels
+*     if required. The input array is passed directly; the output array
+*     is passed by pointer.
+
+*  Parameters:
+*     bad
+*        Whether to check for bad pixel values.
+*     n
+*        Number of array elements to convert.
+*     array
+*        The input vectorised array containing the values to be converted.
+*     type
+*        The data type of the output vectorised array. This value must
+*        be one of the HDS primitive numeric data type strings and must
+*        be supplied in upper case.
+*     pntr
+*        Pointer to the output vectorised array.
+*     dce
+*        Returned holding a flag indicating whether any data conversion
+*        errors occurred (bad values are entered into the affected elements
+*        of the output array if this happens).
+*     status
+*        The global status.
+
+*  Copyright:
+*      Copyright (C) 2017 East Asian Observatory
+*      All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     28-AUG-2017 (DSB):
+*        Original version, based on equivalent Fortran routine by RFWS.
+
+*-
+*/
+
+/* Local variables: */
+   size_t ierr;               /* Position of first conversion error */
+   size_t nerr;               /* Number of conversion errors */
+   char typok;                /* Whether the TYPE argument is valid */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Initialise and mark the error stack. */
+   typok = 1;
+   nerr = 0;
+   errMark();
+
+/* Test for each valid output data type in turn and call the appropriate
+   conversion routine ("vec<Tin>to<Tout>"). */
+   if( !strcmp( type, "_BYTE" ) ){
+     NAME(CGEN_CODE,B)( bad, n, array, pntr, ierr, nerr, status );
+
+   } else if( !strcmp( type, "_UBYTE" ) ){
+     NAME(CGEN_CODE,UB)( bad, n, array, pntr, ierr, nerr, status );
+
+   } else if( !strcmp( type, "_DOUBLE" ) ){
+     NAME(CGEN_CODE,D)( bad, n, array, pntr, ierr, nerr, status );
+
+   } else if( !strcmp( type, "_INTEGER" ) ){
+     NAME(CGEN_CODE,I)( bad, n, array, pntr, ierr, nerr, status );
+
+   } else if( !strcmp( type, "_REAL" ) ){
+     NAME(CGEN_CODE,R)( bad, n, array, pntr, ierr, nerr, status );
+
+   } else if( !strcmp( type, "_WORD" ) ){
+     NAME(CGEN_CODE,W)( bad, n, array, pntr, ierr, nerr, status );
+
+   } else if( !strcmp( type, "_UWORD" ) ){
+     NAME(CGEN_CODE,UW)( bad, n, array, pntr, ierr, nerr, status );
+
+   } else if( !strcmp( type, "_INT64" ) ){
+     NAME(CGEN_CODE,K)( bad, n, array, pntr, ierr, nerr, status );
+
+/* Note if the output data type specified is not valid. */
+   } else {
+      typok = 0;
+   }
+
+/* If a data conversion error occurred, then annul any error reports it
+   might have produced. */
+   *dce = ( nerr != 0 );
+   if( *dce ) errAnnul( status );
+   errRlse();
+
+/* Report an error if the output data type specified was not valid. */
+   if( *status == SAI__OK ){
+      if( !typok ){
+         *status = ARY__FATIN;
+         msgSetc( "BADTYPE", type );
+         errRep( " ", "Routine ary1Cvfx called with an invalid TYPE argument of"
+                 "'^BADTYPE' (internal programming error).", status );
+      }
+   }
+
+/* Call error tracing routine and exit. */
+   if( *status != SAI__OK ) ary1Trace( "ary1Cvfx", status );
+
+}

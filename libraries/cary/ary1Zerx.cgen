@@ -1,0 +1,73 @@
+#include "sae_par.h"
+#include "star/hds.h"
+#include "prm_par.h"
+
+void  CGEN_FUNCTION(ary1Zer)( size_t n, CGEN_TYPE *argv, int *status ){
+/*
+*+
+*  Name:
+*     ary1Zer<T>
+
+*  Purpose:
+*     Set all elements of a vectorised array to zero.
+
+*  Synopsis:
+*     ary1Zer<T>( size_t n, CGEN_TYPE *argv, int *status )
+
+*  Description:
+*     The routine sets each element of the vectorised array supplied
+*     to zero.
+
+*  Parameters:
+*     n
+*        Number of array elements.
+*     argv
+*        The vectorised array whose elements are to be set.
+*     status
+*        The global status.
+
+*  Copyright:
+*      Copyright (C) 2017 East Asian Observatory
+*      All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     03-JUL-2017 (DSB):
+*        Original version, based on equivalent Fortran routine by RFWS.
+*     {enter_further_changes_here}
+
+*-
+*/
+
+/*  Local variables: */
+   size_t i;          /* Loop counter for array elements */
+   CGEN_TYPE *p;      /* Pointer to next element */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Assign the value VAL__BAD<T> to each array element in turn. */
+   p = argv;
+   for( i = 0; i < n; i++ ) *(p++) = 0;
+
+}
+
