@@ -1,0 +1,237 @@
+#include "sae_par.h"
+#include "prm_par.h"
+#include "prm_err.h"
+#include <pthread.h>
+#include <string.h>
+#include <inttypes.h>
+
+#define JOIN2(a,b) a##b
+#define NUM_MIN(t) JOIN2(NUM__MIN,t)
+#define NUM_MAX(t) JOIN2(NUM__MAX,t)
+
+void CGEN_FUNCTION(vecKto)( char bad, size_t n, const int64_t *argv,
+                            CGEN_TYPE *resv, size_t *ierr, size_t *nerr,
+                            int *status ){
+/*
+*+
+*  Name:
+*     vecKto<t>
+
+*  Purpose:
+*     Convert vectorised _INT64 values to another data type.
+
+*  Synopsis:
+*     void vecKto<T>( char bad, size_t n, const int64_t *argv,
+*                     CGEN_TYPE *resv, size_t *ierr, size_t *nerr,
+*                     int *status )
+
+*  Description:
+*     The function performs type conversion on a vectorised array
+*     of _INT64 values, converting them to equivalent values of type <T>.
+*     If numerical errors occur, the value VAL__BAD<T> is returned in
+*     appropriate elements of the result array and a "status" value is
+*     set.
+
+*  Arguments:
+*     bad
+*        A boolean value indicating whether the argument values ("argv")
+*        may be "bad".
+*     n
+*        The number of values to be processed.  If "n" is zero the function
+*        returns with "ierr" and "nerr" set to zero, but without converting
+*        any values.
+*     argv
+*        A vectorised (1-dimensional) array of size "n" containing the
+*        values to be converted.
+*     resv
+*        A vectoried (1-dimensional) array of at least "n" elements to
+*        receive the converted values.  The value VAL__BAD<T> will be
+*        set in appropriate elements of "resv" under error conditions.
+*     ierr
+*        Returned holding the index of the first input array element to
+*        generate a numerical error.  Zero is returned if no errors occur.
+*     nerr
+*        Returned holding a count of the number of numerical errors that
+*        occur.
+*     status
+*        This should be set to SAI__OK on entry, otherwise the routine
+*        returns without action.  A "status" value will be set by this
+*        function if any numerical errors occur.
+
+*  Copyright:
+*     Copyright (C) 2017 East Asian Observatory.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     29-AUG-2017 (DSB):
+*        Original version, based on equivalent Fortran routine by RFWS.
+
+*-
+*/
+
+/* Local Variables: */
+   CGEN_TYPE *pout;      /* Pointer to next output value */
+   const int64_t *pin;   /* Pointer to next input value */
+   double dhi1;          /* Upper bound on input data */
+   double dhi2;          /* Upper bound on output data */
+   double dhi;           /* Upper bound on data */
+   double dlo1;          /* Lower bound on input data */
+   double dlo2;          /* Lower bound on output data */
+   double dlo;           /* Lower bound on data */
+   size_t i;             /* Loop counter */
+
+/* Static variables: */
+   static int64_t hi;    /* Upper bound on argument */
+   static int64_t lo;    /* Lower bound on argument */
+   static char first=1;  /* Have lo and hi been initialised? */
+
+/* A mutex used to serialise access to the static values declared above so
+   that multiple threads do not try to access them simultaneously. */
+   static pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
+
+/* Check status. */
+   if( status != SAI__OK ) return;
+
+/* If the input and output types are the same, just copy the data without
+   change. */
+   if( CGEN_CODE_TYPE == CGEN_INT64_TYPE ) {
+      memcpy( resv, argv, n*sizeof(*argv) );
+      return;
+   }
+
+/* If the conversion can potentially fail, then on the first invocation
+   set up the lower and upper bounds on the argument values. The following
+   check on the data type uses integer constants and so should be optimised
+   out by the compiler. */
+   if( CGEN_CODE_TYPE != CGEN_DOUBLE_TYPE &&
+       CGEN_CODE_TYPE != CGEN_FLOAT_TYPE ) {
+
+/* Attempt to lock the mutex. This causes us to wait until no other thread
+   is accessing the static values. */
+      pthread_mutex_lock( &mutex1 );
+
+/* If this is the first time this code has been run, set up the values of
+   static variables "lo" and "hi". */
+      if( first ) {
+
+/* Find the intersection of the ranges of allowed values between the
+   input and output data types. Perform this calculation in double
+   precision. */
+         dlo1 = (double) NUM__MINK;
+         dlo2 = (double) NUM_MIN(CGEN_PRM_TYPE);
+         dlo = ( dlo1 > dlo2 ) ? dlo1 : dlo2;
+         dhi1 = (double) NUM__MAXK;
+         dhi2 = (double) NUM_MAX(CGEN_PRM_TYPE);
+         dhi = ( dhi1 < dhi2 ) ? dhi1 : dhi2;
+
+/* Convert the limits to the input data type and note they have been
+   set up. */
+         lo = (int64_t) dlo;
+         hi = (int64_t) dhi;
+         first = 0;
+      }
+
+/* Unlock the mutex. This allows any other thread that is waiting for the
+   mutex to proceed. */
+      pthread_mutex_unlock( &mutex1 );
+   }
+
+/* Initialise the numerical error pointer and the error count. */
+   *ierr = 0;
+   *nerr = 0;
+
+/* Initialise pointers to the next input and output values. */
+   pin = argv;
+   pout = resv;
+
+/* If the bad data flag is set:
+   ---------------------------
+   Loop to process each element of the input array in turn. */
+   if( bad ) {
+      for( i = 0; i < n; i++,pin++,pout++ ) {
+
+/* Check if the input value is bad.  If it is, then put a value of
+   VAL__BAD<T> in the corresponding element of the result array. */
+         if( *pin == VAL__BADK ) {
+            *pout = CGEN_BAD;
+
+/* If the conversion can potentially fail, then test if the argument
+   value lies within its allowed bounds. The following check on the data
+   type uses integer constants and so should be optimised out by the
+   compiler. */
+         } else if( ( CGEN_CODE_TYPE != CGEN_DOUBLE_TYPE &&
+                      CGEN_CODE_TYPE != CGEN_FLOAT_TYPE ) &&
+                    ( ( *pin < lo ) || ( *pin > hi ) ) ) {
+
+/* If not, then put a value of VAL__BAD<T> in the corresponding
+   element of the result array, and increment the numerical error
+   count. */
+            *pout = CGEN_BAD;
+            (*nerr)++;
+
+/* Set a STATUS value (if not already set) and update the error pointer. */
+            if( *status == SAI__OK ) {
+               *status = PRM__INTOF;
+               *ierr = i;
+            }
+
+/* If the input value is OK, perform type conversion. */
+         } else {
+            *pout = (CGEN_TYPE) *pin;
+         }
+      }
+
+/* If the bad data flag is not set:
+   -------------------------------
+   Loop to process each element of the input array in turn. */
+   } else {
+      for( i = 0; i < n; i++,pin++,pout++ ) {
+
+/* If the conversion can potentially fail, then test if the argument
+   value lies within its allowed bounds. The following check on the data
+   type uses integer constants and so should be optimised out by the
+   compiler. */
+         if( ( CGEN_CODE_TYPE != CGEN_DOUBLE_TYPE &&
+               CGEN_CODE_TYPE != CGEN_FLOAT_TYPE ) &&
+             ( ( *pin < lo ) || ( *pin > hi ) ) ) {
+
+/* If not, then put a value of VAL__BAD<T> in the corresponding
+   element of the result array, and increment the numerical error
+   count. */
+            *pout = CGEN_BAD;
+            (*nerr)++;
+
+/* Set a STATUS value (if not already set) and update the error pointer. */
+            if( *status == SAI__OK ) {
+               *status = PRM__INTOF;
+               *ierr = i;
+            }
+
+/* If the input value is OK, perform type conversion. */
+         } else {
+            *pout = (CGEN_TYPE) *pin;
+         }
+      }
+   }
+}
+

@@ -4,14 +4,13 @@ dist_bin_SCRIPTS = prm_link prm_link_adam
 lib_LTLIBRARIES = libprm.la libprm_a.la
 noinst_PROGRAMS = make-prm-par
 
-
-
 libprm_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(PUBLIC_INCLUDES) \
 	$(include_MESSAGES) \
 	$(noinst_MESSAGES) \
 	$(PRIVATE_INCLUDES) \
+	$(BUILT_C_ROUTINES) \
 	PRM_PAR
 
 libprm_a_la_SOURCES = \
@@ -117,6 +116,14 @@ val_uwtox.gbBdikrw vec_uwtox.gbBdikrw
 # we can compile it unconditionally.
 PLATFORM_C = num_han.c num1_cvt.c
 
+#  Generic C functions.
+CGENERIC_ROUTINES = vecBtox.cgen vecDtox.cgen vecItox.cgen \
+vecKtox.cgen vecRtox.cgen vecUBtox.cgen vecUWtox.cgen vecWtox.cgen
+
+# The .c files which are built from the above .cgen files.
+BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
+
+
 PLATFORM_SOURCE = num_han.c num_han.cdefault num_han.c_sun num_han.c_dec_osf \
 num_han.cmips num_han.c_sun_solaris
 
@@ -129,7 +136,7 @@ NORMAL_INCLUDES = \
 	NUM_DEF_UB NUM_DEF_UW NUM_DEF_W \
 	NUM_DEC_K NUM_DEF_K \
 	NUM_DEF NUM_DEC \
-	PRM_PAR prm_par.h
+	PRM_PAR prm_par.h prm.h prm_cgen.h
 
 
 
@@ -185,8 +192,10 @@ PRM_PAR prm_par.h: make-prm-par$(EXEEXT)
 	./make-prm-par -fPRM_PAR -cprm_par.h
 
 BUILT_SOURCES = $(include_MESSAGES) $(noinst_MESSAGES) PRM_PAR prm_par.h \
-	$(PLATFORM_INCLUDES) $(PLATFORM_PRIVATE_INCLUDES)
+	$(PLATFORM_INCLUDES) $(PLATFORM_PRIVATE_INCLUDES) prm_cgen.h
 
+prm_cgen.h: prm_cgen.h.source make_h
+	./make_h
 
 # Tests
 
@@ -233,3 +242,64 @@ CLEANFILES = PRM_ERR
 .gbBdikrw.f:
 	$(FGENERIC)  -t bBdikrw $<
 
+
+# Create the .c file which defines type-specific code generated from each
+# .cgen file.
+$(CGENERIC_ROUTINES:.cgen=.c):
+	echo "/*" > $@
+	echo "*  Name:" >> $@
+	echo "*    $@" >> $@
+	echo "" >> $@
+	echo "*  Purpose:" >> $@
+	echo "*    This file expands the generic C code held in $(@:.c=.cgen) to provide" >> $@
+	echo "*    the required type-specific implementations which can be called by" >> $@
+	echo "*    other functions." >> $@
+	echo "" >> $@
+	echo "*  Notes:" >> $@
+	echo "*    - This file is generated automatically at build time (see" >> $@
+	echo "*    Makefile.am)" >> $@
+	echo "*/" >> $@
+	echo "" >> $@
+	echo "#include \"prm_par.h\"" >> $@
+	echo "#include \"cgeneric.h\"" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_DOUBLE_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_FLOAT_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_INT_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_WORD_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_UWORD_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_BYTE_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_UBYTE_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_INT64_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
