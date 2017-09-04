@@ -181,7 +181,7 @@ void ary1Danl( char dispos, AryDCB **dcb, int *status ) {
                   *status = ARY__UNDEF;
                   errRep( "ARY1_DANL_UNDEF",
                           "The array ^ARRAY has been released from the ARY_"
-                          "system in an undefined state (possible"
+                          "system in an undefined state (possible "
                           "programming error).", status );
                }
             }
