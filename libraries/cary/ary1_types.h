@@ -513,10 +513,9 @@ typedef struct AryACB {
 
 typedef struct AryPCB {
 
-/* PCB Usage: This value is non-zero if the remaining values in the PCB are
-   in use, and zero if the PCB is not currently being used and can thus be
-   re-used. */
-   char used;
+/* Header. This contains components that are common to all types of block
+   structure. */
+   AryObject header;
 
 /* Placeholder locator:  If the PCB is in use, then "loc is an HDS locator
    to an ARY_ placeholder, which reserves a position in the data system. */

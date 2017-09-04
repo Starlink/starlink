@@ -10,10 +10,10 @@
 typedef union IdUnion {
    int i;
    unsigned u;
-   Ary *pointer;
+   void *pointer;
 } IdUnion;
 
-/* The global variable that holds the count of ARY identifiers that have
+/* The global variable that holds the count of identifiers that have
    been issued so far. */
 static char Ary_Nids = 0;
 
@@ -21,7 +21,7 @@ static char Ary_Nids = 0;
    above value at any one time. */
 static pthread_mutex_t  Ary_Nids_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-Ary *ary1Expid( AryACB *acb, int *status ) {
+void *ary1Expid( AryObject *object, int *status ) {
 /*
 *+
 *  Name:
@@ -31,13 +31,13 @@ Ary *ary1Expid( AryACB *acb, int *status ) {
 *     Export an array identifier.
 
 *  Synopsis:
-*     Ary *ary1Expid( AryACB *acb, int *status )
+*     void *ary1Expid( AryObject *object, int *status )
 
 *  Description:
-*     The routine converts a pointer to an ACB into an array identifier
-*     which can be issued to an application to refer to that entry. The
-*     identifier issued is saved in the ACB so that a check on its validity
-*     can later be made.  Array identifiers are encoded so that it is
+*     The routine converts a pointer to an ACB or PCB into an identifier
+*     which can be issued to an application to refer to the ACB or PCB. The
+*     identifier issued is saved in the ACB or PCB so that a check on its
+*     validity can later be made.  Identifiers are encoded so that it is
 *     extremely unlikely that two identical ones will ever be issued, even
 *     if the ARY_ system is closed down completely and restarted (an
 *     identifier which is still valid can, of course, never be duplicated).
@@ -46,15 +46,16 @@ Ary *ary1Expid( AryACB *acb, int *status ) {
 *     to annul them.
 
 *  Parameters:
-*     acb
-*        Pointer to the ACB.
+*     object
+*        Pointer to the ACB or PCB.
 *     status
 *        The global status.
 
 *  Returned function value:
 *     The returned array identifier, cast into the form of a pointer to
-*     an "Ary" structure. This is an opaque pointer that cannot be
-*     de-referenced directly.
+*     an "Ary" (if "object" is an ACB) or "AryPlace" (if "object" is a PCB)
+*     structure. This is an opaque pointer that cannot be de-referenced
+*     directly.
 
 *  Notes:
 *     -  If an error has already occurred, or if this function should
@@ -87,15 +88,16 @@ Ary *ary1Expid( AryACB *acb, int *status ) {
 *  History:
 *     03-JUL-2017 (DSB):
 *        Original version, based on AST identifier system by RFWS.
-
+*     4-SEP-2017 (DSB):
+*        Modified so that the same code can be used for ACB and PCB
+*        identifiers.
 *-
 */
 
 /* Local variables: */
-   Ary *result = NULL;      /* Returned pointer */
+   void *result = NULL;     /* Returned pointer */
    IdUnion test;            /* Union for testing encoding */
    IdUnion work;            /* Union for encoding ID value */
-   AryObject *object;       /* Pointer to header object */
 
 /* Set a default value of NULL for the returned pointer. */
    result = NULL;
@@ -103,18 +105,19 @@ Ary *ary1Expid( AryACB *acb, int *status ) {
 /* Check inherited global status. */
    if( *status != SAI__OK ) return result;
 
-/* Check that the ACB is valid and report an error if it is not. */
-   object = (AryObject *) acb;
+/* Chack that the supplied Object is valid and report an
+   error if it is not. */
    if( !ary1IsValid( object, status ) ) {
       *status = ARY__FATIN;
-      errRep( " ", "Function ary1Expid called with an invalid ACB pointer "
+      errRep( " ", "Function ary1Expid called with an invalid pointer "
               " (internal programming error).", status );
 
-/* Check that the object is an ACB and not a DCB, etc. */
-   } else if( object->type != ARY__ACBTYPE ) {
+/* Check that the object is an ACB or PCB and not a DCB, etc. */
+   } else if( object->type != ARY__ACBTYPE &&
+              object->type != ARY__PCBTYPE ) {
       *status = ARY__FATIN;
-      errRep( " ", "Function ary1Expid called with a non-ACB pointer "
-              " (internal programming error).", status );
+      errRep( " ", "Pointer supplied to ary1Expid is of an inappropriate "
+              "type (internal programming error).", status );
 
 /*  Otherwise, associate an integer identifier with it. */
    } else {
