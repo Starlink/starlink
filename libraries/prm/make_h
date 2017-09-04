@@ -45,4 +45,4 @@ cat <<EOF > temp.h
 EOF
 
 cpp -P temp.h -I. -I$STARLINK_DIR/include | grep vec > prm_cgen.h
-#rm temp.h
+rm temp.h
