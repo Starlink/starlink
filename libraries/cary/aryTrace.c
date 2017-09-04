@@ -25,7 +25,7 @@ char aryTrace( char newflg ) {
 *     char aryTrace( char newflg )
 
 *  Description:
-*     The routine sets an internal flag in the ARY_ system which
+*     This function sets an internal flag in the ARY_ system which
 *     enables or disables error-tracing messages. If this flag is set
 *     non-zero, then any error occurring within the ARY_ system will
 *     be accompanied by error messages indicating which internal

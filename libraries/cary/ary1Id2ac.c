@@ -7,37 +7,43 @@
 typedef union IdUnion {
    int i;
    unsigned u;
-   const Ary *pointer;
+   const void *pointer;
 } IdUnion;
 
 /* These globals are declared in ary1Ffs.c */
 extern int Ary_NACB;
+extern int Ary_NPCB;
 extern AryACB **Ary_ACB;
+extern AryPCB **Ary_PCB;
 
-AryACB *ary1Id2ac( const Ary *ary ) {
+AryObject *ary1Id2ac( const void *id_ptr, char isacb ) {
 /*
 *+
 *  Name:
 *     ary1Id2Ac
 
 *  Purpose:
-*     Convert an array identifier into the associated ACB pointer.
+*     Convert an identifier into the associated ACB or PCB pointer.
 
 *  Synopsis:
-*     AryACB *ary1Id2ac( const Ary *ary ) {
+*     AryObject *ary1Id2ac( const void *id_ptr, char isacb )
 
 *  Description:
-*     The routine converts an array identifier, previously issued by
-*     ary1Expid, into a pointer to the appropriate ACB structure.
+*     The routine converts an identifier, previously issued by
+*     ary1Expid, into a pointer to the appropriate ACB pr PCB structure.
 *     The identifier supplied is fully checked and a NULL pointer is
 *     returned if it is not valid.
 
 *  Parameters:
-*     ary
-*        Array identifier.
+*     id_ptr
+*        The identifier, in the form of an Ary or AryPlace pointer.
+*     isacb
+*        Indicates the type of object expected by the calling function.
+*        Non-zero indicates an ACB is expected. Zero indicates a PCB is
+*        expected.
 
 *  Returned function value:
-*     Pointer to the ACB structure, or NULL of the identifier supplied
+*     Pointer to the ACB or PCB structure, or NULL of the identifier supplied
 *     was not valid.
 
 *  Notes:
@@ -70,49 +76,66 @@ AryACB *ary1Id2ac( const Ary *ary ) {
 *  History:
 *     03-JUL-2017 (DSB):
 *        Original version, based on AST identifier system by RFWS.
-
+*     4-SEP-2017 (DSB):
+*        Modified to handle either ACB or PCB identifiers.
 *-
 */
 
 /* Local variables: */
-   AryACB *result = NULL;
+   AryObject *result = NULL;
    IdUnion work;
    int id;
+   int slot;
+   int nel;
 
 /* Check an identifier was supplied. */
-   if( !ary ) return result;
+   if( !id_ptr ) return result;
 
-/* Wait for exclusive access to the ACB related global variables */
-   ARY__ACB_LOCK_MUTEX;
+/* Wait for exclusive access to the ACB or PCB related global variables */
+   if( isacb ) {
+      ARY__ACB_LOCK_MUTEX;
+   } else {
+      ARY__PCB_LOCK_MUTEX;
+   }
 
 /* If OK, reverse the encoding process performed by ary1Expid to
    retrieve the slot index for the ACB. */
-   work.pointer = ary;
+   work.pointer = id_ptr;
    id = work.i;
    work.u = ( work.u ^ ( ( (unsigned) ARY__FACNO ) << 8U ) ) >> 8U;
 
 /* Check that the offset obtained doesn't extend beyond the limits of
    the array of ACB pointers. */
-   if ( ( work.i >= 0 ) && ( work.i < Ary_NACB ) ) {
+   nel = isacb ? Ary_NACB : Ary_NPCB;
+   if ( ( work.i >= 0 ) && ( work.i < nel ) ) {
 
 /* Get a pointer to the ACB structure. Remember that ary1Expid converts
    the slot number from zero-base to one-base, so we need to convert it
    back to zero-base before using it. */
-      result = Ary_ACB[ work.i - 1 ];
+      slot = work.i - 1;
+      if( isacb ) {
+         result = (AryObject *) Ary_ACB[ slot ];
+      } else {
+         result = (AryObject *) Ary_PCB[ slot ];
+      }
 
 /* See if the "check" field matches the ID value. */
-      if( ((AryObject *) result)->check != id ) {
+      if( result->check != id ) {
          result = NULL;
 
 /* Also check that the slot number stored in the object is the expected
    value. */
-      } else if( ((AryObject *) result)->slot != work.i - 1 ) {
+      } else if( result->slot != slot ) {
          result = NULL;
       }
    }
 
-/* Allow other threads to access the ACB related global variables */
-   ARY__ACB_UNLOCK_MUTEX;
+/* Allow other threads to access the ACB or PCB related global variables */
+   if( isacb ) {
+      ARY__ACB_UNLOCK_MUTEX;
+   } else {
+      ARY__PCB_UNLOCK_MUTEX;
+   }
 
 /* Return the result. */
    return result;

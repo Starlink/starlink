@@ -82,7 +82,7 @@ void aryUnlock( Ary *ary, int *status ) {
 /* Import and validate the array identifier, but do not include the usual
    check that the array is locked by the current thread since we'll be
    handling that as part of this function. */
-   acb = ary1Impid( ary, 0, 0, status );
+   acb = (AryACB *) ary1Impid( ary, 0, 0, 1, status );
 
 /* Attempt to unlock the specified array. Test status first so that we know
    it is safe to deference "acb". */
