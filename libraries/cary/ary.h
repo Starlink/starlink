@@ -97,7 +97,7 @@ void arySize( Ary *ary, int npix, int *status );
 void arySsect( int iary1, int iary2, int iary3, int *status );
 void aryState( Ary *ary, char state, int *status );
 void aryStype( const char *ftype, Ary *ary, int *status );
-void aryTemp( int place, int *status );
+void aryTemp( AryPlace **place, int *status );
 char aryTrace( char newflg );
 void aryType( Ary *ary, const char *type, int *status );
 void aryUnlock( Ary *ary, int *status );
