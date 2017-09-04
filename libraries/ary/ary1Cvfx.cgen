@@ -2,6 +2,7 @@
 #include "ary1.h"
 #include "mers.h"
 #include "ary_err.h"
+#include "prm.h"
 #include <string.h>
 
 #define JOIN4(a,b,c,d) a##b##c##d
@@ -96,28 +97,28 @@ void CGEN_FUNCTION(ary1Cvf)( char bad, size_t n, const CGEN_TYPE *array,
 /* Test for each valid output data type in turn and call the appropriate
    conversion routine ("vec<Tin>to<Tout>"). */
    if( !strcmp( type, "_BYTE" ) ){
-     NAME(CGEN_CODE,B)( bad, n, array, pntr, ierr, nerr, status );
+     NAME(CGEN_CODE,B)( bad, n, array, pntr, &ierr, &nerr, status );
 
    } else if( !strcmp( type, "_UBYTE" ) ){
-     NAME(CGEN_CODE,UB)( bad, n, array, pntr, ierr, nerr, status );
+     NAME(CGEN_CODE,UB)( bad, n, array, pntr, &ierr, &nerr, status );
 
    } else if( !strcmp( type, "_DOUBLE" ) ){
-     NAME(CGEN_CODE,D)( bad, n, array, pntr, ierr, nerr, status );
+     NAME(CGEN_CODE,D)( bad, n, array, pntr, &ierr, &nerr, status );
 
    } else if( !strcmp( type, "_INTEGER" ) ){
-     NAME(CGEN_CODE,I)( bad, n, array, pntr, ierr, nerr, status );
+     NAME(CGEN_CODE,I)( bad, n, array, pntr, &ierr, &nerr, status );
 
    } else if( !strcmp( type, "_REAL" ) ){
-     NAME(CGEN_CODE,R)( bad, n, array, pntr, ierr, nerr, status );
+     NAME(CGEN_CODE,F)( bad, n, array, pntr, &ierr, &nerr, status );
 
    } else if( !strcmp( type, "_WORD" ) ){
-     NAME(CGEN_CODE,W)( bad, n, array, pntr, ierr, nerr, status );
+     NAME(CGEN_CODE,W)( bad, n, array, pntr, &ierr, &nerr, status );
 
    } else if( !strcmp( type, "_UWORD" ) ){
-     NAME(CGEN_CODE,UW)( bad, n, array, pntr, ierr, nerr, status );
+     NAME(CGEN_CODE,UW)( bad, n, array, pntr, &ierr, &nerr, status );
 
    } else if( !strcmp( type, "_INT64" ) ){
-     NAME(CGEN_CODE,K)( bad, n, array, pntr, ierr, nerr, status );
+     NAME(CGEN_CODE,K)( bad, n, array, pntr, &ierr, &nerr, status );
 
 /* Note if the output data type specified is not valid. */
    } else {

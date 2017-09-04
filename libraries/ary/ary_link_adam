@@ -43,7 +43,7 @@
 
 #-
 
-      echo -lary `err_link_adam` `hds_link_adam` `ast_link_adam` \
+      echo -lary `prm_link_adam` `err_link_adam` `hds_link_adam` `ast_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

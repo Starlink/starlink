@@ -3,12 +3,6 @@
 #include "ary1.h"
 #include "dat_par.h"
 
-/* A mutex used to ensure that only one thread is searching the list of
-   ACB entries at any one time. The mutex is declared in ary1Ffs.c. */
-extern pthread_mutex_t Ary_ACB_mutex;
-#define LOCK_MUTEX pthread_mutex_lock( &Ary_ACB_mutex );
-#define UNLOCK_MUTEX pthread_mutex_unlock( &Ary_ACB_mutex );
-
 void ary1Sbd( char bad, AryACB *acb, int *status ) {
 /*
 *+
@@ -136,8 +130,9 @@ void ary1Sbd( char bad, AryACB *acb, int *status ) {
 
 /* The effect on other ACB entries, whose mapping transfer regions may
    overlap must now be considered. Loop to consider all other ACB entries
-   which might be affected. */
-               LOCK_MUTEX;
+   which might be affected. We lock a mutex first to ensure that no other
+   thread is currently accessing the slot array. */
+               ARY__ACB_LOCK_MUTEX;
                iacbt = -1;
                next = 0;
                while( 1 ){
@@ -189,7 +184,7 @@ void ary1Sbd( char bad, AryACB *acb, int *status ) {
                      }
                   }
                }
-               UNLOCK_MUTEX;
+               ARY__ACB_UNLOCK_MUTEX;
             }
          }
       }
