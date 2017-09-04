@@ -40,7 +40,7 @@
 
 #-
 
-      echo -lary `err_link` `hds_link` `ast_link` \
+      echo -lary `prm_link` `err_link` `hds_link` `ast_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

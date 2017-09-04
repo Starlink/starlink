@@ -15,12 +15,6 @@ extern int Ary_NACB;    /* Number of ACBs in above array */
 extern int Ary_NMCB;    /* Number of MCBs in above array */
 extern int Ary_NPCB;    /* Number of PCBs in above array */
 
-extern pthread_mutex_t Ary_DCB_mutex;
-extern pthread_mutex_t Ary_ACB_mutex;
-extern pthread_mutex_t Ary_MCB_mutex;
-extern pthread_mutex_t Ary_PCB_mutex;
-
-
 void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status ) {
 /*
 *+
@@ -60,6 +54,15 @@ void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status ) {
 *     specified by the returned "next" value. The returned pointer should
 *     be cast to the appropriate type (ArcDCB, AryACB, etc).
 
+* Prior Requirements:
+*     Since this function accesses global variables, each calling
+*     function must ensure that only one thread (the current thread)
+*     is searching a list using this function at any one time. To do
+*     this, the private ARY macros ARY1__xCB_LOCK_SLOT_MUTEX and
+*     ARY1__xCB_UNLOCK_SLOT_MUTEX should be used to lock the appripriate
+*     mutex prior to calling this function, and to unlock it afterwards
+*     ("x" should be replaced by "A", "D", "M" or "P").
+
 *  Notes:
 *     -  This interface is provided so that a more efficient implementation
 *     (e.g. using linked lists) might be added later.
@@ -96,7 +99,6 @@ void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status ) {
 */
 
 /* Local variables: */
-   pthread_mutex_t *mutex;
    void *result = NULL;
    AryObject **start;
    int nel;
@@ -114,17 +116,14 @@ void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status ) {
 
 /* Check the supplied type, and save info about the type. */
    if( type == ARY__DCBTYPE ){
-      mutex = &Ary_DCB_mutex;
       start = (AryObject **) Ary_DCB;
       nel = Ary_NDCB;
 
    } else if( type == ARY__ACBTYPE ){
-      mutex = &Ary_ACB_mutex;
       start = (AryObject **) Ary_ACB;
       nel = Ary_NACB;
 
    } else if( type == ARY__MCBTYPE ){
-      mutex = &Ary_MCB_mutex;
       start = (AryObject **) Ary_MCB;
       nel = Ary_NMCB;
 
@@ -142,10 +141,6 @@ void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status ) {
 /* If all is OK... */
    if( *status == SAI__OK ){
 
-/* Lock the mutex so that this thread has exclusive access to the array
-   holding pointers to all the allocated structures of the requested type. */
-      pthread_mutex_lock( mutex );
-
 /* Get a pointer to the first slot to be checked. Each slot in the array
    holds a pointer to an object of the requested type. All types begin with
    a component of type AryObject, and so can be cast to that type. */
@@ -160,9 +155,6 @@ void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status ) {
             break;
          }
       }
-
-/* Unlock the mutex. */
-      pthread_mutex_unlock( mutex );
    }
 
 /* Call error tracing routine and exit. */

@@ -5,13 +5,6 @@
 #include "ary_err.h"
 #include "mers.h"
 
-/* A mutex used to ensure that only one thread is searching the list of
-   DCB entries at any one time. The mutex is declared in ary1Ffs.c. */
-extern pthread_mutex_t Ary_DCB_mutex;
-#define LOCK_MUTEX pthread_mutex_lock( &Ary_DCB_mutex );
-#define UNLOCK_MUTEX pthread_mutex_unlock( &Ary_DCB_mutex );
-
-
 void ary1Imp( HDSLoc *loc, AryACB **acb, int *status ) {
 /*
 *+
@@ -96,7 +89,7 @@ void ary1Imp( HDSLoc *loc, AryACB **acb, int *status ) {
 /* Loop through all the existing DCBs to see whether the same data object
    has previously been imported. We use a mutex to ensure that this
    search is only being performed in one thread at any one time. */
-      LOCK_MUTEX;
+      ARY__DCB_LOCK_MUTEX;
       dupe = 0;
       next = 0;
       idcbt = -1;
@@ -163,7 +156,7 @@ void ary1Imp( HDSLoc *loc, AryACB **acb, int *status ) {
       }
 
 /* Allow the next thread to proceed with the above search. */
-      UNLOCK_MUTEX;
+      ARY__DCB_UNLOCK_MUTEX;
 
 /* Create a new ACB base array entry to describe the new data object. */
       ary1Crnba( dcb, acb, status );

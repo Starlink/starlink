@@ -41,8 +41,31 @@
 
 */
 
+#include <pthread.h>
 #include "star/hds.h"
 #include "ary_types.h"
+
+/* Macros to lock and unlock a mutex that serialises access to the
+   global variables used byu ary1Nxtsl (and declared in ary1Ffs). These
+   mutexes should be locked by any function that uses ary1Nxtsl to search
+   the list of ACB, DCB, PCB or MCP entries, or which accesses these
+   lists directly. */
+
+extern pthread_mutex_t Ary_ACB_mutex;
+#define ARY__ACB_LOCK_MUTEX pthread_mutex_lock( &Ary_ACB_mutex );
+#define ARY__ACB_UNLOCK_MUTEX pthread_mutex_unlock( &Ary_ACB_mutex );
+
+extern pthread_mutex_t Ary_DCB_mutex;
+#define ARY__DCB_LOCK_MUTEX pthread_mutex_lock( &Ary_DCB_mutex );
+#define ARY__DCB_UNLOCK_MUTEX pthread_mutex_unlock( &Ary_DCB_mutex );
+
+extern pthread_mutex_t Ary_PCB_mutex;
+#define ARY__PCB_LOCK_MUTEX pthread_mutex_lock( &Ary_PCB_mutex );
+#define ARY__PCB_UNLOCK_MUTEX pthread_mutex_unlock( &Ary_PCB_mutex );
+
+extern pthread_mutex_t Ary_MCB_mutex;
+#define ARY__MCB_LOCK_MUTEX pthread_mutex_lock( &Ary_MCB_mutex );
+#define ARY__MCB_UNLOCK_MUTEX pthread_mutex_unlock( &Ary_MCB_mutex );
 
 
 /* Maximum number of dimensions for which the data system (HDS) is
@@ -123,7 +146,11 @@ typedef struct AryObject {
 /* Type: The type of block structure; DCB, ACB, MCB or PCB. */
    AryBlockType type;
 
-/* Check: The integer identifier associated with the object (if any) */
+/* Check: When an integer identifier is issued for an object, its value is
+   stored in the "check" value and an identifier is only considered valid
+   if it matches the "check" value in the object to which it refers. This
+   allows identifiers to be rendered invalid either by the user or by the
+   ARY_  system by assigning NULL to them. */
    int check;
 
 } AryObject;
@@ -430,13 +457,6 @@ typedef struct AryACB {
    is not mapped, then the "mcb" will be NULL. */
    AryMCB *mcb;
 
-/* Record of identifiers issued: When an integer identifier is issued for
-   an ACB object, its value is stored in the "check" value and an identifier
-   is only considered valid if it matches the "check" value in the slot to
-   which it refers. This allows identifiers to be rendered invalid either
-   by the user or by the ARY_  system by assigning NULL to them. */
-   int check;
-
 /* Dimensionality and bounds information: If the ACB is in use, then the
    "ndiM" value holds the number of dimensions of the virtual object which
    it describes and the "lbnd" and "ubnd" values hold the lower and upper
@@ -506,13 +526,6 @@ typedef struct AryPCB {
    whether the object which replaces the placeholder object should be
    temporary. */
    char tmp;
-
-/* Record of identifiers issued: When an integer identifier is issued for
-   a PCB object, its value is stored in the "check" value and an identifier
-   is only considered valid if it matches the "check" value in the PCB
-   to which it refers. This allows identifiers to be rendered invalid either
-   by the user or by the ARY_  system by assigning NULL to them. */
-   int check;
 
 } AryPCB;
 
