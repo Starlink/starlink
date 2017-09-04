@@ -12,7 +12,6 @@ typedef union IdUnion {
 
 /* These globals are declared in ary1Ffs.c */
 extern int Ary_NACB;
-extern pthread_mutex_t Ary_ACB_mutex;
 extern AryACB **Ary_ACB;
 
 AryACB *ary1Id2ac( const Ary *ary ) {
@@ -84,7 +83,7 @@ AryACB *ary1Id2ac( const Ary *ary ) {
    if( !ary ) return result;
 
 /* Wait for exclusive access to the ACB related global variables */
-   pthread_mutex_lock( &Ary_ACB_mutex );
+   ARY__ACB_LOCK_MUTEX;
 
 /* If OK, reverse the encoding process performed by ary1Expid to
    retrieve the slot index for the ACB. */
@@ -96,22 +95,24 @@ AryACB *ary1Id2ac( const Ary *ary ) {
    the array of ACB pointers. */
    if ( ( work.i >= 0 ) && ( work.i < Ary_NACB ) ) {
 
-/* Get a pointer to the ACB structure. */
-      result = Ary_ACB[ work.i ];
+/* Get a pointer to the ACB structure. Remember that ary1Expid converts
+   the slot number from zero-base to one-base, so we need to convert it
+   back to zero-base before using it. */
+      result = Ary_ACB[ work.i - 1 ];
 
 /* See if the "check" field matches the ID value. */
-      if( result->check != id ) {
+      if( ((AryObject *) result)->check != id ) {
          result = NULL;
 
 /* Also check that the slot number stored in the object is the expected
    value. */
-      } else if( ((AryObject *) result)->slot != work.i ) {
+      } else if( ((AryObject *) result)->slot != work.i - 1 ) {
          result = NULL;
       }
    }
 
 /* Allow other threads to access the ACB related global variables */
-   pthread_mutex_unlock( &Ary_ACB_mutex );
+   ARY__ACB_UNLOCK_MUTEX;
 
 /* Return the result. */
    return result;

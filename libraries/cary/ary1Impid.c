@@ -88,7 +88,8 @@ AryACB *ary1Impid( const Ary *ary, int checklock, int readonly, int *status ) {
 /* If required, check that the array is locked appropriately by the
    current thread. */
    } else if( checklock ){
-      printf("ary1Impid: BANG - lock checking not yet done !!!!!!!!!!\n");
+      *status = ARY__FATIN;
+      errRep( " ", "ary1Impid: Lock checking not yet implemented!", status );
    }
 
 /* Call error tracing routine and exit. */
