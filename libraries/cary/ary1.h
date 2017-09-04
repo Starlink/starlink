@@ -51,6 +51,7 @@
 #include "ary1_types.h"
 
 /* Prototypes for private functions */
+void ary1Annpl( char erase, AryPCB **pcb, int *status );
 void *ary1Expid( AryObject *acb, int *status );
 AryACB *ary1Anl( AryACB *acb, int *status );
 AryObject *ary1Id2ac( const void *id_ptr, char isacb );
@@ -97,6 +98,9 @@ void ary1Upsw( AryACB *acb, const char *type, char bad, char copy, HDSLoc *datlo
 void ary1Vbad( const char *type, size_t n, void *pntr, int *status );
 void ary1Vzero( const char *type, size_t n, void *pntr, int *status );
 void ary1Xsbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2, const hdsdim *lbnd2, const hdsdim *ubnd2, int ndim, int *lbnd, int *ubnd, char *exist, int *status );
+void ary1Vftp( const char *ftype, size_t len, char *type, char *cmplx, int *status );
+void ary1Vbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, int *status );
+void ary1Dcre( char defer, const char *type, char cmplx, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, char temp, HDSLoc *loc, AryDCB **dcb, int *status );
 
 /* Now include the expanded generic prototypes. */
 #include "ary1_cgen.h"

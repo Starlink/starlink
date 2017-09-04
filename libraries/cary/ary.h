@@ -78,8 +78,8 @@ void aryMapz( Ary *ary, const char *type, const char *mmod, int rpntr,
               int ipntr, int el, int *status );
 void aryMsg( const char *token, Ary *ary );
 void aryNdim( Ary *ary, int ndim, int *status );
-void aryNew( const char *ftype, int ndim, int lbnd, int ubnd, int place,
-             Ary *ary, int *status );
+void aryNew( const char *ftype, int ndim, const hdsdim *lbnd, const hdsdim *ubnd,
+             AryPlace **place, Ary **ary, int *status );
 void aryNewp( const char *ftype, int ndim, int ubnd, int place, Ary *ary,
               int *status );
 void aryNoacc( const char *access, Ary *ary, int *status );
