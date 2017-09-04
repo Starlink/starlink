@@ -10,12 +10,6 @@ extern AryACB **Ary_ACB;  /* Pointer to array of all ACB pointers */
 extern AryMCB **Ary_MCB;  /* Pointer to array of all MCB pointers */
 extern AryPCB **Ary_PCB;  /* Pointer to array of all PCB pointers */
 
-extern pthread_mutex_t Ary_DCB_mutex;
-extern pthread_mutex_t Ary_ACB_mutex;
-extern pthread_mutex_t Ary_MCB_mutex;
-extern pthread_mutex_t Ary_PCB_mutex;
-
-
 int ary1IsValid( AryObject *object, int *status ) {
 /*
 *+

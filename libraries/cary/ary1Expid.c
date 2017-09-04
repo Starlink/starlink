@@ -122,16 +122,17 @@ Ary *ary1Expid( AryACB *acb, int *status ) {
 /* Clear the pointer value in the work IdUnion. */
       (void) memset( &(work.pointer), 0, sizeof( work.pointer ) );
 
-/* Copy the integer slot number into a signed int component of a union, and
-   clear the lowest 8 bits by shifting the unsigned equivalent left. */
-      work.i = object->slot;
+/* Copy the integer slot number into a signed int component of a union,
+   converting it from zero-base to one-base in the process, and clear the
+   lowest 8 bits by shifting the unsigned equivalent left. */
+      work.i = object->slot + 1;
       work.u = work.u << 8U;
 
 /* Make a copy of the result shifted right again. Test if any bits
    have been lost in this process. If so, there are too many arrays
    in use at once to encode them into IDs, so report an error. */
       test.u = work.u >> 8U;
-      if ( test.i != object->slot ) {
+      if ( test.i != object->slot + 1 ) {
          *status = ARY__XSARY;
          errRep( " ", "There are too many ARY arrays in use at once.",
                  status );
