@@ -51,10 +51,10 @@
 #include "ary1_types.h"
 
 /* Prototypes for private functions */
-Ary *ary1Expid( AryACB *acb, int *status );
+void *ary1Expid( AryObject *acb, int *status );
 AryACB *ary1Anl( AryACB *acb, int *status );
-AryACB *ary1Id2ac( const Ary *ary );
-AryACB *ary1Impid( const Ary *ary, int checklock, int readonly, int *status );
+AryObject *ary1Id2ac( const void *id_ptr, char isacb );
+AryObject *ary1Impid( const void *id_ptr, int checklock, int readonly, char isacb, int *status );
 char *ary1Get0C( const HDSLoc *loc, int *status );
 char ary1Defr( const AryDCB *dcb, int *status );
 char ary1Intyp( const char *type, int *status );

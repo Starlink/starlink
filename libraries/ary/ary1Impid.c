@@ -4,7 +4,8 @@
 #include "mers.h"
 #include "ary_err.h"
 
-AryACB *ary1Impid( const Ary *ary, int checklock, int readonly, int *status ) {
+AryObject *ary1Impid( const void *id, int checklock, int readonly,
+                      char isacb, int *status ) {
 /*
 *+
 *  Name:
@@ -14,8 +15,8 @@ AryACB *ary1Impid( const Ary *ary, int checklock, int readonly, int *status ) {
 *     Import an identifier.
 
 *  Synopsis:
-*     AryACB *ary1Impid( const Ary *ary, int checklock, int readonly,
-*                        int *status )
+*     AryObject *ary1Impid( const void *id, int checklock, int readonly,
+*                           char isacb, int *status )
 
 *  Description:
 *     The routine converts an array identifier, previously issued by
@@ -24,20 +25,25 @@ AryACB *ary1Impid( const Ary *ary, int checklock, int readonly, int *status ) {
 *     it is not valid.
 
 *  Parameters:
-*     ary
-*        Array identifier, in the form of a pointer as issued by ary1Expid.
+*     id
+*        An identifier for the object to be imported, in the form of an
+*        Ary or AryPlace pointer as issued by ary1Expid.
 *     checklock
-*        If non-zero, check that the supplied array is locked
+*        If non-zero, check that the supplied identifier is locked
 *        appropriately by the current thread.
 *     readonly
-*        Only used iof "checklock" is non-zero, in which case it gives
+*        Only used if "checklock" is non-zero, in which case it gives
 *        the type of lock required; read-only if non-zero, and read-write
 *        if zero.
+*     isacb
+*        If non-zero, the supplied object is expected to be an ACB.
+*        Otherwise it is expected to be a PCB.
 *     status
 *        The global status.
 
 *  Returned function value:
-*     Pointer to the ACB structure, or NULL if an error occurs.
+*     Pointer to the ACB or PCB structure, cast to an AryObject,
+*     or NULL if an error occurs.
 
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
@@ -66,24 +72,40 @@ AryACB *ary1Impid( const Ary *ary, int checklock, int readonly, int *status ) {
 *  History:
 *     03-JUL-2017 (DSB):
 *        Original version, based on equivalent Fortran routine by RFWS.
+*     4-SEP-2017 (DSB):
+*        Modified to be able to handle ACB or PCB objects.
 
 *-
 */
 
 /* Local Variables: */
-   AryACB *result = NULL;
+   AryObject *result = NULL;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return result;
 
 /* Convert the identifier to an ACB index. */
-   result = ary1Id2ac( ary );
+   result = ary1Id2ac( id, isacb );
 
 /* If a valid ACB was not returned, then report an error. */
-   if( ! result ){
+   if( !result ){
       *status = ARY__IDINV;
+      if( isacb ) {
+         msgSetc( "T", "Array" );
+      } else {
+         msgSetc( "T", "Placeholder" );
+      }
       errRep( " ", "Array identifier invalid (possible programming error).",
               status );
+
+/* Otherwise, if the object is of the wrong type, report an error. */
+   } else if( isacb && result->type != ARY__ACBTYPE ){
+      *status = ARY__IDINV;
+      errRep( " ", "Supplied identifier is not an Array identifier.", status );
+
+   } else if( !isacb && result->type != ARY__PCBTYPE ){
+      *status = ARY__IDINV;
+      errRep( " ", "Supplied identifier is not a Placeholder identifier.", status );
 
 /* If required, check that the array is locked appropriately by the
    current thread. */
