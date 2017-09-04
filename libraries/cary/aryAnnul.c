@@ -15,7 +15,7 @@ void aryAnnul( Ary **ary, int *status ) {
 *     void aryAnnul( Ary **ary, int *status )
 
 *  Description:
-*     The routine annuls the array pointer supplied so that it is no
+*     This function annuls the array pointer supplied so that it is no
 *     longer recognised as a valid pointer by the ARY_ routines.
 *     Any resources associated with it are released and made available
 *     for re-use. If the array is mapped for access, then it is
@@ -83,7 +83,7 @@ void aryAnnul( Ary **ary, int *status ) {
 
 /* Import the array pointer. */
    *status = SAI__OK;
-   acb = ary1Impid( *ary, 0, 0, status );
+   acb = (AryACB *) ary1Impid( *ary, 0, 0, 1, status );
 
 /* Annul the associated ACB entry and reset the array pointer value. */
    if( *status == SAI__OK ){

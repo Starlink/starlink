@@ -84,7 +84,7 @@ void aryNewp( const char *ftype, int ndim, int ubnd, int place, Ary *ary,
               int *status );
 void aryNoacc( const char *access, Ary *ary, int *status );
 void aryOffs( int iary1, int iary2, int mxoffs, int offs, int *status );
-void aryPlace( const char *loc, const char *name, int place, int *status );
+void aryPlace( HDSLoc *loc, const char *name, AryPlace **place, int *status );
 void aryReset( Ary *ary, int *status );
 void arySame( int iary1, int iary2, char same, char isect, int *status );
 void arySbad( char bad, Ary *ary, int *status );

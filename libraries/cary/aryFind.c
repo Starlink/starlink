@@ -17,7 +17,7 @@ void aryFind( HDSLoc *loc, const char *name, Ary **ary, int *status ) {
 *     void aryFind( HDSLoc *loc, const char *name, Ary **ary, int *status )
 
 *  Description:
-*     The routine finds a named array within an HDS structure, imports
+*     This function finds a named array within an HDS structure, imports
 *     it into the ARY_ system and issues an identifier for it. The
 *     imported array may then be manipulated by the ARY_ routines.
 
@@ -89,7 +89,7 @@ void aryFind( HDSLoc *loc, const char *name, Ary **ary, int *status ) {
    ary1Imp( locary, &acb, status );
 
 /* Export an array identifier. */
-   *ary = ary1Expid( acb, status );
+   *ary = ary1Expid( (AryObject *) acb, status );
 
 /* Annul the locator to the array structure. */
    datAnnul( &locary, status );
