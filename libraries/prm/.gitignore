@@ -58,3 +58,13 @@
 /vec_wtox.f
 /prm_test
 /sun39.pdf
+/prm_cgen.h
+/vecBtox.c
+/vecDtox.c
+/vecFtox.c
+/vecItox.c
+/vecKtox.c
+/vecRtox.c
+/vecUBtox.c
+/vecUWtox.c
+/vecWtox.c
