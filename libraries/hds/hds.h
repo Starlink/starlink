@@ -1539,5 +1539,13 @@ hdsFind( const HDSLoc *loc1, const char *name, const char *mode,
          HDSLoc **loc2, int *status );
 
 
+
+/*===================================================================*/
+/* Stubs for functions to be introduced in HDS V5.
+/*===================================================================*/
+int datLock( HDSLoc *locator, int recurs, int readonly, int *status );
+int datLocked( const HDSLoc *locator, int *status );
+int datUnlock( HDSLoc *locator, int recurs, int *status );
+
 /* STAR_HDS_H_INCLUDED */
 #endif
