@@ -1,6 +1,5 @@
 #include "sae_par.h"
 #include "dat_par.h"
-#include "hds1.h"
 #include "hds.h"
 
 void cmpType( HDSLoc *struc, const char *comp, char type[DAT__SZTYP+1],
