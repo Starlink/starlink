@@ -94,7 +94,7 @@ F_C_ROUTINES = hds_run.c fortran_interface.c hdsFind.c
 #  List of Fortran BLOCK DATA routines.
 BLOCK_DATA_FILES = cmp_blk.f
 
-CMP_C_ROUTINES = cmpMod.c cmpPut0x.c
+CMP_C_ROUTINES = cmpMod.c cmpPut0x.c cmpType.c
 
 C_ROUTINES = $(CMP_C_ROUTINES) \
 	dat1_alloc_lcp.c dat1_annul_lcp.c dat1_check_mode.c \
