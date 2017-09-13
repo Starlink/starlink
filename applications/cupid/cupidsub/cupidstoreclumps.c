@@ -237,8 +237,8 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
    double *tj;              /* Pointer to next table entry to write*/
    fitsfile *fptr;          /* Pointer to FITS file structure */
    int bad;                 /* Does clump touch an area of bad pixels? */
-   int i;                   /* Index of next locator */
-   int iclump;              /* Usable clump index */
+   hdsdim i;                /* Index of next locator */
+   hdsdim iclump;           /* Usable clump index */
    int icol;                /* Zero based column index */
    int ifrm;                /* Frame index */
    int indf1;               /* Identifier for supplied NDF */

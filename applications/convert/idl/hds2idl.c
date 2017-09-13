@@ -111,7 +111,7 @@ int status;             /* Starlink status */
 char type[DAT__SZTYP+1];/* HDS type of component */
 UCHAR idltype;          /* IDl type of component */
 int ndims;              /* Number of dimensions of object */
-int dims[DAT__MXDIM];   /* Dimensions of object HDS style */
+hdsdim dims[DAT__MXDIM];/* Dimensions of object HDS style */
 IDL_LONG idldims[DAT__MXDIM];/* Dimensions of object IDL style */
 int i;                  /* loop index */
 int fstat;              /* Final status (before emsEload) */

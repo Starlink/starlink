@@ -92,7 +92,8 @@ void smf_km2ext( int indf, const char *xname, AstKeyMap *keymap,
    HDSLoc *cloc = NULL;
    HDSLoc *xloc = NULL;
    const char *key = NULL;
-   int dim[ NDF__MXDIM ];
+   hdsdim dim[ NDF__MXDIM ];
+   int idim[ NDF__MXDIM ];
    int i;
    int ndim;
    int nentry;
@@ -104,7 +105,7 @@ void smf_km2ext( int indf, const char *xname, AstKeyMap *keymap,
    if( *status != SAI__OK ) return;
 
 /* Get the shape of the NDF, and note the length of the 3rd axis. */
-   ndfDim( indf, 3, dim, &ndim, status );
+   ndfDim( indf, 3, idim, &ndim, status );
    ntime = dim[ 2 ];
 
 /* Get a locator to the named extension. */

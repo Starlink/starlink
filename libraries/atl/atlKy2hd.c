@@ -89,14 +89,14 @@ void atlKy2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
    float fval;
    int i;
    int ival;
-   int j;
+   hdsdim j;
    int lenc;
    int nval;
    char *oldsortby;
    int *oldstat = NULL;
    int size;
    int type;
-   int veclen;
+   hdsdim veclen;
    size_t el;
    void *pntr = NULL;
 

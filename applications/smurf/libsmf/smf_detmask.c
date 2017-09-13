@@ -30,7 +30,7 @@
 *        otherwise, and a value of 1 is assumed.
 *     ndim = int (Given)
 *        Number of array axes in "in" and "out".
-*     dims_in = const int * (Given)
+*     dims_in = const hdsdim * (Given)
 *        Pointer to an array of "ndim" values, each being the length of
 *        the corresponding dimension of the "in" array. The dimensions of
 *        the "out" array should be the same as those of the "in" array,
@@ -118,8 +118,9 @@
 #include "mers.h"
 #include "smf.h"
 
-void smf_detmask( const char *type, const void *in, int len, int ndim, const int *dims_in,
-                  int maxis, const int *mask, void *out, int *status ){
+void smf_detmask( const char *type, const void *in, int len, int ndim,
+                  const hdsdim *dims_in, int maxis, const int *mask,
+                  void *out, int *status ){
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;

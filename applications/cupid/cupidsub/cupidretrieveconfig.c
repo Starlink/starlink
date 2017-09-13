@@ -77,7 +77,7 @@ AstKeyMap *cupidRetrieveConfig( HDSLoc *xloc, int *status ){
    HDSLoc *aloc;         /* HDS locator for entire CONFIG array */
    HDSLoc *cloc;         /* HDS locator for single cell of ONFIG array */
    char text[ GRP__SZNAM + 1 ];/* Value extracted from GRP group */
-   int i;                /* Index of next entry in group */
+   hdsdim i;             /* Index of next entry in group */
    int size;             /* Number of lines of text */
    int there;            /* Does component exist?*/
 

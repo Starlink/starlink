@@ -85,11 +85,11 @@ char *comp;
 char *name = NULL;
 char *saveptr;
 char *tempstr = NULL;
-int ends[DAT__MXDIM];
+hdsdim ends[DAT__MXDIM];
 int file_opened=FALSE;
 int ndims;
 int slice;
-int starts[DAT__MXDIM];
+hdsdim starts[DAT__MXDIM];
 int true=TRUE;
 
    if ( ( (tempstr = (char *)calloc(strlen(object)+2,sizeof(char))) != NULL )

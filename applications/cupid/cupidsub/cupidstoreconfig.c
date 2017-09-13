@@ -78,13 +78,13 @@ void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config, int *status ){
    HDSLoc *cloc;         /* HDS locator for single cell of ONFIG array */
    char name[ GRP__SZNAM + 1 ];/* Value extracted from GRP group */
    char *pname;          /* Pointer to pass to grpGet */
-   int el;               /* Index of element to store */
+   hdsdim el;            /* Index of element to store */
    int i;                /* Index of next entry in group */
-   int n;                /* Number of entries in group */
+   hdsdim n;             /* Number of entries in group */
    int nc;               /* Number of characters in group entry */
    int ncmax;            /* Max number of characters in any group entry */
-   int subs[ 1 ];        /* Array containing required cell index */
-   int there;                   /* Does component exist?*/
+   hdsdim subs[ 1 ];     /* Array containing required cell index */
+   int there;            /* Does component exist?*/
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;

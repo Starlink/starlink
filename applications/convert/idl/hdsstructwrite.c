@@ -11,7 +11,7 @@
 *  Invocation:
 *     Call from C
 *     int hdsstructwrite( HDSLoc *toploc, char *data, char **taglist,
-*                     int numtags, int ndims, int dims[],
+*                     int numtags, int ndims, hdsdim dims[],
 *                     IDL_VPTR var, int *status )
 
 *  Arguments:
@@ -26,7 +26,7 @@
 *        The number of tags in the IDL structure
 *     ndims = int (Given)
 *        The number of dimensions
-*     dims = int * (Given)
+*     dims = hdsdim * (Given)
 *        The dimensions
 *     var = IDL_VPTR (Given)
 *        Variable containing data description
@@ -88,7 +88,7 @@
 #include "hds2idl.h"
 
 void hdsstructwrite( HDSLoc *toploc, void *data, char **taglist, int numtags,
-                     int ndims, int dims[],
+                     int ndims, hdsdim dims[],
                      IDL_VPTR var, int *status ) {
 
 IDL_StructDefPtr sdef;
@@ -102,7 +102,7 @@ int starttag;                  /* 1 if first tag is HDSSTRUCTYPE */
 /* values pertaining to the structure component */
 int cmpnumtags;                /* No of tags */
 int cmpndims;                  /* No. of dimensions */
-int cmpdims[DAT__MXDIM];       /* Dimensions */
+hdsdim cmpdims[DAT__MXDIM];    /* Dimensions */
 char objhdstype[DAT__SZTYP+1];
 char cmphdstype[DAT__SZTYP+1];
 HDSLoc * cmploc = NULL;

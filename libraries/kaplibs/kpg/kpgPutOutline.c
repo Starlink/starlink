@@ -121,7 +121,7 @@ void kpgPutOutline( int indf, float wlim, int convex, int *status ){
    int iaxis;
    int iel;
    int inside[ 2 ];
-   int i;
+   hdsdim i;
    int iz;
    int latax;
    int lbnd[ 2 ];

@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     void smf_detmask<X>( const CGEN_TYPE *in, int len, int ndim,
-*                          const int *dims_in, int maxis, const int *mask,
+*                          const hdsdim *dims_in, int maxis, const int *mask,
 *                          CGEN_TYPE *out, int *status );
 
 *  Arguments:
@@ -27,7 +27,7 @@
 *        otherwise, and a value of 1 is assumed.
 *     ndim = int (Given)
 *        Number of array axes in "in" and "out".
-*     dims_in = const int * (Given)
+*     dims_in = const hdsdim * (Given)
 *        Pointer to an array of "ndim" values, each being the length of
 *        the corresponding dimension of the "in" array. The dimensions of
 *        the "out" array should be the same as those of the "in" array,
@@ -116,7 +116,7 @@
 #include "smf.h"
 
 void CGEN_FUNCTION(smf_detmask)( const CGEN_TYPE *in, int len, int ndim,
-                                 const int *dims_in, int maxis,
+                                 const hdsdim *dims_in, int maxis,
                                  const int *mask, CGEN_TYPE *out,
                                  int *status ){
 
@@ -124,7 +124,7 @@ void CGEN_FUNCTION(smf_detmask)( const CGEN_TYPE *in, int len, int ndim,
    const CGEN_TYPE *pin;
    CGEN_TYPE *pout;
    int i;
-   int ic[ NDF__MXDIM ];
+   hdsdim ic[ NDF__MXDIM ];
    size_t iel;
    size_t nel;
 

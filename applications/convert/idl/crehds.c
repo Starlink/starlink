@@ -91,7 +91,7 @@ char *strucname;  /* The name of the top-level structure */
 IDL_VPTR var;
 
 int ndims;
-int dims[DAT__MXDIM];
+hdsdim dims[DAT__MXDIM];
 
 int status;        /* Starlink status */
 
@@ -108,7 +108,7 @@ char *data;                 /* Pointer to data */
 IDL_LONG nvals;             /* Number of values in var */
 int elt_len;                /* Length of element of structure */
 IDL_STRING *IDL_tags;
-int IDL_ntags;
+hdsdim IDL_ntags;
 
 char defname[12]="IDL2HDS_OUT";
 
@@ -122,7 +122,7 @@ char defname[12]="IDL2HDS_OUT";
 
       if ( argv[1]->flags & IDL_V_ARR ) {
          IDL_tags = (IDL_STRING *)argv[1]->value.arr->data;
-         IDL_ntags = (int)argv[1]->value.arr->n_elts;
+         IDL_ntags = (hdsdim)argv[1]->value.arr->n_elts;
       } else {
          IDL_tags = &argv[1]->value.str;
          IDL_ntags = 1;

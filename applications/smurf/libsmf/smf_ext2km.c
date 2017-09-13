@@ -129,7 +129,7 @@ void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap,
    const char *key = NULL;
    hdsdim diml[NDF__MXDIM];
    hdsdim dimu[NDF__MXDIM];
-   int dim[ NDF__MXDIM ];
+   hdsdim dim[ NDF__MXDIM ];
    int i;
    int idim;
    int lbnd[ NDF__MXDIM ];

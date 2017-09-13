@@ -107,7 +107,7 @@ void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode,
 /* Local Varianles: */
    char name[ DAT__SZNAM + 1 ];
    const char *hdstype;
-   int dim[ NDF__MXDIM ];
+   hdsdim dim[ NDF__MXDIM ];
    int ndim;
    int haskey;
    int hslice;

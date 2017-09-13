@@ -139,7 +139,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim,
    int i;               /* 1D vector index loop count */
    int ii;              /* 1D vector index of current "out" pixel */
    int indf;            /* NDF identifier for clump image */
-   int j;               /* Clump loop count */
+   hdsdim j;            /* Clump loop count */
    int k;               /* Axis loop count */
    size_t nclump;       /* Number of clump NDFs supplied */
    int step[ 3 ];       /* 1D step between adjacent pixels on each axis */

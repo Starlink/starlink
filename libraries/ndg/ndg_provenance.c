@@ -461,7 +461,7 @@ static AstKeyMap *ndg1Hd2ky( HDSLoc *, int * );
 static AstKeyMap *ndg1ShowProv( Prov *, int, AstKeyMap *, FILE *, int * )__attribute__((unused));
 static AstObject *ndg1ReadObject( char *, int *, int * );
 static HDSLoc *ndg1GtAnc( HDSLoc *, size_t *, int * );
-static HDSLoc *ndg1Temp( const char *, int, int *, int * );
+static HDSLoc *ndg1Temp( const char *, int, const hdsdim *, int * );
 static NdgProvenance *ndg1Encode( Provenance *, int * );
 static Prov *ndg1CopyProv( Prov *, int * );
 static Prov *ndg1FreeProv( Prov *, int * );
@@ -7491,7 +7491,7 @@ static char *ndg1StoreObject( char *mem, AstObject *obj, size_t *memsize,
    return result;
 }
 
-static HDSLoc *ndg1Temp( const char *type, int ndim, int *dim, int *status ){
+static HDSLoc *ndg1Temp( const char *type, int ndim, const hdsdim *dim, int *status ){
 /*
 *  Name:
 *     ndg1Temp
@@ -7500,7 +7500,7 @@ static HDSLoc *ndg1Temp( const char *type, int ndim, int *dim, int *status ){
 *     Create a temporary HDS object.
 
 *  Invocation:
-*     HDSLoc *ndg1Temp( const char *type, int ndim, int *dim, int *status )
+*     HDSLoc *ndg1Temp( const char *type, int ndim, const hdsdim *dim, int *status )
 
 *  Description:
 *     This function creates a temporary HDS object with the specified
@@ -7532,7 +7532,7 @@ static HDSLoc *ndg1Temp( const char *type, int ndim, int *dim, int *status ){
 /* Local variables: */
    HDSLoc *result = NULL;        /* Returned locator for temporary object */
    char name[ DAT__SZNAM + 1 ];  /* Temporary object name */
-   int dummy[ 1 ];               /* Dummy dimensions array */
+   hdsdim dummy[ 1 ];            /* Dummy dimensions array */
 
 /* Static variables! But the NDF library is not thread safe, so we cannot
    be using this module in a thread-safe environment, so there is no harm

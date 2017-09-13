@@ -10,7 +10,7 @@
 
 *  Invocation:
 *     Call from C
-*     int hdsprimwrite(HDSLoc *toploc, char *hdstype, int ndims, int *dims,
+*     int hdsprimwrite(HDSLoc *toploc, char *hdstype, int ndims, hdsdim *dims,
 *         void *data, int *status ) {
 
 *  Arguments:
@@ -20,7 +20,7 @@
 *        The HDS type to be written
 *     ndims = int (Given)
 *        The number of dimensions
-*     dims = int * (Given)
+*     dims = hdsdim * (Given)
 *        The dimensions
 *     data = void * (Given)
 *        Pointer to the IDL data
@@ -88,24 +88,23 @@
 #include "export.h"
 #include "sae_par.h"
 #include "hds.h"
+#include "cnf.h"
 #include "ems.h"
 #include "ems_par.h"
 #include "star/hds.h"
 #include "hds2idl.h"
 
-void hdsprimwrite(HDSLoc *toploc, char *hdstype, int ndims, int *dims,
+void hdsprimwrite(HDSLoc *toploc, char *hdstype, int ndims, hdsdim *dims,
                     void *data, int *status ) {
 int clen;       /* length of strings in array */
 char **carray;  /* Pointer to an array of C strings */
 int i;
- hdsdim hdims[MAXDIMS];
-
+char *concat;
+char *cpos;
+size_t nel;
+size_t iel;
    if ( *status != SAI__OK ) return;
 
-   /* Copy dims to HDS type */
-   for (i = 0; i < ndims ; i ++ ) {
-     hdims[i] = dims[i];
-   }
 
    if ( strncmp( hdstype, "_CHAR", 5 ) ) {
       if ( *hdstype == '_' ) {
@@ -119,7 +118,20 @@ int i;
    } else {
       clen = atoi( hdstype+6 )+1;
       carray = getstringarray( ndims, dims, data );
-      idlDatPutc( toploc, ndims, dims, carray, clen, status );
+
+      nel = 1;
+      for( i = 0; i < ndims; i++ ) nel *= dims[ i ];
+      concat = starMalloc( nel*clen );
+      if( concat ) {
+         cpos = concat;
+         for( iel = 0; iel < nel; iel++ ) {
+            cnfExprt( carray[iel], cpos, clen );
+            cpos + clen;
+         }
+
+         datPutC( toploc, ndims, dims, concat, clen, status );
+         starFree( concat );
+      }
       retstringarray(carray);
    }
 return;

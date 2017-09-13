@@ -21,9 +21,9 @@
 *       If the component spec is a slice
 *    ndims = int * (Returned)
 *       The number of dimensions of any any index or slice info
-*    starts = int[] (Returned)
+*    starts = hdsdim[] (Returned)
 *       The start indices of any index or slice info
-*    ends = int[] (Returned)
+*    ends = hdsdim[] (Returned)
 *       The end indices of any index or slice info
 *    status = int * (Given and Returned)
 *       The Starlink global status
@@ -71,12 +71,13 @@
 #include <string.h>
 #include "sae_par.h"
 #include "ems.h"
+#include "hds.h"
 
 #define TRUE 1
 #define FALSE 0
 
 int checkarr( char *comp, char name[], int *slice, int *ndims,
-              int starts[], int ends[], int *status ) {
+              hdsdim starts[], hdsdim ends[], int *status ) {
 int i,j;              /* counters */
 int isarr;            /* temp return value */
 int len;              /* length of remainder of index string */

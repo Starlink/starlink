@@ -22,7 +22,7 @@
 *    ndims = int (Given)
 *       Number of dimensions
 *
-*    dims = int[] (Given)
+*    dims = hdsdim[] (Given)
 *       Array of dimensions
 *
 *    status = *int (Given and Returned)
@@ -66,7 +66,7 @@
 #define TAG__SZNAM DAT__SZNAM+30
 
 IDL_StructDefPtr idlstructarrdef(
-   HDSLoc *sloc, char *name, int ndims, int dims[], int *status ) {
+   HDSLoc *sloc, char *name, int ndims, hdsdim dims[], int *status ) {
 
 static char hdsstructype[13] =  "HDSSTRUCTYPE";
 static IDL_STRUCT_TAG_DEF niltagdef={0};
@@ -74,9 +74,9 @@ static IDL_STRUCT_TAG_DEF niltagdef={0};
 IDL_STRUCT_TAG_DEF *tags;
 IDL_VPTR tagvar;
 IDL_VPTR tagnamevar;
-
-int i, j;                 /* Loop counters */
-size_t nels;                 /* Number of elements */
+hdsdim i;                 /* Loop counter */
+int j;                    /* Loop counters */
+size_t nels;              /* Number of elements */
 char suffix[5]="_";       /* Name suffix component */
 int index[DAT__MXDIM]={0};/* current indices */
 

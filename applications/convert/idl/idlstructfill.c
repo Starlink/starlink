@@ -75,11 +75,12 @@ return SAI__OK;
 }
 
 void idlstructfill( HDSLoc *sloc, IDL_SREF sref, int *status ) {
-int i, j, k;              /* Loop counters */
+int i, j;                 /* Loop counters */
+hdsdim k;
 int nscomp;               /* Number of structure components */
 int ncomp;                /* Number of hds components */
 int ndims;                /* Number of hds dimensions */
-int dims[DAT__MXDIM];     /* dimensions */
+hdsdim dims[DAT__MXDIM];  /* dimensions */
 char type[DAT__SZTYP+1];  /* type as C string */
 char hdsstructype[DAT__SZTYP+30];
 UCHAR idltype;            /* IDL type code */

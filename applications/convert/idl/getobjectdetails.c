@@ -11,7 +11,7 @@
 *  Invocation:
 *     Call from C
 *     getobjectdetails( IDL_VPTR var, void *data, char *taglist[],
-*          char hdstype[], int *numtags, int *ndims, int dims[],
+*          char hdstype[], int *numtags, int *ndims, hdsdim dims[],
 *          int *elt_len, int *status ) {
 
 *  Arguments:
@@ -27,7 +27,7 @@
 *        Number of tags (0 implies non-structure)
 *     ndims = int * (Returned)
 *        The number of dimensions
-*     dims = int[] (Returned)
+*     dims = hdsdim[] (Returned)
 *        The dimensions
 *     elt_len = int * (Returned)
 *        Length of an array element
@@ -81,6 +81,7 @@
 #include <string.h>
 #include "export.h"
 #include "sae_par.h"
+#include "hds.h"
 
 int getidlstringsize( IDL_VPTR var, IDL_STRING *data );
 
@@ -88,7 +89,7 @@ char *gethdstype( UCHAR idltype );
 
 void getobjectdetails( IDL_VPTR var, void *data, char *taglist[],
                     char hdstype[], int *numtags,
-                    int *ndims, int dims[], int *elt_len, int *status ) {
+                    int *ndims, hdsdim dims[], int *elt_len, int *status ) {
 
 UCHAR idltype;     /* Type of variable */
 int i;             /* counter */

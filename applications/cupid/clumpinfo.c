@@ -137,7 +137,7 @@ void clumpinfo( int *status ) {
    int *clump_flags = NULL;  /* Flags indicating if each clump is to be used */
    int *clump_indices = NULL;/* List of indices of clumps to be used */
    int i;               /* Loop count */
-   int iclump;          /* One-based clump index */
+   hdsdim iclump;       /* One-based clump index */
    int indf;            /* NDF identifier for input NDF */
    int ipix;            /* Index of PIXEL Frame */
    size_t nclumps;      /* No. of clump descriptions within the supplied NDF */
