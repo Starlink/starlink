@@ -667,7 +667,7 @@ int *status        /* global status (given and returned) */
    int ndim;               /* number of dimensions */
    int ndimx;              /* max number of dimensions */
    int place;              /* NDF placeholder */
-   int strnum;             /* structure element number */
+   hdsdim strnum;          /* structure element number */
    int there;              /* existence flag */
    int uindf;              /* NDF identifier */
 
@@ -893,7 +893,7 @@ int *status                      /* global status (given and returned) */
     20Mar2007 : use const in signature (timj)
 */
 {
-   int dim[2];
+   hdsdim dim[2];
    int j;
    int ndim;
    int pos;
@@ -1114,7 +1114,7 @@ int *status                   /* global status (given and returned) */
     20Mar2007 : Use const in signature (TIMJ)
 */
 {
-   int dim[2];
+   hdsdim dim[2];
    int j;
    int ndim;
    int pos;
@@ -1156,7 +1156,7 @@ int *status                   /* global status (given and returned) */
          if (*status == SAI__OK) {
            *status = DITS__APP_ERROR;
            sprintf( sc2store_errmess,
-                    "sc2store_headrmap: Size mismatch in entry '%s'. Expected %d elements got %" HDS_DIM_FORMAT,
+                    "sc2store_headrmap: Size mismatch in entry '%s'. Expected %ld elements got %" HDS_DIM_FORMAT,
                     hdsRecords[j].name, nframes, dims[0] );
            ErsRep( 0, status, sc2store_errmess );
          }
@@ -1476,7 +1476,7 @@ const AstFrameSet *fset, /* World coordinate transformations (given) */
 int ndim,                /* dimensionality of image (given) */
 const int dims[],        /* dimensions of image (given) */
 size_t colsize,          /* number of pixels in a column (given) */
-size_t rowsize,            /* number of pixels in a row (given) */
+size_t rowsize,          /* number of pixels in a row (given) */
 const double *image,     /* constructed image (given) */
 const double *zero,      /* bolometer zero values [can be null pointer] (given) */
 const char * obsidss,    /* OBSIDSS string for provenance (given) */
@@ -1672,7 +1672,7 @@ int *status           /* global status (given and returned) */
    int lbnd[3];            /* lower dimension bounds */
    HDSLoc *loc2 = NULL;    /* HDS locator */
    int place;              /* NDF placeholder */
-   int strnum;             /* structure element number */
+   hdsdim strnum;          /* structure element number */
    int uindf;              /* NDF identifier */
    int ubnd[3];            /* upper dimension bounds */
 
@@ -2006,7 +2006,7 @@ int *status              /* global status (given and returned) */
     31Oct2007 : change name nfits to nrec (bdk)
 */
 {
-   int dim[1];                /* number of FITS entries */
+   hdsdim dim[1];             /* number of FITS entries */
    HDSLoc *fitsloc = NULL;    /* HDS locator to FITS headers */
    void *fptr = NULL;         /* Pointer to the mapped FITS header */
    int ndim;                  /* number of dimensions in query */
@@ -2065,7 +2065,7 @@ int *status              /* global status (given and returned) */
    int el;                     /* number of elements mapped */
    int isthere = 0;            /* Is component present? */
    int nfdim;                  /* number of flatpar dimensions */
-   int fdims[1];               /* flatpar dimensios */
+   hdsdim fdims[1];            /* flatpar dimensios */
    int place;                  /* NDF placeholder */
 
 
@@ -2455,8 +2455,8 @@ int *status              /* Global status (given and returned) */
 #ifdef PACKAGE_UPCASE
    HDSLoc *xloc3 = NULL;
    char name[ DAT__SZNAM + 1 ];
-   hdsdim lower[ 1 ];
-   hdsdim upper[ 1 ];
+   int lower[ 1 ];
+   int upper[ 1 ];
    int ncomp;
 #endif
 
@@ -2868,7 +2868,7 @@ int *status              /* global status (given and returned) */
    int j;                      /* loop counter */
    int lbnd[3];                /* lower dimension bounds */
    int place;                  /* NDF placeholder */
-   int tdims[1];               /* temporary dimension store */
+   hdsdim tdims[1];            /* temporary dimension store */
    int ubnd[3];                /* upper dimension bounds */
 
 
@@ -3034,7 +3034,7 @@ int *status                 /* global status (given and returned) */
   /* Macro to create items in HDS and copy the values. */
 #define STORE_STATE( ITEM, ITEMSTR, HDSTYPE, TYPE, BUFFER, DIFFERENT ) \
   if (*status == SAI__OK) {                                            \
-    int dim[1];                                                        \
+    hdsdim dim[1];                                                        \
     int different = DIFFERENT;                                         \
     int ndim;                                                          \
     int nwrite;                                                        \
@@ -3076,7 +3076,7 @@ int *status                 /* global status (given and returned) */
 
 #define STORE_CHAR( ITEM, ITEMSTR, ITEMLEN )                            \
   if (*status == SAI__OK) {                                             \
-    int dim[1];                                                         \
+    hdsdim dim[1];                                                         \
     int different = 0;                                                  \
     int ndim;                                                           \
     int nwrite;                                                         \

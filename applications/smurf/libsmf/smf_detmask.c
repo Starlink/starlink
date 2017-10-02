@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_detmask( type, void *in, int len, int ndim, int *dims_in,
+*     smf_detmask( type, void *in, int len, int ndim, const hdsdim *dims_in,
 *                  int axis, int *index, int maxis, int *mask, void *out,
 *                  int *status );
 

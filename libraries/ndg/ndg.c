@@ -116,7 +116,7 @@ F77_SUBROUTINE(ndg_ndfcr)( INTEGER(IGRP), INTEGER(INDEX), CHARACTER(FTYPE), INTE
 			   TRAIL(FTYPE) );
 
 void ndgNdfcr( const Grp* igrp, size_t index, const char ftype[], int ndim,
-	       const hdsdim lbnd[], const hdsdim ubnd[], int * indf, int * status ) {
+	       const int lbnd[], const int ubnd[], int * indf, int * status ) {
 
   DECLARE_INTEGER(IGRP);
   DECLARE_INTEGER(INDEX);
@@ -127,15 +127,14 @@ void ndgNdfcr( const Grp* igrp, size_t index, const char ftype[], int ndim,
   DECLARE_INTEGER(INDF);
   DECLARE_INTEGER(STATUS);
 
-  DECLARE_INTEGER_ARRAY( LBND_DUMMY, NDF__MXDIM );
-  DECLARE_INTEGER_ARRAY( UBND_DUMMY, NDF__MXDIM );
-
+  F77_CREATE_INTEGER_ARRAY( LBND, ndim );
+  F77_EXPORT_INTEGER_ARRAY( lbnd, LBND, ndim );
+  F77_CREATE_INTEGER_ARRAY( UBND, ndim );
+  F77_EXPORT_INTEGER_ARRAY( ubnd, UBND, ndim );
   IGRP = grpC2F( igrp, status );
   F77_EXPORT_INTEGER( index, INDEX );
   F77_EXPORT_CHARACTER( ftype, FTYPE, NDF__SZFTP );
   F77_EXPORT_INTEGER( ndim, NDIM );
-  LBND = hdsDimC2F( ndim, lbnd, LBND_DUMMY, status );
-  UBND = hdsDimC2F( ndim, ubnd, UBND_DUMMY, status );
   F77_EXPORT_INTEGER(*status, STATUS );
 
   F77_LOCK( F77_CALL(ndg_ndfcr)( INTEGER_ARG(&IGRP), INTEGER_ARG(&INDEX), CHARACTER_ARG(FTYPE),

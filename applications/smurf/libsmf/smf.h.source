@@ -1005,7 +1005,7 @@ smfHead * smf_deepcopy_smfHead ( const smfHead *old, int * status);
 int smf_despike_wvm(double* data, int n, int width, double tol, int* status);
 
 void smf_detmask( const char *type, const void *in, int len, int ndim,
-                  const int *dims_in, int maxis, const int *mask,
+                  const hdsdim *dims_in, int maxis, const int *mask,
                   void *out, int *status );
 
 void smf_detmaskc( const char *in, int len, int ndim, const int *dims_in,

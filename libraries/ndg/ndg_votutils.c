@@ -446,7 +446,7 @@ AstXmlElement *ndgPutGroup( AstXmlElement *elem, const char *name, int *status )
 }
 
 AstXmlElement *ndgPutParam( AstXmlElement *elem, const char *name,
-                            int ndim, int *dim, const char *datatype,
+                            int ndim, hdsdim *dim, const char *datatype,
                             const char *values, int *status ){
 /*
 *+
@@ -458,7 +458,7 @@ AstXmlElement *ndgPutParam( AstXmlElement *elem, const char *name,
 
 *  Invocation:
 *     AstXmlElement *ndgPutParam( AstXmlElement *elem, const char *name,
-*                                 int ndim, int *dim, const char *datatype,
+*                                 int ndim, hdsdim *dim, const char *datatype,
 *                                 const char *values, int *status )
 
 *  Description:
@@ -513,14 +513,14 @@ AstXmlElement *ndgPutParam( AstXmlElement *elem, const char *name,
    astXmlAddAttr( param, "datatype", datatype, NULL );
 
 /* Format the first dimension into a dynamically allocated string. */
-   sprintf( buf, "%d", dim[ 0 ] ) ;
+   sprintf( buf, "%" HDS_DIM_FORMAT, dim[ 0 ] ) ;
    arraysize = NULL;
    nc = 0;
    arraysize = astAppendString( arraysize, &nc, buf );
 
 /* For each other axis, add the dimension size to the buffer. */
    for( i = 1; i < ndim; i++ ) {
-      sprintf( buf, "x%d", dim[ i ] ) ;
+      sprintf( buf, "x%" HDS_DIM_FORMAT, dim[ i ] ) ;
       arraysize = astAppendString( arraysize, &nc, buf );
    }
 

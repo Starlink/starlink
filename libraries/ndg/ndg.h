@@ -109,7 +109,7 @@ void ndgGtsup( const Grp *grp, size_t i, char *const fields[6], size_t len, int 
 void ndgHideProv( NdgProvenance *, int, int * );
 void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km, int *status );
 void ndgNdfas( const Grp *igrp, size_t index, const char mode[], int *indf, int *status );
-void ndgNdfcr( const Grp *igrp, size_t index, const char ftype[], int ndim, const hdsdim lbnd[], const hdsdim ubnd[], int *indf, int *status );
+void ndgNdfcr( const Grp *igrp, size_t index, const char ftype[], int ndim, const int lbnd[], const int ubnd[], int *indf, int *status );
 void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, size_t index, int *indf2, int *status);
 void ndgNdfco( int indf1, const Grp *igrp, size_t index, int *indf2, int *status);
 void ndgPutProv( NdgProvenance *prov, int indf, AstKeyMap *more, int isroot, int *status );
@@ -120,7 +120,7 @@ void ndgWriteProv( NdgProvenance *prov, int indf, int whdef, int *status );
 
 AstXmlElement *ndgHds2vot( const HDSLoc *loc, AstXmlElement *elem, int *status );
 AstXmlElement *ndgPutParam0( AstXmlElement *elem, const char *name, const char *datatype, const char *value, int *status );
-AstXmlElement *ndgPutParam( AstXmlElement *elem, const char *name, int ndim, int *dim, const char *datatype, const char *values, int *status );
+AstXmlElement *ndgPutParam( AstXmlElement *elem, const char *name, int ndim, hdsdim *dim, const char *datatype, const char *values, int *status );
 AstXmlElement *ndgPutGroup( AstXmlElement *elem, const char *name, int *status );
 HDSLoc *ndgVot2hds( AstXmlElement *elem, HDSLoc *ploc, int *status );
 const char *ndgGetAttrib( AstXmlElement *elem, const char *name, const char *method, int *status );

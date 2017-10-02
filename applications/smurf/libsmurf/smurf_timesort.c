@@ -376,7 +376,9 @@ void smurf_timesort( int *status ) {
    int conform;
    int detbit;
    int detpurge;
-   int dims[ 3 ];
+   int ii;
+   int idims[ 3 ];
+   hdsdim dims[ 3 ];
    int el;
    int found;
    int genvar;
@@ -627,7 +629,7 @@ void smurf_timesort( int *status ) {
 
 /* Get the pixel dimensions of the input NDF. Report an error if not
    three dimensional. */
-            ndfDim( indf1, 3, dims, &ndim, status );
+            ndfDim( indf1, 3, idims, &ndim, status );
             if( ndim != 3 && *status == SAI__OK ) {
                *status = SAI__ERROR;
                ndfMsg( "NDF", indf1 );
@@ -638,7 +640,7 @@ void smurf_timesort( int *status ) {
             if( nbaddet > 0 ) {
                ndfBound( indf2, 3, lbnd, ubnd, &ndim, status );
                lbnd[ 1 ] = 1;
-               ubnd[ 1 ] = dims[ 1 ] - nbaddet;
+               ubnd[ 1 ] = idims[ 1 ] - nbaddet;
                ndfSbnd( 3, lbnd, ubnd, indf2, status );
             }
 
@@ -648,7 +650,7 @@ void smurf_timesort( int *status ) {
                if( there ) {
                   ndfMap( indf1, comp[ i ], "_REAL", "READ", &ipin, &el, status );
                   ndfMap( indf2, comp[ i ], "_REAL", "WRITE", &ipout, &el, status );
-                  smf_reorderF( (float *) ipin, 1, ndim, dims, 2, index, 1,
+                  smf_reorderF( (float *) ipin, 1, ndim, idims, 2, index, 1,
                                 mask, (float *) ipout, status );
                }
             }
@@ -682,8 +684,9 @@ void smurf_timesort( int *status ) {
 
 /* Re-order the array (no masking since the JCMTSTATE extension does not
    - currently - contain any arrays that are indexed by detector number. */
+                  for( ii = 0; ii < ndim; ii++ ) idims[ii] = dims[ii];
                   datLen( loc1c, &len, status );
-                  smf_reorder( type, ipin, len, ndim, dims, ndim - 1, index,
+                  smf_reorder( type, ipin, len, ndim, idims, ndim - 1, index,
                                0, NULL, ipout, status );
 
 /* Unmap the mapped arrays. */
@@ -734,7 +737,8 @@ void smurf_timesort( int *status ) {
 
 /* Re-order the array. */
                datLen( loc1c, &len, status );
-               smf_reorder( type, ipin, len, ndim, dims, ndim - 1,
+               for( ii = 0; ii < ndim; ii++ ) idims[ii] = dims[ii];
+               smf_reorder( type, ipin, len, ndim, idims, ndim - 1,
                             index, 0, NULL, ipout, status );
 
 /* Unmap the mapped arrays. */
