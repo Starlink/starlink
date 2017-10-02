@@ -9,6 +9,7 @@ F77_SUBROUTINE(pol1_rotrf)( INTEGER(NROW), INTEGER(NCOL), INTEGER(WCS),
                             DOUBLE_ARRAY(QOUT), DOUBLE_ARRAY(UOUT),
                             DOUBLE_ARRAY(QINV), DOUBLE_ARRAY(UINV),
                             DOUBLE_ARRAY(QOUTV), DOUBLE_ARRAY(UOUTV),
+                            INTEGER(MAP),
                             INTEGER(STATUS) ){
 /*
 *+
@@ -23,7 +24,8 @@ F77_SUBROUTINE(pol1_rotrf)( INTEGER(NROW), INTEGER(NCOL), INTEGER(WCS),
 
 *  Invocation:
 *     CALL POL1_ROTRF( NROW, NCOL, WCS, TWCS, IFRM, IAXIS, VAR, QIN,
-*                      UIN, QOUT, UOUT, QIN, UIN, QOUT, UOUT, STATUS )
+*                      UIN, QOUT, UOUT, QINV, UINV, QOUTV, UOUTV, MAP,
+*                      STATUS )
 
 *  Description:
 *     The routine creates new Q and U values by rotating the reference
@@ -80,6 +82,9 @@ F77_SUBROUTINE(pol1_rotrf)( INTEGER(NROW), INTEGER(NCOL), INTEGER(WCS),
 *     UOUTV( EL ) = DOUBLE PRECISION (Returned)
 *        The Returned array of U variance values. Only used if VAR is
 *        .TRUE.
+*     MAP = INTEGER (Returned)
+*        An AST Mapping that goes from the base Frame in WCS to the base
+*        Frame in TWCS. Returned holding AST__NULL if TWCS is AST__NULL.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -117,18 +122,22 @@ F77_SUBROUTINE(pol1_rotrf)( INTEGER(NROW), INTEGER(NCOL), INTEGER(WCS),
    GENPTR_DOUBLE_ARRAY(UINV)
    GENPTR_DOUBLE_ARRAY(QOUTV)
    GENPTR_DOUBLE_ARRAY(UOUTV)
+   GENPTR_INTEGER(MAP)
    GENPTR_INTEGER(STATUS)
 
    AstFrameSet *wcs = astI2P( *WCS );
    AstFrameSet *twcs = astI2P( *TWCS );
+   AstMapping *map;
 
    if( F77_ISTRUE( *VAR ) ) {
       pol1Rotrf( *NROW, *NCOL, wcs, twcs, *IFRM, *IAXIS, QIN, UIN,
-                 QOUT, UOUT, QINV, UINV, QOUTV, UOUTV, STATUS );
+                 QOUT, UOUT, QINV, UINV, QOUTV, UOUTV, &map, STATUS );
    } else {
       pol1Rotrf( *NROW, *NCOL, wcs, twcs, *IFRM, *IAXIS, QIN, UIN,
-                 QOUT, UOUT, NULL, NULL, NULL, NULL, STATUS );
+                 QOUT, UOUT, NULL, NULL, NULL, NULL, &map, STATUS );
    }
+
+   *MAP = astP2I( map );
 
 }
 

@@ -164,6 +164,7 @@
       INTEGER IPUOUTV            ! Pointer to mapped output U variances
       INTEGER IWCS               ! WCS FrameSet for input Q and U NDFs
       INTEGER IWCSL              ! WCS FrameSet for template NDF
+      INTEGER MAP                ! Unused Mapping
       INTEGER NAX                ! No. of axes in required frame
       INTEGER NTHAX              ! Zero-based index of north axis
       INTEGER SDIM( NDF__MXDIM)  ! Indices of significant dimensions
@@ -288,7 +289,7 @@
      :                 %VAL( CNF_PVAL( IPQINV ) ),
      :                 %VAL( CNF_PVAL( IPUINV ) ),
      :                 %VAL( CNF_PVAL( IPQOUTV ) ),
-     :                 %VAL( CNF_PVAL( IPUOUTV ) ), STATUS )
+     :                 %VAL( CNF_PVAL( IPUOUTV ) ), MAP, STATUS )
 
 *  If the Q input NDF has a Quality array, copy it to the output.
       CALL NDF_STATE( INDFQI, 'Quality', THERE, STATUS )

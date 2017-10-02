@@ -14,7 +14,7 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
                 int ifrm, int iaxis, const double *qin,
                 const double *uin, double *qout, double *uout,
                 const double *qinv, const double *uinv, double *qoutv,
-                double *uoutv, int *status );
+                double *uoutv, AstMapping **map, int *status );
 
 
 #endif

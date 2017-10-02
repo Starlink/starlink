@@ -2419,6 +2419,31 @@ package polpack {
             helpkey *
           }
       }
+
+
+      action polconcat {
+
+         helplib {$POLPACK_HELP}
+
+         parameter in {
+            position 1
+            type LITERAL
+            ppath GLOBAL
+            association <-GLOBAL.CATALOGUE
+            prompt {Input catalogues}
+            helpkey *
+          }
+
+         parameter out {
+            position 2
+            type LITERAL
+            ppath GLOBAL
+            association ->GLOBAL.CATALOGUE
+            prompt {Output catalogue}
+            helpkey *
+          }
+      }
+
    }
 
    command makecube {

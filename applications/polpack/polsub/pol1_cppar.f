@@ -1,19 +1,19 @@
-      SUBROUTINE POL1_CPPAR( CIIN, CIOUT, STATUS )
+      SUBROUTINE POL1_CPPAR( CIIN, CIOUT, REPORT, STATUS )
 *+
 *  Name:
 *     POL1_CPPAR
 
 *  Purpose:
-*     Create output cat. parameters corresponding to input cat. ones.
+*     Ensure the output cat. parameters corresponding to input cat. ones.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_CPPAR( CIIN, CIOUT, STATUS )
+*     CALL POL1_CPPAR( CIIN, CIOUT, REPORT, STATUS )
 
 *  Description:
-*     Create parameters in the output catalogue corresponding to those
+*     Ensure parameters in the output catalogue correspond to those
 *     in the input catalogue.
 
 *  Arguments:
@@ -21,6 +21,12 @@
 *        Identifier for the input catalogue.
 *     CIOUT  =  INTEGER (Given)
 *        Identifier for the output catalogue.
+*     REPORT =  LOGICAL (Given)
+*        If .TRUE., then the required parameters should already exist in the
+*        output. In which case, report an error if there are any differences
+*        between the parameters in the input and ouput catalogues. If
+*        .FALSE. we know that there are no parameters in the supplied output
+*        catalogue, and this routine will therefore create them.
 *     STATUS  =  INTEGER (Given and Returned)
 *        The global status.
 
@@ -35,6 +41,10 @@
 *  History:
 *     29-JUN-2017 (DSB):
 *        Original version, based on cap_cppar.f by ACD.
+*     27-SEP-2017 (DSB):
+*        Modified to allow new parameters to be added into a pre-existing
+*        output catalogue that may already contain parameters of the same
+*        name.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -57,6 +67,7 @@
 *  Arguments Given:
       INTEGER CIIN
       INTEGER CIOUT
+      LOGICAL REPORT
 
 *  Status:
       INTEGER STATUS
@@ -70,29 +81,42 @@
 *    The following variables represent the attributes of the current
 *    parameter.
       INTEGER
+     :  BUFLEN,      ! Length of BUFFER (excl. trail. blanks).
+     :  LQNAME,      !   "    "  QNAME  ( "  .   "  .   "   ).
+     :  OQI,         ! Parameter identifier in the output catalogue.
+     :  OSTAT,       ! Status checking whether parameter in output cat.
+     :  PCI,         ! Parent catalogue.
+     :  PCSIZE,      ! Size if a character string.
+     :  PDIMS,       ! Dimensionality.
+     :  PDTYPE,      ! Data type.
+     :  PSIZEA(10),  ! Size of each array dimension.
      :  QCI,         ! Parent catalogue.
-     :  QDTYPE,      ! Data type.
      :  QCSIZE,      ! Size if a character string.
      :  QDIMS,       ! Dimensionality.
-     :  QSIZEA(10),  ! Size of each array dimension.
-     :  OSTAT,       ! Status checking whether parameter in output cat.
-     :  OQI,         ! Parameter identifier in the output catalogue.
-     :  BUFLEN,      ! Length of BUFFER (excl. trail. blanks).
-     :  LQNAME       !   "    "  QNAME  ( "  .   "  .   "   ).
+     :  QDTYPE,      ! Data type.
+     :  QSIZEA(10)   ! Size of each array dimension.
 
       CHARACTER
+     :  BUFFER*75,             ! Output buffer.
+     :  PCOMM*(CAT__SZCOM),    ! Comments.
+     :  PNAME*(CAT__SZCMP),    ! Name.
+     :  PUNITS*(CAT__SZUNI),   ! Units.
+     :  PVALUE*(CAT__SZVAL),   ! Value.
+     :  PXTFMT*(CAT__SZEXF),   ! External format.
+     :  QCOMM*(CAT__SZCOM),    ! Comments.
      :  QNAME*(CAT__SZCMP),    ! Name.
      :  QUNITS*(CAT__SZUNI),   ! Units.
-     :  QXTFMT*(CAT__SZEXF),   ! External format.
-     :  QCOMM*(CAT__SZCOM),    ! Comments.
      :  QVALUE*(CAT__SZVAL),   ! Value.
-     :  BUFFER*75              ! Output buffer.
+     :  QXTFMT*(CAT__SZEXF)    ! External format.
 
       LOGICAL
-     :  QPRFDS       ! Preferential display flag.
+     :  QPRFDS,       ! Preferential display flag.
+     :  PPRFDS,       ! Preferential display flag.
+     :  THERE         ! Does parameter exist?
 
       DOUBLE PRECISION
-     :  QDATE        ! Modification date.
+     :  QDATE,       ! Modification date.
+     :  PDATE        ! Modification date.
 *.
 
 *  Check inherited status.
@@ -113,22 +137,72 @@
 
 *  Inquire the values of all the attributes for this parameter.
             CALL CAT_PINQ( QIINC, 10, QCI, QNAME, QDTYPE, QCSIZE,
-     :             QDIMS, QSIZEA, QUNITS, QXTFMT, QPRFDS, QCOMM, QVALUE,
-     :             QDATE, STATUS )
+     :                     QDIMS, QSIZEA, QUNITS, QXTFMT, QPRFDS,
+     :                     QCOMM, QVALUE, QDATE, STATUS )
 
 *  Determine whether the output catalogue already contains a parameter
-*  (or column) of the given name.  Proceed if it does not; otherwise
-*  issue a warning. ( Note: CAT_TIDNT returns a bad status if the output
-*  catalogue does not contain the parameter).
+*  (or column) of the given name.  ( Note: CAT_TIDNT returns a bad status
+*  if the output catalogue does not contain the parameter).
             OSTAT = SAI__OK
             CALL CAT_TIDNT( CIOUT, QNAME, OQI, OSTAT )
-
             IF( OSTAT .NE. SAI__OK ) THEN
-
-*  Annul the error generated by CAT_TIDNT.
                CALL ERR_ANNUL( OSTAT )
+               THERE = .FALSE.
+            ELSE
+               THERE = .TRUE.
+            END IF
 
-*  Attempt to create a corresponding parameter in the output catalogue.
+*  If the parameter already exists in the output catalogue, check its
+*  attributes are correct. Report an error if not.
+            IF( THERE ) THEN
+               CALL CAT_PINQ( OQI, 10, PCI, PNAME, PDTYPE, PCSIZE,
+     :                        PDIMS, PSIZEA, PUNITS, PXTFMT, PPRFDS,
+     :                        PCOMM, PVALUE, PDATE, STATUS )
+
+               IF( PCI .NE. QCI .OR.
+     :             PNAME .NE. QNAME .OR.
+     :             PDTYPE .NE. QDTYPE .OR.
+     :             PCSIZE .NE. QCSIZE .OR.
+     :             PDIMS .NE. QDIMS .OR.
+     :             PSIZEA(1) .NE. QSIZEA(1) .OR.
+     :             PUNITS .NE. QUNITS .OR.
+     :             PXTFMT .NE. QXTFMT .OR.
+     :             PPRFDS .NEQV. QPRFDS .OR.
+     :             PCOMM .NE. QCOMM .OR.
+     :             PVALUE .NE. QVALUE .OR.
+     :             PDATE .NE. QDATE ) THEN
+
+                  IF( STATUS .EQ. SAI__OK ) THEN
+                     CALL MSG_SETC( 'P', PNAME )
+
+                     IF( PNAME .NE. QNAME )  THEN
+                        CALL MSG_SETC( 'P', '/' )
+                        CALL MSG_SETC( 'P', QNAME )
+                     END IF
+
+                     STATUS = SAI__ERROR
+                     CALL ERR_REP( ' ', 'POL1_CPPAR: Existing '//
+     :                             'parameter "^P" has unexpected '//
+     :                             'attribute values (possible '//
+     :                             'programming error).', STATUS )
+                  END IF
+               END IF
+
+*  If the parameter does not exist, report an error if it should exist.
+            ELSE IF( REPORT ) THEN
+               IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETC( 'C', QNAME )
+                  CALL ERR_REP( ' ', 'POL1_CPPAR: Parameter "^C" '//
+     :                          'not found in supplied output '//
+     :                          'catalogue, and REPORT is TRUE '//
+     :                          '(possible programming error).',
+     :                            STATUS )
+               END IF
+
+*  Otherwise, attempt to create a corresponding parameter in the output
+*  catalogue.
+            ELSE
                CALL CAT_PNEW0( CIOUT, CAT__QITYP, QNAME, QDTYPE,
      :                         QIOUTC, STATUS )
 
@@ -141,28 +215,11 @@
                CALL CAT_TATTC( QIOUTC, 'COMM', QCOMM, STATUS )
                CALL CAT_TATTC( QIOUTC, 'VALUE', QVALUE, STATUS )
 
-            ELSE
-               BUFFER = ' '
-               BUFLEN = 0
-
-               CALL CHR_PUTC( 'Parameter ', BUFFER, BUFLEN )
-
-               IF( QNAME .NE. ' ') THEN
-                  LQNAME = CHR_LEN(QNAME)
-                  CALL CHR_PUTC( QNAME(1 : LQNAME), BUFFER, BUFLEN )
-               ELSE
-                  CALL CHR_PUTC( '<blank>', BUFFER, BUFLEN )
-               END IF
-
-               CALL CHR_PUTC( ' has been modified.', BUFFER, BUFLEN )
-               CALL MSG_OUT( ' ', BUFFER(1 : BUFLEN), STATUS )
-
             END IF
 
-          ELSE
-
-*  Either an error has occurred or the last parameter has been accessed
-*  from the input catalogue; set the termination status.
+*  If an error occurred accessing the parametwr wuthin the input
+*  catalogue, set the termination criterion.
+         ELSE
             MORE = .FALSE.
          END IF
 

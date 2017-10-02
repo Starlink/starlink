@@ -26,8 +26,10 @@
 *     NCOL = INTEGER (Given)
 *        The number of columns to read.
 *     GI( NCOL ) = INTEGER (Given)
-*        The CAT identifiers for the columns to be read.
-*     OUT( NROW, NCOL) = REAL (Returned)
+*        The CAT identifiers for the columns to be read. Any CAT__NOID
+*        values in this array will result in rows of VAL__BADR being
+*        stored in the returned table.
+*     OUT( NROW, NCOL ) = REAL (Returned)
 *        The returned values.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -42,6 +44,8 @@
 *  History:
 *     5-FEB-1998 (DSB):
 *        Original version.
+*     28-SEP-2017 (DSB):
+*        Allow CAT__NOID values in the GI array.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -55,6 +59,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'CAT_PAR'          ! CAT__ constants
 
 *  Arguments Given:
       INTEGER CI
@@ -86,11 +91,17 @@
 *  Loop round each column.
          DO J = 1, NCOL
 
+*  IF the column identifier is null, return bad values.
+            IF( GI( J ) .EQ. CAT__NOID ) THEN
+               OUT( I, J ) = VAL__BADR
+
 *  Get the value of this column from the current row buffer.
-            CALL CAT_EGT0R( GI( J ), OUT( I, J ), NULL, STATUS )
+            ELSE
+               CALL CAT_EGT0R( GI( J ), OUT( I, J ), NULL, STATUS )
 
 *  Store a Starlink bad value if the value is null.
-            IF( NULL ) OUT( I, J ) = VAL__BADR
+               IF( NULL ) OUT( I, J ) = VAL__BADR
+            END IF
 
          END DO
 

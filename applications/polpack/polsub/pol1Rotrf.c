@@ -33,7 +33,7 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
                 int ifrm, int iaxis, const double *qin,
                 const double *uin, double *qout, double *uout,
                 const double *qinv, const double *uinv, double *qoutv,
-                double *uoutv, int *status ){
+                double *uoutv, AstMapping **map, int *status ){
 /*
 *+
 *  Name:
@@ -50,7 +50,7 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
 *                     int ifrm, int iaxis, const double *qin,
 *                     const double *uin, double *qout, double *uout,
 *                     const double *qinv, const double *uinv, double *qoutv,
-*                     double *uoutv, int *status )
+*                     double *uoutv, AstMapping **map, int *status )
 
 *  Description:
 *     The routine creates new Q and U values by rotating the reference
@@ -101,8 +101,17 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
 *        The Returned array of Q variance values (may be NULL).
 *     uoutv( el )
 *        The Returned array of U variance values (may be NULL).
+*     map
+*        Returned holding an AST Mapping that goes from the base Frame in
+*        "wcs" to the base Frame in "twcs". Returned as NULL if "twcs" is
+*        NULL.
 *     status
 *        The global status.
+
+*  Notes:
+*     - This function may be used to transform (Q,U) values in-situ. That
+*     is, each corresponding pair of input and output pointers (e.g. qin
+*     and qout, etc) may point to the same array.
 
 *  Copyright:
 *     Copyright (C) 2015 East Asian Observatory.
@@ -128,10 +137,14 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
 *        applies and becomes bad very rapidly when positions outside the
 *        subarray are transformed).
 *     3-NOV-2015 (DSB):
-*        Ensure positive rotation is always anticlockwise within the focal 
-*        plane. Previously the sense of positive rotation was influenced 
-*        by the nature of the sky coordinate system (eg AzEl is a right 
+*        Ensure positive rotation is always anticlockwise within the focal
+*        plane. Previously the sense of positive rotation was influenced
+*        by the nature of the sky coordinate system (eg AzEl is a right
 *        handed system, but other sky systems are left handed).
+*     28-SEP-2017 (DSB):
+*        - Allow the input and output arrays to be the same (i.e. values
+*        can now be changed in-situ).
+*        - Added argument "map".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -148,7 +161,6 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
    AstMapping *gpmap;
    AstMapping *gpmapt;
    AstMapping *gptmap;
-   AstMapping *map;
    ThrWorkForce *wf;
    int ipfrm;
    int perm[2];
@@ -163,6 +175,9 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
    int pstep;
    pol1RotrfJobData *job_data;
    pol1RotrfJobData *pdata;
+
+/* Initialise returned values. */
+   *map = NULL;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -233,12 +248,12 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
 /* Get the Mapping from GRID coords in wcs to GRID coords in twcs.
    The GRID frame had index "ibase" within "wcs" so now has index
    "ibase+nf" within "twcs". */
-      map = astGetMapping( twcs, ibase + nf, AST__BASE );
+      *map = astGetMapping( twcs, ibase + nf, AST__BASE );
 
 /* Combine this Mapping with the Mapping from twcs GRID coords to twcs
    POLANAL coords, to get the Mapping from wcs GRID coords to twcs
    POLANAL coords. */
-      gptmap = astSimplify( astCmpMap( map, gpmapt, 1, " " ) );
+      gptmap = astSimplify( astCmpMap( *map, gpmapt, 1, " " ) );
 
 /* If "twcs" was not supplied, we use suitable Mappings and Frames
    derived from "wcs" that result in the "ifrm" Frame being used as the
@@ -359,6 +374,10 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
 /* Free resources. */
    job_data = astFree( job_data );
 
+/* Export the returned Mapping pointer to the parent AST context so that
+   it is not annulled by the following call to astEnd. */
+   if( *map ) astExport( *map );
+
 /* End the AST context. */
    astEnd;
 }
@@ -419,6 +438,10 @@ static void pol1RotrfJob( void *job_data, int *status ) {
    double cos2a;
    double rot;
    double sin2a;
+   double this_qin;
+   double this_uin;
+   double this_qinv;
+   double this_uinv;
    int block_size;
    int gx;
    int gy;
@@ -599,7 +622,9 @@ static void pol1RotrfJob( void *job_data, int *status ) {
                                      pgx0++,pgx1++,pgx2++,pgy0++,pgy1++,pgy2++){
 
 /* Check both inputs and angles are good. */
-            if( *qin != VAL__BADD && *uin != VAL__BADD &&
+            this_qin = *qin;
+            this_uin = *uin;
+            if( this_qin != VAL__BADD && this_uin != VAL__BADD &&
                 *pgx0 != AST__BAD && *pgy0 != AST__BAD &&
                 *pgx1 != AST__BAD && *pgy1 != AST__BAD &&
                 *pgx2 != AST__BAD && *pgy2 != AST__BAD ) {
@@ -613,16 +638,20 @@ static void pol1RotrfJob( void *job_data, int *status ) {
                sin2a = sin( 2*rot );
 
 /* Calculate the rotated Q/U values or variances. */
-               *qout = (*qin)*cos2a - (*uin)*sin2a;
-               *uout = (*uin)*cos2a + (*qin)*sin2a;
+               *qout = this_qin*cos2a - this_uin*sin2a;
+               *uout = this_uin*cos2a + this_qin*sin2a;
+
+
 
 /* Calculate variances if required. */
                if( var ) {
-                  if( *qinv != VAL__BADD && *uinv != VAL__BADD ) {
+                  this_qinv = *qinv;
+                  this_uinv = *uinv;
+                  if( this_qinv != VAL__BADD && this_uinv != VAL__BADD ) {
                      cos2a *= cos2a;
                      sin2a *= sin2a;
-                     *qoutv = (*qinv)*cos2a + (*uinv)*sin2a;
-                     *uoutv = (*uinv)*cos2a + (*qinv)*sin2a;
+                     *qoutv = this_qinv*cos2a + this_uinv*sin2a;
+                     *uoutv = this_uinv*cos2a + this_qinv*sin2a;
                   } else {
                      *qoutv = VAL__BADD;
                      *uoutv = VAL__BADD;

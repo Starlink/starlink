@@ -10,10 +10,10 @@
 \stardocsource      {sun\stardocnumber}
 \stardocnumber      {223.7}
 \stardocauthors     {D.S. Berry \& T.M. Gledhill }
-\stardocdate        {30th June 2017}
+\stardocdate        {29th September 2017}
 \stardoctitle       {POLPACK \\
                             An Imaging Polarimetry Reduction Package}
-\stardocversion     {Version 3.5-0}
+\stardocversion     {Version 3.6-0}
 \stardocmanual      {Users' Manual}
 \startitlepic {\includegraphics[clip,width=0.75\textwidth]{sun223_figures/fig}}
 \stardocabstract  {POLPACK is a package of applications for
@@ -1908,6 +1908,8 @@ POLPACK is registered with the Astrophysics Source Code Library as entry
 
 \quickdes{POLCAL}{Calculates Stokes vectors from a set of aligned intensity images.}{POLCAL}
 
+\quickdes{POLCONCAT}{Concatenates two or more POLPACK vector catalogues.}{POLCONCAT}
+
 \quickdes{POLEXP}{Exports POLPACK information within an NDF to a FITS extension.}{POLEXP}
 
 \quickdes{POLEXT}{Sets explicit values in the POLPACK extension.}{POLEXT}
@@ -2611,6 +2613,54 @@ for NDF applications.
       Copyright
    }{
       Copyright (C) 2001 Central Laboratory of the Research Councils
+   }
+}
+\sstroutine{
+   POLCONCAT
+}{
+   Concatenate two or more vector catalogues
+}{
+   \sstdescription{
+      This application creates a new vector catalogue by concatenating
+      the vectors from a list of two or more input catalogues. The output
+      catalogue inherits the WCS and reference diection of the first input
+      catalogue.
+   }
+   \sstusage{
+      polconcat in out
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = LITERAL (Write)
+      }{
+         A group of two or more input vector catalogues.
+      }
+      \sstsubsection{
+         OUT = LITERAL (Write)
+      }{
+         The output catalogue.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          All input catalogues must contain WCS information (i.e. they must
+         have been created using polpack).
+
+         \sstitem
+          This command does not currently support concatenating catalogues
+         that contain circular polarisation values.
+
+         \sstitem
+          All input catalogues must use the same units for I, Q and U.
+
+         \sstitem
+          If the first input catalogue contains variance columns, then all
+         input catalogues must contain variance columns. If the first input
+         catalogue does not contains variance columns, then none of the
+         input catalogues must contain variance columns.
+      }
    }
 }
 \sstroutine{
@@ -6396,6 +6446,8 @@ the vector map.
 \quickdes{POLBIN}{Bins a catalogue containing Stokes vectors.}{POLBIN}
 
 \quickdes{POLCAL}{Calculates Stokes vectors from a set of aligned intensity images.}{POLCAL}
+
+\quickdes{POLCONCAT}{Concatenates two or more POLPACK vector catalogues.}{POLCONCAT}
 
 \quickdes{POLEXP}{Exports POLPACK information within an NDF to a FITS extension.}{POLEXP}
 

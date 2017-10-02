@@ -149,7 +149,7 @@
 
 * Copy the input catalogue to the output catalogue, excluding textual
 * information.
-      CALL POL1_CPCAT( CIIN, CIOUT, STATUS )
+      CALL POL1_CPCAT( CIIN, CIOUT, AST__NULL, STATUS )
 
 *  Close the output catalogue, storing a copy of the WCS information
 *  selected above.
