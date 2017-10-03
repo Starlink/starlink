@@ -362,6 +362,13 @@ int main (int argc, char ** argv ) {
            "#define HDS_GLUE(a,b) HDS_GLUE_HELPER(a,b)\n"
            "#define HDSDIM_CODE(a) HDS_GLUE(a,HDS_DIM_CODE)\n\n");
 
+  fprintf( OutputFile,
+           "/* Helper macros for HDS dimensions. For instance HDSDIM_TYPE(datFred)\n"
+           "   expands to datFredK or datFredI, as required. */\n"
+           "#define HDS_GLUE_HELPER(a,b) a##b\n"
+           "#define HDS_GLUE(a,b) HDS_GLUE_HELPER(a,b)\n"
+           "#define HDSDIM_TYPE(a) HDS_GLUE(a,HDS_DIM_TYPE)\n\n");
+
   fprintf( POutputFile,
 	   "/* Private types and sizes relating to dimensions */\n"
 	   "typedef %s FORTRAN_INDEX_TYPE;\n"
