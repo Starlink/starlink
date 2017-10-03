@@ -243,7 +243,7 @@ void ary1Dbnd( AryDCB *dcb, int *status ) {
                }
 
 /* Obtain the ORIGIN values. */
-               datGet1I( locor, ARY__MXDIM, orig, &nel, status );
+               datGet1K( locor, ARY__MXDIM, orig, &nel, status );
             }
 
 /* Annul the locator to the ORIGIN component. */

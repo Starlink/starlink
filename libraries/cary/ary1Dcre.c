@@ -144,7 +144,7 @@ void ary1Dcre( char defer, const char *type, char cmplx, int ndim,
 /* Create the ORIGIN component and enter the lower bounds information. */
       datNew1I( (*dcb)->loc, "ORIGIN", ndim, status );
       datFind( (*dcb)->loc, "ORIGIN", &tloc, status );
-      datPut1I( tloc, ndim, lbnd, status );
+      datPut1K( tloc, ndim, lbnd, status );
       datAnnul( &tloc, status );
 
 /* If there was an error, then clean up by annulling all the locators which
