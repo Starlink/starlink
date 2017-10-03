@@ -44,6 +44,13 @@
  *        Use inttypes.h in preference to stdint.h.
  *     2006-Jul-25 (PWD):
  *        More fixes for MINGW handling of "long long" printfs.
+ *     2017-Oct-3 (DSB):
+ *        - HDS dimensions should be signed, since otherwise there is no way
+ *        to store them in an HDS data file, since we do not currently
+ *        provide either "UI" (unsigned 32 bit int) or "UK" (unsigned 64
+ *        bit int) data types in HDS.
+ *        - Add a macro (HDS_DIM_TYPE) that gives the HDS data type to use
+ *        for storing HDS dimensions.
 
  *  Copyright:
  *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
@@ -137,15 +144,23 @@ error unable to find an 8 byte integer type
 /* Can not derive the dim size so we just set it */
 /* We also state whether this is unsigned so that we can compare with
    the fortran type and also define the size. The last bit is a bit of
-   a kluge to prevent sizeof("uint64_t") coming up with  9 */
+   a kluge to prevent sizeof("uint64_t") coming up with  9. Note, since
+   HDS does not currently support a "UK" data type (i.e unsigned long
+   long int), it is a bad idea to use UINT_BIG as the dimensions type as
+   there is currently no suitable HDS data type for storing HDS dimension
+   values within an HDS data file. Instead, use "INT_BIG" (i.e. signed)
+   since then HDS dimensions can be stored in HDS data files using the
+   "K" data type. */
 #define BIGDIM 0   /* set to 1 if testing 64 bit dims */
 #if BIGDIM
-#define DIM_TYPE UINT_BIG
+#define DIM_TYPE INT_BIG
+#define HDS_DIM_TYPE "K"
 #define SIZEOF_DIM 8
-#define DIM_FORMAT INT_BIG_U
-#define DIM_IS_UNSIGNED 1
+#define DIM_FORMAT INT_BIG_S
+#define DIM_IS_UNSIGNED 0
 #else
 #define DIM_TYPE STD_INT
+#define HDS_DIM_TYPE "I"
 #define SIZEOF_DIM 4
 #define DIM_FORMAT STD_INT_FMT
 #define DIM_IS_UNSIGNED 0
@@ -308,8 +323,9 @@ int main (int argc, char ** argv ) {
   fprintf( OutputFile,
 	   "/* Public type for specifying HDS dimensions */\n"
 	   "typedef %s hdsdim;\n"
-	   "#define HDS_DIM_FORMAT \"%s\"\n\n",
-	   DIM_TYPE, DIM_FORMAT);
+	   "#define HDS_DIM_FORMAT \"%s\"\n"
+	   "#define HDS_DIM_TYPE \"%s\"\n\n",
+	   DIM_TYPE, DIM_FORMAT, HDS_DIM_TYPE );
 
   fprintf( POutputFile,
 	   "/* Private types and sizes relating to dimensions */\n"
