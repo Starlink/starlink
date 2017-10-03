@@ -69,10 +69,10 @@ void ary1Dp2s( AryDCB *dcb, int *status ) {
 /* Local variables: */
    HDSLoc *loc = NULL;        /* New object locator */
    HDSLoc *locp = NULL;       /* Parent structure locator */
+   char defer;                /* Defer creation of data arrys(s)? */
    char name[DAT__SZNAM+1];   /* Data object name */
    char tname[DAT__SZNAM+1];  /* Temporary component name */
-   int dummy;                 /* Dummy dimension array */
-   char defer;                /* Defer creation of data arrys(s)? */
+   hdsdim dummy;              /* Dummy dimension array */
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
