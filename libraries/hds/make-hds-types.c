@@ -24,6 +24,7 @@
  *  Authors:
  *     TIMJ: Tim Jenness (JAC, Hawaii)
  *     PWD: Peter W. Draper (JAC, Durham University)
+ *     DSB: David S Berry (EAO)
  *     {enter_new_authors_here}
 
  *  History:
@@ -51,6 +52,8 @@
  *        bit int) data types in HDS.
  *        - Add a macro (HDS_DIM_TYPE) that gives the HDS data type to use
  *        for storing HDS dimensions.
+ *        - Add a macro (HDSDIM_TYPE) that appends HDS_DIM_TYPE to the 
+ *        end of a given function name.
 
  *  Copyright:
  *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
@@ -84,6 +87,7 @@
 #endif
 
 #include <limits.h>
+#include <inttypes.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -112,13 +116,8 @@
 #if HAVE_INT64_T && HAVE_UINT64_T
 #define INT_BIG "int64_t"
 #define UINT_BIG "uint64_t"
-#if __MINGW32__
-#define INT_BIG_S "I64d"
-#define INT_BIG_U "I64u"
-#else
-#define INT_BIG_S "lld"
-#define INT_BIG_U "llu"
-#endif
+#define INT_BIG_S PRId64
+#define INT_BIG_U PRIu64
 #elif SIZEOF_LONG == 8
 #define INT_BIG "long int"
 #define UINT_BIG "unsigned long int"
@@ -321,11 +320,18 @@ int main (int argc, char ** argv ) {
 
   /* Dimensions */
   fprintf( OutputFile,
-	   "/* Public type for specifying HDS dimensions */\n"
-	   "typedef %s hdsdim;\n"
-	   "#define HDS_DIM_FORMAT \"%s\"\n"
-	   "#define HDS_DIM_TYPE \"%s\"\n\n",
-	   DIM_TYPE, DIM_FORMAT, HDS_DIM_TYPE );
+           "/* Public type for specifying HDS dimensions */\n"
+           "typedef %s hdsdim;\n"
+           "#define HDS_DIM_FORMAT \"%s\"\n"
+           "#define HDS_DIM_TYPE %s\n\n",
+           DIM_TYPE, DIM_FORMAT, HDS_DIM_TYPE );
+
+  fprintf( OutputFile,
+           "/* Helper macros for HDS dimensions. For instance HDSDIM_TYPE(datFred)\n"
+           "   expands to datFredK or datFredI, as required. */\n"
+           "#define HDS_GLUE_HELPER(a,b) a##b\n"
+           "#define HDS_GLUE(a,b) HDS_GLUE_HELPER(a,b)\n"
+           "#define HDSDIM_TYPE(a) HDS_GLUE(a,HDS_DIM_TYPE)\n\n");
 
   fprintf( POutputFile,
 	   "/* Private types and sizes relating to dimensions */\n"
