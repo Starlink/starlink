@@ -47,7 +47,6 @@
  *        More fixes for MINGW handling of "long long" printfs.
  *     2014-10-24 (TIMJ):
  *        Add hdsbool_t to make it easy to spot logicals in the C API.
-<<<<<<< HEAD
  *     2017-Oct-3 (DSB):
  *        - HDS dimensions should be signed, since otherwise there is no way
  *        to store them in an HDS data file, since we do not currently
@@ -67,12 +66,6 @@
  *     2017-Nov-16 (DSB):
  *        Change HDS(_)DIM_TYPE to HDS(_)DIM_CODE, and add a new macro
  *        HDS_DIM_TYPE that holds the full HDS name for the dimension type.
-=======
- *     2017-Sep-12 (DSB):
- *        Switch HDS dimensions to signed 64 bit integers. They need to be
- *        signed since they will also be used for ARY/NDF array bounds, which
- *        can be negative.
->>>>>>> hds: Change to use signed 64 bit int for dimensions
 
  *  Copyright:
  *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
@@ -162,7 +155,6 @@ error unable to find an 8 byte integer type
 /* Can not derive the dim size so we just set it */
 /* We also state whether this is unsigned so that we can compare with
    the fortran type and also define the size. The last bit is a bit of
-<<<<<<< HEAD
    a kluge to prevent sizeof("uint64_t") coming up with  9. Note, since
    HDS does not currently support a "UK" data type (i.e unsigned long
    long int), it is a bad idea to use UINT_BIG as the dimensions type as
@@ -175,12 +167,6 @@ error unable to find an 8 byte integer type
 #define DIM_TYPE INT_BIG
 #define HDS_DIM_CODE "K"
 #define HDS_DIM_TYPE "_INT64"
-=======
-   a kluge to prevent sizeof("uint64_t") coming up with  9 */
-#define BIGDIM 1   /* set to 1 if testing 64 bit dims */
-#if BIGDIM
-#define DIM_TYPE INT_BIG
->>>>>>> hds: Change to use signed 64 bit int for dimensions
 #define SIZEOF_DIM 8
 #define DIM_FORMAT INT_BIG_S
 #define DIM_IS_UNSIGNED 0
