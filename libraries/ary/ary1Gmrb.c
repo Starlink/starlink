@@ -3,8 +3,8 @@
 #include "dat_par.h"
 
 void ary1Gmrb( AryACB *acb, char *mtrex, char *mrfull, char *whole,
-               int lmrb[ ARY__MXDIM ], int umrb[ ARY__MXDIM ],
-               int lmtr[ ARY__MXDIM ], int umtr[ ARY__MXDIM ], int *status ) {
+               hdsdim lmrb[ ARY__MXDIM ], hdsdim umrb[ ARY__MXDIM ],
+               hdsdim lmtr[ ARY__MXDIM ], hdsdim umtr[ ARY__MXDIM ], int *status ) {
 /*
 *+
 *  Name:
@@ -15,8 +15,8 @@ void ary1Gmrb( AryACB *acb, char *mtrex, char *mrfull, char *whole,
 
 *  Synopsis:
 *     void ary1Gmrb( AryACB *acb, char *mtrex, char *mrfull, char *whole,
-*                    int lmrb[ ARY__MXDIM ], int umrb[ ARY__MXDIM ],
-*                    int lmtr[ ARY__MXDIM ], int umtr[ ARY__MXDIM ],
+*                    hdsdim lmrb[ ARY__MXDIM ], hdsdim umrb[ ARY__MXDIM ],
+*                    hdsdim lmtr[ ARY__MXDIM ], hdsdim umtr[ ARY__MXDIM ],
 *                    int *status )
 
 *  Description:
