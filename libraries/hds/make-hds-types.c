@@ -59,7 +59,10 @@
  *     2017-Sep-12 (DSB):
  *        Switch HDS dimensions to signed 64 bit integers. They need to be
  *        signed since they will also be used for ARY/NDF array bounds, which
- *        can be negative.
+ *        can be negative. Another reason for using signed values is that
+ *        HDS does not provide a "UK" (unsigned 64 bit int) data type, and
+ *        so there would be no way to store unsigned dimension values in an
+ *        HDS data file.
  *     2017-Nov-16 (DSB):
  *        Change HDS(_)DIM_TYPE to HDS(_)DIM_CODE, and add a new macro
  *        HDS_DIM_TYPE that holds the full HDS name for the dimension type.
@@ -152,7 +155,13 @@ error unable to find an 8 byte integer type
 /* Can not derive the dim size so we just set it */
 /* We also state whether this is unsigned so that we can compare with
    the fortran type and also define the size. The last bit is a bit of
-   a kluge to prevent sizeof("uint64_t") coming up with  9 */
+   a kluge to prevent sizeof("uint64_t") coming up with  9. Note, since
+   HDS does not currently support a "UK" data type (i.e unsigned long
+   long int), it is a bad idea to use UINT_BIG as the dimensions type as
+   there is currently no suitable HDS data type for storing HDS dimension
+   values within an HDS data file. Instead, use "INT_BIG" (i.e. signed)
+   since then HDS dimensions can be stored in HDS data files using the
+   "K" data type. */
 #define BIGDIM 1   /* set to 1 if testing 64 bit dims */
 #if BIGDIM
 #define DIM_TYPE INT_BIG
