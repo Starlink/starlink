@@ -115,9 +115,18 @@
                   RVAL = VAL__BADR
                END IF
 
-*  If is is outside the map, store a bad value in the table.
-            ELSE
+*  If is is outside the map, report an error.
+            ELSE IF( STATUS .EQ. SAI__OK ) THEN
                RVAL = VAL__BADR
+               STATUS = SAI__ERROR
+               CALL MSG_SETI( 'X', IX )
+               CALL MSG_SETI( 'Y', IY )
+               CALL MSG_SETI( 'N', NX )
+               CALL MSG_SETI( 'M', NY )
+               CALL MSG_SETI( 'J', J )
+               CALL ERR_REP( ' ', 'POL1_CPMD2: grid position ^J '//
+     :                       '(^X,^Y) falls outside ^N x ^M map '//
+     :                       '(programming error).', status )
             END IF
 
 *  Place the required value in the current element of the table row.
@@ -140,8 +149,18 @@
                ELSE
                   RVAL = VAL__BADR
                END IF
-            ELSE
+
+            ELSE IF( STATUS .EQ. SAI__OK ) THEN
                RVAL = VAL__BADR
+               STATUS = SAI__ERROR
+               CALL MSG_SETI( 'X', IX )
+               CALL MSG_SETI( 'Y', IY )
+               CALL MSG_SETI( 'N', NX )
+               CALL MSG_SETI( 'M', NY )
+               CALL MSG_SETI( 'J', J )
+               CALL ERR_REP( ' ', 'POL1_CPMD2: grid position ^J '//
+     :                       '(^X,^Y) falls outside ^N x ^M map '//
+     :                       '(programming error).', status )
             END IF
 
             TABLE( J, IROW ) = RVAL

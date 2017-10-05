@@ -117,6 +117,10 @@
       INTEGER IPQV
       INTEGER IPU
       INTEGER IPUV
+      INTEGER IPXIN
+      INTEGER IPXOUT
+      INTEGER IPYIN
+      INTEGER IPYOUT
       INTEGER IWCS
       INTEGER IXHI
       INTEGER IXLO
@@ -297,35 +301,41 @@
 
       END DO
 
-*  Copy the (X,Y) values into double precision workspace so that they can
-*  be transformed using AST. We re-use the IPQ and IPU arrays for convenience.
-      CALL POL1_CPMD1( NROW, TABLE, 1, IXLO, IYLO, NX, NY, .FALSE.,
-     :                 %VAL( CNF_PVAL( IPQ ) ), STATUS )
-      CALL POL1_CPMD1( NROW, TABLE, 2, IXLO, IYLO, NX, NY, .FALSE.,
-     :                 %VAL( CNF_PVAL( IPU ) ), STATUS )
-
-*  Modify the X and Y positions (PIXEL coords) so that they refer to the
-*  PIXEL Frame in TWCS. First get the Mapping from PIXEL in the input
-*  catalogue (IWCS) to PIXEL in the output catalogue (TWCS). Then use the
-*  Mapping to transform the (X,Y) values. The transformed values are put
-*  into work arrays IPQV and IPUV for convenience.
-      TMAP = AST_CMPMAP( PMAP, MAP, .TRUE., ' ', STATUS )
-      CALL AST_TRAN2( TMAP, NX*NY, %VAL( CNF_PVAL( IPQ ) ),
-     :                %VAL( CNF_PVAL( IPU ) ), .TRUE.,
-     :                %VAL( CNF_PVAL( IPQV ) ),
-     :                %VAL( CNF_PVAL( IPUV ) ), STATUS )
-
-*  Copy the modified values back to the returned table.
-      CALL POL1_CPMD2( IXLO, IYLO, NX, NY, %VAL( CNF_PVAL( IPQV ) ),
-     :                 .FALSE., NROW, 1, TABLE, STATUS )
-      CALL POL1_CPMD2( IXLO, IYLO, NX, NY, %VAL( CNF_PVAL( IPUV ) ),
-     :                 .FALSE., NROW, 2, TABLE, STATUS )
-
 *  Free resources.
       IF( IPQV .NE. IPQ ) CALL PSX_FREE( IPQV, STATUS )
       IF( IPUV .NE. IPU ) CALL PSX_FREE( IPUV, STATUS )
       CALL PSX_FREE( IPQ, STATUS )
       CALL PSX_FREE( IPU, STATUS )
+
+*  Copy the (X,Y) values into double precision workspace so that they can
+*  be transformed using AST.
+      CALL PSX_CALLOC( NROW, '_DOUBLE', IPXIN, STATUS )
+      CALL PSX_CALLOC( NROW, '_DOUBLE', IPYIN, STATUS )
+      CALL PSX_CALLOC( NROW, '_DOUBLE', IPXOUT, STATUS )
+      CALL PSX_CALLOC( NROW, '_DOUBLE', IPYOUT, STATUS )
+
+      CALL POL1_CPMD3( NROW, TABLE, 1, %VAL( CNF_PVAL(IPXIN) ), STATUS )
+      CALL POL1_CPMD3( NROW, TABLE, 2, %VAL( CNF_PVAL(IPYIN) ), STATUS )
+
+*  Modify the X and Y positions (PIXEL coords) so that they refer to the
+*  PIXEL Frame in TWCS. First get the Mapping from PIXEL in the input
+*  catalogue (IWCS) to PIXEL in the output catalogue (TWCS). Then use the
+*  Mapping to transform the (X,Y) values.
+      TMAP = AST_CMPMAP( PMAP, MAP, .TRUE., ' ', STATUS )
+      CALL AST_TRAN2( TMAP, NROW, %VAL( CNF_PVAL( IPXIN ) ),
+     :                %VAL( CNF_PVAL( IPYIN ) ), .TRUE.,
+     :                %VAL( CNF_PVAL( IPXOUT ) ),
+     :                %VAL( CNF_PVAL( IPYOUT ) ), STATUS )
+
+*  Copy the modified values back to the returned table.
+      CALL POL1_CPMD4( NROW, %VAL( CNF_PVAL(IPXIN) ), TABLE, 1, STATUS )
+      CALL POL1_CPMD4( NROW, %VAL( CNF_PVAL(IPYIN) ), TABLE, 2, STATUS )
+
+*  Free resources.
+      CALL PSX_FREE( IPXIN, STATUS )
+      CALL PSX_FREE( IPYIN, STATUS )
+      CALL PSX_FREE( IPXOUT, STATUS )
+      CALL PSX_FREE( IPYOUT, STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )

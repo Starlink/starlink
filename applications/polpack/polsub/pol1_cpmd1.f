@@ -110,7 +110,7 @@
             IX = NINT( TABLE( J, 1 ) + 0.5 ) + 1 - IXLO
             IY = NINT( TABLE( J, 2 ) + 0.5 ) + 1 - IYLO
 
-*  Check it walls within the map.
+*  Check it falls within the map.
             IF( IX .GE. 1 .AND. IX .LE. NX .AND.
      :          IY .GE. 1 .AND. IY .LE. NY ) THEN
 
@@ -121,6 +121,17 @@
                ELSE
                   MAP( IX, IY ) = VAL__BADD
                END IF
+
+            ELSE IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETI( 'X', IX )
+               CALL MSG_SETI( 'Y', IY )
+               CALL MSG_SETI( 'N', NX )
+               CALL MSG_SETI( 'M', NY )
+               CALL MSG_SETI( 'J', J )
+               CALL ERR_REP( ' ', 'POL1_CPMD1: grid position ^J '//
+     :                       '(^X,^Y) falls outside ^N x ^M map '//
+     :                       '(programming error).', status )
             END IF
          END DO
 
@@ -138,6 +149,17 @@
                ELSE
                   MAP( IX, IY ) = VAL__BADD
                END IF
+
+            ELSE IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETI( 'X', IX )
+               CALL MSG_SETI( 'Y', IY )
+               CALL MSG_SETI( 'N', NX )
+               CALL MSG_SETI( 'M', NY )
+               CALL MSG_SETI( 'J', J )
+               CALL ERR_REP( ' ', 'POL1_CPMD1: grid position ^J '//
+     :                       '(^X,^Y) falls outside ^N x ^M map '//
+     :                       '(programming error).', status )
             END IF
          END DO
       END IF
