@@ -1171,17 +1171,15 @@ fakedelay = 0.0
 #  Description: To test the response of the map-maker to different known
 # 		astronomical sources, an external "fakemap" can be specified
 #		to provide an image of the sky that will produce additional
-# 		astronomical signal to the time series. At present, the
-#		dimensions of this map must be identical to that of the real
-#		map. A typical procedure may involve: (i) produce a map with
-#		makemap; (ii) produce an image with simulated data with the
-#		same pixel dimensions; (iii) specify this new map for the
-#		"fakemap" parameter below. Note that this is a fully-parsed
-#		ndf identifier, so you can do things like:
-#
-# 		- fakemap = fakesky.sdf
-#
-# 		- fakemap = fakesky[1:300,100:450]
+# 		astronomical signal to the time series. A rectangular
+#               region is first extracted from the supplied fake map with
+#               pixel bounds equal to those of the main output map. The WCS
+#               within this extracted region must match that of the main
+#               output map (i.e. each pixel must have the same sky
+#               coordinates in both maps). A typical procedure may involve:
+#               (i) produce a map with makemap; (ii) produce an image with
+#               simulated data with the same pixel dimensions and WCS;
+#               (iii) specify this new map for the "fakemap" parameter below.
 fakemap = <undef>
 
 #-----------------------------------------------------------------
