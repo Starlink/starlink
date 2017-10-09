@@ -812,7 +812,7 @@ try:
       if fcf is None:
          try:
             filter = int( float( starutil.get_fits_header( indata[0], "FILTER", True )))
-         except NoValueError:
+         except starutil.NoValueError:
             filter = 850
             msg_out( "No value found for FITS header 'FILTER' in {0} - assuming 850".format(indata[0]))
 
