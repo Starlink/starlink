@@ -135,6 +135,16 @@
          TMPLOC = ARY__NOLOC
          CALL DAT_TEMP( 'ARY_TEMP', 0, DUMMY, TMPLOC, STATUS )
          CALL HDS_TUNE( 'NCOMP', 20, STATUS )
+
+*  Fortran code is not thread safe, so if it is to be used in
+*  multi-threaded code (e.g. from C, using a C wrapper ), entry to
+*  Fortran subroutines must be serialised using a mutex (usually implemented 
+*  in the C wrapper). It follows that we will never be trying to execute this 
+*  code simultaneously from multiple threads. So we can  switch off thread-lock
+*  checking for the root temporary object. Without this, we would need to find
+*  some way to lock and unlock the root object each time is was used from a 
+*  different thread (via a C wrapper). 
+         CALL DAT_NOLOCK( TMPLOC, STATUS )
       END IF
 
 *  Form a unique name for the temporary object.
