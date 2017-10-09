@@ -1018,7 +1018,7 @@ itcl::class gaia::GaiaCubeSpectrum {
          -notify_selected_cmd [code $this update_region_selection]
 
       #  Display the first extraction.
-      display_region_spectrum_ localstart [$toolbox_ get_selected_description]
+      display_region_spectrum_ localstart [$toolbox_ get_selected_description 1]
 
       #  Bindings are disabled when object creation starts, so reenable.
       toggle_extraction_
@@ -1034,7 +1034,7 @@ itcl::class gaia::GaiaCubeSpectrum {
    #  Deal with notification that a region has been updated. Need to extract
    #  the current ARD description and display the extracted spectrum.
    protected method region_update_ {} {
-      display_region_spectrum_ localdrag [$toolbox_ get_selected_description]
+      display_region_spectrum_ localdrag [$toolbox_ get_selected_description 1]
    }
 
    #  Region has been selected or deselected. Only react to selected which
@@ -1042,7 +1042,7 @@ itcl::class gaia::GaiaCubeSpectrum {
    public method update_region_selection {state} {
       if { $state == "selected" } {
          display_region_spectrum_ localstart \
-            [$toolbox_ get_selected_description]
+            [$toolbox_ get_selected_description 1]
       }
    }
 

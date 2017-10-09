@@ -307,8 +307,14 @@ itcl::class gaia::StarArdTool {
    }
 
    #  Return a description of the currently selected regions as a string.
-   method get_selected_description {} {
-      return [$object_list_ get_selected_description]
+   #  with no spaces or newlines if requested.
+   method get_selected_description {{oneline 1}} {
+      set desc [$object_list_ get_selected_description]
+      if {$oneline} {
+         regsub -all {\n} $desc {} desc
+         regsub -all {\s+} $desc {} desc
+      }
+      return "$desc"
    }
 
    #  Set the description of the selected region (first if more than one).

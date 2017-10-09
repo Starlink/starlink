@@ -4,6 +4,8 @@
 
   Added the APASS DR9 CDS catalogue to the standard list.
 
+  Saving or sending (using SAMP) a spectrum that was extracted
+  from a cube using a multi-line ARD region should now work.
 
   Star-2016A Release
   ==================
@@ -37,7 +39,7 @@
 
     Add work around for problems when printing a colour ramp from an image
     that has a very large data range. Previously this failed completely.
-    
+
   Star-2015A Release
   ==================
 
@@ -45,7 +47,7 @@
     =============
 
     It is now possible to do limited catalogue queries using the Table
-    Access Protocol (TAP) and then plot the results. A new toolbox in 
+    Access Protocol (TAP) and then plot the results. A new toolbox in
     the VO support section of the "Data-Servers" menu is provided for this.
 
     RegTap can now be used when query for VO resources, such as catalogues
@@ -56,7 +58,7 @@
     These should now be more robust against failure.
 
     Support for the VOTable 1.3 standard has been added.
-        
+
     A bug that caused GAIA to exit uncontrollably when interrupting
     a stalled skycat-style catalogue download has been fixed.
 
@@ -95,7 +97,7 @@
     input.
 
     A serious bug that stopped images with modified astrometries from
-    being saved to disk has been fixed. Users experiencing this issue 
+    being saved to disk has been fixed. Users experiencing this issue
     should downgrade or get the development release.
 
     A bug in the printing of the colour ramp (which caused GAIA to exit)
@@ -121,7 +123,7 @@
 
     Restoring graphics that included marker types (produced by the positions
     and 3D toolboxes) previously failed, causing GAIA to crash. This has been
-    fixed. 
+    fixed.
 
     Version 4.4-4
     =============
@@ -140,7 +142,7 @@
     coordinates for such images.
 
     The UCAC4 catalogue has been added to the standard Skycat catalogues.
-    
+
 
   Kapuahi Release
   ===============
