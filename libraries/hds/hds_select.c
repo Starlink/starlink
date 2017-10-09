@@ -3107,6 +3107,22 @@ datUnlock( HDSLoc *locator, int recurs, int *status) {
   return retval;
 }
 
+/*=============================================================*/
+/* datNolock - Prevent lock checks being performed on the
+   supplied object. */
+/*=============================================================*/
+
+int
+datNolock( HDSLoc *locator, int *status) {
+  int retval = 0;
+  int instat = *status;
+  int isv5 = ISHDSv5(locator);
+  EnterCheck("datNolock",*status);
+  if (isv5) retval = datNolock_v5(locator, status);
+  HDS_CHECK_STATUS("datNolock","(v5)");
+  return retval;
+}
+
 /*=========================*/
 /* datUnmap - Unmap object */
 /*=========================*/

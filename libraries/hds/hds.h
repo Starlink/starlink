@@ -947,6 +947,13 @@ int
 datType(const HDSLoc *locator, char type_str[DAT__SZTYP + 1], int *status);
 
 /*=============================================================*/
+/* datNolock - Prevent lock checks being performed on an object */
+/*=============================================================*/
+
+int
+datNolock( HDSLoc *locator, int *status);
+
+/*=============================================================*/
 /* datUnlock - Unlock an object so another thread can lock it. */
 /*=============================================================*/
 
