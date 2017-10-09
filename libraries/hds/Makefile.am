@@ -113,7 +113,7 @@ C_ROUTINES = $(CMP_C_ROUTINES) \
 	datnew0.c datMapN.c datPut1C.c datPutVC.c datGet1C.c datGetVC.c \
 	datChscn.c \
 	datput.c datput0x.c dattemp.c daucheck.c daucnv.c daucopy.c \
-        datLocked.c datLock.c datUnlock.c \
+        datLocked.c datLock.c datUnlock.c datNolock.c \
 	dauflush.c \
 	dauloc.c daumove.c dauscatgath.c daushape.c dautypes.c \
 	datExportFloc.c	datImportFloc.c hdsdim.c hds1_cleanup.c \
