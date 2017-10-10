@@ -2011,6 +2011,25 @@ F77_SUBROUTINE(dat_new1c)( CHARACTER(locator),
 
 }
 
+F77_SUBROUTINE(dat_nolock)( CHARACTER(locator),
+                            F77_INTEGER_TYPE *status
+                            TRAIL(locator) )
+{
+
+/*============================================================== */
+/* DAT_NOLOCK - Prevent lock checks being performed on an object */
+/*============================================================== */
+
+/* Local variables */
+   HDSLoc *locator_c = NULL;
+
+/* Import the input locator string                  */
+   datImportFloc( locator, locator_length, &locator_c, status );
+
+/* Call pure C routine                                       */
+   datNolock( locator_c, status );
+}
+
 
 F77_SUBROUTINE(dat_paren)( CHARACTER(locator1),
                            CHARACTER(locator2),
