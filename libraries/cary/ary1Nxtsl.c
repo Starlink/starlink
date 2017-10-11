@@ -59,7 +59,7 @@ void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status ) {
 *     function must ensure that only one thread (the current thread)
 *     is searching a list using this function at any one time. To do
 *     this, the private ARY macros ARY1__xCB_LOCK_SLOT_MUTEX and
-*     ARY1__xCB_UNLOCK_SLOT_MUTEX should be used to lock the appripriate
+*     ARY1__xCB_UNLOCK_SLOT_MUTEX should be used to lock the appropriate
 *     mutex prior to calling this function, and to unlock it afterwards
 *     ("x" should be replaced by "A", "D", "M" or "P").
 
@@ -135,8 +135,6 @@ void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status ) {
               "invalid 'type' argument of ^B (internal programming error).",
               status );
    }
-
-
 
 /* If all is OK... */
    if( *status == SAI__OK ){

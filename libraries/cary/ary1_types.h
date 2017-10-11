@@ -103,6 +103,10 @@ extern pthread_mutex_t Ary_MCB_mutex;
    can be exercised. */
 #define ARY__MXACC 6
 
+/* Maximum length of a string describing an initialisation option
+   appended to an array mapping mode specification, e.g. 'ZERO'. */
+#define ARY__SZIOP 4
+
 /* Identifiers for block types (use a large starting value to reduce the
    chance of uninitialised integer values being interpreted as a legal
    type). */

@@ -1,0 +1,406 @@
+#include "sae_par.h"
+#include "ary1.h"
+#include "star/hds.h"
+#include "mers.h"
+#include "ary_err.h"
+#include "ary_ast.h"
+#include <string.h>
+
+void CGEN_FUNCTION(ary1Gtn)( char bad, const char *htype, HDSLoc *loc,
+                            int ndim, const hdsdim *lbndd, const hdsdim *ubndd,
+                            const hdsdim *lsub, const hdsdim *usub,
+                            const hdsdim *lbnda, const hdsdim *ubnda, char pad,
+                            HDSLoc *scloc, CGEN_TYPE *array, char *dce,
+                            int *status ) {
+/*
+*+
+*  Name:
+*     ary1Gtn<T>
+
+*  Purpose:
+*     Get an n-dimensional subregion of an HDS object.
+
+*  Synopsis:
+*     void CGEN_FUNCTION(ary1Gtn)( char bad, const char *htype, HDSLoc *loc,
+*                           int ndim, const hdsdim *lbndd, const hdsdim *ubndd,
+*                           const hdsdim *lsub, const hdsdim *usub,
+*                           const hdsdim *lbnda, const hdsdim *ubnda, char pad,
+*                           HDSLoc *scloc, CGEN_TYPE *array, char *dce,
+*                           int *status )
+
+*  Description:
+*     The routine extracts an n-dimensional subregion from a numeric
+*     HDS array and transfers the data to an n-dimensional subregion of
+*     a CGEN_TYPE Fortran array, making use of lower and upper bounds
+*     information for both arrays. Data type conversion and scaling is
+*     performed if necessary, with bad pixel testing if required. Optionally,
+*     the surrounding region of the output array which does not receive
+*     data may be padded with "bad" values.
+
+*  Parameters:
+*     bad
+*        Whether it is necessary to check for "bad" values during data
+*        type conversions.
+*     htype
+*        The data type of the HDS object. This should be a primitive
+*        numeric HDS data type string (case insensitive).
+*     loc
+*        Locator to HDS object.
+*     ndim
+*        Number of HDS object dimensions. The bounds arrays supplied as
+*        arguments should have this many elements.
+*     lbndd
+*        Lower bounds of the HDS object.
+*     ubndd
+*        Upper bounds of the HDS object.
+*     lsub
+*        Lower bounds of subregion to be extracted.
+*     usub
+*        Upper bounds of subregion to be extracted.
+*     lbnda
+*        Lower bounds of output array.
+*     ubnda
+*        Upper bounds of output array.
+*     pad
+*        Whether to fill regions of the output array which do not
+*        receive data with "bad" values.
+*     scloc
+*        Locator to an HDS object containing the scale and zero terms to
+*        apply to the stored values. If this is NULL then no scaling will
+*        be performed.
+*     array
+*        Output <TYPE> array.
+*     dce
+*        Returned holding a flag indicating whether an error occurred
+*        during data type conversion.
+*     status
+*        The global status.
+
+*  Notes:
+*     -  It is assumed that the input data object and the output array
+*     have the same number of dimensions. If this is not the case
+*     intrinsically, then the "ndim" argument should be set to match
+*     whichever object has the larger dimensionality and the dimension
+*     bounds of the other object (and possibly of the subregion also)
+*     should be padded to match this dimensionality, normally with 1's.
+*     It does not matter that the value of "ndim" may not match the
+*     actual dimensionality of the HDS object in such cases.
+*     -  The lower and upper bounds of the subregion to be extracted
+*     must lie within the bounds of both the input data object and the
+*     output array, although the routine does not check for this.
+*     -  The input data object must be suitable for vectorisation using
+*     the HDS routine datVec.
+
+*  Algorithm:
+*     This routine is derived logically from a recursive treatment of
+*     the problem of traversing an arbitrary number of array dimensions
+*     whilst copying data from a subregion in each dimension. It may be
+*     written schematically as follows...
+*
+*        procedure LOOP( I )
+*           <set preceding output data to "bad">
+*           for DIM( I ) from LSUB( I ) to USUB( I ) do
+*              if ( I = DCONTG ) then
+*                 <copy a contiguous block of data>
+*                 return
+*              else
+*                 LOOP( I - 1 )
+*              end
+*           end
+*           <set following output data to "bad">
+*        end
+*
+*  A call of LOOP( NDIM ) then performs the entire data extraction
+*  operation. The dimension DCONTG is chosen to be the highest
+*  dimension where a contiguous block of data may be transferred (in
+*  the worst case it will be 1). In the actual algorithm, the regions
+*  of data being set to "bad" are indicated by start and end pointers.
+*  This allows contiguous "bad" regions identified in each recursive
+*  invocation of the algorithm to be combined, so that "bad" values may
+*  be assigned to output array elements in a single step which takes
+*  place between each transfer of contiguous data values.
+*
+*  This code was originally written in Fortran, which does not allow
+*  recursive subroutine calls. So they are simulated here by branching back
+*  to the start of the algorithm, having saved the previous dimension index
+*  in an appropriate element of an array. A similar process (in reverse) is
+*  used to simulate a return from the recursively invoked algorithm. To avoid
+*  branching back into the range of a DO loop, looping has to be implemented
+*  using IF and GO TO statements.
+*
+*  The algorithm operates as follows:
+*     -  Check that the HTYPE argument is valid and convert it to upper
+*     case. Report an error if it is not valid.
+*     -  Initialise.
+*     -  Find the highest dimension in which it is possible to transfer
+*     contiguous data.
+*     -  Set up strides for each dimension for both the input data
+*     object and the output array.
+*     -  Vectorise the input object and initialise pointers into the
+*     input and output data streams.
+*     -  Invoke the recursive algorithm.
+*     -  Set pointers to the start and end of the data regions to be
+*     skipped (in front of the subregion) in the current dimension.
+*     -  If the current dimension allows contiguous data to be
+*     transferred, then pad any preceding data region with "bad" values
+*     (if required) and obtain a locator to a slice of the input data
+*     object containing the values to be transferred.
+*     -  Transfer a contiguous block of data (with data type conversion
+*     if necessary) and annul the slice locator.
+*     -  If contiguous data cannot be transferred at the current
+*     dimension, then invoke the algorithm again to handle the next
+*     lower dimension.
+*     -  Set pointers to the start and end of the data regions to be
+*     skipped (after the subregion) in the current dimension.
+*     -  Return from the recursive algorithm.
+*     -  If necessary, pad any trailing data region with "bad" values.
+*     -  Annul the locator to the vectorised input object.
+
+*  Copyright:
+*      Copyright (C) 2017 East Asian Observatory
+*      All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     12-SEP-2017 (DSB):
+*        Original version, based on equivalent Fortran routine by RFWS.
+
+*-
+*/
+
+/* Local variables: */
+   CGEN_TYPE scale;           /* Scale term for stored values */
+   CGEN_TYPE zero;            /* Zero term for stored values */
+   HDSLoc *locsz=NULL;        /* Locator to scale/zero value */
+   HDSLoc *slice=NULL;        /* Locator to data slice */
+   HDSLoc *vec=NULL;          /* Locator to vectorised data */
+   char contig;               /* Whether data values are contiguous */
+   char dceslc;               /* Data conversion error in slice? */
+   char doscl;                /* Should scaling be applied? */
+   char type[DAT__SZTYP+1];   /* HDS data type */
+   hdsdim dim[ARY__MXDIM];    /* Array of dimension indices */
+   hdsdim eslice[1];          /* End of data slice */
+   hdsdim sslice[1];          /* Start of data slice */
+   int dcontg;                /* Dimension containing contiguous data */
+   int i;                     /* (Current) dimension count */
+   int iscale;                /* Integer version of scale factor */
+   int izero;                 /* Integer version of zero offset */
+   size_t ea;                 /* End of "bad" output array region */
+   size_t ed;                 /* End of "bad" (unwanted) data region */
+   size_t ncontg;             /* Number of contiguous data values */
+   size_t sa;                 /* Start of "bad" output array region */
+   size_t strda[ARY__MXDIM];  /* Dimension strides for output array */
+   size_t strdd[ARY__MXDIM];  /* Dimension strides for data object */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Convert the HTYPE value to upper case, reporting an error if the string
+   supplied is too long. */
+   astChrCase( htype, type, 1, sizeof(type) );
+   if( strlen(type) != strlen(htype) ) {
+      *status = ARY__FATIN;
+      msgSetc( "BADHTYPE", htype );
+      errRep( "ARY1_GTN<T>_TYP",
+              "Routine ary1Gtnx called with an invalid HTYPE argument of"
+              "'^BADHTYPE' (internal programming error).", status );
+      return;
+   }
+
+/* Extract the scale and zero values from the supplied HDS object,
+   converting them to the required data type. */
+   if( scloc ){
+      datFind( scloc, "SCALE", &locsz, status );
+      datGet( locsz, CGEN_HDS_TYPE, 0, 0, &scale, status );
+      datAnnul( &locsz, status );
+
+      datFind( scloc, "ZERO", &locsz, status );
+      datGet( locsz, CGEN_HDS_TYPE, 0, 0, &zero, status );
+      datAnnul( &locsz, status );
+
+      doscl = ( scale != 1.0 || zero != 0.0 );
+   } else {
+      doscl = 0;
+   }
+
+/* Initialise the stride of dimension no. 1 for the input array and the
+   output object. (The stride for a dimension is the amount by which the
+   vectorised array index increases when the n-dimensional array index for
+   that dimension increases by 1.) */
+   strda[ 0 ] = 1;
+   strdd[ 0 ] = 1;
+
+/* Calculate the stride for each remaining dimension. */
+   for( i = 1; i < ndim; i++ ){
+      strda[ i ] = strda[ i - 1 ] *( ubnda[ i - 1 ] - lbnda[ i - 1 ] + 1 );
+      strdd[ i ] = strdd[ i - 1 ] *( ubndd[ i - 1 ] - lbndd[ i - 1 ] + 1 );
+   }
+
+/* Initialise variables for finding the length of contiguous blocks of data
+   which can be transferred from the data object to the output array. */
+   contig = 1;
+   ncontg = 1;
+   dcontg = 1;
+
+/* Loop through each dimension. */
+   for( i = 0; i < ndim; i++ ){
+
+/* If the data blocks to be transferred are contiguous over all lower
+   dimensions so far, then note the current dimension and calculate the
+   number of data elements found to be contiguous so far.  Test for data
+   being contiguous over the current dimension (i.e. not broken in either
+   the input array or the output data object). */
+      if( contig ){
+         dcontg = i;
+         ncontg = ncontg * ( usub[ i ] - lsub[ i ] + 1 );
+         contig = ( lsub[ i ] == lbnda[ i ] ) && ( usub[ i ] == ubnda[ i ] ) &&
+                  ( lsub[ i ] == lbndd[ i ] ) && ( usub[ i ] == ubndd[ i ] );
+
+/* Quit looping once the data are no longer contiguous. */
+      } else {
+         break;
+      }
+   }
+
+/* Vectorise the input data object and initialise pointers into the input
+   and output vectorised arrays. */
+   datVec( loc, &vec, status );
+   if( *status == SAI__OK ) {
+      ed = 0;
+      sa = 1;
+      ea = 0;
+      dce = 0;
+
+/* Recursive scanning of the array dimensions begins with the highest
+   dimension. */
+      i = ndim;
+
+/* A recursive invocation of the algorithm starts here.
+   =================================================== */
+
+/* Increment pointers to the end of the data region which lies before the
+   lower bound of the subregion being extracted (in the current
+   dimension), and which is therefore NOT going to be copied. */
+L2:
+      ea = ea + ( lsub[ i ] - lbnda[ i ] ) * strda[ i ];
+      ed = ed + ( lsub[ i ] - lbndd[ i ] ) * strdd[ i ];
+
+/* This is a "DO UNTIL" loop, which starts with the current dimension set
+   to the lower bound of the subregion and executes until it goes beyond
+   the upper bound. */
+      dim[ i ] = lsub[ i ];
+L3:
+      if( dim[ i ] > usub[ i ] ) goto L5;
+
+/* If the data blocks to be transferred are contiguous over the current
+   dimension (and therefore all lower dimensions), then data can be
+   transferred. */
+         if( i <= dcontg ){
+
+/* First pad the preceding region of the output array which is not to
+   receive data with bad values (if required). */
+            if( pad && ( ea >= sa ) ){
+               CGEN_FUNCTION(ary1Bad)( ea - sa + 1, array + sa, status );
+               if( *status != SAI__OK ) goto L999;
+            }
+
+/* Locate the slice of the vectorised data object which contains the block
+   of contiguous data to be transferred. */
+            sslice[ 0 ] = ed + 1;
+            eslice[ 0 ] = sslice[ 0 ] + ncontg - 1;
+            datSlice( vec, 1, sslice, eslice, &slice, status );
+
+/* Transfer the data to the appropriate part of the output array and annul
+   the slice. Note if a data conversion error occurred. */
+            CGEN_FUNCTION(ary1Gt1)( bad, slice, type, ncontg, doscl, scale,
+                                    zero, array + ea + 1, &dceslc, status );
+            datAnnul( &slice, status );
+            if( *status != SAI__OK ) goto L999;
+            *dce = *dce || dceslc;
+
+/* Update the array pointers to refer to the next gap in the data stream,
+   after the block just transferred. */
+            ed = ed + ncontg;
+            ea = ea + ncontg;
+            sa = ea + 1;
+
+/* Update the dimension index to indicate that all of the subregion in this
+   dimension has now been processed. */
+            dim[ i ] = usub[ i ];
+
+/* The algorithm calls itself recursively here.
+   =========================================== */
+
+/* If data blocks are not contiguous over the current dimension, then the
+   algorithm invokes itself recursively to process the next lower
+   dimension. Decrement the current dimension count and branch back to the
+   start. */
+         } else {
+            i--;
+            goto L2;
+         }
+
+/* The recursively invoked algorithm returns to this point.
+   ======================================================= */
+L4:
+
+/* The current dimension count is "popped" back to its previous value
+   before the recursively invoked algorithm returns, so increment the
+   dimension index and branch to continue execution of the "DO UNTIL"
+   loop. */
+         dim[ i ]++;
+         goto L3;
+L5:
+
+/* Increment pointers to the end of the data region which lies after the
+   upper bound of the subregion being extracted (in the current
+   dimension), and which is therefore NOT going to be copied. */
+      ea = ea + ( ubnda[ i ] - usub[ i ] ) * strda[ i ];
+      ed = ed + ( ubndd[ i ] - usub[ i ] ) * strdd[ i ];
+
+/* The recursively invoked algorithm returns from here.
+   =================================================== */
+
+/* "Pop" the current dimension count and make a return from a recursive
+   invocation of the algorithm (unless this is the top level invocation -
+   i.e. the current dimension count is equal to NDIM - in which case all
+   the data have been transferred, so make a final exit). */
+      if( i < ndim ) {
+         i++;
+         goto L4;
+      }
+
+/* If required, pad any output array elements which remain after the last
+   data transfer with bad values. */
+      if( pad && ( ea >= sa ) ){
+         CGEN_FUNCTION(ary1Bad)( ea - sa + 1, array + sa, status );
+      }
+   }
+L999:
+
+/* Annul the locator to the vectorised input data. */
+   datAnnul( &vec, status );
+
+/* Call error tracing routine and exit. */
+   if( *status != SAI__OK ) ary1Trace( "ary1Gtnx", status );
+
+}
