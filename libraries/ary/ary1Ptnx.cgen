@@ -280,7 +280,7 @@ L3:
 
 /* Transfer the data from the appropriate part of the input array and annul
    the slice. Note if a data conversion error occurred. */
-            CGEN_FUNCTION(ary1Pt1)( bad, ncontg, array + ea + 1, type, slice,
+            CGEN_FUNCTION(ary1Pt1)( bad, ncontg, array + ea, type, slice,
                                     &dceslc, status );
             datAnnul( &slice, status );
             if( *status != SAI__OK ) goto L999;
