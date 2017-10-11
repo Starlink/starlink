@@ -6,3 +6,6 @@ void CGEN_FUNCTION(ary1Zer)( size_t n, CGEN_TYPE *argv, int *status );
 void CGEN_FUNCTION(ary1Ptn)( char bad, int ndim, const hdsdim *lbnda, const hdsdim *ubnda,  const CGEN_TYPE *array,const hdsdim *lsub, const hdsdim *usub, const hdsdim *lbndd, const hdsdim *ubndd, const char *htype, HDSLoc *loc, char *dce, int *status );
 void CGEN_FUNCTION(ary1Pt1)( char bad, size_t el, const CGEN_TYPE *array, const char *type, HDSLoc *loc, char *dce, int *status );
 void CGEN_FUNCTION(ary1Cvf)( char bad, size_t n, const CGEN_TYPE *array, const char *type, void *pntr, char *dce, int *status );
+void CGEN_FUNCTION(ary1Gtn)( char bad, const char *htype, HDSLoc *loc, int ndim, const hdsdim *lbndd, const hdsdim *ubndd, const hdsdim *lsub, const hdsdim *usub, const hdsdim *lbnda, const hdsdim *ubnda, char pad, HDSLoc *scloc, CGEN_TYPE *array, char *dce, int *status );
+void CGEN_FUNCTION(ary1Gt1)( char bad, HDSLoc *loc, const char *type, size_t el, char doscl, CGEN_TYPE scale, CGEN_TYPE zero, CGEN_TYPE *result, char *dce, int *status );
+void CGEN_FUNCTION(ary1Cvt)( char bad, size_t n, const char *type, void *pntr, CGEN_TYPE *result, char *dce, int *status );

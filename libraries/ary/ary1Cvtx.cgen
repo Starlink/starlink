@@ -8,41 +8,40 @@
 #define JOIN4(a,b,c,d) a##b##c##d
 #define NAME(tin,tout) JOIN4(vec,tin,to,tout)
 
-void CGEN_FUNCTION(ary1Cvf)( char bad, size_t n, const CGEN_TYPE *array,
-                             const char *type, void *pntr, char *dce,
-                             int *status ) {
+void CGEN_FUNCTION(ary1Cvt)( char bad, size_t n, const char *type, void *pntr,
+                             CGEN_TYPE *result, char *dce, int *status ) {
 /*
 *+
 *  Name:
-*     ary1Cvf<T>
+*     ary1Cvt
 
 *  Purpose:
 *     Convert a vectorised array from one data type to another.
 
 *  Synopsis:
-*     void CGEN_FUNCTION(ary1Cvf)( char bad, size_t n, const CGEN_TYPE *array,
-*                                  const char *type, void *pntr, char *dce,
+*     void CGEN_FUNCTION(ary1Cvt)( char bad, size_t n, const char *type,
+*                                  void *pntr, CGEN_TYPE *result, char *dce,
 *                                  int *status )
 
 *  Description:
-*     This function routine converts a vectorised array from the supplied data
-*     type to any primitive numeric type, checking for the presence of bad
-*     pixels if required. The input array is passed directly; the output array
-*     is passed by pointer.
+*     This function converts a vectorised array of any primitive numeric
+*     type to a data type of CGEN_TYPE, checking for the presence of bad
+*     pixels if required. The input array is passed by pointer; the
+*     output array is passed directly.
 
 *  Parameters:
 *     bad
 *        Whether to check for bad pixel values.
 *     n
 *        Number of array elements to convert.
-*     array
-*        The input vectorised array containing the values to be converted.
 *     type
-*        The data type of the output vectorised array. This value must
-*        be one of the HDS primitive numeric data type strings and must
-*        be supplied in upper case.
+*        The data type of the input vectorised array. This value must be
+*        one of the HDS primitive numeric data type strings and must be
+*        supplied in upper case.
 *     pntr
-*        Pointer to the output vectorised array.
+*        Pointer to the input vectorised array.
+*     result
+*        The output vectorised array, to contain the converted values.
 *     dce
 *        Returned holding a flag indicating whether any data conversion
 *        errors occurred (bad values are entered into the affected elements
@@ -75,7 +74,7 @@ void CGEN_FUNCTION(ary1Cvf)( char bad, size_t n, const CGEN_TYPE *array,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     28-AUG-2017 (DSB):
+*     12-SEP-2017 (DSB):
 *        Original version, based on equivalent Fortran routine by RFWS.
 
 *-
@@ -94,33 +93,33 @@ void CGEN_FUNCTION(ary1Cvf)( char bad, size_t n, const CGEN_TYPE *array,
    nerr = 0;
    errMark();
 
-/* Test for each valid output data type in turn and call the appropriate
-   conversion routine ("vec<Tin>to<Tout>"). */
-   if( !strcmp( type, "_BYTE" ) ){
-     NAME(CGEN_CODE,B)( bad, n, array, pntr, &ierr, &nerr, status );
+/* Test for each valid input data type in turn and call the appropriate
+   conversion routine. */
+   if( !strcmp( type, "_BYTE" )){
+      NAME(B,CGEN_CODE)( bad, n, pntr, result, &ierr, &nerr, status );
 
-   } else if( !strcmp( type, "_UBYTE" ) ){
-     NAME(CGEN_CODE,UB)( bad, n, array, pntr, &ierr, &nerr, status );
+   } else if( !strcmp( type, "_UBYTE" )){
+      NAME(UB,CGEN_CODE)( bad, n, pntr, result, &ierr, &nerr, status );
 
-   } else if( !strcmp( type, "_DOUBLE" ) ){
-     NAME(CGEN_CODE,D)( bad, n, array, pntr, &ierr, &nerr, status );
+   } else if( !strcmp( type, "_DOUBLE" )){
+      NAME(D,CGEN_CODE)( bad, n, pntr, result, &ierr, &nerr, status );
 
-   } else if( !strcmp( type, "_INTEGER" ) ){
-     NAME(CGEN_CODE,I)( bad, n, array, pntr, &ierr, &nerr, status );
+   } else if( !strcmp( type, "_INTEGER" )){
+      NAME(I,CGEN_CODE)( bad, n, pntr, result, &ierr, &nerr, status );
 
-   } else if( !strcmp( type, "_REAL" ) ){
-     NAME(CGEN_CODE,F)( bad, n, array, pntr, &ierr, &nerr, status );
+   } else if( !strcmp( type, "_REAL" )){
+      NAME(F,CGEN_CODE)( bad, n, pntr, result, &ierr, &nerr, status );
 
-   } else if( !strcmp( type, "_WORD" ) ){
-     NAME(CGEN_CODE,W)( bad, n, array, pntr, &ierr, &nerr, status );
+   } else if( !strcmp( type, "_WORD" )){
+      NAME(W,CGEN_CODE)( bad, n, pntr, result, &ierr, &nerr, status );
 
-   } else if( !strcmp( type, "_UWORD" ) ){
-     NAME(CGEN_CODE,UW)( bad, n, array, pntr, &ierr, &nerr, status );
+   } else if( !strcmp( type, "_UWORD" )){
+      NAME(UW,CGEN_CODE)( bad, n, pntr, result, &ierr, &nerr, status );
 
-   } else if( !strcmp( type, "_INT64" ) ){
-     NAME(CGEN_CODE,K)( bad, n, array, pntr, &ierr, &nerr, status );
+   } else if( !strcmp( type, "_INT64" )){
+      NAME(K,CGEN_CODE)( bad, n, pntr, result, &ierr, &nerr, status );
 
-/* Note if the output data type specified is not valid. */
+/* Note if the input data type specified is not valid. */
    } else {
       typok = 0;
    }
@@ -131,17 +130,17 @@ void CGEN_FUNCTION(ary1Cvf)( char bad, size_t n, const CGEN_TYPE *array,
    if( *dce ) errAnnul( status );
    errRlse();
 
-/* Report an error if the output data type specified was not valid. */
+/* Report an error if the input data type specified was not valid. */
    if( *status == SAI__OK ){
       if( !typok ){
          *status = ARY__FATIN;
          msgSetc( "BADTYPE", type );
-         errRep( " ", "Routine ary1Cvfx called with an invalid TYPE argument of"
+         errRep( " ", "Routine ary1Cvtx called with an invalid TYPE argument of"
                  "'^BADTYPE' (internal programming error).", status );
       }
    }
 
 /* Call error tracing routine and exit. */
-   if( *status != SAI__OK ) ary1Trace( "ary1Cvfx", status );
+   if( *status != SAI__OK ) ary1Trace( "ary1Cvtx", status );
 
 }
