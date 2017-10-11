@@ -98,7 +98,7 @@ void aryFind( HDSLoc *loc, const char *name, Ary **ary, int *status ) {
    information. */
    if( *status != SAI__OK ){
       ary = NULL;
-      errRep( " ", "ARY_FIND: Error finding an array in an HDS structure.",
+      errRep( " ", "aryFind: Error finding an array in an HDS structure.",
               status );
    }
 

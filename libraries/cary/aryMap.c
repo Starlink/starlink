@@ -98,8 +98,12 @@ void aryMap( Ary *ary, const char *type, const char *mmod, void **pntr,
 /* Map the array data. */
    ary1Maps( acb, type, 0, mode, inopt, pntr, NULL, status );
 
+/* Check we can de-reference "acb" safely. */
+   if( *status == SAI__OK ) {
+
 /* Calculate the number of mapped data elements. */
-   ary1Nel( acb->ndim, acb->lbnd, acb->ubnd, el, status );
+      ary1Nel( acb->ndim, acb->lbnd, acb->ubnd, el, status );
+   }
 
 /* If an error occurred, then report context information and call the error
    tracing routine. */
