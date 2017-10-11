@@ -332,7 +332,7 @@ printf("ary1Gtnx: Transferring %ld -> %ld\n", sslice[ 0 ], eslice[ 0 ] );
 /* Transfer the data to the appropriate part of the output array and annul
    the slice. Note if a data conversion error occurred. */
             CGEN_FUNCTION(ary1Gt1)( bad, slice, type, ncontg, doscl, scale,
-                                    zero, array + ea + 1, &dceslc, status );
+                                    zero, array + ea, &dceslc, status );
             datAnnul( &slice, status );
             if( *status != SAI__OK ) goto L999;
             *dce = *dce || dceslc;
