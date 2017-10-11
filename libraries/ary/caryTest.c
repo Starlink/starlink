@@ -15,6 +15,7 @@ aryUnlock.c
 
 
 
+#include <stdio.h>
 
 #include "ary.h"
 #include "mers.h"
@@ -24,6 +25,7 @@ aryUnlock.c
 
 int main(){
    Ary *ary;
+   Ary *ary2;
    AryPlace *place = NULL;
    HDSLoc *loc = NULL;
    float *fpntr;
@@ -54,10 +56,15 @@ int main(){
    }
 
    aryFind( loc, "data_array", &ary, status );
-   aryMap( ary, "_REAL", "Read", (void **) &fpntr, &el, status );
-   if( el != 372099 && *status == SAI__OK ){
+   lbnd[ 0 ] = 1;
+   lbnd[ 1 ] = 1;
+   ubnd[ 0 ] = 100;
+   ubnd[ 1 ] = 100;
+   arySect( ary, 2, lbnd, ubnd, &ary2, status );
+   aryMap( ary2, "_REAL", "Read", (void **) &fpntr, &el, status );
+   if( el != 10000 && *status == SAI__OK ){
       *status = SAI__ERROR;
-      errRepf( " ", "Error 2 (%ld != 372099 )", status, el );
+      errRepf( " ", "Error 2 (%ld != 10000)", status, el );
    } else if( *status == SAI__OK ) {
       dsum = 0.0;
       ngood = 0;
@@ -67,14 +74,15 @@ int main(){
             ngood++;
          }
       }
-      if( ngood != 230391 ){
+      if( ngood != 1368 ){
          *status = SAI__ERROR;
-         errRepf( " ", "Error 3 (%ld != 230391 )", status, ngood );
-      } else if( dsum != 402371046 ){
+         errRepf( " ", "Error 3 (%ld != 1368)", status, ngood );
+      } else if( dsum != 1204057 ){
          *status = SAI__ERROR;
-         errRepf( " ", "Error 4 (%g != 402371046 )", status, dsum );
+         errRepf( " ", "Error 4 (%g != 1204057)", status, dsum );
       }
    }
+   aryAnnul( &ary2, status );
 
 /* NB - THESE TWO CALLS FAIL IF THEY ARE SWAPPED !!! But the same
    happens with the F77 version of ARY, so presumably it's correct
