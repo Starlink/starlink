@@ -112,7 +112,7 @@ void ary1Upsw( AryACB *acb, const char *type, char bad, char copy,
       if( mcb->mtrex ){
          dcb = acb->dcb;
          ary1Ptn( bad, ( acb->ndim > dcb->ndim ) ? acb->ndim : dcb->ndim,
-                  mcb->lmrb, mcb->umrb, type, pntr, mcb->lmtr,
+                  mcb->lmrb, mcb->umrb, type, *pntr, mcb->lmtr,
                   mcb->umtr, dcb->lbnd, dcb->ubnd, dcb->type, datloc,
                   dce, status );
       }
