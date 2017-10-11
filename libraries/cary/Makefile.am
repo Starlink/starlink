@@ -30,19 +30,19 @@ PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
 include_MESSAGES = ary_err.h ARY_ERR
 
 #C_ROUTINES = ary1_s2dlt.c ary1_undlt.c
-C_ROUTINES = ary1Trace.c aryTrace.c ary1Rls.c ary1Ffs.c ary1Dfrm.c \
-ary1Get0C.c ary1Dimp.c ary1Dmod.c ary1Defr.c ary1Intyp.c ary1Dtyp.c \
-ary1Dlshp.c ary1Dbnd.c ary1Hunmp.c ary1Danl.c ary1Dsta.c ary1Antmp.c \
-ary1Dbad.c ary1Crnba.c ary1Chscn.c ary1DCBLock.c aryLocked.c ary1Tcnam.c \
-aryUnlock.c aryLock.c ary1Imp.c ary1Nxtsl.c ary1IsValid.c ary1Expid.c \
-ary1Impid.c ary1Id2ac.c aryFind.c aryAnnul.c ary1Anl.c ary1Ump.c \
-ary1Umps.c ary1Mpsw.c ary1Cmtmp.c ary1Temp.c ary1Iobw.c ary1Vbad.c \
-ary1Vzero.c ary1Upsr.c ary1Upsw.c ary1Sbd.c ary1Dsbd.c ary1Gmrb.c \
-ary1Inbnd.c ary1Xsbnd.c ary1Ptn.c ary1Dp2s.c ary1Ccpy.c aryPlace.c \
-aryTemp.c ary1Annpl.c aryNew.c ary1Vftp.c ary1Vbnd.c ary1Dcre.c \
-aryMap.c ary1Nel.c ary1Vmmd.c ary1Maps.c ary1Vtyp.c ary1Chmod.c \
+C_ROUTINES = $(BUILT_C_ROUTINES) ary1Trace.c aryTrace.c ary1Rls.c \
+ary1Ffs.c ary1Dfrm.c ary1Get0C.c ary1Dimp.c ary1Dmod.c ary1Defr.c \
+ary1Intyp.c ary1Dtyp.c ary1Dlshp.c ary1Dbnd.c ary1Hunmp.c ary1Danl.c \
+ary1Dsta.c ary1Antmp.c ary1Dbad.c ary1Crnba.c ary1Chscn.c ary1DCBLock.c \
+aryLocked.c ary1Tcnam.c aryUnlock.c aryLock.c ary1Imp.c ary1Nxtsl.c \
+ary1IsValid.c ary1Expid.c ary1Impid.c ary1Id2ac.c aryFind.c aryAnnul.c \
+ary1Anl.c ary1Ump.c ary1Umps.c ary1Mpsw.c ary1Cmtmp.c ary1Temp.c \
+ary1Iobw.c ary1Vbad.c ary1Vzero.c ary1Upsr.c ary1Upsw.c ary1Sbd.c \
+ary1Dsbd.c ary1Gmrb.c ary1Inbnd.c ary1Xsbnd.c ary1Ptn.c ary1Dp2s.c \
+ary1Ccpy.c aryPlace.c aryTemp.c ary1Annpl.c aryNew.c ary1Vftp.c ary1Vbnd.c \
+ary1Dcre.c aryMap.c ary1Nel.c ary1Vmmd.c ary1Maps.c ary1Vtyp.c ary1Chmod.c \
 ary1Dobj.c ary1Chacc.c ary1Accok.c ary1Chcma.c ary1Mpsr.c ary1Gtn.c \
-ary1Extyp.c ary1Dscl.c ary1Undlt.c ary1Vscl.c $(BUILT_C_ROUTINES)
+ary1Extyp.c ary1Dscl.c ary1Undlt.c ary1Vscl.c arySect.c ary1Cut.c
 
 CGENERIC_ROUTINES = ary1Badx.cgen ary1Zerx.cgen ary1Ptnx.cgen \
 ary1Pt1x.cgen ary1Cvfx.cgen ary1Gtnx.cgen ary1Gt1x.cgen ary1Cvtx.cgen
