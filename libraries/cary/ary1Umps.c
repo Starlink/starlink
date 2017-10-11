@@ -196,8 +196,8 @@ void ary1Umps( AryACB *acb, int *status ) {
    with WRITE or UPDATE access. Determine whether any "bad" values may
    have been written back into the data object and update the bad pixel
    flag accordingly. */
-            dce = dce || idce;
-            bad = mcb->bad || dce;
+            dce = ( dce || idce );
+            bad = ( mcb->bad || dce );
             ary1Sbd( bad, acb, status );
          }
 
