@@ -284,7 +284,7 @@ void CGEN_FUNCTION(ary1Gtn)( char bad, const char *htype, HDSLoc *loc,
    datVec( loc, &vec, status );
    if( *status == SAI__OK ) {
       ed = 0;
-      sa = 1;
+      sa = 0;
       ea = 0;
       *dce = 0;
 
@@ -326,8 +326,6 @@ L3:
             sslice[ 0 ] = ed + 1;
             eslice[ 0 ] = sslice[ 0 ] + ncontg - 1;
             datSlice( vec, 1, sslice, eslice, &slice, status );
-
-printf("ary1Gtnx: Transferring %ld -> %ld\n", sslice[ 0 ], eslice[ 0 ] );
 
 /* Transfer the data to the appropriate part of the output array and annul
    the slice. Note if a data conversion error occurred. */
