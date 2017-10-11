@@ -22,23 +22,30 @@ aryUnlock.c
 #include "sae_par.h"
 
 int main(){
-   HDSLoc *loc = NULL;
-   int ival;
-   int status_value = 0;
-   int *status = &status_value;
    Ary *ary;
    AryPlace *place = NULL;
+   HDSLoc *loc = NULL;
    hdsdim lbnd[ ARY__MXDIM ];
    hdsdim ubnd[ ARY__MXDIM ];
+   int status_value = 0;
+   int *status = &status_value;
+   int can_lock;
+   int ival;
+   size_t el;
+   void *pntr;
 
 /* Test accessing an existing array.
    ================================ */
 
    hdsOpen( "$KAPPA_DIR/m31", "Read", &loc, status );
    ival = datLocked( loc, status );
-   if( ival != 3 && *status == SAI__OK ){
+   if( ival == -1 ) {
+      can_lock = 0;   /* HDS V4 - cannot lock objects */
+   } else if( ival != 3 && *status == SAI__OK ){
       *status = SAI__ERROR;
       errRepf( " ", "Error 1 (%d != 3 )", status, ival );
+   } else {
+      can_lock = 1;
    }
 
    aryFind( loc, "data_array", &ary, status );
@@ -66,6 +73,7 @@ int main(){
    ubnd[ 3 ] = 30;
 
    aryNew( "_UWORD", 4, lbnd, ubnd, &place, &ary, status );
+   aryMap( ary, "_INTEGER", "Write/ZERO", &pntr, &el, status );
 
    aryAnnul( &ary, status );
    datAnnul( &loc, status );

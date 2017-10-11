@@ -165,7 +165,7 @@ void ary1Mpsw( AryACB *acb, HDSLoc *loc, const char *type,
    }
 
 /* Initialise the mapped data, as required. */
-   ary1Iobw( type, inopt, el, pntr, status );
+   ary1Iobw( type, inopt, el, *pntr, status );
 
 /* Call error tracing routine and exit. */
    if( *status != SAI__OK ) ary1Trace( "ary1Mpsw", status );

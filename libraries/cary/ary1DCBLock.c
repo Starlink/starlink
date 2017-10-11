@@ -38,6 +38,7 @@ int ary1DCBLock( AryDCB *dcb, int oper, int rdonly, int *status ){
 *
 *        1 - Return information about the current locks on the supplied DCB.
 *
+*           -1: Locking unsupported (e.g HDS is V4 or earlier).
 *            0: unlocked;
 *            1: locked for writing by the current thread;
 *            2: locked for writing by another thread;
@@ -50,6 +51,7 @@ int ary1DCBLock( AryDCB *dcb, int oper, int rdonly, int *status ){
 *            thread. Returns 0 if the requested lock conflicts with an
 *            existing lock (in which case the request to lock the supplied
 *            DCB is ignored) and +1 otherwise.
+*
 *        3 - Unlock the DCB. If the current thread has a lock - either
 *            read-write or read-only - on the DCB, it is removed.
 *            Otherwise the DCB is left unchanged. A value of +1 is always
@@ -66,6 +68,10 @@ int ary1DCBLock( AryDCB *dcb, int oper, int rdonly, int *status ){
 *     description of the "oper" argument above.
 
 *  Notes:
+*     - If the version of HDS being used does not support object locking,
+*     this function will return without action for "oper" values 2 or 3
+*     unless the HDS tuning parameter V4LOCKERROR is set to a non-zero
+*     value, in which case an error will be reported.
 *     - If a thread gets a read-write lock on the DCB, and
 *     subsequently attempts to get a read-only lock, the existing
 *     read-write lock will be demoted to a read-only lock.
