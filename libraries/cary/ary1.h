@@ -101,6 +101,21 @@ void ary1Xsbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2, 
 void ary1Vftp( const char *ftype, size_t len, char *type, char *cmplx, int *status );
 void ary1Vbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, int *status );
 void ary1Dcre( char defer, const char *type, char cmplx, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, char temp, HDSLoc *loc, AryDCB **dcb, int *status );
+void ary1Nel( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, size_t *el, int *status );
+void ary1Vmmd( const char *mmod,  char mode[ARY__SZMOD+1], char inopt[ARY__SZIOP+1], int *status );
+void ary1Maps( AryACB *acb, const char *type, char cmplx, const char *mode, const char *inopt, void **dpntr, void **ipntr, int *status );
+void ary1Vtyp( const char *type, char vtype[ARY__SZTYP+1], int *status );
+void ary1Chmod( AryACB *acb, const char *mode, int *status );
+void ary1Chacc( AryACB *acb, const char *access, int *status );
+void ary1Accok( AryACB *acb, const char *access, char *ok, int *status );
+void ary1Chcma( AryACB *acb, const char *mode, int *status );
+void ary1Dobj( AryDCB *dcb, int *status );
+void ary1Mpsr( AryACB *acb, HDSLoc *loc, const char *type, const char *mode, char bad, HDSLoc **mloc, char *copy, void **pntr, char *dce, int *status );
+void ary1Extyp( AryDCB *dcb, char type[DAT__SZTYP+1], int *status );
+void ary1Dscl( AryDCB *dcb, int *status );
+void ary1Gtn( char bad, const char *htype, HDSLoc *loc, int ndim, const hdsdim *lbndd, const hdsdim *ubndd, const hdsdim *lsub, const hdsdim *usub, const char *atype, const hdsdim *lbnda, const hdsdim *ubnda, char pad, HDSLoc *scloc, void *pntr, char *dce, int *status );
+void ary1Undlt( HDSLoc *loc1, int ndim_in, const hdsdim *lbnd, const hdsdim *ubnd, void *pntr, char *bad_out, int *status );
+void ary1Vscl( HDSLoc *loc, int *status );
 
 /* Now include the expanded generic prototypes. */
 #include "ary1_cgen.h"

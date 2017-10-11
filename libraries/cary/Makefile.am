@@ -4,11 +4,6 @@ dist_bin_SCRIPTS = ary_link ary_link_adam
 cincludedir = $(includedir)/star
 dist_noinst_SCRIPTS = make_h
 
-# Note that "classic" has a libary and libary_adam but they
-# are identical. Since everyone goes through the _link scripts
-# there is no reason to persist with this madness so we have only
-# one library here.
-
 lib_LTLIBRARIES = libary.la
 
 libary_la_SOURCES = \
@@ -45,10 +40,12 @@ ary1Umps.c ary1Mpsw.c ary1Cmtmp.c ary1Temp.c ary1Iobw.c ary1Vbad.c \
 ary1Vzero.c ary1Upsr.c ary1Upsw.c ary1Sbd.c ary1Dsbd.c ary1Gmrb.c \
 ary1Inbnd.c ary1Xsbnd.c ary1Ptn.c ary1Dp2s.c ary1Ccpy.c aryPlace.c \
 aryTemp.c ary1Annpl.c aryNew.c ary1Vftp.c ary1Vbnd.c ary1Dcre.c \
-$(BUILT_C_ROUTINES)
+aryMap.c ary1Nel.c ary1Vmmd.c ary1Maps.c ary1Vtyp.c ary1Chmod.c \
+ary1Dobj.c ary1Chacc.c ary1Accok.c ary1Chcma.c ary1Mpsr.c ary1Gtn.c \
+ary1Extyp.c ary1Dscl.c ary1Undlt.c ary1Vscl.c $(BUILT_C_ROUTINES)
 
 CGENERIC_ROUTINES = ary1Badx.cgen ary1Zerx.cgen ary1Ptnx.cgen \
-ary1Pt1x.cgen ary1Cvfx.cgen
+ary1Pt1x.cgen ary1Cvfx.cgen ary1Gtnx.cgen ary1Gt1x.cgen ary1Cvtx.cgen
 
 # The .c files which are built from the above .cgen files.
 BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
@@ -60,13 +57,12 @@ ary1_cgen.h: ary1_cgen.h.source make_h
 
 # Testing
 
-TESTS = aryTest
-check_PROGRAMS = aryTest
-
-aryTest_SOURCES = aryTest.c
+TESTS = caryTest
+check_PROGRAMS = caryTest
+caryTest_SOURCES = caryTest.c
 
 # LDADD is the expansion of ary_link, with -lary replaced by libary.la
-aryTest_LDADD = libary.la `hds_link` `err_link` `chr_link` `prm_link`
+caryTest_LDADD = libary.la `ast_link` `hds_link` `err_link` `chr_link` `prm_link`
 
 dist_starnews_DATA = ary.news
 dist_pkgdata_DATA = LICENCE
