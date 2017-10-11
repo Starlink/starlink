@@ -286,11 +286,11 @@ void CGEN_FUNCTION(ary1Gtn)( char bad, const char *htype, HDSLoc *loc,
       ed = 0;
       sa = 1;
       ea = 0;
-      dce = 0;
+      *dce = 0;
 
 /* Recursive scanning of the array dimensions begins with the highest
-   dimension. */
-      i = ndim;
+   dimension ("i" is the zero-based dimension index)*/
+      i = ndim - 1;
 
 /* A recursive invocation of the algorithm starts here.
    =================================================== */
@@ -326,6 +326,8 @@ L3:
             sslice[ 0 ] = ed + 1;
             eslice[ 0 ] = sslice[ 0 ] + ncontg - 1;
             datSlice( vec, 1, sslice, eslice, &slice, status );
+
+printf("ary1Gtnx: Transferring %ld -> %ld\n", sslice[ 0 ], eslice[ 0 ] );
 
 /* Transfer the data to the appropriate part of the output array and annul
    the slice. Note if a data conversion error occurred. */
@@ -380,9 +382,9 @@ L5:
 
 /* "Pop" the current dimension count and make a return from a recursive
    invocation of the algorithm (unless this is the top level invocation -
-   i.e. the current dimension count is equal to NDIM - in which case all
+   i.e. the current dimension count is equal to "ndim-1" - in which case all
    the data have been transferred, so make a final exit). */
-      if( i < ndim ) {
+      if( i < ndim - 1 ) {
          i++;
          goto L4;
       }

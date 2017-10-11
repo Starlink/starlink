@@ -248,7 +248,7 @@ void CGEN_FUNCTION(ary1Ptn)( char bad, int ndim, const hdsdim *lbnda,
 
 /* Recursive scanning of the array dimensions begins with the highest
    dimension. */
-      i = ndim;
+      i = ndim - 1;
 
 /* A recursive invocation of the algorithm starts here.
    =================================================== */
@@ -330,9 +330,9 @@ L5:
 
 /* "Pop" the current dimension count and make a return from a recursive
    invocation of the algorithm (unless this is the top level invocation -
-   i.e. the current dimension count is equal to NDIM - in which case all
-   the data have been transferred, so make a final exit). */
-      if( i < ndim ) {
+   i.e. the current dimension count is equal to "ndim - 1" - in which case
+   all the data have been transferred, so make a final exit). */
+      if( i < ndim - 1 ) {
          i++;
          goto L4;
       }

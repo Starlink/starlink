@@ -187,7 +187,7 @@ void ary1Mpsr( AryACB *acb, HDSLoc *loc, const char *type,
       }
 
 /* Uncompress the required section. */
-      ary1Undlt( dcb->loc, ndimd, diml, dimu, pntr, &newbad, status );
+      ary1Undlt( dcb->loc, ndimd, diml, dimu, *pntr, &newbad, status );
       *copy = 1;
       *dce = 0;
 
@@ -228,7 +228,7 @@ void ary1Mpsr( AryACB *acb, HDSLoc *loc, const char *type,
    conversion and padding with bad values as necessary. */
          ary1Gtn( bad, extyp, tloc, ndim, mcb->lmtr, mcb->umtr, mcb->lmtr,
                   mcb->umtr, type, mcb->lmrb, mcb->umrb, 1, dcb->scloc,
-                  pntr, dce, status );
+                  *pntr, dce, status );
 
 /* Annul the temporary array holding the uncompressed values. */
          ary1Antmp( &tloc, status );
@@ -242,7 +242,7 @@ void ary1Mpsr( AryACB *acb, HDSLoc *loc, const char *type,
 /* Read the data in the mapping transfer region into the returned temporary
    object, padding the rest of the mapped array with "bad" values. */
          ary1Gtn( bad, dcb->type, loc, ndim, dcb->lbnd, dcb->ubnd, mcb->lmtr,
-                  mcb->umtr, type, mcb->lmrb, mcb->umrb, 1, dcb->scloc, pntr,
+                  mcb->umtr, type, mcb->lmrb, mcb->umrb, 1, dcb->scloc, *pntr,
                   dce, status );
       }
 
@@ -252,7 +252,7 @@ void ary1Mpsr( AryACB *acb, HDSLoc *loc, const char *type,
    and map a temporary object and fill it with "bad" values. */
    } else {
       ary1Cmtmp( type, ndima, dim, mloc, pntr, status );
-      ary1Vbad( type, el, pntr, status );
+      ary1Vbad( type, el, *pntr, status );
       *copy = 1;
       *dce = 0;
    }
