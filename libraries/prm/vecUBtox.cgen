@@ -109,7 +109,7 @@ void CGEN_FUNCTION(vecUBto)( char bad, size_t n, const unsigned char *argv,
    static pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
 
 /* Check status. */
-   if( status != SAI__OK ) return;
+   if( *status != SAI__OK ) return;
 
 /* If the input and output types are the same, just copy the data without
    change. */
