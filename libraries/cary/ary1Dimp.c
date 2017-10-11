@@ -86,7 +86,7 @@ void ary1Dimp( HDSLoc *loc, AryDCB **dcb, int *status ) {
    this function, and so either a read-write or read-only lock will do.
    So report an error if the object is not locked by the current thread. */
    lock_status = datLocked( loc, status );
-   if( lock_status != 1 && lock_status != 3 && *status == SAI__OK ) {
+   if( lock_status != 1 && lock_status != 3 && lock_status != -1 && *status == SAI__OK ) {
       *status = ARY__THREAD;
       datMsg( "O", loc );
       if( lock_status == 0 || lock_status == 4 ) {

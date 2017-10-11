@@ -80,11 +80,12 @@ AryObject *ary1Impid( const void *id, int checklock, int readonly,
 
 /* Local Variables: */
    AryObject *result = NULL;
+   int lock_status;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return result;
 
-/* Convert the identifier to an ACB index. */
+/* Convert the identifier to an ACB pointer. */
    result = ary1Id2ac( id, isacb );
 
 /* If a valid ACB was not returned, then report an error. */
@@ -109,9 +110,22 @@ AryObject *ary1Impid( const void *id, int checklock, int readonly,
 
 /* If required, check that the array is locked appropriately by the
    current thread. */
-   } else if( checklock ){
-      *status = ARY__FATIN;
-      errRep( " ", "ary1Impid: Lock checking not yet implemented!", status );
+   } else if( result->type != ARY__ACBTYPE && checklock &&
+              ((AryACB *)result)->dcb ){
+      lock_status = ary1DCBLock( ((AryACB *)result)->dcb, 1, 0, status );
+      if( readonly ){
+         if( lock_status == 0 || lock_status == 2 || lock_status == 4 ) {
+            *status = ARY__THREAD;
+            errRep( " ", "The supplied array is not locked for use by "
+                    "the current thread.", status );
+         }
+      } else {
+         if( lock_status != -1 && lock_status != 1 ) {
+            *status = ARY__THREAD;
+            errRep( " ", "The supplied array is not locked for writing by "
+                    "the current thread.", status );
+         }
+      }
    }
 
 /* Call error tracing routine and exit. */
