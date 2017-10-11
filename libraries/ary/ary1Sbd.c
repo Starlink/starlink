@@ -182,6 +182,8 @@ void ary1Sbd( char bad, AryACB *acb, int *status ) {
                            }
                         }
                      }
+                  } else {
+                     break;
                   }
                }
                ARY__ACB_UNLOCK_MUTEX;

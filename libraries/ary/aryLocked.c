@@ -37,6 +37,9 @@ int aryLocked( const Ary *ary, int *status ) {
 *  Returned function value:
 *     A value indicating the status of the supplied array:
 *
+*    -1: The application is is linked with a version of HDS that does
+*        not support object locking.
+*
 *     0: the supplied array is unlocked. This is the condition that must
 *        be met for the current thread to be able to lock the supplied
 *        array for read-write access using function aryLock. This condition

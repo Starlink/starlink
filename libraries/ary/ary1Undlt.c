@@ -349,7 +349,6 @@ void ary1Undlt( HDSLoc *loc1, int ndim_in, const hdsdim *lbnd,
    HDSLoc *loc_zero = NULL;
    char *pdata;
    char *ptr_data = NULL;
-   char *ptr_out = NULL;
    char *ptr_value = NULL;
    char *pvalue;
    char scale_buf[ 20 ];

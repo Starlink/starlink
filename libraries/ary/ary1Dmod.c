@@ -103,7 +103,7 @@ void ary1Dmod( AryDCB *dcb, int *status ) {
             strcpy( dcb->mode, "READ" );
 
 /* Even if the locator is locked for read-write, we may still only have
-   read access if the underlying HDS object was opened for read-oly
+   read access if the underlying HDS object was opened for read-only
    access. */
          } else if( *status == SAI__OK ) {
 

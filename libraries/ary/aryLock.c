@@ -56,6 +56,10 @@ void aryLock( Ary *ary, int readonly, int *status ) {
 *        Pointer to global status.
 
 *  Notes:
+*     - If the version of HDS being used does not support object locking,
+*     this function will return without action unless the HDS tuning
+*     parameter V4LOCKERROR is set to a non-zero value, in which case an
+*     error will be reported.
 *     - An error will be reported if the supplied array is currently
 *     locked by another thread.
 *     - The majority of ARY functions will report an error if the array

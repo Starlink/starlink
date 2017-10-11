@@ -202,8 +202,6 @@ void CGEN_FUNCTION(ary1Gtn)( char bad, const char *htype, HDSLoc *loc,
    hdsdim sslice[1];          /* Start of data slice */
    int dcontg;                /* Dimension containing contiguous data */
    int i;                     /* (Current) dimension count */
-   int iscale;                /* Integer version of scale factor */
-   int izero;                 /* Integer version of zero offset */
    size_t ea;                 /* End of "bad" output array region */
    size_t ed;                 /* End of "bad" (unwanted) data region */
    size_t ncontg;             /* Number of contiguous data values */
