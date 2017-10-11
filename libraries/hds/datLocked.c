@@ -24,6 +24,9 @@
 *  Returned function value:
 *     A value indicating the status of the supplied Object:
 *
+*    -1: The application is is linked with a version of HDS that does
+*        not support object locking.
+*
 *     0: the supplied object is unlocked. This is the condition that must
 *        be met for the current thread to be able to lock the supplied
 *        object for read-write access using function datLock. This condition
@@ -56,8 +59,9 @@
 *  Description:
 *     This is temporary stub for a new HDS-V5 function that returns a value
 *     that indicates if the object specified by the supplied locator has
-*     been locked for use by one or more threads. It simply reports an error
-*     if called.
+*     been locked for use by one or more threads. It simply returns -1
+*     (without error), indicating that the object locking is not
+*     supported by this version of HDS.
 
 *  Authors:
 *     DSB: David S Berry (EAO)
@@ -66,6 +70,9 @@
 *  History:
 *     7-SEP-2017 (DSB):
 *        Initial version
+*     11-OCT-2017 (DSB):
+*        Changed to return -1 without error, rather than reporting an
+*        error.
 *     {enter_further_changes_here}
 
 *  Copyright:
