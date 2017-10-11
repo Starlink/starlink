@@ -27,7 +27,6 @@ int main(){
    AryPlace *place = NULL;
    HDSLoc *loc = NULL;
    float *fpntr;
-   double *dpntr;
    double dsum;
    hdsdim lbnd[ ARY__MXDIM ];
    hdsdim ubnd[ ARY__MXDIM ];
@@ -62,7 +61,7 @@ int main(){
    } else if( *status == SAI__OK ) {
       dsum = 0.0;
       ngood = 0;
-      for( i = 0; i < el; i++,dpntr++ ) {
+      for( i = 0; i < el; i++,fpntr++ ) {
          if( *fpntr != VAL__BADR ) {
             dsum += *fpntr;
             ngood++;
