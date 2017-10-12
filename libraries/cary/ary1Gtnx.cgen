@@ -283,10 +283,13 @@ void CGEN_FUNCTION(ary1Gtn)( char bad, const char *htype, HDSLoc *loc,
    and output vectorised arrays. */
    datVec( loc, &vec, status );
    if( *status == SAI__OK ) {
-      ed = 0;
-      sa = 0;
-      ea = 0;
       *dce = 0;
+
+/* Note the following index values are zero-based - the fiurst element in
+   an array has index zero. */
+      ed = -1;
+      sa = 0;
+      ea = -1;
 
 /* Recursive scanning of the array dimensions begins with the highest
    dimension ("i" is the zero-based dimension index)*/
@@ -299,8 +302,8 @@ void CGEN_FUNCTION(ary1Gtn)( char bad, const char *htype, HDSLoc *loc,
    lower bound of the subregion being extracted (in the current
    dimension), and which is therefore NOT going to be copied. */
 L2:
-      ea = ea + ( lsub[ i ] - lbnda[ i ] ) * strda[ i ];
-      ed = ed + ( lsub[ i ] - lbndd[ i ] ) * strdd[ i ];
+      ea += ( lsub[ i ] - lbnda[ i ] ) * strda[ i ];
+      ed += ( lsub[ i ] - lbndd[ i ] ) * strdd[ i ];
 
 /* This is a "DO UNTIL" loop, which starts with the current dimension set
    to the lower bound of the subregion and executes until it goes beyond
@@ -322,23 +325,24 @@ L3:
             }
 
 /* Locate the slice of the vectorised data object which contains the block
-   of contiguous data to be transferred. */
-            sslice[ 0 ] = ed + 1;
+   of contiguous data to be transferred. Note, indicies in the
+   vectorised slice are 1-based. */
+            sslice[ 0 ] = ed + 2;
             eslice[ 0 ] = sslice[ 0 ] + ncontg - 1;
             datSlice( vec, 1, sslice, eslice, &slice, status );
 
 /* Transfer the data to the appropriate part of the output array and annul
    the slice. Note if a data conversion error occurred. */
             CGEN_FUNCTION(ary1Gt1)( bad, slice, type, ncontg, doscl, scale,
-                                    zero, array + ea, &dceslc, status );
+                                    zero, array + ea + 1, &dceslc, status );
             datAnnul( &slice, status );
             if( *status != SAI__OK ) goto L999;
             *dce = *dce || dceslc;
 
 /* Update the array pointers to refer to the next gap in the data stream,
    after the block just transferred. */
-            ed = ed + ncontg;
-            ea = ea + ncontg;
+            ed += ncontg;
+            ea += ncontg;
             sa = ea + 1;
 
 /* Update the dimension index to indicate that all of the subregion in this
@@ -372,8 +376,8 @@ L5:
 /* Increment pointers to the end of the data region which lies after the
    upper bound of the subregion being extracted (in the current
    dimension), and which is therefore NOT going to be copied. */
-      ea = ea + ( ubnda[ i ] - usub[ i ] ) * strda[ i ];
-      ed = ed + ( ubndd[ i ] - usub[ i ] ) * strdd[ i ];
+      ea += ( ubnda[ i ] - usub[ i ] ) * strda[ i ];
+      ed += ( ubndd[ i ] - usub[ i ] ) * strdd[ i ];
 
 /* The recursively invoked algorithm returns from here.
    =================================================== */
