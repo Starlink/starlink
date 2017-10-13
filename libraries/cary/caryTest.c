@@ -1,22 +1,4 @@
-/* Ready to test:
-
-aryAnnul.c
-aryFind.c
-aryLock.c
-aryLocked.c
-aryMap.c
-aryNew.c
-aryPlace.c
-aryTemp.c
-aryTrace.c
-aryUnlock.c
-
-*/
-
-
-
 #include <stdio.h>
-
 #include "ary.h"
 #include "mers.h"
 #include "star/hds.h"
@@ -37,6 +19,7 @@ int main(){
    int *status = &status_value;
    int can_lock;
    int ival;
+   char bad;
    size_t i;
    size_t el;
    size_t ngood;
@@ -84,6 +67,42 @@ int main(){
          errRepf( " ", "Error 4 (%g != 20666.916872823)", status, dsum );
       }
    }
+
+   aryBad( ary2, 1, &bad, status );
+   if( !bad && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4c", status );
+   }
+
+   aryBad( ary2, 0, &bad, status );
+   if( !bad && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4b", status );
+   }
+
+   aryAnnul( &ary2, status );
+
+   lbnd[ 0 ] = 1023;
+   lbnd[ 1 ] = 7;
+   lbnd[ 2 ] = 2008;
+   ubnd[ 0 ] = 1023;
+   ubnd[ 1 ] = 7;
+   ubnd[ 2 ] = 2008;
+   arySect( ary, 3, lbnd, ubnd, &ary2, status );
+   aryMap( ary2, "_DOUBLE", "Read", (void **) &dpntr, &el, status );
+
+   aryBad( ary2, 1, &bad, status );
+   if( bad && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4d", status );
+   }
+
+   aryBad( ary2, 0, &bad, status );
+   if( !bad && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4e", status );
+   }
+
    aryAnnul( &ary2, status );
 
 /* NB - THESE TWO CALLS FAIL IF THEY ARE SWAPPED !!! But the same
@@ -161,6 +180,45 @@ int main(){
    }
    aryAnnul( &ary, status );
    datAnnul( &loc, status );
+
+
+/* Test creating a temporary array.
+   =============================== */
+
+   aryTemp( &place, status );
+   lbnd[ 0 ] = -10;
+   lbnd[ 1 ] = -30;
+   lbnd[ 2 ] = -20;
+   lbnd[ 3 ] = -50;
+   ubnd[ 0 ] = 0;
+   ubnd[ 1 ] = 10;
+   ubnd[ 2 ] = 20;
+   ubnd[ 3 ] = 30;
+
+   aryNew( "_UWORD", 4, lbnd, ubnd, &place, &ary, status );
+   aryMap( ary, "_INTEGER", "Write/ZERO", (void **) &ipntr, &el, status );
+   aryUnmap( ary, status );
+
+   lbnd[ 0 ] = -15;
+   lbnd[ 1 ] = -20;
+   lbnd[ 2 ] = -20;
+   lbnd[ 3 ] = -10;
+   ubnd[ 0 ] = 10;
+   ubnd[ 1 ] = 0;
+   ubnd[ 2 ] = 20;
+   ubnd[ 3 ] = 40;
+   arySect( ary, 4, lbnd, ubnd, &ary2, status );
+   aryMap( ary2, "_DOUBLE", "Update", (void **) &dpntr, &el, status );
+
+   if( el != 1141686 && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 9 (%ld != 1141686)", status, el );
+   } else if( *status == SAI__OK ) {
+      for( i = 0; i < el; i++,dpntr++ ) *dpntr = 1.0;
+   }
+
+   aryAnnul( &ary2, status );
+   aryAnnul( &ary, status );
 
 
 
