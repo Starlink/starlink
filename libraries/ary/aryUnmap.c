@@ -74,7 +74,9 @@ void aryUnmap( Ary *ary, int *status ) {
 
 /* Import the array identifier and unmap the array. */
    acb = (AryACB *) ary1Impid( ary, 1, 1, 1, status );
-   ary1Ump( acb, status );
+   if( *status == SAI__OK ) {
+      ary1Ump( acb, status );
+   }
 
 /* Annul any error if STATUS was previously bad, otherwise let the new
    error report stand. */
