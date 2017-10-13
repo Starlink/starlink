@@ -117,6 +117,9 @@ void ary1Gtn( char bad, const char *htype, HDSLoc *loc, int ndim, const hdsdim *
 void ary1Undlt( HDSLoc *loc1, int ndim_in, const hdsdim *lbnd, const hdsdim *ubnd, void *pntr, char *bad_out, int *status );
 void ary1Vscl( HDSLoc *loc, int *status );
 void ary1Cut( AryACB *acb1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, AryACB **acb2, int *status );
+void ary1Bad( AryACB *acb, char check, char *bad, int *status );
+void ary1Chbpp( AryACB *acb, char *bad, int *status );
+void ary1Bpp( const char *type, size_t el, void *pntr, char *bad, int *status );
 
 /* Now include the expanded generic prototypes. */
 #include "ary1_cgen.h"

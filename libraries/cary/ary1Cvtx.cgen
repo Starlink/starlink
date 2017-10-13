@@ -13,19 +13,18 @@ void CGEN_FUNCTION(ary1Cvt)( char bad, size_t n, const char *type, void *pntr,
 /*
 *+
 *  Name:
-*     ary1Cvt
+*     ary1Cvt<T>
 
 *  Purpose:
 *     Convert a vectorised array from one data type to another.
 
 *  Synopsis:
-*     void CGEN_FUNCTION(ary1Cvt)( char bad, size_t n, const char *type,
-*                                  void *pntr, CGEN_TYPE *result, char *dce,
-*                                  int *status )
+*     void ary1Cvt<T>( char bad, size_t n, const char *type, void *pntr,
+*                      CGEN_TYPE *result, char *dce, int *status )
 
 *  Description:
 *     This function converts a vectorised array of any primitive numeric
-*     type to a data type of CGEN_TYPE, checking for the presence of bad
+*     type to a data type of <T>, checking for the presence of bad
 *     pixels if required. The input array is passed by pointer; the
 *     output array is passed directly.
 
@@ -141,6 +140,6 @@ void CGEN_FUNCTION(ary1Cvt)( char bad, size_t n, const char *type, void *pntr,
    }
 
 /* Call error tracing routine and exit. */
-   if( *status != SAI__OK ) ary1Trace( "ary1Cvtx", status );
+   if( *status != SAI__OK ) ary1Trace( "ary1Cvt<T>", status );
 
 }
