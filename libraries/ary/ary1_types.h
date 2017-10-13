@@ -483,7 +483,7 @@ typedef struct AryACB {
    If the "dtwex" value is zero, then no access to actual data is
    available, otherwise the "ldtw" and "udtw" values hold the lower and
    upper bounds of the data transfer window. */
-   char dtwex;
+   int dtwex;
    hdsdim ldtw[ ARY__MXDIM ];
    hdsdim udtw[ ARY__MXDIM ];
 

@@ -4,7 +4,7 @@
 
 void ary1Xsbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2,
                 const hdsdim *lbnd2, const hdsdim *ubnd2, int ndim, hdsdim *lbnd,
-                hdsdim *ubnd, char *exist, int *status ) {
+                hdsdim *ubnd, int *exist, int *status ) {
 /*
 *+
 *  Name:
@@ -16,7 +16,7 @@ void ary1Xsbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2,
 *  Synopsis:
 *     void ary1Xsbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2,
 *                     const hdsdim *lbnd2, const hdsdim *ubnd2, int ndim,
-*                     hdsdim *lbnd, hdsdim *ubnd, char *exist, int *status )
+*                     hdsdim *lbnd, hdsdim *ubnd, int *exist, int *status )
 
 *  Description:
 *     The routine calculates the bounds of the region in common between

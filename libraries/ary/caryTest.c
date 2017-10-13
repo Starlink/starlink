@@ -6,10 +6,13 @@
 #include "sae_par.h"
 
 int main(){
-   Ary *ary;
+   Ary *ary3;
    Ary *ary2;
+   Ary *ary;
    AryPlace *place = NULL;
    HDSLoc *loc = NULL;
+   HDSLoc *loc2 = NULL;
+   char bad;
    double *dpntr;
    double dsum;
    hdsdim lbnd[ ARY__MXDIM ];
@@ -18,10 +21,11 @@ int main(){
    int status_value = 0;
    int *status = &status_value;
    int can_lock;
+   int isect;
    int ival;
-   char bad;
-   size_t i;
+   int same;
    size_t el;
+   size_t i;
    size_t ngood;
 
 /* Test accessing an existing array.
@@ -80,6 +84,24 @@ int main(){
       errRepf( " ", "Error 4b", status );
    }
 
+   arySame( ary, ary2, &same, &isect, status );
+   if( !same && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4b1", status );
+   }
+   if( !isect && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4b2", status );
+   }
+
+   aryBase( ary2, &ary3, status );
+   arySame( ary, ary3, &same, &isect, status );
+   if( !same && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4b3", status );
+   }
+
+   aryAnnul( &ary3, status );
    aryAnnul( &ary2, status );
 
    lbnd[ 0 ] = 1023;
@@ -104,20 +126,14 @@ int main(){
    }
 
    aryAnnul( &ary2, status );
-
-/* NB - THESE TWO CALLS FAIL IF THEY ARE SWAPPED !!! But the same
-   happens with the F77 version of ARY, so presumably it's correct
-   behaviour. */
-   aryAnnul( &ary, status );
-   datAnnul( &loc, status );
-
+   ary3 = ary;
 
 
 /* Test creating a new array.
    ======================== */
 
-   hdsNew( "cary_test", "TEST", "TEST", 0, 0, &loc, status );
-   aryPlace( loc, "data_array", &place, status );
+   hdsNew( "cary_test", "TEST", "TEST", 0, 0, &loc2, status );
+   aryPlace( loc2, "data_array", &place, status );
    lbnd[ 0 ] = -10;
    lbnd[ 1 ] = -30;
    lbnd[ 2 ] = -20;
@@ -130,6 +146,19 @@ int main(){
    aryNew( "_UWORD", 4, lbnd, ubnd, &place, &ary, status );
    aryMap( ary, "_INTEGER", "Write/ZERO", (void **) &ipntr, &el, status );
    aryUnmap( ary, status );
+
+   arySame( ary, ary3, &same, &isect, status );
+   if( same && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4e1", status );
+   }
+
+/* NB - THESE TWO CALLS FAIL IF THEY ARE SWAPPED !!! But the same
+   happens with the F77 version of ARY, so presumably it's correct
+   behaviour. */
+   aryAnnul( &ary3, status );
+   datAnnul( &loc, status );
+
 
    lbnd[ 0 ] = -15;
    lbnd[ 1 ] = -20;
@@ -151,7 +180,7 @@ int main(){
 
    aryAnnul( &ary2, status );
    aryAnnul( &ary, status );
-   datAnnul( &loc, status );
+   datAnnul( &loc2, status );
 
 
 

@@ -73,18 +73,18 @@ void ary1Chcma( AryACB *acb, const char *mode, int *status ) {
 */
 
 /* Local variables: */
-   char umode[ARY__SZMOD+1];  /* Upper case access mode string */
    AryACB *acbt;              /* ACB entry to test */
-   int iacbt;                 /* Index of ACB entry to test */
    AryDCB *dcb;               /* Data object entry in DCB */
    AryDCB *dcbt;              /* DCB entry to test */
    AryMCB *mcb;               /* Mapping entry in MCB */
    AryMCB *mcbt;              /* MCB entry to test */
-   hdsdim lx[ARY__MXDIM];     /* Lower bound of intersection region */
-   int next;                  /* Next ACB slot number */
-   hdsdim ux[ARY__MXDIM];     /* Upper bound of intersection region */
-   char isect;                /* Whether array bounds intersect */
    char needwr;               /* Whether write access is needed */
+   char umode[ARY__SZMOD+1];  /* Upper case access mode string */
+   hdsdim lx[ARY__MXDIM];     /* Lower bound of intersection region */
+   hdsdim ux[ARY__MXDIM];     /* Upper bound of intersection region */
+   int iacbt;                 /* Index of ACB entry to test */
+   int isect;                 /* Whether array bounds intersect */
+   int next;                  /* Next ACB slot number */
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
