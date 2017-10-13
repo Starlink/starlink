@@ -48,7 +48,7 @@
 
 /* Prototypes for public functions */
 void aryAnnul( Ary **ary, int *status );
-void aryBad( Ary *ary, char check, char bad, int *status );
+void aryBad( Ary *ary, char check, char *bad, int *status );
 void aryBase( int iary1, int iary2, int *status );
 void aryBound( Ary *ary, int ndimx, int lbnd, int ubnd, int ndim,
                int *status );

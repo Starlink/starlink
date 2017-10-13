@@ -5,7 +5,7 @@
 #include "ary_err.h"
 #include <string.h>
 
-void ary1Maps( AryACB *acb, const char *type, char cmplx, const char *mode,
+void ary1Maps( AryACB *acb, const char *type, char cmplx, const char *mmod,
                const char *inopt, void **dpntr, void **ipntr, int *status ) {
 /*
 *+
@@ -34,12 +34,13 @@ void ary1Maps( AryACB *acb, const char *type, char cmplx, const char *mode,
 *        Whether the data access type is complex (i.e. whether access
 *        is required to an imaginary component in addition to the
 *        non-imaginary component).
-*     mode
+*     mmod
 *        The mapping access mode (either "READ", "UPDATE" or "WRITE",
 *        in upper case).
 *     inopt
 *        The initialisation option (either "ZERO", "BAD" or " ") in upper
-*        case.
+*        case. If a NULL pointer is supplied, then any initialisation
+*        option appended to the end of "mmod" is used.
 *     dpntr
 *        Returned holding a pointer to the mapped non-imaginary component
 *        of the data.
@@ -91,6 +92,8 @@ void ary1Maps( AryACB *acb, const char *type, char cmplx, const char *mode,
    char dce;                  /* Data conversion error? */
    char entire;               /* Entire object filled with values? */
    char idce;                 /* Imaginary data conversion error? */
+   char mode[ARY__SZMOD+1];   /* Mapping mode buffer */
+   char tinop[ARY__SZIOP+1];  /* Temporary initialisation option buffer */
    char vtype[ARY__SZTYP+1];  /* Validated data type string */
    hdsdim dim[ARY__MXDIM];    /* Array (ACB) dimension sizes */
    int i;                     /* Loop counter for dimensions */
@@ -101,6 +104,14 @@ void ary1Maps( AryACB *acb, const char *type, char cmplx, const char *mode,
 
 /* Validate the access data type string. */
    ary1Vtyp( type, vtype, status );
+
+/* Validate the mapping mode string, decomposing it into an access mode
+   and an initialisation option. */
+   ary1Vmmd( mmod, mode, tinop, status );
+
+/* If a value has been supplied for "inopt", use it. Otherwise, use the
+   init option read fomr "mmod". */
+   if( !inopt ) inopt = tinop;
 
 /* Check to see if the array is already mapped for access. Report an error
    if it is. */
