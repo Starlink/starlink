@@ -70,7 +70,6 @@ void ary1Sbd( char bad, AryACB *acb, int *status ) {
    AryACB *acbt;              /* Pointer to the test ACB */
    AryDCB *dcb;               /* Pointer to the DCB */
    AryDCB *dcbt;              /* Test DCB */
-   char insect;               /* Whether bounds intersect */
    char inside;               /* Whether bounds lie inside */
    char mrfull;               /* Mapping region filled by data? */
    char mtrex;                /* Mapping transfer region exists? */
@@ -84,6 +83,7 @@ void ary1Sbd( char bad, AryACB *acb, int *status ) {
    hdsdim utest[ARY__MXDIM];  /* Upper bounds of test region */
    hdsdim ux[ARY__MXDIM];     /* Upper bounds of intersection region */
    int iacbt;                 /* Index of test ACB */
+   int insect;                /* Whether bounds intersect */
    int next;                  /* Next ACB slot which is in use */
 
 /* Check inherited global status. */
