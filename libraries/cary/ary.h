@@ -49,7 +49,7 @@
 /* Prototypes for public functions */
 void aryAnnul( Ary **ary, int *status );
 void aryBad( Ary *ary, char check, char *bad, int *status );
-void aryBase( int iary1, int iary2, int *status );
+void aryBase( Ary *ary1, Ary **ary2, int *status );
 void aryBound( Ary *ary, int ndimx, int lbnd, int ubnd, int ndim,
                int *status );
 void aryClone( int iary1, int iary2, int *status );
@@ -86,7 +86,7 @@ void aryNoacc( const char *access, Ary *ary, int *status );
 void aryOffs( int iary1, int iary2, int mxoffs, int offs, int *status );
 void aryPlace( HDSLoc *loc, const char *name, AryPlace **place, int *status );
 void aryReset( Ary *ary, int *status );
-void arySame( int iary1, int iary2, char same, char isect, int *status );
+void arySame( Ary *ary1, Ary *ary2, int *same, int *isect, int *status );
 void arySbad( char bad, Ary *ary, int *status );
 void arySbnd( int ndim, int lbnd, int ubnd, Ary *ary, int *status );
 void arySctyp( Ary *ary, const char *type, int *status );

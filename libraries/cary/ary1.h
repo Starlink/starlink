@@ -97,7 +97,7 @@ void ary1Upsr( char copy, HDSLoc **mloc, int *status );
 void ary1Upsw( AryACB *acb, const char *type, char bad, char copy, HDSLoc *datloc, HDSLoc **mloc, void **pntr, char *dce, int *status );
 void ary1Vbad( const char *type, size_t n, void *pntr, int *status );
 void ary1Vzero( const char *type, size_t n, void *pntr, int *status );
-void ary1Xsbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2, const hdsdim *lbnd2, const hdsdim *ubnd2, int ndim, hdsdim *lbnd, hdsdim *ubnd, char *exist, int *status );
+void ary1Xsbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2, const hdsdim *lbnd2, const hdsdim *ubnd2, int ndim, hdsdim *lbnd, hdsdim *ubnd, int *exist, int *status );
 void ary1Vftp( const char *ftype, size_t len, char *type, char *cmplx, int *status );
 void ary1Vbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, int *status );
 void ary1Dcre( char defer, const char *type, char cmplx, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, char temp, HDSLoc *loc, AryDCB **dcb, int *status );
