@@ -5,7 +5,7 @@
 #include "mers.h"
 #include "ary_err.h"
 
-void ary1Danl( char dispos, AryDCB **dcb, int *status ) {
+void ary1Danl( int dispos, AryDCB **dcb, int *status ) {
 /*
 *+
 *  Name:
@@ -15,7 +15,7 @@ void ary1Danl( char dispos, AryDCB **dcb, int *status ) {
 *     Perform an "annul" operation on a data object.
 
 *  Synopsis:
-*     void ary1Danl( char dispos, AryDCB **dcb, int *status )
+*     void ary1Danl( int dispos, AryDCB **dcb, int *status )
 
 *  Description:
 *     The routine performs an "annul" operation on a DCB entry and

@@ -16,7 +16,7 @@ extern int Ary_NPCB;
 extern AryACB **Ary_ACB;
 extern AryPCB **Ary_PCB;
 
-AryObject *ary1Id2ac( const void *id_ptr, char isacb ) {
+AryObject *ary1Id2ac( const void *id_ptr, int isacb ) {
 /*
 *+
 *  Name:
@@ -26,7 +26,7 @@ AryObject *ary1Id2ac( const void *id_ptr, char isacb ) {
 *     Convert an identifier into the associated ACB or PCB pointer.
 
 *  Synopsis:
-*     AryObject *ary1Id2ac( const void *id_ptr, char isacb )
+*     AryObject *ary1Id2ac( const void *id_ptr, int isacb )
 
 *  Description:
 *     The routine converts an identifier, previously issued by

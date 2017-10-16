@@ -2,7 +2,7 @@
 #include "ary1.h"
 #include "dat_par.h"
 
-void ary1Gmrb( AryACB *acb, char *mtrex, char *mrfull, char *whole,
+void ary1Gmrb( AryACB *acb, int *mtrex, int *mrfull, int *whole,
                hdsdim lmrb[ ARY__MXDIM ], hdsdim umrb[ ARY__MXDIM ],
                hdsdim lmtr[ ARY__MXDIM ], hdsdim umtr[ ARY__MXDIM ], int *status ) {
 /*
@@ -14,7 +14,7 @@ void ary1Gmrb( AryACB *acb, char *mtrex, char *mrfull, char *whole,
 *     Get mapping region bounds.
 
 *  Synopsis:
-*     void ary1Gmrb( AryACB *acb, char *mtrex, char *mrfull, char *whole,
+*     void ary1Gmrb( AryACB *acb, int *mtrex, int *mrfull, int *whole,
 *                    hdsdim lmrb[ ARY__MXDIM ], hdsdim umrb[ ARY__MXDIM ],
 *                    hdsdim lmtr[ ARY__MXDIM ], hdsdim umtr[ ARY__MXDIM ],
 *                    int *status )

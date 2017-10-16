@@ -6,11 +6,11 @@
 #include "ary_ast.h"
 #include <string.h>
 
-void ary1Gtn( char bad, const char *htype, HDSLoc *loc, int ndim,
+void ary1Gtn( int bad, const char *htype, HDSLoc *loc, int ndim,
               const hdsdim *lbndd, const hdsdim *ubndd, const hdsdim *lsub,
               const hdsdim *usub, const char *atype, const hdsdim *lbnda,
-              const hdsdim *ubnda, char pad, HDSLoc *scloc, void *pntr,
-              char *dce, int *status ) {
+              const hdsdim *ubnda, int pad, HDSLoc *scloc, void *pntr,
+              int *dce, int *status ) {
 /*
 *+
 *  Name:
@@ -20,11 +20,11 @@ void ary1Gtn( char bad, const char *htype, HDSLoc *loc, int ndim,
 *     Get an n-dimensional subregion from an HDS object.
 
 *  Synopsis:
-*     void ary1Gtn( char bad, const char *htype, HDSLoc *loc, int ndim,
+*     void ary1Gtn( int bad, const char *htype, HDSLoc *loc, int ndim,
 *                   const hdsdim *lbndd, const hdsdim *ubndd, const hdsdim *lsub,
 *                   const hdsdim *usub, const char *atype, const hdsdim *lbnda,
-*                   const hdsdim *ubnda, char pad, HDSLoc *scloc, void *pntr,
-*                   char *dce, int *status )
+*                   const hdsdim *ubnda, int pad, HDSLoc *scloc, void *pntr,
+*                   int *dce, int *status )
 
 *  Description:
 *     This function extracts an n-dimensional subregion of any numeric
@@ -126,7 +126,7 @@ void ary1Gtn( char bad, const char *htype, HDSLoc *loc, int ndim,
 
 /* Local variables: */
    char type[ARY__SZTYP+1];    /* Upper case data type for output array */
-   char typok;                 /* Is the supplied atype value valid? */
+   int typok;                  /* Is the supplied atype value valid? */
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

@@ -89,10 +89,10 @@ void ary1Umps( AryACB *acb, int *status ) {
    AryDCB *dcb;               /* Pointer to DCB */
    AryMCB *mcb;               /* Pointer to MCB */
    HDSLoc *mloc;              /* Locator to mapped imaginary data */
-   char bad;                  /* Possible "bad" values written back? */
-   char copy;                 /* Whether mapping involves a "copy" */
-   char dce;                  /* Non-imaginary data conversion error? */
-   char idce;                 /* Imaginary data conversion error? */
+   int bad;                   /* Possible "bad" values written back? */
+   int copy;                  /* Whether mapping involves a "copy" */
+   int dce;                   /* Non-imaginary data conversion error? */
+   int idce;                  /* Imaginary data conversion error? */
    int tstat;                 /* Temporary status value */
    void *pntr;                /* Pointer to mapped imaginary data */
 

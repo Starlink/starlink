@@ -3,7 +3,7 @@
 #include "dat_par.h"
 
 void ary1Inbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2,
-                const hdsdim *lbnd2, const hdsdim *ubnd2, char *inside, int *status ) {
+                const hdsdim *lbnd2, const hdsdim *ubnd2, int *inside, int *status ) {
 /*
 *+
 *  Name:
@@ -14,7 +14,7 @@ void ary1Inbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2,
 
 *  Synopsis:
 *     void ary1Inbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2,
-*                     const hdsdim *lbnd2, const hdsdim *ubnd2, char *inside,
+*                     const hdsdim *lbnd2, const hdsdim *ubnd2, int *inside,
 *                     int *status )
 
 *  Description:

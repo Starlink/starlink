@@ -8,8 +8,8 @@
 #define JOIN4(a,b,c,d) a##b##c##d
 #define NAME(tin,tout) JOIN4(vec,tin,to,tout)
 
-void CGEN_FUNCTION(ary1Cvt)( char bad, size_t n, const char *type, void *pntr,
-                             CGEN_TYPE *result, char *dce, int *status ) {
+void CGEN_FUNCTION(ary1Cvt)( int bad, size_t n, const char *type, void *pntr,
+                             CGEN_TYPE *result, int *dce, int *status ) {
 /*
 *+
 *  Name:
@@ -19,8 +19,8 @@ void CGEN_FUNCTION(ary1Cvt)( char bad, size_t n, const char *type, void *pntr,
 *     Convert a vectorised array from one data type to another.
 
 *  Synopsis:
-*     void ary1Cvt<T>( char bad, size_t n, const char *type, void *pntr,
-*                      CGEN_TYPE *result, char *dce, int *status )
+*     void ary1Cvt<T>( int bad, size_t n, const char *type, void *pntr,
+*                      CGEN_TYPE *result, int *dce, int *status )
 
 *  Description:
 *     This function converts a vectorised array of any primitive numeric
@@ -82,7 +82,7 @@ void CGEN_FUNCTION(ary1Cvt)( char bad, size_t n, const char *type, void *pntr,
 /* Local variables: */
    size_t ierr;               /* Position of first conversion error */
    size_t nerr;               /* Number of conversion errors */
-   char typok;                /* Whether the TYPE argument is valid */
+   int typok;                 /* Whether the TYPE argument is valid */
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

@@ -4,10 +4,10 @@
 #include "ary_err.h"
 #include <string.h>
 
-void ary1Ptn( char bad, int ndim, const hdsdim *lbnda, const hdsdim *ubnda,
+void ary1Ptn( int bad, int ndim, const hdsdim *lbnda, const hdsdim *ubnda,
               const char *type, const void *pntr, const hdsdim *lsub,
               const hdsdim *usub, const hdsdim *lbndd, const hdsdim *ubndd,
-              const char *htype, HDSLoc *loc, char *dce, int *status ) {
+              const char *htype, HDSLoc *loc, int *dce, int *status ) {
 /*
 *+
 *  Name:
@@ -17,10 +17,10 @@ void ary1Ptn( char bad, int ndim, const hdsdim *lbnda, const hdsdim *ubnda,
 *     Write an n-dimensional subregion to an HDS object.
 
 *  Synopsis:
-*     void ary1Ptn( char bad, int ndim, const hdsdim *lbnda, const hdsdim *ubnda,
+*     void ary1Ptn( int bad, int ndim, const hdsdim *lbnda, const hdsdim *ubnda,
 *                   const char *type, const void *pntr, const hdsdim *lsub,
 *                   const hdsdim *usub, const hdsdim *lbndd, const hdsdim *ubndd,
-*                   const char *htype, HDSLoc *loc, char *dce, int *status )
+*                   const char *htype, HDSLoc *loc, int *dce, int *status )
 
 *  Description:
 *     The routine writes to an n-dimensional subregion of a numeric HDS
