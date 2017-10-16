@@ -140,7 +140,7 @@ typedef struct AryObject {
 /* Usage: This value is non-zero if the remaining values in the block
    structure are in use, and zero if it is not currently being used to
    describe an object and can thus be used to describe a new object. */
-   char used;
+   int used;
 
 /* Slot. The index of the block structure within the arrays maintained
    by ary1Ffs. For historical reasons, this is referred to as the slot
@@ -191,7 +191,7 @@ typedef struct AryDCB {
    "form" entry contains the storage form (e.g. 'SIMPLE') of the array data
    object associated with the DCB. If "kfrm" is zero, then this information
    is not available or is out of date. */
-   char kform;
+   int kform;
    char form[ ARY__SZFRM + 1 ];
 
 /* Reference count: If the DCB is in use, then "refcount" stores the number
@@ -212,7 +212,7 @@ typedef struct AryDCB {
    then the "mode" value contains the access mode available for the associated
    data object ('READ' or 'UPDATE'). If the "kmode" value is zero, then this
    information is not available, or is out of date. */
-   char kmode;
+   int kmode;
    char mode[ ARY__SZMOD + 1 ];
 
 /* Array state: If the DCB is in use and "kstate" is non-zero, then the
@@ -226,9 +226,9 @@ typedef struct AryDCB {
    unaffected data in the array is initialised.  "state" is set non-zero
    when the first write operation completes.) If "kstate" is zero, then this
    information is not available or is out of date. */
-   char kstate;
+   int kstate;
    int state;
-   char init;
+   int init;
 
 /* Disposal mode: If the DCB is in use, then the "dispose" value contains the
    disposal mode ('DELETE', 'KEEP' or 'TEMP') which indicates the action to
@@ -244,7 +244,7 @@ typedef struct AryDCB {
    data component and, if "complex" is non-zero, "iloc" is a locator to the
    imaginary data component. If "ktype" is zero, then this information is
    not available or is out of date. */
-   char ktype;
+   int ktype;
    char type[ DAT__SZTYP + 1 ];
    int complex;
    HDSLoc *dloc;
@@ -257,7 +257,7 @@ typedef struct AryDCB {
    bad pixel flag is non-zero, then there are (or may be) "bad" pixels
    present which must be checked for. If "kbad" is zero, then this
    information is not abailable or is out of date. */
-   char kbad;
+   int kbad;
    int bad;
 
 /* Dimensionality and bounds information: If the DCB is in use and the
@@ -267,8 +267,8 @@ typedef struct AryDCB {
    padded with 1's to make the number of bounds up to ARY__MXDIM. If
    "kbnd" is zero, then this information is not available or is out of
    date. */
-   char kbnd;
-   char ndim;
+   int kbnd;
+   int ndim;
    hdsdim lbnd[ ARY__MXDIM ];
    hdsdim ubnd[ ARY__MXDIM ];
 
@@ -283,7 +283,7 @@ typedef struct AryDCB {
    If "kscl" is zero, then this information is not available or is out
    of date, in which case NULL is stored. NULL is also stored if the array
    storage form is not "scaled". */
-   char kscl;
+   int kscl;
    HDSLoc *scloc;
 
 /* Accumulated pixel index shifts: If the DCB is in use, then the "shift"
@@ -357,7 +357,7 @@ typedef struct AryMCB {
    system of the actual data object. These values are padded with 1's to
    give ARY__MXDIM bounds, regardless of the data object's actual
    dimensionality. */
-   char mtrex;
+   int mtrex;
    hdsdim lmtr[ ARY__MXDIM ];
    hdsdim umtr[ ARY__MXDIM ];
 
@@ -370,16 +370,16 @@ typedef struct AryMCB {
    regions both match the actual data object extent. If this is so, then the
    whole data object will have been mapped directly (without any slicing or
    padding). */
-   char mrful;
-   char whole;
+   int mrful;
+   int whole;
 
 /* Data copy flags: If the MCB is in use, then the "dcopy" value holds a
    logical value indicating if the mapped non-imaginary data component is
    held in a temporary object representing a memory "copy" of the actual
    data. If mapped access to complex data is in effect, then "icopy" holds
    a similar flag for the imaginary component. */
-   char dcopy;
-   char icopy;
+   int dcopy;
+   int icopy;
 
 /* Mapped object locators: If the MCB is in use, then the "dloc" value is
    a locator to the data object which is mapped to contain the non-imaginary
@@ -404,8 +404,8 @@ typedef struct AryMCB {
    similarly indicates if "bad" values are present in the "padding"
    region which exists around the mapping transfer region if the latter
    does not completely fill the mapping region. */
-   char bad;
-   char pbad;
+   int bad;
+   int pbad;
 
 /* Data type for access: If the MCB is in use, then the "type" value
    contains the numeric data type used to access the data and the "complex"
@@ -448,7 +448,7 @@ typedef struct AryACB {
    access to a subset or superset of the data. If this value is zero, then
    the array is a "base array" which gives direct access to the actual data
    object. */
-   char cut;
+   int cut;
 
 /* Index to data object value in the DCB: If the ACB is in use, then "dcb"
    is a pointer to the DCB structure that describes the actual data object
@@ -466,7 +466,7 @@ typedef struct AryACB {
    it describes and the "lbnd" and "ubnd" values hold the lower and upper
    pixel index bounds of the object. These values are padded with 1's to
    give ARY__MXDIM bounds, regardless of the actual object dimensionality. */
-   char ndim;
+   int ndim;
    hdsdim lbnd[ ARY__MXDIM ];
    hdsdim ubnd[ ARY__MXDIM ];
 
@@ -494,7 +494,7 @@ typedef struct AryACB {
    takes no account of the data transfer window extending beyond the edge of
    the data object). This value is only significant if a data transfer
    window exists. */
-   char bad;
+   int bad;
 
 /* Accumulated pixel index shifts: If the ACB is in use, then the "shift"
    value contains an accumulated sum of the pixel index shifts applied to
@@ -528,7 +528,7 @@ typedef struct AryPCB {
 /* Temporary placeholder flag: If the PCB is in use, then "tmp" indicates
    whether the object which replaces the placeholder object should be
    temporary. */
-   char tmp;
+   int tmp;
 
 } AryPCB;
 

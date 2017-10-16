@@ -2,7 +2,7 @@
 #include "ary1.h"
 #include "prm_par.h"
 
-void  CGEN_FUNCTION(ary1Bpp)( size_t el, const CGEN_TYPE *array, char *bad,
+void  CGEN_FUNCTION(ary1Bpp)( size_t el, const CGEN_TYPE *array, int *bad,
                               int *status ) {
 /*
 *+
@@ -13,7 +13,7 @@ void  CGEN_FUNCTION(ary1Bpp)( size_t el, const CGEN_TYPE *array, char *bad,
 *     Determine if bad pixels are present in a vectorised array.
 
 *  Synopsis:
-*     void ary1Bpp<T>( size_t el, const CGEN_TYPE *array, char *bad,
+*     void ary1Bpp<T>( size_t el, const CGEN_TYPE *array, int *bad,
 *                      int *status )
 
 *  Description:

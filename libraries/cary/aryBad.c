@@ -3,7 +3,7 @@
 #include "mers.h"
 #include "dat_par.h"
 
-void aryBad( Ary *ary, char check, char *bad, int *status ) {
+void aryBad( Ary *ary, int check, int *bad, int *status ) {
 /*
 *+
 *  Name:
@@ -13,7 +13,7 @@ void aryBad( Ary *ary, char check, char *bad, int *status ) {
 *     Determine if an array may contain bad pixels.
 
 *  Synopsis:
-*     void aryBad( Ary *ary, char check, char *bad, int *status )
+*     void aryBad( Ary *ary, int check, int *bad, int *status )
 
 *  Description:
 *     This function returns a boolean value indicating whether an array

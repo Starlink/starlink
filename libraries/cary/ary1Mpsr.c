@@ -4,8 +4,8 @@
 #include <string.h>
 
 void ary1Mpsr( AryACB *acb, HDSLoc *loc, const char *type,
-               const char *mode, char bad, HDSLoc **mloc, char *copy,
-               void **pntr, char *dce, int *status ) {
+               const char *mode, int bad, HDSLoc **mloc, int *copy,
+               void **pntr, int *dce, int *status ) {
 /*
 *+
 *  Name:
@@ -16,8 +16,8 @@ void ary1Mpsr( AryACB *acb, HDSLoc *loc, const char *type,
 
 *  Synopsis:
 *     void ary1Mpsr( AryACB *acb, HDSLoc *loc, const char *type,
-*                    const char *mode, char bad, HDSLoc **mloc, char *copy,
-*                    void **pntr, char *dce, int *status )
+*                    const char *mode, int bad, HDSLoc **mloc, int *copy,
+*                    void **pntr, int *dce, int *status )
 
 *  Description:
 *     This function maps a component (non-imaginary or imaginary) of a

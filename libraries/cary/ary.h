@@ -48,12 +48,12 @@
 
 /* Prototypes for public functions */
 void aryAnnul( Ary **ary, int *status );
-void aryBad( Ary *ary, char check, char *bad, int *status );
+void aryBad( Ary *ary, int check, int *bad, int *status );
 void aryBase( Ary *ary1, Ary **ary2, int *status );
 void aryBound( Ary *ary, int ndimx, int lbnd, int ubnd, int ndim,
                int *status );
 void aryClone( int iary1, int iary2, int *status );
-void aryCmplx( Ary *ary, char cmplx, int *status );
+void aryCmplx( Ary *ary, int cmplx, int *status );
 void aryCopy( int iary1, int place, int iary2, int *status );
 void aryDelet( Ary *ary, int *status );
 void aryDelta( int iary1, int zaxis, const char *type, float minrat,
@@ -66,10 +66,10 @@ void aryFtype( Ary *ary, const char *ftype, int *status );
 void aryGtdlt( Ary *ary, int zaxis, const char *ztype, float zratio,
                int *status );
 void aryImprt( const char *loc, Ary *ary, int *status );
-void aryIsacc( Ary *ary, const char *access, char isacc, int *status );
-void aryIsbas( Ary *ary, char base, int *status );
-void aryIsmap( Ary *ary, char mapped, int *status );
-void aryIstmp( Ary *ary, char temp, int *status );
+void aryIsacc( Ary *ary, const char *access, int isacc, int *status );
+void aryIsbas( Ary *ary, int base, int *status );
+void aryIsmap( Ary *ary, int mapped, int *status );
+void aryIstmp( Ary *ary, int temp, int *status );
 void aryLoc( Ary *ary, HDSLoc *loc, int *status );
 int aryLocked( const Ary *ary, int *status );
 void aryMap( Ary *ary, const char *type, const char *mmod, void **pntr,
@@ -87,21 +87,21 @@ void aryOffs( int iary1, int iary2, int mxoffs, int offs, int *status );
 void aryPlace( HDSLoc *loc, const char *name, AryPlace **place, int *status );
 void aryReset( Ary *ary, int *status );
 void arySame( Ary *ary1, Ary *ary2, int *same, int *isect, int *status );
-void arySbad( char bad, Ary *ary, int *status );
+void arySbad( int bad, Ary *ary, int *status );
 void arySbnd( int ndim, int lbnd, int ubnd, Ary *ary, int *status );
 void arySctyp( Ary *ary, const char *type, int *status );
 void arySect( Ary *ary1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, Ary **ary2, int *status );
 void aryShift( int nshift, int shift, Ary *ary, int *status );
 void arySize( Ary *ary, int npix, int *status );
 void arySsect( int iary1, int iary2, int iary3, int *status );
-void aryState( Ary *ary, char state, int *status );
+void aryState( Ary *ary, int state, int *status );
 void aryStype( const char *ftype, Ary *ary, int *status );
 void aryTemp( AryPlace **place, int *status );
-char aryTrace( char newflg );
+int aryTrace( int newflg );
 void aryType( Ary *ary, const char *type, int *status );
 void aryUnlock( Ary *ary, int *status );
 void aryUnmap( Ary *ary, int *status );
-void aryValid( Ary *ary, char valid, int *status );
+void aryValid( Ary *ary, int valid, int *status );
 void aryVerfy( Ary *ary, int *status );
 
 #endif
