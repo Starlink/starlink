@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "ary.h"
+#include "ary_err.h"
 #include "mers.h"
 #include "star/hds.h"
 #include "prm_par.h"
@@ -23,6 +24,7 @@ int main(){
    int can_lock;
    int isect;
    int ival;
+   int ndim;
    int same;
    size_t el;
    size_t i;
@@ -247,6 +249,41 @@ int main(){
    }
 
    aryAnnul( &ary2, status );
+
+   if( *status == SAI__OK ) {
+      aryBound( ary, 2, lbnd, ubnd, &ndim, status );
+      if( *status != ARY__XSDIM ) {
+         int lstat = *status;
+         if( *status != SAI__OK ) errAnnul( status );
+         *status = SAI__ERROR;
+         errRepf( " ", "Error 9a (%d != %d)", status, lstat, ARY__XSDIM );
+      } else {
+         errAnnul( status );
+      }
+   }
+
+   aryBound( ary, ARY__MXDIM, lbnd, ubnd, &ndim, status );
+   if( ( lbnd[ 0 ] != -10 ) ||
+       ( lbnd[ 1 ] != -30 ) ||
+       ( lbnd[ 2 ] != -20 ) ||
+       ( lbnd[ 3 ] != -50 ) ||
+       ( ubnd[ 0 ] != 0 ) ||
+       ( ubnd[ 1 ] != 10 ) ||
+       ( ubnd[ 2 ] != 20 ) ||
+       ( ubnd[ 3 ] != 30 ) ) {
+      if( *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRep( " ", "Error 9b", status );
+      }
+   } else if( *status == SAI__OK ){
+      for( i = 4; i < ARY__MXDIM; i++ ) {
+         if( lbnd[i] != 1 || ubnd[i] != 1 ) {
+            *status = SAI__ERROR;
+            errRep( " ", "Error 9c", status );
+         }
+      }
+   }
+
    aryAnnul( &ary, status );
 
 

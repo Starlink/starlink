@@ -50,7 +50,7 @@
 void aryAnnul( Ary **ary, int *status );
 void aryBad( Ary *ary, int check, int *bad, int *status );
 void aryBase( Ary *ary1, Ary **ary2, int *status );
-void aryBound( Ary *ary, int ndimx, int lbnd, int ubnd, int ndim,
+void aryBound( Ary *ary, int ndimx, hdsdim *lbnd, hdsdim *ubnd, int *ndim,
                int *status );
 void aryClone( int iary1, int iary2, int *status );
 void aryCmplx( Ary *ary, int cmplx, int *status );
