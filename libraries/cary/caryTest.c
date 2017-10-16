@@ -290,7 +290,17 @@ int main(){
       *status = SAI__ERROR;
       errRepf( " ", "Error 13", status );
    }
+
+   aryCmplx( ary2, &ival, status );
+   if( ival && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 14", status );
+   }
+
    aryAnnul( &ary2, status );
+
+
+
 
 
 
