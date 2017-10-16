@@ -120,6 +120,7 @@ void ary1Cut( AryACB *acb1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, Ar
 void ary1Bad( AryACB *acb, int check, int *bad, int *status );
 void ary1Chbpp( AryACB *acb, int *bad, int *status );
 void ary1Bpp( const char *type, size_t el, void *pntr, int *bad, int *status );
+void ary1Cln( AryACB *acb1, AryACB **acb2, int *status );
 
 /* Now include the expanded generic prototypes. */
 #include "ary1_cgen.h"
