@@ -6,13 +6,12 @@
 #include "sae_par.h"
 
 int main(){
-   Ary *ary3;
    Ary *ary2;
+   Ary *ary3;
    Ary *ary;
    AryPlace *place = NULL;
    HDSLoc *loc = NULL;
    HDSLoc *loc2 = NULL;
-   char bad;
    double *dpntr;
    double dsum;
    hdsdim lbnd[ ARY__MXDIM ];
@@ -20,6 +19,7 @@ int main(){
    int *ipntr;
    int status_value = 0;
    int *status = &status_value;
+   int bad;
    int can_lock;
    int isect;
    int ival;

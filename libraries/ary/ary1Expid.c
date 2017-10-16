@@ -15,7 +15,7 @@ typedef union IdUnion {
 
 /* The global variable that holds the count of identifiers that have
    been issued so far. */
-static char Ary_Nids = 0;
+static unsigned int Ary_Nids = 0;
 
 /* A pthread mutex is used to ensure only one thread is accessing the
    above value at any one time. */

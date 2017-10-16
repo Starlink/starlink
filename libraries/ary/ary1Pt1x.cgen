@@ -3,8 +3,8 @@
 #include "star/hds.h"
 #include <string.h>
 
-void CGEN_FUNCTION(ary1Pt1)( char bad, size_t el, const CGEN_TYPE *array,
-                             const char *type, HDSLoc *loc, char *dce,
+void CGEN_FUNCTION(ary1Pt1)( int bad, size_t el, const CGEN_TYPE *array,
+                             const char *type, HDSLoc *loc, int *dce,
                              int *status ) {
 /*
 *+
@@ -15,8 +15,8 @@ void CGEN_FUNCTION(ary1Pt1)( char bad, size_t el, const CGEN_TYPE *array,
 *     Write a 1-dimensional array of values to an HDS object.
 
 *  Synopsis:
-*     void ary1Pt1<T>( char bad, size_t el, const CGEN_TYPE *array,
-*                      const char *type, HDSLoc *loc, char *dce,
+*     void ary1Pt1<T>( int bad, size_t el, const CGEN_TYPE *array,
+*                      const char *type, HDSLoc *loc, int *dce,
 *                      int *status )
 
 *  Description:

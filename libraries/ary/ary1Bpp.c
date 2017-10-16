@@ -5,7 +5,7 @@
 #include "ary_ast.h"
 #include <string.h>
 
-void ary1Bpp( const char *type, size_t el, void *pntr, char *bad, int *status ) {
+void ary1Bpp( const char *type, size_t el, void *pntr, int *bad, int *status ) {
 /*
 *+
 *  Name:
@@ -15,7 +15,7 @@ void ary1Bpp( const char *type, size_t el, void *pntr, char *bad, int *status ) 
 *     Determine if bad pixels are present in a vectorised array.
 
 *  Synopsis:
-*     void ary1Bpp( const char *type, size_t el, void *pntr, char *bad,
+*     void ary1Bpp( const char *type, size_t el, void *pntr, int *bad,
 *                   int *status )
 
 *  Description:
@@ -72,7 +72,7 @@ void ary1Bpp( const char *type, size_t el, void *pntr, char *bad, int *status ) 
 
 /* Local variables: */
    char utype[ARY__SZTYP+1];  /* Upper case version of TYPE */
-   char typok;                /* Whether the TYPE argument is valid */
+   int typok;                 /* Whether the TYPE argument is valid */
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

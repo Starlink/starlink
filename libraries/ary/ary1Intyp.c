@@ -2,7 +2,7 @@
 #include "ary1.h"
 #include "ary_ast.h"
 
-char ary1Intyp( const char *type, int *status ) {
+int ary1Intyp( const char *type, int *status ) {
 /*
 *+
 *  Name:
@@ -12,7 +12,7 @@ char ary1Intyp( const char *type, int *status ) {
 *     Is an HDS type numeric?
 
 *  Synopsis:
-*     char ary1Intyp( const char *type, int *status )
+*     int ary1Intyp( const char *type, int *status )
 
 *  Description:
 *     The routine returns a logical value indicating if the HDS data

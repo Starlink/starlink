@@ -2,7 +2,7 @@
 #include "ary1.h"
 #include "dat_par.h"
 
-void ary1Bad( AryACB *acb, char check, char *bad, int *status ) {
+void ary1Bad( AryACB *acb, int check, int *bad, int *status ) {
 /*
 *+
 *  Name:
@@ -12,7 +12,7 @@ void ary1Bad( AryACB *acb, char check, char *bad, int *status ) {
 *     Determine whether bad pixels may be present for an ACB entry.
 
 *  Synopsis:
-*     void ary1Bad( AryACB *acb, char check, char *bad, int *status )
+*     void ary1Bad( AryACB *acb, int check, int *bad, int *status )
 
 *  Description:
 *     This function obtains the value of the bad pixel flag for an array
@@ -72,10 +72,10 @@ void ary1Bad( AryACB *acb, char check, char *bad, int *status ) {
    hdsdim lmtr[ARY__MXDIM];   /* Lower mapping transfer region bounds */
    hdsdim umrb[ARY__MXDIM];   /* Upper mapping region bounds */
    hdsdim umtr[ARY__MXDIM];   /* Upper mapping transfer region bounds */
-   char mrfull;               /* Mapping region full of data? */
-   char mtrex;                /* Mapping transfer region exists? */
-   char sure;                 /* Whether bad pixel presence is certain */
-   char whole;                /* Mapping region is whole object? */
+   int mrfull;                /* Mapping region full of data? */
+   int mtrex;                 /* Mapping transfer region exists? */
+   int sure;                  /* Whether bad pixel presence is certain */
+   int whole;                 /* Mapping region is whole object? */
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

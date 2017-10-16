@@ -70,10 +70,6 @@ void ary1Sbd( char bad, AryACB *acb, int *status ) {
    AryACB *acbt;              /* Pointer to the test ACB */
    AryDCB *dcb;               /* Pointer to the DCB */
    AryDCB *dcbt;              /* Test DCB */
-   char inside;               /* Whether bounds lie inside */
-   char mrfull;               /* Mapping region filled by data? */
-   char mtrex;                /* Mapping transfer region exists? */
-   char whole;                /* Whole data object to be mapped? */
    hdsdim lbad[ARY__MXDIM];   /* Lower bounds of "bad pixel data" */
    hdsdim lmrb[ARY__MXDIM];   /* Lower mapping region bounds */
    hdsdim ltest[ARY__MXDIM];  /* Lower bounds of test region */
@@ -84,7 +80,11 @@ void ary1Sbd( char bad, AryACB *acb, int *status ) {
    hdsdim ux[ARY__MXDIM];     /* Upper bounds of intersection region */
    int iacbt;                 /* Index of test ACB */
    int insect;                /* Whether bounds intersect */
+   int inside;                /* Whether bounds lie inside */
+   int mrfull;                /* Mapping region filled by data? */
+   int mtrex;                 /* Mapping transfer region exists? */
    int next;                  /* Next ACB slot which is in use */
+   int whole;                 /* Whole data object to be mapped? */
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

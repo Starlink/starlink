@@ -3,7 +3,7 @@
 #include "mers.h"
 #include "dat_par.h"
 
-void ary1Chbpp( AryACB *acb, char *bad, int *status ) {
+void ary1Chbpp( AryACB *acb, int *bad, int *status ) {
 /*
 *+
 *  Name:
@@ -13,7 +13,7 @@ void ary1Chbpp( AryACB *acb, char *bad, int *status ) {
 *     Perform an explicit check that bad pixels are present in an array.
 
 *  Synopsis:
-*     void ary1Chbpp( AryACB *acb, char *bad, int *status )
+*     void ary1Chbpp( AryACB *acb, int *bad, int *status )
 
 *  Description:
 *     This function checks explicitly that bad pixels are present in an

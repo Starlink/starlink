@@ -3,9 +3,9 @@
 #include "star/hds.h"
 #include <string.h>
 
-void CGEN_FUNCTION(ary1Gt1)( char bad, HDSLoc *loc, const char *type,
-                             size_t el, char doscl, CGEN_TYPE scale,
-                             CGEN_TYPE zero, CGEN_TYPE *result, char *dce,
+void CGEN_FUNCTION(ary1Gt1)( int bad, HDSLoc *loc, const char *type,
+                             size_t el, int doscl, CGEN_TYPE scale,
+                             CGEN_TYPE zero, CGEN_TYPE *result, int *dce,
                              int *status ) {
 /*
 *+
@@ -16,9 +16,9 @@ void CGEN_FUNCTION(ary1Gt1)( char bad, HDSLoc *loc, const char *type,
 *     Read a 1-dimensional array of values from an HDS object.
 
 *  Synopsis:
-*     void CGEN_FUNCTION(ary1Gt1)( char bad, HDSLoc *loc, const char *type,
-*                                size_t el, char doscl, CGEN_TYPE scale,
-*                                CGEN_TYPE zero, CGEN_TYPE *result, char *dce,
+*     void CGEN_FUNCTION(ary1Gt1)( int bad, HDSLoc *loc, const char *type,
+*                                size_t el, int doscl, CGEN_TYPE scale,
+*                                CGEN_TYPE zero, CGEN_TYPE *result, int *dce,
 *                                int *status )
 
 *  Description:

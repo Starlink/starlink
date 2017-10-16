@@ -3,8 +3,8 @@
 #include "star/hds.h"
 #include "mers.h"
 
-void ary1Upsw( AryACB *acb, const char *type, char bad, char copy,
-               HDSLoc *datloc, HDSLoc **mloc, void **pntr, char *dce,
+void ary1Upsw( AryACB *acb, const char *type, int bad, int copy,
+               HDSLoc *datloc, HDSLoc **mloc, void **pntr, int *dce,
                int *status ) {
 /*
 *+
@@ -15,8 +15,8 @@ void ary1Upsw( AryACB *acb, const char *type, char bad, char copy,
 *     Unmap simple array component mapped for WRITE (or UPDATE) access.
 
 *  Synopsis:
-*     void ary1Upsw( AryACB *acb, const char *type, char bad, char copy,
-*                    HDSLoc *datloc, HDSLoc **mloc, void **pntr, char *dce,
+*     void ary1Upsw( AryACB *acb, const char *type, int bad, int copy,
+*                    HDSLoc *datloc, HDSLoc **mloc, void **pntr, int *dce,
 *                    int *status )
 
 *  Description:

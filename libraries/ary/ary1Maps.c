@@ -5,7 +5,7 @@
 #include "ary_err.h"
 #include <string.h>
 
-void ary1Maps( AryACB *acb, const char *type, char cmplx, const char *mmod,
+void ary1Maps( AryACB *acb, const char *type, int cmplx, const char *mmod,
                const char *inopt, void **dpntr, void **ipntr, int *status ) {
 /*
 *+
@@ -16,7 +16,7 @@ void ary1Maps( AryACB *acb, const char *type, char cmplx, const char *mmod,
 *     Map a simple array.
 
 *  Synopsis:
-*     void ary1Maps( AryACB *acb, const char *type, char cmplx,
+*     void ary1Maps( AryACB *acb, const char *type, int cmplx,
 *                    const char *mode, const char *inopt, void **dpntr,
 *                    void **ipntr, int *status )
 
@@ -88,15 +88,15 @@ void ary1Maps( AryACB *acb, const char *type, char cmplx, const char *mmod,
 /* Local variables: */
    AryDCB *dcb;               /* Data object entry in the DCB */
    AryMCB *mcb;               /* Mapping entry in the MCB */
-   char bad;                  /* Whether to check for "bad" values */
-   char dce;                  /* Data conversion error? */
-   char entire;               /* Entire object filled with values? */
-   char idce;                 /* Imaginary data conversion error? */
    char mode[ARY__SZMOD+1];   /* Mapping mode buffer */
    char tinop[ARY__SZIOP+1];  /* Temporary initialisation option buffer */
    char vtype[ARY__SZTYP+1];  /* Validated data type string */
    hdsdim dim[ARY__MXDIM];    /* Array (ACB) dimension sizes */
+   int bad;                   /* Whether to check for "bad" values */
+   int dce;                   /* Data conversion error? */
+   int entire;                /* Entire object filled with values? */
    int i;                     /* Loop counter for dimensions */
+   int idce;                  /* Imaginary data conversion error? */
    size_t el;                 /* Number of array elements to be mapped */
 
 /* Check inherited global status. */
