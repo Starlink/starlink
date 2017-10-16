@@ -3,7 +3,7 @@
 #include "ary1.h"
 #include "star/hds.h"
 
-char ary1Defr( const AryDCB *dcb, int *status ) {
+int ary1Defr( const AryDCB *dcb, int *status ) {
 /*
 *+
 *  Name:
@@ -13,7 +13,7 @@ char ary1Defr( const AryDCB *dcb, int *status ) {
 *     See if the creation of the arrays has been deferred.
 
 *  Synopsis:
-*     char ary1Defr( const AryDCB *dcb, int *status )
+*     int ary1Defr( const AryDCB *dcb, int *status )
 
 *  Description:
 *     Arrays created via aryDupe initially have no HDS data objects to
@@ -71,10 +71,10 @@ char ary1Defr( const AryDCB *dcb, int *status ) {
 /* Local variables: */
    HDSLoc *loc=NULL;          /* Locator to first component */
    char name[ DAT__SZNAM+1 ]; /* Name of first component */
-   char result;               /* Returned value */
    int i;                     /* Component index */
    int ncomp;                 /* Number of components */
    int prim;                  /* Is the locator primitive? */
+   int result;                /* Returned value */
 
 /* Initialise */
    result = 0;

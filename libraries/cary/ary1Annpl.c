@@ -3,7 +3,7 @@
 #include "star/hds.h"
 #include "mers.h"
 
-void ary1Annpl( char erase, AryPCB **pcb, int *status ) {
+void ary1Annpl( int erase, AryPCB **pcb, int *status ) {
 /*
 *+
 *  Name:
@@ -13,7 +13,7 @@ void ary1Annpl( char erase, AryPCB **pcb, int *status ) {
 *     Annul a placeholder.
 
 *  Synopsis:
-*     void ary1Annpl( char erase, AryPCB **pcb, int *status )
+*     void ary1Annpl( int erase, AryPCB **pcb, int *status )
 
 *  Description:
 *     The routine annuls a placeholder, releasing the PCB slot which it

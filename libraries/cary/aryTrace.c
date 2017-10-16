@@ -3,7 +3,7 @@
 #include <pthread.h>
 
 /* The global variable that indicates if error tracing is enabled. */
-static char Ary_Trace = 0;
+static int Ary_Trace = 0;
 
 /* A pthread read/write lock used to serialise access to the above flag.
    This allows multiple threads to perform concurrent read, but only one
@@ -77,7 +77,7 @@ char aryTrace( char newflg ) {
 */
 
 /* Local Variables; */
-   char result;
+   int result;
 
 /* If the flag value is not being changed, acquire a read-lock for the global
    variable. This blocks if another thread currently has a write lock on the

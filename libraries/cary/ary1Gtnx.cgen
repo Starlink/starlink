@@ -6,11 +6,11 @@
 #include "ary_ast.h"
 #include <string.h>
 
-void CGEN_FUNCTION(ary1Gtn)( char bad, const char *htype, HDSLoc *loc,
+void CGEN_FUNCTION(ary1Gtn)( int bad, const char *htype, HDSLoc *loc,
                             int ndim, const hdsdim *lbndd, const hdsdim *ubndd,
                             const hdsdim *lsub, const hdsdim *usub,
-                            const hdsdim *lbnda, const hdsdim *ubnda, char pad,
-                            HDSLoc *scloc, CGEN_TYPE *array, char *dce,
+                            const hdsdim *lbnda, const hdsdim *ubnda, int pad,
+                            HDSLoc *scloc, CGEN_TYPE *array, int *dce,
                             int *status ) {
 /*
 *+
@@ -21,11 +21,11 @@ void CGEN_FUNCTION(ary1Gtn)( char bad, const char *htype, HDSLoc *loc,
 *     Get an n-dimensional subregion of an HDS object.
 
 *  Synopsis:
-*     void CGEN_FUNCTION(ary1Gtn)( char bad, const char *htype, HDSLoc *loc,
+*     void CGEN_FUNCTION(ary1Gtn)( int bad, const char *htype, HDSLoc *loc,
 *                           int ndim, const hdsdim *lbndd, const hdsdim *ubndd,
 *                           const hdsdim *lsub, const hdsdim *usub,
-*                           const hdsdim *lbnda, const hdsdim *ubnda, char pad,
-*                           HDSLoc *scloc, CGEN_TYPE *array, char *dce,
+*                           const hdsdim *lbnda, const hdsdim *ubnda, int pad,
+*                           HDSLoc *scloc, CGEN_TYPE *array, int *dce,
 *                           int *status )
 
 *  Description:
@@ -193,14 +193,14 @@ void CGEN_FUNCTION(ary1Gtn)( char bad, const char *htype, HDSLoc *loc,
    HDSLoc *locsz=NULL;        /* Locator to scale/zero value */
    HDSLoc *slice=NULL;        /* Locator to data slice */
    HDSLoc *vec=NULL;          /* Locator to vectorised data */
-   char contig;               /* Whether data values are contiguous */
-   char dceslc;               /* Data conversion error in slice? */
-   char doscl;                /* Should scaling be applied? */
    char type[DAT__SZTYP+1];   /* HDS data type */
    hdsdim dim[ARY__MXDIM];    /* Array of dimension indices */
    hdsdim eslice[1];          /* End of data slice */
    hdsdim sslice[1];          /* Start of data slice */
+   int contig;                /* Whether data values are contiguous */
+   int dceslc;                /* Data conversion error in slice? */
    int dcontg;                /* Dimension containing contiguous data */
+   int doscl;                 /* Should scaling be applied? */
    int i;                     /* (Current) dimension count */
    size_t ea;                 /* End of "bad" output array region */
    size_t ed;                 /* End of "bad" (unwanted) data region */

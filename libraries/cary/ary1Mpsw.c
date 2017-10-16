@@ -5,7 +5,7 @@
 
 void ary1Mpsw( AryACB *acb, HDSLoc *loc, const char *type,
                const char *inopt, HDSLoc **mloc,
-               char *copy, void **pntr, int *status ) {
+               int *copy, void **pntr, int *status ) {
 /*
 *+
 *  Name:
@@ -17,7 +17,7 @@ void ary1Mpsw( AryACB *acb, HDSLoc *loc, const char *type,
 *  Synopsis:
 *     void ary1Mpsw( AryACB *acb, HDSLoc *loc, const char *type,
 *                    const char *inopt, HDSLoc **mloc,
-*                    char *copy, void **pntr, int *status )
+*                    int *copy, void **pntr, int *status )
 
 *  Description:
 *     The routine maps a component (non-imaginary or imaginary) of a

@@ -5,7 +5,7 @@
 #include "ary_err.h"
 
 AryObject *ary1Impid( const void *id, int checklock, int readonly,
-                      char isacb, int *status ) {
+                      int isacb, int *status ) {
 /*
 *+
 *  Name:
@@ -16,7 +16,7 @@ AryObject *ary1Impid( const void *id, int checklock, int readonly,
 
 *  Synopsis:
 *     AryObject *ary1Impid( const void *id, int checklock, int readonly,
-*                           char isacb, int *status )
+*                           int isacb, int *status )
 
 *  Description:
 *     The routine converts an array identifier, previously issued by

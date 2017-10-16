@@ -85,12 +85,12 @@ void arySame( Ary *ary1, Ary *ary2, int *same, int *isect, int *status ) {
    hdsdim umtr1[ARY__MXDIM];  /* Upper bounds mapping tr. region 1 */
    hdsdim umtr2[ARY__MXDIM];  /* Upper bounds mapping tr. region 2 */
    hdsdim ux[ARY__MXDIM];     /* Upper bound of intersection region */
-   char mrful1;               /* 1st mapping transfer region full? */
-   char mrful2;               /* 2nd mapping transfer region full? */
-   char mtrex1;               /* 1st mapping transfer region exists? */
-   char mtrex2;               /* 2nd mapping transfer region exists? */
-   char whole1;               /* 1st array mapped whole? */
-   char whole2;               /* 2nd array mapped whole? */
+   int mrful1;                /* 1st mapping transfer region full? */
+   int mrful2;                /* 2nd mapping transfer region full? */
+   int mtrex1;                /* 1st mapping transfer region exists? */
+   int mtrex2;                /* 2nd mapping transfer region exists? */
+   int whole1;                /* 1st array mapped whole? */
+   int whole2;                /* 2nd array mapped whole? */
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
