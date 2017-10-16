@@ -256,7 +256,7 @@ int main(){
          int lstat = *status;
          if( *status != SAI__OK ) errAnnul( status );
          *status = SAI__ERROR;
-         errRepf( " ", "Error 9a (%d != %d)", status, lstat, ARY__XSDIM );
+         errRepf( " ", "Error 10 (%d != %d)", status, lstat, ARY__XSDIM );
       } else {
          errAnnul( status );
       }
@@ -273,16 +273,28 @@ int main(){
        ( ubnd[ 3 ] != 30 ) ) {
       if( *status == SAI__OK ) {
          *status = SAI__ERROR;
-         errRep( " ", "Error 9b", status );
+         errRep( " ", "Error 11", status );
       }
    } else if( *status == SAI__OK ){
       for( i = 4; i < ARY__MXDIM; i++ ) {
          if( lbnd[i] != 1 || ubnd[i] != 1 ) {
             *status = SAI__ERROR;
-            errRep( " ", "Error 9c", status );
+            errRep( " ", "Error 12", status );
          }
       }
    }
+
+   aryClone( ary, &ary2, status );
+   arySame( ary, ary2, &same, &isect, status );
+   if( !same && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 13", status );
+   }
+   aryAnnul( &ary2, status );
+
+
+
+
 
    aryAnnul( &ary, status );
 

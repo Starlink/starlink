@@ -52,7 +52,7 @@ void aryBad( Ary *ary, int check, int *bad, int *status );
 void aryBase( Ary *ary1, Ary **ary2, int *status );
 void aryBound( Ary *ary, int ndimx, hdsdim *lbnd, hdsdim *ubnd, int *ndim,
                int *status );
-void aryClone( int iary1, int iary2, int *status );
+void aryClone( Ary *ary1, Ary **ary2, int *status );
 void aryCmplx( Ary *ary, int cmplx, int *status );
 void aryCopy( int iary1, int place, int iary2, int *status );
 void aryDelet( Ary *ary, int *status );
