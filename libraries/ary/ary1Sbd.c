@@ -3,7 +3,7 @@
 #include "ary1.h"
 #include "dat_par.h"
 
-void ary1Sbd( char bad, AryACB *acb, int *status ) {
+void ary1Sbd( int bad, AryACB *acb, int *status ) {
 /*
 *+
 *  Name:
@@ -13,7 +13,7 @@ void ary1Sbd( char bad, AryACB *acb, int *status ) {
 *     Set the bad pixel flag for an array.
 
 *  Synopsis:
-*     void ary1Sbd( char bad, AryACB *acb, int *status )
+*     void ary1Sbd( int bad, AryACB *acb, int *status )
 
 *  Description:
 *     The routine sets a bad pixel flag value for a given ACB. A call
