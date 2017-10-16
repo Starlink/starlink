@@ -70,7 +70,6 @@ void aryBase( Ary *ary1, Ary**ary2, int *status ) {
    AryACB *acb1;              /* Pointer to input Access Control Block */
    AryACB *acb2;              /* Pointer to returned Access Control Block */
    AryDCB *dcb;               /* Pointer to shared Data Control Block */
-   int iacc;                  /* Loop counter for access control flags */
 
 /* Set an initial value for the IARY2 argument. */
    *ary2 = NULL;

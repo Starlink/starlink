@@ -3,7 +3,7 @@
 #include "star/hds.h"
 #include "mers.h"
 
-void ary1Upsr( char copy, HDSLoc **mloc, int *status ) {
+void ary1Upsr( int copy, HDSLoc **mloc, int *status ) {
 /*
 *+
 *  Name:
@@ -13,7 +13,7 @@ void ary1Upsr( char copy, HDSLoc **mloc, int *status ) {
 *     Unmap a simple array component mapped for READ access.
 
 *  Synopsis:
-*     void ary1Upsr( char copy, HDSLoc **mloc, int *status )
+*     void ary1Upsr( int copy, HDSLoc **mloc, int *status )
 
 *  Description:
 *     The routine unmaps a component of a simple array which has

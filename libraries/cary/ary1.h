@@ -77,7 +77,7 @@ void ary1Dimp( HDSLoc *loc, AryDCB **dcb, int *status );
 void ary1Dlshp( HDSLoc *loc, int mxdim, hdsdim *dim, int *ndim, int *status );
 void ary1Dmod( AryDCB *dcb, int *status );
 void ary1Dp2s( AryDCB *dcb, int *status );
-void ary1Dsbd( char bad, AryDCB *dcb, int *status );
+void ary1Dsbd( int bad, AryDCB *dcb, int *status );
 void ary1Dsta( AryDCB *dcb, int *status );
 void ary1Dtyp( AryDCB *dcb, int *status );
 void ary1Gmrb( AryACB *acb, int *mtrex, int *mrfull, int *whole, hdsdim lmrb[ ARY__MXDIM ], hdsdim umrb[ ARY__MXDIM ], hdsdim lmtr[ ARY__MXDIM ], hdsdim umtr[ ARY__MXDIM ], int *status );
@@ -87,20 +87,20 @@ void ary1Inbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2, 
 void ary1Iobw( const char *type, const char *inopt, size_t el, void *pntr, int *status );
 void ary1Mpsw( AryACB *acb, HDSLoc *loc, const char *type, const char *inopt, HDSLoc **mloc, int *copy, void **pntr, int *status );
 void ary1Ptn( int bad, int ndim, const hdsdim *lbnda, const hdsdim *ubnda, const char *type, const void *pntr, const hdsdim *lsub, const hdsdim *usub, const hdsdim *lbndd, const hdsdim *ubndd, const char *htype, HDSLoc *loc, int *dce, int *status );
-void ary1Sbd( char bad, AryACB *acb, int *status );
+void ary1Sbd( int bad, AryACB *acb, int *status );
 void ary1Tcnam( HDSLoc *loc, char *name, int *status );
 void ary1Temp( const char *type, int ndim, const hdsdim *dim, HDSLoc **loc, int *status );
 void ary1Trace( const char *routin, int *status );
 void ary1Ump( AryACB *acb, int *status );
 void ary1Umps( AryACB *acb, int *status );
-void ary1Upsr( char copy, HDSLoc **mloc, int *status );
+void ary1Upsr( int copy, HDSLoc **mloc, int *status );
 void ary1Upsw( AryACB *acb, const char *type, int bad, int copy, HDSLoc *datloc, HDSLoc **mloc, void **pntr, int *dce, int *status );
 void ary1Vbad( const char *type, size_t n, void *pntr, int *status );
 void ary1Vzero( const char *type, size_t n, void *pntr, int *status );
 void ary1Xsbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2, const hdsdim *lbnd2, const hdsdim *ubnd2, int ndim, hdsdim *lbnd, hdsdim *ubnd, int *exist, int *status );
 void ary1Vftp( const char *ftype, size_t len, char *type, char *cmplx, int *status );
 void ary1Vbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, int *status );
-void ary1Dcre( char defer, const char *type, char cmplx, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, char temp, HDSLoc *loc, AryDCB **dcb, int *status );
+void ary1Dcre( int defer, const char *type, int cmplx, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, int temp, HDSLoc *loc, AryDCB **dcb, int *status );
 void ary1Nel( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, size_t *el, int *status );
 void ary1Vmmd( const char *mmod,  char mode[ARY__SZMOD+1], char inopt[ARY__SZIOP+1], int *status );
 void ary1Maps( AryACB *acb, const char *type, int cmplx, const char *mode, const char *inopt, void **dpntr, void **ipntr, int *status );
@@ -121,6 +121,14 @@ void ary1Bad( AryACB *acb, int check, int *bad, int *status );
 void ary1Chbpp( AryACB *acb, int *bad, int *status );
 void ary1Bpp( const char *type, size_t el, void *pntr, int *bad, int *status );
 void ary1Cln( AryACB *acb1, AryACB **acb2, int *status );
+void ary1Cpy( AryACB *acb1, int temp, HDSLoc *loc, int expand, AryACB **acb2, int *status );
+void ary1Dcrep( int defer, const char *type, int ndim, const hdsdim *ubnd, int temp, HDSLoc **loc, AryDCB **dcb, int *status );
+void ary1Dfppl( HDSLoc *locp, const char *name, HDSLoc **loc, int *status );
+void ary1Pbnd( AryACB *acb, int *prim, int *status );
+void ary1Dcpy( AryDCB *dcb1, int temp, HDSLoc **loc, AryDCB **dcb2, int *status );
+void ary1Cpync( HDSLoc *loc1, const char *name, HDSLoc *loc2, int *status );
+void ary1Cpscl( AryDCB *dcb1, AryDCB *dcb2, int *status );
+void ary1Cpdlt( AryDCB *dcb1, AryDCB *dcb2, int *status );
 
 /* Now include the expanded generic prototypes. */
 #include "ary1_cgen.h"

@@ -6,7 +6,7 @@
 #include "mers.h"
 #include "ary_err.h"
 
-void ary1Dsbd( char bad, AryDCB *dcb, int *status ) {
+void ary1Dsbd( int bad, AryDCB *dcb, int *status ) {
 /*
 *+
 *  Name:
@@ -16,7 +16,7 @@ void ary1Dsbd( char bad, AryDCB *dcb, int *status ) {
 *     Set the bad pixel flag for a data object.
 
 *  Synopsis:
-*     void ary1Dsbd( char bad, AryDCB *dcb, int *status )
+*     void ary1Dsbd( int bad, AryDCB *dcb, int *status )
 
 *  Description:
 *     The routine sets the bad pixel flag to a specified value for a
