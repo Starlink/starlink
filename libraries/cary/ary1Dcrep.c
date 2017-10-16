@@ -1,27 +1,24 @@
 #include "sae_par.h"
 #include "ary1.h"
-#include "star/hds.h"
-#include "ary_ast.h"
 #include <string.h>
+#include "ary_ast.h"
 
-void ary1Dcre( int defer, const char *type, int cmplx, int ndim,
-               const hdsdim *lbnd, const hdsdim *ubnd, int temp,
-               HDSLoc *loc, AryDCB **dcb, int *status ) {
+void ary1Dcrep( int defer, const char *type, int ndim, const hdsdim *ubnd,
+                int temp, HDSLoc **loc, AryDCB **dcb, int *status ) {
 /*
 *+
 *  Name:
-*     ary1Dcre
+*     ary1Dcrep
 
 *  Purpose:
-*     Create a simple array with an entry in the DCB.
+*     Create a primitive array with an entry in the DCB.
 
 *  Synopsis:
-*     void ary1Dcre( int defer, const char *type, int cmplx, int ndim,
-*                    const hdsdim *lbnd, const hdsdim *ubnd, int temp,
-*                    HDSLoc *loc, AryDCB **dcb, int *status )
+*     void ary1Dcrep( int defer, const char *type, int ndim, const hdsdim *ubnd,
+*                     int temp, HDSLoc **loc, AryDCB **dcb, int *status )
 
 *  Description:
-*     The routine converts an array placeholder object into a simple
+*     This function converts an array placeholder object into a primitive
 *     array and creates a new entry in the DCB to refer to it. The
 *     placeholder object is passed by an HDS locator, which may be
 *     annulled afterwards.
@@ -40,22 +37,20 @@ void ary1Dcre( int defer, const char *type, int cmplx, int ndim,
 *     type
 *        Data type of the array to be created; an HDS primitive numeric
 *        data type string (case insensitive).
-*     cmplx
-*        Whether a complex array is required.
 *     ndim
 *        Number of array dimensions.
-*     lbnd
-*        Lower bounds of the array.
 *     ubnd
-*        Upper bounds of the array.
+*        Upper bounds of the array (the lower bounds are taken to be 1).
 *     temp
 *        Whether the array is temporary (this is used to set its
 *        disposal mode entry in the DCB).
 *     loc
 *        Locator to an array placeholder object (an empty scalar data
-*        structure of type ARRAY).
+*        structure of type ARRAY); it should not be a cell or a slice.
+*        A new locator is returned, since the original structure will
+*        be erased and a new primitive array created in its place.
 *     dcb
-*        Returned holding a pointer to the DCB which refers to the new data object.
+*        Returned holding a DCB pointer for the new data object.
 *     status
 *        The global status.
 
@@ -91,8 +86,8 @@ void ary1Dcre( int defer, const char *type, int cmplx, int ndim,
 */
 
 /* Local variables: */
-   HDSLoc *tloc = NULL;       /* Locator for ORIGIN component */
-   hdsdim dim[ARY__MXDIM];    /* Dimension sizes of array components */
+   HDSLoc *locp = NULL;       /* Parent structure locator */
+   char name[DAT__SZNAM+1];   /* Object name */
    int i;                     /* Loop counter for dimensions */
    int nlev;                  /* Levels in HDS path name */
 
@@ -105,54 +100,60 @@ void ary1Dcre( int defer, const char *type, int cmplx, int ndim,
    if( *status != SAI__OK ){
       *dcb = NULL;
 
-/* Calculate the dimension sizes for the array components to be created. */
+/* Obtain a locator to the placeholder object's parent structure. */
    } else {
-      for( i = 0; i < ndim; i++ ){
-         dim[ i ] = ubnd[ i ] - lbnd[ i ] + 1;
+      datParen( *loc, &locp, status );
+
+/* Obtain the placeholder object's name. Then annul its locator and erase
+   the object. */
+      datName( *loc, name, status );
+      datAnnul( loc, status );
+      datErase( locp, name, status );
+
+/* If we are not defering the creation of the HDS array, create a new
+   primitive array of the required type and shape in its place and obtain
+   a new locator to it. */
+      if( !defer ){
+         datNew( locp, name, type, ndim, ubnd, status );
+         datFind( locp, name, loc, status );
+
+/* If we are defering creation of the array, create an ARRAY structure
+   containing a single component called Variant that is set to the value
+   "PRIMITIVE". This is picked up by the ary1Dfrm function, and used as an
+   indication that the array is primitive (actually, will be primitive
+   when it is created). */
+      } else {
+         ary1Dfppl( locp, name, loc, status );
       }
 
-/* Clone a locator to the data object for storage in the DCB. Link this
-   locator into a private group to prevent external events annulling it. */
-      datClone( loc, &(*dcb)->loc, status );
+/* Annul the parent structure locator. */
+      datAnnul( &locp, status );
+
+/* Clone a locator to the array for storage in the DCB. Link this locator
+   into a private group to prevent external events annulling it. */
+      (*dcb)->loc = NULL;
+      datClone( *loc, &(*dcb)->loc, status );
       hdsLink( (*dcb)->loc, "ARY_DCB", status );
 
 /* Obtain the new data object file and path names and enter them into the
    DCB. */
-      hdsTrace( (*dcb)->loc, &nlev, (*dcb)->path, (*dcb)->file,
-                status, sizeof((*dcb)->path), sizeof((*dcb)->file) );
+      hdsTrace( (*dcb)->loc, &nlev, (*dcb)->path, (*dcb)->file, status,
+                sizeof((*dcb)->path), sizeof((*dcb)->file) );
 
-/* Tune HDS for the expected maximum number of structure components. */
-      hdsTune( "NCOMP", 5, status );
-
-/* If we are not defering the creation of the HDS array, create the
-   non-imaginary data component and obtain a locator to it. Store the
-   locator in the DCB. */
+/* If we are not deferring creation of the array, obtain a non-imaginary
+   component locator by cloning the data object locator. If we are
+   deferring creation, retain a null locator. */
       (*dcb)->dloc = NULL;
+      if( !defer ) datClone( (*dcb)->loc, &(*dcb)->dloc, status );
+
+/* Set a null imaginary component locator. */
       (*dcb)->iloc = NULL;
-      if( !defer ){
-         datNew( (*dcb)->loc, "DATA", type, ndim, dim, status );
-         datFind( (*dcb)->loc, "DATA", &(*dcb)->dloc, status );
-
-/* If a complex array is required, then create and locate the imaginary
-   component similarly. */
-         if( cmplx ){
-            datNew( (*dcb)->loc, "IMAGINARY_DATA", type, ndim, dim, status );
-            datFind( (*dcb)->loc, "IMAGINARY_DATA", &(*dcb)->iloc, status );
-         }
-      }
-
-/* Create the ORIGIN component and enter the lower bounds information. */
-      datNew1I( (*dcb)->loc, "ORIGIN", ndim, status );
-      datFind( (*dcb)->loc, "ORIGIN", &tloc, status );
-      HDSDIM_TYPE(datPut1)( tloc, ndim, lbnd, status );
-      datAnnul( &tloc, status );
 
 /* If there was an error, then clean up by annulling all the locators which
    may have been acquired. */
       if( *status != SAI__OK ){
          datAnnul( &(*dcb)->loc, status );
-         if( (*dcb)->dloc ) datAnnul( &(*dcb)->dloc, status );
-         if( cmplx && (*dcb)->iloc ) datAnnul( &(*dcb)->iloc, status );
+         datAnnul( &(*dcb)->dloc, status );
 
 /* Release the allocated DCB slot. */
          *dcb = ary1Rls( (AryObject *) *dcb, status );
@@ -163,9 +164,9 @@ void ary1Dcre( int defer, const char *type, int cmplx, int ndim,
          (*dcb)->nread = 0;
          (*dcb)->nwrite = 0;
 
-/* The form is known to be SIMPLE, the access mode to be UPDATE and the
+/* The form is known to be PRIMITIVE, the access mode to be UPDATE and the
    state to be "undefined", since the array has just been created. */
-         strcpy( (*dcb)->form, "SIMPLE" );
+         strcpy( (*dcb)->form, "PRIMITIVE" );
          (*dcb)->kform = 1;
          strcpy( (*dcb)->mode, "UPDATE" );
          (*dcb)->kmode = 1;
@@ -182,21 +183,21 @@ void ary1Dcre( int defer, const char *type, int cmplx, int ndim,
             strcpy( (*dcb)->dispose, "KEEP" );
          }
 
-/* The array is created with a bad pixel flag value of 1. */
+/* Set the bad pixel flag to 1. */
          (*dcb)->bad = 1;
          (*dcb)->kbad = 1;
 
 /* Store the data type (and complexity) information in upper case. */
          strncpy( (*dcb)->type, type, DAT__SZTYP + 1 ) ;
          astChrCase( NULL, (*dcb)->type, 1, 0 );
-         (*dcb)->complex = cmplx;
+         (*dcb)->complex = 0;
          (*dcb)->ktype = 1;
 
 /* Store the number of dimensions and the array bounds information, padding
    with 1's if necessary. */
          (*dcb)->ndim = ndim;
          for( i = 0; i < ndim; i++ ){
-            (*dcb)->lbnd[ i ] = lbnd[ i ];
+            (*dcb)->lbnd[ i ] = 1;
             (*dcb)->ubnd[ i ] = ubnd[ i ];
          }
          for( ; i < ARY__MXDIM; i++ ){
@@ -213,6 +214,6 @@ void ary1Dcre( int defer, const char *type, int cmplx, int ndim,
    }
 
 /* Call error tracing routine and exit. */
-   if( *status != SAI__OK ) ary1Trace( "ary1Dcre", status );
+   if( *status != SAI__OK ) ary1Trace( "ary1Dcrep", status );
 
 }

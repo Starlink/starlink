@@ -127,6 +127,25 @@ int main(){
       errRepf( " ", "Error 4e", status );
    }
 
+   hdsNew( "cary_test2", "TEST", "TEST", 0, 0, &loc2, status );
+   aryPlace( loc2, "data_array", &place, status );
+   aryCopy( ary2, &place, &ary3, status );
+   aryBound( ary3, 3, lbnd, ubnd, &ndim, status );
+   if( lbnd[ 0 ] != 1023 ||
+       lbnd[ 1 ] != 7 ||
+       lbnd[ 2 ] != 2008 ||
+       ubnd[ 0 ] != 1023 ||
+       ubnd[ 1 ] != 7 ||
+       ubnd[ 2 ] != 2008 ||
+       ndim != 3 ) {
+      if( *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRepf( " ", "Error 4f", status );
+      }
+   }
+   aryAnnul( &ary3, status );
+   datAnnul( &loc2, status );
+
    aryAnnul( &ary2, status );
    ary3 = ary;
 

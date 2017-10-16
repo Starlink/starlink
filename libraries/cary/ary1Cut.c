@@ -87,7 +87,6 @@ void ary1Cut( AryACB *acb1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd,
    hdsdim ux[ARY__MXDIM];     /* Upper intersection region bounds */
    int exist;                 /* Whether intersection region exists */
    int i;                     /* Loop counter for dimensions */
-   int iacc;                  /* Loop counter for access control flags */
 
 /* Set an initial value for the "acb2" argument. */
    *acb2 = NULL;

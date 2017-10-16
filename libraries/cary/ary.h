@@ -54,7 +54,7 @@ void aryBound( Ary *ary, int ndimx, hdsdim *lbnd, hdsdim *ubnd, int *ndim,
                int *status );
 void aryClone( Ary *ary1, Ary **ary2, int *status );
 void aryCmplx( Ary *ary, int *cmplx, int *status );
-void aryCopy( int iary1, int place, int iary2, int *status );
+void aryCopy( Ary *ary1, AryPlace **place, Ary **ary2, int *status );
 void aryDelet( Ary *ary, int *status );
 void aryDelta( int iary1, int zaxis, const char *type, float minrat,
                int place, float zratio, int iary2, int *status );
