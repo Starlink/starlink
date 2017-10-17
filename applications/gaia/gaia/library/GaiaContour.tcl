@@ -454,7 +454,7 @@ itcl::class gaia::GaiaContour {
             puts $fid "keytitle = \{[$itk_component(keytitle) get]\}"
             puts $fid "xkeypos = [$itk_component(xkeypos) get]"
             puts $fid "ykeypos = [$itk_component(ykeypos) get]"
-            puts $fid "keyfont = [$itk_component(keyfont) get]"
+            puts $fid "keyfont = \{[$itk_component(keyfont) get]\}"
             set colour [gaia::AstColours::lookup_index [$itk_component(keycolour) get]]
             puts $fid "keycolour = $colour"
             puts $fid "keylength = [$itk_component(keylength) get]"

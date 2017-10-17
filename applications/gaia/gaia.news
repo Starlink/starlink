@@ -7,6 +7,9 @@
   Saving or sending (using SAMP) a spectrum that was extracted
   from a cube using a multi-line ARD region should now work.
 
+  Saving the configuration of the contour toolbox failed if the
+  key font had a compound name. This is now fixed.
+
   Star-2016A Release
   ==================
 
