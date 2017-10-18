@@ -46,7 +46,7 @@ ary1Extyp.c ary1Dscl.c ary1Undlt.c ary1Vscl.c arySect.c ary1Cut.c \
 aryUnmap.c aryBad.c ary1Bad.c ary1Chbpp.c ary1Bpp.c aryBase.c arySame.c \
 aryBound.c aryClone.c ary1Cln.c aryCmplx.c aryCopy.c ary1Cpy.c ary1Dcrep.c \
 ary1Dfppl.c ary1Pbnd.c ary1Dcpy.f ary1Cpync.c ary1Cpscl.c ary1Cpdlt.c \
-aryDelet.c ary1Del.c
+aryDelet.c ary1Del.c aryValid.c
 
 CGENERIC_ROUTINES = ary1Badx.cgen ary1Zerx.cgen ary1Ptnx.cgen \
 ary1Pt1x.cgen ary1Cvfx.cgen ary1Gtnx.cgen ary1Gt1x.cgen ary1Cvtx.cgen \
