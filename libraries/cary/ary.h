@@ -62,8 +62,7 @@ void aryDupe( int iary1, int place, int iary2, int *status );
 void aryFind( HDSLoc *loc, const char *name, Ary **ary, int *status );
 void aryForm( Ary *ary, const char *form, int *status );
 void aryFtype( Ary *ary, const char *ftype, int *status );
-void aryGtdlt( Ary *ary, int zaxis, const char *ztype, float zratio,
-               int *status );
+void aryGtdlt( Ary *ary, int *zaxis, char ztype[DAT__SZTYP+1], float *zratio, int *status );
 void aryImprt( const char *loc, Ary *ary, int *status );
 void aryIsacc( Ary *ary, const char *access, int isacc, int *status );
 void aryIsbas( Ary *ary, int base, int *status );
