@@ -130,6 +130,8 @@ void ary1Cpync( HDSLoc *loc1, const char *name, HDSLoc *loc2, int *status );
 void ary1Cpscl( AryDCB *dcb1, AryDCB *dcb2, int *status );
 void ary1Cpdlt( AryDCB *dcb1, AryDCB *dcb2, int *status );
 void ary1Del( AryACB **acb, int *status );
+void ary1Gtdlt( AryDCB *dcb, int *zaxis, char ztype[DAT__SZTYP+1], float *zratio, int *status );
+void ary1S2dlt( HDSLoc *loc1, int zaxis, const char *type, HDSLoc *loc2, float *zratio, int *status );
 
 /* Now include the expanded generic prototypes. */
 #include "ary1_cgen.h"

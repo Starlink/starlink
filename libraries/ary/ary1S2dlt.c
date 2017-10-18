@@ -1,5 +1,4 @@
 #include "sae_par.h"
-#include "f77.h"
 #include "mers.h"
 #include "star/hds.h"
 #include "star/hds_fortran.h"
@@ -80,60 +79,56 @@ MAKE_PROTOB(B,char)
 
 
 
-
-
-F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
-                            CHARACTER(LOC2), REAL(ZRATIO), INTEGER(STATUS)
-                            TRAIL(LOC1) TRAIL(TYPE) TRAIL(LOC2) ) {
+void ary1S2dlt( HDSLoc *loc1, int zaxis, const char *type, HDSLoc *loc2,
+                float *zratio, int *status ){
 /*
 *+
 *  Name:
-*     ARY1_S2DLT
+*     ary1S2dlt
 
 *  Purpose:
 *     Convert a simple, scaled or primitive array to a delta compressed array.
 
-*  Language:
-*     ANSI C
-
-*  Invocation:
-*     CALL ARY1_S2DLT( LOC1, ZAXIS, TYPE, LOC2, ZRATIO, STATUS )
+*  Synopsis:
+*     void ary1S2dlt( HDSLoc *loc1, int zaxis, const char *type, HDSLoc *loc2,
+*                     float *zratio, int *status )
 
 *  Description:
-*     This routine compresses a simple, scaled or primtive array to produce
+*     This function compresses a simple, scaled or primtive array to produce
 *     a corresponding delta compressed array, stored within a supplied output
 *     structure.
 *
-*     See the inverse function, ary1_dlt2s.c, for a description of the
+*     See the inverse function, ary1Dlt2s.c, for a description of the
 *     structure of a delta compressed array.
 
-*  Arguments:
-*     LOC1 = CHARACTER * ( DAT__SZLOC ) (Given)
+*  Parameters:
+*     loc1
 *        An HDS locator for a structure holding a simple, scaled or
 *        primitive array. The data type of this array must be an integer
 *        type (signed or unsigned), otherwise an error will be reported.
-*     ZAXIS = INTEGER (Given)
+*     zaxis
 *        The one-based index of the pixel axis within the input along
 *        which the compression is to occur. An error is reported if the
 *        specified axis spans only a single pixel.
-*     TYPE = CHARACTER * ( DAT__SZTYP ) (Given)
+*     type
 *        The HDS data type of the compressed array. Must be one of
 *        _INTEGER, _WORD or _BYTE, otherwise an error is reported.
-*     LOC2 = CHARACTER * ( DAT__SZLOC ) (Given)
+*     loc2
 *        An HDS locator for a structure into which the components of
 *        the output delta compressed array will be written. If this is
-*        DAT__NOLOC, then no array is created, but SIZE is still returned.
-*     ZRATIO = REAL (Returned)
-*        The compresison ratio - the ratio of the uncompressed array size to
-*        the compressed array size. If LOC2 is DAT__NOLOC, a value will
-*        still be returned but will be estimated by looking at only 20% of
-*        the input data. This approximation is done to save time.
-*     STATUS = INTEGER (Given and Returned)
+*        NULL, then no array is created.
+*     zratio
+*        Returned holding the compresison ratio - the ratio of the
+*        uncompressed array size to the compressed array size. If "loc2"
+*        is NULL, a value will still be returned but will be estimated by
+*        looking at only 20% of the input data. This approximation is done
+*        to save time.
+*     status
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
-*     All Rights Reserved.
+*     Copyright (C) 2017 East Asian Observatory
+*     All rights reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -152,17 +147,12 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
 *     MA 02110-1301, USA
 
 *  Authors:
-*     DSB: David Berry (JAC, Hawaii)
-*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
-*     19-OCT-2010 (DSB):
-*        Original version.
-*     2010-11-30 (TIMJ):
-*        Avoid dereferencing off the end of an array in the check functions
-*     1-DEC-2010 (DSB):
-*        Take care with casting of size_t values used in floating point calculations.
+*     03-JUL-2017 (DSB):
+*        Original version, based on equivalent ARY routine.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -170,21 +160,7 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
 *-
 */
 
-/* Arguments Given: */
-   GENPTR_CHARACTER(LOC1)
-   GENPTR_INTEGER(ZAXIS)
-   GENPTR_CHARACTER(TYPE)
-   GENPTR_CHARACTER(LOC2)
-
-/* Arguments Returned: */
-   GENPTR_REAL(ZRATIO)
-
-/* Status: */
-   GENPTR_INTEGER(STATUS)
-
 /* Local Variables; */
-   HDSLoc *loc1 = NULL;
-   HDSLoc *loc2 = NULL;
    HDSLoc *loc_data = NULL;
    HDSLoc *loc_firstd = NULL;
    HDSLoc *loc_firstr = NULL;
@@ -196,7 +172,6 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
    char *ptr_data = NULL;
    char *ptr_indata = NULL;
    char *ptr_value = NULL;
-   char type[DAT__SZTYP + 1];
    char type_indata[DAT__SZTYP + 1];
    char variant[ VARIANT_LEN + 1 ];
    check_fun_type check_fun = NULL;
@@ -223,7 +198,6 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
    int row_inc;
    int size_temp;
    int there;
-   int zaxis;
    int zdim;
    size_t bsize;
    size_t div_indata[ ARY__MXDIM ];
@@ -245,79 +219,72 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
    size_t zstride;
 
 /* Initialise */
-   *ZRATIO = 1.0;
+   *zratio = 1.0;
 
 /* Check inherited status. */
-   if ( *STATUS != SAI__OK ) return;
+   if ( *status != SAI__OK ) return;
 
 
 
 /* The next section verifies the input. */
 /* ------------------------------------ */
 
-/* Import the Fortran TYPE string. */
-   cnfImpn( TYPE, TYPE_length, DAT__SZTYP, type );
-
 /* Report an error if the output (compressed) data type is not a signed
    integer type. */
    if( strcmp( type, "_INTEGER" ) && strcmp( type, "_WORD" ) &&
-       strcmp( type, "_BYTE" ) && *STATUS == SAI__OK ) {
-      *STATUS = ARY__TYPIN;
+       strcmp( type, "_BYTE" ) && *status == SAI__OK ) {
+      *status = ARY__TYPIN;
       msgSetc( "T", type );
       errRep( "", "Cannot create a ^T array using delta compression.",
-              STATUS );
+              status );
       goto L999;
    }
 
-/* Import the supplied F77 locators. */
-   datImportFloc( LOC1, LOC1_length, &loc1, STATUS );
-   datImportFloc( LOC2, LOC2_length, &loc2, STATUS );
-
 /* Get a locator for the input DATA array. If the input is a primitive array,
    then just clone the supplied locator. */
-   datPrim( loc1, &isprim, STATUS );
+   datPrim( loc1, &isprim, status );
    if( isprim ) {
-      datClone( loc1, &loc_indata, STATUS );
+      datClone( loc1, &loc_indata, status );
    } else {
-      datFind( loc1, "DATA", &loc_indata, STATUS );
+      datFind( loc1, "DATA", &loc_indata, status );
    }
 
 /* Finds the dimensions of the array. */
-   datShape( loc_indata, ARY__MXDIM, dims_indata, &ndim, STATUS );
+   datShape( loc_indata, ARY__MXDIM, dims_indata, &ndim, status );
 
 /* Get its type. */
-   datType( loc_indata, type_indata, STATUS );
+   datType( loc_indata, type_indata, status );
 
 /* Report an error if the input data type is not an integer type. */
    if( ( !strcmp( type_indata, "_DOUBLE" ) ||
-         !strcmp( type_indata, "_REAL" ) ) && *STATUS == SAI__OK ) {
-      *STATUS = ARY__TYPIN;
+         !strcmp( type_indata, "_REAL" ) ) && *status == SAI__OK ) {
+      *status = ARY__TYPIN;
       msgSetc( "T", type_indata );
       errRep( "", "Cannot apply delta compression to a ^T array.",
-              STATUS );
+              status );
       goto L999;
    }
 
 /* Report an error if the compression axis is out of bounds. */
-   if( ( *ZAXIS < 1 || *ZAXIS > ndim ) && *STATUS == SAI__OK ) {
-      *STATUS = ARY__AXINV;
-      msgSeti( "Z", *ZAXIS );
+   if( ( zaxis < 1 || zaxis > ndim ) && *status == SAI__OK ) {
+      *status = ARY__AXINV;
+      msgSeti( "Z", zaxis );
       msgSeti( "N", ndim );
       errRep( "", "Cannot compress a ^N-D array along axis ^Z.",
-              STATUS );
+              status );
       goto L999;
    }
 
 /* Get the zero-based compression axis index. */
-   zaxis = *ZAXIS - 1;
+   zaxis--;
 
 /* Report an error if the compression axis spans only a single pixel. */
    zdim =  (int) dims_indata[ zaxis ];
-   if( zdim == 1 && *STATUS == SAI__OK ) {
-      *STATUS = ARY__DIMIN;
-      msgSeti( "I", *ZAXIS );
+   if( zdim == 1 && *status == SAI__OK ) {
+      *status = ARY__DIMIN;
+      msgSeti( "I", zaxis + 1 );
       errRep( "", "Cannot compress along axis ^I because it spans only a "
-              "single pixel.", STATUS );
+              "single pixel.", status );
       goto L999;
    }
 
@@ -329,7 +296,7 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
 
 /* Map the input DATA array. */
    datMapV( loc_indata, type_indata, "READ", (void **) &ptr_indata,
-            &nel_indata, STATUS );
+            &nel_indata, status );
 
 
 
@@ -342,46 +309,46 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
 
 /* If the input has an ORIGIN component, copy it to the output. */
       if( !isprim ) {
-         datThere( loc1, "ORIGIN", &there, STATUS );
+         datThere( loc1, "ORIGIN", &there, status );
          if( there ) {
-            datFind( loc1, "ORIGIN", &loc_temp, STATUS );
-            datCopy( loc_temp, loc2, "ORIGIN", STATUS );
-            datAnnul( &loc_temp, STATUS );
+            datFind( loc1, "ORIGIN", &loc_temp, status );
+            datCopy( loc_temp, loc2, "ORIGIN", status );
+            datAnnul( &loc_temp, status );
          }
 
 /* If the input is a SCALED array, copy the SCALE and ZERO components
    to the output. Report an error if either does not exist. */
-         datThere( loc1, "VARIANT", &there, STATUS );
+         datThere( loc1, "VARIANT", &there, status );
          if( there ) {
-            datFind( loc1, "VARIANT", &loc_temp, STATUS );
-            datGet0C( loc_temp, variant, VARIANT_LEN, STATUS );
-            datAnnul( &loc_temp, STATUS );
+            datFind( loc1, "VARIANT", &loc_temp, status );
+            datGet0C( loc_temp, variant, VARIANT_LEN, status );
+            datAnnul( &loc_temp, status );
 
             if( !strcmp( variant, "SCALED" ) ) {
 
-               datThere( loc1, "SCALE", &there, STATUS );
+               datThere( loc1, "SCALE", &there, status );
                if( there ) {
-                  datFind( loc1, "SCALE", &loc_temp, STATUS );
-                  datCopy( loc_temp, loc2, "SCALE", STATUS );
-                  datAnnul( &loc_temp, STATUS );
-               } else if( *STATUS == SAI__OK ) {
-                  *STATUS = ARY__SCLIN;
+                  datFind( loc1, "SCALE", &loc_temp, status );
+                  datCopy( loc_temp, loc2, "SCALE", status );
+                  datAnnul( &loc_temp, status );
+               } else if( *status == SAI__OK ) {
+                  *status = ARY__SCLIN;
                   datMsg( "A", loc1 );
                   errRep( "", "The SCALE component is missing from the "
-                          "scaled array structure '^A'.", STATUS );
+                          "scaled array structure '^A'.", status );
                   goto L999;
                }
 
-               datThere( loc1, "ZERO", &there, STATUS );
+               datThere( loc1, "ZERO", &there, status );
                if( there ) {
-                  datFind( loc1, "ZERO", &loc_temp, STATUS );
-                  datCopy( loc_temp, loc2, "ZERO", STATUS );
-                  datAnnul( &loc_temp, STATUS );
-               } else if( *STATUS == SAI__OK ) {
-                  *STATUS = ARY__SCLIN;
+                  datFind( loc1, "ZERO", &loc_temp, status );
+                  datCopy( loc_temp, loc2, "ZERO", status );
+                  datAnnul( &loc_temp, status );
+               } else if( *status == SAI__OK ) {
+                  *status = ARY__SCLIN;
                   datMsg( "A", loc1 );
                   errRep( "", "The ZERO component is missing from the "
-                          "scaled array structure '^A'.", STATUS );
+                          "scaled array structure '^A'.", status );
                   goto L999;
                }
 
@@ -390,22 +357,22 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
       }
 
 /* Put the VARIANT component into the output delta compressed array */
-      datNew0C( loc2, "VARIANT", 5, STATUS );
-      datFind( loc2, "VARIANT", &loc_temp, STATUS );
-      datPut0C( loc_temp, "DELTA", STATUS );
-      datAnnul( &loc_temp, STATUS );
+      datNew0C( loc2, "VARIANT", 5, status );
+      datFind( loc2, "VARIANT", &loc_temp, status );
+      datPut0C( loc_temp, "DELTA", status );
+      datAnnul( &loc_temp, status );
 
 /* Put the ZAXIS and ZDIM components into the output delta compressed
    array */
-      datNew0I( loc2, "ZAXIS", STATUS );
-      datFind( loc2, "ZAXIS", &loc_temp, STATUS );
-      datPut0I( loc_temp, *ZAXIS, STATUS );
-      datAnnul( &loc_temp, STATUS );
+      datNew0I( loc2, "ZAXIS", status );
+      datFind( loc2, "ZAXIS", &loc_temp, status );
+      datPut0I( loc_temp, zaxis + 1, status );
+      datAnnul( &loc_temp, status );
 
-      datNew0I( loc2, "ZDIM", STATUS );
-      datFind( loc2, "ZDIM", &loc_temp, STATUS );
-      datPut0I( loc_temp, zdim, STATUS );
-      datAnnul( &loc_temp, STATUS );
+      datNew0I( loc2, "ZDIM", status );
+      datFind( loc2, "ZDIM", &loc_temp, status );
+      datPut0I( loc_temp, zdim, status );
+      datAnnul( &loc_temp, status );
    }
 
 
@@ -433,11 +400,11 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
       } else if( !strcmp( type_indata, "_UBYTE" ) ) { \
          ASSIGN_FUNS(UB,outcode) \
 \
-      } else if( *STATUS == SAI__OK ) { \
-         *STATUS = ARY__FATIN; \
+      } else if( *status == SAI__OK ) { \
+         *status = ARY__FATIN; \
          msgSetc( "T", type_indata ); \
          errRep( "", "ARY1_S2DLT: Unsupported input data type '^T' " \
-                 "(programming error).", STATUS ); \
+                 "(programming error).", status ); \
          goto L999; \
       }
 
@@ -450,11 +417,11 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
    } else if( !strcmp( type, "_BYTE" ) ) {
       CHOOSE_FUNS(B)
 
-   } else if( *STATUS == SAI__OK ) {
-      *STATUS = ARY__FATIN;
+   } else if( *status == SAI__OK ) {
+      *status = ARY__FATIN;
       msgSetc( "T", type );
       errRep( "", "ARY1_S2DLT: Unsupported output data type '^T' "
-              "(programming error).", STATUS );
+              "(programming error).", status );
       goto L999;
    }
 
@@ -525,12 +492,12 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
    max_repeat = 0;
 
 /* Abort if an error has occurred. */
-   if( *STATUS != SAI__OK ) goto L999;
+   if( *status != SAI__OK ) goto L999;
 
 /* Check the first row to see how many elements are required to
    describe it within the DATA, VALUE and REPEAT arrays. */
    (*check_fun)( ptr_indata + iv_indata, zdim, zstride, &ndata, &nvalue,
-                 &nrepeat, &max_repeat, STATUS );
+                 &nrepeat, &max_repeat, status );
 
 /* If we are not creating an output array, we can base the returned
    compression estimate on a subset of the data, on the assumption that
@@ -572,7 +539,7 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
    within the DATA, VALUE and REPEAT arrays. */
       if( irow == next_row ) {
          (*check_fun)( ptr_indata + iv_indata, zdim, zstride, &ndata,
-                       &nvalue, &nrepeat, &max_repeat, STATUS );
+                       &nvalue, &nrepeat, &max_repeat, status );
          next_row += row_inc;
          ntest_row++;
       } else {
@@ -597,26 +564,26 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
    them and map them. We find the size of the output, even if we do not
    create it. */
    if( loc2 ) {
-      datNew( loc2, "DATA", type, 1, &idata, STATUS );
-      datFind( loc2, "DATA", &loc_data, STATUS );
+      datNew( loc2, "DATA", type, 1, &idata, status );
+      datFind( loc2, "DATA", &loc_data, status );
       datMapV( loc_data, type, "WRITE", (void **) &ptr_data, &nel_data,
-               STATUS );
+               status );
    }
    bsize = idata*size_outtype;
 
    if( loc2 ) {
-      datNew( loc2, "FIRST_DATA", "_INTEGER", ndim - 1, dims_first, STATUS );
-      datFind( loc2, "FIRST_DATA", &loc_firstd, STATUS );
+      datNew( loc2, "FIRST_DATA", "_INTEGER", ndim - 1, dims_first, status );
+      datFind( loc2, "FIRST_DATA", &loc_firstd, status );
       datMapV( loc_firstd, "_INTEGER", "WRITE", (void **) &ptr_firstd,
-               &nel_firstd, STATUS );
+               &nel_firstd, status );
    }
    bsize += ntest_row*VAL__NBI;
 
    if( loc2 ) {
-      datNew( loc2, "VALUE", type_indata, 1, &ivalue, STATUS );
-      datFind( loc2, "VALUE", &loc_value, STATUS );
+      datNew( loc2, "VALUE", type_indata, 1, &ivalue, status );
+      datFind( loc2, "VALUE", &loc_value, status );
       datMapV( loc_value, type_indata, "WRITE", (void **) &ptr_value,
-               &nel_value, STATUS );
+               &nel_value, status );
    }
    bsize += ivalue*size_intype;
 
@@ -632,10 +599,10 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
    }
 
    if( loc2 ) {
-      datNew( loc2, "FIRST_VALUE", type_temp, ndim - 1, dims_first, STATUS );
-      datFind( loc2, "FIRST_VALUE", &loc_firstv, STATUS );
+      datNew( loc2, "FIRST_VALUE", type_temp, ndim - 1, dims_first, status );
+      datFind( loc2, "FIRST_VALUE", &loc_firstv, status );
       datMapV( loc_firstv, "_INTEGER", "WRITE", (void **) &ptr_firstv,
-               &nel_firstv, STATUS );
+               &nel_firstv, status );
    }
    bsize += ntest_row*size_temp;
 
@@ -653,10 +620,10 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
       }
 
       if( loc2 ) {
-         datNew( loc2, "REPEAT", type_temp, 1, &irepeat, STATUS );
-         datFind( loc2, "REPEAT", &loc_repeat, STATUS );
+         datNew( loc2, "REPEAT", type_temp, 1, &irepeat, status );
+         datFind( loc2, "REPEAT", &loc_repeat, status );
          datMapV( loc_repeat, "_INTEGER", "WRITE", (void **) &ptr_repeat,
-                  &nel_repeat, STATUS );
+                  &nel_repeat, status );
       }
       bsize += irepeat*size_temp;
 
@@ -672,16 +639,16 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
       }
 
       if( loc2 ) {
-         datNew( loc2, "FIRST_REPEAT", type_temp, ndim - 1, dims_first, STATUS );
-         datFind( loc2, "FIRST_REPEAT", &loc_firstr, STATUS );
+         datNew( loc2, "FIRST_REPEAT", type_temp, ndim - 1, dims_first, status );
+         datFind( loc2, "FIRST_REPEAT", &loc_firstr, status );
          datMapV( loc_firstr, "_INTEGER", "WRITE", (void **) &ptr_firstr,
-                  &nel_firstr, STATUS );
+                  &nel_firstr, status );
       }
       bsize += ntest_row*size_temp;
    }
 
-/* Calculate the compressed ratio and return it in argument ZRATIO. */
-   *ZRATIO = ( (float)nel_indata*(float)size_intype )/
+/* Calculate the compressed ratio and return it in argument zratio. */
+   *zratio = ( (float)nel_indata*(float)size_intype )/
              ( 2*VAL__NBI + ((float)bsize*(float)nel_first)/(float)ntest_row );
 
 
@@ -690,7 +657,7 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
 
 /* We can skip this section if we are not actually creating an output
    compressed array. */
-   if( loc2 && *STATUS == SAI__OK ) {
+   if( loc2 && *status == SAI__OK ) {
 
 /* Initialise the vector index (into the input array) at the start of the
    current row of pixels parallel to the compression axis. */
@@ -708,7 +675,7 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
 /* Compress the first row, putting the compressed values into the
    output array. */
       (*delt_fun)( ptr_indata + iv_indata, zdim, zstride, ptr_data, ptr_value,
-                   ptr_repeat, &ndata, &nvalue, &nrepeat, STATUS );
+                   ptr_repeat, &ndata, &nvalue, &nrepeat, status );
 
 /* Loop round all remaining rows of input pixels that are parallel to the
    compression axis. */
@@ -746,14 +713,14 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
    array. */
          (*delt_fun)( ptr_indata + iv_indata, zdim, zstride, ptr_data,
                       ptr_value, ptr_repeat, &ndata, &nvalue, &nrepeat,
-                      STATUS );
+                      status );
       }
 
 /* Store the compressed ratio in the DELTA array. */
-      datNew0R( loc2, "ZRATIO", STATUS );
-      datFind( loc2, "ZRATIO", &loc_temp, STATUS );
-      datPut0R( loc_temp, *ZRATIO, STATUS );
-      datAnnul( &loc_temp, STATUS );
+      datNew0R( loc2, "ZRATIO", status );
+      datFind( loc2, "ZRATIO", &loc_temp, status );
+      datPut0R( loc_temp, *zratio, status );
+      datAnnul( &loc_temp, status );
    }
 
 /* The next section tidies up. */
@@ -762,24 +729,18 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
 L999:
 
 /* Annul all local locators. */
-   datAnnul( &loc_indata, STATUS );
-   if( loc_data ) datAnnul( &loc_data, STATUS );
-   if( loc_value ) datAnnul( &loc_value, STATUS );
-   if( loc_repeat ) datAnnul( &loc_repeat, STATUS );
-   if( loc_firstd ) datAnnul( &loc_firstd, STATUS );
-   if( loc_firstv ) datAnnul( &loc_firstv, STATUS );
-   if( loc_firstr ) datAnnul( &loc_firstr, STATUS );
-
-/* We need to free the HDSLoc structures created at the start by
-   datImportFloc. The only way to do this seems to be to export the locators
-   back to Fortran, even though they have not been changed. */
-   datExportFloc( &loc1, 1, LOC1_length, LOC1, STATUS );
-   if( loc2 ) datExportFloc( &loc2, 1, LOC2_length, LOC2, STATUS );
+   datAnnul( &loc_indata, status );
+   if( loc_data ) datAnnul( &loc_data, status );
+   if( loc_value ) datAnnul( &loc_value, status );
+   if( loc_repeat ) datAnnul( &loc_repeat, status );
+   if( loc_firstd ) datAnnul( &loc_firstd, status );
+   if( loc_firstv ) datAnnul( &loc_firstv, status );
+   if( loc_firstr ) datAnnul( &loc_firstr, status );
 
 /* Report a context error if anything went wrong. */
-   if( *STATUS != SAI__OK ) {
-      errRep( "", "ARY1_S2DLT: Failed to convert a simple array into a delta "
-              "compressed array.", STATUS );
+   if( *status != SAI__OK ) {
+      errRep( "", "ary1S2dlt: Failed to convert a simple array into a delta "
+              "compressed array.", status );
    }
 }
 

@@ -94,9 +94,9 @@ AryObject *ary1Impid( const void *id, int checklock, int readonly,
       if( isacb ) {
          msgSetc( "T", "Array" );
       } else {
-         msgSetc( "T", "Placeholder" );
+         msgSetc( "T", "ARY Placeholder" );
       }
-      errRep( " ", "Array identifier invalid (possible programming error).",
+      errRep( " ", "^T identifier invalid (possible programming error).",
               status );
 
 /* Otherwise, if the object is of the wrong type, report an error. */
