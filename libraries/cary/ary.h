@@ -58,7 +58,7 @@ void aryCopy( Ary *ary1, AryPlace **place, Ary **ary2, int *status );
 void aryDelet( Ary **ary, int *status );
 void aryDelta( Ary *ary1, int zaxis, const char *type, float minrat, AryPlace **place, float *zratio, Ary **ary2, int *status );
 void aryDim( Ary *ary, int ndimx, hdsdim *dim, int *ndim, int *status );
-void aryDupe( int iary1, int place, int iary2, int *status );
+void aryDupe( Ary *iary1, AryPlace **place, Ary **iary2, int *status );
 void aryFind( HDSLoc *loc, const char *name, Ary **ary, int *status );
 void aryForm( Ary *ary, const char *form, int *status );
 void aryFtype( Ary *ary, const char *ftype, int *status );

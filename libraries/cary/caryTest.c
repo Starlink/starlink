@@ -176,8 +176,38 @@ int main(){
 
    datAnnul( &loc2, status );
 
+   aryTemp( &place, status );
+   aryDupe( ary2, &place, &ary3, status );
+   aryBound( ary3, 3, lbnd, ubnd, &ndim, status );
+   if( lbnd[ 0 ] != 1023 ||
+       lbnd[ 1 ] != 7 ||
+       lbnd[ 2 ] != 2008 ||
+       ubnd[ 0 ] != 1023 ||
+       ubnd[ 1 ] != 7 ||
+       ubnd[ 2 ] != 2008 ||
+       ndim != 3 ) {
+      if( *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRepf( " ", "Error 4h2", status );
+      }
+   }
+
+/*
+   aryState( ary3, &defined, status );
+   if( defined && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4h3", status );
+   }
+*/
+
+   aryAnnul( &ary3, status );
+
+
    aryAnnul( &ary2, status );
    ary3 = ary;
+
+
+
 
 
 /* Test creating a new array.
