@@ -16,6 +16,7 @@ int main(){
    HDSLoc *loc2 = NULL;
    double *dpntr;
    double dsum;
+   float zratio;
    hdsdim lbnd[ ARY__MXDIM ];
    hdsdim ubnd[ ARY__MXDIM ];
    int *ipntr;
@@ -29,6 +30,7 @@ int main(){
    int same;
    int there;
    size_t el;
+   size_t el2;
    size_t i;
    size_t ngood;
 
@@ -342,21 +344,54 @@ int main(){
    }
 
    aryAnnul( &ary2, status );
-
-
-
-
-
-
-
-
    aryAnnul( &ary, status );
 
 
 
 
+/* Test delta compression
+   ====================== */
+
+   aryTemp( &place, status );
+   lbnd[ 0 ] = -10;
+   lbnd[ 1 ] = -20;
+   lbnd[ 2 ] = 0;
+   ubnd[ 0 ] = 0;
+   ubnd[ 1 ] = 10;
+   ubnd[ 2 ] = 20;
+
+   aryNew( "_INTEGER", 3, lbnd, ubnd, &place, &ary, status );
+   aryMap( ary, "_INTEGER", "Write", (void **) &ipntr, &el, status );
+   for( i = 0; i < el; i++ ) ipntr[i] = i;
+   aryUnmap( ary, status );
+
+   aryTemp( &place, status );
+   aryDelta( ary, 0, " ", 0.8, &place, &zratio, &ary2, status );
+
+   if( ( zratio < 3.09731 || zratio > 3.09733 ) && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 15", status );
+   }
+
+   aryMap( ary2, "_INTEGER", "Read", (void **) &ipntr, &el2, status );
+
+   if( el != el2 && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 16", status );
+   }
+
+   for( i = 0; i < el; i++ ) {
+      if( ipntr[i] != i && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRepf( " ", "Error 17 (%d != %d)", status, ipntr[i], i );
+      }
+   }
+   aryUnmap( ary2, status );
 
 
+
+   aryAnnul( &ary2, status );
+   aryAnnul( &ary, status );
 
 
    return *status;
