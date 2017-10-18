@@ -60,7 +60,7 @@ void aryDelta( Ary *ary1, int zaxis, const char *type, float minrat, AryPlace **
 void aryDim( Ary *ary, int ndimx, hdsdim *dim, int *ndim, int *status );
 void aryDupe( Ary *iary1, AryPlace **place, Ary **iary2, int *status );
 void aryFind( HDSLoc *loc, const char *name, Ary **ary, int *status );
-void aryForm( Ary *ary, const char *form, int *status );
+void aryForm( Ary *ary, char form[ARY__SZFRM+1], int *status );
 void aryFtype( Ary *ary, const char *ftype, int *status );
 void aryGtdlt( Ary *ary, int *zaxis, char ztype[DAT__SZTYP+1], float *zratio, int *status );
 void aryImprt( const char *loc, Ary *ary, int *status );

@@ -18,6 +18,7 @@ int main(){
    HDSLoc *loc = NULL;
    HDSLoc *loc2 = NULL;
    char type[DAT__SZTYP+1];
+   char form[ARY__SZFRM+1];
    double *dpntr;
    double dsum;
    float zratio;
@@ -239,6 +240,12 @@ int main(){
       errRepf( " ", "Error 4e1", status );
    }
 
+   aryForm( ary, form, status );
+   if( strcmp( form, "SIMPLE") && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4e2", status );
+   }
+
 /* NB - THESE TWO CALLS FAIL IF THEY ARE SWAPPED !!! But the same
    happens with the F77 version of ARY, so presumably it's correct
    behaviour. */
@@ -415,6 +422,12 @@ int main(){
 
    aryTemp( &place, status );
    aryDelta( ary, 0, " ", 0.8, &place, &zratio, &ary2, status );
+
+   aryForm( ary2, form, status );
+   if( strcmp( form, "DELTA") && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 14c", status );
+   }
 
    if( ( zratio < 3.09731 || zratio > 3.09733 ) && *status == SAI__OK ) {
       *status = SAI__ERROR;
