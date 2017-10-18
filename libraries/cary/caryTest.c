@@ -29,6 +29,7 @@ int main(){
    int axis;
    int bad;
    int can_lock;
+   int defined;
    int isect;
    int ival;
    int ndim;
@@ -192,13 +193,17 @@ int main(){
       }
    }
 
-/*
-   aryState( ary3, &defined, status );
-   if( defined && *status == SAI__OK ) {
+   aryState( ary2, &defined, status );
+   if( !defined && *status == SAI__OK ) {
       *status = SAI__ERROR;
       errRepf( " ", "Error 4h3", status );
    }
-*/
+
+   aryState( ary3, &defined, status );
+   if( defined && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4h4", status );
+   }
 
    aryAnnul( &ary3, status );
 

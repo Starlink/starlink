@@ -92,7 +92,7 @@ void arySect( Ary *ary1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, Ary *
 void aryShift( int nshift, int shift, Ary *ary, int *status );
 void arySize( Ary *ary, int npix, int *status );
 void arySsect( int iary1, int iary2, int iary3, int *status );
-void aryState( Ary *ary, int state, int *status );
+void aryState( Ary *ary, int *state, int *status );
 void aryStype( const char *ftype, Ary *ary, int *status );
 void aryTemp( AryPlace **place, int *status );
 int aryTrace( int newflg );
