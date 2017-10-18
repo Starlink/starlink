@@ -21,6 +21,7 @@ int main(){
    double *dpntr;
    double dsum;
    float zratio;
+   hdsdim dims[ ARY__MXDIM ];
    hdsdim lbnd[ ARY__MXDIM ];
    hdsdim ubnd[ ARY__MXDIM ];
    int *ipntr;
@@ -368,6 +369,14 @@ int main(){
    aryMap( ary, "_INTEGER", "Write", (void **) &ipntr, &el, status );
    for( i = 0; i < el; i++ ) ipntr[i] = i;
    aryUnmap( ary, status );
+
+   aryDim( ary, ARY__MXDIM, dims, &ndim, status );
+   if( ndim != 3 || dims[0] != 11 || dims[1] != 31 || dims[2] != 21 ) {
+      if( *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRepf( " ", "Error 14b", status );
+      }
+   }
 
    aryTemp( &place, status );
    aryDelta( ary, 0, " ", 0.8, &place, &zratio, &ary2, status );
