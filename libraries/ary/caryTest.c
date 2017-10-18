@@ -58,10 +58,20 @@ int main(){
 
    aryFind( loc, "data_array", &ary, status );
 
+   datFind( loc, "data_array", &loc2, status );
+   aryImprt( loc2, &ary2, status );
+   arySame( ary, ary2, &same, &isect, status );
+   if( !same && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 1b", status );
+   }
+   aryAnnul( &ary2, status );
+   datAnnul( &loc2, status );
+
    aryFtype( ary, ftype, status );
    if( strcmp( ftype, "_REAL" ) && *status == SAI__OK ) {
       *status = SAI__ERROR;
-      errRepf( " ", "Error 1b (%s )", status, ftype );
+      errRepf( " ", "Error 1c (%s )", status, ftype );
    }
 
    lbnd[ 0 ] = 1000;
@@ -417,7 +427,9 @@ int main(){
 
    aryNew( "_INTEGER", 3, lbnd, ubnd, &place, &ary, status );
    aryMap( ary, "_INTEGER", "Write", (void **) &ipntr, &el, status );
-   for( i = 0; i < el; i++ ) ipntr[i] = i;
+   if( *status == SAI__OK ) {
+      for( i = 0; i < el; i++ ) ipntr[i] = i;
+   }
    aryUnmap( ary, status );
 
    aryDim( ary, ARY__MXDIM, dims, &ndim, status );
