@@ -5,8 +5,11 @@
 #include "star/hds.h"
 #include "prm_par.h"
 #include "sae_par.h"
+#include <string.h>
 
 int main(){
+   int status_value = 0;
+
    Ary *ary2;
    Ary *ary3;
    Ary *ary4;
@@ -14,14 +17,15 @@ int main(){
    AryPlace *place = NULL;
    HDSLoc *loc = NULL;
    HDSLoc *loc2 = NULL;
+   char type[DAT__SZTYP+1];
    double *dpntr;
    double dsum;
    float zratio;
    hdsdim lbnd[ ARY__MXDIM ];
    hdsdim ubnd[ ARY__MXDIM ];
    int *ipntr;
-   int status_value = 0;
    int *status = &status_value;
+   int axis;
    int bad;
    int can_lock;
    int isect;
@@ -29,8 +33,8 @@ int main(){
    int ndim;
    int same;
    int there;
-   size_t el;
    size_t el2;
+   size_t el;
    size_t i;
    size_t ngood;
 
@@ -373,17 +377,33 @@ int main(){
       errRepf( " ", "Error 15", status );
    }
 
-   aryMap( ary2, "_INTEGER", "Read", (void **) &ipntr, &el2, status );
-
-   if( el != el2 && *status == SAI__OK ) {
+   aryGtdlt( ary2, &axis, type, &zratio, status );
+   if( ( zratio < 3.09731 || zratio > 3.09733 ) && *status == SAI__OK ) {
       *status = SAI__ERROR;
       errRepf( " ", "Error 16", status );
    }
+   if( strcmp( type, "_BYTE" ) && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 17 (%s)", status, type );
+   }
+   if( axis != 2 && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 18", status );
+   }
 
-   for( i = 0; i < el; i++ ) {
-      if( ipntr[i] != i && *status == SAI__OK ) {
+   aryMap( ary2, "_INTEGER", "Read", (void **) &ipntr, &el2, status );
+
+   if( *status == SAI__OK ) {
+      if( el != el2 ) {
          *status = SAI__ERROR;
-         errRepf( " ", "Error 17 (%d != %d)", status, ipntr[i], i );
+         errRepf( " ", "Error 19", status );
+      }
+
+      for( i = 0; i < el; i++ ) {
+         if( ipntr[i] != i ) {
+            *status = SAI__ERROR;
+            errRepf( " ", "Error 20 (%d != %d)", status, ipntr[i], i );
+         }
       }
    }
    aryUnmap( ary2, status );
