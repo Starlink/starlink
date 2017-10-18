@@ -145,10 +145,10 @@ void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status ) {
       AryObject **object = start + slot;
 
 /* Loop through the array starting at element "slot" looking for an element
-   that is not currently in use. */
+   that is currently in use. */
       for( i = slot; i < nel; i++,object++ ){
-         if( !(*object)->used ){
-            *next = slot;
+         if( (*object)->used ){
+            *next = i;
             result = *object;
             break;
          }

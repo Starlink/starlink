@@ -129,6 +129,7 @@ void ary1Dcpy( AryDCB *dcb1, int temp, HDSLoc **loc, AryDCB **dcb2, int *status 
 void ary1Cpync( HDSLoc *loc1, const char *name, HDSLoc *loc2, int *status );
 void ary1Cpscl( AryDCB *dcb1, AryDCB *dcb2, int *status );
 void ary1Cpdlt( AryDCB *dcb1, AryDCB *dcb2, int *status );
+void ary1Del( AryACB **acb, int *status );
 
 /* Now include the expanded generic prototypes. */
 #include "ary1_cgen.h"

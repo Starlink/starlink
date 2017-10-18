@@ -123,7 +123,7 @@ void aryBound( Ary *ary, int ndimx, hdsdim *lbnd, hdsdim *ubnd, int *ndim,
             dcb = acb->dcb;
             datMsg( "ARRAY", dcb->loc );
             msgSeti( "NDIMX", ndimx );
-            errRep( " ", "The array structure ^ARRAY has more than ^NDIMX"
+            errRep( " ", "The array structure ^ARRAY has more than ^NDIMX "
                     "significant dimension(s).", status );
             break;
          }
