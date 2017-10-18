@@ -147,6 +147,10 @@ int main(){
    }
 
    aryClone( ary3, &ary4, status );
+   if( !aryValid( ary4, status ) && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4f1", status );
+   }
    datThere( loc2, "DATA_ARRAY", &there, status );
    if( !there && *status == SAI__OK ) {
       *status = SAI__ERROR;
@@ -157,6 +161,10 @@ int main(){
    if( there && *status == SAI__OK ) {
       *status = SAI__ERROR;
       errRepf( " ", "Error 4h", status );
+   }
+   if( aryValid( ary4, status ) && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4h1", status );
    }
 
    datAnnul( &loc2, status );
