@@ -101,7 +101,7 @@ int aryTrace( int newflg );
 void aryType( Ary *ary, const char *type, int *status );
 void aryUnlock( Ary *ary, int *status );
 void aryUnmap( Ary *ary, int *status );
-void aryValid( Ary *ary, int valid, int *status );
+int aryValid( Ary *ary, int *status );
 void aryVerfy( Ary *ary, int *status );
 
 #endif
