@@ -9,6 +9,7 @@
 int main(){
    Ary *ary2;
    Ary *ary3;
+   Ary *ary4;
    Ary *ary;
    AryPlace *place = NULL;
    HDSLoc *loc = NULL;
@@ -26,6 +27,7 @@ int main(){
    int ival;
    int ndim;
    int same;
+   int there;
    size_t el;
    size_t i;
    size_t ngood;
@@ -128,7 +130,7 @@ int main(){
    }
 
    hdsNew( "cary_test2", "TEST", "TEST", 0, 0, &loc2, status );
-   aryPlace( loc2, "data_array", &place, status );
+   aryPlace( loc2, "DATA_ARRAY", &place, status );
    aryCopy( ary2, &place, &ary3, status );
    aryBound( ary3, 3, lbnd, ubnd, &ndim, status );
    if( lbnd[ 0 ] != 1023 ||
@@ -143,7 +145,20 @@ int main(){
          errRepf( " ", "Error 4f", status );
       }
    }
-   aryAnnul( &ary3, status );
+
+   aryClone( ary3, &ary4, status );
+   datThere( loc2, "DATA_ARRAY", &there, status );
+   if( !there && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4g", status );
+   }
+   aryDelet( &ary3, status );
+   datThere( loc2, "DATA_ARRAY", &there, status );
+   if( there && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4h", status );
+   }
+
    datAnnul( &loc2, status );
 
    aryAnnul( &ary2, status );
@@ -270,6 +285,7 @@ int main(){
    aryAnnul( &ary2, status );
 
    if( *status == SAI__OK ) {
+      errMark();
       aryBound( ary, 2, lbnd, ubnd, &ndim, status );
       if( *status != ARY__XSDIM ) {
          int lstat = *status;
@@ -279,6 +295,7 @@ int main(){
       } else {
          errAnnul( status );
       }
+      errRlse();
    }
 
    aryBound( ary, ARY__MXDIM, lbnd, ubnd, &ndim, status );
