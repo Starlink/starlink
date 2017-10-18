@@ -17,6 +17,7 @@ int main(){
    AryPlace *place = NULL;
    HDSLoc *loc = NULL;
    HDSLoc *loc2 = NULL;
+   char ftype[ARY__SZFTP+1];
    char type[DAT__SZTYP+1];
    char form[ARY__SZFRM+1];
    double *dpntr;
@@ -56,6 +57,13 @@ int main(){
    }
 
    aryFind( loc, "data_array", &ary, status );
+
+   aryFtype( ary, ftype, status );
+   if( strcmp( ftype, "_REAL" ) && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 1b (%s )", status, ftype );
+   }
+
    lbnd[ 0 ] = 1000;
    lbnd[ 1 ] = 1;
    lbnd[ 2 ] = 1950;
