@@ -127,6 +127,10 @@ AryObject *ary1Id2ac( const void *id_ptr, int isacb ) {
    value. */
       } else if( result->slot != slot ) {
          result = NULL;
+
+/* Also check that the slot is in used. */
+      } else if( !result->used ) {
+         result = NULL;
       }
    }
 
