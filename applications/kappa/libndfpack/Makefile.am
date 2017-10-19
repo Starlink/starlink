@@ -16,13 +16,16 @@ provrem.f ndfecho.f
 C_ROUTINES = ndfcompare.c
 
 # Create help for this library
-ndfpack.hlp: $(F_ROUTINES)
+ndfpack.hlp: $(F_ROUTINES) $(C_ROUTINES)
+	-rm -f $@  $@.1 $@.2
 	cat $(F_ROUTINES) > all.f
-	-rm -f ndfpack.hlp
+	cat $(C_ROUTINES) > all.c
 	PATH="$(PATH):$(STARLINK)/bin/sst"; \
 	export PATH ; \
-	@PROHLP@ in=all.f out=ndfpack.hlp single=no
-	-rm all.f
+	@PROHLP@ in=all.f out=$@.1 single=no ; \
+	@PROHLP@ in=all.c out=$@.2 single=no
+	-rm all.f all.c
+	cat $@.1 $@.2 > $@
 
 CLEANFILES = ndfpack.hlp
 
