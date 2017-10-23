@@ -35,6 +35,7 @@ int main(){
    int isect;
    int ival;
    int ndim;
+   int ok;
    int same;
    int there;
    size_t el2;
@@ -72,6 +73,12 @@ int main(){
    if( strcmp( ftype, "_REAL" ) && *status == SAI__OK ) {
       *status = SAI__ERROR;
       errRepf( " ", "Error 1c (%s )", status, ftype );
+   }
+
+   aryIsacc( ary, "WRITE", &ok, status );
+   if( ok && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 1c1 (%s )", status, ftype );
    }
 
    lbnd[ 0 ] = 1000;
@@ -262,6 +269,12 @@ int main(){
    if( strcmp( form, "SIMPLE") && *status == SAI__OK ){
       *status = SAI__ERROR;
       errRepf( " ", "Error 4e2", status );
+   }
+
+   aryIsacc( ary, "WRITE", &ok, status );
+   if( !ok && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4e3 (%s )", status, ftype );
    }
 
 /* NB - THESE TWO CALLS FAIL IF THEY ARE SWAPPED !!! But the same
