@@ -22,6 +22,8 @@ int main(){
    char form[ARY__SZFRM+1];
    double *dpntr;
    double dsum;
+   double scale;
+   double zero;
    float zratio;
    hdsdim dims[ ARY__MXDIM ];
    hdsdim lbnd[ ARY__MXDIM ];
@@ -79,6 +81,12 @@ int main(){
    if( ok && *status == SAI__OK ) {
       *status = SAI__ERROR;
       errRepf( " ", "Error 1c1 (%s )", status, ftype );
+   }
+
+   aryGtszD( ary, &scale, &zero, status );
+   if( ( scale != 1.0 || zero != 0.0 ) && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 1c2 (%s )", status, ftype );
    }
 
    lbnd[ 0 ] = 1000;

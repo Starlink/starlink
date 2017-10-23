@@ -52,7 +52,7 @@ aryIsacc.c
 
 CGENERIC_ROUTINES = ary1Badx.cgen ary1Zerx.cgen ary1Ptnx.cgen \
 ary1Pt1x.cgen ary1Cvfx.cgen ary1Gtnx.cgen ary1Gt1x.cgen ary1Cvtx.cgen \
-ary1Bppx.cgen
+ary1Bppx.cgen aryGtszx.cgen
 
 # The .c files which are built from the above .cgen files.
 BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
@@ -60,6 +60,9 @@ BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
 BUILT_SOURCES = $(include_MESSAGES) $(BUILT_C_ROUTINES) ary1_cgen.h
 
 ary1_cgen.h: ary1_cgen.h.source make_h
+	./make_h
+
+ary_cgen.h: ary_cgen.h.source make_h
 	./make_h
 
 # Testing
