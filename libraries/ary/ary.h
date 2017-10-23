@@ -102,4 +102,8 @@ void aryUnmap( Ary *ary, int *status );
 int aryValid( Ary *ary, int *status );
 void aryVerfy( Ary *ary, int *status );
 
+/* Now include the expanded generic prototypes. */
+#include "ary_cgen.h"
+
+
 #endif
