@@ -41,6 +41,7 @@ int main(){
    int ndim;
    int ok;
    int same;
+   int temp;
    int there;
    size_t el2;
    size_t el;
@@ -173,6 +174,12 @@ int main(){
       errRepf( " ", "Error 4b6", status );
    }
 
+   aryIstmp( ary2, &temp, status );
+   if( temp && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4b7", status );
+   }
+
    aryAnnul( &ary3, status );
    aryAnnul( &ary2, status );
 
@@ -265,8 +272,13 @@ int main(){
       errRepf( " ", "Error 4h4", status );
    }
 
-   aryAnnul( &ary3, status );
+   aryIstmp( ary3, &temp, status );
+   if( !temp && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4h5", status );
+   }
 
+   aryAnnul( &ary3, status );
 
    aryAnnul( &ary2, status );
    ary3 = ary;
