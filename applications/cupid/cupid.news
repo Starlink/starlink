@@ -6,6 +6,13 @@
  and  analyse clumps of emission within 2- or 3- dimensional
  data arrays.
 
+Changes introduced at V2.4
+
+   - If FINDCLUMPS fails to find any clumps, it now deletes any
+   pre-existing NDF that has the same path as the specified output NDF.
+   Previously, it simply skipped the creation of the output NDF, leaving
+   any pre-existing NDF In place.
+
 Changes introduced at V2.3
 
    - A bug has been fixed in the determination of the WCS pixel scales,

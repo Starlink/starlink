@@ -916,6 +916,8 @@ void findclumps( int *status ) {
 *     22-NOV-2013 (DSN):
 *        We need to map the variance array even if an RMS is supplied
 *        in the configuration.
+*     23-OCT-2017 (DSN):
+*        Ensure any pre-existing output NDF is deleted if no clumps are found.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1605,6 +1607,11 @@ void findclumps( int *status ) {
 
 /* Release the extension locator.*/
       datAnnul( &xloc, status );
+
+/* If no clumps were found, ensure the output NDF does not exist. */
+   } else {
+      ndfProp( indf, " ", "OUT", &indf2, status );
+      ndfDelet( &indf2, status );
    }
 
 /* Ensure the following has a fair chance of working even if an error has
