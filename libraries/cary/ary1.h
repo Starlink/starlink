@@ -107,7 +107,7 @@ void ary1Maps( AryACB *acb, const char *type, int cmplx, const char *mode, const
 void ary1Vtyp( const char *type, char vtype[ARY__SZTYP+1], int *status );
 void ary1Chmod( AryACB *acb, const char *mode, int *status );
 void ary1Chacc( AryACB *acb, const char *access, int *status );
-void ary1Accok( AryACB *acb, const char *access, char *ok, int *status );
+void ary1Accok( AryACB *acb, const char *access, int *ok, int *status );
 void ary1Chcma( AryACB *acb, const char *mode, int *status );
 void ary1Dobj( AryDCB *dcb, int *status );
 void ary1Mpsr( AryACB *acb, HDSLoc *loc, const char *type, const char *mode, int bad, HDSLoc **mloc, int *copy, void **pntr, int *dce, int *status );

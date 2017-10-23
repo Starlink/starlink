@@ -4,7 +4,7 @@
 #include "ary_err.h"
 #include <string.h>
 
-void ary1Accok( AryACB *acb, const char *access, char *ok, int *status ) {
+void ary1Accok( AryACB *acb, const char *access, int *ok, int *status ) {
 /*
 *+
 *  Name:
@@ -14,7 +14,7 @@ void ary1Accok( AryACB *acb, const char *access, char *ok, int *status ) {
 *     Determine whether a specified type of ACB access is available.
 
 *  Synopsis:
-*     void ary1Accok( AryACB *acb, const char *access, char *ok, int *status )
+*     void ary1Accok( AryACB *acb, const char *access, int *ok, int *status )
 
 *  Description:
 *     This function returns a logical value indicating whether the
