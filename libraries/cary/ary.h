@@ -65,7 +65,7 @@ void aryFtype( Ary *ary,  char ftype[ARY__SZFTP+1], int *status );
 void aryGtdlt( Ary *ary, int *zaxis, char ztype[DAT__SZTYP+1], float *zratio, int *status );
 void aryImprt( HDSLoc *loc, Ary **ary, int *status );
 void aryIsacc( Ary *ary, const char *access, int *isacc, int *status );
-void aryIsbas( Ary *ary, int base, int *status );
+void aryIsbas( Ary *ary, int *base, int *status );
 void aryIsmap( Ary *ary, int mapped, int *status );
 void aryIstmp( Ary *ary, int temp, int *status );
 void aryLoc( Ary *ary, HDSLoc *loc, int *status );

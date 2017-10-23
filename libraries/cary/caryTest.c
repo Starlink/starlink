@@ -17,9 +17,9 @@ int main(){
    AryPlace *place = NULL;
    HDSLoc *loc = NULL;
    HDSLoc *loc2 = NULL;
+   char form[ARY__SZFRM+1];
    char ftype[ARY__SZFTP+1];
    char type[DAT__SZTYP+1];
-   char form[ARY__SZFRM+1];
    double *dpntr;
    double dsum;
    double scale;
@@ -32,6 +32,7 @@ int main(){
    int *status = &status_value;
    int axis;
    int bad;
+   int base;
    int can_lock;
    int defined;
    int isect;
@@ -145,6 +146,18 @@ int main(){
    if( !same && *status == SAI__OK ){
       *status = SAI__ERROR;
       errRepf( " ", "Error 4b3", status );
+   }
+
+   aryIsbas( ary, &base, status );
+   if( !base && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4b4", status );
+   }
+
+   aryIsbas( ary2, &base, status );
+   if( base && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4b5", status );
    }
 
    aryAnnul( &ary3, status );
