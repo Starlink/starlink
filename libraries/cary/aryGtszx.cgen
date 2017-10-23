@@ -3,6 +3,7 @@
 #include "star/hds.h"
 #include "mers.h"
 #include "ary_err.h"
+#include <string.h>
 
 void CGEN_FUNCTION(aryGtsz)( Ary *ary, CGEN_TYPE *scale, CGEN_TYPE *zero,
                              int *status ) {
@@ -97,7 +98,7 @@ void CGEN_FUNCTION(aryGtsz)( Ary *ary, CGEN_TYPE *scale, CGEN_TYPE *zero,
          datGet( locc, CGEN_HDS_TYPE, 0, 0, scale, status );
          datAnnul( &locc, status );
 
-         datFind( dcb->scloc, "ZERO", locc, status );
+         datFind( dcb->scloc, "ZERO", &locc, status );
          datGet( locc, CGEN_HDS_TYPE, 0, 0, zero, status );
          datAnnul( &locc, status );
 
