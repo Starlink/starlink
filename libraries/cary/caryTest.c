@@ -37,6 +37,7 @@ int main(){
    int defined;
    int isect;
    int ival;
+   int mapped;
    int ndim;
    int ok;
    int same;
@@ -88,6 +89,12 @@ int main(){
    if( ( scale != 1.0 || zero != 0.0 ) && *status == SAI__OK ) {
       *status = SAI__ERROR;
       errRepf( " ", "Error 1c2 (%s )", status, ftype );
+   }
+
+   aryIsmap( ary, &mapped, status );
+   if( mapped && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 1c3", status );
    }
 
    lbnd[ 0 ] = 1000;
@@ -158,6 +165,12 @@ int main(){
    if( base && *status == SAI__OK ){
       *status = SAI__ERROR;
       errRepf( " ", "Error 4b5", status );
+   }
+
+   aryIsmap( ary2, &mapped, status );
+   if( !mapped && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4b6", status );
    }
 
    aryAnnul( &ary3, status );
