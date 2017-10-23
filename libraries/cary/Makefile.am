@@ -47,7 +47,8 @@ aryUnmap.c aryBad.c ary1Bad.c ary1Chbpp.c ary1Bpp.c aryBase.c arySame.c \
 aryBound.c aryClone.c ary1Cln.c aryCmplx.c aryCopy.c ary1Cpy.c ary1Dcrep.c \
 ary1Dfppl.c ary1Pbnd.c ary1Dcpy.f ary1Cpync.c ary1Cpscl.c ary1Cpdlt.c \
 aryDelet.c ary1Del.c aryValid.c aryDelta.c ary1Gtdlt.c ary1S2dlt.c \
-aryGtdlt.c aryDim.c aryDupe.c aryState.c aryForm.c aryFtype.c aryImprt.c
+aryGtdlt.c aryDim.c aryDupe.c aryState.c aryForm.c aryFtype.c aryImprt.c \
+aryIsacc.c
 
 CGENERIC_ROUTINES = ary1Badx.cgen ary1Zerx.cgen ary1Ptnx.cgen \
 ary1Pt1x.cgen ary1Cvfx.cgen ary1Gtnx.cgen ary1Gt1x.cgen ary1Cvtx.cgen \

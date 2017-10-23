@@ -66,7 +66,7 @@ void ary1Chacc( AryACB *acb, const char *access, int *status ) {
 /* Local variables: */
    char uacc[ARY__SZACC+1];   /* Upper case version of ACCESS */
    AryDCB *dcb;               /* The data object (DCB) */
-   char ok;                   /* Whether requested access is permitted */
+   int ok;                    /* Whether requested access is permitted */
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
