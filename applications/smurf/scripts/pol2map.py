@@ -446,6 +446,10 @@
 *        supplied config, allow for the possibility that the config may contain
 *        no modelorder value at all. This bug prevented the abortsoon
 *        parameter being used with makemap in the majority of cases.
+*     23-OCT-2017 (DSB):
+*        Ensure findlcumps output files does not already exist before running 
+*        findclumps. Failing to do this can lead to an infinite loop in which 
+*        findclumps is called repeatedly.
 '''
 
 import glob
@@ -1203,10 +1207,11 @@ try:
                if noise == minheight:
                   minheight *= 1.2
                noise = minheight
+               if astmask:
+                  astmask.remove( 0 )
 
 #  The source regions within the PCA mask need to be smaller than in the
-#  AST mask. Make sure it uses no more than 10% of the original good
-#  pixels.
+#  AST mask. Make sure it uses no more than 50% of the AST mask.
          maxgood = ngood / 2
 
          noise = 3
@@ -1236,7 +1241,8 @@ try:
                if noise == minheight:
                   minheight *= 1.2
                noise = minheight
-
+               if pcamask:
+                  pcamask.remove( 0 )
 
 #  We need to decide on the value to use for the PCA.PCATHRESH config
 #  parameter when running makemap below. If a value is given in the
