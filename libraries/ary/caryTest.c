@@ -397,11 +397,20 @@ int main(){
       errRepf( " ", "Error 4e2", status );
    }
 
-   aryIsacc( ary, "WRITE", &ok, status );
+   aryClone( ary, &ary2, status );
+   aryIsacc( ary2, "WRITE", &ok, status );
    if( !ok && *status == SAI__OK ) {
       *status = SAI__ERROR;
       errRepf( " ", "Error 4e3 (%s )", status, ftype );
    }
+
+   aryNoacc( "Write", ary2, status );
+   aryIsacc( ary2, "WRITE", &ok, status );
+   if( ok && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4e4 (%s )", status, ftype );
+   }
+   aryAnnul( &ary2, status );
 
 /* NB - THESE TWO CALLS FAIL IF THEY ARE SWAPPED !!! But the same
    happens with the F77 version of ARY, so presumably it's correct
