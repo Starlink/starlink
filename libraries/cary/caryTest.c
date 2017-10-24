@@ -23,6 +23,7 @@ int main(){
    char name2[DAT__SZNAM+1];
    char name3[DAT__SZNAM+1];
    char type[DAT__SZTYP+1];
+   char text[200];
    double *dpntr;
    double *drpntr;
    double *dipntr;
@@ -45,6 +46,7 @@ int main(){
    int mapped;
    int ndim;
    int ok;
+   int oplen;
    int same;
    int temp;
    int there;
@@ -70,6 +72,14 @@ int main(){
    }
 
    aryFind( loc, "data_array", &ary, status );
+   aryMsg( "A", ary );
+
+   msgLoad( " ", "^A", text, sizeof(text), &oplen, status );
+   if( *status == SAI__OK && strcmp( text, "/stardev/git/starlink/"
+              "libraries/cary/./test_array.DATA_ARRAY" ) ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 1a", status );
+   }
 
    datFind( loc, "data_array", &loc2, status );
    aryImprt( loc2, &ary2, status );
@@ -606,7 +616,7 @@ int main(){
       for( i = 0; i < el; i++ ) {
          if( ipntr[i] != i ) {
             *status = SAI__ERROR;
-            errRepf( " ", "Error 20 (%d != %d)", status, ipntr[i], i );
+            errRepf( " ", "Error 20 (%d != %zu)", status, ipntr[i], i );
          }
       }
    }
