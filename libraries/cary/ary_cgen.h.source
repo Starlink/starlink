@@ -3,3 +3,4 @@
    ary.h. */
 
 void CGEN_FUNCTION(aryGtsz)( Ary *ary, CGEN_TYPE *scale, CGEN_TYPE *zero, int *status );
+void CGEN_FUNCTION(aryPtsz)( Ary *ary, CGEN_TYPE scale, CGEN_TYPE zero, int *status );
