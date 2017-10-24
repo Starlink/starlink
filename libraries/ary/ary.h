@@ -78,8 +78,8 @@ void aryMsg( const char *token, Ary *ary );
 void aryNdim( Ary *ary, int *ndim, int *status );
 void aryNew( const char *ftype, int ndim, const hdsdim *lbnd, const hdsdim *ubnd,
              AryPlace **place, Ary **ary, int *status );
-void aryNewp( const char *ftype, int ndim, int ubnd, int place, Ary *ary,
-              int *status );
+void aryNewp( const char *ftype, int ndim, const hdsdim *ubnd,
+              AryPlace **place, Ary **ary, int *status );
 void aryNoacc( const char *access, Ary *ary, int *status );
 void aryOffs( int iary1, int iary2, int mxoffs, int offs, int *status );
 void aryPlace( HDSLoc *loc, const char *name, AryPlace **place, int *status );

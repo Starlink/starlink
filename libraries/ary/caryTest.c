@@ -436,7 +436,40 @@ int main(){
 
    aryAnnul( &ary2, status );
    aryAnnul( &ary, status );
+
+
+
+   aryPlace( loc2, "image", &place, status );
+   ubnd[ 0 ] = 2;
+   ubnd[ 1 ] = 10;
+   aryNewp( "_BYTE", 2, ubnd, &place, &ary, status );
+   aryBound( ary, ARY__MXDIM, lbnd, ubnd, &ndim, status );
+   if( ( lbnd[ 0 ] != 1 ) ||
+       ( lbnd[ 1 ] != 1 ) ||
+       ( ubnd[ 0 ] != 2 ) ||
+       ( ubnd[ 1 ] != 10 ) ) {
+      if( *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRep( " ", "Error 5b", status );
+      }
+   }
+   aryForm( ary, form, status );
+   if( strcmp( form, "PRIMITIVE") && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 5c", status );
+   }
+   aryMap( ary, "_DOUBLE", "Write", (void **) &dpntr, &el, status );
+   if( el != 20 && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 5d (%ld != 20)", status, el );
+   } else if( *status == SAI__OK ) {
+      for( i = 0; i < el; i++,dpntr++ ) *dpntr = 1.0;
+   }
+
+   aryAnnul( &ary, status );
    datAnnul( &loc2, status );
+
+
 
 
 
