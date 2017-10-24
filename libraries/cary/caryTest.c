@@ -725,6 +725,26 @@ int main(){
       errRepf( " ", "Error 23", status );
    }
 
+   lbnd[ 0 ] = -10;
+   lbnd[ 1 ] = -10;
+   lbnd[ 2 ] = 0;
+   ubnd[ 0 ] = 10;
+   ubnd[ 1 ] = 10;
+   ubnd[ 2 ] = 20;
+   arySbnd( 3, lbnd, ubnd, ary, status );
+   aryBound( ary, 3, lbnd, ubnd, &ndim, status );
+   if( ( lbnd[ 0 ] != -10 ) ||
+       ( lbnd[ 1 ] != -10 ) ||
+       ( lbnd[ 2 ] != 0 ) ||
+       ( ubnd[ 0 ] != 10 ) ||
+       ( ubnd[ 1 ] != 10 ) ||
+       ( ubnd[ 2 ] != 20 ) ) {
+      if( *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRep( " ", "Error 23a", status );
+      }
+   }
+
    aryState( ary, &defined, status );
    if( !defined && *status == SAI__OK ) {
       *status = SAI__ERROR;
