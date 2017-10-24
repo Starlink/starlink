@@ -86,7 +86,7 @@ void aryPlace( HDSLoc *loc, const char *name, AryPlace **place, int *status );
 void aryReset( Ary *ary, int *status );
 void arySame( Ary *ary1, Ary *ary2, int *same, int *isect, int *status );
 void arySbad( int bad, Ary *ary, int *status );
-void arySbnd( int ndim, int lbnd, int ubnd, Ary *ary, int *status );
+void arySbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, Ary *ary, int *status );
 void arySctyp( Ary *ary, const char *type, int *status );
 void arySect( Ary *ary1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, Ary **ary2, int *status );
 void aryShift( int nshift, int shift, Ary *ary, int *status );

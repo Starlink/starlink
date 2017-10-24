@@ -133,6 +133,9 @@ void ary1Del( AryACB **acb, int *status );
 void ary1Gtdlt( AryDCB *dcb, int *zaxis, char ztype[DAT__SZTYP+1], float *zratio, int *status );
 void ary1S2dlt( HDSLoc *loc1, int zaxis, const char *type, HDSLoc *loc2, float *zratio, int *status );
 void ary1Drst( AryDCB *dcb, int *status );
+void ary1Sbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, AryACB *acb, int *status );
+void ary1Dsbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, AryDCB *dcb, int *same, int *drx, hdsdim *lx, hdsdim *ux, int *status );
+void ary1Rebnd( int defer, HDSLoc *paren, const char *name, const char *type, int state, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, int nndim, const hdsdim *nlbnd, const hdsdim *nubnd, HDSLoc **loc, int *same, int *drx, hdsdim *lx, hdsdim *ux, int *status );
 
 /* Now include the expanded generic prototypes. */
 #include "ary1_cgen.h"
