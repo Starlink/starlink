@@ -10,7 +10,7 @@ void CGEN_FUNCTION(aryGtsz)( Ary *ary, CGEN_TYPE *scale, CGEN_TYPE *zero,
 /*
 *+
 *  Name:
-*     aryGtsz
+*     aryGtsz<T>
 
 *  Purpose:
 *     Get the scale and zero values for an array.

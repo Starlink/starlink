@@ -80,7 +80,8 @@ char *ary1Get0C( const HDSLoc *loc, int *status ){
    datClen( loc, &clen, status );
 
 /* Allocate memory, including room for a terminating null. */
-   result = astMalloc( (clen + 1)*sizeof(*result) );
+   clen++;
+   result = astMalloc( clen*sizeof(*result) );
 
 /* Read the string into the memory. */
    datGet0C( loc, result, clen, status );
