@@ -428,6 +428,12 @@ int main(){
       for( i = 0; i < el; i++,dpntr++ ) *dpntr = 1.0;
    }
 
+   aryNdim( ary2, &ndim, status );
+   if( ndim != 4 && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 5a (%d != 4)", status, ndim );
+   }
+
    aryAnnul( &ary2, status );
    aryAnnul( &ary, status );
    datAnnul( &loc2, status );
