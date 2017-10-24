@@ -53,7 +53,7 @@ aryNdim.c aryNewp.c aryNoacc.c aryOffs.c
 
 CGENERIC_ROUTINES = ary1Badx.cgen ary1Zerx.cgen ary1Ptnx.cgen \
 ary1Pt1x.cgen ary1Cvfx.cgen ary1Gtnx.cgen ary1Gt1x.cgen ary1Cvtx.cgen \
-ary1Bppx.cgen aryGtszx.cgen
+ary1Bppx.cgen aryGtszx.cgen aryPtszx.cgen
 
 # The .c files which are built from the above .cgen files.
 BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
