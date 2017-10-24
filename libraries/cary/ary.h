@@ -68,7 +68,7 @@ void aryIsacc( Ary *ary, const char *access, int *isacc, int *status );
 void aryIsbas( Ary *ary, int *base, int *status );
 void aryIsmap( Ary *ary, int *mapped, int *status );
 void aryIstmp( Ary *ary, int *temp, int *status );
-void aryLoc( Ary *ary, HDSLoc *loc, int *status );
+void aryLoc( Ary *ary, HDSLoc **loc, int *status );
 int aryLocked( const Ary *ary, int *status );
 void aryMap( Ary *ary, const char *type, const char *mmod, void **pntr,
              size_t *el, int *status );
