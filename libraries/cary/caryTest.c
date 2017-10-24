@@ -33,6 +33,7 @@ int main(){
    float zratio;
    hdsdim dims[ ARY__MXDIM ];
    hdsdim lbnd[ ARY__MXDIM ];
+   hdsdim offs[ ARY__MXDIM ];
    hdsdim ubnd[ ARY__MXDIM ];
    int *ipntr;
    int *status = &status_value;
@@ -133,6 +134,15 @@ int main(){
    ubnd[ 1 ] = 16;
    ubnd[ 2 ] = 2040;
    arySect( ary, 3, lbnd, ubnd, &ary2, status );
+
+   aryOffs( ary, ary2, 6, offs, status );
+   for( i = 0; i < 6; i++ ) {
+      if( offs[ i ] != 0 && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRepf( " ", "Error 1c4", status );
+      }
+   }
+
    aryMap( ary2, "_DOUBLE", "Read", (void **) &dpntr, &el, status );
    if( el != 30576 && *status == SAI__OK ){
       *status = SAI__ERROR;
