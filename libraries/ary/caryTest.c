@@ -712,17 +712,29 @@ int main(){
       }
    }
 
+   aryBad( ary, 1, &bad, status );
+   if( bad && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 22", status );
+   }
+
+   arySbad( 1, ary, status );
+   aryBad( ary, 0, &bad, status );
+   if( !bad && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 23", status );
+   }
 
    aryState( ary, &defined, status );
    if( !defined && *status == SAI__OK ) {
       *status = SAI__ERROR;
-      errRepf( " ", "Error 22", status );
+      errRepf( " ", "Error 24", status );
    }
    aryReset( ary, status );
    aryState( ary, &defined, status );
    if( defined && *status == SAI__OK ) {
       *status = SAI__ERROR;
-      errRepf( " ", "Error 23", status );
+      errRepf( " ", "Error 25", status );
    }
 
    aryAnnul( &ary2, status );
