@@ -115,10 +115,20 @@ int main(){
       errRepf( " ", "Error 1c1 (%s )", status, ftype );
    }
 
+   if( *status == SAI__OK ) {
+      aryPtszD( ary, 2.0, -1.0, status );
+      if( *status != ARY__ACDEN ) {
+         if( *status == SAI__OK ) *status = SAI__ERROR;
+         errRepf( " ", "Error 1c1a (%s )", status, ftype );
+      } else {
+         errAnnul( status );
+      }
+   }
+
    aryGtszD( ary, &scale, &zero, status );
    if( ( scale != 1.0 || zero != 0.0 ) && *status == SAI__OK ) {
       *status = SAI__ERROR;
-      errRepf( " ", "Error 1c2 (%s )", status, ftype );
+      errRepf( " ", "Error 1c2", status );
    }
 
    aryIsmap( ary, &mapped, status );
@@ -604,6 +614,18 @@ int main(){
    }
 
    aryAnnul( &ary2, status );
+
+   aryPtszD( ary, 2.0, -1.0, status );
+   aryGtszD( ary, &scale, &zero, status );
+   if( ( scale != 2.0 || zero != -1.0 ) && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4h6", status );
+   }
+   aryForm( ary, form, status );
+   if( strcmp( form, "SCALED") && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4h7", status );
+   }
    aryAnnul( &ary, status );
 
 

@@ -4,6 +4,7 @@
 #include "mers.h"
 #include "ary_err.h"
 #include "prm_par.h"
+#include <string.h>
 
 void ary1Vscl( HDSLoc *loc, int *status ) {
 /*
@@ -153,7 +154,7 @@ void ary1Vscl( HDSLoc *loc, int *status ) {
       }
 
 /* Report an error if they have different data types. */
-      if( styp != ztyp ){
+      if( strcmp( styp, ztyp ) ){
          if( *status == SAI__OK ){
             *status = ARY__SCLIN;
             errRep( " ", "The ZERO and SCALE components have different data"
