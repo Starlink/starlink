@@ -72,8 +72,8 @@ void aryLoc( Ary *ary, HDSLoc **loc, int *status );
 int aryLocked( const Ary *ary, int *status );
 void aryMap( Ary *ary, const char *type, const char *mmod, void **pntr,
              size_t *el, int *status );
-void aryMapz( Ary *ary, const char *type, const char *mmod, int rpntr,
-              int ipntr, int el, int *status );
+void aryMapz( Ary *ary, const char *type, const char *mmod, void **rpntr,
+              void **ipntr, size_t *el, int *status );
 void aryMsg( const char *token, Ary *ary );
 void aryNdim( Ary *ary, int ndim, int *status );
 void aryNew( const char *ftype, int ndim, const hdsdim *lbnd, const hdsdim *ubnd,
