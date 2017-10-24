@@ -17,8 +17,11 @@ int main(){
    AryPlace *place = NULL;
    HDSLoc *loc = NULL;
    HDSLoc *loc2 = NULL;
+   HDSLoc *loc3 = NULL;
    char form[ARY__SZFRM+1];
    char ftype[ARY__SZFTP+1];
+   char name2[DAT__SZNAM+1];
+   char name3[DAT__SZNAM+1];
    char type[DAT__SZTYP+1];
    double *dpntr;
    double dsum;
@@ -71,8 +74,19 @@ int main(){
       *status = SAI__ERROR;
       errRepf( " ", "Error 1b", status );
    }
+
+   aryLoc( ary, &loc3, status );
+   datName( loc2, name2, status );
+   datName( loc3, name3, status );
+   datAnnul( &loc3, status );
+   if( *status == SAI__OK && strcmp( name2, name3 ) ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 1b1", status );
+   }
+
    aryAnnul( &ary2, status );
    datAnnul( &loc2, status );
+
 
    aryFtype( ary, ftype, status );
    if( strcmp( ftype, "_REAL" ) && *status == SAI__OK ) {
