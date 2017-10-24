@@ -24,6 +24,8 @@ int main(){
    char name3[DAT__SZNAM+1];
    char type[DAT__SZTYP+1];
    double *dpntr;
+   double *drpntr;
+   double *dipntr;
    double dsum;
    double scale;
    double zero;
@@ -50,6 +52,8 @@ int main(){
    size_t el;
    size_t i;
    size_t ngood;
+
+   errMark();
 
 /* Test accessing an existing array.
    ================================ */
@@ -140,6 +144,58 @@ int main(){
          errRepf( " ", "Error 4 (%g != 20666.916872823)", status, dsum );
       }
    }
+
+   if( *status == SAI__OK ) {
+      aryMapz( ary2, "_DOUBLE", "Read", (void **) &drpntr, (void **) &dipntr,
+               &el, status );
+      if( *status != ARY__ISMAP ) {
+         if( *status == SAI__OK ) *status = SAI__ERROR;
+         errRepf( " ", "Error 4a0", status );
+      } else {
+         errAnnul( status );
+      }
+   }
+
+   aryClone( ary2, &ary3, status );
+   aryMapz( ary3, "_DOUBLE", "Read", (void **) &drpntr, (void **) &dipntr,
+            &el, status );
+   if( el != 30576 && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4a1 (%ld != 30576)", status, el );
+   } else if( *status == SAI__OK ) {
+      dsum = 0.0;
+      ngood = 0;
+      for( i = 0; i < el; i++,drpntr++ ) {
+         if( *drpntr != VAL__BADD ) {
+            dsum += *drpntr;
+            ngood++;
+         }
+      }
+      if( ngood != 13650 ){
+         *status = SAI__ERROR;
+         errRepf( " ", "Error 4a2 (%ld != 13650)", status, ngood );
+      } else if( dsum != 20666.916872823029 ){
+         *status = SAI__ERROR;
+         errRepf( " ", "Error 4a3 (%g != 20666.916872823)", status, dsum );
+      }
+
+      dsum = 0.0;
+      ngood = 0;
+      for( i = 0; i < el; i++,dipntr++ ) {
+         if( *dipntr != VAL__BADD ) {
+            dsum += *dipntr;
+            ngood++;
+         }
+      }
+      if( ngood != 30576 ){
+         *status = SAI__ERROR;
+         errRepf( " ", "Error 4a4 (%ld != 30576)", status, ngood );
+      } else if( dsum != 0.0 ){
+         *status = SAI__ERROR;
+         errRepf( " ", "Error 4a5 (%g != 0.0)", status, dsum );
+      }
+   }
+   aryAnnul( &ary3, status );
 
    aryBad( ary2, 1, &bad, status );
    if( !bad && *status == SAI__OK ){
@@ -433,7 +489,6 @@ int main(){
    aryAnnul( &ary2, status );
 
    if( *status == SAI__OK ) {
-      errMark();
       aryBound( ary, 2, lbnd, ubnd, &ndim, status );
       if( *status != ARY__XSDIM ) {
          int lstat = *status;
@@ -443,7 +498,6 @@ int main(){
       } else {
          errAnnul( status );
       }
-      errRlse();
    }
 
    aryBound( ary, ARY__MXDIM, lbnd, ubnd, &ndim, status );
@@ -563,6 +617,7 @@ int main(){
    aryAnnul( &ary2, status );
    aryAnnul( &ary, status );
 
+   errRlse();
 
    return *status;
 }
