@@ -120,7 +120,7 @@ void ary1Maps( AryACB *acb, const char *type, int cmplx, const char *mmod,
       dcb = acb->dcb;
       datMsg( "ARRAY", dcb->loc );
       errRep( " ", "The array ^ARRAY is already mapped for access through the"
-              "specified identifier (possible programming error).", status );
+              " specified identifier (possible programming error).", status );
 
 /* Check the array access mode to ensure the requested access is permitted. */
    } else {
@@ -181,7 +181,7 @@ void ary1Maps( AryACB *acb, const char *type, int cmplx, const char *mmod,
                      } else {
                         mcb->icopy = 1;
                         ary1Cmtmp( vtype, acb->ndim, dim, &mcb->iloc,
-                                   mcb->ipntr, status );
+                                   &mcb->ipntr, status );
                         ary1Vzero( vtype, el, mcb->ipntr, status );
                      }
                   }
