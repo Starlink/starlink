@@ -702,7 +702,28 @@ int main(){
    }
    aryUnmap( ary2, status );
 
+   if( *status == SAI__OK ) {
+      aryReset( ary2, status );
+      if( *status != ARY__CMPAC ){
+         if( *status == SAI__OK ) *status = SAI__ERROR;
+         errRepf( " ", "Error 21", status );
+      } else{
+         errAnnul( status );
+      }
+   }
 
+
+   aryState( ary, &defined, status );
+   if( !defined && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 22", status );
+   }
+   aryReset( ary, status );
+   aryState( ary, &defined, status );
+   if( defined && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 23", status );
+   }
 
    aryAnnul( &ary2, status );
    aryAnnul( &ary, status );
