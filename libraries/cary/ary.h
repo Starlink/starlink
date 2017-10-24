@@ -75,7 +75,7 @@ void aryMap( Ary *ary, const char *type, const char *mmod, void **pntr,
 void aryMapz( Ary *ary, const char *type, const char *mmod, void **rpntr,
               void **ipntr, size_t *el, int *status );
 void aryMsg( const char *token, Ary *ary );
-void aryNdim( Ary *ary, int ndim, int *status );
+void aryNdim( Ary *ary, int *ndim, int *status );
 void aryNew( const char *ftype, int ndim, const hdsdim *lbnd, const hdsdim *ubnd,
              AryPlace **place, Ary **ary, int *status );
 void aryNewp( const char *ftype, int ndim, int ubnd, int place, Ary *ary,
