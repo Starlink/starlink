@@ -87,7 +87,7 @@ void aryReset( Ary *ary, int *status );
 void arySame( Ary *ary1, Ary *ary2, int *same, int *isect, int *status );
 void arySbad( int bad, Ary *ary, int *status );
 void arySbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, Ary *ary, int *status );
-void arySctyp( Ary *ary, const char *type, int *status );
+void arySctyp( Ary *ary, char type[ARY__SZTYP+1], int *status );
 void arySect( Ary *ary1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, Ary **ary2, int *status );
 void aryShift( int nshift, int shift, Ary *ary, int *status );
 void arySize( Ary *ary, int npix, int *status );

@@ -23,6 +23,7 @@ int main(){
    char name2[DAT__SZNAM+1];
    char name3[DAT__SZNAM+1];
    char type[DAT__SZTYP+1];
+   char sctype[ARY__SZTYP+1];
    char text[200];
    double *dpntr;
    double *drpntr;
@@ -625,6 +626,11 @@ int main(){
    if( strcmp( form, "SCALED") && *status == SAI__OK ){
       *status = SAI__ERROR;
       errRepf( " ", "Error 4h7", status );
+   }
+   arySctyp( ary, sctype, status );
+   if( strcmp( sctype, "_UWORD") && *status == SAI__OK ){
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 4h8", status );
    }
    aryAnnul( &ary, status );
 
