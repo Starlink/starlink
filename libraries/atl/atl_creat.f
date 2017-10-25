@@ -31,7 +31,9 @@
 *        "NATIVE:"   - FITS, using NATIVE encoding
 *
 *        The default (i.e. used if the string does not contain a
-*        colon) is "AST".
+*        colon) is "AST". Attribute values for the Channel (of whatever
+*        class) can be specified using the environment variable
+*        ATOOLS_CHANATTRS.
 *     IAST = INTEGER (Given)
 *        The AST Object, or AST__NULL.
 *     STATUS = INTEGER (Given and Returned)
@@ -75,6 +77,9 @@
 *     8-JUN-2012 (DSB):
 *        Allow required format to specified via PARAM argument (doing it
 *        this way provides backward compatibility in the API).
+*     25-OCT-2017 (DSB):
+*        Allow Channel attributes to be set using environment variable
+*        ATOOLS_CHANATTRS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -108,6 +113,7 @@
       CHARACTER FMT*50
       CHARACTER PARAM*50
       CHARACTER FNAME*255
+      CHARACTER ATTRS*500
       INTEGER CHAN
       INTEGER COLON
       INTEGER NOBJ
@@ -156,6 +162,16 @@
          CALL MSG_SETC( 'F', FPARAM )
          CALL ERR_REP( ' ', 'ATL_CREAT: Unknown format specified '//
      :                'in ''^F''.', STATUS )
+      END IF
+
+*  See if any attributes should be set in the channel.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL PSX_GETENV( 'ATOOLS_CHANATTRS', ATTRS, STATUS )
+         IF( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+         ELSE
+            CALL AST_SET( CHAN, ATTRS, STATUS )
+         END IF
       END IF
 
 *  Write the Object to the Channel.
