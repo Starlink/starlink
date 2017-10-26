@@ -784,8 +784,14 @@ int main(){
       }
    }
 
-
-
+   arySize( ary, &el, status );
+   if( el !=
+       ( ubnd[ 0 ] - lbnd[ 0 ] + 1 )*
+       ( ubnd[ 1 ] - lbnd[ 1 ] + 1 )*
+       ( ubnd[ 2 ] - lbnd[ 2 ] + 1 ) && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 27", status );
+   }
 
    aryAnnul( &ary2, status );
    aryAnnul( &ary, status );
