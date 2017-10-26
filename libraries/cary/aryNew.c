@@ -86,8 +86,8 @@ void aryNew( const char *ftype, int ndim, const hdsdim *lbnd, const hdsdim *ubnd
    AryDCB *dcb;               /* Pointer to the DCB */
    AryPCB *pcb;               /* Pointer to the PCB */
    int tstat;                 /* Temporary status variable */
-   char cmplx;                /* Whether a complex array is required */
-   char erase;                /* Whether to erase placeholder object */
+   int cmplx;                 /* Whether a complex array is required */
+   int erase;                 /* Whether to erase placeholder object */
 
 /* Set an initial value for the returned "ary" argument. */
    *ary = NULL;

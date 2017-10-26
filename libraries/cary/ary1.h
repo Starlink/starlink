@@ -98,7 +98,7 @@ void ary1Upsw( AryACB *acb, const char *type, int bad, int copy, HDSLoc *datloc,
 void ary1Vbad( const char *type, size_t n, void *pntr, int *status );
 void ary1Vzero( const char *type, size_t n, void *pntr, int *status );
 void ary1Xsbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2, const hdsdim *lbnd2, const hdsdim *ubnd2, int ndim, hdsdim *lbnd, hdsdim *ubnd, int *exist, int *status );
-void ary1Vftp( const char *ftype, size_t len, char *type, char *cmplx, int *status );
+void ary1Vftp( const char *ftype, size_t len, char *type, int *cmplx, int *status );
 void ary1Vbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, int *status );
 void ary1Dcre( int defer, const char *type, int cmplx, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, int temp, HDSLoc *loc, AryDCB **dcb, int *status );
 void ary1Nel( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, size_t *el, int *status );
@@ -138,6 +138,9 @@ void ary1Dsbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, AryDCB *dcb, i
 void ary1Rebnd( int defer, HDSLoc *paren, const char *name, const char *type, int state, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, int nndim, const hdsdim *nlbnd, const hdsdim *nubnd, HDSLoc **loc, int *same, int *drx, hdsdim *lx, hdsdim *ux, int *status );
 void ary1Sft( int nshift, const hdsdim *shift, AryACB *acb, int *status );
 void ary1Dsft( int nshift, const hdsdim *shift, AryDCB *dcb, int *status );
+void ary1Stp( const char *type, int cmplx, AryACB *acb, int *status );
+void ary1Dstp( const char *type, int cmplx, AryDCB *dcb, int *dce, int *status );
+void ary1Retyp( HDSLoc *paren, const char *name, const char *type, char state, char bad, int ndim, const hdsdim *dim, const char *ntype, char defer, HDSLoc **loc, int *dce, int *status );
 
 /* Now include the expanded generic prototypes. */
 #include "ary1_cgen.h"

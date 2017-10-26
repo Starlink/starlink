@@ -5,7 +5,7 @@
 #include "dat_par.h"
 #include <string.h>
 
-void ary1Vftp( const char *ftype, size_t len, char *type, char *cmplx,
+void ary1Vftp( const char *ftype, size_t len, char *type, int *cmplx,
                int *status ) {
 /*
 *+
@@ -16,7 +16,7 @@ void ary1Vftp( const char *ftype, size_t len, char *type, char *cmplx,
 *     Check a full type specification for validity.
 
 *  Synopsis:
-*     void ary1Vftp( const char *ftype, size_t len, char *type, char *cmplx,
+*     void ary1Vftp( const char *ftype, size_t len, char *type, int *cmplx,
 *                    int *status )
 
 *  Description:
@@ -32,9 +32,10 @@ void ary1Vftp( const char *ftype, size_t len, char *type, char *cmplx,
 *     len
 *        The length of the "type" array.
 *     type
-*        Returned holding the primitive numeric type implied by FTYPE.
+*        Returned holding the primitive numeric type implied by "ftype".
 *     cmplx
-*        Whether FTYPE specifies complex data or not.
+*        Returned holding a flag indicating whether "ftype" specifies complex
+*        data or not.
 *     status
 *        The global status.
 
