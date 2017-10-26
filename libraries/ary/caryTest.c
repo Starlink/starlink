@@ -650,6 +650,12 @@ int main(){
       *status = SAI__ERROR;
       errRepf( " ", "Error 4h8", status );
    }
+   if( *status == SAI__OK ) {
+      aryVerfy( ary, status );
+      if( *status != SAI__OK ) {
+         errRepf( " ", "Error 4h9", status );
+      }
+   }
    aryAnnul( &ary, status );
 
 
@@ -707,6 +713,13 @@ int main(){
    if( axis != 2 && *status == SAI__OK ) {
       *status = SAI__ERROR;
       errRepf( " ", "Error 18", status );
+   }
+
+   if( *status == SAI__OK ) {
+      aryVerfy( ary2, status );
+      if( *status != SAI__OK ) {
+         errRepf( " ", "Error 18b", status );
+      }
    }
 
    aryMap( ary2, "_INTEGER", "Read", (void **) &ipntr, &el2, status );
