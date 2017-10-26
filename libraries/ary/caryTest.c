@@ -810,6 +810,13 @@ int main(){
       errRepf( " ", "Error 27", status );
    }
 
+   aryStype( "COMPLEX_REAL", ary, status );
+   aryFtype( ary, ftype, status );
+   if( strcmp( ftype, "COMPLEX_REAL" ) && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 28", status );
+   }
+
    aryAnnul( &ary2, status );
    aryAnnul( &ary, status );
 
