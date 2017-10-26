@@ -5,7 +5,7 @@
 #include "ary_err.h"
 #include <string.h>
 
-void ary1Gtdlt( AryDCB *dcb, int *zaxis, char ztype[DAT__SZTYP+1],
+void ary1Gtdlt( AryDCB *dcb, int *zaxis, char ztype[ARY__SZTYP+1],
                 float *zratio, int *status ) {
 /*
 *+
@@ -16,7 +16,7 @@ void ary1Gtdlt( AryDCB *dcb, int *zaxis, char ztype[DAT__SZTYP+1],
 *     Get the compressed axis and data type for a DELTA array.
 
 *  Synopsis:
-*     void ary1Gtdlt( AryDCB *dcb, int *zaxis, char ztype[DAT__SZTYP+1],
+*     void ary1Gtdlt( AryDCB *dcb, int *zaxis, char ztype[ARY__SZTYP+1],
 *                     float *zratio, int *status )
 
 *  Description:
