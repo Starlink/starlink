@@ -96,7 +96,7 @@ void aryState( Ary *ary, int *state, int *status );
 void aryStype( const char *ftype, Ary *ary, int *status );
 void aryTemp( AryPlace **place, int *status );
 int aryTrace( int newflg );
-void aryType( Ary *ary, const char *type, int *status );
+void aryType( Ary *ary, char type[ARY__SZTYP+1], int *status );
 void aryUnlock( Ary *ary, int *status );
 void aryUnmap( Ary *ary, int *status );
 int aryValid( Ary *ary, int *status );
