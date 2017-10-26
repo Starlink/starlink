@@ -28,6 +28,7 @@ int main(){
    double *dpntr;
    double *drpntr;
    double *dipntr;
+   hdsdim shift[2];
    double dsum;
    double scale;
    double zero;
@@ -762,6 +763,29 @@ int main(){
       *status = SAI__ERROR;
       errRepf( " ", "Error 25", status );
    }
+
+   shift[ 0 ] = 1;
+   shift[ 1 ] = -2;
+   aryShift( 2, shift, ary, status );
+   aryBound( ary, 3, lbnd, ubnd, &ndim, status );
+   if( ( lbnd[ 0 ] != -9 ) ||
+       ( lbnd[ 1 ] != -12 ) ||
+       ( lbnd[ 2 ] != 0 ) ||
+       ( ubnd[ 0 ] != 11 ) ||
+       ( ubnd[ 1 ] != 8 ) ||
+       ( ubnd[ 2 ] != 20 ) ) {
+      if( *status == SAI__OK ) {
+         *status = SAI__ERROR;
+
+         printf("%d %d %d %d %d %d\n", lbnd[0], lbnd[1], lbnd[2],
+                                       ubnd[0], ubnd[1], ubnd[2] );
+
+         errRep( " ", "Error 26", status );
+      }
+   }
+
+
+
 
    aryAnnul( &ary2, status );
    aryAnnul( &ary, status );
