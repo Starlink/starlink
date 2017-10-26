@@ -141,6 +141,7 @@ void ary1Dsft( int nshift, const hdsdim *shift, AryDCB *dcb, int *status );
 void ary1Stp( const char *type, int cmplx, AryACB *acb, int *status );
 void ary1Dstp( const char *type, int cmplx, AryDCB *dcb, int *dce, int *status );
 void ary1Retyp( HDSLoc *paren, const char *name, const char *type, char state, char bad, int ndim, const hdsdim *dim, const char *ntype, char defer, HDSLoc **loc, int *dce, int *status );
+void ary1Dvfy( AryDCB *dcb, int *status );
 
 /* Now include the expanded generic prototypes. */
 #include "ary1_cgen.h"
