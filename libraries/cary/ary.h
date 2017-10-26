@@ -47,11 +47,13 @@
 #include "ary_types.h"
 
 /* Prototypes for public functions */
+int aryLocked( const Ary *ary, int *status );
+int aryTrace( int newflg );
+int aryValid( Ary *ary, int *status );
 void aryAnnul( Ary **ary, int *status );
 void aryBad( Ary *ary, int check, int *bad, int *status );
 void aryBase( Ary *ary1, Ary **ary2, int *status );
-void aryBound( Ary *ary, int ndimx, hdsdim *lbnd, hdsdim *ubnd, int *ndim,
-               int *status );
+void aryBound( Ary *ary, int ndimx, hdsdim *lbnd, hdsdim *ubnd, int *ndim, int *status );
 void aryClone( Ary *ary1, Ary **ary2, int *status );
 void aryCmplx( Ary *ary, int *cmplx, int *status );
 void aryCopy( Ary *ary1, AryPlace **place, Ary **ary2, int *status );
@@ -69,17 +71,12 @@ void aryIsbas( Ary *ary, int *base, int *status );
 void aryIsmap( Ary *ary, int *mapped, int *status );
 void aryIstmp( Ary *ary, int *temp, int *status );
 void aryLoc( Ary *ary, HDSLoc **loc, int *status );
-int aryLocked( const Ary *ary, int *status );
-void aryMap( Ary *ary, const char *type, const char *mmod, void **pntr,
-             size_t *el, int *status );
-void aryMapz( Ary *ary, const char *type, const char *mmod, void **rpntr,
-              void **ipntr, size_t *el, int *status );
+void aryMap( Ary *ary, const char *type, const char *mmod, void **pntr, size_t *el, int *status );
+void aryMapz( Ary *ary, const char *type, const char *mmod, void **rpntr, void **ipntr, size_t *el, int *status );
 void aryMsg( const char *token, Ary *ary );
 void aryNdim( Ary *ary, int *ndim, int *status );
-void aryNew( const char *ftype, int ndim, const hdsdim *lbnd, const hdsdim *ubnd,
-             AryPlace **place, Ary **ary, int *status );
-void aryNewp( const char *ftype, int ndim, const hdsdim *ubnd,
-              AryPlace **place, Ary **ary, int *status );
+void aryNew( const char *ftype, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, AryPlace **place, Ary **ary, int *status );
+void aryNewp( const char *ftype, int ndim, const hdsdim *ubnd, AryPlace **place, Ary **ary, int *status );
 void aryNoacc( const char *access, Ary *ary, int *status );
 void aryOffs( Ary *ary1, Ary *ary2, int mxoffs, hdsdim *offs, int *status );
 void aryPlace( HDSLoc *loc, const char *name, AryPlace **place, int *status );
@@ -95,11 +92,9 @@ void arySsect( Ary *ary1, Ary *ary2, Ary **ary3, int *status );
 void aryState( Ary *ary, int *state, int *status );
 void aryStype( const char *ftype, Ary *ary, int *status );
 void aryTemp( AryPlace **place, int *status );
-int aryTrace( int newflg );
 void aryType( Ary *ary, char type[ARY__SZTYP+1], int *status );
 void aryUnlock( Ary *ary, int *status );
 void aryUnmap( Ary *ary, int *status );
-int aryValid( Ary *ary, int *status );
 void aryVerfy( Ary *ary, int *status );
 
 /* Now include the expanded generic prototypes. */
