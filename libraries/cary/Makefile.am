@@ -52,7 +52,7 @@ aryIsacc.c aryIsbas.c aryIsmap.c aryIstmp.c aryLoc.c aryMapz.c aryMsg.c \
 aryNdim.c aryNewp.c aryNoacc.c aryOffs.c aryReset.c ary1Drst.c arySbad.c \
 arySbnd.c ary1Sbnd.c ary1Dsbnd.c ary1Rebnd.c arySctyp.c aryShift.c \
 ary1Sft.c ary1Dsft.c arySize.c arySsect.c aryStype.c ary1Stp.c ary1Dstp.c \
-ary1Retyp.c aryType.c
+ary1Retyp.c aryType.c aryVerfy.c ary1Dvfy.c
 
 CGENERIC_ROUTINES = ary1Badx.cgen ary1Zerx.cgen ary1Ptnx.cgen \
 ary1Pt1x.cgen ary1Cvfx.cgen ary1Gtnx.cgen ary1Gt1x.cgen ary1Cvtx.cgen \

@@ -152,6 +152,7 @@ void ary1Dcpy( AryDCB *dcb1, int temp, HDSLoc **loc, AryDCB **dcb2, int *status 
             (*dcb2)->iloc = NULL;
 
 /* There is no scaling information */
+            if( (*dcb2)->scloc ) datAnnul( &(*dcb2)->scloc, status );
             (*dcb2)->kscl = 0;
 
 /* Simple, scaled and delta arrays.
