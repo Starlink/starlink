@@ -91,7 +91,7 @@ void arySctyp( Ary *ary, char type[ARY__SZTYP+1], int *status );
 void arySect( Ary *ary1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, Ary **ary2, int *status );
 void aryShift( int nshift, const hdsdim *shift, Ary *ary, int *status );
 void arySize( Ary *ary, size_t *npix, int *status );
-void arySsect( int iary1, int iary2, int iary3, int *status );
+void arySsect( Ary *ary1, Ary *ary2, Ary **ary3, int *status );
 void aryState( Ary *ary, int *state, int *status );
 void aryStype( const char *ftype, Ary *ary, int *status );
 void aryTemp( AryPlace **place, int *status );
