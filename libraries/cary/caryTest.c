@@ -817,6 +817,12 @@ int main(){
       errRepf( " ", "Error 28", status );
    }
 
+   aryType( ary, type, status );
+   if( strcmp( type, "_REAL" ) && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Error 29", status );
+   }
+
    aryAnnul( &ary2, status );
    aryAnnul( &ary, status );
 
