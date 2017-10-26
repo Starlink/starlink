@@ -557,6 +557,23 @@ int main(){
    ubnd[ 2 ] = 20;
    ubnd[ 3 ] = 40;
    arySect( ary, 4, lbnd, ubnd, &ary2, status );
+   arySsect( ary, ary2, &ary3, status );
+   aryBound( ary3, ARY__MXDIM, lbnd, ubnd, &ndim, status );
+   if( ( lbnd[ 0 ] != -15 ) ||
+       ( lbnd[ 1 ] != -20 ) ||
+       ( lbnd[ 2 ] != -20 ) ||
+       ( lbnd[ 3 ] != -10 ) ||
+       ( ubnd[ 0 ] != 10 ) ||
+       ( ubnd[ 1 ] != 0 ) ||
+       ( ubnd[ 2 ] != 20 ) ||
+       ( ubnd[ 3 ] != 40 ) ) {
+      if( *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRep( " ", "Error 11", status );
+      }
+   }
+   aryAnnul( &ary3, status );
+
    aryMap( ary2, "_DOUBLE", "Update", (void **) &dpntr, &el, status );
 
    if( el != 1141686 && *status == SAI__OK ){
