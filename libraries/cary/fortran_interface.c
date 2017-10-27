@@ -48,6 +48,20 @@ F77_SUBROUTINE(ary_find)( CHARACTER(LOC),
    *IARY = aryP2I(ary);
 }
 
+F77_SUBROUTINE(ary_ftype)( INTEGER(IARY),
+                           CHARACTER(FTYPE),
+                           INTEGER(STATUS)
+                           TRAIL(FTYPE) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_CHARACTER(LOC)
+   GENPTR_INTEGER(STATUS)
+   char ftype[ARY__SZFTP+1];
+
+   aryFtype( aryI2P(*IARY), char ftype[ARY__SZFTP+1], int *status );
+   cnfExprt( ftype, FTYPE, FTYPE_length );
+
+}
+
 
 F77_SUBROUTINE(ary_imprt)( CHARACTER(LOC),
                           INTEGER(IARY),
