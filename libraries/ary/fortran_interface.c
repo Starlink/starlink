@@ -10,20 +10,128 @@ typedef union IdUnion {
    void *pointer;
 } IdUnion;
 
+
 IdUnion work;
-#define aryP2I(ary) (work.pointer=(ary),work.i)
-#define aryI2P(iary) (work.i=(iary),work.pointer)
+
+#define ARY__NOID 0
+#define aryA2I(ary) (ary?(work.pointer=(ary),work.i):ARY__NOID)
+#define aryI2A(iary) (((iary)!=ARY__NOID)?(work.i=(iary),work.pointer):NULL)
+
+#define ARY__NOPL 0
+#define aryP2I(place) (place?(work.pointer=(place),work.i):ARY__NOPL)
+#define aryI2P(iplace) (((iplace)!=ARY__NOPL)?(work.i=(iplace),work.pointer):NULL)
+
+
+
+
+
+
+
+
+
 
 F77_SUBROUTINE(ary_annul)( INTEGER(IARY),
                            INTEGER(STATUS) ) {
    GENPTR_INTEGER(IARY)
    GENPTR_INTEGER(STATUS)
 
-   Ary *ary = aryI2P(*IARY);
+   Ary *ary = aryI2A(*IARY);
    aryAnnul( &ary, STATUS );
-   *IARY = aryP2I(ary);
+   *IARY = aryA2I(ary);
 }
 
+F77_SUBROUTINE(ary_bad)( INTEGER(IARY),
+                         LOGICAL(CHECK),
+                         LOGICAL(BAD),
+                         INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_LOGICAL(CHECK)
+   GENPTR_LOGICAL(BAD)
+   GENPTR_INTEGER(STATUS)
+   int bad;
+   aryBad( aryI2A(*IARY), F77_ISTRUE(*CHECK)?1:0, &bad, STATUS );
+   *BAD = bad ? F77_TRUE : F77_FALSE;
+}
+
+F77_SUBROUTINE(ary_base)( INTEGER(IARY1),
+                          INTEGER(IARY2),
+                          INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY1)
+   GENPTR_INTEGER(IARY2)
+   GENPTR_INTEGER(STATUS)
+   Ary *ary2;
+   aryBase( aryI2A(*IARY1), &ary2, STATUS );
+   *IARY2 = aryA2I(ary2);
+}
+
+F77_SUBROUTINE(ary_bound)( INTEGER(IARY),
+                           INTEGER(NDIMX),
+                           INTEGER8_ARRAY(LBND),
+                           INTEGER8_ARRAY(UBND),
+                           INTEGER(NDIM),
+                          INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY1)
+   GENPTR_INTEGER(NDIMX)
+   GENPTR_INTEGER8_ARRAY(LBND)
+   GENPTR_INTEGER8_ARRAY(UBND)
+   GENPTR_INTEGER(NDIM)
+   GENPTR_INTEGER(STATUS)
+
+   int i, n;
+   hdsdim lbnd[ARY__MXDIM];
+   hdsdim ubnd[ARY__MXDIM];
+   aryBound( aryI2A(*IARY), ARY__MXDIM, lbnd, ubnd, NDIM, STATUS );
+
+   n = ( *NDIMX < ARY__MXDIM ) ? *NDIMX : ARY__MXDIM;
+   for( i = 0; i < n; i++ ) {
+      LBND[ i ] = lbnd[ i ];
+      UBND[ i ] = ubnd[ i ];
+   }
+
+   for( ; i < *NDIMX; i++ ) {
+      LBND[ i ] = 1;
+      UBND[ i ] = 1;
+   }
+}
+
+F77_SUBROUTINE(ary_clone)( INTEGER(IARY1),
+                          INTEGER(IARY2),
+                          INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY1)
+   GENPTR_INTEGER(IARY2)
+   GENPTR_INTEGER(STATUS)
+   Ary *ary2;
+   aryClone( aryI2A(*IARY1), &ary2, STATUS );
+   *IARY2 = aryA2I(ary2);
+}
+
+F77_SUBROUTINE(ary_cmplx)( INTEGER(IARY),
+                           LOGICAL(CMPLX),
+                           INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_LOGICAL(CMPLX)
+   GENPTR_INTEGER(STATUS)
+   int cmplx;
+   aryCmplx( aryI2A(*IARY), &cmplx, STATUS );
+   *CMPLX = cmplx ? F77_TRUE : F77_FALSE;
+}
+
+
+void aryCopy( Ary *ary1, AryPlace **place, Ary **ary2, int *status );
+F77_SUBROUTINE(ary_copy)( INTEGER(IARY1),
+                          INTEGER(PLACE),
+                          INTEGER(IARY2),
+                          INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY1)
+   GENPTR_INTEGER(PLACE)
+   GENPTR_INTEGER(IARY2)
+   GENPTR_INTEGER(STATUS)
+   Ary *ary2;
+   AryPlace *place = aryI2P(*PLACE);
+   aryCopy( aryI2A(*IARY1), &place, &ary2, STATUS );
+   *PLACE = aryP2I(place);
+   *IARY2 = aryA2I(ary2);
+}
 
 F77_SUBROUTINE(ary_find)( CHARACTER(LOC),
                           CHARACTER(NAME),
@@ -45,7 +153,7 @@ F77_SUBROUTINE(ary_find)( CHARACTER(LOC),
 
    aryFind( loc, name, &ary, STATUS );
 
-   *IARY = aryP2I(ary);
+   *IARY = aryA2I(ary);
 }
 
 F77_SUBROUTINE(ary_ftype)( INTEGER(IARY),
@@ -57,11 +165,10 @@ F77_SUBROUTINE(ary_ftype)( INTEGER(IARY),
    GENPTR_INTEGER(STATUS)
    char ftype[ARY__SZFTP+1];
 
-   aryFtype( aryI2P(*IARY), char ftype[ARY__SZFTP+1], int *status );
+   aryFtype( aryI2A(*IARY), ftype, STATUS );
    cnfExprt( ftype, FTYPE, FTYPE_length );
 
 }
-
 
 F77_SUBROUTINE(ary_imprt)( CHARACTER(LOC),
                           INTEGER(IARY),
@@ -78,7 +185,7 @@ F77_SUBROUTINE(ary_imprt)( CHARACTER(LOC),
 
    aryImprt( loc, &ary, STATUS );
 
-   *IARY = aryP2I(ary);
+   *IARY = aryA2I(ary);
 }
 
 F77_SUBROUTINE(ary_loc)( INTEGER(IARY),
@@ -91,11 +198,10 @@ F77_SUBROUTINE(ary_loc)( INTEGER(IARY),
 
    HDSLoc *loc = NULL;
 
-   aryLoc( aryI2P(*IARY), &loc, STATUS );
+   aryLoc( aryI2A(*IARY), &loc, STATUS );
    datExportFloc( &loc, 1, LOC_length, LOC, STATUS );
 
 }
-
 
 F77_SUBROUTINE(ary_msg)( CHARACTER(TOKEN),
                          INTEGER(IARY)
@@ -104,10 +210,9 @@ F77_SUBROUTINE(ary_msg)( CHARACTER(TOKEN),
    GENPTR_INTEGER(IARY)
 
    char *token = cnfCreim( TOKEN, TOKEN_length );
-   aryMsg( token, aryI2P(*IARY) );
+   aryMsg( token, aryI2A(*IARY) );
    cnfFree( token );
 }
-
 
 F77_SUBROUTINE(ary_same)( INTEGER(IARY1),
                           INTEGER(IARY2),
@@ -122,7 +227,7 @@ F77_SUBROUTINE(ary_same)( INTEGER(IARY1),
 
    int same, isect;
 
-   arySame( aryI2P(*IARY1), aryI2P(*IARY2), &same, &isect, STATUS );
+   arySame( aryI2A(*IARY1), aryI2A(*IARY2), &same, &isect, STATUS );
    F77_EXPORT_LOGICAL( same, *SAME );
    F77_EXPORT_LOGICAL( isect, *ISECT );
 
@@ -136,18 +241,11 @@ F77_SUBROUTINE(ary_same)( INTEGER(IARY1),
 
 /*
 
-void aryBad( Ary *ary, int check, int *bad, int *status );
-void aryBase( Ary *ary1, Ary **ary2, int *status );
-void aryBound( Ary *ary, int ndimx, hdsdim *lbnd, hdsdim *ubnd, int *ndim, int *status );
-void aryClone( Ary *ary1, Ary **ary2, int *status );
-void aryCmplx( Ary *ary, int *cmplx, int *status );
-void aryCopy( Ary *ary1, AryPlace **place, Ary **ary2, int *status );
 void aryDelet( Ary **ary, int *status );
 void aryDelta( Ary *ary1, int zaxis, const char *type, float minrat, AryPlace **place, float *zratio, Ary **ary2, int *status );
 void aryDim( Ary *ary, int ndimx, hdsdim *dim, int *ndim, int *status );
 void aryDupe( Ary *iary1, AryPlace **place, Ary **iary2, int *status );
 void aryForm( Ary *ary, char form[ARY__SZFRM+1], int *status );
-void aryFtype( Ary *ary,  char ftype[ARY__SZFTP+1], int *status );
 void aryGtdlt( Ary *ary, int *zaxis, char ztype[DAT__SZTYP+1], float *zratio, int *status );
 void aryIsacc( Ary *ary, const char *access, int *isacc, int *status );
 void aryIsbas( Ary *ary, int *base, int *status );

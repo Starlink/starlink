@@ -52,6 +52,7 @@
       logical temp
       logical there
       logical mapped
+      logical valid
       real zratio
 
 
@@ -298,8 +299,8 @@ c ================================
       end if
 
       call ary_clone( iary3, iary4, status )
-      if( .not. ary_valid( iary4, status ) .and.
-     :    status .eq. SAI__OK ) then
+      call ary_valid( iary4, valid, status )
+      if( .not. valid .and. status .eq. SAI__OK ) then
          status = SAI__ERROR
          call err_rep( ' ', 'Error 4f1', status )
       end if
@@ -314,7 +315,8 @@ c ================================
          status = SAI__ERROR
          call err_rep( ' ', 'Error 4h', status )
       end if
-      if( ary_valid( iary4, status ) .and. status .eq. SAI__OK ) then
+      call ary_valid( iary4, valid, status )
+      if( valid .and. status .eq. SAI__OK ) then
          status = SAI__ERROR
          call err_rep( ' ', 'Error 4h1', status )
       end if
