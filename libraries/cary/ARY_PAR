@@ -1,0 +1,103 @@
+*+
+*  Name:
+*     ARY_PAR
+
+*  Purpose:
+*     Define public global constants for the ARY_ system.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file contains definitions of global constants which are used
+*     by the ARY_ system and which may also be needed by software which
+*     calls routines from this system.
+
+*  Copyright:
+*     Copyright (C) 1989, 1990 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     22-SEP-1989 (RFWS):
+*        Original version.
+*     16-JAN-1990 (RFWS):
+*        Changed the value of the ARY__SZMMD constant to allow
+*        initialisation modes to appear on all access types.
+*     7-MAR-1990 (RFWS):
+*        Increased the value of the ARY__SZFTP constant in anticipation
+*        of future development involving scaled arrays.
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Constants:
+
+*  General.
+*  =======
+
+*  Maximum number of array dimensions.
+      INTEGER ARY__MXDIM
+      PARAMETER ( ARY__MXDIM = 7 )
+
+*  Value which is never used as an array identifier, to which an
+*  invalid identifier may be set.
+      INTEGER ARY__NOID
+      PARAMETER ( ARY__NOID = 0 )
+
+*  Value which is never used as an array placeholder, to which an
+*  invalid placeholder may be set.
+      INTEGER ARY__NOPL
+      PARAMETER ( ARY__NOPL = 0 )
+
+*  String lengths.
+*  ==============
+
+*  Maximum size of a string describing an array access type, e.g.
+*  'DELETE'.
+      INTEGER ARY__SZACC
+      PARAMETER ( ARY__SZACC = 6 )
+
+*  Maximum length of a string describing an array's "form", e.g.
+*  'SIMPLE'.
+      INTEGER ARY__SZFRM
+      PARAMETER ( ARY__SZFRM = 10 )
+
+*  Maximum length of a string describing the full type of an array
+*  (including whether it is complex), e.g. 'COMPLEX_REAL'.
+      INTEGER ARY__SZFTP
+      PARAMETER ( ARY__SZFTP = 20 )
+
+*  Maximum length of a string describing the "mapping mode" used to map
+*  an array for access, e.g. 'WRITE/ZERO'.
+      INTEGER ARY__SZMMD
+      PARAMETER ( ARY__SZMMD = 11 )
+
+*  Maximum length of a string describing an array's numeric type, e.g.
+*  '_INTEGER'.
+      INTEGER ARY__SZTYP
+      PARAMETER ( ARY__SZTYP = 8 )
+
+*.
