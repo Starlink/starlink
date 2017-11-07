@@ -33,7 +33,7 @@
 *        The default (i.e. used if the string does not contain a
 *        colon) is "AST". Attribute values for the Channel (of whatever
 *        class) can be specified using the environment variable
-*        ATOOLS_CHANATTRS.
+*        ATOOLS_CHATT_OUT.
 *     IAST = INTEGER (Given)
 *        The AST Object, or AST__NULL.
 *     STATUS = INTEGER (Given and Returned)
@@ -81,9 +81,12 @@
 *        Allow Channel attributes to be set using environment variable
 *        ATOOLS_CHANATTRS.
 *     7-NOV-2017 (DSB):
-*        Annul the error if the Channel attributes supplied via
+*        - Annul the error if the Channel attributes supplied via
 *        ATOOLS_CHANATTRS are inappropriate for the type of channel in
 *        use.
+*        - Rename env. variable from ATOOLS_CHANATTRS to ATOOLS_CHATT_OUT
+*        preparatory to allowing input channels to be configured using
+*        ATOOLS_CHATT_IN.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -171,7 +174,7 @@
 
 *  See if any attributes should be set in the channel.
       IF( STATUS .EQ. SAI__OK ) THEN
-         CALL PSX_GETENV( 'ATOOLS_CHANATTRS', ATTRS, STATUS )
+         CALL PSX_GETENV( 'ATOOLS_CHATT_OUT', ATTRS, STATUS )
          IF( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
