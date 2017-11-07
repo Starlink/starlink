@@ -13,7 +13,9 @@
 *     CALL ATL_RDFCH( IGRP, IAST, STATUS )
 
 *  Description:
-*     Read an AST Object from a GRP group using a FitsChan.
+*     Read an AST Object from a GRP group using a FitsChan. The FitsChan
+*     can be configured using a set of attribute settings specified in
+*     the environment variable ATOOLS_CHATT_IN.
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
@@ -52,6 +54,9 @@
 *        Original version.
 *     4-FEB-2003 (DSB):
 *        Fixed bug which caused last line in FITS header to be ignored.
+*     7-NOV-2017 (DSB):
+*        Allow Channel attributes to be set using environment variable
+*        ATOOLS_CHATT_IN.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -65,6 +70,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'AST_ERR'          ! AST error constants
 
 *  Arguments Given:
       INTEGER IGRP
@@ -86,6 +92,7 @@
 
 *  Local Variables:
       INTEGER CHAN
+      CHARACTER ATTRS*500
 *.
 
 *  Initialise.
@@ -110,6 +117,17 @@
 *  Create a FitsChan through which to read the Objects stored in the
 *  group.
       CHAN = AST_FITSCHAN( ATL_SRC2, AST_NULL, ' ', STATUS )
+
+*  See if any attributes should be set in the channel.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL PSX_GETENV( 'ATOOLS_CHATT_IN', ATTRS, STATUS )
+         IF( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+            CALL AST_SET( CHAN, ATTRS, STATUS )
+            IF( STATUS .EQ. AST__BADAT ) CALL ERR_ANNUL( STATUS )
+         END IF
+      END IF
 
 *  Attempt to read an object from the current channel.
       IAST = AST_READ( CHAN, STATUS )

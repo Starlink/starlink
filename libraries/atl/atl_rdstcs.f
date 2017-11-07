@@ -13,7 +13,9 @@
 *     CALL ATL_RDSTCS( IGRP, IAST, STATUS )
 
 *  Description:
-*     Read an AST Object from a GRP group using an StcsChan.
+*     Read an AST Object from a GRP group using an StcsChan.The StcsChan
+*     can be configured using a set of attribute settings specified in
+*     the environment variable ATOOLS_CHATT_IN.
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
@@ -50,6 +52,9 @@
 *  History:
 *     30-JUN-2009 (DSB):
 *        Original version.
+*     7-NOV-2017 (DSB):
+*        Allow Channel attributes to be set using environment variable
+*        ATOOLS_CHATT_IN.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -63,6 +68,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'AST_ERR'          ! AST error constants
 
 *  Arguments Given:
       INTEGER IGRP
@@ -84,6 +90,7 @@
 
 *  Local Variables:
       INTEGER CHAN
+      CHARACTER ATTRS*500
 *.
 
 *  Initialise.
@@ -109,6 +116,17 @@
 *  group.
       CHAN = AST_STCSCHAN( ATL_SRC1, AST_NULL, 'ReportLevel=2',
      :                     STATUS )
+
+*  See if any attributes should be set in the channel.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL PSX_GETENV( 'ATOOLS_CHATT_IN', ATTRS, STATUS )
+         IF( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+            CALL AST_SET( CHAN, ATTRS, STATUS )
+            IF( STATUS .EQ. AST__BADAT ) CALL ERR_ANNUL( STATUS )
+         END IF
+      END IF
 
 *  Attempt to read an object from the StcsChan.
       IAST = AST_READ( CHAN, STATUS )
