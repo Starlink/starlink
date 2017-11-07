@@ -80,6 +80,10 @@
 *     25-OCT-2017 (DSB):
 *        Allow Channel attributes to be set using environment variable
 *        ATOOLS_CHANATTRS.
+*     7-NOV-2017 (DSB):
+*        Annul the error if the Channel attributes supplied via
+*        ATOOLS_CHANATTRS are inappropriate for the type of channel in
+*        use.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -93,6 +97,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'AST_ERR'          ! AST error constants
 
 *  Arguments Given:
       CHARACTER FPARAM*(*)
@@ -169,8 +174,9 @@
          CALL PSX_GETENV( 'ATOOLS_CHANATTRS', ATTRS, STATUS )
          IF( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
-         ELSE
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
             CALL AST_SET( CHAN, ATTRS, STATUS )
+            IF( STATUS .EQ. AST__BADAT ) CALL ERR_ANNUL( STATUS )
          END IF
       END IF
 
