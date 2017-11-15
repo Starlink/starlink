@@ -117,7 +117,6 @@ F77_SUBROUTINE(ary_cmplx)( INTEGER(IARY),
 }
 
 
-void aryCopy( Ary *ary1, AryPlace **place, Ary **ary2, int *status );
 F77_SUBROUTINE(ary_copy)( INTEGER(IARY1),
                           INTEGER(PLACE),
                           INTEGER(IARY2),
@@ -161,7 +160,7 @@ F77_SUBROUTINE(ary_ftype)( INTEGER(IARY),
                            INTEGER(STATUS)
                            TRAIL(FTYPE) ) {
    GENPTR_INTEGER(IARY)
-   GENPTR_CHARACTER(LOC)
+   GENPTR_CHARACTER(FTYPE)
    GENPTR_INTEGER(STATUS)
    char ftype[ARY__SZFTP+1];
 
@@ -208,9 +207,10 @@ F77_SUBROUTINE(ary_msg)( CHARACTER(TOKEN),
                          TRAIL(TOKEN) ) {
    GENPTR_CHARACTER(TOKEN)
    GENPTR_INTEGER(IARY)
-
    char *token = cnfCreim( TOKEN, TOKEN_length );
+
    aryMsg( token, aryI2A(*IARY) );
+
    cnfFree( token );
 }
 
@@ -228,52 +228,575 @@ F77_SUBROUTINE(ary_same)( INTEGER(IARY1),
    int same, isect;
 
    arySame( aryI2A(*IARY1), aryI2A(*IARY2), &same, &isect, STATUS );
+
    F77_EXPORT_LOGICAL( same, *SAME );
    F77_EXPORT_LOGICAL( isect, *ISECT );
+}
 
+F77_SUBROUTINE(ary_delet)( INTEGER(IARY),
+                           INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_INTEGER(STATUS)
+
+   Ary *ary = aryI2A(*IARY);
+
+   aryDelet( &ary, STATUS );
+
+   *IARY = aryA2I(ary);
 }
 
 
 
+F77_SUBROUTINE(ary_delta)( INTEGER(IARY1),
+                           INTEGER(ZAXIS),
+                           CHARACTER(TYPE),
+                           REAL(MINRAT),
+                           INTEGER(PLACE),
+                           REAL(ZRATIO),
+                          INTEGER(IARY2),
+                          INTEGER(STATUS)
+                          TRAIL(TYPE) ) {
+   GENPTR_INTEGER(IARY1)
+   GENPTR_INTEGER(ZAXIS)
+   GENPTR_CHARACTER(TYPE)
+   GENPTR_REAL(MINRAT)
+   GENPTR_INTEGER(PLACE)
+   GENPTR_REAL(ZRATIO)
+   GENPTR_INTEGER(IARY2)
+   GENPTR_INTEGER(STATUS)
+
+   char type[ ARY__SZTYP + 1 ];
+   cnfImpn( TYPE, TYPE_length, ARY__SZTYP, type );
+   Ary *ary2;
+   AryPlace *place = aryI2P(*PLACE);
+
+   aryDelta( aryI2A(*IARY1), *ZAXIS, type, *MINRAT, &place, ZRATIO,
+             &ary2, STATUS );
+
+   *PLACE = aryP2I(place);
+   *IARY2 = aryA2I(ary2);
+}
+
+F77_SUBROUTINE(ary_dim)( INTEGER(IARY),
+                         INTEGER(NDIMX),
+                         INTEGER8_ARRAY(DIM),
+                         INTEGER(NDIM),
+                         INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_INTEGER(NDIMX)
+   GENPTR_INTEGER8_ARRAY(DIM)
+   GENPTR_INTEGER(NDIM)
+   GENPTR_INTEGER(STATUS)
+
+   int i, n;
+   hdsdim dim[ ARY__MXDIM ];
+
+   aryDim( aryI2A(*IARY), ARY__MXDIM, dim, NDIM, STATUS );
+
+   n = ( *NDIMX < ARY__MXDIM ) ? *NDIMX : ARY__MXDIM;
+   for( i = 0; i < n; i++ ) DIM[ i ] = dim[ i ];
+   for( ; i < *NDIMX; i++ ) DIM[ i ] = 1;
+}
+
+F77_SUBROUTINE(ary_dupe)( INTEGER(IARY1),
+                          INTEGER(PLACE),
+                          INTEGER(IARY2),
+                          INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY1)
+   GENPTR_INTEGER(PLACE)
+   GENPTR_INTEGER(IARY2)
+   GENPTR_INTEGER(STATUS)
+   Ary *ary2;
+   AryPlace *place = aryI2P(*PLACE);
+
+   aryDupe( aryI2A(*IARY1), &place, &ary2, STATUS );
+
+   *PLACE = aryP2I(place);
+   *IARY2 = aryA2I(ary2);
+}
+
+F77_SUBROUTINE(ary_form)( INTEGER(IARY),
+                          CHARACTER(FORM),
+                          INTEGER(STATUS)
+                          TRAIL(FORM) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_CHARACTER(FORM)
+   GENPTR_INTEGER(STATUS)
+   char form[ARY__SZFRM+1];
+
+   aryForm( aryI2A(*IARY), form, STATUS );
+
+   cnfExprt( form, FORM, FORM_length );
+}
+
+F77_SUBROUTINE(ary_gtdlt)( INTEGER(IARY),
+                           INTEGER(ZAXIS),
+                           CHARACTER(ZTYPE),
+                           REAL(ZRATIO),
+                           INTEGER(STATUS)
+                           TRAIL(ZTYPE) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_INTEGER(ZAXIS)
+   GENPTR_CHARACTER(ZTYPE)
+   GENPTR_REAL(ZRATIO)
+   GENPTR_INTEGER(STATUS)
+   char ztype[DAT__SZTYP+1];
+
+   aryGtdlt( aryI2A(*IARY), ZAXIS, ztype, ZRATIO, STATUS );
+
+   cnfExprt( ztype, ZTYPE, ZTYPE_length );
+}
+
+F77_SUBROUTINE(ary_isacc)( INTEGER(IARY),
+                           CHARACTER(ACCESS),
+                           LOGICAL(ISACC),
+                           INTEGER(STATUS)
+                           TRAIL(ACCESS) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_CHARACTER(ACCESS)
+   GENPTR_LOGICAL(ISACC)
+   GENPTR_INTEGER(STATUS)
+   int isacc;
+
+   char access[ ARY__SZACC + 1 ];
+   cnfImpn( ACCESS, ACCESS_length, ARY__SZTYP, access );
+
+   aryIsacc( aryI2A(*IARY), access, &isacc, STATUS );
+   *ISACC = isacc ? F77_TRUE : F77_FALSE;
+
+}
+
+F77_SUBROUTINE(ary_isbas)( INTEGER(IARY),
+                           LOGICAL(BASE),
+                           INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_LOGICAL(BASE)
+   GENPTR_INTEGER(STATUS)
+   int base;
+
+   aryIsbas( aryI2A(*IARY), &base, STATUS );
+   *BASE = base ? F77_TRUE : F77_FALSE;
+}
+
+F77_SUBROUTINE(ary_ismap)( INTEGER(IARY),
+                           LOGICAL(MAPPED),
+                           INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_LOGICAL(MAPPED)
+   GENPTR_INTEGER(STATUS)
+   int mapped;
+
+   aryIsmap( aryI2A(*IARY), &mapped, STATUS );
+   *MAPPED = mapped ? F77_TRUE : F77_FALSE;
+}
+
+F77_SUBROUTINE(ary_istmp)( INTEGER(IARY),
+                           LOGICAL(TEMP),
+                           INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_LOGICAL(TEMP)
+   GENPTR_INTEGER(STATUS)
+   int temp;
+
+   aryIstmp( aryI2A(*IARY), &temp, STATUS );
+   *TEMP = temp ? F77_TRUE : F77_FALSE;
+}
+
+F77_SUBROUTINE(ary_map)( INTEGER(IARY),
+                         CHARACTER(TYPE),
+                         CHARACTER(MMOD),
+                         INTEGER(PNTR),
+                         INTEGER8(EL),
+                         INTEGER(STATUS)
+                         TRAIL(TYPE)
+                         TRAIL(MMOD) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_CHARACTER(TYPE)
+   GENPTR_CHARACTER(MMOD)
+   GENPTR_INTEGER(PNTR)
+   GENPTR_INTEGER8(EL)
+   GENPTR_INTEGER(STATUS)
+   char type[ ARY__SZTYP + 1 ];
+   char mmod[ ARY__SZMMD + 1 ];
+   void *pntr = NULL;
+   size_t el;
+
+   cnfImpn( TYPE, TYPE_length, ARY__SZTYP, type );
+   cnfImpn( MMOD, MMOD_length, ARY__SZMMD, type );
+
+   aryMap( aryI2A(*IARY), type, mmod, &pntr, &el, STATUS );
+
+   *PNTR = cnfFptr( pntr );
+   *EL = el;
+}
+
+F77_SUBROUTINE(ary_mapz)( INTEGER(IARY),
+                         CHARACTER(TYPE),
+                         CHARACTER(MMOD),
+                         INTEGER(RPNTR),
+                         INTEGER(IPNTR),
+                         INTEGER8(EL),
+                         INTEGER(STATUS)
+                         TRAIL(TYPE)
+                         TRAIL(MMOD) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_CHARACTER(TYPE)
+   GENPTR_CHARACTER(MMOD)
+   GENPTR_INTEGER(RPNTR)
+   GENPTR_INTEGER(IPNTR)
+   GENPTR_INTEGER8(EL)
+   GENPTR_INTEGER(STATUS)
+   char type[ ARY__SZTYP + 1 ];
+   char mmod[ ARY__SZMMD + 1 ];
+   void *rpntr = NULL;
+   void *ipntr = NULL;
+   size_t el;
+
+   cnfImpn( TYPE, TYPE_length, ARY__SZTYP, type );
+   cnfImpn( MMOD, MMOD_length, ARY__SZMMD, type );
+
+   aryMapz( aryI2A(*IARY), type, mmod, &rpntr, &ipntr, &el, STATUS );
+
+   *RPNTR = cnfFptr( rpntr );
+   *IPNTR = cnfFptr( ipntr );
+   *EL = el;
+}
+
+F77_SUBROUTINE(ary_ndim)( INTEGER(IARY),
+                          INTEGER(NDIM),
+                          INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_INTEGER(NDIM)
+   GENPTR_INTEGER(STATUS)
+
+   aryNdim( aryI2A(*IARY), NDIM, STATUS );
+
+}
+
+F77_SUBROUTINE(ary_new)( CHARACTER(FTYPE),
+                         INTEGER(NDIM),
+                         INTEGER8_ARRAY(LBND),
+                         INTEGER8_ARRAY(UBND),
+                         INTEGER(PLACE),
+                         INTEGER(IARY),
+                         INTEGER(STATUS)
+                         TRAIL(FTYPE) ) {
+   GENPTR_CHARACTER(FTYPE)
+   GENPTR_INTEGER(NDIM)
+   GENPTR_INTEGER8_ARRAY(LBND)
+   GENPTR_INTEGER8_ARRAY(UBND)
+   GENPTR_INTEGER(PLACE)
+   GENPTR_INTEGER(IARY)
+   GENPTR_INTEGER(STATUS)
+
+   char ftype[ ARY__SZFTP + 1 ];
+   cnfImpn( FTYPE, FTYPE_length, ARY__SZFTP, ftype );
+   int i;
+   Ary *ary;
+   AryPlace *place = aryI2P(*PLACE);
+
+   hdsdim lbnd[ARY__MXDIM];
+   hdsdim ubnd[ARY__MXDIM];
+   int ndim = ( *NDIM < ARY__MXDIM ) ? *NDIM : ARY__MXDIM;
+   for( i = 0; i < ndim; i++ ) {
+      lbnd[ i ] = LBND[ i ];
+      ubnd[ i ] = UBND[ i ];
+   }
+
+   aryNew( ftype, *NDIM, lbnd, ubnd, &place, &ary, STATUS );
+
+   *PLACE = aryP2I(place);
+   *IARY = aryA2I(ary);
+}
+
+F77_SUBROUTINE(ary_newp)( CHARACTER(FTYPE),
+                          INTEGER(NDIM),
+                          INTEGER8_ARRAY(UBND),
+                          INTEGER(PLACE),
+                          INTEGER(IARY),
+                          INTEGER(STATUS)
+                          TRAIL(FTYPE) ) {
+   GENPTR_CHARACTER(FTYPE)
+   GENPTR_INTEGER(NDIM)
+   GENPTR_INTEGER8_ARRAY(UBND)
+   GENPTR_INTEGER(PLACE)
+   GENPTR_INTEGER(IARY)
+   GENPTR_INTEGER(STATUS)
+
+   char ftype[ ARY__SZFTP + 1 ];
+   cnfImpn( FTYPE, FTYPE_length, ARY__SZFTP, ftype );
+   Ary *ary;
+   int i;
+   AryPlace *place = aryI2P(*PLACE);
+
+   hdsdim ubnd[ARY__MXDIM];
+   int ndim = ( *NDIM < ARY__MXDIM ) ? *NDIM : ARY__MXDIM;
+   for( i = 0; i < ndim; i++ ) ubnd[ i ] = UBND[ i ];
+
+   aryNewp( ftype, *NDIM, ubnd, &place, &ary, STATUS );
+
+   *PLACE = aryP2I(place);
+   *IARY = aryA2I(ary);
+}
+
+F77_SUBROUTINE(ary_noacc)( CHARACTER(ACCESS),
+                           INTEGER(IARY),
+                           INTEGER(STATUS)
+                           TRAIL(ACCESS) ) {
+   GENPTR_CHARACTER(ACCESS)
+   GENPTR_INTEGER(IARY)
+   GENPTR_INTEGER(STATUS)
+
+   char access[ ARY__SZACC + 1 ];
+   cnfImpn( ACCESS, ACCESS_length, ARY__SZTYP, access );
+
+   aryNoacc( access, aryI2A(*IARY), STATUS );
+}
+
+F77_SUBROUTINE(ary_offs)( INTEGER(IARY1),
+                          INTEGER(IARY2),
+                          INTEGER(MXOFFS),
+                          INTEGER8_ARRAY(OFFS),
+                          INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY1)
+   GENPTR_INTEGER(IARY2)
+   GENPTR_INTEGER(MXOFFS)
+   GENPTR_INTEGER8_ARRAY(OFFS)
+   GENPTR_INTEGER(STATUS)
+
+   int i, mxoffs;
+   hdsdim offs[ ARY__MXDIM ];
+
+   aryOffs( aryI2A(*IARY1), aryI2A(*IARY2), ARY__MXDIM, offs, STATUS );
+
+   mxoffs = ( *MXOFFS < ARY__MXDIM ) ? *MXOFFS : ARY__MXDIM;
+   for( i = 0; i < mxoffs; i++ ) OFFS[ i ] = offs[ i ];
+   for( ; i < *MXOFFS; i++ ) OFFS[ i ] = 1;
+}
+
+F77_SUBROUTINE(ary_place)( CHARACTER(LOC),
+                           CHARACTER(NAME),
+                           INTEGER(IPLACE),
+                           INTEGER(STATUS)
+                           TRAIL(LOC)
+                           TRAIL(NAME) ) {
+   GENPTR_CHARACTER(LOC)
+   GENPTR_CHARACTER(NAME)
+   GENPTR_INTEGER(IPLACE)
+   GENPTR_INTEGER(STATUS)
+
+   AryPlace *place;
+   char name[DAT__SZNAM+1];
+   HDSLoc *loc = NULL;
+
+   datImportFloc( LOC, LOC_length, &loc, STATUS );
+   cnfImpn( NAME, NAME_length, DAT__SZNAM, name );
+
+   aryPlace( loc, name, &place, STATUS );
+
+   *IPLACE = aryP2I(place);
+}
+
+F77_SUBROUTINE(ary_reset)( INTEGER(IARY),
+                           INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_INTEGER(STATUS)
+
+   aryReset( aryI2A(*IARY), STATUS );
+
+}
+
+F77_SUBROUTINE(ary_sbad)( LOGICAL(BAD),
+                          INTEGER(IARY),
+                          INTEGER(STATUS) ) {
+   GENPTR_LOGICAL(BAD)
+   GENPTR_INTEGER(IARY)
+   GENPTR_INTEGER(STATUS)
+
+   arySbad( (*BAD == F77_TRUE), aryI2A(*IARY), STATUS );
+}
 
 
+F77_SUBROUTINE(ary_sbnd)( INTEGER(NDIM),
+                          INTEGER8_ARRAY(LBND),
+                          INTEGER8_ARRAY(UBND),
+                          INTEGER(IARY),
+                          INTEGER(STATUS) ) {
+   GENPTR_INTEGER(NDIM)
+   GENPTR_INTEGER8_ARRAY(LBND)
+   GENPTR_INTEGER8_ARRAY(UBND)
+   GENPTR_INTEGER(IARY)
+   GENPTR_INTEGER(STATUS)
 
+   int i, ndim;
+   hdsdim lbnd[ARY__MXDIM];
+   hdsdim ubnd[ARY__MXDIM];
 
-/*
+   ndim = ( *NDIM < ARY__MXDIM ) ? *NDIM : ARY__MXDIM;
+   for( i = 0; i < ndim; i++ ) {
+      lbnd[ i ] = LBND[ i ];
+      ubnd[ i ] = UBND[ i ];
+   }
 
-void aryDelet( Ary **ary, int *status );
-void aryDelta( Ary *ary1, int zaxis, const char *type, float minrat, AryPlace **place, float *zratio, Ary **ary2, int *status );
-void aryDim( Ary *ary, int ndimx, hdsdim *dim, int *ndim, int *status );
-void aryDupe( Ary *iary1, AryPlace **place, Ary **iary2, int *status );
-void aryForm( Ary *ary, char form[ARY__SZFRM+1], int *status );
-void aryGtdlt( Ary *ary, int *zaxis, char ztype[DAT__SZTYP+1], float *zratio, int *status );
-void aryIsacc( Ary *ary, const char *access, int *isacc, int *status );
-void aryIsbas( Ary *ary, int *base, int *status );
-void aryIsmap( Ary *ary, int *mapped, int *status );
-void aryIstmp( Ary *ary, int *temp, int *status );
-void aryMap( Ary *ary, const char *type, const char *mmod, void **pntr, size_t *el, int *status );
-void aryMapz( Ary *ary, const char *type, const char *mmod, void **rpntr, void **ipntr, size_t *el, int *status );
-void aryNdim( Ary *ary, int *ndim, int *status );
-void aryNew( const char *ftype, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, AryPlace **place, Ary **ary, int *status );
-void aryNewp( const char *ftype, int ndim, const hdsdim *ubnd, AryPlace **place, Ary **ary, int *status );
-void aryNoacc( const char *access, Ary *ary, int *status );
-void aryOffs( Ary *ary1, Ary *ary2, int mxoffs, hdsdim *offs, int *status );
-void aryPlace( HDSLoc *loc, const char *name, AryPlace **place, int *status );
-void aryReset( Ary *ary, int *status );
-void arySbad( int bad, Ary *ary, int *status );
-void arySbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, Ary *ary, int *status );
-void arySctyp( Ary *ary, char type[ARY__SZTYP+1], int *status );
-void arySect( Ary *ary1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, Ary **ary2, int *status );
-void aryShift( int nshift, const hdsdim *shift, Ary *ary, int *status );
-void arySize( Ary *ary, size_t *npix, int *status );
-void arySsect( Ary *ary1, Ary *ary2, Ary **ary3, int *status );
-void aryState( Ary *ary, int *state, int *status );
-void aryStype( const char *ftype, Ary *ary, int *status );
-void aryTemp( AryPlace **place, int *status );
-void aryType( Ary *ary, char type[ARY__SZTYP+1], int *status );
-void aryUnlock( Ary *ary, int *status );
-void aryUnmap( Ary *ary, int *status );
-void aryVerfy( Ary *ary, int *status );
-nclude "ary_cgen.h"
+   arySbnd( ndim, lbnd, ubnd, aryI2A(*IARY), STATUS );
+}
 
-*/
+F77_SUBROUTINE(ary_sctyp)( INTEGER(IARY),
+                           CHARACTER(TYPE),
+                           INTEGER(STATUS)
+                           TRAIL(TYPE) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_CHARACTER(TYPE)
+   GENPTR_INTEGER(STATUS)
+   char type[ARY__SZTYP+1];
+
+   arySctyp( aryI2A(*IARY), type, STATUS );
+   cnfExprt( type, TYPE, TYPE_length );
+
+}
+
+F77_SUBROUTINE(ary_sect)( INTEGER(IARY1),
+                          INTEGER(NDIM),
+                          INTEGER8_ARRAY(LBND),
+                          INTEGER8_ARRAY(UBND),
+                          INTEGER(IARY2),
+                          INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY1)
+   GENPTR_INTEGER(NDIM)
+   GENPTR_INTEGER8_ARRAY(LBND)
+   GENPTR_INTEGER8_ARRAY(UBND)
+   GENPTR_INTEGER(IARY2)
+   GENPTR_INTEGER(STATUS)
+
+   Ary *ary2;
+   int i, ndim;
+   hdsdim lbnd[ARY__MXDIM];
+   hdsdim ubnd[ARY__MXDIM];
+
+   ndim = ( *NDIM < ARY__MXDIM ) ? *NDIM : ARY__MXDIM;
+   for( i = 0; i < ndim; i++ ) {
+      lbnd[ i ] = LBND[ i ];
+      ubnd[ i ] = UBND[ i ];
+   }
+
+   arySect( aryI2A(*IARY1), ndim, lbnd, ubnd, &ary2, STATUS );
+
+   *IARY2 = aryA2I(ary2);
+
+}
+
+F77_SUBROUTINE(ary_shift)( INTEGER(NSHIFT),
+                           INTEGER8_ARRAY(SHIFT),
+                           INTEGER(IARY),
+                           INTEGER(STATUS) ) {
+   GENPTR_INTEGER(NSHIFT)
+   GENPTR_INTEGER8_ARRAY(SHIFT)
+   GENPTR_INTEGER(IARY)
+   GENPTR_INTEGER(STATUS)
+
+   int i, nshift;
+   hdsdim shift[ARY__MXDIM];
+   nshift = ( *NSHIFT < ARY__MXDIM ) ? *NSHIFT : ARY__MXDIM;
+   for( i = 0; i < nshift; i++ ) shift[ i ] = SHIFT[ i ];
+
+   aryShift( nshift, shift, aryI2A(*IARY), STATUS );
+
+}
+
+F77_SUBROUTINE(ary_size)( INTEGER(IARY),
+                          INTEGER8(NPIX),
+                          INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_INTEGER8(NPIX)
+   GENPTR_INTEGER(STATUS)
+   size_t npix;
+
+   arySize( aryI2A(*IARY), &npix, STATUS );
+
+   *NPIX = npix;
+}
+
+F77_SUBROUTINE(ary_ssect)( INTEGER(IARY1),
+                           INTEGER(IARY2),
+                           INTEGER(IARY3),
+                           INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY1)
+   GENPTR_INTEGER(IARY2)
+   GENPTR_INTEGER(IARY3)
+   GENPTR_INTEGER(STATUS)
+   Ary *ary3;
+
+   arySsect( aryI2A(*IARY1), aryI2A(*IARY2), &ary3, STATUS );
+
+   *IARY3 = aryA2I(ary3);
+}
+
+F77_SUBROUTINE(ary_state)( INTEGER(IARY),
+                           LOGICAL(STATE),
+                           INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_LOGICAL(STATE)
+   GENPTR_INTEGER(STATUS)
+   int state;
+
+   aryState( aryI2A(*IARY), &state, STATUS );
+   *STATE = state ? F77_TRUE : F77_FALSE;
+}
+
+F77_SUBROUTINE(ary_stype)( CHARACTER(FTYPE),
+                           INTEGER(IARY),
+                           INTEGER(STATUS)
+                           TRAIL(FTYPE) ) {
+   GENPTR_CHARACTER(FTYPE)
+   GENPTR_INTEGER(IARY)
+   GENPTR_INTEGER(STATUS)
+   char ftype[ ARY__SZFTP + 1 ];
+   cnfImpn( FTYPE, FTYPE_length, ARY__SZFTP, ftype );
+
+   aryStype( ftype, aryI2A(*IARY), STATUS );
+
+}
+
+F77_SUBROUTINE(ary_temp)( INTEGER(IPLACE),
+                          INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IPLACE)
+   GENPTR_INTEGER(STATUS)
+   AryPlace *place;
+
+   aryTemp( &place, STATUS );
+
+   *IPLACE = aryP2I(place);
+}
+
+F77_SUBROUTINE(ary_type)( INTEGER(IARY),
+                          CHARACTER(TYPE),
+                          INTEGER(STATUS)
+                          TRAIL(TYPE) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_CHARACTER(TYPE)
+   GENPTR_INTEGER(STATUS)
+   char type[ARY__SZTYP+1];
+
+   aryType( aryI2A(*IARY), type, STATUS );
+
+   cnfExprt( type, TYPE, TYPE_length );
+}
+
+F77_SUBROUTINE(ary_unmap)( INTEGER(IARY),
+                           INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_INTEGER(STATUS)
+
+   aryUnmap( aryI2A(*IARY), STATUS );
+
+}
+
+F77_SUBROUTINE(ary_verfy)( INTEGER(IARY),
+                           INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_INTEGER(STATUS)
+
+   aryVerfy( aryI2A(*IARY), STATUS );
+
+}
+

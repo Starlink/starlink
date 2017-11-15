@@ -3,7 +3,8 @@
 #include "mers.h"
 #include "dat_par.h"
 
-void aryIsacc( Ary *ary, const char *access, int *isacc, int *status ) {
+void aryIsacc( Ary *ary, const char access[ARY__SZACC+1], int *isacc,
+               int *status ) {
 /*
 *+
 *  Name:
@@ -13,7 +14,8 @@ void aryIsacc( Ary *ary, const char *access, int *isacc, int *status ) {
 *     Determine whether a specified type of array access is available.
 
 *  Synopsis:
-*     void aryIsacc( Ary *ary, const char *access, int *isacc, int *status )
+*     void aryIsacc( Ary *ary, const char access[ARY__SZACC+1], int *isacc,
+*                    int *status )
 
 *  Description:
 *     This function determines whether a specified type of access to an
