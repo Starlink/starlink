@@ -200,9 +200,9 @@ used "int *" in the API instead of "hdsdim *"
 
 
 
-                  datNew1I( dcb->loc, "ORIGIN", ndim, status );
+                  HDSDIM_CODE(datNew1)( dcb->loc, "ORIGIN", ndim, status );
                   datFind( dcb->loc, "ORIGIN", &loct, status );
-                  datPut1I( loct, ndim, lbnd, status );
+                  HDSDIM_CODE(datPut1)( loct, ndim, lbnd, status );
                   datAnnul( &loct, status );
                }
             }
@@ -256,7 +256,7 @@ used "int *" in the API instead of "hdsdim *"
                if( *status == SAI__OK ){
 
 /* If not, then create one with the required number of elements. */
-                  if( !there ) datNew1I( dcb->loc, "ORIGIN", ndim, status );
+                  if( !there ) HDSDIM_CODE(datNew1)( dcb->loc, "ORIGIN", ndim, status );
 
 /* Obtain a locator to the ORIGIN component. */
                   datFind( dcb->loc, "ORIGIN", &loc, status );
@@ -269,7 +269,7 @@ used "int *" in the API instead of "hdsdim *"
                   }
 
 /* Enter the origin values. */
-                  datPut1I( loc, ndim, lbnd, status );
+                  HDSDIM_CODE(datPut1)( loc, ndim, lbnd, status );
 
 /* Annul the origin locator. */
                   datAnnul( &loc, status );
