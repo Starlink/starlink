@@ -11,15 +11,21 @@ typedef union IdUnion {
 } IdUnion;
 
 
-IdUnion work;
+IdUnion work1;
+IdUnion work2;
+IdUnion work3;
 
 #define ARY__NOID 0
-#define aryA2I(ary) (ary?(work.pointer=(ary),work.i):ARY__NOID)
-#define aryI2A(iary) (((iary)!=ARY__NOID)?(work.i=(iary),work.pointer):NULL)
+#define aryI2A(iary) (((iary)!=ARY__NOID)?(work1.i=(iary),work1.pointer):NULL)
+#define aryI2A2(iary) (((iary)!=ARY__NOID)?(work2.i=(iary),work2.pointer):NULL)
+#define aryA2I(ary) (ary?(work3.pointer=(ary),work3.i):ARY__NOID)
+
+IdUnion work4;
+IdUnion work5;
 
 #define ARY__NOPL 0
-#define aryP2I(place) (place?(work.pointer=(place),work.i):ARY__NOPL)
-#define aryI2P(iplace) (((iplace)!=ARY__NOPL)?(work.i=(iplace),work.pointer):NULL)
+#define aryP2I(place) (place?(work4.pointer=(place),work4.i):ARY__NOPL)
+#define aryI2P(iplace) (((iplace)!=ARY__NOPL)?(work5.i=(iplace),work5.pointer):NULL)
 
 
 
@@ -227,7 +233,7 @@ F77_SUBROUTINE(ary_same)( INTEGER(IARY1),
 
    int same, isect;
 
-   arySame( aryI2A(*IARY1), aryI2A(*IARY2), &same, &isect, STATUS );
+   arySame( aryI2A(*IARY1), aryI2A2(*IARY2), &same, &isect, STATUS );
 
    F77_EXPORT_LOGICAL( same, *SAME );
    F77_EXPORT_LOGICAL( isect, *ISECT );
@@ -359,7 +365,7 @@ F77_SUBROUTINE(ary_isacc)( INTEGER(IARY),
    int isacc;
 
    char access[ ARY__SZACC + 1 ];
-   cnfImpn( ACCESS, ACCESS_length, ARY__SZTYP, access );
+   cnfImpn( ACCESS, ACCESS_length, ARY__SZACC, access );
 
    aryIsacc( aryI2A(*IARY), access, &isacc, STATUS );
    *ISACC = isacc ? F77_TRUE : F77_FALSE;
@@ -422,7 +428,7 @@ F77_SUBROUTINE(ary_map)( INTEGER(IARY),
    size_t el;
 
    cnfImpn( TYPE, TYPE_length, ARY__SZTYP, type );
-   cnfImpn( MMOD, MMOD_length, ARY__SZMMD, type );
+   cnfImpn( MMOD, MMOD_length, ARY__SZMMD, mmod );
 
    aryMap( aryI2A(*IARY), type, mmod, &pntr, &el, STATUS );
 
@@ -453,7 +459,7 @@ F77_SUBROUTINE(ary_mapz)( INTEGER(IARY),
    size_t el;
 
    cnfImpn( TYPE, TYPE_length, ARY__SZTYP, type );
-   cnfImpn( MMOD, MMOD_length, ARY__SZMMD, type );
+   cnfImpn( MMOD, MMOD_length, ARY__SZMMD, mmod );
 
    aryMapz( aryI2A(*IARY), type, mmod, &rpntr, &ipntr, &el, STATUS );
 
@@ -548,7 +554,7 @@ F77_SUBROUTINE(ary_noacc)( CHARACTER(ACCESS),
    GENPTR_INTEGER(STATUS)
 
    char access[ ARY__SZACC + 1 ];
-   cnfImpn( ACCESS, ACCESS_length, ARY__SZTYP, access );
+   cnfImpn( ACCESS, ACCESS_length, ARY__SZACC, access );
 
    aryNoacc( access, aryI2A(*IARY), STATUS );
 }
@@ -567,7 +573,7 @@ F77_SUBROUTINE(ary_offs)( INTEGER(IARY1),
    int i, mxoffs;
    hdsdim offs[ ARY__MXDIM ];
 
-   aryOffs( aryI2A(*IARY1), aryI2A(*IARY2), ARY__MXDIM, offs, STATUS );
+   aryOffs( aryI2A(*IARY1), aryI2A2(*IARY2), ARY__MXDIM, offs, STATUS );
 
    mxoffs = ( *MXOFFS < ARY__MXDIM ) ? *MXOFFS : ARY__MXDIM;
    for( i = 0; i < mxoffs; i++ ) OFFS[ i ] = offs[ i ];
@@ -726,7 +732,7 @@ F77_SUBROUTINE(ary_ssect)( INTEGER(IARY1),
    GENPTR_INTEGER(STATUS)
    Ary *ary3;
 
-   arySsect( aryI2A(*IARY1), aryI2A(*IARY2), &ary3, STATUS );
+   arySsect( aryI2A(*IARY1), aryI2A2(*IARY2), &ary3, STATUS );
 
    *IARY3 = aryA2I(ary3);
 }
@@ -791,6 +797,16 @@ F77_SUBROUTINE(ary_unmap)( INTEGER(IARY),
 
 }
 
+F77_SUBROUTINE(ary_valid)( INTEGER(IARY),
+                           LOGICAL(VALID),
+                           INTEGER(STATUS) ) {
+   GENPTR_INTEGER(IARY)
+   GENPTR_LOGICAL(VALID)
+   GENPTR_INTEGER(STATUS)
+
+   *VALID = aryValid( aryI2A(*IARY), STATUS ) ? F77_TRUE : F77_FALSE;
+}
+
 F77_SUBROUTINE(ary_verfy)( INTEGER(IARY),
                            INTEGER(STATUS) ) {
    GENPTR_INTEGER(IARY)
@@ -799,4 +815,55 @@ F77_SUBROUTINE(ary_verfy)( INTEGER(IARY),
    aryVerfy( aryI2A(*IARY), STATUS );
 
 }
+
+
+#define MAKE_GTSZ(CT,FT,FTYPE) \
+F77_SUBROUTINE(ary_gtsz##FT)( INTEGER(IARY), \
+                              FTYPE(SCALE), \
+                              FTYPE(ZERO), \
+                              INTEGER(STATUS) ) { \
+   GENPTR_INTEGER(IARY) \
+   GENPTR_##FTYPE(SCALE) \
+   GENPTR_##FTYPE(ZERO) \
+   GENPTR_INTEGER(STATUS) \
+\
+   aryGtsz##CT( aryI2A(*IARY), SCALE, ZERO, STATUS ); \
+}
+
+MAKE_GTSZ(B, b, BYTE)
+MAKE_GTSZ(D, d, DOUBLE)
+MAKE_GTSZ(F, r, REAL)
+MAKE_GTSZ(I, i, INTEGER)
+MAKE_GTSZ(K, k, INTEGER8)
+MAKE_GTSZ(UB, ub, UBYTE)
+MAKE_GTSZ(UW, uw, UWORD)
+MAKE_GTSZ(W, w, WORD)
+
+#undef MAKE_GTSZ
+
+
+#define MAKE_PTSZ(CT,FT,FTYPE) \
+F77_SUBROUTINE(ary_ptsz##FT)( INTEGER(IARY), \
+                              FTYPE(SCALE), \
+                              FTYPE(ZERO), \
+                              INTEGER(STATUS) ) { \
+   GENPTR_INTEGER(IARY) \
+   GENPTR_##FTYPE(SCALE) \
+   GENPTR_##FTYPE(ZERO) \
+   GENPTR_INTEGER(STATUS) \
+\
+   aryPtsz##CT( aryI2A(*IARY), *SCALE, *ZERO, STATUS ); \
+}
+
+MAKE_PTSZ(B, b, BYTE)
+MAKE_PTSZ(D, d, DOUBLE)
+MAKE_PTSZ(F, r, REAL)
+MAKE_PTSZ(I, i, INTEGER)
+MAKE_PTSZ(K, k, INTEGER8)
+MAKE_PTSZ(UB, ub, UBYTE)
+MAKE_PTSZ(UW, uw, UWORD)
+MAKE_PTSZ(W, w, WORD)
+
+#undef MAKE_PTSZ
+
 
