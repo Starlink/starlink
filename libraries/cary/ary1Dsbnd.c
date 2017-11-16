@@ -183,6 +183,23 @@ void ary1Dsbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, AryDCB *dcb,
 
 /* Create an ORIGIN component in the data object and enter the new origin
    values. */
+
+/*
+This code assumes the ORIGIN component is an _INTEGER. Should it use K
+instead? Why does this code not fail to cpompile since "lbnd" is hdsdim,
+not int? Are we using "hdsdim=32 bit" configuration? Does this error
+occur anywhere else in CARY?
+
+How will someone with an old starlink read an NDF with a "K" origin?
+
+ary1S2dlt is riddled with places that assumes INTEGER rather than K and
+used "int *" in the API instead of "hdsdim *"
+
+*/
+
+
+
+
                   datNew1I( dcb->loc, "ORIGIN", ndim, status );
                   datFind( dcb->loc, "ORIGIN", &loct, status );
                   datPut1I( loct, ndim, lbnd, status );
