@@ -52,8 +52,11 @@
  *        bit int) data types in HDS.
  *        - Add a macro (HDS_DIM_TYPE) that gives the HDS data type to use
  *        for storing HDS dimensions.
- *        - Add a macro (HDSDIM_TYPE) that appends HDS_DIM_TYPE to the 
+ *        - Add a macro (HDSDIM_TYPE) that appends HDS_DIM_TYPE to the
  *        end of a given function name.
+ *     2017-Nov-16 (DSB):
+ *        Change HDS(_)DIM_TYPE to HDS(_)DIM_CODE, and add a new macro
+ *        HDS_DIM_TYPE that holds the full HDS name for the dimension type.
 
  *  Copyright:
  *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
@@ -153,13 +156,15 @@ error unable to find an 8 byte integer type
 #define BIGDIM 0   /* set to 1 if testing 64 bit dims */
 #if BIGDIM
 #define DIM_TYPE INT_BIG
-#define HDS_DIM_TYPE "K"
+#define HDS_DIM_CODE "K"
+#define HDS_DIM_TYPE "_INT64"
 #define SIZEOF_DIM 8
 #define DIM_FORMAT INT_BIG_S
 #define DIM_IS_UNSIGNED 0
 #else
 #define DIM_TYPE STD_INT
-#define HDS_DIM_TYPE "I"
+#define HDS_DIM_CODE "I"
+#define HDS_DIM_TYPE "_INTEGER"
 #define SIZEOF_DIM 4
 #define DIM_FORMAT STD_INT_FMT
 #define DIM_IS_UNSIGNED 0
@@ -323,15 +328,15 @@ int main (int argc, char ** argv ) {
            "/* Public type for specifying HDS dimensions */\n"
            "typedef %s hdsdim;\n"
            "#define HDS_DIM_FORMAT \"%s\"\n"
-           "#define HDS_DIM_TYPE %s\n\n",
-           DIM_TYPE, DIM_FORMAT, HDS_DIM_TYPE );
+           "#define HDS_DIM_CODE %s\n\n",
+           DIM_TYPE, DIM_FORMAT, HDS_DIM_CODE );
 
   fprintf( OutputFile,
-           "/* Helper macros for HDS dimensions. For instance HDSDIM_TYPE(datFred)\n"
+           "/* Helper macros for HDS dimensions. For instance HDSDIM_CODE(datFred)\n"
            "   expands to datFredK or datFredI, as required. */\n"
            "#define HDS_GLUE_HELPER(a,b) a##b\n"
            "#define HDS_GLUE(a,b) HDS_GLUE_HELPER(a,b)\n"
-           "#define HDSDIM_TYPE(a) HDS_GLUE(a,HDS_DIM_TYPE)\n\n");
+           "#define HDSDIM_CODE(a) HDS_GLUE(a,HDS_DIM_CODE)\n\n");
 
   fprintf( POutputFile,
 	   "/* Private types and sizes relating to dimensions */\n"
