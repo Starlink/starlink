@@ -184,6 +184,7 @@ void ary1Dsbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, AryDCB *dcb,
 /* Create an ORIGIN component in the data object and enter the new origin
    values. */
 
+/*
 This code assumes the ORIGIN component is an _INTEGER. Should it use K
 instead? Why does this code not fail to cpompile since "lbnd" is hdsdim,
 not int? Are we using "hdsdim=32 bit" configuration? Does this error
@@ -194,7 +195,7 @@ How will someone with an old starlink read an NDF with a "K" origin?
 ary1S2dlt is riddled with places that assumes INTEGER rather than K and
 used "int *" in the API instead of "hdsdim *"
 
-
+*/
 
 
 
@@ -255,11 +256,7 @@ used "int *" in the API instead of "hdsdim *"
                if( *status == SAI__OK ){
 
 /* If not, then create one with the required number of elements. */
-<<<<<<< HEAD
                   if( !there ) HDSDIM_CODE(datNew1)( dcb->loc, "ORIGIN", ndim, status );
-=======
-                  if( !there ) datNew1I( dcb->loc, "ORIGIN", ndim, status );
->>>>>>> 715c996e48e86c4adfbc3ddca2def88ae7286020
 
 /* Obtain a locator to the ORIGIN component. */
                   datFind( dcb->loc, "ORIGIN", &loc, status );
@@ -272,11 +269,7 @@ used "int *" in the API instead of "hdsdim *"
                   }
 
 /* Enter the origin values. */
-<<<<<<< HEAD
                   HDSDIM_CODE(datPut1)( loc, ndim, lbnd, status );
-=======
-                  datPut1I( loc, ndim, lbnd, status );
->>>>>>> 715c996e48e86c4adfbc3ddca2def88ae7286020
 
 /* Annul the origin locator. */
                   datAnnul( &loc, status );
