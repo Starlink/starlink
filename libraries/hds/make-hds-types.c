@@ -328,8 +328,9 @@ int main (int argc, char ** argv ) {
            "/* Public type for specifying HDS dimensions */\n"
            "typedef %s hdsdim;\n"
            "#define HDS_DIM_FORMAT \"%s\"\n"
+           "#define HDS_DIM_TYPE \"%s\"\n"
            "#define HDS_DIM_CODE %s\n\n",
-           DIM_TYPE, DIM_FORMAT, HDS_DIM_CODE );
+           DIM_TYPE, DIM_FORMAT, HDS_DIM_TYPE, HDS_DIM_CODE );
 
   fprintf( OutputFile,
            "/* Helper macros for HDS dimensions. For instance HDSDIM_CODE(datFred)\n"
