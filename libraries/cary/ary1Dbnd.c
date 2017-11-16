@@ -208,15 +208,16 @@ void ary1Dbnd( AryDCB *dcb, int *status ) {
             datShape( locor, 1, &dimor, &ndimor, status );
             if( *status == SAI__OK ){
 
-/* Report an error if the ORIGIN component is not of type '_INTEGER'. */
-               if( strcmp( type, "_INTEGER" ) ){
+/* Report an error if the ORIGIN component is not of the correct type. */
+               if( strcmp( type, HDS_DIM_TYPE ) ){
                   *status = ARY__TYPIN;
                   datMsg( "ARRAY", dcb->loc );
                   msgSetc( "BADTYPE", type );
+                  msgSetc( "GOODTYPE", HDS_DIM_TYPE );
                   errRep( "ARY1_DBND_OTYP",
                           "The ORIGIN component in the array structure"
                           "^ARRAY has an invalid HDS type of '^BADTYPE';"
-                          "its type should be '_INTEGER'.", status );
+                          "its type should be '^GOODTYPE'.", status );
 
 /* Report an error if it is not 1-dimensional. */
                } else if( ndimor != 1 ){
@@ -243,7 +244,7 @@ void ary1Dbnd( AryDCB *dcb, int *status ) {
                }
 
 /* Obtain the ORIGIN values. */
-               HDSDIM_TYPE(datGet1)( locor, ARY__MXDIM, orig, &nel, status );
+               HDSDIM_CODE(datGet1)( locor, ARY__MXDIM, orig, &nel, status );
             }
 
 /* Annul the locator to the ORIGIN component. */
