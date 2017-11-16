@@ -75,8 +75,8 @@ void ary1Vbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, int *status ) {
       *status = ARY__NDMIN;
       msgSeti( "NDIM", ndim );
       msgSeti( "MXDIM", ARY__MXDIM );
-      errRep( " ", "Number of array dimensions (^NDIM) is invalid; this number"
-              "should lie between 1 and ^MXDIM inclusive (possible"
+      errRep( " ", "Number of array dimensions (^NDIM) is invalid; this number "
+              "should lie between 1 and ^MXDIM inclusive (possible "
               "programming error).", status );
 
 /* Check the lower and upper bounds of each dimension for validity. */
@@ -87,8 +87,8 @@ void ary1Vbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, int *status ) {
             msgSeti( "LBND", lbnd[ i ] );
             msgSeti( "DIM", i+1 );
             msgSeti( "UBND", ubnd[ i ] );
-            errRep( " ", "Lower bound (^LBND) of array dimension ^DIM exceeds"
-                    "the corresponding upper bound (^UBND) (possible"
+            errRep( " ", "Lower bound (^LBND) of array dimension ^DIM exceeds "
+                    "the corresponding upper bound (^UBND) (possible "
                     "programming error).", status );
             break;
          }
