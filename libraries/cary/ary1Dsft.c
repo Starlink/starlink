@@ -113,7 +113,7 @@ void ary1Dsft( int nshift, const hdsdim *shift, AryDCB *dcb, int *status ) {
          if( *status == SAI__OK ){
 
 /* If there is no ORIGIN component, then create one. */
-            if( !there ) datNew1I( dcb->loc, "ORIGIN", dcb->ndim, status );
+            if( !there ) HDSDIM_CODE(datNew1)( dcb->loc, "ORIGIN", dcb->ndim, status );
 
 /* Apply the pixel shifts to both sets of array bounds and to the
    accumulated pixel shifts held in the DCB. */
@@ -127,7 +127,7 @@ void ary1Dsft( int nshift, const hdsdim *shift, AryDCB *dcb, int *status ) {
 /* Write new values to the ORIGIN component reflecting the array's new
    origin position. */
             datFind( dcb->loc, "ORIGIN", &loco, status );
-            datPut1I( loco, dcb->ndim, dcb->lbnd, status );
+            HDSDIM_CODE(datPut1)( loco, dcb->ndim, dcb->lbnd, status );
             datAnnul( &loco, status );
 
 /* Note if the DCB bounds information is correct. */
