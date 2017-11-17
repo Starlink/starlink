@@ -90,6 +90,9 @@
 *  Initialise the global status.
       STATUS = SAI__OK
 
+*  Defer error reporting.
+      CALL ERR_MARK()
+
 *  Initialise HDS and create a new container file.
       CALL HDS_START( STATUS )
       CALL HDS_NEW( 'ary_test', 'ARY_TEST', 'NDF', 0, DIM, LOC, STATUS )
@@ -427,14 +430,26 @@
 *  Close down HDS.
       CALL HDS_STOP( STATUS )
 
+*  Defer error reporting.
+      CALL ERR_MARK()
+
 *  Report a context error.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'ARY_TEST_ERR', 'ARY_TEST: ARY installation '//
      :                 'test failed.', STATUS )
-         CALL EXIT(1)
       END IF
 
+*  Display any deferred error messages.
+      CALL ERR_MARK()
+
+*  Abort with a non-zero status if an error has occurred, so that the
+*  makefile can detect that the test has failed.
+      IF( STATUS .NE. SAI__OK ) CALL EXIT(1)
+
       END
+
+
+
 
       SUBROUTINE SETUP( EL, ARRAY, STATUS )
 *+
