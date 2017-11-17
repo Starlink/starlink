@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include "ary.h"
 #include "ary_err.h"
@@ -18,6 +19,7 @@ int main(){
    HDSLoc *loc = NULL;
    HDSLoc *loc2 = NULL;
    HDSLoc *loc3 = NULL;
+   char buf[1000];
    char form[ARY__SZFRM+1];
    char ftype[ARY__SZFTP+1];
    char name2[DAT__SZNAM+1];
@@ -77,11 +79,11 @@ int main(){
    aryFind( loc, "data_array", &ary, status );
    aryMsg( "A", ary );
 
+   sprintf( buf, "%s/%s", getenv("PWD"), "./test_array.DATA_ARRAY" );
    msgLoad( " ", "^A", text, sizeof(text), &oplen, status );
-   if( *status == SAI__OK && strcmp( text, "/stardev/git/starlink/"
-              "libraries/cary/./test_array.DATA_ARRAY" ) ) {
+   if( *status == SAI__OK && strcmp( text, buf ) ) {
       *status = SAI__ERROR;
-      errRepf( " ", "Error 1a", status );
+      errRepf( " ", "Error 1a (%s)", status, text );
    }
 
    datFind( loc, "data_array", &loc2, status );
