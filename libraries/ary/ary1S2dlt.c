@@ -28,14 +28,12 @@
 /* ----------------- */
 /* Type for the compression and check functions that accepts void * pointers
    for arrays. */
-typedef  void (*delt_fun_type)( void *, int, size_t, void *, void *, void *,
-                                int *, int *, int *, int * );
+typedef  void (*delt_fun_type)( void *, size_t, size_t, void *, void *, hdsdim *,
+                                size_t *, hdsdim *, hdsdim *, int * );
 
-/* Type for the check function that accepts void * pointers for
-   arrays. */
-typedef  void (*check_fun_type)( void *, int, size_t, int *, int *, int *,
-                                 int *, int * );
-
+/* Type for the check function that accepts void * pointers for arrays. */
+typedef  void (*check_fun_type)( void *, size_t, size_t, size_t *, hdsdim *,
+                                 hdsdim *, size_t *, int * );
 
 
 /* Prototypes for private functions defined within this file. */
@@ -50,16 +48,21 @@ typedef  void (*check_fun_type)( void *, int, size_t, int *, int *, int *,
    _BYTE. */
 
 #define MAKE_PROTOA(incode,intype,outcode,outtype) \
-   static void ary1Delt##incode##outcode( intype *pindata, int nel, \
+   static void ary1Delt##incode##outcode( intype *pindata, size_t nel, \
                                           size_t stride, outtype *poutdata, \
-                                          intype *pvalue, int *prepeat, \
-                                          int *ndata, int *nvalue, \
-                                          int *nrepeat, int *status ); \
+                                          intype *pvalue, hdsdim *prepeat, \
+                                          size_t *ndata, hdsdim *nvalue, \
+                                          hdsdim *nrepeat, int *status ); \
 \
-   static void ary1Check##incode##outcode( intype *pindata, int nel, \
-                                           size_t stride, int *ndata, \
-                                           int *nvalue, int *nrepeat, \
-                                           int *max_repeat, int *status );
+   static void ary1Check##incode##outcode( intype *pindata, size_t nel, \
+                                           size_t stride, size_t *ndata, \
+                                           hdsdim *nvalue, hdsdim *nrepeat, \
+                                           size_t *max_repeat, int *status );
+
+
+
+
+
 
 #define MAKE_PROTOB(outcode,outtype) \
    MAKE_PROTOA(I,int,outcode,outtype) \
@@ -181,20 +184,20 @@ void ary1S2dlt( HDSLoc *loc1, int zaxis, const char *type, HDSLoc *loc2,
    hdsdim dims_first[ ARY__MXDIM - 1 ];
    hdsdim dims_indata[ ARY__MXDIM ];
    hdsdim start[ ARY__MXDIM ];
-   int *ptr_firstd = NULL;
-   int *ptr_firstr = NULL;
-   int *ptr_firstv = NULL;
-   int *ptr_repeat = NULL;
-   int idata;
+   hdsdim *ptr_firstd = NULL;
+   hdsdim *ptr_firstr = NULL;
+   hdsdim *ptr_firstv = NULL;
+   hdsdim *ptr_repeat = NULL;
+   hdsdim idata;
    int idim;
-   int irepeat;
+   hdsdim irepeat;
    int isprim;
-   int ivalue;
-   int max_repeat;
-   int ndata;
+   hdsdim ivalue;
+   size_t max_repeat;
+   size_t ndata;
    int ndim;
-   int nrepeat;
-   int nvalue;
+   hdsdim nrepeat;
+   hdsdim nvalue;
    int row_inc;
    int size_temp;
    int there;
@@ -757,10 +760,10 @@ L999:
 *     Delta compress a row of pixel values.
 
 *  Invocation:
-*     void ary1Delt<TIN><TOUT>( <TIN> *pindata, int nel, size_t stride,
+*     void ary1Delt<TIN><TOUT>( <TIN> *pindata, size_t nel, size_t stride,
 *                               <TOUT> *poutdata, <TIN> *pvalue,
-*                               int *prepeat, int *ndata, int *nvalue,
-*                               int *nrepeat, int *status )
+*                               hdsdim *prepeat, size_t *ndata, hdsdim *nvalue,
+*                               hdsdim *nrepeat, int *status )
 
 *  Description:
 *     This family of functions delta compresses a row of input pixel
@@ -772,7 +775,7 @@ L999:
 *  Arguments:
 *     pindata = <TIN> *
 *        Pointer to the first value to be compressed.
-*     nel = int
+*     nel = size_t
 *        The number of values to read from "pindata".
 *     stride = size_t
 *        The stride between adjacent values to be compressed within the
@@ -781,17 +784,17 @@ L999:
 *        Array in which to place the compressed values.
 *     pvalue = <TIN> *
 *        Array in which to store individual uncompressed values.
-*     prepeat = int *
+*     prepeat = hdsdim *
 *        Array in which to store the number of repeats for each value in
 *        "pvalue" that is flagged as REPEAT_GOOD or REPEAT_BAD in the
 *        compressed DATA array.
-*     ndata = int *
+*     ndata = size_t *
 *        Pointer to an int in which to return the number of values stored
 *        in the "poutdata" array.
-*     nvalue = int *
+*     nvalue = hdsdim *
 *        Pointer to an int in which to return the number of values stored
 *        in the "pvalue" array.
-*     nrepeat = int *
+*     nrepeat = hdsdim *
 *        Pointer to an int in which to return the number of values stored
 *        in the "prepeat" array.
 *     status
@@ -815,18 +818,18 @@ L999:
 
 #define MAKE_FUNA(incode,intype,outcode,outtype) \
 \
-static void ary1Delt##incode##outcode( intype *pindata, int nel, \
+static void ary1Delt##incode##outcode( intype *pindata, size_t nel, \
                                        size_t stride, outtype *poutdata, \
-                                       intype *pvalue, int *prepeat, \
-                                       int *ndata, int *nvalue, \
-                                       int *nrepeat, int *status ){ \
+                                       intype *pvalue, hdsdim *prepeat, \
+                                       size_t *ndata, hdsdim *nvalue, \
+                                       hdsdim *nrepeat, int *status ){ \
 \
 /* Local Variables: */ \
-   int *prepeat0; \
-   int iel; \
-   int nbad_repeat; \
-   int ngood_repeat; \
-   int nsingle; \
+   hdsdim *prepeat0; \
+   size_t iel; \
+   hdsdim nbad_repeat; \
+   hdsdim ngood_repeat; \
+   size_t nsingle; \
    intype *pvalue0; \
    intype vdata; \
    intype vnext; \
@@ -1117,8 +1120,6 @@ MAKE_FUNB(B,char)
 
 
 
-
-
 /*
 *  Name:
 *     ary1Check<TIN><TOUT>
@@ -1127,9 +1128,9 @@ MAKE_FUNB(B,char)
 *     Check how much data is needed to describe a row of pixel values.
 
 *  Invocation:
-*     void ary1Check<TIN><TOUT>( <TIN> *pindata, int nel, size_t stride,
-*                                int *ndata, int *nvalue, int *nrepeat,
-*                                int *max_repeat, int *status );
+*     void ary1Check<TIN><TOUT>( <TIN> *pindata, size_t nel, size_t stride,
+*                                size_t *ndata, hdsdim *nvalue, hdsdim *nrepeat,
+*                                size_t *max_repeat, int *status );
 
 *  Description:
 *     This family of functions check how much data is needed to store a
@@ -1139,21 +1140,21 @@ MAKE_FUNB(B,char)
 *  Arguments:
 *     pindata = <TIN> *
 *        Pointer to the first value to be compressed.
-*     nel = int
+*     nel = size_t
 *        The number of values to read from "pindata".
 *     stride = size_t
 *        The stride between adjacent values read from "pindata".
-*     ndata = int *
-*        Pointer to an int in which to return the number of values that
+*     ndata = size_t *
+*        Pointer to a value in which to return the number of values that
 *        must be added to the compressed DATA array to describe the row.
-*     nvalue = int *
-*        Pointer to an int in which to return the number of values that
+*     nvalue = hdsdim *
+*        Pointer to a value in which to return the number of values that
 *        must be added to the VALUES array to describe the row.
-*     nrepeat = int *
-*        Pointer to an int in which to return the number of values that
+*     nrepeat = hdsdim *
+*        Pointer to a value in which to return the number of values that
 *        must be added to the REPEAT array to describe the row.
-*     max_repeat = int *
-*        Pointer to an int in which to return the maximum value to be
+*     max_repeat = size_t *
+*        Pointer to a value in which to return the maximum value to be
 *        stored in the REPEAT array. The supplied value is left unchanged
 *        if the row does not require a larger REPEAT value.
 *     status
@@ -1177,16 +1178,16 @@ MAKE_FUNB(B,char)
 
 #define MAKE_FUNA(incode,intype,outcode,outtype) \
 \
-static void ary1Check##incode##outcode( intype *pindata, int nel, \
-                                        size_t stride, int *ndata, \
-                                        int *nvalue, int *nrepeat, \
-                                        int *max_repeat, int *status ){ \
+static void ary1Check##incode##outcode( intype *pindata, size_t nel, \
+                                        size_t stride, size_t *ndata, \
+                                        hdsdim *nvalue, hdsdim *nrepeat, \
+                                        size_t *max_repeat, int *status ){ \
 \
 /* Local Variables: */ \
-   int iel; \
-   int nbad_repeat; \
-   int ngood_repeat; \
-   int nsingle; \
+   size_t iel; \
+   size_t nbad_repeat; \
+   size_t ngood_repeat; \
+   size_t nsingle; \
    intype vdata; \
    intype vnext; \
    intype vprev2 = 0; \
