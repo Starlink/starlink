@@ -74,9 +74,10 @@
 *  Description:
 *     This is temporary stub for a new HDS-V5 function that returns a value
 *     that indicates if the object specified by the supplied locator has
-*     been locked for use by one or more threads. It simply returns -1
-*     (without error), indicating that the object locking is not
-*     supported by this version of HDS.
+*     been locked for use by one or more threads. It always returns a value
+*     indicating that the supplied object is locked by the current
+*     thread, since there is no way for an object  to be locked by a
+*     different thread in hds-v4.
 
 *  Authors:
 *     DSB: David S Berry (EAO)
@@ -90,6 +91,8 @@
 *        error.
 *     21-NOV-2017 (DSB):
 *        Added "recursive" argument.
+*     11-OCT-2017 (DSB):
+*        Changed to return +1 without error.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -140,19 +143,6 @@
 #include "hds_types.h"
 
 int datLocked( const HDSLoc *locator, int recursive, int *status ) {
-
-/* Local Variables; */
-   int result = 0;
-
-/* Check inherited status. */
-   if (*status != SAI__OK) return result;
-
-/* Report an error to indicate this function is not available yet. */
-   *status = DAT__FATAL;
-   emsRep( " ", "datLocked: The datLocked function has not yet been "
-           "implemented (programming error).", status );
-
-/* Return the result. */
-   return result;
+   return 1;
 }
 
