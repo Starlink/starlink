@@ -1188,13 +1188,13 @@ datLock( HDSLoc *locator, int recurs, int readonly, int *status) {
 /*=======================================================================*/
 
 int
-datLocked( const HDSLoc *locator, int *status) {
+datLocked( const HDSLoc *locator, int recurs, int *status) {
   int retval = 0;
   int instat = *status;
   int isv5 = ISHDSv5(locator);
   EnterCheck("datLocked",*status);
   if (isv5) {
-    retval = datLocked_v5(locator, status);
+    retval = datLocked_v5(locator, recurs, status);
   } else {
     retval = -1;  /* Indicates that HDS V4 does not support object locking */
   }
