@@ -85,7 +85,7 @@ void ary1Dimp( HDSLoc *loc, AryDCB **dcb, int *status ) {
    can be imported. We will not be attempting to modify the object in
    this function, and so either a read-write or read-only lock will do.
    So report an error if the object is not locked by the current thread. */
-   lock_status = datLocked( loc, status );
+   lock_status = datLocked( loc, 0, status );
    if( lock_status != 1 && lock_status != 3 && lock_status != -1 && *status == SAI__OK ) {
       *status = ARY__THREAD;
       datMsg( "O", loc );
