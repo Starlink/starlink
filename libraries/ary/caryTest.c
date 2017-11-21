@@ -65,24 +65,15 @@ int main(){
 
 /* Test accessing an existing array.
    ================================ */
-
    hdsOpen( "./test_array", "Read", &loc, status );
-   if( *status == SAI__OK ) {
-      ival = datLocked( loc, 0, status );
-      if( *status == DAT__FATAL ) {
-          can_lock = 0;   /* HDS V4 - cannot lock objects */
-          errAnnul( status );
-      } else {
-          can_lock = 1;   /* HDS V5 - can lock objects */
-      }
-   }
 
-   if( ival == -1 ) {
-      can_lock = 0;   /* HDS V4 - cannot lock objects */
-   } else if( can_lock && ival != 3 && *status == SAI__OK ){
+/* This test should only be done when linked with HDS V5
+   ival = datLocked( loc, 0, status );
+   if( ival != 3 && *status == SAI__OK ){
       *status = SAI__ERROR;
       errRepf( " ", "Error 1 (%d != 3 )", status, ival );
    }
+*/
 
    aryFind( loc, "data_array", &ary, status );
    aryMsg( "A", ary );
