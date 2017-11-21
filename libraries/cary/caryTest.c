@@ -4,6 +4,7 @@
 #include "ary_err.h"
 #include "mers.h"
 #include "star/hds.h"
+#include "dat_err.h"
 #include "prm_par.h"
 #include "sae_par.h"
 #include <string.h>
@@ -66,14 +67,21 @@ int main(){
    ================================ */
 
    hdsOpen( "./test_array", "Read", &loc, status );
-   ival = datLocked( loc, status );
+   if( *status == SAI__OK ) {
+      ival = datLocked( loc, 0, status );
+      if( *status == DAT__FATAL ) {
+          can_lock = 0;   /* HDS V4 - cannot lock objects */
+          errAnnul( status );
+      } else {
+          can_lock = 1;   /* HDS V5 - can lock objects */
+      }
+   }
+
    if( ival == -1 ) {
       can_lock = 0;   /* HDS V4 - cannot lock objects */
-   } else if( ival != 3 && *status == SAI__OK ){
+   } else if( can_lock && ival != 3 && *status == SAI__OK ){
       *status = SAI__ERROR;
       errRepf( " ", "Error 1 (%d != 3 )", status, ival );
-   } else {
-      can_lock = 1;
    }
 
    aryFind( loc, "data_array", &ary, status );

@@ -128,9 +128,14 @@ int ary1DCBLock( AryDCB *dcb, int oper, int rdonly, int *status ){
 
 /* If required, inquire about any current locks on the HDS object. */
    } else if( oper == 1 ) {
-      result = datLocked( dcb->loc, status );
+      result = datLocked( dcb->loc, 0, status );
 
-/* If required, request a lock on the HDS object. */
+/* If required, request a lock on the HDS object. Should these locks be
+   recursive? Making them recursive (i.e. putting a separate lock on each
+   individual hds object within the file) could take a long time. But on
+   the other hand, there is nothing to stop another thread getting a lock
+   on a sub-component, which would cause problems if this thread ever
+   attempted to access that same sub-component. Time will tell... */
    } else if( oper == 2 ) {
       result = datLock( dcb->loc, 0, rdonly, status );
 

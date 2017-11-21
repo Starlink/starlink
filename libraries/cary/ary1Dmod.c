@@ -99,7 +99,7 @@ void ary1Dmod( AryDCB *dcb, int *status ) {
 
 /* If the locator is locked for read-only access, indicate that the array
    has READ access. */
-         if( datLocked( dcb->dloc, status ) == 3 ) {
+         if( datLocked( dcb->dloc, 0, status ) == 3 ) {
             strcpy( dcb->mode, "READ" );
 
 /* Even if the locator is locked for read-write, we may still only have
