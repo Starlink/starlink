@@ -7,12 +7,13 @@
   <path>docs/sc/022</path>
   <description>The POL-2 Data Reduction Cookbook</description>
   <abstract><p>
-     This cookbook provides an introduction to Starlink facilities,
-     SMURF, the Sub-Millimetre User Reduction Facility, and in
-     particular POL2MAP -- the command for reducing POL-2 data. This
-     cookbook illustrates the various steps required to reduce the
-     data, including an overview of the method. It also describes how
-     to calibrate and display the data as images or vector maps.
+     This cookbook provides an introduction to POL-2 data reduction,
+     using the Starlink facilities SMURF (the Sub-Millimetre
+     User Reduction Facility), and in particular its command
+     POL2MAP. This cookbook illustrates the various steps required
+     to reduce the data, including an overview of the method. It
+     also describes how to calibrate and display the data as images
+     or vector maps.
   </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
