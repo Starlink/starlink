@@ -29,7 +29,7 @@
 *     factor and any zero-level offset between the NDFs (the offset may
 *     optionally be fixed at zero - see parameter ZEROFF).  To reduce
 *     computation time, the data points are binned according to the
-*     data value in the first NDF.  The mean data value within each bin
+*     data value in the second NDF.  The mean data value within each bin
 *     is used to find the fit and weights are applied according to the
 *     number of pixels which contribute to each bin.
 *
