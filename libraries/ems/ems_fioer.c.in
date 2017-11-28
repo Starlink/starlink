@@ -352,8 +352,8 @@ static void initMessageInfo( void )
                 "Corrupt unformatted sequential file", /* ERROR_BAD_US */
                 "Bad value during read",           /* ERROR_READ_VALUE */
                 "Numeric overflow on read",        /* ERROR_READ_OVERFLOW */
-                "Internal error in run-time library" /* ERROR_INTERNAL */
-                "Internal unit I/O error"          /* ERROR_INTERNAL_UNIT */
+                "Internal error in run-time library",/* ERROR_INTERNAL */
+                "Internal unit I/O error",         /* ERROR_INTERNAL_UNIT */
                 "Error in allocation",             /* ERROR_ALLOCATION */
                 "Write exceeds length of DIRECT access record", /* ERROR_DIRECT_EOR */
                 "I/O past end of record on unformatted file", /* ERROR_SHORT_RECORD */
