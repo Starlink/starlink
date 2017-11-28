@@ -115,6 +115,7 @@
 
 
 *  External References:
+      INTEGER CHR_LEN
 
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'
@@ -179,7 +180,8 @@
 *      If to be stored in a data structure, get its locator
 *
          IF ( .NOT. INTERNAL ) THEN
-            CALL SUBPAR_ASSOC ( NAMECODE, 'WRITE', LOC, STATUS )
+            CALL SUBPAR_ASS0C ( NAMECODE, 'WRITE', CHR_LEN(CVALUE), LOC,
+     :                          STATUS )
          ENDIF
 
          IF (STATUS .EQ. SAI__OK) THEN

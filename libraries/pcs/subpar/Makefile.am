@@ -30,6 +30,7 @@ NONGEN_F_ROUTINES = sup_accpt.f \
              sup_activ.f \
              sup_actname.f \
              sup_array.f \
+             sup_ass0c.f \
              sup_assoc.f \
              sup_bascopy.f \
              sup_cancl.f \
