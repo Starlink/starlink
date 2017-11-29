@@ -110,7 +110,7 @@ AryObject *ary1Impid( const void *id, int checklock, int readonly,
 
 /* If required, check that the array is locked appropriately by the
    current thread. */
-   } else if( result->type != ARY__ACBTYPE && checklock &&
+   } else if( result->type == ARY__ACBTYPE && checklock &&
               ((AryACB *)result)->dcb ){
       lock_status = ary1DCBLock( ((AryACB *)result)->dcb, 1, 0, status );
       if( readonly ){

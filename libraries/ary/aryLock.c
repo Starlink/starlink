@@ -131,7 +131,7 @@ void aryLock( Ary *ary, int readonly, int *status ) {
 
 /* If an error occurred, then report context information and call the
    error tracing routine. */
-   if( status != SAI__OK ) {
+   if( *status != SAI__OK ) {
       msgSetc( "U", readonly ? "read-only" : "read-write" );
       errRep( "ARY_LOCK_ERR", "aryLock: Error locking an array for ^U "
               "access by the current thread.", status );

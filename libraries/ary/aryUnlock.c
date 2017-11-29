@@ -96,7 +96,7 @@ void aryUnlock( Ary *ary, int *status ) {
 
 /* If an error occurred, then report context information and call the
    error tracing routine. */
-   if( status != SAI__OK ) {
+   if( *status != SAI__OK ) {
       errRep( "ARY_UNLOCK_ERR", "aryUnlock: Error unlocking an array.",
               status );
       ary1Trace( "ary1Unlock", status );

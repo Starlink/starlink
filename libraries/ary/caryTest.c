@@ -1,3 +1,4 @@
+#include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "ary.h"
@@ -8,6 +9,13 @@
 #include "prm_par.h"
 #include "sae_par.h"
 #include <string.h>
+
+typedef struct threadData {
+   Ary *ary;
+   int test;
+} threadData;
+
+void *threadLocking( void *data );
 
 int main(){
    int status_value = 0;
@@ -45,10 +53,10 @@ int main(){
    int axis;
    int bad;
    int base;
-   int can_lock;
    int defined;
    int isect;
    int ival;
+   int hdsversion;
    int mapped;
    int ndim;
    int ok;
@@ -60,6 +68,10 @@ int main(){
    size_t el;
    size_t i;
    size_t ngood;
+   pthread_t t1, t2;
+   threadData threaddata1;
+   threadData threaddata2;
+
 
    errMark();
 
@@ -67,13 +79,17 @@ int main(){
    ================================ */
    hdsOpen( "./test_array", "Read", &loc, status );
 
-/* This test should only be done when linked with HDS V5
-   ival = datLocked( loc, 0, status );
-   if( ival != 3 && *status == SAI__OK ){
-      *status = SAI__ERROR;
-      errRepf( " ", "Error 1 (%d != 3 )", status, ival );
+/* See if the array is V4 or V5. */
+   hdsInfoI( loc, "VERSION", " ", &hdsversion, status );
+
+/* If V5, check that the object is lcoked by the current thread. */
+   if( hdsversion >= 5 ) {
+      ival = datLocked( loc, 0, status );
+      if( ival != 3 && *status == SAI__OK ){
+         *status = SAI__ERROR;
+         errRepf( " ", "Error 1 (%d != 3 )", status, ival );
+      }
    }
-*/
 
    aryFind( loc, "data_array", &ary, status );
    aryMsg( "A", ary );
@@ -498,6 +514,74 @@ int main(){
       for( i = 0; i < el; i++,dpntr++ ) *dpntr = 1.0;
    }
 
+/* If "cary_test.sdf" was created by HDS V5, which is thread-safe, we
+   test locking of ARY objects.
+   ------------------------------------------------------------------ */
+   hdsInfoI( loc2, "VERSION", " ", &hdsversion, status );
+   if( hdsversion == 5 && *status == SAI__OK ) {
+      msgOut(" ", "Using HDS-V5, so testing array locking", status );
+
+/* Check the array is locked for read/write by the current thread. */
+      ival = aryLocked( ary, status );
+      if( ival != 1 && *status == SAI__OK ){
+         *status = SAI__ERROR;
+         errRepf( " ", "Lock error 1 (%d != 1 )", status, ival );
+      }
+
+/* Attempt to use it in a thread. This should cause an error because the
+   current thread still has it locked (the thread does not attempt to
+   lock it). */
+      errMark();
+
+      threaddata1.ary = ary;
+      threaddata1.test = 1;
+      pthread_create( &t1, NULL, threadLocking, &threaddata1 );
+      pthread_join( t1, NULL );
+      errStat( status );
+      if( *status == ARY__THREAD ) {
+         errAnnul( status );
+      } else if( *status != SAI__OK ) {
+         errFlush( status );
+         *status = SAI__ERROR;
+         errRep( " ", "Lock error 2 (unexpected error).", status );
+      } else {
+         *status = SAI__ERROR;
+         errRep( " ", "Lock error 3 (no error).", status );
+      }
+
+/* Attempt to use it in a thread. This should cause an error because the
+   current thread still has it locked (the thread does attempt to lock
+   it). */
+      threaddata1.test = 2;
+      pthread_create( &t1, NULL, threadLocking, &threaddata1 );
+      pthread_join( t1, NULL );
+      errStat( status );
+      if( *status == DAT__THREAD ) {
+         errAnnul( status );
+      } else if( *status != SAI__OK ) {
+         errFlush( status );
+         *status = SAI__ERROR;
+         errRep( " ", "Lock error 2 (unexpected error).", status );
+      } else {
+         *status = SAI__ERROR;
+         errRep( " ", "Lock error 3 (no error).", status );
+      }
+
+/* Unlock it and then attempt to use it again in a thread. This should
+   not cause an error because the current thread has unlocked it. */
+
+
+
+
+
+
+
+      errRlse();
+
+   } else {
+      msgOut(" ", "Using HDS-V4, so not testing array locking", status );
+   }
+
    aryAnnul( &ary, status );
    datAnnul( &loc2, status );
 
@@ -807,10 +891,6 @@ int main(){
        ( ubnd[ 2 ] != 20 ) ) {
       if( *status == SAI__OK ) {
          *status = SAI__ERROR;
-
-         printf("%d %d %d %d %d %d\n", lbnd[0], lbnd[1], lbnd[2],
-                                       ubnd[0], ubnd[1], ubnd[2] );
-
          errRep( " ", "Error 26", status );
       }
    }
@@ -844,3 +924,28 @@ int main(){
 
    return *status;
 }
+
+
+
+
+
+void *threadLocking( void *data ) {
+   threadData *tdata = (threadData *) data;
+   Ary *ary = tdata->ary;
+   hdsdim dim[7];
+   int ndim;
+   int status = SAI__OK;
+
+   if( tdata->test == 1 ) {
+      aryDim( ary, 7, dim, &ndim, &status );
+
+   } else if( tdata->test == 2 ) {
+      aryLock( ary, 1, &status );
+      aryDim( ary, 7, dim, &ndim, &status );
+
+
+   }
+   return NULL;
+}
+
+
