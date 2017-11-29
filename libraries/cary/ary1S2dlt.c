@@ -201,7 +201,7 @@ void ary1S2dlt( HDSLoc *loc1, int zaxis, const char *type, HDSLoc *loc2,
    int row_inc;
    int size_temp;
    int there;
-   int zdim;
+   hdsdim zdim;
    size_t bsize;
    size_t div_indata[ ARY__MXDIM ];
    size_t irow;
@@ -282,7 +282,7 @@ void ary1S2dlt( HDSLoc *loc1, int zaxis, const char *type, HDSLoc *loc2,
    zaxis--;
 
 /* Report an error if the compression axis spans only a single pixel. */
-   zdim =  (int) dims_indata[ zaxis ];
+   zdim = dims_indata[ zaxis ];
    if( zdim == 1 && *status == SAI__OK ) {
       *status = ARY__DIMIN;
       msgSeti( "I", zaxis + 1 );
@@ -372,9 +372,9 @@ void ary1S2dlt( HDSLoc *loc1, int zaxis, const char *type, HDSLoc *loc2,
       datPut0I( loc_temp, zaxis + 1, status );
       datAnnul( &loc_temp, status );
 
-      datNew0I( loc2, "ZDIM", status );
+      HDSDIM_CODE(datNew0)( loc2, "ZDIM", status );
       datFind( loc2, "ZDIM", &loc_temp, status );
-      datPut0I( loc_temp, zdim, status );
+      HDSDIM_CODE(datPut0)( loc_temp, zdim, status );
       datAnnul( &loc_temp, status );
    }
 
@@ -575,9 +575,9 @@ void ary1S2dlt( HDSLoc *loc1, int zaxis, const char *type, HDSLoc *loc2,
    bsize = idata*size_outtype;
 
    if( loc2 ) {
-      datNew( loc2, "FIRST_DATA", "_INTEGER", ndim - 1, dims_first, status );
+      datNew( loc2, "FIRST_DATA", HDS_DIM_TYPE, ndim - 1, dims_first, status );
       datFind( loc2, "FIRST_DATA", &loc_firstd, status );
-      datMapV( loc_firstd, "_INTEGER", "WRITE", (void **) &ptr_firstd,
+      datMapV( loc_firstd, HDS_DIM_TYPE, "WRITE", (void **) &ptr_firstd,
                &nel_firstd, status );
    }
    bsize += ntest_row*VAL__NBI;
@@ -604,7 +604,7 @@ void ary1S2dlt( HDSLoc *loc1, int zaxis, const char *type, HDSLoc *loc2,
    if( loc2 ) {
       datNew( loc2, "FIRST_VALUE", type_temp, ndim - 1, dims_first, status );
       datFind( loc2, "FIRST_VALUE", &loc_firstv, status );
-      datMapV( loc_firstv, "_INTEGER", "WRITE", (void **) &ptr_firstv,
+      datMapV( loc_firstv, HDS_DIM_TYPE, "WRITE", (void **) &ptr_firstv,
                &nel_firstv, status );
    }
    bsize += ntest_row*size_temp;
@@ -625,7 +625,7 @@ void ary1S2dlt( HDSLoc *loc1, int zaxis, const char *type, HDSLoc *loc2,
       if( loc2 ) {
          datNew( loc2, "REPEAT", type_temp, 1, &irepeat, status );
          datFind( loc2, "REPEAT", &loc_repeat, status );
-         datMapV( loc_repeat, "_INTEGER", "WRITE", (void **) &ptr_repeat,
+         datMapV( loc_repeat, HDS_DIM_TYPE, "WRITE", (void **) &ptr_repeat,
                   &nel_repeat, status );
       }
       bsize += irepeat*size_temp;
