@@ -57,6 +57,7 @@ int main(){
    int isect;
    int ival;
    int hdsversion;
+   int locked;
    int mapped;
    int ndim;
    int ok;
@@ -570,6 +571,11 @@ int main(){
 /* Unlock it and then attempt to use it again in a thread. This should
    still cause an error because the thread does not lock it. */
       aryUnlock( ary, status );
+      locked = aryLocked( ary, status );
+      if( locked != 0 && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRepf( " ", "Lock error 5b (%d != 0).", status, locked );
+      }
 
       threaddata1.test = 3;
       pthread_create( &t1, NULL, threadLocking, &threaddata1 );
@@ -586,12 +592,20 @@ int main(){
          errRep( " ", "Lock error 7 (no error).", status );
       }
 
+/* Try again, but this time the thread locks the ary before using it and
+   unlocks it afterwards. This should succeed. */
+      threaddata1.test = 4;
+      pthread_create( &t1, NULL, threadLocking, &threaddata1 );
+      pthread_join( t1, NULL );
+      errStat( status );
+      if( *status != SAI__OK ) {
+         errFlush( status );
+         *status = SAI__ERROR;
+         errRep( " ", "Lock error 8 (unexpected error).", status );
+      }
 
-
-
-
-
-
+/* Lock the array so that it can be annulled in the current thread. */
+      aryLock( ary, 0, status );
       errRlse();
 
    } else {
@@ -961,6 +975,11 @@ void *threadLocking( void *data ) {
 
    } else if( tdata->test == 3 ) {
       aryDim( ary, 7, dim, &ndim, &status );
+
+   } else if( tdata->test == 4 ) {
+      aryLock( ary, 1, &status );
+      aryDim( ary, 7, dim, &ndim, &status );
+      aryUnlock( ary, &status );
 
 
    }
