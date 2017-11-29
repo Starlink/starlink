@@ -237,6 +237,9 @@
 *        Added Parameter PATTERN.
 *     28-JUN-2013 (DSB):
 *        Added Parameter EXISTS.
+*     29-NOV-2017 (DSB):
+*        Ensure output NDF paths displayed on the screen are not split
+*        up into multiple lines.
 *     {enter_further_changes_here}
 
 *-
@@ -390,6 +393,9 @@
 *  See if only existing and accessible NDFs are to be displayed.
          CALL PAR_GET0L( 'EXISTS', EXISTS, STATUS )
 
+*  Avoid line breaks in the screen output created by MSG_OUT.
+         CALL MSG_TUNE( 'SZOUT', 0, STATUS )
+
 *  Loop round testing the required NDFs.
          NMATCH = 0
          DO I = FIRST, LAST
@@ -447,6 +453,9 @@
                NMATCH = NMATCH + 1
             END IF
          END DO
+
+*  Restore the default line breaking in the screen output created by MSG_OUT.
+         CALL MSG_TUNE( 'SZOUT', 79, STATUS )
 
 *  Create the log file.
          CALL GRP_LIST( 'LOGFILE', 0, 0, ' ', IGRP2, STATUS )
