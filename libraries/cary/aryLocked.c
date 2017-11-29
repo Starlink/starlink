@@ -125,7 +125,7 @@ int aryLocked( const Ary *ary, int *status ) {
 
 /* If an error occurred, then report context information and call the
    error tracing routine. */
-   if( status != SAI__OK ) {
+   if( *status != SAI__OK ) {
       errRep( "ARY_LOCKED_ERR", "aryLocked: Error querying the current "
               "locks on an array.", status );
       ary1Trace( "ary1Locked", status );
