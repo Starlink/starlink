@@ -83,7 +83,7 @@ void aryAnnul( Ary **ary, int *status ) {
 
 /* Import the array pointer. */
    *status = SAI__OK;
-   acb = (AryACB *) ary1Impid( *ary, 0, 0, 1, status );
+   acb = (AryACB *) ary1Impid( *ary, 1, 1, 1, status );
 
 /* Annul the associated ACB entry and reset the array pointer value. */
    if( *status == SAI__OK ){
