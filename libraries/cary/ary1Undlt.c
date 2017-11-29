@@ -489,6 +489,8 @@ void ary1Undlt( HDSLoc *loc1, int ndim_in, const hdsdim *lbnd,
       datFind( loc1, "REPEAT", &loc_repeat, status );
       datMapV( loc_repeat, "_INTEGER", "READ", (void **) &ptr_repeat,
                &nel_repeat, status );
+   } else {
+      nel_repeat = 0;
    }
 
 /* Get the index of the compressed axis, and convert to a zero-based

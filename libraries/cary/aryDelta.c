@@ -135,12 +135,11 @@ void aryDelta( Ary *ary1, int zaxis, const char *type, float minrat,
 *     02110-1301, USA
 
 *  Authors:
-*     RFWS: R.F. Warren-Smith (STARLINK)
 *     DSB: David S. Berry (EAO)
 
 *  History:
 *     03-JUL-2017 (DSB):
-*        Original version, based on equivalent Fortran routine by RFWS.
+*        Original version, based on equivalent Fortran routine.
 
 *-
 */
@@ -229,7 +228,7 @@ void aryDelta( Ary *ary1, int zaxis, const char *type, float minrat,
       goto L999;
    }
 
-/* Set a flag indicating if the suppleid type string is blank. */
+/* Set a flag indicating if the supplied type string is blank. */
    p = type - 1;
    while( *(++p) && isspace(*p) );
    blank_type = (*p == 0);
