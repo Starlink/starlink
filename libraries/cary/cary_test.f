@@ -93,8 +93,7 @@
 *  Defer error reporting.
       CALL ERR_MARK()
 
-*  Initialise HDS and create a new container file.
-      CALL HDS_START( STATUS )
+*  Create a new container file.
       CALL HDS_NEW( 'ary_test', 'ARY_TEST', 'NDF', 0, DIM, LOC, STATUS )
 
 *  Create an array inside it.
@@ -426,13 +425,6 @@
       CALL ARY_ANNUL( IARY, STATUS )
       CALL HDS_ERASE( LOC, STATUS )
 
-
-*  Close down HDS.
-      CALL HDS_STOP( STATUS )
-
-*  Defer error reporting.
-      CALL ERR_MARK()
-
 *  Report a context error.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'ARY_TEST_ERR', 'ARY_TEST: ARY installation '//
@@ -440,7 +432,7 @@
       END IF
 
 *  Display any deferred error messages.
-      CALL ERR_MARK()
+      CALL ERR_RLSE()
 
 *  Abort with a non-zero status if an error has occurred, so that the
 *  makefile can detect that the test has failed.
