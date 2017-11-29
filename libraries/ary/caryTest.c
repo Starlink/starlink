@@ -561,14 +561,30 @@ int main(){
       } else if( *status != SAI__OK ) {
          errFlush( status );
          *status = SAI__ERROR;
-         errRep( " ", "Lock error 2 (unexpected error).", status );
+         errRep( " ", "Lock error 4 (unexpected error).", status );
       } else {
          *status = SAI__ERROR;
-         errRep( " ", "Lock error 3 (no error).", status );
+         errRep( " ", "Lock error 5 (no error).", status );
       }
 
 /* Unlock it and then attempt to use it again in a thread. This should
-   not cause an error because the current thread has unlocked it. */
+   still cause an error because the thread does not lock it. */
+      aryUnlock( ary, status );
+
+      threaddata1.test = 3;
+      pthread_create( &t1, NULL, threadLocking, &threaddata1 );
+      pthread_join( t1, NULL );
+      errStat( status );
+      if( *status == ARY__THREAD ) {
+         errAnnul( status );
+      } else if( *status != SAI__OK ) {
+         errFlush( status );
+         *status = SAI__ERROR;
+         errRep( " ", "Lock error 6 (unexpected error).", status );
+      } else {
+         *status = SAI__ERROR;
+         errRep( " ", "Lock error 7 (no error).", status );
+      }
 
 
 
@@ -941,6 +957,9 @@ void *threadLocking( void *data ) {
 
    } else if( tdata->test == 2 ) {
       aryLock( ary, 1, &status );
+      aryDim( ary, 7, dim, &ndim, &status );
+
+   } else if( tdata->test == 3 ) {
       aryDim( ary, 7, dim, &ndim, &status );
 
 
