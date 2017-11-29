@@ -48,13 +48,12 @@ int ary1DCBLock( AryDCB *dcb, int oper, int rdonly, int *status ){
 *               current thread does not have a read lock on the DCB);
 *
 *        2 - Lock the DCB for read-write or read-only use by the current
-*            thread. Returns 0 if the requested lock conflicts with an
-*            existing lock (in which case the request to lock the supplied
-*            DCB is ignored) and +1 otherwise.
+*            thread. Reports an error if the requested lock conflicts with an
+*            existing lock. A value of +1 is always returned.
 *
 *        3 - Unlock the DCB. If the current thread has a lock - either
 *            read-write or read-only - on the DCB, it is removed.
-*            Otherwise the DCB is left unchanged. A value of +1 is always
+*            Otherwise an error is reported. A value of +1 is always
 *            returned.
 *
 *     rdonly = int (Given)
@@ -115,7 +114,7 @@ int ary1DCBLock( AryDCB *dcb, int oper, int rdonly, int *status ){
 */
 
 /* Local Variables; */
-   int result = 0;
+   int result = 1;
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return result;
@@ -137,11 +136,11 @@ int ary1DCBLock( AryDCB *dcb, int oper, int rdonly, int *status ){
    on a sub-component, which would cause problems if this thread ever
    attempted to access that same sub-component. Time will tell... */
    } else if( oper == 2 ) {
-      result = datLock( dcb->loc, 0, rdonly, status );
+      datLock( dcb->loc, 0, rdonly, status );
 
 /* If required, remove a lock on the HDS object. */
    } else if( oper == 3 ) {
-      result = datUnlock( dcb->loc, 0, status );
+      datUnlock( dcb->loc, 0, status );
 
 /* Report an error for any other "oper" value. */
    } else if( *status == SAI__OK ) {

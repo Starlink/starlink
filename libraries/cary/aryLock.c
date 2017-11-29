@@ -117,16 +117,10 @@ void aryLock( Ary *ary, int readonly, int *status ) {
 /* Check we can de-reference "acb" safely. */
    if( *status == SAI__OK ) {
 
-/* Attempt to lock the specified array. If the array could not be locked
-   because it was already locked by another thread, report an error. */
-      if( !ary1DCBLock( acb->dcb, 2, readonly, status ) ) {
-         if( *status == SAI__OK ) {
-            *status = ARY__THREAD;
-            datMsg( "O", acb->dcb->loc );
-            errRep( " ", "Array '^O' is already locked by another thread.",
-                    status );
-         }
-      }
+/* Attempt to lock the specified array. An error will be reported if the
+   array could not be locked because it was already locked by another
+   thread. */
+      ary1DCBLock( acb->dcb, 2, readonly, status );
    }
 
 /* If an error occurred, then report context information and call the
