@@ -101,7 +101,7 @@ void ary1S2dlt( HDSLoc *loc1, int zaxis, const char *type, HDSLoc *loc2,
 *     a corresponding delta compressed array, stored within a supplied output
 *     structure.
 *
-*     See the inverse function, ary1Dlt2s.c, for a description of the
+*     See the inverse function, ary1Undlt.c, for a description of the
 *     structure of a delta compressed array.
 
 *  Parameters:
