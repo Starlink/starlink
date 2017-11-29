@@ -498,7 +498,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      INTEGER EL
+      INTEGER*8 EL
 
 *  Arguments Returned:
       REAL ARRAY( * )
@@ -507,7 +507,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER I                  ! Loop counter
+      INTEGER*8 I                ! Loop counter
 
 *.
 
@@ -569,7 +569,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      INTEGER EL
+      INTEGER*8 EL
       INTEGER ARRAY( * )
 
 *  Arguments Returned:
@@ -579,7 +579,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER I                  ! Loop counter
+      INTEGER*8 I                ! Loop counter
 
 *.
 
@@ -603,7 +603,8 @@
       SUBROUTINE FILL( EL, ARRAY, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INTEGER I, EL, STATUS
+      INTEGER*8 I, EL
+      INTEGER STATUS
       INTEGER ARRAY( EL )
 
       IF( STATUS .NE. SAI__OK ) RETURN
@@ -620,7 +621,8 @@
       SUBROUTINE BACKR( EL, ARRAY, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INTEGER I, EL, STATUS
+      INTEGER*8 I, EL
+      INTEGER STATUS
       REAL ARRAY( EL ), VAL
 
       IF( STATUS .NE. SAI__OK ) RETURN
@@ -647,17 +649,14 @@
       SUBROUTINE UNCOMPR( EL, ARRAY, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INTEGER I, EL, STATUS
+      INTEGER STATUS
+      INTEGER*8 I, EL
       REAL ARRAY( EL )
 
       IF( STATUS .NE. SAI__OK ) RETURN
 
       DO I = 1, 10
          IF( ABS( ARRAY( I ) - REAL( I ) ) .GT. 1.0E-6 ) THEN
-      write(*,*) ARRAY( I )
-      write(*,*) REAL( I )
-      write(*,*) ARRAY( I ) - REAL( I )
-
             STATUS = SAI__ERROR
             CALL MSG_SETR( 'B', ARRAY( I ) )
             CALL MSG_SETR( 'SB', REAL( I ) )
@@ -674,7 +673,8 @@
       SUBROUTINE UNCOMPI( EL, ARRAY, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INTEGER I, EL, STATUS
+      INTEGER STATUS
+      INTEGER*8 I, EL
       INTEGER ARRAY( EL )
 
       IF( STATUS .NE. SAI__OK ) RETURN
