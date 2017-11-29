@@ -208,8 +208,11 @@ void ary1Dbnd( AryDCB *dcb, int *status ) {
             datShape( locor, 1, &dimor, &ndimor, status );
             if( *status == SAI__OK ){
 
-/* Report an error if the ORIGIN component is not of the correct type. */
-               if( strcmp( type, HDS_DIM_TYPE ) ){
+/* Report an error if the ORIGIN component is not of the correct type.
+   We need to read HDS v4 and v5 files, so allow it to be _INT64 or
+   _INTEGER. */
+               if( strcmp( type, HDS_DIM_TYPE ) &&
+                   strcmp( type, "_INTEGER" ) ){
                   *status = ARY__TYPIN;
                   datMsg( "ARRAY", dcb->loc );
                   msgSetc( "BADTYPE", type );

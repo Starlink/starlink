@@ -29,7 +29,7 @@
 /* Type for the compression function that accepts void * pointers for
    arrays. */
 typedef  void (*undelt_fun_type)( void *, size_t, size_t, void *, void *,
-                                  void *, int *, void *, size_t, int *,
+                                  void *, hdsdim *, void *, size_t, int *,
                                   size_t *, size_t *, size_t *, int * );
 
 
@@ -47,7 +47,7 @@ typedef  void (*undelt_fun_type)( void *, size_t, size_t, void *, void *,
                                             size_t row_lbnd, \
                                             size_t row_ubnd, outtype *scale, \
                                             outtype *zero, vtype *pvalue, \
-                                            int *prepeat, outtype *pout, \
+                                            hdsdim *prepeat, outtype *pout, \
                                             size_t stride, int *bad, \
                                             size_t *ndata_used, size_t *nvalue_used, \
                                             size_t *nrepeat_used, int *status );
@@ -253,7 +253,7 @@ void ary1Undlt( HDSLoc *loc1, int ndim_in, const hdsdim *lbnd,
 *        array, it should default to the axis that gives the greatest
 *        compression. Note, the ZAXIS value is one-based, not zero-based.
 *
-*     ZDIM: _INTEGER scalar holding the length of the ZAXIS axis of the
+*     ZDIM: _INTEGER/_INT64 scalar holding the length of the ZAXIS axis of the
 *        uncompressed array. The other dimensions of the uncompressed
 *        array are given by the shape of the FIRST_DATA array.
 *
@@ -274,8 +274,8 @@ void ary1Undlt( HDSLoc *loc1, int ndim_in, const hdsdim *lbnd,
 *        not be present if there are no runs in the uncompressed data
 *        array.
 *
-*     FIRST_DATA: _INTEGER array with NDIM-1 axes in the same order as the
-*        axes of the uncompressed array, but omitting the ZAXIS axis. It
+*     FIRST_DATA: _INTEGER/_INT64 array with NDIM-1 axes in the same order as
+*        the axes of the uncompressed array, but omitting the ZAXIS axis. It
 *        holds the zero-based index into the DATA array at which the first
 *        element of the corresponding hyper-row (i.e. the row of values
 *        parallel to ZAXIS) is stored.
@@ -370,11 +370,11 @@ void ary1Undlt( HDSLoc *loc1, int ndim_in, const hdsdim *lbnd,
    hdsdim lbnd_cwhole[ ARY__MXDIM ];
    hdsdim start[ ARY__MXDIM + 1 ];
    hdsdim ubnd_csection[ ARY__MXDIM + 1 ];
-   int *prepeat;
-   int *ptr_firstd = NULL;
-   int *ptr_firstr = NULL;
-   int *ptr_firstv = NULL;
-   int *ptr_repeat = NULL;
+   hdsdim *prepeat;
+   hdsdim *ptr_firstd = NULL;
+   hdsdim *ptr_firstr = NULL;
+   hdsdim *ptr_firstv = NULL;
+   hdsdim *ptr_repeat = NULL;
    int bad;
    int idim;
    int is_invalid;
@@ -384,7 +384,7 @@ void ary1Undlt( HDSLoc *loc1, int ndim_in, const hdsdim *lbnd,
    int there;
    int whole;
    int zaxis;
-   int zdim;
+   hdsdim zdim;
    size_t div_cwhole[ ARY__MXDIM ];
    size_t div_section[ ARY__MXDIM ];
    size_t iv_csection;
@@ -487,7 +487,7 @@ void ary1Undlt( HDSLoc *loc1, int ndim_in, const hdsdim *lbnd,
    datThere( loc1, "REPEAT", &there, status );
    if( there ) {
       datFind( loc1, "REPEAT", &loc_repeat, status );
-      datMapV( loc_repeat, "_INTEGER", "READ", (void **) &ptr_repeat,
+      datMapV( loc_repeat, HDS_DIM_TYPE, "READ", (void **) &ptr_repeat,
                &nel_repeat, status );
    } else {
       nel_repeat = 0;
@@ -500,13 +500,12 @@ void ary1Undlt( HDSLoc *loc1, int ndim_in, const hdsdim *lbnd,
 
 /* Get the size of the uncompressed array along the compression axis, and
    report an error if is is not positive. */
-   datGet0I( loc_zdim, &zdim, status );
+   HDSDIM_CODE(datGet0)( loc_zdim, &zdim, status );
    if( zdim < 1 && *status == SAI__OK ) {
       *status = ARY__DLTIN;
       datMsg( "A", loc1 );
-      msgSeti( "I", zdim );
-      errRep( "", "The compressed array '^A' is invalid - the ZDIM "
-              "value (^I) is invalid.", status );
+      errRepf( "", "The compressed array '^A' is invalid - the ZDIM "
+              "value (%" HDS_DIM_FORMAT ") is invalid.", status, zdim );
       goto L999;
    }
 
@@ -739,13 +738,13 @@ void ary1Undlt( HDSLoc *loc1, int ndim_in, const hdsdim *lbnd,
       is_invalid = 0;
 
 /* We now know we need to map the FIRST_DATA array. */
-      datMapV( loc_firstd, "_INTEGER", "READ", (void **) &ptr_firstd,
+      datMapV( loc_firstd, HDS_DIM_TYPE, "READ", (void **) &ptr_firstd,
                &nel_firstd, status );
 
 /* We also know we need the FIRST_VALUE array, so find it, map it, and
    report an error if it has a different shape to the FIRST_DATA array. */
       datFind( loc1, "FIRST_VALUE", &loc_firstv, status );
-      datMapV( loc_firstv, "_INTEGER", "READ", (void **) &ptr_firstv,
+      datMapV( loc_firstv, HDS_DIM_TYPE, "READ", (void **) &ptr_firstv,
                &nel_firstv, status );
 
       datShape( loc_firstv, ARY__MXDIM - 1, dims_firstv, &ndim_firstv,
@@ -775,7 +774,7 @@ void ary1Undlt( HDSLoc *loc1, int ndim_in, const hdsdim *lbnd,
    to the FIRST_DATA array. */
       if( loc_repeat ) {
          datFind( loc1, "FIRST_REPEAT", &loc_firstr, status );
-         datMapV( loc_firstr, "_INTEGER", "READ", (void **) &ptr_firstr,
+         datMapV( loc_firstr, HDS_DIM_TYPE, "READ", (void **) &ptr_firstr,
                   &nel_firstr, status );
 
          datShape( loc_firstr, ARY__MXDIM - 1, dims_firstr, &ndim_firstr,
@@ -1049,7 +1048,7 @@ L999:
 *     void ary1Undelt<TIN><TOUT><TVAL><SCALE>( <TIN> *pindata, size_t row_lbnd,
 *                                        size_t row_ubnd, <TOUT> *pscale,
 *                                        <TOUT> *pzero, <TVAL> *pvalue,
-*                                        int *prepeat, <TOUT> *poutdata,
+*                                        hdsdim *prepeat, <TOUT> *poutdata,
 *                                        size_t stride, int *bad, size_t *ndata_used,
 *                                        size_t *nvalue_used, size_t *nrepeat_used,
 *                                        int *status )
@@ -1087,7 +1086,7 @@ L999:
 *     pvalue = <TVAL> *
 *        Array of uncompressed values that should be used to replace
 *        flagged values in "pindata".
-*     prepeat = int *
+*     prepeat = hdsdim *
 *        Array holding the number of repeats for each repeated value in
 *        "pvalue".
 *     poutdata = <TOUT> *
@@ -1135,13 +1134,13 @@ L999:
 static void ary1Undelt##incode##outcode##vcode##scale( intype *pindata, size_t row_lbnd, \
                                             size_t row_ubnd, outtype *pscale, \
                                             outtype *pzero, vtype *pvalue, \
-                                            int *prepeat, outtype *poutdata, \
+                                            hdsdim *prepeat, outtype *poutdata, \
                                             size_t stride, int *bad, size_t *ndata_used, \
                                             size_t *nvalue_used, size_t *nrepeat_used, \
                                             int *status ){ \
 \
 /* Local Variables: */ \
-   int *prepeat_orig; \
+   hdsdim *prepeat_orig; \
    int dim; \
    int nleft;  \
    intype * pindata_orig; \
