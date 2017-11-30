@@ -1,7 +1,7 @@
       SUBROUTINE NDF1_WSBND( NDIM, LBND, UBND, IACB, IWCS, STATUS )
 *+
-* Name:
-*    NDF1_WSBND
+*  Name:
+*     NDF1_WSBND
 
 *  Purpose:
 *     Obtain the effect of new pixel-index bounds on WCS information.

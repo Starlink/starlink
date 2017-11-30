@@ -61,7 +61,7 @@
 *     history component. A value of 'T' is returned if a new record has
 *     been written, otherwise 'F' is returned.
 
-*  Specific Items
+*  Specific Items:
 *     The following ITEM values request information about specific
 *     history records and should be accompanied by a valid value for
 *     the IREC argument specifying the record for which information is

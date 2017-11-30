@@ -1,7 +1,7 @@
       LOGICAL FUNCTION NDF1_ABSNT( ISTAT )
 *+
-* Name:
-*    NDF1_ABSNT
+*  Name:
+*     NDF1_ABSNT
 
 *  Purpose:
 *     Test status codes for absent NDF data structures or components.

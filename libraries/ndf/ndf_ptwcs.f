@@ -1,7 +1,7 @@
       SUBROUTINE NDF_PTWCS( IWCS, INDF, STATUS )
 *+
 *  Name:
-*    NDF_PTWCS
+*     NDF_PTWCS
 
 *  Purpose:
 *     Store world coordinate system information in an NDF.

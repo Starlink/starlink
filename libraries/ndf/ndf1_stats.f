@@ -17,7 +17,7 @@
 *  Description:
 *     The routine returns simple statistics for the supplied
 *     1-dimensional array.
-*
+
 *  Arguments:
 *     DIM = INTEGER (Given)
 *        Length of the array.

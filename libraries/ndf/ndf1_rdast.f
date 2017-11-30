@@ -1,7 +1,7 @@
       SUBROUTINE NDF1_RDAST( STATUS )
 *+
-* Name:
-*    NDF1_RDAST
+*  Name:
+*     NDF1_RDAST
 
 *  Purpose:
 *     Read AST_ data as text from an HDS object.

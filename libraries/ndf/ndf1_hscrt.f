@@ -1,7 +1,7 @@
       SUBROUTINE NDF1_HSCRT( LOC, STATUS )
 *+
-* Name:
-*    NDF1_HSCRT
+*  Name:
+*     NDF1_HSCRT
 
 *  Purpose:
 *     Mark an HDS container file as a scratch file.

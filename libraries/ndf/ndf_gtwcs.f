@@ -1,7 +1,7 @@
       SUBROUTINE NDF_GTWCS( INDF, IWCS, STATUS )
 *+
 *  Name:
-*    NDF_GTWCS
+*     NDF_GTWCS
 
 *  Purpose:
 *     Obtain world coordinate system information from an NDF.

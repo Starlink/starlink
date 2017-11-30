@@ -1,7 +1,7 @@
       SUBROUTINE NDF1_ASETC( IAST, VALUE, ATTRIB, STATUS )
 *+
-* Name:
-*    NDF1_ASETC
+*  Name:
+*     NDF1_ASETC
 
 *  Purpose:
 *     Set an AST_ character attribute value.

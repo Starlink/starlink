@@ -1,7 +1,7 @@
       SUBROUTINE NDF1_CVTOK( FORFIL, IFMT, NDFLOC, NDFNAM, STATUS )
 *+
-* Name:
-*    NDF1_CVTOK
+*  Name:
+*     NDF1_CVTOK
 
 *  Purpose:
 *     Define standard message tokens for use in conversion commands.

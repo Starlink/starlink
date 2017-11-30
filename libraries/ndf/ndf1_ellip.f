@@ -1,7 +1,7 @@
       SUBROUTINE NDF1_ELLIP( STR )
 *+
-* Name:
-*    NDF1_ELLIP
+*  Name:
+*     NDF1_ELLIP
 
 *  Purpose:
 *     Add an ellipsis to the end of a character string.

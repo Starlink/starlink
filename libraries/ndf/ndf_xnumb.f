@@ -13,8 +13,8 @@
 *     CALL NDF_XNUMB( INDF, NEXTN, STATUS )
 
 *  Description:
-*    The routine returns the number of extensions present in the NDF
-*    whose identifier is supplied.
+*     The routine returns the number of extensions present in the NDF
+*     whose identifier is supplied.
 
 *  Arguments:
 *     INDF = INTEGER (Given)

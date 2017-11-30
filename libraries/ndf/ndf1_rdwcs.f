@@ -1,7 +1,7 @@
       SUBROUTINE NDF1_RDWCS( IACB, IWCS, STATUS )
 *+
-* Name:
-*    NDF1_RDWCS
+*  Name:
+*     NDF1_RDWCS
 
 *  Purpose:
 *     Read WCS information from an ACB entry.
@@ -32,9 +32,9 @@
 *        The global status.
 
 *  Notes:
-*    - A value of AST__NULL will be returned for the IWCS argument if
-*    this routine is called with STATUS set, or if it should fail for
-*    any reason.
+*     - A value of AST__NULL will be returned for the IWCS argument if
+*     this routine is called with STATUS set, or if it should fail for
+*     any reason.
 
 *  Copyright:
 *     Copyright (C) 1997 Rutherford Appleton Laboratory

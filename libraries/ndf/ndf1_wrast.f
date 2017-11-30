@@ -1,7 +1,7 @@
       SUBROUTINE NDF1_WRAST( STATUS )
 *+
-* Name:
-*    NDF1_WRAST
+*  Name:
+*     NDF1_WRAST
 
 *  Purpose:
 *     Write AST_ data as text to an HDS object.

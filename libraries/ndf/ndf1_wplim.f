@@ -207,7 +207,7 @@
       LOGICAL ALLWCS
       LOGICAL MIXED
 
-       integer kk
+c       integer kk
 *.
 
 *  Check inherited global status.

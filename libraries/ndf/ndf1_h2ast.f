@@ -1,7 +1,7 @@
       SUBROUTINE NDF1_H2AST( DATA, ILINE, LINE, STATUS )
 *+
-* Name:
-*    NDF1_H2AST
+*  Name:
+*     NDF1_H2AST
 
 *  Purpose:
 *     Copy AST_ data from an HDS object.

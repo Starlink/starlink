@@ -1,7 +1,7 @@
       SUBROUTINE NDF1_WRWCS( IWCS, IACB, STATUS )
 *+
-* Name:
-*    NDF1_WRWCS
+*  Name:
+*     NDF1_WRWCS
 
 *  Purpose:
 *     Write WCS information to an entry in the ACB.

@@ -1,7 +1,7 @@
       SUBROUTINE NDF1_HTOP( LOC1, MODE, LOC2, STATUS )
 *+
-* Name:
-*    NDF1_HTOP
+*  Name:
+*     NDF1_HTOP
 
 *  Purpose:
 *     Return a top-level locator for an HDS container file.

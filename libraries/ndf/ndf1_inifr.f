@@ -1,7 +1,7 @@
       SUBROUTINE NDF1_INIFR( IACB, IWCS, STATUS )
 *+
-* Name:
-*    NDF1_INIFR
+*  Name:
+*     NDF1_INIFR
 
 *  Purpose:
 *     Initialise standard Frames in an NDF's WCS information.

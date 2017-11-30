@@ -1,7 +1,7 @@
       INTEGER FUNCTION NDF1_LEN( STR )
 *+
-* Name:
-*    NDF1_LEN
+*  Name:
+*     NDF1_LEN
 
 *  Purpose:
 *     Return the declared length of a character string.

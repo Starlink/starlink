@@ -1,10 +1,10 @@
       SUBROUTINE NDF1_FARG( INDEX, VALUE )
 *+
-* Name:
-*    NDF1_FARG
+*  Name:
+*     NDF1_FARG
 
 *  Purpose:
-*    Get a command-line argument from the Fortran routine GETARG.
+*     Get a command-line argument from the Fortran routine GETARG.
 
 *  Language:
 *     Starlink Fortran 77

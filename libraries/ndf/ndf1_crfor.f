@@ -1,6 +1,6 @@
       SUBROUTINE NDF1_CRFOR( FILE, IFMT, EXPFIL, LEXP, FID, STATUS )
 *+
-* Name:
+*  Name:
 *     NDF1_CRFOR
 
 *  Purpose:

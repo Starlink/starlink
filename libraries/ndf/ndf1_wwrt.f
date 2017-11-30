@@ -1,7 +1,7 @@
       SUBROUTINE NDF1_WWRT( IWCS, IDCB, STATUS )
 *+
-* Name:
-*    NDF1_WWRT
+*  Name:
+*     NDF1_WWRT
 
 *  Purpose:
 *     Write WCS information to an entry in the DCB.

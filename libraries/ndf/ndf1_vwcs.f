@@ -1,7 +1,7 @@
       SUBROUTINE NDF1_VWCS( IACB, IWCS1, IWCS2, STATUS )
 *+
-* Name:
-*    NDF1_VWCS
+*  Name:
+*     NDF1_VWCS
 
 *  Purpose:
 *     Validate and strip WCS information.

@@ -1,7 +1,7 @@
       SUBROUTINE NDF1_WSTA( IACB, STATE, STATUS )
 *+
-* Name:
-*    NDF1_WSTA
+*  Name:
+*     NDF1_WSTA
 
 *  Purpose:
 *     Determine the state of the WCS component of an NDF.

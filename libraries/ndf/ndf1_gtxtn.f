@@ -1,8 +1,8 @@
       SUBROUTINE NDF1_GTXTN( NAME, MXXTN, DEF, XTN, XTN1, XTN2, NXTN,
      :                       STATUS )
 *+
-* Name:
-*    NDF1_GTXTN
+*  Name:
+*     NDF1_GTXTN
 
 *  Purpose:
 *     Get a list of NDF extension names from the environment.

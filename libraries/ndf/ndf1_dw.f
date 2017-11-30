@@ -1,7 +1,7 @@
       SUBROUTINE NDF1_DW( IDCB, STATUS )
 *+
-* Name:
-*    NDF1_DW
+*  Name:
+*     NDF1_DW
 
 *  Purpose:
 *     Ensure that WCS information is available in the DCB.

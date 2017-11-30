@@ -1,7 +1,7 @@
       SUBROUTINE NDF1_GTENV( NAME, DEF, VAL, LVAL, STATUS )
 *+
-* Name:
-*    NDF1_GTENV
+*  Name:
+*     NDF1_GTENV
 
 *  Purpose:
 *     Translate an environment variable.
