@@ -28,6 +28,7 @@ package polpack {
          helplib {$POLPACK_HELP}
 
          parameter box {
+            position 3
             type _REAL
             ppath CURRENT
             prompt {Spatial bin size (pixels)}
@@ -70,6 +71,7 @@ package polpack {
           }
 
          parameter method {
+            position 4
             type LITERAL
             vpath PROMPT CURRENT DEFAULT
             ppath CURRENT DEFAULT
