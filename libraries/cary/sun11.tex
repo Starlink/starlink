@@ -13,13 +13,13 @@
 \stardocsource      {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\stardocnumber      {11.5}
+\stardocnumber      {11.6}
 \stardocauthors     {R.F. Warren-Smith \& D.S. Berry}
-\stardocdate        {19th July 2012}
+\stardocdate        {4th December 2017}
 \stardoctitle       {ARY\\[\latex{2.5ex}]
                                 A Subroutine Library for Accessing\\
                                 ARRAY Data Structures}
-\stardocversion     {Version 1.4}
+\stardocversion     {Version 2.0}
 \stardocmanual      {Reference Manual}
 \stardocabstract  {%
 The ARY library is a set of routines for accessing Starlink ARRAY data
@@ -62,8 +62,81 @@ present is for accessing ARRAY structures stored in NDF extensions.
 Since most ARY\_ routines closely resemble the equivalent NDF\_ routine,
 \xref{SUN/33}{sun33}{} should initially form an adequate introduction to
 their use, in conjunction with the detailed routine descriptions contained in
-Appendix~\ref{ss:routinedescriptions} of this document.
+Appendix~\ref{ss:fortranroutinedescriptions} of this document.
 
+Note, version 2.0 of the ARY system is based on a complete re-write of
+the original Fortran system in C.
+
+\section{\xlabel{bounds_dimensions_and_pixel_counts}Bounds, Dimensions and Pixel Counts}
+\label{bounds_dimensions_and_pixel_counts}
+The API for version 2.0 of the ARY system has been changed to allow very
+large arrays to be handled - that is, arrays that have more elements than can
+be counted in a single 4-byte integer. This has been achieved in
+different ways  in the C and Fortran interfaces.
+
+\subsection{The Fortran API}
+Routines that have integer arguments that represent either the index of a
+pixel along a pixel axis or the number of elements in an array now have
+two APIs - one that supports use with very large arrays and a legacy API
+that does not (included for the benefit of old code). The ``large array''
+and ``legacy'' routines have the same names except that the ``large array''
+versions have the character ``K'' appended to the end. For instance, the
+legacy API includes ARY\_DIM, which returns the number of pixels along
+each pixel axis of an array:
+
+\begin{terminalv}
+      INTEGER STATUS
+      INTEGER IARY
+      INTEGER NDIM
+      INTEGER DIM( 3 )
+      ...
+      CALL ARY\_DIM( IARY, 3, DIM, NDIM, STATUS )
+\end{terminalv}
+
+The `large array'' API includes ARY\_DIMK, which behaves exactly like
+ARY\_DIM, but returns the pixel counts in 8 byte integers:
+
+\begin{terminalv}
+      INTEGER STATUS
+      INTEGER IARY
+      INTEGER NDIM
+      INTEGER*8 DIM( 3 )
+      ...
+      CALL ARY\_DIMK( IARY, 3, DIM, NDIM, STATUS )
+\end{terminalv}
+
+The list of routines for which ``K'' versions exist is as follows:
+\begin{itemize}
+\item ARY\_BOUND
+\item ARY\_DIM
+\item ARY\_MAP
+\item ARY\_MAPZ
+\item ARY\_NEW
+\item ARY\_NEWP
+\item ARY\_OFFS
+\item ARY\_SBND
+\item ARY\_SECT
+\item ARY\_SHIFT
+\item ARY\_SIZE
+\end{itemize}
+
+\subsection{The C API}
+The C API does not include alternate functions for the two APIS. Instead,
+all arguments that refer to pixel indices or counts are declared with a
+special data type of "hdsdim" (defined in include file ``star/hds.h'').
+The particular form of integer corresponding to ``hdsdim'' is determiend
+by the version fo the HDS library with which the application is linked.
+Local variables used to store pixel indices or counts should also be
+declared with type ``hdsdim'':
+
+\begin{terminalv}
+      Ary *ary;
+      int status;
+      int ndim;
+      hdsdim dim[ 3 ];
+      ...
+      aryDim( ary, 3, dim, ndim, &status );
+\end{terminalv}
 
 
 \section{\xlabel{array_storage_forms}Array Storage Forms}
@@ -365,19 +438,6 @@ to hold the HDS component names, types, dimensions, etc).
 \section{\xlabel{compiling_and_linking}Compiling and Linking}
 \label{compiling_and_linking}
 
-Before compiling or linking applications which call ARY\_ routines, you
-should first ``log in'' for software development using these routines.
-This is done using the \texttt{ary\_dev} command.
-
-\begin{terminalv}
-% ary_dev
-\end{terminalv}
-
-This will generate links to the ARY include files required for
-programming (note that this is only necessary if you reference ARY\_
-system include files, or call ARY\_ routines explicitly in your
-application).
-
 ADAM applications which call ARY\_ routines may be linked with the link
 script \mbox{ary\_link\_adam}, which should be specified on the linker
 command line.  For example, to compile and link an application called
@@ -392,11 +452,11 @@ A ``stand-alone'' (\emph{i.e.} non-ADAM) version of the ARY\_ system is
 also available and should be used by those applications which do not
 use ADAM facilities.  This version may be obtained by specifying the
 options file \mbox{ary\_link} on the linker command line.  For example,
-to compile and link a stand-alone application called \texttt{prog}, the
+to compile and link a stand-alone C application called \texttt{prog}, the
 following might be used:
 
 \begin{terminalv}
-% f77 -O prog.f -o prog `ary_link`
+% gcc  prog.c -o prog `ary_link`
 \end{terminalv}
 
 Both versions of the ARY\_ system contain the same set of user-callable
@@ -416,6 +476,8 @@ routines.
             {Obtain an identifier for a base array}
 \noteroutine{ARY\_BOUND( IARY, NDIMX, LBND, UBND, NDIM, STATUS )}
             {Enquire the pixel-index bounds of an array}
+\noteroutine{ARY\_BOUNDK( IARY, NDIMX, LBND, UBND, NDIM, STATUS )}
+            {Enquire the pixel-index bounds of an array}
 \noteroutine{ARY\_CLONE( IARY1, IARY2, STATUS )}
             {Clone an array identifier}
 \noteroutine{ARY\_CMPLX( IARY, CMPLX, STATUS )}
@@ -425,6 +487,8 @@ routines.
 \noteroutine{ARY\_DELET( IARY, STATUS )}
             {Delete an array}
 \noteroutine{ARY\_DIM( IARY, NDIMX, DIM, NDIM, STATUS )}
+            {Enquire the dimension sizes of an array}
+\noteroutine{ARY\_DIMK( IARY, NDIMX, DIM, NDIM, STATUS )}
             {Enquire the dimension sizes of an array}
 \noteroutine{ARY\_DUPE( IARY1, PLACE, IARY2, STATUS )}
             {Duplicate an array}
@@ -448,7 +512,11 @@ routines.
             {Determine if an array is temporary}
 \noteroutine{ARY\_MAP( IARY, TYPE, MMOD, PNTR, EL, STATUS )}
             {Obtain mapped access to an array}
+\noteroutine{ARY\_MAPK( IARY, TYPE, MMOD, PNTR, EL, STATUS )}
+            {Obtain mapped access to an array}
 \noteroutine{ARY\_MAPZ( IARY, TYPE, MMOD, RPNTR, IPNTR, EL, STATUS )}
+            {Obtain complex mapped access to an array}
+\noteroutine{ARY\_MAPZK( IARY, TYPE, MMOD, RPNTR, IPNTR, EL, STATUS )}
             {Obtain complex mapped access to an array}
 \noteroutine{ARY\_MSG( TOKEN, IARY )}
             {Assign the name of an array to a message token}
@@ -456,11 +524,17 @@ routines.
             {Enquire the dimensionality of an array}
 \noteroutine{ARY\_NEW( FTYPE, NDIM, LBND, UBND, PLACE, IARY, STATUS )}
             {Create a new simple array}
+\noteroutine{ARY\_NEWK( FTYPE, NDIM, LBND, UBND, PLACE, IARY, STATUS )}
+            {Create a new simple array}
 \noteroutine{ARY\_NEWP( FTYPE, NDIM, UBND, PLACE, IARY, STATUS )}
+            {Create a new primitive array}
+\noteroutine{ARY\_NEWPK( FTYPE, NDIM, UBND, PLACE, IARY, STATUS )}
             {Create a new primitive array}
 \noteroutine{ARY\_NOACC( ACCESS, IARY, STATUS )}
             {Disable a specified type of access to an array}
 \noteroutine{ARY\_OFFS( IARY1, IARY2, MXOFFS, OFFS, STATUS )}
+            {Obtain the pixel offset between two arrays}
+\noteroutine{ARY\_OFFSK( IARY1, IARY2, MXOFFS, OFFS, STATUS )}
             {Obtain the pixel offset between two arrays}
 \noteroutine{ARY\_PLACE( LOC, NAME, PLACE, STATUS )}
             {Obtain an array placeholder}
@@ -474,13 +548,21 @@ routines.
             {Set the bad-pixel flag for an array}
 \noteroutine{ARY\_SBND( NDIM, LBND, UBND, IARY, STATUS )}
             {Set new pixel-index bounds for an array}
+\noteroutine{ARY\_SBNDK( NDIM, LBND, UBND, IARY, STATUS )}
+            {Set new pixel-index bounds for an array}
 \noteroutine{ARY\_SCTYP( IARY, TYPE, STATUS )}
             {Obtain the numeric type of a scaled array}
 \noteroutine{ARY\_SECT( IARY1, NDIM, LBND, UBND, IARY2, STATUS )}
             {Create an array section}
+\noteroutine{ARY\_SECTK( IARY1, NDIM, LBND, UBND, IARY2, STATUS )}
+            {Create an array section}
 \noteroutine{ARY\_SHIFT( NSHIFT, SHIFT, IARY, STATUS )}
             {Apply pixel-index shifts to an array}
+\noteroutine{ARY\_SHIFTK( NSHIFT, SHIFT, IARY, STATUS )}
+            {Apply pixel-index shifts to an array}
 \noteroutine{ARY\_SIZE( IARY, NPIX, STATUS )}
+            {Determine the size of an array}
+\noteroutine{ARY\_SIZEK( IARY, NPIX, STATUS )}
             {Determine the size of an array}
 \noteroutine{ARY\_SSECT( IARY1, IARY2, IARY3, STATUS )}
             {Produce a similar array section to an existing one}
@@ -525,7 +607,7 @@ routines.
             {Enquire the pixel-index bounds of an array}
 \noteroutine{ARY\_CMPLX( IARY, CMPLX, STATUS )}
             {Determine whether an array holds complex values}
-\noteroutine{ARY\_DIM( IARY, NDIMX, DIM, NDIM, STATUS )}
+\noteroutine{ARY\_DIM(K)( IARY, NDIMX, DIM, NDIM, STATUS )}
             {Enquire the dimension sizes of an array}
 \noteroutine{ARY\_FORM( IARY, FORM, STATUS )}
             {Obtain the storage form of an array}
@@ -541,11 +623,11 @@ routines.
             {Determine if an array is temporary}
 \noteroutine{ARY\_NDIM( IARY, NDIM, STATUS )}
             {Enquire the dimensionality of an array}
-\noteroutine{ARY\_OFFS( IARY1, IARY2, MXOFFS, OFFS, STATUS )}
+\noteroutine{ARY\_OFFS(K)( IARY1, IARY2, MXOFFS, OFFS, STATUS )}
             {Obtain the pixel offset between two arrays}
 \noteroutine{ARY\_SAME( IARY1, IARY2, SAME, ISECT, STATUS )}
             {Enquire if two arrays are part of the same base array}
-\noteroutine{ARY\_SIZE( IARY, NPIX, STATUS )}
+\noteroutine{ARY\_SIZE(K)( IARY, NPIX, STATUS )}
             {Determine the size of an array}
 \noteroutine{ARY\_STATE( IARY, STATE, STATUS )}
             {Determine the state of an array (defined or undefined)}
@@ -563,9 +645,9 @@ routines.
             {Delete an array}
 \noteroutine{ARY\_DUPE( IARY1, PLACE, IARY2, STATUS )}
             {Duplicate an array}
-\noteroutine{ARY\_NEW( FTYPE, NDIM, LBND, UBND, PLACE, IARY, STATUS )}
+\noteroutine{ARY\_NEW(K)( FTYPE, NDIM, LBND, UBND, PLACE, IARY, STATUS )}
             {Create a new simple array}
-\noteroutine{ARY\_NEWP( FTYPE, NDIM, UBND, PLACE, IARY, STATUS )}
+\noteroutine{ARY\_NEWP(K)( FTYPE, NDIM, UBND, PLACE, IARY, STATUS )}
             {Create a new primitive array}
 
 
@@ -578,7 +660,7 @@ routines.
             {Reset an array to an undefined state}
 \noteroutine{ARY\_SBAD( BAD, IARY, STATUS )}
             {Set the bad-pixel flag for an array}
-\noteroutine{ARY\_SHIFT( NSHIFT, SHIFT, IARY, STATUS )}
+\noteroutine{ARY\_SHIFT(K)( NSHIFT, SHIFT, IARY, STATUS )}
             {Apply pixel-index shifts to an array}
 \noteroutine{ARY\_STYPE( FTYPE, IARY, STATUS )}
             {Set a new type for an array}
@@ -587,9 +669,9 @@ routines.
 \subsection{\xlabel{access_to_array_values}Access to Array Values}
 \label{access_to_array_values}
 
-\noteroutine{ARY\_MAP( IARY, TYPE, MMOD, PNTR, EL, STATUS )}
+\noteroutine{ARY\_MAP(K)( IARY, TYPE, MMOD, PNTR, EL, STATUS )}
             {Obtain mapped access to an array}
-\noteroutine{ARY\_MAPZ( IARY, TYPE, MMOD, RPNTR, IPNTR, EL, STATUS )}
+\noteroutine{ARY\_MAPZ(K)( IARY, TYPE, MMOD, RPNTR, IPNTR, EL, STATUS )}
             {Obtain complex mapped access to an array}
 \noteroutine{ARY\_UNMAP( IARY, STATUS )}
             {Unmap an array}
@@ -605,7 +687,7 @@ Creation and Control of Identifiers}
             {Obtain an identifier for a base array}
 \noteroutine{ARY\_CLONE( IARY1, IARY2, STATUS )}
             {Clone an array identifier}
-\noteroutine{ARY\_SECT( IARY1, NDIM, LBND, UBND, IARY2, STATUS )}
+\noteroutine{ARY\_SECT(K)( IARY1, NDIM, LBND, UBND, IARY2, STATUS )}
             {Create an array section}
 \noteroutine{ARY\_SSECT( IARY1, IARY2, IARY3, STATUS )}
             {Produce a similar array section to an existing one}
@@ -645,9 +727,9 @@ Creation and Control of Identifiers}
             {Set the internal ARY\_ system error-tracing flag}
 
 \newpage
-\section{\xlabel{routine_descriptions}Routine Descriptions}
-\label{routine_descriptions}
-\label{ss:routinedescriptions}
+\section{\xlabel{fortran_routine_descriptions}Fortran Routine Descriptions}
+\label{fortran_routine_descriptions}
+\label{ss:fortranroutinedescriptions}
 
 
 \sstroutine{
@@ -843,6 +925,75 @@ Creation and Control of Identifiers}
       }
       \sstsubsection{
          UBND( NDIMX ) = INTEGER (Returned)
+      }{
+         Upper pixel-index bounds for each dimension.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Returned)
+      }{
+         Total number of array dimensions.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the array has fewer than NDIMX dimensions, then any
+         remaining elements of the LBND and UBND arguments will be filled
+         with 1\texttt{'}s.
+
+         \sstitem
+         If the array has more than NDIMX dimensions, then the NDIM
+         argument will return the actual number of dimensions. In this
+         case only the first NDIMX sets of bounds will be returned, and an
+         error will result if the size of any of the remaining dimensions
+         exceeds 1.
+
+         \sstitem
+         The symbolic constant ARY\_\_MXDIM may be used to declare the
+         size of the LBND and UBND arguments so that they will be able to
+         hold the maximum number of array bounds that this routine can
+         return. This constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_BOUNDK
+}{
+   Enquire the pixel-index bounds of an array
+}{
+   \sstdescription{
+      The routine returns the lower and upper pixel-index bounds of
+      each dimension of an array, together with the total number of
+      dimensions.
+   }
+   \sstinvocation{
+      CALL ARY\_BOUNDK( IARY, NDIMX, LBND, UBND, NDIM, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         NDIMX = INTEGER (Given)
+      }{
+         Maximum number of pixel-index bounds to return (i.e. the
+         declared size of the LBND and UBND arguments).
+      }
+      \sstsubsection{
+         LBND( NDIMX ) = INTEGER*8 (Returned)
+      }{
+         Lower pixel-index bounds for each dimension.
+      }
+      \sstsubsection{
+         UBND( NDIMX ) = INTEGER*8 (Returned)
       }{
          Upper pixel-index bounds for each dimension.
       }
@@ -1217,6 +1368,70 @@ Creation and Control of Identifiers}
       }
       \sstsubsection{
          DIM( NDIMX ) = INTEGER (Returned)
+      }{
+         Size of each dimension in pixels.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Returned)
+      }{
+         Total number of array dimensions.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the array has fewer than NDIMX dimensions, then any
+         remaining elements of the DIM argument will be filled with 1\texttt{'}s.
+
+         \sstitem
+         If the array has more than NDIMX dimensions, then the NDIM
+         argument will return the actual number of dimensions. In this
+         case only the first NDIMX dimension sizes will be returned, and
+         an error will result if the size of any of the excluded
+         dimensions exceeds 1.
+
+         \sstitem
+         The symbolic constant ARY\_\_MXDIM may be used to declare the
+         size of the DIM argument so that it will be able to hold the
+         maximum number of array dimension sizes that this routine can
+         return. This constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_DIMK
+}{
+   Enquire the dimension sizes of an array
+}{
+   \sstdescription{
+      The routine returns the size in pixels of each dimension of an
+      array, together with the total number of dimensions (the size of
+      a dimension is the difference between that dimension\texttt{'}s upper and
+      lower pixel-index bounds $+$ 1).
+   }
+   \sstinvocation{
+      CALL ARY\_DIMK( IARY, NDIMX, DIM, NDIM, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         NDIMX = INTEGER (Given)
+      }{
+         Maximum number of dimension sizes to return (i.e. the declared
+         size of the DIM argument).
+      }
+      \sstsubsection{
+         DIM( NDIMX ) = INTEGER*8 (Returned)
       }{
          Size of each dimension in pixels.
       }
@@ -1844,6 +2059,72 @@ Creation and Control of Identifiers}
    }
 }
 \sstroutine{
+   ARY\_MAPK
+}{
+   Obtain mapped access to an array
+}{
+   \sstdescription{
+      The routine obtains mapped access an array, returning a pointer
+      to the mapped values and a count of the number of elements
+      mapped.
+   }
+   \sstinvocation{
+      CALL ARY\_MAPK( IARY, TYPE, MMOD, PNTR, EL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         TYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The numerical data type required for access (e.g. \texttt{'}\_REAL\texttt{'}).
+      }
+      \sstsubsection{
+         MMOD = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The mapping mode for access to the array: \texttt{'}READ\texttt{'}, \texttt{'}UPDATE\texttt{'} or
+         \texttt{'}WRITE\texttt{'}, with an optional initialisation mode \texttt{'}/BAD\texttt{'} or
+         \texttt{'}/ZERO\texttt{'} appended.
+      }
+      \sstsubsection{
+         PNTR = INTEGER (Returned)
+      }{
+         Pointer to the mapped values.
+      }
+      \sstsubsection{
+         EL = INTEGER*8 (Returned)
+      }{
+         Number of elements mapped.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the array is a scaled array, the returned mapped values will
+         be the stored array values multiplied by the scale factor and shifted
+         by the zero term.
+
+         \sstitem
+         If the array is a delta (i.e. compressed) array, the returned mapped
+         values will be the uncompressed array values.
+
+         \sstitem
+         Currently, only READ access is available for scaled and
+         compressed arrays. An error will be reported if an attempt is made to
+         get WRITE or UPDATE access to a scaled or compressed array.
+      }
+   }
+}
+\sstroutine{
    ARY\_MAPZ
 }{
    Obtain complex mapped access to an array
@@ -1887,6 +2168,60 @@ Creation and Control of Identifiers}
       }
       \sstsubsection{
          EL = INTEGER (Returned)
+      }{
+         Number of elements mapped.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ARY\_MAPZK
+}{
+   Obtain complex mapped access to an array
+}{
+   \sstdescription{
+      The routine obtains complex mapped access to an array, returning
+      pointers to the real and imaginary values and a count of the
+      number of elements mapped.
+   }
+   \sstinvocation{
+      CALL ARY\_MAPZK( IARY, TYPE, MMOD, RPNTR, IPNTR, EL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         TYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The numerical data type required for accessing the array (e.g.
+         \texttt{'}\_REAL\texttt{'}).
+      }
+      \sstsubsection{
+         MMOD = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The mapping mode for access to the array: \texttt{'}READ\texttt{'}, \texttt{'}UPDATE\texttt{'} or
+         \texttt{'}WRITE\texttt{'}, with an optional initialisation mode \texttt{'}/BAD\texttt{'} or
+         \texttt{'}/ZERO\texttt{'} appended.
+      }
+      \sstsubsection{
+         RPNTR = INTEGER (Returned)
+      }{
+         Pointer to the mapped real (i.e. non-imaginary) values.
+      }
+      \sstsubsection{
+         IPNTR = INTEGER (Returned)
+      }{
+         Pointer to the mapped imaginary values.
+      }
+      \sstsubsection{
+         EL = INTEGER*8 (Returned)
       }{
          Number of elements mapped.
       }
@@ -2031,6 +2366,73 @@ Creation and Control of Identifiers}
    }
 }
 \sstroutine{
+   ARY\_NEWK
+}{
+   Create a new simple array
+}{
+   \sstdescription{
+      The routine creates a new simple array and returns an identifier
+      for it. The array may subsequently be manipulated with the ARY\_
+      routines.
+   }
+   \sstinvocation{
+      CALL ARY\_NEWK( FTYPE, NDIM, LBND, UBND, PLACE, IARY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FTYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Full data type of the array.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         Number of array dimensions.
+      }
+      \sstsubsection{
+         LBND( NDIM ) = INTEGER*8 (Given)
+      }{
+         Lower pixel-index bounds of the array.
+      }
+      \sstsubsection{
+         UBND( NDIM ) = INTEGER*8 (Given)
+      }{
+         Upper pixel-index bounds of the array.
+      }
+      \sstsubsection{
+         PLACE = INTEGER (Given and Returned)
+      }{
+         An array placeholder (e.g. generated by the ARY\_PLACE routine)
+         which indicates the position in the data system where the new
+         array will reside. The placeholder is annulled by this
+         routine, and a value of ARY\_\_NOPL will be returned (as defined
+         in the include file ARY\_PAR).
+      }
+      \sstsubsection{
+         IARY = INTEGER (Returned)
+      }{
+         Identifier for the new array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         ARY\_\_NOID will be returned for the IARY argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. In either
+         event, the placeholder will still be annulled. The ARY\_\_NOID
+         constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
    ARY\_NEWP
 }{
    Create a new primitive array
@@ -2057,6 +2459,70 @@ Creation and Control of Identifiers}
       }
       \sstsubsection{
          UBND( NDIM ) = INTEGER (Given)
+      }{
+         Upper pixel-index bounds of the array (the lower bound of each
+         dimension is taken to be 1).
+      }
+      \sstsubsection{
+         PLACE = INTEGER (Given and Returned)
+      }{
+         An array placeholder (e.g. generated by the ARY\_PLACE routine)
+         which indicates the position in the data system where the new
+         array will reside. The placeholder is annulled by this
+         routine, and a value of ARY\_\_NOPL will be returned (as defined
+         in the include file ARY\_PAR).
+      }
+      \sstsubsection{
+         IARY = INTEGER (Returned)
+      }{
+         Identifier for the new array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         ARY\_\_NOID will be returned for the IARY argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. In either
+         event, the placeholder will still be annulled. The ARY\_\_NOID
+         constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_NEWPK
+}{
+   Create a new primitive array
+}{
+   \sstdescription{
+      The routine creates a new primitive array and returns an
+      identifier for it. The array may subsequently be manipulated with
+      the ARY\_ routines.
+   }
+   \sstinvocation{
+      CALL ARY\_NEWPK( FTYPE, NDIM, UBND, PLACE, IARY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FTYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Data type of the array (e.g. \texttt{'}\_REAL\texttt{'}). Note that complex types
+         are not allowed for primitive arrays.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         Number of array dimensions.
+      }
+      \sstsubsection{
+         UBND( NDIM ) = INTEGER*8 (Given)
       }{
          Upper pixel-index bounds of the array (the lower bound of each
          dimension is taken to be 1).
@@ -2192,6 +2658,66 @@ Creation and Control of Identifiers}
       }
       \sstsubsection{
          OFFS( MXOFFS ) = INTEGER (Returned)
+      }{
+         Array of pixel offsets for each dimension.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The two array identifiers supplied need not refer to the same
+         base array (although they may often do so). If they do not, then
+         the offset between the pixels in each array is determined by
+         matching the pixel indices of their respective base arrays.
+
+         \sstitem
+         Note that non-zero pixel offsets may exist even for dimensions
+         which exceed the dimensionality of either of the two arrays
+         supplied. The symbolic constant ARY\_\_MXDIM may be used to declare
+         the size of the OFFS argument so that it will be able to hold the
+         maximum number of non-zero offsets that this routine can return.
+      }
+   }
+}
+\sstroutine{
+   ARY\_OFFSK
+}{
+   Obtain the pixel offset between two arrays
+}{
+   \sstdescription{
+      The routine returns the pixel offset for each requested dimension
+      between two arrays. These values are the offsets which should be
+      added to the pixel indices of the first array to obtain the
+      indices of the corresponding pixel in the second array.
+   }
+   \sstinvocation{
+      CALL ARY\_OFFSK( IARY1, IARY2, MXOFFS, OFFS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY1 = INTEGER (Given)
+      }{
+         First array identifier.
+      }
+      \sstsubsection{
+         IARY2 = INTEGER (Given)
+      }{
+         Second array identifier.
+      }
+      \sstsubsection{
+         MXOFFS = INTEGER (Given)
+      }{
+         Maximum number of pixel offsets to return (i.e. the declared
+         size of the OFFS argument).
+      }
+      \sstsubsection{
+         OFFS( MXOFFS ) = INTEGER*8 (Returned)
       }{
          Array of pixel offsets for each dimension.
       }
@@ -2539,6 +3065,81 @@ Creation and Control of Identifiers}
    }
 }
 \sstroutine{
+   ARY\_SBNDK
+}{
+   Set new pixel-index bounds for an array
+}{
+   \sstdescription{
+      The routine sets new pixel-index bounds for an array (or array
+      section). The number of array dimensions may also be changed.  If
+      a base array is specified, then a permanent change is made to the
+      actual data object and this will be apparent through any other
+      array identifiers which refer to it.  However, if an identifier
+      for an array section is specified, then its bounds are altered
+      without affecting other arrays.
+   }
+   \sstinvocation{
+      CALL ARY\_SBNDK( NDIM, LBND, UBND, IARY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         New number of array dimensions.
+      }
+      \sstsubsection{
+         LBND( NDIM ) = INTEGER*8 (Given)
+      }{
+         New lower pixel-index bounds of the array.
+      }
+      \sstsubsection{
+         UBND( NDIM ) = INTEGER*8 (Given)
+      }{
+         New upper pixel-index bounds of the array,
+      }
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The bounds of an array section cannot be altered while it is
+         mapped for access through the identifier supplied to this
+         routine.
+
+         \sstitem
+         The bounds of a base array cannot be altered while any part of
+         it is mapped for access (i.e. even through another identifier).
+
+         \sstitem
+         The array\texttt{'}s pixel values (if defined) will be retained for
+         those pixels which lie within both the old and new bounds. Any
+         pixels lying outside the new bounds will be lost (and cannot
+         later be recovered by further changes to the array\texttt{'}s bounds).
+         Any new pixels introduced where the new bounds extend beyond the
+         old ones will be assigned the \texttt{"}bad\texttt{"} value, and the subsequent
+         value of the bad-pixel flag will reflect this.
+
+         \sstitem
+         If the bounds of a base array are to be altered and retention
+         of the existing pixel values is not required, then a call to
+         ARY\_RESET should be made before calling this routine. This will
+         eliminate any processing which might otherwise be needed to
+         retain the existing values. This step is not necessary with an
+         array section, where no processing of pixel values takes place.
+      }
+   }
+}
+\sstroutine{
    ARY\_SCTYP
 }{
    Obtain the numeric type of a scaled array
@@ -2654,6 +3255,74 @@ Creation and Control of Identifiers}
    }
 }
 \sstroutine{
+   ARY\_SECTK
+}{
+   Create an array section
+}{
+   \sstdescription{
+      The routine creates a new array section which refers to a
+      selected region of an existing array (or array section). The
+      section may be larger or smaller in extent than the original
+      array.
+   }
+   \sstinvocation{
+      CALL ARY\_SECTK( IARY1, NDIM, LBND, UBND, IARY2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Identifier for the initial array.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         Number of dimensions for new section.
+      }
+      \sstsubsection{
+         LBND( NDIM ) = INTEGER*8 (Given)
+      }{
+         Lower pixel-index bounds for the new section.
+      }
+      \sstsubsection{
+         UBND( NDIM ) = INTEGER*8 (Given)
+      }{
+         Upper pixel-index bounds for the new section.
+      }
+      \sstsubsection{
+         IARY2 = INTEGER (Returned)
+      }{
+         Identifier for the new section.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The number of section dimensions need not match the number of
+         dimensions in the initial array. Pixel-index bounds will be
+         padded with 1\texttt{'}s as necessary to identify the pixels to which the
+         new section should refer.
+
+         \sstitem
+         Note that sections which extend beyond the pixel-index bounds
+         of the initial array will be padded with bad pixels.
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         ARY\_\_NOID will be returned for the IARY2 argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. The ARY\_\_NOID
+         constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
    ARY\_SHIFT
 }{
    Apply pixel-index shifts to an array
@@ -2721,6 +3390,73 @@ Creation and Control of Identifiers}
    }
 }
 \sstroutine{
+   ARY\_SHIFTK
+}{
+   Apply pixel-index shifts to an array
+}{
+   \sstdescription{
+      The routine applies pixel-index shifts to an array. An integer
+      shift is applied to each dimension so that its pixel-index
+      bounds, and the indices of each pixel, change by the amount of
+      shift applied to the corresponding dimension. The array\texttt{'}s pixels
+      retain their values and none are lost.
+   }
+   \sstinvocation{
+      CALL ARY\_SHIFTK( NSHIFT, SHIFT, IARY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NSHIFT = INTEGER (Given)
+      }{
+         Number of dimensions to which shifts are to be applied. This
+         must not exceed the number of array dimensions. If fewer
+         shifts are supplied than there are dimensions in the array,
+         then the extra dimensions will not be shifted.
+      }
+      \sstsubsection{
+         SHIFT( NSHIFT ) = INTEGER*8 (Given)
+      }{
+         The pixel-index shifts to be applied to each dimension.
+      }
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Pixel-index shifts applied to a base array will affect the
+         appearance of that array as seen by all base-array identifiers
+         associated with it. However, array sections derived from that
+         base array will remain unchanged (as regards both pixel-indices
+         and data content).
+
+         \sstitem
+         Pixel-index shifts cannot be applied to a base array while any
+         part of it is mapped for access (i.e. even through another
+         identifier).
+
+         \sstitem
+         Pixel-index shifts applied to an array section only affect
+         that section itself, and have no effect on other array
+         identifiers.
+
+         \sstitem
+         Pixel-index shifts cannot be applied to an array section while
+         it is mapped for access through the identifier supplied to this
+         routine.
+      }
+   }
+}
+\sstroutine{
    ARY\_SIZE
 }{
    Determine the size of an array
@@ -2740,6 +3476,36 @@ Creation and Control of Identifiers}
       }
       \sstsubsection{
          NPIX = INTEGER (Returned)
+      }{
+         Number of pixels in the array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ARY\_SIZEK
+}{
+   Determine the size of an array
+}{
+   \sstdescription{
+      The routine returns the number of pixels in the array whose
+      identifier is supplied (i.e. the product of its dimensions).
+   }
+   \sstinvocation{
+      CALL ARY\_SIZEK( IARY, NPIX, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         NPIX = INTEGER*8 (Returned)
       }{
          Number of pixels in the array.
       }
@@ -3136,6 +3902,2893 @@ Creation and Control of Identifiers}
    }
 }
 
+
+\newpage
+\section{\xlabel{c_function_descriptions}C Function Descriptions}
+\label{c_function_descriptions}
+\label{ss:cfunctiondescriptions}
+
+The C API differs from the Fortran API  in the following ways:
+
+\begin{enumerate}
+\item Arrays are identified using pointers of type ``Ary *'' rather than
+integer values.
+\item Values representing pixel indices or counts are stored in variables
+of type ``hdsdim''. This will be a 4 or 8 byte integer type, depending on
+the version of the installed HDS library.
+\item HDS locators are passed as pointers of type ``HDSLoc *'' rather
+than as character strings.
+\end{enumerate}
+
+\newpage
+\sstroutine{
+   aryAnnul
+}{
+   Annul an array pointer
+}{
+   \sstdescription{
+      This function annuls the array pointer supplied so that it is no
+      longer recognised as a valid pointer by the ARY\_ routines.
+      Any resources associated with it are released and made available
+      for re-use. If the array is mapped for access, then it is
+      automatically unmapped by this routine.
+   }
+   \sstinvocation{
+      void aryAnnul( Ary $*$$*$ary, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          This routine attempts to execute even if \texttt{'} status\texttt{'}  is set on
+         entry, although no further error report will be made if it
+         subsequently fails under these circumstances. In particular, it
+         will fail if the pointer supplied is not initially valid, but
+         this will only be reported if \texttt{'} status\texttt{'}  is set to SAI\_\_OK on entry.
+
+         \sstitem
+          An error will result if an attempt is made to annul the last
+         remaining pointer associated with an array which is in an
+         undefined state (unless it is a temporary array, in which case it
+         will be deleted at this point).
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Address of the array pointer to be annulled. A value of NULL is
+         returned in place of the supplied pointer.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryBad
+}{
+   Determine if an array may contain bad pixels
+}{
+   \sstdescription{
+      This function returns a boolean value indicating whether an array
+      may contain bad pixels for which checks must be made when its
+      values are processed. Only if the returned value is zero can
+      such checks be omitted.  If the \texttt{"} check\texttt{"}  argument to this function
+      is set non-zero, then it will perform an explicit check (if
+      necessary) to see whether bad pixels are actually present.
+   }
+   \sstinvocation{
+      void aryBad( Ary $*$ary, int check, int $*$bad, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          If \texttt{"} check\texttt{"}  is set to zero, then the returned value of \texttt{"} bad\texttt{"}  will
+         indicate whether bad pixels might be present and should therefore
+         be checked for during subsequent processing. However, even if \texttt{"} bad\texttt{"}
+         is returned non-zero in such circumstances, it is still possible
+         that there may not actually be any bad pixels present (for
+         instance, in an array section, the region of the base array
+         accessed might happen to avoid all the bad pixels).
+
+         \sstitem
+          If \texttt{"} check\texttt{"}  is set non-zero, then an explicit check will be made,
+         if necessary, to ensure that \texttt{"} bad\texttt{"}  is only returned non-zero if bad
+         pixels are actually present.
+
+         \sstitem
+          If the array is mapped for access through the identifier
+         supplied, then the value of \texttt{"} bad\texttt{"}  will refer to the actual mapped
+         values. It may differ from its original (unmapped) value if
+         conversion errors occurred during the mapping process, or if an
+         initialisation option of \texttt{'} /ZERO\texttt{'}  was specified for an array which
+         was initially undefined, or if the mapped values have subsequently
+         been modified.
+
+         \sstitem
+          The \texttt{"} bad\texttt{"}  argument will always be returned holding a non-zero value
+         if the array is in an undefined state.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         check
+      }{
+         If non-zero, an explicit check is performed to see if bad pixels
+         are actually present.
+      }
+      \sstsubsection{
+         bad
+      }{
+         Returned holding a flag indicating whether it is necessary to
+         check for bad pixels when processing the array\texttt{'} s values.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryBase
+}{
+   Obtain an identifier for a base array
+}{
+   \sstdescription{
+      This function returns an identifier for the base array with which
+      an array section is associated.
+   }
+   \sstinvocation{
+      void aryBase( Ary $*$ary1, Ary$*$$*$ary2, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          If this routine is called with \texttt{"} status\texttt{"}  set, then a value of
+         NULL will be returned for the \texttt{"} ary2\texttt{"}  argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary1
+      }{
+         Identifier for an existing array section (the function will also
+         work if this is already a base array).
+      }
+      \sstsubsection{
+         ary2
+      }{
+         Returned holding an identifier for the base array with which the
+         section is associated.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryBound
+}{
+   Enquire the pixel-index bounds of an array
+}{
+   \sstdescription{
+      This function returns the lower and upper pixel-index bounds of
+      each dimension of an array, together with the total number of
+      dimensions.
+   }
+   \sstinvocation{
+      void aryBound( Ary $*$ary, int ndimx, hdsdim $*$lbnd, hdsdim $*$ubnd, int $*$ndim,
+                     int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          If the array has fewer than \texttt{"} ndimx\texttt{"}  dimensions, then any
+         remaining elements of the \texttt{"} lbnd\texttt{"}  and \texttt{"} ubnd\texttt{"}  arguments will be filled
+         with 1\texttt{'} s.
+
+         \sstitem
+          If the array has more than \texttt{"} ndimx\texttt{"}  dimensions, then the \texttt{"} ndim\texttt{"}
+         argument will return the actual number of dimensions. In this
+         case only the first \texttt{"} ndimx\texttt{"}  sets of bounds will be returned, and an
+         error will result if the size of any of the remaining dimensions
+         exceeds 1.
+
+         \sstitem
+          The symbolic constant ARY\_\_MXDIM may be used to declare the
+         size of the \texttt{"} lbnd\texttt{"}  and \texttt{"} ubnd\texttt{"}  arguments so that they will be able to
+         hold the maximum number of array bounds that this routine can
+         return. This constant is defined in the header file \texttt{"} ary.h\texttt{"} .
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         ndimx
+      }{
+         Maximum number of pixel-index bounds to return (i.e. the
+         declared size of the \texttt{"} lbnd\texttt{"}  and \texttt{"} ubnd\texttt{"}  arguments).
+      }
+      \sstsubsection{
+         lbnd
+      }{
+         Returned holding the lower pixel-index bounds for each dimension.
+      }
+      \sstsubsection{
+         ubnd
+      }{
+         Returned holding the upper pixel-index bounds for each dimension.
+      }
+      \sstsubsection{
+         ndim
+      }{
+         Returned holding the total number of array dimensions.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryClone
+}{
+   Clone an array identifier
+}{
+   \sstdescription{
+      This function produces a \texttt{"} cloned\texttt{"}  copy of an array identifier (i.e.
+      it produces a new identifier describing an array with identical
+      attributes to the original).
+   }
+   \sstinvocation{
+      void aryClone( Ary $*$ary1, Ary $*$$*$ary2, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          If this routine is called with \texttt{"} status\texttt{"}  set, then a value of
+         NULL will be returned for the \texttt{"} ary2\texttt{"}  argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary1
+      }{
+         Array identifier to be cloned.
+      }
+      \sstsubsection{
+         ary2
+      }{
+         Returned holding the cloned identifier.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryCmplx
+}{
+   Determine whether an array holds complex values
+}{
+   \sstdescription{
+      This function returns a logical value indicating whether an array
+      holds complex values.
+   }
+   \sstinvocation{
+      void aryCmplx( Ary $*$ary, int $*$cmplx, int $*$status )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         cmplx
+      }{
+         Returned holding a flag indicating whether the array holds
+         complex values.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryCopy
+}{
+   Copy an array to a new location
+}{
+   \sstdescription{
+      This function copies an array to a new location and returns an
+      identifier for the resulting new base array.
+   }
+   \sstinvocation{
+      void aryCopy( Ary $*$ary1, AryPlace $*$$*$place, Ary $*$$*$ary2, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         ary1
+      }{
+         Identifier for the array (or array section) to be copied.
+      }
+      \sstsubsection{
+         place
+      }{
+         An array placeholder (e.g. generated by the aryPlace function)
+         which indicates the position in the data system where the new
+         array will reside. The placeholder is annulled by this
+         function, and a value of NULL will be returned.
+      }
+      \sstsubsection{
+         ary2
+      }{
+         Returned holding the identifier for the new array.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          The result of copying a scaled or delta array will be an
+         equivalent simple array.
+
+         \sstitem
+          If this routine is called with \texttt{"} status\texttt{"}  set, then a value of
+         NULL will be returned for the \texttt{"} ary\texttt{"}  argument, although no
+         further processing will occur. The same value will also be
+         returned if the function should fail for any reason.  In either
+         event, the placeholder will still be annulled.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryDelet
+}{
+   Delete an array
+}{
+   \sstdescription{
+      This function deletes the specified array. If this is a base array,
+      then the associated data object is erased and all array
+      identifiers which refer to it (or to sections derived from it)
+      become invalid. If the array is mapped for access, then it is
+      first unmapped.  If an array section is specified, then this
+      function is equivalent to calling aryAnnul.
+   }
+   \sstinvocation{
+      void aryDelet( Ary $*$$*$ary, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          This function attempts to execute even if \texttt{"} status\texttt{"}  is set on
+         entry, although no further error report will be made if it
+         subsequently fails under these circumstances.
+
+         \sstitem
+          A value of NULL is always returned for the \texttt{"} ary\texttt{"}  argument,
+         even if the function should fail.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Identifier for the array to be deleted. A value of NULL
+         is returned.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryDelta
+}{
+   Compress an array using delta compression
+}{
+   \sstdescription{
+      This function creates a copy of the supplied array stored in DELTA form,
+      which provides a lossless compression scheme for integer data. This
+      scheme assumes that adjacent integer values in the input array tend
+      to be close in value, and so differences between adjacent values can
+      be represented in fewer bits than the absolute values themselves.
+      The differences are taken along a nominated pixel axis within the
+      supplied array (specified by argument ZAXIS).
+
+      In practice, the scheme is limited currently to representing differences
+      between adjacent values using a HDS integer data type (specified by
+      argyument TYPE) - that is, arbitrary bit length is not yet supported.
+      So for instance an \_INTEGER input array can be compressed by storing
+      differences as \_WORD or \_BYTE values, but a \_WORD input array can only
+      be compressed by storing differences as \_BYTE values.
+
+      Any input value that differs from its earlier neighbour by more than
+      the data range of the selected data type is stored explicitly using
+      the data type of the input array.
+
+      Further compression is achieved by replacing runs of equal input values
+      by a single occurrence of the value with a correspsonding repetition
+      count.
+
+      It should be noted that the degree of compression achieved is
+      dependent on the nature of the data, and it is possible for the
+      compressed array to occupy more space than the uncompressed array.
+      The compression factor actually achieved is returned in argument
+      \texttt{"} zratio\texttt{"}  (the ratio of the supplied array size to the compressed
+      array size). A minmum allowed compression ratio may be specified via
+      argument \texttt{"} minrat\texttt{"} . If the compression ratio is less than this value,
+      then the returned copy is left uncompressed.
+   }
+   \sstinvocation{
+      void aryDelta( Ary $*$ary1, int zaxis, const char $*$type, float minrat,
+                     AryPlace $*$$*$place, float $*$zratio, Ary $*$$*$ary2, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          An error will be reported if the supplied array does not hold
+         integer values. In the case of a SCALED array, the internal
+         (scaled) values must be integers, but the external (unscaled) values
+         can be of any data type.
+
+         \sstitem
+          The compression axis and compressed data type actually used can
+         be determined by passing the returned array to aryGtdlt.
+
+         \sstitem
+          An error will result if the array, or any part of it, is
+         currently mapped for access (e.g. through another identifier).
+
+         \sstitem
+          An error will result if the array holds complex values.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary1
+      }{
+         The input array identifier. This can be stored in any form. If
+         it is already stored in DELTA form, it is uncompressed and then
+         re-compressed using the supplied compression parameters. If
+         is is stored in SCALED form, the internal integer values are
+         compressed and the scale and zero terms are copied into the
+         DELTA array.
+      }
+      \sstsubsection{
+         zaxis
+      }{
+         The one-based index of the pixel axis along which differences are
+         to be taken. If this is zero, a default value will be selected that
+         gives the greatest compression. An error will be reported if a
+         value less than zero or greater than the number of axes in the
+         input array is supplied.
+      }
+      \sstsubsection{
+         type
+      }{
+         The data type in which to store the differences between adjacent
+         input values. This must be one of \texttt{'} \_BYTE\texttt{'} , \texttt{'} \_WORD\texttt{'}  or
+         \texttt{'} \_INTEGER\texttt{'} . Additionally, a blank string may be supplied in which
+         case a default value will be selected that gives the greatest
+         compression.
+      }
+      \sstsubsection{
+         minrat
+      }{
+         The minimum allowed ZRATIO value. If compressing the input array
+         results in a ZRATIO value smaller than or equal to MINRAT, then
+         the returned array is left uncompressed. If the supplied value is
+         zero or negative, then the array will be compressed regardless of
+         the compression ratio.
+      }
+      \sstsubsection{
+         place
+      }{
+         Address of an array placeholder pointer (e.g. generated by the
+         aryPlace function), which indicates the position in the data system
+         where the new array will reside. The placeholder is annulled by this
+         function, and a value of NULL will be returned.
+      }
+      \sstsubsection{
+         zratio
+      }{
+         Returned holding the compression factor actually achieved (the ratio
+         of the supplied array size to the compressed array size). Genuine
+         compressions are represented by values more than 1.0, but values
+         less than 1.0 may be returned if the input data is not suited
+         to delta compression (i.e. if the \texttt{"} compression\texttt{"}  actually expands
+         the array storage). Note, the returned value of ZRATIO may be
+         smaller than MINRAT, in which case the supplied array is left
+         unchanged. The returned compression factor is approximate as it
+         does not take into account the space occupied by the HDS metadata
+         describing the extra components of a DELTA array (i.e. the
+         component names, data types, dimensions, etc). This will only be
+         significant for very small arrays.
+      }
+      \sstsubsection{
+         ary2
+      }{
+         Returned holding a pointer to the new DELTA array.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryDim
+}{
+   Enquire the dimension sizes of an array
+}{
+   \sstdescription{
+      This function returns the size in pixels of each dimension of an
+      array, together with the total number of dimensions (the size of
+      a dimension is the difference between that dimension\texttt{'} s upper and
+      lower pixel-index bounds $+$ 1).
+   }
+   \sstinvocation{
+      void aryDim( Ary $*$ary, int ndimx, hdsdim $*$dim, int $*$ndim, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          If the array has fewer than \texttt{"} ndimx\texttt{"}  dimensions, then any
+         remaining elements of the \texttt{"} dim\texttt{"}  argument will be filled with 1\texttt{'} s.
+
+         \sstitem
+          If the array has more than \texttt{"} ndimx\texttt{"}  dimensions, then the \texttt{"} ndim\texttt{"}
+         argument will return the actual number of dimensions. In this
+         case only the first \texttt{"} ndimx\texttt{"}  dimension sizes will be returned, and
+         an error will result if the size of any of the excluded
+         dimensions exceeds 1.
+
+         \sstitem
+          The symbolic constant ARY\_\_MXDIM may be used to declare the
+         size of the \texttt{"} dim\texttt{"}  argument so that it will be able to hold the
+         maximum number of array dimension sizes that this routine can
+         return. This constant is defined in the header file ary.h.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         ndimx
+      }{
+         Maximum number of dimension sizes to return (i.e. the size of
+         the \texttt{"} dim\texttt{"}  array).
+      }
+      \sstsubsection{
+         dim
+      }{
+         An array returned holding the size of each dimension in pixels.
+      }
+      \sstsubsection{
+         ndim
+      }{
+         Returned holding the total number of array dimensions.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryDupe
+}{
+   Duplicate an array
+}{
+   \sstdescription{
+      This function duplicates an array, creating a new base array with
+      the same attributes as an existing array (or array section). The
+      new array is left in an undefined state.
+   }
+   \sstinvocation{
+      void aryDupe( Ary $*$ary1, AryPlace $*$$*$place, Ary $*$$*$ary2, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          Duplicating a scaled or delta array produces an equivalent
+         simple array.
+
+         \sstitem
+          If this routine is called with \texttt{"} status\texttt{"}  set, then a value of
+         NULL will be returned for the \texttt{"} ary\texttt{"}  argument, although no
+         further processing will occur. The same value will also be
+         returned if the function should fail for any reason.  In either
+         event, the placeholder will still be annulled.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary1
+      }{
+         Identifier for the array to be duplicated.
+      }
+      \sstsubsection{
+         place
+      }{
+         An array placeholder (e.g. generated by the aryPlace routine)
+         which indicates the position in the data system where the new
+         array will reside. The placeholder is annulled by this
+         routine, and a value of NULL will be returned.
+      }
+      \sstsubsection{
+         ary2
+      }{
+         Returned holding the identifier for the new duplicate array.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryFind
+}{
+   Find an array in an HDS structure and import it into the ARY\_
+   system
+}{
+   \sstdescription{
+      This function finds a named array within an HDS structure, imports
+      it into the ARY\_ system and issues an identifier for it. The
+      imported array may then be manipulated by the ARY\_ routines.
+   }
+   \sstinvocation{
+      void aryFind( HDSLoc $*$loc, const char $*$name, Ary $*$$*$ary, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          If this routine is called with \texttt{"} status\texttt{"}  set, then a NNULL pointer
+         will be returned for the \texttt{"} ary\texttt{"}  argument, although no further
+         processing will occur. The same value will also be returned if the
+         routine should fail for any reason.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         loc
+      }{
+         Locator to the enclosing HDS structure.
+      }
+      \sstsubsection{
+         name
+      }{
+         Name of the HDS structure component to be imported.
+      }
+      \sstsubsection{
+         ary
+      }{
+         Address of variable in which to return the Array identifier.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryForm
+}{
+   Obtain the storage form of an array
+}{
+   \sstdescription{
+      This function returns the storage form of an array as an upper-case
+      character string (e.g. \texttt{'} SIMPLE\texttt{'} ).
+   }
+   \sstinvocation{
+      void aryForm( Ary $*$ary, char form[ARY\_\_SZFRM$+$1], int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          The symbolic constant ARY\_\_SZFRM should be used for declaring the
+         length of a character variable to hold the storage form of an
+         array. This constant is defined in the header file ary.h.
+
+         \sstitem
+          At present, the ARY\_ routines only support \texttt{"} primitive\texttt{"} , \texttt{"} scaled\texttt{"} ,
+         \texttt{"} simple\texttt{"}  and \texttt{"} delta\texttt{"}  arrays, so only the values \texttt{'} PRIMITIVE\texttt{'} , \texttt{'} SCALED\texttt{'}
+         \texttt{'} DELTA\texttt{'}  and \texttt{'} SIMPLE\texttt{'}  can be returned.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         form
+      }{
+         Returned holding the storage form of the array.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryFtype
+}{
+   Obtain the full data type of an array
+}{
+   \sstdescription{
+      This function returns the full data type of an array as an
+      upper-case character string (e.g. \texttt{'} \_REAL\texttt{'}  or \texttt{'} COMPLEX\_BYTE\texttt{'} ).
+   }
+   \sstinvocation{
+      void aryFtype( Ary $*$ary,  char ftype[ARY\_\_SZFTP$+$1], int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          The symbolic constant ARY\_\_SZFTP should be used for declaring the
+         length of a character variable to hold the full data type of an
+         array. This constant is defined in the header file ary.h.
+
+         \sstitem
+          For \texttt{"} Scaled\texttt{"}  arrays, the data type returned by this function is
+         the data type of the SCALE and ZERO terms, rather than the data
+         type of the stored array.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         ftype
+      }{
+         Returned holding the full data type of the array.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryGtdlt
+}{
+   Get the compressed axis and data type for a DELTA array
+}{
+   \sstdescription{
+      This function returns the details of the compression used to produce
+      an array stored in DELTA form. If the array is not stored in
+      DELTA form, then null values are returned as listed below, but no
+      error is reported.
+
+      A DELTA array is compressed by storing only the differences between
+      adjacent array values along a nominated compression axis, rather than
+      the full array values. The differences are stored using a smaller data
+      type than the original absolute values. The compression is lossless
+      because any differences that will not fit into the smaller data type
+      are stored explicitly in an extra array with a larger data type.
+      Additional compression is achieved by replacing runs of equal values
+      by a single value and a repeat count.
+   }
+   \sstinvocation{
+      void aryGtdlt( Ary $*$ary, int $*$zaxis, char ztype[DAT\_\_SZTYPE$+$1],
+                     float $*$zratio, int $*$status )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         zaxis
+      }{
+         Returned holding the index of the pixel axis along which compression
+         occurred. The first axis has index 1. Zero is returned if the array
+         is not stored in DELTA form.
+      }
+      \sstsubsection{
+         ztype
+      }{
+         Returned holding the data type in which the differences between
+         adjacent array values are stored. This will be one of \texttt{'} \_BYTE\texttt{'} ,
+         \texttt{'} \_WORD\texttt{'}  or \texttt{'} \_INTEGER\texttt{'} . The data type of the array itself is returned
+         if the supplid array is not stored in DELTA form.
+      }
+      \sstsubsection{
+         zratio
+      }{
+         Returned holding the compression factor - the ratio of the
+         uncompressed array size to the compressed array size. This is
+         approximate as it does not include the effects of the metadata
+         needed to describe the extra components of a DELTA array (i.e. the
+         space needed to hold the component names, types, dimensions, etc).
+         A value of 1.0 is returned if the supplid array is not stored in
+         DELTA form.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryGtsz$<$T$>$
+}{
+   Get the scale and zero values for an array
+}{
+   \sstdescription{
+      This function returns the scale and zero values associated with an array.
+      If the array is not stored in scaled form, then values of 1.0 and 0.0
+      are returned.
+   }
+   \sstinvocation{
+      void aryGtsz$<$T$>$( Ary $*$ary, CGEN\_TYPE $*$scale, CGEN\_TYPE $*$zero,
+                       int $*$status )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         scale
+      }{
+         Returned holding the scaling factor.
+      }
+      \sstsubsection{
+         zero
+      }{
+         Returned holding the zero offset.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryImprt
+}{
+   Import an array into the ARY\_ system from HDS
+}{
+   \sstdescription{
+      This function imports an array into the ARY\_ system from HDS and
+      issues an identifier for it. The array may then be manipulated by
+      the ARY\_ routines.
+   }
+   \sstinvocation{
+      void aryImprt( HDSLoc $*$loc, Ary $*$$*$ary, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          The locator supplied as input to this routine may later be
+         annulled without affecting the subsequent behaviour of the ARY\_
+         system.
+
+         \sstitem
+          If this routine is called with \texttt{"} status\texttt{"}  set, then a value of
+         NULL will be returned for the \texttt{"} ary\texttt{"}  argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         loc
+      }{
+         HDS locator to an array structure.
+      }
+      \sstsubsection{
+         ary
+      }{
+         Returned holding an array identifier for the array structure.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryIsacc
+}{
+   Determine whether a specified type of array access is available
+}{
+   \sstdescription{
+      This function determines whether a specified type of access to an
+      array is available, or whether it has been disabled. If access is
+      not available, then any attempt to access the array in this way
+      will fail.
+   }
+   \sstinvocation{
+      void aryIsacc( Ary $*$ary, const char access[ARY\_\_SZACC$+$1], int $*$isacc,
+                     int $*$status )
+   }
+   \sstnotes{
+      The valid access types control the following operations on the
+      array:
+      \sstitemlist{
+
+         \sstitem
+          \texttt{'} BOUNDS\texttt{'}  permits the pixel-index bounds of a base array to be
+         altered.
+
+         \sstitem
+          \texttt{'} DELETE\texttt{'}  permits deletion of the array.
+
+         \sstitem
+          \texttt{'} SHIFT\texttt{'}  permits pixel-index shifts to be applied to a base
+         array.
+
+         \sstitem
+          \texttt{'} TYPE\texttt{'}  permits the data type of the array to be altered.
+
+         \sstitem
+          \texttt{'} WRITE\texttt{'}  permits new values to be written to the array, or the
+         array\texttt{'} s state to be reset.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         access
+      }{
+         The type of array access required: \texttt{'} BOUNDS\texttt{'} , \texttt{'} DELETE\texttt{'} ,
+         \texttt{'} SHIFT\texttt{'} , \texttt{'} TYPE\texttt{'}  or \texttt{'} WRITE\texttt{'}  (see the Notes section for
+         details).
+      }
+      \sstsubsection{
+         isacc
+      }{
+         Returned holding a flag indicating whether the specified type
+         of access is available.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryIsbas
+}{
+   Enquire if an array is a base array
+}{
+   \sstdescription{
+      This function returns a boolean value indicating whether the array
+      whose identifier is supplied is a base array (as opposed to an
+      array section).
+   }
+   \sstinvocation{
+      void aryIsbas( Ary $*$ary, int $*$base, int $*$status )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         base
+      }{
+         Returned holding a flag indicating whether the array is a base
+         array.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryIsmap
+}{
+   Determine if an array is currently mapped
+}{
+   \sstdescription{
+      This function returns a boolean value indicating whether an array
+      is currently mapped for access through the identifier supplied.
+   }
+   \sstinvocation{
+      void aryIsmap( Ary $*$ary, int $*$mapped, int $*$status )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         mapped
+      }{
+         Returned holding a flag indicating whether the array is mapped
+         for access through the ARY identifier.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryIstmp
+}{
+   Determine if an array is temporary
+}{
+   \sstdescription{
+      This function returns a boolean value indicating whether the
+      specified array is temporary. Temporary arrays are deleted once
+      the last identifier which refers to them is annulled.
+   }
+   \sstinvocation{
+      void aryIstmp( Ary $*$ary, int $*$temp, int $*$status )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         temp
+      }{
+         Returned holding a flag indicating whether the array is temporary.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryLoc
+}{
+   Obtain an HDS locator for an array
+}{
+   \sstdescription{
+      This function returns an HDS locator for the data object referred to
+      by the supplied ARY identifier.
+   }
+   \sstinvocation{
+      void aryLoc( Ary $*$ary, HDSLoc $*$$*$loc, int $*$status )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         loc
+      }{
+         Returned holding the HDS locator. It should be annulled using
+         datAnnul when no longer needed. A value of NULL will be returned
+         if an error occurs.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryLock
+}{
+   Lock an array for exclusive use by the current thread
+}{
+   \sstdescription{
+      This function locks an ARY array for use by the current thread.
+      An array can be locked for read-only access or read-write access.
+      Multiple threads can lock an array simultaneously for read-only
+      access, but only one thread can lock an array for read-write access
+      at any one time. Use of any ARY function that may modify any aspect
+      of the array - either the data values stored in the array or the
+      meta-data describing the whole array - will fail with an error unless
+      the thread has locked the array for read-write access. Use of an ARY
+      function that cannot modify the array will fail with an error unless
+      the thread has locked the array (in this case the lock can be either
+      for read-only or read-write access).
+
+      If \texttt{"} readonly\texttt{"}  is zero (indicating the current thread wants to
+      modify some aspect of the array), this function will report an error
+      if any other thread currently has a lock (read-only or read-write)
+      on the array.
+
+      If \texttt{"} readonly\texttt{"}  is non-zero (indicating the current thread wants
+      read-only access to the array), this function will report an error
+      only if another thread currently has a read-write lock on the array.
+
+      The current thread must unlock the array using datUnlock before it
+      can be locked for use by another thread. All arrays are initially
+      locked by the current thread when they are created or opened. The
+      type of access available to the array (\texttt{"} Read\texttt{"} , \texttt{"} Write\texttt{"}  or \texttt{"} Update\texttt{"} )
+      determines the type of the initial lock. For pre-existing arrays,
+      this is determined by the access mode specified when it is first
+      opened. For new and temporary arrays, the initial lock is always
+      a read-write lock.
+   }
+   \sstinvocation{
+      aryLock( Ary $*$ary, int readonly, int $*$status );
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          If the version of HDS being used does not support object locking,
+         this function will return without action unless the HDS tuning
+         parameter V4LOCKERROR is set to a non-zero value, in which case an
+         error will be reported.
+
+         \sstitem
+          An error will be reported if the supplied array is currently
+         locked by another thread.
+
+         \sstitem
+          The majority of ARY functions will report an error if the array
+         supplied to the function has not been locked for use by the calling
+         thread. The exceptions are the functions that manage these locks -
+         aryLock, datUnlock and aryLocked.
+
+         \sstitem
+          Attempting to lock an array that is already locked by the
+         current thread will change the type of lock (read-only or
+         read-write) if the lock types differ, but will otherwise have no
+         effect.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Pointer to the array that is to be locked.
+      }
+      \sstsubsection{
+         readonly
+      }{
+         If non-zero, the array is locked for read-only access. Otherwise
+         it is locked for read-write access.
+      }
+      \sstsubsection{
+         status = int$*$ (Given and Returned)
+      }{
+         Pointer to global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryLocked
+}{
+   See if an array is locked
+}{
+   \sstdescription{
+      This function returns a value that indicates if the supplied ARY
+      array has been locked for use by one or more threads. A thread can
+      lock an array either for read-only access or for read-write access.
+      The lock management functions (aryLock and aryUnlock) will ensure
+      that any thread that requests and is given a read-write lock will
+      have exclusive access to the array - no other locks of either type
+      will be issued to other threads until the first thread releases the
+      read-write lock using aryUnlock. If a thread requests and is given
+      a read-only lock, the lock management functions may issue read-only
+      locks to other threads, but it will also ensure that no other thread
+      is granted a read-write lock until all read-only locks have been
+      released.
+   }
+   \sstinvocation{
+      locked = aryLocked( const Ary $*$ary, int $*$status );
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          Zero is returned as the function value if an error has already
+         occurred, or if an error occurs in this function.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Pointer to the array to be checked.
+      }
+      \sstsubsection{
+         status
+      }{
+         Pointer to global status.
+      }
+   }
+   \sstdiytopic{
+      Returned function value
+   }{
+       A value indicating the status of the supplied array:
+
+      \sstitemlist{
+
+         \sstitem
+          1: The application is is linked with a version of HDS that does
+             not support object locking.
+
+      }
+       0: the supplied array is unlocked. This is the condition that must
+          be met for the current thread to be able to lock the supplied
+          array for read-write access using function aryLock. This condition
+          can be achieved by releasing any existing locks using aryUnlock.
+
+       1: the supplied array is locked for reading and writing by the current
+          thread. This is the condition that must be met for the current
+          thread to be able to use the supplied array in any ARY function
+          that might modify the array (except for the locking and unlocking
+          functions - see below). This condition can be achieved by calling
+          aryLock.
+
+       2: the supplied array is locked for reading and writing by a different
+          thread. An error will be reported if the current thread attempts to
+          use the array in any other ARY function.
+
+       3: the supplied array is locked read-only by the current thread (and
+          maybe other threads as well). This is the condition that must be
+          met for the current thread to be able to use the supplied array
+          in any ARY function that cannot modify the array. An error will be
+          reported if the current thread attempts to use the array in any
+          ARY function that could modify the array. This condition can be
+          achieved by calling aryLock.
+
+       4: the supplied array is not locked by the current thread, but is
+          locked read-only by one or more other threads. An error will be
+          reported if the current thread attempts to use the array in any
+          other ARY function.
+   }
+}
+\newpage
+\sstroutine{
+   aryMap
+}{
+   Obtain mapped access to an array
+}{
+   \sstdescription{
+      This function obtains mapped access an array, returning a pointer
+      to the mapped values and a count of the number of elements
+      mapped.
+   }
+   \sstinvocation{
+      void aryMap( Ary $*$ary, const char $*$type, const char $*$mmod, void $*$$*$pntr,
+                   size\_t $*$el, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          If the array is a scaled array, the returned mapped values will
+         be the stored array values multiplied by the scale factor and shifted
+         by the zero term.
+
+         \sstitem
+          If the array is a delta (i.e. compressed) array, the returned mapped
+         values will be the uncompressed array values.
+
+         \sstitem
+          Currently, only READ access is available for scaled and
+         compressed arrays. An error will be reported if an attempt is made to
+         get WRITE or UPDATE access to a scaled or compressed array.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         type
+      }{
+         The numerical data type required for access (e.g. \texttt{"} \_REAL\texttt{"} ).
+      }
+      \sstsubsection{
+         mmod
+      }{
+         The mapping mode for access to the array: \texttt{"} READ\texttt{"} , \texttt{"} UPDATE\texttt{"}  or
+         \texttt{"} WRITE\texttt{"} , with an optional initialisation mode \texttt{"} /BAD\texttt{"}  or
+         \texttt{"} /ZERO\texttt{"}  appended.
+      }
+      \sstsubsection{
+         pntr
+      }{
+         Returned holding a pointer to the mapped values.
+      }
+      \sstsubsection{
+         el
+      }{
+         Returned holding the number of elements mapped.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryMapz
+}{
+   Obtain complex mapped access to an array
+}{
+   \sstdescription{
+      This function obtains complex mapped access to an array, returning
+      pointers to the real and imaginary values and a count of the
+      number of elements mapped.
+   }
+   \sstinvocation{
+      void aryMapz( Ary $*$ary, const char $*$type, const char $*$mmod, void $*$$*$rpntr,
+                    void $*$$*$ipntr, size\_t $*$el, int $*$status )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         type
+      }{
+         The numerical data type required for accessing the array (e.g.
+         \texttt{'} \_REAL\texttt{'} ).
+      }
+      \sstsubsection{
+         mmod
+      }{
+         The mapping mode for access to the array: \texttt{'} READ\texttt{'} , \texttt{'} UPDATE\texttt{'}  or
+         \texttt{'} WRITE\texttt{'} , with an optional initialisation mode \texttt{'} /BAD\texttt{'}  or
+         \texttt{'} /ZERO\texttt{'}  appended.
+      }
+      \sstsubsection{
+         rpntr
+      }{
+         Returned holding a pointer to the mapped real (i.e. non-imaginary)
+         values.
+      }
+      \sstsubsection{
+         ipntr
+      }{
+         Returned holding a pointer to the mapped imaginary values.
+      }
+      \sstsubsection{
+         el
+      }{
+         Returned holding the number of elements mapped.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryMsg
+}{
+   Assign the name of an array to a message token
+}{
+   \sstdescription{
+      This function assigns the name of an array to a message token (in
+      a form which a user will understand) for use in constructing
+      messages with the MSG\_ and ERR\_ routines (see SUN/104).
+   }
+   \sstinvocation{
+      void aryMsg( const char $*$token, Ary $*$ary )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          This routine has no \texttt{"} status\texttt{"}  argument and performs no error
+         checking. If it should fail, then no assignment to the message
+         token will be made and this will be apparent in the final
+         message.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         token
+      }{
+         Name of the message token.
+      }
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryNdim
+}{
+   Enquire the dimensionality of an array
+}{
+   \sstdescription{
+      This routine determines the number of dimensions which an array
+      has.
+   }
+   \sstinvocation{
+      void aryNdim( Ary $*$ary, int $*$ndim, int $*$status )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         ndim
+      }{
+         Returned holding the number of array dimensions.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryNew
+}{
+   Create a new simple array
+}{
+   \sstdescription{
+      This function creates a new simple array and returns an identifier
+      for it. The array may subsequently be manipulated with other Ary
+      functions.
+   }
+   \sstinvocation{
+      void aryNew( const char $*$ftype, int ndim, const hdsdim $*$lbnd, const hdsdim $*$ubnd,
+                   AryPlace $*$$*$place, Ary $*$$*$ary, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          If this routine is called with \texttt{"} status\texttt{"}  set, then a value of
+         NULL will be returned for the \texttt{"} ary\texttt{"}  argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. In either
+         event, the placeholder will still be annulled.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ftype
+      }{
+         Full data type of the array.
+      }
+      \sstsubsection{
+         ndim
+      }{
+         Number of array dimensions.
+      }
+      \sstsubsection{
+         lbnd
+      }{
+         Lower pixel-index bounds of the array.
+      }
+      \sstsubsection{
+         ubnd
+      }{
+         Upper pixel-index bounds of the array.
+      }
+      \sstsubsection{
+         place
+      }{
+         On entry, holds an array placeholder (e.g. generated by the
+         aryPlace function) which indicates the position in the data
+         system where the new array will reside. The placeholder is
+         annulled by this function, and a value of NULL will be returned
+         on exit.
+      }
+      \sstsubsection{
+         ary
+      }{
+         Returned holding an identifier for the new array.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryNewp
+}{
+   Create a new primitive array
+}{
+   \sstdescription{
+      This function creates a new primitive array and returns an
+      identifier for it. The array may subsequently be manipulated with
+      other Ary routines.
+   }
+   \sstinvocation{
+      void aryNewp( const char $*$ftype, int ndim, const hdsdim $*$ubnd,
+                    AryPlace $*$$*$place, Ary $*$$*$ary, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          If this routine is called with \texttt{"} status\texttt{"}  set, then a value of
+         NULL will be returned for the \texttt{"} ary\texttt{"}  argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. In either
+         event, the placeholder will still be annulled.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ftype
+      }{
+         Data type of the array (e.g. \texttt{'} \_REAL\texttt{'} ). Note that complex types
+         are not allowed for primitive arrays.
+      }
+      \sstsubsection{
+         ndim
+      }{
+         Number of array dimensions.
+      }
+      \sstsubsection{
+         ubnd
+      }{
+         Upper pixel-index bounds of the array (the lower bound of each
+         dimension is taken to be 1).
+      }
+      \sstsubsection{
+         place
+      }{
+         On entry, holds an array placeholder (e.g. generated by the
+         aryPlace function) which indicates the position in the data
+         system where the new array will reside. The placeholder is
+         annulled by this function, and a value of NULL will be returned
+         on exit.
+      }
+      \sstsubsection{
+         ary
+      }{
+         Returned holding an identifier for the new array.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryNoacc
+}{
+   Disable a specified type of access to an array
+}{
+   \sstdescription{
+      This function disables the specified type of access to an array,
+      so that any subsequent attempt to access it in that way will fail.
+      Access restrictions imposed on an array identifier by this
+      routine will be propagated to any new identifiers derived from
+      it, and cannot be revoked.
+   }
+   \sstinvocation{
+      void aryNoacc( const char $*$access, Ary $*$ary, int $*$status )
+   }
+   \sstnotes{
+      Disabling each type of access imposes the following restrictions
+      on an array:
+      \sstitemlist{
+
+         \sstitem
+          \texttt{'} BOUNDS\texttt{'}  prevents the pixel-index bounds of a base array from
+         being altered.
+
+         \sstitem
+          \texttt{'} DELETE\texttt{'}  prevents the array being deleted.
+
+         \sstitem
+          \texttt{'} MODIFY\texttt{'}  prevents any form of modification to the array (i.e.
+         it disables all the other access types).
+
+         \sstitem
+          \texttt{'} SCALE\texttt{'}  prevents the scale and zero values from being changed.
+
+         \sstitem
+          \texttt{'} SHIFT\texttt{'}  prevents pixel-index shifts from being applied to a
+         base array.
+
+         \sstitem
+          \texttt{'} TYPE\texttt{'}  prevents the data type of the array from being altered.
+
+         \sstitem
+          \texttt{'} WRITE\texttt{'}  prevents new values from being written to the array,
+         or the array\texttt{'} s state from being reset.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         access
+      }{
+         The type of access to be disabled: \texttt{'} BOUNDS\texttt{'} , \texttt{'} DELETE\texttt{'} ,
+         \texttt{'} MODIFY\texttt{'} , \texttt{'} SCALE\texttt{'} , \texttt{'} SHIFT\texttt{'} , \texttt{'} TYPE\texttt{'}  or \texttt{'} WRITE\texttt{'} .
+      }
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryOffs
+}{
+   Obtain the pixel offset between two arrays
+}{
+   \sstdescription{
+      This function returns the pixel offset for each requested dimension
+      between two arrays. These values are the offsets which should be
+      added to the pixel indices of the first array to obtain the
+      indices of the corresponding pixel in the second array.
+   }
+   \sstinvocation{
+      void aryOffs( Ary $*$ary1, Ary $*$ary2, int mxoffs, hdsdim $*$offs,
+                    int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          The two array identifiers supplied need not refer to the same
+         base array (although they may often do so). If they do not, then
+         the offset between the pixels in each array is determined by
+         matching the pixel indices of their respective base arrays.
+
+         \sstitem
+          Note that non-zero pixel offsets may exist even for dimensions
+         which exceed the dimensionality of either of the two arrays
+         supplied. The symbolic constant ARY\_\_MXDIM may be used to declare
+         the size of the OFFS argument so that it will be able to hold the
+         maximum number of non-zero offsets that this routine can return.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         iary1
+      }{
+         First array identifier.
+      }
+      \sstsubsection{
+         iary2
+      }{
+         Second array identifier.
+      }
+      \sstsubsection{
+         mxoffs
+      }{
+         Maximum number of pixel offsets to return (i.e. the declared
+         size of the supplied \texttt{"} offs\texttt{"}  array).
+      }
+      \sstsubsection{
+         offs
+      }{
+         Returned holding an array of pixel offsets for each dimension.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryPlace
+}{
+   Obtain an array placeholder
+}{
+   \sstdescription{
+      This function returns an array placeholder. A placeholder is used
+      to identify a position in the underlying data system (HDS) and
+      may be passed to other routines (e.g. aryNew) to indicate where
+      a newly created array should be positioned.
+   }
+   \sstinvocation{
+      void aryPlace( HDSLoc $*$loc, const char $*$name, AryPlace $*$$*$place, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          Placeholders are intended only for local use within an
+         application and only a limited number of them are available
+         simultaneously. They are always annulled as soon as they are
+         passed to another routine to create a new array, where they are
+         effectively exchanged for an array identifier.
+
+         \sstitem
+          If this routine is called with \texttt{"} status\texttt{"}  set, then a value of
+         NULL will be returned for the \texttt{"} place\texttt{"}  argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         loc
+      }{
+         HDS locator to the structure to contain the new array.
+      }
+      \sstsubsection{
+         name
+      }{
+         Name of the new structure component (i.e. the array).
+      }
+      \sstsubsection{
+         place
+      }{
+         Returned holding an array placeholder identifying the nominated
+         position in the data system.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryPtsz$<$T$>$
+}{
+   Set new scale and zero values for a scaled array
+}{
+   \sstdescription{
+      This function sets new values for the scale and zero values
+      associated with an array. If the array is stored in simple form,
+      then the storage form is changed to scaled.
+   }
+   \sstinvocation{
+      void aryPtsz$<$T$>$( Ary $*$ary, CGEN\_TYPE scale, CGEN\_TYPE zero, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          This routine may only be used to change the type of a base
+         array. If it is called with an array which is not a base array,
+         then it will return without action. No error will result.
+
+         \sstitem
+          An error will result if the array, or any part of it, is
+         currently mapped for access (e.g. through another identifier).
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         scale
+      }{
+         The new value for the scaling factor.
+      }
+      \sstsubsection{
+         zero
+      }{
+         The new value for the zero offset.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryReset
+}{
+   Reset an array to an undefined state
+}{
+   \sstdescription{
+      This function resets an array so that its values become undefined.
+      Its use is advisable before making format changes to an array if
+      retention of the existing values is not required (e.g. before
+      changing its data type with the aryStype function); this will
+      avoid the cost of converting the existing values.
+   }
+   \sstinvocation{
+      void aryReset( Ary $*$ary, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          This function may only be used to reset the state of a base
+         array. If an array section is supplied, then it will return
+         without action. No error will result.
+
+         \sstitem
+          An array cannot be reset while it is mapped for access. This
+         routine will fail if this is the case.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   arySame
+}{
+   Enquire if two arrays are part of the same base array
+}{
+   \sstdescription{
+      This function determines whether two array identifiers refer to
+      parts of the same base array.  If so, it also determines whether
+      they intersect.
+   }
+   \sstinvocation{
+      void arySame( Ary $*$ary1, Ary $*$ary2, int $*$same, int $*$isect,
+                    int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          Two arrays (or array sections) are counted as intersecting if
+         (i) they both refer to the same base array and (ii) altering
+         values in one of the arrays can result in the values in the other
+         array changing in consequence.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary1
+      }{
+         Identifier for the first array (or array section).
+      }
+      \sstsubsection{
+         ary2
+      }{
+         Identifier for the second array (or array section).
+      }
+      \sstsubsection{
+         same
+      }{
+         Returned holding a boolean flag indicating whether the identifiers
+         refer to parts of the same base array.
+      }
+      \sstsubsection{
+         isect
+      }{
+         Returned holding a boolean flag indicating whether the arrays
+         intersect.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   arySbad
+}{
+   Set the bad-pixel flag for an array
+}{
+   \sstdescription{
+      This function sets the value of the bad-pixel flag for an array
+      A call to this routine with \texttt{"} bad\texttt{"}  set non-zero declares that the
+      specified array may contain bad pixel values for which checks
+      must be made by algorithms which subsequently processes its
+      values.  A call with \texttt{"} bad\texttt{"}  set to zero declares that there are
+      definitely no bad values present and that subsequent checks for
+      such values may be omitted.
+   }
+   \sstinvocation{
+      void arySbad( int bad, Ary $*$ary, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          If the array is mapped for access when this routine is called,
+         then the bad-pixel flag will be associated with the mapped
+         values. This information will only be transferred to the actual
+         data object when the array is unmapped (but only if it was mapped
+         for UPDATE or WRITE access). The value transferred may be
+         modified if conversion errors occur during the unmapping process.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         bad
+      }{
+         Bad-pixel flag value to be set.
+      }
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   arySbnd
+}{
+   Set new pixel-index bounds for an array
+}{
+   \sstdescription{
+      This function sets new pixel-index bounds for an array (or array
+      section). The number of array dimensions may also be changed.  If
+      a base array is specified, then a permanent change is made to the
+      actual data object and this will be apparent through any other
+      array identifiers which refer to it.  However, if an identifier
+      for an array section is specified, then its bounds are altered
+      without affecting other arrays.
+   }
+   \sstinvocation{
+      void arySbnd( int ndim, const hdsdim $*$lbnd, const hdsdim $*$ubnd,
+                    Ary $*$ary, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          The bounds of an array section cannot be altered while it is
+         mapped for access through the identifier supplied to this
+         routine.
+
+         \sstitem
+          The bounds of a base array cannot be altered while any part of
+         it is mapped for access (i.e. even through another identifier).
+
+         \sstitem
+          The array\texttt{'} s pixel values (if defined) will be retained for
+         those pixels which lie within both the old and new bounds. Any
+         pixels lying outside the new bounds will be lost (and cannot
+         later be recovered by further changes to the array\texttt{'} s bounds).
+         Any new pixels introduced where the new bounds extend beyond the
+         old ones will be assigned the \texttt{"} bad\texttt{"}  value, and the subsequent
+         value of the bad-pixel flag will reflect this.
+
+         \sstitem
+          If the bounds of a base array are to be altered and retention
+         of the existing pixel values is not required, then a call to
+         aryReset should be made before calling this routine. This will
+         eliminate any processing which might otherwise be needed to
+         retain the existing values. This step is not necessary with an
+         array section, where no processing of pixel values takes place.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ndim
+      }{
+         New number of array dimensions.
+      }
+      \sstsubsection{
+         lbnd
+      }{
+         Array holding the new lower pixel-index bounds of the array.
+      }
+      \sstsubsection{
+         ubnd
+      }{
+         Array holding the new upper pixel-index bounds of the array.
+      }
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   arySctyp
+}{
+   Obtain the numeric type of a scaled array
+}{
+   \sstdescription{
+      This function returns the numeric type of a scaled array as an
+      upper-case character string (e.g. \texttt{'} \_REAL\texttt{'} ). The returned type
+      describes the values stored in the array, before they are unscaled
+      using the associated scale and zero values. Use aryType if you
+      need the data type of the array after it has been unscaled.
+   }
+   \sstinvocation{
+      void arySctyp( Ary $*$ary, char type[ARY\_\_SZTYP$+$1], int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          If the array is not stored in SCALED form, then this routine
+         returns the same type as the aryType function.
+
+         \sstitem
+          The symbolic constant ARY\_\_SZTYP should be used to declare the
+         length of a character variable which is to hold the numeric type
+         of an array. This constant is defined in the header file
+         ary\_par.h.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         type
+      }{
+         Numeric type of the array.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   arySect
+}{
+   Create an array section
+}{
+   \sstdescription{
+      This function creates a new array section which refers to a
+      selected region of an existing array (or array section). The
+      section may be larger or smaller in extent than the original
+      array.
+   }
+   \sstinvocation{
+      void arySect( Ary $*$ary1, int ndim, const hdsdim $*$lbnd,
+                    const hdsdim $*$ubnd, Ary $*$$*$ary2, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          The number of section dimensions need not match the number of
+         dimensions in the initial array. Pixel-index bounds will be
+         padded with 1\texttt{'} s as necessary to identify the pixels to which the
+         new section should refer.
+
+         \sstitem
+          Note that sections which extend beyond the pixel-index bounds
+         of the initial array will be padded with bad pixels.
+
+         \sstitem
+          If this routine is called with \texttt{"} Status\texttt{"}  set, then a value of
+         NULL will be returned for the \texttt{"} ary2\texttt{"}  argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Identifier for the initial array.
+      }
+      \sstsubsection{
+         ndim
+      }{
+         Number of dimensions for new section. This is the length of the
+         \texttt{"} lbnd\texttt{"}  and Ubnd\texttt{"}  arrays.
+      }
+      \sstsubsection{
+         lbnd
+      }{
+         Lower pixel-index bounds for the new section.
+      }
+      \sstsubsection{
+         ubnd
+      }{
+         Upper pixel-index bounds for the new section.
+      }
+      \sstsubsection{
+         ary2
+      }{
+         Address of a variable in which to return an identifier for the
+         new section.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryShift
+}{
+   Apply pixel-index shifts to an array
+}{
+   \sstdescription{
+      This function applies pixel-index shifts to an array. An integer
+      shift is applied to each dimension so that its pixel-index
+      bounds, and the indices of each pixel, change by the amount of
+      shift applied to the corresponding dimension. The array\texttt{'} s pixels
+      retain their values and none are lost.
+   }
+   \sstinvocation{
+      void aryShift( int nshift, const hdsdim $*$shift, Ary $*$ary, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          Pixel-index shifts applied to a base array will affect the
+         appearance of that array as seen by all base-array identifiers
+         associated with it. However, array sections derived from that
+         base array will remain unchanged (as regards both pixel-indices
+         and data content).
+
+         \sstitem
+          Pixel-index shifts cannot be applied to a base array while any
+         part of it is mapped for access (i.e. even through another
+         identifier).
+
+         \sstitem
+          Pixel-index shifts applied to an array section only affect
+         that section itself, and have no effect on other array
+         identifiers.
+
+         \sstitem
+          Pixel-index shifts cannot be applied to an array section while
+         it is mapped for access through the identifier supplied to this
+         routine.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         nshift
+      }{
+         Number of dimensions to which shifts are to be applied (i.e. the
+         length of array \texttt{"} shift\texttt{"} ). This must not exceed the number of array
+         dimensions. If fewer shifts are supplied than there are dimensions
+         in the array, then the extra dimensions will not be shifted.
+      }
+      \sstsubsection{
+         shift
+      }{
+         An array holding the pixel-index shifts to be applied to each
+         dimension.
+      }
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   arySize
+}{
+   Determine the size of an array
+}{
+   \sstdescription{
+      This function returns the number of pixels in the array whose
+      identifier is supplied (i.e. the product of its dimensions).
+   }
+   \sstinvocation{
+      void arySize( Ary $*$ary, int npix, int $*$status )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         npix
+      }{
+         Returned holding the number of pixels in the array.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   arySsect
+}{
+   Create a similar array section to an existing one
+}{
+   \sstdescription{
+      This function creates a new array section, using an existing
+      section as a template. The new section bears the same
+      relationship to its base array as the template section does to
+      its own base array. Allowance is made for pixel-index shifts
+      which may have been applied so that the pixel-indices of the new
+      section match those of the template.  The number of dimensions of
+      the input and template arrays may differ.
+   }
+   \sstinvocation{
+      void arySsect( Ary $*$ary1, Ary $*$ary2, Ary $*$$*$ary3, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          This routine normally generates an array section.  However, if
+         both input arrays are base arrays with identical pixel-index
+         bounds, then there is no need to create a section in order to
+         access the required part of the first array. In this case a base
+         array identifier will be returned instead.
+
+         \sstitem
+          The new section created by this routine will have the same
+         number of dimensions as the array (or array section) from which
+         it is derived. If the template (ary2) array has fewer dimensions
+         than this, then the bounds of any additional input dimensions are
+         preserved unchanged in the new array. If the template (ary2)
+         array has more dimensions, then the excess ones are ignored.
+
+         \sstitem
+          This routine takes account of the regions of each base array
+         to which the input array sections have access. It may therefore
+         restrict the region accessible to the new section (and pad with
+         \texttt{"} bad\texttt{"}  pixels) so as not to grant access to regions of the base
+         array which were not previously accessible through the input
+         arrays.
+
+         \sstitem
+          If this routine is called with \texttt{"} status\texttt{"}  set, then a value of
+         NULL will be returned for the \texttt{"} ary3\texttt{"}  argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary1
+      }{
+         Identifier for the input array from which the section is to be
+         derived. This may be a base array or an array section.
+      }
+      \sstsubsection{
+         ary2
+      }{
+         Identifier for the template section (this may also be a base
+         array or an array section).
+      }
+      \sstsubsection{
+         ary3
+      }{
+         Returned holding the identifier for the new array section.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryState
+}{
+   Determine the state of an array (defined or undefined)
+}{
+   \sstdescription{
+      This function returns a flag indicating whether an array\texttt{'} s
+      pixel values are currently defined.
+   }
+   \sstinvocation{
+      void aryState( Ary $*$ary, int $*$state, int $*$status )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         state
+      }{
+         Returned hoplding a flag indicating whether the array\texttt{'} s
+         pixel values are defined.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryStype
+}{
+   Set a new type for an array
+}{
+   \sstdescription{
+      This function sets a new full type for an array, causing its data
+      storage type to be changed. If the array\texttt{'} s pixel values are
+      defined, then they will be converted from the old type to the new
+      one.  If they are undefined, then no conversion will be
+      necessary.  Subsequent enquiries will reflect the new type.
+      Conversion may be performed between any types supported by the
+      ary\_ routines, including from a non-complex type to a complex
+      type (and vice versa).
+   }
+   \sstinvocation{
+      void aryStype( const char $*$ftype, Ary $*$ary, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          This function may only be used to change the type of a base
+         array. If it is called with an array which is not a base array,
+         then it will return without action. No error will result.
+
+         \sstitem
+          An error will result if the array, or any part of it, is
+         currently mapped for access (e.g. through another identifier).
+
+         \sstitem
+          If the type of an array is to be changed without its pixel
+         values being retained, then a call to aryReset should be made
+         beforehand. This will avoid the cost of converting all the
+         values.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ftype
+      }{
+         The new full type specification for the array (e.g.  \texttt{'} \_REAL\texttt{'}
+         or \texttt{'} COMPLEX\_INTEGER\texttt{'} ).
+      }
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryTemp
+}{
+   Obtain a placeholder for a temporary array
+}{
+   \sstdescription{
+      This function returns an array placeholder which may be used to
+      create a temporary array (i.e. one which will be deleted
+      automatically once the last identifier associated with it is
+      annulled). The placeholder returned by this routine may be passed
+      to other routines (e.g. aryNew or aryCopy) to produce a
+      temporary array in the same way as a new permanent array would be
+      created.
+   }
+   \sstinvocation{
+      void aryTemp( AryPlace $*$$*$place, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          Placeholders are intended only for local use within an
+         application and only a limited number of them are available
+         simultaneously. They are always annulled as soon as they are
+         passed to another routine to create a new array, where they are
+         effectively exchanged for an array identifier.
+
+         \sstitem
+          If this routine is called with STATUS set, then a value of
+         NULL will be returned for the \texttt{"} place\texttt{"}  argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         place
+      }{
+         Returned holding a placeholder for a temporary array.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryTrace
+}{
+   Set the internal ARY\_ system error-tracing flag
+}{
+   \sstdescription{
+      This function sets an internal flag in the ARY\_ system which
+      enables or disables error-tracing messages. If this flag is set
+      non-zero, then any error occurring within the ARY\_ system will
+      be accompanied by error messages indicating which internal
+      routines have exited prematurely as a result. If the flag is set
+      to zero, this internal diagnostic information will not appear
+      and only standard error messages will be produced.
+   }
+   \sstinvocation{
+      char aryTrace( char newflg )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          By default, the error tracing flag is set to zero, so
+         no internal diagnostic information will be produced.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         newflg
+      }{
+         The new value to be set for the error-tracing flag. If a
+         negative value is supplied, the existing value is left unchanged.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryType
+}{
+   Obtain the numeric type of an array
+}{
+   \sstdescription{
+      This function returns the numeric type of an array as an upper-case
+      character string (e.g. \texttt{'} \_REAL\texttt{'} ).
+   }
+   \sstinvocation{
+      void aryType( Ary $*$ary, char type[ARY\_\_SZTYP$+$1], int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          The symbolic constant ARY\_\_SZTYP should be used for declaring the
+         length of a character array which is to hold the numeric type
+         of an array. This constant is defined in the header file ary\_par.h
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         type
+      }{
+         Numeric type of the array.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryUnlock
+}{
+   Unlock an array so that it can be locked by a different thread
+}{
+   \sstdescription{
+      This function ensures that the current thread does not have a
+      lock of any type on the supplied array. See aryLock.
+
+      The array must be locked again, using aryLock, before it can
+      be used by any other ARY function. All arrays are initially
+      locked by the current thread when they are first created or
+      opened.
+   }
+   \sstinvocation{
+      aryUnlock( Ary $*$ary, int $*$status );
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          If the version of HDS being used does not support object locking,
+         this function will return without action unless the HDS tuning
+         parameter V4LOCKERROR is set to a non-zero value, in which case an
+         error will be reported.
+
+         \sstitem
+          No error is reported if the supplied array is currently locked
+         for read-only or read-write access by another thread.
+
+         \sstitem
+          The majority of ARY functions will report an error if the array
+         supplied to the function has not been locked for use by the calling
+         thread. The exceptions are the functions that manage these locks -
+         aryLock, aryUnlock and aryLocked.
+
+         \sstitem
+          Attempting to unlock an array that is not locked by the current
+         thread has no effect, and no error is reported. The aryLocked
+         function can be used to determine if the current thread has a lock
+         on the array.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Pointer to to the array to be unlocked.
+      }
+      \sstsubsection{
+         status
+      }{
+         Pointer to global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryUnmap
+}{
+   Unmap an array
+}{
+   \sstdescription{
+      This function unmaps an array which has previously been mapped for
+      READ, UPDATE or WRITE access.
+   }
+   \sstinvocation{
+      void aryUnmap( Ary $*$ary, int $*$status )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          This function attempts to execute even if \texttt{"} status\texttt{"}  is set on
+         entry, although no further error report will be made if it
+         subsequently fails under these circumstances.
+
+         \sstitem
+          An error will result if the array has not previously been
+         mapped for access.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryValid
+}{
+   Determine whether an array identifier is valid
+}{
+   \sstdescription{
+      Determine whether an array identifier is valid (i.e. associated
+      with an array).
+   }
+   \sstinvocation{
+      int aryValid( Ary $*$ary, int $*$status )
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         A flag indicating if the identifier is valid.
+      }{
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier to be tested.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   aryVerfy
+}{
+   Verify that an array\texttt{'} s data structure is correctly constructed
+}{
+   \sstdescription{
+      This function checks that the data structure containing an array is
+      correctly constructed and that the array\texttt{'} s pixel values are
+      defined. It also checks for the presence of any \texttt{"} rogue\texttt{"}
+      components in the data structure. If an anomaly is found, then an
+      error results. Otherwise, the routine returns without further
+      action.
+   }
+   \sstinvocation{
+      void aryVerfy( Ary $*$ary, int $*$status )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ary
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+
+
+
 \newpage
 \section{\xlabel{changes_and_new_features_in_v11}%
 Changes and new features in V1.1}
@@ -3210,6 +6863,22 @@ as follows:
 \item A bug in ARY\_DUPE has been fixed. This bug resulted in the wrong data
 type for the output array if the input array was compressed.
 
+\end{enumerate}
+
+\section{\xlabel{changes_and_new_features_in_v20}%
+Changes and new features in V2.0}
+\label{changes_and_new_features_in_v20}
+The most significant changes in version (V2.0) of the ARY\_ system are
+as follows:
+
+\begin{enumerate}
+
+\item This is a complete new re-write of the orignial Fortran code in C.
+\item The C Interface is thread-safe, including new facilities for locking
+and unlocking arrays for exclusive use by the current thread.
+\item The Fortran API has been expanded ito include versions of routines
+that allow pixel index and count values to be given and returned in 8
+byte integers.
 \end{enumerate}
 
 No changes to existing applications should be required, neither should any
