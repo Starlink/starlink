@@ -34,5 +34,5 @@ DLTIN	<invalid compression information in delta array>
 AXINV	<invalid axis index>
 CMPAC   <attempt to change a read-only property of a compressed array>
 THREAD  <Object not locked by current thread>
-
+TOOBIG  <Array dimensions exceed limits of the 32 bit API>
 .END

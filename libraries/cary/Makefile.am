@@ -72,14 +72,16 @@ ary_cgen.h: ary_cgen.h.source make_h
 
 # Testing
 
-TESTS = caryTest cary_test
-check_PROGRAMS = caryTest cary_test
+TESTS = caryTest cary_test64 cary_test32
+check_PROGRAMS = caryTest cary_test64 cary_test32
 caryTest_SOURCES = caryTest.c
-cary_test_SOURCES = cary_test.f
+cary_test64_SOURCES = cary_test64.f
+cary_test32_SOURCES = cary_test32.f
 
 # LDADD is the expansion of ary_link, with -lary replaced by libary.la
 caryTest_LDADD = libary.la `ast_link` `hds_link` `err_link` `chr_link` `prm_link`
-cary_test_LDADD = libary.la `ast_link` `hds_link` `err_link` `chr_link` `prm_link`
+cary_test64_LDADD = libary.la `ast_link` `hds_link` `err_link` `chr_link` `prm_link`
+cary_test32_LDADD = libary.la `ast_link` `hds_link` `err_link` `chr_link` `prm_link`
 
 dist_starnews_DATA = ary.news
 dist_pkgdata_DATA = LICENCE
