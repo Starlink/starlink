@@ -1306,7 +1306,10 @@ class Parameter(object):
             result = raw_input(pmt).strip()
 
          if result == "" or result.isspace():
-            if default != Parameter.UNSET:
+            if default is None:
+               result = None
+               break
+            elif default != Parameter.UNSET:
                result = "{0}".format(default)
                break
 
