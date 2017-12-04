@@ -1,10 +1,10 @@
-      PROGRAM CARY_TEST
+#      PROGRAM CARY_TEST64
 *+
 *  Name:
-*     CARY_TEST
+*     CARY_TEST64
 
 *  Purpose:
-*     Test installation of C ARY.
+*     Test installation of 64 bit ARY Fortran API
 
 *  Language:
 *     Starlink Fortran 77
@@ -98,10 +98,10 @@
 
 *  Create an array inside it.
       CALL ARY_PLACE( LOC, 'ARRAY', PLACE, STATUS )
-      CALL ARY_NEWP( '_INTEGER', 2, DIM, PLACE, IARY, STATUS )
+      CALL ARY_NEWPK( '_INTEGER', 2, DIM, PLACE, IARY, STATUS )
 
 *  Map the array.
-      CALL ARY_MAP( IARY, '_REAL', 'WRITE', PNTR, EL, STATUS )
+      CALL ARY_MAPK( IARY, '_REAL', 'WRITE', PNTR, EL, STATUS )
 
 *  Initialise the array.
       CALL SETUP( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
@@ -115,7 +115,7 @@
 
 *  Find and map the array.
       CALL ARY_FIND( LOC, 'ARRAY', IARY, STATUS )
-      CALL ARY_MAP( IARY, '_INTEGER', 'READ', PNTR, EL, STATUS )
+      CALL ARY_MAPK( IARY, '_INTEGER', 'READ', PNTR, EL, STATUS )
 
 *  Sum the data elements.
       CALL SUM( EL, %VAL( CNF_PVAL( PNTR ) ), ISUM, STATUS )
@@ -145,8 +145,8 @@
       LBND( 2 ) = -200
       UBND( 1 ) = 100
       UBND( 2 ) = 0
-      CALL ARY_NEW( '_WORD', 2, LBND, UBND, PLACE, IARY, STATUS )
-      CALL ARY_MAP( IARY, '_INTEGER', 'WRITE', PNTR, EL, STATUS )
+      CALL ARY_NEWK( '_WORD', 2, LBND, UBND, PLACE, IARY, STATUS )
+      CALL ARY_MAPK( IARY, '_INTEGER', 'WRITE', PNTR, EL, STATUS )
       CALL FILL( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
       CALL ARY_UNMAP( IARY, STATUS )
 
@@ -209,7 +209,7 @@
 
 *  Map the array and check that the mapped values include the effect of
 *  the above scaling.
-      CALL ARY_MAP( IARY, '_REAL', 'READ', PNTR, EL, STATUS )
+      CALL ARY_MAPK( IARY, '_REAL', 'READ', PNTR, EL, STATUS )
       CALL BACKR( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
       CALL ARY_UNMAP( IARY, STATUS )
 
@@ -229,7 +229,7 @@
      :                  STATUS )
       END IF
 
-      CALL ARY_MAP( IARY, '_REAL', 'READ', PNTR, EL, STATUS )
+      CALL ARY_MAPK( IARY, '_REAL', 'READ', PNTR, EL, STATUS )
       CALL BACKR( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
       CALL ARY_UNMAP( IARY, STATUS )
 
@@ -238,7 +238,7 @@
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL ERR_MARK
          OK = .TRUE.
-         CALL ARY_MAP( IARY, '_REAL', 'UPDATE', PNTR, EL, STATUS )
+         CALL ARY_MAPK( IARY, '_REAL', 'UPDATE', PNTR, EL, STATUS )
          IF( STATUS .NE. ARY__CMPAC ) THEN
             OK = .FALSE.
          ELSE
@@ -259,7 +259,7 @@
       CALL ARY_COPY( IARY, PLACE, IARY2, STATUS )
 
 *  Check the values in the copied array are correct.
-      CALL ARY_MAP( IARY2, '_REAL', 'READ', PNTR, EL, STATUS )
+      CALL ARY_MAPK( IARY2, '_REAL', 'READ', PNTR, EL, STATUS )
       CALL BACKR( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
       CALL ARY_UNMAP( IARY2, STATUS )
 
@@ -288,8 +288,8 @@
       LBND( 2 ) = -200
       UBND( 1 ) = 100
       UBND( 2 ) = 0
-      CALL ARY_NEW( '_INTEGER', 2, LBND, UBND, PLACE, IARY2, STATUS )
-      CALL ARY_MAP( IARY2, '_INTEGER', 'WRITE', PNTR, EL, STATUS )
+      CALL ARY_NEWK( '_INTEGER', 2, LBND, UBND, PLACE, IARY2, STATUS )
+      CALL ARY_MAPK( IARY2, '_INTEGER', 'WRITE', PNTR, EL, STATUS )
       CALL FILL( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
       CALL ARY_UNMAP( IARY2, STATUS )
 
@@ -354,11 +354,11 @@
 
 *  Map the array and check that the mapped values are uncompressed. Do it
 *  first as INTEGER then as REAL.
-      CALL ARY_MAP( IARY, '_INTEGER', 'READ', PNTR, EL, STATUS )
+      CALL ARY_MAPK( IARY, '_INTEGER', 'READ', PNTR, EL, STATUS )
       CALL UNCOMPI( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
       CALL ARY_UNMAP( IARY, STATUS )
 
-      CALL ARY_MAP( IARY, '_REAL', 'READ', PNTR, EL, STATUS )
+      CALL ARY_MAPK( IARY, '_REAL', 'READ', PNTR, EL, STATUS )
       CALL UNCOMPR( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
       CALL ARY_UNMAP( IARY, STATUS )
 
@@ -378,7 +378,7 @@
      :                  STATUS )
       END IF
 
-      CALL ARY_MAP( IARY, '_REAL', 'READ', PNTR, EL, STATUS )
+      CALL ARY_MAPK( IARY, '_REAL', 'READ', PNTR, EL, STATUS )
       CALL UNCOMPR( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
       CALL ARY_UNMAP( IARY, STATUS )
 
@@ -387,7 +387,7 @@
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL ERR_MARK
          OK = .TRUE.
-         CALL ARY_MAP( IARY, '_REAL', 'UPDATE', PNTR, EL, STATUS )
+         CALL ARY_MAPK( IARY, '_REAL', 'UPDATE', PNTR, EL, STATUS )
          IF( STATUS .NE. ARY__CMPAC ) THEN
             OK = .FALSE.
          ELSE
@@ -408,7 +408,7 @@
       CALL ARY_COPY( IARY, PLACE, IARY2, STATUS )
 
 *  Check the values in the copied array are correct.
-      CALL ARY_MAP( IARY2, '_REAL', 'READ', PNTR, EL, STATUS )
+      CALL ARY_MAPK( IARY2, '_REAL', 'READ', PNTR, EL, STATUS )
       CALL UNCOMPR( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
       CALL ARY_UNMAP( IARY2, STATUS )
 
