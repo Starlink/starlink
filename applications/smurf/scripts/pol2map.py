@@ -32,10 +32,16 @@
 *             [glevel] [logfile]
 
 *  ADAM Parameters:
+*     BINSIZE = _REAL (Read)
+*        The bin size in the output vector catalogue, in arcsec. The
+*        value supplied for parameter PIXSIZE is used as the default for
+*        BINSIZE. An error is reported if BINSIZE is smaller than
+*        PIXSIZE. []
 *     CAT = LITERAL (Read)
 *        The output FITS vector catalogue. No catalogue is created if
-*        null (!) is supplied. Note - currently, the Q, U  and PI values
-*        in this catalogue will be in units of pW. [!]
+*        null (!) is supplied. The Q, U  and PI values in this catalogue
+*        will be in units of pW or mJy/beam, as selected using parameter
+*        JY . The bin size is specified by parameter BINSIZE. [!]
 *     CONFIG = LITERAL (Read)
 *        Extra parameter values to include in the MAKEMAP configuration
 *        used to create both the I maps and the Q/U maps.
@@ -352,8 +358,10 @@
 *        Declination axis. If "TRACKING" is supplied, they use north in the
 *        tracking system - what ever that may be. ["TRACKING"]
 *     PIXSIZE = _REAL (Read)
-*        Pixel dimensions in the output I maps, in arcsec. The default
-*        is 4 arc-sec for 850 um data and 2 arc-sec for 450 um data. []
+*        Pixel dimensions in the output I, Q and U maps, in arcsec. The default
+*        is 4 arc-sec for 850 um data and 2 arc-sec for 450 um data. The
+*        bin size for the output catalogue can be specified separately -
+*        see parameter BINSIZE and CAT. []
 *     QOUT = NDF (Write)
 *        The output NDF in which to return the Q map including all supplied
 *        observations. This will be in units of pW. Supply null (!) if no Q
@@ -618,6 +626,9 @@ try:
    params.append(starutil.Par0S("QUCONFIG", "Map-maker tuning parameters for Q/U maps",
                                 "def", noprompt=True))
 
+   params.append(starutil.Par0F("BINSIZE", "Catalogue bin size (arcsec)", None,
+                                 maxval=1000, minval=0.01, noprompt=True))
+
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
@@ -643,6 +654,7 @@ try:
 #  If a catalogue is required, we need to create all three maps, so
 #  ensure this is the case (use temporary files for any that have not
 #  been requested by the user).
+   catref = None
    if outcat:
       if not imap:
          imap = NDG( 1 )
@@ -650,6 +662,9 @@ try:
          qmap = NDG( 1 )
       if not umap:
          umap = NDG( 1 )
+
+#  Get the binsize for the catalogue.
+      binsize = parsys["BINSIZE"].value
 
 #  See if statistical debiasing is to be performed.
    debias = parsys["DEBIAS"].value
@@ -1444,6 +1459,8 @@ try:
             conf = iconf
             coadd = imap
             pcathresh = pcathresh_i
+            imap_cat = NDG(1)
+            coadd_cat = imap_cat
          else:
             continue
 
@@ -1454,6 +1471,8 @@ try:
             conf = quconf
             coadd = qmap
             pcathresh = pcathresh_qu
+            qmap_cat = NDG(1)
+            coadd_cat = qmap_cat
          else:
             continue
 
@@ -1464,6 +1483,8 @@ try:
             conf = quconf
             coadd = umap
             pcathresh = pcathresh_qu
+            umap_cat = NDG(1)
+            coadd_cat = umap_cat
          else:
             continue
 
@@ -1799,10 +1820,37 @@ try:
          raise starutil.InvalidParameterError("No usable {0} maps remains "
                                               "to be coadded.".format(qui))
 
+#  If required, create a reference map that defines the WCS for the
+#  catalogue grid, using a pixel size of BINSIZE.
+      if outcat and binsize is not None and catref is None:
+         key = list(qui_maps)[0]
+         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(qui_maps[key]) )
+         pxsize = float(get_task_par( "FPIXSCALE(1)", "ndftrace" ))
+         if binsize < pxsize:
+            raise starutil.InvalidParameterError("Requested catalogue bin "
+                          "size ({}) is smaller than the map pixel size "
+                          "({}).".format(binsize,pxsize))
+         else:
+            msg_out("The output vector catalogue will be based on maps "
+                    "that are binned up to {0} arcsec pixels.".format(binsize))
+
+         catref = NDG( 1 )
+         invoke("$KAPPA_DIR/sqorst in={0} out={1} mode=pixelscale method=near "
+                "pixscale=\"\'{2},{2},*\'\"".format(qui_maps[key],catref,binsize))
+
+
 #  If we have only one observation just copy it to the output maps.
       if len(qui_maps) == 1:
          key = list(qui_maps)[0]
          invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(qui_maps[key],coadd))
+
+#  If required, bin it to the pixel size required by the catalogue.
+         if catref:
+            invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
+                   "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
+                   format(qui_maps[key],coadd_cat,catref))
+         elif outcat:
+            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
 
 #  If we have more than one observation, coadd them. Also coadd the
 #  extension NDFs (EXP_TIMES and WEIGHTS), but without normalisation so
@@ -1825,6 +1873,19 @@ try:
                 "out={1}.more.smurf.weights conserve=no method=bilin norm=no "
                 "variance=no".format(allmaps,coadd))
 
+#  If we are creating a binned up catalogue, bin the input observation maps
+#  up to the required catalogue bin size, and then coadd them.
+         if catref:
+            catmaps = NDG(allmaps)
+            invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
+                   "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
+                   format(allmaps,catmaps,catref))
+            invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
+                   "conserve=no method=near variance=yes genvar={2}".
+                   format(catmaps,coadd_cat,mapvar))
+         elif outcat:
+            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
+
 
 
 
@@ -1835,8 +1896,9 @@ try:
 # The rest we only do if an output catalogue is reqired.
    if outcat:
 
-#  We need I, Q and U maps to create a catalogue.
-      if imap and qmap and umap:
+#  We need I, Q and U maps to create a catalogue. TThe pixel size in
+#  these maps will be equal to the value of parameter BINSIZE.
+      if imap_cat and qmap_cat and umap_cat:
 
 #  Ensure the Q, U and I images all have the same bounds, equal to the
 #  overlap region between them. To get the overlap region, use MATHS to
@@ -1844,13 +1906,13 @@ try:
 #  which match the overlap area.
          tmp = NDG( 1 )
          invoke( "$KAPPA_DIR/maths exp=\"'ia+ib+ic'\" ia={0} ib={1} ic={2} out={3}".
-                 format(qmap,umap,imap,tmp) )
+                 format(qmap_cat,umap_cat,imap_cat,tmp) )
          qtrim = NDG( 1 )
-         invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(qmap,tmp,qtrim) )
+         invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(qmap_cat,tmp,qtrim) )
          utrim = NDG( 1 )
-         invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(umap,tmp,utrim) )
+         invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(umap_cat,tmp,utrim) )
          itrim = NDG( 1 )
-         invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(imap,tmp,itrim) )
+         invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(imap_cat,tmp,itrim) )
 
 #  The polarisation vectors are calculated by the polpack:polvec command,
 #  which requires the input Stokes vectors in the form of a 3D cube. Paste
