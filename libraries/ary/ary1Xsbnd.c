@@ -113,7 +113,7 @@ void ary1Xsbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2,
 
 /* Obtain the bounds of the first array in this dimension, padding with 1's
    if necessary. */
-      if( i <= ndim1 ){
+      if( i < ndim1 ){
          l1 = lbnd1[ i ];
          u1 = ubnd1[ i ];
       } else {
@@ -122,7 +122,7 @@ void ary1Xsbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2,
       }
 
 /* Similarly, obtain the bounds of the second array. */
-      if( i <= ndim2 ){
+      if( i < ndim2 ){
          l2 = lbnd2[ i ];
          u2 = ubnd2[ i ];
       } else {
@@ -141,7 +141,7 @@ void ary1Xsbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2,
 
 /* Put the bounds of the overlap region into the output arrays, if there is
    room. */
-      } else if( i <= ndim ){
+      } else if( i < ndim ){
          lbnd[ i ] = l;
          ubnd[ i ] = u;
       }
