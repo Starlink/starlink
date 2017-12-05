@@ -96,7 +96,7 @@ void ary1Inbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2,
 
 /* Obtain the bounds of the first array in each dimension, padding with 1's
    if necessary. */
-      if( i <= ndim1 ){
+      if( i < ndim1 ){
          l1 = lbnd1[ i ];
          u1 = ubnd1[ i ];
       } else {
@@ -105,7 +105,7 @@ void ary1Inbnd( int ndim1, const hdsdim *lbnd1, const hdsdim *ubnd1, int ndim2,
       }
 
 /* Similarly, obtain the bounds of the second array. */
-      if( i <= ndim2 ){
+      if( i < ndim2 ){
          l2 = lbnd2[ i ];
          u2 = ubnd2[ i ];
       } else {
