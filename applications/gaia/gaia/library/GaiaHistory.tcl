@@ -326,6 +326,11 @@ itcl::class gaia::GaiaHistory {
       set last_ [$gaiatoplevel get_image]
    }
 
+   #  Set the location of the history file.
+   public proc set_history_catalog {catalog} {
+      set history_catalog_ "$catalog"
+   }
+
 
    #  Configuration options: (public variables)
    #  ----------------------

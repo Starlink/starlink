@@ -2346,6 +2346,13 @@ window gives you access to this."
       $image_ configure -autofill $itk_option(-autofill)
    }
 
+   #  Set the location of the history file.
+   public proc set_history_catalog {catalog} {
+      gaia::GaiaSearch::set_history_catalog "$catalog"
+      gaia::GaiaHistory::set_history_catalog "$catalog"
+      gaia::GaiaCubeHistory::set_history_catalog "$catalog"
+   }
+
    #  SAMP support
    #  ------------
 

@@ -904,9 +904,13 @@ itcl::class gaia::GaiaSearch {
          $m add separator
          $w add_menuitem $m command "History..."  \
             "Open an automatically generated catalog of previously viewed images" \
-            -command [code cat::AstroCat::select_catalog history local $id $classname 0 $debug $w] \
+            -command [code open_history_catalog $id $classname 0 $debug $w] \
             -accelerator "Control-h"
       }
+   }
+
+   protected proc open_history_catalog {id classname tcs_flag debug w} {
+        cat::AstroCat::select_catalog "$history_catalog_" local $id $classname $tcs_flag $debug $w
    }
 
    #  See if a list of comments extracted from a table contain a KAPPA-like
@@ -1007,6 +1011,11 @@ itcl::class gaia::GaiaSearch {
             }
          }
       }
+   }
+
+   #  Set the location of the history file.
+   public proc set_history_catalog {catalog} {
+      set history_catalog_ "$catalog"
    }
 
    #  Configuration options (public variables):

@@ -373,6 +373,11 @@ itcl::class gaia::GaiaCubeHistory {
       set last_cube_ [$gaia_cube cget -cube]
    }
 
+   #  Set the location of the history file.
+   public proc set_history_catalog {catalog} {
+      set history_catalog_ "$catalog"
+   }
+
 
    #  Configuration options: (public variables)
    #  ----------------------
