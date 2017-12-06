@@ -55,7 +55,7 @@
 *        displayed so that the position supplied in POS is at the
 *        specified point within the displayed text string.
 *     IDS( NPOS ) = INTEGER (Given)
-*        Array of position identifiers. Only used if LABTYP is 'ID'.
+*        Array of position identifiers.
 *     WORK( NPOS, 2 ) = DOUBLE PRECISION (Given and Returned)
 *        Work space.
 *     STATUS = INTEGER (Given and Returned)
@@ -98,6 +98,8 @@
 *        Added LABTYP and IGRP2 arguments.
 *     3-MAY-2009 (DSB):
 *        Added KEYMAP argument.
+*     6-DEC-2017 (DSB):
+*        Correct selection of STCS shape to display for a given index.
 *     {enter_further_changes_here}
 
 *-
@@ -326,7 +328,7 @@
 *  using the StcsChan created above.
          IF( CHAN .NE. AST__NULL ) THEN
             IAT = IAT0
-            CALL CHR_PUTI( I, KEY, IAT )
+            CALL CHR_PUTI( IDS( I ), KEY, IAT )
             CALL CHR_UCASE( KEY( : IAT ) )
             IF( AST_MAPGET0C( KEYMAP, KEY( : IAT ), STCS, LSTCS,
      :                        STATUS ) ) THEN

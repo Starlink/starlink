@@ -451,6 +451,9 @@
 *     1-APR-2011 (DSB):
 *        Use KPG_GDFND in place of KPG1_AGFND in case the most recent
 *        data picture had no WCS.
+*     6-DEC-2017 (DSB):
+*        Pass the array of selected position identifiers to KPS1_LSHPL, 
+*        rather than the array of all position identifiers.
 *     {enter_further_changes_here}
 
 *-
@@ -940,7 +943,7 @@
          CALL KPS1_LSHPL( IWCS, NDISP, NRAX, %VAL( CNF_PVAL( IPW2 ) ),
      :                    PLOT, STCSKM,
      :                    GEO, IMARK, CLOSE, LABTYP, IGRP2, IGRP4, JUST,
-     :                    %VAL( CNF_PVAL( IPID ) ),
+     :                    %VAL( CNF_PVAL( IPW0 ) ),
      :                    %VAL( CNF_PVAL( IPW3 ) ), STATUS )
 
 
