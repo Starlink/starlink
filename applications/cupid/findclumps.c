@@ -378,15 +378,24 @@ void findclumps( int *status ) {
 *        spatial plane and "size" of the collapsed clump at four different
 *        position angles - all separated by 45 degrees - is found (see the
 *        OUTCAT parameter for a description of clump "size"). The ellipse
-*        that generates the same sizes at the four position angles is then
+*        that generates the closest sizes at the four position angles is then
 *        found and used as the clump shape.
 *
-*        In general, "Ellipse" will outline the brighter, inner regions
-*        of each clump, and "Polygon" will include the fainter outer
+*        - Ellipse2: The above method for determining ellipses works well
+*        for clumps that are in fact elliptical, but can generate extremely
+*        long thin ellipses for clumps are far from being ellitical. The
+*        "Ellipse2" option uses a different method for determining the best
+*        ellipse based on finding many marginal profiles at one degree
+*        intervals of azimuth, and using the longest marginal profile as
+*        the major axis.
+*
+*        In general, ellipses will outline the brighter, inner regions
+*        of each clump, and polygons will include the fainter outer
 *        regions. The dynamic default is "Polygon" if a JSA-style
 *        catalogue (see parameters JSACAT) is being created, and "None"
-*        otherwise. Note, if a JSA-style catalogue is neing created an
-*        error will be reported if "Ellipse" or "None" is selected. []
+*        otherwise. Note, if a JSA-style catalogue is being created an
+*        error will be reported if "Ellipse", "Ellipse2"  or "None" is
+*        selected. []
 *     WCSPAR = _LOGICAL (Read)
 *        If a TRUE value is supplied, then the clump parameters stored in
 *        the output catalogue and in the CUPID extension of the output NDF,
@@ -913,11 +922,13 @@ void findclumps( int *status ) {
 *     20-NOV-2013 (DSB):
 *        - Copy main output NDF history to output JSA catalogue.
 *        - Do not prompt for RMS if it is in the supplied config.
-*     22-NOV-2013 (DSN):
+*     22-NOV-2013 (DSB):
 *        We need to map the variance array even if an RMS is supplied
 *        in the configuration.
-*     23-OCT-2017 (DSN):
+*     23-OCT-2017 (DSB):
 *        Ensure any pre-existing output NDF is deleted if no clumps are found.
+*     8-DEC-2017 (DSB):
+*        Add "Ellipse2" option for parameter SHAPE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1140,13 +1151,15 @@ void findclumps( int *status ) {
 
 /* See what STC-S shape should be used to describe each spatial clump. */
    ishape = 0;
-   parChoic( "SHAPE", jsacat ? "Polygon" : "None", "Ellipse,Polygon,None", 1,
+   parChoic( "SHAPE", jsacat ? "Polygon" : "None", "Ellipse,Ellipse2,Polygon,None", 1,
              shape, 10, status );
    if( *status == SAI__OK ) {
       if( !strcmp( shape, "POLYGON" ) ) {
          ishape = 2;
       } else if( !strcmp( shape, "ELLIPSE" ) ) {
          ishape = 1;
+      } else if( !strcmp( shape, "ELLIPSE2" ) ) {
+         ishape = 3;
       }
    }
 

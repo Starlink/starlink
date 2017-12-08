@@ -117,8 +117,13 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *        the spatial shape of the clump. Ignored if "stcs" is NULL.
 *        Otherwise:
 *           0 - No STC-S to be created ("stcs" is ignored)
-*           1 - Use an ellipse to describe the spatial extent of the clump
+*           1 - Use an ellipse to describe the spatial extent of the clump,
+*               created using the old algorithm, based on analysis of
+*               four marginal profiles at 45 degree intervals.
 *           2 - Use a polygon to describe the spatial extent of the clump
+*           3 - Use an ellipse to describe the spatial extent of the clump,
+*               created by finding many marginal profiles at 1 degree
+*               intervals and finding the longest.
 *     velax
 *        The zero-based index of the velocity pixel axis. Should be -1 if
 *        there is no velocity axis.
@@ -227,7 +232,11 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *     18-APR-2017 (DSB):
 *        Change centroid position from pixel indices to pixel coords.
 *        This makes it consistent with the peak position.
-*     {enter_further_changes_here}
+*     8-DEC-2017 (DSB):
+*        Added "shape=3" option, to avoid the long thin ellipses that
+*        could be created using the old algorithm. Keep the old algorithm
+*        as an option in case there is some problem with the new algorithm.
+     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -769,7 +778,16 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
    call the routine appropriate to the requested shape to create an AST
    Region. */
       if( stcs && *ok > 0 ) {
-         if( shape == 1 ) {
+
+/* The new ellipse fitting algorithm avoids creating very long thin ellipses for
+   non-elliptical clumps. */
+         if( shape == 3 ) {
+            reg = cupidEllipseDescNew( pixel_frm, ipd, velax, ret + ndim, space_axes,
+                                       ndim, lbnd, ubnd, wcsmap, space_frm,
+                                       space_map, status );
+
+/* The old elipse fitting algorithm, is better at genuinly elliptical sources. */
+         } else if( shape == 1 ) {
             sig[ 0 ] = ret[ 2*ndim + space_axes[ 0 ] ];
             sig[ 2 ] = ret[ 2*ndim + space_axes[ 1 ] ];
             reg = cupidEllipseDesc( pixel_frm, space_axes, beamcorr,
@@ -778,6 +796,7 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
                                     ret[ ndim + space_axes[ 1 ] ],
                                     sig, deconv, ok, wcsmap, space_frm,
                                     space_map, status );
+
          } else if( shape == 2 ) {
             reg = cupidPolygonDesc( ipd, velax, ret, space_axes, ndim,
                                     lbnd, ubnd, wcsmap, space_frm,

@@ -256,6 +256,7 @@ extern int cupid_ps_cache_size;
 /* Function prototypes */
 /* ------------------  */
 AstKeyMap *cupidRetrieveConfig( HDSLoc *, int * );
+AstRegion *cupidEllipseDescNew( AstFrame *, double *ipd, int velax, double *peak, int space_axes[ 2 ], int ndim, int *lbnd, int *ubnd, AstMapping *wcsmap, AstFrame *space_frm, AstMapping *space_map, int *status );
 AstRegion *cupidEllipseDesc( AstFrame *, int[ 2 ], double[ 3 ], double, double, double, double, double, double, float[ 4 ], int, int *, AstMapping *, AstFrame *, AstMapping *, int * );
 AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak, int space_axes[ 2 ], int ndim, int *lbnd, int *ubnd, AstMapping *wcsmap, AstFrame *space_frm, AstMapping *space_map, int *status );
 CupidBoxIter *cupidBoxIterator( CupidBoxIter *, int[3], int[3], int[3], int, int * );

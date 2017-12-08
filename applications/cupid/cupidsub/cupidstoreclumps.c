@@ -89,8 +89,13 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 *        form of an STC-S description. The non-zero value indicates the shape
 *        to use:
 *           0 - No STC-S to be created
-*           1 - Use an ellipse to describe the spatial extent of the clump
+*           1 - Use an ellipse to describe the spatial extent of the clump,
+*               created using the old algorithm, based on analysis of
+*               four marginal profiles at 45 degree intervals.
 *           2 - Use a polygon to describe the spatial extent of the clump
+*           3 - Use an ellipse to describe the spatial extent of the clump,
+*               created by finding many marginal profiles at 1 degree
+*               intervals and finding the longest.
 *     velax
 *        The index of the velocity pixel axis. Only used if "ndim" is 3.
 *     backoff

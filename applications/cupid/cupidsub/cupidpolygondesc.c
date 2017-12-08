@@ -30,13 +30,7 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
 
 *  Description:
 *     This function returns an Polygon describing the spatial extent of the
-*     clump specified by the supplied statistics.
-*
-*     The supplied statistics include the Polygon centre, and the distance
-*     from the centre to the Polygon perimeter in four different directions,
-*     all specified in pixels coords. These directions are the pixel X and Y
-*     axes, plus the "U" and "V" axes, which are axes at 45 degrees to the X
-*     and Y spatial axes.
+*     clump specified by the supplied masked clump data array.
 
 *  Parameters:
 *     ipd

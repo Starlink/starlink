@@ -6,6 +6,14 @@
  and  analyse clumps of emission within 2- or 3- dimensional
  data arrays.
 
+Changes introduced at V2.5
+
+   - The FINDCLUMPS SHAPE parameter can now be set to "Ellipse2". This is
+   like "Ellipse", in that it adds an STC-S description of an ellipse for
+   each clump to the output catalogue, but uses a different algorithm to
+   determine the ellipse that is better at avoiding very long thin
+   ellipses.
+
 Changes introduced at V2.4
 
    - If FINDCLUMPS fails to find any clumps, it now deletes any
