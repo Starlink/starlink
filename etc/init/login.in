@@ -113,47 +113,47 @@ if ( ${?@LD_LIB_PATH@} ) then
    if (`echo ${@LD_LIB_PATH@} | grep -c ':${sharelibdir}'` != 0 ) set found_sharelib = "yes"
    if (`echo ${@LD_LIB_PATH@} | grep -c '^${sharelibdir}'` != 0 ) set found_sharelib = "yes"
 
-#  Add required components to end of @LD_LIB_PATH@ if flag variables
+#  Add required components to start of @LD_LIB_PATH@ if flag variables
 #  indicate they are not present.
 
    if ( $found_openwin == "no" ) then
       switch (@build@)
          case *sun4*:
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:/usr/openwin/lib"
+            setenv @LD_LIB_PATH@ "/usr/openwin/lib:${@LD_LIB_PATH@}"
          breaksw
       endsw
    endif
 
    if ( $found_sharelib == "no" ) then
-      setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${sharelibdir}"
-
       switch (@build@)
          case *-osf*:
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/alpha"
+            setenv @LD_LIB_PATH@ "${starjavadir}/lib/alpha:${@LD_LIB_PATH@}"
          breaksw
          case x86_64*-linux*:
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/amd64"
+            setenv @LD_LIB_PATH@ "${starjavadir}/lib/amd64:${@LD_LIB_PATH@}"
          breaksw
          case *-linux*:
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/i386"
+            setenv @LD_LIB_PATH@ "${starjavadir}/lib/i386:${@LD_LIB_PATH@}"
          breaksw
          case *-cygwin*:
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/x86"
+            setenv @LD_LIB_PATH@ "${starjavadir}/lib/x86:${@LD_LIB_PATH@}"
          breaksw
          case *-pc-solaris*:
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/x86"
+            setenv @LD_LIB_PATH@ "${starjavadir}/lib/x86:${@LD_LIB_PATH@}"
          breaksw
          case *-sun*:
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/sparc"
+            setenv @LD_LIB_PATH@ "${starjavadir}/lib/sparc:${@LD_LIB_PATH@}"
          breaksw
          case *pc-apple-darwin*:
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/ppc"
+            setenv @LD_LIB_PATH@ "${starjavadir}/lib/ppc:${@LD_LIB_PATH@}"
          breaksw
          case *86*-apple-darwin*:
             # Add both architectures to search path
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/i386:${starjavadir}/lib/x86_64"
+            setenv @LD_LIB_PATH@ "${starjavadir}/lib/i386:${starjavadir}/lib/x86_64:${@LD_LIB_PATH@}"
          breaksw
       endsw
+
+      setenv @LD_LIB_PATH@ "${sharelibdir}:${@LD_LIB_PATH@}"
 
    endif
    unset found_openwin found_sharelib

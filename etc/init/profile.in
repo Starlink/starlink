@@ -131,36 +131,36 @@ if test "${@LD_LIB_PATH@}" != ""; then
       found_sharelib="yes"
    fi
 
-#  Add required components to end of @LD_LIB_PATH@ if flag variables
+#  Add required components to start of @LD_LIB_PATH@ if flag variables
 #  indicate they are not present.
 
    if test "$found_sharelib" = "no"; then
-      export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${sharelibdir}"
-
       case "@build@" in
          *-osf*)
-            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/alpha"
+            export @LD_LIB_PATH@="${starjavadir}/lib/alpha:${@LD_LIB_PATH@}"
          ;;
          x86_64*-linux*)
-            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/amd64"
+            export @LD_LIB_PATH@="${starjavadir}/lib/amd64:${@LD_LIB_PATH@}"
          ;;
          *-linux*)
-            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/i386"
+            export @LD_LIB_PATH@="${starjavadir}/lib/i386:${@LD_LIB_PATH@}"
          ;;
          *-cygwin*)
-            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/x86"
+            export @LD_LIB_PATH@="${starjavadir}/lib/x86:${@LD_LIB_PATH@}"
          ;;
          *-sun*)
-            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/sparc"
+            export @LD_LIB_PATH@="${starjavadir}/lib/sparc:${@LD_LIB_PATH@}"
          ;;
          *pc-apple-darwin*)
-            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/ppc"
+            export @LD_LIB_PATH@="${starjavadir}/lib/ppc:${@LD_LIB_PATH@}"
          ;;
          *86*-apple-darwin*)
             # We just add both architectures
-            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/i386:${starjavadir}/lib/x86_64"
+            export @LD_LIB_PATH@="${starjavadir}/lib/i386:${starjavadir}/lib/x86_64:${@LD_LIB_PATH@}"
          ;;
       esac
+
+      export @LD_LIB_PATH@="${sharelibdir}:${@LD_LIB_PATH@}"
    fi
 
 else
