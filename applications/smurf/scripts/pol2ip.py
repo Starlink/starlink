@@ -105,6 +105,14 @@
 *        assign the new log file path to the module variable
 *        "starutil.logfile". Any old log file will be closed befopre the
 *        new one is opened. []
+*     MAPDIR = LITERAL (Read)
+*        Path to a directory containing any pre-existing Q/U/I maps. Each
+*        UT date should have a separate subdirectory within "qudir", and
+*        each observation should have a separate subdirectory within its
+*        <UT> date subdirectory. Any new Q/U/I maps created by this script
+*        are placed in this directory. If null (!) is supplied, the root
+*        directory containing the Q/U maps is placed within the temporary
+*        directory used to store all other intermediate files. [!]
 *     MSG_FILTER = LITERAL (Read)
 *        Controls the default level of information reported by Starlink
 *        atasks invoked within the executing script. This default can be
@@ -140,12 +148,13 @@
 *        before the script exits. If retained, a message will be
 *        displayed at the end specifying the path to the directory. [FALSE]
 *     QUDIR = LITERAL (Read)
-*        Path to a directory containing any pre-exiting Q/U time streams
-*        or Q/U maps. Each UT date should have a separate subdirectory
-*        within "qudir", and each observation should have a separate
-*        subdirectory within its <UT> date subdirectory. If null (!) is
-*        supplied, the root directory is placed within the temporary
-*        directory used to store all other intermediate files. [!]
+*        Path to a directory containing any pre-existing Q/U/I time streams.
+*        Each UT date should have a separate subdirectory within "qudir",
+*        and each observation should have a separate subdirectory within
+*        its <UT> date subdirectory. Any new Q/U/I time streams created by
+*        this script are placed in this directory. If null (!) is supplied,
+*        the root directory containing the Q/U time streams is placed within
+*        the temporary directory used to store all other intermediate files. [!]
 *     TABLE = LITERAL (Read)
 *        The path to a new text file to create in which to place a table
 *        holding columns of elevation, Q, U, Qfit and Ufit (and various
