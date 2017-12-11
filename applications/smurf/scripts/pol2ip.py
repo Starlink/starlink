@@ -120,7 +120,8 @@
 *        starting with "#" are ignored. The raw data for all
 *        observations is expected to reside in a directory given by
 *        environment variable "SC2", within subdirectories with paths
-*        of the form: $SC2/s8a/20150918/00056/ etc.
+*        of the form: $SC2/[s4a|s8a]/20150918/00056/ etc. The choice of
+*        "s8" or "s4" is made on the basis of parameter WAVEBAND.
 *     PIXSIZE = _REAL (Read)
 *        Pixel dimensions in the Q and U maps, in arcsec. The default
 *        is 4 arc-sec for 850 um data and 2 arc-sec for 450 um data. []
@@ -154,6 +155,8 @@
 *        a previous run of this script, using the TABLE parameter. If
 *        supplied, none of the other parameters are accessed, and a fit
 *        is performed to the values in the supplied table. [!]
+*     WAVEBAND = LITERAL (Read)
+*        Indicates the waveband - "450" or "850".
 
 *  Copyright:
 *     Copyright (C) 2015,2016 East Asian Observatory
@@ -210,6 +213,8 @@
 *        except that no COM model is used.
 *        - Add option to base the total intensity values on the POL2 data
 *        instead of an external map.
+*     11-DEC-2017 (DSB):
+*        Added parameter WAVEBAND.
 *-
 '''
 
@@ -513,6 +518,8 @@ try:
    params = []
 
    params.append(starutil.Par0S("OBSLIST", "List of POL2 observations"))
+   params.append(starutil.ParChoice("WAVEBAND", ("450","850"),
+                                    "The waveband to use (450 or 850)" ))
    params.append(starutil.ParNDG("IREF", "The reference I map", None,
                                  minsize=0, maxsize=1 ))
    params.append(starutil.Par0F("DIAM", "Aperture diameter (arc-sec)",
@@ -546,6 +553,13 @@ try:
 #  Get the name of the input table.
    tablein = parsys["TABLEIN"].value
    if not tablein:
+
+#  Get the waveband to use.
+      waveband = parsys["WAVEBAND"].value
+      if waveband == "450":
+         sarray = "s4"
+      else:
+         sarray = "s8"
 
 #  Get the observation list. Verify it exists, and then read the contents
 #  into a list.
@@ -670,7 +684,7 @@ try:
 #  Create an NDG object describing all NDFs containsing raw data for the
 #  current observations.
          try:
-            raw = NDG( "{0}/s8\?/{1}/\*".format(sc2,obs) )
+            raw = NDG( "{0}/{1}\?/{2}/\*".format(sc2,sarray,obs) )
          except starutil.StarUtilError:
             raw = None
 
