@@ -78,6 +78,9 @@ AryObject *ary1Id2ac( const void *id_ptr, int isacb ) {
 *        Original version, based on AST identifier system by RFWS.
 *     4-SEP-2017 (DSB):
 *        Modified to handle either ACB or PCB identifiers.
+*     12-DEC-2017 (DSB):
+*        Use zero-based slot index when checking against bounds of
+*        arrays, not the one-based index.
 *-
 */
 
@@ -105,14 +108,16 @@ AryObject *ary1Id2ac( const void *id_ptr, int isacb ) {
    work.u = ( work.u ^ ( ( (unsigned) ARY__FACNO ) << 8U ) ) >> 8U;
 
 /* Check that the offset obtained doesn't extend beyond the limits of
-   the array of ACB pointers. */
+   the array of ACB pointers. Remember that ary1Expid converts the
+   slot number from zero-base to one-base, so we need to convert it
+   back to zero-base before using it. */
+   slot = work.i - 1;
    nel = isacb ? Ary_NACB : Ary_NPCB;
-   if ( ( work.i >= 0 ) && ( work.i < nel ) ) {
+   if ( ( slot >= 0 ) && ( slot < nel ) ) {
 
 /* Get a pointer to the ACB structure. Remember that ary1Expid converts
    the slot number from zero-base to one-base, so we need to convert it
    back to zero-base before using it. */
-      slot = work.i - 1;
       if( isacb ) {
          result = (AryObject *) Ary_ACB[ slot ];
       } else {
