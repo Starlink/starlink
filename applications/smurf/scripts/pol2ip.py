@@ -107,7 +107,7 @@
 *        new one is opened. []
 *     MAPDIR = LITERAL (Read)
 *        Path to a directory containing any pre-existing Q/U/I maps. Each
-*        UT date should have a separate subdirectory within "qudir", and
+*        UT date should have a separate subdirectory within "mapdir", and
 *        each observation should have a separate subdirectory within its
 *        <UT> date subdirectory. Any new Q/U/I maps created by this script
 *        are placed in this directory. If null (!) is supplied, the root
@@ -724,16 +724,32 @@ try:
                obsdir = "{0}/{1}".format( qudir, obs )
             else:
                obsdir = "{0}/{1}".format( NDG.tempdir, obs )
-
             if not os.path.isdir(obsdir):
+               os.makedirs(obsdir)
+
+            try:
+               qts = NDG( "{0}/*_QT".format( obsdir ), True )
+               uts = NDG( "{0}/*_UT".format( obsdir ), True )
+
+               if iref is None:
+                  its = NDG( "{0}/*_IT".format( obsdir ), True )
+                  msg_out("Re-using pre-calculated Q, U and I time streams for {0}.".format(obs))
+               else:
+                  msg_out("Re-using pre-calculated Q and U time streams for {0}.".format(obs))
+
+               if len(uts) != len(qts):
+                  msg_out("Differing numbers of Q and U time-streams. Re-calculating them...")
+                  raise starutil.NoNdfError("Inconsistent pre-existing time-series")
+               elif iref is None and len(iref) != len(qts):
+                  msg_out("Differing numbers of Q and I time-streams. Re-calculating them...")
+                  raise starutil.NoNdfError("Inconsistent pre-existing time-series")
+
+            except starutil.NoNdfError:
                if not raw:
                   raise UsageError( "Cannot find raw SCUBA-2 data.")
-               os.makedirs(obsdir)
                invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config=def outq={1}/\*_QT "
                       "outu={1}/\*_UT outi={1}/\*_IT fix=yes north=!".
                        format( raw, obsdir ) )
-            else:
-               msg_out("Re-using pre-calculated Q, U and I time streams for {0}.".format(obs))
 
 #  Make maps from the Q, U and (if required) I time streams. These Q and U values are
 #  with respect to the focal plane Y axis, and use (az,el) as the WCS axes. Set
