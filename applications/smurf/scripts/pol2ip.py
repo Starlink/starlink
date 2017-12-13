@@ -1039,7 +1039,7 @@ try:
             invoke("$KAPPA_DIR/stats ndf={0} comp=var".format(qmasked))
             vmean = get_task_par( "mean", "stats" )
             vnum = get_task_par( "numgood", "stats" )
-            dqlist.append( sqrt(vmean)/vnum )
+            dqlist.append( sqrt(vmean/vnum) )
 
 #  Likewise, store the mean U value in the same circle, and the
 #  associated error on the mean.
@@ -1052,7 +1052,7 @@ try:
             invoke("$KAPPA_DIR/stats ndf={0} comp=var".format(umasked))
             vmean = get_task_par( "mean", "stats" )
             vnum = get_task_par( "numgood", "stats" )
-            dulist.append( sqrt(vmean)/vnum )
+            dulist.append( sqrt(vmean/vnum) )
 
 #  Likewise, store the mean I value in the same circle, and the
 #  associated error on the mean.
@@ -1066,7 +1066,7 @@ try:
                invoke("$KAPPA_DIR/stats ndf={0} comp=var".format(imasked))
                vmean = get_task_par( "mean", "stats" )
                vnum = get_task_par( "numgood", "stats" )
-               dilist.append( sqrt(vmean)/vnum )
+               dilist.append( sqrt(vmean/vnum) )
 
 
 
