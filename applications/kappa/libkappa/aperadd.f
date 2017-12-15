@@ -248,6 +248,8 @@
 *        Add _INT64 support.
 *     29-JAN-2016 (DSB):
 *        Add Parameter MASK.
+*     15-DEC-2017 (DSB):
+*        Ensdure 2D slices from 3D cubes are processed correctly. 
 *     {enter_further_changes_here}
 
 *-
@@ -286,6 +288,7 @@
       INTEGER DIM( NDF__MXDIM )  ! NDF dimensions
       INTEGER EL                 ! Total number of pixels in the image
       INTEGER FDL                ! File descriptor
+      INTEGER I                  ! Loop count
       INTEGER IAT                ! Used length of a string
       INTEGER IGRP               ! Group identifier
       INTEGER INDF1              ! Identifier for the input NDF
@@ -299,7 +302,9 @@
       INTEGER IWCS               ! NDF WCS FrameSet
       INTEGER LBNDE( NDF__MXDIM )! Lower bounds of a box encompassing all external array elements
       INTEGER LBNDI( NDF__MXDIM )! Lower bounds of a box encompassing all internal array elements
-      INTEGER NDIM               ! Number of dimensions in the image
+      INTEGER LBNDS( NDF__MXDIM )! Lower bounds of required section
+      INTEGER NDIM               ! Number of dimensions to use
+      INTEGER NDIMS              ! Total number of dimensions in NDF
       INTEGER NGOOD              ! Number of good pixels
       INTEGER NUMPIX             ! Total number of pixels
       INTEGER NVAL               ! Number of supplied values
@@ -310,6 +315,7 @@
       INTEGER SUBND( NDF__MXDIM )! Upper limit for input NDF
       INTEGER UBNDE( NDF__MXDIM )! Upper bounds of a box encompassing all external array elements
       INTEGER UBNDI( NDF__MXDIM )! Upper bounds of a box encompassing all internal array elements
+      INTEGER UBNDS( NDF__MXDIM )! Upper bounds of required section
       LOGICAL ARD                ! Aperture specified by an ARD file?
       LOGICAL CONT               ! ARD description to continue?
       LOGICAL LOG                ! Log results?
@@ -445,7 +451,17 @@
       END IF
 
 *  Create a section from the input NDF which just encloses the aperture.
-      CALL NDF_SECT( INDF1, NDIM, LBNDI, UBNDI, INDF2, STATUS )
+*  First get the pixel bounds of the required section. Get the bound sof
+*  the NDF so that we inherited the pixel index of any degenerate axis,
+*  then add the bound son the significant pixel axes.
+      CALL NDF_BOUND( INDF1, NDF__MXDIM, LBNDS, UBNDS, NDIMS, STATUS )
+      DO I = 1, NDIM
+         LBNDS( SDIM( I ) ) = LBNDI ( I )
+         UBNDS( SDIM( I ) ) = UBNDI ( I )
+      END DO
+
+*  Now get an NDF identifier for the section.
+      CALL NDF_SECT( INDF1, NDIMS, LBNDS, UBNDS, INDF2, STATUS )
 
 *  Obtain the numeric type of the array, and map it.
       CALL NDF_TYPE( INDF2, 'DATA', TYPE, STATUS )
