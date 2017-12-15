@@ -79,7 +79,9 @@
 *     WLIM = REAL (Given)
 *        The lower weight limit for a valid output pixel.
 *     LBNDR( NDIM2 ) = INTEGER (Given)
-*        The lower pixel bounds of the reference NDF.
+*        The lower pixel bounds of the reference NDF. The first element
+*        will be set to VAL__BADI if the WCS is defined by a catalogue
+*        rather than an NDF.
 *     UBNDR( NDIM2 ) = INTEGER (Given)
 *        The upper pixel bounds of the reference NDF.
 *     STATUS = INTEGER (Given and Returned)

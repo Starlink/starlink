@@ -22,7 +22,8 @@
 *  Description:
 *     This application resamples or rebins a group of input NDFs,
 *     producing corresponding output NDFs which are aligned
-*     pixel-for-pixel with a specified reference NDF.
+*     pixel-for-pixel with a specified reference NDF, or POLPACK
+*     catalogue (see parameter REFCAT).
 *
 *     If an input NDF has more pixel axes than the reference NDF, then
 *     the extra pixel axes are retained unchanged in the output NDF.
@@ -185,7 +186,7 @@
 *        values are calculated for each output NDF which result in the
 *        output NDF just encompassing the corresponding input NDF. The
 *        suggested defaults are the lower pixel-index bounds from the
-*        reference NDF (see Parameter REF).
+*        reference NDF, if supplied (see Parameter REF).
 *     MAXPIX = _INTEGER (Read)
 *        A value which specifies an initial scale size in pixels for the
 *        adaptive algorithm which approximates non-linear Mappings with
@@ -331,7 +332,12 @@
 *     REF = NDF (Read)
 *        The NDF to which all the input NDFs are to be aligned. If a
 *        null value is supplied for this parameter, the first NDF
-*        supplied for Parameter IN is used.
+*        supplied for Parameter IN is used. This parameter is only used
+*        if no catalogue is supplied for parameter REFCAT.
+*     REFCAT = NDF (Read)
+*        A POLPACK catalogue defining the WCS to which all the input NDFs
+*        are to be aligned. If a null value is supplied for this parameter,
+*        the WCS will be obtained from an NDF using parameter REF. [!]
 *     UBND() = _INTEGER (Read)
 *        An array of values giving the upper pixel-index bound on each
 *        axis for the output NDFs. The number of values supplied should
@@ -341,7 +347,7 @@
 *        values are calculated for each output NDF which result in the
 *        output NDF just encompassing the corresponding input NDF. The
 *        suggested defaults are the upper pixel-index bounds from the
-*        reference NDF (see Parameter REF).
+*        reference NDF, if supplied (see Parameter REF).
 *     WLIM = _REAL (Read)
 *        This parameter is only used if REBIN is set TRUE. It specifies
 *        the minimum number of good pixels which must contribute to an
@@ -532,12 +538,16 @@
       CHARACTER MODE*6           ! Access mode for input NDFs
       CHARACTER NDFNAM*(GRP__SZNAM) ! The name of an NDF.
       DOUBLE PRECISION PARAMS( 2 ) ! Param. values passed to AST_RESAMPLE<x>
+      INTEGER CI                 ! Catalogue identifier
       INTEGER I                  ! Index into input and output groups
+      INTEGER ICUR               ! Index of current Frame
+      INTEGER IGRID              ! Index of GRID Frame
       INTEGER IGRP1              ! GRP id. for group holding input NDFs
       INTEGER IGRP2              ! GRP id. for group holding output NDFs
       INTEGER INDF1              ! NDF id. for the input NDF
       INTEGER INDF2              ! NDF id. for the output NDF
       INTEGER INDFR              ! NDF id. for the reference NDF
+      INTEGER IPIX               ! Index of PIXEL Frame
       INTEGER IWCSR              ! WCS FrameSet for reference NDF
       INTEGER IWCSRT             ! Modified WCS FrameSet for ref. NDF
       INTEGER J                  ! Axis index
@@ -589,29 +599,78 @@
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Get the reference NDF.
-      CALL LPG_ASSOC( 'REF', 'READ', INDFR, STATUS )
+*  Attempt first to get the reference WCS from a catalogue.
+*  Open the input catalogue.
+      CALL LPG_CATASSOC( 'REFCAT', 'READ', CI, STATUS )
+
+*  If a null value was supplied, annul the error. Otherwise, attempt to
+*  get the WCS FrameSet.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         IWCSR = AST__NULL
+      ELSE
+         CALL CAT_RSTXT( CI, STATUS )
+         CALL KPG1_RCATW( CI, IWCSR, STATUS )
+         CALL CAT_TRLSE( CI, STATUS )
+         INDFR = NDF__NOID
+         LBNDR( 1 ) = VAL__BADI
+         NDIMR = AST_GETI( IWCSR, 'Nin', STATUS )
+
+*  If the FrameSet has no GRID Frame, add one, assuming an origin of (1,1),
+*  so that PIXEL and GRID coordinateas are equal.
+         CALL KPG1_ASFFR( IWCSR, 'GRID', IGRID, STATUS )
+         IF( IGRID .EQ. AST__NOFRAME ) THEN
+            CALL KPG1_ASFFR( IWCSR, 'PIXEL', IPIX, STATUS )
+            IF( IPIX .EQ. AST__NOFRAME .AND. STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( ' ', 'Catalogue supplied for parameter '//
+     :                       'REFCAT has no suitable WCS', status )
+            ELSE
+               ICUR = AST_GETI( IWCSR, 'Current', STATUS )
+               CALL AST_ADDFRAME( IWCSR, IPIX,
+     :                            AST_UNITMAP( NDIMR, ' ', STATUS ),
+     :                            AST_FRAME( NDIMR, 'Domain=GRID',
+     :                                       STATUS ), STATUS )
+               CALL AST_SETI( IWCSR, 'Base',
+     :                        AST_GETI( IWCSR, 'Current', STATUS ),
+     :                        STATUS )
+               CALL AST_SETI( IWCSR, 'Current', ICUR, STATUS )
+            END IF
+
+*  If there is a GRID Frame, ensure it is the base Frame.
+         ELSE
+            CALL AST_SETI( IWCSR, 'Base', IGRID, STATUS )
+         END IF
+      END IF
+
+*  If no WCS was obtained from the catalogue, attempt to get the reference
+*  WCS from an NDF.
+      IF( IWCSR .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
+         CALL LPG_ASSOC( 'REF', 'READ', INDFR, STATUS )
 
 *  If a null value was supplied, annul the error and use the first NDF
 *  supplied for IN.
-      IF( STATUS .EQ. PAR__NULL ) THEN
-         CALL ERR_ANNUL( STATUS )
-         CALL NDG_NDFAS( IGRP1, 1, 'READ', INDFR, STATUS )
-      END IF
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            CALL NDG_NDFAS( IGRP1, 1, 'READ', INDFR, STATUS )
+         END IF
 
 *  Get the associated WCS FrameSet.
-      CALL KPG1_GTWCS( INDFR, IWCSR, STATUS )
+         CALL KPG1_GTWCS( INDFR, IWCSR, STATUS )
+
+*  Get the dimensionality and pixel bounds of the reference NDF.
+         CALL NDF_BOUND( INDFR, NDF__MXDIM, LBNDR, UBNDR, NDIMR,
+     :                   STATUS )
+
+*  Set the suggested default for LBND and UBND.
+         CALL PAR_DEF1I( 'LBND', NDIMR, LBNDR, STATUS )
+         CALL PAR_DEF1I( 'UBND', NDIMR, UBNDR, STATUS )
+
+      END IF
 
 *  See if the reference NDF is to be used to define the cordinate system
 *  in which alignment will occur.
       CALL PAR_GET0L( 'ALIGNREF', REFALN, STATUS )
-
-*  Get the dimensionality and pixel bounds of the reference NDF.
-      CALL NDF_BOUND( INDFR, NDF__MXDIM, LBNDR, UBNDR, NDIMR, STATUS )
-
-*  Set the suggested default for LBND and UBND.
-      CALL PAR_DEF1I( 'LBND', NDIMR, LBNDR, STATUS )
-      CALL PAR_DEF1I( 'UBND', NDIMR, UBNDR, STATUS )
 
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
@@ -866,8 +925,13 @@
 *  together with the reference NDF. Using the provenance block within the
 *  monolith routine would result in all input NDFs being used as
 *  ancestors of all output NDFs.
-         CALL NDF_SAME( INDF1, INDFR, SAME, ISECT, STATUS )
-         IF( SAME ) THEN
+         IF( INDFR .NE. NDF__NOID ) THEN
+            CALL NDF_SAME( INDF1, INDFR, SAME, ISECT, STATUS )
+         ELSE
+            SAME = .FALSE.
+         END IF
+
+         IF( SAME .OR. INDFR .EQ. NDF__NOID ) THEN
             NNDF = 1
             NDFS( 1 ) = INDF1
          ELSE

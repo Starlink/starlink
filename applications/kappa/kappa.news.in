@@ -42,6 +42,10 @@
       the input text file and generate appropriate bad values in the output
       NDF.
 
+   o  WCSALIGN
+      -  The input NDFs can now be aligned with a specified POLPACK
+      catalogue - see new parameter REFCAT.
+
 
 1 KAPPA_Version_2.4
 

@@ -47200,7 +47200,8 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
    \sstdescription{
       This application resamples or rebins a group of input \NDFref{NDFs},
       producing corresponding output NDFs which are aligned pixel-for-pixel
-      with a specified reference NDF.
+      with a specified reference NDF, or POLPACK catalogue (see parameter
+      REFCAT).
 
       If an input NDF has more pixel axes than the reference NDF, then
       the extra pixel axes are retained unchanged in the output NDF.
@@ -47385,7 +47386,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          or for Parameter UBND, then separate default values are calculated for
          each output NDF which result in the output NDF just encompassing
          the corresponding input NDF.  The suggested defaults are the
-         lower pixel-index bounds from the reference NDF (see Parameter REF).
+         lower pixel-index bounds from the reference NDF, if supplied (see Parameter REF).
       }
       \sstsubsection{
          MAXPIX = \_INTEGER (Read)
@@ -47567,7 +47568,15 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       }{
          The NDF to which all the input NDFs are to be aligned. If a null
          value is supplied for this parameter, the first NDF supplied for
-         Parameter IN is used.
+         Parameter IN is used. This parameter is only used if no catalogue
+         is supplied for parameter REFCAT.
+      }
+      \sstsubsection{
+         REFCAT = FILENAME (Read)
+      }{
+         A POLPACK catalogue defining the WCS to which all the input NDFs
+         are to be aligned. If a null value is supplied for this parameter,
+         the WCS will be obtained from an NDF using parameter REF. \texttt{[!]}
       }
       \sstsubsection{
          UBND() = \_INTEGER (Read)
@@ -47579,7 +47588,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          or for Parameter LBND, then separate default values are calculated for
          each output NDF which result in the output NDF just encompassing
          the corresponding input NDF.  The suggested defaults are the
-         upper pixel-index bounds from the reference NDF (see Parameter REF).
+         upper pixel-index bounds from the reference NDF, if supplied (see Parameter REF).
       }
       \sstsubsection{
          WLIM = \_REAL (Read)
@@ -53634,6 +53643,12 @@ The following applications have been modified:
         \item Will now recognise the string \texttt{"BAD"} (case
         insensitive) within the input text file and generate appropriate
         bad values in the output NDF.
+      \end{itemize}
+
+   \item [\htmlref{WCSALIGN}{WCSALIGN}]\mbox{}
+      \begin{itemize}
+        \item The input NDFs can now be aligned with a specified POLPACK
+         catalogue - see new parameter REFCAT.
       \end{itemize}
 
 \end{description}
