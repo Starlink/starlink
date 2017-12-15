@@ -224,6 +224,9 @@
 *        instead of an external map.
 *     11-DEC-2017 (DSB):
 *        Added parameter WAVEBAND.
+*     13-DEC-2017 (DSB):
+*        Add columns for debiased P, error on P and error on ANG to 
+*        output table.
 *-
 '''
 
@@ -1128,21 +1131,37 @@ try:
             ival = wisum/wsum
 
 #  Otherwise, find the mean I value in the aperture centred on the
-#  accurate source centre.
+#  accurate source centre. Also find the error on the mean.
          else:
-            invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\" diam={1}".format(imap,diam,xcen,ycen))
+            mask = NDG( 1 )
+            invoke("$KAPPA_DIR/aperadd ndf={0} centre=\"'{2},{3}'\"  diam={1} "
+                   "mask={4}".format(imap,diam,xcen,ycen,mask))
             ival = get_task_par( "mean", "aperadd" )
 
+            imasked = NDG( 1 )
+            invoke("$KAPPA_DIR/copybad in={0} out={1} ref={2}".
+                    format(imap,imasked,mask))
+            invoke("$KAPPA_DIR/stats ndf={0} comp=var".format(imasked))
+            vmean = get_task_par( "mean", "stats" )
+            vnum = get_task_par( "numgood", "stats" )
+            isigma = sqrt(vmean/vnum)
+
 #  If no external reference map was supplied, use the weighted mean of the
-#  I values determined from the individual POL2 observations.
+#  I values determined from the individual POL2 observations. Also find
+#  the error on the mean.
       else:
          s1 = 0.0
          s2 = 0.0
+         s3 = 0.0
+         s4 = 0.0
          for (ival,dival,tau) in zip( ilist, dilist, wvmlist ):
             w = 1.0/(dival*dival*tau)
             s1 += ival*w
             s2 += w
+            s3 += ival*ival*w
+            s4 += w*w
          ival = s1/s2
+         isigma = sqrt( ( s3/s2 - ival*ival )*s4/(s2*s2) )
 
 #  If an input table was supplied, read its contents.
    else:
@@ -1210,11 +1229,11 @@ try:
 
 #  Normalize dq and du values to a mean of unity. This is to ensure the
 #  weights (1/dq**2 and 1/du**2) are scaled nicely.
-   mean = np.array(dqlist).mean()
-   dqlist = [x / mean for x in dqlist]
-   dulist = [x / mean for x in dulist]
-   mean = np.array(dilist).mean()
-   dilist = [x / mean for x in dilist]
+   dqmean = np.array(dqlist).mean()
+   dqlist = [x / dqmean for x in dqlist]
+   dulist = [x / dqmean for x in dulist]
+   dimean = np.array(dilist).mean()
+   dilist = [x / dimean for x in dilist]
 
 #  Record original lists before we reject any points.
    qlist0 = qlist
@@ -1305,7 +1324,7 @@ try:
       fd.write("# DIAM = {0}\n".format(diam))
       fd.write("# IREF = {0}\n".format(iref))
       fd.write("# PIXSIZE = {0}\n".format(actpixsize0))
-      fd.write("# Total intensity value = {0} pW\n".format(ival))
+      fd.write("# Total intensity value = {0} +/- {1} pW\n".format(ival,isigma))
       fd.write("#\n")
       if dofit:
          fd.write("# A={0} B={1} C={2} D={3} ({4} degrees)\n".format(a,b,c,d,degrees(d)))
@@ -1313,7 +1332,7 @@ try:
          fd.write("# Qn RMS = {0}   Un RMS = {1} \n".format(qrms/ival,urms/ival))
          fd.write("#\n")
 
-      fd.write("# ut obs az el q dq u du i di pi ang p qfit ufit pifit pfit tau tran rej "
+      fd.write("# ut obs az el q dq u du i di pi ang p pdeb dang dp qfit ufit pifit pfit tau tran rej "
                "hst at hum bp wndspd wnddir frleg bkleg" )
       if diam <= 0.0:
          fd.write(" fwhm1 fwhm2 orient gamma" )
@@ -1340,25 +1359,37 @@ try:
          tran = exp(-4.6*(tau-0.00435)/sin(radians(el)))
          q = qlist0[i]
          u = ulist0[i]
-         dq = dqlist0[i]
-         du = dulist0[i]
+         dq = dqlist0[i]*dqmean
+         du = dulist0[i]*dqmean
 
          if iref is None:
             ii = ilist0[i]
-            di = dilist0[i]
+            di = dilist0[i]*dimean
          else:
             ii = ival
-            di = 0
+            di = isigma
 
-         pi = sqrt( q*q + u*u )
+         # Replicate the code in polpack/polsub/pol1_plvec.f
+         q2 = q*q
+         u2 = u*u
+         pi2 = q2 + u2
+         pi = sqrt( max( 0.0, pi2 ) )
          ang = degrees( 0.5*atan2( u, q ) )
          p = pi/ival
 
+         vpi = ( q2*dq*dq + u2*du*du )/pi2
+         dpi = sqrt( vpi )
+         dp = sqrt( vpi/(ival**2) + (isigma*isigma)*pi2/(ival**4) )
+         dang = degrees( sqrt( ( q2*du*du + u2*dq*dq )/ ( 4.0*pi2*pi2 ) ) )
+
+         pideb = sqrt( max( 0.0, pi2 - vpi ) )
+         pdeb = pideb / ival
+
          fd.write("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} "
                   "{13} {14} {15} {16} {17} {18} {19} {20} {21} {22} {23} "
-                  "{24} {25} {26} {27}"
+                  "{24} {25} {26} {27} {28} {29} {30}"
                   .format(utlist[i], obsnumlist[i],
-                  alist[i], el, q, dq, u, du, ii, di, pi, ang, p, qfp, ufp, pifit, pfit,
+                  alist[i], el, q, dq, u, du, ii, di, pi, ang, p, pdeb, dang, dp, qfp, ufp, pifit, pfit,
                   tau, tran, rej, hstlist[i], atlist[i], humlist[i],
                   bplist[i], wndspdlist[i], wnddirlist[i], frleglist[i],
                   bkleglist[i] ))
