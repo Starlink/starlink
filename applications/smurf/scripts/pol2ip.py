@@ -1180,6 +1180,12 @@ try:
            m = re.compile("# Total intensity value = (\S+) pW").match(line)
            if m:
               ival = float(m.group(1))
+              isigma = 0.0
+
+           m = re.compile("# Total intensity value = (\S+) +/- (\S+) pW").match(line)
+           if m:
+              ival = float(m.group(1))
+              isigma = float(m.group(2))
 
            m = re.compile("# PIXSIZE = (\S+)").match(line)
            if m:
