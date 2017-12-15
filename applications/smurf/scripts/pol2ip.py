@@ -225,7 +225,7 @@
 *     11-DEC-2017 (DSB):
 *        Added parameter WAVEBAND.
 *     13-DEC-2017 (DSB):
-*        Add columns for debiased P, error on P and error on ANG to 
+*        Add columns for debiased P, error on P and error on ANG to
 *        output table.
 *-
 '''
@@ -743,7 +743,7 @@ try:
                if len(uts) != len(qts):
                   msg_out("Differing numbers of Q and U time-streams. Re-calculating them...")
                   raise starutil.NoNdfError("Inconsistent pre-existing time-series")
-               elif iref is None and len(iref) != len(qts):
+               elif iref is None and len(its) != len(qts):
                   msg_out("Differing numbers of Q and I time-streams. Re-calculating them...")
                   raise starutil.NoNdfError("Inconsistent pre-existing time-series")
 
