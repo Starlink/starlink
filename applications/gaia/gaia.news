@@ -1,3 +1,12 @@
+
+  Important bug fix: A problem with accessing CDS and other services using
+  Apache has been fixed. Previously Skycat used a non-standard end of line
+  encoding resulting in a HTTP 400 response.
+
+
+  Star-2016A Release
+  ==================
+
   Following hyperlinks in the help system should be working again.
   Previously clicking on a hyperlink could result in a mangled URL
   causing a failure.
