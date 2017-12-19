@@ -19029,9 +19029,11 @@ iraf! {
 
          parameter refcat {
             type FILENAME
-            ppath GLOBAL CURRENT
+            vpath default
+            ppath GLOBAL CURRENT DEFAULT
             association <-GLOBAL.CATALOGUE
             prompt {Positions list defining required WCS}
+            default !
             helpkey *
          }
 
