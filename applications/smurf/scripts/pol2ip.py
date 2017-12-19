@@ -838,9 +838,13 @@ try:
 
 #  Find the position of the source centre in sky coords within the polarised
 #  intensity map.
-         invoke("$KAPPA_DIR/centroid ndf={0} mode=int init=\"'0,0'\"".format(pimap) )
-         xcen = get_task_par( "xcen", "centroid" )
-         ycen = get_task_par( "ycen", "centroid" )
+         try:
+            invoke("$KAPPA_DIR/centroid ndf={0} mode=int init=\"'0,0'\"".format(pimap) )
+            xcen = get_task_par( "xcen", "centroid" )
+            ycen = get_task_par( "ycen", "centroid" )
+         except starutil.StarUtilError:
+            xcen = 0.0
+            ycen = 0.0
 
 #  Get the elevation at the middle of the observation.
          el1 = float( get_fits_header( qmap, "ELSTART" ) )
@@ -1096,9 +1100,13 @@ try:
                               format(actpixsize,actpixsize0))
 
 #  Find the position of the source centre in sky offsets within the total intensity map.
-         invoke("$KAPPA_DIR/centroid ndf={0} mode=int init=\"'0,0'\"".format(imap) )
-         xcen = get_task_par( "xcen", "centroid" )
-         ycen = get_task_par( "ycen", "centroid" )
+         try:
+            invoke("$KAPPA_DIR/centroid ndf={0} mode=int init=\"'0,0'\"".format(imap) )
+            xcen = get_task_par( "xcen", "centroid" )
+            ycen = get_task_par( "ycen", "centroid" )
+         except starutil.StarUtilError:
+            xcen = 0.0
+            ycen = 0.0
 
 #  If we are using weighted mean values, use beamfit to fit a beam to the total
 #  intensity source.
