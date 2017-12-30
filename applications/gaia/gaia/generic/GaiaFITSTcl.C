@@ -854,7 +854,7 @@ static int GaiaFITSTclFitsHeaders( ClientData clientData, Tcl_Interp *interp,
             ptr += 81;
             headerPtr += 80;
         }
-        ptr = '\0';
+        ptr = 0;
         Tcl_SetResult( interp, headers, TCL_DYNAMIC );
     }
     return result;
