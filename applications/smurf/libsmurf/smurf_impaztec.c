@@ -744,8 +744,9 @@ void smurf_impaztec( int *status ) {
 
         /* Free cache */
         hdr.cache2 = smf_create_lutwcs( -1, hdr.fplanex, hdr.fplaney, hdr.ndet,
-                                        &(head[i_good]), 0.0,hdr.instap, telpos,
-                                        &(hdr.wcs), hdr.cache2, status );
+                                        &(head[i_good]), 0.0, VAL__BADD,
+                                        hdr.instap, telpos, &(hdr.wcs),
+                                        hdr.cache2, status );
 
       }
     }
