@@ -251,14 +251,14 @@
       ($rname = $name) =~ s/_/\\\\_/g;
        $qname = uc( $name );
        if( $subset == 0 ) {
-          $document =~ s/(arameter\s*\\texttt{\"})\s*$rname\s*(\\texttt{\"})/$1\\htmlref{$pname}{$qname}$2/gs;
+          $document =~ s/(arameter\s*\\texttt\{\"})\s*$rname\s*(\\texttt\{\"})/$1\\htmlref{$pname}{$qname}$2/gs;
        } else {
-          $document =~ s/(arameter\s*\\texttt{\"})\s*$rname\s*(\\texttt{\"})/$1\\xref{$pname}{sun258}{$qname}$2/gs;
+          $document =~ s/(arameter\s*\\texttt\{\"})\s*$rname\s*(\\texttt\{\"})/$1\\xref{$pname}{sun258}{$qname}$2/gs;
        }
    }
 
 #  Edit the Latex macro invocations into their final form.
-   $document =~ s/\\sstinvocation{/\\sstattributetype{/gs;
+   $document =~ s/\\sstinvocation\{/\\sstattributetype{/gs;
 
 #  Fix up constructs that don't otherwise convert to HTML properly.
    $document =~ s/(\$<\$undef\$>\$)/\\texttt{$1}/gs;
