@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="automake" buildsupport="yes" support="U">
-  <version>starlink-1.14</version>
+  <version>starlink-1.15</version>
   <path>thirdparty/fsf/autotools/automake</path>
   <description>GNU automake, patched</description>
   <!-- <abstract><p></p></abstract> -->

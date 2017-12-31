@@ -1,5 +1,5 @@
 
-This is GNU automake 1.14 with patches to support Fortran, preprocessed
+This is GNU automake 1.15 with patches to support Fortran, preprocessed
 Fortran and special requirements for the Starlink project.
 
 The "automake" directory contains the modified vendor source. It should be
