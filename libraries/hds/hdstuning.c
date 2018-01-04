@@ -37,7 +37,9 @@ static pthread_mutex_t hdstuning_mutex = PTHREAD_MUTEX_INITIALIZER;
 static void hds1ReadTuneEnvironment () {
   LOCK_MUTEX;
   if(!HAVE_INITIALIZED_TUNING) {
-    dat1Getenv( "HDS_VERSION5", USE_VERSION5, &USE_VERSION5 );
+    int version = 0;
+    dat1Getenv( "HDS_VERSION", USE_VERSION5 ? 5 : 4, &version );
+    USE_VERSION5 = version == 5;
     dat1Getenv( "HDS_V4LOCKERROR", V4LOCK_ERROR, &V4LOCK_ERROR );
     HAVE_INITIALIZED_TUNING = 1;
   }
@@ -64,8 +66,8 @@ static void hds1ReadTuneEnvironment () {
 *  Arguments:
 *     param_str = const char * (Given)
 *        Name of the tuning parameter. Allowed values are:
-*        - VERSION5: Positive value and v5 will be called for new files,
-*                    zero, v4 will be used to create new files.
+*        - VERSION: 5 and v5 will be called for new files,
+*                   4, v4 will be used to create new files.
 *        - V4LOCKERROR: Report an error if a thread lock function is used on
 *                       a V4 locator (otherwise, do nothing).
 *     value = int (Given)
@@ -115,10 +117,21 @@ static void hds1ReadTuneEnvironment () {
 int hds1TuneWrapper( const char * param_str, int value, int *status ) {
   if (*status != SAI__OK) return *status;
 
-  if (strncmp( param_str, "VERSION5", 8) == 0 ) {
-    LOCK_MUTEX;
-    USE_VERSION5 = ( value == 0 ? 0 : 1 );
-    UNLOCK_MUTEX;
+  if (strncmp( param_str, "VERSION", 7) == 0 ) {
+    int new_value = 0;
+    switch (value) {
+      case 5:
+        new_value = 1;
+      case 4:
+        LOCK_MUTEX;
+        USE_VERSION5 = new_value;
+        UNLOCK_MUTEX;
+        break;
+      default:
+        *status = DAT__NAMIN;
+        emsRepf("hdsTune_1", "hdsTune: Unknown HDS version '%d'",
+                status, value );
+    }
   } else if (strncmp( param_str, "V4LOCKERROR", 11) == 0 ) {
     LOCK_MUTEX;
     V4LOCK_ERROR = ( value == 0 ? 0 : 1 );
@@ -153,7 +166,7 @@ int hds1TuneWrapper( const char * param_str, int value, int *status ) {
 *     param_str = const char * (Given)
 *        Name of the tuning parameter whose value is required (case insensitive).
 *        Supported parameter names are:
-*        - VERSION5: Wrapper is using v5 for file creation if non-zero.
+*        - VERSION: Wrapper is using v5 for file creation if equal to 5.
 *        - V4LOCKERROR: Report an error if a thread lock function is used on
 *                       a V4 locator (otherwise, do nothing).
 *     value = int * (Returned)
@@ -207,9 +220,9 @@ hds1GtuneWrapper(const char *param_str, int *value, int *status) {
   /* Ensure that defaults have been read */
   hds1ReadTuneEnvironment();
 
-  if (strncasecmp( param_str, "VERSION5", 8 ) ) {
+  if (strncasecmp( param_str, "VERSION", 7 ) ) {
     LOCK_MUTEX;
-    *value = ( USE_VERSION5 ? 1 : 0 );
+    *value = ( USE_VERSION5 ? 5 : 4 );
     UNLOCK_MUTEX;
   } else if (strncasecmp( param_str, "V4LOCKERROR", 11 ) ) {
     LOCK_MUTEX;

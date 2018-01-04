@@ -3347,7 +3347,7 @@ hdsGtune(const char *param_str, int *value, int *status) {
   const char * used = "(none)";
   EnterCheck("hdsGtune",*status);
   if (*status != SAI__OK) return *status;
-  if ( strncasecmp(param_str, "VERSION5", 8) == 0 ) {
+  if ( strncasecmp(param_str, "VERSION", 7) == 0 ) {
     hds1GtuneWrapper( param_str, value, status );
     used = "(wrapper)";
   } else {
@@ -3579,7 +3579,7 @@ hdsTune(const char *param_str, int value, int *status) {
   const char * used = "(none)";
   EnterCheck("hdsTune",*status);
   if (*status != SAI__OK) return *status;
-  if ( strncasecmp(param_str, "VERSION5", 8) == 0 ) {
+  if ( strncasecmp(param_str, "VERSION", 7) == 0 ) {
     hds1TuneWrapper( param_str, value, status );
     used = "(wrapper)";
   } else {
