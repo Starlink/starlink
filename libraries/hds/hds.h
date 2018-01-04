@@ -947,18 +947,19 @@ int
 datType(const HDSLoc *locator, char type_str[DAT__SZTYP + 1], int *status);
 
 /*=============================================================*/
-/* datNolock - Prevent lock checks being performed on an object */
-/*=============================================================*/
-
-int
-datNolock( HDSLoc *locator, int *status);
-
-/*=============================================================*/
 /* datUnlock - Unlock an object so another thread can lock it. */
 /*=============================================================*/
 
 int
 datUnlock( HDSLoc *locator, int recurs, int *status);
+
+/*=============================================================*/
+/* datNolock - Prevent lock checks being performed on the      */
+/* supplied object.                                            */
+/*=============================================================*/
+
+int
+datNolock( HDSLoc *locator, int *status);
 
 /*=========================*/
 /* datUnmap - Unmap object */
@@ -1137,7 +1138,6 @@ hdsClose(HDSLoc **locator, int *status);
 /*===================================================================*/
 
 int hdsFind(const HDSLoc *locator1, const char *name, const char *mode, HDSLoc **locator2, int *status);
-
 
 
 /* STAR_HDS_H_INCLUDED */

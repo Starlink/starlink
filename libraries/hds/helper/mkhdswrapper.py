@@ -75,6 +75,23 @@ def func_simple(func,line):
         locvar = "locator1"
     elif line.startswith("datAnnul") or line.startswith("datPrmry") or line.startswith("hdsErase") or line.startswith("hdsClose"):
         locvar = "*locator"
+    v4_dims = v4_free = thing = ''
+    if 'ndim, dims' in line or 'ndim, pntr, dims' in line:
+        thing = 'dims'
+    elif 'ndim, subs' in line:
+        thing = 'subs'
+    if thing:
+        v4_dims = 'hdsdim_v4 *{0}_v4 = dat1ExportV4Dims( "{1}", ndim, {0}, status );\n    '.format(thing, func)
+        v4_free = '\n    if( {0}_v4 ) starFree( {0}_v4 );'.format(thing)
+        v4 = v4.replace(thing, '(hdsdim *) {0}_v4'.format(thing))
+    elif 'ndim, lower, upper' in line:
+        v4_dims = """hdsdim_v4 *lower_v4 = dat1ExportV4Dims( "{0}", ndim, lower, status );
+    hdsdim_v4 *upper_v4 = dat1ExportV4Dims( "{0}", ndim, upper, status );
+    """.format(func)
+        v4_free = """
+    if( lower_v4 ) starFree( lower_v4 );
+    if( upper_v4 ) starFree( upper_v4 );"""
+        v4 = v4.replace('lower, upper', '(hdsdim *) lower_v4, (hdsdim *) upper_v4')
     print("""
   int retval = 0;
   int instat = *status;
@@ -83,12 +100,12 @@ def func_simple(func,line):
   if (isv5) {{
     retval = {1}
   }} else {{
-    LOCK_MUTEX;
+    {4}LOCK_MUTEX;
     retval = {2}
-    UNLOCK_MUTEX;
+    UNLOCK_MUTEX;{5}
   }}
   HDS_CHECK_STATUS(\"{3}\",(isv5 ? "(v5)" : "(v4)"));
-  return retval;""".format(locvar, v5, v4, func))
+  return retval;""".format(locvar, v5, v4, func, v4_dims, v4_free))
 
 
 def func_special(func,line):
@@ -113,6 +130,7 @@ def func_both(func,line):
 
 def func_versioned(func,line):
     (v4,v5) = version_names(line)
+    v4 = v4.replace('dims', '(hdsdim *) dims_v4')
     print("""  int retval = 0;
   int instat = *status;
   const char * used = "(none)";
@@ -122,9 +140,11 @@ def func_versioned(func,line):
     retval = {0}
     used = "(v5)";
   }} else {{
+    hdsdim_v4 *dims_v4 = dat1ExportV4Dims( "{2}", ndim, dims, status );
     LOCK_MUTEX;
     retval = {1}
     UNLOCK_MUTEX;
+    if( dims_v4 ) starFree( dims_v4 );
     used = "(v4)";
   }}
   HDS_CHECK_STATUS(\"{2}\", used);
@@ -161,6 +181,16 @@ def func_v5(func,line):
     else:
         print('  EnterCheck("'+func+'",-1);')
         print("  return " +v5)
+
+def func_v5only(func, line):
+    (v4,v5) = version_names(line)
+    print("""  int retval = 0;
+  int instat = *status;
+  int isv5 = ISHDSv5(locator);
+  EnterCheck("{1}",*status);
+  if (isv5) retval = {0}
+  HDS_CHECK_STATUS("{1}","(v5)");
+  return retval;""".format(v5, func))
 
 def func_copy(func,line):
     (v4,v5) = version_names(line)
@@ -392,6 +422,78 @@ def func_hdsCopy(func,line):
   HDS_CHECK_STATUS("hdsCopy", (ISHDSv5(locator) ? "(v5)" : "(v4)"));
   return *status;""")
 
+def func_datLock(func, line):
+    print("""  int retval = 0;
+  int instat = *status;
+  int isv5 = ISHDSv5(locator);
+  EnterCheck("datLock",*status);
+  if (isv5) {
+    retval = datLock_v5(locator, recurs, readonly, status);
+  } else if( *status == SAI__OK && hds1V4LockError() ){
+    *status = DAT__VERMM;
+    datMsg( "O", locator );
+    emsRepf("","datLock: supplied HDS object (^O) uses V4 data format", status );
+    emsRepf("","The running application is multi-threaded and so requires V5 data files.",
+            status );
+  }
+  HDS_CHECK_STATUS("datLock","(v5)");
+  return retval;""")
+
+def func_datLocked(func, line):
+    print("""  int retval = 0;
+  int instat = *status;
+  int isv5 = ISHDSv5(locator);
+  EnterCheck("datLocked",*status);
+  if (isv5) {
+    retval = datLocked_v5(locator, recurs, status);
+  } else {
+    retval = -1;  /* Indicates that HDS V4 does not support object locking */
+  }
+  HDS_CHECK_STATUS("datLocked","(v5)");
+  return retval;""")
+
+def func_datUnlock(func, line):
+    print("""  int retval = 0;
+  int instat = *status;
+  int isv5 = ISHDSv5(locator);
+  EnterCheck("datUnlock",*status);
+  if (isv5) {
+    retval = datUnlock_v5(locator, recurs, status);
+  } else if( *status == SAI__OK && hds1V4LockError() ){
+    *status = DAT__VERMM;
+    datMsg( "O", locator );
+    emsRepf("","datUnlock: supplied HDS object (^O) uses V4 data format", status );
+    emsRepf("","The running application is multi-threaded and so requires V5 data files.",
+            status );
+  }
+  HDS_CHECK_STATUS("datUnlock","(v5)");
+  return retval;""")
+
+def func_datShape(func, line):
+    print("""
+  int retval = 0;
+  int instat = *status;
+  int isv5 = ISHDSv5(locator);
+  EnterCheck("datShape",*status);
+  if (isv5) {
+    retval = datShape_v5(locator, maxdim, dims, actdim, status);
+  } else if( *status == SAI__OK ){
+    hdsdim_v4 *dims_v4 = starMalloc( maxdim*sizeof(*dims_v4) );
+    if( dims_v4 ) {
+       int i;
+       LOCK_MUTEX;
+       retval = datShape_v4(locator, maxdim, (hdsdim *) dims_v4, actdim, status);
+       UNLOCK_MUTEX;
+       for( i = 0; i < maxdim; i++ ) dims[ i ] = (hdsdim) dims_v4[ i ];
+       starFree( dims_v4 );
+    } else {
+       *status = DAT__NOMEM;
+       emsRep( " ", "datShape wrapper - Error allocating memory", status );
+    }
+  }
+  HDS_CHECK_STATUS("datShape",(isv5 ? "(v5)" : "(v4)"));
+  return retval;""")
+
 # Dictionary indicating special cases
 special = dict({
     "datCcopy": func_copy,
@@ -399,12 +501,14 @@ special = dict({
     "datChscn": func_v5,
     "datCopy": func_copy,
     "datErmsg": func_v5,
-    "datLock": func_special,
-    "datLocked": func_special,
+    "datLock": func_datLock,
+    "datLocked": func_datLocked,
     "datMove": func_datMove,
     "datMsg": func_void,
+    "datNolock": func_v5only,
+    "datShape": func_datShape,
     "datTemp": func_versioned,
-    "datUnlock": func_special,
+    "datUnlock": func_datUnlock,
     "hdsCopy": func_hdsCopy,
     "hdsEwild": func_special,
     "hdsFlush": func_hdsFlush,
@@ -456,6 +560,11 @@ for line in open("hds.h"):
             print('/* Code generated by helper/mkhdswrapper.py */')
             print('/* Do not commit changes to this file without also */')
             print('/* adjusting the python code.*/')
+            print('')
+            print('/* This gives us the PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP static')
+            print('   initialiser used below. */')
+            print('#define _GNU_SOURCE')
+            print('')
             print('#include <stdlib.h>')  # For abort()
             print('#include <stdio.h>')  # For printf()
             print('#include <string.h>')
@@ -469,7 +578,10 @@ for line in open("hds.h"):
             print('#include "dat_err.h"')
             print('#include "star/hds_v4.h"')
             print('#include "star/hds_v5.h"')
+            print('#include "star/mem.h"')
+            print('')
             print('#define ISHDSv5(loc) ((loc) && (loc)->hds_version >= 5)')
+            print('')
             print('#if DEBUG_HDS')
             print('#define HDS_CHECK_STATUS(func,txt) if (*status != instat && *status != SAI__OK) { emsRepf("wrap_" func, func ": Error in call to HDS %s", status, txt); printf("Bad status from %s %s: %d\\n", func, txt, *status);}')
             print('static void EnterCheck( const char * func, int status ) { printf("Enter HDS routine: %s [%d]\\n", func,status); }')
@@ -478,12 +590,26 @@ for line in open("hds.h"):
             print("#  define EnterCheck(A,B) ;")
             print('#endif')
             print("")
-            print('/* HDS V5 is thread-safe, but V4 is not. So we use a ')
-            print('   mutex to serialise all calls to V4 functions. */')
-            print('static pthread_mutex_t hdsv4_mutex = PTHREAD_MUTEX_INITIALIZER;')
+            print('/* Define the type used for hdsdim when calling HDS v4 (defined within')
+            print('   hds-v4/hds_types.h. It is assumed that HDS v5 and this wrapper package')
+            print('   use the same type for hdsdim. */')
+            print('typedef int hdsdim_v4;')
+            print('')
+            print('/* HDS V5 is thread-safe, but V4 is not. So we use a mutex to serialise all')
+            print('   calls to V4 functions. Some HDS functions make direct calls to other HDS')
+            print('   top level functions. Using a normal mutex to serialise top-level HDS')
+            print('   calls would therefore cause deadlock. The right way to fix this would')
+            print('   be to re-structure HDS to avoid top-level functions being called from')
+            print('   within HDS, but that would be a lot of work. */')
+            print('static pthread_mutex_t hdsv4_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;')
             print('#define LOCK_MUTEX pthread_mutex_lock( &hdsv4_mutex );')
             print('#define UNLOCK_MUTEX pthread_mutex_unlock( &hdsv4_mutex );')
             print("")
+            print('/* Prototypes for local functions. */')
+            print('static hdsdim_v4 *dat1ExportV4Dims( const char *func, int ndim, const hdsdim *dims, int *status );')
+            print('')
+            print('')
+            print('')
             print(line)
             in_prologue = 0
         elif in_prologue:
@@ -495,3 +621,36 @@ for line in open("hds.h"):
         else:
             print(line)
 
+print('''static hdsdim_v4 *dat1ExportV4Dims( const char *func, int ndim,
+                                    const hdsdim *dims, int *status ){
+   int i;
+   hdsdim_v4 *result = NULL;
+
+   if( *status != SAI__OK ) return NULL;
+
+   result = starMalloc( ndim*sizeof(*result) );
+   if( result ) {
+      for( i = 0; i < ndim; i++ ) {
+         result[ i ] = dims[ i ];
+         if( (hdsdim) result[ i ] != dims[ i ] ) {
+            *status = DAT__DIMIN;
+            emsRepf( "", "%s: Supplied HDS dimension on axis %d (%"
+                     HDS_DIM_FORMAT ") is too big to use with an "
+                     "HDS V4 data file.", status, func, i + 1, dims[i] );
+            starFree( result );
+            result = NULL;
+            break;
+         }
+      }
+
+   } else {
+      *status = DAT__NOMEM;
+      emsRepf( "", "%s: Failed to allocate memory for HDS V4 dimensions.",
+               status, func );
+   }
+
+   return result;
+}
+
+
+''')
