@@ -220,11 +220,11 @@ hds1GtuneWrapper(const char *param_str, int *value, int *status) {
   /* Ensure that defaults have been read */
   hds1ReadTuneEnvironment();
 
-  if (strncasecmp( param_str, "VERSION", 7 ) ) {
+  if (strncasecmp( param_str, "VERSION", 7 ) == 0) {
     LOCK_MUTEX;
     *value = ( USE_VERSION5 ? 5 : 4 );
     UNLOCK_MUTEX;
-  } else if (strncasecmp( param_str, "V4LOCKERROR", 11 ) ) {
+  } else if (strncasecmp( param_str, "V4LOCKERROR", 11 ) == 0) {
     LOCK_MUTEX;
     *value = ( V4LOCK_ERROR ? 1 : 0 );
     UNLOCK_MUTEX;
