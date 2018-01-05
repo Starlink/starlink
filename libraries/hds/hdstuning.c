@@ -117,6 +117,9 @@ static void hds1ReadTuneEnvironment () {
 int hds1TuneWrapper( const char * param_str, int value, int *status ) {
   if (*status != SAI__OK) return *status;
 
+  /* Ensure that defaults have been read first so that we can override them. */
+  hds1ReadTuneEnvironment();
+
   if (strncmp( param_str, "VERSION", 7) == 0 ) {
     int new_value = 0;
     switch (value) {
