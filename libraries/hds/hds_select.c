@@ -1385,11 +1385,18 @@ datMapN(HDSLoc *locator, const char *type_str, const char *mode_str, int ndim, v
   if (isv5) {
     retval = datMapN_v5(locator, type_str, mode_str, ndim, pntr, dims, status);
   } else {
-    hdsdim_v4 *dims_v4 = dat1ExportV4Dims( "datMapN", ndim, dims, status );
-    LOCK_MUTEX;
-    retval = datMapN_v4(locator, type_str, mode_str, ndim, pntr, (hdsdim *) dims_v4, status);
-    UNLOCK_MUTEX;
-    if( dims_v4 ) starFree( dims_v4 );
+    hdsdim_v4 *dims_v4 = starMalloc( DAT__MXDIM*sizeof(*dims_v4) );
+    if( dims_v4 ) {
+       int i;
+       LOCK_MUTEX;
+       retval = datMapN_v4(locator, type_str, mode_str, ndim, pntr, (hdsdim *) dims_v4, status);
+       UNLOCK_MUTEX;
+       for( i = 0; i < ndim; i++ ) dims[ i ] = (hdsdim) dims_v4[ i ];
+       starFree( dims_v4 );
+    } else {
+       *status = DAT__NOMEM;
+       emsRep( " ", "datMapN wrapper - Error allocating memory", status );
+    }
   }
   HDS_CHECK_STATUS("datMapN",(isv5 ? "(v5)" : "(v4)"));
   return retval;
