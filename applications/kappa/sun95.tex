@@ -15033,7 +15033,7 @@ XV; PBMPLUS; NETPBM.
          ESTIMATOR = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The method to use for estimating the output pixel values.  It
-         can be one of the following options.  The first four are
+         can be one of the following options.  The first five are
          more for general collapsing, and the remainder are for cube
          analysis.
 
@@ -15054,7 +15054,14 @@ XV; PBMPLUS; NETPBM.
             \sstitem
             \texttt{"Median"} --- Median value.  Note that this is extremely memory
                         and CPU intensive for large datasets; use with
-                        care!  If strange things happen, use \texttt{"Mean"}. \\
+                        care!  If strange things happen, use \texttt{"Mean"}.
+
+            \sstitem
+            \texttt{"FastMed"} --- Faster median using Wirth's algorithm for selecting
+                        the $k$th value, rather than a full sort.
+                        Weighting is not supported, thus this option is
+                        unavailable if both Parameter VARIANCE is \texttt{TRUE} and
+                        the input NDF contains a VARIANCE component.\\
 
             \sstitem
             \texttt{"Absdev"} --- Mean absolute deviation from the unweighted mean.
@@ -53607,6 +53614,13 @@ The following applications have been modified:
       \begin{itemize}
         \item Parameter TR may also include the scale and offset in
         its seventh and eight elements.
+      \end{itemize}
+
+   \item [\htmlref{COLLAPSE}{COLLAPSE}]\mbox{}
+      \begin{itemize}
+        \item There is a new estimator option, \texttt{"FastMed"},
+        that offers a substantially faster calculation of unweighted
+        medians.
       \end{itemize}
 
    \item [\htmlref{CONFIGMELD}{CONFIGMELD}]\mbox{}

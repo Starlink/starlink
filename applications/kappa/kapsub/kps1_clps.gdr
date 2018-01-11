@@ -35,10 +35,11 @@
 *     VAR = LOGICAL (Given)
 *        Process variances?
 *     METH = CHARACTER * ( * ) (Given)
-*        Estimator: 'MEAN', 'WMEAN', 'MODE', 'MEDIAN', 'SUM', 'SIGMA',
-*        'CMEAN', 'CSIGMA', 'INTEG', 'IWC', 'IWD', 'RMS', 'ABSDEV',
-*        'MAX', 'MIN', 'COMAX', 'COMIN', 'NGOOD', 'NBAD', 'FGOOD' or
-*        'FBAD'.  See the COLLAPSE documentation for details.
+*        Estimator: 'MEAN', 'WMEAN', 'MODE', 'MEDIAN', 'FASTMED',
+*        'SUM', 'SIGMA', 'CMEAN', 'CSIGMA', 'INTEG', 'IWC', 'IWD',
+*        'RMS', 'ABSDEV', 'MAX', 'MIN', 'COMAX', 'COMIN', 'NGOOD',
+*        'NBAD', 'FGOOD' or 'FBAD'.  See the COLLAPSE documentation
+*        for details.
 *     WLIM = REAL (Given)
 *        Fraction of pixels which must be good to create a good output
 *        pixel.
@@ -210,6 +211,8 @@
 *        Added CLIP argument.
 *     17-JUL-2012 (DSB):
 *        Added NGood, NBad, FGood and FBad methods.
+*     2018 January 11 (MJC):
+*        Permit FastMed method.
 *     {enter_further_changes_here}
 
 *-
@@ -316,6 +319,9 @@
 
       ELSE IF ( METH .EQ. 'CMEAN' ) THEN
          IMETH = 6
+
+      ELSE IF ( METH .EQ. 'FASTMED' ) THEN
+         IMETH = 11
 
       ELSE IF ( METH .EQ. 'SUM' ) THEN
          IMETH = 12

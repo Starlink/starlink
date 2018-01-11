@@ -11,12 +11,15 @@
    Note that the format of the log may change to simple command lines
    that could be replayed in a script.
 
-
 2 Modified_applications
 
    o  ALIGN2D
       -  Parameter TR may also include the scale and offset in its seventh
       and eight elements.
+
+   o   COLLAPSE
+      - There is a new estimator option, "FastMed", that offers a
+      substantially faster calculation of unweighted medians.
 
    o  CONFIGMELD
       -  This now reports all elements in an array, not just the first

@@ -81,7 +81,7 @@
 *        255).  ["Data"]
 *     ESTIMATOR = LITERAL (Read)
 *        The method to use for estimating the output pixel values.  It
-*        can be one of the following options.  The first four are
+*        can be one of the following options.  The first five are
 *        more for general collapsing, and the remainder are for cube
 *        analysis.
 *          "Mean"   -- Mean value
@@ -92,7 +92,13 @@
 *          "Mode"   -- Modal value
 *          "Median" -- Median value.  Note that this is extremely memory
 *                      and CPU intensive for large datasets; use with
-*                      care!  If strange things happen, use "Mean".
+*                      care!  If strange things happen, use "Mean" or
+*                      try "FastMed".
+*          "FastMed"-- Faster median using Wirth's algorithm for selecting
+*                      the kth value, rather than a full sort.
+*                      Weighting is not supported, thus this option is
+*                      unavailable if both Parameter VARIANCE is TRUE and
+*                      the input NDF contains a VARIANCE component.
 *
 *          "Absdev" -- Mean absolute deviation from the unweighted mean.
 *          "Cmean"  -- Sigma-clipped mean.
@@ -301,7 +307,7 @@
 *  Copyright:
 *     Copyright (C) 2000-2001, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2005-2006 Particle Physics & Astronomy
-*     Research Council.  Copyright (C) 2007-2009, 2013 Science and
+*     Research Council.  Copyright (C) 2007-2009, 2013, 2018 Science and
 *     Technology Facilities Council.  All Rights Reserved.
 
 *  Licence:
@@ -448,6 +454,8 @@
 *        Added "NGood", "NBad", "FGood" and "FBad" estimators.
 *     2013 May 10 (MJC):
 *        Do not pass COMP=Error to NDF_MTYPE.
+*     2018 January 11 (MJC):
+*        Add "FastMed" estimator.
 *     {enter_further_changes_here}
 
 *-
@@ -488,7 +496,7 @@
       CHARACTER COMP * ( 13 )    ! List of components to process
       CHARACTER COMPO * ( 13 )   ! List of output components to process
       CHARACTER DTYPE*( NDF__SZFTP ) ! Numeric type for output arrays
-      CHARACTER ESTIM*( 6 )      ! Method to use to estimate collapsed
+      CHARACTER ESTIM*( 7 )      ! Method to use to estimate collapsed
                                  ! values
       CHARACTER FORMAT*6         ! Format for warning
       CHARACTER ITYPE*( NDF__SZTYP ) ! Numeric type for input arrays
@@ -981,18 +989,24 @@
 *  Obtain the remaining parameters.
 *  ================================
 
-*  Get the ESTIMATOR and WLIM parameters.  Can weight with the
-*  variance if it is the variance that's being collapsed.
+*  Get the ESTIMATOR and WLIM parameters.  Cannot weight with the
+*  variance if it is the variance that's being collapsed.  The fast
+*  median does not support weights.
       IF ( PROVAR ) THEN
          CALL PAR_CHOIC( 'ESTIMATOR', 'Mean','Mean,Mode,Median,Max,'/
      :                   /'Min,Comax,Comin,Absdev,RMS,Sigma,Sum,Iwc,'/
      :                   /'Iwd,Integ,Cmean,Csigma,NGood,NBad,FGood,'/
-     :                   /'FBad', .FALSE., ESTIM, STATUS )
-      ELSE
+     :                   /'FBad,FastMed', .FALSE., ESTIM, STATUS )
+      ELSE IF ( VAR ) THEN
          CALL PAR_CHOIC( 'ESTIMATOR', 'Mean','Mean,WMean,Mode,Median,'/
      :                   /'Max,Min,Comax,Comin,Absdev,RMS,Sigma,Sum,'/
      :                   /'Iwc,Iwd,Integ,Cmean,Csigma,NGood,NBad,'/
      :                   /'FGood,FBad', .FALSE., ESTIM, STATUS )
+      ELSE
+         CALL PAR_CHOIC( 'ESTIMATOR', 'Mean','Mean,WMean,Mode,Median,'/
+     :                   /'Max,Min,Comax,Comin,Absdev,RMS,Sigma,Sum,'/
+     :                   /'Iwc,Iwd,Integ,Cmean,Csigma,NGood,NBad,'/
+     :                   /'FGood,FBad,FastMed', .FALSE., ESTIM, STATUS )
       END IF
 
       CALL PAR_GDR0R( 'WLIM', 0.3, 0.0, 1.0, .FALSE., WLIM, STATUS )
