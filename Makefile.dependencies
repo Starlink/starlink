@@ -2801,18 +2801,30 @@ $(MANIFESTS)/surf: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/gks \
+		$(MANIFESTS)/gns \
+		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/gsl \
+		$(MANIFESTS)/gwm \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
+		$(MANIFESTS)/pgp \
+		$(MANIFESTS)/pgplot \
 		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
+		$(MANIFESTS)/ref \
 		$(MANIFESTS)/sae \
+		$(MANIFESTS)/sgs \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
-		$(MANIFESTS)/starutil
+		$(MANIFESTS)/starutil \
+		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk
 	cd applications/surf \
 	  && $(MAKE_CPT)
 

@@ -1906,7 +1906,7 @@ the James Clerk Maxwell Telescope. The tasks allows one to completely
 re-reduce your SCUBA data.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>sae</build><build>prm</build><build>pcs</build><build>mers</build><build>ndf</build><build>gsl</build><link>ndf</link><link>fio</link><link>sla</link><link>hlp</link><link>pda</link><link>prm</link><link>agi</link><link>kaplibs</link><link>pgplot</link><link>grp</link><link>ndg</link><link>gsl</link><sourceset>star2html</sourceset>
+    <build>pcs</build><build>sae</build><build>prm</build><build>pcs</build><build>mers</build><build>ndf</build><build>gsl</build><build>ref</build><build>pgplot</build><build>pgp</build><build>graphpar</build><link>ndf</link><link>fio</link><link>sla</link><link>hlp</link><link>pda</link><link>prm</link><link>agi</link><link>kaplibs</link><link>pgplot</link><link>grp</link><link>ndg</link><link>gsl</link><link>ref</link><link>pgp</link><link>graphpar</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
