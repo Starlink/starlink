@@ -2478,6 +2478,7 @@ $(MANIFESTS)/smurf: \
 		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ctg \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/erfa \
 		$(MANIFESTS)/fftw \
@@ -2510,6 +2511,7 @@ $(MANIFESTS)/smurf: \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/sgs \
 		$(MANIFESTS)/shl \
+		$(MANIFESTS)/sla \
 		$(MANIFESTS)/snx \
 		$(MANIFESTS)/sofa \
 		$(MANIFESTS)/sst \
