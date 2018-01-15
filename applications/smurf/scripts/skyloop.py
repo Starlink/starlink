@@ -202,6 +202,15 @@
 *        atasks invoked within the executing script. The accepted values
 *        are the list defined in SUN/104 ("None", "Quiet", "Normal",
 *        "Verbose", etc). ["Normal"]
+*     OBSDIR = LITERAL (Read)
+*        The name of a directory in which to put maps made from the
+*        individual observations. These are generated on the final
+*        iteration. If null is supplied, individual observation maps will
+*        not be created. Each map is stored in a file with name
+*        <UT>_<OBS>.sdf. If a single observation is split into multiple
+*        chunks, the first chunk will use the above naming scheme but the
+*        second and subsequent chunks will have names of the form
+*        <UT>_<OBS>_<CHUNK>.sdf. [!]
 *     OUT = NDF (Write)
 *        The NDF holding the output map.
 *     PIXSIZE = _REAL (Read)
@@ -333,12 +342,15 @@
 *     28-NOV-2016 (DSB):
 *        Take account of the value of ast.skip when determining whether to
 *        freeze (xxx.zero_freeze) or apply (xxx.zero_niter) masks, etc.
+*     15-JAN-2018 (DSB):
+*        Added parameter OBSDIR.
 *-
 '''
 
 
 import glob
 import os
+import re
 import shutil
 import starutil
 import sys
@@ -448,6 +460,11 @@ try:
    params.append(starutil.Par0S("RESTART", "Directory holding data from an interrupted run of skyloop",
                                 default=None, noprompt=True ))
 
+   params.append(starutil.Par0S("OBSDIR", "Directory in which to save maps "
+                                "made from individual observations", None,
+                                noprompt=True))
+
+
 #  Initialise the parameters to hold any values supplied on the command
 #  line. This automatically adds definitions for the additional parameters
 #  "MSG_FILTER", "ILEVEL", "GLEVEL" and "LOGFILE".
@@ -476,6 +493,7 @@ try:
    extra = parsys["EXTRA"].value
    ipref = parsys["IPREF"].value
    itermap = parsys["ITERMAP"].value
+   obsdir =  parsys["OBSDIR"].value
 
 #  See if we are using pre-cleaned data, in which case there is no need
 #  to export the cleaned data on the first iteration. Note we need to
@@ -880,9 +898,16 @@ try:
             newcon = 1
 
 #  If this is the last iteration, put the output map in the NDF specified
-#  by the script's "OUT" parameter.
+#  by the script's "OUT" parameter. If required, change the config to
+#  indicate that maps made from individual chunks should be created.
          if iter == niter:
             newmap = outdata
+            if obsdir is not None:
+               add["itermap"] = -2
+               newcon = 1
+               itermaps = os.path.join(NDG.tempdir,"chunkmaps")
+            else:
+               itermaps = None
 
 #  Also, if this is the last iteration, create a modified configuration file
 #  that supresses masking (unless the xxx.zero_notlast value in the
@@ -932,6 +957,7 @@ try:
 #  the NDG temp directory.
          else:
             newmap = NDG(1)
+            itermaps = None
 
 #  If required, create a new config file.
          if newcon:
@@ -972,6 +998,8 @@ try:
                cmd += " mask2={0}".format(mask2)
             if mask3:
                cmd += " mask3={0}".format(mask3)
+            if itermaps:
+               cmd += " itermaps={0}".format(itermaps)
             if extra:
                cmd += " "+extra
             invoke(cmd)
@@ -1012,6 +1040,36 @@ try:
 #  Append the output map name to the list of maps to be included in any
 #  itermap cube.
          maps.append(newmap)
+
+#  Copy any chunk maps into the specified directory, creating it first
+#  if required.
+         lobs = ""
+         lut = ""
+         if itermaps:
+            if not os.path.exists(obsdir):
+               os.makedirs(obsdir)
+            for chunkmap in NDG(itermaps):
+               obsid=starutil.get_fits_header( chunkmap, "OBSIDSS" )
+               m1 = re.search( 'CH(\d+)I', chunkmap )
+               m2 = re.search( 'scuba2_(\d+)_(\d+)T', obsid )
+               if m1 and m2:
+                  ichunk = int( m1.group(1) )
+                  obs = int( m2.group(1) )
+                  ut = int( m2.group(2) )
+                  if obs != lobs or ut != lut:
+                     ich0 = ichunk
+
+                  if ichunk == ich0:
+                     thischunk = "{0}/{1}_{2}.sdf".format(obsdir,ut,obs)
+                  else:
+                     thischunk = "{0}/{1}_{2}_chunk{3}.sdf".format(obsdir,ut,obs,ichunk-ich0)
+                  invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(chunkmap,thischunk))
+
+                  lobs = obs
+                  lut = ut
+               else:
+                  raise starutil.InvalidParameterError("Could not identify "
+                                          "chunk map '{}'.".format(chunkmap))
 
 #  Update the NDF from which new quality info is to be read.
          if qua:
