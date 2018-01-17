@@ -1,0 +1,12 @@
+/* Generic prototypes for generic C functions. These are expanded at
+   make-time by script make_h to generate ary1_cgen.h, which is included in ary1.h. */
+
+void CGEN_FUNCTION(ary1Bad)( size_t n, CGEN_TYPE *argv, int *status );
+void CGEN_FUNCTION(ary1Zer)( size_t n, CGEN_TYPE *argv, int *status );
+void CGEN_FUNCTION(ary1Ptn)( int bad, int ndim, const hdsdim *lbnda, const hdsdim *ubnda,  const CGEN_TYPE *array,const hdsdim *lsub, const hdsdim *usub, const hdsdim *lbndd, const hdsdim *ubndd, const char *htype, HDSLoc *loc, int *dce, int *status );
+void CGEN_FUNCTION(ary1Pt1)( int bad, size_t el, const CGEN_TYPE *array, const char *type, HDSLoc *loc, int *dce, int *status );
+void CGEN_FUNCTION(ary1Cvf)( int bad, size_t n, const CGEN_TYPE *array, const char *type, void *pntr, int *dce, int *status );
+void CGEN_FUNCTION(ary1Gtn)( int bad, const char *htype, HDSLoc *loc, int ndim, const hdsdim *lbndd, const hdsdim *ubndd, const hdsdim *lsub, const hdsdim *usub, const hdsdim *lbnda, const hdsdim *ubnda, int pad, HDSLoc *scloc, CGEN_TYPE *array, int *dce, int *status );
+void CGEN_FUNCTION(ary1Gt1)( int bad, HDSLoc *loc, const char *type, size_t el, int doscl, CGEN_TYPE scale, CGEN_TYPE zero, CGEN_TYPE *result, int *dce, int *status );
+void CGEN_FUNCTION(ary1Cvt)( int bad, size_t n, const char *type, void *pntr, CGEN_TYPE *result, int *dce, int *status );
+void CGEN_FUNCTION(ary1Bpp)( size_t el, const CGEN_TYPE *array, int *bad, int *status );

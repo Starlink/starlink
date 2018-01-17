@@ -1,0 +1,90 @@
+#include "sae_par.h"
+#include "ary1.h"
+#include "prm_par.h"
+
+void  CGEN_FUNCTION(ary1Bpp)( size_t el, const CGEN_TYPE *array, int *bad,
+                              int *status ) {
+/*
+*+
+*  Name:
+*     ary1Bpp<T>
+
+*  Purpose:
+*     Determine if bad pixels are present in a vectorised array.
+
+*  Synopsis:
+*     void ary1Bpp<T>( size_t el, const CGEN_TYPE *array, int *bad,
+*                      int *status )
+
+*  Description:
+*     This function examines the values in a vectorised array and
+*     returns a boolean result "bad" whether any element of the
+*     array contains the bad pixel value VAL__BAD<T>.
+
+*  Parameters:
+*     el
+*        Number of elements in the vectorised array.
+*     array
+*        Pointer to the array to be examined.
+*     bad
+*        Returned holding a flag indicating whether any "array" element
+*        had the value VAL__BAD<T>.
+*     status
+*        The global status.
+
+*  Copyright:
+*      Copyright (C) 2017 East Asian Observatory
+*      All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     12-SEP-2017 (DSB):
+*        Original version, based on equivalent Fortran routine by RFWS.
+
+*-
+*/
+
+/* Local variables: */
+   size_t i;                     /* Loop counter for array elements */
+   const CGEN_TYPE *p;           /* Pointer to next array element */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Initialise. */
+   *bad = 0;
+   p = array;
+
+/* Loop to examine each array element. */
+   for( i = 0; i < el; i++ ){
+
+/* If a bad value is found, set "bad" to a non-zero value and quit checking. */
+      if( *(p++) == CGEN_BAD ){
+         *bad = 1;
+         break;
+      }
+   }
+
+/* Call error tracing routine and exit. */
+   if( *status != SAI__OK ) ary1Trace( "ary1Bpp<T>", status );
+
+}

@@ -1,0 +1,48 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     ary_link
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against standalone ARY.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building standalone
+#     applications which use ARY in order to generate the correct
+#     arguments for the compiler (or ld) command. The arguments
+#     generated are written to the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a compiler command line,
+#     such as:
+#
+#        gcc -o program -L/star/lib `ary_link` program.c
+
+#  Copyright:
+#      Copyright (C) 2017 East Asian Observatory
+#      All rights reserved.
+
+#  Authors:
+#     DSB: David S Berry (EAO)
+#     {enter_new_authors_here}
+
+#  History:
+#     27-JUL-2017 (DSB):
+#        Original version.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+      echo -lary `prm_link` `err_link` `hds_link` `ast_link` \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.

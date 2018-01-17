@@ -1,0 +1,185 @@
+#include "sae_par.h"
+#include "ary1.h"
+#include "star/hds.h"
+#include <string.h>
+
+void CGEN_FUNCTION(ary1Gt1)( int bad, HDSLoc *loc, const char *type,
+                             size_t el, int doscl, CGEN_TYPE scale,
+                             CGEN_TYPE zero, CGEN_TYPE *result, int *dce,
+                             int *status ) {
+/*
+*+
+*  Name:
+*     ary1Gt1
+
+*  Purpose:
+*     Read a 1-dimensional array of values from an HDS object.
+
+*  Synopsis:
+*     void CGEN_FUNCTION(ary1Gt1)( int bad, HDSLoc *loc, const char *type,
+*                                size_t el, int doscl, CGEN_TYPE scale,
+*                                CGEN_TYPE zero, CGEN_TYPE *result, int *dce,
+*                                int *status )
+
+*  Description:
+*     This function reads a 1-dimensional array of values from an
+*     HDS object. The object must also be 1-dimensional and must
+*     contain exactly the number of elements to be read. Data type
+*     conversion from any primitive numeric HDS data type is performed
+*     if necessary, with optional testing for bad pixel values.
+
+*  Parameters:
+*     bad
+*        Whether to test for bad pixel values.
+*     loc
+*        Locator to 1-dimensional HDS object to be read.
+*     type
+*        HDS data type of the object to be read. This must be in upper
+*        case.
+*     el
+*        Number of array elements to be read.
+*     doscl
+*        If non-zero, then the copied data values are scaled so that
+*        "new value = old value * SCALE + ZERO" before returning them.
+*     scale
+*        The scale factor. Only used if "doscl" is non-zero.
+*     zero
+*        The zero point. Only used if "doscl" is non-zero.
+*     result
+*        The returned array of values.
+*     dce
+*        Returned holding a flag that indicates whether any data type
+*        conversion errors occurred (the affected elements of the results
+*        array are set to bad values if this happens).
+*     status
+*        The global status.
+
+*  Copyright:
+*      Copyright (C) 2017 East Asian Observatory
+*      All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     12-SEP-2017 (DSB):
+*        Original version, based on equivalent Fortran routine by RFWS.
+
+*-
+*/
+
+/* Local variables: */
+   CGEN_TYPE vmax;            /* Maximum scaled value */
+   CGEN_TYPE vmin;            /* Minimum scaled value */
+   double v1;                 /* First limit on scaled value */
+   double v2;                 /* Second limit on scaled value */
+   hdsdim dim;                /* Object dimension array */
+   size_t i;                  /* Element index */
+   void *pntr;                /* Pointer to mapped data */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Initialise. */
+   dim = el;
+
+/* If no data type conversion is required, then read the data values
+   directly. */
+   if( !strcasecmp( type, CGEN_HDS_TYPE ) ){
+      *dce = 0;
+      datGet( loc, CGEN_HDS_TYPE, 1, &dim, result, status );
+
+/* If type conversion is required, then map the data without type
+   conversion, perform the type conversion explicitly and unmap the data. */
+   } else {
+      datMap( loc, type, "READ", 1, &dim, &pntr, status );
+      CGEN_FUNCTION(ary1Cvt)( bad, el, type, pntr, result, dce, status );
+      ary1Hunmp( loc, status );
+   }
+
+/* If required, scale the returned value */
+   if( doscl ){
+
+/* If the scale is zero, fill the result with bad values. */
+      if( scale == 0.0 ){
+         for( i = 0; i < el; i++ ) result[ i ] = CGEN_BAD;
+
+/* Otherwise, find the largest and smallest value that will still be within
+   the range of the requested data type after scaling. */
+      } else {
+         v1 = (double)( CGEN_MAX ) - (double)( zero )/(double)( scale );
+         v2 = (double)( CGEN_MIN ) - (double)( zero )/(double)( scale );
+         if( v1 > v2 ){
+
+            if( v1 > (double)( CGEN_MAX ) ){
+               vmax = CGEN_MAX;
+            } else {
+               vmax = (CGEN_TYPE)( v1 );
+            }
+
+            if( v2 < (double)( CGEN_MIN ) ){
+               vmin = CGEN_MIN;
+            } else {
+               vmin = (CGEN_TYPE)( v2 );
+            }
+
+         } else {
+
+            if( v2 > (double)( CGEN_MAX ) ){
+               vmax = CGEN_MAX;
+            } else {
+               vmax = (CGEN_TYPE)( v2 );
+            }
+
+            if( v1 < (double)( CGEN_MIN ) ){
+               vmin = CGEN_MIN;
+            } else {
+               vmin = (CGEN_TYPE)( v1 );
+            }
+
+         }
+
+/* Scale the values, checking for bad values or not as required. */
+         if( bad ){
+            for( i = 0; i < el; i++ ){
+               if( result[ i ] != CGEN_BAD ){
+                  if( result[ i ] >= vmin && result[ i ] <= vmax ){
+                     result[ i ] = result[ i ]*scale + zero;
+                  } else {
+                     result[ i ] = CGEN_BAD;
+                  }
+               }
+            }
+         } else {
+            for( i = 0; i < el; i++ ){
+               if( result[ i ] >= vmin && result[ i ] <= vmax ){
+                  result[ i ] = result[ i ]*scale + zero;
+               } else {
+                  result[ i ] = CGEN_BAD;
+               }
+            }
+         }
+      }
+   }
+
+/* Call error tracing routine and exit. */
+   if( *status != SAI__OK ) ary1Trace( "ary1Gt1x", status );
+
+}
