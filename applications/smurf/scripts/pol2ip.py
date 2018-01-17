@@ -227,6 +227,9 @@
 *     13-DEC-2017 (DSB):
 *        Add columns for debiased P, error on P and error on ANG to
 *        output table.
+*     17-JAN-2018 (DSB):
+*        Determine the source position from the I map rather than the PI map, 
+*        but only if the I map was derived form the POL" observation.
 *-
 '''
 
@@ -828,18 +831,27 @@ try:
             invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(1)' newval='s'".format(imap) )
             invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=set name=Format'(2)' newval='s'".format(imap) )
 
-#  Form the polarised intensity map (no de-biassing), and remove the
-#  spectral axis.
-         tmp1 = NDG( 1 )
-         invoke( "$KAPPA_DIR/maths exp=\"'sqrt(ia**2+ib**2)'\" ia={0} ib={1} out={2}"
-                 .format(qmap,umap,tmp1) )
-         pimap = NDG( 1 )
-         invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(tmp1,pimap) )
+#  If a total intensity map made form the observation is available we use
+#  it to define the source position. If not, form and use the polarised
+#  intensity map instead. Prefer total intensity since it is brighter
+#  (e.g. at 450 the PI map may be almost empty).
+         if iref is None and diam > 0.0:
+            posmap = NDG( 1 )
+            invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes"
+                    .format(imap,posmap) )
 
-#  Find the position of the source centre in sky coords within the polarised
-#  intensity map.
+#  Form the polarised intensity map (no de-biasing), and remove the
+#  spectral axis.
+         else:
+            tmp1 = NDG( 1 )
+            invoke( "$KAPPA_DIR/maths exp=\"'sqrt(ia**2+ib**2)'\" ia={0} ib={1} out={2}"
+                    .format(qmap,umap,tmp1) )
+            posmap = NDG( 1 )
+            invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(tmp1,posmap) )
+
+#  Find the position of the source centre in sky coords within the above map.
          try:
-            invoke("$KAPPA_DIR/centroid ndf={0} mode=int init=\"'0,0'\"".format(pimap) )
+            invoke("$KAPPA_DIR/centroid ndf={0} mode=int init=\"'0,0'\"".format(posmap) )
             xcen = get_task_par( "xcen", "centroid" )
             ycen = get_task_par( "ycen", "centroid" )
          except starutil.StarUtilError:
@@ -919,7 +931,7 @@ try:
             try:
                bresid2 = NDG(1)
                invoke("$KAPPA_DIR/beamfit ndf={0}'(0~30,0~30)' pos=\"'{1},{2}'\" "
-                      "gauss=no mode=int resid={3}".format(pimap,xcen,ycen,bresid2) )
+                      "gauss=no mode=int resid={3}".format(posmap,xcen,ycen,bresid2) )
 
 #  Blank out residuals that are more than 3 sigma. The sidelobes should
 #  be blanked out by this process.
@@ -929,7 +941,7 @@ try:
                masked = NDG(1)
                invoke("$KAPPA_DIR/maths exp=\"'qif((abs(ib)<pa),ia,<bad>)'\" "
                       "ib={0} ia={1} out={2} pa={3}".
-                      format(bresid2,pimap,masked,lim) )
+                      format(bresid2,posmap,masked,lim) )
 
 #  Run beamfit again on the masked PI map to get a better fit on the
 #  central component.
@@ -945,7 +957,7 @@ try:
 
 #  Subtract the residuals from the data to get the beam model.
                tmodel = NDG(1)
-               invoke("$KAPPA_DIR/sub in1={0} in2={1} out={2}".format(pimap,bresid,tmodel) )
+               invoke("$KAPPA_DIR/sub in1={0} in2={1} out={2}".format(posmap,bresid,tmodel) )
 
 #  Modify the model so that is has a minimum value of zero.
                invoke("$KAPPA_DIR/stats ndf={0}".format(tmodel) )
