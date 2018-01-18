@@ -60,6 +60,7 @@
 *           ast.zero_notlast = 0
 *           flt.zero_notlast = 0
 *           com.zero_notlast = 0
+*           pca.zero_notlast = 0
 *           itermap=0
 *           shortmap=0
 *           bolomap=0
@@ -79,7 +80,9 @@
 *           ast.zero_notlast = 0
 *           flt.zero_notlast = 0
 *           com.zero_notlast = 0
+*           pca.zero_notlast = 0
 *           flt.notfirst = 0
+*           pca.notfirst = 0
 *           pln.notfirst = 0
 *           smo.notfirst = 0
 *           itermap=0
@@ -103,7 +106,9 @@
 *           ast.zero_notlast = 1
 *           flt.zero_notlast = 1
 *           com.zero_notlast = 1
+*           pca.zero_notlast = 1
 *           flt.notfirst = 0
+*           pca.notfirst = 0
 *           pln.notfirst = 0
 *           smo.notfirst = 0
 *           itermap=0
@@ -187,16 +192,16 @@
 *        configuration. [0]
 *     MASK2 = NDF (Read)
 *        An existing NDF that can be used to specify a second external mask
-*        for use with either the AST, FLT or COM model. See configuration
-*        parameters AST.ZERO_MASK, FLT.ZERO_MASK and COM.ZERO_MASK. Note,
-*        it is assumed that this image is aligned in pixel coordinate with
-*        the output map. [!]
+*        for use with either the AST, PCA, FLT or COM model. See configuration
+*        parameters AST.ZERO_MASK, PCA.ZERO_MASK, FLT.ZERO_MASK and
+*        COM.ZERO_MASK. Note, it is assumed that this image is aligned in
+*        pixel coordinate with the output map. [!]
 *     MASK3 = NDF (Read)
 *        An existing NDF that can be used to specify a third external mask
-*        for use with either the AST, FLT or COM model. See configuration
-*        parameters AST.ZERO_MASK, FLT.ZERO_MASK and COM.ZERO_MASK. Note,
-*        it is assumed that this image is aligned in pixel coordinate with
-*        the output map. [!]
+*        for use with either the AST, PCA, FLT or COM model. See configuration
+*        parameters AST.ZERO_MASK, PCA.ZERO_MASK, FLT.ZERO_MASK and
+*        COM.ZERO_MASK. Note, it is assumed that this image is aligned in
+*        pixel coordinate with the output map. [!]
 *     MSG_FILTER = LITERAL (Read)
 *        Controls the default level of information reported by Starlink
 *        atasks invoked within the executing script. The accepted values
@@ -223,9 +228,9 @@
 *        reference NDF. The reference can be either 2D or 3D and the spatial
 *        frame will be extracted. If a null (!) value is supplied then the
 *        output grid is determined by parameters REFLON, REFLAT, etc.
-*        In addition, this NDF can be used to mask the AST, FLT or COM
-*        model. See configuration parameters AST.ZERO_MASK, FLT.ZERO_MASK
-*        and COM.ZERO_MASK.
+*        In addition, this NDF can be used to mask the AST, PCA, FLT or COM
+*        model. See configuration parameters AST.ZERO_MASK, PCA.ZERO_MASK,
+*        FLT.ZERO_MASK and COM.ZERO_MASK.
 *
 *        On the second and subsequent invocations of MAKEMAP, any
 *        supplied REF image is replaced by the map created by the previous
@@ -344,6 +349,9 @@
 *        freeze (xxx.zero_freeze) or apply (xxx.zero_niter) masks, etc.
 *     15-JAN-2018 (DSB):
 *        Added parameter OBSDIR.
+*     18-JAN-2018 (DSB):
+*        Modify PCA-related config parameters in the same way that
+*        FLT-related parametrers are modified.
 *-
 '''
 
@@ -526,14 +534,14 @@ try:
 
    converged = False
 
-#  Determine the value of the (AST,COM,FLT).ZERO_NITER, ZERO_NOTLAST and
+#  Determine the value of the (AST,COM,PCA,FLT).ZERO_NITER, ZERO_NOTLAST and
 #  ZERO_FREEZE parameters in the supplied config. We need to ensure that
 #  appropriate changes are made to the values of these on each invocation
 #  of makemap.
    zero_niter = {}
    zero_notlast = {}
    zero_freeze = {}
-   for model in ["ast", "com", "flt"]:
+   for model in ["ast", "com", "flt", "pca"]:
       zero_niter[model] = myint( invoke( "$KAPPA_DIR/configecho name={0}.zero_niter config={1} "
                                        "defaults=$SMURF_DIR/smurf_makemap.def "
                                        "select=\"\'450=0,850=1\'\"".format(model,config)))
@@ -643,7 +651,7 @@ try:
 #  skipped iteration, so we need to include the skip iterations in these
 #  counts.
    if ast_skip > 0:
-      for model in ["ast", "com", "flt"]:
+      for model in ["ast", "com", "flt", "pca"]:
          if zero_niter[model] > 0:
             zero_niter[model] += ast_skip;
 
@@ -691,6 +699,7 @@ try:
    fd.write("ast.zero_notlast = 0\n") # Masking is normally not performed
    fd.write("flt.zero_notlast = 0\n") # on the last iteration. But the first
    fd.write("com.zero_notlast = 0\n") # iteration is also the last iteration
+   fd.write("pca.zero_notlast = 0\n") # iteration is also the last iteration
                               # in our case, so force any enabled
                               # masking to be performed on the last iteration.
    fd.write("diag.append = 0\n") # Ensure a new diagnostics file is started
@@ -822,6 +831,7 @@ try:
       add["importlut"] = 1     # Import the LUT model created by the first iteration.
       add["ext.import"] = 1    # Import the EXT model created by the first iteration.
       add["flt.notfirst"] = 0  # Ensure we use FLT on 2nd and subsequent invocations
+      add["pca.notfirst"] = 0  # Ensure we use PCA on 2nd and subsequent invocations
       add["pln.notfirst"] = 0  # Ensure we use PLN on 2nd and subsequent invocations
       add["smo.notfirst"] = 0  # Ensure we use SMO on 2nd and subsequent invocations
       add["diag.append"] = 1   # Ensure we append diagnostics to the file
@@ -867,17 +877,18 @@ try:
          prevmap = newmap
 
 #  When "zero_niter" invocations have been performed, switch off zero
-#  masking (so long as zero_niter > 0).  Do this for AST, COM and FLT
+#  masking (so long as zero_niter > 0).  Do this for AST, PCA, COM and FLT
 #  models.
-         for model in ["ast", "com", "flt"]:
+         for model in ["ast", "com", "flt", "pca"]:
             if zero_niter[model] > 0 and iter > zero_niter[model]:
                zero_niter[model] = 0
                add[ model+".zero_niter" ] = -1
                newcon = 1
 
 #  When "zero_freeze" invocations have been performed, switch freeze the
-#  mask (so long as zero_freeze > 0).  Do this for AST, COM and FLT models.
-         for model in ["ast", "com", "flt"]:
+#  mask (so long as zero_freeze > 0).  Do this for AST, PCA, COM and FLT
+#  models.
+         for model in ["ast", "com", "flt", "pca"]:
             if zero_freeze[model] > 0 and iter > zero_freeze[model] + 1:
                zero_freeze[model] = 0
                add[ model+".zero_freeze" ] = -1
@@ -912,7 +923,7 @@ try:
 #  Also, if this is the last iteration, create a modified configuration file
 #  that supresses masking (unless the xxx.zero_notlast value in the
 #  supplied config indicates otherwise).
-            for model in ["ast", "com", "flt"]:
+            for model in ["ast", "com", "flt", "pca"]:
                if zero_notlast[model] != 0:
                   add["ast.zero_notlast"] = 1
                   newcon = 1
