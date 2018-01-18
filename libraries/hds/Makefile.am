@@ -49,6 +49,7 @@ hds_test_LDADD = libhdsf.la
 
 hdsTest_SOURCES = hdsTest.c
 hdsTest_LDADD = libhds.la
+hdsTest_CFLAGS = $(AM_CFLAGS) -DHDS_INTERNAL_INCLUDES
 
 cincludedir = $(includedir)/star
 cinclude_HEADERS = $(PUBLIC_CINCLUDES)
