@@ -228,8 +228,12 @@
 *        Add columns for debiased P, error on P and error on ANG to
 *        output table.
 *     17-JAN-2018 (DSB):
-*        Determine the source position from the I map rather than the PI map, 
+*        - Determine the source position from the I map rather than the PI map, 
 *        but only if the I map was derived form the POL" observation.
+*        - Ensure majority of P values predicted by the fit are positive 
+*        (if the original fit gives negative P values, negate them and rotate by 90 degrees)..
+*        - Only use previously made maps that have the expected number of WCS 
+*        frames (others may have been the result of a failed run of makemap).
 *-
 '''
 
@@ -294,6 +298,9 @@ fwhm2list = []
 orientlist = []
 gammalist = []
 arealist = []
+
+#  Are most fitted PI values negative?
+pineg = False
 
 # The mean total intensity within the aperture.
 ival = 0
@@ -445,23 +452,28 @@ def model2( el, x ):
    pi = a + b*elval + c*elval*elval
    qfp = ival*pi*cos( -2*( elval - d ) )
    ufp = ival*pi*sin( -2*( elval - d ) )
-   return (qfp, ufp)
+   return (qfp, ufp, pi)
 
 #  Objective function used by minimisation routine. It returns the
 #  weighted mean of the squared Q/U residuals between the model and
 #  the data for a given set of model parameters.
 def objfun(x):
-   global qlist, dqlist, ulist, dulist, elist
+   global qlist, dqlist, ulist, dulist, elist, pineg
+   npineg = 0
    res = 0.0
    swgt = 0.0
    for i in range(len(elist)):
-      (qfp,ufp) = model( i, x )
+      (qfp,ufp,pi) = model( i, x )
+      if pi < 0.0:
+         npineg += 1
       qwgt = 1/(dqlist[i]*dqlist[i]*wvmlist[i])
       dq = qfp - qlist[i]
       uwgt = 1/(dulist[i]*dulist[i]*wvmlist[i])
       du = ufp - ulist[i]
       res += qwgt*dq*dq + uwgt*du*du
       swgt += qwgt+uwgt
+   pineg = ( npineg > len(elist)/2 )
+
    return res/swgt
 
 #  Find weighted RMS residual of Q or U from fit.
@@ -470,7 +482,7 @@ def resid( useq, x ):
    swgt = 0.0
    res = 0.0
    for i in range(len(elist)):
-      (qfp,ufp) = model( i, x )
+      (qfp,ufp,pi) = model( i, x )
       if useq:
          wgt = 1/(dqlist[i]*dqlist[i]*wvmlist[i])
          dqu = qfp - qlist[i]
@@ -491,7 +503,7 @@ def reject( useq, lim, x ):
    newelist = []
 
    for i in range(len(elist)):
-      (qfp,ufp) = model( i, x )
+      (qfp,ufp,pi) = model( i, x )
       if useq:
          dqu = qfp - qlist[i]
       else:
@@ -770,12 +782,16 @@ try:
             msg_out("Re-using pre-calculated Q map for {0}.".format(obs))
 
          invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(qmap) )
-         actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
-         if actpixsize0 is None:
-            actpixsize0 = actpixsize
-         elif actpixsize != actpixsize0:
-            raise UsageError( "{0} had pixel size {1} - was expecting {2}".
-                              format(qmap,actpixsize,actpixsize0))
+         if int( get_task_par( "nframe", "ndftrace" ) ) < 5:
+            msg_out("WARNING: The Q map cannot be used")
+            continue
+         else:
+            actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
+            if actpixsize0 is None:
+               actpixsize0 = actpixsize
+            elif actpixsize != actpixsize0:
+               raise UsageError( "{0} had pixel size {1} - was expecting {2}".
+                                 format(qmap,actpixsize,actpixsize0))
 
 
          if not os.path.exists( umapfile ) or newpixsize:
@@ -788,10 +804,14 @@ try:
             msg_out("Re-using pre-calculated U map for {0}.".format(obs))
 
          invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(umap) )
-         actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
-         if actpixsize != actpixsize0:
-            raise UsageError( "{0} had pixel size {1} - was expecting {2}".
-                              format(qmap,actpixsize,actpixsize0))
+         if int( get_task_par( "nframe", "ndftrace" ) ) < 5:
+            msg_out("WARNING: The U map cannot be used")
+            continue
+         else:
+            actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
+            if actpixsize != actpixsize0:
+               raise UsageError( "{0} had pixel size {1} - was expecting {2}".
+                                 format(qmap,actpixsize,actpixsize0))
 
 
          if iref is None:
@@ -805,10 +825,14 @@ try:
                msg_out("Re-using pre-calculated I map for {0}.".format(obs))
 
             invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(imap) )
-            actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
-            if actpixsize != actpixsize0:
-               raise UsageError( "{0} had pixel size {1} - was expecting {2}".
-                                 format(imap,actpixsize,actpixsize0))
+            if int( get_task_par( "nframe", "ndftrace" ) ) < 5:
+               msg_out("WARNING: The I map cannot be used")
+               continue
+            else:
+               actpixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
+               if actpixsize != actpixsize0:
+                  raise UsageError( "{0} had pixel size {1} - was expecting {2}".
+                                    format(imap,actpixsize,actpixsize0))
 
 
 #  Ensure the maps use offset coordinates so that we can assume the
@@ -1202,7 +1226,7 @@ try:
               ival = float(m.group(1))
               isigma = 0.0
 
-           m = re.compile("# Total intensity value = (\S+) +/- (\S+) pW").match(line)
+           m = re.compile("# Total intensity value = (\S+) \+/- (\S+) pW").match(line)
            if m:
               ival = float(m.group(1))
               isigma = float(m.group(2))
@@ -1297,8 +1321,16 @@ try:
 #  Remove U points more than 2 sigma from the fit.
          reject( False, 2*urms, res.x )
 
-#  Display results.
+#  If most of the polarisations are negative, negate the polarisation and
+#  rotate by 90 degrees.
       (a,b,c,d) = res.x
+      if pineg:
+         a = -a
+         b = -b
+         c = -c
+         d += 1.5707963
+
+#  Display results.
       msg_out("\n\nA={0} B={1} C={2} D={3} ({4} degrees)".format(a,b,c,d,degrees(d)))
       msg_out("Q RMS = {0} pW  U RMS = {1} pW\n".format(qrms,urms))
       msg_out("Qn RMS = {0}   Un RMS = {1} \n".format(qrms/ival,urms/ival))
@@ -1371,7 +1403,7 @@ try:
                rej = 0
             else:
                rej = 1
-            (qfp,ufp) = model2( elist0[i], res.x )
+            (qfp,ufp,pi) = model2( elist0[i], res.x )
             pifit = sqrt( qfp*qfp + ufp*ufp )
             pfit = pifit/ival
          else:
