@@ -105,7 +105,7 @@ hds1_types.h: make-hds-types$(EXEEXT)
 BUILT_SOURCES = hds_types.h hds1_types.h \
 	$(include_MESSAGES) $(noinst_MESSAGES) DAT_PAR
 
-CLEANFILES = DAT_PAR dat_par.h hds_machine.txt CMP_ERR DAT_ERR dat_err.h \
+CLEANFILES = DAT_PAR hds_machine.txt CMP_ERR DAT_ERR dat_err.h \
 	hds_types.h hds1_types.h
 
 dist_starnews_DATA = hds.news
