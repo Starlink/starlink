@@ -305,10 +305,16 @@ def func_hdsGtune(func,line):
     used = "(wrapper)";
   } else {
     hdsGtune_v5(param_str, value, status);
-    LOCK_MUTEX;
-    hdsGtune_v4(param_str, value, status);
-    UNLOCK_MUTEX;
-    used = "(both)";
+    if (*status == DAT__NOTIM) {
+      emsAnnul(status);
+      LOCK_MUTEX;
+      hdsGtune_v4(param_str, value, status);
+      UNLOCK_MUTEX;
+      used = "(v4)";
+    }
+    else {
+      used = "(v5)";
+    }
   }
   if (*status != SAI__OK) {
     emsRepf("hdsGtune_wrap", "hdsGtune: Error obtaining value of tuning parameter '%s'",
