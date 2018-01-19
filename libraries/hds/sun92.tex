@@ -1355,18 +1355,35 @@ may be used to determine the current setting of a tuning parameter
 HDS currently uses the following tuning parameters to control its
 behaviour.
 
+\subsubsection*{Parameters which control the top level HDS library}
+
 \begin{description}
 
 \item [\xlabel{HDS_VERSION_tuning_parameter}VERSION - Data Format for New Files:]\mbox{}\\
 This determines the data format that is used when a new container file is
-created. It may take the value 4 or 5, and currently defaults to 4
+created. It may take the value 3, 4 or 5, and currently defaults to 4
 (although this will change to 5 in a future release). Version 4 is a
 Starlink-specific data format that is a development of the original HDS
 data format created by the Starlink project in the 1980's. Version 5 uses
 the HDF5 data format on disk to mimic the facilities of version 4. Such
 files cannot be accessed by versions of the HDS library prior to version
 6, but can be examined using various publicly available HDF5 tools - see
-section \htmlref{``DISK FORMATS AND HDF5''}{sect:hdf5}.
+section \htmlref{``DISK FORMATS AND HDF5''}{sect:hdf5}.  Version 3 refers
+to the Starlink-specific data format as it was prior to the introduction of
+64-bit mode.
+
+\begin{description}
+\item[VERSION$=$5:]\mbox{}\\
+Use the HDS data format 5 library, which is based on HDF5.
+
+\item[VERSION$=$4:]\mbox{}\\
+Use the HDS data format 4 library with its
+``\texttt{64BIT}'' tuning parameter set to 1.
+
+\item[VERSION$=$3:]\mbox{}\\
+Use the same HDS library as data format 4, but with its
+``\texttt{64BIT}'' tuning parameter set to 0.
+\end{description}
 
 \item [\xlabel{HDS_V4LOCKERROR_tuning_parameter}V4LOCKERROR - controls error reporting:]\mbox{}\\
 If non-zero, an error is reported if a thread lock function (datLock,
@@ -1375,24 +1392,11 @@ disk format version 4. Otherwise, the function returns without action.
 The default is to return without action. This facility is intended for
 debugging purposes.
 
-\item [\xlabel{HDS_INALQ_tuning_parameter}INALQ - Initial File Allocation Quantity:]\mbox{}\\
-This value determines how many blocks\footnote{An HDS block is 512
-bytes.} are to be allocated when a new container file is created. The
-default value of 2 is the minimum value allowed; the first block
-contains header information and the second contains the top-level
-object. Note that the host operating system may impose further
-restrictions on allowable file sizes, so the actual size of a file may
-not match the value specified exactly.
+\end{description}
 
-The value of this parameter reverts to its default value (or the value
-specified by the HDS\_INALQ environment variable) after each file is
-created, so if it is being set from within a program, it must be set
-every time that it is required.
+\subsubsection*{Parameters used with both HDS version 4 and version 5 files}
 
-If a file is to be extended frequently (through the creation of new
-objects within it), then this parameter may provide a worthwhile
-efficiency gain by allowing a file of a suitable size to be created
-initially. On most UNIX systems, however, the benefits are minimal.
+\begin{description}
 
 \item [\xlabel{HDS_MAP_tuning_parameter}MAP - Use file mapping if available?]\mbox{}\\
 This value controls the method by which HDS performs I/O operations on
@@ -1520,6 +1524,65 @@ same object while modifications are being made.
 
 \end{itemize}
 
+\item [\xlabel{HDS_SHELL_tuning_parameter}SHELL - Preferred shell:]\mbox{}\\
+This parameter determines which UNIX shell should be used to interpret
+container file names which contain \qt{special} characters
+representing pattern-matching, environment variable substitution,
+\st{etc.} Each shell typically has its own particular way of
+interpreting these characters, so users of HDS may wish to select the
+same shell as they normally use for entering commands. The following
+values are allowed:
+
+\begin{description}
+
+\item[SHELL$=$2:]\mbox{}\\
+Use the \qt{tcsh} shell (if available). If this is not available, then
+use the same shell as when SHELL$=$1.
+
+\item[SHELL$=$1:]\mbox{}\\
+Use the \qt{csh} shell (C~shell on traditional UNIX systems). If this
+is not available, then use the same shell as when SHELL$=$0.
+
+\item[SHELL$=$0 (the default):]\mbox{}\\
+Use the \qt{sh} shell. This normally means the Bourne Shell on
+traditional UNIX systems, but on systems which support it, the similar
+POSIX \qt{sh} shell may be used instead.
+
+\item[SHELL$=-$1:]\mbox{}\\
+Don't use any shell for interpreting single file names (all special
+characters are to be interpreted literally). When performing
+\qt{wild-card} searches for multiple files (with
+\htmlref{HDS\_WILD}{HDS_WILD}), use the same shell as when SHELL$=$0.
+
+\end{description}
+
+HDS converts all other values to zero.
+
+\end{description}
+
+\subsubsection*{Parameters used only with HDS version 4 files}
+
+\begin{description}
+
+\item [\xlabel{HDS_INALQ_tuning_parameter}INALQ - Initial File Allocation Quantity:]\mbox{}\\
+This value determines how many blocks\footnote{An HDS block is 512
+bytes.} are to be allocated when a new container file is created. The
+default value of 2 is the minimum value allowed; the first block
+contains header information and the second contains the top-level
+object. Note that the host operating system may impose further
+restrictions on allowable file sizes, so the actual size of a file may
+not match the value specified exactly.
+
+The value of this parameter reverts to its default value (or the value
+specified by the HDS\_INALQ environment variable) after each file is
+created, so if it is being set from within a program, it must be set
+every time that it is required.
+
+If a file is to be extended frequently (through the creation of new
+objects within it), then this parameter may provide a worthwhile
+efficiency gain by allowing a file of a suitable size to be created
+initially. On most UNIX systems, however, the benefits are minimal.
+
 \item [\xlabel{HDS_MAXWPL_tuning_parameter}MAXWPL - Maximum Size of the \qt{Working Page List}:]\mbox{}\\
 This value specifies how many blocks\htmltext{\footnote{An HDS block
 is 512 bytes.}}  are to be allocated to the memory cache which HDS
@@ -1566,40 +1629,6 @@ the value specified by the HDS\_NCOMP environment variable)
 afterwards, so if it is being set from within a program, it must be
 set every time it is needed.
 
-\item [\xlabel{HDS_SHELL_tuning_parameter}SHELL - Preferred shell:]\mbox{}\\
-This parameter determines which UNIX shell should be used to interpret
-container file names which contain \qt{special} characters
-representing pattern-matching, environment variable substitution,
-\st{etc.} Each shell typically has its own particular way of
-interpreting these characters, so users of HDS may wish to select the
-same shell as they normally use for entering commands. The following
-values are allowed:
-
-\begin{description}
-
-\item[SHELL$=$2:]\mbox{}\\
-Use the \qt{tcsh} shell (if available). If this is not available, then
-use the same shell as when SHELL$=$1.
-
-\item[SHELL$=$1:]\mbox{}\\
-Use the \qt{csh} shell (C~shell on traditional UNIX systems). If this
-is not available, then use the same shell as when SHELL$=$0.
-
-\item[SHELL$=$0 (the default):]\mbox{}\\
-Use the \qt{sh} shell. This normally means the Bourne Shell on
-traditional UNIX systems, but on systems which support it, the similar
-POSIX \qt{sh} shell may be used instead.
-
-\item[SHELL$=-$1:]\mbox{}\\
-Don't use any shell for interpreting single file names (all special
-characters are to be interpreted literally). When performing
-\qt{wild-card} searches for multiple files (with
-\htmlref{HDS\_WILD}{HDS_WILD}), use the same shell as when SHELL$=$0.
-
-\end{description}
-
-HDS converts all other values to zero.
-
 \item [\xlabel{HDS_SYSLCK_tuning_parameter}SYSLCK - System wide lock flag:]\mbox{}\\
 This parameter is present for historical reasons and has no effect on
 UNIX systems.
@@ -1607,6 +1636,14 @@ UNIX systems.
 \item [\xlabel{HDS_WAIT_tuning_parameter}WAIT - Wait for locked files?]\mbox{}\\
 This parameter is present for historical reasons and currently has no
 effect on UNIX systems, where HDS file locking is not implemented.
+
+\item [\xlabel{HDS_64BIT_tuning_parameter}64BIT - Use 64-bit (HDS version 4) files?]\mbox{}\\
+This value can be used to select whether new files are created
+in the 64-bit (HDS version 4) format.  If 64BIT=0 then
+files are created in the previous (HDS version 3) format.
+
+This parameter is normally overriden by the VERSION parameter
+of the top level library.
 
 \end{description}
 
