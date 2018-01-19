@@ -197,8 +197,6 @@ def func_copy(func,line):
     vXtoY = line.replace("(", "XtoY(")
     vXtoY = vXtoY.replace("datC","dat1C")
     loc1 = "locator1"
-    if line.startswith("datMove"):
-        loc1 = "*locator1"
     print("""  /* Requires special code */
   int instat = *status;
   int isv5 = 0;
@@ -266,6 +264,7 @@ def func_datMove(func,line):
   }} else {{
     HDSLoc * parenloc = NULL;
     char namestr[DAT__SZNAM+1];
+    isv5 = (loc1isv5 ? -1 : -2);
     /* Just do a copy */
     datCopy(*locator1, locator2, name_str, status);
     /* and then erase - HDS API insists that we can not erase
@@ -276,7 +275,19 @@ def func_datMove(func,line):
     datErase(parenloc, namestr, status);
     datAnnul(&parenloc, status);
   }}
-  HDS_CHECK_STATUS(\"{2}\",(isv5 ? "(v5)" : "(v4)"));
+  {{
+    const char *helptxt = "(unexpected)";
+    if (isv5 == 1) {{
+      helptxt = "(v5)";
+    }} else if (isv5 == 0) {{
+      helptxt = "(v4)";
+    }} else if (isv5 == -1) {{
+      helptxt = "(v5->v4)";
+    }} else if (isv5 == -2) {{
+      helptxt = "(v4->v5)";
+    }}
+    HDS_CHECK_STATUS(\"{2}\", helptxt);
+  }}
   return *status;""".format(v5,v4,func))
 
 def func_hdsOpen(func,line):

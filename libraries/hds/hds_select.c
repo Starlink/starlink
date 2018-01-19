@@ -1476,6 +1476,7 @@ datMove(HDSLoc **locator1, const HDSLoc *locator2, const char *name_str, int *st
   } else {
     HDSLoc * parenloc = NULL;
     char namestr[DAT__SZNAM+1];
+    isv5 = (loc1isv5 ? -1 : -2);
     /* Just do a copy */
     datCopy(*locator1, locator2, name_str, status);
     /* and then erase - HDS API insists that we can not erase
@@ -1486,7 +1487,19 @@ datMove(HDSLoc **locator1, const HDSLoc *locator2, const char *name_str, int *st
     datErase(parenloc, namestr, status);
     datAnnul(&parenloc, status);
   }
-  HDS_CHECK_STATUS("datMove",(isv5 ? "(v5)" : "(v4)"));
+  {
+    const char *helptxt = "(unexpected)";
+    if (isv5 == 1) {
+      helptxt = "(v5)";
+    } else if (isv5 == 0) {
+      helptxt = "(v4)";
+    } else if (isv5 == -1) {
+      helptxt = "(v5->v4)";
+    } else if (isv5 == -2) {
+      helptxt = "(v4->v5)";
+    }
+    HDS_CHECK_STATUS("datMove", helptxt);
+  }
   return *status;
 }
 
