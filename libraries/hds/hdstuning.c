@@ -8,6 +8,7 @@
 #include "dat_err.h"
 #include "hds_types.h"
 #include "ems.h"
+#include "star/hds_v4.h"
 
 /* Variable storing tuned state */
 
@@ -30,6 +31,29 @@ static pthread_mutex_t hdstuning_mutex = PTHREAD_MUTEX_INITIALIZER;
 #define LOCK_MUTEX pthread_mutex_lock( &hdstuning_mutex );
 #define UNLOCK_MUTEX pthread_mutex_unlock( &hdstuning_mutex );
 
+/* Configure HDS based on the given version number.  This includes
+   setting the HDS-v4 tuning parameter 64BIT as appropriate for
+   version 4 or 3. */
+
+static void hds1SetHDSVersion(int version, int* status) {
+  switch (version) {
+    case 5:
+      USE_VERSION5 = 1;
+      break;
+    case 4:
+      USE_VERSION5 = 0;
+      hdsTune_v4("64BIT", 1, status);
+      break;
+    case 3:
+      USE_VERSION5 = 0;
+      hdsTune_v4("64BIT", 0, status);
+      break;
+    default:
+      *status = DAT__NAMIN;
+      emsRepf("hdsTune_1", "hdsTune: Unknown HDS version '%d'",
+              status, version);
+  }
+}
 
 /* Parse tuning environment variables. Should only be called once the
    first time a tuning parameter is required */
@@ -37,9 +61,12 @@ static pthread_mutex_t hdstuning_mutex = PTHREAD_MUTEX_INITIALIZER;
 static void hds1ReadTuneEnvironment () {
   LOCK_MUTEX;
   if(!HAVE_INITIALIZED_TUNING) {
+    int status = SAI__OK;
     int version = 0;
     dat1Getenv( "HDS_VERSION", USE_VERSION5 ? 5 : 4, &version );
-    USE_VERSION5 = version == 5;
+    emsBegin(&status);
+    hds1SetHDSVersion(version, &status);
+    emsEnd(&status);
     dat1Getenv( "HDS_V4LOCKERROR", V4LOCK_ERROR, &V4LOCK_ERROR );
     HAVE_INITIALIZED_TUNING = 1;
   }
@@ -67,7 +94,8 @@ static void hds1ReadTuneEnvironment () {
 *     param_str = const char * (Given)
 *        Name of the tuning parameter. Allowed values are:
 *        - VERSION: 5 and v5 will be called for new files,
-*                   4, v4 will be used to create new files.
+*                   4, v4 will be used to create new files,
+*                   3, v4 library is used for new files, with 64bit=0.
 *        - V4LOCKERROR: Report an error if a thread lock function is used on
 *                       a V4 locator (otherwise, do nothing).
 *     value = int (Given)
@@ -121,20 +149,9 @@ int hds1TuneWrapper( const char * param_str, int value, int *status ) {
   hds1ReadTuneEnvironment();
 
   if (strncmp( param_str, "VERSION", 7) == 0 ) {
-    int new_value = 0;
-    switch (value) {
-      case 5:
-        new_value = 1;
-      case 4:
-        LOCK_MUTEX;
-        USE_VERSION5 = new_value;
-        UNLOCK_MUTEX;
-        break;
-      default:
-        *status = DAT__NAMIN;
-        emsRepf("hdsTune_1", "hdsTune: Unknown HDS version '%d'",
-                status, value );
-    }
+    LOCK_MUTEX;
+    hds1SetHDSVersion(value, status);
+    UNLOCK_MUTEX;
   } else if (strncmp( param_str, "V4LOCKERROR", 11) == 0 ) {
     LOCK_MUTEX;
     V4LOCK_ERROR = ( value == 0 ? 0 : 1 );
@@ -225,7 +242,14 @@ hds1GtuneWrapper(const char *param_str, int *value, int *status) {
 
   if (strncasecmp( param_str, "VERSION", 7 ) == 0) {
     LOCK_MUTEX;
-    *value = ( USE_VERSION5 ? 5 : 4 );
+    if (USE_VERSION5) {
+      *value = 5;
+    }
+    else {
+      int is64bit = 1;
+      hdsGtune_v4("64BIT", &is64bit, status);
+      *value = ( is64bit ? 4 : 3 );
+    }
     UNLOCK_MUTEX;
   } else if (strncasecmp( param_str, "V4LOCKERROR", 11 ) == 0) {
     LOCK_MUTEX;
