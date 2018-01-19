@@ -3611,11 +3611,17 @@ hdsTune(const char *param_str, int value, int *status) {
     hds1TuneWrapper( param_str, value, status );
     used = "(wrapper)";
   } else {
-    hdsTune_v5(param_str, value, status);
     LOCK_MUTEX;
     hdsTune_v4(param_str, value, status);
     UNLOCK_MUTEX;
-    used = "(both)";
+    if (*status == DAT__NAMIN) {
+      emsAnnul(status);
+      used = "(v5)";
+    }
+    else {
+      used = "(both)";
+    }
+    hdsTune_v5(param_str, value, status);
   }
   if (*status != SAI__OK) {
     emsRepf("hdsTune_wrap", "hdsTune: Error setting value of tuning parameter '%s'",
