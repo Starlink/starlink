@@ -24,8 +24,9 @@
 *     keymap = AstKeyMap * (Given)
 *        A KeyMap holding all configuration parameters.
 *     qui = int * (Given)
-*        Pointer to a returned value indicating if the data is POL-2 data or not.
-*        Returned VAL__BADI for non-pol2, +1 for "Q", 0 for "I" and -1 for "U".
+*        Pointer to a returned value indicating if the data is POL-2 data
+*        or not. Returned VAL__BADI for non-pol2, +1 for "Q", 0 for "I"
+*        and -1 for "U".
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -34,24 +35,19 @@
 *     by subtracting off estimates of the Q or U caused by instrumental
 *     polarisation, based on the total intensity values specified by the
 *     map associated with environment parameter IPREF. The values in this
-*     map are multiplied by factors determined from the current elevation
-*     in a manner specified by config parameter "ipmodel", which can be
-*     either "JK" for the Johnstone-Kennedy model based on analysis of
-*     skydip data, or "PL1" for the first model based on analysis of
-*     planet data, or "PL2" for the second model based on analysis of
-*     planet data. If "ipmodel" is "JK", then config parameter "jkdata"
-*     should be the path to the NDF holding the parameter values of the
-*     JK model. If "ipmodel" is "PL1", then config parameter "pl1data"
-*     should be coefficients of a quadratic polynomial that gives the
-*     fractional polarisation caused by the instrument as a function of
-*     elevation (the polarisation angle is assumed parallel to the elevation
-*     axis). If "ipmodel" is "PL2", then config parameter "pl2data"
-*     should be coefficients of a quadratic polynomial that gives the
-*     fractional polarisation caused by the instrument as a function of
-*     elevation, and the offset between IP and the elevation axis, in radians.
-*     The instrumental Q and U values determined in this way are then rotated
-*     to use the same reference direction as the Q/U bolometer values. The
-*     rotated corrections are then subtracted off the extinction-corrected
+*     map are multiplied by factors (Qf,Uf) determined from the current
+*     elevation:
+*
+*     p = A + B*el + C*el*el
+*     Qf = p*cos( -2*( el - D ) )
+*     Uf = p*sin( -2*( el - D ) )
+*
+*     (p is th expected fractional polarisation, el is the elvation in
+*     radians, (A,B,C,D) are the numerical parameters of the model).
+*
+*     This gives the expected instrumental Q and U values, which are then
+*     rotated to use the same reference direction as the Q/U bolometer values.
+*     The rotated corrections are then subtracted off the extinction-corrected
 *     bolometer data (the extinction correction is removed before returning).
 
 *  Authors:
@@ -98,6 +94,12 @@
 *        450 um non-POL2 data.
 *     24-MAY-2017 (DSB):
 *        Add IPOFFSET configuration parameter.
+*     19-JAN-2018 (DSB):
+*        - Remove support for the Johnson-Kennedy model
+*        - Remove user-configurable IP model: the choice of IP model is
+*        now made by the logic in this function.
+*        - Add support for 450 um.
+*        - Add support for observations without the wind blind.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -137,11 +139,6 @@
 #include "libsmf/smf_typ.h"
 #include "libsmf/smf_err.h"
 
-#define JK 0
-#define PL1 1
-#define PL2 2
-#define PL3 3
-
 /* Prototypes for local static functions. */
 static void smf1_subip( void *job_data_ptr, int *status );
 static double *smf1_calcang( ThrWorkForce *wf, smfData *data, const char *trsys,
@@ -158,23 +155,18 @@ typedef struct smfSubIPData {
    const double *gy;
    dim_t b1;
    dim_t b2;
-   dim_t t1;
-   dim_t t2;
    dim_t nbolo;
    dim_t ntslice;
-   double *angcdata;
-   double *c0data;
+   dim_t t1;
+   dim_t t2;
    double *imapdata;
    double *ipang;
-   double *p0data;
-   double *p1data;
-   double *pldata;
+   double *ippars;
    double *res_data;
    double *result;
    double degfac;
    double ipoffset;
    int *lut_data;
-   int model;
    int oper;
    size_t bstride;
    size_t tstride;
@@ -190,49 +182,42 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
 
 /* Local Variables: */
    AstFitsChan *fc;
-   HDSLoc *loc = NULL;
-   HDSLoc *sloc = NULL;
    SmfSubIPData *job_data = NULL;
    SmfSubIPData *pdata;
    char *polnorth;
-   char ipref[200];
-   char subname[10];
    char *trsys;
+   char ipref[200];
    const char *cpntr;
-   const char *ipmodel;
-   const char *jkdata;
    const char *qu;
    dim_t bolostep;
    dim_t nbolo;
    dim_t ntslice;
-   double *angcdata;
-   double *c0data;
    double *imapdata;
    double *ipang;
-   double *p0data;
-   double *p1data;
+   double *ippars;
    double degfac;
    double ipoffset;
-   double pldata[4];
-   int angcndf;
-   int c0ndf;
    int imapndf;
    int iw;
-   int model;
-   int nmap;
-   int nval;
    int nw;
-   int p0ndf;
-   int p1ndf;
    int polref;
+   int windblind;
    size_t bstride;
    size_t idx;
    size_t tstride;
+   smfArray *lut;
+   smfArray *res;
    smfData *data = NULL;
    smf_qual_t *qua_data;
-   smfArray *res;
-   smfArray *lut;
    smf_subinst_t waveband;
+
+/* IP model parameters. See report "IP model without the wind blind"
+   (written January 2018) in section "Data Reduction and Analysis" of
+   the POL2 commissioning wiki. */
+   double model1[] = { 5.520E-3, -3.649E-4,  1.316E-3, -8.544E-2 }; /* No wind blind */
+   double model2[] = { 6.188E-3,  3.650E-2, -1.978E-2, -3.240E-2 }; /* 850 um with wind blind */
+   double model3[] = { 1.190E-2,  1.835E-2, -1.374E-2,  1.486 };    /* 450 um with wind blind */
+
 
    *qui = VAL__BADI;
 
@@ -312,18 +297,13 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
 /* If we are applying IP correction... */
    if( qu && ( *qui == 1 || *qui == -1 ) && *status == SAI__OK ) {
 
-/* Get the waveband (850 or 450) and report an error if 450 data is
-   supplied, and note the POL2 degradation factor. */
+/* Get the waveband (850 or 450), and note the nominal POL2 degradation
+   factor. */
       waveband = smf_calc_subinst( res->sdata[0]->hdr, status );
       if( waveband == SMF__SUBINST_850 ) {
          degfac = 1.35;
       } else {
          degfac = 1.96;
-         *status = SAI__ERROR;
-         errRep("","Cannot currently correct 450 um POL2 data for "
-                "instrumental polarisation as the 450 um IP model "
-                "has not yet been determined.", status );
-         return;
       }
 
 /* Get the value of the POLNORTH FITS keyword from the supplied header. */
@@ -341,7 +321,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    uncertainty. The offset value is obtained as a percentage. */
       astMapGet0D( keymap, "IPOFFSET", &ipoffset );
 
-/* Convert from perenctage to fraction. */
+/* Convert from percentage to fraction. */
       ipoffset /= 100.0;
 
 /* Determine the AST system corresponding to polarimetric reference direction
@@ -374,37 +354,33 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
          astGetFitsS( fc, "INBEAM", &cval );
          if( cval && strstr( cval, "pol" ) ) polref = 1;
       }
+
+/* See if the JCMT wind blind was in place. The wind blind was removed from
+   December 2017 to January 2018. */
+      windblind = 1;
+      if( astTestFits( fc, "WND_BLND", NULL ) ) {
+         char *cval = NULL;
+         astGetFitsS( fc, "WND_BLND", &cval );
+         if( astChrMatch( cval, "NONE" ) ) windblind = 0;
+      }
+
       fc = astAnnul( fc );
 
 /* Annul the NDF identifier. */
       ndfAnnul( &imapndf, status );
 
-/* See what form of IP model to use, and tell the user. If the user does
-   not specify an IP model, use "PL2" if the IP reference as created from
-   non-POL2 data and "PL3" otherwise. */
-      if( !astMapGet0C( keymap, "IPMODEL", &ipmodel ) ) {
-         ipmodel = polref ? "PL3" : "PL2";
-      }
+/* Tell the user what's happening. */
       msgOutf( "", "smf_subip: applying instrumental polarisation %s "
-               "correction based on total intensity map `%s' and IP model '%s'.",
-               status, qu, ipref, ipmodel );
+               "correction based on total intensity map `%s'.",
+               status, qu, ipref );
 
 /* Create structures used to pass information to the worker threads. */
       nw = wf ? wf->nworker : 1;
       job_data = astMalloc( nw*sizeof( *job_data ) );
 
-/* If the Johnstone-Kennedy model has been selected, get the path to the
-   container file holding the IP model parameters. */
-      if( astChrMatch( ipmodel, "JK" ) ) {
-         jkdata = "$STARLINK_DIR/share/smurf/ipdata.sdf";
-         astMapGet0C( keymap, "JKDATA", &jkdata );
-
-/* Open the container file. */
-         hdsOpen( jkdata, "READ", &loc, status );
-      }
-
-/* The IP correction applies to extinction-corrected bolometer values, So
-   apply any existinction correction first before doing the IP correction. */
+/* The IP correction was determined using extinction-corrected bolometer
+   values, So apply any existinction correction first before doing the IP
+   correction. */
       if( dat->ext ) smf_calcmodel_ext( wf, dat, 0, keymap, dat->ext, 0,
                                         status);
 
@@ -424,86 +400,27 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
          smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, &bstride,
                        &tstride, status );
 
-/* If we are using the "JK" model.... */
-         if( loc ) {
-            model = JK;
+/* Choose the parameter values to use for the IP model.... See report
+   "IP model without the wind blind" (written January 2018)  in section
+   "Data Reduction and Analysis" of the POL2 commissioning wiki...
 
-/* Get a locator for the structure holding the IP parameters for the
-   current subarray */
-            smf_find_subarray( data->hdr, subname, sizeof( subname ), NULL,
-                               status );
-            datFind( loc, subname, &sloc, status );
+   If the data was taken without the wind blind in place, the model is the
+   same at 450 and 850. */
+         if( !windblind ) {
+            ippars = model1;
 
-/* Begin an NDF context. */
-            ndfBegin();
-
-/* Get identifiers for the NDFs holding the individual parameters. Each
-   NDF holds a parameter value for each bolometer. */
-            ndfFind( sloc, "P0", &p0ndf, status );
-            ndfFind( sloc, "P1", &p1ndf, status );
-            ndfFind( sloc, "C0", &c0ndf, status );
-            ndfFind( sloc, "ANGC", &angcndf, status );
-
-/* Map them. Check each one has the expected number of elements. */
-            ndfMap( p0ndf, "DATA", "_DOUBLE", "READ", (void **) &p0data,
-                    &nmap, status );
-            if( nmap != (int) nbolo && *status == SAI__OK ) {
-               *status = SAI__ERROR;
-               ndfMsg( "N", p0ndf );
-               errRep( "", "smf_subip: Bad dimensions for ^N - should be 32x40.", status );
-            }
-
-            ndfMap( p1ndf, "DATA", "_DOUBLE", "READ", (void **) &p1data,
-                    &nmap, status );
-            if( nmap != (int) nbolo && *status == SAI__OK ) {
-               *status = SAI__ERROR;
-               ndfMsg( "N", p1ndf );
-               errRep( "", "smf_subip: Bad dimensions for ^N - should be 32x40.", status );
-            }
-
-            ndfMap( c0ndf, "DATA", "_DOUBLE", "READ", (void **) &c0data,
-                    &nmap, status );
-            if( nmap != (int) nbolo && *status == SAI__OK ) {
-               *status = SAI__ERROR;
-               ndfMsg( "N", c0ndf );
-               errRep( "", "smf_subip: Bad dimensions for ^N - should be 32x40.", status );
-            }
-
-            ndfMap( angcndf, "DATA", "_DOUBLE", "READ", (void **) &angcdata,
-                    &nmap, status );
-            if( nmap != (int) nbolo && *status == SAI__OK ) {
-               *status = SAI__ERROR;
-               ndfMsg( "N", angcndf );
-               errRep( "", "smf_subip: Bad dimensions for ^N - should be 32x40.", status );
-            }
-
-/* If using the "PL1", "PL2" or "PL3" model... */
+/* If the wind blind was in place, the model is differemt at 450 and 850. */
+         } else if( waveband == SMF__SUBINST_850 ) {
+            ippars = model2;
          } else {
-            p0data = NULL;
-            p1data = NULL;
-            c0data = NULL;
-            angcdata = NULL;
-            if( astChrMatch( ipmodel, "PL1" ) ) {
-               model = PL1;
-               astMapGet1D( keymap, "PL1DATA", 3, &nval, pldata );
-            } else if( astChrMatch( ipmodel, "PL2" ) ) {
-               model = PL2;
-               astMapGet1D( keymap, "PL2DATA", 4, &nval, pldata );
-            } else {
-               model = PL3;
-               astMapGet1D( keymap, "PL3DATA", 4, &nval, pldata );
-            }
-
-/* If the PL model is appropriate for the IP reference data (i.e. "PL2" with
-   non-POL2 IP map or "PL3" with POL2 IP map), then we use a degradation factor
-   of 1.0 since any required degradation is already included in the model
-   coefficients. */
-            if( ( polref && model == PL3 ) || ( !polref && model == PL2 ) ) {
-               degfac = 1.0;
-            } else if( !polref && model == PL3 ) {
-               degfac = 1.0/degfac;
-            }
+            ippars = model3;
          }
+
+/* The above IP parameters were determined using total intensity maps
+   made from POL2 observations. So if the supplied IP reference map was
+   *not* made from POL2 data, we need to take account of the POL2
+   degradation factor. */
+         if( polref ) degfac = 1.0;
 
 /* Get a pointer to the quality array for the residuals. */
          qua_data = smf_select_qualpntr( data, NULL, status );
@@ -536,13 +453,8 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
             pdata->tstride = tstride;
             pdata->imapdata = imapdata;
             pdata->qu = qu;
-            pdata->p0data = p0data;
-            pdata->p1data = p1data;
-            pdata->c0data = c0data;
-            pdata->angcdata = angcdata;
+            pdata->ippars = ippars;
             pdata->allstate = data->hdr->allState;
-            pdata->pldata = pldata;
-            pdata->model = model;
             pdata->oper = 1;
             pdata->degfac = degfac;
             pdata->ipoffset = ipoffset;
@@ -554,25 +466,14 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
 /* Wait for all jobs to complete. */
          thrWait( wf, status );
 
-/* Clear up if using the JK model. */
-         if( loc ) {
-
-/* End the NDF context, thus unmapping and freeing all NDF identifiers
-   created since the context was started. */
-            ndfEnd( status );
-
-/* Free locator for subarray IP parameters. */
-            datAnnul( &sloc, status );
-         }
-
+/* Free resources. */
          ipang = astFree( ipang );
       }
 
-/* Remove any existinction correction to the modifed bolometer data. */
+/* Remove any extinction correction to the modifed bolometer data. */
       if( dat->ext ) smf_calcmodel_ext( wf, dat, 0, keymap, dat->ext,
                                         SMF__DIMM_INVERT, status);
 /* Free resources. */
-      if( loc ) datAnnul( &loc, status );
       imapdata = astFree( imapdata );
       job_data = astFree( job_data );
       trsys = astFree( (void *) trsys );
@@ -606,20 +507,18 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    SmfSubIPData *pdata;
    const char *qu;
    const char *trsys;
+   const double *fx;
+   const double *fy;
+   const double *gy;
+   const double *gx;
    dim_t ibolo;
    dim_t itime;
    dim_t nbolo;
    dim_t ntslice;
-   const double *fx;
-   const double *fy;
-   const double *gx;
-   const double *gy;
    double *imapdata;
    double *pa;
    double *pr;
    double angle;
-   double angc;
-   double c0;
    double ca;
    double cb;
    double cc;
@@ -628,7 +527,6 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    double degfac;
    double ipoffset;
    double ival;
-   double p0;
    double p1;
    double qfp;
    double qtr;
@@ -678,30 +576,12 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
          if( !( *pq & SMF__Q_BADB ) ) {
 
 /* Get the IP model parameters for this bolometer. */
-            if( pdata->p0data ) {       /* "JK" model */
-                  p0 = pdata->p0data[ ibolo ];
-                  p1 = pdata->p1data[ ibolo ];
-                  c0 = pdata->c0data[ ibolo ];
-                  angc = pdata->angcdata[ ibolo ];
-                  bad = ( p0 == VAL__BADD || p1 == VAL__BADD ||
-                          c0 == VAL__BADD || angc == VAL__BADD );
-
-/* Cache values needed in the itime loop. */
-                  ca = p0*cos( 2*angc*AST__DD2R );
-                  cb = p0*sin( 2*angc*AST__DD2R );
-                  cc = 2*( c0 + angc )*AST__DD2R;
-                  cd = 0.0;
-
-            } else {         /* "PL1", "PL2" or "PL3" model */
-               p1 = VAL__BADD;
-               ca = pdata->pldata[0];
-               cb = pdata->pldata[1];
-               cc = pdata->pldata[2];
-               cd = ( pdata->model != PL1 ) ? pdata->pldata[3] : 0.0;
-               bad = ( ca == VAL__BADD || cb == VAL__BADD ||
-                       cc == VAL__BADD || cd == VAL__BADD );
-
-            }
+            ca = pdata->ippars[0];
+            cb = pdata->ippars[1];
+            cc = pdata->ippars[2];
+            cd = pdata->ippars[3];
+            bad = ( ca == VAL__BADD || cb == VAL__BADD ||
+                    cc == VAL__BADD || cd == VAL__BADD );
 
 /* If any parameter is bad, flag the whole bolometer as unusable. */
             if( bad ) {
@@ -744,19 +624,11 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
 
 /* Find the normalised instrumental Q and U. These are with respect to the
    focal plane Y axis. */
-                        if( pdata->p0data ) {       /* JK model */
-                           p1 += ipoffset;
-                           qfp = ca + p1*cos( cc + 2*state->tcs_az_ac2 );
-                           ufp = cb + p1*sin( cc + 2*state->tcs_az_ac2 );
-                        } else {                    /* PL1, PL2 or PL3 model */
-                           p1 = ca + cb*state->tcs_az_ac2 + cc*state->tcs_az_ac2*state->tcs_az_ac2;
-                           p1 += ipoffset;
-                           angle = state->tcs_az_ac2;
-                           if( pdata->model != PL1 ) angle -= cd;
-                           angle *= -2;
-                           qfp = p1*cos( angle );
-                           ufp = p1*sin( angle );
-                        }
+                        p1 = ca + cb*state->tcs_az_ac2 + cc*state->tcs_az_ac2*state->tcs_az_ac2;
+                        p1 += ipoffset;
+                        angle = -2*( state->tcs_az_ac2 - cd );
+                        qfp = p1*cos( angle );
+                        ufp = p1*sin( angle );
 
 /* Rotate them to match the reference frame of the supplied Q and U
    values (unless the supplied Q and U values are w.r.t focal plane Y,
@@ -773,13 +645,12 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
 
 
 /* Correct the residual Q or U value. If the total intensity was derived from
-   a POL2 observation but the IP model assumes non-POL2 total intensity values,
-   then we need to correct the total intensity for the POL2 degradation
-   factor. */
+   a non-POL2 observation we need to correct the total intensity for the
+   POL2 degradation factor. */
                         if( *qu == 'Q' ) {
-                           *pr -= degfac*ival*qtr;
+                           *pr -= ival*qtr/degfac;
                         } else {
-                           *pr -= degfac*ival*utr;
+                           *pr -= ival*utr/degfac;
                         }
                      }
                   }

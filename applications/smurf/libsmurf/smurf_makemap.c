@@ -185,8 +185,7 @@
 *          rotated so that they use the same reference direction as the input
 *          Q/U data, corrected for extinction, and are then subtracted from
 *          the input Q or U value before going on to make a map from the
-*          corrected values. The factors are determined using the IP model
-*          specified by the "ipmodel" configuration parameter. [!]
+*          corrected values. [!]
 *     ITERMAPS = LITERAL (Read)
 *          Specifies the name of a file in which to place a copy of the
 *          current map at the end of each iteration. If a null (!) value is
