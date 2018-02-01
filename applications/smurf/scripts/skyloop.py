@@ -170,8 +170,7 @@
 *        rotated so that they use the same reference direction as the input
 *        Q/U data, corrected for extinction, and are then subtracted from
 *        the input Q or U value before going on to make a map from the
-*        corrected values. The factors are determined using the IP model
-*        specified by the "ipmodel" configuration parameter. [!]
+*        corrected values. [!]
 *     ITERMAP = NDF (Write)
 *        A 3D NDF to create holding the maps from all iterations. [!]
 *     LOGFILE = LITERAL (Read)
@@ -352,6 +351,8 @@
 *     18-JAN-2018 (DSB):
 *        Modify PCA-related config parameters in the same way that
 *        FLT-related parametrers are modified.
+*     23-JAN-2018 (DSB):
+*        Handle ZERO_NITER values between 0.0 and 1.0.
 *-
 '''
 
@@ -542,9 +543,9 @@ try:
    zero_notlast = {}
    zero_freeze = {}
    for model in ["ast", "com", "flt", "pca"]:
-      zero_niter[model] = myint( invoke( "$KAPPA_DIR/configecho name={0}.zero_niter config={1} "
-                                       "defaults=$SMURF_DIR/smurf_makemap.def "
-                                       "select=\"\'450=0,850=1\'\"".format(model,config)))
+      zero_niter[model] = float( invoke( "$KAPPA_DIR/configecho name={0}.zero_niter config={1} "
+                                         "defaults=$SMURF_DIR/smurf_makemap.def "
+                                         "select=\"\'450=0,850=1\'\"".format(model,config)))
       zero_notlast[model] = myint( invoke( "$KAPPA_DIR/configecho name={0}.zero_notlast config={1} "
                                        "defaults=$SMURF_DIR/smurf_makemap.def "
                                        "select=\"\'450=0,850=1\'\"".format(model,config)))
@@ -652,7 +653,7 @@ try:
 #  counts.
    if ast_skip > 0:
       for model in ["ast", "com", "flt", "pca"]:
-         if zero_niter[model] > 0:
+         if zero_niter[model] >= 1.0:
             zero_niter[model] += ast_skip;
 
          if zero_freeze[model] > 0:
@@ -867,6 +868,7 @@ try:
       if ast_skip > 0:
          msg_out( "Skipping {0} iterations since ast.skip is set to {0}".format(ast_skip))
 
+      meanchange = 1E10
       iter = niter0 + 1
       while iter <= niter:
          msg_out( "Iteration {0}...".format(iter))
@@ -880,7 +882,9 @@ try:
 #  masking (so long as zero_niter > 0).  Do this for AST, PCA, COM and FLT
 #  models.
          for model in ["ast", "com", "flt", "pca"]:
-            if zero_niter[model] > 0 and iter > zero_niter[model]:
+            if zero_niter[model] > 0 and (
+               ( zero_niter[model] < 1.0 and meanchange <= zero_niter[model] ) or
+               ( zero_niter[model] >= 1.0 and iter > zero_niter[model] ) ):
                zero_niter[model] = 0
                add[ model+".zero_niter" ] = -1
                newcon = 1
