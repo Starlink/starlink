@@ -117,6 +117,7 @@ void ary1Maps( AryACB *acb, const char *type, int cmplx, const char *mode, const
 void ary1Mpsr( AryACB *acb, HDSLoc *loc, const char *type, const char *mode, int bad, HDSLoc **mloc, int *copy, void **pntr, int *dce, int *status );
 void ary1Mpsw( AryACB *acb, HDSLoc *loc, const char *type, const char *inopt, HDSLoc **mloc, int *copy, void **pntr, int *status );
 void ary1Nel( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, size_t *el, int *status );
+void ary1NewOr( HDSLoc *loc, int ndim, HDSLoc **locor, int *status );
 void ary1Pbnd( AryACB *acb, int *prim, int *status );
 void ary1Ptn( int bad, int ndim, const hdsdim *lbnda, const hdsdim *ubnda, const char *type, const void *pntr, const hdsdim *lsub, const hdsdim *usub, const hdsdim *lbndd, const hdsdim *ubndd, const char *htype, HDSLoc *loc, int *dce, int *status );
 void ary1Rebnd( int defer, HDSLoc *paren, const char *name, const char *type, int state, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, int nndim, const hdsdim *nlbnd, const hdsdim *nubnd, HDSLoc **loc, int *same, int *drx, hdsdim *lx, hdsdim *ux, int *status );
