@@ -258,12 +258,13 @@ ast.zero_mask = 0
 #               the count of iterations. If ast.zero_niter is greater than
 #               zero but less than 1.0, the AST mask will be used until
 #               the normalized change in the map between iterations drops
-#               below the ast.zero_freeze value. If a value is set for
-#               "ast.zero_niter", the iterative map-making process will
-#               not terminate until the number of iterations required by
-#               the supplied "ast.zero_niter" value have occurred, regardless
-#               of whether the condition specified by parameter "maptol"
-#               is achieved earlier.
+#               below the ast.zero_freeze value. A negative value for
+#               ast.zero_niter will disable all masking of the AST model.
+#               If a value is set for "ast.zero_niter", the iterative
+#               map-making process will not terminate until the number of
+#               iterations required by the supplied "ast.zero_niter" value
+#               have occurred, regardless of whether the condition specified
+#               by parameter "maptol" is achieved earlier.
 ast.zero_niter = 0
 
 #-----------------------------------------------------------------
@@ -550,6 +551,7 @@ com.zero_mask = 0
 #		on the last iteration, even if com.zero_niter is zero.
 #               Note, any initial iterations specified by parameter
 #               "ast.skip" are not included in the count of iterations.
+#               A negative value will disable all masking of the COM model.
 com.zero_niter = 0
 
 #-----------------------------------------------------------------
@@ -1717,7 +1719,8 @@ flt.zero_mask = 0
 #		Note, using FLT masking on many iterations can inhibit
 #		convergence. Also, any initial iterations specified by
 #               parameter "ast.skip" are not included in the count of
-#               iterations.
+#               iterations. A negative value will disable all masking
+#               of the FLT model.
 flt.zero_niter = 2
 
 #-----------------------------------------------------------------
@@ -2632,7 +2635,8 @@ ssn.zero_mask = 0
 #		Note, using SSN masking on many iterations can inhibit
 #		convergence. Also, any initial iterations specified by
 #               parameter "ast.skip" are not included in the count of
-#               iterations.
+#               iterations. A negative value will disable all masking
+#               of the SSN model.
 ssn.zero_niter = 2
 
 #-----------------------------------------------------------------
