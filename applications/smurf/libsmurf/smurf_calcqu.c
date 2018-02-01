@@ -301,11 +301,13 @@
 *     6-OCT-2016 (DSB):
 *        Allow cleaned data to be exported by setting config parameter
 *        "exportclean", as for makemap.
+*     1-FEB-2018 (DSB):
+*        Added config parameter ANG0.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2011-2013 Science and Technology Facilities Council.
-*     Copyright (C) 2015-2016 East Asian Observatory
+*     Copyright (C) 2015-2018 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -389,6 +391,7 @@ void smurf_calcqu( int *status ) {
    char polcrd[ 81 ];         /* FITS 'POL_CRD' header value */
    char subarray[ 10 ];       /* Subarray name (e.g. "s4a", etc) */
    const char *north;         /* Celestial system to use as ref. direction  */
+   double ang0;               /* HWP angle at start of each fitting box */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double rotafreq;           /* HWP rotation frequency */
@@ -584,6 +587,8 @@ void smurf_calcqu( int *status ) {
          msgOutiff( MSG__VERB, "", "PAOFF=%g", status, paoff );
          if( !astMapGet0D( config, "ANGROT", &angrot ) ) angrot = 90.0;
          msgOutiff( MSG__VERB, "", "ANGROT=%g", status, angrot );
+         if( !astMapGet0D( config, "ANG0", &ang0 ) ) ang0 = 90.0;
+         msgOutiff( MSG__VERB, "", "ANG0=%g", status, ang0 );
          if( !astMapGet0I( config, "DOCLEAN", &doclean ) ) doclean = 0;
          msgOutiff( MSG__VERB, "", "DOCLEAN=%d", status, doclean );
 
@@ -845,7 +850,7 @@ void smurf_calcqu( int *status ) {
                smf_fit_qui( wf, data, &odataq, &odatau, ogrpi ? &odatai : NULL,
                             ogrpf ? &odataf : NULL, (dim_t) polbox, ipolcrd,
                             pasign, AST__DD2R*paoff, AST__DD2R*angrot, north,
-                            harmonic, status );
+                            harmonic, AST__DD2R*ang0, status );
 
 /* Copy the smfData structures to the output NDFs. Store the output
    provenenance info at the same time. */

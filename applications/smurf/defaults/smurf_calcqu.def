@@ -80,6 +80,15 @@ paoff = 18.65
 angrot = 90.0
 
 #-----------------------------------------------------------------
+#  Name: 	ang0
+#  Type: 	real
+#  Default: 	90
+#  Purpose: 	Specifies the start of each fitting box
+#  Description: The half-wave plate position at which each fitting box
+#               begins, in degrees.
+ang0 = 90.0
+
+#-----------------------------------------------------------------
 #  Name: 	submean
 #  Type: 	int
 #  Default: 	0

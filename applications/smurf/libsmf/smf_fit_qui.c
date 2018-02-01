@@ -18,7 +18,7 @@
 *                  smfData **odatau, smfData **odatai, smfData **odataf,
 *                  dim_t box, int ipolcrd, int pasign, double paoff,
 *                  double angrot, const char *north, int harmonic,
-*                  int *status )
+*                  double ang0, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -70,6 +70,8 @@
 *        i.e. 1 + 4 + 8, then the returned Q and U values will be the sum
 *        of the individual Q and U values formed from the first, fourth and
 *        eigth harmonic.
+*     ang0 = double (Given)
+*        The HWP angle, in radians, at which each fitting box starts.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -226,9 +228,10 @@ typedef struct smfFitQUIJobData {
 
 /* Prototypes for local functions */
 static void smf1_fit_qui_job( void *job_data, int *status );
-static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t box,
-                             dim_t *ontslice, dim_t **box_starts, dim_t *lolim,
-                             dim_t *hilim, int *status );
+static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates,
+                             double ang0, dim_t box, dim_t *ontslice,
+                             dim_t **box_starts, dim_t *lolim, dim_t *hilim,
+                             int *status );
 
 /* Number of free parameters in the fit */
 #define NPAR 10
@@ -244,7 +247,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
                   smfData **odatau, smfData **odatai, smfData **odataf,
                   dim_t box, int ipolcrd, int pasign, double paoff,
                   double angrot, const char *north, int harmonic,
-                  int *status ){
+                  double ang0, int *status ){
 
 /* Local Variables: */
    AstFrameSet *wcs;        /* WCS FrameSet for current time slice */
@@ -328,8 +331,8 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 
 /* Find the input time slice at which each fitting box starts, and the
    length of the output time axis (in time-slices). */
-   smf1_find_boxes( intslice, hdr->allState, box, &ontslice, &box_starts,
-                    &lolim, &hilim, status );
+   smf1_find_boxes( intslice, hdr->allState, ang0, box, &ontslice,
+                    &box_starts, &lolim, &hilim, status );
 
 /* Time axis scaling factor. */
    scale = (double) intslice / (double) ontslice;
@@ -1273,9 +1276,10 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 }
 
 
-static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t box,
-                             dim_t *ontslice, dim_t **box_starts, dim_t *lolim,
-                             dim_t *hilim, int *status ) {
+static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates,
+                             double ang0, dim_t box, dim_t *ontslice,
+                             dim_t **box_starts, dim_t *lolim, dim_t *hilim,
+                             int *status ) {
 /*
 *  Name:
 *     smf1_find_boxes
@@ -1291,15 +1295,18 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
 *     SMURF subroutine
 
 *  Invocation:
-*     smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t box,
-*                      dim_t *ontslice, dim_t **box_starts, dim_t *lolim,
-*                      dim_t *hilim, int *status )
+*     void smf1_find_boxes( dim_t intslice, const JCMTState *allstates,
+*                           double ang0, dim_t box, dim_t *ontslice,
+*                           dim_t **box_starts, dim_t *lolim, dim_t *hilim,
+*                           int *status )
 
 *  Arguments:
 *     intslice = dim_t (Given)
 *        Number of time slices in input.
 *     allstates = const JCMTState * (Given)
 *        Pointer to the JCMT state information for all input time slices.
+*     ang0 = double (Given)
+*        The HWP angle, in radians, at which each fitting box starts.
 *     box = dim_t (Given)
 *        Number of complete HWP rotations per fitting box.
 *     ontslice = dim_t * (Returned)
@@ -1333,7 +1340,6 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
    dim_t iel;
    dim_t itime;
    dim_t nrot;
-   double ang0 = 0.5*AST__DPI;
    double s1;
    double s2;
 
@@ -1344,7 +1350,7 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
 /* Check inherited status. */
    if( *status != SAI__OK ) return;
 
-/* If the HWP angle is above PI, move on until the HWP angle wraps back to
+/* If the HWP angle is above "ang0", move on until the HWP angle wraps back to
    zero. */
    nrot = 0;
    itime = 0;
@@ -1358,7 +1364,7 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
 /* HWP angles vary between 0 and 2*PI in a roughly linear manner, but
    with some sudden steps. When the HWP angle reaches 2*PI it wraps
    back round to zero. Find the first time slice for which the HWP
-   angle is greater than PI (a safe value in the middle of the range). */
+   angle is greater than "ang0" (a safe value in the middle of the range). */
    while( more && ( state->pol_ang == VAL__BADD || state->pol_ang <= ang0 ) ) {
       if( ++itime == intslice ) more = 0;
       state++;
@@ -1382,7 +1388,7 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
          state++;
       }
 
-/* Move on until the HWP angle again exceeds PI. */
+/* Move on until the HWP angle again exceeds "ang0". */
       while( more && ( state->pol_ang == VAL__BADD || state->pol_ang <= ang0 ) ) {
          if( ++itime == intslice ) more = 0;
          state++;
