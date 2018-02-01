@@ -359,6 +359,7 @@ fi
 
 if test -f ${bindir}/oracdr/src/etc/oracdr_start.sh; then
    export ORAC_DIR=${bindir}/oracdr/src
+   export ORAC_PERLBIN=${exec_prefix}/Perl/bin/perl
    export ORAC_PERL5LIB=${ORAC_DIR}/lib/perl5
    export ORAC_CAL_ROOT=${bindir}/oracdr/cal
 else

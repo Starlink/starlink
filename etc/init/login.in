@@ -456,6 +456,7 @@ if ( -e ${bindir}/oracdr ) then
     endif
     if ( -e ${orac_dir}/etc/oracdr_start.csh ) then
         setenv ORAC_DIR ${orac_dir}
+        setenv ORAC_PERLBIN ${exec_prefix}/Perl/bin/perl
         setenv ORAC_PERL5LIB ${ORAC_DIR}/lib/perl5
         setenv ORAC_CAL_ROOT ${orac_root}/cal
     endif
