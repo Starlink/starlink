@@ -141,9 +141,10 @@ void ary1Dcre( int defer, const char *type, int cmplx, int ndim,
          }
       }
 
-/* Create the ORIGIN component and enter the lower bounds information. */
-      HDSDIM_CODE(datNew1)( (*dcb)->loc, "ORIGIN", ndim, status );
-      datFind( (*dcb)->loc, "ORIGIN", &tloc, status );
+/* Create the ORIGIN component and get a locator to it. */
+      ary1NewOr( (*dcb)->loc, ndim, &tloc, status );
+
+/* Enter the lower bounds information, and annul the locator. */
       HDSDIM_CODE(datPut1)( tloc, ndim, lbnd, status );
       datAnnul( &tloc, status );
 

@@ -183,25 +183,7 @@ void ary1Dsbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, AryDCB *dcb,
 
 /* Create an ORIGIN component in the data object and enter the new origin
    values. */
-
-/*
-This code assumes the ORIGIN component is an _INTEGER. Should it use K
-instead? Why does this code not fail to cpompile since "lbnd" is hdsdim,
-not int? Are we using "hdsdim=32 bit" configuration? Does this error
-occur anywhere else in CARY?
-
-How will someone with an old starlink read an NDF with a "K" origin?
-
-ary1S2dlt is riddled with places that assumes INTEGER rather than K and
-used "int *" in the API instead of "hdsdim *"
-
-*/
-
-
-
-
-                  HDSDIM_CODE(datNew1)( dcb->loc, "ORIGIN", ndim, status );
-                  datFind( dcb->loc, "ORIGIN", &loct, status );
+                  ary1NewOr( dcb->loc, ndim, &loct, status );
                   HDSDIM_CODE(datPut1)( loct, ndim, lbnd, status );
                   datAnnul( &loct, status );
                }
@@ -255,11 +237,13 @@ used "int *" in the API instead of "hdsdim *"
                datThere( dcb->loc, "ORIGIN", &there, status );
                if( *status == SAI__OK ){
 
-/* If not, then create one with the required number of elements. */
-                  if( !there ) HDSDIM_CODE(datNew1)( dcb->loc, "ORIGIN", ndim, status );
-
-/* Obtain a locator to the ORIGIN component. */
-                  datFind( dcb->loc, "ORIGIN", &loc, status );
+/* If not, then create one with the required number of elements.
+   Either way, obtain a locator to the ORIGIN component. */
+                  if( !there ) {
+                     ary1NewOr( dcb->loc, ndim, &loc, status );
+                  } else {
+                     datFind( dcb->loc, "ORIGIN", &loc, status );
+                  }
 
 /* If this component was initially present, but now has the wrong number of
    elements, then change the number of elements. */
