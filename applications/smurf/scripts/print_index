@@ -556,29 +556,28 @@ sub acsis_header {
       $mode =~ s/RASTER/RAS/;
       $mode =~ s/GRID/GRD/;
     }
-    $mode = $A{INBEAM}.$mode;
 
 #    print "$A{RUN} $mode $A{UT} \'$A{OBJECT}\' $A{PROJECT} $rx $boloms $filter $A{CSOTAU} $A{SEEING}\n";
 
     # Declare formats here since it has to be in scope of the lexical variables
 format STDOUT_SHORT_ACS =
-@<<<<< UT  Projid     Mode     Source  Intt/Stp  Tau  WVM  Rx/Freq   Vel/Velsys
+@<<<<< UT Projid   Mode    InB Source Intt/Stp  Tau  WVM  Rx/Freq   Vel/Velsys D
 $origin
 .
 
 format STDOUT_LONG_ACS =
-@<<<<< UT  Projid     Mode     Source               Intt/Stp   Tau   WVM  Rx/Freq   Vel/Velsys    Az    El   Uaz    Uel  Bwmode
+@<<<<< UT Projid   Mode     InBeam Source               Intt/Stp   Tau   WVM  Rx/Freq   Vel/Velsys Dome    Az    El   Uaz    Uel  Bwmode
 $origin
 .
 
 format SHORT_ACS =
-@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<< @>>>/@<< @<<< @<<< @<<<<<<< @>>>>>>>>>>>
-$A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode, $A{OBJECT}, $intt, $step, $A{CSOTAU}, $A{WVMTAU}, $cfreq, $cvref
+@<< @<<<< @<<<<<<< @<<<<<< @<< @<<<<< @>>>/@<< @<<< @<<< @<<<<<<< @>>>>>>>>>>> @
+$A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode, $A{INBEAM}, $A{OBJECT}, $intt, $step, $A{CSOTAU}, $A{WVMTAU}, $cfreq, $cvref, $A{DOMESTATE}
 .
 
 format LONG_ACS =
-@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<<<<<<<<<<<<<<< @>>>/@<< @<<<< @<<<< @<<<<<<< @>>>>>>>>>>> @<<<< @<<<< @<<<<< @<<<<< @>>>>>>>>>>>
-$A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode, $A{OBJECT}, $intt, $step, $A{LCSOTAU}, $A{LWVMTAU}, $cfreq, $cvref, $A{AZ}, $A{EL}, $A{UAZ}, $A{UEL}, $bwmode
+@<< @<<<< @<<<<<<< @<<<<<<< @<<<<< @<<<<<<<<<<<<<<<<<<< @>>>/@<< @<<<< @<<<< @<<<<<<< @>>>>>>>>>>> @<<< @<<<< @<<<< @<<<<< @<<<<< @>>>>>>>>>>>
+$A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode, $A{INBEAM}, $A{OBJECT}, $intt, $step, $A{LCSOTAU}, $A{LWVMTAU}, $cfreq, $cvref, $A{DOMESTATE}, $A{AZ}, $A{EL}, $A{UAZ}, $A{UEL}, $bwmode
 .
 
     # Set format
@@ -668,30 +667,31 @@ sub scuba2_header {
     }
 
     # Prepend in-beam information to mode unless the shutter is closed
-    $mode = $S{INBEAM}.$mode unless $fitsitem->{SHUTTER} < 0.5;
+    my $inbeam =  '';
+    $inbeam = $S{INBEAM} unless $fitsitem->{SHUTTER} < 0.5;
 
 #    print "$S{RUN} $mode $S{UT} \'$S{OBJECT}\' $S{PROJECT} $rx $boloms $filter $S{CSOTAU} $S{SEEING}\n";
 
 
 format STDOUT_SHORT_SCU2 =
-@<<<<< UT  Projid     Mode      Source            Map     Secs  Tau    WVM  See
+@<<<<< UT Projid   Mode   InB Source          Map     Secs  Tau    WVM  See Dome
 $origin
 .
 
 format STDOUT_LONG_SCU2 =
-@<<<<< UT  Projid     Mode      Source                   Map       Secs   Tau     WVM  See       Az    El   Uaz    Uel
+@<<<<< UT Projid   Mode     InBeam Source                   Map      Secs    Tau    WVM   See Dome      Az    El   Uaz    Uel
 $origin
 .
 
     # Declare formats here since it has to be in scope of the lexical variables
 format SHORT_SCU2 =
-@<< @<<<<< @<<<<<<<<< @<<<<<<<  @<<<<<<<<<<<< @<<<<<<<<<< @<<<< @<<<< @<<< @<<<
-$S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode, $S{OBJECT}, $map, $S{OBSTIME}, $S{CSOTAU}, $S{WVMTAU},$S{SEEING}
+@<< @<<<< @<<<<<<< @<<<<< @<< @<<<<<<<<<< @<<<<<<<<<< @<<<< @<<<< @<<< @<<< @<<<
+$S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode, $inbeam, $S{OBJECT}, $map, $S{OBSTIME}, $S{CSOTAU}, $S{WVMTAU},$S{SEEING},$S{DOMESTATE}
 .
 
 format LONG_SCU2 =
-@<< @<<<<< @<<<<<<<<< @<<<<<<<  @<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<< @<<<< @<<<<  @<<<< @<<<<  @<<<<< @<<<< @<<<<< @<<<<<
-$S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode, $S{OBJECT}, $map, $S{OBSTIME}, $S{LCSOTAU}, $S{LWVMTAU}, $S{LSEEING}, $S{AZ}, $S{EL}, $S{UAZ}, $S{UEL}
+@<< @<<<< @<<<<<<< @<<<<<<< @<<<<< @<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<< @<<<< @<<<<  @<<<< @<<<< @<<<  @<<<<< @<<<< @<<<<< @<<<<<
+$S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode, $inbeam, $S{OBJECT}, $map, $S{OBSTIME}, $S{LCSOTAU}, $S{LWVMTAU}, $S{LSEEING}, $S{DOMESTATE}, $S{AZ}, $S{EL}, $S{UAZ}, $S{UEL}
 .
 
     # Set format
@@ -1113,6 +1113,7 @@ sub calc_shared_scuba2_acsis {
   my $lseeing = " n/a";
   my $lcsotau = " n/a";
   my $lwvmtau = " n/a";
+  my $domestate = " n/a";
 
   $obstime = $genitem2{UTEND} - $genitem{UTSTART}
     if (defined $genitem2{UTEND} and defined $genitem{UTSTART});
@@ -1135,6 +1136,15 @@ sub calc_shared_scuba2_acsis {
                          0.5*($fitsitem->{WVMTAUST}+$fitsitem2->{WVMTAUEN})+0.5)
     if defined $fitsitem->{WVMTAUST};
 
+  if (defined $genitem{'DOME_OPEN'} and defined $genitem2{'DOME_OPEN'}) {
+    if ($genitem{'DOME_OPEN'} != $genitem2{'DOME_OPEN'}) {
+      $domestate = 'Mixd';
+    }
+    else {
+      $domestate = $genitem{'DOME_OPEN'} ? 'Open' : 'Clsd';
+    }
+  }
+
   %results = ( %results,
                OBSTIME => sprintf("%4d",$obstime),
                SEEING => $seeing,
@@ -1144,6 +1154,7 @@ sub calc_shared_scuba2_acsis {
                LCSOTAU => $lcsotau,
                LWVMTAU => $lwvmtau,
                INBEAM => $inbeam,
+               DOMESTATE => $domestate,
              );
 
   return %results;
