@@ -47,6 +47,13 @@
  *        More fixes for MINGW handling of "long long" printfs.
  *     2014-10-24 (TIMJ):
  *        Add hdsbool_t to make it easy to spot logicals in the C API.
+ *     2017-Sep-12 (DSB):
+ *        Switch HDS dimensions to signed 64 bit integers. They need to be
+ *        signed since they will also be used for ARY/NDF array bounds, which
+ *        can be negative. Another reason for using signed values is that
+ *        HDS does not provide a "UK" (unsigned 64 bit int) data type, and
+ *        so there would be no way to store unsigned dimension values in an
+ *        HDS data file.
  *     2017-Oct-3 (DSB):
  *        - HDS dimensions should be signed, since otherwise there is no way
  *        to store them in an HDS data file, since we do not currently
@@ -56,13 +63,6 @@
  *        for storing HDS dimensions.
  *        - Add a macro (HDSDIM_TYPE) that appends HDS_DIM_TYPE to the
  *        end of a given function name.
- *     2017-Sep-12 (DSB):
- *        Switch HDS dimensions to signed 64 bit integers. They need to be
- *        signed since they will also be used for ARY/NDF array bounds, which
- *        can be negative. Another reason for using signed values is that
- *        HDS does not provide a "UK" (unsigned 64 bit int) data type, and
- *        so there would be no way to store unsigned dimension values in an
- *        HDS data file.
  *     2017-Nov-16 (DSB):
  *        Change HDS(_)DIM_TYPE to HDS(_)DIM_CODE, and add a new macro
  *        HDS_DIM_TYPE that holds the full HDS name for the dimension type.
@@ -162,7 +162,7 @@ error unable to find an 8 byte integer type
    values within an HDS data file. Instead, use "INT_BIG" (i.e. signed)
    since then HDS dimensions can be stored in HDS data files using the
    "K" data type. */
-#define BIGDIM 1   /* set to 1 if testing 64 bit dims */
+#define BIGDIM 0   /* set to 1 if testing 64 bit dims */
 #if BIGDIM
 #define DIM_TYPE INT_BIG
 #define HDS_DIM_CODE "K"
