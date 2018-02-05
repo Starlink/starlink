@@ -59,6 +59,13 @@ void ary1Dbnd( AryDCB *dcb, int *status ) {
 *  History:
 *     03-JUL-2017 (DSB):
 *        Original version, based on equivalent Fortran routine by RFWS.
+*     5-FEB-2018 (DSB):
+*        Use _INT64 in place of HDS_DIM_TYPE when checking that the ORIGIN
+*        data type is legal. This is because people with older starlink
+*        installations may still have HDS_DIM_TYPE set to _INTEGER, and
+*        we want such people to be able to read new NDFs (relying on the
+*        automatic type conversion provided by HDS to convert _INT64 to
+*        _INTEGER when the ORIGIN values are accessed).
 
 *-
 */
@@ -210,17 +217,19 @@ void ary1Dbnd( AryDCB *dcb, int *status ) {
 
 /* Report an error if the ORIGIN component is not of the correct type.
    We need to read HDS v4 and v5 files, so allow it to be _INT64 or
-   _INTEGER. */
-               if( strcmp( type, HDS_DIM_TYPE ) &&
+   _INTEGER. Note, use "_INT64" rather than "HDS_DIM_TYPE" because people
+   with older starlink installations may still have HDS_DIM_TYPE set to
+   _INTEGER, and we want such people to be able to read new NDFs. */
+               if( strcmp( type, "_INT64" ) &&
                    strcmp( type, "_INTEGER" ) ){
                   *status = ARY__TYPIN;
                   datMsg( "ARRAY", dcb->loc );
                   msgSetc( "BADTYPE", type );
-                  msgSetc( "GOODTYPE", HDS_DIM_TYPE );
                   errRep( "ARY1_DBND_OTYP",
                           "The ORIGIN component in the array structure"
                           "^ARRAY has an invalid HDS type of '^BADTYPE';"
-                          "its type should be '^GOODTYPE'.", status );
+                          "its type should be '_INTEGER' or '_INT64'.",
+                          status );
 
 /* Report an error if it is not 1-dimensional. */
                } else if( ndimor != 1 ){
