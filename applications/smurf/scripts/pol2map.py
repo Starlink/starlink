@@ -488,12 +488,16 @@ def getPcaThresh( mapdir, automask ):
    for tmap in glob.glob("{0}/*{1}.sdf".format(mapdir, base )):
       nsec = os.path.getmtime( tmap )
       if nsec < nsecmin:
-         nsecmin = nsec
-         this_map = tmap
-         pcathresh = float( invoke("$KAPPA_DIR/configecho name=pca.pcathresh "
-                                   "ndf={0} config=! application=makemap "
-                                   "defaults=$SMURF_DIR/smurf_makemap.def"
-                                   .format(tmap)))
+         try:
+            pcathresh = float( invoke("$KAPPA_DIR/configecho name=pca.pcathresh "
+                                      "ndf={0} config=! application=makemap "
+                                      "defaults=$SMURF_DIR/smurf_makemap.def"
+                                      .format(tmap)))
+            nsecmin = nsec
+            this_map = tmap
+         except starutil.AtaskError:
+            pass
+
    return (pcathresh,this_map)
 
 
