@@ -146,7 +146,7 @@
             IF( CR( IX, IY ) .NE. VAL__BADD ) THEN
                IF( CR( IX, IY ) .LT. CORLIM ) THEN
                   CR( IX, IY ) = VAL__BADD
-                  NREJ = NREJ + 1
+                  IF( IN( IX, IY ) .NE. VAL__BADD ) NREJ = NREJ + 1
                ELSE
                   CR( IX, IY ) = IN( IX, IY )
                END IF
