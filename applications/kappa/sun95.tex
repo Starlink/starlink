@@ -9671,7 +9671,8 @@ KAPPA: \htmlref{CADD}{CADD},
       ($C_1$--$C_6$) are determined by doing a least-squares
       fit that minimises the sum of the squared residuals between the
       reference NDF and the transformed input NDF. If variance
-      information is present in either NDF, it is used to weight the
+      information is present in either NDF, it is used
+      to determine the SNR of each pixel which is used to weight the
       residuals within the fit, so that noisy data values have less
       effect on the fit. The best fit coefficients are displayed on
       the screen and written to an output parameter. Optionally, the
@@ -53614,6 +53615,10 @@ The following applications have been modified:
       \begin{itemize}
         \item Parameter TR may also include the scale and offset in
         its seventh and eight elements.
+        \item The residuals used to determine the fit are now weighted
+        using the SNR of the data rather than the reciprocal of the variance.
+        This will cause the final alignment to be determined more by the
+        brighter sections of the map than previously.
       \end{itemize}
 
    \item [\htmlref{COLLAPSE}{COLLAPSE}]\mbox{}

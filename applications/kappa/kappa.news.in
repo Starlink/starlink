@@ -16,6 +16,10 @@
    o  ALIGN2D
       -  Parameter TR may also include the scale and offset in its seventh
       and eight elements.
+      - The residuals used to determine the fit are now weighted using
+      the SNR of the data rather than the reciprocal of the variance.
+      This will cause the final alignment to be determined more by the
+      brighter sections of the map than previously.
 
    o   COLLAPSE
       - There is a new estimator option, "FastMed", that offers a

@@ -35,7 +35,8 @@
 *     least-squares fit that minimises the sum of the squared
 *     residuals between the reference NDF and the transformed input
 *     NDF. If variance information is present in either NDF, it is used
-*     to weight the residuals within the fit, so that noisy data values
+*     to determine the SNR of each pixel which is used to weight the
+*     residuals within the fit, so that noisy data values
 *     have less effect on the fit. The best fit coefficients are
 *     displayed on the screen and written to an output parameter.
 *     Optionally, the transformation may be applied to the input NDF to
