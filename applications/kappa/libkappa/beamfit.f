@@ -197,8 +197,9 @@
 *        will be no logging.  Note this is intended for the human reader
 *        and is not intended for passing to other applications.  [!]
 *     MAJFWHM( 2 ) = _DOUBLE (Write)
-*         The major-axis FWHM and its error, measured in the current
-*         co-ordinate Frame of the NDF, for each beam.
+*        The major-axis FWHM and its error, measured in the current
+*        co-ordinate Frame of the NDF, for each beam.  Note that the
+*        unit for sky co-ordinate Frames is radians.
 *     MARK = LITERAL (Read)
 *        Only accessed if Parameter MODE is given the value "Cursor".
 *        It indicates which positions are to be marked on the screen
@@ -225,7 +226,8 @@
 *        The value must be larger than or equal to -31.  [current value]
 *     MINFWHM( 2 ) = _DOUBLE (Write)
 *        The minor-axis FWHM and its error, measured in the current
-*        co-ordinate Frame of the NDF, for each beam.
+*        co-ordinate Frame of the NDF, for each beam.  Note that the
+*        unit for sky co-ordinate Frames is radians.
 *     MODE = LITERAL (Read)
 *        The mode in which the initial co-ordinates are to be obtained.
 *        The supplied string can be one of the following values.
@@ -239,7 +241,7 @@
 *        - "Catalogue" -- positions are obtained from a positions list
 *        using Parameter INCAT.
 *
-*        -  "File" -- positions are obtained from a text file using
+*        - "File" -- positions are obtained from a text file using
 *        Parameter COIN.
 *        [current value]
 *     NDF = NDF (Read)
@@ -513,7 +515,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2009, 2010, 2011, 2013 Science & Technology
+*     Copyright (C) 2009, 2010, 2011, 2013, 2018 Science & Technology
 *     Facilities Council.
 *     All Rights Reserved.
 
