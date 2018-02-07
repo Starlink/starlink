@@ -115,6 +115,13 @@
 *        Added arguments IFAC, RFAC, IOFF and ROFF.
 *     12-MAY-2016 (DSB):
 *        Added argument FITVAL.
+*     7-FEB-2018 (DSB):
+*        - Reduce the required accuracy by a factor of 10 as it was
+*        unnecessarily high before, leading to longer than needed run times.
+*        - Use SNR to weight the residuals rather than the reciprocal of the
+*        variances. The variance around bright point sources is often very
+*        high causing them to be largely ignored, when in fact point sources
+*        are good for determing alignment.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -284,7 +291,7 @@
 
 *  Do the minimisation.
       CALL PDA_LMDIF1( KPG1_ALIGN2, M, NP, P,
-     :                 %VAL( CNF_PVAL( IPFVEC ) ), 1.0D-6, INFO,
+     :                 %VAL( CNF_PVAL( IPFVEC ) ), 1.0D-5, INFO,
      :                 %VAL( CNF_PVAL( IPW2 ) ),
      :                 %VAL( CNF_PVAL( IPW1 ) ), LWA )
 
@@ -503,12 +510,12 @@
 *     C( 6 ) = DOUBLE PRECISION (Given)
 *        The coefficients of the transformation.
 *     USEVIN = LOGICAL (Given)
-*        Use the VIN array to weight the IN values?
+*        Use the SNR of the IN array to weight the IN values?
 *     VIN( NX, NY ) = DOUBLE PRECISION (Given)
 *        The variances associated with the IN array. Only used if VIN is
 *        .TRUE.
 *     USEVREF = LOGICAL (Given)
-*        Use the VREF array to weight the REF values?
+*        Use the SNR of the REF array to weight the REF values?
 *     VREF( NX, NY ) = DOUBLE PRECISION (Given)
 *        The variances associated with the REF array. Only used if VREF is
 *        .TRUE.
@@ -572,6 +579,8 @@
       DOUBLE PRECISION KX
       DOUBLE PRECISION KY
       DOUBLE PRECISION NORM
+      DOUBLE PRECISION SNRIN
+      DOUBLE PRECISION SNRREF
       DOUBLE PRECISION TOTVAR
       DOUBLE PRECISION V1
       DOUBLE PRECISION V2
@@ -690,22 +699,31 @@
 
 *  Calculate the weight.
                IF( USEVIN .OR. USEVREF ) THEN
+
+*  Get the SNR of the reference pixel. Ignore values below 2.
+                  SNRREF = 0.0D0
                   IF( USEVREF ) THEN
-                     TOTVAR = VREF( IREF, JREF )
-                  ELSE
-                     TOTVAR = 0.0D0
+                     V1 = VREF( IREF, JREF )
+                     IF( V1 .NE. VAL__BADD .AND. V1 .GT. 0.0D0 ) THEN
+                        SNRREF = ABS( DREF )/SQRT( V1 )
+                        IF( SNRREF .LT. 2.0 ) SNRREF = 0.0
+                     END IF
                   END IF
 
-                  IF( USEVIN .AND. TOTVAR .NE. VAL__BADD ) THEN
-                     TOTVAR = TOTVAR*RFAC*RFAC + VINTERP
+*  Get the SNR of the input pixel. Ignore values below 2.
+                  SNRIN = 0.0D0
+                  IF( USEVIN ) THEN
+                     IF( VINTERP .NE. VAL__BADD .AND.
+     :                   VINTERP .GT. 0.0D0 ) THEN
+                        SNRIN = ABS( DREF )/SQRT( V1 )
+                        IF( SNRIN .LT. 2.0 ) SNRIN = 0.0
+                     END IF
                   END IF
 
-                  IF( TOTVAR .NE. VAL__BADD .AND.
-     :                TOTVAR .GT. 0.0D0 ) THEN
-                     WGT = 1.0D0/TOTVAR
-                  ELSE
-                     WGT = 0.0D0
-                  END IF
+*  The weight is the square root of the sum of the SNRs. Use the square
+*  root so that the alignment is not completely dominated by the brightest
+*  point in the map.
+                  WGT = SQRT( SNRIN + SNRREF )
 
                ELSE
                   WGT = 1.0D0
