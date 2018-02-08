@@ -1065,10 +1065,10 @@ sub calc_shared_scuba2_acsis {
   $results{OBJECT}   = (defined $fitsitem->{OBJECT} ? "$fitsitem->{OBJECT}" : "");
   $results{OBJECT} =~ s/\s+//g;
 
-  my $az     = (defined $fitsitem->{AZSTART} ?
+  my $az     = ((defined $fitsitem->{AZSTART} and defined $fitsitem2->{'AZEND'}) ?
                 sprintf("%6.2f",0.5*($fitsitem->{AZSTART}+$fitsitem2->{AZEND})) :
                 sprintf("%6s","n/a") );
-  my $el     = (defined $fitsitem->{ELSTART} ?
+  my $el     = ((defined $fitsitem->{ELSTART} and defined $fitsitem2->{'ELEND'}) ?
                 sprintf("%5.2f",0.5*($fitsitem->{ELSTART}+$fitsitem2->{ELEND})) :
                 sprintf("%5s","n/a") );
 
