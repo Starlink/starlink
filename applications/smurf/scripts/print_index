@@ -674,7 +674,7 @@ sub scuba2_header {
 
 
 format STDOUT_SHORT_SCU2 =
-@<<<<< UT Projid   Mode   InB Source          Map     Secs  Tau    WVM  See Dome
+@<<<<< UT Projid   Mode    InB Source         Map     Secs  Tau    WVM  See Dome
 $origin
 .
 
@@ -685,7 +685,7 @@ $origin
 
     # Declare formats here since it has to be in scope of the lexical variables
 format SHORT_SCU2 =
-@<< @<<<< @<<<<<<< @<<<<< @<< @<<<<<<<<<< @<<<<<<<<<< @<<<< @<<<< @<<< @<<< @<<<
+@<< @<<<< @<<<<<<< @<<<<<< @<< @<<<<<<<<< @<<<<<<<<<< @<<<< @<<<< @<<< @<<< @<<<
 $S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode, $inbeam, $S{OBJECT}, $map, $S{OBSTIME}, $S{CSOTAU}, $S{WVMTAU},$S{SEEING},$S{DOMESTATE}
 .
 
