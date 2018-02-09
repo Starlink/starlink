@@ -461,6 +461,10 @@
 *        where the map cannot be masked (in which case align2d may be
 *        influenced by the bright noisey edge pixels) by masking off the
 *        edges using the EXP_TIME values.
+*     9-FEB-2018 (DSB):
+*        Remove hardwired assumption of 850 data when looking for
+*        pre-existing I,Q,U time-stream data, and when checking value of
+*        NUMITER in the supplied config.
 '''
 
 import glob
@@ -829,6 +833,17 @@ try:
          invoke("$KAPPA_DIR/cdiv in={0} scalar={1} out={2}".format(ref,ref_fcf,refpw) )
          ref = refpw
 
+#  Get the waveband of the supplied data (450 or 850).
+   try:
+      filter = int( float( starutil.get_fits_header( indata[0], "FILTER", True )))
+   except starutil.NoValueError:
+      filter = 850
+      msg_out( "No value found for FITS header 'FILTER' in {0} - assuming 850".format(indata[0]))
+
+   if filter != 450 and filter != 850:
+      raise starutil.InvalidParameterError("Invalid FILTER header value "
+             "'{0} found in {1}.".format( filter, indata[0] ) )
+
 #  See if we should store I, Q and U values in mJy/beam in the output
 #  calatlogue.
    jy = parsys["JY"].value
@@ -837,23 +852,12 @@ try:
    if jy:
       fcf = parsys["FCF"].value
 
-#  If no FCF supplied, get the waveband and get the corresponding default
-#  FCF value.
+#  If no FCF supplied, get the default FCF for the waveband
       if fcf is None:
-         try:
-            filter = int( float( starutil.get_fits_header( indata[0], "FILTER", True )))
-         except starutil.NoValueError:
-            filter = 850
-            msg_out( "No value found for FITS header 'FILTER' in {0} - assuming 850".format(indata[0]))
-
          if filter == 450:
             fcf = 962.0
-         elif filter == 850:
-            fcf = 725.0
          else:
-            raise starutil.InvalidParameterError("Invalid FILTER header value "
-                   "'{0} found in {1}.".format( filter, indata[0] ) )
-
+            fcf = 725.0
 
 #  If IP correction is to be performed, get the map to be used to define
 #  the IP correction.
@@ -1042,36 +1046,37 @@ try:
 #  If REUSE is TRUE and old Q, U and I time-streams exists, re-use them.
             try:
                if reuse:
-                  aqts = NDG("{0}/s8a{1}\*_QT".format(qudir, id), True)
-                  auts = NDG("{0}/s8a{1}\*_UT".format(qudir, id), True)
-                  aits = NDG("{0}/s8a{1}\*_IT".format(qudir, id), True)
+                  w = filter // 100
+                  aqts = NDG("{0}/s{2}a{1}\*_QT".format(qudir,id,w), True)
+                  auts = NDG("{0}/s{2}a{1}\*_UT".format(qudir,id,w), True)
+                  aits = NDG("{0}/s{2}a{1}\*_IT".format(qudir,id,w), True)
                   anq = len( aqts )
                   anu = len( auts )
                   ani = len( aits )
                   if anq != anu or anq != ani:
                      raise starutil.NoNdfError("Ignoring pre-existing data")
 
-                  bqts = NDG("{0}/s8b{1}\*_QT".format(qudir, id), True)
-                  buts = NDG("{0}/s8b{1}\*_UT".format(qudir, id), True)
-                  bits = NDG("{0}/s8b{1}\*_IT".format(qudir, id), True)
+                  bqts = NDG("{0}/s{2}b{1}\*_QT".format(qudir,id,w), True)
+                  buts = NDG("{0}/s{2}b{1}\*_UT".format(qudir,id,w), True)
+                  bits = NDG("{0}/s{2}b{1}\*_IT".format(qudir,id,w), True)
                   bnq = len( bqts )
                   bnu = len( buts )
                   bni = len( bits )
                   if bnq != anq or bnu != anu or bni != ani:
                      raise starutil.NoNdfError("Ignoring pre-existing data")
 
-                  cqts = NDG("{0}/s8c{1}\*_QT".format(qudir, id), True)
-                  cuts = NDG("{0}/s8c{1}\*_UT".format(qudir, id), True)
-                  cits = NDG("{0}/s8c{1}\*_IT".format(qudir, id), True)
+                  cqts = NDG("{0}/s{2}c{1}\*_QT".format(qudir,id,w), True)
+                  cuts = NDG("{0}/s{2}c{1}\*_UT".format(qudir,id,w), True)
+                  cits = NDG("{0}/s{2}c{1}\*_IT".format(qudir,id,w), True)
                   cnq = len( cqts )
                   cnu = len( cuts )
                   cni = len( cits )
                   if cnq != anq or cnu != anu or cni != ani:
                      raise starutil.NoNdfError("Ignoring pre-existing data")
 
-                  dqts = NDG("{0}/s8d{1}\*_QT".format(qudir, id), True)
-                  duts = NDG("{0}/s8d{1}\*_UT".format(qudir, id), True)
-                  dits = NDG("{0}/s8d{1}\*_IT".format(qudir, id), True)
+                  dqts = NDG("{0}/s{2}d{1}\*_QT".format(qudir,id,w), True)
+                  duts = NDG("{0}/s{2}d{1}\*_UT".format(qudir,id,w), True)
+                  dits = NDG("{0}/s{2}d{1}\*_IT".format(qudir,id,w), True)
                   dnq = len( dqts )
                   dnu = len( duts )
                   dni = len( dits )
@@ -1594,9 +1599,10 @@ try:
 #  "pcathresh" is zero, indicating that no value has yet been determined for
 #  PCA.PCATHRESH. We also require the NUMITER config parameter is negative
 #  - i.e. MAPTOL defines convergence.
+               sel =  "450=1,850=0" if ( filter == 450 ) else "450=0,850=1"
                numiter = float( invoke("$KAPPA_DIR/configecho name=numiter config=^{0} "
                                        "defaults=$SMURF_DIR/smurf_makemap.def "
-                                       "select=\"\'450=0,850=1\'\"".format(conf)))
+                                       "select=\"\'{1}\'\"".format(conf,sel)))
                if pcathresh == 0 and numiter < 0:
                   pcathresh = pcathresh_def1 if automask else pcathresh_def2
                   abpar = "abortsoon=yes"
