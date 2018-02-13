@@ -378,7 +378,7 @@
 *        script exists (unless parameter RETAIN is set TRUE). [!]
 *     REF = NDF (Read)
 *        An optional map defining the pixel grid for the output maps,
-*        and which is used to determine pointing corrections. If null
+*        and which is used to determien pointing corrections. If null
 *        (!) is supplied, then the map (if any) specified by parameter
 *        MASK is used. See also parameter REFFCF. [!]
 *     REFFCF = _REAL (Read)
@@ -454,17 +454,6 @@
 *        supplied config, allow for the possibility that the config may contain
 *        no modelorder value at all. This bug prevented the abortsoon
 *        parameter being used with makemap in the majority of cases.
-*     7-FEB-2018 (DSB):
-*        Some maps have low correlation with the reference but can still
-*        be aligned successfully using kappa:align2d. So remove the
-*        correlation limit when running align2d. But guard against cases
-*        where the map cannot be masked (in which case align2d may be
-*        influenced by the bright noisey edge pixels) by masking off the
-*        edges using the EXP_TIME values.
-*     9-FEB-2018 (DSB):
-*        Remove hardwired assumption of 850 data when looking for
-*        pre-existing I,Q,U time-stream data, and when checking value of
-*        NUMITER in the supplied config.
 '''
 
 import glob
@@ -758,16 +747,12 @@ try:
 #  Get the reference map
    ref = parsys["REF"].value
    if not ref:
-      use_ref_for_alignment = False
-      if maskmap is not None:
+      if maskmap:
          ref = maskmap[0]
-         if masktype == "SIGNAL":
-            use_ref_for_alignment = True
       else:
          ref = "!"
 
    else:
-      use_ref_for_alignment = True
 
 #  If the REF map is in units of mJy/beam, convert it to pW using the FCF
 #  in the "FCF" FITS header if available, or the standard FCF for the
@@ -833,17 +818,6 @@ try:
          invoke("$KAPPA_DIR/cdiv in={0} scalar={1} out={2}".format(ref,ref_fcf,refpw) )
          ref = refpw
 
-#  Get the waveband of the supplied data (450 or 850).
-   try:
-      filter = int( float( starutil.get_fits_header( indata[0], "FILTER", True )))
-   except starutil.NoValueError:
-      filter = 850
-      msg_out( "No value found for FITS header 'FILTER' in {0} - assuming 850".format(indata[0]))
-
-   if filter != 450 and filter != 850:
-      raise starutil.InvalidParameterError("Invalid FILTER header value "
-             "'{0} found in {1}.".format( filter, indata[0] ) )
-
 #  See if we should store I, Q and U values in mJy/beam in the output
 #  calatlogue.
    jy = parsys["JY"].value
@@ -852,12 +826,23 @@ try:
    if jy:
       fcf = parsys["FCF"].value
 
-#  If no FCF supplied, get the default FCF for the waveband
+#  If no FCF supplied, get the waveband and get the corresponding default
+#  FCF value.
       if fcf is None:
+         try:
+            filter = int( float( starutil.get_fits_header( indata[0], "FILTER", True )))
+         except starutil.NoValueError:
+            filter = 850
+            msg_out( "No value found for FITS header 'FILTER' in {0} - assuming 850".format(indata[0]))
+
          if filter == 450:
             fcf = 962.0
-         else:
+         elif filter == 850:
             fcf = 725.0
+         else:
+            raise starutil.InvalidParameterError("Invalid FILTER header value "
+                   "'{0} found in {1}.".format( filter, indata[0] ) )
+
 
 #  If IP correction is to be performed, get the map to be used to define
 #  the IP correction.
@@ -1046,37 +1031,36 @@ try:
 #  If REUSE is TRUE and old Q, U and I time-streams exists, re-use them.
             try:
                if reuse:
-                  w = filter // 100
-                  aqts = NDG("{0}/s{2}a{1}\*_QT".format(qudir,id,w), True)
-                  auts = NDG("{0}/s{2}a{1}\*_UT".format(qudir,id,w), True)
-                  aits = NDG("{0}/s{2}a{1}\*_IT".format(qudir,id,w), True)
+                  aqts = NDG("{0}/s8a{1}\*_QT".format(qudir, id), True)
+                  auts = NDG("{0}/s8a{1}\*_UT".format(qudir, id), True)
+                  aits = NDG("{0}/s8a{1}\*_IT".format(qudir, id), True)
                   anq = len( aqts )
                   anu = len( auts )
                   ani = len( aits )
                   if anq != anu or anq != ani:
                      raise starutil.NoNdfError("Ignoring pre-existing data")
 
-                  bqts = NDG("{0}/s{2}b{1}\*_QT".format(qudir,id,w), True)
-                  buts = NDG("{0}/s{2}b{1}\*_UT".format(qudir,id,w), True)
-                  bits = NDG("{0}/s{2}b{1}\*_IT".format(qudir,id,w), True)
+                  bqts = NDG("{0}/s8b{1}\*_QT".format(qudir, id), True)
+                  buts = NDG("{0}/s8b{1}\*_UT".format(qudir, id), True)
+                  bits = NDG("{0}/s8b{1}\*_IT".format(qudir, id), True)
                   bnq = len( bqts )
                   bnu = len( buts )
                   bni = len( bits )
                   if bnq != anq or bnu != anu or bni != ani:
                      raise starutil.NoNdfError("Ignoring pre-existing data")
 
-                  cqts = NDG("{0}/s{2}c{1}\*_QT".format(qudir,id,w), True)
-                  cuts = NDG("{0}/s{2}c{1}\*_UT".format(qudir,id,w), True)
-                  cits = NDG("{0}/s{2}c{1}\*_IT".format(qudir,id,w), True)
+                  cqts = NDG("{0}/s8c{1}\*_QT".format(qudir, id), True)
+                  cuts = NDG("{0}/s8c{1}\*_UT".format(qudir, id), True)
+                  cits = NDG("{0}/s8c{1}\*_IT".format(qudir, id), True)
                   cnq = len( cqts )
                   cnu = len( cuts )
                   cni = len( cits )
                   if cnq != anq or cnu != anu or cni != ani:
                      raise starutil.NoNdfError("Ignoring pre-existing data")
 
-                  dqts = NDG("{0}/s{2}d{1}\*_QT".format(qudir,id,w), True)
-                  duts = NDG("{0}/s{2}d{1}\*_UT".format(qudir,id,w), True)
-                  dits = NDG("{0}/s{2}d{1}\*_IT".format(qudir,id,w), True)
+                  dqts = NDG("{0}/s8d{1}\*_QT".format(qudir, id), True)
+                  duts = NDG("{0}/s8d{1}\*_UT".format(qudir, id), True)
+                  dits = NDG("{0}/s8d{1}\*_IT".format(qudir, id), True)
                   dnq = len( dqts )
                   dnu = len( duts )
                   dni = len( dits )
@@ -1537,8 +1521,8 @@ try:
 #  header. If so, we use them when creating the new map.
          try:
             hmap = NDG("{0}/{1}_imap".format(mapdir,key))
-            dx = get_fits_header( hmap, "PNTRQ_DX" )
-            dy = get_fits_header( hmap, "PNTRQ_DY" )
+            dx = get_fits_header( hmap, "POINT_DX" )
+            dy = get_fits_header( hmap, "POINT_DY" )
          except starutil.NoNdfError:
             dx = None
             dy = None
@@ -1551,6 +1535,7 @@ try:
          if dx is not None and dy is not None:
             dx = float( dx )
             dy = float( dy )
+            msg_out( "   Using pre-calculated pointing corrections of ({0},{1}) arc-seconds".format(dx,dy) )
             if pntfile == "!":
                pntfile = NDG.tempfile()
                fd = open(pntfile,"w")
@@ -1563,6 +1548,12 @@ try:
             fd.write("54000 {0} {1}\n".format(dx,dy))
             fd.write("56000 {0} {1}\n".format(dx,dy))
             fd.close()
+            calculate_pointing = False
+         else:
+            calculate_pointing = True
+
+
+
 
 #  Get the path to the map.
          if automask:
@@ -1581,10 +1572,6 @@ try:
 #  Otherwise create a new map.  The call signature for makemap depends on
 #  whether an external mask is being supplied or not.
          except starutil.NoNdfError:
-
-            if dx is not None and dy is not None:
-               msg_out( "   Using pre-calculated pointing corrections of ({0},{1}) arc-seconds".format(dx,dy) )
-
             qui_maps[key] = NDG(mapname, False)
             try:
 
@@ -1599,10 +1586,9 @@ try:
 #  "pcathresh" is zero, indicating that no value has yet been determined for
 #  PCA.PCATHRESH. We also require the NUMITER config parameter is negative
 #  - i.e. MAPTOL defines convergence.
-               sel =  "450=1,850=0" if ( filter == 450 ) else "450=0,850=1"
                numiter = float( invoke("$KAPPA_DIR/configecho name=numiter config=^{0} "
                                        "defaults=$SMURF_DIR/smurf_makemap.def "
-                                       "select=\"\'{1}\'\"".format(conf,sel)))
+                                       "select=\"\'450=0,850=1\'\"".format(conf)))
                if pcathresh == 0 and numiter < 0:
                   pcathresh = pcathresh_def1 if automask else pcathresh_def2
                   abpar = "abortsoon=yes"
@@ -1668,26 +1654,13 @@ try:
                   else:
                      again = False
 
-#  Store FITS headers holding the pointing corrections that were actually used.
-               if pntfile != "!":
-                  sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(1)'".
-                                     format(qui_maps[key]))
-                  invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=POINT_DX "
-                         "edit=a value={1} comment=\"'Used {2} pointing correction [arcsec]'\""
-                         " position=! mode=interface".format(qui_maps[key],dx,sym))
-
-                  sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(2)'".
-                               format(qui_maps[key]))
-                  invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=POINT_DY "
-                         "edit=a value={1} comment=\"'Used {2} pointing correction [arcsec]'\""
-                         " position=! mode=interface".format(qui_maps[key],dy,sym))
-
-
 #  If makemap failed, warn the user and delete any map that was created,
 #  and pass on to the next observation chunk.
             except starutil.AtaskError:
                msg_out("WARNING: makemap failed - could not produce a {1} map "
                        "for observation chunk {0}".format(key,qui) )
+               if ref == qui_maps[key]:
+                  ref = "!"
                try:
                   invoke("$KAPPA_DIR/erase object={0} ok=yes".format(qui_maps[key]))
                except starutil.AtaskError:
@@ -1697,135 +1670,23 @@ try:
                   pcathresh = 0
                continue
 
-#  A map was obtained successfully. Add it to the list of maps in mapdir.
+#  A new map was created successfully. Add it to the list of new maps in
+#  mapdir.
          new_maps.append( qui_maps[key] )
 
+#  If no ref map was supplied, use the first map for the first observation as
+#  the ref map so that all maps are aligned.
+         if ref == "!":
+            ref = qui_maps[key]
 
-
-
-
-
-
-
-
-
-
-
-
-#  -----------  CREATE THE COADDED MAP FOR THE CURRENT STOKES PARAMETER -------------
-
-
-#  Check some good maps remain to be processed.
-      if len(qui_maps) == 0:
-         raise starutil.InvalidParameterError("No usable {0} maps remains "
-                                              "to be coadded.".format(qui))
-
-#  If required, create a reference map that defines the WCS for the
-#  catalogue grid, using a pixel size of BINSIZE.
-      if outcat and binsize is not None and catref is None:
-         key = list(qui_maps)[0]
-         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(qui_maps[key]) )
-         pxsize = float(get_task_par( "FPIXSCALE(1)", "ndftrace" ))
-         if binsize < pxsize:
-            raise starutil.InvalidParameterError("Requested catalogue bin "
-                          "size ({0}) is smaller than the map pixel size "
-                          "({1}).".format(binsize,pxsize))
-         else:
-            msg_out("The output vector catalogue will be based on maps "
-                    "that are binned up to {0} arcsec pixels.".format(binsize))
-
-         catref = NDG( 1 )
-         invoke("$KAPPA_DIR/sqorst in={0} out={1} mode=pixelscale method=near "
-                "pixscale=\"\'{2},{2},*\'\"".format(qui_maps[key],catref,binsize))
-
-
-#  If we have only one observation just copy it to the output maps.
-      if len(qui_maps) == 1:
-         key = list(qui_maps)[0]
-         invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(qui_maps[key],coadd))
-
-#  If required, bin it to the pixel size required by the catalogue.
-         if catref:
-            invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
-                   "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
-                   format(qui_maps[key],coadd_cat,catref))
-         elif outcat:
-            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
-
-#  If we have more than one observation, coadd them. Also coadd the
-#  extension NDFs (EXP_TIMES and WEIGHTS), but without normalisation so
-#  that the coadd is the sum rather than the mean of the inputs.
-      elif len(qui_maps) > 1:
-
-         msg_out("Coadding {0} maps from all observations:".format(qui))
-         allmaps = NDG( list( qui_maps.values() ) )
-         invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
-                "conserve=no method=near variance=yes genvar={2}".
-                format(allmaps,coadd,mapvar))
-
-         invoke("$KAPPA_DIR/erase object={0}.more.smurf.exp_time ok=yes".format(coadd))
-         invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.exp_time lbnd=! ref=! "
-                "out={1}.more.smurf.exp_time conserve=no method=bilin norm=no "
-                "variance=no".format(allmaps,coadd))
-
-         invoke("$KAPPA_DIR/erase object={0}.more.smurf.weights ok=yes".format(coadd))
-         invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.weights lbnd=! ref=! "
-                "out={1}.more.smurf.weights conserve=no method=bilin norm=no "
-                "variance=no".format(allmaps,coadd))
-
-#  If we are creating a binned up catalogue, bin the input observation maps
-#  up to the required catalogue bin size, and then coadd them.
-         if catref:
-            catmaps = NDG(allmaps)
-            invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
-                   "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
-                   format(allmaps,catmaps,catref))
-            invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
-                   "conserve=no method=near variance=yes genvar={2}".
-                   format(catmaps,coadd_cat,mapvar))
-         elif outcat:
-            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
-
-
-
-
-
-
-
-
-
-#  -----------  CALCULATE AND STORE POINTING CORRECTIONS IN NEW I MAPS ------------------------
-
-#  If we have just created the coadd of all I maps, we determine the pointing
-#  correct for each individual I map. This should give better results than
-#  using the I map from an individual observation as the reference (which
-#  is what was done prior to Feb 2018).
-      if qui == 'I':
-
-#  Choose the map with which to align each of the new I maps. We use the
-#  external reference map if one was supplied. Otherwise we use the I mosaic
-#  so long as it contains more than one observation (if there is only one
-#  observation then the aligment is bound to be a unit transformation
-#  because the mosaic and the individual map will be identical).
-         if use_ref_for_alignment:
-            aref = ref
-         elif len(qui_maps) > 1 and imap:
-            aref = imap
-         else:
-            aref = "!"
-
-#  Loop round all observations.
-         for key in qui_maps:
-
-#  Can't align if we have no reference.
-            if aref == "!":
-               continue
-
-#  See what translations (in pixels) are needed to align the new I map with
-#  the reference map. The determination of the shift is more accurate if we
-#  first mask out background areas. Use the AST mask to define source pixels,
-#  but only if the mask contains a reasonable number of pixels (very faint
-#  sources will have very small or non-existant AST masks).
+#  If the pointing correction is not already known, and we have just
+#  created an I map, see what translations (in pixels) are needed to align
+#  the new I map with the reference map. The determination of the shift is
+#  more accurate if we first mask out background areas. Use the AST mask to
+#  define source pixels, but only if the mask contains a reasonable number
+#  of pixels (very faint sources will have very small or non-existant AST
+#  masks).
+         if calculate_pointing and qui == 'I':
             invoke("$KAPPA_DIR/showqual ndf={0}".format(qui_maps[key]))
             if get_task_par( "QNAMES(1)", "showqual" ) == "AST":
                bb = 1
@@ -1840,26 +1701,18 @@ try:
                invoke("$KAPPA_DIR/setbb ndf={0} bb={1}".format(qui_maps[key],bb))
 
 #  Clear badbits to use the whole map if the above masking results in too
-#  few pixels, and instead mask the map to remove pixels that have less
-#  than the mean exposure time per pixel.
+#  few pixels.
             invoke("$KAPPA_DIR/stats ndf={0}".format(qui_maps[key]))
             nused = float( get_task_par( "numgood", "stats" ) )
             if nused < 400:
                invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(qui_maps[key]))
-               invoke("$KAPPA_DIR/stats ndf={0}".format(qui_maps[key]))
-               mean = float( get_task_par( "mean", "stats" ) )
-               aligner = NDG(1)
-               invoke( "$KAPPA_DIR/maths exp=\"'qif((ia.ge.pa),ib,<bad>'\" "
-                       "ia={0}.more.smurf.exp_time ib={0} pa={1} out={2}".
-                       format(qui_maps[key],mean,aligner) )
-            else:
-               aligner = qui_maps[key]
 
 #  Find the pixel shift that aligns features in this masked, trimmed I map with
 #  corresponding features in the reference map.
             try:
-               invoke("$KAPPA_DIR/align2d ref={0} out=! in={1} form=3".
-                      format(aref,aligner))
+               invoke("$KAPPA_DIR/align2d ref={0} out=! in={1} form=3 "
+                      "corlimit=0.7 rebin=no method=sincsinc params=\[0,2\]".
+                      format(ref,qui_maps[key]))
                dx = float( get_task_par( "TR(1)", "align2d" ) )
                dy = float( get_task_par( "TR(4)", "align2d" ) )
 
@@ -1869,17 +1722,19 @@ try:
                dx = 1E6
                dy = 1E6
 
-#  Ensure the bad-bits mask has been reset.
+#  Reset the bad-bits mask.
             if bb > 0:
                invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(qui_maps[key]))
 
 #  If the shifts are suspiciously high, we do not believe them. In which
 #  case we cannot do pointing ocorrection when creating the Q and U maps.
-            if abs(dx) > 8 or abs(dy) > 8:
-               msg_out( "\nWARNING: {0}: The I map created from the POL2 data cannot "
-                        "be aligned with the supplied reference map. Check the maps "
-                        "for the current observation to see if they should be omitted "
-                        "from the reduction.\n".format(key) )
+            if abs(dx) > 5 or abs(dy) > 5:
+               pointing_dx = "null"
+               pointing_dy = "null"
+               dx = None
+               dy = None
+               msg_out( "\nWARNING: The I map created from the POL2 data cannot be aligned "
+                        "with the supplied reference map.\n" )
 
 #  Otherwise, convert the offset in pixels to (longitude,latitude) offsets
 #  in the sky system of the reference map, in arc-seconds....
@@ -1941,25 +1796,99 @@ try:
                db = offb - cenb
                if db < 0.0:
                   dy = -dy
-               msg_out( "{0}: Storing pointing corrections of ({1:5.1f},{2:5.1f}) "
-                        "arc-seconds for future use".format(key,dx,dy) )
+               msg_out( "Storing pointing corrections of ({0},{1}) "
+                        "arc-seconds for future use".format(dx,dy) )
 
-#  Store the required pointing corrections as FITS headers within the map.
-               sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(1)'".
-                                  format(qui_maps[key]))
-               invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=PNTRQ_DX "
-                      "edit=a value={1} comment=\"'Required {2} pointing correction [arcsec]'\""
-                      " position=! mode=interface".format(qui_maps[key],dx,sym))
+#  Store the pointing corrections as FITS headers within the map. Do this whether
+#  they were calculated here or inherited from an earlier map.
+         if dx is not None and dy is not None:
+            sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(1)'".
+                               format(qui_maps[key]))
+            invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=POINT_DX "
+                   "edit=w value={1} comment=\"'{2} pointing correction [arcsec]'\""
+                   " position=! mode=interface".format(qui_maps[key],dx,sym))
 
-               sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(2)'".
-                            format(qui_maps[key]))
-               invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=PNTRQ_DY "
-                      "edit=a value={1} comment=\"'Required {2} pointing correction [arcsec]'\""
-                      " position=! mode=interface".format(qui_maps[key],dy,sym))
+            sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(2)'".
+                         format(qui_maps[key]))
+            invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=POINT_DY "
+                   "edit=w value={1} comment=\"'{2} pointing correction [arcsec]'\""
+                   " position=! mode=interface".format(qui_maps[key],dy,sym))
 
 
 
+#  -----------  CREATE THE COADDED MAP FOR THE CURRENT STOKES PARAMETER -------------
 
+
+#  Check some good maps remain to be processed.
+      if len(qui_maps) == 0:
+         raise starutil.InvalidParameterError("No usable {0} maps remains "
+                                              "to be coadded.".format(qui))
+
+#  If required, create a reference map that defines the WCS for the
+#  catalogue grid, using a pixel size of BINSIZE.
+      if outcat and binsize is not None and catref is None:
+         key = list(qui_maps)[0]
+         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(qui_maps[key]) )
+         pxsize = float(get_task_par( "FPIXSCALE(1)", "ndftrace" ))
+         if binsize < pxsize:
+            raise starutil.InvalidParameterError("Requested catalogue bin "
+                          "size ({}) is smaller than the map pixel size "
+                          "({}).".format(binsize,pxsize))
+         else:
+            msg_out("The output vector catalogue will be based on maps "
+                    "that are binned up to {0} arcsec pixels.".format(binsize))
+
+         catref = NDG( 1 )
+         invoke("$KAPPA_DIR/sqorst in={0} out={1} mode=pixelscale method=near "
+                "pixscale=\"\'{2},{2},*\'\"".format(qui_maps[key],catref,binsize))
+
+
+#  If we have only one observation just copy it to the output maps.
+      if len(qui_maps) == 1:
+         key = list(qui_maps)[0]
+         invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(qui_maps[key],coadd))
+
+#  If required, bin it to the pixel size required by the catalogue.
+         if catref:
+            invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
+                   "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
+                   format(qui_maps[key],coadd_cat,catref))
+         elif outcat:
+            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
+
+#  If we have more than one observation, coadd them. Also coadd the
+#  extension NDFs (EXP_TIMES and WEIGHTS), but without normalisation so
+#  that the coadd is the sum rather than the mean of the inputs.
+      elif len(qui_maps) > 1:
+
+         msg_out("Coadding {0} maps from all observations:".format(qui))
+         allmaps = NDG( list( qui_maps.values() ) )
+         invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
+                "conserve=no method=near variance=yes genvar={2}".
+                format(allmaps,coadd,mapvar))
+
+         invoke("$KAPPA_DIR/erase object={0}.more.smurf.exp_time ok=yes".format(coadd))
+         invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.exp_time lbnd=! ref=! "
+                "out={1}.more.smurf.exp_time conserve=no method=bilin norm=no "
+                "variance=no".format(allmaps,coadd))
+
+         invoke("$KAPPA_DIR/erase object={0}.more.smurf.weights ok=yes".format(coadd))
+         invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.weights lbnd=! ref=! "
+                "out={1}.more.smurf.weights conserve=no method=bilin norm=no "
+                "variance=no".format(allmaps,coadd))
+
+#  If we are creating a binned up catalogue, bin the input observation maps
+#  up to the required catalogue bin size, and then coadd them.
+         if catref:
+            catmaps = NDG(allmaps)
+            invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
+                   "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
+                   format(allmaps,catmaps,catref))
+            invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
+                   "conserve=no method=near variance=yes genvar={2}".
+                   format(catmaps,coadd_cat,mapvar))
+         elif outcat:
+            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
 
 
 
@@ -2000,7 +1929,7 @@ try:
 #  requires a 2D POLANAL Frame. So use wcsframe to create the 2D Frame
 #  from the 3D Frame, then delete the 3D Frame.
          invoke( "$KAPPA_DIR/wcsframe ndf={0} frame=POLANAL".format(cube) )
-         invoke( "$KAPPA_DIR/wcsremove ndf={0} frame=POLANAL-SPECTRUM".format(cube) )
+         invoke( "$KAPPA_DIR/wcsremove ndf={0} frames=POLANAL-SPECTRUM".format(cube) )
 
 #  Re-instate SKY as the current Frame
          invoke( "$KAPPA_DIR/wcsframe ndf={0} frame=SKY".format(cube) )
