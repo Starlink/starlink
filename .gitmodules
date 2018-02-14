@@ -163,3 +163,12 @@
 [submodule "libext/ast"]
 	path = libext/ast
 	url = ../ast.git
+[submodule "thirdparty/hdfgroup/hdf5/hdf5"]
+	path = thirdparty/hdfgroup/hdf5/hdf5
+	url = ../hdf5.git
+[submodule "libext/hds-v5"]
+	path = libext/hds-v5
+	url = ../hds-v5.git
+[submodule "libext/hds-v4"]
+	path = libext/hds-v4
+	url = ../hds-v4.git

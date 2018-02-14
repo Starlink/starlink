@@ -82,7 +82,7 @@
 #  followed by the list of options for packages on which HDS depends.
 #  Pass the result through an awk script to remove duplicate library
 #  references.
-      echo "${special}" -lhdsf -lhds `chr_link_adam` `ems_link_adam` `cnf_link_adam` `starmem_link` \
+      echo "${special}" -lhdsf -lhds `one_link_adam` `chr_link_adam` `ems_link_adam` `cnf_link_adam` `starmem_link` \
            | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
 
 #  End of script.

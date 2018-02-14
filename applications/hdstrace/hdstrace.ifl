@@ -156,4 +156,25 @@ interface HDSTRACE
       helpkey     *
    endparameter
 
+   parameter HDSVERSION          # Output parameter to recieve HDS version
+      type        _INTEGER
+      access      'WRITE'
+      vpath       'DEFAULT'
+      default     0
+      helpkey     '*'
+   endparameter
+
+   parameter      VERSION        # Display HDS version at end of trace?
+      position    11
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      default     NO
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Display HDS version number at end of trace?'
+      helpkey     *
+   endparameter
+
+
+
 endinterface

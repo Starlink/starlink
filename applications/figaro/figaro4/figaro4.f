@@ -67,6 +67,8 @@
 *        GOODVAR removed as it was transferred to Figaro in 2001 July.
 *     24-APR-2006 (TIMJ):
 *        Force inclusion of block data
+*     2014-11-14 (TIMJ):
+*        Cancel NDF parameters to free dangling locators.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -99,6 +101,10 @@
 *  Get task name.
       CALL TASK_GET_NAME( ACTION, STATUS )
       CALL CHR_UCASE( ACTION )
+
+*  Mark currently active NDF parameters so that they will not be
+*  canceled at the end.
+      CALL NDF_CANCL( '*', STATUS)
 
 *  Test the action name against each valid value in turn, calling the
 *  appropriate routine...
@@ -210,5 +216,8 @@
      :                 'not recognised by the SPECDRE monolith.',
      :                 STATUS )
       END IF
+
+*  Cancel any remaining NDF parameters that were opened by this action
+      CALL NDF_CANCL( ' ', STATUS)
 
       END

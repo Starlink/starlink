@@ -6,7 +6,7 @@
 \stardocnumber      {102.4}
 \stardocsource      {sun\stardocnumber}
 \stardocauthors     {Malcolm J. Currie}
-\stardocdate        {2014 November 15}
+\stardocdate        {2017 May 16}
 \stardoctitle       {HDSTRACE --- Listing HDS Data Files}
 \stardocversion     {1.2}
 \stardocmanual      {User's Guide}
@@ -535,6 +535,9 @@ would give a full trace of the last object traced.
       almost all HDS structures or objects.  The examination may also
       be written to an text file as well as being reported to the user.
 
+      The version number of the HDS data format used by the supplied file
+      may also be displayed. See parameter VERSION.
+
       For the specified ADAM data-system object ($X$) there are three
       cases which are handled:
 
@@ -598,6 +601,15 @@ would give a full trace of the last object traced.
          If \texttt{true}, all the contents of an array of structures will be
          traced, otherwise only the first element is examined. \texttt{[FALSE]}
       }
+
+      \sstsubsection{
+         HDSVERSION = \_INTEGER (Write)
+      }{
+         An output parameter in which is placed the version number of
+         the HDS data format used by the supplied file. See also parameter
+         VERSION.
+      }
+
       \sstsubsection{
          LOGFILE = FILENAME (Read)
       }{
@@ -655,6 +667,15 @@ would give a full trace of the last object traced.
          there be a gap of at least two columns.  HDS types can be up
          to 15 characters. \texttt{[15]}
       }
+
+      \sstsubsection{
+         VERSION = \_LOGICAL (Read)
+      }{
+         If true, the version number (an integer) of the HDS data format
+         used by the supplied file is appended to the end of the trace.
+         It is also stored in output parameter HDSVERSION. \texttt{[FALSE]}
+      }
+
       \sstsubsection{
          WIDEPAGE = \_LOGICAL (Read)
       }{

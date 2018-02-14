@@ -56,7 +56,8 @@
 # include <config.h>
 #endif
 
-#include "hds1.h"
+#include <string.h>
+#include "sae_par.h"
 #include "hds.h"
 #include <stdlib.h>
 #include "ems.h"
@@ -72,7 +73,7 @@ int main (void) {
 
   /*  Local Variables: */
   const char path[] = "hds_ctest";
-  int status = DAT__OK;
+  int status = SAI__OK;
   hdsdim dim[] = { 10, 20 };
   hdsdim dimd[1];
   const char * chararr[] = { "TEST1", "TEST2", "Longish String" };
@@ -115,15 +116,19 @@ int main (void) {
     hdsdim celldims[] = {1};
     hdsdim gdims[DAT__MXDIM];
     datShape(loc1, DAT__MXDIM, gdims, &gndim, &status);
-    printf("GROUP NDIMS: %d\n", gndim);
-    for (i=0; i<gndim; i++) {
-      printf(" Dim[%d] = %zu\n", i, (size_t)gdims[i]);
+    if (status == SAI__OK) {
+      printf("GROUP NDIMS: %d\n", gndim);
+      for (i=0; i<gndim; i++) {
+        printf(" Dim[%d] = %zu\n", i, (size_t)gdims[i]);
+      }
     }
     datVec( loc1, &loc2, &status);
     datShape(loc2, DAT__MXDIM, gdims, &gndim, &status);
-    printf("GROUP NDIMS: %d\n", gndim);
-    for (i=0; i<gndim; i++) {
-      printf(" Dim[%d] = %zu\n", i, (size_t)gdims[i]);
+    if (status == SAI__OK) {
+      printf("GROUP NDIMS: %d\n", gndim);
+      for (i=0; i<gndim; i++) {
+        printf(" Dim[%d] = %zu\n", i, (size_t)gdims[i]);
+      }
     }
     datCell( loc2, 1, celldims, &loc3, &status );
     datAnnul( &loc3, &status );
@@ -201,7 +206,7 @@ int main (void) {
   datPut0K( loc2, testin64, &status );
   datGet0K( loc2, &test64, &status );
   datAnnul( &loc2, &status );
-  if (status == DAT__OK) {
+  if (status == SAI__OK) {
     if ( test64 != testin64 ) {
       status = DAT__FATAL;
       emsRepf( "TESTI64", "Test _INT64 value %" PRIi64 " did not match expected %"PRIi64,
@@ -213,7 +218,7 @@ int main (void) {
   datPut0K( loc2, VAL__BADK, &status );
   datGet0K( loc2, &test64, &status );
   datAnnul( &loc2, &status );
-  if (status == DAT__OK) {
+  if (status == SAI__OK) {
     if ( test64 != VAL__BADK ) {
       status = DAT__FATAL;
       emsRepf( "TESTBADI64", "Test _INT64 value %" PRIi64 " did not match expected VAL__BADK",
@@ -226,7 +231,7 @@ int main (void) {
 
   traceme(loc2, &status);
 
- if (status == DAT__OK) {
+ if (status == SAI__OK) {
     /* Do not use MERS in test. We create an error message
        with EMS and then extract it as text */
     int lstat = DAT__FATAL;
@@ -250,7 +255,7 @@ int main (void) {
 
   /* Check contents */
   datGetVC(loc2, 3, 1024, buffer, retchararr, &actval, &status);
-  if (status == DAT__OK) {
+  if (status == SAI__OK) {
     if (actval == 3) {
       for (i = 0; i < 3; i++ ) {
 	if (strncmp( chararr[i], retchararr[i], strlen(chararr[i]) ) ) {
@@ -281,7 +286,7 @@ int main (void) {
 
   /* Check contents */
   datGetVD( loc2, 2, retdarr, &actval, &status);
-  if (status == DAT__OK) {
+  if (status == SAI__OK) {
     if (actval == 2) {
       for (i = 0; i < 2; i++ ) {
          if (darr[i] != retdarr[i]) {
@@ -299,7 +304,7 @@ int main (void) {
   /* Try mapping - _DOUBLE */
   dimd[0] = 2;
   datMapD(loc2, "READ", 1, dimd, &mapd, &status);
-  if (status == DAT__OK) {
+  if (status == SAI__OK) {
       for (i = 0; i < 2; i++ ) {
          if (darr[i] != mapd[i]) {
            status = DAT__DIMIN;
@@ -312,7 +317,7 @@ int main (void) {
 
   /* Try mapping - _FLOAT */
   datMapR(loc2, "READ", 1, dimd, &mapf, &status);
-  if (status == DAT__OK) {
+  if (status == SAI__OK) {
       for (i = 0; i < 2; i++ ) {
          if ( (float)darr[i] != mapf[i]) {
            status = DAT__DIMIN;
@@ -330,7 +335,7 @@ int main (void) {
   datFind( loc1, "DATA_ARRAY", &loc2, &status );
   datMapV( loc2, "_REAL", "WRITE", &mapv, &nel, &status );
   mapf = mapv;
-  if (status == DAT__OK) {
+  if (status == SAI__OK) {
     nelt = dim[0] * dim[1];
     if ( nelt != nel) {
       status = DAT__FATAL;
@@ -355,7 +360,7 @@ int main (void) {
   datFind( loc1, "DATA_ARRAY", &loc2, &status );
   datVec( loc2, &loc3, &status );
   datSize( loc3, &nel, &status);
-  if (status == DAT__OK) {
+  if (status == SAI__OK) {
     nelt = dim[0] * dim[1];
     if ( nelt != nel) {
       status = DAT__FATAL;
@@ -366,7 +371,7 @@ int main (void) {
   }
 
   datPrec( loc3, &nbytes, &status );
-  if (status == DAT__OK) {
+  if (status == SAI__OK) {
     if ( nbytes != 4) {
       status = DAT__FATAL;
       emsSeti( "NB", nbytes );
@@ -374,7 +379,7 @@ int main (void) {
     }
   }
   datLen( loc3, &nbytes, &status );
-  if (status == DAT__OK) {
+  if (status == SAI__OK) {
     if ( nbytes != 4) {
       status = DAT__FATAL;
       emsSeti( "NB", nbytes );
@@ -383,16 +388,16 @@ int main (void) {
   }
 
   /* Try hdsShow */
-  hdsShow("LOCATORS", &status);
-  hdsShow("FILES", &status);
-  hdsInfoI(NULL, "LOCATORS", "!HDS_TEST.,YYY", &n, &status );
-  hdsInfoI(NULL, "FILES", NULL, &n, &status );
+  //hdsShow("LOCATORS", &status);
+  //hdsShow("FILES", &status);
+  //hdsInfoI(NULL, "LOCATORS", "!HDS_TEST.,YYY", &n, &status );
+  //hdsInfoI(NULL, "FILES", NULL, &n, &status );
 
   datAnnul( &loc3, &status );
 
   datMapV( loc2, "_INTEGER", "READ", &mapv, &nel, &status );
   mapi = mapv;
-  if (status == DAT__OK) {
+  if (status == SAI__OK) {
     nelt = dim[0] * dim[1];
     if ( nelt != nel) {
       status = DAT__FATAL;
@@ -407,7 +412,7 @@ int main (void) {
   }
   datUnmap( loc2, &status );
 
-  if (status == DAT__OK) {
+  if (status == SAI__OK) {
     if (sumi != (int)sumd) {
       status = DAT__FATAL;
       emsSeti( "I", sumi );
@@ -419,7 +424,7 @@ int main (void) {
   /* _INT64 test */
   datMapV( loc2, "_INT64", "READ", &mapv, &nel, &status );
   mapi64 = mapv;
-  if (status == DAT__OK) {
+  if (status == SAI__OK) {
     nelt = dim[0] * dim[1];
     if ( nelt != nel) {
       status = DAT__FATAL;
@@ -434,7 +439,7 @@ int main (void) {
   }
   datUnmap( loc2, &status );
 
-  if (status == DAT__OK) {
+  if (status == SAI__OK) {
     if (sumi64 != (int)sumd) {
       status = DAT__FATAL;
       emsSeti( "I", (int)sumi64 );
@@ -447,7 +452,7 @@ int main (void) {
   /* Tidy up and close */
   //hdsErase( &loc1, &status );
 
-  if (status == DAT__OK) {
+  if (status == SAI__OK) {
     printf("HDS C installation test succeeded\n");
     emsEnd(&status);
     return EXIT_SUCCESS;
@@ -480,7 +485,9 @@ static void traceme (const HDSLoc * loc, int *status) {
     hdsTrace( loc, &nlev, path_str, file_str,
               status, sizeof(path_str),
               sizeof(file_str));
-    printf("File: '%s' Path: '%s' Level = %d\n", file_str,
-           path_str, nlev);
+    if (*status == SAI__OK) {
+      printf("File: '%s' Path: '%s' Level = %d\n", file_str,
+             path_str, nlev);
+    }
   }
 

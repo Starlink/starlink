@@ -28,6 +28,9 @@
 *     almost all HDS structures or objects.  The examination may also
 *     be written to a text file as well as being reported to the user.
 *
+*     The version number of the HDS data format used by the supplied file
+*     may also be displayed. See parameter VERSION.
+*
 *     For the specified ADAM data-system object (X) there are three
 *     cases which are handled:
 *
@@ -76,7 +79,7 @@
 
 *  Usage:
 *     hdstrace object [full] [nlines] [typind] [valind] [logfile]
-*        [eachline] [newline] [width] [widepage]
+*        [eachline] [newline] [width] [widepage] [version]
 
 *  ADAM Parameters:
 *     EACHLINE = _LOGICAL (Read)
@@ -86,6 +89,10 @@
 *     FULL = _LOGICAL (Read)
 *        If true, all the contents of an array of structures will be
 *        traced, otherwise only the first element is examined. [FALSE]
+*     HDSVERSION = _INTEGER (Write)
+*        An output parameter in which is placed the version number of
+*        the HDS data format used by the supplied file. See also parameter
+*        VERSION.
 *     LOGFILE = FILENAME (Read)
 *        The name of the ASCII file to contain a log of the examination
 *        of the data object.  Null (!) means do not create a log file.
@@ -125,6 +132,10 @@
 *        provided alignment will be lost, since HDSTRACE insists that
 *        there be a gap of at least two columns.  HDS types can be up
 *        to 15 characters. [15]
+*     VERSION = _LOGICAL (Read)
+*        If true, the version number (an integer) of the HDS data format
+*        used by the supplied file is appended to the end of the trace.
+*        It is also stored in output parameter HDSVERSION. [FALSE]
 *     WIDEPAGE = _LOGICAL (Read)
 *        If true a 132-character-wide format is used to report the
 *        examination.  Otherwise the format is 80 characters wide.
@@ -187,6 +198,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -219,6 +231,8 @@
 *        message-system output size to match.  Only access WIDEPAGE if
 *        WIDTH is undefined.  WIDEPAGE is retained only for backwards
 *        compatibility.
+*     2017 May 16 (DSB):
+*        Added VERSION and HDSVERSION parameters.
 *     {enter_further_changes_here}
 
 *-
@@ -231,6 +245,7 @@
       INCLUDE 'DAT_PAR'        ! Data-system constants
       INCLUDE 'PAR_ERR'        ! Parameter-system errors
       INCLUDE 'PRM_PAR'        ! Maximum-value constant
+      INCLUDE 'MSG_PAR'        ! MSG constants
 
 *  Status:
       INTEGER STATUS           ! Global status
@@ -274,6 +289,8 @@
      :  ONEPLN,                ! Character arrays will have one element
                                ! reported per line
      :  PRIM,                  ! Object is primitive
+     :  QUIET,                 ! Will screen output be suppressed?
+     :  VERSIO,                ! Display the HDS version number?
      :  WIDEPG                 ! A wide page (132 character) is produced
                                ! rather than default 80
 
@@ -281,6 +298,8 @@
      :  CMNTYP,                ! Indentation for type
      :  CMNVAL,                ! Indentation for value
      :  FD,                    ! File description
+     :  FILTER,                ! MSG filtering level
+     :  HDSVER,                ! HDS version number
      :  I, J,                  ! Character counters
      :  INDENT,                ! Indentation level for text output
      :  NDIM,                  ! Dimensionality of the object
@@ -297,6 +316,11 @@
 *    Check global status for an error.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Get the conditional filtering level for screen output, and set a flag
+*    if no screen output will be displayed.
+      CALL MSG_IFLEV( FILTER, ' ', STATUS )
+      QUIET = ( FILTER .EQ. MSG__QUIET )
 
 *    Get a locator to the desired object.
 
@@ -376,6 +400,10 @@
 
       CALL PAR_GTD0L( 'EACHLINE', .FALSE., .TRUE., ONEPLN, STATUS )
 
+*    Get the switch for displaying the HDS version number.
+
+      CALL PAR_GET0L( 'VERSION', VERSIO, STATUS )
+
 *    Something has gone wrong obtaining the parameters.  Tidy the
 *    locator and exit.
 
@@ -412,79 +440,89 @@
       IF ( LOGEXM )
      :   CALL MSG_OUT( 'LOG', 'Logging to $LOGFILE', STATUS )
 
+*    Store the HDS version number in an output parameter.
+
+      CALL HDS_INFOI( OBJLOC, 'VERSION', ' ', HDSVER, STATUS )
+      CALL PAR_PUT0I( 'HDSVERSION', HDSVER, STATUS )
+
+*    Skip the rest if no output is required either on the screen or in a
+*    log file.
+
+      IF ( .NOT. QUIET .OR. LOGEXM ) THEN
+
 *    Set the indentation column.
 
-      INDENT = STEP
+         INDENT = STEP
 
 *    Get all necessary information on this object.
 
-      CALL TRA_LOCIN( OBJLOC, NAME, PRIM, TYPE, SIZE, NDIM, DIMS,
-     :                STATUS )
+         CALL TRA_LOCIN( OBJLOC, NAME, PRIM, TYPE, SIZE, NDIM, DIMS,
+     :                   STATUS )
 
 *    Report the header.
 
-      CALL MSG_OUT( 'BLANK', ' ', STATUS )
-      CALL MSG_SETC( 'TYPE', TYPE )
-      CALL MSG_OUT( 'HDSTRACE_START', '$OBJECT  <^TYPE>', STATUS )
-      CALL MSG_OUT( 'BLANK', ' ', STATUS )
+         CALL MSG_OUT( 'BLANK', ' ', STATUS )
+         CALL MSG_SETC( 'TYPE', TYPE )
+         CALL MSG_OUT( 'HDSTRACE_START', '$OBJECT  <^TYPE>', STATUS )
+         CALL MSG_OUT( 'BLANK', ' ', STATUS )
 
 *    Write the header to the logfile.
 *    =================================
 
-      IF ( LOGEXM .AND. STATUS .EQ. SAI__OK ) THEN
-         DUMMY = ' '
-         CALL FIO_WRITE( FD, DUMMY( 1:1 ), STATUS )
-         I = 0
+         IF ( LOGEXM .AND. STATUS .EQ. SAI__OK ) THEN
+            DUMMY = ' '
+            CALL FIO_WRITE( FD, DUMMY( 1:1 ), STATUS )
+            I = 0
 
 *       Obtain the file name.  This is not ideal.
 
-         CALL HDS_TRACE( OBJLOC, NLEV, OBJNAM, FILSPC, STATUS )
+            CALL HDS_TRACE( OBJLOC, NLEV, OBJNAM, FILSPC, STATUS )
 
 *       Form the output string.
 
-         J = CHR_LEN( OBJNAM )
-         CALL CHR_PUTC( OBJNAM( 1:J ), DUMMY, I )
-         CALL CHR_PUTC( '  <', DUMMY, I )
-         J = CHR_LEN( TYPE )
-         CALL CHR_PUTC( TYPE( 1:J ), DUMMY, I )
-         CALL CHR_PUTC( '>', DUMMY, I )
+            J = CHR_LEN( OBJNAM )
+            CALL CHR_PUTC( OBJNAM( 1:J ), DUMMY, I )
+            CALL CHR_PUTC( '  <', DUMMY, I )
+            J = CHR_LEN( TYPE )
+            CALL CHR_PUTC( TYPE( 1:J ), DUMMY, I )
+            CALL CHR_PUTC( '>', DUMMY, I )
 
 *       Write the header line to the log file.
 
-         CALL FIO_WRITE( FD, DUMMY( 1:I ), STATUS )
-      END IF
+            CALL FIO_WRITE( FD, DUMMY( 1:I ), STATUS )
+         END IF
 
 *    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 *    Deal with the object depending on whether it is PRIMITIVE,
 *    a STRUCTURE or an ARRAY of STRUCTURES.
 
-      IF ( PRIM ) THEN
+         IF ( PRIM ) THEN
 
 *       Write out the information and values associated with the
 *       primitive object.
 
-         CALL TRA_PRIMI( OBJLOC, NAME, TYPE, SIZE, NDIM, DIMS,
-     :                   INDENT, CMNVAL, NEWLIN, NLINES, ONEPLN,
-     :                   LOGEXM, FD, LINE( :WIDTH ), STATUS )
+            CALL TRA_PRIMI( OBJLOC, NAME, TYPE, SIZE, NDIM, DIMS,
+     :                      INDENT, CMNVAL, NEWLIN, NLINES, ONEPLN,
+     :                      LOGEXM, FD, LINE( :WIDTH ), STATUS )
 
 *       Insert a blank line to match the output from the Hierarchical
 *       trace.
 
-         CALL MSG_BLANK( STATUS )
-         IF ( LOGEXM ) CALL FIO_WRITE( FD, ' ', STATUS )
+            CALL MSG_BLANK( STATUS )
+            IF ( LOGEXM ) CALL FIO_WRITE( FD, ' ', STATUS )
 
-      ELSE
+         ELSE
 
 *      Check for a scalar-structure object.
 
-         IF ( NDIM .GT. 0 ) THEN
+            IF ( NDIM .GT. 0 ) THEN
 
 *         We must have an array of structures; output its name and
 *         dimensions.
-*
-            CALL TRA1_ARSTR( NAME, NDIM, DIMS, INDENT, LOGEXM, FD,
-     :                       LINE( :WIDTH ), STATUS )
+
+               CALL TRA1_ARSTR( NAME, NDIM, DIMS, INDENT, LOGEXM, FD,
+     :                          LINE( :WIDTH ), STATUS )
 
 *         Increment the indentation by one step so that in the output
 *         the "Contents of..." message is aligned with the structure's
@@ -492,34 +530,56 @@
 *         of structures are indented with respect to the structure's
 *         name.
 
-            INDENT = INDENT + STEP
-         END IF
+               INDENT = INDENT + STEP
+            END IF
 
 *       Examine the scalar structure using the recursive routine.
 
-         CALL TRA1_THIER( OBJLOC, INDENT, FULL, STEP, CMNTYP,
-     :                    CMNVAL, NEWLIN, NLINES, ONEPLN, LOGEXM,
-     :                    FD, LINE( : WIDTH ), STATUS )
+            CALL TRA1_THIER( OBJLOC, INDENT, FULL, STEP, CMNTYP,
+     :                       CMNVAL, NEWLIN, NLINES, ONEPLN, LOGEXM,
+     :                       FD, LINE( : WIDTH ), STATUS )
 
-      END IF
+         END IF
 
 *    Write the termination message.
 
-      CALL MSG_OUT( 'HDSTRACE_END', 'End of Trace.', STATUS )
-      CALL MSG_BLANK( STATUS )
+         CALL MSG_OUT( 'HDSTRACE_END', 'End of Trace.', STATUS )
+         CALL MSG_BLANK( STATUS )
+
+*    If required, append the HDS version number.
+
+         IF( VERSIO ) THEN
+            CALL MSG_SETI( 'V', HDSVER )
+            CALL MSG_OUT( 'HDSTRACE_VER', 'HDS data format: V^V',
+     :                    STATUS )
+            CALL MSG_BLANK( STATUS )
+         END IF
 
 *    Write the terminator to the logfile.
 
-      IF ( LOGEXM .AND. STATUS .EQ. SAI__OK ) THEN
-         DUMMY = 'End of Trace.'
-         CALL FIO_WRITE( FD, DUMMY( 1:13 ), STATUS )
-         DUMMY = ' '
-         CALL FIO_WRITE( FD, DUMMY( 1:1 ), STATUS )
-      END IF
+         IF ( LOGEXM .AND. STATUS .EQ. SAI__OK ) THEN
+            DUMMY = 'End of Trace.'
+            CALL FIO_WRITE( FD, DUMMY( 1:13 ), STATUS )
+            DUMMY = ' '
+            CALL FIO_WRITE( FD, DUMMY( 1:1 ), STATUS )
+         END IF
+
+*    If required, write the HDS version number to the logfile.
+
+         IF ( LOGEXM .AND. STATUS .EQ. SAI__OK ) THEN
+            DUMMY = 'HDS data format : V'
+            I = CHR_LEN( DUMMY )
+            CALL CHR_PUTI( HDSVER, DUMMY, I )
+            CALL FIO_WRITE( FD, DUMMY( 1:I ), STATUS )
+            DUMMY = ' '
+            CALL FIO_WRITE( FD, DUMMY( 1:1 ), STATUS )
+         END IF
 
 *    Close the log file.
 
-      IF ( LOGEXM ) CALL FIO_CLOSE( FD, STATUS )
+         IF ( LOGEXM ) CALL FIO_CLOSE( FD, STATUS )
+
+      END IF
 
 *    Tidy the locator.
 

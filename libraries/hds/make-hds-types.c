@@ -45,6 +45,15 @@
  *        Use inttypes.h in preference to stdint.h.
  *     2006-Jul-25 (PWD):
  *        More fixes for MINGW handling of "long long" printfs.
+ *     2014-10-24 (TIMJ):
+ *        Add hdsbool_t to make it easy to spot logicals in the C API.
+ *     2017-Sep-12 (DSB):
+ *        Switch HDS dimensions to signed 64 bit integers. They need to be
+ *        signed since they will also be used for ARY/NDF array bounds, which
+ *        can be negative. Another reason for using signed values is that
+ *        HDS does not provide a "UK" (unsigned 64 bit int) data type, and
+ *        so there would be no way to store unsigned dimension values in an
+ *        HDS data file.
  *     2017-Oct-3 (DSB):
  *        - HDS dimensions should be signed, since otherwise there is no way
  *        to store them in an HDS data file, since we do not currently
@@ -321,7 +330,21 @@ int main (int argc, char ** argv ) {
 	   "/* Public type for dealing with HDS locators */\n"
 	   "/* The contents of the struct are private to HDS. The only public */\n"
 	   "/* part is the HDSLoc typedef. Never use 'struct LOC' directly.   */\n"
-	   "typedef struct LOC HDSLoc;\n\n");
+           "/* Do not redefine if an internal definition has been made.       */\n"
+           "#ifndef HDS_USE_INTERNAL_STRUCT\n"
+	   "  typedef struct LOC HDSLoc;\n"
+           "#endif\n"
+           "\n");
+
+   /* HDS wild card matching needs a struct but we just create a stub for now
+     until we know for sure how it's going to work. Has never worked in C anyhow */
+  fprintf( OutputFile,
+           "/* HDS Wild card matching structure */\n"
+           "/* This is a stub structure. The C API for this routine is unstable */\n"
+           "typedef struct HDSWild {\n"
+           "   int wild;\n"
+           "} HDSWild;\n"
+           "\n");
 
   /* Dimensions */
   fprintf( OutputFile,
@@ -338,6 +361,13 @@ int main (int argc, char ** argv ) {
            "#define HDS_GLUE_HELPER(a,b) a##b\n"
            "#define HDS_GLUE(a,b) HDS_GLUE_HELPER(a,b)\n"
            "#define HDSDIM_CODE(a) HDS_GLUE(a,HDS_DIM_CODE)\n\n");
+
+  fprintf( OutputFile,
+           "/* Helper macros for HDS dimensions. For instance HDSDIM_TYPE(datFred)\n"
+           "   expands to datFredK or datFredI, as required. */\n"
+           "#define HDS_GLUE_HELPER(a,b) a##b\n"
+           "#define HDS_GLUE(a,b) HDS_GLUE_HELPER(a,b)\n"
+           "#define HDSDIM_TYPE(a) HDS_GLUE(a,HDS_DIM_TYPE)\n\n");
 
   fprintf( POutputFile,
 	   "/* Private types and sizes relating to dimensions */\n"
@@ -363,6 +393,13 @@ int main (int argc, char ** argv ) {
 	  "#define HDS_COPY_FORTRAN_DIMS %d\n\n",
 	  copydims);
 
+  /* Logical type -- the C side does not need to be the same as the Fortran
+     side. */
+  fprintf( OutputFile,
+          "/* Public type for Logical type */\n"
+          "typedef %s hdsbool_t;\n"
+          "#define HDS_BOOL_FORMAT \"%s\"\n\n",
+          "int", "d");
 
   fprintf(OutputFile,
 	  "#endif /* _INCLUDED */\n\n");

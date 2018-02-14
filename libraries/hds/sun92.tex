@@ -10,22 +10,27 @@
 \stardocinitials    {SUN}
 \stardocsource      {sun\stardocnumber}
 \stardoccopyright
-{Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
+{Copyright \copyright\ 2018 East Asian Observatory}
 
 % Variable part - replace [xxx] as appropriate.
-\stardocnumber      {92.13}
+\stardocnumber      {92.14}
 \stardocauthors   {R.F.~Warren-Smith\\ M.D.~Lawden\\
-                                B.K.~McIlwrath \\ T.~Jenness\\ P.W.~Draper}
-\stardocdate        {18th April 2008}
+                                B.K.~McIlwrath \\ T.~Jenness\\ P.W.~Draper\\
+                                D.S.~Berry}
+\stardocdate        {6th February 2018}
 \stardoctitle       {HDS\\ [\latex{1ex}]
                                 Hierarchical Data System}
-\stardocversion     {Version 5.1}
+\stardocversion     {Version 6.0}
 \stardocmanual      {Programmer's Manual}
 \stardocabstract  {
-HDS is a file-based hierarchical data system designed for the storage
-of a wide variety of information. It is particularly suited to the
-storage of large multi-dimensional arrays (with their ancillary data)
-where efficient access is needed.
+HDS is a library of functions used for accessing file-based hierarchical
+data and supports the storage of a wide variety of information. It is
+particularly suited to the storage of large multi-dimensional arrays (with
+their ancillary data) where efficient access is needed.
+
+Historically the HDS library used a unique format for disk-file storage
+developed by the UK Starlink project in the 1980's. However it now
+supports both this historical Starlink format and also the popular HDF5 format.
 
 HDS organises data into \htmlref{hierarchies}{fig:hierarchy}, broadly
 similar to the directory structure of a hierarchical filing system,
@@ -146,6 +151,79 @@ logical structure. HDS also provides portability of data, so that the
 same data objects may be accessed from different types of computer
 despite the fact that each may actually format its files and data in
 different ways.
+
+\section{\xlabel{HDF5}\label{sect:hdf5}DISK FORMATS AND HDF5}
+
+Historically, the term ``HDS'' was used to refer both to a subroutine
+library and also to an on-disk data format. Both were developed by the UK
+Starlink project in the 1980's. Since then the subroutine library has
+been used extensively - mainly within the Starlink
+Software Collection but also outside. However the size of typical
+astronomical data sets has increased enormously since the 1980's (as has
+the typical astronomer's desktop computing power) and the original disk
+format upon which the HDS library was based no longer looks like a good
+match to current needs. Solving this problem by upgrading the original
+disk format was deemed impractical as documentation on the internals of
+the HDS disk format is sparse and the original developers are no
+longer available. Instead, it was decided to move to the popular and well
+supported HDF5 library and corresponding disk format - see
+\htmladdnormallink{\texttt{{https://support.hdfgroup.org/HDF5/}}}{https://support.hdfgroup.org/HDF5/}
+
+However, given the extensive use of the HDS library within the Starlink
+Software Collection, simply changing all the HDS calls within starlink
+application code to equivalent HDF5 calls would be prohibitive, both from
+the point of view of the effort involved and also the likelihood of bugs
+being introduced.
+
+Instead it was decided to re-implement the routines within the HDS
+library using calls to the routines provided by the HDF5 library, using
+the HDF5 disk format in a way that mimics as closely as possible the
+original HDS disk format. In this way no changes would be needed to
+application code since all HDS routines would still be available and
+would behave in the same way. In addition, data files created by the new
+HDS library would be compatible with the wide range of publicly available
+tools that already exist for examining HDF5 files.
+
+For further information about the motivation behind this change and the
+technicalities involved see ``Re-implementing the Hierarchical Data System
+using HDF5'' (T. Jenness, Astronomy and Computing, Vol.12, 2015 -
+\htmladdnormallink{\texttt{{https://arxiv.org/abs/1502.04029}}}{https://arxiv.org/abs/1502.04029}).
+
+Note, this document has not yet been fully updated to refer to the new
+library and disk format. If in doubt, send a query to the
+\htmladdnormallink{Starlink support mailing list}{http://www.jiscmail.ac.uk/archives/starlink.html}
+or consult the code (held in various repositories within the Starlink project
+on github).
+
+\subsection{\label{sect:version}Choosing the disk format version for new HDS files}
+
+The new HDF5-based disk format is called ``HDS version 5'' (the previous
+Starlink-specific disk format was version 4). Perhaps confusingly, the
+HDS library and data format have always had independent version numbers.
+So where-as the new HDF5-based \emph{data format} is ``HDS version 5'',
+the new \emph{library} is ``HDS version 6.0''.
+
+An obvious requirement was that version 6.0 of the HDS library should be
+able to read and write both data formats (version 4 and version 5). This
+is necessary for it to be possible to pass data files to and from sites
+that still use version 5 of the HDS library (i.e. can only access files
+that use the Starlink-specific HDS disk format). However, when creating a new
+disk file, the HDS library (version 6) needs to known which disk format
+(version 4 or version 5) to use. By default, the original disk format
+(version 4) is used so that files created by version 6 of the HDS library
+can be read by starlink systems that still use version 5. However, this
+can be changed by setting the environment variable ``\texttt{HDS\_VERSION}''
+to ``5'', or by using the HDS\_TUNE routine to set tuning parameter
+``\texttt{VERSION}'' to 5.
+
+All data files created by version 6 of the HDS library still have the
+traditional extension - ``\texttt{.sdf}'' - (``Starlink Data File''),
+regardless of the disk format in use.
+
+\begin{center}
+\emph{ Note, in a future release the default disk format will be changed from
+version 4 to version 5.}
+\end{center}
 
 \section{\xlabel{HDS_objects}\label{sect:objects}OBJECTS}
 
@@ -511,6 +589,9 @@ what already exists.
 
 \item No primitive values have been stored yet (\st{i.e.}\ the
 structure does not yet contain any data) -- we will do that next.
+
+\item All new container files are created using the disk format indicated
+by the \htmlref{``VERSION'' tuning parameter}{sect:version}.
 
 \end{itemize}
 
@@ -1274,26 +1355,48 @@ may be used to determine the current setting of a tuning parameter
 HDS currently uses the following tuning parameters to control its
 behaviour.
 
+\subsubsection*{Parameters which control the top level HDS library}
+
 \begin{description}
 
-\item [\xlabel{HDS_INALQ_tuning_parameter}INALQ - Initial File Allocation Quantity:]\mbox{}\\
-This value determines how many blocks\footnote{An HDS block is 512
-bytes.} are to be allocated when a new container file is created. The
-default value of 2 is the minimum value allowed; the first block
-contains header information and the second contains the top-level
-object. Note that the host operating system may impose further
-restrictions on allowable file sizes, so the actual size of a file may
-not match the value specified exactly.
+\item [\xlabel{HDS_VERSION_tuning_parameter}VERSION - Data Format for New Files:]\mbox{}\\
+This determines the data format that is used when a new container file is
+created. It may take the value 3, 4 or 5, and currently defaults to 4
+(although this will change to 5 in a future release). Version 4 is a
+Starlink-specific data format that is a development of the original HDS
+data format created by the Starlink project in the 1980's. Version 5 uses
+the HDF5 data format on disk to mimic the facilities of version 4. Such
+files cannot be accessed by versions of the HDS library prior to version
+6, but can be examined using various publicly available HDF5 tools - see
+section \htmlref{``DISK FORMATS AND HDF5''}{sect:hdf5}.  Version 3 refers
+to the Starlink-specific data format as it was prior to the introduction of
+64-bit mode.
 
-The value of this parameter reverts to its default value (or the value
-specified by the HDS\_INALQ environment variable) after each file is
-created, so if it is being set from within a program, it must be set
-every time that it is required.
+\begin{description}
+\item[VERSION$=$5:]\mbox{}\\
+Use the HDS data format 5 library, which is based on HDF5.
 
-If a file is to be extended frequently (through the creation of new
-objects within it), then this parameter may provide a worthwhile
-efficiency gain by allowing a file of a suitable size to be created
-initially. On most UNIX systems, however, the benefits are minimal.
+\item[VERSION$=$4:]\mbox{}\\
+Use the HDS data format 4 library with its
+``\texttt{64BIT}'' tuning parameter set to 1.
+
+\item[VERSION$=$3:]\mbox{}\\
+Use the same HDS library as data format 4, but with its
+``\texttt{64BIT}'' tuning parameter set to 0.
+\end{description}
+
+\item [\xlabel{HDS_V4LOCKERROR_tuning_parameter}V4LOCKERROR - controls error reporting:]\mbox{}\\
+If non-zero, an error is reported if a thread lock function (datLock,
+datUnlock or datLocked) is used on a locator for an object stored using
+disk format version 4. Otherwise, the function returns without action.
+The default is to return without action. This facility is intended for
+debugging purposes.
+
+\end{description}
+
+\subsubsection*{Parameters used with both HDS version 4 and version 5 files}
+
+\begin{description}
 
 \item [\xlabel{HDS_MAP_tuning_parameter}MAP - Use file mapping if available?]\mbox{}\\
 This value controls the method by which HDS performs I/O operations on
@@ -1421,6 +1524,65 @@ same object while modifications are being made.
 
 \end{itemize}
 
+\item [\xlabel{HDS_SHELL_tuning_parameter}SHELL - Preferred shell:]\mbox{}\\
+This parameter determines which UNIX shell should be used to interpret
+container file names which contain \qt{special} characters
+representing pattern-matching, environment variable substitution,
+\st{etc.} Each shell typically has its own particular way of
+interpreting these characters, so users of HDS may wish to select the
+same shell as they normally use for entering commands. The following
+values are allowed:
+
+\begin{description}
+
+\item[SHELL$=$2:]\mbox{}\\
+Use the \qt{tcsh} shell (if available). If this is not available, then
+use the same shell as when SHELL$=$1.
+
+\item[SHELL$=$1:]\mbox{}\\
+Use the \qt{csh} shell (C~shell on traditional UNIX systems). If this
+is not available, then use the same shell as when SHELL$=$0.
+
+\item[SHELL$=$0 (the default):]\mbox{}\\
+Use the \qt{sh} shell. This normally means the Bourne Shell on
+traditional UNIX systems, but on systems which support it, the similar
+POSIX \qt{sh} shell may be used instead.
+
+\item[SHELL$=-$1:]\mbox{}\\
+Don't use any shell for interpreting single file names (all special
+characters are to be interpreted literally). When performing
+\qt{wild-card} searches for multiple files (with
+\htmlref{HDS\_WILD}{HDS_WILD}), use the same shell as when SHELL$=$0.
+
+\end{description}
+
+HDS converts all other values to zero.
+
+\end{description}
+
+\subsubsection*{Parameters used only with HDS version 4 files}
+
+\begin{description}
+
+\item [\xlabel{HDS_INALQ_tuning_parameter}INALQ - Initial File Allocation Quantity:]\mbox{}\\
+This value determines how many blocks\footnote{An HDS block is 512
+bytes.} are to be allocated when a new container file is created. The
+default value of 2 is the minimum value allowed; the first block
+contains header information and the second contains the top-level
+object. Note that the host operating system may impose further
+restrictions on allowable file sizes, so the actual size of a file may
+not match the value specified exactly.
+
+The value of this parameter reverts to its default value (or the value
+specified by the HDS\_INALQ environment variable) after each file is
+created, so if it is being set from within a program, it must be set
+every time that it is required.
+
+If a file is to be extended frequently (through the creation of new
+objects within it), then this parameter may provide a worthwhile
+efficiency gain by allowing a file of a suitable size to be created
+initially. On most UNIX systems, however, the benefits are minimal.
+
 \item [\xlabel{HDS_MAXWPL_tuning_parameter}MAXWPL - Maximum Size of the \qt{Working Page List}:]\mbox{}\\
 This value specifies how many blocks\htmltext{\footnote{An HDS block
 is 512 bytes.}}  are to be allocated to the memory cache which HDS
@@ -1467,40 +1629,6 @@ the value specified by the HDS\_NCOMP environment variable)
 afterwards, so if it is being set from within a program, it must be
 set every time it is needed.
 
-\item [\xlabel{HDS_SHELL_tuning_parameter}SHELL - Preferred shell:]\mbox{}\\
-This parameter determines which UNIX shell should be used to interpret
-container file names which contain \qt{special} characters
-representing pattern-matching, environment variable substitution,
-\st{etc.} Each shell typically has its own particular way of
-interpreting these characters, so users of HDS may wish to select the
-same shell as they normally use for entering commands. The following
-values are allowed:
-
-\begin{description}
-
-\item[SHELL$=$2:]\mbox{}\\
-Use the \qt{tcsh} shell (if available). If this is not available, then
-use the same shell as when SHELL$=$1.
-
-\item[SHELL$=$1:]\mbox{}\\
-Use the \qt{csh} shell (C~shell on traditional UNIX systems). If this
-is not available, then use the same shell as when SHELL$=$0.
-
-\item[SHELL$=$0 (the default):]\mbox{}\\
-Use the \qt{sh} shell. This normally means the Bourne Shell on
-traditional UNIX systems, but on systems which support it, the similar
-POSIX \qt{sh} shell may be used instead.
-
-\item[SHELL$=-$1:]\mbox{}\\
-Don't use any shell for interpreting single file names (all special
-characters are to be interpreted literally). When performing
-\qt{wild-card} searches for multiple files (with
-\htmlref{HDS\_WILD}{HDS_WILD}), use the same shell as when SHELL$=$0.
-
-\end{description}
-
-HDS converts all other values to zero.
-
 \item [\xlabel{HDS_SYSLCK_tuning_parameter}SYSLCK - System wide lock flag:]\mbox{}\\
 This parameter is present for historical reasons and has no effect on
 UNIX systems.
@@ -1508,6 +1636,14 @@ UNIX systems.
 \item [\xlabel{HDS_WAIT_tuning_parameter}WAIT - Wait for locked files?]\mbox{}\\
 This parameter is present for historical reasons and currently has no
 effect on UNIX systems, where HDS file locking is not implemented.
+
+\item [\xlabel{HDS_64BIT_tuning_parameter}64BIT - Use 64-bit (HDS version 4) files?]\mbox{}\\
+This value can be used to select whether new files are created
+in the 64-bit (HDS version 4) format.  If 64BIT=0 then
+files are created in the previous (HDS version 3) format.
+
+This parameter is normally overriden by the VERSION parameter
+of the top level library.
 
 \end{description}
 
@@ -1599,8 +1735,9 @@ f77 -c -I$STARLINK_DIR/include subroutine.f
 
 \section{ACKNOWLEDGEMENTS}
 
-The \htmlref{routines}{appendix:alphalist} currently distributed as
-HDS derive from two original sources. The first is the initial
+The \htmlref{routines}{appendix:alphalist} historically distributed as
+HDS and which are still used to access HDS version 4 files, derive from
+two original sources. The first is the initial
 implementation written by Dave Pearce and Anton Walter at RAL for the
 VAX/VMS operating system (initially using the BLISS language), which
 was subsequently converted into C by Mike Lawden (RAL) and William
@@ -1610,10 +1747,13 @@ Fortran~77 by Sid Wright and Jack Giddings. William Lupton
 subsequently performed some of the initial work aimed at making HDS
 more portable.
 
-Since then, HDS has undergone considerable internal change, including
-substantial re-coding to produce a fully portable system based on the
-POSIX operating system interface. It is currently supported by Rodney
-Warren-Smith at RAL.
+HDS then underwent considerable internal change, including substantial
+re-coding to produce a fully portable system based on the POSIX operating
+system interface - work done by Rodney Warren-Smith at RAL.
+
+More recently, Tim Jenness (Cornell University) has re-implemented the
+HDS API on top of the HDF5 library to create the current (version 6)
+library.
 
 \appendix
 
@@ -6329,6 +6469,304 @@ The reason for obsolescence is indicated in each case.
 \normalsize
 
 \newpage
+\section{\xlabel{c_api}\label{appendix:capi}CALLING HDS FROM C}
+
+The C interface for the HDS library is defined within file
+\texttt{\$STARLINK\_DIR/include/star/hds.h}. There is a one-to-one
+correspondance between each C function and each Fortran routine
+described in this document - the Fortran documentation should be consulted
+for information about the purpose of each function and the nature of its
+arguments.
+
+Within C, each HDS locator is referred to by a pointer to an ``\texttt{
+HDSLoc}'', and all such variables \emph{must} be initialised to NULL when
+they are declared. Functions that require a locator as input should be
+supplied with an ``\texttt{HDSLoc \**}''. Functions that return a locator
+as output should be supplied with an ``\texttt{HDSLoc \**\**}'' (i.e. the
+address of an ``\texttt{HDSLoc \**}''):
+
+\begin{small}
+\begin{terminalv}
+#include "star/hds.h"
+...
+HDSLoc *loc = NULL;
+HDSLoc *cloc = NULL;
+int status;
+...
+hdsOpen( "fred.sdf", "READ", &loc, &status );
+datFind( loc, "DATA", &cloc, &status );
+...
+datAnnul( &cloc, status );
+datAnnul( &loc, status );
+\end{terminalv}
+\end{small}
+
+Each C function returns the integer status value as the function value in
+addition to returning it in the usual manner via the inherited status
+variable. In most cases, the returned function value will be ignored, as
+in the above example.
+
+The C API includes the following three extra functions to manage the
+locking of HDS Locators by specific threads:
+
+\newpage
+\small
+\sstroutine{
+   datLock
+}{
+   Lock an object for exclusive use by the current thread
+}{
+   \sstdescription{
+      This function locks an HDS object for use by the current thread.
+      An object can be locked for read-only access or read-write access.
+      Multiple threads can lock an object simultaneously for read-only
+      access, but only one thread can lock an object for read-write access
+      at any one time. Use of any HDS function that may modify the object
+      will fail with an error unless the thread has locked the object for
+      read-write access. Use of an HDS function that cannot modify the
+      object will fail with an error unless the thread has locked the
+      object (in this case the lock can be either for read-only or
+      read-write access).
+
+      If \texttt{"} readonly\texttt{"}  is zero (indicating the current thread wants to
+      modify the object), this function will report an error if any
+      other thread currently has a lock (read-only or read-write) on
+      the object.
+
+      If \texttt{"} readonly\texttt{"}  is non-zero (indicating the current thread wants
+      read-only access to the object), this function will report an error
+      only if another thread currently has a read-write lock on the object.
+
+      If the object is a structure, each component object will have its
+      own lock, which is independent of the lock on the parent object. A
+      component object and its parent can be locked by different threads.
+      However, as a convenience function this function allows all
+      component objects to be locked in addition to the supplied object
+      (see \texttt{"} recurs\texttt{"} ).
+
+      The current thread must unlock the object using datUnlock before it
+      can be locked for use by another thread. All objects are initially
+      locked by the current thread when they are created. The type of
+      access available to the object (\texttt{"} Read\texttt{"} , \texttt{"} Write\texttt{"}  or \texttt{"} Update\texttt{"} )
+      determines the type of the initial lock. For pre-existing objects,
+      this is determined by the access mode specified when calling hdsOpen.
+      For new and temporary objects, the initial lock is always a read-write
+      lock.
+   }
+   \sstinvocation{
+      datLock( HDSLoc $*$locator, int recurs, int readonly, int $*$status );
+   }
+   \sstarguments{
+      \sstsubsection{
+         locator = HDSLoc $*$ (Given)
+      }{
+         Locator to the object that is to be locked.
+      }
+      \sstsubsection{
+         recurs = int (Given)
+      }{
+         If the supplied object is locked successfully, and \texttt{"} recurs\texttt{"}  is
+         non-zero, then an attempt is made to lock any component objects
+         contained within the supplied object. An error is reported if
+         any components cannot be locked due to them being locked already
+         by a different thread. This operation is recursive - any children
+         of the child components are also locked, etc.
+      }
+      \sstsubsection{
+         readonly = int (Given)
+      }{
+         If non-zero, the object (and child objects if \texttt{"} recurs\texttt{"}  is non-zero)
+         is locked for read-only access. Otherwise it is locked for
+         read-write access.
+      }
+      \sstsubsection{
+         status = int$*$ (Given and Returned)
+      }{
+         Pointer to global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          An error will be reported if the supplied object is currently
+         locked by another thread. If \texttt{"} recurs\texttt{"}  is non-zero, an error is
+         also reported if any component objects contained within the
+         supplied object are locked by other threads.
+
+         \sstitem
+          The majority of HDS functions will report an error if the object
+         supplied to the function has not been locked for use by the calling
+         thread. The exceptions are the functions that manage these locks -
+         datLock, datUnlock and datLocked.
+
+         \sstitem
+          Attempting to lock an object that is already locked by the
+         current thread will change the type of lock (read-only or
+         read-write) if the lock types differ, but will otherwise have no
+         effect.
+      }
+   }
+}
+\sstroutine{
+   datLocked
+}{
+   See if an object is locked
+}{
+   \sstdescription{
+      This function returns a value that indicates if the object
+      specified by the supplied locator has been locked for use by one or
+      more threads. A thread can lock an object either for read-only
+      access or for read-write access. The lock management functions
+      (datLock and datUnlock) will ensure that any thread that requests
+      and is given a read-write lock will have exclusive access to the
+      object - no other locks of either type will be issued to other
+      threads until the first thread releases the read-write lock using
+      datUnlock. If a thread requests and is given a read-only lock, the
+      lock management functions may issue read-only locks to other
+      threads, but it will also ensure that no other thread is granted
+      a read-write lock until all read-only locks have been released.
+   }
+   \sstinvocation{
+      locked = datLocked( const HDSLoc $*$locator, int recursive, int $*$status );
+   }
+   \sstarguments{
+      \sstsubsection{
+         locator = const HDSLoc $*$ (Given)
+      }{
+         A locator for the object to be checked.
+      }
+      \sstsubsection{
+         recursive = int (Given)
+      }{
+         If non-zero, then all descendants of the supplied object are
+         also checked in the same way.
+      }
+      \sstsubsection{
+         status = int$*$ (Given and Returned)
+      }{
+         Pointer to global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          The locking performed by datLock, datUnlock and datLocked is
+         based on POSIX threads, and has no connection with the locking
+         referred to in hdsLock and hdsFree.
+
+         \sstitem
+          Zero is returned as the function value if an error has already
+         occurred, or if an error occurs in this function.
+      }
+   }
+   \sstdiytopic{
+      Returned function value
+   }{
+       A value indicating the status of the supplied Object:
+
+      \sstitemlist{
+
+         \sstitem
+          1: the application is is linked with a version of HDS that does
+             not support object locking.
+
+      }
+       0: the supplied object is unlocked. If \texttt{"} recursive\texttt{"}  is non-zero,
+          then all descendant objects are also unlocked, and this is then
+          the condition that must be met for the current thread to be able
+          to lock the supplied object for read-write access using function
+          datLock. This condition can be achieved by releasing any existing
+          locks using datUnlock.
+
+       1: the supplied object is locked for reading and writing by the
+          current thread. This is the condition that must be met for the current
+          thread to be able to use the supplied object in any HDS function
+          that might modify the object (except for the locking and unlocking
+          functions - see below). If \texttt{"} recursive\texttt{"}  is non-zero, then all
+          descendant objects are also locked for reading and writing. This
+          condition can be achieved by calling datLock.
+
+       2: the supplied object is locked for reading and writing by a different
+          thread. An error will be reported if the current thread attempts to
+          use the object in any other HDS function. If \texttt{"} recursive\texttt{"}  is non-zero,
+          then either the object itself or one of its descendant objects is
+          locked for reading and writing.
+
+       3: the supplied object is locked read-only by the current thread
+          (and maybe other threads as well). If \texttt{"} recursive\texttt{"}  is non-zero,
+          then all descendant objects are also locked read-only by the
+          current thread. This is the condition that must be met for the
+          current thread to be able to use the supplied object in any HDS
+          function that cannot modify the object. An error will be
+          reported if the current thread attempts to use the object in any
+          HDS function that could modify the object. This condition can be
+          achieved by calling datLock.
+
+       4: the supplied object is not locked by the current thread, but is
+          locked read-only by one or more other threads. An error will be
+          reported if the current thread attempts to use the object in any
+          other HDS function. If \texttt{"} recursive\texttt{"}   is non-zero, then all
+          descendant objects are also locked read-only by one or more
+          other threads.
+
+       5: Some complex mix of locked and unlocked descendants not covered by
+          any of the above values.
+   }
+}
+\sstroutine{
+   datUnlock
+}{
+   Unlock an object so that it can be locked by a different thread
+}{
+   \sstdescription{
+      This function removes a lock on the supplied HDS object. An error
+      is reported if the object is not locked by the current thread. If
+      \texttt{"} recurs\texttt{"}  is non-zero, an error will be reported if any child component
+      within the supplied object is not locked by the current thread. See
+      datLock.
+
+      The object must be locked again, using datLock, before it can be
+      used by any other HDS function. All objects are initially
+      locked by the current thread when they are created.
+   }
+   \sstinvocation{
+      datUnlock( HDSLoc $*$locator, int recurs, int $*$status );
+   }
+   \sstarguments{
+      \sstsubsection{
+         locator = HDSLoc $*$ (Given)
+      }{
+         Locator to the object that is to be unlocked.
+      }
+      \sstsubsection{
+         recurs = int (Given)
+      }{
+         If the supplied object is unlocked successfully, and \texttt{"} recurs\texttt{"}  is
+         non-zero, then an attempt is made to unlock any component objects
+         contained within the supplied object.
+      }
+      \sstsubsection{
+         status = int$*$ (Given and Returned)
+      }{
+         Pointer to global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          The majority of HDS functions will report an error if the object
+         supplied to the function has not been locked for use by the calling
+         thread. The exceptions are the functions datLock and datLocked.
+      }
+   }
+}
+\normalsize
+
+
+\newpage
 \section{\xlabel{error_codes}\label{appendix:errors}ERROR CODES}
 
 \subsection{Error Code Descriptions}
@@ -7174,6 +7612,23 @@ via CMP\_ routines has been increased to 1024.
 
 \item This document (\xref{SUN/92}{sun92}{}) has been updated to
 reflect the above changes.
+\end{enumerate}
+
+\newpage
+\subsection{\xlabel{list_of_most_recent_changes}Changes in V6.0}
+
+\begin{enumerate}
+\item The entire HDS library has been re-implemented to support HDS files that
+use the HDF5 data format. The library can read and write both old (V4) and new
+(V5) formats. By default, new files are created using the old V4 format,
+but this can be changed using the new ``VERSION'' tuning parameter. Note,
+the default output format will change to V5 in a future release.
+
+\item New functions (datock, datUnlock and datLocked) have been added to the
+C interface to allow an HDS object to be locked for exclusive use by a single
+thread. An error is reported if a thread attempts to make a change to an
+object that it has not previously locked for its own exclusive use. By
+defaults objects are locked by the thread that creates them.
 \end{enumerate}
 
 \end{document}

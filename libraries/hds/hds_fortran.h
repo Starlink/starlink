@@ -29,7 +29,7 @@
 *-
 */
 
-
+#include <limits.h>
 
 #include "dat_par.h"
 
@@ -70,6 +70,11 @@ hdsdim *
 hdsDimF2C( int ndim, const F77_INTEGER_TYPE fdims[],
 	   hdsdim cdims[DAT__MXDIM], int * status );
 
+/* Set message token for hdsdim integer. */
+
+void dat1emsSetHdsdim( const char * token, hdsdim value );
+
+
 /* Macro to convert a single hdsdim integer to a single
    Fortran integer, checking for truncation. Will set status
    to DAT__DTRNC if truncation occurs. There is no optimizaton
@@ -79,7 +84,7 @@ hdsDimF2C( int ndim, const F77_INTEGER_TYPE fdims[],
 #define HDSDIM2INT( subname, cint, fint, status )			\
   if ( cint > (hdsdim)INT_MAX ) {					\
     fint = 0;								\
-    if (*status == DAT__OK) {						\
+    if (*status == SAI__OK) {						\
       *status = DAT__DTRNC;						\
       dat1emsSetHdsdim( "DIM", cint );					\
       emsRep( " ",							\

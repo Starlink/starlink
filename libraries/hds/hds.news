@@ -1,6 +1,14 @@
 HDS Library
 -----------
 
+   Version 6.0
+   ===========
+
+   Now supports HDSv5 files. These. files are based upon HDF5.
+   HDS can still read HDSv4 (and v3) files but will write files
+   in the new format. The HDSv5 files can be read by any
+   standard HDF5 tools (e.g. h5py in Python).
+
    Version 5.1-1
    =============
 

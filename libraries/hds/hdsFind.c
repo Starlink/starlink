@@ -42,7 +42,7 @@
 #  include <config.h>
 #endif
 
-#include "hds1.h"
+
 #include "hds.h"
 #include "hds_fortran.h"
 #include "f77.h"
@@ -73,7 +73,7 @@ F77_SUBROUTINE( hds_find )( CHARACTER( floc1 ),
  *     status = global status
  *
  */
-void hdsFind( const HDSLoc *loc1, const char *name, const char *mode,
+int hdsFind( const HDSLoc *loc1, const char *name, const char *mode,
               HDSLoc **loc2, int *status )
 {
     DECLARE_CHARACTER(floc1,DAT__SZLOC);
@@ -103,5 +103,5 @@ void hdsFind( const HDSLoc *loc1, const char *name, const char *mode,
     F77_FREE_CHARACTER( fmode );
     HDS_IMPORT_FLOCATOR( floc2, loc2, status );
     F77_IMPORT_INTEGER( fstatus, *status );
-    return;
+    return *status;
 }

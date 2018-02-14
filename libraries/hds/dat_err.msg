@@ -53,5 +53,9 @@ NOMEM	<Memory allocation error>
 WLDIN	<Wild-card search context invalid>
 NOCMP   <No component name>
 DTRNC   <Dimensions truncate in Fortran INTEGER*4>
+HDF5E   <Internal error from HDF5>
+FILFM   <File not in the expected format>
 THREAD  <Object not locked by current thread>
+MUTEX   <Failed to initialise mutex>
+NOTIM   <Not implemented>
 .END

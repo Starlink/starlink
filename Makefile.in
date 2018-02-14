@@ -56,6 +56,8 @@ ALL_TARGETS = \
 	$(MANIFESTS)/gsl \
 	$(MANIFESTS)/gwm \
 	$(MANIFESTS)/hds \
+	$(MANIFESTS)/hds-v4 \
+	$(MANIFESTS)/hds-v5 \
 	$(MANIFESTS)/hdstools \
 	$(MANIFESTS)/hdstrace \
 	$(MANIFESTS)/hlp \
