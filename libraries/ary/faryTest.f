@@ -1,4 +1,4 @@
-      program fcarytest
+      program farytest
       implicit none
       include 'SAE_PAR'
       include 'ARY_PAR'
@@ -281,7 +281,7 @@ c ================================
          call err_rep( ' ', 'Error 4e', status )
       end if
 
-      call hds_new( 'cary_test2', 'TEST', 'TEST', 0, 0, loc2, status )
+      call hds_new( 'ary_test2', 'TEST', 'TEST', 0, 0, loc2, status )
       call ary_place( loc2, 'DATA_ARRAY', place, status )
       call ary_copy( iary2, place, iary3, status )
       call ary_bound( iary3, 3, lbnd, ubnd, ndim, status )
@@ -368,7 +368,7 @@ c ================================
 
 c  Test creating a new array.
 
-      call hds_new( 'cary_test', 'TEST', 'TEST', 0, 0, loc2, status )
+      call hds_new( 'ary_test', 'TEST', 'TEST', 0, 0, loc2, status )
       call ary_place( loc2, 'data_array', place, status )
       lbnd( 1 ) = -10
       lbnd( 2 ) = -30
@@ -480,7 +480,7 @@ c behaviour.
 
 
 
-      call hd_open( 'cary_test', 'Read', loc, status )
+      call hd_open( 'ary_test', 'Read', loc, status )
       call ary_find( loc, 'data_array', iary, status )
       call ary_map( iary, '_DOUBLE', 'Read', ipntr, el, status )
       if( el .ne. 1497771 .and. status .eq. SAI__OK ) then

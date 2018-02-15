@@ -1,7 +1,7 @@
-#      PROGRAM CARY_TEST64
+#      PROGRAM ARY_TEST64
 *+
 *  Name:
-*     CARY_TEST64
+*     ARY_TEST64
 
 *  Purpose:
 *     Test installation of 64 bit ARY Fortran API

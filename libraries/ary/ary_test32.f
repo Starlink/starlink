@@ -1,7 +1,7 @@
-      PROGRAM CARY_TEST32
+      PROGRAM ARY_TEST32
 *+
 *  Name:
-*     CARY_TEST32
+*     ARY_TEST32
 
 *  Purpose:
 *     Test installation of 32 bit ARY Fortran API

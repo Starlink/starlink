@@ -324,7 +324,7 @@ int main(){
       errRepf( " ", "Error 4e", status );
    }
 
-   hdsNew( "cary_test2", "TEST", "TEST", 0, 0, &loc2, status );
+   hdsNew( "ary_test2", "TEST", "TEST", 0, 0, &loc2, status );
    aryPlace( loc2, "DATA_ARRAY", &place, status );
    aryCopy( ary2, &place, &ary3, status );
    aryBound( ary3, 3, lbnd, ubnd, &ndim, status );
@@ -410,7 +410,7 @@ int main(){
 /* Test creating a new array.
    ======================== */
 
-   hdsNew( "cary_test", "TEST", "TEST", 0, 0, &loc2, status );
+   hdsNew( "ary_test", "TEST", "TEST", 0, 0, &loc2, status );
    aryPlace( loc2, "data_array", &place, status );
    lbnd[ 0 ] = -10;
    lbnd[ 1 ] = -30;
@@ -515,7 +515,7 @@ int main(){
       for( i = 0; i < el; i++,dpntr++ ) *dpntr = 1.0;
    }
 
-/* If "cary_test.sdf" was created by HDS V5, which is thread-safe, we
+/* If "ary_test.sdf" was created by HDS V5, which is thread-safe, we
    test locking of ARY objects.
    ------------------------------------------------------------------ */
    hdsInfoI( loc2, "VERSION", " ", &hdsversion, status );
@@ -619,7 +619,7 @@ int main(){
 
 
 
-   hdsOpen( "cary_test", "Read", &loc, status );
+   hdsOpen( "ary_test", "Read", &loc, status );
    aryFind( loc, "data_array", &ary, status );
    aryMap( ary, "_DOUBLE", "Read", (void **) &dpntr, &el, status );
    if( el != 1497771 && *status == SAI__OK ){
