@@ -1,6 +1,0 @@
-/* Generic prototypes for generic C functions. These are expanded at
-   make-time by script make_h to generate ary_cgen.h, which is included in
-   ary.h. */
-
-void CGEN_FUNCTION(aryGtsz)( Ary *ary, CGEN_TYPE *scale, CGEN_TYPE *zero, int *status );
-void CGEN_FUNCTION(aryPtsz)( Ary *ary, CGEN_TYPE scale, CGEN_TYPE zero, int *status );
