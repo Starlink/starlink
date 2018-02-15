@@ -42,7 +42,12 @@ typedef int hdsdim_v4;
    calls would therefore cause deadlock. The right way to fix this would
    be to re-structure HDS to avoid top-level functions being called from
    within HDS, but that would be a lot of work. */
+#ifdef PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP 
 static pthread_mutex_t hdsv4_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+#else
+static pthread_mutex_t hdsv4_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
+#endif
+
 #define LOCK_MUTEX pthread_mutex_lock( &hdsv4_mutex );
 #define UNLOCK_MUTEX pthread_mutex_unlock( &hdsv4_mutex );
 
