@@ -53,12 +53,12 @@ dnl    Determine whether the Fortran compiler supports the VOLATILE keyword
 AC_FC_HAVE_VOLATILE
 
 dnl    Determine whether the Fortran compiler supports the 'xxx'X notation
-dnl    or the X'xxx' notation. 
-dnl 
+dnl    or the X'xxx' notation.
+dnl
 dnl    This is used for assigning integers and reals using a typeless
 dnl    transformation of the given bit patterns. Note the other BOZ
 dnl    descriptors are just usually integers in disguise, so like plain
-dnl    numbers may also require compiler support to work with PRM, see 
+dnl    numbers may also require compiler support to work with PRM, see
 dnl    STAR_PRM_COMPATIBLE_SYMBOLS. For this reason we only use plain
 dnl    numbers or the 'X' descriptor.
 AC_FC_HAVE_OLD_TYPELESS_BOZ()
@@ -81,14 +81,14 @@ AC_CACHE_CHECK([whether ${FC} supports type-kind notation],
         ac_cv_fc_type_kind=yes,
         ac_cv_fc_type_kind=no)])
 if test $ac_cv_fc_type_kind = yes; then
-    AC_DEFINE([FC_HAVE_TYPE_KIND], 1, 
+    AC_DEFINE([FC_HAVE_TYPE_KIND], 1,
        [Define to 1 if the Fortran compiler supports type-kind notation])
 fi
 
 
 dnl    So they can be noted in the generated parameter files, pass the
 dnl    $build and FC variables in to config.h
-AC_DEFINE_UNQUOTED([INFO_BUILD], "$build", 
+AC_DEFINE_UNQUOTED([INFO_BUILD], "$build",
     "The config.guess value for the build system")
 AC_DEFINE_UNQUOTED([INFO_FC],    "$FC",
     "The Fortran compiler whose characteristics were tested")
@@ -107,6 +107,7 @@ dnl    which correspond to it.
 STAR_MESSGEN(prm_err.msg)
 
 AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES([make_h], [chmod +x make_h])
 AC_CONFIG_HEADERS([config.h])
 
 dnl    This is the bit that does the actual work
