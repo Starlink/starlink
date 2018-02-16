@@ -44,7 +44,7 @@ cat <<EOF > temp.h
 
 EOF
 
-cpp -P temp.h -I. -I$STARLINK_DIR/include | grep ary1 > ary1_cgen.h
+@CPP@ -P temp.h -I. -I$STARLINK_DIR/include | grep ary1 > ary1_cgen.h
 rm temp.h
 
 
@@ -98,5 +98,5 @@ cat <<EOF > temp.h
 
 EOF
 
-cpp -P temp.h -I. -I$STARLINK_DIR/include | grep ary > ary_cgen.h
+@CPP@ -P temp.h -I. -I$STARLINK_DIR/include | grep ary > ary_cgen.h
 rm temp.h

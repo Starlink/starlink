@@ -48,6 +48,7 @@ STAR_MESSGEN(ary_err.msg)
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES([make_h], [chmod +x make_h])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
