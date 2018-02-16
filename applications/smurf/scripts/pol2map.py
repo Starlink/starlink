@@ -2000,7 +2000,7 @@ try:
 #  requires a 2D POLANAL Frame. So use wcsframe to create the 2D Frame
 #  from the 3D Frame, then delete the 3D Frame.
          invoke( "$KAPPA_DIR/wcsframe ndf={0} frame=POLANAL".format(cube) )
-         invoke( "$KAPPA_DIR/wcsremove ndf={0} frame=POLANAL-SPECTRUM".format(cube) )
+         invoke( "$KAPPA_DIR/wcsremove ndf={0} frames=POLANAL-SPECTRUM".format(cube) )
 
 #  Re-instate SKY as the current Frame
          invoke( "$KAPPA_DIR/wcsframe ndf={0} frame=SKY".format(cube) )
