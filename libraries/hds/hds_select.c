@@ -41,18 +41,19 @@ typedef int hdsdim_v4;
    top level functions. Using a normal mutex to serialise top-level HDS
    calls would therefore cause deadlock. The right way to fix this would
    be to re-structure HDS to avoid top-level functions being called from
-   within HDS, but that would be a lot of work. */
-#ifdef PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP 
-static pthread_mutex_t hdsv4_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
-#else
-static pthread_mutex_t hdsv4_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
-#endif
-
-#define LOCK_MUTEX pthread_mutex_lock( &hdsv4_mutex );
+   within HDS, but that would be a lot of work. Since static initialisation
+   of recursive mutexes is not always available on OSX, we use dynamic
+   initialisation via function dat1InitialiseV4Mutex. */
+static pthread_once_t hdsv4_mutex_is_initialized = PTHREAD_ONCE_INIT;
+static pthread_mutex_t hdsv4_mutex;
+#define LOCK_MUTEX \
+   (void) pthread_once(&hdsv4_mutex_is_initialized, dat1InitialiseV4Mutex); \
+   pthread_mutex_lock( &hdsv4_mutex );
 #define UNLOCK_MUTEX pthread_mutex_unlock( &hdsv4_mutex );
 
 /* Prototypes for local functions. */
 static hdsdim_v4 *dat1ExportV4Dims( const char *func, int ndim, const hdsdim *dims, int *status );
+static void dat1InitialiseV4Mutex();
 
 
 /*=================================*/
@@ -3735,4 +3736,28 @@ static hdsdim_v4 *dat1ExportV4Dims( const char *func, int ndim,
 }
 
 
+/*======================================================================
+
+  dat1InitialiseV4Mutex() - Called exactly once to initialise the mutex
+  that is used to serialise calls to HDS V4 functions. Since internal HDS
+  V4 functions sometimes call other top-level HDS V4 functions, this
+  mutex needs to be recursive. This dynamic initialisation function is
+  needed because some versions of OSX do not provide the pthreads macros
+  needed to do static initialisation of recursive mutexes.
+
+  ====================================================================== */
+static void dat1InitialiseV4Mutex(){
+
+/* Declare and initialise a variable that holds the attributes required
+   for the mutex. */
+   pthread_mutexattr_t mta;
+   pthread_mutexattr_init( &mta );
+
+/* Modify the default attributes set above to indicater we want a
+   recursive mutex. */
+   pthread_mutexattr_settype( &mta, PTHREAD_MUTEX_RECURSIVE );
+
+/* Initialise the mutex using these attributes. */
+   pthread_mutex_init( &hdsv4_mutex, &mta );
+}
 
