@@ -23,6 +23,9 @@ AC_PROG_CC
 AC_PROG_FC
 LT_INIT
 
+dnl   If --with-pic=no is set we should honour that.
+AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
+
 dnl    Check if sys/wait.h exists and is POSIX compatible
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT

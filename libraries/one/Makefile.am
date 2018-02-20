@@ -9,6 +9,13 @@ libone_la_SOURCES = \
 	$(include_MESSAGES) \
         $(C_ROUTINES)
 
+# Make all library code position independent. This is handy for creating
+# shareable libraries from the static ones (Java JNI libraries).
+if !NOPIC
+libone_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+libone_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
+endif
+
 libone_la_LIBADD = `psx_link`
 
 include_MESSAGES = ONE_ERR one_err.h
@@ -43,4 +50,4 @@ CLEANFILES = fac_1522_err one_err.h ONE_ERR
 
 dist_pkgdata_DATA = LICENCE
 
- 
+
