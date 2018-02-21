@@ -8,7 +8,13 @@ bolometer camera on the JCMT \cite{Friberg} \cite{Bastien2011}.  POL-2
 in itself is not a detector - thus requiring SCUBA-2 and its detectors
 for operation. SCUBA-2 operates simultaneously at both 850 and
 \SI{450}{\micro\metre}. The POL-2 instrument is currently commissioned
-at \SI{850}{\micro\metre} only.
+at \SI{850}{\micro\metre} only\footnote{\SI{450}{\micro\metre} data can
+in fact be processed using the same commands as \SI{850}{\micro\metre}
+data, but the noise levels and other possible artefacts have not yet been
+fully characterised. Note, the default pixel size at 450 is 4 arc-seconds}.
+
+
+.
 
 \begin{figure}[t!]
 \begin{center}
@@ -418,7 +424,8 @@ to complete the observation.
 
 \textbf{Note:} All of these files are written out eight times, once
 for each of the eight sub-arrays. It should also be noted that the
-POL-2 instrument has not been released from commissioning at 450\,$\mu$m.
+POL-2 instrument has not yet been fully released from commissioning at
+450\,$\mu$m (a ``shared risk'' approach is currently in use).
 
 The main data array in each NDF is a cube, with the first two
 dimensions corresponding to bolometer columns and rows within a

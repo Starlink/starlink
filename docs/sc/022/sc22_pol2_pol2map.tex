@@ -41,7 +41,10 @@ for future use in the directory \texttt{qudata}, specified by the
 The \xref{SMURF:makemap}{sun258}{MAKEMAP} command is then used to
 create a separate map from the I time-stream for each observation,
 using SNR-based ``auto-masking'' to define the background regions that
-are to be set to zero at the end of each iteration.
+are to be set to zero at the end of each iteration. This step uses a
+PCA threshold of 50 (see Section~\ref{sec:pca} for more details).
+
+\texttt{pca.pcathresh = -50}
 
 These maps are stored for future use in the directory \texttt{maps},
 specified by the \param{MAPDIR} parameter. Each map has a name of the form:
@@ -50,17 +53,12 @@ specified by the \param{MAPDIR} parameter. Each map has a name of the form:
 
 where \texttt{<CHUNK$\_$NUM>} indicates the raw data file at the start
 of the contiguous chunk of data used to create the map, and is usually
-0003.  Each of these maps is compared to the specified reference map
-(if any) to determine a pointing correction to be applied to the
-observation in future. If no reference map is supplied, the I map
-created from the first observation defines the expected source
-position, and is compared with later maps to determine their pointing
-corrections.
+0003.
 
-This step uses a PCA threshold of 50 (see Section~\ref{sec:pca} for more details).
-
-\texttt{pca.pcathresh = -50}
-
+A coadd is then formed by adding all these maps together. Each individual map
+is then compared to the coadd in order to determine a pointing correction
+to be applied to the observation in future. These corrections are stored
+in the FITS header of the individual maps.
 
 
 \subsection*{Step 2}
@@ -69,7 +67,7 @@ In the second step of the process (see Run~2 in
 Figure~\ref{fig:pol2drflow}) an improved I map is produced. These
 improvements come from
 \begin{enumerate}
-\item applied relative pointing corrections
+\item applying the pointing corrections determined in step 1
 \item the use of an increased number of PCA components
   (\texttt{pca.pcathresh=-150})
 \item using a single fixed mask for all observations. The mask is
@@ -112,8 +110,8 @@ This \xref{calcqu}{sun258}{CALCQU} tool creates time series holding Q and U valu
 time series holding raw data values. The supplied time-series data files are first
 flat-fielded, cleaned and concatenated, before being used to create
 the Q and U values. The Q and U time-series are down-sampled to 2Hz
-(\emph{i.e.} they contain two Q or U samples per second), and are 
-chosen to minimise the sum of the squared residuals between the measured 
+(\emph{i.e.} they contain two Q or U samples per second), and are
+chosen to minimise the sum of the squared residuals between the measured
 raw data values and the expected values given by Equation~\ref{eqn:idet}.
 
 
@@ -232,6 +230,19 @@ variances in \file{imapvar.sdf}, \file{qmapvar.sdf} and
 \file{umapvar.sdf} will be calculated using the new method, and
 these variances will then be used to form the errors in the
 \file{cat$\_$mapvar.FIT} catalogue.
+
+In general, within the source regions the variances created using
+\param{MAPVAR}=\texttt{TRUE} will be larger than those created using
+using \param{MAPVAR}=\texttt{FALSE} (within background regions there
+should be little difference). This is partly caused by intrinisic
+instabilities within the map-making process that allow low-level
+artifical extended structures to develop within the source regions
+defined by the AST mask. Such artificial structures will vary from
+observation to observation and so will contribute to the variances
+calculated using \param{MAPVAR}=\texttt{TRUE}. Residual pointing errors
+are another cause of increased variance near bright sources when using
+\param{MAPVAR}=\texttt{TRUE}. Investigation is under way to find a means
+to reduce these effects.
 
 
 

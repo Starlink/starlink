@@ -28,8 +28,7 @@ package started (see \cref{Section}{sec:starinit}{Initialising
 
 This chapter describes how to run \task{pol2map} firstly to produce an
 initial I map and then again to produce the final I, Q, U maps and
-vector catalogue as described in Section~\ref{sec:how-step1}
-(this is referred to as ``Run 1'' in Figure~\ref{fig:pol2drflow}).
+vector catalogue as described in Section~\ref{sec:how-step1}.
 
 To run \task{pol2map}, values should normally be supplied for the following
 command-line parameters\footnote{Note the distinction between
@@ -194,16 +193,21 @@ Calculating Q, U and I time streams from raw analysed intensity data...
 
 >>>>   Making I map from 20160125_00043_0003...
 
-Storing pointing corrections of (0.0,0.0) arc-seconds for future use
-
 >>>>   Making I map from 20160112_00056_0003...
-
-Storing pointing corrections of (1.889022181,2.8085505485) arc-seconds for future use
 
 >>>>   Making I map from 20160112_00059_0003...
 
-Storing pointing corrections of (2.13319187001,2.40199783004) arc-seconds for future use
 Coadding I maps from all observations:
+
+20160125_00043_0003: Storing pointing corrections of (0.0,0.0) arc-seconds
+for future use
+
+20160112_00056_0003: Storing pointing corrections of (1.9,2.8) arc-seconds
+for future use
+
+20160112_00059_0003: Storing pointing corrections of (2.1,2.4) arc-seconds
+for future use
+
 \end{terminalv}
 
 The files and folders produced in this reduction are described below.
@@ -211,18 +215,20 @@ The files and folders produced in this reduction are described below.
 \begin{aligndesc}
 \item[\file{pol2map.log}] A log file containing the output from the
   various \SMURF, \KAPPA\ and \POLPACK\ commands run as part of the \task{pol2map}
-  command. In fact, \task{pol2map} is a Python script, which runs various other
-  Starlink tasks behind the scenes to perform the bulk of the work.
+  command (\task{pol2map} is a Python script, which runs various other
+  Starlink tasks behind the scenes to perform the bulk of the work).
 
 \item[\file{qudata/}] A folder containing the I, Q and U time-series data
   for each sub array for each observation (these are produced by
   \task{calcqu} (see Section~\cref{Chapter}{sec:calcqu}{CALCQU}).
 
 \item[\file{maps/}] A folder containing the individual I maps from
-  each separate observation \texttt{$\_$imap.sdf}.
+  each separate observation. These will have names that end with
+  \file{$\_$imap.sdf}.
 
-\item[\file{iauto.sdf}] Output total intensity file from an
-  automatically generated astronomical mask.
+\item[\file{iauto.sdf}] Output total intensity map (the term ``auto'' is
+used to indicate that it was created using an automatically generated
+AST mask).
 
 \end{aligndesc}
 
@@ -238,7 +244,7 @@ The output I map, \file{iauto.sdf}, can be opened and viewed with \GAIA.
 \end{center}
 \end{figure}
 
-The maps folder contains the individual I maps from each separate
+The \file{maps} folder contains the individual I maps from each separate
 observation:
 
 \begin{terminalv}
@@ -283,8 +289,7 @@ The following shows the output from running this second \task{pol2map}
 command. First, \task{pol2map} produces new I maps for each map, correcting
 the position using the correction stored in the old I
 map\footnote{This correction is found by aligning the old I map with the
-supplied reference map, or the first observation if no reference map was
-supplied.}, and then coadds all the observations.
+\file{iauto.sdf} map.}, and then coadds all the observations.
 
 \begin{terminalv}
 Logging to file pol2map.log
@@ -294,7 +299,7 @@ Masking will be based on SNR values in 'iauto'.
 
 >>>>   Making I map from 20160112_00056_0003...
 
-   Using pre-calculated pointing corrections of (1.889022181,2.8085505485) arc-seconds
+   Using pre-calculated pointing corrections of (1.9,2.8) arc-seconds
 
 >>>>   Making I map from 20160125_00043_0003...
 
@@ -302,7 +307,7 @@ Masking will be based on SNR values in 'iauto'.
 
 >>>>   Making I map from 20160112_00059_0003...
 
-   Using pre-calculated pointing corrections of (2.13319187001,2.40199783004) arc-seconds
+   Using pre-calculated pointing corrections of (2.1,2.4) arc-seconds
 Coadding I maps from all observations:
 \end{terminalv}
 
@@ -313,7 +318,7 @@ vector catalogue.
 \begin{terminalv}
 >>>>   Making Q map from 20160112_00056_0003...
 
-   Using pre-calculated pointing corrections of (1.889022181,2.8085505485) arc-seconds
+   Using pre-calculated pointing corrections of (1.9,2.8) arc-seconds
 
 >>>>   Making Q map from 20160125_00043_0003...
 
@@ -321,12 +326,12 @@ vector catalogue.
 
 >>>>   Making Q map from 20160112_00059_0003...
 
-   Using pre-calculated pointing corrections of (2.13319187001,2.40199783004) arc-seconds
+   Using pre-calculated pointing corrections of (2.1,2.4) arc-seconds
 Coadding Q maps from all observations:
 
 >>>>   Making U map from 20160112_00056_0003...
 
-   Using pre-calculated pointing corrections of (1.889022181,2.8085505485) arc-seconds
+   Using pre-calculated pointing corrections of (1.9,2.8) arc-seconds
 
 >>>>   Making U map from 20160125_00043_0003...
 
@@ -334,7 +339,7 @@ Coadding Q maps from all observations:
 
 >>>>   Making U map from 20160112_00059_0003...
 
-   Using pre-calculated pointing corrections of (2.13319187001,2.40199783004) arc-seconds
+   Using pre-calculated pointing corrections of (2.1,2.4) arc-seconds
 Coadding U maps from all observations:
 Creating the output catalogue: 'mycat'...
 
@@ -356,15 +361,15 @@ The output of this final run of \task{pol2map} is as follows.
   final I, Q and U maps.
 
 \item[\file{iext.sdf}] The total intensity image, created using the
-  external AST and PCA mask described above.
+  external AST and PCA masks described above.
 
 \item[\file{qext.sdf}] The Q map (\emph{i.e} the intensity of the radiation
   linearly polarised in the direction parallel or perpendicular to the
   reference plane), created using an external AST and PCA mask.
 
 \item[\file{maps/}] A folder containing the individual I, Q and U
-  maps from each separate observation \file{$\_$Imap.sdf}.
-  \file{$\_$Qmap.sdf} and \file{$\_$Umap.sdf}.
+  maps from each separate observation. These will have names that end with
+  \file{$\_$Imap.sdf}, \file{$\_$Qmap.sdf} or \file{$\_$Umap.sdf}.
 
 \item[\file{uext.sdf}] The U map (\emph{i.e.} the intensity of the radiation
   linearly polarised in the direction $\pm45^{\circ }$ to the reference plane).
@@ -425,13 +430,13 @@ The output vector catalogue contains a range of values derived by
 errors in the
 catalogue are expressed in units of mJy/beam.  If desired it is possible
 to switch the catalogue to units of pW by using \texttt{Jy=no} on the \task{pol2map}
-command line.  The values are tabulated below.
+command line.  The columns are listed below.
 
 \begin{aligndesc}
-\item[\texttt{X}] Pixel coordinate
-\item[\texttt{Y}] Pixel coordinate
-\item[\texttt{RA}] RA coordinate
-\item[\texttt{Dec}] Dec coordinate
+\item[\texttt{X}] Pixel coordinate at the centre of the pixel
+\item[\texttt{Y}] Pixel coordinate at the centre of the pixel
+\item[\texttt{RA}] RA coordinate at the centre of the pixel
+\item[\texttt{Dec}] Dec coordinate at the centre of the pixel
 \item[\texttt{I}] Total intensity
 \item[\texttt{DI}] Error in I
 \item[\texttt{Q}] Stokes Q parameter
@@ -452,14 +457,14 @@ command line.  The values are tabulated below.
 
 Inserting POL-2 in front of SCUBA-2 reduces the throughput to SCUBA-2.
 POL-2 is not a perfect polarimiter. Its wire grid absorbs and scatters incoming
-signal so the modulation amplitude is lower than for a perfect polarimeter. 
-In addition cross polarization and depolarization decreases the modulation 
-amplitude without decreasing the power in the transmitted signal. The first 
-type of inefficiencies can be measured by comparing normal SCUBA-2 maps with 
-and without the polarimeter inserted. Such observations have been done on Uranus, 
-Mars and Jupiter. The second type of losses can be measured with a source of know polarization. 
+signal so the modulation amplitude is lower than for a perfect polarimeter.
+In addition cross polarization and depolarization decreases the modulation
+amplitude without decreasing the power in the transmitted signal. The first
+type of inefficiencies can be measured by comparing normal SCUBA-2 maps with
+and without the polarimeter inserted. Such observations have been done on Uranus,
+Mars and Jupiter. The second type of losses can be measured with a source of know polarization.
 
-To convert POL-2 data to astronomical units such as mJy/beam a Flux Conversion 
+To convert POL-2 data to astronomical units such as mJy/beam a Flux Conversion
 Factor, FCF, must be applied to the data. For POL-2 the FCFs are quoted in terms of
 the SCUBA-2 FCF.
 
@@ -475,13 +480,20 @@ Inevitably, as with unpolarised SCUBA-2 data reduction, it will
 probably be necessary for you to tweak the \poltwomap\ reduction for
 specific situations.
 
-The pixel size of the final map produced is controlled by the \param{PIXSIZE}
-parameter in the \SMURF\ \task{pol2map} command.
+The bin size within the final vector catalogue is controlled by the
+\param{BINSIZE} parameter in the \SMURF\ \task{pol2map} command.
 
 \begin{terminalv}
-% pol2map pixsize=12
+% pol2map binsize=12
 \end{terminalv}
 
+Changing the catalogue bin size in this way does not change the pixel
+size of the maps created \task{pol2map}. Instead, the maps are binned up
+to the requested bin size before the catalogue is created. There is
+another parameter, called \param{PIXSIZE}, which controls the map pixel
+size, but it is usually advisable to leave this at its default value
+as the map pixel size can affect the behaviour of the iterative algorithm
+used to create maps.
 
 
 

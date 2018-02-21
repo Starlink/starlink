@@ -93,8 +93,8 @@ catalogue created by an earlier run of \task{pol2map}.
 
 \section{\xlabel{pixelsize}Experimenting with pixel sizes}
 
-Currently, as with unpolarised SCUBA-2 reductions, the default
-reduction pixel size is 4\si{\arcsecond}.  The pixel size is controlled by the
+Currently,the default map pixel size is 4\si{\arcsecond} at both 
+450 and \SI{450}{\micro\metre}. The pixel size is controlled by the
 \param{PIXSIZE} parameter in the \smurf\ \poltwomap\ command:
 
 \begin{terminalv}
@@ -156,6 +156,10 @@ pixels and 7\si{\arcsecond} pixels.
 
   Check the masks (\file{astmask12.sdf} and \file{pcamask12.sdf}) to make sure they
   look reasonable.
+
+  It is usually advisable to leave \param{PIXSIZE} at its default value
+  and instead use the \param{BINSIZE} parameter to control the bin size in
+  the vector catalogue - see Section~\ref{sec:pol2map-pixelsize}).
 \end{tip}
 
 \section{\xlabel{IPerror}Investigating systematic error in IP}
