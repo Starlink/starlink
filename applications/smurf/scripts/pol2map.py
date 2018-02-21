@@ -359,9 +359,8 @@
 *        tracking system - what ever that may be. ["TRACKING"]
 *     PIXSIZE = _REAL (Read)
 *        Pixel dimensions in the output I, Q and U maps, in arcsec. The default
-*        is 4 arc-sec for 850 um data and 2 arc-sec for 450 um data. The
-*        bin size for the output catalogue can be specified separately -
-*        see parameter BINSIZE and CAT. []
+*        is 4 arc-sec for both 450 and 850 um data. The bin size for the output
+*        catalogue can be specified separately - see parameter BINSIZE and CAT. [4]
 *     QOUT = NDF (Write)
 *        The output NDF in which to return the Q map including all supplied
 *        observations. This will be in units of pW. Supply null (!) if no Q
@@ -465,6 +464,8 @@
 *        Remove hardwired assumption of 850 data when looking for
 *        pre-existing I,Q,U time-stream data, and when checking value of
 *        NUMITER in the supplied config.
+*     21-FEB-2018 (DSB):
+*        Change default for PIXSIZE to 4 arc-seconds at both 450 and 850.
 '''
 
 import glob
@@ -569,7 +570,7 @@ try:
    params.append(starutil.Par0S("CONFIG", "Map-maker tuning parameters",
                                 "def", noprompt=True))
 
-   params.append(starutil.Par0F("PIXSIZE", "Pixel size (arcsec)", None,
+   params.append(starutil.Par0F("PIXSIZE", "Pixel size (arcsec)", 4.0,
                                  maxval=1000, minval=0.01, noprompt=True))
 
    params.append(starutil.Par0S("QUDIR", "Directory in which to save new "
@@ -689,10 +690,6 @@ try:
    iconfig = parsys["ICONFIG"].value
    quconfig = parsys["QUCONFIG"].value
    pixsize = parsys["PIXSIZE"].value
-   if pixsize:
-      pixsize_par = "pixsize={0}".format(pixsize)
-   else:
-      pixsize_par = ""
 
 #  See if temp files are to be retained.
    retain = parsys["RETAIN"].value
@@ -1583,7 +1580,7 @@ try:
          except starutil.NoNdfError:
 
             if dx is not None and dy is not None:
-               msg_out( "   Using pre-calculated pointing corrections of ({0},{1}) arc-seconds".format(dx,dy) )
+               msg_out( "   Using pre-calculated pointing corrections of ({0:5.1f},{1:5.1f}) arc-seconds".format(dx,dy) )
 
             qui_maps[key] = NDG(mapname, False)
             try:
@@ -1616,11 +1613,11 @@ try:
 
                   if not maskmap:
                      invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
-                         "{5} {6} {7}".format(isdf,conf,qui_maps[key],ref,pntfile,pixsize_par,ip,abpar))
+                         "pixsize={5} {6} {7}".format(isdf,conf,qui_maps[key],ref,pntfile,pixsize,ip,abpar))
                   else:
                      invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
-                         "{5} {6} {7} {8}".format(isdf,conf,qui_maps[key],astmask,pntfile,
-                                                        pixsize_par,ip,pcamaskpar,abpar))
+                         "pixsize={5} {6} {7} {8}".format(isdf,conf,qui_maps[key],astmask,pntfile,
+                                                        pixsize,ip,pcamaskpar,abpar))
 
 #  If we do not yet know what pcathresh value to use, see if makemap aborted
 #  due to slow convergence. If so, reduce the number of PCA components
@@ -1971,7 +1968,7 @@ try:
 # The rest we only do if an output catalogue is reqired.
    if outcat:
 
-#  We need I, Q and U maps to create a catalogue. TThe pixel size in
+#  We need I, Q and U maps to create a catalogue. The pixel size in
 #  these maps will be equal to the value of parameter BINSIZE.
       if imap_cat and qmap_cat and umap_cat:
 
