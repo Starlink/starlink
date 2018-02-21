@@ -63,11 +63,11 @@ static void hds1ReadTuneEnvironment () {
   if(!HAVE_INITIALIZED_TUNING) {
     int status = SAI__OK;
     int version = 0;
-    dat1Getenv( "HDS_VERSION", USE_VERSION5 ? 5 : 4, &version );
+    dat1GetEnv( "HDS_VERSION", USE_VERSION5 ? 5 : 4, &version );
     emsBegin(&status);
     hds1SetHDSVersion(version, &status);
     emsEnd(&status);
-    dat1Getenv( "HDS_V4LOCKERROR", V4LOCK_ERROR, &V4LOCK_ERROR );
+    dat1GetEnv( "HDS_V4LOCKERROR", V4LOCK_ERROR, &V4LOCK_ERROR );
     HAVE_INITIALIZED_TUNING = 1;
   }
   UNLOCK_MUTEX;

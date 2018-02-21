@@ -11,13 +11,13 @@
 /*
 *+
 * Name:
-*   dat1Getenv
+*   dat1GetEnv
 
 * Purpose:
 *    Obtain an integer value from an environment variable.
 
 * Invocation:
-*    dat1Getenv( varname, def, val );
+*    dat1GetEnv( varname, def, val );
 
 * Description:
 *    This function obtains the value of a specified environment variable
@@ -63,7 +63,7 @@
 
 *-
 */
-void dat1Getenv( const char *varname, int def, int *val ) {
+void dat1GetEnv( const char *varname, int def, int *val ) {
 
   /* Local Variables: */
   char *txt;                 /* Pointer to translation value */

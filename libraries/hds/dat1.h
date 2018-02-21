@@ -93,7 +93,7 @@ hds1GtuneWrapper(const char *param_str, int *value, int *status);
 hdsbool_t hds1UseVersion5();
 hdsbool_t hds1V4LockError();
 
-void dat1Getenv( const char *varname, int def, int *val );
+void dat1GetEnv( const char *varname, int def, int *val );
 
 #endif
 
