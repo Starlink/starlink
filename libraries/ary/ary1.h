@@ -78,7 +78,7 @@ void ary1Cln( AryACB *acb1, AryACB **acb2, int *status );
 void ary1Cmtmp( const char *type, int ndim, const hdsdim  *dim, HDSLoc **loc, void **pntr, int *status );
 void ary1Cpdlt( AryDCB *dcb1, AryDCB *dcb2, int *status );
 void ary1Cpscl( AryDCB *dcb1, AryDCB *dcb2, int *status );
-void ary1Cpy( AryACB *acb1, int temp, HDSLoc *loc, int expand, AryACB **acb2, int *status );
+void ary1Cpy( AryACB *acb1, int temp, HDSLoc **loc, int expand, AryACB **acb2, int *status );
 void ary1Cpync( HDSLoc *loc1, const char *name, HDSLoc *loc2, int *status );
 void ary1Crnba( AryDCB *dcb, AryACB **acb, int *status );
 void ary1Cut( AryACB *acb1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd, AryACB **acb2, int *status );

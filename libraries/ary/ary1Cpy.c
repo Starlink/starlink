@@ -6,7 +6,7 @@
 #include "ary_err.h"
 #include <string.h>
 
-void ary1Cpy( AryACB *acb1, int temp, HDSLoc *loc, int expand,
+void ary1Cpy( AryACB *acb1, int temp, HDSLoc **loc, int expand,
               AryACB **acb2, int *status ) {
 /*
 *+
@@ -18,7 +18,7 @@ void ary1Cpy( AryACB *acb1, int temp, HDSLoc *loc, int expand,
 *     location.
 
 *  Synopsis:
-*     void ary1Cpy( AryACB *acb1, int temp, HDSLoc *loc, int expand,
+*     void ary1Cpy( AryACB *acb1, int temp, HDSLoc **loc, int expand,
 *                   AryACB **acb2, int *status )
 
 *  Description:
@@ -36,7 +36,10 @@ void ary1Cpy( AryACB *acb1, int temp, HDSLoc *loc, int expand,
 *        set its disposal mode in the DCB).
 *     loc
 *        Locator to array placeholder object (a scalar data structure
-*        of type ARRAY).
+*        of type ARRAY). If a simple array is created, the supplied
+*        object becomes the new array object, and the supplied locator
+*        is left unchanged. If a primitive array is created, the supplied
+*        object is annulled and a locator for a new object is returned.
 *     expand
 *        Determines whether base arrays stored in DELTA or SCALED form
 *        should be expanded. Note, this only controls what happens with
@@ -81,6 +84,12 @@ void ary1Cpy( AryACB *acb1, int temp, HDSLoc *loc, int expand,
 *  History:
 *     03-JUL-2017 (DSB):
 *        Original version, based on equivalent Fortran routine by RFWS.
+*     22-FEB-2018 (DSB):
+*        The "loc" argument is now given and returned (an "HDSLoc **"
+*        instead of an "HDSLoc *" ) since the supplied locator will be
+*        annulled and a new one returned if a primitive array is created
+*        (see ary1Dcrep). This looks like a bug that has been in the Fortran
+*        code comments (ary1_cpy.f) for a long time.
 
 *-
 */
@@ -130,7 +139,7 @@ void ary1Cpy( AryACB *acb1, int temp, HDSLoc *loc, int expand,
 /* Make a direct copy of the data object and then create a new base array
    entry in the ACB to describe it. */
       } else {
-         ary1Dcpy( dcb1, temp, &loc, &dcb2, status );
+         ary1Dcpy( dcb1, temp, loc, &dcb2, status );
          ary1Crnba( dcb2, acb2, status );
       }
 
@@ -155,10 +164,10 @@ void ary1Cpy( AryACB *acb1, int temp, HDSLoc *loc, int expand,
    array if possible. Otherwise, create a simple array. */
                if( pbnd ){
                   ary1Dcrep( 0, dcb1->type, acb1->ndim, acb1->ubnd, temp,
-                             &loc, &dcb2, status );
+                             loc, &dcb2, status );
                } else {
                   ary1Dcre( 0, dcb1->type, 0, acb1->ndim, acb1->lbnd,
-                            acb1->ubnd, temp, loc, &dcb2, status );
+                            acb1->ubnd, temp, *loc, &dcb2, status );
                }
             }
 
@@ -264,7 +273,7 @@ void ary1Cpy( AryACB *acb1, int temp, HDSLoc *loc, int expand,
    correct type and bounds to accommodate the copied data. */
             ary1Dcre( 0, newtype, dcb1->complex, acb1->ndim,
                       acb1->lbnd, acb1->ubnd, temp,
-                      loc, &dcb2, status );
+                      *loc, &dcb2, status );
 
 /* Create a new base array entry in the ACB to describe it. */
             ary1Crnba( dcb2, acb2, status );

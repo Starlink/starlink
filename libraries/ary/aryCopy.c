@@ -100,7 +100,7 @@ void aryCopy( Ary *ary1, AryPlace **place, Ary **ary2, int *status ){
       if( *status == SAI__OK ){
 
 /* Make a copy of the array. */
-         ary1Cpy( acb1, pcb->tmp, pcb->loc, 1, &acb2, status );
+         ary1Cpy( acb1, pcb->tmp, &(pcb->loc), 1, &acb2, status );
 
 /* Export an identifier for the new array. */
          *ary2 = ary1Expid( (AryObject *) acb2, status );

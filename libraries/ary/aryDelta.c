@@ -188,7 +188,7 @@ void aryDelta( Ary *ary1, int zaxis, const char *type, float minrat,
 /* If the array is not a base array, produce a temporary copy of it. */
    if( acb1->cut ){
       ary1Temp( "ARRAY", 0, NULL, &loct, status );
-      ary1Cpy( acb1, 1, loct, 1, &acbt, status );
+      ary1Cpy( acb1, 1, &loct, 1, &acbt, status );
 
 /* If the array is a base array, use it directly. */
    } else {
@@ -282,7 +282,7 @@ void aryDelta( Ary *ary1, int zaxis, const char *type, float minrat,
    create the output array. We want the copy to be a DELTA compressed
    array, so do not expand the compressed array. */
       if( zaxold == zaxis && ztyold == type ){
-         ary1Cpy( acb1, pcb->tmp, pcb->loc, 0, &acb2, status );
+         ary1Cpy( acb1, pcb->tmp, &(pcb->loc), 0, &acb2, status );
 
 /* If they are not the same as the new ones, we need to uncompress the
    supplied delta array so that we can re-compress it with the new
@@ -290,7 +290,7 @@ void aryDelta( Ary *ary1, int zaxis, const char *type, float minrat,
    simplest way to uncompress it. */
       } else {
          ary1Temp( "ARRAY", 0, 0, &loct, status );
-         ary1Cpy( acb1, 1, loct, 1, &acbt, status );
+         ary1Cpy( acb1, 1, &(loct), 1, &acbt, status );
 
 /* Get the DCB entry for the uncompressed copy, and ensure type
    information is available for it in the DCB. */
@@ -409,7 +409,7 @@ void aryDelta( Ary *ary1, int zaxis, const char *type, float minrat,
             datErase( pcb->loc, name, status );
          }
 
-         ary1Cpy( acbt, pcb->tmp, pcb->loc, 1, &acb2, status );
+         ary1Cpy( acbt, pcb->tmp, &(pcb->loc), 1, &acb2, status );
 
 /* If the compression ratio was high enough, and all went well, store the
    new storage form in the DCB. */
