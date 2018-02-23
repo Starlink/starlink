@@ -251,8 +251,8 @@ F77_SUBROUTINE(ary_delta)( INTEGER(IARY1),
    GENPTR_INTEGER(IARY2)
    GENPTR_INTEGER(STATUS)
 
-   char type[ ARY__SZTYP + 1 ];
-   cnfImpn( TYPE, TYPE_length, ARY__SZTYP, type );
+   char type[ DAT__SZTYP + 1 ];
+   cnfImpn( TYPE, TYPE_length, DAT__SZTYP, type );
    Ary *ary2;
    AryPlace *place = aryI2P(*PLACE);
 
@@ -442,7 +442,7 @@ F77_SUBROUTINE(ary_sctyp)( INTEGER(IARY),
    GENPTR_INTEGER(IARY)
    GENPTR_CHARACTER(TYPE)
    GENPTR_INTEGER(STATUS)
-   char type[ARY__SZTYP+1];
+   char type[DAT__SZTYP+1];
 
    arySctyp( aryI2A(*IARY), type, STATUS );
    cnfExprt( type, TYPE, TYPE_length );
@@ -508,7 +508,7 @@ F77_SUBROUTINE(ary_type)( INTEGER(IARY),
    GENPTR_INTEGER(IARY)
    GENPTR_CHARACTER(TYPE)
    GENPTR_INTEGER(STATUS)
-   char type[ARY__SZTYP+1];
+   char type[DAT__SZTYP+1];
 
    aryType( aryI2A(*IARY), type, STATUS );
 
@@ -664,12 +664,12 @@ F77_SUBROUTINE(ary_mapk)( INTEGER(IARY),
    GENPTR_INTEGER(PNTR)
    GENPTR_INTEGER8(EL)
    GENPTR_INTEGER(STATUS)
-   char type[ ARY__SZTYP + 1 ];
+   char type[ DAT__SZTYP + 1 ];
    char mmod[ ARY__SZMMD + 1 ];
    void *pntr = NULL;
    size_t el;
 
-   cnfImpn( TYPE, TYPE_length, ARY__SZTYP, type );
+   cnfImpn( TYPE, TYPE_length, DAT__SZTYP, type );
    cnfImpn( MMOD, MMOD_length, ARY__SZMMD, mmod );
 
    aryMap( aryI2A(*IARY), type, mmod, &pntr, &el, STATUS );
@@ -694,13 +694,13 @@ F77_SUBROUTINE(ary_mapzk)( INTEGER(IARY),
    GENPTR_INTEGER(IPNTR)
    GENPTR_INTEGER8(EL)
    GENPTR_INTEGER(STATUS)
-   char type[ ARY__SZTYP + 1 ];
+   char type[ DAT__SZTYP + 1 ];
    char mmod[ ARY__SZMMD + 1 ];
    void *rpntr = NULL;
    void *ipntr = NULL;
    size_t el;
 
-   cnfImpn( TYPE, TYPE_length, ARY__SZTYP, type );
+   cnfImpn( TYPE, TYPE_length, DAT__SZTYP, type );
    cnfImpn( MMOD, MMOD_length, ARY__SZMMD, mmod );
 
    aryMapz( aryI2A(*IARY), type, mmod, &rpntr, &ipntr, &el, STATUS );
@@ -957,12 +957,12 @@ F77_SUBROUTINE(ary_map)( INTEGER(IARY),
    GENPTR_INTEGER(PNTR)
    GENPTR_INTEGER(EL)
    GENPTR_INTEGER(STATUS)
-   char type[ ARY__SZTYP + 1 ];
+   char type[ DAT__SZTYP + 1 ];
    char mmod[ ARY__SZMMD + 1 ];
    void *pntr = NULL;
    size_t el;
 
-   cnfImpn( TYPE, TYPE_length, ARY__SZTYP, type );
+   cnfImpn( TYPE, TYPE_length, DAT__SZTYP, type );
    cnfImpn( MMOD, MMOD_length, ARY__SZMMD, mmod );
 
    aryMap( aryI2A(*IARY), type, mmod, &pntr, &el, STATUS );
@@ -989,13 +989,13 @@ F77_SUBROUTINE(ary_mapz)( INTEGER(IARY),
    GENPTR_INTEGER(IPNTR)
    GENPTR_INTEGER(EL)
    GENPTR_INTEGER(STATUS)
-   char type[ ARY__SZTYP + 1 ];
+   char type[ DAT__SZTYP + 1 ];
    char mmod[ ARY__SZMMD + 1 ];
    void *rpntr = NULL;
    void *ipntr = NULL;
    size_t el;
 
-   cnfImpn( TYPE, TYPE_length, ARY__SZTYP, type );
+   cnfImpn( TYPE, TYPE_length, DAT__SZTYP, type );
    cnfImpn( MMOD, MMOD_length, ARY__SZMMD, mmod );
 
    aryMapz( aryI2A(*IARY), type, mmod, &rpntr, &ipntr, &el, STATUS );

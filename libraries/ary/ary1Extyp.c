@@ -4,7 +4,7 @@
 #include "star/cmp.h"
 #include <string.h>
 
-void ary1Extyp( AryDCB *dcb, char type[ARY__SZTYP+1], int *status ) {
+void ary1Extyp( AryDCB *dcb, char type[DAT__SZTYP+1], int *status ) {
 /*
 *+
 *  Name:
@@ -14,7 +14,7 @@ void ary1Extyp( AryDCB *dcb, char type[ARY__SZTYP+1], int *status ) {
 *     Obtain the external numeric type of a possible scaled array.
 
 *  Synopsis:
-*     void ary1Extyp( AryDCB *dcb, char type[ARY__SZTYP+1], int *status )
+*     void ary1Extyp( AryDCB *dcb, char type[DAT__SZTYP+1], int *status )
 
 *  Description:
 *     This function returns the numeric type of the externally visible
@@ -83,12 +83,12 @@ void ary1Extyp( AryDCB *dcb, char type[ARY__SZTYP+1], int *status ) {
       if( there ){
          cmpType( dcb->loc, "SCALE", type, status );
       } else {
-         ary1Ccpy( dcb->type, ARY__SZTYP + 1, type, status );
+         ary1Ccpy( dcb->type, DAT__SZTYP + 1, type, status );
       }
 
 /* For othe forms, use the data type of the DATA array. */
    } else {
-      ary1Ccpy( dcb->type, ARY__SZTYP + 1, type, status );
+      ary1Ccpy( dcb->type, DAT__SZTYP + 1, type, status );
    }
 
 }

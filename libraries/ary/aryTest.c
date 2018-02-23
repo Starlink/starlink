@@ -34,7 +34,7 @@ int main(){
    char name2[DAT__SZNAM+1];
    char name3[DAT__SZNAM+1];
    char type[DAT__SZTYP+1];
-   char sctype[ARY__SZTYP+1];
+   char sctype[DAT__SZTYP+1];
    char text[200];
    double *dpntr;
    double *drpntr;

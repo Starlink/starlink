@@ -78,7 +78,7 @@ void aryStype( const char *ftype, Ary *ary, int *status ) {
 
 /* Local variables: */
    AryACB *acb;               /* Array ACB */
-   char type[ARY__SZTYP+1];   /* Array numeric type */
+   char type[DAT__SZTYP+1];   /* Array numeric type */
    int cmplx;                 /* Whether the array is to be complex */
 
 /* Check inherited global status. */

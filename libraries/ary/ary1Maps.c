@@ -90,7 +90,7 @@ void ary1Maps( AryACB *acb, const char *type, int cmplx, const char *mmod,
    AryMCB *mcb;               /* Mapping entry in the MCB */
    char mode[ARY__SZMOD+1];   /* Mapping mode buffer */
    char tinop[ARY__SZIOP+1];  /* Temporary initialisation option buffer */
-   char vtype[ARY__SZTYP+1];  /* Validated data type string */
+   char vtype[DAT__SZTYP+1];  /* Validated data type string */
    hdsdim dim[ARY__MXDIM];    /* Array (ACB) dimension sizes */
    int bad;                   /* Whether to check for "bad" values */
    int dce;                   /* Data conversion error? */

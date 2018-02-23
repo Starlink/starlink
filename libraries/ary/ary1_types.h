@@ -410,7 +410,7 @@ typedef struct AryMCB {
 /* Data type for access: If the MCB is in use, then the "type" value
    contains the numeric data type used to access the data and the "complex"
    value indicates if access to complex data was requested. */
-   char type[ ARY__SZTYP + 1 ];
+   char type[ DAT__SZTYP + 1 ];
    int complex;
 
 } AryMCB;

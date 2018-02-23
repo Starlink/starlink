@@ -171,7 +171,7 @@ void CGEN_FUNCTION(ary1Ptn)( int bad, int ndim, const hdsdim *lbnda,
 /* Local variables: */
    HDSLoc *slice=NULL;        /* Locator to data slice */
    HDSLoc *vec=NULL;          /* Locator to vectorised data */
-   char type[ARY__SZTYP+1];   /* HDS data type */
+   char type[DAT__SZTYP+1];   /* HDS data type */
    hdsdim dim[ARY__MXDIM];    /* Array of dimension indices */
    hdsdim eslice[1];          /* End of data slice */
    hdsdim sslice[1];          /* Start of data slice */

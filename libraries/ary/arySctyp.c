@@ -4,7 +4,7 @@
 #include "dat_par.h"
 #include <string.h>
 
-void arySctyp( Ary *ary, char type[ARY__SZTYP+1], int *status ) {
+void arySctyp( Ary *ary, char type[DAT__SZTYP+1], int *status ) {
 /*
 *+
 *  Name:
@@ -14,7 +14,7 @@ void arySctyp( Ary *ary, char type[ARY__SZTYP+1], int *status ) {
 *     Obtain the numeric type of a scaled array.
 
 *  Synopsis:
-*     void arySctyp( Ary *ary, char type[ARY__SZTYP+1], int *status )
+*     void arySctyp( Ary *ary, char type[DAT__SZTYP+1], int *status )
 
 *  Description:
 *     This function returns the numeric type of a scaled array as an
@@ -34,10 +34,10 @@ void arySctyp( Ary *ary, char type[ARY__SZTYP+1], int *status ) {
 *  Notes:
 *     -  If the array is not stored in SCALED form, then this routine
 *     returns the same type as the aryType function.
-*     -  The symbolic constant ARY__SZTYP should be used to declare the
+*     -  The symbolic constant DAT__SZTYP should be used to declare the
 *     length of a character variable which is to hold the numeric type
 *     of an array. This constant is defined in the header file
-*     ary_par.h.
+*     dat_par.h.
 
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory

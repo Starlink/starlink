@@ -60,10 +60,6 @@
    an array for access, e.g. 'WRITE/ZERO'. */
 #define ARY__SZMMD 11
 
-/* Maximum length of a string describing an array's numeric type, e.g.
-   '_INTEGER'. */
-#define ARY__SZTYP 8
-
 /* An opaque data type used by public identifiers for ACB objects. Each
    ACB object has an associated integer identifier value. This ID value
    is used directly by the F77 API, but is converted to a pointer for

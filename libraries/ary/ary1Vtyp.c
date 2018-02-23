@@ -5,7 +5,7 @@
 #include "dat_par.h"
 #include <string.h>
 
-void ary1Vtyp( const char *type, char vtype[ARY__SZTYP + 1], int *status ) {
+void ary1Vtyp( const char *type, char vtype[DAT__SZTYP + 1], int *status ) {
 /*
 *+
 *  Name:
@@ -15,7 +15,7 @@ void ary1Vtyp( const char *type, char vtype[ARY__SZTYP + 1], int *status ) {
 *     Validate a type specification string.
 
 *  Synopsis:
-*     void ary1Vtyp( const char *type, char vtype[ARY__SZTYP + 1], int *status )
+*     void ary1Vtyp( const char *type, char vtype[DAT__SZTYP + 1], int *status )
 
 *  Description:
 *     This function checks a data type specification string for validity.
@@ -70,35 +70,35 @@ void ary1Vtyp( const char *type, char vtype[ARY__SZTYP + 1], int *status ) {
 
 /* ...byte data type. */
    if( !strcasecmp( type, "_BYTE" ) ){
-      ary1Ccpy( "_BYTE", ARY__SZTYP + 1, vtype, status );
+      ary1Ccpy( "_BYTE", DAT__SZTYP + 1, vtype, status );
 
 /* ...unsigned byte data type. */
    } else if( !strcasecmp( type, "_UBYTE" ) ){
-      ary1Ccpy( "_UBYTE", ARY__SZTYP + 1, vtype, status );
+      ary1Ccpy( "_UBYTE", DAT__SZTYP + 1, vtype, status );
 
 /* ...double precision data type. */
    } else if( !strcasecmp( type, "_DOUBLE" ) ){
-      ary1Ccpy( "_DOUBLE", ARY__SZTYP + 1, vtype, status );
+      ary1Ccpy( "_DOUBLE", DAT__SZTYP + 1, vtype, status );
 
 /* ...integer data type. */
    } else if( !strcasecmp( type, "_INTEGER" ) ){
-      ary1Ccpy( "_INTEGER", ARY__SZTYP + 1, vtype, status );
+      ary1Ccpy( "_INTEGER", DAT__SZTYP + 1, vtype, status );
 
 /* ...real data type. */
    } else if( !strcasecmp( type, "_REAL" ) ){
-      ary1Ccpy( "_REAL", ARY__SZTYP + 1, vtype, status );
+      ary1Ccpy( "_REAL", DAT__SZTYP + 1, vtype, status );
 
 /* ...word data type. */
    } else if( !strcasecmp( type, "_WORD" ) ){
-      ary1Ccpy( "_WORD", ARY__SZTYP + 1, vtype, status );
+      ary1Ccpy( "_WORD", DAT__SZTYP + 1, vtype, status );
 
 /* ...unsigned word data type. */
    } else if( !strcasecmp( type, "_UWORD" ) ){
-      ary1Ccpy( "_UWORD", ARY__SZTYP + 1, vtype, status );
+      ary1Ccpy( "_UWORD", DAT__SZTYP + 1, vtype, status );
 
 /* ...64-bit integer data type. */
    } else if( !strcasecmp( type, "_INT64" ) ){
-      ary1Ccpy( "_INT64", ARY__SZTYP + 1, vtype, status );
+      ary1Ccpy( "_INT64", DAT__SZTYP + 1, vtype, status );
 
 /* If the data type string is invalid, then report an error. */
    } else {

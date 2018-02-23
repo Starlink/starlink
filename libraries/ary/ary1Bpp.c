@@ -71,16 +71,16 @@ void ary1Bpp( const char *type, size_t el, void *pntr, int *bad, int *status ) {
 */
 
 /* Local variables: */
-   char utype[ARY__SZTYP+1];  /* Upper case version of TYPE */
+   char utype[DAT__SZTYP+1];  /* Upper case version of TYPE */
    int typok;                 /* Whether the TYPE argument is valid */
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
 
 /* If the supplied string is not too long, convert it to upper case. */
-   typok =  ( strlen(type) <= ARY__SZTYP );
+   typok =  ( strlen(type) <= DAT__SZTYP );
    if( typok ) {
-      astChrCase( type, utype, 1, ARY__SZTYP + 1 );
+      astChrCase( type, utype, 1, DAT__SZTYP + 1 );
 
 /* Compare the data type with each permitted value in turn, calling the
    appropriate routine to examine the array for bad pixels. */

@@ -96,8 +96,9 @@
       PARAMETER ( ARY__SZMMD = 11 )
 
 *  Maximum length of a string describing an array's numeric type, e.g.
-*  '_INTEGER'.
+*  '_INTEGER'. Retained for backwards compatibility with the F77
+*  version of ARY. New software should use DAT__SZTYP in place of ARY__SZTYP.
       INTEGER ARY__SZTYP
-      PARAMETER ( ARY__SZTYP = 8 )
+      PARAMETER ( ARY__SZTYP = 15 )
 
 *.

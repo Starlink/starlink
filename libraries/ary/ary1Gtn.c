@@ -125,16 +125,16 @@ void ary1Gtn( int bad, const char *htype, HDSLoc *loc, int ndim,
 */
 
 /* Local variables: */
-   char type[ARY__SZTYP+1];    /* Upper case data type for output array */
+   char type[DAT__SZTYP+1];    /* Upper case data type for output array */
    int typok;                  /* Is the supplied atype value valid? */
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
 
 /* If the supplied string is not too long, convert it to upper case. */
-   typok =  ( strlen(atype) <= ARY__SZTYP );
+   typok =  ( strlen(atype) <= DAT__SZTYP );
    if( typok ) {
-      astChrCase( atype, type, 1, ARY__SZTYP + 1 );
+      astChrCase( atype, type, 1, DAT__SZTYP + 1 );
 
 /* Test the output data type string against each permitted value in turn,
    calling the appropriate routine to extract the data subregion. */

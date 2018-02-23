@@ -3,7 +3,7 @@
 #include "mers.h"
 #include "dat_par.h"
 
-void aryType( Ary *ary, char type[ARY__SZTYP+1], int *status ) {
+void aryType( Ary *ary, char type[DAT__SZTYP+1], int *status ) {
 /*
 *+
 *  Name:
@@ -13,7 +13,7 @@ void aryType( Ary *ary, char type[ARY__SZTYP+1], int *status ) {
 *     Obtain the numeric type of an array.
 
 *  Synopsis:
-*     void aryType( Ary *ary, char type[ARY__SZTYP+1], int *status )
+*     void aryType( Ary *ary, char type[DAT__SZTYP+1], int *status )
 
 *  Description:
 *     This function returns the numeric type of an array as an upper-case
@@ -28,9 +28,9 @@ void aryType( Ary *ary, char type[ARY__SZTYP+1], int *status ) {
 *        The global status.
 
 *  Notes:
-*     -  The symbolic constant ARY__SZTYP should be used for declaring the
+*     -  The symbolic constant DAT__SZTYP should be used for declaring the
 *     length of a character array which is to hold the numeric type
-*     of an array. This constant is defined in the header file ary_par.h
+*     of an array. This constant is defined in the header file dat_par.h
 
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory

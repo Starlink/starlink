@@ -81,7 +81,7 @@ void aryNew( const char *ftype, int ndim, const hdsdim *lbnd, const hdsdim *ubnd
 */
 
 /* Local variables: */
-   char type[ARY__SZTYP+1];   /* Numeric type of the array */
+   char type[DAT__SZTYP+1];   /* Numeric type of the array */
    AryACB *acb;               /* Pointer to the ACB */
    AryDCB *dcb;               /* Pointer to the DCB */
    AryPCB *pcb;               /* Pointer to the PCB */
