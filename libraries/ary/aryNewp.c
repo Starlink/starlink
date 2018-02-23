@@ -83,7 +83,7 @@ void aryNewp( const char *ftype, int ndim, const hdsdim *ubnd,
 
 /* Local variables: */
    AryACB *acb;               /* Pointer to the ACB */
-   AryDCB *dcb;               /* Pointer to the DCB */
+   AryDCB *dcb = NULL;        /* Pointer to the DCB */
    AryPCB *pcb;               /* Pointer to the PCB */
    char vtype[DAT__SZTYP+1];  /* Numeric type of the array */
    hdsdim lbnd[ARY__MXDIM];   /* Lower bounds of array */

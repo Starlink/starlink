@@ -98,7 +98,7 @@ void ary1Cpy( AryACB *acb1, int temp, HDSLoc **loc, int expand,
    char newtype[DAT__SZTYP+1];/* New data type */
    AryACB *acbc;              /* Index to cloned ACB entry */
    AryDCB *dcb1;              /* Index to input object entry in DCB */
-   AryDCB *dcb2;              /* Index to output object entry in DCB */
+   AryDCB *dcb2 = NULL;       /* Index to output object entry in DCB */
    int bad;                   /* Bad pixel flag */
    int icomp;                 /* Loop counter for array components */
    int ncomp;                 /* Number of array components to copy */

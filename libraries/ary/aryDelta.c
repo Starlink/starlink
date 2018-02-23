@@ -150,7 +150,7 @@ void aryDelta( Ary *ary1, int zaxis, const char *type, float minrat,
    AryACB *acbt;              /* Input copy ACB */
    AryDCB *dcb2;              /* Output array DCB */
    AryDCB *dcbt;              /* Input copy DCB */
-   AryPCB *pcb;               /* Placeholder PCB */
+   AryPCB *pcb=NULL;          /* Placeholder PCB */
    HDSLoc *locc=NULL;         /* Locator for component */
    HDSLoc *loct=NULL;         /* Locator for temporary copy of array */
    char name[DAT__SZNAM+1];   /* Name of component */

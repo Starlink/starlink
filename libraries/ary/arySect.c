@@ -84,7 +84,7 @@ void arySect( Ary *ary1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd,
 
 /* Local variables: */
    AryACB *acb1;                 /* Pointer to initial array in the ACB */
-   AryACB *acb2;                 /* Pointer to new array in the ACB */
+   AryACB *acb2 = NULL;          /* Pointer to new array in the ACB */
 
 /* Set an initial value for the "ary2" argument. */
    *ary2 = NULL;

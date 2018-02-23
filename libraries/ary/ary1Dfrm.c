@@ -65,7 +65,7 @@ void ary1Dfrm( AryDCB *dcb, int *status ) {
 
 /* Local variables: */
    HDSLoc *locvar=NULL;       /* Locator to VARIANT component */
-   char *variant;             /* Pointer to VARIANT value */
+   char *variant=NULL;        /* Pointer to VARIANT value */
    char type[DAT__SZTYP+1];   /* HDS type string */
    hdsdim dim[DAT__MXDIM];    /* HDS dimension array */
    int ndim;                  /* Number of HDS dimensions */

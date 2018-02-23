@@ -79,7 +79,7 @@ void aryDupe( Ary *ary1, AryPlace **place, Ary **ary2, int *status ) {
    AryACB *acb1;              /* Input array ACB */
    AryACB *acb2;              /* Output array ACB */
    AryDCB *dcb1;              /* Input data object DCB */
-   AryDCB *dcb2;              /* Output data object DCB */
+   AryDCB *dcb2=NULL;         /* Output data object DCB */
    AryPCB *pcb;               /* Placeholder entry in the PCB */
    char newtyp[DAT__SZTYP+1]; /* Data type for new array */
    int erase;                 /* Whether to erase placeholder object */
