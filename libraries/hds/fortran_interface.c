@@ -3860,7 +3860,3 @@ F77_SUBROUTINE(dat_erdsn)( CHARACTER(locator), CHARACTER(cmp),
 
 }
 
-F77_SUBROUTINE(hds_start)( F77_INTEGER_TYPE(*status) )
-{
-
-}
