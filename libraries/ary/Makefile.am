@@ -33,7 +33,7 @@ C_ROUTINES = $(BUILT_C_ROUTINES) ary1Accok.c ary1Anl.c ary1Annpl.c \
 ary1Antmp.c ary1Bad.c ary1Bpp.c ary1Ccpy.c ary1Chacc.c ary1Chbpp.c \
 ary1Chcma.c ary1Chmod.c ary1Chscn.c ary1Cln.c ary1Cmtmp.c \
 ary1Cpdlt.c ary1Cpscl.c ary1Cpy.c ary1Cpync.c ary1Crnba.c ary1Cut.c \
-ary1DCBLock.c ary1Danl.c ary1Dbad.c ary1Dbnd.c ary1Dcpy.f ary1Dcre.c \
+ary1DCBLock.c ary1Danl.c ary1Dbad.c ary1Dbnd.c ary1Dcpy.c ary1Dcre.c \
 ary1Dcrep.c ary1Defr.c ary1Del.c ary1Dfppl.c ary1Dfrm.c ary1Dimp.c \
 ary1Dlshp.c ary1Dmod.c ary1Dobj.c ary1Dp2s.c ary1Drst.c ary1Dsbd.c \
 ary1Dsbnd.c ary1Dscl.c ary1Dsft.c ary1Dsta.c ary1Dstp.c ary1Dtyp.c \
