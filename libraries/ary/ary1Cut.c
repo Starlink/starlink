@@ -44,6 +44,11 @@ void ary1Cut( AryACB *acb1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd,
 *        The global status.
 
 *  Notes:
+*     -  If the supplied array is locked read-only by the current thread
+*     an attempt will be made to promote the lock to a read-write lock
+*     and an error will be reported if this attempt fails. This promotion
+*     is necessary because the meta-data associated with the cut (e.g.
+*     pixel shift etc) can be modified using the returned identifier.
 *     -  If "status" is set on entry, then a value of NULL will be
 *     returned for the "acb2" argument, although no further processing
 *     will occur.
@@ -98,14 +103,18 @@ void ary1Cut( AryACB *acb1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd,
    *acb2 = ary1Ffs( ARY__ACBTYPE, status );
    if( *status == SAI__OK ){
 
+/* Attempt to promote the supplied array to a read-write lock. This is
+   needed because the mata-data of the returned cut can be modified. */
+      dcb = acb1->dcb;
+      ary1DCBLock( dcb, 2, 0, status );
+
 /* Mark the new entry as a cut. */
       (*acb2)->cut = 1;
 
 /* Transfer the access control flags. */
       (*acb2)->access = acb1->access;
 
-/* Transfer the index to the data object entry in the DCB. */
-      dcb = acb1->dcb;
+/* Transfer the data object in the DCB. */
       (*acb2)->dcb = dcb;
 
 /* The new array is not mapped for access. */

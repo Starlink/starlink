@@ -37,6 +37,11 @@ void arySsect( Ary *ary1, Ary *ary2, Ary **ary3, int *status ) {
 *        The global status.
 
 *  Notes:
+*     -  If the supplied array is locked read-only by the current thread
+*     an attempt will be made to promote the lock to a read-write lock
+*     and an error will be reported if this attempt fails. This promotion
+*     is necessary because the meta-data associated with the cut (e.g.
+*     pixel shift etc) can be modified using the returned identifier.
 *     -  This routine normally generates an array section.  However, if
 *     both input arrays are base arrays with identical pixel-index
 *     bounds, then there is no need to create a section in order to

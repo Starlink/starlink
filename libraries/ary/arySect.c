@@ -40,6 +40,11 @@ void arySect( Ary *ary1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd,
 *        The global status.
 
 *  Notes:
+*     -  If the supplied array is locked read-only by the current thread
+*     an attempt will be made to promote the lock to a read-write lock
+*     and an error will be reported if this attempt fails. This promotion
+*     is necessary because the meta-data associated with the cut (e.g.
+*     pixel shift etc) can be modified using the returned identifier.
 *     -  The number of section dimensions need not match the number of
 *     dimensions in the initial array. Pixel-index bounds will be
 *     padded with 1's as necessary to identify the pixels to which the
