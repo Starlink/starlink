@@ -256,6 +256,10 @@
  *        Added SMF__ISFLAT flag to allow LUT models to be opened. These
  *        are _INTEGER arrays holding pixel indices, and so should not be
  *        flat-fielded.
+ *     2018-2-28 (DSB):
+ *        Use RTS_END to define the length of the JCMTSTATE vectors,
+ *        rather than the first component, since the first component may
+ *        be a scalar.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -1145,7 +1149,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
                  assuming we know the answer from the primary data array. This
                  is more annoying than it should be because we have to open up
                  one of the state entries, close it and then reopen it again. */
-              datIndex( xloc, 1, &tloc, status );
+              datFind( xloc, "RTS_END", &tloc, status );
               datSize( tloc, &nframes, status );
               datAnnul( &tloc, status );
 
