@@ -108,6 +108,7 @@
 #include "mers.h"
 #include "sae_par.h"
 #include "dat_par.h"
+#include "par_err.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -171,7 +172,7 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
 /* Get an identifier for the NDF using the associated ADAM parameter.
    First try UPDATE access. If this fails try READ access. */
       ndfAssoc( refparam, "UPDATE", &indf1, status );
-      if( *status != SAI__OK ) {
+      if( *status != SAI__OK && *status != PAR__NULL && *status != PAR__ABORT ){
          errAnnul( status );
          ndfAssoc( refparam, "READ", &indf1, status );
          update = 0;
