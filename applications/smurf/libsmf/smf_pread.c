@@ -219,6 +219,14 @@ void smf_pread( Grp *igrp, const char *param, int *status ){
          dlonmap = (AstMapping *) atlTablelutMap( subtable, "DLON", status );
          dlatmap = (AstMapping *) atlTablelutMap( subtable, "DLAT", status );
 
+/* If "taimap" has no inverse, it means the TAI column is not monotonic.
+   Report an error. */
+         if( !astGetI( taimap, "TranInverse" ) && *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRep( " ", "smf_pread: The values in the TAI column are "
+                    "not monotonic.", status );
+         }
+
 /* Create Mappings that transforms TAI into a DLON and DLAT. These use
    linear interpolation for non-tabulated TAI values. */
          astInvert( taimap );
