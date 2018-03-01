@@ -936,9 +936,6 @@ unset starjavadir
 #  ADAM_ABBRV environment variable to allow abbreviated parameters.
 export ADAM_ABBRV=1
 
-# 64-bit mode for HDS
-export HDS_64BIT=1
-
 # Done
 
 export STAR_LOGIN=''

@@ -654,10 +654,6 @@ endif
 setenv ADAM_ABBRV
 
 #
-#  HDS_64BIT environment variable to enable 64-bit mode.
-setenv HDS_64BIT 1
-
-#
 #  Run local Starlink login script if it exists
 if ( -e ${exec_prefix}/local/etc/login ) then
    source ${exec_prefix}/local/etc/login
