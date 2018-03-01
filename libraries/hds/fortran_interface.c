@@ -1456,19 +1456,36 @@ F77_SUBROUTINE(dat_msg)( CHARACTER(token), CHARACTER(locator)
   char token_c[EMS__SZTOK+1];
   HDSLoc * locator_c = NULL;
   int status = SAI__OK;
+  int lstat;
+  int locok;
 
-  /* Import the locator */
+  /* Get the current error status, then start a new error reporting context. */
+  emsStat( &lstat );
+  emsMark();
+
+  /* Try to import the locator */
   datImportFloc( locator, locator_length, &locator_c, &status );
-  if (status != SAI__OK) {
-    emsAnnul(&status);
-    return;
+
+  /* Was the locator imported successfully? */
+  locok = ( status == SAI__OK );
+
+  /* If the initial status was bad ignore any error that occurred
+     importing the locator. */
+  if( !locok && lstat != SAI__OK ) emsAnnul(&status);
+
+  /* Release the current error context. */
+  emsRlse();
+
+  /* If the locator was imported successfully... */
+  if( locok ) {
+
+     /* Import "token" to C string  */
+     cnfImpn( token, token_length, EMS__SZTOK,  token_c );
+
+     /* Call datMsg itself but only if status is good */
+     datMsg( token_c, locator_c );
+
   }
-
-  /* Import "token" to C string  */
-  cnfImpn( token, token_length, EMS__SZTOK,  token_c );
-
-  /* Call datMsg itself but only if status is good */
-  datMsg( token_c, locator_c );
 
 }
 
