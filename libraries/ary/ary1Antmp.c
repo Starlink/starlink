@@ -67,6 +67,7 @@ void ary1Antmp( HDSLoc **loc, int *status ) {
 /* Local variables: */
    HDSLoc *locp=NULL;         /* Locator to parent object */
    char name[DAT__SZNAM+1];   /* Name of object to be erased */
+   int plocked;               /* Original lock state for parent */
    int tstat;                 /* Local temporary status variable */
 
 /* Return if no pointer supplied. */
@@ -83,11 +84,26 @@ void ary1Antmp( HDSLoc **loc, int *status ) {
 /* Find its parent. */
    datParen( *loc, &locp, status );
 
+/* Attempt to lock the parent for read-write access by the current thread,
+   remembering if it was already locked or not. */
+   plocked = datLocked( locp, 0, status );
+   datLock( locp, 0, 0, status );
+
 /* Annul the object's locator. */
    datAnnul( loc, status );
 
 /* Erase the object. */
    datErase( locp, name, status );
+
+/* If the parent locator was originally unlocked, unlock it now. */
+   if( plocked == 0 ) {
+      datUnlock( locp, 0, status );
+
+/* If the parent locator was originally locked read-only, change it back
+   to a read-only lcok. */
+   } else if( plocked == 3 ) {
+      datLock( locp, 0, 1, status );
+   }
 
 /* Annul the parent's locator. */
    datAnnul( &locp, status );

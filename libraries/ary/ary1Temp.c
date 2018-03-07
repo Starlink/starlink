@@ -102,6 +102,12 @@ void ary1Temp( const char *type, int ndim, const hdsdim *dim, HDSLoc **loc,
    if( count == 1 ){
       datTemp( "ARY_TEMP", 0, NULL, &tmploc, status );
       hdsTune( "NCOMP", 20, status );
+
+/* If the enclosing structure has just been created it will already be
+   locked for access by the current thread. If the enclosing structure
+   already existed, lock it now for use by the current thread. */
+   } else {
+      datLock( tmploc, 0, 0, status );
    }
 
 /* Form a unique name for the temporary object. */
@@ -117,6 +123,10 @@ void ary1Temp( const char *type, int ndim, const hdsdim *dim, HDSLoc **loc,
       datNew( tmploc, name, type, ndim, dim, status );
       datFind( tmploc, name, loc, status );
    }
+
+/* Unlock the enclosing structure  so that other threads can create temporary
+   objects in it. */
+   datUnlock( tmploc, 0, status );
 
 /* Unlock the mutex. */
    pthread_mutex_unlock( &mutex );
