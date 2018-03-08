@@ -623,22 +623,22 @@ try:
 #  created by the starutil module (two succesive NDFs with the same
 #  path can have the same inode number).
    orig_cln_ndfs = {}
-   for path in glob.glob("s*_con_res_cln.sdf"):
+   for path in glob.glob("*_con_res_cln.sdf"):
       orig_cln_ndfs[path] = os.stat(path).st_atime
 
 #  Note any pre-existing NDFs holding extinction values.
    orig_ext_ndfs = {}
-   for path in glob.glob("s*_con_ext.sdf"):
+   for path in glob.glob("*_con_ext.sdf"):
       orig_ext_ndfs[path] = os.stat(path).st_atime
 
 #  Note any pre-existing NDFs holding NOI values.
    orig_noi_ndfs = {}
-   for path in glob.glob("s*_con_noi.sdf"):
+   for path in glob.glob("*_con_noi.sdf"):
       orig_noi_ndfs[path] = os.stat(path).st_atime
 
 #  Note any pre-existing NDFs holding LUT values.
    orig_lut_ndfs = {}
-   for path in glob.glob("s*_con_lut.sdf"):
+   for path in glob.glob("*_con_lut.sdf"):
       orig_lut_ndfs[path] = os.stat(path).st_atime
 
 #  Find the number of iterations to perform on the initial invocation of
@@ -779,7 +779,7 @@ try:
 #  existed before makemap was run.
       if niter > 1:
          if not precleaned:
-            for ndf in glob.glob("s*_con_res_cln.sdf"):
+            for ndf in glob.glob("*_con_res_cln.sdf"):
                if not ndf in orig_cln_ndfs:
                   shutil.move( ndf, NDG.tempdir )
                elif os.stat(ndf).st_atime > orig_cln_ndfs[ndf]:
@@ -787,14 +787,14 @@ try:
 
 #  Get a list of the extinction correction files created by the first
 #  invocation of makemap.
-         for ndf in glob.glob("s*_con_ext.sdf"):
+         for ndf in glob.glob("*_con_ext.sdf"):
             if not ndf in orig_ext_ndfs:
                new_ext_ndfs.append(ndf)
             elif os.stat(ndf).st_atime > orig_ext_ndfs[ndf]:
                new_ext_ndfs.append(ndf)
 
 #  Get a list of the LUT files created by the first invocation of makemap.
-         for ndf in glob.glob("s*_con_lut.sdf"):
+         for ndf in glob.glob("*_con_lut.sdf"):
             if not ndf in orig_lut_ndfs:
                new_lut_ndfs.append(ndf)
             elif os.stat(ndf).st_atime > orig_lut_ndfs[ndf]:
@@ -802,7 +802,7 @@ try:
 
 #  Get a list of the NOI model files created by the first invocation of
 #  makemap.
-         for ndf in glob.glob("s*_con_noi.sdf"):
+         for ndf in glob.glob("*_con_noi.sdf"):
             if not ndf in orig_noi_ndfs:
                new_noi_ndfs.append(ndf)
             elif os.stat(ndf).st_atime > orig_noi_ndfs[ndf]:
@@ -813,7 +813,7 @@ try:
 #  makemap.
    if niter > 1:
       if not precleaned:
-         cleaned = NDG( os.path.join( NDG.tempdir,"s*_con_res_cln.sdf"))
+         cleaned = NDG( os.path.join( NDG.tempdir,"*_con_res_cln.sdf"))
          qua = NDG( cleaned, "./*|_cln||" )
       else:
          cleaned = indata
