@@ -74,8 +74,7 @@
 *     Parameter GENVAR). Any input variances can also be used to weight
 *     the input data (see Parameter VARIANCE).  By default, all input
 *     data is given equal weight. An additional weight for each NDF can be
-      specified using parameter WEIGHTS.
-
+*     specified using parameter WEIGHTS.
 *
 *     The transformations needed to produce alignment are derived from
 *     the co-ordinate system information stored in the WCS components of
