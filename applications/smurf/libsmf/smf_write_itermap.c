@@ -73,6 +73,10 @@
 *        Add mapqua argument.
 *     2013-7-19 (DSB):
 *        Correct imapdata->pntr[2] to imapdata->qual.
+*     2018-3-9 (DSB):
+*        Added FITS headers needed by pol2map: INBEAM, FILTER, UTDATE,
+*        OBSNUM and NSUBSCAN. Also store NDF character components
+*        (Title,Label,Units).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -185,10 +189,12 @@ void smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapva
     AstFitsChan *fitschan=NULL;
     JCMTState *allState = hdr->allState;
     char *obsidss=NULL;
+    char *cval=NULL;
     char obsidssbuf[SZFITSTR];
     double iter_nboloeff;
     size_t nmap;
     size_t ngood_tslices;
+    int ival;
     dim_t ntslice;                /* Number of time slices */
 
     fitschan = astFitsChan ( NULL, NULL, " " );
@@ -217,9 +223,46 @@ void smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapva
     atlPtftd( fitschan, "NBOLOEFF", iter_nboloeff,
               "Effective bolometer count", status );
 
+    /* Other FITS headers needed by pol2map */
+    if( astTestFits( hdr->fitshdr, "INBEAM", NULL ) ) {
+       astGetFitsS( hdr->fitshdr, "INBEAM", &cval );
+       atlPtfts( fitschan, "INBEAM", cval, astGetC( fitschan, "CardComm" ), status );
+    }
+    if( astTestFits( hdr->fitshdr, "FILTER", NULL ) ) {
+       astGetFitsS( hdr->fitshdr, "FILTER", &cval );
+       atlPtfts( fitschan, "FILTER", cval, astGetC( fitschan, "CardComm" ), status );
+    }
+    if( astTestFits( hdr->fitshdr, "UTDATE", NULL ) ) {
+       astGetFitsI( hdr->fitshdr, "UTDATE", &ival );
+       atlPtfti( fitschan, "UTDATE", ival, astGetC( fitschan, "CardComm" ), status );
+    }
+    if( astTestFits( hdr->fitshdr, "OBSNUM", NULL ) ) {
+       astGetFitsI( hdr->fitshdr, "OBSNUM", &ival );
+       atlPtfti( fitschan, "OBSNUM", ival, astGetC( fitschan, "CardComm" ), status );
+    }
+    if( astTestFits( hdr->fitshdr, "NSUBSCAN", NULL ) ) {
+       astGetFitsI( hdr->fitshdr, "NSUBSCAN", &ival );
+       atlPtfti( fitschan, "NSUBSCAN", ival, astGetC( fitschan, "CardComm" ), status );
+    }
+
+    /* Copy the FITS headers from the FitsChan to the NDFs FITS extension. */
     kpgPtfts( imapdata->file->ndfid, fitschan, status );
 
     if( fitschan ) fitschan = astAnnul( fitschan );
+
+    /* NDF character components */
+    if( strlen(hdr->units) ) {
+       ndfCput( hdr->units, imapdata->file->ndfid, "UNITS", status);
+    }
+
+    if( strlen(hdr->dlabel) ) {
+       ndfCput( hdr->dlabel, imapdata->file->ndfid, "LABEL", status);
+    }
+
+    if( strlen(hdr->title) ) {
+       ndfCput( hdr->title, imapdata->file->ndfid, "TITLE", status);
+    }
+
   }
 
   /* Write WCS (protecting the pointer dereference) */
