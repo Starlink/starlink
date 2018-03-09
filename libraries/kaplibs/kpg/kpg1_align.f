@@ -1,6 +1,6 @@
       SUBROUTINE KPG1_ALIGN( NX, NY, IPIN, IPREF, VIN, VREF,
      :                       IPVIN, IPVREF, FORM, IFAC, RFAC,
-     :                       IOFF, ROFF, FITVAL, C, STATUS )
+     :                       IOFF, ROFF, FITVAL, C, RMS, STATUS )
 *+
 *  Name:
 *     KPG1_ALIGN
@@ -14,7 +14,7 @@
 *  Invocation:
 *     CALL KPG1_ALIGN( NX, NY, IPIN, IPREF, VIN, VREF,
 *                      IPVIN, IPVREF, FORM, IFAC, RFAC,
-*                      IOFF, ROFF, FITVAL, C, STATUS )
+*                      IOFF, ROFF, FITVAL, C, RMS, STATUS )
 
 *  Description:
 *     This routine aligns  a pair of 2-dimensional arrays using a least
@@ -81,6 +81,8 @@
 *
 *        - in = C7*ref + C8
 *
+*     RMS = DOUBLE PRECISION( * ) (Returned)
+*        The RMS of the final residuals.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -122,6 +124,8 @@
 *        variances. The variance around bright point sources is often very
 *        high causing them to be largely ignored, when in fact point sources
 *        are good for determing alignment.
+*     9-MAR-2018 (DSB):
+*        Added argument RMS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -181,6 +185,7 @@
 
 *  Arguments Returned:
       DOUBLE PRECISION C( * )
+      DOUBLE PRECISION RMS
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -321,6 +326,9 @@
 *  Convert the minimised parameters into a full 6 coefficient affine
 *  transformation.
       CALL KPG1_ALIGN6( NP, P, C, STATUS )
+
+*  Get the RMS residual.
+      CALL KPG1_RMSD( M, %VAL( CNF_PVAL( IPFVEC ) ), RMS, STATUS )
 
 *  Free workspace.
  999  CONTINUE

@@ -20,6 +20,8 @@
       the SNR of the data rather than the reciprocal of the variance.
       This will cause the final alignment to be determined more by the
       brighter sections of the map than previously.
+      - The RMS residual between the aligned and the reference arrays is
+      now written to an output parameter called "RMS".
 
    o  COLLAPSE
       - There is a new estimator option, "FastMed", that offers a

@@ -223,6 +223,9 @@
 *        "Choice of Algorithm" below.  [current value]
 *     REF = NDF (Read)
 *        NDF to be used as a refernece.
+*     RMS = _DOUBLE (Write)
+*        An output parameter to which is written the RMS residual
+*        between the aligned data and the reference data.
 *     TOL = _DOUBLE (Read)
 *        The maximum tolerable geometrical distortion that may be
 *        introduced as a result of approximating non-linear Mappings
@@ -403,6 +406,7 @@
       DOUBLE PRECISION PT2I( 2 )
       DOUBLE PRECISION PT2O( 2 )
       DOUBLE PRECISION RFAC
+      DOUBLE PRECISION RMS
       DOUBLE PRECISION ROFF
       DOUBLE PRECISION SCALE
       DOUBLE PRECISION SHIFT( 2 )
@@ -596,7 +600,7 @@
 *  Calculate the alignment transformation.
       CALL KPG1_ALIGN( DIMS( 1 ), DIMS( 2 ), IPIN, IPREF, VIN, VREF,
      :                 IPVIN, IPVREF, FORM, IFAC, RFAC, IOFF, ROFF,
-     :                 FITVAL, C, STATUS )
+     :                 FITVAL, C, RMS, STATUS )
 
 *  If a local copy of the input array is in used, free it.
       IF( CORLIM .GE. 0 ) CALL PSX_FREE( IPIN, STATUS )
@@ -642,6 +646,9 @@
       ELSE
          CALL PAR_PUT1D( 'TR', 6, C, STATUS )
       END IF
+
+*  Write the RMS to an output parameter.
+      CALL PAR_PUT0D( 'RMS', RMS, STATUS )
 
 *  Annul the NDF section identifiers since they are no longer needed.
       CALL NDF_ANNUL( INDF1, STATUS )

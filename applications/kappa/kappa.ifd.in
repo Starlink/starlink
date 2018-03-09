@@ -7741,6 +7741,14 @@ package kappa {
             helpkey *
          }
 
+         parameter RMS {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0.0
+            helpkey *
+         }
+
          parameter tol {
             type _DOUBLE
             vpath DEFAULT

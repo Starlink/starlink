@@ -9923,6 +9923,12 @@ KAPPA: \htmlref{CADD}{CADD},
          NDF to be used as a refernece.
       }
       \sstsubsection{
+         RMS = \_DOUBLE (Write)
+      }{
+         An output parameter to which is written the RMS residual
+         between the aligned data and the reference data.
+      }
+      \sstsubsection{
          TOL = \_DOUBLE (Read)
       }{
          The maximum tolerable geometrical distortion that may be
@@ -53632,6 +53638,8 @@ The following applications have been modified:
         using the SNR of the data rather than the reciprocal of the variance.
         This will cause the final alignment to be determined more by the
         brighter sections of the map than previously.
+        \item The RMS residual between the aligned and the reference arrays is
+        now written to an output parameter called ``RMS''.
       \end{itemize}
 
    \item [\htmlref{COLLAPSE}{COLLAPSE}]\mbox{}
