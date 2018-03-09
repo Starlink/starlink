@@ -21,11 +21,11 @@
       This will cause the final alignment to be determined more by the
       brighter sections of the map than previously.
 
-   o   COLLAPSE
+   o  COLLAPSE
       - There is a new estimator option, "FastMed", that offers a
       substantially faster calculation of unweighted medians.
 
-   o  CONFIGMELD
+   o  CONFIGECHO
       -  This now reports all elements in an array, not just the first
       element.
 
@@ -53,6 +53,9 @@
       -  The input NDFs can now be aligned with a specified POLPACK
       catalogue - see new parameter REFCAT.
 
+   o  WCSMOSAIC
+      -  Has a new parameter called WEIGHTS that can be used to specify
+      a weight for each of the input NDFs.
 
 1 KAPPA_Version_2.4
 

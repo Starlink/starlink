@@ -48379,7 +48379,8 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       the spread of input values contributing to each output pixel (see
       Parameter GENVAR). Any input variances can also be used to weight
       the input data (see Parameter VARIANCE).  By default, all input data
-      are given equal weight.
+      are given equal weight. An additional weight for each NDF can be
+      specified using parameter WEIGHTS.
 
       The transformations needed to produce alignment are derived from
       the co-ordinate system information stored in the WCS components of
@@ -48702,6 +48703,16 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          (determining whether to weight the input data).  The second
          purpose (determining how to create output variances) is
          fulfilled by the GENVAR parameter.  \texttt{[FALSE]}
+      }
+      \sstsubsection{
+         WEIGHTS = LITERAL (Read)
+      }{
+         An optional group of numerical weights, one for each of the input
+         NDFs specified by parameter IN. If VARIANCE is TRUE, the weight
+         assigned to each input pixel is the value supplied in this group
+         correspoinding to the appropriate input NDF, divided by the variance
+         of the pixel value. An error is reported if the number of supplied
+         weights does not equal the number of supplied input NDFs. \texttt{[!]}
       }
       \sstsubsection{
          WLIM = \_REAL (Read)
@@ -53630,7 +53641,7 @@ The following applications have been modified:
         medians.
       \end{itemize}
 
-   \item [\htmlref{CONFIGMELD}{CONFIGMELD}]\mbox{}
+   \item [\htmlref{CONFIGECHO}{CONFIGECHO}]\mbox{}
       \begin{itemize}
         \item This now reports all elements in an array, not just the
         first element.
@@ -53670,6 +53681,12 @@ The following applications have been modified:
       \begin{itemize}
         \item The input NDFs can now be aligned with a specified POLPACK
          catalogue - see new parameter REFCAT.
+      \end{itemize}
+
+   \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}]\mbox{}
+      \begin{itemize}
+        \item Has a new parameter called WEIGHTS that can be used to
+         specify a weight for each of the input NDFs.
       \end{itemize}
 
 \end{description}

@@ -18908,6 +18908,15 @@ iraf! {
             default 1.0E-10
             helpkey *
          }
+
+         parameter weights {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Weights for each NDF}
+            helpkey *
+         }
       }
 
       action wcsalign {

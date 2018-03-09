@@ -73,7 +73,9 @@
 *     the spread of input values contributing to each output pixel (see
 *     Parameter GENVAR). Any input variances can also be used to weight
 *     the input data (see Parameter VARIANCE).  By default, all input
-*     data is given equal weight.
+*     data is given equal weight. An additional weight for each NDF can be
+      specified using parameter WEIGHTS.
+
 *
 *     The transformations needed to produce alignment are derived from
 *     the co-ordinate system information stored in the WCS components of
@@ -352,6 +354,13 @@
 *        first of these purposes (determining whether to weight the
 *        input data).  The second purpose (determining how to create
 *        output variances) is fulfilled by the GENVAR parameter. [FALSE]
+*     WEIGHTS = LITERAL (Read)
+*        An optional group of numerical weights, one for each of the input
+*        NDFs specified by parameter IN. If VARIANCE is TRUE, the weight
+*        assigned to each input pixel is the value supplied in this group
+*        correspoinding to the appropriate input NDF, divided by the variance
+*        of the pixel value. An error is reported if the number of supplied
+*        weights does not equal the number of supplied input NDFs. [!]
 *     WLIM = _REAL (Read)
 *        This parameter specifies the minimum number of good pixels
 *        that must contribute to an output pixel for the output pixel
@@ -460,6 +469,8 @@
 *        Added Parameters CONSERVE and NORM.
 *     1-DEC-2014 (DSB):
 *        Added parameter ALIGNREF.
+*     9-MAR-2018 (DSB):
+*        Added parameter WEIGHTS.
 *     {enter_further_changes_here}
 
 *-
@@ -484,12 +495,13 @@
       CHARACTER DTYPE*(NDF__SZFTP) ! Data type
       CHARACTER MESS*60      ! Message text
       CHARACTER METHOD*13    ! Interpolation method to use.
+      CHARACTER TEXT*(GRP__SZNAM)! Text of current element
       CHARACTER TY_IN*(NDF__SZTYP) ! Numeric type for processing
       DOUBLE PRECISION FLBND( NDF__MXDIM ) ! Lower WCS bounds of output
       DOUBLE PRECISION FUBND( NDF__MXDIM ) ! Upper WCS bounds of output
       DOUBLE PRECISION GLBND( NDF__MXDIM ) ! Lower GRID bounds of output
       DOUBLE PRECISION GUBND( NDF__MXDIM ) ! Upper GRID bounds of output
-      DOUBLE PRECISION PARAMS( 2 )! Param values passed to AST_RESAMPLE
+      DOUBLE PRECISION PARAMS( 3 )! Param values passed to AST_RESAMPLE
       DOUBLE PRECISION XL( NDF__MXDIM ) ! GRID position at lower limit
       DOUBLE PRECISION XU( NDF__MXDIM ) ! GRID position at upper limit
       INTEGER DLBND( NDF__MXDIM )! Defaults for LBND
@@ -498,6 +510,7 @@
       INTEGER FLAGS          ! Flags for AST_REBINSEQ
       INTEGER I              ! Index into input and output groups
       INTEGER IGRP1          ! GRP id. for group holding input NDFs
+      INTEGER IGRP2          ! GRP id. for group holding input weights
       INTEGER INDF0          ! NDF id. for the first input NDF
       INTEGER INDF1          ! NDF id. for the input NDF
       INTEGER INDF2          ! NDF id. for the output NDF
@@ -510,14 +523,15 @@
       INTEGER IPV1           ! Pntr. to input variance array
       INTEGER IPV2           ! Pntr. to output variance array
       INTEGER IPW            ! Pntr. to work array
+      INTEGER ISTAT          ! Local status value
       INTEGER IWCS2          ! Original output WCS FrameSet
       INTEGER IWCSR          ! WCS FrameSet for reference NDF
       INTEGER IWCSR2         ! New output WCS FrameSet
       INTEGER LBND( NDF__MXDIM ) ! Indices of lower-left corner of o/p
       INTEGER LBND1( NDF__MXDIM )! Indices of lower-left corner of input
       INTEGER MAP            ! AST id for (pix_in->pix_out) Mapping
-      INTEGER MAP3           ! AST Mapping (ref. GRID -> o/p GRID)
       INTEGER MAP2           ! Mapping from PIXEL to output GRID Frame
+      INTEGER MAP3           ! AST Mapping (ref. GRID -> o/p GRID)
       INTEGER MAPR           ! AST Mapping (ref. GRID -> ref. PIXEL)
       INTEGER MAXPIX         ! Initial scale size in pixels
       INTEGER METHOD_CODE    ! Integer identifier for spreading method
@@ -525,14 +539,16 @@
       INTEGER NDIM           ! Number of pixel axes in output NDF
       INTEGER NDIM1          ! Number of pixel axes in input NDF
       INTEGER NPAR           ! No. of required interpolation parameters
-      INTEGER*8 NUSED        ! No. of input values used so far
       INTEGER SIZE           ! Total size of the input group
       INTEGER UBND( NDF__MXDIM ) ! Indices of upper-right corner of o/p
       INTEGER UBND1( NDF__MXDIM )! Indices of upper-right corner of i/p
+      INTEGER WSIZE          ! Number of NDF weights given
+      INTEGER*8 NUSED        ! No. of input values used so far
       LOGICAL BAD_DV         ! Any bad data/variance values in input?
       LOGICAL CONSRV         ! Conserve flux in each input NDF?
       LOGICAL GENVAR         ! Use i/p spread to create o/p variance?
       LOGICAL HASVAR         ! Do all i/p NDFs have variances?
+      LOGICAL NDFWGT         ! Has a weight been supplied for each NDF?
       LOGICAL NORM           ! Normalise the o/p values?
       LOGICAL REFALN         ! Use ref. to define alignment properties?
       LOGICAL USEVAR         ! Use i/p variances to create o/p variance?
@@ -758,6 +774,34 @@
          VARWGT = .FALSE.
       END IF
 
+*  Get any per-NDF weights.
+      NDFWGT = .FALSE.
+      IGRP2 = GRP__NOID
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL KPG1_GTGRP( 'WEIGHTS', IGRP2, WSIZE, STATUS )
+
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+
+         ELSE IF( WSIZE .NE. SIZE .AND. STATUS .EQ. SAI__OK ) THEN
+            CALL MSG_SETI( 'N', SIZE )
+            CALL MSG_SETI( 'W', WSIZE )
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'No. of values supplied for parameter '//
+     :                    'WEIGHTS (^W) is not the same as the number'//
+     :                    ' of input NDFs (^N).', STATUS )
+
+         ELSE
+            NDFWGT = .TRUE.
+
+*  Shuffle the values in the PARAMS array down one element to leave room
+*  for the NDF weight in the first element.
+            PARAMS( 3 ) = PARAMS( 2 )
+            PARAMS( 2 ) = PARAMS( 1 )
+
+         END IF
+      END IF
+
 *  Cannot skip the normalisation if we are weighting input data.
       IF( VARWGT .AND. .NOT. NORM .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
@@ -872,6 +916,29 @@
          IF( GENVAR ) FLAGS = FLAGS + AST__GENVAR
          IF( USEVAR ) FLAGS = FLAGS + AST__USEVAR
          IF( VARWGT ) FLAGS = FLAGS + AST__VARWGT
+         IF( NDFWGT ) THEN
+            FLAGS = FLAGS + AST__PARWGT
+
+*  Copy the NDF's initial weight to the first element of the PARAMS array,
+*  checking it for validity.
+            CALL GRP_GET( IGRP2, I, 1, TEXT, STATUS )
+            ISTAT = SAI__OK
+            CALL CHR_CTOD( TEXT, PARAMS( 1 ), ISTAT )
+            IF( ISTAT .NE. SAI__OK .AND. STATUS .EQ. SAI__OK ) THEN
+               STATUS = ISTAT
+               CALL MSG_SETC( 'V', TEXT )
+               CALL ERR_REP( ' ', 'Invalid numerical value ''^V'' '//
+     :                       'supplied for parameter WEIGHTS.',
+     :                       STATUS )
+            ELSE IF( PARAMS( 1 ) .LE. 0.0 .AND.
+     :               STATUS .EQ. SAI__OK ) THEN
+               STATUS = ISTAT
+               CALL MSG_SETC( 'V', TEXT )
+               CALL ERR_REP( ' ', 'Zero or negative value ''^V'' '//
+     :                       'supplied for parameter WEIGHTS.',
+     :                       STATUS )
+            END IF
+         END IF
 
          CALL NDF_BAD( INDF1, 'DATA,VARIANCE', .FALSE., BAD_DV, STATUS )
          IF( BAD_DV ) FLAGS = FLAGS + AST__USEBAD
@@ -957,6 +1024,7 @@
 
 *  Free resourcee.
       CALL GRP_DELET( IGRP1, STATUS )
+      IF( IGRP2 .NE. GRP__NOID ) CALL GRP_DELET( IGRP2, STATUS )
       CALL PSX_FREE( IPW, STATUS )
       CALL PSX_FREE( IPMAP, STATUS )
 
