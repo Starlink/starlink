@@ -1,5 +1,151 @@
                    Log of Changes Made to CFITSIO
 
+Version 3.43 - March 2018
+                   
+The NASA security team requires the following warning to all users of 
+CFITSIO:
+
+   =====
+   The CFITSIO open source software project contains vulnerabilities 
+   that could allow a remote, unauthenticated attacker to take control
+   of a server running the CFITSIO software.  These vulnerabilities 
+   affect all servers and products running the CFITSIO software.
+
+   The CFITSIO team has released software updates to address these 
+   vulnerabilities.  There are no workarounds to address these 
+   vulnerabilities.  In all cases, the CFITSIO team is recommending an 
+   immediate update to resolve the issues.
+   =====
+
+  - Fixed security vulnerabilities.   
+ 
+  - Calls to https driver functions in cfileio.c need to be macro-
+     protected by the HAVE_NET_SERVICES variable (as are the http and
+     ftp driver function calls).  Otherwise CMake builds on native
+     Windows will fail since drvrnet.o is left empty.
+                   
+   - Bug fix to ffmvec function.  Should be resetting a local colptr
+     variable after making a call to ffiblk (which can reallocate Ftpr->
+     tableptr).  Originally reported by Willem van Straten.
+     
+   - Ignore any attempted request to not quantize an image before
+     compressing it if the image has integer datatype pixels.
+     
+   - Improved error message construction throughout CFITSIO.
+                   
+Version 3.42 - August 2017 (Stand-alone release)
+                   
+   - added https support to the collection of drivers handled in cfileio.c
+     and drvrnet.c.  This also handles the case where http transfers are 
+     rerouted to https.  Note that this enhancement introduces a dependency
+     on the libcurl development package.  If this package is absent, CFITSIO
+     will still build but will not have https capability.
+                   
+   - made fix to imcomp_init_table function in imcompress.c.  It now writes
+     ZSIMPLE keyword only to a compressed image that will be placed in the
+     primary header.
+     
+   - fix made to fits_get_col_display_width for case of a vector column
+     of strings. 
+
+Version 3.42 - March 2017 (Ftools release only)
+
+   - in ftp_open_network and in ftp_file_exist, added code to repeatedly
+     attempt to make a ftp connection if the ftp server does not respond
+     to the first request. (some ftp servers don't appear to be 100% reliable).
+
+   - in drvrnet.c added many calls to 'fclose' to close unneeded files,
+     to avoid exceeding the maximum allowed number of files that can be 
+     open at once.
+     
+   - made substantial changes to the ftp_checkfile and http_checkfile routines
+     to streamline the process of checking for the existence of a .gz or .Z
+     compressed version of the file before opening the uncompressed file
+     (when using http or ftp to open the file). 
+
+   - modified the code in ftp_open_network to send "\r\n" as end-of-line
+     characters instead of just "\n".  Some ftp servers (in particular,
+     at heasarc.gsfc.nasa.gov) now require both characters, otherwise the
+     network connection simply hangs.
+     
+   - modified the http_open_network routine to handle HTTP 301 or 302 redirects
+     to a FTP url.  This is needed to support the new configuration on
+     the heasarc HTTP server which sometimes redirects http URLS to a ftp URL.
+
+Version 3.41 - November 2016
+
+   - The change made in version 3.40 to include strings.h caused problems on
+     Windows (and other) platforms, so this change was backed out. The reason
+     for including it was to define the strcasecmp and strcasencmp functions, so
+     as an alternative, new equivalent functions called fits_strcasecmp and
+     fits_strncasecmp have been added to CFITSIO.as a substitute. All the
+     previous calls to the str[n]casecmp functions have been changed to
+     now call fits_str[n]casecmp. In addition, the previously defined 
+     ngp_strcasecmp function (in grparser.c) has been removed and the calls to
+     it have been changed to fits_strcasecmp.
+     
+   - The speed.c utility program was changed to correctly call 
+     the gettimeofday function with a NULL second arguement. 
+
+Version 3.40 - October 2016
+
+   - fixed a bug when writing long string keywords with the CONTINUE convention
+     which caused the CONTINUE'd strings to only be 16 characters long, instead
+     of using up all the available space in the 80-character header record.
+
+   - fixed a missing 'defined' keyword in fitsio.h.
+
+   - replaced all calls to strtok (which is not threadsafe) with a new ffstrtok
+     function which internally calls the threadsafe strtok_r function.  One 
+     byproduct of this change is that <strings.h> must also be included
+     in several of the C source code files.
+
+   - modified the ffphbn function in putkey.c to support TFORM specifiers that
+     use lowercase 'p' (instead of uppercase) when referring to a variable-length
+     array column.
+
+   - modified the lexical parser in eval.y and eval_y.c to support bit array 
+     columns (with TFORMn = 'X') with greater than 256 elements. Fix to bitcmp 
+     function:  The internal 'stream' array is now
+     allocated dynamically rather than statically fixed at size 256.
+     This was failing when users attempted a row filtering of a bitcol
+     that was wider than 256X. In bitlgte, bitand, and bitor functions, replaced 
+     static stream[256] array allocation with dynamic allocation.  
+
+   - modified the ffiter function in putcol.c to fix a problem which could
+     cause the iterator function to incorrectly deal with null values.  This
+     only affected TLONG type columns in cases where sizeof(long) = 8, as well
+     as for TLONGLONG type columns.
+
+   - Fix made to uncompress2mem function in zcomprss.c for case where output
+     uncompressed file expands to over the 2^32 (4Gb) limit.  It now
+     checks for this case at the start, and implements a 4Gb paging
+     system through the output buffer.  The problem was specifically
+     caused by the d_stream.avail_out member being of 4-byte type uInt,
+     and thus unable to handle any memory position values above 4Gb. 
+
+   - fixed a bug in fpackutil.c when using the -i2f (integer to float) option
+     in fpack to compress an integer image that is scaled with non-default values
+     for BSCALE and BZERO. This required an additional call to ffrhdu to reset
+     the internal structures that describe the input FITS file.
+
+   - modified fits_uncompress_table in imcompress.c to silently ignore the
+     ZTILELEN keyword value if it larger than the number of rows in the table
+     
+   - Tweak strcasecmp/strncasecmp ifdefs to exclude 64-bit MINGW
+     environment, as it does not lack those functions. (eval_l.c,
+     fitsio2.h)
+
+   - CMakeLists.txt: Set M_LIB to "" for MINGW build environment (in
+     addition to MSVC).
+
+   - Makefile.in: Add *.dSYM (non-XCode gcc leftovers on Macs) to
+     clean list.  Install libs by name rather than using a wildcard.
+
+   - configure: Fix rpath token usage for XCode vs. non-XCode gcc on Macs.
+
+
+
 Version 3.39 - April 2016
 
    - added 2 new routines suggested by Eric Mandel:
