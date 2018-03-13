@@ -55,8 +55,8 @@ where \texttt{<CHUNK$\_$NUM>} indicates the raw data file at the start
 of the contiguous chunk of data used to create the map, and is usually
 0003.
 
-A coadd is then formed by adding all these maps together. Each individual map
-is then compared to the coadd in order to determine a pointing correction
+A co-add is then formed by adding all these maps together. Each individual map
+is then compared to the co-add in order to determine a pointing correction
 to be applied to the observation in future. These corrections are stored
 in the FITS header of the individual maps.
 
@@ -203,12 +203,12 @@ external NDF.
 \subsection*{Variances between POL-2 maps}
 
 \param{MAPVAR} is a \poltwomap\ parameter that controls how the variances in the
-coadded I, Q and U maps are formed.
+co-added I, Q and U maps are formed.
 
-If \param{MAPVAR} is set \texttt{TRUE}, the variances in the coadded I, Q and U maps
+If \param{MAPVAR} is set \texttt{TRUE}, the variances in the co-added I, Q and U maps
 are formed from the spread of pixel data values between the individual
 observation maps. If \param{MAPVAR} is \texttt{FALSE} (the default), the variances in
-the coadded maps are formed by propagating the pixel variance values
+the co-added maps are formed by propagating the pixel variance values
 created by \makemap\ from the individual observation maps (these are
 based on the spread of I, Q or U values that fall in each pixel).
 
