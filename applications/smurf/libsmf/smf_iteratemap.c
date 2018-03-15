@@ -526,6 +526,9 @@
 *        If the max number of iterations was hit before convergence was
 *        reached, report no convergence, rather than reporting "Solution
 *        CONVERGED", which was mis-leading.
+*     2018-03-13 (DSB):
+*        Allow models to be exported to a specified directory (given by 
+*        config parameter "dumpdir").
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -662,6 +665,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int dimmflags;                /* Control flags for DIMM model components */
   int doclean=1;                /* Are we doing data pre-processing? */
   dim_t dsize;                  /* Size of data arrays in containers */
+  char *dumpdir=NULL;           /* Directory for exported models etc */
   int ensureflat=1;             /* flatfield data as they are loaded */
   double *epsbuf1=NULL;         /* Buffer for diff map */
   double *epsbuf2=NULL;         /* Buffer for diff map */
@@ -749,7 +753,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   dim_t mdims[2];               /* Dimensions of map */
   dim_t msize;                  /* Number of elements in map */
   int mw = 0;                   /* No. of threads to use when rebinning data into a map */
-  char name[GRP__SZNAM+1];      /* Buffer for storing exported model names */
+  char name[1500];              /* Buffer for storing exported model names */
   dim_t nbolo;                  /* Number of bolometers */
   size_t ncontchunks=0;         /* Number continuous chunks outside iter loop*/
   int nhitslim=0;               /* Min number of hits allowed in a map pixel */
@@ -1038,6 +1042,16 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           maxiter = numiter;
           untilconverge = 0;
         }
+      }
+
+      /* Get the path to the directory in which to place exported models
+         etc. Ensure its end with "/"  */
+      tempstr = NULL;
+      astMapGet0C( keymap, "DUMPDIR", &tempstr );
+      if( tempstr ) {
+         size_t clen = strlen( tempstr );
+         dumpdir = astStore( NULL, tempstr, clen + 2 );
+         if( dumpdir[clen-1] != '/' ) strcpy( dumpdir + clen, "/" );
       }
 
     }
@@ -2162,9 +2176,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               data = res[0]->sdata[idx];
 
               /* create a file name with "_res_cln" suffix */
+              *name = 0;
+              if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
               smf_stripsuffix( res[0]->sdata[idx]->file->name,
-                               SMF__DIMM_SUFFIX, name, status );
-              one_strlcat( name, "_res_cln", SMF_PATH_MAX+1, status );
+                               SMF__DIMM_SUFFIX, name + strlen( name ), status );
+              one_strlcat( name, "_res_cln", sizeof(name), status );
 
               /* Use the correct order */
               oldorder = res[0]->sdata[idx]->isTordered;
@@ -3234,9 +3250,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          for( idx=0; idx<res[0]->ndat; idx++ ) {
 
             /* Get the NDF name for the exported NOI model. */
+            *name = 0;
+            if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
             smf_stripsuffix( res[0]->sdata[idx]->file->name, SMF__DIMM_SUFFIX,
-                             name, status );
-            one_strlcat( name, "_noi", SMF_PATH_MAX+1, status );
+                             name + strlen(name), status );
+            one_strlcat( name, "_noi", sizeof(name), status );
 
             /* Export it. */
             smf_export_noi( dat.noi[0]->sdata[idx], name, dat.noi_boxsize,
@@ -3299,9 +3317,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
                 smf_model_createHdr( res[0]->sdata[idx], SMF__RES, refdata,
                                      status );
+
+                *name = 0;
+                if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
                 smf_stripsuffix( res[0]->sdata[idx]->file->name,
-                                 SMF__DIMM_SUFFIX, name, status );
-                one_strlcat( name, "_res", SMF_PATH_MAX+1, status );
+                                 SMF__DIMM_SUFFIX, name + strlen(name), status );
+                one_strlcat( name, "_res", sizeof( name ), status );
 
                 if( !noexportsetbad ) {
                   smf_update_valbad( res[0]->sdata[idx], SMF__NUL,
@@ -3336,10 +3357,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
                 smf_model_createHdr( lut[0]->sdata[idx], SMF__RES, refdata,
                                      status );
+                *name = 0;
+                if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
                 smf_stripsuffix( res[0]->sdata[idx]->file->name,
-                                 SMF__DIMM_SUFFIX, name, status );
-                one_strlcat( name, "_lut", SMF_PATH_MAX+1, status );
-
+                                 SMF__DIMM_SUFFIX, name + strlen(name), status );
+                one_strlcat( name, "_lut", sizeof( name ), status );
                 smf_write_smfData( wf, lut[0]->sdata[idx], NULL, name, NULL, 0,
                                    NDF__NOID, MSG__VERB, 0, NULL, NULL, status );
               } else {
@@ -3366,9 +3388,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 astname = smf_model_getname( SMF__AST, status );
                 resname = smf_model_getname( SMF__RES, status );
 
+                *name = 0;
+                if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
                 smf_stripsuffix( res[0]->sdata[idx]->file->name,
                                  SMF__DIMM_SUFFIX, workstr, status );
-                smf_stripsuffix( workstr, resname, name, status );
+                smf_stripsuffix( workstr, resname, name + strlen(name), status );
 
                 one_strlcat( name, "_" , sizeof(name), status );
                 one_strlcat( name, astname, sizeof(name), status );
@@ -3436,10 +3460,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 exportNDF_which[j] ) {
               if( (model[j][0]->sdata[idx]->file->name)[0] ) {
 
+                *name = 0;
+                if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
                 smf_model_createHdr( model[j][0]->sdata[idx], modeltyps[j],
                                      refdata,status );
                 smf_stripsuffix( model[j][0]->sdata[idx]->file->name,
-                                 SMF__DIMM_SUFFIX, name, status );
+                                 SMF__DIMM_SUFFIX, name + strlen(name), status );
 
                 if( !noexportsetbad ) {
                   smf_update_valbad( model[j][0]->sdata[idx], modeltyps[j],
@@ -3713,6 +3739,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   mapweights = astFree( mapweights );
 
   modeltyps = astFree( modeltyps );
+  dumpdir = astFree( dumpdir );
   exportNDF_which = astFree( exportNDF_which );
 
   if( igroup ) {

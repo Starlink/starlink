@@ -55,6 +55,10 @@
 *        - Remove argument "noi_boxsize".
 *     15-MAY-2014 (DSB):
 *        Flag bad variances in the quality array.
+*     2018-03-15 (DSB):
+*        Read existing model data from NDFs stored in the directory specified 
+*        by the config parameter "dumpdir", rather than from the current 
+*        directory.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -97,6 +101,8 @@ int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
 /* Local Variables */
    AstKeyMap *kmap = NULL;
    char *ename = NULL;
+   const char *bn = NULL;
+   const char *tempstr = NULL;
    dim_t ibolo;
    dim_t nbolo;
    dim_t ncols;
@@ -138,10 +144,36 @@ int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
       smf_get_dims( &((*head).data), &nrows, &ncols, &nbolo, &ntslice, NULL,
                     &bstride, &tstride, status );
 
-/* Append "_noi" to the container file name. */
-      nc = strstr( name, "_con" ) - name + 4;
-      ename = astStore( NULL, name, nc + 1 );
+/* Initialise the file path to be the path to the directory in which exported
+   models etc are placed. Ensure its end with "/"  */
+      tempstr = NULL;
+      astMapGet0C( keymap, "DUMPDIR", &tempstr );
+      if( tempstr ) {
+         nc = strlen( tempstr );
+         ename = astStore( NULL, tempstr, nc + 2 );
+         if( ename[nc-1] != '/' ) {
+            strcpy( ename + nc, "/" );
+            nc++;
+         }
+      } else{
+         nc = 0;
+      }
+
+/* Find the start of the basename of the contained file, then append it
+   to the path. */
+      bn = strrchr( name, '/' );
+      if( bn ) {
+         bn++;
+      } else {
+         bn = name;
+      }
+      ename = astAppendString( ename, &nc, bn );
+
+/* Terminate the banename after "_con". */
+      nc = strstr( ename, "_con" ) - ename + 4;
       ename[ nc ] = 0;
+
+/* Append "_noi". */
       ename = astAppendString( ename, &nc, "_noi" );
 
 /* Attempt to open the NDF. */

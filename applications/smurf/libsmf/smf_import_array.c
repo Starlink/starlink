@@ -14,8 +14,9 @@
 
 *  Invocation:
 *     void smf_import_array( ThrWorkForce *wf, smfData *refdata,
-*                            const char *name, int bad, int expand,
-*                            smf_dtype type, void *dataptr, int *status )
+*                            const char *dumpdir, const char *name, int bad,
+*                            int expand, smf_dtype type, void *dataptr,
+*                            int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -23,8 +24,14 @@
 *     refdata = smfData * (Given)
 *        Pointer to a smfData that defines the data ordering and dimensions
 *        required of the imported NDF.
+*     dumpdir = const char * (Given)
+*        The path to the directory from which the file should be read.
+*        May be NULL. If not NULL, it is assumed to be terminated with a
+*        "/" character.
 *     name = const char * (Given)
-*        The name of the NDF to be imported.
+*        The name of the NDF to be imported. Any leading directory
+*        path within this string is ignored if a non-NULL value is supplied
+*        for dumpdir, and the path given by dumpdir is used instead.
 *     bad = int (Given)
 *        Indicates how bad values within the input NDF should be handled:
 *        0 - Retain them
@@ -71,6 +78,8 @@
 *        Added argument wf (needed by smf_open_file).
 *     14-JAN-2014 (DSB):
 *        Multi-thread.
+*     14-MAR-2018 (DSB):
+*        Added argument "dumpdir".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -127,17 +136,21 @@ typedef struct smfImportArrayData {
    void *dout;
 } SmfImportArrayData;
 
-void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *name, int bad,
-                       int expand, smf_dtype type, void *dataptr,
-                       int *status ){
+void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *dumpdir,
+                       const char *name, int bad, int expand, smf_dtype type,
+                       void *dataptr, int *status ){
 
 /* Local Variables: */
    Grp *igrp;                  /* Group holding NDF name */
    SmfImportArrayData *job_data = NULL;
    SmfImportArrayData *pdata;
+   const char *cname;
+   char *ename;
+   const char *bn;
    dim_t nbolo;                /* Number of bolometers */
    dim_t nel;                  /* Number of elements in array */
    dim_t ntslice;              /* Number of time slices */
+   int nc;
    int iw;
    int nw;
    size_t bstride;             /* Stride between bolometer values */
@@ -150,9 +163,28 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *name, int
 /* Check inherited status. */
    if( *status != SAI__OK ) return;
 
+/* If a value is supplied for "dumpdir", use it to replace any directory
+   specification in "name". */
+   if( dumpdir ) {
+      nc = strlen( dumpdir );
+      ename = astStore( NULL, dumpdir, nc+1 );
+
+      bn = strrchr( name, '/' );
+      if( bn ) {
+         bn++;
+      } else {
+         bn = name;
+      }
+
+      ename = astAppendString( ename, &nc, bn );
+      cname = ename;
+   } else {
+      cname = name;
+   }
+
 /* Attempt to open the NDF. */
    igrp = grpNew( " ", status );
-   grpPut1( igrp, name, 0, status );
+   grpPut1( igrp, cname, 0, status );
    smf_open_file( wf, igrp, 1, "READ", SMF__NOTTSERIES, &data, status );
    grpDelet( &igrp, status );
 
@@ -167,12 +199,12 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *name, int
          const char *stype = smf_dtype_str( type, status );
          *status = SAI__ERROR;
          errRepf( " ", "NDF '%s' has incorrect data type - should be "
-                  "%s.", status, name, stype );
+                  "%s.", status, cname, stype );
 
       } else if( data->ndims != refdata->ndims ) {
          *status = SAI__ERROR;
          errRepf( " ", "NDF '%s' is %zu dimensional - must be %zu "
-                  "dimensional.", status, name, data->ndims, refdata->ndims );
+                  "dimensional.", status, cname, data->ndims, refdata->ndims );
 
       } else if( !expand || refdata->ndims != 3 ) {
          expand = 0;
@@ -183,13 +215,13 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *name, int
                *status = SAI__ERROR;
                errRepf( " ", "NDF '%s' has incorrect dimension %zu on "
                         "pixel axis %zu - should be %zu.", status,
-                        name, data->dims[i], i + 1, refdata->dims[i] );
+                        cname, data->dims[i], i + 1, refdata->dims[i] );
             } else if( data->lbnd[i] != refdata->lbnd[i] &&
                 *status == SAI__OK ){
                *status = SAI__ERROR;
                errRepf( " ", "NDF '%s' has incorrect lower bound %d on "
                         "pixel axis %zu - should be %d.", status,
-                        name, data->lbnd[i], i + 1, refdata->lbnd[i] );
+                        cname, data->lbnd[i], i + 1, refdata->lbnd[i] );
             }
          }
 
@@ -203,13 +235,13 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *name, int
                *status = SAI__ERROR;
                errRepf( " ", "NDF '%s' has incorrect dimension %zu on "
                         "pixel axis %zu - should be %zu.", status,
-                        name, data->dims[i], i + 1, refdata->dims[i] );
+                        cname, data->dims[i], i + 1, refdata->dims[i] );
             } else if( data->lbnd[i] != refdata->lbnd[i] &&
                 *status == SAI__OK ){
                *status = SAI__ERROR;
                errRepf( " ", "NDF '%s' has incorrect lower bound %d on "
                         "pixel axis %zu - should be %d.", status,
-                        name, data->lbnd[i], i + 1, refdata->lbnd[i] );
+                        cname, data->lbnd[i], i + 1, refdata->lbnd[i] );
             }
          }
       }
@@ -249,7 +281,7 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *name, int
             pdata->bstride = bstride;
             pdata->tstride = tstride;
             pdata->nbolo = nbolo;
-            pdata->name = name;
+            pdata->name = cname;
          }
       }
 
@@ -298,6 +330,7 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *name, int
       job_data = astFree( job_data );
       smf_close_file( wf, &data, status );
    }
+   if( dumpdir ) ename = astFree( ename );
 }
 
 static void smf1_import_array( void *job_data_ptr, int *status ) {

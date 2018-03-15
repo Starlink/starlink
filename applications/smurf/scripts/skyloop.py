@@ -35,10 +35,6 @@
 *     located within the directory specified by environment variable
 *     STAR_TEMP. If STAR_TEMP is not defined, they are placed in the system's
 *     temporary directory (e.g. "/tmp").
-*
-*     In addition, files holding the extinction correction factor for each
-*     data sample, and files holding the noise model, are written to the
-*     current working directory. These are deleted when the script ends.
 
 *  Usage:
 *     skyloop in out niter pixsize config [itermap] [ref] [mask2] [mask3]
@@ -353,6 +349,10 @@
 *        FLT-related parametrers are modified.
 *     23-JAN-2018 (DSB):
 *        Handle ZERO_NITER values between 0.0 and 1.0.
+*     14-MAR-2018 (DSB):
+*        Put the temporary NDFs created by makemap (models, cleaned data,
+*        etc) in the temporary directory rather than in the current
+*        directory.
 *-
 '''
 
@@ -371,20 +371,6 @@ from starutil import msg_out
 #  Assume for the moment that we will not be retaining temporary files.
 retain = 0
 
-#  A list of the extinction correction NDFs created by this script. These
-#  are created and used in the current working directory, and are deleted
-#  when the script exist.
-new_ext_ndfs = []
-
-#  A list of the LUT NDFs created by this script. These are created and used
-#  in the current working directory, and are deleted when the script exist.
-new_lut_ndfs = []
-
-#  A list of the NOI model NDFs created by this script. These are created
-#  and used in the current working directory, and are deleted when the
-#  script exist.
-new_noi_ndfs = []
-
 #  A function that converts a string to an int, handling cases where the
 #  string ends with ".0" (the python intrinsic "int" function moans in
 #  such cases).
@@ -399,17 +385,9 @@ def cleanup():
    try:
       starutil.ParSys.cleanup()
       if retain:
-         msg_out( "Retaining EXT, LUT and NOI models in {0} and temporary files in {1}".format(os.getcwd(),NDG.tempdir))
+         msg_out( "Retaining EXT, LUT and NOI models and all temporary files in {1}".format(NDG.tempdir))
       else:
          NDG.cleanup()
-         for ext in new_ext_ndfs:
-            os.remove( ext )
-         for lut in new_lut_ndfs:
-            os.remove( lut )
-         for noi in new_noi_ndfs:
-            os.remove( noi )
-         for res in qua:
-            os.remove( res )
    except:
       pass
 
@@ -607,39 +585,9 @@ try:
                                "defaults=$SMURF_DIR/smurf_makemap.def "
                                "select=\"\'450=0,850=1\'\" defval=0.0".format(config)))
 
-#  The first invocation of makemap will create NDFs holding cleaned
-#  time-series data, EXT, LUT and NOI model values. The NDFs are created
-#  with hard-wired names and put in the current working directory. For
-#  tidyness, we will move the cleaned data files into the NDG temp
-#  directory, where all the other temp files are stored. In order to
-#  distinguish NDFs created by this script from any pre-existing NDFs
-#  - which we do not want to move, we now record the paths and
-#  last-accessed times of any relevant pre-existing NDFs. Note, if the
-#  "ext.import" config parameter is set, makemap expects EXT model
-#  values to be in the current working directory, so we do not move
-#  those NDFs to the NDG temp directory. Likewise for LUT and NOI model
-#  files. Use last-accessed times rather than inode numbers since something
-#  very strange seems to be happening with inode numbers for NDFs
-#  created by the starutil module (two succesive NDFs with the same
-#  path can have the same inode number).
-   orig_cln_ndfs = {}
-   for path in glob.glob("*_con_res_cln.sdf"):
-      orig_cln_ndfs[path] = os.stat(path).st_atime
-
-#  Note any pre-existing NDFs holding extinction values.
-   orig_ext_ndfs = {}
-   for path in glob.glob("*_con_ext.sdf"):
-      orig_ext_ndfs[path] = os.stat(path).st_atime
-
-#  Note any pre-existing NDFs holding NOI values.
-   orig_noi_ndfs = {}
-   for path in glob.glob("*_con_noi.sdf"):
-      orig_noi_ndfs[path] = os.stat(path).st_atime
-
-#  Note any pre-existing NDFs holding LUT values.
-   orig_lut_ndfs = {}
-   for path in glob.glob("*_con_lut.sdf"):
-      orig_lut_ndfs[path] = os.stat(path).st_atime
+#  Create a directory in which makemap should store the dumped models, cleaned data,
+#  etc.
+   dumpdir = NDG.subdir()
 
 #  Find the number of iterations to perform on the initial invocation of
 #  makemap.
@@ -682,6 +630,7 @@ try:
    fd.write("shortmap=0\n")   # Shortmaps don't make sense
    fd.write("flagmap=<undef>\n")# Flagmaps don't make sense
    fd.write("sampcube=0\n")   # Sampcubes don't make sense
+   fd.write("dumpdir={0}\n".format(dumpdir)) # Where to dump models, cleaned data etc
 
    if niter > 1:
       fd.write("noi.export=1\n") # Export the NOI model. This forces the
@@ -771,50 +720,13 @@ try:
       ux = starutil.get_task_par( "ubound(1)", "makemap" )
       uy = starutil.get_task_par( "ubound(2)", "makemap" )
 
-#  Unless the supplied data was pre-cleaned, the NDFs holding the cleaned
-#  time-series data will have been created by makemap in the current working
-#  directory. Move them to the NDG temporary directory. Avoid moving any
-#  other files that have similar names by checking each file inode number and
-#  last-accessed time against the lists of inode numbers and times that
-#  existed before makemap was run.
-      if niter > 1:
-         if not precleaned:
-            for ndf in glob.glob("*_con_res_cln.sdf"):
-               if not ndf in orig_cln_ndfs:
-                  shutil.move( ndf, NDG.tempdir )
-               elif os.stat(ndf).st_atime > orig_cln_ndfs[ndf]:
-                  shutil.move( ndf, NDG.tempdir )
-
-#  Get a list of the extinction correction files created by the first
-#  invocation of makemap.
-         for ndf in glob.glob("*_con_ext.sdf"):
-            if not ndf in orig_ext_ndfs:
-               new_ext_ndfs.append(ndf)
-            elif os.stat(ndf).st_atime > orig_ext_ndfs[ndf]:
-               new_ext_ndfs.append(ndf)
-
-#  Get a list of the LUT files created by the first invocation of makemap.
-         for ndf in glob.glob("*_con_lut.sdf"):
-            if not ndf in orig_lut_ndfs:
-               new_lut_ndfs.append(ndf)
-            elif os.stat(ndf).st_atime > orig_lut_ndfs[ndf]:
-               new_lut_ndfs.append(ndf)
-
-#  Get a list of the NOI model files created by the first invocation of
-#  makemap.
-         for ndf in glob.glob("*_con_noi.sdf"):
-            if not ndf in orig_noi_ndfs:
-               new_noi_ndfs.append(ndf)
-            elif os.stat(ndf).st_atime > orig_noi_ndfs[ndf]:
-               new_noi_ndfs.append(ndf)
-
-#  Get the paths to the the moved cleaned files. Also get the paths to the
+#  Get the paths to the cleaned files. Also get the paths to the
 #  files holding the quality flags at the end of each invocation of
 #  makemap.
    if niter > 1:
       if not precleaned:
-         cleaned = NDG( os.path.join( NDG.tempdir,"*_con_res_cln.sdf"))
-         qua = NDG( cleaned, "./*|_cln||" )
+         cleaned = NDG( os.path.join( dumpdir, "*_con_res_cln.sdf"))
+         qua = NDG( cleaned, "*|_cln||" )
       else:
          cleaned = indata
          qua = None
@@ -1088,7 +1000,7 @@ try:
 
 #  Update the NDF from which new quality info is to be read.
          if qua:
-            qua = NDG( cleaned, "./*_con_res" )
+            qua = NDG( cleaned, "*_con_res" )
 
 #  Increment the iteration number
          iter += 1

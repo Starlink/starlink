@@ -984,6 +984,19 @@ downsampfreq = 0
 downsampscale = -1
 
 #-----------------------------------------------------------------
+#  Name: 	dumpdir
+#  Type: 	string
+#  Default: 	<undef>
+#  Purpose: 	Directory for NDFs containing exported models etc.
+#  Description: This parameter specifies an existing directory in which
+#               to place NDFs created by configuration parameters such as 
+#               "exportndf", "noi.export", "exportclean" etc. It is also 
+#               the directory from which NDFs are read by parameters such 
+#               as "noi.import" and "ext.import". The current directory is 
+#               used if "dumpdir" is undefined.
+dumpdir = <undef>
+
+#-----------------------------------------------------------------
 #  Name: 	ensureflat
 #  Type: 	integer
 #  Default: 	1

@@ -242,6 +242,10 @@
  *        Correct ordering of grid axes in time series WCS.
  *     2014-01-31 (DSB):
  *        Ensure it is safe to supply a NULL value for config.
+ *     2018-03-15 (DSB):
+ *        Read existing model data from NDFs stored in the directory specified 
+ *        by the config parameter "dumpdir", rather than from the current 
+ *        directory.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -331,6 +335,8 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
   smfData *data=NULL;           /* Concatenated smfData */
   dim_t *dslen=NULL;            /* Down-sampled lengths */
   char *ename = NULL;           /* Name of file to import */
+  char *dumpdir=NULL;           /* Directory for exported models etc */
+  const char *tempstr = NULL;   /* Temporary string pointer */
   int flag;                     /* Flag */
   char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
   dim_t firstpiece = 0;         /* index to start of whichchunk */
@@ -387,6 +393,19 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
 
   /* Main routine */
   if (*status != SAI__OK) return;
+
+  /* Get the path to the directory in which to place exported models
+     etc. Ensure its end with "/"  */
+  tempstr = NULL;
+  astMapGet0C( config, "DUMPDIR", &tempstr );
+  if( tempstr ) {
+     size_t clen = strlen( tempstr );
+     dumpdir = astStore( NULL, tempstr, clen + 2 );
+     if( dumpdir[clen-1] != '/' ) strcpy( dumpdir + clen, "/" );
+  }
+
+  /* How many threads do we get to play with */
+  nw = wf ? wf->nworker : 1;
 
   /* Verify that we have a valid whichchunk, and determine the range of
      indices into igrp->chunk */
@@ -948,9 +967,6 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
           /* If we have not yet done so, set up threading info. */
           if( ! job_data ) {
 
-            /* How many threads do we get to play with */
-            nw = wf ? wf->nworker : 1;
-
             /* Find how many bolometers to process in each worker thread. */
             bolostep = nbolo/nw;
             if( bolostep == 0 ) bolostep = 1;
@@ -1278,7 +1294,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
         ename = astAppendString( ename, &nc, "_lut" );
         msgOutiff( MSG__VERB, "", FUNC_NAME ": using external LUT "
                   "model imported from '%s'.", status, ename );
-        smf_import_array( wf, data, ename, 0, 0, SMF__INTEGER,
+        smf_import_array( wf, data, dumpdir, ename, 0, 0, SMF__INTEGER,
                           data->lut, status );
         ename = astFree( ename );
       }
@@ -1290,6 +1306,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
   }
 
   /* Clean up */
+  dumpdir = astFree( dumpdir );
   dslen = astFree( dslen );
   job_data = astFree( job_data );
 }

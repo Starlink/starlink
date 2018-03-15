@@ -232,6 +232,10 @@
 *        Added SSN.
 *     2015-06-15 (DSB):
 *        Added PCA.
+*     2018-03-15 (DSB):
+*        Read existing model data from NDFs stored in the directory specified 
+*        by the config parameter "dumpdir", rather than from the current 
+*        directory.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -306,7 +310,9 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
   smfData *data = NULL;         /* Data struct for file */
   size_t datalen=0;             /* Size of data buffer in bytes */
   void *dataptr=NULL;           /* Pointer to data portion of buffer */
+  char *dumpdir=NULL;           /* Directory for exported models etc */
   char *ename = NULL;           /* Name of file to import */
+  const char *tempstr = NULL;   /* Temporary string pointer */
   smf_extmeth extmeth;          /* method of extinction correction */
   int flag=0;                   /* Flag */
   char fname_grpex[GRP__SZNAM+1];/* String for holding filename grpex */
@@ -329,7 +335,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
   Grp *mgrp=NULL;               /* Temporary group to hold model names */
   const char *mname=NULL;       /* String model component name */
   size_t msize=0;               /* Number of files in model group */
-  char name[GRP__SZNAM+1];      /* Name of container file without suffix */
+  char name[1500];              /* Name of container file without suffix */
   dim_t nblock=0;               /* Number of time blocks */
   dim_t nbolo;                  /* Number of bolometers */
   int nc;                       /* Used length of string */
@@ -339,7 +345,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
   dim_t ntslice=0;              /* Number of time slices */
   int oflag=0;                  /* Flags for opening template file */
   int perarray;                 /* Create a COM model for each subarray? */
-  char *pname=NULL;             /* Poiner to fname */
+  char *pname=NULL;             /* Pointer to fname */
   char suffix[] = SMF__DIMM_SUFFIX; /* String containing model suffix */
   double tau;                   /* tau */
   smf_tausrc tausrc;            /* Type of tau monitor */
@@ -390,6 +396,16 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
      astMapGet0A( keymap, "COM", &kmap );
   } else {
      kmap = astClone( keymap );
+  }
+
+  /* Get the path to the directory in which to place exported models
+     etc. Ensure its end with "/"  */
+  tempstr = NULL;
+  astMapGet0C( keymap, "DUMPDIR", &tempstr );
+  if( tempstr ) {
+     size_t clen = strlen( tempstr );
+     dumpdir = astStore( NULL, tempstr, clen + 2 );
+     if( dumpdir[clen-1] != '/' ) strcpy( dumpdir + clen, "/" );
   }
 
   astMapGet0I( kmap, "PERARRAY", &perarray );
@@ -540,7 +556,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                  ename = astAppendString( ename, &nc, "_lut" );
                  msgOutiff( MSG__VERB, "", FUNC_NAME ": using external LUT "
                            "model imported from '%s'.", status, ename );
-                 smf_import_array( wf, idata, ename, 0, 0, SMF__INTEGER,
+                 smf_import_array( wf, idata, dumpdir, ename, 0, 0, SMF__INTEGER,
                                    idata->lut, status );
                  ename = astFree( ename );
 
@@ -1148,8 +1164,8 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                  ename = astAppendString( ename, &nc, "_ext" );
                  msgOutiff( MSG__VERB, "", FUNC_NAME ": using external EXT "
                            "model imported from '%s'.", status, ename );
-                 smf_import_array( wf, idata, ename, 2, 1, idata->dtype, dataptr,
-                                   status );
+                 smf_import_array( wf, idata, dumpdir, ename, 2, 1, idata->dtype,
+                                   dataptr, status );
                  ename = astFree( ename );
 
               /* If calculating new EXT values here... */
@@ -1403,7 +1419,9 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
          we have sitting around */
       wvmtaucache = astFree( wvmtaucache );
 
-    }
+  }
+
+  dumpdir = astFree( dumpdir );
 
   msgOutiff( SMF__TIMER_MSG, "",
              "Created model %s in %.3f s",

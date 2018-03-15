@@ -239,7 +239,6 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t i;                      /* Loop counter */
   dim_t ibolo;                  /* Bolometer index */
   int ibox;                     /* Index of current noise box */
-  int import;                   /* Has an external NOI model been imported? */
   dim_t itime;                  /* Time slice index */
   dim_t idx=0;                  /* Index within subgroup */
   JCMTState *instate=NULL;      /* Pointer to input JCMTState */
@@ -337,9 +336,6 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Did we already calculate the noise on each detector? */
   astMapGet0I( kmap, "CALCFIRST", &calcfirst );
-
-  /* Did we import an external BOI model? */
-  astMapGet0I( kmap, "IMPORT", &import );
 
   /* Use FFT method or simple variance? */
   astMapGet0I( kmap, "BOX_TYPE", &box_type );
