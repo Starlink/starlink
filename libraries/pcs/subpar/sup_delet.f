@@ -69,6 +69,8 @@
 *        Add INCLUDE DAT_PAR
 *      9-AUG-1993 (AJC):
 *        Remove INCLUDE PAR_ERR
+*     19-MAR-2018 (DSB):
+*        Cater for long file names (<=1000).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,9 +99,9 @@
 
 
 *  Local Variables:
-      CHARACTER*80 FILENAME                ! name of VMS container file
+      CHARACTER*1000 FILENAME              ! name of VMS container file
 
-      CHARACTER*(132) STRUCTNAME           ! character string associated
+      CHARACTER*1000 STRUCTNAME            ! character string associated
                                            ! with named parameter
 
       CHARACTER*15 COMPONENT(30)           ! names of the levels in the

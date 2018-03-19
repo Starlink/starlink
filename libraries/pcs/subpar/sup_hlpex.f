@@ -81,6 +81,8 @@
 *        Remove unwanted declarations
 *     24-FEB-1994 (AJC):
 *        Only force name to lower case if there's a VMS-type logical name
+*     19-MAR-2018 (DSB):
+*        Cater for long file names.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -113,7 +115,7 @@
       INTEGER SLN                ! Pointer to start of logical name
       INTEGER ELN                ! Pointer to end of logical name
       INTEGER STNM               ! Pointer to start of file name
-      CHARACTER*80 ULIB          ! LIBRARY in upper case
+      CHARACTER*1000 ULIB        ! LIBRARY in upper case
       CHARACTER*8 SYSNM          ! PSX_UNAME returns
       CHARACTER*8 NODENM         !    "      "
       CHARACTER*8 RELEASE        !    "      "

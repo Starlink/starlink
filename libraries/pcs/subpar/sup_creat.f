@@ -88,6 +88,8 @@
 *        Add error reports
 *     26-FEB-1993 (AJC):
 *        Add INCLUDE DAT_PAR
+*     19-MAR-2018 (DSB):
+*        Cater for long file names (<= 1000).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -125,17 +127,17 @@
 
 
 *  Local Variables:
-      CHARACTER*80 FILENAME       ! name of VMS container file
+      CHARACTER*1000 FILENAME              ! name of VMS container file
 
-      CHARACTER*80 FULNAM         ! expanded filename
+      CHARACTER*1000 FULNAM                ! expanded filename
 
-      INTEGER NAMLEN              ! used length of FULNAM
+      INTEGER NAMLEN                       ! used length of FULNAM
 
-      CHARACTER*(132) STRUCTNAME             ! character string associated
-                                             ! with named parameter
+      CHARACTER*1000 STRUCTNAME            ! character string associated
+                                           ! with named parameter
 
-      CHARACTER*15 COMPONENT(30)             ! names of the levels in the
-                                             ! data structure
+      CHARACTER*15 COMPONENT(30)           ! names of the levels in the
+                                           ! data structure
 
       INTEGER NUMLEVS                      ! number of levels in the
                                            ! named structure
