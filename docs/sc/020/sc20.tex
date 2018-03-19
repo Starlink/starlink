@@ -609,7 +609,7 @@ position. For frequency switched observations it is 1.414 instead.
 describes the total noise of the system. It includes contributions
 from the background sky temperature, the Earth's atmosphere, ground
 spillover picked up by the side lobes and the noise from the receiver
-itself (known as $T_{\textnormal{rec}}$).  $T_{\textnormal{rec}}$ can
+itself (known as $T_{\textnormal{R^{*}}}$).  $T_{\textnormal{R^{*}}}$ can
 be determined by measuring the effects on $T_{\textnormal{sys}}$ when
 looking at hot and cold loads, where the cold load is black-body
 source.
@@ -620,7 +620,7 @@ in the spectrum in kelvin.
 
 
 \begin{tip}
-Both $T_{\textnormal{sys}}$ and $T_{\textnormal{rec}})$ are stored in
+Both $T_{\textnormal{sys}}$ and $T_{\textnormal{R^{*}}})$ are stored in
 the raw data files. This information is stored in the .MORE.ACSIS.TSYS
 and .MORE.ACSIS.TRX extensions respectively, and can be viewed using
 \HDSTRACE\ (see \cref{Section}{sec:fitslist}{How can I view the
@@ -1556,7 +1556,7 @@ options and their descriptions see \oracdrsun.
 \hline
 %-from/-to         & Number of first/last observation \\
 %-list             & Comma separated list of observation numbers \\
--file $<$mylist$>$ & Input data to be read in from a text file. Supply the
+-file $<$mylist$>$ & Input data provided by a text file. Supply the
                      file name (relative to current directory, or the full
                      path) of an ASCII text file containing a list of all
                      observation files to be reduced, one file per line. \\
@@ -1910,7 +1910,7 @@ are three options for \param{GENVAR}:
 
 \begin{center}
 \begin{aligndesc}
-\item[\textbf{Spread}]
+\item[\textbf{Spread }]
 The output variance values are based on the spread of input data
 values contributing to each output pixel. Note that this option is not
 available if parameter \param{SPARSE} is set \param{true}. If the
@@ -1918,15 +1918,23 @@ available if parameter \param{SPARSE} is set \param{true}. If the
 variance value will be produced for each output spectrum. However,
 when \param{BADMASK} is \param{and}, an independent variance value is
 calculated for each channel in each output spectrum.
+\end{aligndesc}
+\end{center}
 
-\item[\textbf{Tsys}]
+\begin{center}
+\begin{aligndesc}
+\item[\textbf{Tsys }]
 The output variance values are based on the system noise temperature
 values supplied in the input NDFs. Since each input spectrum is
 characterised by a single Tsys value, each output spectrum will have a
 constant variance value (i.e. all channels in an output spectrum will
 have the same variance value). [Default].
+\end{aligndesc}
+\end{center}
 
-\item[\textbf{None}]
+\begin{center}
+\begin{aligndesc}
+\item[\textbf{None }]
  No output variance values are created.\\
 \end{aligndesc}
 \end{center}
@@ -1949,7 +1957,7 @@ This is generates a one-dimensional array where spectra are displayed by
 \subsection{Creating a catalogue of receptor positions}
 
 You can use the option \param{OUTCAT} to generate a catalogue of the
-spatial potions of the receptors used to make your final cube. The
+spatial positions of the receptors used to make your final cube. The
 label associated with each row in the catalogue is the detector name.
 The detector positions in the catalogue are ordered as follows: all
 the positions for the first input NDF come first, followed by those
@@ -2054,7 +2062,8 @@ clip levels. The \param{clip} option is only used when
 \param{auto=true}.
 
 For convenience \gaia\ has a \gaiathing{Baseline} tab in its cube
-control panel.  This invokes \mfittrend.
+control panel - see Section \ref{sec:gaiabaseline} for an example. 
+This invokes \mfittrend.
 
 
 \subsection{Advanced method}
@@ -2139,7 +2148,8 @@ If you do not know the axis name you can give the number instead
 (1=RA, 2=Dec, 3=vrad).
 
 For convenience \gaia\ has a \gaiathing{Collapse} tab in its cube
-control panel.  This invokes \collapse.
+control panel - see Section \ref{sec:gaiacollapse} for an example.  
+This invokes \collapse.
 
 
 \subsection{Advanced method}
@@ -2202,7 +2212,7 @@ the advanced method outlined above.
 Your cube will come out of \makecube\, and the pipeline, in units of
 $T_{\textnormal{A}}^*$. To convert this to main-beam brightness temperature, $T_{\textnormal{MB}}$
 divide your cube by the main-beam efficiency, $\eta_{\textnormal{MB}}$. Alternatively,
-to convert to receiver temperature, $T_{rec}$, divide by the forward
+to convert to receiver temperature, $T_{R^{*}}$, divide by the forward
 scattering and spillover efficiency, $\eta_{\textnormal{\,fss}}$.  See
 \cref{Section}{sec:instruments}{Heterodyne instruments} for efficiency
 values for RxA and HARP, and the JCMT webpages for further information
@@ -2851,6 +2861,7 @@ viewed with \gaia.]{\label{fig:clumps2}
 \label{sec:gaia}
 
 \section{Removing a baseline with GAIA}
+\label{sec:gaiabaseline}
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 \item Select the spectrum you want to use as your template for the entire cube.
@@ -3107,6 +3118,7 @@ averaged spectrum gives a much clearer profile of the source.
 \end{enumerate}
 
 \section{Collapsing your cube with GAIA}
+\label{sec:gaiacollapse}
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
