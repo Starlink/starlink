@@ -198,6 +198,7 @@ external NDF.
 
 
 \section{\xlabel{tailoredDR}Tailoring a reduction}
+\label{sec:tailoredDR}
 
 \subsection*{Variances between POL-2 maps}
 
@@ -234,15 +235,81 @@ these variances will then be used to form the errors in the
 In general, within the source regions the variances created using
 \param{MAPVAR}=\texttt{TRUE} will be larger than those created using
 using \param{MAPVAR}=\texttt{FALSE} (within background regions there
-should be little difference). This is partly caused by intrinisic
-instabilities within the map-making process that allow low-level
-artifical extended structures to develop within the source regions
-defined by the AST mask. Such artificial structures will vary from
-observation to observation and so will contribute to the variances
-calculated using \param{MAPVAR}=\texttt{TRUE}. Residual pointing errors
-are another cause of increased variance near bright sources when using
-\param{MAPVAR}=\texttt{TRUE}. Investigation is under way to find a means
-to reduce these effects.
+should be little difference).  This is partly caused by residual
+uncorrected pointing errors, which have a particularly large effect near
+bright point sources if \param{MAPVAR}=\texttt{TRUE}.
+
+It is also partly caused by intrinisic instabilities within the iterative
+map-making algorithm, which allow low-level artifical extended structures
+to develop within the source regions defined by the AST mask. Such
+artificial structures will vary from observation to observation and so
+will contribute to the variances calculated using \param{MAPVAR}=\texttt{TRUE}.
+
+Two options are provided by \task{pol2map} that may be useful in reducing
+the larger than expected dispersion between maps made from different
+observations:
+
+\begin{enumerate}
+\item Setting the parameter \param{OBSWEIGHT}=\texttt{TRUE} when running
+\task{pol2map}  will cause each observation to be assigned a separate
+weight, which will be used when forming the coadd of all observations.
+This will affect both the data values and the variances in the resulting
+coadd. The purpose of these weights is to down-weight observations that
+produce maps that very dissimilar to maps made from the other observations.
+
+Without this parameter setting, the coadd is formed using weights equal
+to the reciprocal of the pixel variance values in each individual
+observation's map. As mentioned above, these pixel variance values can
+sometimes seriously under-estimate the dispersion between observations.
+For instance, observations that are clearly bad (out of focus for
+instance) can have relatively low pixel variance values, and thus get
+included with high weight in the coadd.
+
+If the \param{OBSWEIGHT} parameter is set \texttt{TRUE}, each observation
+is given an additional weight that is used to factor the per-pixel
+weights derived from the pixel variance values, in order to down-weight
+observations that are clearly bad. To form these weights, an initial
+coadd is formed using equal weights for all observations. The maps made
+from the individual observations are then compared to this initial coadd,
+and each observation is assigned a weight equal to the reciprocal of the
+mean squared residual between the individual observation's map and the
+initial coadd (any required pointing correction is applied to the
+individual observation map before forming these residuals). The
+calculation of the mean squared residual is limited to those pixels
+inside the AST mask (i.e. source pixels). The weights derived in this
+manner are normalised to have a median value of 1.0, and any normalised
+weights larger than 1.0 are reduced to 1.0. An improved coadd is then
+formed using these observation weights.
+
+Another iteration is then performed in which individual maps are compared
+with this improved coadd and new weights are derived. This iterative
+process continues until the typical error in the middle of the coadd
+stops falling significantly.
+
+\item  Setting the parameter \param{SKYLOOP}=\texttt{TRUE} when running
+\task{pol2map}  will cause maps to be made using the
+\xref{SMURF:\task{skyloop}}{sc21}{skyloop} command instead of
+\task{makemap}. In the context of the \task{skyloop} documentation, one
+``chunk'' of data usually corresponds to a single observation.
+
+A single invocation of \task{skyloop} creates an I, Q or U map from all
+supplied observations, using a method that attempt to minimise the
+intrinsic instabilities of the map-making algorithm within the AST mask.
+Note, convergence can require a significantly greater number of iterations
+when using \task{skyloop} than when using \task{makemap}. Also,
+\task{skyloop} requires much more disk space than \task{makemap}.
+
+The \task{skyloop} command combines all observations together at each
+iteration of the map-making algorithm. Since the spurious large-scale
+structures created at each iteration are independent of each other,
+taking the mean of the maps after each iteration reduces the level of such
+structures, and prevents them growing in amplitude on successive
+iterations due to the instability in the map-making algorithm.
+
+\end{enumerate}
+
+The above two methods can be used together by supplying \texttt{TRUE}
+values for both \param{OBSWEIGHT} and \param{SKYLOOP}.
 
 
 

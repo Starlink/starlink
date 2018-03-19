@@ -383,11 +383,11 @@ def myint( text ):
 def cleanup():
    global retain, new_ext_ndfs, new_lut_ndfs, new_noi_ndfs
    try:
-      starutil.ParSys.cleanup()
       if retain:
          msg_out( "Retaining EXT, LUT and NOI models and all temporary files in {1}".format(NDG.tempdir))
       else:
          NDG.cleanup()
+      starutil.ParSys.cleanup()
    except:
       pass
 

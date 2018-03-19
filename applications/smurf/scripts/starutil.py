@@ -115,6 +115,23 @@ logfile = None
 __logfd = None
 __logfile = None
 
+
+#  Print and then immediately flush standard output.
+def fprint(text):
+   print( text )
+   sys.stdout.flush()
+
+#  Funtion to close the log file, if open.
+def close_log_file():
+   global __logfd
+   global __logfile
+
+   if __logfd is not None:
+      __logfd.close()
+      __logfd = None
+      __logfile is None
+
+
 #  Funtion to ensure a log file is open
 def __open_log_file():
    global logfile
@@ -123,18 +140,15 @@ def __open_log_file():
 
    # If a log file is currently open, close it if the user has assigned a
    # different value to the module "logfile" variable.
-   if __logfd is not None:
-      if logfile != __logfile:
-         print( "Closing log file {0}".format(__logfile) )
-         __logfd.close()
-         __logfd = None
-         __logfile is None
+   if __logfile is not None and logfile != __logfile:
+      fprint( "Closing log file {0}".format(__logfile) )
+      close_log_file()
 
    # If no log file is currently open, open one now.
    if __logfd is None:
       if logfile is None:
          logfile = "{0}.log".format(cmd())
-      print( "Logging to file {0} ".format(logfile) )
+      fprint( "Logging to file {0} ".format(logfile) )
 
       # Rename any existing file by appending a unique version number to
       # the end of it.
@@ -146,9 +160,9 @@ def __open_log_file():
 
       if version > 0 :
          os.rename( logfile, mvto )
-         print( "(existing file {0} moved to {1})\n".format(logfile,mvto) )
+         fprint( "(existing file {0} moved to {1})\n".format(logfile,mvto) )
 
-      __logfd = open( logfile, "w" )
+      __logfd = open( logfile, "w", 1 )
       __logfile = logfile
       __logfd.write("{0} log file created at {1}\n".format(cmd(),datetime.datetime.now()))
 
@@ -200,11 +214,38 @@ def msg_out(text,level=PROGRESS):
       text = "debug> {0}".format(text)
 
    if level <= ilevel:
-      print(text)
+      fprint(text)
 
    if level <= glevel:
       __open_log_file()
-      __logfd.write(text)
+      if level <= ilevel:
+         __logfd.write(".  "+text+"\n")
+      else:
+         __logfd.write(text+"\n")
+      __logfd.flush()
+      os.fsync(__logfd)
+
+def append_logfile(file):
+   """
+   Append the contents of the supplied text file to the curent log file.
+
+   Invocation:
+      append_logfile(file)
+
+   Arguments:
+      file = string
+         The path to the text file to be appended to the log file.
+   """
+
+   global __logfd
+
+   # Ensure the log file is open.
+   __open_log_file()
+
+   #  Append the contents of the new file to the log file.
+   __logfd.write("\n")
+   with open( file, 'r') as infile:
+      __logfd.write(infile.read())
 
 
 def _getLevel( level ):
@@ -264,7 +305,8 @@ def ndfExists( ndf ):
    return result
 
 
-def invoke(command,aslist=False,buffer=None,annul=False):
+def invoke(command,aslist=False,buffer=False,annul=False,msg_level=ATASK,
+           cmdscreen=True):
    """
 
    Invoke an ADAM atask. An AtaskError is raised if the command fails.
@@ -272,14 +314,9 @@ def invoke(command,aslist=False,buffer=None,annul=False):
    It may also be written to the screen and to the log file, depending
    on the value of the "ilevel" and "glevel" module variables.
 
-   Note - this command should only be used to invoke ADAM tasks. It is
-   not re-entrant. That is, you should not use it to invoke a command
-   that may possible then use "invoke" itself (i.e. do not use it to
-   invoke other python scripts, or ADAM tasks that result in other
-   python scripts being run).
-
    Invocation:
-      value = invoke(command,aslist=False,buffer=None,annul=False)
+      value = invoke(command,aslist=False,buffer=False,annul=False,
+                     msg_level=ATASK,cmdscreen=True)
 
    Arguments:
       command = string
@@ -305,12 +342,17 @@ def invoke(command,aslist=False,buffer=None,annul=False):
          will never terminate and so will cause this script to freeze
          whilst it waits for the gwmXrefresh process to end. Writing
          standard output to a disk file seems to prevent this for some unknown
-         reason. If "buffer" is not specified, the default is always to
-         buffer unless the screen information level ("ILEVEL") is set to
-         ATASK or higher.
+         reason.
+      msg_level = int
+         The level at which to report any standard output from the
+         supplied command.
       annul = boolean
          If False, then an AtaskError exception is raised if the command
          fails for any reason. If True, then no exception is raised.
+      cmdscreen = boolean
+         If False, never display the command being executed on the screen.
+         If True, display it on screen if the current ilevel is set to
+         ATASK or higher.
 
    Returned Value:
       A single string, or a list of strings, holding the standard output
@@ -340,10 +382,12 @@ def invoke(command,aslist=False,buffer=None,annul=False):
    # instance) NDF names reported by KAPPA:NDFECHO can be mangled.
    os.environ["MSG_SZOUT"] = "0"
 
-   msg_out( "\n>>> {0}\n".format(command), ATASK )
-
-   if buffer is None:
-      buffer = ( ilevel < ATASK )
+   if not cmdscreen:
+      old_ilevel = ilevel
+      ilevel = NONE
+   msg_out( "\n>>> {0}".format(command), ATASK )
+   if not cmdscreen:
+      ilevel = old_ilevel
 
    #  The original scheme used subprocess.check_output to invoke the
    #  atask. But the process hung for ever if the invoked command
@@ -367,7 +411,7 @@ def invoke(command,aslist=False,buffer=None,annul=False):
          outtxt = fd.read().strip()
          fd.close()
          os.remove(stdout_file)
-         msg_out( outtxt, ATASK )
+         msg_out( outtxt, msg_level )
       else:
          outtxt = ""
 
@@ -384,7 +428,7 @@ def invoke(command,aslist=False,buffer=None,annul=False):
       if aslist:
          outtxt = []
       else:
-         outtxt = ""
+         outtxt = None
 
       proc = subprocess.Popen(command,shell=True, stdout=subprocess.PIPE,
                               stderr=subprocess.STDOUT)
@@ -395,9 +439,11 @@ def invoke(command,aslist=False,buffer=None,annul=False):
             if isinstance( line, bytes ):
                line = line.decode("ascii","ignore")
             line = line.rstrip()
-            msg_out( line, ATASK )
+            msg_out( line, msg_level )
             if aslist:
                outtxt.append(line)
+            elif outtxt is None:
+               outtxt = line
             else:
                outtxt = "{0}\n{1}".format(outtxt,line)
             line = proc.stdout.readline()
@@ -406,7 +452,7 @@ def invoke(command,aslist=False,buffer=None,annul=False):
          if status is not None:
             break
 
-         time.sleep(1.0)
+         time.sleep(0.1)
 
       if status != 0 and not annul:
          if outtxt:
@@ -420,7 +466,6 @@ def invoke(command,aslist=False,buffer=None,annul=False):
          else:
             raise AtaskError()
 
-   msg_out( "\n", ATASK )
    return outtxt
 
 def get_adam_user():
@@ -834,7 +879,7 @@ class ParSys(object):
                text = None;
             if not text:
                text = self.usage
-            print(text)
+            fprint(text)
             sys.exit(0)
 
          self.cmdline += "{0} ".format(item)
@@ -910,7 +955,7 @@ class ParSys(object):
       if ParSys.adamdir is None:
          ParSys.adamdir = tempfile.mkdtemp( prefix="adam_", suffix="_py",
                                             dir=NDG._gettmpdir() )
-      msg_out( "Setting ADAM_USER to {0}\n".format(ParSys.adamdir), ATASK )
+      msg_out( "Setting ADAM_USER to {0}".format(ParSys.adamdir), ATASK )
       os.environ["ADAM_USER"] = ParSys.adamdir
 
       # Ensure that KAPPA is not in verbose mode and does not report NDF
@@ -925,11 +970,12 @@ class ParSys(object):
       os.environ["NDF_AUTO_HISTORY"] = "1"
       os.environ["AUTOPROV"] = "1"
 
-   # Delete the temporary ADAM directory.
+   # Delete the temporary ADAM directory and close the log file.
    @classmethod
    def cleanup(cls):
       if ParSys.adamdir is not None:
          shutil.rmtree( ParSys.adamdir )
+      close_log_file()
 
 #  Allow the ParSys to be indexed by parameter name (returns the
 #  Parameter object as the value).
@@ -958,7 +1004,7 @@ class ParSys(object):
 #  A method to deliver an error message to the user without affecting
 #  control flow
    def _error(self,msg):
-      print("{0}\n".format(msg))
+      fprint("{0}\n".format(msg))
 
 
 
@@ -1183,7 +1229,7 @@ class Parameter(object):
          elif value == "?" or value == "??":
             help = self._getHelp()
             if help:
-               print(help)
+               fprint(help)
             else:
                text = "No help available for parameter '{0}'.".format(name)
                self.__error(text)
@@ -1193,7 +1239,7 @@ class Parameter(object):
             try:
                self._setValue( value )
                self.__validate()
-               msg_out( "Parameter {0} is set to {1}\n".format(name,self.__value), ATASK )
+               msg_out( "Parameter {0} is set to {1}".format(name,self.__value), ATASK )
 
             except InvalidParameterError as err:
                self.__error(err)
@@ -1271,7 +1317,7 @@ class Parameter(object):
       if self._parsys:
          self._parsys._error(msg)
       else:
-         print("{0}\n".format(msg))
+         fprint("{0}\n".format(msg))
 
 
 
@@ -2640,7 +2686,7 @@ class NDG(object):
    #  Print the NDFs in a NDG.
    def list( self ):
       for ndf in self.__ndfs:
-         print( ndf )
+         fprint( ndf )
 
    # Allow the NDG to be indexed like a list of NDF names
    def __len__(self):

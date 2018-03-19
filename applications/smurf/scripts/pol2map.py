@@ -112,7 +112,8 @@
 *        ---
 *        The default value for pca.pcathresh indicated above will be
 *        changed if it is too high to allow convergence of the I maps
-*        within the number of iterations allowed by numiter.
+*        within the number of iterations allowed by numiter (this change
+*        only occurs if parameter SKYLOOP is FALSE).
 *
 *        If MASK is set to the name of an NDF, this script creates fixed
 *        masks from the NDF, and the following parameters are added
@@ -357,6 +358,23 @@
 *        reference direction, and if "ICRS" is supplied, they use the ICRS
 *        Declination axis. If "TRACKING" is supplied, they use north in the
 *        tracking system - what ever that may be. ["TRACKING"]
+*     OBSWEIGHT = _LOGICAL (Write)
+*        This parameter affects how maps from separate observations are
+*        weighted when they are combined together to form a coadd. If it is
+*        FALSE, each pixel in each map is weighted simply using the reciprocal
+*        of the Variance value stored in the map. If it is TRUE, an extra
+*        factor is included in the pixel weights that is constant for all
+*        pixels in a map  but varies from observation to observation. In
+*        other words, each observation is assigned a weight, which is used
+*        to factor the pixel weights derived from the Variance values.
+*        The purpose of this per-observation weight is to down-weight
+*        observations that are very different to the other observations
+*        and which would therefore contribute to a high Variance if parameter
+*        MAPVAR is set TRUE. These weights are proportional to 1/(RMS*RMS),
+*        where "RMS" is the RMS residual between an individual observation
+*        map and the coadd of all observation maps, after they have been
+*        aligned spatially to take account of any pointing error in the
+*        individual observation. [FALSE]
 *     PIXSIZE = _REAL (Read)
 *        Pixel dimensions in the output I, Q and U maps, in arcsec. The default
 *        is 4 arc-sec for both 450 and 850 um data. The bin size for the output
@@ -400,10 +418,19 @@
 *        created by this script be retained? If not, it will be deleted
 *        before the script exits. If retained, a message will be
 *        displayed at the end specifying the path to the directory. [FALSE]
+*     SKYLOOP = _LOGICAL (Read)
+*        Should the skyloop script be used in place of makemap to create the
+*        maps from the I, Q and U time-series data? Note, when using skyloop
+*        it is not possible to add in new observations to an existing
+*        collection of I, Q and U maps - all observations must be processed
+*        together. Therefore the value supplied for parameter REUSE will be
+*        ignored and a value of FALSE assumed if the MAPDIR directory is
+*        missing maps for any of the supplied observations. [FALSE]
 *     UOUT = NDF (Write)
 *        The output NDF in which to return the U map including all supplied
 *        observations. This will be in units of pW. Supply null (!) if no U
 *        map is required.
+
 
 *  Copyright:
 *     Copyright (C) 2017 East Asian Observatory.
@@ -466,6 +493,11 @@
 *        NUMITER in the supplied config.
 *     21-FEB-2018 (DSB):
 *        Change default for PIXSIZE to 4 arc-seconds at both 450 and 850.
+*     27-FEB-2018 (DSB):
+*        Added SKYLOOP parameter.
+*     13-MAR-2018 (DSB):
+*        Added parameter OBSWEIGHT.
+
 '''
 
 import glob
@@ -479,12 +511,23 @@ from starutil import NDG
 from starutil import Parameter
 from starutil import ParSys
 from starutil import msg_out
+from starutil import append_logfile
 from starutil import AtaskError
 from starutil import get_fits_header
 from starutil import get_task_par
 
 #  Assume for the moment that we will not be retaining temporary files.
 retain = 0
+
+#  Return the median value in a supplied list.
+def median(lst):
+   n = len(lst)
+   if n < 1:
+      return None
+   if n % 2 == 1:
+      return sorted(lst)[n//2]
+   else:
+      return sum(sorted(lst)[n//2-1:n//2+1])/2.0
 
 #  A function to find the PCA.PCATHRESH value used to create the most
 #  recent auto-masked or ext-masked map.
@@ -519,11 +562,355 @@ def getPcaThresh( mapdir, automask ):
 #  retained. Also delete the script's temporary ADAM directory.
 def cleanup():
    global retain
-   ParSys.cleanup()
    if retain:
       msg_out( "Retaining temporary files in {0}".format(NDG.tempdir))
    else:
       NDG.cleanup()
+   ParSys.cleanup()
+
+
+#  A function to create the coadd of all the observation maps. If I data
+#  is being processed, it also determines pointing corrections that align
+#  each individual I map with the coadd of all I maps. It then determines
+#  a weight for each observation by comparing the aligned individual I map
+#  for the observation with the I coadd - observations that are similar
+#  to the coadd get higher weight. The weight for each observation is
+#  stored in the CHUNKWGT header within the FITS extension of the
+#  observation's I map.
+def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, use_ref_for_alignment,
+               ref, obsweight ):
+   allmaps = []
+   allkeys = []
+   for key in qui_maps:
+      allmaps.append( qui_maps[key] )
+      allkeys.append( key )
+   allmaps = NDG( allmaps )
+
+#  No observation weighting.
+   if not obsweight:
+      msg_out("Coadding {0} maps from all observations with no weighting:".format(qui))
+
+#  Form the coadd using equal weights for all observations.
+      invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
+             "conserve=no method=near variance=yes genvar={2} "
+             .format(allmaps,coadd,mapvar))
+
+#  If we are processing I data, determine pointing corrections by comparing
+#  each individual observation map with the new coadd. The pointing corrections
+#  are stored in the FITS headers of the observation I maps. We determine
+#  the pointing corrections from the I data since it is brighter than Q or
+#  U, and then apply the same pointing corrections to the Q and U data when
+#  creating maps from the Q and U time streams.
+      if qui == "I":
+         PointingCorrections( qui_maps, coadd, use_ref_for_alignment, ref )
+
+#  If we are weighting observations separately, first deal with I data.
+   elif qui == "I":
+      msg_out("Coadding I maps with a separate weight for each observation:")
+
+#  Initialise the weights for all observations to 1.0. The weights are
+#  stored in a text file so that they can be read by wcsmosaic.
+      wfile = NDG.tempfile()
+      with open( wfile, "w" ) as fd:
+         for i in range(len(qui_maps)):
+            fd.write("1.0\n")
+
+#  Loop until convergence.
+      this_coadd = None
+      more = True
+      meanerr_last = 1E30
+      iter = 0
+      while more:
+         iter += 1
+         msg_out("   Iteration {0}:".format(iter))
+
+#  Form the coadd, using the current weights.
+         previous_coadd = this_coadd
+         this_coadd = NDG(1)
+         if iter == 1:
+            msg_out("     Making new coadd using unit weights...")
+         else:
+            msg_out("     Making new coadd using improved weights...")
+         invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
+                "conserve=no method=near variance=yes genvar={2} "
+                "weights=^{3}".format(allmaps,this_coadd,mapvar,wfile))
+
+#  Report the mean error within the central 40 pixels of the coadd
+         invoke("$KAPPA_DIR/stats ndf={0}'(0~40,0~40)' comp=err quiet=yes".format(this_coadd) )
+         meanerr = float( get_task_par( "MEAN", "stats" ))
+         msg_out("     Typical error at centre of new coadd = {1}".format(iter,meanerr))
+
+#  Decide if converged. If so copy the current coadd to the required file
+#  and leave the loop retaining the current pointing corrections and
+#  weights.
+         if meanerr > 0.99*meanerr_last:
+            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(this_coadd,coadd))
+            msg_out("\n   Converged")
+            more = False
+
+#  If not converged, record the previous error level and find new pointing
+#  corrections and weights based on the new improved coadd.
+         else:
+            meanerr_last = meanerr
+
+#  Determine pointing corrections and weights by comparing each
+#  individual oibservation map with the new coadd. The pointing
+#  corrections are stored in the FITS headers of the observation maps.
+#  The weights are returned in a list.
+            weights = PointingCorrections( qui_maps, this_coadd, use_ref_for_alignment, ref )
+
+#  Store the new weights in the weights file and in the I maps. Ensure
+#  the order of the values in the weights file matches the order of the maps
+#  in the allmaps NDG object.
+            wfile = NDG.tempfile()
+            with open( wfile, "w" ) as fd:
+               msg_out("     Improved weights derived using new coadd:")
+               for key in allkeys:
+                  wgt = weights[key]
+                  invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=CHUNKWGT "
+                         "edit=a value={1} comment=\"'Weight for this chunk of data'\""
+                         " position=! mode=interface".format(qui_maps[key],wgt))
+                  msg_out("       {0}: {1}".format(key, wgt))
+                  fd.write( "{0}\n".format(wgt) )
+            msg_out(" ")
+
+
+#  Now deal with Q and U data. These use the weights stored in the
+#  corresponding I (ext-masked or auto-masked) maps.
+   else:
+      msg_out("Coadding {0} maps with a separate weight for each observation:".format(qui))
+      wfile = NDG.tempfile()
+      allone = True
+      with open( wfile, "w" ) as fd:
+         for key in allkeys:
+            try:
+               wgt = get_fits_header( i_maps[key], "CHUNKWGT", report=True )
+               fd.write("{0}\n".format(wgt))
+               if float(wgt) < 1.0:
+                  allone = False
+            except Exception:
+               fd.write("1.0\n")
+
+      if allone:
+         weights = "!"
+      else:
+         weights = "^{0}".format(wfile)
+
+      invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
+             "conserve=no method=near variance=yes genvar={2} "
+             "weights={3}".format(allmaps,coadd,mapvar,weights))
+
+
+
+
+
+#  Function to determine pointing correction and weight for each
+#  individual observation by comparing the observation's I map with
+#  the coadd of all I maps.
+def PointingCorrections( qui_maps, imap, use_ref_for_alignment, ref ):
+
+#  Choose the map with which to align each of the new I maps. We use the
+#  external reference map if one was supplied. Otherwise we use the I mosaic
+#  so long as it contains more than one observation (if there is only one
+#  observation then the aligment is bound to be a unit transformation
+#  because the mosaic and the individual map will be identical).
+   if use_ref_for_alignment:
+      aref = ref
+   elif len(qui_maps) > 1 and imap:
+      aref = imap
+   else:
+      aref = "!"
+
+#  Initialise the returned weights.
+   weights = {}
+   swgt = 0.0
+   nwgt = 0
+
+#  Loop round all observations.
+   comment = None
+   msg_out( "     Improved pointing corrections derived using new coadd:" )
+   for key in qui_maps:
+
+#  Can't align if we have no reference.
+      if aref == "!":
+         continue
+
+#  Decide on a suitable comment to store with the PNTRQ_DX/DY FITS headers,
+#  indicating if the recorded value is an extra remaining error that needs
+#  to be added to the values already stored in the POINT_DX/DY headers, or
+#  is a first estimate at the total pointing error. We do this for the
+#  first observation and then use the same comment for all subsequent
+#  observations.
+      if comment is None:
+         there = invoke("$KAPPA_DIR/fitsmod ndf={0} edit=exist keyword=POINT_DX".
+                        format( qui_maps[key] ), False ).strip()
+         if there == "TRUE":
+            comment = "Remaining {0} pointing error [arcsec]"
+         else:
+            comment = "Required {0} pointing correction [arcsec]"
+
+#  The determination of the pointing correction is more accurate if we
+#  first mask out background areas. Use the AST mask to define source pixels,
+#  but only if the mask contains a reasonable number of pixels (very faint
+#  sources will have very small or non-existant AST masks).
+      invoke("$KAPPA_DIR/showqual ndf={0}".format(qui_maps[key]))
+      if get_task_par( "QNAMES(1)", "showqual" ) == "AST":
+         bb = 1
+      elif get_task_par( "QNAMES(2)", "showqual" ) == "AST":
+         bb = 2
+      elif get_task_par( "QNAMES(3)", "showqual" ) == "AST":
+         bb = 4
+      else:
+         bb = 0
+
+      if bb > 0:
+         invoke("$KAPPA_DIR/setbb ndf={0} bb={1}".format(qui_maps[key],bb))
+
+#  Clear badbits to use the whole map if the above masking results in too
+#  few pixels, and instead mask the map to remove pixels that have less
+#  than the mean exposure time per pixel.
+      invoke("$KAPPA_DIR/stats ndf={0}".format(qui_maps[key]))
+      nused = float( get_task_par( "numgood", "stats" ) )
+      if nused < 400:
+         invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(qui_maps[key]))
+         invoke("$KAPPA_DIR/stats ndf={0}".format(qui_maps[key]))
+         mean = float( get_task_par( "mean", "stats" ) )
+         aligner = NDG(1)
+         invoke( "$KAPPA_DIR/maths exp=\"'qif((ia.ge.pa),ib,<bad>'\" "
+                 "ia={0}.more.smurf.exp_time ib={0} pa={1} out={2}".
+                 format(qui_maps[key],mean,aligner) )
+      else:
+         aligner = qui_maps[key]
+
+#  Find the pixel shift that aligns features in this masked, trimmed I map
+#  with corresponding features in the reference map. Also get the RMS residual
+#  between the two maps after alignment, and store the corresponding
+#  weight.
+      try:
+         invoke("$KAPPA_DIR/align2d ref={0} out=! in={1} form=3".
+                format(aref,aligner))
+         dx = float( get_task_par( "TR(1)", "align2d" ) )
+         dy = float( get_task_par( "TR(4)", "align2d" ) )
+         rms = float( get_task_par( "RMS", "align2d" ) )
+         weights[key] = 1/(rms*rms)
+         swgt += weights[key]
+         nwgt += 1
+
+#  If align2d failed, use silly dx,dy values to ensure it is flagged by
+#  the following code.
+      except starutil.AtaskError:
+         dx = 1E6
+         dy = 1E6
+         weights[key] = 0.0
+
+#  Ensure the bad-bits mask has been reset.
+      if bb > 0:
+         invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(qui_maps[key]))
+
+#  If the shifts are suspiciously high, we do not believe them. In which
+#  case we cannot do pointing ocorrection when creating the Q and U maps.
+      if abs(dx) > 8 or abs(dy) > 8:
+         msg_out( "\nWARNING: {0}: The I map created from the POL2 data cannot "
+                  "be aligned with the supplied reference map. Check the maps "
+                  "for the current observation to see if they should be omitted "
+                  "from the reduction.\n".format(key) )
+
+#  Otherwise, convert the offset in pixels to (longitude,latitude) offsets
+#  in the sky system of the reference map, in arc-seconds....
+      else:
+
+#  Strip the wavelength axis off the total intensity map created above.
+         imap2d = NDG( 1 )
+         invoke("$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(qui_maps[key],imap2d))
+
+#  Get the pixel coords at the centre of the total intensity map.
+         invoke("$KAPPA_DIR/ndftrace ndf={0}".format(imap2d))
+         lbndx = float( get_task_par( "LBOUND(1)", "ndftrace" ) )
+         lbndy = float( get_task_par( "LBOUND(2)", "ndftrace" ) )
+         ubndx = float( get_task_par( "UBOUND(1)", "ndftrace" ) )
+         ubndy = float( get_task_par( "UBOUND(2)", "ndftrace" ) )
+         cenx = 0.5*( lbndx + ubndx )
+         ceny = 0.5*( lbndy + ubndy )
+
+#  Convert to SKY coords, in radians. Use ATOOLS rather than pyast in
+#  order to avoid the need for people to install pyast. Also, ATOOLS
+#  integrates with NDFs more easily than pyast.
+         (cena,cenb) = invoke("$ATOOLS_DIR/asttran2 this={0} forward=yes "
+                              "xin={1} yin={2}".format( imap2d,cenx,ceny)).split()
+         cena = float( cena )
+         cenb = float( cenb )
+
+#  Add on the pixel offsets, and convert to SKY coords, in radians.
+         offx = cenx + dx
+         offy = ceny + dy
+         (offa,offb) = invoke("$ATOOLS_DIR/asttran2 this={0} forward=yes "
+                              "xin={1} yin={2}".format( imap2d,offx,offy)).split()
+         offa = float( offa )
+         offb = float( offb )
+
+#   Now find the arc-distance parallel to the longitude axis, between the central
+#   and offset positions, and convert from radians to arc-seconds.
+         dx = invoke("$ATOOLS_DIR/astdistance this={0}, point1=\[{1},{2}\] "
+                     "point2=\[{3},{4}\]".format(imap2d,cena,cenb,offa,cenb))
+         dx = 3600.0*math.degrees( float( dx ) )
+
+#  The value returned by astDistance is always positive. Adjust the sign
+#  of dx so that it goes the right way.
+         da = offa - cena
+         while da > math.pi:
+            da -= math.pi
+         while da < -math.pi:
+            da += math.pi
+         if da < 0.0:
+            dx = -dx
+
+#  Now find the arc-distance parallel to the latitude axis, between the central
+#  and offset positions, and convert from radians to arc-seconds.
+         dy = invoke("$ATOOLS_DIR/astdistance this={0}, point1=\[{1},{2}\] "
+                           "point2=\[{3},{4}\]".format(imap2d,cena,cenb,cena,offb))
+         dy = 3600.0*math.degrees( float( dy ) )
+
+#  The value returned by astDistance is always positive. Adjust the sign
+#  of dx so that it goes the right way.
+         db = offb - cenb
+         if db < 0.0:
+            dy = -dy
+         msg_out( "       {0}: ({1:5.1f},{2:5.1f}) arc-sec".format(key,dx,dy) )
+
+#  Store the required pointing corrections as FITS headers within the map.
+         sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(1)'".
+                            format(qui_maps[key]))
+         com = comment.format(sym)
+         invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=PNTRQ_DX "
+                "edit=a value={1} comment=\"'{2}'\""
+                " position=! mode=interface".format(qui_maps[key],dx,com))
+
+         sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(2)'".
+                format(qui_maps[key]))
+         com = comment.format(sym)
+         invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=PNTRQ_DY edit=a value={1} "
+                "comment=\"'{2}'\" position=! mode=interface".
+                format(qui_maps[key],dy,com))
+
+#  Find the median of the weights.
+   wmed = median( weights.values() )
+
+#  Normalise the weights to a median value of 1.0 then limit them to be <= 1.0
+#  to avoid biasing the results heavily towards observations that happen to
+#  be close to the median, and return them.
+   for key in qui_maps:
+      if weights[key] > wmed:
+         weights[key] = 1.0
+      else:
+         weights[key] /= wmed
+
+   return weights
+
+
+
+
+
+
 
 
 
@@ -630,7 +1017,7 @@ try:
    params.append(starutil.Par0L("MAPVAR", "Use variance between observation maps?",
                                  False, noprompt=True))
 
-   params.append(starutil.Par0L("Jy", "Should outputs be converted from pW to mJy/beam?",
+   params.append(starutil.Par0L("JY", "Should outputs be converted from pW to mJy/beam?",
                                 True, noprompt=True))
 
    params.append(starutil.Par0F("FCF", "pW to Jy/beam conversion factor",
@@ -644,6 +1031,12 @@ try:
 
    params.append(starutil.Par0F("BINSIZE", "Catalogue bin size (arcsec)", None,
                                  maxval=1000, minval=0.01, noprompt=True))
+
+   params.append(starutil.Par0L("SKYLOOP", "Use skyloop instead of makemap?",
+                                False, noprompt=True))
+
+   params.append(starutil.Par0L("OBSWEIGHT", "Down-weight unusual observations?",
+                                False, noprompt=True))
 
 
 #  Initialise the parameters to hold any values supplied on the command
@@ -769,7 +1162,7 @@ try:
 #  If the REF map is in units of mJy/beam, convert it to pW using the FCF
 #  in the "FCF" FITS header if available, or the standard FCF for the
 #  wavelength otherwise.
-      invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(ref) )
+      invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(ref) )
       ref_units = get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
       if ref_units != "pW":
 
@@ -841,6 +1234,12 @@ try:
       raise starutil.InvalidParameterError("Invalid FILTER header value "
              "'{0} found in {1}.".format( filter, indata[0] ) )
 
+#  See if we should use skyloop instead of makemap.
+   skyloop = parsys["SKYLOOP"].value
+
+#  See if unusual observations should be down-weighted.
+   obsweight = parsys["OBSWEIGHT"].value
+
 #  See if we should store I, Q and U values in mJy/beam in the output
 #  calatlogue.
    jy = parsys["JY"].value
@@ -869,7 +1268,7 @@ try:
 
       else:
          if ipref != imap:
-            invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(ipref) )
+            invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(ipref) )
             units = get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
             if units != "pW":
                raise starutil.InvalidParameterError("IP reference map {0} is"
@@ -988,7 +1387,7 @@ try:
                                           "was not created from POL2 data or "
                                           "is corrupt.".format(stokes,path))
 
-         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(path) )
+         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(path) )
          units = get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
          if units != "pW":
             raise starutil.InvalidParameterError("All supplied "
@@ -1276,7 +1675,7 @@ try:
       try:
          pcathresh = float( invoke("$KAPPA_DIR/configecho name=pca.pcathresh "
                                    "config={0}".format(config)) )
-      except:
+      except Exception:
          pcathresh = 0
 
 #  If no value is supplied in the config, the default values are -50
@@ -1335,7 +1734,7 @@ try:
                             "config={0}".format(config))
             if "<***>" not in models and "pca" not in models.lower():
                pcathresh = (pcathresh_def1 if automask else pcathresh_def2)
-         except:
+         except Exception:
             pass
 
 #  See if the ICONFIG or QUCONFIG configurations provide a value for
@@ -1343,13 +1742,13 @@ try:
       try:
          pcathresh_i = float( invoke("$KAPPA_DIR/configecho name=pca.pcathresh "
                                      "config={0}".format(iconfig)) )
-      except:
+      except Exception:
          pcathresh_i = pcathresh
 
       try:
          pcathresh_qu = float( invoke("$KAPPA_DIR/configecho name=pca.pcathresh "
                                      "config={0}".format(quconfig)) )
-      except:
+      except Exception:
          pcathresh_qu = pcathresh
 
 #  Create a config file to use with makemap. This file contains stuff
@@ -1459,9 +1858,6 @@ try:
       fd.write("downsampscale=0\n")
       fd.close()
 
-
-
-
 #  Loop over each Stokes parameter, creating maps from each observation
 #  if reqired.
    for qui in ('I', 'Q', 'U'):
@@ -1478,6 +1874,7 @@ try:
             pcathresh = pcathresh_i
             imap_cat = NDG(1)
             coadd_cat = imap_cat
+            this_ip = ""
          else:
             continue
 
@@ -1490,6 +1887,7 @@ try:
             pcathresh = pcathresh_qu
             qmap_cat = NDG(1)
             coadd_cat = qmap_cat
+            this_ip = ip
          else:
             continue
 
@@ -1502,88 +1900,349 @@ try:
             pcathresh = pcathresh_qu
             umap_cat = NDG(1)
             coadd_cat = umap_cat
+            this_ip = ip
          else:
             continue
+
+#  Get the suffix to append to the end of individual observation maps
+#  created below (e.g. "_Imap" for ext-masked I maps or "_imap" for
+#  auto-masked I maps etc).
+      if automask:
+         suffix = qui.lower()+"map"
+      else:
+         suffix = qui+"map"
+
+#  Issue a warning if no time-streams have been supplied for the current
+#  Stokes parameter 9not an error since there may be some pre-existing
+#  maps for the current Stokes parameter)..
+      if len(qui_list) == 0:
+         msg_out( "No usable {0} time-stream data supplied.".format(qui))
+         msg_out( "Looking for pre-existing {0} maps...".format(qui))
+
+#  If we are using skyloop to generate the observation maps...
+#  -----------------------------------------------------------
+      if skyloop:
+
+#  If all the expected maps, including the coadd, already exist, and REUSE
+#  is True, we do not re-create the maps. But if any maps are mising we need
+#  to re-create them all. When using skyloop we cannot re-create one without
+#  re-creating them all.
+         if reuse:
+            try:
+               junk = NDG(coadd,"*")
+               make_new_maps = False
+            except starutil.NoNdfError:
+               make_new_maps = True
+         else:
+            make_new_maps = True
+
+         if not make_new_maps:
+            for key in qui_list.keys():
+               newpath = "{0}/{1}_{2}.sdf".format(mapdir,key,suffix)
+               if os.path.exists(newpath):
+                  qui_maps[key] = NDG(newpath)
+               else:
+                  make_new_maps = True
+                  break
+
+         if not make_new_maps:
+            msg_out("   Re-using previously created maps")
+         else:
+
+#  Create a directory in which to put the individual observation maps.
+            obsdir = NDG.subdir()
+
+#  Create a text file holding the paths to all the input time-stream
+#  files for the current Stokes parameter. Note if there are any files
+#  taken between 20150606 and 20150930, which require an extra Az/El
+#  correction.
+            azelcor = False
+            inpaths  = NDG.tempfile()
+            fd = open( inpaths, "w" )
+            for key in qui_list:
+               (ut,obs,subscan) = key.split('_')
+               if ut >= 20150606 and ut <=20150929:
+                 azelcor = True
+
+               for path in qui_list[ key ]:
+                  fd.write( path+"\n" )
+            fd.close()
+
+#  Create a text file holding the pointing corrections for all input
+#  time-streams. First include any AZ/EL pointing correction, for
+#  data between 20150606 and 20150930.
+            if azelcor:
+               pntfile = NDG.tempfile()
+               fd = open(pntfile,"w")
+               fd.write("# system=azel\n")
+               fd.write("# tai dlon dlat\n")
+               fd.write("54000 32.1 27.4\n")
+               fd.write("56000 32.1 27.4\n")
+               fd.close()
+            else:
+               pntfile = "!"
+
+#  Create the timeframe and mapping used to convert DATE-OBS values (utc)
+#  to mjd TAI values.
+            utcframe = NDG.tempfile()
+            invoke('$ATOOLS_DIR/asttimeframe options="timescale=utc" result={0}'.format(utcframe) )
+            taiframe = NDG.tempfile()
+            invoke('$ATOOLS_DIR/asttimeframe options=! result={0}'.format(taiframe) )
+            utc2tai = NDG.tempfile()
+            invoke('$ATOOLS_DIR/astconvert from={0} to={1} domainlist=! result={2}'.format(utcframe,taiframe,utc2tai) )
+
+#  Store a weight within each time series file. Makemap uses these
+#  weights when coadding all the observations together. The weights will
+#  have been found on a previous run of pol2map as part of generating the
+#  auto-masked I map. The weight or an observation will have been stored in
+#  the CHUNKWGT header in the auto-masked imap. Transfer it to the time-series
+#  file. Only use the weights if all observations have a weight.
+            allone = True
+            if obsweight:
+               for key in qui_list:
+                  try:
+                     hmap = NDG("{0}/{1}_imap".format(mapdir,key))
+                     wgt = float( get_fits_header( hmap, "CHUNKWGT" ))
+                  except starutil.NoNdfError:
+                     wgt = 1.0
+
+                  if wgt < 1.0:
+                     allone = False
+
+                  invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=CHUNKWGT "
+                         "edit=a value={1} comment=\"'Weight for this chunk of data'\""
+                         " position=! mode=interface".format(NDG(qui_list[key]),wgt))
+
+#  If any of the weights are not 1.0, modify the config to indicate that
+#  makemap should read the weights from the CHUNKWGT header in the
+#  time-stream data . Otherwise ensure no weighting is done inside
+#  skyloop by setting the config parameter "chunkweight" to its default
+#  weight of 1.0.
+            fd = open( conf, "a" )
+            if not allone:
+               fd.write('chunkweight="CHUNKWGT"\n')
+            else:
+               fd.write('chunkweight=1.0\n')
+            fd.close()
+
+#  Add pointing corrections to the file for each observation
+            corrections = {}
+            fd = None
+            for key in qui_list:
+
+#  If an auto-masked I map from a previous run exists for the current
+#  observation, see if it has pointing corrections recorded in its FITS
+#  header. If so, we use them when creating the new map.
+               try:
+                  hmap = NDG("{0}/{1}_imap".format(mapdir,key))
+                  dx = get_fits_header( hmap, "PNTRQ_DX" )
+                  dy = get_fits_header( hmap, "PNTRQ_DY" )
+               except starutil.NoNdfError:
+                  dx = None
+                  dy = None
+
+#  If required, create a file to hold the correction If a file is
+#  already in use (because of the data being old) append the new
+#  pointing correction to the end of the file, preceeded by an
+#  "end-of-table" marker (two minus signs). Makemap will then apply
+#  both correction.
+               if dx is not None and dy is not None:
+                  dx = float( dx )
+                  dy = float( dy )
+                  if pntfile == "!":
+                     pntfile = NDG.tempfile()
+                     fd = open(pntfile,"w")
+                     fd.write("# system=tracking\n")
+                     fd.write("# tai dlon dlat\n")
+
+                  elif fd is None:
+                     fd = open(pntfile,"a")
+                     fd.write("--\n")
+                     fd.write("# system=tracking\n")
+                     fd.write("# tai dlon dlat\n")
+
+#  Add two lines to the correction file - the first corresponds to the
+#  earliest data in the current observation and the second corresponds
+#  to the latest data in the current observation. The pointing correction
+#  is constant between these two times. We need to use an AstTimeFrame to
+#  get the MJD TAI corresponding to the DATE-OBS abd DATE-END FITS keywords.
+#  Add 2 minutes to each time as a safety margin.
+                  utcstart = get_fits_header( hmap, "DATE-OBS" )
+                  invoke('$ATOOLS_DIR/astunformat this={0} axis=1 value={1}'.format(utcframe,utcstart) )
+                  utcstart = get_task_par( "dval", "astunformat" )
+                  taistart = invoke('$ATOOLS_DIR/asttran1 this={0} forward=true xin={1}'.format(utc2tai,utcstart) )
+                  taistart = float(taistart) - 120.0/86400.0
+
+                  utcend = get_fits_header( hmap, "DATE-END" )
+                  invoke('$ATOOLS_DIR/astunformat this={0} axis=1 value={1}'.format(utcframe,utcend) )
+                  utcend = get_task_par( "dval", "astunformat" )
+                  taiend = invoke('$ATOOLS_DIR/asttran1 this={0} forward=true xin={1}'.format(utc2tai,utcend) )
+                  taiend = float(taiend) + 120.0/86400.0
+
+                  corrections[taistart] = "{0} {1} {2}\n".format(taistart,dx,dy)
+                  corrections[taiend] = "{0} {1} {2}\n".format(taiend,dx,dy)
+
+#  Ensure the corrections are sorted into monotonic increasing TAI
+#  values, write them out to the file and then close the file.
+            if fd is not None:
+               for tai in sorted(corrections.keys()):
+                  fd.write(corrections[tai])
+               fd.close()
+
+#  Invoke skyloop, putting the individual observation maps in obsdir.
+            old_ilevel = starutil.ilevel
+            starutil.ilevel = starutil.ATASK
+            skylog = NDG.tempfile()
+            extra = "pointing={0}".format(pntfile)
+            msg_out("Invoking skyloop to create the {0} map from all "
+                    "supplied observations".format(qui))
+            msg_out("\n--------------------------------------------------\n")
+            if not maskmap:
+               invoke("$SMURF_DIR/skyloop.py in=^{0} config=^{1} out={2} ref={3} extra={4} "
+                      "pixsize={5} {6} obsdir={7} retain={8} logfile={9}".
+                      format(inpaths,conf,coadd,ref,extra,pixsize,this_ip,obsdir,
+                             retain,skylog),
+                             msg_level=starutil.PROGRESS,cmdscreen=False)
+            else:
+               invoke("$SMURF_DIR/skyloop.py in=^{0} config=^{1} out={2} ref={3} extra={4} "
+                      "pixsize={5} {6} {7} obsdir={8} retain={9} logfile={10}".
+                      format(inpaths,conf,coadd,astmask,extra,pixsize,this_ip,
+                             pcamaskpar,obsdir,retain,skylog),
+                             msg_level=starutil.PROGRESS,cmdscreen=False)
+
+#  Append the skyloop logfile output to the pol2map logfile.
+            starutil.ilevel = old_ilevel
+            append_logfile( skylog )
+            msg_out("\n--------------------------------------------------\n")
+            msg_out("Back from skyloop...")
+            msg_out("Contents of skyloop logfile follows...")
+            append_logfile( skylog )
+            msg_out("\n--------------------------------------------------\n")
+            msg_out("Back to pol2map...")
+
+#  Modify the names of the observation maps so that they use the same scheme
+#  as those created by makemap below, and move them into the main maps
+#  directory.
+            ut_previous = ""
+            obs_previous = ""
+            for key in sorted(qui_list.keys()):
+               (ut,obs,subscan) = key.split('_')
+               obs = obs.lstrip('0')
+
+#  First chunk for this ut/obs? If so, the corresponding skyloop map name
+#  will include no chunk number.
+               if ut != ut_previous or obs != obs_previous:
+                  oldpath = "{0}/{1}_{2}.sdf".format(obsdir,ut,obs)
+                  ut_previous = ut
+                  obs_previous = obs
+                  next_chunk = 1
+
+#  Subsequent chunks for this ut/obs are assumed to be in the same order
+#  as the subscans number within "key".
+               else:
+                  oldpath = "{0}/{1}_{2}_chunk{3}.sdf".format(obsdir,ut,obs,next_chunk)
+                  next_chunk += 1
+
+#  Get the new file name and do the rename.
+               newpath = "{0}/{1}_{2}.sdf".format(mapdir,key,suffix)
+               if os.path.exists(oldpath):
+                  shutil.move( oldpath, newpath )
+
+#  Add it to the dictionary of maps holding the current stokes parameter.
+                  qui_maps[key] = NDG(newpath)
+
+#  Clear its bad bits mask.
+                  invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(qui_maps[key]))
+
+#  Add it to the list of maps in mapdir.
+                  new_maps.append( qui_maps[key] )
+
+               else:
+                  msg_out("Failed to find skyloop observation map "+oldpath+". Continuing without it..." )
+                  del qui_list[key]
+
+
+
+#  If we are using makemap to generate the observation maps...
+#  -----------------------------------------------------------
+      else:
 
 #  Loop over all the time series files for the current Stokes parameter. Each
 #  separate observation will usually have one time series file (although
 #  there may be more if the observation was split into two or more discontiguous
 #  chunks). We form a map for each observation chunk present in the supplied
 #  list of input raw data.
-      for key in qui_list:
+         for key in qui_list:
 
 #  Get the Stokes time stream files for the current observation chunk.
-         isdf = NDG( qui_list[ key ] )
-         msg_out("\n>>>>   Making {1} map from {0}...\n".format(key,qui) )
+            isdf = NDG( qui_list[ key ] )
+            msg_out("\nMaking {1} map from {0}...\n".format(key,qui) )
 
 #  AZ/EL pointing correction, for data between 20150606 and 20150930.
-         ut = int(get_fits_header( isdf[0], "UTDATE", True ))
-         if ut >= 20150606 and ut <= 20150929:
-            pntfile = NDG.tempfile()
-            fd = open(pntfile,"w")
-            fd.write("# system=azel\n")
-            fd.write("# tai dlon dlat\n")
-            fd.write("54000 32.1 27.4\n")
-            fd.write("56000 32.1 27.4\n")
-            fd.close()
-         else:
-            pntfile = "!"
+            ut = int(get_fits_header( isdf[0], "UTDATE", True ))
+            if ut >= 20150606 and ut <= 20150929:
+               pntfile = NDG.tempfile()
+               fd = open(pntfile,"w")
+               fd.write("# system=azel\n")
+               fd.write("# tai dlon dlat\n")
+               fd.write("54000 32.1 27.4\n")
+               fd.write("56000 32.1 27.4\n")
+               fd.close()
+            else:
+               pntfile = "!"
 
 #  If an auto-masked I map from a previous run exists for the current
 #  observation, see if it has pointing corrections recorded in its FITS
 #  header. If so, we use them when creating the new map.
-         try:
-            hmap = NDG("{0}/{1}_imap".format(mapdir,key))
-            dx = get_fits_header( hmap, "PNTRQ_DX" )
-            dy = get_fits_header( hmap, "PNTRQ_DY" )
-         except starutil.NoNdfError:
-            dx = None
-            dy = None
+            try:
+               hmap = NDG("{0}/{1}_imap".format(mapdir,key))
+               dx = get_fits_header( hmap, "PNTRQ_DX" )
+               dy = get_fits_header( hmap, "PNTRQ_DY" )
+            except starutil.NoNdfError:
+               dx = None
+               dy = None
 
 #  Create the pointing correction file to use when running makemap. If
 #  a file is already in use (because of the data being old) append the
 #  new pointing correction to the end of the file, preceeded by an
 #  "end-of-table" Marker (two minus signs). Makemap will then apply
 #  both correction.
-         if dx is not None and dy is not None:
-            dx = float( dx )
-            dy = float( dy )
-            if pntfile == "!":
-               pntfile = NDG.tempfile()
-               fd = open(pntfile,"w")
-            else:
-               fd = open(pntfile,"a")
-               fd.write("--\n")
+            if dx is not None and dy is not None:
+               dx = float( dx )
+               dy = float( dy )
+               if pntfile == "!":
+                  pntfile = NDG.tempfile()
+                  fd = open(pntfile,"w")
+               else:
+                  fd = open(pntfile,"a")
+                  fd.write("--\n")
 
-            fd.write("# system=tracking\n")
-            fd.write("# tai dlon dlat\n")
-            fd.write("54000 {0} {1}\n".format(dx,dy))
-            fd.write("56000 {0} {1}\n".format(dx,dy))
-            fd.close()
+               fd.write("# system=tracking\n")
+               fd.write("# tai dlon dlat\n")
+               fd.write("54000 {0} {1}\n".format(dx,dy))
+               fd.write("56000 {0} {1}\n".format(dx,dy))
+               fd.close()
 
 #  Get the path to the map.
-         if automask:
-            mapname = "{0}/{1}_{2}map".format(mapdir,key,qui.lower())
-         else:
-            mapname = "{0}/{1}_{2}map".format(mapdir,key,qui)
+            mapname = "{0}/{1}_{2}".format(mapdir,key,suffix)
 
-#  If REUSE is TRUE and an old map exists, re-use it.
-         try:
-            if reuse:
-               qui_maps[key] = NDG(mapname, True)
-               msg_out("   Re-using previously created map {0}".format(qui_maps[key]))
-            else:
-               raise starutil.NoNdfError("Ignoring pre-existing data")
+#  If REUSE is True and an old map exists, re-use it.
+            try:
+               if reuse:
+                  qui_maps[key] = NDG(mapname, True)
+                  msg_out("   Re-using previously created map {0}".format(qui_maps[key]))
+               else:
+                  raise starutil.NoNdfError("Ignoring pre-existing data")
 
 #  Otherwise create a new map.  The call signature for makemap depends on
 #  whether an external mask is being supplied or not.
-         except starutil.NoNdfError:
+            except starutil.NoNdfError:
 
-            if dx is not None and dy is not None:
-               msg_out( "   Using pre-calculated pointing corrections of ({0:5.1f},{1:5.1f}) arc-seconds".format(dx,dy) )
+               if dx is not None and dy is not None:
+                  msg_out( "   Using pre-calculated pointing corrections of ({0:5.1f},{1:5.1f}) arc-seconds".format(dx,dy) )
 
-            qui_maps[key] = NDG(mapname, False)
-            try:
+               qui_maps[key] = NDG(mapname, False)
+               try:
 
 #  If we are using the default value for PCA.PCATHRESH (as indicated by
 #  pcathresh being zero), we need to look out for makemap not converging.
@@ -1596,106 +2255,106 @@ try:
 #  "pcathresh" is zero, indicating that no value has yet been determined for
 #  PCA.PCATHRESH. We also require the NUMITER config parameter is negative
 #  - i.e. MAPTOL defines convergence.
-               sel =  "450=1,850=0" if ( filter == 450 ) else "450=0,850=1"
-               numiter = float( invoke("$KAPPA_DIR/configecho name=numiter config=^{0} "
-                                       "defaults=$SMURF_DIR/smurf_makemap.def "
-                                       "select=\"\'{1}\'\"".format(conf,sel)))
-               if pcathresh == 0 and numiter < 0:
-                  pcathresh = pcathresh_def1 if automask else pcathresh_def2
-                  abpar = "abortsoon=yes"
-               else:
-                  abpar = ""
-
-               attempt = 0
-               again = True
-               while again:
-                  attempt += 1
-
-                  if not maskmap:
-                     invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
-                         "pixsize={5} {6} {7}".format(isdf,conf,qui_maps[key],ref,pntfile,pixsize,ip,abpar))
+                  sel =  "450=1,850=0" if ( filter == 450 ) else "450=0,850=1"
+                  numiter = float( invoke("$KAPPA_DIR/configecho name=numiter config=^{0} "
+                                          "defaults=$SMURF_DIR/smurf_makemap.def "
+                                          "select=\"\'{1}\'\"".format(conf,sel)))
+                  if pcathresh == 0 and numiter < 0:
+                     pcathresh = pcathresh_def1 if automask else pcathresh_def2
+                     abpar = "abortsoon=yes"
                   else:
-                     invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
-                         "pixsize={5} {6} {7} {8}".format(isdf,conf,qui_maps[key],astmask,pntfile,
-                                                        pixsize,ip,pcamaskpar,abpar))
+                     abpar = ""
+
+                  attempt = 0
+                  again = True
+                  while again:
+                     attempt += 1
+
+                     if not maskmap:
+                        invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
+                            "pixsize={5} {6} {7}".format(isdf,conf,qui_maps[key],ref,pntfile,pixsize,ip,abpar))
+                     else:
+                        invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
+                            "pixsize={5} {6} {7} {8}".format(isdf,conf,qui_maps[key],astmask,pntfile,
+                                                           pixsize,ip,pcamaskpar,abpar))
 
 #  If we do not yet know what pcathresh value to use, see if makemap aborted
 #  due to slow convergence. If so, reduce the number of PCA components
 #  removed on each iteration by 25% and re-run makemap.
-                  if abpar != "":
-                     abortedat = int( float( get_task_par( "abortedat", "makemap" ) ) )
-                     if abortedat == 0:
-                        again = False
-                        if attempt > 1:
-                           msg_out( ">>>> MAKEMAP converged succesfully, so all further "
-                                    "maps will be created using PCA.PCATHRESH={0}.".
-                                    format( pcathresh ) )
-
-                     elif attempt < 20:
-                        reduction = int( -pcathresh * 0.25 )
-                        if reduction < 2:
-                           reduction = 2
-                        pcathresh_old = pcathresh
-                        pcathresh = -( -pcathresh - reduction )
-                        if pcathresh > -5:
-                           pcathresh = -5
-
-                        if pcathresh <= pcathresh_old:
+                     if abpar != "":
+                        abortedat = int( float( get_task_par( "abortedat", "makemap" ) ) )
+                        if abortedat == 0:
                            again = False
-                           msg_out(">>>> MAKEMAP failed to converge but we have "
-                                   "reached the lower limit for PCA.PCATHRESH, so "
-                                   "all further maps will be created using "
-                                   "PCA.PCATHRESH={0}.".format( pcathresh ) )
+                           if attempt > 1:
+                              msg_out( "MAKEMAP converged succesfully, so all further "
+                                       "maps will be created using PCA.PCATHRESH={0}.".
+                                       format( pcathresh ) )
+
+                        elif attempt < 20:
+                           reduction = int( -pcathresh * 0.25 )
+                           if reduction < 2:
+                              reduction = 2
+                           pcathresh_old = pcathresh
+                           pcathresh = -( -pcathresh - reduction )
+                           if pcathresh > -5:
+                              pcathresh = -5
+
+                           if pcathresh <= pcathresh_old:
+                              again = False
+                              msg_out("MAKEMAP failed to converge but we have "
+                                      "reached the lower limit for PCA.PCATHRESH, so "
+                                      "all further maps will be created using "
+                                      "PCA.PCATHRESH={0}.".format( pcathresh ) )
+                           else:
+                              msg_out("MAKEMAP failed to converge - trying "
+                                      "the current observation again with "
+                                      "PCA.PCATHRESH set to {0} (it was {1}).".
+                                      format(pcathresh,pcathresh_old))
+                              fd = open( conf, "a" )
+                              fd.write( "pca.pcathresh = {0}\n".format( pcathresh ) )
+                              fd.close()
                         else:
-                           msg_out(">>>> MAKEMAP failed to converge - trying "
-                                   "the current observation again with "
-                                   "PCA.PCATHRESH set to {0} (it was {1}).".
-                                   format(pcathresh,pcathresh_old))
-                           fd = open( conf, "a" )
-                           fd.write( "pca.pcathresh = {0}\n".format( pcathresh ) )
-                           fd.close()
-                     else:
-                        again = False
-                        msg_out( ">>>> MAKEMAP failed to converge again - "
-                                 "giving up and using PCA.PCATHRESH={0}.".
-                                 format( pcathresh ) )
+                           again = False
+                           msg_out( "MAKEMAP failed to converge again - "
+                                    "giving up and using PCA.PCATHRESH={0}.".
+                                    format( pcathresh ) )
 
 #  If we already knew the value to use for PCA.PCATHRESH, just proceeed without
 #  checking convergence.
-                  else:
-                     again = False
+                     else:
+                        again = False
 
 #  Store FITS headers holding the pointing corrections that were actually used.
-               if pntfile != "!":
-                  sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(1)'".
-                                     format(qui_maps[key]))
-                  invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=POINT_DX "
-                         "edit=a value={1} comment=\"'Used {2} pointing correction [arcsec]'\""
-                         " position=! mode=interface".format(qui_maps[key],dx,sym))
+                  if pntfile != "!":
+                     sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(1)'".
+                                        format(qui_maps[key]))
+                     invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=POINT_DX "
+                            "edit=a value={1} comment=\"'Used {2} pointing correction [arcsec]'\""
+                            " position=! mode=interface".format(qui_maps[key],dx,sym))
 
-                  sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(2)'".
-                               format(qui_maps[key]))
-                  invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=POINT_DY "
-                         "edit=a value={1} comment=\"'Used {2} pointing correction [arcsec]'\""
-                         " position=! mode=interface".format(qui_maps[key],dy,sym))
+                     sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(2)'".
+                                  format(qui_maps[key]))
+                     invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=POINT_DY "
+                            "edit=a value={1} comment=\"'Used {2} pointing correction [arcsec]'\""
+                            " position=! mode=interface".format(qui_maps[key],dy,sym))
 
 
 #  If makemap failed, warn the user and delete any map that was created,
 #  and pass on to the next observation chunk.
-            except starutil.AtaskError:
-               msg_out("WARNING: makemap failed - could not produce a {1} map "
-                       "for observation chunk {0}".format(key,qui) )
-               try:
-                  invoke("$KAPPA_DIR/erase object={0} ok=yes".format(qui_maps[key]))
                except starutil.AtaskError:
-                  pass
-               del qui_maps[key]
-               if abpar != "":
-                  pcathresh = 0
-               continue
+                  msg_out("WARNING: makemap failed - could not produce a {1} map "
+                          "for observation chunk {0}".format(key,qui) )
+                  try:
+                     invoke("$KAPPA_DIR/erase object={0} ok=yes".format(qui_maps[key]))
+                  except starutil.AtaskError:
+                     pass
+                  del qui_maps[key]
+                  if abpar != "":
+                     pcathresh = 0
+                  continue
 
 #  A map was obtained successfully. Add it to the list of maps in mapdir.
-         new_maps.append( qui_maps[key] )
+            new_maps.append( qui_maps[key] )
 
 
 
@@ -1721,7 +2380,7 @@ try:
 #  catalogue grid, using a pixel size of BINSIZE.
       if outcat and binsize is not None and catref is None:
          key = list(qui_maps)[0]
-         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(qui_maps[key]) )
+         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(qui_maps[key]) )
          pxsize = float(get_task_par( "FPIXSCALE(1)", "ndftrace" ))
          if binsize < pxsize:
             raise starutil.InvalidParameterError("Requested catalogue bin "
@@ -1735,44 +2394,63 @@ try:
          invoke("$KAPPA_DIR/sqorst in={0} out={1} mode=pixelscale method=near "
                 "pixscale=\"\'{2},{2},*\'\"".format(qui_maps[key],catref,binsize))
 
+#  If skyloop was used above, the coadd will already exist. First deal
+#  with cases where skyloop was not used.
+      allmaps = NDG( list( qui_maps.values() ) )
+      if not skyloop:
 
 #  If we have only one observation just copy it to the output maps.
-      if len(qui_maps) == 1:
-         key = list(qui_maps)[0]
-         invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(qui_maps[key],coadd))
+         if len(qui_maps) == 1:
+            key = list(qui_maps)[0]
+            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(qui_maps[key],coadd))
 
-#  If required, bin it to the pixel size required by the catalogue.
-         if catref:
-            invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
-                   "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
-                   format(qui_maps[key],coadd_cat,catref))
-         elif outcat:
-            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
+#  If we have more than one observation, coadd them. If we are processing
+#  I data, determine weights for each observation based on how similar
+#  the observation's map is to the coadd (this weight is stored in the
+#  observation's I map) . Also coadd the extension NDFs (EXP_TIMES and WEIGHTS),
+#  but without normalisation so that the coadd is the sum rather than the
+#  mean of the inputs. Note, for skyloop the extension NDFs need to be copied
+#  from the coadds created by skyloop, rather than forming them by coadding
+#  the individual maps (skyloop does not put the extension NDFs into the
+#  individual observation maps).
+         elif len(qui_maps) > 1:
+            MakeCoadd( qui, qui_maps, imaps, coadd, mapvar,
+                       use_ref_for_alignment, ref, obsweight )
 
-#  If we have more than one observation, coadd them. Also coadd the
-#  extension NDFs (EXP_TIMES and WEIGHTS), but without normalisation so
-#  that the coadd is the sum rather than the mean of the inputs.
-      elif len(qui_maps) > 1:
+            invoke("$KAPPA_DIR/erase object={0}.more.smurf.exp_time ok=yes".format(coadd))
+            invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.exp_time lbnd=! ref=! "
+                   "out={1}.more.smurf.exp_time conserve=no method=bilin norm=no "
+                   "variance=no".format(allmaps,coadd))
 
-         msg_out("Coadding {0} maps from all observations:".format(qui))
-         allmaps = NDG( list( qui_maps.values() ) )
+            invoke("$KAPPA_DIR/erase object={0}.more.smurf.weights ok=yes".format(coadd))
+            invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.weights lbnd=! ref=! "
+                   "out={1}.more.smurf.weights conserve=no method=bilin norm=no "
+                   "variance=no".format(allmaps,coadd))
+
+
+#  Now deal with cases where a coadd has already been created by skyloop.
+#  The existing coadd can be used directly unless the MAPVAR parameter is
+#  True, in which case we need to replace the variances in the coadd with
+#  variances derived from the dispersion of the individual observation maps
+#  created by skyloop.
+      elif mapvar:
+         msg_out("MAPVAR is YES, so forming new variances for {0} skyloop coadd:".format(qui))
+         junk = NDG( 1 )
          invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
-                "conserve=no method=near variance=yes genvar={2}".
-                format(allmaps,coadd,mapvar))
+                "conserve=no method=near variance=yes genvar=yes".
+                format(allmaps,junk))
+         invoke("$KAPPA_DIR/setvar ndf={0} from={1} comp=Variance".
+                format(coadd,junk))
 
-         invoke("$KAPPA_DIR/erase object={0}.more.smurf.exp_time ok=yes".format(coadd))
-         invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.exp_time lbnd=! ref=! "
-                "out={1}.more.smurf.exp_time conserve=no method=bilin norm=no "
-                "variance=no".format(allmaps,coadd))
-
-         invoke("$KAPPA_DIR/erase object={0}.more.smurf.weights ok=yes".format(coadd))
-         invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.weights lbnd=! ref=! "
-                "out={1}.more.smurf.weights conserve=no method=bilin norm=no "
-                "variance=no".format(allmaps,coadd))
 
 #  If we are creating a binned up catalogue, bin the input observation maps
 #  up to the required catalogue bin size, and then coadd them.
-         if catref:
+      if catref:
+         if len(qui_maps) == 1:
+            invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
+                   "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
+                   format(qui_maps[key],coadd_cat,catref))
+         else:
             catmaps = NDG(allmaps)
             invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
                    "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
@@ -1780,182 +2458,9 @@ try:
             invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
                    "conserve=no method=near variance=yes genvar={2}".
                    format(catmaps,coadd_cat,mapvar))
-         elif outcat:
-            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
 
-
-
-
-
-
-
-
-
-#  -----------  CALCULATE AND STORE POINTING CORRECTIONS IN NEW I MAPS ------------------------
-
-#  If we have just created the coadd of all I maps, we determine the pointing
-#  correct for each individual I map. This should give better results than
-#  using the I map from an individual observation as the reference (which
-#  is what was done prior to Feb 2018).
-      if qui == 'I':
-
-#  Choose the map with which to align each of the new I maps. We use the
-#  external reference map if one was supplied. Otherwise we use the I mosaic
-#  so long as it contains more than one observation (if there is only one
-#  observation then the aligment is bound to be a unit transformation
-#  because the mosaic and the individual map will be identical).
-         if use_ref_for_alignment:
-            aref = ref
-         elif len(qui_maps) > 1 and imap:
-            aref = imap
-         else:
-            aref = "!"
-
-#  Loop round all observations.
-         for key in qui_maps:
-
-#  Can't align if we have no reference.
-            if aref == "!":
-               continue
-
-#  See what translations (in pixels) are needed to align the new I map with
-#  the reference map. The determination of the shift is more accurate if we
-#  first mask out background areas. Use the AST mask to define source pixels,
-#  but only if the mask contains a reasonable number of pixels (very faint
-#  sources will have very small or non-existant AST masks).
-            invoke("$KAPPA_DIR/showqual ndf={0}".format(qui_maps[key]))
-            if get_task_par( "QNAMES(1)", "showqual" ) == "AST":
-               bb = 1
-            elif get_task_par( "QNAMES(2)", "showqual" ) == "AST":
-               bb = 2
-            elif get_task_par( "QNAMES(3)", "showqual" ) == "AST":
-               bb = 4
-            else:
-               bb = 0
-
-            if bb > 0:
-               invoke("$KAPPA_DIR/setbb ndf={0} bb={1}".format(qui_maps[key],bb))
-
-#  Clear badbits to use the whole map if the above masking results in too
-#  few pixels, and instead mask the map to remove pixels that have less
-#  than the mean exposure time per pixel.
-            invoke("$KAPPA_DIR/stats ndf={0}".format(qui_maps[key]))
-            nused = float( get_task_par( "numgood", "stats" ) )
-            if nused < 400:
-               invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(qui_maps[key]))
-               invoke("$KAPPA_DIR/stats ndf={0}".format(qui_maps[key]))
-               mean = float( get_task_par( "mean", "stats" ) )
-               aligner = NDG(1)
-               invoke( "$KAPPA_DIR/maths exp=\"'qif((ia.ge.pa),ib,<bad>'\" "
-                       "ia={0}.more.smurf.exp_time ib={0} pa={1} out={2}".
-                       format(qui_maps[key],mean,aligner) )
-            else:
-               aligner = qui_maps[key]
-
-#  Find the pixel shift that aligns features in this masked, trimmed I map with
-#  corresponding features in the reference map.
-            try:
-               invoke("$KAPPA_DIR/align2d ref={0} out=! in={1} form=3".
-                      format(aref,aligner))
-               dx = float( get_task_par( "TR(1)", "align2d" ) )
-               dy = float( get_task_par( "TR(4)", "align2d" ) )
-
-#  If align2d failed, use silly dx,dy values to ensure it is flagged by
-#  the following code.
-            except starutil.AtaskError:
-               dx = 1E6
-               dy = 1E6
-
-#  Ensure the bad-bits mask has been reset.
-            if bb > 0:
-               invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(qui_maps[key]))
-
-#  If the shifts are suspiciously high, we do not believe them. In which
-#  case we cannot do pointing ocorrection when creating the Q and U maps.
-            if abs(dx) > 8 or abs(dy) > 8:
-               msg_out( "\nWARNING: {0}: The I map created from the POL2 data cannot "
-                        "be aligned with the supplied reference map. Check the maps "
-                        "for the current observation to see if they should be omitted "
-                        "from the reduction.\n".format(key) )
-
-#  Otherwise, convert the offset in pixels to (longitude,latitude) offsets
-#  in the sky system of the reference map, in arc-seconds....
-            else:
-
-#  Strip the wavelength axis off the total intensity map created above.
-               imap2d = NDG( 1 )
-               invoke("$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(qui_maps[key],imap2d))
-
-#  Get the pixel coords at the centre of the total intensity map.
-               invoke("$KAPPA_DIR/ndftrace ndf={0}".format(imap2d))
-               lbndx = float( get_task_par( "LBOUND(1)", "ndftrace" ) )
-               lbndy = float( get_task_par( "LBOUND(2)", "ndftrace" ) )
-               ubndx = float( get_task_par( "UBOUND(1)", "ndftrace" ) )
-               ubndy = float( get_task_par( "UBOUND(2)", "ndftrace" ) )
-               cenx = 0.5*( lbndx + ubndx )
-               ceny = 0.5*( lbndy + ubndy )
-
-#  Convert to SKY coords, in radians. Use ATOOLS rather than pyast in
-#  order to avoid the need for people to install pyast. Also, ATOOLS
-#  integrates with NDFs more easily than pyast.
-               (cena,cenb) = invoke("$ATOOLS_DIR/asttran2 this={0} forward=yes "
-                                    "xin={1} yin={2}".format( imap2d,cenx,ceny)).split()
-               cena = float( cena )
-               cenb = float( cenb )
-
-#  Add on the pixel offsets, and convert to SKY coords, in radians.
-               offx = cenx + dx
-               offy = ceny + dy
-               (offa,offb) = invoke("$ATOOLS_DIR/asttran2 this={0} forward=yes "
-                                    "xin={1} yin={2}".format( imap2d,offx,offy)).split()
-               offa = float( offa )
-               offb = float( offb )
-
-#   Now find the arc-distance parallel to the longitude axis, between the central
-#   and offset positions, and convert from radians to arc-seconds.
-               dx = invoke("$ATOOLS_DIR/astdistance this={0}, point1=\[{1},{2}\] "
-                           "point2=\[{3},{4}\]".format(imap2d,cena,cenb,offa,cenb))
-               dx = 3600.0*math.degrees( float( dx ) )
-
-#  The value returned by astDistance is always positive. Adjust the sign
-#  of dx so that it goes the right way.
-               da = offa - cena
-               while da > math.pi:
-                  da -= math.pi
-               while da < -math.pi:
-                  da += math.pi
-               if da < 0.0:
-                  dx = -dx
-
-#  Now find the arc-distance parallel to the latitude axis, between the central
-#  and offset positions, and convert from radians to arc-seconds.
-               dy = invoke("$ATOOLS_DIR/astdistance this={0}, point1=\[{1},{2}\] "
-                           "point2=\[{3},{4}\]".format(imap2d,cena,cenb,cena,offb))
-               dy = 3600.0*math.degrees( float( dy ) )
-
-#  The value returned by astDistance is always positive. Adjust the sign
-#  of dx so that it goes the right way.
-               db = offb - cenb
-               if db < 0.0:
-                  dy = -dy
-               msg_out( "{0}: Storing pointing corrections of ({1:5.1f},{2:5.1f}) "
-                        "arc-seconds for future use".format(key,dx,dy) )
-
-#  Store the required pointing corrections as FITS headers within the map.
-               sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(1)'".
-                                  format(qui_maps[key]))
-               invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=PNTRQ_DX "
-                      "edit=a value={1} comment=\"'Required {2} pointing correction [arcsec]'\""
-                      " position=! mode=interface".format(qui_maps[key],dx,sym))
-
-               sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(2)'".
-                            format(qui_maps[key]))
-               invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=PNTRQ_DY "
-                      "edit=a value={1} comment=\"'Required {2} pointing correction [arcsec]'\""
-                      " position=! mode=interface".format(qui_maps[key],dy,sym))
-
-
-
+      elif outcat:
+         invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
 
 
 
