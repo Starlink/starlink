@@ -880,16 +880,17 @@ is initiated by:
 % gaia rawfile
 \end{terminalv}
 
-Loading a file in \textsc{Gaia} produces two windows (see
-\cref{Figure}{fig:rawgaia}{the first figure below}). The main window
+Loading a file in \textsc{Gaia} produces two to three windows (see
+\cref{Figure}{fig:rawgaia}{the first figure below} and 
+\cref{Figure}{fig:ndfgaia})). The main window
 shows a map of the HARP receptors (along the $x$-axis; note the 16
 pixels) for a given sample of the observation (time on the $y$-axis).
 You can track the performance of an individual receptor by following a
 column from bottom to top to check its consistency. In
 \cref{Figure}{fig:rawgaia}{the first figure below} H03 is dead for the
 whole observation. The spectrum for a receptor at one of the time
-slices can be seen by clicking on the pixel. This will bring up a
-third window---the \gaiathing{Spectral plot} (see
+slices can be seen by clicking on the pixel. This will bring up 
+another window---the \gaiathing{Spectral plot} (see
 \cref{Figure}{fig:gaia2}{the second figure below}). This spectrum will
 be replaced when you click on a different pixel.
 
@@ -913,6 +914,18 @@ your data by moving the \gaiathing{Index of plane} slider.
 \end{center}
 \end{figure}
 
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{sc20_gaia3}
+\typeout{sc20_gaia3 inserted on page \arabic{page}}
+\caption[\gaia\ select NDF in container file]{\label{fig:ndfgaia}
+  Select NDF in container file - displayed upon loading a new file in \textsc{Gaia}
+  which contains the data, the effective time and exposure time.}
+\end{center}
+\end{figure}
+
+
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=0.7\linewidth]{sc20_gaia2}
@@ -926,6 +939,8 @@ your data by moving the \gaiathing{Index of plane} slider.
   time map etc. in ancillary arrays.}
 \end{center}
 \end{figure}
+
+
 
 A second way to scroll through your spectrum is to click and drag the
 vertical red bar on the \gaiathing{Spectral plot} window. As you do so
