@@ -686,7 +686,7 @@ def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, automask,
 
 #  If the supplied set of I maps does not contain the current
 #  observation, attempt to guess the location of the I map from which the
-#  weight for this observation should be read - the correspoinding "imap" 
+#  weight for this observation should be read - the corresponding "imap"
 #  if using auto-masking or the corresponding "Imap" otherwise.
             try:
                if key in i_maps:
@@ -915,12 +915,12 @@ def PointingCorrections( qui_maps, imap, use_ref_for_alignment, ref ):
 
 #  Normalise the weights to a median value of 1.0 then limit them to be <= 1.0
 #  to avoid biasing the results heavily towards observations that happen to
-#  be close to the median, and return them.
+#  be close to the median, and return them rounded to 3 decimal places.
    for key in qui_maps:
       if weights[key] > wmed:
          weights[key] = 1.0
       else:
-         weights[key] /= wmed
+         weights[key] = round( weights[key]/wmed, 3 )
 
    return weights
 
