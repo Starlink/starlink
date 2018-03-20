@@ -3291,7 +3291,8 @@ initialise \splat\ and open the file directly from the gui.
 % splat 
 \end{terminalv}
 
-When \splat\ is initially started you will get a main window appear and also a spectral window.
+When \splat\ is initially started you will get a main window appear
+and also a spectral window.
 
 \begin{figure}[h!]
 \begin{center}
@@ -3304,13 +3305,58 @@ When \splat\ is initially started you will get a main window appear and also a s
 \end{center}
 \end{figure}
 
+\section{Display synopsis of spectrum}
+\label{sec:splat-synopsis}
+
+When you initially open a specrum in \splat\ the synopsis of that spectrum
+will automatically be overlaid on the spectrum displayed.
+
+\begin{enumerate}
+\item  Name
+\item  Telescope
+\item  Object
+\item  Date obs
+\item  Elevation
+\item  Exposure
+\item  Coords sys
+\item  Spec position
+\item  Src position
+\item  Offset
+\item  Doppler RA Dec
+\item  SourceVel
+\item  SourceVRF
+\item  StdOfRest
+\item  RestFreq
+\item  ImageFreq
+\item  Channel spacing
+\item  Number of channels
+\end{enumerate}
+
+To show or remove the synopsis of a spectrum simply click on the
+"Options" button in the spectral view window and select or deselect
+"Display Synopsis".
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.8\linewidth]{sc20_splat_display_synopsis}
+\typeout{sc20_splat_display_synopsis inserted on page \arabic{page}}
+\caption[.]{\label{fig:splat_synopsis}
+  How to display or remove the synopsis of a spectrum in the spectral
+  window}
+\end{center}
+\end{figure}
+
+To move the position of the synopsis simply click and drag the text box
+to the desired location.
+
+
 \section{Cropping a spectrum in SPLAT}
 \label{sec:splat-crop}
 
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
-\item Click on \splatthing{Cut out the regions of the current spectrum} button 
+\item Click on \splatthing{Cut out the regions of the current spectrum} button
 above the spectrum you wish to work on. This will open a new window.
 
 \begin{figure}[h!]
@@ -3322,7 +3368,7 @@ above the spectrum you wish to work on. This will open a new window.
 \end{center}
 \end{figure}
 
-\item Select \splatthing{Add} from the cut region window. 
+\item Select \splatthing{Add} from the cut region window.
 
 \begin{figure}[h!]
 \begin{center}
@@ -3333,10 +3379,10 @@ above the spectrum you wish to work on. This will open a new window.
 \end{center}
 \end{figure}
 
-\item Click and drag the regions you wish to remove from the 
-spectrum in the spectrum window. As we had a 
-second region to remove we click on the \splatthing{Add} button 
-a second time. In this example we select the two noisy edge regions from the 
+\item Click and drag the regions you wish to remove from the
+spectrum in the spectrum window. As we had a
+second region to remove we click on the \splatthing{Add} button
+a second time. In this example we select the two noisy edge regions from the
 spectrum to remove. 
 
 \begin{figure}[h!]
@@ -3359,8 +3405,8 @@ spectrum to remove.
 \end{center}
 \end{figure}
 
-\item A new spectrum with the noisy edges removed will now appear 
-in the main \splat\ window. Click on your newly created spectrum 
+\item A new spectrum with the noisy edges removed will now appear
+in the main \splat\ window. Click on your newly created spectrum
 to view.
 
 \begin{figure}[h!]
@@ -3370,7 +3416,7 @@ to view.
 \includegraphics[width=0.7\linewidth]{sc20_splat_cut_spectrum}
 \typeout{sc20_splat_cut_spectrum inserted on page \arabic{page}}
 \caption[.]{\label{fig:splat_crop5}
-  Top: Select the newly created spectrum in the main \splat\ window. 
+  Top: Select the newly created spectrum in the main \splat\ window.
   The spectrum with the selected noisy-edge-data removed will then appear. }
 \end{center}
 \end{figure}
