@@ -1857,7 +1857,7 @@ If \param{autogrid=true}, the output grid is determined automatically
 so that as many data samples as possible fall close to the centre of
 pixels in the output cube.
 
-If \param{autogrid=false} \param{REFLON} and \param{REFLAT} are set to
+If \param{autogrid=false}, \param{REFLON} and \param{REFLAT} are set to
 the first pointing BASE position, \param{CROTA2} is set to the
 \param{MAP\_PA} value in the FITS header (converted to the requested
 sky co-ordinate system), PIXSIZE is set to 6 arcseconds, and
@@ -1874,7 +1874,7 @@ parameter on the command line.  For instance,
 % makecube in=rawfile spread=sincsinc params="[6,9]"
 \end{terminalv}
 
-The default method is \param{Nearest} which assigns the input pixel
+The default method is \param{Nearest}, which assigns the input pixel
 completely to the nearest output pixel. This is the fastest method
 available but is not optimal. In particular it may result in blank
 pixels in HARP maps due to missing receptors (see Figure~\ref{fig:spread}).
@@ -3189,7 +3189,7 @@ the \gaiawindow{Volume render} window.
 \end{center}
 \end{figure}
 
-\item Include axes labeling, the image plane and other features using
+\item Include axes labelling, the image plane and other features using
 the check boxes on the side bar.
 \end{enumerate}
 
@@ -3515,7 +3515,7 @@ defined by the environment variable \file{ORAC\_DATA\_IN}. Note the
 back-quotes.
 \item Like the ORAC-DR pipeline, the \param{-log} option specifies
 whether the log file should be written to the screen [\param{s}], a
-file [\param{f}] or an x-window [\param{x}].
+file [\param{f}] or an xwindow [\param{x}].
 \end{itemize}
 
 \begin{tip}
