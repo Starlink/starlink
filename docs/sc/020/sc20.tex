@@ -66,6 +66,7 @@
    \newcommand{\kms}{\,km~s$^{-1}$}   % km/s
 \fi
 
+\newcommand{\trs}{$T_{\textnormal{R}}^{*}$}
 
 % arcminute symbol
 
@@ -609,7 +610,7 @@ position. For frequency switched observations it is 1.414 instead.
 describes the total noise of the system. It includes contributions
 from the background sky temperature, the Earth's atmosphere, ground
 spillover picked up by the side lobes and the noise from the receiver
-itself (known as $T_{\textnormal{R^{*}}}$).  $T_{\textnormal{R^{*}}}$ can
+itself (known as \trs).  \trs\ can
 be determined by measuring the effects on $T_{\textnormal{sys}}$ when
 looking at hot and cold loads, where the cold load is black-body
 source.
@@ -620,7 +621,7 @@ in the spectrum in kelvin.
 
 
 \begin{tip}
-Both $T_{\textnormal{sys}}$ and $T_{\textnormal{R^{*}}})$ are stored in
+Both $T_{\textnormal{sys}}$ and \trs\ are stored in
 the raw data files. This information is stored in the .MORE.ACSIS.TSYS
 and .MORE.ACSIS.TRX extensions respectively, and can be viewed using
 \HDSTRACE\ (see \cref{Section}{sec:fitslist}{How can I view the
