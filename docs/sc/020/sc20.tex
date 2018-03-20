@@ -1708,7 +1708,8 @@ unless something has gone wrong.
 \label{sec:reduce}
 
 If you prefer to reduce your data manually, regridding your data
-is the best place to start.
+is the best place to start. (See Appendix~\ref{app:regrid} for an
+explanation of what regridding is.)
 
 To convert your raw time-series cubes with spectral channel number,
 receptor index, time-slices axes into a spatial cube with RA, Dec (or
@@ -2223,7 +2224,8 @@ You can use the \Kappa\ command \cdiv\ to divide any NDF by a constant.
 \section{\xlabel{rebin}Changing the pixel size}
 \label{sec:rebin}
 
-You may want to regrid your data onto larger pixels, for instance to
+You may want to \htmlref{\emph{regrid}}{app:regrid} your data onto
+larger pixels, for instance to
 allow direct comparison with data from other observatories. In the
 example below a JCMT map is regridded and aligned to match a Herschel
 map. See \cref{Appendix}{app:convert}{Converting file formats} for
@@ -2232,7 +2234,8 @@ instructions on converting your FITS file to NDF format.
 % wcsalign in=jcmtmap out=regridmap lbnd=! ubnd=! ref=herschelmap rebin conserve=f
 \end{terminalv}
 
-Alternatively, to resample your data onto smaller pixels you should
+Alternatively, to \htmlref{\emph{resample}}{app:regrid} your data onto smaller
+pixels you should
 use the \Kappa\ command \sqorst. In the example below 'map' has a
 pixel size of 8\arcsec, while `resamplemap' has a pixel size of 4\arcsec --
 the number of pixels has been doubled by applying a factor of 2 to the
