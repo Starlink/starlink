@@ -3511,45 +3511,53 @@ kappa >& /dev/null
 \end{terminalv}
 
 
-\chapter{\xlabel{regrid}Regridding vs resampling}
+\chapter{\xlabel{regrid}Regridding versus resampling}
 \label{app:regrid}
 
-Sometimes you may wish to put you data onto a new pixel size scheme. 
-This may either involve regridding the data onto larger pixel sizes or
-resampling the data onto smaller pixels using \Kappa. 
+Sometimes you may wish to put your data onto a new pixel-size scheme.
+This may either involve regridding (often called rebinning) the data
+onto larger pixel sizes, or resampling the data onto smaller pixels,
+both using \Kappa.
 
-The key difference between resampling and rebinning is if you are 
-sampling the input pixel values (if resampling), or dividing an input
-pixel value between a group of neighbouring output pixels (if rebinning).
+The key difference between rebinning and resampling is whether you
+iterate over the input or output pixels.  Rebinning divides each input
+pixel value between a group of neighbouring output pixels, whereas
+resampling allocates each output pixel a value sampled from the input
+array.
 
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=0.8\linewidth]{sc20_regrid}
 \caption{\label{fig:regrid}
-  Regridding vs resampling.}
+  Regridding versus resampling.}
 \end{center}
 \end{figure}
 
-resampling - Resampling of the grid of input data is performed by 
-transforming the coordinates of the centre of each output 
-pixel into the coordinate system of the input grid. Since the 
-resulting coordinates will not, in general, coincide with the 
-centre of an input pixel, sub-pixel interpolation is performed 
-between the neighbouring input pixels. This produces a resampled 
-value which is then assigned to the output pixel.
-samples input gridded data (i.e. an image), it does not integrate it. 
-Thus total data value in the input image will not, in general, be conserved.
+\emph{resampling}---Resampling of the grid of input data is performed
+by transforming the co-ordinates of the centre of each output pixel
+into the co-ordinate system of the input grid. Since the resulting
+co-ordinates will not, in general, coincide with the centre of an
+input pixel, sub-pixel interpolation is performed between the
+neighbouring input pixels. This produces a resampled value, which is
+then assigned to the output pixel.  Since resampling does not
+integrate, the total data value in the input image will not, in
+general, be conserved.  Resampling has the advantage of ensuring that
+the output image is filled (provided the input array contains good
+data).
 
-rebinning - Rebinning of the grid of input data is performed by 
-transforming the coordinates of the centre of each input pixel 
-into the coordinate system of the output grid. 
-The input pixel value is then divided up and assigned to the 
-output pixels in the neighbourhood of the central output 
-coordinates. A choice of schemes are provided for determining 
-how each input pixel value is divided up between the output 
-pixels. In general, each output pixel may be assigned values 
-from more than one input pixel. All contributions to a given 
+
+\emph{rebinning}---Rebinning of the grid of input data is performed by
+transforming the co-ordinates of the centre of each input pixel
+into the co-ordinate system of the output grid.
+The input pixel value is then divided up and assigned to the
+output pixels in the neighbourhood of the central output
+co-ordinates. A choice of schemes are provided for determining
+how each input pixel value is divided up between the output
+pixels. In general, each output pixel may be assigned values
+from more than one input pixel. All contributions to a given
 output pixel are summed to produce the final output pixel value.
+Rebinning can leave gaps in the output array if the output
+array's pixels are smaller than those of the input array.
 
 \newpage
 \chapter{\xlabel{clumpfind}Clump-finding Algorithms}
