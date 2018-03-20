@@ -32,6 +32,7 @@
 \providecommand{\lineforest}{\xref{REDUCE\_SCIENCE\_LINEFOREST}{sun260}{REDUCE_SCIENCE_LINEFOREST}}
 
 \newcommand{\acsispipelinesun}{\xref{\textbf{SUN/260}}{sun260}{}}
+\newcommand{\splatthing}[1]{\textbf{\textsf{#1}}}
 
 \providecommand{\gaiasc}{\xref{\textbf{SC/17}}{sc17}{}}
 \providecommand{\splatsun}{\xref{\textbf{SUN/243}}{sun243}{}}
@@ -144,6 +145,7 @@ In this cookbook the following styles are followed:
 \item Parameters, FITS keywords, parameters and their values are presented in \texttt{typewriter font}.
 \item The names of Starlink commands appear as in \task{san serif font}.
 \item The names of \gaia\ commands or windows appear in \gaiathing{like this}.
+\item The names of \splat\ commands or windows appear \splatthing{like this}.
 \item The names of attributes appear like \att{StdOfRest}.
 \item Useful tips or reminders are given in outlined boxes.
 \end{itemize}
@@ -3263,7 +3265,7 @@ One can also plot different spectra in the same window and
 make publishable files. The Full \splat\ documentation can be found 
 here: \splatsun.
 
-\section{Opening a spectrum in GAIA}
+\section{Opening a spectrum in SPLAT}
 \label{sec:splat-open}
 
 There are two options for opening up a spectrum in \splat. First it is 
@@ -3293,14 +3295,89 @@ When \splat\ is initially started you will get a main window appear and also a s
 
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[width=0.9\linewidth]{sc20_splat_window}
+\includegraphics[width=0.7\linewidth]{sc20_splat_window}
 \typeout{sc20_splat_window inserted on page \arabic{page}}
-\includegraphics[width=0.8\linewidth]{sc20_splat_spectrum}
+\includegraphics[width=0.6\linewidth]{sc20_splat_spectrum}
 \typeout{sc20_splat_spectrum inserted on page \arabic{page}}
 \caption[The main \splat\ window and spectrum window.]{\label{fig:splat_window}
-  Top: The main \splat\ window, Bottom: the spectral window.}
+  The main \splat\ window and spectral window.}
 \end{center}
 \end{figure}
+
+\section{Cropping a spectrum in SPLAT}
+\label{sec:splat-crop}
+
+
+\begin{enumerate}[label=(\textbf{\arabic*})]
+
+\item Click on \splatthing{Cut out the regions of the current spectrum} button 
+above the spectrum you wish to work on. This will open a new window.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{sc20_splat_tocut_spectrum}
+\typeout{sc20_splat_tocut_spectrum inserted on page \arabic{page}}
+\caption[.]{\label{fig:splat_crop1}
+  Select the cut button}
+\end{center}
+\end{figure}
+
+\item Select \splatthing{Add} from the cut region window. 
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.65\linewidth]{sc20_splat_cutregion_blank}
+\typeout{sc20_splat_cutregion inserted on page \arabic{page}}
+\caption[.]{\label{fig:splat_crop2}
+  Select the add button}
+\end{center}
+\end{figure}
+
+\item Click and drag the regions you wish to remove from the 
+spectrum in the spectrum window. As we had a 
+second region to remove we click on the \splatthing{Add} button 
+a second time. In this example we select the two noisy edge regions from the 
+spectrum to remove. 
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{sc20_splat_cutregion2}
+\typeout{sc20_splat_cutregion inserted on page \arabic{page}}
+\caption[.]{\label{fig:splat_crop3}
+  The two regions selected}
+\end{center}
+\end{figure}
+
+\item Select the \splatthing{Remove selected button}.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.65\linewidth]{sc20_splat_cutregion}
+\typeout{sc20_splat_cutregion2 inserted on page \arabic{page}}
+\caption[.]{\label{fig:splat_crop4}
+  Top: Selecting the cut button}
+\end{center}
+\end{figure}
+
+\item A new spectrum with the noisy edges removed will now appear 
+in the main \splat\ window. Click on your newly created spectrum 
+to view.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.65\linewidth]{sc20_splat_window_main_cut}
+\typeout{sc20_splat_window_main_cut inserted on page \arabic{page}}
+\includegraphics[width=0.7\linewidth]{sc20_splat_cut_spectrum}
+\typeout{sc20_splat_cut_spectrum inserted on page \arabic{page}}
+\caption[.]{\label{fig:splat_crop5}
+  Top: Select the newly created spectrum in the main \splat\ window. 
+  The spectrum with the selected noisy-edge-data removed will then appear. }
+\end{center}
+\end{figure}
+
+\end{enumerate}
+
+
 
 \chapter{\xlabel{cadc}Getting your data from CADC}
 \label{sec:fromcadc}
