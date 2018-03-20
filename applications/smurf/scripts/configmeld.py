@@ -96,6 +96,10 @@
 *        to display default values.
 *     19-MAR-2013 (DSB):
 *        Allow the value of a single parameter to be listed.
+*     20-MAR-2018 (DSB):
+*        Get the waveband from the FILTER header if SUBARRAY is not present.
+*        Only use provenance if all else fails (since checking provenance
+*        can be really slow).
 
 *-
 '''
@@ -199,12 +203,21 @@ try:
    else:
       isndf1 = True
 
-#  If it is an NDF, attempt to get the SUBARRAY fits header, and
-#  determine the waveband. If no SUBARRAY header is found, look for
+#  If it is an NDF, attempt to get the FILTER or SUBARRAY fits header,
+#  and determine the waveband. If neither header is found, look for
 #  "s4a", etc, in the NDF's provenance info.
    if isndf1:
       try:
          subarray = starutil.get_fits_header( config1, "SUBARRAY" )
+         if subarray is None:
+            filter = starutil.get_fits_header( config1, "FILTER" )
+            if filter is not None:
+               filter = filter.strip()
+               if filter == "450":
+                  subarray = "s4"
+               elif filter == "850":
+                  subarray = "s8"
+
          if subarray is None:
             text = starutil.invoke( "$KAPPA_DIR/provshow {0}".format(config1) )
             if "s4a" in text or "s4b" in text or "s4c" in text or "s4d" in text:
@@ -248,12 +261,20 @@ try:
       else:
          isndf2 = True
 
-#  If it is an NDF, attempt to get the SUBARRAY fits header, and
-#  determine the waveband.
+#  If it is an NDF, attempt to get the SUBARRAY or FILTER fits header,
+#  and determine the waveband.
       if isndf2:
          try:
             subarray = starutil.get_fits_header( config2, "SUBARRAY" )
-            isndf2 = True
+            if subarray is None:
+               filter = starutil.get_fits_header( config2, "FILTER" )
+               if filter is not None:
+                  filter = filter.strip()
+                  if filter == "450":
+                     subarray = "s4"
+                  elif filter == "850":
+                     subarray = "s8"
+
             if subarray is None:
                text = starutil.invoke( "$KAPPA_DIR/provshow {0}".format(config2) )
                if "s4a" in text or "s4b" in text or "s4c" in text or "s4d" in text:
