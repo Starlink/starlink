@@ -577,8 +577,8 @@ def cleanup():
 #  to the coadd get higher weight. The weight for each observation is
 #  stored in the CHUNKWGT header within the FITS extension of the
 #  observation's I map.
-def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, use_ref_for_alignment,
-               ref, obsweight ):
+def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, automask,
+               use_ref_for_alignment, ref, obsweight ):
    allmaps = []
    allkeys = []
    for key in qui_maps:
@@ -683,13 +683,31 @@ def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, use_ref_for_alignment,
       allone = True
       with open( wfile, "w" ) as fd:
          for key in allkeys:
+
+#  If the supplied set of I maps does not contain the current
+#  observation, attempt to guess the location of the I map from which the
+#  weight for this observation should be read - the correspoinding "imap" 
+#  if using auto-masking or the corresponding "Imap" otherwise.
             try:
-               wgt = get_fits_header( i_maps[key], "CHUNKWGT", report=True )
-               fd.write("{0}\n".format(wgt))
-               if float(wgt) < 1.0:
-                  allone = False
+               if key in i_maps:
+                  indf = i_maps[key]
+               else:
+                  if automask:
+                     gexp = "{0}|{1}map|imap|".format( qui_maps[key], qui.lower() )
+                  else:
+                     gexp = "{0}|{1}map|Imap|".format( qui_maps[key], qui.upper() )
+                  indf = NDG( gexp )
+               wgt = get_fits_header( indf, "CHUNKWGT", report=True )
             except Exception:
-               fd.write("1.0\n")
+               indf = None
+               wgt = 1.0
+            fd.write("{0}\n".format(wgt))
+            if float(wgt) < 1.0:
+               allone = False
+            if indf is None:
+               msg_out("   {0}: 1.0 (default - no previous I map found)".format(key))
+            else:
+               msg_out("   {0}: {1} (from {2})".format(key, wgt, indf))
 
       if allone:
          weights = "!"
@@ -2414,7 +2432,7 @@ try:
 #  the individual maps (skyloop does not put the extension NDFs into the
 #  individual observation maps).
          elif len(qui_maps) > 1:
-            MakeCoadd( qui, qui_maps, imaps, coadd, mapvar,
+            MakeCoadd( qui, qui_maps, imaps, coadd, mapvar, automask,
                        use_ref_for_alignment, ref, obsweight )
 
             invoke("$KAPPA_DIR/erase object={0}.more.smurf.exp_time ok=yes".format(coadd))
