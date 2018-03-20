@@ -3078,6 +3078,7 @@ The clumps shown will update as you move through the cube.
 \end{enumerate}
 
 \section{Displaying average spectrum with GAIA}
+\label{sec:gaiaaverage}
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 \item Select the \gaiathing{Spectrum} tab in the \gaiathing{Display
@@ -3189,19 +3190,85 @@ the check boxes on the side bar.
 
 
 \section{Sending spectra to SPLAT}
+\label{sec:gaiatosplat}
 
-\splat is a graphical spectral-analysis tool.
-The Full \splat documnetation can be found here: \splatsun 
+Any spectrum displayed in \gaia\ (a single position spectrum or a spectrum
+averaged over some region \ref{sec:gaiaaverage}) can be sent to \splat\ for more detailed
+spectral analysis.
+
+\splat\ is a graphical spectral-analysis tool. \splat\ offers tools for 
+further processing, fitting, or identification of spectral lines. 
+One can also plot different spectra in the same window and
+make publishable files. The Full \splat\ documentation can be found 
+here: \splatsun 
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
-\item Select the spectrum you wish to send to 
+\item Select the spectrum you wish to send to \splat.
 
 \item Select click on \gaiathing{Send: replace} or \gaiathing{Send: add} 
 button in the \gaiathing{Display image regions} window.
-
-
-
 \end{enumerate}
+
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{sc20_gaia_to_splat}
+\typeout{sc20_gaia_to_splat inserted on page \arabic{page}}
+\caption[Sending spectrum in \gaia\ to \splat.]{\label{fig:gaia_to_splat}
+  Sending spectrum in \gaia\ to \splat.}
+\end{center}
+\end{figure}
+
+
+\clearpage
+\chapter{\xlabel{gaia}Using SPLAT}
+\label{sec:splat}
+
+\splat\ is a graphical spectral-analysis tool. \splat\ offers tools for 
+further processing, fitting, or identification of spectral lines. 
+One can also plot different spectra in the same window and
+make publishable files. The Full \splat\ documentation can be found 
+here: \splatsun.
+
+\section{Opening a spectrum in GAIA}
+\label{sec:splat-open}
+
+There are two options for opening up a spectrum in \splat. First it is 
+possible to send a spectrum to \splat\ using \gaia\ as described in 
+Section \ref{sec:gaiatosplat}. 
+
+Alternatively spectra can be displayed in directly in \splat\ using:
+
+\begin{terminalv}
+% splat filename
+\end{terminalv}
+
+for a single position cube or
+
+\begin{terminalv}
+% splat 'filename(xpos,ypos,)'
+\end{terminalv}
+
+to display the spectrum at the pixel position (xpos,ypos). Or simply
+initialise \splat\ and open the file directly from the gui.
+
+\begin{terminalv}
+% splat 
+\end{terminalv}
+
+When \spat\ is initially started you will get a main window appear and also a spectral window.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{sc20_splat_window}
+\typeout{sc20_splat_window inserted on page \arabic{page}}
+\includegraphics[width=0.8\linewidth]{sc20_splat_spectrum}
+\typeout{sc20_splat_spectrum inserted on page \arabic{page}}
+\caption[The main \splat\ window and spectrum window.]{\label{fig:splat_window}
+  Top: The main \splat\ window, Bottom: the spectral window.}
+\end{center}
+\end{figure}
+
 
 \chapter{\xlabel{cadc}Getting your data from CADC}
 \label{sec:fromcadc}
