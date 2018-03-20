@@ -2435,15 +2435,21 @@ try:
             MakeCoadd( qui, qui_maps, imaps, coadd, mapvar, automask,
                        use_ref_for_alignment, ref, obsweight )
 
-            invoke("$KAPPA_DIR/erase object={0}.more.smurf.exp_time ok=yes".format(coadd))
-            invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.exp_time lbnd=! ref=! "
-                   "out={1}.more.smurf.exp_time conserve=no method=bilin norm=no "
-                   "variance=no".format(allmaps,coadd))
+            try:
+               invoke("$KAPPA_DIR/erase object={0}.more.smurf.exp_time ok=yes".format(coadd))
+               invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.exp_time lbnd=! ref=! "
+                      "out={1}.more.smurf.exp_time conserve=no method=bilin norm=no "
+                      "variance=no".format(allmaps,coadd))
+            except starutil.AtaskError:
+               msg_out( "No exposure time array will be present in {0}".format(coadd))
 
-            invoke("$KAPPA_DIR/erase object={0}.more.smurf.weights ok=yes".format(coadd))
-            invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.weights lbnd=! ref=! "
-                   "out={1}.more.smurf.weights conserve=no method=bilin norm=no "
-                   "variance=no".format(allmaps,coadd))
+            try:
+               invoke("$KAPPA_DIR/erase object={0}.more.smurf.weights ok=yes".format(coadd))
+               invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.weights lbnd=! ref=! "
+                      "out={1}.more.smurf.weights conserve=no method=bilin norm=no "
+                      "variance=no".format(allmaps,coadd))
+            except starutil.AtaskError:
+               msg_out( "No weights array will be present in {0}".format(coadd))
 
 
 #  Now deal with cases where a coadd has already been created by skyloop.
