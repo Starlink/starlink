@@ -3197,23 +3197,46 @@ the check boxes on the side bar.
 \section{Sending spectra to SPLAT}
 \label{sec:gaiatosplat}
 
-Any spectrum displayed in \gaia\ (a single position spectrum or a spectrum
-averaged over some region \ref{sec:gaiaaverage}) can be sent to \splat\ for more detailed
-spectral analysis.
+\gaia\ has very limited analysis functionality for spectra.  Whereas
+\splat\ is a sophisticated graphical spectral-analysis tool. Any
+spectrum displayed in \gaia\ (a single-position spectrum or a spectrum
+averaged over some region \ref{sec:gaiaaverage}) can be sent (via a
+protocol called SAMP) to \splat\ for more-detailed spectral analysis.
 
-\splat\ is a graphical spectral-analysis tool. \splat\ offers tools for 
-further processing, fitting, or identification of spectral lines. 
-One can also plot different spectra in the same window and
-make publishable files. The Full \splat\ documentation can be found 
-here: \splatsun 
+\splat\ offers the ability to further process, fit, or identify
+spectral lines.  You can also plot different spectra in the same
+window and make publishable files.  The full \splat\ documentation can
+be found here in \splatsun.
+
+Here are some instructions on how to do this.
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
-\item Select the spectrum you wish to send to \splat.
 
-\item Select click on \gaiathing{Send: replace} or \gaiathing{Send: add} 
-button in the \gaiathing{Display image regions} window.
+\item Start \splat, if it is not already running.
+
+\begin{terminalv}
+% splat &
+\end{terminalv}
+
+\item Click on the \gaiathing{Interop} menu item in \splat.  If the
+\gaiathing{SAMP control} icon has a red circle, it means that the SAMP
+communication hub is running.  If, however, the icon has a white
+circle, you need to start a hub.  To do this press the
+\gaiathing{Register with HUB} button at the bottom of the window, and
+then press the \gaiathing{Start internal hub} button in the window that
+pops up.
+
+\item If you had \gaia\ already running before the hub was active, then in
+\gaia\ select the \gaiathing{Interop$>$Register} to register your GAIA with
+the hub.
+
+\item Select the spectrum you wish to send from \gaia.
+
+\item Click on SPLAT-VO \gaiathing{Send: replace} or \gaiathing{Send: add}
+button near the bottom of the \gaiawindow{Display image sections of a cube}
+window.  The spectrum should appear in a \splat\ window.
+
 \end{enumerate}
-
 
 \begin{figure}[h!]
 \begin{center}
@@ -3223,6 +3246,11 @@ button in the \gaiathing{Display image regions} window.
   Sending spectrum in \gaia\ to \splat.}
 \end{center}
 \end{figure}
+
+SAMP can also transmit images and catalogues between compliant
+applications.  For example, you might have a selected catalogue of
+sources observed elsewhere in \topcat\ and want to plot the locations
+over your HARP maps in \gaia.
 
 
 \clearpage
@@ -3261,7 +3289,7 @@ initialise \splat\ and open the file directly from the gui.
 % splat 
 \end{terminalv}
 
-When \spat\ is initially started you will get a main window appear and also a spectral window.
+When \splat\ is initially started you will get a main window appear and also a spectral window.
 
 \begin{figure}[h!]
 \begin{center}
@@ -3273,7 +3301,6 @@ When \spat\ is initially started you will get a main window appear and also a sp
   Top: The main \splat\ window, Bottom: the spectral window.}
 \end{center}
 \end{figure}
-
 
 \chapter{\xlabel{cadc}Getting your data from CADC}
 \label{sec:fromcadc}
