@@ -580,7 +580,7 @@ local oscillator (LO). This results in a signal of lower
 (intermediate) frequency (IF) which can be amplified and more easily
 sampled. The current JCMT receivers have an IF of 4\,GHz (RxA) or
 5\,GHz (HARP). This mixing produces two frequencies for each value of
-the LO ($\nu_{sky} = \nu_{LO}\pm\nu_{IF}$) which are known as the
+the LO ($\nu_{\textnormal{sky}} = \nu_{\textnormal{LO}}\pm\nu_{\textnormal{IF}}$) which are known as the
 upper sideband (USB) and lower sideband (LSB).
 
 In a single sideband receiver one of these is suppressed. Double
@@ -588,10 +588,11 @@ sideband receivers have the two frequencies superimposed.
 
 Reducing the noise in the system is crucial to the efficiency of these
 receivers. The required integration time is directly proportional to
-the total noise in the system given by $T_{sys}$) via the radiometer
+the total noise in the system given by $T_{\textnormal{sys}}$ via the radiometer
 formula
 
-\[T_{\textnormal{A}}^*(rms) = \frac{2\,T_{\textnormal{sys}}\,\kappa}{\sqrt{\Delta\nu\,t}}\]
+\[T_{\textnormal{A}}^*({\textnormal{rms}}) =
+\frac{2\,T_{\textnormal{sys}}\,\kappa}{\sqrt{\Delta\nu\,t}},\]
 
 where the terms are as follows:
 \begin{itemize}
@@ -615,7 +616,7 @@ be determined by measuring the effects on $T_{\textnormal{sys}}$ when
 looking at hot and cold loads, where the cold load is black-body
 source.
 
-\item $T^*_{\textnormal{A}}(rms)$ is the rms value of the noise observed
+\item $T^*_{\textnormal{A}}({\textnormal{rms}})$ is the rms value of the noise observed
 in the spectrum in kelvin.
 \end{itemize}
 
