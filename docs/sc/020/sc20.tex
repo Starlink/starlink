@@ -175,7 +175,8 @@ undemanding of resources.
 
 This manual utilises software from the \starlink\ package; \smurf\
 \cite{smurf}, \Kappa\ \cite{kappa}, \gaia\ \cite{gaia}, \oracdr\
-\cite{oracdr}, \convert\ \cite{convert}, \ccdpack\ \cite{ccdpack}, and
+\cite{oracdr}, \convert\ \cite{convert}, \cupid\ \cite{cupid},
+\ccdpack\ \cite{ccdpack}, and
 \picard\ \cite{picard}. Starlink software must be installed on your
 system, and Starlink aliases and environment variables must be defined
 before attempting any ACSIS data reduction. You can download Starlink
@@ -288,7 +289,7 @@ in \cref{Section}{sec:fromcadc}{Getting your data from CADC}.
 Starlink routines run on HDS files (Hierarchical Data System) which
 normally have a \file{.sdf} extension (Starlink Data File). HDS files can
 describe a multitude of formats. The most common HDS format you will
-encounter is the NDF ($N$-Dimensional Data Format). This is the standard
+encounter is the NDF ($N$-Dimensional Data Format)\cite{ssds}. This is the standard
 file format for storing data which represent $N$-dimensional arrays of
 numbers, such as spectra, images, etc. The parameter files discussed
 in Section \ref{sec:hdstrace} are also HDS format.
@@ -2587,7 +2588,7 @@ in a high-signal region and apply that to a low-signal or
 compact-source observation.  The flatfield can change during the
 night, but it might better than no flatfield.
 
-The method of Curtis et al. (2010) creates a map for each detector
+The method of Curtis et al. (2010)\cite{flat} creates a map for each detector
 and integrates the measured flux in the main spectral line.  Use the
 \param{DETECTORS} parameter to create a spectral cube from just that
 detector.
@@ -3604,12 +3605,11 @@ filled with an index value associated with the peak position. Another
 cellular automata is used to removed noise from the filled clumps.
 \\\\
 \textbf{FellWalker}\\
-David Berry devised an algorithm which walks up hills along the line
+David Berry devised an algorithm\cite{fellwalker} that walks up hills along the line
 of greatest gradient until a significant peak is reached. It then
 assigns all pixels visited along the route to the clump associated with the peak.
 Such a walk is performed for every pixel in the data array which is
-above a specified background level.  It is described in Berry (2015) 
-
+above a specified background level.
 \\\\
 See \cupidsun\ for more information on \findclumps\ and a full list of
 the configuration options for each algorithm.
