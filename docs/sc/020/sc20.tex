@@ -47,6 +47,9 @@
 % Frame attributes fount.
 \providecommand{\att}[1]{\textsf{#1}}
 
+% Window names as opposed to menu and button names.
+\providecommand{\gaiawindow}[1]{"\texttt{#1}"}
+
 % degrees, arcminutes, arcseconds symbols
 %\usepackage{siunitx}
 \ifpdf
@@ -893,11 +896,11 @@ column from bottom to top to check its consistency. In
 \cref{Figure}{fig:rawgaia}{the first figure below} H03 is dead for the
 whole observation. The spectrum for a receptor at one of the time
 slices can be seen by clicking on the pixel. This will bring up 
-another window---the \gaiathing{Spectral plot} (see
+another window---the \gaiawindow{Spectral plot} (see
 \cref{Figure}{fig:gaia2}{the second figure below}). This spectrum will
 be replaced when you click on a different pixel.
 
-You can change the way the data is displayed in the \gaiathing{Display
+You can change the way the data is displayed in the \gaiawindow{Display
 image sections of a cube} window by changing the \gaiathing{Axis}.
 Selecting Axis number two will display spectra against time while Axis
 number three gives spectra against receptors. You can scroll through
@@ -912,7 +915,7 @@ your data by moving the \gaiathing{Index of plane} slider.
   data file. The main window on the left shows a map of receptors at
   given time-samples during the observation. You may have to zoom in
   multiple times by clicking the large \gaiathing{Z} button on the side
-  panel. On the right, the \gaiathing{Display image sections of a cube}
+  panel. On the right, the \gaiawindow{Display image sections of a cube}
   window enables you to navigate the time axis.}
 \end{center}
 \end{figure}
@@ -939,7 +942,7 @@ your data by moving the \gaiathing{Index of plane} slider.
   The \gaiathing{Spectral plot} window displaying its time-varying
   signal, appears automatically once a pixel is clicked in the main window.
   The vertical red line indicates the time slice that is currently selected
-  in the \gaiathing{Display image sections of a cube} window. This can be
+  in the \gaiawindow{Display image sections of a cube} window. This can be
   dragged across the spectrum to scroll through the spectra. Examine exposure
   time map etc. in ancillary arrays.}
 \end{center}
@@ -948,7 +951,7 @@ your data by moving the \gaiathing{Index of plane} slider.
 
 
 A second way to scroll through your spectrum is to click and drag the
-vertical red bar on the \gaiathing{Spectral plot} window. As you do so
+vertical red bar on the \gaiawindow{Spectral plot} window. As you do so
 array shown in the main window will automatically update.
 
 You will likely want to change the auto cut of the colour scale, the
@@ -2419,7 +2422,7 @@ then releasing the button.
 
 \hspace{0.1cm}
 \begin{minipage}[c]{0.23\linewidth}
-In the \gaiathing{Image regions} window go to \gaiathing{File$>$Save
+In the \gaiawindow{Image regions} window go to \gaiathing{File$>$Save
 ARD description} to save your ARD mask for later use.
 \end{minipage}
 \hspace{0.2cm}
@@ -2543,7 +2546,7 @@ parameter.
 It is also useful to view the noise map itself.
 \cref{Figure}{fig:noisemap}{The figure below} shows how to select the
 error component in \gaia. Other options available from the
-\gaiathing{Select NDF in container file} window include the exposure
+\gaiawindow{Select NDF in container file} window include the exposure
 time, the effective time and, if \param{spread=nearest} when running
 \makecube, the system temperature. To return to your main image select
 the top level and click the \gaiathing{Data} button.
@@ -2869,13 +2872,14 @@ viewed with \gaia.]{\label{fig:clumps2}
 \begin{enumerate}[label=(\textbf{\arabic*})]
 \item Select the spectrum you want to use as your template for the entire cube.
 
-\item Select the Baseline tab in the \gaiathing{Display image regions} window.
+\item Select the Baseline tab in the \gaiawindow{Display image sections
+of a cube} window.
 
 \item Select the order of the baseline you want to fit and remove
 
 \item Check the \gaiathing{Show limits on plot} button to
 interactively draw your baseline windows. You can click and drag the
-edges of these limit lines in the \gaiathing{Spectral plot} window.
+edges of these limit lines in the \gaiawindow{Spectral plot} window.
 
 \item Check \gaiathing{Enable} for each new baseline window you want to define.
 
@@ -2902,11 +2906,12 @@ whole map.
 \begin{enumerate}[label=(\textbf{\arabic*})]
 \item  Select the spectrum you want to use as your template for the entire cube.
 
-\item Select the \gaiathing{Chanmap} tab in the \gaiathing{Display image regions} window.
+\item Select the \gaiathing{Chanmap} tab in the \gaiawindow{Display
+image sections of a cube} window.
 
 \item Check the \gaiathing{Show limits on plot} box to interactively
 draw the range over which to collapse your cube. You can click and
-drag the end-bars of the limit lines in the \gaiathing{Spectral plot}
+drag the end-bars of the limit lines in the \gaiawindow{Spectral plot}
 window.
 
 \item Select the collapse method (Max is chosen in the example).
@@ -2945,10 +2950,10 @@ display grid.
 \item Select \gaiathing{Image-Analysis$>$Contouring} from the menu bar
 across the top of the main window.
 
-\item Select the file you wish to contour in the \gaiathing{Contouring} window.
+\item Select the file you wish to contour in the \gaiawindow{Contouring} window.
 
 \item Generate your contours in the \gaiathing{Generate} tab found on
-the left-hand side of the \gaiathing{Contouring} window. The example
+the left-hand side of the \gaiawindow{Contouring} window. The example
 below defines linearly spaced contours starting at 900K. Clicking the
 \gaiathing{Generate} button will return you to the Levels tab.
 
@@ -2991,7 +2996,7 @@ remain fixed on top.
 \end{figure}
 
 \item To add a second set of contours select \gaiathing{File$>$New
-window} in the top menu of the \gaiathing{Contouring} window. Here you
+window} in the top menu of the \gaiawindow{Contouring} window. Here you
 can define a second image to be contoured and specify new levels and
 appearance. Open as many new contouring windows as necessary.
 
@@ -3038,7 +3043,7 @@ Step 3.
 \end{center}
 \end{figure}
 
-\item In the \gaiathing{Import CUPID catalogue} window, select a file
+\item In the \gaiawindow{Import CUPID catalogue} window, select a file
 with the \gaiathing{Choose file}... button. For polygon shapes tick
 the STC shape box. You can change the RA/Dec co-ordinates from
 Cen1/Cen2, which give the central position of the clumps, to
@@ -3081,8 +3086,8 @@ The clumps shown will update as you move through the cube.
 \label{sec:gaiaaverage}
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
-\item Select the \gaiathing{Spectrum} tab in the \gaiathing{Display
-image regions} window.
+\item Select the \gaiathing{Spectrum} tab in the \gaiawindow{Display
+image sections of a cube} window.
 
 \item Define the shape of your region by selecting one of the
 \gaiathing{Define region} buttons (a circle is chosen in the example
@@ -3100,7 +3105,7 @@ below).
 \end{figure}
 
 \item Draw the shape on your map by clicking and dragging the mouse.
-The \gaiathing{Spectral plot} window will automatically update to show
+The \gaiawindow{Spectral plot} window will automatically update to show
 your combined spectrum. You can re-position and resize your shape at
 any time. You can see from \cref{Figure}{fig:gaia_avgspec2}{} that the
 averaged spectrum gives a much clearer profile of the source.
@@ -3128,16 +3133,16 @@ averaged spectrum gives a much clearer profile of the source.
 
 \item Select the axis you want to collapse you to collapse over by
 selecting from the \gaiathing{Axis} drop-down list in the
-\gaiathing{Display image regions of a cube} window.
+\gaiawindow{Display image regions of a cube} window.
 
 \item Select the spectrum you want to use as a template for your cube.
 
-\item Select the Collapse tab in the \gaiathing{Display image regions
+\item Select the Collapse tab in the \gaiawindow{Display image regions
 of a cube} window.
 
 \item Check the \gaiathing{Show limits on plot} button to
 interactively select your collapse region.  You can click and drag the
-edges of these limit lines in the \gaiathing{Spectral plot} window.
+edges of these limit lines in the \gaiawindow{Spectral plot} window.
 Position these around the region you wish to collapse over.
 
 \item Select the collapse method via the \gaiathing{Combination
@@ -3160,7 +3165,7 @@ to show your collapse image.
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 \item Select \gaiathing{View$>$3D Visualisation$>$Iso
-surfaces.../Volume rendering} in the \gaiathing{Display image sections
+surfaces.../Volume rendering} in the \gaiawindow{Display image sections
 of a cube} window.
 
 \begin{figure}[h!]
@@ -3173,7 +3178,7 @@ of a cube} window.
 \end{figure}
 
 \item Click and drag the image display to change the orientation in
-the \gaiathing{Volume render} window.
+the \gaiawindow{Volume render} window.
 
 \begin{figure}[h!]
 \begin{center}
