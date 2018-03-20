@@ -3495,8 +3495,13 @@ kappa >& /dev/null
 \chapter{\xlabel{regrid}Regridding vs resampling}
 \label{app:regrid}
 
-Regrid vs resample vs rebin 
+Sometimes you may wish to put you data onto a new pixel size scheme. 
+This may either involve regridding the data onto larger pixel sizes or
+resampling the data onto smaller pixels using \Kappa. 
 
+The key difference between resampling and rebinning is if you are 
+sampling the input pixel values (if resampling), or dividing an input
+pixel value between a group of neighbouring output pixels (if rebinning).
 
 \begin{figure}[h!]
 \begin{center}
@@ -3506,6 +3511,26 @@ Regrid vs resample vs rebin
 \end{center}
 \end{figure}
 
+resampling - Resampling of the grid of input data is performed by 
+transforming the coordinates of the centre of each output 
+pixel into the coordinate system of the input grid. Since the 
+resulting coordinates will not, in general, coincide with the 
+centre of an input pixel, sub-pixel interpolation is performed 
+between the neighbouring input pixels. This produces a resampled 
+value which is then assigned to the output pixel.
+samples input gridded data (i.e. an image), it does not integrate it. 
+Thus total data value in the input image will not, in general, be conserved.
+
+rebinning - Rebinning of the grid of input data is performed by 
+transforming the coordinates of the centre of each input pixel 
+into the coordinate system of the output grid. 
+The input pixel value is then divided up and assigned to the 
+output pixels in the neighbourhood of the central output 
+coordinates. A choice of schemes are provided for determining 
+how each input pixel value is divided up between the output 
+pixels. In general, each output pixel may be assigned values 
+from more than one input pixel. All contributions to a given 
+output pixel are summed to produce the final output pixel value.
 
 \newpage
 \chapter{\xlabel{clumpfind}Clump-finding Algorithms}
@@ -3553,7 +3578,8 @@ David Berry devised an algorithm which walks up hills along the line
 of greatest gradient until a significant peak is reached. It then
 assigns all pixels visited along the route to the clump associated with the peak.
 Such a walk is performed for every pixel in the data array which is
-above a specified background level.  It is described in Berry (2015).
+above a specified background level.  It is described in Berry (2015) 
+
 \\\\
 See \cupidsun\ for more information on \findclumps\ and a full list of
 the configuration options for each algorithm.
