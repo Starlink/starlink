@@ -252,7 +252,7 @@ degrees.
 \subsection{Getting the noise}
 \label{sec:mapstats}
 
-You can use the \picard\ recipe \drrecipe{SCUBA2\_MAPSTATS} get the
+You can use the \picard\ recipe \drrecipe{SCUBA2\_MAPSTATS} to get the
 noise. This recipe estimates the RMS from both the map, the NEP, and
 the RMS predicted by the Integration Time Calculator. It then writes out
 a series of results in a log file called \file{log.mapstats}. The
@@ -266,7 +266,7 @@ This recipe will report the noise in the same input units provided.
 
 
 \textbf{Note:} \drrecipe{SCUBA2\_MAPSTATS} is only designed to work on
-reductions of a single observations. On coadded observations it could
+reductions of single observations. On coadded observations it could
 produce misleading results, or even fail completely to work.
 
 If multiple files are run through \drrecipe{SCUBA2\_MAPSTATS}, either in a single call
@@ -668,7 +668,7 @@ with this:
 \end{terminalv}
 
 The output of \task{provshow} can be very long.  If you merely want to
-know what were the original file, the ones with no parents, select the
+know what the original files were, the ones with no parents, select the
 root ancestors.
 
 \begin{terminalv}

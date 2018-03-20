@@ -32,12 +32,15 @@ The parameters written out to \file{log.mapstats} are listed below:
       Airmass & mean airmass of observation\\
       Trans & mean line-of-sight transmission\\
       Tau225 & mean zenith optical depth at 225 GHz, derived from WVM\\
+      Tau & mean zenith optical depth at observed frequency\\
       telapsed & elapsed time of observation in seconds\\
       texp & mean exposure time, derived from EXP\_TIME NDF component (sec)\\
       rms & RMS noise in map, obtained from median of error array\\
       rms\_units & RMS units\\
       nefd & NEFD derived from combination of variance and exposure time images\\
       nefd\_units & NEFD units\\
+      RA & Right Ascension\\
+      Dec & Declination\\
       mapsize & size (requested diameter) of input map (arcsec)\\
       pixscale & pixel scale in arcsec\\
       project & project ID\\
@@ -48,5 +51,11 @@ The parameters written out to \file{log.mapstats} are listed below:
   \end{center}
 \end{table}
 
+Although the output file \file{log.mapstats} can be viewed with any text editor, it is useful to read this file with \topcat:
 
+\begin{terminalv}
+topcat -f ascii log.mapstats
+\end{terminalv}
+
+After running the command above, click on ``Views'' Then ``Table Data'' to display the table.
 

@@ -24,13 +24,29 @@ to \cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline}.}\color{black}
 
 \section{\xlabel{dimm_theory}How it works}
 
+The time-varying signal recorded by a bolometer, $b(t)$, contains
+contributions from a variety of sources:
+
+\begin{equation}
+\label{eq:bolsig}
+b(t) = e(t) \times a(t) + n^{\textrm w}(t) + gn^{\textrm c}(t) + n^{\textrm f}(t),
+\end{equation}
+
+where $e(t)$ is the atmospheric extinction, $a(t)$ is the astronomical
+signal (time varying as the telescope scans across the sky), $n^{\textrm w}(t)$
+is the uncorrelated white noise, $g$ is an optional scalefactor which 
+is unique to each bolometer, $n^{\textrm c}(t)$ is the correlated (or, common mode)
+signal, and $n^{\textrm f}(t)$ is the (predominantly low-frequency) noise which
+does not have a simple correlation relationship that would be included in the
+$n^{\textrm c}(t)$ noise term.
+
 The map-maker works by producing individual models of the various
-components that make up the signal recorded by each bolometer, one
-component being the required astronomical signal.  It models and removes
-each of the other components in order of decreasing magnitude, ultimately
-leaving just the astronomical signal plus residual noise.  The modelled
-components are listed in \cref{Table}{tab:mods}{tabulated} and described
-more fully in \cref{Section}{sec:models}{The individual models}.
+components that make up the signal recorded by each bolometer.  
+It models and removes the extinction and noise components in order of 
+decreasing magnitude, ultimately leaving just the astronomical signal 
+plus residual noise.  The modelled components are listed in 
+\cref{Table}{tab:mods}{tabulated} and described more fully 
+in \cref{Section}{sec:models}{The individual models}.
 
 \textbf{A \emph{configuration file} should usually be supplied when
 running \makemap\ directly.} This file holds a set of parameter values
@@ -204,7 +220,11 @@ explanation of each model is given in \cref{Section}{sec:models}{The individual 
 \raggedbottom
 
 \begin{sltextbox}{Data Chunking}
-  \caption{\label{box:chunk}}
+  \renewcommand\figurename{Data Chunking}
+  \renewcommand{\thefigure}{}
+  \renewcommand{\thefigure}{}
+  \caption{}
+  \label{box:chunk}
   Chunking occurs when there is insufficient computer memory available
   for the map-maker to process all the time-series data together, or when
   there is a gap in the data (e.g.  from a missing sub-scan). In these
@@ -377,8 +397,26 @@ the bolometer passes over the source. Finally, the residual signal
 stored in \model{RES} is flat, indicating that most of the signal has
 been successfully accounted for by the other model components.
 
+\begin{figure}
+\begin{center}
+  \includegraphics[width=\linewidth]{sc21_com} \\
+  \includegraphics[width=\linewidth]{sc21_flt} \\
+  \includegraphics[width=\linewidth]{sc21_ast} \\
+  \includegraphics[width=\linewidth]{sc21_res} \\
+\end{center}
+\caption[Iterative models in the time domain]{\small These plots show
+some of the models for a single bolometer, for part of an
+observation of CRL~2688. From top to bottom: the \model{COM} model
+containing signal common to all bolometers, the \model{FLT} model
+containing residual low-frequency noise missed by \model{COM}, the
+\model{AST} model with the astronomical signal showing as a positive
+spike when this bolometer passes over the source, and the \model{RES}
+model looking (as expected) like white noise.}
+\label{fig:itercomp}
+\end{figure}
 
-\section{\xlabel{convergence}Stopping criteria}
+
+\section{\xlabel{convergence}Stopping Criteria}
 \label{sec:converge}
 
 The map-maker will stop processing either when the requested number of
@@ -390,7 +428,7 @@ criterion specified in the configuration file is reached.
 
 Specifying the number of iterations in the configuration file is done
 via the \xparam{NUMITER}{numiter} parameter. This is shown below for
-\file{dimmconfig\_jsa\_generic.lis}.
+\file{dimmconfig\_jsa\_generic.lis} (JSA stands for ``JCMT Science Archive'').
 
 \begin{terminalv}
 numiter = -25
@@ -428,24 +466,6 @@ while running the map-maker, you can use the \xparam{ITERMAP}{itermap}
 option. This causes the map created by each iteration to be dumped to
 disk for inspection (see \cref{Section}{sec:tweak}{Tweaking the
 configuration file}).
-
-\begin{figure}
-\begin{center}
-  \includegraphics[width=\linewidth]{sc21_com} \\
-  \includegraphics[width=\linewidth]{sc21_flt} \\
-  \includegraphics[width=\linewidth]{sc21_ast} \\
-  \includegraphics[width=\linewidth]{sc21_res} \\
-\end{center}
-\caption[Iterative models in the time domain]{\small These plots show
-some of the models for a single bolometer, for part of an
-observation of CRL~2688. From top to bottom: the \model{COM} model
-containing signal common to all bolometers, the \model{FLT} model
-containing residual low-frequency noise missed by \model{COM}, the
-\model{AST} model with the astronomical signal showing as a positive
-spike when this bolometer passes over the source, and the \model{RES}
-model looking (as expected) like white noise.}
-\label{fig:itercomp}
-\end{figure}
 
 \section{\xlabel{sec_masking}Masking}
 \label{sec:masking}
@@ -656,7 +676,7 @@ the \model{FLT} mask on the first iteration (subsequent iterations will
 create the mask on the basis of the map created at the end of the
 previous iteration). This is a shame since \model{FLT} masking is most
 beneficial on the first few iterations, whilst the bulk of the astronomical
-signal is still present in the time streams. A scheme to get round this
+signal is still present in the time streams. A scheme to get around this
 problem is described in \cref{Section}{sec:skip}{Skipping the AST model}.
 
 All the configuration files supplied with \smurf\ use \model{FLT}
@@ -727,7 +747,7 @@ and \jsageneric\ configuration files supplied with \smurf\ both set
 \section{\xlabel{config}Specialised configuration files}
 \label{sec:config}
 
-Maps made by the pipe-line using the
+Maps made by the pipeline using the
 REDUCE\_SCAN recipe will use \file{dimmconfig\_jsa\_generic.lis} unless some
 alternative configuration has been specified. This configuration file is
 intended to provide a reasonably good map for all types of observations.
@@ -931,11 +951,13 @@ bolometer baseline is also relaxed (parameter \xparam{DCTHRESH}{dcthresh}).
 
 The \brightextended\ configuration is for reducing maps that contain
 emission that is extended to some degree and contains some bright
-regions. Here \xparam{AST.ZERO_SNR}{ast.zero\_snr} is used to constrain
-the \model{AST} model to zero wherever the S/N is lower than 5$\sigma$
-(see \cref{Section}{sec:astmask}{AST masking}). \xparam{NUMITER}{numiter}
-has been raised to \texttt{-40}, as more iterations are required to
-maximise the sensitivity to large dynamic signal ranges in the map.
+regions. Here, the combination of \xparam{AST.ZERO_SNR}{ast.zero\_snr} 
+and \xparam{AST.ZERO_SNRLO}{ast.zero\_snrlo} is used to identify components of
+the \model{AST} model wherever the S/N is higher than 3$\sigma$ and then
+to expand this basic mask down to an SNR equal to 2$\sigma$ without introducing 
+any new isolated source areas (see \cref{Section}{sec:astmask}{AST masking}).
+\xparam{NUMITER}{numiter} has been raised to \texttt{-40}, as more iterations are 
+required to maximise the sensitivity to large dynamic signal ranges in the map.
 
 The other major feature of this configuration is that the subtraction of
 the \model{AST} model is skipped on the first five iterations. In

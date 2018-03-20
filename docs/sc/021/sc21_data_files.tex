@@ -345,8 +345,8 @@ exportndf = (com,gai,ast,flt,res,noi,qua)
 
 In addition to the models listed in \cref{Section}{sec:models}{The
 individual models}, you can request \model{RES} in order to export the
-\model{RES} model --- the residual signal remaining after
-the other models have been removed.  If \model{NOI} (the estimate of
+\model{RES} model (the residual signal remaining after
+the other models have been removed).  If \model{NOI} (the estimate of
 the bolometer noise levels) is exported, it is stored as the VARIANCE
 component of the \model{RES} model; thus, export of \model{RES} is implied
 if \model{NOI} is specified.
@@ -360,7 +360,7 @@ filename (such as \file{s8a20120720\_00030\_0003\_con\_com.sdf},
 \file{s8a20120720\_00030\_0003\_con\_flt.sdf},
 \file{s8a20120720\_00030\_0003\_con\_res.sdf})\footnote{The filename
 shows the third sub-scan of Observation 30 since this is the first science
-file that is encountered (see \cref{Chapter}{sec:raw}{Handling Raw
+file that is encountered (see \cref{Section}{sec:rawdata}{Handling Raw
 SCUBA-2 Data}).~} The variance and quality for the data are stored as
 the VARIANCE and QUALITY components within the residual file NDF.
 

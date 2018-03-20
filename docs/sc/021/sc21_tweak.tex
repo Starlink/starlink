@@ -69,7 +69,7 @@ all the necessary quotation marks.
 
 For full details of all the possible ways of specifying groups of
 parameter values, see Section ``\xref{Specifying Groups of
-Objects}{sun95}{se_groups}'' in ``\xref{Starlink User Note 95}{sun95}{}.
+Objects}{sun95}{se_groups}'' in ``\xref{Starlink User Note 95}{sun95}{}''.
 
 \textbf{What parameters can be changed?}\\*
 \cref{Appendix}{app:parameters}{Configuration-parameter descriptions}
@@ -382,7 +382,8 @@ This generates a mask which has an unrealistic hard 3$\sigma$
 cut-off. Step 4 is performed to smooth the the edges of your mask.
 
 \item[Step 4] Smooth the thresholded map with a Gaussian filter
-  of FWHM of 5 pixels (=\,20\,arcsec). Then it is again thresholded,
+  of FWHM of 5 pixels (=\,20\,arcsec at 850 microns, using the default pixel size).
+  Then it is again thresholded,
   this time keeping everything above 5\,\% of the 0 level as the mask
   and setting the rest to \texttt{bad}.
 \begin{terminalv}

@@ -75,11 +75,11 @@ FCFs are derived from the map.
 
 \subsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN\_CHECKRMS}}
 
-\textbf{Configuration file: \file{dimmconfig\_jsa\_generics.lis}}
+\textbf{Configuration file: \file{dimmconfig\_jsa\_generic.lis}}
 
 This recipe is the same as \drrecipe{REDUCE\_SCAN}, but includes extra
 performance estimations determined by \drrecipe{SCUBA2\_CHECK\_RMS}
-(see \cref{Section}{sec:checkrms}{Getting the noise}). These extra
+(see \picard's \xref{\drrecipe{SCUBA2\_CHECK\_RMS}}{sun265}{SCUBA2_CHECK_RMS}). These extra
 metrics are written to a log file \file{log.checkrms}. Running
 \drrecipe{SCUBA2\_CHECK\_RMS} in the pipeline, rather than as a
 standalone \picard\ recipe, allows it to calculate results for
@@ -149,10 +149,20 @@ this recipe and the files produced.
 \item[Step~1:]
 \textbf{Initialise ORAC-DR}
 
-This is done by:
+For 850 micron data, this is done by:
 \begin{terminalv}
 % oracdr_scuba2_850 -cwd
 \end{terminalv}
+
+\vspace{0.2cm}
+
+For 450 micron data, this is done by:
+
+\begin{terminalv}
+% oracdr_scuba2_450 -cwd
+\end{terminalv}
+
+\vspace{0.2cm}
 
 \item[Step 2:]
 \textbf{Set environment variables}
@@ -178,6 +188,8 @@ This is done by:
 \begin{terminalv}
 % oracdr  -loop file -files <list_of_files>
 \end{terminalv}
+
+\vspace{0.2cm}
 
 where the list of files that you wish to reduce can be
 an individual or multiple observations.
@@ -356,7 +368,7 @@ reduction.
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.7\linewidth]{sc21_crl2688}
-\caption[CRL~2688 produced with \makemap]s{
+\caption[CRL~2688 produced with \makemap]{
   Map of CRL~2688 produced with the \smurf\ task \makemap\ using the
   iterative algorithm with default parameters. \label{fig:itermap}}
 \end{center}
@@ -378,7 +390,7 @@ reduction.
   are reduced in one continuous piece: \param{Continuous chunk 1 /
     1}. Chunking is where the map-maker processes sub-sections of the
   time-series data independently and should be avoided if
-  possible---see the text box below.
+  possible---see the text box on \latexhtml{Page~\pageref{box:chunk}}{\htmlref{Chunking}{box:chunk}}.
 \end{description}
 
 
@@ -453,7 +465,7 @@ The final maps in your output directory will have the suffix
 will start with an \file{s} (e.g.
 \file{s20140620\_00030\_850\_reduced.sdf}). Group maps, which may
 contain co-added observations from a single night, are also produced
-which have the prefix \file{gs}
+which have the prefix \file{gs} and the date/scan of the first input file
 (e.g. \file{gs20140620\_30\_850\_reduced.sdf}).
 
 \textbf{Note:} A group file is \emph{always} created, even if only a

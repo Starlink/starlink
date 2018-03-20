@@ -9,7 +9,7 @@ detect unresolved point sources. In the examples below we work through the
 reduction of just such an extra-galactic field, A1835.
 
 Most extra-galactic objects are on average only slightly brighter than
-the confusion limit---the fluctuations of the background sky
+the confusion limit. The fluctuations of the background sky
 brightness due to multiple super-imposed, unresolved sources within
 the telescope beam, below which individual sources cannot be detected.
 It is likely that any sources in the map will be at best, only a few
@@ -18,9 +18,9 @@ combination of instrumental noise and source confusion).
 
 \subsection{Example 1 -- The simple reduction}
 The basic reduction method for maps like these follow two main
-steps---running the data through the map-maker using the
+steps: 1. running the data through the map-maker using the
 \file{dimmconfig\_blank\_field.lis} configuration file (see
-\cref{Section}{sec:config}{Specialised configuration files}). Then
+\cref{Section}{sec:config}{Specialised configuration files}), and 2.
 applying the \picard\ \drrecipe{SCUBA2\_MATCHED\_FILTER} recipe (see
 \cref{Section}{sec:mf}{Point-source extraction}).
 \\ \\
@@ -148,7 +148,7 @@ given. The pipeline is particularly recommended for this recipe due to
 its extra analysis steps.
 
 \textbf{Step 1: Create input file}\\
-Create an file with the names of all the files you wish to process (e.g.
+Create a file with the full path names of all the files you wish to process, one per line (e.g.
 \file{myfiles.lis})
 \\ \\
 \textbf{Step 2: Run the pipeline}\\
@@ -310,7 +310,7 @@ everything above to 1.
 The thresholded map is shown in the left-hand panel of
 \cref{Figure}{fig:mask}{this figure}. The next step is to smooth this map
 by convolving it with a Gaussian of 16\,arcsec. For this we use a factor
-of 4 for the FWHM parameter.
+of 4 (pixels) for the FWHM parameter (since the default pixel size at 850 microns is 4 arcseconds).
 
 \begin{terminalv}
 % gausmooth 850map_mask 850map_mask_sm fwhm=4
@@ -350,8 +350,8 @@ personalised configuration file, \file{mydimmconfig.lis}.
 \end{terminalv}
 
 The configuration file, \file{mydimmconfig.lis}, has the following
-format---note how it is based on
-\file{dimmconfig\allowbreak\_bright\allowbreak\_extended.lis}. It has decreased the
+format (note how it is based on
+\file{dimmconfig\allowbreak\_bright\allowbreak\_extended.lis}). It has decreased the
 convergence parameter to \xparam{MAPTOL}{maptol}~=~0.03 but increased the number
 of iterations to compensate as 40 is unlikely to be sufficient.
 \begin{terminalv}
