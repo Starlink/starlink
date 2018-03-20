@@ -974,7 +974,10 @@ class ParSys(object):
    @classmethod
    def cleanup(cls):
       if ParSys.adamdir is not None:
-         shutil.rmtree( ParSys.adamdir )
+         try:
+            shutil.rmtree( ParSys.adamdir )
+         except Exception:
+            pass
       close_log_file()
 
 #  Allow the ParSys to be indexed by parameter name (returns the
