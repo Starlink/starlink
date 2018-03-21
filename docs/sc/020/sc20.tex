@@ -32,7 +32,6 @@
 \providecommand{\lineforest}{\xref{REDUCE\_SCIENCE\_LINEFOREST}{sun260}{REDUCE_SCIENCE_LINEFOREST}}
 
 \newcommand{\acsispipelinesun}{\xref{\textbf{SUN/260}}{sun260}{}}
-\newcommand{\splatthing}[1]{\textbf{\textsf{#1}}}
 
 \providecommand{\gaiasc}{\xref{\textbf{SC/17}}{sc17}{}}
 \providecommand{\splatsun}{\xref{\textbf{SUN/243}}{sun243}{}}
@@ -3353,11 +3352,11 @@ Sometime you may wish to change the units of a spectrum in \splat.
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
-\item Click on \splatthing{Change the units of the current spectrum}
+\item Click on \guithing{Change the units of the current spectrum}
 button in your current spectral window. 
 
 
-\item A new window will appear - \splatthing{Current spectrum units}.
+\item A new window will appear - \guiwindow{Current Spectrum Units}.
 
 \begin{figure}[h!]
 \begin{center}
@@ -3366,16 +3365,16 @@ button in your current spectral window.
 \includegraphics[width=0.7\linewidth]{sc20_splat_spectrum_units2}
 \typeout{sc20_splat_spectrum_units2 inserted on page \arabic{page}}
 \caption[Change the units of the current spectrum.]{\label{fig:splat_units1}
-  Top: Select the \splatthing{Change the units of the current spectrum}
+  Top: Select the \guithing{Change the units of the current spectrum}
   button. Note that in this example the current units are Frequency.
-  Bottom: the \splatthing{Current spectrum units} window.}
+  Bottom: the \guiwindow{Current Spectrum Units} window.}
 \end{center}
 \end{figure}
 
 
 \item From the Coordinates drop down menu select the desired unit
-(in this case we select \splatthing{Kilometers-per-sec (radio)}).
-Then click \splatthing{Apply}.
+(in this case we select \guithing{Kilometers-per-sec (radio)}).
+Then click \guithing{Apply}.
 
 \begin{figure}[h!]
 \begin{center}
@@ -3387,7 +3386,7 @@ Then click \splatthing{Apply}.
 \end{figure}
 
 \item You will now see that the spectrum is
-displayed in \splatthing{Radio Velocity (km/s)}.
+displayed in \guithing{Radio Velocity (km/s)}.
 
 \begin{figure}[h!]
 \begin{center}
@@ -3407,11 +3406,11 @@ displayed in \splatthing{Radio Velocity (km/s)}.
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
-\item Click on \splatthing{Cut out the regions of the current spectrum} button
+\item Click on \guithing{Cut out the regions of the current spectrum} button
 above the spectrum you wish to work on. This will open a new window.
 
 
-\item Select \splatthing{Add} from the cut region window.
+\item Select \guithing{Add} from the cut region window.
 
 \begin{figure}[h!]
 \begin{center}
@@ -3420,19 +3419,19 @@ above the spectrum you wish to work on. This will open a new window.
 \includegraphics[width=0.65\linewidth]{sc20_splat_cutregion_blank}
 \typeout{sc20_splat_cutregion inserted on page \arabic{page}}
 \caption[Select the crop button in SPLAT.]{\label{fig:splat_crop1}
-  Top: Select the cut button. Bottom: Select the \splatthing{Add} button.}
+  Top: Select the cut button. Bottom: Select the \guithing{Add} button.}
 \end{center}
 \end{figure}
 
 
 \item Click and drag the regions you wish to remove from the
 spectrum in the spectrum window. As we had a
-second region to remove we click on the \splatthing{Add} button
+second region to remove we click on the \guithing{Add} button
 a second time. In this example we select the two noisy edge regions from the
 spectrum to remove. 
 
 
-\item Select the \splatthing{Remove selected button.}
+\item Select the \guithing{Remove Selected} button.
 
 \begin{figure}[h!]
 \begin{center}
@@ -3442,7 +3441,7 @@ spectrum to remove.
 \typeout{sc20_splat_cutregion2 inserted on page \arabic{page}}
 \caption[Selected regions for removal.]{\label{fig:splat_crop2}
   Top: The two regions selected. Bottom: remove the selected region
-  by clicking the \splatthing{remove selected} button.}
+  by clicking the \guithing{Remove Selected} button.}
 \end{center}
 \end{figure}
 
@@ -3471,15 +3470,15 @@ to view.
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
-\item Click on \splatthing{Apply a filter to the current spectrum} button
+\item Click on \guithing{Apply a filter to the current spectrum} button
 above the spectrum you wish to work on. This will open a new window.
 
 \item Select the number of channels over which you want to 
-bin - this is the \splatthing{Width}.
+bin - this is the \guithing{Width}.
 In this example the spectrum has a resolution of 0.055km/s. We
 bin by 18 channels to rebin the spectrum to 1km/s channels.
 
-\item Select \splatthing{Filter (replace)}. This will create a
+\item Select \guithing{Filter (Replace)}. This will create a
 new spectrum in the main \splat\ window and will also replace the
 existing spectrum displayed in the spectral window with the new
 binned spectrum.
@@ -3491,7 +3490,7 @@ binned spectrum.
 \includegraphics[width=0.7\linewidth]{sc20_splat_rebin2}
 \typeout{sc20_splat_rebin2 inserted on page \arabic{page}}
 \caption[Filter regions of a spectrum window.]{\label{fig:splat_rebin}
-  Top: The \splat\ \splatthing{Filter regions of a spectrum window}.
+  Top: The \splat\ \guiwindow{Filter regions of a spectrum} window.
   Bottom: The final rebinned spectrum.}
 \end{center}
 \end{figure}
@@ -3505,13 +3504,12 @@ binned spectrum.
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
-\item Click on \splatthing{Get statistics on region of spectrum}
+\item Click on \guithing{Get statistics on region of spectrum}
 button above the spectrum you wish to work on. This will open a
 new window. 
 
 
-\item Select \splatthing{Add} from the \splatthing{Regional
-statistics} region window.
+\item Select \guithing{Add} from the \guiwindow{Region statistics} window.
 
 \begin{figure}[h!]
 \begin{center}
@@ -3520,14 +3518,14 @@ statistics} region window.
 \includegraphics[width=0.6\linewidth]{sc20_splat_stats1}
 \typeout{sc20_splat_stats1 inserted on page \arabic{page}}
 \caption[Select the stats button.]{\label{fig:splat_stats1}
-  Top: Select the stats button. Bottom: Select the \splatthing{Add}
+  Top: Select the stats button. Bottom: Select the \guithing{Add}
   button.}
 \end{center}
 \end{figure}
 
 \item Click and drag the regions you calculate the statistics over.
 As we wish to include baselines eithersie of the spectral line seen
-in the data we click on the \splatthing{Add} button a second time.
+in the data we click on the \guithing{Add} button a second time.
 
 \begin{figure}[h!]
 \begin{center}
@@ -3539,7 +3537,7 @@ in the data we click on the \splatthing{Add} button a second time.
 \end{figure}
 
 \item You will see the two selected spectral regions appear in
-a table in the \splatthing{Regional statistic} window with some
+a table in the \guiwindow{Region statistics} window with some
 basic statistic already computed for each region created.
 
 \begin{figure}[h!]
@@ -3548,11 +3546,11 @@ basic statistic already computed for each region created.
 \typeout{sc20_splat_stats3 inserted on page \arabic{page}}
 \caption[Two spectral regions have been selected.]{\label{fig:splat_stats3}
   Two spectral regions have been selected and are displayed
-  in the \splatthing{Regional statistic} window.}
+  in the \guiwindow{Region statistics} window.}
 \end{center}
 \end{figure}
 
-\item Click on \splatthing{Selected stats} or \splatthing{All stats}
+\item Click on \guithing{Selected stats} or \guithing{All stats}
 to get statistics of the regions combined. In this example we see the
 standard deviation in the regions selected is 0.19K.
 
@@ -3561,8 +3559,8 @@ standard deviation in the regions selected is 0.19K.
 \includegraphics[width=0.75\linewidth]{sc20_splat_stats4}
 \typeout{sc20_splat_stats4 inserted on page \arabic{page}}
 \caption[statistics for both regions.]{\label{fig:splat_stats4}
-  Statistics for both regions are displayed in the \splatthing{Regional
-  statistic} window. }
+  Statistics for both regions are displayed in the \guiwindow{Region
+  statistics} window. }
 \end{center}
 \end{figure}
 
@@ -3580,12 +3578,12 @@ line strength and width.
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
 
-\item Click on \splatthing{Fit spectral lines using a variety of functions}
+\item Click on \guithing{Fit spectral lines using a variety of functions}
 button above the spectrum you wish to work on. This will open a
 new window. 
 
-\item Click on the \splatthing{Add} button in the
-\splatthing{Measure spectral lines} window. 
+\item Click on the \guithing{Add} button in the
+\guiwindow{Measure spectral lines} window.
 
 
 \begin{figure}[h!]
@@ -3596,7 +3594,7 @@ new window.
 \typeout{sc20_splat_fit2 inserted on page \arabic{page}}
 \caption[Select the SPLAT fit button.]{\label{fig:splat_fit1}
   Top: Select the spectral fitting button. Bottom: Click on
-  the \splatthing{Add} button.}
+  the \guithing{Add} button.}
 \end{center}
 \end{figure}
 
@@ -3616,23 +3614,23 @@ to encompass the line for which you wish to calculate a fit for.
 \end{figure}
 
 
-\item Click on the \splatthing{Fit} button to produce both a
-\splatthing{Quick} and \splatthing{Gaussian} fit to the spectral line.
+\item Click on the \guithing{Fit} button to produce both a
+\guithing{Quick} and \guithing{Gaussian} fit to the spectral line.
 
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=0.45\linewidth]{sc20_splat_fit4}
 \typeout{sc20_splat_fit4 inserted on page \arabic{page}}
 \caption[Getting the spectral line fit.]{\label{fig:splat_fit4}
-  In the \splatthing{Measure spectral lines} window we see the both
-  the \splatthing{Quick} fit (black dashed line) and the
-  \splatthing{Gaussian} fit (pink line) of the spectral line.}
+  In the \guiwindow{Measure spectral lines} window we see the both
+  the \guithing{Quick} fit (black dashed line) and the
+  \guithing{Gaussian} fit (pink line) of the spectral line.}
 \end{center}
 \end{figure}
 
 
 \item We see the results of the fit are provided in the
-\splatthing{Measure spectral lines} window and the two fits can
+\guiwindow{Measure spectral lines} window and the two fits can
 be seen in the spectral line window.
 
 \begin{figure}[h!]
@@ -3640,8 +3638,8 @@ be seen in the spectral line window.
 \includegraphics[width=0.9\linewidth]{sc20_splat_fit5}
 \typeout{sc20_splat_fit5 inserted on page \arabic{page}}
 \caption[Spectrum with fits.]{\label{fig:splat_stats5}
-  In the spectral window we see the both the \splatthing{Quick}
-  fit (black dashed line) and the \splatthing{Gaussian} fit
+  In the spectral window we see the both the \guithing{Quick}
+  fit (black dashed line) and the \guithing{Gaussian} fit
   (pink line) of the spectral line.}
 \end{center}
 \end{figure}
