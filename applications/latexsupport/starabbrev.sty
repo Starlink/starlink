@@ -128,9 +128,15 @@
 \newcommand{\model}[1]{\texttt{#1}}
 %\providecommand{\url}[1]{\texttt{#1}}
 
-% GAIA menu functions and buttons.  Would like a bold texttt to mimic
-% their appearance in GAIA, but the founts are not in regular LaTeX.
+% Nenu functions and buttons for graphical tools like SPLAT and GAIA.
+% Would like a bold texttt to mimic their appearance in GAIA, but the
+% typeface is not in regular LaTeX.  Retain the old \gaiathing until
+% documents using it have been edited to use \guithing.
+\newcommand{\guithing}[1]{\textbf{\textsf{#1}}}
 \newcommand{\gaiathing}[1]{\textbf{\textsf{#1}}}
+
+% The name of a window produced by a graphical tool.
+\newcommand{\guiwindow}[1]{"\texttt{#1}"}
 
 % SMURF tasks
 \newcommand{\calcnoise}{\xref{\task{calcnoise}}{sun258}{CALCNOISE}}
