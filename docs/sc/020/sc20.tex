@@ -3355,29 +3355,25 @@ Sometime you may wish to change the units of a spectrum in \splat.
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
-\item click on \splatthing{Change the units of the current spectrum}
+\item Click on \splatthing{Change the units of the current spectrum}
 button in your current spectral window. 
 
-\begin{figure}[h!]
-\begin{center}
-\includegraphics[width=0.9\linewidth]{sc20_splat_spectrum_units}
-\typeout{sc20_splat_spectrum_units inserted on page \arabic{page}}
-\caption[Change the units of the current spectrum.]{\label{fig:splat_units}
-  Select the \splatthing{Change the units of the current spectrum}
-  button. Note that in this example the current units are Frequency.}
-\end{center}
-\end{figure}
 
 \item A new window will appear - \splatthing{Current spectrum units}.
 
 \begin{figure}[h!]
 \begin{center}
+\includegraphics[width=0.9\linewidth]{sc20_splat_spectrum_units}
+\typeout{sc20_splat_spectrum_units inserted on page \arabic{page}}
 \includegraphics[width=0.7\linewidth]{sc20_splat_spectrum_units2}
 \typeout{sc20_splat_spectrum_units2 inserted on page \arabic{page}}
-\caption[Current spectrum units window.]{\label{fig:splat_units2}
-  Current spectrum units window.}
+\caption[Change the units of the current spectrum.]{\label{fig:splat_units1}
+  Top: Select the \splatthing{Change the units of the current spectrum}
+  button. Note that in this example the current units are Frequency.
+  Bottom: the \splatthing{Current spectrum units} window.}
 \end{center}
 \end{figure}
+
 
 \item From the Coordinates drop down menu select the desired unit
 (in this case we select \splatthing{Kilometers-per-sec (radio)}).
@@ -3387,7 +3383,7 @@ Then click \splatthing{Apply}.
 \begin{center}
 \includegraphics[width=0.7\linewidth]{sc20_splat_spectrum_units3}
 \typeout{sc20_splat_spectrum_units3 inserted on page \arabic{page}}
-\caption[Changing the units via the drop down menu.]{\label{fig:splat_units3}
+\caption[Changing the units via the drop down menu.]{\label{fig:splat_units2}
   Changing the units of the spectrum via the drop down menu to km/s.}
 \end{center}
 \end{figure}
@@ -3399,7 +3395,7 @@ displayed in \splatthing{Radio Velocity (km/s)}.
 \begin{center}
 \includegraphics[width=0.9\linewidth]{sc20_splat_spectrum_units4}
 \typeout{sc20_splat_spectrum_units4 inserted on page \arabic{page}}
-\caption[Spectrum with units of km/s.]{\label{fig:splat_units4}
+\caption[Spectrum with units of km/s.]{\label{fig:splat_units3}
   Spectrum with units of km/s.}
 \end{center}
 \end{figure}
@@ -3416,25 +3412,20 @@ displayed in \splatthing{Radio Velocity (km/s)}.
 \item Click on \splatthing{Cut out the regions of the current spectrum} button
 above the spectrum you wish to work on. This will open a new window.
 
-\begin{figure}[h!]
-\begin{center}
-\includegraphics[width=0.7\linewidth]{sc20_splat_tocut_spectrum}
-\typeout{sc20_splat_tocut_spectrum inserted on page \arabic{page}}
-\caption[Select the crop button in SPLAT.]{\label{fig:splat_crop1}
-  Select the cut button.}
-\end{center}
-\end{figure}
 
 \item Select \splatthing{Add} from the cut region window.
 
 \begin{figure}[h!]
 \begin{center}
+\includegraphics[width=0.7\linewidth]{sc20_splat_tocut_spectrum}
+\typeout{sc20_splat_tocut_spectrum inserted on page \arabic{page}}
 \includegraphics[width=0.65\linewidth]{sc20_splat_cutregion_blank}
 \typeout{sc20_splat_cutregion inserted on page \arabic{page}}
-\caption[Adding a region to cut.]{\label{fig:splat_crop2}
-  Select the \splatthing{Add} button.}
+\caption[Select the crop button in SPLAT.]{\label{fig:splat_crop1}
+  Top: Select the cut button. Bottom: Select the \splatthing{Add} button.}
 \end{center}
 \end{figure}
+
 
 \item Click and drag the regions you wish to remove from the
 spectrum in the spectrum window. As we had a
@@ -3442,25 +3433,21 @@ second region to remove we click on the \splatthing{Add} button
 a second time. In this example we select the two noisy edge regions from the
 spectrum to remove. 
 
-\begin{figure}[h!]
-\begin{center}
-\includegraphics[width=0.7\linewidth]{sc20_splat_cutregion2}
-\typeout{sc20_splat_cutregion inserted on page \arabic{page}}
-\caption[Selected regions for removal.]{\label{fig:splat_crop3}
-  The two regions selected.}
-\end{center}
-\end{figure}
 
 \item Select the \splatthing{Remove selected button.}
 
 \begin{figure}[h!]
 \begin{center}
+\includegraphics[width=0.7\linewidth]{sc20_splat_cutregion2}
+\typeout{sc20_splat_cutregion inserted on page \arabic{page}}
 \includegraphics[width=0.65\linewidth]{sc20_splat_cutregion}
 \typeout{sc20_splat_cutregion2 inserted on page \arabic{page}}
-\caption[Removing regions.]{\label{fig:splat_crop4}
-  Selecting the \splatthing{remove selected} button.}
+\caption[Selected regions for removal.]{\label{fig:splat_crop2}
+  Top: The two regions selected. Bottom: remove the selected region
+  by clicking the \splatthing{remove selected} button.}
 \end{center}
 \end{figure}
+
 
 \item A new spectrum with the noisy edges removed will now appear
 in the main \splat\ window. Click on your newly created spectrum
@@ -3489,17 +3476,6 @@ to view.
 \item Click on \splatthing{Apply a filter to the current spectrum} button
 above the spectrum you wish to work on. This will open a new window.
 
-
-\begin{figure}[h!]
-\begin{center}
-\includegraphics[width=0.7\linewidth]{sc20_splat_rebin}
-\typeout{sc20_splat_rebin inserted on page \arabic{page}}
-\caption[Filter regions of a spectrum window.]{\label{fig:splat_rebin1}
-  The \splat\ \splatthing{Filter regions of a spectrum window}.}
-\end{center}
-\end{figure}
-
-
 \item Select the number of channels over which you want to 
 bin - this is the \splatthing{Width}.
 In this example the spectrum has a resolution of 0.055km/s. We
@@ -3512,10 +3488,13 @@ binned spectrum.
 
 \begin{figure}[h!]
 \begin{center}
+\includegraphics[width=0.6\linewidth]{sc20_splat_rebin}
+\typeout{sc20_splat_rebin inserted on page \arabic{page}}
 \includegraphics[width=0.7\linewidth]{sc20_splat_rebin2}
 \typeout{sc20_splat_rebin2 inserted on page \arabic{page}}
-\caption[The final rebinned spectrum.]{\label{fig:splat_rebin2}
-  The final rebinned spectrum. }
+\caption[Filter regions of a spectrum window.]{\label{fig:splat_rebin}
+  Top: The \splat\ \splatthing{Filter regions of a spectrum window}.
+  Bottom: The final rebinned spectrum.}
 \end{center}
 \end{figure}
 
@@ -3532,24 +3511,19 @@ binned spectrum.
 button above the spectrum you wish to work on. This will open a
 new window. 
 
-\begin{figure}[h!]
-\begin{center}
-\includegraphics[width=0.75\linewidth]{sc20_splat_stats}
-\typeout{sc20_splat_stats inserted on page \arabic{page}}
-\caption[Select the stats button.]{\label{fig:splat_stats1}
-  Select the stats button.}
-\end{center}
-\end{figure}
 
 \item Select \splatthing{Add} from the \splatthing{Regional
 statistics} region window.
 
 \begin{figure}[h!]
 \begin{center}
+\includegraphics[width=0.75\linewidth]{sc20_splat_stats}
+\typeout{sc20_splat_stats inserted on page \arabic{page}}
 \includegraphics[width=0.6\linewidth]{sc20_splat_stats1}
 \typeout{sc20_splat_stats1 inserted on page \arabic{page}}
-\caption[Select the button in statistics.]{\label{fig:splat_stats2}
-  Select the \splatthing{Add} button.}
+\caption[Select the stats button.]{\label{fig:splat_stats1}
+  Top: Select the stats button. Bottom: Select the \splatthing{Add}
+  button.}
 \end{center}
 \end{figure}
 
@@ -3612,27 +3586,19 @@ line strength and width.
 button above the spectrum you wish to work on. This will open a
 new window. 
 
-\begin{figure}[h!]
-\begin{center}
-\includegraphics[width=0.7\linewidth]{sc20_splat_fit1}
-\typeout{sc20_splat_fit1 inserted on page \arabic{page}}
-\caption[Select the SPLAT fit button.]{\label{fig:splat_fit1}
-  Select the spectral fitting button.}
-\end{center}
-\end{figure}
-
-
 \item Click on the \splatthing{Add} button in the
 \splatthing{Measure spectral lines} window. 
 
 
 \begin{figure}[h!]
 \begin{center}
+\includegraphics[width=0.7\linewidth]{sc20_splat_fit1}
+\typeout{sc20_splat_fit1 inserted on page \arabic{page}}
 \includegraphics[width=0.45\linewidth]{sc20_splat_fit2}
 \typeout{sc20_splat_fit2 inserted on page \arabic{page}}
-\caption[Click on the Measure spectral lines add button.]
-  {\label{fig:splat_fit2}
-  Click on the \splatthing{Add} button.}
+\caption[Select the SPLAT fit button.]{\label{fig:splat_fit1}
+  Top: Select the spectral fitting button. Bottom: Click on
+  the \splatthing{Add} button.}
 \end{center}
 \end{figure}
 
