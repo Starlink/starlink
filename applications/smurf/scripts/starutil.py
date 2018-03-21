@@ -180,6 +180,35 @@ def _rmcwd(path):
 
 
 
+def msg_log(text):
+   """
+
+   Write a string to the starutil log file, regardless of the current
+   log file information level ("glevel"). The name of the log file is
+   specified by the module variable "logfile".If "logfile" is unset,
+   it will default to "<script>.log" if the name of the executing
+   script is known, or to "starutil.log" otherwise.
+
+   Invocation:
+      msg_log(text)
+
+   Arguments:
+      text = string
+         The text to write to the log file.
+
+   """
+
+   global __logfd
+
+   if isinstance( text, bytes ):
+      text = text.decode("ascii","ignore")
+
+   __open_log_file()
+   __logfd.write(text+"\n")
+   __logfd.flush()
+   os.fsync(__logfd)
+
+
 def msg_out(text,level=PROGRESS):
    """
 
@@ -207,23 +236,19 @@ def msg_out(text,level=PROGRESS):
 
    global ilevel
    global glevel
-   global __logfd
    if isinstance( text, bytes ):
       text = text.decode("ascii","ignore")
+
    if level == DEBUG:
-      text = "debug> {0}".format(text)
+      text = "debug> "+text
 
    if level <= ilevel:
       fprint(text)
 
    if level <= glevel:
-      __open_log_file()
       if level <= ilevel:
-         __logfd.write(".  "+text+"\n")
-      else:
-         __logfd.write(text+"\n")
-      __logfd.flush()
-      os.fsync(__logfd)
+         text = ".  "+text
+      msg_log( text )
 
 def append_logfile(file):
    """

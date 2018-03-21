@@ -2128,15 +2128,15 @@ try:
                              pcamaskpar,obsdir,retain,skylog),
                              msg_level=starutil.PROGRESS,cmdscreen=False)
 
-#  Append the skyloop logfile output to the pol2map logfile.
             starutil.ilevel = old_ilevel
-            append_logfile( skylog )
             msg_out("\n--------------------------------------------------\n")
             msg_out("Back from skyloop...")
-            msg_out("Contents of skyloop logfile follows...")
+
+#  Append the skyloop logfile output to the pol2map logfile.
+            msg_log("Contents of skyloop logfile follows...")
             append_logfile( skylog )
-            msg_out("\n--------------------------------------------------\n")
-            msg_out("Back to pol2map...")
+            msg_log("\n--------------------------------------------------\n")
+            msg_log("Back to pol2map...")
 
 #  Modify the names of the observation maps so that they use the same scheme
 #  as those created by makemap below, and move them into the main maps
