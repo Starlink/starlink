@@ -399,7 +399,7 @@ opacity. In the example below, just the object name is extracted.
 \begin{terminalv}
 % fitslist file | grep OBJECT
 \end{terminalv}
-Likewise, if you know the name of the keyword you want to view you can
+Likewise, if you know the name of the keyword you want to view, you can
 use the \fitsval\ command instead, for instance
 \begin{terminalv}
 % fitsval file OBJECT
@@ -546,7 +546,7 @@ file in \gaia\ and change the built-in co-ordinates to PIXEL via
 \begin{tabular}{p{2.3cm}|p{7.3cm}|p{5cm}}
 \textbf{Command} & \textbf{Description} & \textbf{Usage}\\
 \hline
-\task{showme} & If you know the name of the Starlink document you want to view
+\task{showme} & If you know the name of the Starlink document you want to view,
                 use \task{showme}. When run, it launches a new web page or tab
                 displaying the hypertext version of the document. &
                 \texttt{\% showme sun95}\\
@@ -1798,7 +1798,7 @@ the raw files for observation 10.
 
 To save disk space and processing time you can specify the region of
 the spectra to be processed with \param{SPECBOUNDS}. If you know your
-line lies close to 0\kms\ you may chose to process only the central
+line lies close to 0\kms, you may chose to process only the central
 100\kms\ as in the example below.
 \begin{terminalv}
 %  makecube rawfile specbounds=\"-50.0 50.0\"
@@ -2758,10 +2758,10 @@ collapse in=reduced.sdf axis=skylat estimator=sum out=pv
 \end{terminalv}
 You can view your pv map with  \gaia\ or \display.
 
-To obtain a position-velocity map at an arbitrary angle there is a
+To obtain a position-velocity map at an arbitrary angle, there is a
 \xref{\textsc{pvslice}}{sun237}{pvslice} in the \datacube\ package.
 This can be invoked directly, or its recipe extracted from the
-\textsc{pvslice} script if you know the co-ordinates of the ends of
+\textsc{pvslice} script, if you know the co-ordinates of the ends of
 the slice and do not need the graphics.
 
 \section{\xlabel{channel}Creating channel maps}
@@ -3622,7 +3622,7 @@ to encompass the line for which you wish to calculate a fit for.
 \includegraphics[width=0.45\linewidth]{sc20_splat_fit4}
 \typeout{sc20_splat_fit4 inserted on page \arabic{page}}
 \caption[Getting the spectral line fit.]{\label{fig:splat_fit4}
-  In the \guiwindow{Measure spectral lines} window we see the both
+  In the \guiwindow{Measure spectral lines} window, we see the both
   the \guithing{Quick} fit (black dashed line) and the
   \guithing{Gaussian} fit (pink line) of the spectral line.}
 \end{center}
