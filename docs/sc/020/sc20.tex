@@ -3259,36 +3259,36 @@ over your HARP maps in \gaia.
 \chapter{\xlabel{gaia}Using SPLAT}
 \label{sec:splat}
 
-\splat\ is a graphical spectral-analysis tool. \splat\ offers tools for 
-further processing, fitting, or identification of spectral lines. 
+\splat\ is a graphical spectral-analysis tool. \splat\ offers tools for
+further processing, fitting, or identification of spectral lines.
 One can also plot different spectra in the same window and
-make publishable files. The Full \splat\ documentation can be found 
+make publishable files. The Full \splat\ documentation can be found
 here: \splatsun.
 
 \section{Opening a spectrum in SPLAT}
 \label{sec:splat-open}
 
-There are two options for opening up a spectrum in \splat. First it is 
-possible to send a spectrum to \splat\ using \gaia\ as described in 
+There are two options for opening up a spectrum in \splat. First it is
+possible to send a spectrum to \splat\ using \gaia\ as described in
 Section \ref{sec:gaiatosplat}. 
 
 Alternatively spectra can be displayed in directly in \splat\ using:
 
 \begin{terminalv}
-% splat filename
+% splat filename &
 \end{terminalv}
 
 for a single position cube or
 
 \begin{terminalv}
-% splat 'filename(xpos,ypos,)'
+% splat 'filename(xpos,ypos,)' &
 \end{terminalv}
 
 to display the spectrum at the pixel position (xpos,ypos). Or simply
 initialise \splat\ and open the file directly from the gui.
 
 \begin{terminalv}
-% splat 
+% splat  &
 \end{terminalv}
 
 When \splat\ is initially started you will get a main window appear
@@ -3401,7 +3401,7 @@ spectrum to remove.
 \includegraphics[width=0.65\linewidth]{sc20_splat_cutregion}
 \typeout{sc20_splat_cutregion2 inserted on page \arabic{page}}
 \caption[.]{\label{fig:splat_crop4}
-  Top: Selecting the cut button}
+  Selecting the \splatthing{remove selected} button}
 \end{center}
 \end{figure}
 
@@ -3422,6 +3422,49 @@ to view.
 \end{figure}
 
 \end{enumerate}
+
+\section{Rebinning a spectrum in SPLAT}
+\label{sec:splat-rebin}
+
+
+\begin{enumerate}[label=(\textbf{\arabic*})]
+
+\item Click on \splatthing{Apply a filter to the current spectrum} button
+above the spectrum you wish to work on. This will open a new window.
+
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{sc20_splat_rebin}
+\typeout{sc20_splat_rebin inserted on page \arabic{page}}
+\caption[.]{\label{fig:splat_rebin1}
+  The \splat\ \splatthing{Filter regions of a spectrum window}.}
+\end{center}
+\end{figure}
+
+
+\item Select the number of channels over which you want to 
+bin - this is the \splatthing{Width}.
+In this example the spectrum has a resolution of 0.055km/s. We
+bin by 18 channels to rebin the spectrum to 1km/s channels.
+
+\item Select \splatthing{Filter (replace)}. This will create a
+new spectrum in the main \splat\ window and will also replace the
+existing spectrum displayed in the spectral window with the new
+binned spectrum.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{sc20_splat_rebin2}
+\typeout{sc20_splat_rebin2 inserted on page \arabic{page}}
+\caption[.]{\label{fig:splat_rebin2}
+  The final spectrum. }
+\end{center}
+\end{figure}
+
+
+\end{enumerate}
+
 
 
 
