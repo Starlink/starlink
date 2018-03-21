@@ -501,7 +501,7 @@ The bounds are given in the co-ordinates of the data (Galactic for Axes
 the axes along with the pixel bounds of your data file by running
 \ndftrace. In the example above the ranges are 10.5$^\circ$ to
 10$^\circ$ in Longitude (note the range goes from left to right),
-0$^\circ$ to 0.25$^\circ$ in Latitude, and -25 to +25 km/s in
+0$^\circ$ to 0.25$^\circ$ in Latitude, and -25 to +25\kms\ in
 velocity. To leave an axis untouched simply include the comma but do
 not specify any bounds.
 
@@ -1798,8 +1798,8 @@ the raw files for observation 10.
 
 To save disk space and processing time you can specify the region of
 the spectra to be processed with \param{SPECBOUNDS}. If you know your
-line lies close to 0 km/s you may chose to process only the central
-100 km/s as in the example below.
+line lies close to 0\kms\ you may chose to process only the central
+100\kms\ as in the example below.
 \begin{terminalv}
 %  makecube rawfile specbounds=\"-50.0 50.0\"
 \end{terminalv}
@@ -2132,7 +2132,7 @@ See \kappasun\ for a full list.
 
 The example below includes the options \param{low} and \param{high}
 which can be specified to limit the range over which the cube is
-collapsed on the given axis (in this case from $-5$\,km/s to $+10$\,km/s).
+collapsed on the given axis (in this case from $-5$\kms\ to $+10$\kms).
 The \param{variance} flag indicates the variance array should be used
 to define weights and generate an output variance. The option
 \param{wlim} sets the fraction of pixels that must be `good' in the
@@ -2250,7 +2250,7 @@ leaving it unchanged.
 \param{mode=factors} is the default setting so it was not specified in
 the example above. The example below however, uses
 \param{mode=pixelscale} to define a pixel size for the third axis;
-here the spectra are rebinned into 2\,km/s channels.
+here the spectra are rebinned into 2\kms\ channels.
 \begin{terminalv}
 % sqorst in=map out=resamplemap mode=pixelscale pixscale=2 axis=3
 \end{terminalv}
@@ -2600,7 +2600,7 @@ detector.
 \end{terminalv}
 
 The simplest way to sum the flux across a line run \stats\ over a chosen
-spectral range, such as $-5$ km/s to 7.2 km/s.
+spectral range, such as $-5$\kms\ to 7.2\kms.
 
 \begin{terminalv}
 % stats cube_H01"(,,-5.0:7.2)"
@@ -3381,7 +3381,7 @@ Then click \guithing{Apply}.
 \includegraphics[width=0.7\linewidth]{sc20_splat_spectrum_units3}
 \typeout{sc20_splat_spectrum_units3 inserted on page \arabic{page}}
 \caption[Changing the units via the drop down menu.]{\label{fig:splat_units2}
-  Changing the units of the spectrum via the drop down menu to km/s.}
+  Changing the units of the spectrum via the drop down menu to \kms.}
 \end{center}
 \end{figure}
 
@@ -3392,8 +3392,8 @@ displayed in \guithing{Radio Velocity (km/s)}.
 \begin{center}
 \includegraphics[width=0.9\linewidth]{sc20_splat_spectrum_units4}
 \typeout{sc20_splat_spectrum_units4 inserted on page \arabic{page}}
-\caption[Spectrum with units of km/s.]{\label{fig:splat_units3}
-  Spectrum with units of km/s.}
+\caption[Spectrum with units of \kms.]{\label{fig:splat_units3}
+  Spectrum with units of \kms.}
 \end{center}
 \end{figure}
 
@@ -3475,8 +3475,8 @@ above the spectrum you wish to work on. This will open a new window.
 
 \item Select the number of channels over which you want to 
 bin - this is the \guithing{Width}.
-In this example the spectrum has a resolution of 0.055km/s. We
-bin by 18 channels to rebin the spectrum to 1km/s channels.
+In this example the spectrum has a resolution of 0.055\kms. We
+bin by 18 channels to rebin the spectrum to 1\kms\ channels.
 
 \item Select \guithing{Filter (Replace)}. This will create a
 new spectrum in the main \splat\ window and will also replace the
@@ -3805,10 +3805,10 @@ the moments map.
 \item MOMENTS:  Which moments maps to create (\param{integ}/\param{iwc}/\param{itd})
 \param{[integ]}
 
-\item MOMENTS\_LOWER: An optional lower velocity in km/s, below which
+\item MOMENTS\_LOWER: An optional lower velocity in \kms, below which
 no data will be used when creating the moments map.  \param{[undef]}
 
-\item MOMENTS\_UPPER: An optional upper velocity in km/s, above which
+\item MOMENTS\_UPPER: An optional upper velocity in \kms, above which
 no data will be used when creating the moments map. \param{[undef]}
 
 \item MOMENTS\_SNR: Whether or not to do clump detection on an
@@ -4246,8 +4246,8 @@ override the text label size which is too big for these axes labels.
 \end{center}
 \end{figure}
 
-\item Re-plot, but this time only show the velocity range 10 to 35
-km/s. You can do it this way:
+\item Re-plot, but this time only show the velocity range 10 to 35\kms.
+You can do it this way:
 \begin{terminalv}
 % linplot "cube(60.87,0.18,-10:50)"  style="'^style.dat,size(textlab)=1'" \
   mode=histogram
@@ -4304,7 +4304,7 @@ The plus sign means the change will not be remembered next time
 \end{terminalv}
 
 This example plots a grid of 5$\times$4 pixels around $l$=61.\udeg06
-and $b$=0.\udeg15. Each spectrum has a range of 10 to 30 km/s.  Note
+and $b$=0.\udeg15. Each spectrum has a range of 10 to 30\kms.  Note
 the decimal points are necessary for the spectral limits, otherwise
 the spectrum would extend from pixel co-ordinates 10 to 30.  The
 \param{specstyle} option allows you to format the spectral axes inside
@@ -4736,7 +4736,7 @@ BASELINE\_LINEARITY\_CLIP & This is used to reject receptors that have non-linea
 
 BASELINE\_LINEARITY\_LINEWIDTH  & This is used to reject receptors that have non-linear
                                   baselines.  It is the extent of the source spectral
-                                  line measured in km/s, which is excluded from the
+                                  line measured in \kms, which is excluded from the
                                   non-linearity tests.\\
 
 BASELINE\_LINEARITY\_MINRMS & This is used to retain receptors that have noisy or
