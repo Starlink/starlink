@@ -511,6 +511,7 @@ from starutil import NDG
 from starutil import Parameter
 from starutil import ParSys
 from starutil import msg_out
+from starutil import msg_log
 from starutil import append_logfile
 from starutil import AtaskError
 from starutil import get_fits_header
