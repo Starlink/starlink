@@ -106,7 +106,7 @@
 
       CHARACTER*(DAT__SZLOC) FILOC    ! HDS file locator
 
-      CHARACTER*200 GLONAM            ! expanded GLOBAL association name
+      CHARACTER*1000 GLONAM            ! expanded GLOBAL association name
 
       CHARACTER*(DAT__SZLOC) BOTLOC   ! HDS locator
 

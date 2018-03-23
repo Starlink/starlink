@@ -206,14 +206,14 @@
       INTEGER FLEN               ! Length of total string to append
       CHARACTER*(DAT__SZLOC) FLOC ! Locator the parameter file
       LOGICAL IFC                ! TRUE if .IFC found (not used)
-      CHARACTER*128 IFNAME       ! Name of interface module (not used)
+      CHARACTER*1024 IFNAME       ! Name of interface module (not used)
       INTEGER IPAR               ! SUBPAR pointer to the parameter
       CHARACTER*(MXGEX) GRPEXP   ! The total group expression
       INTEGER NC                 ! No. of characters in GRPEXP so far
       INTEGER NCP                ! No. of characters in PGRPEX so far
       INTEGER NEXP               ! No. of group expressions obtained
       INTEGER PARLEN             ! Length of parameter name
-      CHARACTER*128 PFNAME       ! Name of parameter file
+      CHARACTER*1024 PFNAME       ! Name of parameter file
       INTEGER PLEN               ! Length of persistent value to append
       CHARACTER*(MXGEX) PGRPEX   ! Persistent group expression
       CHARACTER*(DAT__SZLOC) PLOC ! Locator top-level of parameter file

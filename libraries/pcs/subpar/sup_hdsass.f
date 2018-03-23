@@ -129,7 +129,7 @@
 
 
 *  Local Variables:
-      CHARACTER*200 GLONAM           ! expanded GLOBAL association name
+      CHARACTER*1000 GLONAM          ! expanded GLOBAL association name
 
       CHARACTER*(DAT__SZLOC) ASSLOC  ! top-level locator to global
                                      ! association file

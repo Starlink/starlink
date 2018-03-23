@@ -125,7 +125,7 @@
 
       INTEGER NUMLEVS               ! number of levels in structure-name
 
-      CHARACTER*256 FILENAME        ! name of container-file
+      CHARACTER*1024 FILENAME        ! name of container-file
 
       CHARACTER*(DAT__SZLOC) TOPLOC ! temporary locator
 

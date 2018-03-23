@@ -127,9 +127,11 @@
 
 
 *  Local Variables:
+
       CHARACTER*1000 FILENAME              ! name of VMS container file
 
       CHARACTER*1000 FULNAM                ! expanded filename
+
 
       INTEGER NAMLEN                       ! used length of FULNAM
 
