@@ -309,7 +309,80 @@ iterations due to the instability in the map-making algorithm.
 \end{enumerate}
 
 The above two methods can be used together by supplying \texttt{TRUE}
-values for both \param{OBSWEIGHT} and \param{SKYLOOP}.
+values for both \param{OBSWEIGHT} and \param{SKYLOOP}.  Using
+\task{skyloop} to produce the co-add usually requires more time and
+disk space. Therefore it is usually advisable to restrict its usage within
+\task{pol2map} to the external-masking phase that produces the final
+required maps - that is, Steps~2 and 3 as described above. The
+\param{OBSWEIGHT} parameter can generally be used on all steps as it adds
+little to the time taken to run \task{pol2map}.
 
+The following panels show the effects of using \param{SKYLOOP}. and
+\param{OBSWEIGHT} on a total intensity mosaic of 21 observations. All
+data value maps are shown with a single scaling, and all standard
+deviation maps are shown with a single scaling (different to the scaling
+for the data value maps):
+
+\newlength{\picwid}
+\latexhtml{\setlength{\picwid}{0.3\linewidth}}{\setlength{\picwid}{0.9\linewidth}}
+
+\vspace{5mm}
+\begin{tabular}{|ccc|}
+\hline
+\multicolumn{3}{|c|}{\textbf{SKYLOOP=no OBSWEIGHT=no}} \\
+Data value & Std. Dev. (MAPVAR=no) & Std. Dev. (MAPVAR=yes) \\
+\includegraphics[width=\picwid]{tailoring/i1.png} &
+\includegraphics[width=\picwid]{tailoring/sqvar1.png} &
+\includegraphics[width=\picwid]{tailoring/disp1.png} \\
+\hline
+\end{tabular}
+
+\vspace{5mm}
+\begin{tabular}{|ccc|}
+\hline
+\multicolumn{3}{|c|}{\textbf{SKYLOOP=no OBSWEIGHT=yes}} \\
+Data value & Std. Dev. (MAPVAR=no) & Std. Dev. (MAPVAR=yes) \\
+\includegraphics[width=\picwid]{tailoring/i2.png} &
+\includegraphics[width=\picwid]{tailoring/sqvar2.png} &
+\includegraphics[width=\picwid]{tailoring/disp2.png} \\
+\hline
+\end{tabular}
+
+\vspace{5mm}
+\begin{tabular}{|ccc|}
+\hline
+\multicolumn{3}{|c|}{\textbf{SKYLOOP=yes OBSWEIGHT=no}} \\
+Data value & Std. Dev. (MAPVAR=no) & Std. Dev. (MAPVAR=yes) \\
+\includegraphics[width=\picwid]{tailoring/i3.png} &
+\includegraphics[width=\picwid]{tailoring/sqvar3.png} &
+\includegraphics[width=\picwid]{tailoring/disp3.png} \\
+\hline
+\end{tabular}
+
+\vspace{5mm}
+\begin{tabular}{|ccc|}
+\hline
+\multicolumn{3}{|c|}{\textbf{SKYLOOP=yes OBSWEIGHT=yes}} \\
+Data value & Std. Dev. (MAPVAR=no) & Std. Dev. (MAPVAR=yes) \\
+\includegraphics[width=\picwid]{tailoring/i4.png} &
+\includegraphics[width=\picwid]{tailoring/sqvar4.png} &
+\includegraphics[width=\picwid]{tailoring/disp4.png} \\
+\hline
+\end{tabular}
+
+\vspace{5mm}
+
+For comparison, below are the equivalent auto-masked maps made by Step~1:
+
+\vspace{5mm}
+\begin{tabular}{|ccc|}
+\hline
+\multicolumn{3}{|c|}{\textbf{Step 1 - auto-masked co-add (SKYLOOP=no OBSWEIGHT=no)}} \\
+Data value & Std. Dev. (MAPVAR=no) & Std. Dev. (MAPVAR=yes) \\
+\includegraphics[width=\picwid]{tailoring/i5.png} &
+\includegraphics[width=\picwid]{tailoring/sqvar5.png} &
+\includegraphics[width=\picwid]{tailoring/disp5.png} \\
+\hline
+\end{tabular}
 
 
