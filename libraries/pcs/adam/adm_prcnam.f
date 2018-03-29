@@ -90,7 +90,7 @@
       EXTERNAL STRING_IANYR
 
 *  Local Variables:
-      CHARACTER*1024 ARGV0
+      CHARACTER*256 ARGV0
       INTEGER STNM         ! Start of command name
 
 *.

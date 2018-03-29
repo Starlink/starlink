@@ -70,4 +70,4 @@
       PARAMETER ( SUBPAR__MAXLIMS = 1500 )
 
       INTEGER SUBPAR__STRLEN           ! size of Character values
-      PARAMETER ( SUBPAR__STRLEN = 1024 )
+      PARAMETER ( SUBPAR__STRLEN = 256 )

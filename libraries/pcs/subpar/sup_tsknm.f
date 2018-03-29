@@ -115,9 +115,9 @@
       INTEGER STRING_IANYR       ! Index search backwards
 
 *  Local Variables:
-      CHARACTER*(1024) ARGV0     ! Argument 0 of command
-      CHARACTER*(1024) EXENAM    ! Full executable image name
-      CHARACTER*(1024) ADMUSR    ! ADAM_USER directory
+      CHARACTER*(256) ARGV0      ! Argument 0 of command
+      CHARACTER*(256) EXENAM     ! Full executable image name
+      CHARACTER*(256) ADMUSR     ! ADAM_USER directory
       INTEGER EXELEN             ! Used length of EXENAM
       INTEGER AULEN              ! Length of ADAM_USER directory name
       INTEGER STNM               ! Start of file name in description

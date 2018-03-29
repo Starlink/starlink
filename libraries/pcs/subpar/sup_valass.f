@@ -114,7 +114,7 @@
       INTEGER CHR_LEN              ! used length of string
 
 *  Local Variables:
-      CHARACTER*1000 GLONAM                ! expanded GLOBAL association name
+      CHARACTER*200 GLONAM                 ! expanded GLOBAL association name
       CHARACTER*(DAT__SZLOC) ASSLOC        ! HDS locator (temporary)
       CHARACTER*(DAT__SZLOC) BOTLOC        ! HDS locator (temporary)
       CHARACTER*(DAT__SZLOC) LOC   ! Locator to data structure

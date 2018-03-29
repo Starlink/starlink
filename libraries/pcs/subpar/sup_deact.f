@@ -195,16 +195,12 @@
       INTEGER J                        ! parameter counter
       INTEGER K                        ! action counter
       INTEGER KSTART, KEND             ! action counter limits
-
       CHARACTER*1000 ADMUSR            ! definition of ADAM_USER directory
-
       INTEGER AULEN                    ! used length of ADMUSR
-      CHARACTER*1024 GLOBNAME            ! name of global association
+      CHARACTER*80 GLOBNAME            ! name of global association
       INTEGER NUMLEVS                  ! number of levels in globname
       CHARACTER*15 COMPONENT(16)       ! GLOBNAME split into components
-
       CHARACTER*1000 FILENAME          ! container file for GLOBNAME
-
       INTEGER NAMLEN                   ! used length of FILENAME
       LOGICAL THERE                    ! return from DAT_THERE
       LOGICAL STARTED                  ! .FALSE. => global store not yet

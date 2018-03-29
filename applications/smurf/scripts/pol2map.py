@@ -795,7 +795,7 @@ def PointingCorrections( qui_maps, imap, use_ref_for_alignment, ref ):
          invoke("$KAPPA_DIR/stats ndf={0}".format(qui_maps[key]))
          mean = float( get_task_par( "mean", "stats" ) )
          aligner = NDG(1)
-         invoke( "$KAPPA_DIR/maths exp=\"'qif((ia.ge.pa),ib,<bad>)'\" "
+         invoke( "$KAPPA_DIR/maths exp=\"'qif((ia.ge.pa),ib,<bad>'\" "
                  "ia={0}.more.smurf.exp_time ib={0} pa={1} out={2}".
                  format(qui_maps[key],mean,aligner) )
       else:

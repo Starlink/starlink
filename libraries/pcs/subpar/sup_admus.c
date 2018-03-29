@@ -79,8 +79,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define MAX_LEN 1000
-
 F77_SUBROUTINE(subpar_admus)( CHARACTER(admus), INTEGER(aulen), INTEGER(status)
                            TRAIL(admus) )
 {
@@ -88,8 +86,9 @@ GENPTR_CHARACTER(admus)
 GENPTR_INTEGER(aulen)
 GENPTR_INTEGER(status)
 
-char buffer[MAX_LEN + 1];
+char buffer[200];
 char *tmp;
+char output[201];
 int *nchars;
 struct stat statb;
 
@@ -100,27 +99,7 @@ struct stat statb;
  *  If it didn't work, use ~/adam
  */
    if ( ( tmp = getenv( "ADAM_USER" ) ) != NULL ) {
-      if( strlen( tmp ) > MAX_LEN ) {
-         *status = SAI__ERROR;
-         emsRep("ADMUS1",
-                "Failed to create ADAM_USER directory", status );
-         emsSetnc("PATH", tmp, EMS__SZTOK);
-         emsSeti( "N", MAX_LEN );
-         emsRep("ADMUS2", "Directory path is too long - exceeds limit of "
-                "^N characters set in subpar_admus.c", status );
-         tmp = NULL;
-      } else if( strlen( tmp ) > admus_length ) {
-         *status = SAI__ERROR;
-         emsRep("ADMUS1",
-                "Failed to create ADAM_USER directory", status );
-         emsSetnc("PATH", tmp, EMS__SZTOK);
-         emsSeti( "N", admus_length );
-         emsRep("ADMUS2", "Directory path is too long - exceeds length of buffer "
-                "(^N characters) supplied to subpar_admus.c", status );
-         tmp = NULL;
-      } else {
-         strcpy( buffer, tmp );
-      }
+      strcpy( buffer, tmp );
    } else if ( ( tmp = getenv( "HOME" ) ) != NULL ) {
       strcpy( buffer, tmp );
       strcat( buffer, "/adam" );
@@ -170,7 +149,4 @@ struct stat statb;
       emsRep("ADMUS3","Failed to create ADAM_USER directory",status);
       emsRep("ADMUS4", "Neither $ADAM_USER nor $HOME are defined", status);
    }
-
-/* If an error has occurred, return ero string length */
-   if( *status != SAI__OK ) *aulen = 0;
 }

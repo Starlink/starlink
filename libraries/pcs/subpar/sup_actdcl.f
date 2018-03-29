@@ -132,8 +132,8 @@
 *  External References:
 
 *  Local Variables:
-      CHARACTER*1024 PFNAM                  ! name task parameter file
-      CHARACTER*1024 IFNAM                  ! name of interface module
+      CHARACTER*128 PFNAM                  ! name task parameter file
+      CHARACTER*128 IFNAM                  ! name of interface module
       INTEGER ISTAT                        ! internal status
       LOGICAL IFC                          ! TRUE if .IFC found
       LOGICAL THERE                        ! check for existence of HDS
