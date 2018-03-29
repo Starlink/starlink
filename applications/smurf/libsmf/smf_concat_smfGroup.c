@@ -243,9 +243,11 @@
  *     2014-01-31 (DSB):
  *        Ensure it is safe to supply a NULL value for config.
  *     2018-03-15 (DSB):
- *        Read existing model data from NDFs stored in the directory specified 
- *        by the config parameter "dumpdir", rather than from the current 
+ *        Read existing model data from NDFs stored in the directory specified
+ *        by the config parameter "dumpdir", rather than from the current
  *        directory.
+ *     2018-03-29 (DSB):
+*         Use dumpdir value if "config" is NULL.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -396,12 +398,14 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
 
   /* Get the path to the directory in which to place exported models
      etc. Ensure its end with "/"  */
-  tempstr = NULL;
-  astMapGet0C( config, "DUMPDIR", &tempstr );
-  if( tempstr ) {
-     size_t clen = strlen( tempstr );
-     dumpdir = astStore( NULL, tempstr, clen + 2 );
-     if( dumpdir[clen-1] != '/' ) strcpy( dumpdir + clen, "/" );
+  if( config ) {
+     tempstr = NULL;
+     astMapGet0C( config, "DUMPDIR", &tempstr );
+     if( tempstr ) {
+        size_t clen = strlen( tempstr );
+        dumpdir = astStore( NULL, tempstr, clen + 2 );
+        if( dumpdir[clen-1] != '/' ) strcpy( dumpdir + clen, "/" );
+     }
   }
 
   /* How many threads do we get to play with */
