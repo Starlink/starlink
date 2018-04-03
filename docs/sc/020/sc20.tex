@@ -3308,27 +3308,39 @@ and also a spectral window.
 \label{sec:splat-synopsis}
 
 When you initially open a specrum in \splat\ the synopsis of that spectrum
-will automatically be overlaid on the spectrum displayed.
+will automatically be overlaid on the spectrum displayed, if the metadata are
+known to \splat. The following are a list of possible properties
+than can be displayed, with a brief description. Names in parenthesis
+are either the FITS keywords or AST attributes used to obtain the values.
 
 \begin{enumerate}
-\item  Name
-\item  Telescope
-\item  Object
-\item  Date obs
-\item  Elevation
-\item  Exposure
-\item  Coords sys
-\item  Spec position
-\item  Src position
-\item  Offset
-\item  Doppler RA Dec
-\item  SourceVel
-\item  SourceVRF
-\item  StdOfRest
-\item  RestFreq
-\item  ImageFreq
-\item  Channel spacing
-\item  Number of channels
+\item  Name: the short name
+\item  Telescope: telescope, instrument and it’s backend (TELESCOP/INSTRUME/BACKEND)
+\item  Object: target, molecule and molecular transition being observed (OBJECT/MOLECULE/TRANSITI)
+\item  Date obs: date of the observation (DATE−OBS or Epoch in UTC)
+\item  Elevation: observatory elevation (ELSTART or 0.5 * (ELSTART+ELEND))
+\item  Exposure: exposure time for the spectrum (EXTIME).
+\item  Exposure (median): exposure time for the spectrum (EXP_TIME).
+\item  Exposure (elapsed): the time elapsed during exposure (INT_TIME otherwise DATE-END − DATE-OBS)
+\item  Exposure (effective): effective exposure time (EXEFFT)
+\item  Coords sys: the coordinate system code (System)
+\item  Spec position: position of spectrum on the sky (EXRAX, EXDECX)
+\item  Src position: position of the observation centre (EXRRA, EXRDEC)
+\item  Img centre: centre of the originating image (EXRA, EXDEC)
+\item  Offset: offset of spectrum from observation centre (EXRRAOF, EXRDECOF or EXRAOF, EXDECOF)
+\item  Doppler RA Dec: reference position (RefRA,RefDec)
+\item  SourceVel: source velocity (SourceVel)
+\item  SourceVRF: source velocity reference frame (SourceVRF)
+\item  SourceSys: system of the source velocity (SourceSys)
+\item  StdOfRest: standard of rest (StdOfRest)
+\item  RestFreq: rest frequency (RestFreq
+\item  ImageFreq: image sideband equivalent of the rest frequency (ImagFreq)
+\item  Channel spacing: channel spacing (derived value)
+\item  Number of channels: Number of coordinate positions
+\item  TSYS: system temperature (TSYS).
+\item  TSYS (median): median system temperature (MEDTSYS).
+\item  TSYS (est): system temperature (derived value, see region statistics window).
+\item  TRX: receiver temperature (TRX)
 \end{enumerate}
 
 To show or remove the synopsis of a spectrum simply click on the
