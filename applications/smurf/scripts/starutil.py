@@ -224,7 +224,8 @@ def msg_out(text,level=PROGRESS):
 
    Arguments:
       text = string
-         The text to display.
+         The text to display. Can be any object that can be converted to
+         text using str().
       level = integer
          The message will be displayed on the screen if "level" is less
          than or equal to the current value of "starutil.ilevel". It
@@ -239,6 +240,7 @@ def msg_out(text,level=PROGRESS):
    if isinstance( text, bytes ):
       text = text.decode("ascii","ignore")
 
+   text = str(text)
    if level == DEBUG:
       text = "debug> "+text
 
