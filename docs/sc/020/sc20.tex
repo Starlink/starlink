@@ -3315,32 +3315,37 @@ are either the FITS keywords or AST attributes used to obtain the values.
 
 \begin{enumerate}
 \item  Name: the short name
-\item  Telescope: telescope, instrument and it’s backend (TELESCOP/INSTRUME/BACKEND)
-\item  Object: target, molecule and molecular transition being observed (OBJECT/MOLECULE/TRANSITI)
-\item  Date obs: date of the observation (DATE−OBS or Epoch in UTC)
-\item  Elevation: observatory elevation (ELSTART or 0.5 * (ELSTART+ELEND))
-\item  Exposure: exposure time for the spectrum (EXTIME).
-\item  Exposure (median): exposure time for the spectrum (EXP_TIME).
-\item  Exposure (elapsed): the time elapsed during exposure (INT_TIME otherwise DATE-END − DATE-OBS)
-\item  Exposure (effective): effective exposure time (EXEFFT)
-\item  Coords sys: the coordinate system code (System)
-\item  Spec position: position of spectrum on the sky (EXRAX, EXDECX)
-\item  Src position: position of the observation centre (EXRRA, EXRDEC)
-\item  Img centre: centre of the originating image (EXRA, EXDEC)
-\item  Offset: offset of spectrum from observation centre (EXRRAOF, EXRDECOF or EXRAOF, EXDECOF)
-\item  Doppler RA Dec: reference position (RefRA,RefDec)
-\item  SourceVel: source velocity (SourceVel)
-\item  SourceVRF: source velocity reference frame (SourceVRF)
-\item  SourceSys: system of the source velocity (SourceSys)
-\item  StdOfRest: standard of rest (StdOfRest)
-\item  RestFreq: rest frequency (RestFreq
-\item  ImageFreq: image sideband equivalent of the rest frequency (ImagFreq)
+\item  Telescope: telescope, instrument and its backend
+       (\param{TELESCOP}/\param{INSTRUME}/\param{BACKEND})
+\item  Object: target, molecule and molecular transition being
+       observed (\param{OBJECT}/\param{MOLECULE}/\param{TRANSITI})
+\item  Date obs: date of the observation (\param{DATE-OBS} or \att{Epoch} in UTC)
+\item  Elevation: observatory elevation (\param{ELSTART} or
+       $0.5 * $(\param{ELSTART}$+$\param{ELEND}))
+\item  Exposure: exposure time for the spectrum (\param{EXTIME})
+\item  Exposure (median): exposure time for the spectrum (\param{EXP\_TIME})
+\item  Exposure (elapsed): the time elapsed during exposure (\param{INT\_TIME}
+       otherwise \param{DATE-END} $-$ \param{DATE-OBS})
+\item  Exposure (effective): effective exposure time (\param{EXEFFT})
+\item  Coords sys: the co-ordinate system code (\att{System})
+\item  Spec position: position of spectrum on the sky (\param{EXRAX}, \param{EXDECX})
+\item  Src position: position of the observation centre (\param{EXRRA}, \param{EXRDEC})
+\item  Img centre: centre of the originating image (\param{EXRA}, \param{EXDEC})
+\item  Offset: offset of spectrum from the observation centre
+       (\param{EXRRAOF}, \param{EXRDECOF} or \param{EXRAOF}, \param{EXDECOF})
+\item  Doppler RA Dec: reference position (\att{RefRA},\att{RefDec})
+\item  SourceVel: source velocity (\att{SourceVel})
+\item  SourceVRF: source velocity reference frame (\att{SourceVRF})
+\item  SourceSys: system of the source velocity (\att{SourceSys})
+\item  StdOfRest: standard of rest (\att{StdOfRest})
+\item  RestFreq: rest frequency (\att{RestFreq}
+\item  ImageFreq: image sideband equivalent of the rest frequency (\att{ImagFreq})
 \item  Channel spacing: channel spacing (derived value)
-\item  Number of channels: Number of coordinate positions
-\item  TSYS: system temperature (TSYS).
-\item  TSYS (median): median system temperature (MEDTSYS).
-\item  TSYS (est): system temperature (derived value, see region statistics window).
-\item  TRX: receiver temperature (TRX)
+\item  Number of channels: Number of co-ordinate positions
+\item  TSYS: system temperature (\param{TSYS})
+\item  TSYS (median): median system temperature (\param{MEDTSYS})
+\item  TSYS (est): system temperature (derived value)
+\item  TRX: receiver temperature (\param{TRX})
 \end{enumerate}
 
 To show or remove the synopsis of a spectrum simply click on the
