@@ -2826,7 +2826,19 @@ a textual format developed by the IVOA for describing regions within
 a WCS---\htmladdnormallink{see here for
 details.}{http://www.ivoa.net/Documents/latest/STC-S.html}.
 The STC-S descriptions are added as extra columns to the output catalogue.
-\vspace{0.7cm}\\
+\vspace{0.7cm}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{sc20_clumps}
+\typeout{sc20_clumps inserted on page \arabic{page}}
+\caption[A velocity slice of the result of three-dimensional clump finding
+viewed with \gaia.]{\label{fig:clumps2}
+  A velocity slice of the result of three-dimensional clump finding viewed
+  with \gaia. This output NDF contains boundaries of the clumps, with the
+  value reflecting the number of pixels contained within that clump.}
+\end{center}
+\end{figure}
+
 \begin{aligndesc}
 \item[\textbf{Polygon}]
 Each polygon will have, at most, 15 vertices. For two-dimensional data
@@ -2848,19 +2860,6 @@ the clump shape.
 
 You can plot the clump outlines over an image using \gaia. See Section
 \ref{sec:plotclumps} for instructions.
-
-\vspace{0.7cm}
-\begin{figure}[h!]
-\begin{center}
-\includegraphics[width=0.7\linewidth]{sc20_clumps}
-\typeout{sc20_clumps inserted on page \arabic{page}}
-\caption[A velocity slice of the result of three-dimensional clump finding
-viewed with \gaia.]{\label{fig:clumps2}
-  A velocity slice of the result of three-dimensional clump finding viewed
-  with \gaia. This output NDF contains boundaries of the clumps, with the
-  value reflecting the number of pixels contained within that clump.}
-\end{center}
-\end{figure}
 
 
 
