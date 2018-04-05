@@ -2863,6 +2863,70 @@ viewed with \gaia.]{\label{fig:clumps2}
 \end{figure}
 
 
+
+\section{\xlabel{telluricsplat}Using SPLAT to identify telluric emission}
+\label{sec:telluricsplat}
+
+Occasionally you may see unexpected emission within your data. An example
+is shown in Figure \ref{fig:telluric1}. In this figure we use the average
+spectrum feature (see Section \ref{sec:gaiaaverage} -- and in this example
+ -- we see expected bright emission around 7 km/s. In addition to the
+expected bright emission we see some faint emission around -30 km/s.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{sc20_splat_spectrum_example_telluric1.png}
+\typeout{sc20_splat_spectrum_example_telluric1 inserted on page \arabic{page}}
+\caption[An example of unexpected emission seen in \gaia.]{\label{fig:telluric1}
+  An example of a spectrum with bright expected emission around 7 km/s and
+unexpected emission around -30 km/s. The data are displayed using
+\gaia.}
+\end{center}
+\end{figure}
+
+We can use \splat to investigate this emission further (see Section \ref{sec:gaiatosplat}
+on how to open up a spectrum in \splat\).
+
+\begin{figure}[hc!]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{sc20_splat_spectrum_example_telluric2.png}
+\typeout{sc20_splat_spectrum_example_telluric2 inserted on page \arabic{page}}
+\caption[blah]{\label{fig:telluric2}
+  Displaying a channel map with \gaia.}
+\end{center}
+\end{figure}
+
+It is possible to use \splat to change the units to \guithing{Standard of rest: Observer}
+by first going to \guithing{Analysis} and clicking on \guithing{Change units}.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{sc20_splat_spectrum_example_telluric3.png}
+\includegraphics[width=0.7\linewidth]{sc20_splat_spectrum_example_telluric4.png}
+\typeout{sc20_splat_spectrum_example_telluric3 and 4 inserted on page \arabic{page}}
+\caption[blah]{\label{fig:telluric3}
+  Select \guithing{Observer} from the \guithing{Standard of rest} Menue and select
+\guithing{Apply}.}
+\end{center}
+\end{figure}
+
+We then use the drop down menue next to \guithing{Standard of rest} to select
+\guithing{Observer} from the list, and select \guithing{Apply}.
+
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{sc20_splat_spectrum_example_telluric5.png}
+\typeout{sc20_splat_spectrum_example_telluric5 inserted on page \arabic{page}}
+\caption[blah]{\label{fig:telluric4}
+  Spectrum from the observer rest frame. We see the unexpected line is found at 0 km/s
+and is likely telluric contamination.}
+\end{center}
+\end{figure}
+
+Now we see the unexpected line is at 0 km/s and is therfore likely to be
+contamination from telluric lines.
+
 \clearpage
 \chapter{\xlabel{gaia}Using GAIA}
 \label{sec:gaia}
