@@ -497,6 +497,8 @@
 *        Added SKYLOOP parameter.
 *     13-MAR-2018 (DSB):
 *        Added parameter OBSWEIGHT.
+*     9-APR-2018 (DSB):
+*        Avoid infinite findclumps loop if no emission found in supplied mask.
 
 '''
 
@@ -1642,6 +1644,10 @@ try:
             try:
                invoke("$KAPPA_DIR/stats ndf={0}".format(astmask))
                ngood = float( get_task_par( "numgood", "stats" ) )
+               if ngood < 5:
+                  raise starutil.InvalidParameterError( "No significant emission "
+                               "found in total intensity map {0} supplied for "
+                               "parameter MASK".format(maskmap))
             except starutil.AtaskError:
                raise starutil.InvalidParameterError( "No significant emission "
                                "found in total intensity map {0} supplied for "
@@ -1679,6 +1685,10 @@ try:
             except starutil.AtaskError:
                ngood = 0
                pcamask = None
+               msg_out( "WARNING - No significant emission found in total "
+                        "intensity map {0} supplied for parameter MASK - "
+                        "shall proceed without PCA masking.".format(maskmap))
+               break
 
             if ngood < maxgood:
                break
