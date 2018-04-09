@@ -38,6 +38,11 @@
 *
 *     An error is reported if POL2 data from more than one waveband (450
 *     or 850) is present in the list of supplied data files.
+*
+*     By default, an error is also reported if POL2 data for more than
+*     one object is present in the list of supplied data files (this check
+*     can be disabled by setting parameter MULTIOBJECT to TRUE). The object
+*     is given by FITS header "OBJECT".
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -81,6 +86,12 @@
 *        sub-scans. Each line will start with the sub-array name and be
 *        followed by a space spearated list of sub-scan identifiers.
 *        For instance, "S8A: _0012 _0034".
+*     MULTIOBJECT = _LOGICAL (Read)
+*        Indicates if it is acceptable for the list of input files to
+*        include data for multiple objects. If FALSE, an error is reported
+*        if data for more than one object is specified by parameter IN.
+*        Otherwise, no error is reported if multiple objects are found.
+*        [FALSE]
 *     RAWFILE = LITERAL (Read)
 *        The name of a text file to create containing the paths to the
 *        input NDFs that hold raw analysed intensity POL-2 time-series
@@ -141,6 +152,8 @@
 *        if the input file list contained data for only one observation.
 *     31-MAR-2017 (DSB):
 *        Add support for 450 um data.
+*     9-APR-2018 (DSB):
+*        Add parameter MULTIOBJECT.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -227,12 +240,15 @@ void smurf_pol2check( int *status ) {
    char buf[GRP__SZNAM+1];    /* Path to matching NDF */
    char filepath[GRP__SZNAM+1];/* NDF path, derived from GRP */
    char label[GRP__SZNAM+1];  /* NDF label string */
+   char object0[80];          /* Pointer to Object for first POL2 file */
+   char object[80];           /* Pointer to Object for current POL2 file */
    const char *key;           /* Pointer to KeyMap key string */
    const char *wave0;         /* Pointer to waveband for first POL2 file */
    const char *wave;          /* Pointer to waveband for current POL2 file */
    int dims[NDF__MXDIM];      /* No. of pixels along each axis of NDF */
    int ikey;                  /* Index of next key */
    int indf;                  /* NDF identifier */
+   int multiobject;           /* OK for more than one object to be given? */
    int ndims;                 /* Number of dimensions in NDF */
    int nkey;                  /* Number of keys in KeyMap */
    int obs;                   /* Observation number */
@@ -261,8 +277,12 @@ void smurf_pol2check( int *status ) {
    been found in each observation. */
    sskm = astKeyMap( " " );
 
+/* See if it is OK for data for more than one object to be supplied. */
+   parGet0l( "MULTIOBJECT", &multiobject, status );
+
 /* Loop round all NDFs. */
    wave0 = NULL;
+   *object0 = 0;
    for( i = 1; i <= isize && *status == SAI__OK; i++ ) {
       ok = 0;
 
@@ -283,6 +303,7 @@ void smurf_pol2check( int *status ) {
              astGetFitsS( fc, "INBEAM", &cval ) &&
              !strncmp( cval, "pol", 3 ) ) {
             wave = NULL;
+            *object = 0;
 
 /* Get the pixel dimensions of the NDF. */
             ndfDim( indf, NDF__MXDIM, dims, &ndims, status );
@@ -348,6 +369,10 @@ void smurf_pol2check( int *status ) {
 /* Get the waveband. */
                      wave = (cval[1] == '8') ? "S8" : "S4";
 
+/* Get the object. */
+                     astGetFitsS( fc, "OBJECT", &cval );
+                     if( *status == SAI__OK ) strcpy( object, cval );
+
 /* For Stokes parameter data check that the NDF Label component is
    "Q", "U" or "I". */
                   } else if( !strcmp( label, "Q" ) ||
@@ -369,6 +394,10 @@ void smurf_pol2check( int *status ) {
 /* Get the waveband. */
                      astGetFitsS( fc, "SUBARRAY", &cval );
                      wave = (cval[1] == '8') ? "S8" : "S4";
+
+/* Get the object. */
+                     astGetFitsS( fc, "OBJECT", &cval );
+                     if( *status == SAI__OK ) strcpy( object, cval );
                   }
                }
 
@@ -401,6 +430,11 @@ void smurf_pol2check( int *status ) {
                      errRepf("","Unsupported FILTER header value "
                                 "'%s' found in %s.", status, cval, filepath );
                   }
+
+/* Get the object. */
+                  astGetFitsS( fc, "OBJECT", &cval );
+                  if( *status == SAI__OK ) strcpy( object, cval );
+
                }
             }
 
@@ -416,6 +450,21 @@ void smurf_pol2check( int *status ) {
                   }
                } else {
                   wave0 = wave;
+               }
+            }
+
+/* Check the data is for the same object as all previous files. */
+            if( *object ) {
+               if( *object0 ) {
+                  if( !multiobject && strcmp( object, object0 ) && *status == SAI__OK ) {
+                     *status = SAI__ERROR;
+                     errRepf(" ","Data supplied for multiple objects ('%s' "
+                             "and '%s'). If you really want to process these "
+                             "objects together, re-run with parameter setting "
+                             "MULTIOBJECT=YES.", status, object, object0 );
+                  }
+               } else {
+                  strcpy( object0, object );
                }
             }
          }

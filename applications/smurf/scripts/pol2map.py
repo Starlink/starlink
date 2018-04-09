@@ -346,6 +346,12 @@
 *        within the command string passed to the "invoke" function. The
 *        accepted values are the list defined in SUN/104 ("None", "Quiet",
 *        "Normal", "Verbose", etc). ["Normal"]
+*     MULTIOBJECT = _LOGICAL (Read)
+*        Indicates if it is acceptable for the list of input files to
+*        include data for multiple objects. If FALSE, an error is reported
+*        if data for more than one object is specified by parameter IN.
+*        Otherwise, no error is reported if multiple objects are found.
+*        [FALSE]
 *     NEWMAPS = LITERAL (Read)
 *        The name of a text file to create, in which to put the paths of
 *        all the new maps written to the directory specified by parameter
@@ -498,7 +504,8 @@
 *     13-MAR-2018 (DSB):
 *        Added parameter OBSWEIGHT.
 *     9-APR-2018 (DSB):
-*        Avoid infinite findclumps loop if no emission found in supplied mask.
+*        - Avoid infinite findclumps loop if no emission found in supplied mask.
+*        - Added parameter MULTIOBJECT.
 
 '''
 
@@ -1038,6 +1045,9 @@ try:
    params.append(starutil.Par0L("MAPVAR", "Use variance between observation maps?",
                                  False, noprompt=True))
 
+   params.append(starutil.Par0L("MULTIOBJECT", "Allow processing of data from multiple objects?",
+                                 False, noprompt=True))
+
    params.append(starutil.Par0L("JY", "Should outputs be converted from pW to mJy/beam?",
                                 True, noprompt=True))
 
@@ -1117,6 +1127,12 @@ try:
 #  If not, variances in the coadds are propagated from the variances
 #  in the observation maps.
    mapvar = parsys["MAPVAR"].value
+
+#  See if it is acceptable for the list of input files to include data
+#  for multiple objects. This should usually be False to avoid
+#  accidentally attempting to create maps that are large enough to contain
+#  objects from different parts of the sky.
+   multiobject = parsys["MULTIOBJECT"].value
 
 #  Get the type of masking to use. If a map is supplied, assume external
 #  masking.
@@ -1344,8 +1360,9 @@ try:
    missing = NDG.tempfile()
    mapinfo = NDG.tempfile()
    invoke("$SMURF_DIR/pol2check in={0} quiet=yes junkfile={1} mapfile={2} "
-          "rawfile={3} stokesfile={4} rawinfo={5} missing={6} mapinfo={7}".
-          format(indata,junks,inmaps,inraws,inquis,rawinfo,missing,mapinfo))
+          "rawfile={3} stokesfile={4} rawinfo={5} missing={6} mapinfo={7} "
+          "multiobject={8}".format(indata,junks,inmaps,inraws,inquis,rawinfo,
+                                   missing,mapinfo,multiobject))
 
 #  Warn about any non-POL2 input data files that are being ignored.
    if get_task_par( "JUNKFOUND", "pol2check" ):
@@ -1575,8 +1592,8 @@ try:
 #  "<UT>_<OBS>_<SUBSCAN>".
       stokesinfo = NDG.tempfile()
       quindg = NDG("^{0}".format(allquis) )
-      invoke("$SMURF_DIR/pol2check in={0} quiet=yes stokesinfo={1}".
-             format(quindg,stokesinfo))
+      invoke("$SMURF_DIR/pol2check in={0} quiet=yes stokesinfo={1} multiobject={2}".
+             format(quindg,stokesinfo,multiobject))
 
 #  Set up three dicts - one each for Q, U and I. Each key is as described
 #  above. Each value is a list of paths for NDFs holding data with the same

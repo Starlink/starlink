@@ -4225,6 +4225,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter multiobject {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default FALSE
+                prompt {Allow data for multiple objects?}
+                helpkey *
+            }
+
             parameter rawfile {
                 type LITERAL
                 prompt {File in which to put raw POL2 time-series NDF paths}
