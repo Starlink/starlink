@@ -214,13 +214,13 @@ a UNIX shell.
           three-dimensional data arrays & \texttt{\%\,cupid}
         & \texttt{\%\,cupidhelp} \newline \cupidsun\ \\
 \hline
-\oracdr\ & The \oracdr\ Data Reduction Pipeline \cite{oracdr} is an
-           automated reduction pipeline. \textsc{Orac-dr} uses \smurf\ and
+\oracdr\ & The \ORACDR\ Data Reduction Pipeline \cite{oracdr} is an
+           automated reduction pipeline. \ORACDR\ uses \smurf\ and
            \Kappa\ (along with other Starlink tools) to perform an automated
            reduction of the raw data following pre-defined recipes.
          & \texttt{\%\,oracdr\_acsis} & \oracdrsun \\
 \hline
-\textsc{Picard} & \textsc{Picard} uses a similar pipeline system as \oracdr\ but
+\textsc{Picard} & \textsc{Picard} uses a similar pipeline system as \ORACDR\ but
                   for the post-processing of reduced data. While mainly implemented
                   for SCUBA-2 data, there are a few recipes that are heterodyne
                   compatible. See \cref{Appendix}{app:picard}{Picard} for more details
@@ -279,7 +279,7 @@ find pipeline reduced files for individual and co-added observations by
 night in the \htmladdnormallink{JCMT Science
 Archive}{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/} (JSA).
 
-These have been reduced using the \oracdr\ pipeline with the recipe
+These have been reduced using the \ORACDR\ pipeline with the recipe
 specified in the MSB or with the Legacy Survey recipe.  Principal
 investigators (PIs) and co-investigators (co-Is) can access these data
 through the JSA before it becomes public by following the instructions
@@ -1030,7 +1030,7 @@ spectra (see Figures~\ref{fig:maskreceptor} and
 \chapter{\xlabel{pipeline}The ACSIS Pipeline}
 \label{sec:pipe}
 
-The ORAC-DR pipeline \cite{oracdr} is a generic automated data
+The \ORACDR\ pipeline \cite{oracdr} is a generic automated data
 reduction pipeline that can process your raw JCMT data and return
 advanced data products: baselined single observation cubes, mosaicked
 and co-added cubes, moments map and clump catalogues.
@@ -1044,7 +1044,7 @@ described in later chapters.
 \section{\xlabel{recipes}Recipes and primitives}
 \label{sec:recipes}
 
-Reduction recipes in ORAC-DR consist of a series of stand-alone
+Reduction recipes in \ORACDR\ consist of a series of stand-alone
 processes, known as primitives. These primitives are linked together
 to form data reduction recipes. Each primitive can be fed different
 input data depending on the nature of the recipe in question and may
@@ -1126,7 +1126,7 @@ command-line option.
 
 \item The raw data is copied to the local directory. Typically,
 subsystems are treated as individual and separate observations by
-ORAC-DR except for hybrid-mode observations.
+\ORACDR\ except for hybrid-mode observations.
 
 \item Because data acquisition is asynchronous, time slices are not
 necessarily written in sequential order. The next step sort the
@@ -1233,8 +1233,8 @@ to make a new \textbf{g\_cube}.
 
 \begin{figure}[h!]
 \begin{center}
-\caption[Flow chart of the ORAC-DR ACSIS pipeline process.]{\label{fig:pipeline}
-  Flow chart of the processes employed by the ORAC-DR ACSIS pipeline,
+\caption[Flow chart of the \ORACDR\ ACSIS pipeline process.]{\label{fig:pipeline}
+  Flow chart of the processes employed by the \ORACDR\ ACSIS pipeline,
   specifically the \narrowline\ and \gradient\ recipes. A few minor processing
   steps are omitted to avoid the diagram being too long. Other recipes may have
   additional steps or omit steps as appropriate. Because of space
@@ -1262,7 +1262,7 @@ You can use either of the options below:
 \end{terminalv}
 
 You can override the recipe set in the FITS header by listing any different
-one on the command line when starting \oracdr. For example:
+one on the command line when starting \ORACDR. For example:
 \begin{terminalv}
 % oracdr -file mylist -loop file -log x REDUCE_SCIENCE_GRADIENT
 \end{terminalv}
@@ -1295,7 +1295,7 @@ parameters.
 
 The \file{.ini} file can contain an arbitrary number of \param{[]}
 constructs for different recipes, qualified by object name or
-\oracdr\ internal headers.
+\ORACDR\ internal headers.
 
 While the use of recipe parameters is optional, once you have some
 experience with the pipeline you are encouraged to tailor the recipe
@@ -1329,11 +1329,11 @@ PIXEL_SCALE = 15.0
 would apply the same parameter values for any beginning with the Arp
 designation.
 
-\subsection{Setting recipe parameters by ORAC-DR internal header}
+\subsection{Setting recipe parameters by \ORACDR\ internal header}
 \label{sec:recpars_orac}
 
 The pipeline translates a selection of metadata from the FITS headers
-into \oracdr\ internal headers.  You can choose different sets of recipe
+into \ORACDR\ internal headers.  You can choose different sets of recipe
 parameters from the internal headers.  The available headers can be
 inspected with \task{translatehdr} supplied with one of your raw data
 files.
@@ -1556,7 +1556,7 @@ recipe name on the end ensures that all data being processed using
 \end{enumerate}
 
 Below is a list of commonly used command line options when running the
-ORAC-DR pipeline from outside the EAO. For a full list of all possible
+\ORACDR\ pipeline from outside the EAO. For a full list of all possible
 options and their descriptions see \oracdrsun.
 \begin{table}[h!]
 \begin{tabular}{p{2.5cm}|p{12.5cm}}
@@ -1608,7 +1608,7 @@ options and their descriptions see \oracdrsun.
 \hline
 \end{tabular}
 \caption{\small \label{tab:pipe-options}
-  The options available on the command line when running the ORAC-DR pipeline from outside
+  The options available on the command line when running the \ORACDR\ pipeline from outside
   the EAO.}
 \end{table}
 
@@ -1693,7 +1693,7 @@ In addition to these NDFs a number of log files are created.
 \hline
 \multicolumn{2}{l}{\textbf{Default Files}}\\
 \hline
-\file{.oracdr\_*.log}  & The \oracdr\ log file. \\
+\file{.oracdr\_*.log}  & The \ORACDR\ log file. \\
 \file{log.flat}   & Flat-field ratios for each receptor and observation. \\
 \file{log.group}  & The files contributing to each group. \\
 \file{log.noisestats} & Noise statistics for each observation and group. \\
@@ -2293,7 +2293,7 @@ between a group of neighbouring output ones (the default is
 \param{SincSinc}).
 
 Note that by default \wcsmosaic\ aligns reduced cubes along the
-spectral axis using the heliocentric standard of rest (the \oracdr\ 
+spectral axis using the heliocentric standard of rest (the \ORACDR\
 pipeline also does this).  If you want to align using
 a non-heliocentric standard of rest, you should set the
 \att{AlignStdOfRest} attribute for your NDFs using \wcsattrib\ 
@@ -2619,10 +2619,10 @@ The receptors are normalised to the flux of the reference receptor,
 near the centre, normally H05, but given by the FITS header \param{REFRECEP}.
 
 
-There are other methods in \oracdr, one to cope with multiple lines.
+There are other methods in \ORACDR, one to cope with multiple lines.
 It sums all the signal above some threshold, such as the median plus four
 standard deviations, to exclude the baseline noise.  Since the flat
-ratio biases this sum, \oracdr\ iterates to converge to a solution.
+ratio biases this sum, \ORACDR\ iterates to converge to a solution.
 
 \clearpage
 \chapter{\xlabel{advanced}Advanced Analysis}
@@ -3772,7 +3772,7 @@ the pipeline and identical sources across the project are co-added
 into master group files.
 
 The format and file naming conventions are different in the JSA for
-\emph{reduced} data compared with merely running \oracdr.  Reduced
+\emph{reduced} data compared with merely running \ORACDR.  Reduced
 observations will be in FITS format with the \file{.fits} file
 extension.  File names begin with the \file{jcmth} prefix followed by
 the UT date, observation number, subsystem number, the product name
@@ -3941,7 +3941,7 @@ The example below illustrates most of them.
 \begin{itemize}
 \item The recipe parameters are listed in a file called \file{params.ini}.
 It is called by the \param{recpars} option. This file has the same
-\file{.ini} format used by the ORAC-DR pipeline (see
+\file{.ini} format used by the \ORACDR\ pipeline (see
 \cref{Section}{sec:recpars}{Setting recipe parameters}).
 \item The recipe name need to be in uppercase.
 \item If you need to supply multiple files you can do so by listing
@@ -3949,7 +3949,7 @@ them in a file (\file{myfilelist.lis} in this example) and running cat on it.
 The input file must be in the current directory, or a directory
 defined by the environment variable \file{ORAC\_DATA\_IN}. Note the
 back-quotes.
-\item Like the ORAC-DR pipeline, the \param{-log} option specifies
+\item Like the \ORACDR\ pipeline, the \param{-log} option specifies
 whether the log file should be written to the screen [\param{s}], a
 file [\param{f}] or an xwindow [\param{x}].
 \end{itemize}
