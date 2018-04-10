@@ -18,7 +18,7 @@
 *                         dim_t msize, const Grp *shortrootgrp,size_t contchunk,
 *                         int varmapmethod, const int *lbnd_out,
 *                         const int *ubnd_out, AstFrameSet *outfset,
-*                         int *status );
+*                         double chunkfactor, int *status );
 
 *  Arguments:
 *     wf = ThrWOrkForce * (Given)
@@ -50,6 +50,8 @@
 *        2-element array pixel coord. for the upper bounds of the output map
 *     outfset = AstFrameSet* (Given)
 *        Frameset containing the sky->output map mapping
+*     chunkfactor = double (Given)
+*        The scale factor for the current chunk.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -86,9 +88,12 @@
 *        Ensure smf_rebinmap1 is not used in mult-threaded mode since it
 *        now assumes there is an input maps for every thread. Could change
 *        this some rainy day...
+*     2018-04-10 (DSB):
+*        Added parameter chunkfactor.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2018 East Asian Observatory.
 *     Copyright (C) 2010-2011 University of British Columbia
 *     All Rights Reserved.
 
@@ -134,7 +139,7 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res,
                          dim_t msize, const Grp *shortrootgrp, size_t contchunk,
                          int varmapmethod, const int *lbnd_out,
                          const int *ubnd_out, AstFrameSet *outfset,
-                         int *status ) {
+                         double chunkfactor, int *status ) {
 
   dim_t dsize;                  /* Size of data arrays in containers */
   size_t i;                     /* loop counter */
@@ -307,7 +312,8 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res,
                      rebinflag,
                      mapdata->pntr[0],
                      shortmapweight, shortmapweightsq, shorthitsmap,
-                     mapdata->pntr[1], msize, NULL, status );
+                     mapdata->pntr[1], msize, chunkfactor, NULL,
+                     status );
 
       /* Write out FITS header */
       if( (*status == SAI__OK) && res->sdata[idx]->hdr &&

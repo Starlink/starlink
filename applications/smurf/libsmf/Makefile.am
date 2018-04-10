@@ -81,6 +81,8 @@ smf_choose_darks.c \
 smf_choose_flat.c \
 smf_choosepolbins.c \
 smf_choosetiles.c \
+smf_chunkfactor.c \
+smf_chunkpar.c \
 smf_chunkweight.c \
 smf_clipnoise.c \
 smf_clipped_stats1D.c \

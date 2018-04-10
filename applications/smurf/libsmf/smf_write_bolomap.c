@@ -17,7 +17,8 @@
 *                        smfArray *qua, smfDIMMData *dat, dim_t msize,
 *                        const Grp *bolrootgrp, int varmapmethod,
 *                        const int *lbnd_out, const int *ubnd_out,
-*                        AstFrameSet *outfset, const char *root, int *status ) {
+*                        AstFrameSet *outfset, const char *root,
+*                        double chunkfactor, int *status ) {
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -47,6 +48,8 @@
 *     root = const char * (Given)
 *        The root name for the bolometer maps. If NULL, then the value
 *        specified by "bolrootgrp" is used.
+*     chunkfactor = double (Given)
+*        The scale factor for the current chunk.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -80,9 +83,12 @@
 *        Ensure smf_rebinmap1 is not used in mult-threaded mode since it
 *        now assumes there is an input maps for every thread. Could change
 *        this some rainy day...
+*     2018-04-10 (DSB):
+*        Added parameter "chunkfactor".
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2018 East Asian Observatory.
 *     Copyright (C) 2011 Science & Technology Facilities Council
 *     Copyright (C) 2010-2011 University of British Columbia
 *     All Rights Reserved.
@@ -131,7 +137,8 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
                         smfArray *qua, smfDIMMData *dat, dim_t msize,
                         const Grp *bolrootgrp, int varmapmethod,
                         const int *lbnd_out, const int *ubnd_out,
-                        AstFrameSet *outfset, const char *root, int *status ) {
+                        AstFrameSet *outfset, const char *root,
+                        double chunkfactor, int *status ) {
 
   int addtomap=0;               /* Set if adding to existing map */
   size_t bstride;               /* Bolometer stride */
@@ -286,7 +293,7 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
                          SMF__Q_GOOD, varmapmethod,
                          AST__REBININIT | AST__REBINEND,
                          curmap, bmapweight, bmapweightsq, bhitsmap,
-                         curvar, msize, NULL, status );
+                         curvar, msize, chunkfactor, NULL, status );
 
           /* If required, add this new map to the existing one */
           if( addtomap ) {

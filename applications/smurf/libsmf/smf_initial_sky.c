@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap,
-*                          smfDIMMData *dat, int *iters, int *status )
+*                          smfDIMMData *dat, double chunkfactor, int *iters,
+*                          int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -23,6 +24,10 @@
 *        Configuration parameters that control the map-maker.
 *     dat = smfDIMMData * (Given)
 *        Struct of pointers to information required by model calculation.
+*     chunkfactor = double (Given)
+*        The calibration correction factor to use for the current chunk.
+*        The values sampled from the supplied initial sky map are divided
+*        by this factor before being subtracted from the time-series data.
 *     iters = int * (Returned)
 *        If the initial sky NDF was created by a previous run of makemap
 *        that was interupted using control-C, "*iters" will be returned
@@ -76,10 +81,13 @@
 *        masks are now made from the Quality array in the supplied NDF.
 *        These will be immediately over-written (within smf_calcmodel_ast)
 *        with new masks unless the mask is frozen.
+*     10-APR-2018 (DSB):
+*        Added parameter "chunkfactor".
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2012-2014 Science & Technology Facilities Council.
+*     Copyright (C) 2018 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -115,7 +123,7 @@
 #include "libsmf/smf_typ.h"
 
 int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
-                     int *iters, int *status ) {
+                     double chunkfactor, int *iters, int *status ){
 
 /* Local Variables: */
    char refparam[ DAT__SZNAM ];/* Name for reference NDF parameter */
@@ -298,7 +306,8 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
 
 /* Sample the above map at the position of each bolometer sample and
    subtract the sampled value from the cleaned bolometer value. */
-      smf_calcmodel_ast( wf, dat, 0, keymap, NULL, SMF__DIMM_PREITER, status);
+      smf_calcmodel_ast( wf, dat, 0, keymap, NULL, SMF__DIMM_PREITER,
+                         chunkfactor, status);
 
 /* Remove any existinction correction to the modifed bolometer data. */
       if( dat->ext ) smf_calcmodel_ext( wf, dat, 0, keymap, dat->ext,

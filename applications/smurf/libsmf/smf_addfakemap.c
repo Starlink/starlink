@@ -13,8 +13,9 @@
 *     C function
 
 *  Invocation:
-*     void smf_addfakemap( ThrWorkForce *wf, smfArray *res, smfArray *ext, smfArray *lut, int *lbnd_out,
-*                          int *ubnd_out, AstKeyMap *keymap, int *status )
+*     void smf_addfakemap( ThrWorkForce *wf, smfArray *res, smfArray *ext,
+*                          smfArray *lut, int *lbnd_out, int *ubnd_out,
+*                          AstKeyMap *keymap, double chunkfactor, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -35,6 +36,11 @@
 *        A 2-element array - the upper pixel index bounds of the output map.
 *     config = AstKeyMap * (Given)
 *        A KeyMap holding all configuration parameters.
+*     chunkfactor = double (Given)
+*        The calibration correction factor to use for the current chunk.
+*        The values sampled from the fakemap are divided by this factor
+*        before being added onto the time-series data. This is in addition
+*        to any scaling specified by the "fakescale" config parameter.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -49,10 +55,12 @@
 *  History:
 *     7-OCT-2015 (DSB):
 *        Original version.
+*     10-APR-2018 (DSB):
+*        Added parameter "chunkfactor".
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2015 East Asian Observatory.
+*     Copyright (C) 2015-2018 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -87,8 +95,9 @@
 #include "libsmf/smf_typ.h"
 #include "libsmf/smf_err.h"
 
-void smf_addfakemap(  ThrWorkForce *wf, smfArray *res, smfArray *ext, smfArray *lut,
-                      int *lbnd_out, int *ubnd_out, AstKeyMap *keymap, int *status ) {
+void smf_addfakemap( ThrWorkForce *wf, smfArray *res, smfArray *ext,
+                     smfArray *lut, int *lbnd_out, int *ubnd_out,
+                     AstKeyMap *keymap, double chunkfactor, int *status ){
 
 /* Local Variables: */
    char *fakemap;
@@ -128,6 +137,15 @@ void smf_addfakemap(  ThrWorkForce *wf, smfArray *res, smfArray *ext, smfArray *
       astMapGet0D( keymap, "FAKESCALE", &fakescale );
       astMapGet0I( keymap, "FAKEMCE", &fakemce );
       astMapGet0D( keymap, "FAKEDELAY", &fakedelay );
+
+/* Modify the fakescale value to incorporate the scaling requested by
+   parameter "chunkfactor". */
+      if( chunkfactor != 0.0 ) {
+         fakescale /= chunkfactor;
+      } else if( *status == SAI__OK ) {
+         errRep( " ", "SMF_ADDFAKEMAP: Illegal zero value supplied for "
+                 "parameter 'chunkfactor'.", status );
+      }
 
 /* Open the NDF, get a section from it matching the bounds of the output map,
    then close the original NDF - retaining the section. .  */

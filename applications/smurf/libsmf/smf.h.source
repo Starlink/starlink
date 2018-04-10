@@ -561,8 +561,9 @@ void smf_accumulate_prov( const smfData * data, const Grp* igrp, size_t index,
                           int ondf, const char *creator,
                           NdgProvenance ** modprov, int * status );
 
-void smf_addfakemap(  ThrWorkForce *wf, smfArray *res, smfArray *ext, smfArray *lut,
-                      int *lbnd_out, int *ubnd_out, AstKeyMap *keymap, int *status );
+void smf_addfakemap(  ThrWorkForce *wf, smfArray *res, smfArray *ext,
+                      smfArray *lut, int *lbnd_out, int *ubnd_out,
+                      AstKeyMap *keymap, double chunkfactor, int *status );
 
 void smf_add_grp_metadata( Grp *grp, const char *name, const char *value,
                            int *status );
@@ -676,7 +677,7 @@ void smf_calc_wvm_clear( int *status );
 
 void smf_calcmodel_ast( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
-                        int *status);
+                        double chunkfactor, int *status);
 
 void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
@@ -766,6 +767,12 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
 void smf_checkmem_map( const int lbnd[2], const int ubnd[2], int rebin, int nw,
                        size_t available, const char *epsout, size_t *necessary,
                        int *status );
+
+double smf_chunkfactor( smfData *data, AstKeyMap *keymap, int contchunk,
+                        int *status );
+
+double smf_chunkpar( smfData *data, const char *par, const char *label,
+                     AstKeyMap *keymap, int contchunk, int *status );
 
 double smf_chunkweight( smfData *data, AstKeyMap *keymap, int contchunk,
                         int *status );
@@ -1020,11 +1027,13 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                int power, int time, int isub, smfDIMMData *dat,
                smf_modeltype type, smfArray *model, int res,
                const char *root, int mask, double mingood, int cube,
-               int map, int addqual, smfSampleTable *table, int *status );
+               int map, int addqual, smfSampleTable *table,
+               double chunkfactor, int *status );
 
 void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                       int chunk, AstKeyMap *keymap, smfArray **allmodel,
-                      smf_modeltype type, int flags, int *status );
+                      smf_modeltype type, int flags, double chunkfactor,
+                      int *status );
 
 double smf_difftime( struct timeval *tv1, struct timeval *tv2, int *status);
 
@@ -1505,7 +1514,7 @@ int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
 void smf_inbeam_str ( smf_inbeam_t inbeam, char *inbeamstr, size_t lenstr, int * status );
 
 int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *config, smfDIMMData *dat,
-                     int *iters, int *status );
+                     double chunkfactor, int *iters, int *status );
 
 void
 smf_inst_get( const smfHead * hdr, inst_t * instrument,
@@ -1871,7 +1880,8 @@ void smf_rebinmap1( ThrWorkForce *wf, smfData *data, smfData *variance, int *lut
                     int *whichmap, dim_t nmap, smf_qual_t mask, int sampvar,
                     int flags, double *map, double *mapweight,
                     double *mapweightsq, int *hitsmap, double *mapvar,
-                    dim_t msize, double *scalevariance, int *status );
+                    dim_t msize, double chunkfactor, double *scalevariance,
+                    int *status );
 
 void smf_rebinseq_thread( void *data_ptr, int *status );
 
@@ -2080,7 +2090,8 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
                         smfArray *qua, smfDIMMData *dat, dim_t msize,
                         const Grp *bolrootgrp, int varmapmethod,
                         const int *lbnd_out, const int *ubnd_out,
-                        AstFrameSet *outfset, const char *root, int *status );
+                        AstFrameSet *outfset, const char *root,
+                        double chunkfactor, int *status );
 
 void smf_write_clabels( const smfData* data, int * status );
 
@@ -2108,7 +2119,7 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res, smfArray
                          dim_t msize, const Grp *shortrootgrp, size_t contchunk,
                          int varmapmethod, const int *lbnd_out,
                          const int *ubnd_out, AstFrameSet *outfset,
-                         int *status );
+                         double chunkfactor, int *status );
 
 void smf_write_smfData ( ThrWorkForce *wf, const smfData *data, const smfData *variance,
                          const char * filename, const Grp * igrp, size_t grpindex,

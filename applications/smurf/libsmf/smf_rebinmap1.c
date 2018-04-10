@@ -18,7 +18,7 @@
 *                    dim_t nmap, smf_qual_t mask, int sampvar, int flags,
 *                    double *map, double *mapweight, double *mapweightsq,
 *                    int *hitsmap, double *mapvar, dim_t msize,
-*                    double *scalevariance, int *status )
+*                    double chunkfactor, double *scalevariance, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -70,6 +70,11 @@
 *        are required.
 *     msize = dim_t (Given)
 *        Number of pixels in map
+*     chunkfactor = double (Given)
+*        The calibration correction factor to use for the current chunk.
+*        The time-series data is multiplied by this factor before being
+*        used. Any supplied time-stream variances are mutiplied by this
+*        factor squared before being used.
 *     scalevariance = double* (Returned)
 *        If sampvar set, calculate average scale factor to be applied
 *        to input variances such that error propagation would give the
@@ -139,8 +144,10 @@
 *        Check for bad and negative bolometer variance values, as well as
 *        zero values.
 *     2014-12-15 (DSB):
-*        Do not attempt to run surplus threads when making a map from very 
+*        Do not attempt to run surplus threads when making a map from very
 *        few bolometers (smaller than the number of threads).
+*     2018-04-10 (DSB):
+*        Added parameter "chunkfactor".
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -249,6 +256,7 @@ typedef struct smfRebinMap1Data {
    double *mapweight;
    double *mapweightsq;
    double *var;
+   double chunkfactor;
    double scalevar;
    double scaleweight;
    int *hitsmap;
@@ -273,12 +281,11 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status );
 #define FUNC_NAME "smf_rebinmap1"
 
 void smf_rebinmap1( ThrWorkForce *wf, smfData *data, smfData *variance, int *lut,
-                    size_t tslice1, size_t tslice2, int trange,
-                    int *whichmap, dim_t nmap, smf_qual_t mask, int sampvar,
-                    int flags, double *map, double *mapweight,
-                    double *mapweightsq, int *hitsmap,
-                    double *mapvar, dim_t msize, double *scalevariance,
-                    int *status ) {
+                    size_t tslice1, size_t tslice2, int trange, int *whichmap,
+                    dim_t nmap, smf_qual_t mask, int sampvar, int flags,
+                    double *map, double *mapweight, double *mapweightsq,
+                    int *hitsmap, double *mapvar, dim_t msize,
+                    double chunkfactor, double *scalevariance, int *status ) {
 
   /* Local Variables */
   SmfRebinMap1Data *job_data = NULL;
@@ -424,6 +431,7 @@ void smf_rebinmap1( ThrWorkForce *wf, smfData *data, smfData *variance, int *lut
       pdata->vtstride = vtstride;
       pdata->mask = mask;
       pdata->qual = qual;
+      pdata->chunkfactor = chunkfactor;
       pdata->mbufsize = mbufsize;
       pdata->nw = nw; /* used for final summing/rescaling */
       pdata->iw = iw; /* so the thread knows with chunk it's working on */
@@ -575,19 +583,21 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
    dim_t di;                  /* data array index */
    dim_t vi;                  /* variance array index */
    double R;                  /* Another temp variable for variance calc */
+   double cf2;                /* Squared calibration correction */
+   double cf;                 /* Calibration correction */
    double delta;              /* Offset for weighted mean */
+   double mapacc;             /* map accumulator */
    double temp;               /* Temporary calculation */
    double thisweight;         /* The weight at this point */
-   double mapacc;             /* map accumulator */
-   double weightacc;          /* weights accumulator */
    double varacc;             /* variance accumulator */
+   double weightacc;          /* weights accumulator */
    double weightsqacc;        /* weights squared accumulator */
    int hitsacc;               /* hits accumulator */
    int imap;                  /* Submap index */
    size_t ibolo;              /* Bolometer index */
    size_t ipix;               /* Map pixel index */
-   size_t tipix;              /* index into sub map */
    size_t itime;              /* Time slice index */
+   size_t tipix;              /* index into sub map */
    size_t tmap0;              /* index for start of current submap */
 
 /* Check inherited status */
@@ -596,6 +606,9 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
 /* Get a pointer that can be used for accessing the required items in the
    supplied structure. */
    pdata = (SmfRebinMap1Data *) job_data_ptr;
+
+   cf = pdata->chunkfactor;
+   cf2 = cf*cf;
 
 /* Map variance from spread of input values - quality checking version.
    ================================================================== */
@@ -647,11 +660,11 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
 
 /* Update things. */
                      pdata->hitsmap[ tipix ]++;
-                     thisweight = 1/pdata->var[ vi ];
+                     thisweight = 1/(pdata->var[ vi ]*cf2);
 
 /* Weighted incremental algorithm */
                      temp = pdata->mapweight[ tipix ] + thisweight;
-                     delta = pdata->dat[ di ] - pdata->map[ tipix ];
+                     delta = pdata->dat[ di ]*cf - pdata->map[ tipix ];
                      R = delta * thisweight / temp;
                      pdata->map[ tipix ] += R;
                      if( pdata->mapvar ) pdata->mapvar[ tipix ] +=
@@ -698,10 +711,10 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
                   tipix = tmap0 + ipix;
 
                   pdata->hitsmap[ tipix ]++;
-                  thisweight = 1/pdata->var[ vi ];
+                  thisweight = 1/(pdata->var[ vi ]*cf2);
 
                   temp = pdata->mapweight[ tipix ] + thisweight;
-                  delta = pdata->dat[ di ] - pdata->map[ tipix ];
+                  delta = pdata->dat[ di ]*cf - pdata->map[ tipix ];
                   R = delta * thisweight / temp;
                   pdata->map[ tipix ] += R;
                   if( pdata->mapvar ) pdata->mapvar[ tipix ] += pdata->mapweight[ tipix ]*delta*R;
@@ -742,8 +755,8 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
 
                      tipix = tmap0 + ipix;
 
-                     thisweight = 1/pdata->var[ vi ];
-                     pdata->map[ tipix ] += thisweight*pdata->dat[ di ];
+                     thisweight = 1/(pdata->var[ vi ]*cf2);
+                     pdata->map[ tipix ] += thisweight*pdata->dat[ di ]*cf;
                      pdata->mapweight[ tipix ] += thisweight;
                      pdata->mapweightsq[ tipix ] += thisweight*thisweight;
                      pdata->hitsmap[ tipix ]++;
@@ -780,8 +793,8 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
 
                   tipix = tmap0 + ipix;
 
-                  thisweight = 1/pdata->var[ vi ];
-                  pdata->map[ tipix ] += thisweight*pdata->dat[ di ];
+                  thisweight = 1/(pdata->var[ vi ]*cf2);
+                  pdata->map[ tipix ] += thisweight*pdata->dat[ di ]*cf;
                   pdata->mapweight[ tipix ] += thisweight;
                   pdata->mapweightsq[ tipix ] += thisweight*thisweight;
                   pdata->hitsmap[ tipix ]++;
@@ -815,7 +828,7 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
                      tipix = tmap0 + ipix;
                      pdata->hitsmap[ tipix ]++;
                      temp = pdata->mapweight[ tipix ] + 1.0;
-                     delta = pdata->dat[ di ] - pdata->map[ tipix ];
+                     delta = pdata->dat[ di ]*cf - pdata->map[ tipix ];
                      R = delta / temp;
                      pdata->map[ tipix ] += R;
                      if( pdata->mapvar ) pdata->mapvar[ tipix ] +=
@@ -855,7 +868,7 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
                   tipix = tmap0 + ipix;
                   pdata->hitsmap[ tipix ]++;
                   temp = pdata->mapweight[ tipix ] + 1.0;
-                  delta = pdata->dat[ di ] - pdata->map[ tipix ];
+                  delta = pdata->dat[ di ]*cf - pdata->map[ tipix ];
                   R = delta / temp;
                   pdata->map[ tipix ] += R;
                   if( pdata->mapvar ) pdata->mapvar[ tipix ] += pdata->mapweight[ tipix ]*delta*R;

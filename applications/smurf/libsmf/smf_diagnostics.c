@@ -15,7 +15,8 @@
 *  Invocation:
 *     smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 *		       int chunk, AstKeyMap *keymap, smfArray **allmodel,
-*                      smf_modeltype type, int flags, int *status )
+*                      smf_modeltype type, int flags, double chunkfactor,
+*                      int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -145,6 +146,8 @@
 *        Indicates which model is to be dumped.
 *     flags = int (Given)
 *        Control flags.
+*     chunkfactor = double (Given)
+*        The scale factor for the current chunk.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -162,8 +165,11 @@
 *        Added option to create diagnostic maps from each model.
 *     21-JAN-2015 (DSB):
 *        Make the inclusion of data for a specific bolometer optional.
+*     10-APR-2018 (DSB):
+*        Added parameter "chunkfactor".
 
 *  Copyright:
+*     Copyright (C) 2018 East Asian Observatory.
 *     Copyright (C) 2013-2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -202,7 +208,8 @@
 
 void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                       int chunk, AstKeyMap *keymap, smfArray **allmodel,
-                      smf_modeltype type, int flags, int *status ){
+                      smf_modeltype type, int flags, double chunkfactor,
+                      int *status ){
 
 /* Local Variables: */
    AstKeyMap *kmap;
@@ -468,7 +475,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                   sprintf( root, "bef_%d", chunk );
                   smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                             dat, type, NULL, 1, root, 0, mingood, cube,
-                            map, addqual, tabdata, status );
+                            map, addqual, tabdata, chunkfactor, status );
                }
 
 /* If this function has been called immediately after estimating the new
@@ -479,14 +486,14 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                          dat, type, allmodel ? allmodel[ 0 ] : NULL,
                          0, root, mask, mingood, cube, map, addqual,
-                         tabdata, status );
+                         tabdata, chunkfactor, status );
                if( res_after && type != SMF__RES ) {
                   msgOutf( "", "Diagnostics: Dumping residuals after subtraction of %s",
                            status, modname );
                   sprintf( root, "aft_%d", chunk );
                   smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                             dat, type, NULL, 1, root, 0, mingood, cube,
-                            map, addqual, tabdata, status );
+                            map, addqual, tabdata, chunkfactor, status );
                }
 
 /* Any other "where" value is currently an error. */

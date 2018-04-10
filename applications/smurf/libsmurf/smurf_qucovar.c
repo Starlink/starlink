@@ -397,7 +397,7 @@ void smurf_qucovar( int *status ) {
 /* Bin the QU product into a map. */
    smf_rebinmap1( wf, prod_data, vprod_data, qlut_data->pntr[0], 0, 0, 0, NULL,
                   0, SMF__Q_GOOD, 1, AST__REBININIT | AST__REBINEND, map,
-                  mapweight, mapweightsq, hits, NULL, msize, &scalevar, status );
+                  mapweight, mapweightsq, hits, NULL, msize, 1.0, &scalevar, status );
 
 /* Copy the map into the output NDF. */
    if( *status == SAI__OK ) {

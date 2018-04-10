@@ -527,8 +527,13 @@
 *        reached, report no convergence, rather than reporting "Solution
 *        CONVERGED", which was mis-leading.
 *     2018-03-13 (DSB):
-*        Allow models to be exported to a specified directory (given by 
+*        Allow models to be exported to a specified directory (given by
 *        config parameter "dumpdir").
+*     2018-04-10 (DSB):
+*        Allow each chunk to have a separate calibration correction,
+*        specified by the CHUNKFACTOR config parameter. This is mainly
+*        intended for cases where multiple observations, potentially
+*        with different FCFs, are being combined (e.g. skyloop).
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -612,6 +617,7 @@ static void smf1_iteratemap( void *job_data_ptr, int *status );
 
 /* Local data types */
 typedef struct smfIterateMapData {
+   double chunkfactor;
    double *epsout;
    double *err1;
    double *err2;
@@ -654,6 +660,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
   double chitol=VAL__BADD;      /* chisquared change tolerance for stopping */
   int chunking;                 /* Will we be chunking due to low memory? */
+  double chunkfactor;           /* A calibration correction factor for the
+                                   current chunk */
   double chunkweight;           /* The relative weight to give to the
                                    current chunk when adding into the running
                                    sum map. */
@@ -1847,10 +1855,17 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         _smf_iteratemap_showmem(status);
 #endif
 
+      /* Get an optional scale factor to apply to the time stream data.
+         This is useful when data from multiple observations, potentially
+         with differetn FCFs, are being combined in a single invocation
+         of makemap (e.g. when makemap is run from the skyloop script). */
+      chunkfactor = smf_chunkfactor( res[0]->sdata[0], keymap, contchunk,
+                                     status );
+
       /* We now have RES, LUT, and EXT loaded into memory. Add fake
          astronomical signal to RES at this stage if requested */
       smf_addfakemap( wf, res[0], haveext?model[whichext][0]:NULL, lut[0],
-                      lbnd_out, ubnd_out, keymap, status );
+                      lbnd_out, ubnd_out, keymap, chunkfactor, status );
 
       /* Do data cleaning */
       if( doclean ) {
@@ -2048,7 +2063,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Allow an initial guess at the sky brightness to be supplied, in
          which case copy it into "thismap", sample it and subtract it from
          the cleaned data. The initial guess is returned in "lastmap". */
-      importsky = smf_initial_sky( wf, keymap, &dat, &itsdone, status );
+      importsky = smf_initial_sky( wf, keymap, &dat, chunkfactor, &itsdone,
+                                   status );
 
       /* If an initial sky was imported, copy it into the "lastmap" array
          so that we get a reasonable value for the normalised change in the
@@ -2320,7 +2336,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               /* Before subtraction of the model, dump the original
                  residuals. */
               smf_diagnostics( wf, 0, &dat, contchunk, keymap, model[j],
-                               modeltyps[j], dimmflags, status );
+                               modeltyps[j], dimmflags, chunkfactor, status );
 
               /* Estimate the new model and subtract it from the residuals. */
               (*modelptr)( wf, &dat, 0, keymap, model[j], dimmflags, status );
@@ -2328,7 +2344,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               /* After subtraction of the model, dump the model itself
                  and the modified residuals. */
               smf_diagnostics( wf, 1, &dat, contchunk, keymap, model[j],
-                               modeltyps[j], dimmflags, status );
+                               modeltyps[j], dimmflags, chunkfactor, status );
 
               /* Set a flag if we now have a NOI model. */
               if( modeltyps[j] == SMF__NOI ) noidone = 1;
@@ -2404,6 +2420,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 pdata->lut_data = lut_data;
                 pdata->thismap = thismap;
                 pdata->thisqual = thisqual;
+                pdata->chunkfactor = chunkfactor;
                 pdata->operation = 1;
 
                 /* Submit the job to the workforce. */
@@ -2464,7 +2481,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                            lut_data, 0, 0, 0, NULL, 0, SMF__Q_GOOD,
                            varmapmethod, rebinflags, thismap, thisweight,
                            thisweightsq, thishits, reuse_var ? NULL : thisvar,
-                           msize, &scalevar, status );
+                           msize, chunkfactor, &scalevar, status );
           }
 
           /* Indicate the map arrays within the supplied smfDIMMData
@@ -2589,7 +2606,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           /* Before subtraction of the model, dump the original
              residuals. */
           smf_diagnostics( wf, 0, &dat, contchunk, keymap, NULL,
-                           SMF__AST, dimmflags, status );
+                           SMF__AST, dimmflags, chunkfactor, status );
 
           /* Remember if no AST model was subtracted from the
              previous iteration. The dat.ast_skipped flag is updated
@@ -2601,7 +2618,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           if( ast_skip > 0 ) last_skipped = dat.ast_skipped;
 
           /* Estimate the AST model and subtract from the residuals. */
-          smf_calcmodel_ast( wf, &dat, 0, keymap, NULL, dimmflags, status );
+          smf_calcmodel_ast( wf, &dat, 0, keymap, NULL, dimmflags,
+                             chunkfactor, status );
 
           /*** TIMER ***/
           msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
@@ -2627,12 +2645,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           /* After subtraction of the model, dump the model itself
              and the modified residuals. */
           smf_diagnostics( wf, 1, &dat, contchunk, keymap, NULL,
-                           SMF__AST, dimmflags, status );
+                           SMF__AST, dimmflags, chunkfactor, status );
 
 
           /* And dump RES as a model in its own right. */
           smf_diagnostics( wf, 1, &dat, contchunk, keymap, NULL,
-                           SMF__RES, dimmflags,  status );
+                           SMF__RES, dimmflags,  chunkfactor, status );
 
 
 #ifdef __ITERATEMAP_SHOW_MEM
@@ -3145,7 +3163,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       if( bolomap ) {
         smf_write_bolomap( wf, res[0], lut[0], qua[0], &dat, msize,
                            bolrootgrp, varmapmethod, lbnd_out, ubnd_out,
-                           outfset, NULL, status );
+                           outfset, NULL, chunkfactor, status );
 
         /*** TIMER ***/
         msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
@@ -3158,7 +3176,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       if( shortmap ) {
         smf_write_shortmap( wf, shortmap, res[0], lut[0], qua[0], &dat,
                             msize, shortrootgrp, contchunk, varmapmethod,
-                            lbnd_out, ubnd_out, outfset, status );
+                            lbnd_out, ubnd_out, outfset, chunkfactor, status );
         /*** TIMER ***/
         msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                    ": ** %f s writing shortmap",
@@ -3812,6 +3830,7 @@ static void smf1_iteratemap( void *job_data_ptr, int *status ) {
 
 /* Local Variables: */
    SmfIterateMapData *pdata;
+   double cf;
    double *pr;
    int *pl;
    size_t idata;
@@ -3827,6 +3846,7 @@ static void smf1_iteratemap( void *job_data_ptr, int *status ) {
 /* Add last iter. of astronomical signal back in to residual. Ignore map
    pixels that have been constrained to zero. */
    if( pdata->operation == 1 ) {
+      cf = pdata->chunkfactor;
       pr = pdata->res_data +  pdata->d1;
       pq = pdata->qua_data +  pdata->d1;
       pl = pdata->lut_data +  pdata->d1;
@@ -3835,7 +3855,7 @@ static void smf1_iteratemap( void *job_data_ptr, int *status ) {
             double ast_data = pdata->thismap[ *pl ];
             if( ast_data != VAL__BADD &&
                 !(pdata->thisqual[ *pl ] & SMF__MAPQ_AST ) ) {
-               *pr += ast_data;
+               *pr += ast_data/cf;
             }
          }
       }

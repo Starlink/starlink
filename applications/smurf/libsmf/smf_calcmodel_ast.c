@@ -15,7 +15,8 @@
 *  Invocation:
 *     smf_calcmodel_ast( ThrWorkForce *wf, smfDIMMData *dat, int
 *                        chunk, AstKeyMap *keymap, smfArray
-*                        **allmodel, int flags, int *status)
+*                        **allmodel, int flags, double chunkfactor,
+*                        int *status)
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -30,6 +31,10 @@
 *        Array of smfArrays (each time chunk) to hold result of model calc
 *     flags = int (Given )
 *        Control flags: not used
+*     chunkfactor = double (Given)
+*        The calibration correction factor to use for the current chunk.
+*        The values sampled from the current map are divided by this factor
+*        before being subtracted from the time-series data.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -159,9 +164,12 @@
 *     2016-11-08 (DSB):
 *        Allow map based de-spiking to be frozen after a specified number
 *        of iterations or map change.
+*     2018-04-10 (DSB):
+*        Added parameter "chunkfactor".
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2018 East Asian Observatory.
 *     Copyright (C) 2006-2011 University of British Columbia.
 *     Copyright (C) 2010-2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
@@ -209,6 +217,7 @@ typedef struct smfCalcModelAstData {
    dim_t ntslice;
    double *map;
    double *res_data;
+   double chunkfactor;
    int *lut_data;
    int oper;
    size_t bstride;
@@ -220,11 +229,10 @@ typedef struct smfCalcModelAstData {
 
 #define FUNC_NAME "smf_calcmodel_ast"
 
-void smf_calcmodel_ast( ThrWorkForce *wf,
-                        smfDIMMData *dat, int chunk,
+void smf_calcmodel_ast( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap,
                         smfArray **allmodel __attribute__((unused)),
-                        int flags, int *status) {
+                        int flags, double chunkfactor, int *status) {
 
   /* Local Variables */
   size_t bstride;               /* bolo stride */
@@ -435,6 +443,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf,
           pdata->tstride = tstride;
           pdata->map = map;
           pdata->mapqual = mapqual;
+          pdata->chunkfactor = chunkfactor;
           pdata->oper = 1;
 
           thrAddJob( wf, 0, pdata, smf1_calcmodel_ast, 0, NULL, status );
@@ -481,6 +490,7 @@ static void smf1_calcmodel_ast( void *job_data_ptr, int *status ) {
    dim_t itime;
    dim_t ngood;
    double *pr;
+   double cf;
    double m;
    int *pl;
    size_t ibase;
@@ -495,6 +505,7 @@ static void smf1_calcmodel_ast( void *job_data_ptr, int *status ) {
 
 /* Remove map values from the corresponding bolometer values. */
    if( pdata->oper == 1 ) {
+      cf = pdata->chunkfactor;
 
 /* Loop round all bolos to be processed by this thread, maintaining the
    index of the first time slice for the current bolo. */
@@ -530,7 +541,7 @@ static void smf1_calcmodel_ast( void *job_data_ptr, int *status ) {
 
                   if( !( *pq & SMF__Q_MOD ) ) {
                      ngood++;
-                     if( m != VAL__BADD ) *pr -= m;
+                     if( m != VAL__BADD ) *pr -= m/cf;
                   }
                }
 

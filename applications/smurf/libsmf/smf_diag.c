@@ -17,7 +17,8 @@
 *               int power, int time, int isub, smfDIMMData *dat,
 *               smf_modeltype type, smfArray *model, int res,
 *               const char *root, int mask, double mingood, int cube,
-*               int map, int addqual, smfSampleTable *table, int *status )
+*               int map, int addqual, smfSampleTable *table,
+*               double chunkfactor, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -79,6 +80,8 @@
 *     table = smfSampleTable * (Given)
 *        Pointer to a structure to be updated with information about
 *        values falling in a specified map pixel, or NULL.
+*     chunkfactor = double (Given)
+*        The scale factor for the current chunk.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -97,6 +100,8 @@
 *        Added argument "addqual".
 *     21-JAN-2015 (DSB):
 *        Added "ibolo=-4" option.
+*     10-APR-2018 (DSB):
+*        Added parameter "chunkfactor".
 
 *  Copyright:
 *     Copyright (C) 2013,2015 Science and Technology Facilities Council.
@@ -164,7 +169,8 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                int power, int time, int isub, smfDIMMData *dat,
                smf_modeltype type, smfArray *model, int res,
                const char *root, int mask, double mingood, int cube,
-               int map, int addqual, smfSampleTable *table, int *status ){
+               int map, int addqual, smfSampleTable *table, double chunkfactor,
+               int *status ){
 
 /* Local Variables: */
    AstCmpFrame *totfrm;
@@ -839,7 +845,8 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
             smf_rebinmap1( wf, array->sdata[ idx ], noi, dat->lut[0]->sdata[idx]->pntr[0],
                            0, 0, 0, NULL, 0, SMF__Q_GOOD, 1, rebinflags,
                            wf_map, wf_mapwgt, wf_mapwgtsq, wf_hitsmap,
-                           wf_mapvar, dat->msize, &scalevar, status );
+                           wf_mapvar, dat->msize, chunkfactor, &scalevar,
+                           status );
           }
 
 /* Copy the data and variance arrays to the NDF. */
