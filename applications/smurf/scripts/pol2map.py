@@ -831,7 +831,8 @@ def StoreCorrections( qui_maps, imap, use_ref_for_alignment, ref ):
 #  weight.
       try:
          aligned = NDG(1)
-         invoke("$KAPPA_DIR/align2d ref={0} out={2} in={1} form=3".
+         invoke("$KAPPA_DIR/align2d ref={0} out={2} in={1} form=3 "
+                "method=sincsinc rebin=no conserve=no params=\[0,2\]".
                 format(aref,aligner,aligned))
          dx = float( get_task_par( "TR(1)", "align2d" ) )
          dy = float( get_task_par( "TR(4)", "align2d" ) )
@@ -841,7 +842,7 @@ def StoreCorrections( qui_maps, imap, use_ref_for_alignment, ref ):
          nwgt += 1
 
          invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out=! device=! "
-                 "zeroff=yes".format(aligned,aref))
+                 "zeroff=yes pcrange=\[10,99.5\]".format(aligned,aref))
          scale = 1/float( get_task_par( "SLOPE", "normalize" ) )
 
 #  If align2d failed, use silly dx,dy values to ensure it is flagged by
