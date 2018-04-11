@@ -357,6 +357,17 @@
 *        all the new maps written to the directory specified by parameter
 *        MAPDIR (one per line). If a null (!) value is supplied no file is
 *        created. [!]
+*     NORMALISE = _LOGICAL (Read)
+*        If TRUE, scale corrections for individual observations found in
+*        any pre-existing auto-masked maps (e.g. made on a previous run of
+*        this script) are applied when creating new maps. If False, no
+*        scale corrections are applied. Scale correction factors are
+*        created and stored at the same time as the pointing corrections.
+*        The correction factor for a single observation is found by comparing
+*        the data values in the map made from the single observation with
+*        those in the mean of the maps made from all observation. The
+*        factor found in this way is stored in the FITS extension of the
+*        map made  from the observation (header "CHUNKFAC"). [FALSE]
 *     NORTH = LITERAL (Read)
 *        Specifies the celestial coordinate system to use as the reference
 *        direction in any newly created Q and U time series files. For
@@ -506,6 +517,8 @@
 *     9-APR-2018 (DSB):
 *        - Avoid infinite findclumps loop if no emission found in supplied mask.
 *        - Added parameter MULTIOBJECT.
+*     10-APR-2018 (DSB):
+*        Added parameter NORMALISE.
 
 '''
 
@@ -605,14 +618,14 @@ def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, automask,
              "conserve=no method=near variance=yes genvar={2} "
              .format(allmaps,coadd,mapvar))
 
-#  If we are processing I data, determine pointing corrections by comparing
-#  each individual observation map with the new coadd. The pointing corrections
-#  are stored in the FITS headers of the observation I maps. We determine
-#  the pointing corrections from the I data since it is brighter than Q or
-#  U, and then apply the same pointing corrections to the Q and U data when
-#  creating maps from the Q and U time streams.
+#  If we are processing I data, determine pointing and calibration corrections
+#  by comparing each individual observation map with the new coadd. These
+#  corrections are stored in the FITS headers of the observation I maps. We
+#  determine the corrections from the I data since it is brighter than Q or U,
+#  and then apply the same corrections to the Q and U data when creating maps
+#  from the Q and U time streams.
       if qui == "I":
-         PointingCorrections( qui_maps, coadd, use_ref_for_alignment, ref )
+         StoreCorrections( qui_maps, coadd, use_ref_for_alignment, ref )
 
 #  If we are weighting observations separately, first deal with I data.
    elif qui == "I":
@@ -667,7 +680,7 @@ def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, automask,
 #  individual oibservation map with the new coadd. The pointing
 #  corrections are stored in the FITS headers of the observation maps.
 #  The weights are returned in a list.
-            weights = PointingCorrections( qui_maps, this_coadd, use_ref_for_alignment, ref )
+            weights = StoreCorrections( qui_maps, this_coadd, use_ref_for_alignment, ref )
 
 #  Store the new weights in the weights file and in the I maps. Ensure
 #  the order of the values in the weights file matches the order of the maps
@@ -732,10 +745,10 @@ def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, automask,
 
 
 
-#  Function to determine pointing correction and weight for each
-#  individual observation by comparing the observation's I map with
-#  the coadd of all I maps.
-def PointingCorrections( qui_maps, imap, use_ref_for_alignment, ref ):
+#  Function to determine pointing correction, calibration correction and
+#  weight for each individual observation by comparing the observation's
+#  I map with the coadd of all I maps.
+def StoreCorrections( qui_maps, imap, use_ref_for_alignment, ref ):
 
 #  Choose the map with which to align each of the new I maps. We use the
 #  external reference map if one was supplied. Otherwise we use the I mosaic
@@ -774,8 +787,10 @@ def PointingCorrections( qui_maps, imap, use_ref_for_alignment, ref ):
                         format( qui_maps[key] ), False ).strip()
          if there == "TRUE":
             comment = "Remaining {0} pointing error [arcsec]"
+            scomment = "Relative calibration factor"
          else:
             comment = "Required {0} pointing correction [arcsec]"
+            scomment = "Relative calibration factor"
 
 #  The determination of the pointing correction is more accurate if we
 #  first mask out background areas. Use the AST mask to define source pixels,
@@ -815,8 +830,9 @@ def PointingCorrections( qui_maps, imap, use_ref_for_alignment, ref ):
 #  between the two maps after alignment, and store the corresponding
 #  weight.
       try:
-         invoke("$KAPPA_DIR/align2d ref={0} out=! in={1} form=3".
-                format(aref,aligner))
+         aligned = NDG(1)
+         invoke("$KAPPA_DIR/align2d ref={0} out={2} in={1} form=3".
+                format(aref,aligner,aligned))
          dx = float( get_task_par( "TR(1)", "align2d" ) )
          dy = float( get_task_par( "TR(4)", "align2d" ) )
          rms = float( get_task_par( "RMS", "align2d" ) )
@@ -824,12 +840,17 @@ def PointingCorrections( qui_maps, imap, use_ref_for_alignment, ref ):
          swgt += weights[key]
          nwgt += 1
 
+         invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out=! device=! "
+                 "zeroff=yes".format(aligned,aref))
+         scale = 1/float( get_task_par( "SLOPE", "normalize" ) )
+
 #  If align2d failed, use silly dx,dy values to ensure it is flagged by
 #  the following code.
       except starutil.AtaskError:
          dx = 1E6
          dy = 1E6
          weights[key] = 0.0
+         scale = 1.0
 
 #  Ensure the bad-bits mask has been reset.
       if bb > 0:
@@ -919,6 +940,11 @@ def PointingCorrections( qui_maps, imap, use_ref_for_alignment, ref ):
          invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=PNTRQ_DY edit=a value={1} "
                 "comment=\"'{2}'\" position=! mode=interface".
                 format(qui_maps[key],dy,com))
+
+#  Also store the scale factor.
+         invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=CHUNKFAC edit=a value={1} "
+                "comment=\"'{2}'\" position=! mode=interface".
+                format(qui_maps[key],scale,scomment))
 
 #  Find the median of the weights.
    wmed = median( weights.values() )
@@ -1067,6 +1093,9 @@ try:
                                 False, noprompt=True))
 
    params.append(starutil.Par0L("OBSWEIGHT", "Down-weight unusual observations?",
+                                False, noprompt=True))
+
+   params.append(starutil.Par0L("NORMALISE", "Normalise each observation to the mean?",
                                 False, noprompt=True))
 
 
@@ -1276,6 +1305,10 @@ try:
 
 #  See if unusual observations should be down-weighted.
    obsweight = parsys["OBSWEIGHT"].value
+
+#  See if observations are to be normalised to the mean of all
+#  observations.
+   normalise = parsys["NORMALISE"].value
 
 #  See if we should store I, Q and U values in mJy/beam in the output
 #  calatlogue.
@@ -2071,6 +2104,41 @@ try:
                fd.write('chunkweight=1.0\n')
             fd.close()
 
+#  Store a calibration correction factor within each time series file.
+#  Makemap uses these factors to scale the maps made from individual
+#  observations. The factors will have been found on a previous run of
+#  pol2map as part of generating the auto-masked I map. The factor for
+#  an observation will have been stored in the CHUNKFAC header in the
+#  auto-masked imap. Transfer it to the time-series file. Only use the
+#  factors if all observations have a factor.
+            allone = True
+            if normalise:
+               for key in qui_list:
+                  try:
+                     hmap = NDG("{0}/{1}_imap".format(mapdir,key))
+                     factor = float( get_fits_header( hmap, "CHUNKFAC" ))
+                  except starutil.NoNdfError:
+                     factor = 1.0
+
+                  if factor != 1.0:
+                     allone = False
+
+                  invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=CHUNKFAC edit=a "
+                         "value={1} comment=\"'Calibration correction factor'\" "
+                         "position=! mode=interface".format(NDG(qui_list[key]),factor))
+
+#  If any of the factors are not 1.0, modify the config to indicate that
+#  makemap should read the factors weights from the CHUNKFAC header in
+#  the time-stream data . Otherwise ensure no weighting is done inside
+#  skyloop by setting the config parameter "chunkfactor" to its default
+#  weight of 1.0.
+            fd = open( conf, "a" )
+            if not allone:
+               fd.write('chunkfactor="CHUNKFAC"\n')
+            else:
+               fd.write('chunkfactor=1.0\n')
+            fd.close()
+
 #  Add pointing corrections to the file for each observation
             corrections = {}
             fd = None
@@ -2196,6 +2264,9 @@ try:
 
 #  Add it to the dictionary of maps holding the current stokes parameter.
                   qui_maps[key] = NDG(newpath)
+
+#  Copy quality information from the coadd created by skyloop.
+                  invoke("$KAPPA_DIR/setqual ndf={0} like={1}".format(qui_maps[key],coadd))
 
 #  Clear its bad bits mask.
                   invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(qui_maps[key]))
