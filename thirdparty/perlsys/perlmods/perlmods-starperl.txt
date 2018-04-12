@@ -7,3 +7,4 @@ Perl/bin/maparea2region
 Perl/bin/sourceplot
 Perl/bin/stime
 Perl/bin/translatehdr
+Perl/bin/pod2sst
