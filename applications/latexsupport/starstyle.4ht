@@ -3,6 +3,9 @@
 %%% This file implements tex4ht alterations to starlink.cls and
 %%% starstyle.sty
 
+%% Deal with missing \T1 command on tex4ht with texlive 2017 (ubuntu)
+\providecommand{\T1}{}
+
 %%%%%%%%%%%%%%%%%%% Table of contents and sectioning formatting
 % Set up the places to cut and the places to put tocs.
 \ifwithchapters
