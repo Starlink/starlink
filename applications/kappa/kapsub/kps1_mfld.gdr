@@ -19,7 +19,7 @@
 *     This routine serves MFITTREND.  It fits a straight line to
 *     to all lines of the supplied data that lie parallel to a given
 *     axis, and iteratively rejects outliers within each line using the
-*     dispersion within that line.
+*     dispersion within that line with respect to its median.
 
 *  Arguments:
 *     DTAXIS = INTEGER (Given)
@@ -48,14 +48,14 @@
 *     specified.
 
 *  Copyright:
-*     Copyright (C) 2007, 2008, 2016 Science & Technology Facilities
-*     Council.
+*     Copyright (C) 2007, 2008, 2016, 2018 Science & Technology]
+*     Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -80,7 +80,10 @@
 *     2016 March 29 (MJC):
 *        Add FOREST argument and determine the mode from the histogram
 *        peak to assess outliers in line forests.
-*     {enter_changes_here}
+*     2018 April 25 (MJC):
+*        Take the residuals with respect to the median instead of the
+*        mean to handle extended bright emission.
+*     {enter_further_changes_here}
 
 *-
 
@@ -333,14 +336,20 @@
      :                         %VAL( CNF_PVAL( IPLINE ) ), NEL, STATUS )
 
 *  Derive the statistics of the residuals to the fit.  No clipping is
-*  applied here.
+*  applied here.  First the regular statistics...
             CALL KPG_OSTA<T>( BAD, DTEL, %VAL( CNF_PVAL( IPRLIN ) ), 0,
      :                      CLIP, ISTAT, DSTAT, ISTATC, DSTATC, STATUS )
-
             MEAN = DSTAT( 4 )
             STDEV = DSTAT( 5 )
             SKEW = DSTAT( 6 )
             NGOOD = ISTAT( 1 )
+
+*  then get the median.  Given a strong signal, the mean will lie outside
+*  the baseline peak of the spectrum's histogram, whereas the median is
+*  far more likely to reside in that peak.  Thus clipping about the
+*  median will be more closely with respect to the baseline, as desired.
+            CALL KPG_STOS<T>( DTEL, %VAL( CNF_PVAL( IPRLIN ) ), NGOOD,
+     :                        1, VAL__BADR, MEDIAN, PERVAL, STATUS )
 
 *  Flag outliers beyond the clipping interval.
             IF ( STDEV .NE. VAL__BADD ) THEN
@@ -458,8 +467,8 @@
                   LOW = NUM_DTO<T>( MODE - DBLE( CLIP( J ) ) * STDEVM )
                   HIGH = NUM_DTO<T>( MODE + DBLE( CLIP ( J ) ) * STDEVM )
                ELSE
-                  LOW = NUM_DTO<T>( MEAN - DBLE( CLIP( J ) ) * STDEV )
-                  HIGH = NUM_DTO<T>( MEAN + DBLE( CLIP ( J ) ) * STDEV )
+                  LOW = NUM_DTO<T>( MEDIAN - DBLE( CLIP( J ) ) * STDEV )
+                  HIGH = NUM_DTO<T>( MEDIAN + DBLE( CLIP ( J ) ) * STDEV )
                END IF
 
 *  Replace the values in the output array outside the range with the
