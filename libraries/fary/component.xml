@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="ary" support="S">
+<component id="fary" support="S">
   <version>1.4</version>
   <path>libraries/fary</path>
   <description>A Subroutine Library for Accessing ARRAY Data Structures</description>

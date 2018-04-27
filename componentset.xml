@@ -172,7 +172,7 @@ including FITS.
 </component>
 
 <component id="cupid" support="S">
-  <version>2.3</version>
+  <version>2.5</version>
   <path>applications/cupid</path>
   <description>CUPID - AST applications</description>
   <abstract><p>
@@ -835,7 +835,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>2.5-5</version>
+  <version>2.5-8</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -1526,7 +1526,7 @@ spectropolarimetry data, complimenting facilities available in TSP.
 </component>
 
 <component id="polpack" support="S">
-  <version>3.5-0</version>
+  <version>3.6-0</version>
   <path>applications/polpack</path>
   <description>POLPACK - An Imaging Polarimetry Reduction Package</description>
   <abstract><p>
@@ -2475,12 +2475,13 @@ to handle data from a variety of different instruments.
   <path>docs/sc/022</path>
   <description>The POL-2 Data Reduction Cookbook</description>
   <abstract><p>
-     This cookbook provides an introduction to Starlink facilities,
-     SMURF, the Sub-Millimetre User Reduction Facility, and in
-     particular POL2MAP -- the command for reducing POL-2 data. This
-     cookbook illustrates the various steps required to reduce the
-     data, including an overview of the method. It also describes how
-     to calibrate and display the data as images or vector maps.
+     This cookbook provides an introduction to POL-2 data reduction,
+     using the Starlink facilities SMURF (the Sub-Millimetre
+     User Reduction Facility), and in particular its command
+     POL2MAP. This cookbook illustrates the various steps required
+     to reduce the data, including an overview of the method. It
+     also describes how to calibrate and display the data as images
+     or vector maps.
   </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
@@ -3150,7 +3151,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>8.5.1</version>
+  <version>8.6.2</version>
   <path>libext/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -3365,7 +3366,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ary" support="S">
-  <version>1.4</version>
+  <version>2.0</version>
   <path>libraries/ary</path>
   <description>A Subroutine Library for Accessing ARRAY Data Structures</description>
   <abstract><p> The ARY library is a set of routines for accessing
@@ -3373,7 +3374,7 @@ to handle data from a variety of different instruments.
   System (HDS).
     </p></abstract>
   <dependencies >
-    <build>sae</build><build>prm</build><build>hds</build><build>chr</build><build>ems</build><build>generic</build><link>hds</link><link>ems</link><link>chr</link><link>prm</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>ast</build><build>prm</build><build>hds</build><build>ems</build><build>generic</build><link>hds</link><link>ast</link><link>ems</link><link>prm</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -3625,6 +3626,37 @@ No longer under active control.
       <role>owner</role>
     </person>  </developers>
   <documentation> ssn4</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+</component>
+
+<component id="fary" support="S">
+  <version>1.4</version>
+  <path>libraries/fary</path>
+  <description>A Subroutine Library for Accessing ARRAY Data Structures</description>
+  <abstract><p> The ARY library is a set of routines for accessing
+  Starlink ARRAY data structures built using the Hierarchical Data
+  System (HDS).
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><build>prm</build><build>hds</build><build>chr</build><build>ems</build><build>generic</build><link>hds</link><link>ems</link><link>chr</link><link>prm</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Rodney Warren-Smith</name>
+      <uname>rfws</uname>
+    </person>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation> sun11</documentation>
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
@@ -5022,7 +5054,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="automake" buildsupport="yes" support="U">
-  <version>starlink-1.14</version>
+  <version>starlink-1.15</version>
   <path>thirdparty/fsf/autotools/automake</path>
   <description>GNU automake, patched</description>
   <dependencies>
