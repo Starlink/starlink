@@ -406,7 +406,7 @@ void ary1S2dlt( HDSLoc *loc1, int zaxis, const char *type, HDSLoc *loc2,
       } else if( *status == SAI__OK ) { \
          *status = ARY__FATIN; \
          msgSetc( "T", type_indata ); \
-         errRep( "", "ARY1_S2DLT: Unsupported input data type '^T' " \
+         errRep( "", "ary1S2dlt: Unsupported input data type '^T' " \
                  "(programming error).", status ); \
          goto L999; \
       }
@@ -423,7 +423,7 @@ void ary1S2dlt( HDSLoc *loc1, int zaxis, const char *type, HDSLoc *loc2,
    } else if( *status == SAI__OK ) {
       *status = ARY__FATIN;
       msgSetc( "T", type );
-      errRep( "", "ARY1_S2DLT: Unsupported output data type '^T' "
+      errRep( "", "ary1S2dlt: Unsupported output data type '^T' "
               "(programming error).", status );
       goto L999;
    }

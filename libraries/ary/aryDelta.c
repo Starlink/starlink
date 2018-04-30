@@ -377,7 +377,7 @@ void aryDelta( Ary *ary1, int zaxis, const char *type, float minrat,
       if( *status != SAI__OK ) goto L999;
 
 /* Erase all components within the data object - they will be re-created in
-   compressed form by ARY1_S2DLT. */
+   compressed form by ary1S2dlt. */
       datNcomp( dcb2->loc, &ncomp, status );
       for( icomp = 0; icomp < ncomp; icomp++ ){
          datIndex( dcb2->loc, 1, &locc, status );

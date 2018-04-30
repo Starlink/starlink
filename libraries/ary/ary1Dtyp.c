@@ -85,7 +85,7 @@ void ary1Dtyp( AryDCB *dcb, int *status ) {
       if( ary1Defr( dcb, status ) ){
          *status = ARY__UNDEF;
          errRep( "ARY1_DTYP_ERR1",
-                 "ARY1_DTYP: Cannot get type information because the"
+                 "ary1Dtyp: Cannot get type information because the"
                  "creation of the supplied array has been deferred (ARY"
                  "programming error).", status );
       }

@@ -73,9 +73,9 @@ void ary1Dobj( AryDCB *dcb, int *status ) {
    if( ary1Defr( dcb, status ) && *status == SAI__OK ){
 
 /* Report an error if required information is not available. The only
-   situation in which creation is deferred is if ARY1_DCRE(P) is called
+   situation in which creation is deferred is if ary1Dcre(p) is called
    with its DEFER parameter set TRUE. In this case, all the required
-   information should already be available because ARY1_DCRE(P) will have
+   information should already be available because ary1Dcre(p) will have
    set it up. */
       if( !dcb->ktype ){
          *status = ARY__UNDEF;
