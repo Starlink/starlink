@@ -65,14 +65,36 @@ void ary1Imp( HDSLoc *loc, AryACB **acb, int *status ) {
 *  History:
 *     03-JUL-2017 (DSB):
 *        Original version, based on equivalent Fortran routine by RFWS.
+*     20-APR-2018 (DSB):
+*        The original C version of this function reported an error if the
+*        requested array was already mapped with a different access mode.
+*        This differed from the F77 version, which promoted any existing
+*        read-only DCB entries to "UPDATE" access in such cases. This
+*        difference was introduced in an attempt to reduce the chance of
+*        errors occurring in mult-threaded applications. However, there
+*        are cases where the original behaviour is required (e.g.
+*        kappa:wcsalign needs it when attmepting to modify the input NDFs
+*        - when parameter INSITU is set TRUE). Experience from smurf
+*        suggests that it should be the responsibility of the application
+*        code to avoid simultaneous reading and writing of the same parts
+*        of an array. And the original C behaviour was flawed anyway,
+*        because it did not preclude the simulataneous mapping of an
+*        array for write access by two threads, which is just as likely to
+*        produce threading issues as simultaneous reading and writing. So
+*        this change re-instates the F77 behaviour.
 
 *-
 */
 
 /* Local variables: */
+   AryACB *acbt;              /* ACB to be tested */
    AryDCB *dcb;               /* Pointer to new DCB structure */
+   AryDCB *dcba;              /* DCB to be annulled */
+   AryDCB *dcbk;              /* DCB to be kept */
    AryDCB *dcbt;              /* Pointer to tested DCB structure */
+   AryDCB *temp;              /* Temporary store for DCB pointer */
    char dupe;                 /* Whether DCB entry is duplicated */
+   int iacbt;                 /* Index of ACB entry to be tested */
    int idcbt;                 /* Index of DCB to be tested/compared */
    int next;                  /* Index of next object to consider */
 
@@ -112,45 +134,60 @@ void ary1Imp( HDSLoc *loc, AryACB **acb, int *status ) {
          }
       }
 
-/* If duplicate DCB entries exist, we can use the existing DCB in place
-   of the new DCB. But only if they have the same access mode. Report an
-   error if the new and old DCBs have different access modes (i.e. we do
-   not allow the same file to be open for separate read and write access
-   at he same time). This is different to the Fortran version of this
-   routine, which did not prohibit mixed access (the read-only DCB
-   was promoted to read-write). However, in a multi-threaded world it
-   really can't be a good idea to have  one part of the code reading an
-   array whilst another part is wanting to write to the same array. We
-   shall see...  We can always change this later if required. */
+/* If a duplicate DCB entries exist, then they must be combined into a
+   single entry, but account must be taken of possible differences in
+   the access mode when the same data object is imported several times. */
+      dcbk = dcb;
       if( *status == SAI__OK ){
          if( dupe ){
 
 /* Ensure access mode information is available for both old and new DCB. */
             ary1Dmod( dcb, status );
             ary1Dmod( dcbt, status );
+            if( *status == SAI__OK ){
 
-/* If the new and old DCB entries have different access modes, report an
-   error. */
-            if( strcmp( dcb->mode, dcbt->mode ) ) {
-               if( *status == SAI__OK ) {
-                  *status = ARY__CFLAC;
-                  datMsg( "A", dcb->loc );
-                  msgSetc( "M1", dcb->mode );
-                  msgSetc( "M2", dcbt->mode );
-                  errRep( "ARY1_IMP_1", "Requested ^M1 access to the "
-                          "array ^A conflicts with existing ^M2 "
-                          "access to the same data object (possible "
-                          "programming error).", status );
+/* For preference, we keep the DCB entry which was there first, and
+   annul the new one. */
+               dcbk = dcbt;
+               dcba = dcb;
+
+/* However, if the new entry has UPDATE access to the data object,
+   whereas the first one does not, then the new DCB entry has to be
+   kept at the expense of the old one. */
+               if( strcmp( dcbk->mode, "UPDATE" ) &&
+                   !strcmp( dcba->mode, "UPDATE" ) ){
+                  dcbk = dcb;
+                  dcba = dcbt;
+
+/* Transfer the reference count and mapping counts to the new DCB entry. */
+                  dcb->refcount = dcbt->refcount;
+                  dcb->nread = dcbt->nread;
+                  dcb->nwrite = dcbt->nwrite;
                }
 
-/* If the access modes are the same, just annul the new DCB and use the
-   old one in its place. Because the new DCB has only just been created,
-   we know it has not yet been used within any ACB. So we know it will be
-   removed when we annul it, and we do not need to check the existing
-   ACBs for occurrences of the new DCB. */
-            } else {
-               ary1Danl( 0, &dcb, status );
-               dcb = dcbt;
+/* Reset the reference count for the other DCB to 1 and annul it, so that
+   it is removed. Retain the DCB pointer for use later. */
+               dcba->refcount = 1;
+               temp = dcba;
+               ary1Danl( 0, &dcba, status );
+               dcba = temp;
+
+/* Loop through all the entries in the ACB to make adjustments to any
+   which referred to the DCB entry which has just been removed. */
+               iacbt = -1;
+               next = 0;
+               while( 1 ) {
+                  acbt = ary1Nxtsl( ARY__ACBTYPE, iacbt, &next, status );
+                  if( ( *status == SAI__OK ) && ( next != -1 ) ){
+                     iacbt = next;
+
+/* Any ACB entries which point to the annulled DCB entry are changed to
+   point to the one which was kept instead. */
+                     if( acbt->dcb == dcba ) acbt->dcb = dcbk;
+                  } else {
+                     break;
+                  }
+               }
             }
          }
       }
@@ -159,10 +196,10 @@ void ary1Imp( HDSLoc *loc, AryACB **acb, int *status ) {
       ARY__DCB_UNLOCK_MUTEX;
 
 /* Create a new ACB base array entry to describe the new data object. */
-      ary1Crnba( dcb, acb, status );
+      ary1Crnba( dcbk, acb, status );
    }
 
 /* Call error tracing routine and exit. */
-   if( *status != SAI__OK ) ary1Trace( "ARY1_IMP", status );
+   if( *status != SAI__OK ) ary1Trace( "ary1Imp", status );
 
 }
