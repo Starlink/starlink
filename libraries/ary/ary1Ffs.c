@@ -160,7 +160,7 @@ void *ary1Ffs( AryBlockType type, int *status ) {
       *status = ARY__FATIN;
       msgSetc( "ROUTINE", "ary1Ffs" );
       msgSeti( "BADTYPE", type );
-      errRep( " ", "Routine ^ROUTINE called with an invalid 'type' argument of"
+      errRep( " ", "Routine ^ROUTINE called with an invalid 'type' argument of "
               "^BADBLOCK (internal programming error).", status );
    }
 

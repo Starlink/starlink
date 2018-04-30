@@ -94,7 +94,7 @@ void ary1Dscl( AryDCB *dcb, int *status ) {
          } else if( !there ){
             *status = ARY__SCLIN;
             datMsg( "ARRAY", dcb->loc );
-            errRep( " ", "The SCALE component in missing in the scaled array"
+            errRep( " ", "The SCALE component in missing in the scaled array "
                     "structure ^ARRAY.", status );
 
 /* If there is, copy it to the temporary structure stored in the DCB. */
@@ -112,7 +112,7 @@ void ary1Dscl( AryDCB *dcb, int *status ) {
          } else if( !there ){
             *status = ARY__SCLIN;
             datMsg( "ARRAY", dcb->loc );
-            errRep( " ", "The ZERO component in missing in the scaled array"
+            errRep( " ", "The ZERO component in missing in the scaled array "
                     "structure ^ARRAY.", status );
 
 /* If there is, copy it to the temporary structure stored in the DCB. */
@@ -140,7 +140,7 @@ void ary1Dscl( AryDCB *dcb, int *status ) {
       } else {
          *status = ARY__FATIN;
          msgSetc( "BADFORM", dcb->form );
-         errRep( " ", "Unsupported array form '^BADFORM' found in Data Control"
+         errRep( " ", "Unsupported array form '^BADFORM' found in Data Control "
                  "Block (internal programming error).", status );
       }
    }

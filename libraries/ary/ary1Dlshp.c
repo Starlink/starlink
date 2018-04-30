@@ -86,7 +86,7 @@ void ary1Dlshp( HDSLoc *loc, int mxdim, hdsdim *dim, int *ndim, int *status ) {
    } else if( *status == SAI__OK ){
       *status = ARY__DLTIN;
       datMsg( "A", loc );
-      errRep( " ", "The DELTA compressed array '^A' is invalid - the ZAXIS"
+      errRep( " ", "The DELTA compressed array '^A' is invalid - the ZAXIS "
               "component is missing.", status );
       goto L999;
    }
@@ -102,7 +102,7 @@ void ary1Dlshp( HDSLoc *loc, int mxdim, hdsdim *dim, int *ndim, int *status ) {
       *status = ARY__DLTIN;
       datMsg( "A", loc );
       errRep( " ",
-              "The DELTA compressed array '^A' is invalid - the ZDIM"
+              "The DELTA compressed array '^A' is invalid - the ZDIM "
               "component is missing.", status );
       goto L999;
    }
@@ -133,7 +133,7 @@ void ary1Dlshp( HDSLoc *loc, int mxdim, hdsdim *dim, int *ndim, int *status ) {
       datMsg( "A", loc );
       msgSeti( "N", *ndim );
       msgSeti( "X", mxdim );
-      errRep( " ", "The DELTA compressed array '^A' is invalid - the number of"
+      errRep( " ", "The DELTA compressed array '^A' is invalid - the number of "
               "axes (^N) is more than the allowed maximum (^X).", status );
       goto L999;
    }

@@ -104,7 +104,7 @@ void ary1Vtyp( const char *type, char vtype[DAT__SZTYP + 1], int *status ) {
    } else {
       *status = ARY__TYPIN;
       msgSetc( "BADTYPE", type );
-      errRep( " ", "Invalid array data type '^BADTYPE' specified (possible"
+      errRep( " ", "Invalid array data type '^BADTYPE' specified (possible "
               "programming error).", status );
    }
 

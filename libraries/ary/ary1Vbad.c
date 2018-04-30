@@ -99,7 +99,7 @@ void ary1Vbad( const char *type, size_t n, void *pntr, int *status ) {
       *status = ARY__FATIN;
       msgSetc( "BADTYPE", type );
       errRep( "ARY1_VBAD_TYPE",
-              "Routine ary1Vbad called with an invalid 'type' argument of"
+              "Routine ary1Vbad called with an invalid 'type' argument of "
               "'^BADTYPE' (internal programming error).", status );
    }
 

@@ -120,7 +120,7 @@ void ary1Vmmd( const char *mmod,  char mode[ARY__SZMOD+1],
    } else {
       *status = ARY__MMDIN;
       msgSetc( "BADMMODE", mmod );
-      errRep( " ", "Invalid array mapping mode '^BADMMODE' specified (possible"
+      errRep( " ", "Invalid array mapping mode '^BADMMODE' specified (possible "
               "programming error).", status );
    }
 

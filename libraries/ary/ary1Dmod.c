@@ -163,7 +163,7 @@ void ary1Dmod( AryDCB *dcb, int *status ) {
          *status = ARY__FATIN;
          msgSetc( "BADFORM", dcb->form );
          errRep( "ARY1_DMOD_FRM",
-                 "Unsupported array form '^BADFORM' found in Data Control"
+                 "Unsupported array form '^BADFORM' found in Data Control "
                  "Block (internal programming error).", status );
       }
 

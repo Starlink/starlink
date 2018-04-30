@@ -111,8 +111,8 @@ void ary1Dbad( AryDCB *dcb, int *status ) {
                   datMsg( "ARRAY", dcb->loc );
                   msgSetc( "BADTYPE", type );
                   errRep( "ARY1_DBAD_TYPE",
-                          "The BAD_PIXEL component in the array structure"
-                          "^ARRAY has an invalid HDS type of '^BADTYPE'; it"
+                          "The BAD_PIXEL component in the array structure "
+                          "^ARRAY has an invalid HDS type of '^BADTYPE'; it "
                           "should be of type '_LOGICAL'.", status );
 
 /* Check it is scalar and report an error if it is not. */
@@ -121,8 +121,8 @@ void ary1Dbad( AryDCB *dcb, int *status ) {
                   datMsg( "ARRAY", dcb->loc );
                   msgSeti( "BADNDIM", ndimb );
                   errRep( "ARY1_DBAD_BDIM",
-                          "The BAD_PIXEL component in the array structure"
-                          "^ARRAY is ^BADNDIM-dimensional; it should be a"
+                          "The BAD_PIXEL component in the array structure "
+                          "^ARRAY is ^BADNDIM-dimensional; it should be a "
                           "scalar.", status );
 
 /* Obtain the BAD_PIXEL value. */
@@ -141,7 +141,7 @@ void ary1Dbad( AryDCB *dcb, int *status ) {
          *status = ARY__FATIN;
          msgSetc( "BADFORM", dcb->form );
          errRep( "ARY1_DBAD_FRM",
-                 "Unsupported array form '^BADFORM' found in Data Control"
+                 "Unsupported array form '^BADFORM' found in Data Control "
                  "Block (internal programming error).", status );
       }
 

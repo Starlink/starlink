@@ -79,20 +79,20 @@ void ary1Dobj( AryDCB *dcb, int *status ) {
    set it up. */
       if( !dcb->ktype ){
          *status = ARY__UNDEF;
-         errRep( " ", "ary1Dobj: Deferred creation of an array is not possible"
-                 "because no type information is available (ARY programming"
+         errRep( " ", "ary1Dobj: Deferred creation of an array is not possible "
+                 "because no type information is available (ARY programming "
                  "error).", status );
 
       } else if( !dcb->kbnd ){
          *status = ARY__UNDEF;
-         errRep( " ", "ary1Dobj: Deferred creation of an array is not possible"
-                 "because no bounds information is available (ARY"
+         errRep( " ", "ary1Dobj: Deferred creation of an array is not possible "
+                 "because no bounds information is available (ARY "
                  "programming error).", status );
 
       } else if( !dcb->kform ){
          *status = ARY__UNDEF;
-         errRep( " ", "ary1Dobj: Deferred creation of an array is not possible"
-                 "because no form information is available (ARY programming"
+         errRep( " ", "ary1Dobj: Deferred creation of an array is not possible "
+                 "because no form information is available (ARY programming "
                  "error).", status );
       }
 
@@ -165,7 +165,7 @@ void ary1Dobj( AryDCB *dcb, int *status ) {
       } else {
          *status = ARY__FATIN;
          msgSetc( "BADFORM", dcb->form );
-         errRep( " ", "Unsupported array form '^BADFORM' found in Data Control"
+         errRep( " ", "Unsupported array form '^BADFORM' found in Data Control "
                  "Block (internal programming error).", status );
       }
 

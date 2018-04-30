@@ -133,7 +133,7 @@ void ary1Cpy( AryACB *acb1, int temp, HDSLoc **loc, int expand,
          *status = ARY__ISMAP;
          datMsg( "ARRAY", dcb1->loc );
          errRep( " ", "The array structure ^ARRAY is already mapped for UPDATE"
-                 " or WRITE access, perhaps through another identifier"
+                 " or WRITE access, perhaps through another identifier "
                  "(possible programming error).", status );
 
 /* Make a direct copy of the data object and then create a new base array
@@ -376,7 +376,7 @@ void ary1Cpy( AryACB *acb1, int temp, HDSLoc **loc, int expand,
          } else {
             *status = ARY__FATIN;
             msgSetc( "BADFORM", dcb1->form );
-            errRep( " ", "Invalid array form '^BADFORM' found in Data Control"
+            errRep( " ", "Invalid array form '^BADFORM' found in Data Control "
                     "Block (internal programming error).", status );
          }
       }

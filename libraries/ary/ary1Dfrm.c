@@ -96,7 +96,7 @@ void ary1Dfrm( AryDCB *dcb, int *status ) {
                   datMsg( "ARRAY", dcb->loc );
                   msgSetc( "BADTYPE", type );
                   errRep( "ARY1_DFRM_TYPE",
-                          "The array structure ^ARRAY has an invalid data"
+                          "The array structure ^ARRAY has an invalid data "
                           "type of '^BADTYPE'.", status );
 
 /* Check it is a scalar. Report an error if it is not. */
@@ -105,7 +105,7 @@ void ary1Dfrm( AryDCB *dcb, int *status ) {
                   datMsg( "ARRAY", dcb->loc );
                   msgSeti( "BADNDIM", ndim );
                   errRep( "ARY1_DFRM_NDMA",
-                          "The array structure ^ARRAY is"
+                          "The array structure ^ARRAY is "
                           "^BADNDIM-dimensional; it should be a scalar.",
                           status );
 
@@ -130,9 +130,9 @@ void ary1Dfrm( AryDCB *dcb, int *status ) {
                            datMsg( "ARRAY", dcb->loc );
                            msgSetc( "BADTYPE", type );
                            errRep( "ARY1_DFRM_VTYP",
-                                   "The VARIANT component in the array"
-                                   "structure ^ARRAY has an invalid HDS"
-                                   "type of '^BADTYPE'; it should be of"
+                                   "The VARIANT component in the array "
+                                   "structure ^ARRAY has an invalid HDS "
+                                   "type of '^BADTYPE'; it should be of "
                                    "type '_CHAR'.", status );
 
 /* Check that it is scalar and report an error if it is not. */
@@ -141,9 +141,9 @@ void ary1Dfrm( AryDCB *dcb, int *status ) {
                            datMsg( "ARRAY", dcb->loc );
                            msgSeti( "BADNDIM", ndim );
                            errRep( "ARY1_DFRM_NDMV",
-                                   "The VARIANT component in the array"
-                                   "structure ^ARRAY is"
-                                   "^BADNDIM-dimensional; it should be a"
+                                   "The VARIANT component in the array "
+                                   "structure ^ARRAY is "
+                                   "^BADNDIM-dimensional; it should be a "
                                    "scalar.", status );
 
 /* If the VARIANT component is OK, then map it and obtain its value. */
@@ -187,8 +187,8 @@ void ary1Dfrm( AryDCB *dcb, int *status ) {
                                  datMsg( "ARRAY", dcb->loc );
                                  msgSetc( "BADVARIANT", variant );
                                  errRep( "ARY1_DFRM_VRNT",
-                                         "The VARIANT component in the array"
-                                         "structure ^ARRAY has an invalid"
+                                         "The VARIANT component in the array "
+                                         "structure ^ARRAY has an invalid "
                                          "value of '^BADVARIANT'.", status );
                               }
                            }

@@ -80,7 +80,7 @@ void ary1Cmtmp( const char *type, int ndim, const hdsdim *dim, HDSLoc **loc,
       *status = ARY__FATIN;
       msgSetc( "BADTYPE", type );
       errRep( "ARY1_CMTMP_TYPE",
-              "Routine ary1Cmtmp called with an invalid TYPE argument of"
+              "Routine ary1Cmtmp called with an invalid TYPE argument of "
               "'^BADTYPE' (internal programming error).", status );
 
 /* Create the temporary object and map it as workspace. */

@@ -92,7 +92,7 @@ void ary1Cpdlt( AryDCB *dcb1, AryDCB *dcb2, int *status ) {
          } else if( *status == SAI__OK ){
             *status = ARY__DLTIN;
             datMsg( "A", dcb1->loc );
-            errRep( " ", "The DELTA compressed array '^A' is invalid - the ZAXIS"
+            errRep( " ", "The DELTA compressed array '^A' is invalid - the ZAXIS "
                     "component is missing.", status );
          }
 
@@ -106,7 +106,7 @@ void ary1Cpdlt( AryDCB *dcb1, AryDCB *dcb2, int *status ) {
          } else if( *status == SAI__OK ){
             *status = ARY__DLTIN;
             datMsg( "A", dcb1->loc );
-            errRep( " ", "The DELTA compressed array '^A' is invalid - the ZDIM"
+            errRep( " ", "The DELTA compressed array '^A' is invalid - the ZDIM "
                     "component is missing.", status );
          }
 
@@ -120,7 +120,7 @@ void ary1Cpdlt( AryDCB *dcb1, AryDCB *dcb2, int *status ) {
          } else if( *status == SAI__OK ){
             *status = ARY__DLTIN;
             datMsg( "A", dcb1->loc );
-            errRep( " ", "The DELTA compressed array '^A' is invalid - the VALUE"
+            errRep( " ", "The DELTA compressed array '^A' is invalid - the VALUE "
                     "component is missing.", status );
          }
 
@@ -134,7 +134,7 @@ void ary1Cpdlt( AryDCB *dcb1, AryDCB *dcb2, int *status ) {
          } else if( *status == SAI__OK ){
             *status = ARY__DLTIN;
             datMsg( "A", dcb1->loc );
-            errRep( " ", "The DELTA compressed array '^A' is invalid - the"
+            errRep( " ", "The DELTA compressed array '^A' is invalid - the "
                     "FIRST_DATA component is missing.", status );
          }
 
@@ -149,7 +149,7 @@ void ary1Cpdlt( AryDCB *dcb1, AryDCB *dcb2, int *status ) {
          } else if( *status == SAI__OK ){
             *status = ARY__DLTIN;
             datMsg( "A", dcb1->loc );
-            errRep( " ", "The DELTA compressed array '^A' is invalid - the"
+            errRep( " ", "The DELTA compressed array '^A' is invalid - the "
                     "FIRST_VALUE component is missing.", status );
          }
 
@@ -163,7 +163,7 @@ void ary1Cpdlt( AryDCB *dcb1, AryDCB *dcb2, int *status ) {
          } else if( *status == SAI__OK ){
             *status = ARY__DLTIN;
             datMsg( "A", dcb1->loc );
-            errRep( " ", "The DELTA compressed array '^A' is invalid - the ZRATIO"
+            errRep( " ", "The DELTA compressed array '^A' is invalid - the ZRATIO "
                     "component is missing.", status );
          }
 
@@ -214,7 +214,7 @@ void ary1Cpdlt( AryDCB *dcb1, AryDCB *dcb2, int *status ) {
 /* Report an error if the input array is not a DELTA array. */
       } else if( *status == SAI__OK ){
          *status = ARY__FATIN;
-         errRep( " ", "ary1Cpdlt: Input array is not a DELTA array (internal"
+         errRep( " ", "ary1Cpdlt: Input array is not a DELTA array (internal "
                  "programming error).", status );
       }
 

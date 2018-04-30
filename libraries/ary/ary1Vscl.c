@@ -157,7 +157,7 @@ void ary1Vscl( HDSLoc *loc, int *status ) {
       if( strcmp( styp, ztyp ) ){
          if( *status == SAI__OK ){
             *status = ARY__SCLIN;
-            errRep( " ", "The ZERO and SCALE components have different data"
+            errRep( " ", "The ZERO and SCALE components have different data "
                     "types.", status );
          }
       }

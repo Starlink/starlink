@@ -102,7 +102,7 @@ void ary1Chmod( AryACB *acb, const char *mode, int *status ) {
    } else {
       *status = ARY__FATIN;
       msgSetc( "BADMODE", mode );
-      errRep( " ", "Routine ary1Chmod called with an invalid MODE argument of"
+      errRep( " ", "Routine ary1Chmod called with an invalid MODE argument of "
               "'^BADMODE' (internal programming error).", status );
    }
 

@@ -113,7 +113,7 @@ void aryNewp( const char *ftype, int ndim, const hdsdim *ubnd,
       if( cmplx ){
          *status = ARY__FTPIN;
          msgSetc( "B", ftype );
-         errRep( " ", "The complex type '^B' is not valid for a primitive"
+         errRep( " ", "The complex type '^B' is not valid for a primitive "
                  "array (possible programming error).", status );
       }
 

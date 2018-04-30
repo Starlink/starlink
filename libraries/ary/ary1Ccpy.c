@@ -92,7 +92,7 @@ void ary1Ccpy( const char *cin, size_t len, char *cout, int *status ) {
          msgSetc( "STRING", cout );
          errRep( "ARY1_CCPY_STR", "Character string truncated: '^STRING'.",
                  status );
-         errRep( " ", "Output character variable is too short to accommodate the"
+         errRep( " ", "Output character variable is too short to accommodate the "
                  "returned result (possible programming error).", status );
       }
    }

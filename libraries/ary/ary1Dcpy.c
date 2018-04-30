@@ -208,7 +208,7 @@ void ary1Dcpy( AryDCB *dcb1, int temp, HDSLoc **loc, AryDCB **dcb2, int *status 
          } else {
             *status = ARY__FATIN;
             msgSetc( "F", dcb1->form );
-            errRep( " ", "Unsupported array form '^F' found in Data Control"
+            errRep( " ", "Unsupported array form '^F' found in Data Control "
                     "Block (internal programming error).", status );
          }
       }

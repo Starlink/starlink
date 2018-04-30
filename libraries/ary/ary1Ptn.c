@@ -151,7 +151,7 @@ void ary1Ptn( int bad, int ndim, const hdsdim *lbnda, const hdsdim *ubnda,
    } else {
       *status = ARY__FATIN;
       msgSetc( "BADATYPE", type );
-      errRep( " ", "Routine ary1Ptn called with an invalid TYPE argument of"
+      errRep( " ", "Routine ary1Ptn called with an invalid TYPE argument of "
               "'^BADATYPE' (internal programming error).", status );
    }
 

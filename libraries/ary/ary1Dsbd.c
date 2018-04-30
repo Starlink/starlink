@@ -94,8 +94,8 @@ void ary1Dsbd( int bad, AryDCB *dcb, int *status ) {
                      *status = ARY__ISMAP;
                      datMsg( "ARRAY", dcb->loc );
                      errRep( "ARY1_DSBD_MAP",
-                             "The array ^ARRAY is mapped for access,"
-                             "perhaps through another identifier (possible"
+                             "The array ^ARRAY is mapped for access, "
+                             "perhaps through another identifier (possible "
                              "programming error).", status );
 
 /* Otherwise, perform the conversion. */
@@ -107,7 +107,7 @@ void ary1Dsbd( int bad, AryDCB *dcb, int *status ) {
    information. */
                   if( *status != SAI__OK ){
                      errRep( "ARY1_DSBD_CVT",
-                             "Unable to perform implicit conversion from"
+                             "Unable to perform implicit conversion from "
                              "'PRIMITIVE' to 'SIMPLE' array storage form.",
                              status );
                   }
@@ -129,7 +129,7 @@ void ary1Dsbd( int bad, AryDCB *dcb, int *status ) {
                *status = ARY__FATIN;
                msgSetc( "BADFORM", dcb->form );
                errRep( "ARY1_DSBD_FORM",
-                       "Unsupported array form '^BADFORM' found in Data"
+                       "Unsupported array form '^BADFORM' found in Data "
                        "Control Block (internal programming error).",
                        status );
             }

@@ -150,8 +150,8 @@ void ary1Dimp( HDSLoc *loc, AryDCB **dcb, int *status ) {
             datMsg( "ARRAY", (*dcb)->loc );
             msgSetc( "USFORM", (*dcb)->form );
             errRep( "ARY1_DIMP_USF",
-                    "Sorry, the array structure ^ARRAY is of '^USFORM'"
-                    "form; this is not currently supported by the ARY_"
+                    "Sorry, the array structure ^ARRAY is of '^USFORM' "
+                    "form; this is not currently supported by the ARY_ "
                     "routines.", status );
          }
       }

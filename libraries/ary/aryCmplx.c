@@ -83,7 +83,7 @@ void aryCmplx( Ary *ary, int *cmplx, int *status ) {
 /* If an error occurred, then report context information and call the error
    tracing routine. */
    if( *status != SAI__OK ){
-      errRep( " ", "aryCmplx: Error determining if an array holds complex"
+      errRep( " ", "aryCmplx: Error determining if an array holds complex "
               "values.", status );
       ary1Trace( "aryCmplx", status );
    }

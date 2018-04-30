@@ -88,7 +88,7 @@ void aryReset( Ary *ary, int *status ) {
             *status = ARY__ISMAP;
             dcb = acb->dcb;
             datMsg( "ARRAY", dcb->loc );
-            errRep( " ", "The array ^ARRAY is mapped for access through the"
+            errRep( " ", "The array ^ARRAY is mapped for access through the "
                     "specified identifier (possible programming error).",
                     status );
          }
@@ -103,8 +103,8 @@ void aryReset( Ary *ary, int *status ) {
             *status = ARY__ISMAP;
             dcb = acb->dcb;
             datMsg( "ARRAY", dcb->loc );
-            errRep( " ", "The base array ^ARRAY is mapped for access, perhaps"
-                    "through another identifier (possible programming"
+            errRep( " ", "The base array ^ARRAY is mapped for access, perhaps "
+                    "through another identifier (possible programming "
                     "error).", status );
 
 /* Reset the array's state to "undefined". */

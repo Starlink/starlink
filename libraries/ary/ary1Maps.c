@@ -291,8 +291,8 @@ void ary1Maps( AryACB *acb, const char *type, int cmplx, const char *mmod,
                *status = ARY__UNDEF;
                datMsg( "ARRAY", dcb->loc );
                msgSetc( "BADMODE", mode );
-               errRep( " ", "^BADMODE access to the array ^ARRAY is not"
-                       "available; the array's values are undefined"
+               errRep( " ", "^BADMODE access to the array ^ARRAY is not "
+                       "available; the array's values are undefined "
                        "(possible programming error).", status );
             }
          }

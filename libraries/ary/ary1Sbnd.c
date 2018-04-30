@@ -124,7 +124,7 @@ void ary1Sbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, AryACB *acb,
          *status = ARY__ISMAP;
          dcb = acb->dcb;
          datMsg( "ARRAY", dcb->loc );
-         errRep( " ", "The array structure ^ARRAY is mapped for access through"
+         errRep( " ", "The array structure ^ARRAY is mapped for access through "
                  "the identifier supplied (possible programming error).",
                  status );
 
@@ -172,8 +172,8 @@ void ary1Sbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, AryACB *acb,
 /* Report an error if there is. */
          *status = ARY__ISMAP;
          datMsg( "ARRAY", dcb->loc );
-         errRep( " ", "The base array structure ^ARRAY is mapped for access,"
-                 "perhaps through another identifier (possible programming"
+         errRep( " ", "The base array structure ^ARRAY is mapped for access, "
+                 "perhaps through another identifier (possible programming "
                  "error).", status );
 
 /* Set the new bounds for the data object. */
