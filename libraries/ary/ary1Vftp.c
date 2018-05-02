@@ -149,7 +149,7 @@ void ary1Vftp( const char *ftype, size_t len, char *type, int *cmplx,
    } else {
       *status = ARY__FTPIN;
       msgSetc( "BADFTYPE", ftype );
-      errRep( " ", "Invalid full array type '^BADFTYPE' specified (possible"
+      errRep( " ", "Invalid full array type '^BADFTYPE' specified (possible "
               "programming error).", status );
    }
 

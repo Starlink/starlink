@@ -89,7 +89,6 @@ void ary1Iobw( const char *type, const char *inopt, size_t el, void *pntr,
    error. */
    } else {
       *status = ARY__FATIN;
-      msgSetc( "ROUTINE", "ARY1_IOBW" );
       msgSetc( "BADINOPT", inopt );
       errRep( " ", "Routine ary1Iobw called with an invalid 'inopt' argument "
               "of '^BADINOPT' (internal programming error).", status );

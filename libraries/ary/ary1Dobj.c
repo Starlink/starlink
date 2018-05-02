@@ -73,26 +73,26 @@ void ary1Dobj( AryDCB *dcb, int *status ) {
    if( ary1Defr( dcb, status ) && *status == SAI__OK ){
 
 /* Report an error if required information is not available. The only
-   situation in which creation is deferred is if ARY1_DCRE(P) is called
+   situation in which creation is deferred is if ary1Dcre(p) is called
    with its DEFER parameter set TRUE. In this case, all the required
-   information should already be available because ARY1_DCRE(P) will have
+   information should already be available because ary1Dcre(p) will have
    set it up. */
       if( !dcb->ktype ){
          *status = ARY__UNDEF;
-         errRep( " ", "ary1Dobj: Deferred creation of an array is not possible"
-                 "because no type information is available (ARY programming"
+         errRep( " ", "ary1Dobj: Deferred creation of an array is not possible "
+                 "because no type information is available (ARY programming "
                  "error).", status );
 
       } else if( !dcb->kbnd ){
          *status = ARY__UNDEF;
-         errRep( " ", "ary1Dobj: Deferred creation of an array is not possible"
-                 "because no bounds information is available (ARY"
+         errRep( " ", "ary1Dobj: Deferred creation of an array is not possible "
+                 "because no bounds information is available (ARY "
                  "programming error).", status );
 
       } else if( !dcb->kform ){
          *status = ARY__UNDEF;
-         errRep( " ", "ary1Dobj: Deferred creation of an array is not possible"
-                 "because no form information is available (ARY programming"
+         errRep( " ", "ary1Dobj: Deferred creation of an array is not possible "
+                 "because no form information is available (ARY programming "
                  "error).", status );
       }
 
@@ -165,7 +165,7 @@ void ary1Dobj( AryDCB *dcb, int *status ) {
       } else {
          *status = ARY__FATIN;
          msgSetc( "BADFORM", dcb->form );
-         errRep( " ", "Unsupported array form '^BADFORM' found in Data Control"
+         errRep( " ", "Unsupported array form '^BADFORM' found in Data Control "
                  "Block (internal programming error).", status );
       }
 

@@ -133,7 +133,7 @@ void aryBound( Ary *ary, int ndimx, hdsdim *lbnd, hdsdim *ubnd, int *ndim,
 /* If an error occurred, then report context information and call the error
    tracing routine. */
    if( *status != SAI__OK ){
-      errRep( " ", "aryBound: Error obtaining the pixel-index bounds of an"
+      errRep( " ", "aryBound: Error obtaining the pixel-index bounds of an "
               "array.", status );
       ary1Trace( "aryBound", status );
    }

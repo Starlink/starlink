@@ -142,7 +142,7 @@ void ary1Chcma( AryACB *acb, const char *mode, int *status ) {
                         msgSetc( "MODE", umode );
                         errRep( " ", "Requested ^MODE access to the array "
                                 "^ARRAY conflicts with existing mapped access "
-                                "to the same data object (possible programming"
+                                "to the same data object (possible programming "
                                 "error).", status );
                         break;
                      }

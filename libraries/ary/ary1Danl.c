@@ -156,7 +156,7 @@ void ary1Danl( int dispos, AryDCB **dcb, int *status ) {
             *status = ARY__FATIN;
             msgSetc( "BADFORM", (*dcb)->form );
             errRep( "ARY1_DANL_FORM",
-                    "Unsupported array form '^BADFORM' found in Data Control"
+                    "Unsupported array form '^BADFORM' found in Data Control "
                     "Block (internal programming error).", status );
          }
 
@@ -180,7 +180,7 @@ void ary1Danl( int dispos, AryDCB **dcb, int *status ) {
                    ( !strcmp( (*dcb)->mode, "UPDATE" ) ) ){
                   *status = ARY__UNDEF;
                   errRep( "ARY1_DANL_UNDEF",
-                          "The array ^ARRAY has been released from the ARY_"
+                          "The array ^ARRAY has been released from the ARY_ "
                           "system in an undefined state (possible "
                           "programming error).", status );
                }

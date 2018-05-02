@@ -93,7 +93,7 @@
 *
 *        Pixels are rejected at the ith clipping cycle if they lie
 *        beyond plus or minus CLIP(i) times the dispersion about the
-*        mean of the remaining good pixels.  Thus lower values of CLIP
+*        median of the remaining good pixels.  Thus lower values of CLIP
 *        will reject more pixels.  The normal approach is to start low
 *        and progressivley increase the clipping factors, as the
 *        dispersion decreases after the exclusion of features.  The

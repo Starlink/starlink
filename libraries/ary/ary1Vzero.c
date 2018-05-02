@@ -95,7 +95,7 @@ void ary1Vzero( const char *type, size_t n, void *pntr, int *status ) {
    } else {
       *status = ARY__FATIN;
       msgSetc( "BADTYPE", type );
-      errRep( " ", "Routine ary1Vzero called with an invalid TYPE argument of"
+      errRep( " ", "Routine ary1Vzero called with an invalid TYPE argument of "
               "'^BADTYPE' (internal programming error).", status );
    }
 

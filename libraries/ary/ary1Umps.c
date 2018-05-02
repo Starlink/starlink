@@ -206,7 +206,7 @@ void ary1Umps( AryACB *acb, int *status ) {
       } else {
          *status = ARY__FATIN;
          msgSetc( "BADMAP", mcb->amm );
-         errRep( " ", "Invalid active mapping mode '^BADMAP' found in Mapping"
+         errRep( " ", "Invalid active mapping mode '^BADMAP' found in Mapping "
                  "Control Block (internal programming error).", status );
       }
    }

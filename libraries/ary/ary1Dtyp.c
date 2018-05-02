@@ -85,8 +85,8 @@ void ary1Dtyp( AryDCB *dcb, int *status ) {
       if( ary1Defr( dcb, status ) ){
          *status = ARY__UNDEF;
          errRep( "ARY1_DTYP_ERR1",
-                 "ARY1_DTYP: Cannot get type information because the"
-                 "creation of the supplied array has been deferred (ARY"
+                 "ary1Dtyp: Cannot get type information because the "
+                 "creation of the supplied array has been deferred (ARY "
                  "programming error).", status );
       }
 
@@ -117,7 +117,7 @@ void ary1Dtyp( AryDCB *dcb, int *status ) {
                   datMsg( "ARRAY", dcb->loc );
                   msgSetc( "BADTYPE", dcb->type );
                   errRep( "ARY1_DTYP_PDTYP",
-                          "The array ^ARRAY has an invalid data type of"
+                          "The array ^ARRAY has an invalid data type of "
                           "'^BADTYPE'; it should have a numeric type.",
                           status );
                }
@@ -148,8 +148,8 @@ void ary1Dtyp( AryDCB *dcb, int *status ) {
                   datMsg( "ARRAY", dcb->loc );
                   msgSetc( "BADTYPE", dcb->type );
                   errRep( "ARY1_DTYP_DTYP",
-                          "The DATA component in the array structure ^ARRAY"
-                          "has an invalid HDS type of '^BADTYPE'; it should"
+                          "The DATA component in the array structure ^ARRAY "
+                          "has an invalid HDS type of '^BADTYPE'; it should "
                           "have a numeric type.", status );
                } else {
 
@@ -164,7 +164,7 @@ void ary1Dtyp( AryDCB *dcb, int *status ) {
                         if( !strcmp( dcb->form, "SCALED" ) ){
                            *status = ARY__USFRM;
                            errRep( "ARY1_DSTP_SCMX",
-                                   "Complex scaled arrays are currently"
+                                   "Complex scaled arrays are currently "
                                    "unsupported by the ARY library.",
                                    status );
                         }
@@ -183,10 +183,10 @@ void ary1Dtyp( AryDCB *dcb, int *status ) {
                               msgSetc( "BADTYPE", type );
                               msgSetc( "DTYPE", dcb->type );
                               errRep( "ARY1_DTYP_IMAG",
-                                      "The IMAGINARY_DATA component in the"
-                                      "array structure ^ARRAY has an"
-                                      "invalid HDS type of '^BADTYPE'; its"
-                                      "type should match that of the DATA"
+                                      "The IMAGINARY_DATA component in the "
+                                      "array structure ^ARRAY has an "
+                                      "invalid HDS type of '^BADTYPE'; its "
+                                      "type should match that of the DATA "
                                       "component ('^DTYPE').", status );
                            }
                         }
@@ -222,7 +222,7 @@ void ary1Dtyp( AryDCB *dcb, int *status ) {
                *status = ARY__DLTIN;
                datMsg( "A", dcb->loc );
                errRep( " ",
-                       "The DELTA compressed array '^A' is invalid - the"
+                       "The DELTA compressed array '^A' is invalid - the "
                        "VALUE component is missing.", status );
             }
 
@@ -233,8 +233,8 @@ void ary1Dtyp( AryDCB *dcb, int *status ) {
                datMsg( "A", dcb->loc );
                msgSetc( "T", dcb->type );
                errRep( " ",
-                       "The DELTA compressed array '^A' is invalid - the"
-                       "VALUE component has an invalid HDS type of '^T'; it"
+                       "The DELTA compressed array '^A' is invalid - the "
+                       "VALUE component has an invalid HDS type of '^T'; it "
                        "should have a numeric type.", status );
             }
 
@@ -245,8 +245,8 @@ void ary1Dtyp( AryDCB *dcb, int *status ) {
                *status = ARY__USFRM;
                datMsg( "A", dcb->loc );
                errRep( " ",
-                       "The DELTA compressed array '^A' holds complex values"
-                       "but the ARY library does not yet support complex"
+                       "The DELTA compressed array '^A' holds complex values "
+                       "but the ARY library does not yet support complex "
                        "DELTA arrays.", status );
             }
 
@@ -256,7 +256,7 @@ void ary1Dtyp( AryDCB *dcb, int *status ) {
             *status = ARY__FATIN;
             msgSetc( "BADFORM", dcb->form );
             errRep( "ARY1_DTYP_FRM",
-                    "Unsupported array form '^BADFORM' encountered in Data"
+                    "Unsupported array form '^BADFORM' encountered in Data "
                     "Control Block (internal programming error).", status );
          }
 

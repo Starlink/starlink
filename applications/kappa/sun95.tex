@@ -31542,7 +31542,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
 
          Pixels are rejected at the $i$th clipping cycle if they lie
          beyond plus or minus CLIP($i$) times the dispersion about the
-         mean of the remaining good pixels.  Thus lower values of CLIP
+         mediaan of the remaining good pixels.  Thus lower values of CLIP
          will reject more pixels.  The normal approach is to start low
          and progressivley increase the clipping factors, as the
          dispersion decreases after the exclusion of features.  The
@@ -53670,6 +53670,13 @@ The following applications have been modified:
         is to use the full range of available pens.
         \item The vertical position of the key can now be controlled
         through Parameter KEYPOS.
+      \end{itemize}
+
+   \item [\htmlref{MFITTREND}{MFITTREND}]\mbox{}
+      \begin{itemize}
+        \item The auto method uses the median rather than the mean to
+         clip outliers. This permits better masking of strong and
+         extended emission.
       \end{itemize}
 
    \item [\htmlref{SQORTST}{SQORST}]\mbox{}

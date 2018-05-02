@@ -109,7 +109,7 @@ void ary1Dbnd( AryDCB *dcb, int *status ) {
             *status = ARY__NDMIN;
             datMsg( "ARRAY", dcb->loc );
             errRep( "ARY1_DBND_PSCLR",
-                    "The array ^ARRAY is a scalar; it should have at least"
+                    "The array ^ARRAY is a scalar; it should have at least "
                     "one dimension.", status );
             goto L999;
          }
@@ -151,7 +151,7 @@ void ary1Dbnd( AryDCB *dcb, int *status ) {
             *status = ARY__NDMIN;
             datMsg( "ARRAY", dcb->loc );
             errRep( "ARY1_DBND_SCLR",
-                    "The DATA component in the array structure ^ARRAY is a"
+                    "The DATA component in the array structure ^ARRAY is a "
                     "scalar; it should have at least one dimension.",
                     status );
             goto L999;
@@ -169,9 +169,9 @@ void ary1Dbnd( AryDCB *dcb, int *status ) {
                msgSeti( "NDIMD", ndimd );
                msgSeti( "NDIMI", ndimi );
                errRep( "ARY1_DBND_NDIM",
-                       "The IMAGINARY_DATA component in the array structure"
-                       "^ARRAY has a different number of dimensions"
-                       "(^NDIMI) to the corresponding DATA component"
+                       "The IMAGINARY_DATA component in the array structure "
+                       "^ARRAY has a different number of dimensions "
+                       "(^NDIMI) to the corresponding DATA component "
                        "(^NDIMD).", status );
                goto L999;
 
@@ -186,10 +186,10 @@ void ary1Dbnd( AryDCB *dcb, int *status ) {
                      msgSeti( "DIMD", dimd[ i ] );
                      msgSeti( "DIMI", dimi[ i ] );
                      errRep( "ARY1_DBND_DIM",
-                             "Dimension no. ^I of the IMAGINARY_DATA"
-                             "component in the array structure ^ARRAY has a"
-                             "different size (^DIMI) to the corresponding"
-                             "dimension of the array's DATA component"
+                             "Dimension no. ^I of the IMAGINARY_DATA "
+                             "component in the array structure ^ARRAY has a "
+                             "different size (^DIMI) to the corresponding "
+                             "dimension of the array's DATA component "
                              "(^DIMD).", status );
                      goto L999;
                   }
@@ -226,8 +226,8 @@ void ary1Dbnd( AryDCB *dcb, int *status ) {
                   datMsg( "ARRAY", dcb->loc );
                   msgSetc( "BADTYPE", type );
                   errRep( "ARY1_DBND_OTYP",
-                          "The ORIGIN component in the array structure"
-                          "^ARRAY has an invalid HDS type of '^BADTYPE';"
+                          "The ORIGIN component in the array structure "
+                          "^ARRAY has an invalid HDS type of '^BADTYPE'; "
                           "its type should be '_INTEGER' or '_INT64'.",
                           status );
 
@@ -237,8 +237,8 @@ void ary1Dbnd( AryDCB *dcb, int *status ) {
                   datMsg( "ARRAY", dcb->loc );
                   msgSeti( "NDIM", ndimor );
                   errRep( "ARY1_DBND_ONDI",
-                          "The ORIGIN component in the array structure"
-                          "^ARRAY has an invalid number of dimensions"
+                          "The ORIGIN component in the array structure "
+                          "^ARRAY has an invalid number of dimensions "
                           "(^NDIM); this component should be 1-dimensional.",
                           status );
 
@@ -249,9 +249,9 @@ void ary1Dbnd( AryDCB *dcb, int *status ) {
                   msgSeti( "DIM", dimor );
                   msgSeti( "NDIMD", ndimd );
                   errRep( "ARY1_DBND_ODIM",
-                          "The ORIGIN component in the array structure"
-                          "^ARRAY has an invalid number of elements (^DIM);"
-                          "this number should match the dimensionality of"
+                          "The ORIGIN component in the array structure "
+                          "^ARRAY has an invalid number of elements (^DIM); "
+                          "this number should match the dimensionality of "
                           "the array's DATA component (^NDIMD).", status );
                }
 
@@ -281,7 +281,7 @@ void ary1Dbnd( AryDCB *dcb, int *status ) {
          *status = ARY__FATIN;
          msgSetc( "BADFORM", dcb->form );
          errRep( "ARY1_DBND_FORM",
-                 "Unsupported array form '^BADFORM' found in Data Control"
+                 "Unsupported array form '^BADFORM' found in Data Control "
                  "Block (internal programming error).", status );
       }
 

@@ -239,7 +239,7 @@ void aryDelta( Ary *ary1, int zaxis, const char *type, float minrat,
        strcmp( type, "_BYTE" ) && !blank_type && *status == SAI__OK ){
       *status = ARY__TYPIN;
       msgSetc( "T", type );
-      errRep( " ", "Illegal compressed data type '^T' - (possible programming"
+      errRep( " ", "Illegal compressed data type '^T' - (possible programming "
               "error).", status );
       goto L999;
    }
@@ -248,7 +248,7 @@ void aryDelta( Ary *ary1, int zaxis, const char *type, float minrat,
    if( ( dcbt->nwrite != 0  || dcbt->nread != 0 ) && *status == SAI__OK ){
       *status = ARY__ISMAP;
       datMsg( "ARRAY", dcbt->loc );
-      errRep( " ", "The array ^ARRAY is mapped for access, perhaps through"
+      errRep( " ", "The array ^ARRAY is mapped for access, perhaps through "
               "another identifier (possible programming error).", status );
       goto L999;
    }
@@ -270,7 +270,7 @@ void aryDelta( Ary *ary1, int zaxis, const char *type, float minrat,
    seem to have uncompressed it. */
       if( loct && *status == SAI__OK ){
          *status = ARY__FATIN;
-         errRep( " ", "aryDelta: Array has delta form after being copied"
+         errRep( " ", "aryDelta: Array has delta form after being copied "
                  "(internal programming error).", status );
          goto L999;
       }
@@ -377,7 +377,7 @@ void aryDelta( Ary *ary1, int zaxis, const char *type, float minrat,
       if( *status != SAI__OK ) goto L999;
 
 /* Erase all components within the data object - they will be re-created in
-   compressed form by ARY1_S2DLT. */
+   compressed form by ary1S2dlt. */
       datNcomp( dcb2->loc, &ncomp, status );
       for( icomp = 0; icomp < ncomp; icomp++ ){
          datIndex( dcb2->loc, 1, &locc, status );

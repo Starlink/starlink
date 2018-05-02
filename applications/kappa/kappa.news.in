@@ -42,6 +42,11 @@
       -  The vertical position of the key can now be controlled through
       Parameter KEYPOS.
 
+   o  MFITTREND
+      -  The auto method uses the median rather than the mean to clip
+      outliers.  This permits better masking of strong and extended
+      emission.
+
    o  SQORST
       -  Permit an axis scale to be retained by using an asterisk
       in Parameter PIXSCALE.

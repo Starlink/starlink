@@ -102,7 +102,7 @@ void aryBad( Ary *ary, int check, int *bad, int *status ) {
 /* If an error occurred, then report context information and call the error
    tracing routine. */
    if( *status != SAI__OK ){
-      errRep( " ", "aryBad: Error determining if an array may contain bad"
+      errRep( " ", "aryBad: Error determining if an array may contain bad "
               "pixels.", status );
       ary1Trace( "aryBad", status );
    }
