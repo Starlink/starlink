@@ -1865,7 +1865,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* We now have RES, LUT, and EXT loaded into memory. Add fake
          astronomical signal to RES at this stage if requested */
       smf_addfakemap( wf, res[0], haveext?model[whichext][0]:NULL, lut[0],
-                      lbnd_out, ubnd_out, keymap, chunkfactor, status );
+                      lbnd_out, ubnd_out, keymap, chunkfactor, contchunk,
+                      status );
 
       /* Do data cleaning */
       if( doclean ) {

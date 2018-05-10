@@ -1252,8 +1252,26 @@ fakemce = 0
 #  Default: 	1
 #  Purpose: 	Control the use of the supplied fake map.
 #  Description: Each pixel in the supplied fake map (see paramater "fakemap")
-#		will be multiplied by this scaling factor before being added
-#		to the time stream data.
+#		will be multiplied by a scaling factor before being added
+#		to the time stream data. If more than one contiguous chunk
+#               of data is being processed, each chunk may be given a
+#               different scale. They can be specified in two ways:
+#
+#               - A comma-separated list of explicit numerical values can
+#               be supplied for the "fakescale" parameter. The list must be
+#               enclosed in parentheses if it contains more than a single
+#               element. The last value in the list will be replicated if
+#               the number of values in the list is smaller than the number
+#               of chunks. Thus, the default value of 1.0 will cause a scale
+#               of 1.0 to be used for every chunk.
+#
+#               - The "fakescale" parameter can be set to an arbitrary
+#               algebraic expression in which the variable names are the
+#               names of FITS keyword. The keyword must be present in the
+#               FITS extension of the input data and must have numerical
+#               values. The expression should be enclosed in double quotes.
+#               The value of the expression using the FITS keywords values
+#               for a chunk will then be used as the scale for that chunk.
 fakescale = 1
 
 #-----------------------------------------------------------------
