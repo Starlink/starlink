@@ -660,7 +660,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
   double chitol=VAL__BADD;      /* chisquared change tolerance for stopping */
   int chunking;                 /* Will we be chunking due to low memory? */
-  double chunkfactor;           /* A calibration correction factor for the
+  double chunkfactor=1.0;       /* A calibration correction factor for the
                                    current chunk */
   double chunkweight;           /* The relative weight to give to the
                                    current chunk when adding into the running
