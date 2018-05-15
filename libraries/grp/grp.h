@@ -103,7 +103,7 @@
 /* Note that GRP__NOIDs role in C is to use a NULL pointer. */
 
 /* Maximum length of a group expression. */
-enum { GRP__SZGEX  = 255 };
+enum { GRP__SZGEX  = 2047 };
 
 /* Length of a name within a group. */
 enum { GRP__SZNAM  = 255 };
