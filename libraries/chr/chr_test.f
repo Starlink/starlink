@@ -13,7 +13,10 @@
 *  Description:
 *    This program tests most of the CHR routines. It is self
 *    checking and will report as it goes along, terminating
-*    with an overall result
+*    with an overall result. It prompts the user to indicate which test
+*    should be performed unless something (anything) is supplied on
+*    the command line, in which case all tests are performed and the
+*    command then exits.
 
 *  Copyright:
 *     Copyright (C) 1989, 1990, 1993 Science & Engineering Research Council.
@@ -49,6 +52,10 @@
 *        Split single module into main program plus four subroutines,
 *        using grouping as in Appendix A of SUN/40.3, for easier
 *        maintenance.
+*     15-MAY-2018 (DSB):
+*        Do not prompt the suer unless something (anything) is supplied
+*        on the command line. This is so that we can do a "make check" in
+*        CHR.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -71,6 +78,7 @@
       INTEGER STATUS             ! Global Status
       INTEGER ISTAT              ! Status for each routine tested
       INTEGER JSTAT              ! Status for each test or set of tests
+      LOGICAL LOOP               ! User indicates tests to perform?
       LOGICAL TEST_PERFORMED     ! Whether or not a test was performed
       CHARACTER*2 SELECT         ! Test Selection
       CHARACTER*2 TCASE          ! Case Test
@@ -99,6 +107,9 @@
 *    Initialize STATUS
       STATUS = SAI__OK
 
+*  We do not loop if the command line is empty..
+      LOOP = ( IARGC() .GT. 0 )
+
 *  Query which test to run
 
 *     DO WHILE Loop (DO WHILE SELECT .NE. EXIT)
@@ -106,15 +117,19 @@
 10    JSTAT = SAI__OK
       TEST_PERFORMED = .FALSE.
 
-      PRINT *,' '
-      PRINT *,'Which CHR test would you like to run? '
-      PRINT *,
-     : '(CAse, COmpare, DEcode, EDit, ENcode, EnQuire(EQ), '//
-     : 'POrtability, SEarch, '
-      PRINT *,' ALl tests, EXit)'
-      READ (*,'(A2)') SELECT
+      IF( LOOP ) THEN
+         PRINT *,' '
+         PRINT *,'Which CHR test would you like to run? '
+         PRINT *,
+     :    '(CAse, COmpare, DEcode, EDit, ENcode, EnQuire(EQ), '//
+     :    'POrtability, SEarch, '
+         PRINT *,' ALl tests, EXit)'
+         READ (*,'(A2)') SELECT
 
-      CALL CHR_UCASE(SELECT)
+         CALL CHR_UCASE(SELECT)
+      ELSE
+         SELECT = 'ALL'
+      END IF
 
       IF (SELECT .NE. EXIT) THEN
 
@@ -224,7 +239,7 @@
             ENDIF
          END IF
 
-         GO TO 10
+         IF( LOOP ) GO TO 10
       END IF
 *     End of Loop
 
