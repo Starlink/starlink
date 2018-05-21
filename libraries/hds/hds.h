@@ -1140,5 +1140,10 @@ hdsClose(HDSLoc **locator, int *status);
 int hdsFind(const HDSLoc *locator1, const char *name, const char *mode, HDSLoc **locator2, int *status);
 
 
+/*===================================================================*/
+/* hdsDimtoc - Encode an hdsdim value as a string (modelled on chrItoc)
+/*===================================================================*/
+void hdsDimtoc( hdsdim ivalue, char *string, size_t string_length, size_t *nchar );
+
 /* STAR_HDS_H_INCLUDED */
 #endif
