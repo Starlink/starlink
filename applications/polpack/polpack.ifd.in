@@ -2390,6 +2390,86 @@ package polpack {
             helpkey *
          }
       }
+      action polselect {
+
+         helplib {$POLPACK_HELP}
+
+         parameter exp {
+            type LITERAL
+            access UPDATE
+            ppath CURRENT
+            prompt {Selection expression}
+            helpkey *
+          }
+
+         parameter in {
+            position 1
+            type LITERAL
+            ppath GLOBAL
+            association <-GLOBAL.CATALOGUE
+            prompt {Input catalogue}
+            helpkey *
+          }
+
+         parameter invert {
+            type _LOGICAL
+            ppath default
+            vpath default
+            default FALSE
+            prompt {Invert the selection?}
+            helpkey *
+          }
+
+
+         parameter mask {
+            type NDF
+            access READ
+            prompt {Mask NDF}
+            helpkey *
+          }
+
+         parameter mode {
+            type LITERAL
+            access UPDATE
+            ppath CURRENT DEFAULT
+            default Expression
+            prompt {Type of selection}
+            helpkey *
+          }
+
+         parameter out {
+            position 2
+            type LITERAL
+            ppath GLOBAL
+            association ->GLOBAL.CATALOGUE
+            prompt {Output catalogue}
+            helpkey *
+          }
+
+         parameter ref {
+            type NDF
+            access READ
+            prompt {Reference NDF}
+            helpkey *
+          }
+
+         parameter region {
+            type LITERAL
+            access UPDATE
+            ppath CURRENT
+            prompt {File holding ARD description or AST Region}
+            helpkey *
+          }
+
+         parameter useaxis {
+            type LITERAL
+            vpath DEFAULT
+            ppath DYNAMIC DEFAULT
+            default !
+            prompt {The WCS axes spanning the spatial plane}
+            helpkey *
+         }
+      }
 
       action polwcscopy {
 
