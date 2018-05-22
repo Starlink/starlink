@@ -482,7 +482,8 @@ $(MANIFESTS)/chr: \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/chr \
 	  && $(MAKE_CPT)
 
@@ -1258,7 +1259,8 @@ $(MANIFESTS)/gns: \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/gns \
 	  && $(MAKE_CPT)
 
@@ -1369,7 +1371,8 @@ $(MANIFESTS)/hds-v4: \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libext/hds-v4 \
 	  && $(MAKE_CPT)
 
@@ -2723,7 +2726,8 @@ $(MANIFESTS)/sgs: \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/sgs \
 	  && $(MAKE_CPT)
 
@@ -2839,7 +2843,8 @@ $(MANIFESTS)/snx: \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/sgs \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/snx \
 	  && $(MAKE_CPT)
 

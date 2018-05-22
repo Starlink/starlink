@@ -3452,7 +3452,7 @@ No longer under active control.
 </component>
 
 <component id="chr" support="S">
-  <version>2.4-1</version>
+  <version>3.0</version>
   <path>libraries/chr</path>
   <description>Character Handling Routines</description>
   <abstract><p>The CHR library augments the limited character handling
@@ -3465,7 +3465,7 @@ No longer under active control.
       basis for more complex text processing applications.
     </p></abstract>
   <dependencies >
-    <build>sae</build><build>cnf</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>cnf</build><build>starutil</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

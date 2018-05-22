@@ -16,7 +16,7 @@
       basis for more complex text processing applications.
     </p></abstract>
   <dependencies >
-    <build>sae</build><build>cnf</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>cnf</build><build>starutil</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

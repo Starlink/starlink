@@ -27,7 +27,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 dnl We need to be compatible with PRM for the INTEGER*8 tests
 STAR_PRM_COMPATIBLE_SYMBOLS
 
-STAR_DECLARE_DEPENDENCIES([build], [sae cnf])
+STAR_DECLARE_DEPENDENCIES([build], [sae cnf starutil])
 
 STAR_LATEX_DOCUMENTATION(sun40)
 
