@@ -96,7 +96,7 @@
 #  references.
 #  Note that even though we do not need the fortran interfaces to EMS
 #  in pure C mode, we still need CNF because we use CNF for memory allocation
-      echo "${special}" ${flibs} -lhds -lhds_v4 -lhds_v5 -lhdf5 `ems_link $ems_opts` `one_link` `cnf_link` `starmem_link`\
+      echo "${special}" ${flibs} -lhds -lhds_v4 -lhds_v5 -lhdf5 `ems_link $ems_opts` `chr_link` `one_link` `cnf_link` `starmem_link`\
            | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
 
 #  End of script.
