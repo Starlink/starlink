@@ -46,8 +46,7 @@
 *        either C and Fortran can be used (e.g. '.ge.', '>=', '.and.',
 *        '&&', etc.), as can the usual mathematical functions (e.g. 'abs',
 *        'tan', 'pow', etc). A vector is selected if the expression
-*        evaluates to TRUE (if using a Fortran-style expression) or a
-*        non-zero value (if using a C-style expression).
+*        evaluates to a  true value.
 *     IN = LITERAL (Read)
 *        The name of the input catalogue. A file type of .FIT is
 *        assumed if none is provided.
@@ -123,12 +122,20 @@
 *  Status:
       INTEGER STATUS
 
+*  Local Constants:
+      INTEGER NSYM
+      PARAMETER ( NSYM = 4 )
+
 *  Local Variables:
+      CHARACTER CSYM(NSYM)*6     ! C operators to be replaced
       CHARACTER EXP*255          ! Selection expression
       CHARACTER FIELDS(5)*1024   ! Fields of input catalogue path
       CHARACTER FILNAM*(GRP__SZFNM)! Name of ARD file
+      CHARACTER FSYM(NSYM)*5     ! Equivalent F77 operators
       CHARACTER MODE*10          ! How to define selected vectors
+      CHARACTER NEWEXP*255       ! Modified selection expression
       CHARACTER ONAME*250        ! Path to output catalogue
+      CHARACTER PAT*20           ! Substitution pattern
       INTEGER BADVAL             ! Mask value for unselected pixels
       INTEGER CIIN               ! CAT identifier for input catalogue
       INTEGER CIOUT              ! CAT identifier for output catalogue
@@ -137,16 +144,21 @@
       INTEGER FD                 ! File descriptor
       INTEGER FS                 ! FrameSet connectig region and pixel
       INTEGER GI(2)              ! Identifiers for X and Y columns
+      INTEGER I                  ! Loop count
+      INTEGER IAT                ! Used length of string
       INTEGER IBASE              ! Original index of base Frame
       INTEGER IGRP               ! Group identifier
       INTEGER INDFM              ! Identifier for mask NDF
       INTEGER INDFR              ! Identifier for reference NDF
+      INTEGER INDFS              ! Identifier for mask section NDF
       INTEGER IPIX               ! Index of PIXEL Frame
       INTEGER IPLIST             ! Pointer to selected row list
       INTEGER IPMASK             ! Pointer to pixle mask
       INTEGER IPXY               ! Pointer to X and Y column values
       INTEGER IREG               ! AST pointer for supplied Region
+      INTEGER ISYM               ! Symbol index
       INTEGER IWCS               ! Pointer to AST FrameSet read from catalogue
+      INTEGER IWCSARD            ! Pointer to AST FrameSet used with ARD_WORK
       INTEGER IWCSR              ! Reference FrameSet
       INTEGER LBNDE(2)           ! Lower pixel bounds of external box
       INTEGER LBNDI(2)           ! Lower pixel bounds of internal box
@@ -155,6 +167,7 @@
       INTEGER MLBND(2)           ! Lower pixel bounds of catalogue
       INTEGER MUBND(2)           ! Upper pixel bounds of catalogue
       INTEGER NBAD               ! No. of bad values
+      INTEGER NFRM               ! No. of frames in FrameSet
       INTEGER NROWIN             ! No. of input rows
       INTEGER NUMREJ             ! No. of rejected rows
       INTEGER NUMSEL             ! No. of selected rows
@@ -172,9 +185,13 @@
       INTEGER YOFF               ! Offset to start of Y values
       LOGICAL CONT               ! ARD description to continue?
       LOGICAL INVERT             ! Invert the selection?
+      LOGICAL MATCH              ! Was a substitution performed?
       LOGICAL VERB               ! Verose errors required?
       REAL MAXVAL                ! Max X or Y value
       REAL MINVAL                ! Min X or Y value
+
+      DATA CSYM /    '&&',   '\|\|',   '!=',     '!' /,
+     :     FSYM / '.AND.', '.OR.', '.NE.', '.NOT.' /
 
 *.
 
@@ -221,6 +238,24 @@
 
 *  Get the text of the expression from the user.
          CALL PAR_GET0C( 'EXP', EXP, STATUS )
+
+*  Convert the subset of C-like operators that are not supported by CAT
+*  to Fortran.
+         DO ISYM = 1, NSYM
+
+            IAT = 1
+            PAT = '('
+            CALL CHR_APPND( CSYM(ISYM), PAT, IAT )
+            CALL CHR_APPND( ')=', PAT, IAT )
+            CALL CHR_APPND( FSYM(ISYM), PAT, IAT )
+
+            MATCH = AST_CHRSUB( EXP, PAT, NEWEXP, STATUS )
+            DO WHILE( MATCH )
+               EXP = NEWEXP
+               MATCH = AST_CHRSUB( EXP, PAT, NEWEXP, STATUS )
+            END DO
+
+         END DO
 
 *  Parse it.
          CALL CAT_EIDNT( CIIN, EXP, EI, STATUS)
@@ -291,6 +326,9 @@
             CALL ARD_GRPEX( FILNAM, GRP__NOID, IGRP, CONT, STATUS )
             IF( STATUS .EQ. SAI__OK ) THEN
 
+*  Take a copy of the WCS FrameSet so that the original is not modified.
+               IWCSARD = AST_COPY( IWCS, STATUS )
+
 *  See if a reference NDF is to be used - this defines the pixel coord
 *  system associated with the  ARD description. If no reference NDF is
 *  supplied, the ARD description pixel coord system is assumed to be the
@@ -304,23 +342,21 @@
      :                             SDIM, SLBND, SUBND, IWCSR,
      :                             STATUS )
                   CALL KPG1_ASFFR( IWCSR, 'PIXEL', IPIX, STATUS )
-                  CALL AST_ADDFRAME( IWCSR, IPIX,
-     :                               AST_UNITMAP(2, ' ', STATUS ),
-     :                               AST_GETFRAME( IWCSR, IPIX,
-     :                                             STATUS ), STATUS )
-                  CALL AST_SET( IWCSR, 'Domain=REFPIXEL', STATUS )
-                  CALL KPG1_ASMRG( IWCS, IWCSR, ' ', .TRUE., 3,
+                  NFRM = AST_GETI( IWCSARD, 'NFrame', STATUS )
+                  CALL KPG1_ASMRG( IWCSARD, IWCSR, ' ', .FALSE., 3,
      :                             STATUS )
+                  CALL AST_SETI( IWCSARD, 'Current', IPIX+NFRM, STATUS )
+
                   CALL NDF_ANNUL( INDFR, STATUS )
 
                ELSE IF( STATUS .EQ. PAR__NULL ) THEN
                   CALL ERR_ANNUL( STATUS )
-                  CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
-                  CALL AST_SETI( IWCS, 'Current', IPIX, STATUS )
+                  CALL KPG1_ASFFR( IWCSARD, 'PIXEL', IPIX, STATUS )
+                  CALL AST_SETI( IWCSARD, 'Current', IPIX, STATUS )
                END IF
 
 *  Use this as the ARD description's WCS FrameSet.
-               CALL ARD_WCS( IWCS, ' ', STATUS )
+               CALL ARD_WCS( IWCSARD, ' ', STATUS )
 
 *  Create the pixel mask.
                REGVAL = 2
@@ -362,8 +398,8 @@
 * Now deal with selection by mask.
          ELSE IF( MODE .EQ. 'MASK' ) THEN
             CALL NDF_ASSOC( 'MASK', 'READ', INDFM, STATUS )
-            CALL NDF_SECT( INDFM, 2, MLBND, MUBND, INDFM, STATUS )
-            CALL NDF_MAP( INDFM, 'Data', '_INTEGER', 'Read', IPMASK, EL,
+            CALL NDF_SECT( INDFM, 2, MLBND, MUBND, INDFS, STATUS )
+            CALL NDF_MAP( INDFS, 'Data', '_INTEGER', 'Read', IPMASK, EL,
      :                    STATUS )
             BADVAL = VAL__BADI
          END IF
@@ -379,13 +415,19 @@
 *  Free resources.
          IF( IGRP .NE. GRP__NOID ) CALL GRP_DELET( IGRP, STATUS )
          CALL PSX_FREE( IPXY, STATUS )
-         CALL PSX_FREE( IPMASK, STATUS )
+         IF( MODE. NE. 'MASK' ) CALL PSX_FREE( IPMASK, STATUS )
          CALL CAT_TRLSE( GI( 1 ), STATUS )
          CALL CAT_TRLSE( GI( 2 ), STATUS )
 
 *  Use the row list created above to select rows from the input catalogue.
-         CALL CAT_SLIST( NUMSEL, %VAL( CNF_PVAL( IPLIST ) ), ' ',
-     :                   INVERT, CIIN, SI, SIR, NUMREJ, STATUS)
+         IF( NUMSEL .GT. 0 .OR. INVERT  ) THEN
+            CALL CAT_SLIST( NUMSEL, %VAL( CNF_PVAL( IPLIST ) ), ' ',
+     :                      INVERT, CIIN, SI, SIR, NUMREJ, STATUS)
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'The output catalogue would be empty.',
+     :                    STATUS )
+         END IF
 
 *  Free the row list.
          CALL PSX_FREE( IPLIST, STATUS )
@@ -402,6 +444,16 @@
          SI = SIR
          NUMSEL = NUMREJ
       END  IF
+
+      IF( NUMSEL .EQ. NROWIN ) THEN
+         CALL MSG_OUT( ' ', '   All input vectors were copied without'//
+     :                 ' any rejections', STATUS )
+      ELSE IF( NUMSEL .EQ. 1 ) THEN
+         CALL MSG_OUT( ' ', '   1 vector copied', STATUS )
+      ELSE
+         CALL MSG_SETI( 'N', NUMSEL )
+         CALL MSG_OUT( ' ', '   ^N vectors copied', STATUS )
+      END IF
 
 * Copy the selected rows to the output catalogue, excluding textual
 * information. Then release the selection identifier.

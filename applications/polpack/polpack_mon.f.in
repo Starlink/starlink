@@ -226,6 +226,9 @@
          ELSE IF ( NAME .EQ. 'POLSIM' ) THEN
             CALL POLSIM( STATUS )
 
+         ELSE IF ( NAME .EQ. 'POLSELECT' ) THEN
+            CALL POLSELECT( STATUS )
+
          ELSE IF ( NAME .EQ. 'POLSTACK' ) THEN
             CALL POLSTACK( STATUS )
 
