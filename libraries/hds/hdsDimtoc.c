@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "chr.h"
-#include "star/hds.h"
+#include "hds.h"
 
 void hdsDimtoc( hdsdim ivalue, char *string, size_t string_length, size_t *nchar ){
 /*
