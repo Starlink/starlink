@@ -3621,6 +3621,46 @@ for the output string.
    }
 }
 \sstroutine{
+   chrSimlrN
+}{
+   Return whether the starts of two strings are equal, apart from case
+}{
+   \sstdescription{
+      Determine whether the first \texttt{"} n\texttt{"}  characters of two strings are the
+      same, ignoring distinctions between upper and lowercase letters.
+   }
+   \sstinvocation{
+      int chrSimlrN( const char $*$str1, const char $*$str2, size\_t n )
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         Returned as non-zero if the two strings are the same
+      }{
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         str1
+      }{
+         Pointer to a null terminated string holding the first string.
+      }
+      \sstsubsection{
+         str2
+      }{
+         Pointer to a null terminated string holding the second string.
+      }
+      \sstsubsection{
+         n
+      }{
+         The number of characters that must match at the start of each
+         string. If the length of either string is less than \texttt{"} n\texttt{"} , zero
+         will be returned.
+      }
+   }
+}
+\sstroutine{
    chrSizetoc
 }{
    Encode a size\_t value as a string

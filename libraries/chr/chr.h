@@ -46,6 +46,7 @@
 int chrIsalm( char cvalue );
 int chrIsnam( const char *string );
 int chrSimlr( const char *str1, const char *str2 );
+int chrSimlrN( const char *str1, const char *str2, size_t n );
 size_t chrLen( const char *string );
 void chrAppnd( const char *str1, char *str2, size_t str2_length, size_t *iposn );
 void chrClean( char *string );
