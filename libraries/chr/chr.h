@@ -60,6 +60,7 @@ void chrLdblk( char *string );
 void chrPutc( const char *str1, char *str2, size_t str2_length, size_t *iposn );
 void chrPuti( int ivalue, char *string, size_t string_length, size_t *iposn );
 void chrRmblk( char *string );
+void chrSizetoc( size_t value, char *string, size_t string_length, size_t *nchar );
 void chrUcase( char *string );
 
 #endif

@@ -3621,6 +3621,48 @@ for the output string.
    }
 }
 \sstroutine{
+   chrSizetoc
+}{
+   Encode a size\_t value as a string
+}{
+   \sstdescription{
+      Encode a size\_t value as a (decimal) character string, using as
+      concise a format as possible, and return the number of characters
+      used. In the event of an error, \texttt{"} $*$\texttt{'} s will be written into to the
+      string.
+   }
+   \sstinvocation{
+      void chrSizetoc( size\_t value, char $*$string, size\_t string\_length,
+                       size\_t $*$nchar )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         value
+      }{
+         The value to be encoded.
+      }
+      \sstsubsection{
+         string
+      }{
+         Pointer to an array in which to return a null terminated string
+         holding the string into which the integer value is encoded.
+      }
+      \sstsubsection{
+         string\_length
+      }{
+         The maximum length of the supplied \texttt{'} string\texttt{'}  array. This should
+         include room for the terminating null.
+      }
+      \sstsubsection{
+         $*$nchar
+      }{
+         Returned holding the field width used in encoding the value.
+      }
+   }
+}
+\sstroutine{
    chrUcase
 }{
    Convert a string to uppercase

@@ -44,7 +44,7 @@ F_ROUTINES = chr_abbrv.f chr_achr.f chr_appnd.f chr_atok.f \
 C_ROUTINES = chrAppnd.c chrClean.c chrCtod.c chrCtoi.c chrCtor.c \
         chrFandl.c chrFparx.c chrIsalm.c chrIsnam.c chrItoc.c chrLdblk.c \
 	chrLen.c chrPutc.c chrPuti.c chrRmblk.c chrSimlr.c \
-	chrUcase.c chr_etom.c chr_ktoc.c chr_mtoe.c chrFill.c
+	chrUcase.c chr_etom.c chr_ktoc.c chr_mtoe.c chrFill.c chrSizetoc.c
 
 BUILT_SOURCES = $(include_MESSAGES)
 
