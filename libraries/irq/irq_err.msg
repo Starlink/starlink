@@ -19,7 +19,7 @@ IVNDF  <Invalid NDF identifier found>
 LSHRT  <Character variable too short>
 MSOPD  <Missing operand>
 MSOPT  <Missing or invalid operator>
-MSPAR  <Unpaired parenthesise>
+MSPAR  <Unpaired parentheses>
 MULT   <Multiple quality names information found>
 NOMOR  <No free IRQ identifiers>
 NOQNI  <No QUALITY_NAMES structure found in the NDF>
@@ -41,7 +41,7 @@ BADST  <Incomplete slot structure found>
 .BASE  231
 QUNDF  <QUALITY component is undefined>
 NOSPA  <Can't reclaim space in an instruction array>
-MSDOT  <Missing delimter "." in quality expression>
+MSDOT  <Missing delimiter "." in quality expression>
 BADSY  <Unrecognised logical operator or constant>
 NOOPS  <No operands can be found>
 
