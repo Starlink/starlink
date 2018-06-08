@@ -54,20 +54,25 @@
 
 /* we need size_t */
 #include <stdlib.h>
+#include "star/hds.h"
 
-void subParFindpar( const char * name, size_t * namecode, int * status );
-void subParGet0c( size_t namecode, char *cvalue, size_t cvalue_length,
-		  int * status );
-void subParGet0l( size_t namecode, int *lvalue, int * status );
-void subParGetkey( size_t namecode, char *keyword, size_t keyword_length,
-		   int * status);
 int subParGref( size_t namecode, char * refstr, size_t reflen );
+void subParCancl( size_t namecode, int * status );
+void subParCurval( size_t namecode, char *string, size_t string_length, int * status );
+void subParFindpar( const char * name, size_t * namecode, int * status );
+void subParGet0c( size_t namecode, char *cvalue, size_t cvalue_length, int * status );
+void subParGet0l( size_t namecode, int *lvalue, int * status );
+void subParGetkey( size_t namecode, char *keyword, size_t keyword_length, int * status);
+void subParGetloc( size_t namecode, int *valid,  HDSLoc **loc, int *status );
+void subParGetname( size_t namecode, char *structname, size_t structname_length, int * status );
+void subParIndex( size_t *namecode, int *status );
+void subParParname( size_t namecode, char *name, size_t name_length, size_t *namelen, int *status );
+void subParPutfloc( size_t namecode, HDSLoc *loc, int *status );
+void subParPutloc( size_t namecode, HDSLoc *loc, int *status );
 void subParState( size_t namecode, int * state, int * status );
 void subParSync( int * status );
 void subParWrerr( const char * string, int * status );
 void subParWrmsg( const char * string, int * status );
-void subParGetname( size_t namecode, char *structname, size_t structname_length,
-                    int * status );
 
 
 #endif
