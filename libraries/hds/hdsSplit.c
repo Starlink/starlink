@@ -141,7 +141,7 @@ void hdsSplit( const char *name, size_t *f1, size_t *f2, size_t *p1,
       nc = l - f + 1;
       lname = starMalloc( nc + 1 );
       if( lname ) {
-         memcpy( lname, name, nc );
+         memcpy( lname, name + f, nc );
          lname[ nc ] = 0;
       } else if( *status == SAI__OK ) {
          emsRepf( " ", "Failed to allocate %zu bytes of memory", status, nc + 1 );
@@ -157,7 +157,7 @@ void hdsSplit( const char *name, size_t *f1, size_t *f2, size_t *p1,
          iend = 0;
          if( nc > 1 ) {
             p = strchr( lname + 1, '"' );
-            if( p ) iend = p - lname + 1;
+            if( p ) iend = p - lname;
          }
 
 /* If the closing quote is missing, then report an error. */
@@ -174,13 +174,13 @@ void hdsSplit( const char *name, size_t *f1, size_t *f2, size_t *p1,
    filename which appears between the quotes. */
          } else {
             lname[ 0 ] = ' ';
-            lname[ iend - 1 ] = 0;
+            lname[ iend ] = 0;
             chrFandl( lname, f1, f2 );
 
 /* If the file name is blank, then report an error. */
             if( *f1 > *f2 ) {
                lname[ 0 ] = '"';
-               lname[ iend - 1 ] = '"';
+               lname[ iend ] = '"';
                *status = DAT__NAMIN;
                emsRepf( "", "Quoted filename is blank in the HDS "
                         "name '\"%s\"'.", status, name );
@@ -199,7 +199,7 @@ void hdsSplit( const char *name, size_t *f1, size_t *f2, size_t *p1,
 /* If the file name extends to the end of the object name string, then
    there is no path name (i.e. it is a top-level object), so return
    a "null" position. */
-            if( iend > l ) {
+            if( iend >= l ) {
                *p1 = 1;
                *p2 = 0;
 
@@ -207,27 +207,27 @@ void hdsSplit( const char *name, size_t *f1, size_t *f2, size_t *p1,
    whatever follows the file name. Terminate the string to exclude any
    trailing spaces. */
             } else {
-               chrFandl( lname + iend, &istart, &l );
-               istart += iend;
-               l += iend;
+               chrFandl( lname + iend + 1, &istart, &l );
+               istart += iend + 1;
+               l += iend + 1;
                lname[ l + 1 ] = 0;
 
 /* If this candidate path name does not start with a "." or a "(", then
    there is a top-level name present. This must be ignored (the actual
    file name fills this role). */
-               if( ( lname[ istart ] != '.' ) && ( lname[ istart ] != '(' ) ) {
+               if( lname[ istart ] != '.' && lname[ istart ] != '(' ) {
 
 /* Find the first following occurrence of a "." or "(". */
                   p = strchr( lname + istart, '.' );
                   i1 = p ? ( p - lname ) : 0;
                   p = strchr( lname + istart, '(' );
                   i2 = p ? ( p - lname ) : 0;
-                  if( ( i1 == 0 ) || ( ( i2 != 0 ) && ( i2 < i1 ) ) ) i1 = i2;
+                  if( i1 == 0 || ( i2 != 0 && i2 < i1 ) ) i1 = i2;
 
 /* Move the starting position to the character found, or beyond the
    last non-blank character if a "." or "(" was not found. */
                   if( i1 != 0 ) {
-                     istart += i1;
+                     istart = i1;
                   } else {
                      istart = l + 1;
                   }
@@ -242,8 +242,8 @@ void hdsSplit( const char *name, size_t *f1, size_t *f2, size_t *p1,
 
 /* Otherwise return the path name limits. */
                } else {
-                  *p1 = istart;
-                  *p2 = l;
+                  *p1 = istart + f;
+                  *p2 = l + f;
                }
             }
          }
@@ -290,18 +290,18 @@ void hdsSplit( const char *name, size_t *f1, size_t *f2, size_t *p1,
    search for a "." or a "(" which marks the end of the first field in
    the object path name. */
          p = strchr( lname + iend + 1, '.' );
-         i1 = p ? p - ( lname + iend + 1 ): -1;
+         i1 = p ? p - lname : -1;
          p = strchr( lname + iend + 1, '(' );
-         i2 = p ? p - ( lname + iend + 1 ): -1;
+         i2 = p ? p - lname : -1;
          if( i1 == -1 || ( i2 != -1 && i2 < i1 ) ) i1 = i2;
 
-/* If a ending character was found above, replace it with a null
+/* If an ending character was found above, replace it with a null
    character in order to terminate the file name. Otherwise the whole
    string is the file name and so we leave it unchanged. */
          if( i1 < 0 ) {
             iend = nc;
          } else {
-            iend += i1 + 1;
+            iend = i1;
             tc = lname[ iend ];
             lname[ iend ] = 0;
          }
@@ -328,11 +328,13 @@ void hdsSplit( const char *name, size_t *f1, size_t *f2, size_t *p1,
          offset = iend + DAT__SZFLX;
          if( offset <= nc && chrSimlrN( lname + iend, DAT__FLEXT, DAT__SZFLX ) ) {
 
-/* Must disambiguate .sdf from .sdfx (the file name cannot contain
-   embedded spaces, so check that the *f2 position is immediately before
-   the terminating null character). */
+/* The path starts with ".sdf". This can only be part of the file name if
+   ".sdf" is followed by a character that marks the end of the file name
+   (' ', '.', '(' or end-of-string). For instance, if the path starts with
+   ".sdfgroup" then we cannot use the leading ".sdf" as part of the file
+   name. */
             delta = 0;
-            if( offset < nc && lname[ *f2 - f + 1 ] == 0 ) {
+            if( offset < nc ) {
                if( lname[ offset ] == ' ' ||
                    lname[ offset ] == '.' ||
                    lname[ offset ] == '(' ) {
@@ -353,7 +355,11 @@ void hdsSplit( const char *name, size_t *f1, size_t *f2, size_t *p1,
             if( delta != 0 ) {
                emsMark();
                lstat = SAI__OK;
+
+               if( i1 >= 0 ) lname[ iend ] = 0;
                hdsOpen( lname, "READ", &testloc, &lstat );
+               if( i1 >= 0 ) lname[ iend ] = tc;
+
                if( lstat == SAI__OK ) {
 
 /* File opened okay, so now disambiguate (taking substring requires local
@@ -390,9 +396,9 @@ void hdsSplit( const char *name, size_t *f1, size_t *f2, size_t *p1,
 /* Otherwise, eliminate any leading blanks from the candidate path name
    which follows the file name and return the path name limits. */
             } else {
-               chrFandl( lname + iend + 1, &istart, &l );
-               *p1 = istart + iend + 1 + f;
-               *p2 = l + iend + 1 + f;
+               chrFandl( lname + iend, &istart, &l );
+               *p1 = istart + iend + f;
+               *p2 = l + iend + f;
             }
          }
       }

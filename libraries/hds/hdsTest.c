@@ -67,7 +67,7 @@
 
 static void traceme (const HDSLoc * loc, int *status);
 static void cmpprec ( const HDSLoc * loc1, const char * name, int * status );
-
+static void testHdsSplit( int *status );
 
 int main (void) {
 
@@ -94,7 +94,6 @@ int main (void) {
   size_t nelt;
   size_t nbytes;
   size_t i;
-  int n;
   double sumd;
   int sumi;
   int64_t sumi64;
@@ -452,6 +451,9 @@ int main (void) {
   /* Tidy up and close */
   //hdsErase( &loc1, &status );
 
+  /* Test hdsSplit */
+  testHdsSplit( &status );
+
   if (status == SAI__OK) {
     printf("HDS C installation test succeeded\n");
     emsEnd(&status);
@@ -490,4 +492,65 @@ static void traceme (const HDSLoc * loc, int *status) {
              path_str, nlev);
     }
   }
+
+
+static void testHdsSplit( int *status ){
+
+   typedef struct Test {
+      const char *name;
+      size_t f1;
+      size_t f2;
+      size_t p1;
+      size_t p2;
+   } Test;
+
+   size_t f1;
+   size_t f2;
+   size_t p1;
+   size_t p2;
+   Test *test;
+   int itest;
+
+#define NTEST 21
+   Test tests[NTEST] = {
+      {"hello", 0, 4, 1, 0 },
+      {"\"hello\"", 1, 5, 1, 0 },
+      {"\"hello.sdf\"", 1, 9, 1, 0 },
+      {"\"hello.sdf\"", 1, 9, 1, 0 },
+      {"\"  hello.sdf   \"", 3, 11, 1, 0 },
+      {"  \"  hello.sdf   \"  ", 5, 13, 1, 0 },
+      {"  \"  hello   \"  ", 5, 9, 1, 0 },
+      {"  \"  hello.sdf   \" .more  ", 5, 13, 19, 23 },
+      {"  \"  hello.sdf   \"(~10,~10)  ", 5, 13, 18, 26 },
+      {"  \"  hello.sdf   \"fred.more  ", 5, 13, 22, 26 },
+      {"  \"  hello.sdf   \"fred  ", 5, 13, 1, 0 },
+      {"hello.sdf", 0, 8, 1, 0 },
+      {"  hello.sdf   ", 2, 10, 1, 0 },
+      {"  hello   ", 2, 6, 1, 0 },
+      {"  hello.sdf.more  ", 2, 10, 11, 15 },
+      {"  hello.sdfmore  ", 2, 6, 7, 14 },
+      {"  hello.more  ", 2, 6, 7, 11 },
+      {"  hello.sdf   (~10,~10)  ", 2, 10, 14, 22 },
+      {"  hello(~10,~10)  ", 2, 6, 7, 15 },
+      {"/a/b/hello(~10,~10)  ", 0, 9, 10, 18 },
+      {"  /a/b/hello  ", 2, 11, 1, 0 },
+   };
+
+   if( *status != SAI__OK ) return;
+
+   test = tests;
+   for( itest = 0; itest < NTEST; itest++, test++ ) {
+      hdsSplit( test->name, &f1, &f2, &p1, &p2, status );
+      if( f1 != test->f1 || f2 != test->f2 || p1 != test->p1 || p2 != test->p2 ){
+         *status = SAI__ERROR;
+         emsRepf( " ", "hdsSplit test %d (%s) fails: (%zu %zu %zu %zu) != "
+                  "(%zu %zu %zu %zu)", status, itest, test->name, f1, f2, p1, p2,
+                  test->f1, test->f2, test->p1, test->p2 );
+         break;
+      }
+   }
+}
+
+
+
 
