@@ -10,7 +10,7 @@
 \stardocsource      {sun\stardocnumber}
 \stardocnumber      {223.7}
 \stardocauthors     {D.S. Berry \& T.M. Gledhill }
-\stardocdate        {29th September 2017}
+\stardocdate        {22nd May 2018}
 \stardoctitle       {POLPACK \\
                             An Imaging Polarimetry Reduction Package}
 \stardocversion     {Version 3.6-0}
@@ -1948,7 +1948,6 @@ These descriptions follow the style used in \xref{SUN/95}{sun95}{ap_full}
 for NDF applications.
 
 \newpage
-\newpage
 \sstroutine{
    POLBIN
 }{
@@ -2098,7 +2097,6 @@ for NDF applications.
       Copyright (C) 2001 Central Laboratory of the Research Councils
    }
 }
-\newpage
 \sstroutine{
    POLCAL
 }{
@@ -3141,7 +3139,6 @@ for NDF applications.
       Copyright (C) 1999 Central Laboratory of the Research Councils
    }
 }
-\newpage
 \sstroutine{
    POLIMAGE
 }{
@@ -4105,7 +4102,6 @@ for NDF applications.
       Copyright (C) 1999 Central Laboratory of the Research Councils
    }
 }
-\newpage
 \sstroutine{
    POLPLOT
 }{
@@ -4564,7 +4560,6 @@ for NDF applications.
       }
    }
 }
-\newpage
 \sstroutine{
    POLROTREF
 }{
@@ -4673,7 +4668,121 @@ for NDF applications.
       }
    }
 }
-\newpage
+\sstroutine{
+   POLSELECT
+}{
+   Select vectors from a catalogue
+}{
+   \sstdescription{
+      This application creates an output catalogue that contains a subset
+      of the vectors in the specified input catalogue. The subset can be
+      specified in various ways (see parameter MODE):
+
+      \sstitemlist{
+
+         \sstitem
+          using the bad pixels in a reference image to mask out unwanted
+         vectors
+
+         \sstitem
+          using ARD or AST region specifications to select the required
+         vectors
+
+         \sstitem
+          using an algebraic expression to select the required vectors on
+         the basis of their column values
+      }
+   }
+   \sstusage{
+      polselect in out mode
+   }
+   \sstparameters{
+      \sstsubsection{
+         EXP = LITERAL (Read)
+      }{
+         This parameter is only used if parameter MODE is set to
+         \texttt{"} EXPRESSION\texttt{"} . It should be set to a boolean expression that uses
+         column names from the input catalogue as variables. It should
+         have the format used by the CURSA \texttt{'} CATSELECT\texttt{'}  command (see sun/190).
+         In general, the arithmetic and boolean operators available in
+         either C and Fortran can be used (e.g. \texttt{'} .ge.\texttt{'} , \texttt{'} $>$=\texttt{'} , \texttt{'} .and.\texttt{'} ,
+         \texttt{'} \&\&\texttt{'} , etc.), as can the usual mathematical functions (e.g. \texttt{'} abs\texttt{'} ,
+         \texttt{'} tan\texttt{'} , \texttt{'} pow\texttt{'} , etc). A vector is selected if the expression
+         evaluates to TRUE (if using a Fortran-style expression) or a
+         non-zero value (if using a C-style expression).
+      }
+      \sstsubsection{
+         IN = LITERAL (Read)
+      }{
+         The name of the input catalogue. A file type of .FIT is
+         assumed if none is provided.
+      }
+      \sstsubsection{
+         INVERT = \_LOGICAL (Read)
+      }{
+         If FALSE, all selected vectors are copied to the output
+         catalogue. If TRUE, all unselected vectors are copied to the
+         output catalogue. [FALSE]
+      }
+      \sstsubsection{
+         MASK = NDF (Read)
+      }{
+         This parameter is only used if parameter MODE is set to \texttt{"} MASK\texttt{"} .
+         It specifies the two-dimensional NDF to be used as a mask to
+         select the required vectors. Vectors corresponding to good pixel
+         values in the mask are selected. The mask is assumed to be
+         aligned with the catalogue in pixel coordinates.
+      }
+      \sstsubsection{
+         MODE = LITERAL (Read)
+      }{
+         Specifies the manner in which the vectors are selected:
+
+         \sstitemlist{
+
+            \sstitem
+             \texttt{"} MASK\texttt{"} : The image specified by parameter MASK is used to
+            select the vectors. If a vector has a position that corresponds
+            to a good pixel in MASK, then the vector is selected.
+
+            \sstitem
+             \texttt{"} REGION\texttt{"} : The ARD or AST region specified by parameter REGION
+            is used to select the vectors. If a vector falls within the
+            region, then it is selected.
+
+            \sstitem
+             \texttt{"} EXPRESSION\texttt{"} : The boolean expression specified by parameter
+            EXP is used to select the vectors. If the boolean expression
+            evaluates to TRUE for a vector, then the vector is selected.
+         }
+      }
+      \sstsubsection{
+         OUT = LITERAL (Write)
+      }{
+         The name of the output catalogue. A file type of .FIT is
+         assumed if none is provided.
+      }
+      \sstsubsection{
+         REF = NDF (Read)
+      }{
+         This parameter is only used if parameter MODE is set to \texttt{"} REGION\texttt{"} .
+         It specifies the NDF to which the ARD description refers. It is
+         used to define the pixel coordinate system used by the ARD
+         description. If null (!) is supplied, it is assumed that the
+         pixel coordinate system used by the ARD description is the
+         pixel coordinate system of the input catalogue. [!]
+      }
+      \sstsubsection{
+         REGION = FILENAME (Read)
+      }{
+         This parameter is only used if parameter MODE is set to \texttt{"} REGION\texttt{"} .
+         It should be set to the name of a text file containing a
+         description of the region containing the vectors to be selected.
+         This can either be in the form of an \texttt{'} ARD description\texttt{'}  (see
+         SUN/183), or an \texttt{'} AST Region\texttt{'}  (see SUN/210).
+      }
+   }
+}
 \sstroutine{
    POLSIM
 }{
@@ -4741,7 +4850,6 @@ for NDF applications.
       Copyright (C) 2001 Central Laboratory of the Research Councils
    }
 }
-\newpage
 \sstroutine{
    POLSTACK
 }{
@@ -4898,7 +5006,6 @@ for NDF applications.
       Copyright (C) 2001 Central Laboratory of the Research Councils
    }
 }
-\newpage
 \sstroutine{
    POLVEC
 }{
@@ -6078,6 +6185,16 @@ assumed that the reference direction is parallel to the first image axis).
 \section{\label{APP:HISTORY}History}
 This section describes the major changes introduced at each release of
 POLPACK.
+
+\subsection{V3.6-0}
+
+\begin{itemize}
+ \item A new command called POLSELECT has been added. This command allows
+  rows to be selected from a vector catalogue in threee different ways:
+  1) using a pixel maks defined in an NDF, 2) using a region description
+  (either ARD or AST), or 3) Using an algebraic expression (like the
+  CATSELECT command in CURSA).
+\end{itemize}
 
 \subsection{V3.5-0}
 

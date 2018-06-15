@@ -24,6 +24,7 @@
 *          -- CGEN_BAD
 *          -- CGEN_MAX
 *          -- CGEN_MIN
+*          -- CGEN_EPS
 *          -- CGEN_FUNCTION
 *          -- CGEN_HDS_TYPE
 *          -- CGEN_TYPE
@@ -53,11 +54,8 @@
 *          unsigned char, and int64_t as appropriate.
 *
 *          The value of CGEN_BAD will be set to one of the PRM constants
-*          VAL__BADD, VAL__BADR etc. as appropriate. Likewise, CGEN_MAX
-*          and CGEN_MIN will be set to the corresponding PRM constants.
-*
-*          The value of CGEN_BAD will be set to one of the PRM constants
-*          VAL__BADD, VAL__BADR etc. as appropriate.
+*          VAL__BADD, VAL__BADR etc. as appropriate. Likewise, CGEN_MAX,
+*          CGEN_MIN and CGEN_EPS will be set to the corresponding PRM constants.
 *
 *          The value of CGEN_HDS_TYPE will be set to the HDS type of the
 *          current type, one of "_DOUBLE", "_REAL", "_INTEGER", "_WORD"
@@ -140,6 +138,8 @@
 *        Add CGEN_MAX and CGEN_MIN.
 *     2012-04-23 (TIMJ):
 *        Add INT64 support.
+*     7-JUN-2018 (DSB):
+*        Add CGEN_EPS
 *     {enter_further_changes_here}
 
 *-
@@ -170,6 +170,10 @@
 /* The CGEN_MIN value for the current data type, which is the PRM
  * type specified by CGEN_PRM_TYPE (VAL__MIND, VAL__MINR etc.). */
 #define CGEN_MIN CGEN_JOIN_STRINGS(VAL__MIN,CGEN_PRM_TYPE)
+
+/* The CGEN_EPS value for the current data type, which is the PRM
+ * type specified by CGEN_PRM_TYPE (VAL__EPSD, VAL__EPSR etc.). */
+#define CGEN_EPS CGEN_JOIN_STRINGS(VAL__EPS,CGEN_PRM_TYPE)
 
 /* Enumeration of the known types, define CGEN_CODE_TYPE to one of these and
  * include cgeneric_defs.h, note these have to be defines, not enums, for

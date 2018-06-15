@@ -36,9 +36,9 @@
 *        Indicates how bad values within the input NDF should be handled:
 *        0 - Retain them
 *        1 - Replace them with zero.
-*        2 - Replace them with the mean value in the time-slice, or with the
-*            most recent valid mean time-slice value, if the time-slice has
-*            no good values.
+*        2 - Replace them with the mean value in the time-slice, or with
+*            the closest valid mean time-slice value, if the time-slice
+*            has no good values.
 *     expand = int (Given)
 *        If non-zero, then expand 1D arrays into 3D arrays.
 *     type = smf_dtype (Given)
@@ -80,6 +80,9 @@
 *        Multi-thread.
 *     14-MAR-2018 (DSB):
 *        Added argument "dumpdir".
+*     11-MAY-2018 (DSB):
+*        Handle cases where there are no good values in the first plane
+*        of the supplied NDF.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -315,7 +318,9 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *dumpdir,
             }
             thrWait( wf, status );
 
-/* Replace bad values with the mean value in the time slice. */
+/* Replace bad values with the mean value in the time slice, or with the
+   mean value in the closest non-bad time slice if the whole time slice
+   is bad. */
          } else if( bad == 2 )  {
             for( iw = 0; iw < nw; iw++ ) {
                pdata = job_data + iw;
@@ -359,6 +364,7 @@ static void smf1_import_array( void *job_data_ptr, int *status ) {
    dim_t nbolo;
    double *pin;
    double *pout;
+   int badmean;
    int *ipin;
    int *ipout;
    size_t bstride;
@@ -442,87 +448,157 @@ static void smf1_import_array( void *job_data_ptr, int *status ) {
       }
 
    } else if( pdata->operation == 3 ){
-      double mean = VAL__BADD;
+      double *mean;
+      double vnext;
+      double vprev;
       double vsum;
+      int dgap = 0;
+      int dnext = 0;
+      int dprev = 0;
+      size_t *nbad;
       size_t ngood;
-      size_t nbad;
 
-      if( pdata->type == SMF__DOUBLE ) {
-         for( i = t1; i <= t2; i++ ) {
-            vsum = 0.0;
-            ngood = 0;
-            nbad = 0;
-            pout = (double *) pdata->dout + i*tstride;
+      double *means = astMalloc((t2-t1+1)*smf_dtype_sz(pdata->type,status));
+      size_t *nbads = astMalloc((t2-t1+1)*sizeof(*nbads));
+      if( means && nbads ) {
 
-            for( j = 0; j < nbolo; j++ ) {
-               if( *pout != VAL__BADD ) {
-                  vsum += *pout;
-                  ngood++;
-               } else {
-                  nbad++;
+/* Get the mean value and the number of bad values in each time slice. */
+         badmean = 0;
+         mean = means;
+         nbad = nbads;
+
+         if( pdata->type == SMF__DOUBLE ) {
+
+            for( i = t1; i <= t2; i++,nbad++,mean++ ) {
+               vsum = 0.0;
+               ngood = 0;
+               *nbad = 0;
+               pout = (double *) pdata->dout + i*tstride;
+
+               for( j = 0; j < nbolo; j++ ) {
+                  if( *pout != VAL__BADD ) {
+                     vsum += *pout;
+                     ngood++;
+                  } else {
+                     (*nbad)++;
+                  }
+                  pout += bstride;
                }
-               pout += bstride;
+               if( ngood > 0 ) {
+                  *mean = vsum/ngood;
+               } else {
+                  *mean = VAL__BADD;
+                  badmean = 1;
+               }
             }
 
-            if( ngood > 0 ) mean = vsum/ngood;
+         } else if( pdata->type == SMF__INTEGER ) {
+            for( i = t1; i <= t2; i++,nbad++,mean++ ) {
+               vsum = 0.0;
+               ngood = 0;
+               *nbad = 0;
+               ipout = (int *) pdata->dout + i*tstride;
 
-            if( nbad > 0 ) {
-               if( mean != VAL__BADD ) {
+               for( j = 0; j < nbolo; j++ ) {
+                  if( *ipout != VAL__BADI ) {
+                     vsum += *ipout;
+                     ngood++;
+                  } else {
+                     (*nbad)++;
+                  }
+                  ipout += bstride;
+               }
+               if( ngood > 0 ) {
+                  *mean = vsum/ngood;
+               } else {
+                  *mean = VAL__BADD;
+                  badmean = 1;
+               }
+            }
+
+         } else if( *status == SAI__OK ) {
+            const char *stype = smf_dtype_str( pdata->type, status );
+            *status = SAI__ERROR;
+            errRepf( " ", "smf_import_array: Data type '%s' not supported "
+                     "(programming error).", status, stype );
+         }
+
+/* Replace any sections of bad values in the array of mean values using
+   linear interpolation between the neighbouring good values. Take care
+   with any bad values at the start and end. */
+         if( badmean && *status == SAI__OK ) {
+            vnext = VAL__BADD;
+            vprev = VAL__BADD;
+            mean = means;
+            for( i = t1; i <= t2; i++,mean++ ) {
+               if( *mean == VAL__BADD ){
+                  if( vnext == VAL__BADD ) {
+                     for( j = i + 1; j <= t2; j++ ) {
+                        if( means[ j ] != VAL__BADD ) {
+                           vnext = means[ j ];
+                           dnext = j - i + 1;
+                           dprev = 0;
+                           dgap = dnext;
+                           break;
+                        }
+                     }
+
+                     if( vnext == VAL__BADD ) {
+                        for( j = i; j <= t2; j++ ) means[ j ] = vprev;
+                        break;
+                     }
+                  }
+
+                  if( vprev == VAL__BADD ) {
+                     *mean = vnext;
+                  } else {
+                     dprev++;
+                     dnext--;
+                     *mean = ( dnext*vprev + dprev*vnext )/dgap;
+                  }
+
+               } else {
+                  vprev = *mean;
+                  vnext = VAL__BADD;
+               }
+            }
+
+            if( vprev == VAL__BADD && *status == SAI__OK ) {
+               *status = SAI__ERROR;
+               errRepf( " ", "NDF '%s' has no good values.", status,
+                        pdata->name );
+            }
+         }
+
+/* Now replace any bad values with the mean value for the whole time
+   slice. */
+         mean = means;
+         nbad = nbads;
+         if( pdata->type == SMF__DOUBLE ) {
+            for( i = t1; i <= t2; i++,nbad++,mean++ ) {
+               if( *nbad > 0 ) {
                   pout = (double *) pdata->dout + i*tstride;
                   for( j = 0; j < nbolo; j++ ) {
-                     if( *pout == VAL__BADD ) *pout = mean;
+                     if( *pout == VAL__BADD ) *pout = *mean;
                      pout += bstride;
                   }
-               } else {
-                  *status = SAI__ERROR;
-                  errRepf( " ", "NDF '%s' has no good values in plane "
-                           "%zu.", status, pdata->name, i );
-                  break;
                }
             }
-         }
-
-      } else if( pdata->type == SMF__INTEGER ) {
-         for( i = t1; i <= t2; i++ ) {
-            vsum = 0.0;
-            ngood = 0;
-            nbad = 0;
-            ipout = (int *) pdata->dout + i*tstride;
-
-            for( j = 0; j < nbolo; j++ ) {
-               if( *ipout != VAL__BADI ) {
-                  vsum += *ipout;
-                  ngood++;
-               } else {
-                  nbad++;
-               }
-               ipout += bstride;
-            }
-
-            if( ngood > 0 ) mean = vsum/ngood;
-
-            if( nbad > 0 ) {
-               if( mean != VAL__BADD ) {
+         } else if( pdata->type == SMF__INTEGER ) {
+            for( i = t1; i <= t2; i++,nbad++,mean++ ) {
+               if( *nbad > 0 ) {
                   ipout = (int *) pdata->dout + i*tstride;
                   for( j = 0; j < nbolo; j++ ) {
-                     if( *ipout == VAL__BADI ) *ipout = mean;
+                     if( *ipout == VAL__BADI ) *ipout = *mean;
                      ipout += bstride;
                   }
-               } else {
-                  *status = SAI__ERROR;
-                  errRepf( " ", "NDF '%s' has no good values in plane "
-                           "%zu.", status, pdata->name, i );
-                  break;
                }
             }
          }
-
-      } else if( *status == SAI__OK ) {
-         const char *stype = smf_dtype_str( pdata->type, status );
-         *status = SAI__ERROR;
-         errRepf( " ", "smf_import_array: Data type '%s' not supported "
-                  "(programming error).", status, stype );
       }
+
+      means = astFree( means );
+      nbads = astFree( nbads );
 
    } else {
       *status = SAI__ERROR;

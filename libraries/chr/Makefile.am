@@ -19,6 +19,7 @@ endif
 
 include_MESSAGES = CHR_ERR
 PRIVATE_INCLUDES = CHR_SYS
+PUBLIC_INCLUDES = chr.h
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
@@ -40,11 +41,14 @@ F_ROUTINES = chr_abbrv.f chr_achr.f chr_appnd.f chr_atok.f \
         chr1_wild3.f chr1_wild4.f chr1_wild5.f chr1_wild6.f chr1_wild7.f \
         chr_fparx.f chr_lasto.f
 
-C_ROUTINES = chr_etom.c chr_mtoe.c chr_ktoc.c
+C_ROUTINES = chrAppnd.c chrClean.c chrCtod.c chrCtoi.c chrCtor.c \
+        chrFandl.c chrFparx.c chrIsalm.c chrIsnam.c chrItoc.c chrLdblk.c \
+	chrLen.c chrPutc.c chrPuti.c chrRmblk.c chrSimlr.c chrSimlrN.c \
+	chrUcase.c chr_etom.c chr_ktoc.c chr_mtoe.c chrFill.c chrSizetoc.c
 
 BUILT_SOURCES = $(include_MESSAGES)
 
-TEST_ROUTINES = case.f compare.f decode.f edit.f \
+TEST_ROUTINES_F = case.f compare.f decode.f edit.f \
         encode.f enquire.f port.f search.f \
         test_abbrv.f test_achr.f test_appnd.f test_atok.f \
         test_btoi.f  test_clean.f test_copy.f  test_ctoc.f \
@@ -63,11 +67,19 @@ TEST_ROUTINES = case.f compare.f decode.f edit.f \
         test_ucase.f test_upper.f test_wild.f  test_lasto.f \
 	test_ctok.f test_ktoc.f
 
-TESTS = chr_test
-check_PROGRAMS = chr_test
+TEST_ROUTINES_C = testAppnd.c testClean.c testCtod.c testCtoi.c \
+        testCtor.c testFandl.c testFill.c testFparx.c testIsalm.c \
+	testIsnam.c testItoc.c testLdblk.c testLen.c testPutc.c \
+	testPuti.c testRmblk.c testSimlr.c testUcase.c
 
-chr_test_SOURCES = chr_test.f $(TEST_ROUTINES)
-chr_test_LDADD = libchr.la `cnf_link`
+TESTS = chr_test chrTest
+check_PROGRAMS = chr_test chrTest
+
+chr_test_SOURCES = chr_test.f $(TEST_ROUTINES_F)
+chr_test_LDADD = libchr.la `cnf_link` `starutil_link`
+
+chrTest_SOURCES = chrTest.c $(TEST_ROUTINES_C)
+chrTest_LDADD = libchr.la `cnf_link` `starutil_link`
 
 dist_starnews_DATA = chr.news
 dist_pkgdata_DATA = LICENCE

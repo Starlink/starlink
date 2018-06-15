@@ -46,6 +46,8 @@
 *        Original version
 *     7-JAN-2003 (DSB):
 *        Added private status values returned by GRP1_WILD
+*     15-MAY-2018 (DSB):
+*        Increased GRP__SZGEX from 255 to 2047.
 *     {enter_further_changes_here}
 
 *-
@@ -68,7 +70,7 @@
 
 *  Maximum length of a group expression.
       INTEGER GRP__SZGEX
-      PARAMETER ( GRP__SZGEX = 255 )
+      PARAMETER ( GRP__SZGEX = 2047 )
 
 *  Length of a name within a group.
       INTEGER GRP__SZNAM

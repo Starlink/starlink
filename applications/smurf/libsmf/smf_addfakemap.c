@@ -15,7 +15,8 @@
 *  Invocation:
 *     void smf_addfakemap( ThrWorkForce *wf, smfArray *res, smfArray *ext,
 *                          smfArray *lut, int *lbnd_out, int *ubnd_out,
-*                          AstKeyMap *keymap, double chunkfactor, int *status )
+*                          AstKeyMap *keymap, double chunkfactor,
+*                          int contchunk, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -41,6 +42,8 @@
 *        The values sampled from the fakemap are divided by this factor
 *        before being added onto the time-series data. This is in addition
 *        to any scaling specified by the "fakescale" config parameter.
+*     contchunk = int (Given)
+*        Zero based index of current time series data chunk.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -57,6 +60,8 @@
 *        Original version.
 *     10-APR-2018 (DSB):
 *        Added parameter "chunkfactor".
+*     10-MAY-2018 (DSB):
+*        Allow each chunk of data to have a different fakescale.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -97,7 +102,8 @@
 
 void smf_addfakemap( ThrWorkForce *wf, smfArray *res, smfArray *ext,
                      smfArray *lut, int *lbnd_out, int *ubnd_out,
-                     AstKeyMap *keymap, double chunkfactor, int *status ){
+                     AstKeyMap *keymap, double chunkfactor, int contchunk,
+                     int *status ){
 
 /* Local Variables: */
    char *fakemap;
@@ -133,8 +139,11 @@ void smf_addfakemap( ThrWorkForce *wf, smfArray *res, smfArray *ext,
    if( *status == SAI__OK ) {
       msgOutf( "", "smf_addfakemap: loading external fakemap `%s'", status, fakemap );
 
-/* Get the other required config parameters. */
-      astMapGet0D( keymap, "FAKESCALE", &fakescale );
+/* Get the other required config parameters. FAKESCALE can have a
+   different value for each chunk, but this is not currently true of FAKEMCE
+   or FAKEDELAY. */
+      fakescale = smf_chunkpar( res->sdata[0], "FAKESCALE", "fakemap scale factor",
+                                keymap, contchunk, status );
       astMapGet0I( keymap, "FAKEMCE", &fakemce );
       astMapGet0D( keymap, "FAKEDELAY", &fakedelay );
 

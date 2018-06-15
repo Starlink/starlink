@@ -16,7 +16,7 @@ libhds_la_SOURCES = \
 	$(PRIVATE_INCLUDES) \
 	$(C_ROUTINES)
 
-libhds_la_LIBADD = -lhds_v4 -lhds_v5
+libhds_la_LIBADD = -lhds_v4 -lhds_v5 `chr_link`
 
 libhdsf_la_SOURCES = \
 	$(F_ROUTINES) \
@@ -74,11 +74,11 @@ F_ROUTINES = \
 	cmp_putnx.f cmp_putvx.f cmp_shape.f cmp_size.f cmp_struc.f \
 	cmp_type.f cmp_unmap.f \
 	dat_getnx.f dat_putnx.f \
-	dat_cut.f hds_split.f \
+	dat_cut.f \
 	dat1_pshde.f dat1_pshdf.f dat1_pshdb.f \
 	hds_find.f
 
-F_C_ROUTINES = hds_run.c fortran_interface.c hdsFind.c
+F_C_ROUTINES = hds_run.c fortran_interface.c hdsFind.c hds_split.c
 
 #  List of Fortran BLOCK DATA routines.
 BLOCK_DATA_FILES = cmp_blk.f
@@ -89,8 +89,7 @@ C_ROUTINES = $(CMP_C_ROUTINES) \
 	dat1CcopyLocXtoY.c dat1CcopyXtoY.c \
 	dat1CopyPrimXtoY.c dat1CopyStrucXtoY.c dat1CopyXtoY.c \
 	datExportFloc.c datImportFloc.c dat1_import_floc.c hdsdim.c \
-	dat1GetEnv.c hdstuning.c \
-	hds_select.c
+	dat1GetEnv.c hdstuning.c hdsDimtoc.c hds_select.c hdsSplit.c
 
 DAT_PAR: dat_par_f$(EXEEXT)
 	./dat_par_f > DAT_PAR

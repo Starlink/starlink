@@ -1,9 +1,17 @@
 1 POLPACK
 
- Version 3.5 of POLPACK (an applications package for processing imaging
+ Version 3.6 of POLPACK (an applications package for processing imaging
  polarimetry data) is now available. It is fully documented in SUN/223.
 
- The main changes since V3.4 are:
+ The main changes since V3.5 are:
+
+ o  A new command polselect has been added, which allows selection of
+ vectors using region descriptions (ARD or AST), pixel masks and algebraic
+ expressions.
+
+
+ The main changes between V3.4 and V3.5 were:
+
 
  o  The POLWRTCL command now excludes any rows that contain one or more
  bad values.  This means that literal bad values (-0.340282E+39) are no
@@ -13,8 +21,6 @@
  information form one catalogue to another. It is useful for adding WCS
  information back into catalogues that have had the WCS information
  stripped out - for instance by being processed using TOPCAT or STILTS.
-
-
 
 
  The main changes between V3.3. and V3.4 were:

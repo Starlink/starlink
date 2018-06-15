@@ -2,7 +2,7 @@ dnl  Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl   Initialisation: package name and version number
-AC_INIT([chr],[2.4-1],[starlink@jiscmail.ac.uk])
+AC_INIT([chr],[3.0],[starlink@jiscmail.ac.uk])
 AC_CONFIG_AUX_DIR([build-aux])
 
 dnl   Require autoconf-2.50 at least
@@ -27,7 +27,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 dnl We need to be compatible with PRM for the INTEGER*8 tests
 STAR_PRM_COMPATIBLE_SYMBOLS
 
-STAR_DECLARE_DEPENDENCIES([build], [sae cnf])
+STAR_DECLARE_DEPENDENCIES([build], [sae cnf starutil])
 
 STAR_LATEX_DOCUMENTATION(sun40)
 

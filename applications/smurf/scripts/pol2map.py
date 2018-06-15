@@ -519,6 +519,12 @@
 *        - Added parameter MULTIOBJECT.
 *     10-APR-2018 (DSB):
 *        Added parameter NORMALISE.
+*     17-MAY-2018 (DSB):
+*        Check that weights are available in the auto-masked I maps if
+*        this script is run with "skyloop=yes obsweight=yes". skyloop
+*        requires CHUNKWGT values in the input time-stream data. These
+*        are copied into the time-series data from the pre-calculated
+*        automasked I maps.
 
 '''
 
@@ -2076,14 +2082,18 @@ try:
 #  have been found on a previous run of pol2map as part of generating the
 #  auto-masked I map. The weight or an observation will have been stored in
 #  the CHUNKWGT header in the auto-masked imap. Transfer it to the time-series
-#  file. Only use the weights if all observations have a weight.
+#  file.
             allone = True
             if obsweight:
+               nwgt = 0
+               nnowgt = 0
                for key in qui_list:
                   try:
                      hmap = NDG("{0}/{1}_imap".format(mapdir,key))
-                     wgt = float( get_fits_header( hmap, "CHUNKWGT" ))
-                  except starutil.NoNdfError:
+                     wgt = float( get_fits_header( hmap, "CHUNKWGT", report=True ))
+                     nwgt += 1
+                  except Exception:
+                     nnowgt += 1
                      wgt = 1.0
 
                   if wgt < 1.0:
@@ -2092,6 +2102,24 @@ try:
                   invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=CHUNKWGT "
                          "edit=a value={1} comment=\"'Weight for this chunk of data'\""
                          " position=! mode=interface".format(NDG(qui_list[key]),wgt))
+
+               if nwgt == 0:
+                  raise starutil.InvalidParameterError( "\npol2map was run "
+                           "with 'skyloop=yes obsweight=yes', so each "
+			   "pre-existing auto-masked I map is expected to "
+			   "contain a weight. But none did. The "
+			   "auto-masked I maps should have been created "
+			   "using 'skyloop=no obsweight=yes'. Was this "
+			   "done?\n" )
+               elif nnowgt > 0:
+                  msg_out("\nWARNING: pol2map was run with 'skyloop=yes "
+ 			   "obsweight=yes', so each pre-existing "
+			   "auto-masked I map is expected to contain a "
+			   "weight. But {0} did not (a default weight of "
+			   "1.0 will be used for each such map). All "
+			   "auto-masked I maps should have been created "
+			   "using 'skyloop=no obsweight=yes'. Was this "
+			   "done?\n".format(nnowgt))
 
 #  If any of the weights are not 1.0, modify the config to indicate that
 #  makemap should read the weights from the CHUNKWGT header in the

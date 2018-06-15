@@ -11,16 +11,15 @@
 \stardoccategory    {Starlink User Note}
 \stardocinitials    {SUN}
 \stardocsource      {sun\stardocnumber}
-\stardoccopyright
-{Copyright \copyright\ 2005 Council for the Central Laboratory of the Research Councils}
+\stardoccopyright   {Copyright \copyright\ 2018 East Asian Observatory}
 
 % Variable part - replace [xxx] as appropriate.
 \stardocnumber      {40.6}
-\stardocauthors     {A C Charles\\P C T Rees\\A J Chipperfield\\ T Jenness }
-\stardocdate        {27 December 2005}
+\stardocauthors     {A C Charles\\P C T Rees\\A J Chipperfield\\ T Jenness\\ D Berry }
+\stardocdate        {16 May 2018}
 \stardoctitle       {CHR \\ [\latex{1ex}]
                                 Character Handling Routines}
-\stardocversion     {2.0}
+\stardocversion     {3.0}
 \stardocmanual      {Programmer's Manual}
 \stardocabstract  {
 This document describes the Character Handling Routine library, CHR,
@@ -88,6 +87,9 @@ The functions performed by the CHR library may be categorised as follows:
 
 A classified list of of these routines is given in Appendix \ref{class_sect}.
 
+Equivalent functions written entirely in C are available for a subset of
+the CHR routines (see Appendix \ref{c_funcs}). These are provided mainly
+for use when porting Fortran application code to C.
 
 \section {Error Handling \label{err_sect} }
 
@@ -2992,6 +2994,737 @@ set.
 }
 \end{small}
 
+
+
+
+\section {C Function Descriptions \label{c_funcs}}
+
+\subsection{Overview}
+Equivalent functions written entirely in C are available for the
+following subset of the CHR routines. These are provided mainly for use
+when porting Fortran application code to C.
+
+The C and Fortran implementations are completely independent of each
+other - no ``wrapper'' layer is involved. This is done to avoid
+efficiency problems caused by the continual copying of strings between
+Fortran and C that would be required if the C interface was provided by a
+wrapper layer on top of the Fortran coide (or vice versa). The behaviour
+of C functions is slightly different to that of the Fortran routines
+because the two languages index strings in different ways (C is
+zero-based, Fortran is one-based). Also C has no equivalent to the
+Fortran intrinsic function LEN, and so each C function that returns a
+string has an extra argument specifying the length of the buffer reserved
+for the output string.
+
+\newpage
+\sstroutine{
+   chrAppnd
+}{
+   Copy one string into another, ignoring trailing blanks
+}{
+   \sstdescription{
+      The string \texttt{"}str1\texttt{"} (or as much of it as there is room for) is copied
+      into the part of \texttt{"}str2\texttt{"} beginning at position \texttt{"}iposn\texttt{"}. \texttt{"}iposn\texttt{"} is
+      updated to indicate the final length of \texttt{"}str2\texttt{"} after this operation.
+      Trailing blanks in \texttt{"}str1\texttt{"} are ignored.
+   }
+   \sstinvocation{
+      void chrAppnd( const char $*$str1, char $*$str2, size\_t str2\_length,
+                     size\_t $*$iposn )
+   }
+   \sstnotes{
+      If the output string is too small to append the entire input
+      string, truncation will occur and \texttt{"}iposn\texttt{"} will be set to the total
+      length of \texttt{"}str2\texttt{"} (excluding the trailing null).
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         str1
+      }{
+         Pointer to a null terminated string holding the string to be
+         copied.
+      }
+      \sstsubsection{
+         str2
+      }{
+         Pointer to a null terminated string holding the string to be
+         updated.
+      }
+      \sstsubsection{
+         str2\_length
+      }{
+         The maximum length of the \texttt{'} str2\texttt{'}  string. This should include
+         room for the terminating null.
+      }
+      \sstsubsection{
+         $*$iposn
+      }{
+         The used length of the \texttt{"}str2\texttt{"}. If \texttt{"}str2\texttt{"} is empty on entry, then
+         this should be supplied as zero. On exit, the supplied value
+         is incremented by the length of \texttt{"}str1\texttt{"} (ignoring any trailing
+         spaces).
+      }
+   }
+}
+\sstroutine{
+   chrClean
+}{
+   Remove all unprintable characters from a string
+}{
+   \sstdescription{
+      Replace all unprintable characters in the given string with blanks.
+   }
+   \sstinvocation{
+      void chrClean( char $*$string )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         string
+      }{
+         Pointer to a null terminated string holding the string to be
+         cleaned.
+      }
+   }
+}
+\sstroutine{
+   chrCtod
+}{
+   Read a double value from a string
+}{
+   \sstdescription{
+      Read a double value from the given character string.
+   }
+   \sstinvocation{
+      void chrCtod( const char $*$string, double $*$dvalue, int $*$status )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         string
+      }{
+         Pointer to a null terminated string holding the string from which
+         a double value is to be read.
+      }
+      \sstsubsection{
+         $*$dvalue
+      }{
+         Returned holding the resulting double value.
+      }
+      \sstsubsection{
+         $*$status
+      }{
+         The status value: if this value is not SAI\_\_OK on input, the
+         function returns without action; if the function does not complete
+         successfully, \texttt{"}status\texttt{"} is returned set to SAI\_\_ERROR.
+      }
+   }
+}
+\sstroutine{
+   chrCtoi
+}{
+   Read an integer value from a string
+}{
+   \sstdescription{
+      Read an integer value from the given character string.
+   }
+   \sstinvocation{
+      void chrCtoi( const char $*$string, int $*$ivalue, int $*$status )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         string
+      }{
+         Pointer to a null terminated string holding the string from which
+         an integer value is to be read.
+      }
+      \sstsubsection{
+         $*$ivalue
+      }{
+         Returned holding the resulting integer value.
+      }
+      \sstsubsection{
+         $*$status
+      }{
+         The status value. If this value is not SAI\_\_OK on input, the
+         function returns without action; if the function does not complete
+         successfully, \texttt{"}status\texttt{"} is returned set to SAI\_\_ERROR.
+      }
+   }
+}
+\sstroutine{
+   chrCtor
+}{
+   Read a float value from a string
+}{
+   \sstdescription{
+      Read a float value from the given character string.
+   }
+   \sstinvocation{
+      void chrCtor( const char $*$string, float $*$rvalue, int $*$status )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         string
+      }{
+         Pointer to a null terminated string holding the string from which
+         a float value is to be read.
+      }
+      \sstsubsection{
+         $*$rvalue
+      }{
+         Returned holding the resulting float value.
+      }
+      \sstsubsection{
+         $*$status
+      }{
+         The status value: if this value is not SAI\_\_OK on input, the
+         function returns without action; if the function does not complete
+         successfully, \texttt{"}status\texttt{"} is returned set to SAI\_\_ERROR.
+      }
+   }
+}
+\sstroutine{
+   chrFandl
+}{
+   Find the first and last non-blank characters in a string
+}{
+   \sstdescription{
+      Find the indices of the first and last non-blank characters in the
+      given string. If the string contains no non-blank characters, the first
+      index is returned set to 1 and last index is returned set to 0, i.e.
+      \texttt{"}index1\texttt{"} is greater than \texttt{"}index2\texttt{"}.
+   }
+   \sstinvocation{
+      void chrFandl( const char $*$string, size\_t $*$index1, size\_t $*$index2 )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          For consistency with the Fortran routine CHR\_FANDL, this function
+         only checks for spaces. Other forms of whitespace characters such
+         as tabs, line-feeds, etc are considered to be non-blank.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         string
+      }{
+         Pointer to a null terminated string holding the character string.
+      }
+      \sstsubsection{
+         $*$index1
+      }{
+         Returned holding the zero-based position of first non-blank character.
+      }
+      \sstsubsection{
+         $*$index2
+      }{
+         Returned holding the zero-based position of last non-blank character.
+      }
+   }
+}
+\sstroutine{
+   chrFill
+}{
+   Fill a string with a given character
+}{
+   \sstdescription{
+      The given character string is filled with the specified character.
+   }
+   \sstinvocation{
+      void chrFill( char cvalue, char $*$string, size\_t string\_length )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         cvalue
+      }{
+         The character specified to fill the string.
+      }
+      \sstsubsection{
+         string
+      }{
+         Pointer to an array in which to return a null terminated string
+         holding the string to be filled.
+      }
+      \sstsubsection{
+         string\_length
+      }{
+         The declared length of the supplied \texttt{'} string\texttt{'}  array. This should
+         include room for the terminating null.
+      }
+   }
+}
+\sstroutine{
+   chrFparx
+}{
+   Find a parenthesised expression in a character string
+}{
+   \sstdescription{
+      This function searches the string \texttt{"}str\texttt{"} to identify a sub-string
+      containing a parenthesised expression and returns the character
+      positions of the opening and closing parentheses in the \texttt{"}f\texttt{"} and \texttt{"}l\texttt{"}
+      arguments. Allowance is made for nested parentheses. If a
+      parenthesised expression was not found, then the returned value of
+      \texttt{"}f\texttt{"} will be greater than the returned value of \texttt{"}l\texttt{"}.
+   }
+   \sstinvocation{
+      void chrFparx( const char $*$str, char oppar, char clpar, size\_t $*$f,
+                     size\_t $*$l )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         str
+      }{
+         Pointer to a null terminated string holding the string to be
+         searched.
+      }
+      \sstsubsection{
+         oppar
+      }{
+         The opening parenthesis character.
+      }
+      \sstsubsection{
+         clpar
+      }{
+         The closing parenthesis character.
+      }
+      \sstsubsection{
+         $*$f
+      }{
+         Returned holding the zero-based character position of the opening
+         parenthesis.
+      }
+      \sstsubsection{
+         $*$l
+      }{
+         Returned holding the zero-based character position of the closing
+         parenthesis.
+      }
+   }
+}
+\sstroutine{
+   chrIsalm
+}{
+   Return whether a character is alphanumeric
+}{
+   \sstdescription{
+      Determine whether a character is alphanumeric, i.e. A - Z, a - z, 0 -
+      9 or \_. Note that this function treats the underscore character as an
+      alphanumeric character.
+   }
+   \sstinvocation{
+      int chrIsalm( char cvalue )
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         Returns non-zero if the given character is alphanumeric,
+      }{
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         cvalue
+      }{
+         The character to be tested.
+      }
+   }
+}
+\sstroutine{
+   chrIsnam
+}{
+   Return whether a string is a valid name
+}{
+   \sstdescription{
+      Determine whether the given string is a valid name: i.e. whether it
+      starts with an alphabetic character and continues with alphanumeric
+      or underscore characters.
+   }
+   \sstinvocation{
+      int chrIsnam( const char $*$string )
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         Returns non-zero if the given string is a valid name, returns
+      }{
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         string
+      }{
+         Pointer to a null terminated string holding the string to be
+         tested.
+      }
+   }
+}
+\sstroutine{
+   chrItoc
+}{
+   Encode an integer value as a string
+}{
+   \sstdescription{
+      Encode an integer value as a (decimal) character string, using as
+      concise a format as possible, and return the number of characters
+      used. In the event of an error, \texttt{"}$*$\texttt{'} s will be written into to the
+      string.
+   }
+   \sstinvocation{
+      void chrItoc( int ivalue, char $*$string, size\_t string\_length,
+                    size\_t $*$nchar )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ivalue
+      }{
+         The value to be encoded.
+      }
+      \sstsubsection{
+         string
+      }{
+         Pointer to an array in which to return a null terminated string
+         holding the string into which the integer value is encoded.
+      }
+      \sstsubsection{
+         string\_length
+      }{
+         The maximum length of the supplied \texttt{'} string\texttt{'}  array. This should
+         include room for the terminating null.
+      }
+      \sstsubsection{
+         $*$nchar
+      }{
+         Returned holding the field width used in encoding the value.
+      }
+   }
+}
+\sstroutine{
+   chrLdblk
+}{
+   Remove any leading blanks from a string
+}{
+   \sstdescription{
+      Remove any leading blanks from the character string. The remaining
+      characters are moved to the left to eliminate the resulting empty
+      space, and a terminating null is appended to the end.
+   }
+   \sstinvocation{
+      void chrLdblk( char $*$string )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         string
+      }{
+         Pointer to a null terminated string holding the string from which
+         the leading blanks are to be removed.
+      }
+   }
+}
+\sstroutine{
+   chrLen
+}{
+   Return the length of a string, ignoring trailing spaces
+}{
+   \sstdescription{
+      Find length of string, ignoring trailing spaces.
+   }
+   \sstinvocation{
+      size\_t chrLen( const char $*$string )
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         Returns the length of the string, not including the
+      }{
+      }
+      \sstsubsection{
+         terminating null or any trailing spaces.
+      }{
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         string
+      }{
+         Pointer to a null terminated string holding the string whose
+         length is to be determined.
+      }
+   }
+}
+\sstroutine{
+   chrPutc
+}{
+   Put a character string into another at a given position
+}{
+   \sstdescription{
+      The string \texttt{"}str1\texttt{"} (or as much of it as there is room for) is copied
+      into the part of \texttt{"}str2\texttt{"} beginning at position \texttt{"}iposn$+$1\texttt{"}. \texttt{"}iposn\texttt{"} is
+      updated to indicate the end position of the copy of \texttt{"}str1\texttt{"} within
+      \texttt{"}str2\texttt{"} after this operation. If no copying is done, \texttt{"}iposn\texttt{"} is
+      returned unchanged.
+   }
+   \sstinvocation{
+      void chrPutc( const char $*$str1, char $*$str2, size\_t str2\_length,
+                    size\_t $*$iposn )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         str1
+      }{
+         Pointer to a null terminated string holding the string to be
+         copied.
+      }
+      \sstsubsection{
+         str2
+      }{
+         Pointer to a null terminated string holding the string into which
+         \texttt{"}str1\texttt{"} is to be copied.
+      }
+      \sstsubsection{
+         str2\_length
+      }{
+         The declared length of the supplied \texttt{'} str2\texttt{'}  array. This should include
+         room for the terminating null.
+      }
+      \sstsubsection{
+         $*$iposn
+      }{
+         The zero-based position pointer within \texttt{"}str2\texttt{"}.
+      }
+   }
+}
+\sstroutine{
+   chrPuti
+}{
+   Put an integer value into a string at a given position
+}{
+   \sstdescription{
+      The integer value is encoded into a concise string which is then
+      copied into the given string beginning at position \texttt{"}iposn$+$1\texttt{"}. \texttt{"}iposn\texttt{"}
+      is returned updated to indicate the end position of the encoded
+      number within \texttt{"}string\texttt{"}. This is a combination of chrItoc and chrPutc.
+   }
+   \sstinvocation{
+      void chrPuti( int ivalue, char $*$string, size\_t string\_length,
+                    size\_t $*$iposn )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         ivalue
+      }{
+         The value to be encoded into the string.
+      }
+      \sstsubsection{
+         string
+      }{
+         Pointer to a null terminated string holding the string into which
+         \texttt{"}ivalue\texttt{"} is to be copied.
+      }
+      \sstsubsection{
+         string\_length
+      }{
+         The declared length of the supplied \texttt{'} string\texttt{'}  array. This should
+         include room for the terminating null.
+      }
+      \sstsubsection{
+         $*$iposn
+      }{
+         The zero-based position pointer within \texttt{"}string\texttt{"}.
+      }
+   }
+}
+\sstroutine{
+   chrRmblk
+}{
+   Remove all blanks from a string
+}{
+   \sstdescription{
+      All leading and embedded blanks in the string are removed. The
+      remaining characters are moved to the left to eliminate the resulting
+      empty space, and a terminating null is appended to the end of the
+      string.
+   }
+   \sstinvocation{
+      void chrRmblk( char $*$string )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         string
+      }{
+         Pointer to a null terminated string holding the string from which
+         all leading and embedded blanks are removed.
+      }
+   }
+}
+\sstroutine{
+   chrSimlr
+}{
+   Return whether two strings are equal, apart from case
+}{
+   \sstdescription{
+      Determine whether two strings are the same, ignoring distinctions
+      between upper and lowercase letters. Their lengths must be identical
+      after removing trailing blanks.
+   }
+   \sstinvocation{
+      int chrSimlr( const char $*$str1, const char $*$str2 )
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         Returned as non-zero if the two strings are the same
+      }{
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         str1
+      }{
+         Pointer to a null terminated string holding the first string.
+      }
+      \sstsubsection{
+         str2
+      }{
+         Pointer to a null terminated string holding the second string.
+      }
+   }
+}
+\sstroutine{
+   chrSimlrN
+}{
+   Return whether the starts of two strings are equal, apart from case
+}{
+   \sstdescription{
+      Determine whether the first \texttt{"} n\texttt{"}  characters of two strings are the
+      same, ignoring distinctions between upper and lowercase letters.
+   }
+   \sstinvocation{
+      int chrSimlrN( const char $*$str1, const char $*$str2, size\_t n )
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         Returned as non-zero if the two strings are the same
+      }{
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         str1
+      }{
+         Pointer to a null terminated string holding the first string.
+      }
+      \sstsubsection{
+         str2
+      }{
+         Pointer to a null terminated string holding the second string.
+      }
+      \sstsubsection{
+         n
+      }{
+         The number of characters that must match at the start of each
+         string. If the length of either string is less than \texttt{"} n\texttt{"} , zero
+         will be returned.
+      }
+   }
+}
+\sstroutine{
+   chrSizetoc
+}{
+   Encode a size\_t value as a string
+}{
+   \sstdescription{
+      Encode a size\_t value as a (decimal) character string, using as
+      concise a format as possible, and return the number of characters
+      used. In the event of an error, \texttt{"} $*$\texttt{'} s will be written into to the
+      string.
+   }
+   \sstinvocation{
+      void chrSizetoc( size\_t value, char $*$string, size\_t string\_length,
+                       size\_t $*$nchar )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         value
+      }{
+         The value to be encoded.
+      }
+      \sstsubsection{
+         string
+      }{
+         Pointer to an array in which to return a null terminated string
+         holding the string into which the integer value is encoded.
+      }
+      \sstsubsection{
+         string\_length
+      }{
+         The maximum length of the supplied \texttt{'} string\texttt{'}  array. This should
+         include room for the terminating null.
+      }
+      \sstsubsection{
+         $*$nchar
+      }{
+         Returned holding the field width used in encoding the value.
+      }
+   }
+}
+\sstroutine{
+   chrUcase
+}{
+   Convert a string to uppercase
+}{
+   \sstdescription{
+      The characters in the string are all converted to uppercase in situ.
+   }
+   \sstinvocation{
+      void chrUcase( char $*$string )
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         string
+      }{
+         Pointer to a null terminated string holding the string to be
+         converted to uppercase.
+      }
+   }
+}
+
 \newpage
 
 \section {Portability}
@@ -3134,6 +3867,10 @@ from the previous versions.
 
 \subsection{Documentation Changes}
 This document has been modified to remove references to the use of CHR on VMS.
+
+\section {Changes and New Features in Version 3.0}
+C equivalents for a subset of the Fortran routines have been added to the
+CHR library to assist in porting Fortran code to C.
 
 \end{document}
 

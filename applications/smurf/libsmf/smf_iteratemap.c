@@ -660,7 +660,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
   double chitol=VAL__BADD;      /* chisquared change tolerance for stopping */
   int chunking;                 /* Will we be chunking due to low memory? */
-  double chunkfactor;           /* A calibration correction factor for the
+  double chunkfactor=1.0;       /* A calibration correction factor for the
                                    current chunk */
   double chunkweight;           /* The relative weight to give to the
                                    current chunk when adding into the running
@@ -1865,7 +1865,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* We now have RES, LUT, and EXT loaded into memory. Add fake
          astronomical signal to RES at this stage if requested */
       smf_addfakemap( wf, res[0], haveext?model[whichext][0]:NULL, lut[0],
-                      lbnd_out, ubnd_out, keymap, chunkfactor, status );
+                      lbnd_out, ubnd_out, keymap, chunkfactor, contchunk,
+                      status );
 
       /* Do data cleaning */
       if( doclean ) {

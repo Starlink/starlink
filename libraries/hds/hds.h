@@ -1140,5 +1140,15 @@ hdsClose(HDSLoc **locator, int *status);
 int hdsFind(const HDSLoc *locator1, const char *name, const char *mode, HDSLoc **locator2, int *status);
 
 
+/*======================================================================*/
+/* hdsDimtoc - Encode an hdsdim value as a string (modelled on chrItoc) */
+/*======================================================================*/
+void hdsDimtoc( hdsdim ivalue, char *string, size_t string_length, size_t *nchar );
+
+/*=======================================================================*/
+/* hdsSplit - Split an HDS object name into a file name and a path name. */
+/*=======================================================================*/
+void hdsSplit( const char *name, size_t *f1, size_t *f2, size_t *p1, size_t *p2, int *status );
+
 /* STAR_HDS_H_INCLUDED */
 #endif
