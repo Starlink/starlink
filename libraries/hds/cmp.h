@@ -4,6 +4,8 @@
 
 void cmpMod( HDSLoc *struc, const char *comp, const char *type,
              int ndim, const hdsdim *dims, int *status );
+void cmpModC( HDSLoc *struc, const char *comp, size_t len,
+             int ndim, const hdsdim *dims, int *status );
 
 void cmpPut0C( HDSLoc *struc, const char *comp, const char *value, int *status );
 void cmpPut0D( HDSLoc *struc, const char *comp, double value, int *status );

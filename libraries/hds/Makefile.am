@@ -83,7 +83,7 @@ F_C_ROUTINES = hds_run.c fortran_interface.c hdsFind.c hds_split.c
 #  List of Fortran BLOCK DATA routines.
 BLOCK_DATA_FILES = cmp_blk.f
 
-CMP_C_ROUTINES = cmpMod.c cmpPut0x.c cmpType.c cmpGet0x.c
+CMP_C_ROUTINES = cmpMod.c cmpModC.c cmpPut0x.c cmpType.c cmpGet0x.c
 
 C_ROUTINES = $(CMP_C_ROUTINES) \
 	dat1CcopyLocXtoY.c dat1CcopyXtoY.c \
