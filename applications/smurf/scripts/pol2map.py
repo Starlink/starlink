@@ -2690,9 +2690,9 @@ try:
 #  Remove temporary files.
    cleanup()
 
-#  If an StarUtilError of any kind occurred, display the message but hide the
+#  If an Exception of any kind occurred, display the message but hide the
 #  python traceback. To see the trace back, uncomment "raise" instead.
-except starutil.StarUtilError as err:
+except Exception as err:
 #  raise
    print( err )
    print( "See the end of the log file ({0}) for further details.".format(starutil.logfile) )
