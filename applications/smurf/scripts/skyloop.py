@@ -42,6 +42,16 @@
 *             [logfile] [restart]
 
 *  ADAM Parameters:
+*     CHUNKWGT = _LOGICAL (Read)
+*        Controls the weight used for each chunk. If False, then the
+*        weights are determined by the value of the CHUNKWGT FITS header
+*        in each input time-stream data file (unit weight is used for any
+*        data file that has no CHUNKWGT FITS header). If True, the weight
+*        for each chunk is based on the normalised map change for each
+*        chunk calculated on the previous iteration - the weight for a
+*        chunk is the ratio of the mean of all the chunk map changes to
+*        the chunk's own map change. Weights above 1.0 are limited to 1.0.
+*        [False]
 *     CONFIG = LITERAL (Read)
 *        The MAKEMAP configuration parameter values to use. Additions
 *        will be made as follows:
@@ -388,7 +398,7 @@ def cleanup():
       else:
          NDG.cleanup()
       starutil.ParSys.cleanup()
-   except:
+   except Exception:
       pass
 
 #  Catch any exception so that we can always clean up, even if control-C
@@ -441,6 +451,9 @@ try:
                                  "correction of POL2 data", default=None,
                                  minsize=0, maxsize=1, noprompt=True ))
 
+   params.append(starutil.Par0L("CHUNKWGT", "Use separate weights for each chunk?",
+                                False, noprompt=True))
+
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
 
@@ -481,6 +494,7 @@ try:
    ipref = parsys["IPREF"].value
    itermap = parsys["ITERMAP"].value
    obsdir =  parsys["OBSDIR"].value
+   chunkwgt =  parsys["CHUNKWGT"].value
 
 #  See if we are using pre-cleaned data, in which case there is no need
 #  to export the cleaned data on the first iteration. Note we need to
@@ -694,7 +708,7 @@ try:
          ux = starutil.get_task_par( "ubound(1)", "ndftrace" )
          uy = starutil.get_task_par( "ubound(2)", "ndftrace" )
 
-      except:
+      except Exception:
          pass
 
 #  If required, construct the text of the makemap command and invoke it.
@@ -886,6 +900,37 @@ try:
             newmap = NDG(1)
             itermaps = None
 
+#  Determine the weight to use for each chunk on the next iteration. Only
+#  do this after 3 iterations have been done.
+         if chunkwgt and iter > 3:
+            chunkchange = []
+            ichunk = 0
+            while  True:
+               ichunk += 1
+               try:
+                  chunkchange.append( starutil.get_task_par( "chunkchange({0})".format(ichunk),
+                                                             "makemap" ))
+               except starutil.StarUtilError:
+                  break
+            nchunk = len(chunkchange)
+            meancc = sum(chunkchange)/nchunk
+
+            text = "("
+            for ichunk in range(nchunk):
+               wgt = meancc/chunkchange[ichunk]
+               wgt = 0.001*int(wgt*1000.0)
+               if wgt > 1:
+                  wgt = 1
+
+               if ichunk > 0:
+                  text += ","
+               text += str( wgt )
+
+            text += ")"
+            msg_out("chunkweight = {0}".format(text))
+            add["chunkweight"] = text
+            newcon = 1
+
 #  If required, create a new config file.
          if newcon:
             newcon = 0
@@ -909,7 +954,7 @@ try:
                invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(newmap))
                msg_out( "Re-using existing map {0}".format(newmap) )
                gotit = True
-            except:
+            except Exception:
                pass
 
 #  If required, construct the text of the makemap command and invoke it. We
@@ -1022,7 +1067,7 @@ try:
 
 #  If an StarUtilError of any kind occurred, display the message but hide the
 #  python traceback. To see the trace back, uncomment "raise" instead.
-except starutil.StarUtilError as err:
+except Exception as err:
 #  raise
    print( err )
    print( "\n\nskyloop ended prematurely so intermediate files are being retained in {0}.".format(NDG.tempdir) )
