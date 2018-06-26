@@ -3650,6 +3650,14 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter chunkchange {
+                size *
+                type _DOUBLE
+                access WRITE
+                vpath INTERNAL
+                helpkey *
+            }
+
             parameter config {
                 type LITERAL
                 access READ

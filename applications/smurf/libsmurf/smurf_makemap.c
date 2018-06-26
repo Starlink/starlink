@@ -66,6 +66,9 @@
 *          there is no previous mask the closest following will be
 *          used. It is not an error for no mask to match. A NULL
 *          parameter indicates no mask files to be supplied. [!]
+*     CHUNKCHANGE( ) = _DOUBLE (Write)
+*          An output array holding the final normalised map change value
+*          for each chunk.
 *     CONFIG = GROUP (Read)
 *          Specifies values for the configuration parameters used by the
 *          iterative map maker (METHOD=ITERATE). If the string "def"
