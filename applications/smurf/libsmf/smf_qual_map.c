@@ -226,9 +226,10 @@ smf_qual_t * smf_qual_map( ThrWorkForce *wf, int indf, const char mode[],
     numqn = irqNumqn( qlocs, status );
 
     if ( *status == IRQ__NOQNI || numqn == 0) {
+
       /* do not have any names defined so we have no choice
          in copying the values directly out the file */
-      if (*status != SAI__OK) errAnnul( status );
+      if (*status != IRQ__NOQNI) errAnnul( status );
 
       /* simple copy with type conversion */
 
