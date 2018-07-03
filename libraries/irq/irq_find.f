@@ -91,6 +91,8 @@
 *        routines which require a scalar.
 *     10-JUL-2008 (TIMJ):
 *        Initialise QNLOC and XNAME to resolve valgrind warnings.
+*     3-JUL-2018 (DSB):
+*        Ensure cloned NDF identifier is annulled if an error occurs.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -105,6 +107,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'IRQ_PAR'          ! IRQ constants.
+      INCLUDE 'NDF_PAR'          ! NDF constants.
       INCLUDE 'IRQ_ERR'          ! IRQ error values.
 
 
@@ -254,6 +257,11 @@
                CALL DAT_FIND( QNLOC, IRQ__LUNAM, LOCS(3), STATUS )
                CALL DAT_FIND( QNLOC, IRQ__NFNAM, LOCS(4), STATUS )
                CALL DAT_FIND( QNLOC, IRQ__FRNAM, LOCS(5), STATUS )
+
+               IF( STATUS .NE. SAI__OK ) THEN
+                  CALL NDF_ANNUL( CINDF, STATUS )
+                  CALL DAT_PUT0I( LOCS(1), NDF__NOID, STATUS )
+               END IF
 
             END IF
          END IF
