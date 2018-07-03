@@ -2694,7 +2694,7 @@ try:
 #  python traceback. To see the trace back, uncomment "raise" instead.
 except Exception as err:
 #  raise
-   print( err )
+   msg_out( err )
    print( "See the end of the log file ({0}) for further details.".format(starutil.logfile) )
    cleanup()
 
