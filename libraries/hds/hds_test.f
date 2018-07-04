@@ -67,6 +67,10 @@
       CHARACTER * ( 32 ) PATHX    ! Non-standard file name
       PARAMETER ( PATHX = 'hds_test.sdfxyz' )
 
+*  For testing V5
+      CHARACTER * ( 32 ) PATH5    ! V5 file name
+      PARAMETER ( PATH5 = 'hds_test5' // DAT__FLEXT )
+
 *  Local Variables:
       CHARACTER * ( DAT__SZLOC ) LOC1 ! Top-level locator
       CHARACTER * ( DAT__SZLOC ) LOC2 ! Locator for data array
@@ -97,6 +101,7 @@
       CHARACTER * (10) CHARARR(2), RETCHARARR(2)
       DOUBLE PRECISION DTEMP
       CHARACTER * (DAT__SZFLX) UPEXTENSION
+      INTEGER LOCK_STATUS
 
 *  Local Data:
       DATA DIM / 10, 20 /
@@ -458,6 +463,45 @@
       CALL DAT_ANNUL( LOC1, STATUS )
       CALL HDS_OPEN( PATH, 'UPDATE', LOC1, STATUS )
       CALL HDS_ERASE( LOC1, STATUS )
+
+*  Ensure V5 format is used from now on.
+      CALL HDS_TUNE( 'VERSION', 5, STATUS )
+
+*  Create a new file.
+      CALL HDS_NEW( PATH5, 'HDS_TEST', 'NDF', 0, DIM, LOC1,
+     :              STATUS )
+
+*  Check it is locked for read-write access by the current thread.
+      CALL DAT_LOCKED( LOC1, .FALSE., LOCK_STATUS, STATUS )
+      IF( LOCK_STATUS .NE. 1 .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL EMS_SETI( 'I', LOCK_STATUS )
+         CALL EMS_REP( ' ', 'DAT_LOCK_ERR1: lock status was ^I not 1',
+     :                 STATUS)
+      END IF
+
+*  Unlock it, then check it is unlocked.
+      CALL DAT_UNLOCK( LOC1, .FALSE., STATUS )
+      CALL DAT_LOCKED( LOC1, .FALSE., LOCK_STATUS, STATUS )
+      IF( LOCK_STATUS .NE. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL EMS_SETI( 'I', LOCK_STATUS )
+         CALL EMS_REP( ' ', 'DAT_UNLOCK_ERR1: lock status was ^I not 0',
+     :                 STATUS)
+      END IF
+
+*  Lock it for read-only access, then check it is locked.
+      CALL DAT_LOCK( LOC1, .FALSE., .TRUE., STATUS )
+      CALL DAT_LOCKED( LOC1, .FALSE., LOCK_STATUS, STATUS )
+      IF( LOCK_STATUS .NE. 3 .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL EMS_SETI( 'I', LOCK_STATUS )
+         CALL EMS_REP( ' ', 'DAT_LOCK_ERR2: lock status was ^I not 3',
+     :                 STATUS)
+      END IF
+
+*  Close it.
+      CALL DAT_ANNUL( LOC1, STATUS )
 
 
 *  Check if the test ran OK. If so, then report success.

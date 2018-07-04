@@ -1021,6 +1021,51 @@ F77_SUBROUTINE(dat_len)( CHARACTER(locator),
    *len = (F77_INTEGER_TYPE)len_c;
 }
 
+
+F77_SUBROUTINE(dat_lock)( CHARACTER(locator),
+                          F77_LOGICAL_TYPE *recurs,
+                          F77_LOGICAL_TYPE *readonly,
+                          F77_INTEGER_TYPE *status
+                          TRAIL(locator) )
+{
+
+/*========================================================= */
+/* DAT_LOCK - Lock an object for use by the current thread. */
+/*========================================================= */
+
+/* Local variables */
+   HDSLoc * locator_c = NULL;
+
+/* Import the input locator string                  */
+   datImportFloc( locator, locator_length, &locator_c, status);
+
+/* Call pure C routine                                       */
+   datLock( locator_c, F77_ISTRUE( *recurs ), F77_ISTRUE( *readonly ), status );
+}
+
+
+F77_SUBROUTINE(dat_locked)( CHARACTER(locator),
+                            F77_LOGICAL_TYPE *recurs,
+                            F77_INTEGER_TYPE *reply,
+                            F77_INTEGER_TYPE *status
+                            TRAIL(locator) )
+{
+
+/* =======================================================================*/
+/* dat_locked - See of an object is locked for use by the current thread. */
+/* =======================================================================*/
+
+/* Local variables */
+   HDSLoc * locator_c = NULL;
+
+/* Import the input locator string. */
+   datImportFloc( locator, locator_length, &locator_c, status);
+
+/* Call pure C routine. */
+   *reply = datLocked( locator_c, F77_ISTRUE( *recurs ), status);
+}
+
+
 F77_SUBROUTINE(dat_map)( CHARACTER(locator),
                          CHARACTER(type),
                          CHARACTER(mode),
@@ -2999,6 +3044,27 @@ F77_SUBROUTINE(dat_type)( CHARACTER(locator),
 /* Export returned type name to FORTRAN                 */
    cnfExpn( type_c, DAT__SZNAM, type, type_length );
 }
+
+F77_SUBROUTINE(dat_unlock)( CHARACTER(locator),
+                            F77_LOGICAL_TYPE *recurs,
+                            F77_INTEGER_TYPE *status
+                            TRAIL(locator) )
+{
+
+/*============================================================== */
+/* DAT_UNLOCK - Unlock an object  so another thread can lock it. */
+/*============================================================== */
+
+/* Local variables */
+   HDSLoc * locator_c = NULL;
+
+/* Import the input locator string                  */
+   datImportFloc( locator, locator_length, &locator_c, status);
+
+/* Call pure C routine                                       */
+   datUnlock( locator_c, F77_ISTRUE( *recurs ), status );
+}
+
 
 F77_SUBROUTINE(dat_unmap)( CHARACTER(locator),
                            F77_INTEGER_TYPE *status
