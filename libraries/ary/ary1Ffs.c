@@ -218,7 +218,9 @@ void *ary1Ffs( AryBlockType type, int *status ) {
          } else {
             head = parray + oldsize;
             for( i = oldsize; i < *pn; i++ ) {
+               astBeginPM;
                result = *(head++) = astCalloc( 1, size );
+               astEndPM;
                if( *status == SAI__OK ) {
                   result->used = 0;
                   result->slot = i;
