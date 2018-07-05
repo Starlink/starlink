@@ -192,7 +192,9 @@ void *ary1Ffs( AryBlockType type, int *status ) {
             *pn = 100;
          }
 
+         astBeginPM;
          parray = astGrow( parray, *pn, sizeof(*parray) );
+         astEndPM;
 
 /* Store the new pointer to the re-allocated array back in the correct
    global variable. */
