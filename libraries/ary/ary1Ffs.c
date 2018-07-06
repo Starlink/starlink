@@ -192,7 +192,9 @@ void *ary1Ffs( AryBlockType type, int *status ) {
             *pn = 100;
          }
 
+         astBeginPM;
          parray = astGrow( parray, *pn, sizeof(*parray) );
+         astEndPM;
 
 /* Store the new pointer to the re-allocated array back in the correct
    global variable. */
@@ -218,7 +220,9 @@ void *ary1Ffs( AryBlockType type, int *status ) {
          } else {
             head = parray + oldsize;
             for( i = oldsize; i < *pn; i++ ) {
+               astBeginPM;
                result = *(head++) = astCalloc( 1, size );
+               astEndPM;
                if( *status == SAI__OK ) {
                   result->used = 0;
                   result->slot = i;

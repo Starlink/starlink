@@ -79,6 +79,11 @@
 *  History:
 *     19-MAY-1992 (DSB):
 *        Original, derived from the equivalent AIF_ routine.
+*     4-JUL-2018 (DSB):
+*        Ensure the enclosing HDS object ois locked for access by the
+*        current thread. Accessing the SAVEd variables will be safe
+*        because multi-threaded invocations of all F77 functions are
+*        serialised by mutex locking in the F77 macros.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -134,6 +139,12 @@
       IF ( COUNT .EQ. 1 ) THEN
          TMPLOC = ' '
          CALL DAT_TEMP( 'IRQ1_TEMP', 0, DUMMY, TMPLOC, STATUS )
+
+*  If the enclosing structure has just been created it will already be
+*  locked for access by the current thread. If the enclosing structure
+*  already existed, lock it now for use by the current thread.
+      ELSE
+         CALL DAT_LOCK( TMPLOC, .FALSE., .FALSE., STATUS )
       END IF
 
 *  Form a unique name for the temporary object.
@@ -151,6 +162,10 @@
             LOC = ' '
          END IF
       END IF
+
+*  Unlock the enclosing structure  so that other threads can create
+*  temporary objects in it.
+      CALL DAT_UNLOCK( TMPLOC, .FALSE., STATUS )
 
 *  Report a contextual error containing the total number of array
 *  elements.

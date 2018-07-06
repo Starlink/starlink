@@ -534,6 +534,9 @@
 *        specified by the CHUNKFACTOR config parameter. This is mainly
 *        intended for cases where multiple observations, potentially
 *        with different FCFs, are being combined (e.g. skyloop).
+*     2018-06-26 (DSB):
+*        Write out the final mapchange value for each chunk to output
+*        parameter "CHUNKCHANGE".
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -659,6 +662,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   size_t bstride;               /* Bolometer stride */
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
   double chitol=VAL__BADD;      /* chisquared change tolerance for stopping */
+  double *chunkchange;          /* Holds final mapchange value for each chunk */
   int chunking;                 /* Will we be chunking due to low memory? */
   double chunkfactor=1.0;       /* A calibration correction factor for the
                                    current chunk */
@@ -1655,6 +1659,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   }
 
 
+  /* Create an array to hold the final mapchange value for each chunk. */
+  chunkchange = astMalloc( ncontchunks*sizeof( *chunkchange ) );
 
 
   /* ***************************************************************************
@@ -3015,6 +3021,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         if( quit < 1 ) memcpy( lastmap, thismap, msize*sizeof(*lastmap) );
       }
 
+      /* Save the final mapchange value */
+      chunkchange[ contchunk ] = dat.mapchange;
+
       /* If we are dumping the final error map, check we have done at
          least 3 iterations. */
       if( epsout && *status == SAI__OK ) {
@@ -3721,8 +3730,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   /* Store a flag indicating if the MAPTOL_RATE limit was hit. */
   parPut0l( "RATE_LIMITED", rate_limited, status );
 
-
-
+  /* Store the final mapchange value for each chunk in an output
+     parameter. Then free the array. */
+  parPut1d( "CHUNKCHANGE", ncontchunks, chunkchange, status );
+  chunkchange = astFree( chunkchange );
 
 
   /* ***************************************************************************

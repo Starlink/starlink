@@ -68,6 +68,9 @@
 *  History:
 *     19-MAY-1992 (RFWS):
 *        Original, derived from the equivalent AIF_ routine.
+*     4-JUL-2018 (DSB):
+*        Lock and unlock the parent HDS object to avoid HDS locking
+*        errors when using HDS V5.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -91,6 +94,7 @@
 *  Local variables:
       CHARACTER * ( DAT__SZLOC ) LOCP ! Locator to parent object
       CHARACTER * ( DAT__SZNAM ) NAME ! Name of object to be erased
+      INTEGER PLOCKED            ! Original lock state for parent
       INTEGER TSTAT              ! Local temporary status variable
 
 *.
@@ -107,12 +111,27 @@
       LOCP = ' '
       CALL DAT_PAREN( LOC, LOCP, STATUS )
 
+*  Attempt to lock the parent for read-write access by the current thread,
+*  remembering if it was already locked or not.
+      CALL DAT_LOCKED( LOCP, .FALSE., PLOCKED, status )
+      CALL DAT_LOCK( LOCP, .FALSE., .FALSE., STATUS )
+
 *  Annul the object's locator.
       CALL DAT_ANNUL( LOC, STATUS )
       LOC = ' '
 
 *  Erase the object.
       CALL DAT_ERASE( LOCP, NAME, STATUS )
+
+*  If the parent locator was originally unlocked, unlock it now.
+      IF( PLOCKED .EQ. 0 ) THEN
+         CALL DAT_UNLOCK( LOCP, .FALSE., STATUS )
+
+*  If the parent locator was originally locked read-only, change it back
+*  to a read-only lock.
+      ELSE IF( PLOCKED .EQ. 3 ) THEN
+         CALL DAT_LOCK( LOCP, .FALSE., .TRUE., STATUS )
+      END IF
 
 *  Annul the parent's locator.
       CALL DAT_ANNUL( LOCP, STATUS )
