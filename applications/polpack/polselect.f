@@ -264,11 +264,14 @@
          CALL CAT_SELCT( CIIN, EI, INVERT, SI, NUMSEL, SIR, NUMREJ,
      :                   STATUS)
 
-* Release the expression identifier.
+*  Release the expression identifier.
          CALL CAT_TRLSE( EI, STATUS )
 
-* The other two modes create row selection using CAT_SLIST.
+*  The other two modes create row selection using CAT_SLIST.
       ELSE
+
+*  Initialise "no group used".
+         IGRP = GRP__NOID
 
 *  Allocate work space to hold the data from the (X,Y) columns.
          CALL PSX_CALLOC( NROWIN*2, '_REAL', IPXY, STATUS )
@@ -322,7 +325,6 @@
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Read the ARD description from the file, into a GRP group.
-            IGRP = GRP__NOID
             CALL ARD_GRPEX( FILNAM, GRP__NOID, IGRP, CONT, STATUS )
             IF( STATUS .EQ. SAI__OK ) THEN
 
