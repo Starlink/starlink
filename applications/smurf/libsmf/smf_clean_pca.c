@@ -649,6 +649,12 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
        pdata->b2 = ngoodbolo - 1;
     }
 
+    /* Ensure we don't try to use more bolos or tslices than we have. This 
+       can happen for instance if the number of good bolos is smaller than 
+       the number of threads. */
+    if( pdata->t2 >= t_first + tlen ) pdata->t2 = t_first + tlen - 1;
+    if( pdata->b2 >= ngoodbolo ) pdata->b2 = ngoodbolo - 1;
+
     /* initialize work data */
     pdata->amp = NULL;
     pdata->abstride = abstride;
