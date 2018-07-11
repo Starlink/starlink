@@ -67,7 +67,8 @@ pasign = 0
 #		plate for a POL_ANG value of zero, in degrees. Measured
 #		positive in the same sense as rotation from focal plane X
 #		to focal plane Y.
-paoff = 18.65
+450.paoff = 22.8
+850.paoff = 18.65
 
 #-----------------------------------------------------------------
 #  Name: 	angrot
