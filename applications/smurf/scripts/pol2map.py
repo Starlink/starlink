@@ -391,7 +391,7 @@
 *        where "RMS" is the RMS residual between an individual observation
 *        map and the coadd of all observation maps, after they have been
 *        aligned spatially to take account of any pointing error in the
-*        individual observation. [FALSE]
+*        individual observation. See also parameter WEIGHTLIM. [FALSE]
 *     PIXSIZE = _REAL (Read)
 *        Pixel dimensions in the output I, Q and U maps, in arcsec. The default
 *        is 4 arc-sec for both 450 and 850 um data. The bin size for the output
@@ -447,7 +447,12 @@
 *        The output NDF in which to return the U map including all supplied
 *        observations. This will be in units of pW. Supply null (!) if no U
 *        map is required.
-
+*     WEIGHTLIM = _REAL (Read)
+*        The lowest usable weight (see parameter OBSWEIGHT). Any observation
+*        that has a weight below this value will not be included in the
+*        final coadded I, Q or U maps or in the vector catalogue. This
+*        can be useful since observations with very low weight can sometimes
+*        cause makemap to crash. [0.05]
 
 *  Copyright:
 *     Copyright (C) 2017 East Asian Observatory.
@@ -525,6 +530,9 @@
 *        requires CHUNKWGT values in the input time-stream data. These
 *        are copied into the time-series data from the pre-calculated
 *        automasked I maps.
+*     10-JUL-2018 (DSB):
+*        Added parameter WEIGHTLIM, to avoid observations with silly
+*        CHUNKWGT and/or CHUNKFAC causing skyloop to abort.
 
 '''
 
@@ -851,6 +859,14 @@ def StoreCorrections( qui_maps, imap, use_ref_for_alignment, ref ):
                  "zeroff=yes pcrange=\[10,99.5\]".format(aligned,aref))
          scale = 1/float( get_task_par( "SLOPE", "normalize" ) )
 
+#  Ensure we don't use silly scale factors (this can happen for
+#  observations that are very different to the mean and so have very
+#  low weight).
+         if scale < 0.5:
+            scale = 0.5
+         elif scale > 2.0:
+            scale = 2.0
+
 #  If align2d failed, use silly dx,dy values to ensure it is flagged by
 #  the following code.
       except starutil.AtaskError:
@@ -1105,6 +1121,9 @@ try:
    params.append(starutil.Par0L("NORMALISE", "Normalise each observation to the mean?",
                                 False, noprompt=True))
 
+   params.append(starutil.Par0F("WEIGHTLIM", "Lowest usable observation weight",
+                                 0.05, maxval=1.0, minval=0.0, noprompt=True))
+
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
@@ -1312,6 +1331,9 @@ try:
 
 #  See if unusual observations should be down-weighted.
    obsweight = parsys["OBSWEIGHT"].value
+
+#  Get the lowest usable weight.
+   wgtlim = parsys["WEIGHTLIM"].value
 
 #  See if observations are to be normalised to the mean of all
 #  observations.
@@ -2005,6 +2027,11 @@ try:
          msg_out( "No usable {0} time-stream data supplied.".format(qui))
          msg_out( "Looking for pre-existing {0} maps...".format(qui))
 
+#  Initialise a list to hold the identifiers for observations that have a
+#  weight that is too low to use (i.e. which create maps that look very
+#  little like the mean of all maps).
+      badkeys = []
+
 #  If we are using skyloop to generate the observation maps...
 #  -----------------------------------------------------------
       if skyloop:
@@ -2034,6 +2061,7 @@ try:
          if not make_new_maps:
             msg_out("   Re-using previously created maps")
          else:
+            badlist = []
 
 #  Create a directory in which to put the individual observation maps.
             obsdir = NDG.subdir()
@@ -2099,6 +2127,15 @@ try:
                   if wgt < 1.0:
                      allone = False
 
+                  if wgt < wgtlim:
+                     msg_out("WARNING: pol2map will exclude observation {0} "
+                             "since it's weight ({1}) is below the value "
+                             "of parameter WEIGHTLIM ({2}).",
+                             format( key, wgt, wgtlim ))
+                     for path in qui_list[ key ]:
+                        badlist.append( path )
+                     badkeys.append( key )
+
                   invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=CHUNKWGT "
                          "edit=a value={1} comment=\"'Weight for this chunk of data'\""
                          " position=! mode=interface".format(NDG(qui_list[key]),wgt))
@@ -2129,6 +2166,21 @@ try:
             fd = open( conf, "a" )
             if not allone:
                fd.write('chunkweight="CHUNKWGT"\n')
+
+#  If any observations have been omitted due to low weights, read the old
+#  raw data list and create a new one omitting the required fiules.
+               if len( badlist ) > 0:
+                  oldpaths = inpaths
+                  inpaths  = NDG.tempfile()
+                  fd1 = open( inpaths, "w" )
+                  fd2 = open( oldpaths, "r" )
+                  for line in fd2:
+                     line = line.strip()
+                     if line and line not in badlist:
+                        fd1.write( line+"\n" )
+                  fd1.close()
+                  fd2.close()
+
             else:
                fd.write('chunkweight=1.0\n')
             fd.close()
@@ -2322,7 +2374,16 @@ try:
 
 #  Get the Stokes time stream files for the current observation chunk.
             isdf = NDG( qui_list[ key ] )
-            msg_out("\nMaking {1} map from {0}...\n".format(key,qui) )
+
+#  Get the chunk weight. If it is below the minimum, skip this observation.
+            wgt = get_fits_header( isdf[0], "CHUNKWGT" )
+            if wgt and wgt < wgtlim:
+               del qui_maps[key]
+               badkeys.append( key )
+               msg_out("\nSkipping {0} since its weight ({1}) is too low (<{2})...\n".format(key,wgt,wgtlim) )
+               continue
+            else:
+               msg_out("\nMaking {1} map from {0}...\n".format(key,qui) )
 
 #  AZ/EL pointing correction, for data between 20150606 and 20150930.
             ut = int(get_fits_header( isdf[0], "UTDATE", True ))
@@ -2614,8 +2675,11 @@ try:
       elif outcat:
          invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
 
-
-
+      if len( badkeys ) > 0:
+         msg_out( "\n\nThe following observations were omitted because "
+                  "their auto-masked maps look peculiar:")
+         for key in badkeys:
+            msg_out( key )
 
 
 
