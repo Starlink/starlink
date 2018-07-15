@@ -37,7 +37,7 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
 *     This application creates a new NDF from an existing NDF by dividing
 *     the DATA component of the input NDF by the square root of its
 *     VARIANCE component. The DATA array in the output NDF thus measures
-*     the signal to noise ratio in the input NDF.
+*     the signal-to-noise ratio in the input NDF.
 *
 *     Anomalously small variance values in the input can cause very
 *     large spurious values in the output signal to noise array. To avoid
