@@ -153,6 +153,14 @@
 *        Added parameter "odataf".
 *     14-SEP-2016 (DSB):
 *        Check consistently for bad POL_ANG values.
+*     16-JUL-2018 (DSB):
+*        Resample the JCMTState info using the correct scaling factor.
+*        Previously, the scaling factor did not take account of the fact
+*        that some input time slices are not used. This resulted in the
+*        wrong pointing info besing assigned to samples, with an
+*        increasing error along the time stream, resulting in the source
+*        being smeared. The degree of smearing was related to how many input
+*        slices were unused and so varied from observation to observation.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -240,7 +248,7 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates,
 #define NSUM ( NPAR*(3+NPAR) )/2
 
 /* Macro to simplify resampling of individual JCMTState fields */
-#define RESAMPSTATE(in,out,member,intslice,ontslice,isang) smf_downsamp1D( wf, &(in->member),sizeof(JCMTState),1,intslice,&(out->member), sizeof(JCMTState),1,ontslice,1,1,isang,status );
+#define RESAMPSTATE(in,out,member,intslice,startat,ontslice,isang) smf_downsamp1D( wf, &((in+startat)->member),sizeof(JCMTState),1,intslice,&(out->member), sizeof(JCMTState),1,ontslice,1,1,isang,status );
 
 
 void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
@@ -260,6 +268,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    dim_t intslice;          /* ntslice of idata */
    dim_t istart;            /* Input time index at start of fitting box */
    dim_t itime;             /* Time slice index */
+   dim_t itstart;           /* Index of first used input time slice */
    dim_t lolim;             /* Min no. of samples in a box */
    dim_t nbolo;             /* No. of bolometers */
    dim_t ncol;              /* No. of columns of bolometers in the array */
@@ -334,8 +343,14 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    smf1_find_boxes( intslice, hdr->allState, ang0, box, &ontslice,
                     &box_starts, &lolim, &hilim, status );
 
+/* Adjust intslice to hold the number of used input time slices rather
+   than the total number of input time slices. Also record the index of the
+   first used input time slice. */
+   itstart = box_starts[ 0 ];
+   intslice = box_starts[ ontslice ] - itstart;
+
 /* Time axis scaling factor. */
-   scale = (double) intslice / (double) ontslice;
+   scale = (double)intslice/(double) ontslice;
 
 /* First copy everything from input to output except for the data that needs
    to be downsampled */
@@ -549,7 +564,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
             size_t frame;  /* index of nearest neighbour JCMTState */
 
             for( i=0; i<ontslice; i++ ) {
-               frame = (size_t) round(((double) i + 0.5)*scale);
+               frame = (size_t) round(((double) i + 0.5)*scale) + itstart;
                memcpy( outstate + i, instate + frame, sizeof(*instate) );
             }
 
@@ -557,43 +572,43 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    fields like pointing. Note that since there are approximate values there
    already we need to explicitly re-initialize to 0. */
 
-            RESAMPSTATE(instate, outstate, rts_end, intslice, ontslice, 0);
+            RESAMPSTATE(instate, outstate, rts_end, intslice, itstart, ontslice, 0);
 
-            RESAMPSTATE(instate, outstate, smu_az_jig_x, intslice, ontslice, 0);
-            RESAMPSTATE(instate, outstate, smu_az_jig_y, intslice, ontslice, 0);
-            RESAMPSTATE(instate, outstate, smu_az_chop_x, intslice, ontslice, 0);
-            RESAMPSTATE(instate, outstate, smu_az_chop_y, intslice, ontslice, 0);
-            RESAMPSTATE(instate, outstate, smu_tr_jig_x, intslice, ontslice, 0);
-            RESAMPSTATE(instate, outstate, smu_tr_jig_y, intslice, ontslice, 0);
-            RESAMPSTATE(instate, outstate, smu_tr_chop_x, intslice, ontslice, 0);
-            RESAMPSTATE(instate, outstate, smu_tr_chop_y, intslice, ontslice, 0);
+            RESAMPSTATE(instate, outstate, smu_az_jig_x, intslice, itstart, ontslice, 0);
+            RESAMPSTATE(instate, outstate, smu_az_jig_y, intslice, itstart, ontslice, 0);
+            RESAMPSTATE(instate, outstate, smu_az_chop_x, intslice, itstart, ontslice, 0);
+            RESAMPSTATE(instate, outstate, smu_az_chop_y, intslice, itstart, ontslice, 0);
+            RESAMPSTATE(instate, outstate, smu_tr_jig_x, intslice, itstart, ontslice, 0);
+            RESAMPSTATE(instate, outstate, smu_tr_jig_y, intslice, itstart, ontslice, 0);
+            RESAMPSTATE(instate, outstate, smu_tr_chop_x, intslice, itstart, ontslice, 0);
+            RESAMPSTATE(instate, outstate, smu_tr_chop_y, intslice, itstart, ontslice, 0);
 
-            RESAMPSTATE(instate, outstate, tcs_tai, intslice, ontslice, 0);
-            RESAMPSTATE(instate, outstate, tcs_airmass, intslice, ontslice, 0);
+            RESAMPSTATE(instate, outstate, tcs_tai, intslice, itstart, ontslice, 0);
+            RESAMPSTATE(instate, outstate, tcs_airmass, intslice, itstart, ontslice, 0);
 
 /* Second coordinates (Dec, El etc) can not wrap 0 to 360 so we do not need
    to test for those cases */
-            RESAMPSTATE(instate, outstate, tcs_az_ang, intslice, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_az_ac1, intslice, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_az_ac2, intslice, ontslice, 0);
-            RESAMPSTATE(instate, outstate, tcs_az_dc1, intslice, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_az_dc2, intslice, ontslice, 0);
-            RESAMPSTATE(instate, outstate, tcs_az_bc1, intslice, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_az_bc2, intslice, ontslice, 0);
+            RESAMPSTATE(instate, outstate, tcs_az_ang, intslice, itstart, ontslice, 1);
+            RESAMPSTATE(instate, outstate, tcs_az_ac1, intslice, itstart, ontslice, 1);
+            RESAMPSTATE(instate, outstate, tcs_az_ac2, intslice, itstart, ontslice, 0);
+            RESAMPSTATE(instate, outstate, tcs_az_dc1, intslice, itstart, ontslice, 1);
+            RESAMPSTATE(instate, outstate, tcs_az_dc2, intslice, itstart, ontslice, 0);
+            RESAMPSTATE(instate, outstate, tcs_az_bc1, intslice, itstart, ontslice, 1);
+            RESAMPSTATE(instate, outstate, tcs_az_bc2, intslice, itstart, ontslice, 0);
 
-            RESAMPSTATE(instate, outstate, tcs_tr_ang, intslice, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_tr_ac1, intslice, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_tr_ac2, intslice, ontslice, 0);
-            RESAMPSTATE(instate, outstate, tcs_tr_dc1, intslice, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_tr_dc2, intslice, ontslice, 0);
-            RESAMPSTATE(instate, outstate, tcs_tr_bc1, intslice, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_tr_bc2, intslice, ontslice, 0);
+            RESAMPSTATE(instate, outstate, tcs_tr_ang, intslice, itstart, ontslice, 1);
+            RESAMPSTATE(instate, outstate, tcs_tr_ac1, intslice, itstart, ontslice, 1);
+            RESAMPSTATE(instate, outstate, tcs_tr_ac2, intslice, itstart, ontslice, 0);
+            RESAMPSTATE(instate, outstate, tcs_tr_dc1, intslice, itstart, ontslice, 1);
+            RESAMPSTATE(instate, outstate, tcs_tr_dc2, intslice, itstart, ontslice, 0);
+            RESAMPSTATE(instate, outstate, tcs_tr_bc1, intslice, itstart, ontslice, 1);
+            RESAMPSTATE(instate, outstate, tcs_tr_bc2, intslice, itstart, ontslice, 0);
 
-            RESAMPSTATE(instate, outstate, tcs_en_dc1, intslice, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_en_dc2, intslice, ontslice, 0);
+            RESAMPSTATE(instate, outstate, tcs_en_dc1, intslice, itstart, ontslice, 1);
+            RESAMPSTATE(instate, outstate, tcs_en_dc2, intslice, itstart, ontslice, 0);
 
-            RESAMPSTATE(instate, outstate, tcs_dm_abs, intslice, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_dm_rel, intslice, ontslice, 0);
+            RESAMPSTATE(instate, outstate, tcs_dm_abs, intslice, itstart, ontslice, 1);
+            RESAMPSTATE(instate, outstate, tcs_dm_rel, intslice, itstart, ontslice, 0);
 
 /* Wait for all the above smf_downsamp1 jobs to finish. */
             thrWait( wf, status );
@@ -1169,7 +1184,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
                *(ipu++) = -qval*sinval - uval*cosval;
 
 /* Store the correspoinding I value. */
-               if( ipi ) *(ipi++) = solution[ 6 ]*box_size + 2*solution[ 7 ];
+               if( ipi ) *(ipi++) = 2*( solution[ 6 ]*(box_size/2) + solution[ 7 ] );
 
 /* Loop over the data again in the same way to calculate the variance of the
    residuals between the above fit and the supplied data. */
