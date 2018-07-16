@@ -988,6 +988,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
                 } else {
                    pdata->b2 = nbolo - 1 ;
                 }
+                if( pdata->b2 >= nbolo ) pdata->b2 = 0;
               }
             }
           }
