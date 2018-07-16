@@ -1880,6 +1880,14 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+         parameter axisndf {
+            type NDF
+            access READ
+            ppath CURRENT
+            prompt {NDFs from which to read axis values}
+            helpkey *
+         }
+
          parameter comp {
             position 4
             type LITERAL

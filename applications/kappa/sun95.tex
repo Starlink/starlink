@@ -42036,6 +42036,14 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
    }
    \sstparameters{
       \sstsubsection{
+         AXISNDF = NDF (Read)
+      }{
+         The Data values in this NDF are used as the axis centre values
+         if parameter MODE is set to \texttt{"NDF"}. The supplied NDF must be
+         one dimensional and must be aligned in pixel co-ordinates with
+         the NDF axis that is being modified.
+      }
+      \sstsubsection{
          COMP = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The name of the NDF axis array component to be modified.  The
@@ -42146,6 +42154,12 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
                             limited FITS WCS compatibility and when the
                             non-linearity is small.  \texttt{"Linear\_WCS"} is only
                             available when COMP=\texttt{"Data"} or \texttt{"Centre"}.
+
+            \sstitem
+            \texttt{"NDF"} --- The axis centres are set to the corresponding
+                            Data values read from the NDF specified by
+                            parameter AXISNDF. This is only available when
+                            COMP=\texttt{"Data"} or \texttt{"Centre"}.
 
             \sstitem
             \texttt{"Pixel"} --- The axis centres are set to pixel
@@ -55023,3 +55037,4 @@ Compares a pair of NDFs for equivalence.
 \end{latexonly}
 
 \end{document}
+

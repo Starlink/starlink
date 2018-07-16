@@ -37,9 +37,15 @@
 *     setaxis ndf dim mode [comp] { file=?
 *                                 { index=? newval=?
 *                                 { exprs=?
+*                                 { axisndf=?
 *                                 mode
 
 *  ADAM Parameters:
+*     AXISNDF = NDF (Read)
+*        The Data values in this NDF are used as the axis centre values
+*        if parameter MODE is set to "NDF". The supplied NDF must be
+*        one dimensional and must be aligned in pixel coordinates with
+*        the NDF axis that is being modified.
 *     COMP = LITERAL (Read)
 *        The name of the NDF axis array component to be modified.  The
 *        choices are: "Centre", "Data", "Error", "Width" or "Variance".
@@ -119,6 +125,10 @@
 *                          limited FITS WCS compatibility and when the
 *                          non-linearity is small.  "Linear_WCS" is only
 *                          available when COMP="Data" or "Centre".
+*           "NDF"        - The axis centres are set to the corresponding
+*                          Data values read from the NDF specified by
+*                          parameter AXISNDF. This is only available when
+*                          COMP="Data" or "Centre".
 *           "Pixel"      - The axis centres are set to pixel
 *                          co-ordinates.  This is only available when
 *                          COMP="Data" or "Centre".
@@ -271,6 +281,8 @@
 *        pixel and WCS axes have the same index.
 *     2012 May 1 (MJC):
 *        Add Linear_WCS mode.
+*     16-JUL-2018 (DSB):
+*        Added mode "NDF" and parameter AXISNDF.
 *     {enter_further_changes_here}
 
 *-
@@ -306,6 +318,7 @@
       CHARACTER CVAL*100         ! AST attribute value
       CHARACTER CVALUE*( VAL__SZD )  ! Replacement value as obtained
       CHARACTER DEFTYP*( NDF__SZTYP )! Default processing type
+      CHARACTER DTYPE*( NDF__SZFTP ) ! Full data type
       CHARACTER EXPRS*( SZEXP )  ! Variance expression
       CHARACTER FOR( 1 )*( SZEXP + 22 ) ! Forward transformation
       CHARACTER INV( 2 )*6       ! Inverse transformation
@@ -344,6 +357,8 @@
       INTEGER NC                 ! Used length of string
       INTEGER NDF                ! Input NDF identifier
       INTEGER NDF2               ! NDF identifier for the LIKE parameter
+      INTEGER NDF3               ! NDF identifier for the AXISNDF parameter
+      INTEGER NDF4               ! identifier for section of AXISNDF
       INTEGER NDIM               ! Number of dimensions of NDF
       INTEGER NERR               ! Number of conversion errors (dummy=0)
       INTEGER NIN                ! Number of inverse expressions or input axes
@@ -353,6 +368,7 @@
       INTEGER PIND               ! Pixel index of element to change
       INTEGER PMAP1              ! PermMap to select 1 input axis from MAP0
       INTEGER PMAP2              ! PermMap to select 1 output axis from MAP0
+      INTEGER PNTRA              ! Pointer to mapped axis values
       INTEGER PNTRW              ! Pointer to mapped pixel indices and/or axis centres (work space)
       INTEGER RANGES( 2 )        ! The linear fit ranges in pixels
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of the NDF
@@ -413,7 +429,7 @@
 *  Obtain the mode of the modification.  Note that the "Pixel" option
 *  is only available for the axis centres.
          IF ( COMP .EQ. 'CENTRE' .OR. COMP .EQ. 'DATA' ) THEN
-            CALL PAR_CHOIC( 'MODE', 'Expression', 'Delete,Edit,'/
+            CALL PAR_CHOIC( 'MODE', 'Expression', 'Delete,Edit,NDF,'/
      :                      /'Expression,File,Linear_WCS,Pixel,WCS',
      :                      .FALSE., MODE, STATUS )
          ELSE
@@ -795,6 +811,66 @@
 
 *  Close free-format data file.
             CALL FIO_ANNUL( FD, STATUS )
+
+*  NDF mode.
+*  =========
+         ELSE IF ( MODE .EQ. 'NDF' ) THEN
+
+*  Start a new NDF context.
+            CALL NDF_BEGIN
+
+*  Obtain the NDF containing axis centre values, and check it is one
+*  dimensional.
+            CALL LPG_ASSOC( 'AXISNDF', 'READ', NDF3, STATUS )
+            CALL NDF_BOUND( NDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+            IF( NDIM .GT. 1 .AND. STATUS .EQ. SAI__OK ) THEN
+               CALL NDF_MSG( 'N', NDF3 )
+               CALL ERR_REP( ' ', 'The NDF supplied for parameter '//
+     :                       'AXISNDF (^N) is not 1-dimensional.',
+     :                       STATUS )
+            END IF
+
+*  Decide whether to map its data array in single or double precision.
+            CALL NDF_MTYPE( '_REAL,_DOUBLE', NDF3, NDF3, 'Data', TYPE,
+     :                      DTYPE, STATUS )
+
+*  Get a section of it that matches the the NDF axis being modified.
+            CALL NDF_BOUND( NDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+            LBND( 1 ) = LBND( IAXIS )
+            UBND( 1 ) = UBND( IAXIS )
+            CALL NDF_SECT( NDF3, 1, LBND, UBND, NDF4, STATUS )
+
+*  Reset any pre-existing axis-array component and set its data type to
+*  the chosen data type.
+            IF ( COMP .NE. 'CENTRE' ) CALL NDF_AREST( NDF, COMP, IAXIS,
+     :                                                STATUS )
+            CALL NDF_ASTYP( TYPE, NDF, COMP, IAXIS, STATUS )
+
+*  Map the array component for writing.
+            CALL NDF_AMAP( NDF, MCOMP, IAXIS, TYPE, 'WRITE', AXPNTR, EL,
+     :                     STATUS )
+
+*  Map the Data array of AXISNDF.
+            CALL NDF_MAP( NDF4, 'Data', TYPE, 'READ', PNTRA, EL,
+     :                    STATUS )
+
+*  Copy the values from AXISNDF to NDF.
+            CALL KPG1_COPY( TYPE, EL, PNTRA, AXPNTR, STATUS )
+
+*  Unmap the array.  Note that 'Error' is not allowed as the component.
+            CALL NDF_AUNMP( NDF, COMP, IAXIS, STATUS )
+
+*  Copy the LABEL and UNITS componments.
+            CVAL = ' '
+            CALL NDF_CGET( NDF3, 'LABEL', CVAL, STATUS )
+            CALL NDF_ACPUT( CVAL, NDF, 'LABEL', IAXIS, STATUS )
+
+            CVAL = ' '
+            CALL NDF_CGET( NDF3, 'UNITS', CVAL, STATUS )
+            CALL NDF_ACPUT( CVAL, NDF, 'UNITS', IAXIS, STATUS )
+
+*  End the NDF context, thus closing the AXISNDF NDF.
+            CALL NDF_END( STATUS )
 
 *  Pixel mode.
 *  ===========
