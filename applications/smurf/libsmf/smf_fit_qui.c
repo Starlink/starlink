@@ -161,6 +161,17 @@
 *        increasing error along the time stream, resulting in the source
 *        being smeared. The degree of smearing was related to how many input
 *        slices were unused and so varied from observation to observation.
+*     17-JUL-2018 (DSB):
+*        Yesterday's fix cleared up cases of really bad scaling - e.g. where
+*        a potentially large section of the time stream was ignored because
+*        of jumps in the POL_ANG value. But it leaves smaller scaling issues
+*        in a significant number of observations. This can cause makemap to
+*        create badly blurred images The problem was that the JCMTState
+*        resampling code was assuming that all boxes are the same length,
+*        which is not the case. So now, instead of using smfDownsamp1, each
+*        important JCMTState value in the output is calculated within this
+*        function as the average of the input JCMTState values for the time
+*        slices that contibute to each output I, Q or U value.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -234,8 +245,17 @@ typedef struct smfFitQUIJobData {
    smf_qual_t *qua;
 } smfFitQUIJobData;
 
+typedef struct smfFitQUIJob2Data {
+   size_t nstep;
+   size_t bytestride;
+   char *pntstart;
+   int isang;
+   double *result;
+} smfFitQUIJob2Data;
+
 /* Prototypes for local functions */
 static void smf1_fit_qui_job( void *job_data, int *status );
+static void smf1_fit_qui_job2( void *job_data, int *status );
 static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates,
                              double ang0, dim_t box, dim_t *ontslice,
                              dim_t **box_starts, dim_t *lolim, dim_t *hilim,
@@ -248,7 +268,17 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates,
 #define NSUM ( NPAR*(3+NPAR) )/2
 
 /* Macro to simplify resampling of individual JCMTState fields */
-#define RESAMPSTATE(in,out,member,intslice,startat,ontslice,isang) smf_downsamp1D( wf, &((in+startat)->member),sizeof(JCMTState),1,intslice,&(out->member), sizeof(JCMTState),1,ontslice,1,1,isang,status );
+#define RESAMPSTATE(member,isangle) \
+         p2data = astMalloc( sizeof( *p2data ) ); \
+         if( *status == SAI__OK ) { \
+            p2data->nstep = box_size; \
+            p2data->bytestride = sizeof(JCMTState); \
+            p2data->pntstart = (char *) &((instate+istart)->member); \
+            p2data->isang = isangle;   \
+            p2data->result = &((outstate+itime)->member); \
+            thrAddJob( wf, THR__FREE_JOBDATA, p2data, \
+                       smf1_fit_qui_job2, 0, NULL, status ); \
+         }
 
 
 void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
@@ -266,6 +296,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    dim_t box_size;          /* First time slice in box */
    dim_t hilim;             /* Max no. of samples in a box */
    dim_t intslice;          /* ntslice of idata */
+   dim_t iend;              /* Input time index at start of next fitting box */
    dim_t istart;            /* Input time index at start of fitting box */
    dim_t itime;             /* Time slice index */
    dim_t itstart;           /* Index of first used input time slice */
@@ -285,7 +316,10 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    smfData *indksquid=NULL; /* Pointer to input dksquid data */
    smfFitQUIJobData *job_data = NULL; /* Pointer to all job data */
    smfFitQUIJobData *pdata = NULL;/* Pointer to next job data */
-   smfHead *hdr;            /* Pointer to data header this time slice */
+   smfFitQUIJob2Data *p2data = NULL; /* Pointer to JCMTState resampling data */
+   smfHead *ihdr;           /* Pointer to input data header */
+   smfHead *ghdr;           /* Pointer to other data header */
+   smfHead *ohdr;           /* Pointer to output data header */
    smf_qual_t *qua;         /* Input quality pointer */
 
 /* Check inherited status */
@@ -326,8 +360,8 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    units of radians (new data) or arbitrary encoder units (old data).
    They are assumed to be in radians if no POL_ANG value is larger than
    20. This function can only handle new data. */
-   hdr = idata->hdr;
-   instate = hdr->allState;
+   ihdr = idata->hdr;
+   instate = ihdr->allState;
    ntime = ( intslice > 1000 ) ? 1000 : intslice;
    for( itime = 0; itime < ntime; itime++,instate++ ) {
       if( instate->pol_ang != VAL__BADD && instate->pol_ang > 20 ) {
@@ -340,7 +374,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 
 /* Find the input time slice at which each fitting box starts, and the
    length of the output time axis (in time-slices). */
-   smf1_find_boxes( intslice, hdr->allState, ang0, box, &ontslice,
+   smf1_find_boxes( intslice, ihdr->allState, ang0, box, &ontslice,
                     &box_starts, &lolim, &hilim, status );
 
 /* Adjust intslice to hold the number of used input time slices rather
@@ -358,9 +392,9 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 /* We want to copy everything in the smfHead except for allState. So we
    make a copy of the allState pointer, and then set it to NULL in the
    header before the copy */
-   if( idata->hdr ) {
-     instate = idata->hdr->allState;
-     idata->hdr->allState = NULL;
+   if( ihdr ) {
+     instate = ihdr->allState;
+     ihdr->allState = NULL;
    }
 
 /* Similarly, we want everything in the smfDa except for the dksquid. */
@@ -395,7 +429,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    }
 
 /* Restore values in idata now that we're done */
-   if( instate ) idata->hdr->allState = instate;
+   if( instate ) ihdr->allState = instate;
    if( indksquid ) idata->da->dksquid = indksquid;
 
 /* Store the required length for the output time axis. The time axis is
@@ -416,6 +450,34 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    (*odataq)->pntr[1] = astCalloc( ondata, sizeof(double) );
    (*odatau)->pntr[1] = astCalloc( ondata, sizeof(double) );
    if( odatai ) (*odatai)->pntr[1] = astCalloc( ondata, sizeof(double) );
+
+/* Down-sample all the JCMTState values in the smfHead by selecting the
+   input time slice that is closest to the nominal box centre. These
+   approximate values will be replaced by more accurate value for the
+   important, fast-changing, fields later. */
+   ohdr = (*odataq)->hdr;
+
+   ohdr->curframe = (dim_t) (((double) ohdr->curframe + 0.5) / scale);
+   ohdr->nframes = ontslice;
+   ohdr->steptime *= scale;
+   strcpy( ohdr->dlabel, "Q" );
+   strncpy( ohdr->title, "POL-2 Stokes parameter Q", SMF__CHARLABEL );
+
+   instate = ihdr->allState;
+   if( instate ) {
+
+      ohdr->allState = astCalloc( ontslice, sizeof(*instate) );
+      outstate = ohdr->allState;
+
+      if( *status == SAI__OK ) {
+         size_t frame;  /* index of nearest neighbour JCMTState */
+
+         for( i=0; i<ontslice; i++ ) {
+            frame = (size_t) round(((double) i + 0.5)*scale) + itstart;
+            memcpy( outstate + i, instate + frame, sizeof(*instate) );
+         }
+      }
+   }
 
 /* Create structures used to pass information to the worker threads. */
    nworker = wf ? wf->nworker : 1;
@@ -445,10 +507,57 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 
 /* Get the number of input time slices that contribute to the output time
    slice. */
-         box_size = box_starts[ itime + 1 ] - istart;
+         iend = box_starts[ itime + 1 ];
+         box_size = iend - istart;
+
+/* Down-sample the more important fast-changing fields (like pointing)
+   properly. The output value is the average of the input values within
+   the box corresponding to the current output time slice. Each value
+   is averaged in a different workforce job. Take account of the 0-360
+   wrap-around for angular values. */
+         RESAMPSTATE( rts_end, 0);
+
+         RESAMPSTATE( smu_az_jig_x, 0);
+         RESAMPSTATE( smu_az_jig_y, 0);
+         RESAMPSTATE( smu_az_chop_x, 0);
+         RESAMPSTATE( smu_az_chop_y, 0);
+         RESAMPSTATE( smu_tr_jig_x, 0);
+         RESAMPSTATE( smu_tr_jig_y, 0);
+         RESAMPSTATE( smu_tr_chop_x, 0);
+         RESAMPSTATE( smu_tr_chop_y, 0);
+
+         RESAMPSTATE( tcs_tai, 0);
+         RESAMPSTATE( tcs_airmass, 0);
+
+/* Second coordinates (Dec, El etc) cannot wrap 0 to 360 so we do not need
+   to test for those cases */
+         RESAMPSTATE( tcs_az_ang, 1);
+         RESAMPSTATE( tcs_az_ac1, 1);
+         RESAMPSTATE( tcs_az_ac2, 0);
+         RESAMPSTATE( tcs_az_dc1, 1);
+         RESAMPSTATE( tcs_az_dc2, 0);
+         RESAMPSTATE( tcs_az_bc1, 1);
+         RESAMPSTATE( tcs_az_bc2, 0);
+
+         RESAMPSTATE( tcs_tr_ang, 1);
+         RESAMPSTATE( tcs_tr_ac1, 1);
+         RESAMPSTATE( tcs_tr_ac2, 0);
+         RESAMPSTATE( tcs_tr_dc1, 1);
+         RESAMPSTATE( tcs_tr_dc2, 0);
+         RESAMPSTATE( tcs_tr_bc1, 1);
+         RESAMPSTATE( tcs_tr_bc2, 0);
+
+         RESAMPSTATE( tcs_en_dc1, 1);
+         RESAMPSTATE( tcs_en_dc2, 0);
+
+         RESAMPSTATE( tcs_dm_abs, 1);
+         RESAMPSTATE( tcs_dm_rel, 0);
+
+/* Wait for all the above jobs to finish. */
+         thrWait( wf, status );
 
 /* Check this box is of a usable length. If not, set the box size to zero
-   and increent the number of strange boxes. */
+   and increment the number of strange boxes. */
          if( box_size < lolim || box_size > hilim ) {
             if( box_size < lolim ) {
                msgOutiff( MSG__VERB, " ", "Unusually short POL_ANG block "
@@ -469,9 +578,9 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
          setbad = 0;
          if( north ) {
             smf_tslice_ast( idata, istart + box_size/2, 1, NO_FTS, status );
-            wcs = idata->hdr->wcs;
+            wcs = ihdr->wcs;
             if( !strcmp( north, "TRACKING" ) ) {
-               usesys = sc2ast_convert_system( (idata->hdr->allState)[0].tcs_tr_sys,
+               usesys = sc2ast_convert_system( (ihdr->allState)[0].tcs_tr_sys,
                                                status );
             } else {
                usesys = north;
@@ -496,7 +605,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 
             pdata->dat = ((double *) idata->pntr[0] ) + istart*nbolo;
             pdata->qua = qua + istart*nbolo;
-            pdata->allstates = hdr->allState + istart;
+            pdata->allstates = ihdr->allState + istart;
 
             pdata->ipi = odatai ? ( (double*) (*odatai)->pntr[0] ) + itime*nbolo : NULL;
             pdata->ipf = odataf ? ( (double*) (*odataf)->pntr[0] ) + istart*nbolo : NULL;
@@ -544,98 +653,26 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
                   status, nodd, lolim, hilim );
       }
 
-/* Down-sample the smfHead -------------------------------------------------*/
-      smfHead *hdr = (*odataq)->hdr;
-
-      hdr->curframe = (dim_t) (((double) hdr->curframe + 0.5) / scale);
-      hdr->nframes = ontslice;
-      hdr->steptime *= scale;
-      strcpy( hdr->dlabel, "Q" );
-      strncpy( hdr->title, "POL-2 Stokes parameter Q", SMF__CHARLABEL );
-
-/* Down-sample all the JCMTState values using nearest neighbours */
-      instate = idata->hdr->allState;
-      if( instate ) {
-
-         hdr->allState = astCalloc( ontslice, sizeof(*instate) );
-         outstate = hdr->allState;
-
-         if( *status == SAI__OK ) {
-            size_t frame;  /* index of nearest neighbour JCMTState */
-
-            for( i=0; i<ontslice; i++ ) {
-               frame = (size_t) round(((double) i + 0.5)*scale) + itstart;
-               memcpy( outstate + i, instate + frame, sizeof(*instate) );
-            }
-
-/* Then go back and properly down-sample the more important fast-changing
-   fields like pointing. Note that since there are approximate values there
-   already we need to explicitly re-initialize to 0. */
-
-            RESAMPSTATE(instate, outstate, rts_end, intslice, itstart, ontslice, 0);
-
-            RESAMPSTATE(instate, outstate, smu_az_jig_x, intslice, itstart, ontslice, 0);
-            RESAMPSTATE(instate, outstate, smu_az_jig_y, intslice, itstart, ontslice, 0);
-            RESAMPSTATE(instate, outstate, smu_az_chop_x, intslice, itstart, ontslice, 0);
-            RESAMPSTATE(instate, outstate, smu_az_chop_y, intslice, itstart, ontslice, 0);
-            RESAMPSTATE(instate, outstate, smu_tr_jig_x, intslice, itstart, ontslice, 0);
-            RESAMPSTATE(instate, outstate, smu_tr_jig_y, intslice, itstart, ontslice, 0);
-            RESAMPSTATE(instate, outstate, smu_tr_chop_x, intslice, itstart, ontslice, 0);
-            RESAMPSTATE(instate, outstate, smu_tr_chop_y, intslice, itstart, ontslice, 0);
-
-            RESAMPSTATE(instate, outstate, tcs_tai, intslice, itstart, ontslice, 0);
-            RESAMPSTATE(instate, outstate, tcs_airmass, intslice, itstart, ontslice, 0);
-
-/* Second coordinates (Dec, El etc) can not wrap 0 to 360 so we do not need
-   to test for those cases */
-            RESAMPSTATE(instate, outstate, tcs_az_ang, intslice, itstart, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_az_ac1, intslice, itstart, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_az_ac2, intslice, itstart, ontslice, 0);
-            RESAMPSTATE(instate, outstate, tcs_az_dc1, intslice, itstart, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_az_dc2, intslice, itstart, ontslice, 0);
-            RESAMPSTATE(instate, outstate, tcs_az_bc1, intslice, itstart, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_az_bc2, intslice, itstart, ontslice, 0);
-
-            RESAMPSTATE(instate, outstate, tcs_tr_ang, intslice, itstart, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_tr_ac1, intslice, itstart, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_tr_ac2, intslice, itstart, ontslice, 0);
-            RESAMPSTATE(instate, outstate, tcs_tr_dc1, intslice, itstart, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_tr_dc2, intslice, itstart, ontslice, 0);
-            RESAMPSTATE(instate, outstate, tcs_tr_bc1, intslice, itstart, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_tr_bc2, intslice, itstart, ontslice, 0);
-
-            RESAMPSTATE(instate, outstate, tcs_en_dc1, intslice, itstart, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_en_dc2, intslice, itstart, ontslice, 0);
-
-            RESAMPSTATE(instate, outstate, tcs_dm_abs, intslice, itstart, ontslice, 1);
-            RESAMPSTATE(instate, outstate, tcs_dm_rel, intslice, itstart, ontslice, 0);
-
-/* Wait for all the above smf_downsamp1 jobs to finish. */
-            thrWait( wf, status );
-
-         }
-      }
-
 /* Add a keyword to the Q header indicating the polarimetric reference
    direction. */
-      smf_fits_updateS( (*odataq)->hdr, "POLNORTH", north ? north : "FPLANE",
+      smf_fits_updateS( ohdr, "POLNORTH", north ? north : "FPLANE",
                         north ? "Pol ref dir is tracking north" :
                                 "Pol ref dir is focal plane Y", status );
 
 /* Copy the Q header to the other outputs. */
-      hdr = smf_deepcopy_smfHead( (*odataq)->hdr, status );
-      (*odatau)->hdr = hdr;
+      ghdr = smf_deepcopy_smfHead( ohdr, status );
+      (*odatau)->hdr = ghdr;
       if( *status == SAI__OK ) {
-         strcpy( hdr->dlabel, "U" );
-         strncpy( hdr->title, "POL-2 Stokes parameter U", SMF__CHARLABEL );
+         strcpy( ghdr->dlabel, "U" );
+         strncpy( ghdr->title, "POL-2 Stokes parameter U", SMF__CHARLABEL );
       }
 
       if( odatai ) {
-         hdr = smf_deepcopy_smfHead( (*odataq)->hdr, status );
-         (*odatai)->hdr = hdr;
+         ghdr = smf_deepcopy_smfHead( ohdr, status );
+         (*odatai)->hdr = ghdr;
          if( *status == SAI__OK ) {
-            strcpy( hdr->dlabel, "I" );
-            strncpy( hdr->title, "POL-2 Stokes parameter I", SMF__CHARLABEL );
+            strcpy( ghdr->dlabel, "I" );
+            strncpy( ghdr->title, "POL-2 Stokes parameter I", SMF__CHARLABEL );
          }
       }
    }
@@ -1454,8 +1491,114 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates,
 
 
 
+static void smf1_fit_qui_job2( void *job_data, int *status ) {
+/*
+*  Name:
+*     smf1_fit_qui_job2
 
+*  Purpose:
+*     Find the average value of a single JCMTState variable over a
+*     single fitting box.
 
+*  Invocation:
+*     void smf1_fit_qui_job( void *job_data, int *status )
 
+*  Arguments:
+*     job_data = void * (Given)
+*        Pointer to the data needed by the job. Should be a pointer to a
+*        smfFitQUIJob2Data structure.
+*     status = int * (Given and Returned)
+*        Pointer to global status.
+
+*  Description:
+*     This routine calculate the average value of a single JCMTState
+*     variable over a single fitting box.
+
+*/
+
+/* Local Variables: */
+   char *pnt;
+   double centre;
+   double sum;
+   double val;
+   size_t bytestride;
+   size_t istep;
+   size_t nstep;
+   size_t nsum;
+   smfFitQUIJob2Data *pdata;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer to the structure holding the required input variables. */
+   pdata = (smfFitQUIJob2Data *) job_data;
+
+/* Extract some commonly used variables into local variables */
+   nstep = pdata->nstep;
+   bytestride = pdata->bytestride;
+
+/* Initialise running sumes etc needed to form the average. */
+   sum = 0.0;
+   nsum = 0;
+   pnt = pdata->pntstart;
+
+/* If the values being averaged are angular values, we need to take
+   account of wrap-around form 360 degs to zero degs. */
+   if( pdata->isang ) {
+
+/* Every iunput value is normalised into a range which is within +/- 180
+   degs of the first good value (the "centre" value). Indicate we have not
+   yet found a good centre value. Then loop through all the input values. */
+      centre = VAL__BADD;
+      for( istep = 0; istep < nstep; istep++ ) {
+
+/* Get the current input value. The strid ebetween adjacent values may
+   not be a whole number of doubles, so we use a "char *" pointer to
+   point to each value, which can be incremented by an arbitrary number
+   of bytes. */
+         val = *((double *)pnt);
+         if( val != VAL__BADD ) {
+
+/* If this is the first good value, use it as the centre of the angular
+   range into which all other values are to be normalised. */
+            if( centre == VAL__BADD ) {
+               centre = val;
+
+/* If this is not the first good value, add multiples of 360 degrees
+   until the value is within +/- 180 degrees of the centre value. */
+            } else {
+               while( val > centre + AST__DPI ) val -= 2*AST__DPI;
+               while( val <= centre - AST__DPI ) val += 2*AST__DPI;
+            }
+
+/* Increment the running sums. */
+            sum += val;
+            nsum++;
+         }
+
+/* Move the "char *" pointer on to the next value. */
+         pnt += bytestride;
+      }
+
+/* If the values being averaged are not angular values, just do a simple
+   average. */
+   } else {
+      for( istep = 0; istep < nstep; istep++ ) {
+         val = *((double *)pnt);
+         if( val != VAL__BADD ) {
+            sum += val;
+            nsum++;
+         }
+         pnt += bytestride;
+      }
+   }
+
+/* Form the returned average value. */
+   if( nsum > 0 ) {
+      *(pdata->result) = sum/nsum;
+   } else {
+      *(pdata->result) = VAL__BADD;
+   }
+}
 
 
