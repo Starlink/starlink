@@ -6,9 +6,9 @@
 \stardocsource    {sun95.44}
 \stardocnumber    {95.44}
 \stardocauthors   {Malcolm J. Currie \& David S. Berry}
-\stardocdate      {2018 March 13}
+\stardocdate      {2018 July 11}
 \stardoctitle     {KAPPA --- Kernel Application Package}
-\stardocversion   {2.5}
+\stardocversion   {2.5-9}
 \stardocmanual    {User's Guide}
 % -----------------------------------------------------------------------------
 \stardocabstract{
@@ -53630,16 +53630,7 @@ and HDS data types is as follows:
 
 \newpage
 
-\section{\xlabel{se_changes}Release Notes---V2.5\label{se:changes}}
-
-\subsubsection{General Changes}
-\begin{itemize}
-   \item A log of \KAPPA\ commands can now be written to a text file
-   specified by the environment variable \texttt{KAPPA\_LOG}.  The log
-   lists the application name and parameter values in separate headed
-   lines.  Note that the format of the log may change to simple command
-   lines that could be replayed in a script.
-\end{itemize}
+\section{\xlabel{se_changes}Release Notes---V2.5-9\label{se:changes}}
 
 \subsection{Modified Commands}
 The following applications have been modified:
@@ -53647,14 +53638,10 @@ The following applications have been modified:
 
    \item [\htmlref{ALIGN2D}{ALIGN2D}]\mbox{}
       \begin{itemize}
-        \item Parameter TR may also include the scale and offset in
-        its seventh and eight elements.
         \item The residuals used to determine the fit are now weighted
         using the SNR of the data rather than the reciprocal of the variance.
         This will cause the final alignment to be determined more by the
         brighter sections of the map than previously.
-        \item The RMS residual between the aligned and the reference arrays is
-        now written to an output parameter called ``RMS''.
       \end{itemize}
 
    \item [\htmlref{COLLAPSE}{COLLAPSE}]\mbox{}
@@ -53664,47 +53651,11 @@ The following applications have been modified:
         medians.
       \end{itemize}
 
-   \item [\htmlref{CONFIGECHO}{CONFIGECHO}]\mbox{}
+   \item [\htmlref{SETAXIS}{SETAXIS}]\mbox{}
       \begin{itemize}
-        \item This now reports all elements in an array, not just the
-        first element.
-      \end{itemize}
-
-   \item [\htmlref{CONTOUR}{CONTOUR}]\mbox{}
-      \begin{itemize}
-        \item The dynamic default for Parameter LABPOS is now \texttt{{!}}
-        (\emph{i.e.} a null value), so no label is now drawn in
-        \texttt{"Bounds"} or \texttt"{Good"} mode unless a value is supplied
-        explicitly for LABPOS.
-      \end{itemize}
-
-   \item [\htmlref{DISPLAY}{DISPLAY}]\mbox{}
-      \begin{itemize}
-        \item Has a new Parameter PENRANGE, which can be used to restrict
-        the range of pens (i.e. colour indices) used. The default
-        is to use the full range of available pens.
-        \item The vertical position of the key can now be controlled
-        through Parameter KEYPOS.
-      \end{itemize}
-
-   \item [\htmlref{MFITTREND}{MFITTREND}]\mbox{}
-      \begin{itemize}
-        \item The auto method uses the median rather than the mean to
-         clip outliers. This permits better masking of strong and
-         extended emission.
-      \end{itemize}
-
-   \item [\htmlref{SQORTST}{SQORST}]\mbox{}
-      \begin{itemize}
-        \item Permit an axis scale to be retained by using an asterisk
-         in Parameter PIXSCALE.
-      \end{itemize}
-
-   \item [\htmlref{TRANDAT}{TRANDAT}]\mbox{}
-      \begin{itemize}
-        \item Will now recognise the string \texttt{"BAD"} (case
-        insensitive) within the input text file and generate appropriate
-        bad values in the output NDF.
+        \item There is a new mode, \texttt{"NDF"}.  It assigns the axis
+        values using the data values in another NDF, specified by a
+        parameter called AXISNDF.
       \end{itemize}
 
    \item [\htmlref{WCSALIGN}{WCSALIGN}]\mbox{}
@@ -54293,15 +54244,71 @@ The following applications have been modified:
 
 \end{description}
 
+\subsection{Release Notes---V2.5}
 
+\subsubsection{General Changes}
+\begin{itemize}
+   \item A log of \KAPPA\ commands can now be written to a text file
+   specified by the environment variable \texttt{KAPPA\_LOG}.  The log
+   lists the application name and parameter values in separate headed
+   lines.  Note that the format of the log may change to simple command
+   lines that could be replayed in a script.
+\end{itemize}
 
+\subsubsection{Modified Commands}
+The following applications have been modified:
+\begin{description}[style=nextline]
 
+   \item [\htmlref{ALIGN2D}{ALIGN2D}]\mbox{}
+      \begin{itemize}
+        \item Parameter TR may also include the scale and offset in
+        its seventh and eight elements.
+    \item The RMS residual between the aligned and the reference arrays is
+        now written to an output parameter called ``RMS''.
+      \end{itemize}
 
+   \item [\htmlref{CONFIGECHO}{CONFIGECHO}]\mbox{}
+      \begin{itemize}
+        \item This now reports all elements in an array, not just the
+        first element.
+      \end{itemize}
 
+   \item [\htmlref{CONTOUR}{CONTOUR}]\mbox{}
+      \begin{itemize}
+        \item The dynamic default for Parameter LABPOS is now \texttt{{!}}
+        (\emph{i.e.} a null value), so no label is now drawn in
+        \texttt{"Bounds"} or \texttt"{Good"} mode unless a value is supplied
+        explicitly for LABPOS.
+      \end{itemize}
 
+   \item [\htmlref{DISPLAY}{DISPLAY}]\mbox{}
+      \begin{itemize}
+        \item Has a new Parameter PENRANGE, which can be used to restrict
+        the range of pens (i.e. colour indices) used. The default
+        is to use the full range of available pens.
+        \item The vertical position of the key can now be controlled
+        through Parameter KEYPOS.
+      \end{itemize}
 
+   \item [\htmlref{MFITTREND}{MFITTREND}]\mbox{}
+      \begin{itemize}
+        \item The auto method uses the median rather than the mean to
+         clip outliers. This permits better masking of strong and
+         extended emission.
+      \end{itemize}
 
+   \item [\htmlref{SQORTST}{SQORST}]\mbox{}
+      \begin{itemize}
+        \item Permit an axis scale to be retained by using an asterisk
+         in Parameter PIXSCALE.
+      \end{itemize}
 
+   \item [\htmlref{TRANDAT}{TRANDAT}]\mbox{}
+      \begin{itemize}
+        \item Will now recognise the string \texttt{"BAD"} (case
+        insensitive) within the input text file and generate appropriate
+        bad values in the output NDF.
+      \end{itemize}
 
 \end{description}
 

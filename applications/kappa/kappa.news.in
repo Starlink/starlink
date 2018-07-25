@@ -1,3 +1,34 @@
+1 KAPPA_Version_2.5-9
+
+   A new release of KAPPA is available in Starlink 2018A.  The main
+   changes are listed below.  For complete details of all
+   changes, see the "Release Notes" appendix in SUN/95.
+
+2 Modified_applications
+
+   o  ALIGN2D
+      - The residuals used to determine the fit are now weighted using
+      the SNR of the data rather than the reciprocal of the variance.
+      This will cause the final alignment to be determined more by the
+      brighter sections of the map than previously.
+
+   o  COLLAPSE
+      - There is a new estimator option, "FastMed", that offers a
+      substantially faster calculation of unweighted medians.
+
+   o  SETAXIS
+      - There is a new mode, "NDF".  It assigns the axis values using
+      the data values in another NDF, specified by a parameter called
+      AXISNDF.
+
+   o  WCSALIGN
+      -  The input NDFs can now be aligned with a specified POLPACK
+      catalogue - see new parameter REFCAT.
+
+   o  WCSMOSAIC
+      -  Has a new parameter called WEIGHTS that can be used to specify
+      a weight for each of the input NDFs.
+
 1 KAPPA_Version_2.5
 
    A new release of KAPPA is available in Starlink 2017A.  The main
@@ -16,16 +47,8 @@
    o  ALIGN2D
       -  Parameter TR may also include the scale and offset in its seventh
       and eight elements.
-      - The residuals used to determine the fit are now weighted using
-      the SNR of the data rather than the reciprocal of the variance.
-      This will cause the final alignment to be determined more by the
-      brighter sections of the map than previously.
       - The RMS residual between the aligned and the reference arrays is
       now written to an output parameter called "RMS".
-
-   o  COLLAPSE
-      - There is a new estimator option, "FastMed", that offers a
-      substantially faster calculation of unweighted medians.
 
    o  CONFIGECHO
       -  This now reports all elements in an array, not just the first
@@ -55,14 +78,6 @@
       -  Will now recognised the string "BAD" (case insensitive) within
       the input text file and generate appropriate bad values in the output
       NDF.
-
-   o  WCSALIGN
-      -  The input NDFs can now be aligned with a specified POLPACK
-      catalogue - see new parameter REFCAT.
-
-   o  WCSMOSAIC
-      -  Has a new parameter called WEIGHTS that can be used to specify
-      a weight for each of the input NDFs.
 
 1 KAPPA_Version_2.4
 
