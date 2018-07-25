@@ -23,7 +23,7 @@
 *  Description:
 *     This routine modifies the values of an axis array component or
 *     system within an NDF data structure.  There are a number of
-*     options (see parameters LIKE and  MODE).  They permit the deletion
+*     options (see Parameters LIKE and  MODE).  They permit the deletion
 *     of the axis system, or an individual variance or width component;
 *     the replacement of one or more individual values; assignment of the
 *     whole array using Fortran-like mathematical expressions, or values
@@ -43,7 +43,7 @@
 *  ADAM Parameters:
 *     AXISNDF = NDF (Read)
 *        The Data values in this NDF are used as the axis centre values
-*        if parameter MODE is set to "NDF". The supplied NDF must be
+*        if Parameter MODE is set to "NDF". The supplied NDF must be
 *        one dimensional and must be aligned in pixel coordinates with
 *        the NDF axis that is being modified.
 *     COMP = LITERAL (Read)
@@ -65,7 +65,7 @@
 *     EXPRS = LITERAL (Read)
 *        A Fortran-like arithmetic expression giving the value to be
 *        assigned to each element of the axis array specified by
-*        parameter COMP.  The expression may just contain a constant
+*        Parameter COMP.  The expression may just contain a constant
 *        for the axis widths or variances, but the axis-centre values
 *        must vary.  In the latter case and whenever a constant value
 *        is not required, there are two tokens available---INDEX and
@@ -100,7 +100,7 @@
 *        default is the current value.
 *     LIKE = NDF (Read)
 *        A template NDF containing axis arrays. These arrays will be
-*        copied into the NDF given by parameter NDF. All axes are copied.
+*        copied into the NDF given by Parameter NDF. All axes are copied.
 *        The other parameters are only accessed if a null (!) value is
 *        supplied for LIKE. If the NDF being modified extends beyond the
 *        edges of the template NDF, then the template axis arrays will be
@@ -115,7 +115,7 @@
 *           "Edit"       - Allows the modification of individual
 *                          elements within the array.
 *           "Expression" - Allows a mathematical expression to define
-*                          the array values.  See parameter EXPRS.
+*                          the array values.  See Parameter EXPRS.
 *           "File"       - The array values are read in from a
 *                          free-format text file.
 *           "Linear_WCS" - The axis centres are set to the least-squares
@@ -127,7 +127,7 @@
 *                          available when COMP="Data" or "Centre".
 *           "NDF"        - The axis centres are set to the corresponding
 *                          Data values read from the NDF specified by
-*                          parameter AXISNDF. This is only available when
+*                          Parameter AXISNDF. This is only available when
 *                          COMP="Data" or "Centre".
 *           "Pixel"      - The axis centres are set to pixel
 *                          co-ordinates.  This is only available when
@@ -138,7 +138,7 @@
 *                          COMP="Data" or "Centre".
 *
 *        MODE is only accessed if a null (!) value is supplied for
-*        parameter LIKE. The suggested default is the current value.
+*        Parameter LIKE. The suggested default is the current value.
 *     NDF = NDF (Read and Write)
 *        The NDF data structure in which an axis array component is to
 *        be modified.
@@ -203,7 +203,7 @@
 *     -  The chapter entitled "The Axis Coordinate System" in SUN/33
 *     describes the NDF axis co-ordinate system and is recommended
 *     reading especially if you are using axis widths.
-*     -  There is no check, apart from constraints on parameter NEWVAL,
+*     -  There is no check, apart from constraints on Parameter NEWVAL,
 *     that the variance is not negative and the widths are positive.
 
 *  Related Applications:
@@ -282,7 +282,7 @@
 *     2012 May 1 (MJC):
 *        Add Linear_WCS mode.
 *     16-JUL-2018 (DSB):
-*        Added mode "NDF" and parameter AXISNDF.
+*        Added mode "NDF" and Parameter AXISNDF.
 *     {enter_further_changes_here}
 
 *-
