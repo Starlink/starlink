@@ -1,7 +1,21 @@
 
+    Version 4.4-9
+    =============
+
+  The cubehelix0 colormap has been added to the quick lookups in the main panel.
+
+
+  Star-2018A Release
+  ==================
+
   Important bug fix: A problem with accessing CDS and other services using
   Apache has been fixed. Previously Skycat used a non-standard end of line
   encoding resulting in a HTTP 400 response.
+
+  When reading a multiple-line ARD region to extract a spectrum, all newlines
+  and spaces are removed so that it can be saved.
+
+  Key fonts with compound names can now be saved to the configuration of the contour toolbox.
 
 
   Star-2016A Release
