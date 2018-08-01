@@ -833,7 +833,8 @@ itcl::class gaia::GaiaImagePanel {
       greyscale ramp
       color bgyrw
       heat heat
-      pastel pastel}
+      pastel pastel
+      cubehelix cubehelix0}
 
    #  Define whether to use the unicode representations for RA/Dec.
    itk_option define -unicoderadec unicoderadec UnicodeRaDec 1 {
