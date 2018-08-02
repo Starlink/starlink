@@ -87,7 +87,7 @@
 *     filled by this routine.
 
 *  Notes:
-*     - refcount will be set to 1 in this routine.
+*     - refcount and onmap will be set to 1 in this routine.
 *     - The pntr[] and qual pointers are copied and will be owned by the smfData.
 *       Do not free them independently.
 *     - Free this memory using smf_close_file
@@ -221,7 +221,7 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
       errRep(FUNC_NAME, "Attempt to overwrite pre-existing smfDA struct"
              " (possible programming error)",
              status);
-    }   
+    }
     if (*status == SAI__OK &&  data->fts != NULL && fts != NULL) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Attempt to overwrite pre-existing smfFts struct"
@@ -240,6 +240,7 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
       /* Fill in other bits */
       data->dtype = dtype;
       data->refcount = 1;
+      data->onmap = 1;
       data->virtual = virtual;
       if (pntr) {
         for (i = 0; i < 2; i++ ) {

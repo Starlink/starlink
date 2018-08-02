@@ -18,8 +18,8 @@
 *                          dim_t itime_hi, AstSkyFrame *abskyfrm,
 *                          AstMapping *oskymap, int moving, int olbnd[ 2 ],
 *                          int oubnd[ 2 ], fts2Port fts_port, int *lut,
-*                          double *angle,
-*                          double *lon, double *lat, int *status );
+*                          double *angle, double *lon, double *lat,
+*                          dim_t *onmap, int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -69,6 +69,9 @@
 *        A pointer to a (nbolo,ntslice) array in which to return the
 *        latitude value (degs) at all samples between and including itime_lo
 *        and itime_hi. May be NULL.
+*     onmap = dim_t * (Returned)
+*        A pointer to a size_t in which to return the count of bolometer
+*        samples that fell within the bounds of the map. Ignored if NULL.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -104,6 +107,8 @@
 *        Make it work with mising TCS information.
 *     12-DEC-2011 (DSB):
 *        Add lon and lat to interface.
+*     2-AUG-2018 (DSB):
+*        Add onmap to interface.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -146,8 +151,8 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
                      dim_t itime_hi, AstSkyFrame *abskyfrm,
                      AstMapping *oskymap, int moving, int olbnd[ 2 ],
                      int oubnd[ 2 ], fts2Port fts_port, int *lut,
-                     double *angle,
-                     double *lon, double *lat, int *status ) {
+                     double *angle, double *lon, double *lat, dim_t *onmap,
+                     int *status ) {
 
 /* Local Variables */
    AstCmpMap *bsmap = NULL;     /* Tracking -> output grid Mapping */
@@ -196,6 +201,10 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
    int ox;               /* Output X GRID index (-1) containing current bolo */
    int oy;               /* Output Y GRID index (-1) containing current bolo */
    int ubnd_in[ 2 ];     /* Upper bounds of input array */
+
+
+/* Initialise */
+   if( onmap ) *onmap = 0;
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
@@ -453,6 +462,9 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 
 /* Check it is within the output map */
             if( ox >= 0 && ox < odimx && oy >= 0 && oy < odimy ) {
+
+/* Increment the count of bolometer samples that fall within the map */
+               if( onmap ) (*onmap)++;
 
 /* Find the 1-dimensional vector index into the output array for this
    pixel and store in the next element of the returned LUT. */

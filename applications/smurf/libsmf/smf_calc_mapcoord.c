@@ -104,6 +104,8 @@
 *     2014-02-06 (DSB):
 *        Use "_lon" and "_lat" for exportlonlat file names, rather than the
 *        AST symbols for the skyframe axes.
+*     2018-08-02 (DSB):
+*        Add "onmap" flag to smfData.
 
 *  Notes:
 *     This routines asserts ICD data order.
@@ -168,6 +170,7 @@ typedef struct smfCalcMapcoordData {
   int *lut;
   int *lbnd_out;
   int moving;
+  dim_t onmap;
   AstMapping *sky2map;
   size_t t1;               /* Index of first timeslice of block */
   size_t t2;               /* Index of last timeslice of block */
@@ -190,6 +193,7 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
   int *lbnd_out=NULL;
   int *lut=NULL;
   int moving;
+  dim_t onmap;
   int *ubnd_out=NULL;
   dim_t nbolo;             /* number of bolometers */
   dim_t ntslice;           /* number of time slices */
@@ -252,7 +256,10 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
   smf_coords_lut( data, pdata->tstep, pdata->t1, pdata->t2,
                   abskyfrm, sky2map, moving, lbnd_out, ubnd_out, fts_port,
                   lut + pdata->t1*nbolo, theta + pdata->t1,
-                  pdata->lon_ptr, pdata->lat_ptr, status );
+                  pdata->lon_ptr, pdata->lat_ptr, &onmap, status );
+
+  /* Return the flag indicating if any data fell within the map bounds. */
+  pdata->onmap = onmap;
 
   /* Unlock the supplied AST object pointers so that other threads can use
      them. */
@@ -307,13 +314,17 @@ void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
   int ubnd_temp[1];            /* Bounds for bounds NDF component */
   int *lut = NULL;             /* The lookup table */
   dim_t nbolo=0;               /* Number of bolometers */
+  dim_t ndata=0;               /* Number of samples */
   dim_t ntslice=0;             /* Number of time slices */
   int nmap;                    /* Number of mapped elements */
+  dim_t onmap;                 /* Number of samples that fall within the map */
   AstMapping *sky2map=NULL;    /* Mapping celestial->map coordinates */
   size_t step;                 /* step size for dividing up work */
   AstCmpMap *testcmpmap=NULL;  /* Combined forward/inverse mapping */
   AstMapping *testsimpmap=NULL;/* Simplified testcmpmap */
+  int there;                   /* Does component exist? */
   double *theta = NULL;        /* Scan direction at each time slice */
+  HDSLoc *tloc=NULL;           /* Temporary HDS locator */
   int tstep;                   /* Time slices between full Mapping calculations */
   int exportlonlat;            /* Dump longitude and latitude values? */
 
@@ -338,7 +349,7 @@ void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
   smf_dataOrder( wf, data, 1, status );
 
   /* Get the data dimensions */
-  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, NULL, NULL, status );
+  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, &ndata, NULL, NULL, status );
 
   /* If SMF__NOCREATE_FILE is not set, and file associated with an NDF,
      map a new MAPCOORD extension (or verify an existing one) */
@@ -537,6 +548,9 @@ void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
 
       /* --- Begin parellelized portion ------------------------------------ */
 
+      /* Initially assume the smfData does not overlap the map. */
+      onmap = 0;
+
       /* Start a new job context. Each call to thrWait within this
          context will wait until all jobs created within the context have
          completed. Jobs created in higher contexts are ignored by thrWait. */
@@ -610,6 +624,17 @@ void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
         /* Wait until all of the jobs submitted within the current job
            context have completed */
         thrWait( wf, status );
+
+        /* Find the total number of samples that fall within the map. */
+        for( ii=0; ii<nw; ii++ ) {
+          pdata = job_data + ii;
+          onmap += pdata->onmap;
+        }
+
+        /* Set a flag that causes the smfData to be ignored if fewer than
+           5% of the samples fall within the map. */
+        data->onmap = ( onmap > 0.05*ndata );
+
       }
 
       /* End the current job context. */
@@ -659,8 +684,27 @@ void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
                   status);
         }
         ndfAnnul( &bndndf, status );
+
+        /* Store a flag in the MAPCOORD extension indicating if the LUT
+           has any  overlap with the map. */
+        datNew0I( mapcoordloc, "ONMAP", status );
+        datFind( mapcoordloc, "ONMAP", &tloc, status );
+        datPut0I( tloc, data->onmap, status );
+        datAnnul( &tloc, status );
       }
     }
+
+  /* Check if the existing LUT overlaps the map, and store a flag in the
+     smfData. */
+  } else {
+     datThere( mapcoordloc, "ONMAP", &there, status );
+     if( there ){
+        datFind( mapcoordloc, "ONMAP", &tloc, status );
+        datGet0I( tloc, &(data->onmap), status );
+        datAnnul( &tloc, status );
+     } else {
+        data->onmap = 1;
+     }
   }
 
   /* Clean Up */

@@ -187,6 +187,10 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
   msgSeti("N",data->refcount);
   msgOut("", "  refcount = ^N", status);
 
+  /* Does the smfData overlap the region of interest (map)? */
+  msgSeti("N",data->onmap);
+  msgOut("", "  onmap = ^N", status);
+
   /* Is this a virtual smfData? */
   msgSeti("N",data->virtual);
   msgOut("", "  virtual = ^N", status);

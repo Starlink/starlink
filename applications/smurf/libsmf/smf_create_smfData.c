@@ -161,6 +161,7 @@ smf_create_smfData( int flags, int * status ) {
   /* Initialise remainder of smfData */
   data->dtype = SMF__NULL;
   data->refcount = 1;
+  data->onmap = 1;
   data->virtual = 0;
   data->ndims = 0;
   data->ncoeff = 0;

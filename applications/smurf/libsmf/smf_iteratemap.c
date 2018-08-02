@@ -733,7 +733,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   smfData *localmap = NULL;     /* A temporary container for the map */
   smfArray **lut=NULL;          /* Pointing LUT for each file */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
-  smfGroup *lutgroup=NULL;      /* smfGroup of lut model files */
   int make_flagmap = 0;         /* Should flagmaps be created? */
   double *mapchange=NULL;       /* Array storing change (map - lastmap)/sigma*/
   double mapchange_mean=0;      /* Mean change in map */
@@ -786,13 +785,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   size_t qcount_last[SMF__NQBITS_TSERIES];/* quality bit counter -- last iter */
   smfArray **qua=NULL;          /* Quality flags for each file */
   smf_qual_t *qua_data=NULL;    /* Pointer to DATA component of qua */
-  smfGroup *quagroup=NULL;      /* smfGroup of quality model files */
   int quit=0;                   /* flag indicates when to quit */
   int rate_limited=0;           /* Was the MAPTOL_RATE limit hit? */
   int rebinflags;               /* Flags to control rebinning */
   smfArray **res=NULL;          /* Residual signal */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  smfGroup *resgroup=NULL;      /* smfGroup of model residual files */
   int reuse_var;                /* Reuse map variances from previous iteration? */
   int sampcube;                 /* write SAMPCUBES extensions? */
   double scalevar=0;            /* scale factor for variance */
@@ -1902,533 +1899,1182 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     }
 
-    /* Check units */
-    if (*status == SAI__OK && res && res[0]) {
-      smfData *tmpdata = res[0]->sdata[0];
-      /* Check units are consistent */
-      if (tmpdata && tmpdata->hdr) {
-        smf_check_units( contchunk+1, data_units, tmpdata->hdr, status);
-      }
-    }
-
-    /* Dynamic components */
-    if( igroup && (nmodels > 0) && (*status == SAI__OK) ) {
-
-      for( imodel = 0; imodel < nmodels; imodel++ ) {
-
-        /* Don't do SMF__LUT or SMF__EXT as they were handled earlier.
-           Also we do not need to allocate models to hold SMF__AST as the
-           AST values are calculated on-the-fly from the current map.  */
-        if( (modeltyps[imodel] != SMF__LUT) && (modeltyps[imodel] != SMF__EXT) &&
-            (modeltyps[imodel] != SMF__AST) ) {
-
-          smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
-                            noisemaps, 1, modeltyps[imodel], 0, NULL, 0, NULL, NULL,
-                            NO_FTS, qua, NULL, model[imodel], keymap, status );
-
-          /* If PCA.COMFILL is non-zero, the PCA model makes use of COM and GAI
-             models internally. Create them now. Use the values in the "PCA.xxx"
-             config parameters rather than the "COM.xxx" parameters. */
-          if( modeltyps[imodel] != SMF__PCA ) {
-             int comfill;
-             astMapGet0A( keymap, "PCA", &kmap );
-             astMapGet0I( kmap, "COMFILL", &comfill );
-             if( comfill ) {
-                pcacom = astCalloc( 1, sizeof(*pcacom) );
-                smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
-                                  noisemaps, 1, SMF__COM, 0, NULL, 0, NULL, NULL,
-                                  NO_FTS, qua, NULL, pcacom, kmap, status );
-
-                pcagai = astCalloc( 1, sizeof(*pcagai) );
-                smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
-                                  noisemaps, 1, SMF__GAI, 0, NULL, 0, NULL, NULL,
-                                  NO_FTS, qua, NULL, pcagai, kmap, status );
-             }
-             kmap = astAnnul( kmap );
-          }
-        }
-
-        /* Associate quality with some models */
-        if( ( modeltyps[imodel] == SMF__FLT ||
-              modeltyps[imodel] == SMF__SSN ||
-              modeltyps[imodel] == SMF__PCA ) && *status == SAI__OK ) {
-          for( idx=0; idx<res[0]->ndat; idx++ ) {
-            smfData *thisqua = qua[0]->sdata[idx];
-            model[imodel][0]->sdata[idx]->sidequal = thisqua;
-          }
-        }
-
-      }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    }
-
-    /*** TIMER ***/
-    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME": ** %f s creating dynamic models",
-               status, smf_timerupdate(&tv1,&tv2,status) );
-
-#ifdef __ITERATEMAP_SHOW_MEM
-    _smf_iteratemap_showmem(status);
-#endif
-
-    /* We initialize the structure even if status is bad to prevent
-       downstream problems when freeing resources. */
-    memset( &dat, 0, sizeof(dat) );
-
+    /* If none of the smfDatas in the current contchunk overlap the output map
+       significantly, then we can skip this contchunk entirely. */
+    int onmap = 0;
     if( *status == SAI__OK ) {
-
-      /* Stuff pointers into smfDIMMData to pass around to model component
-         solvers */
-      dat.ast_skipped = 1;
-      dat.mapchange = VAL__MAXD;
-      dat.res = res;
-      dat.qua = qua;
-      dat.lut = lut;
-      dat.map = thismap;
-      dat.lastmap = lastmap;
-      dat.hitsmap = thishits;
-      dat.mapqual = thisqual;
-      dat.mapvar = thisvar;
-      dat.mapweight = thisweight;
-      dat.mapweightsq = thisweightsq;
-      dat.mapok = 0;
-      dat.mdims[0] = mdims[0];
-      dat.mdims[1] = mdims[1];
-      dat.msize = msize;
-      dat.outfset = outfset;
-      dat.lbnd_out = lbnd_out;
-      dat.ubnd_out = ubnd_out;
-      dat.chisquared = chisquared;
-      dat.pixsize = pixsize;
-      if( havenoi ) {
-        dat.noi = model[whichnoi];
-      } else {
-        dat.noi = NULL;
-      }
-      if( haveext ) {
-        dat.ext = model[whichext];
-      } else {
-        dat.ext = NULL;
-      }
-      if( havegai ) {
-        dat.gai = model[whichgai];
-      } else {
-        dat.gai = NULL;
-      }
-      if( havecom ) {
-        dat.com = model[whichcom];
-      } else {
-        dat.com = NULL;
-      }
-      if( havepca ) {
-        dat.pcacom = pcacom;
-        dat.pcagai = pcagai;
-      } else {
-        dat.pcacom = NULL;
-        dat.pcagai = NULL;
-      }
-      dat.poldata = ( !strcmp( res[0]->sdata[0]->hdr->dlabel, "Q" ) ||
-                      !strcmp( res[0]->sdata[0]->hdr->dlabel, "U" ) );
-
-      /* We can close noisemaps here because they will already have
-         been used to initialize the NOI model if needed. */
-
-      if( noisemaps ) smf_close_related( wf, &noisemaps, status );
-
-      /* Allow an initial guess at the sky brightness to be supplied, in
-         which case copy it into "thismap", sample it and subtract it from
-         the cleaned data. The initial guess is returned in "lastmap". */
-      importsky = smf_initial_sky( wf, keymap, &dat, chunkfactor, &itsdone,
-                                   status );
-
-      /* If an initial sky was imported, copy it into the "lastmap" array
-         so that we get a reasonable value for the normalised change in the
-         map at the end of the iteration. */
-      if( importsky && *status == SAI__OK ) memcpy( lastmap, dat.map,
-                                                    msize*sizeof(*lastmap) );
-
-      /* Do any required correction for instrumental polarisation. */
-      smf_subip( wf, &dat, keymap, &qui, status );
-
-      /* Return the NDF label for the output map. */
-      if( qui == VAL__BADI ) {
-         strcpy( data_label, "Flux Density" );
-      } else if( qui > 0 ) {
-         strcpy( data_label, "Q" );
-      } else if( qui < 0 ) {
-         strcpy( data_label, "U" );
-      } else {
-         strcpy( data_label, "I" );
-      }
-
-
-
-
-      /* ***********************************************************************
-         Start the main iteration loop.
-
-         At this stage the full pointing solution for the data in this
-         continuous chunk has been calculated, and all of the model
-         containers have been created. This loop stops either if chi^2
-         has converged, or we did the requested number of iterations,
-         for this continuous chunk.
-      *********************************************************************** */
-
-      /* Initialize quit to -1. Once one of the stopping criterion have
-         been met set to 0 and do one final loop, then set to 1 at the
-         end of the last loop to exit. If an initial sky was supplied
-         that was created by a previous interupted run of makemap, we
-         start counting iterations from where the previous run of makemap
-         left off.  */
-      quit = -1;
-      iter = ( itsdone == -1 ) ? 0 : itsdone;
-
-      /* The NOI model has not been calculated yet. */
-      noidone = 0;
-
-      /* The mean mapchange for the previous two iterations. */
-      mapchange_l2 = mapchange_l3 = VAL__BADD;
-      rate_limited = 0;
-
-      /* The "iter" variable counts how many iterations have been done in
-         total, including any from a previous run of makemap if an initial sky
-         image was given that was generated by makemap. We also need a
-         flag which indicates if this is the first iteration, ignoring
-         any such previous iterations. */
-      firstiter = 1;
-
-      while( quit < 1 ) {
-        msgSeti("ITER", iter+1);
-        msgSeti("MAXITER", maxiter);
-        msgOut(" ",
-               FUNC_NAME ": Iteration ^ITER / ^MAXITER ---------------",
-               status);
-
-        /* If we have reached the last possible iteration, we will quit
-           after this iteration. */
-        if( iter + 1 >= maxiter ) quit = 0;
-
-        /* Assume we've converged until we find a filegroup that hasn't.
-	   On the last iteration (quit==0) leave the converged flag
-           unchanged (without this, converged ends up as 1 even if we
-           hit the iteration limit). */
-        if( quit < 0 ) {
-           if( iter > 0 ) {
-             converged = 1;
-           } else {
-             converged = 0;
-           }
+      for( idx=0; idx<res[0]->ndat; idx++ ) {
+        if( res[0]->sdata[idx]->onmap ) {
+          onmap = 1;
+          break;
         }
-
-        /* Some models (e.g. AST) need to know the iteration number, so
-           store it now. */
-        dat.iter = iter;
-
-        /* Indicate that we are allowed to converge on this iteration.
-           Other functions may set this flag to zero to prevent convergence
-           being reached on this iteration. For instance, see msf_get_mask. */
-        dat.allow_convergence = 1;
+      }
+    }
+    if( onmap ) {
 
 
+      /* Check units */
+      if (*status == SAI__OK && res && res[0]) {
+        smfData *tmpdata = res[0]->sdata[0];
+        /* Check units are consistent */
+        if (tmpdata && tmpdata->hdr) {
+          smf_check_units( contchunk+1, data_units, tmpdata->hdr, status);
+        }
+      }
 
+      /* Dynamic components */
+      if( igroup && (nmodels > 0) && (*status == SAI__OK) ) {
 
-        /* *********************************************************************
-           Start the calculation of all the model components up to AST
-           (including models that follow AST in modelorder, and then wrapping
-           back around to the beginning).
-        ********************************************************************* */
+        for( imodel = 0; imodel < nmodels; imodel++ ) {
 
+          /* Don't do SMF__LUT or SMF__EXT as they were handled earlier.
+             Also we do not need to allocate models to hold SMF__AST as the
+             AST values are calculated on-the-fly from the current map.  */
+          if( (modeltyps[imodel] != SMF__LUT) && (modeltyps[imodel] != SMF__EXT) &&
+              (modeltyps[imodel] != SMF__AST) ) {
 
-        /* If first iteration report on initial stats and write out
-           cleaned data if requested. */
-        if( iter == 0 ) {
+            smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
+                              noisemaps, 1, modeltyps[imodel], 0, NULL, 0, NULL, NULL,
+                              NO_FTS, qua, NULL, model[imodel], keymap, status );
 
-          /* initial quality report */
-          smf_qualstats_report( wf, MSG__NORM, SMF__QFAM_TSERIES, 1, qua[0],
-                                qcount_last, &nsamples, 1, &ntgood, &numdata,
-                                &exptime, status );
-          *totexp += exptime;
+            /* If PCA.COMFILL is non-zero, the PCA model makes use of COM and GAI
+               models internally. Create them now. Use the values in the "PCA.xxx"
+               config parameters rather than the "COM.xxx" parameters. */
+            if( modeltyps[imodel] != SMF__PCA ) {
+               int comfill;
+               astMapGet0A( keymap, "PCA", &kmap );
+               astMapGet0I( kmap, "COMFILL", &comfill );
+               if( comfill ) {
+                  pcacom = astCalloc( 1, sizeof(*pcacom) );
+                  smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
+                                    noisemaps, 1, SMF__COM, 0, NULL, 0, NULL, NULL,
+                                    NO_FTS, qua, NULL, pcacom, kmap, status );
 
-          /* If no good bolos left, set status */
-          if( (*status==SAI__OK) &&
-              (qcount_last[smf_qual_to_bit(SMF__Q_BADB,status)] >= numdata)) {
-            *status = SMF__INSMP;
-            errRep("", FUNC_NAME ": All bolos are bad", status );
-          }
-
-          /* Export the cleaned data here if desired */
-          if( exportclean ) {
-            msgOut( "", FUNC_NAME
-                    ": Writing out clean data prior to map-making.",
-                    status );
-
-            for( idx=0; idx<res[0]->ndat; idx++ ) {
-              int oldorder;
-              data = res[0]->sdata[idx];
-
-              /* create a file name with "_res_cln" suffix */
-              *name = 0;
-              if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
-              smf_stripsuffix( res[0]->sdata[idx]->file->name,
-                               SMF__DIMM_SUFFIX, name + strlen( name ), status );
-              one_strlcat( name, "_res_cln", sizeof(name), status );
-
-              /* Use the correct order */
-              oldorder = res[0]->sdata[idx]->isTordered;
-              smf_dataOrder( wf, res[0]->sdata[idx], 1, status );
-              smf_dataOrder( wf, qua[0]->sdata[idx], 1, status );
-
-              smf_write_smfData( wf, res[0]->sdata[idx], NULL,
-                                 name, NULL, 0, NDF__NOID,
-                                 MSG__VERB, 0, NULL, NULL, status );
-
-              /* Revert the order */
-              smf_dataOrder( wf, res[0]->sdata[idx], oldorder, status );
-              smf_dataOrder( wf, qua[0]->sdata[idx], oldorder, status );
+                  pcagai = astCalloc( 1, sizeof(*pcagai) );
+                  smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
+                                    noisemaps, 1, SMF__GAI, 0, NULL, 0, NULL, NULL,
+                                    NO_FTS, qua, NULL, pcagai, kmap, status );
+               }
+               kmap = astAnnul( kmap );
             }
           }
-        }
 
-        msgOut(" ",
-               FUNC_NAME ": Calculate time-stream model components",
-               status);
-
-        /* Call the model calculations in the desired order */
-        if( *status == SAI__OK ) {
-
-          /* If this is the first iteration just do all of the models up
-             to AST. Subsequent iterations start at the first model after
-             AST, and then loop back to the start */
-
-          if( iter == 0 ) {
-            l = 0;
-          } else {
-            l = whichast+1;
+          /* Associate quality with some models */
+          if( ( modeltyps[imodel] == SMF__FLT ||
+                modeltyps[imodel] == SMF__SSN ||
+                modeltyps[imodel] == SMF__PCA ) && *status == SAI__OK ) {
+            for( idx=0; idx<res[0]->ndat; idx++ ) {
+              smfData *thisqua = qua[0]->sdata[idx];
+              model[imodel][0]->sdata[idx]->sidequal = thisqua;
+            }
           }
 
-          for( k=l; (*status==SAI__OK)&&((k%nmodels)!=whichast); k++ ) {
-            /* Which model component are we on */
-            j = k%nmodels;
+        }
 
-            /* If this is the first model component and not the first
-               iteration, we need to undo some models (COM, GAI, EXT, FLT ).
-               Undo them in the reverse order to which they were done. */
 
-            if( (j==0) && !firstiter ) {
-              dim_t jj = whichast - 1;
-              while( jj != whichast ) {
 
-                if( jj == whichcom && havecom ) {
-                  msgOutiff( MSG__VERB, "",
-                             "  ** undoing COM from previous iteration",
-                             status );
-                  smf_calcmodel_com( wf, &dat, 0, keymap, model[whichcom],
-                                     SMF__DIMM_INVERT, status );
-                  msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                             ": ** %f s undoing COM",
-                             status, smf_timerupdate(&tv1,&tv2,status) );
 
-                } else if( jj == whichext && haveext ) {
-                  msgOutiff( MSG__VERB, "",
-                             "  ** undoing EXTinction from previous iteration",
-                             status );
-                  smf_calcmodel_ext( wf, &dat, 0, keymap, model[whichext],
-                                     SMF__DIMM_INVERT, status );
-                  msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                             ": ** %f s undoing EXT",
-                             status, smf_timerupdate(&tv1,&tv2,status) );
 
-                } else if( jj == whichgai && havegai ) {
-                  msgOutiff( MSG__VERB, "",
-                             "  ** undoing GAIn from previous iteration",
-                             status );
-                  smf_calcmodel_gai( wf, &dat, 0, keymap, model[whichgai],
-                                     SMF__DIMM_INVERT, status );
-                  msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                             ": ** %f s undoing GAI",
-                             status, smf_timerupdate(&tv1,&tv2,status) );
 
-                } else if( jj == whichflt && haveflt && flt_undofirst ) {
-                  msgOutiff( MSG__VERB, "",
-                             "  ** undoing FLT from previous iteration",
-                             status );
-                  smf_calcmodel_flt( wf, &dat, 0, keymap, model[whichflt],
-                                     SMF__DIMM_INVERT, status );
-                  msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                             ": ** %f s undoing FLT",
-                             status, smf_timerupdate(&tv1,&tv2,status) );
 
-                } else if( jj == whichssn && havessn ) {
-                  msgOutiff( MSG__VERB, "",
-                             "  ** undoing SSN from previous iteration",
-                             status );
-                  smf_calcmodel_ssn( wf, &dat, 0, keymap, model[whichssn],
-                                     SMF__DIMM_INVERT, status );
-                  msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                             ": ** %f s undoing SSN",
-                             status, smf_timerupdate(&tv1,&tv2,status) );
 
-                } else if( jj == whichpca && havepca ) {
-                  msgOutiff( MSG__VERB, "",
-                             "  ** undoing PCA from previous iteration",
-                             status );
-                  smf_calcmodel_pca( wf, &dat, 0, keymap, model[whichpca],
-                                     SMF__DIMM_INVERT, status );
-                  msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                             ": ** %f s undoing PCA",
-                             status, smf_timerupdate(&tv1,&tv2,status) );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      }
+
+      /*** TIMER ***/
+      msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME": ** %f s creating dynamic models",
+                 status, smf_timerupdate(&tv1,&tv2,status) );
+
+  #ifdef __ITERATEMAP_SHOW_MEM
+      _smf_iteratemap_showmem(status);
+  #endif
+
+      /* We initialize the structure even if status is bad to prevent
+         downstream problems when freeing resources. */
+      memset( &dat, 0, sizeof(dat) );
+
+      if( *status == SAI__OK ) {
+
+        /* Stuff pointers into smfDIMMData to pass around to model component
+           solvers */
+        dat.ast_skipped = 1;
+        dat.mapchange = VAL__MAXD;
+        dat.res = res;
+        dat.qua = qua;
+        dat.lut = lut;
+        dat.map = thismap;
+        dat.lastmap = lastmap;
+        dat.hitsmap = thishits;
+        dat.mapqual = thisqual;
+        dat.mapvar = thisvar;
+        dat.mapweight = thisweight;
+        dat.mapweightsq = thisweightsq;
+        dat.mapok = 0;
+        dat.mdims[0] = mdims[0];
+        dat.mdims[1] = mdims[1];
+        dat.msize = msize;
+        dat.outfset = outfset;
+        dat.lbnd_out = lbnd_out;
+        dat.ubnd_out = ubnd_out;
+        dat.chisquared = chisquared;
+        dat.pixsize = pixsize;
+        if( havenoi ) {
+          dat.noi = model[whichnoi];
+        } else {
+          dat.noi = NULL;
+        }
+        if( haveext ) {
+          dat.ext = model[whichext];
+        } else {
+          dat.ext = NULL;
+        }
+        if( havegai ) {
+          dat.gai = model[whichgai];
+        } else {
+          dat.gai = NULL;
+        }
+        if( havecom ) {
+          dat.com = model[whichcom];
+        } else {
+          dat.com = NULL;
+        }
+        if( havepca ) {
+          dat.pcacom = pcacom;
+          dat.pcagai = pcagai;
+        } else {
+          dat.pcacom = NULL;
+          dat.pcagai = NULL;
+        }
+        dat.poldata = ( !strcmp( res[0]->sdata[0]->hdr->dlabel, "Q" ) ||
+                        !strcmp( res[0]->sdata[0]->hdr->dlabel, "U" ) );
+
+        /* We can close noisemaps here because they will already have
+           been used to initialize the NOI model if needed. */
+
+        if( noisemaps ) smf_close_related( wf, &noisemaps, status );
+
+        /* Allow an initial guess at the sky brightness to be supplied, in
+           which case copy it into "thismap", sample it and subtract it from
+           the cleaned data. The initial guess is returned in "lastmap". */
+        importsky = smf_initial_sky( wf, keymap, &dat, chunkfactor, &itsdone,
+                                     status );
+
+        /* If an initial sky was imported, copy it into the "lastmap" array
+           so that we get a reasonable value for the normalised change in the
+           map at the end of the iteration. */
+        if( importsky && *status == SAI__OK ) memcpy( lastmap, dat.map,
+                                                      msize*sizeof(*lastmap) );
+
+        /* Do any required correction for instrumental polarisation. */
+        smf_subip( wf, &dat, keymap, &qui, status );
+
+        /* Return the NDF label for the output map. */
+        if( qui == VAL__BADI ) {
+           strcpy( data_label, "Flux Density" );
+        } else if( qui > 0 ) {
+           strcpy( data_label, "Q" );
+        } else if( qui < 0 ) {
+           strcpy( data_label, "U" );
+        } else {
+           strcpy( data_label, "I" );
+        }
+
+
+
+
+        /* ***********************************************************************
+           Start the main iteration loop.
+
+           At this stage the full pointing solution for the data in this
+           continuous chunk has been calculated, and all of the model
+           containers have been created. This loop stops either if chi^2
+           has converged, or we did the requested number of iterations,
+           for this continuous chunk.
+        *********************************************************************** */
+
+        /* Initialize quit to -1. Once one of the stopping criterion have
+           been met set to 0 and do one final loop, then set to 1 at the
+           end of the last loop to exit. If an initial sky was supplied
+           that was created by a previous interupted run of makemap, we
+           start counting iterations from where the previous run of makemap
+           left off.  */
+        quit = -1;
+        iter = ( itsdone == -1 ) ? 0 : itsdone;
+
+        /* The NOI model has not been calculated yet. */
+        noidone = 0;
+
+        /* The mean mapchange for the previous two iterations. */
+        mapchange_l2 = mapchange_l3 = VAL__BADD;
+        rate_limited = 0;
+
+        /* The "iter" variable counts how many iterations have been done in
+           total, including any from a previous run of makemap if an initial sky
+           image was given that was generated by makemap. We also need a
+           flag which indicates if this is the first iteration, ignoring
+           any such previous iterations. */
+        firstiter = 1;
+
+        while( quit < 1 ) {
+          msgSeti("ITER", iter+1);
+          msgSeti("MAXITER", maxiter);
+          msgOut(" ",
+                 FUNC_NAME ": Iteration ^ITER / ^MAXITER ---------------",
+                 status);
+
+          /* If we have reached the last possible iteration, we will quit
+             after this iteration. */
+          if( iter + 1 >= maxiter ) quit = 0;
+
+          /* Assume we've converged until we find a filegroup that hasn't.
+  	   On the last iteration (quit==0) leave the converged flag
+             unchanged (without this, converged ends up as 1 even if we
+             hit the iteration limit). */
+          if( quit < 0 ) {
+             if( iter > 0 ) {
+               converged = 1;
+             } else {
+               converged = 0;
+             }
+          }
+
+          /* Some models (e.g. AST) need to know the iteration number, so
+             store it now. */
+          dat.iter = iter;
+
+          /* Indicate that we are allowed to converge on this iteration.
+             Other functions may set this flag to zero to prevent convergence
+             being reached on this iteration. For instance, see msf_get_mask. */
+          dat.allow_convergence = 1;
+
+
+
+
+          /* *********************************************************************
+             Start the calculation of all the model components up to AST
+             (including models that follow AST in modelorder, and then wrapping
+             back around to the beginning).
+          ********************************************************************* */
+
+
+          /* If first iteration report on initial stats and write out
+             cleaned data if requested. */
+          if( iter == 0 ) {
+
+            /* initial quality report */
+            smf_qualstats_report( wf, MSG__NORM, SMF__QFAM_TSERIES, 1, qua[0],
+                                  qcount_last, &nsamples, 1, &ntgood, &numdata,
+                                  &exptime, status );
+            *totexp += exptime;
+
+            /* If no good bolos left, set status */
+            if( (*status==SAI__OK) &&
+                (qcount_last[smf_qual_to_bit(SMF__Q_BADB,status)] >= numdata)) {
+              *status = SMF__INSMP;
+              errRep("", FUNC_NAME ": All bolos are bad", status );
+            }
+
+            /* Export the cleaned data here if desired */
+            if( exportclean ) {
+              msgOut( "", FUNC_NAME
+                      ": Writing out clean data prior to map-making.",
+                      status );
+
+              for( idx=0; idx<res[0]->ndat; idx++ ) {
+                int oldorder;
+                data = res[0]->sdata[idx];
+
+                /* create a file name with "_res_cln" suffix */
+                *name = 0;
+                if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
+                smf_stripsuffix( res[0]->sdata[idx]->file->name,
+                                 SMF__DIMM_SUFFIX, name + strlen( name ), status );
+                one_strlcat( name, "_res_cln", sizeof(name), status );
+
+                /* Use the correct order */
+                oldorder = res[0]->sdata[idx]->isTordered;
+                smf_dataOrder( wf, res[0]->sdata[idx], 1, status );
+                smf_dataOrder( wf, qua[0]->sdata[idx], 1, status );
+
+                smf_write_smfData( wf, res[0]->sdata[idx], NULL,
+                                   name, NULL, 0, NDF__NOID,
+                                   MSG__VERB, 0, NULL, NULL, status );
+
+                /* Revert the order */
+                smf_dataOrder( wf, res[0]->sdata[idx], oldorder, status );
+                smf_dataOrder( wf, qua[0]->sdata[idx], oldorder, status );
+              }
+            }
+          }
+
+          msgOut(" ",
+                 FUNC_NAME ": Calculate time-stream model components",
+                 status);
+
+          /* Call the model calculations in the desired order */
+          if( *status == SAI__OK ) {
+
+            /* If this is the first iteration just do all of the models up
+               to AST. Subsequent iterations start at the first model after
+               AST, and then loop back to the start */
+
+            if( iter == 0 ) {
+              l = 0;
+            } else {
+              l = whichast+1;
+            }
+
+            for( k=l; (*status==SAI__OK)&&((k%nmodels)!=whichast); k++ ) {
+              /* Which model component are we on */
+              j = k%nmodels;
+
+              /* If this is the first model component and not the first
+                 iteration, we need to undo some models (COM, GAI, EXT, FLT ).
+                 Undo them in the reverse order to which they were done. */
+
+              if( (j==0) && !firstiter ) {
+                dim_t jj = whichast - 1;
+                while( jj != whichast ) {
+
+                  if( jj == whichcom && havecom ) {
+                    msgOutiff( MSG__VERB, "",
+                               "  ** undoing COM from previous iteration",
+                               status );
+                    smf_calcmodel_com( wf, &dat, 0, keymap, model[whichcom],
+                                       SMF__DIMM_INVERT, status );
+                    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                               ": ** %f s undoing COM",
+                               status, smf_timerupdate(&tv1,&tv2,status) );
+
+                  } else if( jj == whichext && haveext ) {
+                    msgOutiff( MSG__VERB, "",
+                               "  ** undoing EXTinction from previous iteration",
+                               status );
+                    smf_calcmodel_ext( wf, &dat, 0, keymap, model[whichext],
+                                       SMF__DIMM_INVERT, status );
+                    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                               ": ** %f s undoing EXT",
+                               status, smf_timerupdate(&tv1,&tv2,status) );
+
+                  } else if( jj == whichgai && havegai ) {
+                    msgOutiff( MSG__VERB, "",
+                               "  ** undoing GAIn from previous iteration",
+                               status );
+                    smf_calcmodel_gai( wf, &dat, 0, keymap, model[whichgai],
+                                       SMF__DIMM_INVERT, status );
+                    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                               ": ** %f s undoing GAI",
+                               status, smf_timerupdate(&tv1,&tv2,status) );
+
+                  } else if( jj == whichflt && haveflt && flt_undofirst ) {
+                    msgOutiff( MSG__VERB, "",
+                               "  ** undoing FLT from previous iteration",
+                               status );
+                    smf_calcmodel_flt( wf, &dat, 0, keymap, model[whichflt],
+                                       SMF__DIMM_INVERT, status );
+                    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                               ": ** %f s undoing FLT",
+                               status, smf_timerupdate(&tv1,&tv2,status) );
+
+                  } else if( jj == whichssn && havessn ) {
+                    msgOutiff( MSG__VERB, "",
+                               "  ** undoing SSN from previous iteration",
+                               status );
+                    smf_calcmodel_ssn( wf, &dat, 0, keymap, model[whichssn],
+                                       SMF__DIMM_INVERT, status );
+                    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                               ": ** %f s undoing SSN",
+                               status, smf_timerupdate(&tv1,&tv2,status) );
+
+                  } else if( jj == whichpca && havepca ) {
+                    msgOutiff( MSG__VERB, "",
+                               "  ** undoing PCA from previous iteration",
+                               status );
+                    smf_calcmodel_pca( wf, &dat, 0, keymap, model[whichpca],
+                                       SMF__DIMM_INVERT, status );
+                    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                               ": ** %f s undoing PCA",
+                               status, smf_timerupdate(&tv1,&tv2,status) );
+                  }
+
+                  if( jj <= 0 ) {
+                    jj = nmodels - 1;
+                  } else {
+                    jj--;
+                  }
+
+                }
+              }
+
+              /* Message stating which model we're in */
+              msgSetc("MNAME", smf_model_getname(modeltyps[j],status));
+              msgOutif(MSG__VERB," ", "  ^MNAME", status);
+              modelptr = smf_model_getptr( modeltyps[j], status );
+
+              /* Set up control flags for the model calculation */
+              dimmflags = 0;
+
+              if( iter==0 ) dimmflags |= SMF__DIMM_FIRSTITER;
+
+              if( (iter==1) && (j>whichast) ) {
+                /* In the case that AST is not the last model component,
+                   the last models will not be calculated for the first time
+                   until the start of the second iteration. */
+                dimmflags |= SMF__DIMM_FIRSTITER;
+              }
+              if( quit == 0 ) dimmflags |= SMF__DIMM_LASTITER;
+
+              if( *status == SAI__OK ) {
+
+                /* Before subtraction of the model, dump the original
+                   residuals. */
+                smf_diagnostics( wf, 0, &dat, contchunk, keymap, model[j],
+                                 modeltyps[j], dimmflags, chunkfactor, status );
+
+                /* Estimate the new model and subtract it from the residuals. */
+                (*modelptr)( wf, &dat, 0, keymap, model[j], dimmflags, status );
+
+                /* After subtraction of the model, dump the model itself
+                   and the modified residuals. */
+                smf_diagnostics( wf, 1, &dat, contchunk, keymap, model[j],
+                                 modeltyps[j], dimmflags, chunkfactor, status );
+
+                /* Set a flag if we now have a NOI model. */
+                if( modeltyps[j] == SMF__NOI ) noidone = 1;
+
+              }
+
+              /*** TIMER ***/
+              msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                         ": ** %f s calculating model %s",
+                         status, smf_timerupdate(&tv1,&tv2,status),
+                         smf_model_getname(modeltyps[j], status) );
+
+  #ifdef __ITERATEMAP_SHOW_MEM
+              _smf_iteratemap_showmem(status);
+  #endif
+            }
+          }
+
+          /* Once all the other model components have been calculated put the
+             previous iteration of AST back into the residual. Note that
+             even though we've moved signals out from the time streams into
+             the map we don't zero AST here so that we can see how much it
+             has changed within smf_calcmodel_ast. */
+
+          msgOut(" ", FUNC_NAME ": Rebin residual to estimate MAP",
+                 status);
+
+          if( *status == SAI__OK ) {
+
+            /* Ensure we use the RES model ordering */
+            smf_model_dataOrder( wf, &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
+                                 res[0]->sdata[0]->isTordered, status );
+
+            /* Loop over subgroup index (subarray), placing last map
+               estimate (AST) into RES. */
+            for( idx=0; idx<res[0]->ndat; idx++ ) {
+
+              res_data = (res[0]->sdata[idx]->pntr)[0];
+              lut_data = (lut[0]->sdata[idx]->pntr)[0];
+              qua_data = (qua[0]->sdata[idx]->pntr)[0];
+
+              smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL,
+                            &dsize, NULL, NULL, status );
+
+              /* Set up jobs to add last iter. of astronomical signal back in
+                 to residual. Note that if this is the first iteration we do
+                 not yet have a map estimate so we skip this step (in multiple
+                 chunk case thismap will still contain the old map from
+                 the previous chunk). Ignore map pixels that have been
+                 constrained to zero. We also skip this bit if the
+                 subtraction of AST was skipped on the previous invocation
+                 of smf_calcmodel_ast. */
+              if( ( iter > 0 || importsky ) && !dat.ast_skipped ) {
+
+                /* First find how many samples to process in each worker thread. */
+                size_t sampstep = dsize/nw;
+                if( sampstep == 0 ) sampstep = 1;
+
+                /* Store the range of samples to be processed by each thread.
+                   Ensure that the last thread picks up any left-over samples. */
+                for( iw = 0; iw < nw; iw++ ) {
+                  pdata = job_data + iw;
+                  pdata->d1 = iw*sampstep;
+                  if( iw < nw - 1 ) {
+                    pdata->d2 = pdata->d1 + sampstep - 1;
+                  } else {
+                    pdata->d2 = dsize - 1 ;
+                  }
+
+                  /* Store other values common to all jobs. */
+                  pdata->qua_data = qua_data;
+                  pdata->res_data = res_data;
+                  pdata->lut_data = lut_data;
+                  pdata->thismap = thismap;
+                  pdata->thisqual = thisqual;
+                  pdata->chunkfactor = chunkfactor;
+                  pdata->operation = 1;
+
+                  /* Submit the job to the workforce. */
+                  thrAddJob( wf, 0, pdata, smf1_iteratemap, 0, NULL, status );
                 }
 
-                if( jj <= 0 ) {
-                  jj = nmodels - 1;
-                } else {
-                  jj--;
-                }
-
+                /* Wait for all jobs to complete. */
+                thrWait( wf, status );
               }
             }
 
-            /* Message stating which model we're in */
-            msgSetc("MNAME", smf_model_getname(modeltyps[j],status));
-            msgOutif(MSG__VERB," ", "  ^MNAME", status);
-            modelptr = smf_model_getptr( modeltyps[j], status );
-
-            /* Set up control flags for the model calculation */
-            dimmflags = 0;
-
-            if( iter==0 ) dimmflags |= SMF__DIMM_FIRSTITER;
-
-            if( (iter==1) && (j>whichast) ) {
-              /* In the case that AST is not the last model component,
-                 the last models will not be calculated for the first time
-                 until the start of the second iteration. */
-              dimmflags |= SMF__DIMM_FIRSTITER;
+            /* See if the map variances calculated on the previous iteration
+               should be retained. This is the case if we are doing the
+               last iteration, the FLT model is being used and a different
+               FLT filter has been used for this iteration. */
+            reuse_var = 0;
+            if( quit == 0 && haveflt && astMapGet0A( keymap, "FLT", &kmap ) ) {
+               double val, lastval;
+               astMapGet0D( kmap, "FILT_EDGE_LARGESCALE", &val );
+               lastval = val;
+               astMapGet0D( kmap, "FILT_EDGE_LARGESCALE_LAST", &lastval );
+               if( val != lastval ) {
+                  reuse_var = 1;
+                  msgOutif( MSG__VERB, "", FUNC_NAME
+                            ": FLT.FILT_EDGE_LARGESCALE_LAST is set so the "
+                            "map variances from the penultimate iteration "
+                            "will be returned.", status );
+               }
+               kmap = astAnnul( kmap );
             }
-            if( quit == 0 ) dimmflags |= SMF__DIMM_LASTITER;
 
-            if( *status == SAI__OK ) {
+            /* Loop over subgroup index (subarray) again. This time rebin and
+               calculate the new map. */
+            for( idx=0; idx<res[0]->ndat; idx++ ) {
 
-              /* Before subtraction of the model, dump the original
-                 residuals. */
-              smf_diagnostics( wf, 0, &dat, contchunk, keymap, model[j],
-                               modeltyps[j], dimmflags, chunkfactor, status );
+              res_data = (res[0]->sdata[idx]->pntr)[0];
+              lut_data = (lut[0]->sdata[idx]->pntr)[0];
+              qua_data = (qua[0]->sdata[idx]->pntr)[0];
 
-              /* Estimate the new model and subtract it from the residuals. */
-              (*modelptr)( wf, &dat, 0, keymap, model[j], dimmflags, status );
+              smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL,
+                            &dsize, NULL, NULL, status );
 
-              /* After subtraction of the model, dump the model itself
-                 and the modified residuals. */
-              smf_diagnostics( wf, 1, &dat, contchunk, keymap, model[j],
-                               modeltyps[j], dimmflags, chunkfactor, status );
+              /* Setup rebin flags */
+              rebinflags = 0;
+              if( idx == 0 ) {
+                /* First call to rebin clears the arrays */
+                rebinflags = rebinflags | AST__REBININIT;
+              }
 
-              /* Set a flag if we now have a NOI model. */
-              if( modeltyps[j] == SMF__NOI ) noidone = 1;
+              if( idx == res[0]->ndat-1 ) {
+                /* Final call to rebin re-normalizes */
+                rebinflags = rebinflags | AST__REBINEND;
+              }
 
+              /* Rebin the residual + astronomical signal into a map */
+              smf_rebinmap1( ( mw > 1 ) ? wf : NULL, res[0]->sdata[idx],
+                             dat.noi ? dat.noi[0]->sdata[idx] : NULL,
+                             lut_data, 0, 0, 0, NULL, 0, SMF__Q_GOOD,
+                             varmapmethod, rebinflags, thismap, thisweight,
+                             thisweightsq, thishits, reuse_var ? NULL : thisvar,
+                             msize, chunkfactor, &scalevar, status );
             }
+
+            /* Indicate the map arrays within the supplied smfDIMMData
+               structure now contain usable values. */
+            dat.mapok = 1;
 
             /*** TIMER ***/
             msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                       ": ** %f s calculating model %s",
-                       status, smf_timerupdate(&tv1,&tv2,status),
-                       smf_model_getname(modeltyps[j], status) );
+                       ": ** %f s rebinning map",
+                       status, smf_timerupdate(&tv1,&tv2,status) );
 
-#ifdef __ITERATEMAP_SHOW_MEM
-            _smf_iteratemap_showmem(status);
-#endif
-          }
-        }
+            /* If required, modify the map to remove low frequencies changes
+               between the new map and the old map. We do not do this if
+               the AST model was skipped on the previous iteration. */
+            if( ast_filt_diff > 0.0 && !dat.ast_skipped ) {
 
-        /* Once all the other model components have been calculated put the
-           previous iteration of AST back into the residual. Note that
-           even though we've moved signals out from the time streams into
-           the map we don't zero AST here so that we can see how much it
-           has changed within smf_calcmodel_ast. */
+               /* Can only do this if we have a map from the previous
+                  iteration (i.e. this is not the first iter). */
+               if( importsky || iter > 1 ) {
 
-        msgOut(" ", FUNC_NAME ": Rebin residual to estimate MAP",
-               status);
+                  /* Do not do it on the final iteration since we want the
+                     final map to contain all the residual flux. If run
+                     from skyloop (as indicated by numiter being 1), we
+                     always defer this until after the full map has been
+                     made from all chunks.  */
+                  if( quit == -1 && abs( numiter ) > 1 ) {
+                     smf_filter_mapchange( wf, &dat, ast_filt_diff, status );
+                  }
+               }
+            }
 
-        if( *status == SAI__OK ) {
+            /* If required, subtract an external error map from the map
+               created above. */
+            if( emapdata && !dat.ast_skipped ) {
+                double *p1 = thismap;
+                double *p2 = lastmap;
 
-          /* Ensure we use the RES model ordering */
-          smf_model_dataOrder( wf, &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
-                               res[0]->sdata[0]->isTordered, status );
-
-          /* Loop over subgroup index (subarray), placing last map
-             estimate (AST) into RES. */
-          for( idx=0; idx<res[0]->ndat; idx++ ) {
-
-            res_data = (res[0]->sdata[idx]->pntr)[0];
-            lut_data = (lut[0]->sdata[idx]->pntr)[0];
-            qua_data = (qua[0]->sdata[idx]->pntr)[0];
-
-            smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL,
-                          &dsize, NULL, NULL, status );
-
-            /* Set up jobs to add last iter. of astronomical signal back in
-               to residual. Note that if this is the first iteration we do
-               not yet have a map estimate so we skip this step (in multiple
-               chunk case thismap will still contain the old map from
-               the previous chunk). Ignore map pixels that have been
-               constrained to zero. We also skip this bit if the
-               subtraction of AST was skipped on the previous invocation
-               of smf_calcmodel_ast. */
-            if( ( iter > 0 || importsky ) && !dat.ast_skipped ) {
-
-              /* First find how many samples to process in each worker thread. */
-              size_t sampstep = dsize/nw;
-              if( sampstep == 0 ) sampstep = 1;
-
-              /* Store the range of samples to be processed by each thread.
-                 Ensure that the last thread picks up any left-over samples. */
-              for( iw = 0; iw < nw; iw++ ) {
-                pdata = job_data + iw;
-                pdata->d1 = iw*sampstep;
-                if( iw < nw - 1 ) {
-                  pdata->d2 = pdata->d1 + sampstep - 1;
-                } else {
-                  pdata->d2 = dsize - 1 ;
+                p1 = thismap;
+                p2 = emapdata;
+                for( ipix = 0; ipix < msize; ipix++,p1++,p2++ ) {
+                  if( *p1 != VAL__BADD && *p2 != VAL__BADD ) {
+                    *p1 -= *p2;
+                  } else {
+                    *p1 = VAL__BADD;
+                  }
                 }
 
-                /* Store other values common to all jobs. */
-                pdata->qua_data = qua_data;
-                pdata->res_data = res_data;
-                pdata->lut_data = lut_data;
-                pdata->thismap = thismap;
-                pdata->thisqual = thisqual;
-                pdata->chunkfactor = chunkfactor;
-                pdata->operation = 1;
+                msgOutf( "", FUNC_NAME ": subtracted external error map `%s'", status, epsin );
+            }
+
+            /* Replace the map with a linear combination of the original map
+              and the map from the previous iteration. This may help to
+              damp oscillations in the map from iteration to iteration. */
+            if( iter > 1 ) {
+              double maplag = 0.0;
+              astMapGet0D( keymap, "MAPLAG", &maplag );
+              if( iter > 1 && maplag != 0.0 ) {
+                double *p1 = thismap;
+                double *p2 = lastmap;
+                double w1 = 1.0 - maplag;
+                for( ipix = 0; ipix < msize; ipix++,p1++,p2++ ) {
+                  if( *p1 != VAL__BADD && *p2 != VAL__BADD ) {
+                     *p1 = w1*( *p1 ) + maplag*( *p2 );
+                  }
+                }
+              }
+            }
+          }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          /* *********************************************************************
+             Calculate the AST model component and check map convergence
+
+             When we get here we have calculated all of the model
+             components up to, but not including AST (for all
+             filegroups). In addition, the previous iteration of AST has
+             been placed back into the residual, and a map has been
+             estimated. So, we are now in a position to take the current
+             estimate of the map and project it back into the time
+             domain to estimate the new AST. Finally, we look at the
+             change in chisquared and we compare the current map with
+             that of the previous iteration as a convergence tests.
+          ********************************************************************* */
+          if( *status == SAI__OK ) {
+            msgOut(" ", FUNC_NAME ": Calculate ast", status);
+
+            /* Calculate the AST model component. It is a special model
+               because it assumes that the map contains the best current
+               estimate of the astronomical sky. It gets called in this
+               separate loop since the map estimate gets updated by
+               each filegroup in the main model component loop */
+
+            dimmflags=0;
+            if( iter == 0 ) dimmflags |= SMF__DIMM_FIRSTITER;
+            if( quit == 0 ) dimmflags |= SMF__DIMM_LASTITER;
+
+
+            /* Before subtraction of the model, dump the original
+               residuals. */
+            smf_diagnostics( wf, 0, &dat, contchunk, keymap, NULL,
+                             SMF__AST, dimmflags, chunkfactor, status );
+
+            /* Remember if no AST model was subtracted from the
+               previous iteration. The dat.ast_skipped flag is updated
+               within smf_calcmodel_ast, so we store its current value
+               now, before it is changed. It is used to decide on
+               convergence. But if all iterations are being skipped
+               we leave it set to zero to prevent it influencing the
+               termination critirion. */
+            if( ast_skip > 0 ) last_skipped = dat.ast_skipped;
+
+            /* Estimate the AST model and subtract from the residuals. */
+            smf_calcmodel_ast( wf, &dat, 0, keymap, NULL, dimmflags,
+                               chunkfactor, status );
+
+            /*** TIMER ***/
+            msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                       ": ** %f s calculating AST",
+                       status, smf_timerupdate(&tv1,&tv2,status) );
+
+            /* If storing each iteration in an extension do it here if this
+               was the last filegroup of data to be added */
+
+            if( itermap > 0 ) {
+              smf_write_itermap( wf, thismap, thisvar,
+                                 ( itermap > 1 ) ? thisqual : NULL, msize,
+                                 iterrootgrp, contchunk, iter, lbnd_out,
+                                 ubnd_out, outfset, res[0]->sdata[0]->hdr,
+                                 qua[0], status );
+
+              /*** TIMER ***/
+              msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                         ": ** %f s writing itermap",
+                         status, smf_timerupdate(&tv1,&tv2,status) );
+            }
+
+            /* After subtraction of the model, dump the model itself
+               and the modified residuals. */
+            smf_diagnostics( wf, 1, &dat, contchunk, keymap, NULL,
+                             SMF__AST, dimmflags, chunkfactor, status );
+
+
+            /* And dump RES as a model in its own right. */
+            smf_diagnostics( wf, 1, &dat, contchunk, keymap, NULL,
+                             SMF__RES, dimmflags,  chunkfactor, status );
+
+
+  #ifdef __ITERATEMAP_SHOW_MEM
+              _smf_iteratemap_showmem(status);
+  #endif
+
+            /* report on the quality flags for this iterations before closing
+             the quality */
+            smf_qualstats_report( wf, MSG__NORM, SMF__QFAM_TSERIES, 1, qua[0],
+                                  qcount_last, &nsamples, 0, &ntgood, &numdata,
+                                  NULL, status );
+
+            /* If no good bolos left, set status */
+            if( (*status==SAI__OK) &&
+                (qcount_last[smf_qual_to_bit(SMF__Q_BADB, status)] >= numdata)){
+              *status = SMF__INSMP;
+              errRep("", FUNC_NAME ": All bolos are bad", status );
+            }
+
+            /* Check for consistency between quality and data arrays */
+            for( idx=0; (*status==SAI__OK)&&(idx<res[0]->ndat); idx++ ) {
+              size_t nbad;
+              nbad = smf_check_quality( wf, res[0]->sdata[idx], 0, status );
+              if( nbad ) {
+                msgOut( "", FUNC_NAME ": *** Possible programming error! ***",
+                        status );
+                msgOutf( "", FUNC_NAME ": %zu QUALITY/DATA inconsistencies "
+                         "subarray %zu", status, nbad, idx );
+                msgOut( "", FUNC_NAME ": ***********************************",
+                        status );
+              }
+            }
+
+            /* If NOI was present, we now have an estimate of chisquared */
+            if( (*status==SAI__OK) && chisquared ) {
+
+              if( (iter==0) && (whichnoi>whichast) ) {
+                /* If NOI comes after AST in MODELORDER we can't check chi^2 or
+                   convergence until next iteration. */
+                msgOut( "",
+                        FUNC_NAME ": Will calculate chi^2 next iteration",
+                        status );
+              } else {
+                msgSetd("CHISQ",chisquared[0]);
+                msgOut( " ",
+                        FUNC_NAME ": *** CHISQUARED = ^CHISQ", status);
+
+                if( ((iter > 0)&&(whichnoi<whichast)) ||
+                    ((iter > 1)&&(whichnoi>whichast)) ) {
+                  /* Again, we have to check if NOI was calculated at least
+                     twice, which depends on NOI and AST in MODELORDER */
+
+                  double chidiff;   /* temporary variable to store diff */
+
+                  chidiff = chisquared[0]-lastchisquared[0];
+
+                  msgSetd("DIFF", chidiff);
+                  msgOut( " ",
+                          FUNC_NAME ": *** change: ^DIFF", status );
+
+                  if( chidiff > 0 ) {
+                    msgOut( " ", FUNC_NAME
+                            ": ****** WARNING! CHISQUARED Increased ******",
+                            status );
+                  }
+
+                  /* Check for the chi^2 stopping criterion */
+                  if( untilconverge && (chitol!=VAL__BADD) ) {
+                    if( (chidiff > 0) || (-chidiff > chitol) ) {
+                      /* Found a chunk that isn't converged yet */
+                      converged=0;
+                    }
+                  }
+
+                  /* If the AST model was skipped on the previous iteration,
+                     we have not converged yet. */
+                  if( untilconverge && last_skipped ) converged=0;
+
+                } else {
+                  /* Can't converge until at least 2 consecutive chi^2... */
+                  converged=0;
+                }
+
+                /* Update lastchisquared */
+                lastchisquared[0] = chisquared[0];
+
+              }
+            }
+          }
+
+          /* Calculate the absolute difference between the previous and
+             current map pixels normalized by the map standard
+             deviations. Once we're done, update lastmap to the current
+             map. Ignore bad and zero-constrained pixels. */
+
+          if( *status == SAI__OK ) {
+            int maptol_nhitslim;
+            double *usemap;
+
+            /* Pixels with very low hits will have unreliable variances. So
+               exclude pixels with hits below "hitslim" times the mean from
+               the mapchange estimate. The "hitslim" value is used when to
+               set pixels bad in the final map.  The "maptol_hits" value
+               is used to determine which pixels to include in the map change
+               estimater.  */
+            nhitslim = 0;
+            maptol_nhitslim = 0;
+
+            if( hitslim > 0.0 || maptol_hits > 0.0 ) {
+              double meanhits;
+              int *ph = thishits;
+              int ngood = 0;
+              nhitslim = 0;
+              for( ipix = 0; ipix < msize; ipix++,ph++ ) {
+                 if( *ph > 0 ) {
+                    nhitslim += *ph;
+                    ngood++;
+                 }
+              }
+              meanhits = ((double)nhitslim)/ngood;
+              if(  hitslim > 0.0 ) nhitslim = hitslim*meanhits;
+              if(  maptol_hits > 0.0 ) maptol_nhitslim = maptol_hits*meanhits;
+            }
+
+            /* If we will be dumping the final error map, we need to retain
+               copies of the three most recent difference maps. "epsbuf3"
+               currently holds the most recent difference map, so copy it to
+               epsbuf1 or epsbuf2 (which ever is oldest) before changing
+               its contents. */
+            if( epsout ) memcpy( ( iter % 2 == 0 ) ? epsbuf1 : epsbuf2,
+                                 epsbuf3, msize*sizeof(*epsbuf3) );
+
+            mapchange_max = 0;
+            for( ipix = 0; ipix < msize; ipix++ ) {
+
+              if( thismap[ipix] != VAL__BADD && lastmap[ipix] != VAL__BADD ) {
+                double vdiff = thismap[ipix] - lastmap[ipix];
+                if( epsout) epsbuf3[ipix] = vdiff;
+
+                if( !(thisqual[ipix]&maptol_mask) && (thisvar[ipix] != VAL__BADD)
+                    && (thisvar[ipix] > 0) && (thishits[ipix] > maptol_nhitslim) ) {
+                  mapchange[ipix] = fabs( vdiff ) / sqrt(thisvar[ipix]);
+
+                  /* Update max */
+                  if( mapchange[ipix] > mapchange_max ) mapchange_max = mapchange[ipix];
+                } else {
+                  mapchange[ipix] = VAL__BADD;
+                }
+
+              } else {
+                mapchange[ipix] = VAL__BADD;
+                if( epsout ) epsbuf3[ipix] = VAL__BADD;
+              }
+            }
+
+            /* If required, smooth the map change array using a box filter
+               of size specified by MAPTOL_BOX. */
+            if( maptol_box > 1.0 ) {
+               dim_t ibox = (dim_t)( maptol_box + 0.5 );
+               msgOutiff( MSG__VERB, "", FUNC_NAME ":     Smoothing map change "
+                          "using a box filter of %zu pixels.", status, ibox );
+
+               usemap = smf_tophat2( wf, mapchange, mdims, ibox, 0, 0.0, 1, status );
+
+               /* Calculate the max of the smoothed map change values. */
+               mapchange_max = 0;
+               int maxat = -1;
+               for( ipix = 0; ipix < msize; ipix++ ) {
+                  if( usemap[ipix] != VAL__BADD ){
+                     if( usemap[ipix] > mapchange_max ) {
+                        mapchange_max = usemap[ipix];
+                        maxat = ipix;
+                     }
+                  }
+               }
+
+               msgOutiff( MSG__VERB, "", FUNC_NAME ":     Maximum map change is "
+                          "at pixel (%d,%d).", status,
+                          ( maxat % (int)mdims[0] ) + lbnd_out[0],
+                          ( maxat / (int)mdims[0] ) + lbnd_out[1] );
+
+            } else {
+               usemap = mapchange;
+            }
+
+            /* Calculate the mean map change */
+            smf_stats1D( usemap, 1, msize, NULL, 0, 0, &mapchange_mean, NULL,
+                         NULL, NULL, status );
+
+            /* Free the smoothed array, if it exists. */
+            if( usemap != mapchange ) usemap = astFree( usemap );
+
+            /* If there were insufficient samples in the masked area, then
+               just annul the error since it just means that there are no
+               bright sources in the map. */
+            if( *status == SMF__INSMP ) {
+               errAnnul( status );
+               mapchange_mean = 0.0;
+               mapchange_max = 0.0;
+
+               if( quit < 0 ) {
+                  msgOut( "", FUNC_NAME ": *** No source pixels found", status );
+
+               /* There is almost no point in doing any more iterations, since
+                  the AST model is zero and so we'll get exactly the same map
+                  on subsequent iterations. But it may be that a different
+                  set of config parameters have been specified for the final
+                  iteration (the "xxx_LAST" parameters), so we do one more
+                  in order to ensure these parameters are used. Setting
+                  mapchange_xxx to zero above will cause the following code
+                  to think that convergence has been achieved and will so
+                  trigger a final iteration. */
+                  msgOutif( MSG__VERB, "", FUNC_NAME ":     Doing one more iteration "
+                            "to use any '..._LAST' config parameter values", status );
+               }
+               last_skipped = 0;
+               converged = 1;
+
+            }
+
+            msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                       ": ** %f s calculating change in the map",
+                       status, smf_timerupdate(&tv1,&tv2,status) );
+
+            msgOutf( "", FUNC_NAME ": *** NORMALIZED MAP CHANGE: %lg (mean) "
+                     "%lg (max)", status, mapchange_mean, mapchange_max );
+            tol = maptol_mean ? mapchange_mean : mapchange_max;
+            dat.mapchange = tol;
+
+            /* Check for the map change stopping criterion. Do not modify
+               the converged flag on the extra iteration that is done after
+               convergence has been reached (i.e. when quit=0).  We do not
+               allow convergence to be reached until we have done at least
+               one iteration in which the AST model was not skipped. */
+
+            if( untilconverge &&
+              ( ( (maptol!=VAL__BADD) && (tol > maptol) ) ||
+                  last_skipped ) && quit == -1 ) {
+              /* Map hasn't converged yet */
+              converged=0;
+            }
+
+            /* If required, make an estimate of the iteration number at
+               which convergence will occur, and if this number exceeds the
+               maximum  number of iterations allowed, set "*abortedat"
+               non-zero and set "quit" to 1 to indicate that we should leave
+               the iteration loop immediately. */
+            if( abortsoon && abortedat ) {
+               smf_check_convergence( &dat, maxiter, maptol, abortedat, status );
+               if( *abortedat ) quit = 1;
+            }
+
+            /* Do not allow the loop to leave until the conditions required
+               for convergence by other functions are all met. For instance,
+               see smf_get_mask. */
+            if( converged && !dat.allow_convergence ) converged=0;
+
+            /* If we are currently in the initial ast.skip iterations, and
+               the map has more or less stopped changing (i.e. the change
+               between the previous two maps was less than maptol), then
+               there is little point in wasting time doing further ast.skip
+               iterations (since the map is not changing). So we can jump
+               forward to the end of the ast.skip phase, and start on the
+               real iterations. */
+            if( ast_skip > 0 && iter < ast_skip - 1 &&
+                maptol != VAL__BADD && tol < maptol ) {
+               msgOutiff( MSG__DEBUG, "", "The map change has dropped below "
+                          "MAPTOL, so jumping now to iteration %d (the first "
+                          "iteration to subtract the AST model).", status,
+                          ast_skip );
+               iter = ast_skip - 1;
+            }
+
+
+            /* if the mean mapchange becomes constant, we'll never get to
+               convergence, so quit. */
+            if( !last_skipped && maptol_rate != VAL__BADD && mapchange_l3 != VAL__BADD ) {
+               double mmc = ( mapchange_mean + mapchange_l2 + mapchange_l3 )/3;
+               double mclim = maptol_rate*mmc;
+               if( fabs( mapchange_mean - mmc ) < mclim &&
+                   fabs( mapchange_l2 - mmc ) < mclim &&
+                   fabs( mapchange_l3 - mmc ) < mclim ) {
+                  msgOutf( "", FUNC_NAME ": *** Normalised map change has "
+                           "not changed significantly over the previous 3 "
+                           "iterations - quiting immediately.", status );
+                  quit = 1;
+                  rate_limited = 1;
+               }
+            }
+            mapchange_l3 = mapchange_l2;
+            mapchange_l2 = mapchange_mean;
+          }
+
+          /* Increment iteration counter */
+          iter++;
+          firstiter = 0;
+
+          if( *status == SAI__OK ) {
+
+            /* If quit was set to 0 last time through we can now exit the
+               loop */
+            if( quit == 0 ) {
+              quit = 1;
+            } else if( quit < 0 ){
+              /* Check that we will exceed maxiter next time through */
+              if( iter > (maxiter-1) ) {
+                quit = 1;
+              } else if( iter == (maxiter-1) ) {
+                quit = 0;
+              }
+
+              /* Check for convergence */
+              if( untilconverge && converged ) {
+                quit = 0;
+              }
+
+              /* Check to see if a forced exit is required as a result of an
+                 interupt. If so, indicate that one last iteration should be
+                 performed before terminating. */
+              if( smf_interupt && *status == SAI__OK ) {
+                 msgBlank( status );
+                 msgBlank( status );
+
+                 msgOut( "", ">>>> Interupt detected!!! What should we do "
+                         "now? Options are: ", status );
+                 msgOut( "", "1 - abort immediately with an error status",
+                         status );
+                 msgOut( "", "2 - close the application returning the current "
+                         "output map", status );
+                 msgOut( "", "3 - do one more iteration to finialise the "
+                         "map and then close", status );
+                 msgBlank( status );
+                 msgOut( "", "NOTE - another interupt will abort the "
+                         "application, potentially leaving files in an "
+                         "unclean state.", status );
+                 msgBlank( status );
+                 parCancl( "INTOPTION", status );
+                 parGdr0i( "INTOPTION", 3, 1, 3, 1, &intopt, status );
+                 msgBlank( status );
+
+                 if( intopt == 1 ) {
+                    *status = SAI__ERROR;
+                    errRep( "", "Application aborted by an interupt.", status );
+                 } else if( intopt == 2 ) {
+                    *iters = iter;
+                    quit = 1;
+                 } else {
+                    *iters = iter + 1;
+                    quit = 0;
+                 }
+              }
+            }
+
+          } else {
+            quit = 1;
+          }
+
+  /* If another iteration is to be done, copy the map created by this
+     iteration into the "lastmap" array. Otherwise, leave "lastmap" unchanged
+     so that it is available later on, if needed. */
+          if( quit < 1 ) memcpy( lastmap, thismap, msize*sizeof(*lastmap) );
+        }
+
+        /* Save the final mapchange value */
+        chunkchange[ contchunk ] = dat.mapchange;
+
+        /* If we are dumping the final error map, check we have done at
+           least 3 iterations. */
+        if( epsout && *status == SAI__OK ) {
+           if( iter < 4 ) {
+              *status = SAI__ERROR;
+              errRep( "", FUNC_NAME ": error, config parameter EPSOUT cannot be "
+                      "used since too few iterations have been performed.",
+                      status );
+
+           /* Otherwise map the epsout NDF data array and store the median of
+              the three last difference maps in it. */
+           } else {
+              int place, tndf, el;
+              double *ip;
+              size_t pixstep;
+
+              msgOutf( "", FUNC_NAME ": creating output error map `%s'",
+                       status, epsout );
+              ndfPlace( NULL, epsout, &place, status );
+              ndfNew( "_DOUBLE", 2, lbnd_out, ubnd_out, &place, &tndf, status );
+              ndfMap( tndf, "DATA", "_DOUBLE", "WRITE", (void **) &ip, &el,
+                      status );
+
+              pixstep = msize/nw;
+              if( pixstep == 0 ) pixstep = 1;
+
+              for( iw = 0; iw < nw; iw++ ) {
+                pdata = job_data + iw;
+                pdata->d1 = iw*pixstep;
+                if( iw < nw - 1 ) {
+                  pdata->d2 = pdata->d1 + pixstep - 1;
+                } else {
+                  pdata->d2 = msize - 1;
+                }
+
+                pdata->epsout = ip;
+                pdata->err1 = epsbuf1;
+                pdata->err2 = epsbuf2;
+                pdata->err3 = epsbuf3;
+                pdata->operation = 2;
 
                 /* Submit the job to the workforce. */
                 thrAddJob( wf, 0, pdata, smf1_iteratemap, 0, NULL, status );
@@ -2436,1224 +3082,594 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               /* Wait for all jobs to complete. */
               thrWait( wf, status );
+
+              ndfAnnul( &tndf, status );
+           }
+        }
+
+
+        msgSeti("ITER",iter);
+        msgOut( " ",
+                FUNC_NAME ": ****** Completed in ^ITER iterations", status);
+        if( untilconverge ) {
+          if( converged ) {
+            msgOut( " ",
+                    FUNC_NAME ": ****** Solution CONVERGED",
+                    status);
+          } else {
+            if( abortedat && *abortedat == 0 ) *abortedat = maxiter;
+            msgOut( " ",
+                    FUNC_NAME ": ****** Solution did NOT converge",
+                    status);
+
+            /* Increment counter of how many chunks did not converge so
+               that we can tell the caller */
+            count_mcnvg++;
+          }
+        }
+
+        /* Set map pixels bad if they have very low hits. */
+        if( hitslim > 0 ) {
+          int *ph = thishits;
+          int nrej = 0;
+          for( ipix = 0; ipix < msize; ipix++ ) {
+            if( *(ph++) < nhitslim ) {
+              thismap[ ipix ] = thisvar[ ipix ] = thisweight[ ipix ] = VAL__BADD;
+              nrej++;
             }
           }
-
-          /* See if the map variances calculated on the previous iteration
-             should be retained. This is the case if we are doing the
-             last iteration, the FLT model is being used and a different
-             FLT filter has been used for this iteration. */
-          reuse_var = 0;
-          if( quit == 0 && haveflt && astMapGet0A( keymap, "FLT", &kmap ) ) {
-             double val, lastval;
-             astMapGet0D( kmap, "FILT_EDGE_LARGESCALE", &val );
-             lastval = val;
-             astMapGet0D( kmap, "FILT_EDGE_LARGESCALE_LAST", &lastval );
-             if( val != lastval ) {
-                reuse_var = 1;
-                msgOutif( MSG__VERB, "", FUNC_NAME
-                          ": FLT.FILT_EDGE_LARGESCALE_LAST is set so the "
-                          "map variances from the penultimate iteration "
-                          "will be returned.", status );
-             }
-             kmap = astAnnul( kmap );
+          if( nrej > 0 ) {
+             msgOutf( "", "Setting %d map pixels bad because they contain "
+                      "fewer than %d samples (=%g of the mean samples per pixel).",
+                      status, nrej, nhitslim, hitslim );
           }
+        }
 
-          /* Loop over subgroup index (subarray) again. This time rebin and
-             calculate the new map. */
-          for( idx=0; idx<res[0]->ndat; idx++ ) {
 
-            res_data = (res[0]->sdata[idx]->pntr)[0];
-            lut_data = (lut[0]->sdata[idx]->pntr)[0];
-            qua_data = (qua[0]->sdata[idx]->pntr)[0];
 
+
+        /* ***********************************************************************
+           The continous chunk has finished.
+
+           The model components for this continuous chunk have converged.
+
+           We can now do things like write out the bolomap and shortmap
+           extensions, and also export model components (if requested).
+
+           We also add the map estimated from this contchunk to those from
+           previous contchunks if necessary.
+        *********************************************************************** */
+
+        /* Are we going to produce short maps every SHORTMAP time slices?
+           If the user supplies -1, this will be interpreted as "1.0
+           seconds", so trap this and revert to the -1 value used to
+           indicate that a map should be created each time a full pass
+           through the scan pattern has # been completed. */
+        dim_t dimval;
+        if( smf_get_nsamp( keymap, "SHORTMAP", res[0]->sdata[0], &dimval,
+                           status ) == -1.0 ) {
+           shortmap = -1;
+        } else {
+           shortmap = dimval;
+        }
+
+        if( bolomap || shortmap || sampcube ) {
+
+          /* Ensure we use the RES model ordering. */
+          smf_model_dataOrder( wf, &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
+                               res[0]->sdata[0]->isTordered, status );
+
+          for( idx=0; (idx<res[0]->ndat)&&(*status==SAI__OK); idx++ ){
             smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL,
                           &dsize, NULL, NULL, status );
 
-            /* Setup rebin flags */
-            rebinflags = 0;
-            if( idx == 0 ) {
-              /* First call to rebin clears the arrays */
-              rebinflags = rebinflags | AST__REBININIT;
-            }
+            res_data = res[0]->sdata[idx]->pntr[0];
+            lut_data = lut[0]->sdata[idx]->pntr[0];
+            qua_data = qua[0]->sdata[idx]->pntr[0];
 
-            if( idx == res[0]->ndat-1 ) {
-              /* Final call to rebin re-normalizes */
-              rebinflags = rebinflags | AST__REBINEND;
-            }
-
-            /* Rebin the residual + astronomical signal into a map */
-            smf_rebinmap1( ( mw > 1 ) ? wf : NULL, res[0]->sdata[idx],
-                           dat.noi ? dat.noi[0]->sdata[idx] : NULL,
-                           lut_data, 0, 0, 0, NULL, 0, SMF__Q_GOOD,
-                           varmapmethod, rebinflags, thismap, thisweight,
-                           thisweightsq, thishits, reuse_var ? NULL : thisvar,
-                           msize, chunkfactor, &scalevar, status );
-          }
-
-          /* Indicate the map arrays within the supplied smfDIMMData
-             structure now contain usable values. */
-          dat.mapok = 1;
-
-          /*** TIMER ***/
-          msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                     ": ** %f s rebinning map",
-                     status, smf_timerupdate(&tv1,&tv2,status) );
-
-          /* If required, modify the map to remove low frequencies changes
-             between the new map and the old map. We do not do this if
-             the AST model was skipped on the previous iteration. */
-          if( ast_filt_diff > 0.0 && !dat.ast_skipped ) {
-
-             /* Can only do this if we have a map from the previous
-                iteration (i.e. this is not the first iter). */
-             if( importsky || iter > 1 ) {
-
-                /* Do not do it on the final iteration since we want the
-                   final map to contain all the residual flux. If run
-                   from skyloop (as indicated by numiter being 1), we
-                   always defer this until after the full map has been
-                   made from all chunks.  */
-                if( quit == -1 && abs( numiter ) > 1 ) {
-                   smf_filter_mapchange( wf, &dat, ast_filt_diff, status );
-                }
-             }
-          }
-
-          /* If required, subtract an external error map from the map
-             created above. */
-          if( emapdata && !dat.ast_skipped ) {
-              double *p1 = thismap;
-              double *p2 = lastmap;
-
-              p1 = thismap;
-              p2 = emapdata;
-              for( ipix = 0; ipix < msize; ipix++,p1++,p2++ ) {
-                if( *p1 != VAL__BADD && *p2 != VAL__BADD ) {
-                  *p1 -= *p2;
-                } else {
-                  *p1 = VAL__BADD;
-                }
-              }
-
-              msgOutf( "", FUNC_NAME ": subtracted external error map `%s'", status, epsin );
-          }
-
-          /* Replace the map with a linear combination of the original map
-            and the map from the previous iteration. This may help to
-            damp oscillations in the map from iteration to iteration. */
-          if( iter > 1 ) {
-            double maplag = 0.0;
-            astMapGet0D( keymap, "MAPLAG", &maplag );
-            if( iter > 1 && maplag != 0.0 ) {
-              double *p1 = thismap;
-              double *p2 = lastmap;
-              double w1 = 1.0 - maplag;
-              for( ipix = 0; ipix < msize; ipix++,p1++,p2++ ) {
-                if( *p1 != VAL__BADD && *p2 != VAL__BADD ) {
-                   *p1 = w1*( *p1 ) + maplag*( *p2 );
+            /* Add ast back into res. Mask should match ast_calcmodel_ast. */
+            for( k=0; k<dsize; k++ ) {
+              if( !(qua_data[k]&SMF__Q_MOD) && (lut_data[k]!=VAL__BADI) ) {
+                double ast_data = thismap[lut_data[k]];
+                if( ast_data != VAL__BADD ) {
+                  res_data[k] += ast_data;
                 }
               }
             }
+
           }
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        /* *********************************************************************
-           Calculate the AST model component and check map convergence
-
-           When we get here we have calculated all of the model
-           components up to, but not including AST (for all
-           filegroups). In addition, the previous iteration of AST has
-           been placed back into the residual, and a map has been
-           estimated. So, we are now in a position to take the current
-           estimate of the map and project it back into the time
-           domain to estimate the new AST. Finally, we look at the
-           change in chisquared and we compare the current map with
-           that of the previous iteration as a convergence tests.
-        ********************************************************************* */
-        if( *status == SAI__OK ) {
-          msgOut(" ", FUNC_NAME ": Calculate ast", status);
-
-          /* Calculate the AST model component. It is a special model
-             because it assumes that the map contains the best current
-             estimate of the astronomical sky. It gets called in this
-             separate loop since the map estimate gets updated by
-             each filegroup in the main model component loop */
-
-          dimmflags=0;
-          if( iter == 0 ) dimmflags |= SMF__DIMM_FIRSTITER;
-          if( quit == 0 ) dimmflags |= SMF__DIMM_LASTITER;
-
-
-          /* Before subtraction of the model, dump the original
-             residuals. */
-          smf_diagnostics( wf, 0, &dat, contchunk, keymap, NULL,
-                           SMF__AST, dimmflags, chunkfactor, status );
-
-          /* Remember if no AST model was subtracted from the
-             previous iteration. The dat.ast_skipped flag is updated
-             within smf_calcmodel_ast, so we store its current value
-             now, before it is changed. It is used to decide on
-             convergence. But if all iterations are being skipped
-             we leave it set to zero to prevent it influencing the
-             termination critirion. */
-          if( ast_skip > 0 ) last_skipped = dat.ast_skipped;
-
-          /* Estimate the AST model and subtract from the residuals. */
-          smf_calcmodel_ast( wf, &dat, 0, keymap, NULL, dimmflags,
-                             chunkfactor, status );
+        /* Create sub-maps for each bolometer if requested. */
+        if( bolomap ) {
+          smf_write_bolomap( wf, res[0], lut[0], qua[0], &dat, msize,
+                             bolrootgrp, varmapmethod, lbnd_out, ubnd_out,
+                             outfset, NULL, chunkfactor, status );
 
           /*** TIMER ***/
           msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                     ": ** %f s calculating AST",
+                     ": ** %f s writing bolomap",
                      status, smf_timerupdate(&tv1,&tv2,status) );
+        }
 
-          /* If storing each iteration in an extension do it here if this
-             was the last filegroup of data to be added */
+        /* Create short maps using every SHORTMAP samples if requested */
 
-          if( itermap > 0 ) {
-            smf_write_itermap( wf, thismap, thisvar,
-                               ( itermap > 1 ) ? thisqual : NULL, msize,
-                               iterrootgrp, contchunk, iter, lbnd_out,
-                               ubnd_out, outfset, res[0]->sdata[0]->hdr,
-                               qua[0], status );
+        if( shortmap ) {
+          smf_write_shortmap( wf, shortmap, res[0], lut[0], qua[0], &dat,
+                              msize, shortrootgrp, contchunk, varmapmethod,
+                              lbnd_out, ubnd_out, outfset, chunkfactor, status );
+          /*** TIMER ***/
+          msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                     ": ** %f s writing shortmap",
+                     status, smf_timerupdate(&tv1,&tv2,status) );
+        }
 
-            /*** TIMER ***/
-            msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                       ": ** %f s writing itermap",
-                       status, smf_timerupdate(&tv1,&tv2,status) );
-          }
+        /* If we're writing out only the final map from each chunk, do it here */
+        if( itermap < 0 ) {
+          smf_write_itermap( wf, thismap, thisvar,
+                             ( itermap < -1 ) ? thisqual : NULL, msize,
+                             iterrootgrp, contchunk, iter, lbnd_out,
+                             ubnd_out, outfset, res[0]->sdata[0]->hdr,
+                             qua[0], status );
+          /*** TIMER ***/
+          msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                     ": ** %f s writing itermap",
+                     status, smf_timerupdate(&tv1,&tv2,status) );
+        }
 
-          /* After subtraction of the model, dump the model itself
-             and the modified residuals. */
-          smf_diagnostics( wf, 1, &dat, contchunk, keymap, NULL,
-                           SMF__AST, dimmflags, chunkfactor, status );
+        /* Create a data sample cube where the first two dimensions
+           match the map, and the third dimension enumerates samples that
+           land in each pixel */
 
+        if( sampcube ) {
+          smf_write_sampcube( wf, res[0], lut[0], qua[0], &dat, thishits,
+                              samprootgrp, contchunk, lbnd_out, ubnd_out,
+                              status );
 
-          /* And dump RES as a model in its own right. */
-          smf_diagnostics( wf, 1, &dat, contchunk, keymap, NULL,
-                           SMF__RES, dimmflags,  chunkfactor, status );
+          /*** TIMER ***/
+          msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                     ": ** %f s writing sampcube",
+                     status, smf_timerupdate(&tv1,&tv2,status) );
+        }
 
+        /* Now we can remove AST from RES again before continuing */
 
-#ifdef __ITERATEMAP_SHOW_MEM
-            _smf_iteratemap_showmem(status);
-#endif
+        if( bolomap || shortmap || sampcube ) {
 
-          /* report on the quality flags for this iterations before closing
-           the quality */
-          smf_qualstats_report( wf, MSG__NORM, SMF__QFAM_TSERIES, 1, qua[0],
-                                qcount_last, &nsamples, 0, &ntgood, &numdata,
-                                NULL, status );
+          /* Ensure we use the RES model ordering.  */
+          smf_model_dataOrder( wf, &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
+                               res[0]->sdata[0]->isTordered, status );
 
-          /* If no good bolos left, set status */
-          if( (*status==SAI__OK) &&
-              (qcount_last[smf_qual_to_bit(SMF__Q_BADB, status)] >= numdata)){
-            *status = SMF__INSMP;
-            errRep("", FUNC_NAME ": All bolos are bad", status );
-          }
+          for( idx=0; (idx<res[0]->ndat)&&(*status==SAI__OK); idx++ ){
+            smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL,
+                          &dsize, NULL, NULL, status );
 
-          /* Check for consistency between quality and data arrays */
-          for( idx=0; (*status==SAI__OK)&&(idx<res[0]->ndat); idx++ ) {
-            size_t nbad;
-            nbad = smf_check_quality( wf, res[0]->sdata[idx], 0, status );
-            if( nbad ) {
-              msgOut( "", FUNC_NAME ": *** Possible programming error! ***",
-                      status );
-              msgOutf( "", FUNC_NAME ": %zu QUALITY/DATA inconsistencies "
-                       "subarray %zu", status, nbad, idx );
-              msgOut( "", FUNC_NAME ": ***********************************",
-                      status );
-            }
-          }
+            res_data = res[0]->sdata[idx]->pntr[0];
+            lut_data = lut[0]->sdata[idx]->pntr[0];
+            qua_data = qua[0]->sdata[idx]->pntr[0];
 
-          /* If NOI was present, we now have an estimate of chisquared */
-          if( (*status==SAI__OK) && chisquared ) {
-
-            if( (iter==0) && (whichnoi>whichast) ) {
-              /* If NOI comes after AST in MODELORDER we can't check chi^2 or
-                 convergence until next iteration. */
-              msgOut( "",
-                      FUNC_NAME ": Will calculate chi^2 next iteration",
-                      status );
-            } else {
-              msgSetd("CHISQ",chisquared[0]);
-              msgOut( " ",
-                      FUNC_NAME ": *** CHISQUARED = ^CHISQ", status);
-
-              if( ((iter > 0)&&(whichnoi<whichast)) ||
-                  ((iter > 1)&&(whichnoi>whichast)) ) {
-                /* Again, we have to check if NOI was calculated at least
-                   twice, which depends on NOI and AST in MODELORDER */
-
-                double chidiff;   /* temporary variable to store diff */
-
-                chidiff = chisquared[0]-lastchisquared[0];
-
-                msgSetd("DIFF", chidiff);
-                msgOut( " ",
-                        FUNC_NAME ": *** change: ^DIFF", status );
-
-                if( chidiff > 0 ) {
-                  msgOut( " ", FUNC_NAME
-                          ": ****** WARNING! CHISQUARED Increased ******",
-                          status );
+            /* Remove ast from res again. Mask should match ast_calcmodel_ast. */
+            for( k=0; k<dsize; k++ ) {
+              if( !(qua_data[k]&SMF__Q_MOD) && (lut_data[k]!=VAL__BADI) ) {
+                double ast_data = thismap[lut_data[k]];
+                if( ast_data != VAL__BADD ) {
+                  res_data[k] -= ast_data;
                 }
+              }
+            }
 
-                /* Check for the chi^2 stopping criterion */
-                if( untilconverge && (chitol!=VAL__BADD) ) {
-                  if( (chidiff > 0) || (-chidiff > chitol) ) {
-                    /* Found a chunk that isn't converged yet */
-                    converged=0;
+          }
+        }
+        /* ---------------------------------------------------------------- */
+
+        /* Create maps indicating locations of flags matching bitmask */
+
+        if( make_flagmap ) {
+          smf_write_flagmap( wf, flagmap, lut[0], qua[0], &dat, flagrootgrp,
+                             contchunk, lbnd_out, ubnd_out, outfset, status );
+          /*** TIMER ***/
+          msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                     ": ** %f s writing flagmap",
+                     status, smf_timerupdate(&tv1,&tv2,status) );
+        }
+
+
+        /* If required export NOI in compressed form to its own NDF. This
+           is different to how NOI is exported via the "exportNDF" config
+           parameter.  */
+        if( noi_export && havenoi ) {
+
+           /* If NOI is being exported but has not yet been calculated
+              (e.g. if numiter=1), calculate it now. This is useful for
+              SKYLOOP, which runs makemap with numiter=1. */
+           if( !noidone ) smf_calcmodel_noi( wf, &dat, 0, keymap,
+                                             model[whichnoi],
+                                             SMF__DIMM_FIRSTITER, status );
+
+           for( idx=0; idx<res[0]->ndat; idx++ ) {
+
+              /* Get the NDF name for the exported NOI model. */
+              *name = 0;
+              if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
+              smf_stripsuffix( res[0]->sdata[idx]->file->name, SMF__DIMM_SUFFIX,
+                               name + strlen(name), status );
+              one_strlcat( name, "_noi", sizeof(name), status );
+
+              /* Export it. */
+              smf_export_noi( dat.noi[0]->sdata[idx], name, dat.noi_boxsize,
+                              status );
+           }
+        }
+
+
+        /* Export DIMM model components to NDF files.
+           Also - check that a filename is defined in the smfFile! */
+
+        if( exportNDF && ((*status == SAI__OK) || (*status == SMF__INSMP)) ) {
+          errBegin( status );
+          msgOut(" ", FUNC_NAME ": Export model components to NDF files.",
+                 status);
+
+          /* Loop over smfArray elements and export. Note that QUA and NOI
+             get stuffed into the QUALITY and VARIANCE components of the
+             residual. Also notice that everything must be changed to
+             time-ordered data before writing ICD-compliant files. */
+
+          /* Loop over subarray, re-order, set bad values wherever a
+             SMF__Q_BADB flag is encountered (if requested), and
+             export */
+          for( idx=0; idx<res[0]->ndat; idx++ ) {
+            smf_dataOrder( wf, qua[0]->sdata[idx], 1, status );
+            smf_dataOrder( wf, res[0]->sdata[idx], 1, status );
+            smf_dataOrder( wf, lut[0]->sdata[idx], 1, status );
+
+            /* Get quality array strides for smf_update_valbad */
+            smf_get_dims( qua[0]->sdata[idx], NULL, NULL, &nbolo, &ntslice,
+                          NULL, &bstride, &tstride, status );
+
+            for( j=0; j<nmodels; j++ ) {
+
+              /* Check for existence of the model for this subarray - in
+                 some cases, like COM, there is only a file for one subarray,
+                 unlike RES from which the range of idx is derived */
+              if( (modeltyps[j] != SMF__AST) && model[j][0]->sdata[idx] ) {
+                smf_dataOrder( wf, model[j][0]->sdata[idx], 1, status );
+                if( *status == SMF__WDIM ) {
+                  /* fails if not 3-dimensional data. Just annul and write out
+                     data as-is. */
+                  errAnnul(status);
+                  model[j][0]->sdata[idx]->isTordered=1;
+                }
+              }
+            }
+
+            /* Pointer to the header in the concatenated data */
+            if( *status == SAI__OK ) refdata = res[0]->sdata[idx];
+
+            /* QUA becomes the quality component of RES. NOI becomes
+               the variance component of RES if present. */
+            if( *status == SAI__OK ) {
+              qua_data = (qua[0]->sdata[idx]->pntr)[0];
+
+              if( exportNDF_which[nmodels] ) {
+                if( (res[0]->sdata[idx]->file->name)[0] ) {
+
+                  smf_model_createHdr( res[0]->sdata[idx], SMF__RES, refdata,
+                                       status );
+
+                  *name = 0;
+                  if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
+                  smf_stripsuffix( res[0]->sdata[idx]->file->name,
+                                   SMF__DIMM_SUFFIX, name + strlen(name), status );
+                  one_strlcat( name, "_res", sizeof( name ), status );
+
+                  if( !noexportsetbad ) {
+                    smf_update_valbad( res[0]->sdata[idx], SMF__NUL,
+                                       NULL, 0, 0, SMF__Q_BADB, status );
                   }
+
+                  /* Ensure only the quality bits requested by the
+                     EXPORTQBITS config parameter are written out to the
+                     NDF. This makes it possible for the user to limit the
+                     number of bits to 8 or fewer, and so avoid lossy
+                     compression of quality bits. */
+                  res[0]->sdata[idx]->qbits = exportqbits;
+
+                  smf_write_smfData( wf, res[0]->sdata[idx],
+                                     (havenoi && exportNDF_which[whichnoi]) ?
+                                     dat.noi[0]->sdata[idx] : NULL,
+                                     name, NULL, 0, NDF__NOID,
+                                     MSG__VERB, 0, NULL, NULL, status );
+                } else {
+                  msgOut( " ",
+                          "SMF__ITERATEMAP: Can't export RES -- NULL filename",
+                          status);
                 }
-
-                /* If the AST model was skipped on the previous iteration,
-                   we have not converged yet. */
-                if( untilconverge && last_skipped ) converged=0;
-
-              } else {
-                /* Can't converge until at least 2 consecutive chi^2... */
-                converged=0;
               }
 
-              /* Update lastchisquared */
-              lastchisquared[0] = chisquared[0];
 
-            }
-          }
-        }
+            /* LUT is stored in a separate NDF. */
+              lut_data = (lut[0]->sdata[idx]->pntr)[0];
 
-        /* Calculate the absolute difference between the previous and
-           current map pixels normalized by the map standard
-           deviations. Once we're done, update lastmap to the current
-           map. Ignore bad and zero-constrained pixels. */
+              if( exportNDF_which[nmodels+2] ) {
+                if( (res[0]->sdata[idx]->file->name)[0] ) {
 
-        if( *status == SAI__OK ) {
-          int maptol_nhitslim;
-          double *usemap;
-
-          /* Pixels with very low hits will have unreliable variances. So
-             exclude pixels with hits below "hitslim" times the mean from
-             the mapchange estimate. The "hitslim" value is used when to
-             set pixels bad in the final map.  The "maptol_hits" value
-             is used to determine which pixels to include in the map change
-             estimater.  */
-          nhitslim = 0;
-          maptol_nhitslim = 0;
-
-          if( hitslim > 0.0 || maptol_hits > 0.0 ) {
-            double meanhits;
-            int *ph = thishits;
-            int ngood = 0;
-            nhitslim = 0;
-            for( ipix = 0; ipix < msize; ipix++,ph++ ) {
-               if( *ph > 0 ) {
-                  nhitslim += *ph;
-                  ngood++;
-               }
-            }
-            meanhits = ((double)nhitslim)/ngood;
-            if(  hitslim > 0.0 ) nhitslim = hitslim*meanhits;
-            if(  maptol_hits > 0.0 ) maptol_nhitslim = maptol_hits*meanhits;
-          }
-
-          /* If we will be dumping the final error map, we need to retain
-             copies of the three most recent difference maps. "epsbuf3"
-             currently holds the most recent difference map, so copy it to
-             epsbuf1 or epsbuf2 (which ever is oldest) before changing
-             its contents. */
-          if( epsout ) memcpy( ( iter % 2 == 0 ) ? epsbuf1 : epsbuf2,
-                               epsbuf3, msize*sizeof(*epsbuf3) );
-
-          mapchange_max = 0;
-          for( ipix = 0; ipix < msize; ipix++ ) {
-
-            if( thismap[ipix] != VAL__BADD && lastmap[ipix] != VAL__BADD ) {
-              double vdiff = thismap[ipix] - lastmap[ipix];
-              if( epsout) epsbuf3[ipix] = vdiff;
-
-              if( !(thisqual[ipix]&maptol_mask) && (thisvar[ipix] != VAL__BADD)
-                  && (thisvar[ipix] > 0) && (thishits[ipix] > maptol_nhitslim) ) {
-                mapchange[ipix] = fabs( vdiff ) / sqrt(thisvar[ipix]);
-
-                /* Update max */
-                if( mapchange[ipix] > mapchange_max ) mapchange_max = mapchange[ipix];
-              } else {
-                mapchange[ipix] = VAL__BADD;
-              }
-
-            } else {
-              mapchange[ipix] = VAL__BADD;
-              if( epsout ) epsbuf3[ipix] = VAL__BADD;
-            }
-          }
-
-          /* If required, smooth the map change array using a box filter
-             of size specified by MAPTOL_BOX. */
-          if( maptol_box > 1.0 ) {
-             dim_t ibox = (dim_t)( maptol_box + 0.5 );
-             msgOutiff( MSG__VERB, "", FUNC_NAME ":     Smoothing map change "
-                        "using a box filter of %zu pixels.", status, ibox );
-
-             usemap = smf_tophat2( wf, mapchange, mdims, ibox, 0, 0.0, 1, status );
-
-             /* Calculate the max of the smoothed map change values. */
-             mapchange_max = 0;
-             int maxat = -1;
-             for( ipix = 0; ipix < msize; ipix++ ) {
-                if( usemap[ipix] != VAL__BADD ){
-                   if( usemap[ipix] > mapchange_max ) {
-                      mapchange_max = usemap[ipix];
-                      maxat = ipix;
-                   }
+                  smf_model_createHdr( lut[0]->sdata[idx], SMF__RES, refdata,
+                                       status );
+                  *name = 0;
+                  if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
+                  smf_stripsuffix( res[0]->sdata[idx]->file->name,
+                                   SMF__DIMM_SUFFIX, name + strlen(name), status );
+                  one_strlcat( name, "_lut", sizeof( name ), status );
+                  smf_write_smfData( wf, lut[0]->sdata[idx], NULL, name, NULL, 0,
+                                     NDF__NOID, MSG__VERB, 0, NULL, NULL, status );
+                } else {
+                  msgOut( " ",
+                          "SMF__ITERATEMAP: Can't export LUT -- NULL filename",
+                          status);
                 }
-             }
-
-             msgOutiff( MSG__VERB, "", FUNC_NAME ":     Maximum map change is "
-                        "at pixel (%d,%d).", status,
-                        ( maxat % (int)mdims[0] ) + lbnd_out[0],
-                        ( maxat / (int)mdims[0] ) + lbnd_out[1] );
-
-          } else {
-             usemap = mapchange;
-          }
-
-          /* Calculate the mean map change */
-          smf_stats1D( usemap, 1, msize, NULL, 0, 0, &mapchange_mean, NULL,
-                       NULL, NULL, status );
-
-          /* Free the smoothed array, if it exists. */
-          if( usemap != mapchange ) usemap = astFree( usemap );
-
-          /* If there were insufficient samples in the masked area, then
-             just annul the error since it just means that there are no
-             bright sources in the map. */
-          if( *status == SMF__INSMP ) {
-             errAnnul( status );
-             mapchange_mean = 0.0;
-             mapchange_max = 0.0;
-
-             if( quit < 0 ) {
-                msgOut( "", FUNC_NAME ": *** No source pixels found", status );
-
-             /* There is almost no point in doing any more iterations, since
-                the AST model is zero and so we'll get exactly the same map
-                on subsequent iterations. But it may be that a different
-                set of config parameters have been specified for the final
-                iteration (the "xxx_LAST" parameters), so we do one more
-                in order to ensure these parameters are used. Setting
-                mapchange_xxx to zero above will cause the following code
-                to think that convergence has been achieved and will so
-                trigger a final iteration. */
-                msgOutif( MSG__VERB, "", FUNC_NAME ":     Doing one more iteration "
-                          "to use any '..._LAST' config parameter values", status );
-             }
-             last_skipped = 0;
-             converged = 1;
-
-          }
-
-          msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                     ": ** %f s calculating change in the map",
-                     status, smf_timerupdate(&tv1,&tv2,status) );
-
-          msgOutf( "", FUNC_NAME ": *** NORMALIZED MAP CHANGE: %lg (mean) "
-                   "%lg (max)", status, mapchange_mean, mapchange_max );
-          tol = maptol_mean ? mapchange_mean : mapchange_max;
-          dat.mapchange = tol;
-
-          /* Check for the map change stopping criterion. Do not modify
-             the converged flag on the extra iteration that is done after
-             convergence has been reached (i.e. when quit=0).  We do not
-             allow convergence to be reached until we have done at least
-             one iteration in which the AST model was not skipped. */
-
-          if( untilconverge &&
-            ( ( (maptol!=VAL__BADD) && (tol > maptol) ) ||
-                last_skipped ) && quit == -1 ) {
-            /* Map hasn't converged yet */
-            converged=0;
-          }
-
-          /* If required, make an estimate of the iteration number at
-             which convergence will occur, and if this number exceeds the
-             maximum  number of iterations allowed, set "*abortedat"
-             non-zero and set "quit" to 1 to indicate that we should leave
-             the iteration loop immediately. */
-          if( abortsoon && abortedat ) {
-             smf_check_convergence( &dat, maxiter, maptol, abortedat, status );
-             if( *abortedat ) quit = 1;
-          }
-
-          /* Do not allow the loop to leave until the conditions required
-             for convergence by other functions are all met. For instance,
-             see smf_get_mask. */
-          if( converged && !dat.allow_convergence ) converged=0;
-
-          /* If we are currently in the initial ast.skip iterations, and
-             the map has more or less stopped changing (i.e. the change
-             between the previous two maps was less than maptol), then
-             there is little point in wasting time doing further ast.skip
-             iterations (since the map is not changing). So we can jump
-             forward to the end of the ast.skip phase, and start on the
-             real iterations. */
-          if( ast_skip > 0 && iter < ast_skip - 1 &&
-              maptol != VAL__BADD && tol < maptol ) {
-             msgOutiff( MSG__DEBUG, "", "The map change has dropped below "
-                        "MAPTOL, so jumping now to iteration %d (the first "
-                        "iteration to subtract the AST model).", status,
-                        ast_skip );
-             iter = ast_skip - 1;
-          }
-
-
-          /* if the mean mapchange becomes constant, we'll never get to
-             convergence, so quit. */
-          if( !last_skipped && maptol_rate != VAL__BADD && mapchange_l3 != VAL__BADD ) {
-             double mmc = ( mapchange_mean + mapchange_l2 + mapchange_l3 )/3;
-             double mclim = maptol_rate*mmc;
-             if( fabs( mapchange_mean - mmc ) < mclim &&
-                 fabs( mapchange_l2 - mmc ) < mclim &&
-                 fabs( mapchange_l3 - mmc ) < mclim ) {
-                msgOutf( "", FUNC_NAME ": *** Normalised map change has "
-                         "not changed significantly over the previous 3 "
-                         "iterations - quiting immediately.", status );
-                quit = 1;
-                rate_limited = 1;
-             }
-          }
-          mapchange_l3 = mapchange_l2;
-          mapchange_l2 = mapchange_mean;
-        }
-
-        /* Increment iteration counter */
-        iter++;
-        firstiter = 0;
-
-        if( *status == SAI__OK ) {
-
-          /* If quit was set to 0 last time through we can now exit the
-             loop */
-          if( quit == 0 ) {
-            quit = 1;
-          } else if( quit < 0 ){
-            /* Check that we will exceed maxiter next time through */
-            if( iter > (maxiter-1) ) {
-              quit = 1;
-            } else if( iter == (maxiter-1) ) {
-              quit = 0;
-            }
-
-            /* Check for convergence */
-            if( untilconverge && converged ) {
-              quit = 0;
-            }
-
-            /* Check to see if a forced exit is required as a result of an
-               interupt. If so, indicate that one last iteration should be
-               performed before terminating. */
-            if( smf_interupt && *status == SAI__OK ) {
-               msgBlank( status );
-               msgBlank( status );
-
-               msgOut( "", ">>>> Interupt detected!!! What should we do "
-                       "now? Options are: ", status );
-               msgOut( "", "1 - abort immediately with an error status",
-                       status );
-               msgOut( "", "2 - close the application returning the current "
-                       "output map", status );
-               msgOut( "", "3 - do one more iteration to finialise the "
-                       "map and then close", status );
-               msgBlank( status );
-               msgOut( "", "NOTE - another interupt will abort the "
-                       "application, potentially leaving files in an "
-                       "unclean state.", status );
-               msgBlank( status );
-               parCancl( "INTOPTION", status );
-               parGdr0i( "INTOPTION", 3, 1, 3, 1, &intopt, status );
-               msgBlank( status );
-
-               if( intopt == 1 ) {
-                  *status = SAI__ERROR;
-                  errRep( "", "Application aborted by an interupt.", status );
-               } else if( intopt == 2 ) {
-                  *iters = iter;
-                  quit = 1;
-               } else {
-                  *iters = iter + 1;
-                  quit = 0;
-               }
-            }
-          }
-
-        } else {
-          quit = 1;
-        }
-
-/* If another iteration is to be done, copy the map created by this
-   iteration into the "lastmap" array. Otherwise, leave "lastmap" unchanged
-   so that it is available later on, if needed. */
-        if( quit < 1 ) memcpy( lastmap, thismap, msize*sizeof(*lastmap) );
-      }
-
-      /* Save the final mapchange value */
-      chunkchange[ contchunk ] = dat.mapchange;
-
-      /* If we are dumping the final error map, check we have done at
-         least 3 iterations. */
-      if( epsout && *status == SAI__OK ) {
-         if( iter < 4 ) {
-            *status = SAI__ERROR;
-            errRep( "", FUNC_NAME ": error, config parameter EPSOUT cannot be "
-                    "used since too few iterations have been performed.",
-                    status );
-
-         /* Otherwise map the epsout NDF data array and store the median of
-            the three last difference maps in it. */
-         } else {
-            int place, tndf, el;
-            double *ip;
-            size_t pixstep;
-
-            msgOutf( "", FUNC_NAME ": creating output error map `%s'",
-                     status, epsout );
-            ndfPlace( NULL, epsout, &place, status );
-            ndfNew( "_DOUBLE", 2, lbnd_out, ubnd_out, &place, &tndf, status );
-            ndfMap( tndf, "DATA", "_DOUBLE", "WRITE", (void **) &ip, &el,
-                    status );
-
-            pixstep = msize/nw;
-            if( pixstep == 0 ) pixstep = 1;
-
-            for( iw = 0; iw < nw; iw++ ) {
-              pdata = job_data + iw;
-              pdata->d1 = iw*pixstep;
-              if( iw < nw - 1 ) {
-                pdata->d2 = pdata->d1 + pixstep - 1;
-              } else {
-                pdata->d2 = msize - 1;
               }
 
-              pdata->epsout = ip;
-              pdata->err1 = epsbuf1;
-              pdata->err2 = epsbuf2;
-              pdata->err3 = epsbuf3;
-              pdata->operation = 2;
-
-              /* Submit the job to the workforce. */
-              thrAddJob( wf, 0, pdata, smf1_iteratemap, 0, NULL, status );
-            }
-
-            /* Wait for all jobs to complete. */
-            thrWait( wf, status );
-
-            ndfAnnul( &tndf, status );
-         }
-      }
-
-
-      msgSeti("ITER",iter);
-      msgOut( " ",
-              FUNC_NAME ": ****** Completed in ^ITER iterations", status);
-      if( untilconverge ) {
-        if( converged ) {
-          msgOut( " ",
-                  FUNC_NAME ": ****** Solution CONVERGED",
-                  status);
-        } else {
-          if( abortedat && *abortedat == 0 ) *abortedat = maxiter;
-          msgOut( " ",
-                  FUNC_NAME ": ****** Solution did NOT converge",
-                  status);
-
-          /* Increment counter of how many chunks did not converge so
-             that we can tell the caller */
-          count_mcnvg++;
-        }
-      }
-
-      /* Set map pixels bad if they have very low hits. */
-      if( hitslim > 0 ) {
-        int *ph = thishits;
-        int nrej = 0;
-        for( ipix = 0; ipix < msize; ipix++ ) {
-          if( *(ph++) < nhitslim ) {
-            thismap[ ipix ] = thisvar[ ipix ] = thisweight[ ipix ] = VAL__BADD;
-            nrej++;
-          }
-        }
-        if( nrej > 0 ) {
-           msgOutf( "", "Setting %d map pixels bad because they contain "
-                    "fewer than %d samples (=%g of the mean samples per pixel).",
-                    status, nrej, nhitslim, hitslim );
-        }
-      }
-
-
-
-
-      /* ***********************************************************************
-         The continous chunk has finished.
-
-         The model components for this continuous chunk have converged.
-
-         We can now do things like write out the bolomap and shortmap
-         extensions, and also export model components (if requested).
-
-         We also add the map estimated from this contchunk to those from
-         previous contchunks if necessary.
-      *********************************************************************** */
-
-      /* Are we going to produce short maps every SHORTMAP time slices?
-         If the user supplies -1, this will be interpreted as "1.0
-         seconds", so trap this and revert to the -1 value used to
-         indicate that a map should be created each time a full pass
-         through the scan pattern has # been completed. */
-      dim_t dimval;
-      if( smf_get_nsamp( keymap, "SHORTMAP", res[0]->sdata[0], &dimval,
-                         status ) == -1.0 ) {
-         shortmap = -1;
-      } else {
-         shortmap = dimval;
-      }
-
-      if( bolomap || shortmap || sampcube ) {
-
-        /* Ensure we use the RES model ordering. */
-        smf_model_dataOrder( wf, &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
-                             res[0]->sdata[0]->isTordered, status );
-
-        for( idx=0; (idx<res[0]->ndat)&&(*status==SAI__OK); idx++ ){
-          smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL,
-                        &dsize, NULL, NULL, status );
-
-          res_data = res[0]->sdata[idx]->pntr[0];
-          lut_data = lut[0]->sdata[idx]->pntr[0];
-          qua_data = qua[0]->sdata[idx]->pntr[0];
-
-          /* Add ast back into res. Mask should match ast_calcmodel_ast. */
-          for( k=0; k<dsize; k++ ) {
-            if( !(qua_data[k]&SMF__Q_MOD) && (lut_data[k]!=VAL__BADI) ) {
-              double ast_data = thismap[lut_data[k]];
-              if( ast_data != VAL__BADD ) {
-                res_data[k] += ast_data;
-              }
-            }
-          }
-
-        }
-      }
-
-      /* Create sub-maps for each bolometer if requested. */
-      if( bolomap ) {
-        smf_write_bolomap( wf, res[0], lut[0], qua[0], &dat, msize,
-                           bolrootgrp, varmapmethod, lbnd_out, ubnd_out,
-                           outfset, NULL, chunkfactor, status );
-
-        /*** TIMER ***/
-        msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                   ": ** %f s writing bolomap",
-                   status, smf_timerupdate(&tv1,&tv2,status) );
-      }
-
-      /* Create short maps using every SHORTMAP samples if requested */
-
-      if( shortmap ) {
-        smf_write_shortmap( wf, shortmap, res[0], lut[0], qua[0], &dat,
-                            msize, shortrootgrp, contchunk, varmapmethod,
-                            lbnd_out, ubnd_out, outfset, chunkfactor, status );
-        /*** TIMER ***/
-        msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                   ": ** %f s writing shortmap",
-                   status, smf_timerupdate(&tv1,&tv2,status) );
-      }
-
-      /* If we're writing out only the final map from each chunk, do it here */
-      if( itermap < 0 ) {
-        smf_write_itermap( wf, thismap, thisvar,
-                           ( itermap < -1 ) ? thisqual : NULL, msize,
-                           iterrootgrp, contchunk, iter, lbnd_out,
-                           ubnd_out, outfset, res[0]->sdata[0]->hdr,
-                           qua[0], status );
-        /*** TIMER ***/
-        msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                   ": ** %f s writing itermap",
-                   status, smf_timerupdate(&tv1,&tv2,status) );
-      }
-
-      /* Create a data sample cube where the first two dimensions
-         match the map, and the third dimension enumerates samples that
-         land in each pixel */
-
-      if( sampcube ) {
-        smf_write_sampcube( wf, res[0], lut[0], qua[0], &dat, thishits,
-                            samprootgrp, contchunk, lbnd_out, ubnd_out,
-                            status );
-
-        /*** TIMER ***/
-        msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                   ": ** %f s writing sampcube",
-                   status, smf_timerupdate(&tv1,&tv2,status) );
-      }
-
-      /* Now we can remove AST from RES again before continuing */
-
-      if( bolomap || shortmap || sampcube ) {
-
-        /* Ensure we use the RES model ordering.  */
-        smf_model_dataOrder( wf, &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
-                             res[0]->sdata[0]->isTordered, status );
-
-        for( idx=0; (idx<res[0]->ndat)&&(*status==SAI__OK); idx++ ){
-          smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL,
-                        &dsize, NULL, NULL, status );
-
-          res_data = res[0]->sdata[idx]->pntr[0];
-          lut_data = lut[0]->sdata[idx]->pntr[0];
-          qua_data = qua[0]->sdata[idx]->pntr[0];
-
-          /* Remove ast from res again. Mask should match ast_calcmodel_ast. */
-          for( k=0; k<dsize; k++ ) {
-            if( !(qua_data[k]&SMF__Q_MOD) && (lut_data[k]!=VAL__BADI) ) {
-              double ast_data = thismap[lut_data[k]];
-              if( ast_data != VAL__BADD ) {
-                res_data[k] -= ast_data;
-              }
-            }
-          }
-
-        }
-      }
-      /* ---------------------------------------------------------------- */
-
-      /* Create maps indicating locations of flags matching bitmask */
-
-      if( make_flagmap ) {
-        smf_write_flagmap( wf, flagmap, lut[0], qua[0], &dat, flagrootgrp,
-                           contchunk, lbnd_out, ubnd_out, outfset, status );
-        /*** TIMER ***/
-        msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                   ": ** %f s writing flagmap",
-                   status, smf_timerupdate(&tv1,&tv2,status) );
-      }
-
-
-      /* If required export NOI in compressed form to its own NDF. This
-         is different to how NOI is exported via the "exportNDF" config
-         parameter.  */
-      if( noi_export && havenoi ) {
-
-         /* If NOI is being exported but has not yet been calculated
-            (e.g. if numiter=1), calculate it now. This is useful for
-            SKYLOOP, which runs makemap with numiter=1. */
-         if( !noidone ) smf_calcmodel_noi( wf, &dat, 0, keymap,
-                                           model[whichnoi],
-                                           SMF__DIMM_FIRSTITER, status );
-
-         for( idx=0; idx<res[0]->ndat; idx++ ) {
-
-            /* Get the NDF name for the exported NOI model. */
-            *name = 0;
-            if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
-            smf_stripsuffix( res[0]->sdata[idx]->file->name, SMF__DIMM_SUFFIX,
-                             name + strlen(name), status );
-            one_strlcat( name, "_noi", sizeof(name), status );
-
-            /* Export it. */
-            smf_export_noi( dat.noi[0]->sdata[idx], name, dat.noi_boxsize,
-                            status );
-         }
-      }
-
-
-      /* Export DIMM model components to NDF files.
-         Also - check that a filename is defined in the smfFile! */
-
-      if( exportNDF && ((*status == SAI__OK) || (*status == SMF__INSMP)) ) {
-        errBegin( status );
-        msgOut(" ", FUNC_NAME ": Export model components to NDF files.",
-               status);
-
-        /* Loop over smfArray elements and export. Note that QUA and NOI
-           get stuffed into the QUALITY and VARIANCE components of the
-           residual. Also notice that everything must be changed to
-           time-ordered data before writing ICD-compliant files. */
-
-        /* Loop over subarray, re-order, set bad values wherever a
-           SMF__Q_BADB flag is encountered (if requested), and
-           export */
-        for( idx=0; idx<res[0]->ndat; idx++ ) {
-          smf_dataOrder( wf, qua[0]->sdata[idx], 1, status );
-          smf_dataOrder( wf, res[0]->sdata[idx], 1, status );
-          smf_dataOrder( wf, lut[0]->sdata[idx], 1, status );
-
-          /* Get quality array strides for smf_update_valbad */
-          smf_get_dims( qua[0]->sdata[idx], NULL, NULL, &nbolo, &ntslice,
-                        NULL, &bstride, &tstride, status );
-
-          for( j=0; j<nmodels; j++ ) {
-
-            /* Check for existence of the model for this subarray - in
-               some cases, like COM, there is only a file for one subarray,
-               unlike RES from which the range of idx is derived */
-            if( (modeltyps[j] != SMF__AST) && model[j][0]->sdata[idx] ) {
-              smf_dataOrder( wf, model[j][0]->sdata[idx], 1, status );
-              if( *status == SMF__WDIM ) {
-                /* fails if not 3-dimensional data. Just annul and write out
-                   data as-is. */
-                errAnnul(status);
-                model[j][0]->sdata[idx]->isTordered=1;
-              }
-            }
-          }
-
-          /* Pointer to the header in the concatenated data */
-          if( *status == SAI__OK ) refdata = res[0]->sdata[idx];
-
-          /* QUA becomes the quality component of RES. NOI becomes
-             the variance component of RES if present. */
-          if( *status == SAI__OK ) {
-            qua_data = (qua[0]->sdata[idx]->pntr)[0];
-
-            if( exportNDF_which[nmodels] ) {
-              if( (res[0]->sdata[idx]->file->name)[0] ) {
-
-                smf_model_createHdr( res[0]->sdata[idx], SMF__RES, refdata,
-                                     status );
-
-                *name = 0;
-                if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
-                smf_stripsuffix( res[0]->sdata[idx]->file->name,
-                                 SMF__DIMM_SUFFIX, name + strlen(name), status );
-                one_strlcat( name, "_res", sizeof( name ), status );
-
-                if( !noexportsetbad ) {
-                  smf_update_valbad( res[0]->sdata[idx], SMF__NUL,
-                                     NULL, 0, 0, SMF__Q_BADB, status );
-                }
-
-                /* Ensure only the quality bits requested by the
-                   EXPORTQBITS config parameter are written out to the
-                   NDF. This makes it possible for the user to limit the
-                   number of bits to 8 or fewer, and so avoid lossy
-                   compression of quality bits. */
-                res[0]->sdata[idx]->qbits = exportqbits;
-
-                smf_write_smfData( wf, res[0]->sdata[idx],
-                                   (havenoi && exportNDF_which[whichnoi]) ?
-                                   dat.noi[0]->sdata[idx] : NULL,
-                                   name, NULL, 0, NDF__NOID,
-                                   MSG__VERB, 0, NULL, NULL, status );
-              } else {
-                msgOut( " ",
-                        "SMF__ITERATEMAP: Can't export RES -- NULL filename",
-                        status);
-              }
-            }
-
-
-          /* LUT is stored in a separate NDF. */
-            lut_data = (lut[0]->sdata[idx]->pntr)[0];
-
-            if( exportNDF_which[nmodels+2] ) {
-              if( (res[0]->sdata[idx]->file->name)[0] ) {
-
-                smf_model_createHdr( lut[0]->sdata[idx], SMF__RES, refdata,
-                                     status );
-                *name = 0;
-                if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
-                smf_stripsuffix( res[0]->sdata[idx]->file->name,
-                                 SMF__DIMM_SUFFIX, name + strlen(name), status );
-                one_strlcat( name, "_lut", sizeof( name ), status );
-                smf_write_smfData( wf, lut[0]->sdata[idx], NULL, name, NULL, 0,
-                                   NDF__NOID, MSG__VERB, 0, NULL, NULL, status );
-              } else {
-                msgOut( " ",
-                        "SMF__ITERATEMAP: Can't export LUT -- NULL filename",
-                        status);
-              }
-            }
-
-            if( exportNDF_which[whichast] ) {
-              /* Create a smfData to hold the map projected into a data
-                 cube and then write it out. */
-
-              if( (res[0]->sdata[idx]->file->name)[0] ) {
-                smfData *ast=NULL;
-                double *ast_data=NULL;
-                const char *astname=NULL;
-                const char *resname=NULL;
-                char workstr[GRP__SZNAM+1];
-
-                /* Since AST only exists as a time-series model if exporting,
-                   we work out the AST container filename based on RES here */
-
-                astname = smf_model_getname( SMF__AST, status );
-                resname = smf_model_getname( SMF__RES, status );
-
-                *name = 0;
-                if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
-                smf_stripsuffix( res[0]->sdata[idx]->file->name,
-                                 SMF__DIMM_SUFFIX, workstr, status );
-                smf_stripsuffix( workstr, resname, name + strlen(name), status );
-
-                one_strlcat( name, "_" , sizeof(name), status );
-                one_strlcat( name, astname, sizeof(name), status );
-
-                /* Create the smfData, fill it with the projected
-                   map data, create its header, associate a quality
-                   array, and set bad values */
-
-                ast = smf_construct_smfData( NULL, NULL, NULL, NULL, NULL,
-                                             SMF__DOUBLE, NULL, NULL,
-                                             SMF__QFAM_NULL,
-                                             qua[0]->sdata[idx], 0, 1,
-                                             res[0]->sdata[idx]->dims,
-                                             res[0]->sdata[idx]->lbnd,
-                                             res[0]->sdata[idx]->ndims,
-                                             0, 0, NULL, NULL, status );
-
-                smf_get_dims( ast, NULL, NULL, NULL, NULL, &dsize,
-                              NULL, NULL, status );
-
-                ast->pntr[0] = astCalloc( dsize, smf_dtype_size(ast,status) );
-
-                if( *status == SAI__OK ) {
-                  ast_data = ast->pntr[0];
-                  lut_data = (lut[0]->sdata[idx]->pntr)[0];
-
-                  for( j=0; j<dsize; j++ ) {
-                    if( lut_data[j] != VAL__BADI ) {
-                      ast_data[j] = thismap[lut_data[j]];
-                    } else {
-                      ast_data[j] = VAL__BADD;
+              if( exportNDF_which[whichast] ) {
+                /* Create a smfData to hold the map projected into a data
+                   cube and then write it out. */
+
+                if( (res[0]->sdata[idx]->file->name)[0] ) {
+                  smfData *ast=NULL;
+                  double *ast_data=NULL;
+                  const char *astname=NULL;
+                  const char *resname=NULL;
+                  char workstr[GRP__SZNAM+1];
+
+                  /* Since AST only exists as a time-series model if exporting,
+                     we work out the AST container filename based on RES here */
+
+                  astname = smf_model_getname( SMF__AST, status );
+                  resname = smf_model_getname( SMF__RES, status );
+
+                  *name = 0;
+                  if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
+                  smf_stripsuffix( res[0]->sdata[idx]->file->name,
+                                   SMF__DIMM_SUFFIX, workstr, status );
+                  smf_stripsuffix( workstr, resname, name + strlen(name), status );
+
+                  one_strlcat( name, "_" , sizeof(name), status );
+                  one_strlcat( name, astname, sizeof(name), status );
+
+                  /* Create the smfData, fill it with the projected
+                     map data, create its header, associate a quality
+                     array, and set bad values */
+
+                  ast = smf_construct_smfData( NULL, NULL, NULL, NULL, NULL,
+                                               SMF__DOUBLE, NULL, NULL,
+                                               SMF__QFAM_NULL,
+                                               qua[0]->sdata[idx], 0, 1,
+                                               res[0]->sdata[idx]->dims,
+                                               res[0]->sdata[idx]->lbnd,
+                                               res[0]->sdata[idx]->ndims,
+                                               0, 0, NULL, NULL, status );
+
+                  smf_get_dims( ast, NULL, NULL, NULL, NULL, &dsize,
+                                NULL, NULL, status );
+
+                  ast->pntr[0] = astCalloc( dsize, smf_dtype_size(ast,status) );
+
+                  if( *status == SAI__OK ) {
+                    ast_data = ast->pntr[0];
+                    lut_data = (lut[0]->sdata[idx]->pntr)[0];
+
+                    for( j=0; j<dsize; j++ ) {
+                      if( lut_data[j] != VAL__BADI ) {
+                        ast_data[j] = thismap[lut_data[j]];
+                      } else {
+                        ast_data[j] = VAL__BADD;
+                      }
                     }
                   }
+
+                  smf_model_createHdr( ast, SMF__AST, refdata, status );
+
+                  if( !noexportsetbad ) {
+                    smf_update_valbad( ast, SMF__NUL, NULL, 0, 0, SMF__Q_BADB,
+                                       status );
+                  }
+
+                  /* Export AST */
+                  smf_write_smfData( wf, ast, NULL, name, NULL, 0, NDF__NOID,
+                                     MSG__VERB, 0, NULL, NULL, status );
+
+                  /* Clean up */
+                  smf_close_file( wf, &ast, status );
+                } else {
+                  msgOut( " ",
+                          "SMF__ITERATEMAP: Can't export AST -- NULL filename",
+                          status);
                 }
 
-                smf_model_createHdr( ast, SMF__AST, refdata, status );
-
-                if( !noexportsetbad ) {
-                  smf_update_valbad( ast, SMF__NUL, NULL, 0, 0, SMF__Q_BADB,
-                                     status );
-                }
-
-                /* Export AST */
-                smf_write_smfData( wf, ast, NULL, name, NULL, 0, NDF__NOID,
-                                   MSG__VERB, 0, NULL, NULL, status );
-
-                /* Clean up */
-                smf_close_file( wf, &ast, status );
-              } else {
-                msgOut( " ",
-                        "SMF__ITERATEMAP: Can't export AST -- NULL filename",
-                        status);
               }
+            }
 
+            /* Dynamic components excluding NOI/AST */
+            for( j=0; j<nmodels; j++ ) {
+
+              /* Remember to check again whether model[j][0]->sdata[idx] exists
+                 for cases like COM */
+              if( (*status == SAI__OK) && (modeltyps[j] != SMF__NOI) &&
+                  (modeltyps[j] != SMF__AST) && model[j][0]->sdata[idx] &&
+                  exportNDF_which[j] ) {
+                if( (model[j][0]->sdata[idx]->file->name)[0] ) {
+
+                  *name = 0;
+                  if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
+                  smf_model_createHdr( model[j][0]->sdata[idx], modeltyps[j],
+                                       refdata,status );
+                  smf_stripsuffix( model[j][0]->sdata[idx]->file->name,
+                                   SMF__DIMM_SUFFIX, name + strlen(name), status );
+
+                  if( !noexportsetbad ) {
+                    smf_update_valbad( model[j][0]->sdata[idx], modeltyps[j],
+                                       qua_data, bstride, tstride, SMF__Q_BADB,
+                                       status );
+                  }
+
+                  /* decide if we're writing quality: has to be requested,
+                     and either need to have 3d data array
+                     (check array dimensions), or we can supply a collapsed
+                     quality in the special case of COM */
+
+                  if( modeltyps[j] == SMF__COM && qua_data ) {
+                    smf_qual_t *tempqual = NULL;
+                    smfData * com = model[j][0]->sdata[idx];
+
+                    smf_collapse_quality( qua_data, com->qfamily, nbolo,
+                                          ntslice, bstride, tstride, 0,
+                                          &tempqual, status );
+
+                    com->sidequal = smf_construct_smfData( NULL, NULL, NULL,
+                                                           NULL, NULL,
+                                                           SMF__QUALTYPE,
+                                                           NULL, tempqual,
+                                                           SMF__QFAM_TSERIES,
+                                                           NULL, 0, 1,
+                                                           com->dims,
+                                                           com->lbnd,
+                                                           com->ndims, 0, 0,
+                                                           NULL, NULL, status );
+                  }
+
+                  /* Decide if we can dump the EXT model as 1D or if it
+                     needs to be 3D. */
+                  int single = 0;
+                  if( modeltyps[j] == SMF__EXT ) {
+                    astMapGet0A( keymap, "EXT", &kmap );
+                    if( astMapHasKey( kmap, "ALLQUICK" ) ) {
+                       astMapGet0I( kmap, "ALLQUICK", &single );
+                    }
+                    kmap = astAnnul( kmap );
+                  }
+
+                  smf_write_smfData( wf, model[j][0]->sdata[idx], NULL,
+                                     name, NULL, 0, NDF__NOID,
+                                     MSG__VERB, single, NULL, NULL, status );
+
+                  /* if we had temporary quality free it */
+                  if ( modeltyps[j] == SMF__COM && qua_data ) {
+                    smf_close_file( wf, &(model[j][0]->sdata[idx]->sidequal),
+                                    status );
+                  }
+
+                } else {
+                  msgSetc("MOD",smf_model_getname(modeltyps[j], status) );
+                  msgOut( " ",
+                          "SMF__ITERATEMAP: Can't export ^MOD: NULL filename",
+                          status);
+                }
+              }
             }
           }
 
-          /* Dynamic components excluding NOI/AST */
-          for( j=0; j<nmodels; j++ ) {
 
-            /* Remember to check again whether model[j][0]->sdata[idx] exists
-               for cases like COM */
-            if( (*status == SAI__OK) && (modeltyps[j] != SMF__NOI) &&
-                (modeltyps[j] != SMF__AST) && model[j][0]->sdata[idx] &&
-                exportNDF_which[j] ) {
-              if( (model[j][0]->sdata[idx]->file->name)[0] ) {
+          /*** TIMER ***/
+          msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                     ": ** %f s Exporting models",
+                     status, smf_timerupdate(&tv1,&tv2,status) );
 
-                *name = 0;
-                if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
-                smf_model_createHdr( model[j][0]->sdata[idx], modeltyps[j],
-                                     refdata,status );
-                smf_stripsuffix( model[j][0]->sdata[idx]->file->name,
-                                 SMF__DIMM_SUFFIX, name + strlen(name), status );
+          errEnd( status );
+        }
 
-                if( !noexportsetbad ) {
-                  smf_update_valbad( model[j][0]->sdata[idx], modeltyps[j],
-                                     qua_data, bstride, tstride, SMF__Q_BADB,
-                                     status );
-                }
+  /* Free the zero masks. */
+        dat.ast_mask = astFree( dat.ast_mask );
+        dat.com_mask = astFree( dat.com_mask );
+        dat.flt_mask = astFree( dat.flt_mask );
+        dat.ssn_mask = astFree( dat.ssn_mask );
+        dat.pca_mask = astFree( dat.pca_mask );
+      }
 
-                /* decide if we're writing quality: has to be requested,
-                   and either need to have 3d data array
-                   (check array dimensions), or we can supply a collapsed
-                   quality in the special case of COM */
+  #ifdef __ITERATEMAP_SHOW_MEM
+      _smf_iteratemap_showmem(status);
+  #endif
 
-                if( modeltyps[j] == SMF__COM && qua_data ) {
-                  smf_qual_t *tempqual = NULL;
-                  smfData * com = model[j][0]->sdata[idx];
+      /* If we get here and there is a SMF__INSMP we probably flagged
+         all of the data as bad for some reason. In a multi-contchunk
+         map it is annoying to have the whole thing die here. So, annul
+         the error, warn the user, and then continue on... This will
+         also help us to properly free up resources used by this
+         chunk. However, we use the count_minsmp to remember that this
+         happened, and will tell the caller. */
 
-                  smf_collapse_quality( qua_data, com->qfamily, nbolo,
-                                        ntslice, bstride, tstride, 0,
-                                        &tempqual, status );
+      if( *status == SMF__INSMP ) {
+        if( msgIflev( NULL, status ) >= MSG__VERB ) {
+           errFlush( status );
+        } else {
+           errAnnul( status );
+        }
+        msgOut(""," ************************* Warning! *************************",
+               status );
+        msgOut(""," This continuous chunk failed due to insufficient samples.",
+                status );
+        msgOut(""," This can be due to strict bad-bolo flagging.", status );
+        msgOut(""," Another possibility is that the data are bad.", status );
+        msgOut(""," Annuling the bad status and trying to continue...", status);
+        msgOut(""," ************************************************************",
+               status );
 
-                  com->sidequal = smf_construct_smfData( NULL, NULL, NULL,
-                                                         NULL, NULL,
-                                                         SMF__QUALTYPE,
-                                                         NULL, tempqual,
-                                                         SMF__QFAM_TSERIES,
-                                                         NULL, 0, 1,
-                                                         com->dims,
-                                                         com->lbnd,
-                                                         com->ndims, 0, 0,
-                                                         NULL, NULL, status );
-                }
+        /* Remember how many chunks failed due to lack of samples */
+        count_minsmp++;
+      } else if( *status == SAI__OK ){
 
-                /* Decide if we can dump the EXT model as 1D or if it
-                   needs to be 3D. */
-                int single = 0;
-                if( modeltyps[j] == SMF__EXT ) {
-                  astMapGet0A( keymap, "EXT", &kmap );
-                  if( astMapHasKey( kmap, "ALLQUICK" ) ) {
-                     astMapGet0I( kmap, "ALLQUICK", &single );
-                  }
-                  kmap = astAnnul( kmap );
-                }
+        /* In the multiple contchunk case, add this map to the total if
+           we got here with clean status. First get the weight for this
+           chunk. */
+        chunkweight = smf_chunkweight( res[0]->sdata[0], keymap,
+                                       contchunk, status );
 
-                smf_write_smfData( wf, model[j][0]->sdata[idx], NULL,
-                                   name, NULL, 0, NDF__NOID,
-                                   MSG__VERB, single, NULL, NULL, status );
+        /* on first chunk, copy thismap onto map
+           subsquent chunks get added below */
+        if( contchunk == 0 ) {
+          memcpy( map, thismap, msize*sizeof(*map) );
+          memcpy( weights, thisweight, msize*sizeof(*weights) );
+          memcpy( mapweightsq, thisweightsq, msize*sizeof(*mapweightsq) );
+          memcpy( mapvar, thisvar, msize*sizeof(*mapvar) );
+          memcpy( hitsmap, thishits, msize*sizeof(*hitsmap) );
+          memcpy( mapqual, thisqual, msize*sizeof(*mapqual) );
+        }
 
-                /* if we had temporary quality free it */
-                if ( modeltyps[j] == SMF__COM && qua_data ) {
-                  smf_close_file( wf, &(model[j][0]->sdata[idx]->sidequal),
-                                  status );
-                }
+        if( ncontchunks > 1 ) {
+          msgOut( " ", FUNC_NAME ": Adding map estimated from this continuous"
+                  " chunk to total", status);
+          smf_addmap1( contchunk, map, mapweights, weights, hitsmap, mapvar,
+                       mapqual, thismap, thisweight, thishits, thisvar, thisqual,
+                       msize, chunkweight, status );
+        }
 
-              } else {
-                msgSetc("MOD",smf_model_getname(modeltyps[j], status) );
-                msgOut( " ",
-                        "SMF__ITERATEMAP: Can't export ^MOD: NULL filename",
-                        status);
-              }
+        /* Add this chunk of exposure time to the total. We assume the array was
+           initialised to zero and will not contain bad values. */
+        if( *status == SAI__OK ) {
+          steptime = res[0]->sdata[0]->hdr->steptime;
+          for (ipix = 0; ipix < msize; ipix++ ) {
+            if ( thishits[ipix] != VAL__BADI) {
+              exp_time[ipix] += chunkweight*steptime * (double)thishits[ipix];
             }
           }
         }
-
-
-        /*** TIMER ***/
-        msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                   ": ** %f s Exporting models",
-                   status, smf_timerupdate(&tv1,&tv2,status) );
-
-        errEnd( status );
+        /* Update the sum of all chunk weights. */
+        sumchunkweights += chunkweight;
       }
 
-/* Free the zero masks. */
-      dat.ast_mask = astFree( dat.ast_mask );
-      dat.com_mask = astFree( dat.com_mask );
-      dat.flt_mask = astFree( dat.flt_mask );
-      dat.ssn_mask = astFree( dat.ssn_mask );
-      dat.pca_mask = astFree( dat.pca_mask );
-    }
-
-#ifdef __ITERATEMAP_SHOW_MEM
-    _smf_iteratemap_showmem(status);
-#endif
-
-    /* If we get here and there is a SMF__INSMP we probably flagged
-       all of the data as bad for some reason. In a multi-contchunk
-       map it is annoying to have the whole thing die here. So, annul
-       the error, warn the user, and then continue on... This will
-       also help us to properly free up resources used by this
-       chunk. However, we use the count_minsmp to remember that this
-       happened, and will tell the caller. */
-
-    if( *status == SMF__INSMP ) {
-      if( msgIflev( NULL, status ) >= MSG__VERB ) {
-         errFlush( status );
-      } else {
-         errAnnul( status );
-      }
+    } else {
       msgOut(""," ************************* Warning! *************************",
              status );
-      msgOut(""," This continuous chunk failed due to insufficient samples.",
-              status );
-      msgOut(""," This can be due to strict bad-bolo flagging.", status );
-      msgOut(""," Another possibility is that the data are bad.", status );
-      msgOut(""," Annuling the bad status and trying to continue...", status);
+      msgOut(""," This continuous chunk was ignored because it", status );
+      msgOut(""," does not have any overlap with the output map.", status );
       msgOut(""," ************************************************************",
              status );
-
-      /* Remember how many chunks failed due to lack of samples */
-      count_minsmp++;
-    } else if( *status == SAI__OK ){
-
-      /* In the multiple contchunk case, add this map to the total if
-         we got here with clean status. First get the weight for this
-         chunk. */
-      chunkweight = smf_chunkweight( res[0]->sdata[0], keymap,
-                                     contchunk, status );
-
-      /* on first chunk, copy thismap onto map
-         subsquent chunks get added below */
-      if( contchunk == 0 ) {
-        memcpy( map, thismap, msize*sizeof(*map) );
-        memcpy( weights, thisweight, msize*sizeof(*weights) );
-        memcpy( mapweightsq, thisweightsq, msize*sizeof(*mapweightsq) );
-        memcpy( mapvar, thisvar, msize*sizeof(*mapvar) );
-        memcpy( hitsmap, thishits, msize*sizeof(*hitsmap) );
-        memcpy( mapqual, thisqual, msize*sizeof(*mapqual) );
-      }
-
-      if( ncontchunks > 1 ) {
-        msgOut( " ", FUNC_NAME ": Adding map estimated from this continuous"
-                " chunk to total", status);
-        smf_addmap1( contchunk, map, mapweights, weights, hitsmap, mapvar,
-                     mapqual, thismap, thisweight, thishits, thisvar, thisqual,
-                     msize, chunkweight, status );
-      }
-
-      /* Add this chunk of exposure time to the total. We assume the array was
-         initialised to zero and will not contain bad values. */
-      if( *status == SAI__OK ) {
-        steptime = res[0]->sdata[0]->hdr->steptime;
-        for (ipix = 0; ipix < msize; ipix++ ) {
-          if ( thishits[ipix] != VAL__BADI) {
-            exp_time[ipix] += chunkweight*steptime * (double)thishits[ipix];
-          }
-        }
-      }
-      /* Update the sum of all chunk weights. */
-      sumchunkweights += chunkweight;
     }
+
 
     /* *************************************************************************
        Clean up temporary resources associated with this continuous chunk
        before continuing in the outer loop.
     ************************************************************************* */
-
-    /* fixed model smfGroups */
-    if( resgroup ) smf_close_smfGroup( &resgroup, status );
-    if( lutgroup ) smf_close_smfGroup( &lutgroup, status );
-    if( quagroup ) smf_close_smfGroup( &quagroup, status );
 
     /* fixed model smfArrays */
     if( res ) {
@@ -3756,6 +3772,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       *status = SMF__INSMP;
       errRep("", FUNC_NAME ": No good samples", status );
     }
+
+  } else if(*status == SAI__OK ) {
+    *status = SMF__INSMP;
+    errRep("", FUNC_NAME ": No good samples fell within the map", status );
   }
 
   /* The second set of map arrays get freed in the multiple contchunk case */

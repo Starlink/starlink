@@ -1027,6 +1027,8 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
                 memcpy( data->theta + tchunk, refdata->theta,
                         reftlen*sizeof(*(data->theta)) );
               }
+
+              data->onmap = refdata->onmap;
             }
 
             /* dark squids */
@@ -1302,6 +1304,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
         smf_import_array( wf, data, dumpdir, ename, 0, 0, SMF__INTEGER,
                           data->lut, status );
         ename = astFree( ename );
+        data->onmap = 1;
       }
     }
 

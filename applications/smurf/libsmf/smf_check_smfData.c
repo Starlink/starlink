@@ -331,6 +331,9 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
     }
   }
 
+  /* Does the smfData overlap the region of interest (usually the map). */
+  odata->onmap = idata->onmap;
+
   /* Refcount & virtual */
   /* Since odata is not a clone, refcount should be 1 */
   if ( odata->refcount != 1 ) {

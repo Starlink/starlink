@@ -756,6 +756,7 @@ typedef struct smfData {
   double *poly;              /* Polynomial scan fits */
   size_t ncoeff;             /* Number of coefficients in polynomial */
   int * lut;                 /* Pointing lookup table */
+  int onmap;                 /* Non-zero if the smfData overlaps the map */
   double * theta;            /* Scan direction each time slice */
   AstKeyMap *history;        /* History entries */
 } smfData;
