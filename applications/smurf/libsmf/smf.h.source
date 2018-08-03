@@ -918,7 +918,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
                      AstMapping *oskymap, int moving, int olbnd[ 2 ],
                      int oubnd[ 2 ], fts2Port fts_port, int *lut,
                      double *angle, double *lon,
-                     double *lat, int *status );
+                     double *lat, size_t *onmap, int *status );
 
 void smf_copytime( struct timeval *target, struct timeval *source,
                    int *status);
