@@ -59,8 +59,14 @@
 *     16-OCT-2009 (DSB):
 *        Original version.
 *     21-JUL-2011 (DSB):
-*        New scheme for preventing a group from being written out more 
+*        New scheme for preventing a group from being written out more
 *        than once to a NDF - see NDG1_HWRGH.
+*     6-AUG-2018 (DSB):
+*        Fix bug introduced by previous change (2011!) that prevented 
+*        group history being written out to the second and subsequent 
+*        output NDFs created by an application. For instamce, this caused 
+*        no group history to be stored in "itermap" NDFs created by 
+*        smurf:makemap.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -153,6 +159,11 @@
 
             END IF
          END IF
+
+*  Remove the current NDF path from the KeyMap. This is the key with 
+*  index 1, which means a new NDF path will then have index 1.
+         CALL AST_MAPREMOVE( DHKMP_COM2, PATH, STATUS )
+
       END DO
 
 *  Free resources. First delete the groups for which identifiers are held
