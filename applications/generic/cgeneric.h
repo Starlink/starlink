@@ -26,6 +26,7 @@
 *          -- CGEN_MIN
 *          -- CGEN_EPS
 *          -- CGEN_FUNCTION
+*          -- CGEN_FUNCTION2
 *          -- CGEN_HDS_TYPE
 *          -- CGEN_TYPE
 *          -- CGEN_BIG_TYPE
@@ -48,6 +49,10 @@
 *
 *          with the trivial job of testing the first element of an array
 *          against the BAD value contant.
+*
+*          The CGEN_FUNCTION2 is like CGEN_FUNCTION except that it
+*          appends a specified suffix to the end of the expanded function
+*          name (i.e. after the type code).
 *
 *          The value of CGEN_TYPE will be set to the C type, that is
 *          double, float, int, short int, unsigned short int, char,
@@ -140,6 +145,8 @@
 *        Add INT64 support.
 *     7-JUN-2018 (DSB):
 *        Add CGEN_EPS
+*     7-JUN-2018 (DSB):
+*        Add CGEN_FUNCTION2
 *     {enter_further_changes_here}
 
 *-
@@ -158,6 +165,14 @@
 /* Macro to define the generic function name based on the current
  * CGEN_CODE value. */
 #define CGEN_FUNCTION(name) CGEN_JOIN_STRINGS(name,CGEN_CODE)
+
+/* The CGEN_FUNCTION2 macro is like CGEN_FUNCTION, but adds a specified
+   suffix to the end of the expanded function name (i.e. after the type
+   code). */
+#define DEFER_CGEN_JOIN_STRINGS2(string1,string2,suffix) string1 ## string2 ## suffix
+#define CGEN_JOIN_STRINGS2(string1,string2,suffix) \
+           DEFER_CGEN_JOIN_STRINGS2(string1,string2,suffix)
+#define CGEN_FUNCTION2(name,suffix) CGEN_JOIN_STRINGS2(name,CGEN_CODE,suffix)
 
 /* The CGEN_BAD value for the current data type, which is the PRM
  * type specified by CGEN_PRM_TYPE (VAL__BADD, VAL__BADR etc.). */
