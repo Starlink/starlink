@@ -537,6 +537,10 @@
 *     2018-06-26 (DSB):
 *        Write out the final mapchange value for each chunk to output
 *        parameter "CHUNKCHANGE".
+*     2018-08-18 (DSB):
+*        If a continuous chunk fails for any reason, flush the error and
+*        proceed to map any remaining chunks. Only flush the error if
+*        there is more than one continuous chunk.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1671,7 +1675,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   sumchunkweights = 0.0;
   *totexp = 0.0;
 
-  for( contchunk=0; contchunk<ncontchunks  && !smf_interupt; contchunk++ ) {
+  for( contchunk=0; contchunk<ncontchunks  && !smf_interupt && *status == SAI__OK;
+       contchunk++ ) {
 
     size_t ntgood = 0;       /* Number of good time slices in this chunk */
     size_t nsamples = 0;     /* Number of good samples in this chunk */
@@ -3724,6 +3729,17 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     thetabincen = astFree( thetabincen );
     thetabins = astFree( thetabins );
     whichthetabin = astFree( whichthetabin );
+
+    /* If an error has occurred processing the current chunk, let the
+       error report stand if there is only one chunk. If there is more
+       than one chunk, add a context message and then flush the error
+       so that any remaining chunks can be processed. */
+    if( *status != SAI__OK && ncontchunks > 1 ) {
+       errRep( " ", "Ignoring errors for current continuous chunk and "
+               "proceeding to map remaining chunks.", status );
+       errFlush( status );
+    }
+
   }
 
   /* Normalise the returned exposure times to a mean chunk weight of unity. */
