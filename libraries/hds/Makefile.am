@@ -72,13 +72,10 @@ F_ROUTINES = \
 	cmp_getnx.f cmp_getvx.f cmp_len.f cmp_mapn.f cmp_mapv.f \
 	cmp_mod.f cmp_modc.f cmp_prim.f cmp_put0x.f cmp_put1x.f \
 	cmp_putnx.f cmp_putvx.f cmp_shape.f cmp_size.f cmp_struc.f \
-	cmp_type.f cmp_unmap.f \
-	dat_getnx.f dat_putnx.f \
-	dat_cut.f \
-	dat1_pshde.f dat1_pshdf.f dat1_pshdb.f \
-	hds_find.f
+	cmp_type.f cmp_unmap.f dat_getnx.f dat_putnx.f
 
-F_C_ROUTINES = hds_run.c fortran_interface.c hdsFind.c hds_split.c
+
+F_C_ROUTINES = hds_run.c fortran_interface.c
 
 #  List of Fortran BLOCK DATA routines.
 BLOCK_DATA_FILES = cmp_blk.f
@@ -86,10 +83,11 @@ BLOCK_DATA_FILES = cmp_blk.f
 CMP_C_ROUTINES = cmpMod.c cmpModC.c cmpPut0x.c cmpType.c cmpGet0x.c
 
 C_ROUTINES = $(CMP_C_ROUTINES) \
-	dat1CcopyLocXtoY.c dat1CcopyXtoY.c \
+        hdsFind.c hds_split.c dat1CcopyLocXtoY.c dat1CcopyXtoY.c \
 	dat1CopyPrimXtoY.c dat1CopyStrucXtoY.c dat1CopyXtoY.c \
 	datExportFloc.c datImportFloc.c dat1_import_floc.c hdsdim.c \
-	dat1GetEnv.c hdstuning.c hdsDimtoc.c hds_select.c hdsSplit.c
+	dat1GetEnv.c hdstuning.c hdsDimtoc.c hds_select.c hdsSplit.c \
+        datCut.c
 
 DAT_PAR: dat_par_f$(EXEEXT)
 	./dat_par_f > DAT_PAR

@@ -329,6 +329,46 @@ F77_SUBROUTINE(dat_copy)( CHARACTER(locator1),
    datCopy( locator1_c, locator2_c, name_c, status);
 }
 
+
+F77_SUBROUTINE(dat_cut)( CHARACTER(loc1),
+                          CHARACTER(str),
+                          CHARACTER(loc2),
+                          F77_INTEGER_TYPE *status
+                          TRAIL(loc1)
+                          TRAIL(str)
+                          TRAIL(loc2) )
+{
+
+/*==================================================*/
+/* DAT_CUT - Cut a cell or slice from an HDS object */
+/*==================================================*/
+
+/* Local variables. */
+   char *str_c;
+   HDSLoc *loc1_c = NULL;
+   HDSLoc *loc2_c = NULL;
+
+/* Create a null terminated copy of the supplied string. */
+   str_c = cnfCreim( str, str_length );
+
+/* Import the input locator string. Translated DAT__ROOT to NULL since
+   datImportFloc doesnot recognised DAT_ROOT. */
+   if( strncmp( DAT__ROOT, loc1, loc1_length ) ) {
+      datImportFloc( loc1, loc1_length, &loc1_c, status );
+   }
+
+/* Call pure C routine */
+   datCut( loc1_c, str_c, &loc2_c, status);
+
+/* Free the null-terminated buffers. */
+   cnfFree( str_c );
+
+/* Export the returned locator */
+   datExportFloc( &loc2_c, 1, loc2_length, loc2, status );
+}
+
+
+
 F77_SUBROUTINE(dat_drep)( CHARACTER(locator),
                           CHARACTER(format),
                           CHARACTER(order),
@@ -3250,6 +3290,51 @@ F77_SUBROUTINE(hds_ewild) ( F77_INTEGER_TYPE *iwld,
 /* Call pure C routine               */
    hdsEwild( iwld, status );
 }
+
+F77_SUBROUTINE(hds_find)( CHARACTER(locator1),
+                          CHARACTER(name),
+                          CHARACTER(mode),
+                          CHARACTER(locator2),
+                          F77_INTEGER_TYPE *status
+                          TRAIL(locator1)
+                          TRAIL(name)
+                          TRAIL(mode)
+                          TRAIL(locator2) )
+{
+
+/*=========================================*/
+/* HDS_FIND - Find named component or path */
+/*=========================================*/
+
+/* Local variables. */
+   char *mode_c;
+   char *name_c;
+   HDSLoc *locator1_c = NULL;
+   HDSLoc *locator2_c = NULL;
+
+/* Create a null terminated copy of the supplied name/path. */
+   name_c = cnfCreim( name, name_length );
+
+/* Create a null terminated copy of the supplied mode. */
+   mode_c = cnfCreim( mode, mode_length );
+
+/* Import the input locator string. Translated DAT__ROOT to NULL since
+   datImportFloc doesnot recognised DAT_ROOT.  */
+   if( strncmp( DAT__ROOT, locator1, locator1_length ) ) {
+      datImportFloc( locator1, locator1_length, &locator1_c, status );
+   }
+
+/* Call pure C routine */
+   hdsFind( locator1_c, name_c, mode_c, &locator2_c, status);
+
+/* Free the null-terminated buffers. */
+   cnfFree( name_c );
+   cnfFree( mode_c );
+
+/* Export the returned locator */
+   datExportFloc( &locator2_c, 1, locator2_length, locator2, status );
+}
+
 
 F77_SUBROUTINE(hds_flush)( CHARACTER(group),
                            F77_INTEGER_TYPE *status

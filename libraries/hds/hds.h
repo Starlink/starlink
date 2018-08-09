@@ -90,6 +90,14 @@ datCoerc(const HDSLoc *locator1, int ndim, HDSLoc **locator2, int *status);
 int
 datCopy(const HDSLoc *locator1, const HDSLoc *locator2, const char *name_c, int *status);
 
+
+/*===================================================================*/
+/* datCut - Cut a cell or slice from an HDS object.                  */
+/*===================================================================*/
+
+int datCut( HDSLoc *loc1, char *str, HDSLoc **loc2, int *status );
+
+
 /*============================================================*/
 /* datDrep - Obtain primitive data representation information */
 /*============================================================*/
@@ -1137,7 +1145,7 @@ hdsClose(HDSLoc **locator, int *status);
 /* hdsFind - Find an object (Fortran routine, requires hdsf library) */
 /*===================================================================*/
 
-int hdsFind(const HDSLoc *locator1, const char *name, const char *mode, HDSLoc **locator2, int *status);
+int hdsFind(HDSLoc *locator1, const char *name, const char *mode, HDSLoc **locator2, int *status);
 
 
 /*======================================================================*/
