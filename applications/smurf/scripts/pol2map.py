@@ -391,7 +391,12 @@
 *        where "RMS" is the RMS residual between an individual observation
 *        map and the coadd of all observation maps, after they have been
 *        aligned spatially to take account of any pointing error in the
-*        individual observation. See also parameter WEIGHTLIM. [FALSE]
+*        individual observation. See also parameter WEIGHTLIM.
+*
+*        WARNING: This option should only be used if the number of
+*        observation being processed is sufficiently large to allow
+*        aberrant observations to be identified with a reasonable degree
+*        of confidence. [FALSE]
 *     PIXSIZE = _REAL (Read)
 *        Pixel dimensions in the output I, Q and U maps, in arcsec. The default
 *        is 4 arc-sec for both 450 and 850 um data. The bin size for the output
@@ -2130,7 +2135,7 @@ try:
                   if wgt < wgtlim:
                      msg_out("WARNING: pol2map will exclude observation {0} "
                              "since it's weight ({1}) is below the value "
-                             "of parameter WEIGHTLIM ({2}).",
+                             "of parameter WEIGHTLIM ({2}).".
                              format( key, wgt, wgtlim ))
                      for path in qui_list[ key ]:
                         badlist.append( path )
