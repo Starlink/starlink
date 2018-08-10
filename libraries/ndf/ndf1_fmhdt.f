@@ -70,6 +70,11 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
 
+*  Global Variables:
+      INCLUDE 'NDF_TCB'          ! NDF_ Tuning Control Block
+*        TCB_FIXDT = LOGICAL (Read)
+*           Use a fixed date and time in new history records?
+
 *  Arguments Given:
       INTEGER YMDHM( 5 )
       REAL SEC
@@ -93,6 +98,15 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  If the FIXDT tuning flag indicates that we are to use a fixed date and
+*  time in place of the real date and time, then just return an arbitrary
+*  (but fixed) string. This is intended to facilitate regression testing,
+*  where a change in date/time could cause tests to fail.
+      IF( TCB_FIXDT ) THEN
+         STR = '10-AUG-2018 11:00:00'
+         RETURN
+      END IF
 
 *  Format the data and time as a character string using the defined
 *  standard history record format.

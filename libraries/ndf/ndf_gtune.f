@@ -74,6 +74,8 @@
 *        Add the AUTO_HISTORY tuning parameter.
 *     16-JUL-2012 (DSB):
 *        Add the SECMAX tuning parameter.
+*     10-AUG-2018 (DSB):
+*        Add the FIXDT tuning parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -111,6 +113,8 @@
 *        TCB_PXT = INTEGER (Read)
 *           An AST pointer to a KeyMap holding the names of NDF
 *           extensions and their associated default propagation flags.
+*        TCB_FIXDT = LOGICAL (Read)
+*           Use a fixed date and time in history records.
 
 *  Arguments Given:
       CHARACTER * ( * ) TPAR
@@ -195,6 +199,16 @@
 *  If WARN was specified, then return the warning message flag value.
          ELSE IF ( NDF1_SIMLR( TPAR, 'WARN', NDF__MINAB ) ) THEN
             IF ( TCB_WARN ) THEN
+               VALUE = 1
+            ELSE
+               VALUE = 0
+            END IF
+
+*  Fix History date/time flag.
+*  ===========================
+*  If FIXDT was specified, then return the fixed history date/time flag value.
+         ELSE IF ( NDF1_SIMLR( TPAR, 'FIXDT', NDF__MINAB ) ) THEN
+            IF ( TCB_FIXDT ) THEN
                VALUE = 1
             ELSE
                VALUE = 0

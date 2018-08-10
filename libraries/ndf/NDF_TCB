@@ -59,6 +59,8 @@
 *        Added TCB_PXT to control default propgation of named extensions.
 *     16-JUL-2012 (DSB):
 *        Added TCB_SECMAX.
+*     10-AUG-2018 (DSB):
+*        Added TCB_FIXDT.
 *     {enter_further_changes_here}
 
 *-
@@ -158,13 +160,22 @@
 *  section on the command line.
       INTEGER TCB_SECMAX
 
+*  Fix the date/time strings stored in history records?
+*  ====================================================
+*  If .TRUE., the date and time string stored in any new History records
+*  will be fixed at an arbitrary value ("10-AUG-2018 11:00:00") regardless
+*  of the current time. If .FALSE., the real date and time will be used.
+*  This facility is intended to facilitate regression testing, where the
+*  difference in date/time in history records could cause a test to fail.
+      LOGICAL TCB_FIXDT
+
 *  Common blocks:
 *  =============
 
 *  Non-character data.
       COMMON /NDF1_TCB1/ TCB_DOCVT, TCB_ETFLG, TCB_FNFMT, TCB_KEEP,
      :                   TCB_SHCVT, TCB_WARN, TCB_PXT, TCB_AUTOHISTORY,
-     :                   TCB_SECMAX
+     :                   TCB_SECMAX, TCB_FIXDT
 
 *  Save common block contents.
       SAVE /NDF1_TCB1/

@@ -97,6 +97,12 @@
 *     argument when calling NDF_PROP or NDF_SCOPY. The default value for
 *     all "PXT..." tuning parameters is 1, meaning that all extensions
 *     are propagated by default.
+*     - 'FIXDT': If FIXDT is set to 1, the date and time string stored
+*     in any new History records will be fixed at an arbitrary value
+*     ("10-AUG-2018 11:00:00") regardless of the current time. If 0, the
+*     real date and time will be used. This facility is intended to allow
+*     regression testing, where any change in the date/time within history
+*     records could cause a test to fail.
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
@@ -142,6 +148,8 @@
 *        Add the AUTO_HISTORY tuning parameter.
 *     16-JUL-2012 (DSB):
 *        Add the SECMAX tuning parameter.
+*     10-AUG-2018 (DSB):
+*        Add the FIXDT tuning parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -179,6 +187,8 @@
 *        TCB_PXT = INTEGER (Write)
 *           An AST pointer to a KeyMap holding the names of NDF
 *           extensions and their associated default propagation flags.
+*        TCB_FIXDT = LOGICAL (Write)
+*           Use a fixed date and time within new History records?
 
 *  Arguments Given:
       INTEGER VALUE
@@ -309,6 +319,26 @@
                CALL ERR_REP( 'NDF_TUNE_WARN',
      : 'The value ^VALUE is not valid for the tuning parameter ' //
      : 'WARN; it should be 0 or 1 (possible programming error).',
+     :                       STATUS )
+            END IF
+
+*  Use a fixed date/time wqithin new History records.
+*  =================================================
+*  If FIXDT was specified, then set the "use fixed history date/time" flag
+*  appropriately.
+         ELSE IF ( NDF1_SIMLR( TPAR, 'FIXDT', NDF__MINAB ) ) THEN
+            IF ( VALUE .EQ. 0 ) THEN
+               TCB_FIXDT = .FALSE.
+            ELSE IF ( VALUE .EQ. 1 ) THEN
+               TCB_FIXDT = .TRUE.
+
+*  If the value supplied is not valid, then report an error.
+            ELSE
+               STATUS = NDF__TPVIN
+               CALL MSG_SETI( 'VALUE', VALUE )
+               CALL ERR_REP( 'NDF_TUNE_FXDT',
+     : 'The value ^VALUE is not valid for the tuning parameter ' //
+     : 'FIXDT; it should be 0 or 1 (possible programming error).',
      :                       STATUS )
             END IF
 

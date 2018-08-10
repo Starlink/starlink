@@ -70,6 +70,8 @@
 *        Add initialisation of TCB_AUTOHISTORY.
 *     15-JUL-2012 (DSB):
 *        Add initialisation of TCB_SECMAX
+*     10-AUG-2018 (DSB):
+*        Add initialisation of TCB_FIXDT
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -225,6 +227,15 @@
 *  is not specified within this KeyMap is propagated by default. Note,
 *  these tuning parameter cannot be set from an environment variable.
          TCB_PXT = AST__NULL
+
+*  Fix the date/time strings stored in history records?
+*  ====================================================
+*  Read the warning message flag value from its environment variable
+*  (if present) and set the TCB flag accordingly.
+         CALL NDF1_RDTUN( 'NDF_FIXDT', 0, IVAL, STATUS )
+         IF ( STATUS .EQ. SAI__OK ) THEN
+            TCB_FIXDT = ( IVAL .EQ. 1 )
+         END IF
 
 *  Note when the first successful invocation of this routine has
 *  completed.
