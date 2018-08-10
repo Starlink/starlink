@@ -73,7 +73,7 @@ void hdsDimtoc( hdsdim ivalue, char *string, size_t string_length, size_t *nchar
 
 /* Perform the internal write to the buffer, left justifying the
    resulting string. */
-      *nchar = sprintf( buf, "%-zu", ivalue );
+      *nchar = sprintf( buf, "%-" HDS_DIM_FORMAT, ivalue );
 
 /* Copy the value to the supplied string if there is room. */
       if( *nchar < string_length ) {
