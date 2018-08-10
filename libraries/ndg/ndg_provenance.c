@@ -3768,6 +3768,7 @@ static const char *ndg1Date( int *status ){
 /* Local Variables: */
    AstTimeFrame *tf;
    const char *result;
+   const char *fixdt;
 
 /* Initialise */
    result = " ";
@@ -3775,11 +3776,21 @@ static const char *ndg1Date( int *status ){
 /* Check the inherited status value. */
    if( *status != SAI__OK ) return result;
 
-/* Create a TimeFrame representing UTC, then use the TimeFrame to
-   determine and format the current time. */
-   tf = astTimeFrame("TimeScale=UTC,Format(1)=iso.0");
-   result = astFormat( tf, 1, astCurrentTime( tf ) );
-   tf = astAnnul( tf );
+/* If the environment variable NDF_FIXDT indicates that the NDF "FIXDT"
+   tuning parameter is set, then use a fixed date and time in place
+   of the current date and time. This mimics the behaviour of the NDF
+   library. */
+   fixdt = getenv( "NDF_FIXDT" );
+   if( fixdt && !strcmp( fixdt, "1" ) ) {
+      result = "2018-08-10 11:00:00";
+
+/* Otherwise, create a TimeFrame representing UTC, then use the
+   TimeFrame to determine and format the current time. */
+   } else {
+      tf = astTimeFrame("TimeScale=UTC,Format(1)=iso.0");
+      result = astFormat( tf, 1, astCurrentTime( tf ) );
+      tf = astAnnul( tf );
+   }
 
    return result;
 }
