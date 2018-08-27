@@ -369,9 +369,22 @@ itcl::class gaia::GaiaPolDisp {
 #  Ensure any old key is deleted.
       noKey
 
-#  If the key is currently enabled, and the vector style is known, draw a
-#  new key.
-      if { $kenabled_ && $style_ != "" && $cat_ != "" } {
+#  Get the vector scale (image pixels per unit value in the $lencol_ column).
+#  Negative or zero values mean that each vector will have a constant
+#  length regardless of any column value, in which case no key is need.
+#  Set "mag" blank to indicate this.
+      if { $style_ != "" && $cat_ != "" } {
+         set mag [$style_ getMagd $cat_ $rtdimage_]
+         if { $mag <= 0.0 } {
+           set mag ""
+         }
+      } else {
+         set mag ""
+      }
+
+#  If the key is currently enabled, and the vector scale is known,
+#  draw a new key.
+      if { $kenabled_ && $mag != "" } {
 
 #  Get the vector length to use.
          set kvval [getKvVal]
@@ -392,7 +405,6 @@ itcl::class gaia::GaiaPolDisp {
 #  Find the required length of the vector in canvas coords.
          $rtdimage_ convert coords 0.0 0.0 "image" vx0 vy0 "canvas"
          $rtdimage_ convert coords 1.0 0.0 "image" vx1 vy1 "canvas"
-         set mag [$style_ getMagd $cat_ $rtdimage_]
          set vcl [expr $kvval*$mag*abs( $vx1 - $vx0 )]
 
 #  Find the coords at the ends, so that the vector is centred at x=0
@@ -631,7 +643,7 @@ itcl::class gaia::GaiaPolDisp {
 
 #  The nominal default vector length is equal to 0.05 of the image diagonal.
 #  Find the corresponding number of data units.
-            if { $mag_ != 0.0 } {
+            if { $mag_ > 0.0 } {
                set d [expr 0.05*$diag/$mag_]
 
 #  We now find a "nice" value which is close to this value.
@@ -1397,7 +1409,9 @@ itcl::class gaia::GaiaPolDisp {
 
 #  Get the scale factor for vector length (image pixels per unit column
 #  value). If no value has been set, a default value is calculated on the
-#  basis of the supplied data.
+#  basis of the supplied data. Negative values indicate that all vectors
+#  should be drawn with the same length, regardless of the associated
+#  column value.
       set mag [$style getMagd $cat $rtdimage_]
 
 #  Get the angle to add on to the angle column values (degrees).
@@ -1587,8 +1601,13 @@ itcl::class gaia::GaiaPolDisp {
 #  Ignore zero length vectors.
                if { $lval != 0.0 } {
 
-#  Get the vector length in the required units for drawing.
-                  set len [expr $lval*$mag ]
+#  Get the vector length in the required units for drawing. Negative
+#  scales indicate that all vectors should have the same length.
+                  if { $mag > 0.0 } {
+                     set len [expr $lval*$mag ]
+                  } else {
+                     set len [expr {abs($mag)}]
+                  }
 
 #  Get the required vector angle.
                   set ang [expr $d2r_*([lindex $rowdata $acol] + $rot) ]

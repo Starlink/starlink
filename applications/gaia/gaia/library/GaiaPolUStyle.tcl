@@ -64,6 +64,8 @@
 #  History:
 #     22-OCT-2000 (DSB):
 #        Original version.
+#     27-AUG-2018 (DSB):
+#        If vector scale is negative, used constant vector length.
 #     {enter_further_changes_here}
 
 #-
@@ -701,7 +703,7 @@ itcl::class gaia::GaiaPolUStyle {
 	 }
 
          grid $itk_component(mag) -row $r -column 0 -sticky nw -padx $px
-         add_short_help $itk_component(mag) {Vector scale in image pixels per unit column value. If blank, a default value will be found}
+         add_short_help $itk_component(mag) {Vector scale in image pixels per unit column value. Default used if blank. All vectors have same length if negative.}
 
 #  Angle rotation
          itk_component add arot {
