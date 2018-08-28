@@ -24396,6 +24396,17 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
    }
    \sstparameters{
       \sstsubsection{
+         APPNAME = LITERAL (Read)
+      }{
+         The application name to be recorded in the new history record.
+         If a null value (\texttt{{!}}) is supplied, a default of
+         ``HISCOM'' is used and the new history record describes the
+         parameter values supplied when HISCOM was invoked. If a non-null
+         value is supplied, the new history record refers to the specified
+         application name instead of ``HISCOM'' and does not describe the
+         HISCOM parameter values. \texttt{[!]}
+      }
+      \sstsubsection{
          COMMENT = LITERAL (Read)
       }{
          A line of commentary limited to 72 characters.  If the value is
@@ -54112,6 +54123,15 @@ The following applications have been modified:
         is to use the full range of available pens.
         \item The vertical position of the key can now be controlled
         through Parameter KEYPOS.
+      \end{itemize}
+
+   \item [\htmlref{HISCOM}{HISCOM}]\mbox{}
+      \begin{itemize}
+        \item Has a new Parameter APPNAME, which can be used to change
+        the application name stored in the new history record from the
+        default of ``HISCOM''. Scripts that generate NDFs can use this
+        facility to record the details of the invocation of the script
+        in the form of a history record in the output NDF.
       \end{itemize}
 
    \item [\htmlref{MFITTREND}{MFITTREND}]\mbox{}

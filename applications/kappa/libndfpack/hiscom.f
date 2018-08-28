@@ -30,6 +30,13 @@
 *                      mode
 
 *  ADAM Parameters:
+*     APPNAME = LITERAL (Read)
+*        The application name to be recorded in the new history record.
+*        If a null (!) value is supplied, a default of "HISCOM" is used
+*        and the new history record describes the parameter values supplied
+*        when HISCOM was invoked. If a non-null value is supplied, the
+*        new history record refers to the specified application name instead
+*        of HISCOM and does not describe the HISCOM parameter values. [!]
 *     COMMENT = LITERAL (Read)
 *        A line of commentary limited to 72 characters.  If the value is
 *        supplied on the command line only that line of commentary will
@@ -181,6 +188,7 @@
                                  ! paragraph
 
 *  Local Variables:
+      CHARACTER * ( 80 ) APPNAM  ! Application name
       CHARACTER * ( NDF__SZHMX ) BUFFER ! Comment record
       CHARACTER * ( NDF__SZHMX ) COMENT( MXLINE ) ! Comment records
                                  ! (handling mapped char arrays is
@@ -197,6 +205,7 @@
       CHARACTER * ( 132 ) PARBUF ! Comment record (length limited by
                                  ! parameter system)
       INTEGER PLINES             ! Number of lines in current paragraph
+      LOGICAL REPLAC             ! Replace the default history record?
       LOGICAL THERE              ! HISTORY component present?
       LOGICAL WRAP               ! Wrap history?
 
@@ -207,6 +216,22 @@
 
 *  Obtain the NDF.
       CALL LPG_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
+
+*  Get the application name to use. If no application name is supplied,
+*  annul the error and indicate that the default history record created by
+*  HISCOM should not be replaced (also set APPNAM blank to indicate that
+*  NDF_HPUT should use the defaulty application name). Otherwise, indicate
+*  the default history should be replaced.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL PAR_GET0C( 'APPNAME', APPNAM, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            REPLAC = .FALSE.
+            APPNAM = ' '
+         ELSE
+            REPLAC = .TRUE.
+         END IF
+      END IF
 
 *  Determine the mode to be used.
       CALL PAR_CHOIC( 'MODE', 'Interface', 'File,Interface', .FALSE.,
@@ -247,9 +272,10 @@
      :        /'mode is DISABLED.', STATUS )
          ELSE
 
-*  Write the default history information first, so that the commentary
+*  If we are not replacing the default history record created by HISCOM,
+*  wWrite the default history information first, so that the commentary
 *  will follow it.
-            CALL NDF_HDEF( INDF, ' ', STATUS )
+            IF( .NOT. REPLAC ) CALL NDF_HDEF( INDF, ' ', STATUS )
          END IF
       END IF
 
@@ -302,10 +328,10 @@
                IF ( BUFFER .EQ. ' ' .OR. .NOT. LOOP .OR.
      :              PLINES .EQ. MXLINE ) THEN
 
-*  Append the line to the history.  It does not replace the existing
-*  history, there are no message tokens to expand, and the right margin
+*  Append the line to the history, replacing the existing history if
+*  requested, there are no message tokens to expand, and the right margin
 *  is ragged.
-                  CALL NDF_HPUT( HUMODE, ' ', .FALSE., PLINES, COMENT,
+                  CALL NDF_HPUT( HUMODE, APPNAM, REPLAC, PLINES, COMENT,
      :                           .FALSE., WRAP, .FALSE., INDF, STATUS )
 
 *  Reset the paragraph line counter.
@@ -371,10 +397,10 @@
                IF ( PARBUF .EQ. ' ' .OR. .NOT. LOOP .OR.
      :              PLINES .EQ. MXLINE ) THEN
 
-*  Append the line to the history.  It does not replace the existing
-*  history, there are no message tokens to expand, and the right margin
+*  Append the line to the history, replacing the existing history if
+*  requested, there are no message tokens to expand, and the right margin
 *  is ragged.
-                  CALL NDF_HPUT( HUMODE, ' ', .FALSE., PLINES, COMENT,
+                  CALL NDF_HPUT( HUMODE, APPNAM, REPLAC, PLINES, COMENT,
      :                           .FALSE., WRAP, .FALSE., INDF, STATUS )
 
 *  Reset the paragraph line counter.

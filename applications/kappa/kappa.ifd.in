@@ -786,6 +786,15 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+         parameter appname {
+            type LITERAL
+            ppath CURRENT
+            vpath DEFAULT
+            prompt {Application name}
+            default !
+            helpkey *
+         }
+
          parameter comment {
             type LITERAL
             vpath PROMPT

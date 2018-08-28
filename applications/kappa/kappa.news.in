@@ -16,6 +16,14 @@
       - There is a new estimator option, "FastMed", that offers a
       substantially faster calculation of unweighted medians.
 
+   o  HISCOM
+
+      - Has a new Parameter APPNAME, which can be used to change the
+      application name stored in the new history record from the default
+      of "HISCOM". Scripts that generate NDFs can use this facility to
+      record the details of the invocation of the script in the form of a
+      history record in the output NDF.
+
    o  SETAXIS
       - There is a new mode, "NDF".  It assigns the axis values using
       the data values in another NDF, specified by a parameter called
