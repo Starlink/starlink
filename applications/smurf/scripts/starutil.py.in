@@ -2890,7 +2890,8 @@ class NDG(object):
 
          try:
             invoke("$KAPPA_DIR/hiscom ndf={0} mode=file appname=\"'{1}'\" "
-                   "file={2}".format(ndf,appname,textfile))
+                   "file={2}".format(ndf,appname,textfile),
+                   msg_level=DEBUG )
          except AtaskError:
             pass
 
