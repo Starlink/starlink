@@ -536,8 +536,9 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
    int nc;
    int nkey;
 
-/* Check the inherited status */
-   if( *status != SAI__OK ) return;
+/* Check the inherited status. Also return immediately if no keymap is
+   supplied.  */
+   if( *status != SAI__OK || !km ) return;
    if (refkm) astClear(refkm, "KeyError");
 
 /* Sort the supplied KeyMap is required. */
