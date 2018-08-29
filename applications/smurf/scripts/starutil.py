@@ -10,6 +10,7 @@ import glob
 import inspect
 import time
 import datetime
+import textwrap
 import uuid
 
 #  Provide recall and editing facilities for parameter prompts
@@ -674,7 +675,8 @@ def shell_quote(text,remove=False):
 class ParSys(object):
    """
 
-   Encapsulates all parameters used by a Python script.
+   A singleton class that encapsulates all parameters used by a Python
+   script.
 
    Each parameter is described by an instance of a subclass of the base
    "Parameter" class defined within this module. Different subclasses
@@ -811,13 +813,26 @@ class ParSys(object):
 
    """
 
+   # The single allowed instance of the ParSys class - initially None.
+   singleton = None
+
    # The full path to the temporary ADAM directory.
    adamdir = None
+
+   # A dict of parameter values returned to the calling app,
+   # keyed by parameter name
+   usedvalues = {}
 
    def __init__(self,params):
       global ilevel
       global glevel
       global logfile
+
+      #  This is a singleton class. Check we have not already created a
+      #  ParSys object.
+      if ParSys.singleton is not None:
+         raise UsageError("A ParSys object has already been created. Each "
+                          "script may only use one ParSys object.")
 
       #  Ensure starlink has been initialised (i.e. the etc/login and
       #  etc/cshrc files have been sourced). Do this by checking that
@@ -997,15 +1012,29 @@ class ParSys(object):
       os.environ["NDF_AUTO_HISTORY"] = "1"
       os.environ["AUTOPROV"] = "1"
 
-   # Delete the temporary ADAM directory and close the log file.
+      # Record the single allowed instance of the ParSys class.
+      ParSys.singleton = self
+
+   # Add history to any output NDFs, delete the temporary ADAM directory
+   # and close the log file.
    @classmethod
    def cleanup(cls):
+      print("   In ParSys cleanup")
+      for param in ParSys.singleton:
+         if isinstance(param,ParNDG) and not param.exists:
+            print("      NDG "+param.name )
+            ndg = param.value
+            if ndg:
+               ndg.histadd()
+
       if ParSys.adamdir is not None:
          try:
             shutil.rmtree( ParSys.adamdir )
          except Exception:
             pass
+
       close_log_file()
+
 
 #  Allow the ParSys to be indexed by parameter name (returns the
 #  Parameter object as the value).
@@ -1269,7 +1298,8 @@ class Parameter(object):
             try:
                self._setValue( value )
                self.__validate()
-               msg_out( "Parameter {0} is set to {1}".format(name,self.__value), ATASK )
+               msg_out( "Parameter {0} is set to {1}".format(name,value), ATASK )
+               ParSys.usedvalues[name] = value
 
             except InvalidParameterError as err:
                self.__error(err)
@@ -1586,6 +1616,62 @@ class Par0S(Parameter):
       Parameter._setValue(self,"{0}".format(value))
 
 
+class ParGrp(Parameter):
+   '''
+
+   Describes a scalar parameter used to get a group of strings via a GRP
+   group expression. The parameter is initially in an unset state.
+
+   Constructor:
+      param = ParGrp( name, prompt=None, default=Parameter.UNSET,
+                     noprompt=False, help=None  )
+         name = string
+            The parameter name. The supplied string is converted to upper case.
+         prompt = string
+            The prompt string.
+         default = string
+            The initial default value (group expression).
+         noprompt = boolean
+            If True, then the user will not be prompted for a parameter value
+            if none was supplied on the command line. Instead, the default
+            value will be used if set (a NoValueError will be raised otherwise).
+         help = string
+            The help string
+
+   Properties:
+      This class has no extra properties over and above those of
+      the Parameter class:
+
+   Methods:
+      This class has no extra methods over and above those of
+      the Parameter class:
+
+   '''
+
+   def __init__(self, name, prompt=None, default=Parameter.UNSET,
+                noprompt=False, help=None ):
+      Parameter.__init__(self, name, prompt, default, noprompt, help )
+      self.values = None
+
+   def _isValid(self):
+      value = Parameter._getValue(self)
+      value = "{0}".format(value)
+      try:
+         self.values = {}
+         for setting in invoke("$KAPPA_DIR/configecho config={0} name=!".
+                                 format(value),aslist=True ):
+            (key,val) = setting.split('=')
+            self.values[ key.strip() ] = val.strip()
+
+      except AtaskError:
+         raise InvalidParameterError( "\n{0}Cannot access a group of values "
+                                      "using parameter '{1}' ('{2}').".
+                                      format(_cmd_token(),Parameter._getName(self),
+                                             value) )
+      Parameter._setValue(self,value)
+
+   def groupvalues(self):
+      return self.values
 
 class Par1S(Par1):
    '''
@@ -2718,6 +2804,91 @@ class NDG(object):
       for ndf in self.__ndfs:
          fprint( ndf )
 
+   #  Add a History record to all NDFs in the NDG describing the
+   #  invocation of the current script.
+   def histadd( self ):
+      width = 72
+
+      appname = cmd().upper()
+      nspace = 16 - len(appname)
+      if nspace < 2:
+         nspace = 2
+      appname += " "*nspace + "(SMURF  V1.6.1)"
+
+      groups = []
+      common_text = []
+
+      line = "Parameters: "
+      for param_name in sorted(ParSys.usedvalues):
+         val = ParSys.usedvalues[param_name]
+         if val is None or str(val) == "<unset>":
+            val = "!"
+
+         setting = "{0}={1} ".format(param_name.upper(),val)
+
+         newline = line + setting
+         if len(newline) > width:
+            common_text.append(line)
+            line = "   "+setting
+         else:
+            line = newline
+
+         try:
+            grp = ParSys.singleton[param_name].groupvalues()
+         except AttributeError:
+            grp = None
+
+         if grp:
+            gline = 'Group: {0}="'.format(param_name.upper())
+
+            nkey = len(grp)
+            ikey = 0
+
+            glines = []
+            for key in sorted(grp):
+               val = grp[key]
+               setting = "{0}={1}".format(key.upper(),val)
+               ikey += 1
+               if ikey < nkey:
+                  setting += ", "
+
+               newgline = gline + setting
+               if len(newgline) > width:
+                  glines.append(gline)
+                  gline = "   "+setting
+               else:
+                  gline = newgline
+
+            glines.append(gline+'"')
+            groups.append(glines)
+
+      common_text.append(line)
+      for group in groups:
+         for gline in group:
+            common_text.append(gline)
+
+      for ndf in self.__ndfs:
+         textfile = NDG.tempfile()
+         fd = open( textfile, "w" )
+         para = ( "The preceding history records describe the creation of NDF "
+                  "'{0}' by the '{1}' script, invoked with the following "
+                  "parameters:".format(ndf,cmd()) )
+         fd.write( textwrap.fill(para,width)+"\n\n" )
+
+         for line in common_text:
+            fd.write(line+"\n")
+         fd.close()
+
+         try:
+            print("         hiscom {0}".format(ndf))
+            invoke("$KAPPA_DIR/hiscom ndf={0} mode=file appname=\"'{1}'\" "
+                   "file={2}".format(ndf,appname,textfile))
+         except AtaskError:
+            pass
+
+         os.remove( textfile )
+
+
    # Allow the NDG to be indexed like a list of NDF names
    def __len__(self):
       return len(self.__ndfs)
@@ -2791,13 +2962,17 @@ class NDG(object):
    # group. The NDG.tempdir directory is then deleted.
    @classmethod
    def cleanup(cls):
+      print("In NDG cleanup 1")
       for ndg in NDG.instances:
+         print("   cleaning {0}".format(ndg))
          if ndg.__tmpdir is not None and ndg.__tmpdir == NDG.tempdir:
             ndg.__file = None
             ndg.__ndfs = []
             ndg.__tmpdir = None
+      print("In NDG cleanup 2")
       if NDG.tempdir is not None:
          shutil.rmtree( NDG.tempdir )
+      print("Leaving NDG cleanup")
 
    # Return the path to a new temporary file.
    @classmethod
@@ -2839,6 +3014,10 @@ class NDG(object):
          return not self.__eq__(other)
       else:
          return True
+
+
+
+
 
 #  -------------------  Exceptions ---------------------------
 
