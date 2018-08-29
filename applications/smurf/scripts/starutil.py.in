@@ -413,7 +413,7 @@ def invoke(command,aslist=False,buffer=False,annul=False,msg_level=ATASK,
    if not cmdscreen:
       old_ilevel = ilevel
       ilevel = NONE
-   msg_out( "\n>>> {0}".format(command), ATASK )
+   msg_out( "\n>>> {0}".format(command), msg_level )
    if not cmdscreen:
       ilevel = old_ilevel
 
@@ -2611,11 +2611,15 @@ class NDG(object):
          # list.
          if exists:
             try:
-               self.__ndfs = invoke("$KAPPA_DIR/ndfecho ndf=\"{0}\" abspath=yes".format(gexp),True)
+               self.__ndfs = invoke("$KAPPA_DIR/ndfecho ndf=\"{0}\" "
+                                    "abspath=yes".format(gexp), True,
+                                    msg_level=DEBUG)
             except AtaskError:
                raise NoNdfError("\n\nCannot access one or more of the NDFs specified by '{0}'.".format(p1))
          else:
-            self.__ndfs = invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" abspath=yes".format(gexp),True)
+            self.__ndfs = invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" "
+                                 "abspath=yes".format(gexp), True,
+                                 msg_level=DEBUG)
 
       # If the first argument is a list or tuple, create a group containing
       # the contents of the list or tuple as NDF names. Flag that we do not
@@ -2649,12 +2653,14 @@ class NDG(object):
       # an error occurs.
       elif isinstance(p1,NDG) and p2 is None:
          try:
-            invoke("$KAPPA_DIR/ndfecho ndf=\"{0}\" quiet".format(p1))
+            invoke("$KAPPA_DIR/ndfecho ndf=\"{0}\" quiet".format(p1),
+                   msg_level=DEBUG)
             nfile = get_task_par( "size", "ndfecho" )
             intemp = True
          except AtaskError:
             try:
-               invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" quiet".format(p1))
+               invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" quiet".format(p1),
+                      msg_level=DEBUG )
                nfile = get_task_par( "size", "ndfecho" )
             except AtaskError:
                nfile = len(p1.__ndfs)
@@ -2667,7 +2673,8 @@ class NDG(object):
          gexp2 = shell_quote(p2)
 
          try:
-            self.__ndfs = invoke("$KAPPA_DIR/ndfecho ndf=\"{0}\" mod=\"{1}\" abspath=yes".format(gexp1,gexp2),True)
+            self.__ndfs = invoke("$KAPPA_DIR/ndfecho ndf=\"{0}\" mod=\"{1}\" abspath=yes".format(gexp1,gexp2),
+                                 True, msg_level=DEBUG )
          except AtaskError:
             raise NoNdfError("\n\nCannot access one or more of the NDFs specified by '{0}'.".format(gexp1))
 
@@ -2722,7 +2729,8 @@ class NDG(object):
 
       # Ensure the NDF paths are absolute.
       if nfile > 0 and not isabs:
-         self.__ndfs = invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" abspath=yes".format(self),True)
+         self.__ndfs = invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" abspath=yes".format(self),
+                              True, msg_level=DEBUG )
          if len(self.__ndfs) > 1:
             if not self.__file:
                self.__tmpdir = NDG._gettmpdir()
@@ -2765,11 +2773,14 @@ class NDG(object):
       result = None
       if pattern:
          try:
-            ndfs = invoke("$KAPPA_DIR/ndfecho ndf=\"{0}\" abspath=yes pattern={1}".format(self,pattern),True)
+            ndfs = invoke("$KAPPA_DIR/ndfecho ndf=\"{0}\" abspath=yes pattern={1}".format(self,pattern),
+                          True, msg_level=DEBUG )
          except AtaskError:
-            ndfs = invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" abspath=yes pattern={1}".format(self,pattern),True)
+            ndfs = invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" abspath=yes pattern={1}".format(self,pattern),
+                          True, msg_level=DEBUG )
       else:
-         ndfs = invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" abspath=yes exists=yes".format(self),True)
+         ndfs = invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" abspath=yes exists=yes".format(self),
+                       True, msg_level=DEBUG )
 
       if get_task_par( "nmatch", "ndfecho" ) > 0:
          result = NDG( ndfs )
