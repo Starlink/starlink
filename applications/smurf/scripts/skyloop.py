@@ -394,7 +394,8 @@ def cleanup():
    global retain, new_ext_ndfs, new_lut_ndfs, new_noi_ndfs
    try:
       if retain:
-         msg_out( "Retaining EXT, LUT and NOI models and all temporary files in {1}".format(NDG.tempdir))
+         msg_out( "Retaining EXT, LUT and NOI models and all "
+                  "temporary files in {0}".format(NDG.tempdir))
       else:
          NDG.cleanup()
       starutil.ParSys.cleanup()
@@ -428,7 +429,7 @@ try:
    params.append(starutil.Par0F("PIXSIZE", "Pixel size (arcsec)", None,
                                  maxval=1000, minval=0.01))
 
-   params.append(starutil.Par0S("CONFIG", "Map-maker tuning parameters",
+   params.append(starutil.ParGrp("CONFIG", "Map-maker tuning parameters",
                                 "^$STARLINK_DIR/share/smurf/dimmconfig.lis"))
 
    params.append(starutil.ParNDG("ITERMAP", "Output cube holding itermaps",
@@ -1020,6 +1021,8 @@ try:
          if itermaps:
             if not os.path.exists(obsdir):
                os.makedirs(obsdir)
+
+            obsmaps = []
             for chunkmap in NDG(itermaps):
                obsid=starutil.get_fits_header( chunkmap, "OBSIDSS" )
                m1 = re.search( 'CH(\d+)I', chunkmap )
@@ -1037,11 +1040,16 @@ try:
                      thischunk = "{0}/{1}_{2}_chunk{3}.sdf".format(obsdir,ut,obs,ichunk-ich0)
                   invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(chunkmap,thischunk))
 
+                  obsmaps.append(thischunk)
+
                   lobs = obs
                   lut = ut
                else:
                   raise starutil.InvalidParameterError("Could not identify "
                                           "chunk map '{}'.".format(chunkmap))
+
+#  Add a SKYLOOP history record to each chunk map.
+            NDG(obsmaps).histadd()
 
 #  Update the NDF from which new quality info is to be read.
          if qua:

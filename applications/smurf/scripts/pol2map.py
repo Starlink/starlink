@@ -1036,8 +1036,8 @@ try:
    params.append(starutil.Par0S("CAT", "The output FITS vector catalogue",
                                  default=None, noprompt=True))
 
-   params.append(starutil.Par0S("CONFIG", "Map-maker tuning parameters",
-                                "def", noprompt=True))
+   params.append(starutil.ParGrp("CONFIG", "Map-maker tuning parameters",
+                                 "def", noprompt=True))
 
    params.append(starutil.Par0F("PIXSIZE", "Pixel size (arcsec)", 4.0,
                                  maxval=1000, minval=0.01, noprompt=True))
@@ -1108,11 +1108,11 @@ try:
    params.append(starutil.Par0F("FCF", "pW to Jy/beam conversion factor",
                                 None, noprompt=True ))
 
-   params.append(starutil.Par0S("ICONFIG", "Map-maker tuning parameters for I maps",
-                                "def", noprompt=True))
+   params.append(starutil.ParGrp("ICONFIG", "Map-maker tuning parameters for I maps",
+                                 "def", noprompt=True))
 
-   params.append(starutil.Par0S("QUCONFIG", "Map-maker tuning parameters for Q/U maps",
-                                "def", noprompt=True))
+   params.append(starutil.ParGrp("QUCONFIG", "Map-maker tuning parameters for Q/U maps",
+                                 "def", noprompt=True))
 
    params.append(starutil.Par0F("BINSIZE", "Catalogue bin size (arcsec)", None,
                                  maxval=1000, minval=0.01, noprompt=True))

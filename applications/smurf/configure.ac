@@ -136,6 +136,7 @@ AC_CONFIG_FILES(Makefile smurf.ifd component.xml libsmurf/Makefile \
                 libsmfftsio/Makefile \
                 libnanten/Makefile \
                 libsupercam/Makefile \
+                scripts/starutil.py \
                 docs/Makefile docs/sun258/Makefile docs/sun259/Makefile \
                 docs/sc19/Makefile docs/ssn79/Makefile defaults/Makefile scripts/Makefile )
 
