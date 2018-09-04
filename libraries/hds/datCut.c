@@ -638,7 +638,7 @@ static void dat1Pshdb( char *str, int def, hdsdim *value, int *status ){
 /* Otherwise, attempt to convert the string to an integer. */
    } else {
       slen = strlen( str );
-      if( nc = 0, ( sscanf( str, "%d%n", value, &nc ) < 1 || nc < slen ) ){
+      if( nc = 0, ( sscanf( str, "%" HDS_DIM_FORMAT "%n", value, &nc ) < 1 || nc < slen ) ){
 
 /* If the attempt fails, then report an error message. */
          if( *status != SAI__OK ) {
