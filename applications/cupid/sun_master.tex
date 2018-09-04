@@ -680,18 +680,18 @@ highest data value in the clump.
 \item[Cen1:] The first co-ordinate of the clump centroid.
 \item[Cen2:] The second co-ordinate of the clump centroid.
 \item[Cen3:] The third co-ordinate of the clump centroid.
-\item[Size1:] The size of the clump along the first axis, in pixels.
-\item[Size2:] The size of the clump along the second axis, in pixels.
-\item[Size3:] The size of the clump along the third axis, in pixels.
+\item[Size1:] The size of the clump along the first axis.
+\item[Size2:] The size of the clump along the second axis.
+\item[Size3:] The size of the clump along the third axis.
 \item[Sum:] The total data sum in the clump.
 \item[Peak:] The peak value in the clump.
-\item[Volume:] The total number of pixels falling within the clump (a
-volume for 3D data and an area for 2D data).
+\item[Volume:] The total volume (for 3D data) or area (for 2D data)
+falling within the clump.
 \end{aligndesc}
 
-The co-ordinate system used depends on the value supplied for the WCSPAR
-parameter. If WCSPAR is set to TRUE, then current WCS co-ordinate system
-in the input NDF will be used. If WCSPAR is left at its default value of
+The co-ordinate system and units used for the above values depends on the
+value supplied for the WCSPAR parameter. If WCSPAR is set to TRUE, then
+current WCS co-ordinate system in the input NDF will be used. If WCSPAR is
 FALSE, then the input NDF's PIXEL co-ordinate system is used. The centroid
 position is the weighted mean of the pixel co-ordinate values at the centre
 of all the pixels in the clump, with the pixel values being used as the
