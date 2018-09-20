@@ -562,7 +562,7 @@
 
 
 *  Local Variables:
-      CHARACTER * ( 6 ) AMODE    ! NDF access mode
+      CHARACTER * 6 AMODE         ! NDF access mode
       INTEGER ATEMPT             ! Number of attempts to obtain a
                                  ! valid keyword
       CHARACTER * ( DAT__SZLOC ) CELLOC ! Locator to first element of
@@ -571,9 +571,10 @@
       INTEGER COPNTR             ! Pointer to mapped values
       INTEGER CSTAT              ! Local status variable
       DOUBLE PRECISION DVAL      ! Double precision FITS value
-      CHARACTER * ( 6 ) EDIT     ! Edit command
+      CHARACTER * 6 EDIT         ! Edit command
       INTEGER EDPNTR             ! Pointer to mapped edit commands
       INTEGER EKPNTR             ! Pointer to mapped edit keywords
+      LOGICAL EXISTS             ! Result of final "Exist" operation
       INTEGER FD                 ! Descriptor of the text file
       INTEGER FDIM( 1 )          ! Initial length of the FITS extension
       INTEGER INDF               ! NDF identifier
@@ -586,7 +587,7 @@
       INTEGER LKEY               ! Length of a keyword
       CHARACTER * ( DAT__SZLOC ) LOC ! FITS extension locator
       LOGICAL LVAL               ! Logical FITS value
-      CHARACTER * ( 9 ) MODE     ! Mode for accessing edit instructions
+      CHARACTER * 9 MODE         ! Mode for accessing edit instructions
       INTEGER NBLANK             ! Number of blank lines in file
       INTEGER NCOMS              ! Number of comment lines in file
       INTEGER NDIGIT             ! Number of significant digits
@@ -600,7 +601,6 @@
                                  ! occurrences
       LOGICAL RDONLY             ! Will all the editing be read-only?
       LOGICAL STRING             ! Is value a string?
-      LOGICAL EXISTS             ! Result of final "Exist" operation
       LOGICAL THERE              ! FITS extension already exists?
       CHARACTER * ( DAT__SZTYP ) TYPE ! Component's data type
       INTEGER TYPNTR             ! Pointer to mapped types

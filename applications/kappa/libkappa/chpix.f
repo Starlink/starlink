@@ -221,9 +221,8 @@
       LOGICAL BADO               ! Output array may have bad values?
       BYTE BVALUE                ! Replacement value for byte data
       CHARACTER * ( VAL__SZD ) CVALUE ! Replacement value as obtained
-      CHARACTER * ( 8 ) COMP     ! Name of array component to analyse
+      CHARACTER * 8 COMP         ! Name of array component to analyse
       DOUBLE PRECISION DVALUE    ! Replacement value for d.p. data
-      CHARACTER * ( 40 ) SUGDEF  ! Suggested default
       INTEGER EL                 ! Number of array elements mapped
       INTEGER FD                 ! Descriptor of the text file
       LOGICAL FILE               ! File mode was selected
@@ -231,10 +230,10 @@
       INTEGER IGRPV              ! Group of valus from text file
       LOGICAL INTERF             ! Interface mode was selected
       INTEGER IVALUE             ! Replacement value for integer data
-      INTEGER*8 KVALUE           ! Replacement value for 64-bit integer
+      INTEGER * 8 KVALUE         ! Replacement value for 64-bit integer
       CHARACTER * ( DAT__SZLOC ) LOC ! Locators for the NDF
       LOGICAL LOOP               ! Loop for another section to replace
-      CHARACTER * ( 8 ) MCOMP    ! Component name for mapping arrays
+      CHARACTER * 8 MCOMP        ! Component name for mapping arrays
       INTEGER MEMBER             ! Number of editing lines
       CHARACTER * 9 MODE         ! Mode for getting sections and values
       INTEGER NCHAR              ! Number of characters written to string
@@ -246,7 +245,8 @@
       LOGICAL OPEN               ! Is text file open?
       REAL RVALUE                ! Replacement value for real data
       INTEGER PNTR( 1 )          ! Pointer to mapped NDF array
-      CHARACTER * ( 80 ) SECT    ! Section specifier
+      CHARACTER * 80 SECT        ! Section specifier
+      CHARACTER * 40 SUGDEF      ! Suggested default
       LOGICAL THERE              ! Array component exists?
       CHARACTER * ( NDF__SZTYP ) TYPE ! Numeric type for processing
       INTEGER * 2 WVALUE         ! Replacement value for word data
