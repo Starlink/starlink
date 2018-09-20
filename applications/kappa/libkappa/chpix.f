@@ -93,7 +93,7 @@
 *        that ranges can be defined along any axis, and be given as
 *        pixel indices or axis (data) co-ordinates.  So for example
 *        "3,4,5" would select the pixel at (3,4,5); "3:5," would
-*        replace all elements in columns 3 to 5; ",4" replaces line 4.
+*        replace all elements in Columns 3 to 5; ",4" replaces Line 4.
 *        See "NDF sections" in SUN/95, or the online documentation for
 *        details.  A null value (!) terminates the loop during multiple
 *        replacements.

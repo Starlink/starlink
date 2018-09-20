@@ -11312,7 +11312,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          contain the \xref{formatted axis values}{sun210}{AST_UNFORMAT} for a single position, in the
          \htmlref{current Frame}{se:curframe}~ of the NDF.  Axis values
          can be separated by spaces, tabs or commas.  The file may
-         contain comment lines with the first character \# or !.
+         contain comment lines with the first character \texttt{\#} or \texttt{!}.
       }
       \sstsubsection{
          DESCRIBE = \_LOGICAL (Read)
@@ -13940,7 +13940,7 @@ KAPPA: \htmlref{PASTE}{PASTE},
          that ranges can be defined along any axis, and be given as
          pixel indices or axis (data) co-ordinates.  So for example
          \texttt{"3,4,5"} would select the pixel at (3,4,5); \texttt{"3:5,"} would
-         replace all elements in columns 3 to 5; \texttt{",4"} replaces line 4.
+         replace all elements in Columns 3 to 5; \texttt{",4"} replaces Line 4.
          See \slhyperref{NDF Sections}{Section~}{}{se:ndfsect}
          for details.  A null value (\texttt{{!}}) terminates the loop during multiple
          replacements.
@@ -24300,8 +24300,9 @@ KAPPA: \htmlref{GDSET}{GDSET},
          to be replaced.  The positions should be given in the current
          \htmlref{co-ordinate Frame}{se:domains}~  of the input NDF, one per line.  Spaces or
          commas can be used as delimiters between axis values.  The file
-         may contain comment lines with the first character \# or !.  This
-         parameter is only used if Parameter MODE is set to \texttt{"File"}.
+         may contain comment lines with the first character \texttt{\#}
+         or \texttt{!}.  This parameter is only used if Parameter MODE is
+         set to \texttt{"File"}.
       }
       \sstsubsection{
          MODE = \htmlref{LITERAL}{se:parmenu} (Read)
