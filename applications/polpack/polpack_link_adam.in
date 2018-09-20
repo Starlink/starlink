@@ -58,6 +58,10 @@
 #        Add shl_link_adam
 #     11-OCT-2004 (BRADC):
 #        Added Tcl libraries.
+#     20-SEP-2018 (DSB):
+#        Use thr_link_adam instead of thr_link. Without this, AST does
+#        not defer the delivery of error messages but writes them out
+#        immediately.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -66,7 +70,7 @@
 #-
 
       echo @TCL_LIBS@ -lsla `kaplibs_link_adam -nogks` \
-           `shl_link_adam` `thr_link` `ard_link_adam` \
+           `shl_link_adam` `thr_link_adam` `ard_link_adam` \
            `starutil_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
