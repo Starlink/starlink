@@ -25,13 +25,13 @@
 *        A comma-separated list of comment characters.  If any line of
 *        the file begins with one of these, the line is treated as a
 *        comment line.
-*     NLINES = INTEGER (Given)
+*     NLINES = INTEGER (Returned)
 *        The number of non-comment lines in the file.
-*     NCOMS = INTEGER (Given)
+*     NCOMS = INTEGER (Returned)
 *        The number of comment lines in the file.
-*     NCOMS = INTEGER (Given)
+*     NCOMS = INTEGER (Returned)
 *        The number of blank lines in the file.
-*     STATUS = INTEGER ({status_access_mode})
+*     STATUS = INTEGER (Given & Returned)
 *        The global status.
 
 *  Notes:
