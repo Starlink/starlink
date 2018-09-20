@@ -826,7 +826,7 @@
             IF( NDIM .GT. 1 .AND. STATUS .EQ. SAI__OK ) THEN
                CALL NDF_MSG( 'N', NDF3 )
                CALL ERR_REP( ' ', 'The NDF supplied for parameter '//
-     :                       'AXISNDF (^N) is not 1-dimensional.',
+     :                       'AXISNDF (^N) is not one-dimensional.',
      :                       STATUS )
             END IF
 

@@ -690,7 +690,7 @@
          CALL FIO_ASSOC( 'TABLE', 'READ', 'LIST', 0, FD, STATUS )
          IF ( STATUS .EQ. SAI__OK ) OPEN = .TRUE.
 
-*  Count the number of data lines lines in the file.
+*  Count the number of data lines in the file.
          CALL KPG1_NUMFL( FD, '!,#', NWRITE, NCOMS, NBLANK, STATUS )
 
 *  Obtain and perform the editing instructions for the file mode.
