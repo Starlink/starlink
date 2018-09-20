@@ -13845,10 +13845,27 @@ KAPPA: \htmlref{PASTE}{PASTE},
 }{
    \sstdescription{
       This application replaces selected elements of an \NDFref{NDF} array
-      component with specified values.  The task loops until there are
-      no more elements to change, indicated by a null value in response
-      to a prompt.  For non-interactive processing, supply the value of
-      Parameter NEWVAL on the command line.
+      component with specified values.
+
+      Two methods are available for obtaining the regions and
+      replacement values, selected through Parameter MODE:
+
+      \sstitemlist{
+         \sstitem
+         from the parameter system (see Parameters SECTION and NEWVAL).
+         The task loops until there are no more elements to change,
+         indicated by a null value in response to a prompt.  For
+         non-interactive processing, supply the value of Parameter NEWVAL
+         on the command line.
+
+         \sstitem
+         The second approach uses a text file, that is especially
+         beneficial where there are too many section and value pairs to
+         enter manually.  The file should contain two space-separated
+         columns; the first column is the NDF section to replace, and the
+         second supplies the value to insert into the section (see
+         Parameter FILE).
+     }
    }
    \sstusage{
       chpix in out section newval [comp]
@@ -13865,10 +13882,38 @@ KAPPA: \htmlref{PASTE}{PASTE},
          output VARIANCE array.  \texttt{["Data"]}
       }
       \sstsubsection{
+         FILE = FILENAME (Read)
+      }{
+         Name of a text file containing the sections and replacement
+         values.  It is only accessed if Parameter MODE is given the
+         value \texttt{"File"}.  Each line should contain an NDF section of
+         a region (see Parameter SECTION), then one or more spaces,
+         followed by the replacement value.  The value is either
+         numeric or \texttt{"Bad"}, the latter requests that the bad value
+         be inserted into the section.  The file may contain comment
+         lines with the first character \texttt{\#} or \texttt{!}.
+      }
+      \sstsubsection{
          IN = NDF (Read)
       }{
          NDF structure containing the array component to be modified.
       }
+      \sstsubsection{
+         MODE = LITERAL (Read)
+      }{
+         The mode in which the sections and replacement values are to be
+         obtained.  The supplied string can be one of the following values.
+         \ssthitemlist{
+
+           \sstitem
+           \texttt{"Interface"} --- sections and values are obtained via Parameters
+                                    SECTION and NEWVAL respectively.
+
+           \sstitem
+           \texttt{"File"} --- sections and values are obtained from a text file
+                               specified by Parameter FILE.
+        }
+        \texttt{["Interface"]}
       \sstsubsection{
          NEWVAL = LITERAL (Read)
       }{
@@ -13948,6 +13993,13 @@ KAPPA: \htmlref{PASTE}{PASTE},
          Assigns value $-$1 to the pixels at index (45,~21) within all
          planes of the three-dimensional NDF called zzcha, creating
          the output NDF called zzcha\_c.
+      }
+      \sstexamplesubsection{
+         chpix harpcube harpmasked mode=file file=badbaseline.txt
+      }
+         This reads the text file called \texttt{badbaseline.txt} to obtain the
+         editing commands to be applied to the NDF called harpcube to
+         form the NDF harpmasked.
       }
    }
    \sstdiytopic{
@@ -53641,44 +53693,18 @@ and HDS data types is as follows:
 
 \newpage
 
-\section{\xlabel{se_changes}Release Notes---V2.5-9\label{se:changes}}
+\section{\xlabel{se_changes}Release Notes---V2.6\label{se:changes}}
 
 \subsection{Modified Commands}
 The following applications have been modified:
 \begin{description}[style=nextline]
 
-   \item [\htmlref{ALIGN2D}{ALIGN2D}]\mbox{}
+   \item [\htmlref{CHPIX}{CHPIX}]\mbox{}
       \begin{itemize}
-        \item The residuals used to determine the fit are now weighted
-        using the SNR of the data rather than the reciprocal of the variance.
-        This will cause the final alignment to be determined more by the
-        brighter sections of the map than previously.
-      \end{itemize}
-
-   \item [\htmlref{COLLAPSE}{COLLAPSE}]\mbox{}
-      \begin{itemize}
-        \item There is a new estimator option, \texttt{"FastMed"},
-        that offers a substantially faster calculation of unweighted
-        medians.
-      \end{itemize}
-
-   \item [\htmlref{SETAXIS}{SETAXIS}]\mbox{}
-      \begin{itemize}
-        \item There is a new mode, \texttt{"NDF"}.  It assigns the axis
-        values using the data values in another NDF, specified by a
-        parameter called AXISNDF.
-      \end{itemize}
-
-   \item [\htmlref{WCSALIGN}{WCSALIGN}]\mbox{}
-      \begin{itemize}
-        \item The input NDFs can now be aligned with a specified POLPACK
-         catalogue - see new parameter REFCAT.
-      \end{itemize}
-
-   \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}]\mbox{}
-      \begin{itemize}
-        \item Has a new parameter called WEIGHTS that can be used to
-         specify a weight for each of the input NDFs.
+        \item It is easier now to make several edits by supplying the
+        NDF sections and fill values in a text file.   This is made
+        possible new parameters called MODE and FILE.  The default
+        for MODE preserves the historic interactive behaviour.
       \end{itemize}
 
 \end{description}
@@ -54152,6 +54178,48 @@ The following applications have been modified:
         \item Will now recognise the string \texttt{"BAD"} (case
         insensitive) within the input text file and generate appropriate
         bad values in the output NDF.
+      \end{itemize}
+
+\end{description}
+
+\section{Release Notes---V2.5-9}
+
+\subsection{Modified Commands}
+The following applications have been modified:
+\begin{description}[style=nextline]
+
+   \item [\htmlref{ALIGN2D}{ALIGN2D}]\mbox{}
+      \begin{itemize}
+        \item The residuals used to determine the fit are now weighted
+        using the SNR of the data rather than the reciprocal of the variance.
+        This will cause the final alignment to be determined more by the
+        brighter sections of the map than previously.
+      \end{itemize}
+
+   \item [\htmlref{COLLAPSE}{COLLAPSE}]\mbox{}
+      \begin{itemize}
+        \item There is a new estimator option, \texttt{"FastMed"},
+        that offers a substantially faster calculation of unweighted
+        medians.
+      \end{itemize}
+
+   \item [\htmlref{SETAXIS}{SETAXIS}]\mbox{}
+      \begin{itemize}
+        \item There is a new mode, \texttt{"NDF"}.  It assigns the axis
+        values using the data values in another NDF, specified by a
+        parameter called AXISNDF.
+      \end{itemize}
+
+   \item [\htmlref{WCSALIGN}{WCSALIGN}]\mbox{}
+      \begin{itemize}
+        \item The input NDFs can now be aligned with a specified POLPACK
+         catalogue - see new parameter REFCAT.
+      \end{itemize}
+
+   \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}]\mbox{}
+      \begin{itemize}
+        \item Has a new parameter called WEIGHTS that can be used to
+         specify a weight for each of the input NDFs.
       \end{itemize}
 
 \end{description}

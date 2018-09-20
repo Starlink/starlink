@@ -15,7 +15,7 @@ kps1_bfcrf.f kps1_bffil.f kps1_bffn.f  kps1_bfft.f  \
 kps1_bfftg.f kps1_bfhd.f  kps1_bfint.f kps1_bflog.f kps1_bfop.f \
 kps1_bfpre.f kps1_bs2ge.f kps1_bs2pu.f kps1_ccmpp.f kps1_ccmqn.f \
 kps1_cenbt.f kps1_cenhd.f kps1_censg.f \
-kps1_censh.f kps1_chsha.f kps1_clpa0.f kps1_clpal.f \
+kps1_censh.f kps1_chpin.f kps1_chsha.f kps1_clpa0.f kps1_clpal.f \
 kps1_clpa2.f kps1_cntdr.f kps1_cntgd.f kps1_cntky.f \
 kps1_cntpn.f kps1_cntsc.f kps1_cntst.f kps1_cnvfp.f kps1_cnvlv.f \
 kps1_clptm.f kps1_clpky.f kps1_clpcp.f kps1_cnvrp.f kps1_cremg.f \

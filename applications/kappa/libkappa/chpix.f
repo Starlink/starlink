@@ -21,10 +21,23 @@
 
 *  Description:
 *     This application replaces selected elements of an NDF array
-*     component with specified values.  The task loops until there are
-*     no more elements to change, indicated by a null value in response
-*     to a prompt.  For non-interactive processing, supply the value of
-*     parameter NEWVAL on the command line.
+*     component with specified values.
+
+*     Two methods are available for obtaining the regions and
+*     replacement values, selected through Parameter MODE:
+*
+*     - from the parameter system (see Parameters SECTION and NEWVAL).
+*     The task loops until there are no more elements to change,
+*     indicated by a null value in response to a prompt.  For
+*     non-interactive processing, supply the value of Parameter NEWVAL
+*     on the command line.
+*
+*     - The second approach uses a text file, that is especially
+*     beneficial where there are too many section and value pairs to
+*     enter manually.  The file should contain two space-separated
+*     columns; the first column is the NDF section to replace, and the
+*     second supplies the value to insert into the section (see
+*     Parameter FILE).
 
 *  Usage:
 *     chpix in out section newval [comp]
@@ -36,8 +49,28 @@
 *        "Error" is the alternative to "Variance" and causes the
 *        square of the supplied replacement value to be stored in the
 *        output VARIANCE array. ["Data"]
+*     FILE = FILENAME (Read)
+*        Name of a text file containing the sections and replacement
+*        values.  It is only accessed if Parameter MODE is given the
+*        value "File".  Each line should contain an NDF section of
+*        a region (see Parameter SECTION), then one or more spaces,
+*        followed by the replacement value.  The value is either
+*        numeric or "Bad", the latter requests that the bad value
+*        be inserted into the section.  The file may contain comment
+*        lines with the first character # or !.
 *     IN = NDF (Read)
 *        NDF structure containing the array component to be modified.
+*     MODE = LITERAL (Read)
+*        The mode in which the sections and replacement values are to be
+*        obtained.  The supplied string can be one of the following values.
+*
+*        - "Interface" -- sections and values are obtained via Parameters
+*                         SECTION and NEWVAL respectively.
+*
+*        - "File"      -- sections and values are obtained from a text file
+*                         specified by Parameter FILE.
+*
+*        ["Interface"]
 *     NEWVAL = LITERAL (Read)
 *        Value to substitute in the output array element or elements.
 *        The range of allowed values depends on the data type of the
@@ -88,6 +121,10 @@
 *        Assigns value -1 to the pixels at index (45,21) within all
 *        planes of the three-dimensional NDF called zzcha, creating
 *        the output NDF called zzcha_c.
+*     chpix harpcube harpmasked mode=file file=badbaseline.txt
+*        This reads the text file called badbaseline.txt to obtain the
+*        editing commands to be applied to the NDF called harpcube to
+*        form the NDF harpmasked.
 
 *  Related Applications:
 *     KAPPA: ARDMASK, FILLBAD, GLITCH, NOMAGIC, REGIONMASK, SEGMENT,
@@ -153,6 +190,8 @@
 *        data types.
 *     2012 May 8 (MJC):
 *        Add _INT64 support.
+*     2018 September 19 (MJC):
+*        Add Parameters MODE and FILE.
 *     {enter_further_changes_here}
 
 *-
@@ -164,6 +203,7 @@
       INCLUDE 'SAE_PAR'          ! Global SSE definitions
       INCLUDE 'NDF_PAR'          ! NDF__ constants
       INCLUDE 'DAT_PAR'          ! DAT__ constants
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
       INCLUDE 'PAR_PAR'          ! PAR__ constants
       INCLUDE 'PAR_ERR'          ! PAR__ error constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
@@ -185,16 +225,25 @@
       DOUBLE PRECISION DVALUE    ! Replacement value for d.p. data
       CHARACTER * ( 40 ) SUGDEF  ! Suggested default
       INTEGER EL                 ! Number of array elements mapped
+      INTEGER FD                 ! Descriptor of the text file
+      LOGICAL FILE               ! File mode was selected
+      INTEGER IGRPS              ! Group of sections from text file
+      INTEGER IGRPV              ! Group of valus from text file
+      LOGICAL INTERF             ! Interface mode was selected
       INTEGER IVALUE             ! Replacement value for integer data
       INTEGER*8 KVALUE           ! Replacement value for 64-bit integer
       CHARACTER * ( DAT__SZLOC ) LOC ! Locators for the NDF
       LOGICAL LOOP               ! Loop for another section to replace
       CHARACTER * ( 8 ) MCOMP    ! Component name for mapping arrays
+      INTEGER MEMBER             ! Number of editing lines
+      CHARACTER * 9 MODE         ! Mode for getting sections and values
       INTEGER NCHAR              ! Number of characters written to string
       INTEGER NCSECT             ! Number of characters in section
       INTEGER NDFI               ! Identifier for input NDF
       INTEGER NDFO               ! Identifier for output NDF
       INTEGER NDFS               ! Identifier for NDF section
+      INTEGER NEDIT              ! Number of in-file edits
+      LOGICAL OPEN               ! Is text file open?
       REAL RVALUE                ! Replacement value for real data
       INTEGER PNTR( 1 )          ! Pointer to mapped NDF array
       CHARACTER * ( 80 ) SECT    ! Section specifier
@@ -210,6 +259,34 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Obtain the mode by which values and sections are accessed.
+      CALL PAR_CHOIC( 'MODE', 'Interface', 'Interface,File', .TRUE.,
+     :                MODE, STATUS )
+      FILE = MODE .EQ. 'FILE'
+      INTERF = MODE .EQ. 'INTERFACE'
+
+      OPEN = .FALSE.
+      IF ( FILE ) THEN
+
+*  Open the text file of editing instructions.
+         CALL FIO_ASSOC( 'FILE', 'READ', 'LIST', 0, FD, STATUS )
+         IF ( STATUS .EQ. SAI__OK ) OPEN = .TRUE.
+
+* Create groups for the sections and values supplied in the text file.
+         CALL GRP_NEW( 'Sections', IGRPS, STATUS )
+         CALL GRP_NEW( 'Values', IGRPV, STATUS )
+
+*  Read the values and sections into the groups.  Ignore blank and
+*  comment lines.
+         CALL KPS1_CHPIN( FD, '#,!', IGRPS, IGRPV, MEMBER, STATUS )
+         CALL MSG_SETI( 'N', MEMBER )
+         CALL MSG_OUTIF( MSG__VERB, '', 'Number sections read is ^N',
+     :                   STATUS )
+
+      END IF
+
+      NEDIT = 0
 
 *  Obtain the input NDF.
 *  =====================
@@ -277,16 +354,23 @@
 *  Determine whether or not to loop.  Looping does not occur if the
 *  NEWVAL is given on the command line, i.e. it is already in the active
 *  state.
-      CALL LPG_STATE( 'NEWVAL', ACTVAL, STATUS )
+      IF ( INTERF ) CALL LPG_STATE( 'NEWVAL', ACTVAL, STATUS )
 
       LOOP = .TRUE.
       DO WHILE ( STATUS .EQ. SAI__OK .AND. LOOP )
+         NEDIT = NEDIT + 1
 
 *  Do not loop if the value was given on the command line.
-         LOOP = ACTVAL .NE. PAR__ACTIVE
+         LOOP = ( INTERF .AND. ACTVAL .NE. PAR__ACTIVE ) .OR.
+     :          ( FILE .AND. NEDIT .LT. MEMBER )
 
-*  Obtain the section.
-         CALL PAR_GET0C( 'SECTION', SECT, STATUS )
+*  Obtain the section string. and the value in file mode.
+         IF ( INTERF ) THEN
+            CALL PAR_GET0C( 'SECTION', SECT, STATUS )
+         ELSE IF ( FILE ) THEN
+            CALL GRP_GET( IGRPS, NEDIT, 1, SECT, STATUS )
+            CALL GRP_GET( IGRPV, NEDIT, 1, CVALUE, STATUS )
+         END IF
          NCSECT = CHR_LEN( SECT )
 
 *  Create the section in the output array.
@@ -309,25 +393,27 @@
          SUGDEF = 'Junk'
          IF ( TYPE .EQ. '_REAL' ) THEN
 
-*  If the section contains only a single pixel, use its value as the
-*  default for the parameter.
-            IF( EL .EQ. 1 ) THEN
-               CALL KPG1_MEANR( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          RVALUE, STATUS )
-               IF( RVALUE .NE. VAL__BADR ) THEN
-                  CALL CHR_RTOC( RVALUE, SUGDEF, NCHAR )
-               ELSE
-                  SUGDEF = 'Bad'
+*  Drive a suitable suggested default.  If the section contains only a
+*  single pixel, use its value as the default for the parameter.
+            IF ( INTERF ) THEN
+               IF ( EL .EQ. 1 ) THEN
+                  CALL KPG1_MEANR( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                             RVALUE, STATUS )
+                  IF ( RVALUE .NE. VAL__BADR ) THEN
+                     CALL CHR_RTOC( RVALUE, SUGDEF, NCHAR )
+                  ELSE
+                     SUGDEF = 'Bad'
+                  END IF
+                  CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
                END IF
-               CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
-            END IF
 
 *  Get the replacement value.  The range depends on the processing data
 *  type.
-            CALL PAR_MIX0R( 'NEWVAL', SUGDEF, VAL__MINR, VAL__MAXR,
-     :                      'Bad', .FALSE., CVALUE, STATUS )
+               CALL PAR_MIX0R( 'NEWVAL', SUGDEF, VAL__MINR, VAL__MAXR,
+     :                         'Bad', .FALSE., CVALUE, STATUS )
+            END IF
 
-*  Convert the returned string to a numerical value.
+*  Convert the value string to a numerical value.
             IF ( CVALUE .EQ. 'BAD' ) THEN
                RVALUE = VAL__BADR
                BADO = .TRUE.
@@ -342,21 +428,27 @@
 *  Double precision
 *  ----------------
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            IF( EL .EQ. 1 ) THEN
-               CALL KPG1_MEAND( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          DVALUE, STATUS )
-               IF( DVALUE .NE. VAL__BADD ) THEN
-                  CALL CHR_DTOC( DVALUE, SUGDEF, NCHAR )
-               ELSE
-                  SUGDEF = 'Bad'
+            IF ( INTERF ) THEN
+
+*  Drive a suitable suggested default.  If the section contains only a
+*  single pixel, use its value as the default for the parameter.
+               IF ( EL .EQ. 1 ) THEN
+                  CALL KPG1_MEAND( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                             DVALUE, STATUS )
+                  IF ( DVALUE .NE. VAL__BADD ) THEN
+                     CALL CHR_DTOC( DVALUE, SUGDEF, NCHAR )
+                  ELSE
+                     SUGDEF = 'Bad'
+                  END IF
+                  CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
                END IF
-               CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
+
+*  Get the replacement value.
+               CALL PAR_MIX0D( 'NEWVAL', SUGDEF, VAL__MIND, VAL__MAXD,
+     :                         'Bad', .FALSE., CVALUE, STATUS )
             END IF
 
-            CALL PAR_MIX0D( 'NEWVAL', SUGDEF, VAL__MIND, VAL__MAXD,
-     :                      'Bad', .FALSE., CVALUE, STATUS )
-
-*  Convert the returned string to a numerical value.
+*  Convert the value string to a numerical value.
             IF ( CVALUE .EQ. 'BAD' ) THEN
                DVALUE = VAL__BADD
                BADO = .TRUE.
@@ -371,21 +463,27 @@
 *  Integer
 *  -------
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-            IF( EL .EQ. 1 ) THEN
-               CALL KPG1_MEANI( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          IVALUE, STATUS )
-               IF( IVALUE .NE. VAL__BADI ) THEN
-                  CALL CHR_ITOC( IVALUE, SUGDEF, NCHAR )
-               ELSE
-                  SUGDEF = 'Bad'
+            IF ( INTERF ) THEN
+
+*  Drive a suitable suggested default.  If the section contains only a
+*  single pixel, use its value as the default for the parameter.
+               IF ( EL .EQ. 1 ) THEN
+                  CALL KPG1_MEANI( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                             IVALUE, STATUS )
+                  IF ( IVALUE .NE. VAL__BADI ) THEN
+                     CALL CHR_ITOC( IVALUE, SUGDEF, NCHAR )
+                  ELSE
+                     SUGDEF = 'Bad'
+                  END IF
+                  CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
                END IF
-               CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
+
+*  Get the replacement value.
+               CALL PAR_MIX0I( 'NEWVAL', SUGDEF, VAL__MINI, VAL__MAXI,
+     :                         'Bad', .FALSE., CVALUE, STATUS )
             END IF
 
-            CALL PAR_MIX0I( 'NEWVAL', SUGDEF, VAL__MINI, VAL__MAXI,
-     :                      'Bad', .FALSE., CVALUE, STATUS )
-
-*  Convert the returned string to a numerical value.
+*  Convert the value string to a numerical value.
             IF ( CVALUE .EQ. 'BAD' ) THEN
                IVALUE = VAL__BADI
                BADO = .TRUE.
@@ -400,21 +498,27 @@
 *  64-bit Integer
 *  --------------
          ELSE IF ( TYPE .EQ. '_INT64' ) THEN
-            IF( EL .EQ. 1 ) THEN
-               CALL KPG1_MEANK( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          KVALUE, STATUS )
-               IF( KVALUE .NE. VAL__BADK ) THEN
-                  CALL CHR_ITOC( KVALUE, SUGDEF, NCHAR )
-               ELSE
-                  SUGDEF = 'Bad'
+            IF ( INTERF ) THEN
+
+*  Drive a suitable suggested default.  If the section contains only a
+*  single pixel, use its value as the default for the parameter.
+               IF ( EL .EQ. 1 ) THEN
+                  CALL KPG1_MEANK( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                             KVALUE, STATUS )
+                  IF ( KVALUE .NE. VAL__BADK ) THEN
+                     CALL CHR_ITOC( KVALUE, SUGDEF, NCHAR )
+                  ELSE
+                     SUGDEF = 'Bad'
+                  END IF
+                  CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
                END IF
-               CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
+
+*  Get the replacement value.
+               CALL PAR_MIX0I( 'NEWVAL', SUGDEF, VAL__MINK, VAL__MAXK,
+     :                         'Bad', .FALSE., CVALUE, STATUS )
             END IF
 
-            CALL PAR_MIX0I( 'NEWVAL', SUGDEF, VAL__MINK, VAL__MAXK,
-     :                      'Bad', .FALSE., CVALUE, STATUS )
-
-*  Convert the returned string to a numerical value.
+*  Convert the value string to a numerical value.
             IF ( CVALUE .EQ. 'BAD' ) THEN
                KVALUE = VAL__BADK
                BADO = .TRUE.
@@ -429,23 +533,29 @@
 *  Byte
 *  ----
          ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
-            IF( EL .EQ. 1 ) THEN
-               CALL KPG1_MEANB( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          BVALUE, STATUS )
-               IF( BVALUE .NE. VAL__BADB ) THEN
-                  CALL CHR_ITOC( NUM_BTOI( BVALUE ), SUGDEF, NCHAR )
-               ELSE
-                  SUGDEF = 'Bad'
+            IF ( INTERF ) THEN
+
+*  Drive a suitable suggested default.  If the section contains only a
+*  single pixel, use its value as the default for the parameter.
+               IF ( EL .EQ. 1 ) THEN
+                  CALL KPG1_MEANB( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                             BVALUE, STATUS )
+                  IF ( BVALUE .NE. VAL__BADB ) THEN
+                     CALL CHR_ITOC( NUM_BTOI( BVALUE ), SUGDEF, NCHAR )
+                  ELSE
+                     SUGDEF = 'Bad'
+                  END IF
+
+                  CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
                END IF
 
-               CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
+*  Get the replacement value.
+               CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_BTOI( VAL__MINB ),
+     :                         NUM_BTOI( VAL__MAXB ), 'Bad', .FALSE.,
+     :                         CVALUE, STATUS )
             END IF
 
-            CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_BTOI( VAL__MINB ),
-     :                      NUM_BTOI( VAL__MAXB ), 'Bad', .FALSE.,
-     :                      CVALUE, STATUS )
-
-*  Convert the returned string to a numerical value.
+*  Convert the value string to a numerical value.
             IF ( CVALUE .EQ. 'BAD' ) THEN
                BVALUE = VAL__BADB
                BADO = .TRUE.
@@ -461,22 +571,29 @@
 *  Unsigned Byte
 *  -------------
          ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-            IF( EL .EQ. 1 ) THEN
-               CALL KPG1_MEANUB( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                           BVALUE, STATUS )
-               IF( BVALUE .NE. VAL__BADUB ) THEN
-                  CALL CHR_ITOC( NUM_UBTOI( BVALUE ), SUGDEF, NCHAR )
-               ELSE
-                  SUGDEF = 'Bad'
+            IF ( INTERF ) THEN
+
+*  Drive a suitable suggested default.  If the section contains only a
+*  single pixel, use its value as the default for the parameter.
+               IF ( EL .EQ. 1 ) THEN
+                  CALL KPG1_MEANUB( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                              BVALUE, STATUS )
+                  IF ( BVALUE .NE. VAL__BADUB ) THEN
+                     CALL CHR_ITOC( NUM_UBTOI( BVALUE ), SUGDEF, NCHAR )
+                  ELSE
+                     SUGDEF = 'Bad'
+                  END IF
+                  CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
                END IF
-               CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
+
+*  Get the replacement value.
+               CALL PAR_MIX0I( 'NEWVAL', SUGDEF,
+     :                         NUM_UBTOI( VAL__MINUB ),
+     :                         NUM_UBTOI( VAL__MAXUB ), 'Bad', .FALSE.,
+     :                         CVALUE, STATUS )
             END IF
 
-            CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_UBTOI( VAL__MINUB ),
-     :                      NUM_UBTOI( VAL__MAXUB ), 'Bad', .FALSE.,
-     :                      CVALUE, STATUS )
-
-*  Convert the returned string to a numerical value.
+*  Convert the value string to a numerical value.
             IF ( CVALUE .EQ. 'BAD' ) THEN
                BVALUE = VAL__BADUB
                BADO = .TRUE.
@@ -492,22 +609,28 @@
 *  Word
 *  ----
          ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-            IF( EL .EQ. 1 ) THEN
-               CALL KPG1_MEANW( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          WVALUE, STATUS )
-               IF( WVALUE .NE. VAL__BADW ) THEN
-                  CALL CHR_ITOC( NUM_WTOI( WVALUE ), SUGDEF, NCHAR )
-               ELSE
-                  SUGDEF = 'Bad'
+            IF ( INTERF ) THEN
+
+*  Drive a suitable suggested default.  If the section contains only a
+*  single pixel, use its value as the default for the parameter.
+               IF ( EL .EQ. 1 ) THEN
+                  CALL KPG1_MEANW( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                             WVALUE, STATUS )
+                  IF ( WVALUE .NE. VAL__BADW ) THEN
+                     CALL CHR_ITOC( NUM_WTOI( WVALUE ), SUGDEF, NCHAR )
+                  ELSE
+                     SUGDEF = 'Bad'
+                  END IF
+                  CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
                END IF
-               CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
+
+*  Get the replacement value.
+               CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_WTOI( VAL__MINW ),
+     :                          NUM_WTOI( VAL__MAXW ), 'Bad', .FALSE.,
+     :                          CVALUE, STATUS )
             END IF
 
-            CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_WTOI( VAL__MINW ),
-     :                       NUM_WTOI( VAL__MAXW ), 'Bad', .FALSE.,
-     :                       CVALUE, STATUS )
-
-*  Convert the returned string to a numerical value.
+*  Convert the value string to a numerical value.
             IF ( CVALUE .EQ. 'BAD' ) THEN
                WVALUE = VAL__BADW
                BADO = .TRUE.
@@ -523,21 +646,29 @@
 *  Unsigned Word
 *  -------------
          ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-            IF( EL .EQ. 1 ) THEN
-               CALL KPG1_MEANUW( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                           WVALUE, STATUS )
-               IF( WVALUE .NE. VAL__BADUW ) THEN
-                  CALL CHR_ITOC( NUM_UWTOI( WVALUE ), SUGDEF, NCHAR )
-               ELSE
-                  SUGDEF = 'Bad'
-               END IF
-               CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
-            END IF
-            CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_UWTOI( VAL__MINUW ),
-     :                      NUM_UWTOI( VAL__MAXUW ), 'Bad', .FALSE.,
-     :                      CVALUE, STATUS )
+            IF ( INTERF ) THEN
 
-*  Convert the returned string to a numerical value.
+*  Drive a suitable suggested default.  If the section contains only a
+*  single pixel, use its value as the default for the parameter.
+               IF ( EL .EQ. 1 ) THEN
+                  CALL KPG1_MEANUW( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                              WVALUE, STATUS )
+                  IF ( WVALUE .NE. VAL__BADUW ) THEN
+                     CALL CHR_ITOC( NUM_UWTOI( WVALUE ), SUGDEF, NCHAR )
+                  ELSE
+                     SUGDEF = 'Bad'
+                  END IF
+                  CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
+               END IF
+
+*  Get the replacement value.
+               CALL PAR_MIX0I( 'NEWVAL', SUGDEF,
+     :                         NUM_UWTOI( VAL__MINUW ),
+     :                         NUM_UWTOI( VAL__MAXUW ), 'Bad', .FALSE.,
+     :                         CVALUE, STATUS )
+            END IF
+
+*  Convert the value string to a numerical value.
             IF ( CVALUE .EQ. 'BAD' ) THEN
                WVALUE = VAL__BADUW
                BADO = .TRUE.
@@ -556,14 +687,16 @@
          CALL NDF_ANNUL( NDFS, STATUS )
 
 *  Annul a null status as this is expected, and closes the loop.
-         IF ( STATUS .EQ. PAR__NULL ) THEN
-            CALL ERR_ANNUL( STATUS )
-            LOOP = .FALSE.
+         IF ( INTERF ) THEN
+            IF ( STATUS .EQ. PAR__NULL ) THEN
+               CALL ERR_ANNUL( STATUS )
+               LOOP = .FALSE.
 
 *  Cancel the previous values of NEWVAL and SECTION for the loop.
-         ELSE IF ( LOOP .AND. STATUS .EQ. SAI__OK ) THEN
-             CALL PAR_CANCL( 'SECTION', STATUS )
-             CALL PAR_CANCL( 'NEWVAL', STATUS )
+            ELSE IF ( LOOP .AND. STATUS .EQ. SAI__OK ) THEN
+                CALL PAR_CANCL( 'SECTION', STATUS )
+                CALL PAR_CANCL( 'NEWVAL', STATUS )
+            END IF
          END IF
 
 *  End of the do-while loop for the section.
@@ -578,6 +711,15 @@
 *  Closedown sequence.
 *  ===================
   999 CONTINUE
+
+*  Close an open text file.
+      IF ( OPEN ) CALL FIO_CLOSE( FD, STATUS )
+
+*  Delete the groups.
+      IF ( FILE ) THEN
+         CALL GRP_DELET( IGRPS, STATUS )
+         CALL GRP_DELET( IGRPV, STATUS )
+      END IF
 
 *  Free NDF resources.
       CALL NDF_END( STATUS )

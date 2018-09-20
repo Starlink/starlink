@@ -9735,7 +9735,14 @@ package kappa {
             helpkey *
          }
 
-         parameter in {
+         parameter file {
+            type FILENAME
+            ppath CURRENT
+            prompt {Text file containing NDF sections and replacement values}
+            helpkey *
+         }
+
+        parameter in {
             position 1
             type NDF
             access READ
@@ -9743,6 +9750,15 @@ package kappa {
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
             prompt {NDF to be modified}
+            helpkey *
+         }
+
+         parameter mode {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Mode used to obtain NDF sections and values}
+            default Interface
             helpkey *
          }
 
