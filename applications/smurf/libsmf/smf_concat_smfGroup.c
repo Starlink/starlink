@@ -247,7 +247,12 @@
  *        by the config parameter "dumpdir", rather than from the current
  *        directory.
  *     2018-03-29 (DSB):
-*         Use dumpdir value if "config" is NULL.
+ *        Use dumpdir value if "config" is NULL.
+ *     2018-09-21 (DSB):
+ *        Modified so that the FITS header in the output smfData contains
+ *        the result of merging the FITS headers from all the concatenated
+ *        input smfDatas. Previously, the output FITS header was just a
+ *        copy of the FITS header from the first input smfData.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -347,7 +352,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
   int havearray[2];             /* flags for DATA/VARIANCE present */
   int havequal=0;               /* flag for QUALITY present */
   int havelut=0;                /* flag for pointing LUT present */
-  smfHead *hdr;                 /* pointer to smfHead in concat data */
+  smfHead *hdr=NULL;            /* pointer to smfHead in concat data */
   dim_t i;                      /* Loop counter */
   int importlut;                /* Import LUT array from an NDF? */
   Grp *ingrp=NULL;              /* Pointer to 1-element input group */
@@ -825,6 +830,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
               /* Copy over basic header information from the reference */
               hdr = data->hdr;
               refhdr = refdata->hdr;
+              hdr->fitshdr = NULL;
               hdr->instrument = refhdr->instrument;
               hdr->scanvel = refhdr->scanvel;
               hdr->steptime = refhdr->steptime;
@@ -954,11 +960,6 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
                 data->theta = astCalloc(tlen, sizeof(*(data->theta)) );
               }
 
-              /* Copy over the FITS header */
-              if( (*status == SAI__OK) && (refhdr->fitshdr) ) {
-                hdr->fitshdr = astCopy( refhdr->fitshdr );
-              }
-
               /* Copy over the TSWCS, ensuring the axes are in the required
                  order. */
               if( (*status == SAI__OK) && (refhdr->tswcs) ) {
@@ -967,6 +968,12 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
               }
             }
           }
+
+          /* Merge the FITS headers. This filters out headers that have
+             different values, except for those that relate to the start and
+             end values for a specific quantity - these are merged. */
+          refhdr = refdata->hdr;
+          if( hdr && refhdr && refhdr->fitshdr ) smf_fits_outhdr( refhdr->fitshdr, &hdr->fitshdr, status );
 
           /* If we have not yet done so, set up threading info. */
           if( ! job_data ) {
