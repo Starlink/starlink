@@ -1014,10 +1014,13 @@ class ParSys(object):
 
       #  Log information about the version of starlink being used.
       file = os.environ["STARLINK_DIR"]+"/manifests/starlink.version"
-      with open(file) as fd:
-         msg_out( "Contents of {0}".format(file), ATASK )
-         for line in fd:
-            msg_out( "   "+line.strip(), ATASK )
+      try:
+         with open(file) as fd:
+            msg_out( "Contents of {0}".format(file), ATASK )
+            for line in fd:
+               msg_out( "   "+line.strip(), ATASK )
+      except IOError:
+         msg_out( "Unable to open starlink version file: {0}".format(file), ATASK )
       msg_out( " ", ATASK )
 
       # Record the single allowed instance of the ParSys class.
