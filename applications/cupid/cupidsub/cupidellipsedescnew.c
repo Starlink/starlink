@@ -9,10 +9,10 @@ static void cupid1FitParabola( int nbin, double *hist, int box, int oper, int *i
                                double *vcen, int *status );
 
 AstRegion *cupidEllipseDescNew( AstFrame *pixel_frm, double *ipd, int velax,
-                             double *cent, int space_axes[ 2 ], int ndim,
-                             int *lbnd, int *ubnd, AstMapping *wcsmap,
-                             AstFrame *space_frm, AstMapping *space_map,
-                             int *status ){
+                                double *cent, int space_axes[ 2 ], int ndim,
+                                int *lbnd, int *ubnd, AstMapping *wcsmap,
+                                AstFrame *space_frm, AstMapping *space_map,
+                                int weight, int *status ){
 /*
 *+
 *  Name:
@@ -29,18 +29,18 @@ AstRegion *cupidEllipseDescNew( AstFrame *pixel_frm, double *ipd, int velax,
 *                                     double *cent, int space_axes[ 2 ], int ndim,
 *                                     int *lbnd, int *ubnd, AstMapping *wcsmap,
 *                                     AstFrame *space_frm, AstMapping *space_map,
-*                                     int *status )
+*                                     int weight, int *status )
 
 *  Description:
 *     This function returns an Ellipse describing the spatial extent of the
 *     clump specified by the supplied masked clump data array.
 *
-*     It forms an azimuthal profile of the clump, which gives the weighted
-*     mean radius of the clump at each azimuthal angle from zero to 360
-*     (the data value is used as the weight). It then find the azimuth
-*     with the largest radius (i.e. the largest value in the profile),
-*     and fits a parabola to the peak in the profile to determine the
-*     position and size of the accurate peak. This defines the semi-major
+*     It forms an azimuthal profile of the clump, which gives the mean
+*     radius of the clump at each azimuthal angle from zero to 360 (the
+*     data value is used as a weight if "weight" is non-zero). It then finds
+*     the azimuth with the largest radius (i.e. the largest value in the
+*     profile), and fits a parabola to the peak in the profile to determine
+*     the position and size of the accurate peak. This defines the semi-major
 *     axis of the ellipse. The semi-minor axis is determines from the
 *     profile value corresponding to the angle at right angles to the
 *     semi-major axis.
@@ -58,7 +58,8 @@ AstRegion *cupidEllipseDescNew( AstFrame *pixel_frm, double *ipd, int velax,
 *        The zero-based index of the velocity pixel axis. Should be -1 if
 *        there is no velocity axis.
 *     cent
-*        Array holding pixel coords of the clump centroid.
+*        Array holding pixel coords of the ellipse centre (usually the
+*        clump centroid or the clump peak).
 *     space_axes[ 2 ]
 *        Zero based indices of the two spatial pixel axes.
 *     ndim
@@ -77,6 +78,10 @@ AstRegion *cupidEllipseDescNew( AstFrame *pixel_frm, double *ipd, int velax,
 *     space_map
 *        A pointer to the 2D spatial pixel->WCS Mapping. Ignored if "wcsmap"
 *        is NULL.
+*     weight
+*        If non-zero, the radial distance of each pixel is weighted by the
+*        pixel value when forming the mean radial distance at each azimuth.
+*        Otherwise, the pixel value is not used as a weight.
 *     status
 *        Pointer to the inherited status value.
 
@@ -111,6 +116,8 @@ AstRegion *cupidEllipseDescNew( AstFrame *pixel_frm, double *ipd, int velax,
 *     25-MAY-2009 (DSB):
 *        Complete re-write to avoid suprious very long thin ellipses
 *        being returned.
+*     21-SEP-2018 (DSB):
+*        Added argument "weight".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -179,8 +186,8 @@ AstRegion *cupidEllipseDescNew( AstFrame *pixel_frm, double *ipd, int velax,
    ellipse = NULL;
 
 /* Allocate memory for a pair of 1-dimensional arrays in which index
-   corresponds to azimuthal angle within the spatial plane, with the clump
-   centroid defining the origin and the first spatial pixel axis defining zero
+   corresponds to azimuthal angle within the spatial plane, with the supplied
+   centre defining the origin and the first spatial pixel axis defining zero
    azimuth. Initialise the contents to zero by using astCalloc rather than
    astMalloc. */
    hist1 = astCalloc( NBIN, sizeof(*hist1) );
@@ -217,23 +224,23 @@ AstRegion *cupidEllipseDescNew( AstFrame *pixel_frm, double *ipd, int velax,
             for( i = lbnd[ 0 ]; i <= ubnd[ 0 ]; i++, pd++ ) {
                if( *pd != VAL__BADD && *pd > 0.0 ) {
 
-/* Get the distance from the centroid to the current pixel, projected
+/* Get the distance from the ellipse centre to the current pixel, projected
    onto the spatial plane. */
                   d1 = *spax1 - c1;
                   d2 = *spax2 - c2;
                   r = sqrt( d1*d1 + d2*d2 );
 
 /* Get the range of azimuthal angle subtended by the current pixel, as seen
-   from the centroid. This is the angle from the first spatial axis to the
-   line from the centroid to the current pixel, positive from spatial axis 1
+   from the centre. This is the angle from the first spatial axis to the
+   line from the centre to the current pixel, positive from spatial axis 1
    to spatial axis 2, in radians. Find the azimuth at the four pixel
-   corners and find the max and min of them. */
+   corners. */
                   az[ 0 ] = atan2( d2, d1 );
                   az[ 1 ] = atan2( d2-1.0, d1 );
                   az[ 2 ] = atan2( d2, d1-1.0 );
                   az[ 3 ] = atan2( d2-1.0, d1-1.0 );
 
-/* Sort azimuth values into increasing order. */
+/* Sort azimuth values into increasing order (bubblesort). */
                   jj = 3;
                   sorted = 0;
                   while( !sorted ) {
@@ -334,13 +341,12 @@ AstRegion *cupidEllipseDescNew( AstFrame *pixel_frm, double *ipd, int velax,
                      mf0 = mf1;
                   }
 
-/* Normalize the the modifying factors to have a sum of unity, then
-   multiply them by the pixel data value to get he final weights. */
-/*                  mfsum /= *pd; */
+/* Normalize the modifying factors to have a sum of unity, then
+   multiply them by the pixel data value to get the final weights. */
+                  if( weight ) mfsum /= *pd;
                   for( jj = 0; jj < ii; jj++ ) {
                      mf[ jj ] /= mfsum;
                   }
-
 
 /* Paste the current pixel into the profile arrays, using the weights
    found above (in "mf") for each azimuth bin. Handle the wrap around for
@@ -399,8 +405,13 @@ AstRegion *cupidEllipseDescNew( AstFrame *pixel_frm, double *ipd, int velax,
    to produce ellipses that are the same size as the old algorithm. */
       centre[ 0 ] = c1;
       centre[ 1 ] = c2;
-      point1[ 0 ] = rmaj*0.55;
-      point1[ 1 ] = rmin*0.55;
+      if( weight ) {
+         point1[ 0 ] = rmaj*0.73;
+         point1[ 1 ] = rmin*0.73;
+      } else {
+         point1[ 0 ] = rmaj*0.55;
+         point1[ 1 ] = rmin*0.55;
+      }
       ellipse = astEllipse( pixel_frm, 1, centre, point1, &theta, NULL, " " );
 
 /* If required, convert the parameter values from pixel units to WCS

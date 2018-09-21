@@ -203,7 +203,7 @@ void makeclumps( int *status ) {
 *     SHAPE = LITERAL (Read)
 *        Specifies the shape that should be used to describe the spatial
 *        coverage of each clump in the output catalogue. It can be set to
-*        "None", "Polygon" or "Ellipse". If it is set to "None", the
+*        any of the strings described below. If it is set to "None", the
 *        spatial shape of each clump is not recorded in the output
 *        catalogue. Otherwise, the catalogue will have an extra column
 *        named "Shape" holding an STC-S description of the spatial coverage
@@ -230,12 +230,25 @@ void makeclumps( int *status ) {
 *        spatial plane and "size" of the collapsed clump at four different
 *        position angles - all separated by 45 degrees - is found (see the
 *        OUTCAT parameter for a description of clump "size"). The ellipse
-*        that generates the same sizes at the four position angles is then
+*        that generates the closest sizes at the four position angles is then
 *        found and used as the clump shape.
 *
-*        In general, "Ellipse" will outline the brighter, inner regions
-*        of each clump, and "Polygon" will include the fainter outer
-*        regions. ["None"]
+*        - Ellipse2: The above method for determining ellipses works well
+*        for clumps that are in fact elliptical, but can generate extremely
+*        long thin ellipses for clumps are far from being ellitical. The
+*        "Ellipse2" option uses a different method for determining the best
+*        ellipse based on finding many marginal profiles at one degree
+*        intervals of azimuth, and using the longest marginal profile as
+*        the major axis. The ellipse is centred at the clump centroid.
+*
+*        - Ellipse3: The same as "Ellipse2" except that the ellipse is
+*        centred at the clump peak, rather than the clump centroid, and 
+*        the pixel data values are used as weights when forming the mean 
+*        radial distance at each azimuth angle.
+*
+*        In general, ellipses will outline the brighter, inner regions
+*        of each clump, and polygons will include the fainter outer
+*        regions. [None]
 *     TRUNC = _REAL (Read)
 *        The level (above the local background) at which clumps should be
 *        truncated to zero, given as a fraction of the noise level specified
@@ -385,7 +398,6 @@ void makeclumps( int *status ) {
    int nspecax;                  /* Number of spectral axes in the current WCS frame */
    int nval;                     /* Number of values supplied */
    int precat;                   /* Create catalogue before beam smoothing? */
-   int sdim[ 3 ];                /* Indicies of significant pixel axes */
    int sdims;                    /* Number of significant pixel axes */
    int slbnd[ 3 ];               /* Lower bounds of significant pixel axes */
    int subnd[ 3 ];               /* Upper bounds of significant pixel axes */
@@ -433,7 +445,6 @@ void makeclumps( int *status ) {
    sdims = 0;
    for( i = 0; i < ndim; i++ ) {
       if( ubnd[ i ] > lbnd[ i ] ) {
-         sdim[ sdims ] = i;
          slbnd[ sdims ] = lbnd[ i ];
          subnd[ sdims ] = ubnd[ i ];
          sdims++;
@@ -478,13 +489,17 @@ void makeclumps( int *status ) {
 
 /* See what STC-S shape should be used to describe each spatial clump. */
    ishape = 0;
-   parChoic( "SHAPE", "None", "Ellipse,Polygon,None", 1, shape, 10,
-             status );
+   parChoic( "SHAPE", "None", "Ellipse,Ellipse2,Ellipse3,Polygon,None", 1,
+             shape, 10, status );
    if( *status == SAI__OK ) {
       if( !strcmp( shape, "POLYGON" ) ) {
          ishape = 2;
       } else if( !strcmp( shape, "ELLIPSE" ) ) {
          ishape = 1;
+      } else if( !strcmp( shape, "ELLIPSE2" ) ) {
+         ishape = 3;
+      } else if( !strcmp( shape, "ELLIPSE3" ) ) {
+         ishape = 4;
       }
    }
 

@@ -351,7 +351,7 @@ void findclumps( int *status ) {
 *     SHAPE = LITERAL (Read)
 *        Specifies the shape that should be used to describe the spatial
 *        coverage of each clump in the output catalogue. It can be set to
-*        "None", "Polygon" or "Ellipse". If it is set to "None", the
+*        any of the strings described below. If it is set to "None", the
 *        spatial shape of each clump is not recorded in the output
 *        catalogue. Otherwise, the catalogue will have an extra column
 *        named "Shape" holding an STC-S description of the spatial coverage
@@ -387,15 +387,20 @@ void findclumps( int *status ) {
 *        "Ellipse2" option uses a different method for determining the best
 *        ellipse based on finding many marginal profiles at one degree
 *        intervals of azimuth, and using the longest marginal profile as
-*        the major axis.
+*        the major axis. The ellipse is centred at the clump centroid.
+*
+*        - Ellipse3: The same as "Ellipse2" except that the ellipse is
+*        centred at the clump peak, rather than the clump centroid, and 
+*        the pixel data values are used as weights when forming the mean 
+*        radial distance at each azimuth angle.
 *
 *        In general, ellipses will outline the brighter, inner regions
 *        of each clump, and polygons will include the fainter outer
 *        regions. The dynamic default is "Polygon" if a JSA-style
 *        catalogue (see parameters JSACAT) is being created, and "None"
 *        otherwise. Note, if a JSA-style catalogue is being created an
-*        error will be reported if "Ellipse", "Ellipse2"  or "None" is
-*        selected. []
+*        error will be reported if "Ellipse", "Ellipse2", "Ellipse 3"
+*        or "None" is selected. []
 *     WCSPAR = _LOGICAL (Read)
 *        If a TRUE value is supplied, then the clump parameters stored in
 *        the output catalogue and in the CUPID extension of the output NDF,
@@ -941,7 +946,6 @@ void findclumps( int *status ) {
    AstFrameSet *iwcs;           /* Pointer to the WCS FrameSet */
    AstKeyMap *aconfig;          /* Pointer to KeyMap holding algorithm settings */
    AstKeyMap *config2;          /* Pointer to KeyMap holding used config settings */
-   AstKeyMap *config;           /* Pointer to KeyMap holding used config settings */
    AstKeyMap *keymap;           /* Pointer to KeyMap holding all config settings */
    AstMapping *map;             /* Current->base Mapping from WCS FrameSet */
    AstMapping *tmap;            /* Unused Mapping */
@@ -1151,7 +1155,8 @@ void findclumps( int *status ) {
 
 /* See what STC-S shape should be used to describe each spatial clump. */
    ishape = 0;
-   parChoic( "SHAPE", jsacat ? "Polygon" : "None", "Ellipse,Ellipse2,Polygon,None", 1,
+   parChoic( "SHAPE", jsacat ? "Polygon" : "None",
+             "Ellipse,Ellipse2,Ellipse3,Polygon,None", 1,
              shape, 10, status );
    if( *status == SAI__OK ) {
       if( !strcmp( shape, "POLYGON" ) ) {
@@ -1160,6 +1165,8 @@ void findclumps( int *status ) {
          ishape = 1;
       } else if( !strcmp( shape, "ELLIPSE2" ) ) {
          ishape = 3;
+      } else if( !strcmp( shape, "ELLIPSE3" ) ) {
+         ishape = 4;
       }
    }
 

@@ -124,6 +124,9 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *           3 - Use an ellipse to describe the spatial extent of the clump,
 *               created by finding many marginal profiles at 1 degree
 *               intervals and finding the longest.
+*           4 - Like 3 except the ellipse centre is at the clump peak rather
+*               than the clump centroid, and the pixel data values are used 
+*               as weights.
 *     velax
 *        The zero-based index of the velocity pixel axis. Should be -1 if
 *        there is no velocity axis.
@@ -781,10 +784,10 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 
 /* The new ellipse fitting algorithm avoids creating very long thin ellipses for
    non-elliptical clumps. */
-         if( shape == 3 ) {
-            reg = cupidEllipseDescNew( pixel_frm, ipd, velax, ret + ndim, space_axes,
-                                       ndim, lbnd, ubnd, wcsmap, space_frm,
-                                       space_map, status );
+         if( shape == 3 || shape == 4 ){
+            reg = cupidEllipseDescNew( pixel_frm, ipd, velax, ret+((shape==3)?ndim:0),
+                                       space_axes, ndim, lbnd, ubnd, wcsmap, space_frm,
+                                       space_map, (shape==4), status );
 
 /* The old elipse fitting algorithm, is better at genuinly elliptical sources. */
          } else if( shape == 1 ) {

@@ -96,6 +96,9 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 *           3 - Use an ellipse to describe the spatial extent of the clump,
 *               created by finding many marginal profiles at 1 degree
 *               intervals and finding the longest.
+*           4 - Like 3 except the ellipse centre is at the clump peak rather
+*               than the clump centroid, and the pixel values are used as
+*               weights when forming the mean radial distance in the clump.
 *     velax
 *        The index of the velocity pixel axis. Only used if "ndim" is 3.
 *     backoff

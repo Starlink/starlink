@@ -111,7 +111,7 @@ void extractclumps( int *status ) {
 *     SHAPE = LITERAL (Read)
 *        Specifies the shape that should be used to describe the spatial
 *        coverage of each clump in the output catalogue. It can be set to
-*        "None", "Polygon" or "Ellipse". If it is set to "None", the
+*        any of the strings described below. If it is set to "None", the
 *        spatial shape of each clump is not recorded in the output
 *        catalogue. Otherwise, the catalogue will have an extra column
 *        named "Shape" holding an STC-S description of the spatial coverage
@@ -138,15 +138,29 @@ void extractclumps( int *status ) {
 *        spatial plane and "size" of the collapsed clump at four different
 *        position angles - all separated by 45 degrees - is found (see the
 *        OUTCAT parameter for a description of clump "size"). The ellipse
-*        that generates the same sizes at the four position angles is then
+*        that generates the closest sizes at the four position angles is then
 *        found and used as the clump shape.
 *
-*        In general, "Ellipse" will outline the brighter, inner regions
-*        of each clump, and "Polygon" will include the fainter outer
+*        - Ellipse2: The above method for determining ellipses works well
+*        for clumps that are in fact elliptical, but can generate extremely
+*        long thin ellipses for clumps are far from being ellitical. The
+*        "Ellipse2" option uses a different method for determining the best
+*        ellipse based on finding many marginal profiles at one degree
+*        intervals of azimuth, and using the longest marginal profile as
+*        the major axis. The ellipse is centred at the clump centroid.
+*
+*        - Ellipse3: The same as "Ellipse2" except that the ellipse is
+*        centred at the clump peak, rather than the clump centroid, and 
+*        the pixel data values are used as weights when forming the mean 
+*        radial distance at each azimuth angle.
+*
+*        In general, ellipses will outline the brighter, inner regions
+*        of each clump, and polygons will include the fainter outer
 *        regions. The dynamic default is "Polygon" if a JSA-style
 *        catalogue (see parameters JSACAT) is being created, and "None"
-*        otherwise. Note, if a JSA-style catalogue is neing created an
-*        error will be reported if "Ellipse" or "None" is selected. []
+*        otherwise. Note, if a JSA-style catalogue is being created an
+*        error will be reported if "Ellipse", "Ellipse2", "Ellipse 3"
+*        or "None" is selected. []
 *     VELORES = _REAL (Read)
 *        The velocity resolution of the instrument, in channels. If DECONV is
 *        TRUE, the velocity width of each clump written to the output
@@ -438,13 +452,18 @@ void extractclumps( int *status ) {
 
 /* See what STC-S shape should be used to describe each spatial clump. */
    ishape = 0;
-   parChoic( "SHAPE", jsacat ? "Polygon" : "None", "Ellipse,Polygon,None", 1,
+   parChoic( "SHAPE", jsacat ? "Polygon" : "None",
+             "Ellipse,Ellipse2,Ellipse3,Polygon,None", 1,
              shape, 10, status );
    if( *status == SAI__OK ) {
       if( !strcmp( shape, "POLYGON" ) ) {
          ishape = 2;
       } else if( !strcmp( shape, "ELLIPSE" ) ) {
          ishape = 1;
+      } else if( !strcmp( shape, "ELLIPSE2" ) ) {
+         ishape = 3;
+      } else if( !strcmp( shape, "ELLIPSE3" ) ) {
+         ishape = 4;
       }
    }
 
@@ -728,9 +747,6 @@ void extractclumps( int *status ) {
 /* Close the FITS file. */
       cvgClose( &fptr, status );
    }
-
-/* Tidy up */
-L999:
 
 /* Release the HDS object containing the list of NDFs describing the clumps. */
    if( ndfs ) datAnnul( &ndfs, status );
