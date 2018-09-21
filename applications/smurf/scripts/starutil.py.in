@@ -964,7 +964,7 @@ class ParSys(object):
       #  for unknown parameters were supplied on the command line), raise an
       #  exception.
       if len(byName) > 0:
-         name = list(byName.keys())[0]
+         name = list(byName)[0]
          text = "\n\n{0}: Unknown parameter '{1}' specified on the command line.".format(cmd(),name)
 
       elif len(byPosition) > 0:
@@ -1012,6 +1012,14 @@ class ParSys(object):
       os.environ["NDF_AUTO_HISTORY"] = "1"
       os.environ["AUTOPROV"] = "1"
 
+      #  Log information about the version of starlink being used.
+      file = os.environ["STARLINK_DIR"]+"/manifests/starlink.version"
+      with open(file) as fd:
+         msg_out( "Contents of {0}".format(file), ATASK )
+         for line in fd:
+            msg_out( "   "+line.strip(), ATASK )
+      msg_out( " ", ATASK )
+
       # Record the single allowed instance of the ParSys class.
       ParSys.singleton = self
 
@@ -1051,7 +1059,7 @@ class ParSys(object):
       return self.next()
    def next(self):
       self.__inext += 1
-      parnames = self.params.keys()
+      parnames = list(self.params)
       if self.__inext < len( parnames ):
          return self.params[parnames[ self.__inext ]]
       else:
