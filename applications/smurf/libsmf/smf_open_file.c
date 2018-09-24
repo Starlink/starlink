@@ -260,6 +260,9 @@
  *        Use RTS_END to define the length of the JCMTSTATE vectors,
  *        rather than the first component, since the first component may
  *        be a scalar.
+ *     2018-9-24 (DSB):
+ *        Do not over-write potentially good scanvel and steptime values
+ *        in the smfHead with bad values read from the SMURF extension.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -1606,7 +1609,8 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
        Such an extension item will be present if the data has been
        pre-cleaned by a previous run of makemap, and will be the value
        actually used by the previous run of makemap. Similarly get the
-       SCAN_VEL (in arcsec/sec). */
+       SCAN_VEL (in arcsec/sec). Ignore the extension values if they are
+       bad. */
     smf_getfitsd( hdr, "STEPTIME", &steptime, status );
     smf_getfitsd( hdr, "SCAN_VEL", &scanvel, status );
     if( file && file->ndfid != NDF__NOID ) {
@@ -1617,8 +1621,8 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
          ndfXgt0d( file->ndfid, SMURF__EXTNAME, "SCAN_VEL", &scanvel, status );
       }
     }
-    hdr->scanvel = scanvel;
-    hdr->steptime = steptime;
+    if( scanvel != VAL__BADD ) hdr->scanvel = scanvel;
+    if( steptime != VAL__BADD ) hdr->steptime = steptime;
 
     /* If this looks like a SCUBA-2 image but we are missing
        STEPTIME or SCAN_VEL we do not really mind if this is
