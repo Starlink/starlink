@@ -103,6 +103,9 @@
 *     2017-03-27 (DSB):
 *        Modify smf__validate_scan to take account of any map offset
 *        specified by the MAP_X and MAP_Y FITS headers.
+*     2018-09-24 (DSB):
+*        Re-calculate SCAN_VEL from JCMTSTATE info if it is undefined
+*        in the FITS header.
 
 *  Copyright:
 *     Copyright (C) 2009-2014 Science & Technology Facilities Council.
@@ -170,6 +173,7 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
   smfHead *hdr = NULL;       /* Data header struct */
   AstKeyMap * obsmap = NULL; /* Info from all observations */
   AstKeyMap * objmap = NULL; /* All the object names used */
+  double scanvel;            /* Value of SCAN_VEL header */
   int validate_scans;        /* Should scan patterns be validated? */
   if (*status != SAI__OK) return have_fixed;
 
@@ -260,10 +264,27 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
       msgOutiff( msglev, "", INDENT "Recalculated step time as %g sec from JCMTSTATE (was %g sec)",
                  status, newstep, steptime);
       smf_fits_updateD( hdr, "STEPTIME", newstep, NULL, status );
+      hdr->steptime = newstep;
       have_fixed |= SMF__FIXED_FITSHDR;
     }
   }
 
+  /* Some observations do not have a value for SCAN_VEL (e.g. 20150918
+    #24). In such cases, determine a SCAN_VEL value from the pointing info. */
+  scanvel = VAL__BADD;
+  smf_getfitsd( hdr, "SCAN_VEL", &scanvel, status );
+  if( scanvel == VAL__BADD ) {
+    size_t nflagged;
+    smf_flag_slewspeed( data, 0.0, 0.0, &nflagged, &scanvel, status );
+    if( scanvel != VAL__BADD ) {
+      msgOutiff( msglev, "", INDENT "Recalculated scan velocity as %g "
+                 "arcsec/sec from JCMTSTATE (was undefined)", status,
+                 scanvel );
+      smf_fits_updateD( hdr, "SCAN_VEL", scanvel, NULL, status );
+      hdr->scanvel = scanvel;
+      have_fixed |= SMF__FIXED_FITSHDR;
+    }
+  }
 
   /* Read some FITS headers, intialising the struct first */
   fitsvals.utdate = VAL__BADI;
@@ -645,7 +666,7 @@ static int smf__validate_scan( smfHead *hdr, int *status ) {
    map_wdth = 0.0;
    smf_getfitsd( hdr, "MAP_WDTH", &map_wdth, status );
 
-/* Get the requested map offset (in tracking coords) from the 
+/* Get the requested map offset (in tracking coords) from the
    boresight, in arc-seconds. Convert to radians. */
    mapx = 0.0;
    smf_getfitsd( hdr, "MAP_X", &mapx, status );

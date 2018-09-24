@@ -72,6 +72,11 @@
 *     2015-11-18 (DSB):
 *        Quality array is not needed if smin and smax indicate no flagging
 *        is required.
+*     2018-08-24 (DSB):
+*        Modified so that the smfData dimensions are only accessed if 
+*        smin and smax indicate flagging is required. The number of 
+*        time slices is now obtained from the smfHead rather than from
+*        smfData->dims.
 
 *  Copyright:
 *     Copyright (C) 2011-2012 Science & Technology Facilities Council.
@@ -148,12 +153,24 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
   /* Main routine */
   if (*status != SAI__OK) return;
 
-  /* obtain data dimensions */
-  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, &bstride, &tstride,
-                status );
-
   /* other validity checks */
-  if( (*status==SAI__OK) && (ntslice<3) ) {
+  if( !data->hdr ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": Supplied smfData has no header", status );
+
+  } else if( !data->hdr->allState ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": Supplied smfData has no JCMTState in its header",
+            status );
+
+  } else if( data->hdr->steptime <= 0 ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": Supplied smfData has invalid STEPTIME",
+            status );
+  }
+
+  ntslice = data->hdr->nframes;
+  if( ntslice < 3 ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": Need at least three time steps", status );
   }
@@ -168,18 +185,6 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
     errRep( "", FUNC_NAME ": smax must be >= 0", status );
   }
 
-  if( !data->hdr ) {
-    *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": Supplied smfData has no header", status );
-  } else if( !data->hdr->allState ) {
-    *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": Supplied smfData has no JCMTState in its header",
-            status );
-  } else if( data->hdr->steptime <= 0 ) {
-    *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": Supplied smfData has invalid STEPTIME",
-            status );
-  }
 
   qua = smf_select_qualpntr( data, NULL, status );
 
@@ -266,6 +271,11 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
 
   /* Set first and last flag values to nearest estimate */
   if( *status == SAI__OK && qua ) {
+
+    /* Get data dimensions and strides. */
+    smf_get_dims( data,  NULL, NULL, &nbolo, NULL, NULL, &bstride,
+                  &tstride, status );
+
     flag[0] = flag[1];
     flag[ntslice-1] = flag[ntslice-2];
 
