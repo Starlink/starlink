@@ -2080,6 +2080,7 @@ try:
             fd = open( inpaths, "w" )
             for key in qui_list:
                (ut,obs,subscan) = key.split('_')
+               ut = int(ut)
                if ut >= 20150606 and ut <=20150929:
                  azelcor = True
 
