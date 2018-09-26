@@ -69,6 +69,8 @@
 *  History:
 *     3-JUN-2015 (DSB):
 *        Original version.
+*     26-SEP-2018 (DSB):
+*        Fix memory leak (job_data).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -243,6 +245,9 @@ void smf_collapse( ThrWorkForce *wf, const double *array, const smf_qual_t *qua,
       }
       thrWait( wf, status );
    }
+
+/* Free resources. */
+   job_data = astFree( job_data );
 
 /* Return any requested arrays, and free the others. */
    if( mean ){
