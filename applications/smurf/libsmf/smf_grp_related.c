@@ -196,6 +196,9 @@
  *        may be calculated.
  *     2011-09-09 (EC):
  *        Add srate_maxlen
+ *     2018-10-02 (DSB):
+ *        Handle cases where input does not have a NSUBSCAN value (e.g.
+ *        if it is the concatenation of several subscans).
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -434,7 +437,13 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       smf_find_seqcount( data->hdr, &itemp, status );
       astMapPut0I( filemap, "SEQCOUNT", itemp, NULL );
 
-      smf_fits_getI( data->hdr, "NSUBSCAN", &itemp, status );
+      if( *status == SAI__OK ) {
+         smf_fits_getI( data->hdr, "NSUBSCAN", &itemp, status );
+         if( *status != SAI__OK ) { /* No NSCUBSCAN available if input is */
+            errAnnul( status );     /* concatenation of multiple subscans. */
+            itemp = VAL__BADI;
+         }
+      }
       astMapPut0I( filemap, "NSUBSCAN", itemp, NULL );
 
       /* Number of time slices */

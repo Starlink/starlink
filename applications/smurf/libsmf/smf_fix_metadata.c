@@ -75,6 +75,9 @@
 *        Only run ACSIS and SCUBA-2 fixups with those specific instruments.
 *     2014-04-11 (TIMJ):
 *        Do not run STEPTIME guessing code unless we really are ACSIS or SCUBA-2.
+*     2018-10-02 (DSB):
+*        STEPTIME guess now ignores initial padding that has constant rts
+*        values.
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -197,12 +200,22 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
       if (steptime == VAL__BADD) {
         if (hdr->nframes > 1 && tmpState[0].rts_end != VAL__BADD
             && tmpState[1].rts_end != VAL__BADD) {
-          steptime = tmpState[1].rts_end - tmpState[0].rts_end;
+
+          /* Skip any initial padding that will have a constant value for
+             rts_end. */
+          size_t islice = 1;
+          while( islice < hdr->nframes-10 && tmpState[islice-1].rts_end <= tmpState[islice].rts_end ) {
+             islice++;
+          }
+
+          steptime = tmpState[islice+10].rts_end - tmpState[islice].rts_end;
           steptime *= SPD;
+
           /* Correct for actual number of steps */
-          steptime /= (tmpState[1].rts_num - tmpState[0].rts_num );
+          steptime /= (tmpState[islice+10].rts_num - tmpState[islice].rts_num );
+
           msgSetd("STP", steptime);
-          msgOutif(MSG__QUIET, " ", "WARNING: Determined step time to be ^STP"
+          msgOutif(MSG__VERB, " ", "WARNING: Determined step time to be ^STP"
                    " by examining state information", status );
         } else {
           /* no idea - make this fatal for now */
