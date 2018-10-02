@@ -574,14 +574,17 @@ from starutil import get_task_par
 retain = 0
 
 
-#  Trim a map to set pixels bad if they have an exposure time less than 
+#  Trim a map to set pixels bad if they have an exposure time less than
 #  a given fraction of the mean expsoure time.
-def exptrim(map,trim):
+def exptrim(map,trim,out=None):
    invoke("$KAPPA_DIR/stats ndf={0}.more.smurf.exp_time".format(map) )
    mean = float( get_task_par( "MEAN", "stats" ))
-   result = NDG(1)
-   invoke( "$KAPPA_DIR/maths exp=\"'qif((ia.ge.pa),ib,<bad>)'\" "
-           "ia={0}.more.smurf.exp_time ib={0} pa={1} out={2}".
+   if out is None:
+      result = NDG(1)
+   else:
+      result = out
+   invoke( "$KAPPA_DIR/maths exp=\"'qif((ib.ge.pa),ia,<bad>)'\" "
+           "ib={0}.more.smurf.exp_time ia={0} pa={1} out={2}".
            format(map,mean*trim,result) )
    return result
 
@@ -2714,13 +2717,13 @@ try:
                    format(catmaps,temp,mapvar))
 
          if trim is not None:
-            coadd_cat = exptrim( temp, trim )
+            exptrim( temp, trim, coadd_cat )
          else:
-            coadd_cat = temp
+            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(temp,coadd_cat))
 
       elif outcat:
          if trim is not None:
-            coadd_cat = exptrim( coadd, trim )
+            exptrim( coadd, trim, coadd_cat )
          else:
             invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
 
