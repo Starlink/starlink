@@ -91,6 +91,11 @@
 *        - Correct DELTA from "samples per pixel" to "pixels per sample".
 *     2007 April 3 (MJC):
 *        Added GLO and GHI arguments (based upon DSB's analysis).
+*     1-OCT-2018 (DSB):
+*        Change the way in which it is decided whether a WCS axis has a
+*        constant value or not. Before an axis was constant if its range
+*        was less than 1E-6 of its mean value. Now it is constant if its
+*        range corresponds to less than 0.25 of a pixel.
 *-
 
 *  Type Definitions:
@@ -131,6 +136,7 @@
       DOUBLE PRECISION NEWPOS( NDF__MXDIM )! Reduced dimensionality POS
       DOUBLE PRECISION OUTA( NDF__MXDIM )! Output position of corner A
       DOUBLE PRECISION OUTB( NDF__MXDIM )! Output position of corner B
+      DOUBLE PRECISION PXSCL( NDF__MXDIM )! WCS pixel scales
       INTEGER AXES( NDF__MXDIM ) ! Indices of remaining axes
       INTEGER BFRM               ! Pointer to original base Frame
       INTEGER CFRM               ! Pointer to original current Frame
@@ -171,6 +177,11 @@
 *  First deal with cases where the output WCS FrameSet is being trimmed
 *  to remove the collapsed axis.
       IF( TRIM ) THEN
+
+*  Get the pixel scale on each WCS axis. This is the WCS axis increment
+*  produced by moving a distance of one pixel away from the supplied "POS"
+*  position, along the WCS axis.
+         CALL KPG1_PXSCL( IWCS, POS, PXSCL, STATUS )
 
 *  Get a list of the "NIN-1" pixel axes which are being retained. Also
 *  store the reduced dimensionality version of POS.
@@ -267,12 +278,13 @@
                END DO
             END DO
 
-*  Identify the axes which have constant value. These axes are retained,
-*  others are removed fRom the current Frame.
+*  Identify the axes which have constant value (i.e. vary by less than
+*  0.25 of a pixel). These axes are retained, others are removed from
+*  the current Frame.
             NAXES = 0
             DO I = 1, NOUT
                IF( CMAX( I ) - CMIN( I ) .LT.
-     :             1.0E-6*ABS( CMAX( I ) + CMIN( I ) ) ) THEN
+     :             0.25*PXSCL( I ) ) THEN
                   NAXES = NAXES + 1
                   AXES( NAXES ) = I
                END IF
