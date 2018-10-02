@@ -448,6 +448,16 @@
 *        together. Therefore the value supplied for parameter REUSE will be
 *        ignored and a value of FALSE assumed if the MAPDIR directory is
 *        missing maps for any of the supplied observations. [FALSE]
+*     TRIM = _REAL (Read)
+*        This indicates how the edges of the final I, Q and U coadds should
+*        be trimmed to remove the noisey edges. If a null (!) value is
+*        supplied (the default), no trimming is performed. Otherwise, the
+*        supplied value indicates the fraction of the mean expsoure time
+*        at which the coadd should be trimmed. For instance, a value of 0.2
+*        causes pixels to be set bad if the number of usable bolometer
+*        samples that fall within the pixel is less than 0.2 times the mean
+*        number of samples per pixel, taken over the whole coadd (excluding
+*        parts that receive no samples at all). [!]
 *     UOUT = NDF (Write)
 *        The output NDF in which to return the U map including all supplied
 *        observations. This will be in units of pW. Supply null (!) if no U
@@ -460,7 +470,7 @@
 *        cause makemap to crash. [0.05]
 
 *  Copyright:
-*     Copyright (C) 2017 East Asian Observatory.
+*     Copyright (C) 2017,2018 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -538,6 +548,8 @@
 *     10-JUL-2018 (DSB):
 *        Added parameter WEIGHTLIM, to avoid observations with silly
 *        CHUNKWGT and/or CHUNKFAC causing skyloop to abort.
+*     2-OCT-2018 (DSB):
+*        Added parameter TRIM.
 
 '''
 
@@ -560,6 +572,18 @@ from starutil import get_task_par
 
 #  Assume for the moment that we will not be retaining temporary files.
 retain = 0
+
+
+#  Trim a map to set pixels bad if they have an exposure time less than 
+#  a given fraction of the mean expsoure time.
+def exptrim(map,trim):
+   invoke("$KAPPA_DIR/stats ndf={0}.more.smurf.exp_time".format(map) )
+   mean = float( get_task_par( "MEAN", "stats" ))
+   result = NDG(1)
+   invoke( "$KAPPA_DIR/maths exp=\"'qif((ia.ge.pa),ib,<bad>)'\" "
+           "ia={0}.more.smurf.exp_time ib={0} pa={1} out={2}".
+           format(map,mean*trim,result) )
+   return result
 
 #  Return the median value in a supplied list.
 def median(lst):
@@ -835,12 +859,7 @@ def StoreCorrections( qui_maps, imap, use_ref_for_alignment, ref ):
       nused = float( get_task_par( "numgood", "stats" ) )
       if nused < 400:
          invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(qui_maps[key]))
-         invoke("$KAPPA_DIR/stats ndf={0}".format(qui_maps[key]))
-         mean = float( get_task_par( "mean", "stats" ) )
-         aligner = NDG(1)
-         invoke( "$KAPPA_DIR/maths exp=\"'qif((ia.ge.pa),ib,<bad>)'\" "
-                 "ia={0}.more.smurf.exp_time ib={0} pa={1} out={2}".
-                 format(qui_maps[key],mean,aligner) )
+         aligner = exptrim( qui_maps[key], 1.0 )
       else:
          aligner = qui_maps[key]
 
@@ -1129,6 +1148,9 @@ try:
    params.append(starutil.Par0F("WEIGHTLIM", "Lowest usable observation weight",
                                  0.05, maxval=1.0, minval=0.0, noprompt=True))
 
+   params.append(starutil.Par0F("TRIM", "Fractional exposure time at "
+                                "which to trim coadds", None, maxval=10.0,
+                                minval=0.0, noprompt=True))
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
@@ -1343,6 +1365,10 @@ try:
 #  See if observations are to be normalised to the mean of all
 #  observations.
    normalise = parsys["NORMALISE"].value
+
+#  Get the fractional exposure time at which to trim the mosaics. This is
+#  a fraction of the mean expsoure time over the whole coadd.
+   trim = parsys["TRIM"].value
 
 #  See if we should store I, Q and U values in mJy/beam in the output
 #  calatlogue.
@@ -2661,14 +2687,23 @@ try:
          invoke("$KAPPA_DIR/setvar ndf={0} from={1} comp=Variance".
                 format(coadd,junk))
 
+#  If required, trim off the edges of the coadds that have an exposure
+#  time less than "trim" times the mean exposure time.
+      if trim is not None:
+         msg_out("TRIM is {0}, so trimming the edges of {1}".format(trim,coadd))
+         trimmed = exptrim( coadd, trim )
+         invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(trimmed,coadd))
 
 #  If we are creating a binned up catalogue, bin the input observation maps
-#  up to the required catalogue bin size, and then coadd them.
+#  up to the required catalogue bin size, and then coadd them. Trim the
+#  resulting coadd if required.
       if catref:
+         temp = NDG(1)
+
          if len(qui_maps) == 1:
             invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
                    "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
-                   format(qui_maps[key],coadd_cat,catref))
+                   format(qui_maps[key],temp,catref))
          else:
             catmaps = NDG(allmaps)
             invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
@@ -2676,10 +2711,18 @@ try:
                    format(allmaps,catmaps,catref))
             invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
                    "conserve=no method=near variance=yes genvar={2}".
-                   format(catmaps,coadd_cat,mapvar))
+                   format(catmaps,temp,mapvar))
+
+         if trim is not None:
+            coadd_cat = exptrim( temp, trim )
+         else:
+            coadd_cat = temp
 
       elif outcat:
-         invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
+         if trim is not None:
+            coadd_cat = exptrim( coadd, trim )
+         else:
+            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
 
       if len( badkeys ) > 0:
          msg_out( "\n\nThe following observations were omitted because "
