@@ -111,7 +111,7 @@
 *     handle hierarchical keywords.  In this case the form is
 *     keyword1.keyword2.keyword3 etc.  All keywords must be valid FITS
 *     keywords.  This means they must be no more than 8 characters
-*     long, and the only permitted characters are uppercase alphabetic,
+*     long, and the only permitted characters are upper-case alphabetic,
 *     numbers, hyphen, and underscore.  Invalid keywords will be
 *     rejected.
 *
@@ -285,6 +285,14 @@
 *     2009 January 19 (MJC):
 *        Description modified for Null option retaining the Value
 *        Indicator.
+*     2018 October 4 (MJC):
+*        Replace CHR_INSET, which tests for valid editing commands,
+*        with the INDEX function, as the former is case insensitive.
+*        Routine FTS1_EDKEY, where the edits are implemented, expects
+*        upper-case commands (using only the first character).  While
+*        it is customary to ignore case for user input, here it offers
+*        some protection against mistyped commands.
+*        Remove a superflous CHR_LDBLK.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -319,7 +327,6 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      LOGICAL CHR_INSET          ! A string is a member of a given set?
       INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Constants:
@@ -435,10 +442,8 @@
 *  Decompose the line into words.
 *  ==============================
 
-*  Remove non-printable characters (e.g. tabs) and leading blanks from
-*  the rest.  Decompose the line into tokens.
+*  Remove non-printable characters (e.g. tabs). Decompose the line into tokens.
          CALL CHR_CLEAN( LINE( :NC ) )
-         CALL CHR_LDBLK( LINE( :NC ) )
          CALL CHR_DCWRD( LINE( :NC ), 4, NTOK, I1, I2, TOK, CSTAT )
 
 *  Go to the next line if there are no words.  A bad status on its own
@@ -455,13 +460,13 @@
 *  Validate the edit command.  Just use the first character, as
 *  subsequent characters are superfluous (but might help the human
 *  reader).
-         IF ( .NOT. CHR_INSET( 'A,D,E,M,N,P,R,U,W', EDIT ) ) THEN
+         IF ( INDEX( 'ADEMNPRUW', EDIT ) .EQ. 0 ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'EDIT', LINE( I1( 1 ):I2( 1 ) ) )
             CALL ERR_REP( 'FTS1_RFMOD_BADEDIT',
      :        'The edit command ^EDIT is not one of Amend, Delete, '/
-     :        /'Exist, Move, NUll, Print, Rename, Update, or Write.',
-     :        STATUS )
+     :        /'Exist, Move, NUll, Print, Rename, Update, or Write. '/
+     :        /'The first letter must be a capital.', STATUS )
             GOTO 50
          END IF
 
@@ -895,7 +900,7 @@
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL MSG_SETI( 'ILINE', ILINE )
             CALL ERR_REP( 'FTS1_RFMOD_ILINE',
-     :        'Error occurred in line ^ILINE of the keyword '/
+     :        'Error occurred in Line ^ILINE of the keyword '/
      :        /'translation table $TABLE.', STATUS )
             CALL MSG_SETC( 'LINE', LINE )
             CALL ERR_REP( 'FTS1_RFMOD_LINE',
