@@ -37,8 +37,9 @@
 *        be not less than NOCARD + NKEY + 1.
 *     EDITS( MAXMOD ) = CHARACTER * ( * ) (Returned)
 *        The editing commands.  Allowed values are 'Amend', 'Delete',
-*        'Exist', 'Move', 'Rename', 'Print', 'Update', and 'Write'.
-*        Each element can be abbreviated to the initial letter.
+*        'Exist', 'Move', 'Rename', 'Print', 'Update', and 'Write'
+*        (case sensitive). Each element can be abbreviated to the
+*        initial letter.
 *
 *        'Amend' acts as 'Update' if the keyword exists, but as 'Write'
 *        if the keyword is absent.
