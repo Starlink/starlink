@@ -358,7 +358,9 @@
 *     -  Field 1:
 *        This specifies the editing operation.  Allowed values are
 *        Amend, Delete, Exist, Move, Null, Print, Rename, Write, and
-*        Update, and can be abbreviated to the initial letter.
+*        Update, and can be abbreviated to the initial upper-case
+*        letter.  It is not case insensitive to afford some protection
+*        against typing errors.
 *        -  Delete removes a named keyword.
 *        -  Print causes the value of a named keyword to be
 *        displayed to standard output.
