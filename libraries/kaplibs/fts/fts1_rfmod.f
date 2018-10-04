@@ -33,9 +33,7 @@
 *        The number of modifications actually made.
 *     EDITS( MAXMOD ) = CHARACTER * ( * ) (Returned)
 *        The editing commands.  Thus need only be one character per
-*        element. The first character of each returned value will be
-*        upper case, all others will be lower case (as required by
-*        FTS1_EDFEX).
+*        element.
 *     KEYWDS( MAXMOD ) = CHARACTER * ( * ) (Returned)
 *        The FITS keywords to be modified into FITS card array.  The
 *        length should be at least 48 characters to allow for
@@ -275,7 +273,6 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
-*     DSB: David S. Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -288,10 +285,6 @@
 *     2009 January 19 (MJC):
 *        Description modified for Null option retaining the Value
 *        Indicator.
-*     4-OCT-2018 (DSB):
-*        Ensure returned EDIT strings have form expected by FTS1_EDFEX
-*        - first character upper case, all others lower case, with no
-*        leading spaces.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -328,7 +321,6 @@
 *  External References:
       LOGICAL CHR_INSET          ! A string is a member of a given set?
       INTEGER CHR_LEN            ! Used length of a string
-      CHARACTER*1 CHR_UPPER      ! Returned upper case character
 
 *  Local Constants:
       INTEGER HKEYLN             ! Maximum number of characters in a
@@ -457,12 +449,8 @@
 *  Extract and validate the mandatory fields.
 *  ==========================================
 
-*  Extract the edit command, and ensure it is lower case except for the
-*  first character, which is upper case. Also remove leading blanks.
+*  Extract the edit command.
          EDIT = LINE( I1( 1 ):I1( 1 ) )
-         CALL CHR_LDBLK( EDIT )
-         CALL CHR_LCASE( EDIT )
-         EDIT( 1:1 ) = CHR_UPPER( EDIT( 1:1 ) )
 
 *  Validate the edit command.  Just use the first character, as
 *  subsequent characters are superfluous (but might help the human

@@ -40,7 +40,7 @@
 *        The editing commands.  These need only be one character per
 *        element.  Allowed values are 'Amend', 'Delete', 'Exist',
 *        'Move', 'Null'', 'Rename', 'Print', 'Update', and 'Write',
-*        (case sensitive) which can be abbreviated to the initial letter.
+*        which can be abbreviated to the initial letter.
 *
 *        'Amend' acts as 'Update' if the keyword exists, but as 'Write'
 *        if the keyword is absent.
