@@ -139,9 +139,6 @@ void smf_filter_mapchange( ThrWorkForce *wf, smfDIMMData *dat,
       smf_filter2d_edge( filt, 1.0/filt_diff, 1, status );
       smf_filter_execute( wf, filtermap, filt, 0, 0, status );
 
-sprintf( name, "Lofreq_%d", dat->iter );
-smf1_dump( lofreq, dat->lbnd_out, dat->ubnd_out, name, status );
-
 /* Do a least squares fit to express the total map change as a multiple
    of the low-frequencies left in the smoothed map change. */
       smf_templateFit1D( change, NULL, NULL, NULL, 0, 0, dat->msize, 1,
