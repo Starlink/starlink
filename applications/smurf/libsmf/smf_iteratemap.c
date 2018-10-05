@@ -2523,7 +2523,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
                /* Can only do this if we have a map from the previous
                   iteration (i.e. this is not the first iter). */
-               if( importsky || iter > 1 ) {
+               if( importsky || iter > 0 ) {
 
                   /* Do not do it on the final iteration since we want the
                      final map to contain all the residual flux. If run
