@@ -44,6 +44,9 @@
 *  History:
 *     20-AUG-2014 (DSB):
 *        Initial Version
+*     5-OCT-2018 (DSB):
+*        Scale the low frequency background values to fit the original
+*        map values before subtracting them from the map.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -91,7 +94,9 @@ void smf_filter_mapchange( ThrWorkForce *wf, smfDIMMData *dat,
 /* Local Variables: */
    dim_t i;
    double *change = NULL;
+   double *lofreq = NULL;
    double *map;
+   double gain;
    smfData *filtermap=NULL;
    smfFilter *filt=NULL;
 
@@ -101,17 +106,14 @@ void smf_filter_mapchange( ThrWorkForce *wf, smfDIMMData *dat,
 /* Store a pointer to the current map. */
    map = dat->map;
 
-/* Tell the user what is happening. */
-   msgOutiff( MSG__DEBUG, "","   high-pass filtering the map-change to "
-              "remove features larger than %g arc-sec.", status, filt_diff );
-
 /* Create a smfData to hold the changes in the map. */
    change = astMalloc( dat->msize*sizeof( *change ) );
+   lofreq = astMalloc( dat->msize*sizeof( *lofreq ) );
    filtermap = smf_create_smfData( 0, status );
    if( *status == SAI__OK ) {
       filtermap->isFFT = -1;
       filtermap->dtype = SMF__DOUBLE;
-      filtermap->pntr[0] = change;
+      filtermap->pntr[0] = lofreq;
       filtermap->ndims = 2;
       filtermap->lbnd[0] = dat->lbnd_out[0];
       filtermap->lbnd[1] = dat->lbnd_out[1];
@@ -123,34 +125,52 @@ void smf_filter_mapchange( ThrWorkForce *wf, smfDIMMData *dat,
       for( i = 0; i < dat->msize; i++ ) {
          if( map[ i ] != VAL__BADD && dat->lastmap[ i ] != VAL__BADD ) {
             change[ i ] = map[ i ] - dat->lastmap[ i ];
+            lofreq[ i ] = change[ i ];
          } else {
-            change[ i ] = 0;
+            change[ i ] = AST__BAD;
+            lofreq[ i ] = 0;
          }
       }
 
-/* Create and apply a sharp-edged high-pass filter to remove large-scale
-   structures from the map change image. */
+/* Create and apply a sharp-edged low-pass filter to remove small-scale
+   structures from the map change image. The remaining low frequencies
+   are left in "lofreq". */
       filt = smf_create_smfFilter( filtermap, status );
-
-      smf_filter2d_edge( filt, 1.0/filt_diff, 0, status );
+      smf_filter2d_edge( filt, 1.0/filt_diff, 1, status );
       smf_filter_execute( wf, filtermap, filt, 0, 0, status );
 
-/* Add the remining high frequencies of the filtered map-change image back
-   onto the previous map. */
+sprintf( name, "Lofreq_%d", dat->iter );
+smf1_dump( lofreq, dat->lbnd_out, dat->ubnd_out, name, status );
+
+/* Do a least squares fit to express the total map change as a multiple
+   of the low-frequencies left in the smoothed map change. */
+      smf_templateFit1D( change, NULL, NULL, NULL, 0, 0, dat->msize, 1,
+                         lofreq, 0, 1, &gain, NULL, NULL, status );
+
+/* Subtract the remining low frequencies in the filtered map-change image
+   from the new map. */
       for( i = 0; i < dat->msize; i++ ) {
-         if( map[ i ] != VAL__BADD && dat->lastmap[ i ] != VAL__BADD ) {
-            map[ i ] = change[ i ] + dat->lastmap[ i ];
+         if( map[ i ] != VAL__BADD && lofreq[ i ] != VAL__BADD ) {
+            map[ i ] -= gain*lofreq[ i ];
+            lofreq[ i ] *= gain;
          } else {
             map[ i ] = VAL__BADD;
+            lofreq[ i ] = VAL__BADD;
          }
       }
 
 /* Unset pointers to avoid freeing them */
       filtermap->pntr[0] = NULL;
+
+/* Tell the user what was done. */
+      msgOutiff( MSG__DEBUG, "","   high-pass filtering the map-change to "
+                 "remove features larger than %g arc-sec (gain=%g).", status,
+                 filt_diff, gain );
    }
 
 /* Free resources. */
    change = astFree( change );
+   lofreq = astFree( lofreq );
    smf_close_file( wf, &filtermap, status );
    filt = smf_free_smfFilter( filt, status );
 }
