@@ -102,6 +102,8 @@
 *        Added "ibolo=-4" option.
 *     10-APR-2018 (DSB):
 *        Added parameter "chunkfactor".
+*     4-OCT-2018 (DSB):
+*        Fix memory leak associated with variable "name".
 
 *  Copyright:
 *     Copyright (C) 2013,2015 Science and Technology Facilities Council.
@@ -180,7 +182,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    AstMapping *fmap;
    SmfDiagData *job_data = NULL;
    SmfDiagData *pdata;
-   char *name;
+   char *name = NULL;
    char attr[ 50 ];
    const char *dom;
    const char *mode;
@@ -217,7 +219,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    int idxlo;
    int indf;
    int iw;
-   int lbnd[ 2 ];
+   int lbnd[ 3 ];
    int nax;
    int nc;
    int ndim;
@@ -226,7 +228,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    int rebinflags;
    int sorted;
    int timestep;
-   int ubnd[ 2 ];
+   int ubnd[ 3 ];
    int usebolo;
    size_t bstride;
    size_t bstrider;
@@ -617,7 +619,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
          }
 
 /* Form the name of the NDF to receive the data. */
-         name = NULL;
+         name = astFree( name );
          nc = 0;
          name = astAppendString( name, &nc, root );
          name = astAppendString( name, &nc, i ? "_power" : "_time" );
@@ -731,7 +733,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    if( cube && data->ndims == 3 && (data->pntr)[0] ) {
 
 /* Get the name of the NDF to hold the cube. */
-      name = NULL;
+      name = astFree( name );
       nc = 0;
       name = astAppendString( name, &nc, root );
       name = astAppendString( name, &nc, "_cube_" );
@@ -782,7 +784,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    if( map && data->ndims == 3 && (data->pntr)[0] ) {
 
 /* Get the name of the NDF to hold the map. */
-      name = NULL;
+      name = astFree( name );
       nc = 0;
       name = astAppendString( name, &nc, root );
       name = astAppendString( name, &nc, "_map_" );
@@ -1002,6 +1004,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 
 /* Free remaining resources. */
    job_data = astFree( job_data );
+   name = astFree( name );
 
 /* End the AST context. */
    astEnd;
