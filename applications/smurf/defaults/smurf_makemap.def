@@ -70,15 +70,16 @@
 #               iteration.
 #
 #               If "ast.filt_diff" is non-zero it gives the size of the
-#               largest features to be retained, in arc-sconds. At the
-#               end of each iteration the difference is taken between the
-#               new map and the previous map. This difference is filtered
-#               using a sharp-edged high-pass filter, of size specified
-#               by "ast.filt_diff". The remaining high frequencies (i.e.
-#               small structures that have been introduced by the new
-#               iteration) are added back onto the map created by the
-#               previous iteration. This modified map is then used, instead
-#               of the original map, to define the AST model.
+#               largest features to be retained, in arc-sconds (a value
+#               equal to half of the FLT filter size seems to be a good
+#               starting point). At the end of each iteration the difference
+#               is taken between the new map and the previous map. This
+#               difference is filtered using a sharp-edged high-pass filter,
+#               of size specified by "ast.filt_diff". The remaining high
+#               frequencies (i.e. small structures that have been introduced
+#               by the new iteration) are added back onto the map created by
+#               the previous iteration. This modified map is then used,
+#               instead of the original map, to define the AST model.
 ast.filt_diff = 0
 
 #-----------------------------------------------------------------
