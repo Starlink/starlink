@@ -20,7 +20,7 @@
 *        Pointer to 2d smfFilter to be modified
 *     f = double (Given)
 *        Frequency of the edge in 1/arcsec
-*     highpass = int (Given)
+*     lowpass = int (Given)
 *        Set flag if edge is low-pass. Otherwise high-pass is assumed.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -30,7 +30,7 @@
 *  Description:
 *     This function applies a hard low- or high-pass cut at the specified
 *     edge frequency. The power at all frequencies below (or above) this
-*     edge are set to zero if highpass is 0 (or non-zero). The conversion
+*     edge are set to zero if lowpass is 0 (or non-zero). The conversion
 *     of the frequency to a discrete bin in the filter is accomplished by
 *     rounding. The range of frequencies set to 0 include the bin corresponding
 *     to the edge frequency. This function will operate on either real or
@@ -42,16 +42,20 @@
 *  Notes:
 
 *  Authors:
-*     Ed Chapin (UBC)
+*     EC: Ed Chapin (UBC)
+*     DSB: David S Berry (EAO):
 *     {enter_new_authors_here}
 
 *  History:
 *     2011-10-26 (EC):
 *        Initial version based in 1d smf_filter_edge
+*     2018-10-04 (DSB):
+*        Correct comments and prologue to refer to argument "lowpass"
+*        instead of "highpass".
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2011University of British Columbia.
+*     Copyright (C) 2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
