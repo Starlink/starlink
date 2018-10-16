@@ -550,6 +550,8 @@
 *        CHUNKWGT and/or CHUNKFAC causing skyloop to abort.
 *     2-OCT-2018 (DSB):
 *        Added parameter TRIM.
+*     15-OCT-2018 (DSB):
+*        When skyloop=yes, ensure pointing correction ranges do not overlap.
 
 '''
 
@@ -2296,18 +2298,18 @@ try:
 #  to the latest data in the current observation. The pointing correction
 #  is constant between these two times. We need to use an AstTimeFrame to
 #  get the MJD TAI corresponding to the DATE-OBS abd DATE-END FITS keywords.
-#  Add 2 minutes to each time as a safety margin.
+#  Add 1 second to each time as a safety margin.
                   utcstart = get_fits_header( hmap, "DATE-OBS" )
                   invoke('$ATOOLS_DIR/astunformat this={0} axis=1 value={1}'.format(utcframe,utcstart) )
                   utcstart = get_task_par( "dval", "astunformat" )
                   taistart = invoke('$ATOOLS_DIR/asttran1 this={0} forward=true xin={1}'.format(utc2tai,utcstart) )
-                  taistart = float(taistart) - 120.0/86400.0
+                  taistart = float(taistart) - 1.0/86400.0
 
                   utcend = get_fits_header( hmap, "DATE-END" )
                   invoke('$ATOOLS_DIR/astunformat this={0} axis=1 value={1}'.format(utcframe,utcend) )
                   utcend = get_task_par( "dval", "astunformat" )
                   taiend = invoke('$ATOOLS_DIR/asttran1 this={0} forward=true xin={1}'.format(utc2tai,utcend) )
-                  taiend = float(taiend) + 120.0/86400.0
+                  taiend = float(taiend) + 1.0/86400.0
 
                   corrections[taistart] = "{0} {1} {2}\n".format(taistart,dx,dy)
                   corrections[taiend] = "{0} {1} {2}\n".format(taiend,dx,dy)
