@@ -166,7 +166,8 @@
      :                'AST__SFL,AST__PAR,AST__MOL,AST__AIT,AST__COP,'//
      :                'AST__COE,AST__COD,AST__COO,AST__BON,AST__PCO,'//
      :                'AST__TSC,AST__CSC,AST__QSC,AST__NCP,AST__GLS,'//
-     :                'AST__HPX,AST__TPN', .FALSE., TYPE, STATUS )
+     :                'AST__HPX,AST__TPN,AST__XPH', .FALSE., TYPE,
+     :                STATUS )
 
 *  Find the corresponding integer value.
       IF( TYPE .EQ. 'AST__AZP' ) THEN
@@ -229,6 +230,8 @@
          ITYPE = AST__HPX
       ELSE IF( TYPE .EQ. 'AST__TPN' ) THEN
          ITYPE = AST__TPN
+      ELSE IF( TYPE .EQ. 'AST__XPH' ) THEN
+         ITYPE = AST__XPH
       ELSE
          ITYPE = AST__WCSBAD
       END IF
