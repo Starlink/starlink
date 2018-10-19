@@ -552,6 +552,11 @@
 *        Added parameter TRIM.
 *     15-OCT-2018 (DSB):
 *        When skyloop=yes, ensure pointing correction ranges do not overlap.
+*     18-OCT-2018 (DSB):
+*        The PCA mask was previously limited to be no larger than half the
+*        size of the AST mask. This was a bug. What was intended was
+*        that the AST mask should be no more than 20% of the good pixels,
+*        and the PCA mask should be no more than 10% of the good pixels.
 
 '''
 
@@ -1737,7 +1742,8 @@ try:
 #  are insufficient background pixels to allow future invocations of
 #  makemap to succeed. We therefore loop round raising the SNR limits for
 #  the mask until no more than 20% of the originally good pixels are
-#  designated as source pixels.
+#  designated as source pixels. The AST mask contains peaks above SNR=3,
+#  followed down to SNR=2.
          invoke("$KAPPA_DIR/stats ndf={0}".format(snr))
          ngood = float( get_task_par( "numgood", "stats" ) )
          maxgood = ngood / 5
@@ -1777,8 +1783,8 @@ try:
 
 #  The source regions within the PCA mask need to be smaller than in the
 #  AST mask. Make sure it uses no more than 10% of the original good
-#  pixels.
-         maxgood = ngood / 2
+#  pixels. The PCA mask contains peaks above SNR=5, followed down to SNR=3.
+         maxgood = maxgood / 2
 
          noise = 3
          minheight = 5
