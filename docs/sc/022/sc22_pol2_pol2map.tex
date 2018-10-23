@@ -309,13 +309,17 @@ iterations due to the instability in the map-making algorithm.
 \end{enumerate}
 
 The above two methods can be used together by supplying \texttt{TRUE}
-values for both \param{OBSWEIGHT} and \param{SKYLOOP}.  Using
-\task{skyloop} to produce the co-add usually requires more time and
-disk space. Therefore it is usually advisable to restrict its usage within
-\task{pol2map} to the external-masking phase that produces the final
-required maps - that is, Steps~2 and 3 as described above. The
-\param{OBSWEIGHT} parameter can generally be used on all steps as it adds
-little to the time taken to run \task{pol2map}.
+values for both \param{OBSWEIGHT} and \param{SKYLOOP}.
+
+\begin{center}
+\emph{Note, it is not recommended to use \param{MAPVAR}=\texttt{TRUE} or
+\param{SKYLOOP}=\texttt{TRUE} on step 1 (i.e. when creating the auto-masked
+maps). Doing so is of no benefit to the final maps and can cause problems
+such as negative bowling.}
+\end{center}
+
+If the \param{OBSWEIGHT} parameter is used at step 2 or 3, then it must
+also be used at step 1.
 
 The following panels show the effects of using \param{SKYLOOP}. and
 \param{OBSWEIGHT} on a total intensity mosaic of 21 observations. All
