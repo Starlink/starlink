@@ -475,6 +475,7 @@ Fedora:
    from "libxyz-dev" to "libXyz-devel".
 
    ncurses-devel
+   makedepend
 
    For the new documentation build, it may be necessary to install the
    following (at least on Fedora 20 and 21):
@@ -488,6 +489,9 @@ Fedora:
    texlive-titling.noarch
    texlive-tocloft.noarch
    texlive-eqparbox.noarch
+
+
+
 
 Arch Linux:
    base-devel
