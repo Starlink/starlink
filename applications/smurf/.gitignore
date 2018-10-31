@@ -12,6 +12,7 @@
 /libsmf/smf_tophat1.c
 /libsmf/smf_weightstats1.c
 /libsmurf/smurfmon.tex
+/scripts/starutil.py
 /smurf.csh
 /smurf.icl
 /smurf.sh
