@@ -2041,7 +2041,7 @@ C
       INTEGER I,IDERIV,IDERP1,IHI,IHMKMJ,ILO,IMK,IMKPJ, INBV, IPJ,
      1 IP1, IP1MJ, J, JJ, J1, J2, K, KMIDER, KMJ, KM1, KPK, MFLAG, N
       DOUBLE PRECISION A, FKMJ, T, WORK, X
-      DIMENSION T(1), A(N), WORK(1)
+      DIMENSION T(1), A(N), WORK(*)
 C***FIRST EXECUTABLE STATEMENT  DBVAL2
 
       VALUE = 0.0D0
@@ -2205,8 +2205,8 @@ C  Starlink Status.
       INTEGER STATUS                  ! Global status
 
 c declaration statements
-      dimension xd(100), yd(100), zd(100), xi(1000), yi(1000),
-     :          zi(1000), iwk(4100), wk(800)
+      dimension xd(*), yd(*), zd(*), xi(*), yi(*),
+     :          zi(*), iwk(*), wk(*)
       common /idlc  / nit
       common /idpi  / itpv
       integer istat
