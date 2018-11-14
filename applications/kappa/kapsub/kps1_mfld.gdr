@@ -83,6 +83,9 @@
 *     2018 April 25 (MJC):
 *        Take the residuals with respect to the median instead of the
 *        mean to handle extended bright emission.
+*     2018 November 14 (MJC):
+*        Replace a call to KPG1_HSTAx with the accurate and robust
+*        KPG_STOSx.
 *     {enter_further_changes_here}
 
 *-
@@ -380,11 +383,9 @@
                      UPECNT( 3 ) = PERCNT( 3 )
 
 *  Obtain the percentile values.
-                     CALL KPG1_HSTA<T>( BAD, DTEL,
-     :                                  %VAL( CNF_PVAL( IPRLIN ) ), 4,
-     :                                  PERCNT, NGOOD, IMIN( 1 ), DMIN,
-     :                                  IMAX( 1 ), DMAX, SUM, MEAN,
-     :                                  MEDIAN, MODE, PERVAL, STATUS )
+                     CALL KPG_STOS<T>( DTEL, %VAL( CNF_PVAL( IPRLIN ) ),
+     :                                 NGOOD, 4, PERCNT, MEDIAN, PERVAL,
+     :                                 STATUS )
 
 *  Save the percentile values for later.  They will be overwritten
 *  otherwise.
