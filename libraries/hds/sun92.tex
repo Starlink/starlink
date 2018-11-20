@@ -17,10 +17,10 @@
 \stardocauthors   {R.F.~Warren-Smith\\ M.D.~Lawden\\
                                 B.K.~McIlwrath \\ T.~Jenness\\ P.W.~Draper\\
                                 D.S.~Berry}
-\stardocdate        {6th February 2018}
+\stardocdate        {20th November 2018}
 \stardoctitle       {HDS\\ [\latex{1ex}]
                                 Hierarchical Data System}
-\stardocversion     {Version 6.0}
+\stardocversion     {Version 6.1}
 \stardocmanual      {Programmer's Manual}
 \stardocabstract  {
 HDS is a library of functions used for accessing file-based hierarchical
@@ -209,21 +209,16 @@ is necessary for it to be possible to pass data files to and from sites
 that still use version 5 of the HDS library (i.e. can only access files
 that use the Starlink-specific HDS disk format). However, when creating a new
 disk file, the HDS library (version 6) needs to known which disk format
-(version 4 or version 5) to use. By default, the original disk format
-(version 4) is used so that files created by version 6 of the HDS library
-can be read by starlink systems that still use version 5. However, this
-can be changed by setting the environment variable ``\texttt{HDS\_VERSION}''
-to ``5'', or by using the HDS\_TUNE routine to set tuning parameter
-``\texttt{VERSION}'' to 5.
+(version 4 or version 5) to use. By default, the new disk format
+(version 5) is used. This means that, by default, files created by version
+6 of the HDS library cannot be read by starlink systems that still use
+version 5. However, this can be changed by setting the environment variable
+``\texttt{HDS\_VERSION}'' to ``4'', or by using the HDS\_TUNE routine to
+set tuning parameter ``\texttt{VERSION}'' to 4.
 
 All data files created by version 6 of the HDS library still have the
 traditional extension - ``\texttt{.sdf}'' - (``Starlink Data File''),
 regardless of the disk format in use.
-
-\begin{center}
-\emph{ Note, in a future release the default disk format will be changed from
-version 4 to version 5.}
-\end{center}
 
 \section{\xlabel{HDS_objects}\label{sect:objects}OBJECTS}
 
@@ -1361,14 +1356,13 @@ behaviour.
 
 \item [\xlabel{HDS_VERSION_tuning_parameter}VERSION - Data Format for New Files:]\mbox{}\\
 This determines the data format that is used when a new container file is
-created. It may take the value 3, 4 or 5, and currently defaults to 4
-(although this will change to 5 in a future release). Version 4 is a
-Starlink-specific data format that is a development of the original HDS
-data format created by the Starlink project in the 1980's. Version 5 uses
-the HDF5 data format on disk to mimic the facilities of version 4. Such
-files cannot be accessed by versions of the HDS library prior to version
-6, but can be examined using various publicly available HDF5 tools - see
-section \htmlref{``DISK FORMATS AND HDF5''}{sect:hdf5}.  Version 3 refers
+created. It may take the value 3, 4 or 5, and currently defaults to 5.
+Version 4 is a Starlink-specific data format that is a development of the
+original HDS data format created by the Starlink project in the 1980's.
+Version 5 uses the HDF5 data format on disk to mimic the facilities of
+version 4. Such files cannot be accessed by versions of the HDS library prior
+to version 6, but can be examined using various publicly available HDF5 tools
+- see section \htmlref{``DISK FORMATS AND HDF5''}{sect:hdf5}.  Version 3 refers
 to the Starlink-specific data format as it was prior to the introduction of
 64-bit mode.
 
@@ -7587,7 +7581,6 @@ may be obtained by contacting Starlink Software Support
 
 \end{enumerate}
 
-\newpage
 \subsection{\xlabel{list_of_most_recent_changes}Changes in V4.3}
 
 The following describes the most significant changes which occurred in HDS
@@ -7614,8 +7607,7 @@ via CMP\_ routines has been increased to 1024.
 reflect the above changes.
 \end{enumerate}
 
-\newpage
-\subsection{\xlabel{list_of_most_recent_changes}Changes in V6.0}
+\subsection{Changes in V6.0}
 
 \begin{enumerate}
 \item The entire HDS library has been re-implemented to support HDS files that
@@ -7629,6 +7621,14 @@ C interface to allow an HDS object to be locked for exclusive use by a single
 thread. An error is reported if a thread attempts to make a change to an
 object that it has not previously locked for its own exclusive use. By
 defaults objects are locked by the thread that creates them.
+\end{enumerate}
+
+\subsection{\xlabel{list_of_most_recent_changes}Changes in V6.1}
+
+\begin{enumerate}
+\item The default output data format has been changed from V4 (the
+classic starlink format) to V5 (the HDF5-based format). To re-establish
+the old behaviour, set environment variable HDS\_VERSION to ``4''.
 \end{enumerate}
 
 \end{document}

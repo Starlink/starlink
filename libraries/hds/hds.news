@@ -1,6 +1,14 @@
 HDS Library
 -----------
 
+
+   Version 6.1
+   ===========
+
+   The default output data format has been changed from V4 (the classic
+   starlink format) to V5 (the HDF5-based format). To re-establish the
+   old behaviour, set environment variable HDS_VERSION to "4".
+
    Version 6.0
    ===========
 

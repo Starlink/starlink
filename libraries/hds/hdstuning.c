@@ -16,8 +16,8 @@
 static hdsbool_t HAVE_INITIALIZED_TUNING = 0;
 
 /* Use version 5 or version 4? Default to
-   use version 4 */
-static int USE_VERSION5 = 0;
+   use version 5 */
+static int USE_VERSION5 = 1;
 
 /* Report an error if a thread lock function is used on a V4 locator?
    Otherwise, the function returns without action. Default is to return
