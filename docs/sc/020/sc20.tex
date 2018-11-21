@@ -4538,7 +4538,10 @@ ITERATIONS & Number of iterations. Further iterations refine the
 \hline
 PIXEL\_SCALE & The pixel scale, in arcseconds, of cubes.\\
 \hline
-REBIN & List of velocity resolutions to rebin the final cube to.\\
+REBIN & Comma-separated list of velocity resolutions to rebin the
+        final spectral cube.  The rebinned cubes are in addition to
+        the full-resolution cube.  The last can be compressed too (cf.
+        VELOCITY\_BIN\_FACTOR). \\
 \hline
 SPREAD\_FWHM\_OR\_ZERO & Depending on the spreading method, this parameter controls the
                          number of arcseconds at which the envelope of the spreading
@@ -4548,6 +4551,12 @@ SPREAD\_METHOD & The method to use when spreading each input pixel between a gro
                  neighbouring output pixels when regridding cubes.\\
 SPREAD\_WIDTH & The number of arcseconds on either side of the output position which
                 receive contributions from the input pixel.\\
+\hline
+VELOCITY\_BIN\_FACTOR & Average contiguous sets of velocity channels by this integer
+                        factor, each forming one channel in the reduced output.  This
+                        compression is intended for the high-resolution ACSIS modes, to
+                        save significant storage and processing time, but it also yields
+                        better baseline subtraction. \\
 \hline
 \end{tabular}
 \end{small}
@@ -4594,14 +4603,22 @@ TRIM\_PERCENTAGE\_UPPER & The percentage of the total frequency range to trim
 \hline
 \textbf{Parameter} & \textbf{Description} \\
 \hline
-BASELINE\_ORDER & The polynomial order to use when baselining cubes.\\
-\hline
 BASELINE\_EDGES & Percentage of the full range to fit on either edge of the spectra
                   for baselining purposes.  If set to a non-positive value and
                   BASELINE\_REGIONS is undefined, then the baseline is derived after
                   smoothing and automatic emission detection.  If assigned a negative
                   value, BASELINE\_REGIONS, if it is defined, will be used instead to
                   specify where to determine the baseline. \\
+\hline
+BASELINE\_METHOD & Source of the baseline region.  Currently only \texttt{"auto"}
+                   is recognised.  This requests the automated mode where the emission
+                   is detected and masked before baseline fitting.  Otherwise
+                   BASELINE\_EDGES or BASELINE\_REGIONS (q.v.) will be used. \\
+\hline
+BASELINE\_NUMBIN & The number of channels to which the spectral axis is compressed
+                    for automated masking of emission when BASELINE\_METHOD=\texttt{"auto"}. \\
+\hline
+BASELINE\_ORDER & The polynomial order to use when baselining cubes.\\
 \hline
 BASELINE\_REGIONS & A comma-separated list of velocity ranges each in the format
                     $v1:v2$, from where the baseline should be estimated.  It is
@@ -4630,7 +4647,7 @@ There are a number of ways to define the baseline regions:
       corresponding recipe parameters is undefined,
 \item use the whole spectrum smoothing spectrally and spatially (see
       FREQUENCY\_SMOOTH and SPATIAL\_SMOOTH) with feature detection to mask
-      lines.
+      lines (see BASELINE\_METHOD).
 \end{itemize}
 The first two are suitable for broadline emission.  The second is
 desirable in the presence of many lines.  The third is the default and
