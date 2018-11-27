@@ -36,7 +36,7 @@
 *     OBSn    = _CHAR                / OBSCNTth observation identifier
 *
 *     and the output file name:
-*     FILEID  = _CHAR                / Filename without extension
+*     FILEID  = _CHAR                / Filename
 *
 *     The above headers are prefaced by a blank header and a title
 *     "Provenance:" comment.
@@ -91,6 +91,7 @@
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     DSB: David S. Berry (JAC, Hawaii)
 *     BRADC: Brad Cavanagh (JAC, Hawaii)
+*     GSB: Graham Bell (EAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -128,6 +129,10 @@
 *        Renamed from COF_PCADC to CVG_PCADC and moved from CONVERT to
 *        CVG, so that CUPID can use it. The old NDF argument has
 *        been replaced by IPROV.
+*     26-NOV-2018 (GSB):
+*        Retained file extensions in provenance headers as CADC are
+*        apparently moving to a new storage system and only supporting
+*        full filenames.
 *     {enter_further_changes_here}
 
 *-
@@ -190,7 +195,6 @@
       INTEGER PIPNTR             ! Pointer to indices of the parents
       CHARACTER*68 PRODUC        ! Value PRODUCT keyword
       INTEGER PRVKM              ! KeyMap holding PROVENANCE info
-      INTEGER SOE                ! Character position of file extension
       LOGICAL THERE              ! Component is present
 
 *  The PRODUCT keyword may only exist in the primary HDU, so save its
@@ -266,16 +270,12 @@
                END IF
                IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*  Extract the name excluding the file extension.
+*  Extract the name.
 *  *** Assume UNIX for the moment. ***
                CALL CHR_LASTO( PATH, '/', CPOS )
-               CALL CHR_LASTO( PATH, '.', SOE )
-               IF ( ( SOE .EQ. 0 ) .OR. ( SOE .LT. CPOS ) ) THEN
-                  SOE = CHR_LEN( PATH ) + 1
-               END IF
 
-               NAME = PATH( CPOS + 1 : SOE - 1 )
-               NCNAME = SOE - CPOS - 1
+               NAME = PATH( CPOS + 1 : )
+               NCNAME = CHR_LEN( NAME )
 
 *  Form keyword without leading zeroes (the FITS Standard says it shall
 *  be done this way).
@@ -404,11 +404,8 @@
 *  the filename, path, and extension. ***
          CALL CHR_LASTO( FNAME, '/', CPOS )
 
-         CALL CHR_LASTO( FNAME, '.', SOE )
-         IF ( SOE .EQ. 0 ) SOE = CHR_LEN( FNAME ) + 1
-
-         CALL FTPKYS( FUNIT, 'FILEID', FNAME( CPOS + 1 : SOE - 1 ),
-     :                'Filename minus extension', FSTAT )
+         CALL FTPKYS( FUNIT, 'FILEID', FNAME( CPOS + 1 : ),
+     :                'Filename', FSTAT )
 
 *  Write a blank header.
          CARD = ' '

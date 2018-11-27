@@ -546,8 +546,7 @@
 *        OBSCNT --- is the number of root ancestor OBSm headers.
 *        OBSm --- is mth root ancestor identifier from its
 *          MORE.OBSIDSS component.
-*        FILEID --- is the name of the output FITS file, omitting any
-*          file extension.
+*        FILEID --- is the name of the output FITS file.
 *
 *        PRODUCT is modified or added to each sub-file's header to
 *        be the primary header's value of PRODUCT with a '_<extnam>'
