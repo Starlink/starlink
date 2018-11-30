@@ -3310,8 +3310,11 @@ hdsFlush(const char *group_str, int *status) {
      if the group doesn't exist but v4 does not trigger such an error.
      For now we catch the specific error from v5 and assume that means
      v4 will deal with it. */
+  emsMark();
   hdsFlush_v5(group_str, status);
   if (*status == DAT__GRPIN) emsAnnul(status);
+  emsRlse();
+
   LOCK_MUTEX;
   hdsFlush_v4(group_str, status);
   UNLOCK_MUTEX;
@@ -3378,6 +3381,7 @@ hdsGtune(const char *param_str, int *value, int *status) {
     hds1GtuneWrapper( param_str, value, status );
     used = "(wrapper)";
   } else {
+    emsMark();
     hdsGtune_v5(param_str, value, status);
     if (*status == DAT__NOTIM) {
       emsAnnul(status);
@@ -3389,6 +3393,7 @@ hdsGtune(const char *param_str, int *value, int *status) {
     else {
       used = "(v5)";
     }
+    emsRlse();
   }
   if (*status != SAI__OK) {
     emsRepf("hdsGtune_wrap", "hdsGtune: Error obtaining value of tuning parameter '%s'",
@@ -3513,8 +3518,15 @@ hdsOpen(const char *file_str, const char *mode_str, HDSLoc **locator, int *statu
   int instat = *status;
   EnterCheck("hdsOpen",*status);
   if (*status != SAI__OK) return *status;
+
   /* HDSv4 can reliably spot when a file is not v4
-     format so for now we open in v4 and catch that specific error */
+     format so for now we open in v4 and catch that specific error. Make
+     sure we are in a deferred error reporting context by calling emsMark
+     and emsRlse, otherwise the error may be delivered immediately rather
+     than being annuled. */
+
+  emsMark();
+
   LOCK_MUTEX;
   hdsOpen_v4(file_str, mode_str, locator, status);
   UNLOCK_MUTEX;
@@ -3522,6 +3534,13 @@ hdsOpen(const char *file_str, const char *mode_str, HDSLoc **locator, int *statu
     emsAnnul(status);
     hdsOpen_v5(file_str, mode_str, locator, status);
   }
+
+  emsRlse();
+
+  if( *status != SAI__OK ) {
+    emsRepf("hdsOpen", "hdsOpen: Failed to open '%s'", status, file_str );
+  }
+
   HDS_CHECK_STATUS( "hdsOpen", file_str);
   return *status;
 }
@@ -3617,6 +3636,7 @@ hdsTune(const char *param_str, int value, int *status) {
     hds1TuneWrapper( param_str, value, status );
     used = "(wrapper)";
   } else {
+    emsMark();
     LOCK_MUTEX;
     hdsTune_v4(param_str, value, status);
     UNLOCK_MUTEX;
@@ -3628,6 +3648,7 @@ hdsTune(const char *param_str, int value, int *status) {
       used = "(both)";
     }
     hdsTune_v5(param_str, value, status);
+    emsRlse();
   }
   if (*status != SAI__OK) {
     emsRepf("hdsTune_wrap", "hdsTune: Error setting value of tuning parameter '%s'",
