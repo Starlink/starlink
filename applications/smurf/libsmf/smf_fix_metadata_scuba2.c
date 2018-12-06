@@ -106,10 +106,12 @@
 *     2018-09-24 (DSB):
 *        Re-calculate SCAN_VEL from JCMTSTATE info if it is undefined
 *        in the FITS header.
+*     2018-12-6 (DSB):
+*        Clear bad status before setting new SCAN_VEL value.
 
 *  Copyright:
 *     Copyright (C) 2009-2014 Science & Technology Facilities Council.
-*     Copyright (C) 2017 East Asian Observatory.
+*     Copyright (C) 2017-2018 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -271,18 +273,21 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
 
   /* Some observations do not have a value for SCAN_VEL (e.g. 20150918
     #24). In such cases, determine a SCAN_VEL value from the pointing info. */
-  scanvel = VAL__BADD;
-  smf_getfitsd( hdr, "SCAN_VEL", &scanvel, status );
-  if( scanvel == VAL__BADD ) {
-    size_t nflagged;
-    smf_flag_slewspeed( data, 0.0, 0.0, &nflagged, &scanvel, status );
-    if( scanvel != VAL__BADD ) {
-      msgOutiff( msglev, "", INDENT "Recalculated scan velocity as %g "
-                 "arcsec/sec from JCMTSTATE (was undefined)", status,
-                 scanvel );
-      smf_fits_updateD( hdr, "SCAN_VEL", scanvel, NULL, status );
-      hdr->scanvel = scanvel;
-      have_fixed |= SMF__FIXED_FITSHDR;
+  if( *status == SAI__OK ) {
+    scanvel = VAL__BADD;
+    smf_getfitsd( hdr, "SCAN_VEL", &scanvel, status );
+    if( *status != SAI__OK || scanvel == VAL__BADD ) {
+      if( *status != SAI__OK ) errAnnul( status );
+      size_t nflagged;
+      smf_flag_slewspeed( data, 0.0, 0.0, &nflagged, &scanvel, status );
+      if( scanvel != VAL__BADD ) {
+        msgOutiff( msglev, "", INDENT "Recalculated scan velocity as %g "
+                   "arcsec/sec from JCMTSTATE (was undefined)", status,
+                   scanvel );
+        smf_fits_updateD( hdr, "SCAN_VEL", scanvel, NULL, status );
+        hdr->scanvel = scanvel;
+        have_fixed |= SMF__FIXED_FITSHDR;
+      }
     }
   }
 
