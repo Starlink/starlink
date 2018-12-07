@@ -5,7 +5,7 @@
 .SEVERITY       ERROR
 .BASE 300
 
-CFCNT	 <Too many ClumpFind contour levels>
+CFCNT	 <Too many or too few ClumpFind contour levels>
 FWVAL	 <Insufficient good values>
 
 .END
