@@ -191,7 +191,7 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
          } else if( *status == SAI__OK ) {
             *nlevels = (int) ( ( maxd - clow )/cdelta ) + 1;
 
-/* Check the number of lebels is reasonable. */
+/* Check the number of levels is reasonable. */
             if( ( *nlevels < 2 || *nlevels > 10000000 ) ) {
                *status = CUPID__CFCNT;
                msgSetd( "T", clow );
