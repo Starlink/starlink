@@ -26,7 +26,8 @@
 *     If the above attempt fails, and the parameter value ends with
 *     ".FIT", attempt to interpret the parameter value as the name of a
 *     FITS file. Open the FITS file and attempt to obtained an AST
-*     FrameSet from the primary HDU headers.
+*     FrameSet from the primary HDU headers, or a MOC from a binary table
+*     extension.
 *
 *     If the above attempt fails, attempt to interpret the parameter
 *     value as the name of a text file containing either an AST object
@@ -127,6 +128,8 @@
 *        If a Region is requested, and an NDF is supplied by the user
 *        that has an OUTLINE extension, read the region form the outline
 *        (see kpgPutOutline).
+*     7-DEC-2018 (DSB):
+*        Add support for reading FrameSets and Mocs from FITS files.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -143,6 +146,7 @@
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'CNF_PAR'          ! CNF constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
 
 *  Arguments Given:
@@ -159,26 +163,46 @@
 *  External References:
       EXTERNAL ISA
       INTEGER KPG1_GETOUTLINE
+      INTEGER CHR_LEN
 
 *  Local Variables:
+      CHARACTER CARD*80
       CHARACTER LOC1*(DAT__SZLOC)
       CHARACTER LOC2*(DAT__SZLOC)
       CHARACTER NAME*(DAT__SZNAM)
       CHARACTER PARVAL*512
+      CHARACTER TFORM*10
       DOUBLE PRECISION DLBND( NDF__MXDIM )
       DOUBLE PRECISION DUBND( NDF__MXDIM )
       INTEGER DIMS( NDF__MXDIM )
       INTEGER DOCVT
+      INTEGER FC
+      INTEGER FSTAT
+      INTEGER FUNIT
+      INTEGER HDUTYP
       INTEGER I
-      INTEGER IAST2
       INTEGER IAST3
+      INTEGER IAST2
+      INTEGER ICARD
       INTEGER IFRM
       INTEGER IGRP
       INTEGER INDF
+      INTEGER IP
       INTEGER IPAR
+      INTEGER JUNK
+      INTEGER MOCORD
+      INTEGER MOCLEN
+      INTEGER NBYTE
+      INTEGER NCARD
+      INTEGER NCOL
       INTEGER NDIM
       INTEGER OUTLINE
+      LOGICAL AGAIN
+      LOGICAL ANYF
+      LOGICAL GOTXTN
+      LOGICAL MORE
       LOGICAL OK
+
 *.
 
 *  Initialise.
@@ -273,7 +297,142 @@
          END IF
       END IF
 
-*  If it was not a native HDS NDF or HDS object ...
+*  If it was not a native HDS NDF or HDS object, see if it is a FITS file.
+      IF( IAST .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
+
+*  Create a FitsChan to hold header cards.
+         CALL AST_BEGIN( STATUS )
+         FC = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
+
+*  Set a flag indicating if a specific extension is specified in PARVAL
+*  (i.e. the last character is "]").
+         GOTXTN = ( PARVAL( CHR_LEN( PARVAL ): ) .EQ. ']' )
+
+*  Find a free logical-unit.
+         FSTAT = 0
+         CALL FTGIOU( FUNIT, FSTAT )
+
+*  Attempt to open the file with read access, moving to the extension
+*  specified in PARVAL (the primary HDU if no extension is included in
+*  PARVAL). Get the type of the opened HDU.
+         CALL FTNOPN( FUNIT, PARVAL, 0, FSTAT )
+         CALL FTGHDT( FUNIT, HDUTYP, FSTAT )
+
+*  If successful, check each required HDU in turn. Negative status values
+*  are reserved for non-fatal warnings.
+         MORE = .TRUE.
+         DO WHILE( MORE .AND. FSTAT .LE. 0 )
+
+*  Empty the FitsChan then copy all header cards from the HDU into
+*  the FitsChan.
+            CALL AST_EMPTYFITS( FC, STATUS )
+            CALL FTGHSP( FUNIT, NCARD, JUNK, FSTAT )
+            DO ICARD = 1, NCARD
+               CALL FTGREC( FUNIT, ICARD, CARD, FSTAT )
+               CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS )
+            END DO
+
+*  Read AST objects from the FitsChan until one is found of the required
+*  class, or no more can be read.
+            CALL AST_CLEAR( FC, 'Card', STATUS )
+            AGAIN  = .TRUE.
+            DO WHILE( AGAIN )
+               IAST = AST_READ( FC, STATUS )
+               IF( IAST .EQ. AST__NULL ) THEN
+                  AGAIN = .FALSE.
+               ELSE IF( ISA( IAST, STATUS ) ) THEN
+                  AGAIN = .FALSE.
+               ELSE
+                  CALL AST_ANNUL( IAST, STATUS )
+               END IF
+            END DO
+
+*  If no suitable object has yet been found, and this HDU is a binary table,
+*  we may be able to read a Region (Moc) from it.
+            IF( IAST .EQ. AST__NULL .AND. HDUTYP .EQ. 2 ) THEN
+
+*  Create an empty Moc, and use the supplied ISA function to check that
+*  Mocs are acceptable. Annull the Moc if not.
+               IAST = AST_MOC( ' ', STATUS )
+               IF( .NOT. ISA( IAST, STATUS ) ) THEN
+                  CALL AST_ANNUL( IAST, STATUS )
+
+*  If Mocs are acceptable, get the number of bytes per integer value
+*  from the TFORM1 header.
+               ELSE IF( STATUS .EQ. SAI__OK ) THEN
+                  NBYTE = 0
+                  IF( AST_GETFITSS( FC, 'TFORM1', TFORM,
+     :                              STATUS )  ) THEN
+                     IF( TFORM .EQ. '1J' ) THEN
+                        NBYTE = 4
+                     ELSE IF( TFORM .EQ. '1K' ) THEN
+                        NBYTE = 8
+                     END IF
+                  END IF
+
+*  Get the order and length of the MOC and check there is only one column
+*  in the table.
+                  IF( AST_GETFITSI( FC, 'MOCORDER', MOCORD,
+     :                              STATUS ) .AND.
+     :                AST_GETFITSI( FC, 'NAXIS2', MOCLEN, STATUS ) .AND.
+     :                AST_GETFITSI( FC, 'TFIELDS', NCOL, STATUS ) .AND.
+     :                NCOL .EQ. 1 .AND. NBYTE .GT. 0 .AND.
+     :                STATUS .EQ. SAI__OK ) THEN
+
+*  Allocate memory then copy the column data from the FITS file into it.
+                     CALL PSX_CALLOC( NBYTE*MOCLEN, '_BYTE', IP,
+     :                                STATUS )
+                     IF( NBYTE .EQ. 4 ) THEN
+                        CALL FTGCVJ( FUNIT, 1, 1, 1, MOCLEN, 0,
+     :                               %VAL( CNF_PVAL( IP ) ), ANYF,
+     :                               FSTAT )
+                     ELSE
+                        CALL FTGCVK( FUNIT, 1, 1, 1, MOCLEN, 0,
+     :                               %VAL( CNF_PVAL( IP ) ), ANYF,
+     :                               FSTAT )
+                     END IF
+
+*  Add the column data into the Moc. Then free the memory.
+                     CALL AST_ADDMOCDATA( IAST, AST__OR, .FALSE.,
+     :                                    MOCORD, MOCLEN, NBYTE,
+     :                                    %VAL( CNF_PVAL( IP ) ),
+     :                                    STATUS )
+                     CALL PSX_FREE( IP, STATUS )
+
+*  Annul the Moc if any of the required keywords were not found or were
+*  inappropriate for a Moc.
+                  ELSE
+                      CALL AST_ANNUL( IAST, STATUS )
+                  END IF
+
+*  If anything went wrong creating the Moc, annull the object and error.
+                  IF( STATUS .NE. SAI__OK ) THEN
+                     CALL AST_ANNUL( IAST, STATUS )
+                     CALL ERR_ANNUL( STATUS )
+                  END IF
+               END IF
+            END IF
+
+*  If a specific HDU was included in PARVAL, we do not check any more HDUs.
+            IF( GOTXTN ) MORE = .FALSE.
+
+*  If we have not yet found a suitable object, move to the next HDU.
+            IF( MORE ) CALL FTMRHD( FUNIT, 1, HDUTYP, FSTAT )
+         END DO
+
+*  Close the file and release the logical-unit.
+         CALL FTCLOS( FUNIT, FSTAT )
+         CALL FTFIOU( FUNIT, FSTAT )
+
+*  If an AST object was found, export it from the current AST context so
+*  that it is not annulled by the following call to AST_END.
+         IF( IAST .NE. AST__NULL ) CALL AST_EXPORT( IAST, STATUS )
+
+*  End the AST object context.
+         CALL AST_END( STATUS )
+      END IF
+
+*  If it was not a FITS file, native HDS NDF or HDS object ...
       IF( IAST .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Obtain a GRP group containing text from which an Object is to be read.
