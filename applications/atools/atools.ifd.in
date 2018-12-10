@@ -4846,6 +4846,102 @@ iraf! {
           }
       }
 
+      action astmoc {
+         helplib {$ATOOLS_HELP}
+
+         parameter fmt {
+            type LITERAL
+            prompt {Format for output text file}
+            ppath DEFAULT
+            vpath DEFAULT
+            default AST
+            helpkey *
+          }
+
+         parameter options {
+            position 1
+            type LITERAL
+            prompt {Options for the Moc}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 2
+            type LITERAL
+            prompt {Name of file in which to store the Moc}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+      }
+
+      action astaddpixelmask {
+         helplib {$ATOOLS_HELP}
+
+         parameter array {
+            position 5
+            type NDF
+            access READ
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The input NDF}
+            helpkey *
+         }
+
+         parameter cmode {
+            position 2
+            type LITERAL
+            prompt {How the Moc and pixels are to be combined}
+            ppath CURRENT DEFAULT
+            default OR
+            helpkey *
+          }
+
+         parameter fmt {
+            type LITERAL
+            prompt {Format for output text file}
+            ppath DEFAULT
+            vpath DEFAULT
+            default AST
+            helpkey *
+          }
+
+         parameter oper {
+            position 4
+            type LITERAL
+            prompt {Operation defining the pixels to be selected}
+            ppath CURRENT DEFAULT
+            default EQ
+            helpkey *
+          }
+
+         parameter result {
+            position 6
+            type LITERAL
+            prompt {Name of file in which to store the Moc}
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Moc}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter value {
+            position 3
+            type LITERAL
+            prompt {The value that defines the pixels to be selected}
+            ppath CURRENT DEFAULT
+            default BAD
+            helpkey *
+          }
+      }
    }
 
    command astshow {

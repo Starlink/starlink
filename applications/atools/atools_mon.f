@@ -340,6 +340,12 @@
       ELSE IF ( NAME .EQ. 'ASTCHEBYDOMAIN' ) THEN
          CALL ASTCHEBYDOMAIN( STATUS )
 
+      ELSE IF ( NAME .EQ. 'ASTMOC' ) THEN
+         CALL ASTMOC( STATUS )
+
+      ELSE IF ( NAME .EQ. 'ASTADDPIXELMASK' ) THEN
+         CALL ASTADDPIXELMASK( STATUS )
+
 *  If the action name is not recognised, then report an error.
       ELSE
          STATUS = SAI__ERROR
