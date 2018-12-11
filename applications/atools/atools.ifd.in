@@ -4942,6 +4942,53 @@ iraf! {
             helpkey *
           }
       }
+
+      action astaddregion {
+         helplib {$ATOOLS_HELP}
+
+         parameter cmode {
+            position 2
+            type LITERAL
+            prompt {How the Moc and Region are to be combined}
+            ppath CURRENT DEFAULT
+            default OR
+            helpkey *
+          }
+
+         parameter fmt {
+            type LITERAL
+            prompt {Format for output text file}
+            ppath DEFAULT
+            vpath DEFAULT
+            default AST
+            helpkey *
+          }
+
+         parameter region {
+            position 3
+            type LITERAL
+            prompt {The Region to add}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {Name of file in which to store the Moc}
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Moc}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
    }
 
    command astshow {

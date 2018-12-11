@@ -346,6 +346,9 @@
       ELSE IF ( NAME .EQ. 'ASTADDPIXELMASK' ) THEN
          CALL ASTADDPIXELMASK( STATUS )
 
+      ELSE IF ( NAME .EQ. 'ASTADDREGION' ) THEN
+         CALL ASTADDREGION( STATUS )
+
 *  If the action name is not recognised, then report an error.
       ELSE
          STATUS = SAI__ERROR
