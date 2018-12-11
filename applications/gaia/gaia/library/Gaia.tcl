@@ -872,8 +872,12 @@ itcl::class gaia::Gaia {
       bind $w_ <Control-r> [code $this make_toolbox ard]
 
       add_menuitem $m command "STC-S regions..." \
-         {Drawn STC-S regions over image} \
+         {Draw STC-S regions over image} \
          -command [code $this make_toolbox stcs]
+
+      add_menuitem $m command "MOC outline regions..." \
+         {Draw IVOA HEALpix MOC outline over image} \
+         -command [code $this make_toolbox moc]
 
       add_menuitem $m command "Patch image..." \
          {Realistically replace parts of image} \
@@ -1122,6 +1126,22 @@ itcl::class gaia::Gaia {
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
             -clone_cmd [code $this make_toolbox stcs 1] \
+            -really_die $cloned
+      }
+   }
+
+   #  Make a MOS toolbox.
+   public method make_moc_toolbox {name {cloned 0}} {
+      itk_component add $name {
+         GaiaMOC $w_.\#auto \
+            -canvasdraw [$image_ component draw] \
+            -canvas [$image_ get_canvas] \
+            -rtdimage [$image_ get_image]\
+            -ast_tag ast_tag_ \
+            -image $image_ \
+            -transient $itk_option(-transient_tools) \
+            -number $clone_ \
+            -clone_cmd [code $this make_toolbox moc 1] \
             -really_die $cloned
       }
    }

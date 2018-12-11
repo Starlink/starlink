@@ -382,6 +382,9 @@ class StarRtdImage : public Skycat
    //  STC-S command.
    int stcplotCmd( int argc, char *argv[] );
 
+   //  MOC command.
+   int mocplotCmd( int argc, char *argv[] );
+
    //  HDU command.
    int hduCmd( int argc, char *argv[] );
 
