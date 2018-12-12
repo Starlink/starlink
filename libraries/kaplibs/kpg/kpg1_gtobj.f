@@ -130,6 +130,10 @@
 *        (see kpgPutOutline).
 *     7-DEC-2018 (DSB):
 *        Add support for reading FrameSets and Mocs from FITS files.
+*     12-DEC-2018 (DSB):
+*        If a Frame was requested but a Region was supplied, return the
+*        equivalent Frame. This is to avoid clipping introduced by using
+*        Regions in place of Frrames.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -164,6 +168,7 @@
       EXTERNAL ISA
       INTEGER KPG1_GETOUTLINE
       INTEGER CHR_LEN
+      LOGICAL CHR_SIMLR
 
 *  Local Variables:
       CHARACTER CARD*80
@@ -574,6 +579,14 @@
             END IF
          END IF
 
+*  If a Frame was requested, but a Region was  supplied, return the
+*  corresponding Frame. */
+         IF( OK .AND. CHR_SIMLR( CLASS, 'Frame' ) .AND.
+     :       AST_ISAREGION( IAST, STATUS ) ) THEN
+            IFRM = AST_GETREGIONFRAME( IAST, STATUS )
+            CALL AST_ANNUL( IAST, STATUS )
+            IAST = IFRM
+         END IF
       END IF
 
 *  Report an error if no object was read.
