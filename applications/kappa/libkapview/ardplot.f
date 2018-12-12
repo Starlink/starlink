@@ -180,10 +180,13 @@
 *        Allow Regions to be plotted over an empty picture.
 *     20-NOV-2018 (DSB):
 *        Change the tangent point for the projection used to display regions
-*        if there is no underlying picture. The tangent point used to be the 
+*        if there is no underlying picture. The tangent point used to be the
 *        south east corner of the Region's bounding box. Now it is the centre
-*        of the bounding box. This is because Regions that cover a large 
+*        of the bounding box. This is because Regions that cover a large
 *        fraction of the sky were being displayed with lots of distortion.
+*     12-DEC-2018 (DSB):
+*        Improve the projection if an AST Region near the pole is provided and 
+*        no DATA picture exists. Previously only part of the Region was displayed.
 *     {enter_further_changes_here}
 
 *-
@@ -206,7 +209,6 @@
       CHARACTER ADOM*30          ! Name of alignment Domain
       CHARACTER FILNAM*(GRP__SZFNM)! Name of ARD file
       DOUBLE PRECISION ARDIS     ! Aspect ratio of display surface
-      DOUBLE PRECISION ARREG     ! Aspect ratio of Region
       DOUBLE PRECISION BOX( 4 )  ! Bounds of used region of (X,Y) axes
       DOUBLE PRECISION CEN( 2 )  ! Centre of Region
       DOUBLE PRECISION DX        ! Size of Region on axis 1
@@ -215,7 +217,7 @@
       DOUBLE PRECISION INA( 2 )  ! Bottom left corner of PIXEL area
       DOUBLE PRECISION INB( 2 )  ! Top right corner of PIXEL area
       DOUBLE PRECISION INC( 2 )  ! Centre of PIXEL area
-      DOUBLE PRECISION PEND( 2 ) ! The end of the line
+      DOUBLE PRECISION RADIUS    ! Radius of Region's bounding disc
       DOUBLE PRECISION RLBND( 2 )! Lower bounds of Region
       DOUBLE PRECISION RUBND( 2 )! Upper bounds of Region
       INTEGER FC                 ! Temporary FitsChan
@@ -240,7 +242,7 @@
       LOGICAL SPARSE             ! Were there holds in the coord frame?
       REAL GBOX( 4 )             ! Bounds of used region of (X,Y) axes
       REAL MARGIN( 4 )           ! Margins round DATA picture
-      REAL SIZE                  ! Size of plot if no DAT pic found
+      REAL SIZE                  ! Size of plot if no DATA pic found
 
 *  Initialisations:
       DATA MARGIN / 0.15, 0.15, 0.15, 0.15 /
@@ -341,10 +343,10 @@
 *  Now handle cases where an AST Region was supplied.
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
 
-*  If there was no suitable existing DATA picture on ther graphics
+*  If there was no suitable existing DATA picture on the graphics
 *  device, we now modify the Plot returned by KPG1_PLOT so that it
-*  represents the a suitable area within the current Frame of the
-*  ARD region. We can then use the blank screen as a background for
+*  represents a suitable area within the current Frame of the
+*  AST Region. We can then use the blank screen as a background for
 *  plotting the Region.
          IF( .NOT. ALIGN ) THEN
 
@@ -354,30 +356,9 @@
 * Get the size for the plot.
                CALL PAR_GET0R( 'SIZE', SIZE, STATUS )
 
-*  Get the bounds of the Region, and it's Frame.
-               CALL AST_GETREGIONBOUNDS( IREG, RLBND, RUBND, STATUS )
+*  Get the centre and radius of a disc enclosing the Region, and it's Frame.
+               CALL AST_GETREGIONDISC( IREG, CEN, RADIUS, STATUS )
                RFRM = AST_GETREGIONFRAME( IREG, STATUS )
-
-*  Get the length of the bounding box along its bottom edge (DX) and
-*  along its left edge (DY). Use AST_DISTANCE since the Frame may be a
-*  SKYFRAME.
-               PEND( 1 ) = RUBND( 1 )
-               PEND( 2 ) = RLBND( 2 )
-               DX = AST_DISTANCE( RFRM, RLBND, PEND, STATUS )
-
-               PEND( 1 ) = RLBND( 1 )
-               PEND( 2 ) = RUBND( 2 )
-               DY = AST_DISTANCE( RFRM, RLBND, PEND, STATUS )
-
-*  Get the centre of the bounding box.
-               CEN( 1 ) = AST_AXOFFSET( RFRM, 1, RLBND( 1 ), DX/2,
-     :                                  STATUS )
-               CEN( 2 ) = AST_AXOFFSET( RFRM, 2, RLBND( 2 ), DY/2,
-     :                                  STATUS )
-
-*  Get the aspect ratio (normalised height) of the region, within its
-*  frame.
-               ARREG = DY/DX
 
 *  We want to draw the region on a uniform coordinate system (i.e. unit
 *  aspect ratio) in order to avoid stretching it. So get the bounds of
@@ -390,8 +371,8 @@
 *  Decide on the bounds of the area to be used, in "NDC" coords (where
 *  the whole plotting surface corresponds to a unit box). INA is the
 *  bottom left corner, and INB is the top right corner.
-               IF( ARDIS .LE. ARREG ) THEN
-                  HW = ARDIS/(2.0*SIZE*ARREG)
+               IF( ARDIS .LE. 1.0 ) THEN
+                  HW = ARDIS/(2.0*SIZE)
                   INA( 1 ) = 0.5D0 - HW
                   INB( 1 ) = 0.5D0 + HW
                   HW = 1.0/(2.0*SIZE)
@@ -401,7 +382,7 @@
                   HW = 1.0/(2.0*SIZE)
                   INA( 1 ) = 0.5D0 - HW
                   INB( 1 ) = 0.5D0 + HW
-                  HW = ARREG/(2.0*SIZE*ARDIS)
+                  HW = 1.0/(2.0*SIZE*ARDIS)
                   INA( 2 ) = 0.5D0 - HW
                   INB( 2 ) = 0.5D0 + HW
                END IF
@@ -415,8 +396,8 @@
 
 *  Calculate the pixel sizes that result in the required area of the
 *  DATA picture spanning an area of (DX,DY), and convert to degrees.
-                  DX = AST__DR2D*DX/( INB(1) - INA(1) )
-                  DY = AST__DR2D*DY/( INB(2) - INA(2) )
+                  DX = 2*AST__DR2D*RADIUS/( INB(1) - INA(1) )
+                  DY = 2*AST__DR2D*RADIUS/( INB(2) - INA(2) )
 
 *  Create a FitsChan holding the FITS-WCS equivalent of the required
 *  mapping. Assume the sky frame is (RA,Dec) for the moment. The DATA
@@ -464,6 +445,10 @@
 *  that maps the central half of the DATA picture to the bounds of the
 *  Region.
                ELSE
+                  RLBND( 1 ) = CEN( 1 ) - RADIUS
+                  RLBND( 2 ) = CEN( 2 ) - RADIUS
+                  RUBND( 1 ) = CEN( 1 ) + RADIUS
+                  RUBND( 2 ) = CEN( 2 ) + RADIUS
                   MAP = AST_WINMAP( 2, INA, INB, RLBND, RUBND, ' ',
      :                              STATUS )
                END IF
