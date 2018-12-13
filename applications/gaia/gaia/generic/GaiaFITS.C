@@ -438,7 +438,7 @@ int GaiaFITSHduList( StarFitsIO* fits, string &result )
     int numHDUs = fits->getNumHDUs();
     if ( numHDUs <= 0 ) {
         //  No HDUs.
-	return TCL_OK;
+        return TCL_OK;
     }
 
     //  Save current HDU, then loop through all HDUs to get info
@@ -447,27 +447,27 @@ int GaiaFITSHduList( StarFitsIO* fits, string &result )
     int status = 0;
     int count = 0;
     for ( int i = 1; i <= numHDUs; i++ ) {
-	if ( fits->setHDU( i ) != 0 ) {
-	    status++;
-	    break;
-	}
-	const char* type = fits->getHDUType();
-	if ( !type ) {
-	    status++;
-	    break;
-	}
+        if ( fits->setHDU( i ) != 0 ) {
+            status++;
+            break;
+        }
+        const char* type = fits->getHDUType();
+        if ( !type ) {
+            status++;
+            break;
+        }
 
-	//  Get these keyword values and default to "".
-	char extName[80];
+        //  Get these keyword values and default to "".
+        char extName[80];
         int naxis, naxis1, naxis2, naxis3;
-	double crpix1, crpix2;
-	fits->get( "EXTNAME", extName, 80 );
-	fits->get( "NAXIS", naxis );
-	fits->get( "NAXIS1", naxis1 );
-	fits->get( "NAXIS2", naxis2 );
-	fits->get( "NAXIS3", naxis3 );
-	fits->get( "CRPIX1", crpix1 );
-	fits->get( "CRPIX2", crpix2 );
+        double crpix1, crpix2;
+        fits->get( "EXTNAME", extName, 80 );
+        fits->get( "NAXIS", naxis );
+        fits->get( "NAXIS1", naxis1 );
+        fits->get( "NAXIS2", naxis2 );
+        fits->get( "NAXIS3", naxis3 );
+        fits->get( "CRPIX1", crpix1 );
+        fits->get( "CRPIX2", crpix2 );
 
         //  Is this compressed? ZIMAGE will be T or extname already contains
         //  the COMPRESSED_IMAGE string.
@@ -490,14 +490,14 @@ int GaiaFITSHduList( StarFitsIO* fits, string &result )
            << " {" << crpix1 << "}"
            << " {" << crpix2 << "}"
            << "} ";
-	count++;
+        count++;
     }
     if ( count > 0 ) {
         fits->setHDU( curHDU );
-	if ( status == 0 ) {
+        if ( status == 0 ) {
             result = os.str();
             return TCL_OK;
-	}
+        }
     }
     return TCL_ERROR;
 }
