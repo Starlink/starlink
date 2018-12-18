@@ -4767,8 +4767,8 @@ int StarRtdImage::stcplotCmd( int argc, char *argv[] )
 //      TCL status
 //
 //    Notes:
-//      The first parameter passed to this command should be a FITS
-//      file containing the MOC and the second any attributes for the plot
+//      The first parameter passed to this command should be a pointer
+//      to an AST MOC and the second any attributes for the plot
 //      (line colours etc. as for an AstPlot).
 //-
 int StarRtdImage::mocplotCmd( int argc, char *argv[] )
@@ -4782,101 +4782,9 @@ int StarRtdImage::mocplotCmd( int argc, char *argv[] )
     }
     const char *errmsg = NULL;
 
-    //  Attempt to read the MOC from the FITS file.
-    AstMoc *moc = NULL;
-    int nb = 0;
-    void *data = NULL;
-
-    // Open the FITS file.
-    fitsfile *fptr;
-    int status = 0;
-    fits_open_file( &fptr, argv[0], READONLY, &status );
-
-    // Loop round all extensions.
-    int nhdu = 0;
-    fits_get_num_hdus( fptr, &nhdu, &status );
-    for ( int ihdu = 1; ihdu <= nhdu; ihdu++ ) {
-        int hdutype = 0;
-        fits_movabs_hdu( fptr, ihdu, &hdutype, &status);
-
-        // Skip it if it is not a binary table.
-        if ( hdutype ==  BINARY_TBL ) {
-
-            // Check there is only one column, and that the mandatory keywords
-            // exist with the right values.
-            int ncol = 0;
-            fits_read_key( fptr, TINT, "TFIELDS", &ncol, NULL, &status );
-            int mocorder = 0;
-            fits_read_key( fptr, TINT, "MOCORDER", &mocorder, NULL, &status );
-            int moclen = 0;
-            fits_read_key( fptr, TINT, "NAXIS2", &moclen, NULL, &status );
-            char value[80];
-            int valuelen = 0;
-            fits_read_string_key( fptr, "PIXTYPE", 1, sizeof(value) - 1,
-                                  value, &valuelen, NULL, &status );
-            if ( ncol == 1 && !strcmp( value, "HEALPIX" ) ) {
-                fits_read_string_key( fptr, "ORDERING", 1, sizeof(value) - 1,
-                                      value, &valuelen, NULL, &status );
-                if ( strcmp( value, "NUNIQ" ) == 0 ) {
-                    fits_read_string_key( fptr, "COORDSYS", 1,
-                                          sizeof(value) - 1, value, &valuelen,
-                                          NULL, &status );
-                    if ( strcmp( value, "C" ) == 0 ) {
-
-                        // See if the column values are 4-byte or 8-byte
-                        // integers. Use the appropriate cfitsio function to
-                        // read the column data into a pre-allocated array.
-                        fits_read_string_key( fptr, "TFORM1", 1,
-                                              sizeof(value) - 1,
-                                              value, &valuelen, NULL,
-                                              &status );
-                        if ( strcmp( value, "1J" ) == 0 ) {
-                            nb = 4;
-                            data = astMalloc( nb*moclen );
-                            int anynul = 0;
-                            fits_read_col_int( fptr, 1, 1, 1, moclen, 0, 
-                                               (int *) data, &anynul,
-                                               &status );
-                        } else if ( strcmp( value, "1K" ) == 0 ) {
-                            nb = 8;
-                            data = astMalloc( nb * moclen );
-                            int anynul = 0;
-                            fits_read_col_lnglng( fptr, 1, 1, 1, moclen, 0, 
-                                                  (LONGLONG *)data,
-                                                  &anynul, &status );
-                        } else {
-                            nb = 0;
-                        }
-                        if ( nb > 0 ) {
-
-                            // Create an empty Moc.
-                            moc = astMoc( " " );
-
-                            // Add the column data into it. */
-                            astAddMocData( moc, AST__OR, 0, mocorder,
-                                           moclen, nb, data );
-
-                            // Free resources.
-                            data = astFree( data );
-
-                            // Leave the HDU loop.
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // Close the FITS file
-    fits_close_file( fptr, &status );
-
-    // Report any cfitsio error.
-    if ( status > 0 ) {
-        char fmsg[32];
-        fits_get_errstatus(status, fmsg);
-        return error( "Failed to read MOC from FITS file: %s", fmsg );
-    }
+    /* Get the MOC object, XXX some error handling. */
+    long adr = atol( argv[0] );
+    AstMoc *moc = (AstMoc *) adr;
 
     //  Create the mapping from MOC coordinates to the image WCS.
     if ( moc != NULL ) {
@@ -4926,22 +4834,8 @@ int StarRtdImage::mocplotCmd( int argc, char *argv[] )
             errmsg = "no WCS available";
         }
     }
-    else {
-        if ( ! astOK ) {
-            //  Get informative error message.
-            int status_check;
-            errTcl_LastError( &status_check, &errmsg );
-        }
-        else {
-            errmsg = "not a valid STC-S region";
-        }
-    }
 
     //  Tidy up.
-    if ( moc != NULL ) {
-        moc = (AstMoc *) astAnnul( moc );
-    }
-
     if ( !astOK || errmsg != NULL ) {
         if ( ! astOK ) {
             astClearStatus;

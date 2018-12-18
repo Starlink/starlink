@@ -917,6 +917,40 @@ int StarFitsIO::setHDUByName( const char *extname, int extver )
     return FitsIO::setHDU( hdu );
 }
 
+
+
+/**
+ * Get the contents of the given column as an array of longs.
+ * The caller should pass an array of numValues longs.
+ */
+int StarFitsIO::getTableColumn(int col, long* values, int numValues)
+{
+    if ( !fitsio_ ) return 1;
+
+    int status = 0, anynull = 0;
+    if ( fits_read_col( fitsio_, TLONG, col, 1, 1, numValues, NULL,
+                        values, &anynull, &status ) != 0 )
+        return cfitsio_error();
+
+    return 0;
+}
+
+/**
+ * Get the contents of the given column as an array of long longs.
+ * The caller should pass an array of numValues long longs.
+ */
+int StarFitsIO::getTableColumn(int col, LONGLONG* values, int numValues)
+{
+    if ( !fitsio_ ) return 1;
+
+    int status = 0, anynull = 0;
+    if ( fits_read_col( fitsio_, TLONGLONG, col, 1, 1, numValues, NULL,
+                        values, &anynull, &status ) != 0 )
+        return cfitsio_error();
+
+    return 0;
+}
+
 //
 // Compressed image support
 // ========================
@@ -1095,7 +1129,7 @@ int StarFitsIO::saveCompressedImage( const char *filename, const char *object )
                 v = array[i];
                 if ( v != blank ) {
                     v = v * bscale + bzero;
-                    array[i] = 2.0 * bsoften * sinh( v / 1.08573620475813 ) 
+                    array[i] = 2.0 * bsoften * sinh( v / 1.08573620475813 )
                                + boffset;
 
                     //  Unscaled to match file BSCALE and BZERO.

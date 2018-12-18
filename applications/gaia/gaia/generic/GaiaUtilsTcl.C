@@ -52,6 +52,8 @@
 extern "C" {
 #include <ast.h>
 }
+#include "StarFitsIO.h"
+#include "GaiaFITS.h"
 #include "gaiaUtils.h"
 #include "grf_tkcan.h"
 
@@ -140,6 +142,8 @@ static int GaiaUtilsGtFrame( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGtROIPlots( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsFitsMoc( ClientData clientData, Tcl_Interp *interp,
+                             int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsRegionType( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsShiftWcs( ClientData clientData, Tcl_Interp *interp,
@@ -259,6 +263,9 @@ int GaiaUtils_Init( Tcl_Interp *interp )
     Tcl_CreateObjCommand( interp, "gaiautils::getroiplots",
                           GaiaUtilsGtROIPlots, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::fitsmoc", GaiaUtilsFitsMoc,
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::regiontype", GaiaUtilsRegionType,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
@@ -2075,10 +2082,111 @@ static int GaiaUtilsGrfAddColour( ClientData clientData, Tcl_Interp *interp,
     return TCL_OK;
 }
 
-/*  ===================================
- *  STC and AST region support commands
- *  ===================================
+/*  ========================================
+ *  STC, MOC and AST region support commands
+ *  ========================================
  */
+
+/**
+ * Create an AST MOC from a FITS file.
+ *
+ * Accepts one argument the name of a file containing the MOC.
+ * The result is the address of the new object.
+ */
+static int GaiaUtilsFitsMoc( ClientData clientData, Tcl_Interp *interp,
+                             int objc, Tcl_Obj *CONST objv[] )
+{
+    const char *filename = NULL;
+    AstMoc * moc = NULL;
+
+    /* Check arguments, need  1 the filename. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "FITS-file" );
+        return TCL_ERROR;
+    }
+
+    /* XXX allow the specification of the HDU? */
+    filename = Tcl_GetString( objv[1] );
+    StarFitsIO *fitsio = GaiaFITSOpen( filename, 1 );
+    if ( fitsio == NULL ) {
+        Tcl_SetResult( interp, "Failed to open MOC FITS file", TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+
+    /* Need to find a HDU with the MOC. */
+    for ( int i = 1; i <= fitsio->getNumHDUs(); i++ ) {
+        const char *type = fitsio->getHDUType();
+        if ( strcmp( type, "binary" ) == 0 ) {
+
+            /* Signature is one column with some mandatory keywords .*/
+            long rows = 0;
+            int cols = 0;
+            int status = fitsio->getTableDims( rows, cols );
+            if ( status == 0 && cols == 1 ) {
+
+                /* Look for mandatory keywords. */
+                int moclen = 0;
+                fitsio->get( "NAXIS2", moclen );
+                int mocorder = 0;
+                fitsio->get( "MOCORDER", mocorder );
+                char *pixtype = fitsio->get( "PIXTYPE" );
+
+                if ( strcmp( pixtype, "HEALPIX" ) == 0 ) {
+                    char *ordering = fitsio->get( "ORDERING" );
+                    if ( strcmp( ordering, "NUNIQ" ) == 0 ) {
+                        char *coordsys = fitsio->get( "COORDSYS" );
+                        if ( strcmp( coordsys, "C" ) == 0 ) {
+
+                            /* We're in business. Need to read the column with
+                             * the appropriate data type. */
+                            int nb = 0;
+                            char *tform = fitsio->get( "TFORM1" );
+                            void *data;
+                            if ( strcmp( tform, "1J" ) == 0 ) {
+                                data = (void *) malloc( nb * moclen );
+                                fitsio->getTableColumn( 1, (long *)data,
+                                                        moclen );
+                            } else if ( strcmp( tform, "1K" ) == 0 ) {
+                                nb = 8;
+                                data = (void *) malloc( nb * moclen );
+                                fitsio->getTableColumn( 1, (long *)data,
+                                                        moclen );
+                            }
+
+                            if ( nb > 0 ) {
+                                /* Create an empty Moc. */
+                                moc = astMoc( " " );
+
+                                /* Add the column data into it. */
+                                astAddMocData( moc, AST__OR, 0, mocorder,
+                                               moclen, nb, data );
+
+                                /* Free resources. */
+                                free( data );
+
+                                /* Leave the HDU loop. */
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /* Next HDU. */
+        fitsio->setHDU( i + 1 );
+    }
+
+    /* Export the new object as a long containing the address */
+    if ( astOK ) {
+        Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) moc ) );
+        return TCL_OK;
+    }
+    astClearStatus;
+    Tcl_SetResult( interp, "Failed to create STC region", TCL_VOLATILE );
+    return TCL_ERROR;
+}
+
 
 /**
  * Create an AST region from an STC-S description.

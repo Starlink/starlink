@@ -278,7 +278,9 @@ itcl::class gaia::GaiaMOC {
          set attributes "colour(border)=$colour_"
 
          #  And draw...
-         $itk_option(-rtdimage) mocplot $filename_ $attributes
+         set moc [gaiautils::fitsmoc $filename_]
+         $itk_option(-rtdimage) mocplot $moc $attributes
+         gaiautils::astannul $moc
          update
          set_width_ $width_
       }

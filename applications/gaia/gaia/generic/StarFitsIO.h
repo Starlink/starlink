@@ -125,6 +125,10 @@ public:
     int loadTabTable( AstFitsChan *chan, const char *extname,
                       int extver, int extlevel, int *status );
 
+    // Get a column of values from a table.
+    int getTableColumn(int col, long *values, int numValues);
+    int getTableColumn(int col, LONGLONG* values, int numValues);
+
 protected:
     // Whether to merge headers or not.
     static int alwaysMerge_;
