@@ -118,26 +118,6 @@ itcl::class gaia::GaiaMOC {
       $short_help_win_ add_menu_short_help $File \
          {New window} {Create a new toolbox}
 
-      #  Save description to a file.
-      #$File add command \
-      #   -label {Save description...} \
-      #  -command [code $this write_file] \
-      #   -accelerator {Control-s}
-      #bind $w_ <Control-s> [code $this write_file]
-      #$short_help_win_ add_menu_short_help $File \
-      #   {Save description...}\
-      #   {Write the current description to a text file}
-
-      #  Read MOC from a file.
-      $File add command \
-         -label {MOC FITS file...} \
-         -command [code $this read_file] \
-         -accelerator {Control-r}
-      bind $w_ <Control-r> [code $this read_file]
-      $short_help_win_ add_menu_short_help $File \
-         {MOC FITS file...}\
-         {Read a MOC from a table in a FITS file}
-
       #  Set the exit menu item.
       $File add command -label Exit \
          -command [code $this close] \
@@ -157,19 +137,20 @@ itcl::class gaia::GaiaMOC {
             -bitmap width$i \
             -command [code $this set_width_ $i]
       }
-
-      #  Text area for the FITS filename. XXX not needed.
-      itk_component add mainrule {
-         LabelRule $w_.astrule \
-            -text "MOC FITS file:"
+      
+      #  Table for MOCs.
+      itk_component add moctable {
+         TableList $w_.moctable \
+            -title "List of MOCs" \
+            -hscroll 1 \
+            -vscroll 1 \
+            -selectmode extended \
+            -exportselection 0 \
+            -headings {ID description} \
+            -height 5
       }
-      pack $itk_component(mainrule) -side top -fill x -expand 1
-
-      itk_component add maintext {
-         gaia::ScrollText $w_.text
-      }
-      pack $itk_component(maintext) -side top -fill both -expand 1
-      set lwidth 21
+      add_short_help $itk_component(moctable) \
+         {Table of all available MOCs}
 
       #  Create the button bar
       itk_component add actionframe {frame $w_.action}
@@ -181,6 +162,13 @@ itcl::class gaia::GaiaMOC {
       }
       add_short_help $itk_component(close) {Close window}
 
+      #  Read MOC from a file.
+      itk_component add readfits {
+         button $itk_component(actionframe).readfits -text {FITS} \
+            -command [code $this read_file]
+      }
+      add_short_help $itk_component(readfits) {Read a MOC from a FITS file}
+
       #  Draw the MOCs.
       itk_component add draw {
          button $itk_component(actionframe).draw -text {Draw MOCs} \
@@ -190,9 +178,9 @@ itcl::class gaia::GaiaMOC {
 
       #  Pack all the components into place.
       pack $itk_component(actionframe) -side bottom -fill x -pady 5 -padx 5
-      pack $itk_component(mainrule) -side top -fill x -expand 1
-      pack $itk_component(maintext) -side top -fill both -expand 1
+      pack $itk_component(moctable) -side top -fill both -expand 1
       pack $itk_component(close) -side right -expand 1 -pady 3 -padx 3
+      pack $itk_component(readfits) -side left -expand 1 -pady 3 -padx 3
       pack $itk_component(draw) -side left -expand 1 -pady 3 -padx 3
 
       #  Initialise the graphics tag.
@@ -248,18 +236,23 @@ itcl::class gaia::GaiaMOC {
       destroy $w
    }
 
-   #  Read MOC from a FITS file. XXX use an entry dialog with file selector.
+   #  Read MOC from a FITS file.
    public method read_file {} {
       set w [FileSelect .\#auto -title "Read MOC from a FITS file"]
       if {[$w activate]} {
-         read_description [$w get]
+         add_file [$w get]
       }
       destroy $w
    }
 
-   #  Set the MOC filename.
-   public method read_description {filename} {
-      set filename_ $filename
+   #  Add a FITS MOC filename.
+   public method add_file {filename} {
+      if { ! [info exists filename_($filename)] } {
+         set filename_($index_) $filename
+         incr index_
+         $itk_component(moctable) append_row [list $index_ $filename]
+         $itk_component(moctable) new_info
+      }
    }
 
    #  Draw the regions.
@@ -278,9 +271,11 @@ itcl::class gaia::GaiaMOC {
          set attributes "colour(border)=$colour_"
 
          #  And draw...
-         set moc [gaiautils::fitsmoc $filename_]
-         $itk_option(-rtdimage) mocplot $moc $attributes
-         gaiautils::astannul $moc
+         for {set i 0} {$i < $index_} {incr i} {
+            set moc [gaiautils::fitsmoc $filename_($i)]
+            $itk_option(-rtdimage) mocplot $moc $attributes
+            gaiautils::astannul $moc
+         }
          update
          set_width_ $width_
       }
@@ -349,8 +344,11 @@ itcl::class gaia::GaiaMOC {
    #  Protected variables: (available to instance)
    #  --------------------
 
-   #  Name of MOC FITS file.
-   protected variable filename_ {}
+   #  Index of MOCs.
+   protected variable index_ 0
+
+   #  Name of MOC FITS files.
+   protected variable filename_
 
    #  Whether regions have been drawn.
    protected variable drawn_
