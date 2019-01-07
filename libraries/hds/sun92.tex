@@ -1641,6 +1641,22 @@ of the top level library.
 
 \end{description}
 
+\subsubsection*{Parameters used only with HDS version 5 files}
+
+\begin{description}
+
+\item [\xlabel{HDS_LOCKCHECK_tuning_parameter}LOCKCHECK - controls lock checking:]\mbox{}\\
+If non-zero, an error is reported if a V5 HDS object has not been locked
+appropriately by the current thread before use. If zero, no such check is
+performed. This is provided so that old software which pre-dates the
+datLock function (and which presumably is explicitly designed to avoid conflicting
+simultaneous access to an HDS object from separate threads) can be used
+without change. Use of this tuning parameter should be seen as a
+temporary stop-gap measure until such time as the software can be changed
+to use the datLock function correctly.
+
+\end{description}
+
 \subsection{\xlabel{tuning_in_practice}\label{sect:gtune}Tuning in Practice}
 
 Normally, a single application which wished to tune HDS itself (rather
