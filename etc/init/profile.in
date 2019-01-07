@@ -775,8 +775,8 @@ fi
 # Pamela
 
 if test -f ${bindir}/pamela/pamela.sh; then
-   pamela () { ${PAMELA_DIR}/pamela.sh; }
-   pamelasetup () { ${PAMELA_DIR}/pamela.sh; }
+   pamela () { . ${PAMELA_DIR}/pamela.sh; }
+   pamelasetup () { . ${PAMELA_DIR}/pamela.sh; }
 else
    pamela () { ${STARLINK_DIR}/etc/notinst pamela; }
    pamelasetup () { ${STARLINK_DIR}/etc/notinst pamela; }
