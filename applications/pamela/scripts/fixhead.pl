@@ -108,7 +108,7 @@ my $night = shift or die "No night number supplied.\n";
 ($night > 0) or die "Night number must be > 0\n";
 
 my $format = shift;
-($format >= 1 && $format <= 12)  or die
+($format >= 1 && $format <= 13)  or die
     "No format number supplied.\n"
     . "Formats available are:\n\n"
     . " 1) WHT July 1998, normal and LSD\n"
@@ -122,7 +122,8 @@ my $format = shift;
     . " 9) VLT FORS2, Mar 2004\n"
     . "10) Magellan LDSS3, April 2007 (JKT)\n"
     . "11) Magellan IMACS, September 2007 (JKT)\n"
-    . "12) SAAO 72inch Oct 2008\n";
+    . "12) SAAO 72inch Oct 2008\n"
+    . "13) WHT August 2018\n";
 
 # Interpret file name arguments
 
@@ -131,14 +132,14 @@ my $arg;
 my @files;
 while($arg = shift){
     if($arg =~ /^@(.*)/){
-	my $list = $1;
-	open(LIST, $list) or die "Can't open $list\n";
-	while(<LIST>){
-	    chop($files[$nfiles++] = $_);
-	}
-	close(LIST);
+        my $list = $1;
+        open(LIST, $list) or die "Can't open $list\n";
+        while(<LIST>){
+            chop($files[$nfiles++] = $_);
+        }
+        close(LIST);
     }else{
-	$files[$nfiles++] = $arg;
+        $files[$nfiles++] = $arg;
     }
 }
 
@@ -182,11 +183,12 @@ foreach $file (@files){
 # you just need to add another entry into the 'if' statement.
     if($format == 1 || $format == 2 || $format == 3 || $format == 4 ||
        $format == 5 || $format == 6 || $format == 7 || $format == 8 ||
-       $format == 9 || $format == 10 || $format == 11 || $format == 12 ){
-	print SCRIPT "echo File name = $file\n";
-	print SCRIPT "$STAR/bin/hdstrace $file.more.fits nlines=all eachline\n";
+       $format == 9 || $format == 10 || $format == 11 || $format == 12 ||
+       $format == 13 ){
+        print SCRIPT "echo File name = $file\n";
+        print SCRIPT "$STAR/bin/hdstrace $file.more.fits nlines=all eachline\n";
     }else{
-	die "Format number = $format has no header listing section defined!\n";
+        die "Format number = $format has no header listing section defined!\n";
     }
 # END EDITING!
 }
@@ -248,137 +250,137 @@ while(<LOG>){
 
     if(/^File name = (\S*)/){
 
-	$file  = $1;
+        $file  = $1;
 
     }elsif($format == 1){
 
 # WHT July 1998
 
-	if(/\'OBJECT *=\s*\'([^']*)\'/){
+        if(/\'OBJECT *=\s*\'([^']*)\'/){
             $object{$file} = $1;
         }elsif(/\'RUN *= *(\d*) .*Run number/){
-	    $numrun{$file} = $1;
-	}elsif(/\'CAT-RA *=.* (\d\d):(\d\d):(\d\d\.\d*)/){
-	    $ra{$file} = $1+$2/60.+$3/3600.;
+            $numrun{$file} = $1;
+        }elsif(/\'CAT-RA *=.* (\d\d):(\d\d):(\d\d\.\d*)/){
+            $ra{$file} = $1+$2/60.+$3/3600.;
         }elsif(/\'CAT-DEC *=.*(.)(\d\d):(\d\d):(\d\d\.\d*)/){
-	    $sign = $1;
-	    $dec{$file}  = $2+$3/60.+$4/3600.;
-	    if($sign eq "-"){
-		$dec{$file} *= -1.;
-	    }elsif($sign eq " "){
-		print STDERR "WARNING: no sign found on declination in file = $file; assuming it to be positive\n";
-	    }elsif($sign ne "+"){
-		die "Failed to recognise declinations sign = $sign in file = $file\n";
-	    }
-	}elsif(/\'CAT-EQUI *=.*(\d\d\d\d\.\d*)/){
+            $sign = $1;
+            $dec{$file}  = $2+$3/60.+$4/3600.;
+            if($sign eq "-"){
+                $dec{$file} *= -1.;
+            }elsif($sign eq " "){
+                print STDERR "WARNING: no sign found on declination in file = $file; assuming it to be positive\n";
+            }elsif($sign ne "+"){
+                die "Failed to recognise declinations sign = $sign in file = $file\n";
+            }
+        }elsif(/\'CAT-EQUI *=.*(\d\d\d\d\.\d*)/){
             $equinox{$file} = $1;
         }elsif(/\'UTSTART *= .*(\d\d):(\d\d):(\d\d\S*)/ && !defined $utc{$file}){
-	    $utc{$file} = $1 + $2/60. + $3/3600.;
+            $utc{$file} = $1 + $2/60. + $3/3600.;
         }elsif(/\'DATE[-\_]OBS= .*(\d\d)\/(\d\d)\/(\d\d)[^\d]/){
             $date{$file} = "$1/$2/19$3";
         }elsif(/\'EXPOSED\s*=\s*([\.\d]*)/ && !defined $time{$file}){
-           $time{$file} = $1;
-	   print "found time = [",$1,"]\n";
-	}elsif(/\'ROTSKYPA\s*=\s*$float\s*\//){
-	    $slitpa{$file} = $1;
+            $time{$file} = $1;
+            print "found time = [",$1,"]\n";
+        }elsif(/\'ROTSKYPA\s*=\s*$float\s*\//){
+            $slitpa{$file} = $1;
         }elsif(/\'DETECTOR\s*=\s*\'\s*([^\']*?)\s*\'/){
-           $detector{$file} = $1;
+            $detector{$file} = $1;
         }elsif(/\'INSTRUME\s*=\s*\'\s*([^\']*?)\s*\'/){
-           $instrument{$file} = $1;
+            $instrument{$file} = $1;
         }elsif(/\'OBSTYPE\s*=\s*\'\s*([^\']*?)\s*\'/){
-           $source{$file} = $1;
+            $source{$file} = $1;
         }elsif(/\'SPECTIME *= .*(\d\d):(\d\d):(\d\d\.\d*)/){
-	    $utc{$file} = $1 + $2/60. + $3/3600.;
+            $utc{$file} = $1 + $2/60. + $3/3600.;
         }elsif(/\'SPECINTT\s*=\s*([\.\d]+)/){
-           $time{$file} = $1;
+            $time{$file} = $1;
         }
 
     }elsif($format == 2){
 
 # AAT Dec 1998
 
-	if(/\'OBJECT *= \'(.*)\' *\//){
+        if(/\'OBJECT *= \'(.*)\' *\//){
             $object{$file} = $1;
         }elsif(/\'RUN *= *(\d*) .*Run number/){
-	    $numrun{$file} = $1;
-	}elsif(/\'MEANRA *= *(\d*\.\d*)/){
-	    $ra{$file} = $1/15.;
+            $numrun{$file} = $1;
+        }elsif(/\'MEANRA *= *(\d*\.\d*)/){
+            $ra{$file} = $1/15.;
         }elsif(/\'MEANDEC *= *([-+]?\d*\.\d*)/){
-	    $dec{$file}  = $1;
-	}elsif(/\'EQUINOX *= *(\d\d\d\d)/){
+            $dec{$file}  = $1;
+        }elsif(/\'EQUINOX *= *(\d\d\d\d)/){
             $equinox{$file} = $1;
         }elsif(/\'UTSTART *= .*(\d\d):(\d\d):(\d\d\.\d\d)/){
-	    $utc{$file} = $1 + $2/60. + $3/3600.;
+            $utc{$file} = $1 + $2/60. + $3/3600.;
         }elsif(/\'UTDATE *= *\'(\d\d\d\d):(\d\d):(\d\d)/){
             $date{$file} = "$3/$2/$1";
         }elsif(/\'EXPOSED *= *(\d*)/){
-           $time{$file} = $1;
+            $time{$file} = $1;
         }
 
     }elsif($format == 3){
 
 # WHT Jan 2000 & 2001
 
-	if(/\'OBJECT *= \'(.*)\' \//){
+        if(/\'OBJECT *= \'(.*)\' \//){
             $object{$file} = $1;
         }elsif(/\'RUN *= *(\d*) .*Run number/){
-	    $numrun{$file} = $1;
-	}elsif(/\'CAT-RA *=.* ([ \d]\d):(\d\d):(\d\d\.\d*)/){
-	    $ra{$file} = $1+$2/60.+$3/3600.;
+            $numrun{$file} = $1;
+        }elsif(/\'CAT-RA *=.* ([ \d]\d):(\d\d):(\d\d\.\d*)/){
+            $ra{$file} = $1+$2/60.+$3/3600.;
         }elsif(/\'CAT-DEC *=.*(.)(\d\d):(\d\d):(\d\d\.\d*)/){
-	    $sign = $1;
-	    $dec{$file}  = $2+$3/60.+$4/3600.;
-	    if($sign eq "-"){
-		$dec{$file} *= -1.;
-	    }elsif($sign eq " "){
-		print STDERR "WARNING: no sign found on declination in file = $file; assuming it to be positive\n";
-	    }elsif($sign ne "+"){
-		die "Failed to recognise declinations sign = $sign in file = $file\n";
-	    }
-	}elsif(/\'CAT-EQUI *=.*(\d\d\d\d\.\d*)/){
+            $sign = $1;
+            $dec{$file}  = $2+$3/60.+$4/3600.;
+            if($sign eq "-"){
+                $dec{$file} *= -1.;
+            }elsif($sign eq " "){
+                print STDERR "WARNING: no sign found on declination in file = $file; assuming it to be positive\n";
+            }elsif($sign ne "+"){
+                die "Failed to recognise declinations sign = $sign in file = $file\n";
+            }
+        }elsif(/\'CAT-EQUI *=.*(\d\d\d\d\.\d*)/){
             $equinox{$file} = $1;
         }elsif(/\'UTSTART *= .*(\d\d):(\d\d):(\d\d\S*)/){
-	    $utc{$file} = $1 + $2/60. + $3/3600.;
+            $utc{$file} = $1 + $2/60. + $3/3600.;
         }elsif(/\'DATE[-\_]OBS= .*(\d\d\d\d)-(\d\d)-(\d\d)/){
             $date{$file} = "$3/$2/$1";
         }elsif(/\'EXPOSED\s*=\s*([\.\d]+)/){
-           $time{$file} = $1;
-	}elsif(/\'ROTSKYPA\s*=\s*$float\s*\//){
-	    $slitpa{$file} = $1;
+            $time{$file} = $1;
+        }elsif(/\'ROTSKYPA\s*=\s*$float\s*\//){
+            $slitpa{$file} = $1;
         }elsif(/\'DETECTOR\s*=\s*\'\s*([^\']*?)\s*\'/){
-           $detector{$file} = $1;
+            $detector{$file} = $1;
         }elsif(/\'OBSTYPE\s*=\s*\'\s*([^\']*?)\s*\'/){
-           $source{$file} = $1;
+            $source{$file} = $1;
         }elsif(/\'INSTRUME\s*=\s*\'\s*([^\']*?)\s*\'/){
-           $instrument{$file} = $1;
+            $instrument{$file} = $1;
         }
 
     }elsif($format == 4){
 
 # INT March 2001
 
-	if(/\'OBJECT *= \'(.*)\' \//){
+        if(/\'OBJECT *= \'(.*)\' \//){
             $object{$file} = $1;
         }elsif(/\'RUN *= *(\d*) .*Run number/){
-	    $numrun{$file} = $1;
-	}elsif(/\'CAT-RA *=.* (\d\d):(\d\d):(\d\d\.\d*)/){
-	    $ra{$file} = $1+$2/60.+$3/3600.;
+            $numrun{$file} = $1;
+        }elsif(/\'CAT-RA *=.* (\d\d):(\d\d):(\d\d\.\d*)/){
+            $ra{$file} = $1+$2/60.+$3/3600.;
         }elsif(/\'CAT-DEC *=.*(.)(\d\d):(\d\d):(\d\d\.\d*)/){
-	    $sign = $1;
-	    $dec{$file}  = $2+$3/60.+$4/3600.;
-	    if($sign eq "-"){
-		$dec{$file} *= -1.;
-	    }elsif($sign eq " "){
-		print STDERR "WARNING: no sign found on declination in file = $file; assuming it to be positive\n";
-	    }elsif($sign ne "+"){
-		die "Failed to recognise declinations sign = $sign in file = $file\n";
-	    }
-	}elsif(/\'CAT-EQUI *=.*(\d\d\d\d\.\d*)/){
+            $sign = $1;
+            $dec{$file}  = $2+$3/60.+$4/3600.;
+            if($sign eq "-"){
+                $dec{$file} *= -1.;
+            }elsif($sign eq " "){
+                print STDERR "WARNING: no sign found on declination in file = $file; assuming it to be positive\n";
+            }elsif($sign ne "+"){
+                die "Failed to recognise declinations sign = $sign in file = $file\n";
+            }
+        }elsif(/\'CAT-EQUI *=.*(\d\d\d\d\.\d*)/){
             $equinox{$file} = $1;
         }elsif(/\'EXPOSED *= *(\d*)/){
-           $time{$file} = $1;
+            $time{$file} = $1;
         }elsif(/\'JD *= *(24\d\d\d\d\d\.\d\d\d\d\d\d)/){
-           $jd{$file} = $1;
+            $jd{$file} = $1;
         }elsif(/\'ROTSKYPA\s*=\s*$float\s*\//){
             $slitpa{$file} = $1;
         }
@@ -387,159 +389,159 @@ while(<LOG>){
 
 # VLT UVES pipeline data
 
-	if(/\'OBJECT\s*=\s*\'(.*)\'\s/){
+        if(/\'OBJECT\s*=\s*\'(.*)\'\s/){
             $object{$file} = $1;
         }elsif(/\'OS-EXPOI\s*=\s*(\d*)\s/){
-	    $numrun{$file} = $1;
-	}elsif(/\'RA\s*=\s*(\S*)\s/){
-	    $ra{$file} = $1/15.;
+            $numrun{$file} = $1;
+        }elsif(/\'RA\s*=\s*(\S*)\s/){
+            $ra{$file} = $1/15.;
         }elsif(/\'DEC\s*=\s*(\S*)\s/){
-	    $dec{$file} = $1;
-	}elsif(/\'EQUINOX\s*=\s*(\S*)\s/){
+            $dec{$file} = $1;
+        }elsif(/\'EQUINOX\s*=\s*(\S*)\s/){
             $equinox{$file} = $1;
         }elsif(/\'EXPTIME\s*=\s*(\S*)\s/){
-           $time{$file} = $1;
+            $time{$file} = $1;
         }elsif(/\'MJD-OBS\s*=\s*(\S*)\s/){
-           $jd{$file} = $1+2400000.5;
+            $jd{$file} = $1+2400000.5;
         }
 
     }elsif($format == 6){
 
 # SAAO
 
-	if(/\'OBJECT *= \'(.*)\' *\//){
+        if(/\'OBJECT *= \'(.*)\' *\//){
             $object{$file} = $1;
-	}elsif(/\'RA\s*=\s'(\d\d):(\d\d):(\d\d)'/){
-	    $ra{$file} = $1/15.;
+        }elsif(/\'RA\s*=\s'(\d\d):(\d\d):(\d\d)'/){
+            $ra{$file} = $1/15.;
         }elsif(/\'DEC\s*=\s*'(.)(\d\d):(\d\d):(\d\d)'/){
-	    $sign = $1;
-	    $dec{$file}  = $2+$3/60.+$4/3600.;
-	    if($sign eq "-"){
-		$dec{$file} *= -1.;
-	    }elsif($sign eq " "){
-		print STDERR "WARNING: no sign found on declination in file = $file; assuming it to be positive\n";
-	    }elsif($sign ne "+"){
-		die "Failed to recognise declinations sign = $sign in file = $file\n";
-	    }
-	}elsif(/\'EQUINOX\s*=\s*(\d\d\d\d)/){
+            $sign = $1;
+            $dec{$file}  = $2+$3/60.+$4/3600.;
+            if($sign eq "-"){
+                $dec{$file} *= -1.;
+            }elsif($sign eq " "){
+                print STDERR "WARNING: no sign found on declination in file = $file; assuming it to be positive\n";
+            }elsif($sign ne "+"){
+                die "Failed to recognise declinations sign = $sign in file = $file\n";
+            }
+        }elsif(/\'EQUINOX\s*=\s*(\d\d\d\d)/){
             $equinox{$file} = $1;
         }elsif(/\'TIME-OBS\s*=\s'(\d\d):(\d\d):(\d\d)'/){
-	    $utc{$file} = $1 + $2/60. + $3/3600.;
+            $utc{$file} = $1 + $2/60. + $3/3600.;
         }elsif(/\'DATE-OBS\s*=\s\'(\d\d\d\d)-(\d\d)-(\d\d)/){
             $date{$file} = "$3/$2/$1";
         }elsif(/\'EXPTIME\s*=\s*(\S*)/){
-           $time{$file} = $1;
+            $time{$file} = $1;
         }
 
     }elsif($format == 7){
 
 # INT April 2003
 
-	if(/\'OBJECT *= \'(.*)\' \//){
+        if(/\'OBJECT *= \'(.*)\' \//){
             $object{$file} = $1;
         }elsif(/\'RUN *= *(\d*) .*Run number/){
-	    $numrun{$file} = $1;
-	}elsif(/\'CAT-RA *=.* (\d+):(\d\d):(\d\d\.\d*)/){
-	    $ra{$file} = $1+$2/60.+$3/3600.;
+            $numrun{$file} = $1;
+        }elsif(/\'CAT-RA *=.* (\d+):(\d\d):(\d\d\.\d*)/){
+            $ra{$file} = $1+$2/60.+$3/3600.;
         }elsif(/\'CAT-DEC *=.*(.)(\d\d):(\d\d):(\d\d\.\d*)/){
-	    $sign = $1;
-	    $dec{$file}  = $2+$3/60.+$4/3600.;
-	    if($sign eq "-"){
-		$dec{$file} *= -1.;
-	    }elsif($sign eq " "){
-		print STDERR "WARNING: no sign found on declination in file = $file; assuming it to be positive\n";
-	    }elsif($sign ne "+"){
-		die "Failed to recognise declinations sign = $sign in file = $file\n";
-	    }
-	}elsif(/\'CAT-EQUI *=.*(\d\d\d\d\.\d*)/){
+            $sign = $1;
+            $dec{$file}  = $2+$3/60.+$4/3600.;
+            if($sign eq "-"){
+                $dec{$file} *= -1.;
+            }elsif($sign eq " "){
+                print STDERR "WARNING: no sign found on declination in file = $file; assuming it to be positive\n";
+            }elsif($sign ne "+"){
+                die "Failed to recognise declinations sign = $sign in file = $file\n";
+            }
+        }elsif(/\'CAT-EQUI *=.*(\d\d\d\d\.\d*)/){
             $equinox{$file} = $1;
         }elsif(/\'EXPOSED *= *(\d*)/){
-           $time{$file} = $1;
+            $time{$file} = $1;
         }elsif(/\'UTSTART *= .*(\d\d):(\d\d):(\d\d\S*)/){
-	    $utc{$file} = $1 + $2/60. + $3/3600.;
+            $utc{$file} = $1 + $2/60. + $3/3600.;
         }elsif(/\'DATE-OBS\s*=\s\'(\d\d\d\d)-(\d\d)-(\d\d)/){
             $date{$file} = "$3/$2/$1";
-	}elsif(/\'ROTSKYPA\s*=\s*$float\s*\//){
-	    $slitpa{$file} = $1;
+        }elsif(/\'ROTSKYPA\s*=\s*$float\s*\//){
+            $slitpa{$file} = $1;
         }
 
     }elsif($format == 8){
 
 # VLT FORS1 PMOS
 
-	if(/\'HIERARCH ESO OBS TARG NAME *= \'(.*)\' *\//){
+        if(/\'HIERARCH ESO OBS TARG NAME *= \'(.*)\' *\//){
             $object{$file} = $1;
         }elsif(/\'HIERARCH ESO DET EXP NO *= *(\d*)/){
-	    $numrun{$file} = $1;
-	}elsif(/\'RA *=.* (\d*\.\d*)/){
-	    $ra{$file} = $1/15.;
+            $numrun{$file} = $1;
+        }elsif(/\'RA *=.* (\d*\.\d*)/){
+            $ra{$file} = $1/15.;
         }elsif(/\'DEC *=  *(.\d*\.\d*)/){
-	    $dec{$file}  = $1;
-	}elsif(/\'EQUINOX *=.*(\d\d\d\d\.\d*)/){
+            $dec{$file}  = $1;
+        }elsif(/\'EQUINOX *=.*(\d\d\d\d\.\d*)/){
             $equinox{$file} = $1;
         }elsif(/\'EXPTIME *= *(\d*\.\d*)/){
-           $time{$file} = $1;
+            $time{$file} = $1;
         }elsif(/\'MJD-OBS *= *(\d\d\d\d\d\.\d\d*)/){
-           $jd{$file} = 2400000.5+$1;
+            $jd{$file} = 2400000.5+$1;
         }elsif(/\'HIERARCH ESO INS RETA4 POSANG *= *(-?\d*\.\d*)/){
-           $reta{$file} = $1;
+            $reta{$file} = $1;
         }elsif(/\'HIERARCH ESO INS WOLL POSANG *= *(-?\d*\.\d*)/){
-           $woll{$file} = $1;
-	}elsif(/\'HIERARCH ESO ADA POSANG\s*=\s*(-?\d*\.\d*)/){
-	    $slitpa{$file} = $1;
+            $woll{$file} = $1;
+        }elsif(/\'HIERARCH ESO ADA POSANG\s*=\s*(-?\d*\.\d*)/){
+            $slitpa{$file} = $1;
         }
 
     }elsif($format == 9){
 
 # VLT FORS2, Mar 2004
 
-	if(/\'HIERARCH ESO OBS TARG NAME *= \'(.*)\' *\//){
+        if(/\'HIERARCH ESO OBS TARG NAME *= \'(.*)\' *\//){
             $object{$file} = $1;
-	}elsif(/\'HIERARCH ESO DPR TYPE *= \'(.*)\' *\//){
+        }elsif(/\'HIERARCH ESO DPR TYPE *= \'(.*)\' *\//){
             $obstype{$file} = $1;
-	    my $source = $1;
-	    if($source =~ /sky/i){
-		$source{$file} = "data";
-	    }elsif($source =~ /flat/i){
-		$source{$file} = "flat";
-	    }elsif($source =~ /wave/i){
-		$source{$file} = "arc";
-	    }elsif($source =~ /bias/i){
-		$source{$file} = "bias";
-	    }
+            my $source = $1;
+            if($source =~ /sky/i){
+                $source{$file} = "data";
+            }elsif($source =~ /flat/i){
+                $source{$file} = "flat";
+            }elsif($source =~ /wave/i){
+                $source{$file} = "arc";
+            }elsif($source =~ /bias/i){
+                $source{$file} = "bias";
+            }
         }elsif(/\'HIERARCH ESO DET EXP NO *= *(\d*)/){
-	    $numrun{$file} = $1;
-	}elsif(/\'RA *=.* (\d*\.\d*)/){
-	    $ra{$file} = $1/15.;
+            $numrun{$file} = $1;
+        }elsif(/\'RA *=.* (\d*\.\d*)/){
+            $ra{$file} = $1/15.;
         }elsif(/\'DEC *=  *(.\d*\.\d*)/){
-	    $dec{$file}  = $1;
-	}elsif(/\'EQUINOX *=.*(\d\d\d\d\.\d*)/){
+            $dec{$file}  = $1;
+        }elsif(/\'EQUINOX *=.*(\d\d\d\d\.\d*)/){
             $equinox{$file} = $1;
         }elsif(/\'EXPTIME *= *(\d*\.\d*)/){
-           $time{$file} = $1;
+            $time{$file} = $1;
         }elsif(/\'MJD-OBS *= *(\d\d\d\d\d\.\d\d*)/){
-           $jd{$file} = 2400000.5+$1;
-	}elsif(/\'HIERARCH ESO ADA POSANG\s*=\s*(-?\d*\.\d*)/){
-	    $slitpa{$file} = $1;
+            $jd{$file} = 2400000.5+$1;
+        }elsif(/\'HIERARCH ESO ADA POSANG\s*=\s*(-?\d*\.\d*)/){
+            $slitpa{$file} = $1;
         }
 
 # Magellan LDSS3, April 2007 (JKT)
 
     }elsif($format == 10){
 
-	if(/\'OBJECT *= \'(.*)\' *\//){
+        if(/\'OBJECT *= \'(.*)\' *\//){
             $object{$file} = $1;
         }elsif(/\'EXPTYPE *= \'(.*)\' *\//){
-	    $obstype{$file} = $1;
+            $obstype{$file} = $1;
             my $source = $1;
             if($source =~ /sky/i){
-		$source{$file} = "data";
+                $source{$file} = "data";
             }elsif($source =~ /flat/i){
-		$source{$file} = "flat";
+                $source{$file} = "flat";
             }elsif($source =~ /wave/i){
-		$source{$file} = "arc";
+                $source{$file} = "arc";
             }elsif($source =~ /bias/i){
-		$source{$file} = "bias";
+                $source{$file} = "bias";
             }
         }elsif(/\'FILENAME= *\'ccd(\d*)c\d/){
             $numrun{$file} = $1;
@@ -556,30 +558,30 @@ while(<LOG>){
         }elsif(/\'UT-TIME\s*=\s'(\d\d):(\d\d):(\d\d)'/){
             $utc{$file} = $1 + $2/60. + $3/3600.;
         }elsif(/\'ROTANGLE\s*=\s*(-?\d*\.\d*)/){
-	    $slitpa{$file} = $1;
+            $slitpa{$file} = $1;
 #         }elsif(/\'DETECTOR\s*=\s*\'\s*([^\']*?)\s*\'/){
 #              $detector{$file} = $1;
         }elsif(/\'INSTRUME\s*=\s*\'\s*([^\']*?)\s*\'/){
-	    $instrument{$file} = $1;
+            $instrument{$file} = $1;
         }
 
 # Magellan IMACS, September 2007 (JKT)
 
     }elsif($format == 11){
 
-	if(/\'OBJECT *= \'(.*)\' *\//){
+        if(/\'OBJECT *= \'(.*)\' *\//){
             $object{$file} = $1;
         }elsif(/\'EXPTYPE *= \'(.*)\' *\//){
-	    $obstype{$file} = $1;
+            $obstype{$file} = $1;
             my $source = $1;
             if($source =~ /sky/i){
-		$source{$file} = "data";
+                $source{$file} = "data";
             }elsif($source =~ /flat/i){
-		$source{$file} = "flat";
+                $source{$file} = "flat";
             }elsif($source =~ /wave/i){
-		$source{$file} = "arc";
+                $source{$file} = "arc";
             }elsif($source =~ /bias/i){
-		$source{$file} = "bias";
+                $source{$file} = "bias";
             }
         }elsif(/\'FILENAME= *\'ccd(\d*)c\d/){
             $numrun{$file} = $1;
@@ -596,8 +598,8 @@ while(<LOG>){
         }elsif(/\'UT-TIME\s*=\s'(\d\d):(\d\d):(\d\d)'/){
             $utc{$file} = $1 + $2/60. + $3/3600.;
         }elsif(/\'ROTANGLE\s*=\s*(-?\d*\.\d*)/){
-	    $slitpa{$file} = $1;
-	}
+            $slitpa{$file} = $1;
+        }
 
     }elsif($format == 12){
 
@@ -605,28 +607,66 @@ while(<LOG>){
 
         $slitpa{$file} = 0.0 ;
         $numrun{$file} = int(substr($file,-1,4));
-	if(/\'OBJECT *= \'(.*)\' *\//){
+        if(/\'OBJECT *= \'(.*)\' *\//){
             $object{$file} = $1;
-	}elsif(/\'RA\s*=\s'\s*(\d\d):(\d\d):(\d\d)'/){
-	    $ra{$file} = $1+$2/60.+$3/3600.;
+        }elsif(/\'RA\s*=\s'\s*(\d\d):(\d\d):(\d\d)'/){
+            $ra{$file} = $1+$2/60.+$3/3600.;
         }elsif(/\'DEC\s*=\s*'(.)(\d\d):(\d\d):(\d\d)'/){
-	    $sign = $1;
-	    $dec{$file}  = $2+$3/60.+$4/3600.;
-	    if($sign eq "-"){
-		$dec{$file} *= -1.;
-	    }elsif($sign eq " "){
-		print STDERR "WARNING: no sign found on declination in file = $file; assuming it to be positive\n";
-	    }elsif($sign ne "+"){
-		die "Failed to recognise declinations sign = $sign in file = $file\n";
-	    }
-	}elsif(/\'EPOCH\s*=\s*(\d\d\d\d)/){
+            $sign = $1;
+            $dec{$file}  = $2+$3/60.+$4/3600.;
+            if($sign eq "-"){
+                $dec{$file} *= -1.;
+            }elsif($sign eq " "){
+                print STDERR "WARNING: no sign found on declination in file = $file; assuming it to be positive\n";
+            }elsif($sign ne "+"){
+                die "Failed to recognise declinations sign = $sign in file = $file\n";
+            }
+        }elsif(/\'EPOCH\s*=\s*(\d\d\d\d)/){
             $equinox{$file} = $1;
         }elsif(/\'UT\s*=\s'(\d\d):(\d\d):(\d\d)'/){
-	    $utc{$file} = $1 + $2/60. + $3/3600.;
+            $utc{$file} = $1 + $2/60. + $3/3600.;
         }elsif(/\'DATE-OBS\s*=\s\'(\d\d\d\d)-(\d\d)-(\d\d)/){
             $date{$file} = "$3/$2/$1";
         }elsif(/\'EXPTIME\s*=\s*(\S*)/){
-           $time{$file} = $1;
+            $time{$file} = $1;
+        }
+
+    }elsif($format == 13){
+
+# WHT Aug 2018
+
+        if(/\'OBJECT *= \'(.*)\' \//){
+            $object{$file} = $1;
+        }elsif(/\'RUN *= *(\d*) .*Run number/){
+            $numrun{$file} = $1;
+        }elsif(/\'CAT-RA *= *'([ \d]\d):(\d\d):(\d\d\.\d*)/){
+            $ra{$file} = $1+$2/60.+$3/3600.;
+        }elsif(/\'CAT-DEC *= *'(.)(\d\d):(\d\d):(\d\d\.\d*)/){
+            $sign = $1;
+            $dec{$file}  = $2+$3/60.+$4/3600.;
+            if($sign eq "-"){
+                $dec{$file} *= -1.;
+            }elsif($sign eq " "){
+                print STDERR "WARNING: no sign found on declination in file = $file; assuming it to be positive\n";
+            }elsif($sign ne "+"){
+                die "Failed to recognise declinations sign = $sign in file = $file\n";
+            }
+        }elsif(/\'CAT-EQUI *=.*(\d\d\d\d\.\d*)/){
+            $equinox{$file} = $1;
+        }elsif(/\'UTSTART *= .*(\d\d):(\d\d):(\d\d\S*)/){
+            $utc{$file} = $1 + $2/60. + $3/3600.;
+        }elsif(/\'DATE[-\_]OBS= .*(\d\d\d\d)-(\d\d)-(\d\d)/){
+            $date{$file} = "$3/$2/$1";
+        }elsif(/\'EXPOSED\s*=\s*([\.\d]+)/){
+            $time{$file} = $1;
+        }elsif(/\'ROTSKYPA\s*=\s*$float\s*\//){
+            $slitpa{$file} = $1;
+        }elsif(/\'DETECTOR\s*=\s*\'\s*([^\']*?)\s*\'/){
+            $detector{$file} = $1;
+        }elsif(/\'OBSTYPE\s*=\s*\'\s*([^\']*?)\s*\'/){
+            $source{$file} = $1;
+        }elsif(/\'INSTRUME\s*=\s*\'\s*([^\']*?)\s*\'/){
+            $instrument{$file} = $1;
         }
 
 # START EDITING!
@@ -634,7 +674,7 @@ while(<LOG>){
 # END EDITING!
 
     }else{
-	die "Regular expressions for parameter extraction not defined for format = $format!\n";
+        die "Regular expressions for parameter extraction not defined for format = $format!\n";
     }
 }
 close(LOG);
@@ -661,17 +701,17 @@ foreach $file (@files){
 # object name
 
     if(defined $object{$file}){
-	print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*32' 0 $file.more.pamela.object\n";
-	$object{$file} =~ s/^\s*//;
-	$object{$file} =~ s/\s*$//;
-	print SCRIPT "$STAR/bin/figaro/setobj \\'\"$object{$file}\"\\' $file.more.pamela.object\n";
+        print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*32' 0 $file.more.pamela.object\n";
+        $object{$file} =~ s/^\s*//;
+        $object{$file} =~ s/\s*$//;
+        print SCRIPT "$STAR/bin/figaro/setobj \\'\"$object{$file}\"\\' $file.more.pamela.object\n";
     }elsif(defined $obstype{$file}){
-	print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*32' 0 $file.more.pamela.object\n";
-	($object{$file} = $obstype{$file}) =~ s/^\s*//;
-	$object{$file} =~ s/\s*$//;
-	print SCRIPT "$STAR/bin/figaro/setobj \\'$object{$file}\\' $file.more.pamela.object\n";
+        print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*32' 0 $file.more.pamela.object\n";
+        ($object{$file} = $obstype{$file}) =~ s/^\s*//;
+        $object{$file} =~ s/\s*$//;
+        print SCRIPT "$STAR/bin/figaro/setobj \\'$object{$file}\\' $file.more.pamela.object\n";
     }else{
-	print "'object' undefined for $file\n";
+        print "'object' undefined for $file\n";
     }
 
 # Now the time. For each format we need to know exactly what the time represents
@@ -680,76 +720,76 @@ foreach $file (@files){
 # START EDITING!
     if($format == 1  || $format == 2  || $format == 3 || $format == 5 ||
        $format == 6  || $format == 7  || $format == 8 || $format == 9 ||
-       $format == 10 || $format == 11 || $format == 12) {
-	if(defined $jd{$file}){
-	    if(defined $time{$file}) {
-		$jd{$file} += $time{$file}/7200./24;
-		print "Assuming that JD grabbed represents the START of exposure of file = $file\n";
-	    }else{
-		print "JD found in $file, but not exposure time, so JD cannot be corrected\n";
-		print "and will therefore be UNDEFINED for safety\n";
-		undef $jd{$file};
-	    }
-	}elsif(defined $utc{$file}){
-	    if(defined $time{$file}){
-		$utc{$file} += $time{$file}/7200.;
-		if($utc{$file} >= 24.0){
-		    if($date{$file} =~ /(\d\d)\/(\d\d)\/(\d\d\d\d)/){
-			$utc{$file} -= 24.;
-			my ($day, $month, $year, $nday);
-			$day   = $1;
-			$month = $2;
-			$year  = $3;
-			$day++;
-			$nday  = $mdays[$month-1];
-			if($year % 4 == 0 && $month == 2){
-			    $nday++;
-			}
-			if($day > $nday){
-			    $month++;
-			    $day = 1;
-			}
-			if($month > 12){
-			    $month = 1;
-			    $year++;
-			}
-			$date{$file} = sprintf("%02d/%02d/%04d", $day, $month, $year);
-		    }else{
-			die "UTC > 24 but date cannot be corrected.\n";
-		    }
-		}
+       $format == 10 || $format == 11 || $format == 12 || $format == 13) {
+        if(defined $jd{$file}){
+            if(defined $time{$file}) {
+                $jd{$file} += ($time{$file} / 7200. / 24.);
+                print "Assuming that JD grabbed represents the START of exposure of file = $file\n";
+            }else{
+                print "JD found in $file, but not exposure time, so JD cannot be corrected\n";
+                print "and will therefore be UNDEFINED for safety\n";
+                undef $jd{$file};
+            }
+        }elsif(defined $utc{$file}){
+            if(defined $time{$file}){
+                $utc{$file} += $time{$file}/7200.;
+                if($utc{$file} >= 24.0){
+                    if($date{$file} =~ /(\d\d)\/(\d\d)\/(\d\d\d\d)/){
+                        $utc{$file} -= 24.;
+                        my ($day, $month, $year, $nday);
+                        $day   = $1;
+                        $month = $2;
+                        $year  = $3;
+                        $day++;
+                        $nday  = $mdays[$month-1];
+                        if($year % 4 == 0 && $month == 2){
+                            $nday++;
+                        }
+                        if($day > $nday){
+                            $month++;
+                            $day = 1;
+                        }
+                        if($month > 12){
+                            $month = 1;
+                            $year++;
+                        }
+                        $date{$file} = sprintf("%02d/%02d/%04d", $day, $month, $year);
+                    }else{
+                        die "UTC > 24 but date cannot be corrected.\n";
+                    }
+                }
 
-		print "Assuming that UT grabbed represents the START of exposure of file = $file\n";
-	    }else{
-		print "UTC found in $file, but not exposure time, so UTC cannot be corrected\n";
-		print "and will therefore be UNDEFINED for safety\n";
-		undef $utc{$file};
-	    }
-	}
+                print "Assuming that UT grabbed represents the START of exposure of file = $file\n";
+            }else{
+                print "UTC found in $file, but not exposure time, so UTC cannot be corrected\n";
+                print "and will therefore be UNDEFINED for safety\n";
+                undef $utc{$file};
+            }
+        }
     }elsif($format == 4){
-	if(defined $jd{$file}){
-	    print "Assuming that the JD grabbed represents the MIDDLE of exposure...\n";
-	}elsif(defined $utc{$file}){
-	    print "Assuming that UT grabbed represents the MIDDLE of exposure...\n";
-	}
+        if(defined $jd{$file}){
+            print "Assuming that the JD grabbed represents the MIDDLE of exposure...\n";
+        }elsif(defined $utc{$file}){
+            print "Assuming that UT grabbed represents the MIDDLE of exposure...\n";
+        }
     }else{
-	die "No correction to the centre of the exposure specified for format = $format!\n";
+        die "No correction to the centre of the exposure specified for format = $format!\n";
     }
 # END EDITING!
 
     if(defined $jd{$file}){
-	print SCRIPT "$STAR/bin/figaro/creobj '_DOUBLE' 0 $file.more.pamela.jd\n";
-	print SCRIPT "$STAR/bin/figaro/setobj $jd{$file} $file.more.pamela.jd\n";
+        print SCRIPT "$STAR/bin/figaro/creobj '_DOUBLE' 0 $file.more.pamela.jd\n";
+        print SCRIPT "$STAR/bin/figaro/setobj $jd{$file} $file.more.pamela.jd\n";
     }elsif(defined $utc{$file} && defined $date{$file}){
-	print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*10' 0 $file.more.pamela.date\n";
-	print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*12' 0 $file.more.pamela.utc\n";
-	print SCRIPT "$STAR/bin/figaro/setobj \\'$date{$file}\\' $file.more.pamela.date\n";
-	my $uth = int($utc{$file});
-	my $utm = int(60.*($utc{$file}-$uth));
-	my $uts = 3600.*($utc{$file}-$uth)-60.*$utm;
-	printf SCRIPT "$STAR/bin/figaro/setobj %2.2d:%2.2d:%06.3f $file.more.pamela.utc\n",$uth,$utm,$uts;
+        print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*10' 0 $file.more.pamela.date\n";
+        print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*12' 0 $file.more.pamela.utc\n";
+        print SCRIPT "$STAR/bin/figaro/setobj \\'$date{$file}\\' $file.more.pamela.date\n";
+        my $uth = int($utc{$file});
+        my $utm = int(60.*($utc{$file}-$uth));
+        my $uts = 3600.*($utc{$file}-$uth)-60.*$utm;
+        printf SCRIPT "$STAR/bin/figaro/setobj %2.2d:%2.2d:%06.3f $file.more.pamela.utc\n",$uth,$utm,$uts;
     }else{
-	print "ERROR: no time found in file = $file\n";
+        print "ERROR: no time found in file = $file\n";
     }
 
 # Night number must be defined
@@ -758,82 +798,82 @@ foreach $file (@files){
     print SCRIPT "$STAR/bin/figaro/setobj $night   $file.more.pamela.night\n";
 
     if(defined $numrun{$file}){
-	print SCRIPT "$STAR/bin/figaro/creobj '_INTEGER' 0 $file.more.pamela.numrun\n";
-	print SCRIPT "$STAR/bin/figaro/setobj $numrun{$file}  $file.more.pamela.numrun\n";
+        print SCRIPT "$STAR/bin/figaro/creobj '_INTEGER' 0 $file.more.pamela.numrun\n";
+        print SCRIPT "$STAR/bin/figaro/setobj $numrun{$file}  $file.more.pamela.numrun\n";
     }else{
-	print "Run number not defined for file = $file\n";
+        print "Run number not defined for file = $file\n";
     }
 
     if(defined $time{$file}){
-	print SCRIPT "$STAR/bin/figaro/creobj '_REAL' 0 $file.more.pamela.time\n";
-	print SCRIPT "$STAR/bin/figaro/setobj $time{$file}    $file.more.pamela.time\n";
+        print SCRIPT "$STAR/bin/figaro/creobj '_REAL' 0 $file.more.pamela.time\n";
+        print SCRIPT "$STAR/bin/figaro/setobj $time{$file}    $file.more.pamela.time\n";
     }else{
-	print "Exposure time not defined for file = $file\n";
+        print "Exposure time not defined for file = $file\n";
     }
 
     if(defined $ra{$file} && defined $dec{$file} && defined $equinox{$file}){
-	print SCRIPT "$STAR/bin/figaro/creobj '_DOUBLE' 0 $file.more.pamela.ra\n";
-	print SCRIPT "$STAR/bin/figaro/setobj $ra{$file}      $file.more.pamela.ra\n";
-	print SCRIPT "$STAR/bin/figaro/creobj '_DOUBLE' 0 $file.more.pamela.dec\n";
-	print SCRIPT "$STAR/bin/figaro/setobj $dec{$file}     $file.more.pamela.dec\n";
-	print SCRIPT "$STAR/bin/figaro/creobj '_DOUBLE' 0 $file.more.pamela.equinox\n";
-	print SCRIPT "$STAR/bin/figaro/setobj $equinox{$file} $file.more.pamela.equinox\n";
+        print SCRIPT "$STAR/bin/figaro/creobj '_DOUBLE' 0 $file.more.pamela.ra\n";
+        print SCRIPT "$STAR/bin/figaro/setobj $ra{$file}      $file.more.pamela.ra\n";
+        print SCRIPT "$STAR/bin/figaro/creobj '_DOUBLE' 0 $file.more.pamela.dec\n";
+        print SCRIPT "$STAR/bin/figaro/setobj $dec{$file}     $file.more.pamela.dec\n";
+        print SCRIPT "$STAR/bin/figaro/creobj '_DOUBLE' 0 $file.more.pamela.equinox\n";
+        print SCRIPT "$STAR/bin/figaro/setobj $equinox{$file} $file.more.pamela.equinox\n";
     }else{
-	print "One or more of ra, dec and equinox undefined for file = $file, so none of them saved\n";
+        print "One or more of ra, dec and equinox undefined for file = $file, so none of them saved\n";
     }
 
     if(defined $slitpa{$file}){
-	print SCRIPT "$STAR/bin/figaro/creobj '_REAL' 0 $file.more.pamela.slitpa\n";
-	print SCRIPT "$STAR/bin/figaro/setobj $slitpa{$file}    $file.more.pamela.slitpa\n";
+        print SCRIPT "$STAR/bin/figaro/creobj '_REAL' 0 $file.more.pamela.slitpa\n";
+        print SCRIPT "$STAR/bin/figaro/setobj $slitpa{$file}    $file.more.pamela.slitpa\n";
     }else{
-	print "Slit PA time not defined for file = $file\n";
+        print "Slit PA time not defined for file = $file\n";
     }
 
 
     if(defined $source{$file}){
-	if($source{$file} =~ /flat/i){
-	    print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*4' 0 $file.more.pamela.source\n";
-	    print SCRIPT "$STAR/bin/figaro/setobj FLAT        $file.more.pamela.source\n";
-	}elsif($source{$file} =~ /dark/i){
-	    print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*4' 0 $file.more.pamela.source\n";
-	    print SCRIPT "$STAR/bin/figaro/setobj DARK        $file.more.pamela.source\n";
-	}elsif($source{$file} =~ /bias/i){
-	    print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*4' 0 $file.more.pamela.source\n";
-	    print SCRIPT "$STAR/bin/figaro/setobj BIAS        $file.more.pamela.source\n";
-	}elsif($source{$file} =~ /arc/i){
-	    print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*4' 0 $file.more.pamela.source\n";
-	    print SCRIPT "$STAR/bin/figaro/setobj ARC         $file.more.pamela.source\n";
-	}elsif($source{$file} =~ /data/i || $source{$file} =~ /target/i){
-	    print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*4' 0 $file.more.pamela.source\n";
-	    print SCRIPT "$STAR/bin/figaro/setobj DATA        $file.more.pamela.source\n";
-	}elsif($source{$file} =~ /sky/i){
-	    print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*4' 0 $file.more.pamela.source\n";
-	    print SCRIPT "$STAR/bin/figaro/setobj SKY         $file.more.pamela.source\n";
-	}
+        if($source{$file} =~ /flat/i){
+            print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*4' 0 $file.more.pamela.source\n";
+            print SCRIPT "$STAR/bin/figaro/setobj FLAT        $file.more.pamela.source\n";
+        }elsif($source{$file} =~ /dark/i){
+            print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*4' 0 $file.more.pamela.source\n";
+            print SCRIPT "$STAR/bin/figaro/setobj DARK        $file.more.pamela.source\n";
+        }elsif($source{$file} =~ /bias/i){
+            print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*4' 0 $file.more.pamela.source\n";
+            print SCRIPT "$STAR/bin/figaro/setobj BIAS        $file.more.pamela.source\n";
+        }elsif($source{$file} =~ /arc/i){
+            print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*4' 0 $file.more.pamela.source\n";
+            print SCRIPT "$STAR/bin/figaro/setobj ARC         $file.more.pamela.source\n";
+        }elsif($source{$file} =~ /data/i || $source{$file} =~ /target/i){
+            print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*4' 0 $file.more.pamela.source\n";
+            print SCRIPT "$STAR/bin/figaro/setobj DATA        $file.more.pamela.source\n";
+        }elsif($source{$file} =~ /sky/i){
+            print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*4' 0 $file.more.pamela.source\n";
+            print SCRIPT "$STAR/bin/figaro/setobj SKY         $file.more.pamela.source\n";
+        }
     }
 
     if(defined $detector{$file}){
-	print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*20' 0 $file.more.pamela.detector\n";
-	print SCRIPT "$STAR/bin/figaro/setobj \\'$detector{$file}\\' $file.more.pamela.detector\n";
+        print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*20' 0 $file.more.pamela.detector\n";
+        print SCRIPT "$STAR/bin/figaro/setobj \\'$detector{$file}\\' $file.more.pamela.detector\n";
     }
 
     if(defined $instrument{$file}){
-	print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*20' 0 $file.more.pamela.instrument\n";
-	print SCRIPT "$STAR/bin/figaro/setobj \\'$instrument{$file}\\' $file.more.pamela.instrument\n";
+        print SCRIPT "$STAR/bin/figaro/creobj '_CHAR*20' 0 $file.more.pamela.instrument\n";
+        print SCRIPT "$STAR/bin/figaro/setobj \\'$instrument{$file}\\' $file.more.pamela.instrument\n";
     }
 
 
 # Special section for the VLT spectropolarimetry
 
     if($format == 8){
-	if(defined $reta{$file} && $woll{$file}){
-	    my $angle = $woll{$file} - $reta{$file};
-	    print SCRIPT "$STAR/bin/figaro/creobj Struct 0 $file.more.pamela.vlt_fors1\n";
-	    print SCRIPT "$STAR/bin/figaro/creobj '_DOUBLE' 0 $file.more.pamela.vlt_fors1.angle\n";
-	    print SCRIPT "$STAR/bin/figaro/setobj $angle $file.more.pamela.vlt_fors1.angle\n";
-	}else{
-	    print "Either or both of reta and woll not defined for file = $file\n";
-	}
+        if(defined $reta{$file} && $woll{$file}){
+            my $angle = $woll{$file} - $reta{$file};
+            print SCRIPT "$STAR/bin/figaro/creobj Struct 0 $file.more.pamela.vlt_fors1\n";
+            print SCRIPT "$STAR/bin/figaro/creobj '_DOUBLE' 0 $file.more.pamela.vlt_fors1.angle\n";
+            print SCRIPT "$STAR/bin/figaro/setobj $angle $file.more.pamela.vlt_fors1.angle\n";
+        }else{
+            print "Either or both of reta and woll not defined for file = $file\n";
+        }
     }
 
 # format code stored in case of problems
