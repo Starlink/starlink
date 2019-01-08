@@ -17,10 +17,10 @@
 \stardocauthors   {R.F.~Warren-Smith\\ M.D.~Lawden\\
                                 B.K.~McIlwrath \\ T.~Jenness\\ P.W.~Draper\\
                                 D.S.~Berry}
-\stardocdate        {20th November 2018}
+\stardocdate        {8th January 2019}
 \stardoctitle       {HDS\\ [\latex{1ex}]
                                 Hierarchical Data System}
-\stardocversion     {Version 6.1}
+\stardocversion     {Version 6.2}
 \stardocmanual      {Programmer's Manual}
 \stardocabstract  {
 HDS is a library of functions used for accessing file-based hierarchical
@@ -1809,6 +1809,7 @@ library.
 \textbf{\htmlref{DAT\_COERC}{DAT_COERC}}\st{(loc1,ndim;loc2,status)} -- Coerce object shape \\
 \textbf{\htmlref{DAT\_COPY}{DAT_COPY}}\st{(loc1,loc2,name;status)} -- Copy object \\
 \textbf{\htmlref{DAT\_DREP}{DAT_DREP}}\st{(loc;format,order,status)} -- Obtain primitive data representation information\\
+\textbf{\htmlref{DAT\_DSAME}{DAT_DSAME}}\st{(loc1,loc2;same,status)} -- Are two primitive data representations the same?\\
 \textbf{\htmlref{DAT\_ERASE}{DAT_ERASE}}\st{(loc,name;status)} -- Erase component \\
 \textbf{\htmlref{DAT\_ERMSG}{DAT_ERMSG}}\st{(status;length,msg)} -- Translate error status\\
 \textbf{\htmlref{DAT\_FIND}{DAT_FIND}}\st{(loc1,name;loc2,status)} -- Find named component \\
@@ -3249,8 +3250,16 @@ be addressed
       }
    }
    \sstnotes{
-      Not all combinations of data format and storage order are
-      supported.
+      \sstitemlist{
+
+         \sstitem Not all combinations of data format and storage order are
+                  supported.
+
+         \sstitem This routine may only be used with objects stored using
+                  HDS data formats that pre-date version 5. An error is
+                  reported if the supplied object is stored using data
+                  format version 5 or later.
+      }
    }
    \sstdiytopic{
       Data Format
@@ -3320,6 +3329,47 @@ be addressed
       }
       In the case of floating point formats, the byte in question is the
       most/least significant byte of the fraction.
+   }
+}
+\sstroutine{
+   DAT\_DSAME
+}{
+   Check if two primitive objects have the same data representation.
+}{
+   \sstdescription{
+      The routine returns a flag indicating if the two supplied objects
+      (which must both be primitive) are stored using the same data
+      representation. See also DAT\_DREP.
+   }
+   \sstinvocation{
+      CALL DAT\_DSAME( LOC1, LOC2, SAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LOC1 = CHARACTER \astar\ ( DAT\_\_SZLOC ) (Given)
+      }{
+         First primitive object \htmlref{locator}{sect:locators}.
+      }
+      \sstsubsection{
+         LOC2 = CHARACTER \astar\ ( DAT\_\_SZLOC ) (Given)
+      }{
+         Second primitive object \htmlref{locator}{sect:locators}.
+      }
+      \sstsubsection{
+         SAME = LOGICAL (Returned)
+      }{
+         .TRUE. if and only if the two objects use the same data
+         representation.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      Unlike DAT\_DREP, this routine may be used on objects stored in
+      using any HDS data format, including version 5 and later.
    }
 }
 \sstroutine{

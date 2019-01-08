@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="hds" support="S">
-  <version>6.1</version>
+  <version>6.2</version>
   <path>libraries/hds</path>
   <description>Hierarchical Data System</description>
   <abstract>

@@ -404,6 +404,37 @@ F77_SUBROUTINE(dat_drep)( CHARACTER(locator),
    }
 }
 
+F77_SUBROUTINE(dat_dsame)( CHARACTER(loc1),
+                           CHARACTER(loc2),
+                           LOGICAL(same),
+                           INTEGER(status )
+	                   TRAIL(loc1)
+	                   TRAIL(loc2) )
+{
+
+/*=============================================================*/
+/* DAT_DSAME - Are two primitive data representations the same?*/
+/*=============================================================*/
+
+/* Local variables.     */
+   HDSLoc *loc1_c = NULL;
+   HDSLoc *loc2_c = NULL;
+   hdsbool_t same_c;
+
+/* Import the locator strings */
+   datImportFloc( loc1, loc1_length, &loc1_c, status);
+   datImportFloc( loc2, loc2_length, &loc2_c, status);
+
+/* Call pure C routine */
+   datDsame( loc1_c, loc2_c, &same_c, status);
+
+   if( same_c )
+      *same = F77_TRUE;
+   else
+      *same = F77_FALSE;
+
+}
+
 F77_SUBROUTINE(dat_erase)( CHARACTER(locator),
                            CHARACTER(name),
                            F77_INTEGER_TYPE *status

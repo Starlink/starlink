@@ -105,6 +105,13 @@ int datCut( HDSLoc *loc1, char *str, HDSLoc **loc2, int *status );
 int
 datDrep(const HDSLoc *locator, char **format_str, char **order_str, int *status);
 
+/*============================================================*/
+/* datDsame - Are two primitive data representations the same?*/
+/*============================================================*/
+
+int
+datDsame(const HDSLoc *loc1, const HDSLoc *loc2, hdsbool_t *same, int *status);
+
 /*========================================*/
 /* datErase - Erase object                */
 /*========================================*/

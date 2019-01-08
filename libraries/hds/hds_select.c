@@ -343,6 +343,45 @@ datCopy(const HDSLoc *locator1, const HDSLoc *locator2, const char *name_c, int 
   return *status;
 }
 
+/*==============================================================*/
+/* datDsame - See if 2 objects have the same data representation*/
+/*==============================================================*/
+
+int
+datDsame(const HDSLoc *loc1, const HDSLoc *loc2, hdsbool_t *same,
+         int *status) {
+  char format1[ 20 ];
+  char order1[ 10 ];
+  char *fmt;
+  char *ord;
+
+  *same = 0;
+
+  int retval = 0;
+  int instat = *status;
+  int isv51 = ISHDSv5(loc1);
+  int isv52 = ISHDSv5(loc2);
+  EnterCheck("datDsame",*status);
+  if (isv51 && isv52) {
+    retval = datDsame_v5(loc1, loc2, same, status);
+  } else if (!isv51 && !isv52) {
+    LOCK_MUTEX;
+    retval = datDrep_v4(loc1, &fmt, &ord, status);
+    if( *status == SAI__OK ) {
+       strcpy( format1, fmt );
+       strcpy( order1, ord );
+       retval = datDrep_v4(loc2, &fmt, &ord, status);
+       if( *status == SAI__OK ) {
+          *same = ( !strcmp(format1,fmt) && !strcmp(order1,ord) );
+       }
+    }
+    UNLOCK_MUTEX;
+  }
+  HDS_CHECK_STATUS("datDsame",(isv51 ? "(v5)" : "(v4)"));
+  return retval;
+}
+
+
 /*============================================================*/
 /* datDrep - Obtain primitive data representation information */
 /*============================================================*/

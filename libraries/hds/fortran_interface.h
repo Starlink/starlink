@@ -142,6 +142,13 @@ F77_SUBROUTINE(dat_drep)( CHARACTER(locator),
                           TRAIL(format)
                           TRAIL(order) );
 
+F77_SUBROUTINE(dat_dsame)( CHARACTER(loc1),
+                           CHARACTER(loc2),
+                           LOGICAL(same),
+                           INTEGER(status)
+   	                   TRAIL(loc1)
+                           TRAIL(loc2) );
+
 F77_SUBROUTINE(dat_erase)( CHARACTER(locator),
                            CHARACTER(name),
                            F77_INTEGER_TYPE *status
