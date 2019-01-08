@@ -67,6 +67,10 @@
 *        are found.
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL
+*     8-JAN-2019 (DSB):
+*        Use DAT_DSAME (added at version 6 of the HDS library) instead
+*        of DAT_DREP, since DAT_DREP is not available for files that use
+*        version 5 of the HDS format.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -95,10 +99,6 @@
       PARAMETER ( SZPATH = 256 )
 
 *  Local Variables:
-      CHARACTER * ( 10 ) FORM1 ! Original data format
-      CHARACTER * ( 10 ) FORM2 ! Required data format
-      CHARACTER * ( 10 ) ORDER1 ! Original byte order
-      CHARACTER * ( 10 ) ORDER2 ! Required byte order
       CHARACTER * ( DAT__SZLOC ) LOCP ! Parent structure locator
       CHARACTER * ( DAT__SZLOC ) LOCSCR ! Scratch object locator
       CHARACTER * ( DAT__SZLOC ) LOCTMP ! Temporary structure locator
@@ -114,6 +114,7 @@
       INTEGER SIZE( 1 )          ! Object size
       LOGICAL FIRST              ! First invocation?
       LOGICAL PRIM               ! Object primitive?
+      LOGICAL DSAME              ! Are the data representations equal?
       SAVE LOCTMP
       SAVE FIRST
 
@@ -147,10 +148,9 @@
             CALL DAT_NEW( LOCTMP, 'SCRATCH', TYPE, 0, DIM, STATUS )
             CALL DAT_FIND( LOCTMP, 'SCRATCH', LOCSCR, STATUS )
 
-*  Obtain data representation information for both objects. Annul the
-*  scratch object locator and erase the associated object.
-            CALL DAT_DREP( LOC, FORM1, ORDER1, STATUS )
-            CALL DAT_DREP( LOCSCR, FORM2, ORDER2, STATUS )
+*  See if the data representation is the same for both objects. Annul
+*  the scratch object locator and erase the associated object.
+            CALL DAT_DSAME( LOC, LOCSCR, DSAME, STATUS )
             CALL DAT_ANNUL( LOCSCR, STATUS )
             CALL DAT_ERASE( LOCTMP, 'SCRATCH', STATUS )
          END IF
@@ -158,7 +158,7 @@
 *  Check if the object needs to be converted. If so, obtain its name,
 *  shape, size and length.
          IF ( STATUS .EQ. SAI__OK ) THEN
-            IF ( ( FORM1 .NE. FORM2 ) .OR. ( ORDER1 .NE. ORDER2 ) ) THEN
+            IF ( .NOT. DSAME ) THEN
                CALL DAT_NAME( LOC, NAME, STATUS )
                CALL DAT_SHAPE( LOC, DAT__MXDIM, DIM, NDIM, STATUS )
                CALL DAT_SIZE( LOC, SIZE( 1 ), STATUS )
