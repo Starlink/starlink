@@ -557,6 +557,15 @@
 *        size of the AST mask. This was a bug. What was intended was
 *        that the AST mask should be no more than 20% of the good pixels,
 *        and the PCA mask should be no more than 10% of the good pixels.
+*     9-JAN-2019 (DSB):
+*        - When processing old (pre 20150930) and new data together in skyloop, 
+*        ensure that the pointing correction required for old data is not also 
+*        applied to the new data. 
+*        - Fix bug that caused wrong pointing corrections to be used when 
+*        skyloop is used to process multiple observations that do not all have 
+*        the same reference point.
+*        - Prevent POINT_DX/Y FITS headers being stored in maps if no pointing 
+*        correction was used.
 
 '''
 
@@ -873,15 +882,24 @@ def StoreCorrections( qui_maps, imap, use_ref_for_alignment, ref ):
       else:
          aligner = qui_maps[key]
 
-#  Find the pixel shift that aligns features in this masked, trimmed I map
-#  with corresponding features in the reference map. Also get the RMS residual
-#  between the two maps after alignment, and store the corresponding
-#  weight.
+#  The individual observation map may not use the same WCS as the coadd
+#  (e.g. different observations of the same source may use different
+#  reference positions), so now align the observation map with the coadd
+#  so that they both use the same pixel grid.
+      aligner_A = NDG( 1 )
+      invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
+             "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
+             format(aligner,aligner_A,aref))
+
+#  Find the pixel shift that aligns features in this masked, trimmed,
+#  aligned I map with corresponding features in the reference map. Also
+#  get the RMS residual between the two maps after alignment, and store
+#  the corresponding weight.
       try:
          aligned = NDG(1)
          invoke("$KAPPA_DIR/align2d ref={0} out={2} in={1} form=3 "
                 "method=sincsinc rebin=no conserve=no params=\[0,2\]".
-                format(aref,aligner,aligned))
+                format(aref,aligner_A,aligned))
          dx = float( get_task_par( "TR(1)", "align2d" ) )
          dy = float( get_task_par( "TR(4)", "align2d" ) )
          rms = float( get_task_par( "RMS", "align2d" ) )
@@ -2127,14 +2145,18 @@ try:
 
 #  Create a text file holding the pointing corrections for all input
 #  time-streams. First include any AZ/EL pointing correction, for
-#  data between 20150606 and 20150930.
+#  data between 20150606 and 20150930, ensuring the correction goes
+#  to zero for later data (skyloop process multiple observations
+#  simultaneously, so old and new observations may be processed together).
             if azelcor:
                pntfile = NDG.tempfile()
                fd = open(pntfile,"w")
                fd.write("# system=azel\n")
                fd.write("# tai dlon dlat\n")
-               fd.write("54000 32.1 27.4\n")
-               fd.write("56000 32.1 27.4\n")
+               fd.write("57179 32.1 27.4\n")
+               fd.write("57295.5 32.1 27.4\n")
+               fd.write("57295.6 0.0 0.0\n")
+               fd.write("57295.7 0.0 0.0\n")
                fd.close()
             else:
                pntfile = "!"
@@ -2428,7 +2450,9 @@ try:
             else:
                msg_out("\nMaking {1} map from {0}...\n".format(key,qui) )
 
-#  AZ/EL pointing correction, for data between 20150606 and 20150930.
+#  AZ/EL pointing correction, for data between 20150606 and 20150930. Not
+#  using skyloop here, so only one observation will be processed at any one
+#  time, so no danger of having old and new data files together.
             ut = int(get_fits_header( isdf[0], "UTDATE", True ))
             if ut >= 20150606 and ut <= 20150929:
                pntfile = NDG.tempfile()
@@ -2575,19 +2599,19 @@ try:
                         again = False
 
 #  Store FITS headers holding the pointing corrections that were actually used.
-                  if pntfile != "!":
+                  if dx is not None:
                      sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(1)'".
                                         format(qui_maps[key]))
                      invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=POINT_DX "
                             "edit=a value={1} comment=\"'Used {2} pointing correction [arcsec]'\""
                             " position=! mode=interface".format(qui_maps[key],dx,sym))
 
+                  if dy is not None:
                      sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(2)'".
                                   format(qui_maps[key]))
                      invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=POINT_DY "
                             "edit=a value={1} comment=\"'Used {2} pointing correction [arcsec]'\""
                             " position=! mode=interface".format(qui_maps[key],dy,sym))
-
 
 #  If makemap failed, warn the user and delete any map that was created,
 #  and pass on to the next observation chunk.
