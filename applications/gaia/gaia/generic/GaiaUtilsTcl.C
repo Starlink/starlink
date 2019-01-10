@@ -144,6 +144,10 @@ static int GaiaUtilsGtROIPlots( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsFitsMoc( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsRegion( ClientData clientData, Tcl_Interp *interp,
+                            int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsRegionMoc( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsRegionType( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsShiftWcs( ClientData clientData, Tcl_Interp *interp,
@@ -265,6 +269,12 @@ int GaiaUtils_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::fitsmoc", GaiaUtilsFitsMoc,
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::region", GaiaUtilsRegion,
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::regionmoc", GaiaUtilsRegionMoc,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::regiontype", GaiaUtilsRegionType,
@@ -2183,10 +2193,203 @@ static int GaiaUtilsFitsMoc( ClientData clientData, Tcl_Interp *interp,
         return TCL_OK;
     }
     astClearStatus;
-    Tcl_SetResult( interp, "Failed to create STC region", TCL_VOLATILE );
+    Tcl_SetResult( interp, "Failed to create MOC from FITS data",
+                   TCL_VOLATILE );
     return TCL_ERROR;
 }
 
+/**
+ * Create an AST MOC from an AST Region.
+ *
+ * Accepts two arguments the address of the current AST frameset
+ * with a celestial coordinate system connected to grid coordinates,
+ * and a region defined in grid coordinates.
+ *
+ * The result is the address of the new object.
+ */
+static int GaiaUtilsRegionMoc( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] )
+{
+    /* Check arguments, need  2. */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset region" );
+        return TCL_ERROR;
+    }
+
+    /* Get the coordinate frameset. */
+    long adr;
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    AstFrameSet *frmset = (AstFrameSet *) adr;
+
+    /* And the Region. */
+    if ( Tcl_GetLongFromObj( interp, objv[2], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    AstRegion *region = (AstRegion *) adr;
+
+    /* Need to add the Region to the SkyFrame. */
+    int current = astGetI( frmset, "Current" );
+    astAddFrame( frmset, AST__BASE, astUnitMap( 2, " " ), region );
+    astSetI( frmset, "Current", current );
+
+    /* Create an empty Moc. XXX MaxRes? */
+    AstMoc *moc = astMoc( " " );
+
+    /* Add the Region to it. */
+    astAddRegion( moc, AST__OR, region);
+
+    /* Export the new object as a long containing the address */
+    if ( astOK ) {
+        Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) moc ) );
+        return TCL_OK;
+    }
+    astClearStatus;
+    Tcl_SetResult( interp, "Failed to create MOC from FITS data",
+                   TCL_VOLATILE );
+    return TCL_ERROR;
+}
+
+
+/**
+ * Create an AST region from a description in grid coordinates.
+ *
+ * There is one required argument the region type (circle, etc.)
+ * followed by the arguments needed to define it.
+ * The result is the address of the new object.
+ */
+static int GaiaUtilsRegion( ClientData clientData, Tcl_Interp *interp,
+                            int objc, Tcl_Obj *CONST objv[] )
+{
+    if ( objc < 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "region c1 c2 ..." );
+        return TCL_ERROR;
+    }
+    const char *type = Tcl_GetString( objv[1] );
+    AstRegion *region = NULL;
+
+    /* Box, Circle, Ellipse, Polygon. */
+    if ( strcmp( type, "box" ) == 0 ) {
+        if ( objc != 6 ) {
+            Tcl_WrongNumArgs( interp, 1, objv, "box c11 c12 c21 c22" );
+            return TCL_ERROR;
+        }
+
+        /* Need two points at opposite corners. */
+        double p1[2];
+        double p2[2];
+        if ( Tcl_GetDoubleFromObj( interp, objv[2], &p1[0] ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        if ( Tcl_GetDoubleFromObj( interp, objv[3], &p1[1] ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        if ( Tcl_GetDoubleFromObj( interp, objv[4], &p2[0] ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        if ( Tcl_GetDoubleFromObj( interp, objv[5], &p2[1] ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+
+        /* And create the region. */
+        AstFrame *frame = astFrame( 2, "Title=Grid coordinates" );
+        region = (AstRegion *) astBox( frame, 2, p1, p2, NULL, " " );
+        astAnnul( frame );
+    }
+    else if ( strcmp( type, "circle" ) == 0 ) {
+        if ( objc != 5 ) {
+            Tcl_WrongNumArgs( interp, 1, objv, "circle c1 c2 radius" );
+            return TCL_ERROR;
+        }
+
+        /* Need two points the centre and radius. */
+        double p1[2];
+        double p2[2];
+        if ( Tcl_GetDoubleFromObj( interp, objv[2], &p1[0] ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        if ( Tcl_GetDoubleFromObj( interp, objv[3], &p1[1] ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        if ( Tcl_GetDoubleFromObj( interp, objv[4], &p2[0] ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+
+        /* And create the region. */
+        AstFrame *frame = astFrame( 2, "Title=Grid coordinates" );
+        region = (AstRegion *) astCircle( frame, 1, p1, p2, NULL, " " );
+        astAnnul( frame );
+    }
+    else if ( strcmp( type, "ellipse" ) == 0 ) {
+        if ( objc != 8 ) {
+            Tcl_WrongNumArgs( interp, 1, objv, "ellipse c1 c2 p11 p12 p21 p22" );
+            return TCL_ERROR;
+        }
+
+        /* Need three points the centre, the semi-major and minor lengths,
+           and the angle. */
+        double p1[2];
+        double p2[2];
+        double p3[2];
+        if ( Tcl_GetDoubleFromObj( interp, objv[2], &p1[0] ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        if ( Tcl_GetDoubleFromObj( interp, objv[3], &p1[1] ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        if ( Tcl_GetDoubleFromObj( interp, objv[4], &p2[0] ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        if ( Tcl_GetDoubleFromObj( interp, objv[5], &p2[1] ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        if ( Tcl_GetDoubleFromObj( interp, objv[6], &p3[0] ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+
+        /* And create the region. */
+        AstFrame *frame = astFrame( 2, "Title=Grid coordinates" );
+        region = (AstRegion *) astEllipse( frame, 1, p1, p2, p3, NULL, " " );
+        astAnnul( frame );
+    }
+    else if ( strcmp( type, "polygon" ) == 0 ) {
+        if ( objc < 9 ) {
+            Tcl_WrongNumArgs( interp, 1, objv,
+                              "polygon npoints p11 p12 p21 p22 p31 p32 ..." );
+            return TCL_ERROR;
+        }
+
+        /* Get number of points. */
+        int np = 0;
+        if ( Tcl_GetIntFromObj( interp, objv[2], &np ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        double points[np];
+
+        for (int i = 0; i < np; i++) {
+            if ( Tcl_GetDoubleFromObj( interp, objv[2+i], &points[i] ) != TCL_OK ) {
+                return TCL_ERROR;
+            }
+        }
+
+        /* And create the region. */
+        AstFrame *frame = astFrame( 2, "Title=Grid coordinates" );
+        region = (AstRegion *) astPolygon( frame, np, 2, points, NULL, " " );
+        astAnnul( frame );
+    }
+
+    /* Export the new object as a long containing the address */
+    if ( astOK && region != NULL ) {
+        Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) region ) );
+        return TCL_OK;
+    }
+    if ( !astOK ) {
+        astClearStatus;
+    }
+    Tcl_SetResult( interp, "Failed to create AST region", TCL_VOLATILE );
+    return TCL_ERROR;
+}
 
 /**
  * Create an AST region from an STC-S description.
