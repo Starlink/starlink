@@ -69,6 +69,8 @@
 #        Original version.
 #     5-JUL-1996 (PWD):
 #        Converted to itcl2.0.
+#     11-JAN-2019 (PWD):
+#        Added getcoords and getregion.
 #     {enter_further_changes_here}
 
 #-
@@ -99,8 +101,8 @@ itcl::class gaia::StarArdRotBox {
    #  Methods:
    #  --------
 
-   #  Return the ARD description of the object.
-   method getard {{do_update 1}} {
+   #  Get the coordinates of the canvas object.
+   method getcoords {{do_update 1}} {
 
       #  Make sure that the coords are up to date, if allowed.
       if { $do_update} { update $canvas_id_ resize }
@@ -112,7 +114,36 @@ itcl::class gaia::StarArdRotBox {
       set major [image_dist [expr $smaj*2.0]]
       set minor [image_dist [expr $smin*2.0]]
       set angle [image_angle $ang]
+      return [list $x $y $major $minor $angle]
+   }
+
+   #  Return the ARD description of the object.
+   method getard {{do_update 1}} {
+      lassign [getcoords $do_update] x y major minor angle
       return "ROTBOX($x,$y,$major,$minor,$angle)"
+   }
+
+   #  Return an "AST" region description of the object.
+   method getregion {{do_update 1}} {
+      lassign [get_coords $do_update] x y major minor angle
+
+      #  We really need a polygon.
+      set cost [expr cos(angle * acos(-1)/180.0)]
+      set sint [expr sin(angle * acos(-1)/180.0)]
+
+      # Apply rotation and offset around centre.
+      set x0 [expr ( $x + ( $major*$cost ) - ( $minor*$sint ))]
+      set y0 [expr ( $y + ( $major*$sint ) + ( $minor*$cost ))]
+      set x1 [expr ( $x - ( $major*$cost ) - ( $minor*$sint ))]
+      set y1 [expr ( $y - ( $major*$sint ) + ( $minor*$cost ))]
+      set x2 [expr ( $x - ( $major*$cost ) + ( $minor*$sint ))]
+      set y2 [expr ( $y - ( $major*$sint ) - ( $minor*$cost ))]
+      set x3 [expr ( $x + ( $major*$cost ) + ( $minor*$sint ))]
+      set y3 [expr ( $y + ( $major*$sint ) - ( $minor*$cost ))]
+      set x4 $x0;
+      set y4 $y0;
+
+      return "polygon $x0 $y0 $x1 $y1 $x2 $y2 $x3 $y3 $x4 $y4"
    }
 
    #  Set the properties of the object to those of an ARD description

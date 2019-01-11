@@ -14,7 +14,6 @@
 #     ARD box region. It provides the basic draw facilities and
 #     returns an ARD description of the region.
 
-
 #  Invocations:
 #
 #        StarArdBox object_name [configuration options]
@@ -71,7 +70,9 @@
 #        Original version.
 #     6-JUL-1996 (PWD):
 #        Converted to itcl2.0.
-#     {enter_further_changes_here}
+#     11-JAN-2019 (PWD):
+#        Added getcoords and getregion.
+     {enter_further_changes_here}
 
 #-
 
@@ -101,11 +102,12 @@ itcl::class gaia::StarArdBox {
    #  Methods:
    #  --------
 
-   #  Return the ARD description of the object.
-   method getard {{do_update 1}} {
+   #  Get the coordinates of the canvas object.
+   method getcoords {{do_update 1}} {
 
       #  Make sure that the coords are up to date, if allowed.
       if { $do_update} { update $canvas_id_ resize }
+
       lassign $coords x0 y0 x1 y1
       lassign [image_coord $x0 $y0] x0 y0
       lassign [image_coord $x1 $y1] x1 y1
@@ -115,7 +117,19 @@ itcl::class gaia::StarArdBox {
       set ycen [expr $y0+($yside/2.0)]
       set xside [expr abs($xside)]
       set yside [expr abs($yside)]
+      return [list $xcen $ycen $xside $yside]
+   }
+
+   #  Return the ARD description of the object.
+   method getard {{do_update 1}} {
+      lassign [get_coords_ $do_update] xcen ycen xside yside
       return "BOX($xcen,$ycen,$xside,$yside)"
+   }
+
+   #  Return an "AST" region description of the object.
+   method getregion {{do_update 1}} {
+      lassign [get_coords $do_update] xcen ycen xside yside
+      return "box $xcen $ycen $xside $yside"
    }
 
    #  Set the properties of the object to those of an ARD description

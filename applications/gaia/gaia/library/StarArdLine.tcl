@@ -70,6 +70,8 @@
 #        Original version.
 #     6-JUL-1996 (PWD):
 #        Converted to itcl2.0.
+#     11-JAN-2019 (PWD):
+#        Added getcoords and getregion.
 #     {enter_further_changes_here}
 
 #-
@@ -100,16 +102,27 @@ itcl::class gaia::StarArdLine {
    #  Methods:
    #  --------
 
-   #  Return the ARD description of the object.
-   method getard {{do_update 1}} {
-
+   #  Get the coordinates of the canvas object.
+   method getcoords {{do_update 1}} {
       #  Make sure that the coords are up to date, if allowed.
       if { $do_update} { update $canvas_id_ resize }
       lassign $coords x0 y0 x1 y1
       lassign [image_coord $x0 $y0] xlower ylower
       lassign [image_coord $x1 $y1] xupper yupper
       set endpoints "$xlower $ylower $xupper $yupper"
+      return [list $xlower $ylower $xupper $yupper]
+   }
+
+   #  Return the ARD description of the object.
+   method getard {{do_update 1}} {
+      lassign [getcoords $do_update] xlower ylower xupper yupper
       return "LINE($xlower,$ylower,$xupper,$yupper)"
+   }
+
+   #  Return an "AST" region description of the object.
+   method getregion {{do_update 1}} {
+      lassign [getcoords $do_update] xlower ylower xupper yupper
+      return "polygon $xlower $ylower $xupper $yupper $xlower $ylower"
    }
 
    #  Set the properties of the object to those of an ARD description

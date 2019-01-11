@@ -107,6 +107,8 @@
 #        Original version.
 #     6-JUL-1996 (PWD):
 #        Converted to itcl2.0.
+#     11-JAN-2019 (PWD):
+#        Added getcoords and getregion.
 #     {enter_further_changes_here}
 
 #-
@@ -137,8 +139,8 @@ itcl::class gaia::StarArdRect {
    #  Methods:
    #  --------
 
-   #  Return the ARD description of the object.
-   public method getard {{do_update 1}} {
+   #  Get the coordinates of the canvas object.
+   public method getcoords {{do_update 1}} {
 
       #  Make sure that the coords are up to date, if allowed.
       if { $do_update} { update $canvas_id_ resize }
@@ -146,7 +148,19 @@ itcl::class gaia::StarArdRect {
       lassign [image_coord $x0 $y0] xlower ylower
       lassign [image_coord $x1 $y1] xupper yupper
       set corners "$xlower $ylower $xupper $yupper"
+      return [list $xlower $ylower $xupper $yupper]
+   }
+
+   #  Return the ARD description of the object.
+   public method getard {{do_update 1}} {
+      lassign [getcoords] xlower ylower xupper yupper
       return "RECT($xlower,$ylower,$xupper,$yupper)"
+   }
+
+   #  Return an "AST" region description of the object.
+   method getregion {{do_update 1}} {
+      lassign [getcoords] xlower ylower xupper yupper
+      return "box $xlower $ylower $xupper $yupper"
    }
 
    #  Set the properties of the object to those of an ARD description

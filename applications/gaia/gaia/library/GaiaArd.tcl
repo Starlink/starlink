@@ -16,6 +16,8 @@
 #
 #     It also runs the applications ARDSTAT and ARDMASK to get
 #     statistics on the image regions and extract or remove parts.
+#
+#     The regions can be converted and save as an IVOA FITS MOC.
 
 #  Invocations:
 #
@@ -182,6 +184,8 @@
 #        GaiaArd. Added short_help.
 #     26-APR-2006 (PWD):
 #        Added -image option to support volatile cube slices.
+#     11-JAN-2019 (PWD):
+#        Added FITS MOC support.
 #     {enter_further_changes_here}
 #-
 
@@ -253,6 +257,16 @@ itcl::class gaia::GaiaArd {
       $short_help_win_ add_menu_short_help $File \
          {Read ARD description...} \
          {Read a simple ARD description from a file}
+
+      #  Save regions to a FITS MOC.
+      $File add command \
+         -label {Save to FITS MOC...} \
+         -command [code $this save_fitsmoc] \
+         -accelerator {Control-f}
+      bind $w_ <Control-s> [code $this save_fitsmoc]
+      $short_help_win_ add_menu_short_help $File \
+         {Save to FITS MOC...} \
+         {Save the current ARD regions to FITS MOC file}
 
       #  Set the exit menu item.
       $File add command -label Exit \
@@ -512,6 +526,15 @@ itcl::class gaia::GaiaArd {
                -exists 0]
       }
       return [$tempimages_ get_name]
+   }
+
+   #  Save ARD description to a FITS MOC.
+   public method save_fitsmoc {{filename ""}} {
+      if { $filename == "" } {
+         $Toolbox_ save_moc
+      } else {
+         $Toolbox_ save_fitsmoc $filename
+      }
    }
 
    #  Save ARD description to a file.

@@ -70,6 +70,8 @@
 #        Original version.
 #     6-JUL-1996 (PWD):
 #        Converted to itcl2.0.
+#     11-JAN-2019 (PWD):
+#        Added getcoords and getregion.
 #     {enter_further_changes_here}
 
 #-
@@ -100,8 +102,8 @@ itcl::class gaia::StarArdRow {
    #  Methods:
    #  --------
 
-   #  Return the ARD description of the object.
-   method getard {{do_update 1}} {
+   #  Return the coordinates of the canvas object.
+   method getcoords {{do_update 1}} {
 
       #  Make sure that the coords are up to date, if allowed.
       if { $do_update} { update $canvas_id_ resize }
@@ -110,7 +112,18 @@ itcl::class gaia::StarArdRow {
 
       # Rows should really be specified in pixel indices.
       set y [expr round($y0+0.5)]
+      return $y
+   }
+
+   #  Return the ARD description of the object.
+   method getard {{do_update 1}} {
+      set y [getcoords $do_update]
       return "ROW($y)"
+   }
+
+   #  Return an "AST" region description of the object. This is invalid.
+   method getregion {{do_update 1}} {
+      return {}
    }
 
    #  Set the properties of the object to those of an ARD description

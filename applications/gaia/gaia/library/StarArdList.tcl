@@ -13,7 +13,8 @@
 #     It controls the creation of many objects from an ARD description
 #     stored in a file (the format at this time must be simple and
 #     just consist of REGION(parameter) statements). It also writes a
-#     description of the current ARD regions to disk file.
+#     description of the current ARD regions to disk file and can
+#     convert some regions into FITS MOCs.
 
 #  Invocations:
 #
@@ -129,6 +130,8 @@
 #        Original version.
 #     5-JUL-1996 (PWD):
 #        Converted to itcl2.0.
+#     11-JAN_2019 (PWD):
+#        Added FITS MOCs updates.
 #     {enter_further_changes_here}
 
 #-
@@ -266,6 +269,41 @@ itcl::class gaia::StarArdList {
          }
       }
       return $desc
+   }
+
+   #  Write the description of the currently selected regions to a
+   #  FITS file as a MOC. Requires the AST frameset of the displayed image.
+   method save_fitsmoc {frameset filename} {
+      set regions {}
+
+      #  Get a list of the currently selected objects and convert
+      #  into AST regions.
+      for {set i 1} {$i <= $highest_index_} {incr i} {
+         if { [info exists objects_($i)] } {
+            if { [$objects_($i) is_selected] } {
+               set desc [$objects_($i) getregion]
+               if {$desc != {}} {
+                  puts "$desc [llength $desc]"
+                  lappend regions [eval gaiautils::region $desc]
+               }
+            }
+         }
+      }
+      puts $regions
+      if { $regions != {} } {
+         #  Create the MOC.
+         set moc [gaiautils::regionmoc $frameset $regions]
+
+         #  And save.
+         gaiautils::fitsmocwrite $moc $filename
+
+         #  Clean up.
+         foreach region $regions {
+            gaiautils::astannul $region
+         }
+         gaiautils::astannul $moc
+      }
+      return 1
    }
 
    #  Create an ARD region of the given type.

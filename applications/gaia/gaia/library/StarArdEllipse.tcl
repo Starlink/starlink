@@ -69,6 +69,8 @@
 #        Original version.
 #     5-JUL-1996 (PWD):
 #        Converted to itcl2.0.
+#     11-JAN-2019 (PWD):
+#        Added getcoords and getregion.
 #     {enter_further_changes_here}
 
 #-
@@ -99,8 +101,8 @@ itcl::class gaia::StarArdEllipse {
    #  Methods:
    #  --------
 
-   #  Return the ARD description of the object.
-   method getard {{do_update 1}} {
+   #  Get the coordinates of the canvas object.
+   method getcoords {{do_update 1}} {
 
       #  Make sure that the coords are up to date, if allowed.
       if { $do_update} { update $canvas_id_ resize }
@@ -112,7 +114,19 @@ itcl::class gaia::StarArdEllipse {
       set semimajor [image_dist $maj]
       set semiminor [image_dist $min]
       set angle [image_angle $ang]
+      return [list $x $y $semimajor $semiminor $angle]
+   }
+
+   #  Return the ARD description of the object.
+   method getard {{do_update 1}} {
+      lassign [getcoords $do_update] x y semimajor semiminor angle
       return "ELLIPSE($x,$y,$semimajor,$semiminor,$angle)"
+   }
+
+   #  Return an "AST" region description of the object.
+   method getregion {{do_update 1}} {
+      lassign [getcoords $do_update] x y semimajor semiminor angle
+      return "ellipse $x $y $semimajor $semiminor $angle"
    }
 
    #  Set the properties of the object to those of an ARD description

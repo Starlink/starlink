@@ -13,7 +13,8 @@
 #     This class creates a class that can populates other frames with
 #     buttons for controlling the creation of ARD regions on a canvas
 #     with an RTD image displayed. It also provides methods for
-#     reading and writing ARD descriptions.
+#     reading and writing ARD descriptions and converting
+#     some to IVOA FITS MOCs.
 
 #  Invocations:
 #
@@ -171,6 +172,8 @@
 #        There was a conflict with an rtd bitmap named "rect", use "rectangle"
 #     4-FEB-1999 (ALLAN)
 #        Added [code ...] to object_list_ for correct scope in tcl8
+#     11-JAN-2019 (PWD):
+#        Added export to IVOA FITS MOCs.
 #     {enter_further_changes_here}
 
 #-
@@ -193,14 +196,14 @@ itcl::class gaia::StarArdTool {
 
       #  Create the StarArdList object to deal with the ARD objects.
       set object_list_ [code [gaia::${routine_prefix}List \#auto \
-				 -canvasdraw $canvasdraw \
-				 -canvas $canvas \
-				 -rtdimage $rtdimage \
-				 -notify_created_cmd \
+                                 -canvasdraw $canvasdraw \
+                                 -canvas $canvas \
+                                 -rtdimage $rtdimage \
+                                 -notify_created_cmd \
                                     [code $this created_object_] \
-				 -selected_colour $selected_colour \
-				 -deselected_colour $deselected_colour \
-				 -continuous_updates $continuous_updates]]
+                                 -selected_colour $selected_colour \
+                                 -deselected_colour $deselected_colour \
+                                 -continuous_updates $continuous_updates]]
    }
 
    #  Destructor:
@@ -368,11 +371,11 @@ itcl::class gaia::StarArdTool {
       set col 0
       foreach i [$object_list_ known_types {}] {
          set l [string tolower $i]
-	 set bitmap $l
-	 # allan: conflict with rtd bitmap named "rect", use "rectangle" here...
-	 if {"$bitmap" == "rect"} {
-	     set bitmap rectangle
-	 }
+         set bitmap $l
+         # allan: conflict with rtd bitmap named "rect", use "rectangle" here...
+         if {"$bitmap" == "rect"} {
+             set bitmap rectangle
+         }
          set b [button $Buttonbox_.$l \
                    -bitmap $bitmap \
                    -bd 3 \
@@ -439,6 +442,29 @@ itcl::class gaia::StarArdTool {
       if { $object_list_ != {} } {
          $object_list_ clear
       }
+   }
+
+   #  Save the ARD description to a FITS MOC.
+   public method save_moc {} {
+      if { $routine_prefix == "StarArd" } {
+         set w [FileSelect .\#auto -title "Save MOC"]
+         if {[$w activate]} {
+            save_fitsmoc [$w get]
+         }
+         destroy $w
+      } else {
+         error "Cannot save Annular regions as MOCs" 
+      }
+   }
+
+   #  Save the current description to the named file as a FITS MOC.
+   method save_fitsmoc {filename} {
+      if { $filename != {} } {
+         set frmset [$rtdimage astgetclone]
+         set ok [$object_list_ save_fitsmoc $frmset $filename]
+         gaiautils::astannul $frmset
+      }
+      return $ok
    }
 
    #  Configuration options: (public variables)

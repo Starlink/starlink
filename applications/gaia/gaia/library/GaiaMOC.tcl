@@ -272,7 +272,7 @@ itcl::class gaia::GaiaMOC {
 
          #  And draw...
          for {set i 0} {$i < $index_} {incr i} {
-            set moc [gaiautils::fitsmoc $filename_($i)]
+            set moc [gaiautils::fitsmocread $filename_($i)]
             $itk_option(-rtdimage) mocplot $moc $attributes
             gaiautils::astannul $moc
          }

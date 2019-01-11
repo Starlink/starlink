@@ -69,6 +69,8 @@
 #        Original version.
 #     5-JUL-1996 (PWD):
 #        Converted to itcl2.0.
+#     11-JAN-2019 (PWD):
+#        Added getcoords and getregion.
 #     {enter_further_changes_here}
 
 #-
@@ -100,18 +102,27 @@ itcl::class gaia::StarArdCircle {
    #  Methods:
    #  --------
 
-   #  Return the ARD description of the object.
-   method getard {{do_update 1}} {
-
+   #  Get the coordinates of the canvas object.
+   method getcoords {{do_update 1}} {
       #  Make sure that the coords are up to date, if allowed.
-      if { $do_update} {
-         update $canvas_id_ resize
-      }
+      if { $do_update} {update $canvas_id_ resize}
       lassign $coords x y
       lassign [image_coord $x $y] x y
       set rad [$canvas itemcget $canvas_id_ -semimajor]
       set rad [image_dist $rad]
+      return [list $x $y $rad]
+   }
+
+   #  Return the ARD description of the object.
+   method getard {{do_update 1}} {
+      lassign [getcoords $do_update] x y rad
       return "$unary_operator CIRCLE($x,$y,$rad)"
+   }
+
+   #  Return an "AST" region description of the object.
+   method getregion {{do_update 1}} {
+      lassign [getcoords $do_update] x y rad
+      return "circle $x $y $rad"
    }
 
    #  Set the properties of the object to those of an ARD description

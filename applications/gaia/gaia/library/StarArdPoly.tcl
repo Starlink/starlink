@@ -70,6 +70,8 @@
 #        Original version.
 #     5-JUL-1996 (PWD):
 #        Converted to itcl2.0.
+#     11-JAN-2019 (PWD):
+#        Added getcoords and getregion.
 #     {enter_further_changes_here}
 
 #-
@@ -100,24 +102,37 @@ itcl::class gaia::StarArdPoly {
    #  Methods:
    #  --------
 
+   #  Get the coordinates of the canvas object.
+   method getcoords {{do_update 1}} {
+
+      #  Make sure that the coords are up to date, if allowed.
+      if { $do_update} { update $canvas_id_ resize }
+      process_coords_ $coords
+      return $vertices
+   }
+
+
    #  Return the ARD description of the object.
    method getard {{do_update 1}} {
 
       #  Make sure that the coords are up to date, if allowed.
       if { $do_update} { update $canvas_id_ resize }
       process_coords_ $coords
-      set two 0
       set desc "POLYGON("
-      foreach coord $vertices {
-         append desc "$coord,"
-         incr two
-         if { $two == 2 } {
-            append desc "\n"
-            set two 0
-         }
+      foreach {p1 p2} $vertices {
+         append desc "$p1,$p2\n"
       }
       set desc "[string trim $desc ",\n"])"
       return "$desc"
+   }
+
+   #  Return an "AST" region description of the object.
+   method getregion {{do_update 1}} {
+
+      #  Make sure that the coords are up to date, if allowed.
+      if { $do_update} { update $canvas_id_ resize }
+      process_coords_ $coords
+      return "polygon $vertices"
    }
 
    #  Set the properties of the object to those of an ARD description
