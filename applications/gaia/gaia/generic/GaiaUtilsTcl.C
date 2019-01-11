@@ -142,8 +142,10 @@ static int GaiaUtilsGtFrame( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGtROIPlots( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] );
-static int GaiaUtilsFitsMoc( ClientData clientData, Tcl_Interp *interp,
-                             int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsFitsMocRead( ClientData clientData, Tcl_Interp *interp,
+                                 int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsFitsMocWrite( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsRegion( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsRegionMoc( ClientData clientData, Tcl_Interp *interp,
@@ -268,8 +270,13 @@ int GaiaUtils_Init( Tcl_Interp *interp )
                           GaiaUtilsGtROIPlots, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "gaiautils::fitsmoc", GaiaUtilsFitsMoc,
-                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
+    Tcl_CreateObjCommand( interp, "gaiautils::fitsmocread",
+                          GaiaUtilsFitsMocRead, (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::fitsmocwrite",
+                          GaiaUtilsFitsMocWrite, (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::region", GaiaUtilsRegion,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
@@ -2103,8 +2110,8 @@ static int GaiaUtilsGrfAddColour( ClientData clientData, Tcl_Interp *interp,
  * Accepts one argument the name of a file containing the MOC.
  * The result is the address of the new object.
  */
-static int GaiaUtilsFitsMoc( ClientData clientData, Tcl_Interp *interp,
-                             int objc, Tcl_Obj *CONST objv[] )
+static int GaiaUtilsFitsMocRead( ClientData clientData, Tcl_Interp *interp,
+                                 int objc, Tcl_Obj *CONST objv[] )
 {
     const char *filename = NULL;
     AstMoc * moc = NULL;
@@ -2199,11 +2206,91 @@ static int GaiaUtilsFitsMoc( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
- * Create an AST MOC from an AST Region.
+ * Write an AST MOC to a FITS file.
  *
- * Accepts two arguments the address of the current AST frameset
- * with a celestial coordinate system connected to grid coordinates,
- * and a region defined in grid coordinates.
+ * Accepts two arguments the address of the MOC and the name of a file
+ * to write the MOC into.
+ */
+static int GaiaUtilsFitsMocWrite( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] )
+{
+    /* Check arguments, need 2. */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "AST-MOC FITS-file" );
+        return TCL_ERROR;
+    }
+
+    /* Get the MOC and FITS filename. */
+    long adr;
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    AstMoc *moc = (AstMoc *) adr;
+    const char *filename = Tcl_GetString( objv[2] );
+
+    /*  Get the length and width of the MOC. */
+    int nb = astGetI( moc, "MOCTYPE" );
+    int ln = astGetI( moc, "MOCLENGTH" );
+    char *data = new char[ nb * ln ];
+
+    /* Get the data to be put in the UNIQ column of the binary table. */
+    astGetMocData( moc, nb * ln, data );
+
+    /*  Get the FitsChan holding the required headers for the binary table. */
+    AstFitsChan *chan = (AstFitsChan *)astGetMocHeader( moc );
+
+    /*  Use FITSIO to create the FITS file and put the data into a binary table
+     *  extension. Delete any pre-existing file with the same name. */
+    fitsfile *fptr;
+    int status;
+    fits_create_file( &fptr, filename, &status );
+
+    int fval = 1;
+    fits_write_key( fptr, TLOGICAL, "SIMPLE", &fval, " ", &status );
+    fval = 8;
+    fits_write_key( fptr, TINT, "BITPIX", &fval, " ", &status );
+    fval = 0;
+    fits_write_key( fptr, TINT, "NAXIS", &fval, " ", &status );
+    fval = 1;
+    fits_write_key( fptr, TLOGICAL, "EXTEND", &fval, " ", &status );
+
+    fits_create_hdu( fptr, &status );
+
+    astClear( chan, "Card" );
+    int ncards = astGetI( chan, "Ncard" );
+    char card[81];
+    for ( int i = 0; i < ncards; i++ ) {
+        astFindFits( chan, "%f", card, 1 );
+        card[80] = '\0';
+        fits_insert_card( fptr, card, &status );
+    }
+    if ( nb == 4 ) {
+        fits_write_col_int( fptr, 1, 1, 1, ln, (int *)data, &status );
+    } else {
+        fits_write_col_lnglng( fptr, 1, 1, 1, ln, (LONGLONG *)data, &status );
+    }
+    fits_close_file( fptr, &status );
+
+    /* XXX handle errors */
+
+    /*  Free resources. */
+    astAnnul( chan );
+
+    if (!astOK) {
+        astClearStatus;
+        Tcl_SetResult( interp, "Failed to save the MOC to a FITS file",
+                       TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+/**
+ * Create an AST MOC from AST Regions.
+ *
+ * Accepts two or more arguments which are the address of the current AST
+ * frameset with a celestial coordinate system connected to grid coordinates,
+ * and a number of regions, defined in grid coordinates, to be added.
  *
  * The result is the address of the new object.
  */
@@ -2211,8 +2298,8 @@ static int GaiaUtilsRegionMoc( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] )
 {
     /* Check arguments, need  2. */
-    if ( objc != 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "frameset region" );
+    if ( objc < 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset region ..." );
         return TCL_ERROR;
     }
 
@@ -2223,22 +2310,26 @@ static int GaiaUtilsRegionMoc( ClientData clientData, Tcl_Interp *interp,
     }
     AstFrameSet *frmset = (AstFrameSet *) adr;
 
-    /* And the Region. */
-    if ( Tcl_GetLongFromObj( interp, objv[2], &adr ) != TCL_OK ) {
-        return TCL_ERROR;
-    }
-    AstRegion *region = (AstRegion *) adr;
-
-    /* Need to add the Region to the SkyFrame. */
-    int current = astGetI( frmset, "Current" );
-    astAddFrame( frmset, AST__BASE, astUnitMap( 2, " " ), region );
-    astSetI( frmset, "Current", current );
-
     /* Create an empty Moc. XXX MaxRes? */
     AstMoc *moc = astMoc( " " );
 
-    /* Add the Region to it. */
-    astAddRegion( moc, AST__OR, region);
+    /* And add the Regions. */
+    for ( int i = 0; i < objc - 2; i++ ) {
+        if ( Tcl_GetLongFromObj( interp, objv[i+2], &adr ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        AstRegion *region = (AstRegion *) adr;
+
+        /* Need to convert the Region to the SkyFrame coordinates. */
+        AstRegion *skyregion = (AstRegion *) astMapRegion( region, frmset,
+                                                           frmset );
+
+        /* Add the Region to it. */
+        astAddRegion( moc, AST__OR, skyregion );
+
+        /* Tidy up. */
+        astAnnul( skyregion );
+    }
 
     /* Export the new object as a long containing the address */
     if ( astOK ) {
@@ -2246,7 +2337,7 @@ static int GaiaUtilsRegionMoc( ClientData clientData, Tcl_Interp *interp,
         return TCL_OK;
     }
     astClearStatus;
-    Tcl_SetResult( interp, "Failed to create MOC from FITS data",
+    Tcl_SetResult( interp, "Failed to create MOC from region description",
                    TCL_VOLATILE );
     return TCL_ERROR;
 }
@@ -2262,8 +2353,8 @@ static int GaiaUtilsRegionMoc( ClientData clientData, Tcl_Interp *interp,
 static int GaiaUtilsRegion( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] )
 {
-    if ( objc < 4 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "region c1 c2 ..." );
+    if ( objc < 3 ) {
+        Tcl_WrongNumArgs( interp, objc, objv, "region c1 c2 ..." );
         return TCL_ERROR;
     }
     const char *type = Tcl_GetString( objv[1] );
