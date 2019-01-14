@@ -122,7 +122,28 @@ itcl::class gaia::StarArdLine {
    #  Return an "AST" region description of the object.
    method getregion {{do_update 1}} {
       lassign [getcoords $do_update] xlower ylower xupper yupper
-      return "polygon $xlower $ylower $xupper $yupper $xlower $ylower"
+      lassign [grid_coord $xlower $ylower] xlower ylower
+      lassign [grid_coord $xupper $yupper] xupper yupper
+
+      set dx [expr ($xupper-$xlower)]
+      set dy [expr ($yupper-$ylower)]
+
+      set result "polygon 5 "
+      if {$dx > $dy} {
+         append result "$xlower [expr $ylower+0.5] "
+         append result "$xlower [expr $ylower-0.5] "
+         append result "$xupper [expr $yupper-0.5] "
+         append result "$xupper [expr $yupper+0.5] "
+         append result "$xlower [expr $ylower+0.5]"
+      } else {
+         append result "[expr $xlower+0.5] $ylower "
+         append result "[expr $xlower-0.5] $ylower "
+         append result "[expr $xupper-0.5] $yupper "
+         append result "[expr $xupper+0.5] $yupper "
+         append result "[expr $xlower+0.5] $ylower"
+      }
+      puts "$result"
+      return $result
    }
 
    #  Set the properties of the object to those of an ARD description

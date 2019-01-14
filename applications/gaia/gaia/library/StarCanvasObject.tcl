@@ -312,6 +312,22 @@ itcl::class gaia::StarCanvasObject {
       }
    }
 
+   #  Convert from image coordinates to grid coordinates, i.e.
+   #  remove the origin and 1/2 pixel.
+   method grid_coord { x y } {
+      if { $rtdimage != {} } {
+         if { $use_origins } {
+            $rtdimage origin xo yo
+         } else {
+            set xo 1.0
+            set yo 1.0
+         }
+         set x [expr $x+1.5-$xo]
+         set y [expr $y+1.5-$yo]
+      }
+      return "$x $y"
+   }
+
    #  Convert from canvas coordinates to image coordinates.
    method image_coord { x y } {
       if { $rtdimage != {} } {

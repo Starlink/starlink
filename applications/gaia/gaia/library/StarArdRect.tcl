@@ -159,7 +159,9 @@ itcl::class gaia::StarArdRect {
 
    #  Return an "AST" region description of the object.
    method getregion {{do_update 1}} {
-      lassign [getcoords] xlower ylower xupper yupper
+      lassign [getcoords $do_update] xlower ylower xupper yupper
+      lassign [grid_coord $xlower $ylower] xlower ylower
+      lassign [grid_coord $xupper $yupper] xupper yupper
       return "box $xlower $ylower $xupper $yupper"
    }
 

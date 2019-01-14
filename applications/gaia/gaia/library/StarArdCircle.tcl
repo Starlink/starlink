@@ -122,6 +122,7 @@ itcl::class gaia::StarArdCircle {
    #  Return an "AST" region description of the object.
    method getregion {{do_update 1}} {
       lassign [getcoords $do_update] x y rad
+      lassign [grid_coord $x $y] x y
       return "circle $x $y $rad"
    }
 

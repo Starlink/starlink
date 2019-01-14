@@ -125,11 +125,14 @@ itcl::class gaia::StarArdRotBox {
 
    #  Return an "AST" region description of the object.
    method getregion {{do_update 1}} {
-      lassign [get_coords $do_update] x y major minor angle
+      lassign [getcoords $do_update] x y major minor angle
+      lassign [grid_coord $x $y] x y
+      set major [expr $major*0.5]
+      set minor [expr $minor*0.5]
 
       #  We really need a polygon.
-      set cost [expr cos(angle * acos(-1)/180.0)]
-      set sint [expr sin(angle * acos(-1)/180.0)]
+      set cost [expr cos($angle * acos(-1)/180.0)]
+      set sint [expr sin($angle * acos(-1)/180.0)]
 
       # Apply rotation and offset around centre.
       set x0 [expr ( $x + ( $major*$cost ) - ( $minor*$sint ))]
@@ -143,7 +146,7 @@ itcl::class gaia::StarArdRotBox {
       set x4 $x0;
       set y4 $y0;
 
-      return "polygon $x0 $y0 $x1 $y1 $x2 $y2 $x3 $y3 $x4 $y4"
+      return "polygon 4 $x0 $y0 $x1 $y1 $x2 $y2 $x3 $y3 $x4 $y4"
    }
 
    #  Set the properties of the object to those of an ARD description

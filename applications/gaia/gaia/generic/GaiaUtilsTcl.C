@@ -2241,8 +2241,8 @@ static int GaiaUtilsFitsMocWrite( ClientData clientData, Tcl_Interp *interp,
 
     /*  Use FITSIO to create the FITS file and put the data into a binary table
      *  extension. Delete any pre-existing file with the same name. */
-    fitsfile *fptr;
-    int status;
+    fitsfile *fptr = NULL;
+    int status = 0;
     fits_create_file( &fptr, filename, &status );
 
     int fval = 1;
@@ -2367,7 +2367,7 @@ static int GaiaUtilsRegion( ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
 
-        /* Need two points at opposite corners. */
+        /* Need two corners. */
         double p1[2];
         double p2[2];
         if ( Tcl_GetDoubleFromObj( interp, objv[2], &p1[0] ) != TCL_OK ) {
@@ -2385,7 +2385,7 @@ static int GaiaUtilsRegion( ClientData clientData, Tcl_Interp *interp,
 
         /* And create the region. */
         AstFrame *frame = astFrame( 2, "Title=Grid coordinates" );
-        region = (AstRegion *) astBox( frame, 2, p1, p2, NULL, " " );
+        region = (AstRegion *) astBox( frame, 1, p1, p2, NULL, " " );
         astAnnul( frame );
     }
     else if ( strcmp( type, "circle" ) == 0 ) {
@@ -2413,13 +2413,13 @@ static int GaiaUtilsRegion( ClientData clientData, Tcl_Interp *interp,
         astAnnul( frame );
     }
     else if ( strcmp( type, "ellipse" ) == 0 ) {
-        if ( objc != 8 ) {
-            Tcl_WrongNumArgs( interp, 1, objv, "ellipse c1 c2 p11 p12 p21 p22" );
+        if ( objc != 7 ) {
+            Tcl_WrongNumArgs( interp, 1, objv, "ellipse c1 c2 semi-major"
+                              "semi-minor angle " );
             return TCL_ERROR;
         }
 
-        /* Need three points the centre, the semi-major and minor lengths,
-           and the angle. */
+        /* Need the centre, the semi-major and minor lengths and the angle. */
         double p1[2];
         double p2[2];
         double p3[2];
@@ -2456,17 +2456,20 @@ static int GaiaUtilsRegion( ClientData clientData, Tcl_Interp *interp,
         if ( Tcl_GetIntFromObj( interp, objv[2], &np ) != TCL_OK ) {
             return TCL_ERROR;
         }
-        double points[np];
+        double points[np * 2];
 
         for (int i = 0; i < np; i++) {
-            if ( Tcl_GetDoubleFromObj( interp, objv[2+i], &points[i] ) != TCL_OK ) {
+            if ( Tcl_GetDoubleFromObj( interp, objv[3+(i*2)], &points[i] ) != TCL_OK ) {
+                return TCL_ERROR;
+            }
+            if ( Tcl_GetDoubleFromObj( interp, objv[3+(i*2)+1], &points[i+np] ) != TCL_OK ) {
                 return TCL_ERROR;
             }
         }
 
         /* And create the region. */
         AstFrame *frame = astFrame( 2, "Title=Grid coordinates" );
-        region = (AstRegion *) astPolygon( frame, np, 2, points, NULL, " " );
+        region = (AstRegion *) astPolygon( frame, np, np, points, NULL, " " );
         astAnnul( frame );
     }
 

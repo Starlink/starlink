@@ -128,8 +128,11 @@ itcl::class gaia::StarArdBox {
 
    #  Return an "AST" region description of the object.
    method getregion {{do_update 1}} {
-      lassign [get_coords $do_update] xcen ycen xside yside
-      return "box $xcen $ycen $xside $yside"
+      lassign [get_coords $do_update] xo yo xside yside
+      lassign [grid_coord $xo $yo] xo yo
+      set xcorn [expr $xo + $xside]
+      set ycorn [expr $yo + $yside]
+      return "box $xo $yxo $xcorn $ycorn"
    }
 
    #  Set the properties of the object to those of an ARD description

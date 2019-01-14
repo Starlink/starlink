@@ -125,7 +125,7 @@ itcl::class gaia::StarArdPixel {
    #  Return an "AST" region description of the object.
    method getregion {{do_update 1}} {
       lassign [getcoords $do_update] x y
-      return "box [expr $x-0.5] [expr $y-0.5] [expr $x+0.5] [expr $y+0.5]]"
+      return "box [expr $x-0.5] [expr $y-0.5] [expr $x+0.5] [expr $y+0.5]"
    }
 
    #  Set the properties of the object to those of an ARD description

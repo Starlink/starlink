@@ -126,6 +126,8 @@ itcl::class gaia::StarArdEllipse {
    #  Return an "AST" region description of the object.
    method getregion {{do_update 1}} {
       lassign [getcoords $do_update] x y semimajor semiminor angle
+      lassign [grid_coord $x $y] x y
+      set angle [expr (90.0-$angle) * acos(-1)/180.0]
       return "ellipse $x $y $semimajor $semiminor $angle"
    }
 

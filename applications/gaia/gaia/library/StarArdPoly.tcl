@@ -132,7 +132,15 @@ itcl::class gaia::StarArdPoly {
       #  Make sure that the coords are up to date, if allowed.
       if { $do_update} { update $canvas_id_ resize }
       process_coords_ $coords
-      return "polygon $vertices"
+
+      #  Correct vertices from image to grid coordinates.
+      set gridpos {}
+      set np 0
+      foreach {p1 p2} $vertices {
+         append gridpos "[grid_coord $p1 $p2] "
+         incr np
+      }
+      return "polygon $np $gridpos"
    }
 
    #  Set the properties of the object to those of an ARD description
