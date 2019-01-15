@@ -272,8 +272,9 @@ itcl::class gaia::StarArdList {
    }
 
    #  Write the description of the currently selected regions to a
-   #  FITS file as a MOC. Requires the AST frameset of the displayed image.
-   method save_fitsmoc {frameset filename} {
+   #  FITS file as a MOC. Requires the AST frameset of the displayed image
+   #  and the maximum resolution of an image pixel in arcsecs.
+   method save_fitsmoc {frameset maxres filename} {
       set regions {}
 
       #  Get a list of the currently selected objects and convert
@@ -284,7 +285,7 @@ itcl::class gaia::StarArdList {
                set desc [$objects_($i) getregion]
                if {$desc != {}} {
                   puts "$desc [llength $desc]"
-                  lappend regions [eval gaiautils::region $desc]
+                  append regions [eval gaiautils::region $desc]
                }
             }
          }
@@ -292,7 +293,7 @@ itcl::class gaia::StarArdList {
       puts $regions
       if { $regions != {} } {
          #  Create the MOC.
-         set moc [gaiautils::regionmoc $frameset $regions]
+         set moc [gaiautils::regionmoc $frameset $maxres $regions]
 
          #  And save.
          gaiautils::fitsmocwrite $moc $filename

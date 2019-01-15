@@ -917,13 +917,27 @@ int StarFitsIO::setHDUByName( const char *extname, int extver )
     return FitsIO::setHDU( hdu );
 }
 
+/**
+ * Get the contents of the given column as an array of ints.
+ * The caller should pass an array of numValues ints.
+ */
+int StarFitsIO::getTableColumn(int col, int *values, int numValues)
+{
+    if ( !fitsio_ ) return 1;
 
+    int status = 0, anynull = 0;
+    if ( fits_read_col( fitsio_, TINT, col, 1, 1, numValues, NULL,
+                        values, &anynull, &status ) != 0 )
+        return cfitsio_error();
+
+    return 0;
+}
 
 /**
  * Get the contents of the given column as an array of longs.
  * The caller should pass an array of numValues longs.
  */
-int StarFitsIO::getTableColumn(int col, long* values, int numValues)
+int StarFitsIO::getTableColumn(int col, long *values, int numValues)
 {
     if ( !fitsio_ ) return 1;
 
@@ -939,7 +953,7 @@ int StarFitsIO::getTableColumn(int col, long* values, int numValues)
  * Get the contents of the given column as an array of long longs.
  * The caller should pass an array of numValues long longs.
  */
-int StarFitsIO::getTableColumn(int col, LONGLONG* values, int numValues)
+int StarFitsIO::getTableColumn(int col, LONGLONG *values, int numValues)
 {
     if ( !fitsio_ ) return 1;
 

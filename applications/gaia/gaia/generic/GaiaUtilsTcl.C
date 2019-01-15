@@ -499,7 +499,16 @@ static int GaiaUtilsAstAnnul( ClientData clientData, Tcl_Interp *interp,
     if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
         return TCL_ERROR;
     }
-    (void) astAnnul( (AstObject *) adr );
+    if (adr != 0) {
+        (void) astAnnul( (AstObject *) adr );
+    } else {
+        if ( ! astOK ) {
+            astClearStatus;
+            Tcl_SetResult( interp, "Failed to annul NULL AST object",
+                           TCL_VOLATILE );
+            return TCL_ERROR;
+        }
+    }
 
     if ( ! astOK ) {
         astClearStatus;
@@ -2160,13 +2169,14 @@ static int GaiaUtilsFitsMocRead( ClientData clientData, Tcl_Interp *interp,
                             char *tform = fitsio->get( "TFORM1" );
                             void *data;
                             if ( strcmp( tform, "1J" ) == 0 ) {
+                                nb = 4;
                                 data = (void *) malloc( nb * moclen );
-                                fitsio->getTableColumn( 1, (long *)data,
+                                fitsio->getTableColumn( 1, (int *)data,
                                                         moclen );
                             } else if ( strcmp( tform, "1K" ) == 0 ) {
                                 nb = 8;
                                 data = (void *) malloc( nb * moclen );
-                                fitsio->getTableColumn( 1, (long *)data,
+                                fitsio->getTableColumn( 1, (LONGLONG *)data,
                                                         moclen );
                             }
 
@@ -2297,9 +2307,9 @@ static int GaiaUtilsFitsMocWrite( ClientData clientData, Tcl_Interp *interp,
 static int GaiaUtilsRegionMoc( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] )
 {
-    /* Check arguments, need  2. */
-    if ( objc < 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "frameset region ..." );
+    /* Check arguments, need 3. */
+    if ( objc < 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset maxres region ..." );
         return TCL_ERROR;
     }
 
@@ -2310,12 +2320,20 @@ static int GaiaUtilsRegionMoc( ClientData clientData, Tcl_Interp *interp,
     }
     AstFrameSet *frmset = (AstFrameSet *) adr;
 
-    /* Create an empty Moc. XXX MaxRes? */
-    AstMoc *moc = astMoc( " " );
+    /* And the maximum resolution in arcsecs. */
+    double maxres = 0.0;
+    if ( Tcl_GetDoubleFromObj( interp, objv[2], &maxres ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    /* Create an empty Moc. */
+    AstMoc *moc = astMoc( "MaxRes=%f", maxres );
+    fprintf(stderr, "maxres = %f\n", maxres);
+    astShow(moc);
 
     /* And add the Regions. */
-    for ( int i = 0; i < objc - 2; i++ ) {
-        if ( Tcl_GetLongFromObj( interp, objv[i+2], &adr ) != TCL_OK ) {
+    for ( int i = 3; i < objc; i++ ) {
+        if ( Tcl_GetLongFromObj( interp, objv[i], &adr ) != TCL_OK ) {
             return TCL_ERROR;
         }
         AstRegion *region = (AstRegion *) adr;

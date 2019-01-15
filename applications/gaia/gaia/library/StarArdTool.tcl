@@ -461,7 +461,9 @@ itcl::class gaia::StarArdTool {
    method save_fitsmoc {filename} {
       if { $filename != {} } {
          set frmset [$rtdimage astgetclone]
-         set ok [$object_list_ save_fitsmoc $frmset $filename]
+         lassign [$rtdimage wcsset] ra dec secpix nxpix nypix rotate equinox epoch
+         set maxres [expr $secpix * 0.25]
+         set ok [$object_list_ save_fitsmoc $frmset $maxres $filename]
          gaiautils::astannul $frmset
       }
       return $ok
