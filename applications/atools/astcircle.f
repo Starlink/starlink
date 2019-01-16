@@ -131,6 +131,7 @@
 
 *  External References:
       EXTERNAL AST_ISAFRAME
+      EXTERNAL AST_ISAREGION
 
 *  Local Variables:
       INTEGER RESULT
@@ -165,9 +166,9 @@
          CALL PAR_EXACD( 'POINT', 1, POINT, STATUS )
       END IF
 
-*  Get the uncertainty Frame.
+*  Get the uncertainty Region.
       IF( STATUS .NE. SAI__OK ) GO TO 999
-      CALL KPG1_GTOBJ( 'UNC', 'Frame', AST_ISAFRAME, UNC, STATUS )
+      CALL KPG1_GTOBJ( 'UNC', 'Region', AST_ISAREGION, UNC, STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          UNC = ast__null
