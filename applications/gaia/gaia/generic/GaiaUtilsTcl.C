@@ -2328,8 +2328,6 @@ static int GaiaUtilsRegionMoc( ClientData clientData, Tcl_Interp *interp,
 
     /* Create an empty Moc. */
     AstMoc *moc = astMoc( "MaxRes=%f", maxres );
-    fprintf(stderr, "maxres = %f\n", maxres);
-    astShow(moc);
 
     /* And add the Regions. */
     for ( int i = 3; i < objc; i++ ) {
@@ -2402,7 +2400,7 @@ static int GaiaUtilsRegion( ClientData clientData, Tcl_Interp *interp,
         }
 
         /* And create the region. */
-        AstFrame *frame = astFrame( 2, "Title=Grid coordinates" );
+        AstFrame *frame = astFrame( 2, "Domain=GRID,Title=Grid coordinates" );
         region = (AstRegion *) astBox( frame, 1, p1, p2, NULL, " " );
         astAnnul( frame );
     }
@@ -2426,7 +2424,7 @@ static int GaiaUtilsRegion( ClientData clientData, Tcl_Interp *interp,
         }
 
         /* And create the region. */
-        AstFrame *frame = astFrame( 2, "Title=Grid coordinates" );
+        AstFrame *frame = astFrame( 2, "Domain=GRID,Title=Grid coordinates" );
         region = (AstRegion *) astCircle( frame, 1, p1, p2, NULL, " " );
         astAnnul( frame );
     }
@@ -2456,9 +2454,10 @@ static int GaiaUtilsRegion( ClientData clientData, Tcl_Interp *interp,
         if ( Tcl_GetDoubleFromObj( interp, objv[6], &p3[0] ) != TCL_OK ) {
             return TCL_ERROR;
         }
+        p3[1] = 0.0;
 
         /* And create the region. */
-        AstFrame *frame = astFrame( 2, "Title=Grid coordinates" );
+        AstFrame *frame = astFrame( 2, "Domain=GRID,Title=Grid coordinates" );
         region = (AstRegion *) astEllipse( frame, 1, p1, p2, p3, NULL, " " );
         astAnnul( frame );
     }
@@ -2486,7 +2485,7 @@ static int GaiaUtilsRegion( ClientData clientData, Tcl_Interp *interp,
         }
 
         /* And create the region. */
-        AstFrame *frame = astFrame( 2, "Title=Grid coordinates" );
+        AstFrame *frame = astFrame( 2, "Domain=GRID,Title=Grid coordinates" );
         region = (AstRegion *) astPolygon( frame, np, np, points, NULL, " " );
         astAnnul( frame );
     }
