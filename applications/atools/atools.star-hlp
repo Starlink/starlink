@@ -1,17 +1,17 @@
 0 Help
- Welcome to the ATOOLS online help system.  
+ Welcome to the ATOOLS online help system.
 
  The applications in the ATOOLS package follow closely the routines of
- the same names in the AST library. The AST documentation (SUN/210) is 
+ the same names in the AST library. The AST documentation (SUN/210) is
  not repeated here but should be consulted when using these commands.
- The parameters of a given ATOOLS command correspond to those of the 
+ The parameters of a given ATOOLS command correspond to those of the
  same AST routine, so for further information on (say) the ATOOLS
- astremapframe command, see the entry for the AST_REMAPFRAME routine in 
+ astremapframe command, see the entry for the AST_REMAPFRAME routine in
  SUN/210. Any differences in behaviour between the AST routine and the
  corresponding ATOOLS command are noted in the documentation for the
  command.
 
- Many of these commands require AST Objects to be supplied as input. 
+ Many of these commands require AST Objects to be supplied as input.
  These may be supplied in several formats:
 
  - as a dump of an AST Object stored in a text file (as produced by the
@@ -26,7 +26,7 @@
  command required an Object of a different class).
 
 
- Many of the ATOOLS commands create new AST Objects as output. These may be 
+ Many of the ATOOLS commands create new AST Objects as output. These may be
  stored in the following ways:
 
  - If the name of an existing NDF is supplied for the parameter, the new
@@ -48,15 +48,77 @@
  names of these text files are fixed, and determined by the name of the
  Object being saved).
 
- 
+
  Invocation:
 
     %  astshow <file>
- 
+
  where <file> is the name of the text file containing the AST object. An
  error will be reported if no file is specified on the command line.
 
 
+1 ASTVIEWER
+ASTVIEWER is a python script that allows you to visualise the contents of a
+FrameSet. It allows you to:
+
+   - Read a FrameSet from various sorts of file including text files,
+   Starlink NDFs and FITS files.
+
+   -  See a graphical representation of the coordinate Frames contained in
+   the FrameSet and the Mappings that describe the transformations that
+   connect them.
+
+   - Examine the details of any Frame or Mapping, including individual AST
+   attribute values as well as a more human-readable summary.
+
+   - Save individual Frames or Mappings to new text files
+
+   - Transform positions between any two Frames or using any Mapping, seeing
+   the results of any intermediate Mappings that may make up the total
+   Mapping.
+
+   - Convert numerical axis values into their `formatted` representation
+   (e.g. convert Declination values from radians to sexagesimal format).
+
+   - Convert formatted axis values in to the corresponding numerical values
+   (e.g. convert Declination values from sexagesimal format to radians).
+
+   -  Explore the effects of Simplifying a Mapping or FrameSet.
+
+   -  Explore the effects of changing FrameSet attribute values.
+
+2 Requirements
+Running astviewer requires the following packages to be installed:
+
+   - Python 2.7 or later (including Python 3).
+
+   - The pyqt4 library. This is usually included in Linux distributions, but
+   can be installed separately if required. See
+   http://pyqt.sourceforge.net/Docs/PyQt4/installation.html.
+
+   - The Starlink pyast package - a Python interface to AST. This can be
+   installed from pypi.org by doing:
+
+   % pip install starlink-pyast
+
+   Documentation is available at timj.github.io/starlink-pyast/pyast.html.
+   Note, pyast version 3.11 or later is required for full functionality.
+
+   - In order to read FrameSets from FITS files, the io.fits module within
+   astropy (see www.astropy.org) must be available. If the astropy.io.fits is
+   not available, astviewer will still run but will not be able to read
+   FrameSets from FITS files.
+
+2 Running astviewer
+
+Simply type "astviewer", optionally followed by the name of an NDF, text
+file or FITS file from which to read a FrameSet. If no input file is
+specified, an example FrameSet will be generated and displayed
+automatically. To replace this example FrameSet, use the Open option in
+the File menu to read a FrameSet from a selected file.
+
+For further information, click on the Help menu in the GUI.
 
 
- 
+
+

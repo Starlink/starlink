@@ -4995,6 +4995,10 @@ iraf! {
       obey {$ATOOLS_DIR/astshow.tcl}
    }
 
+   command astviewer {
+      obey {$ATOOLS_DIR/astviewer}
+   }
+
    icl {defhelp atools $ATOOLS_HELP 0}
 
    display {

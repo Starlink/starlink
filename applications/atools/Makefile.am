@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-dist_bin_SCRIPTS = atools.csh atools.sh atools.icl astshow.tcl
+dist_bin_SCRIPTS = atools.csh atools.sh atools.icl astshow.tcl astviewer
 
 dist_noinst_SCRIPTS = atools_link_adam
 
@@ -63,7 +63,8 @@ atools.csh atools.sh atools.icl $(atools_mon_TASKS:=.ifl): atools.ifd
 	@IFD2STAR@ atools
 
 ##  Any misc ATOOLS files that have no where else.
-dist_pkgdata_DATA = ATOOLS_CONDITIONS
+dist_pkgdata_DATA = ATOOLS_CONDITIONS astviewer.html example-frameset.png \
+                    frame.png  makecube.png  mapping.png  parallel.png
 
 ##  Things for distribution that are not picked up otherwise.
 EXTRA_DIST = $(HELP_SOURCES) atools.star-hlp asttest.sh \
@@ -87,6 +88,7 @@ asttest_SOURCES = asttest.f \
 asttest_LDADD = $(LDADD) `$(srcdir)/atools_link_adam`
 
 dist_starnews_DATA = atools.news
+
 
 MISC_FILES = asttest dtask_applic.lo atools.shl history.help \
 atools_mon version.dat atools.csh atools.icl atools.sh
