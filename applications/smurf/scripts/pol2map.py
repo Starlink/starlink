@@ -558,14 +558,18 @@
 *        that the AST mask should be no more than 20% of the good pixels,
 *        and the PCA mask should be no more than 10% of the good pixels.
 *     9-JAN-2019 (DSB):
-*        - When processing old (pre 20150930) and new data together in skyloop, 
-*        ensure that the pointing correction required for old data is not also 
-*        applied to the new data. 
-*        - Fix bug that caused wrong pointing corrections to be used when 
-*        skyloop is used to process multiple observations that do not all have 
+*        - When processing old (pre 20150930) and new data together in skyloop,
+*        ensure that the pointing correction required for old data is not also
+*        applied to the new data.
+*        - Fix bug that caused wrong pointing corrections to be used when
+*        skyloop is used to process multiple observations that do not all have
 *        the same reference point.
-*        - Prevent POINT_DX/Y FITS headers being stored in maps if no pointing 
+*        - Prevent POINT_DX/Y FITS headers being stored in maps if no pointing
 *        correction was used.
+*    29-JAN-2019 (DSB):
+*        Remove any third (wavelength) axis from the reference map. For
+*        instance, this allows 450 um data to be aligned with a reference 
+*        map made from 850 um data.
 
 '''
 
@@ -1305,6 +1309,14 @@ try:
 
    else:
       use_ref_for_alignment = True
+
+#  Remove any third (wavelength) axis from the reference map. For
+#  instance, this allows 450 um data to be aligned with a map made
+#  from 850 um data.
+      ref2d = NDG( 1 )
+      invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".
+              format( ref, ref2d ) )
+      ref = ref2d
 
 #  If the REF map is in units of mJy/beam, convert it to pW using the FCF
 #  in the "FCF" FITS header if available, or the standard FCF for the
