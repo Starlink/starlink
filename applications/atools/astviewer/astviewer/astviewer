@@ -1,0 +1,3203 @@
+#!/usr/bin/python
+
+#  To run the app under the pdb debugger and break at a given line,
+#  copy the following line to the place where the break point is
+#  required, and uncomment.
+# import pdb; pdb.set_trace()
+
+
+
+
+import os
+import sys
+from PyQt4 import QtCore, QtGui, QtOpenGL
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+from math import *
+import starlink.Ast as Ast
+import random
+import subprocess
+import math
+import re
+try:
+   import pkg_resources
+   setuptools = True
+except ImportError:
+   setuptools = False
+
+# If we are using Python3 QString is not defined
+try:
+    from PyQt4.QtCore import QString
+    py3 = False
+except ImportError:
+    QString = type("")
+    py3 = True
+
+#  Do we have astropy fits? If not do we have pyfits? If not, not FITS
+#  support.
+fits_supported = False
+try:
+   import astropy.io.fits as pyfits
+   fits_supported = True
+except ImportError:
+   pass
+
+if not fits_supported:
+   try:
+      import pyfits
+      fits_supported = True
+   except ImportError:
+      pass
+
+if fits_supported:
+   import starlink.Atl as Atl
+
+#  Ignore warnings (pyfits issues warnings when it tries to open a
+#  non-FITS file)
+   import warnings
+   warnings.filterwarnings('ignore')
+
+else:
+   print("!! astropy/pyfits not found. No FITS support")
+
+#  Do we have ATOOLS? If not, no NDF support (can't get pyndf to work).
+ndf_supported = False
+starlink = os.environ.get("STARLINK_DIR")
+if starlink:
+   astcopy = starlink+"/bin/atools/astcopy"
+   if os.path.isfile( astcopy ):
+      ndf_supported = True
+if not ndf_supported:
+   print("!! Starlink ATOOLS not found. No NDF support")
+
+
+
+
+
+
+
+#  astviewer options
+
+OPTIONS_FNAME = '.astviewerrc'
+OPT_CHANGED = 'changed'
+OPT_FCATTS = 'fcatts'
+
+option_defs = {}
+option_defs[ OPT_FCATTS ] = [ "FitsChan attributes to use when reading FITS-WCS", " ", True ]
+
+
+
+
+
+
+#  Other constants
+
+light_grey = QColor( 240, 240, 240 )
+black = QColor( 0, 0, 0 )
+pen1 = QPen( Qt.black, 2, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
+pen2 = QPen( Qt.black, 1, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
+pen3 = QPen( Qt.blue, 2, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
+pen4 = QPen( Qt.red, 2, Qt.DotLine, Qt.RoundCap, Qt.RoundJoin)
+UP = 1
+DOWN = 2
+LEFT = 3
+RIGHT = 4
+
+#  Invoke a starlink command
+def invoke(command):
+   os.environ["ADAM_NOPROMPT"] = "1"
+   os.environ["ADAM_EXIT"] = "1"
+   os.environ["MSG_SZOUT"] = "0"
+   outtxt = ""
+   proc = subprocess.Popen(command,shell=True, stdout=subprocess.PIPE,
+                           stderr=subprocess.STDOUT)
+   while True:
+
+      line = proc.stdout.readline()
+      while line is not None and len(line) > 0:
+         if isinstance( line, bytes ):
+            line = line.decode("ascii","ignore")
+         line = line.rstrip()
+         outtxt = "{0}\n{1}".format(outtxt,line)
+         line = proc.stdout.readline()
+
+      status = proc.poll()
+      if status is not None:
+         break
+
+      time.sleep(1.0)
+
+   if status != 0:
+      if outtxt:
+         msg = outtxt
+         raise RuntimeError("\n\n{0}".format(msg))
+      else:
+         raise RuntimeError()
+
+   return outtxt
+
+
+#  Expand a Mapping into a list of component Mappings to be applied in
+#  series or in parallel. The list contains deep copies of the Mappings,
+#  with the Invert flags set to the value it had when the CmpMap was created.
+def maplist( mapping, series=None, invert=None ):
+   result = []
+
+#  Get the current Invert flag value from the Mapping and temporarily set it
+#  to the supplied value. Leave the current value unchanged if this is the
+#  top-level call (i.e. if "invert" is None).
+   if invert is not None:
+      old_invert = mapping.Invert
+      mapping.Invert = invert
+
+#  Compound mapping - get its components and check they are combined in the
+#  required manner (series or parallel). On the top-level entry ("series" is
+#  None), either manner is allowed.
+   if isinstance( mapping, Ast.CmpMap ):
+      (map1, map2, isseries, invert1, invert2)= mapping.decompose()
+      if (series is None) or (series and isseries) or (not series and not isseries):
+
+#  Ensure future decompositions decompose in the same manner as this
+#  decomposition (this line will change "series" only if this is a top-level
+#  entry).
+         series = isseries
+
+#  Expand the first Mapping into a list, then append the contents of the list
+#  to "result".
+         ( list, series ) = maplist( map1, series, invert1 )
+         result.extend( list )
+
+#  Expand the second Mapping into a list, then append the contents of the list
+#  to "result".
+         ( list, series ) = maplist( map2, series, invert2 )
+         result.extend( list )
+
+#  If the components of the CmpMap are not combined in the required manner,
+#  add a deep copy of the CmpMap itself to the returned list.
+      else:
+         result.append(mapping.copy())
+
+#  Atomic mapping - return a deep copy of the supplied Mapping.
+   else:
+      result.append(mapping.copy())
+
+#  Re-instate the old Invert flag value.
+   if invert is not None:
+      mapping.Invert = old_invert
+
+   return (result,series)
+
+
+def setTip( self, tip ):
+   self.setToolTip( tip )
+   self.setStatusTip( tip )
+
+def stripbr( text ):
+   if text.lower().endswith("<br>"):
+      text = text[ : -2 ]
+   return text
+
+
+
+
+#  ================================================================
+class HelpBrowser(QWidget):
+   __instance = None
+
+   def __init__(self, ):
+      super(HelpBrowser,self).__init__()
+
+      self.setWindowModality( Qt.NonModal )
+
+      self.textbrowser = QTextBrowser()
+
+      self.backButton = QPushButton( '&Back' )
+      self.backButton.setDisabled( True )
+      self.fwdButton = QPushButton( '&Forward' )
+      self.fwdButton.setDisabled( True )
+      closeButton = QPushButton( '&Close' )
+      closeButton.setShortcut( 'Ctrl+Q' )
+
+      buttonLayout = QHBoxLayout()
+      buttonLayout.addWidget( self.backButton )
+      buttonLayout.addWidget( self.fwdButton )
+      buttonLayout.addStretch()
+      buttonLayout.addWidget( closeButton )
+
+      mainLayout = QVBoxLayout()
+      mainLayout.addLayout( buttonLayout )
+      mainLayout.addWidget( self.textbrowser )
+      self.setLayout( mainLayout )
+
+      self.backButton.clicked.connect( self.backward )
+      self.fwdButton.clicked.connect( self.forward )
+      closeButton.clicked.connect( self.close )
+      self.findUrl()
+
+      self.textbrowser.sourceChanged.connect( self.updateWindowTitle )
+      self.textbrowser.backwardAvailable.connect( self.backavailable )
+      self.textbrowser.forwardAvailable.connect( self.fwdavailable )
+
+   def backavailable(self,avail):
+      self.backButton.setDisabled( not avail )
+
+   def fwdavailable(self,avail):
+      self.fwdButton.setDisabled( not avail )
+
+   def setPage(self,page):
+      if page:
+         self.url.setFragment(page)
+      else:
+         self.url.setFragment("")
+      self.textbrowser.setSource( self.url )
+
+   def backward(self):
+      self.textbrowser.backward()
+
+   def forward(self):
+      self.textbrowser.forward()
+
+   def close(self):
+      self.hide()
+
+   def updateWindowTitle(self):
+      self.setWindowTitle( "Help: {0}".format(self.textbrowser.documentTitle() ) )
+
+   def findUrl(self):
+      file = __file__+".html"
+      if starlink:
+         atools_share = starlink+"/share/atools"
+         file = atools_share+"/astviewer.html"
+      if not os.path.isfile( file ) and setuptools:
+         req = pkg_resources.Requirement.parse("astviewer")
+         file = pkg_resources.resource_filename(req,"astviewer/astviewer.html")
+      self.url = QUrl.fromLocalFile( file );
+
+   @staticmethod
+   def showPage( page=None ):
+      if HelpBrowser.__instance == None:
+         HelpBrowser.__instance = HelpBrowser( )
+      HelpBrowser.__instance.setPage( page )
+      HelpBrowser.__instance.resize(900,700)
+      HelpBrowser.__instance.show()
+      HelpBrowser.__instance.raise_()
+
+   @staticmethod
+   def kill():
+      if HelpBrowser.__instance != None:
+         HelpBrowser.__instance.close()
+         del HelpBrowser.__instance
+
+#  ================================================================
+class MySpinBox(QSpinBox):
+
+#  ----------------------------------------------------------------
+   def __init__(self, parent, list ):
+      super(MySpinBox,self).__init__( parent )
+      self.list = list
+      self.setMinimum( 1 )
+      self.setMaximum( len(list) )
+      self.setFixedWidth( 200 )
+
+   def textFromValue(self, v ):
+      if v >= self.minimum() and v <= self.maximum():
+         result = "{0}: {1}".format(v, self.list[ v - 1 ].Class )
+      else:
+         result = ""
+      return result
+
+   def valueFromText(self, text ):
+      m = re.match(r' *(\d+)', text )
+      if m:
+         result = int( m.group(1) )
+      else:
+         result = 0
+      return result
+
+
+
+#  ================================================================
+class MyMenu(QMenu):
+
+#  ----------------------------------------------------------------
+   def __init__(self, parent, label ):
+      super(MyMenu,self).__init__( label, parent )
+
+   def event(self, e ):
+      if e.type() == QEvent.ToolTip and self.activeAction():
+         QToolTip.showText( e.globalPos(), self.activeAction().toolTip() )
+      else:
+         QToolTip.hideText()
+      return super(MyMenu,self).event( e )
+
+#  ================================================================
+class Line(QFrame):
+
+#  ----------------------------------------------------------------
+   def __init__(self, parent=None, horiz=True ):
+      super(Line,self).__init__( parent )
+      if horiz:
+         shape = QFrame.HLine
+      else:
+         shape = QFrame.VLine
+      self.setFrameShape( shape )
+      self.setFrameShadow( QFrame.Sunken )
+
+
+#  ================================================================
+class ArrowLayout(QGridLayout):
+
+#  ----------------------------------------------------------------
+   def __init__(self, parent=None ):
+      super(ArrowLayout,self).__init__( parent )
+
+   def replaceWidget( self, row, col, widget=None, align=Qt.AlignHCenter ):
+      item = self.itemAtPosition( row, col )
+      if item:
+         oldwidget = item.widget()
+         if oldwidget:
+            self.removeWidget( oldwidget )
+            oldwidget.deleteLater()
+            del oldwidget
+      if widget:
+         self.addWidget( widget, row, col, align )
+
+   def addArrow( self, row, col, tip, dir=None, align=Qt.AlignHCenter  ):
+      if dir is None:
+         char = ' '
+      elif dir == UP:
+         char = u'\u2191'
+      elif dir == DOWN:
+         char = u'\u2193'
+      elif dir == LEFT:
+         char = u'\u2190'
+      elif dir == RIGHT:
+         char = u'\u2192'
+      else:
+         char = str(dir)
+      label = QLabel( QString( char ) )
+      label.setFixedWidth( 15 )
+      if tip:
+         setTip( label, tip )
+      self.replaceWidget( row, col, label, align )
+
+
+#  ================================================================
+class DataButton(QPushButton):
+
+#  ----------------------------------------------------------------
+   def __init__(self, label, parent, data=None ):
+      super(DataButton,self).__init__( label, parent )
+      self.data = data
+
+#  ================================================================
+class LinkLabel(QLabel):
+
+#  ----------------------------------------------------------------
+   def __init__(self, label, parent, input, mapwidget ):
+      super(LinkLabel,self).__init__( label, parent )
+      self.setStyleSheet("LinkLabel { color: #07C }")
+      self.setCursor( Qt.PointingHandCursor )
+      font = QFont('SanSerif', 10 )
+      font.setUnderline( True )
+      self.setFont( font )
+      self.mapwidget = mapwidget
+      self.input = input
+
+   def mousePressEvent( self, event ):
+      if self.input:
+         frame = self.mapwidget.input_frame
+      else:
+         frame = self.mapwidget.output_frame
+      self.mapwidget.dialog.showObject( frame, [self.mapwidget,self.input] )
+
+
+#  ================================================================
+class DataEdit(QLineEdit):
+
+#  ----------------------------------------------------------------
+   def __init__(self, parent, data=None):
+      super(DataEdit,self).__init__( parent )
+      self.setFixedWidth( 160 )
+      self.data = data
+
+
+#  ================================================================
+class ValueEdit(DataEdit):
+
+#  ----------------------------------------------------------------
+   def __init__(self, parent, data=None):
+      super(ValueEdit,self).__init__( parent, data )
+      self.setValidator( AstValidator() )
+      self._value = Ast.BAD
+      self.textEdited.connect(self.textEdit)
+
+   def setValue(self,value):
+      self._value = value
+      if value == Ast.BAD:
+         self.setText( "BAD" )
+      else:
+         if value > -1.0E6 and value < 1.0E6:
+            self.setText( "%.11g" % value )
+         else:
+            self.setText( "%.11e" % value )
+
+   def setUndef(self):
+      self._value = Ast.BAD
+      self.setText( "" )
+
+   def value(self):
+      if self._value is None:
+         text = str( self.text() ).lower().strip()
+         if "bad".startswith(text):
+            self.setText( "BAD" )
+            self_value = Ast.BAD
+         else:
+            self._value = float( text )
+      return self._value
+
+   def textEdit(self,string):
+      self._value = None
+
+#  ================================================================
+class AstValidator(QDoubleValidator):
+
+#  ----------------------------------------------------------------
+   def __init__(self ):
+      super(AstValidator,self).__init__()
+
+   def validate(self, string, pos ):
+      s = str(string).strip().lower()
+      if s == "bad":
+         if py3:
+            result = (QValidator.Acceptable, string, pos)
+         else:
+            result = (QValidator.Acceptable, pos)
+      elif "bad".startswith(s):
+         if py3:
+            result = (QValidator.Intermediate, string, pos)
+         else:
+            result = (QValidator.Intermediate, pos)
+      else:
+         result = super(AstValidator,self).validate( string, pos )
+      return result
+
+#  ================================================================
+class SettingsDialog(QDialog):
+
+#  ----------------------------------------------------------------
+   def __init__(self, parent, options, viewer ):
+      super(SettingsDialog,self).__init__( parent )
+
+      self.options = options
+      self.viewer = viewer
+
+      vlayout = QVBoxLayout(self)
+      self.setLayout(vlayout)
+
+      self.lineedits = {}
+      grid = QGridLayout()
+      irow = 0
+      for key in options:
+         if key != OPT_CHANGED:
+            value = options[ key ]
+            prompt = option_defs[ key ][ 0 ]
+            self.lineedits[key] =  QLineEdit( str(value), self )
+            grid.addWidget( QLabel( prompt+":" ), irow, 0 )
+            grid.addWidget( self.lineedits[key], irow, 1 )
+            irow += 1
+
+      vlayout.addLayout( grid )
+
+      buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+            Qt.Horizontal, self)
+      buttons.accepted.connect(self.accept)
+      buttons.rejected.connect(self.reject)
+
+      vlayout.addWidget(buttons)
+
+   def accept(self):
+      for key in self.options:
+         if key != OPT_CHANGED:
+            text = str(self.lineedits[ key ].text()).strip()
+            if text != self.options[ key ]:
+               self.options[ key ] = text
+               if option_defs[ key ][ 2 ]:
+                  self.viewer.redraw = True
+               self.options[ OPT_CHANGED ] = True
+      super(SettingsDialog,self).accept()
+
+
+#  ================================================================
+class getAttrDialog(QDialog):
+
+#  ----------------------------------------------------------------
+   def __init__(self, parent, object ):
+      super(getAttrDialog,self).__init__( parent )
+      self.object = object
+      self.changed = False
+
+      vlayout = QVBoxLayout(self)
+      self.setLayout(vlayout)
+      if not object.isaframe():
+         text = "Enter attribute name and press Get or return:"
+      else:
+         text = "Enter attribute name and press Get or Clear (return = get):"
+      vlayout.addWidget( QLabel(text) )
+
+      self.hlayout = QHBoxLayout()
+      self.edit = QLineEdit()
+      self.edit.setFixedWidth( 100 )
+      self.edit.returnPressed.connect(self.get)
+      self.hlayout.addWidget( self.edit )
+      self.label = QLabel(":                                                ")
+      self.hlayout.addWidget( self.label )
+
+      vlayout.addLayout( self.hlayout )
+      buttons = QDialogButtonBox( QDialogButtonBox.Close,
+                                  Qt.Horizontal, self)
+      vlayout.addWidget(buttons)
+      buttons.rejected.connect(self.reject)
+
+      getbut = buttons.addButton( "Get", QDialogButtonBox.ActionRole )
+      getbut.released.connect(self.get)
+      if object.isaframe():
+         clearbut = buttons.addButton( "Clear", QDialogButtonBox.ActionRole )
+         clearbut.released.connect(self.clear)
+
+   def keyPressEvent(self,event):
+      if event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return:
+         return
+      if event.key() == Qt.Key_Q and event.modifiers() & Qt.ControlModifier:
+         self.reject()
+      super(getAttrDialog,self).keyPressEvent( event )
+
+   def get( self ):
+      self.hlayout.removeWidget( self.label )
+      self.label.deleteLater()
+      name = str(self.edit.text())
+      try:
+         value = self.object.get( name )
+         if self.object.test( name ):
+            self.label = QLabel( ": '<code>{0}</code>' (set)".format(value) )
+         else:
+            self.label = QLabel( ": '<code>{0}</code>' (default)".format(value) )
+      except Ast.AstError as ex:
+         self.label = QLabel(":                                                ")
+         QMessageBox.warning( self, "Bad attribute", str(ex), QMessageBox.Ok )
+      self.hlayout.addWidget( self.label )
+
+   def clear( self ):
+      name = str(self.edit.text())
+      try:
+         if self.object.test( name ):
+            value = self.object.clear( name )
+            self.get()
+            self.changed = True
+         else:
+            QMessageBox.warning( self, "Cannot clear", "Attribute '{0}' is already "
+                                 "cleared".format(name), QMessageBox.Ok )
+      except Ast.AstError as ex:
+         QMessageBox.warning( self, "Bad attribute", str(ex), QMessageBox.Ok )
+
+
+
+#  ================================================================
+class setAttrDialog(QDialog):
+
+#  ----------------------------------------------------------------
+   def __init__(self, parent, object, dialog=None ):
+      super(setAttrDialog,self).__init__( parent )
+      self.object = object
+      self.dialog = dialog
+      self.changed = dialog
+
+      vlayout = QVBoxLayout(self)
+      self.setLayout(vlayout)
+      text = "Enter an attribute setting string in the form '<code>name=value</code>':"
+      vlayout.addWidget( QLabel( text ) )
+      self.edit = QLineEdit()
+      self.edit.setFixedWidth( 500 )
+      vlayout.addWidget( self.edit )
+      buttons = QDialogButtonBox( QDialogButtonBox.Cancel | QDialogButtonBox.Ok,
+                                  Qt.Horizontal, self)
+      vlayout.addWidget(buttons)
+
+      buttons.accepted.connect(self.accept)
+      buttons.rejected.connect(self.reject)
+
+   def accept( self ):
+      setting = str(self.edit.text()).strip()
+      if '=' in setting:
+         (name,value) = setting.split('=',1)
+         name = name.strip()
+         value = value.strip()
+
+         try:
+            oldval = self.object.get( name )
+            self.object.set( setting )
+            if oldval != self.object.get( name ):
+               self.changed = True
+            if self.dialog:
+               self.dialog.newObject( self.object )
+            super(setAttrDialog,self).accept()
+         except Ast.AstError as e:
+            QMessageBox.warning( self, "Setting error", str(e), QMessageBox.Ok )
+
+      else:
+         QMessageBox.warning( self, "Invalid setting", "Invalid setting "
+                              "string. Should be of the form <name>=<value>",
+                              QMessageBox.Ok )
+
+
+#  ================================================================
+class mergeDialog(QDialog):
+
+#  ----------------------------------------------------------------
+   def __init__(self, parent ):
+      super(mergeDialog,self).__init__( parent )
+      self.mappingwidget = parent
+      parent.merge = 0
+
+      vlayout = QVBoxLayout(self)
+      self.setLayout(vlayout)
+      vlayout.addWidget( QLabel("Select the index of the Mapping to be merged, and press OK:") )
+      hlayout = QHBoxLayout()
+      vlayout.addLayout( hlayout )
+
+      self.spinbox = MySpinBox( self, parent.list )
+
+      hlayout.addWidget( self.spinbox )
+      buttons = QDialogButtonBox( QDialogButtonBox.Cancel |
+                                  QDialogButtonBox.Ok,
+                                  Qt.Horizontal, self)
+      hlayout.addWidget(buttons)
+      buttons.rejected.connect(self.reject)
+      buttons.accepted.connect(self.accept)
+
+   def accept(self):
+      if self.spinbox.value() == 0:
+         QMessageBox.warning( self, "Bad value", "The value entered ('{0}') is "
+                              "invalid. Please enter an integer in the range 1 "
+                              "to {1}.".format( self.spinbox.text(),
+                              self.spinbox.maximum() ), QMessageBox.Ok )
+      else:
+         self.mappingwidget.merge = self.spinbox.value()
+         super(mergeDialog,self).accept()
+
+#  ================================================================
+class ObjectDialog(QDialog):
+
+#  ----------------------------------------------------------------
+   def __init__(self, parent, object, data=None ):
+      super(ObjectDialog,self).__init__( parent )
+      self.data = None
+      self.history = []
+      self.objectwidget = None
+
+      vlayout = QVBoxLayout(self)
+      self.setLayout(vlayout)
+
+      self.menubar = QMenuBar( self )
+      vlayout.addWidget( self.menubar )
+
+      fileMenu = MyMenu(self,'&File')
+      self.menubar.addMenu( fileMenu )
+
+      saveAction = QAction('&Save', self)
+      saveAction.setShortcut('Ctrl+S')
+      setTip( saveAction, 'Save object to text file')
+      saveAction.triggered.connect(self.save)
+      fileMenu.addAction(saveAction)
+
+      self.backAction = QAction('&Back', self)
+      self.backAction.setShortcut('Ctrl+K')
+      self.backAction.setDisabled( True )
+      setTip( self.backAction, 'Show previous object' )
+      self.backAction.triggered.connect(self.back)
+      fileMenu.addAction(self.backAction)
+
+      closeAction = QAction('&Close', self)
+      closeAction.setShortcut('Ctrl+Q')
+      setTip( closeAction, 'Close window' )
+      closeAction.triggered.connect(self.close)
+      fileMenu.addAction(closeAction)
+
+      self.actionMenu = MyMenu( self, '&Actions')
+      self.menubar.addMenu( self.actionMenu )
+
+      self.getAction = QAction('&Get Attribute', self)
+      setTip( self.getAction, 'Get attribute values' )
+      self.getAction.setShortcut('Ctrl+G')
+      self.getAction.triggered.connect(self.getAttr)
+      self.actionMenu.addAction( self.getAction )
+
+      helpMenu = MyMenu( self, '&Help' )
+      self.menubar.addMenu( helpMenu )
+
+      help1Action = QAction('&Help on astviewer', self)
+      help1Action.setShortcut('Ctrl+H')
+      setTip( help1Action, 'Display help on astviewer' )
+      help1Action.triggered.connect(self.help1)
+      helpMenu.addAction(help1Action)
+
+      help2Action = QAction('&Help on window', self)
+      help2Action.setShortcut('Ctrl+W')
+      setTip( help2Action, 'Display help on the current window' )
+      help2Action.triggered.connect(self.help2)
+      helpMenu.addAction(help2Action)
+
+
+      vlayout.setContentsMargins(10,10,10,10)
+      vlayout.setSpacing(5)
+
+      self.tabs = QTabWidget()
+      vlayout.addWidget( self.tabs )
+
+      buttons = QDialogButtonBox(
+            QDialogButtonBox.Close,
+            Qt.Horizontal, self)
+      vlayout.addWidget(buttons)
+      buttons.rejected.connect(self.reject)
+      setTip( buttons.button(QDialogButtonBox.Close), "Click to close the window" )
+
+      self.sendButton = DataButton( "Send", self )
+      setTip( self.sendButton, "Go back to previous object, retaining any changed axis values" )
+      buttons.addButton( self.sendButton, QDialogButtonBox.ActionRole )
+      self.sendButton.setDisabled( True )
+      self.sendButton.clicked.connect(self.send)
+
+      self.backButton = QPushButton( "Back" )
+      setTip( self.backButton, "Go back to previous object, discarding any changed axis values" )
+      buttons.addButton( self.backButton, QDialogButtonBox.ActionRole )
+      self.backButton.setDisabled( True )
+      self.backButton.clicked.connect(self.back)
+
+      self.newObject( object, data )
+
+      if self.objectwidget.helpTarget is None:
+         helpAction.setDisabled( True )
+
+   def help1( self ):
+      HelpBrowser.showPage()
+
+   def help2( self ):
+      HelpBrowser.showPage( self.objectwidget.helpTarget )
+
+   def initialiser(self):
+      result = None
+      if self.objectwidget:
+         result = self.objectwidget.initialiser()
+      return result
+
+   def getAttr( self ):
+      if self.objectwidget:
+         dialog = getAttrDialog( self, self.objectwidget.object )
+         dialog.exec_()
+
+   def send( self ):
+      if len(self.history) > 0 and self.objectwidget:
+         ( object, data, initialiser ) = self.history.pop()
+         new_initialiser = self.objectwidget.send_initialiser()
+         if new_initialiser:
+            initialiser = new_initialiser
+         self.history.append( [object,data,initialiser] )
+         self.back()
+
+   def back( self ):
+      self.newObject( *self.history.pop() )
+      if len(self.history) == 0:
+         self.backButton.setDisabled( True )
+         self.backAction.setDisabled( True )
+
+   def showObject( self, object, data=None, initialiser=None ):
+      if self.objectwidget and self.objectwidget.object:
+         self.history.append( [self.objectwidget.object,self.data,self.initialiser()] )
+         self.backButton.setDisabled( False )
+         self.backAction.setDisabled( False )
+      self.newObject( object, data, initialiser )
+
+   def newObject( self, object, data=None, initialiser=None ):
+      self.data = data
+      self.addTabs( object )
+      if initialiser:
+         initialiser.initialise( self.objectwidget )
+
+   def keyPressEvent(self,event):
+      if event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return:
+         return
+      super(ObjectDialog,self).keyPressEvent( event )
+
+   def reject(self):
+      super(ObjectDialog,self).accept()
+
+   def save(self):
+      if self.objectwidget and self.objectwidget.object:
+         fname = QtGui.QFileDialog.getSaveFileName(self, 'Save {0} to file:'.format(self.objectwidget.object.Class))
+         if fname:
+            Ast.Channel( None, None, "SinkFile={0}".format(fname) ).write( self.objectwidget.object )
+
+   def addTabs( self, object ):
+      for itab in range(self.tabs.count()):
+         wid = self.tabs.widget(0)
+         self.tabs.removeTab(0)
+         wid.deleteLater()
+      self.addObjectTab( object )
+      self.addDumpTab( object )
+
+   def addDumpTab( self, object ):
+      s = QScrollArea()
+      text = QLabel( "<pre>{}</pre>".format(object) )
+      text.setMargin(10)
+      s.setWidget( text )
+      self.tabs.addTab( s, "Raw AST data" )
+
+   def addObjectTab( self, object ):
+      sendable = False
+
+      if isinstance( object, Ast.Frame ):
+         mapwid = None
+         input = False
+         try:
+            if isinstance( self.data[0], MappingWidget ):
+               mapwid = self.data[0]
+               input = self.data[1]
+         except TypeError:
+            mapwid = None
+            input = False
+         self.objectwidget = FrameWidget( self, object, mapwid, input )
+         if mapwid:
+            sendable =True
+
+      elif isinstance( object, Ast.Mapping ):
+         self.objectwidget = MappingWidget( self, object, self.data )
+         if self.objectwidget.parent_icomp is not None:
+            sendable = True
+
+      else:
+         self.objectwidget = ObjectWidget( self, object )
+
+      s = QScrollArea()
+      s.setWidget( self.objectwidget )
+      self.tabs.addTab( s, self.objectwidget.title )
+
+      if sendable:
+         self.sendButton.setDisabled( False )
+      else:
+         self.sendButton.setDisabled( True )
+
+
+#  ================================================================
+class ObjectWidget(QWidget):
+
+#  ----------------------------------------------------------------
+   def __init__( self, dialog, object ):
+      super(ObjectWidget,self).__init__()
+      self.object = object
+      self.dialog = dialog
+      self.helpTarget = None
+
+      self.layout = QVBoxLayout(self)
+      self.setLayout( self.layout )
+      self.layout.setContentsMargins( 20, 20, 20, 20 )
+      self.layout.setSpacing( 20 )
+      self.layout.addWidget( QLabel( self.objectDesc() ) )
+      self.title = "Object class"
+
+      if object.isaframe():
+         dialog.getAction.setText( 'Get/Clear attributes' )
+         setTip(  dialog.getAction, 'Get or clear attribute values' )
+      else:
+         dialog.getAction.setText( 'Get attributes' )
+         setTip(  dialog.getAction, 'Get attribute values' )
+
+
+
+   def objectDesc( self ):
+      object = self.object
+      text = "<h3>AST Class: {0}</h3>".format( object.Class )
+      if object.test("ID"):
+         text = "{0}ID: {1}<br>".format(text,object.ID.strip() )
+      if object.test("Ident"):
+         text = "{0}Ident: {1}".format(text,object.Ident.strip() )
+
+      return stripbr(text)
+
+   def send_initialiser(self):
+      return None
+
+   def initialiser(self):
+      return None
+
+#  ================================================================
+class FrameWidget(ObjectWidget):
+
+#  ----------------------------------------------------------------
+   def __init__(self, dialog, object, mapwid=None, input=False ):
+      super(FrameWidget,self).__init__( dialog, object )
+      self.title = "Axis descriptions"
+      self.mapwid = mapwid
+      self.input = input
+      self.helpTarget = "framewidget"
+
+      setAction = QAction('&Set Attribute', self)
+      setAction.setShortcut('Ctrl+T')
+      setTip( setAction, 'Change a Frame attribute value' )
+      setAction.triggered.connect(self.setAttr)
+      dialog.actionMenu.addAction( setAction )
+
+      layout = ArrowLayout()
+      self.grid = layout
+      layout.setSpacing(5)
+      self.layout.addLayout( layout )
+
+      row = 0
+
+      text = ""
+      frame = self.object
+      dom0 = frame.Domain
+      title0 = frame.Title
+      epoch0 = frame.Epoch
+      if dom0:
+         text = "{0}Domain: {1}<br>".format(text,dom0)
+      if title0:
+         text = "{0}Title: {1}<br>".format(text,title0)
+      if epoch0 and frame.Class != "Frame":
+         if float(epoch0) < 1984.0:
+            text = "{0}Epoch: B{1}<br>".format(text,epoch0)
+         else:
+            text = "{0}Epoch: J{1}<br>".format(text,epoch0)
+
+      layout.addWidget( QLabel( stripbr(text) ), row, 0, 1, -1 )
+      row += 1
+
+      spec_axis = 0
+      dsb_axis = 0
+      skylon_axis = 0
+      skylat_axis = 0
+      time_axis = 0
+
+      self.frm_edits = []
+      self.unf_edits = []
+      self.rows = []
+
+      for i in range( frame.Naxes ):
+         layout.addItem( QSpacerItem(10,10), row, 0 )
+         row += 1
+
+         text = "<h4>Axis {0}:</h4>".format(i+1)
+         layout.addWidget( QLabel( text ), row, 0, 1, 2 )
+
+         if i == 0:
+            lab = QLabel( "Formatted:" )
+            setTip( lab, "Textual axis values formatted for human readers" )
+            layout.addWidget( lab, row, 2, Qt.AlignHCenter )
+            lab = QLabel( "Unformatted:" )
+            setTip( lab, "Numerical axis values used internally by AST" )
+            layout.addWidget( lab, row, 4, Qt.AlignHCenter )
+
+         row += 1
+
+         classified = False
+         try:
+            junk = frame.get( "IsLatAxis({0})".format( i+1 ) )
+            if junk == '1':
+               skylat_axis = i + 1
+            else:
+               skylon_axis = i + 1
+            classified = True
+         except Ast.BADAT:
+            pass
+
+         try:
+            junk = frame.get( "SideBand({0})".format( i+1 ) )
+            dsb_axis = i + 1
+            classified = True
+         except Ast.BADAT:
+            try:
+               junk = frame.get( "StdOfRest({0})".format( i+1 ) )
+               spec_axis = i + 1
+               classified = True
+            except Ast.BADAT:
+               pass
+
+         try:
+            junk = frame.get( "TimeScale({0})".format( i+1 ) )
+            time_axis = i + 1
+            classified = True
+         except Ast.BADAT:
+            pass
+
+         text = ""
+         item = frame.get( "Domain({0})".format( i+1 ) )
+         if item and item != dom0 and not classified:
+            text = "{0}Domain: {1}<br>".format(text,item)
+         item = frame.get("Label({0})".format( i+1 ))
+         if item:
+            text = "{0}Label: {1}<br>".format(text,item)
+
+         item1 = frame.get("InternalUnit({0})".format( i+1 ))
+         item2 = frame.get("Unit({0})".format( i+1 ))
+         if item1 and item2 and item1 == item2:
+            item = item1
+            item1 = None
+            item2 = None
+         if item:
+            text = "{0}Unit: {1}<br>".format(text,item)
+         if item1:
+            text = "{0}Unformatted unit: {1}<br>".format(text,item1)
+         if item2:
+            text = "{0}Formatted unit: {1}<br>".format(text,item2)
+
+         item = frame.get("Format({0})".format( i+1 ))
+         if item:
+            text = "{0}Format: {1}<br>".format(text,item)
+
+         layout.addWidget( QLabel( stripbr(text) ), row, 1 )
+
+         self.rows.append( row )
+
+         edit = DataEdit(self, [ i, row ] )
+         setTip( edit, "Enter a formatted value for axis {0}, then press return to see the unformatted value".format(i+1) )
+         edit.editingFinished.connect(self.unformat_all)
+         self.frm_edits.append( edit )
+         layout.addWidget( edit, row, 2, Qt.AlignTop )
+
+         self.setarrow( row )
+
+         edit = ValueEdit(self, [ i, row, -1 ] )
+         setTip( edit, "Enter an unformatted value for axis {0}, then press return to see the formatted value".format(i+1) )
+         edit.editingFinished.connect(self.format_all)
+         self.unf_edits.append( edit )
+         layout.addWidget( edit, row, 4, Qt.AlignTop )
+         row += 1
+
+      sky_axis = max( [skylon_axis, skylat_axis ] )
+      if sky_axis > 0:
+         layout.addItem( QSpacerItem(10,10), row, 0 )
+         row += 1
+
+         text = "<h4>Celestial co-ordinates:</h4>"
+         layout.addWidget( QLabel( text ), row, 0, 1, -1 )
+         row += 1
+
+         text = ""
+         item = frame.get("System({0})".format( sky_axis ))
+         if item:
+            text = "{0}System: {1}<br>".format(text,item)
+         item = frame.get("Equinox({0})".format( sky_axis ))
+         if item:
+            text = "{0}Equinox: {1}<br>".format(text,item)
+
+         if skylon_axis > 0 and skylat_axis > 0:
+            att1 = "SkyRef({0})".format( skylon_axis )
+            att2 = "SkyRef({0})".format( skylat_axis )
+            if frame.test(att1) and frame.test(att2):
+               fmt1 = frame.format( skylon_axis, float(frame.get(att1)) )
+               fmt2 = frame.format( skylat_axis, float(frame.get(att2)) )
+               text = "{0}Ref. position: {1} {2}<br>".format(text,fmt1,fmt2)
+               item = frame.get("SkyRefIs({0})".format( sky_axis ))
+               text = "{0}Ref. position is {1}<br>".format(text,item)
+         layout.addWidget( QLabel( stripbr(text) ), row, 1, 1, -1 )
+         row += 1
+
+      if spec_axis == 0:
+         spec_axis = dsb_axis
+
+      if spec_axis > 0:
+         layout.addItem( QSpacerItem(10,10), row, 0 )
+         row += 1
+
+         text = "<h4>Spectral co-ordinates:</h4>"
+         layout.addWidget( QLabel( text ), row, 0, 1, -1 )
+         row += 1
+
+         text = ""
+         item = frame.get("System({0})".format( spec_axis ))
+         if item:
+            text = "{0}System: {1}<br>".format(text,item)
+         item = frame.get("RefRA({0})".format( spec_axis ))
+         if item:
+            text = "{0}Ref. RA: {1}<br>".format(text,item)
+         item = frame.get("RefDec({0})".format( spec_axis ))
+         if item:
+            text = "{0}Ref. Dec: {1}<br>".format(text,item)
+         item = frame.get("RestFreq({0})".format( spec_axis ))
+         if item:
+            text = "{0}Rest freq: {1} GHz<br>".format(text,item)
+         item = frame.get("StdOfRest({0})".format( spec_axis ))
+         if item:
+            text = "{0}Standard of rest: {1}<br>".format(text,item)
+
+         if dsb_axis > 0:
+            label = frame.get("Label({0})".format( dsb_axis )).lower()
+            unit = frame.get("Unit({0})".format( dsb_axis ))
+            item = frame.get("DSBCentre({0})".format( dsb_axis ))
+            if item:
+               text = "{0}Central {1}: {2} {3}<br>".format(text,label,item,unit)
+            item = frame.get("IF({0})".format( dsb_axis ))
+            if item:
+               text = "{0}Intermediate freq: {1} GHz<br>".format(text,item)
+            item = frame.get("SideBand({0})".format( dsb_axis )).lower()
+            if item:
+               if item == "usb":
+                  item = "upper"
+               elif item == "lsb":
+                  item = "lower"
+               elif item == "lo":
+                  item = "offset from local oscillator"
+               text = "{0}Side band: {1}<br>".format(text,item)
+
+         layout.addWidget( QLabel( stripbr(text) ), row, 1, 1, -1 )
+         row += 1
+
+      if time_axis > 0:
+         layout.addItem( QSpacerItem(10,10), row, 0 )
+         row += 1
+
+         text = "<h4>Time co-ordinate:</h4>"
+         layout.addWidget( QLabel( text ), row, 0, 1, -1 )
+         row += 1
+
+         text = ""
+         unit = frame.get("Unit({0})".format( time_axis ))
+         item = frame.get("System({0})".format( time_axis ))
+         if item:
+            text = "{0}System: {1}<br>".format(text,item)
+         if frame.test("TimeOrigin({0})".format( time_axis )):
+            item = frame.get("TimeOrigin({0})".format( time_axis ))
+            if item:
+               text = "{0}Origin: {1} {2}<br>".format(text,item,unit)
+         if frame.test("LTOffset({0})".format( time_axis )):
+            item = frame.get("LTOffset({0})".format( time_axis ))
+            if item:
+               text = "{0}Time-zone offset: {1} hr<br>".format(text,item)
+         item = frame.get("TimeScale({0})".format( time_axis ))
+         if item:
+            text = "{0}Time scale: {1}<br>".format(text,item)
+
+         layout.addWidget( QLabel( stripbr(text) ), row, 1, 1, -1 )
+         row += 1
+
+      if mapwid:
+         if input:
+            medits = mapwid.input_edits
+         elif mapwid.series:
+            medits = mapwid.output_edits[ -1 ]
+         else:
+            medits = mapwid.output_edits
+
+         if len(medits) != frame.Naxes:
+            QMessageBox.critical( self, "astviewer error", "The Frame has "
+                                  "{0} axes, but the associated Mapping has "
+                                  "{1} axes (astviewer programming error)."
+                                  .format(frame.Naxes,len(medits)),
+                                  QMessageBox.Ok )
+            self.mapwid = None
+         else:
+            for (medit,fedit) in zip(medits,self.unf_edits):
+               fedit.setValue( medit.value() )
+            self.format_all()
+
+   def setarrow( self, row, dir=None ):
+      if dir is None:
+         tip = ""
+      elif dir == RIGHT:
+         tip = "Unformatted value generated from formatted value"
+      else:
+         tip = "Formatted value generated from unformatted value"
+      self.grid.addArrow( row, 3, tip, dir, Qt.AlignTop )
+
+   def format_all(self):
+      for iaxis in range(self.object.Naxes):
+         text = self.object.format( iaxis + 1, self.unf_edits[ iaxis ].value() )
+         self.frm_edits[ iaxis ].setText( text )
+         self.setarrow( self.rows[ iaxis ], LEFT )
+
+   def unformat_all(self):
+      for iaxis in range(self.object.Naxes):
+         text = str(self.frm_edits[ iaxis ].text())
+         (nc,value) = self.object.unformat( iaxis + 1, text )
+         if nc < len(text):
+            self.frm_edits[ iaxis ].setText(text[:nc])
+         self.unf_edits[ iaxis ].setValue( value )
+         self.setarrow( self.rows[ iaxis ], RIGHT )
+
+   def send_initialiser(self):
+      result = None
+      if self.mapwid:
+         self.unformat_all()
+         values = []
+         for iaxis in range(self.object.Naxes):
+            values.append( self.unf_edits[ iaxis ].value() )
+         result = MappingInitialiser( -1, self.input, values )
+      return result
+
+   def setAttr( self ):
+      dialog = setAttrDialog( self, self.object, self.dialog )
+      dialog.exec_()
+
+#  ================================================================
+class MappingWidget(ObjectWidget):
+
+#  ----------------------------------------------------------------
+   def __init__(self, dialog, object, data ):
+      super(MappingWidget,self).__init__( dialog, object )
+      self.input_edits = None
+      self.output_edits = None
+      self.helpTarget = "mappingwidget"
+
+      if data is not None:
+         self.input_frame = data[ 0 ]
+         self.output_frame = data[ 1 ]
+         self.parent_icomp = data[ 2 ]
+      else:
+         self.input_frame = None
+         self.output_frame = None
+         self.parent_icomp = None
+
+      self.hasFwd = object.TranForward
+      self.hasInv = object.TranInverse
+      if not self.hasFwd:
+         self.layout.addWidget( QLabel("The forward transformation of the {0} is undefined".format(object.Class) ))
+      if not self.hasInv:
+         self.layout.addWidget( QLabel("The inverse transformation of the {0} is undefined".format(object.Class) ))
+
+      if isinstance( object, Ast.CmpMap ):
+         self.compound = True
+         self.title = "Component Mappings"
+         ( self.list, self.series ) = maplist( object )
+         self.nmap = len( self.list )
+         if self.series:
+            header = "<h4>Mappings in series:</h4>"
+            widget = self.seriesWidget( )
+         else:
+            header = "<h4>Mappings in parallel:</h4>"
+            widget = self.parallelWidget( )
+         self.layout.addWidget( QLabel( header ) )
+         simplify_target = "whole CmpMap"
+      else:
+         self.compound = False
+         self.title = "Atomic Mapping"
+         self.list = [object]
+         self.series = False
+         self.nmap = 1
+         widget = self.parallelWidget( )
+         simplify_target = object.Class
+
+      self.layout.addWidget( widget )
+
+      simplifyAction = QAction('&Simplify', self)
+      simplifyAction.setShortcut('Ctrl+S')
+      setTip( simplifyAction, 'Simplify the {0}'.format(simplify_target) )
+      simplifyAction.triggered.connect(self.simplify)
+      self.dialog.actionMenu.addAction( simplifyAction )
+
+      mergeAction = QAction('&Merge', self)
+      setTip( mergeAction, 'Attempt to merge a single Mapping with its neighbours' )
+      mergeAction.triggered.connect(self.merge)
+      mergeAction.setShortcut('Ctrl+R')
+      self.dialog.actionMenu.addAction( mergeAction )
+
+      QTimer.singleShot( 50, self.initFocus )
+
+
+   def merge( self ):
+      dialog = mergeDialog( self )
+      dialog.exec_()
+
+      if self.merge > 0:
+         where = self.merge - 1
+         invlist = []
+         for map in self.list:
+            invlist.append( int(map.Invert) )
+         this = self.list[where]
+         (result,mlist,ilist) = this.mapmerge( where, self.series, self.list, invlist )
+         ttl = "Merged Mapping {0} - a {1}".format(self.merge,this.Class)
+         if result >= 0:
+            new = None
+            for (map,inv) in zip(mlist,ilist):
+               map.Invert = inv
+               if new is None:
+                  new = map
+               else:
+                  new = Ast.CmpMap( new, map, self.series )
+            self.dialog.showObject( new, [ self.input_frame, self.output_frame, None ] )
+
+            if new.isacmpmap():
+               QMessageBox.information( self, ttl, "Mapping {0} (a {1}) in the "
+                                        "new mapping list is the first modified mapping."
+                                        .format( result + 1, mlist[result].Class ),
+                                         QMessageBox.Ok )
+            elif self.compound:
+               QMessageBox.information( self, ttl, "The merge resulted in a "
+                                        "single {0}".format( new.Class ),
+                                        QMessageBox.Ok )
+            else:
+               QMessageBox.information( self, ttl, "The merge resulted in a "
+                                        "changed {0}".format( new.Class ),
+                                        QMessageBox.Ok )
+         else:
+            QMessageBox.information( self, ttl, "The selected Mapping "
+                                     "(Mapping {0} - a {1}) could not be "
+                                     "merged so no changes were made to the "
+                                     "list of Mappings".format( self.merge,
+                                     this.Class ), QMessageBox.Ok )
+
+   def simplify( self ):
+      simp = self.object.simplify()
+      if simp is self.object:
+         QMessageBox.warning( self, "No Simplification", "The {0} could "
+                              "not be simplified".format(self.object.Class),
+                              QMessageBox.Ok )
+      else:
+         self.dialog.showObject( simp, [self.input_frame, self.output_frame, None] )
+
+   def initFocus(self):
+      if self.input_edits:
+         self.input_edits[0].setFocus()
+
+   def parallelWidget( self ):
+      result = QWidget(self)
+      self.grid = ArrowLayout()
+      result.setLayout( self.grid )
+
+      self.input_edits = []
+      self.output_edits = []
+
+      row = self.nmap
+      iin = 1
+      iout = 1
+      for icomp in range(self.nmap):
+         comp = self.list[ icomp ]
+
+         inaxes = []
+         iplayout = QGridLayout()
+         for i in range(comp.Nin-1,-1,-1):
+            col = 0
+
+            lab = QLabel( str(iin) )
+            lab.setFixedWidth( 15 )
+            iplayout.addWidget( lab, i, col, Qt.AlignLeft )
+            col += 1
+
+            if self.input_frame:
+               sym = self.input_frame.get( "Symbol({0})".format(iin) )
+               lab = self.input_frame.get( "Label({0})".format(iin) )
+               w = LinkLabel( "({0})".format(sym), result, True, self )
+               if lab:
+                  setTip( w, lab  )
+               else:
+                  setTip( w, "Click to see details of the input axes"  )
+               iplayout.addWidget( w, i, col, Qt.AlignLeft )
+               col += 1
+
+            edit = ValueEdit(result, [True,iin,icomp] )
+            setTip( edit, "Enter value for input {0}. Press <return> to forward transform.".format(iin)  )
+            edit.editingFinished.connect(self.ptransform)
+            self.input_edits.append( edit )
+            iplayout.addWidget( edit, i, col, Qt.AlignHCenter )
+            inaxes.append( iin )
+            iin += 1
+         self.grid.addLayout( iplayout, row, 0 )
+
+         comp_edits = []
+         outaxes = []
+         oplayout = QGridLayout()
+         for i in range(comp.Nout-1,-1,-1):
+            edit = ValueEdit(result, [False,iout,icomp] )
+            setTip( edit, "Enter value for output {0}. Press <return> to inverse transform.".format(iout)  )
+            edit.editingFinished.connect(self.ptransform)
+            self.output_edits.append( edit )
+            comp_edits.append( edit )
+            oplayout.addWidget( edit, i, 0, Qt.AlignHCenter )
+            lab = QLabel( str(iout) )
+            lab.setFixedWidth( 13 )
+            oplayout.addWidget( lab, i, 1 )
+            outaxes.append( iout )
+
+            if self.output_frame:
+               sym = self.output_frame.get( "Symbol({0})".format(iout) )
+               lab = self.output_frame.get( "Label({0})".format(iout) )
+               w = LinkLabel( "({0})".format(sym), result, False, self )
+               if lab:
+                  setTip( w, lab  )
+               else:
+                  setTip( w, "Click to see details of the output axes"  )
+               oplayout.addWidget( w, i, 2 )
+
+            iout += 1
+
+         self.grid.addLayout( oplayout, row, 2 )
+
+         blayout = QVBoxLayout()
+         blayout.setContentsMargins( 0, 0, 0, 0 )
+         blayout.setSpacing( 0 )
+         blayout.addWidget( Line(result),Qt.AlignTop )
+         if self.compound:
+
+            inframe = None
+            outframe = None
+            if self.input_frame:
+               ( inframe, junk ) = self.input_frame.pickaxes( inaxes )
+            if self.output_frame:
+               ( outframe, junk ) = self.output_frame.pickaxes( outaxes )
+
+            button = DataButton( "{0}:{1}".format(icomp+1,comp.Class), result, [comp,inframe,outframe,comp_edits,icomp] )
+            setTip( button, "Mapping {0}. Click to see details of the {1}".format(icomp+1,comp.Class)  )
+            button.clicked.connect(self.mapClicked)
+            button.setStyleSheet("QPushButton { margin: 0px 20px 0px 20px }")
+         else:
+            button = QLabel( "This {0}".format( comp.Class ) )
+         blayout.addWidget( button )
+         blayout.addWidget( Line(result),Qt.AlignBottom )
+         self.grid.addLayout( blayout, row, 1)
+
+         row -= 1
+
+      if self.input_frame:
+         w = LinkLabel( "Inputs", result, True, self )
+         setTip( w, "Click to see details of the input axes"  )
+      else:
+         w = QLabel( "Inputs" )
+         setTip( w, "No Frame is associated with the input axes"  )
+      self.grid.addWidget( w, row, 0, Qt.AlignHCenter )
+
+      self.grid.addArrow( row, 1, None )
+
+      if self.output_frame:
+         w = LinkLabel( "Outputs", result, False, self )
+         setTip( w, "Click to see details of the output axes"  )
+      else:
+         w = QLabel( "Outputs" )
+         setTip( w, "No Frame is associated with the output axes"  )
+      self.grid.addWidget( w, row, 2, Qt.AlignHCenter )
+
+      prevtab = edit
+      for edit in self.input_edits:
+         QWidget.setTabOrder( prevtab, edit )
+         prevtab = edit
+      for edit in self.output_edits:
+         QWidget.setTabOrder( prevtab, edit )
+         prevtab = edit
+
+      return result
+
+   def seriesWidget( self ):
+      result = QWidget(self)
+      self.grid = ArrowLayout()
+      result.setLayout( self.grid )
+      self.row_offset = 2
+
+      row = 0
+      if self.input_frame:
+         for i in range(self.input_frame.Naxes):
+            sym = self.input_frame.get( "Symbol({0})".format(i+1) )
+            lab = self.input_frame.get( "Label({0})".format(i+1) )
+            w = LinkLabel( sym, result, True, self )
+            if lab:
+               setTip( w, lab  )
+            else:
+               setTip( w, "Click to see details of the input axes"  )
+            self.grid.addWidget( w, row, 3 + i, Qt.AlignHCenter )
+         row += 1
+         self.row_offset += 1
+         w = LinkLabel( "Inputs", result, True, self )
+         setTip( w, "Click to see details of the input axes"  )
+      else:
+         w = QLabel( "Inputs" )
+         setTip( w, "No Frame is associated with the input axes"  )
+      self.grid.addWidget( w, row, 1, Qt.AlignHCenter )
+
+      col = 3
+      self.input_edits = []
+      for iin in range(self.list[0].Nin):
+         edit = ValueEdit(self, [-1,iin] )
+         setTip( edit, "Enter value for axis {0}. Press <return> to transform.".format(iin+1)  )
+         edit.editingFinished.connect(self.stransform)
+
+         self.input_edits.append( edit )
+         self.grid.addWidget( edit, row, col, Qt.AlignHCenter )
+         col += 1
+      row += 1
+
+      self.grid.addWidget( QLabel( QString(u'\u21e9') ), row, 1, Qt.AlignHCenter )
+      self.grid.addWidget( QLabel( "Mapping outputs" ), row, 2, 1, -1, Qt.AlignHCenter )
+      row += 1
+
+      self.output_edits = []
+
+      for icomp in range(self.nmap):
+
+         inframe = None
+         outframe = None
+         if icomp == 0:
+            inframe = self.input_frame
+         if icomp == self.nmap - 1:
+            outframe = self.output_frame
+
+         self.grid.addWidget( QLabel(str(icomp+1)), row, 0 )
+         comp = self.list[ icomp ]
+
+         col = 3
+         edits = []
+         for iin in range(comp.Nout):
+            edit = ValueEdit(self, [icomp,iin] )
+            setTip( edit, "Enter value for axis {0}. Press <return> to transform.".format(iin+1)  )
+            edit.editingFinished.connect(self.stransform)
+            edits.append( edit )
+            self.grid.addWidget( edit, row, col, Qt.AlignHCenter )
+            col += 1
+         self.output_edits.append( edits )
+
+         if self.compound:
+            button = DataButton( comp.Class, result, [comp,inframe,outframe,edits,icomp] )
+            setTip( button, "Mapping {0}. Click to see details of the {1}".format(icomp+1,comp.Class)  )
+            button.clicked.connect(self.mapClicked)
+         else:
+            button = QLabel( "This {0}".format( comp.Class ) )
+         self.grid.addWidget( button, row, 1, Qt.AlignHCenter )
+         self.grid.addArrow( row, 2, None )
+
+         row += 1
+
+      self.grid.addWidget( QLabel( QString(u'\u21e9') ), row, 1, Qt.AlignHCenter )
+
+      if self.output_frame:
+         for i in range(self.output_frame.Naxes):
+            sym = self.output_frame.get( "Symbol({0})".format(i+1) )
+            lab = self.output_frame.get( "Label({0})".format(i+1) )
+            w = LinkLabel( sym, result, False, self )
+            if lab:
+               setTip( w, lab  )
+            else:
+               setTip( w, "Click to see details of the output axes"  )
+            self.grid.addWidget( w, row+1, 3 + i, Qt.AlignHCenter )
+         w = LinkLabel( "Outputs", result, False, self )
+         setTip( w, "Click to see details of the output axes"  )
+      else:
+         w = QLabel( "Outputs" )
+         setTip( w, "No Frame is associated with the output axes"  )
+      self.grid.addWidget( w, row + 1, 1, Qt.AlignHCenter )
+
+      return result
+
+   def mapClicked(self):
+      ( map, inframe, outframe, edits, icomp ) = self.sender().data
+      ovalues = []
+      for edit in edits:
+         ovalues.append( edit.value() )
+      initialiser = MappingInitialiser( -1, False, ovalues )
+      self.dialog.showObject( map, [ inframe, outframe, icomp ], initialiser )
+
+   def setarrow( self, row, dir=None, icomp=0 ):
+      if dir is None:
+         tip = "Values entered by the user"
+      elif dir == UP:
+         tip = "Values generated from the row below using the inverse transformation of Mapping {0}".format(icomp)
+      else:
+         tip = "Values generated from the row above using the foward transformation of Mapping {0}".format(icomp-1)
+      self.grid.addArrow( row, 2, tip, dir )
+
+   def ptransform(self):
+      ( input, iaxis, icomp ) = self.sender().data
+      self.ptransformer( input )
+
+   def ptransformer( self, input ):
+      defined = True
+      if input:
+         edits0 = self.input_edits
+         edits1 = self.output_edits
+         arrowdir = RIGHT
+         tip = "Outputs derived from inputs using the CmpMap forward transformation"
+         if not self.hasFwd:
+            defined = False
+            QMessageBox.warning( self, "Undefined transformation", "The {0} "
+                                 "does not have a foward transformation".
+                                 format(self.object.Class), QMessageBox.Ok )
+      else:
+         edits0 = self.output_edits
+         edits1 = self.input_edits
+         tip = "Inputs derived from outputs using the CmpMap inverse transformation"
+         arrowdir = LEFT
+         if not self.hasInv:
+            defined = False
+            QMessageBox.warning( self, "Undefined transformation", "The {0} "
+                                 "does not have an inverse transformation".
+                                 format(self.object.Class), QMessageBox.Ok )
+
+      self.grid.addArrow( 0, 1, tip, arrowdir )
+
+      if defined:
+         vals0 = []
+         for edit in edits0:
+            vals0.append( [edit.value()] )
+
+         vals1 = self.object.tran( vals0, input )
+
+         for (edit,val) in zip(edits1,vals1):
+            edit.setValue( val )
+      else:
+         for edit in edits1:
+            edit.setUndef()
+
+   def stransform(self):
+      ( icomp, iaxis ) = self.sender().data
+      self.stransformer( icomp )
+
+   def stransformer( self, icomp ):
+      if icomp == -1:
+         edits = self.input_edits
+         irow = 0
+      else:
+         irow = icomp + self.row_offset
+         edits = self.output_edits[ icomp ]
+
+      self.setarrow( irow )
+      warning = ""
+
+      vals0 = []
+      for edit in edits:
+         vals0.append( [edit.value()] )
+
+      invals = vals0
+      for i in range( icomp+1, self.nmap ):
+         if invals is not None and self.list[i].TranForward:
+            outvals = self.list[ i ].tran( invals )
+            j = 0
+            for val in outvals:
+               self.output_edits[ i ][ j ].setValue( val[0] )
+               j += 1
+         else:
+            outvals = None
+            for edit in self.output_edits[ i ]:
+               edit[ j ].setUndef( )
+
+         invals = outvals
+         text = self.list[ i ].Class
+         self.setarrow( self.row_offset + i, DOWN, 2 + i )
+
+      if invals is None:
+         warning = "One or more of the component Mappings has an undefined forward transformation"
+
+      outvals = vals0
+      for i in range( icomp, -1, -1 ):
+         if outvals is not None and self.list[i].TranInverse:
+            invals = self.list[ i ].tran( outvals, False )
+         else:
+            invals = None
+
+         if i > 0:
+            edits = self.output_edits[ i - 1 ]
+            text = self.list[ i ].Class
+            self.setarrow( self.row_offset - 1 + i, UP, 1 + i )
+         else:
+            edits = self.input_edits
+
+         if invals is not None:
+            j = 0
+            for val in invals:
+               edits[ j ].setValue( val[0] )
+               j += 1
+         else:
+            for edit in edits:
+               edit.setUndef( )
+
+         outvals = invals
+
+      if outvals is None:
+         if warning:
+            warning += "\n"
+         warning += "One or more of the component Mappings has an undefined inverse transformation"
+
+      if warning:
+         QMessageBox.warning( self, "Undefined transformation", warning,
+                              QMessageBox.Ok )
+
+#  Creates an initialiser that will initialise a MappingWidget so that it equals the current state
+#  of "self".
+   def initialiser(self):
+      values = []
+      for iaxis in range(self.object.Nin):
+         values.append( self.input_edits[ iaxis ].value() )
+      return MappingInitialiser( -1, True, values )
+
+#  Creates an initialiser that will initialise the parent MappingWidget so that it is in the same state
+#  that it was before "self" was displayed, except that any "sent" axis values are inherited from "self".
+   def send_initialiser(self):
+      if self.series:
+         edits = self.output_edits[ -1 ]
+      else:
+         edits = self.output_edits
+      values = []
+      for edit in edits:
+         values.append( edit.value() )
+      return MappingInitialiser( self.parent_icomp, False, values )
+
+
+
+#  ================================================================
+class Initialiser(object):
+
+   def initialise( self, objwidget ):
+      pass
+
+
+#  ================================================================
+class MappingInitialiser(Initialiser):
+
+   def __init__(self, icomp, input, values ):
+      super(MappingInitialiser,self).__init__()
+      self.icomp = icomp
+      self.input = input
+      self.values = values
+
+   def initialise( self, objwidget ):
+      if isinstance( objwidget, MappingWidget ):
+
+         if objwidget.series:
+            if self.input:
+               if self.icomp > 0:
+                  edits = objwidget.output_edits[ self.icomp - 1 ]
+               else:
+                  edits = objwidget.input_edits
+            else:
+               if self.icomp >= 0:
+                  edits = objwidget.output_edits[ self.icomp ]
+               else:
+                  edits = objwidget.output_edits[ -1 ]
+         else:
+            if self.input:
+               if self.icomp > 0:
+                  QMessageBox.warning( self, "astviewer error", "The MappingInitialiser class "
+                                       "does not support parallel inputs", QMessageBox.Ok )
+               else:
+                  edits = objwidget.input_edits
+            else:
+               if self.icomp >= 0:
+                  edits = []
+                  for edit in objwidget.output_edits:
+                     ( input, iout, icomp ) = edit.data
+                     if icomp == self.icomp:
+                        edits.append( edit )
+               else:
+                  edits = objwidget.output_edits
+
+         for (value,edit) in zip(self.values,edits):
+            edit.setValue( value )
+
+         if objwidget.series:
+            if self.input:
+               if self.icomp <= 0:
+                  objwidget.stransformer( -1 )
+               else:
+                  objwidget.stransformer( self.icomp - 1 )
+            else:
+               if self.icomp < 0:
+                  objwidget.stransformer( len(objwidget.output_edits) -1 )
+               else:
+                  objwidget.stransformer( self.icomp )
+         else:
+            if self.input:
+               objwidget.ptransformer( True )
+            else:
+               objwidget.ptransformer( False )
+
+
+
+#  ================================================================
+class NodeIcon(QGraphicsEllipseItem):
+
+#  ----------------------------------------------------------------
+   def __init__(self, inode, scene, radius=7 ):
+      super(NodeIcon,self).__init__( 0, 0, radius, radius )
+      self.inode = inode
+      self.scene = scene
+      self.radius = radius
+      self.setBrush( black )
+      self.setPen( pen1 )
+      self.setAcceptHoverEvents(True)
+      self.childmaps = []
+      self.parentmap = None
+
+#  ----------------------------------------------------------------
+#  Show help in the status bar when the mouse enters the FrameIcon.
+   def hoverEnterEvent(self,event):
+      self.scene.statusbar.showMessage( "Click and drag to move a node and all its children." )
+      QApplication.setOverrideCursor(Qt.DragMoveCursor)
+
+#  ----------------------------------------------------------------
+#  Clear the status bar when the mouse leaves the FrameIcon.
+   def hoverLeaveEvent(self,event):
+      self.scene.statusbar.clearMessage()
+      QApplication.restoreOverrideCursor()
+
+#  ----------------------------------------------------------------
+#  Return X at centre of icon.
+   def centreX(self):
+      return self.sceneBoundingRect().center().x()
+
+#  ----------------------------------------------------------------
+#  Return Y at centre of icon.
+   def centreY(self):
+      return self.sceneBoundingRect().center().y()
+
+#  ----------------------------------------------------------------
+#  Centre the icon on a given (X,Y) value
+   def setCentre(self,x,y):
+      dx = self.centreX() - x
+      dy = self.centreY() - y
+      self.setPos( self.x() - dx, self.y() - dy )
+
+#  ----------------------------------------------------------------
+#  Return the point on the circle that is closest to the supplied point.
+   def connectPos(self, x, y):
+      x0 = self.centreX()
+      y0 = self.centreY()
+
+      dx = x - x0
+      dy = y - y0
+
+      l = sqrt( dx*dx + dy*dy )
+      if l > 0.0:
+         x = x0 + 0.5*dx*self.radius/l
+         y = y0 + 0.5*dy*self.radius/l
+
+      return ( x, y )
+
+#  ----------------------------------------------------------------
+#  Record the current position of the node and all its children.
+   def mark( self ):
+      self.markx = self.x()
+      self.marky = self.y()
+      if self.inode in self.scene.tree:
+         for inode in self.scene.tree[self.inode]:
+            self.scene.nodes[ inode ].mark()
+
+#  ----------------------------------------------------------------
+#  Move the current position of the node and all its children.
+   def move( self, dx, dy ):
+      self.setPos( self.markx + dx, self.marky + dy )
+      if self.inode in self.scene.tree:
+         for inode in self.scene.tree[self.inode]:
+            self.scene.nodes[ inode ].move( dx, dy )
+
+      if self.parentmap:
+         self.parentmap.setEnds()
+      for map in self.childmaps:
+         map.setEnds()
+
+#  ----------------------------------------------------------------
+#  When the left mouse button is pressed over the node, prepare to drag
+#  the node and all its children.
+   def mousePressEvent( self, event):
+      if event.modifiers() != QtCore.Qt.ControlModifier:
+         curpos = event.scenePos()
+         self.drag_curx = curpos.x()
+         self.drag_cury = curpos.y()
+         self.mark()
+
+#  ----------------------------------------------------------------
+#  When the mouse is moved, move the node and all its children.
+   def mouseMoveEvent( self, event):
+      if event.modifiers() != QtCore.Qt.ControlModifier:
+         curpos = event.scenePos()
+         dx = curpos.x() - self.drag_curx
+         dy = curpos.y() - self.drag_cury
+         self.move( dx, dy )
+
+#  ----------------------------------------------------------------
+#  Add a mapping to a child node.
+   def addChildMapping( self, mapping ):
+      self.childmaps.append( mapping )
+
+#  ----------------------------------------------------------------
+#  Set the mapping from the parent node.
+   def setParentMapping( self, mapping ):
+      self.parentmap = mapping
+
+
+#  ================================================================
+class FrameIcon(QGraphicsRectItem):
+
+#  ----------------------------------------------------------------
+   def __init__(self, inode, iframe, frame, scene, label="" ):
+      super(FrameIcon,self).__init__()
+
+      self.inode = inode
+      self.iframe = iframe
+      self.frame = frame
+      self.scene = scene
+      self.rb = None
+      self.origin = None
+      self.childmaps = []
+      self.parentmap = None
+      self.dragging = False
+      self.dragged = False
+
+      self.setAcceptHoverEvents(True)
+      self.setEnabled(True)
+      self.setActive(True)
+      self.setFlag( QGraphicsItem.ItemIsSelectable )
+#      self.setFlag( QGraphicsItem.ItemIsMovable )
+
+      self.setBrush( light_grey )
+      self.setPen( pen2 )
+
+#  Create a SimpleTextItem to hold the text.
+      self.text = QGraphicsSimpleTextItem()
+
+#  Attach it to this RectItem so that the text apears inside the box.
+      self.text.setParentItem(self)
+
+#  Assign the default text.
+      if label:
+         self.setText(  "Frame: {} ({})\nDomain: {}".format( iframe, label, frame.Domain) )
+      else:
+         self.setText(  "Frame: {}\nDomain: {}".format( iframe, frame.Domain) )
+
+#  ----------------------------------------------------------------
+#  Show help in the status bar when the mouse enters the FrameIcon.
+   def hoverEnterEvent(self,event):
+      self.scene.statusbar.showMessage( "Click to see Frame properties. "
+                                        "Click and drag to move a Frame and its children. "
+                                        "Control-click and drag to another Frame "
+                                        "to see Mapping between two Frames" )
+      QApplication.setOverrideCursor(Qt.PointingHandCursor)
+
+#  ----------------------------------------------------------------
+#  Clear the status bar when the mouse leaves the FrameIcon.
+   def hoverLeaveEvent(self,event):
+      self.scene.statusbar.clearMessage()
+      QApplication.restoreOverrideCursor()
+
+#  ----------------------------------------------------------------
+#  Record the current position of the frame and all its children.
+   def mark( self ):
+      self.markx = self.x()
+      self.marky = self.y()
+      if self.inode in self.scene.tree:
+         for inode in self.scene.tree[self.inode]:
+            self.scene.nodes[ inode ].mark()
+
+#  ----------------------------------------------------------------
+#  Move the current position of the frame and all its children.
+   def move( self, dx, dy ):
+      self.setPos( self.markx + dx, self.marky + dy )
+      if self.inode in self.scene.tree:
+         for inode in self.scene.tree[self.inode]:
+            self.scene.nodes[ inode ].move( dx, dy )
+
+      if self.parentmap:
+         self.parentmap.setEnds()
+      for map in self.childmaps:
+         map.setEnds()
+
+#  ----------------------------------------------------------------
+#  When the left mouse button is pressed over the FrameIcon, prepare to drag
+#  out a line to the pointer as it is moved.
+   def mousePressEvent( self, event):
+      self.dragged = False
+      if event.modifiers() == QtCore.Qt.ControlModifier:
+         self.origin = QPointF( self.centreX(), self.centreY() )
+         if not self.rb:
+            self.rb = ArrowItem( self.origin.x(), self.origin.y(),
+                                 self.origin.x(), self.origin.y() )
+            self.rb.setPen( pen4 )
+            self.scene.addItem( self.rb )
+      else:
+         curpos = event.scenePos()
+         self.drag_curx = curpos.x()
+         self.drag_cury = curpos.y()
+         self.mark()
+
+#  ----------------------------------------------------------------
+#  When the mouse is moved, drag out a line to the pointer.
+   def mouseMoveEvent( self, event):
+      self.dragged = True
+      if event.modifiers() == QtCore.Qt.ControlModifier or self.dragging:
+         if self.rb:
+            self.dragging = True
+            here = event.scenePos()
+            self.rb.setArrow( self.origin.x(), self.origin.y(), here.x(), here.y() )
+         else:
+            self.dragging = False
+      else:
+         curpos = event.scenePos()
+         dx = curpos.x() - self.drag_curx
+         dy = curpos.y() - self.drag_cury
+         self.move( dx, dy )
+
+#  ----------------------------------------------------------------
+#  When the left mouse button is released, display the Frame details if
+#  the mouse is still over the original FrameIcon, or the Mapping joining
+#  the two Frames if it over a differetn FrameIcon.
+   def mouseReleaseEvent(self, event):
+
+#  Remove the arrow first or else itemAt will return the arrow rather
+#  than the TextItem.
+      done = False
+      if event.modifiers() == QtCore.Qt.ControlModifier or self.dragging:
+         if self.rb:
+            self.scene.removeItem( self.rb )
+
+         it = self.scene.itemAt( event.scenePos() )
+         if it and isinstance( it, QGraphicsSimpleTextItem ):
+            it = it.parentItem()
+
+         self.scene.clearSelection()
+         self.setSelected(True)
+         if it and isinstance( it, FrameIcon ) and it != self:
+            it.setSelected(True)
+            self.scene.addItem( self.rb )
+            map = self.scene.frameset.getmapping( self.iframe, it.iframe )
+            inframe = self.scene.frameset.getframe( self.iframe )
+            outframe = self.scene.frameset.getframe( it.iframe )
+            dialog = ObjectDialog( None, map, [ inframe, outframe, None ] )
+            dialog.show()
+            self.scene.removeItem( self.rb )
+            done = True
+
+         self.rb = None
+
+      if not done and not self.dragged:
+         dialog = ObjectDialog( None, self.frame )
+         dialog.show()
+
+      self.dragging = False
+      return QGraphicsRectItem.mouseReleaseEvent(self,event)
+
+#  ----------------------------------------------------------------
+#  Return X at centre of icon.
+   def centreX(self):
+      return self.sceneBoundingRect().center().x()
+
+#  ----------------------------------------------------------------
+#  Return Y at centre of icon.
+   def centreY(self):
+      return self.sceneBoundingRect().center().y()
+
+#  ----------------------------------------------------------------
+#  Centre the icon on a given (X,Y) value
+   def setCentre(self,x,y):
+      dx = self.centreX() - x
+      dy = self.centreY() - y
+      self.setPos( self.x() - dx, self.y() - dy )
+
+#  ----------------------------------------------------------------
+#  Return the point on the rectangle that is closest to the supplied point.
+   def connectPos(self, x, y):
+      rect = self.sceneBoundingRect()
+      h = rect.height()
+      w = rect.width()
+
+      x0 = rect.center().x()
+      y0 = rect.center().y()
+
+      dx = x - x0
+      dy = y - y0
+
+      if abs(dx) > w/2 or abs(dy) > h/2:
+         if dx > 0:
+            if dy*w > h*dx:
+               x = x0 + 0.5*h*dx/dy
+               y = y0 + 0.5*h
+            elif dy*w < -h*dx:
+               x = x0 - 0.5*h*dx/dy
+               y = y0 - 0.5*h
+            else:
+               x = x0 + 0.5*w
+               y = y0 + 0.5*w*dy/dx
+
+         elif dx < 0:
+            if dy/(-dx) > h/w:
+               x = x0 + 0.5*h*dx/dy
+               y = y0 + 0.5*h
+            elif dy/(-dx) < -h/w:
+               x = x0 - 0.5*h*dx/dy
+               y = y0 - 0.5*h
+            else:
+               x = x0 - 0.5*w
+               y = y0 - 0.5*w*dy/dx
+
+         else:
+            if dy > 0.0:
+               x = x0
+               y = y0 + 0.5*h
+            else:
+               x = x0
+               y = y0 - 0.5*h
+
+      return ( x, y )
+
+#  ----------------------------------------------------------------
+   def setText(self, text ):
+
+#  Store the text  in the SimpleTextItem.
+      self.text.setText( text )
+
+#  Set the size of the box to give a border around the text.
+      self.setRect( -10, -10, self.text.boundingRect().width() + 20,
+                              self.text.boundingRect().height() + 20 )
+
+
+#  ----------------------------------------------------------------
+#  Add a mapping to a child node.
+   def addChildMapping( self, mapping ):
+      self.childmaps.append( mapping )
+
+#  ----------------------------------------------------------------
+#  Set the mapping from the parent node.
+   def setParentMapping( self, mapping ):
+      self.parentmap = mapping
+
+
+
+
+
+#  ================================================================
+class ArrowItem(QGraphicsPolygonItem):
+
+#  ----------------------------------------------------------------
+   def __init__(self):
+      super(ArrowItem,self).__init__()
+
+   def __init__(self,x1,y1,x2,y2):
+      super(ArrowItem,self).__init__()
+      self.setArrow( x1, y1, x2, y2 )
+
+#  Set the start and end of the arrow.
+   def setArrow( self, x1, y1, x2, y2 ):
+
+#  Arrow head dimensions (pixels)
+      head_width = 4
+      head_length = 10
+
+#  Create an empty polygon.
+      poly = QPolygonF()
+
+#  Add points to the polygon so that the polygon forms an arrow from
+#  (x1,y1) to (x2,y2)
+      dx = x2 - x1
+      dy = y2 - y1
+      l = sqrt( dx*dx + dy*dy )
+      if l > 0.0:
+
+         bar_length = l - head_length
+         vx = dx/l
+         vy = dy/l
+
+         x = x1
+         y = y1
+         poly += QPointF( x, y )
+
+         x += vx*bar_length
+         y += vy*bar_length
+         poly += QPointF( x, y )
+
+         x += vy*head_width
+         y += -vx*head_width
+         poly += QPointF( x, y )
+
+         x += -vy*head_width + vx*head_length
+         y += vx*head_width + vy*head_length
+         poly += QPointF( x, y )
+
+         x += -vx*head_length - vy*head_width
+         y += -vy*head_length + vx*head_width
+         poly += QPointF( x, y )
+
+         x += vy*head_width
+         y += -vx*head_width
+         poly += QPointF( x, y )
+
+#  Use the polygon.
+         self.setPolygon(poly)
+
+
+#  ================================================================
+class MappingIcon(ArrowItem):
+
+#  ----------------------------------------------------------------
+   def __init__(self,from_node,to_node,mapping,scene):
+      super(ArrowItem,self).__init__()
+      self.setAcceptHoverEvents(True)
+      self.setEnabled(True)
+      self.setActive(True)
+      self.setFlag( QGraphicsItem.ItemIsSelectable )
+#      self.setFlag( QGraphicsItem.ItemIsMovable )
+
+      self.mapping = mapping
+      self.scene = scene
+      self.from_node = from_node
+      self.to_node = to_node
+      self.setPen( pen1 )
+      self.setBrush( black )
+      from_node.addChildMapping( self )
+      to_node.setParentMapping( self )
+      self.setEnds()
+
+#  -------------------------------------------------------------------
+   def hoverEnterEvent(self,event):
+      self.scene.statusbar.showMessage( "Click to see Mapping properties.")
+      QApplication.setOverrideCursor(Qt.PointingHandCursor)
+
+#  -------------------------------------------------------------------
+   def hoverLeaveEvent(self,event):
+      self.scene.statusbar.clearMessage()
+      QApplication.restoreOverrideCursor()
+
+#  -------------------------------------------------------------------
+   def mouseReleaseEvent(self, event):
+      inframe = None
+      outframe = None
+      if isinstance( self.from_node, FrameIcon ):
+         inframe = self.from_node.frame
+      if isinstance( self.to_node, FrameIcon ):
+         outframe = self.to_node.frame
+
+      dialog = ObjectDialog( None, self.mapping, [inframe, outframe, None] )
+      dialog.show()
+      return QGraphicsPolygonItem.mouseReleaseEvent(self,event)
+
+#  -------------------------------------------------------------------
+#  Set the positions of the two ends of the MappingIcon so that they match
+#  the attached nodes.
+   def setEnds( self ):
+
+#  Get central (x,y) for each node.
+      x1 = self.from_node.centreX()
+      y1 = self.from_node.centreY()
+      x2 = self.to_node.centreX()
+      y2 = self.to_node.centreY()
+
+      dx = x2 - x1
+      dy = y2 - y1
+      length = math.sqrt(dx*dx+dy*dy)
+      cosa = dx/length
+      sina = dy/length
+
+#  Modify the position of the arrow end so that it is on the nearest
+#  point of the box representing to_node.
+      (x2,y2) = self.to_node.connectPos( x1, y1 )
+
+#  Modify the position of the arrow start so that it is on the nearest
+#  point of the box representing from_node.
+      (x1,y1) = self.from_node.connectPos( x2, y2 )
+
+#  Set the start and end of the arrow.
+      self.setArrow( x1, y1, x2, y2 )
+
+
+
+#  ================================================================
+class AstScene(QGraphicsScene):
+
+#  ----------------------------------------------------------------
+   def __init__(self,frameset,view,parent):
+        super(AstScene,self).__init__(parent)
+
+        w = 800
+        h = 500
+        self.setSceneRect( 0, 0, w, h )
+
+        self.view = view
+        self.frameset = frameset
+        self.nodes = []
+        self.parents = []
+        self.statusbar = parent.statusbar
+        self.baseIcon = None
+        self.currentIcon = None
+        self.nodegrid = {}
+
+#  Get the indices of the base and current Frames.
+        ibase = frameset.Base
+        icurrent = frameset.Current
+
+#  Get the number of nodes in the FrameSet.
+        ( ok, nnode, iframen, mapn, parent ) = frameset.getnode( -1 )
+
+#  Loop round all nodes in the FrameSet.
+        for inode in range( nnode ):
+
+#  Get the details of the FrameSet node.
+           ( ok, nnode, iframe, map, parent ) = frameset.getnode( inode )
+
+#  If the node is associated with a Frame, create a FramceIcon to add to
+#  the QGraphicsScene. Otherwise, create a NodeIcon. They all have the default
+#  position (0,0) to begin with.
+           if iframe != Ast.NOFRAME:
+              if iframe == ibase:
+                 label = "base"
+                 if iframe == icurrent:
+                    label += " and current"
+              elif iframe == icurrent:
+                 label = "current"
+              else:
+                 label = ""
+
+              frame = frameset.getframe( iframe )
+              item = FrameIcon( inode, iframe, frame, self, label )
+
+              if iframe == ibase:
+                 item.setPen( pen3 )
+                 self.baseIcon = item
+
+              if iframe == icurrent:
+                 item.setPen( pen3 )
+                 self.currentIcon = item
+
+           else:
+              item = NodeIcon( inode, self )
+
+#  Add the item to the scene, and append the icon to the list of node
+#  icons. Also record the node index of the parent node (the node that
+#  feeds the current node).
+           self.addItem( item )
+           self.nodes.append( item )
+           self.parents.append( parent )
+
+#  Create a tree holding the node indices. Each node in the tree holds
+#  nodes representing the child nodes. Each node is represented by its
+#  index in the "self.nodes" array.
+        self.tree = {}
+        nnode  = len( self.nodes )
+        for inode in range( nnode ):
+           iparent = self.parents[ inode ]
+           if iparent < 0:
+              self.iroot = inode
+           else:
+              if not iparent in self.tree:
+                 self.tree[iparent] = []
+              self.tree[iparent].append(inode)
+
+#  Assign a spatial position to each node icon. Make sure the mean position
+#  is the center of the window.
+        icon_spacing = 110
+        self.layout( icon_spacing, w/2, h/2 )
+        self.layout2( icon_spacing, w/2, h/2 )
+
+#  Now that the nodes have spatial positions, we can join them together
+#  using MappingIcons. Must do these down the tree.
+        for inode in range( nnode ):
+           iparent =  self.parents[inode]
+           if iparent >= 0:
+              from_node = self.nodes[ iparent ]
+              to_node = self.nodes[ inode ]
+              ( ok, nnode, iframe, map, parent ) = frameset.getnode( inode )
+              item = MappingIcon( from_node, to_node, map, self )
+              self.addItem( item )
+
+#  ----------------------------------------------------------------
+#  Ensure each node has an optimal position in the graph
+   def layout(self, spacing, centrex, centrey ):
+
+#  Find the weight for each node.
+      nnode  = len( self.nodes )
+      self.node_weight = []
+      for inode in range( nnode ):
+         self.node_weight.append( self.getNodeWeight( self.tree, inode ) )
+
+#  Place the root node at its original position, then recursively place
+#  each descendant on a set of concentric rings centred on the root node.
+      x = self.nodes[ self.iroot ].centreX()
+      y = self.nodes[ self.iroot ].centreY()
+      (xmin, xmax, ymin, ymax) = self.placeNode( self.tree, self.iroot, x, y,
+                                                 -0.5*pi, 1.5*pi, spacing, "" )
+
+#  Adjust the above positions to put the centre of the bounding box at
+#  the centre of the window, and assign the adjusted position to the icon.
+      dx = 0.5*( xmax + xmin ) - centrex
+      dy = 0.5*( ymax + ymin ) - centrey
+      for inode in range( nnode ):
+         x = self.nodes[ inode ].x()
+         y = self.nodes[ inode ].y()
+         self.nodes[ inode ].setPos( x - dx, y - dy )
+
+
+
+
+
+
+#  ----------------------------------------------------------------
+#  Ensure each node has an optimal position in the graph. This updtes the
+#  positions created by "layout1" using a dynamical model in which all
+#  nodes repel each other with a inverse square force, and each node is
+#  connected to its parent with a spring of natural length "spacing".
+   def layout2( self, spacing, centrex, centrey ):
+
+      K = -100000
+      A = 0.1
+      E = 0.1
+
+      nnode = len( self.nodes )
+      iter = -1
+      delta_maxl = 2E30
+      delta_max = 1E30
+      while delta_max < delta_maxl and iter < 200:
+         iter += 1
+         delta_maxl = delta_max
+         delta_max = 0
+         xmin = 1.0E30
+         xmax = -1.0E30
+         ymin = 1.0E30
+         ymax = -1.0E30
+
+         deltas = []
+         newxs = []
+         newys = []
+         for inode in range(nnode):
+
+            this_node = self.nodes[ inode ]
+            this_x = this_node.centreX()
+            this_y = this_node.centreY()
+
+            if isinstance( this_node, FrameIcon):
+               lab = "{0} {1}".format(inode,this_node.text.text())
+            else:
+               lab = "{0}".format(inode)
+
+            fx = 0
+            fy = 0
+            for jnode in range(nnode):
+               if inode != jnode:
+                  node = self.nodes[ jnode ]
+                  dx = node.centreX() - this_x
+                  dy = node.centreY() - this_y
+                  l2 = dx*dx + dy*dy
+                  if l2 > 0.0:
+                     l = math.sqrt( l2 )
+                     f = K/l2
+                     fx += f*dx/l
+                     fy += f*dy/l
+
+            iparent = self.parents[ inode ]
+            if iparent >= 0:
+               parent_node = self.nodes[ iparent ]
+               par_x = parent_node.centreX()
+               par_y = parent_node.centreY()
+               dx = par_x - this_x
+               dy = par_y - this_y
+               l = math.sqrt( dx*dx + dy*dy )
+
+               fx += E*(l-spacing)*dx/l
+               fy += E*(l-spacing)*dy/l
+
+               newx = this_x + A*fx
+               newy = this_y + A*fy
+
+               dx = newx - this_x
+               dy = newy - this_y
+               delta = math.sqrt( dx*dx + dy*dy )
+               if delta > delta_max:
+                  delta_max = delta
+
+               dx = this_x - par_x
+               dy = this_y - par_y
+               l = math.sqrt( dx*dx + dy*dy )
+
+               dx = newx - par_x
+               dy = newy - par_y
+               lnew = math.sqrt( dx*dx + dy*dy )
+
+               if isinstance( parent_node, FrameIcon):
+                  plab = "{0} {1}".format(iparent,parent_node.text.text())
+               else:
+                  plab = "{0}".format(iparent)
+
+            else:
+               newx = this_x
+               newy = this_y
+               delta = 0
+
+            newxs.append( newx )
+            newys.append( newy )
+            deltas.append( delta )
+
+            if newx > xmax:
+               xmax = newx
+            if newx < xmin:
+               xmin = newx
+            if newy > ymax:
+               ymax = newy
+            if newy < ymin:
+               ymin = newy
+
+         for inode in range(nnode):
+            self.nodes[inode].setCentre( newxs[inode], newys[inode] )
+
+#  Adjust the above positions to put the centre of the bounding box at
+#  the centre of the window, and assign the adjusted position to the icon.
+      dx = 0.5*( xmax + xmin ) - centrex
+      dy = 0.5*( ymax + ymin ) - centrey
+      for inode in range( nnode ):
+         x = self.nodes[ inode ].x()
+         y = self.nodes[ inode ].y()
+         self.nodes[ inode ].setPos( x - dx, y - dy )
+
+
+
+
+
+#  ----------------------------------------------------------------
+#  Return the angular weight for a specified node.
+   def getNodeWeight( self, tree, inode ):
+
+#  If the tree has no node for the given index, it is a leaf node so give
+#  it a weight of 1.0.
+      if inode not in tree:
+         return 1.0
+
+#  Otherwise, summing up the angular weight of its children.
+      else:
+         children = tree[ inode ]
+         nchild = len( children )
+         result = 0
+         for ichild in range(nchild):
+            result += self.getNodeWeight( tree, children[ ichild ] )
+
+#  Apply a factor so that smaller weight are given to nodes deeper in the tree.
+         result = 1.0 + 0.5*result
+
+      return result
+
+#  ----------------------------------------------------------------
+#  Place a given node at the specified position, and then place all
+#  descendants on concentric rings centred on the supplied node, but
+#  restricted to a specified angular section of each concentric ring.
+   def placeNode( self, tree, inode, x, y, a1, a2, spacing, indent ):
+      node = self.nodes[ inode ]
+      if isinstance( node, FrameIcon ):
+         text = "(Frame {0})".format(node.iframe)
+      else:
+         text = ""
+#      print("{6}Drawing node {0} {1} at ({2},{3}) with children between {4} and {5} (weight {7})".
+#            format( inode, text, x, y, 57.29578*a1, 57.29578*a2, indent, self.node_weight[inode] ))
+
+#  Initialise the bounding box containing the supplied node and all its
+#  decendants.
+      xmax = -1.0E30
+      xmin = 1.0E30
+      ymax = -1.0E30
+      ymin = 1.0E30
+
+#  Find the offset from origin to centre of the node, and then set the
+#  node's origin position so as to get the requested centre position.
+      dx = node.centreX() - node.x()
+      dy = node.centreY() - node.y()
+      node.setPos( x - dx, y - dy )
+
+#  Initialise the bounding box containing the supplied node and all its
+#  decendants.
+      xmax = x
+      xmin = x
+      ymax = y
+      ymin = y
+
+#  If this node has any children, draw them.
+      if inode in tree:
+
+#  Get the number of children.
+         children = tree[ inode ]
+         nchild = len( children )
+
+#  Get the total weight of all children of the current node.
+         wtot = 0.0
+         for ichild in range(nchild):
+            wtot += self.node_weight[ children[ ichild ] ]
+
+#  Divide up the angular range available to this node so that each unit
+#  weight gets the same angular width.
+         delta = ( a2 - a1 )/wtot
+         if delta > 0.5*pi:
+            delta = 0.5*pi
+
+#  INitialise the central angle for the first child
+
+#  Loop round drawing each child.
+         b2 = a1
+         for ichild in range(nchild):
+            inode_child = children[ ichild ]
+
+#  Get the angular width for the current node, based on its weight. */
+            awidth = delta*self.node_weight[ children[ ichild ] ]
+
+#  Get the upper and lower angular limits for the node.
+            b1 = b2
+            b2 = b1 + awidth
+
+#  Get the position for the child.
+            if isinstance( self.nodes[inode_child], NodeIcon ) or \
+               isinstance( self.nodes[inode], NodeIcon ):
+               sp = spacing
+            else:
+               sp = spacing
+            a0 = 0.5*( b1 + b2 )
+            cx = x + sp*sin( a0 )
+            cy = y + sp*cos( a0 )
+
+#  Call this function recursively to draw the child and all its decendants.
+            (cxmin, cxmax, cymin, cymax) = self.placeNode( tree, inode_child,
+                                                      cx, cy, b1-0.2, b2+0.2, spacing, indent+"  " )
+
+#  Update the bounding box.
+            if cxmin < xmin:
+               xmin = cxmin
+            if cxmax > xmax:
+               xmax = cxmax
+            if cymin < ymin:
+               ymin = cymin
+            if cymax > ymax:
+               ymax = cymax
+
+#  Return the bounding box.
+      return (xmin, xmax, ymin, ymax)
+
+
+#  ================================================================
+class AstView(QGraphicsView):
+   def __init__(self, tab, parent = None):
+      super(AstView, self).__init__(parent)
+      self.tab = tab
+
+#  ================================================================
+class AstTab(QWidget):
+   def __init__(self, label, parent = None):
+      super(AstTab, self).__init__(parent)
+      self.label = label
+      self.view =  AstView(self)
+      layout = QHBoxLayout()
+      layout.addWidget( self.view )
+      self.setLayout(layout)
+
+   def setSize(self):
+      self.view.setSceneRect( self.sceneRect() )
+
+   def sceneRect(self):
+      rect = self.view.scene().itemsBoundingRect()
+      width = rect.width()*1.1
+      height = rect.height()*1.1
+      cent = rect.center()
+      left = cent.x() - width/2
+      top = cent.y() - height/2
+      return QRectF( left, top, width, height )
+
+
+#  ================================================================
+class AstTabs(QTabWidget):
+   def __init__(self, parent = None):
+      super(AstTabs, self).__init__(parent)
+      self.tabs = {}
+      self.setTabsClosable( True )
+      self.tabCloseRequested.connect(self.closeTab)
+
+   def addTab(self,label="",tabtext=""):
+      self.s = QScrollArea()
+      tab = AstTab( label )
+      self.s.setWidget( tab )
+      self.s.setWidgetResizable(True)
+      itab = super(AstTabs, self).addTab( self.s, label )
+      self.tabs[label] = tab
+      self.setTabText( self.count()-1, tabtext)
+      return itab
+
+   def closeTab(self,itab):
+      tab = self.widget(itab).widget()
+      ikey = None
+      for (key,value) in self.tabs.items():
+         if value == tab:
+            ikey = key
+            break
+      if ikey is not None:
+         del self.tabs[ikey]
+      self.removeTab( itab )
+
+   def removeCurrentTab(self):
+      itab = self.currentIndex()
+      self.closeTab(itab)
+      return self.count()
+
+   def getCurrentView(self):
+      result = self.currentWidget()
+      if result is not None:
+         result = result.widget()
+      if result is not None:
+         result = result.view
+      return result
+
+   def setSize(self):
+      self.currentWidget().widget().setSize()
+
+#  ================================================================
+class AstViewer(QMainWindow):
+
+#  ----------------------------------------------------------------
+   def __init__(self, fname ):
+      super(AstViewer,self).__init__()
+      self.resize(QDesktopWidget().availableGeometry(self).size() * 0.6)
+      self.loadOptions()
+
+      self.exampleTab = -1
+      self.file = None
+      self.object = None
+      self.tabs = AstTabs()
+      self.setCentralWidget( self.tabs )
+      self.statusbar = self.statusBar()
+      self.titles = {}
+      self.fname = None
+      self.redraw = False
+
+      self.tabs.currentChanged.connect(self.tabChanged)
+
+      if fname:
+         self.readFile( fname )
+      else:
+         self.showExample( )
+
+      exitAction = QAction('&Exit', self)
+      exitAction.setShortcut('Ctrl+Q')
+      setTip( exitAction, 'Exit application' )
+      exitAction.triggered.connect(self.close)
+
+      openFileAction = QAction('Open', self)
+      openFileAction.setShortcut('Ctrl+O')
+
+      if ndf_supported:
+         if fits_supported:
+            text = 'Open new File - text, NDF or FITS'
+         else:
+            text = 'Open new File - text or NDF'
+      elif fits_supported:
+         text = 'Open new File - text or FITS'
+      else:
+         text = 'Open new File - text only'
+
+      setTip( openFileAction, text )
+      openFileAction.triggered.connect(self.showOpenFileDialog)
+
+      closeTabAction = QAction('&Close', self)
+      setTip( closeTabAction, 'Close tab' )
+      closeTabAction.triggered.connect(self.closeTab)
+
+      settingsAction = QAction('Preferences', self)
+      setTip( settingsAction, 'Change global preferences' )
+      settingsAction.triggered.connect(self.showSettingsDialog)
+
+      baseToCurrentAction = QAction('&View Base->Current Mapping', self)
+      baseToCurrentAction.setShortcut('Ctrl+M')
+      setTip( baseToCurrentAction, 'View the Mapping from the base to '
+                                   'the current Frame')
+      baseToCurrentAction.triggered.connect(self.btoc)
+
+      currentAction = QAction('&View Current Frame', self)
+      currentAction.setShortcut('Ctrl+C')
+      setTip( currentAction, 'View the current Frame' )
+      currentAction.triggered.connect(self.cframe)
+
+      baseAction = QAction('&View Base Frame', self)
+      baseAction.setShortcut('Ctrl+B')
+      setTip( baseAction, 'View the base Frame' )
+      baseAction.triggered.connect(self.bframe)
+
+      getAction = QAction('&Get/Clear Attributes', self)
+      getAction.setShortcut('Ctrl+G')
+      setTip( getAction, 'Get or clear FrameSet attribute values' )
+      getAction.triggered.connect(self.getAttr)
+
+      setAction = QAction('&Set Attributes', self)
+      setAction.setShortcut('Ctrl+T')
+      setTip( getAction, 'Set FrameSet attribute values' )
+      setAction.triggered.connect(self.setAttr)
+
+      simplifyAction = QAction('&Simplify FrameSet', self)
+      simplifyAction.setShortcut('Ctrl+S')
+      setTip( simplifyAction, 'Simplify the FrameSet' )
+      simplifyAction.triggered.connect(self.simplify)
+
+      menubar = self.menuBar()
+
+      fileMenu = MyMenu( self, '&File' )
+      menubar.addMenu( fileMenu )
+      fileMenu.addAction(openFileAction)
+      fileMenu.addAction(closeTabAction)
+      fileMenu.addAction(settingsAction)
+      fileMenu.addAction(exitAction)
+
+      actionsMenu = MyMenu( self, '&Actions' )
+      menubar.addMenu( actionsMenu )
+      actionsMenu.addAction(getAction)
+      actionsMenu.addAction(setAction)
+      actionsMenu.addAction(baseAction)
+      actionsMenu.addAction(currentAction)
+      actionsMenu.addAction(baseToCurrentAction)
+      actionsMenu.addAction(simplifyAction)
+
+      helpMenu = MyMenu( self, '&Help' )
+      menubar.addMenu( helpMenu )
+
+      help1Action = QAction('&Help on astviewer', self)
+      help1Action.setShortcut('Ctrl+H')
+      setTip( help1Action, 'Display help on astviewer' )
+      help1Action.triggered.connect(self.help1)
+      helpMenu.addAction(help1Action)
+
+      help2Action = QAction('&Help on window', self)
+      help2Action.setShortcut('Ctrl+W')
+      setTip( help2Action, 'Display help on the current window' )
+      help2Action.triggered.connect(self.help2)
+      helpMenu.addAction(help2Action)
+
+
+#  ----------------------------------------------------------------
+#  Show help
+   def help1( self ):
+      HelpBrowser.showPage()
+   def help2( self ):
+      HelpBrowser.showPage( "astviewer" )
+
+#  ----------------------------------------------------------------
+#  Display a simplified FrameSet
+   def simplify( self ):
+      if self.scene and self.scene.frameset:
+         simp = self.scene.frameset.simplify()
+         if simp is self.scene.frameset:
+            QMessageBox.warning( self, "No Simplification", "The FrameSet could "
+                                 "not be simplified", QMessageBox.Ok )
+         else:
+            self.newTab( simp )
+
+#  ----------------------------------------------------------------
+# Create a new Tab to show a FrameSet derived form the current FrameSet.
+   def newTab( self, newframeset ):
+      if newframeset:
+         title = self.this_title
+         m = re.match(r'(.*\()(\d+)\)$',title)
+         if m:
+            title = "{0}{1})".format( m.group(1), int(m.group(2))+1 )
+         else:
+            title = "{0} (2)".format(title)
+         label = self.this_label
+         m = re.match(r'(.*\()(\d+)\)$',label)
+         if m:
+            label = "{0}{1})".format( m.group(1), int(m.group(2))+1 )
+         else:
+            label = "{0} (2)".format(label)
+         self.showObject( newframeset, title, label )
+
+#  ----------------------------------------------------------------
+#  Get or clear an attribute value in a dialog. If anything changes, display
+#  the modified FrameSet in a new tab.
+   def getAttr( self ):
+      if self.scene and self.scene.frameset:
+         newframeset = self.scene.frameset.copy()
+         dialog = getAttrDialog( self, newframeset )
+         dialog.exec_()
+         if dialog.changed:
+            self.newTab( newframeset )
+
+#  ----------------------------------------------------------------
+#  Set new attribute values in a dialog. If anything changes, display
+#  the modified FrameSet in a new tab.
+   def setAttr( self ):
+      if self.scene and self.scene.frameset:
+         newframeset = self.scene.frameset.copy()
+         dialog = setAttrDialog( self, newframeset )
+         dialog.exec_()
+         if dialog.changed:
+            self.newTab( newframeset )
+
+#  ----------------------------------------------------------------
+#  Display the base to current Mapping
+   def btoc(self ):
+      if self.scene and self.scene.frameset:
+         self.scene.clearSelection()
+         self.scene.baseIcon.setSelected(True)
+         self.scene.currentIcon.setSelected(True)
+
+         x1 = self.scene.baseIcon.centreX()
+         y1 = self.scene.baseIcon.centreY()
+         x2 = self.scene.currentIcon.centreX()
+         y2 = self.scene.currentIcon.centreY()
+
+         (x2,y2) = self.scene.currentIcon.connectPos( x1, y1 )
+         (x1,y1) = self.scene.baseIcon.connectPos( x2, y2 )
+
+         rb = ArrowItem( x1, y1, x2, y2 )
+         rb.setPen( pen4 )
+         self.scene.addItem( rb )
+         map = self.scene.frameset.getmapping( Ast.BASE, Ast.CURRENT )
+         inframe = self.scene.frameset.getframe( Ast.BASE )
+         outframe = self.scene.frameset.getframe( Ast.CURRENT )
+         dialog = ObjectDialog( None, map, [inframe, outframe, None ] )
+         dialog.show()
+         self.scene.removeItem( rb )
+
+#  ----------------------------------------------------------------
+#  Display the current Frame
+   def cframe(self ):
+      if self.scene and self.scene.frameset:
+         self.scene.clearSelection()
+         self.scene.currentIcon.setSelected(True)
+         frame = self.scene.frameset.getframe( Ast.CURRENT )
+         dialog = ObjectDialog( None, frame )
+         dialog.show()
+
+#  ----------------------------------------------------------------
+   def bframe(self ):
+#  Display the base Frame
+      if self.scene and self.scene.frameset:
+         self.scene.clearSelection()
+         self.scene.baseIcon.setSelected(True)
+         frame = self.scene.frameset.getframe( Ast.BASE )
+         dialog = ObjectDialog( None, frame )
+         dialog.show()
+
+#  ----------------------------------------------------------------
+#  Display a FrameSet in a tab
+   def showObject(self, object, title, label ):
+      if object:
+         self.tabs.blockSignals(True)
+         if self.exampleTab >= 0:
+            self.tabs.removeTab( self.exampleTab )
+            self.exampleTab = -1
+
+         itab = self.tabs.addTab( label, label )
+         self.tabs.setCurrentIndex( itab )
+
+         view = self.tabs.getCurrentView()
+         scene = AstScene( object, view, self )
+         view.setScene( scene )
+         self.titles[ scene ] = title
+
+         self.this_title = title
+         self.this_label = label
+
+         self.showTab()
+         self.tabs.blockSignals(False)
+
+#  ----------------------------------------------------------------
+#  Invoked when the user clicks on a new tab.
+   def tabChanged( self, i ):
+      self.showTab()
+
+#  ----------------------------------------------------------------
+#  Invoked when the current tab changes.
+   def showTab( self ):
+      self.view = self.tabs.getCurrentView()
+      if self.view:
+         self.view.setMouseTracking(True)
+         self.scene = self.view.scene()
+         self.setWindowTitle( "astviewer: "+self.titles[ self.scene ] )
+         self.object = object
+         self.tabs.setSize( )
+
+#  ----------------------------------------------------------------
+#  Close a tab. Close the app if no other tabs left.
+   def closeTab(self):
+      if self.tabs.removeCurrentTab() == 0:
+         self.close()
+
+#  ----------------------------------------------------------------
+   def readFile(self, fname ):
+      self.fname = fname
+      return self.drawFile()
+
+#  ----------------------------------------------------------------
+   def drawFile( self ):
+      ok = False
+      obj = None
+
+      if self.fname:
+         fname = str(self.fname)
+         if not os. path. isfile(fname):
+            fname += ".sdf"
+            if not os. path. isfile(fname):
+               QMessageBox.warning( self, "Message", "Cannot find file '{}'".format( fname ),
+                                    QMessageBox.Ok )
+               fname = None
+
+#  See if it a binary file - usually works.
+      if fname:
+         textchars = bytearray({7,8,9,10,12,13,27} | set(range(0x20,0x100)) - {0x7f})
+         is_binary_string = lambda bytes: bool(bytes.translate(None, textchars))
+         binfile = is_binary_string(open(fname, 'rb').read(32768))
+
+#  If binary, first try as an NDF. Convert to text using astcopy.
+         if binfile and ndf_supported:
+            try:
+               dumpfile = "astviewer.tmp"
+               invoke( "{} this={} result={}".format(astcopy,fname,dumpfile))
+               binfile = False
+            except:
+               dumpfile = fname
+         else:
+            dumpfile = fname
+
+#  Now try reading the file as a text file.
+         if not binfile:
+            try:
+               obj = Ast.Channel( None, None, "SourceFile="+dumpfile ).read()
+            except:
+               obj = None
+
+            if not obj:
+               try:
+                  fc = Ast.FitsChan( None, None, self.options[ OPT_FCATTS ] )
+                  fc.SourceFile = dumpfile
+                  obj = fc.read()
+               except:
+                  obj = None
+
+         if dumpfile != fname:
+            os.remove( dumpfile )
+
+         if not obj and fits_supported and binfile:
+            try:
+               fits = pyfits.open( fname )
+               obj = Ast.FitsChan( Atl.PyFITSAdapter(fits[ 0 ]), None,
+                                   self.options[ OPT_FCATTS ] ).read()
+            except:
+               obj = None
+
+#  If we have a suitable object, display it. Otherwise warn the user.
+         if obj:
+            if obj.isaframeset():
+               self.showObject( obj, fname, os.path.basename(fname) )
+               ok = True
+            elif obj.isamapping() or obj.isaframe():
+               dialog = ObjectDialog( None, obj )
+               dialog.exec_()
+            else:
+               QMessageBox.warning( self, "Message", "Read an AST '{}' from  "
+                                    "file '{}' - only FrameSets can be displayed"
+                                    .format(obj.Class, fname) )
+         else:
+            QMessageBox.warning( self, "Message", "Failed to read an AST "
+                                 "object from file '{}'".format( fname ) )
+      if ok:
+         self.redraw = False
+
+      return ok
+
+
+#  ----------------------------------------------------------------
+   def showExample(self):
+      f1 = Ast.Frame( 2, "Domain=D1" )
+      f2 = Ast.Frame( 2, "Domain=D2" )
+      f3 = Ast.Frame( 2, "Domain=D3" )
+      f4 = Ast.Frame( 2, "Domain=D4" )
+      f5 = Ast.Frame( 2, "Domain=D5" )
+      f6 = Ast.Frame( 2, "Domain=D6" )
+      f7 = Ast.Frame( 2, "Domain=D7" )
+      f8 = Ast.Frame( 2, "Domain=D8" )
+      f9 = Ast.Frame( 2, "Domain=D9" )
+      f10 = Ast.Frame( 2, "Domain=D10" )
+
+      m2 = Ast.ZoomMap( 2, 2.0 )
+      m3 = Ast.UnitMap( 2 )
+      m4 = Ast.UnitMap( 2 )
+      m5 = Ast.UnitMap( 2 )
+      m6 = Ast.UnitMap( 2 )
+      m7 = Ast.UnitMap( 2 )
+      m8 = Ast.UnitMap( 2 )
+
+      fs = Ast.FrameSet( f1 )
+      fs.addframe( 1, m2, f2 )
+      fs.addframe( 1, m3, f3 )
+      fs.addframe( 3, m4, f4 )
+      fs.addframe( 3, m5, f5 )
+      fs.addframe( 4, m5, f6 )
+      fs.addframe( 4, m6, f7 )
+      fs.addframe( 6, m5, f8 )
+      fs.addframe( 6, m6, f9 )
+      fs.addframe( 6, m6, f10 )
+
+      fs.removeframe( 6 )
+      fs.removeframe( 3 )
+
+      self.showObject( fs, "An example FrameSet", "Example" )
+      self.exampleTab = self.tabs.currentIndex()
+
+#  ----------------------------------------------------------------
+   def showOpenFileDialog(self):
+      fname = QFileDialog.getOpenFileName(self, 'Open file', '.')
+      self.readFile( fname )
+
+
+#  ----------------------------------------------------------------
+   def showSettingsDialog(self):
+      dialog = SettingsDialog( self, self.options, self )
+      dialog.exec_()
+      if self.redraw:
+         self.drawFile()
+
+#  ----------------------------------------------------------------
+   def optionsPath(self):
+      home = os.environ.get("HOME")
+      if home:
+         return "{}/{}".format( home, OPTIONS_FNAME )
+      else:
+         return ""
+
+#  ----------------------------------------------------------------
+   def loadOptions(self):
+      self.options = {}
+      self.options[ OPT_CHANGED ] = False
+
+      for key in option_defs:
+         self.options[ key ] = option_defs[ key ][ 1 ]
+
+      opath = self.optionsPath()
+      if opath:
+         try:
+            with open(opath) as file:
+                for line in file:
+                   line = line.strip()
+                   if line and not line.startswith('#'):
+                      if ':' in line:
+                         (key,value) = line.split( ':', 1 )
+                         if key in self.options:
+                            self.options[key] = value
+                         else:
+                            print("!! Ignoring unknown key '{}' in astviewer "
+                                  "options file ({}).".format(key,opath) )
+                      else:
+                         print("!! Ignoring bad line '{}' in astviewer "
+                               "options file ({}).".format(line,opath) )
+
+
+         except IOError:
+            pass
+
+#  ----------------------------------------------------------------
+   def saveOptions(self):
+      if self.options[ OPT_CHANGED ]:
+         path = self.optionsPath()
+         if path:
+            with open(path,'w') as file:
+               file.write( "# astviewer options file\n" )
+               for key in self.options:
+                  if key != OPT_CHANGED:
+                     file.write( "{}:{}\n".format( key, self.options[key] ))
+
+
+#  ----------------------------------------------------------------
+   def closeEvent(self, event):
+      self.saveOptions()
+      HelpBrowser.kill()
+      event.accept()
+
+#  ================================================================
+if __name__ == "__main__":
+   app = QtGui.QApplication(sys.argv)
+
+   if len(sys.argv) > 1:
+      infile = sys.argv[1]
+   else:
+      infile = None
+
+   astview = AstViewer( infile )
+   astview.show()
+   sys.exit(app.exec_())
+
