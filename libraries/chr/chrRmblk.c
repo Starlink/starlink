@@ -59,6 +59,8 @@ void chrRmblk( char *string ){
    const char *pr;    /* Pointer to next character to copy */
    char *pw;          /* Pointer to next destination character */
 
+   if( !string ) return;
+
    pr = string - 1;
    pw = string;
    while( *(++pr) ) {

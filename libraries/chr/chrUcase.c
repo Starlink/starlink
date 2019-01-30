@@ -54,6 +54,9 @@ void chrUcase( char *string ){
 /* Local Variables: */
    char *pw; /* pointer to next character */
 
+/* Check supplied string is usable */
+   if( !string ) return;
+
 /* Convert string to uppercase. */
    pw = string - 1;
    while( *(++pw) ){

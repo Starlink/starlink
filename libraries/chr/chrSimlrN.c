@@ -68,6 +68,9 @@ int chrSimlrN( const char *str1, const char *str2, size_t n ){
    int result;           /* Returned value */
    size_t i;             /* Nummber of matching characters found so far */
 
+/* Check supplied string is usable */
+   if( !str1 || !str2 ) return 0;
+
 /* Compare characters in lower case, until "n" characters have been
    compared, the end of either string is reached, or a mis-match is found. */
    result = 1;

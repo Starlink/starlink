@@ -73,6 +73,10 @@ void chrFparx( const char *str, char oppar, char clpar, size_t *f, size_t *l ){
    size_t i;             /* Loop counter for characters */
    size_t len;           /* string length */
 
+
+/* Check supplied string is usable */
+   if( !str ) return;
+
 /* Initialise. */
    *f = 1;
    *l = 0;

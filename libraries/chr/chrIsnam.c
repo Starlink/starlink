@@ -61,6 +61,9 @@ int chrIsnam( const char *string ){
    const char *pr;    /* Pointer to next character to check */
    int result;        /* Returned value */
 
+/* Check supplied string is usable */
+   if( !string ) return 0;
+
 /* The string is non-blank, so initialise the returned value. */
    result = isalpha( string[0] );
 

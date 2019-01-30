@@ -63,6 +63,9 @@ int chrSimlr( const char *str1, const char *str2 ){
    int result;           /* Returned value */
    size_t i;             /* Length of str1 */
 
+/* Check supplied string is usable */
+   if( !str1 || !str2 ) return 0;
+
 /* Initialise the string length. */
    i = chrLen( str1 );
    result = ( chrLen( str2 ) == i );

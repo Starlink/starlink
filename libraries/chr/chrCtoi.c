@@ -65,7 +65,7 @@ void chrCtoi( const char *string, int *ivalue, int *status ){
    long int lvalue;      /* Long value */
 
 /* Check the inherited status. */
-   if( *status != SAI__OK ) return;
+   if( *status != SAI__OK || !string ) return;
 
 /* Trap any commas in the given string or blank string. */
    if( strchr( string, ',' ) || chrLen( string ) == 0 ){

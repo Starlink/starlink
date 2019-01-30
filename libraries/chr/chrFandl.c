@@ -62,6 +62,9 @@ void chrFandl( const char *string, size_t *index1, size_t *index2 ){
 *-
 */
 
+/* Check supplied string is usable */
+   if( !string ) return;
+
 /* Find the used length of the input string and check it is not zero. */
    *index2 = chrLen( string );
    if( *index2 == 0 ) {

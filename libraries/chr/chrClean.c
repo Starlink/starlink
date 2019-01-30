@@ -56,6 +56,8 @@ void chrClean( char *string ){
 /* Local Variables: */
    char *pr;    /* Pointer to next character */
 
+   if( !string ) return;
+
    pr = string - 1;
    while( *(++pr) ) {
       if( *pr < ' ' || *pr > '~' ) *pr = ' ';

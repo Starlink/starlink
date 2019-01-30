@@ -58,6 +58,8 @@ void chrLdblk( char *string ){
    const char *pr;    /* Pointer to next character to copy */
    char *pw;          /* Pointer to next destination character */
 
+   if( !string ) return;
+
    start = 1;
    pr = string - 1;
    pw = string;

@@ -77,6 +77,8 @@ void chrAppnd( const char *str1, char *str2, size_t str2_length,
    size_t str1len;       /* Used length of str1 */
    size_t str2sz;        /* Max size of str2 without terminating null */
 
+   if( !str1 || !str2 ) return;
+
    if( str2_length > 0 ) {
       str1len = chrLen( str1 );
       str2sz = str2_length - 1;

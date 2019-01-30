@@ -67,7 +67,7 @@ void chrItoc( int ivalue, char *string, size_t string_length, size_t *nchar ){
    char buf[ 20 ];       /* Buffer for integer value */
 
 /* Check the output buffer has non-zero length. */
-   if( string_length > 0 ) {
+   if( string && string_length > 0 ) {
 
 /* Perform the internal write to the buffer, left justifying the
    resulting string. */

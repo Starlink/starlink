@@ -58,6 +58,9 @@ size_t chrLen( const char *string ){
 /* Local Variables: */
    const char *pr;       /* Pointer to next character to test */
 
+/* Check supplied string is usable */
+   if( !string ) return 0;
+
 /* Find a pointer to the space following the last non-space character. */
    pr = string + strlen( string );
    while( pr > string ) {

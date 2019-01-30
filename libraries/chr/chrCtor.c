@@ -64,7 +64,7 @@ void chrCtor( const char *string, float *rvalue, int *status ){
    int nc;               /* Number of characters read by sscanf */
 
 /* Check the inherited status. */
-   if( *status != SAI__OK ) return;
+   if( *status != SAI__OK || !string ) return;
 
 /* Trap any commas in the given string or blank string. */
    if( strchr( string, ',' ) || chrLen( string ) == 0  ){

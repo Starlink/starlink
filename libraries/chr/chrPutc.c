@@ -70,7 +70,7 @@ void chrPutc( const char *str1, char *str2, size_t str2_length, size_t *iposn ){
    size_t size2;         /* Size of STR2 */
 
 /* Check the supplied string length is OK. */
-   if( str2_length > 0 ) {
+   if( str1 && str2 && str2_length > 0 ) {
 
 /* Get the max size of target string, excluding the trailing null. */
       size2 = str2_length - 1;

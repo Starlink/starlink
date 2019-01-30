@@ -60,6 +60,9 @@ void chrFill( char cvalue, char *string, size_t string_length ){
    size_t i;          /* Loop index */
    size_t size;       /* Declared size of given string */
 
+/* Check supplied string is usable */
+   if( !string ) return;
+
 /* Get the declared size of given string excluding terminating null. */
    if( string_length > 0 ) {
       size = string_length - 1;
