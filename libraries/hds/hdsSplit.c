@@ -106,7 +106,9 @@ void hdsSplit( const char *name, size_t *f1, size_t *f2, size_t *p1,
 *     21-MAY-2018 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS
 *        et al.
-
+*     20-JAN-2019 (DSB):
+*        - Initialise returned values before checking inherited status.
+*        - Return immediately if the supplied string pointer is NULL.
 *-
 */
 
@@ -128,8 +130,14 @@ void hdsSplit( const char *name, size_t *f1, size_t *f2, size_t *p1,
    size_t nc;            /* Number of characters to copy */
    size_t offset;        /* Offset into string */
 
-/* Check inherited global status. */
-   if( *status != SAI__OK ) return;
+/* Initialise */
+   *p1 = 1;
+   *p2 = 0;
+   *f1 = 1;
+   *f2 = 0;
+
+/* Check inherited global status and supplied string. */
+   if( *status != SAI__OK || !name ) return;
 
 /* Create a null-terminated copy of the object name that excludes any
    leading or trailing spaces, reporting an error if the name is blank. */
