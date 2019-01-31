@@ -171,9 +171,9 @@ def __open_log_file():
 #  Funtion to remove the current working directory from the front of a
 #  file path.
 def _rmcwd(path):
-   cwd = os.getcwd()
+   cwd = os.getcwd()+"/"
    if path.find(cwd) == 0:
-      return path[len(cwd)+1:]
+      return path[len(cwd):]
    elif path.find("./") == 0:
       return path[2:]
    else:
