@@ -113,17 +113,19 @@ AryObject *ary1Impid( const void *id, int checklock, int readonly,
    } else if( result->type == ARY__ACBTYPE && checklock &&
               ((AryACB *)result)->dcb ){
       lock_status = ary1DCBLock( ((AryACB *)result)->dcb, 1, 0, status );
-      if( readonly ){
-         if( lock_status == 0 || lock_status == 2 || lock_status == 4 ) {
-            *status = ARY__THREAD;
-            errRep( " ", "The supplied array is not locked for use by "
-                    "the current thread.", status );
-         }
-      } else {
-         if( lock_status != -1 && lock_status != 1 ) {
-            *status = ARY__THREAD;
-            errRep( " ", "The supplied array is not locked for writing by "
-                    "the current thread.", status );
+      if( *status == SAI__OK ) {
+         if( readonly ){
+            if( lock_status == 0 || lock_status == 2 || lock_status == 4 ) {
+               *status = ARY__THREAD;
+               errRep( " ", "The supplied array is not locked for use by "
+                       "the current thread.", status );
+            }
+         } else {
+            if( lock_status != -1 && lock_status != 1 ) {
+               *status = ARY__THREAD;
+               errRep( " ", "The supplied array is not locked for writing by "
+                       "the current thread.", status );
+            }
          }
       }
    }
