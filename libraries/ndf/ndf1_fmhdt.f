@@ -56,6 +56,8 @@
 *  History:
 *     25-MAY-1993 (RFWS):
 *        Original version.
+*     1-FEB-2019 (DSB):
+*        Change FIXDT date to yyyy-mm-dd format.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -104,22 +106,24 @@
 *  (but fixed) string. This is intended to facilitate regression testing,
 *  where a change in date/time could cause tests to fail.
       IF( TCB_FIXDT ) THEN
-         STR = '10-AUG-2018 11:00:00'
-         RETURN
-      END IF
+         BUF = '2018-AUG-10 11:00:00'
+
+*  Otherwise...
+      ELSE
 
 *  Format the data and time as a character string using the defined
 *  standard history record format.
-      WRITE( BUF, 9000 ) YMDHM( 1 ), MNAME( YMDHM( 2 ) ), YMDHM( 3 ),
-     :                   YMDHM( 4 ), YMDHM( 5 ), SEC
- 9000 FORMAT( I4, '-', A3, '-', I2, ' ', I2, ':', I2, ':', F6.3 )
+         WRITE( BUF, 9000 ) YMDHM( 1 ), MNAME( YMDHM( 2 ) ), YMDHM( 3 ),
+     :                      YMDHM( 4 ), YMDHM( 5 ), SEC
+ 9000    FORMAT( I4, '-', A3, '-', I2, ' ', I2, ':', I2, ':', F6.3 )
 
 *  Replace any leading blank characters in the resulting string with
 *  zeros. Then restore the blank between the date and time fields.
-      DO 1 I = 1, NDF__SZHDT
-         IF ( BUF( I : I ) .EQ. ' ' ) BUF( I : I ) = '0'
- 1    CONTINUE
-      BUF( 12 : 12 ) = ' '
+         DO 1 I = 1, NDF__SZHDT
+            IF ( BUF( I : I ) .EQ. ' ' ) BUF( I : I ) = '0'
+ 1       CONTINUE
+         BUF( 12 : 12 ) = ' '
+      END IF
 
 *  Return the result.
       CALL NDF1_CCPY( BUF, STR, STATUS )
