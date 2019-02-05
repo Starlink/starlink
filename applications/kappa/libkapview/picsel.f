@@ -87,17 +87,18 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     TIMJ: Tim Jenness (JAC)
 *     {enter_new_authors_here}
 
 *  History:
-*     1990 Jan 14 (MJC):
+*     1990 January 14 (MJC):
 *        Original.
-*     1990 Apr 12 (MJC):
+*     1990 April 12 (MJC):
 *        Bug fix so that the last picture's label is tested, and
 *        improved the closedown operation when there is no match with
 *        the label.
@@ -172,7 +173,7 @@
 
       CALL AGI_BEGIN
 
-*    Open GKS workstation to reset device
+*    Open GKS workstation to reset device.
 
       CALL AGI_ASSOC( 'DEVICE', 'UPDATE', PICID, STATUS )
 
