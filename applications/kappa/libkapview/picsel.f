@@ -71,12 +71,13 @@
 *  Copyright:
 *     Copyright (C) 1990-1991 Science & Engineering Research Council.
 *     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 2019 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -109,6 +110,11 @@
 *        Added AGI begin-and-end block.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     2019 February 1 (MJC):
+*        Activate and deactivate PGPLOT.  This plaster fix appears to
+*        prevent an AGI__DIFDV error in ORAC-DR when displaying to
+*        KAPVIEW and then switching PGPLOT to create a PNG.  The
+*        underlying cause has escaped detection for a few years.
 *     {enter_further_changes_here}
 
 *-
@@ -169,6 +175,10 @@
 *    Open GKS workstation to reset device
 
       CALL AGI_ASSOC( 'DEVICE', 'UPDATE', PICID, STATUS )
+
+*    Activate PGPLOT.
+
+      CALL AGP_ACTIV( STATUS )
 
 *    If the graphics device was not available, report the error and
 *    leave the programme.
@@ -296,7 +306,9 @@
 
  999  CONTINUE
 
-*    Close AGI workstation.
+*    Deactivate PGPLOT and close AGI workstation.
+
+      CALL AGP_DEACT( STATUS )
 
       IF ( DEVCAN ) THEN
          CALL AGI_CANCL( 'DEVICE', STATUS )
