@@ -22,7 +22,7 @@ dnl    since that prompts autoreconf to try to reconfigure that directory, and
 dnl    automake to assume it's allowed to play there, too.
 (
     cd hdf5
-    ./configure --prefix=$prefix --enable-threadsafe H5_CFLAGS=-fPIC
+    ./configure --prefix=$prefix --enable-threadsafe --disable-hl H5_CFLAGS=-fPIC
 )
 
 dnl    Find required versions of the programs we need for configuration
