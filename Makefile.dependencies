@@ -24,7 +24,7 @@
 CONFIG_CPT=test -f config.status \
   || ./configure >configure-output.log 2>configure-output.log.err \
   || { cat configure-output.log.err; false; }
-MAKE_CPT=( (make -j || make) && make install) >make.log 2>make.log.err \
+MAKE_CPT=(make && make install) >make.log 2>make.log.err \
   || { cat make.log.err; false; }
 
 $(MANIFESTS)/acsisio: \
