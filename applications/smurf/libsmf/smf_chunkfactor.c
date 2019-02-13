@@ -95,6 +95,7 @@ double smf_chunkfactor( smfData *data, AstKeyMap *keymap, int contchunk,
 /* Check inherited status. */
    if( *status != SAI__OK ) return result;
 
+
 /* Get the factor. */
    result = smf_chunkpar( data, "CHUNKFACTOR", "calibration correction factor",
                           keymap, contchunk, status );

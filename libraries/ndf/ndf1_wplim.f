@@ -119,6 +119,10 @@
 *     28-JUN-2012 (DSB):
 *        If any part of an axis specification uses WCS values, check that
 *        there is a corresponding pixel axis and report an error if not.
+*     13-FEB-2019 (DSB):
+*        If any part of an axis specification uses WCS values, and there is
+*        no corresponding pixel axis, allow WCS axes that take a constant
+*        value over the entire pixel box.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -646,7 +650,7 @@ c      write(*,*) '   '
 *  value on the corresponding pixel axis. Use this criterion to fill in
 *  values for which ever WCS bound has not been supplied.
                IF( JJ .GT. 0 ) THEN
-                  IF( WLBND( I ) .EQ. AST__BAD .AND. JJ .GT. 0 ) THEN
+                  IF( WLBND( I ) .EQ. AST__BAD ) THEN
                      IF( XL( JJ ) .LT. XU( JJ ) ) THEN
                         WLBND( I ) = V1
                      ELSE
@@ -654,13 +658,17 @@ c      write(*,*) '   '
                      END IF
                   END IF
 
-                  IF( WUBND( I ) .EQ. AST__BAD  .AND. JJ .GT. 0 ) THEN
+                  IF( WUBND( I ) .EQ. AST__BAD  ) THEN
                      IF( XL( JJ ) .GT. XU( JJ ) ) THEN
                         WUBND( I ) = V1
                      ELSE
                         WUBND( I ) = V2
                      END IF
                   END IF
+
+               ELSE IF( V1 .EQ. V2 ) THEN
+                  WLBND( I ) = V1
+                  WUBND( I ) = V2
 
                ELSE IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = NDF__WCSIN
