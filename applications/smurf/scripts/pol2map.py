@@ -571,7 +571,7 @@
 *        instance, this allows 450 um data to be aligned with a reference
 *        map made from 850 um data.
 *    13-FEB-2019 (DSB):
-*        Always find the pointing correction by aligning with the I map made from 
+*        Always find the pointing correction by aligning with the I map made from
 *        the same data, rather than using the supplied REF map (which may have different
 *        structure and so may produce sub-optimal pointing corrections).
 
@@ -912,7 +912,7 @@ def StoreCorrections( qui_maps, imap, ref ):
          swgt += weights[key]
          nwgt += 1
 
-# Get the scale factor that normalises the I map to the coadded I map. 
+# Get the scale factor that normalises the I map to the coadded I map.
          invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out=! device=! "
                  "zeroff=yes pcrange=\[10,99.5\]".format(aligned,imap))
          scale = 1/float( get_task_par( "SLOPE", "normalize" ) )
@@ -1309,74 +1309,75 @@ try:
 #  Remove any third (wavelength) axis from the reference map. For
 #  instance, this allows 450 um data to be aligned with a map made
 #  from 850 um data.
-      ref2d = NDG( 1 )
-      invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".
-              format( ref, ref2d ) )
-      ref = ref2d
+      if ref != "!":
+         ref2d = NDG( 1 )
+         invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".
+                 format( ref, ref2d ) )
+         ref = ref2d
 
 #  If the REF map is in units of mJy/beam, convert it to pW using the FCF
 #  in the "FCF" FITS header if available, or the standard FCF for the
 #  wavelength otherwise.
-      invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(ref) )
-      ref_units = get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
-      if ref_units != "pW":
+         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(ref) )
+         ref_units = get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
+         if ref_units != "pW":
 
-         try:
-            filter = int( float( get_fits_header( ref, "FILTER", True )))
-         except starutil.NoValueError:
-            filter = 850
-            msg_out( "No value found for FITS header 'FILTER' in {0} - assuming 850".format(ref))
+            try:
+               filter = int( float( get_fits_header( ref, "FILTER", True )))
+            except starutil.NoValueError:
+               filter = 850
+               msg_out( "No value found for FITS header 'FILTER' in {0} - assuming 850".format(ref))
 
-         if filter != 450 and filter != 850:
-            raise starutil.InvalidParameterError("Invalid FILTER header value "
-                   "'{0} found in {1}.".format( filter, ref ) )
+            if filter != 450 and filter != 850:
+               raise starutil.InvalidParameterError("Invalid FILTER header value "
+                      "'{0} found in {1}.".format( filter, ref ) )
 
-         if ref_units == "mJy/beam":
-            if filter == 450:
-               fcf = 491000.0
+            if ref_units == "mJy/beam":
+               if filter == 450:
+                  fcf = 491000.0
+               else:
+                  fcf = 537000.0
+
+            elif ref_units == "Jy/beam":
+               if filter == 450:
+                  fcf = 491.0
+               else:
+                  fcf = 537.0
+
+            elif ref_units == "mJy/arcsec**2" or ref_units == "mJy/arcsec^2" :
+               if filter == 450:
+                  fcf = 4710
+               else:
+                  fcf = 2340
+
+            elif ref_units == "Jy/arcsec**2" or ref_units == "Jy/arcsec^2" :
+               if filter == 450:
+                  fcf = 4.71
+               else:
+                  fcf = 2.34
+
             else:
-               fcf = 537000.0
+               raise starutil.InvalidParameterError("REF map {0} has unsupported units {1}".
+                                                    format(ref, ref_units) )
 
-         elif ref_units == "Jy/beam":
-            if filter == 450:
-               fcf = 491.0
-            else:
-               fcf = 537.0
+            fcfhead = get_fits_header( ref, "FCF" )
+            if fcfhead is not None:
+               fcfhead = float( fcfhead )
+               ratio = fcfhead/fcf
+               if ratio < 0.5 or ratio > 2.0:
+                  msg_out("WARNING: REF map {0} has units {1} but the FCF header is {2} "
+                          "- which looks wrong (the expected FCF is {3}).".
+                          format(ref, ref_units, fcfhead, fcf) )
+               fcf = fcfhead
 
-         elif ref_units == "mJy/arcsec**2" or ref_units == "mJy/arcsec^2" :
-            if filter == 450:
-               fcf = 4710
-            else:
-               fcf = 2340
+            parsys["REFFCF"].default = fcf
+            ref_fcf = parsys["REFFCF"].value
 
-         elif ref_units == "Jy/arcsec**2" or ref_units == "Jy/arcsec^2" :
-            if filter == 450:
-               fcf = 4.71
-            else:
-               fcf = 2.34
-
-         else:
-            raise starutil.InvalidParameterError("REF map {0} has unsupported units {1}".
-                                                 format(ref, ref_units) )
-
-         fcfhead = get_fits_header( ref, "FCF" )
-         if fcfhead is not None:
-            fcfhead = float( fcfhead )
-            ratio = fcfhead/fcf
-            if ratio < 0.5 or ratio > 2.0:
-               msg_out("WARNING: REF map {0} has units {1} but the FCF header is {2} "
-                       "- which looks wrong (the expected FCF is {3}).".
-                       format(ref, ref_units, fcfhead, fcf) )
-            fcf = fcfhead
-
-         parsys["REFFCF"].default = fcf
-         ref_fcf = parsys["REFFCF"].value
-
-         msg_out( "Converting REF map ({0}) from {1} to pW using FCF={2}...".
-                  format(ref,ref_units,ref_fcf))
-         refpw = NDG(1)
-         invoke("$KAPPA_DIR/cdiv in={0} scalar={1} out={2}".format(ref,ref_fcf,refpw) )
-         ref = refpw
+            msg_out( "Converting REF map ({0}) from {1} to pW using FCF={2}...".
+                     format(ref,ref_units,ref_fcf))
+            refpw = NDG(1)
+            invoke("$KAPPA_DIR/cdiv in={0} scalar={1} out={2}".format(ref,ref_fcf,refpw) )
+            ref = refpw
 
 #  Get the waveband of the supplied data (450 or 850).
    try:
@@ -2282,8 +2283,8 @@ try:
                          "position=! mode=interface".format(NDG(qui_list[key]),factor))
 
 #  If any of the factors are not 1.0, modify the config to indicate that
-#  makemap should read the factors weights from the CHUNKFAC header in
-#  the time-stream data . Otherwise ensure no weighting is done inside
+#  makemap should read the factors from the CHUNKFAC header in the
+#  time-stream data . Otherwise ensure no factors are used inside
 #  skyloop by setting the config parameter "chunkfactor" to its default
 #  weight of 1.0.
             fd = open( conf, "a" )
