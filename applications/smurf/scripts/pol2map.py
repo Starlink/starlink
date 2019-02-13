@@ -568,8 +568,12 @@
 *        correction was used.
 *    29-JAN-2019 (DSB):
 *        Remove any third (wavelength) axis from the reference map. For
-*        instance, this allows 450 um data to be aligned with a reference 
+*        instance, this allows 450 um data to be aligned with a reference
 *        map made from 850 um data.
+*    13-FEB-2019 (DSB):
+*        Always find the pointing correction by aligning with the I map made from 
+*        the same data, rather than using the supplied REF map (which may have different
+*        structure and so may produce sub-optimal pointing corrections).
 
 '''
 
@@ -667,7 +671,7 @@ def cleanup():
 #  stored in the CHUNKWGT header within the FITS extension of the
 #  observation's I map.
 def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, automask,
-               use_ref_for_alignment, ref, obsweight ):
+               ref, obsweight ):
    allmaps = []
    allkeys = []
    for key in qui_maps:
@@ -691,7 +695,7 @@ def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, automask,
 #  and then apply the same corrections to the Q and U data when creating maps
 #  from the Q and U time streams.
       if qui == "I":
-         StoreCorrections( qui_maps, coadd, use_ref_for_alignment, ref )
+         StoreCorrections( qui_maps, coadd, ref )
 
 #  If we are weighting observations separately, first deal with I data.
    elif qui == "I":
@@ -746,7 +750,7 @@ def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, automask,
 #  individual oibservation map with the new coadd. The pointing
 #  corrections are stored in the FITS headers of the observation maps.
 #  The weights are returned in a list.
-            weights = StoreCorrections( qui_maps, this_coadd, use_ref_for_alignment, ref )
+            weights = StoreCorrections( qui_maps, this_coadd, ref )
 
 #  Store the new weights in the weights file and in the I maps. Ensure
 #  the order of the values in the weights file matches the order of the maps
@@ -814,16 +818,13 @@ def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, automask,
 #  Function to determine pointing correction, calibration correction and
 #  weight for each individual observation by comparing the observation's
 #  I map with the coadd of all I maps.
-def StoreCorrections( qui_maps, imap, use_ref_for_alignment, ref ):
+def StoreCorrections( qui_maps, imap, ref ):
 
 #  Choose the map with which to align each of the new I maps. We use the
-#  external reference map if one was supplied. Otherwise we use the I mosaic
-#  so long as it contains more than one observation (if there is only one
-#  observation then the aligment is bound to be a unit transformation
+#  I mosaic so long as it contains more than one observation (if there is
+#  only one observation then the aligment is bound to be a unit transformation
 #  because the mosaic and the individual map will be identical).
-   if use_ref_for_alignment:
-      aref = ref
-   elif len(qui_maps) > 1 and imap:
+   if len(qui_maps) > 1 and imap:
       aref = imap
    else:
       aref = "!"
@@ -911,8 +912,9 @@ def StoreCorrections( qui_maps, imap, use_ref_for_alignment, ref ):
          swgt += weights[key]
          nwgt += 1
 
+# Get the scale factor that normalises the I map to the coadded I map. 
          invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out=! device=! "
-                 "zeroff=yes pcrange=\[10,99.5\]".format(aligned,aref))
+                 "zeroff=yes pcrange=\[10,99.5\]".format(aligned,imap))
          scale = 1/float( get_task_par( "SLOPE", "normalize" ) )
 
 #  Ensure we don't use silly scale factors (this can happen for
@@ -1299,16 +1301,10 @@ try:
 #  Get the reference map
    ref = parsys["REF"].value
    if not ref:
-      use_ref_for_alignment = False
       if maskmap is not None:
          ref = maskmap[0]
-         if masktype == "SIGNAL":
-            use_ref_for_alignment = True
       else:
          ref = "!"
-
-   else:
-      use_ref_for_alignment = True
 
 #  Remove any third (wavelength) axis from the reference map. For
 #  instance, this allows 450 um data to be aligned with a map made
@@ -2701,7 +2697,7 @@ try:
 #  individual observation maps).
          elif len(qui_maps) > 1:
             MakeCoadd( qui, qui_maps, imaps, coadd, mapvar, automask,
-                       use_ref_for_alignment, ref, obsweight )
+                       ref, obsweight )
 
             try:
                invoke("$KAPPA_DIR/erase object={0}.more.smurf.exp_time ok=yes".format(coadd))
