@@ -574,6 +574,11 @@
 *        Always find the pointing correction by aligning with the I map made from
 *        the same data, rather than using the supplied REF map (which may have different
 *        structure and so may produce sub-optimal pointing corrections).
+*    14-FEB-2019 (DSB):
+*        As a consequence of the previous change (13-FEB-2019) the pixel
+*        values in the REF map are no longer used for anything (the
+*        pixel positions are the only thing used from the REF map), so
+*        there is now no need to ensure that the REF map is in units of pW.
 
 '''
 
@@ -670,8 +675,7 @@ def cleanup():
 #  to the coadd get higher weight. The weight for each observation is
 #  stored in the CHUNKWGT header within the FITS extension of the
 #  observation's I map.
-def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, automask,
-               ref, obsweight ):
+def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, automask, obsweight ):
    allmaps = []
    allkeys = []
    for key in qui_maps:
@@ -695,7 +699,7 @@ def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, automask,
 #  and then apply the same corrections to the Q and U data when creating maps
 #  from the Q and U time streams.
       if qui == "I":
-         StoreCorrections( qui_maps, coadd, ref )
+         StoreCorrections( qui_maps, coadd )
 
 #  If we are weighting observations separately, first deal with I data.
    elif qui == "I":
@@ -750,7 +754,7 @@ def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, automask,
 #  individual oibservation map with the new coadd. The pointing
 #  corrections are stored in the FITS headers of the observation maps.
 #  The weights are returned in a list.
-            weights = StoreCorrections( qui_maps, this_coadd, ref )
+            weights = StoreCorrections( qui_maps, this_coadd )
 
 #  Store the new weights in the weights file and in the I maps. Ensure
 #  the order of the values in the weights file matches the order of the maps
@@ -818,7 +822,7 @@ def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, automask,
 #  Function to determine pointing correction, calibration correction and
 #  weight for each individual observation by comparing the observation's
 #  I map with the coadd of all I maps.
-def StoreCorrections( qui_maps, imap, ref ):
+def StoreCorrections( qui_maps, imap ):
 
 #  Choose the map with which to align each of the new I maps. We use the
 #  I mosaic so long as it contains more than one observation (if there is
@@ -1314,70 +1318,6 @@ try:
          invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".
                  format( ref, ref2d ) )
          ref = ref2d
-
-#  If the REF map is in units of mJy/beam, convert it to pW using the FCF
-#  in the "FCF" FITS header if available, or the standard FCF for the
-#  wavelength otherwise.
-         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(ref) )
-         ref_units = get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
-         if ref_units != "pW":
-
-            try:
-               filter = int( float( get_fits_header( ref, "FILTER", True )))
-            except starutil.NoValueError:
-               filter = 850
-               msg_out( "No value found for FITS header 'FILTER' in {0} - assuming 850".format(ref))
-
-            if filter != 450 and filter != 850:
-               raise starutil.InvalidParameterError("Invalid FILTER header value "
-                      "'{0} found in {1}.".format( filter, ref ) )
-
-            if ref_units == "mJy/beam":
-               if filter == 450:
-                  fcf = 491000.0
-               else:
-                  fcf = 537000.0
-
-            elif ref_units == "Jy/beam":
-               if filter == 450:
-                  fcf = 491.0
-               else:
-                  fcf = 537.0
-
-            elif ref_units == "mJy/arcsec**2" or ref_units == "mJy/arcsec^2" :
-               if filter == 450:
-                  fcf = 4710
-               else:
-                  fcf = 2340
-
-            elif ref_units == "Jy/arcsec**2" or ref_units == "Jy/arcsec^2" :
-               if filter == 450:
-                  fcf = 4.71
-               else:
-                  fcf = 2.34
-
-            else:
-               raise starutil.InvalidParameterError("REF map {0} has unsupported units {1}".
-                                                    format(ref, ref_units) )
-
-            fcfhead = get_fits_header( ref, "FCF" )
-            if fcfhead is not None:
-               fcfhead = float( fcfhead )
-               ratio = fcfhead/fcf
-               if ratio < 0.5 or ratio > 2.0:
-                  msg_out("WARNING: REF map {0} has units {1} but the FCF header is {2} "
-                          "- which looks wrong (the expected FCF is {3}).".
-                          format(ref, ref_units, fcfhead, fcf) )
-               fcf = fcfhead
-
-            parsys["REFFCF"].default = fcf
-            ref_fcf = parsys["REFFCF"].value
-
-            msg_out( "Converting REF map ({0}) from {1} to pW using FCF={2}...".
-                     format(ref,ref_units,ref_fcf))
-            refpw = NDG(1)
-            invoke("$KAPPA_DIR/cdiv in={0} scalar={1} out={2}".format(ref,ref_fcf,refpw) )
-            ref = refpw
 
 #  Get the waveband of the supplied data (450 or 850).
    try:
@@ -2697,8 +2637,7 @@ try:
 #  the individual maps (skyloop does not put the extension NDFs into the
 #  individual observation maps).
          elif len(qui_maps) > 1:
-            MakeCoadd( qui, qui_maps, imaps, coadd, mapvar, automask,
-                       ref, obsweight )
+            MakeCoadd( qui, qui_maps, imaps, coadd, mapvar, automask, obsweight )
 
             try:
                invoke("$KAPPA_DIR/erase object={0}.more.smurf.exp_time ok=yes".format(coadd))
