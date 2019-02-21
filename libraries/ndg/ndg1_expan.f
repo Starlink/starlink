@@ -135,6 +135,8 @@
 *        RPOS should be zero when using CHR_APPND otherwise you get a leading space.
 *     14-NOV-2011 (DSB):
 *        Allow foreign files to have dots in the file basename.
+*     21-FEB-2019 (DSB):
+*        Ensure LOC is always initialised, to avoid valgrind warnings.
 *     {enter_further_changes_here}
 
 *-
@@ -575,6 +577,7 @@
 
 *  Now find the locator assuming HDS file (but only if status is good at this point)
          SLICE = ' '
+         LOC = DAT__NOLOC
          CALL HDS_FIND( DAT__ROOT, HDSPATH, 'READ', LOC, STATUS )
 
 *  If this worked we look for NDFs...
@@ -583,7 +586,6 @@
 *  the NDF section will apply to the components *within* the specified component.
 
          IF (STATUS .EQ. SAI__OK .OR. STATUS .EQ. DAT__SUBIN ) THEN
-
 
 *  Deal with SUBIN case
             IF (STATUS .EQ. DAT__SUBIN) THEN
@@ -620,10 +622,10 @@
      :                          IGRPH, IGRPS, LOC, DIR, NAM, TYP, SLICE,
      :                          FOUND, STATUS )
 
-            END IF
 
 *  Annul the locator.
-            CALL DAT_ANNUL( LOC, STATUS )
+               CALL DAT_ANNUL( LOC, STATUS )
+            END IF
 
 *  If the file could not be opened as an HDS container file, annul the
 *  error.
