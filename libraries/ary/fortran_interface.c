@@ -5,26 +5,8 @@
 #include "ary_err.h"
 #include "star/hds_fortran.h"
 
-/* Define a union which allows a bit pattern to be accessed as a
-   signed or unsigned int, or as a pointer. */
-typedef union IdUnion {
-   int i;
-   unsigned u;
-   void *pointer;
-} IdUnion;
-
-
-IdUnion work1;
-IdUnion work2;
-IdUnion work3;
-
-#define ARY__NOID 0
-#define aryI2A(iary) (((iary)!=ARY__NOID)?(work1.i=(iary),work1.pointer):NULL)
-#define aryI2A2(iary) (((iary)!=ARY__NOID)?(work2.i=(iary),work2.pointer):NULL)
-#define aryA2I(ary) (ary?(work3.pointer=(ary),work3.i):ARY__NOID)
-
-IdUnion work4;
-IdUnion work5;
+AryIdUnion work4;
+AryIdUnion work5;
 
 #define ARY__NOPL 0
 #define aryP2I(place) (place?(work4.pointer=(place),work4.i):ARY__NOPL)

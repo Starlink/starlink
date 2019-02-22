@@ -46,6 +46,28 @@
 /* Include public data types and constants */
 #include "ary_types.h"
 
+/* Define a union which allows a bit pattern to be accessed as a
+   signed or unsigned int, or as a pointer. */
+typedef union AryIdUnion {
+   int i;
+   unsigned u;
+   void *pointer;
+} AryIdUnion;
+
+AryIdUnion work1;
+AryIdUnion work2;
+AryIdUnion work3;
+
+/* Macros that allow C routines to import and export Ary pointers to F77
+   as integers (e.g. used by NDF fortran interface). */
+#define ARY__NOID 0
+#define aryI2A(iary) (((iary)!=ARY__NOID)?(work1.i=(iary),work1.pointer):NULL)
+#define aryI2A2(iary) (((iary)!=ARY__NOID)?(work2.i=(iary),work2.pointer):NULL)
+#define aryA2I(ary) (ary?(work3.pointer=(ary),work3.i):ARY__NOID)
+
+
+
+
 /* Prototypes for public functions */
 int aryLocked( const Ary *ary, int *status );
 int aryTrace( int newflg );
