@@ -271,6 +271,11 @@
 *        Allow COMP=ERROR.
 *     2013 July 10 (MJC):
 *        Add an example using TRIM and TRIMWCS.
+*     22-FEB-2019 (DSB):
+*        When changing the shape of an extension NDF, do not delete
+*        the original NDF until the new NDF has been created. Deleting 
+*        the original NDF first seem to trigger a bug in HDF5 that 
+*        causes dat_copy to report an error.
 *     {enter_further_changes_here}
 
 *-
@@ -310,6 +315,7 @@
       INTEGER NDF4               ! Input extension NDF identifier
       INTEGER NDF5               ! Input extension NDF section identifier
       INTEGER NDF6               ! Output extension NDF identifier
+      INTEGER NDF7               ! Modified output extension NDF identifier
       INTEGER NDFT               ! Temporary NDF identifier
       INTEGER NDIM               ! Dimensionality of input extension NDF
       INTEGER NGOOD              ! No. of good data values in NDF
@@ -481,24 +487,34 @@
                CALL NDG_NDFAS( IGRP, I, 'WRITE', NDF6, STATUS )
 
 *  Get an HDS locator for this existing NDF, locate its parent, and
-*  then delete the NDF.
+*  get its name. Note, we do not delete the NDF here as doing so seems 
+*  to trigger a bug in HDF5 that causes datCopy to report an error.
                CALL NDF_LOC( NDF6, 'WRITE', LOC, STATUS )
                CALL DAT_PAREN( LOC, PLOC, STATUS )
                CALL DAT_NAME( LOC, NAME, STATUS )
                CALL DAT_ANNUL( LOC, STATUS )
-               CALL NDF_DELET( NDF6, STATUS )
 
-*  Get a placeholder for a new NDF at the same location.
-               CALL NDF_PLACE( PLOC, NAME, PLACE, STATUS )
+*  Get a placeholder for a new NDF at the same location but with a
+*  temporary name.
+               CALL NDF_PLACE( PLOC, 'NDFCOPY_TMPXXX', PLACE, STATUS )
 
 *  Copy the input extension NDF section to the output, using the above
 *  placeholder to indicate where the new NDF should be placed.
                CALL KPS1_NDFCP( NDF5, COMP, TRIM, TRMWCS, ' ', PLACE,
-     :                          NDF6, STATUS )
+     :                          NDF7, STATUS )
+
+*  Delete the original NDF.
+               CALL NDF_DELET( NDF6, STATUS )
+
+*  Rename the new NDF to the name of the original NDF. First annull it's NDF
+*  identifier, then use HDS to do the rename.
+               CALL NDF_ANNUL( NDF7, STATUS )
+               CALL DAT_FIND( PLOC, 'NDFCOPY_TMPXXX', LOC, STATUS )
+               CALL DAT_RENAM( LOC, NAME, STATUS )
+               CALL DAT_ANNUL( LOC, STATUS )
 
 *  Free resources.
                CALL NDF_ANNUL( NDF5, STATUS )
-               CALL NDF_ANNUL( NDF6, STATUS )
                CALL DAT_ANNUL( PLOC, STATUS )
             END IF
 
