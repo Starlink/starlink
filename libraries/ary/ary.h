@@ -54,9 +54,10 @@ typedef union AryIdUnion {
    void *pointer;
 } AryIdUnion;
 
-AryIdUnion work1;
-AryIdUnion work2;
-AryIdUnion work3;
+/* These are declared in ary1Expid. */
+extern AryIdUnion work1;
+extern AryIdUnion work2;
+extern AryIdUnion work3;
 
 /* Macros that allow C routines to import and export Ary pointers to F77
    as integers (e.g. used by NDF fortran interface). */

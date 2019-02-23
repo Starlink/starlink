@@ -2,16 +2,14 @@
 #include <string.h>
 #include "sae_par.h"
 #include "ary1.h"
+#include "ary.h"
 #include "mers.h"
 #include "ary_err.h"
 
-/* Define a union which allows a bit pattern to be accessed as a
-   signed or unsigned int, or as a pointer. */
-typedef union IdUnion {
-   int i;
-   unsigned u;
-   void *pointer;
-} IdUnion;
+/* Variables reference as extern in ary.h */
+AryIdUnion work1;
+AryIdUnion work2;
+AryIdUnion work3;
 
 /* The global variable that holds the count of identifiers that have
    been issued so far. */
@@ -96,8 +94,8 @@ void *ary1Expid( AryObject *object, int *status ) {
 
 /* Local variables: */
    void *result = NULL;     /* Returned pointer */
-   IdUnion test;            /* Union for testing encoding */
-   IdUnion work;            /* Union for encoding ID value */
+   AryIdUnion test;         /* Union for testing encoding */
+   AryIdUnion work;         /* Union for encoding ID value */
 
 /* Set a default value of NULL for the returned pointer. */
    result = NULL;
@@ -122,7 +120,7 @@ void *ary1Expid( AryObject *object, int *status ) {
 /*  Otherwise, associate an integer identifier with it. */
    } else {
 
-/* Clear the pointer value in the work IdUnion. */
+/* Clear the pointer value in the work AryIdUnion. */
       (void) memset( &(work.pointer), 0, sizeof( work.pointer ) );
 
 /* Copy the integer slot number into a signed int component of a union,
