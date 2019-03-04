@@ -1288,8 +1288,7 @@ fakescale = 1
 #		of samples with a quality bit matching at least one of the
 #		specified flags. Any of the standard quality names can be
 #               specified. These are: BADDA, BADB, SPIKE, JUMP, PAD, APOD,
-#               STAT, COM, FILT, NOISE, EXT, LOWAP, BADEF, RING, SSN, PCA,
-#               IP.
+#               STAT, COM, NOISE, EXT, LOWAP, RING, SSN, PCA, IP.
 #
 #		Note: If BADBOL is set the behaviour is slightly different than
 #		expected; the bolometer will be completely ignored when
