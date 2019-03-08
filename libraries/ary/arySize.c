@@ -69,7 +69,7 @@ void arySize( Ary *ary, size_t *npix, int *status ) {
 
 /* Calculate the number of array elements from the bounds information in
    the ACB. */
-   ary1Nel( acb->ndim, acb->lbnd, acb->ubnd, npix, status );
+   if( acb ) ary1Nel( acb->ndim, acb->lbnd, acb->ubnd, npix, status );
 
 /* If an error occurred, then report context information and call the error
    tracing routine. */
