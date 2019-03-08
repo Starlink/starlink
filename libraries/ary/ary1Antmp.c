@@ -60,7 +60,9 @@ void ary1Antmp( HDSLoc **loc, int *status ) {
 *  History:
 *     23-JUN-2017 (DSB):
 *        Original version, based on equivalent Fortran routine by RFWS.
-
+*     25-FEB-2019 (DSB):
+*        Ensure the locator for the parent is a primary locator (as per
+*        NDF equivalent function).
 *-
 */
 
@@ -68,6 +70,7 @@ void ary1Antmp( HDSLoc **loc, int *status ) {
    HDSLoc *locp=NULL;         /* Locator to parent object */
    char name[DAT__SZNAM+1];   /* Name of object to be erased */
    int plocked;               /* Original lock state for parent */
+   int prim;                  /* Is locator primary? */
    int tstat;                 /* Local temporary status variable */
 
 /* Return if no pointer supplied. */
@@ -88,6 +91,12 @@ void ary1Antmp( HDSLoc **loc, int *status ) {
    remembering if it was already locked or not. */
    plocked = datLocked( locp, 0, status );
    datLock( locp, 0, 0, status );
+
+/* Promote the locator for the parent to a primary locator to ensure that
+   the container file will not be closed when the locator for the data
+   object is annulled. */
+   prim = 1;
+   datPrmry( 1, &locp, &prim, status );
 
 /* Annul the object's locator. */
    datAnnul( loc, status );
