@@ -624,7 +624,7 @@ C           WRITE(*,*)'!ANT_STOI: bad integer number ', STRING
       ELSE IF(INDEX('NFnf', STRING(K:K)) .NE. 0) THEN
          VALUE = .FALSE.
       ELSE
-         CALL ANT_ERR ('ANT_STOL: bad logical,', STRING)
+         CALL ANT_ERRC ('ANT_STOL: bad logical,', STRING)
 C        WRITE(*,*)'!ANT_STOL: bad logical ', STRING
          STATUS = -9
       END IF
