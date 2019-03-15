@@ -228,11 +228,11 @@
 *        Add columns for debiased P, error on P and error on ANG to
 *        output table.
 *     17-JAN-2018 (DSB):
-*        - Determine the source position from the I map rather than the PI map, 
+*        - Determine the source position from the I map rather than the PI map,
 *        but only if the I map was derived form the POL" observation.
-*        - Ensure majority of P values predicted by the fit are positive 
+*        - Ensure majority of P values predicted by the fit are positive
 *        (if the original fit gives negative P values, negate them and rotate by 90 degrees)..
-*        - Only use previously made maps that have the expected number of WCS 
+*        - Only use previously made maps that have the expected number of WCS
 *        frames (others may have been the result of a failed run of makemap).
 *-
 '''
@@ -298,6 +298,9 @@ fwhm2list = []
 orientlist = []
 gammalist = []
 arealist = []
+
+# Table header line defining column names
+tabhead = "# ut obs az el q dq u du i di pi ang p pdeb dang dp qfit ufit pifit pfit tau tran rej hst at hum bp wndspd wnddir frleg bkleg"
 
 #  Are most fitted PI values negative?
 pineg = False
@@ -1214,36 +1217,46 @@ try:
       iref = 0.0
       actpixsize0 = 0.0
       lines  = []
+      inhead = True
       bad = False
       with open(tablein,"r") as f:
         for line in f:
-           m = re.compile("# DIAM = (\S+)").match(line)
-           if m:
-              diam = float(m.group(1))
+           if line.startswith("#"):
+              if not inhead:
+                 bad = True
+                 break
+              else:
+                 m = re.compile("# DIAM = (\S+)").match(line)
+                 if m:
+                    diam = float(m.group(1))
 
-           m = re.compile("# Total intensity value = (\S+) pW").match(line)
-           if m:
-              ival = float(m.group(1))
-              isigma = 0.0
+                 m = re.compile("# Total intensity value = (\S+) pW").match(line)
+                 if m:
+                    ival = float(m.group(1))
+                    isigma = 0.0
 
-           m = re.compile("# Total intensity value = (\S+) \+/- (\S+) pW").match(line)
-           if m:
-              ival = float(m.group(1))
-              isigma = float(m.group(2))
+                 m = re.compile("# Total intensity value = (\S+) \+/- (\S+) pW").match(line)
+                 if m:
+                    ival = float(m.group(1))
+                    isigma = float(m.group(2))
 
-           m = re.compile("# PIXSIZE = (\S+)").match(line)
-           if m:
-              actpixsize0 = float(m.group(1))
+                 m = re.compile("# PIXSIZE = (\S+)").match(line)
+                 if m:
+                    actpixsize0 = float(m.group(1))
 
-           m = re.compile("# IREF = '(\S+)'").match(line)
-           if m:
-              iref = m.group(1)
+                 m = re.compile("# IREF = '(\S+)'").match(line)
+                 if m:
+                    iref = m.group(1)
 
-           if line.startswith("# ut obs az el q dq u du i di pi ang p qfit ufit "
-               "pifit pfit tau tran rej hst at hum bp wndspd wnddir frleg bkleg"):
-              bad = False
-           elif not line.startswith("#"):
-              lines.append(line)
+                 if line.startswith( tabhead ):
+                    inhead = False
+           else:
+              if inhead:
+                 bad = True
+                 break
+              else:
+                 lines.append(line)
+
 
       if diam == -999.0 or ival == 0.0 or bad:
          raise UsageError( "TABLEIN file ('{0}') has unexpected structure.".
@@ -1261,14 +1274,14 @@ try:
             dulist.append( float( words[7] ) )
             ilist.append( float( words[8] ) )
             dilist.append( float( words[9] ) )
-            wvmlist.append( float( words[17] ) )
-            atlist.append( float( words[21] ) )
-            humlist.append( float( words[22] ) )
-            bplist.append( float( words[23] ) )
-            wndspdlist.append( float( words[24] ) )
-            wnddirlist.append( float( words[25] ) )
-            frleglist.append( float( words[26] ) )
-            bkleglist.append( float( words[27] ) )
+            wvmlist.append(float( words[20] ) )
+            atlist.append( float( words[24] ) )
+            humlist.append( float( words[25] ) )
+            bplist.append( float( words[26] ) )
+            wndspdlist.append( float( words[27] ) )
+            wnddirlist.append( float( words[28] ) )
+            frleglist.append( float( words[29] ) )
+            bkleglist.append( float( words[30] ) )
 
             m = re.compile("T(\d\d):(\d\d):(\d\d)").search(words[18])
             if m:
@@ -1390,8 +1403,7 @@ try:
          fd.write("# Qn RMS = {0}   Un RMS = {1} \n".format(qrms/ival,urms/ival))
          fd.write("#\n")
 
-      fd.write("# ut obs az el q dq u du i di pi ang p pdeb dang dp qfit ufit pifit pfit tau tran rej "
-               "hst at hum bp wndspd wnddir frleg bkleg" )
+      fd.write( tabhead )
       if diam <= 0.0:
          fd.write(" fwhm1 fwhm2 orient gamma" )
       fd.write("\n")
@@ -1420,7 +1432,7 @@ try:
          dq = dqlist0[i]*dqmean
          du = dulist0[i]*dqmean
 
-         if iref is None:
+         if iref is None or tablein is not None:
             ii = ilist0[i]
             di = dilist0[i]*dimean
          else:
