@@ -1013,7 +1013,7 @@ sub acsis_tsys {
 
       if ($tsys) {
         my @tsys_all = split(/\n/,
-           `${tsyscmd} -statistics ${sdffile} | grep '[A-z]'`);
+           `${tsyscmd} -statistics ${sdffile} | grep '[A-Za-z]'`);
         $tsys_all[1] =~ s/\[median\]/\[Tsys\]/;
         $tsys_all[3] =~  s/\[stdev\]/\[ \+\/\-\]/;
 
@@ -1028,7 +1028,7 @@ sub acsis_tsys {
 
       if ($trx) {
         my @trx_all =  split(/\n/,
-           `${tsyscmd} -trx -statistics ${sdffile} | grep '[A-z]'`);
+           `${tsyscmd} -trx -statistics ${sdffile} | grep '[A-Za-z]'`);
         $trx_all[1] =~ s/\[median\]/\[Trx\]/;
         $trx_all[3] =~  s/\[stdev\]/\[ \+\/\-\]/;
 
