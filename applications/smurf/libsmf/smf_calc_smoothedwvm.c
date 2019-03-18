@@ -15,7 +15,8 @@
 *  Invocation:
 *     smf_calc_smoothedwvm ( ThrWorkForce * wf, const smfArray * alldata,
 *                            const smfData * adata, AstKeyMap* extpars, double **wvmtau,
-*                            size_t *nframes, size_t *ngood, int * status );
+*                            size_t *nframes, size_t *ngood, size_t *ngood_pre_despike,
+*                            int * status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -39,6 +40,8 @@
 *        Number of elements in "wvmtau" array.
 *     ngood = size_t * (Returned)
 *        Number of good values in the "wvmtau" array.
+*     ngood_pre_despike = size_t * (Returned)
+*        Number of good values prior to despiking.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -75,6 +78,8 @@
 *        Fix critical indexing bugs in multi-threaded implementation
 *     2016-01-29 (GSB):
 *        Add despiking step.
+*     2019-03-18 (GSB):
+*        Add ngood_pre_despike parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -154,11 +159,13 @@ void smf__calc_wvm_job( void *job_data, int *status );
 
 void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
                             const smfData * adata, AstKeyMap* extpars, double **wvmtau,
-                            size_t *nelems, size_t *ngoodvals, int * status ) {
+                            size_t *nelems, size_t *ngoodvals,
+                            size_t *ngoodvals_pre_despike, int * status ) {
   size_t i;
   size_t nrelated = 0;          /* Number of entries in smfArray */
   size_t nframes = 0;           /* Number of timeslices */
   size_t ngood = 0;             /* Number of elements with good tau */
+  size_t ngood_pre_despike = 0; /* Number of elements with good opacity before despking */
   double *taudata = NULL;       /* Local version of WVM tau */
   const smfArray * thesedata = NULL;  /* Collection of smfDatas to analyse */
   smfArray * tmpthesedata = NULL; /* Local version of adata in a smfArray */
@@ -468,8 +475,7 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
 
   }
 
-
-
+  ngood_pre_despike = ngood;
 
   if (*status == SAI__OK && extpars) {
     /* Read extpars to see if we need to despike and/or smooth */
@@ -537,10 +543,12 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
     if (taudata) taudata = astFree( taudata );
     *nelems = 0;
     *ngoodvals = 0;
+    *ngoodvals_pre_despike = 0;
   } else {
     *wvmtau = taudata;
     *nelems = nframes;
     *ngoodvals = ngood;
+    *ngoodvals_pre_despike = ngood_pre_despike;
   }
 
 }

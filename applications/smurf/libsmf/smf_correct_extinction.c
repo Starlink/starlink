@@ -199,10 +199,12 @@
 *        Update the tausrc argument so the caller knows which scheme was used.
 *     2015-11-19 (GSB):
 *        Try WVM fit before CSO fit in AUTO mode.
+*     2019-03-18 (GSB):
+*        Check new ngood_pre_despike parameter from smf_calc_smoothedwvm.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2015 East Asian Observatory.
+*     Copyright (C) 2015-2019 East Asian Observatory.
 *     Copyright (C) 2008-2010, 2012, 2013 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2008 University of British Columbia.
@@ -436,12 +438,14 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausr
   if (!wvmtau && tausrc == SMF__TAUSRC_WVMRAW) {
     size_t ntotaltau = 0;
     size_t ngoodtau = 0;
+    size_t ngood_pre_despike = 0;
     smf_calc_smoothedwvm( wf, NULL, data, extpars, &wvmtau, &ntotaltau,
-                          &ngoodtau, status );
+                          &ngoodtau, &ngood_pre_despike, status );
     smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
     msgOutiff( MSG__VERB, "", "Using WVM mode for extinction correction of ^FILE"
-               " %.0f %% of WVM data are present", status,
-               (double)(100.0*(double)ngoodtau/(double)ntotaltau) );
+               " %.0f %% of WVM data are present (%.0f %% before despiking)", status,
+               (double)(100.0*(double)ngoodtau/(double)ntotaltau),
+               (double)(100.0*(double)ngood_pre_despike/(double)ntotaltau) );
   }
 
   if (*status == SAI__OK &&
@@ -489,22 +493,27 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausr
       *thetausrc = tausrc;
     } else if (ndims == 3) {
       /* We have already done the cache test so not needed here */
+      double percentgood = 0.0;
+      double percentgood_pre_despike = 0.0;
+      double percentgood_thresh = 80.0;
 
       /* Is the WVM nominally stable for this night? */
       if (smf_is_wvm_usable( data->hdr, status ) ) {
 
         /* Calculate the WVM tau data and see if we have enough good data */
         size_t ngoodtau = 0;
+        size_t ngood_pre_despike = 0;
         size_t ntotaltau = 0;
-        double percentgood = 0.0;
         smf_calc_smoothedwvm( wf, NULL, data, extpars, &wvmtau, &ntotaltau,
-                              &ngoodtau, status );
+                              &ngoodtau, &ngood_pre_despike, status );
         percentgood = 100.0 * ((double)ngoodtau / (double)ntotaltau);
+        percentgood_pre_despike = 100.0 * ((double) ngood_pre_despike / (double) ntotaltau);
 
-        if ( percentgood > 80.0) {
+        if ( percentgood > percentgood_thresh ) {
           tausrc = SMF__TAUSRC_WVMRAW;
           msgOutiff( MSG__VERB, "", "Selecting WVM mode for extinction correction of ^FILE."
-                     " %.0f %% of WVM data are present", status, percentgood );
+                     " %.0f %% of WVM data are present (%.0f %% before despiking)",
+                     status, percentgood, percentgood_pre_despike );
           *thetausrc = tausrc;
         } else {
           tausrc = SMF__TAUSRC_AUTO; /* keep it AUTO (a no-op but make it clear) */
@@ -554,7 +563,19 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausr
          is no CSO fit for the night. */
       if (*status == SAI__OK && tausrc != SMF__TAUSRC_WVMRAW) {
         *status = SAI__ERROR;
-        errRep("", "Unable to determine opacity data for this observation. Raw WVM, WVM fits and CSO fits failed. Please investigate and if necessary use CSO mode explicitly but proceed with caution.", status );
+        msgFmt( "PCGFIN", "%.0f %%", percentgood );
+        msgFmt( "PCGPDS", "%.0f %%", percentgood_pre_despike );
+
+        /* Try to select a suggestion to help, for example, the operator
+           running the summit pipeline, identify what might be wrong. */
+        msgSetc( "SUGGN", (percentgood_pre_despike < 1.0) ? "WVM data missing or entirely unusable." :(
+                          (percentgood_pre_despike <= percentgood_thresh) ? "WVM data may be insufficient." :(
+                          (percentgood <= percentgood_thresh) ? "WVM data insufficient after despiking." :(
+                          "WVM data unexpectedly rejected." ))));
+
+        errRep("", "Unable to determine opacity data for this observation. "
+               "^SUGGN ^PCGFIN of WMV data are present (^PCGPDS before despiking).",
+               status );
       }
     }
   }

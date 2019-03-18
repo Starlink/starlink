@@ -655,7 +655,8 @@ void smf_calc_skyframe( const AstFrame * skyin,
 
 void smf_calc_smoothedwvm ( ThrWorkForce * wf, const smfArray * alldata,
                             const smfData * adata, AstKeyMap* extpars, double **wvmtau,
-                            size_t *nelems, size_t *ngood, int * status );
+                            size_t *nelems, size_t *ngood, size_t *ngood_pre_despike,
+                            int * status );
 
 void smf_calc_stareimage( smfData *data, const int naver, int *status);
 
