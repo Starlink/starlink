@@ -1542,6 +1542,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter wvmlog {
+                type LITERAL
+                prompt {Text file in which to write processed WVM data}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
             # These are the generic flatfield parameters. Not in alphabetical order
             # with the other parameters to make it easier to do bulk copies
 
@@ -4076,6 +4085,15 @@ package @PACKAGE@ {
                 type _INTEGER
                 access WRITE
                 vpath INTERNAL
+                helpkey *
+            }
+
+            parameter wvmlog {
+                type LITERAL
+                prompt {Text file in which to write processed WVM data}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 helpkey *
             }
 

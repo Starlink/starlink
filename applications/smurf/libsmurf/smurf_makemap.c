@@ -495,6 +495,12 @@
 *          The upper pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied
 *          for parameter OUT.
+*     WVMLOG = FILENAME (Write)
+*          Name of a text file into which to write raw WVM data with
+*          columns for each stage of processing.  Multiple blocks of data
+*          may be written to the file if the WVM data are processed in
+*          chunks.  New data are appended to the file if it already exists.
+*          If a null (!) value is supplied, no file is written. [!]
 
 *  Related Applications:
 *     SMURF: QLMAKEMAP
@@ -794,6 +800,8 @@
 *        Store total expsoure time in map FITS extension.
 *     2017-03-2 (DSB):
 *        Added parameters ABORTSOON and ABORTEDAT.
+*     2019-03-19 (GSB):
+*        Mention WVMLOG parameter in the documentation.
 *     {enter_further_changes_here}
 
 *  Copyright:

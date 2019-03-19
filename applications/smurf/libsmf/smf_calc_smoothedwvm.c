@@ -80,6 +80,10 @@
 *        Add despiking step.
 *     2019-03-18 (GSB):
 *        Add ngood_pre_despike parameter.
+*        Use WVMLOG parameter to control debugging output rather than
+*        a #define.  Combined the 3 sets of WVM data (original, despiked
+*        and smoothed) into columns of a table rather than outputting
+*        them separately.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -116,9 +120,6 @@
 #include <math.h>
 #include <sys/time.h>
 
-/* Define macro DEBUG_WVM to enable debugging output for WVM processing. */
-/* #define DEBUG_WVM 1 */
-
   /* Macro to find a smfData in the smfGroup that contains valid
      data at this time slice */
 #define SELECT_DATA( ALLDATA, SMFDATA, BADVAL, ITEM, INDEX )     \
@@ -148,10 +149,8 @@ typedef struct {
   dim_t nframes;
 } smfCalcWvmJobData;
 
-#ifdef DEBUG_WVM
-void smf__print_wvm_data(double* taudata, smfHead *hdr, size_t nframes,
-                         int* status);
-#endif
+void smf__print_wvm_data(FILE* fd, double* taudata, double* taudata_pre_despike, double* taudata_pre_smooth,
+                         smfHead *hdr, size_t nframes, int* status);
 
 void smf__calc_wvm_job( void *job_data, int *status );
 
@@ -167,8 +166,11 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
   size_t ngood = 0;             /* Number of elements with good tau */
   size_t ngood_pre_despike = 0; /* Number of elements with good opacity before despking */
   double *taudata = NULL;       /* Local version of WVM tau */
+  double *taudata_pre_despike = NULL;
+  double *taudata_pre_smooth = NULL;
   const smfArray * thesedata = NULL;  /* Collection of smfDatas to analyse */
   smfArray * tmpthesedata = NULL; /* Local version of adata in a smfArray */
+  FILE *fd = NULL;              /* WVM debug log file descriptor */
 
   if (*status != SAI__OK) return;
 
@@ -477,6 +479,8 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
 
   ngood_pre_despike = ngood;
 
+  fd = smf_open_textfile( "WVMLOG", "a", "<none>", status );
+
   if (*status == SAI__OK && extpars) {
     /* Read extpars to see if we need to despike and/or smooth */
     double despiketime = VAL__BADD;
@@ -487,10 +491,11 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
             && astMapGet0D(extpars, "DESPIKEWVMTOL", &despiketol)) {
         if  ((despiketime != VAL__BADD) && (despiketol != VAL__BADD) &&
              (despiketime > 0.0) && (despiketol > 0.0)) {
-            #ifdef DEBUG_WVM
-            /* Get the raw WVM output for debugging before despiking */
-            smf__print_wvm_data(taudata, (thesedata->sdata)[0]->hdr, nframes, status);
-            #endif
+            if (fd) {
+                /* Store the raw WVM output for debugging before despiking */
+                taudata_pre_despike = astCalloc( nframes, sizeof(*taudata) );
+                memcpy(taudata_pre_despike, taudata, nframes * sizeof(*taudata_pre_despike));
+            }
 
             msgOutiff(MSG__VERB, "",
                       "Despiking WVM data with %f s window and %f tolerance",
@@ -507,10 +512,11 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
 
     if (astMapGet0D( extpars, "SMOOTHWVM", &smoothtime ) ) {
       if (smoothtime != VAL__BADD && smoothtime > 0.0) {
-        #ifdef DEBUG_WVM
-        /* Get the raw WVM output for debugging before smoothing */
-        smf__print_wvm_data(taudata, (thesedata->sdata)[0]->hdr, nframes, status);
-        #endif
+        if (fd) {
+          /* Store the raw WVM output for debugging before smoothing */
+          taudata_pre_smooth = astCalloc( nframes, sizeof(*taudata) );
+          memcpy(taudata_pre_smooth, taudata, nframes * sizeof(*taudata_pre_smooth));
+        }
 
         smfData * data = (thesedata->sdata)[0];
         double steptime = data->hdr->steptime;
@@ -532,13 +538,21 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
     }
   }
 
-  #ifdef DEBUG_WVM
-  /* Get the raw WVM output for debugging */
-  smf__print_wvm_data(taudata, (thesedata->sdata)[0]->hdr, nframes, status);
-  #endif
+  if (fd) {
+      /* Print the raw WVM output for debugging */
+      smf__print_wvm_data(fd, taudata, taudata_pre_despike, taudata_pre_smooth,
+                          (thesedata->sdata)[0]->hdr, nframes, status);
+      fclose(fd);
+  }
 
   /* Free resources */
   if (tmpthesedata) smf_close_related( wf, &tmpthesedata, status );
+  if (taudata_pre_despike) {
+    taudata_pre_despike = astFree( taudata_pre_despike );
+  }
+  if (taudata_pre_smooth) {
+    taudata_pre_smooth = astFree( taudata_pre_smooth );
+  }
 
   if (*status != SAI__OK) {
     if (taudata) taudata = astFree( taudata );
@@ -554,23 +568,47 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
 
 }
 
-#ifdef DEBUG_WVM
 /* Debugging routine to print out the raw WVM data. */
-void smf__print_wvm_data(double* taudata, smfHead *hdr, size_t nframes,
-                         int* status) {
+void smf__print_wvm_data(FILE* fd, double* taudata, double* taudata_pre_despike, double* taudata_pre_smooth,
+                         smfHead *hdr, size_t nframes, int* status) {
   size_t i;
+  double* tau[3] = {0, 0, 0};
+  int ncol = 0;
+  int j;
   if (*status == SAI__OK) {
-    fprintf(stderr, "# IDX TAU RTS_NUM RTS_END WVM_TIME\n");
+    /* Determine which columns are present.  Since we saved the data before
+       each step, the names are "off by one".  We print the original "TAU"
+       title first but will add "taudata" to the array last. */
+    fprintf(fd, "# IDX RTS_NUM RTS_END WVM_TIME TAU");
+    if (taudata_pre_despike) {
+      fprintf(fd, " TAU_DESPIKE");
+      tau[ncol ++] = taudata_pre_despike;
+    }
+    if (taudata_pre_smooth) {
+      fprintf(fd, " TAU_SMOOTH");
+      tau[ncol ++] = taudata_pre_smooth;
+    }
+    fprintf(fd, "\n");
+    tau[ncol ++] = taudata;
+
     for (i=0; i<nframes;i++) {
       JCMTState * state = &(hdr->allState)[i];
-      fprintf(stderr, "%zu %.*g %d %.*g %.*g\n",
-              i, DBL_DIG, taudata[i], state->rts_num,
+      fprintf(fd, "%zu %d %.*g %.*g",
+              i, state->rts_num,
               DBL_DIG, state->rts_end, DBL_DIG, state->wvm_time);
+      for (j = 0; j < ncol; j ++) {
+        if (VAL__BADD != tau[j][i]) {
+          fprintf(fd, " %.*g", DBL_DIG, tau[j][i]);
+        }
+        else {
+          fprintf(fd, " \"\"");
+        }
+      }
+      fprintf(fd, "\n");
     }
-    fprintf(stderr, "\n\n");
+    fprintf(fd, "\n\n");
   }
 }
-#endif
 
 /* Routine called by thread queue to calculate a chunk of WVM data.
    Actual arguments are passed in through job_data struct defined
