@@ -485,7 +485,8 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
 
     if (astMapGet0D(extpars, "DESPIKEWVM", &despiketime)
             && astMapGet0D(extpars, "DESPIKEWVMTOL", &despiketol)) {
-        if  ((despiketime != VAL__BADD) && (despiketol != VAL__BADD)) {
+        if  ((despiketime != VAL__BADD) && (despiketol != VAL__BADD) &&
+             (despiketime > 0.0) && (despiketol > 0.0)) {
             #ifdef DEBUG_WVM
             /* Get the raw WVM output for debugging before despiking */
             smf__print_wvm_data(taudata, (thesedata->sdata)[0]->hdr, nframes, status);
