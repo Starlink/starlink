@@ -79,7 +79,8 @@
 *        STEPTIME guess now ignores initial padding that has constant rts
 *        values.
 *     2019-03-19 (GSB):
-*        Avoid reading beyond end of state array.
+*        Avoid reading beyond end of state array.  Correct sense of rts_end
+*        comparison.
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -206,7 +207,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
           /* Skip any initial padding that will have a constant value for
              rts_end. */
           size_t islice = 1;
-          while( islice < hdr->nframes-11 && tmpState[islice-1].rts_end <= tmpState[islice].rts_end ) {
+          while( islice < hdr->nframes-11 && tmpState[islice-1].rts_end >= tmpState[islice].rts_end ) {
              islice++;
           }
 
