@@ -300,7 +300,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
           }
         }
 
-        smf_fit_poly1d( order, nrgood, CLIP, goodht, scan, (usevar ? scanvar : NULL),
+        smf_fit_poly1d( order, nrgood, CLIP, 0, goodht, scan, (usevar ? scanvar : NULL),
                         NULL, scoeff, scoeffvar, poly, &nused, status);
 
         /* and calculate the fitted polynomial */
@@ -352,7 +352,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
 
       } else {
         /* disable variance and fit the other way */
-        smf_fit_poly1d( order, nrgood, CLIP, scan, goodht, NULL, NULL, scoeff,
+        smf_fit_poly1d( order, nrgood, CLIP, 0, scan, goodht, NULL, NULL, scoeff,
                         NULL, NULL, &nused, status);
       }
 

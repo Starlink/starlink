@@ -14,6 +14,7 @@
 
 *  Invocation:
 *     void smf_fit_poly1d ( size_t order, size_t nelem, double clip,
+*                           int maxiter,
 *                           const double x[], const double y[],
 *                           const double vary[], const smf_qual_t qual[],
 *                           double coeffs[], double varcoeffs[],
@@ -30,8 +31,11 @@
 *        standard deviation of the residual is calculated. If there
 *        are any points greater than the supplied clip level the
 *        points are removed and the polynomial refitted. This
-*        continues until no points are removed. A value less than or
-*        equal to zero disables clipping.
+*        continues until no points are removed, or "maxiter" iterations
+*        have been performed. A value less than or equal to zero disables
+*        clipping.
+*     maxiter = int (Given)
+*        Max number of clipping iterations. Zero or negative means no limit.
 *     x = const double [] (Given)
 *        X coordinates. If NULL the array index will be used.
 *     y = const double [] (Given)
@@ -83,6 +87,8 @@
 *        -Added quality to interface
 *     2013-07-31 (MS):
 *        Expose alternate function that returns chi^2 value, but without clipping
+*     2019-03-27 (DSB):
+*        Added argument "maxiter".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -143,11 +149,12 @@ void smf_fit_poly1d_chisq ( size_t order, size_t nelem, const double x[],
 
 }
 
-void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
-                      const double y[], const double vary[],
+void smf_fit_poly1d ( size_t order, size_t nelem, double clip, int maxiter,
+                      const double x[], const double y[], const double vary[],
                       const smf_qual_t qual[], double coeffs[],
                       double varcoeffs[], double polydata[], int64_t * nused,
                       int *status ) {
+  int niter;
   size_t i;
   double rchisq;     /* Reduced chisq of fit */
 
@@ -201,7 +208,10 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
     resid = astMalloc( nelem*sizeof(*resid) );
 
     /* we are clipping */
-    while (iterating && *status == SAI__OK) {
+    niter = 0;
+    while ( ( maxiter <= 0 || niter < maxiter ) && iterating &&
+            *status == SAI__OK) {
+      niter++;
       double mean;
       double stdev;
       size_t ngood;

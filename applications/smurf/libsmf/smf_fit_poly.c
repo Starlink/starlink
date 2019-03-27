@@ -216,7 +216,7 @@ static void smfFitPolyPar( void *job_data_ptr, int *status ) {
         curqual = (smf_qual_t *) qual + j*bstride;
       }
 
-      smf_fit_poly1d( pdata->order, ntslice, 0, NULL, curbolo, NULL, curqual,
+      smf_fit_poly1d( pdata->order, ntslice, 0, 0, NULL, curbolo, NULL, curqual,
                       curpoly,NULL, curpolydata, &nused, status );
 
       if( *status == SAI__OK ) {

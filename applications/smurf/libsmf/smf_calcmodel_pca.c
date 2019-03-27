@@ -47,6 +47,9 @@
 *  History:
 *     15-JUN-2015 (DSB):
 *        Original version.
+*     27-MAR-2019 (DSB):
+*        Allow the quadratic background removal to be disabled. It is
+*        often not needed, and is very slow.
 
 *  Copyright:
 *     Copyright (C) 2015 East Asian Observatory.
@@ -104,6 +107,7 @@ typedef struct smfCalcModelPCAData {
    double *model_data;
    double *res_data;
    int *lut_data;
+   int backoff;
    int oper;
    smf_qual_t *qua_data;
    unsigned char *mask;
@@ -130,13 +134,14 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    double pcathresh_freeze = 0.0;
    double skip;
    int astskip;
+   int backoff;
    int comfill;
    int iw;
    int nw;
    int proceed;
    size_t ipix;
-   smfArray **oldgai;
    smfArray **oldres;
+   smfArray **oldgai;
    smfArray *lut=NULL;
    smfArray *model;
    smfArray *res;
@@ -168,6 +173,11 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    PCA model. */
    astMapGet0A( keymap, "PCA", &obj );
    kmap = (AstKeyMap *) obj;
+
+/* See if the residuals after subtraction of the PCA model should be
+   flattened by the removal of a quadratic background from each bolometer.
+   If so, this background is added onto the PCA model for eacb bolometer. */
+   astMapGet0I( kmap, "BACKOFF", &backoff );
 
 /* Get the number of initial iterations for which the PCA model is to be
    skipped. Zero means use the PCA model on all iterations. A fractional
@@ -519,6 +529,7 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                pdata->model_data = model_data;
                pdata->res_data = res_data;
                pdata->qua_data = qua_data;
+               pdata->backoff = backoff;
                pdata->oper = 2;
                thrAddJob( wf, 0, pdata, smf1_calcmodel_pca, 0, NULL, status );
             }
@@ -665,27 +676,31 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
                pm++;
             }
 
-/* Fit a cubic quadratic baseline to the residuals, using sigma-clipping. */
-            smf_fit_poly1d( 2, ntslice, 2.0, NULL, pdata->res_data + ibase,
-                            NULL, pdata->qua_data + ibase, coeffs, NULL,
-                            polydata, &nused, status );
+/* If required, fit a cubic quadratic baseline to the residuals, using
+   sigma-clipping. */
+            if( pdata->backoff ) {
+               smf_fit_poly1d( 2, ntslice, 2.0, 3, NULL, pdata->res_data + ibase,
+                               NULL, pdata->qua_data + ibase, coeffs, NULL,
+                               polydata, &nused, status );
+
 
 /* Modify the model by adding on the above baseline. Reduce the residuals
    correspondingly. This results in the residuals having a flat(ish)
    background. */
-            pr = pdata->res_data + ibase;
-            pq = pdata->qua_data + ibase;
-            pm = pdata->model_data + ibase;
-            pp = polydata;
-            for( itime = 0; itime < ntslice; itime++ ) {
+               pr = pdata->res_data + ibase;
+               pq = pdata->qua_data + ibase;
+               pm = pdata->model_data + ibase;
+               pp = polydata;
+               for( itime = 0; itime < ntslice; itime++ ) {
 
-               if( *pm != VAL__BADD ) *pm += *pp;
-               if( *pr != VAL__BADD && !(*pq & SMF__Q_MOD) ) *pr -= *pp;
+                  if( *pm != VAL__BADD ) *pm += *pp;
+                  if( *pr != VAL__BADD && !(*pq & SMF__Q_MOD) ) *pr -= *pp;
 
-               pp++;
-               pr++;
-               pq++;
-               pm++;
+                  pp++;
+                  pr++;
+                  pq++;
+                  pm++;
+               }
             }
          }
 

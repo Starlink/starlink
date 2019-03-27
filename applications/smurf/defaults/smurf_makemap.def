@@ -2977,8 +2977,8 @@ varmapmethod = 1
 #               amplitude across all bolometers is calculated for each
 #               component -- a single positive number related to the average
 #               strength of the component. An iterative sigma clipper is then
-#               used to flag components that are more than pcathresh*RMS away
-#               from the mean value. This approach is quite arbitrary, but a
+#               used to flag components that are more than pcathresh*RMS
+#               above the mean value. This approach is quite arbitrary, but a
 #               value of about 4 seems reasonable for some test data.
 #
 #               Be warned that this statistical black box will remove real
@@ -3027,6 +3027,19 @@ pca.pcathresh = 4.0
 pca.pcathresh_freeze = 0.0
 
 #-----------------------------------------------------------------
+#  Name: 	pca.backoff
+#  Type: 	integer
+#  Default: 	1
+#  Purpose: 	Controls the determination of multiple background signals
+#  Description: This parameter controls whether the residuals after
+#               subtraction of the PCA model should be flattened by the
+#               removal of a quadratic background fomr each bolometer.
+#               Disabling this option speeds up the PCA model considerably,
+#               and seems to produce little effect if the PCA model
+#               occurs after the COM model within the model order.
+pca.backoff = 1
+
+#-----------------------------------------------------------------
 #  Name: 	pca.comfill
 #  Type: 	integer
 #  Default: 	0
@@ -3071,7 +3084,7 @@ pca.comfill = 0
 #               start using the PCA model. A positive integer specifies
 #               the number of initial iterations for which no PCA model
 #               should be used. A negative value causes the PCA model to
-#               be used only on the very last iteration".
+#               be used only on the very last iteration.
 pca.skip = 0
 
 

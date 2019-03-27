@@ -287,7 +287,7 @@ void smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
       }
     }
 
-    smf_fit_poly1d( 1, nfit-1, 0, x, y, NULL, NULL, fit, NULL, NULL, &nused,
+    smf_fit_poly1d( 1, nfit-1, 0, 0, x, y, NULL, NULL, fit, NULL, NULL, &nused,
                     status );
 
     if( *status == SAI__OK ) {

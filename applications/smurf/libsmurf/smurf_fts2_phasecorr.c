@@ -421,7 +421,7 @@ void smurf_fts2_phasecorr(int* status)
 
           // ### PHASE FIT
           for(k = 0; k <= DSLENGTH2; k++) { TMPPHASE[k] = PHASE[k]; }
-        smf_fit_poly1d(PDEGREE, DSLENGTH2 + 1, CLIP, WN, TMPPHASE, WEIGHTS, NULL, COEFFS, NULL, FIT, &nUsed, status);
+        smf_fit_poly1d(PDEGREE, DSLENGTH2 + 1, CLIP, 0, WN, TMPPHASE, WEIGHTS, NULL, COEFFS, NULL, FIT, &nUsed, status);
         // MORE.FTS2.SIGMA, STANDARD DEVIATION,
         double sum   = 0.0;
         double error = 0.0;

@@ -407,7 +407,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
                      "Calculating sky background at reference heater for bolometer %zd",
                      status, bol);
           if (ndata > 1) {
-            smf_fit_poly1d( skyorder, ndata, 0, dindices, ddata, NULL, NULL,
+            smf_fit_poly1d( skyorder, ndata, 0, 0, dindices, ddata, NULL, NULL,
                             coeff, coeffvar, NULL, &nused, status );
 
           } else {
@@ -625,7 +625,7 @@ double smf__calc_refheat_meas ( int indata[], size_t boloffset, size_t tstride, 
     }
     buffer[i] = indata[ boloffset + htindex * tstride ];
   }
-  smf_fit_poly1d( 1, nmeas, 0, heatdata, buffer, NULL, NULL,
+  smf_fit_poly1d( 1, nmeas, 0, 0, heatdata, buffer, NULL, NULL,
                   coeff, NULL, NULL, &nused, status );
 
   /* Evaluate the result and push it onto the array for fitting */
