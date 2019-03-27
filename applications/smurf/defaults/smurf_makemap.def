@@ -3040,6 +3040,16 @@ pca.pcathresh_freeze = 0.0
 pca.backoff = 1
 
 #-----------------------------------------------------------------
+#  Name: 	pca.samplim
+#  Type: 	float
+#  Default: 	0.9
+#  Purpose: 	Controls the determination of multiple background signals
+#  Description: This parameter gives the minimum fraction of good samples
+#               that a bolometer must have for it to be used in the
+#               determination of the principal components.
+pca.samplim = 0.9
+
+#-----------------------------------------------------------------
 #  Name: 	pca.comfill
 #  Type: 	integer
 #  Default: 	0

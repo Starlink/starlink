@@ -132,6 +132,7 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    double *res_data;
    double pcathresh;
    double pcathresh_freeze = 0.0;
+   double samplim;
    double skip;
    int astskip;
    int backoff;
@@ -244,6 +245,10 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    smf_model_create, and so adding the mdel back into the residuals has
    no effect. */
    } else {
+
+/* Get the minimum fraction of good samples required in a bolometer for it
+   to be used in the determination of the principal components. */
+      astMapGet0D( kmap, "SAMPLIM", &samplim );
 
 /* Ensure the data is bolo-ordered (i.e. adjacent values in memory are
    adjacent time slices from the same bolometer, so tstride is 1 and
@@ -510,8 +515,8 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    value to use in the sigma-clipping algorithm. The number of components
    removed is returned. */
             ncomp[idx] = smf_clean_pca( wf, model->sdata[idx], 0, 0,
-                                        pcathresh, ncomp[idx], NULL, NULL,
-                                        0, 0, kmap,
+                                        pcathresh, ncomp[idx], samplim,
+                                        NULL, NULL, 0, 0, kmap,
                                         comfill ? SMF__Q_PCA : SMF__Q_GAP,
                                         status );
 

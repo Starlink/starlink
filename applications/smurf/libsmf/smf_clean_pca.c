@@ -15,9 +15,9 @@
 *  Invocation:
 *     size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
 *                           size_t t_last, double thresh, size_t ncomp,
-*                           smfData **components, smfData **amplitudes,
-*                           int flagbad, int sub, AstKeyMap *keymap,
-*                           smf_qual_t mask, int *status )
+*                           double lim, smfData **components,
+*                           smfData **amplitudes, int flagbad, int sub,
+*                           AstKeyMap *keymap, smf_qual_t mask, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -40,7 +40,10 @@
 *        explicitly by "ncomp".
 *     ncomp = size_t (Given)
 *        The number of components to remove. Only used if "thresh" is
-*         negative.
+*        negative.
+*     lim = double (Given)
+*        The minimum fraction of good samples required in a bolometer for it
+*        to be used in the determination of the principal components.
 *     components = smfData ** (Returned)
 *        New 3d cube of principal component time-series (ncomponents * 1 * time)
 *        Can be NULL. Will only have length t_last-t_first+1.
@@ -137,6 +140,14 @@
 *     2017-1-27 (DSB):
 *        Correct calculation and use of log mean of the component sigma
 *        values.
+*     2019-3-27 (DSB):
+*        - If the absolute number of components to remove is supplied, this
+*        function can be speeded up a lot by only calculating the
+*        specified number of components. The other - weaker - components
+*        need not be calculated.
+*        - When determining the principal components, do not include
+*        boloemeters that too few good samples. This because gap-filled
+*        samples seem to upset the calculation of the components.
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
@@ -213,9 +224,11 @@ typedef struct smfPCAData {
   size_t t2;              /* Index of last time slice */
   size_t b1;              /* Index of first bolo for chunk */
   size_t b2;              /* Index of last bolo */
+  size_t goodlim;         /* Min number of usable samples in a good bolo */
   size_t t_first;         /* First index for total data being analyzed */
   size_t t_last;          /* Last index for total data being analyzed */
   size_t tstride;         /* time slice stride */
+  smf_qual_t *qua;        /* Quality array */
 } smfPCAData;
 
 void smfPCAParallel( void *job_data_ptr, int *status );
@@ -234,6 +247,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   double v2;              /* A data value */
   gsl_matrix *cov=NULL;   /* bolo-bolo covariance matrix */
   size_t *goodbolo;       /* Local copy of global goodbolo */
+  size_t *pg;             /* Pointer to next goodbolo value */
   size_t abstride;        /* bolo stride in amp array */
   size_t acompstride;     /* component stride in amp array */
   size_t bstride;         /* bolo stride */
@@ -249,6 +263,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   size_t t_last;          /* First time slice being analyzed */
   size_t tstride;         /* time slice stride */
   smfPCAData *pdata=NULL; /* Pointer to job data */
+  smf_qual_t *pq;
 
   double check=0;
 
@@ -307,7 +322,29 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
     return;
   }
 
-  if( (pdata->operation == -1) && (*status==SAI__OK) ) {
+  if( (pdata->operation == -2) && (*status==SAI__OK) ) {
+    size_t ngood;
+
+    /* Operation -2: identify usable bolometers (bolometers with more
+       than "goodlim" good samples */
+
+    pg = pdata->goodbolo + pdata->b1;
+    for( i = pdata->b1; i <= pdata->b2; i++,pg++ ) {
+       *pg = 0;
+       pq = pdata->qua + i*bstride;
+       if( !(*pq & SMF__Q_BADB) ) {
+         pq += t_first*tstride;
+         ngood = 0;
+         for( k = t_first; k <= t_last; k++ ) {
+            if( !(*pq & SMF__Q_GOOD ) ) ngood++;
+            pq += tstride;
+         }
+         if( ngood > pdata->goodlim ) *pg = 1;
+       }
+    }
+
+
+  } else if( (pdata->operation == -1) && (*status==SAI__OK) ) {
 
     /* Operation -1: remove mean from each bolometer in a block of bolos ---- */
 
@@ -458,7 +495,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
 
 size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
                       size_t t_last, double thresh, size_t ncomp,
-                      smfData **components, smfData **amplitudes,
+                      double lim, smfData **components, smfData **amplitudes,
                       int flagbad, int sub, AstKeyMap *keymap,
                       smf_qual_t mask, int *status ){
 
@@ -475,11 +512,13 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   size_t j;               /* Loop counter */
   smfPCAData *job_data=NULL;/* job data */
   size_t k;               /* Loop counter */
-  size_t *goodbolo=NULL;  /* Indices of the good bolometers for analysis */
+  size_t *goodbolo1=NULL; /* Indices of the good bolometers */
+  size_t *goodbolo2=NULL; /* Indices of the high quality bolometers */
   dim_t nbolo;            /* number of bolos */
   dim_t ndata;            /* number of samples in data */
   size_t ncalc;           /* number of PCA components to calculate */
-  size_t ngoodbolo;       /* number good bolos */
+  size_t ngoodbolo1;      /* number good bolos */
+  size_t ngoodbolo2;      /* number high quality bolos */
   dim_t ntslice;          /* number of time slices */
   int nw;                 /* total available worker threads */
   smfPCAData *pdata=NULL; /* Pointer to job data */
@@ -565,37 +604,107 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   }
 
   if( qua ) {
-    /* If quality supplied, identify good bolometers */
-    ngoodbolo = 0;
+    /* If quality supplied, identify good bolometers (i.e. bolos that
+       have not been entirely rejected). */
+    ngoodbolo1 = 0;
     for( i=0; i<nbolo; i++ ) {
       if( !(qua[i*bstride]&SMF__Q_BADB) ) {
-        ngoodbolo++;
+        ngoodbolo1++;
       }
     }
 
     /* Now remember which were the good bolometers */
-    goodbolo = astCalloc( ngoodbolo, sizeof(*goodbolo) );
-    ngoodbolo = 0;
+    goodbolo1 = astCalloc( ngoodbolo1, sizeof(*goodbolo1) );
+    ngoodbolo1 = 0;
     for( i=0; i<nbolo; i++ ) {
       if( !(qua[i*bstride]&SMF__Q_BADB) ) {
-        goodbolo[ngoodbolo] = i;
-        ngoodbolo++;
+        goodbolo1[ngoodbolo1] = i;
+        ngoodbolo1++;
       }
     }
 
   } else {
     /* Otherwise assume all bolometers are good */
-    ngoodbolo = nbolo;
-    goodbolo = astCalloc( ngoodbolo, sizeof(*goodbolo) );
-    for( i=0; i<ngoodbolo; i++ ) {
-      goodbolo[i] = i;
+    ngoodbolo1 = nbolo;
+    goodbolo1 = astCalloc( ngoodbolo1, sizeof(*goodbolo1) );
+    for( i=0; i<ngoodbolo1; i++ ) {
+      goodbolo1[i] = i;
     }
   }
 
-  if( ngoodbolo <= 2 ) {
+  if( ngoodbolo1 <= 2 ) {
     *status = SAI__ERROR;
     errRep( " ", FUNC_NAME ": fewer than 2 working bolometers!", status );
     goto CLEANUP;
+  }
+
+  /* Now identify the "high quality" bolometers. These are bolometers from
+     which few samples have been rejected. Rejected samples are gap-filled
+     below, and too much gap-filling can badly affect the determination of
+     the principal components. So we exclude from the analysis bolometers
+     with many rejected samples. */
+
+  /* Allocate job data for threads */
+  job_data = astCalloc( nw, sizeof(*job_data) );
+
+  /* If quality supplied, identify the bolometers to be used in the
+     analysis. Bolometers that have a lot of gaps are not used as they
+     can badly affect the determination of the principal components. */
+  if( qua ) {
+    goodbolo2 = astMalloc( nbolo*sizeof(goodbolo2) );
+
+    if( nw > (int) nbolo ) {
+      bstep = 1;
+    } else {
+      bstep = nbolo/nw;
+    }
+
+    for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
+      pdata = job_data + ii;
+      pdata->b1 = ii*bstep;
+      if( ii == nw - 1 ) {
+         pdata->b2 = nbolo - 1;
+      } else {
+         pdata->b2 = (ii+1)*bstep - 1;
+      }
+
+      pdata->goodbolo = goodbolo2;
+      pdata->bstride = bstride;
+      pdata->tstride = tstride;
+      pdata->t_first = t_first;
+      pdata->t_last = t_last;
+      pdata->qua = qua;
+      pdata->goodlim = lim*tlen;
+      pdata->operation = -2;
+
+      thrAddJob( wf, 0, pdata, smfPCAParallel, 0, NULL, status );
+    }
+
+    /* Wait until all of the submitted jobs have completed */
+    thrWait( wf, status );
+
+    /* The above stores a boolean flag for each bolo in "goodbolo2".
+       Instead, store the indices of the usable bolometers at the start
+       of "goodbolo2". */
+    ngoodbolo2 = 0;
+    for( i = 0; i < nbolo; i++ ) {
+      if( goodbolo2[ i ] ) goodbolo2[ ngoodbolo2++ ] = i;
+    }
+
+    if( ngoodbolo2 < ngoodbolo1 ) {
+      msgOutiff( MSG__DEBUG, " ", FUNC_NAME ": excluding %zu poor bolometers "
+                  "from the component calculations", status, ngoodbolo1-ngoodbolo2 );
+    }
+
+    if( ngoodbolo2 <= 2 ) {
+      *status = SAI__ERROR;
+      errRep( " ", FUNC_NAME ": fewer than 2 high quality bolometers!", status );
+      goto CLEANUP;
+    }
+
+  } else{
+    ngoodbolo2 = ngoodbolo1;
+    goodbolo2 = goodbolo1;
   }
 
 /* If "thresh" is negative, we already know how many PCA components will
@@ -603,9 +712,9 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
    components. Decide how many PCA components to calculate. */
   if( thresh < 0.0 ) {
      ncalc = ncomp;
-     if( ncalc > ngoodbolo ) ncalc = ngoodbolo;
+     if( ncalc > ngoodbolo2 ) ncalc = ngoodbolo2;
   } else {
-     ncalc = ngoodbolo;
+     ncalc = ngoodbolo2;
   }
 
   /* Fill bad values and values flagged via "mask" (except entirely bad
@@ -616,9 +725,9 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   /* Allocate arrays */
   amp = astCalloc( nbolo*ncalc, sizeof(*amp) );
   comp = astCalloc( ncalc*tlen, sizeof(*comp) );
-  cov = gsl_matrix_alloc( ngoodbolo, ngoodbolo );
-  s = gsl_vector_alloc( ngoodbolo );
-  work = gsl_vector_alloc( ngoodbolo );
+  cov = gsl_matrix_alloc( ngoodbolo2, ngoodbolo2 );
+  s = gsl_vector_alloc( ngoodbolo2 );
+  work = gsl_vector_alloc( ngoodbolo2 );
 
   /* These strides will make comp time-ordered */
   ccompstride = 1;
@@ -629,9 +738,6 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   abstride = 1;
   acompstride = nbolo;
 
-  /* Allocate job data for threads */
-  job_data = astCalloc( nw, sizeof(*job_data) );
-
   /* Set up the division of labour for threads: independent blocks of time */
 
   if( nw > (int) tlen ) {
@@ -640,10 +746,10 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     step = tlen/nw;
   }
 
-  if( nw > (int) ngoodbolo ) {
+  if( nw > (int) ngoodbolo2 ) {
     bstep = 1;
   } else {
-    bstep = ngoodbolo/nw;
+    bstep = ngoodbolo2/nw;
   }
 
   for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
@@ -660,14 +766,14 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     /* Ensure that the last thread picks up any left-over tslices */
     if( (ii==(nw-1)) ) {
        pdata->t2 = t_first + tlen - 1;
-       pdata->b2 = ngoodbolo - 1;
+       pdata->b2 = ngoodbolo2 - 1;
     }
 
     /* Ensure we don't try to use more bolos or tslices than we have. This
        can happen for instance if the number of good bolos is smaller than
        the number of threads. */
     if( pdata->t2 >= t_first + tlen ) pdata->t2 = t_first + tlen - 1;
-    if( pdata->b2 >= ngoodbolo ) pdata->b2 = ngoodbolo - 1;
+    if( pdata->b2 >= ngoodbolo2 ) pdata->b2 = ngoodbolo2 - 1;
 
     /* initialize work data */
     pdata->amp = NULL;
@@ -680,10 +786,10 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     pdata->ccompstride = ccompstride;
     pdata->ctstride = ctstride;
     pdata->data = data;
-    pdata->goodbolo = NULL;
+    pdata->goodbolo = goodbolo2;
     pdata->ijob = -1;
     pdata->nbolo = nbolo;
-    pdata->ngoodbolo = ngoodbolo;
+    pdata->ngoodbolo = ngoodbolo2;
     pdata->t_first = t_first;
     pdata->t_last = t_last;
     pdata->tlen = tlen;
@@ -693,20 +799,12 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
 
     /* Each thread will accumulate the projection of its own portion of
        the time-series. We'll add them to the master amp at the end */
-    pdata->amp = astCalloc( nbolo*ngoodbolo, sizeof(*(pdata->amp)) );
+    pdata->amp = astCalloc( nbolo*ncalc, sizeof(*(pdata->amp)) );
 
     /* Each thread will accumulate sums of x, y, and x*y for each bolo when
        calculating the covariance matrix */
-    pdata->covwork = astCalloc( ngoodbolo*ngoodbolo,
+    pdata->covwork = astCalloc( ngoodbolo2*ngoodbolo2,
                                 sizeof(*(pdata->covwork)) );
-
-    /* each thread gets its own copy of the goodbolo lookup table */
-    pdata->goodbolo = astCalloc( ngoodbolo, sizeof(*(pdata->goodbolo)) );
-    if( *status == SAI__OK ) {
-      memcpy( pdata->goodbolo, goodbolo,
-              ngoodbolo*sizeof(*(pdata->goodbolo)) );
-    }
-
   }
 
   if( *status == SAI__OK ) {
@@ -746,8 +844,8 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     /* We now have to add together all of the sums from each thread and
        normalize */
     if( *status == SAI__OK ) {
-      for( i=0; i<ngoodbolo; i++ ) {
-        for( j=i; j<ngoodbolo; j++ ) {
+      for( i=0; i<ngoodbolo2; i++ ) {
+        for( j=i; j<ngoodbolo2; j++ ) {
           double c;
           double *covwork=NULL;
           double sum_xy;
@@ -758,7 +856,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
             pdata = job_data + ii;
             covwork = pdata->covwork;
 
-            sum_xy += covwork[ i + j*ngoodbolo ];
+            sum_xy += covwork[ i + j*ngoodbolo2 ];
           }
 
           c = sum_xy / ((double)tlen-1);
@@ -776,13 +874,13 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   msgOutif( MSG__VERB, "", FUNC_NAME
             ": perfoming singular value decomposition...", status );
 
-  smf_svd( wf, ngoodbolo, cov->data, s->data, NULL, 10*VAL__EPSD,
+  smf_svd( wf, ngoodbolo2, cov->data, s->data, NULL, 10*VAL__EPSD,
            1, status );
   if( CHECK ) {
     double check=0;
 
-    for( i=0; i<ngoodbolo; i++ ) {
-      for( j=0; j<ngoodbolo; j++ ) {
+    for( i=0; i<ngoodbolo2; i++ ) {
+      for( j=0; j<ngoodbolo2; j++ ) {
         check += gsl_matrix_get( cov, j, i );
       }
     }
@@ -869,7 +967,8 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     }
 
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": rejecting %d (out of %zu) components"
-               " because they are too weak to normalise", status, nlow, ngoodbolo );
+               " because they are too weak to normalise", status, nlow,
+               ngoodbolo2 );
 
     for( i=0; i<ncalc*tlen; i++ ) {
       if( comp[i] != VAL__BADD ) check += comp[i];
@@ -892,10 +991,28 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   msgOutif( MSG__VERB, "", FUNC_NAME
               ": calculating component amplitudes in each bolo...", status );
 
-  /* Set up the jobs  */
+  /* Set up the jobs. From here on the parallel code uses the full set of
+     all good bolometers, not just the high quality bolometers. */
   if( *status == SAI__OK ) {
+
+    if( nw > (int) ngoodbolo1 ) {
+      bstep = 1;
+    } else {
+      bstep = ngoodbolo1/nw;
+    }
+
     for( ii=0; ii<nw; ii++ ) {
       pdata = job_data + ii;
+
+      pdata->b1 = ii*bstep;
+      pdata->b2 = (ii+1)*bstep - 1;
+
+      if( (ii==(nw-1)) ) pdata->b2 = ngoodbolo1 - 1;
+      if( pdata->b2 >= ngoodbolo1 ) pdata->b2 = ngoodbolo1 - 1;
+
+      pdata->goodbolo = goodbolo1;
+      pdata->ngoodbolo = ngoodbolo1;
+
       pdata->operation = 2;
       pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata, smfPCAParallel,
                                  0, NULL, status );
@@ -912,9 +1029,9 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     for( ii=0; ii<nw; ii++ ) {
       pdata = job_data + ii;
 
-      for( i=0; i<ngoodbolo; i++ ) {        /* Loop over good bolo */
-        for( j=0; j<ncalc; j++ ) {          /* Loop over component */
-          index = goodbolo[i]*abstride + j*acompstride;
+      for( i=0; i<ngoodbolo1; i++ ) {    /* Loop over good bolo */
+        for( j=0; j<ncalc; j++ ) {       /* Loop over component */
+          index = goodbolo1[i]*abstride + j*acompstride;
           amp[index] += pdata->amp[index];
         }
       }
@@ -945,16 +1062,16 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     double total;
     for( j=0; j<ncalc; j++ ) {    /* loop over component */
       total = 0;
-      for( i=0; i<ngoodbolo; i++ ) {  /* loop over bolometer */
-        total += amp[goodbolo[i]*abstride + j*acompstride];
+      for( i=0; i<ngoodbolo1; i++ ) {  /* loop over bolometer */
+        total += amp[goodbolo1[i]*abstride + j*acompstride];
       }
 
       /* Are most amplitudes negative for this component? */
       if( total < 0 ) {
         /* Flip sign of the amplitude */
-        for( i=0; i<ngoodbolo; i++ ) { /* loop over bolometer */
-          amp[goodbolo[i]*abstride + j*acompstride] =
-            -amp[goodbolo[i]*abstride + j*acompstride];
+        for( i=0; i<ngoodbolo1; i++ ) { /* loop over bolometer */
+          amp[goodbolo1[i]*abstride + j*acompstride] =
+            -amp[goodbolo1[i]*abstride + j*acompstride];
         }
 
         /* Flip sign of the component */
@@ -1058,7 +1175,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
       ncomp = ncalc;
       for( i=0; i<ncalc; i++ ) rms_amp[i] = VAL__BADD;
       msgOutiff( MSG__VERB, "", FUNC_NAME ": will remove %zu / %zu components...",
-                 status, ncalc, ngoodbolo );
+                 status, ncalc, ngoodbolo2 );
 
     /* Otherwise, first calculate the RMS of the amplitudes across the array
        for each component. This will be a positive number whose value
@@ -1070,8 +1187,8 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
         sum = 0;
         sum_sq = 0;
         nsum = 0;
-        for( j=0; j<ngoodbolo; j++ ) {      /* Loop over bolo */
-          x = amp[i*acompstride + goodbolo[j]*abstride];
+        for( j=0; j<ngoodbolo1; j++ ) {      /* Loop over bolo */
+          x = amp[i*acompstride + goodbolo1[j]*abstride];
           if( x != 0.0 ) {
              sum += x;
              sum_sq += x*x;
@@ -1275,7 +1392,8 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
  CLEANUP:
   amp = astFree( amp );
   comp = astFree( comp );
-  goodbolo = astFree( goodbolo );
+  if( goodbolo1 != goodbolo2 ) goodbolo2 = astFree( goodbolo2 );
+  goodbolo1 = astFree( goodbolo1 );
   if( cov ) gsl_matrix_free( cov );
   if( s ) gsl_vector_free( s );
   if( work ) gsl_vector_free( work );
@@ -1283,7 +1401,6 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   if( job_data ) {
     for( ii=0; ii<nw; ii++ ) {
       pdata = job_data + ii;
-      if( pdata->goodbolo ) pdata->goodbolo = astFree( pdata->goodbolo );
       if( pdata->covwork ) pdata->covwork = astFree( pdata->covwork );
       if( pdata->amp ) pdata->amp = astFree( pdata->amp );
     }

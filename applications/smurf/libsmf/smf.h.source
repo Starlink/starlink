@@ -810,7 +810,7 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window,
                         int *status );
 
 size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
-                      size_t t_last, double thresh, size_t ncomp,
+                      size_t t_last, double thresh, size_t ncomp, double lim,
                       smfData **components, smfData **amplitudes,
                       int flagbad, int sub, AstKeyMap *keymap,
                       smf_qual_t mask, int *status );

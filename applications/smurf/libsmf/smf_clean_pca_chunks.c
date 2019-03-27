@@ -166,8 +166,8 @@ void smfPCAChunkParallel( void *job_data_ptr, int *status ) {
 
      /* PCA clean this chunk */
      smf_clean_pca( NULL, pdata->data, pdata->t1, pdata->t2, pdata->thresh,
-                    0, NULL, NULL, 0, pdata->sub, pdata->keymap, ~SMF__Q_BADB,
-                    status );
+                    0, 0.0, NULL, NULL, 0, pdata->sub, pdata->keymap,
+                    ~SMF__Q_BADB, status );
 
      /* Debugging message indicating thread finished work */
      msgOutiff( MSG__DEBUG, "",
@@ -258,7 +258,7 @@ void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
     msgOutif( MSG__VERB, "", FUNC_NAME
              ": only 1 chunk, smf_clean_pca will parallelize internally",
              status );
-    smf_clean_pca( wf, data, 0, 0, thresh, 0, NULL, NULL, 0, sub, keymap,
+    smf_clean_pca( wf, data, 0, 0, thresh, 0, 0.0, NULL, NULL, 0, sub, keymap,
                    ~SMF__Q_BADB, status);
   } else {
     msgOutiff( MSG__VERB, "", FUNC_NAME
