@@ -203,6 +203,7 @@ typedef struct smfPCAData {
   size_t *goodbolo;       /* Local copy of global goodbolo */
   int ijob;               /* Job identifier */
   dim_t nbolo;            /* Number of detectors  */
+  size_t ncalc;           /* Number of components to calculate */
   size_t ngoodbolo;       /* Number of good bolos */
   dim_t tlen;             /* Number of time slices */
   int operation;          /* 0=covar,1=eigenvect,2=projection */
@@ -242,7 +243,8 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   size_t j;               /* Loop counter */
   size_t k;               /* Loop counter */
   size_t l;               /* Loop counter */
-  size_t ngoodbolo;       /* number good bolos = number principal components */
+  size_t ncalc;           /* number of calculated principal components */
+  size_t ngoodbolo;       /* number good bolos */
   size_t t_first;         /* First time slice being analyzed */
   size_t t_last;          /* First time slice being analyzed */
   size_t tstride;         /* time slice stride */
@@ -264,9 +266,10 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   cov = pdata->cov;
   covwork = pdata->covwork;
   ctstride = pdata->ctstride;
-  d = pdata->data->pntr[0];
+  d = pdata->data ? pdata->data->pntr[0] : NULL;
   goodbolo = pdata->goodbolo;
   ngoodbolo = pdata->ngoodbolo;
+  ncalc = pdata->ncalc;
   rms_amp = pdata->rms_amp;
   t_first = pdata->t_first;
   t_last = pdata->t_last;
@@ -359,7 +362,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
 
     check = 0;
 
-    for( i=0; i<ngoodbolo; i++ ) {   /* loop over comp */
+    for( i=0; i<ncalc; i++ ) {   /* loop over comp */
       double u;
 
       /*msgOutiff( MSG__DEBUG, "", "   bolo %zu", status, goodbolo[i] );*/
@@ -393,7 +396,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
 
     for( i=0; i<ngoodbolo; i++ ) {    /* loop over bolometer */
       /*msgOutiff( MSG__DEBUG, "", "   bolo %zu", status, goodbolo[i] );*/
-      for( j=0; j<ngoodbolo; j++ ) {  /* loop over component */
+      for( j=0; j<ncalc; j++ ) {  /* loop over component */
         if( comp[j*ccompstride] != VAL__BADD ) {
           for( k=pdata->t1; k<=pdata->t2; k++ ) {
             v1 = d[goodbolo[i]*bstride + k*tstride];
@@ -405,7 +408,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
       }
     }
 
-    for( i=0; i<(1280l*ngoodbolo); i++ ) check += amp[i];
+    for( i=0; i<(1280l*ncalc); i++ ) check += amp[i];
 
     if( CHECK ) {
        printf("--- check %i: %lf\n", pdata->operation, check);
@@ -416,7 +419,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
     double a;
     double factor = pdata->sub ? 1 : -1;
 
-    for( j=0; j<ngoodbolo; j++ ) {        /* loop over component */
+    for( j=0; j<ncalc; j++ ) {        /* loop over component */
       if( rms_amp[j] == VAL__BADD && comp[j*ccompstride] != VAL__BADD ) {
 
         /* Bad values in rms_amp indicate components that we are
@@ -475,7 +478,8 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   size_t *goodbolo=NULL;  /* Indices of the good bolometers for analysis */
   dim_t nbolo;            /* number of bolos */
   dim_t ndata;            /* number of samples in data */
-  size_t ngoodbolo;       /* number good bolos = number principal components */
+  size_t ncalc;           /* number of PCA components to calculate */
+  size_t ngoodbolo;       /* number good bolos */
   dim_t ntslice;          /* number of time slices */
   int nw;                 /* total available worker threads */
   smfPCAData *pdata=NULL; /* Pointer to job data */
@@ -525,7 +529,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     goto CLEANUP;
   }
 
-  /* If the range of time slices has not been specified, us the total
+  /* If the range of time slices has not been specified, use the total
      range excluding padding and apodizing. */
   qua = smf_select_qualpntr( data, 0, status );
   if( !t_last ) {
@@ -594,21 +598,31 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     goto CLEANUP;
   }
 
+/* If "thresh" is negative, we already know how many PCA components will
+   be removed, in which case we do not need to calculate the other PCA
+   components. Decide how many PCA components to calculate. */
+  if( thresh < 0.0 ) {
+     ncalc = ncomp;
+     if( ncalc > ngoodbolo ) ncalc = ngoodbolo;
+  } else {
+     ncalc = ngoodbolo;
+  }
+
   /* Fill bad values and values flagged via "mask" (except entirely bad
      bolometers) with interpolated data values. */
   mask &= ~SMF__Q_BADB;
   smf_fillgaps( wf, data, mask, status );
 
   /* Allocate arrays */
-  amp = astCalloc( nbolo*ngoodbolo, sizeof(*amp) );
-  comp = astCalloc( ngoodbolo*tlen, sizeof(*comp) );
+  amp = astCalloc( nbolo*ncalc, sizeof(*amp) );
+  comp = astCalloc( ncalc*tlen, sizeof(*comp) );
   cov = gsl_matrix_alloc( ngoodbolo, ngoodbolo );
   s = gsl_vector_alloc( ngoodbolo );
   work = gsl_vector_alloc( ngoodbolo );
 
   /* These strides will make comp time-ordered */
   ccompstride = 1;
-  ctstride = ngoodbolo;
+  ctstride = ncalc;
 
   /* These strides will also make amp look time-ordered (sort-of: the time
      axis is now the component number */
@@ -649,8 +663,8 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
        pdata->b2 = ngoodbolo - 1;
     }
 
-    /* Ensure we don't try to use more bolos or tslices than we have. This 
-       can happen for instance if the number of good bolos is smaller than 
+    /* Ensure we don't try to use more bolos or tslices than we have. This
+       can happen for instance if the number of good bolos is smaller than
        the number of threads. */
     if( pdata->t2 >= t_first + tlen ) pdata->t2 = t_first + tlen - 1;
     if( pdata->b2 >= ngoodbolo ) pdata->b2 = ngoodbolo - 1;
@@ -675,6 +689,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     pdata->tlen = tlen;
     pdata->operation = 0;
     pdata->tstride = tstride;
+    pdata->ncalc = ncalc;
 
     /* Each thread will accumulate the projection of its own portion of
        the time-series. We'll add them to the master amp at the end */
@@ -805,13 +820,13 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
      component for which the sigma is less than 1E-10 of the log-mean
      sigma is excluded. */
   {
-    double *sigmas = astMalloc( ngoodbolo*sizeof( *sigmas ) );
+    double *sigmas = astMalloc( ncalc*sizeof( *sigmas ) );
     double check = 0;
     double s1 = 0.0;
     int s2 = 0;
     int nlow = 0;
 
-    for( i=0; (*status==SAI__OK)&&(i<ngoodbolo); i++ ) {
+    for( i=0; (*status==SAI__OK)&&(i<ncalc); i++ ) {
       double sigma;
 
       smf_stats1D( comp + i*ccompstride, ctstride, tlen, NULL, 0,
@@ -843,7 +858,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
        standard deviation will already have been excluded. */
     if( s2 > 0 ) {
        double thresh = 1E-10*pow( 10.0, s1/s2 );
-       for( i=0; i<ngoodbolo; i++ ) {
+       for( i=0; i<ncalc; i++ ) {
           if( sigmas[ i ] != VAL__BADD && sigmas[ i ] < thresh ) {
              for( k=0; k<tlen; k++ ) {
                 comp[i*ccompstride + k*ctstride] = VAL__BADD;
@@ -856,7 +871,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": rejecting %d (out of %zu) components"
                " because they are too weak to normalise", status, nlow, ngoodbolo );
 
-    for( i=0; i<ngoodbolo*tlen; i++ ) {
+    for( i=0; i<ncalc*tlen; i++ ) {
       if( comp[i] != VAL__BADD ) check += comp[i];
     }
 
@@ -898,7 +913,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
       pdata = job_data + ii;
 
       for( i=0; i<ngoodbolo; i++ ) {        /* Loop over good bolo */
-        for( j=0; j<ngoodbolo; j++ ) {      /* Loop over component */
+        for( j=0; j<ncalc; j++ ) {          /* Loop over component */
           index = goodbolo[i]*abstride + j*acompstride;
           amp[index] += pdata->amp[index];
         }
@@ -909,7 +924,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   if( CHECK ){
     double check=0;
 
-    for( i=0; i<nbolo*ngoodbolo; i++ ) {
+    for( i=0; i<nbolo*ncalc; i++ ) {
       check += amp[i];
     }
     printf("--- check combined amp: %lf\n", check);
@@ -917,7 +932,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
 
   if( CHECK ){
     double check=0;
-    for( i=0; i<ngoodbolo*tlen; i++ ) {
+    for( i=0; i<ncalc*tlen; i++ ) {
       if( comp[i] != VAL__BADD ) check += comp[i];
     }
 
@@ -928,7 +943,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
      mostly negative, flip the sign of both the component and amplitudes */
   if( *status == SAI__OK ) {
     double total;
-    for( j=0; j<ngoodbolo; j++ ) {    /* loop over component */
+    for( j=0; j<ncalc; j++ ) {    /* loop over component */
       total = 0;
       for( i=0; i<ngoodbolo; i++ ) {  /* loop over bolometer */
         total += amp[goodbolo[i]*abstride + j*acompstride];
@@ -957,13 +972,13 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   if( *status == SAI__OK ) {
     for( ii=0; ii<nw; ii++ ) {
       pdata = job_data + ii;
-      memcpy( pdata->amp, amp, sizeof(*(pdata->amp))*nbolo*ngoodbolo );
+      memcpy( pdata->amp, amp, sizeof(*(pdata->amp))*nbolo*ncalc );
     }
   }
 
   if( CHECK ){
     double check=0;
-    for( i=0; i<ngoodbolo*tlen; i++ ) {
+    for( i=0; i<ncalc*tlen; i++ ) {
       if( comp[i] != VAL__BADD ) check += comp[i];
     }
 
@@ -1035,109 +1050,98 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     double x;
     int nsum;
 
-    rms_amp = astCalloc( ngoodbolo, sizeof(*rms_amp) );
+    rms_amp = astCalloc( ncalc, sizeof(*rms_amp) );
 
     /* If we know how many components to remove, flag them by setting
        them bad in the above array. */
     if( thresh < 0.0 ) {
-
-      /* Ensure we do not try to remove more components than we have. */
-      if( ncomp > ngoodbolo ) ncomp = ngoodbolo;
-
-      for( i=0; i<ncomp; i++ ) rms_amp[i] = VAL__BADD;
+      ncomp = ncalc;
+      for( i=0; i<ncalc; i++ ) rms_amp[i] = VAL__BADD;
       msgOutiff( MSG__VERB, "", FUNC_NAME ": will remove %zu / %zu components...",
-                 status, ncomp, ngoodbolo );
+                 status, ncalc, ngoodbolo );
 
-    /* Otherwise, we determine the number of components to remove using a
-       sigma-clipping algorithm. */
-    } else {
+    /* Otherwise, first calculate the RMS of the amplitudes across the array
+       for each component. This will be a positive number whose value
+       gives a typical amplitude of the component that can be compared
+       to other components */
+    } else if( *status == SAI__OK ) {
 
-       /* First calculate the RMS of the amplitudes across the array for
-          each component. This will be a positive number whose value
-          gives a typical amplitude of the component that can be compared
-          to other components */
+      for( i=0; i<ncalc; i++ ) {        /* Loop over component */
+        sum = 0;
+        sum_sq = 0;
+        nsum = 0;
+        for( j=0; j<ngoodbolo; j++ ) {      /* Loop over bolo */
+          x = amp[i*acompstride + goodbolo[j]*abstride];
+          if( x != 0.0 ) {
+             sum += x;
+             sum_sq += x*x;
+             nsum++;
+          }
+        }
 
+        if( nsum > 0 ) {
+           rms_amp[i] = sqrt( sum_sq / ((double)nsum) );
+        } else {
+           rms_amp[i] = VAL__BADD;
+        }
+      }
 
-       if( *status == SAI__OK ) {
-         for( i=0; i<ngoodbolo; i++ ) {        /* Loop over component */
-           sum = 0;
-           sum_sq = 0;
-           nsum = 0;
+      /* We determine the number of components to remove using a
+         sigma-clipping algorithm. Perform an iterative clip using the mean
+         and standard deviation of the component amplitude RMS's. Note that
+         the RMS is always massively dominated by the first mode, so we will
+         always assume that it should be removed to help things be more
+         well-behaved. */
 
-           for( j=0; j<ngoodbolo; j++ ) {      /* Loop over bolo */
-             x = amp[i*acompstride + goodbolo[j]*abstride];
-             if( x != 0.0 ) {
-                sum += x;
-                sum_sq += x*x;
-                nsum++;
-             }
-           }
+      rms_amp[0] = VAL__BADD;
+      while( !converge && (*status==SAI__OK) ) {
+        double m;                   /* mean */
+        int new;                    /* Set if new values flagged */
+        double sig;                 /* standard deviation */
 
-           if( nsum > 0 ) {
-              rms_amp[i] = sqrt( sum_sq / ((double)nsum) );
-           } else {
-              rms_amp[i] = VAL__BADD;
-           }
-         }
-       }
+        /* Update interation counter */
+        iter ++;
 
-       /* Then, perform an iterative clip using the mean and standard
-          deviation of the component amplitude RMS's. Note that the RMS
-          is always massively dominated by the first mode, so we will
-          always assume that it should be removed to help things be more
-          well-behaved. */
+        /* Measure mean and standard deviation of non-flagged samples */
+        smf_stats1D( rms_amp, 1, ncalc, NULL, 0, 0, &m, &sig, NULL, &ngood,
+                     status );
 
-       rms_amp[0] = VAL__BADD;
+        msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                   ": iter %zu mean=%lf sig=%lf ngood=%zu", status,
+                   iter, m, sig, ngood );
 
-       while( !converge && (*status==SAI__OK) ) {
-         double m;                   /* mean */
-         int new;                    /* Set if new values flagged */
-         double sig;                 /* standard deviation */
+        /* Flag new outliers */
+        new = 0;
+        for( i=0; i<ngood; i++ ) {
+          if( (rms_amp[i]!=VAL__BADD) && ((rms_amp[i]-m) > sig*thresh) ) {
+            new = 1;
+            rms_amp[i] = VAL__BADD;
+            ngood--;
+          }
+        }
 
-         /* Update interation counter */
-         iter ++;
+        /* Converged if no new values flagged */
+        if( !new ) converge = 1;
 
-         /* Measure mean and standard deviation of non-flagged samples */
-         smf_stats1D( rms_amp, 1, ngoodbolo, NULL, 0, 0, &m, &sig, NULL, &ngood,
-                      status );
+        /* Trap huge numbers of iterations */
+        if( iter > 50 ) {
+          *status = SAI__ERROR;
+          errRep( "", FUNC_NAME ": more than 50 iterations!", status );
+        }
 
-         msgOutiff( MSG__DEBUG, "", FUNC_NAME
-                    ": iter %zu mean=%lf sig=%lf ngood=%zu", status,
-                    iter, m, sig, ngood );
+        /* If we have less than 10% of the original modes (or 2,
+           whichever is larger), generate bad status */
+        if( (ngood <= 2) || (ngood < 0.1*ncalc) ) {
+          *status = SAI__ERROR;
+          errRepf( "", FUNC_NAME ": only %zu of %zu modes remain!", status,
+                   ncalc, ngood );
+        }
+      }
 
-         /* Flag new outliers */
-         new = 0;
-         for( i=0; i<ngood; i++ ) {
-           if( (rms_amp[i]!=VAL__BADD) && ((rms_amp[i]-m) > sig*thresh) ) {
-             new = 1;
-             rms_amp[i] = VAL__BADD;
-             ngood--;
-           }
-         }
-
-         /* Converged if no new values flagged */
-         if( !new ) converge = 1;
-
-         /* Trap huge numbers of iterations */
-         if( iter > 50 ) {
-           *status = SAI__ERROR;
-           errRep( "", FUNC_NAME ": more than 50 iterations!", status );
-         }
-
-         /* If we have less than 10% of the original modes (or 2,
-            whichever is larger), generate bad status */
-         if( (ngood <= 2) || (ngood < 0.1*ngoodbolo) ) {
-           *status = SAI__ERROR;
-           errRepf( "", FUNC_NAME ": only %zu of %zu modes remain!", status,
-                    ngoodbolo, ngood );
-         }
-       }
-
-       ncomp =  ngoodbolo - ngood;
-       msgOutiff( MSG__VERB, "", FUNC_NAME
+      ncomp = ncalc - ngood;
+      msgOutiff( MSG__VERB, "", FUNC_NAME
                   ": after %zu clipping iterations, will remove "
-                  "%zu / %zu components...", status, iter, ncomp,
-                  ngoodbolo );
+                  "%zu / %zu components...", status, iter, ncomp, ncalc );
 
     }
 
@@ -1162,6 +1166,10 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     thrWait( wf, status );
 
     rms_amp = astFree( rms_amp );
+
+    msgOutiff( MSG__VERB, "", FUNC_NAME ": %zu components removed.",
+              status, ncomp );
+
   }
 
   /* Returning components? ---------------------------------------------------*/
@@ -1170,7 +1178,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     int lbnd[3];
     smfHead *hdr=NULL;
 
-    dims[0] = ngoodbolo;
+    dims[0] = ncalc;
     dims[1] = 1;
     lbnd[0] = 0;
     lbnd[1] = 0;
@@ -1215,11 +1223,11 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     smf_qual_t *q=NULL;   /* Quality array that just maps SMF__Q_BADB */
 
     if( qua ) {
-      q = astCalloc( nbolo*ngoodbolo, sizeof(*q) );
+      q = astCalloc( nbolo*ncalc, sizeof(*q) );
 
       if( *status == SAI__OK ) {
         for( i=0; i<nbolo; i++ ) {        /* bolometer */
-          for( j=0; j<ngoodbolo; j++ ) {  /* component amplitude */
+          for( j=0; j<ncalc; j++ ) {  /* component amplitude */
             q[i*abstride + j*acompstride] = qua[i*bstride]&SMF__Q_BADB;
           }
         }
@@ -1239,7 +1247,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     }
 
     /* last dimension enumerates component */
-    dims[2] = ngoodbolo;
+    dims[2] = ncalc;
     lbnd[2] = 0;
 
 
@@ -1256,7 +1264,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
 
   if( comp && CHECK ) {
     double check=0;
-    for( i=0; i<ngoodbolo*tlen; i++ ) {
+    for( i=0; i<ncalc*tlen; i++ ) {
       if( comp[i] != VAL__BADD ) check += comp[i];
     }
 
