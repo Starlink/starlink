@@ -579,6 +579,9 @@
 *        values in the REF map are no longer used for anything (the
 *        pixel positions are the only thing used from the REF map), so
 *        there is now no need to ensure that the REF map is in units of pW.
+*    28-MAR-2019 (DSB):
+*        If an output catalogue is being created, but no output I map has been 
+*        requested, use any supplied IPREF map in favour of creating a new I map. 
 
 '''
 
@@ -1208,27 +1211,6 @@ try:
    qmap = parsys["QOUT"].value
    umap = parsys["UOUT"].value
 
-#  Get the output catalogue.
-   outcat = parsys["CAT"].value
-
-#  If a catalogue is required, we need to create all three maps, so
-#  ensure this is the case (use temporary files for any that have not
-#  been requested by the user).
-   catref = None
-   if outcat:
-      if not imap:
-         imap = NDG( 1 )
-      if not qmap:
-         qmap = NDG( 1 )
-      if not umap:
-         umap = NDG( 1 )
-
-#  Get the binsize for the catalogue.
-      binsize = parsys["BINSIZE"].value
-
-#  See if statistical debiasing is to be performed.
-   debias = parsys["DEBIAS"].value
-
 #  The user-supplied makemap configs, and pixel size.
    config = parsys["CONFIG"].value
    iconfig = parsys["ICONFIG"].value
@@ -1364,6 +1346,7 @@ try:
 
 #  If IP correction is to be performed, get the map to be used to define
 #  the IP correction.
+   ipref = None
    parsys["IPCOR"].default = ( qmap is not None or umap is not None )
    if parsys["IPCOR"].value:
       ipref = parsys["IPREF"].value
@@ -1384,6 +1367,43 @@ try:
       ip = "ipref={0}".format(ipref)
    else:
       ip = "ipref=!"
+
+#  Get the output catalogue.
+   outcat = parsys["CAT"].value
+
+#  If a catalogue is required, we need to create all three maps, so
+#  ensure this is the case (use temporary files for any that have not
+#  been requested by the user).
+   catref = None
+   if outcat:
+      if not imap:
+         if ipref is not None:
+            msg_out("The supplied IPREF map will be used as the total "
+                    "intensity map when creating the polarisation values")
+            imap = ipref
+         else:
+            msg_out("The total intensity map will also be created since "
+                    "it is required to calculate the polarisation values")
+            imap = NDG( 1 )
+      if not qmap:
+         msg_out("The Q map will also be created since "
+                 "it is required to calculate the polarisation values")
+         qmap = NDG( 1 )
+      if not umap:
+         msg_out("The U map will also be created since "
+                 "it is required to calculate the polarisation values")
+         umap = NDG( 1 )
+
+#  Get the binsize for the catalogue.
+      binsize = parsys["BINSIZE"].value
+
+#  See if statistical debiasing is to be performed.
+   debias = parsys["DEBIAS"].value
+
+
+
+
+
 
 #  See where to put new Q, U and I maps for individual observations, and
 #  ensure the directory exists.
@@ -2619,8 +2639,8 @@ try:
 
 #  If skyloop was used above, the coadd will already exist. First deal
 #  with cases where skyloop was not used.
-      allmaps = NDG( list( qui_maps.values() ) )
       if not skyloop:
+         allmaps = NDG( list( qui_maps.values() ) )
 
 #  If we have only one observation just copy it to the output maps.
          if len(qui_maps) == 1:
@@ -2661,7 +2681,8 @@ try:
 #  True, in which case we need to replace the variances in the coadd with
 #  variances derived from the dispersion of the individual observation maps
 #  created by skyloop.
-      elif mapvar:
+      elif mapvar and make_new_maps:
+         allmaps = NDG( list( qui_maps.values() ) )
          msg_out("MAPVAR is YES, so forming new variances for {0} skyloop coadd:".format(qui))
          junk = NDG( 1 )
          invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
