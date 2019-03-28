@@ -580,8 +580,12 @@
 *        pixel positions are the only thing used from the REF map), so
 *        there is now no need to ensure that the REF map is in units of pW.
 *    28-MAR-2019 (DSB):
-*        If an output catalogue is being created, but no output I map has been 
+*        - If an output catalogue is being created, but no output I map has been 
 *        requested, use any supplied IPREF map in favour of creating a new I map. 
+*        - If we are processing I data with makemap (i.e. "step 1"), and no ref
+*        map was given, then use the I map created from the first observation as 
+*        the ref map for the remaining observations. This ensures that all the 
+*        auto-masked I maps are aligned with each other.
 
 '''
 
@@ -2581,6 +2585,13 @@ try:
                      invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=POINT_DY "
                             "edit=a value={1} comment=\"'Used {2} pointing correction [arcsec]'\""
                             " position=! mode=interface".format(qui_maps[key],dy,sym))
+
+#  If we are processing I data with makemap (i.e. "step 1"), and no ref
+#  map was given, then use the I map just created as the ref map for the
+#  remaining observations. This ensures that all the auto-masked I maps
+#  are aligned with each other.
+                  if ref == "!" and qui == 'I':
+                     ref = qui_maps[key]
 
 #  If makemap failed, warn the user and delete any map that was created,
 #  and pass on to the next observation chunk.
