@@ -1979,6 +1979,25 @@ hitslimit = 0.01
 importsky = 0
 
 #-----------------------------------------------------------------
+#  Name: 	ipangoff
+#  Type: 	float
+#  Default: 	0.0
+#  Purpose: 	Modify the angle of Instrumental Polarisation correction.
+#  Description: This parameter is only used when processing POL2 Q or U
+#               time-streams as created by SMURF:CALCQU, and if a value
+#               is supplied for ADAM parameter IPREF. It specifies an
+#               offset to be added onto the "D" constant defined by the
+#               selected IP model, and should be supplied in units of
+#               degrees. The "D" value is the elevation at which the IP
+#               is parallel to the focal plane Y axis (i.e. all Q and
+#               no U, if using the cocal plane Y axis as the polarimetric
+#               reference direction). Creating maps with different values
+#               of ipangoff provides a handle on how sensitive the map is
+#               to the details of the IP correction. See also parameter
+#               "ipoffset".
+ipangoff = 0.0
+
+#-----------------------------------------------------------------
 #  Name: 	ipoffset
 #  Type: 	float
 #  Default: 	0.0
@@ -1995,6 +2014,7 @@ importsky = 0
 #               different values of ipoffset provides a handle on how
 #               sensitive the map is to the details of the IP correction.
 #               The current IP model is roughly accurate to about +/- 0.3%.
+#               See also parameter "ipangoff".
 ipoffset = 0.0
 
 #-----------------------------------------------------------------

@@ -100,6 +100,9 @@
 *        now made by the logic in this function.
 *        - Add support for 450 um.
 *        - Add support for observations without the wind blind.
+*     20-MAR-2019 (DSB):
+*        Allow user to modifty the IP angle using the new config parameter
+*        IPANGOFF.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -196,6 +199,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    double *ipang;
    double *ippars;
    double degfac;
+   double ipangoff;
    double ipoffset;
    int imapndf;
    int iw;
@@ -324,6 +328,15 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
 /* Convert from percentage to fraction. */
       ipoffset /= 100.0;
 
+/* Get the amount by which to change the elevation at which the IP is
+   parallel to the focal plane Y axis (i.e. Qip is non-zero and Uip is
+   zero - the "D" constant described in the prologue). This allows the
+   user to experiment with the effects of changing the IP angle a bit. */
+      astMapGet0D( keymap, "IPANGOFF", &ipangoff );
+
+/* Convert from degrees to to radians. */
+      ipangoff *= AST__DD2R;
+
 /* Determine the AST system corresponding to polarimetric reference direction
    of the Q/U bolometer values. Set "trsys" to NULL if the focal plane Y axis
    is the reference direction. */
@@ -415,6 +428,11 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
          } else {
             ippars = model3;
          }
+
+/* Modify the elevation at which the IP is parallel to the focal plane Y axis
+   (i.e. Qip is non-zero and Uip is zero) by adding on the user-specified
+   offset. */
+         ippars[ 3 ] += ipangoff;
 
 /* The above IP parameters were determined using total intensity maps
    made from POL2 observations. So if the supplied IP reference map was
