@@ -48,8 +48,10 @@
 *     15-JUN-2015 (DSB):
 *        Original version.
 *     27-MAR-2019 (DSB):
-*        Allow the quadratic background removal to be disabled. It is
+*        - Allow the quadratic background removal to be disabled. It is
 *        often not needed, and is very slow.
+*        - Flag bolometers for which the removal of the PCA model causes
+*        the noise to drop too much.
 
 *  Copyright:
 *     Copyright (C) 2015 East Asian Observatory.
@@ -92,6 +94,7 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "libsmf/smf_err.h"
 
 /* Prototypes for local static functions. */
 static void smf1_calcmodel_pca( void *job_data_ptr, int *status );
@@ -105,12 +108,14 @@ typedef struct smfCalcModelPCAData {
    dim_t t1;
    dim_t t2;
    double *model_data;
+   double *noise;
    double *res_data;
    int *lut_data;
    int backoff;
    int oper;
    smf_qual_t *qua_data;
    unsigned char *mask;
+   smfData *data;
 } SmfCalcModelPCAData;
 
 
@@ -125,11 +130,16 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    SmfCalcModelPCAData *pdata;
    dim_t bstep;
    dim_t idx;
+   dim_t ibolo;
+   dim_t itime;
    dim_t nbolo;
    dim_t ntslice;
    dim_t tstep;
+   double *noise_before;
+   double *noise_after;
    double *model_data;
    double *res_data;
+   double noiselim;
    double pcathresh;
    double pcathresh_freeze = 0.0;
    double samplim;
@@ -141,6 +151,7 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    int nw;
    int proceed;
    size_t ipix;
+   size_t nsetbad;
    smfArray **oldres;
    smfArray **oldgai;
    smfArray *lut=NULL;
@@ -179,6 +190,12 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    flattened by the removal of a quadratic background from each bolometer.
    If so, this background is added onto the PCA model for eacb bolometer. */
    astMapGet0I( kmap, "BACKOFF", &backoff );
+
+/* Get the maximum allowable fractional reduction in a bolometer's noise
+   level that can be produced by removing the PCA model. If the noise would
+   fall by a greater fraction than this as a result of removing the PCA
+   model, then the bolometer is set bad. */
+   astMapGet0D( kmap, "NOISELIM", &noiselim );
 
 /* Get the number of initial iterations for which the PCA model is to be
    skipped. Zero means use the PCA model on all iterations. A fractional
@@ -473,6 +490,15 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
             }
          }
 
+/* Allocate arrays to hold the noise level in each bolo before and after
+   subtraction of the PCA model. */
+         noise_before = astMalloc( nbolo*sizeof( *noise_before ) );
+         noise_after = astMalloc( nbolo*sizeof( *noise_after ) );
+
+/* initialise the number of bolometers set entirely bad because the noise
+   level drops too much as a result of subtracting off the PCA model. */
+         nsetbad = 0;
+
 /* If comfill is specified, the above results in the PCA model arrays
    containing a copy of the supplied residual data, but with no gaps.
    In other words, all values in the PCA model - except for padding and
@@ -486,10 +512,10 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 /* If we are doing masking within this function, flag the residual values
    that fall within the source regions. The gaps thus produced will be
    filled within smf_clean_pca using linear interpolation. */
+            qua_data = smf_select_qualpntr( res->sdata[idx], NULL, status );
             if( !comfill && mask ) {
                res_data = (res->sdata[idx]->pntr)[0];
                model_data = (model->sdata[idx]->pntr)[0];
-               qua_data = smf_select_qualpntr( res->sdata[idx], NULL, status );
 
                for( iw = 0; iw < nw; iw++ ) {
                   pdata = job_data + iw;
@@ -502,6 +528,17 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                }
                thrWait( wf, status );
             }
+
+/* Find the noise in each bolo before subtracting the PCA model. */
+            for( iw = 0; iw < nw; iw++ ) {
+               pdata = job_data + iw;
+               pdata->oper = 4;
+               pdata->qua_data = qua_data;
+               pdata->data = res->sdata[idx];
+               pdata->noise = noise_before + pdata->b1;
+               thrAddJob( wf, 0, pdata, smf1_calcmodel_pca, 0, NULL, status );
+            }
+            thrWait( wf, status );
 
 /* Do a PCA analysis of the values in the PCA model arrays. The model
    arrays are returned containing time-stream values made up from the
@@ -539,8 +576,38 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                thrAddJob( wf, 0, pdata, smf1_calcmodel_pca, 0, NULL, status );
             }
             thrWait( wf, status );
+
+/* Find the noise in each bolo now that the PCA model has been removed. */
+            for( iw = 0; iw < nw; iw++ ) {
+               pdata = job_data + iw;
+               pdata->oper = 4;
+               pdata->data = res->sdata[idx];
+               pdata->noise = noise_after + pdata->b1;
+               thrAddJob( wf, 0, pdata, smf1_calcmodel_pca, 0, NULL, status );
+            }
+            thrWait( wf, status );
+
+/* If the noise level in any bolometer has fallen too much as a result of
+   removing the PCA model, flag it as bad. */
+            for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+               if( noise_before[ ibolo ] != VAL__BADD ) {
+                  if( noise_after[ibolo] < noiselim*noise_before[ibolo]) {
+                     qua_data[ ibolo*ntslice ] |= SMF__Q_BADB;
+                     for( itime = 0; itime < ntslice; itime++ ){
+                        qua_data[ ibolo*ntslice + itime ] |= SMF__Q_PCA;
+                     }
+                     nsetbad++;
+                  }
+               }
+            }
          }
 
+         msgOutiff( MSG__DEBUG, "", "smf_calcmodel_pca: %zu bolometers set "
+                    "bad due to too much noise removal.", status, nsetbad );
+
+/* Free the noise arrays. */
+         noise_before = astFree( noise_before );
+         noise_after = astFree( noise_after );
       }
 
 /* Free resources. */
@@ -582,6 +649,7 @@ static void smf1_calcmodel_pca( void *job_data_ptr, int *status ) {
    dim_t ntslice;
    double *pm;
    double *polydata;
+   double *pn;
    double *pp;
    double *pr;
    double coeffs[3];
@@ -614,6 +682,14 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
    is 1, and bstride is ntslice. */
       ibase = b1*ntslice;
       for( ibolo = b1; ibolo <= b2; ibolo++ ) {
+
+/* Clear the BADB bit if the bolometer was flagged as bad within this
+   fuction because it suffered too great a noise reduction on the
+   previous iteration. */
+         if( ( (pdata->qua_data)[ ibase ] & SMF__Q_BADB ) &&
+             ( (pdata->qua_data)[ ibase ] & SMF__Q_PCA ) ) {
+            (pdata->qua_data)[ ibase ] &= ~SMF__Q_BADB;
+         }
 
 /* Check that the whole bolometer has not been flagged as bad. */
          if( !( (pdata->qua_data)[ ibase ] & SMF__Q_BADB ) ) {
@@ -755,6 +831,30 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
    bolometer. */
          ibase += ntslice;
       }
+
+/* Get the noise in each working bolometer. */
+   } else if( pdata->oper == 4 ) {
+
+/* Loop round all bolos to be processed by this thread, maintaining the
+   index of the first time slice for the current bolo. */
+      ibase = b1*ntslice;
+      pn = pdata->noise;
+      for( ibolo = b1; ibolo <= b2; ibolo++,pn++ ) {
+
+/* Check that the whole bolometer has not been flagged as bad. */
+         if( !( (pdata->qua_data)[ ibase ] & SMF__Q_BADB ) ) {
+            *pn = smf_quick_noise( pdata->data, ibolo, 20, 50, SMF__Q_GOOD,
+                                   status );
+            if(  *status == SMF__INSMP ) {
+               errAnnul( status );
+               *pn = VAL__BADD;
+            }
+
+         } else {
+            *pn = VAL__BADD;
+         }
+      }
+
 
 /* Report an error if the worker was to do an unknown job.
    ====================================================== */

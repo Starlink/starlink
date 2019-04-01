@@ -3049,25 +3049,42 @@ pca.pcathresh_freeze = 0.0
 #-----------------------------------------------------------------
 #  Name: 	pca.backoff
 #  Type: 	integer
-#  Default: 	1
+#  Default: 	0
 #  Purpose: 	Controls the determination of multiple background signals
 #  Description: This parameter controls whether the residuals after
 #               subtraction of the PCA model should be flattened by the
-#               removal of a quadratic background fomr each bolometer.
+#               removal of a quadratic background from each bolometer.
 #               Disabling this option speeds up the PCA model considerably,
 #               and seems to produce little effect if the PCA model
 #               occurs after the COM model within the model order.
-pca.backoff = 1
+pca.backoff = 0
 
 #-----------------------------------------------------------------
 #  Name: 	pca.samplim
 #  Type: 	float
-#  Default: 	0.9
+#  Default: 	0.8
 #  Purpose: 	Controls the determination of multiple background signals
 #  Description: This parameter gives the minimum fraction of good samples
 #               that a bolometer must have for it to be used in the
 #               determination of the principal components.
-pca.samplim = 0.9
+pca.samplim = 0.8
+
+#-----------------------------------------------------------------
+#  Name: 	pca.noiselim
+#  Type: 	float
+#  Default: 	0.1
+#  Purpose: 	Controls the determination of multiple background signals
+#  Description: This parameter gives the smallest allowed noise level
+#               after removal of the PCA model. If the removal of the PCA
+#               model causes the noise in a bolometer to fall to lower than
+#               "pca.noiselim" times the noise level it had before removal
+#               of the PCA model, then the bolometer is flagged as bad
+#               until the next iteration. This usually happens for bolometers 
+#               that appear to be "unique" for some reason (i.e. look completely 
+#               unlike other bolometers). In such cases one of the PCA components 
+#               will be nearly identical to the bolometer, and so leave no
+#               significant residuals after subtraction of hte PCA model.
+pca.noiselim = 0.1
 
 #-----------------------------------------------------------------
 #  Name: 	pca.comfill
