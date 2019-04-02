@@ -253,6 +253,9 @@
  *        the result of merging the FITS headers from all the concatenated
  *        input smfDatas. Previously, the output FITS header was just a
  *        copy of the FITS header from the first input smfData.
+ *     2019-04-02 (GSB):
+ *        Accumulate onmap flag value in subgroup loop rather than retaining
+ *        only the last value.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -1035,7 +1038,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
                         reftlen*sizeof(*(data->theta)) );
               }
 
-              data->onmap = refdata->onmap;
+              data->onmap = (j != firstpiece && data->onmap) || refdata->onmap;
             }
 
             /* dark squids */
