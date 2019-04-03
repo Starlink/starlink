@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ndf" support="S">
-  <version>1.13-0</version>
+  <version>2.0</version>
   <path>libraries/ndf</path>
   <description>NDF - Routines for Accessing the Extensible N-Dimensional Data Format</description>
   <abstract><p>The Extensible N-Dimensional Data Format (NDF) is a
@@ -34,7 +34,7 @@
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
-    <name>Council for the Central Laboratory of the Research Councils</name>
+    <name>East Asian Observatory</name>
   </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

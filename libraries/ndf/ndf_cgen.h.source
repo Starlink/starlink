@@ -1,0 +1,8 @@
+/* Generic prototypes for generic C functions. These are expanded at
+   make-time by script make_h to generate ndf_cgen.h, which is included in
+   ndf.h. */
+
+void CGEN_FUNCTION2(ndfGtsz,_)( int indf, const char *comp, CGEN_TYPE *scale, CGEN_TYPE *zero, int *status );
+void CGEN_FUNCTION2(ndfPtsz,_)( CGEN_TYPE scale, CGEN_TYPE zero, int indf, const char *comp, int *status );
+void CGEN_FUNCTION2(ndfXgt0,_)( int indf, const char *xname, const char *cmpt, CGEN_TYPE *value, int *status );
+void CGEN_FUNCTION2(ndfXpt0,_)( CGEN_TYPE value, int indf, const char *xname, const char *cmpt, int *status );

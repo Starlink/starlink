@@ -1,0 +1,123 @@
+#include "sae_par.h"
+#include "ndf_err.h"
+#include "prm_par.h"
+#include "ndf1.h"
+#include "mers.h"
+
+void CGEN_FUNCTION(ndf1Awi)( hdsdim lbnd, hdsdim ubnd, const double data[],
+                             CGEN_TYPE width[], int *status ){
+/*
+*+
+*  Name:
+*     ndf1Awi<T>
+
+*  Purpose:
+*     Initialise a generic axis width array.
+
+*  Synopsis:
+*     void ndf1Awi<T>( hdsdim lbnd, hdsdim ubnd, const double data[],
+*                      CGEN_TYPE width[], int *status )
+
+*  Description:
+*     This function initialises a generic axis width array.  The values
+*     assigned are calculated from an associated axis data array giving the
+*     positions of the pixel centres by forming differences between the
+*     centre positions of neighbouring pixels.
+
+*  Parameters:
+*     lbnd
+*        The lower bound of the axis width array.
+*     ubnd
+*        The upper bound of the axis width array.
+*     data
+*        Array of axis data values (containing pixel centre coordinates)
+*        from which the axis width values should be derived. The supplied
+*        "data" array should have at least "ubnd - lbnd + 1" elements.
+*     width
+*        Returned holding the generic axis width array. The supplied
+*        "width" array should have at least "ubnd - lbnd + 1" elements.
+*     *status
+*        The global status.
+
+*  Notes:
+*     -  If overflow occurs because any of the width values cannot be
+*     represented using the array's numeric type, then an error will be
+*     reported and "status" set.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     xxx (DSB):
+*        Original version, based on equivalent Fortran function by RFWS.
+
+*-
+*/
+
+/* Local Variables: */
+   CGEN_TYPE *pw;        /* Pointer to next returned width value */
+   const double *p;      /* Pointer to data index "i" */
+   double hi;            /* Maximum value which can be stored */
+   double w;             /* Width value */
+   hdsdim i;             /* Loop counter for array elements */
+   int ovflow;           /* Whether overflow has occurred */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Determine the maximum axis width value that can be stored without
+   overflow. */
+   hi = (double) CGEN_MAX;
+
+/* Loop to assign values to the array elements. */
+   p = data;
+   pw = width;
+   for( i = lbnd; i <= ubnd; i++,p++ ){
+
+/* If there is a pixel on either side of the current pixel, then use
+   half the separation of their centres to calculate the current pixel
+   width. */
+      if( i > lbnd && i < ubnd ) {
+         w = 0.5*( p[ 1 ] - p[ -1 ] );
+
+/* If there is a pixel on only one side, then use the distance from the
+   current pixel to calculate the width. */
+      } else if( i < ubnd ) {
+         w = p[ 1 ] - p[ 0 ];
+      } else if( i > lbnd ) {
+         w = p[ 0 ] - p[ -1 ];
+
+/* If there is only one pixel, then use a width of unity. */
+      } else {
+         w = 1.0;
+      }
+
+/* Ensure the result is positive.  If it can be stored without
+   overflow, then assign it to the width array. */
+      if( w < 0.0 ) w = -w;
+      if( w <= hi ) {
+         *(pw++) = w;
+
+/* Otherwise, assign a bad result. */
+      } else {
+         *(pw++) = CGEN_BAD;
+
+/* If this is the first such error, then report it. */
+         if( !ovflow ) {
+            *status = NDF__AXOVF;
+            msgSeti( "PIXEL", i + 1 );
+            errRep( " ", "Overflow occurred while calculating a value for "
+                    "pixel ^PIXEL of an axis width array.", status );
+
+/* Note that overflow has occurred. */
+            ovflow = 1;
+         }
+      }
+   }
+
+/* Call error tracing function and exit. */
+   if( *status != SAI__OK ) ndf1Trace( "ndf1Awi<T>", status );
+
+}
+

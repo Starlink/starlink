@@ -1,0 +1,16 @@
+/* Generic prototypes for generic C functions. These are expanded at
+   make-time by script make_h to generate ndf1_cgen.h, which is included
+   in ndf1.h. */
+
+void CGEN_FUNCTION(ndf1Bpp)( size_t el, const CGEN_TYPE array[], int *bad, int *status );
+void CGEN_FUNCTION(ndf1Awi)( hdsdim lbnd, hdsdim ubnd, const double data[], CGEN_TYPE width[], int *status );
+void CGEN_FUNCTION(ndf1V2s)( int bad, size_t el, CGEN_TYPE array[], int *dce, int *status );
+void CGEN_FUNCTION(ndf1SqLimit)( CGEN_TYPE *result );
+void CGEN_FUNCTION(ndf1Adi)( hdsdim lbnda, hdsdim ubnda, CGEN_TYPE adata[], int *status );
+void CGEN_FUNCTION(ndf1S2v)( int bad, size_t el, CGEN_TYPE array[], int *dce, int *status );
+void CGEN_FUNCTION(ndf1Ade)( double scale, double zero, int upper, hdsdim pix0, hdsdim lbnda, hdsdim ubnda, CGEN_TYPE adata[], int *status );
+void CGEN_FUNCTION(ndf1Qma)( int el, const unsigned char qual[], unsigned char badbit, int narray,CGEN_TYPE array1[], CGEN_TYPE array2[],CGEN_TYPE array3[], CGEN_TYPE array4[],int *bad, int *status );
+void CGEN_FUNCTION(ndf1Ave)( int upper, hdsdim pix0, hdsdim lbnda, hdsdim ubnda, CGEN_TYPE avar[], int *status );
+void CGEN_FUNCTION(ndf1Awe)( int upper, hdsdim pix0, double width, hdsdim lbnd, hdsdim ubnd, CGEN_TYPE awidth[], int *status );
+void CGEN_FUNCTION(ndf1Adi)( hdsdim lbnda, hdsdim ubnda, CGEN_TYPE adata[], int *status );
+void CGEN_FUNCTION(ndf1Cvt)( int bad, size_t n, const char *type, void *pntr, CGEN_TYPE *result, int *dce, int *status );

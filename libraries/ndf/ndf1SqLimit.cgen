@@ -1,0 +1,103 @@
+#include <math.h>
+#include "sae_par.h"
+#include "ndf1.h"
+
+void CGEN_FUNCTION( ndf1SqLimit )( CGEN_TYPE *result ){
+/*
+*+
+*  Name:
+*     ndf1Sqlimit<T>
+
+*  Purpose:
+*     Find the highest <T> value that can be squared without overflow.
+
+*  Synopsis:
+*     void ndf1SqLimit<T>( CGEN_TYPE *result )
+
+*  Description:
+*     This function returns the  highest <T> value that can be squared
+*     without overflow.
+
+*  Parameters:
+*     result
+*        Pointer to the location at which to return the required value.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     xxx (DSB):
+*        Original version, based on Fortran NDF1_S2V routine by RFWS.
+
+*-
+*/
+
+/* Local Variables: */
+   CGEN_TYPE a;          /* Number to which 1 can't be added */
+   CGEN_TYPE b;          /* Number which can be added to A */
+   CGEN_TYPE base;       /* Base of floating point numbers */
+   CGEN_TYPE hi;         /* Maximum value that can be squared */
+   CGEN_TYPE new;        /* New estimate of square root */
+   CGEN_TYPE test;       /* Test value for finding number base */
+   int iter;             /* Loop counter for iterations */
+
+/* If we are dealing with a floating point type, then obtain an initial
+   estimate of "hi" from the square root of the largest positive number. */
+   if( CGEN_CODE_TYPE == CGEN_FLOAT_TYPE || CGEN_CODE_TYPE == CGEN_DOUBLE_TYPE ) {
+      hi = sqrt( CGEN_MAX );
+
+/* Since this may not always achieve the full machine precision, we now
+   apply up to 10 iterations to refine the result, using Newton"s
+   formula to estimate each new value. */
+      for( iter = 0; iter < 10; iter++ ){
+         new = ( hi + CGEN_MAX/hi )/2;
+         if( new == hi ) break;
+         hi = new;
+      }
+
+/* The current value of "hi" may still be too large (i.e. may overflow if
+   squared) if the result has been rounded upwards. To test for this,
+   we must square a known fraction of "hi" and check that it does not
+   exceed the expected value. For this to work, however, the fraction
+   chosen must be derived using the exponent base for the floating
+   point number representation in use (so that the mantissa is not
+   changed). Thus we must first determine this base. */
+
+/* Starting with unity, repeatedly double until a value "a" is found to
+   which 1 cannot be added without losing precision. */
+      a = 1;
+      do {
+         a = a + a;
+         test = a + 1;
+      } while( test - a == 1 );
+
+/* Again starting with unity, repeatedly double until a value "b" is
+   found that can be added to "a" to give a result that differs from "a". */
+      b = 1;
+      do {
+         b = b + b;
+         test = a + b;
+      } while( test == a );
+
+/* The number base is now given by the difference between "a" and the
+   next representable number that differs from it ("test"). */
+      base = test - a;
+
+/* Now test if "hi" is too large, using an appropriate fraction of it to
+   prevent overflow occurring. If it is too large, we decrement it to
+   obtain the next smaller representable value. */
+      if( (hi/base)*(hi/base) > CGEN_MAX/(base*base) ) hi = hi - hi*CGEN_EPS;
+
+/* If we are dealing with an integer type, then find the square root of
+   the largest positive number using double precision arithmetic. Round
+   the result down to an integer and convert back to the required type. */
+   } else {
+      hi = (int) sqrt( (double) CGEN_MAX );
+   }
+
+/* Return the result. */
+   *result = hi;
+
+}
+

@@ -1,0 +1,153 @@
+#include "sae_par.h"
+#include "dat_par.h"
+#include "ndf_err.h"
+#include "prm_par.h"
+#include "ndf1.h"
+#include <string.h>
+#include "mers.h"
+
+void CGEN_FUNCTION( ndf1S2v )( int bad, size_t el, CGEN_TYPE array[],
+                               int *dce, int *status ){
+/*
+*+
+*  Name:
+*     ndf1S2v<T>
+
+*  Purpose:
+*     Convert generic standard deviation values to variances.
+
+*  Synopsis:
+*     void ndf1S2v<T>( int bad, int el, CGEN_TYPE array[], int *dce,
+*                      int *status )
+
+*  Description:
+*     This function converts a vectorised generic array of standard
+*     deviation values into variances by squaring them. It checks for "bad"
+*     values if required and handles numerical overflow errors, replacing
+*     them with bad values. If a negative standard deviation is found, then
+*     "status" is set to NDF__NGSTD, an error is reported and a bad value
+*     is assigned to the affected array element - however, the function
+*     continues to process the entire array.
+
+*  Parameters:
+*     bad
+*        Whether it is necessary to check for bad values.
+*     el
+*        Number of array elements to process.
+*     array
+*        On input, an array of generic standard deviation values is
+*        supplied. On output, they are replaced by the variance values. The
+*        supplied "array" array should have at least "el" elements.
+*     *dce
+*        Returned holding the whether a data conversion error occurred
+*        resulting in new bad values being produced. This may result either
+*        from numerical overflow (which the function handles) or from
+*        replacement of illegal negative standard deviations.
+*     *status
+*        The global status.
+
+*  Notes:
+*     -  This function works through the array backwards. This is to
+*     minimise page faulting on a virtual memory machine, since it will
+*     usually be followed by a data-processing loop which passes forwards
+*     through the same array.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     xxx (DSB):
+*        Original version, based on equivalent Fortran function by RFWS.
+
+*-
+*/
+
+/* Local Variables: */
+   CGEN_TYPE errval;        /* Value causing last error */
+   size_t i;                /* Loop counter for array elements */
+   size_t nneg;             /* Number negative standard deviations */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Initialise the count of negative standard deviations and the data
+   conversion error flag. */
+   nneg = 0;
+   *dce = 0;
+   errval= 0;
+
+/* If required, loop through the array without checking for bad values. */
+   if( !bad ) {
+      for( i = el - 1; i >= 0; i-- ){
+
+/* If the data values are not unsigned, then check if the standard
+   deviation is negative. */
+         if( CGEN_CODE_TYPE != CGEN_UBYTE_TYPE &&
+             CGEN_CODE_TYPE != CGEN_UWORD_TYPE && array[i] < 0 ){
+
+/* If so, then increment the negative standard deviation count, note a
+   data conversion error and assign a bad value to the affected array
+   element. */
+            nneg++;
+            *dce = 1;
+            errval = array[ i ];
+            array[ i ] = CGEN_BAD;
+
+/* Otherwise, check that the value will not overflow when squared. If
+   not, then square it. */
+         } else if( array[ i ] <= CGEN_FUNCTION(Ndf_SQLIM) ) {
+            array[ i ] *= array[ i ];
+
+/* If it would overflow, then note a data conversion error and assign a
+   bad result. */
+         } else {
+            *dce = 1;
+            array[ i ] = CGEN_BAD;
+         }
+      }
+
+/* If required, loop through the array checking for bad values. */
+   } else {
+      for( i = el - 1; i >= 0; i-- ){
+
+/* Perform the bad value check. */
+         if( array[ i ] != CGEN_BAD ) {
+
+/* Check the value is not negative. */
+            if( CGEN_CODE_TYPE != CGEN_UBYTE_TYPE &&
+                CGEN_CODE_TYPE != CGEN_UWORD_TYPE && array[i] < 0 ){
+               nneg++;
+               *dce = 1;
+               errval = array[ i ];
+               array[ i ] = CGEN_BAD;
+
+/* Check for overflow and square the standard deviation. */
+            } else if( array[ i ] <= CGEN_FUNCTION(Ndf_SQLIM) ) {
+               array[ i ] *= array[ i ];
+
+/* Deal with overflows. */
+            } else {
+               *dce = 1;
+               array[ i ] = CGEN_BAD;
+            }
+         }
+      }
+   }
+
+/* If negative standard deviation values were encountered, then report
+   an error. */
+   if( nneg != 0 ) {
+      *status = NDF__NGSTD;
+      msgSeti( "NNEG", nneg );
+      msgSetd( "ERRVAL", (double) errval );
+      errRep( " ", "^NNEG illegal negative standard deviation value(s) "
+              "encountered; first offending value was ^ERRVAL (possible "
+              "programming error).", status );
+   }
+
+/* Call error tracing function and exit. */
+   if( *status != SAI__OK ) ndf1Trace( "ndf1S2V<T>", status );
+
+}
+

@@ -1,0 +1,55 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     ndf_link_adam
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against the ADAM version
+#     of the NDF library.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building ADAM applications
+#     which use the NDF library in order to generate the correct arguments
+#     for the compiler (or ld) command. The arguments generated are written
+#     to the standard output.
+
+#  Invocation:
+#     The script may be invoked as part of a command such as:
+#
+#        alink program.f -L/star/lib `ndf_link_adam`
+
+#  Copyright:
+#     Copyright (C) 1997 Rutherford Appleton Laboratory
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     2-JUN-1994 (RFWS):
+#     14-JUL-1997 (RFWS)
+#        Added AST_ linking and improved "awk" script.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#.
+
+#  Echo the NDF library reference, followed by the list of options for
+#  packages on which the NDF library depends. Pass the result through an
+#  awk script to remove duplicate library references.
+      echo -lndf_adam -lndf `psx_link_adam` `ary_link_adam` `hds_link_adam` \
+           `err_link_adam` `ems_link_adam` `chr_link_adam` `prm_link_adam` \
+           `ast_link_adam` \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {if($1)f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.

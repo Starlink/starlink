@@ -23,7 +23,7 @@
 #
 #        f77 -o program -L/star/lib `ndf_link [ast_switches]` program.f
 #
-#     The possible values for [ast_switches] are the same as those available 
+#     The possible values for [ast_switches] are the same as those available
 #     to the ast_link command.
 
 #  Copyright:
@@ -41,6 +41,8 @@
 #        Added AST_ linking and improved "awk" script.
 #     15-JUN-2006 (PWD):
 #        Added ast_switches handling to pass on any AST linker options.
+#     3-AUG-2018 (DSB):
+#        The C version of NDF does not need PSX or CHR.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -56,8 +58,8 @@
 #  Echo the NDF library reference, followed by the list of options for
 #  packages on which the NDF library depends. Pass the result through an
 #  awk script to remove duplicate library references.
-      echo -lndf `psx_link` `ary_link` `hds_link` `err_link` `ems_link` \
-           `chr_link` `prm_link` `ast_link -ems $ast_options` \
+      echo -lndf `ary_link` `hds_link` `err_link` `ems_link` \
+           `prm_link` `ast_link -ems $ast_options` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {if($1)f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

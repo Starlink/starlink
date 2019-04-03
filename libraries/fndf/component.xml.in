@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@" support="S">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/ndf</path>
+  <description>NDF - Routines for Accessing the Extensible N-Dimensional Data Format</description>
+  <abstract><p>The Extensible N-Dimensional Data Format (NDF) is a
+  format for storing bulk data in the form of N-dimensional arrays of
+  numbers. It is typically used for storing spectra, images and
+  similar datasets with higher dimensionality. The NDF format is based
+  on the Hierarchical Data System HDS (SUN/92) and is extensible; not
+  only does it provide a comprehensive set of standard ancillary items
+  to describe the data, it can also be extended indefinitely to handle
+  additional user-defined information of any type.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Rodney Warren-Smith</name>
+      <uname>rfws</uname>
+    </person>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+  <!-- <notes><p></p></notes> -->
+</component>

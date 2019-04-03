@@ -1,0 +1,261 @@
+#include <stdlib.h>
+#include <string.h>
+#include "sae_par.h"
+#include "dat_par.h"
+#include "ndf1.h"
+#include "ndf_err.h"
+#include "ndf.h"
+#include "mers.h"
+
+void CGEN_FUNCTION2(ndfPtsz,_)( CGEN_TYPE scale, CGEN_TYPE zero, int indf,
+                                const char *comp, int *status ){
+/*
+*+
+*  Name:
+*     ndfPtsz<T>
+
+*  Purpose:
+*     Set new scale and zero values for an NDF array component
+
+*  Synopsis:
+*     void ndfPtsz<T>( CGEN_TYPE scale, CGEN_TYPE zero, int indf,
+*                      const char *comp, int *status )
+
+*  Description:
+*     This function sets new values for the scale and zero values
+*     associated with an NDF array component. If the array is stored in
+*     simple form, then the storage form is changed to scaled.
+*
+*     See also ndfZscal which provides a higher level interface for
+*     creating scaled arrays.
+
+*  Parameters:
+*     scale
+*        The new value for the scaling factor.
+*     zero
+*        The new value for the zero offset.
+*     indf
+*        NDF identifier.
+*     comp
+*        Pointer to a null terminated string holding the name of the NDF
+*        array component; "DATA" or "VARIANCE".
+*     *status
+*        The global status.
+
+*  Notes:
+*     - There is a function for each of the standard Fortran numerical data
+*     types: integer, real and double precision. Replace the (lower case)
+*     "x" in the function name by I, R or D as appropriate.
+*     -  A comma-separated list of component names may also be supplied, in
+*     which case the same scale and zero values will be used for each
+*     component in turn.
+*     -  This function may only be used to change the scaling of a base
+*     NDF. If it is called with an array which is not a base array, then it
+*     will return without action. No error will result.
+*     -  An error will result if the array component, or any part of it, is
+*     currently mapped for access (e.g. through another identifier).
+*     -  This function has no effect on components which are in an
+*     undefined state.
+
+*  Copyright:
+*     Copyright (C) 2018 East Asian Observatory
+*     All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or modify
+*     it under the terms of the GNU General Public License as published by
+*     the Free Software Foundation; either version 2 of the License, or (at
+*     your option) any later version.
+*
+*     This program is distributed in the hope that it will be useful,but
+*     WITHOUT ANY WARRANTY; without even the implied warranty of
+*     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+*     General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA 02111-1307,
+*     USA
+
+*  Authors:
+*     RFWS: R."f". Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     xxx (DSB):
+*        Original version, based on equivalent Fortran function by RFWS.
+
+*-
+*/
+
+/* Local Variables: */
+   NdfACB *acb;          /* Pointer to NDF entry in the ACB */
+   char **comps;         /* Array of component name pointers */
+   int nonblank;         /* Have any non-blank names been found? */
+   int icomp;            /* Index of next component */
+   int ncomp;            /* Number of components specified */
+   int there;            /* Whether the variance array exists */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Ensure the NDF library has been initialised. */
+   ndf1Init( status );
+
+/* Import the NDF identifier. */
+   ndf1Impid( indf, &acb, status );
+
+/* Check that write access to the NDF is available. */
+   ndf1Chacc( acb, "WRITE", status );
+
+/* Set a flag inidicating that no non-blank component names have yet been
+   found. */
+   nonblank = 0;
+
+/* Split the supplied list of components up into words, and loop round
+   them all, skipping totally blank components. */
+   comps = ndf1Findwords( comp, &ncomp, status );
+   for( icomp = 0; icomp < ncomp && *status == SAI__OK; icomp++ ){
+      if( strlen( comps[ icomp ] ) > 0 ) {
+         nonblank = 1;
+
+/* Compare the component name with each value in turn (allowing
+   abbreviation), and take the appropriate action, or report an error
+   if an inappropriate component name has been given. */
+
+/* AXIS component:
+   ==============
+   Report an error, since this component has no scaling. */
+         if( ndf1Simlr( comps[ icomp ], 1, 0, "AXIS", NDF__MINAB ) ) {
+            *status = NDF__CNMIN;
+            errRep( " ", "Scale and zero values cannot be set for an "
+                    "AXIS component (possible programming error).",
+                    status );
+
+/* DATA component:
+   ==============
+   If the data component is mapped for access, then report an error. */
+         } else if( ndf1Simlr( comps[ icomp ], 1, 0, "DATA", NDF__MINAB ) ) {
+            if( acb->dmap ) {
+               *status = NDF__ACDEN;
+               errRep( " ", "Scale and zero values cannot be set for "
+                       "a DATA component since the array is "
+                       "currently mapped for access (possible "
+                       "programming error).", status );
+
+/* Otherwise, use the ARY_ system to set the scale and zero values for
+   the data array. */
+            } else {
+               CGEN_FUNCTION( aryPtsz )( acb->did, scale, zero, status );
+            }
+
+/* EXTENSION:
+   =========
+   Report an error, since extensions have no scaling. */
+         } else if( ndf1Simlr( comps[ icomp ], 1, 0, "EXTENSION", NDF__MINAB ) ) {
+            *status = NDF__CNMIN;
+            errRep( " ", "Scale and zero values cannot be set for an "
+                    "EXTENSION (possible programming error).", status );
+
+/* HISTORY component:
+   =================
+   Report an error, since this component has no scaling. */
+         } else if( ndf1Simlr( comps[ icomp ], 1, 0, "HISTORY", NDF__MINAB ) ) {
+            *status = NDF__CNMIN;
+            errRep( " ", "Scale and zero values cannot be set for an "
+                    "HISTORY component (possible programming "
+                    "error).", status );
+
+/* LABEL component:
+   ===============
+   Report an error, since this component has no scaling. */
+         } else if( ndf1Simlr( comps[ icomp ], 1, 0, "LABEL", NDF__MINAB ) ) {
+            *status = NDF__CNMIN;
+            errRep( " ", "Scale and zero values cannot be set for an "
+                    "LABEL component (possible programming error).",
+                    status );
+
+/* QUALITY component:
+   =================
+   Report an error, since this component has no scaling. */
+         } else if( ndf1Simlr( comps[ icomp ], 1, 0, "QUALITY", NDF__MINAB ) ) {
+            *status = NDF__CNMIN;
+            errRep( " ", "Scale and zero values cannot be set for an "
+                    "QUALITY component (possible programming "
+                    "error).", status );
+
+/* TITLE component:
+   ===============
+   Report an error, since this component has no scaling. */
+         } else if( ndf1Simlr( comps[ icomp ], 1, 0, "TITLE", NDF__MINAB ) ) {
+            *status = NDF__CNMIN;
+            errRep( " ", "Scale and zero values cannot be set for an "
+                    "TITLE component (possible programming error).",
+                    status );
+
+/* UNITS component:
+   ===============
+   Report an error, since this component has no scaling. */
+         } else if( ndf1Simlr( comps[ icomp ], 1, 0, "UNITS", NDF__MINAB ) ) {
+            *status = NDF__CNMIN;
+            errRep( " ", "Scale and zero values cannot be set for an "
+                    "UNITS component (possible programming error).",
+                    status );
+
+/* VARIANCE component:
+   ==================
+   If the variance component is mapped for access, then report an error. */
+         } else if( ndf1Simlr( comps[ icomp ], 1, 0, "VARIANCE", NDF__MINAB ) ) {
+            if( acb->vmap ) {
+               *status = NDF__ACDEN;
+               errRep( " ", "Scale and zero values cannot be set for "
+                       "a VARIANCE component since the array is "
+                       "currently mapped for access (possible "
+                       "programming error).", status );
+
+/* Otherwise, ensure that variance information is available in the DCB
+   and ACB. */
+            } else {
+               ndf1Vimp( acb, status );
+
+/* See if the ARY_ system identifier for the variance array is valid.
+   If not, then the array does not exist. */
+               there = aryValid( acb->vid, status );
+               if( *status == SAI__OK ) {
+
+/* If it exists, then set the scaling. */
+                  if( there ) CGEN_FUNCTION( aryPtsz )( acb->vid, scale, zero, status );
+               }
+            }
+
+/* If the component name is not recognised, then report an error. */
+         } else {
+            *status = NDF__CNMIN;
+            msgSetc( "BADCOMP", comps[ icomp ] );
+            errRep( " ", "Invalid array component name '^BADCOMP' "
+                    "specified (possible programming error).", status );
+         }
+      }
+   }
+
+/* If no error has occurred, but no non-blank component names have been
+   processed, then report an error. */
+   if( *status == SAI__OK && nonblank == 0 ) {
+      *status = NDF__NOCMP;
+      errRep( " ", "No array component name specified (possible "
+              "programming error).", status );
+   }
+
+/* Free the words array. */
+   comps = ndf1Freewords( ncomp, comps );
+
+/* If an error occurred, then report context information and call the
+   error tracing function. */
+   if( *status != SAI__OK ) {
+      errRep( " ", "ndfPtsz<T>: Error setting the scale and zero values "
+              "for an NDF array component.", status );
+      ndf1Trace( "ndfPtsz<T>", status );
+   }
+
+}
+

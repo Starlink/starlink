@@ -1,0 +1,88 @@
+*+
+*  Name:
+*     NDF_QMASK
+
+*  Purpose:
+*     Combine an NDF quality value with a bad-bits mask to give a
+*     logical result.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     RESULT = NDF_QMASK( QUAL, BADBIT )
+
+*  Description:
+*     This function may be used to combine an NDF quality array value
+*     with the associated bad-bits mask value to derive a logical
+*     result indicating whether an NDF pixel should be included or
+*     excluded from processing by general-purpose software.
+
+*  Arguments:
+*     QUAL = BYTE (Given)
+*        The unsigned byte quality value.
+*     BADBIT = BYTE (Given)
+*        The unsigned byte bad-bits mask value.
+
+*  Returned Value:
+*     NDF_QMASK = LOGICAL
+*        If the function returns a .TRUE. result, then the pixel with
+*        quality value QUAL should be included in processing by
+*        general-purpose software. If it returns a .FALSE. result, then
+*        the pixel should be regarded as "bad" and excluded from
+*        processing.
+
+*  Notes:
+*     -  This function is implemented as a Fortran statement function
+*     and should be defined in each program unit from which it is
+*     invoked by means of the include file NDF_FUNC. This file should
+*     normally be included immediately after any local variable
+*     declarations.
+*     -  The result of this function is computed by forming the
+*     bit-wise "AND" between the QUAL and BADBIT values and testing the
+*     result for equality with zero. Its actual implementation is
+*     machine-dependent.
+
+*  Copyright:
+*     Copyright (C) 1990 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-MAR-1990 (RFWS):
+*        Original version.
+*     2-APR-1990 (RFWS):
+*        Changed NDF_DEC and NDF_DEF to NDF_FUNC_DEC and NDF_FUNC_DEF.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Function and argument declarations.
+      INCLUDE 'NDF_FUNC_DEC'
+
+*  Function definitions.
+      INCLUDE 'NDF_FUNC_DEF'
+
+*.

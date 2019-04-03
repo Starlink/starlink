@@ -1,0 +1,57 @@
+Version 2:
+
+Each NDF (the HDS structure, plus all NDF identifiers for it) - is either
+"locked" by a specific thread, or "unlocked". Locking is a long term
+contract that persists between invocations of public NDF functions, and
+can be changed only by the caller using one of the public
+lock-management methods: ndfLock, ndfUnlock and ndfLocked.
+
+A locking contract means that:
+- only the thread with the lock can invokes public NDF functions that
+  read, write or modify the NDF through any identifier.
+- if a thread attempts to invoke a public NDF function to read, write
+  or modify an NDF which it has not locked, an error is reported. The
+  only exception is that ndfLock can be called on an NDF that is
+  not locked by any thread (i.e. has been unlocked previously using
+  ndfUnlock).
+
+Upon creation, an NDF is always locked by the current thread. The locker
+thread can at any time unlock the NDF by calling ndfUnlock on any
+identifier for the NDF (all other identifiers referring to the same base
+NDF are annulled at that point), allowing another thread subsequently to
+lock the NDF by calling ndfLock on the same identifier. An error is
+reported if the DCB is currently locked by a different thread. ndfUnlock
+will unlock both the DCB and (implicitly) all associated ACBs - an error
+is reported if the DCB is currently locked by another thread.
+
+A consequence of this is that an NDF identifier will become unsable
+if another identifier for the same base NDF is unlocked.
+
+When an NDF identifier is unlocked, its associated context level is set
+to a special value indicating it is not in any context. All other
+identifiers for the same base NDF are annulled regardless of their
+context level. When an NDF identifier is locked, its associated context
+level is set to the current context level in the thread that locks. The
+ndfEnd function only annuls NDF identifiers for base NDFs that are locked
+by the current thread. The function ndfReportUnlocked will report an
+error if there are any currently any unlocked NDFs. It should typically
+be called at the end of an application.
+
+
+
+Implementation:
+---------------
+
+Put following fields in DCB structure:
+
+pthread_identifier locker;
+int locked;
+
+When a DCB is created (ndf1Ffs) its locker is set to the current thread.
+When a DCB is deleted (ndf1Rls) it is unlocked.
+When an ACB is imported (ndf1Impid) a check is made that the corresponding DCB
+      is locked by the current thread.
+When an NDF is unlocked, all the associated HDS and ARY resources are unlocked.
+When an NDF is locked, all the associated HDS and ARY resources are locked.
+Annul all other identifiers for the same base NDF when an identifier is unlocked.
+

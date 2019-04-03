@@ -8,13 +8,13 @@
 \stardoccategory    {Starlink User Note}
 \stardocinitials    {SUN}
 \stardocsource      {sun\stardocnumber}
-\stardocnumber      {33.11}
+\stardocnumber      {33.12}
 \stardocauthors     {R.F.~Warren-Smith \& D.S.~Berry}
-\stardocdate        {11th November 2014}
+\stardocdate        {3rd April 2019}
 \stardoctitle       {NDF \\ [\latex{1ex}]
                                 Routines for Accessing the\\
                                 Extensible N-Dimensional Data Format}
-\stardocversion     {Version 1.13}
+\stardocversion     {Version 2.0}
 \stardocmanual      {Programmer's Manual}
 
 \stardocabstract{%
@@ -30,8 +30,9 @@ type.
 
 This document describes the routines provided for accessing NDF data
 objects. It also discusses all the important NDF concepts and includes
-a selection of simple example applications.
-}
+a selection of simple example applications. The majority of the text
+describes the Fortran 77 interface for the NDF library. The C interface
+is described briefly in an appendix. }
 
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -18488,15 +18489,15 @@ locator}{sun92}{using_locators}}
 \section{\xlabel{the_ndf_library_c_interface}\label{ss:cinterface}THE NDF\_ LIBRARY C INTERFACE}
 
 \subsection{\xlabel{conventions_used_in_the_c_interface}Conventions Used in the C Interface}
-
-Although the NDF\_ library is implemented mainly in Fortran, an
-interface is provided which allows it to be called from programs
-written in C (see Appendix~\ref{ss:alphalistofcfunctions} for a list
-of the C functions available). Of course, most of the rest of this
-document describes the Fortran interface, but it is quite easy to
-translate the descriptions and examples into C once you are aware of
-the conventions used. The following notes are intended to assist with
-this:
+As of Version 2.0, the NDF\_ library is implemented in C, with an
+additional layer providing the traditional Fortran interface described in
+the rest of this manual. This appendix describes the underlying C
+interface, which allows NDF functions to be called from programs written
+in C (see Appendix~\ref{ss:alphalistofcfunctions} for a list of the C
+functions available). It is quite easy to translate the Fortran
+descriptions and examples given in the rest of this manual into C once
+you are aware of the conventions used. The following notes are intended
+to assist with this:
 
 \begin{enumerate}
 \item C function names are derived from the corresponding Fortran
@@ -18560,10 +18561,9 @@ will occur if this length would be exceeded.
 pointers to null-terminated strings (like the standard argument vector
 passed to the C ``main'' function).
 
-\item A few functions pass HDS locators. These are stored in character
-arrays, but they are not strings and hence are not
-null-terminated. The number of array elements required is given by the
-HDS constant DAT\_\_SZLOC.
+\item A few functions pass HDS locators. These are stored in variables of
+type \texttt{HDSLoc $*$}. The calling function should include the
+\texttt{hds.h} header file.
 
 \item Strings which are used to describe the data type of NDF
 components must contain the same text in C as in Fortran. Hence, you
@@ -18603,107 +18603,250 @@ system information. These use the same C argument passing conventions
 for these pointers as used in the AST library itself.
 \end{enumerate}
 
-\subsection{\xlabel{using_the_c_interface_a_few_peculiarities}Using the C Interface -- a Few Peculiarities}
+\subsection{\xlabel{multi_threaded_applications}Multi-threaded Applications}
 
-There are several small peculiarities of the C interface to the NDF\_
-library which arise from the fact that the library itself is
-implemented mainly in Fortran. You must be aware of these when writing
-software in C, otherwise your program may give unpredictable results
-(including crashing):
+In a multi-threaded context, each base NDF is either ''locked'' by a
+specific thread, or ''unlocked''. Locking is a long term contract that
+persists between invocations of public NDF functions, and can be changed
+only by the caller using one of the public lock-management methods:
+\htmlref{ndfLock}{ndfLock}, \htmlref{ndfUnlock}{ndfUnlock} and
+\htmlref{ndfLocked}{ndfLocked}.
 
-\begin{description}
-\item[{\bf{Initialisation.}}]\mbox{}\\
-By default, the NDF\_ library depends on the main routine in your
-program being written in Fortran. This is because Fortran compilers
-generally arrange for certain initialisation steps to be performed in
-the main routine. If this does not happen (because the main routine is
-written in C) the library may malfunction. Typically, problems occur
-when updating NDF \st{history\/} information (see~\S\ref{ss:history}),
-so you might not recognise immediately that your application is
-affected.
+A locking contract means that:
+\begin{itemize}
+\item only the thread with the lock can invokes public NDF functions that
+  read, write or modify the base NDF through any identifier.
+\item if a thread attempts to invoke a public NDF function to read, write
+  or modify an NDF which it has not locked, an error is reported. The
+  only exception is that ndfLock can be called on an NDF that is
+  not locked by any thread (i.e. has been unlocked previously using
+  ndfUnlock).
+\end{itemize}
 
-One solution is to write your main routine in Fortran. This routine
-need do no more than call a C function to do all the work, and
-facilities which allow Fortran to call C in a portable way are
-available in the CNF library (\xref{SUN/209}{sun209}{}). Note that
-applications written using the \xref{ADAM}{sun101}{} programming
-environment are automatically structured in this way, with a Fortran
-main routine, so that using the ``alink'' command to build your
-application (see~\S\ref{ss:buildingadamapplications}) will avoid any
-difficulty.
+Upon creation, an NDF is always locked by the current thread. The locker
+thread can at any time unlock the NDF by calling ndfUnlock on any
+identifier for the NDF (all other identifiers referring to the same base
+NDF are annulled at that point), allowing another thread subsequently to
+lock the NDF by calling ndfLock on the same identifier. An error is
+reported if the NDF is currently locked by a different thread. ndfUnlock
+will unlock both the NDF and (implicitly) all associated identifiers - an error
+is reported if the NDF is currently locked by another thread.
 
-However, to avoid problems in standalone (non-ADAM) applications which
-have a C ``main'' function, you {\bf{MUST}} invoke the C-specific
-ndfInit initialisation function as follows, before using any other
-facilities from the NDF\_ library:
+A consequence of this is that an NDF identifier will become unsable
+if another identifier for the same base NDF is unlocked.
+
+When an NDF identifier is unlocked, its associated context level is set
+to a special value indicating it is not in any context. All other
+identifiers for the same base NDF are annulled regardless of their
+context level. When an NDF identifier is locked, its associated context
+level is set to the current context level in the thread that locks it.
+The ndfEnd function only annuls NDF identifiers for base NDFs that are
+locked by the current thread. The function ndfReport will report the lock
+state of all currently active NDF identifiers.
+
+
+
+\subsection{\xlabel{c_only_functions}C-only Functions}
+This section contains descriptions of functions that are only available
+in the C interface.
 
 \small
-\begin{quote}
-\begin{terminalv}
-#include "ndf.h"                 /* Define NDF interface */
-#include "sae_par.h"             /* Define SAI__OK */
+\sstroutine{
+   ndfLock
+}{
+   Lock an NDF for use by the current hread
+}{
+   \sstdescription{
+      This function locks the base NDF associated with the supplied
+      NDF identifier for sole use by the current thread. An error will
+      be reported if another thread subsequently attempts to access the
+      base NDF through any identifier.
+   }
+   \sstinvocation{
+      void ndfLock( int indf, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         $*$status
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
 
-int main( int argc, char *argv[] ) {
-   int status = SAI__OK;
+         \sstitem
+          This function returns without action if the NDF is already
+         locked by the currently running thread.
 
-/* Initialise the NDF_ library for use from a C main routine. */
-   ndfInit( argc, argv, &status );
+         \sstitem
+          This function will report an error if the supplied NDF has not
+         previously been unlocked by calling function ndfUnlock.
 
-   ...
+         \sstitem
+          The supplied NDF identifier will be imported into the current NDF
+         context within the currently running thread.
 
+         \sstitem
+          This function attempts to execute even if \texttt{"} status\texttt{"}  is set on
+         entry, although no further error report will be made if it
+         subsequently fails under these circumstances.
+      }
+   }
 }
-\end{terminalv}
-\end{quote}
+\sstroutine{
+   ndfLocked
+}{
+   Return information about any lock on an NDF
+}{
+   \sstdescription{
+      This functions returns information about any lock on the base NDF
+      associated with the supplied NDF identifier. NDFs are locked and
+      unlocked using functions ndfLock and ndfUnlock.
+   }
+   \sstinvocation{
+      result = ndfLocked( int indf, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         $*$status
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         0 - the base NDF is unlocked
+      }{
+      }
+      \sstsubsection{
+         1 - the base NDF is locked by the current thread
+      }{
+      }
+      \sstsubsection{
+         -1 - the base NDF is locked by some other thread
+      }{
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          This function attempts to execute even if \texttt{"} status\texttt{"}  is set on
+         entry, although no further error report will be made if it
+         subsequently fails under these circumstances.
+      }
+   }
+}
+\sstroutine{
+   ndfReport
+}{
+   Report any currently active NDF identifiers
+}{
+   \sstdescription{
+      This function displays information about any currently active
+      NDF identifiers.
+   }
+   \sstinvocation{
+      result = ndfReport( int report, int $*$status );
+   }
+   \sstarguments{
+      \sstsubsection{
+         report
+      }{
+         If non-zero, an informational message listing any currently
+         active NDF identifiers is displayed. Nothing is displayed if
+         there are no active identifiers, or if report is zero.
+      }
+      \sstsubsection{
+         $*$status
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         The number of active NDF identifiers found.
+      }{
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          This function attempts to execute even if \texttt{"} status\texttt{"}  is set on
+         entry, although no further error report will be made if it
+         subsequently fails under these circumstances.
+      }
+   }
+}
+\sstroutine{
+   ndfUnlock
+}{
+   Unlock an NDF so it can then be locked by another thread
+}{
+   \sstdescription{
+      This function unlocks the base NDF associated with the supplied
+      NDF identifier so that another thread can then lock it for its
+      own use using function ndfLock. An error will be reported if the
+      supplied NDF is currently locked by another thread.
+
+      All other NDF identifiers associated with the same base NDF are
+      annulled on exit from this function.
+   }
+   \sstinvocation{
+      void ndfUnlock( int indf, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         $*$status
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          This function returns without action if the NDF is already
+         unlocked.
+
+         \sstitem
+          This function will report an error if the supplied NDF is locked
+         by any thread other than the currently running thread.
+
+         \sstitem
+          The supplied NDF identifier will be removed from the NDF context
+         associated with the currently running thread, and placed in a
+         \texttt{"} null\texttt{"}  context that is ignored by the ndfEnd function. The
+         ndfReport function can be used to determine if any NDF
+         identifiers are currently in this \texttt{"} null\texttt{"}  context.
+
+         \sstitem
+          This function attempts to execute even if \texttt{"} status\texttt{"}  is set on
+         entry, although no further error report will be made if it
+         subsequently fails under these circumstances.
+      }
+   }
+}
 \normalsize
 
-Note that you should pass to ndfInit the argument count and argument
-vector which the operating system passes to your program via the
-standard arguments of the C ``main'' function. If, for any reason,
-this argument information is not accessible, then you should pass an
-argument count of zero (the argument vector is then ignored). This
-tells the NDF\_ library that argument information is not available.
-
-When calling NDF from a C main there may be additional initialisations
-necessary to properly setup the Fortran Runtime, you will need to perform
-these tasks for yourself, unless you are developing within the Starlink Build
-System (see \xref{SSN/78}{ssn78}{}), in which case you should also invoke the
-\texttt{STAR\_INITIALISE\_FORTRAN} macro within your main function, sometime
-before invoking ndfInit.
-
-\item[{\bf{Input/output.}}]\mbox{}\\
-In general, it is not advisable to mix input/output (I/O) operations
-performed in C and Fortran on the same file within the same
-application.  If you try to do so, you may find that output becomes
-jumbled. On input, you might also find that data get read several
-times, or maybe not at all.
-
-This means that it is usually best to decide which language will
-perform I/O throughout your program and stick with that
-choice. Fortunately, the NDF\_ library does not perform input and
-generates no significant output,\footnote{The function ndfHecho (which
-calls the Fortran routine NDF\_HECHO) is the only routine that
-explicitly generates output, which it does using Fortran. However,
-this is really just a demonstration function and is easily replaced by
-your own C equivalent if necessary.} apart from error
-messages. However, it is designed to integrate with the MERS message
-and error reporting system (\xref{SUN/104}{sun104}{}), for example
-through its use of message tokens, and it uses MERS for reporting its
-own errors. MERS, in turn, uses Fortran to output these error messages
-(in \xref{ADAM}{sg4}{} applications it may also pass output to other
-tasks for delivery).
-
-This means that if you are writing standalone software in C which
-calls the NDF\_ library, then you should be able to use the standard
-I/O functions provided by C for most purposes quite safely, so long as
-you do so consistently. However, you should use MERS (or EMS,
-see~\xref{SSN/4}{ssn4}{}) for reporting errors, in order to be
-compatible with the error reporting performed by the NDF\_ library.
-
-In ADAM applications, you should always use MERS (or EMS) for both
-textual output intended for the user and error messages, otherwise
-output may be lost if the application is not run from the normal
-command line.
-\end{description}
+\newpage
 
 \subsection{\xlabel{building_c_applications}Building C Applications}
 
@@ -18854,8 +18997,6 @@ Appendix~\ref{ss:cinterface}.\\[1.0ex]
             {Set the history update mode for an NDF}
 \noteroutineC{\xlabel{ndfHsdat}void \htmlref{ndfHsdat}{NDF_HSDAT}}{(const char $*$datee, int indf, int $*$status );}
             {Set the date and time for the next history record in an NDF}
-\noteroutineC{\xlabel{ndfInit}void ndfInit}{( int argc, char $*$const argv[~], int $*$status );}
-            {Initialise the NDF\_ library for use from a C main routine (not available from Fortran)}
 \noteroutineC{\xlabel{ndfIsacc}void \htmlref{ndfIsacc}{NDF_ISACC}}{( int indf, const char $*$access, int $*$isacc, int $*$status );}
             {Determine whether a specified type of NDF access is available}
 \noteroutineC{\xlabel{ndfIsbas}void \htmlref{ndfIsbas}{NDF_ISBAS}}{( int indf, int $*$isbas, int $*$status );}
@@ -19376,7 +19517,7 @@ the NDF\_ system between versions V1.11 and V1.12:
 \end{enumerate}
 
 
-\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V1.13}
+\subsection{Changes Introduced in V1.13}
 
 The following describes the most significant changes that occurred in
 the NDF\_ system between versions V1.12 and V1.13 (the current version):
@@ -19388,9 +19529,25 @@ the NDF\_ system between versions V1.12 and V1.13 (the current version):
 
 No changes to existing applications should be required, nor is any
 re-compilation or re-linking essential.
-%However, applications which
-%are statically linked will need to be re-linked in order to take
-%advantage of new facilities.
+
+\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V2.0}
+
+The following describes the most significant changes that occurred in
+the NDF\_ system between versions V1.13 and V2.0 (the current version):
+
+\begin{enumerate}
+   \item  The NDF library is now written entirely in C. However, the Fortran
+interface has not changed and is provided by a thin layer on top of
+the C library.
+   \item The only change to the C interface is that there is now no need
+to call \texttt{ndfInit} to initialise the library. This is done
+automatically when an application first calls an NDF function.
+   \item The C interface is now thread safe.
+   \item New functions are provided in the C interface to allow each NDF
+to be locked for exclusive access by a single thread.
+\end{enumerate}
+
+Existing applications should be re-compiled and re-linked.
 
 % v1.5-2 : fixed quality array number of dimensions not changing when
 %          propagating from a section

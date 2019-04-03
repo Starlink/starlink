@@ -15,14 +15,12 @@
 *    Package public include file.
 
 * Description:
-*    This file contains definitions which are used by the NDF system and
-*    which may also be needed by software which calls routines from this
+*    This file contains definitions needed for public use of the NDF
 *    system.
 
 * Copyright:
-*    Copyright (C) 1998 Central Laboratory of the Research Councils
-*     Copyright (C) 2009 Science & Technology Facilities Council.
-*     All Rights Reserved.
+*    Copyright (C) 2018 East Asian Observatory
+*    All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -41,390 +39,335 @@
 *     02110-1301, USA
 
 * Authors:
-*    RFWS: R.F. Warren-Smith (STARLINK)
 *     DSB: David S Berry (JAC, UCLan)
-*    <{enter_new_authors_here}>
 
 * History:
-*    8-OCT-1993 (RFWS:
+*     29-MAY-2018 (DSB):
 *       Original version.
-*    30-JAN-1995 (RFWS):
-*       Moved error code definitions out into separate file ndf_err.h.
-*    30-SEP-1998 (RFWS)
-*       Added public C interface.
-*    18-NOV-2005 (TIMJ):
-*       Use HDSLoc* rather than char [DAT__SZLOC]
-*     23-JAN-2009 (DSB):
-*        Added ndfHsdat.
-*    <{enter_further_changes_here}>
 
 *-
 */
 
-/* External interfaces.                                                     */
-/* ====================                                                     */
-#include "ast.h"                 /* AST world coordinate system handling    */
-#include "star/hds_types.h"      /* HDS typedefs                            */
+/* External interfaces.
+   ==================== */
+#include "ast.h"
+#include "ary.h"
+#include "star/hds_types.h"
 
-/*  Constants.                                                              */
-/*  ==========                                                              */
-/*  General.                                                                */
-/*  --------                                                                */
-/*  Maximum number of NDF dimensions.                                       */
-#define NDF__MXDIM 7
 
-/*  Value which is never used as an NDF identifier, to which an invalid     */
-/*  identifier may be set.                                                  */
-#define NDF__NOID 0
+/*  Constants and types.
+    ==================== */
+#include "ndf_types.h"
 
-/*  Value which is never used as an NDF placeholder, to which an invalid    */
-/*  placeholder may be set.                                                 */
-#define NDF__NOPL 0
-
-/*  String lengths.                                                         */
-/*  ---------------                                                         */
-/*  Maximum size of a string describing an NDF access type, e.g.            */
-/*  'DELETE'.                                                               */
-#define NDF__SZACC 6
-
-/*  Recommended maximum length of the name of the currently-executing       */
-/*  application.                                                            */
-#define NDF__SZAPP 80
-
-/*  Maximum length of a string describing the storage form of an NDF        */
-/*  array component, e.g. 'SIMPLE'.                                         */
-#define NDF__SZFRM 10
-
-/*  Maximum length of a string describing the full data type of an NDF      */
-/*  array component (including whether it is complex), e.g.                 */
-/*  'COMPLEX_REAL'.                                                         */
-#define NDF__SZFTP 15
-
-/*  Maximum length of a history component date/time string.                 */
-#define NDF__SZHDT 24
-
-/*  Recommended length of a line of history text.                           */
-#define NDF__SZHIS 72
-
-/*  Maximum length of a line of history text (this limit is determined      */
-/*  primarily by the use of MSG_ routines for expanding message tokens,     */
-/*  so is set equal to MSG__SZMSG).                                         */
-#define NDF__SZHMX 200
-
-/*  Recommended maximum length of the host machine node name recorded in    */
-/*  NDF history records.                                                    */
-#define NDF__SZHST 80
-
-/*  Maximum length of a history update mode string, e.g. 'DISABLED'.        */
-#define NDF__SZHUM 8
-
-/*  Maximum length of a string describing the "mapping mode" used to map    */
-/*  an NDF array component for access, e.g. 'WRITE/ZERO'.                   */
-#define NDF__SZMMD 11
-
-/*  Recommended length of a character variable that is to hold the full     */
-/*  "reference name" of an NDF dataset.                                     */
-#define NDF__SZREF 512
-
-/*  Maximum length of a string describing the numeric type of an NDF        */
-/*  array component, e.g. '_INTEGER'.                                       */
-#define NDF__SZTYP 8
-
-/*  Recommended maximum length of the user name recorded in NDF history     */
-/*  records.                                                                */
-#define NDF__SZUSR 80
-
-/*  Maximum length of a string containing an NDF extension name.            */
-#define NDF__SZXNM 15
-
-/* NDF_ error codes.                                                        */
-/* =================                                                        */
-/* N.B. This should be the only place in the NDF_ library where the         */
-/* "ndf_err.h" include file is referenced. It is used only during           */
-/* development and software builds. Include it only if it has not already   */
-/* been pasted on to the front of this file (as happens during software     */
-/* installation).                                                           */
+/* The C wrapper in the F77 version of NDF includes the NDF error
+   definitions in the ndf.h file, so the C version need to too to
+   avoid breaking existing code. */
 #if !defined( NDF_ERROR_DEFINED )
-#include "ndf_err.h"             /* NDF_ error codes                        */
+#include "ndf_err.h"
 #endif
 
-/* Function prototypes.                                                     */
-/* ====================                                                     */
-void ndfAcget( int indf,
+
+
+/*  Function prototypes for NDF V2
+    ==============================  */
+
+void ndfAcget_( int indf,
                const char *comp,
                int iaxis,
                char *value,
-               int value_length,
+               size_t value_length,
                int *status );
 
-void ndfAclen( int indf,
-               const char *comp,
-               int iaxis,
-               int *length,
-               int *status );
+void ndfAclen_( int indf,
+                const char *comp,
+                int iaxis,
+                size_t *length,
+                int *status );
 
-void ndfAcmsg( const char *token,
+void ndfAcmsg_( const char *token,
                int indf,
                const char *comp,
                int iaxis,
                int *status );
 
-void ndfAcput( const char *value,
+void ndfAcput_( const char *value,
                int indf,
                const char *comp,
                int iaxis,
                int *status );
 
-void ndfAcre( int indf,
+void ndfAcre_( int indf,
               int *status );
 
-void ndfAform( int indf,
+void ndfAform_( int indf,
                const char *comp,
                int iaxis,
                char *form,
-               int form_length,
+               size_t form_length,
                int *status );
 
-void ndfAmap( int indf,
-              const char *comp,
-              int iaxis,
-              const char *type,
-              const char *mmod,
-              void *pntr[],
-              int *el,
-              int *status );
-
-void ndfAnnul( int *indf,
+void ndfAmap_( int indf,
+               const char *comp,
+               int iaxis,
+               const char *type,
+               const char *mmod,
+               void *pntr[],
+               size_t *el,
                int *status );
 
-void ndfAnorm( int indf,
+void ndfAnnul_( int *indf,
+               int *status );
+
+void ndfAnorm_( int indf,
                int iaxis,
                int *norm,
                int *status );
 
-void ndfArest( int indf,
+void ndfArest_( int indf,
                const char *comp,
                int iaxis,
                int *status );
 
-void ndfAsnrm( int norm,
+void ndfAsnrm_( int norm,
                int indf,
                int iaxis,
                int *status );
 
-void ndfAssoc( const char *param,
+void ndfAssoc_( const char *param,
                const char *mode,
                int *indf,
                int *status );
 
-void ndfAstat( int indf,
+void ndfAstat_( int indf,
                const char *comp,
                int iaxis,
                int *state,
                int *status );
 
-void ndfAstyp( const char *type,
+void ndfAstyp_( const char *type,
                int indf,
                const char *comp,
                int iaxis,
                int *status );
 
-void ndfAtype( int indf,
+void ndfAtype_( int indf,
                const char *comp,
                int iaxis,
                char *type,
-               int type_length,
+               size_t type_length,
                int *status );
 
-void ndfAunmp( int indf,
+void ndfAunmp_( int indf,
                const char *comp,
                int iaxis,
                int *status );
 
-void ndfBad( int indf,
+void ndfBad_( int indf,
              const char *comp,
              int check,
              int *bad,
              int *status );
 
-void ndfBase( int indf1,
+void ndfBase_( int indf1,
               int *indf2,
               int *status );
 
-void ndfBb( int indf,
+void ndfBb_( int indf,
             unsigned char *badbit,
             int *status );
 
-void ndfBegin( void );
+void ndfBegin_( void );
 
-void ndfBlock( int indf1,
+void ndfBlock_( int indf1,
                int ndim,
-               const int mxdim[],
+               const hdsdim mxdim[],
                int iblock,
                int *indf2,
                int *status );
 
-void ndfBound( int indf,
+void ndfBound_( int indf,
                int ndimx,
-               int lbnd[],
-               int ubnd[],
+               hdsdim lbnd[],
+               hdsdim ubnd[],
                int *ndim,
                int *status );
 
-void ndfCancl( const char *param,
+void ndfCancl_( const char *param,
                int *status );
 
-void ndfCget( int indf,
+void ndfCget_( int indf,
               const char *comp,
               char *value,
-              int value_length,
+              size_t value_length,
               int *status );
 
-void ndfChunk( int indf1,
+void ndfChunk_( int indf1,
                int mxpix,
                int ichunk,
                int *indf2,
                int *status );
 
-void ndfCinp( const char *param,
+void ndfCinp_( const char *param,
               int indf,
               const char *comp,
               int *status );
 
-void ndfClen( int indf,
+void ndfClen_( int indf,
               const char *comp,
-              int *length,
+              size_t *length,
               int *status );
 
-void ndfClone( int indf1,
+void ndfClone_( int indf1,
                int *indf2,
                int *status );
 
-void ndfCmplx( int indf,
+void ndfCmplx_( int indf,
                const char *comp,
                int *cmplx,
                int *status );
 
-void ndfCmsg( const char *token,
+void ndfCmsg_( const char *token,
               int indf,
               const char *comp,
               int *status );
 
-void ndfCopy( int indf1,
+void ndfCopy_( int indf1,
               int *place,
               int *indf2,
               int *status );
 
-void ndfCput( const char *value,
+void ndfCput_( const char *value,
               int indf,
               const char *comp,
               int *status );
 
-void ndfCreat( const char *param,
+void ndfCreat_( const char *param,
                const char *ftype,
                int ndim,
-               const int lbnd[],
-               const int ubnd[],
+               const hdsdim lbnd[],
+               const hdsdim ubnd[],
                int *indf,
                int *status );
 
-void ndfCrep( const char *param,
+void ndfCrep_( const char *param,
               const char *ftype,
               int ndim,
-              const int ubnd[],
+              const hdsdim ubnd[],
               int *indf,
               int *status );
 
-void ndfCrepl( const char *param,
+void ndfCrepl_( const char *param,
                int *place,
                int *status );
 
-void ndfDelet( int *indf,
+void ndfDelet_( int *indf,
                int *status );
 
-void ndfDim( int indf,
+void ndfDim_( int indf,
              int ndimx,
-             int dim[],
+             hdsdim dim[],
              int *ndim,
              int *status );
 
-void ndfEnd( int *status );
+void ndfEnd_( int *status );
 
-void ndfExist( const char *param,
+void ndfExist_( const char *param,
                const char *mode,
                int *indf,
                int *status );
 
-void ndfFind( const HDSLoc * loc,
+void ndfFind_( const HDSLoc *loc,
               const char *name,
               int *indf,
               int *status );
 
-void ndfForm( int indf,
+void ndfForm_( int indf,
               const char *comp,
               char *form,
-              int form_length,
+              size_t form_length,
               int *status );
 
-void ndfFtype( int indf,
+void ndfFtype_( int indf,
                const char *comp,
                char *ftype,
-               int ftype_length,
+               size_t ftype_length,
                int *status );
 
-void ndfGtune( const char *tpar,
+void ndfGtdlt_( int indf,
+               const char *comp,
+               int *zaxis,
+               char *ztype,
+               size_t ztype_length,
+               float *zratio,
+               int *status );
+
+void ndfGtune_( const char *tpar,
                int *value,
                int *status );
 
-void ndfGtwcs( int indf,
+void ndfGtwcs_( int indf,
                AstFrameSet **iwcs,
                int *status );
 
-void ndfHappn( const char *appn,
+void ndfHappn_( const char *appn,
                int *status );
 
-void ndfHcre( int indf,
+void ndfHcopy_( int indf1,
+               int indf2,
+               int *status );
+
+void ndfHcre_( int indf,
               int *status );
 
-void ndfHdef( int indf,
+void ndfHdef_( int indf,
               const char *appn,
               int *status );
 
-void ndfHecho( int nlines,
+void ndfHecho_( int nlines,
                char *const text[],
                int *status );
 
-void ndfHend( int *status );
+void ndfHend_( int *status );
 
-void ndfHfind( int indf,
+void ndfHfind_( int indf,
                const int ymdhm[ 5 ],
                float sec,
                int eq,
                int *irec,
                int *status );
 
-void ndfHinfo( int indf,
+void ndfHgmod_( int indf,
+               char *hmode,
+               size_t hmode_length,
+               int *status );
+
+void ndfHinfo_( int indf,
                const char *item,
                int irec,
                char *value,
-               int value_length,
+               size_t value_length,
                int *status );
 
-void ndfHnrec( int indf,
+void ndfHndlr_( const char *evname,
+               NdfEventHandler hndlr,
+               int set,
+               int *status );
+
+void ndfHnrec_( int indf,
                int *nrec,
                int *status );
 
-void ndfHout( int indf,
+void ndfHout_( int indf,
               int irec,
               void ( *routin )( int, char *const [], int * ),
               int *status );
 
-void ndfHpurg( int indf,
+void ndfHpurg_( int indf,
                int irec1,
                int irec2,
                int *status );
 
-void ndfHput( const char *hmode,
+void ndfHput_( const char *hmode,
               const char *appn,
               int repl,
               int nlines,
@@ -435,68 +378,67 @@ void ndfHput( const char *hmode,
               int indf,
               int *status );
 
-void ndfHgmod( int indf,
-               char *hmode,
-               int hmode_length,
-               int *status );
-
-void ndfHsmod( const char *hmode,
+void ndfHsdat_( const char *date,
                int indf,
                int *status );
 
-void ndfHsdat( const char *date,
+void ndfHsmod_( const char *hmode,
                int indf,
                int *status );
 
-void ndfInit( int argc, char *const *argv, int *status );
-
-void ndfIsacc( int indf,
+void ndfIsacc_( int indf,
                const char *access,
                int *isacc,
                int *status );
 
-void ndfIsbas( int indf,
+void ndfIsbas_( int indf,
                int *isbas,
                int *status );
 
-void ndfIsin( int indf1,
+void ndfIsin_( int indf1,
               int indf2,
               int *isin,
               int *status );
 
-void ndfIstmp( int indf,
+void ndfIstmp_( int indf,
                int *istmp,
                int *status );
 
-void ndfLoc( int indf,
+void ndfLoc_( int indf,
              const char *mode,
              HDSLoc ** loc,
              int *status );
 
-void ndfMap( int indf,
+void ndfLock_( int indf,
+               int *status );
+
+int ndfLocked_( int indf,
+                int *status );
+
+void ndfMap_( int indf,
              const char *comp,
              const char *type,
              const char *mmod,
              void *pntr[],
-             int *el,
+             size_t *el,
              int *status );
 
-void ndfMapql( int indf,
+void ndfMapql_( int indf,
                int **pntr,
-               int *el,
+               size_t *el,
                int *bad,
                int *status );
 
-void ndfMapz( int indf,
+void ndfMapz_( int indf,
               const char *comp,
               const char *type,
               const char *mmod,
               void *rpntr[],
               void *ipntr[],
-              int *el,
+              size_t *el,
               int *status );
 
-void ndfMbad( int badok,
+void ndfMbad_( int badok,
               int indf1,
               int indf2,
               const char *comp,
@@ -504,7 +446,7 @@ void ndfMbad( int badok,
               int *bad,
               int *status );
 
-void ndfMbadn( int badok,
+void ndfMbadn_( int badok,
                int n,
                const int ndfs[],
                const char *comp,
@@ -512,70 +454,70 @@ void ndfMbadn( int badok,
                int *bad,
                int *status );
 
-void ndfMbnd( const char *option,
+void ndfMbnd_( const char *option,
               int *indf1,
               int *indf2,
               int *status );
 
-void ndfMbndn( const char *option,
+void ndfMbndn_( const char *option,
                int n,
                int ndfs[],
                int *status );
 
-void ndfMsg( const char *token,
+void ndfMsg_( const char *token,
              int indf );
 
-void ndfMtype( const char *typlst,
+void ndfMtype_( const char *typlst,
                int indf1,
                int indf2,
                const char *comp,
                char *itype,
-               int itype_length,
+               size_t itype_length,
                char *dtype,
-               int dtype_length,
+               size_t dtype_length,
                int *status );
 
-void ndfMtypn( const char *typlst,
+void ndfMtypn_( const char *typlst,
                int n,
                const int ndfs[],
                const char *comp,
                char *itype,
-               int itype_length,
+               size_t itype_length,
                char *dtype,
-               int dtype_length,
+               size_t dtype_length,
                int *status );
 
-void ndfNbloc( int indf,
+void ndfNbloc_( int indf,
                int ndim,
-               const int mxdim[],
+               const hdsdim mxdim[],
                int *nblock,
                int *status );
 
-void ndfNchnk( int indf,
+void ndfNchnk_( int indf,
                int mxpix,
                int *nchunk,
                int *status );
 
-void ndfNew( const char *ftype,
+void ndfNew_( const char *ftype,
              int ndim,
-             const int lbnd[],
-             const int ubnd[],
+             const hdsdim lbnd[],
+             const hdsdim ubnd[],
              int *place,
              int *indf,
              int *status );
 
-void ndfNewp( const char *ftype,
+void ndfNewp_( const char *ftype,
               int ndim,
-              const int ubnd[],
+              const hdsdim ubnd[],
               int *place,
               int *indf,
               int *status );
 
-void ndfNoacc( const char *access,
+void ndfNoacc_( const char *access,
                int indf,
                int *status );
 
-void ndfOpen( const HDSLoc * loc,
+void ndfOpen_( const HDSLoc * loc,
               const char *name,
               const char *mode,
               const char *stat,
@@ -583,268 +525,190 @@ void ndfOpen( const HDSLoc * loc,
               int *place,
               int *status );
 
-void ndfPlace( const HDSLoc * loc,
+void ndfPlace_( const HDSLoc * loc,
                const char *name,
                int *place,
                int *status );
 
-void ndfProp( int indf1,
+void ndfProp_( int indf1,
               const char *clist,
               const char *param,
               int *indf2,
               int *status );
 
-void ndfPtszi( int scale,
-               int zero,
+void ndfPtwcs_( const AstFrameSet *iwcs,
                int indf,
-               const char *comp,
                int *status );
 
-void ndfPtszr( float scale,
-              float zero,
-              int indf,
-              const char *comp,
-              int *status );
-
-void ndfPtszd( double scale,
-              double zero,
-              int indf,
-              const char *comp,
-              int *status );
-
-void ndfGtszi( int indf,
-               const char *comp,
-               int *scale,
-               int *zero,
-               int *status );
-
-void ndfGtszr( int indf,
-              const char *comp,
-              float *scale,
-              float *zero,
-              int *status );
-
-void ndfGtszd( int indf,
-              const char *comp,
-              double *scale,
-              double *zero,
-              int *status );
-
-#define ndfPtwcs(iwcs,indf,status) ndfPtwcs_((AstFrameSet *)(iwcs),indf,status)
-void ndfPtwcs_( AstFrameSet *iwcs,
-                int indf,
-                int *status );
-
-#define ndfQmask(qual,badbit) ((((unsigned char)(qual))&((unsigned char)(badbit)))==(unsigned char)0)
-
-void ndfQmf( int indf,
+void ndfQmf_( int indf,
              int *qmf,
              int *status );
 
-void ndfReset( int indf,
+int ndfReport_( int indf,
+                int *status );
+
+void ndfReset_( int indf,
                const char *comp,
                int *status );
 
-void ndfSame( int indf1,
+void ndfSame_( int indf1,
               int indf2,
               int *same,
               int *isect,
               int *status );
 
-void ndfSbad( int bad,
+void ndfSbad_( int bad,
               int indf,
               const char *comp,
               int *status );
 
-void ndfSbb( unsigned char badbit,
+void ndfSbb_( unsigned char badbit,
              int indf,
              int *status );
 
-void ndfSbnd( int ndim,
-              const int lbnd[],
-              const int ubnd[],
+void ndfSbnd_( int ndim,
+              const hdsdim lbnd[],
+              const hdsdim ubnd[],
               int indf,
               int *status );
 
-void ndfScopy( int indf1,
+void ndfScopy_( int indf1,
                const char *clist,
                int *place,
                int *indf2,
                int *status );
 
-void ndfSect( int indf1,
+void ndfSctyp_( int indf,
+               const char *comp,
+               char *type,
+               size_t type_length,
+               int *status );
+
+void ndfSect_( int indf1,
               int ndim,
-              const int lbnd[],
-              const int ubnd[],
+              const hdsdim lbnd[],
+              const hdsdim ubnd[],
               int *indf2,
               int *status );
 
-void ndfShift( int nshift,
-               const int shift[],
+void ndfShift_( int nshift,
+               const hdsdim shift[],
                int indf,
                int *status );
 
-void ndfSize( int indf,
-              int *npix,
+void ndfSize_( int indf,
+              size_t *npix,
               int *status );
 
-void ndfSqmf( int qmf,
+void ndfSqmf_( int qmf,
               int indf,
               int *status );
 
-void ndfSsary( int iary1,
+void ndfSsary_( Ary *ary1,
                int indf,
-               int *iary2,
+               Ary **ary2,
                int *status );
 
-void ndfState( int indf,
+void ndfState_( int indf,
                const char *comp,
                int *state,
                int *status );
 
-void ndfStype( const char *ftype,
+void ndfStype_( const char *ftype,
                int indf,
                const char *comp,
                int *status );
 
-void ndfTemp( int *place,
+void ndfTemp_( int *place,
               int *status );
 
-void ndfTune( int value,
+void ndfTune_( int value,
               const char *tpar,
               int *status );
 
-void ndfSctyp( int indf,
+void ndfType_( int indf,
               const char *comp,
               char *type,
-              int type_length,
+              size_t type_length,
               int *status );
 
-void ndfType( int indf,
-              const char *comp,
-              char *type,
-              int type_length,
-              int *status );
+void ndfUnlock_( int indf,
+                 int *status );
 
-void ndfUnmap( int indf,
+void ndfUnmap_( int indf,
                const char *comp,
                int *status );
 
-void ndfValid( int indf,
+void ndfValid_( int indf,
                int *valid,
                int *status );
 
-void ndfXdel( int indf,
+void ndfXdel_( int indf,
               const char *xname,
               int *status );
 
-void ndfXgt0c( int indf,
+void ndfXgt0c_( int indf,
                const char *xname,
                const char *cmpt,
                char *value,
-               int value_length,
+               size_t value_length,
                int *status );
 
-void ndfXgt0d( int indf,
-               const char *xname,
-               const char *cmpt,
-               double *value,
-               int *status );
+void ndfXgt0l_( int indf,
+                const char *xname,
+                const char *cmpt,
+                int *value,
+                int *status );
 
-void ndfXgt0i( int indf,
-               const char *xname,
-               const char *cmpt,
-               int *value,
-               int *status );
-
-void ndfXgt0l( int indf,
-               const char *xname,
-               const char *cmpt,
-               int *value,
-               int *status );
-
-void ndfXgt0r( int indf,
-               const char *xname,
-               const char *cmpt,
-               float *value,
-               int *status );
-
-void ndfXiary( int indf,
+void ndfXiary_( int indf,
                const char *xname,
                const char *cmpt,
                const char *mode,
-               int *iary,
+               Ary **ary,
                int *status );
 
-void ndfXloc( int indf,
+void ndfXloc_( int indf,
               const char *xname,
               const char *mode,
               HDSLoc ** loc,
               int *status );
 
-void ndfXname( int indf,
+void ndfXname_( int indf,
                int n,
                char *xname,
-               int xname_length,
+               size_t xname_length,
                int *status );
 
-void ndfXnew( int indf,
+void ndfXnew_( int indf,
               const char *xname,
               const char *type,
               int ndim,
-              const int dim[],
+              const hdsdim dim[],
               HDSLoc **loc,
               int *status );
 
-void ndfXnumb( int indf,
+void ndfXnumb_( int indf,
                int *nextn,
                int *status );
 
-void ndfXpt0c( const char *value,
+void ndfXpt0c_( const char *value,
                int indf,
                const char *xname,
                const char *cmpt,
                int *status );
 
-void ndfXpt0d( double value,
-               int indf,
-               const char *xname,
-               const char *cmpt,
-               int *status );
+void ndfXpt0l_( int value,
+                int indf,
+                const char *xname,
+                const char *cmpt,
+                int *status );
 
-void ndfXpt0i( int value,
-               int indf,
-               const char *xname,
-               const char *cmpt,
-               int *status );
-
-void ndfXpt0l( int value,
-               int indf,
-               const char *xname,
-               const char *cmpt,
-               int *status );
-
-void ndfXpt0r( float value,
-               int indf,
-               const char *xname,
-               const char *cmpt,
-               int *status );
-
-void ndfXstat( int indf,
+void ndfXstat_( int indf,
                const char *xname,
                int *there,
                int *status );
 
-
-void ndfZscal( int indf1,
-               const char *type,
-               double scale[ 2 ],
-               double zero[ 2 ],
-               int *place,
-               int *indf2,
-               int *status );
-
-void ndfZdelt( int indf1,
+void ndfZdelt_( int indf1,
                const char *comp,
                float minrat,
                int zaxis,
@@ -854,15 +718,301 @@ void ndfZdelt( int indf1,
                float *zratio,
                int *status );
 
-void ndfGtdlt( int indf,
-               const char *comp,
-               int *zaxis,
-               char *ztype,
-               int ztype_length,
-               float *zratio,
+void ndfZscal_( int indf1,
+               const char *type,
+               double scale[ 2 ],
+               double zero[ 2 ],
+               int *place,
+               int *indf2,
                int *status );
 
-void ndfHcopy( int indf1,
-               int indf2,
+
+/*  Prototypes for NDF function that are different in V1 (arguments that
+    are "int" in V1 and "size_t" in V2 are not included since the int
+    value supplied by the caller will be cast to a size_t automatically
+    by the compiler). The changes are mainly "hdsdim"->"int" (for
+    dimension sizes) and *size_t *" -> "int *" (for returned pixel counts,
+    etc).
+    ==================================================================  */
+
+void ndfAmap_v1( int indf,
+               const char *comp,
+               int iaxis,
+               const char *type,
+               const char *mmod,
+               void *pntr[],
+               int *el,
                int *status );
+
+void ndfBound_v1( int indf,
+               int ndimx,
+               int lbnd[],
+               int ubnd[],
+               int *ndim,
+               int *status );
+
+void ndfCreat_v1( const char *param,
+               const char *ftype,
+               int ndim,
+               const int lbnd[],
+               const int ubnd[],
+               int *indf,
+               int *status );
+
+void ndfCrep_v1( const char *param,
+              const char *ftype,
+              int ndim,
+              const int ubnd[],
+              int *indf,
+              int *status );
+
+void ndfDim_v1( int indf,
+             int ndimx,
+             int dim[],
+             int *ndim,
+             int *status );
+
+void ndfMap_v1( int indf,
+             const char *comp,
+             const char *type,
+             const char *mmod,
+             void *pntr[],
+             int *el,
+             int *status );
+
+void ndfMapql_v1( int indf,
+               int **pntr,
+               int *el,
+               int *bad,
+               int *status );
+
+void ndfMapz_v1( int indf,
+              const char *comp,
+              const char *type,
+              const char *mmod,
+              void *rpntr[],
+              void *ipntr[],
+              int *el,
+              int *status );
+
+void ndfNew_v1( const char *ftype,
+             int ndim,
+             const int lbnd[],
+             const int ubnd[],
+             int *place,
+             int *indf,
+             int *status );
+
+void ndfNewp_v1( const char *ftype,
+              int ndim,
+              const int ubnd[],
+              int *place,
+              int *indf,
+              int *status );
+
+void ndfSbnd_v1( int ndim,
+              const int lbnd[],
+              const int ubnd[],
+              int indf,
+              int *status );
+
+void ndfSect_v1( int indf1,
+              int ndim,
+              const int lbnd[],
+              const int ubnd[],
+              int *indf2,
+              int *status );
+
+void ndfShift_v1( int nshift,
+               const int shift[],
+               int indf,
+               int *status );
+
+void ndfSize_v1( int indf,
+              int *npix,
+              int *status );
+
+void ndfSsary_v1( int iary1,
+               int indf,
+               int *iary2,
+               int *status );
+
+void ndfXiary_v1( int indf,
+               const char *xname,
+               const char *cmpt,
+               const char *mode,
+               int *iary,
+               int *status );
+
+void ndfXnew_v1( int indf,
+              const char *xname,
+              const char *type,
+              int ndim,
+              const int dim[],
+              HDSLoc **loc,
+              int *status );
+
+
+
+/* Now define the macros used by application code to invoke the appropriate
+   functions, depending on whether the old or new interface is required.
+
+   Interfaced which are the same in both version... */
+#define ndfAcget  ndfAcget_
+#define ndfAclen  ndfAclen_
+#define ndfAcmsg  ndfAcmsg_
+#define ndfAcput  ndfAcput_
+#define ndfAcre   ndfAcre_
+#define ndfAform  ndfAform_
+#define ndfAnnul  ndfAnnul_
+#define ndfAnorm  ndfAnorm_
+#define ndfArest  ndfArest_
+#define ndfAsnrm  ndfAsnrm_
+#define ndfAssoc  ndfAssoc_
+#define ndfAstat  ndfAstat_
+#define ndfAstyp  ndfAstyp_
+#define ndfAtype  ndfAtype_
+#define ndfAunmp  ndfAunmp_
+#define ndfBad    ndfBad_
+#define ndfBase   ndfBase_
+#define ndfBb     ndfBb_
+#define ndfBegin  ndfBegin_
+#define ndfBlock  ndfBlock_
+#define ndfCancl  ndfCancl_
+#define ndfCget   ndfCget_
+#define ndfChunk  ndfChunk_
+#define ndfCinp   ndfCinp_
+#define ndfClen   ndfClen_
+#define ndfClone  ndfClone_
+#define ndfCmplx  ndfCmplx_
+#define ndfCmsg   ndfCmsg_
+#define ndfCopy   ndfCopy_
+#define ndfCput   ndfCput_
+#define ndfCrepl  ndfCrepl_
+#define ndfDelet  ndfDelet_
+#define ndfEnd    ndfEnd_
+#define ndfExist  ndfExist_
+#define ndfFind   ndfFind_
+#define ndfForm   ndfForm_
+#define ndfFtype  ndfFtype_
+#define ndfGtdlt  ndfGtdlt_
+#define ndfGtune  ndfGtune_
+#define ndfGtwcs  ndfGtwcs_
+#define ndfHappn  ndfHappn_
+#define ndfHcopy  ndfHcopy_
+#define ndfHcre   ndfHcre_
+#define ndfHdef   ndfHdef_
+#define ndfHecho  ndfHecho_
+#define ndfHend   ndfHend_
+#define ndfHfind  ndfHfind_
+#define ndfHgmod  ndfHgmod_
+#define ndfHinfo  ndfHinfo_
+#define ndfHnrec  ndfHnrec_
+#define ndfHout   ndfHout_
+#define ndfHpurg  ndfHpurg_
+#define ndfHput   ndfHput_
+#define ndfHsdat  ndfHsdat_
+#define ndfHsmod  ndfHsmod_
+#define ndfIsacc  ndfIsacc_
+#define ndfIsbas  ndfIsbas_
+#define ndfIsin   ndfIsin_
+#define ndfIstmp  ndfIstmp_
+#define ndfLoc    ndfLoc_
+#define ndfLock   ndfLock_
+#define ndfLocked ndfLocked_
+#define ndfMbad   ndfMbad_
+#define ndfMbadn  ndfMbadn_
+#define ndfMbnd   ndfMbnd_
+#define ndfMbndn  ndfMbndn_
+#define ndfMsg    ndfMsg_
+#define ndfMtype  ndfMtype_
+#define ndfMtypn  ndfMtypn_
+#define ndfNbloc  ndfNbloc_
+#define ndfNchnk  ndfNchnk_
+#define ndfNoacc  ndfNoacc_
+#define ndfOpen   ndfOpen_
+#define ndfPlace  ndfPlace_
+#define ndfProp   ndfProp_
+#define ndfPtwcs  ndfPtwcs_
+#define ndfQmf    ndfQmf_
+#define ndfReport ndfReport_
+#define ndfReset  ndfReset_
+#define ndfSame   ndfSame_
+#define ndfSbad   ndfSbad_
+#define ndfSbb    ndfSbb_
+#define ndfScopy  ndfScopy_
+#define ndfSctyp  ndfSctyp_
+#define ndfSqmf   ndfSqmf_
+#define ndfState  ndfState_
+#define ndfStype  ndfStype_
+#define ndfTemp   ndfTemp_
+#define ndfTune   ndfTune_
+#define ndfType   ndfType_
+#define ndfUnlock ndfUnlock_
+#define ndfUnmap  ndfUnmap_
+#define ndfValid  ndfValid_
+#define ndfXdel   ndfXdel_
+#define ndfXgt0c  ndfXgt0c_
+#define ndfXloc   ndfXloc_
+#define ndfXname  ndfXname_
+#define ndfXnumb  ndfXnumb_
+#define ndfXpt0l  ndfXpt0l_
+#define ndfXpt0c  ndfXpt0c_
+#define ndfXstat  ndfXstat_
+#define ndfZdelt  ndfZdelt_
+#define ndfZscal  ndfZscal_
+
+/* Version 2 interfaces with 64 bit pixel counters, etc */
+#if defined( NDF_V2 )
+
+#define ndfAmap   ndfAmap_
+#define ndfBound  ndfBound_
+#define ndfCreat  ndfCreat_
+#define ndfCrep   ndfCrep_
+#define ndfDim    ndfDim_
+#define ndfMap    ndfMap_
+#define ndfMapql  ndfMapql_
+#define ndfMapz   ndfMapz_
+#define ndfNew    ndfNew_
+#define ndfNewp   ndfNewp_
+#define ndfSbnd   ndfSbnd_
+#define ndfSect   ndfSect_
+#define ndfShift  ndfShift_
+#define ndfSize   ndfSize_
+#define ndfSsary  ndfSsary_
+#define ndfXiary  ndfXiary_
+#define ndfXnew   ndfXnew_
+
+
+/* Version 1 interfaces with 32 bit pixel counters, etc */
+#else
+
+#define ndfAmap   ndfAmap_v1
+#define ndfBound  ndfBound_v1
+#define ndfCreat  ndfCreat_v1
+#define ndfCrep   ndfCrep_v1
+#define ndfDim    ndfDim_v1
+#define ndfMap    ndfMap_v1
+#define ndfMapql  ndfMapql_v1
+#define ndfMapz   ndfMapz_v1
+#define ndfNew    ndfNew_v1
+#define ndfNewp   ndfNewp_v1
+#define ndfSbnd   ndfSbnd_v1
+#define ndfSect   ndfSect_v1
+#define ndfShift  ndfShift_v1
+#define ndfSize   ndfSize_v1
+#define ndfSsary  ndfSsary_v1
+#define ndfXiary  ndfXiary_v1
+#define ndfXnew   ndfXnew_v1
+
+#endif
+
+/* Now include the expanded generic prototypes. */
+#include "ndf_cgen.h"
+
+/* The ndfINit funtion that was included in the F77 version of NDF is no
+   longer needed. But the following null macro is provided so that source
+   code need not be changed. */
+#define ndfInit( argc, argv, status )
+
 #endif

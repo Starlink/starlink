@@ -1,0 +1,139 @@
+#include "sae_par.h"
+#include "ndf_err.h"
+#include "ndf1.h"
+#include <string.h>
+#include "mers.h"
+
+void CGEN_FUNCTION( ndf1Adi )( hdsdim lbnda, hdsdim ubnda, CGEN_TYPE adata[],
+                               int *status ){
+/*
+*+
+*  Name:
+*     ndf1Adi<T>
+
+*  Purpose:
+*     Initialise a generic axis data array.
+
+*  Synopsis:
+*     void ndf1Adi<T>( hdsdim lbnda, hdsdim ubnda, CGEN_TYPE adata[],
+                       int *status )
+
+*  Description:
+*     This function assigns initial values to a generic axis data array.
+*     The values are chosen so as to define the default axis coordinate
+*     system, in which, for each axis, the pixel with index ("i") has a
+*     central coordinate of ("i"-0.5).
+
+*  Parameters:
+*     lbnda
+*        Index of the first pixel on the axis.
+*     ubnda
+*        Index of the last pixel on the axis.
+*     adata
+*        Returned holding the generic axis data array. The supplied "adata"
+*        array should have at least "ubnda - lbnda + 1" elements.
+*     *status
+*        The global status.
+
+*  Notes:
+*     -  Successive elements of the array are set to the values
+*     "lbnda"-0.5, "lbnda"+0.5, "lbnda"+1.5, etc. (these values are rounded
+*     up in the case of non-floating point types, so the values "lbnda",
+*     "lbnda"+1, "lbnda"+2, etc. will result).
+*     -  If overflow occurs because any of the values to be assigned cannot
+*     be represented using the array's numeric type, then an error will be
+*     reported and "status" set.
+
+*  Copyright:
+*     Copyright (C) 2018 East Asian Observatory
+*     All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or modify
+*     it under the terms of the GNU General Public License as published by
+*     the Free Software Foundation; either version 3 of the License, or (at
+*     your option) any later version.
+*
+*     This program is distributed in the hope that it will be useful,but
+*     WITHOUT ANY WARRANTY; without even the implied warranty of
+*     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+*     General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     xxx (DSB):
+*        Original version, based on equivalent Fortran function by RFWS.
+
+*-
+*/
+
+/* Local Variables: */
+   CGEN_TYPE *pa;        /* Pointer to next element of adata */
+   hdsdim hi;            /* Upper bound on array values */
+   hdsdim i;             /* Loop counter for array elements */
+   hdsdim lo;            /* Lower bound on array values */
+   int ovflow;           /* Whether overflow has occurred */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Note no overflow has occurred yet. */
+   ovflow = 0;
+
+/* Depending on the numeric type of the array, determine the lower and
+   upper bounds on the values which may be assigned. */
+   if( CGEN_CODE_TYPE == CGEN_DOUBLE_TYPE ||
+       CGEN_CODE_TYPE == CGEN_FLOAT_TYPE ||
+       CGEN_CODE_TYPE == CGEN_INT_TYPE ) {
+      lo = lbnda;
+      hi = ubnda;
+   } else {
+      lo = (hdsdim) CGEN_MIN;
+      hi = (hdsdim) CGEN_MAX;
+   }
+
+/* Loop to assign a value to each array element, checking that the
+   values are in range. */
+   pa = adata;
+   for( i = lbnda; i <= ubnda; i++,pa++ ){
+      if( i >= lo && i <= hi ) {
+         if( CGEN_CODE_TYPE == CGEN_DOUBLE_TYPE ||
+             CGEN_CODE_TYPE == CGEN_FLOAT_TYPE ) {
+            *pa = i - 0.5;
+         } else {
+            *pa = i;
+         }
+
+/* If the value is out of range, then set a "bad" value for the
+   affected array element. */
+      } else {
+         *pa = CGEN_BAD;
+
+/* If this is the first time overflow has occurred, then report an
+   error. */
+         if( !ovflow ) {
+            *status = NDF__AXOVF;
+            msgSetd( "AXVAL", (double) i + 0.5 );
+            errRepf( " ", "Unable to assign a value of ^AXVAL to an axis "
+                     "centre array with a numeric type of '%s'. ", status,
+                     CGEN_HDS_TYPE );
+         }
+
+/* Note that overflow has occurred. */
+         ovflow = 1;
+      }
+   }
+
+/* Call error tracing function and exit. */
+   if( *status != SAI__OK ) ndf1Trace( "ndf1Adi<T>", status );
+
+}
+
