@@ -290,8 +290,7 @@ void subParGetloc( size_t namecode, int *valid,  HDSLoc **loc, int * status ) {
 
   F77_IMPORT_LOGICAL( VALID, *valid );
   F77_IMPORT_INTEGER( STATUS, *status );
-  HDS_IMPORT_FLOCATOR( LOC, loc, status );
-
+  if( *valid ) HDS_IMPORT_FLOCATOR( LOC, loc, status );
   return;
 }
 
