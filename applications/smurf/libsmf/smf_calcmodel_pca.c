@@ -347,7 +347,7 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
 /* If we are inverting the model, just add the model values onto the
    residuals. This also clears any SMF__Q_PCA flags set on the previous
-   iteration as part of the COM-filling process. */
+   iteration. */
       if( flags & SMF__DIMM_INVERT ) {
 
 /* Process each sub-array in turn. */
@@ -588,26 +588,21 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
             thrWait( wf, status );
 
 /* If the noise level in any bolometer has fallen too much as a result of
-   removing the PCA model, flag it as bad. This flag is permanent (i.e.
-   it is not revoked on the next iteration), because revoking the flag on
-   the next iteration can cause instabilities that slow down convergence
-   badly. */
+   removing the PCA model, flag it as bad. */
             for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
-               if( !( qua_data[ ibolo*ntslice ] & SMF__Q_BADB ) ) {
-                  if( noise_before[ ibolo ] != VAL__BADD ) {
-                     if( noise_after[ibolo] < noiselim*noise_before[ibolo]) {
-                        qua_data[ ibolo*ntslice ] |= SMF__Q_BADB;
-                        for( itime = 0; itime < ntslice; itime++ ){
-                           qua_data[ ibolo*ntslice + itime ] |= SMF__Q_PCA;
-                        }
-                        nsetbad++;
+               if( noise_before[ ibolo ] != VAL__BADD ) {
+                  if( noise_after[ibolo] < noiselim*noise_before[ibolo]) {
+                     qua_data[ ibolo*ntslice ] |= SMF__Q_BADB;
+                     for( itime = 0; itime < ntslice; itime++ ){
+                        qua_data[ ibolo*ntslice + itime ] |= SMF__Q_PCA;
                      }
+                     nsetbad++;
                   }
                }
             }
          }
 
-         msgOutiff( MSG__DEBUG, "", "smf_calcmodel_pca: %zu extra bolometers set "
+         msgOutiff( MSG__DEBUG, "", "smf_calcmodel_pca: %zu bolometers set "
                     "bad due to too much noise removal.", status, nsetbad );
 
 /* Free the noise arrays. */
@@ -688,6 +683,14 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
       ibase = b1*ntslice;
       for( ibolo = b1; ibolo <= b2; ibolo++ ) {
 
+/* Clear the BADB bit if the bolometer was flagged as bad within this
+   fuction because it suffered too great a noise reduction on the
+   previous iteration. */
+         if( ( (pdata->qua_data)[ ibase ] & SMF__Q_BADB ) &&
+             ( (pdata->qua_data)[ ibase ] & SMF__Q_PCA ) ) {
+            (pdata->qua_data)[ ibase ] &= ~SMF__Q_BADB;
+         }
+
 /* Check that the whole bolometer has not been flagged as bad. */
          if( !( (pdata->qua_data)[ ibase ] & SMF__Q_BADB ) ) {
 
@@ -700,10 +703,7 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
 /* Loop over all time slices. */
             for( itime = 0; itime < ntslice; itime++ ) {
 
-/* Remove the SMF__Q_PCA flags. Note, such flags set as a result of the
-   noise dropping too much on the previous iteration will not be removed
-   since such bolometers also have SMF__Q_BADB set and so will fail the
-   above check and not reach this point. */
+/* Remove the SMF__Q_PCA flags. */
                *pq &= ~SMF__Q_PCA;
 
 /* Add the model back onto the residuals, if the sample is modifiable. */

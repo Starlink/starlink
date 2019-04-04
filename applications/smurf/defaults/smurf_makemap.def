@@ -3078,10 +3078,10 @@ pca.samplim = 0.8
 #               after removal of the PCA model. If the removal of the PCA
 #               model causes the noise in a bolometer to fall to lower than
 #               "pca.noiselim" times the noise level it had before removal
-#               of the PCA model, then the bolometer is flagged as bad.
-#               This usually happens for bolometers that appear to be
-#               "unique" for some reason (i.e. look completely unlike
-#               other bolometers). In such cases one of the PCA components
+#               of the PCA model, then the bolometer is flagged as bad
+#               until the next iteration. This usually happens for bolometers 
+#               that appear to be "unique" for some reason (i.e. look completely 
+#               unlike other bolometers). In such cases one of the PCA components 
 #               will be nearly identical to the bolometer, and so leave no
 #               significant residuals after subtraction of hte PCA model.
 pca.noiselim = 0.1
