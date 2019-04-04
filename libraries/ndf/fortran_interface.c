@@ -1132,6 +1132,22 @@ F77_SUBROUTINE(ndf_gtdlt)( INTEGER(INDF),
    cnfExprt( ztype, ZTYPE, ZTYPE_length );
 }
 
+F77_SUBROUTINE(ndf_imprt)( CHARACTER(LOC),
+                           INTEGER(INDF),
+                           INTEGER(STATUS)
+                           TRAIL(LOC) ) {
+   GENPTR_CHARACTER(LOC)
+   GENPTR_INTEGER(INDF)
+   GENPTR_INTEGER(STATUS)
+
+   HDSLoc *loc = NULL;
+   if( strncmp( DAT__ROOT, LOC, LOC_length ) ) {
+      datImportFloc( LOC, LOC_length, &loc, STATUS );
+   }
+
+   ndfFind_( loc, " ", INDF, STATUS );
+}
+
 F77_SUBROUTINE(ndf_isacc)( INTEGER(INDF),
                            CHARACTER(ACCESS),
                            LOGICAL(ISACC),
@@ -1409,6 +1425,16 @@ F77_SUBROUTINE(ndf_temp)( INTEGER(IPLACE),
    GENPTR_INTEGER(STATUS)
 
    ndfTemp_( IPLACE, STATUS );
+}
+
+F77_SUBROUTINE(ndf_trace)( LOGICAL(NEWFLG),
+                           LOGICAL(OLDFLG) ) {
+   GENPTR_LOGICAL(NEWFLG)
+   GENPTR_LOGICAL(OLDFLG)
+   int oldflg;
+
+   ndfTrace_( F77_ISTRUE(*NEWFLG)?1:0, &oldflg );
+   *OLDFLG = oldflg ? F77_TRUE : F77_FALSE;
 }
 
 F77_SUBROUTINE(ndf_tune)( INTEGER(VALUE),
@@ -2030,6 +2056,27 @@ F77_SUBROUTINE(ndf_mapzk)( INTEGER(INDF),
    *EL = el;
 }
 
+F77_SUBROUTINE(ndf_mapqlk)( INTEGER(INDF),
+                            INTEGER(PNTR),
+                            INTEGER8(EL),
+                            LOGICAL(BAD),
+                            INTEGER(STATUS) ) {
+   GENPTR_INTEGER(INDF)
+   GENPTR_INTEGER(PNTR)
+   GENPTR_INTEGER8(EL)
+   GENPTR_LOGICAL(BAD)
+   GENPTR_INTEGER(STATUS)
+   int *pntr = NULL;
+   size_t el;
+   int bad;
+
+   ndfMapql_( *INDF, &pntr, &el, &bad, STATUS );
+
+   *BAD = bad ? F77_TRUE : F77_FALSE;
+   *PNTR = cnfFptr( pntr );
+   *EL = el;
+}
+
 F77_SUBROUTINE(ndf_newk)( CHARACTER(FTYPE),
                           INTEGER(NDIM),
                           INTEGER8_ARRAY(LBND),
@@ -2310,6 +2357,29 @@ F77_SUBROUTINE(ndf_mapz)( INTEGER(INDF),
    }
 
    *EL = (int) el;
+   CHECK_DIM( *EL, el, NDF_MAP, INDF )
+}
+
+F77_SUBROUTINE(ndf_mapql)( INTEGER(INDF),
+                           INTEGER(PNTR),
+                           INTEGER(EL),
+                           LOGICAL(BAD),
+                           INTEGER(STATUS) ) {
+   GENPTR_INTEGER(INDF)
+   GENPTR_INTEGER(PNTR)
+   GENPTR_INTEGER(EL)
+   GENPTR_LOGICAL(BAD)
+   GENPTR_INTEGER(STATUS)
+   int *pntr = NULL;
+   size_t el;
+   int bad;
+
+   ndfMapql_( *INDF, &pntr, &el, &bad, STATUS );
+
+   *BAD = bad ? F77_TRUE : F77_FALSE;
+   *PNTR = cnfFptr( pntr );
+   *EL = (int) el;
+
    CHECK_DIM( *EL, el, NDF_MAP, INDF )
 }
 
