@@ -79,7 +79,7 @@ void CGEN_FUNCTION( ndf1Qma )( int el, const unsigned char qual[],
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

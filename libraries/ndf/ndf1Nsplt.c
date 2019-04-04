@@ -91,7 +91,7 @@ void ndf1Nsplt( const char *name, int rel, size_t *n1, size_t *n2,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

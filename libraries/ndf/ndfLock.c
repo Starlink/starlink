@@ -63,7 +63,7 @@ void ndfLock_( int indf, int *status ){
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version.
 
 *-

@@ -59,7 +59,7 @@ void ndf1Tcnam( HDSLoc *loc, char *name, size_t name_length, int *status ){
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

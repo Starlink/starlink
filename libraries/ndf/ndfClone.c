@@ -61,7 +61,7 @@ void ndfClone_( int indf1, int *indf2, int *status ){
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

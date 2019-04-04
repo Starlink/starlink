@@ -82,7 +82,7 @@ void ndfCreat_( const char *param, const char *ftype, int ndim,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

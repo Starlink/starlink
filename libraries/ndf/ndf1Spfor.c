@@ -107,7 +107,7 @@ void ndf1Spfor( const char *fname, NdfFCB *fcb, size_t *d1, size_t *d2,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

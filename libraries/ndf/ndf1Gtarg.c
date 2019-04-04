@@ -73,7 +73,7 @@ void ndf1Gtarg( int iarg, char *arg, size_t arg_length, int *there,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version.
 
 *-

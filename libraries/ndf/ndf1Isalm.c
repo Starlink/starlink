@@ -56,7 +56,7 @@ int ndf1Isalm( const char *string, size_t start, size_t end ){
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version.
 
 *-

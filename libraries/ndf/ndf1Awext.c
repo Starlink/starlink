@@ -85,7 +85,7 @@ void ndf1Awext( const char *type, int upper, hdsdim pix0, double width,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

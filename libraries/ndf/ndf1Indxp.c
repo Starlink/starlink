@@ -60,7 +60,7 @@ int ndf1Indxp( const char *str, char ch, size_t *iat ){
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

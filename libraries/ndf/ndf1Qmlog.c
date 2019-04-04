@@ -76,7 +76,7 @@ void ndf1Qmlog( unsigned char badbit, size_t el, const unsigned char
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

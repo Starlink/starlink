@@ -83,7 +83,7 @@ void ndf1Mbad( int badok, int n, const int ndfs[], const char *comp,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

@@ -106,7 +106,7 @@ void ndfMtype_( const char *typlst, int indf1, int indf2, const char *comp,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

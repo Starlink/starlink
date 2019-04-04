@@ -79,7 +79,7 @@ void ndf1Prp( NdfACB *acb1, int nextn, char extn[][ DAT__SZNAM + 1 ],
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

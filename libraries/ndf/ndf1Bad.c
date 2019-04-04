@@ -89,7 +89,7 @@ void ndf1Bad( NdfACB *acb, const char *comp, int check, int *bad, int *status ){
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

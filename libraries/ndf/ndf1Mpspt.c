@@ -91,7 +91,7 @@ void ndf1Mpspt( AstMapping *map, AstMapping **map0, AstMapping **map1,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

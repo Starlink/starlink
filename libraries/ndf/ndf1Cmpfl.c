@@ -74,7 +74,7 @@ void ndf1Cmpfl( const char *name1, size_t start1, size_t end1,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 *        Support for VMS has been removed.
 *-

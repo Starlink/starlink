@@ -73,7 +73,7 @@ void ndfForm_( int indf, const char *comp, char *form, size_t form_length,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

@@ -64,7 +64,7 @@ char *ndf1Substr( const char *text, size_t start, size_t end, int *status ){
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version.
 
 *-

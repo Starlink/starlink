@@ -76,7 +76,7 @@ void ndfHfind_( int indf, const int ymdhm[], float sec, int eq, int *irec,
 *     DSB: David "s". Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

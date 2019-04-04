@@ -85,7 +85,7 @@ void ndf1Forxt( const char *name, size_t start, size_t end, size_t *x1,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

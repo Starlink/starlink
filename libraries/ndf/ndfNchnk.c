@@ -71,7 +71,7 @@ void ndfNchnk_( int indf, int mxpix, int *nchunk, int *status ){
 *     DSB: David "s". Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

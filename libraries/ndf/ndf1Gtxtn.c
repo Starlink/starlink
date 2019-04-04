@@ -85,7 +85,7 @@ void ndf1Gtxtn( const char *name, int mxxtn, int *def, char *xtn,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

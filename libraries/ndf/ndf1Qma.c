@@ -84,7 +84,7 @@ void ndf1Qma( size_t el, const unsigned char qual[], unsigned char badbit,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

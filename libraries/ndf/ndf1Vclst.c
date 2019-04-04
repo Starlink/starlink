@@ -74,7 +74,7 @@ void ndf1Vclst( const char *text, int ncomp, const char *cnames[],
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

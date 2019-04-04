@@ -79,7 +79,7 @@ char *ndf1Strip( char *mem, const char *text, size_t start, size_t end, size_t *
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version.
 
 *-

@@ -67,7 +67,7 @@ void ndf1Gtenv( const char *name, int *def, char *val, size_t val_length,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

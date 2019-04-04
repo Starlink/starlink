@@ -66,7 +66,7 @@ void ndfAsnrm_( int norm, int indf, int iaxis, int *status ){
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

@@ -66,7 +66,7 @@ void ndf1Fmhdt( const int ymdhm[], float sec, char *str, size_t str_length,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

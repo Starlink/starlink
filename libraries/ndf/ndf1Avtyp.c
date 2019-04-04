@@ -63,7 +63,7 @@ void ndf1Avtyp( int iax, NdfACB *acb, char *type, size_t type_length,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

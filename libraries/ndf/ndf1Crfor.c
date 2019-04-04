@@ -89,7 +89,7 @@ void ndf1Crfor( const char *file, NdfFCB *fcb, char *expfil,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

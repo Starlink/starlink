@@ -63,7 +63,7 @@ void ndf1Uname( NdfUNAME *info, int *status ){
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on psx_uname.f by PMA et al.
 *        Remove VMS support.
 

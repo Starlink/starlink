@@ -88,7 +88,7 @@ void ndf1Psfmt( const char *fmt, size_t *f1, size_t *f2, size_t *e1,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

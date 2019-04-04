@@ -67,7 +67,7 @@ void ndf1Filex( const char *file, const char *mode, int report, int *ok,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

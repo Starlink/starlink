@@ -71,7 +71,7 @@ void ndf1Gadex( hdsdim lbnd, hdsdim ubnd, Ary *ary, int upper, double *scale,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

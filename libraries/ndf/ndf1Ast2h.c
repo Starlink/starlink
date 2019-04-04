@@ -69,7 +69,7 @@ void ndf1Ast2h( char *data[], size_t data_length, int iline,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

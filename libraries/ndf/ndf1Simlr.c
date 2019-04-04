@@ -69,7 +69,7 @@ int ndf1Simlr( const char *str1, size_t start, size_t end, const char *str2,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

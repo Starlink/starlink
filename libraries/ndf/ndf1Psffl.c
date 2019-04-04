@@ -71,7 +71,7 @@ void ndf1Psffl( const char *list, int mxel, size_t ibeg[], size_t iend[],
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

@@ -74,7 +74,7 @@ void ndf1S2v( int bad, const char *type, size_t el, void *pntr, int *dce,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

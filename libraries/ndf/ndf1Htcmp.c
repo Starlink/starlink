@@ -64,7 +64,7 @@ void ndf1Htcmp( const int ymdhm1[], float sec1, const int ymdhm2[],
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

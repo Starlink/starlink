@@ -84,7 +84,7 @@ void ndf1Hnew( HDSLoc *loc1, const char *name, const char *type, int ndim,
 *     DSB: David S. Berry (EAO)
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 
 *-

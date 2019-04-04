@@ -81,7 +81,7 @@ void ndf1Time( int ymdhm[ 5 ], float *sec, int *status ){
 *     {enter_new_authors_here}
 
 *  History:
-*     xxx (DSB):
+*     3-APR-2019 (DSB):
 *        Original version.
 *     {enter_changes_here}
 
