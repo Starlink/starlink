@@ -52,6 +52,9 @@
 *        often not needed, and is very slow.
 *        - Flag bolometers for which the removal of the PCA model causes
 *        the noise to drop too much.
+*     5-APR-2019 (DSB):
+*        If PCA.SKIP is undefined, do not subtract a PCA model on any
+*        initial iterations for which the AST model is skipped.
 
 *  Copyright:
 *     Copyright (C) 2015 East Asian Observatory.
@@ -198,53 +201,60 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    astMapGet0D( kmap, "NOISELIM", &noiselim );
 
 /* Get the number of initial iterations for which the PCA model is to be
-   skipped. Zero means use the PCA model on all iterations. A fractional
-   value between 0.0 and 1.0 is a normalised map change value at which
-   to start using the PCA model. A positive integer is the number of
-   iterations to skip. A negative value means "only use the PCA model
-   on the very last iteration". A bad value is stored in the KeyMap in
-   place of the origiunal value when the specified cvriterion is reached. */
-   skip = 0.0;
-   astMapGet0D( kmap, "SKIP", &skip );
+   skipped. If the PCA.SKIP parameter is undefined, skip the PCA model on any
+   intial iterations for which the AST model is skipped. */
+   if( !astMapDefined( kmap, "SKIP" ) ) {
+      if( dat->iter <= astskip + 1 ) {
+         proceed = 0;
+         dat->allow_convergence = 0; /* We've not yet reached the specified
+                                        limit so we must do more iterations */
+      } else {
+         proceed = 1;
+      }
+
+/* Otherwise, get the value of the PCA.SKIP parameter. */
+   } else {
+      astMapGet0D( kmap, "SKIP", &skip );
 
 /* If the stored value is bad, the criterion has been reached so proceed
    to use the PCA model. */
-   if( skip == VAL__BADD ) {
-      proceed = 1;
+      if( skip == VAL__BADD ) {
+         proceed = 1;
 
 /* If the stored value is zero, we use PCA on all iterations. */
-   } else if( skip == 0.0 ) {
-      proceed = 1;
+      } else if( skip == 0.0 ) {
+         proceed = 1;
 
 /* If the stored value is negative, only use PCA if this is the last
    iteration. */
-   } else if( skip < 0.0 ) {
-      proceed = ( flags & SMF__DIMM_LASTITER );
+      } else if( skip < 0.0 ) {
+         proceed = ( flags & SMF__DIMM_LASTITER );
 
 /* If the stored value is a fractional value between 0.0 and 1.0, only use
    PCA once the normalised map change between iterations has dropped to
    the value of PCA.SKIP. Ignored initial iterations for which the AST
    model is skipped. */
-   } else if( skip < 1.0 ) {
-      if( dat->mapchange >= skip || dat->iter <= astskip + 1 ) {
-         proceed = 0;
-         dat->allow_convergence = 0; /* We've not yet reached the specified
-                                        limit so we must do more iterations */
+      } else if( skip < 1.0 ) {
+         if( dat->mapchange >= skip || dat->iter <= astskip + 1 ) {
+            proceed = 0;
+         dat->allow_convergence = 0;    /* We've not yet reached the specified
+                                           limit so we must do more iterations */
 
 /* If we have reached the limit, ensure we apply the PCA model on all future
    iterations, regardless of what the normalized map change may do in future.
    To do this, we stored a bad value in place of the original PCA.SKIP value. */
-      } else {
-         proceed = 1;
-         astMapPut0D( kmap, "SKIP", VAL__BADD, NULL );
-      }
+         } else {
+            proceed = 1;
+            astMapPut0D( kmap, "SKIP", VAL__BADD, NULL );
+         }
 
 /* Any other PCA.SKIP value is treated as a number of iterations to skip.
    The initial iterations for which the AST model is skipped are not
    included in this count. */
-   } else {
-      proceed = (dat->iter >= (int)( skip + 0.5 ) + astskip);
-      if( !proceed ) dat->allow_convergence = 0;
+      } else {
+         proceed = (dat->iter >= (int)( skip + 0.5 ) + astskip);
+         if( !proceed ) dat->allow_convergence = 0;
+      }
    }
 
 /* Tell the user if we are skipping the PCA model on this iteration.
