@@ -589,14 +589,16 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
 /* If the noise level in any bolometer has fallen too much as a result of
    removing the PCA model, flag it as bad. */
-            for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
-               if( noise_before[ ibolo ] != VAL__BADD ) {
-                  if( noise_after[ibolo] < noiselim*noise_before[ibolo]) {
-                     qua_data[ ibolo*ntslice ] |= SMF__Q_BADB;
-                     for( itime = 0; itime < ntslice; itime++ ){
-                        qua_data[ ibolo*ntslice + itime ] |= SMF__Q_PCA;
+            if( *status == SAI__OK ) {
+               for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+                  if( noise_before[ ibolo ] != VAL__BADD ) {
+                     if( noise_after[ibolo] < noiselim*noise_before[ibolo]) {
+                        qua_data[ ibolo*ntslice ] |= SMF__Q_BADB;
+                        for( itime = 0; itime < ntslice; itime++ ){
+                           qua_data[ ibolo*ntslice + itime ] |= SMF__Q_PCA;
+                        }
+                        nsetbad++;
                      }
-                     nsetbad++;
                   }
                }
             }
