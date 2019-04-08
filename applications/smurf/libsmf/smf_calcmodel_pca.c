@@ -153,6 +153,7 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    int iw;
    int nw;
    int proceed;
+   int skip_defined;
    size_t ipix;
    size_t nsetbad;
    smfArray **oldres;
@@ -203,7 +204,9 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 /* Get the number of initial iterations for which the PCA model is to be
    skipped. If the PCA.SKIP parameter is undefined, skip the PCA model on any
    intial iterations for which the AST model is skipped. */
+   skip_defined = 0;
    if( !astMapDefined( kmap, "SKIP" ) ) {
+      skip_defined = 0;
       if( dat->iter <= astskip + 1 ) {
          proceed = 0;
          dat->allow_convergence = 0; /* We've not yet reached the specified
@@ -261,8 +264,13 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    Ensure we only get the message once per iteration */
    if( !proceed ) {
       if( !( flags & SMF__DIMM_INVERT ) ) {
-         msgOutf( " ","   skipping PCA model on this iteration (PCA.SKIP=%g)\n",
-                  status, skip );
+         if( skip_defined ) {
+            msgOutf( " ","   skipping PCA model on this iteration (PCA.SKIP=%g)\n",
+                     status, skip );
+         } else {
+            msgOut( " ","   skipping PCA model on this iteration (PCA.SKIP=<undef>)\n",
+                    status );
+         }
       }
 
 /* If we are proceeding with the PCA model... Note, on the first
