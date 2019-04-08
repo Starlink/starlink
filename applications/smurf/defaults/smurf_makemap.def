@@ -529,8 +529,11 @@ com.zero_circle = <undef>
 #               count of iterations. If com.zero_freeze is greater than
 #               zero but less than 1.0, the COM mask will be frozen when
 #               the normalized change in the map between iterations drops
-#               below the com.zero_freeze value. A value less than or
-#               equal to zero means that the mask is never frozen.
+#               below the com.zero_freeze value. A value less than zero
+#               means that the mask is frozen as soon as the initial
+#               iterations specified by parameter "ast.skip" have been
+#               done. A value equal to zero means that the mask is never
+#               frozen.
 com.zero_freeze = 0.0
 
 #-----------------------------------------------------------------
@@ -1725,8 +1728,11 @@ flt.zero_circle = <undef>
 #               count of iterations. If flt.zero_freeze is greater than
 #               zero but less than 1.0, the FLT mask will be frozen when
 #               the normalized change in the map between iterations drops
-#               below the flt.zero_freeze value. A value less than or
-#               equal to zero means that the mask is never frozen.
+#               below the flt.zero_freeze value. A value less than zero
+#               means that the mask is frozen as soon as the initial
+#               iterations specified by parameter "ast.skip" have been
+#               done. A value equal to zero means that the mask is never
+#               frozen.
 flt.zero_freeze = 0.0
 
 #-----------------------------------------------------------------
@@ -2663,8 +2669,11 @@ ssn.zero_circle = <undef>
 #               count of iterations. If ssn.zero_freeze is greater than
 #               zero but less than 1.0, the SSN mask will be frozen when
 #               the normalized change in the map between iterations drops
-#               below the ssn.zero_freeze value. A value less than or
-#               equal to zero means that the mask is never frozen.
+#               below the ssn.zero_freeze value. A value less than zero
+#               means that the mask is frozen as soon as the initial
+#               iterations specified by parameter "ast.skip" have been
+#               done. A value equal to zero means that the mask is never
+#               frozen.
 ssn.zero_freeze = 0.0
 
 #-----------------------------------------------------------------
