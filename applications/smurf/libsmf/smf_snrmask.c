@@ -48,7 +48,8 @@
 *        should be extended.
 *     mask =  unsigned char * (Returned)
 *        The array to recieve the mask - mask pixels are zero in the
-*        "source" (i.e. high SNR) regions and zero in "background" regions.
+*        "source" (i.e. high SNR) regions and non-zero in "background"
+*        regions.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
