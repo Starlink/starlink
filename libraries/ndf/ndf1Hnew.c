@@ -195,7 +195,7 @@ void ndf1Hnew( HDSLoc *loc1, const char *name, const char *type, int ndim,
    using the part of the path which precedes the ".". Promote the
    resulting locator to be a primary locator if necessary (to hold the
    container file open). */
-      } else if( pdot >= name ) {
+      } else if( pdot > name + p1 ) {
          path = ndf1Strip( NULL, name, p1, pdot - name - 1, NULL, NULL,
                            status );
          hdsFind( *loc2, path, "UPDATE", &loc, status );
