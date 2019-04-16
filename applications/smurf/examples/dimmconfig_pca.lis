@@ -1,0 +1,95 @@
+#+
+#  Name:
+#     dimmconfig_pca.lis
+
+#  Purpose:
+#     A MAKEMAP configuration add-on for using a PCA model.
+
+#  Description:
+#     This file provides values for additional parameters used by the
+#     SMURF:MAKEMAP command to control the details of the map-making
+#     algorithm.
+#
+#     The parameters defined by this file attempt to reduce noise in the
+#     in the final map. It also seens to do a good job at removing bright
+#     blobs of emission. It does this by adding an extra noise component
+#     into the iterative map-making process. This extra noise component
+#     represents the correlated noise across multiple bolometers, and is
+#     determined using a Principal Component Analysis (PCA).
+#
+#     This file does not provide a complete set of parameters, and
+#     so should be included in the configuration following another
+#     config that provides a complete set. The values defined in this
+#     file then over-ride the values supplied by the earlier config.
+#     For instance, you may want to use a config file that contains:
+#
+#     ^/star/share/smurf/dimmconfig_bright_extended.lis
+#     ^/star/share/smurf/dimmconfig_pca.lis
+#
+#     This reads a complete set of configuration parameter from the
+#     dimmconfig_bright_extended.lis file, and then assigns new values
+#     for just those parameters defined in dimmconfig_pca.lis. These
+#     values over-ride the values specified in dimmconfig_bright_extended.lis.
+
+#  Notes:
+#     - Using this file will cause makemap to run much more slowly.
+#     - For a full list of all available parameters, and their purposes,
+#     see the file $SMURF_DIR/smurf_makemap.def. All available parameters
+#     are also documented in SUN/258, appendix "Configuration Parameters".
+#     - A single parameter can be given different values to use when
+#     processing 450 or 850 um data. This is done by including the
+#     parameter twice, prefixing the parameter name with "450." and "850."
+
+#  Authors:
+#     DSB: David Berry (EAO)
+
+#  History:
+#     15-APR-2019 (DSB):
+#        Original Version.
+#-
+
+#  Add PCA into the model order. It seems to work best if it comes after
+#  COM/GAI.
+modelorder = (com,gai,pca,ext,flt,ast,noi)
+
+#  Because of the lower noise levels produced by using a PCA model, we
+#  can extend the AST mask down a bit to lower levels.
+ast.zero_snr = 2
+ast.zero_snrlo = 1
+
+#  This is the main parameter controlling the PCA process. If negative,
+#  its absolute value gives the number of components to remove. For
+#  instance, a value of -20 causes the 20 strongest correlated signals
+#  to be removed. Increasing the number of components causes makemap to
+#  run much more slowly but removes more noise. The much reduced map
+#  variance causes the normalised map-change to be much larger at each
+#  iteration, resulting in more iterations being required to reach a
+#  specificied maptol value.
+pca.pcathresh = -20
+
+#  The source areas need to be masked on all iterations (except the last).
+#  This is because removal of astronomical signal from the time streams
+#  to the map leaves significant residuals in the time stream at the
+#  positions of the source. The average of these residuals is (by design)
+#  close to zero at convergence, but the RMS can be high. It is possible
+#  for the PCA model to treat these residuals as a correlated signal.
+#  This causes problems if the positive residuals are removed by PCA but
+#  not the negative (or vice-versa), as can sometimes happen. This
+#  results in the source appearing in the PCA model, with a correspsonding
+#  equal and opposite source in the residuals. This can then cause bad
+#  bowling in the following FLT model. To avoid such issues, mask the PCA
+#  model on all iterations. Do not mask on the final iteration so that
+#  the proper variances can be calculated within the source regions.
+pca.zero_snr = 5
+pca.zero_snrlo = 3
+
+#  Freese the PCA mask when the normalised map-change drops to 0.5. This
+#  helps convergence.
+pca.zero_freeze = 0.5
+
+#  When filling the time-streams gaps left by the masking, do not add any
+#  random noise, as doing so can upset convergence due to the noise being
+#  different on each iteration.
+fillgaps_noise = 0
+
+
