@@ -55,6 +55,9 @@
 *     5-APR-2019 (DSB):
 *        If PCA.SKIP is undefined, do not subtract a PCA model on any
 *        initial iterations for which the AST model is skipped.
+*     16-APR-2019 (DSB):
+*        Ensure PCA model is subtracted prior to substracting the PCA
+*        model for the first time, when using AST.SKIP.
 
 *  Copyright:
 *     Copyright (C) 2015 East Asian Observatory.
@@ -207,7 +210,7 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    skip_defined = 0;
    if( !astMapDefined( kmap, "SKIP" ) ) {
       skip_defined = 0;
-      if( dat->iter <= astskip + 1 ) {
+      if( dat->iter < astskip ) {
          proceed = 0;
          dat->allow_convergence = 0; /* We've not yet reached the specified
                                         limit so we must do more iterations */
@@ -238,7 +241,7 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    the value of PCA.SKIP. Ignored initial iterations for which the AST
    model is skipped. */
       } else if( skip < 1.0 ) {
-         if( dat->mapchange >= skip || dat->iter <= astskip + 1 ) {
+         if( dat->mapchange >= skip || dat->iter < astskip ) {
             proceed = 0;
          dat->allow_convergence = 0;    /* We've not yet reached the specified
                                            limit so we must do more iterations */
