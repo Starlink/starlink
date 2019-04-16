@@ -1137,6 +1137,9 @@ void smurf_makemap( int *status ) {
          not restricted to config parameters). */
        astMapGet0I( keymap, "VALIDATE_SCANS", &ival );
        smf_put_global0I( "VALIDATE_SCANS", ival, status );
+
+       astMapGet0I( keymap, "FILLGAPS_NOISE", &ival );
+       smf_put_global0I( "FILLGAPS_NOISE", ival, status );
     }
 
     parChoic("FTSPORT", "", "TRACKING,IMAGE", 0, fts_port_name, 10, status);

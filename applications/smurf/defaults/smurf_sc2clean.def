@@ -562,9 +562,25 @@ dkclean = 0
 #  Type: 	integer
 #  Default: 	1
 #  Purpose: 	Controls handling of missing data within FFT code
-#  Description: If non-zero, fill vicinity of spikes / DC steps with
-#		constrained realization of noise.
+#  Description: If non-zero, fill vicinity of spikes / DC steps
+#		with artificial data. See also parameter
+#               "fillgaps_noise".
 fillgaps = 1
+
+#-----------------------------------------------------------------
+#  Name: 	fillgaps_noise
+#  Type: 	integer
+#  Default: 	1
+#  Purpose: 	Controls handling of missing data within FFT code
+#  Description: If non-zero, and if parameter "fillgaps" is non-zero,
+#               gaps are filled with a constrained realization of noise.
+#               Otherwise they are filled with a noise-free linear
+#               function that connects the values before and after the
+#               gap. Note, the specific noise values used to fill a
+#               specific gap will be different each time the gap is filled.
+#               So for instance, this could slow down convergence of the
+#               iterative algorithm used by makemap.
+fillgaps_noise = 1
 
 #-----------------------------------------------------------------
 #  Name: 	filt_edge_largescale

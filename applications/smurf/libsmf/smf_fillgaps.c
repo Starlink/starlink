@@ -107,6 +107,10 @@
 *     2016-10-07 (DSB):
 *        Reduce BOX and MINBOX and don't add any noise for very slow
 *        scans (e.g. POL-2).
+*     2019-4-15 (DSB):
+*        Provide an option to disable the addition of noise to the gaps
+*        (see config param FILLGAPS_NOISE). This can help makemap
+*        convergence.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -289,6 +293,15 @@ void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
     box = BOX;
     minbox = MINBOX;
   }
+
+  /* Also set the random number generator type NULL if the user's config
+     indicates that no noise should be added to the gaps. This is useful
+     as an aid to convergence in makemap in cases where the source is
+     masked out over many iterations (e.g. FLT or PCA etc). In such cases
+     the different realisations of noise created by this function on each
+     iteration cause differences in the map created at the end of each
+     iteration, preventing confergence. */
+  if( !smf_get_global0I( "FILLGAPS_NOISE", 1, status ) ) type = NULL;
 
   /* Begin a job context. */
   thrBeginJobContext( wf, status );
