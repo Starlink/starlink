@@ -36,18 +36,30 @@
 *     polarisation, based on the total intensity values specified by the
 *     map associated with environment parameter IPREF. The values in this
 *     map are multiplied by factors (Qf,Uf) determined from the current
-*     elevation:
+*     elevation. Two models are currently provided:
 *
-*     p = A + B*el + C*el*el
-*     Qf = p*cos( -2*( el - D ) )
-*     Uf = p*sin( -2*( el - D ) )
+*     - the "JAN2018" (January 2018) model:
 *
-*     (p is th expected fractional polarisation, el is the elvation in
-*     radians, (A,B,C,D) are the numerical parameters of the model).
+*        p = A + B*el + C*el*el
+*        Qf = p*cos( -2*( el - D ) )
+*        Uf = p*sin( -2*( el - D ) )
 *
-*     This gives the expected instrumental Q and U values, which are then
-*     rotated to use the same reference direction as the Q/U bolometer values.
-*     The rotated corrections are then subtracted off the extinction-corrected
+*        (p is the expected fractional polarisation, el is the elevation
+*        in radians, (A,B,C,D) are the numerical parameters of the model).
+*
+*     - the "APR2019" (April 2019) model:
+*
+*        Qf = A + B*cos( -2*( el - C ) ) + D*cos( -2*( el - E ) )
+*        Uf = F + B*sin( -2*( el - C ) ) + D*sin( -2*( el - E ) )
+*
+*        (el is the elevation in radians, (A,B,C,D,E,F) are the numerical
+*        parameters of the model).
+*
+*     The model to use is specified by the "ipmodel" config parameter.
+*
+*     The selected model gives the expected instrumental Q and U values, which
+*     are then rotated to use the same reference direction as the Q/U bolometer
+*     values. The rotated corrections are then subtracted off the extinction-corrected
 *     bolometer data (the extinction correction is removed before returning).
 
 *  Authors:
@@ -103,6 +115,9 @@
 *     20-MAR-2019 (DSB):
 *        Allow user to modifty the IP angle using the new config parameter
 *        IPANGOFF.
+*     18-APR-2019 (DSB):
+*        Implement Pierre's two component IP model ("APR2019"), and add
+*        "ipmodel" config parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -130,6 +145,9 @@
 *-
 */
 
+/* System includes */
+#include <strings.h>
+
 /* Starlink includes */
 #include "ast.h"
 #include "mers.h"
@@ -141,6 +159,10 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_typ.h"
 #include "libsmf/smf_err.h"
+
+/* Local constants */
+#define JAN2018 0
+#define APR2019 1
 
 /* Prototypes for local static functions. */
 static void smf1_subip( void *job_data_ptr, int *status );
@@ -170,6 +192,7 @@ typedef struct smfSubIPData {
    double degfac;
    double ipoffset;
    int *lut_data;
+   int ipmodel;
    int oper;
    size_t bstride;
    size_t tstride;
@@ -202,6 +225,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    double ipangoff;
    double ipoffset;
    int imapndf;
+   int ipmodel;
    int iw;
    int nw;
    int polref;
@@ -215,14 +239,24 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    smf_qual_t *qua_data;
    smf_subinst_t waveband;
 
-/* IP model parameters. See report "IP model without the wind blind"
-   (written January 2018) in section "Data Reduction and Analysis" of
-   the POL2 commissioning wiki. */
+/* IP model parameters.
+   -------------------- */
+
+/* "JAN2018": See report "IP model without the wind blind" (written
+   January 2018) in section "Data Reduction and Analysis" of the POL2
+   commissioning wiki. */
    double model1[] = { 5.520E-3, -3.649E-4,  1.316E-3, -8.544E-2 }; /* No wind blind */
    double model2[] = { 6.188E-3,  3.650E-2, -1.978E-2, -3.240E-2 }; /* 850 um with wind blind */
    double model3[] = { 1.190E-2,  1.835E-2, -1.374E-2,  1.486 };    /* 450 um with wind blind */
 
+/* "APR02019": See email from Pierre, sent to DSB and PF on 15th April
+   2019 - subject "850 IP model". Note, this model only covers 850 data
+   at the moment. */
+   double model4[] = { -0.47146E-2, 0.57117E-2, 0.24078,        0.0, -2.7784E-2, 0.0 }; /* No wind blind */
+   double model5[] = { -0.47146E-2, 0.57117E-2, 0.24078, 1.34820E-2, -2.7784E-2, 0.0 }; /* 850 um with wind blind */
+   double *model6 = NULL;                                                         /* 450 um with wind blind */
 
+/* Initialise */
    *qui = VAL__BADI;
 
 /* Check inherited status */
@@ -334,6 +368,21 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    user to experiment with the effects of changing the IP angle a bit. */
       astMapGet0D( keymap, "IPANGOFF", &ipangoff );
 
+/* See which IP model to use. */
+      cpntr = NULL;
+      astMapGet0C( keymap, "IPMODEL", &cpntr );
+      if( cpntr ){
+         if( !strcasecmp( "APR2019", cpntr ) ) {
+            ipmodel = APR2019;
+         } else if( !strcasecmp( "JAN2018", cpntr ) ) {
+            ipmodel = JAN2018;
+         } else if( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRepf( " ", "smf_subip: Unknown IPMODEL specified: '%s'.",
+                     status, cpntr );
+         }
+      }
+
 /* Convert from degrees to to radians. */
       ipangoff *= AST__DD2R;
 
@@ -384,8 +433,8 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
 
 /* Tell the user what's happening. */
       msgOutf( "", "smf_subip: applying instrumental polarisation %s "
-               "correction based on total intensity map `%s'.",
-               status, qu, ipref );
+               "correction based on total intensity map `%s' (model %s).",
+               status, qu, ipref, (ipmodel==APR2019)?"APR2019":"JAN2018" );
 
 /* Create structures used to pass information to the worker threads. */
       nw = wf ? wf->nworker : 1;
@@ -413,26 +462,33 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
          smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, &bstride,
                        &tstride, status );
 
-/* Choose the parameter values to use for the IP model.... See report
-   "IP model without the wind blind" (written January 2018)  in section
-   "Data Reduction and Analysis" of the POL2 commissioning wiki...
-
-   If the data was taken without the wind blind in place, the model is the
-   same at 450 and 850. */
+/* Choose the parameter values to use for the IP model. If the data was
+   taken without the wind blind in place, the model is the same at 450 and
+   850. */
          if( !windblind ) {
-            ippars = model1;
+            ippars = ( ipmodel == JAN2018 ) ? model1 : model4;
 
 /* If the wind blind was in place, the model is differemt at 450 and 850. */
          } else if( waveband == SMF__SUBINST_850 ) {
-            ippars = model2;
+            ippars = ( ipmodel == JAN2018 ) ? model2 : model5;
          } else {
-            ippars = model3;
+            ippars = ( ipmodel == JAN2018 ) ? model3 : model6;
+         }
+
+         if( !ippars && *status == SAI__OK ) {
+            errRepf( " ", "smf_subip: The requested IP model is not yet "
+                     "available for the required waveband.", status );
          }
 
 /* Modify the elevation at which the IP is parallel to the focal plane Y axis
    (i.e. Qip is non-zero and Uip is zero) by adding on the user-specified
    offset. */
-         ippars[ 3 ] += ipangoff;
+         if( ipmodel == JAN2018 ) {
+            ippars[ 3 ] += ipangoff;
+         } else {
+            ippars[ 2 ] += ipangoff;
+            ippars[ 4 ] += ipangoff;
+         }
 
 /* The above IP parameters were determined using total intensity maps
    made from POL2 observations. So if the supplied IP reference map was
@@ -472,6 +528,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
             pdata->imapdata = imapdata;
             pdata->qu = qu;
             pdata->ippars = ippars;
+            pdata->ipmodel = ipmodel;
             pdata->allstate = data->hdr->allState;
             pdata->oper = 1;
             pdata->degfac = degfac;
@@ -541,6 +598,8 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    double cb;
    double cc;
    double cd;
+   double ce;
+   double cf;
    double cosval;
    double degfac;
    double ipoffset;
@@ -594,12 +653,24 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
          if( !( *pq & SMF__Q_BADB ) ) {
 
 /* Get the IP model parameters for this bolometer. */
-            ca = pdata->ippars[0];
-            cb = pdata->ippars[1];
-            cc = pdata->ippars[2];
-            cd = pdata->ippars[3];
-            bad = ( ca == VAL__BADD || cb == VAL__BADD ||
-                    cc == VAL__BADD || cd == VAL__BADD );
+            if( pdata->ipmodel == JAN2018 ) {
+               ca = pdata->ippars[0];
+               cb = pdata->ippars[1];
+               cc = pdata->ippars[2];
+               cd = pdata->ippars[3];
+               bad = ( ca == VAL__BADD || cb == VAL__BADD ||
+                       cc == VAL__BADD || cd == VAL__BADD );
+            } else {
+               ca = pdata->ippars[0];
+               cb = pdata->ippars[1];
+               cc = pdata->ippars[2];
+               cd = pdata->ippars[3];
+               ce = pdata->ippars[4];
+               cf = pdata->ippars[5];
+               bad = ( ca == VAL__BADD || cb == VAL__BADD ||
+                       cc == VAL__BADD || cd == VAL__BADD ||
+                       ce == VAL__BADD || cf == VAL__BADD );
+            }
 
 /* If any parameter is bad, flag the whole bolometer as unusable. */
             if( bad ) {
@@ -642,11 +713,20 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
 
 /* Find the normalised instrumental Q and U. These are with respect to the
    focal plane Y axis. */
-                        p1 = ca + cb*state->tcs_az_ac2 + cc*state->tcs_az_ac2*state->tcs_az_ac2;
-                        p1 += ipoffset;
-                        angle = -2*( state->tcs_az_ac2 - cd );
-                        qfp = p1*cos( angle );
-                        ufp = p1*sin( angle );
+                        if( pdata->ipmodel == JAN2018 ) {
+                           p1 = ca + cb*state->tcs_az_ac2 + cc*state->tcs_az_ac2*state->tcs_az_ac2;
+                           p1 += ipoffset;
+                           angle = -2*( state->tcs_az_ac2 - cd );
+                           qfp = p1*cos( angle );
+                           ufp = p1*sin( angle );
+                        } else {
+                           angle = -2*( state->tcs_az_ac2 - cc );
+                           qfp = ca + cb*cos( angle );
+                           ufp = cf + cb*sin( angle );
+                           angle = -2*( state->tcs_az_ac2 - ce );
+                           qfp += cd*cos( angle );
+                           ufp += cd*sin( angle );
+                        }
 
 /* Rotate them to match the reference frame of the supplied Q and U
    values (unless the supplied Q and U values are w.r.t focal plane Y,
@@ -660,7 +740,6 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
                            qtr = qfp;
                            utr = ufp;
                         }
-
 
 /* Correct the residual Q or U value. If the total intensity was derived from
    a non-POL2 observation we need to correct the total intensity for the

@@ -2004,6 +2004,26 @@ importsky = 0
 ipangoff = 0.0
 
 #-----------------------------------------------------------------
+#  Name: 	ipmodel
+#  Type: 	string
+#  Default: 	JAN2018
+#  Purpose: 	Specify the Instrumental Polarisation model to use.
+#  Description: This parameter is only used when processing POL2 Q or U
+#               time-streams as created by SMURF:CALCQU, and if a value
+#               is supplied for ADAM parameter IPREF. It specifies the
+#               IP model to be used. Currently the following models are
+#               available:
+#
+#               - "JAN2018": See report "IP model without the wind blind"
+#               (written January 2018) in section "Data Reduction and
+#               Analysis" of the POL2 commissioning wiki.
+#
+#               - "APR2019": See email from Pierre, sent to DSB and PF on
+#               15th April 2019 - subject "850 IP model". Note, this model
+#               only covers 850 data at the moment.
+ipmodel = JAN2018
+
+#-----------------------------------------------------------------
 #  Name: 	ipoffset
 #  Type: 	float
 #  Default: 	0.0
