@@ -52,10 +52,10 @@
 #  COM/GAI.
 modelorder = (com,gai,pca,ext,flt,ast,noi)
 
-#  Because of the lower noise levels produced by using a PCA model, we
-#  can extend the AST mask down a bit to lower levels.
-ast.zero_snr = 2
-ast.zero_snrlo = 1
+#  Using PCA seems to get rid of a lot of the "blooms" sometimes seen in
+#  maps done without PCA. It seems this allows us to extend the AST mask
+#  a bit down to lower SNR levels without problems.
+ast.zero_snrlo = 1.5
 
 #  This is the main parameter controlling the PCA process. If negative,
 #  its absolute value gives the number of components to remove. For
@@ -92,4 +92,10 @@ pca.zero_freeze = 0.5
 #  different on each iteration.
 fillgaps_noise = 0
 
+#  Mask the FLT model on all iterations (except the last). This helps to
+#  prevent blooms. The above setting of "sillgaps_noise" means that this
+#  does not adversely affect convergence. The mask is frozen when the
+#  normalised map change reached 0.5.
+flt.zero_niter = 0
+flt.zero_freeze = 0.5
 
