@@ -170,6 +170,8 @@
 *     16-OCT-2012 (DSB):
 *        For any additional WCS Frames that are present in the input NDF
 *        but not in the reference NDF, add the Frame to the output NDF.
+*     24-APR-2019 (DSB):
+*        Correct bug determining the bounds of axes that span a single pixel.
 *     {enter_further_changes_here}
 
 *-
@@ -352,10 +354,31 @@
 *  span only one pixel.
                ELSE
                   OUTPRM( I ) = I
-                  LBND2( I ) = NINT( PLBND2( I ) ) + 1
-                  UBND2( I ) = NINT( PUBND2( I ) )
-                  IF( UBND2( I ) .LT. LBND2( I ) )
-     :                UBND2( I ) = LBND2( I )
+
+*  Find the pixel indices that contains the lower and upper bounds (the
+*  Fortran INT function rounds towards zero).
+                  IF( PLBND2( I ) .GT. 0.0 ) THEN
+                     LBND2( I ) = INT( PLBND2( I ) ) + 1
+                  ELSE
+                     LBND2( I ) = INT( PLBND2( I ) )
+                  END IF
+
+                  IF( PUBND2( I ) .GT. 0.0 ) THEN
+                     UBND2( I ) = INT( PUBND2( I ) ) + 1
+                  ELSE
+                     UBND2( I ) = INT( PUBND2( I ) )
+                  END IF
+
+*  If both bounds are in the same pixel, the axis spans only one pixel so
+*  accept the above bopunds. Otherwise, change the bounds so that at
+*  least half of each bounding pixel is inside the output. This is mainly
+*  for compatibility with previous versions of wcsalign.
+                  IF( LBND2( I ) .LT. UBND2( I ) ) THEN
+                     LBND2( I ) = NINT( PLBND2( I ) ) + 1
+                     UBND2( I ) = NINT( PUBND2( I ) )
+                     IF( UBND2( I ) .LT. LBND2( I ) )
+     :                   UBND2( I ) = LBND2( I )
+                  END IF
                END IF
 
 *  Convert to pixel index bounds.
