@@ -103,6 +103,12 @@
 *     real date and time will be used. This facility is intended to allow
 *     regression testing, where any change in the date/time within history
 *     records could cause a test to fail.
+*     - 'FIXSW': If FIXSW is set to 1, the path section of the software
+*     field stored in any new History records will be fixed at a blank
+*     string regardless of the current time. If 0, the real path will be
+*     retained. This facility is intended to allow regression testing,
+*     where any change in the software path within history records could
+*     cause a test to fail.
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
@@ -150,6 +156,8 @@
 *        Add the SECMAX tuning parameter.
 *     10-AUG-2018 (DSB):
 *        Add the FIXDT tuning parameter.
+*     24-APR-2019 (DSB):
+*        Add the FIXSW tuning parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -189,6 +197,8 @@
 *           extensions and their associated default propagation flags.
 *        TCB_FIXDT = LOGICAL (Write)
 *           Use a fixed date and time within new History records?
+*        TCB_FIXSW = LOGICAL (Write)
+*           Use a blank path for the software field within new History records?
 
 *  Arguments Given:
       INTEGER VALUE
@@ -339,6 +349,26 @@
                CALL ERR_REP( 'NDF_TUNE_FXDT',
      : 'The value ^VALUE is not valid for the tuning parameter ' //
      : 'FIXDT; it should be 0 or 1 (possible programming error).',
+     :                       STATUS )
+            END IF
+
+*  Use a blank path for the software field within new History records.
+*  ===================================================================
+*  If FIXSW was specified, then set the "use blank software path" flag
+*  appropriately.
+         ELSE IF ( NDF1_SIMLR( TPAR, 'FIXSW', NDF__MINAB ) ) THEN
+            IF ( VALUE .EQ. 0 ) THEN
+               TCB_FIXSW = .FALSE.
+            ELSE IF ( VALUE .EQ. 1 ) THEN
+               TCB_FIXSW = .TRUE.
+
+*  If the value supplied is not valid, then report an error.
+            ELSE
+               STATUS = NDF__TPVIN
+               CALL MSG_SETI( 'VALUE', VALUE )
+               CALL ERR_REP( 'NDF_TUNE_FXDT',
+     : 'The value ^VALUE is not valid for the tuning parameter ' //
+     : 'FIXSW; it should be 0 or 1 (possible programming error).',
      :                       STATUS )
             END IF
 

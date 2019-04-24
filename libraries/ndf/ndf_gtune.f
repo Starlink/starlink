@@ -76,6 +76,8 @@
 *        Add the SECMAX tuning parameter.
 *     10-AUG-2018 (DSB):
 *        Add the FIXDT tuning parameter.
+*     24-APR-2019 (DSB):
+*        Add the FIXSW tuning parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -115,6 +117,8 @@
 *           extensions and their associated default propagation flags.
 *        TCB_FIXDT = LOGICAL (Read)
 *           Use a fixed date and time in history records.
+*        TCB_FIXSW = LOGICAL (Read)
+*           Use a blank path for the software field in history records.
 
 *  Arguments Given:
       CHARACTER * ( * ) TPAR
@@ -209,6 +213,16 @@
 *  If FIXDT was specified, then return the fixed history date/time flag value.
          ELSE IF ( NDF1_SIMLR( TPAR, 'FIXDT', NDF__MINAB ) ) THEN
             IF ( TCB_FIXDT ) THEN
+               VALUE = 1
+            ELSE
+               VALUE = 0
+            END IF
+
+*  Fix History software path flag.
+*  ===============================
+*  If FIXSW was specified, then return the fixed software path flag value.
+         ELSE IF ( NDF1_SIMLR( TPAR, 'FIXSW', NDF__MINAB ) ) THEN
+            IF ( TCB_FIXSW ) THEN
                VALUE = 1
             ELSE
                VALUE = 0

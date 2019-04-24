@@ -72,6 +72,8 @@
 *        Add initialisation of TCB_SECMAX
 *     10-AUG-2018 (DSB):
 *        Add initialisation of TCB_FIXDT
+*     24-APR-2019 (DSB):
+*        Add initialisation of TCB_FIXSW
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -235,6 +237,15 @@
          CALL NDF1_RDTUN( 'NDF_FIXDT', 0, IVAL, STATUS )
          IF ( STATUS .EQ. SAI__OK ) THEN
             TCB_FIXDT = ( IVAL .EQ. 1 )
+         END IF
+
+*  Fix the software path stored in history records?
+*  ====================================================
+*  Read the warning message flag value from its environment variable
+*  (if present) and set the TCB flag accordingly.
+         CALL NDF1_RDTUN( 'NDF_FIXSW', 0, IVAL, STATUS )
+         IF ( STATUS .EQ. SAI__OK ) THEN
+            TCB_FIXSW = ( IVAL .EQ. 1 )
          END IF
 
 *  Note when the first successful invocation of this routine has

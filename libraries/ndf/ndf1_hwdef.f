@@ -83,6 +83,10 @@
 *        Split verbose mode history text into two lines.
 *     16-OCT-2009 (DSB):
 *        Raise an NDF event after the default history has been written.
+*     24-APR-2019 (DSB):
+*        If tuning parameter FIXSW is defined, remove the path from the
+*        software file name. This is to make it easier to compare NDFs
+*        compared using different versions of the software.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -117,6 +121,11 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  Global Variables:
+      INCLUDE 'NDF_TCB'          ! NDF_ Tuning Control Block
+*        TCB_FIXSW = LOGICAL (Read)
+*           Use a blank path for the software?
+
 *  Local Variables:
       CHARACTER * ( 1 ) NODE     ! Node name (junk)
       CHARACTER * ( 64 ) MACH    ! Machine name
@@ -125,6 +134,7 @@
       CHARACTER * ( 64 ) VERS    ! System version number
       CHARACTER * ( NDF__SZFIL ) FILE ! Executing file name
       CHARACTER * ( NDF__SZHIS ) TEXT( 2 ) ! History text buffer
+      INTEGER IAT                ! Position of final "/"
       INTEGER LFILE              ! Length of file name
       INTEGER NLINES             ! Number of lines of text to write
 
@@ -166,6 +176,17 @@
                IF ( LFILE .EQ. 0 ) THEN
                   LFILE = 9
                   FILE( : LFILE ) = '<unknown>'
+
+*  If the FIXSW tuning flag indicates that we are to use a blank path for
+*  the software, remove the path. This is intended to facilitate regression
+*  testing, where you may want to compare results from two versions of the
+*  software installed in different places.
+               ELSE IF( TCB_FIXSW ) THEN
+                  CALL CHR_LASTO( FILE, '/', IAT )
+                  IF( IAT .GT. 0 ) THEN
+                     FILE( : IAT ) = ' '
+                     CALL CHR_LDBLK( FILE )
+                  END IF
                END IF
 
 *  Define message tokens for these values.

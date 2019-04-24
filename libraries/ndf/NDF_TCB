@@ -61,6 +61,8 @@
 *        Added TCB_SECMAX.
 *     10-AUG-2018 (DSB):
 *        Added TCB_FIXDT.
+*     24-APR-2019 (DSB):
+*        Added TCB_FIXSW.
 *     {enter_further_changes_here}
 
 *-
@@ -169,13 +171,23 @@
 *  difference in date/time in history records could cause a test to fail.
       LOGICAL TCB_FIXDT
 
+*  Fix the software path stored in history records?
+*  ================================================
+*  If .TRUE., the path section of the software string stored in any
+*  new History records will be fixed at a blank value regardless of
+*  the original path. If .FALSE., the real path will be retained.
+*  This facility is intended to facilitate regression testing, where the
+*  difference in software path within history records could cause a test
+*  to fail.
+      LOGICAL TCB_FIXSW
+
 *  Common blocks:
 *  =============
 
 *  Non-character data.
       COMMON /NDF1_TCB1/ TCB_DOCVT, TCB_ETFLG, TCB_FNFMT, TCB_KEEP,
      :                   TCB_SHCVT, TCB_WARN, TCB_PXT, TCB_AUTOHISTORY,
-     :                   TCB_SECMAX, TCB_FIXDT
+     :                   TCB_SECMAX, TCB_FIXDT, TCB_FIXSW
 
 *  Save common block contents.
       SAVE /NDF1_TCB1/
