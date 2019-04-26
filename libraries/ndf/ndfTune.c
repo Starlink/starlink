@@ -110,6 +110,12 @@ void ndfTune_( int value, const char *tpar, int *status ){
 *     real date and time will be used. This facility is intended to allow
 *     regression testing, where any change in the date/time within history
 *     records could cause a test to fail.
+*     - 'FIXSW': If FIXSW is set to 1, the path section of the software
+*     field stored in any new History records will be fixed at a blank
+*     string regardless of the current time. If 0, the real path will be
+*     retained. This facility is intended to allow regression testing,
+*     where any change in the software path within history records could
+*     cause a test to fail.
 
 *  Copyright:
 *     Copyright (C) 2018 East Asian Observatory
@@ -138,6 +144,8 @@ void ndfTune_( int value, const char *tpar, int *status ){
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     26-APR-2019 (DSB):
+*        Add the FIXSW tuning parameter.
 
 *-
 */
@@ -311,7 +319,7 @@ void ndfTune_( int value, const char *tpar, int *status ){
                     "(possible programming error).", status );
          }
 
-/* Use a fixed date/time wqithin new History records.
+/* Use a fixed date/time within new History records.
    =================================================
    If FIXDT was specified, then set the "use fixed history date/time" flag
    appropriately. */
@@ -327,6 +335,25 @@ void ndfTune_( int value, const char *tpar, int *status ){
             msgSeti( "VALUE", value );
             errRep( " ", "The value ^VALUE is not valid for the tuning "
                     "parameter FIXDT; it should be 0 or 1 (possible "
+                    "programming error).", status );
+         }
+
+/* Use a blank software path within new History records.
+   =====================================================
+   If FIXSW was specified, then set the "use blank software path" flag
+   appropriately. */
+      } else if( ndf1Simlr( tpar, 1, 0, "FIXSW", NDF__MINAB ) ) {
+         if( value == 0 ) {
+            Ndf_TCB_fixsw = 0;
+         } else if( value == 1 ) {
+            Ndf_TCB_fixsw = 1;
+
+/* If the value supplied is not valid, then report an error. */
+         } else {
+            *status = NDF__TPVIN;
+            msgSeti( "VALUE", value );
+            errRep( " ", "The value ^VALUE is not valid for the tuning "
+                    "parameter FIXSW; it should be 0 or 1 (possible "
                     "programming error).", status );
          }
 

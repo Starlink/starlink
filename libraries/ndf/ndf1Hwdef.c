@@ -71,6 +71,10 @@ void ndf1Hwdef( NdfDCB *dcb, const char *appn, int *status ){
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     26-APR-2019 (DSB):
+*        If tuning parameter FIXSW is defined, remove the path from the
+*        software file name. This is to make it easier to compare NDFs
+*        compared using different versions of the software.
 
 *-
 */
@@ -111,6 +115,18 @@ void ndf1Hwdef( NdfDCB *dcb, const char *appn, int *status ){
             ndf1Gtfil( file, sizeof( file ), status );
             if( file[ 0 ] == 0 ) {
                star_strlcpy( file, "<unknown>", sizeof( file ) );
+
+/* If the FIXSW tuning flag indicates that we are to use a blank path for
+   the software, remove the path. This is intended to facilitate regression
+   testing, where you may want to compare results from two versions of the
+   software installed in different places. */
+            } else if( Ndf_TCB_fixsw ) {
+               const char *last = strrchr( file, '/' );
+               if( last ) {
+                  last++;
+                  char *p = file;
+                  while( ( *(p++) = *(last++) ) );
+               }
             }
             if( dcb->humod == NDF__HVERB ) ndf1Uname( &info, status );
 

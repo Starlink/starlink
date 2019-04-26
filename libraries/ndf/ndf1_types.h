@@ -1266,25 +1266,9 @@ extern int Ndf_TCB_forin;
 /* Fix the date/time strings stored in history records?: */
 extern int Ndf_TCB_fixdt;
 
-
-
-
-
-
-
-
-
-
-
-
-
+/* Blank out the path in the software strings stored in history records?: */
+extern int Ndf_TCB_fixsw;
 
 #endif
-
-
-
-
-
-
 
 

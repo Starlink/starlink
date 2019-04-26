@@ -58,6 +58,8 @@ void ndf1Intcb( int *status ){
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
 *        Support for VMS has been removed.
+*     26-APR-2019 (DSB):
+*        Add FIXSW.
 
 *-
 */
@@ -78,6 +80,7 @@ void ndf1Intcb( int *status ){
    Ndf_TCB_forout = 0;
    Ndf_TCB_forin = 0;
    Ndf_TCB_fixdt = 0;
+   Ndf_TCB_fixsw = 0;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
@@ -156,6 +159,10 @@ void ndf1Intcb( int *status ){
    ndf1Rdtun( "NDF_FIXDT", 0, &ival, status );
    if( *status == SAI__OK ) Ndf_TCB_fixdt = ( ival == 1 );
 
+/* Fix the software path stored in history records?
+*  ==================================================== */
+   ndf1Rdtun( "NDF_FIXSW", 0, &ival, status );
+   if( *status == SAI__OK ) Ndf_TCB_fixsw = ( ival == 1 );
 
 
 /* Exit the function (note we do not call the ndf1Trace error tracing

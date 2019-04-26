@@ -66,6 +66,8 @@ void ndfGtune_( const char *tpar, int *value, int *status ){
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     26-APR-2019 (DSB):
+*        Add the FIXSW tuning parameter.
 
 *-
 */
@@ -185,9 +187,14 @@ void ndfGtune_( const char *tpar, int *value, int *status ){
          *value = Ndf_TCB_secmax;
 
 /* Fix the date/time strings stored in history records.
-   ========================== */
+   =================================================== */
       } else if( ndf1Simlr( tpar, 1, 0, "FIXDT", NDF__MINAB ) ) {
          *value = Ndf_TCB_fixdt;
+
+/* Fix the software strings stored in history records.
+   ================================================== */
+      } else if( ndf1Simlr( tpar, 1, 0, "FIXSW", NDF__MINAB ) ) {
+         *value = Ndf_TCB_fixsw;
 
 /* Unknown tuning parameter.
    ========================

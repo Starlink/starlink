@@ -47,6 +47,8 @@
 *  History:
 *     31-MAY-2018 (DSB):
 *        Original version.
+*     26-APR-2019 (DSB):
+*        Add Ndf_TCB_fixsw.
 
 *-
 */
@@ -192,6 +194,7 @@ int Ndf_TCB_secmax;
 int Ndf_TCB_forout;
 int Ndf_TCB_forin;
 int Ndf_TCB_fixdt;
+int Ndf_TCB_fixsw;
 
 
 
