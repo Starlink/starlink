@@ -668,6 +668,7 @@ try:
       fd.write("maptol_hits = 1\n")
 
       fd.write("pca.pcathresh = -150\n")
+      fd.write("pca.noiselim = 0\n")
       fd.write("ast.mapspike_freeze = 5\n")
       fd.write("pca.zero_niter = 0.2\n")
       fd.write("com.zero_niter = 0.2\n")

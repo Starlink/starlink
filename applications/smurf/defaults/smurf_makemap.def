@@ -3113,6 +3113,13 @@ pca.samplim = 0.8
 #               unlike other bolometers). In such cases one of the PCA components
 #               will be nearly identical to the bolometer, and so leave no
 #               significant residuals after subtraction of hte PCA model.
+#               Note, this parameter should normally be set to zero if
+#               the PCA model occurs before the COM model within pareameter
+#               "modelorder". This is because the PCA model will then
+#               remove the typically huge common mode, resulting in an
+#               apparent huge fall in noise in all bolometers. This would
+#               cause all bolometers to be rejected if the default value
+#               is used for pca.noiselim.
 pca.noiselim = 0.1
 
 #-----------------------------------------------------------------
