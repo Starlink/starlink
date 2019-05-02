@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -36,6 +37,8 @@ int main(){
    char type[DAT__SZTYP+1];
    char sctype[DAT__SZTYP+1];
    char text[200];
+   char *path1;
+   char *path2;
    double *dpntr;
    double *drpntr;
    double *dipntr;
@@ -94,13 +97,18 @@ int main(){
 
    aryFind( loc, "data_array", &ary, status );
    aryMsg( "A", ary );
+   msgLoad( " ", "^A", text, sizeof(text), &oplen, status );
+   path1 = realpath( text, NULL );  /* Expand sym links etc */
 
    sprintf( buf, "%s/%s", getenv("PWD"), "./test_array.DATA_ARRAY" );
-   msgLoad( " ", "^A", text, sizeof(text), &oplen, status );
-   if( *status == SAI__OK && strcmp( text, buf ) ) {
+   path2 = realpath( buf, NULL );
+
+   if( *status == SAI__OK && path1 && path2 && strcmp( path1, path2 ) ) {
       *status = SAI__ERROR;
-      errRepf( " ", "Error 1a (%s)", status, text );
+      errRepf( " ", "Error 1a ('%s' != '%s')", status, path1, path2 );
    }
+   if( path1 ) free( path1 );
+   if( path2 ) free( path2 );
 
    datFind( loc, "data_array", &loc2, status );
    aryImprt( loc2, &ary2, status );
