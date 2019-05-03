@@ -81,12 +81,14 @@ void CGEN_FUNCTION( ndf1Qma )( int el, const unsigned char qual[],
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     3-MAY-2019 (DSB):
+*        Change element index from int to hdsdim.
 
 *-
 */
 
 /* Local Variables: */
-   int i;                /* Loop counter for array elements */
+   hdsdim i;                /* Loop counter for array elements */
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

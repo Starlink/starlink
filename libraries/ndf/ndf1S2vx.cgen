@@ -59,13 +59,15 @@ void CGEN_FUNCTION( ndf1S2v )( int bad, size_t el, CGEN_TYPE array[],
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     3-MAY-2019 (DSB):
+*        Change array index from size_t to hdsdim.
 
 *-
 */
 
 /* Local Variables: */
    CGEN_TYPE errval;        /* Value causing last error */
-   size_t i;                /* Loop counter for array elements */
+   hdsdim i;                /* Loop counter for array elements */
    size_t nneg;             /* Number negative standard deviations */
 
 /* Check inherited global status. */
