@@ -17,6 +17,16 @@ void cmpGet0D( HDSLoc *struc, const char *comp, double *value, int *status );
 void cmpGet0I( HDSLoc *struc, const char *comp, int *value, int *status );
 void cmpGet0L( HDSLoc *struc, const char *comp, int *value, int *status );
 void cmpGet0R( HDSLoc *struc, const char *comp, float *value, int *status );
+void cmpGet1C( HDSLoc *struc, const char *comp, size_t maxval, size_t bufsize, char *buffer, char *pntrs[], size_t *actval, int *status );
+void cmpGet1D( HDSLoc *struc, const char *comp, size_t maxval, double values[], size_t *actval, int *status );
+void cmpGet1I( HDSLoc *struc, const char *comp, size_t maxval, int values[], size_t *actval, int *status );
+void cmpGet1L( HDSLoc *struc, const char *comp, size_t maxval, int values[], size_t *actval, int *status );
+void cmpGet1R( HDSLoc *struc, const char *comp, size_t maxval, float values[], size_t *actval, int *status );
+void cmpGetVC( HDSLoc *struc, const char *comp, size_t maxval, size_t bufsize, char *buffer, char *pntrs[], size_t *actval, int *status);
+void cmpGetVD( HDSLoc *struc, const char *comp, size_t maxval, double values[], size_t *actval, int *status );
+void cmpGetVI( HDSLoc *struc, const char *comp, size_t maxval, int values[], size_t *actval, int *status );
+void cmpGetVL( HDSLoc *struc, const char *comp, size_t maxval, int values[], size_t *actval, int *status );
+void cmpGetVR( HDSLoc *struc, const char *comp, size_t maxval, float values[], size_t *actval, int *status );
 void cmpType( HDSLoc *struc, const char *comp, char type[DAT__SZTYP+1], int *status );
 
 /* STAR_CMP_H_INCLUDED */
