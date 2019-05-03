@@ -580,11 +580,11 @@
 *        pixel positions are the only thing used from the REF map), so
 *        there is now no need to ensure that the REF map is in units of pW.
 *    28-MAR-2019 (DSB):
-*        - If an output catalogue is being created, but no output I map has been 
-*        requested, use any supplied IPREF map in favour of creating a new I map. 
+*        - If an output catalogue is being created, but no output I map has been
+*        requested, use any supplied IPREF map in favour of creating a new I map.
 *        - If we are processing I data with makemap (i.e. "step 1"), and no ref
-*        map was given, then use the I map created from the first observation as 
-*        the ref map for the remaining observations. This ensures that all the 
+*        map was given, then use the I map created from the first observation as
+*        the ref map for the remaining observations. This ensures that all the
 *        auto-masked I maps are aligned with each other.
 
 '''
@@ -2650,8 +2650,8 @@ try:
 
 #  If skyloop was used above, the coadd will already exist. First deal
 #  with cases where skyloop was not used.
+      allmaps = NDG( list( qui_maps.values() ) )
       if not skyloop:
-         allmaps = NDG( list( qui_maps.values() ) )
 
 #  If we have only one observation just copy it to the output maps.
          if len(qui_maps) == 1:
@@ -2693,7 +2693,6 @@ try:
 #  variances derived from the dispersion of the individual observation maps
 #  created by skyloop.
       elif mapvar and make_new_maps:
-         allmaps = NDG( list( qui_maps.values() ) )
          msg_out("MAPVAR is YES, so forming new variances for {0} skyloop coadd:".format(qui))
          junk = NDG( 1 )
          invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
