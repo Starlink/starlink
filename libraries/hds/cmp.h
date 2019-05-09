@@ -3,6 +3,10 @@
 #define STAR_CMP_H_INCLUDED
 
 void cmpLen( HDSLoc *struc, const char *comp, size_t *len, int *status );
+void cmpMapN(HDSLoc* struc, const char *name, const char *type,
+             const char *mode, int ndim, void **pntr, hdsdim dims[], int *status);
+void cmpMapV(HDSLoc* struc, const char *name, const char *type,
+             const char *mode, void **pntr, size_t *actval, int *status);
 void cmpMod( HDSLoc *struc, const char *comp, const char *type,
              int ndim, const hdsdim *dims, int *status );
 void cmpModC( HDSLoc *struc, const char *comp, size_t len,
@@ -45,6 +49,7 @@ void cmpShape( HDSLoc *struc, const char *comp, int maxdim, hdsdim dims[], int *
 void cmpSize( HDSLoc *struc, const char *comp, size_t *size, int *status );
 void cmpStruc( HDSLoc *strucloc, const char *comp, hdsbool_t *struc, int *status );
 void cmpType( HDSLoc *struc, const char *comp, char type[DAT__SZTYP+1], int *status );
+void cmpUnmap(HDSLoc* struc, const char *name, int *status);
 
 /* STAR_CMP_H_INCLUDED */
 #endif

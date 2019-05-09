@@ -55,7 +55,7 @@ hdsTest_CFLAGS = $(AM_CFLAGS) -DHDS_INTERNAL_INCLUDES
 cincludedir = $(includedir)/star
 cinclude_HEADERS = $(PUBLIC_CINCLUDES)
 include_HEADERS = $(PUBLIC_INCLUDES)
-include_MESSAGES = CMP_ERR DAT_ERR dat_err.h
+include_MESSAGES = CMP_ERR cmp_err.h DAT_ERR dat_err.h
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
@@ -81,7 +81,7 @@ F_C_ROUTINES = hds_run.c fortran_interface.c
 BLOCK_DATA_FILES = cmp_blk.f
 
 CMP_C_ROUTINES = cmpGet0x.c cmpGet1x.c cmpGetVx.c \
-	cmpLen.c cmpMod.c cmpModC.c cmpPrim.c \
+	cmpLen.c cmpMap.c cmpMod.c cmpModC.c cmpPrim.c \
 	cmpPut0x.c cmpPut1x.c cmpPutVx.c \
 	cmpSize.c cmpShape.c cmpStruc.c cmpType.c
 
