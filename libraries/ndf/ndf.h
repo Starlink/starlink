@@ -953,6 +953,7 @@ void ndfXnew_v1( int indf,
 #define ndfValid  ndfValid_
 #define ndfXdel   ndfXdel_
 #define ndfXgt0c  ndfXgt0c_
+#define ndfXgt0l  ndfXgt0l_
 #define ndfXloc   ndfXloc_
 #define ndfXname  ndfXname_
 #define ndfXnumb  ndfXnumb_
