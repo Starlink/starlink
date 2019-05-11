@@ -19,8 +19,6 @@ Number::Interval
 Number::Range
 LWP::Protocol::https
 Astro::FITS::CFITSIO
-ExtUtils::F77
-Astro::SLA
 Astro::PAL
 Astro::Telescope
 Astro::Coords
