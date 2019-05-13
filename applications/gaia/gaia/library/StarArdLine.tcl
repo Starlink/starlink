@@ -142,7 +142,6 @@ itcl::class gaia::StarArdLine {
          append result "[expr $xupper+0.5] $yupper "
          append result "[expr $xlower+0.5] $ylower"
       }
-      puts "$result"
       return $result
    }
 

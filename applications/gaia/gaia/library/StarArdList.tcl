@@ -284,13 +284,11 @@ itcl::class gaia::StarArdList {
             if { [$objects_($i) is_selected] } {
                set desc [$objects_($i) getregion]
                if {$desc != {}} {
-                  puts "$desc [llength $desc]"
                   append regions [eval gaiautils::region $desc]
                }
             }
          }
       }
-      puts $regions
       if { $regions != {} } {
          #  Create the MOC.
          set moc [gaiautils::regionmoc $frameset $maxres $regions]
