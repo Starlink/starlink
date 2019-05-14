@@ -25,17 +25,32 @@
  corresponding FrameSet will be used (an error is reported if the ATOOLS
  command required an Object of a different class).
 
+ - as an STC-S description stored in a text file.
 
- Many of the ATOOLS commands create new AST Objects as output. These may be
- stored in the following ways:
+ - as a MOC stored in either string or JSON format in a text file.
 
- - If the name of an existing NDF is supplied for the parameter, the new
- AST Object will be stored in the NDF as a WCS FrameSet, replacing any
+
+ Many of the ATOOLS commands create new AST Objects as output. These will
+ be stored in one of the manners described below:
+
+ - If the name of an existing NDF is supplied for the output parameter, the
+ new AST Object will be stored in the NDF as a WCS FrameSet, replacing any
  existing WCS FrameSet. An error will be reported if the new AST Object
  is not suitable for being used as a WCS FrameSet.
 
- - Otherwise, a new text file is created with the given name containing a
- dump of the Object.
+ - Otherwise, a new text file is created with the given name containing
+ a textual representation of the the object. These will be created using
+ the format specified by value supplied for the FMT parameter when the
+ command was run. It can be any of the following strings (default
+ is "AST"):
+
+ - AST:      AST native format
+ - STCS:     STCS format
+ - MOC-JSON: MOC JSON format
+ - MOC:      MOC string format
+ - XML:      AST XML format
+ - FITS-xxx: FITS, using the specified encoding
+ - NATIVE:   FITS, using NATIVE encoding
 
 1 ASTSHOW
 
@@ -64,7 +79,7 @@ FrameSet. It allows you to:
    - Read a FrameSet from various sorts of file including text files,
    Starlink NDFs and FITS files.
 
-   -  See a graphical representation of the coordinate Frames contained in
+   - See a graphical representation of the coordinate Frames contained in
    the FrameSet and the Mappings that describe the transformations that
    connect them.
 

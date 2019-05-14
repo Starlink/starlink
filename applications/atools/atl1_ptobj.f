@@ -32,6 +32,8 @@
 *
 *        "AST:"      - AST_SHOW format (the default)
 *        "STCS:"     - STCS format
+*        "MOC-JSON:" - MOC JSON format
+*        "MOC"       - MOC "string" format
 *        "XML:"      - AST XML format
 *        "FITS-xxx:" - FITS, using the specified encoding
 *        "NATIVE:"   - FITS, using NATIVE encoding
@@ -68,6 +70,8 @@
 *        Allow output to be created in a variety of formats.
 *     10-DEC_2018 (DSB):
 *        Allow Moc's to be written out to FITS binary tables.
+*     9-MAY-2019 (DSB):
+*        Allow Moc's to be written out as text files.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -288,7 +292,8 @@
 *  Get the format to use.
          CALL PAR_CHOIC( 'FMT', 'AST', 'AST,STCS,XML,NATIVE,FITS-WCS,'//
      :                   'FITS-PC,FITS-IRAF,FITS-AIPS,FITS-AIPS++,'//
-     :                   'FITS-CLASS', .TRUE., FPARAM, STATUS )
+     :                   'FITS-CLASS,MOC,MOC-JSON', .TRUE., FPARAM,
+     :                   STATUS )
 
 *  Construct a string of the form "<fmt>:<param>".
          NC = CHR_LEN( FPARAM )

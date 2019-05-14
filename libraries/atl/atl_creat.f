@@ -26,6 +26,8 @@
 *
 *        "AST:"      - AST_SHOW format
 *        "STCS:"     - STCS format
+*        "MOC-JSON:" - MOC JSON format
+*        "MOC"       - MOC "string" format
 *        "XML:"      - AST XML format
 *        "FITS-xxx:" - FITS, using the specified encoding
 *        "NATIVE:"   - FITS, using NATIVE encoding
@@ -87,6 +89,8 @@
 *        - Rename env. variable from ATOOLS_CHANATTRS to ATOOLS_CHATT_OUT
 *        preparatory to allowing input channels to be configured using
 *        ATOOLS_CHATT_IN.
+*     9-MAY-2019 (DSB):
+*        Add support for MocChans.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -156,6 +160,14 @@
       ELSE IF( FMT .EQ. 'STCS' ) THEN
          CHAN = AST_STCSCHAN( AST_NULL, ATL_SNK, 'Indent=1,'//
      :                        'StcsLength=200 ', STATUS )
+
+      ELSE IF( FMT .EQ. 'MOC' ) THEN
+         CHAN = AST_MOCCHAN( AST_NULL, ATL_SNK, 'MocLineLen=200',
+     :                       STATUS )
+
+      ELSE IF( FMT .EQ. 'MOC-JSON' ) THEN
+         CHAN = AST_MOCCHAN( AST_NULL, ATL_SNK, 'MocLineLen=200,'//
+     :                       'MocFormat=JSON', STATUS )
 
       ELSE IF( FMT .EQ. 'XML' ) THEN
          CHAN = AST_XMLCHAN( AST_NULL, ATL_SNK, 'XmlLength=200',

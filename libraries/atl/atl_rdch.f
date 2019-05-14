@@ -238,11 +238,13 @@
       INTEGER STATUS
 
 *  Global Variables.
+      INTEGER F
       INTEGER IGRPC
+      INTEGER L
       INTEGER NEXT
       INTEGER SIZE
-      LOGICAL READCH
       LOGICAL BEGIN
+      LOGICAL READCH
       COMMON /ATLSRC/ IGRPC, NEXT, SIZE, READCH, BEGIN
 
 *  External References:
@@ -263,18 +265,20 @@
       ELSE
          CALL GRP_GET( IGRPC, NEXT, 1, BUF, STATUS )
 
-*  Remove leading spaces and get its used length.
-         CALL CHR_LDBLK( BUF )
-         BLEN = CHR_LEN( BUF )
+*  Get the idnices of the first and last non-blank characters, and
+*  its used length.
+         CALL CHR_FANDL( BUF, F, L )
+         BLEN = L
 
 *  If we have not yet read a "Begin " line, and the current line
 *  starts with "Begin ", indicate we have now read a "Begin " line
 *  and go on to see if it is a Channel of any class that is to be read.
-         IF( .NOT. BEGIN .AND. BUF( : 6 ) .EQ. 'Begin ' ) THEN
+         IF( .NOT. BEGIN .AND. BUF( F : F + 5 ) .EQ. 'Begin ' ) THEN
             BEGIN = .TRUE.
 
 *  Ensure "Begin" is followed by only a single space, and get the
 *  potentially modified length.
+            CALL CHR_LDBLK( BUF )
             CALL CHR_LDBLK( BUF( 7 : ) )
             BLEN = CHR_LEN( BUF )
 
@@ -296,6 +300,11 @@
             ELSE IF( BUF( 7 : 20 ) .EQ. 'StcsChan(Read)' ) THEN
                BUF = 'Begin StcsChan'
                BLEN = 14
+               READCH = .TRUE.
+
+            ELSE IF( BUF( 7 : 19 ) .EQ. 'MocChan(Read)' ) THEN
+               BUF = 'Begin MocChan'
+               BLEN = 13
                READCH = .TRUE.
 
             ELSE IF( BUF( 7 : 19 ) .EQ. 'XmlChan(Read)' ) THEN

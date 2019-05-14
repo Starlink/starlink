@@ -96,16 +96,16 @@ higher-level utility tasks.
       \sstitemlist{
 
          \sstitem
-         This routine is just a wrapper around the C function atlAddWcsAxis.
+          This routine is just a wrapper around the C function atlAddWcsAxis.
 
          \sstitem
-         The new axes are appended to the end of the existing axes, so the
+          The new axes are appended to the end of the existing axes, so the
          axis indices associated with the new axes will extend from \texttt{"} nold$+$1\texttt{"}
          to \texttt{"} nold$+$nnew\texttt{"} , where \texttt{"} nold\texttt{"}  is the number of axes in the original
          Frame, and \texttt{"} nnew\texttt{"}  is the number of new axes.
 
          \sstitem
-         An error will be reported if the Nout attribute of \texttt{"} map\texttt{"}  is
+          An error will be reported if the Nout attribute of \texttt{"} map\texttt{"}  is
          different to the Naxes attribute of \texttt{"} frm\texttt{"} .
       }
    }
@@ -270,10 +270,10 @@ higher-level utility tasks.
       \sstitemlist{
 
          \sstitem
-         This routine is just a wrapper around the C function atlChrSplitRE.
+          This routine is just a wrapper around the C function atlChrSplitRE.
 
          \sstitem
-         If a parenthesised sub-string in the regular expression is matched
+          If a parenthesised sub-string in the regular expression is matched
          by more than one sub-string within the test string, then only the
          first is returned. To return multiple matches, the regular
          expression should include multiple copies of the parenthesised
@@ -345,12 +345,16 @@ higher-level utility tasks.
 
          \texttt{"} AST:\texttt{"}       - AST\_SHOW format
          \texttt{"} STCS:\texttt{"}      - STCS format
+         \texttt{"} MOC-JSON:\texttt{"}  - MOC JSON format
+         \texttt{"} MOC\texttt{"}        - MOC \texttt{"} string\texttt{"}  format
          \texttt{"} XML:\texttt{"}       - AST XML format
          \texttt{"} FITS-xxx:\texttt{"}  - FITS, using the specified encoding
          \texttt{"} NATIVE:\texttt{"}    - FITS, using NATIVE encoding
 
          The default (i.e. used if the string does not contain a
-         colon) is \texttt{"} AST\texttt{"} .
+         colon) is \texttt{"} AST\texttt{"} . Attribute values for the Channel (of whatever
+         class) can be specified using the environment variable
+         ATOOLS\_CHATT\_OUT.
       }
       \sstsubsection{
          IAST = INTEGER (Given)
@@ -795,16 +799,16 @@ higher-level utility tasks.
       \sstitemlist{
 
          \sstitem
-         The contents of FC1 and FC2 are unchanged on exit.
+          The contents of FC1 and FC2 are unchanged on exit.
 
          \sstitem
-         For METHOD 3 (overlap), floating point values are compared
+          For METHOD 3 (overlap), floating point values are compared
          by formatting into a string (using the accuracy specified by the
          FitsDigits attributes of the two supplied FitsChans) and then
          comparing the formatted strings for exact equality.
 
          \sstitem
-         Method 4 exists to allow a new header to be appended whilst
+          Method 4 exists to allow a new header to be appended whilst
          retaining the primary order of the cards from the first header.
       }
    }
@@ -879,11 +883,11 @@ higher-level utility tasks.
       \sstitemlist{
 
          \sstitem
-         It is only possible to create the Mapping if the tabluated X values
+          It is only possible to create the Mapping if the tabluated X values
          are monotonic increasing or decreasing.
 
          \sstitem
-         The returned Mapping will have an inverse Transformation only if Y
+          The returned Mapping will have an inverse Transformation only if Y
          increases or decreases monotonically with X.
       }
    }
@@ -998,7 +1002,7 @@ higher-level utility tasks.
       \sstitemlist{
 
          \sstitem
-         This routine is not processed using GENERIC because the names of
+          This routine is not processed using GENERIC because the names of
          the required AST routines do not use standard data type codes.
       }
    }
@@ -1054,7 +1058,7 @@ higher-level utility tasks.
       \sstitemlist{
 
          \sstitem
-         This routine is not processed using GENERIC because the names of
+          This routine is not processed using GENERIC because the names of
          the required AST routines do not use standard data type codes.
       }
    }
@@ -1111,7 +1115,7 @@ higher-level utility tasks.
       \sstitemlist{
 
          \sstitem
-         This routine is not processed using GENERIC because the names of
+          This routine is not processed using GENERIC because the names of
          the required AST routines do not use standard data type codes.
       }
    }
@@ -1171,7 +1175,7 @@ higher-level utility tasks.
       \sstitemlist{
 
          \sstitem
-         This routine is not processed using GENERIC because the names of
+          This routine is not processed using GENERIC because the names of
          the required AST routines do not use standard data type codes.
       }
    }
@@ -1217,7 +1221,9 @@ higher-level utility tasks.
    Read an AST Object from a GRP group using a Channel
 }{
    \sstdescription{
-      Read an AST Object from a GRP group using a Channel.
+      Read an AST Object from a GRP group using a Channel. The Channel
+      can be configured using a set of attribute settings specified in
+      the environment variable ATOOLS\_CHATT\_IN.
    }
    \sstinvocation{
       CALL ATL\_RDCH( IGRP, IAST, STATUS )
@@ -1243,7 +1249,7 @@ higher-level utility tasks.
       \sstitemlist{
 
          \sstitem
-         If the group contains the dump of a Channel (of any class),
+          If the group contains the dump of a Channel (of any class),
          then the Object returned via IAST will be the Channel itself. The
          exception to this is that if the \texttt{"} Begin \texttt{"}  line at the start of
          the dump ends with the string \texttt{"} (Read)\texttt{"} , then the returned IAST
@@ -1263,7 +1269,9 @@ higher-level utility tasks.
    Read an AST Object from a GRP group using a FitsChan
 }{
    \sstdescription{
-      Read an AST Object from a GRP group using a FitsChan.
+      Read an AST Object from a GRP group using a FitsChan. The FitsChan
+      can be configured using a set of attribute settings specified in
+      the environment variable ATOOLS\_CHATT\_IN.
    }
    \sstinvocation{
       CALL ATL\_RDFCH( IGRP, IAST, STATUS )
@@ -1320,7 +1328,7 @@ higher-level utility tasks.
       \sstitemlist{
 
          \sstitem
-         If the group contains the AST dump of a Channel (of any class),
+          If the group contains the AST dump of a Channel (of any class),
          then the Object returned via IAST will be the Channel itself. The
          exception to this is that if the \texttt{"} Begin \texttt{"}  line at the start of
          the dump ends with the string \texttt{"} (Read)\texttt{"} , then the returned IAST
@@ -1335,12 +1343,45 @@ higher-level utility tasks.
    }
 }
 \sstroutine{
+   ATL\_RDMOC
+}{
+   Read an AST Object from a GRP group using an MocChan
+}{
+   \sstdescription{
+      Read an AST Object from a GRP group using an MocChan.The MocChan
+      can be configured using a set of attribute settings specified in
+      the environment variable ATOOLS\_CHATT\_IN.
+   }
+   \sstinvocation{
+      CALL ATL\_RDMOC( IGRP, IAST, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         An identifier for the group holding the text.
+      }
+      \sstsubsection{
+         IAST = INTEGER (Returned)
+      }{
+         The AST Object, or AST\_\_NULL.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    ATL\_RDSTCS
 }{
    Read an AST Object from a GRP group using an StcsChan
 }{
    \sstdescription{
-      Read an AST Object from a GRP group using an StcsChan.
+      Read an AST Object from a GRP group using an StcsChan.The StcsChan
+      can be configured using a set of attribute settings specified in
+      the environment variable ATOOLS\_CHATT\_IN.
    }
    \sstinvocation{
       CALL ATL\_RDSTCS( IGRP, IAST, STATUS )
@@ -1608,11 +1649,11 @@ higher-level utility tasks.
       \sstitemlist{
 
          \sstitem
-         Various assumptions are made about the meaning of several items
+          Various assumptions are made about the meaning of several items
          in the SPECX extensions. These are described in the code comments.
 
          \sstitem
-         Double Sideband is always assumed
+          Double Sideband is always assumed
       }
    }
 }
@@ -1677,13 +1718,13 @@ higher-level utility tasks.
       \sstitemlist{
 
          \sstitem
-         The new axes are appended to the end of the existing axes, so the
+          The new axes are appended to the end of the existing axes, so the
          axis indices associated with the new axes will extend from \texttt{"} nold$+$1\texttt{"}
          to \texttt{"} nold$+$nnew\texttt{"} , where \texttt{"} nold\texttt{"}  is the number of axes in the original
          Frame, and \texttt{"} nnew\texttt{"}  is the number of new axes.
 
          \sstitem
-         An error will be reported if the Nout attribute of \texttt{"} map\texttt{"}  is
+          An error will be reported if the Nout attribute of \texttt{"} map\texttt{"}  is
          different to the Naxes attribute of \texttt{"} frm\texttt{"} .
       }
    }
@@ -1839,11 +1880,11 @@ higher-level utility tasks.
       \sstitemlist{
 
          \sstitem
-         An error will be reported if the parameter value obtained from
+          An error will be reported if the parameter value obtained from
          the environment is a vector with more than 100 elements.
 
          \sstitem
-         An error will be reported if any individual element in the parameter
+          An error will be reported if any individual element in the parameter
          value obtained from the environment requires more than 255 when
          represented as a string.
       }
@@ -2103,7 +2144,7 @@ higher-level utility tasks.
       \sstitemlist{
 
          \sstitem
-         If \texttt{"} frm\texttt{"}  is a FrameSet, the current Frame is checked first. If
+          If \texttt{"} frm\texttt{"}  is a FrameSet, the current Frame is checked first. If
          no match is found, each other Frame is checked in turn, finishing with
          the base Frame. If any of these Frames match, it is left as the
          current Frame in the FrameSet on exit.
@@ -2260,7 +2301,7 @@ higher-level utility tasks.
       \sstitemlist{
 
          \sstitem
-         All columns in the returned Table will hold scalar values.
+          All columns in the returned Table will hold scalar values.
       }
    }
 }
