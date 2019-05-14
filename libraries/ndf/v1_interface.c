@@ -4,6 +4,7 @@
 #include "mers.h"
 #include "sae_par.h"
 #include "ndf_err.h"
+#include "ndf1_types.h"
 
 
 /*
@@ -75,10 +76,10 @@ void ndfBound_v1( int indf, int ndimx, int lbnd[], int ubnd[], int *ndim,
    hdsdim ubnd2[ NDF__MXDIM ];
    int i;
 
-   ndfBound_( indf, ndimx, lbnd2, ubnd2, ndim, status );
+   ndfBound_( indf, NDF_MIN(ndimx, NDF__MXDIM), lbnd2, ubnd2, ndim, status );
 
    if( *status == SAI__OK ) {
-      for( i = 0; i < *ndim; i++ ) {
+      for( i = 0; i < NDF_MIN(ndimx, *ndim); i++ ) {
          if( lbnd2[i] < -INT_MAX || ubnd2[i] > INT_MAX ) {
             ndfMsg( "N", indf );
             msgSeti( "I", i + 1 );
@@ -102,10 +103,10 @@ void ndfDim_v1( int indf, int ndimx, int dim[], int *ndim, int *status ){
    hdsdim dim2[ NDF__MXDIM ];
    int i;
 
-   ndfDim_( indf, ndimx, dim2, ndim, status );
+   ndfDim_( indf, NDF_MIN(ndimx, NDF__MXDIM), dim2, ndim, status );
 
    if( *status == SAI__OK ) {
-      for( i = 0; i < *ndim; i++ ) {
+      for( i = 0; i < NDF_MIN(ndimx, *ndim); i++ ) {
          if( dim2[i] > INT_MAX ) {
             ndfMsg( "N", indf );
             msgSeti( "I", i + 1 );
@@ -179,7 +180,7 @@ void ndfNew_v1( const char *ftype, int ndim, const int lbnd[],
    hdsdim ubnd2[ NDF__MXDIM ];
    int i;
 
-   for( i = 0; i < ndim; i++ ) {
+   for( i = 0; i < NDF_MIN(ndim, NDF__MXDIM); i++ ) {
       lbnd2[ i ] = (size_t) lbnd[ i ];
       ubnd2[ i ] = (size_t) ubnd[ i ];
    }
@@ -193,7 +194,7 @@ void ndfNewp_v1( const char *ftype, int ndim, const int ubnd[],
    hdsdim ubnd2[ NDF__MXDIM ];
    int i;
 
-   for( i = 0; i < ndim; i++ ) {
+   for( i = 0; i < NDF_MIN(ndim, NDF__MXDIM); i++ ) {
       ubnd2[ i ] = (size_t) ubnd[ i ];
    }
 
@@ -208,7 +209,7 @@ void ndfSbnd_v1( int ndim, const int lbnd[], const int ubnd[], int indf,
    hdsdim ubnd2[ NDF__MXDIM ];
    int i;
 
-   for( i = 0; i < ndim; i++ ) {
+   for( i = 0; i < NDF_MIN(ndim, NDF__MXDIM); i++ ) {
       lbnd2[ i ] = (size_t) lbnd[ i ];
       ubnd2[ i ] = (size_t) ubnd[ i ];
    }
@@ -224,7 +225,7 @@ void ndfSect_v1( int indf1, int ndim, const int lbnd[], const int ubnd[],
    hdsdim ubnd2[ NDF__MXDIM ];
    int i;
 
-   for( i = 0; i < ndim; i++ ) {
+   for( i = 0; i < NDF_MIN(ndim, NDF__MXDIM); i++ ) {
       lbnd2[ i ] = (size_t) lbnd[ i ];
       ubnd2[ i ] = (size_t) ubnd[ i ];
    }
@@ -237,7 +238,7 @@ void ndfShift_v1( int nshift, const int shift[], int indf, int *status ){
    hdsdim shift2[ NDF__MXDIM ];
    int i;
 
-   for( i = 0; i < nshift; i++ ) {
+   for( i = 0; i < NDF_MIN(nshift, NDF__MXDIM); i++ ) {
       shift2[ i ] = (size_t) shift[ i ];
    }
 
@@ -283,7 +284,7 @@ void ndfXnew_v1( int indf, const char *xname, const char *type, int ndim,
    hdsdim dim2[ NDF__MXDIM ];
    int i;
 
-   for( i = 0; i < ndim; i++ ) {
+   for( i = 0; i < NDF_MIN(ndim, NDF__MXDIM); i++ ) {
       dim2[ i ] = (size_t) dim[ i ];
    }
 
