@@ -40258,14 +40258,16 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
 }{
    \sstdescription{
       This routine masks out a region of an NDF by setting pixels to
-      the bad value, or to a specified constant value.  The region to
-      be masked is specified within a text file (see Parameter REGION)
-      that should contain a description of the region in the form of an
-      \texttt{"}AST Region\texttt{"}.  This is the system used by the AST library for
-      describing regions (see \xref{SUN/211}{sun211}{} or
-      \xref{SUN/210}{sun210}{}).  Such text files can,
-      for instance, be created using the Starlink ATOOLS package (a
-      high-level interface to the facilities of the AST library).
+      the bad value, or to a specified constant value. The region to
+      be masked is specified by a file (see Parameter REGION) that
+      should contain a description of the region in a form readable
+      by the Starlink AST library (see \xref{SUN/211}{sun211}{} or
+      \xref{SUN/210}{sun210}{}). Such formats include AST's own native
+      format and other formats that can be converted automatically to
+      an AST Region (\emph{e.g.} IVOA MOC and STC-S regions).  AST
+      Regions can be created, for instance, using the Starlink ATOOLS
+      package (a high-level interface to the facilities of the AST
+      library).
    }
    \sstusage{
       regionmask in region out
@@ -40297,13 +40299,18 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       \sstsubsection{
          REGION = FILENAME (Read)
       }{
-         The name of the text file containing a text dump of an AST
-         Region. Any sub-class of Region may be supplied (\emph{e.g.} Box,
-         Polygon, CmpRegion, Prism, \emph{etc.}).  If the axes spanned by
-         this Region are not the same as those of the current WCS Frame in
-         the input NDF, an attempt will be made to create an equivalent
-         new Region that does match the current WCS Frame.  An error will
-         be reported if this is not possible.
+         The name of the file containing a description of the Region.
+         This can be a text file holding a dump of an AST Region (any
+         sub-class of Region may be supplied --- \emph{e.g.} Box, Polygon,
+         CmpRegion, Prism, \emph{etc.}), or any file that can be converted
+         automatically to an AST Region (for instance an IVOA MOC in text
+         or FITS format, an IVOA STC-S region). An NDF may also be supplied,
+         in which case the rectangular boundary of the NDF is used as the
+         Region. If the axes spanned by the Region are not the same as
+         those of the current WCS Frame in the input NDF, an attempt will
+         be made to create an equivalent new Region that does match the
+         current WCS Frame. An error will be reported if this is not
+         possible.
       }
    }
    \sstexamples{

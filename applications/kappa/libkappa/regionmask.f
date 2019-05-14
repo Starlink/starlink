@@ -19,12 +19,14 @@
 *  Description:
 *     This routine masks out a region of an NDF by setting pixels to
 *     the bad value, or to a specified constant value. The region to
-*     be masked is specified within a text file (see Parameter REGION)
-*     that should contain a description of the region in the form of an
-*     "AST Region". This is the system used by the AST library for
-*     describing regions (see SUN/211 or SUN/210). Such text files can,
-*     for instance, be created using the Starlink ATOOLS package (a
-*     high-level interface to the facilities of the AST library).
+*     be masked is specified by a file (see Parameter REGION) that
+*     should contain a description of the region in a form readable
+*     by the Starlink AST library (see SUN/211 or SUN/210). Such formats
+*     include AST's own native format and other formats that can be
+*     converted automatically to an AST Region (e.g. IVOA MOC and STC-S
+*     regions).  AST Regions can be created, for instance, using the
+*     Starlink ATOOLS package (a high-level interface to the facilities
+*     of the AST library).
 
 *  Usage:
 *     regionmask in region out
@@ -42,13 +44,17 @@
 *     OUT = NDF (Write)
 *        The name of the output NDF.
 *     REGION = FILENAME (Read)
-*        The name of the text file containing a text dump of an AST
-*        Region. Any sub-class of Region may be supplied (e.g. Box,
-*        Polygon, CmpRegion, Prism, etc.). If the axes spanned by this
-*        Region are not the same as those of the current WCS Frame in
-*        the input NDF, an attempt will be made to create an equivalent
-*        new Region that does match the current WCS Frame. An error will
-*        be reported if this is not possible.
+*        The name of the file containing a description of the Region.
+*        This can be a text file holding a dump of an AST Region (any
+*        sub-class of Region may be supplied - e.g. Box, Polygon, CmpRegion,
+*        Prism, etc.), or any file that can be converted automatically to
+*        an AST Region (for instance an IVOA MOC in text or FITS format,
+*        an IVOA STC-S region). An NDF may also be supplied, in which case
+*        the rectangular boundary of the NDF is used as the Region. If the
+*        axes spanned by the Region are not the same as those of the current
+*        WCS Frame in the input NDF, an attempt will be made to create an
+*        equivalent new Region that does match the current WCS Frame. An
+*        error will be reported if this is not possible.
 
 *  Examples:
 *     regionmask a1060 galaxies.txt a1060_sky
@@ -99,6 +105,8 @@
 *        Modified to allow Region and WCS Frame to have different axes.
 *     30-SEP-2009 (DSB):
 *        Correct half-pixel shift.
+*     14-MAY-2019 (DSB):
+*        Update prologue for new ATL facilities (i.e. read MOCs).
 *     {enter_further_changes_here}
 
 *-
