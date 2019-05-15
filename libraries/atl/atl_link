@@ -1,2 +1,2 @@
-echo -latl `sla_link` `grp_link` `ast_link` `err_link`  `psx_link` `chr_link` `hds_link` \
+echo -latl `cfitsio_link` `sla_link` `grp_link` `ast_link` `err_link`  `psx_link` `chr_link` `hds_link` \
 | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'

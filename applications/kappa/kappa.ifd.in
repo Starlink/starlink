@@ -14402,6 +14402,89 @@ iraf! {
 
       }
 
+      action mocgen {
+         alias {mocg(en)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter comp {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Component to analyse}
+            helpkey *
+            default Data
+        }
+
+         parameter format {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Format for output MOC}
+            ppath CURRENT DEFAULT
+            default FITS
+            helpkey *
+         }
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input NDF}
+            helpkey *
+         }
+
+         parameter maxres {
+            type _REAL
+            vpath DEFAULT
+            prompt {Max resolution in MOC (arc-seconds)}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+        }
+
+         parameter minres {
+            type _REAL
+            vpath DEFAULT
+            prompt {Min resolution in MOC (arc-seconds)}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+        }
+
+         parameter mode {
+            position 3
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Mode used to determine MOC}
+            default Good
+            helpkey *
+         }
+
+         parameter out {
+            position 2
+            type LITERAL
+            vpath PROMPT
+            prompt {Name of the output file}
+            helpkey *
+        }
+
+         parameter qexp {
+            type LITERAL
+            access READ
+            ppath GLOBAL DEFAULT
+            default ANY
+            association <->GLOBAL.QUALITY_EXP
+            prompt {Quality expression}
+            helpkey *
+         }
+
+      }
+
       action mstats {
          alias {msta(ts)}
 

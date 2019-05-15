@@ -488,6 +488,10 @@
          ELSE IF ( NAME .EQ. 'MFITTREND' ) THEN
             CALL MFITTREND ( STATUS )
 
+*  Creates a Multi-Order Coverage map from an NDF
+         ELSE IF ( NAME .EQ. 'MOCGEN' ) THEN
+            CALL MOCGEN ( STATUS )
+
 *  Does cumulative statistics on a two-dimensional sub-array over a
 *  sequence of two-dimensional data arrays.
          ELSE IF ( NAME .EQ. 'MSTATS' ) THEN

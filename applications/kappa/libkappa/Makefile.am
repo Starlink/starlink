@@ -19,7 +19,8 @@ normalize.f numb.f oddeven.f outset.f parget.f paste.f permaxes.f \
 pixdupe.f profile.f pluck.f psf.f rift.f regrid.f rotate.f segment.f \
 setmagic.f shadow.f slide.f sqorst.f stats.f sub.f substitute.f \
 surfit.f thresh.f trandat.f trig.f wcsalign.f wcsmosaic.f wcsslide.f \
-wcstran.f wiener.f zaplin.f regionmask.f excludebad.f align2d.f
+wcstran.f wiener.f zaplin.f regionmask.f excludebad.f align2d.f \
+mocgen.f
 
 F2_ROUTINES = kap_div.f kap_pow.f
 

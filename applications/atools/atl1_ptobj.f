@@ -152,72 +152,7 @@
       IF( AST_ISAMOC( IAST, STATUS ) .AND. STATUS .EQ. SAI__OK ) THEN
          IF( CHR_SIMLR( FILE( FLEN-3 : ), '.fit' ) .OR.
      :       CHR_SIMLR( FILE( FLEN-4 : ), '.fits' ) ) THEN
-
-*  Get the length and width of the MOC and reserve space to hold the data.
-            NB = AST_GETI( IAST, 'MOCTYPE', STATUS )
-            LN = AST_GETI( IAST, 'MOCLENGTH', STATUS )
-            CALL PSX_CALLOC( NB*LN, '_BYTE', IP, STATUS )
-
-* Get the data to be put in the UNIQ column of the binary table.
-            CALL AST_GETMOCDATA( IAST, NB*LN, %VAL( CNF_PVAL( IP ) ),
-     :                           STATUS )
-
-*  Get the FitsChan holding the required headers for the binary table.
-            FC = AST_GETMOCHEADER( IAST, STATUS )
-            IF( STATUS .EQ. SAI__OK ) THEN
-
-*  Use FITSIO to create the FITS file and put the data into a binary table
-*  extension. Delete any pre-existing file with the same name.
-               FSTAT = 0
-               CALL FTGIOU( UNIT, FSTAT )
-               OPEN( UNIT=UNIT, IOSTAT=FSTAT, FILE=FILE, STATUS='OLD' )
-               IF( FSTAT == 0 ) CLOSE( UNIT, STATUS='DELETE' )
-
-               FSTAT = 0
-               CALL FTGIOU( UNIT, FSTAT )
-               CALL FTINIT( UNIT, FILE, 1, FSTAT )
-
-               CALL FTIKYL( UNIT, 'simple', .true.,  ' ', FSTAT )
-               CALL FTIKYJ( UNIT, 'bitpix', 8,  ' ', FSTAT )
-               CALL FTIKYJ( UNIT, 'naxis', 0,  ' ', FSTAT )
-               CALL FTIKYL( UNIT, 'extend', .true.,  ' ', FSTAT )
-
-               CALL FTCRHD( UNIT, FSTAT )
-
-               CALL AST_CLEAR( FC, 'Card', STATUS )
-               DO WHILE( AST_FINDFITS( FC, '%f', CARD, .TRUE., STATUS) )
-                  CALL FTPREC( UNIT, CARD, FSTAT )
-               END DO
-
-               IF( NB .EQ. 4 ) THEN
-                  CALL FTPCLJ( UNIT, 1, 1, 1, LN,
-     :                         %VAL( CNF_PVAL( IP ) ), FSTAT )
-               ELSE
-                  CALL FTPCLK( UNIT, 1, 1, 1, LN,
-     :                         %VAL( CNF_PVAL( IP ) ), FSTAT )
-               END IF
-               CALL FTCLOS( UNIT, FSTAT )
-               CALL FTFIOU( UNIT, FSTAT )
-
-               IF( FSTAT .GT. 0 ) THEN
-                  STATUS = SAI__ERROR
-                  CALL FTGERR( FSTAT, ERRTEXT )
-                  CALL MSG_SETC( 'T', ERRTEXT )
-                  CALL ERR_REP( ' ', 'FITSIO error: ^T', STATUS )
-                  CALL FTGMSG( ERRMESS )
-                  DO WHILE( ERRMESS .NE. ' ' )
-                     CALL MSG_SETC( 'T', ERRMESS )
-                     CALL ERR_REP( ' ', '^T', STATUS )
-                     CALL FTGMSG(ERRMESS)
-                  END DO
-               ELSE
-                  DONE = .TRUE.
-               END IF
-            END IF
-
-*  Free resources.
-            CALL AST_ANNUL( FC, STATUS )
-            CALL PSX_FREE( IP, STATUS )
+            CALL ATL_MOCFT( IAST, FILE, STATUS )
          END IF
 
 *  If the object is a FrameSet, it can be stored in an NDF.

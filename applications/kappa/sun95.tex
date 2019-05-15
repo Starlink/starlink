@@ -6,9 +6,9 @@
 \stardocsource    {sun95.44}
 \stardocnumber    {95.44}
 \stardocauthors   {Malcolm J. Currie \& David S. Berry}
-\stardocdate      {2018 July 11}
+\stardocdate      {2019 May 15}
 \stardoctitle     {KAPPA --- Kernel Application Package}
-\stardocversion   {2.5-9}
+\stardocversion   {2.6-0}
 \stardocmanual    {User's Guide}
 % -----------------------------------------------------------------------------
 \stardocabstract{
@@ -9294,6 +9294,8 @@ WCS component of an NDF.
  Replaces bad pixels in a two-dimensional image with the local median.
 \classitem{MFITTREND}
  Fits independent trends to data lines that are parallel to an axis.
+\classitem{MOCGEN}
+ Creates a Multi-Order Coverage (MOC) map describing regions of an image.
 \classitem{NOMAGIC}
  Replaces all occurrences of \htmlref{magic-value}{se:masking}~ pixels in an NDF array with
  a new value.
@@ -32627,7 +32629,138 @@ KAPPA: \htmlref{CLINPLOT}{CLINPLOT},
    }
 }
 
+\sstroutine{
+   MOCGEN
+}{
+   Creates a Multi-Order Coverage map describing regions of an image
+}{
+   \sstdescription{
+      This application creates a Multi-Order Coverage (MOC) map describing
+      selected regions of the sky, using the scheme described in version
+      1.1 of the \htmladdnormallink{MOC recommendation}{http://ivoa.net/documents/MOC/}
+      published by the International Virtual Observatory Alliance (IVOA).
 
+      The regions of sky to be included in the MOC may be specified in
+      several ways (see Parameter MODE).
+   }
+   \sstusage{
+      mocgen in out mode
+   }
+   \sstparameters{
+      \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The NDF component to be used if Parameter MODE is \texttt{"Good"}  or
+         \texttt{"Bad"}.  It may be \texttt{"Data"}  or \texttt{"Variance"}. \texttt{["Data"]}
+      }
+      \sstsubsection{
+         FORMAT = LITERAL (Read)
+      }{
+         The format to use when generating the output MOC specified by
+         Parameter OUT.
+
+         \sstitemlist{
+
+            \sstitem
+             \texttt{"FITS"}  --- The output MOC is stored as a binary table extension
+            in a FITS file, using the conventions described in version 1.1
+            of the IVOA's MOC recommendation.
+
+            \sstitem
+             \texttt{"AST"}  --- The output MOC is stored as a text file using native
+            AST encoding.
+
+            \sstitem
+             \texttt{"String"}  --- The output MOC is stored as a text file using the
+            \texttt{"string"}  encoding described in version 1.1 of the IVOA's MOC
+            recommendation.
+
+            \sstitem
+             \texttt{"JSON"}  --- The output MOC is stored as a text file using the
+            JSON encoding described in version 1.1 of the IVOA's MOC
+            recommendation.
+
+         }
+         \texttt{["FITS"]}
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The input NDF. Must be two-dimensional.
+      }
+      \sstsubsection{
+         MAXRES = \_REAL (Read)
+      }{
+         The size of the smallest cells in the returned MOC, in
+         arc-seconds. The nearest of the valid values defined in the MOC
+         recommendation is used. The default value is the largest legal
+         value that results in the cells in the Moc being no larger than
+         the size of the pixels in the centre of the supplied NDF. [!]
+      }
+      \sstsubsection{
+         MINRES = \_REAL (Read)
+      }{
+         The size of the largest feature that may be missed in the
+         supplied NDF, in arc-seconds. It gives the resolution of the
+         initial grid used to identify areas that are inside the MOC.
+         Bounded 'holes'  or 'islands'  in the NDF that are smaller than
+         one cell of this initial grid may be missed (i.e. such holes may
+         be 'filled in' and islands omitted in the resulting Moc). The
+         default value 16 times Parameter MaxRes. [!]
+      }
+      \sstsubsection{
+         MODE = LITERAL (Read)
+      }{
+         The mode used to specify the sky regions to include in the
+         output MOC.
+
+         \sstitemlist{
+
+            \sstitem
+             \texttt{"Good"}  --- The output MOC contains the good pixels in the input
+            NDF specified by Parameter IN.
+
+            \sstitem
+             \texttt{"Bad"}  --- The output MOC contains the bad pixels in the input
+            NDF specified by Parameter IN.
+
+            \sstitem
+             \texttt{"Qual"}  --- The output MOC contains the pixels that have the
+            quality specified by Parameter QEXP within the input NDF
+            specified by parameter IN.
+
+         }
+         \texttt{["Good"]}
+      }
+      \sstsubsection{
+         OUT = FILENAME (Write)
+      }{
+         Name of the file in which to store the MOC description of the
+         selected regions. The format to use is specified by Parameter
+         FORMAT. If Parameter FMT is \texttt{"FITS"}, \texttt{".fits"}  is
+         appended to the supplied file name if no other file type is
+         included in the supplied string.
+      }
+      \sstsubsection{
+         QEXP = LITERAL (Read)
+      }{
+         The quality expression. Only used if Parameter MOD is \texttt{"QUAL"}.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         mocgen m31 m31.fits
+      }{
+         Generates a a MOC description of the good pixels in NDF \texttt{"m31"},
+         storing the MOC as a binary table in FITS file \texttt{"m31.fits"}.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: REGIONMASK.
+   }
+}
 
 \sstroutine{
    MSTATS
@@ -53716,6 +53849,15 @@ The following applications have been modified:
         for MODE preserves the historic interactive behaviour.
       \end{itemize}
 
+\end{description}
+
+\subsection{New Commands}
+The following new applications have been added:
+
+\begin{description}
+   \item [\htmlref{MOCGEN}{MOCGEN}] \mbox{}
+   Creates a description of selected regions in an image using the IVOA's
+   Multi-Order Coverage (MOC) scheme.
 \end{description}
 
 \section{Notes from Previous Few Releases}
