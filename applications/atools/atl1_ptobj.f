@@ -153,6 +153,7 @@
          IF( CHR_SIMLR( FILE( FLEN-3 : ), '.fit' ) .OR.
      :       CHR_SIMLR( FILE( FLEN-4 : ), '.fits' ) ) THEN
             CALL ATL_MOCFT( IAST, FILE, STATUS )
+            DONE = .TRUE.
          END IF
 
 *  If the object is a FrameSet, it can be stored in an NDF.
