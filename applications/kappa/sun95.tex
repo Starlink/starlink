@@ -32636,7 +32636,7 @@ KAPPA: \htmlref{CLINPLOT}{CLINPLOT},
 }{
    \sstdescription{
       This application creates a Multi-Order Coverage (MOC) map describing
-      selected regions of the sky, using the scheme described in version
+      selected regions of the sky, using the scheme described in Version
       1.1 of the \htmladdnormallink{MOC recommendation}{http://ivoa.net/documents/MOC/}
       published by the International Virtual Observatory Alliance (IVOA).
 
@@ -32662,8 +32662,8 @@ KAPPA: \htmlref{CLINPLOT}{CLINPLOT},
          \sstitemlist{
 
             \sstitem
-             \texttt{"FITS"}  --- The output MOC is stored as a binary table extension
-            in a FITS file, using the conventions described in version 1.1
+             \texttt{"FITS"}  --- The output MOC is stored as a binary-table extension
+            in a FITS file, using the conventions described in Version 1.1
             of the IVOA's MOC recommendation.
 
             \sstitem
@@ -32672,12 +32672,12 @@ KAPPA: \htmlref{CLINPLOT}{CLINPLOT},
 
             \sstitem
              \texttt{"String"}  --- The output MOC is stored as a text file using the
-            \texttt{"string"}  encoding described in version 1.1 of the IVOA's MOC
+            \texttt{"string"}  encoding described in Version 1.1 of the IVOA's MOC
             recommendation.
 
             \sstitem
              \texttt{"JSON"}  --- The output MOC is stored as a text file using the
-            JSON encoding described in version 1.1 of the IVOA's MOC
+            JSON encoding described in Version 1.1 of the IVOA's MOC
             recommendation.
 
          }
@@ -32692,21 +32692,21 @@ KAPPA: \htmlref{CLINPLOT}{CLINPLOT},
          MAXRES = \_REAL (Read)
       }{
          The size of the smallest cells in the returned MOC, in
-         arc-seconds. The nearest of the valid values defined in the MOC
+         arcseconds. The nearest of the valid values defined in the MOC
          recommendation is used. The default value is the largest legal
-         value that results in the cells in the Moc being no larger than
+         value that results in the cells in the MOC being no larger than
          the size of the pixels in the centre of the supplied NDF. [!]
       }
       \sstsubsection{
          MINRES = \_REAL (Read)
       }{
          The size of the largest feature that may be missed in the
-         supplied NDF, in arc-seconds. It gives the resolution of the
+         supplied NDF, in arcseconds. It gives the resolution of the
          initial grid used to identify areas that are inside the MOC.
          Bounded 'holes'  or 'islands'  in the NDF that are smaller than
          one cell of this initial grid may be missed (i.e. such holes may
-         be 'filled in' and islands omitted in the resulting Moc). The
-         default value 16 times Parameter MaxRes. [!]
+         be 'filled in' and islands omitted in the resulting MOC). The
+         default value is 16 times Parameter MaxRes. [!]
       }
       \sstsubsection{
          MODE = LITERAL (Read)
@@ -32727,7 +32727,7 @@ KAPPA: \htmlref{CLINPLOT}{CLINPLOT},
             \sstitem
              \texttt{"Qual"}  --- The output MOC contains the pixels that have the
             quality specified by Parameter QEXP within the input NDF
-            specified by parameter IN.
+            specified by Parameter IN.
 
          }
          \texttt{["Good"]}
@@ -32737,8 +32737,8 @@ KAPPA: \htmlref{CLINPLOT}{CLINPLOT},
       }{
          Name of the file in which to store the MOC description of the
          selected regions. The format to use is specified by Parameter
-         FORMAT. If Parameter FMT is \texttt{"FITS"}, \texttt{".fits"}  is
-         appended to the supplied file name if no other file type is
+         FORMAT. If Parameter FORMAT is \texttt{"FITS"}, \texttt{".fits"}  is
+         appended to the supplied file name, provided no other file type is
          included in the supplied string.
       }
       \sstsubsection{
@@ -32758,7 +32758,7 @@ KAPPA: \htmlref{CLINPLOT}{CLINPLOT},
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: REGIONMASK.
+      \htmlref{REGIONMASK}{REGIONMASK}
    }
 }
 

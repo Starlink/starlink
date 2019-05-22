@@ -20,13 +20,13 @@
 *        The global status.
 
 *  Description:
-*     This application creates a Multi-Order Coverage (MOC) map describing
-*     selected regions of the sky, using the scheme described in version
-*     1.1 of the MOC recommendation published by the Internatiobal
-*     Virtual Observatory Alliance (IVOA).
+*     This application creates a Multi-Order Coverage (MOC) map
+*     describing selected regions of the sky, using the scheme
+*     described in Version 1.1 of the MOC recommendation published by
+*     the Internatiobal Virtual Observatory Alliance (IVOA).
 *
 *     The regions of sky to be included in the MOC may be specified in
-*     several ways (see parameter MODE).
+*     several ways (see Parameter MODE).
 
 *  Usage:
 *     mocgen in out mode
@@ -39,19 +39,19 @@
 *        The format to use when generating the output MOC specified by
 *        Parameter OUT.
 *
-*        - "FITS" -- The output MOC is stored as a binary table extension
-*        in a FITS file, using the conventions described in version 1.1
-*        of the IVOA's MOC recommendation.
+*        - "FITS" -- The output MOC is stored as a binary-table
+*        extension in a FITS file, using the conventions described in
+*        Version 1.1 of the IVOA's MOC recommendation.
 *
 *        - "AST" -- The output MOC is stored as a text file using native
 *        AST encoding.
 *
 *        - "String" -- The output MOC is stored as a text file using the
-*        "string" encoding described in version 1.1 of the IVOA's MOC
+*        "string" encoding described in Version 1.1 of the IVOA's MOC
 *        recommendation.
 
 *        - "JSON" -- The output MOC is stored as a text file using the
-*        JSON encoding described in version 1.1 of the IVOA's MOC
+*        JSON encoding described in Version 1.1 of the IVOA's MOC
 *        recommendation.
 *
 *        ["FITS"]
@@ -59,39 +59,39 @@
 *        The input NDF. Must be two-dimensional.
 *     MAXRES = _REAL (Read)
 *        The size of the smallest cells in the returned MOC, in
-*        arc-seconds. The nearest of the valid values defined in the MOC
+*        arcseconds. The nearest of the valid values defined in the MOC
 *        recommendation is used. The default value is the largest legal
-*        value that results in the cells in the Moc being no larger than
+*        value that results in the cells in the MOC being no larger than
 *        the size of the pixels in the centre of the supplied NDF. [!]
 *     MINRES = _REAL (Read)
 *        The size of the largest feature that may be missed in the
-*        supplied NDF, in arc-seconds. It gives the resolution of the
+*        supplied NDF, in arcseconds. It gives the resolution of the
 *        initial grid used to identify areas that are inside the MOC.
 *        Bounded "holes" or "islands" in the NDF that are smaller than
-*        one cell of this initial grid may be missed (i.e. such holes may
-*        be "filled in" and islands omitted in the resulting Moc). The
-*        default value 16 times Parameter MaxRes. [!]
+*        one cell of this initial grid may be missed (i.e. such holes
+*        may be "filled in" and islands omitted in the resulting MOC).
+*        The default value is 16 times Parameter MaxRes. [!]
 *     MODE = LITERAL (Read)
 *        The mode used to specify the sky regions to include in the
 *        output MOC.
 *
-*        - "Good" -- The output MOC contains the good pixels in the input
-*        NDF specified by Parameter IN.
+*        - "Good" -- The output MOC contains the good pixels in the
+*        input NDF specified by Parameter IN.
 *
 *        - "Bad" -- The output MOC contains the bad pixels in the input
 *        NDF specified by Parameter IN.
 *
 *        - "Qual" -- The output MOC contains the pixels that have the
 *        quality specified by Parameter QEXP within the input NDF
-*        specified by parameter IN.
+*        specified by Parameter IN.
 *
 *        ["Good"]
 *     OUT = FILENAME (Write)
 *        Name of the file in which to store the MOC description of the
 *        selected regions. The format to use is specified by Parameter
-*        FORMAT. If Parameter is "FITS", ".fits" is appended to the
-*        supplied file name if no other file type is included in the
-*        supplied string.
+*        FORMAT. If Parameter FORMAT is "FITS", ".fits" is appended to
+*        the supplied file name, provided no other file type is included
+*        in the supplied string.
 *     QEXP = LITERAL (Read)
 *        The quality expression. Only used if Parameter MOD is "QUAL".
 
@@ -172,7 +172,7 @@
                                  !  names referenced in the quality expression
       CHARACTER XNAME*(DAT__SZNAM)! Name of NDF extension containing quality
                                  ! name information
-      INTEGER DIMS( NDIM )       ! DImensions of significant pixel axes
+      INTEGER DIMS( NDIM )       ! Dimensions of significant pixel axes
       INTEGER ERRPNT             ! Offset to error within quality exprs.
       INTEGER IDQ                ! Identifier for compiled quality exprs
       INTEGER INDF               ! Input NDF identifier
@@ -189,8 +189,8 @@
       INTEGER SUBND( NDIM )      ! Upper bounds of significant pixel axes
       LOGICAL ALLBAD             ! All pixels bad?
       LOGICAL NOBAD              ! No pixels bad?
-      REAL MAXRES                ! Max resolution of MOC in arc-seconds
-      REAL MINRES                ! Min resolution of MOC in arc-seconds
+      REAL MAXRES                ! Max resolution of MOC in arcseconds
+      REAL MINRES                ! Min resolution of MOC in arcseconds
 *.
 
 *  Check the inherited global status.
