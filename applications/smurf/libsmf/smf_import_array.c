@@ -83,6 +83,11 @@
 *     11-MAY-2018 (DSB):
 *        Handle cases where there are no good values in the first plane
 *        of the supplied NDF.
+*     22-MAY-2019 (DSB):
+*        Fix broken algorithm for filling in bad values in the "means"
+*        array using linear interpolation. This bug could cause catastrophically
+*        bad values to be inserted into the EXT model when running
+*        skyloop, if the original EXT model had any bad values.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -449,18 +454,20 @@ static void smf1_import_array( void *job_data_ptr, int *status ) {
 
    } else if( pdata->operation == 3 ){
       double *mean;
+      double *pend;
+      double *pnext;
+      double delta;
       double vnext;
       double vprev;
       double vsum;
-      int dgap = 0;
-      int dnext = 0;
-      int dprev = 0;
+      int gap;
       size_t *nbad;
       size_t ngood;
 
-      double *means = astMalloc((t2-t1+1)*smf_dtype_sz(pdata->type,status));
+      double *means = astMalloc((t2-t1+1)*sizeof(*means));
       size_t *nbads = astMalloc((t2-t1+1)*sizeof(*nbads));
       if( means && nbads ) {
+         pend = means + t2 - t1;  /* Pointer to final "means" value */
 
 /* Get the mean value and the number of bad values in each time slice. */
          badmean = 0;
@@ -527,46 +534,45 @@ static void smf1_import_array( void *job_data_ptr, int *status ) {
    linear interpolation between the neighbouring good values. Take care
    with any bad values at the start and end. */
          if( badmean && *status == SAI__OK ) {
-            vnext = VAL__BADD;
-            vprev = VAL__BADD;
             mean = means;
             for( i = t1; i <= t2; i++,mean++ ) {
                if( *mean == VAL__BADD ){
-                  if( vnext == VAL__BADD ) {
-                     for( j = i + 1; j <= t2; j++ ) {
-                        if( means[ j ] != VAL__BADD ) {
-                           vnext = means[ j ];
-                           dnext = j - i + 1;
-                           dprev = 0;
-                           dgap = dnext;
-                           break;
-                        }
+                  pnext = mean;
+                  while( pnext < pend && *(++pnext) == VAL__BADD ) ;
+
+                  vprev = ( mean > means ) ? mean[-1] : VAL__BADD;
+                  vnext = ( *pnext == VAL__BADD )? vprev : *pnext;
+                  gap = pnext - mean + 1;
+                  if( vprev != VAL__BADD && vnext != VAL__BADD ) {
+                     delta = ( vnext - vprev )/gap;
+
+                     vprev += delta;
+                     *mean = vprev;
+                     pnext = mean;
+                     while( pnext < pend && *(++pnext) == VAL__BADD ) {
+                        vprev += delta;
+                        *pnext = vprev;
                      }
 
-                     if( vnext == VAL__BADD ) {
-                        for( j = i; j <= t2; j++ ) means[ j ] = vprev;
-                        break;
+                  } else if( vnext != VAL__BADD ) {
+                     pnext = mean;
+                     while( pnext < pend && *(++pnext) == VAL__BADD ) {
+                        *pnext = vnext;
                      }
-                  }
 
-                  if( vprev == VAL__BADD ) {
-                     *mean = vnext;
+                  } else if( vprev != VAL__BADD ) {
+                     pnext = mean;
+                     while( pnext < pend && *(++pnext) == VAL__BADD ) {
+                        *pnext = vprev;
+                     }
+
                   } else {
-                     dprev++;
-                     dnext--;
-                     *mean = ( dnext*vprev + dprev*vnext )/dgap;
+                     *status = SAI__ERROR;
+                     errRepf( " ", "smf_import_array: Large sections of "
+                              "NDF '%s' are bad.", status, pdata->name );
+                     return;
                   }
-
-               } else {
-                  vprev = *mean;
-                  vnext = VAL__BADD;
                }
-            }
-
-            if( vprev == VAL__BADD && *status == SAI__OK ) {
-               *status = SAI__ERROR;
-               errRepf( " ", "NDF '%s' has no good values.", status,
-                        pdata->name );
             }
          }
 
