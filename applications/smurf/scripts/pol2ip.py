@@ -164,6 +164,12 @@
 *        a previous run of this script, using the TABLE parameter. If
 *        supplied, none of the other parameters are accessed, and a fit
 *        is performed to the values in the supplied table. [!]
+*     USEMEANI = _LOGICAL (Read)
+*        If TRUE, the Q and U values for all observations are normalised
+*        using the same total intensity value - the mean of the total intensity
+*        values averaged over all observations. If FALSE, the Q and U values
+*        for each observation are normalised using the total intensity value
+*        for that observation. [TRUE]
 *     WAVEBAND = LITERAL (Read)
 *        Indicates the waveband - "450" or "850".
 
@@ -234,6 +240,8 @@
 *        (if the original fit gives negative P values, negate them and rotate by 90 degrees)..
 *        - Only use previously made maps that have the expected number of WCS
 *        frames (others may have been the result of a failed run of makemap).
+*     23-MAY-2019 (DSB):
+*        Added USEMEANI parameter.
 *-
 '''
 
@@ -302,11 +310,16 @@ arealist = []
 # Table header line defining column names
 tabhead = "# ut obs az el q dq u du i di pi ang p pdeb dang dp qfit ufit pifit pfit tau tran rej hst at hum bp wndspd wnddir frleg bkleg"
 
-#  Are most fitted PI values negative?
-pineg = False
+#  Are most fitted fractional polarisation values negative?
+pneg = False
 
 # The mean total intensity within the aperture.
 ival = 0
+
+#  Use the mean total intensity to normalise Q and U values for all
+#  observations? Otherwise, use the total intensity for the individual
+#  observation rather than the mean total intensity.
+usemeanI = True
 
 #  A function to clean up before exiting. Delete all temporary NDFs etc,
 #  unless the script's RETAIN parameter indicates that they are to be
@@ -443,8 +456,19 @@ def fitquad(text,a,b,c,xvals,yvals):
 #  in ulist, elevation valuesin ellist).
 #  ------------------------------------------------------------------
 
-#  Returns the normalised Q and U representing the IP at a given
-#  elevation, assuming given model parameter values.
+#  Return the total intensity to use when forming normalised Q/U during
+#  fitting process.
+def totint( i, array=None ):
+   global ilist, ival, usemeanI
+   if( usemeanI ):
+      return ival
+   elif array is None:
+      return ilist[ i ]
+   else:
+      return array[ i ]
+
+#  Returns the normalised Q and U, and fractional polarisation, representing
+#  the IP at a given elevation, assuming given model parameter values.
 def model( i, x ):
    global elist
    return model2( elist[i], x )
@@ -452,30 +476,30 @@ def model( i, x ):
 def model2( el, x ):
    (a,b,c,d) = x
    elval = radians( el )
-   pi = a + b*elval + c*elval*elval
-   qfp = ival*pi*cos( -2*( elval - d ) )
-   ufp = ival*pi*sin( -2*( elval - d ) )
-   return (qfp, ufp, pi)
+   p = a + b*elval + c*elval*elval
+   qnfp = p*cos( -2*( elval - d ) )
+   unfp = p*sin( -2*( elval - d ) )
+   return (qnfp, unfp, p)
 
 #  Objective function used by minimisation routine. It returns the
 #  weighted mean of the squared Q/U residuals between the model and
 #  the data for a given set of model parameters.
 def objfun(x):
-   global qlist, dqlist, ulist, dulist, elist, pineg
-   npineg = 0
+   global qlist, dqlist, ulist, dulist, elist, pneg
+   npneg = 0
    res = 0.0
    swgt = 0.0
    for i in range(len(elist)):
-      (qfp,ufp,pi) = model( i, x )
-      if pi < 0.0:
-         npineg += 1
+      (qnfp,unfp,p) = model( i, x )
+      if p < 0.0:
+         npneg += 1
       qwgt = 1/(dqlist[i]*dqlist[i]*wvmlist[i])
-      dq = qfp - qlist[i]
+      dq = qnfp - qlist[i]/totint(i)
       uwgt = 1/(dulist[i]*dulist[i]*wvmlist[i])
-      du = ufp - ulist[i]
+      du = unfp - ulist[i]/totint(i)
       res += qwgt*dq*dq + uwgt*du*du
       swgt += qwgt+uwgt
-   pineg = ( npineg > len(elist)/2 )
+   pneg = ( npneg > len(elist)/2 )
 
    return res/swgt
 
@@ -485,44 +509,47 @@ def resid( useq, x ):
    swgt = 0.0
    res = 0.0
    for i in range(len(elist)):
-      (qfp,ufp,pi) = model( i, x )
+      (qnfp,unfp,p) = model( i, x )
       if useq:
          wgt = 1/(dqlist[i]*dqlist[i]*wvmlist[i])
-         dqu = qfp - qlist[i]
+         dqu = qnfp - qlist[i]/totint(i)
       else:
          wgt = 1/(dulist[i]*dulist[i]*wvmlist[i])
-         dqu = ufp - ulist[i]
+         dqu = unfp - ulist[i]/totint(i)
       swgt += wgt
       res += wgt*dqu*dqu
    return sqrt( res/swgt )
 
 #  Form new lists excluding outliers.
 def reject( useq, lim, x ):
-   global qlist, dqlist, ulist, dulist, elist
+   global qlist, dqlist, ulist, dulist, elist, ilist
    newqlist = []
    newulist = []
    newdqlist = []
    newdulist = []
    newelist = []
+   newilist = []
 
    for i in range(len(elist)):
-      (qfp,ufp,pi) = model( i, x )
+      (qnfp,unfp,p) = model( i, x )
       if useq:
-         dqu = qfp - qlist[i]
+         dqu = qnfp - qlist[i]/totint(i)
       else:
-         dqu = ufp - ulist[i]
+         dqu = unfp - ulist[i]/totint(i)
 
       if fabs( dqu ) < lim:
          newqlist.append( qlist[i] )
          newulist.append( ulist[i] )
          newdqlist.append( dqlist[i] )
          newdulist.append( dulist[i] )
+         newilist.append( ilist[i] )
          newelist.append( elist[i] )
 
    qlist = newqlist
    ulist = newulist
    dqlist = newdqlist
    dulist = newdulist
+   ilist = newilist
    elist = newelist
 
 #--------------------------------------------------------------------------------
@@ -568,10 +595,15 @@ try:
                                 "Q/U values", None, noprompt=True))
    params.append(starutil.Par0S("TABLEIN", "Input table holding raw "
                                 "Q/U values", None, noprompt=True))
+   params.append(starutil.Par0L("USEMEANI", "Use mean total intensity to normalise Q and U?",
+                                True, noprompt=True))
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
    parsys = ParSys( params )
+
+#  Normalise Q and U using the mean I value?
+   usemeanI = parsys["USEMEANI"].value
 
 #  It's a good idea to get parameter values early if possible, in case
 #  the user goes off for a coffee whilst the script is running and does not
@@ -668,7 +700,6 @@ try:
       fd.write("maptol_hits = 1\n")
 
       fd.write("pca.pcathresh = -150\n")
-      fd.write("pca.noiselim = 0\n")
       fd.write("ast.mapspike_freeze = 5\n")
       fd.write("pca.zero_niter = 0.2\n")
       fd.write("com.zero_niter = 0.2\n")
@@ -1323,13 +1354,13 @@ try:
          res = minimize( objfun, x0, method='nelder-mead',
                          options={'xtol': 1e-5, 'disp': True})
 
-#  Find RMS Q residual between data and fit.
+#  Find RMS of the normalised Q residual between data and fit.
          qrms = resid( True, res.x )
 
 #  Remove Q points more than 2 sigma from the fit.
          reject( True, 2*qrms, res.x )
 
-#  Find RMS U residual between data and fit.
+#  Find RMS of the normalised U residual between data and fit.
          urms = resid( False, res.x )
 
 #  Remove U points more than 2 sigma from the fit.
@@ -1338,7 +1369,7 @@ try:
 #  If most of the polarisations are negative, negate the polarisation and
 #  rotate by 90 degrees.
       (a,b,c,d) = res.x
-      if pineg:
+      if pneg:
          a = -a
          b = -b
          c = -c
@@ -1346,8 +1377,7 @@ try:
 
 #  Display results.
       msg_out("\n\nA={0} B={1} C={2} D={3} ({4} degrees)".format(a,b,c,d,degrees(d)))
-      msg_out("Q RMS = {0} pW  U RMS = {1} pW\n".format(qrms,urms))
-      msg_out("Qn RMS = {0}   Un RMS = {1} \n".format(qrms/ival,urms/ival))
+      msg_out("Qn RMS = {0} Un RMS = {1}\n".format(qrms,urms))
 
 
 #  If we have models for all beams, produce fits of FWHM1 and FWHM2 (in
@@ -1400,8 +1430,7 @@ try:
       fd.write("#\n")
       if dofit:
          fd.write("# A={0} B={1} C={2} D={3} ({4} degrees)\n".format(a,b,c,d,degrees(d)))
-         fd.write("# Q RMS = {0} pW  U RMS = {1} pW\n".format(qrms,urms))
-         fd.write("# Qn RMS = {0}   Un RMS = {1} \n".format(qrms/ival,urms/ival))
+         fd.write("# Qn RMS = {0}   Un RMS = {1}\n".format(qrms,urms))
          fd.write("#\n")
 
       fd.write( tabhead )
@@ -1416,13 +1445,12 @@ try:
                rej = 0
             else:
                rej = 1
-            (qfp,ufp,pi) = model2( elist0[i], res.x )
-            pifit = sqrt( qfp*qfp + ufp*ufp )
-            pfit = pifit/ival
+            (qnfp,unfp,pfit) = model2( elist0[i], res.x )
+            pifit = totint(i,ilist0)*pfit
          else:
             rej = 0
-            qfp = "null"
-            ufp = "null"
+            qnfp = "null"
+            unfp = "null"
             pifit = "null"
             pfit = "null"
 
@@ -1446,7 +1474,7 @@ try:
          pi2 = q2 + u2
          pi = sqrt( max( 0.0, pi2 ) )
          ang = degrees( 0.5*atan2( u, q ) )
-         p = pi/ival
+         p = pi/totint(i,ilist0)
 
          vpi = ( q2*dq*dq + u2*du*du )/pi2
          dpi = sqrt( vpi )
@@ -1454,13 +1482,14 @@ try:
          dang = degrees( sqrt( ( q2*du*du + u2*dq*dq )/ ( 4.0*pi2*pi2 ) ) )
 
          pideb = sqrt( max( 0.0, pi2 - vpi ) )
-         pdeb = pideb / ival
+         pdeb = pideb / totint(i,ilist0)
 
          fd.write("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} "
                   "{13} {14} {15} {16} {17} {18} {19} {20} {21} {22} {23} "
                   "{24} {25} {26} {27} {28} {29} {30}"
                   .format(utlist[i], obsnumlist[i],
-                  alist[i], el, q, dq, u, du, ii, di, pi, ang, p, pdeb, dang, dp, qfp, ufp, pifit, pfit,
+                  alist[i], el, q, dq, u, du, ii, di, pi, ang, p, pdeb,
+                  dang, dp, qnfp, unfp, pifit, pfit,
                   tau, tran, rej, hstlist[i], atlist[i], humlist[i],
                   bplist[i], wndspdlist[i], wnddirlist[i], frleglist[i],
                   bkleglist[i] ))
