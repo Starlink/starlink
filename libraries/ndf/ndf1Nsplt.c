@@ -93,6 +93,8 @@ void ndf1Nsplt( const char *name, int rel, size_t *n1, size_t *n2,
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     28-MAY-2019 (DSB):
+*        Fix bug that caused an HDS error report if the object name is blank.
 
 *-
 */
@@ -117,7 +119,7 @@ void ndf1Nsplt( const char *name, int rel, size_t *n1, size_t *n2,
    returned indices for the start and end of the HDS name so that they
    contain the whole non-blank section of the supplied string. */
    substr = ndf1Strip( NULL, name, 1, 0, &lstr, n1, status );
-   if( substr ) {
+   if( substr && lstr > 0 ) {
       *n2 = *n1 + lstr - 1;
 
 /* If this is an absolute HDS object name (including a container file
@@ -194,9 +196,16 @@ void ndf1Nsplt( const char *name, int rel, size_t *n1, size_t *n2,
                *pzero = 0;
 
 /* Update the object name end position, removing any new trailing
-   blanks. */
-               *n2 = *s1 - 1;
-               if( *n1 <= *n2 ) *n2 = *n1 + astChrLen( substr ) - 1;
+   blanks. Since n1 and n2 are unsigned, we need to check explicitly for
+   condifitions that might try to set n2 to a negativer value (i.e. cases
+   where the object name is missing). */
+               if( *s1 > 0 ) {
+                  *n2 = *s1 - 1;
+                  if( *n1 <= *n2 ) *n2 = *n1 + astChrLen( substr ) - 1;
+               } else {
+                  *n1 = 1;
+                  *n2 = 0;
+               }
 
 /* Note if no trailing section specification was found. */
             } else {
