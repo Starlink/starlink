@@ -58,8 +58,6 @@ and alphabetical summaries.}
 \providecommand{\CGSDRref}{\xref{{\footnotesize CGS4DR}}{sun27}{}}
 \providecommand{\CONVERT}{{\footnotesize CONVERT}\normalsize}
 \providecommand{\CONVERTref}{\xref{{\footnotesize CONVERT}}{sun55}{}}
-\providecommand{\CURSA}{{\footnotesize CURSA}\normalsize}
-\providecommand{\CURSAref}{\xref{\CURSA}{sun190}{}}
 \providecommand{\ECHOMOPref}{\xref{{\footnotesize ECHOMOP}}{sun152}{}}
 \providecommand{\ESPref}{\xref{{\footnotesize ESP}}{sun180}{}}
 \providecommand{\EVINCE}{{\footnotesize EVINCE}\normalsize}
@@ -17787,8 +17785,7 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM}.
          The catalogue has the form of a positions list such as created by
          application LISTMAKE.  Only positions in the first selected picture
          are recorded.  This application uses the conventions of the
-         \CURSAref\ package((\xref{SUN/190}{sun190}{}) for determining the format
-         of the catalogue.  If a
+         \cursa\ package for determining the format of the catalogue.  If a
          file type of \texttt{.fit} is given, then the catalogue is stored as a FITS
          binary table.  If a file type of \texttt{.txt} is given, then the catalogue
          is stored in a text file in \texttt{"Small Text List"} (STL) format.  If no
@@ -20667,7 +20664,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          TABLE.  A null value (\texttt{{!}}) means that no description file will
          be created, so this is now the recommended usage.  If your
          FITS file comprises just tables, you should consider other
-         tools such as the \CURSA\  package, which has facilities for
+         tools such as the \cursa\  package, which has facilities for
          examining and processing ASCII and binary tables in FITS files.
 
          A suggested filename for the description file is reported
@@ -20869,7 +20866,7 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
 \htmlref{FITSIN}{FITSIN},
 \htmlref{FITSLIST}{FITSLIST};
 \xref{CONVERT}{sun55}{}: \xref{FITS2NDF}{sun55}{FITS2NDF};
-\xref{CURSA}{sun190}{};
+\cursa;
 \xref{FIGARO}{sun86}{}: \xref{RDFITS}{sun86}{RDFITS}.
    }
    \sstimplementationstatus{
@@ -21535,7 +21532,7 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
          TABLE.  A null value (\texttt{{!}}) means that no description file will
          be created, so this is now the recommended usage.  If your
          FITS file comprises just tables, you should consider other
-         tools such as the \CURSA\  package, which has facilities for
+         tools such as the \cursa\  package, which has facilities for
          examining and processing ASCII and binary tables in FITS files.
 
          A suggested filename for the description file is reported
@@ -21771,7 +21768,7 @@ KAPPA: \htmlref{FITSDIN}{FITSDIN},
 \htmlref{FITSIMP}{FITSIMP},
 \htmlref{FITSLIST}{FITSLIST};
 \xref{CONVERT}{sun55}{}: \xref{FITS2NDF}{sun55}{FITS2NDF};
-\xref{CURSA}{sun190}{};
+\cursa;
 \xref{FIGARO}{sun86}{}: \xref{RDFITS}{sun86}{RDFITS}.
    }
    \sstimplementationstatus{
@@ -27038,7 +27035,7 @@ KAPPA: \htmlref{PROFILE}{PROFILE},
       \htmlref{co-ordinate Frames}{se:domains}~ in which the positions are defined.  Integer
       position identifiers which allow positions to be distinguished are
       also stored in the catalogue.  The catalogue may be manipulated
-      using the \CURSA\ ~package (\xref{SUN/190}{sun190}{}), and is stored in either FITS
+      using the \cursa\ ~package, and is stored in either FITS
       binary format or the \emph{Small Text List}~ (\STLref) format
       defined by \CURSA.
 
@@ -27338,7 +27335,7 @@ KAPPA: \htmlref{PROFILE}{PROFILE},
       \sstitemlist{
 
          \sstitem
-         This application uses the conventions of the \CURSA\ package
+         This application uses the conventions of the \cursa\ package
          for determining the formats of input and output catalogues.  If a file
          type of .fit is given, then the catalogue is assumed to be a FITS
          binary table.  If a file type of .txt is given, then the catalogue is
@@ -27364,7 +27361,7 @@ KAPPA: \htmlref{PROFILE}{PROFILE},
    }{
 KAPPA: \htmlref{CURSOR}{CURSOR},
 \htmlref{LISTSHOW}{LISTSHOW};
-\xref{CURSA}{sun190}{}: \xref{XCATVIEW}{sun190}{XVIEW},
+\CURSA: \xref{XCATVIEW}{sun190}{XVIEW},
 \xref{CATSELECT}{sun190}{CATSELECT}.
    }
 }
@@ -27838,7 +27835,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
       \sstitemlist{
 
          \sstitem
-         This application uses the conventions of the \CURSA\ package (\xref{SUN/190}{sun190}{})
+         This application uses the conventions of the \cursa\ package
          for determining the formats of input and output catalogues.  If a file
          type of .fits is given, then the catalogue is assumed to be a FITS
          binary table.  If a file type of .txt is given, then the catalogue is
@@ -27860,7 +27857,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
    }{
 KAPPA: \htmlref{CURSOR}{CURSOR},
 \htmlref{LISTMAKE}{LISTMAKE};
-\xref{CURSA}{sun190}{}: \xref{XCATVIEW}{sun190}{XVIEW},
+\CURSA: \xref{XCATVIEW}{sun190}{XVIEW},
 \xref{CATSELECT}{sun190}{CATSELECT}.
    }
 }
@@ -38877,7 +38874,7 @@ KAPPA: \htmlref{ADD}{ADD},
       \sstitemlist{
 
          \sstitem
-         This application uses the conventions of the \CURSA\ package (\xref{SUN/190}{sun190}{})
+         This application uses the conventions of the \cursa\ package
          for determining the formats of input and output positions list
          catalogues.  If a file type of .fit is given, then the catalogue is
          assumed to be a FITS binary table.  If a file type of .txt is given,
@@ -38893,7 +38890,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
 \htmlref{CURSOR}{CURSOR},
 \htmlref{LISTMAKE}{LISTMAKE},
 \htmlref{LISTSHOW}{LISTSHOW};
-\xref{CURSA}{sun190}{}: \xref{XCATVIEW}{sun190}{XVIEW}.
+\CURSA: \xref{XCATVIEW}{sun190}{XVIEW}.
    }
    \sstimplementationstatus{
       \sstitemlist{
