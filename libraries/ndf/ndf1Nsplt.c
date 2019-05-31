@@ -95,6 +95,8 @@ void ndf1Nsplt( const char *name, int rel, size_t *n1, size_t *n2,
 *        Original version, based on equivalent Fortran function by RFWS.
 *     28-MAY-2019 (DSB):
 *        Fix bug that caused an HDS error report if the object name is blank.
+*     31-MAY-2019 (DSB):
+*        Initialise the returned values.
 
 *-
 */
@@ -110,6 +112,12 @@ void ndf1Nsplt( const char *name, int rel, size_t *n1, size_t *n2,
    size_t lstr;          /* Length of substr */
    size_t p1;            /* Start of HDS path name */
    size_t p2;            /* End of HDS path name */
+
+/* Initialise returned values. */
+   *n1 = 1;
+   *n2 = 0;
+   *s1 = 1;
+   *s2 = 0;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
