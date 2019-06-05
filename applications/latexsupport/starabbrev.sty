@@ -117,36 +117,6 @@
 % Starlink Package name
 \newcommand{\starlink}{\href{http://www.starlink.ac.uk}{Starlink}}
 
-% Set up links to some common packages.  The aim is to have \package
-% but some clash with LaTeX definitions are \Package.
-\newcommand{\ccdpack}{\xref{\textsc{Ccdpack}}{sun139}{}}
-\newcommand{\convert}{\xref{\textsc{Convert}}{sun55}{}}
-\newcommand{\cupid}{\xref{\textsc{Cupid}}{sun255}{}}
-\newcommand{\cursa}{\xref{\textsc{Cursa}}{sun190}{}}
-\newcommand{\datacube}{\xref{\textsc{Datacube}}{sun237}{}}
-\newcommand{\figaro}{\xref{\textsc{Figaro}}{sun86}{}}
-\newcommand{\fluxes}{\xref{\textsc{Fluxes}}{sun213}{}}
-\newcommand{\gaia}{\xref{\textsc{Gaia}}{sun214}{}}
-\newcommand{\hdstrace}{\xref{\textsc{Hdstrace}}{sun102}{}}
-\newcommand{\jcmtdr}{\xref{\textsc{JCMTdr}}{sun132}{}}
-\newcommand{\Kappa}{\xref{\textsc{Kappa}}{sun95}{}}
-\newcommand{\oracdr}{\href{http://dx.doi.org/10.1016/j.ascom.2014.10.005}{\textsc{Orac-dr}}}
-\newcommand{\photom}{\xref{\textsc{Photom}}{sun45}{}}
-\newcommand{\picard}{\xref{\textsc{Picard}}{sun265}{}}
-\newcommand{\polpack}{\xref{\textsc{Polpack}}{sun223}{}}
-\newcommand{\smurf}{\xref{\textsc{Smurf}}{sun258}{}}
-\newcommand{\splat}{\xref{\textsc{Splat}}{sun243}{}}
-\newcommand{\surf}{\xref{\textsc{Surf}}{sun216}{}}
-\newcommand{\topcat}{\href{http://www.starlink.ac.uk/topcat}{\textsc{Topcat}}}
-
-% Links to libraries' documents.
-\newcommand{\agi}{\xref{AGI}{sun48}{}}
-\newcommand{\ard}{\xref{ARD}{sun183}{}}
-\newcommand{\Ast}{\xref{AST}{sun211}{}}
-\newcommand{\hds}{\xref{HDS}{sun92}{}}
-\newcommand{\ndf}{\xref{NDF}{sun33}{}}
-\newcommand{\pda}{\xref{PDA}{sun194}{}}
-
 % Definitions for package names without a link.
 \providecommand{\CCDPACK}{\textsc{Ccdpack}}
 \providecommand{\CONVERT}{\textsc{Convert}}
@@ -167,14 +137,63 @@
 \providecommand{\SPLAT}{\textsc{Splat}}
 \providecommand{\TOPCAT}{\textsc{Topcat}}
 
+% Set up links to some common packages.  The aim was to have \package
+% style of command names, but some clash with LaTeX definitions and
+% \PACKAGEref naming convention is far more extensive.  \package
+% style seems to have originated in the JCMT-instrument cookbooks.
+\newcommand{\CCDPACKref}{\xref{\CCDPACK}{sun139}{}}
+\newcommand{\CONVERTref}{\xref{\CONVERT}{sun55}{}}
+\newcommand{\CUPIDref}{\xref{\CUPID}{sun255}{}}
+\newcommand{\CURSAref}{\xref{\CURSA}{sun190}{}}
+\newcommand{\DATACUBEref}{\xref{\DATACUBE}{sun237}{}}
+\newcommand{\FIGAROref}{\xref{\FIGARO}{sun86}{}}
+\newcommand{\FLUXESref}{\xref{\FLUXES}{sun213}{}}
+\newcommand{\GAIAref}{\xref{\GAIA}{sun214}{}}
+\newcommand{\HDSTRACEref}{\xref{\HDSTRACE}{sun102}{}}
+\newcommand{\JCMTDRref}{\xref{\JcmtDR}{sun132}{}}
+\newcommand{\KAPPAref}{\xref{\KAPPA}{sun95}{}}
+\newcommand{\ORACDRref}{\href{http://dx.doi.org/10.1016/j.ascom.2014.10.005}{\ORACDR}}
+\newcommand{\PHOTOMref}{\xref{\PHOTOM}{sun45}{}}
+\newcommand{\PICARDref}{\xref{\PICARD}{sun265}{}}
+\newcommand{\POLPACKref}{\xref{\POLPACK}{sun223}{}}
+\newcommand{\SMURFref}{\xref{\SMURF}{sun258}{}}
+\newcommand{\SPLATref}{\xref{\SPLAT}{sun243}{}}
+\newcommand{\SURFref}{\xref{\SURF}{sun216}{}}
+\newcommand{\TOPCATref}{\href{http://www.starlink.ac.uk/topcat}{\TOPCAT}}
+
+% Links to libraries' documents.
+\newcommand{\AGIref}{\xref{AGI}{sun48}{}}
+\newcommand{\ARDref}{\xref{ARD}{sun183}{}}
+\newcommand{\ASTref}{\xref{AST}{sun211}{}}
+\newcommand{\HDSref}{\xref{HDS}{sun92}{}}
+\newcommand{\NDFref}{\xref{NDF}{sun33}{}}
+\newcommand{\PDAref}{\xref{PDA}{sun194}{}}
+
 % Deprecated package links
-\providecommand{\CCDPACKref}{\xref{\CCDPACK}{sun139}{}}
+\newcommand{\ccdpack}{\xref{\textsc{Ccdpack}}{sun139}{}}
+\newcommand{\convert}{\xref{\textsc{Convert}}{sun55}{}}
+\newcommand{\cupid}{\xref{\textsc{Cupid}}{sun255}{}}
+\newcommand{\datacube}{\xref{\textsc{Datacube}}{sun237}{}}
 \newcommand{\Figaro}{\xref{\textsc{Figaro}}{sun86}{}}
-\providecommand{\GAIAref}{\xref{\GAIA}{sun214}{}}
-\providecommand{\HDSTRACEref}{\xref{\HDSTRACE}{sun102}{}}
-\providecommand{\KAPPAref}{\xref{(SUN/95)}{sun95}{}}
-\providecommand{\astref}{\xref{SUN/211}{sun211}{}}
-\providecommand{\ndfref}{\xref{SUN/33}{sun33}{}}
+\newcommand{\fluxes}{\xref{\textsc{Fluxes}}{sun213}{}}
+\newcommand{\gaia}{\xref{\textsc{Gaia}}{sun214}{}}
+\newcommand{\Kappa}{\xref{\textsc{Kappa}}{sun95}{}}
+\newcommand{\agi}{\xref{AGI}{sun48}{}}
+\newcommand{\ndf}{\xref{NDF}{sun33}{}}
+\newcommand{\surf}{\xref{\textsc{Surf}}{sun216}{}}
+\newcommand{\jcmtdr}{\xref{\textsc{JCMTdr}}{sun132}{}}
+\newcommand{\oracdr}{\href{http://dx.doi.org/10.1016/j.ascom.2014.10.005}{\textsc{Orac-dr}}}
+\newcommand{\photom}{\xref{\textsc{Photom}}{sun45}{}}
+\newcommand{\picard}{\xref{\textsc{Picard}}{sun265}{}}
+\newcommand{\polpack}{\xref{\textsc{Polpack}}{sun223}{}}
+\newcommand{\smurf}{\xref{\textsc{Smurf}}{sun258}{}}
+\newcommand{\splat}{\xref{\textsc{Splat}}{sun243}{}}
+\newcommand{\topcat}{\href{http://www.starlink.ac.uk/topcat}{\textsc{Topcat}}}
+% SUN/253 is not in the regular $STARLINK_DIR/docs directory and so the
+% following link does not work.  The user guide is present in
+% $STARLINK_DIR/starjava/docs/topcat/sun253 and only in HTML format.
+% Therefore disable the following duplicated definition.
+%\newcommand{\topcat}{\xref{\task{Topcat}}{sun253}{}}
 
 % Set up links to specific applications.
 % --------------------------------------
@@ -277,7 +296,6 @@
 \newcommand{\autophotom}{\xref{\task{autophotom}}{sun45}{AUTOPHOTOM}}
 \newcommand{\fitstondf}{\xref{\task{fits2ndf}}{sun55}{FITS2NDF}}
 \newcommand{\ndftofits}{\xref{\task{ndf2fits}}{sun55}{NDF2FITS}}
-\newcommand{\topcat}{\xref{\task{Topcat}}{sun253}{}}
 
 % Documents
 % ---------
