@@ -85,41 +85,11 @@
 \newcommand{\fcfa}{$\mathrm{FCF\sb{arcsec}}$}
 \newcommand{\fcfm}{$\mathrm{FCF\sb{match}}$}
 
-% Starlink Package name
-\newcommand{\starlink}{\href{http://www.starlink.ac.uk}{Starlink}}
-
-% Set up some common package names.
-\newcommand{\Ast}{\xref{SUN/211}{sun211}{}}
-\newcommand{\ccdpack}{\xref{\textsc{Ccdpack}}{sun139}{}}
-\newcommand{\convert}{\xref{\textsc{Convert}}{sun55}{}}
-\newcommand{\cupid}{\xref{\textsc{Cupid}}{sun255}{}}
-\newcommand{\cursa}{\xref{\textsc{Cursa}}{sun190}{}}
-\newcommand{\datacube}{\xref{\textsc{Datacube}}{sun237}{}}
-\newcommand{\Figaro}{\xref{\textsc{Figaro}}{sun86}{}}
-\newcommand{\fluxes}{\xref{\textsc{Fluxes}}{sun213}{}}
-\newcommand{\gaia}{\xref{\textsc{Gaia}}{sun214}{}}
-\newcommand{\hdstrace}{\xref{\textsc{Hdstrace}}{sun102}{}}
-\newcommand{\Kappa}{\xref{\textsc{Kappa}}{sun95}{}}
-\newcommand{\agi}{\xref{AGI}{sun48}{}}
-\newcommand{\ndf}{\xref{NDF}{sun33}{}}
-\newcommand{\surf}{\xref{\textsc{Surf}}{sun216}{}}
-\newcommand{\jcmtdr}{\xref{\textsc{JCMTdr}}{sun132}{}}
-\newcommand{\oracdr}{\href{http://dx.doi.org/10.1016/j.ascom.2014.10.005}{\textsc{Orac-dr}}}
-\newcommand{\photom}{\xref{\textsc{Photom}}{sun45}{}}
-\newcommand{\picard}{\xref{\textsc{Picard}}{sun265}{}}
-\newcommand{\polpack}{\xref{\textsc{Polpack}}{sun223}{}}
-\newcommand{\smurf}{\xref{\textsc{Smurf}}{sun258}{}}
-\newcommand{\splat}{\xref{\textsc{Splat}}{sun243}{}}
-\newcommand{\ssds}{\xref{\textsc{Starlink Standard Data Structures}}{sgp38}{}}
-\newcommand{\topcat}{\href{http://www.starlink.ac.uk/topcat}{\textsc{Topcat}}}
-
 % DR recipe names
 \newcommand{\drrecipe}[1]{\texttt{#1}}
 
 % Application tasks
 \newcommand{\task}[1]{\textsf{#1}}
-
-
 
 % ADAM parameters
 \newcommand{\param}[1]{\texttt{#1}}
@@ -141,36 +111,134 @@
 % The name of a window produced by a graphical tool.
 \newcommand{\guiwindow}[1]{"\texttt{#1}"}
 
+% Create links to specific packages.
+% ----------------------------------
+
+% Starlink Package name
+\newcommand{\starlink}{\href{http://www.starlink.ac.uk}{Starlink}}
+
+% Set up links to some common packages.  The aim is to have \package
+% but some clash with LaTeX definitions are \Package.
+\newcommand{\agi}{\xref{AGI}{sun48}{}}
+\newcommand{\Ast}{\xref{SUN/211}{sun211}{}}
+\newcommand{\ccdpack}{\xref{\textsc{Ccdpack}}{sun139}{}}
+\newcommand{\convert}{\xref{\textsc{Convert}}{sun55}{}}
+\newcommand{\cupid}{\xref{\textsc{Cupid}}{sun255}{}}
+\newcommand{\cursa}{\xref{\textsc{Cursa}}{sun190}{}}
+\newcommand{\datacube}{\xref{\textsc{Datacube}}{sun237}{}}
+\newcommand{\figaro}{\xref{\textsc{Figaro}}{sun86}{}}
+\newcommand{\fluxes}{\xref{\textsc{Fluxes}}{sun213}{}}
+\newcommand{\gaia}{\xref{\textsc{Gaia}}{sun214}{}}
+\newcommand{\jcmtdr}{\xref{\textsc{JCMTdr}}{sun132}{}}
+\newcommand{\Kappa}{\xref{\textsc{Kappa}}{sun95}{}}
+\newcommand{\ndf}{\xref{NDF}{sun33}{}}
+\newcommand{\oracdr}{\href{http://dx.doi.org/10.1016/j.ascom.2014.10.005}{\textsc{Orac-dr}}}
+\newcommand{\photom}{\xref{\textsc{Photom}}{sun45}{}}
+\newcommand{\picard}{\xref{\textsc{Picard}}{sun265}{}}
+\newcommand{\polpack}{\xref{\textsc{Polpack}}{sun223}{}}
+\newcommand{\smurf}{\xref{\textsc{Smurf}}{sun258}{}}
+\newcommand{\splat}{\xref{\textsc{Splat}}{sun243}{}}
+\newcommand{\surf}{\xref{\textsc{Surf}}{sun216}{}}
+\newcommand{\topcat}{\href{http://www.starlink.ac.uk/topcat}{\textsc{Topcat}}}
+
+% Definitions for package names without a link.
+\providecommand{\CONVERT}{\textsc{Convert}}
+\providecommand{\CURSA}{\textsc{Cursa}}
+\providecommand{\CCDPACK}{\textsc{Ccdpack}}
+\providecommand{\FIGARO}{\textsc{Figaro}}
+\providecommand{\GAIA}{\textsc{Gaia}}
+\providecommand{\HDSTRACE}{\textsc{Hdstrace}}
+\providecommand{\KAPPA}{\textsc{Kappa}}
+\providecommand{\ORACDR}{\textsc{Orac-dr}}
+\providecommand{\POLPACK}{\textsc{Polpack}}
+\providecommand{\SMURF}{\textsc{Smurf}}
+
+% Deprecated package links
+\providecommand{\CCDPACKref}{\xref{\CCDPACK}{sun139}{}}
+\newcommand{\Figaro}{\xref{\textsc{Figaro}}{sun86}{}}
+\providecommand{\GAIAref}{\xref{\GAIA}{sun214}{}}
+\providecommand{\HDSTRACEref}{\xref{\HDSTRACE}{sun102}{}}
+\providecommand{\KAPPAref}{\xref{(SUN/95)}{sun95}{}}
+\providecommand{\astref}{\xref{SUN/211}{sun211}{}}
+\providecommand{\ndfref}{\xref{SUN/33}{sun33}{}}
+
+% Set up links to specific applications.
+% --------------------------------------
+
 % SMURF tasks
+\newcommand{\badbolos}{\xref{\task{badbolos}}{sun258}{BADBOLOS}}
+\newcommand{\calcdark}{\xref{\task{calcdark}}{sun258}{CALCDARK}}
+\newcommand{\calcflat}{\xref{\task{calcflat}}{sun258}{CALCFLAT}}
 \newcommand{\calcnoise}{\xref{\task{calcnoise}}{sun258}{CALCNOISE}}
+\newcommand{\calcresp}{\xref{\task{calcresp}}{sun258}{CALCRESP}}
 \newcommand{\clean}{\xref{\task{sc2clean}}{sun258}{SC2CLEAN}}
 \newcommand{\concat}{\xref{\task{sc2concat}}{sun258}{SC2CONCAT}}
 \newcommand{\configmeld}{\xref{\task{configmeld}}{sun258}{CONFIGMELD}}
+\newcommand{\copyflat}{\xref{\task{copyflat}}{sun258}{COPYFLAT}}
+\newcommand{\dreamsolve}{\xref{\task{dreamsolve}}{sun258}{DREAMSOLVE}}
+\newcommand{\dreamweights}{\xref{\task{dreamweights}}{sun258}{DREAMWEIGHTS}}
+\newcommand{\dumpocscfg}{\xref{\task{dumpocscfg}}{sun258}{DUMPOCSCFG}}
+\newcommand{\extinction}{\xref{\task{extinction}}{sun258}{EXTINCTION}}
+\newcommand{\fft}{\xref{\task{sc2fft}}{sun258}{SC2FFT}}
+%  ...use fitdd instead of fit1d because the 1 breaks the macro
+\newcommand{\fitdd}{\xref{\task{fit1d}}{sun258}{FIT1D}}
 \newcommand{\flatfield}{\xref{\task{flatfield}}{sun258}{FLATFIELD}}
+\newcommand{\fts}{\xref{\task{sc2fts}}{sun258}{SC2FTS}}
+\newcommand{\gettsys}{\xref{\task{gettsys}}{sun258}{GETTSYS}}
+% Use "to" instead of "2" because numbers are not allowed in command names.
+\newcommand{\gsdtoacsis}{\xref{\task{gsd2acsis}}{sun258}{GSD2ACSIS}}
+\newcommand{\gsdshow}{\xref{\task{gsdshow}}{sun258}{GSDSHOW}}
+\newcommand{\impaztec}{\xref{\task{impaztec}}{sun258}{IMPAZTEC}}
 \newcommand{\jcmtstate}{\xref{\task{jcmtstate2cat}}{sun258}{JCMTSTATE2CAT}}
+\newcommand{\makecube}{\xref{\task{makecube}}{sun258}{MAKECUBE}}
 \newcommand{\makemap}{\xref{\task{makemap}}{sun258}{MAKEMAP}}
+\newcommand{\poltwomap}{\xref{\task{pol2map}}{sun258}{POL2MAP}}
+\newcommand{\rawunpress}{\xref{\task{rawunpress}}{sun258}{RAWUNPRESS}}
+\newcommand{\rawfixmeta}{\xref{\task{rawfixmeta}}{sun258}{RAWFIXMETA}}
+\newcommand{\remsky}{\xref{\task{remsky}}{sun258}{REMSKY}}
+\newcommand{\sctwosim}{\xref{\task{sc2sim}}{sun258}{SC2SIM}}
+\newcommand{\sctwothreadtest}{\xref{\task{sc2threadtest}}{sun258}{SC2THREADTEST}}
+\newcommand{\scanfit}{\xref{\task{scanfit}}{sun258}{SCANFIT}}
 \newcommand{\skyloop}{\xref{\task{skyloop}}{sun258}{SKYLOOP}}
+\newcommand{\skynoise}{\xref{\task{skynoise}}{sun258}{SKYNOISE}}
+\newcommand{\smurfcopy}{\xref{\task{smurfcopy}}{sun258}{SMURFCOPY}}
+\newcommand{\smurfhelp}{\xref{\task{smurfhelp}}{sun258}{SMURFHELP}}
 \newcommand{\stackframes}{\xref{\task{stackframes}}{sun258}{STACKFRAMES}}
+\newcommand{\starecalc}{\xref{\task{starecalc}}{sun258}{STARECALC}}
+\newcommand{\timesort}{\xref{\task{timesort}}{sun258}{TIMESORT}}
+\newcommand{\unmakecube}{\xref{\task{unmakecube}}{sun258}{UNMAKECUBE}}
+
+\providecommand{\iterate}{\texttt{iterate}}
 
 % KAPPA
 \newcommand{\beamfit}{\xref{\task{beamfit}}{sun95}{BEAMFIT}}
 \newcommand{\block}{\xref{\task{block}}{sun95}{BLOCK}}
 \newcommand{\chpix}{\xref{\task{chpix}}{sun95}{CHPIX}}
 \newcommand{\cdiv}{\xref{\task{cdiv}}{sun95}{CDIV}}
+\newcommand{\clinplot}{\xref{\task{clinplot}}{sun95}{CLINPLOT}}
 \newcommand{\cmult}{\xref{\task{cmult}}{sun95}{CMULT}}
+\newcommand{\collapse}{\xref{\task{collapse}}{sun95}{COLLAPSE}}
 \newcommand{\compave}{\xref{\task{compave}}{sun95}{COMPAVE}}
 \newcommand{\configecho}{\xref{\task{configecho}}{sun95}{CONFIGECHO}}
 \newcommand{\contour}{\xref{\task{contour}}{sun95}{CONTOUR}}
+\newcommand{\csub}{\xref{\task{csub}}{sun95}{CSUB}}
+\newcommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
+\newcommand{\fillbad}{\xref{\task{fillbad}}{sun95}{FILLBAD}}
+\newcommand{\fitsedit}{\xref{\task{fitsedit}}{sun95}{FITSEDIT}}
 \newcommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
 \newcommand{\fitsval}{\xref{\task{fitsval}}{sun95}{FITSVAL}}
 \newcommand{\gausmooth}{\xref{\task{gausmooth}}{sun95}{GAUSMOOTH}}
 \newcommand{\hislist}{\xref{\task{hislist}}{sun95}{HISLIST}}
 \newcommand{\histat}{\xref{\task{histat}}{sun95}{HISTAT}}
 \newcommand{\histogram}{\xref{\task{histogram}}{sun95}{HISTOGRAM}}
+\newcommand{\kapdiv}{\xref{\task{div}}{sun95}{DIV}}
 \newcommand{\linplot}{\xref{\task{linplot}}{sun95}{LINPLOT}}
 \newcommand{\makesnr}{\xref{\task{makesnr}}{sun95}{MAKESNR}}
+\newcommand{\mlinplot}{\xref{\task{mlinplot}}{sun95}{MLINPLOT}}
+\newcommand{\ndfcompress}{\xref{\task{ndfcompress}}{sun95}{NDFCOMPRESS}}
 \newcommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
 \newcommand{\ndftrace}{\xref{\task{ndftrace}}{sun95}{NDFTRACE}}
+\newcommand{\parget}{\xref{\task{parget}}{sun95}{PARGET}}
 \newcommand{\paste}{\xref{\task{paste}}{sun95}{PASTE}}
 \newcommand{\polplot}{\xref{\task{polplot}}{sun95}{POLPLOT}}
 \newcommand{\provshow}{\xref{\task{provshow}}{sun95}{PROVSHOW}}
@@ -178,6 +246,8 @@
 \newcommand{\setvar}{\xref{\task{setvar}}{sun95}{SETVAR}}
 \newcommand{\stats}{\xref{\task{stats}}{sun95}{STATS}}
 \newcommand{\sub}{\xref{\task{sub}}{sun95}{SUB}}
+\newcommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
+\newcommand{\wcsalign}{\xref{\task{wcsalign}}{sun95}{WCSALIGN}}
 \newcommand{\wcsattrib}{\xref{\task{wcsattrib}}{sun95}{WCSATTRIB}}
 \newcommand{\wcsframe}{\xref{\task{wcsframe}}{sun95}{WCSFRAME}}
 \newcommand{\wcsmosaic}{\xref{\task{wcsmosaic}}{sun95}{WCSMOSAIC}}
@@ -189,12 +259,17 @@
 \newcommand{\findback}{\xref{\task{findback}}{sun255}{FINDBACK}}
 \newcommand{\findclumps}{\xref{\task{findclumps}}{sun255}{FINDCLUMPS}}
 
-% Misc
+% Miscellaneous
 \newcommand{\autophotom}{\xref{\task{autophotom}}{sun45}{AUTOPHOTOM}}
 \newcommand{\fitstondf}{\xref{\task{fits2ndf}}{sun55}{FITS2NDF}}
+\newcommand{\topcat}{\xref{\task{Topcat}}{sun253}{}}
 
 % Documents
+% ---------
+
 \newcommand{\stardocs}[2]{\href{http://www.starlink.ac.uk/docs/#1#2.htx/#1#2.html}{\textbf{\uppercase{#1}/#2}}}
+
+% Package documents
 \newcommand{\convertsun}{\xref{\textbf{SUN/55}}{sun55}{}}
 \newcommand{\cupidsun}{\xref{\textbf{SUN/255}}{sun255}{}}
 \newcommand{\gaiasun}{\xref{\textbf{SUN/214}}{sun214}{}}
@@ -205,92 +280,13 @@
 \newcommand{\pipelinesun}{\xref{\textbf{SUN/264}}{sun264}{}}
 \newcommand{\smurfsun}{\xref{\textbf{SUN/258}}{sun258}{}}
 
-
-% Shorthand and HTML references for other Starlink packages.
-\providecommand{\CURSA}{\textsc{Cursa}}
-\providecommand{\CCDPACK}{\textsc{Ccdpack}}
-\providecommand{\CCDPACKref}{\xref{\CCDPACK}{sun139}{}}
-\providecommand{\GAIA}{\textsc{Gaia}}
-\providecommand{\GAIAref}{\xref{\GAIA}{sun214}{}}
-\providecommand{\HDSTRACE}{\textsc{Hdstrace}}
-\providecommand{\KAPPA}{\textsc{Kappa}}
-\providecommand{\KAPPAref}{\xref{(SUN/95)}{sun95}{}}
-\providecommand{\ORACDR}{\textsc{Orac-dr}}
-\providecommand{\POLPACK}{\textsc{Polpack}}
-\providecommand{\SMURF}{\textsc{Smurf}}
+% Non-package documents and cookbooks
+\newcommand{\ssds}{\xref{\textsc{Starlink Standard Data Structures}}{sgp38}{}}
 \providecommand{\SMURFcook}{\xref{SC/21}{sc21}{}}
 \providecommand{\ADAMsgref}{\xref{SG/4}{sg4}{}}
 \providecommand{\ADAMsunref}{\xref{SUN/101}{sun101}{}}
+\providecommand{\FITSref}{\htmladdnormallink{FITS}{http://fits.gsfc.nasa.gov/}}
 
-% Application tasks
-\providecommand{\task}[1]{\textsf{#1}}
-
-% SMURF tasks
-\providecommand{\badbolos}{\xref{\task{badbolos}}{sun258}{BADBOLOS}}
-\providecommand{\calcdark}{\xref{\task{calcdark}}{sun258}{CALCDARK}}
-\providecommand{\calcflat}{\xref{\task{calcflat}}{sun258}{CALCFLAT}}
-\providecommand{\calcnoise}{\xref{\task{calcnoise}}{sun258}{CALCNOISE}}
-\providecommand{\calcresp}{\xref{\task{calcresp}}{sun258}{CALCRESP}}
-\providecommand{\copyflat}{\xref{\task{copyflat}}{sun258}{COPYFLAT}}
-\providecommand{\dreamsolve}{\xref{\task{dreamsolve}}{sun258}{DREAMSOLVE}}
-\providecommand{\dreamweights}{\xref{\task{dreamweights}}{sun258}{DREAMWEIGHTS}}
-%  ...use fitdd instead of fit1d because the 1 breaks the macro
-\providecommand{\fitdd}{\xref{\task{fit1d}}{sun258}{FIT1D}}
-\providecommand{\gsdtoacsis}{\xref{\task{gsd2acsis}}{sun258}{GSD2ACSIS}}
-\providecommand{\gsdshow}{\xref{\task{gsdshow}}{sun258}{GSDSHOW}}
-\providecommand{\smurfhelp}{\xref{\task{smurfhelp}}{sun258}{SMURFHELP}}
-\providecommand{\impaztec}{\xref{\task{impaztec}}{sun258}{IMPAZTEC}}
-\providecommand{\makecube}{\xref{\task{makecube}}{sun258}{MAKECUBE}}
-\providecommand{\poltwomap}{\xref{\task{pol2map}}{sun258}{POL2MAP}}
-\providecommand{\rawunpress}{\xref{\task{rawunpress}}{sun258}{RAWUNPRESS}}
-\providecommand{\rawfixmeta}{\xref{\task{rawfixmeta}}{sun258}{RAWFIXMETA}}
-\providecommand{\sctwosim}{\xref{\task{sc2sim}}{sun258}{SC2SIM}}
-\providecommand{\sctwothreadtest}{\xref{\task{sc2threadtest}}{sun258}{SC2THREADTEST}}
-\providecommand{\scanfit}{\xref{\task{scanfit}}{sun258}{SCANFIT}}
-\providecommand{\skynoise}{\xref{\task{skynoise}}{sun258}{SKYNOISE}}
-\providecommand{\smurfcopy}{\xref{\task{smurfcopy}}{sun258}{SMURFCOPY}}
-\providecommand{\stackframes}{\xref{\task{stackframes}}{sun258}{STACKFRAMES}}
-\providecommand{\starecalc}{\xref{\task{starecalc}}{sun258}{STARECALC}}
-\providecommand{\timesort}{\xref{\task{timesort}}{sun258}{TIMESORT}}
-\providecommand{\unmakecube}{\xref{\task{unmakecube}}{sun258}{UNMAKECUBE}}
-
-\providecommand{\extinction}{\xref{\task{extinction}}{sun258}{EXTINCTION}}
-\providecommand{\flatfield}{\xref{\task{flatfield}}{sun258}{FLATFIELD}}
-\providecommand{\jcmtstate}{\xref{\task{jcmtstate2cat}}{sun258}{JCMTSTATE2CAT}}
-\providecommand{\dumpocscfg}{\xref{\task{dumpocscfg}}{sun258}{DUMPOCSCFG}}
-\providecommand{\makemap}{\xref{\task{makemap}}{sun258}{MAKEMAP}}
-\providecommand{\gettsys}{\xref{\task{gettsys}}{sun258}{GETTSYS}}
-
-\providecommand{\remsky}{\xref{\task{remsky}}{sun258}{REMSKY}}
-\providecommand{\clean}{\xref{\task{sc2clean}}{sun258}{SC2CLEAN}}
-\providecommand{\concat}{\xref{\task{sc2concat}}{sun258}{SC2CONCAT}}
-\providecommand{\fft}{\xref{\task{sc2fft}}{sun258}{SC2FFT}}
-\providecommand{\fts}{\xref{\task{sc2fts}}{sun258}{SC2FTS}}
-
-\providecommand{\rebin}{\texttt{rebin}}
-\providecommand{\iterate}{\texttt{iterate}}
-
-% Other tasks
-\providecommand{\makemos}{\xref{\task{makemos}}{sun139}{MAKEMOS}}
-\providecommand{\csub}{\xref{\task{csub}}{sun95}{CSUB}}
-\providecommand{\clinplot}{\xref{\task{clinplot}}{sun95}{CLINPLOT}}
-\providecommand{\mlinplot}{\xref{\task{mlinplot}}{sun95}{MLINPLOT}}
-\providecommand{\collapse}{\xref{\task{collapse}}{sun95}{COLLAPSE}}
-\providecommand{\fillbad}{\xref{\task{fillbad}}{sun95}{FILLBAD}}
-\providecommand{\fitsedit}{\xref{\task{fitsedit}}{sun95}{FITSEDIT}}
-\providecommand{\kapdiv}{\xref{\task{div}}{sun95}{DIV}}
-\providecommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
-\providecommand{\parget}{\xref{\task{parget}}{sun95}{PARGET}}
-\providecommand{\provshow}{\xref{\task{provshow}}{sun95}{PROVSHOW}}
-\providecommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
-\providecommand{\wcsmosaic}{\xref{\task{wcsmosaic}}{sun95}{WCSMOSAIC}}
-\providecommand{\wcsalign}{\xref{\task{wcsalign}}{sun95}{WCSALIGN}}
-\providecommand{\wcsattrib}{\xref{\task{wcsattrib}}{sun95}{WCSATTRIB}}
-\providecommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
-\providecommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
-\providecommand{\ndfcompress}{\xref{\task{ndfcompress}}{sun95}{NDFCOMPRESS}}
-\providecommand{\topcat}{\xref{\textsc{Topcat}}{sun253}{}}
-
-% prevent issues if a pdf .aux file is still around
+% Prevent issues if a pdf .aux file is still around.
 \providecommand{\pgfsyspdfmark}[3]{}
 
