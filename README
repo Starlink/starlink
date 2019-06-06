@@ -474,6 +474,7 @@ Fedora:
    Mainly as for Ubuntu, but note that package names are usually changed
    from "libxyz-dev" to "libXyz-devel".
 
+   libXt-devel
    ncurses-devel
    makedepend
 
@@ -489,9 +490,6 @@ Fedora:
    texlive-titling.noarch
    texlive-tocloft.noarch
    texlive-eqparbox.noarch
-
-
-
 
 Arch Linux:
    base-devel
