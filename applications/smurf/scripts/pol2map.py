@@ -393,6 +393,12 @@
 *        aligned spatially to take account of any pointing error in the
 *        individual observation. See also parameter WEIGHTLIM.
 *
+*        If skyloop is used (see parameter SKYLOOP) with OBSWEIGHT=YES,
+*        then a set of observation maps must already exist in the MAPDIR
+*        directory that were also created with OBSWEIGHT=YES. The weights
+*        to be used by skyloop are read from these maps, which would normally
+*        have been created by a prior run of this script.
+*
 *        WARNING: This option should only be used if the number of
 *        observation being processed is sufficiently large to allow
 *        aberrant observations to be identified with a reasonable degree
