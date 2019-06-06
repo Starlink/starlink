@@ -1282,8 +1282,7 @@ The parameter file should not be deleted unless the parameters
 values are to be completely reset, or the file has been corrupted in
 some way.  If you suspect the latter case, say after
 \htmlref{interrupting a task}{se:exiting}\latex{(Section~\ref{se:exiting})},
-run
-{\HDSTRACEref\normalsize}~\latex{(SUN/102)}
+run {\HDSTRACEref}~\latex{(SUN/102)}
 on the file to check its integrity.
 
 \subsection{\xlabel{se_parglobals}Globals\label{se:parglobals}}
@@ -3184,7 +3183,7 @@ described in
 \latexhtml{Section~\ref{se:fitsairlock}.}{\htmlref{the FITS
 airlock}{se:fitsairlock}.}
 
-\Figaroref\ offers some additional tasks (\xref{CREOBJ}{sun86}{CREOBJ},
+\FIGAROref\ offers some additional tasks (\xref{CREOBJ}{sun86}{CREOBJ},
 \xref{DELOBJ}{sun86}{DELOBJ}, and \xref{RENOBJ}{sun86}{RENOBJ}) for
 editing HDS components.
 
@@ -7248,7 +7247,7 @@ this \NDFref{NDF} format generated from within \KAPPA.
 Generally, you will already have data in `foreign' formats, that is
 formats other than the Starlink standard, particularly in the
 \FITSref\ (Flexible Image Transport System),
-\IRAFref , and \Figaroref\ DST formats.
+\IRAFref , and \FIGAROref\ DST formats.
 
 \subsection{\xlabel{se_autoconvert}Automatic Conversion
 \label{se:autoconvert}}
@@ -7388,7 +7387,7 @@ See the \CONVERT\ documentation for more details of these conversions.
 You can run \CONVERT\ ({\it{cf.}}~SUN/55) directly to perform
 conversions.  There is also \htmlref{TRANDAT}{TRANDAT}, which will read a text file of
 data values, or co-ordinates and data values into an NDF, and
-\xref{ASCIN}{sun86}{ASCIN} in the \Figaroref\ package\latex{ (SUN/86)}.
+\xref{ASCIN}{sun86}{ASCIN} in the \FIGAROref\ package\latex{ (SUN/86)}.
 
 \subsection{\xlabel{se_fitsreaders}FITS readers\label{se:fitsreaders}}
 
@@ -8507,7 +8506,7 @@ traces the \file{GLOBALS} file, the application you were running when the
 weird error occurred (here \htmlref{ARDMASK}{ARDMASK}), and the
 graphics database for machine \texttt{cacvad}.  Once you have identified
 the problem file, delete it.  If that proves to be the globals file,
-you might want to retain the output from \HDSTRACEref\normalsize, so that you can
+you might want to retain the output from \HDSTRACEref, so that you can
 restore their former values.  Deleting the graphics database is
 something you should do regularly, so that's not a problem.
 
@@ -10363,7 +10362,7 @@ KAPPA: \htmlref{STATS}{STATS},
       image using a cursor, and then storing a description of the
       selected regions in a text file in the form of an `ARD
       Description' (see \xref{SUN/183}{sun183}{}).  This text file may subsequently be
-      used in conjunction with packages such as \CCDPACKref\normalsize ~or
+      used in conjunction with packages such as \CCDPACKref\ ~or
       \ESPref\normalsize.
 
       The application initially obtains a value for the SHAPE parameter
@@ -17785,7 +17784,7 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM}.
          The catalogue has the form of a positions list such as created by
          application LISTMAKE.  Only positions in the first selected picture
          are recorded.  This application uses the conventions of the
-         \cursa\ package for determining the format of the catalogue.  If a
+         \CURSAref\ package for determining the format of the catalogue.  If a
          file type of \texttt{.fit} is given, then the catalogue is stored as a FITS
          binary table.  If a file type of \texttt{.txt} is given, then the catalogue
          is stored in a text file in \texttt{"Small Text List"} (STL) format.  If no
@@ -20664,7 +20663,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          TABLE.  A null value (\texttt{{!}}) means that no description file will
          be created, so this is now the recommended usage.  If your
          FITS file comprises just tables, you should consider other
-         tools such as the \cursa\  package, which has facilities for
+         tools such as the \CURSAref\  package, which has facilities for
          examining and processing ASCII and binary tables in FITS files.
 
          A suggested filename for the description file is reported
@@ -20866,7 +20865,7 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
 \htmlref{FITSIN}{FITSIN},
 \htmlref{FITSLIST}{FITSLIST};
 \xref{CONVERT}{sun55}{}: \xref{FITS2NDF}{sun55}{FITS2NDF};
-\cursa;
+\CURSAref;
 \xref{FIGARO}{sun86}{}: \xref{RDFITS}{sun86}{RDFITS}.
    }
    \sstimplementationstatus{
@@ -21532,7 +21531,7 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
          TABLE.  A null value (\texttt{{!}}) means that no description file will
          be created, so this is now the recommended usage.  If your
          FITS file comprises just tables, you should consider other
-         tools such as the \cursa\  package, which has facilities for
+         tools such as the \CURSAref\  package, which has facilities for
          examining and processing ASCII and binary tables in FITS files.
 
          A suggested filename for the description file is reported
@@ -21768,7 +21767,7 @@ KAPPA: \htmlref{FITSDIN}{FITSDIN},
 \htmlref{FITSIMP}{FITSIMP},
 \htmlref{FITSLIST}{FITSLIST};
 \xref{CONVERT}{sun55}{}: \xref{FITS2NDF}{sun55}{FITS2NDF};
-\cursa;
+\CURSAref;
 \xref{FIGARO}{sun86}{}: \xref{RDFITS}{sun86}{RDFITS}.
    }
    \sstimplementationstatus{
@@ -27035,7 +27034,7 @@ KAPPA: \htmlref{PROFILE}{PROFILE},
       \htmlref{co-ordinate Frames}{se:domains}~ in which the positions are defined.  Integer
       position identifiers which allow positions to be distinguished are
       also stored in the catalogue.  The catalogue may be manipulated
-      using the \cursa\ ~package, and is stored in either FITS
+      using the \CURSAref\ ~package, and is stored in either FITS
       binary format or the \emph{Small Text List}~ (\STLref) format
       defined by \CURSA.
 
@@ -27335,7 +27334,7 @@ KAPPA: \htmlref{PROFILE}{PROFILE},
       \sstitemlist{
 
          \sstitem
-         This application uses the conventions of the \cursa\ package
+         This application uses the conventions of the \CURSAref\ package
          for determining the formats of input and output catalogues.  If a file
          type of .fit is given, then the catalogue is assumed to be a FITS
          binary table.  If a file type of .txt is given, then the catalogue is
@@ -27835,7 +27834,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
       \sstitemlist{
 
          \sstitem
-         This application uses the conventions of the \cursa\ package
+         This application uses the conventions of the \CURSAref\ package
          for determining the formats of input and output catalogues.  If a file
          type of .fits is given, then the catalogue is assumed to be a FITS
          binary table.  If a file type of .txt is given, then the catalogue is
@@ -38874,7 +38873,7 @@ KAPPA: \htmlref{ADD}{ADD},
       \sstitemlist{
 
          \sstitem
-         This application uses the conventions of the \cursa\ package
+         This application uses the conventions of the \CURSAref\ package
          for determining the formats of input and output positions list
          catalogues.  If a file type of .fit is given, then the catalogue is
          assumed to be a FITS binary table.  If a file type of .txt is given,
@@ -39619,7 +39618,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          \texttt{"More"} --- A summary of any extra information about the
          NDF stored with the provenance information.  In general this may
          be an arbitrary HDS structure and so full details cannot be
-         given on a single line.  The HDSTRACE command can be used to
+         given on a single line.  The \HDSTRACEref\ command can be used to
          examine the MORE field in detail.  To see full details of the
          NDF with \texttt{"ID"} value of \texttt{12} (say), enter (from a UNIX shell)
          \texttt{"hdstrace fred.more.provenance.ancestors'(12)'"}, where
@@ -49018,8 +49017,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
       \htmlref{WCSALIGN}{WCSALIGN},
       \htmlref{REGRID}{REGRID};
-      \xref{CCDPACK}{sun139}{}:
-      \xref{TRANNDF}{sun139}{TRANNDF}.
+      \xref{CCDPACK}{sun139}{}: \xref{TRANNDF}{sun139}{TRANNDF}.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -53723,7 +53721,7 @@ observation or the temperature of the detector; they may be
 calibration data or results produced during processing of the data
 array, {\it{e.g.}}\ spectral-line fits. The extensions are located
 within the MORE top-level component.  \texttt{example.sdf} began life as
-a \Figaroref\ file.  It was converted to an NDF using the command
+a \FIGAROref\ file.  It was converted to an NDF using the command
 \xref{DST2NDF}{sun55}{DST2NDF}\latex{ (see SUN/55)}.  It contains
 values for the airmass and exposure time associated with the
 observations.  These are stored in the FIGARO extension, and the

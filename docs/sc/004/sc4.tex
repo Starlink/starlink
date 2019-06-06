@@ -129,7 +129,7 @@ loops.  There is also a glossary.}
 \providecommand{\IRASref}{\xref{{\footnotesize IRAS90}}{sun163}{}}
 \providecommand{\JCMTDRref}{\xref{{\footnotesize JCMTDR}}{sun132}{}}
 \providecommand{\KAPPAref}{\xref{{\footnotesize KAPPA}}{sun95}{}}
-\providecommand{\NDFref}[1]{\xref{#1}{sun33}{}}
+\providecommand{\NDFrefa}[1]{\xref{#1}{sun33}{}}
 \providecommand{\PDAref}{\xref{PDA}{sun194}{}}
 \providecommand{\PGPLOTref}{\htmladdnormallink{PGPLOT}{http://astro.caltech.edu/\~{}tjp/pgplot/}}
 \providecommand{\PHOTOMref}{\xref{{\footnotesize PHOTOM}}{sun45}{}}
@@ -943,7 +943,7 @@ interactively to learn what parameter values are needed.
 Although there is less typing to use a positional parameter for the
 expression, it's prudent to give full parameter names in scripts.
 Positions might change and parameter names are easier to follow.
-\cursa\ is an exception.  For this package you should list the
+\CURSAref\ is an exception.  For this package you should list the
 answers to prompts in a file as described in
 \latexelsehtml{Section~\ref{sc4_se_reading_files}.}{\htmlref{reading
 dynamic text files}{sc4_se_reading_files}.}
@@ -1458,7 +1458,7 @@ using double-precision arithmetic.
 
 It is sometimes easier to assemble the expression in another variable.
 Here's another recipe which demonstrates this approach.  Suppose that you
-want to find the average median value for a series of \NDFref{\textsf{NDF}s}.
+want to find the average median value for a series of \NDFrefa{\textsf{NDF}s}.
 
 \begin{small}
 \begin{terminalv}
@@ -2064,7 +2064,7 @@ galaxy.bdf.  The value of variable \texttt{type} is \texttt{bdf} and {\tt
 name} equates to \texttt{galaxy} because of the presence of the filename
 modifiers \texttt{:e} and \texttt{:r}.  The rest of the script uses the
 file type to control the processing, in this case to provide a listing
-of the contents of a data file using the \HDSTRACEref\normalsize\ utility.
+of the contents of a data file using the \HDSTRACEref\ utility.
 
 The complete list of modifiers, their meanings, and examples is
 presented in the table below.
@@ -2105,7 +2105,7 @@ of data files.   For this you need a \textbf{foreach...end} construct.
 \end{small}
 This takes all the \htmlref{\textsf{FITS}}{sc4_gl_fits} files in the
 current directory and computes the statistics for them using the
-\xref{\textbf{stats}}{sun95}{STATS} command from \KAPPAref\normalsize\@.  \texttt{file}
+\xref{\textbf{stats}}{sun95}{STATS} command from \KAPPAref\@.  \texttt{file}
 is a \htmlref{\textsf{shell variable}}{sc4_gl_she_var}.  Each time in the
 loop \texttt{file} is assigned to the name of the next file of the list
 between the parentheses.  The \texttt{*} is the familiar
@@ -2116,7 +2116,7 @@ variable's value you prefix it with a \texttt{\$}.  Thus {\tt
 
 \subsubsection{\xlabel{sc4_se_series_ndfs}NDFs\label{sc4_se_series_ndfs}}
 
-Some data formats like the \NDFref{\textsf{NDF}} demand that only the file
+Some data formats like the \NDFrefa{\textsf{NDF}} demand that only the file
 name (\emph{i.e.}\ what appears before the last dot) be given in
 commands.  To achieve this you must first strip off the remainder (the
 file extension or type) with the \texttt{:r} \textsf{file modifier}.
@@ -2131,8 +2131,7 @@ file extension or type) with the \texttt{:r} \textsf{file modifier}.
 
 This processes all the \textsf{\HDSref} files in the current directory
 and calculates an histogram for each of them using the
-\xref{\textbf{histogram}}{sun95}{HISTOGRAM} command from
-\KAPPAref\normalsize\@.  It
+\xref{\textbf{histogram}}{sun95}{HISTOGRAM} command from \KAPPAref.  It
 assumes that the files are NDFs.  The \texttt{:r}
 instructs the shell to remove the file extension (the part of the name
 following the the rightmost full stop).  If we didn't do this, the {\bf
@@ -2144,7 +2143,7 @@ HDS files.
 
 You can give a list of files separated by spaces, each of which can
 include the various UNIX \htmlref{\textsf{wildcards}}{sc4_gl_wild}.  Thus
-the code below would report the name of each \NDFref{\textsf{NDF}} and
+the code below would report the name of each \NDFrefa{\textsf{NDF}} and
 its standard deviation. The NDFs are called `Z' followed by a single
 character, ccd1, ccd2, ccd3, and spot.
 
@@ -2203,7 +2202,7 @@ above example.
 
 In the \latexelsehtml{\texttt{splotem} example from the previous
 section}{\htmlref{splotem example}{sc4_se_wildcard_lists}} the list of
-\NDFref{\textsf{NDF}s} on the command line required the inclusion of
+\NDFrefa{\textsf{NDF}s} on the command line required the inclusion of
 the \texttt{.sdf} file extension.  Having to supply the \texttt{.sdf} for an
 NDF is abnormal.  For reasons of familiarity and ease of use, you
 probably want your relevant scripts to accept a list of NDF names and
@@ -2261,7 +2260,7 @@ error.
 
 A common need is to browse through several datasets, perhaps to locate
 a specific one, or to determine which are acceptable for further
-processing.  The following presents images of a series of \NDFref{{\sf
+processing.  The following presents images of a series of \NDFrefa{{\sf
 NDF}s} using the \xref{\textbf{display}}{sun95}{DISPLAY} task of
 \KAPPAref\@.  The title of each plot tells you which NDF is currently
 displayed.
@@ -2333,8 +2332,8 @@ the original file name.  This is illustrated below.
      end
 \end{terminalv}
 \end{small}
-This uses \xref{\textbf{block}}{sun95}{BLOCK} from \KAPPAref\normalsize\ to perform
-block smoothing on a series of \NDFref{\textsf{NDF}s}, creating new NDFs,
+This uses \xref{\textbf{block}}{sun95}{BLOCK} from \KAPPAref\ to perform
+block smoothing on a series of \NDFrefa{\textsf{NDF}s}, creating new NDFs,
 each of which takes the name of the corresponding input NDF with a
 \texttt{\_sm} suffix.  The \textbf{accept} keyword accepts the suggested
 defaults for parameters that would otherwise be prompted.  We use the
@@ -2485,7 +2484,7 @@ the file with the \textbf{touch} command, and then append output to the file.
      end
 \end{terminalv}
 \end{small}
-Here we list \htmlref{\textsf{FITS}}{sc4_gl_fits} headers from a series of \NDFref{\textsf{NDF}s}
+Here we list \htmlref{\textsf{FITS}}{sc4_gl_fits} headers from a series of \NDFrefa{\textsf{NDF}s}
 to file \texttt{logfile.lis}.  There is a heading including the dataset
 name and blank line between each set of headers.  Notice this time
 we use \texttt{>>} to append.  If you try to redirect with \texttt{>}
@@ -2825,7 +2824,7 @@ information to a \htmlref{shell variable}{sc4_se_variables}.
 \subsubsection{\xlabel{sc4_se_dataset_shape}Obtaining dataset shape
 \label{sc4_se_dataset_shape}}
 
-Suppose that you want to process all the two-dimensional \NDFref{{\sf
+Suppose that you want to process all the two-dimensional \NDFrefa{{\sf
 NDF}s} in a directory.  You would write something like this in your
 script.
 
@@ -3108,7 +3107,7 @@ Suppose the name of the dataset being probed is stored in variable
 \subsection{\xlabel{sc4_se_FITS_headers}FITS Headers\label{sc4_se_FITS_headers}}
 
 Associated with \htmlref{\textsf{FITS}}{sc4_gl_fits} files and many
-\NDFref{\textsf{NDF}s} is header information stored in 80-character
+\NDFrefa{\textsf{NDF}s} is header information stored in 80-character
 `cards'.  It is possible to use these ancillary data in your script.
 Each non-comment header has a keyword, by which you can reference it;
 a value; and usually a comment.  \KAPPAref\ from V0.10 has a few
@@ -3171,7 +3170,7 @@ treated literally, each is preceded by a backslash.
 \label{sc4_se_other_objects}}
 
 You can manipulate data objects in \HDSref\ files, such as components
-of an \NDFref{\textsf{NDF}'s} extension.  There are several Starlink
+of an \NDFrefa{\textsf{NDF}'s} extension.  There are several Starlink
 applications for this purpose including the \Figaroref\ commands
 \xref{\textbf{copobj}}{sun86}{COPOBJ},
 \xref{\textbf{creobj}}{sun86}{CREOBJ}, \xref{\textbf{delobj}}{sun86}{DELOBJ},
@@ -3255,7 +3254,7 @@ you need a \textbf{while} statement, as in this example.
 \end{terminalv}
 \end{small}
 This performs four block smoothing operations, with a decreasing box
-size, on a \NDFref{\textsf{NDF}} called myndf, the final result being
+size, on a \NDFrefa{\textsf{NDF}} called myndf, the final result being
 stored in the NDF called myndf\_sm4.  The \textbf{while} statement tests
 a conditional statement and loops if it is true.  So here it loops
 whenever the value of \texttt{count} is less than 5.
@@ -3291,7 +3290,7 @@ for specifying arguments with defaults, you'll need to use \textbf{switch}
 and \textbf{shift} statements, rather than the simple \textbf{while} loop.
 
 Suppose that we want to obtain photometric details of a galaxy, known
-to be the brightest object in a series of \NDFref{\textsf{NDF}s}.  Before
+to be the brightest object in a series of \NDFrefa{\textsf{NDF}s}.  Before
 that's possible we must first measure the background in each image.
 To reduce contamination that could bias the determination of the sky
 we mask the region containing the galaxy.  Here we obtain the values
@@ -3491,7 +3490,7 @@ seen earlier into lengthier scripts.  So far there is only one.
 \label{sc4_se_long1}}
 
 The following script fits a surface to the background in a series of
-\NDFref{\textsf{NDF}s}.
+\NDFrefa{\textsf{NDF}s}.
 First two bright galaxies are to be excluded from the fitting process by
 being \xref{masked using an ARD region}{sun95}{se_ardwork}\latex{ (see
 SUN/95, ``Doing it the ARD way'')}.  It is known that the brighter
@@ -3642,7 +3641,7 @@ see the example of \htmlref{UNIX-style options}{sc4_se_unix_options}
 \item {\bf\label{sc4_gl_ndf}NDF}\\
       The standard Starlink data-storage format.  An hierarchical format for
       multi-dimensional data storage.  Accessed using libraries supported
-      by Starlink.  Use of NDF is described in \NDFref{SUN/33}.
+      by Starlink.  Use of NDF is described in \NDFrefa{SUN/33}.
 
 \item {\bf\label{sc4_gl_ndf_se}NDF Section}\\
       A subset or superset of a dataset (originally applied to just
