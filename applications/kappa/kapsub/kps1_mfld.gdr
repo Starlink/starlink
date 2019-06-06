@@ -48,7 +48,7 @@
 *     specified.
 
 *  Copyright:
-*     Copyright (C) 2007, 2008, 2016, 2018 Science & Technology]
+*     Copyright (C) 2007, 2008, 2016, 2018 Science & Technology
 *     Facilities Council.
 *     All Rights Reserved.
 
@@ -408,7 +408,7 @@
                      UPECNT( 3 ) = PERCNT( 3 )
 
 *  Assume that the noise about the baseline is normally distributed,
-*  with a mean equal to the mode of the totla distribution of values
+*  with a mean equal to the mode of the total distribution of values
 *  in the line.  We want to find the two-sigma percentiles with respect
 *  to that, rather than the whole distribution.
 
