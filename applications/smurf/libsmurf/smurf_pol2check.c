@@ -154,6 +154,9 @@
 *        Add support for 450 um data.
 *     9-APR-2018 (DSB):
 *        Add parameter MULTIOBJECT.
+*     8-JUN-2019 (DSB):
+*        Coadded maps do not have UTDATE or OBSNUM headers. So use
+*        "<OBJECT>_<DATE-OBS>" as the key for coadded maps.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -237,7 +240,8 @@ void smurf_pol2check( int *status ) {
    SubScanInfo *ssptr;        /* Pointer to subscan info for current obs */
    char *cval;                /* Header value */
    char *pname;               /* Pointer to input filename */
-   char buf[GRP__SZNAM+1];    /* Path to matching NDF */
+   char buf[1000];            /* Path to matching NDF */
+   char dateobs[80];          /* Pointer to DATE-OBS  */
    char filepath[GRP__SZNAM+1];/* NDF path, derived from GRP */
    char label[GRP__SZNAM+1];  /* NDF label string */
    char object0[80];          /* Pointer to Object for first POL2 file */
@@ -411,13 +415,23 @@ void smurf_pol2check( int *status ) {
                   msgOutf( "", "   %s - Stokes map", status, filepath );
                   ok = 1;
 
-/* Also form and store the line of extra information. */
-                  astGetFitsI( fc, "UTDATE", &utdate );
-                  astGetFitsI( fc, "OBSNUM", &obs );
-                  astGetFitsI( fc, "NSUBSCAN", &subscan );
-                  sprintf( buf, "%s %8.8d_%5.5d_%4.4d", label, utdate, obs,
-                           subscan );
+/* Also form and store the line of extra information. Note, if the map is
+   a coadd of several observations, it will not have UTDATE or OBSNUM
+   headers. In such cases use a key of the form "<OBJECT>_<DATE-OBS>". */
+                  if( astGetFitsI( fc, "UTDATE", &utdate ) &&
+                      astGetFitsI( fc, "OBSNUM", &obs ) &&
+                      astGetFitsI( fc, "NSUBSCAN", &subscan ) ){
+                     sprintf( buf, "%s %8.8d_%5.5d_%4.4d", label, utdate, obs,
+                              subscan );
+                  } else {
+                     astGetFitsS( fc, "OBJECT", &cval );
+                     if( *status == SAI__OK ) strcpy( object, cval );
+                     astGetFitsS( fc, "DATE-OBS", &cval );
+                     if( *status == SAI__OK ) strcpy( dateobs, cval );
+                     sprintf( buf, "%s %s_%s", label, object, dateobs );
+                  }
                   astMapPutElemC( km, "MAP_INFO", -1, buf );
+
 
 /* Get the waveband. */
                   astGetFitsS( fc, "FILTER", &cval );
