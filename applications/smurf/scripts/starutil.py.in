@@ -1030,11 +1030,12 @@ class ParSys(object):
    # and close the log file.
    @classmethod
    def cleanup(cls):
-      for param in ParSys.singleton:
-         if isinstance(param,ParNDG) and not param.exists:
-            ndg = param.value
-            if ndg:
-               ndg.histadd()
+      if ParSys.singleton is not None:
+         for param in ParSys.singleton:
+            if isinstance(param,ParNDG) and not param.exists:
+               ndg = param.value
+               if ndg:
+                  ndg.histadd()
 
       if ParSys.adamdir is not None:
          try:
