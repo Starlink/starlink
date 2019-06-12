@@ -157,6 +157,9 @@
 *     8-JUN-2019 (DSB):
 *        Coadded maps do not have UTDATE or OBSNUM headers. So use
 *        "<OBJECT>_<DATE-OBS>" as the key for coadded maps.
+*     12-JUN-2019 (DSB):
+*        Replace spaces with underscores in keys of the form
+*        "<OBJECT>_<DATE-OBS>" (the OBJECT name may contain spaces).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -189,6 +192,7 @@
 #endif
 
 #include <string.h>
+#include <ctype.h>
 #include <stdio.h>
 
 /* Starlink includes */
@@ -417,7 +421,8 @@ void smurf_pol2check( int *status ) {
 
 /* Also form and store the line of extra information. Note, if the map is
    a coadd of several observations, it will not have UTDATE or OBSNUM
-   headers. In such cases use a key of the form "<OBJECT>_<DATE-OBS>". */
+   headers. In such cases use a key of the form "<OBJECT>_<DATE-OBS>"
+   (replacing any spaces with underscores). */
                   if( astGetFitsI( fc, "UTDATE", &utdate ) &&
                       astGetFitsI( fc, "OBSNUM", &obs ) &&
                       astGetFitsI( fc, "NSUBSCAN", &subscan ) ){
@@ -429,9 +434,15 @@ void smurf_pol2check( int *status ) {
                      astGetFitsS( fc, "DATE-OBS", &cval );
                      if( *status == SAI__OK ) strcpy( dateobs, cval );
                      sprintf( buf, "%s %s_%s", label, object, dateobs );
+
+                     cval = buf + 2;
+                     while( *cval ) {
+                        if( isspace( *cval ) ) *cval = '_';
+                        cval++;
+                     }
+
                   }
                   astMapPutElemC( km, "MAP_INFO", -1, buf );
-
 
 /* Get the waveband. */
                   astGetFitsS( fc, "FILTER", &cval );
