@@ -592,6 +592,9 @@
 *        map was given, then use the I map created from the first observation as
 *        the ref map for the remaining observations. This ensures that all the
 *        auto-masked I maps are aligned with each other.
+*    13-JUN-2018 (DSB):
+*       Ensure units ("pW") are propagated to the output I, Q and U
+*       coadded NDFs (gy default, kappa:maths does not propagatre units).
 
 '''
 
@@ -626,7 +629,7 @@ def exptrim(map,trim,out=None):
    else:
       result = out
    invoke( "$KAPPA_DIR/maths exp=\"'qif((ib.ge.pa),ia,<bad>)'\" "
-           "ib={0}.more.smurf.exp_time ia={0} pa={1} out={2}".
+           "ib={0}.more.smurf.exp_time ia={0} pa={1} out={2} units=yes".
            format(map,mean*trim,result) )
    return result
 
