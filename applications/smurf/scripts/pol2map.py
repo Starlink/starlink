@@ -595,6 +595,11 @@
 *    13-JUN-2018 (DSB):
 *       Ensure units ("pW") are propagated to the output I, Q and U
 *       coadded NDFs (gy default, kappa:maths does not propagatre units).
+*    14-JUN-2018 (DSB):
+*       - Ensure that any auto-masked maps for which no pointing correction
+*       can be determined are nevertheless assigned a valid CHUNKCFAC value.
+*       - If NORMALISE=YES, issue a warning if no CHUNKFAC header is found in
+*       any input I map. Previously, pol2map would crash in such cases.
 
 '''
 
@@ -1043,9 +1048,9 @@ def StoreCorrections( qui_maps, imap ):
                 format(qui_maps[key],dy,com))
 
 #  Also store the scale factor.
-         invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=CHUNKFAC edit=a value={1} "
-                "comment=\"'{2}'\" position=! mode=interface".
-                format(qui_maps[key],scale,scomment))
+      invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=CHUNKFAC edit=a value={1} "
+             "comment=\"'{2}'\" position=! mode=interface".
+             format(qui_maps[key],scale,scomment))
 
 #  Find the median of the weights.
    wmed = median( weights.values() )
@@ -2244,7 +2249,16 @@ try:
                for key in qui_list:
                   try:
                      hmap = NDG("{0}/{1}_imap".format(mapdir,key))
-                     factor = float( get_fits_header( hmap, "CHUNKFAC" ))
+                     factor = float( get_fits_header( hmap, "CHUNKFAC",
+                                                      report=True ))
+                  except starutil.NoValueError:
+                     msg_out("\nWARNING: pol2map was run with 'normalise=yes', "
+ 			   "so each pre-existing I map is expected to contain "
+                           "a normalisation factor in FITS header CHUNKFAC. But "
+                           "{0} did not. A default factor of 1.0 will be used.".
+			   format(hmap))
+                     factor = 1.0
+
                   except starutil.NoNdfError:
                      factor = 1.0
 
