@@ -600,6 +600,9 @@
 *       can be determined are nevertheless assigned a valid CHUNKCFAC value.
 *       - If NORMALISE=YES, issue a warning if no CHUNKFAC header is found in
 *       any input I map. Previously, pol2map would crash in such cases.
+*       - Abort if reuse is true and we are about to over-write an existing map
+*       (this can only happen if skyloop=yes). This can occur, for instance, if 
+*       the user forgets to set the MASK parameter on step 2.
 
 '''
 
@@ -2109,6 +2112,17 @@ try:
             msg_out("   Re-using previously created maps")
          else:
             badlist = []
+
+#  Prevent accidental over-writing of existing maps (reuse=no gives us permission
+#  to over-write existing maps).
+            if reuse:
+               for key in qui_list.keys():
+                  newpath = "{0}/{1}_{2}.sdf".format(mapdir,key,suffix)
+                  if os.path.exists(newpath):
+                     raise starutil.InvalidParameterError( "\npol2map would "
+                              "over-write existing map {0}. Is this what you want "
+                              "to do? If so, please delete any existing maps that "
+                              "are to be replaced and re-run pol2map.".format(newpath) )
 
 #  Create a directory in which to put the individual observation maps.
             obsdir = NDG.subdir()
