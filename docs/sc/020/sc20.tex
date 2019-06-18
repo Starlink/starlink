@@ -33,6 +33,8 @@
 \providecommand{\gradient}{\xref{REDUCE\_SCIENCE\_GRADIENT}{sun260}{REDUCE_SCIENCE_GRADIENT}}
 \providecommand{\narrowline}{\xref{REDUCE\_SCIENCE\_NARROWLINE}{sun260}{REDUCE_SCIENCE_NARROWLINE}}
 \providecommand{\lineforest}{\xref{REDUCE\_SCIENCE\_LINEFOREST}{sun260}{REDUCE_SCIENCE_LINEFOREST}}
+\providecommand{\continuum}{\xref{REDUCE\_SCIENCE\_CONTINUUM}{sun260}{REDUCE_SCIENCE_CONTINUUM}}
+\providecommand{\calibratesideband}{\xref{CALIBRATE\_SIDEBAND\_RATIO}{sun265}{CALIBRATE_SIDEBAND_RATIO}}
 
 \newcommand{\acsispipelinesun}{\xref{\textbf{SUN/260}}{sun260}{}}
 
@@ -661,23 +663,32 @@ For the latest and historical calibrations visit
 \htmladdnormallink{ACSIS Beam
 Efficiencies}{http://www.eaobservatory.org/jcmt/instrumentation/heterodyne/calibration}.
 
-\subsection{RxA Frontend}
+\subsection{RxA3 Frontend}
 
-Receiver A (RxA) is a single-element double-sideband receiver. It
+Receiver A3 (RxA3) is a single-element double-sideband receiver. It
 operates in the A-band between 211 and 276 GHz. In addition to stare
-observations, the most common observing mode for RxA is raster
-mapping.
+observations, the most common observing mode for RxA3 is raster
+mapping. In 2016 RxA3 was updated to RxA3M. The instrument was retired in 2018.
+
 \begin{table}[h!]
 \begin{center}
 \begin{tabular}{|p{1.5cm}|p{1.2cm}|p{0.8cm}|p{0.8cm}|}
 \hline
 Receiver &FWHM & $\eta_{\textnormal{MB}}$ & $\eta_{\textnormal{\,fss}}$\\
 \hline
-RxA&19.\uarcs7&0.57 & 0.80\\
+RxA3&19.\uarcs7&0.57 & 0.80\\
 \hline
 \end{tabular}
 \end{center}
 \end{table}
+
+RxA3M has an additional calibration step (automatically applied by our
+pipelines if you use a version after June 2019) to normalise the flux
+levels of observations between the upper and lower sideband. If you
+need more control of this in the pipeline, please see the calibration
+recipe parameters in Appendix~\ref{app:params}. The older RxA3 also
+had some variation in flux levels between the sidebands, but we do not
+have a calibration correction for this.
 
 
 \subsection{\xlabel{harp}HARP Frontend}
@@ -3889,7 +3900,7 @@ MNRAS, 453, 73 (DOI:10.1093/mnras/stv1545)
 
 \chapter{PICARD}
 \label{app:picard}
-There are two \picard\ recipes which can be used with ACSIS data:
+There are two \picard\ recipes which can be used with ACSIS data and are of general interest:
 
 \section{CREATE\_MOMENTS\_MAP}
 
@@ -3943,6 +3954,7 @@ method. \param{[nearest]}
 with \wcsmosaic.
 
 \end{itemize}
+
 
 \section{Running PICARD recipes}
 
@@ -4876,6 +4888,44 @@ BASELINE\_LINEARITY\_SCALELENGTH & This is used to reject receptors that have no
   non-linear baselines throughout or most of an observation.  The
   parameters are not available in the \broadline\ recipe.}
 \end{table}
+
+
+
+\begin{table}[h!]
+\begin{small}
+\begin{tabular}{|p{6.8cm}|p{8.6cm}|}
+  \hline
+  \textbf{Parameter} & \textbf{Description} \\
+  \hline
+  CALCULATE\_STANDARD\_ALWAYS & If set, this will ensure that the log.standard file will be created even if the source, molecule and transition combination is not present in the list of known standard sources. This will affect most non-continuum heterodyne recipes.\\
+  \hline
+  NOSIDEBANDCORR & If set to 1, this recpar option will prevent any sideband calibration correction
+  factor from being applied to the data.\\
+
+  SIDEBAND &     Set which sideband (e.g. USB or LSB) to use to apply the sideband
+                 correction for. By default the system will use the sideband of the observation,
+                 but this recpar can override that default if you are interested in a line in the image
+                 sideband. \\
+
+ SIDEBAND\_CORR\_FACTOR & This allows you to override the sideband correction factor chosen
+                          from the calibration system and provide your own. The data will be
+                          multiplied by the value you provide, so you must ensure it is appropriate
+                          for the given sideband and LO frequency of the data. If using this,
+                          you will set the value to a float.\\
+
+
+        \hline
+\end{tabular}
+\end{small}
+
+
+\caption{\label{tab:cal_params}
+  The recipe parameters associated with calibration of the data. The sideband ratio correction recipe parameters are
+  used for controlling the sideband correction, and are currently only available for instrument RxA3M. These corrections do
+  not affect reductions done with \continuum, but will be used in all other RxA3m science reductions,
+  and in the \picard\ recipe \calibratesideband. The CALCULATE\_STANDARD\_ALWAYS flag will also affect the non-continuum recipes.}
+\end{table}
+
 
 \newpage
 \chapter{\xlabel{qa}Quality Assurance Parameters}
