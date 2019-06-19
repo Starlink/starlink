@@ -802,13 +802,16 @@
 *        Added parameters ABORTSOON and ABORTEDAT.
 *     2019-03-19 (GSB):
 *        Mention WVMLOG parameter in the documentation.
+*     2019-06-19 (DSB):
+*        Add FITS header NCONTNCV to the output map, holding the number of
+*        contiguous chunks that failed to converge.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2010,2013 University of British Columbia.
 *     Copyright (C) 2007-2012 Science and Technology Facilities Council.
-*     Copyright (C) 2017 East Asian Observatory.
+*     Copyright (C) 2017-2019 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -1967,6 +1970,11 @@ void smurf_makemap( int *status ) {
        supplied. */
     atlPtfti( fchan, "NCONTIG", (int) ncontig, "No. of contig. chunks "
               "within supplied data ", status );
+
+    /* Store the number of contiguous chunks of time-series data that
+       did not converged. */
+    atlPtfti( fchan, "NCONTNCV", (int) ncnvg, "No. of chunks that did not "
+              "converge", status );
 
     /* Store a flag indicating if the data was chunked due to lack of
        memory. */
