@@ -1106,6 +1106,14 @@ static int smf__is_file_junk(smfData* data, int* status) {
         {"scuba2_10_20170401T040818_850", 35, 38},
         {"scuba2_10_20170401T040818_450", 35, 38},
 
+        /* TSS closed roof and doors after ten minutes, see log.*/
+        {"scuba2_30_20180412T133748_450", 21, 24},
+        {"scuba2_30_20180412T133748_850", 21, 24},
+
+        /*Emergency stop was hit during the observation.*/
+        {"scuba2_00039_20160908T152015_450", 38, 47},
+        {"scuba2_00039_20160908T152015_850", 38, 47},
+
         /* End marker. */
         {0, 0, 0},
     };
