@@ -29,24 +29,25 @@ contributions from a variety of sources:
 
 \begin{equation}
 \label{eq:bolsig}
-b(t) = e(t) \times a(t) + n^{\textrm w}(t) + gn^{\textrm c}(t) + n^{\textrm f}(t),
+b(t) = e(t) \times a(t) + n^{\textrm{w}}(t) + gn^{\textrm{c}}(t) + n^{\textrm{f}}(t),
 \end{equation}
 
 where $e(t)$ is the atmospheric extinction, $a(t)$ is the astronomical
-signal (time varying as the telescope scans across the sky), $n^{\textrm w}(t)$
-is the uncorrelated white noise, $g$ is an optional scalefactor which 
-is unique to each bolometer, $n^{\textrm c}(t)$ is the correlated (or, common mode)
-signal, and $n^{\textrm f}(t)$ is the (predominantly low-frequency) noise which
-does not have a simple correlation relationship that would be included in the
-$n^{\textrm c}(t)$ noise term.
+signal (time varying as the telescope scans across the sky),
+$n^{\textrm{w}}(t)$ is the uncorrelated white noise, $g$ is an
+optional scalefactor which is unique to each bolometer,
+$n^{\textrm{c}}(t)$ is the correlated (or, common mode) signal, and
+$n^{\textrm{f}}(t)$ is the (predominantly low-frequency) noise which
+does not have a simple correlation relationship that would be included
+in the $n^{\textrm{c}}(t)$ noise term.
 
 The map-maker works by producing individual models of the various
-components that make up the signal recorded by each bolometer.  
-It models and removes the extinction and noise components in order of 
-decreasing magnitude, ultimately leaving just the astronomical signal 
-plus residual noise.  The modelled components are listed in 
-\cref{Table}{tab:mods}{tabulated} and described more fully 
-in \cref{Section}{sec:models}{The individual models}.
+components that make up the signal recorded by each bolometer.  It
+models and removes the extinction and noise components in order of
+decreasing magnitude, ultimately leaving just the astronomical signal
+plus residual noise.  The modelled components are listed in
+\cref{Table}{tab:mods}{tabulated} and described more fully in
+\cref{Section}{sec:models}{The individual models}.
 
 \textbf{A \emph{configuration file} should usually be supplied when
 running \makemap\ directly.} This file holds a set of parameter values
