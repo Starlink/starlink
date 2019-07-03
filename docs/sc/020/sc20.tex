@@ -4812,7 +4812,7 @@ HIGHFREQ\_RINGING\_MIN\_SPECTRA & Minimum number of good spectra for ringing fil
 \hline
 \textbf{Parameter} & \textbf{Description} \\
 \hline
-LOWFREQ\_INTERFERENCE & If set to true (1) the spectra for each receptor are
+LOWFREQ\_INTERFERENCE & If set to true (1), the spectra for each receptor are
                         analysed to detect low-frequency local interference
                         ripples or bad baselines, and those spectra deemed too
                         deviant from linearity are excluded from the reduced
@@ -4895,36 +4895,38 @@ BASELINE\_LINEARITY\_SCALELENGTH & This is used to reject receptors that have no
 \begin{table}[h!]
 \begin{small}
 \begin{tabular}{|p{6.8cm}|p{8.6cm}|}
-  \hline
-  \textbf{Parameter} & \textbf{Description} \\
-  \hline
-  CALCULATE\_STANDARD\_ALWAYS & If set, this will ensure that the log.standard file will be created even if the source, molecule and transition combination is not present in the list of known standard sources. This will affect most non-continuum heterodyne recipes.\\
-  \hline
-  NOSIDEBANDCORR & If set to 1, this recpar option will prevent any sideband calibration correction
-  factor from being applied to the data.\\
+\hline
+\textbf{Parameter} & \textbf{Description} \\
+\hline
+CALCULATE\_STANDARD\_ALWAYS & If set true (1), this will ensure that the \file{log.standard}
+                              file will be created even if the source, molecule, and
+                              transition combination is not present in the list of
+                              known standard sources. This will affect most
+                              non-continuum heterodyne recipes.\\
+\hline
+NOSIDEBANDCORR & If set to 1, this will prevent any sideband-calibration correction
+                 factor from being applied to the data.\\
 
-  SIDEBAND &     Set which sideband (e.g. USB or LSB) to use to apply the sideband
-                 correction for. By default the system will use the sideband of the observation,
-                 but this recpar can override that default if you are interested in a line in the image
-                 sideband. \\
+SIDEBAND &  Set the sideband (e.g. USB or LSB) to use when applying the sideband
+            correction. By default the system will use the sideband of the observation,
+            but this recipe parameter can override that default if you are interested
+            in a line in the image sideband. \\
 
- SIDEBAND\_CORR\_FACTOR & This allows you to override the sideband correction factor chosen
-                          from the calibration system and provide your own. The data will be
-                          multiplied by the value you provide, so you must ensure it is appropriate
-                          for the given sideband and LO frequency of the data. If using this,
-                          you will set the value to a float.\\
+SIDEBAND\_CORR\_FACTOR & This allows you to override the sideband-correction factor chosen
+                         from the calibration system and provide your own. The data will be
+                         multiplied by the value you provide, so you must ensure it is
+                         appropriate for the given sideband and LO frequency of your data.
+                         The factor should be supplied in floating point.\\
 
-
-        \hline
+\hline
 \end{tabular}
 \end{small}
-
-
 \caption{\label{tab:cal_params}
-  The recipe parameters associated with calibration of the data. The sideband ratio correction recipe parameters are
-  used for controlling the sideband correction, and are currently only available for instrument RxA3M. These corrections do
-  not affect reductions done with \continuum, but will be used in all other RxA3m science reductions,
-  and in the \picard\ recipe \calibratesideband. The CALCULATE\_STANDARD\_ALWAYS flag will also affect the non-continuum recipes.}
+  The recipe parameters associated with calibration of the data. The sideband-ratio-correction
+  recipe parameters are used for controlling the sideband correction, and are currently only
+  available for instrument RxA3M. These corrections do not affect reductions done with \continuum,
+  but will be used in all other RxA3M science reductions, and in the \picard\ recipe
+  \calibratesideband. The CALCULATE\_STANDARD\_ALWAYS flag will also affect the non-continuum recipes.}
 \end{table}
 
 
