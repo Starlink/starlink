@@ -805,6 +805,8 @@
 *     2019-06-19 (DSB):
 *        Add FITS header NCONTNCV to the output map, holding the number of
 *        contiguous chunks that failed to converge.
+*     2019-07-9 (DSB):
+*        Ensure no output NDF is created if an error occurs.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -2018,16 +2020,21 @@ void smurf_makemap( int *status ) {
     smf_add_spectral_axis( tndf, fchan, status );
 
     /* If required, split the output map up into JSA tiles. Delete the
-       original output NDF afterwards. */
+       original output NDF afterwards. Always delete the output NDF if 
+       an error has occurred. */
     if( jsatiles ) {
        parGet0l( "TRIMTILES", &trimtiles, status );
        grpSetsz( igrp4, 0, status );
        smf_jsadicer( tndf, oname, trimtiles, SMF__INST_NONE, SMF__JSA_HPX,
                      &njsatile, igrp4, status );
        ndfDelet( &tndf, status );
-    } else {
+
+    } else if( *status == SAI__OK ){
        grpPut1( igrp4, oname, 0, status );
        ndfAnnul( &tndf, status );
+
+    } else {
+       ndfDelet( &tndf, status );
     }
 
   } else {
