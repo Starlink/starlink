@@ -610,6 +610,13 @@
 *       observation I maps exist since they have not been requested and
 *       may not be available. Previously such checks caused pol2map to
 *       abort if any of the individual observation I maps were missing.
+*    10-JUL-2019 (DSB):
+*       When using cupid:findclumps to generate AST and PCA masks from the
+*       signal map specified by parameter MASK (with MASKTYPE=Signal), the
+*       SNR thresholds were previously hard wired values ([3,2] for AST,
+*       [5,3] for PCA). These values are still the defaults, but they can
+*       now be over-ridden by supplying values via the CONFIG parameter for
+*       AST.ZERO_SNR, AST.ZERO_SNRLO, PCA.ZERO_SNR and PCA.ZERO_SNRLO.
 
 '''
 
@@ -1293,7 +1300,7 @@ try:
          if len(maskmap) != 1:
             raise starutil.InvalidParameterError("More than one NDF "
                       "supplied for parameter MASK." )
-         msg_out("Masking will be based on SNR values in {0}.".format(maskmap))
+         msg_out("Masking will be based on SNR values derived from {0}.".format(maskmap))
 
 #  See where (if at all) the masks are to be saved.
          astmask = parsys["MASKOUT1"].value
@@ -1750,8 +1757,36 @@ try:
 #  If required, generate the AST and PCA masks from the supplied MASK
 #  map.
       if maskmap and masktype == "SIGNAL":
+
+#  Get an SNR map from the supplied MASK signal map.
          snr = NDG(1)
          invoke("$KAPPA_DIR/makesnr in={0} out={1} minvar=0".format(maskmap,snr))
+
+#  Get the SNR thresholds for the AST and PCA masks from the supplied config
+#  file, using defaults if they are not there.
+         try:
+            ast_snr = float( invoke("$KAPPA_DIR/configecho name=ast.zero_snr "
+                                    "config={0}".format(config)) )
+         except Exception:
+            ast_snr = 3.0
+
+         try:
+            ast_snrlo = float( invoke("$KAPPA_DIR/configecho name=ast.zero_snrlo "
+                                    "config={0}".format(config)) )
+         except Exception:
+            ast_snrlo = 2.0
+
+         try:
+            pca_snr = float( invoke("$KAPPA_DIR/configecho name=pca.zero_snr "
+                                    "config={0}".format(config)) )
+         except Exception:
+            pca_snr = 3.0
+
+         try:
+            pca_snrlo = float( invoke("$KAPPA_DIR/configecho name=pca.zero_snrlo "
+                                    "config={0}".format(config)) )
+         except Exception:
+            pca_snrlo = 2.0
 
 #  Very strong sources such as Orion A can create masks in which there
 #  are insufficient background pixels to allow future invocations of
@@ -1763,8 +1798,8 @@ try:
          ngood = float( get_task_par( "numgood", "stats" ) )
          maxgood = ngood / 5
 
-         noise = 2
-         minheight = 3
+         noise = ast_snrlo
+         minheight = ast_snr
          aconf = NDG.tempfile()
 
          while True:
@@ -1801,8 +1836,8 @@ try:
 #  pixels. The PCA mask contains peaks above SNR=5, followed down to SNR=3.
          maxgood = maxgood / 2
 
-         noise = 3
-         minheight = 5
+         noise = pca_snrlo
+         minheight = pca_snr
          pconf = NDG.tempfile()
 
          while True:
@@ -2111,7 +2146,7 @@ try:
 #  re-create one without re-creating them all.
          else:
             make_new_maps = True
-            if coadd_exists and reuse
+            if coadd_exists and reuse:
                make_new_maps = False
 
                if need_obsmaps:
