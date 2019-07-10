@@ -328,8 +328,11 @@
 *        created from this map by finding all clumps of contiguous pixels
 *        above a fixed SNR limit, and then extending these clumps down to
 *        a lower SNR limit. For the AST model, the upper and lower SNR
-*        limits are of 3.0 and 2.0. For the PCA mask, the limits are 5.0
-*        and 3.0. The AST and PCA masks created in this way can be saved
+*        limits default to 3.0 and 2.0. For the PCA mask, the defaults are
+*        5.0 and 3.0. These defaults can be over-ridden by supplying
+*        values for AST.ZERO_SNR, AST.ZERO_SNRLO, PCA.ZERO_SNR and
+*        PCA.ZERO_SNRLO within the configuration specified by parameter
+*        CONFIG. The AST and PCA masks created in this way can be saved
 *        using parameters MASKOUT1 and MASKOUT2.
 *
 *        - "Mask": A pair of NDFs should be supplied for parameter MASK,
