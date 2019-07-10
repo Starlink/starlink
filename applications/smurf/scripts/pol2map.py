@@ -592,17 +592,24 @@
 *        map was given, then use the I map created from the first observation as
 *        the ref map for the remaining observations. This ensures that all the
 *        auto-masked I maps are aligned with each other.
-*    13-JUN-2018 (DSB):
+*    13-JUN-2019 (DSB):
 *       Ensure units ("pW") are propagated to the output I, Q and U
 *       coadded NDFs (gy default, kappa:maths does not propagatre units).
-*    14-JUN-2018 (DSB):
+*    14-JUN-2019 (DSB):
 *       - Ensure that any auto-masked maps for which no pointing correction
 *       can be determined are nevertheless assigned a valid CHUNKCFAC value.
 *       - If NORMALISE=YES, issue a warning if no CHUNKFAC header is found in
 *       any input I map. Previously, pol2map would crash in such cases.
 *       - Abort if reuse is true and we are about to over-write an existing map
-*       (this can only happen if skyloop=yes). This can occur, for instance, if 
+*       (this can only happen if skyloop=yes). This can occur, for instance, if
 *       the user forgets to set the MASK parameter on step 2.
+*    9-JUL-2019 (DSB):
+*       If an output catalogue is being created, but IOUT is null, then
+*       the supplied IPREF map is used as the total intensity map when
+*       creating the vectors. In this case, do not check that the individual
+*       observation I maps exist since they have not been requested and
+*       may not be available. Previously such checks caused pol2map to
+*       abort if any of the individual observation I maps were missing.
 
 '''
 
@@ -2086,27 +2093,35 @@ try:
 #  -----------------------------------------------------------
       if skyloop:
 
-#  If all the expected maps, including the coadd, already exist, and REUSE
-#  is True, we do not re-create the maps. But if any maps are mising we need
-#  to re-create them all. When using skyloop we cannot re-create one without
-#  re-creating them all.
-         if reuse:
-            try:
-               junk = NDG(coadd,"*")
-               make_new_maps = False
-            except starutil.NoNdfError:
-               make_new_maps = True
+#  If the current coadd already exists and is being used as the IP
+#  reference map, we do not attempt to recreate it (or the individual
+#  observation maps), regardless of the value of parameter REUSE.
+         try:
+            junk = NDG( coadd, "*" )
+            coadd_exists = True
+         except starutil.NoNdfError:
+            coadd_exists = False
+
+         if coadd_exists and coadd == ipref:
+            make_new_maps = False
+
+#  Otherwise, if all the expected maps, including the coadd, already exist,
+#  and REUSE is True, we do not re-create the maps. But if any maps are
+#  missing we need to re-create them all. When using skyloop we cannot
+#  re-create one without re-creating them all.
          else:
             make_new_maps = True
+            if coadd_exists and reuse
+               make_new_maps = False
 
-         if not make_new_maps:
-            for key in qui_list.keys():
-               newpath = "{0}/{1}_{2}.sdf".format(mapdir,key,suffix)
-               if os.path.exists(newpath):
-                  qui_maps[key] = NDG(newpath)
-               else:
-                  make_new_maps = True
-                  break
+               if need_obsmaps:
+                  for key in qui_list.keys():
+                     obsmap_path = "{0}/{1}_{2}.sdf".format(mapdir,key,suffix)
+                     if os.path.exists(obsmap_path):
+                        qui_maps[key] = NDG(obsmap_path)
+                     else:
+                        make_new_maps = True
+                        break
 
          if not make_new_maps:
             msg_out("   Re-using previously created maps")
@@ -2117,12 +2132,12 @@ try:
 #  to over-write existing maps).
             if reuse:
                for key in qui_list.keys():
-                  newpath = "{0}/{1}_{2}.sdf".format(mapdir,key,suffix)
-                  if os.path.exists(newpath):
+                  obsmap_path = "{0}/{1}_{2}.sdf".format(mapdir,key,suffix)
+                  if os.path.exists(obsmap_path):
                      raise starutil.InvalidParameterError( "\npol2map would "
                               "over-write existing map {0}. Is this what you want "
                               "to do? If so, please delete any existing maps that "
-                              "are to be replaced and re-run pol2map.".format(newpath) )
+                              "are to be replaced and re-run pol2map.".format(obsmap_path) )
 
 #  Create a directory in which to put the individual observation maps.
             obsdir = NDG.subdir()
