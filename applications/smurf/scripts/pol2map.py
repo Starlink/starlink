@@ -2040,10 +2040,19 @@ try:
          fd.write("{0}\n".format(iconfig))
 
 #  Put in values that are absolutely required by this script. These
-#  over-write any values in the user-supplied configs.
+#  over-write any values in the user-supplied configs. This includes
+#  resetting mask SNR thresholds so that any SNR limits intended for
+#  use just by findclumps are not also used by makemap.
       fd.write("noi.usevar=1\n")
       fd.write("flagslow=0.01\n")
       fd.write("downsampscale=0\n")
+
+      if maskmap and masktype == "SIGNAL":
+         fd.write("ast.zero_snr=0\n")
+         fd.write("pca.zero_snr=0\n")
+         fd.write("flt.zero_snr=0\n")
+         fd.write("com.zero_snr=0\n")
+
       fd.close()
 
 #  Create the QU config file in the same way. For Q and U maps, the
