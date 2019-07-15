@@ -108,6 +108,9 @@ int ary1DCBLock( AryDCB *dcb, int oper, int rdonly, int *status ){
 *  History:
 *     26-JUL-2017 (DSB):
 *        Initial version
+*     12-JUL-2019 (DSB):
+*        Lock and unlock all the HDS locators stored in the DCB object,
+*        not just the main data object locator.
 *     {enter_further_changes_here}
 
 *-
@@ -125,7 +128,9 @@ int ary1DCBLock( AryDCB *dcb, int oper, int rdonly, int *status ){
       errRepf( " ", "ary1DCBLock: The supplied DCB has no associated HDS "
                "data object - (internal ARY programming error).", status );
 
-/* If required, inquire about any current locks on the HDS object. */
+/* If required, inquire about any current locks on the HDS object. Test the
+   main data object locator. For speed, assume the other locators are the
+   same.*/
    } else if( oper == 1 ) {
       result = datLocked( dcb->loc, 0, status );
 
@@ -137,10 +142,16 @@ int ary1DCBLock( AryDCB *dcb, int oper, int rdonly, int *status ){
    attempted to access that same sub-component. Time will tell... */
    } else if( oper == 2 ) {
       datLock( dcb->loc, 0, rdonly, status );
+      if( dcb->dloc ) datLock( dcb->dloc, 0, rdonly, status );
+      if( dcb->iloc ) datLock( dcb->iloc, 0, rdonly, status );
+      if( dcb->scloc ) datLock( dcb->scloc, 0, rdonly, status );
 
 /* If required, remove a lock on the HDS object. */
    } else if( oper == 3 ) {
       datUnlock( dcb->loc, 0, status );
+      if( dcb->dloc ) datUnlock( dcb->dloc, 0, status );
+      if( dcb->iloc ) datUnlock( dcb->iloc, 0, status );
+      if( dcb->scloc ) datUnlock( dcb->scloc, 0, status );
 
 /* Report an error for any other "oper" value. */
    } else if( *status == SAI__OK ) {
