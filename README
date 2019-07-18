@@ -491,6 +491,45 @@ Fedora:
    texlive-tocloft.noarch
    texlive-eqparbox.noarch
 
+
+Debian 10:
+   This list (kindly provided by Paul Kerry), may not be complete and
+   some packages may be superfluous..
+
+   bison
+   byacc
+   ed
+   flex
+   g++
+   gcc
+   git
+   gfortran
+   libc6-dev
+   libcurl4-openssl-dev
+   libexpat1-dev
+   libxext-dev
+   libffi-dev
+   libfreetype6-dev
+   libgfortran5
+   libice-dev
+   libjpeg62-turbo-dev
+   libncurses-dev
+   libpng-dev
+   libsm-dev
+   libssl-dev
+   libx11-dev
+   libxau-dev
+   libxcb1-dev
+   libxdmcp-dev
+   libxt-dev
+   make
+   texinfo
+   texlive-full
+   uuid-dev
+   xutils-dev
+   zlib1g-dev
+
+
 Arch Linux:
    base-devel
    ed
@@ -503,6 +542,7 @@ Arch Linux:
    tcsh
    texlive-most
 
+
 CentOS 7:
    libXext-devel
    libXau-devel
@@ -511,6 +551,7 @@ CentOS 7:
    libxml2-devel
    ncurses-devel
    texlive-multirow
+
 
 MacOSX:
     gfortran
