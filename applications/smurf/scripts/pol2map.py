@@ -620,6 +620,10 @@
 *       [5,3] for PCA). These values are still the defaults, but they can
 *       now be over-ridden by supplying values via the CONFIG parameter for
 *       AST.ZERO_SNR, AST.ZERO_SNRLO, PCA.ZERO_SNR and PCA.ZERO_SNRLO.
+*    22-JUL-2019 (DSB):
+*       Fix major SKYLOOP bug that caused pol2map to crash with error
+*       message "name 'need_obsmaps' is not defined" unless pre-existing
+*       I,Q,U maps were found.
 
 '''
 
@@ -2160,15 +2164,13 @@ try:
             make_new_maps = True
             if coadd_exists and reuse:
                make_new_maps = False
-
-               if need_obsmaps:
-                  for key in qui_list.keys():
-                     obsmap_path = "{0}/{1}_{2}.sdf".format(mapdir,key,suffix)
-                     if os.path.exists(obsmap_path):
-                        qui_maps[key] = NDG(obsmap_path)
-                     else:
-                        make_new_maps = True
-                        break
+               for key in qui_list.keys():
+                  obsmap_path = "{0}/{1}_{2}.sdf".format(mapdir,key,suffix)
+                  if os.path.exists(obsmap_path):
+                     qui_maps[key] = NDG(obsmap_path)
+                  else:
+                     make_new_maps = True
+                     break
 
          if not make_new_maps:
             msg_out("   Re-using previously created maps")
