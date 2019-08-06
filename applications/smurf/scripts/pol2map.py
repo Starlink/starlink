@@ -2180,13 +2180,21 @@ try:
 #  Prevent accidental over-writing of existing maps (reuse=no gives us permission
 #  to over-write existing maps).
             if reuse:
+               nbad = 0
                for key in qui_list.keys():
                   obsmap_path = "{0}/{1}_{2}.sdf".format(mapdir,key,suffix)
                   if os.path.exists(obsmap_path):
-                     raise starutil.InvalidParameterError( "\npol2map would "
-                              "over-write existing map {0}. Is this what you want "
-                              "to do? If so, please delete any existing maps that "
-                              "are to be replaced and re-run pol2map.".format(obsmap_path) )
+                     if nbad == 0:
+                        msg_out("\n ")
+                     nbad += 1
+                     msg_out( obsmap_path )
+
+               if nbad > 0:
+                  raise starutil.InvalidParameterError( "\npol2map would "
+                           "over-write the {0} existing map(s) listed above."
+                           " Is this what you want to do? If so, please "
+                           "delete these existing maps and re-run pol2map.".
+                           format(nbad) )
 
 #  Create a directory in which to put the individual observation maps.
             obsdir = NDG.subdir()
