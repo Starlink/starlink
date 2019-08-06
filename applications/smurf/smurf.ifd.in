@@ -4314,6 +4314,69 @@ package @PACKAGE@ {
 
         }
 
+        action pol2ipcor {
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Input I Q and U maps}
+                default !
+                helpkey *
+            }
+
+            parameter inlogs {
+                type LITERAL
+                prompt {Group of existing pol2ipcor log files}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                helpkey *
+            }
+
+            parameter logfile {
+                type LITERAL
+                prompt {Text file to receive output table}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                helpkey *
+            }
+
+            parameter modelfile {
+                type LITERAL
+                prompt {Text file to receive model values}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                helpkey *
+            }
+
+            parameter mapdir {
+                position 1
+                type LITERAL
+                prompt {Path to directory holding input maps}
+                ppath CURRENT DEFAULT
+                default !
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Corrected Q and U maps}
+                helpkey *
+                default !
+            }
+
+        }
+
         action qucovar {
             helplib {$SMURF_HELP}
 

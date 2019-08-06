@@ -1202,6 +1202,10 @@ void smf_find_thetabins( const smfData *data, int nosign, double **bins,
                          double **bincen, dim_t *nbin, int **whichbin,
                          int *status );
 
+void smf_fit_circle( size_t n, double *ax, double *ay, double *wx,
+                     double *wy, double *rad, double *xc, double *yc,
+                     double *rms, int *status );
+
 void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
                   smfData **odatau, smfData **odatai, smfData **odataf, dim_t box,
                   int ipolcrd, int pasign, double paoff, double angrot,
@@ -1734,6 +1738,9 @@ size_t smf_pca( ThrWorkForce *wf, smfData *data, smfData *lut,
                 unsigned char *mask, double corlim, int *status );
 
 void smf_pcorr( smfHead *head, const Grp *igrp, int *status );
+
+void smf_polang( int indf, AstFitsChan *fc, double epoch, double *alpha,
+                 double *el, double *az, double *a, double *b, int *status );
 
 void smf_polext( int ondf, int store_angle, double angle, const char *domain, int axis, int *status );
 

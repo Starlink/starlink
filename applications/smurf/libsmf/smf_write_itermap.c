@@ -77,6 +77,8 @@
 *        Added FITS headers needed by pol2map: INBEAM, FILTER, UTDATE,
 *        OBSNUM and NSUBSCAN. Also store NDF character components
 *        (Title,Label,Units).
+*     2019-6-12 (DSB):
+*        Added more FITS headers: DATE_OBS, DATE-END, OBJECT.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -243,6 +245,20 @@ void smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapva
     if( astTestFits( hdr->fitshdr, "NSUBSCAN", NULL ) ) {
        astGetFitsI( hdr->fitshdr, "NSUBSCAN", &ival );
        atlPtfti( fitschan, "NSUBSCAN", ival, astGetC( fitschan, "CardComm" ), status );
+    }
+
+    /* Other FITS headers needed by pol2ipcor. */
+    if( astTestFits( hdr->fitshdr, "DATE-OBS", NULL ) ) {
+       astGetFitsS( hdr->fitshdr, "DATE-OBS", &cval );
+       atlPtfts( fitschan, "DATE-OBS", cval, astGetC( fitschan, "CardComm" ), status );
+    }
+    if( astTestFits( hdr->fitshdr, "DATE-END", NULL ) ) {
+       astGetFitsS( hdr->fitshdr, "DATE-END", &cval );
+       atlPtfts( fitschan, "DATE-END", cval, astGetC( fitschan, "CardComm" ), status );
+    }
+    if( astTestFits( hdr->fitshdr, "OBJECT", NULL ) ) {
+       astGetFitsS( hdr->fitshdr, "OBJECT", &cval );
+       atlPtfts( fitschan, "OBJECT", cval, astGetC( fitschan, "CardComm" ), status );
     }
 
     /* Copy the FITS headers from the FitsChan to the NDFs FITS extension. */

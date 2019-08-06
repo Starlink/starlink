@@ -36,7 +36,7 @@
 *     polarisation, based on the total intensity values specified by the
 *     map associated with environment parameter IPREF. The values in this
 *     map are multiplied by factors (Qf,Uf) determined from the current
-*     elevation. Two models are currently provided:
+*     elevation. Three models are currently provided:
 *
 *     - the "JAN2018" (January 2018) model:
 *
@@ -54,6 +54,11 @@
 *
 *        (el is the elevation in radians, (A,B,C,D,E,F) are the numerical
 *        parameters of the model).
+*
+*     - the "AUG2019" (August 2019) model: this model has the same form as
+*       the JAN2018 model, but different numerical constants. The constants
+*       are derived using the smurf:pol2ipcor command on observations of
+*       DR21, OMC1, G34, Serpens Main field2 and Orion B.
 *
 *     The model to use is specified by the "ipmodel" config parameter.
 *
@@ -118,6 +123,8 @@
 *     18-APR-2019 (DSB):
 *        Implement Pierre's two component IP model ("APR2019"), and add
 *        "ipmodel" config parameter.
+*     6-AUG-2019 (DSB):
+*        Added AUG2019 IP model based on using smurf:pol2ipcor.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -163,6 +170,7 @@
 /* Local constants */
 #define JAN2018 0
 #define APR2019 1
+#define AUG2019 2
 
 /* Prototypes for local static functions. */
 static void smf1_subip( void *job_data_ptr, int *status );
@@ -213,6 +221,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    char *polnorth;
    char *trsys;
    char ipref[200];
+   char modname[10];
    const char *cpntr;
    const char *qu;
    dim_t bolostep;
@@ -249,12 +258,17 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    double model2[] = { 6.188E-3,  3.650E-2, -1.978E-2, -3.240E-2 }; /* 850 um with wind blind */
    double model3[] = { 1.190E-2,  1.835E-2, -1.374E-2,  1.486 };    /* 450 um with wind blind */
 
-/* "APR02019": See email from Pierre, sent to DSB and PF on 15th April
+/* "APR2019": See email from Pierre, sent to DSB and PF on 15th April
    2019 - subject "850 IP model". Note, this model only covers 850 data
    at the moment. */
    double model4[] = { -0.47146E-2, 0.57117E-2, 0.24078,        0.0, -2.7784E-2, 0.0 }; /* No wind blind */
    double model5[] = { -0.47146E-2, 0.57117E-2, 0.24078, 1.34820E-2, -2.7784E-2, 0.0 }; /* 850 um with wind blind */
    double *model6 = NULL;                                                         /* 450 um with wind blind */
+
+/* "AUG2019": Derived usng smurf:pol2ipcor. */
+   double model7[] = { 5.520E-3, -3.649E-4,  1.316E-3, -8.544E-2 };  /* No wind blind (copied from JAN2018) */
+   double model8[] = { 1.483E-2,  2.062E-2, -1.201E-2, -5.689E-2 };  /* 850 um with wind blind */
+   double model9[] = { 1.020E-2,  9.413E-3, -5.411E-3,  1.719 };     /* 450 um with wind blind */
 
 /* Initialise */
    *qui = VAL__BADI;
@@ -372,10 +386,13 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
       cpntr = NULL;
       astMapGet0C( keymap, "IPMODEL", &cpntr );
       if( cpntr ){
+         strcpy( modname, cpntr );
          if( !strcasecmp( "APR2019", cpntr ) ) {
             ipmodel = APR2019;
          } else if( !strcasecmp( "JAN2018", cpntr ) ) {
             ipmodel = JAN2018;
+         } else if( !strcasecmp( "AUG2019", cpntr ) ) {
+            ipmodel = AUG2019;
          } else if( *status == SAI__OK ) {
             *status = SAI__ERROR;
             errRepf( " ", "smf_subip: Unknown IPMODEL specified: '%s'.",
@@ -434,7 +451,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
 /* Tell the user what's happening. */
       msgOutf( "", "smf_subip: applying instrumental polarisation %s "
                "correction based on total intensity map `%s' (model %s).",
-               status, qu, ipref, (ipmodel==APR2019)?"APR2019":"JAN2018" );
+               status, qu, ipref, modname );
 
 /* Create structures used to pass information to the worker threads. */
       nw = wf ? wf->nworker : 1;
@@ -466,13 +483,32 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    taken without the wind blind in place, the model is the same at 450 and
    850. */
          if( !windblind ) {
-            ippars = ( ipmodel == JAN2018 ) ? model1 : model4;
+            if( ipmodel == JAN2018 ) {
+               ippars = model1;
+            } else if( ipmodel == APR2019 ) {
+               ippars = model4;
+            } else {
+               ippars = model7;
+            }
 
 /* If the wind blind was in place, the model is differemt at 450 and 850. */
          } else if( waveband == SMF__SUBINST_850 ) {
-            ippars = ( ipmodel == JAN2018 ) ? model2 : model5;
+            if( ipmodel == JAN2018 ) {
+               ippars = model2;
+            } else if( ipmodel == APR2019 ) {
+               ippars = model5;
+            } else {
+               ippars = model8;
+            }
+
          } else {
-            ippars = ( ipmodel == JAN2018 ) ? model3 : model6;
+            if( ipmodel == JAN2018 ) {
+               ippars = model3;
+            } else if( ipmodel == APR2019 ) {
+               ippars = model6;
+            } else {
+               ippars = model9;
+            }
          }
 
          if( !ippars && *status == SAI__OK ) {
@@ -483,7 +519,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
 /* Modify the elevation at which the IP is parallel to the focal plane Y axis
    (i.e. Qip is non-zero and Uip is zero) by adding on the user-specified
    offset. */
-         if( ipmodel == JAN2018 ) {
+         if( ipmodel != APR2019 ) {
             ippars[ 3 ] += ipangoff;
          } else {
             ippars[ 2 ] += ipangoff;
@@ -653,7 +689,7 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
          if( !( *pq & SMF__Q_BADB ) ) {
 
 /* Get the IP model parameters for this bolometer. */
-            if( pdata->ipmodel == JAN2018 ) {
+            if( pdata->ipmodel != APR2019 ) {
                ca = pdata->ippars[0];
                cb = pdata->ippars[1];
                cc = pdata->ippars[2];
@@ -713,7 +749,7 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
 
 /* Find the normalised instrumental Q and U. These are with respect to the
    focal plane Y axis. */
-                        if( pdata->ipmodel == JAN2018 ) {
+                        if( pdata->ipmodel != APR2019 ) {
                            p1 = ca + cb*state->tcs_az_ac2 + cc*state->tcs_az_ac2*state->tcs_az_ac2;
                            p1 += ipoffset;
                            angle = -2*( state->tcs_az_ac2 - cd );
