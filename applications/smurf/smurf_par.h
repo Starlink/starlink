@@ -174,4 +174,12 @@ error can not determine PI
 
 #define SC2FLAT__DTOI (24.71e-6/65536)
 
+/* Function macro that emulates the GNU interface for qsort_r. This is
+   needed because the BSD interface has a different argument order. */
+#ifdef HAVE_QSORT_R_BSD
+#define SMURF_QSORT_R(Base,Nmemb,Size,Compar,Arg) qsort_r(Base,Nmemb,Size,Arg,Compar)
+#else
+#define SMURF_QSORT_R(Base,Nmemb,Size,Compar,Arg) qsort_r(Base,Nmemb,Size,Compar,Arg)
+#endif
+
 #endif /* SMURF_PAR_DEFINED */

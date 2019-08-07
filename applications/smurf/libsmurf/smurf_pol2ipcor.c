@@ -882,7 +882,7 @@ void smurf_pol2ipcor( int *status ) {
    indx = astMalloc( nobs*sizeof(*indx) );
    if( *status == SAI__OK && nobs ) {
       for( i = 0; (int) i < nobs; i++ ) indx[ i ] = i;
-      qsort_r( indx, nobs, sizeof(*indx), smf1_qsort, alist );
+      SMURF_QSORT_R( indx, nobs, sizeof(*indx), smf1_qsort, alist );
    }
 
 /* Get the maximum number of observations in one azimuth bin. */
@@ -2425,7 +2425,7 @@ static void smf1_reject( int n, double *vals, int *status ){
 /* Get an index that sorts the values into increasing order. Any
    VAL__BADD values are put at the end. */
       for( i = 0; (int) i < n; i++ ) indx[ i ] = i;
-      qsort_r( indx, n, sizeof(*indx), smf1_qsort, vals );
+      SMURF_QSORT_R( indx, n, sizeof(*indx), smf1_qsort, vals );
 
 /* Find the median of the values. */
       if( ngood % 2 == 0 ) {
@@ -2446,7 +2446,7 @@ static void smf1_reject( int n, double *vals, int *status ){
 
 /* Sort the absolute residuals and find their median. */
       for( i = 0; (int) i < n; i++ ) indx[ i ] = i;
-      qsort_r( indx, n, sizeof(*indx), smf1_qsort, res );
+      SMURF_QSORT_R( indx, n, sizeof(*indx), smf1_qsort, res );
 
       if( ngood % 2 == 0 ) {
          medres = 0.5*( res[ indx[ngood/2] ] + res[ indx[ngood/2 - 1] ] );
