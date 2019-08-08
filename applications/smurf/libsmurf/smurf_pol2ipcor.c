@@ -299,6 +299,7 @@ typedef struct Params {
 static double smf1_f( const gsl_vector *v, void *pars );
 static int smf1_madebyskyloop( int indf, int *status );
 static int smf1_qsort( const void *a, const void *d, void *data );
+static int smf1_qsort_bsd( void *data, const void *a, const void *d );
 static void smf1_worker( void *job_data_ptr, int *status );
 static void smf1_pol2ipcor( ThrWorkForce *wf, AstKeyMap *km, Grp *igrp3, const int *lbnd,
                            const int *ubnd, const int *indx, const int *binsize,
@@ -882,7 +883,13 @@ void smurf_pol2ipcor( int *status ) {
    indx = astMalloc( nobs*sizeof(*indx) );
    if( *status == SAI__OK && nobs ) {
       for( i = 0; (int) i < nobs; i++ ) indx[ i ] = i;
-      SMURF_QSORT_R( indx, nobs, sizeof(*indx), smf1_qsort, alist );
+
+#ifdef HAVE_QSORT_R_BSD
+      qsort_r( indx, nobs, sizeof(*indx), alist, smf1_qsort_bsd );
+#else
+      qsort_r( indx, nobs, sizeof(*indx), smf1_qsort, alist );
+#endif
+
    }
 
 /* Get the maximum number of observations in one azimuth bin. */
@@ -2060,6 +2067,10 @@ static void smf1_worker( void *job_data_ptr, int *status ) {
 }
 
 
+static int smf1_qsort_bsd( void *data, const void *a, const void *b ){
+   return smf1_qsort( a, b, data );
+}
+
 static int smf1_qsort( const void *a, const void *b, void *data ){
    int ia = *((const int *) a);
    int ib = *((const int *) b);
@@ -2425,7 +2436,12 @@ static void smf1_reject( int n, double *vals, int *status ){
 /* Get an index that sorts the values into increasing order. Any
    VAL__BADD values are put at the end. */
       for( i = 0; (int) i < n; i++ ) indx[ i ] = i;
-      SMURF_QSORT_R( indx, n, sizeof(*indx), smf1_qsort, vals );
+
+#ifdef HAVE_QSORT_R_BSD
+      qsort_r( indx, n, sizeof(*indx), vals, smf1_qsort_bsd );
+#else
+      qsort_r( indx, n, sizeof(*indx), smf1_qsort, vals );
+#endif
 
 /* Find the median of the values. */
       if( ngood % 2 == 0 ) {
@@ -2446,7 +2462,11 @@ static void smf1_reject( int n, double *vals, int *status ){
 
 /* Sort the absolute residuals and find their median. */
       for( i = 0; (int) i < n; i++ ) indx[ i ] = i;
-      SMURF_QSORT_R( indx, n, sizeof(*indx), smf1_qsort, res );
+#ifdef HAVE_QSORT_R_BSD
+      qsort_r( indx, n, sizeof(*indx), res, smf1_qsort_bsd );
+#else
+      qsort_r( indx, n, sizeof(*indx), smf1_qsort, res );
+#endif
 
       if( ngood % 2 == 0 ) {
          medres = 0.5*( res[ indx[ngood/2] ] + res[ indx[ngood/2 - 1] ] );
