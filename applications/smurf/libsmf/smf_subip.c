@@ -46,6 +46,9 @@
 *
 *        (p is the expected fractional polarisation, el is the elevation
 *        in radians, (A,B,C,D) are the numerical parameters of the model).
+*        See report "IP model without the wind blind" (written January
+*        2018) in section "Data Reduction and Analysis" of the POL2
+*        commissioning wiki.
 *
 *     - the "APR2019" (April 2019) model:
 *
@@ -58,7 +61,10 @@
 *     - the "AUG2019" (August 2019) model: this model has the same form as
 *       the JAN2018 model, but different numerical constants. The constants
 *       are derived using the smurf:pol2ipcor command on observations of
-*       DR21, OMC1, G34, Serpens Main field2 and Orion B.
+*       DR21, OMC1, G34, Serpens Main field2 and Orion B. See report
+*       "Estimating the IP from observations of bright extended polarised
+*       objects" (written August 2019) in section "Data Reduction and
+*       Analysis" of the POL2 commissioning wiki.
 *
 *     The model to use is specified by the "ipmodel" config parameter.
 *
@@ -265,8 +271,10 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    double model5[] = { -0.47146E-2, 0.57117E-2, 0.24078, 1.34820E-2, -2.7784E-2, 0.0 }; /* 850 um with wind blind */
    double *model6 = NULL;                                                         /* 450 um with wind blind */
 
-/* "AUG2019": Derived usng smurf:pol2ipcor. */
-   double model7[] = { 5.520E-3, -3.649E-4,  1.316E-3, -8.544E-2 };  /* No wind blind (copied from JAN2018) */
+/* "AUG2019": See report "Estimating the IP from observations of bright
+   extended polarised objects" (written August 2019) in section "Data
+   Reduction and Analysis" of the POL2 commissioning wiki. */
+   double *model7 = model1;                                          /* No wind blind */
    double model8[] = { 1.483E-2,  2.062E-2, -1.201E-2, -5.689E-2 };  /* 850 um with wind blind */
    double model9[] = { 1.020E-2,  9.413E-3, -5.411E-3,  1.719 };     /* 450 um with wind blind */
 
