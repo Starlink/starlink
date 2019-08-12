@@ -138,11 +138,7 @@ void ndf1Intcb( int *status ){
    the TCB value accordingly. The default of 2147 mega-pixels corresponds
    to the largest value that can be held in a four byte integer. */
    ndf1Rdtun( "NDF_SECMAX", 2147, &ival, status );
-   if( *status == SAI__OK ) {
-      Ndf_TCB_secmax = ival;
-   } else {
-      Ndf_TCB_secmax = 2147;
-   }
+   if( *status == SAI__OK ) Ndf_TCB_secmax = ival;
 
 /* Propagation of extensions
    =========================
