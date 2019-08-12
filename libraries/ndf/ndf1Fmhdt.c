@@ -87,7 +87,7 @@ void ndf1Fmhdt( const int ymdhm[], float sec, char *str, size_t str_length,
    (but fixed) string. This is intended to facilitate regression testing,
    where a change in date/time could cause tests to fail. */
    if( Ndf_TCB_fixdt ) {
-      ndf1Ccpy( "2018-AUG-10 11:00:00", str, str_length, status );
+      ndf1Ccpy( "2018-AUG-10 11:00:00.000", str, str_length, status );
 
 /* Otherwise */
    } else {
