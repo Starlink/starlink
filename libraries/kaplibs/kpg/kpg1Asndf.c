@@ -99,8 +99,8 @@ void kpg1Asndf( int indf, int ndim, int *dim, int *lbnd, int *ubnd,
    if( *status != SAI__OK ) return;
 
 /* Obtain the actual dimension of the input NDF. */
-   ndfDim( indf, NDF__MXDIM, &dims, &adim, status );
-   adim = ( adim < ndim ) ? adim : ndim; 
+   ndfDim( indf, NDF__MXDIM, dims, &adim, status );
+   adim = ( adim < ndim ) ? adim : ndim;
 
 /* Create a place-holder for a temporary NDF. */
    ndfTemp( &place, status );

@@ -5,6 +5,7 @@
 #include "star/hds.h"
 #include "ndf.h"
 #include "ast.h"
+#include "kaplibs.h"
 
 /* Module variables */
 static char **text;
