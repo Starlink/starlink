@@ -201,13 +201,12 @@ void ndf1Plfor( HDSLoc *loc, const char *name, NdfPCB **pcb, int *status ){
 
 /* Adjust the anticipated starting position for the expected file
    extension. */
-                     tmin = NDF_MIN( NDF_MAX( tmin, t2 - sizeof( fcb->ext + 1 ) + 2 ), t1 );
+                     tmin = NDF_MIN( NDF_MAX( tmin, t2 - strlen( fcb->ext ) + 1 ), t1 );
 
 /* Test if the file extension field matches (be case sensitive if
    necessary). */
                      if( strcmp( fcb->ext, "*" ) && strcmp( fcb->ext, "." ) ) {
-                        ndf1Cmpfl( expfil, tmin - 1, t2 - 1, fcb->ext,
-                                   &found, status );
+                        ndf1Cmpfl( expfil, tmin, t2, fcb->ext, &found, status );
 
 /* Quit searching if a match is found or an error occurs. */
                         if( found || ( *status != SAI__OK ) ) break;

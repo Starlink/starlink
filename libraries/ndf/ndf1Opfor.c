@@ -248,7 +248,7 @@ void ndf1Opfor( HDSLoc *loc, const char *name, const char *mode,
 
 /* Adjust the anticipated starting position for the expected file
    extension. */
-                     tmin = NDF_MIN( NDF_MAX( tmin, t2 - sizeof( fcb->ext ) + 2 ), t1 );
+                     tmin = NDF_MIN( NDF_MAX( tmin, t2 - strlen( fcb->ext ) + 1 ), t1 );
 
 /* Test if the file extension field matches (be case sensitive if
    necessary). We pretend that the a file type of ".URL" has been
