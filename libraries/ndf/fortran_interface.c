@@ -15,6 +15,11 @@
    }
 
 
+/* Prototypes for obsolete functions that are not defined in ndf.h. These
+   still need an F77 wrapper for the sake of legacy code. */
+void ndfTrace_( int newflg, int *oldflg );
+#define ndfTrace  ndfTrace_
+
 /* A pointer to the F77 subroutine supplied to ndf_hout. */
 static void ( *Ndf_f77_routin )( INTEGER(NLINES),
                                  CHARACTER_ARRAY(TEXT),
