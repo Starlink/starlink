@@ -624,6 +624,9 @@
 *       Fix major SKYLOOP bug that caused pol2map to crash with error
 *       message "name 'need_obsmaps' is not defined" unless pre-existing
 *       I,Q,U maps were found.
+*    13-AUG-2019 (DSB):
+*       No need to create the coadd of I, Q or U maps if it already exists
+*       and has not been surplanted by a new set of observation maps.
 
 '''
 
@@ -2140,6 +2143,16 @@ try:
 #  little like the mean of all maps).
       badkeys = []
 
+#  See if the coadd already exists.
+      try:
+         junk = NDG( coadd, "*" )
+         coadd_exists = True
+      except starutil.NoNdfError:
+         coadd_exists = False
+
+#  Indicate that no new maps have yet been made.
+      make_new_maps = False
+
 #  If we are using skyloop to generate the observation maps...
 #  -----------------------------------------------------------
       if skyloop:
@@ -2147,12 +2160,6 @@ try:
 #  If the current coadd already exists and is being used as the IP
 #  reference map, we do not attempt to recreate it (or the individual
 #  observation maps), regardless of the value of parameter REUSE.
-         try:
-            junk = NDG( coadd, "*" )
-            coadd_exists = True
-         except starutil.NoNdfError:
-            coadd_exists = False
-
          if coadd_exists and coadd == ipref:
             make_new_maps = False
 
@@ -2593,6 +2600,7 @@ try:
 #  Otherwise create a new map.  The call signature for makemap depends on
 #  whether an external mask is being supplied or not.
             except starutil.NoNdfError:
+               make_new_maps = True
 
                if dx is not None and dy is not None:
                   msg_out( "   Using pre-calculated pointing corrections of ({0:5.1f},{1:5.1f}) arc-seconds".format(dx,dy) )
@@ -2733,39 +2741,50 @@ try:
 
 #  -----------  CREATE THE COADDED MAP FOR THE CURRENT STOKES PARAMETER -------------
 
+#  We do not need to create the coadd if it already exists and has not
+#  been surplanted by a new set of observation maps.
+      if coadd_exists and not make_new_maps:
+         msg_out("Re-using existing {0} coadd".format(qui))
+         if outcat:
+            if trim is not None:
+               exptrim( coadd, trim, coadd_cat )
+            else:
+               invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
+
+      else:
 
 #  Check some good maps remain to be processed.
-      if len(qui_maps) == 0:
-         raise starutil.InvalidParameterError("No usable {0} maps remains "
-                                              "to be coadded.".format(qui))
+         if len(qui_maps) == 0:
+            raise starutil.InvalidParameterError("No usable {0} maps remains "
+                                                 "to be coadded.".format(qui))
 
 #  If required, create a reference map that defines the WCS for the
 #  catalogue grid, using a pixel size of BINSIZE.
-      if outcat and binsize is not None and catref is None:
-         key = list(qui_maps)[0]
-         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(qui_maps[key]) )
-         pxsize = float(get_task_par( "FPIXSCALE(1)", "ndftrace" ))
-         if binsize < pxsize:
-            raise starutil.InvalidParameterError("Requested catalogue bin "
-                          "size ({0}) is smaller than the map pixel size "
-                          "({1}).".format(binsize,pxsize))
-         else:
-            msg_out("The output vector catalogue will be based on maps "
-                    "that are binned up to {0} arcsec pixels.".format(binsize))
+         if outcat and binsize is not None and catref is None:
+            key = list(qui_maps)[0]
+            invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(qui_maps[key]) )
+            pxsize = float(get_task_par( "FPIXSCALE(1)", "ndftrace" ))
+            if binsize < pxsize:
+               raise starutil.InvalidParameterError("Requested catalogue bin "
+                             "size ({0}) is smaller than the map pixel size "
+                             "({1}).".format(binsize,pxsize))
+            else:
+               msg_out("The output vector catalogue will be based on maps "
+                       "that are binned up to {0} arcsec pixels.".format(binsize))
 
-         catref = NDG( 1 )
-         invoke("$KAPPA_DIR/sqorst in={0} out={1} mode=pixelscale method=near "
-                "pixscale=\"\'{2},{2},*\'\"".format(qui_maps[key],catref,binsize))
+            catref = NDG( 1 )
+            invoke("$KAPPA_DIR/sqorst in={0} out={1} mode=pixelscale method=near "
+                   "pixscale=\"\'{2},{2},*\'\"".format(qui_maps[key],catref,binsize))
 
 #  If skyloop was used above, the coadd will already exist. First deal
 #  with cases where skyloop was not used.
-      allmaps = NDG( list( qui_maps.values() ) )
-      if not skyloop:
+         allmaps = NDG( list( qui_maps.values() ) )
+         if not skyloop:
 
 #  If we have only one observation just copy it to the output maps.
-         if len(qui_maps) == 1:
-            key = list(qui_maps)[0]
-            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(qui_maps[key],coadd))
+            if len(qui_maps) == 1:
+               key = list(qui_maps)[0]
+               invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(qui_maps[key],coadd))
 
 #  If we have more than one observation, coadd them. If we are processing
 #  I data, determine weights for each observation based on how similar
@@ -2776,24 +2795,24 @@ try:
 #  from the coadds created by skyloop, rather than forming them by coadding
 #  the individual maps (skyloop does not put the extension NDFs into the
 #  individual observation maps).
-         elif len(qui_maps) > 1:
-            MakeCoadd( qui, qui_maps, imaps, coadd, mapvar, automask, obsweight )
+            elif len(qui_maps) > 1:
+               MakeCoadd( qui, qui_maps, imaps, coadd, mapvar, automask, obsweight )
 
-            try:
-               invoke("$KAPPA_DIR/erase object={0}.more.smurf.exp_time ok=yes".format(coadd))
-               invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.exp_time lbnd=! ref=! "
-                      "out={1}.more.smurf.exp_time conserve=no method=bilin norm=no "
-                      "variance=no".format(allmaps,coadd))
-            except starutil.AtaskError:
-               msg_out( "No exposure time array will be present in {0}".format(coadd))
+               try:
+                  invoke("$KAPPA_DIR/erase object={0}.more.smurf.exp_time ok=yes".format(coadd))
+                  invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.exp_time lbnd=! ref=! "
+                         "out={1}.more.smurf.exp_time conserve=no method=bilin norm=no "
+                         "variance=no".format(allmaps,coadd))
+               except starutil.AtaskError:
+                  msg_out( "No exposure time array will be present in {0}".format(coadd))
 
-            try:
-               invoke("$KAPPA_DIR/erase object={0}.more.smurf.weights ok=yes".format(coadd))
-               invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.weights lbnd=! ref=! "
-                      "out={1}.more.smurf.weights conserve=no method=bilin norm=no "
-                      "variance=no".format(allmaps,coadd))
-            except starutil.AtaskError:
-               msg_out( "No weights array will be present in {0}".format(coadd))
+               try:
+                  invoke("$KAPPA_DIR/erase object={0}.more.smurf.weights ok=yes".format(coadd))
+                  invoke("$KAPPA_DIR/wcsmosaic in={{{0}}}.more.smurf.weights lbnd=! ref=! "
+                         "out={1}.more.smurf.weights conserve=no method=bilin norm=no "
+                         "variance=no".format(allmaps,coadd))
+               except starutil.AtaskError:
+                  msg_out( "No weights array will be present in {0}".format(coadd))
 
 
 #  Now deal with cases where a coadd has already been created by skyloop.
@@ -2801,57 +2820,57 @@ try:
 #  True, in which case we need to replace the variances in the coadd with
 #  variances derived from the dispersion of the individual observation maps
 #  created by skyloop.
-      elif mapvar and make_new_maps:
-         msg_out("MAPVAR is YES, so forming new variances for {0} skyloop coadd:".format(qui))
-         junk = NDG( 1 )
-         invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
-                "conserve=no method=near variance=yes genvar=yes".
-                format(allmaps,junk))
-         invoke("$KAPPA_DIR/setvar ndf={0} from={1} comp=Variance".
-                format(coadd,junk))
+         elif mapvar and make_new_maps:
+            msg_out("MAPVAR is YES, so forming new variances for {0} skyloop coadd:".format(qui))
+            junk = NDG( 1 )
+            invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
+                   "conserve=no method=near variance=yes genvar=yes".
+                   format(allmaps,junk))
+            invoke("$KAPPA_DIR/setvar ndf={0} from={1} comp=Variance".
+                   format(coadd,junk))
 
 #  If required, trim off the edges of the coadds that have an exposure
 #  time less than "trim" times the mean exposure time.
-      if trim is not None:
-         msg_out("TRIM is {0}, so trimming the edges of {1}".format(trim,coadd))
-         trimmed = exptrim( coadd, trim )
-         invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(trimmed,coadd))
+         if trim is not None:
+            msg_out("TRIM is {0}, so trimming the edges of {1}".format(trim,coadd))
+            trimmed = exptrim( coadd, trim )
+            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(trimmed,coadd))
 
 #  If we are creating a binned up catalogue, bin the input observation maps
 #  up to the required catalogue bin size, and then coadd them. Trim the
 #  resulting coadd if required.
-      if catref:
-         temp = NDG(1)
+         if catref:
+            temp = NDG(1)
 
-         if len(qui_maps) == 1:
-            invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
-                   "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
-                   format(qui_maps[key],temp,catref))
-         else:
-            catmaps = NDG(allmaps)
-            invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
-                   "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
-                   format(allmaps,catmaps,catref))
-            invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
-                   "conserve=no method=near variance=yes genvar={2}".
-                   format(catmaps,temp,mapvar))
+            if len(qui_maps) == 1:
+               invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
+                      "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
+                      format(qui_maps[key],temp,catref))
+            else:
+               catmaps = NDG(allmaps)
+               invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
+                      "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
+                      format(allmaps,catmaps,catref))
+               invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
+                      "conserve=no method=near variance=yes genvar={2}".
+                      format(catmaps,temp,mapvar))
 
-         if trim is not None:
-            exptrim( temp, trim, coadd_cat )
-         else:
-            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(temp,coadd_cat))
+            if trim is not None:
+               exptrim( temp, trim, coadd_cat )
+            else:
+               invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(temp,coadd_cat))
 
-      elif outcat:
-         if trim is not None:
-            exptrim( coadd, trim, coadd_cat )
-         else:
-            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
+         elif outcat:
+            if trim is not None:
+               exptrim( coadd, trim, coadd_cat )
+            else:
+               invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
 
-      if len( badkeys ) > 0:
-         msg_out( "\n\nThe following observations were omitted because "
-                  "their auto-masked maps look peculiar:")
-         for key in badkeys:
-            msg_out( key )
+         if len( badkeys ) > 0:
+            msg_out( "\n\nThe following observations were omitted because "
+                     "their auto-masked maps look peculiar:")
+            for key in badkeys:
+               msg_out( key )
 
 
 
