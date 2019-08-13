@@ -16,7 +16,7 @@ void ndf1Rmblk( char *text ){
 *     Remove all spaces from a string.
 
 *  Synopsis:
-*     void ndf1Dh( char *text )
+*     void ndf1Rmblk( char *text )
 
 *  Description:
 *     This function removes spaces from the supplied string. Subsequent

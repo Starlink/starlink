@@ -137,10 +137,12 @@ void ndf1Ncut( NdfACB *acb1, const char *str, NdfACB **acb2, int *status ){
       } else {
 
 /* If the opening parenthesis is followed by an asterisk  "*" the section
-   refers purely to WCS coords (in which case step over the asterisk).
-   Otherwise, it may contain a mix of axis/wcs coords and pixel indices. */
+   refers purely to WCS coords (in which remove the asterisk). Otherwise,
+   it may contain a mix of axis/wcs coords and pixel indices. */
          if( lstr[1] == '*' ) {
             wcssec = 1;
+            lstr[1] = ' ';
+            ndf1Rmblk( lstr );
          } else {
             wcssec = 0;
          }
