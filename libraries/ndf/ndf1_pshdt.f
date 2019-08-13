@@ -286,8 +286,8 @@
          IF ( ISTAT .NE. SAI__OK ) THEN
             STATUS = NDF__DTMIN
             CALL MSG_SETC( 'STR', STR )
-            CALL MSG_SETI( 'F', F( 1 ) )
-            CALL MSG_SETI( 'L', L( 1 ) )
+            CALL MSG_SETI( 'F', F( 6 ) )
+            CALL MSG_SETI( 'L', L( 6 ) )
             CALL ERR_REP( 'NDF1_PSHDT_SEC',
      :                    'Invalid seconds field encountered ' //
      :                    '(characters ^F:^L) in the history ' //
