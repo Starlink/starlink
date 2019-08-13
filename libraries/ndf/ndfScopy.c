@@ -120,7 +120,7 @@ void ndfScopy_( int indf1, const char *clist, int *place, int *indf2,
    NdfACB *acb2;         /* Pointer to output NDF entry in ACB */
    NdfPCB *pcb;          /* Pointer to placeholder entry in the PCB */
    char extn[ NDF__MXEXT ][ DAT__SZNAM + 1 ];/* Excluded ext. list */
-   int cpf[ NDF__MXCPF ];/* Component propagation flags */
+   int cpf[ NDF__NCPF ];/* Component propagation flags */
    int erase;            /* Whether to erase placeholder object */
    int nextn;            /* Number of excluded extensions */
    int tstat;            /* Temporary status variable */

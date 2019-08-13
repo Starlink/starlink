@@ -170,7 +170,7 @@ void ndfZdelt_( int indf1, const char *comp, float minrat, int zaxis,
    float sumrat;         /* Sum of compression ratios */
    float zrat;           /* Compression ratio for a single array */
    int cflags[ 3 ];      /* Flags giving the components to compress */
-   int cpf[ NDF__MXCPF ];/* Component propagation flags */
+   int cpf[ NDF__NCPF ];/* Component propagation flags */
    int erase;            /* Whether to erase placeholder object */
    int icomp;            /* Component index */
    int mapped;           /* Is ARY array mapped through current id? */
@@ -205,7 +205,7 @@ void ndfZdelt_( int indf1, const char *comp, float minrat, int zaxis,
 
 /* Copy the whole input NDF, except for the arrays being compressed, to
    create a new base NDF and an ACB entry to describe it. */
-   for( icomp = 0; icomp < NDF__MXCPF; icomp++ ){
+   for( icomp = 0; icomp < NDF__NCPF; icomp++ ){
       cpf[ icomp ] = 1;
    }
    if( cflags[ 0 ] ) cpf[ NDF__DCPF ] = 0;

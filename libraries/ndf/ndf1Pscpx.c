@@ -63,7 +63,7 @@ void ndf1Pscpx( const char *str, int mxextn, char extn[][ DAT__SZNAM + 1 ],
 *        Returned holding the array of component propagation flags.
 *        Symbolic constants are defined in the header file "ndf1.h" to
 *        identify the elements of this array. The supplied "cpf" array
-*        should have at least "NDF__MXCPF" elements.
+*        should have at least "NDF__NCPF" elements.
 *     *status
 *        The global status.
 

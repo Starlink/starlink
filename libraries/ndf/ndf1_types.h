@@ -249,7 +249,7 @@ typedef enum NdfAccessControlFlag  {
 #define NDF__MXEXT 32
 
 /* Number of component propagation flags. */
-#define NDF__MXCPF 9
+#define NDF__NCPF 9
 
 /* AXIS component propagation flag. */
 #define NDF__ACPF 0

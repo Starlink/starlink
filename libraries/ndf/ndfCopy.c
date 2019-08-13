@@ -78,7 +78,7 @@ void ndfCopy_( int indf1, int *place, int *indf2, int *status ){
    NdfACB *acb2;         /* Pointer to output NDF entry in ACB */
    NdfPCB *pcb;          /* Pointer to placeholder entry in the PCB */
    char extn[ DAT__SZNAM + 1 ];    /* Dummy extension list */
-   int cpf[ NDF__MXCPF ];/* Component propagation flags */
+   int cpf[ NDF__NCPF ];/* Component propagation flags */
    int erase;            /* Whether to erase placeholder object */
    int i;                /* Loop count */
    int tstat;            /* Temporary status variable */
@@ -90,7 +90,7 @@ void ndfCopy_( int indf1, int *place, int *indf2, int *status ){
    *indf2 = NDF__NOID;
 
 /* Initialise the component propagation flags. */
-   for( i = 0; i < NDF__MXCPF; i++ ) cpf[ i ] = 1;
+   for( i = 0; i < NDF__NCPF; i++ ) cpf[ i ] = 1;
 
 /* Save the "status" value and mark the error stack. */
    tstat = *status;

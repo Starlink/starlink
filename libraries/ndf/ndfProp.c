@@ -124,7 +124,7 @@ void ndfProp_( int indf1, const char *clist, const char *param, int *indf2,
    NdfPCB *pcb;          /* Pointer to placeholder entry in the PCB */
    char extn[ NDF__MXEXT ][ DAT__SZNAM + 1 ];/* Excluded ext. list */
    char name[ NDF__SZPAR + 1 ];    /* NDF name string */
-   int cpf[ NDF__MXCPF ];/* Component propagation flags */
+   int cpf[ NDF__NCPF ];/* Component propagation flags */
    int nextn;            /* Number of excluded extensions */
    int tstat;            /* Temporary status variable */
    size_t ipar;          /* Parameter table index */

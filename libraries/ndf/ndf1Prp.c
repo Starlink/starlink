@@ -40,7 +40,7 @@ void ndf1Prp( NdfACB *acb1, int nextn, char extn[][ DAT__SZNAM + 1 ],
 *        List of component propagation flags; symbolic constants are
 *        defined in the header file "ndf1.h" to identify the elements of
 *        this array. The supplied "cpf" array should have at least
-*        "NDF__MXCPF" elements.
+*        "NDF__NCPF" elements.
 *     pcb
 *        Pointer to a placeholder entry in the PCB which specifies the
 *        location (and certain properties) of the new NDF.

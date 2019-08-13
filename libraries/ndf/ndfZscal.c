@@ -143,7 +143,7 @@ void ndfZscal_( int indf1, const char *type, double scale[], double zero[],
                                                          components to scale */
    const char *datyp[ NDF__NTYP ];  /* Data */
    char form[ NDF__SZFRM + 1 ];    /* Array storage form */
-   int cpf[ NDF__MXCPF ];/* Component propagation flags */
+   int cpf[ NDF__NCPF ];/* Component propagation flags */
    int erase;            /* Whether to erase placeholder object */
    int icomp;            /* Component index */
    int intype;           /* Data type of input NDF */
@@ -196,7 +196,7 @@ void ndfZscal_( int indf1, const char *type, double scale[], double zero[],
 
 /* Propagate all components of the input NDF, except for the DATA and
    VARIANCE arrays, to create a new base NDF and an ACB entry to describe it. */
-   for( icomp = 0; icomp < NDF__MXCPF; icomp++ ){
+   for( icomp = 0; icomp < NDF__NCPF; icomp++ ){
       cpf[ icomp ] = 1;
    }
    cpf[ NDF__DCPF ] = 0;
