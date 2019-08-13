@@ -82,15 +82,15 @@ void ndf1Mxtyp( int itype1, int itype2, int *itype, int *status ){
 /* Obtain the numerical maximum value of the two input type codes,
    constraining it to lie within range. */
    istart = NDF_MIN( NDF_MAX( NDF__TYPUB, NDF_MAX( itype1, itype2 ) ),
-                     NDF__MXTYP );
+                     NDF__NTYP - 1 );
 
 /* Loop to increase this value until conversion from both input data
    types does not lose precision. */
-   for( i = istart - 1; i < NDF__MXTYP; i++ ){
+   for( i = istart; i < NDF__NTYP; i++ ){
 
 /* Test both conversions to see if precision is lost. */
-      ndf1Qityp( itype1, i + 1, &ok1, status );
-      ndf1Qityp( itype2, i + 1, &ok2, status );
+      ndf1Qityp( itype1, i, &ok1, status );
+      ndf1Qityp( itype2, i, &ok2, status );
 
 /* Check for errors. */
       if( *status != SAI__OK ) {
@@ -98,7 +98,7 @@ void ndf1Mxtyp( int itype1, int itype2, int *itype, int *status ){
 
 /* If no precision is lost, then set the result. */
       } else if( ok1 && ok2 ) {
-         *itype = i + 1;
+         *itype = i;
          goto L2;
       }
    }

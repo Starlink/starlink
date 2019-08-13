@@ -83,7 +83,7 @@ void ndf1Awrst( int iax, NdfACB *acb, int *status ){
    this ACB entry. Report an error if it is. */
       if( acb->awmap[ iax ] ) {
          *status = NDF__ISMAP;
-         msgSeti( "AXIS", iax );
+         msgSeti( "AXIS", iax + 1 );
          ndf1Amsg( "NDF", acb );
          errRep( " ", "The width array for axis ^AXIS of the NDF structure "
                  "^NDF is already mapped for access through the specified "
@@ -96,7 +96,7 @@ void ndf1Awrst( int iax, NdfACB *acb, int *status ){
    Report an error if there are. */
          if( dcb->nawmp[ iax ] != 0 ) {
             *status = NDF__ISMAP;
-            msgSeti( "AXIS", iax );
+            msgSeti( "AXIS", iax + 1 );
             ndf1Dmsg( "NDF", dcb );
             errRep( " ", "The width array for axis ^AXIS of the NDF "
                     "structure ^NDF is already mapped for access through "

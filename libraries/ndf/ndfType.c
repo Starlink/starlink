@@ -86,7 +86,7 @@ void ndfType_( int indf, const char *comp, char *type, size_t type_length,
 */
 
 /* Local variables: */
-   const char *datyp[ NDF__MXTYP ];  /* Data */
+   const char *datyp[ NDF__NTYP ];  /* Data */
    NdfACB *acb;          /* Pointer to NDF entry in the ACB */
    int itype;            /* Integer type code of result */
 

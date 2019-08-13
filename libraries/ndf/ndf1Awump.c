@@ -82,7 +82,7 @@ void ndf1Awump( int iax, NdfACB *acb, int *status ){
    Report an error if it is not. */
    if( !acb->awmap[ iax ] ) {
       *status = NDF__NTMAP;
-      msgSeti( "AXIS", iax );
+      msgSeti( "AXIS", iax + 1 );
       ndf1Amsg( "NDF", acb );
       errRep( " ", "The width array for axis ^AXIS of the NDF structure "
               "^NDF is not mapped for access through the specified "

@@ -121,7 +121,7 @@ void CGEN_FUNCTION( ndf1Ade )( double scale, double zero, int upper,
    ovflow = 0;
 
 /* Loop to assign extrapolated values to the array elements. */
-   pa = adata;
+   pa = adata + ( l - lbnda );
    for( i = l; i <= u; i++,pa++ ){
 
 /* Calculate the extrapolated value. */

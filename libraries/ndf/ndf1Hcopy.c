@@ -79,10 +79,10 @@ void ndf1Hcopy( HDSLoc *loc1, HDSLoc *loc2, int *status ){
 
 /* Loop over all source components. */
    datNcomp( loc1, &ncomp, status );
-   for( i = 1; i <= ncomp; i++ ){
+   for( i = 0; i < ncomp; i++ ){
 
 /* Get the component's name. */
-      datIndex( loc1, i, &tloc, status );
+      datIndex( loc1, i + 1, &tloc, status );
       datName( tloc, name, status );
 
 /* Copy it into the destination structure. */

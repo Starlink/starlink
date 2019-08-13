@@ -90,7 +90,7 @@ void ndfFtype_( int indf, const char *comp, char *ftype,
 /* Local variables: */
    NdfACB *acb;          /* Pointer to NDF entry in the ACB */
    char **comps;         /* Array of component name pointers */
-   char *datyp[ NDF__MXTYP ];  /* Data */
+   char *datyp[ NDF__NTYP ];  /* Data */
    char *text;           /* Pointer to dynamically allocated text string */
    char typec[ NDF__SZTYP + 1 ];   /* Numeric data type of component */
    int cmplx;            /* Complex value flag */

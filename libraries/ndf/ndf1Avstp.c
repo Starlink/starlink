@@ -92,7 +92,7 @@ void ndf1Avstp( const char *type, int iax, NdfACB *acb, int *status ){
       if( acb->avmap[ iax ] ) {
          *status = NDF__ISMAP;
          ndf1Amsg( "NDF", acb );
-         msgSeti( "AXIS", iax );
+         msgSeti( "AXIS", iax + 1 );
          errRep( " ", "The variance array for axis ^AXIS of the NDF "
                  "structure ^NDF is already mapped for access through the "
                  "specified identifier (possible programming error).", status );
@@ -104,7 +104,7 @@ void ndf1Avstp( const char *type, int iax, NdfACB *acb, int *status ){
    Report an error if there are. */
          if( dcb->navmp[ iax ] != 0 ) {
             *status = NDF__ISMAP;
-            msgSeti( "AXIS", iax );
+            msgSeti( "AXIS", iax + 1 );
             ndf1Dmsg( "NDF", dcb );
             errRep( " ", "The variance array for axis ^AXIS of the NDF "
                     "structure ^NDF is already mapped for access through "

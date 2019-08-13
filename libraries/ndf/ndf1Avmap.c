@@ -130,7 +130,7 @@ void ndf1Avmap( int iax, NdfACB *acb, const char *type, const char *mode,
    Report an error if it is. */
    if( acb->avmap[ iax ] ) {
       *status = NDF__ISMAP;
-      msgSeti( "AXIS", iax );
+      msgSeti( "AXIS", iax + 1 );
       ndf1Amsg( "NDF", acb );
       errRep( " ", "The variance array for axis ^AXIS of the NDF structure "
               "^NDF is already mapped for access through the specified "
@@ -197,7 +197,7 @@ void ndf1Avmap( int iax, NdfACB *acb, const char *type, const char *mode,
    data object), then create a new axis variance array. Clone an ARY_
    system identifier for it. */
          } else if( ( !exist ) && ( !sect ) && ( modew || modeu ) &&
-                ( iax <= ndimd ) ) {
+                ( iax < ndimd ) ) {
             ndf1Avcre( iax, dcb, status );
             aryClone( dcb->avid[ iax ], &id, status );
 
@@ -297,7 +297,7 @@ void ndf1Avmap( int iax, NdfACB *acb, const char *type, const char *mode,
 
 /* If a conversion error occurs, then report context information. */
          if( *status != SAI__OK ) {
-            msgSeti( "AXIS", iax );
+            msgSeti( "AXIS", iax + 1 );
             ndf1Amsg( "NDF", acb );
             errRep( " ", "Error converting axis variance values into "
                     "standard deviations (errors) for axis ^AXIS of the "

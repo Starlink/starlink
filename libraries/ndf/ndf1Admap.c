@@ -134,7 +134,7 @@ void ndf1Admap( int iax, NdfACB *acb, const char *type, const char *mode,
    an error if it is. */
    if( acb->admap[ iax ] ) {
       *status = NDF__ISMAP;
-      msgSeti( "AXIS", iax );
+      msgSeti( "AXIS", iax + 1 );
       ndf1Amsg( "NDF", acb );
       errRep( " ", "The centre array for axis ^AXIS of the NDF structure "
               "^NDF is already mapped for access through the specified "
@@ -206,7 +206,7 @@ void ndf1Admap( int iax, NdfACB *acb, const char *type, const char *mode,
    object), then create an NDF axis structure containing a new axis
    data array. Clone an ARY_ system identifier for the array. */
             } else if( ( !exist ) && ( !sect ) && ( modew || modeu ) &&
-                   ( iax <= ndimd ) ) {
+                   ( iax < ndimd ) ) {
                ndf1Acre( dcb, status );
                aryClone( dcb->adid[ iax ], &id, status );
 
@@ -234,16 +234,16 @@ void ndf1Admap( int iax, NdfACB *acb, const char *type, const char *mode,
                if( exist && sect ) {
                   if( lbnds < lbndd[ iax ] ) {
                      lower = 1;
-                     ndf1Gadex( lbndd[ iax ], ubndd[ iax ], dcb->adid[ iax
-                                ], 0, &lscale, &lzero, status );
+                     ndf1Gadex( lbndd[ iax ], ubndd[ iax ], dcb->adid[ iax ],
+                                0, &lscale, &lzero, status );
                   }
 
 /* Similarly derive extrapolation parameters if the section extends
    beyond the array's upper bound. */
                   if( ubnds > ubndd[ iax ] ) {
                      upper = 1;
-                     ndf1Gadex( lbndd[ iax ], ubndd[ iax ], dcb->adid[ iax
-                                ], 1, &uscale, &uzero, status );
+                     ndf1Gadex( lbndd[ iax ], ubndd[ iax ], dcb->adid[ iax ],
+                                1, &uscale, &uzero, status );
                   }
                }
             }

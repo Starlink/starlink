@@ -141,7 +141,7 @@ void ndfZscal_( int indf1, const char *type, double scale[], double zero[],
    NdfPCB *pcb;          /* Pointer to placeholder entry in the PCB */
    char comp[ 2 ][ 9 ] = { "DATA", "VARIANCE" };       /* Names of array
                                                          components to scale */
-   const char *datyp[ NDF__MXTYP ];  /* Data */
+   const char *datyp[ NDF__NTYP ];  /* Data */
    char form[ NDF__SZFRM + 1 ];    /* Array storage form */
    int cpf[ NDF__MXCPF ];/* Component propagation flags */
    int erase;            /* Whether to erase placeholder object */

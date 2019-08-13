@@ -30,7 +30,7 @@ void ndf1Adcre( hdsdim lbnd, hdsdim ubnd, int iax, NdfDCB *dcb, int *status ){
 *     ubnd
 *        Upper pixel-index bound of the axis data array.
 *     iax
-*        Axis number.
+*        Zero based axis index.
 *     dcb
 *        Pointer to the data object entry in the DCB.
 *     *status

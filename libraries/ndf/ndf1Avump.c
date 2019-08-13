@@ -87,7 +87,7 @@ void ndf1Avump( int iax, NdfACB *acb, int *status ){
    Report an error if it is not. */
    if( !acb->avmap[ iax ] ) {
       *status = NDF__NTMAP;
-      msgSeti( "AXIS", iax );
+      msgSeti( "AXIS", iax + 1 );
       ndf1Amsg( "NDF", acb );
       errRep( " ", "The variance array for axis ^AXIS of the NDF structure "
               "^NDF is not mapped for access through the specified "
@@ -108,7 +108,7 @@ void ndf1Avump( int iax, NdfACB *acb, int *status ){
 
 /* If a conversion error occurred, then report context information. */
          if( *status != SAI__OK ) {
-            msgSeti( "AXIS", iax );
+            msgSeti( "AXIS", iax + 1 );
             ndf1Amsg( "NDF", acb );
             errRep( " ", "Error converting axis standard deviations "
                     "(errors) into variance values for axis ^AXIS of the "

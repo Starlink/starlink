@@ -235,7 +235,7 @@ void ndf1Ncut( NdfACB *acb1, const char *str, NdfACB **acb2, int *status ){
                } else if( !usewcs ) {
 
                   for( i = 0; i < ndim; i++ ){
-                     ndf1Axlim( i + 1, acb1, value1[ i ], value2[ i ],
+                     ndf1Axlim( i, acb1, value1[ i ], value2[ i ],
                                 frame1[ i ], frame2[ i ], isbnd[ i ],
                                 lbnd + i, ubnd + i, status );
 

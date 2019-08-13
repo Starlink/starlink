@@ -282,7 +282,7 @@ typedef enum NdfAccessControlFlag  {
    ============= */
 
 /* Number of numeric types. */
-#define NDF__MXTYP 8
+#define NDF__NTYP 8
 
 /* Unsigned byte type code. */
 #define NDF__TYPUB 0

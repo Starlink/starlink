@@ -288,7 +288,7 @@ void ndf1Inifr( NdfACB *acb, AstFrameSet *iwcs, int *status ){
          astSet( iwcs, "Title=Normalised pixel coordinate; first "
                   "pixel at %s", costr );
       } else {
-         astSet( iwcs, "Title=Normalised pixel oordinates; first "
+         astSet( iwcs, "Title=Normalised pixel coordinates; first "
                   "pixel at %s", costr );
       }
 

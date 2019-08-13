@@ -27,7 +27,7 @@ void ndf1Awcre( int iax, NdfDCB *dcb, int *status ){
 
 *  Parameters:
 *     iax
-*        Axis number.
+*        Zero-based axis index.
 *     dcb
 *        Pointer to the data object entry in the DCB.
 *     *status

@@ -128,7 +128,7 @@ void ndf1Awmap( int iax, NdfACB *acb, const char *type, const char *mode,
    Report an error if it is. */
    if( acb->awmap[ iax ] ) {
       *status = NDF__ISMAP;
-      msgSeti( "AXIS", iax );
+      msgSeti( "AXIS", iax + 1 );
       ndf1Amsg( "NDF", acb );
       errRep( " ", "The width array for axis ^AXIS of the NDF structure "
               "^NDF is already mapped for access through the specified "
@@ -205,7 +205,7 @@ void ndf1Awmap( int iax, NdfACB *acb, const char *type, const char *mode,
    object), then create a new axis width array. Clone an ARY_ system
    identifier for it. */
          } else if( ( !exist ) && ( !sect ) && ( modew || modeu ) &&
-                ( iax <= ndimd ) ) {
+                ( iax < ndimd ) ) {
             ndf1Awcre( iax, dcb, status );
             aryClone( dcb->awid[ iax ], &id, status );
             new = 1;
@@ -291,7 +291,7 @@ void ndf1Awmap( int iax, NdfACB *acb, const char *type, const char *mode,
 /* If an attempt to access the axis data array fails, then report
    context information. */
                if( *status != SAI__OK ) {
-                  msgSeti( "AXIS", iax );
+                  msgSeti( "AXIS", iax + 1 );
                   ndf1Amsg( "NDF", acb );
                   errRep( " ", "Unable to access the axis centre array for "
                           "axis ^AXIS of the NDF structure ^NDF in order "

@@ -115,7 +115,7 @@ void ndf1Mtyp( const char *typlst, int n, const int ndfs[],
 /* Local Variables: */
    NdfACB *acb;          /* Pointer to ACB entry */
    char **elements;      /* Array of type pointers */
-   char *datyp[ NDF__MXTYP ];  /* Data */
+   char *datyp[ NDF__NTYP ];  /* Data */
    int cdtype;           /* Component data type code */
    int eitype;           /* Element implemented type code */
    int i;                /* Loop counter for NDFs */

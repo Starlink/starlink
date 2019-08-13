@@ -386,7 +386,7 @@ void ndf1Rdwcs( NdfACB *acb, AstFrameSet **iwcs, int *status ){
 /* If the NDF is a section, map the required axis data array for
    reading as double precision values via the temporary "acb" entry. */
             if( acb->cut ) {
-               ndf1Admap( idim + 1, acbt, "_DOUBLE", "READ", (void **) &pntr,
+               ndf1Admap( idim, acbt, "_DOUBLE", "READ", (void **) &pntr,
                           &el, status );
 
 /* If it is not a section, check if the required axis data array is
@@ -410,7 +410,7 @@ void ndf1Rdwcs( NdfACB *acb, AstFrameSet **iwcs, int *status ){
    and map it in the required manner. */
             } else {
                mapped = 0;
-               ndf1Admap( idim + 1, acb, "_DOUBLE", "READ", (void **) &pntr,
+               ndf1Admap( idim, acb, "_DOUBLE", "READ", (void **) &pntr,
                           &el, status );
             }
 
@@ -425,7 +425,7 @@ void ndf1Rdwcs( NdfACB *acb, AstFrameSet **iwcs, int *status ){
 /* Set an appropriate value for the LutEpsilon attribute (the relative
    error of the values in the table), based on the data type of the AXIS
    structure. */
-               ndf1Adtyp( idim + 1, acb, axtype, sizeof( axtype ), status );
+               ndf1Adtyp( idim, acb, axtype, sizeof( axtype ), status );
                if( !strcmp( axtype, "_DOUBLE" ) ) {
                   eps = VAL__EPSD;
                } else if( !strcmp( axtype, "_REAL" ) ) {
@@ -465,7 +465,7 @@ void ndf1Rdwcs( NdfACB *acb, AstFrameSet **iwcs, int *status ){
 /* Now relinquish access to the axis data array. If it was mapped via
    the temporary "acb" entry, then unmap it. */
             if( acb->cut ) {
-               ndf1Adump( idim + 1, acbt, status );
+               ndf1Adump( idim, acbt, status );
 
 /* If access was to a temporary copy of the array, then annul the
    identifier for the temporary copy. Otherwise, simply unmap the array
@@ -473,12 +473,12 @@ void ndf1Rdwcs( NdfACB *acb, AstFrameSet **iwcs, int *status ){
             } else if( mapped ) {
                aryAnnul( &ary, status );
             } else {
-               ndf1Adump( idim + 1, acb, status );
+               ndf1Adump( idim, acb, status );
             }
 
 /* For the first NDF dimension, use the Mapping produced above directly,
    by cloning its pointer. */
-            if( idim + 1 == 1 ) {
+            if( idim == 0 ) {
                map = astClone( axmap );
 
 /* For subsequent dimensions, accumulate the Mappings by combining them
