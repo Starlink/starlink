@@ -106,7 +106,7 @@
 *  (but fixed) string. This is intended to facilitate regression testing,
 *  where a change in date/time could cause tests to fail.
       IF( TCB_FIXDT ) THEN
-         BUF = '2018-AUG-10 11:00:00'
+         BUF = '2018-AUG-10 11:00:00.000'
 
 *  Otherwise...
       ELSE
