@@ -4,6 +4,7 @@
 #include "mers.h"
 #include "ary_err.h"
 #include <string.h>
+#include <stdlib.h>
 
 void ary1Maps( AryACB *acb, const char *type, int cmplx, const char *mmod,
                const char *inopt, void **dpntr, void **ipntr, int *status ) {
@@ -249,7 +250,7 @@ void ary1Maps( AryACB *acb, const char *type, int cmplx, const char *mmod,
 /* Note whether the mapped data may contain "bad" values in (a) the mapping
    transfer region and (b) the padding region which surrounds the actual
    mapped data (if this exists). */
-                  mcb->bad = strcmp( inopt, "ZERO" );
+                  mcb->bad = abs( strcmp( inopt, "ZERO" ) );
                   mcb->pbad = mcb->bad;
                }
 
@@ -281,7 +282,7 @@ void ary1Maps( AryACB *acb, const char *type, int cmplx, const char *mmod,
 /* Note whether the mapped data may contain "bad" values in (a) the mapping
    transfer region and (b) the padding region which surrounds the actual
    mapped data (if this exists). */
-               mcb->bad = strcmp( inopt, "ZERO" );
+               mcb->bad = abs( strcmp( inopt, "ZERO" ) );
                mcb->pbad = mcb->bad;
 
 /* Case 4. ======= It is necessary to read values from the array, but these
