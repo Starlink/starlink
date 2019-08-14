@@ -38,7 +38,6 @@ void ndf1RoutinWrap( int nlines, char *const text[], int *status );
 
 
 
-#define SZMAX 1024
 F77_SUBROUTINE(ndf_acget)( INTEGER(INDF),
                            CHARACTER(COMP),
                            INTEGER(IAXIS),
@@ -52,10 +51,10 @@ F77_SUBROUTINE(ndf_acget)( INTEGER(INDF),
    GENPTR_CHARACTER(VALUE)
    GENPTR_INTEGER(STATUS)
    char *comp = cnfCreim( COMP, COMP_length );
-   char *value = malloc( SZMAX );
+   char *value = malloc( VALUE_length+1 );
    if( value ) {
       strcpy( value, "<null>" );
-      ndfAcget_( *INDF, comp, *IAXIS, value, SZMAX, STATUS );
+      ndfAcget_( *INDF, comp, *IAXIS, value, VALUE_length+1, STATUS );
       if( strcmp( value, "<null>" ) ) {
          cnfExprt( value, VALUE, VALUE_length );
       }
@@ -63,7 +62,6 @@ F77_SUBROUTINE(ndf_acget)( INTEGER(INDF),
    }
    cnfFree( comp );
 }
-#undef SZMAX
 
 F77_SUBROUTINE(ndf_aclen)( INTEGER(INDF),
                            CHARACTER(COMP),
@@ -425,7 +423,6 @@ F77_SUBROUTINE(ndf_blockk)(INTEGER(INDF1),
 
 }
 
-#define SZMAX 1024
 F77_SUBROUTINE(ndf_cget)( INTEGER(INDF),
                           CHARACTER(COMP),
                           CHARACTER(VALUE),
@@ -437,10 +434,10 @@ F77_SUBROUTINE(ndf_cget)( INTEGER(INDF),
    GENPTR_CHARACTER(VALUE)
    GENPTR_INTEGER(STATUS)
    char *comp = cnfCreim( COMP, COMP_length );
-   char *value = malloc( SZMAX );
+   char *value = malloc( VALUE_length+1 );
    if( value ) {
       strcpy( value, "<null>" );
-      ndfCget_( *INDF, comp, value, SZMAX, STATUS );
+      ndfCget_( *INDF, comp, value, VALUE_length+1, STATUS );
       if( strcmp( value, "<null>" ) ) {
          cnfExprt( value, VALUE, VALUE_length );
       }
@@ -448,7 +445,6 @@ F77_SUBROUTINE(ndf_cget)( INTEGER(INDF),
    }
    cnfFree( comp );
 }
-#undef SZMAX
 
 F77_SUBROUTINE(ndf_chunk)(INTEGER(INDF1),
                           INTEGER(MXPIX),
@@ -1528,10 +1524,10 @@ F77_SUBROUTINE(ndf_xgt0c)( INTEGER(INDF),
    GENPTR_INTEGER(STATUS)
    char *xname = cnfCreim( XNAME, XNAME_length );
    char *cmpt = cnfCreim( CMPT, CMPT_length );
-   char *value = malloc( VALUE_length );
+   char *value = malloc( VALUE_length+1 );
    if( value ) {
       strcpy( value, "<null>" );
-      ndfXgt0c_( *INDF, xname, cmpt, value, VALUE_length, STATUS );
+      ndfXgt0c_( *INDF, xname, cmpt, value, VALUE_length+1, STATUS );
       if( strcmp( value, "<null>" ) ) {
          cnfExprt( value, VALUE, VALUE_length );
       }
