@@ -536,7 +536,8 @@ typedef struct NdfDCB {
 /* Axes (individual).
    ================= */
 /* Whether axis extension information is available, and the axis
-   extension locators. */
+   extension locators. NOTE - THIS IS A HANGOVER FROM FORTRAN NDF. IN FACT
+   NO USE IS MADE OF THIS FACILITY IN EITHER THE F77 OR C LIBRARY. */
    int kax[ NDF__MXDIM ];
    HDSLoc *axloc[ NDF__MXDIM ];
 
@@ -552,7 +553,7 @@ typedef struct NdfDCB {
    int kad[ NDF__MXDIM ];
    Ary *adid[ NDF__MXDIM ];
    char adtyp[ NDF__MXDIM ][ NDF__SZTYP + 1 ];
-   char adfrm[ NDF__MXDIM ][ NDF__SZTYP + 1 ];
+   char adfrm[ NDF__MXDIM ][ NDF__SZFRM + 1 ];
    int nadmp[ NDF__MXDIM ];
 
 /* Whether axis variance information is available, the ARY_ system
