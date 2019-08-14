@@ -35,8 +35,8 @@ void ndfBad_( int indf, const char *comp, int check, int *bad, int *status ){
 *        Whether to perform an explicit check to see whether bad pixels are
 *        actually present.
 *     *bad
-*        Returned holding the whether it is necessary to check for bad
-*        pixels when processing the array's values.
+*        Returned holding a flag indicating whether it is necessary to check
+*        for bad pixels when processing the array's values.
 *     *status
 *        The global status.
 
@@ -100,7 +100,7 @@ void ndfBad_( int indf, const char *comp, int check, int *bad, int *status ){
 /* Local Variables: */
    NdfACB *acb;          /* Pointer to the NDF entry in the ACB */
 
-
+/* Initialise */
    *bad = 0;
 
 /* Check inherited global status. */
