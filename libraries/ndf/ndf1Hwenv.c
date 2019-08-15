@@ -1,5 +1,6 @@
-#include "star/util.h"
 #include <stdlib.h>
+#include <string.h>
+#include "star/util.h"
 #include "sae_par.h"
 #include "ndf1.h"
 #include "ndf_ast.h"
@@ -102,6 +103,7 @@ void ndf1Hwenv( NdfDCB *dcb, const char *appn, int *status ){
 
 /* Initialise. */
       lout = 0;
+      memset( out, ' ', sizeof(out) );
 
 /* Determine the text length to be used for the current history record.
    If this is zero (because the current record does not yet exist),
@@ -143,10 +145,11 @@ void ndf1Hwenv( NdfDCB *dcb, const char *appn, int *status ){
                } else {
                   star_strlcpy( arg, "<unknown>", sizeof( arg ) );
                }
-            }
 
 /* Quit looping if there are no more arguments to process. */
-            if( !there ) break;
+            } else if( !there ) {
+               break;
+            }
 
 /* Convert any non-printing characters to blanks, evaluate the
    parameter length and truncate the string to remove trailing spaces. */
@@ -187,7 +190,7 @@ void ndf1Hwenv( NdfDCB *dcb, const char *appn, int *status ){
 
                while( *status == SAI__OK ) {
                   if( lbuf > 0 ) {
-                     star_strlcpy( out + lout, buf, sizeof( out ) - lout );
+                     memcpy( out + lout, buf, lbuf );
                      lout += l;
                   }
 
@@ -197,6 +200,7 @@ void ndf1Hwenv( NdfDCB *dcb, const char *appn, int *status ){
                   if( ( MXOUT - lout ) < l ) {
                      ndf1Hwrt( dcb, appn, lout/l, l, out, status );
                      lout = 0;
+                     memset( out, ' ', sizeof(out) );
                   }
 
 /* Determine how many of the characters remaining in "arg" will fit into
@@ -227,7 +231,7 @@ void ndf1Hwenv( NdfDCB *dcb, const char *appn, int *status ){
    perform a final flush. */
       if( *status == SAI__OK ) {
          if( lbuf > 0 ) {
-            star_strlcpy( out + lout, buf, sizeof( out ) - lout );
+            memcpy( out + lout, buf, lbuf );
             lout += l;
          }
          if( lout > 0 ) ndf1Hwrt( dcb, appn, lout/l, l, out, status );
