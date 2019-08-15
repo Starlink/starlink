@@ -75,11 +75,12 @@ void ndf1Chacc( NdfACB *acb, const char *access, int *status ){
 
 /* If it is not, then report an error. */
       if( !ok ) {
-         *status = NDF__ACDEN;
-         ndf1Amsg( "NDF", acb );
 
 /* ...Use an upper case version of the access type. */
          astChrCase( access, uacc, 1, sizeof( uacc ) );
+
+         *status = NDF__ACDEN;
+         ndf1Amsg( "NDF", acb );
          msgSetc( "ACCESS", uacc );
          errRep( " ", "^ACCESS access to the NDF structure ^NDF is not "
                  "available via the specified identifier or has been "
