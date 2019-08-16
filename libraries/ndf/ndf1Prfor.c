@@ -156,6 +156,7 @@ void ndf1Prfor( NdfACB *acb, NdfPCB *pcb, int *status ){
    file name prior to this, as foreign format information is not
    propagated to files with extensions). Append the file version number
    field, if necessary. */
+            forfil[ 0 ] = 0;
             if( d1 <= d2 ) {
                substring = ndf1Strip( substring, expfil, d1, d2, NULL, NULL, status );
                star_strlcat( forfil, substring, sizeof( forfil ) );

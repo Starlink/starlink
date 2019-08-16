@@ -165,7 +165,7 @@ void ndf1Hwrt( NdfDCB *dcb, const char *appn, int nlines,
                ndf1Hrst( cell, status );
 
 /* If a date/time for the history record has been specified using
-   ndfHdate then convert it to separate fields, as needed by ndf1Fmhdt. */
+   ndfHsdat then convert it to separate fields, as needed by ndf1Fmhdt. */
                if( dcb->htime > 0.0 ) {
                   ndf1Mjd2t( dcb->htime, ymdhm, &sec, status );
 
