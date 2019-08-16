@@ -13,6 +13,7 @@
 #include "ems_par.h"             /* ems_ public constants */
 #include "ndf1.h"                /* Internal NDF definitions */
 #include "ndf_err.h"             /* NDF error definitions */
+#include "ast.h"                 /* AST definitions */
 
 char *ndf1Tilde( const char *file, int *status ){
 /*
@@ -133,7 +134,7 @@ char *ndf1Tilde( const char *file, int *status ){
 /* If the path name starts with ~user or ~user/, then allocate space to
    store the user name and check for errors. */
       } else {
-         user = (char *) malloc( (size_t) i );
+         user = (char *) astMalloc( (size_t) i );
          if( user == NULL ) {
             *status = NDF__NOMEM;
             emsSeti( "NBYTES", i );
@@ -173,7 +174,7 @@ char *ndf1Tilde( const char *file, int *status ){
 /* Determine the amount of space needed for the expanded file path name and
    allocate it. Check for errors. */
             size = strlen( dir ) + strlen( file ) - (size_t) ( i - 1 );
-            result = (char *) malloc( size );
+            result = (char *) astMalloc( size );
             if( result == NULL ) {
                *status = NDF__NOMEM;
                emsSeti( "NBYTES", (int) size );
@@ -192,7 +193,7 @@ char *ndf1Tilde( const char *file, int *status ){
    }
 
 /* Free the user string if necessary. */
-   if( dyn ) free( (void *) user );
+   if( dyn ) astFree( (void *) user );
 
 /* If necessary, call the error tracing function. */
    if( *status != SAI__OK ) ndf1Trace( "ndf1Tilde", status );

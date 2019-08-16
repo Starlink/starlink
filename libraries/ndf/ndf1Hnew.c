@@ -94,6 +94,7 @@ void ndf1Hnew( HDSLoc *loc1, const char *name, const char *type, int ndim,
    HDSLoc *loc = NULL;   /* Temporary locator */
    char *objnam;         /* New top-level object name */
    char *path;           /* Container file path */
+   char expfil[ NDF__SZFIL + 1 ];  /* Expanded file name string */
    const char *pdot;     /* Pointer to final delimiting '.' */
    int done;             /* Finished? */
    int primary;          /* Make locator primary? */
@@ -141,9 +142,16 @@ void ndf1Hnew( HDSLoc *loc1, const char *name, const char *type, int ndim,
                }
 
 /* Create the new file (and top-level object) and note there is nothing
-   more to do. */
+   more to do. HDF5 does not interpret the tilde character, so expand the
+   file name if it starts with a tilde. */
                path = ndf1Strip( NULL, name, f1, f2, NULL, NULL, status );
-               hdsNew( path, objnam, type, ndim, dim, loc2, status );
+               if( name[ f1 ] == '~' ){
+                  ndf1Expfn( path, 0, expfil, sizeof( expfil ), NULL, 0,
+                             status );
+                  hdsNew( expfil, objnam, type, ndim, dim, loc2, status );
+               } else {
+                  hdsNew( path, objnam, type, ndim, dim, loc2, status );
+               }
                done = 1;
 
 /* Free dynamic strings. */
