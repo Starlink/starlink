@@ -89,6 +89,8 @@
 *     27-DEC-2005 (TIMJ):
 *        Call HDS_SPLIT rather than NDF1_HSPLT.
 *        Call HDS_FIND rather than NDF1_HFIND
+*     16-AUG-2019 (DSB):
+*        HDF5 does not do tilde expansion, so do it here.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -119,6 +121,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER * ( NDF__SZFIL ) EXPFIL ! Expanded file name string
       CHARACTER * ( DAT__SZLOC ) LOC ! Temporary locator
       CHARACTER * ( DAT__SZNAM ) OBJNAM ! New top-level object name
       INTEGER D1                 ! First character in directory name
@@ -126,6 +129,7 @@
       INTEGER DOT                ! Position of final delimiting '.'
       INTEGER F1                 ! First character in file name
       INTEGER F2                 ! Last character in file name
+      INTEGER LEXP               ! Length of expanded file name string
       INTEGER N1                 ! First character in file name field
       INTEGER N2                 ! Last character in file name field
       INTEGER P1                 ! First character in HDS path
@@ -165,9 +169,17 @@
                   IF ( N1 .LE. N2 ) OBJNAM = NAME( N1 : N2 )
 
 *  Create the new file (and top-level object) and note there is nothing
-*  more to do.
-                  CALL HDS_NEW( NAME( F1 : F2 ), OBJNAM, TYPE, NDIM,
-     :                          DIM, LOC2, STATUS )
+*  more to do. HDF5 does not interpret the tilde character, so expand the
+*  file name if it starts with a tilde.
+                  IF( NAME( F1 : F1 ) .EQ. '~' ) THEN
+                     CALL NDF1_EXPFN( NAME( F1 : F2 ), .FALSE., EXPFIL,
+     :                                LEXP, 0, STATUS )
+                     CALL HDS_NEW( EXPFIL, OBJNAM, TYPE, NDIM, DIM,
+     :                             LOC2, STATUS )
+                  ELSE
+                     CALL HDS_NEW( NAME( F1 : F2 ), OBJNAM, TYPE, NDIM,
+     :                             DIM, LOC2, STATUS )
+                  END IF
                   DONE = .TRUE.
                END IF
 
