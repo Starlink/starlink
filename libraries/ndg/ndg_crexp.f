@@ -90,6 +90,9 @@
 *        Ensure variables are initialised to avoid valgrind warnings.
 *     21-AUG-2008 (DSB):
 *        Name changed from NDG1_CREXP to NDG_CREXP.
+*     16-AUG-2019 (DSB):
+*        Avoid using a file type of "." (use a blank file type instead) if 
+*        NDF_FORMATS_OUT starts with "*". 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -375,9 +378,12 @@
             IF( SUF1 .EQ. ' ' .AND. SEC1 .EQ. ' ' ) THEN
                IAT = CHR_LEN( NAME )
 
-*  Choose the file type, and append to the supplied name.
+*  Choose the file type, and append to the supplied name. Note, a type of
+*  "." means "use native HDS format", and so we omit the file type.
                IF( DEFTYP .EQ. '*' ) THEN
-                  CALL CHR_APPND( ALTTYP, NAME, IAT )
+                  IF( ALTTYP .NE. '.' ) THEN
+                     CALL CHR_APPND( ALTTYP, NAME, IAT )
+                  END IF
                ELSE IF( DEFTYP .NE. '.' ) THEN
                   CALL CHR_APPND( DEFTYP, NAME, IAT )
                END IF
