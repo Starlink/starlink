@@ -137,7 +137,7 @@ void ndf1P2a( int n, const int ipix[], hdsdim lbnd, hdsdim ubnd, int havcen,
 /* If so, then obtain the pixel spacing to use for extrapolation from
    the spacing of the two nearest pixel centres, if available. */
             if( ubnd > lbnd ) {
-               space = centre[ lbnd ] - centre[ lbnd - 1 ];
+               space = centre[ 1 ] - centre[ 0 ];
 
 /* Check that the spacing is not zero; this indicates invalid centre
    values. */
@@ -154,12 +154,12 @@ void ndf1P2a( int n, const int ipix[], hdsdim lbnd, hdsdim ubnd, int havcen,
             }
 
 /* Extrapolate to obtain the pixel centre position. */
-            cen[ i ] = centre[ lbnd - 1 ] - space*(double)( lbnd - ipix[ i ] );
+            cen[ i ] = centre[ 0 ] - space*(double)( lbnd - ipix[ i ] );
 
 /* If pixel width values have been provided, then use the width of the
    nearest pixel, checking it for validity. */
             if( havwid ) {
-               wid[ i ] = width[ lbnd - 1 ];
+               wid[ i ] = width[ 0 ];
                if( wid[ i ] < 0.0 ) {
                   *status = NDF__AXVIN;
                   errRep( " ", "Invalid negative axis WIDTH value "
@@ -180,7 +180,7 @@ void ndf1P2a( int n, const int ipix[], hdsdim lbnd, hdsdim ubnd, int havcen,
    the spacing of the two nearest pixel centres. */
          } else if( ipix[ i ] > ubnd ) {
             if( ubnd > lbnd ) {
-               space = centre[ ubnd - 1 ] - centre[ ubnd - 2 ];
+               space = centre[ ubnd - lbnd ] - centre[ ubnd - 1 - lbnd ];
 
 /* Check that the spacing is not zero; this indicates invalid centre
    values. */
@@ -197,12 +197,12 @@ void ndf1P2a( int n, const int ipix[], hdsdim lbnd, hdsdim ubnd, int havcen,
             }
 
 /* Extrapolate to obtain the pixel centre position. */
-            cen[ i ] = centre[ ubnd - 1 ] + space*(double)( ipix[ i ] - ubnd );
+            cen[ i ] = centre[ ubnd - lbnd ] + space*(double)( ipix[ i ] - ubnd );
 
 /* If pixel width values have been provided, then use the width of the
    nearest pixel, checking it for validity. */
             if( havwid ) {
-               wid[ i ] = width[ ubnd - 1 ];
+               wid[ i ] = width[ ubnd - lbnd ];
                if( wid[ i ] < 0.0 ) {
                   *status = NDF__AXVIN;
                   errRep( " ", "Invalid negative axis WIDTH value "
@@ -221,12 +221,12 @@ void ndf1P2a( int n, const int ipix[], hdsdim lbnd, hdsdim ubnd, int havcen,
 /* If the pixel index lies within the bounds of the pixel centre array,
    then extract the appropriate centre position. */
          } else {
-            cen[ i ] = centre[ ipix[ i ] - 1 ];
+            cen[ i ] = centre[ ipix[ i ] - lbnd ];
 
 /* If pixel width values have been provided, then extract the matching
    pixel width, checking it for validity. */
             if( havwid ) {
-               wid[ i ] = width[ ipix[ i ] - 1 ];
+               wid[ i ] = width[ ipix[ i ] - lbnd ];
                if( wid[ i ] < 0.0 ) {
                   *status = NDF__AXVIN;
                   errRep( " ", "Invalid negative axis WIDTH value "
@@ -238,17 +238,17 @@ void ndf1P2a( int n, const int ipix[], hdsdim lbnd, hdsdim ubnd, int havcen,
    neighbouring pixels. Use both neighbours if available. */
             } else {
                if( ( ipix[ i ] > lbnd ) && ( ipix[ i ] < ubnd ) ) {
-                  wid[ i ] = 0.5*fabs( centre[ ipix[ i ] ] - centre[ ipix[
-                                       i ] - 2 ] );
+                  wid[ i ] = 0.5*fabs( centre[ ipix[ i ] + 1 - lbnd ] -
+                                       centre[ ipix[ i ] - 1 - lbnd ] );
 
 /* Use only one neighbour if the other lies outside the bounds of the
    pixel centre array. */
                } else if( ipix[ i ] > lbnd ) {
-                  wid[ i ] = fabs( centre[ ipix[ i ] - 1 ] - centre[ ipix[
-                                   i ] - 2 ] );
+                  wid[ i ] = fabs( centre[ ipix[ i ] - lbnd ] -
+                                   centre[ ipix[ i ] - 1 - lbnd ] );
                } else if( ipix[ i ] < ubnd ) {
-                  wid[ i ] = fabs( centre[ ipix[ i ] ] - centre[ ipix[ i ]
-                                   - 1 ] );
+                  wid[ i ] = fabs( centre[ ipix[ i ] + 1 - lbnd ] -
+                                   centre[ ipix[ i ] - lbnd ] );
 
 /* Use a width value of unity if only one centre position has been
    supplied. */
@@ -260,7 +260,7 @@ void ndf1P2a( int n, const int ipix[], hdsdim lbnd, hdsdim ubnd, int havcen,
 /* If an array of variance values has been provided, then extract the
    appropriate value, checking it for validity. */
             if( havvar ) {
-               var[ i ] = varian[ ipix[ i ] - 1 ];
+               var[ i ] = varian[ ipix[ i ] - lbnd ];
                if( var[ i ] < 0.0 ) {
                   *status = NDF__AXVIN;
                   errRep( " ", "Invalid negative axis VARIANCE value "

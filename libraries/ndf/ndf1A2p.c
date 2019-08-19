@@ -216,7 +216,7 @@ void ndf1A2p( int n, const double ax[], hdsdim lbnd, hdsdim ubnd,
    of the axis to the other. Report an error if it does not. */
    } else {
       if( ubnd != lbnd ) {
-         if( centre[ ubnd - 1 ] == centre[ lbnd - 1 ] ) {
+         if( centre[ ubnd - lbnd ] == centre[ 0 ] ) {
             *status = NDF__AXVIN;
             errRep( " ", "Axis CENTRE values do not increase or decrease "
                     "monotonically.", status );
@@ -225,7 +225,7 @@ void ndf1A2p( int n, const double ax[], hdsdim lbnd, hdsdim ubnd,
 /* Determine whether axis centre positions increase or decrease with
    pixel index. If there is a choice, then assume they increase. */
          } else {
-            *inc = ( centre[ ubnd - 1 ] > centre[ lbnd - 1 ] );
+            *inc = ( centre[ ubnd - lbnd ] > centre[ 0 ] );
          }
       } else {
          *inc = 1;
