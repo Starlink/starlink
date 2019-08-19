@@ -92,14 +92,20 @@ char *ndf1Strip( char *mem, const char *text, size_t start, size_t end, size_t *
 
 /* Initialise */
    if( nc ) *nc = 0;
+   if( nlspace ) *nlspace = 0;
    result = NULL;
 
 /* Check inherited global status. */
    if( *status != SAI__OK || !text ) return result;
 
 /* Get the total length of the supplied string, excluding the terminating
-   null. */
+   null. If the string has zero length, return immediately. */
    lnc = strlen( text );
+   if( lnc == 0 ) {
+      result = astMalloc( sizeof(char) );
+      *result = 0;
+      return result;
+   }
 
 /* Adjust the indices of the first and last characters to be used so
    that they are within the range of the string and so that "start" is not

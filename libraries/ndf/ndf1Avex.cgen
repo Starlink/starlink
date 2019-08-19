@@ -63,8 +63,8 @@ void CGEN_FUNCTION( ndf1Ave )( int upper, hdsdim pix0, hdsdim lbnda, hdsdim ubnd
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
 
-/* Determine the lower and upper bounds of the array pixels to have
-   values assigned. */
+/* Determine the zero-based lower and upper bounds of the array pixels
+   that are to have values assigned. */
    if( upper ) {
       l = pix0 - lbnda;
       u = ubnda - lbnda;

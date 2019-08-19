@@ -69,40 +69,37 @@ void CGEN_FUNCTION( ndf1Awe )( int upper, hdsdim pix0, double width,
    hdsdim i;             /* Loop counter for array elements */
    hdsdim l;             /* Lower pixel index to consider */
    hdsdim u;             /* Upper pixel index to consider */
-   size_t npix;          /* Number of pixels to be assigned a value */
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
 
-/* Determine the lower and upper bounds of the array pixels to have
-   values assigned. */
+/* Determine the zero-based lower and upper bounds of the array pixels
+   that are to have values assigned. */
    if( upper ) {
-      l = pix0;
-      u = ubnd;
+      l = pix0 - lbnd;
+      u = ubnd - lbnd;
    } else {
-      l = lbnd;
-      u = pix0;
+      l = 0;
+      u = pix0 - lbnd;
    }
-
-/* Determine the number of pixels to be assigned a value */
-   npix = u - l + 1;
 
 /* Check if the extrapolation value can be represented using the
    numeric type of the axis width array. If not, then report an error. */
    if( width > CGEN_MAX || width < CGEN_MIN ) {
+      *status = NDF__AXOVF;
       errRepf( " ", "Overflow occurred while calculating an extrapolated "
                "value for pixel %" HDS_DIM_FORMAT " of an axis width array.",
                status, pix0 );
 
 /* Assign a bad value to all the affected array pixels. */
-      for( i = 0; i < npix; i++ ){
+      for( i = l; i <= u; i++ ){
          awidth[ i ] = CGEN_BAD;
       }
 
 /* If OK, then loop to assign the extrapolated value to the array
    elements. */
    } else {
-      for( i = 0; i < npix; i++ ){
+      for( i = l; i <= u; i++ ){
          awidth[ i ] = width;
       }
    }
