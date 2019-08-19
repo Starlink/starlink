@@ -336,6 +336,9 @@
 *        If an error occurs whilst displaying information about a WCS
 *        Frame, annull or flush the error and continue to display
 *        information about any remaining frames.
+*     19-AUG-2019 (DSB):
+*        Fix bug that prevent attributes of AXIS Width and Variance
+*        components being displayed.
 *     {enter_further_changes_here}
 
 *-
@@ -754,7 +757,7 @@
 *  obtain its attributes.
                CALL NDF_ASTAT( INDF, 'Width', IAXIS, WIDTH( IAXIS ),
      :                         STATUS )
-               IF ( THERE ) THEN
+               IF ( WIDTH( IAXIS ) ) THEN
                   CALL NDF_ATYPE( INDF, 'Width', IAXIS, TYPE, STATUS )
                   CALL NDF_AFORM( INDF, 'Width', IAXIS, FORM, STATUS )
 
@@ -779,7 +782,7 @@
 *  its attributes.
                CALL NDF_ASTAT( INDF, 'Variance', IAXIS, AVAR( IAXIS ),
      :                         STATUS )
-               IF ( THERE ) THEN
+               IF (  AVAR( IAXIS ) ) THEN
                   CALL NDF_ATYPE( INDF, 'Variance', IAXIS, TYPE,
      :                            STATUS )
                   CALL NDF_AFORM( INDF, 'Variance', IAXIS, FORM,
