@@ -126,6 +126,7 @@
 *  numeric type of the axis width array. If not, then report an error.
       IF ( ( WIDTH .GT. NUM_<T>TOD( NUM__MAX<T> ) ) .OR.
      :     ( WIDTH .LT. NUM_<T>TOD( NUM__MIN<T> ) ) ) THEN
+         STATUS = NDF__AXOVF
          CALL MSG_SETI( 'PIXEL', PIX0 )
          CALL ERR_REP( 'NDF1_AWE<T>_AXVAL',
      :                 'Overflow occurred while calculating ' //
