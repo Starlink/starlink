@@ -143,6 +143,7 @@ void ndf1Ncut( NdfACB *acb1, const char *str, NdfACB **acb2, int *status ){
             wcssec = 1;
             lstr[1] = ' ';
             ndf1Rmblk( lstr );
+            slen = strlen( lstr );
          } else {
             wcssec = 0;
          }
@@ -198,8 +199,7 @@ void ndf1Ncut( NdfACB *acb1, const char *str, NdfACB **acb2, int *status ){
 
 /* Remove the enclosing parentheses (supply a blank bounds expression
    if "()" was specified) and parse the dimension bounds expression. */
-            if( ( !wcssec && !strcmp( lstr, "()" ) ) ||
-                ( wcssec && !strcmp( lstr, "(*)" ) ) ) {
+            if( !strcmp( lstr, "()" ) ) {
                ndf1Psnde( " ", nax, dflbnd, dfubnd, iwcs, wcssec, value1,
                           value2, &ndim, frame1, frame2, isbnd, isdef1,
                           isdef2, status );

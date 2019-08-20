@@ -167,7 +167,7 @@ void ndf1Psndb( const char *str, double def, int axis, AstFrameSet *iwcs,
             ncused = astUnformat( iwcs, axis, str, value );
 
 /* Report an error if there was any spurious text in the string. */
-            if( ncused < strlen( str ) - 1 && *status == SAI__OK ) {
+            if( ncused < strlen( str ) && *status == SAI__OK ) {
                sprintf( attr, "Label(%d)", axis );
                msgSetc( "L", astGetC( iwcs, attr ) );
                msgSetc( "BADBOUND", str );
