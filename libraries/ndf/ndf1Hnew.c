@@ -189,7 +189,7 @@ void ndf1Hnew( HDSLoc *loc1, const char *name, const char *type, int ndim,
    final name field. */
    if( ( *status == SAI__OK ) && ( !done ) ) {
       pdot = name + p2;
-      while( *pdot != '.' && pdot >= name ) pdot--;
+      while( pdot >= name && *pdot != '.' ) pdot--;
 
 /* If the "." occurs at the end of the path, then there is a field
    missing, so report an error. */
