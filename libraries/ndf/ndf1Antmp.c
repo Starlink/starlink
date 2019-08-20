@@ -66,10 +66,10 @@ void ndf1Antmp( HDSLoc **loc, int *status ){
 
 /* Local variables: */
    HDSLoc *locp = NULL;  /* Locator to parent object */
-   char name[ DAT__SZNAM + 1 ];    /* Name of object to be erased */
-   int old;              /* Was locator primary? */
-   int plocked;               /* Original lock state for parent */
-   int tstat;            /* Local temporary status variable */
+   char name[ DAT__SZNAM + 1 ];/* Name of object to be erased */
+   int prmry;                  /* Locator primary flag */
+   int plocked;                /* Original lock state for parent */
+   int tstat;                  /* Local temporary status variable */
 
 /* Save the "status" value and mark the error stack. */
    tstat = *status;
@@ -90,7 +90,8 @@ void ndf1Antmp( HDSLoc **loc, int *status ){
 /* Promote the locator for the parent to a primary locator to ensure that
    the container file will not be closed when the locator for the data
    object is annulled. */
-   datPrmry( 1, &locp, &old, status );
+   prmry = 1;
+   datPrmry( 1, &locp, &prmry, status );
 
 /* Annul the object's locator. */
    datAnnul( loc, status );
