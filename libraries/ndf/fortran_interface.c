@@ -37,6 +37,8 @@ void ndf1RoutinWrap( int nlines, char *const text[], int *status );
 
 
 
+/* -------  Routines that have no pixel count arguments -------------- */
+/* These are the same in NDF V1 and V2 */
 
 F77_SUBROUTINE(ndf_acget)( INTEGER(INDF),
                            CHARACTER(COMP),
