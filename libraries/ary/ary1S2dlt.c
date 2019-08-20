@@ -644,7 +644,7 @@ void ary1S2dlt( HDSLoc *loc1, int zaxis, const char *type, HDSLoc *loc2,
       if( loc2 ) {
          datNew( loc2, "FIRST_REPEAT", type_temp, ndim - 1, dims_first, status );
          datFind( loc2, "FIRST_REPEAT", &loc_firstr, status );
-         datMapV( loc_firstr, "_INTEGER", "WRITE", (void **) &ptr_firstr,
+         datMapV( loc_firstr, HDS_DIM_TYPE, "WRITE", (void **) &ptr_firstr,
                   &nel_firstr, status );
       }
       bsize += ntest_row*size_temp;
