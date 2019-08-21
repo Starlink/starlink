@@ -1,0 +1,67 @@
+*+
+*  Name:
+*     NDF_FUNC_DEC
+
+*  Purpose:
+*     Declare statement functions and their arguments for the NDF_
+*     system.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Function declaration include file.
+
+*  Description:
+*     This include file declares statement functions and their
+*     arguments which are used internally by the NDF_ system and which
+*     may also be used by other software which calls NDF_ routines.
+
+*  Notes:
+*     -  This file exists to encapsulate functions which require
+*     non-portable Fortran and which may therefore need to be
+*     implemented differently on different machines. It should be
+*     followed by the include file NDF_DEF, which defines the functions
+*     declared here.
+
+*  Copyright:
+*     Copyright (C) 1990 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     20-MAR-1990 (RFWS):
+*        Original version.
+*     2-APR-1990 (RFWS):
+*        Change NDF_DEC to NDF_FUNC_DEC.
+*     {enter_further_changes_here}
+
+*-
+      
+*  Dummy Arguments:
+      BYTE NDF_ARGB1             ! (Unsigned) byte dummy argument
+      BYTE NDF_ARGB2             ! (Unsigned) byte dummy argument
+
+*  Statement functions:
+      LOGICAL NDF_QMASK          ! Quality/badbits masking function
+
+*.

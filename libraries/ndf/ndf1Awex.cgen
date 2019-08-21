@@ -1,0 +1,111 @@
+#include "sae_par.h"
+#include "ndf_err.h"
+#include "prm_par.h"
+#include "ndf1.h"
+#include "mers.h"
+
+void CGEN_FUNCTION( ndf1Awe )( int upper, hdsdim pix0, double width,
+                               hdsdim lbnd, hdsdim ubnd, CGEN_TYPE awidth[],
+                               int *status ){
+/*
+*+
+*  Name:
+*     ndf1Awe<T>
+
+*  Purpose:
+*     Assign extrapolated values to a generic axis width array.
+
+*  Synopsis:
+*     void ndf1Awe<T>( int upper, hdsdim pix0, double width, hdsdim lbnd,
+*                      hdsdim ubnd, CGEN_TYPE awidth[], int *status )
+
+*  Description:
+*     This function assigns extrapolated values to a generic axis width
+*     array. It is intended for assigning values to those axis width array
+*     elements which are not present in an actual NDF data structure, but
+*     which are encountered when accessing the axis component of a section
+*     which is a super-set of the NDF.  The extrapolated value assigned is
+*     a constant, and is supplied as an parameter.
+
+*  Parameters:
+*     upper
+*        If a non-zero value is given for this parameter, then
+*        extrapolation will be performed towards higher array index values.
+*        Otherwise extrapolation will be towards lower array index values.
+*     pix0
+*        The index of the first "unknown" pixel to be assigned a value. If
+*        "upper" is non-zero, this will be the index of the pixel following
+*        the last one whose value is known. If "upper" is zero, it will be
+*        the index of the pixel before the first one whose value is known.
+*     width
+*        The extrapolated width value to be assigned.
+*     lbnd
+*        The lower bound of the axis width array.
+*     ubnd
+*        The upper bound of the axis width array.
+*     awidth
+*        The generic axis width array to be extrapolated. The supplied
+*        "awidth" array should have at least "ubnd - lbnd + 1" elements.
+*     *status
+*        The global status.
+
+*  Notes:
+*     -  If overflow occurs because the extrapolated value cannot be
+*     represented using the array's numeric type, then an error will be
+*     reported and "status" set.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     3-APR-2019 (DSB):
+*        Original version, based on equivalent Fortran function by RFWS.
+
+*-
+*/
+
+/* Local Variables: */
+   hdsdim i;             /* Loop counter for array elements */
+   hdsdim l;             /* Lower pixel index to consider */
+   hdsdim u;             /* Upper pixel index to consider */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Determine the zero-based lower and upper bounds of the array pixels
+   that are to have values assigned. */
+   if( upper ) {
+      l = pix0 - lbnd;
+      u = ubnd - lbnd;
+   } else {
+      l = 0;
+      u = pix0 - lbnd;
+   }
+
+/* Check if the extrapolation value can be represented using the
+   numeric type of the axis width array. If not, then report an error. */
+   if( width > CGEN_MAX || width < CGEN_MIN ) {
+      *status = NDF__AXOVF;
+      errRepf( " ", "Overflow occurred while calculating an extrapolated "
+               "value for pixel %" HDS_DIM_FORMAT " of an axis width array.",
+               status, pix0 );
+
+/* Assign a bad value to all the affected array pixels. */
+      for( i = l; i <= u; i++ ){
+         awidth[ i ] = CGEN_BAD;
+      }
+
+/* If OK, then loop to assign the extrapolated value to the array
+   elements. */
+   } else {
+      for( i = l; i <= u; i++ ){
+         awidth[ i ] = width;
+      }
+   }
+
+/* Call error tracing function and exit. */
+   if( *status != SAI__OK ) ndf1Trace( "ndf1Awe<T>", status );
+
+}
+

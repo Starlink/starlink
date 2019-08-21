@@ -1,0 +1,199 @@
+#include <stdlib.h>
+#include "sae_par.h"
+#include "dat_par.h"
+#include "ndf1.h"
+#include "ndf_err.h"
+#include "ndf.h"
+#include "mers.h"
+
+void CGEN_FUNCTION2(ndfGtsz,_)( int indf, const char *comp,
+                                CGEN_TYPE *scale, CGEN_TYPE *zero,
+                                int *status ){
+/*
+*+
+*  Name:
+*     ndfGtsz<T>
+
+*  Purpose:
+*     Get the scale and zero values for an NDF array component
+
+*  Synopsis:
+*     void ndfGtsz<T>( int indf, const char *comp, CGEN_TYPE *scale,
+*                      CGEN_TYPE *zero, int *status )
+
+*  Description:
+*     This function returns the scale and zero values associated with an
+*     NDF array component. If the array is stored in simple or primitive
+*     form, then values of 1.0 and 0.0 are returned.
+
+*  Parameters:
+*     indf
+*        NDF identifier.
+*     comp
+*        Pointer to a null terminated string holding the name of the NDF
+*        array component; "DATA" or "VARIANCE".
+*     *scale
+*        Returned holding the new value for the scaling factor.
+*     *zero
+*        Returned holding the new value for the zero offset.
+*     *status
+*        The global status.
+
+*  Notes:
+*     - There is a function for each of the standard Fortran numerical data
+*     types: integer, real and double precision. Replace the (lower case)
+*     "x" in the function name by I, R or D as appropriate.
+
+*  Copyright:
+*     Copyright (C) 2018 East Asian Observatory
+*     All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or modify
+*     it under the terms of the GNU General Public License as published by
+*     the Free Software Foundation; either version 2 of the License, or (at
+*     your option) any later version.
+*
+*     This program is distributed in the hope that it will be useful,but
+*     WITHOUT ANY WARRANTY; without even the implied warranty of
+*     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+*     General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     RFWS: R."f". Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     3-APR-2019 (DSB):
+*        Original version, based on equivalent Fortran function by RFWS.
+
+*-
+*/
+
+/* Local Variables: */
+   char *lcomp;          /* Local copy of "comp" without spaces */
+   NdfACB *acb;          /* Pointer to NDF entry in the ACB */
+   int there;            /* Whether the variance array exists */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Ensure the NDF library has been initialised. */
+   ndf1Init( status );
+
+/* Import the NDF identifier. */
+   ndf1Impid( indf, &acb, status );
+
+/* Create a copy of the string excluding any leading or trailing spaces. */
+   lcomp = ndf1Strip( NULL, comp, 1, 0, NULL, NULL, status );
+   if( *status == SAI__OK ) {
+
+/* Compare the component name with each value in turn (allowing
+   abbreviation), and take the appropriate action, or report an error
+   if an inappropriate component name has been given. */
+
+/* AXIS component:
+   ==============
+   Report an error, since this component has no scaling. */
+      if( ndf1Simlr( lcomp, 1, 0, "AXIS", NDF__MINAB ) ) {
+         *status = NDF__CNMIN;
+         errRep( " ", "Scale and zero values cannot be obtained for an "
+                 "AXIS component (possible programming error).", status );
+
+/* DATA component:
+   ==============
+   Use the ARY_ system to get the scale and zero values for the data array. */
+      } else if( ndf1Simlr( lcomp, 1, 0, "DATA", NDF__MINAB ) ) {
+         CGEN_FUNCTION( aryGtsz )( acb->did, scale, zero, status );
+
+/* EXTENSION:
+   =========
+   Report an error, since extensions have no scaling. */
+      } else if( ndf1Simlr( lcomp, 1, 0, "EXTENSION", NDF__MINAB ) ) {
+         *status = NDF__CNMIN;
+         errRep( " ", "Scale and zero values cannot be obtained for an "
+                 "EXTENSION (possible programming error).", status );
+
+/* HISTORY component:
+   =================
+   Report an error, since this component has no scaling. */
+      } else if( ndf1Simlr( lcomp, 1, 0, "HISTORY", NDF__MINAB ) ) {
+         *status = NDF__CNMIN;
+         errRep( " ", "Scale and zero values cannot be obtained for an "
+                 "HISTORY component (possible programming error).", status );
+
+/* LABEL component:
+   ===============
+   Report an error, since this component has no scaling. */
+      } else if( ndf1Simlr( lcomp, 1, 0, "LABEL", NDF__MINAB ) ) {
+         *status = NDF__CNMIN;
+         errRep( " ", "Scale and zero values cannot be obtained for an "
+                 "LABEL component (possible programming error).", status );
+
+/* QUALITY component:
+   =================
+   Report an error, since this component has no scaling. */
+      } else if( ndf1Simlr( lcomp, 1, 0, "QUALITY", NDF__MINAB ) ) {
+         *status = NDF__CNMIN;
+         errRep( " ", "Scale and zero values cannot be obtained for a "
+                 "QUALITY component (possible programming error).", status );
+
+/* TITLE component:
+   ===============
+   Report an error, since this component has no scaling. */
+      } else if( ndf1Simlr( lcomp, 1, 0, "TITLE", NDF__MINAB ) ) {
+         *status = NDF__CNMIN;
+         errRep( " ", "Scale and zero values cannot be obtained for a "
+                 "TITLE component (possible programming error).", status );
+
+/* UNITS component:
+   ===============
+   Report an error, since this component has no scaling. */
+      } else if( ndf1Simlr( lcomp, 1, 0, "UNITS", NDF__MINAB ) ) {
+         *status = NDF__CNMIN;
+         errRep( " ", "Scale and zero values cannot be obtained for a "
+                 "UNITS component (possible programming error).", status );
+
+/* VARIANCE component:
+   ==================
+   Ensure that variance information is available in the DCB and ACB. */
+      } else if( ndf1Simlr( lcomp, 1, 0, "VARIANCE", NDF__MINAB ) ) {
+         ndf1Vimp( acb, status );
+
+/* See if the ARY_ system identifier for the variance array is valid.
+   If not, then the array does not exist. */
+         there = aryValid( acb->vid, status );
+         if( *status == SAI__OK ) {
+
+/* If it exists, then get the scaling. */
+            if( there ) CGEN_FUNCTION( aryGtsz )( acb->vid, scale, zero, status );
+         }
+
+/* If the component name is not recognised, then report an error. */
+      } else {
+         *status = NDF__CNMIN;
+         msgSetc( "BADCOMP", lcomp );
+         errRep( " ", "Invalid array component name '^BADCOMP' specified "
+                 "(possible programming error).", status );
+      }
+
+   }
+
+/* Free the memory holding the local copy of the component name */
+   lcomp = astFree( lcomp );
+
+/* If an error occurred, then report context information and call the
+   error tracing function. */
+   if( *status != SAI__OK ) {
+      errRep( " ", "ndfGtsz<T>: Error setting the scale and zero values "
+              "for an NDF array component.", status );
+      ndf1Trace( "ndfGtsz<T>", status );
+   }
+
+}
+

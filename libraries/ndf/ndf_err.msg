@@ -100,4 +100,10 @@ BADCP   <incompatible data types for compression>
 CMPAC   <attempt to change a read-only property of a compressed array>
 BGSEC   <attempt to create a section containing too many pixels>
 NOPAR   <attempt to cancel a parameter that is not associuated with an NDF>
+WRAST   <error writing a line of WCS information to an NDF>
+INERR   <error initialising thread data in the NDF library>
+XSNDF   <Too many NDFs in use at once>
+TOOBIG  <Array dimensions exceed limits of the 32 bit API>
+THREAD  <The supplied NDF is not locked by the current thread>
+
 .END

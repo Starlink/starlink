@@ -1,0 +1,83 @@
+#include "sae_par.h"
+#include "dat_par.h"
+#include "ndf1.h"
+
+void CGEN_FUNCTION( ndf1Ave )( int upper, hdsdim pix0, hdsdim lbnda, hdsdim ubnda,
+                               CGEN_TYPE avar[], int *status ){
+/*
+*+
+*  Name:
+*     ndf1Ave<T>
+
+*  Purpose:
+*     Assign extrapolated values to a generic axis variance array.
+
+*  Synopsis:
+*     void ndf1Ave<T>( int upper, hdsdim pix0, hdsdim lbnda, hdsdim ubnda,
+*                      CGEN_TYPE avar[], int *status )
+
+*  Description:
+*     This function assigns extrapolated values to a generic axis variance
+*     array. It is intended for assigning values to those axis variance
+*     array elements which are not present in an actual NDF data structure,
+*     but which are encountered when accessing the axis component of a
+*     section which is a super-set of the NDF.  The extrapolated value
+*     assigned is zero.
+
+*  Parameters:
+*     upper
+*        If a non-zero value is given for this parameter, then
+*        extrapolation will be performed towards higher array index values.
+*        Otherwise extrapolation will be towards lower array index values.
+*     pix0
+*        The index of the first "unknown" pixel to be assigned a value. If
+*        "upper" is non-zero, this will be the index of the pixel following
+*        the last one whose value is known. If "upper" is zero, it will be
+*        the index of the pixel before the first one whose value is known.
+*     lbnda
+*        The lower bound of the axis variance array.
+*     ubnda
+*        The upper bound of the axis variance array.
+*     avar
+*        The generic axis variance array to be extrapolated. The supplied
+*        "avar" array should have at least "ubnda - lbnda + 1" elements.
+*     *status
+*        The global status.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     3-APR-2019 (DSB):
+*        Original version, based on equivalent Fortran function by RFWS.
+
+*-
+*/
+
+/* Local Variables: */
+   hdsdim i;                /* Loop counter for array elements */
+   hdsdim l;                /* Lower pixel index to consider */
+   hdsdim u;                /* Upper pixel index to consider */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Determine the zero-based lower and upper bounds of the array pixels
+   that are to have values assigned. */
+   if( upper ) {
+      l = pix0 - lbnda;
+      u = ubnda - lbnda;
+   } else {
+      l = 0;
+      u = pix0 - lbnda;
+   }
+
+/* Loop to assign extrapolated values (zero) to the array elements. */
+   for( i = l; i <= u; i++ ) avar[ i ] = 0;
+
+/* Call error tracing function and exit. */
+   if( *status != SAI__OK ) ndf1Trace( "ndf1Ave<T>", status );
+
+}
+

@@ -1,0 +1,65 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     ndf_link
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against the standalone
+#     NDF library.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building standalone
+#     applications which use the NDF library in order to generate the
+#     correct arguments for the compiler (or ld) command. The arguments
+#     generated are written to the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a compiler command line,
+#     such as:
+#
+#        f77 -o program -L/star/lib `ndf_link [ast_switches]` program.f
+#
+#     The possible values for [ast_switches] are the same as those available 
+#     to the ast_link command.
+
+#  Copyright:
+#     Copyright (C) 1997 Rutherford Appleton Laboratory
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     PWD: Peter W. Draper(JAC, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     2-JUN-1994 (RFWS):
+#        Original version.
+#     14-JUL-1997 (RFWS)
+#        Added AST_ linking and improved "awk" script.
+#     15-JUN-2006 (PWD):
+#        Added ast_switches handling to pass on any AST linker options.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#.
+
+#  All command-line switches are assumed to be for AST.
+      ast_options=${1+"$@"}
+
+#  Echo the NDF library reference, followed by the list of options for
+#  packages on which the NDF library depends. Pass the result through an
+#  awk script to remove duplicate library references.
+      echo -lndf `psx_link` `ary_link` `hds_link` `err_link` `ems_link` \
+           `chr_link` `prm_link` `ast_link -ems $ast_options` \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {if($1)f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.

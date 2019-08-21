@@ -1,102 +1,17 @@
 NDF Library
 -----------
 
-V1.13
-   - Add new routine NDF_HCOPY to copy history information from one NDF to
-     another.
+V2.0
 
-V1.12
-   - Add _INT64 data type support (INTEGER*8).
-   - Add tuning parameter SECMAX to limit maximum size of an NDF section.
-   - A new routine NDF_CANCL can be used to cancel the association
-   between an environment parameter and an NDF. This is identical to
-   calling PAR_CANCL, except that NDF_CANCL provides an option to cancel
-   all NDF parameters in a single call, without needing to know their
-   names.
+- The NDF library is now written entirely in C. However, the Fortran
+interface has not changed and is provided by a thin layer on top of the C
+library.
 
-V1.11
-   - A new function NDF_ZSCAL has been added, which creates a SCALED
-   copy of an input NDF.
+- The only change to the C interface is that there is now no need to call
+ndfInit to initialise the library. This is done automatically when an
+application first calls an NDF function.
 
-   - A new function NDF_ZDELT has been added, which creates a DELTA
-   compressed copy of an input NDF.
+- The C interface is now thread safe.
 
-   - A new function NDF_GTDLT has been added, which returns details of
-   the compression of a DELTA compressed NDF.
-
-
-V1.10
-   - Subsecond accuracy has been restored to history recording
-   (was lost in the switch to Unix)
-
-   - A new function NDF_ISIN has been added, which determines if one NDF
-   is contained within another NDF.
-
-   - The NDF_SCOPY and NDF_PROP functions now allow an asterisk to be
-   used within the CLIST argument as a wild card to match all extension
-   names.
-
-V1.9
-   - A new standard WCS Frame called FRACTION has been introduced, This
-   Frame is created automatically by the NDF library in the same that the
-   GRID, PIXEL and AXIS Frames are created. The FRACTION Frame represents
-   normalised pixel coordinates within the array - each pixel axis spans
-   the range 0.0 to 1.0 in the FRACTION Frame.
-
-   - NDF sections specifiers can now use the "%" character to indicate
-   that a value is a percentage of the entire pixel axis. Thus 'm31(~50%,)'
-   will create a section covering the central 50 percent of the NDF on
-   the first pixel axis.
-
-   - A history component will now be added automatically to the NDFs
-   created by NDF_CREAT and NDF_NEW if the "NDF_AUTO_HISTORY" environment
-   variable, or "AUTO_HISTORY" tuning parameter, is set to a non-zero integer.
-
-V1.8
-   - New routine NDF_HSDAT allows history records to be created with a
-   given date and time.
-   - New routine NDF_HGMOD retrieves the current history update mode from
-   an NDF.
-   - Routine NDF_HSMOD now allows temporary disabling of history recording
-   via a new update mode called 'SKIP'.
-
-V1.7
-   NDF sections may now be given in terms of WCS coordinates.
-
-   New tuning parameters ("PXT...") can be used to supress the default
-   propagation of named NDF extensions by NDF_PROP and NDF_SCOPY. See
-   NDF_TUNE.
-
-V1.6-2
-   Limited support for NDF array components stored in scaled form is now
-   available.
-
-V1.6-1
-   For the C interface, all routines that used to take or return
-   HDS Locators as char buffers of size DAT__SZLOC, have been modified
-   to take HDSLoc pointers, matching the new C interface to HDS. All
-   existing C programmes that use these routines will need to be modified
-   (but use of DAT__ROOT should be replaced with a NULL pointer).
-
-   The ".sdf" file extension can now be included when opening a file.
-
-   Now released under the GPL.
-
-V1.5-10
-   SUN/33 has been updated to include additional information about calling
-   NDF from a C main function when working within the new Starlink Build
-   System.
-
-V1.5-9
-   A new release (V1.5-9) of the NDF library is now available.
-
-   - This is a maintenance release. The build system has changed.
-
-V1.5-6
-
-   - A bug has been fixed in the C interface for function ndfChunk.
-
-   - Facilities for handling foreign extension specifiers (such as
-     FITS image extensions) within the "on-the-fly" data conversion
-     scheme have been added. SSN/20 has been updated to include these
-     changes.
+- New functions are provided in the C interface to allow each NDF to be
+locked for exclusive access by a single thread.

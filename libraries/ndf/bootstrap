@@ -131,4 +131,29 @@ else
 
 fi
 
+#  Checked out files don't necessarily have the correct timestamps. If
+#  any local build procedures depend on the checked in state (true for
+#  thirdparty code that should not be automatically autoconf'd, or automake'd 
+#  by our local autotools), then this needs correcting, so provide a 
+#  simple mechanism that just touches the files in the correct order.
+#  (Note this became a problem with subversion, CVS preserved the
+#  checkin dates by default).
+#  
+#  Look for a file "bootstrap_timeorder" in the local directory, if
+#  found just read each line and touch if it identifies an existing file.
+#  Need to sleep between touches as the resolution of these times
+#  is usually about 1 second (so keep the files to be touched to a 
+#  minimum).
+if test -f "bootstrap_timeorder"; then
+   echo "bootstrap: restoring timestamp order..."
+   for f in `cat bootstrap_timeorder` ""
+   do
+      if test -f "$f"; then
+         touch "$f"
+         sleep 1
+         echo "   $f"
+      fi
+   done
+fi
+
 exit 0

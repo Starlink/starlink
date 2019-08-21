@@ -1,0 +1,156 @@
+#include "sae_par.h"
+#include "ndf_err.h"
+#include "prm_par.h"
+#include "ndf1.h"
+#include "mers.h"
+
+void CGEN_FUNCTION( ndf1Ade )( double scale, double zero, int upper,
+                               hdsdim pix0, hdsdim lbnda, hdsdim ubnda,
+                               CGEN_TYPE adata[], int *status ){
+/*
+*+
+*  Name:
+*     ndf1Ade<T>
+
+*  Purpose:
+*     Assign extrapolated values to a generic axis data array.
+
+*  Synopsis:
+*     void ndf1Ade<T>( double scale, double zero, int upper, hdsdim pix0,
+*                      hdsdim lbnda, hdsdim ubnda, CGEN_TYPE adata[],
+*                      int *status )
+
+*  Description:
+*     This function assigns extrapolated values to a generic axis data
+*     array. It is intended for assigning values to those axis data array
+*     elements which are not present in an actual NDF data structure, but
+*     which are encountered when accessing the axis component of a section
+*     which is a super-set of the NDF. Parameters relating the array
+*     element values to the array index are provided as input arguments.
+
+*  Parameters:
+*     scale
+*        The scale factor relating the axis array index to the array values
+*        according to the formula "adata"( "i" ) = "i" * "scale" + "zero".
+*     zero
+*        The zero point of the extrapolation formula.
+*     upper
+*        If a non-zero value is given for this parameter, then
+*        extrapolation will be performed towards higher array index values.
+*        Otherwise extrapolation will be towards lower array index values.
+*     pix0
+*        The index of the first "unknown" pixel to be assigned a value. If
+*        "upper" is non-zero, this will be the index of the pixel following
+*        the last one whose value is known. If "upper" is zero, it will be
+*        the index of the pixel before the first one whose value is known.
+*     lbnda
+*        The lower bound of the axis data array.
+*     ubnda
+*        The upper bound of the axis data array.
+*     adata
+*        The generic axis data array to be extrapolated. The supplied
+*        "adata" array should have at least "ubnda - lbnda + 1" elements.
+*     *status
+*        The global status.
+
+*  Notes:
+*     -  If overflow occurs because any of the extrapolated values cannot
+*     be represented using the array's numeric type, then an error will be
+*     reported and "status" set.
+
+*  Copyright:
+*     Copyright (C) 2018 East Asian Observatory
+*     All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or modify
+*     it under the terms of the GNU General Public License as published by
+*     the Free Software Foundation; either version 3 of the License, or (at
+*     your option) any later version.
+*
+*     This program is distributed in the hope that it will be useful,but
+*     WITHOUT ANY WARRANTY; without even the implied warranty of
+*     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+*     General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     3-APR-2019 (DSB):
+*        Original version, based on equivalent Fortran function by RFWS.
+
+*-
+*/
+
+/* Local Variables: */
+   CGEN_TYPE *pa;        /* Pointer to next array element */
+   double aval;          /* Extrapolated array value */
+   double hi;            /* Highest value which can be stored */
+   double lo;            /* Lowest value which can be stored */
+   hdsdim i;             /* Loop counter for array elements */
+   hdsdim l;             /* Lower pixel index to consider */
+   hdsdim u;             /* Upper pixel index to consider */
+   int ovflow;           /* Whether overflow has occurred */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Determine the lower and upper bounds of the array pixels to have
+   values assigned. */
+   if( upper ) {
+      l = pix0;
+      u = ubnda;
+   } else {
+      l = lbnda;
+      u = pix0;
+   }
+
+/* Also determine the lower and upper extrapolated array values which
+   can be assigned without overflow occurring. */
+   lo = CGEN_MIN;
+   hi = CGEN_MAX;
+
+/* Note no overflow has yet occurred. */
+   ovflow = 0;
+
+/* Loop to assign extrapolated values to the array elements. */
+   pa = adata + ( l - lbnda );
+   for( i = l; i <= u; i++,pa++ ){
+
+/* Calculate the extrapolated value. */
+      aval = scale*i  + zero;
+
+/* If the result can be stored without overflow, then convert to the
+   required data type and assign the result. */
+      if( aval >= lo && aval <= hi ) {
+         *pa = aval;
+
+/* Otherwise, assign a bad result. */
+      } else {
+         *pa = CGEN_BAD;
+
+/* If this is the first such error, then report it. */
+         if( !ovflow ) {
+            *status = NDF__AXOVF;
+            errRepf( " ", "Overflow occurred while calculating an "
+                     "extrapolated value for pixel %" HDS_DIM_FORMAT
+                     " of an axis centre array.", status, i );
+
+/* Note that overflow has occurred. */
+            ovflow = 1;
+         }
+      }
+   }
+
+/* Call error tracing function and exit. */
+   if( *status != SAI__OK ) ndf1Trace( "ndf1Ade<T>", status );
+
+}
+

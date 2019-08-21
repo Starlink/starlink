@@ -1,0 +1,70 @@
+#include "sae_par.h"
+#include "dat_par.h"
+#include "prm_par.h"
+#include "ndf1.h"
+
+void CGEN_FUNCTION( ndf1Bpp )( size_t el, const CGEN_TYPE array[], int *bad,
+                               int *status ){
+/*
+*+
+*  Name:
+*     ndf1Bpp<T>
+
+*  Purpose:
+*     Determine if bad pixels are present in a vectorised generic array.
+
+*  Synopsis:
+*     void ndf1Bpp<T>( size_t el, const CGEN_TYPE array[], int *bad, int *status )
+
+*  Description:
+*     This function examines the values in a vectorised generic array and
+*     returns a logical result "bad" indicating whether any element of the
+*     array contains the "bad" pixel value VAL__BAD<T>.
+
+*  Parameters:
+*     el
+*        Number of elements in the vectorised array.
+*     array
+*        The array to be examined. The supplied "array" array should have
+*        at least "el" elements.
+*     *bad
+*        Returned holding the whether any "array" element had the value
+*        VAL__BAD<T>.
+*     *status
+*        The global status.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     3-APR-2019 (DSB):
+*        Original version, based on equivalent Fortran function by RFWS.
+
+*-
+*/
+
+/* Local Variables: */
+   size_t i;                /* Loop counter for array elements */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Initialise. */
+   *bad = 0;
+
+/* Loop to examine each array element. */
+   for( i = 0; i < el; i++ ){
+
+/* If a bad value is found, set "bad"=non-zero and quit checking. */
+      if( array[ i ] == CGEN_BAD ) {
+         *bad = 1;
+         break;
+      }
+   }
+
+/* Call error tracing function and exit. */
+   if( *status != SAI__OK ) ndf1Trace( "ndf1Bpp<T>", status );
+
+}
+

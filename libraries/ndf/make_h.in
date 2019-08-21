@@ -1,0 +1,124 @@
+
+cat <<EOF > temp.h
+#include "cgeneric.h"
+
+#define CGEN_CODE_TYPE CGEN_DOUBLE_TYPE
+#include "cgeneric_defs.h"
+#include "ndf1_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_FLOAT_TYPE
+#include "cgeneric_defs.h"
+#include "ndf1_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_INT_TYPE
+#include "cgeneric_defs.h"
+#include "ndf1_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_WORD_TYPE
+#include "cgeneric_defs.h"
+#include "ndf1_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_UWORD_TYPE
+#include "cgeneric_defs.h"
+#include "ndf1_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_BYTE_TYPE
+#include "cgeneric_defs.h"
+#include "ndf1_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_UBYTE_TYPE
+#include "cgeneric_defs.h"
+#include "ndf1_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_INT64_TYPE
+#include "cgeneric_defs.h"
+#include "ndf1_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+EOF
+
+@CPP@ -P temp.h -I. -I$STARLINK_DIR/include | grep ndf1 > ndf1_cgen.h
+rm temp.h
+
+
+
+
+
+
+
+cat <<EOF > temp.h
+#include "cgeneric.h"
+
+#define CGEN_CODE_TYPE CGEN_DOUBLE_TYPE
+#include "cgeneric_defs.h"
+#include "ndf_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_FLOAT_TYPE
+#include "cgeneric_defs.h"
+#include "ndf_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_INT_TYPE
+#include "cgeneric_defs.h"
+#include "ndf_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_WORD_TYPE
+#include "cgeneric_defs.h"
+#include "ndf_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_UWORD_TYPE
+#include "cgeneric_defs.h"
+#include "ndf_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_BYTE_TYPE
+#include "cgeneric_defs.h"
+#include "ndf_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_UBYTE_TYPE
+#include "cgeneric_defs.h"
+#include "ndf_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_INT64_TYPE
+#include "cgeneric_defs.h"
+#include "ndf_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+EOF
+
+@CPP@ -P temp.h -I. -I$STARLINK_DIR/include | grep ndf > ndf_cgen.h
+rm temp.h
+
+
+ccodes=(D F I W UW B UB K)
+fcodes=(d r i w uw b ub k)
+funlist=`grep -Po "CGEN_FUNCTION2\( *(\w+) *,_ *\)" ndf_cgen.h.source | grep -Po "ndf\w+"`
+
+echo "" >> ndf_cgen.h
+echo "/* Now define the macros used by application code to invoke the appropriate" >> ndf_cgen.h
+echo "   functions, depending on whether the old or new interface is required. " >> ndf_cgen.h
+echo "   Currently, there is no diffference betwen the two interfaces for the " >> ndf_cgen.h
+echo "   functions defined in this file but this may change in the future. */" >> ndf_cgen.h
+echo "" >> ndf_cgen.h
+for fun in $funlist; do
+   for i in ${!ccodes[@]}; do
+      echo "#define ${fun}${fcodes[$i]} ${fun}${ccodes[$i]}_"  >> ndf_cgen.h
+   done
+done
+echo "" >> ndf_cgen.h
+
+
+
+
