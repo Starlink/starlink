@@ -61,7 +61,7 @@ void ndf1CheckLocker( NdfACB *acb, int *status ){
    int lock_state;
 
 /* Check inherited status. */
-   if( !status != SAI__OK || !acb ) return;
+   if( *status != SAI__OK || !acb ) return;
 
 /* Get information about any lock on the supplied ACB. */
    lock_state = ndf1Locked( acb );
