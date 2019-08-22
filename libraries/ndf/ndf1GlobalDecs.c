@@ -105,7 +105,6 @@ char *Ndf_DCB_astpt;
 
 
 /* The following variables hold information about the application.
-   They are declared in
    =============================================================== */
 
 /* A mutex to serialise access to the following three values. */

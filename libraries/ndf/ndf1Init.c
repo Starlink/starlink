@@ -11,10 +11,6 @@
 pthread_once_t starlink_ndf_globals_initialised = PTHREAD_ONCE_INIT;
 pthread_key_t starlink_ndf_globals_key;
 
-/* Command line arguments */
-int NDF_DCB_argc = 0;
-char **NDF_DCB_argv = NULL;
-
 static void ndf1GlobalInitialisation( void );
 static void *ndf1ThreadInitialisation( void );
 static void ndf1FreeThreadData( void *data );
