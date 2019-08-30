@@ -304,13 +304,17 @@ void ndf1Pscpx( const char *str, int mxextn, char extn[][ DAT__SZNAM + 1 ],
    ensure that the named extensions have a non-zero value and will thus
    be propagated. */
                         recog = 1;
-                        ndf1Pxlst( 1, str, j1 + 1, j2 - 1, pxt, status );
+                        if( j1 + 1 <= j2 - 1 ) {
+                           ndf1Pxlst( 1, str, j1 + 1, j2 - 1, pxt, status );
+                        }
 
 /* Perform the appropriate updating operation if this is a NOEXTENSION
    specification. */
                      } else if( ndf1Simlr( str, f, j1 - 1, "NOEXTENSION", NDF__MINAB ) ) {
                         recog = 1;
-                        ndf1Pxlst( 0, str, j1 + 1, j2 - 1, pxt, status );
+                        if( j1 + 1 <= j2 - 1 ) {
+                           ndf1Pxlst( 0, str, j1 + 1, j2 - 1, pxt, status );
+                        }
                      }
                   }
                }
