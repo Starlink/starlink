@@ -17587,6 +17587,24 @@ iraf! {
             helpkey *
          }
 
+         parameter interp {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Look-up table interpolation method}
+            helpkey *
+            default None
+         }
+
+         parameter lut {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Look-up table}
+            helpkey *
+            default !
+         }
+
          parameter out {
             position 2
             type NDF
@@ -17619,6 +17637,15 @@ iraf! {
             type LITERAL
             vpath DEFAULT
             prompt {Title for output NDF}
+            default !
+            helpkey *
+         }
+
+         parameter type {
+            type LITERAL
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Output numeric type}
             default !
             helpkey *
          }

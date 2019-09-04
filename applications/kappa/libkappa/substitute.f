@@ -22,8 +22,18 @@
 
 *  Description:
 *     This application changes all pixels that have a defined value in
-*     an NDF with an alternate value.  Other values are unchanged.  The
-*     number of replacements is reported.
+*     an NDF with an alternate value. The number of replacements is
+*     reported. Two modes are available:
+*
+*     - A single pair of old and new values can be supplied (see
+*     parameters OLDVAL and NEWVAL). All occurrences of OLDVAL are
+*     replaced with NEWVAL. Other values are unchanged.
+*
+*     - A look-up table containing corresponding old and new values can
+*     be supplied. By default, each input pixel that equals an old value
+*     is replaced by the corresponding new value. Alternatively, all
+*     input pixels can be changed to a new value by interpolation between
+*     the input values (see parameters LUT and INTERP).
 
 *  Usage:
 *     substitute in out oldval newval [comp]
@@ -35,9 +45,36 @@
 *        options forces substitution in both the data and variance
 *        arrays.  This parameter is ignored if the data array is the
 *        only array component within the NDF.  ["Data"]
+*     INTERP = LITERAL (Read)
+*        Determines how the values in the file specified by parameter
+*        LUT are used:
+*
+*        - "None" -- Pixel values that equal an input value are replaced
+*        by the corresponding output value. Other values are left
+*        unchanged.
+*
+*        - "Nearest" -- Every pixel value is replaced by the output value
+*        corresponding to the nearest input value.
+*
+*        - "Linear" -- Every pixel value is replaced by an output value
+*        determined using linear interpolation between the input values.
+*
+*        If "Nearest" or "Linear" is used, pixel values that are outside
+*        the range of input value covered by the look-up table are set
+*        bad in the output. Additionally, an error is reported if the
+*        old data values are not montonic increasing. ["None"]
 *     IN = NDF  (Read)
 *        Input NDF structure containing the data and/or variance array
 *        to have some of its elements substituted.
+*     LUT = FILENAME (Read)
+*        The name of a text file containing a look-up table of old and
+*        new data values. If null (!) is supplied for this parameter the
+*        old and new data values will instead be obtained using parameters
+*        OLDVAL and NEWVAL. Lines starting with a hash (#) or exclamation
+*        mark (!)  are ignored. Other lines should contain an old data
+*        value followed by the corresponding new data value. The way in
+*        which the values in this table are used is determined by
+*        parameter INTERP. [!]
 *     OUT = NDF (Write)
 *        Output NDF structure containing the data and/or variance array
 *        that is a copy of the input array, but with replacemeent values
@@ -47,7 +84,9 @@
 *        within the minimum and maximum values of the data type of the
 *        array with higher precision.  The new value is converted to
 *        data type of the array being converted before the search
-*        begins.  The suggested default is the current value.
+*        begins.  The suggested default is the current value. This
+*        parameter is only accessed if a null (!) value is supplied for
+*        parameter LUT.
 *     OLDVAL = _DOUBLE (Read)
 *        The element value to be replaced.  The same value is
 *        substituted in both the data and variance arrays when
@@ -55,10 +94,17 @@
 *        of the data type of the array with higher precision.  The
 *        replacement value is converted to data type of the array being
 *        converted before the search begins.  The suggested default is
-*        the current value.
+*        the current value. This parameter is only accessed if a null
+*        (!) value is supplied for parameter LUT.
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
 *        propagates the title from the input NDF to the output NDF. [!]
+*     TYPE = LITERAL (Read)
+*        The numeric type for the output NDF. The value given should be
+*        one of the following: _DOUBLE, _REAL, _INTEGER, _INT64, _WORD,
+*        _UWORD, _BYTE or _UBYTE (note the leading underscore).  If a
+*        null (!) value is supplied, the output data type equals the
+*        input data type. [!]
 
 *  Examples:
 *     substitute aa bb 1 0
@@ -109,6 +155,7 @@
 *     Copyright (C) 1997-1998, 2004 Central Laboratory of the Research
 *     Councils.
 *     Copyright (C) 2012 Science & Technology Facilities Council.
+*     Copyright (C) 2019 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -145,6 +192,8 @@
 *        Moved CNF_PAR into declarations.
 *     2012 May 9 (MJC):
 *        Add _INT64 support.
+*     4-SEP-2019 (DSB):
+*        Added parameters LUT, INTERP and TYPE.
 *     {enter_further_changes_here}
 
 *-
@@ -187,25 +236,34 @@
       CHARACTER DTYPE * ( NDF__SZFTP ) ! Type of the image after
                                ! processing (not used)
       INTEGER EL               ! Number of elements in an array
+      DOUBLE PRECISION EPSIN   ! Input precision
       INTEGER I                ! Loop counter
+      INTEGER IFLEV            ! Original MSG information level
+      CHARACTER * 7 INTERP     ! LUT interpolation method
       INTEGER INUVAL           ! New value
+      INTEGER IPLUT            ! Pointer to LUT data
       INTEGER ISUVAL           ! Replacement value
       CHARACTER ITYPE * ( NDF__SZTYP ) ! Processing type of the image
       INTEGER*8 KNUVAL         ! New value
       INTEGER*8 KSUVAL         ! Replacement value
+      DOUBLE PRECISION LBND( 2 )! Lower limits of data value in LUT
       LOGICAL LCOMP( 2 )       ! Data, variance components are requested
                                ! to be processed or not
       DOUBLE PRECISION MAXREP  ! Maximum replacement value
       DOUBLE PRECISION MINREP  ! Minimum replacement value
       INTEGER NDFI             ! Identifier for input NDF
       INTEGER NDFO             ! Identifier for output NDF
+      CHARACTER NEWTYP * ( NDF__SZTYP ) ! New output data type
       DOUBLE PRECISION NEWVAL  ! New value
+      INTEGER NLUT             ! No. of entries in LUT
       INTEGER NREP             ! Number of replacements made
       INTEGER PNTRI( 1 )       ! Pointer to input array component
       INTEGER PNTRO( 1 )       ! Pointer to output array component
+      INTEGER POSCOD( 2 )      ! Indices of LUT columns to use
       DOUBLE PRECISION REPVAL  ! Replacement value
       REAL RNUVAL              ! New value
       REAL RSUVAL              ! Replacement value
+      DOUBLE PRECISION UBND( 2 )! Upper limits of data value in LUT
       INTEGER*2 WNUVAL         ! New value
       INTEGER*2 WSUVAL         ! Replacement value
 
@@ -227,6 +285,30 @@
 *  Obtain the identifier of the NDF to be displayed.
       CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
+*  See if multiple values are to be substituted.
+*  =============================================
+*  Set MSG level to suppress the inappropriate message issued by KPG1_FLCOD
+      CALL MSG_IFLEV( IFLEV, ' ', STATUS )
+      CALL MSG_IFSET( MSG__QUIET, STATUS )
+      POSCOD( 1 ) = 1
+      POSCOD( 2 ) = 2
+      IF( STATUS .NE. SAI__OK ) GOTO 999
+      CALL KPG1_FLCOD( 'LUT', 2, POSCOD, NLUT, IPLUT, LBND, UBND,
+     :                 STATUS )
+      CALL MSG_IFSET( IFLEV, STATUS )
+
+*  Annul the error if no LUT was supplied. Indicate that parameters
+*  OLDVAL and NEWVAL should be used by setting NLUT to zero.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         NLUT = 0
+
+*  If a LUT was supplied, get the interpolation method to use.
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         CALL PAR_CHOIC( 'INTERP', 'None', 'None,Linear,Nearest',
+     :                   .TRUE., INTERP, STATUS )
+      END IF
+
 *  Find which component(s) to alter.
 *  =================================
 *  Inquire which arrays are available and form a comma-separated list
@@ -234,7 +316,7 @@
       CALL KPG1_ARCOL( NDFI, 'Data,Error,Variance', COMLIS,
      :                 COMLN, STATUS )
 
-*  Find which component to plot, including the all option.  No need to
+*  Find which component to change, including the all option.  No need to
 *  inquire when the value can only be 'Data'.
       IF ( COMLIS .EQ. 'Data' ) THEN
          COMPS = 'DATA'
@@ -316,6 +398,47 @@
 
       END IF
 
+* Get the machine precision for the input data type.
+      IF ( ITYPE .EQ. '_BYTE' ) THEN
+         EPSIN = VAL__EPSB
+      ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+         EPSIN = VAL__EPSUB
+      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+         EPSIN = VAL__EPSW
+      ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+         EPSIN = VAL__EPSUW
+      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+         EPSIN = VAL__EPSI
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         EPSIN = VAL__EPSK
+      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+         EPSIN = VAL__EPSR
+      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+         EPSIN = VAL__EPSD
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'T', ITYPE )
+         CALL ERR_REP( ' ', 'Unsupported data type ''^T'' encountered.',
+     :                STATUS )
+      END IF
+
+*  Allow the user to select a different data type for the output NDF.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+      CALL PAR_CHOIC( 'TYPE', ITYPE, '_BYTE,_UBYTE,_WORD,_UWORD,'//
+     :                '_INTEGER,_INT64,_REAL,_DOUBLE', .FALSE.,
+     :                NEWTYP, STATUS )
+
+*  If null (!) was supplied for parameter TYPE, just annull the error and
+*  continue with the output NDF unchanged.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+
+*  Otherwise, change the data type of the output NDF.
+      ELSE
+         ITYPE = NEWTYP
+         CALL NDF_STYPE( ITYPE, NDFO, 'Data,Variance', STATUS )
+      END IF
+
 *  Obtain a title and assign it title to the output NDF.
 *  =====================================================
 *  A null results in the output title being the same as the input
@@ -337,290 +460,386 @@
 *  Process each data type directly.
             IF ( ITYPE .EQ. '_REAL' ) THEN
 
+*  If a LUT was provided, apply it.
+               IF( NLUT .GT. 0 ) THEN
+                  CALL KPG1_LTVAR( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             INTERP, LBND( 1 ), UBND( 1 ), NLUT,
+     :                             %VAL( CNF_PVAL( IPLUT ) ), EPSIN,
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             NREP, STATUS )
+
+*  Otherwise, use the OLDVAL and NEWVAL parameters.
+               ELSE
+
 *  Define the acceptable range of values and the suggested default
 *  (which is not actually used due to the ppath).  If variance is being
 *  processed the minimum value cannot be negative.
-               IF ( LCOMP( 2 ) ) THEN
-                  MINREP = MAX( 0.0D0, NUM_RTOD( VAL__MINR ) )
-               ELSE
-                  MINREP = NUM_RTOD( VAL__MINR )
-               END IF
-               MAXREP = NUM_RTOD( VAL__MAXR )
-               DEFREP = 0.0D0
+                  IF ( LCOMP( 2 ) ) THEN
+                     MINREP = MAX( 0.0D0, NUM_RTOD( VAL__MINR ) )
+                  ELSE
+                     MINREP = NUM_RTOD( VAL__MINR )
+                  END IF
+                  MAXREP = NUM_RTOD( VAL__MAXR )
+                  DEFREP = 0.0D0
 
 *  Get the replacement value.
-               CALL PAR_GDR0D( 'OLDVAL', DEFREP, MINREP, MAXREP,
-     :                         .FALSE., REPVAL, STATUS )
+                  CALL PAR_GDR0D( 'OLDVAL', DEFREP, MINREP, MAXREP,
+     :                            .FALSE., REPVAL, STATUS )
 
 *  Convert the replacement value to the desired type.  Use VAL_ to
 *  protect against potentionally harmful values when there is a bad
 *  status.
-               RSUVAL = VAL_DTOR( .FALSE., REPVAL, STATUS )
+                  RSUVAL = VAL_DTOR( .FALSE., REPVAL, STATUS )
 
 *  Get the new value.
-               CALL PAR_GDR0D( 'NEWVAL', DEFREP, MINREP, MAXREP,
-     :                         .FALSE., NEWVAL, STATUS )
+                  CALL PAR_GDR0D( 'NEWVAL', DEFREP, MINREP, MAXREP,
+     :                            .FALSE., NEWVAL, STATUS )
 
 *  Convert the new value to the desired type.  Use VAL_ to protect
 *  against potentionally harmful values when there is a bad status.
-               RNUVAL = VAL_DTOR( .FALSE., NEWVAL, STATUS )
+                  RNUVAL = VAL_DTOR( .FALSE., NEWVAL, STATUS )
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAR( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          RSUVAL, RNUVAL,
-     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                          NREP, STATUS )
+                  CALL KPG1_CHVAR( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             RSUVAL, RNUVAL,
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             NREP, STATUS )
+               END IF
 
             ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
 
+*  If a LUT was provided, apply it.
+               IF( NLUT .GT. 0 ) THEN
+                  CALL KPG1_LTVAB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             INTERP, LBND( 1 ), UBND( 1 ), NLUT,
+     :                             %VAL( CNF_PVAL( IPLUT ) ), EPSIN,
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             NREP, STATUS )
+
+*  Otherwise, use the OLDVAL and NEWVAL parameters.
+               ELSE
+
 *  Define the acceptable range of values and the suggested default
 *  (which is not actually used due to the ppath).  If variance is being
 *  processed the minimum value cannot be negative.
-               IF ( LCOMP( 2 ) ) THEN
-                  MINREP = MAX( 0.0D0, NUM_BTOD( VAL__MINB ) )
-               ELSE
-                  MINREP = NUM_BTOD( VAL__MINB )
-               END IF
-               MAXREP = NUM_BTOD( VAL__MAXB )
-               DEFREP = 0.0D0
+                  IF ( LCOMP( 2 ) ) THEN
+                     MINREP = MAX( 0.0D0, NUM_BTOD( VAL__MINB ) )
+                  ELSE
+                     MINREP = NUM_BTOD( VAL__MINB )
+                  END IF
+                  MAXREP = NUM_BTOD( VAL__MAXB )
+                  DEFREP = 0.0D0
 
 *  Get the replacement value.
-               CALL PAR_GDR0D( 'OLDVAL', DEFREP, MINREP, MAXREP,
-     :                         .FALSE., REPVAL, STATUS )
+                  CALL PAR_GDR0D( 'OLDVAL', DEFREP, MINREP, MAXREP,
+     :                            .FALSE., REPVAL, STATUS )
 
 *  Convert the replacement value to the desired type.  Use VAL_ to
 *  protect against potentionally harmful values when there is a bad
 *  status.
-               BSUVAL = VAL_DTOB( .FALSE., REPVAL, STATUS )
+                  BSUVAL = VAL_DTOB( .FALSE., REPVAL, STATUS )
 
 *  Get the new value.
-               CALL PAR_GDR0D( 'NEWVAL', DEFREP, MINREP, MAXREP,
-     :                         .FALSE., NEWVAL, STATUS )
+                  CALL PAR_GDR0D( 'NEWVAL', DEFREP, MINREP, MAXREP,
+     :                            .FALSE., NEWVAL, STATUS )
 
 *  Convert the new value to the desired type.  Use VAL_ to protect
 *  against potentionally harmful values when there is a bad status.
-               BNUVAL = VAL_DTOB( .FALSE., NEWVAL, STATUS )
+                  BNUVAL = VAL_DTOB( .FALSE., NEWVAL, STATUS )
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          BSUVAL, BNUVAL,
-     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                          NREP, STATUS )
+                  CALL KPG1_CHVAB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             BSUVAL, BNUVAL,
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             NREP, STATUS )
+               END IF
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
 
+*  If a LUT was provided, apply it.
+               IF( NLUT .GT. 0 ) THEN
+                  CALL KPG1_LTVAD( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             INTERP, LBND( 1 ), UBND( 1 ), NLUT,
+     :                             %VAL( CNF_PVAL( IPLUT ) ), EPSIN,
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             NREP, STATUS )
+
+*  Otherwise, use the OLDVAL and NEWVAL parameters.
+               ELSE
+
 *  Define the acceptable range of values and the suggested default
 *  (which is not actually used due to the ppath).  If variance is being
 *  processed the minimum value cannot be negative.
-               IF ( LCOMP( 2 ) ) THEN
-                  MINREP = MAX( 0.0D0, VAL__MIND )
-               ELSE
-                  MINREP = VAL__MIND
-               END IF
-               MAXREP = VAL__MAXD
-               DEFREP = 0.0D0
+                  IF ( LCOMP( 2 ) ) THEN
+                     MINREP = MAX( 0.0D0, VAL__MIND )
+                  ELSE
+                     MINREP = VAL__MIND
+                  END IF
+                  MAXREP = VAL__MAXD
+                  DEFREP = 0.0D0
 
 *  Get the replacement value.
-               CALL PAR_GDR0D( 'OLDVAL', DEFREP, MINREP, MAXREP,
-     :                         .FALSE., REPVAL, STATUS )
+                  CALL PAR_GDR0D( 'OLDVAL', DEFREP, MINREP, MAXREP,
+     :                            .FALSE., REPVAL, STATUS )
 
 *  Get the new value.
-               CALL PAR_GDR0D( 'NEWVAL', DEFREP, MINREP, MAXREP,
-     :                         .FALSE., NEWVAL, STATUS )
+                  CALL PAR_GDR0D( 'NEWVAL', DEFREP, MINREP, MAXREP,
+     :                            .FALSE., NEWVAL, STATUS )
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAD( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          REPVAL, NEWVAL,
-     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                          NREP, STATUS )
+                  CALL KPG1_CHVAD( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             REPVAL, NEWVAL,
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             NREP, STATUS )
+               END IF
 
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
 
+*  If a LUT was provided, apply it.
+               IF( NLUT .GT. 0 ) THEN
+                  CALL KPG1_LTVAI( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             INTERP, LBND( 1 ), UBND( 1 ), NLUT,
+     :                             %VAL( CNF_PVAL( IPLUT ) ), EPSIN,
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             NREP, STATUS )
+
+*  Otherwise, use the OLDVAL and NEWVAL parameters.
+               ELSE
+
 *  Define the acceptable range of values and the suggested default
 *  (which is not actually used due to the ppath).  If variance is being
 *  processed the minimum value cannot be negative.
-               IF ( LCOMP( 2 ) ) THEN
-                  MINREP = MAX( 0.0D0, NUM_ITOD( VAL__MINI ) )
-               ELSE
-                  MINREP = NUM_ITOD( VAL__MINI )
-               END IF
-               MAXREP = NUM_ITOD( VAL__MAXI )
-               DEFREP = 0.0D0
+                  IF ( LCOMP( 2 ) ) THEN
+                     MINREP = MAX( 0.0D0, NUM_ITOD( VAL__MINI ) )
+                  ELSE
+                     MINREP = NUM_ITOD( VAL__MINI )
+                  END IF
+                  MAXREP = NUM_ITOD( VAL__MAXI )
+                  DEFREP = 0.0D0
 
 *  Get the replacement value.
-               CALL PAR_GDR0D( 'OLDVAL', DEFREP, MINREP, MAXREP,
-     :                         .FALSE., REPVAL, STATUS )
+                  CALL PAR_GDR0D( 'OLDVAL', DEFREP, MINREP, MAXREP,
+     :                            .FALSE., REPVAL, STATUS )
 
 *  Convert the replacement value to the desired type.  Use VAL_ to
 *  protect against potentionally harmful values when there is a bad
 *  status.
-               ISUVAL = VAL_DTOI( .FALSE., REPVAL, STATUS )
+                  ISUVAL = VAL_DTOI( .FALSE., REPVAL, STATUS )
 
 *  Get the new value.
-               CALL PAR_GDR0D( 'NEWVAL', DEFREP, MINREP, MAXREP,
-     :                         .FALSE., NEWVAL, STATUS )
+                  CALL PAR_GDR0D( 'NEWVAL', DEFREP, MINREP, MAXREP,
+     :                            .FALSE., NEWVAL, STATUS )
 
 *  Convert the new value to the desired type.  Use VAL_ to protect
 *  against potentionally harmful values when there is a bad status.
-               INUVAL = VAL_DTOI( .FALSE., NEWVAL, STATUS )
+                  INUVAL = VAL_DTOI( .FALSE., NEWVAL, STATUS )
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAI( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          ISUVAL, INUVAL,
-     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                          NREP, STATUS )
+                  CALL KPG1_CHVAI( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             ISUVAL, INUVAL,
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             NREP, STATUS )
+               END IF
 
             ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
 
+*  If a LUT was provided, apply it.
+               IF( NLUT .GT. 0 ) THEN
+                  CALL KPG1_LTVAK( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             INTERP, LBND( 1 ), UBND( 1 ), NLUT,
+     :                             %VAL( CNF_PVAL( IPLUT ) ), EPSIN,
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             NREP, STATUS )
+
+*  Otherwise, use the OLDVAL and NEWVAL parameters.
+               ELSE
+
 *  Define the acceptable range of values and the suggested default
 *  (which is not actually used due to the ppath).  If variance is being
 *  processed the minimum value cannot be negative.
-               IF ( LCOMP( 2 ) ) THEN
-                  MINREP = MAX( 0.0D0, NUM_KTOD( VAL__MINK ) )
-               ELSE
-                  MINREP = NUM_KTOD( VAL__MINK )
-               END IF
-               MAXREP = NUM_KTOD( VAL__MAXK )
-               DEFREP = 0.0D0
+                  IF ( LCOMP( 2 ) ) THEN
+                     MINREP = MAX( 0.0D0, NUM_KTOD( VAL__MINK ) )
+                  ELSE
+                     MINREP = NUM_KTOD( VAL__MINK )
+                  END IF
+                  MAXREP = NUM_KTOD( VAL__MAXK )
+                  DEFREP = 0.0D0
 
 *  Get the replacement value.
-               CALL PAR_GDR0D( 'OLDVAL', DEFREP, MINREP, MAXREP,
-     :                         .FALSE., REPVAL, STATUS )
+                  CALL PAR_GDR0D( 'OLDVAL', DEFREP, MINREP, MAXREP,
+     :                            .FALSE., REPVAL, STATUS )
 
 *  Convert the replacement value to the desired type.  Use VAL_ to
 *  protect against potentionally harmful values when there is a bad
 *  status.
-               KSUVAL = VAL_DTOK( .FALSE., REPVAL, STATUS )
+                  KSUVAL = VAL_DTOK( .FALSE., REPVAL, STATUS )
 
 *  Get the new value.
-               CALL PAR_GDR0D( 'NEWVAL', DEFREP, MINREP, MAXREP,
-     :                         .FALSE., NEWVAL, STATUS )
+                  CALL PAR_GDR0D( 'NEWVAL', DEFREP, MINREP, MAXREP,
+     :                            .FALSE., NEWVAL, STATUS )
 
 *  Convert the new value to the desired type.  Use VAL_ to protect
 *  against potentionally harmful values when there is a bad status.
-               KNUVAL = VAL_DTOK( .FALSE., NEWVAL, STATUS )
+                  KNUVAL = VAL_DTOK( .FALSE., NEWVAL, STATUS )
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAK( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          KSUVAL, KNUVAL,
-     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                          NREP, STATUS )
+                  CALL KPG1_CHVAK( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             KSUVAL, KNUVAL,
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             NREP, STATUS )
+               END IF
 
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
 
+*  If a LUT was provided, apply it.
+               IF( NLUT .GT. 0 ) THEN
+                  CALL KPG1_LTVAUB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             INTERP, LBND( 1 ), UBND( 1 ), NLUT,
+     :                             %VAL( CNF_PVAL( IPLUT ) ), EPSIN,
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             NREP, STATUS )
+
+*  Otherwise, use the OLDVAL and NEWVAL parameters.
+               ELSE
+
 *  Define the acceptable range of values and the suggested default
 *  (which is not actually used due to the ppath).  If variance is being
 *  processed the minimum value cannot be negative.
-               IF ( LCOMP( 2 ) ) THEN
-                  MINREP = MAX( 0.0D0, NUM_UBTOD( VAL__MINUB ) )
-               ELSE
-                  MINREP = NUM_UBTOD( VAL__MINUB )
-               END IF
-               MAXREP = NUM_UBTOD( VAL__MAXUB )
-               DEFREP = 0.0D0
+                  IF ( LCOMP( 2 ) ) THEN
+                     MINREP = MAX( 0.0D0, NUM_UBTOD( VAL__MINUB ) )
+                  ELSE
+                     MINREP = NUM_UBTOD( VAL__MINUB )
+                  END IF
+                  MAXREP = NUM_UBTOD( VAL__MAXUB )
+                  DEFREP = 0.0D0
 
 *  Get the replacement value.
-               CALL PAR_GDR0D( 'OLDVAL', DEFREP, MINREP, MAXREP,
-     :                         .FALSE., REPVAL, STATUS )
+                  CALL PAR_GDR0D( 'OLDVAL', DEFREP, MINREP, MAXREP,
+     :                            .FALSE., REPVAL, STATUS )
 
 *  Convert the replacement value to the desired type.  Use VAL_ to
 *  protect against potentionally harmful values when there is a bad
 *  status.
-               BSUVAL = VAL_DTOUB( .FALSE., REPVAL, STATUS )
+                  BSUVAL = VAL_DTOUB( .FALSE., REPVAL, STATUS )
 
 *  Get the new value.
-               CALL PAR_GDR0D( 'NEWVAL', DEFREP, MINREP, MAXREP,
-     :                         .FALSE., NEWVAL, STATUS )
+                  CALL PAR_GDR0D( 'NEWVAL', DEFREP, MINREP, MAXREP,
+     :                            .FALSE., NEWVAL, STATUS )
 
 *  Convert the new value to the desired type.  Use VAL_ to protect
 *  against potentionally harmful values when there is a bad status.
-               BNUVAL = VAL_DTOUB( .FALSE., NEWVAL, STATUS )
+                  BNUVAL = VAL_DTOUB( .FALSE., NEWVAL, STATUS )
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAUB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                           BSUVAL, BNUVAL,
-     :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                           NREP, STATUS )
+                  CALL KPG1_CHVAUB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                              BSUVAL, BNUVAL,
+     :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                              NREP, STATUS )
+               END IF
 
             ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
 
+*  If a LUT was provided, apply it.
+               IF( NLUT .GT. 0 ) THEN
+                  CALL KPG1_LTVAUW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             INTERP, LBND( 1 ), UBND( 1 ), NLUT,
+     :                             %VAL( CNF_PVAL( IPLUT ) ), EPSIN,
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             NREP, STATUS )
+
+*  Otherwise, use the OLDVAL and NEWVAL parameters.
+               ELSE
+
 *  Define the acceptable range of values and the suggested default
 *  (which is not actually used due to the ppath).  If variance is being
 *  processed the minimum value cannot be negative.
-               IF ( LCOMP( 2 ) ) THEN
-                  MINREP = MAX( 0.0D0, NUM_UWTOD( VAL__MINUW ) )
-               ELSE
-                  MINREP = NUM_UWTOD( VAL__MINUW )
-               END IF
-               MAXREP = NUM_UWTOD( VAL__MAXUW )
-               DEFREP = 0.0D0
+                  IF ( LCOMP( 2 ) ) THEN
+                     MINREP = MAX( 0.0D0, NUM_UWTOD( VAL__MINUW ) )
+                  ELSE
+                     MINREP = NUM_UWTOD( VAL__MINUW )
+                  END IF
+                  MAXREP = NUM_UWTOD( VAL__MAXUW )
+                  DEFREP = 0.0D0
 
 *  Get the replacement value.
-               CALL PAR_GDR0D( 'OLDVAL', DEFREP, MINREP, MAXREP,
-     :                         .FALSE., REPVAL, STATUS )
+                  CALL PAR_GDR0D( 'OLDVAL', DEFREP, MINREP, MAXREP,
+     :                            .FALSE., REPVAL, STATUS )
 
 *  Convert the replacement value to the desired type.  Use VAL_ to
 *  protect against potentionally harmful values when there is a bad
 *  status.
-               WSUVAL = VAL_DTOUW( .FALSE., REPVAL, STATUS )
+                  WSUVAL = VAL_DTOUW( .FALSE., REPVAL, STATUS )
 
 *  Get the new value.
-               CALL PAR_GDR0D( 'NEWVAL', DEFREP, MINREP, MAXREP,
-     :                         .FALSE., NEWVAL, STATUS )
+                  CALL PAR_GDR0D( 'NEWVAL', DEFREP, MINREP, MAXREP,
+     :                            .FALSE., NEWVAL, STATUS )
 
 *  Convert the new value to the desired type.  Use VAL_ to protect
 *  against potentionally harmful values when there is a bad status.
-               WNUVAL = VAL_DTOUW( .FALSE., NEWVAL, STATUS )
+                  WNUVAL = VAL_DTOUW( .FALSE., NEWVAL, STATUS )
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAUW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                           WSUVAL, WNUVAL,
-     :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                           NREP, STATUS )
+                  CALL KPG1_CHVAUW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                              WSUVAL, WNUVAL,
+     :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                              NREP, STATUS )
+               END IF
 
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
 
+*  If a LUT was provided, apply it.
+               IF( NLUT .GT. 0 ) THEN
+                  CALL KPG1_LTVAW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             INTERP, LBND( 1 ), UBND( 1 ), NLUT,
+     :                             %VAL( CNF_PVAL( IPLUT ) ), EPSIN,
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             NREP, STATUS )
+
+*  Otherwise, use the OLDVAL and NEWVAL parameters.
+               ELSE
+
 *  Define the acceptable range of values and the suggested default
 *  (which is not actually used due to the ppath).  If variance is being
 *  processed the minimum value cannot be negative.
-               IF ( LCOMP( 2 ) ) THEN
-                  MINREP = MAX( 0.0D0, NUM_WTOD( VAL__MINW ) )
-               ELSE
-                  MINREP = NUM_WTOD( VAL__MINW )
-               END IF
-               MAXREP = NUM_WTOD( VAL__MAXW )
-               DEFREP = 0.0D0
+                  IF ( LCOMP( 2 ) ) THEN
+                     MINREP = MAX( 0.0D0, NUM_WTOD( VAL__MINW ) )
+                  ELSE
+                     MINREP = NUM_WTOD( VAL__MINW )
+                  END IF
+                  MAXREP = NUM_WTOD( VAL__MAXW )
+                  DEFREP = 0.0D0
 
 *  Get the replacement value.
-               CALL PAR_GDR0D( 'OLDVAL', DEFREP, MINREP, MAXREP,
-     :                         .FALSE., REPVAL, STATUS )
+                  CALL PAR_GDR0D( 'OLDVAL', DEFREP, MINREP, MAXREP,
+     :                            .FALSE., REPVAL, STATUS )
 
 *  Convert the replacement value to the desired type.  Use VAL_ to
 *  protect against potentionally harmful values when there is a bad
 *  status.
-               WSUVAL = VAL_DTOW( .FALSE., REPVAL, STATUS )
+                  WSUVAL = VAL_DTOW( .FALSE., REPVAL, STATUS )
 
 *  Get the new value.
-               CALL PAR_GDR0D( 'NEWVAL', DEFREP, MINREP, MAXREP,
-     :                         .FALSE., NEWVAL, STATUS )
+                  CALL PAR_GDR0D( 'NEWVAL', DEFREP, MINREP, MAXREP,
+     :                            .FALSE., NEWVAL, STATUS )
 
 *  Convert the new value to the desired type.  Use VAL_ to protect
 *  against potentionally harmful values when there is a bad status.
-               WNUVAL = VAL_DTOW( .FALSE., NEWVAL, STATUS )
+                  WNUVAL = VAL_DTOW( .FALSE., NEWVAL, STATUS )
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          WSUVAL, WNUVAL,
-     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                          NREP, STATUS )
+                  CALL KPG1_CHVAW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             WSUVAL, WNUVAL,
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             NREP, STATUS )
+               END IF
 
             END IF
 
@@ -670,6 +889,9 @@
 
 *  Come here if a specific error occurred early in the application.
   999 CONTINUE
+
+*  Free the LUT.
+      IF( NLUT .GT. 0 ) CALL PSX_FREE( IPLUT, STATUS )
 
 *  Tidy the workspace.
       CALL NDF_END( STATUS )

@@ -1,0 +1,271 @@
+      SUBROUTINE KPG1_LTVA<T>( EL, INARR, INTERP, INLOW, INHIGH, NLUT,
+     :                         LUT, EPSIN, OUTARR, NREP, STATUS )
+*+
+*  Name:
+*     KPG1_LTVAx
+
+*  Purpose:
+*     Replaces all occurrences of a value in an array with another
+*     value derived from a look-up table.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_LTVAx( EL, INARR, INTERP, INLOW, INHIGH, NLUT, LUT,
+*                      EPSIN, OUTARR, NREP, STATUS )
+
+*  Description:
+*     This routine copies the input array to the output array,
+*     replacing input values with output values as defined by the
+*     supplied look-up table.
+
+*  Arguments:
+*     EL = INTEGER (Given)
+*        The dimension of the input and output arrays.
+*     INARR( EL ) = ? (Given)
+*        The input array.
+*     INTERP = CHARACTER * ( * ) (Given)
+*        The interpolation method:
+*
+*        - "NONE" -- Input values that match one of the old values in the
+*        LUT are replaced by the corresponding new value. The comparison
+*        for floating-point values tests that the difference between the
+*        old value and the input value is less than their mean times the
+*        precision of the data type.
+*
+*        - "NEAREST" -- All input values that are between INLOW and
+*        INHIGH are replaced by the new value corresponding to the
+*        old value that is nearest to the input value. Other input
+*        values are replaced by bad values.
+*
+*        - "LINEAR" -- All input values that are between INLOW and
+*        INHIGH are replaced by the new value determined using linear
+*        interpolation between the old values. Other input values are
+*        replaced by bad values.
+*
+*     INLOW = DOUBLE PRECISION (Given)
+*        The lowest input value in the LUT.
+*     INHIGH = DOUBLE PRECISION (Given)
+*        The highest input value in the LUT.
+*     NLUT = INTEGER (Given)
+*        The number of entries in the look-up table.
+*     LUT( 2, NLUT ) = DOUBLE PRECISION (Given)
+*        The look up table. Column 1 holds the old values and column 2
+*        holds the new values.
+*     EPSIN = DOUBLE PRECISION (Given)
+*        The machine precision for the input data type.
+*     OUTARR( EL ) = ? (Returned)
+*        The output array containing the modified values.
+*     NREP = INTEGER (Returned)
+*        The number of replacements made.
+*     STATUS  =  INTEGER (Given and Returned)
+*        Global status value.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     arrays and values supplied to the routine must have the data type
+*     specified.
+
+*  Copyright:
+*     Copyright (C) 2019 East Asian Observatory.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     DSB: David S. Berry (EAO)
+*     {enter_new_authors_here}
+
+*  History:
+*     4-SEP-2019 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT  NONE             ! No default typing allowed
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Global SSE definitions
+      INCLUDE 'PRM_PAR'          ! Machine-precision constant
+
+*  Arguments Given:
+      INTEGER EL
+      <TYPE> INARR( EL )
+      CHARACTER INTERP*(*)
+      DOUBLE PRECISION INLOW
+      DOUBLE PRECISION INHIGH
+      INTEGER NLUT
+      DOUBLE PRECISION LUT( 2, NLUT )
+      DOUBLE PRECISION EPSIN
+
+*  Arguments Returned:
+      <TYPE> OUTARR( EL )
+      INTEGER NREP
+
+*  Status:
+      INTEGER  STATUS
+
+*  Local Variables:
+      DOUBLE PRECISION DDOWN
+      DOUBLE PRECISION DIFF
+      DOUBLE PRECISION DIN
+      DOUBLE PRECISION LUTOLD
+      DOUBLE PRECISION DUP
+      DOUBLE PRECISION NEWVAL
+      INTEGER I
+      INTEGER ILUT
+*.
+
+*  Check the inherited status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+      NREP = 0
+
+*  Check each input value
+      DO  I = 1, EL
+
+*  COnvert the input value to double precision.
+         DIN = DBLE( INARR( I ) )
+
+*  If the input value is bad, so is the output value.
+         IF( INARR( I ) .EQ. VAL__BAD<T> ) THEN
+            OUTARR( I ) = VAL__BAD<T>
+
+*  If the input value is good, but is outside the range of the LUT, just
+*  copy it to the output or set it bad.
+         ELSE IF( DIN .LT. INLOW .OR. DIN .GT. INHIGH ) THEN
+            IF( INTERP .EQ. 'NONE' ) THEN
+               OUTARR( I ) = INARR( I )
+            ELSE
+               OUTARR( I ) = VAL__BAD<T>
+            END IF
+
+*  Otherwise do the requested interpolation. First do no interpolation.
+         ELSE IF( INTERP .EQ. 'NONE' ) THEN
+
+*  Initialise the output to be a copy of the input.
+            OUTARR( I ) = INARR( I )
+
+*  To avoid testing two floating-point values for equality, they are
+*  tested to be different by less than a small fraction of the value to
+*  be replaced.  The machine precision defines the minimum detectable
+*  difference.
+            IF( EPSIN .EQ. 1 ) THEN
+               DIFF = 0.5D0
+            ELSE
+               DIFF = ABS( DIN * EPSIN )
+            END IF
+
+*  Loop round all LUT entries.
+            DO ILUT = 1, NLUT
+
+*  Compare the input value against the LUT old value.
+               IF ( ABS( DIN - LUT( 1, ILUT ) ) .LE. DIFF ) THEN
+
+*  A match has been found so replace the value in the output array and
+*  increment the count of the replacements. Check for overflow.
+                  NEWVAL = LUT( 2, ILUT )
+                  IF( NEWVAL .GT. VAL__MIN<T> .AND.
+     :                NEWVAL .LT. VAL__MAX<T> ) THEN
+                     OUTARR( I ) = NEWVAL
+                  ELSE
+                     OUTARR( I ) = VAL__BAD<T>
+                  END IF
+                  NREP = NREP + 1
+                  GO TO 5
+
+               END IF
+            END DO
+ 5          CONTINUE
+
+*  Now do nearest neighbour and linear interpolation.
+         ELSE
+
+*  Loop round all LUT entries.
+            NEWVAL = VAL__BADD
+            LUTOLD = VAL__MIND
+            DO ILUT = 1, NLUT
+
+*  Report an error if the old values are not monotonic increasing.
+               IF( LUT( 1, ILUT ) .LE. LUTOLD ) THEN
+                  STATUS = SAI__ERROR
+                  CALL ERR_REP( ' ', 'The old data values in the LUT '//
+     :                          'are not monotonic increasing.',
+     :                          STATUS )
+                  GOTO 999
+               END IF
+               LUTOLD = LUT( 1, ILUT )
+
+*  Look for the first LUT entry for which the old value in the lut is
+*  greater than or equal to the input pixel value. Choose the nearest of
+*  the two adjacent LUT entries and store the corresponding new value.
+*  Then break out of the loop.
+               IF( LUTOLD .EQ. DIN ) THEN
+                  NEWVAL = LUT( 2, ILUT )
+                  GO TO 10
+
+               ELSE IF( LUTOLD .GT. DIN ) THEN
+
+*  Nearest neighbour.
+                  IF( INTERP .EQ. 'NEAREST' ) THEN
+                     DUP = LUTOLD - DIN
+                     DDOWN = DIN - LUT( 1, ILUT - 1 )
+                     IF( DUP .LT. DDOWN ) THEN
+                        NEWVAL = LUT( 2, ILUT )
+                     ELSE
+                        NEWVAL = LUT( 2, ILUT - 1 )
+                     END IF
+
+*  Linear.
+                  ELSE
+                     NEWVAL = LUT( 2, ILUT - 1 ) +
+     :                        ( LUT( 2, ILUT ) -  LUT( 2, ILUT - 1 ) )*
+     :                        ( DIN - LUT( 1, ILUT - 1 ) )/
+     :                        ( LUTOLD - LUT( 1, ILUT - 1 ) )
+                  END IF
+
+                  GO TO 10
+               END IF
+
+            END DO
+ 10         CONTINUE
+
+*  Store the new output value.
+            IF( NEWVAL .EQ. VAL__BADD ) THEN
+               OUTARR( I ) = VAL__BAD<T>
+            ELSE IF( NEWVAL .GT. VAL__MIN<T> .AND.
+     :               NEWVAL .LT. VAL__MAX<T> ) THEN
+               OUTARR( I ) = NEWVAL
+            ELSE
+               OUTARR( I ) = VAL__BAD<T>
+            END IF
+            NREP = NREP + 1
+
+         END IF
+
+      END DO
+
+ 999  CONTINUE
+
+      END
+

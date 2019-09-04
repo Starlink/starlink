@@ -1,3 +1,21 @@
+1 KAPPA_Version_2.6
+
+2 Modified_applications
+
+   o CHPIX
+     - It is easier now to make several edits by supplying the NDF
+     sections and fill values in a text file.  This is made possible new
+     parameters called MODE and FILE.  The default for MODE preserves the
+     historic interactive behaviour.
+
+   o SUBSTITUTE
+     - A new parameter called LUT allows multiple values to be changed
+     simultaneously by supplying a table of old and new values in the
+     form a text file. Interpolation between the values can be performed
+     if required.
+     - A new parameter called TYPE allows the data type of the output NDF
+     to be specified explicitly.
+
 1 KAPPA_Version_2.5-9
 
    A new release of KAPPA is available in Starlink 2018A.  The main
