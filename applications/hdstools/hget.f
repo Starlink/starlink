@@ -97,6 +97,7 @@
 *    RB: Richard Beard (ROSAT, University of Birmingham)
 *    AJC: Alan J. Chipperfield (Starlink, RAL)
 *    TIMJ: Tim Jenness (JAC, Hawaii)
+*    DSB: David Berry (EAO)
 
 *    History :
 *     21-APR-1991 (DJA):
@@ -112,7 +113,9 @@
 *      6-SEP-2001 (AJC):
 *        V3.0-0 Remove Asterix stuff
 *     18-JUL-2007 (TIMJ):
-*       Add CNF_PVAL for 64-bit
+*        Add CNF_PVAL for 64-bit
+*      4-SEP-2019 (TIMJ):
+*        Cancel the INP parameter to avoid HDS locator leak reports.
 *-
 *    Type Definitions :
       IMPLICIT NONE
@@ -318,6 +321,9 @@
         END IF
 
       END IF
+
+*  Annul the locator.
+      CALL DAT_CANCL( 'INP', STATUS )
 
       IF ( STATUS .NE. SAI__OK ) THEN
         ATYPE = TYP_CHAR
