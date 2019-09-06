@@ -108,6 +108,10 @@
 *        in the FITS header.
 *     2018-12-6 (DSB):
 *        Clear bad status before setting new SCAN_VEL value.
+*     2019-9-6 (DSB):
+*        If config parameter VALIDATE_SCANS is set to 2, blank out any
+*        individual crazy time slices rather than blanking out the whole
+*        subscan.
 
 *  Copyright:
 *     Copyright (C) 2009-2014 Science & Technology Facilities Council.
@@ -160,7 +164,7 @@ struct FitsHeaderStruct {
 
 /* Local helper routines */
 static void smf__calc_wvm_index( smfHead * hdr, const char * amhdr, size_t index, double *tau, double * time, int * status );
-static int smf__validate_scan( smfHead *hdr, int *status );
+static int smf__validate_scan( smfHead *hdr, int setbad, int *status );
 
 
 #define FUNC_NAME "smf_fix_metadata_scuba2"
@@ -544,13 +548,15 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
   /* If the telescope goes crazy during the subscan (i.e. spends a significant
      amount of time outside the expected map area), null the telescope data
      for the subscan. This check can be suppressed by setting a zero
-     value for config parameter VALIDATE_SCANS. This function does not
-     have direct access to the config KeyMap, so it gets the VALIDATE_SCANS
-     value from the smurf globals keymap. The top level makemap function
-     copies the VALIDATE_SCANS value from the config keymap to the globals
-     keymap. */
+     value for config parameter VALIDATE_SCANS. If VALIDATE_SCANS is set
+     to 2, then any time slices outside the expected map area are
+     nullified even if the total number of such time slices is small. This
+     function does not have direct access to the config KeyMap, so it gets
+     the VALIDATE_SCANS value from the smurf globals keymap. The top level
+     makemap function copies the VALIDATE_SCANS value from the config keymap
+     to the globals keymap. */
   validate_scans = smf_get_global0I( "VALIDATE_SCANS", 0, status );
-  if ( validate_scans && !smf__validate_scan( hdr, status ) ) {
+  if ( validate_scans && !smf__validate_scan( hdr, (validate_scans==2), status ) ) {
     size_t nframes = hdr->nframes;
     JCMTState * curstate;
     size_t i;
@@ -642,7 +648,7 @@ static void smf__calc_wvm_index( smfHead * hdr, const char * amhdr, size_t index
 }
 
 
-static int smf__validate_scan( smfHead *hdr, int *status ) {
+static int smf__validate_scan( smfHead *hdr, int setbad, int *status ) {
 
 /* Local Variables: */
    JCMTState *state;
@@ -711,17 +717,28 @@ static int smf__validate_scan( smfHead *hdr, int *status ) {
             sep = palDsep( lon, lat, lon0 + mapx, lat0 + mapy );
 
 /* If it is greater than the expected radius of the map, increment the
-   count of such time slices. If the number of bad slices exceeds the
-   limit, there is no point in doing any more time slices so break out
-   of the loop and return zero to indicate the scan pattern has gone
-   crazy. */
+   count of such time slices, and clear the returned flag if we exceed the
+   maximum number of allowed bad time slices. */
             if( sep > rad ) {
-               if( ++nbad > maxbad ) {
-                  result = 0;
+               if( ++nbad > maxbad ) result = 0;
+
+/* If required, flag all bad time slices with invalid pointing info. */
+               if( setbad ) {
+                  state->jos_drcontrol |= DRCNTRL__PTCS_BIT;
+
+/* Otherwise, if the number of bad slices exceeds the limit, there is no
+   point in doing any more time slices so break out of the loop. */
+               } else if( !result ) {
                   break;
                }
             }
          }
+      }
+
+/* If a small number of bad time slices were invalidated, tell the user. */
+      if( result && setbad && nbad > 0 ) {
+         msgOutf( " ", INDENT "WARNING: Rejecting %zu time-slices due to "
+                  "extreme excursion", status, nbad );
       }
    }
 

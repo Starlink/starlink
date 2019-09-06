@@ -191,6 +191,8 @@
 *        AlignOffset).
 *     2015-11-11 (DSB):
 *        Added argument "config".
+*     2019-9-6 (DSB):
+*        Ignore samples that have bad pointing info (jos_drcontrol).
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -620,8 +622,14 @@ status );
              p2 = ac2list;
              for( j = 0; j < maxloop; j++ ) {
                 state = (hdr->allState)[ j ];
-                *(p1++) = state.tcs_tr_ac1;
-                *(p2++) = state.tcs_tr_ac2;
+                if( state.jos_drcontrol >= 0 &&
+                    state.jos_drcontrol & drcntrl_mask ) {
+                   *(p1++) = AST__BAD;
+                   *(p2++) = AST__BAD;
+                } else {
+                   *(p1++) = state.tcs_tr_ac1;
+                   *(p2++) = state.tcs_tr_ac2;
+                }
              }
              if( fast_map ) astTran2( fast_map, maxloop, ac1list, ac2list, 1,
                                       ac1list, ac2list );
@@ -640,8 +648,14 @@ status );
 
                 for( j = 0; j < maxloop; j++ ) {
                    state = (hdr->allState)[ j ];
-                   *(p1++) = state.tcs_tr_bc1;
-                   *(p2++) = state.tcs_tr_bc2;
+                   if( state.jos_drcontrol >= 0 &&
+                       state.jos_drcontrol & drcntrl_mask ) {
+                      *(p1++) = AST__BAD;
+                      *(p2++) = AST__BAD;
+                   } else {
+                      *(p1++) = state.tcs_tr_bc1;
+                      *(p2++) = state.tcs_tr_bc2;
+                   }
                 }
 
                 /* Transform them from tracking to absolute output sky coords. */
