@@ -410,6 +410,7 @@ void smurf_calcqu( int *status ) {
    int indfu;                 /* Cloned NDF identifier for output U array */
    int iplace;                /* NDF placeholder for current block's I image */
    int ipolcrd;               /* Reference direction for waveplate angles */
+   int ival;                  /* Integer parameter value */
    int lsqfit;                /* Use least squares approach ? */
    int maxsize;               /* Max no. of time slices in a block */
    int minsize;               /* Min no. of time slices in a block */
@@ -540,6 +541,29 @@ void smurf_calcqu( int *status ) {
                     &ogrpu, &osize, status );
       }
 
+/* Get a KeyMap holding values for the configuration parameters. We
+   assume here that all input files will be for the same wavelength and so
+   can use the same parameters (defined by the first input file). */
+      sub_instruments = smf_subinst_keymap( SMF__SUBINST_NONE,
+                                            NULL, igrp, 1, status );
+      config = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_calcqu.def",
+                            sub_instruments, 1, status );
+      sub_instruments = astAnnul( sub_instruments );
+
+/* Set global values to reflect the contents of the above config keymap.
+   These global values are stored in another KeyMap created in smurf_mon
+   and accessed via the smurf_global_keymap pointer declared within
+   smf.h. This provides a mechanism for getting config values to low
+   level functions that do not have access to the config keymap (e.g.
+   smf_fix_metadata_scuba2). It can also be used to communicate any other
+   required global values (i.e. it's not restricted to config
+   parameters). */
+      astMapGet0I( config, "VALIDATE_SCANS", &ival );
+      smf_put_global0I( "VALIDATE_SCANS", ival, status );
+
+      astMapGet0I( config, "FILLGAPS_NOISE", &ival );
+      smf_put_global0I( "FILLGAPS_NOISE", ival, status );
+
 /* Loop over all contiguous chunks */
       gcount = 1;
       for( ichunk = 0; ichunk < nchunk && *status == SAI__OK; ichunk++ ) {
@@ -567,18 +591,6 @@ void smurf_calcqu( int *status ) {
             msgOutf( "", "   Observation: %d   UT date: %d",
                      status, utdate, obsnum );
          }
-
-/* Get a KeyMap holding values for the configuration parameters. Since we
-   sorted by wavelength when calling smf_grp_related, we know that all
-   smfDatas in the current smfArray (i.e. chunk) will relate to the same
-   wavelength. Therefore we can use the same parameters for all smfDatas in
-   the current smfArray. */
-         sub_instruments = smf_subinst_keymap( SMF__SUBINST_NONE,
-                                               concat->sdata[ 0 ], NULL,
-                                               0, status );
-         config = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_calcqu.def",
-                               sub_instruments, 1, status );
-         sub_instruments = astAnnul( sub_instruments );
 
 /* Get the CALCQU specific parameters. */
          if( !astMapGet0I( config, "PASIGN", &pasign ) ) pasign = 1;
