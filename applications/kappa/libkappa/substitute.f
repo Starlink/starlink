@@ -23,17 +23,17 @@
 *  Description:
 *     This application changes all pixels that have a defined value in
 *     an NDF with an alternate value. The number of replacements is
-*     reported. Two modes are available:
+*     reported. Two modes are available.
 *
 *     - A single pair of old and new values can be supplied (see
-*     parameters OLDVAL and NEWVAL). All occurrences of OLDVAL are
+*     Parameters OLDVAL and NEWVAL). All occurrences of OLDVAL are
 *     replaced with NEWVAL. Other values are unchanged.
 *
 *     - A look-up table containing corresponding old and new values can
 *     be supplied. By default, each input pixel that equals an old value
 *     is replaced by the corresponding new value. Alternatively, all
 *     input pixels can be changed to a new value by interpolation between
-*     the input values (see parameters LUT and INTERP).
+*     the input values (see Parameters LUT and INTERP).
 
 *  Usage:
 *     substitute in out oldval newval [comp]
@@ -47,7 +47,7 @@
 *        only array component within the NDF.  ["Data"]
 *     INTERP = LITERAL (Read)
 *        Determines how the values in the file specified by parameter
-*        LUT are used:
+*        LUT are used, from the following options.
 *
 *        - "None" -- Pixel values that equal an input value are replaced
 *        by the corresponding output value. Other values are left
@@ -69,16 +69,12 @@
 *     LUT = FILENAME (Read)
 *        The name of a text file containing a look-up table of old and
 *        new data values. If null (!) is supplied for this parameter the
-*        old and new data values will instead be obtained using parameters
+*        old and new data values will instead be obtained using Parameters
 *        OLDVAL and NEWVAL. Lines starting with a hash (#) or exclamation
 *        mark (!)  are ignored. Other lines should contain an old data
 *        value followed by the corresponding new data value. The way in
 *        which the values in this table are used is determined by
-*        parameter INTERP. [!]
-*     OUT = NDF (Write)
-*        Output NDF structure containing the data and/or variance array
-*        that is a copy of the input array, but with replacemeent values
-*        substituted.
+*        Parameter INTERP. [!]
 *     NEWVAL = _DOUBLE (Read)
 *        The value to replace occurrences of OLDVAL.  It must lie
 *        within the minimum and maximum values of the data type of the
@@ -86,7 +82,7 @@
 *        data type of the array being converted before the search
 *        begins.  The suggested default is the current value. This
 *        parameter is only accessed if a null (!) value is supplied for
-*        parameter LUT.
+*        Parameter LUT.
 *     OLDVAL = _DOUBLE (Read)
 *        The element value to be replaced.  The same value is
 *        substituted in both the data and variance arrays when
@@ -95,7 +91,11 @@
 *        replacement value is converted to data type of the array being
 *        converted before the search begins.  The suggested default is
 *        the current value. This parameter is only accessed if a null
-*        (!) value is supplied for parameter LUT.
+*        (!) value is supplied for Parameter LUT.
+*     OUT = NDF (Write)
+*        Output NDF structure containing the data and/or variance array
+*        that is a copy of the input array, but with replacemeent values
+*        substituted.
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
 *        propagates the title from the input NDF to the output NDF. [!]

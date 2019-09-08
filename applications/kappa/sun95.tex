@@ -45510,21 +45510,21 @@ KAPPA: \htmlref{ADD}{ADD},
    \sstdescription{
       This application changes all pixels that have a defined value in
       an \NDFref{NDF} with an alternate value. The number of replacements is
-      reported. Two modes are available:
+      reported. Two modes are available.
 
       \sstitemlist{
 
          \sstitem
-          A single pair of old and new values can be supplied (see
-         parameters OLDVAL and NEWVAL). All occurrences of OLDVAL are
+         A single pair of old and new values can be supplied (see
+         Parameters OLDVAL and NEWVAL). All occurrences of OLDVAL are
          replaced with NEWVAL. Other values are unchanged.
 
          \sstitem
-          A look-up table containing corresponding old and new values can
+         A look-up table containing corresponding old and new values can
          be supplied. By default, each input pixel that equals an old value
          is replaced by the corresponding new value. Alternatively, all
          input pixels can be changed to a new value by interpolation between
-         the input values (see parameters LUT and INTERP).
+         the input values (see Parameters LUT and INTERP).
       }
    }
    \sstusage{
@@ -45549,26 +45549,26 @@ KAPPA: \htmlref{ADD}{ADD},
       \sstsubsection{
          INTERP = LITERAL (Read)
       }{
-         Determines how the values in the file specified by parameter
-         LUT are used:
+         Determines how the values in the file specified by Parameter
+         LUT are used, from the following options.
 
          \sstitemlist{
 
             \sstitem
-             \texttt{"} None\texttt{"}  -- Pixel values that equal an input value are replaced
+            \texttt{"None"}  -- Pixel values that equal an input value are replaced
             by the corresponding output value. Other values are left
             unchanged.
 
             \sstitem
-             \texttt{"} Nearest\texttt{"}  -- Every pixel value is replaced by the output value
+            \texttt{"Nearest"}  -- Every pixel value is replaced by the output value
             corresponding to the nearest input value.
 
             \sstitem
-             \texttt{"} Linear\texttt{"}  -- Every pixel value is replaced by an output value
+            \texttt{"Linear"}  -- Every pixel value is replaced by an output value
             determined using linear interpolation between the input values.
 
          }
-         If \texttt{"} Nearest\texttt{"}  or \texttt{"} Linear\texttt{"}  is used, pixel values that are outside
+         If \texttt{"Nearest"}  or \texttt{"Linear"}  is used, pixel values that are outside
          the range of input value covered by the look-up table are set
          bad in the output. Additionally, an error is reported if the
          old data values are not montonic increasing. \texttt{["None"]}
@@ -45578,20 +45578,13 @@ KAPPA: \htmlref{ADD}{ADD},
       }{
          The name of a text file containing a look-up table of old and
          new data values. If null (\texttt{{!}}) is supplied for this parameter the
-         old and new data values will instead be obtained using parameters
+         old and new data values will instead be obtained using Parameters
          OLDVAL and NEWVAL. Lines starting with a hash (\#) or exclamation
          mark (\texttt{{!}}) are ignored, as are blank lines. Other lines
          should contain an old data
          value followed by the corresponding new data value. The way in
          which the values in this table are used is determined by
-         parameter INTERP. \texttt{[!]}
-      }
-      \sstsubsection{
-         OUT = NDF (Write)
-      }{
-         Output NDF structure containing the data and/or variance array
-         that is a copy of the input array, but with replacemeent values
-         substituted.
+         Parameter INTERP. \texttt{[!]}
       }
       \sstsubsection{
          NEWVAL = \_DOUBLE (Read)
@@ -45602,7 +45595,7 @@ KAPPA: \htmlref{ADD}{ADD},
          data type of the array being converted before the search
          begins.  The suggested default is the current value.  This
          parameter is only accessed if a null value is supplied for
-         parameter LUT.
+         Parameter LUT.
       }
       \sstsubsection{
          OLDVAL = \_DOUBLE (Read)
@@ -45614,7 +45607,14 @@ KAPPA: \htmlref{ADD}{ADD},
          replacement value is converted to data type of the array being
          converted before the search begins.  The suggested default is
          the current value.  This parameter is only accessed if a null
-         value is supplied for parameter LUT.
+         value is supplied for Parameter LUT.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         Output NDF structure containing the data and/or variance array
+         that is a copy of the input array, but with replacemeent values
+         substituted.
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
