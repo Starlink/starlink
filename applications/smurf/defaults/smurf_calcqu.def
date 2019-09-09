@@ -32,13 +32,19 @@
 #  default values with values more appropriate for calcqu.
 ^$SMURF_DIR/smurf_makemap.def
 
+#  Change defaults inherited from smurf_makemap.def.
 flagfast = 0
 flagslow = 0
 order = 0
 spikethresh = 5
 
+#  Ensure errors are reported for any crazy sub-scans. calcqu spots these
+#  errors, annuls them and splits the output time-series files up into
+#  multiple chunks, avoiding the crazy subscans.
+validate_scans = -1
+
 #  Do not mask noisy bolometers since the noise is calculated in the 2-10
-# Hz band, which includes 8Hz and 4Hz !
+#  Hz band, which includes 8Hz and 4Hz !
 noisecliphigh=0
 
 

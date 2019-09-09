@@ -303,6 +303,9 @@
 *        "exportclean", as for makemap.
 *     1-FEB-2018 (DSB):
 *        Added config parameter ANG0.
+*     9-SEP-2019 (DSB):
+*        Get the CONFIG group earlier, so that the VALIDATE_SCANS parameter
+*        can be used within smf_grp_related.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -507,6 +510,29 @@ void smurf_calcqu( int *status ) {
          arcerror = 0.0;
       }
 
+/* Get a KeyMap holding values for the configuration parameters. We
+   assume here that all input files will be for the same wavelength and so
+   can use the same parameters (defined by the first input file). */
+      sub_instruments = smf_subinst_keymap( SMF__SUBINST_NONE,
+                                            NULL, sgrp, 1, status );
+      config = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_calcqu.def",
+                            sub_instruments, 1, status );
+      sub_instruments = astAnnul( sub_instruments );
+
+/* Set global values to reflect the contents of the above config keymap.
+   These global values are stored in another KeyMap created in smurf_mon
+   and accessed via the smurf_global_keymap pointer declared within
+   smf.h. This provides a mechanism for getting config values to low
+   level functions that do not have access to the config keymap (e.g.
+   smf_fix_metadata_scuba2). It can also be used to communicate any other
+   required global values (i.e. it's not restricted to config
+   parameters). */
+      astMapGet0I( config, "VALIDATE_SCANS", &ival );
+      smf_put_global0I( "VALIDATE_SCANS", ival, status );
+
+      astMapGet0I( config, "FILLGAPS_NOISE", &ival );
+      smf_put_global0I( "FILLGAPS_NOISE", ival, status );
+
 /* Group the input files so that all files within a single group have the
    same wavelength and belong to the same subscan of the same observation.
    Also identify chunks of data that are contiguous in time, and
@@ -540,29 +566,6 @@ void smurf_calcqu( int *status ) {
          kpg1Wgndf( "OUTU", bgrp, bsize, bsize, "More output files required...",
                     &ogrpu, &osize, status );
       }
-
-/* Get a KeyMap holding values for the configuration parameters. We
-   assume here that all input files will be for the same wavelength and so
-   can use the same parameters (defined by the first input file). */
-      sub_instruments = smf_subinst_keymap( SMF__SUBINST_NONE,
-                                            NULL, igrp, 1, status );
-      config = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_calcqu.def",
-                            sub_instruments, 1, status );
-      sub_instruments = astAnnul( sub_instruments );
-
-/* Set global values to reflect the contents of the above config keymap.
-   These global values are stored in another KeyMap created in smurf_mon
-   and accessed via the smurf_global_keymap pointer declared within
-   smf.h. This provides a mechanism for getting config values to low
-   level functions that do not have access to the config keymap (e.g.
-   smf_fix_metadata_scuba2). It can also be used to communicate any other
-   required global values (i.e. it's not restricted to config
-   parameters). */
-      astMapGet0I( config, "VALIDATE_SCANS", &ival );
-      smf_put_global0I( "VALIDATE_SCANS", ival, status );
-
-      astMapGet0I( config, "FILLGAPS_NOISE", &ival );
-      smf_put_global0I( "FILLGAPS_NOISE", ival, status );
 
 /* Loop over all contiguous chunks */
       gcount = 1;
@@ -1073,9 +1076,9 @@ void smurf_calcqu( int *status ) {
          }
 
 /* Free resources. */
-         config = astAnnul( config );
          smf_close_related( wf, &concat, status );
       }
+      config = astAnnul( config );
 
 /* Final clean up for non-least-squares approach. */
       if( !lsqfit ) {

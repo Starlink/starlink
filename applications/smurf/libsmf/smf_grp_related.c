@@ -13,7 +13,7 @@
  *     SMURF subroutine
 
  *  Invocation:
- *     smf_grp_related( const Grp *igrp, const size_t grpsize,
+ *     smf_grp_related( Grp *igrp, const size_t grpsize,
  *                      const int grouping, const int checksubinst,
  *                      double maxlen_s, double *srate_maxlen,
  *                      AstKeyMap *keymap, dim_t *maxconcatlen,
@@ -21,8 +21,9 @@
  *                      dim_t *pad, int *status );
 
  *  Arguments:
- *     igrp = const Grp* (Given)
- *        Input Grp
+ *     igrp = Grp* (Given)
+ *        Input Grp. The entries in this Grp for any rejected subscans will
+ *        be set to a blank string on exit.
  *     grpsize = const size_t (Given)
  *        Size of input Grp
  *     grouping = const int (Given)
@@ -199,6 +200,12 @@
  *     2018-10-02 (DSB):
  *        Handle cases where input does not have a NSUBSCAN value (e.g.
  *        if it is the concatenation of several subscans).
+ *     2019-9-9 (DSB):
+ *        If smf_open_file reports a SMF__REJECT error (caused by the
+ *        VALIDATE_SCANS parameter being set to -1 and the subscan being
+ *        crazy), annul the error, reject the subscan and continue to
+ *        process other subscans. This will cause a the data to be split
+ *        into separate groups at the rejected subscan.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -255,7 +262,7 @@
 
 #define FUNC_NAME "smf_grp_related"
 
-void smf_grp_related( const Grp *igrp, const size_t grpsize,
+void smf_grp_related( Grp *igrp, const size_t grpsize,
                       const int grouping, const int checksubinst,
                       double maxlen_s, double *srate_maxlen,
                       AstKeyMap *keymap, dim_t *maxconcatlen,
@@ -333,7 +340,16 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
 
     /* First step: open file and harvest metadata */
     smf_open_file( NULL, igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
-    if (*status != SAI__OK) break;
+
+/* If this file has been rejected, annull the error, store a blank value
+   in place of the file name in the Grp and proceed to process other inputs. */
+    if( *status == SMF__REJECT ) {
+       errAnnul( status );
+       grpPut1( igrp, " ", i, status );
+       continue;
+    } else if (*status != SAI__OK) {
+       break;
+    }
 
     if( i==1 ) {
       isFFT = smf_isfft( data, NULL, NULL, NULL, NULL, NULL, status );

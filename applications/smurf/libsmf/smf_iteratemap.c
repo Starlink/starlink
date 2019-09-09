@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_iteratemap(ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
+*     smf_iteratemap(ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
 *                    const Grp *bolrootgrp, const Grp *shortrootgrp,
 *                    const Grp *flagrootgrp, const Grp *samprootgrp,
 *                    AstKeyMap *akeymap,
@@ -30,8 +30,9 @@
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads
-*     igrp = const Grp* (Given)
-*        Group of input data files
+*     igrp = Grp* (Given)
+*        Group of input data files. Any rejected subscans will be set to a
+*        blank string in this Grp on exit.
 *     iterrootgrp = const Grp * (Given)
 *        Root name to use for iteration output maps (if required). Can be a
 *        path to an HDS container.
@@ -645,7 +646,7 @@ typedef struct smfIterateMapData {
 volatile sig_atomic_t smf_interupt = 0;
 
 /* Main routine */
-void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
+void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
                      const Grp *bolrootgrp, const Grp *shortrootgrp,
                      const Grp *flagrootgrp, const Grp *samprootgrp,
                      AstKeyMap *akeymap,

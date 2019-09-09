@@ -112,10 +112,13 @@
 *        If config parameter VALIDATE_SCANS is set to 2, blank out any
 *        individual crazy time slices rather than blanking out the whole
 *        subscan.
+*     2019-9-9 (DSB):
+*        If config parameter VALIDATE_SCANS is set to -1, report an error
+*        if the supplied subscan is crazy.
 
 *  Copyright:
 *     Copyright (C) 2009-2014 Science & Technology Facilities Council.
-*     Copyright (C) 2017-2018 East Asian Observatory.
+*     Copyright (C) 2017-2019 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -546,27 +549,64 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
   }
 
   /* If the telescope goes crazy during the subscan (i.e. spends a significant
-     amount of time outside the expected map area), null the telescope data
-     for the subscan. This check can be suppressed by setting a zero
-     value for config parameter VALIDATE_SCANS. If VALIDATE_SCANS is set
-     to 2, then any time slices outside the expected map area are
-     nullified even if the total number of such time slices is small. This
-     function does not have direct access to the config KeyMap, so it gets
-     the VALIDATE_SCANS value from the smurf globals keymap. The top level
-     makemap function copies the VALIDATE_SCANS value from the config keymap
-     to the globals keymap. */
+     amount of time outside the expected map area), report an error or null
+     the telescope data for the subscan. This check can be suppressed
+     by setting a zero value for config parameter VALIDATE_SCANS. If
+     VALIDATE_SCANS is set to 2, then any time slices outside the expected
+     map area are nullified even if the total number of such time slices is
+     small. This function does not have direct access to the config KeyMap,
+     so it gets the VALIDATE_SCANS value from the smurf globals keymap. The
+     top level makemap function copies the VALIDATE_SCANS value from the
+     config keymap to the globals keymap. */
   validate_scans = smf_get_global0I( "VALIDATE_SCANS", 0, status );
   if ( validate_scans && !smf__validate_scan( hdr, (validate_scans==2), status ) ) {
-    size_t nframes = hdr->nframes;
-    JCMTState * curstate;
-    size_t i;
-    for ( i=0; i<nframes; i++ ) {
-      curstate = &((hdr->allState)[i]);
-      curstate->jos_drcontrol |= DRCNTRL__PTCS_BIT;
+    if( validate_scans == -1 ) {
+      *status = SMF__REJECT;
+      if( data->file && data->file->ndfid ) {
+        smf_smfFile_msg( data->file, "N", 1, "<unknown>" );
+        errRep( "", INDENT "Rejecting subscan ^N due to extreme excursion",
+                status );
+      } else if( data->hdr && data->hdr->fitshdr ){
+        int subscan, ut, obs;
+        char buffer[10];
+        smf_fits_getS( data->hdr, "SUBARRAY", buffer, sizeof(buffer), status );
+        smf_getfitsi( data->hdr, "NSUBSCAN", &subscan, status );
+        smf_getfitsi( data->hdr, "UTDATE", &ut, status );
+        smf_getfitsi( data->hdr, "OBSNUM", &obs, status );
+        errRepf( "", INDENT "%s %d #%d - Rejecting subscan %d due to extreme excursion",
+                status, buffer, ut, obs, subscan);
+      } else {
+        errRep( "", INDENT "Rejecting subscan due to extreme excursion",
+                status );
+      }
+    } else {
+      size_t nframes = hdr->nframes;
+      JCMTState * curstate;
+      size_t i;
+      for ( i=0; i<nframes; i++ ) {
+        curstate = &((hdr->allState)[i]);
+        curstate->jos_drcontrol |= DRCNTRL__PTCS_BIT;
+      }
+
+      if( data->file && data->file->ndfid ) {
+        smf_smfFile_msg( data->file, "N", 1, "<unknown>" );
+        msgOut( "", INDENT "WARNING: Rejecting subscan ^N due to extreme excursion",
+                status );
+      } else if( data->hdr && data->hdr->fitshdr ){
+        int subscan, ut, obs;
+        char buffer[10];
+        smf_fits_getS( data->hdr, "SUBARRAY", buffer, sizeof(buffer), status );
+        smf_getfitsi( data->hdr, "NSUBSCAN", &subscan, status );
+        smf_getfitsi( data->hdr, "UTDATE", &ut, status );
+        smf_getfitsi( data->hdr, "OBSNUM", &obs, status );
+        msgOutf( "", INDENT "WARNING: %s %d #%d - Rejecting subscan %d due to extreme excursion",
+                status, buffer, ut, obs, subscan);
+      } else {
+        msgOut( "", INDENT "WARNING: Rejecting subscan due to extreme excursion",
+                status );
+      }
+      have_fixed |= SMF__FIXED_JCMTSTATE;
     }
-    msgOut( "", INDENT "WARNING: Rejecting subscan due to extreme excursion",
-            status );
-    have_fixed |= SMF__FIXED_JCMTSTATE;
   }
 
   /* The second half of observation 14 on 20111215 (scuba2_00014_20111215T061536)

@@ -1491,7 +1491,7 @@ AstKeyMap *smf_groupscans( const Grp *igrp,  int size, int *maxsyspop,
 
 Grp *smf_grp_new( const Grp *grp, const char *type, int *status );
 
-void smf_grp_related( const Grp *igrp, const size_t grpsize,
+void smf_grp_related( Grp *igrp, const size_t grpsize,
                       const int grouping, const int checksubinst,
                       double maxlen_s, double *srate_maxlen,
                       AstKeyMap *keymap, dim_t *maxconcatlen,
@@ -1535,7 +1535,7 @@ int smf_isdark( const smfData *data, int * status );
 int smf_isfft( const smfData *indata, dim_t rdims[2], dim_t *nbolo,
                dim_t fdims[2], double df[2], size_t *ndims, int *status );
 
-void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
+void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
                      const Grp *bolrootgrp, const Grp *shortrootgrp,
                      const Grp *flagrootgrp, const Grp *samprootgrp,
                      AstKeyMap *keymap,
