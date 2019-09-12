@@ -52,6 +52,9 @@
 *  History:
 *     9-MAY-2019 (DSB):
 *        Original version.
+*     12-SEP_2019 (DSB):
+*        Change to use a source function that preserves the end-of-line
+*        white space, which is significant in the MOC string serialisation.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,7 +86,7 @@
       COMMON /ATLSRC/ IGRPC, NEXT, SIZE
 
 *  External References:
-      EXTERNAL ATL_SRC1
+      EXTERNAL ATL_SRC3
 
 *  Local Variables:
       INTEGER CHAN
@@ -111,7 +114,7 @@
 
 *  Create an MocChan through which to read the Objects stored in the
 *  group.
-      CHAN = AST_MOCCHAN( ATL_SRC1, AST_NULL, 'ReportLevel=2',
+      CHAN = AST_MOCCHAN( ATL_SRC3, AST_NULL, 'ReportLevel=2',
      :                    STATUS )
 
 *  See if any attributes should be set in the channel.
@@ -140,5 +143,95 @@
 
 *  End the AST context.
       CALL AST_END( STATUS )
+
+      END
+
+
+
+      SUBROUTINE ATL_SRC3( STATUS )
+*+
+*  Name:
+*     ATL_SRC3
+
+*  Purpose:
+*     A source function for use with a MocChan.
+
+*  Description:
+*     White space, including white space at the ends of lines, is
+*     significant in the MOC string serialisation. This function is like
+*     ATL_SRC1 except that it adds a space to the end of each line
+*     supplied to AST. This space is equivalent to the carriage return/
+*     line-feed character marking the end of each line of text, but which
+*     will have been removed by GRP.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Copyright:
+*     Copyright (C) 2019 East Asian Observatory
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*-
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'GRP_PAR'
+
+*  Arguments:
+      INTEGER STATUS
+
+*  Global Variables.
+      INTEGER IGRPC
+      INTEGER NEXT
+      INTEGER SIZE
+      COMMON /ATLSRC/ IGRPC, NEXT, SIZE
+
+*  External References:
+      INTEGER CHR_LEN
+
+*  Local Variables:
+      CHARACTER BUF*(GRP__SZNAM)
+      INTEGER BLEN
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  If there are no more elements in the group, return a length of -1.
+      IF( NEXT .GT. SIZE ) THEN
+         CALL AST_PUTLINE( ' ', -1, STATUS )
+
+*  Otherwise, get the element from the group.
+      ELSE
+         CALL GRP_GET( IGRPC, NEXT, 1, BUF, STATUS )
+
+*  Get its used length.
+         BLEN = CHR_LEN( BUF )
+
+*  If possible, increase this length by one to include a trailing space
+*  (Fortran strings are space padded). This space acts as a separator
+*  between the last value on this line and the first value on the next line.
+*  The carriage return/line-feed at the end of the line is supposed to
+*  serve this purpose, but GRP will have removed it.
+         IF( BLEN .LT. LEN( BUF ) ) BLEN = BLEN + 1
+
+*  Store the line in the channel, and increment the index of the next
+*  element to be read from the group.
+         CALL AST_PUTLINE( BUF, BLEN, STATUS )
+         NEXT = NEXT + 1
+      END IF
 
       END

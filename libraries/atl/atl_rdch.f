@@ -257,7 +257,7 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  If there are no more lements in the group, return a length of -1.
+*  If there are no more elements in the group, return a length of -1.
       IF( NEXT .GT. SIZE ) THEN
          CALL AST_PUTLINE( ' ', -1, STATUS )
 
@@ -265,7 +265,7 @@
       ELSE
          CALL GRP_GET( IGRPC, NEXT, 1, BUF, STATUS )
 
-*  Get the idnices of the first and last non-blank characters, and
+*  Get the indices of the first and last non-blank characters, and
 *  its used length.
          CALL CHR_FANDL( BUF, F, L )
          BLEN = L
