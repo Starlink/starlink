@@ -368,9 +368,9 @@
                   NBYTE = 0
                   IF( AST_GETFITSS( FC, 'TFORM1', TFORM,
      :                              STATUS )  ) THEN
-                     IF( TFORM .EQ. '1J' ) THEN
+                     IF( TFORM .EQ. '1J' .OR. TFORM .EQ. 'J' ) THEN
                         NBYTE = 4
-                     ELSE IF( TFORM .EQ. '1K' ) THEN
+                     ELSE IF( TFORM .EQ. '1K' .OR. TFORM .EQ. 'K' ) THEN
                         NBYTE = 8
                      END IF
                   END IF
