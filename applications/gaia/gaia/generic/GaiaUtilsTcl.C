@@ -2168,12 +2168,14 @@ static int GaiaUtilsFitsMocRead( ClientData clientData, Tcl_Interp *interp,
                             int nb = 0;
                             char *tform = fitsio->get( "TFORM1" );
                             void *data;
-                            if ( strcmp( tform, "1J" ) == 0 ) {
+                            if ( ( strcmp( tform, "1J" ) == 0 ) ||
+                                 ( strcmp( tform, "J" ) == 0 ) ) {
                                 nb = 4;
                                 data = (void *) malloc( nb * moclen );
                                 fitsio->getTableColumn( 1, (int *)data,
                                                         moclen );
-                            } else if ( strcmp( tform, "1K" ) == 0 ) {
+                            } else if ( ( strcmp( tform, "1K" ) == 0 ) ||
+                                        ( strcmp( tform, "K" ) == 0 ) ) {
                                 nb = 8;
                                 data = (void *) malloc( nb * moclen );
                                 fitsio->getTableColumn( 1, (LONGLONG *)data,
