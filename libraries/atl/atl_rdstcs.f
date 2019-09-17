@@ -1,25 +1,25 @@
-      SUBROUTINE ATL_RDSTCS( IGRP, IAST, STATUS )
+      SUBROUTINE ATL_RDSTCS( VFS, IAST, STATUS )
 *+
 *  Name:
 *     ATL_RDSTCS
 
 *  Purpose:
-*     Read an AST Object from a GRP group using an StcsChan.
+*     Read an AST Object from a VFS using an StcsChan.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ATL_RDSTCS( IGRP, IAST, STATUS )
+*     CALL ATL_RDSTCS( VFS, IAST, STATUS )
 
 *  Description:
-*     Read an AST Object from a GRP group using an StcsChan.The StcsChan
-*     can be configured using a set of attribute settings specified in
-*     the environment variable ATOOLS_CHATT_IN.
+*     Read an AST Object from a VFS (see atl2.c) using an StcsChan. The
+*     StcsChan can be configured using a set of attribute settings specified
+*     in the environment variable ATOOLS_CHATT_IN.
 
 *  Arguments:
-*     IGRP = INTEGER (Given)
-*        An identifier for the group holding the text.
+*     VFS = INTEGER (Given)
+*        The VFS holding the text, such as returned by ATL_RDVFS.
 *     IAST = INTEGER (Returned)
 *        The AST Object, or AST__NULL.
 *     STATUS = INTEGER (Given and Returned)
@@ -55,6 +55,8 @@
 *     7-NOV-2017 (DSB):
 *        Allow Channel attributes to be set using environment variable
 *        ATOOLS_CHATT_IN.
+*     16-SEP-2019 (DSB):
+*        Changed to use a VFS (see atl2.c) as input instead of a GRP group.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -71,7 +73,7 @@
       INCLUDE 'AST_ERR'          ! AST error constants
 
 *  Arguments Given:
-      INTEGER IGRP
+      INTEGER VFS
 
 *  Arguments Returned:
       INTEGER IAST
@@ -80,10 +82,14 @@
       INTEGER STATUS             ! Global status
 
 *  Global Variables.
-      INTEGER IGRPC
+      INTEGER VFSC
       INTEGER NEXT
       INTEGER SIZE
-      COMMON /ATLSRC/ IGRPC, NEXT, SIZE
+      LOGICAL READCH
+      LOGICAL BEGIN
+      INTEGER MXLEN
+      INTEGER IPLINE
+      COMMON /ATLSRC/ VFSC, NEXT, SIZE, READCH, BEGIN, MXLEN, IPLINE
 
 *  External References:
       EXTERNAL ATL_SRC1
@@ -102,18 +108,22 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Store the group identifer in common so that the source function can
-*  get at it.
-      IGRPC = IGRP
+*  Store the VFS in common so that the source function can get at it.
+      VFSC = VFS
 
-*  Initialise the next group element to be read.
+*  Initialise the next VFS element to be read.
       NEXT = 1
 
-*  Store the size of the group.
-      CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
+*  Store the size of the VFS.
+      CALL ATL2_GTSIZ( VFS, SIZE, STATUS )
+
+*  Get the maximum length of a line in the VFS and allocate a buffer to
+*  store one line.
+      CALL ATL2_GTMXL( VFS, MXLEN, STATUS )
+      CALL PSX_CALLOC( MXLEN, '_BYTE', IPLINE, STATUS )
 
 *  Create an StcsChan through which to read the Objects stored in the
-*  group.
+*  VFS.
       CHAN = AST_STCSCHAN( ATL_SRC1, AST_NULL, 'ReportLevel=2',
      :                     STATUS )
 
@@ -135,6 +145,9 @@
          CALL ERR_REP( 'ATL_RDSTCS_ERR1', 'No AST Object could be '//
      :                 'read from the supplied file.', STATUS )
       END IF
+
+*  Free line buffer.
+      CALL PSX_FREE( IPLINE, STATUS )
 
 *  Export the returned Object from the current AST context so that it is
 *  not annulled by the following call to AST_END. If an error has occurred,

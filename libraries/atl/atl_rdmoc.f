@@ -1,25 +1,25 @@
-      SUBROUTINE ATL_RDMOC( IGRP, IAST, STATUS )
+      SUBROUTINE ATL_RDMOC( VFS, IAST, STATUS )
 *+
 *  Name:
 *     ATL_RDMOC
 
 *  Purpose:
-*     Read an AST Object from a GRP group using an MocChan.
+*     Read an AST Object from a VFS using a MocChan.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ATL_RDMOC( IGRP, IAST, STATUS )
+*     CALL ATL_RDMOC( VFS, IAST, STATUS )
 
 *  Description:
-*     Read an AST Object from a GRP group using an MocChan.The MocChan
-*     can be configured using a set of attribute settings specified in
-*     the environment variable ATOOLS_CHATT_IN.
+*     Read an AST Object from a VFS (see atl2.c) using an MocChan. The
+*     MocChan can be configured using a set of attribute settings specified
+*     in the environment variable ATOOLS_CHATT_IN.
 
 *  Arguments:
-*     IGRP = INTEGER (Given)
-*        An identifier for the group holding the text.
+*     VFS = INTEGER (Given)
+*        The VFS holding the text, such as returned by ATL_RDVFS.
 *     IAST = INTEGER (Returned)
 *        The AST Object, or AST__NULL.
 *     STATUS = INTEGER (Given and Returned)
@@ -55,6 +55,9 @@
 *     12-SEP_2019 (DSB):
 *        Change to use a source function that preserves the end-of-line
 *        white space, which is significant in the MOC string serialisation.
+*     16-SEP-2019 (DSB):
+*        Changed to use a VFS (see atl2.c) as input instead of a GRP group.
+*        This allows files with very long lines of text to be read.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -71,7 +74,7 @@
       INCLUDE 'AST_ERR'          ! AST error constants
 
 *  Arguments Given:
-      INTEGER IGRP
+      INTEGER VFS
 
 *  Arguments Returned:
       INTEGER IAST
@@ -80,10 +83,14 @@
       INTEGER STATUS             ! Global status
 
 *  Global Variables.
-      INTEGER IGRPC
+      INTEGER VFSC
       INTEGER NEXT
       INTEGER SIZE
-      COMMON /ATLSRC/ IGRPC, NEXT, SIZE
+      LOGICAL READCH
+      LOGICAL BEGIN
+      INTEGER MXLEN
+      INTEGER IPLINE
+      COMMON /ATLSRC/ VFSC, NEXT, SIZE, READCH, BEGIN, MXLEN, IPLINE
 
 *  External References:
       EXTERNAL ATL_SRC3
@@ -102,18 +109,24 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Store the group identifer in common so that the source function can
+*  Store the VFS in common so that the source function can
 *  get at it.
-      IGRPC = IGRP
+      VFSC = VFS
 
-*  Initialise the next group element to be read.
+*  Initialise the next VFS element to be read.
       NEXT = 1
 
-*  Store the size of the group.
-      CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
+*  Store the size of the VFS.
+      CALL ATL2_GTSIZ( VFS, SIZE, STATUS )
+
+*  Get the maximum length of a line in the VFS and allocate a buffer to
+*  store one line. Add on an extra space for an implied newline.
+      CALL ATL2_GTMXL( VFS, MXLEN, STATUS )
+      MXLEN = MXLEN + 1
+      CALL PSX_CALLOC( MXLEN, '_BYTE', IPLINE, STATUS )
 
 *  Create an MocChan through which to read the Objects stored in the
-*  group.
+*  VFS.
       CHAN = AST_MOCCHAN( ATL_SRC3, AST_NULL, 'ReportLevel=2',
      :                    STATUS )
 
@@ -135,6 +148,9 @@
          CALL ERR_REP( 'ATL_RDMOC_ERR1', 'No AST Object could be '//
      :                 'read from the supplied file.', STATUS )
       END IF
+
+*  Free line buffer.
+      CALL PSX_FREE( IPLINE, STATUS )
 
 *  Export the returned Object from the current AST context so that it is
 *  not annulled by the following call to AST_END. If an error has occurred,
@@ -162,7 +178,7 @@
 *     ATL_SRC1 except that it adds a space to the end of each line
 *     supplied to AST. This space is equivalent to the carriage return/
 *     line-feed character marking the end of each line of text, but which
-*     will have been removed by GRP.
+*     will have been removed by the VFS.
 
 *  Language:
 *     Starlink Fortran 77
@@ -189,49 +205,62 @@
 
 *-
       INCLUDE 'SAE_PAR'
-      INCLUDE 'GRP_PAR'
+      INCLUDE 'CNF_PAR'
 
 *  Arguments:
       INTEGER STATUS
 
 *  Global Variables.
-      INTEGER IGRPC
+      INTEGER VFSC
       INTEGER NEXT
       INTEGER SIZE
-      COMMON /ATLSRC/ IGRPC, NEXT, SIZE
+      LOGICAL READCH
+      LOGICAL BEGIN
+      INTEGER MXLEN
+      INTEGER IPLINE
+      COMMON /ATLSRC/ VFSC, NEXT, SIZE, READCH, BEGIN, MXLEN, IPLINE
 
 *  External References:
       INTEGER CHR_LEN
 
 *  Local Variables:
-      CHARACTER BUF*(GRP__SZNAM)
       INTEGER BLEN
+      LOGICAL TRUNC
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  If there are no more elements in the group, return a length of -1.
+*  If there are no more elements in the VFS, return a length of -1.
       IF( NEXT .GT. SIZE ) THEN
          CALL AST_PUTLINE( ' ', -1, STATUS )
 
-*  Otherwise, get the element from the group.
+*  Otherwise, get the element from the VFS.
       ELSE
-         CALL GRP_GET( IGRPC, NEXT, 1, BUF, STATUS )
+         CALL ATL2_GET( VFSC, NEXT, 1, %VAL(CNF_PVAL(IPLINE)),
+     :                  TRUNC, STATUS, %VAL(MXLEN) )
+         IF( TRUNC .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'ATL: Text truncated whilst reading an'//
+     :                    ' AST object from a text file:', STATUS )
+            CALL ERR_REP( ' ', BUF, STATUS )
+         ELSE
 
 *  Get its used length.
-         BLEN = CHR_LEN( BUF )
+            BLEN = CHR_LEN( %VAL(CNF_PVAL(IPLINE)), %VAL(MXLEN) )
 
-*  If possible, increase this length by one to include a trailing space
-*  (Fortran strings are space padded). This space acts as a separator
-*  between the last value on this line and the first value on the next line.
-*  The carriage return/line-feed at the end of the line is supposed to
-*  serve this purpose, but GRP will have removed it.
-         IF( BLEN .LT. LEN( BUF ) ) BLEN = BLEN + 1
+*  Increase this length by one to include a trailing space (Fortran strings
+*  are space padded). This space acts as a separator between the last value
+*  on this line and the first value on the next line. The carriage
+*  return/line-feed at the end of the line is supposed to serve this
+*  purpose, but VFS will have removed it.
+            BLEN = BLEN + 1
 
 *  Store the line in the channel, and increment the index of the next
 *  element to be read from the group.
-         CALL AST_PUTLINE( BUF, BLEN, STATUS )
-         NEXT = NEXT + 1
+            CALL AST_PUTLINE( %VAL(CNF_PVAL(IPLINE)), BLEN, STATUS,
+     :                        %VAL(MXLEN) )
+            NEXT = NEXT + 1
+         END IF
       END IF
 
       END

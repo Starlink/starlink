@@ -134,6 +134,9 @@
 *        If a Frame was requested but a Region was supplied, return the
 *        equivalent Frame. This is to avoid clipping introduced by using
 *        Regions in place of Frrames.
+*     16-SEP-2019 (DSB):
+*        Change to use an ATL "virtual file structures" instead of a GRP group.
+*        This allows text files with very long lines to be read successfully.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -149,7 +152,6 @@
       INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'NDF_PAR'          ! NDF constants
-      INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'CNF_PAR'          ! CNF constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
 
@@ -190,7 +192,6 @@
       INTEGER IAST2
       INTEGER ICARD
       INTEGER IFRM
-      INTEGER IGRP
       INTEGER INDF
       INTEGER IP
       INTEGER IPAR
@@ -202,6 +203,7 @@
       INTEGER NCOL
       INTEGER NDIM
       INTEGER OUTLINE
+      INTEGER VFS
       LOGICAL AGAIN
       LOGICAL ANYF
       LOGICAL GOTXTN
@@ -212,7 +214,7 @@
 
 *  Initialise.
       IAST = AST__NULL
-      IGRP = GRP__NOID
+      VFS = 0
       NDIM = 0
       OUTLINE = AST__NULL
 
@@ -440,15 +442,16 @@
 *  If it was not a FITS file, native HDS NDF or HDS object ...
       IF( IAST .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  Obtain a GRP group containing text from which an Object is to be read.
-         CALL ATL_GTGRP( PARAM, IGRP, STATUS )
+*  Obtain an ATL "virtual file structure" containing text from which an
+*  Object is to be read.
+         CALL ATL_GTVFS( PARAM, VFS, STATUS )
 
 *  Abort if requested.
          IF( STATUS .EQ. PAR__NULL .OR.
      :       STATUS .EQ. PAR__ABORT ) GO TO 999
 
-*  Tried to read an object from the group.
-         CALL ATL_RDGRP( IGRP, IAST, STATUS )
+*  Tried to read an object from the VFS.
+         CALL ATL_RDVFS( VFS, IAST, STATUS )
 
 *  If it was not in a format readable by ATL, annull the error, and try to
 *  access it as a foreign format NDF.
@@ -473,8 +476,8 @@
 
 *  If it could not be read as a foreign NDF, re-read it as an AST dump.
 *  This is so that we end up with a useful error message being displayed.
-            ELSE IF( IGRP .NE. GRP__NOID ) THEN
-               CALL ATL_RDGRP( IGRP, IAST, STATUS )
+            ELSE IF( VFS .NE. 0 ) THEN
+               CALL ATL_RDVFS( VFS, IAST, STATUS )
             END IF
          END IF
 
@@ -613,8 +616,8 @@
 *  Annul the object if an error occurred.
  999  IF( STATUS .NE. SAI__OK ) CALL AST_ANNUL( IAST, STATUS )
 
-*  Delete any groups.
-      IF( IGRP .NE. GRP__NOID ) CALL GRP_DELET( IGRP, STATUS )
+*  Free the VFS.
+      IF( VFS .NE. 0 ) CALL ATL_FRVFS( VFS, STATUS )
 
 *  Annul any outline region.
       IF( OUTLINE .NE. AST__NULL ) CALL AST_ANNUL( OUTLINE, STATUS )

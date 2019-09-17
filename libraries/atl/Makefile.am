@@ -34,7 +34,7 @@ PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
 
 #  List of C functions required by both ADAM and standalone
 #  libraries.
-BASIC_C_ROUTINES = atl.c atlMapGet1C.c atlMapPut1C.c atlShow.c \
+BASIC_C_ROUTINES = atl.c atl2.c atlMapGet1C.c atlMapPut1C.c atlShow.c \
 atlMatchRegion.c atlAddWcsAxis.c atlReadFile.c atl_addwcsaxis.c \
 atlReadTable.c atlTableLutMap.c atl_chrsplitre.c atlKy2hd.c \
 atl_ky2hd.c atlHd2ky.c atl_hd2ky.c atlFindMap.c atlPairAxes.c \
@@ -46,10 +46,11 @@ BASIC_F_ROUTINES = atl_axtrm.f atl_mklut.f atl_rm.f atl_notif.f \
 atl_rdgrp.f atl_rdfch.f atl_rdch.f atl_fspec.f atl_plroi.f atl_cutpl.f \
 atl_cppla.f atl_ttlpl.f atl_mgfts.f atl_ptftr.f atl_ptftd.f atl_pxdup.f \
 atl_ptfts.f atl_ptfti.f atl_ptftl.f atl_tolut.f atl_findsky.f atl_wcspx.f \
-atl_kychk.f atl_rdstcs.f atl_rmblft.f atl_rdmoc.f atl_mocft.f
+atl_kychk.f atl_rdstcs.f atl_rmblft.f atl_rdmoc.f atl_mocft.f atl_frvfs.f \
+atl_rdvfs.f atl2_g2vfs.f
 
 #  Additional Fortran routines required for the ADAM library.
-ADAM_F_ROUTINES = atl_creat.f atl_gtgrp.f
+ADAM_F_ROUTINES = atl_creat.f atl_gtgrp.f atl_gtvfs.f
 
 #  Additional C routines required for the ADAM library.
 ADAM_C_ROUTINES = atlGetParam.c atlDumpFits.c atl_adam.c

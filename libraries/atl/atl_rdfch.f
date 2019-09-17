@@ -1,25 +1,26 @@
-      SUBROUTINE ATL_RDFCH( IGRP, IAST, STATUS )
+      SUBROUTINE ATL_RDFCH( VFS, IAST, STATUS )
 *+
 *  Name:
 *     ATL_RDFCH
 
 *  Purpose:
-*     Read an AST Object from a GRP group using a FitsChan.
+*     Read an AST Object from a VFS using a FitsChan.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ATL_RDFCH( IGRP, IAST, STATUS )
+*     CALL ATL_RDFCH( VFS, IAST, STATUS )
 
 *  Description:
-*     Read an AST Object from a GRP group using a FitsChan. The FitsChan
-*     can be configured using a set of attribute settings specified in
-*     the environment variable ATOOLS_CHATT_IN.
+*     Read an AST Object from a VFS (see atl2.c) using a FitsChan. The
+*     FitsChan can be configured using a set of attribute settings specified
+*     in the environment variable ATOOLS_CHATT_IN.
 
 *  Arguments:
-*     IGRP = INTEGER (Given)
-*        An identifier for the group holding the text.
+*     VFS = INTEGER (Given)
+*        An identifier for the VFS holding the text, such as created by
+*        routine ATL_RDVFS.
 *     IAST = INTEGER (Returned)
 *        The AST Object, or AST__NULL.
 *     STATUS = INTEGER (Given and Returned)
@@ -27,6 +28,7 @@
 
 *  Copyright:
 *     Copyright (C) 2001, 2003 Central Laboratory of the Research
+*     Copyright (C) 2019 East Asian Observatory
 *     Councils. All Rights Reserved.
 
 *  Licence:
@@ -57,6 +59,10 @@
 *     7-NOV-2017 (DSB):
 *        Allow Channel attributes to be set using environment variable
 *        ATOOLS_CHATT_IN.
+*     16-SEP-2019 (DSB):
+*        Changed to use a VFS as input rather than a GRP group. This
+*        allows it to read long lines (such as used sometimes to store
+*        MOCs).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -73,7 +79,7 @@
       INCLUDE 'AST_ERR'          ! AST error constants
 
 *  Arguments Given:
-      INTEGER IGRP
+      INTEGER VFS
 
 *  Arguments Returned:
       INTEGER IAST
@@ -82,10 +88,10 @@
       INTEGER STATUS             ! Global status
 
 *  Global Variables.
-      INTEGER IGRPC
+      INTEGER VFSC
       INTEGER NEXT
       INTEGER SIZE
-      COMMON /ATLSRC/ IGRPC, NEXT, SIZE
+      COMMON /ATLSRC/ VFSC, NEXT, SIZE
 
 *  External References:
       EXTERNAL ATL_SRC2
@@ -104,18 +110,18 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Store the group identifer in common so that the source function can
+*  Store the VFS identifer in common so that the source function can
 *  get at it.
-      IGRPC = IGRP
+      VFSC = VFS
 
-*  Initialise the next group element to be read.
+*  Initialise the next VFS element to be read.
       NEXT = 1
 
-*  Store the size of the group.
-      CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
+*  Store the size of the VFS.
+      CALL ATL2_GTSIZ( VFS, SIZE, STATUS )
 
 *  Create a FitsChan through which to read the Objects stored in the
-*  group.
+*  VFS.
       CHAN = AST_FITSCHAN( ATL_SRC2, AST_NULL, ' ', STATUS )
 
 *  See if any attributes should be set in the channel.
@@ -198,10 +204,13 @@
       INTEGER STATUS
 
 *  Global Variables.
-      INTEGER IGRPC
+      INTEGER VFSC
       INTEGER NEXT
       INTEGER SIZE
-      COMMON /ATLSRC/ IGRPC, NEXT, SIZE
+      COMMON /ATLSRC/ VFSC, NEXT, SIZE
+
+* Local Variables:
+      LOGICAL TRUNC
 
 *  Initialise things to indicate "no more headers".
       BUF = ' '
@@ -210,10 +219,12 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  If any elements remain to be read, get the next element from the group,
-*  and increment the index of the next element to be read from the group.
+*  If any elements remain to be read, get the next element from the VFS,
+*  and increment the index of the next element to be read from the VFS.
+*  No chance of truncation since all FITS headers are exactly 80 characters
+*  long.
       IF( NEXT .LE. SIZE ) THEN
-         CALL GRP_GET( IGRPC, NEXT, 1, BUF, STATUS )
+         CALL ATL2_GET( VFSC, NEXT, 1, BUF, TRUNC, STATUS )
          NEXT = NEXT + 1
          ATL_SRC2 = 1
       END IF
