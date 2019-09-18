@@ -143,14 +143,18 @@ ndf1Ptloc.c ndfCancl.c fortran_interface_adam.c v1_interface_adam.c
 
 # Testing
 
-TESTS = ndfCtest ndfCnulltest
-check_PROGRAMS = ndfCtest ndfCnulltest
+TESTS = ndfCtest ndfCnulltest ndf_ftest ndf_ftest8
+check_PROGRAMS = ndfCtest ndfCnulltest ndf_ftest ndf_ftest8
 ndfCtest_SOURCES = ndfCtest.c
 ndfCnulltest_SOURCES = ndfCnulltest.c
+ndf_ftest_SOURCES = ndf_ftest.f
+ndf_ftest8_SOURCES = ndf_ftest8.f
 
 # LDADD is the expansion of ndf_link, with -lndf replaced by libndf.la
 ndfCtest_LDADD = libndf.la `$(srcdir)/ndf_link`
 ndfCnulltest_LDADD = libndf.la `$(srcdir)/ndf_link`
+ndf_ftest_LDADD = libndf.la `$(srcdir)/ndf_link`
+ndf_ftest8_LDADD = libndf.la `$(srcdir)/ndf_link`
 
 dist_starnews_DATA = ndf.news
 dist_pkgdata_DATA = LICENCE

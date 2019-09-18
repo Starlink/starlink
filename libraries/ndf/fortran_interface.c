@@ -1928,7 +1928,7 @@ MAKE_PTSZ(W, w, WORD)
 
 /* -------  Routines with 64 bit arguments -------------- */
 
-F77_SUBROUTINE(ndf_boundk)( INTEGER(INDF),
+F77_SUBROUTINE(ndf_bound8)( INTEGER(INDF),
                             INTEGER(NDIMX),
                             INTEGER8_ARRAY(LBND),
                             INTEGER8_ARRAY(UBND),
@@ -1958,7 +1958,7 @@ F77_SUBROUTINE(ndf_boundk)( INTEGER(INDF),
    }
 }
 
-F77_SUBROUTINE(ndf_dimk)( INTEGER(INDF),
+F77_SUBROUTINE(ndf_dim8)( INTEGER(INDF),
                           INTEGER(NDIMX),
                           INTEGER8_ARRAY(DIM),
                           INTEGER(NDIM),
@@ -1979,7 +1979,7 @@ F77_SUBROUTINE(ndf_dimk)( INTEGER(INDF),
    for( ; i < *NDIMX; i++ ) DIM[ i ] = 1;
 }
 
-F77_SUBROUTINE(ndf_mapk)( INTEGER(INDF),
+F77_SUBROUTINE(ndf_map8)( INTEGER(INDF),
                           CHARACTER(COMP),
                           CHARACTER(TYPE),
                           CHARACTER(MMOD),
@@ -2017,7 +2017,7 @@ F77_SUBROUTINE(ndf_mapk)( INTEGER(INDF),
    *EL = el;
 }
 
-F77_SUBROUTINE(ndf_mapzk)( INTEGER(INDF),
+F77_SUBROUTINE(ndf_mapz8)( INTEGER(INDF),
                            CHARACTER(COMP),
                            CHARACTER(TYPE),
                            CHARACTER(MMOD),
@@ -2059,7 +2059,7 @@ F77_SUBROUTINE(ndf_mapzk)( INTEGER(INDF),
    *EL = el;
 }
 
-F77_SUBROUTINE(ndf_mapqlk)( INTEGER(INDF),
+F77_SUBROUTINE(ndf_mapql8)( INTEGER(INDF),
                             INTEGER(PNTR),
                             INTEGER8(EL),
                             LOGICAL(BAD),
@@ -2080,7 +2080,7 @@ F77_SUBROUTINE(ndf_mapqlk)( INTEGER(INDF),
    *EL = el;
 }
 
-F77_SUBROUTINE(ndf_newk)( CHARACTER(FTYPE),
+F77_SUBROUTINE(ndf_new8)( CHARACTER(FTYPE),
                           INTEGER(NDIM),
                           INTEGER8_ARRAY(LBND),
                           INTEGER8_ARRAY(UBND),
@@ -2112,7 +2112,7 @@ F77_SUBROUTINE(ndf_newk)( CHARACTER(FTYPE),
 
 }
 
-F77_SUBROUTINE(ndf_newpk)( CHARACTER(FTYPE),
+F77_SUBROUTINE(ndf_newp8)( CHARACTER(FTYPE),
                            INTEGER(NDIM),
                            INTEGER8_ARRAY(UBND),
                            INTEGER(PLACE),
@@ -2138,7 +2138,7 @@ F77_SUBROUTINE(ndf_newpk)( CHARACTER(FTYPE),
 
 }
 
-F77_SUBROUTINE(ndf_sbndk)( INTEGER(NDIM),
+F77_SUBROUTINE(ndf_sbnd8)( INTEGER(NDIM),
                            INTEGER8_ARRAY(LBND),
                            INTEGER8_ARRAY(UBND),
                            INTEGER(INDF),
@@ -2162,7 +2162,7 @@ F77_SUBROUTINE(ndf_sbndk)( INTEGER(NDIM),
    ndfSbnd_( ndim, lbnd, ubnd, *INDF, STATUS );
 }
 
-F77_SUBROUTINE(ndf_sectk)( INTEGER(INDF1),
+F77_SUBROUTINE(ndf_sect8)( INTEGER(INDF1),
                            INTEGER(NDIM),
                            INTEGER8_ARRAY(LBND),
                            INTEGER8_ARRAY(UBND),
@@ -2189,7 +2189,7 @@ F77_SUBROUTINE(ndf_sectk)( INTEGER(INDF1),
 
 }
 
-F77_SUBROUTINE(ndf_shiftk)( INTEGER(NSHIFT),
+F77_SUBROUTINE(ndf_shift8)( INTEGER(NSHIFT),
                             INTEGER8_ARRAY(SHIFT),
                             INTEGER(INDF),
                             INTEGER(STATUS) ) {
@@ -2207,7 +2207,7 @@ F77_SUBROUTINE(ndf_shiftk)( INTEGER(NSHIFT),
 
 }
 
-F77_SUBROUTINE(ndf_sizek)( INTEGER(INDF),
+F77_SUBROUTINE(ndf_size8)( INTEGER(INDF),
                            INTEGER8(NPIX),
                            INTEGER(STATUS) ) {
    GENPTR_INTEGER(INDF)
