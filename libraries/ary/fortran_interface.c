@@ -581,7 +581,7 @@ MAKE_PTSZ(W, w, WORD)
 
 /* -------  Routines with 64 bit arguments -------------- */
 
-F77_SUBROUTINE(ary_boundk)( INTEGER(IARY),
+F77_SUBROUTINE(ary_bound8)( INTEGER(IARY),
                             INTEGER(NDIMX),
                             INTEGER8_ARRAY(LBND),
                             INTEGER8_ARRAY(UBND),
@@ -611,7 +611,7 @@ F77_SUBROUTINE(ary_boundk)( INTEGER(IARY),
    }
 }
 
-F77_SUBROUTINE(ary_dimk)( INTEGER(IARY),
+F77_SUBROUTINE(ary_dim8)( INTEGER(IARY),
                           INTEGER(NDIMX),
                           INTEGER8_ARRAY(DIM),
                           INTEGER(NDIM),
@@ -632,7 +632,7 @@ F77_SUBROUTINE(ary_dimk)( INTEGER(IARY),
    for( ; i < *NDIMX; i++ ) DIM[ i ] = 1;
 }
 
-F77_SUBROUTINE(ary_mapk)( INTEGER(IARY),
+F77_SUBROUTINE(ary_map8)( INTEGER(IARY),
                           CHARACTER(TYPE),
                           CHARACTER(MMOD),
                           INTEGER(PNTR),
@@ -660,7 +660,7 @@ F77_SUBROUTINE(ary_mapk)( INTEGER(IARY),
    *EL = el;
 }
 
-F77_SUBROUTINE(ary_mapzk)( INTEGER(IARY),
+F77_SUBROUTINE(ary_mapz8)( INTEGER(IARY),
                            CHARACTER(TYPE),
                            CHARACTER(MMOD),
                            INTEGER(RPNTR),
@@ -692,7 +692,7 @@ F77_SUBROUTINE(ary_mapzk)( INTEGER(IARY),
    *EL = el;
 }
 
-F77_SUBROUTINE(ary_newk)( CHARACTER(FTYPE),
+F77_SUBROUTINE(ary_new8)( CHARACTER(FTYPE),
                           INTEGER(NDIM),
                           INTEGER8_ARRAY(LBND),
                           INTEGER8_ARRAY(UBND),
@@ -728,7 +728,7 @@ F77_SUBROUTINE(ary_newk)( CHARACTER(FTYPE),
    *IARY = aryA2I(ary);
 }
 
-F77_SUBROUTINE(ary_newpk)( CHARACTER(FTYPE),
+F77_SUBROUTINE(ary_newp8)( CHARACTER(FTYPE),
                            INTEGER(NDIM),
                            INTEGER8_ARRAY(UBND),
                            INTEGER(PLACE),
@@ -758,7 +758,7 @@ F77_SUBROUTINE(ary_newpk)( CHARACTER(FTYPE),
    *IARY = aryA2I(ary);
 }
 
-F77_SUBROUTINE(ary_offsk)( INTEGER(IARY1),
+F77_SUBROUTINE(ary_offs8)( INTEGER(IARY1),
                            INTEGER(IARY2),
                            INTEGER(MXOFFS),
                            INTEGER8_ARRAY(OFFS),
@@ -779,7 +779,7 @@ F77_SUBROUTINE(ary_offsk)( INTEGER(IARY1),
    for( ; i < *MXOFFS; i++ ) OFFS[ i ] = 1;
 }
 
-F77_SUBROUTINE(ary_sbndk)( INTEGER(NDIM),
+F77_SUBROUTINE(ary_sbnd8)( INTEGER(NDIM),
                            INTEGER8_ARRAY(LBND),
                            INTEGER8_ARRAY(UBND),
                            INTEGER(IARY),
@@ -803,7 +803,7 @@ F77_SUBROUTINE(ary_sbndk)( INTEGER(NDIM),
    arySbnd( ndim, lbnd, ubnd, aryI2A(*IARY), STATUS );
 }
 
-F77_SUBROUTINE(ary_sectk)( INTEGER(IARY1),
+F77_SUBROUTINE(ary_sect8)( INTEGER(IARY1),
                            INTEGER(NDIM),
                            INTEGER8_ARRAY(LBND),
                            INTEGER8_ARRAY(UBND),
@@ -833,7 +833,7 @@ F77_SUBROUTINE(ary_sectk)( INTEGER(IARY1),
 
 }
 
-F77_SUBROUTINE(ary_shiftk)( INTEGER(NSHIFT),
+F77_SUBROUTINE(ary_shift8)( INTEGER(NSHIFT),
                             INTEGER8_ARRAY(SHIFT),
                             INTEGER(IARY),
                             INTEGER(STATUS) ) {
@@ -851,7 +851,7 @@ F77_SUBROUTINE(ary_shiftk)( INTEGER(NSHIFT),
 
 }
 
-F77_SUBROUTINE(ary_sizek)( INTEGER(IARY),
+F77_SUBROUTINE(ary_size8)( INTEGER(IARY),
                            INTEGER8(NPIX),
                            INTEGER(STATUS) ) {
    GENPTR_INTEGER(IARY)
