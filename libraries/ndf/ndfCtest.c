@@ -1,7 +1,8 @@
 #define _POSIX_SOURCE 1
 
-/* Ensure that ndf.h provides the NDF V2 interface definitions. */
-#define NDF_V2 1
+/* Ensure that ndf.h provides the definitions for the NDF interface that
+   uses 8 byte pixel counters. */
+#define NDF_I8 1
 
 /* External interfaces. */
 /* -------------------- */

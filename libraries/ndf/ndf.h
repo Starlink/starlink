@@ -39,7 +39,7 @@
 *     02110-1301, USA
 
 * Authors:
-*     DSB: David S Berry (JAC, UCLan)
+*     DSB: David S Berry (EAO)
 
 * History:
 *     29-MAY-2018 (DSB):
@@ -963,8 +963,9 @@ void ndfXnew_v1( int indf,
 #define ndfZdelt  ndfZdelt_
 #define ndfZscal  ndfZscal_
 
-/* Version 2 interfaces with 64 bit pixel counters, etc */
-#if defined( NDF_V2 )
+/* Interfaces with 8 byte integer pixel counters, etc (version 2 and
+   onwards). */
+#if defined( NDF_I8 )
 
 #define ndfAmap   ndfAmap_
 #define ndfBound  ndfBound_
@@ -985,7 +986,8 @@ void ndfXnew_v1( int indf,
 #define ndfXnew   ndfXnew_
 
 
-/* Version 1 interfaces with 32 bit pixel counters, etc */
+
+/* Interfaces with 4 byte integer pixel counters, etc (version 1). */
 #else
 
 #define ndfAmap   ndfAmap_v1
