@@ -32742,6 +32742,38 @@ KAPPA: \htmlref{CLINPLOT}{CLINPLOT},
       }{
          The quality expression. Only used if Parameter MOD is \texttt{"QUAL"}.
       }
+      \sstsubsection{
+         USEAXIS = \htmlref{GROUP}{se:groups} (Read)
+      }{
+         USEAXIS is only accessed if the current co-ordinate Frame of the
+         NDF has too many axes.  A group of strings should be supplied
+         specifying the axes which are to be used.  Each axis can
+         be specified using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem
+            Its integer index within the current Frame of the
+            input  NDF (in the range 1 to the number of axes in the
+            current Frame).
+
+            \sstitem
+            Its \htmlattref{Symbol}{Symbol(axis)}~ string such as
+            \texttt{"RA"} or \texttt{"VRAD"}.
+
+            \sstitem
+            A generic option where \texttt{"SPEC"} requests the spectral axis,
+            \texttt{"TIME"} selects the time axis, \texttt{"SKYLON"} and
+            \texttt{"SKYLAT"} picks the sky longitude and latitude axes
+            respectively.  Only those axis domains present are
+            available as options.
+         }
+
+         A list of acceptable values is displayed if an illegal value is
+         supplied.  If a null (\texttt{{!}}) value is supplied, the
+         axes with the same indices as the two used pixel axes within the
+         NDF are used.  \texttt{[!]}
+      }
    }
    \sstexamples{
       \sstexamplesubsection{

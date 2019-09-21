@@ -14483,6 +14483,15 @@ iraf! {
             helpkey *
          }
 
+         parameter useaxis {
+            type LITERAL
+            vpath DEFAULT
+            ppath DYNAMIC DEFAULT
+            default !
+            prompt {The current Frame axes to be used}
+            helpkey *
+         }
+
       }
 
       action mstats {

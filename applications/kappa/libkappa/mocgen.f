@@ -94,6 +94,26 @@
 *        in the supplied string.
 *     QEXP = LITERAL (Read)
 *        The quality expression. Only used if Parameter MOD is "QUAL".
+*     USEAXIS = GROUP (Read)
+*        USEAXIS is only accessed if the current co-ordinate Frame of
+*        the NDF has too many axes. A group of strings should be
+*        supplied specifying the axes which are to be used.
+*        Each axis can be specified using one of the following
+*        options.
+*
+*        - Its integer index within the current Frame of the input
+*        NDF (in the range 1 to the number of axes in the current
+*        Frame).
+*        - Its symbol string such as "RA" or "VRAD".
+*        - A generic option where "SPEC" requests the spectral axis,
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the
+*        sky longitude and latitude axes respectively.  Only those axis
+*        domains present are available as options.
+*
+*        A list of acceptable values is displayed if an illegal value is
+*        supplied.  If a null (!) value is supplied, the axes with the
+*        same indices as the two used pixel axes within the NDF are
+*        used.  [!]
 
 *  Examples:
 *     mocgen m31 m31.fits
