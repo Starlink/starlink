@@ -94,7 +94,7 @@
 *        (!) value is supplied for Parameter LUT.
 *     OUT = NDF (Write)
 *        Output NDF structure containing the data and/or variance array
-*        that is a copy of the input array, but with replacemeent values
+*        that is a copy of the input array, but with replacement values
 *        substituted.
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
@@ -138,7 +138,7 @@
 *     in double precision and convert it to the desired data type.
 *     Do likewise for the new value.  Perform the replacement.  Unmap
 *     the arrays.  Report the number of replacements.
-*     -  Write final error meesage and tidy the NDF system.
+*     -  Write final error message and tidy the NDF system.
 
 *  Related Applications:
 *     KAPPA: CHPIX, FILLBAD, GLITCH, NOMAGIC, SEGMENT, SETMAGIC, ZAPLIN;
