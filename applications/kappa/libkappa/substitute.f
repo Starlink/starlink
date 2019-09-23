@@ -193,7 +193,7 @@
 *     2012 May 9 (MJC):
 *        Add _INT64 support.
 *     4-SEP-2019 (DSB):
-*        Added parameters LUT, INTERP and TYPE.
+*        Added Parameters LUT, INTERP and TYPE.
 *     {enter_further_changes_here}
 
 *-
@@ -297,7 +297,7 @@
      :                 STATUS )
       CALL MSG_IFSET( IFLEV, STATUS )
 
-*  Annul the error if no LUT was supplied. Indicate that parameters
+*  Annul the error if no LUT was supplied. Indicate that Parameters
 *  OLDVAL and NEWVAL should be used by setting NLUT to zero.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -428,7 +428,7 @@
      :                '_INTEGER,_INT64,_REAL,_DOUBLE', .FALSE.,
      :                NEWTYP, STATUS )
 
-*  If null (!) was supplied for parameter TYPE, just annull the error and
+*  If null (!) was supplied for Parameter TYPE, just annul the error and
 *  continue with the output NDF unchanged.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
