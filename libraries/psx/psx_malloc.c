@@ -23,7 +23,11 @@
 
 *  Arguments:
 *     SIZE = INTEGER (Given)
-*        The amount of virtual memory to be allocated.
+*        The amount of virtual memory to be allocated. If the number required
+*        exceeds the maximum that can be stored in an INTEGER (about
+*        2.1E9), them routine PSX_MALLOC8 should be used in place of
+*        PSX_MALLOC. PSX_MALLOC8 has an identical interface except that
+*        the SIZE argument is an INTEGER*8.
 *     PNTR = POINTER (Returned)
 *        A pointer to the allocated storage.
 *     STATUS = INTEGER (Given and Returned)
@@ -126,6 +130,8 @@
 *        Report allocation failure as requesting unsigned int bytes
 *     25-MAY-2011 (TIMJ):
 *        Simplify error reporting.
+*     26-SEP-2019 (DSB):
+*        Add 8-byte interface (PSX_MALLOC8).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -140,18 +146,33 @@
 
 #include <stdio.h>               /* for sprintf */
 #include <stdlib.h>		 /* Standard C library			    */
+#include <stdint.h>              /* int64_t definition                      */
 #include "f77.h"		 /* C - Fortran interface		    */
 #include "psx_err.h"		 /* PSX error values			    */
 #include "psx1.h"		 /* Internal PSX routines		    */
 #include "sae_par.h"		 /* ADAM constants			    */
 
+/* Prototypes */
+F77_SUBROUTINE(psx_malloc8)( INTEGER8(size), POINTER(pntr), INTEGER(status) );
 
-F77_SUBROUTINE(psx_malloc)( INTEGER(size), POINTER(pntr), INTEGER(status) )
+
+/* 4-byte interface - just calls the 8-byte interface */
+F77_SUBROUTINE(psx_malloc)( INTEGER(size), POINTER(pntr), INTEGER(status) ) {
+   GENPTR_INTEGER(size)
+   GENPTR_POINTER(pntr)
+   GENPTR_INTEGER(status)
+   DECLARE_INTEGER8(size8);
+   size8 = *size;
+   F77_CALL(psx_malloc8)( INTEGER8_ARG(&size8), POINTER_ARG(pntr), INTEGER_ARG(status) );
+}
+
+/* 8-byte interface */
+F77_SUBROUTINE(psx_malloc8)( INTEGER8(size), POINTER(pntr), INTEGER(status) )
 {
 
 /* Pointers to Arguments:						    */
 
-   GENPTR_INTEGER(size)
+   GENPTR_INTEGER8(size)
    GENPTR_POINTER(pntr)
    GENPTR_INTEGER(status)
 

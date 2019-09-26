@@ -1,5 +1,11 @@
 1 PSX - POSIX interface routines
                                                           Expires: **.**.**
+v0.6-0:
+     Variants of PSX_CALLOC, PSX_MALLOC and PSX_REALLOC are now available
+     called PSX_CALLOC8, PSX_MALLOC8 and PSX_REALLOC8. These variants are
+     identical to the basic versions, except that the argument specifying
+     how many elements are to be allocated in an INTEGER*8 rather than an
+     INTEGER, thus allowing larger arrays to be allocated.
 v0.5-6:
      PSX_CALLOC now understands _INT64 data type
 v0.5-5:

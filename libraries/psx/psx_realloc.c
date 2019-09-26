@@ -20,7 +20,11 @@
 
 *  Arguments:
 *     SIZE = INTEGER (Given)
-*        The new amount of virtual memory required
+*        The new amount of virtual memory required. If the number required
+*        exceeds the maximum that can be stored in an INTEGER (about
+*        2.1E9), them routine PSX_REALLOC8 should be used in place of
+*        PSX_REALLOC. PSX_REALLOC8 has an identical interface except that
+*        the SIZE argument is an INTEGER*8.
 *     PNTR = POINTER (Given and Returned)
 *        A pointer to the allocated storage
 *     STATUS = INTEGER (Given)
@@ -130,6 +134,8 @@
 *        Use cnfRealloc (which is most of the old psx_realloc)
 *     25-MAY-2011 (TIMJ):
 *        Simplify error reporting.
+*     26-SEP-2019 (DSB):
+*        Add 8-byte interface (PSX_REALLOC8).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -147,18 +153,38 @@
 #include <stdlib.h>		 /* Standard C library			    */
 #if STDC_HEADERS
 #  include <string.h>
+#  include <stdint.h>            /* int64_t definition                      */
 #endif
 #include "f77.h"		 /* C - Fortran interface		    */
 #include "psx_err.h"             /* PSX error values                        */
 #include "sae_par.h"		 /* ADAM constants			    */
 #include "psx1.h"                /* declares psx1_rep_c */
 
-F77_SUBROUTINE(psx_realloc)( INTEGER(size), POINTER(pntr), INTEGER(status) )
+
+/* Prototypes */
+F77_SUBROUTINE(psx_realloc8)( INTEGER8(size), POINTER(pntr), INTEGER(status) );
+
+
+/* 4-byte interface - just calls the 8-byte interface */
+F77_SUBROUTINE(psx_realloc)( INTEGER(size), POINTER(pntr), INTEGER(status) ) {
+   GENPTR_INTEGER(size)
+   GENPTR_POINTER(pntr)
+   GENPTR_INTEGER(status)
+   DECLARE_INTEGER8(size8);
+   size8 = *size;
+   F77_CALL(psx_realloc8)( INTEGER8_ARG(&size8), POINTER_ARG(pntr), INTEGER_ARG(status) );
+}
+
+
+
+
+/* 8-byte interface */
+F77_SUBROUTINE(psx_realloc8)( INTEGER8(size), POINTER(pntr), INTEGER(status) )
 {
 
 /* Pointers to Arguments:						    */
 
-   GENPTR_INTEGER(size)
+   GENPTR_INTEGER8(size)
    GENPTR_POINTER(pntr)
    GENPTR_INTEGER(status)
 

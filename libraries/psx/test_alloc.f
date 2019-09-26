@@ -41,7 +41,7 @@
       INTEGER STATUS
 
 * Local Variables:
-      INTEGER PNTR, PNTR2, PNTR3
+      INTEGER PNTR, PNTR2, PNTR3, PNTR4, PNTR5
 
 * Initialize STATUS
       STATUS = SAI__OK
@@ -75,6 +75,34 @@
          END IF
       END IF
 
+* Test PSX_MALLOC8
+      PRINT *,' '
+      PRINT *,'--  Program TEST_ALLOC, function PSX_MALLOC8  --'
+      PRINT *,' '
+
+      CALL PSX_MALLOC8( 16000000000_8, PNTR4, STATUS )
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL FILLI8( %VAL(CNF_PVAL(PNTR4)), 2000000000_8 )
+      ELSE
+         PRINT *,'Error calling PSX_MALLOC8'
+      END IF
+
+* Test PSX_REALLOC8
+      PRINT *,' '
+      PRINT *,'--  Program TEST_ALLOC, function PSX_REALLOC8  --'
+      PRINT *,' '
+
+      IF (STATUS .EQ. SAI__OK) THEN
+         PRINT *,'Testing PSX_REALLOC8'
+         CALL PSX_REALLOC8( 8000000000_8, PNTR4, STATUS )
+         IF (STATUS .EQ. SAI__OK) THEN
+            CALL FILLI8( %VAL(CNF_PVAL(PNTR4)), 1000000000_8 )
+         ELSE
+            PRINT *,'Error calling PSX_REALLOC8'
+         END IF
+      END IF
+
+
 * Test PSX_CALLOC - INTEGER
       PRINT *,' '
       PRINT *,'--  Program TEST_ALLOC, function PSX_CALLOC, INTEGER  --'
@@ -105,6 +133,20 @@
          PRINT *,'Error calling PSX_CALLOC'
       END IF
 
+* Test PSX_CALLOC8 - WORD (huge array)
+      PRINT *,' '
+      PRINT *,'--  Program TEST_ALLOC, function PSX_CALLOC8, WORD  --'
+      PRINT *,' '
+
+      STATUS = SAI__OK
+      PRINT *,'Testing PSX_CALLOC8'
+      CALL PSX_CALLOC8( 10000000000_8, '_WORD', PNTR5, STATUS )
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL FILLW( %VAL(CNF_PVAL(PNTR5)), 10000000000_8 )
+      ELSE
+         PRINT *,'Error calling PSX_CALLOC'
+      END IF
+
 * Test PSX_FREE
       PRINT *,' '
       PRINT *,'--  Program TEST_ALLOC, function PSX_FREE  --'
@@ -115,6 +157,8 @@
       CALL PSX_FREE( PNTR, STATUS )
       CALL PSX_FREE( PNTR2, STATUS )
       CALL PSX_FREE( PNTR3, STATUS )
+      CALL PSX_FREE( PNTR4, STATUS )
+      CALL PSX_FREE( PNTR5, STATUS )
       IF (STATUS .EQ. SAI__OK) THEN
          CONTINUE
       ELSE
@@ -164,3 +208,26 @@
       END DO
 
       END
+
+      SUBROUTINE FILLI8( ARRAY, N )
+      INTEGER*8 N
+      INTEGER*8 ARRAY( N )
+      INTEGER*8 I
+
+      DO I = 1, N
+         ARRAY( I ) = I
+      END DO
+
+      END
+
+      SUBROUTINE FILLW( ARRAY, N )
+      INTEGER*8 N
+      INTEGER*2 ARRAY( N )
+      INTEGER*8 I
+
+      DO I = 1, N
+         ARRAY( I ) = I
+      END DO
+
+      END
+

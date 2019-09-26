@@ -24,7 +24,11 @@
 
 *  Arguments:
 *     NMEMB = INTEGER (Given)
-*        The number of locations of TYPE required
+*        The number of locations of TYPE required. If the number required
+*        exceeds the maximum that can be stored in an INTEGER (about
+*        2.1E9), them routine PSX_CALLOC8 should be used in place of
+*        PSX_CALLOC. PSX_CALLOC8 has an identical interface except that
+*        the NMEMB argument is an INTEGER*8.
 *     TYPE = CHARACTER * ( * ) (Given)
 *        The type of each location
 *     PNTR = POINTER (Returned)
@@ -140,6 +144,8 @@
 *        Simplify error reporting.
 *     2012-05-11 (TIMJ):
 *        Add _INT64
+*     26-SEP-2019 (DSB):
+*        Add 8-byte interface (PSX_CALLOC8).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -158,20 +164,43 @@
 #  include <stdlib.h>		 /* Standard C library			    */
 #  include <stdio.h>		 /* Standard C I/O library		    */
 #  include <string.h>
+#  include <stdint.h>
+#  include <inttypes.h>
 #endif
 #include "f77.h"		 /* C - Fortran interface		    */
 #include "psx_err.h"		 /* PSX error codes			    */
 #include "psx1.h"		 /* Internal PSX routines		    */
 #include "sae_par.h"		 /* ADAM constants			    */
 
+/* Prototypes */
+F77_SUBROUTINE(psx_calloc8)( INTEGER8(nmemb), CHARACTER(type),
+                             POINTER(pntr), INTEGER(status) TRAIL(type) );
 
+
+
+/* 4-byte interface - just calls the 8-byte interface */
 F77_SUBROUTINE(psx_calloc)( INTEGER(nmemb), CHARACTER(type),
-                            POINTER(pntr), INTEGER(status) TRAIL(type) )
+                            POINTER(pntr), INTEGER(status) TRAIL(type) ){
+   GENPTR_INTEGER(nmemb)
+   GENPTR_CHARACTER(type)
+   GENPTR_POINTER(pntr)
+   GENPTR_INTEGER(status)
+   DECLARE_INTEGER8(nmemb8);
+   nmemb8 = *nmemb;
+   F77_CALL(psx_calloc8)( INTEGER8_ARG(&nmemb8), CHARACTER_ARG(type),
+                          POINTER_ARG(pntr), INTEGER_ARG(status) TRAIL_ARG(type) );
+}
+
+
+
+/* 8-byte interface */
+F77_SUBROUTINE(psx_calloc8)( INTEGER8(nmemb), CHARACTER(type),
+                             POINTER(pntr), INTEGER(status) TRAIL(type) )
 {
 
 /* Pointers to Arguments:						    */
 
-   GENPTR_INTEGER(nmemb)
+   GENPTR_INTEGER8(nmemb)
    GENPTR_CHARACTER(type)
    GENPTR_POINTER(pntr)
    GENPTR_INTEGER(status)
@@ -265,9 +294,9 @@ F77_SUBROUTINE(psx_calloc)( INTEGER(nmemb), CHARACTER(type),
          *status = PSX__NOALL;
 	 total = *nmemb * size;
          psx1_rep_c( "PSX_CALLOC_NOALL",
-                     "Failed to allocate space with calloc. %d elements of size %d bytes (%zu bytes total) requested",
+                     "Failed to allocate space with calloc. % " PRId64 " elements of size %d bytes (%zu bytes total) requested",
                      status,
-                     (int)*nmemb, (int)size, total );
+                     *nmemb, (int)size, total );
       }
    }
 

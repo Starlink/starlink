@@ -17,10 +17,10 @@
 \stardocauthors   {P M Allan\\
                                 A J Chipperfield\\ T Jenness\\
                                 David S Berry}
-\stardocdate        {8th November 2007}
+\stardocdate        {26th September 2019}
 \stardoctitle      {PSX \\ [1ex]
                                 POSIX interface routines}
-\stardocversion     {Version 0.5-4}
+\stardocversion     {Version 0.6-0}
 \stardocmanual      {Programmer's Manual}
 \stardocabstract  {%
 PSX is a FORTRAN subroutine library that allows programmers to use the
@@ -755,7 +755,11 @@ PSX\_\_ERRNO & System error during POSIX call
       \sstsubsection{
          NMEMB = INTEGER (Given)
       }{
-         The number of locations of TYPE required
+         The number of locations of TYPE required. If the number required
+         exceeds the maximum that can be stored in an INTEGER (about
+         2.1E9), them routine PSX\_CALLOC8 should be used in place of
+         PSX\_CALLOC. PSX\_CALLOC8 has an identical interface except that
+         the NMEMB argument is an INTEGER$*$8.
       }
       \sstsubsection{
          TYPE = CHARACTER $*$ ( $*$ ) (Given)
@@ -1822,7 +1826,11 @@ PSX\_\_ERRNO & System error during POSIX call
       \sstsubsection{
          SIZE = INTEGER (Given)
       }{
-         The amount of virtual memory to be allocated.
+         The amount of virtual memory to be allocated. If the number required
+         exceeds the maximum that can be stored in an INTEGER (about
+         2.1E9), them routine PSX\_MALLOC8 should be used in place of
+         PSX\_MALLOC. PSX\_MALLOC8 has an identical interface except that
+         the SIZE argument is an INTEGER$*$8.
       }
       \sstsubsection{
          PNTR = POINTER (Returned)
@@ -2067,7 +2075,11 @@ PSX\_\_ERRNO & System error during POSIX call
       \sstsubsection{
          SIZE = INTEGER (Given)
       }{
-         The new amount of virtual memory required
+         The new amount of virtual memory required. If the number required
+         exceeds the maximum that can be stored in an INTEGER (about
+         2.1E9), them routine PSX\_REALLOC8 should be used in place of
+         PSX\_REALLOC. PSX\_REALLOC8 has an identical interface except that
+         the SIZE argument is an INTEGER$*$8.
       }
       \sstsubsection{
          PNTR = POINTER (Given and Returned)

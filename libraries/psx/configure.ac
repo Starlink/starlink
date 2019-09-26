@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT([psx],[0.5-6],[starlink@jiscmail.ac.uk])
+AC_INIT([psx],[0.6-0],[starlink@jiscmail.ac.uk])
 AC_CONFIG_AUX_DIR([build-aux])
 
 dnl    Require autoconf-2.50 at least
@@ -41,7 +41,7 @@ AC_CHECK_FUNCS([localtime localtime_r])
 AC_CHECK_FUNCS([asctime asctime_r])
 AC_CHECK_FUNCS([getwd getcwd])
 
-dnl    On Solaris ctime_r and asctime_r have three arguments (or two if 
+dnl    On Solaris ctime_r and asctime_r have three arguments (or two if
 dnl    _POSIX_PTHREAD_SEMANTICS is defined, but let's avoid that). This
 dnl    test is taken to apply to both functions.
 AC_CACHE_CHECK([if ctime_r wants three arguments], psx_cv_ctime_r_three_args,
