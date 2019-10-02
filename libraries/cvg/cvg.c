@@ -295,4 +295,44 @@ void cvgHd2fc( fitsfile *fptr, AstFitsChan *fc, int *status ){
    return;
 }
 
+F77_SUBROUTINE(cvg_bt2ft)( INTEGER(FUNIT),
+                           CHARACTER(EXTNAM),
+                           INTEGER(EXTVER),
+                           INTEGER(EXTLEVEL),
+                           INTEGER(TABLE),
+                           INTEGER(STATUS)
+                           TRAIL(EXTNAM) );
 
+void cvgBt2ft( fitsfile *fptr, const char *extnam, int extver, int extlevel,
+               AstFitsTable **table, int *status ) {
+   DECLARE_INTEGER( FUNIT );
+   DECLARE_CHARACTER_DYN( EXTNAM );
+   DECLARE_INTEGER( EXTVER );
+   DECLARE_INTEGER( EXTLEVEL );
+   DECLARE_INTEGER( TABLE );
+   DECLARE_INTEGER( STATUS );
+   int itable;
+
+   if( !astOK ) return;
+
+   CVG_EXPORT_FITS( fptr, FUNIT );
+   F77_CREATE_CHARACTER( EXTNAM, strlen( extnam ) );
+   F77_EXPORT_CHARACTER( extnam, EXTNAM, EXTNAM_length );
+   F77_EXPORT_INTEGER( extver, EXTVER );
+   F77_EXPORT_INTEGER( extlevel, EXTLEVEL );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(cvg_bt2ft)( INTEGER_ARG(&FUNIT),
+                                  CHARACTER_ARG(EXTNAM),
+                                  INTEGER_ARG(&EXTVER),
+                                  INTEGER_ARG(&EXTLEVEL),
+                                  INTEGER_ARG(&TABLE),
+                                  INTEGER_ARG(&STATUS)
+                                  TRAIL_ARG(EXTNAM) ); )
+
+   F77_FREE_CHARACTER( EXTNAM );
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_INTEGER( TABLE, itable );
+   *table = astI2P( itable );
+   return;
+}

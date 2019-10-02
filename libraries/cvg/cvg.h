@@ -93,5 +93,6 @@ void cvgWhisr( int ndf, fitsfile *fptr, int *status );
 void cvgOpen( const char *path, const char *mode, fitsfile **fptr, int *blockf, int *status );
 void cvgFc2hd( AstFitsChan *fc, int clear, fitsfile *fptr, int *status );
 void cvgHd2fc( fitsfile *fptr, AstFitsChan *fc, int *status );
+void cvgBt2ft( fitsfile *fptr, const char *extnam, int extver, int extlevel, AstFitsTable **table, int *status );
 
 #endif
