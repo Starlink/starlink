@@ -142,8 +142,8 @@ void cvgAssoc( const char *param, const char *mode, fitsfile **fptr,
                                   INTEGER_ARG(&FUNIT),
                                   INTEGER_ARG(&BLOCKF),
                                   INTEGER_ARG(&STATUS)
-                                  TRAIL_ARG(MODE)
-                                  TRAIL_ARG(PARAM) ); )
+                                  TRAIL_ARG(PARAM)
+                                  TRAIL_ARG(MODE) ); )
 
    F77_FREE_CHARACTER( PARAM );
    F77_FREE_CHARACTER( MODE );
