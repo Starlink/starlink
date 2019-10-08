@@ -70,7 +70,11 @@ void ndfHout_( int indf, int irec,
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
-
+*     8-OCT-2019 (DSB):
+*        Use astMalloc rather than astStore to allocate storage for the
+*        null-terminated copy of each fixed length string. This is to
+*        avoid reading one character beyond the end of the fixed-length
+*        array (doing so has been seen to cause a seg fault).
 *-
 */
 
@@ -208,13 +212,19 @@ void ndfHout_( int indf, int irec,
 /* The pointer returned by datMapC points to a block of memory holding an
    array of fixed-length, space-padded strings. Create a corresponding
    array of pointers to null-terminated strings, as required by the
-   service function. */
+   service function. Since we are dealing with fixed-length strings,
+   there will be no terminating null characters, so it is not safe to use
+   astStore to create a copy of each string, since it would involve
+   reading beyond the end of the fixed-length data, which could cause a
+   segmentation violation. So instead use astMalloc to allocate the array
+   and memcpy to copy the data. */
                      text = astMalloc( dim[ 0 ]*sizeof( char * ) );
                      if( *status == SAI__OK ) {
                         pin = pntr;
                         for( sub = 0; sub < dim[ 0 ]; sub++ ){
-                           text[ sub ] = astStore( NULL, pin, clen + 1 );
+                           text[ sub ] = astMalloc( clen + 1 );
                            if( *status == SAI__OK ) {
+                              memcpy( text[ sub ], pin, clen );
                               text[ sub ][ clen ] = 0;
                               astChrTrunc( text[ sub ] );
                               pin += clen;
