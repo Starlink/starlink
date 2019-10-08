@@ -312,6 +312,10 @@
          ELSE IF ( NAME .EQ. 'CHPIX' ) THEN
             CALL CHPIX ( STATUS )
 
+*  Converts between representations of complex data.
+         ELSE IF ( NAME .EQ. 'COMPLEX' ) THEN
+            CALL COMPLEX_ ( STATUS )
+
 *  Multiplies an NDF by a scalar.
          ELSE IF ( NAME .EQ. 'CMULT' ) THEN
             CALL CMULT ( STATUS )

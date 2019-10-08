@@ -10249,6 +10249,96 @@ package kappa {
 
       }
 
+      action complex {
+         helplib {$KAPPA_HELP}
+
+         parameter calcmode {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            prompt {Type of calculation performed}
+            default { }
+            helpkey *
+         }
+
+         parameter intype {
+            position 5
+            type LITERAL
+            vpath DYNAMIC DEFAULT
+            prompt {Nature of the input NDF(s)}
+            default COMPLEX
+            helpkey *
+         }
+
+         parameter in1 {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {First input NDF data structure}
+            helpkey *
+         }
+
+         parameter in2 {
+            position 2
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Second input NDF data structure}
+            helpkey *
+         }
+
+         parameter outtype {
+            position 6
+            type LITERAL
+            vpath DYNAMIC DEFAULT
+            prompt {Nature of the output NDF(s)}
+            default COMPLEX
+            helpkey *
+         }
+
+         parameter out1 {
+            position 3
+            type NDF
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {First output NDF data structure}
+            helpkey *
+         }
+
+         parameter out2 {
+            position 4
+            type NDF
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Second output NDF data structure}
+            helpkey *
+         }
+
+         parameter title1 {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Title for the first output NDF}
+            default !
+            helpkey *
+         }
+
+         parameter title2 {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Title for the second output NDF}
+            default !
+            helpkey *
+         }
+
+      }
+
       action configecho {
          alias {config(echo)}
 
