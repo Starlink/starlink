@@ -174,46 +174,6 @@ F77_SUBROUTINE(ndf_amap)( INTEGER(INDF),
    CHECK_DIM( *EL, el, NDF_AMAP, INDF )
 }
 
-F77_SUBROUTINE(ndf_amapk)( INTEGER(INDF),
-                           CHARACTER(COMP),
-                           INTEGER(IAXIS),
-                           CHARACTER(TYPE),
-                           CHARACTER(MMOD),
-                           INTEGER_ARRAY(PNTR),
-                           INTEGER8(EL),
-                           INTEGER(STATUS)
-                           TRAIL(COMP)
-                           TRAIL(TYPE)
-                           TRAIL(MMOD) ) {
-   GENPTR_INTEGER(INDF)
-   GENPTR_CHARACTER(COMP)
-   GENPTR_INTEGER(IAXIS)
-   GENPTR_CHARACTER(TYPE)
-   GENPTR_CHARACTER(MMOD)
-   GENPTR_INTEGER_ARRAY(PNTR)
-   GENPTR_INTEGER8(EL)
-   GENPTR_INTEGER(STATUS)
-   char type[ DAT__SZTYP + 1 ];
-   char mmod[ NDF__SZMMD + 1 ];
-   void *pntr[] = { NULL, NULL, NULL, NULL };
-   size_t el;
-   int ipntr;
-
-   cnfImpn( TYPE, TYPE_length, DAT__SZTYP, type );
-   cnfImpn( MMOD, MMOD_length, NDF__SZMMD, mmod );
-   char *comp = cnfCreim( COMP, COMP_length );
-
-   ndfAmap_( *INDF, comp, *IAXIS, type, mmod, pntr, &el, STATUS );
-
-   cnfFree( comp );
-
-   for( ipntr = 0; ipntr < 4; ipntr++ ) {
-      if( pntr[ ipntr ] ) PNTR[ ipntr ] = cnfFptr( pntr[ ipntr ] );
-   }
-
-   *EL = el;
-}
-
 F77_SUBROUTINE(ndf_annul)( INTEGER(INDF),
                            INTEGER(STATUS) ) {
    GENPTR_INTEGER(INDF)
@@ -403,28 +363,6 @@ F77_SUBROUTINE(ndf_block)(INTEGER(INDF1),
 
 }
 
-F77_SUBROUTINE(ndf_blockk)(INTEGER(INDF1),
-                          INTEGER(NDIM),
-                          INTEGER8_ARRAY(MXDIM),
-                          INTEGER(IBLOCK),
-                          INTEGER(INDF2),
-                          INTEGER(STATUS) ) {
-   GENPTR_INTEGER(INDF1)
-   GENPTR_INTEGER(NDIM)
-   GENPTR_INTEGER8_ARRAY(MXDIM)
-   GENPTR_INTEGER(IBLOCK)
-   GENPTR_INTEGER(INDF2)
-   GENPTR_INTEGER(STATUS)
-   int i;
-
-   hdsdim mxdim[NDF__MXDIM];
-   int ndim = ( *NDIM < NDF__MXDIM ) ? *NDIM : NDF__MXDIM;
-   for( i = 0; i < ndim; i++ ) mxdim[ i ] = (hdsdim) MXDIM[ i ];
-
-   ndfBlock_( *INDF1, *NDIM, mxdim, *IBLOCK, INDF2, STATUS );
-
-}
-
 F77_SUBROUTINE(ndf_cget)( INTEGER(INDF),
                           CHARACTER(COMP),
                           CHARACTER(VALUE),
@@ -455,21 +393,6 @@ F77_SUBROUTINE(ndf_chunk)(INTEGER(INDF1),
                           INTEGER(STATUS) ) {
    GENPTR_INTEGER(INDF1)
    GENPTR_INTEGER(MXPIX)
-   GENPTR_INTEGER(ICHUNK)
-   GENPTR_INTEGER(INDF2)
-   GENPTR_INTEGER(STATUS)
-
-   hdsdim mxpix = (hdsdim) *MXPIX;
-   ndfChunk_( *INDF1, mxpix, *ICHUNK, INDF2, STATUS );
-}
-
-F77_SUBROUTINE(ndf_chunkk)(INTEGER(INDF1),
-                          INTEGER8(MXPIX),
-                          INTEGER(ICHUNK),
-                          INTEGER(INDF2),
-                          INTEGER(STATUS) ) {
-   GENPTR_INTEGER(INDF1)
-   GENPTR_INTEGER8(MXPIX)
    GENPTR_INTEGER(ICHUNK)
    GENPTR_INTEGER(INDF2)
    GENPTR_INTEGER(STATUS)
@@ -1214,26 +1137,6 @@ F77_SUBROUTINE(ndf_nbloc)(INTEGER(INDF),
 
 }
 
-F77_SUBROUTINE(ndf_nblock)(INTEGER(INDF),
-                           INTEGER(NDIM),
-                           INTEGER8_ARRAY(MXDIM),
-                           INTEGER(NBLOCK),
-                           INTEGER(STATUS) ) {
-   GENPTR_INTEGER(INDF)
-   GENPTR_INTEGER(NDIM)
-   GENPTR_INTEGER8_ARRAY(MXDIM)
-   GENPTR_INTEGER(NBLOCK)
-   GENPTR_INTEGER(STATUS)
-
-   int i;
-   hdsdim mxdim[NDF__MXDIM];
-   int ndim = ( *NDIM < NDF__MXDIM ) ? *NDIM : NDF__MXDIM;
-   for( i = 0; i < ndim; i++ ) mxdim[ i ] = (hdsdim) MXDIM[ i ];
-
-   ndfNbloc_( *INDF, *NDIM, mxdim, NBLOCK, STATUS );
-
-}
-
 F77_SUBROUTINE(ndf_noacc)( CHARACTER(ACCESS),
                            INTEGER(INDF),
                            INTEGER(STATUS)
@@ -1698,40 +1601,6 @@ F77_SUBROUTINE(ndf_xnew)( INTEGER(INDF),
    cnfFree( type );
 }
 
-F77_SUBROUTINE(ndf_xnewk)( INTEGER(INDF),
-                           CHARACTER(XNAME),
-                           CHARACTER(TYPE),
-                           INTEGER(NDIM),
-                           INTEGER8_ARRAY(DIM),
-                           CHARACTER(LOC),
-                           INTEGER(STATUS)
-                           TRAIL(XNAME)
-                           TRAIL(TYPE)
-                           TRAIL(LOC) ) {
-   GENPTR_INTEGER(INDF)
-   GENPTR_CHARACTER(XNAME)
-   GENPTR_CHARACTER(TYPE)
-   GENPTR_INTEGER(NDIM)
-   GENPTR_INTEGER8_ARRAY(DIM)
-   GENPTR_CHARACTER(LOC)
-   GENPTR_INTEGER(STATUS)
-   int i;
-
-   HDSLoc *loc = NULL;
-   char *xname = cnfCreim( XNAME, XNAME_length );
-   char *type = cnfCreim( TYPE, TYPE_length );
-
-   hdsdim dim[NDF__MXDIM];
-   int ndim = ( *NDIM < NDF__MXDIM ) ? *NDIM : NDF__MXDIM;
-   for( i = 0; i < ndim; i++ ) dim[ i ] = (hdsdim) DIM[ i ];
-
-   ndfXnew_( *INDF, xname, type, *NDIM, dim, &loc, STATUS );
-
-   datExportFloc( &loc, 1, LOC_length, LOC, STATUS );
-   cnfFree( xname );
-   cnfFree( type );
-}
-
 F77_SUBROUTINE(ndf_xnumb)( INTEGER(INDF),
                            INTEGER(NEXTN),
                            INTEGER(STATUS) ) {
@@ -1928,6 +1797,68 @@ MAKE_PTSZ(W, w, WORD)
 
 /* -------  Routines with 64 bit arguments -------------- */
 
+F77_SUBROUTINE(ndf_amap8)( INTEGER(INDF),
+                           CHARACTER(COMP),
+                           INTEGER(IAXIS),
+                           CHARACTER(TYPE),
+                           CHARACTER(MMOD),
+                           INTEGER_ARRAY(PNTR),
+                           INTEGER8(EL),
+                           INTEGER(STATUS)
+                           TRAIL(COMP)
+                           TRAIL(TYPE)
+                           TRAIL(MMOD) ) {
+   GENPTR_INTEGER(INDF)
+   GENPTR_CHARACTER(COMP)
+   GENPTR_INTEGER(IAXIS)
+   GENPTR_CHARACTER(TYPE)
+   GENPTR_CHARACTER(MMOD)
+   GENPTR_INTEGER_ARRAY(PNTR)
+   GENPTR_INTEGER8(EL)
+   GENPTR_INTEGER(STATUS)
+   char type[ DAT__SZTYP + 1 ];
+   char mmod[ NDF__SZMMD + 1 ];
+   void *pntr[] = { NULL, NULL, NULL, NULL };
+   size_t el;
+   int ipntr;
+
+   cnfImpn( TYPE, TYPE_length, DAT__SZTYP, type );
+   cnfImpn( MMOD, MMOD_length, NDF__SZMMD, mmod );
+   char *comp = cnfCreim( COMP, COMP_length );
+
+   ndfAmap_( *INDF, comp, *IAXIS, type, mmod, pntr, &el, STATUS );
+
+   cnfFree( comp );
+
+   for( ipntr = 0; ipntr < 4; ipntr++ ) {
+      if( pntr[ ipntr ] ) PNTR[ ipntr ] = cnfFptr( pntr[ ipntr ] );
+   }
+
+   *EL = el;
+}
+
+F77_SUBROUTINE(ndf_block8)(INTEGER(INDF1),
+                          INTEGER(NDIM),
+                          INTEGER8_ARRAY(MXDIM),
+                          INTEGER(IBLOCK),
+                          INTEGER(INDF2),
+                          INTEGER(STATUS) ) {
+   GENPTR_INTEGER(INDF1)
+   GENPTR_INTEGER(NDIM)
+   GENPTR_INTEGER8_ARRAY(MXDIM)
+   GENPTR_INTEGER(IBLOCK)
+   GENPTR_INTEGER(INDF2)
+   GENPTR_INTEGER(STATUS)
+   int i;
+
+   hdsdim mxdim[NDF__MXDIM];
+   int ndim = ( *NDIM < NDF__MXDIM ) ? *NDIM : NDF__MXDIM;
+   for( i = 0; i < ndim; i++ ) mxdim[ i ] = (hdsdim) MXDIM[ i ];
+
+   ndfBlock_( *INDF1, *NDIM, mxdim, *IBLOCK, INDF2, STATUS );
+
+}
+
 F77_SUBROUTINE(ndf_bound8)( INTEGER(INDF),
                             INTEGER(NDIMX),
                             INTEGER8_ARRAY(LBND),
@@ -1956,6 +1887,21 @@ F77_SUBROUTINE(ndf_bound8)( INTEGER(INDF),
       LBND[ i ] = 1;
       UBND[ i ] = 1;
    }
+}
+
+F77_SUBROUTINE(ndf_chunk8)(INTEGER(INDF1),
+                          INTEGER8(MXPIX),
+                          INTEGER(ICHUNK),
+                          INTEGER(INDF2),
+                          INTEGER(STATUS) ) {
+   GENPTR_INTEGER(INDF1)
+   GENPTR_INTEGER8(MXPIX)
+   GENPTR_INTEGER(ICHUNK)
+   GENPTR_INTEGER(INDF2)
+   GENPTR_INTEGER(STATUS)
+
+   hdsdim mxpix = (hdsdim) *MXPIX;
+   ndfChunk_( *INDF1, mxpix, *ICHUNK, INDF2, STATUS );
 }
 
 F77_SUBROUTINE(ndf_dim8)( INTEGER(INDF),
@@ -2078,6 +2024,26 @@ F77_SUBROUTINE(ndf_mapql8)( INTEGER(INDF),
    *BAD = bad ? F77_TRUE : F77_FALSE;
    *PNTR = cnfFptr( pntr );
    *EL = el;
+}
+
+F77_SUBROUTINE(ndf_nbloc8)(INTEGER(INDF),
+                           INTEGER(NDIM),
+                           INTEGER8_ARRAY(MXDIM),
+                           INTEGER(NBLOCK),
+                           INTEGER(STATUS) ) {
+   GENPTR_INTEGER(INDF)
+   GENPTR_INTEGER(NDIM)
+   GENPTR_INTEGER8_ARRAY(MXDIM)
+   GENPTR_INTEGER(NBLOCK)
+   GENPTR_INTEGER(STATUS)
+
+   int i;
+   hdsdim mxdim[NDF__MXDIM];
+   int ndim = ( *NDIM < NDF__MXDIM ) ? *NDIM : NDF__MXDIM;
+   for( i = 0; i < ndim; i++ ) mxdim[ i ] = (hdsdim) MXDIM[ i ];
+
+   ndfNbloc_( *INDF, *NDIM, mxdim, NBLOCK, STATUS );
+
 }
 
 F77_SUBROUTINE(ndf_new8)( CHARACTER(FTYPE),
@@ -2220,6 +2186,39 @@ F77_SUBROUTINE(ndf_size8)( INTEGER(INDF),
    *NPIX = npix;
 }
 
+F77_SUBROUTINE(ndf_xnew8)( INTEGER(INDF),
+                           CHARACTER(XNAME),
+                           CHARACTER(TYPE),
+                           INTEGER(NDIM),
+                           INTEGER8_ARRAY(DIM),
+                           CHARACTER(LOC),
+                           INTEGER(STATUS)
+                           TRAIL(XNAME)
+                           TRAIL(TYPE)
+                           TRAIL(LOC) ) {
+   GENPTR_INTEGER(INDF)
+   GENPTR_CHARACTER(XNAME)
+   GENPTR_CHARACTER(TYPE)
+   GENPTR_INTEGER(NDIM)
+   GENPTR_INTEGER8_ARRAY(DIM)
+   GENPTR_CHARACTER(LOC)
+   GENPTR_INTEGER(STATUS)
+   int i;
+
+   HDSLoc *loc = NULL;
+   char *xname = cnfCreim( XNAME, XNAME_length );
+   char *type = cnfCreim( TYPE, TYPE_length );
+
+   hdsdim dim[NDF__MXDIM];
+   int ndim = ( *NDIM < NDF__MXDIM ) ? *NDIM : NDF__MXDIM;
+   for( i = 0; i < ndim; i++ ) dim[ i ] = (hdsdim) DIM[ i ];
+
+   ndfXnew_( *INDF, xname, type, *NDIM, dim, &loc, STATUS );
+
+   datExportFloc( &loc, 1, LOC_length, LOC, STATUS );
+   cnfFree( xname );
+   cnfFree( type );
+}
 
 
 
