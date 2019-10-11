@@ -1410,6 +1410,12 @@ try:
                     " has units {1} - units must be pW".format(ipref,units))
 
       ip = "ipref={0}".format(ipref)
+
+#  Ensure no history record is added to the ip reference map suggesting it
+#  was created by pol2map. This would otherwise happen at cleanup. If it *is*
+#  created by pol2map (due to being the IOUT image), then a suitable history 
+#  record will be created as a result of it being assigned to parameter IOUT.
+      parsys["IPREF"].exists = True
    else:
       ip = "ipref=!"
 
