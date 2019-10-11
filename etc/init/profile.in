@@ -920,6 +920,12 @@ else
   tspsetup () { ${STARLINK_DIR}/etc/notinst tsp; }
 fi
 
+# Source local Starlink profile if it exists.
+
+if test -f ${exec_prefix}/local/etc/profile; then
+   source ${exec_prefix}/local/etc/profile
+fi
+
 #
 #  Unset local shell variables to prevent them from leaking out
 unset exec_prefix
