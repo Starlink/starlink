@@ -106,6 +106,11 @@ void ndf1Hfwrt( NdfDCB *dcb, const char *appn, int nlines,
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     11-OCT-2019 (DSB):
+*        Correct inappropriate use of of MXOUT when specifying the length
+*        of the spaced-padded fixed-length strings passed to ndf1Hout. The
+*        length should be "l", not "MXOUT". This caused badly formatted
+*        history text.
 
 *-
 */
@@ -142,6 +147,10 @@ void ndf1Hfwrt( NdfDCB *dcb, const char *appn, int nlines,
             if( nc > textlen ) textlen = nc;
          }
       }
+
+/* Increment it by one to allow room for a space following the longest
+   line. */
+      textlen++;
 
 /* Check that the length of the input text lines is not too large for
    the internal buffers used for formatting. */
@@ -279,7 +288,7 @@ void ndf1Hfwrt( NdfDCB *dcb, const char *appn, int nlines,
    further lines), then write its contents to the current history record.
    Then re-initialise its length to zero, and fill it with spaces again.  */
                      if( ( MXOUT - lout ) < l ) {
-                        ndf1Hwrt( dcb, appn, lout/l, MXOUT, out, status );
+                        ndf1Hwrt( dcb, appn, lout/l, l, out, status );
                         lout = 0;
                         memset( out, ' ', sizeof( out ) );
                      }
@@ -343,7 +352,7 @@ void ndf1Hfwrt( NdfDCB *dcb, const char *appn, int nlines,
    current history record. Then re-initialise its length to zero,
    and fill it with spaces again.  */
                            if( ( MXOUT - lout ) < l ) {
-                              ndf1Hwrt( dcb, appn, lout/l, MXOUT, out,
+                              ndf1Hwrt( dcb, appn, lout/l, l, out,
                                         status );
                               lout = 0;
                               memset( out, ' ', sizeof( out ) );
@@ -383,7 +392,7 @@ void ndf1Hfwrt( NdfDCB *dcb, const char *appn, int nlines,
 
 /* If any lines remain in the output buffer, then write them to the
    current history record. */
-            if( lout > 0 ) ndf1Hwrt( dcb, appn, lout/l, MXOUT, out, status );
+            if( lout > 0 ) ndf1Hwrt( dcb, appn, lout/l, l, out, status );
          }
       }
 
