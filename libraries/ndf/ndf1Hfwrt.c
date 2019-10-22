@@ -111,7 +111,14 @@ void ndf1Hfwrt( NdfDCB *dcb, const char *appn, int nlines,
 *        of the spaced-padded fixed-length strings passed to ndf1Hout. The
 *        length should be "l", not "MXOUT". This caused badly formatted
 *        history text.
-
+*     22-OCT-2019 (DSB):
+*        Previously, the "textlen" variable was incremented to allow for
+*        a space following the longest line of text. But this caused an
+*        error to be reported for cases where the longest line of text was
+*        exactly equal to the maximum allowed length (NDF__SZHMX), since
+*        the incremented length was then bigger than NDF__SZHMX.  This
+*        change does away with the increment to "textlen" to avoid this
+*        problem, and also because the increment should not be needed anyway.
 *-
 */
 
@@ -147,10 +154,6 @@ void ndf1Hfwrt( NdfDCB *dcb, const char *appn, int nlines,
             if( nc > textlen ) textlen = nc;
          }
       }
-
-/* Increment it by one to allow room for a space following the longest
-   line. */
-      textlen++;
 
 /* Check that the length of the input text lines is not too large for
    the internal buffers used for formatting. */
