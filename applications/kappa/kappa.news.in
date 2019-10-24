@@ -8,6 +8,13 @@
      parameters called MODE and FILE.  The default for MODE preserves the
      historic interactive behaviour.
 
+   o LINPLOT
+     - The XMAP parameter now has a new option called "LRLinear", which
+     causes the X axis to be annotated linearly increasing from left to
+     right. This differs from the existing "Linear" option, which may
+     sometimes produce annotated values that increase from right to left,
+     depending on the nature of the WCS.
+
    o SUBSTITUTE
      - A new parameter called LUT allows multiple values to be changed
      simultaneously by supplying a table of old and new values in the

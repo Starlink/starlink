@@ -411,7 +411,14 @@
 *        and XRIGHT encompasses the value zero.
 *
 *        - "Linear" -- The mapping is such that the value used to
-*        annotate the axis increases linearly across the plot.
+*        annotate the axis increases linearly across the plot. Note the
+*        corresponding pixel indices always increase left to right in
+*        this mode so the annotated values may possibly increase right
+*        to left depending on the nature of the WCS mapping.
+*
+*        - "LRLinear" -- Like "Linear" except that the pixel indices are
+*        reversed if necessary to ensure that the annotated values always
+*        increases left to right.
 *
 *        - "Default" -- One of "Linear" or "log" is chosen
 *        automatically, depending on which one produces a more-even
@@ -673,6 +680,8 @@
 *        a plot being created even if the current WCS Frame is not AXIS.
 *     2016 March 13 (MJC)
 *        Remove long-deprecated TEMPSTYLE.
+*     24-OCT-2019 (DSB):
+*        Added "LRLinear" XMAP option.
 *     {enter_further_changes_here}
 
 *-
@@ -1015,7 +1024,7 @@
 *  See how the X and Y axes are to be mapped on to the screen.
       IF( STATUS .NE. SAI__OK ) GO TO 999
       CALL PAR_CHOIC( 'XMAP', 'Default', 'Default,Linear,Log,Pixel,'//
-     :                'Distance', .TRUE., XMAP, STATUS )
+     :                'Distance,LRLinear', .TRUE., XMAP, STATUS )
       CALL PAR_CHOIC( 'YMAP', 'Linear', 'Linear,Log,ValueLog', .TRUE.,
      :                YMAP, STATUS )
 
@@ -1491,8 +1500,9 @@
          END IF
 
 *  If the annotated values on the horizontal axis is reversed, reverse
-*  the limits.
-         IF( MONO .EQ. -1 ) THEN
+*  the limits. If XMAP is "LRLinear" we retain the reversed limits to
+*  get X axis annotations increasing from left to right.
+         IF( MONO .EQ. -1 .AND. XMAP .NE. 'LRLINEAR' ) THEN
             DVAL = BL( 1 )
             BL( 1 ) = TR( 1 )
             TR( 1 ) = DVAL
