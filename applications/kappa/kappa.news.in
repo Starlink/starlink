@@ -7,29 +7,37 @@
       -  Converts between representations of complex data, such as
       extracting or combining real and imaginary parts.
 
+   o  MOCGEN
+
+      -  Creates a description of selected regions in an image using
+         the IVOA's Multi-Order Coverage (MOC) scheme.
 
 2 Modified_applications
 
-   o CHPIX
-     - It is easier now to make several edits by supplying the NDF
-     sections and fill values in a text file.  This is made possible new
-     parameters called MODE and FILE.  The default for MODE preserves the
-     historic interactive behaviour.
+   o  CHPIX
 
-   o LINPLOT
-     - The XMAP parameter now has a new option called "LRLinear", which
-     causes the X axis to be annotated linearly increasing from left to
-     right. This differs from the existing "Linear" option, which may
-     sometimes produce annotated values that increase from right to left,
-     depending on the nature of the WCS.
+      -  It is easier now to make several edits by supplying the NDF
+      sections and fill values in a text file.  This is made possible
+      new parameters called MODE and FILE.  The default for MODE
+      preserves the historic interactive behaviour.
 
-   o SUBSTITUTE
-     - A new parameter called LUT allows multiple values to be changed
-     simultaneously by supplying a table of old and new values in the
-     form a text file. Interpolation between the values can be performed
-     if required.
-     - A new parameter called TYPE allows the data type of the output NDF
-     to be specified explicitly.
+   o  LINPLOT
+
+      -  The XMAP parameter now has a new option called "LRLinear",
+      which causes the X axis to be annotated linearly increasing
+      from left to right. This differs from the existing "Linear"
+      option, which may sometimes produce annotated values that
+      increase from right to left, depending on the nature of the
+      WCS.
+
+   o  SUBSTITUTE
+
+      -  A new parameter called LUT allows multiple values to be
+      changed simultaneously by supplying a table of old and new
+      values in the form a text file. Interpolation between the
+      values can be performed if required.
+      -  A new parameter called TYPE allows the data type of the
+      output NDF to be specified explicitly.
 
 1 KAPPA_Version_2.5-9
 
@@ -40,33 +48,39 @@
 2 Modified_applications
 
    o  ALIGN2D
-      - The residuals used to determine the fit are now weighted using
-      the SNR of the data rather than the reciprocal of the variance.
-      This will cause the final alignment to be determined more by the
-      brighter sections of the map than previously.
+
+      -  The residuals used to determine the fit are now weighted
+      using the SNR of the data rather than the reciprocal of the
+      variance.  This will cause the final alignment to be
+      determined more by the brighter sections of the map than
+      previously.
 
    o  COLLAPSE
-      - There is a new estimator option, "FastMed", that offers a
+
+      -  There is a new estimator option, "FastMed", that offers a
       substantially faster calculation of unweighted medians.
 
    o  HISCOM
 
-      - Has a new Parameter APPNAME, which can be used to change the
+      -  Has a new Parameter APPNAME, which can be used to change the
       application name stored in the new history record from the default
       of "HISCOM". Scripts that generate NDFs can use this facility to
       record the details of the invocation of the script in the form of a
       history record in the output NDF.
 
    o  SETAXIS
-      - There is a new mode, "NDF".  It assigns the axis values using
+
+      -  There is a new mode, "NDF".  It assigns the axis values using
       the data values in another NDF, specified by a parameter called
       AXISNDF.
 
    o  WCSALIGN
+
       -  The input NDFs can now be aligned with a specified POLPACK
       catalogue - see new parameter REFCAT.
 
    o  WCSMOSAIC
+
       -  Has a new parameter called WEIGHTS that can be used to specify
       a weight for each of the input NDFs.
 
@@ -86,36 +100,43 @@
 2 Modified_applications
 
    o  ALIGN2D
+
       -  Parameter TR may also include the scale and offset in its seventh
       and eight elements.
       - The RMS residual between the aligned and the reference arrays is
       now written to an output parameter called "RMS".
 
    o  CONFIGECHO
+
       -  This now reports all elements in an array, not just the first
       element.
 
    o  CONTOUR
+
       -  The dynamic default for Parameter LABPOS is now "!" (i.e. a null
       value), so no label is now drawn in "Bounds" or "Good" mode unless a
       value is supplied explicitly for LABPOS.
 
    o  DISPLAY
+
       -  New Parameter PENRANGE can be used to restrict the range for pens
       (i.e. colour indices) used by the image.
       -  The vertical position of the key can now be controlled through
       Parameter KEYPOS.
 
    o  MFITTREND
+
       -  The auto method uses the median rather than the mean to clip
       outliers.  This permits better masking of strong and extended
       emission.
 
    o  SQORST
+
       -  Permit an axis scale to be retained by using an asterisk
       in Parameter PIXSCALE.
 
    o  TRANDAT
+
       -  Will now recognised the string "BAD" (case insensitive) within
       the input text file and generate appropriate bad values in the output
       NDF.
