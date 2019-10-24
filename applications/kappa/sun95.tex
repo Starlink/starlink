@@ -6,9 +6,9 @@
 \stardocsource    {sun95.44}
 \stardocnumber    {95.44}
 \stardocauthors   {Malcolm J. Currie \& David S. Berry}
-\stardocdate      {2019 May 15}
+\stardocdate      {2019 October 25}
 \stardoctitle     {KAPPA --- Kernel Application Package}
-\stardocversion   {2.6-0}
+\stardocversion   {2.6-4}
 \stardocmanual    {User's Guide}
 % -----------------------------------------------------------------------------
 \stardocabstract{
@@ -207,7 +207,8 @@ and \htmlref{Laplacian}{LAPLACE}, convolution, edge enhancement via a
 \htmlref{shadow effect}{SHADOW}, \htmlref{thresholding}{THRESH};
 \item \htmlref{calculation of polarimetry images}{CALPOL};
 \item \htmlref{creation of one-dimensional profiles through \textit{n}-dimensional
-data sets}{PROFILE};
+data sets}{PROFILE}; and
+\item \htmlref{conversion between various forms of complex data}{COMPLEX}.
 \end{itemize}
 
 There are also many applications for data visualisation:
@@ -9017,6 +9018,8 @@ functions as follows.
  Calculates polarisation parameters.
 \classitem{COLCOMP}
  Produces a colour composite image from 1, 2 or 3 individual NDFs.
+\classitem{COMPLEX}
+ Converts between representations of complex data.
 \classitem{INTERLEAVE}
  Forms a higher-resolution NDF by interleaving a set of NDFs.
 \classitem{KSTEST}
@@ -9440,6 +9443,8 @@ Compares a pair of NDFs for equivalence.
 \subsection{MISCELLANEOUS}
 
 \begin{aligndesc}
+\classitem{COMPLEX}
+ Converts between representations of complex data.
 \classitem{KAPHELP}
  Gives help about \KAPPA.
 \classitem{LISTMAKE}
@@ -16062,6 +16067,132 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
 
          \sstitem
          Any number of NDF dimensions is supported.
+      }
+   }
+}
+
+\sstroutine{
+   COMPLEX
+}{
+   Converts between representations of complex data
+}{
+   \sstdescription{
+      This application converts between various representations of complex
+      data, including complex \NDFref{NDFs}.  The conversion may simply unpack or pack
+      real and imaginary parts of a complex NDF, or it may convert between
+      polar and Cartesian representation.
+   }
+   \sstusage{
+      complex in1 in2 out1 out2 [intype] [outtype]
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN1 = NDF (Read)
+      }{
+         The first input NDF.  See Parameter INTYPE for its description.
+      }
+      \sstsubsection{
+         IN2 = NDF (Read)
+      }{
+         The second input NDF.  See Parameter INTYPE for its description.
+         IN2 will not be accessed when Parameter INTYPE is set to \texttt{"COMPLEX"}.
+         When Parameter INTYPE is set to \texttt{"MOD\_ARG"}, supply a null
+         (\texttt{!}) value.
+      }
+      \sstsubsection{
+         INTYPE = LITERAL (Read)
+      }{
+         The nature of the input NDF(s).  The allowed options are listed
+         below.
+
+         \sstitemlist{
+
+            \sstitem
+            \texttt{"COMPLEX"}  -- IN1 is a complex NDF containing real
+            and imaginary parts.  (IN2 will not be accessed.)
+
+            \sstitem
+            \texttt{"REAL\_IMAG"}  -- IN1 contains the real part and IN2
+            contains the imaginary parts.
+
+            \sstitem
+            \texttt{"MOD\_ARG"}  -- IN1 contains the modulus and IN2 the
+            argument in radians.
+
+         }
+         The default is\texttt{"COMPLEX"} if IN1 is a complex NDF,
+         otherwise it is \texttt{"REAL\_IMAG"}.
+         \texttt{[]}
+      }
+      \sstsubsection{
+         OUT1 = NDF (Write)
+      }{
+         The first output NDF.  Its contents are governed by Parameter OUTTYPE.
+      }
+      \sstsubsection{
+         OUT2 = NDF (Write)
+      }{
+         The second output NDF.  Its contents are governed by Parameter OUTTYPE.
+         OUT2 will not be accessed when Parameter OUTTYPE is set to \texttt{"COMPLEX"}.
+         When Parameter OUTTYPE is set to \texttt{"MOD\_ARG"}, supply a null
+         (\texttt{!}) value.
+      }
+      \sstsubsection{
+         OUTTYPE = LITERAL (Read)
+      }{
+         The nature of the output NDF(s).  The same options are available as for
+         INTYPE, but relate to NDFs OUT1 and OUT instead of IN1 and IN2.
+
+         The default is \texttt{"REAL\_IMAG"} if IN1 is a complex NDF, otherwise
+         it is \texttt{"COMPLEX"}.  \texttt{[]}
+      }
+      \sstsubsection{
+         TITLE1 = LITERAL (Read)
+      }{
+         The title for the first output NDF.
+      }
+      \sstsubsection{
+         TITLE2 = LITERAL (Read)
+      }{
+         The title for the second output NDF.
+      }
+   }
+   \sstresparameters{
+      \sstsubsection{
+         CALCMODE = LITERAL (Write)
+      }{
+         Set to indicate the type of calculation that was performed:
+         \texttt{"To polar"} , \texttt{"From polar"}  or \texttt{"None"}.
+      }
+  }
+   \sstexamples{
+      \sstexamplesubsection{
+         complex realmap imagmap cmplxmap
+      }{
+         This example combines real and imaginary parts into a complex NDF.
+      }
+      \sstexamplesubsection{
+         complex cplxmap ! modulusmap ! OUTTYPE=MOD\_ARG
+      }{
+         This example would compute the modulus from a complex NDF.
+      }
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA,
+         \htmlref{QUALITY}{apndf:quality}, \htmlref{LABEL}{apndf:label},
+         \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units},
+         \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components
+         of the first input NDF and propagates all of that NDF's
+         \htmlref{extensions}{apndf:extensions}.
+         UNITS is set to \texttt{"radians"} for OUTTYPE = \texttt{"MOD\_ARG"}.
+
+         \sstitem
+         The DATA component is processed in double precision.  The output
+         NDFs have type _DOUBLE, except when OUTTYPE ="COMPLEX" where it is
+         COMPLEX\_DOUBLE.
       }
    }
 }
@@ -53940,6 +54071,18 @@ and HDS data types is as follows:
 
 \section{\xlabel{se_changes}Release Notes---V2.6\label{se:changes}}
 
+\subsection{New Commands}
+The following new applications have been added:
+
+\begin{description}
+   \item [\htmlref{COMPLEX}{COMPLEX}] \mbox{}
+   Converts between representations of complex data, such as
+   extracting or combining real and imaginary parts. 
+   \item [\htmlref{MOCGEN}{MOCGEN}] \mbox{}
+   Creates a description of selected regions in an image using the IVOA's
+   Multi-Order Coverage (MOC) scheme.
+\end{description}
+
 \subsection{Modified Commands}
 The following applications have been modified:
 \begin{description}[style=nextline]
@@ -53971,15 +54114,6 @@ The following applications have been modified:
         output NDF to be specified explicitly.
       \end{itemize}
 
-\end{description}
-
-\subsection{New Commands}
-The following new applications have been added:
-
-\begin{description}
-   \item [\htmlref{MOCGEN}{MOCGEN}] \mbox{}
-   Creates a description of selected regions in an image using the IVOA's
-   Multi-Order Coverage (MOC) scheme.
 \end{description}
 
 \section{Notes from Previous Few Releases}

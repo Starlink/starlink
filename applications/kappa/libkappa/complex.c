@@ -41,7 +41,7 @@ F77_SUBROUTINE(complex_)( INTEGER(STATUS) ){
 *     This application converts between various representations of complex
 *     data, including complex NDFs.  The conversion may simply unpack or pack
 *     real and imaginary parts of a complex NDF, or it may convert between
-*     polar and cartesian representation.
+*     polar and Cartesian representation.
 
 *  Usage:
 *     complex in1 in2 out1 out2 [intype] [outtype]
@@ -51,15 +51,14 @@ F77_SUBROUTINE(complex_)( INTEGER(STATUS) ){
 *        Set to indicate the type of calculation which was performed:
 *        "To polar", "From polar" or "None".
 *     IN1 = NDF (Read)
-*        The first input NDF.
+*        The first input NDF.  See Parameter INTYPE for its description.
 *     IN2 = NDF (Read)
-*        The second input NDF.
-*     OUT1 = NDF (Write)
-*        The first output NDF.
-*     OUT2 = NDF (Write)
-*        The second output NDF.
+*        The second input NDF.  See Parameter INTYPE for its description.
+*        IN2 will not be accessed when Parameter INTYPE is set to "COMPLEX".
+*        When Parameter INTYPE is set to "MOD_ARG", supply a null (!) value.
 *     INTYPE = LITERAL (Read)
-*        The nature of the input NDF(s).  Options are:
+*        The nature of the input NDF(s).  The allowed options are listed
+*        below.
 *
 *        - "COMPLEX" -- IN1 is a complex NDF containing real
 *        and imaginary parts.  (IN2 will not be accessed.)
@@ -70,13 +69,20 @@ F77_SUBROUTINE(complex_)( INTEGER(STATUS) ){
 *        - "MOD_ARG" -- IN1 contains the modulus and IN2 the
 *        argument in radians.
 *
-*        [COMPLEX if IN1 is a complex NDF, otherwise REAL_IMAG]
+*        The default is "COMPLEX" if IN1 is a complex NDF, otherwise it is
+*        "REAL_IMAG".  []
+*     OUT1 = NDF (Write)
+*        The first output NDF.  Its contents are governed by Parameter OUTTYPE.
+*     OUT2 = NDF (Write)
+*        The second output NDF.  Its contents are governed by Parameter OUTTYPE.
+*        OUT2 will not be accessed when Parameter OUTTYPE is set to "COMPLEX".
+*        When Parameter OUTTYPE is set to "MOD_ARG", supply a null (!) value.
 *     OUTTYPE = LITERAL (Read)
-*        The nature of the output NDF(s).  The same options are
-*        available as for INTYPE but relate to NDFs OUT1 and OUT2
-*        instead of IN1 and IN2.
+*        The nature of the output NDF(s).  The same options are available as
+*        for INTYPE, but relate to NDFs OUT1 and OUT2 instead of IN1 and IN2.
 *
-*        [REAL_IMAG if IN1 is a complex NDF, otherwise COMPLEX]
+*        The default is "REAL_IMAG" if IN1 is a complex NDF, otherwise it is
+*        "COMPLEX".  []
 *     TITLE1 = LITERAL (Read)
 *        The title for the first output NDF.
 *     TITLE2 = LITERAL (Read)
@@ -239,7 +245,7 @@ F77_SUBROUTINE(complex_)( INTEGER(STATUS) ){
       errRep( "", "Neither output NDF OUT1 nor OUT2 was specified", STATUS );
    }
 
-/* Set the titles using the TITLE1 and TITLE2 parameter
+/* Set the titles using the TITLE1 and TITLE2 parameters,
    and the OUT2 units to radians if OUTTYPE=MOD_ARG. */
    if( indf_o1 != NDF__NOID ) {
       ndfCinp( "TITLE1", indf_o1, "Title", STATUS );
@@ -331,7 +337,7 @@ F77_SUBROUTINE(complex_)( INTEGER(STATUS) ){
    if( *STATUS != SAI__OK ) goto L999;
 
 /* Determine the type of calculation being performed. This allows the
-   operation to be reported via a parameter and simplifies bad value handling
+   operation to be reported via a parameter and simplifies bad-value handling
    in the case that default values are provided (e.g. for mod and arg). */
    if( ( ipd_om || ipd_oa ) && ! ( ipd_im || ipd_ia ) ) {
       calcmode= CALCMODE_TOPOL;

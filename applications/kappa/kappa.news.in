@@ -1,5 +1,13 @@
 1 KAPPA_Version_2.6
 
+2 New_applications
+
+   o  COMPLEX
+
+      -  Converts between representations of complex data, such as
+      extracting or combining real and imaginary parts.
+
+
 2 Modified_applications
 
    o CHPIX
