@@ -89,6 +89,15 @@ F77_SUBROUTINE(complex_)( INTEGER(STATUS) ){
 *     complex cplxmap ! modulusmap ! OUTTYPE=MOD_ARG
 *         This example would compute the modulus from a complex NDF.
 
+*  Implementation Status:
+*     -  This routine correctly processes the AXIS, DATA, QUALITY, LABEL, TITLE,
+*     UNITS, WCS, and HISTORY components of the first input NDF and propagates
+*     all of that NDF's extensions.  UNITS is set to radians for
+*     OUTTYPE = "MOD_ARG".
+*     -  The DATA component is processed in double precision.  The output
+*     NDFs have type _DOUBLE, except when OUTTYPE ="COMPLEX" where it is
+*     COMPLEX_DOUBLE.
+
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2019 East Asian Observatory.
