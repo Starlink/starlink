@@ -1,13 +1,16 @@
 #include "sae_par.h"
-#include "ndf.h"
 #include "ast.h"
 #include "kaplibs.h"
 
-void kpg1Asndf( int indf, int ndim, int *dim, int *lbnd, int *ubnd,
-                AstFrameSet **iwcs, int *status ){
+/* Use 8-byte NDF API */
+#define NDF_I8 1
+#include "ndf.h"
+
+void kpg1Asndf8( int indf, int ndim, int *dim, hdsdim *lbnd, hdsdim *ubnd,
+                 AstFrameSet **iwcs, int *status ){
 /*
 *  Name:
-*     kpg1Asndf
+*     kpg1Asndf8
 
 *  Purpose:
 *     Create a FrameSet containing NDF-special Frames with given bounds.
@@ -16,14 +19,13 @@ void kpg1Asndf( int indf, int ndim, int *dim, int *lbnd, int *ubnd,
 *     C.
 
 *  Invocation:
-*     void kpg1Asndf( int indf, int ndim, int *dim, int *lbnd, int *ubnd,
-*                     AstFrameSet **iwcs, int *status )
+*     void kpg1Asndf8( int indf, int ndim, int *dim, hdsdim *lbnd,
+*                      hdsdim *ubnd, AstFrameSet **iwcs, int *status )
 
 *  Description:
-*     This function creates a FrameSet containing the NDF-special Frames,
-*     GRID, PIXEL, FRACTION and AXIS, appropriate to an NDF with the
-*     supplied dimensionality and pixel index bounds. Optionally, AXIS
-*     information can be propagated from a supplied NDF.
+*     This function is equivalent to kpg1Asndf except that arguments
+*     "lbnd" and "ubnd" are of type "hdsdim *" instead of "int *". See
+*     kpg1Asndf for more information.
 
 *  Arguments:
 *     indf
@@ -46,12 +48,8 @@ void kpg1Asndf( int indf, int ndim, int *dim, int *lbnd, int *ubnd,
 *     status
 *        The inherited status.
 
-*  Notes:
-*     -  The function kpg1Asndf8 is equivalent to this function but uses
-*     type "hdsdim" for the "lbnd" and "ubnd" arguments.
-
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2019 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -71,19 +69,13 @@ void kpg1Asndf( int indf, int ndim, int *dim, int *lbnd, int *ubnd,
 *     02110-1301, USA.
 
 *  Authors:
-*     DSB: David Berry (JAC, Hawaii)
-*     MJC: Malcolm J. Currie (JAC, Hawaii)
+*     DSB: David Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
-*     22-FEB-2010 (DSB):
-*        Original version.
-*     19-AUG-2010 (DSB):
-*        Added DIM argument.
-*     2012 April 18 (MJC):
-*        Limit axis copying to existing axes.
 *     4-OCT-2019 (DSB):
-*        Changed to be a thin wrapper round kpg1Asndf8.
+*        Original version, copied from kpg1Asndf and changed to use
+*        hdsdim bounds and dimensions.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -92,16 +84,40 @@ void kpg1Asndf( int indf, int ndim, int *dim, int *lbnd, int *ubnd,
 */
 
 /* Local Variables: */
-   int i;
-   hdsdim lbnd8[ NDF__MXDIM ];
-   hdsdim ubnd8[ NDF__MXDIM ];
+   int adim;          /* Number of dimensions of input NDF */
+   hdsdim dims[ NDF__MXDIM ]; /* Dimension sizes of input NDF */
+   int idim;          /* Axis index */
+   int indf2;         /* Identifier for temporary NDF */
+   int place;         /* Place holder for temporary NDF */
 
-/* Copy the supplied "int" values into local "hdsdim" arrays. */
-   for( i = 0; i < ndim; i++ ){
-      lbnd8[ i ] = lbnd[ i ];
-      ubnd8[ i ] = ubnd[ i ];
+/* Initialise */
+   *iwcs = NULL;
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Obtain the actual dimension of the input NDF. */
+   ndfDim( indf, NDF__MXDIM, dims, &adim, status );
+   adim = ( adim < ndim ) ? adim : ndim;
+
+/* Create a place-holder for a temporary NDF. */
+   ndfTemp( &place, status );
+
+/* Create a new NDF with the required bounds. */
+   ndfNew( "_REAL", ndim, lbnd, ubnd, &place, &indf2, status );
+
+/* If an input NDF was supplied, copy the required AXIS structures to the
+   new NDF. */
+   if( indf != NDF__NOID ) {
+      for( idim = 0; idim < adim; idim++ ) {
+         kpg1Axcpy( indf, indf2, dim[ idim ], idim + 1, status );
+      }
    }
 
-/* Call the 8-byte version of this routine. */
-   kpg1Asndf8( indf, ndim, dim, lbnd8, ubnd8, iwcs, status );
+/* Get the WCS FrameSet. */
+   ndfGtwcs( indf2, iwcs, status );
+
+/* Annul the temporary NDF. */
+   ndfAnnul( &indf2, status );
+
 }

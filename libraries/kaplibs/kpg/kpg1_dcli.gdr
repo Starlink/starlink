@@ -80,13 +80,15 @@
 *        Use CNF_PVAL.
 *     2006 April 19 (MJC):
 *        Remove ATYPE and use HTYPE token instead.
+*     4-OCT-2019 (DSB):
+*        Change to use NDF 8-byte interface.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -120,13 +122,15 @@
      :  IDENTY                 ! Axes have unit scale and zero offset
 
       INTEGER
-     :  AEL,                   ! Number of elements in an axis array
      :  AXPNTR( 1 ),           ! Pointer to an NDF-axis component
      :  I,                     ! Loop counter
-     :  LBND( NDF__MXDIM ),    ! Lower bounds of the NDF
      :  NDIMS,                 ! Number of dimensions possessed by the
                                ! NDF
-     :  SGDIM( NDF__MXDIM ),   ! Significant dimensions of the NDF
+     :  SGDIM( NDF__MXDIM )    ! Significant dimensions of the NDF
+
+      INTEGER*8
+     :  AEL,                   ! Number of elements in an axis array
+     :  LBND( NDF__MXDIM ),    ! Lower bounds of the NDF
      :  UBND( NDF__MXDIM )     ! Upper bounds of the NDF
 
 *  Internal References:
@@ -151,7 +155,7 @@
       ELSE
          CALL KPG1_SGDIM( NDF, NDIM, SGDIM, STATUS )
       END IF
-      CALL NDF_BOUND( NDF, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
+      CALL NDF_BOUND8( NDF, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
 
 *  Assume that the data co-ordinates are linear and all have the
 *  identity transformation, i.e. unit scale factor and zero offset.
@@ -162,8 +166,8 @@
       DO  I = 1, ABS( NDIM )
 
 *  Map the axis centres for the dimension.
-         CALL NDF_AMAP( NDF, 'Centre', SGDIM( I ), '<HTYPE>', 'READ',
-     :                  AXPNTR, AEL, STATUS )
+         CALL NDF_AMAP8( NDF, 'Centre', SGDIM( I ), '<HTYPE>', 'READ',
+     :                   AXPNTR, AEL, STATUS )
 
 *  Only evaluate the transformation when there are more than one element
 *  along the axis.
@@ -171,7 +175,7 @@
 
 *  Find the range of the axis co-ordinates and whether or not the axis
 *  is linear.
-            CALL KPG1_AXLI<T>( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+            CALL KPG1_AXLI<T>( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                         DALBND( I ), DAUBND( I ), AXLIN( I ),
      :                         STATUS )
 
@@ -191,16 +195,16 @@
 *  Determine the scale and offset of the transformation between world
 *  and data co-ordinates.
                SCALE( I ) = ( DAUBND( I ) - DALBND( I ) ) /
-     :                      NUM_ITO<T>( AEL - 1 )
+     :                      NUM_KTO<T>( AEL - 1 )
                OFFSET( I ) = DALBND( I ) - SCALE( I ) *
-     :                       ( NUM_ITO<T>( LBND( SGDIM( I ) ) ) - 0.5 )
+     :                       ( NUM_KTO<T>( LBND( SGDIM( I ) ) ) - 0.5 )
 
 *  Correct the lower and upper bounds data co-ordinates.  Current
 *  values are for the array-element centres, whereas the co-ordinates
 *  at the sides are required.  Thus apply half-pixel corrections.
                DAUBND( I ) = DAUBND( I ) + 0.5 * SCALE( I )
                DALBND( I ) = DALBND( I ) - 0.5 * SCALE( I )
-      
+
 *  Determine whether the two co-ordinate systems are identical.
                IDENTY = IDENTY .AND. (
      :               ABS( SCALE( I ) - 1<CONST> ) .LT. VAL__EPS<T> .AND.
@@ -213,7 +217,7 @@
 *  the data-co-ordinate value of the single axis position, obtained by
 *  the bounds-finding routine.
          ELSE
-            CALL KPG1_AXBN<T>( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+            CALL KPG1_AXBN<T>( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                         DALBND( I ), DAUBND( I ), STATUS )
             SCALE( I ) = 0<CONST>
             OFFSET( I ) = DALBND( I )

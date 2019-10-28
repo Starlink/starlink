@@ -98,8 +98,13 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     -  The routine KPG1_ASTRM8 is equivalent to this function but uses
+*     INTEGER*8 for the LBND and UBND arguments.
+
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2019 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -131,6 +136,8 @@
 *        Added support for ROI Regions.
 *     30-MAY-2006 (DSB):
 *        Move the bulk of the work into ATL_AXTRM.
+*     4-OCT-2019 (DSB):
+*        Changed to be a thin wrapper round KPG1_ASTRM8.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -144,7 +151,6 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
-      INCLUDE 'AST_PAR'          ! AST constants
 
 *  Arguments Given:
       INTEGER IWCS
@@ -157,63 +163,18 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER BCMAP
-      INTEGER CURAXES( NDF__MXDIM )
       INTEGER I
-      INTEGER MAP1
-      INTEGER NDIM
-      INTEGER NFC
-      INTEGER PIXAXES( NDF__MXDIM )
+      INTEGER*8 LBND8( NDF__MXDIM )
+      INTEGER*8 UBND8( NDF__MXDIM )
 *.
 
-*  Check the inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
+*  Copy the supplied INTEGER values into local INTEGER*8 arrays.
+      DO I = 1, NDF__MXDIM
+         LBND8( I ) = LBND( I )
+         UBND8( I ) = UBND( I )
+      END DO
 
-*  Begin an AST context.
-      CALL AST_BEGIN( STATUS )
-
-*  Get the base->current Mapping.
-      BCMAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT, STATUS )
-
-*  Get the number of axes in the original current Frame.
-      NFC = MIN( NDF__MXDIM, AST_GETI( BCMAP, 'NOUT', STATUS ) )
-
-*  Get the number of base Frame (i.e. pixel) axes.
-      NDIM = MIN( NDF__MXDIM, AST_GETI( BCMAP, 'NIN', STATUS ) )
-
-*  If there are too many axes, we need to decide which axes to keep.
-      IF( NFC .GT. NDIM ) THEN
-
-*  Our first choice for default axes are those which are fed by the base
-*  Frame axes. Find these axes now.
-         DO I = 1, NDIM
-            PIXAXES( I ) = I
-         END DO
-         CALL AST_MAPSPLIT( BCMAP, NDIM, PIXAXES, CURAXES, MAP1,
-     :                      STATUS )
-
-*  If this could not be done, use the defaults supplied in DEFAX.
-         IF( MAP1 .NE. AST__NULL ) THEN
-            IF( AST_GETI( MAP1, 'Nout', STATUS ) .NE. NDIM ) THEN
-               CALL AST_ANNUL( MAP1, STATUS )
-            END IF
-         END IF
-
-         IF( MAP1 .EQ. AST__NULL ) THEN
-            DO I = 1, NDIM
-               CURAXES( I ) = DEFAX( I )
-            END DO
-         END IF
-
-*  Allow the user to select the current Frame axes to use, using the above
-*  defaults.
-         CALL KPG1_GTAXI( 'USEAXIS', IWCS, NDIM, CURAXES, STATUS )
-      END IF
-
-*  Call ATL_AXTRM to trim or ad axes as required.
-      CALL ATL_AXTRM( IWCS, CURAXES, LBND, UBND, WORK, STATUS )
-
-*  End the AST context.
-      CALL AST_END( STATUS )
+*  Call the 8-byte version of this routine.
+      CALL KPG1_ASTRM8( IWCS, DEFAX, LBND8, UBND8, WORK, STATUS )
 
       END

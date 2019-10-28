@@ -1,9 +1,12 @@
 #include "sae_par.h"
-#include "ndf.h"
 #include "prm_par.h"
 #include "kaplibs.h"
 #include "mers.h"
 #include <string.h>
+
+/* Use 8-byte NDF interface */
+#define NDF_I8 1
+#include "ndf.h"
 
 void kpg1Axcpy( int indf1, int indf2, int ax1, int ax2, int *status ){
 /*
@@ -71,6 +74,8 @@ void kpg1Axcpy( int indf1, int indf2, int ax1, int ax2, int *status ){
 *        Test for character-component existence.
 *     2012-05-09 (TIMJ):
 *        Add _INT64
+*     4-OCT-2019 (DSB):
+*        Use 8-byte NDF interface.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -89,15 +94,15 @@ void kpg1Axcpy( int indf1, int indf2, int ax1, int ax2, int *status ){
    char type[ NDF__SZTYP + 1 ];
    const char *acomp[ NACOMP ] = { "Centre", "Variance", "Width" };
    const char *ccomp[ NCCOMP ] = { "Label", "Unit" };
-   int el;
+   hdsdim el;
+   hdsdim lbnd1[ NDF__MXDIM ];
+   hdsdim lbnd2[ NDF__MXDIM ];
+   hdsdim ubnd1[ NDF__MXDIM ];
+   hdsdim ubnd2[ NDF__MXDIM ];
    int icomp;
    int indf3;
-   int lbnd1[ NDF__MXDIM ];
-   int lbnd2[ NDF__MXDIM ];
    int ndim;
    int there;
-   int ubnd1[ NDF__MXDIM ];
-   int ubnd2[ NDF__MXDIM ];
    size_t size;
    void *pntr1;
    void *pntr2;

@@ -119,7 +119,9 @@ void fts1Astwn( AstFitsChan *, int, int * );
 void kpg1Asffr( AstFrameSet *, const char *, int *, int * );
 void kpg1Asmrg( AstFrameSet *, AstFrameSet *, const char *, int, int, int * );
 void kpg1Asget( int, int, int, int, int, int *, int *, int *, AstFrameSet **, int * );
+void kpg1Asget8( int, int, int, int, int, int *, hdsdim *, hdsdim *, AstFrameSet **, int * );
 void kpg1Asndf( int, int, int *, int *, int *, AstFrameSet **, int * );
+void kpg1Asndf8( int, int, int *, hdsdim *, hdsdim *, AstFrameSet **, int * );
 void kpg1Axcpy( int, int, int, int, int * );
 
 void kpg1Badbx( int, int, int *, int *, int * );

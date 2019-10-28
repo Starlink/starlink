@@ -20,7 +20,7 @@
 *     precision.
 
 *  Arguments:
-*     EL = INTEGER (Given)
+*     EL = INTEGER*8 (Given)
 *        The number of elements in the array.  It must be at least
 *        two.
 *     ARRAY( EL ) = ? (Given)
@@ -45,6 +45,7 @@
 *  Copyright:
 *     Copyright (C) 1991, 1992, 1993 Science & Engineering Research
 *                   Council.
+*     Copyright (C) 2019 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -52,12 +53,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
@@ -65,6 +66,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -78,13 +80,15 @@
 *     1993 may 27 (MJC):
 *        Used improved algorithm for the linearity test scaling the
 *        maximum deviation by maximum absolute value in the array.
+*     4-OCT-2019 (DSB):
+*        Change EL from INTEGER to INTEGER*8.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT    NONE         ! No implicit typing
 
@@ -93,13 +97,13 @@
       INCLUDE    'PRM_PAR'     ! PRIMDAT constants
 
 *  Arguments Given:
-      INTEGER    EL            ! Array size
+      INTEGER*8  EL            ! Array size
       <TYPE>     ARRAY( EL )   ! Array to be tested.
 
 *  Arguments Returned:
       LOGICAL    LINEAR        ! True if array is linear
-      <TYPE>     LVAL          ! Value of first array element. 
-      <TYPE>     UVAL          ! Value of last array element. 
+      <TYPE>     LVAL          ! Value of first array element.
+      <TYPE>     UVAL          ! Value of last array element.
 
 *  Status:
       INTEGER    STATUS        ! Global status
@@ -108,10 +112,10 @@
       DOUBLE PRECISION CURENT  ! Current array value
       DOUBLE PRECISION DIFLIM  ! Tolerance used for comparing intervals
       DOUBLE PRECISION FIRST   ! First non-bad array value
-      INTEGER    HIGH          ! Index of last non-bad array value
-      INTEGER    I             ! Loop variable 
-      DOUBLE PRECISION INCREM  ! Value of step size 
-      INTEGER    LOW           ! Index of first non-bad array value
+      INTEGER*8  HIGH          ! Index of last non-bad array value
+      INTEGER*8  I             ! Loop variable
+      DOUBLE PRECISION INCREM  ! Value of step size
+      INTEGER*8  LOW           ! Index of first non-bad array value
       DOUBLE PRECISION MAXVAL  ! Maximum absolute value in the array
 
 *  Internal References:
@@ -160,7 +164,7 @@
 *    Evaluate the linear increment.
 
       INCREM = ( NUM_<T>TOD( ARRAY( HIGH ) )
-     :         - NUM_<T>TOD( ARRAY( LOW ) ) ) / NUM_ITO<T>( HIGH - LOW )
+     :         - NUM_<T>TOD( ARRAY( LOW ) ) ) / NUM_KTO<T>( HIGH - LOW )
 
 *    Find the biggest absolute value in the array.
 

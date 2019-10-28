@@ -67,6 +67,8 @@
 *     15-JUN-1998 (DSB):
 *        Modified to avoid addressing DIMV outside the range [1-NDIM].
 *        Converted to modern style layout.
+*     4-OCT-2019 (DSB):
+*        Changed to use 8-byte NDF interface.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -93,7 +95,7 @@
 
 *  Local Variables:
       INTEGER ACTDIM             ! Actual number of dimensions in NDF
-      INTEGER DIM( NDF__MXDIM )  ! The NDF dimensions
+      INTEGER*8 DIM( NDF__MXDIM )! The NDF dimensions
       INTEGER I                  ! Loop counter
       INTEGER SIGDIM             ! Number of signifcant dimensions
 
@@ -103,7 +105,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Find the number of dimensions.
-      CALL NDF_DIM( NDF, NDF__MXDIM, DIM, ACTDIM, STATUS )
+      CALL NDF_DIM8( NDF, NDF__MXDIM, DIM, ACTDIM, STATUS )
 
 *  Initialise counter.
       SIGDIM = 0

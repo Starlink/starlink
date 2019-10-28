@@ -3,13 +3,13 @@
 #include "ast.h"
 #include "sae_par.h"
 
-F77_SUBROUTINE(kpg1_asndf)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(DIM),
-                            INTEGER_ARRAY(LBND), INTEGER_ARRAY(UBND),
-                            INTEGER(IWCS), INTEGER(STATUS) ) {
+F77_SUBROUTINE(kpg1_asndf8)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(DIM),
+                             INTEGER8_ARRAY(LBND), INTEGER8_ARRAY(UBND),
+                             INTEGER(IWCS), INTEGER(STATUS) ) {
 /*
 *+
 *  Name:
-*     KPG1_ASNDF
+*     KPG1_ASNDF8
 
 *  Purpose:
 *     Creates a FrameSet containing NDF-special Frames with given bounds.
@@ -18,13 +18,12 @@ F77_SUBROUTINE(kpg1_asndf)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(DIM),
 *     C, designed to be called from Fortran.
 
 *  Invocation:
-*     CALL KPG1_ASNDF( INDF, NDIM, DIM, LBND, UBND, IWCS, STATUS )
+*     CALL KPG1_ASNDF8( INDF, NDIM, DIM, LBND, UBND, IWCS, STATUS )
 
 *  Description:
-*     This function creates a FrameSet containing the NDF-special Frames,
-*     GRID, PIXEL, FRACTION and AXIS, appropriate to an NDF with the
-*     supplied dimensionality and pixel index bounds. Optionally, AXIS
-*     information can be propagated from a supplied NDF.
+*     This routine is equivalent to KPG1_ASNDF except that arguments
+*     LBND and UBND are INTEGER*8 instead of INTEGER. See KPG1_ASNDF
+*     for more information.
 
 *  Arguments:
 *     INDF = INTEGER (Given)
@@ -36,9 +35,9 @@ F77_SUBROUTINE(kpg1_asndf)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(DIM),
 *     DIM( NDIM ) = INTEGER (Given)
 *        The indices within INDF corresponding to each of the required
 *        NDIM axes.
-*     LBND( NDIM ) = INTEGER (Given)
+*     LBND( NDIM ) = INTEGER*8 (Given)
 *        The lower pixel index bounds in the modified FrameSet.
-*     UBND( NDIM ) = INTEGER (Given)
+*     UBND( NDIM ) = INTEGER*8 (Given)
 *        The upper pixel index bounds in the modified FrameSet.
 *     IWCS = INTEGER (Returned)
 *        Pointer to a new FrameSet holding GRID, FRACTION, PIXEL and AXIS
@@ -47,12 +46,8 @@ F77_SUBROUTINE(kpg1_asndf)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(DIM),
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Notes:
-*     -  The routine KPG1_ASNDF8 is equivalent to this function but uses
-*     INTEGER*8 for the LBND and UBND arguments.
-
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2019 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -72,14 +67,13 @@ F77_SUBROUTINE(kpg1_asndf)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(DIM),
 *     02110-1301, USA.
 
 *  Authors:
-*     DSB: David S. Berry
+*     DSB: David Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
-*     22-FEB-2010 (DSB):
-*        Original version.
-*     19-AUG-2010 (DSB):
-*        Added DIM argument.
+*     4-OCT-2019 (DSB):
+*        Original version, copied from KPG1_ASNDF and changed to use
+*        INTEGER*8 bounds and dimensions.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -89,14 +83,14 @@ F77_SUBROUTINE(kpg1_asndf)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(DIM),
    GENPTR_INTEGER(INDF)
    GENPTR_INTEGER(NDIM)
    GENPTR_INTEGER_ARRAY(DIM)
-   GENPTR_INTEGER_ARRAY(LBND)
-   GENPTR_INTEGER_ARRAY(UBND)
+   GENPTR_INTEGER8_ARRAY(LBND)
+   GENPTR_INTEGER8_ARRAY(UBND)
    GENPTR_INTEGER(IWCS)
    GENPTR_INTEGER(STATUS)
 
    AstFrameSet *iwcs;
 
-   kpg1Asndf( *INDF, *NDIM, DIM, LBND, UBND, &iwcs, STATUS );
+   kpg1Asndf8( *INDF, *NDIM, DIM, LBND, UBND, &iwcs, STATUS );
    F77_EXPORT_INTEGER( astP2I( iwcs ), *IWCS );
 
 }

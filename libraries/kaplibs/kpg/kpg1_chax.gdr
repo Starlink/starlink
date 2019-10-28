@@ -62,7 +62,7 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
-*     Copyright (C) 1995, 2004 Central Laboratory of the Research 
+*     Copyright (C) 1995, 2004 Central Laboratory of the Research
 *                   Councils.
 *     All Rights Reserved.
 
@@ -71,12 +71,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
@@ -103,13 +103,15 @@
 *     12-SEP-2006 (DSB):
 *        Update non-monotoinc wanring message since AST can handle
 *        non-monotonic LutMaps.
+*     4-OCT-2019 (DSB):
+*        Changed to use 8-byte NDF interface.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -132,16 +134,16 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER AEL                ! No. of elements in mapped axis array
+      INTEGER*8 AEL              ! No. of elements in mapped axis array
       INTEGER APNTR              ! Pointer to mapped axis array
       INTEGER AXIS               ! Index of current dimension
       <LTYPE> DALBND( NDF__MXDIM ) ! AXIS lower bounds
       <LTYPE> DAUBND( NDF__MXDIM ) ! AXIS upper bounds
       INTEGER I                  ! Dimension counter
       INTEGER IDIM               ! Total number of dimensions
-      INTEGER LBND( NDF__MXDIM ) ! Lower bounds of the NDF
+      INTEGER*8 LBND( NDF__MXDIM ) ! Lower bounds of the NDF
       LOGICAL MONOTO             ! Is the current axis monotonic?
-      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of the NDF
+      INTEGER*8 UBND( NDF__MXDIM ) ! Upper bounds of the NDF
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
@@ -163,8 +165,8 @@
 
 *  Map the axis centre values for this dimension as an array of <HTYPE>
 *  values.
-            CALL NDF_AMAP( INDF, 'Centre', AXIS, '<HTYPE>', 'READ',
-     :                     APNTR, AEL, STATUS )
+            CALL NDF_AMAP8( INDF, 'Centre', AXIS, '<HTYPE>', 'READ',
+     :                      APNTR, AEL, STATUS )
             IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Start a new error context so that any error reports concerning a
@@ -172,9 +174,9 @@
 *  be issued so that the application can continue using world
 *  co-ordinates.
                CALL ERR_MARK
-               CALL KPG1_MONO<T>( .TRUE., AEL, 
-     :                            %VAL( CNF_PVAL( APNTR ) ), 
-     :                            MONOTO, STATUS )
+               CALL KPG1_MONO<T>( .TRUE., AEL,
+     :                             %VAL( CNF_PVAL( APNTR ) ),
+     :                             MONOTO, STATUS )
 
                IF ( STATUS .NE. SAI__OK ) THEN
                   CALL ERR_ANNUL( STATUS )
@@ -197,7 +199,7 @@
                END IF
 
             END IF
-      
+
 *  Unmap the axis centre array.
             CALL NDF_AUNMP( INDF, 'Centre', AXIS, STATUS )
 
@@ -210,8 +212,8 @@
 *  of world co-ordinates is returned if both axes are linear.  Warning
 *  messages are issued for each non-linear axis.
       IF ( DATAVL ) THEN
-         CALL KPG1_DCLI<T>( NDIM, INDF, DALBND, DAUBND, SCALE, OFFSET, 
-     :                     DATAVL, STATUS )
+         CALL KPG1_DCLI<T>( NDIM, INDF, DALBND, DAUBND, SCALE, OFFSET,
+     :                      DATAVL, STATUS )
 
 *  Force the axes to be considered linear.  The returned values of
 *  SCALE and OFFSET will describe a linear approximation to the AXIS
@@ -220,14 +222,14 @@
 *  in the transformation from world to data co-ordinates derived below.
          IF ( .NOT. DATAVL ) THEN
             DATAVL = .TRUE.
-            CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, IDIM, STATUS )
+            CALL NDF_BOUND8( INDF, NDF__MXDIM, LBND, UBND, IDIM, STATUS )
 
             DO I = 1, NDIM
                AXIS = DIM( I )
-               SCALE( I ) = ( DAUBND( I ) - DALBND( I ) ) / NUM_ITO<T>
+               SCALE( I ) = ( DAUBND( I ) - DALBND( I ) ) / NUM_KTO<T>
      :                      ( UBND( AXIS ) - LBND( AXIS ) + 1 )
                OFFSET( I ) = DAUBND( I ) - SCALE( I ) *
-     :                       NUM_ITO<T>( UBND( AXIS ) )
+     :                       NUM_KTO<T>( UBND( AXIS ) )
             END DO
 
          END IF

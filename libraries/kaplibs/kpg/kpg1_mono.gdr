@@ -23,7 +23,7 @@
 *        If BAD=.TRUE., there may be bad values present in the
 *        array, and it instructs this routine to test for the
 *        presence of bad values.
-*     EL = INTEGER (Given)
+*     EL = INTEGER*8 (Given)
 *        The number of elements in the array.
 *     ARRAY( EL ) = ? (Given)
 *        The array to be tested.
@@ -39,6 +39,7 @@
 
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council.
+*     Copyright (C) 2019 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -59,11 +60,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
 *     1992 November 27 (MJC):
 *        Original version.
+*     4-OCT-2019 (DSB):
+*        Changed EL from INTEGER to INTEGER*8
 *     {enter_changes_here}
 
 *  Bugs:
@@ -80,7 +84,7 @@
 
 *  Arguments Given:
       LOGICAL BAD
-      INTEGER EL
+      INTEGER*8 EL
       <TYPE> ARRAY( EL )
 
 *  Arguments Returned:
@@ -90,10 +94,10 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER HIGH               ! Index of second initial value
-      INTEGER I                  ! Loop counter
+      INTEGER*8 HIGH             ! Index of second initial value
+      INTEGER*8 I                ! Loop counter
       LOGICAL INCREA             ! True if the values are increasing
-      INTEGER LOW                ! Index of current value
+      INTEGER*8 LOW              ! Index of current value
 
 *.
 
@@ -103,7 +107,7 @@
 *  Must have at least 3 elements.
       IF ( EL .LT. 2 ) THEN
          STATUS = SAI__ERROR
-         CALL MSG_SETI( 'N', EL )
+         CALL MSG_SETK( 'N', EL )
          CALL ERR_REP( 'KPG1_MONOx_TOOFEW',
      :     'There are too few elements ^N to determine whether an '/
      :     /'array is monotonic.', STATUS )

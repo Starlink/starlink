@@ -84,6 +84,8 @@
 *        temporary NDF when reading WCS from a FITS extension.
 *     4-MAY-2006 (DSB):
 *        Guard against NULL IWCS values.
+*     4-OCT-2019 (DSB):
+*        Changed to use the 8-byte NDF interface.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -139,13 +141,13 @@
       INTEGER IRAFRM             ! AST Frame describing IRA sky co-ords
       INTEGER IRAMAP             ! AST Mapping from IRA "image" to sky co-ords
       INTEGER IWCS2              ! Default FrameSet from supplied NDF
-      INTEGER LBND( NDF__MXDIM ) ! Lower pixel bounds
+      INTEGER*8 LBND( NDF__MXDIM ) ! Lower pixel bounds
       INTEGER NCARD              ! No. of header cards in the FITS extension
       INTEGER NDIM               ! Number of pixel axes
       INTEGER NENCOD             ! No. of prefered AST encodings supplied
       INTEGER PLACE              ! Place holder for temporary NDF
       INTEGER PNTR               ! Pointer to mapped array of FITS headers
-      INTEGER UBND( NDF__MXDIM ) ! Upper pixel bounds
+      INTEGER*8 UBND( NDF__MXDIM ) ! Upper pixel bounds
       LOGICAL FLAG               ! Was group expression flagged? (NO)
       LOGICAL THERE              ! Does object exist?
       LOGICAL VERB               ! Give verbose warnings about bad IRAS90/FITS?
@@ -292,14 +294,14 @@
 *  of only 1 pixel on each axis.
             ELSE
                CALL NDF_TEMP( PLACE, STATUS )
-               CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM,
-     :                         STATUS )
+               CALL NDF_BOUND8( INDF, NDF__MXDIM, LBND, UBND, NDIM,
+     :                          STATUS )
                DO I = 1, NDIM
                   UBND( I ) = LBND( I )
                END DO
 
-               CALL NDF_NEW( '_BYTE', NDIM, LBND, UBND, PLACE, INDFC,
-     :                       STATUS )
+               CALL NDF_NEW8( '_BYTE', NDIM, LBND, UBND, PLACE, INDFC,
+     :                        STATUS )
             END IF
 
 *  Check the pointer can be used.

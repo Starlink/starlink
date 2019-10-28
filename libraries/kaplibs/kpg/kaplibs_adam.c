@@ -140,6 +140,69 @@ void kpg1Asget( int indf, int ndim, int exact, int trim, int reqinv,
    return;
 }
 
+F77_SUBROUTINE(kpg1_asget8)( INTEGER(INDF), INTEGER(NDIM), LOGICAL(EXACT),
+                             LOGICAL(TRIM), LOGICAL(REQINV), INTEGER_ARRAY(SDIM),
+                             INTEGER8_ARRAY(SLBND), INTEGER8_ARRAY(SUBND),
+                             INTEGER(IWCS), INTEGER(STATUS) );
+
+void kpg1Asget8( int indf, int ndim, int exact, int trim, int reqinv,
+                int *sdim, hdsdim *slbnd, hdsdim *subnd, AstFrameSet **iwcs,
+                int *status ){
+   DECLARE_INTEGER(INDF);
+   DECLARE_INTEGER(NDIM);
+   DECLARE_LOGICAL(EXACT);
+   DECLARE_LOGICAL(TRIM);
+   DECLARE_LOGICAL(REQINV);
+   DECLARE_INTEGER_ARRAY_DYN(SDIM);
+   DECLARE_INTEGER8_ARRAY_DYN(SLBND);
+   DECLARE_INTEGER8_ARRAY_DYN(SUBND);
+   DECLARE_INTEGER(IWCS);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( indf, INDF );
+   F77_EXPORT_INTEGER( ndim, NDIM );
+   F77_EXPORT_LOGICAL( exact, EXACT );
+   F77_EXPORT_LOGICAL( trim, TRIM );
+   F77_EXPORT_LOGICAL( reqinv, REQINV );
+   F77_CREATE_INTEGER_ARRAY( SDIM, ndim );
+   F77_ASSOC_INTEGER_ARRAY( SDIM, sdim );
+   F77_CREATE_INTEGER8_ARRAY( SLBND, ndim );
+   F77_ASSOC_INTEGER8_ARRAY( SLBND, slbnd );
+   F77_CREATE_INTEGER8_ARRAY( SUBND, ndim );
+   F77_ASSOC_INTEGER8_ARRAY( SUBND, subnd );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(kpg1_asget8)( INTEGER_ARG(&INDF),
+                         INTEGER_ARG(&NDIM),
+                         LOGICAL_ARG(&EXACT),
+                         LOGICAL_ARG(&TRIM),
+                         LOGICAL_ARG(&REQINV),
+                         INTEGER_ARRAY_ARG(SDIM),
+                         INTEGER8_ARRAY_ARG(SLBND),
+                         INTEGER8_ARRAY_ARG(SUBND),
+                         INTEGER_ARG(&IWCS),
+                         INTEGER_ARG(&STATUS) ); )
+
+   {
+      int tmp;
+      F77_IMPORT_INTEGER( IWCS, tmp );
+      *iwcs = astI2P( tmp );
+   }
+
+   F77_IMPORT_INTEGER_ARRAY( SDIM, sdim, ndim );
+   F77_FREE_INTEGER( SDIM );
+
+   F77_IMPORT_INTEGER8_ARRAY( SLBND, slbnd, ndim );
+   F77_FREE_INTEGER8( SLBND );
+
+   F77_IMPORT_INTEGER8_ARRAY( SUBND, subnd, ndim );
+   F77_FREE_INTEGER8( SUBND );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
 /* ------------------------------- */
 
 F77_SUBROUTINE(kpg1_gtgrp)( CHARACTER(PARAM), INTEGER(IGRP), INTEGER(SIZE),

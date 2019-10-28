@@ -40,8 +40,9 @@ kpg1_ieeer.c  kpg1_isfinr.c kpg1_kygrp.c kpg1_kygp1.c kpg1_kymp1.c \
 kpg1_kymp2.c kpg1_kymap.c kaplibs.c kpgGtfts.c kpgPtfts.c kpg1Hdsky.c \
 kpg1_hdsky.c kpg1Kyhds.c kpg1_kyhds.c kpgGetOutline.c kpgPutOutline.c \
 kpg_gtfts.c kpg_ptfts.c kpg1Ch2pm.c kpg1_ch2pm.c kpg1Chcof.c \
-kpg1Fit1d.c kpg1_fit1d.c kpg1_asndf.c kpg1Asndf.c kpg1Axcpy.c \
-kpg1_getoutline.c kpg1Rnorm.c kpg1_rnorm.c kpg1CrMapD.c kpg1_crmapd.c
+kpg1Fit1d.c kpg1_fit1d.c kpg1_asndf.c kpg1_asndf8.c kpg1Asndf.c \
+kpg1Asndf8.c kpg1Axcpy.c kpg1_getoutline.c kpg1Rnorm.c kpg1_rnorm.c \
+kpg1CrMapD.c kpg1_crmapd.c
 
 F_ROUTINES = $(KPG_NONGEN) $(GEN_F_ROUTINES)
 
@@ -161,6 +162,7 @@ kpg1_aspsy.f \
 kpg1_asptp.f \
 kpg1_asrgn.f \
 kpg1_assig.f \
+kpg1_assig8.f \
 kpg1_assim.f \
 kpg1_assmp.f \
 kpg1_asspl.f \
@@ -279,10 +281,12 @@ kpg1_asfgt.f \
 kpg1_asfil.f \
 kpg1_asfrm.f \
 kpg1_asget.f \
+kpg1_asget8.f \
 kpg1_asgrp.f \
 kpg1_asref.f \
 kpg1_assir.f \
 kpg1_astrm.f \
+kpg1_astrm8.f \
 kpg1_avlut.f \
 kpg1_ccpro.f \
 kpg1_crout.f \

@@ -71,6 +71,8 @@
 *        Original version.
 *     15-JUN-1998 (DSB):
 *        Avoid addressing DIMV outside range [1-NDIM]
+*     4-OCT-2019 (DSB):
+*        CHanged to use the 8-byte NDF interface.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -104,10 +106,12 @@
      :  DEFICT,                  ! The deficit between the required
                                  ! number of dimensions and the number
                                  ! of significant ones.
-     :  DIM( NDF__MXDIM ),       ! The NDF dimensions
      :  I,                       ! Loop counter
      :  PADDIM,                  ! Number of insignificant dimensions
      :  SIGDIM                   ! Number of significant dimensions
+
+      INTEGER*8
+     :  DIM( NDF__MXDIM )        ! The NDF dimensions
 
 *.
 
@@ -115,7 +119,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Find the number of dimensions.
-      CALL NDF_DIM( NDF, NDF__MXDIM, DIM, ACTDIM, STATUS )
+      CALL NDF_DIM8( NDF, NDF__MXDIM, DIM, ACTDIM, STATUS )
 
 *  Deal with one special case---the NDF has a dimensionality that is
 *  less than or equal to qwhat is expected---by just copying the
