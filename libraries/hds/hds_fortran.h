@@ -70,6 +70,14 @@ hdsdim *
 hdsDimF2C( int ndim, const F77_INTEGER_TYPE fdims[],
 	   hdsdim cdims[DAT__MXDIM], int * status );
 
+/* 64 bit versions of the above */
+F77_INTEGER8_TYPE *hdsDimC2F8( int ndim, const hdsdim dims[],
+                               F77_INTEGER8_TYPE fdims[DAT__MXDIM],
+                               int *status );
+hdsdim *hdsDimF2C8( int ndim, const F77_INTEGER8_TYPE fdims[],
+                    hdsdim cdims[DAT__MXDIM], int * status );
+
+
 /* Set message token for hdsdim integer. */
 
 void dat1emsSetHdsdim( const char * token, hdsdim value );
@@ -78,11 +86,13 @@ void dat1emsSetHdsdim( const char * token, hdsdim value );
 /* Macro to convert a single hdsdim integer to a single
    Fortran integer, checking for truncation. Will set status
    to DAT__DTRNC if truncation occurs. There is no optimizaton
-   for the case where the hdsdim is a signed int.
+   for the case where the hdsdim is a signed int. Assumes hdsdim
+   is signed.
 */
 
 #define HDSDIM2INT( subname, cint, fint, status )			\
-  if ( cint > (hdsdim)INT_MAX ) {					\
+  if ( cint > (hdsdim)INT_MAX ||                                        \
+       cint < -(hdsdim)INT_MAX ) {					\
     fint = 0;								\
     if (*status == SAI__OK) {						\
       *status = DAT__DTRNC;						\

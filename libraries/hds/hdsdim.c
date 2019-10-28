@@ -17,7 +17,7 @@
 #include "hds_fortran.h"
 
 /* Routines to import and export arrays of type hdsdim for use in
-   Fortran libraries which require simple INTEGER*4 */
+   Fortran libraries. */
 
 /*
  *+
@@ -121,9 +121,8 @@ hdsDimC2F( int ndim, const hdsdim dims[],
 
   for (i = 0; i < ndim; i++ ) {
     /* need to test for overflow - compare hdsdim to fortran max. Assume
-       Fortran is a signed 32-bit int and negative dims will not
-       be allowed (unsigned int would fit but fortran would treat that
-       as negative dim). Do not test INT_MIN.
+       Fortran is a signed 32-bit int and hdsdim is signed. Do not test
+       INT_MIN.
      */
     HDSDIM2INT( "hdsDimC2F", dims[i], fdims[i], status );
   }
@@ -248,5 +247,27 @@ hdsDimF2C( int ndim, const F77_INTEGER_TYPE fdims[],
 
   return retval;
 
+}
+
+
+
+/* Versions of the above functions that use F77_INTEGER8_TYPE to
+   represent an hdsdim in Fortran rather than an F77_INTEGER_TYPE.
+   These assume that an hdsdim is a 64 bit signed integer, so a simple
+   copy is all that is needed. */
+
+F77_INTEGER8_TYPE *hdsDimC2F8( int ndim, const hdsdim dims[],
+                               F77_INTEGER8_TYPE fdims[DAT__MXDIM],
+                               int *status ) {
+  if ( *status != SAI__OK ) return NULL;
+  memmove( fdims, dims, ndim*sizeof(*fdims) );
+  return fdims;
+}
+
+
+hdsdim *hdsDimF2C8( int ndim, const F77_INTEGER8_TYPE fdims[],
+                    hdsdim cdims[DAT__MXDIM], int *status ) {
+  if ( *status != SAI__OK ) return NULL;
+  return (hdsdim*) fdims;
 }
 

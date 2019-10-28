@@ -10,17 +10,17 @@
 \stardocinitials    {SUN}
 \stardocsource      {sun\stardocnumber}
 \stardoccopyright
-{Copyright \copyright\ 2018 East Asian Observatory}
+{Copyright \copyright\ 2019 East Asian Observatory}
 
 % Variable part - replace [xxx] as appropriate.
 \stardocnumber      {92.14}
 \stardocauthors   {R.F.~Warren-Smith\\ M.D.~Lawden\\
                                 B.K.~McIlwrath \\ T.~Jenness\\ P.W.~Draper\\
                                 D.S.~Berry}
-\stardocdate        {8th January 2019}
+\stardocdate        {18th September 2019}
 \stardoctitle       {HDS\\ [\latex{1ex}]
                                 Hierarchical Data System}
-\stardocversion     {Version 6.2}
+\stardocversion     {Version 7.0}
 \stardocmanual      {Programmer's Manual}
 \stardocabstract  {
 HDS is a library of functions used for accessing file-based hierarchical
@@ -1705,6 +1705,83 @@ tuning parameter remained set to an incorrect value (perhaps causing
 gross inefficiencies elsewhere) simply because HDS\_TUNE did not
 execute after an unexpected error had caused STATUS to be set to an
 error value.
+
+\section{\xlabel{routine_variants_for_large_arrays}\label{sect:variants}ROUTINE VARIANTS FOR LARGE ARRAYS}
+The HDS routines described in the reference section of this document all
+use 4 byte integers arguments (i.e. a basic Fortran INTEGER) to store
+array dimensions, pixel indices and pixel counts. This restricts their
+usefulness to arrays that have no more than 2147483647 pixels (the
+largest positive number that can be stored in an INTEGER). Using these
+functions with larger arrays will cause overflow and undefined behaviour.
+However, for each routine that includes one or more such arguments,
+there is a variant of the routine that uses INTEGER*8 arguments for all
+array dimensions, pixel indices and pixel counts. Each variant routine has the
+same name as the corresponding basic routine but with the digit ``8''
+(as in ``INTEGER*8'') appended to the end of the name. The available
+variant routines are listed below:
+
+\htmlref{DAT\_ALTER8}{DAT_ALTER},
+\htmlref{DAT\_BASIC8}{DAT_BASIC},
+\htmlref{DAT\_CELL8}{DAT_CELL},
+\htmlref{DAT\_GET8}{DAT_GET},
+\htmlref{DAT\_GETx8}{DAT_GETx},
+\htmlref{DAT\_GET1x8}{DAT_GET1x},
+\htmlref{DAT\_GETVx8}{DAT_GETVx},
+\htmlref{DAT\_MAP8}{DAT_MAP},
+\htmlref{DAT\_MAPx8}{DAT_MAPx},
+\htmlref{DAT\_MAPN8}{DAT_MAPN},
+\htmlref{DAT\_MAPV8}{DAT_MAPV},
+\htmlref{DAT\_MOULD8}{DAT_MOULD},
+\htmlref{DAT\_NEW8}{DAT_NEW},
+\htmlref{DAT\_NEWC8}{DAT_NEWC},
+\htmlref{DAT\_NEW18}{DAT_NEW1},
+\htmlref{DAT\_NEW1x8}{DAT_NEW1x},
+\htmlref{DAT\_PUTx8}{DAT_PUTx},
+\htmlref{DAT\_PUT8}{DAT_PUT},
+\htmlref{DAT\_PUT1x8}{DAT_PUT1x},
+\htmlref{DAT\_PUTVx8}{DAT_PUTVx},
+\htmlref{DAT\_SHAPE8}{DAT_SHAPE},
+\htmlref{DAT\_SIZE8}{DAT_SIZE},
+\htmlref{DAT\_SLICE8}{DAT_SLICE},
+\htmlref{DAT\_TEMP8}{DAT_TEMP},
+\htmlref{HDS\_NEW8}{HDS_NEW}
+
+Each variant routine has the same argument list as the corresponding
+basic routine except that any INTEGER argument used to pass array
+dimensions, pixel indices or pixel counts is changed to INTEGER*8.
+
+Note, when changing code from using basic to using variant routines,
+remember that if a literal integer constant is passed to a subroutine,
+it's kind must match that expected by the the subroutine. So if the old
+code was:
+
+\begin{small}
+\begin{terminalv}
+      INTEGER ACTVAL
+      INTEGER STATUS
+      DOUBLE PRECISION VALUES( 5 )
+      ...
+      CALL DAT_GET1D( LOC, 5, VALUES, ACTVAL, STATUS )
+      ...
+\end{terminalv}
+\end{small}
+
+the new code should be
+
+\begin{small}
+\begin{terminalv}
+      INTEGER*8 ACTVAL
+      INTEGER STATUS
+      DOUBLE PRECISION VALUES( 5 )
+      ...
+      CALL DAT_GET1D8( LOC, 5_8, VALUES, ACTVAL, STATUS )
+      ...
+\end{terminalv}
+\end{small}
+
+The literal constant ``5\_8'' indicates a 8 byte integer constant with
+the value 5. If the old literal constant ``5'' was left unchanged,
+spurious behaviour such as a segmentation fault is likely to occur.
 
 \section{\xlabel{compiling_and_linking}COMPILING AND LINKING}
 
@@ -7695,6 +7772,30 @@ defaults objects are locked by the thread that creates them.
 \item The default output data format has been changed from V4 (the
 classic starlink format) to V5 (the HDF5-based format). To re-establish
 the old behaviour, set environment variable HDS\_VERSION to ``4''.
+\end{enumerate}
+
+\subsection{\xlabel{list_of_most_recent_changes}Changes in V7.0}
+
+\begin{enumerate}
+
+\item The definition of the \verb+hdsdim+ type used in the C interface
+has been changed from a 4-byte integer type (\verb+int+) to an 8 byte
+integer type (\verb+int64_t+). This allows HDS-based applications to
+access arrays with more than 2147483647 pixels (the largest value that
+can be stored in a 4-byte integer). Application code that uses the
+\verb+hdsdim+ type consistently should continue to compile and run as
+before. However, application code that assumes that the \verb+hdsdim+
+type is 4-bytes long (e.g. by inappropriate casting between \verb+int+
+and \verb+hdsdim+) may not compile or run correctly. Such code should
+be changed to avoid the assumption of a 4-byte \verb+hdsdim+ type.
+
+The classic HDS Fortran interface has not been changed - INTEGER$*$4
+variables are still used for arguments that pass array dimensions, pixel
+indices or pixel counts. However, there is now a variant routine for each
+routine that has one or more such arguments, which uses INTEGER$*$8 variables
+for array dimensions, pixel indices or pixel counts. Each variant routine
+is identical to the basic routine except that the digiti ``8'' is
+appended to the end of its name.
 \end{enumerate}
 
 \end{document}

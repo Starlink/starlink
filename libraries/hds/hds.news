@@ -1,6 +1,27 @@
 HDS Library
 -----------
 
+   Version 7.0
+   ===========
+
+   The definition of the hdsdim type used in the C interface has been
+   changed from a 4-byte integer type (int) to an 8 byte integer type
+   (int64_t). This allows HDS-based applications to access arrays with
+   more than 2147483647 pixels (the largest value that can be stored in a
+   4-byte integer). Application code that uses the hdsdim type
+   consistently should continue to compile and run as before. However,
+   application code that assumes that the hdsdim type is 4-bytes long
+   (e.g. by inappropriate casting between int and hdsdim) may not compile
+   or run correctly. Such code should be changed to avoid the assumption
+   of a 4-byte hdsdim type.
+
+   The classic HDS Fortran interface has not been changed - INTEGER*4
+   variables are still used for arguments that pass array dimensions,
+   pixel indices or pixel counts. However, there is now a variant routine
+   for each routine that has one or more such arguments, which uses
+   INTEGER*8 variables for array dimensions, pixel indices or pixel
+   counts. Each variant routine is identical to the basic routine except
+   that the digiti "8" is appended to the end of its name.
 
    Version 6.1
    ===========

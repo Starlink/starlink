@@ -150,7 +150,7 @@ error unable to find an 8 byte integer type
 #endif
 
 /* The internal size of array dimensions within HDS can be either 32 or 64 */
-/* bits. Note that 64 bits is untested and WILL change the file format!!!  */
+/* bits. Note that 64 bits WILL change the file format!!!  */
 
 /* Can not derive the dim size so we just set it */
 /* We also state whether this is unsigned so that we can compare with
@@ -162,7 +162,7 @@ error unable to find an 8 byte integer type
    values within an HDS data file. Instead, use "INT_BIG" (i.e. signed)
    since then HDS dimensions can be stored in HDS data files using the
    "K" data type. */
-#define BIGDIM 0   /* set to 1 if testing 64 bit dims */
+#define BIGDIM 1   /* set to 1 if testing 64 bit dims */
 #if BIGDIM
 #define DIM_TYPE INT_BIG
 #define HDS_DIM_CODE "K"

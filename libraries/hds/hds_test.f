@@ -4,7 +4,7 @@
 *     HDS_TEST
 
 *  Purpose:
-*     Test installation of HDS.
+*     Test installation of HDS INTEGER*4 Fortran interface
 
 *  Language:
 *     Starlink Fortran 77
