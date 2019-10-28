@@ -339,6 +339,10 @@
 *     19-AUG-2019 (DSB):
 *        Fix bug that prevent attributes of AXIS Width and Variance
 *        components being displayed.
+*     4-OCT-2019 (DSB):
+*        Cast EL to INTEGER*8 when calling KPG1_MONOD. At some point the
+*        whole of this function (and the whole of KAPPA!) should be
+*        changed to use 8-byte dimensions and counters.
 *     {enter_further_changes_here}
 
 *-
@@ -667,7 +671,7 @@
 *  Instead we issue a warning message so that the application can
 *  continue by using world co-ordinates.
             CALL ERR_BEGIN( STATUS )
-            CALL KPG1_MONOD( .TRUE., EL,
+            CALL KPG1_MONOD( .TRUE., INT8(EL),
      :                       %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                       MONOTO( IAXIS ), STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN

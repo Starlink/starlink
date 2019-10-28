@@ -197,9 +197,13 @@
 *     2010 April 28 (MJC):
 *        Permit output VARIANCE for the spline fit now that component
 *        SURFACEFIT.RMS is used.  This feature had been disabled because
-*        at one time variance was taken from the SURFACEFIT.FIT.VARIANCE 
-*        component which, however, was not present in the BSPLINE 
+*        at one time variance was taken from the SURFACEFIT.FIT.VARIANCE
+*        component which, however, was not present in the BSPLINE
 *        variant.
+*     4-OCT-2019 (DSB):
+*        Cast EL to INTEGER*8 when calling KPG1_AXBN<x>. At some point the
+*        whole of this function (and the whole of KAPPA!) should be
+*        changed to use 8-byte dimensions and counters.
 *     {enter_further_changes_here}
 
 *-
@@ -500,16 +504,16 @@
 
 *  Determine the bounds of the axes of the template NDF.
             IF ( ATYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_AXBNR( XDIM, %VAL( CNF_PVAL( XPTR ) ), XMIN,
-     :                          XMAX, STATUS )
-               CALL KPG1_AXBNR( YDIM, %VAL( CNF_PVAL( YPTR ) ), YMIN,
-     :                          YMAX, STATUS )
+               CALL KPG1_AXBNR( INT8( XDIM ), %VAL( CNF_PVAL( XPTR ) ),
+     :                          XMIN, XMAX, STATUS )
+               CALL KPG1_AXBNR( INT8( YDIM ), %VAL( CNF_PVAL( YPTR ) ),
+     :                          YMIN, YMAX, STATUS )
 
             ELSE
-               CALL KPG1_AXBND( XDIM, %VAL( CNF_PVAL( XPTR ) ), DXMIN,
-     :                          DXMAX, STATUS )
-               CALL KPG1_AXBND( YDIM, %VAL( CNF_PVAL( YPTR ) ), DYMIN,
-     :                          DYMAX, STATUS )
+               CALL KPG1_AXBND( INT8( XDIM ), %VAL( CNF_PVAL( XPTR ) ),
+     :                          DXMIN, DXMAX, STATUS )
+               CALL KPG1_AXBND( INT8( YDIM ), %VAL( CNF_PVAL( YPTR ) ),
+     :                          DYMIN, DYMAX, STATUS )
             END IF
 
 *  WORLD or PIXEL
