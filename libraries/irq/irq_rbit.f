@@ -144,7 +144,6 @@
      :                    'to the NDF.', STATUS )
          END IF
 
-
 *  If there is currently no bit plane reserved for this quality,
 *  reserve one now.
          CALL IRQ1_RBIT( LOCS, BIT, STATUS )

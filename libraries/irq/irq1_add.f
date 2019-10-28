@@ -81,9 +81,9 @@
 *     4-MAR-2008 (DSB):
 *        Added a "fixed bit" flag to the QUAL structure.
 *     24-APR-2016 (DSB):
-*        Ensure that the comment string passed to CMP_PUT0C is 
-*        not above the maximum allowed length. Truncate it if 
-*        it is to avoid an error being reported that would 
+*        Ensure that the comment string passed to CMP_PUT0C is
+*        not above the maximum allowed length. Truncate it if
+*        it is to avoid an error being reported that would
 *        usually cause the application to abort.
 *     {enter_changes_here}
 

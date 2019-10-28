@@ -110,7 +110,6 @@
       INCLUDE 'NDF_PAR'          ! NDF constants.
       INCLUDE 'IRQ_ERR'          ! IRQ error values.
 
-
 *  Arguments Given:
       INTEGER INDF
 
@@ -250,7 +249,7 @@
 *  IRQ_RLSE is called.
             ELSE
                CALL NDF_CLONE( INDF, CINDF, STATUS )
-               CALL IRQ1_TEMP( '_INTEGER', 0, 0, LOCS(1), STATUS )
+               CALL IRQ1_TEMP( '_INTEGER', 0, LOCS(1), STATUS )
                CALL DAT_PUT0I( LOCS(1), CINDF, STATUS )
 
                CALL DAT_FIND( QNLOC, IRQ__QUNAM, LOCS(2), STATUS )

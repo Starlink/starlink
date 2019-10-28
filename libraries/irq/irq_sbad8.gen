@@ -1,8 +1,8 @@
-      SUBROUTINE IRQ_SBAD<T>( IDQ, HELD, SIZE, VEC, ALLBAD, NOBAD,
-     :                     STATUS )
+      SUBROUTINE IRQ_SBAD8<T>( IDQ, HELD, SIZE, VEC, ALLBAD, NOBAD,
+     :                         STATUS )
 *+
 *  Name:
-*     IRQ_SBADx
+*     IRQ_SBAD8x
 
 *  Purpose:
 *     Set pixels `bad' which satisfy a given quality expression.
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL IRQ_SBADx( IDQ, HELD, SIZE, VEC, ALLBAD, NOBAD, STATUS )
+*     CALL IRQ_SBAD8x( IDQ, HELD, SIZE, VEC, ALLBAD, NOBAD, STATUS )
 
 *  Description:
 *     IRQ_COMP should be called before this routine to produce the
@@ -39,7 +39,7 @@
 *        If true then those VEC pixels which hold a quality satisfying
 *        the supplied quality expression are set `bad'. Otherwise, those
 *        pixels which don't hold such a quality are set `bad'.
-*     SIZE = INTEGER (Given)
+*     SIZE = INTEGER*8 (Given)
 *        The total number of pixels in VEC. An error is reported if
 *        this is not the same as the total number of pixels in the NDF
 *        determined by IDQ.
@@ -94,8 +94,6 @@
 *        Original version.
 *     17-JAN-2002 (DSB):
 *        Made generic.
-*     24-OCT-2019 (DSB):
-*        This routine is now a wrapper around IRQ_SBAD8
 *     {enter_changes_here}
 
 *  Bugs:
@@ -108,11 +106,35 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! DAT__ constants
+      INCLUDE 'IRQ_PAR'          ! IRQ constants.
+      INCLUDE 'IRQ_ERR'          ! IRQ error values.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+
+*  Global Variables:
+      INCLUDE 'IRQ_COM'          ! IRQ common blocks.
+*        QCM_INDF( IRQ__MAXQ ) = INTEGER (Read)
+*           Cloned NDF identifiers for the NDFs to which each quality
+*           expression refers.
+*        QCM_MSPNT( IRQ__MAXQ ) = INTEGER (Read)
+*           Pointer to mapped array holding bit masks.
+*        QCM_MXSTK( IRQ__MAXQ ) = INTEGER (Read)
+*           Maximum stack size needed to evaluate quality expression.
+*        QCM_NMASK( IRQ__MAXQ ) = INTEGER (Read)
+*           No. of quality masks needed to evaluate the quality
+*           expression.
+*        QCM_NOPC( IRQ__MAXQ ) = INTEGER (Read)
+*           No. of operations needed to evaluate the quality expression.
+*        QCM_OPPNT( IRQ__MAXQ ) = INTEGER (Read)
+*           Pointer to mapped array holding op. codes.
+*        QCM_VALID( IRQ__MAXQ ) = LOGICAL (Read)
+*           True if the corresponding compiled quality expression
+*           identifier is valid (i.e. in use).
 
 *  Arguments Given:
       INTEGER IDQ
       LOGICAL HELD
-      INTEGER SIZE
+      INTEGER*8 SIZE
 
 *  Arguments Returned:
       <TYPE> VEC( SIZE )
@@ -123,11 +145,61 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER*8 SIZE8
+      INTEGER*8 NDFSIZ           ! Total number of pixels in NDF.
+      INTEGER QPNT               ! Pointer to mapped QUALITY array.
+      CHARACTER WLOC*(DAT__SZLOC)! Locator for temporary workspace.
+      INTEGER WPNT               ! Pointer to mapped workspace.
 *.
 
-      SIZE8 = SIZE
-      CALL IRQ_SBAD8<T>( IDQ, HELD, SIZE8, VEC, ALLBAD, NOBAD,
-     :                   STATUS )
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  If the IRQ identifier is not valid, report an error.
+      IF( IDQ .LT. 1 .OR. IDQ .GT. IRQ__MAXQ ) THEN
+         STATUS = IRQ__INVID
+
+      ELSE IF( .NOT. QCM_VALID( IDQ ) ) THEN
+         STATUS = IRQ__INVID
+
+      END IF
+
+      IF( STATUS .EQ. IRQ__INVID ) THEN
+         CALL ERR_REP( 'IRQ_SBAD8<T>_ERR1', 'IRQ_SBAD8<T>: Invalid '//
+     :                 'IRQ identifier supplied', STATUS )
+      END IF
+
+*  Map the QUALITY component of the NDF.
+      CALL NDF_MAP8( QCM_INDF( IDQ ), 'QUALITY', '_UBYTE', 'READ', QPNT,
+     :               NDFSIZ, STATUS )
+
+*  Check that the supplied vector is the same size as the NDF.
+      IF( NDFSIZ .NE. SIZE .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = IRQ__INCOM
+         CALL ERR_REP( 'IRQ_SBAD8<T>_ERR2', 'IRQ_SBAD8<T>: Supplied '//
+     :                 'vector and NDF have different sizes.', STATUS )
+      END IF
+
+*  Obtain mapped workspace for the evaluation stack.
+      CALL IRQ1_TEMP8( '_LOGICAL', QCM_MXSTK( IDQ )*SIZE, WLOC,
+     :                 STATUS )
+      CALL DAT_MAPV8( WLOC, '_LOGICAL', 'WRITE', WPNT, NDFSIZ, STATUS )
+
+*  Create the pixel mask.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL IRQ1_SBAD1<T>( HELD, QCM_NMASK( IDQ ),
+     :                       %VAL( CNF_PVAL( QCM_MSPNT( IDQ ) ) ),
+     :                       QCM_NOPC( IDQ ),
+     :                       %VAL( CNF_PVAL( QCM_OPPNT( IDQ ) ) ),
+     :                       QCM_MXSTK( IDQ ),
+     :                       SIZE, %VAL( CNF_PVAL( QPNT ) ),
+     :                       %VAL( CNF_PVAL( WPNT ) ), VEC,
+     :                       ALLBAD, NOBAD, STATUS )
+      END IF
+
+*  Release the work space.
+      CALL IRQ1_ANTMP( WLOC, STATUS )
+
+*  Unmap the quality array.
+      CALL NDF_UNMAP( QCM_INDF( IDQ ), 'QUALITY', STATUS )
 
       END

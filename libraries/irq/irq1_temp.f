@@ -1,4 +1,4 @@
-      SUBROUTINE IRQ1_TEMP( TYPE, NDIM, DIM, LOC, STATUS )
+      SUBROUTINE IRQ1_TEMP( TYPE, DIM, LOC, STATUS )
 *+
 *  Name:
 *     IRQ1_TEMP
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL IRQ1_TEMP( TYPE, NDIM, DIM, LOC, STATUS )
+*     CALL IRQ1_TEMP( TYPE, DIM, LOC, STATUS )
 
 *  Description:
 *     The routine creates a temporary HDS object with the specified
@@ -21,10 +21,8 @@
 *  Arguments:
 *     TYPE = CHARACTER * ( * ) (Given)
 *        HDS type of object to be created.
-*     NDIM = INTEGER (Given)
-*        Number of object dimensions.
-*     DIM( NDIM ) = INTEGER (Given)
-*        Object dimensions.
+*     DIM = INTEGER (Given)
+*        Object dimension (zero for a scalar)
 *     LOC = CHARACTER * ( * ) (Returned)
 *        Locator to temporary object.
 *     STATUS = INTEGER (Given and Returned)
@@ -38,17 +36,6 @@
 *     -  This routine is a work-around to avoid the problems associated
 *     with calling DAT_TEMP if the objects created must subsequently be
 *     erased.
-
-*  Algorithm:
-*     -  Initialise the LOC argument, before checking the inherited
-*     status.
-*     -  On the first invocation, create a temporary enclosing
-*     structure.
-*     -  Subsequently, create a unique name for the temporary object
-*     required.
-*     -  Create the object within the enclosing structure and obtain a
-*     locator to it.
-*     -  If an error occurred, then reset the LOC argument.
 
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council.
@@ -84,6 +71,8 @@
 *        current thread. Accessing the SAVEd variables will be safe
 *        because multi-threaded invocations of all F77 functions are
 *        serialised by mutex locking in the F77 macros.
+*     24-OCT-2019 (DSB):
+*        Now a wrapper around IRQ1_TEMP8.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -96,12 +85,10 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'          ! DAT__ constants
 
 *  Arguments Given:
       CHARACTER * ( * ) TYPE
-      INTEGER NDIM
-      INTEGER DIM( * )
+      INTEGER DIM
 
 *  Arguments Returned:
       CHARACTER * ( * ) LOC
@@ -110,76 +97,10 @@
       INTEGER STATUS             ! Global status
 
 *  Local variables:
-      CHARACTER * ( DAT__SZLOC ) TMPLOC ! Locator to enclosing structure
-      CHARACTER * ( DAT__SZNAM ) NAME ! Temporary object name
-      INTEGER COUNT              ! Count of objects created
-      INTEGER DUMMY( 1 )         ! Dummy dimensions array
-      INTEGER EL                 ! Total number of elements requested
-      INTEGER I                  ! Loop counter
-      INTEGER NCHAR              ! Number of characters formatted
-      SAVE COUNT
-      SAVE TMPLOC
-
-*  Local Data:
-      DATA COUNT / 0 /
-
+      INTEGER*8 DIM8
 *.
 
-*  Initialise the LOC argument.
-      LOC = ' '
-
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Increment the count of temporary objects created.
-      COUNT = COUNT + 1
-
-*  Before creating the first object, create a temporary enclosing
-*  structure.
-      IF ( COUNT .EQ. 1 ) THEN
-         TMPLOC = ' '
-         CALL DAT_TEMP( 'IRQ1_TEMP', 0, DUMMY, TMPLOC, STATUS )
-
-*  If the enclosing structure has just been created it will already be
-*  locked for access by the current thread. If the enclosing structure
-*  already existed, lock it now for use by the current thread.
-      ELSE
-         CALL DAT_LOCK( TMPLOC, .FALSE., .FALSE., STATUS )
-      END IF
-
-*  Form a unique name for the temporary object.
-      IF ( STATUS .EQ. SAI__OK ) THEN
-         NAME = 'IRQ1_'
-         CALL CHR_ITOC( COUNT, NAME( 5 : ), NCHAR )
-
-*  Create an object inside the enclosing structure and obtain a locator
-*  to it.
-         CALL DAT_NEW( TMPLOC, NAME, TYPE, NDIM, DIM, STATUS )
-         CALL DAT_FIND( TMPLOC, NAME, LOC, STATUS )
-
-*  If an error occurred, then reset the LOC argument.
-         IF ( STATUS .NE. SAI__OK ) THEN
-            LOC = ' '
-         END IF
-      END IF
-
-*  Unlock the enclosing structure  so that other threads can create
-*  temporary objects in it.
-      CALL DAT_UNLOCK( TMPLOC, .FALSE., STATUS )
-
-*  Report a contextual error containing the total number of array
-*  elements.
-      IF ( STATUS .NE. SAI__OK ) THEN
-         EL = 1
-         DO  I = 1, NDIM
-            EL = EL * DIM( I )
-         END DO
-
-         CALL MSG_SETI( 'EL', EL )
-         CALL MSG_SETC( 'TYPE', TYPE )
-         CALL ERR_REP( 'IRQ1_TEMP_NOTOBT',
-     :            'IRQ1_TEMP: Error obtaining ^EL elements of ^TYPE '//
-     :            'temporary space.', STATUS )
-      END IF
+      DIM8 = DIM
+      CALL IRQ1_TEMP8( TYPE, DIM8, LOC, STATUS )
 
       END

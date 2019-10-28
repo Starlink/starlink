@@ -1,7 +1,7 @@
-      SUBROUTINE IRQ_CNTQ( LOCS, SIZE, SET, STATUS )
+      SUBROUTINE IRQ_CNTQ8( LOCS, SIZE, SET, STATUS )
 *+
 *  Name:
-*     IRQ_CNTQ
+*     IRQ_CNTQ8
 
 *  Purpose:
 *     Count the number of pixels which are set in each bit-plane of the
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL IRQ_CNTQ( LOCS, SIZE, SET, STATUS )
+*     CALL IRQ_CNTQ8( LOCS, SIZE, SET, STATUS )
 
 *  Description:
 *     Each bit plane of the NDF QUALITY component corresponds to a
@@ -33,7 +33,7 @@
 *     SIZE = INTEGER (Given)
 *        The number of bit planes for which a count of set pixels is
 *        required.
-*     SET( SIZE ) = INTEGER (Returned)
+*     SET( SIZE ) = INTEGER*8 (Returned)
 *        The number of pixels holding the corresponding quality in each
 *        of bit planes 1 to SIZE. The least-significant bit is Bit 1.
 *        If SIZE is larger than the number of bit planes in the QUALITY
@@ -42,8 +42,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1991 Science & Engineering Research Council.
-*     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 2019 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -64,16 +63,11 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
-*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
-*     25-JUL-1991 (DSB):
-*        Original version.
-*     2004 September 1 (TIMJ):
-*        Use CNF_PVAL
 *     24-OCT-2019 (DSB):
-*        This routine is now a wrapper around IRQ_CNTQ8.
+*        Original version.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -88,44 +82,79 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'IRQ_PAR'          ! IRQ constants.
       INCLUDE 'IRQ_ERR'          ! IRQ error values.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER LOCS*(*)
       INTEGER SIZE
 
 *  Arguments Returned:
-      INTEGER SET( SIZE )
+      INTEGER*8 SET( SIZE )
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER I
-      INTEGER*8 SET8( IRQ__QBITS )
-
+      INTEGER BIT                ! QUALITY bit (LSB = 1).
+      INTEGER*8 CLEAR            ! No. of pixels which do not hold the
+                                 ! quality.
+      LOGICAL DEF                ! True if QUALITY component is in a
+                                 ! defined state.
+      INTEGER INDF               ! Identifier for the NDF containing the
+                                 ! quality names information.
+      INTEGER*8 NEL              ! No. of pixels in the NDF.
+      INTEGER PNT                ! Pointer to the mapped QUALITY array.
 *.
-      IF( SIZE .GT. IRQ__QBITS ) THEN
-         IF( STATUS .EQ. SAI__OK ) THEN
-            STATUS = IRQ__BDSIZ
-            CALL MSG_SETI( 'S', SIZE )
-            CALL MSG_SETI( 'M', IRQ__QBITS )
-            CALL ERR_REP( ' ', 'IRQ_CNTQ: Too many quality planes '//
-     :                    '(^S) requested: must be no more than ^M.',
-     :                    STATUS )
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Obtain the NDF identifier from LOCS, and check it is still valid.
+      CALL IRQ1_INDF( LOCS, INDF, STATUS )
+
+*  Check that the QUALITY component is in a defined state.
+      CALL NDF_STATE( INDF, 'QUALITY', DEF, STATUS )
+      IF( .NOT. DEF .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = IRQ__QUNDF
+         CALL ERR_REP( 'IRQ_CNTQ8_ERR1',
+     :                 'IRQ_CNTQ8: No QUALITY array found in the NDF.',
+     :                  STATUS )
+      END IF
+
+*  Map the QUALITY component of the NDF.
+      CALL NDF_MAP8( INDF, 'QUALITY', '_UBYTE', 'READ', PNT, NEL,
+     :               STATUS )
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Loop round each element of the SET array.
+      DO BIT = 1, SIZE
+
+*  If there is a QUALITY bit plane with this index, count the number of
+*  set pixels.
+         IF( BIT .LE. IRQ__QBITS ) THEN
+
+*  Count the number of pixels which do and do not have the quality.
+            CALL IRQ1_QCNT( BIT, NEL, %VAL( CNF_PVAL( PNT ) ),
+     :                      SET( BIT ), CLEAR,
+     :                      STATUS )
+
+*  If no such bit exists, set the count to zero.
+         ELSE
+            SET( BIT ) = 0
+
          END IF
 
-      ELSE
-         CALL IRQ_CNTQ8( LOCS, SIZE, SET8, STATUS )
+      END DO
 
-         DO I = 1, SIZE
-            SET( I ) = SET8( I )
-            IF( SET( I ) .NE. SET8( I ) .AND. STATUS .EQ. SAI__OK ) THEN
-               STATUS = IRQ__OVFLW
-               CALL ERR_REP( ' ', 'IRQ_CNTQ: Return value too large '//
-     :                       'for 4-byte integer.', STATUS )
-            END IF
-         END DO
+*  Unmap the QUALITY array.
+      CALL NDF_UNMAP( INDF, 'QUALITY', STATUS )
 
+*  If an error occur, give context information.
+ 999  CONTINUE
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL NDF_MSG( 'NDF', INDF )
+         CALL ERR_REP( 'IRQ_CNTQ8_ERR2', 'IRQ_CNTQ8: Unable to count '//
+     :                 'QUALITY bits in NDF ^NDF', STATUS )
       END IF
 
       END

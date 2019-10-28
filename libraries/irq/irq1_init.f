@@ -88,7 +88,7 @@
 *  Create a temporary HDS object to hold the structures. This is
 *  a one dimensional array of QEXP structures with size given
 *  by symbolic constant IRQ__MAXQ.
-      CALL IRQ1_TEMP( 'QEXP', 1, IRQ__MAXQ, QCM_LOC, STATUS )
+      CALL IRQ1_TEMP( 'QEXP', IRQ__MAXQ, QCM_LOC, STATUS )
 
 *  Initialise all identifiers to "not in use".
       DO IDQ = 1, IRQ__MAXQ

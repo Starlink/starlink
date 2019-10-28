@@ -22,13 +22,13 @@
 *     BIT = INTEGER (Given)
 *        The bit number within the QUALITY component. The least
 *        significant bit is called bit 1 (not bit 0).
-*     SIZE = INTEGER (Given)
+*     SIZE = INTEGER*8 (Given)
 *        The size of the QUAL vector.
 *     QUAL( SIZE ) = BYTE (Given and Returned)
 *        The QUALITY vector.
-*     NSET = INTEGER (Returned)
+*     NSET = INTEGER*8 (Returned)
 *        No. of pixels for which the specified QUALITY bit is set.
-*     NCLR = INTEGER (Returned)
+*     NCLR = INTEGER*8 (Returned)
 *        No. of pixels for which the specified QUALITY bit is cleared.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -39,6 +39,7 @@
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2019 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -64,6 +65,8 @@
 *  History:
 *     30-JUL-1991 (DSB):
 *        Original version.
+*     24-OCT-2019 (DSB):
+*        Changed to use 8-byte integers.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -79,18 +82,18 @@
 
 *  Arguments Given:
       INTEGER BIT
-      INTEGER SIZE
+      INTEGER*8 SIZE
       BYTE QUAL( SIZE )
 
 *  Arguments Returned:
-      INTEGER NSET
-      INTEGER NCLR
+      INTEGER*8 NSET
+      INTEGER*8 NCLR
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER I                  ! Loop count.
+      INTEGER*8 I                ! Loop count.
       INTEGER LBIT               ! Corrected bit number.
 
 *  PRIMDAT type conversion functions.

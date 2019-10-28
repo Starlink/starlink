@@ -90,6 +90,11 @@
 *        Added RDONLY to IRQ1_SEARC and IRRQ1_MOD call.
 *     4-MAR-2008 (DSB):
 *        Cater for fixed bit qualities.
+*     24-OCT-2019 (DSB):
+*        Changed to call 8-byte internal functions. This routine has not
+*        been made a wrapper around IRQ_RESQL8 because that would have
+*        required an 8-byte copy to be made of the supplied 4-byte positions
+*        list, which could be expensive for long lists.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -125,6 +130,7 @@
       INTEGER BIT                ! QUALITY bit corresponding to the
                                  ! quality name (LSB = 1).
       INTEGER CLEAR              ! No. of pixels without the quality.
+      INTEGER*8 CLEAR8           ! No. of pixels without the quality.
       CHARACTER COMMNT*(IRQ__SZCOM)! Descriptive comment stored with
                                  ! the quality name.
       LOGICAL DEF                ! True if the QUALITY component is in a
@@ -140,9 +146,11 @@
       CHARACTER LQNAME*(IRQ__SZQNM) ! Upper case copy of quality name.
       INTEGER MDIM               ! NDF dimensionality.
       CHARACTER MODE*10          ! Mapping mode for the QUALITY array.
-      INTEGER NEL                ! No. of pixels in the NDF.
+      INTEGER NEL                ! No. of pixels in the NDF (4-byte)
+      INTEGER*8 NEL8             ! No. of pixels in the NDF (8-byte)
       INTEGER PNT                ! Pointer to the mapped QUALITY array.
       LOGICAL RDONLY             ! Read-only flag for quality name.
+      INTEGER*8 SET8             ! No. of pixels with the quality.
       INTEGER SLOT               ! Index into the QUALITY_NAMES
                                  ! structure at which the new name will
                                  ! be stored.
@@ -214,7 +222,8 @@
 *  the quality on entry to this routine.
       IF( BIT .EQ. 0 ) THEN
          CALL IRQ1_RBIT( LOCS, BIT, STATUS )
-         CALL IRQ1_QSET( BIT, .TRUE., NEL, %VAL( CNF_PVAL( PNT ) ),
+         NEL8 = NEL
+         CALL IRQ1_QSET( BIT, .TRUE., NEL8, %VAL( CNF_PVAL( PNT ) ),
      :                   STATUS )
       END IF
 
@@ -224,8 +233,15 @@
      :                UBND, NEL, %VAL( CNF_PVAL( PNT ) ), STATUS )
 
 *  Count the number of pixels for which the bit is set or clear.
-      CALL IRQ1_QCNT( BIT, NEL, %VAL( CNF_PVAL( PNT ) ),
-     :                SET, CLEAR, STATUS )
+      CALL IRQ1_QCNT( BIT, NEL8, %VAL( CNF_PVAL( PNT ) ),
+     :                SET8, CLEAR8, STATUS )
+      SET = SET8
+      CLEAR = CLEAR8
+      IF( SET .NE. SET8 .OR. CLEAR .NE. CLEAR8 ) THEN
+         STATUS = IRQ__OVFLW
+         CALL ERR_REP( ' ', 'Too many pixels (4-byte integer '//
+     :                 'overflow).', STATUS )
+      END IF
 
 *  Unmap the QUALITY array.
       CALL NDF_UNMAP( INDF, 'QUALITY', STATUS )

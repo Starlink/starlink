@@ -1,8 +1,8 @@
-      SUBROUTINE IRQ1_QLST( BIT, LISTED, SET, NDIM, NCOORD, LIST, LBND,
-     :                      UBND, SIZE, QUAL, STATUS )
+      SUBROUTINE IRQ1_QLST8( BIT, LISTED, SET, NDIM, NCOORD, LIST, LBND,
+     :                       UBND, SIZE, QUAL, STATUS )
 *+
 *  Name:
-*     IRQ1_QLST
+*     IRQ1_QLST8
 
 *  Purpose:
 *     Set a QUALITY bit for pixels determined by a list.
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL IRQ1_QLST( BIT, LISTED, SET, NDIM, NCOORD, LIST, LBND,
-*                     UBND, SIZE, QUAL, STATUS )
+*     CALL IRQ1_QLST8( BIT, LISTED, SET, NDIM, NCOORD, LIST, LBND,
+*                      UBND, SIZE, QUAL, STATUS )
 
 *  Description:
 *     If SET is true then selected pixels in the QUALITY vector have
@@ -43,16 +43,16 @@
 *        values are stored for each pixel in the list, and also
 *        determines the number of upper and lower bounds supplied in
 *        LBND and UBND.
-*     NCOORD = INTEGER (Given)
+*     NCOORD = INTEGER*8 (Given)
 *        The number of pixels in the input list. Each pixel has NDIM
 *        coordinate values to describe its position.
-*     LIST( NDIM, NCOORD ) = INTEGER (Given)
+*     LIST( NDIM, NCOORD ) = INTEGER*8 (Given)
 *        The list of pixel positions.
-*     LBND( NDIM ) = INTEGER (Given)
+*     LBND( NDIM ) = INTEGER*8 (Given)
 *        The lower bound on each axis of the pixel space.
-*     UBND( NDIM ) = INTEGER (Given)
+*     UBND( NDIM ) = INTEGER*8 (Given)
 *        The upper bound on each axis of the pixel space.
-*     SIZE = INTEGER (Given)
+*     SIZE = INTEGER*8 (Given)
 *        The size of the QUAL vector. This should be equal to the
 *        product of the dimensions implied by LBND and UBND.
 *     QUAL( SIZE ) = BYTE (Given and Returned)
@@ -64,8 +64,7 @@
 *     -  Uses BYTE arrays.
 
 *  Copyright:
-*     Copyright (C) 1991 Science & Engineering Research Council.
-*     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 2019 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -86,14 +85,11 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
-*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
-*     30-JUL-1991 (DSB):
+*     24-OCT-2019 (DSB):
 *        Original version.
-*     2004 September 1 (TIMJ):
-*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -114,11 +110,11 @@
       LOGICAL LISTED
       LOGICAL SET
       INTEGER NDIM
-      INTEGER NCOORD
-      INTEGER LIST( NDIM, NCOORD )
-      INTEGER LBND( NDIM )
-      INTEGER UBND( NDIM )
-      INTEGER SIZE
+      INTEGER*8 NCOORD
+      INTEGER*8 LIST( NDIM, NCOORD )
+      INTEGER*8 LBND( NDIM )
+      INTEGER*8 UBND( NDIM )
+      INTEGER*8 SIZE
 
 *  Arguments Given and Returned:
       BYTE QUAL( SIZE )
@@ -127,8 +123,8 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER NEL                ! No. of elements in mapped workspace.
-      INTEGER NOK                ! No. of listed pixel positions which
+      INTEGER*8 NEL              ! No. of elements in mapped workspace.
+      INTEGER*8 NOK              ! No. of listed pixel positions which
                                  ! satisfy the bounds constraints.
       INTEGER PNT                ! Pointer to mapped workspace.
       CHARACTER WLOC*(DAT__SZLOC)! Locator to workspace.
@@ -140,20 +136,19 @@
 
 *  Get workspace to hold the vectorised addresses corresponding to the
 *  listed pixel positions.
-      CALL IRQ1_TEMP( '_INTEGER', NCOORD, WLOC, STATUS )
+      CALL IRQ1_TEMP8( '_INTEGER*8', NCOORD, WLOC, STATUS )
 
 *  Map the temporary workspace as a 1D vector.
-      CALL DAT_MAPV( WLOC, '_INTEGER', 'WRITE', PNT, NEL, STATUS )
+      CALL DAT_MAPV8( WLOC, '_INTEGER*8', 'WRITE', PNT, NEL, STATUS )
 
 *  Convert the N dimensional coordinates to the corresponding 1D vector
 *  addresses, excluding any coordinates which fall outside the bounds.
-      CALL IRQ1_NDTOV( NDIM, NCOORD, LIST, LBND, UBND,
-     :                 %VAL( CNF_PVAL( PNT ) ), NOK,
-     :                 STATUS )
+      CALL IRQ1_NDTOV8( NDIM, NCOORD, LIST, LBND, UBND,
+     :                  %VAL( CNF_PVAL( PNT ) ), NOK, STATUS )
 
 *  Perform the required operation on the selected pixels.
-      CALL IRQ1_QLST2( BIT, LISTED, SET, NOK, %VAL( CNF_PVAL( PNT ) ),
-     :                 SIZE, QUAL, STATUS )
+      CALL IRQ1_QLST28( BIT, LISTED, SET, NOK, %VAL( CNF_PVAL( PNT ) ),
+     :                  SIZE, QUAL, STATUS )
 
 *  Annul the temporary workspace.
       CALL IRQ1_ANTMP( WLOC, STATUS )

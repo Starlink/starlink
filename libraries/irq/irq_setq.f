@@ -101,7 +101,7 @@
                                  ! quality names information.
       INTEGER LAST               ! Position of last non-blank character.
       CHARACTER LQNAME*(IRQ__SZQNM) ! Upper case copy of quality name.
-      INTEGER NEL                ! No. of pixels in the NDF.
+      INTEGER*8 NEL              ! No. of pixels in the NDF.
       INTEGER PNT                ! Pointer to the mapped QUALITY array.
       LOGICAL RDONLY             ! Read-only flag for quality name.
       INTEGER SLOT               ! Index into the QUALITY_NAMES
@@ -143,8 +143,8 @@
 *  If the quality has a fixed bit number, we need to set the bit for
 *  all pixels in the quality component.
       IF( FIXBIT ) THEN
-         CALL NDF_MAP( INDF, 'QUALITY', '_UBYTE', 'UPDATE', PNT, NEL,
-     :                 STATUS )
+         CALL NDF_MAP8( INDF, 'QUALITY', '_UBYTE', 'UPDATE', PNT, NEL,
+     :                  STATUS )
          CALL IRQ1_QSET( BIT, .TRUE., NEL, %VAL( CNF_PVAL( PNT ) ),
      :                   STATUS )
          CALL NDF_UNMAP( INDF, 'QUALITY', STATUS )

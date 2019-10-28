@@ -15,13 +15,13 @@
 *  Description:
 *     The number of good and bad pixels in the input data are returned.
 *  Arguments:
-*     SIZE = INTEGER (Given)
+*     SIZE = INTEGER*8 (Given)
 *        Size of the data vector.
 *     DATA( SIZE ) = REAL (Given)
 *        Data vector.
-*     NGOOD = INTEGER (Returned)
+*     NGOOD = INTEGER*8 (Returned)
 *        Number of pixels in DATA not equal to VAL__BADR.
-*     NBAD = INTEGER (Returned)
+*     NBAD = INTEGER*8 (Returned)
 *        Number of pixels in DATA equal to VAL__BADR.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -53,6 +53,8 @@
 *  History:
 *     29-JUL-1991 (DSB):
 *        Original version.
+*     24-OCT-2019 (DSB):
+*        Change to use 8-byte args.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -68,18 +70,18 @@
       INCLUDE 'PRM_PAR'          ! Starlink data constants.
 
 *  Arguments Given:
-      INTEGER SIZE
+      INTEGER*8 SIZE
       REAL DATA( SIZE )
 
 *  Arguments Returned:
-      INTEGER NGOOD
-      INTEGER NBAD
+      INTEGER*8 NGOOD
+      INTEGER*8 NBAD
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER I                  ! Loop count.
+      INTEGER*8 I                ! Loop count.
 
 *.
 

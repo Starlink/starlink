@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="irq" support="U">
-  <version>4.0</version>
+  <version>5.0</version>
   <path>libraries/irq</path>
   <description>Library to manage NDF QUALITY information textually</description>
   <abstract><p> This library is a set of Fortran routines that permit

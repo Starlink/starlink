@@ -19,7 +19,8 @@
 *     used to generate the operands are also replaced by NULL.
 
 *  Arguments:
-*     I = Index of instruction to be nullified within OPCODE.
+*     I = INTEGER (Given)
+*        Index of instruction to be nullified within OPCODE.
 *     NOPC = INTEGER (Given)
 *        The no. of instruction codes in OPCODE.
 *     OPCODE( NOPC ) = INTEGER (Given and Returned)

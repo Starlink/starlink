@@ -47,4 +47,8 @@ NOOPS  <No operands can be found>
 
 RDONL  <Quality name is read-only>
 
+BDSIZ  <Too many quality planes specified>
+OVFLW  <Overflow converting from 8-byte to 4-byte integer>
+XSDIM  <Too many dimensions supplied>
+
 .END

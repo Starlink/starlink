@@ -104,7 +104,7 @@
       INTEGER LAST               ! Position of last non-blank character.
       CHARACTER LQNAME*(IRQ__SZQNM) ! Upper case copy of quality name.
       CHARACTER MODE*10          ! Mapping mode for QUALITY component.
-      INTEGER NEL                ! No. of pixels in the NDF.
+      INTEGER*8 NEL              ! No. of pixels in the NDF.
       INTEGER PNT                ! Pointer to the mapped QUALITY array.
       LOGICAL RDONLY             ! Read-only flag for quality name.
       INTEGER SLOT               ! Index into the QUALITY_NAMES
@@ -153,8 +153,8 @@
             MODE = 'WRITE/ZERO'
          END IF
 
-         CALL NDF_MAP( INDF, 'QUALITY', '_UBYTE', MODE, PNT, NEL,
-     :                 STATUS )
+         CALL NDF_MAP8( INDF, 'QUALITY', '_UBYTE', MODE, PNT, NEL,
+     :                  STATUS )
          IF( DEF ) CALL IRQ1_QSET( BIT, .FALSE., NEL,
      :                             %VAL( CNF_PVAL( PNT ) ), STATUS )
          CALL NDF_UNMAP( INDF, 'QUALITY', STATUS )

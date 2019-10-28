@@ -26,7 +26,7 @@
 *        that the corresponding quality is held.  If false, then all
 *        pixels have the given bit cleared, indicating that the
 *        corresponding quality is not held.
-*     SIZE = INTEGER (Given)
+*     SIZE = INTEGER*8 (Given)
 *        The size of the QUAL vector.
 *     QUAL( SIZE ) = BYTE (Given and Returned)
 *        The QUALITY vector.
@@ -64,6 +64,8 @@
 *  History:
 *     30-JUL-1991 (DSB):
 *        Original version.
+*     24-OCT-2019 (DSB):
+*        Change to use 8-byte SIZE.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -80,7 +82,7 @@
 *  Arguments Given:
       INTEGER BIT
       LOGICAL SET
-      INTEGER SIZE
+      INTEGER*8 SIZE
 
 *  Arguments Given and Returned:
       BYTE QUAL( SIZE )
@@ -89,7 +91,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER I                  ! Loop count.
+      INTEGER*8 I                ! Loop count.
       INTEGER LBIT               ! Corrected bit number.
 
 *  PRIMDAT type conversion functions.

@@ -81,7 +81,6 @@
 *           True if the corresponding IRQ identifier is valid (i.e. in
 *           use).
 
-
 *  Status:
       INTEGER STATUS             ! Global status
 

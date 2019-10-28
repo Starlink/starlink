@@ -1,8 +1,8 @@
-      SUBROUTINE IRQ_SETQL( LOCS, LISTED, QNAME, NDIM, NCOORD, LIST,
-     :                      SET, STATUS )
+      SUBROUTINE IRQ_SETQL8( LOCS, LISTED, QNAME, NDIM, NCOORD, LIST,
+     :                       SET, STATUS )
 *+
 *  Name:
-*     IRQ_SETQL
+*     IRQ_SETQL8
 
 *  Purpose:
 *     Assign a given quality to a list of pixels, leaving unlisted
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL IRQ_SETQL( LOCS, LISTED, QNAME, NDIM, NCOORD, LIST, SET,
-*                     STATUS )
+*     CALL IRQ_SETQL8( LOCS, LISTED, QNAME, NDIM, NCOORD, LIST, SET,
+*                      STATUS )
 
 *  Description:
 *     The quality specified by QNAME is assigned to all pixels included
@@ -43,20 +43,18 @@
 *     NDIM = INTEGER (Given)
 *        The number of values required to specify a pixel position
 *        (i.e. the number of dimensions in the NDF).
-*     NCOORD = INTEGER (Given)
+*     NCOORD = INTEGER*8 (Given)
 *        The number of pixels included in the input list.
-*     LIST( NDIM, NCOORD ) = INTEGER (Given)
+*     LIST( NDIM, NCOORD ) = INTEGER*8 (Given)
 *        The list of pixel indices. Any indices which lie outside the
 *        bounds of the NDF are ignored.
-*     SET = INTEGER (Returned)
+*     SET = INTEGER*8 (Returned)
 *        The number of pixels in the NDF which hold the quality.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1991 Science & Engineering Research Council.
-*     Copyright (C) 2004 Central Laboratory of the Research Councils.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2019 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -77,23 +75,11 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
-*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
-*     25-JUL-1991 (DSB):
-*        Original version.
-*     2004 September 1 (TIMJ):
-*        Use CNF_PVAL
-*     15-FEB-2008 (DSB):
-*        Added RDONLY to IRQ1_SEARC and IRQ1_MOD call.
-*     4-MAR-2008 (DSB):
-*        Cater for fixed bit qualities.
 *     24-OCT-2019 (DSB):
-*        Changed to call 8-byte internal functions. This routine has not
-*        been made a wrapper around IRQ_SETQL8 because that would have
-*        required an 8-byte copy to be made of the supplied 4-byte positions
-*        list, which could be expensive for long lists.
+*        Original version.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -116,11 +102,11 @@
       LOGICAL LISTED
       CHARACTER QNAME*(*)
       INTEGER NDIM
-      INTEGER NCOORD
-      INTEGER LIST( NDIM, NCOORD )
+      INTEGER*8 NCOORD
+      INTEGER*8 LIST( NDIM, NCOORD )
 
 *  Arguments Returned:
-      INTEGER SET
+      INTEGER*8 SET
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -128,8 +114,7 @@
 *  Local Variables:
       INTEGER BIT                ! QUALITY bit corresponding to the
                                  ! quality name (LSB = 1).
-      INTEGER CLEAR              ! No. of pixels without the quality.
-      INTEGER*8 CLEAR8           ! No. of pixels without the quality.
+      INTEGER*8 CLEAR            ! No. of pixels without the quality.
       CHARACTER COMMNT*(IRQ__SZCOM)! Descriptive comment stored with
                                  ! the quality name.
       LOGICAL DEF                !True if the QUALITY component is in a
@@ -141,19 +126,17 @@
       INTEGER INDF               ! Identifier for the NDF containing the
                                  ! quality names information.
       INTEGER LAST               ! Position of last non-blank character.
-      INTEGER LBND( NDF__MXDIM ) ! Lower bounds of the NDF.
+      INTEGER*8 LBND( NDF__MXDIM ) ! Lower bounds of the NDF.
       CHARACTER LQNAME*(IRQ__SZQNM) ! Upper case copy of quality name.
       INTEGER MDIM               ! NDF dimensionality.
       CHARACTER MODE*10          ! Mapping mode for QUALITY array.
-      INTEGER NEL                ! No. of pixels in the NDF (4-byte)
-      INTEGER*8 NEL8             ! No. of pixels in the NDF (8-byte)
+      INTEGER*8 NEL              ! No. of pixels in the NDF.
       INTEGER PNT                ! Pointer to the mapped QUALITY array.
       LOGICAL RDONLY             ! Read-only flag for quality name.
-      INTEGER*8 SET8             ! No. of pixels with the quality.
       INTEGER SLOT               ! Index into the QUALITY_NAMES
                                  ! structure at which the new name will
                                  ! be stored.
-      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of the NDF.
+      INTEGER*8 UBND( NDF__MXDIM ) ! Upper bounds of the NDF.
       LOGICAL VALUE              ! True if all pixels have the quality,
                                  ! false if no pixels used to have the
                                  ! quality, indeterminate if some did
@@ -170,13 +153,13 @@
 
 *  Get the NDF bounds, and check that the supplied value for argument
 *  NDIM matches the number of dimensions in the NDF.
-      CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, MDIM, STATUS )
+      CALL NDF_BOUND8( INDF, NDF__MXDIM, LBND, UBND, MDIM, STATUS )
       IF( STATUS .EQ. SAI__OK .AND. MDIM .NE. NDIM ) THEN
          STATUS = IRQ__BADDM
          CALL MSG_SETI( 'ND', NDIM )
          CALL MSG_SETI( 'MD', MDIM )
-         CALL ERR_REP( 'IRQ_SETQL_ERR1',
-     : 'IRQ_SETQL: Supplied dimensionality (^ND) does not match the '//
+         CALL ERR_REP( 'IRQ_SETQL8_ERR1',
+     : 'IRQ_SETQL8: Supplied dimensionality (^ND) does not match the '//
      : 'NDF dimensionality (^MD)', STATUS )
       END IF
 
@@ -199,9 +182,8 @@
       CALL NDF_ISACC( INDF, 'WRITE', WRITE, STATUS )
       IF( .NOT. WRITE .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = IRQ__NOWRT
-         CALL ERR_REP( 'IRQ_SETQL_ERR3',
-     :           'IRQ_SETQL: Write access is not available to the NDF.',
-     :            STATUS )
+         CALL ERR_REP( 'IRQ_SETQL8_ERR3', 'IRQ_SETQL8: Write access '//
+     :                 'is not available to the NDF.', STATUS )
       END IF
 
 *  Map the QUALITY component of the NDF.
@@ -212,8 +194,8 @@
          MODE = 'WRITE/ZERO'
       END IF
 
-      CALL NDF_MAP( INDF, 'QUALITY', '_UBYTE', MODE, PNT, NEL,
-     :              STATUS )
+      CALL NDF_MAP8( INDF, 'QUALITY', '_UBYTE', MODE, PNT, NEL,
+     :               STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  If there is currently no bit plane reserved for this quality,
@@ -221,25 +203,17 @@
 *  the quality on entry to this *routine.
       IF( BIT. EQ. 0 ) THEN
          CALL IRQ1_RBIT( LOCS, BIT, STATUS )
-         NEL8 = NEL
-         CALL IRQ1_QSET( BIT, .FALSE., NEL8, %VAL( CNF_PVAL( PNT ) ),
+         CALL IRQ1_QSET( BIT, .FALSE., NEL, %VAL( CNF_PVAL( PNT ) ),
      :                   STATUS )
       END IF
 
 *  Set the appropriate bit in the QUALITY array for the selected pixels.
-      CALL IRQ1_QLST( BIT, LISTED, .TRUE., NDIM, NCOORD, LIST, LBND,
-     :                UBND, NEL, %VAL( CNF_PVAL( PNT ) ), STATUS )
+      CALL IRQ1_QLST8( BIT, LISTED, .TRUE., NDIM, NCOORD, LIST, LBND,
+     :                 UBND, NEL, %VAL( CNF_PVAL( PNT ) ), STATUS )
 
 *  Count the number of pixels for which the bit is set or clear.
-      CALL IRQ1_QCNT( BIT, NEL, %VAL( CNF_PVAL( PNT ) ),
-     :                SET8, CLEAR8, STATUS )
-      SET = SET8
-      CLEAR = CLEAR8
-      IF( SET .NE. SET8 .OR. CLEAR .NE. CLEAR8 ) THEN
-         STATUS = IRQ__OVFLW
-         CALL ERR_REP( ' ', 'Too many pixels (4-byte integer '//
-     :                 'overflow).', STATUS )
-      END IF
+      CALL IRQ1_QCNT( BIT, NEL, %VAL( CNF_PVAL( PNT ) ), SET, CLEAR,
+     :                STATUS )
 
 *  Unmap the QUALITY array.
       CALL NDF_UNMAP( INDF, 'QUALITY', STATUS )
@@ -268,8 +242,8 @@
       IF( STATUS .NE. SAI__OK ) THEN
          CALL NDF_MSG( 'NDF', INDF )
          CALL MSG_SETC( 'QN', QNAME )
-         CALL ERR_REP( 'IRQ_SETQL_ERR4',
-     :          'IRQ_SETQL: Unable to assign quality name '//
+         CALL ERR_REP( 'IRQ_SETQL8_ERR4',
+     :          'IRQ_SETQL8: Unable to assign quality name '//
      :          '^QN to pixels in NDF ^NDF', STATUS )
       END IF
 

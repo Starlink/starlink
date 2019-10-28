@@ -211,7 +211,6 @@
      :              STATUS )
       CALL DAT_FIND( QILOC, IRQ__FRNAM, LOCS(5), STATUS )
 
-
 *  Initialise the index of the last used slot to zero.
       CALL DAT_PUT0I( LOCS(3), 0, STATUS )
 
@@ -242,7 +241,7 @@
 *  Create a temporary structure holding a cloned NDF identifier.  The
 *  cloned NDF identifier is annulled when IRQ_RLSE is called.
       CALL NDF_CLONE( INDF, CINDF, STATUS )
-      CALL IRQ1_TEMP( '_INTEGER', 0, 0, LOCS(1), STATUS )
+      CALL IRQ1_TEMP( '_INTEGER', 0, LOCS(1), STATUS )
       CALL DAT_PUT0I( LOCS(1), CINDF, STATUS )
 
 *  Reset the QUALITY component of the NDF.
