@@ -19,9 +19,9 @@ extern CupidGC cupidGC;
 
 
 void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
-                                    int *dims, int imax, double rms,
+                                    hdsdim *dims, size_t imax, double rms,
                                     AstKeyMap *config, int init, int velax,
-                                    double *par, int *slbnd, int *status ){
+                                    double *par, hdsdim *slbnd, int *status ){
 /*
 *+
 *  Name:
@@ -35,9 +35,9 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 
 *  Synopsis:
 *     void cupidGCSetInit<X>( CGEN_TYPE *array, double *var, int ndim,
-*                             int *dims, int imax, double rms,
+*                             hdsdim *dims, size_t imax, double rms,
 *                             AstKeyMap *config, int init, int velax,
-*                             double *par, int *slbnd, int *status )
+*                             double *par, hdsdim *slbnd, int *status )
 
 *  Description:
 *     This functions makes an initial guess at the Gaussian clump
@@ -160,16 +160,16 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    double wmean;          /* Mean of the absolute weight values */
    double xx[ 3 ];        /* Internal coords of current pixel */
    double yy[ 3 ];        /* External coords of current pixel */
-   int ax_max[ 3 ];       /* Peak posn on axis 0 */
-   int i;                 /* Vector index within work array */
+   hdsdim ax_max[ 3 ];    /* Peak posn on axis 0 */
+   hdsdim lbnd[ 3 ];      /* Externally ordered lower bounds */
+   hdsdim ubnd[ 3 ];      /* Externally ordered upper bounds */
    int iax;               /* Axis index */
-   int j;                 /* Vector index within input array */
-   int lbnd[ 3 ];         /* Externally ordered lower bounds */
    int nv;                /* Number of variances summed in "sv" */
    int nw;                /* No. of absolute weights summed in sw and sww */
    int nwl;               /* No. of weights summed in previous iteration */
-   int rem;               /* Remaining count of pixels */
-   int ubnd[ 3 ];         /* Externally ordered upper bounds */
+   size_t i;              /* Vector index within work array */
+   size_t j;              /* Vector index within input array */
+   size_t rem;            /* Remaining count of pixels */
 
    static double beamfwhm;/* User supplied beam width in pixels */
    static double beta;    /* Scale factor for used section */

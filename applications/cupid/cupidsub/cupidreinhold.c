@@ -8,7 +8,7 @@
 #include "star/ndg.h"
 #include <math.h>
 
-HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
+HDSLoc *cupidReinhold( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *ipd,
                      double *ipv, double rms, AstKeyMap *config, int velax,
                      double beamcorr[ 3 ], int *status ){
 /*
@@ -24,7 +24,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     Starlink C
 
 *  Synopsis:
-*     HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd,
+*     HDSLoc *cupidReinhold( int type, int ndim, hdsdim *slbnd, hdsdim *subnd,
 *                          void *ipd, double *ipv, double rms,
 *                          AstKeyMap *config, int velax,
 *                          double beamcorr[ 3 ], int *status )
@@ -125,7 +125,6 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 */
 
 /* Local Variables: */
-
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
    double *pd;          /* Pointer to next element of data array */
    double *peakvals;    /* Pointer to array holding clump peak values */
@@ -135,8 +134,12 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    double pv;           /* Pixel value */
    double thresh;       /* Minimum peak value to be considered */
    float *pf;           /* Pointer to next element of data array */
-   int *clbnd;          /* Array holding lower axis bounds of all clumps */
-   int *cubnd;          /* Array holding upper axis bounds of all clumps */
+   hdsdim *clbnd;       /* Array holding lower axis bounds of all clumps */
+   hdsdim *cubnd;       /* Array holding upper axis bounds of all clumps */
+   hdsdim dims[3];      /* Pointer to array of array dimensions */
+   hdsdim ix;           /* Grid index on 1st axis */
+   hdsdim iy;           /* Grid index on 2nd axis */
+   hdsdim iz;           /* Grid index on 3rd axis */
    int *igood;          /* Pointer to array holding usable clump indices */
    int *m1;             /* Pointer to mask array */
    int *m2;             /* Pointer to mask array */
@@ -146,14 +149,9 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int *nrem;           /* Pointer to array marking out edge pixels */
    int *pa;             /* Pointer to next element in the pixel assignment array */
    int caiter;          /* The number of CA iterations to perform */
-   int dims[3];         /* Pointer to array of array dimensions */
-   int el;              /* Number of elements in array */
    int fixiter;         /* The number of CA iterations to perform */
    int i;               /* Loop count */
    int ii;              /* Loop count */
-   int ix;              /* Grid index on 1st axis */
-   int iy;              /* Grid index on 2nd axis */
-   int iz;              /* Grid index on 3rd axis */
    int j;               /* Loop count */
    int maxid;           /* Largest id for any peak (smallest is zero) */
    int minlen;          /* Minimum size of a clump in pixels along one dimension*/
@@ -165,7 +163,8 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int old_ghstate;     /* Non-zero if group history recording is switched on */
    int old_pvstate;     /* Non-zero if provenance recording is switched on */
    int peakval;         /* Minimum value used to flag peaks */
-   int skip[3];         /* Pointer to array of axis skips */
+   size_t el;           /* Number of elements in array */
+   size_t skip[3];      /* Pointer to array of axis skips */
 
 /* Initialise */
    ret = NULL;
@@ -286,16 +285,16 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Allocate an array used to store the number of pixels remaining in each
    clump. */
-   nrem = astMalloc( sizeof( int )*( maxid + 1 ) );
+   nrem = astMalloc( sizeof( *nrem )*( maxid + 1 ) );
 
 /* Allocate an array used to store the peak value in every clump. */
    peakvals = astMalloc( sizeof( double )*( maxid + 1 ) );
 
 /* Determine the bounding box of every clump. First allocate memory to
    hold the bounding boxes. */
-   clbnd = astMalloc( sizeof( int )*( maxid + 1 )*3 );
-   cubnd = astMalloc( sizeof( int )*( maxid + 1 )*3 );
-   igood = astMalloc( sizeof( int )*( maxid + 1 ) );
+   clbnd = astMalloc( sizeof( *clbnd )*( maxid + 1 )*3 );
+   cubnd = astMalloc( sizeof( *cubnd )*( maxid + 1 )*3 );
+   igood = astMalloc( sizeof( *igood )*( maxid + 1 ) );
    if( igood ) {
 
 /* Initialise a list to hold zero for every clump id. These values are
@@ -308,8 +307,8 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Initialise the bounding boxes. */
       for( i = 0; i < 3*( maxid + 1 ); i++ ) {
-         clbnd[ i ] = VAL__MAXI;
-         cubnd[ i ] = VAL__MINI;
+         clbnd[ i ] = VAL__MAXK;
+         cubnd[ i ] = VAL__MINK;
       }
 
 /* Loop round every pixel in the final pixel assignment array. */

@@ -6,10 +6,10 @@
 #include "star/hds.h"
 #include "star/ndg.h"
 
-HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
-                                  int ndim, int dims[ 3 ], int skip[ 3 ],
-                                  int slbnd[ 3 ], int index, int clbnd[ 3 ],
-                                  int cubnd[ 3 ], AstKeyMap *extra,
+HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, size_t nel,
+                                  int ndim, hdsdim dims[ 3 ], hdsdim skip[ 3 ],
+                                  hdsdim slbnd[ 3 ], int index, hdsdim clbnd[ 3 ],
+                                  hdsdim cubnd[ 3 ], AstKeyMap *extra,
                                   HDSLoc *obj, double maxbad, int *status ){
 /*
 *+
@@ -23,9 +23,9 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 *     Starlink C
 
 *  Synopsis:
-*     HDSLoc *cupidNdfClump<X>( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
-*                            int dims[ 3 ], int skip[ 3 ], int slbnd[ 3 ],
-*                            int index, int clbnd[ 3 ], int cubnd[ 3 ],
+*     HDSLoc *cupidNdfClump<X>( CGEN_TYPE *ipd, int *ipa, size_t nel, int ndim,
+*                            hdsdim dims[ 3 ], hdsdim skip[ 3 ], hdsdim slbnd[ 3 ],
+*                            int index, hdsdim clbnd[ 3 ], hdsdim cubnd[ 3 ],
 *                            AstKeyMap *extra, HDSLoc *obj, double maxbad,
 *                            int *status )
 
@@ -141,30 +141,30 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 */
 
 /* Local Variables: */
+   HDSLoc *cloc;             /* Cell locator */
    HDSLoc *dloc;             /* Component locator */
    HDSLoc *ret;              /* The returned HDS object */
-   HDSLoc *cloc;             /* Cell locator */
    HDSLoc *xloc;             /* Extension locator */
    const char *key;          /* KeyMap key name */
    double *out;              /* Pointer to output NDF Data array */
    double *pout;             /* Pointer to next output pixel */
    double dval;              /* Double value to store */
-   int area;                 /* Total number of pixels in clump */
+   hdsdim area;              /* Total number of pixels in clump */
+   hdsdim ivinx;             /* Index of input pixel */
+   hdsdim iviny;             /* Index of start of input row */
+   hdsdim ivinz;             /* Index of start of input plane */
+   hdsdim ix;                /* GRID axis 1 value of next clump element */
+   hdsdim iy;                /* GRID axis 2 value of next clump element */
+   hdsdim iz;                /* GRID axis 3 value of next clump element */
+   hdsdim lb[ 3 ];           /* Lower pixel index bounds of NDF */
+   hdsdim size[1];           /* No.of NDFs in array */
+   hdsdim ub[ 3 ];           /* Upper pixel index bounds of NDF */
    int bad;                  /* Does the clump touch any areas of bad pixels?*/
-   int el;                   /* Number of elements mapped */
    int i;                    /* KeyMap index */
    int indf;                 /* NDF identifier */
-   int ivinx;                /* Index of input pixel */
-   int iviny;                /* Index of start of input row */
-   int ivinz;                /* Index of start of input plane */
-   int ix;                   /* GRID axis 1 value of next clump element */
-   int iy;                   /* GRID axis 2 value of next clump element */
-   int iz;                   /* GRID axis 3 value of next clump element */
-   int lb[ 3 ];              /* Lower pixel index bounds of NDF */
    int nex;                  /* No. of extra items of information */
    int place;                /* NDF place holder */
-   hdsdim size[1];           /* No.of NDFs in array */
-   int ub[ 3 ];              /* Upper pixel index bounds of NDF */
+   size_t el;                /* Number of elements mapped */
 
 /* Initialise */
    ret = obj;

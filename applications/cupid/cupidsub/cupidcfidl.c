@@ -4,8 +4,8 @@
 #include <string.h>
 #include <limits.h>
 
-void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
-                 int skip[3], int naxis, CupidPixelSet **clumps,
+void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, hdsdim *dims,
+                 size_t skip[3], int naxis, CupidPixelSet **clumps,
                  int *status ){
 /*
 *+
@@ -20,8 +20,8 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
-*                      int skip[3], int naxis, CupidPixelSet **clumps,
+*     void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, hdsdim *dims,
+*                      size_t skip[3], int naxis, CupidPixelSet **clumps,
 *                      int *status )
 
 *  Description:
@@ -101,9 +101,12 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 */
 
 /* Local Variables: */
-
+   hdsdim *p;       /* Pointer to array of GRID coords at clump peak */
+   hdsdim ix;       /* GRID index on 1st axis */
+   hdsdim iy;       /* GRID index on 2nd axis */
+   hdsdim iz;       /* GRID index on 3rd axis */
+   hdsdim x[ 3 ];   /* GRID indices of current array element */
    int *nebs;       /* Pointer to list of neighbouring clump indices */
-   int *p;          /* Pointer to array of GRID coords at clump peak */
    int *v1;         /* Pointer to element at start of this row */
    int *v2;         /* Pointer to element at start of this plane */
    int *v;          /* Pointer to next array element */
@@ -114,17 +117,13 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
    int i;           /* Loop count */
    int iclump;      /* Clump index */
    int iclumpmin;   /* Clump index with minimum squared distance */
-   int iv;          /* 1D vector index */
-   int ix;          /* GRID index on 1st axis */
-   int iy;          /* GRID index on 2nd axis */
-   int iz;          /* GRID index on 3rd axis */
    int j;           /* Loop count */
    int old_index;   /* Original index value of the transferred pixels */
    int sorted;      /* Is list now sorted? */
    int t;           /* Temporary storage */
-   int x[ 3 ];      /* GRID indices of current array element */
    int yedge;       /* Pixel at upper or lower bound on 2nd axis? */
    int zedge;       /* Pixel at upper or lower bound on 3rd axis? */
+   size_t iv;       /* 1D vector index */
 
 /* Check inherited status. Also return without action if the supplied
    PointSet is not adjacent to any other clumps. */

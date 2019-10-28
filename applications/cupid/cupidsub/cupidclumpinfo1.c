@@ -72,11 +72,11 @@ void cupidClumpInfo1( HDSLoc *cloc, CupidClumpInfo *info, int *status ){
 */
 
 /* Local Variables: */
+   hdsdim lbnd[ 3 ]; /* Lower pixel index bounds of cut out */
+   hdsdim ubnd[ 3 ]; /* Upper pixel index bounds of cut out */
    int i;            /* Loop index */
    int indf;         /* NDF identifier for clump cut-out */
-   int lbnd[ 3 ];    /* Lower pixel index bounds of cut out */
    int ndim;         /* No. of pixel axes in cut out */
-   int ubnd[ 3 ];    /* Upper pixel index bounds of cut out */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;

@@ -2,9 +2,9 @@
 #include "cupid.h"
 #include <limits.h>
 
-void cupidRFillLine( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
-                     int dims[ 3 ], int gp[ 3 ], int iv, int axis, int id,
-                     int depth, int *gpeak[ 3 ], int *status ){
+void cupidRFillLine( int *ipa, int *out, size_t nel, int ndim, size_t skip[ 3 ],
+                     hdsdim dims[ 3 ], hdsdim gp[ 3 ], size_t iv, int axis, int id,
+                     int depth, hdsdim *gpeak[ 3 ], int *status ){
 /*
 *+
 *  Name:
@@ -17,10 +17,10 @@ void cupidRFillLine( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 *     Starlink C
 
 *  Synopsis:
-*     void cupidRFillLine( int *ipa, int *out, int nel, int ndim,
-*                          int skip[ 3 ], int dims[ 3 ], int gp[ 3 ],
-*                          int iv, int axis, int id, int depth,
-*                          int *gpeak[ 3 ], int *status )
+*     void cupidRFillLine( int *ipa, int *out, size_t nel, int ndim,
+*                          size_t skip[ 3 ], hdsdim dims[ 3 ], hdsdim gp[ 3 ],
+*                          size_t iv, int axis, int id, int depth,
+*                          hdsdim *gpeak[ 3 ], int *status )
 
 *  Description:
 *     This function fills the volume between the edges marked in the "ipa"
@@ -118,16 +118,15 @@ void cupidRFillLine( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 */
 
 /* Local Variables: */
-
-   int dnew;             /* Squared distance to new peak */
-   int dold;             /* Squared distance to old peak */
-   int dx;               /* Increment in x */
-   int dy;               /* Increment in y */
-   int dz;               /* Increment in z */
+   hdsdim dx;            /* Increment in x */
+   hdsdim dy;            /* Increment in y */
+   hdsdim dz;            /* Increment in z */
+   hdsdim p[ 3 ];        /* Grid indices of next root position */
    int iaxis;            /* Next axis to fill */
-   int ii;               /* Vector index of next root position */
    int oldid;            /* Id of peak currently assigned to the pixel */
-   int p[ 3 ];           /* Grid indices of next root position */
+   size_t dnew;          /* Squared distance to new peak */
+   size_t dold;          /* Squared distance to old peak */
+   size_t ii;            /* Vector index of next root position */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;

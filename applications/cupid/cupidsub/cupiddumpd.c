@@ -6,7 +6,7 @@
 #include "cupid.h"
 #include <stdio.h>
 
-void cupidDumpD( double *array, int ndim, int *dims, int *slbnd,
+void cupidDumpD( double *array, int ndim, hdsdim *dims, hdsdim *slbnd,
                  const char *text, int *status ){
 /*
 *+
@@ -20,7 +20,7 @@ void cupidDumpD( double *array, int ndim, int *dims, int *slbnd,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidDumpD( double *array, int ndim, int *dims, int *slbnd,
+*     void cupidDumpD( double *array, int ndim, hdsdim *dims, hdsdim *slbnd,
 *                      const char *text, int *status )
 
 *  Description:
@@ -82,7 +82,9 @@ void cupidDumpD( double *array, int ndim, int *dims, int *slbnd,
 /* Local Variables: */
 
    double *adata;
-   int indf, place, i, el, lbnd[3], ubnd[3];
+   int indf, place;
+   hdsdim lbnd[3], ubnd[3];
+   size_t i, el;
    static int jj = 0;
    char name[ 100 ];
 

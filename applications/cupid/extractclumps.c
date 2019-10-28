@@ -150,8 +150,8 @@ void extractclumps( int *status ) {
 *        the major axis. The ellipse is centred at the clump centroid.
 *
 *        - Ellipse3: The same as "Ellipse2" except that the ellipse is
-*        centred at the clump peak, rather than the clump centroid, and 
-*        the pixel data values are used as weights when forming the mean 
+*        centred at the clump peak, rather than the clump centroid, and
+*        the pixel data values are used as weights when forming the mean
 *        radial distance at each azimuth angle.
 *
 *        In general, ellipses will outline the brighter, inner regions
@@ -268,19 +268,24 @@ void extractclumps( int *status ) {
    double vr;                   /* VELORES value */
    fitsfile *fptr;              /* Pointer to FITS file structure */
    float *rmask;                /* Pointer to cump mask array */
-   int *clbnd;                  /* Lower GRID bounds of each clump */
-   int *cubnd;                  /* Upper GRID bounds of each clump */
+   hdsdim *clbnd;               /* Lower GRID bounds of each clump */
+   hdsdim *cubnd;               /* Upper GRID bounds of each clump */
+   hdsdim dim[ NDF__MXDIM ];    /* Pixel axis dimensions */
+   hdsdim dims[ 3 ];            /* Significant pixel axis dimensions */
+   hdsdim ix;                   /* GRID value on 1st axis */
+   hdsdim iy;                   /* GRID value on 2nd axis */
+   hdsdim iz;                   /* GRID value on 3rd axis */
+   hdsdim skip[ 3 ];            /* Pixel axis skips */
+   hdsdim slbnd[ NDF__MXDIM ];  /* The lower bounds of the significant pixel axes */
+   hdsdim subnd[ NDF__MXDIM ];  /* The upper bounds of the significant pixel axes */
    int *ipa;                    /* Pointer to pixel assignment array */
    int *pa;                     /* Pointer to next pixel assignment value */
    int *pid;                    /* Pointer to next clump ID */
    int backoff;                 /* Remove background when finding clump sizes? */
    int blockf;                  /* FITS file blocking factor */
    int deconv;                  /* Should clump parameters be deconvolved? */
-   int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
-   int dims[ 3 ];               /* Significant pixel axis dimensions */
-   int el;                      /* Number of array elements mapped */
    int gotwcs;                  /* Does input NDF contain a WCS FrameSet? */
-   int i;                       /* Loop count */
+   int i;                       /* Axis count */
    int id;                      /* Clump identifier */
    int idmax;                   /* Maximum clump ID in supplied mask */
    int idmin;                   /* Minimum clump ID in supplied mask */
@@ -289,10 +294,6 @@ void extractclumps( int *status ) {
    int indf3;                   /* Identifier for output mask NDF */
    int ishape;                  /* STC-S shape for spatial coverage */
    int jsacat;                  /* Is a JSA-style catalogue being created? */
-   int ix;                      /* GRID value on 1st axis */
-   int iy;                      /* GRID value on 2nd axis */
-   int iz;                      /* GRID value on 3rd axis */
-   int n;                       /* Number of values summed in "sum" */
    int nclump;                  /* Number of clump IDs */
    int nclumps;                 /* Number of stored clumps */
    int ndim;                    /* Total number of pixel axes */
@@ -300,14 +301,14 @@ void extractclumps( int *status ) {
    int nskyax;                  /* No. of sky axes in current WCS Frame */
    int nspecax;                 /* No. of spectral axes in current WCS Frame */
    int sdim[ NDF__MXDIM ];      /* The indices of the significant pixel axes */
-   int skip[ 3 ];               /* Pixel axis skips */
-   int slbnd[ NDF__MXDIM ];     /* The lower bounds of the significant pixel axes */
-   int subnd[ NDF__MXDIM ];     /* The upper bounds of the significant pixel axes */
    int there;                   /* Does object exist? */
    int type;                    /* Integer identifier for data type */
    int usewcs;                  /* Use WCS coords in output catalogue? */
    int vax;                     /* Index of velocity WCS axis */
    int velax;                   /* Index of velocity pixel axis */
+   size_t el;                   /* Number of array elements mapped */
+   size_t iel;                  /* Element count */
+   size_t n;                    /* Number of values summed in "sum" */
    size_t size;                 /* Number of elements in "grp" */
    void *ipd;                   /* Pointer to Data array */
 
@@ -360,7 +361,7 @@ void extractclumps( int *status ) {
    }
 
 /* Get the WCS FrameSet and the significant axis bounds. */
-   kpg1Asget( indf1, nsig, 1, 0, 0, sdim, slbnd, subnd, &iwcs, status );
+   kpg1Asget8( indf1, nsig, 1, 0, 0, sdim, slbnd, subnd, &iwcs, status );
 
 /* Find the size of each dimension of the data array, and the skip in 1D
    vector index needed to move by pixel along an axis. */
@@ -519,7 +520,7 @@ void extractclumps( int *status ) {
       idmax = VAL__MINI;
       idmin = VAL__MAXI;
       pid = ipa;
-      for( i = 0; i < el; i++, pid++ ) {
+      for( iel = 0; iel < el; iel++, pid++ ) {
          if( *pid != VAL__BADI ) {
             if( *pid < idmin ) idmin = *pid;
             if( *pid > idmax ) idmax = *pid;
@@ -542,8 +543,8 @@ void extractclumps( int *status ) {
    }
 
 /* Allocate memory to hold the pixel bounds of the clumps. */
-   clbnd = astMalloc( sizeof( int )*nclump*3 );
-   cubnd = astMalloc( sizeof( int )*nclump*3 );
+   clbnd = astMalloc( sizeof( *clbnd )*nclump*3 );
+   cubnd = astMalloc( sizeof( *clbnd )*nclump*3 );
 
 /* Find the upper and lower pixel bounds of each clump. */
    if( cubnd ) {
@@ -706,13 +707,13 @@ void extractclumps( int *status ) {
                 status );
 
 /* Transfer the pixel mask to the NDF quality array. */
-      irqSetqm( qlocs, 1, "BACKGROUND", el, rmask, &n, status );
-      irqSetqm( qlocs, 0, "CLUMP", el, rmask, &n, status );
+      irqSetqm8( qlocs, 1, "BACKGROUND", el, rmask, &n, status );
+      irqSetqm8( qlocs, 0, "CLUMP", el, rmask, &n, status );
 
 /* Find the edges of the clumps (all other pixels will be set to
    VAL__BADR in "rmask"), and then set the "EDGE" Quality flag. */
       cupidEdges( rmask, el, dims, skip, 1.0, VAL__BADR, status );
-      irqSetqm( qlocs, 0, "EDGE", el, rmask, &n, status );
+      irqSetqm8( qlocs, 0, "EDGE", el, rmask, &n, status );
 
 /* Release the quality name information. */
       rmask = astFree( rmask );

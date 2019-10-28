@@ -2,8 +2,8 @@
 #include "cupid.h"
 #include <math.h>
 
-int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
-                                     int dims[ 3 ], int skip[ 3 ], int minpix,
+int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, size_t nel, int ndim,
+                                     hdsdim dims[ 3 ], size_t skip[ 3 ], int minpix,
                                      double thresh, double noise, double rms,
                                      double flatslope, int *peakval,
                                      int *status ){
@@ -19,8 +19,8 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
 *     Starlink C
 
 *  Synopsis:
-*     int *cupidRInitEdges<X>( CGEN_TYPE *array, int nel, int ndim,
-*                              int dims[ 3 ], int skip[ 3 ], int minpix,
+*     int *cupidRInitEdges<X>( CGEN_TYPE *array, size_t nel, int ndim,
+*                              hdsdim dims[ 3 ], size_t skip[ 3 ], int minpix,
 *                              double thresh, double noise, double rms,
 *                              double flatslope, int *peakval,
 *                              int *status )
@@ -140,22 +140,21 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
 */
 
 /* Local Variables: */
-
-   double *work1;  /* Work array */
-   int *ret;       /* Pointer to returned mask array */
-   int *work2;     /* Work array */
-   int axis;       /* The axis which is perpendicular to the current face */
-   int i;          /* The index into the mask array */
-   int iv;         /* The count of scan line vectors checked so far */
-   int ivlim;      /* Max count of scan line vectors to be checked */
-   int lbnd;       /* Check the lower axis bound face? Upper otherwise. */
-   int wsize;      /* Length of work arrays */
-   int xvec[ 3 ];  /* The 3D GRID vector along the scan lines */
-   int yhi;        /* Highest value for axis 2 comp of line vector */
-   int ylo;        /* Lowest value for axis 2 comp of line vector */
-   int zhi;        /* Highest value for axis 3 comp of line vector */
-   int zlo;        /* Lowest value for axis 3 comp of line vector */
-   int nl;         /* Number of lines scanned. */
+   double *work1;     /* Work array */
+   int *ret;          /* Pointer to returned mask array */
+   int axis;          /* The axis which is perpendicular to the current face */
+   int lbnd;          /* Check the lower axis bound face? Upper otherwise. */
+   int xvec[ 3 ];     /* The 3D GRID vector along the scan lines */
+   int yhi;           /* Highest value for axis 2 comp of line vector */
+   int ylo;           /* Lowest value for axis 2 comp of line vector */
+   int zhi;           /* Highest value for axis 3 comp of line vector */
+   int zlo;           /* Lowest value for axis 3 comp of line vector */
+   size_t *work2;     /* Work array */
+   size_t i;          /* The index into the mask array */
+   size_t iv;         /* The count of scan line vectors checked so far */
+   size_t ivlim;      /* Max count of scan line vectors to be checked */
+   size_t nl;         /* Number of lines scanned. */
+   size_t wsize;      /* Length of work arrays */
 
 /* Initialise */
    ret = NULL;
@@ -168,11 +167,11 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
    wsize = sqrtf( dims[ 0 ]*dims[ 0 ] +
                   dims[ 1 ]*dims[ 1 ] +
                   dims[ 2 ]*dims[ 2 ] );
-   work1 = astMalloc( sizeof( double )*wsize );
-   work2 = astMalloc( sizeof( int )*wsize );
+   work1 = astMalloc( sizeof( *work1 )*wsize );
+   work2 = astMalloc( sizeof( *work2 )*wsize );
 
 /* Allocate memory for the returned mask array. */
-   ret = astMalloc( sizeof( int )*nel );
+   ret = astMalloc( sizeof( *ret )*nel );
 
 /* Check for success. */
    if( ret ) {

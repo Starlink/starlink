@@ -6,8 +6,8 @@
 #include <math.h>
 
 AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
-                             int space_axes[ 2 ], int ndim, int *lbnd,
-                             int *ubnd, AstMapping *wcsmap,
+                             int space_axes[ 2 ], int ndim, hdsdim *lbnd,
+                             hdsdim *ubnd, AstMapping *wcsmap,
                              AstFrame *space_frm, AstMapping *space_map,
                              int *status ){
 /*
@@ -23,8 +23,8 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
 
 *  Synopsis:
 *     AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
-*                                  int space_axes[ 2 ], int ndim, int *lbnd,
-*                                  int *ubnd, AstMapping *wcsmap,
+*                                  int space_axes[ 2 ], int ndim, hdsdim *lbnd,
+*                                  hdsdim *ubnd, AstMapping *wcsmap,
 *                                  AstFrame *space_frm, AstMapping *space_map,
 *                                  int *status )
 
@@ -112,27 +112,27 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
    double *py;              /* Pointer to next vertex Y axis value */
    double *verts;           /* Pointer to memory holding vertex axis values */
    double pos[ 2 ];         /* Normalised vertex position */
+   hdsdim inside[ 2 ];      /* Spatial pixel indices at clump peak */
    int *iph;                /* Pointer to histogram array */
    int *ipm;                /* Pointer to 2D mask array */
-   int *pix;                /* Pointer to X spatial index in 3D data */
-   int *piy;                /* Pointer to Y spatial index in 3D data */
    int *pm;                 /* Pointer to next 2D mask element */
-   int dim[ 3 ];            /* Array pixel dimensions */
    int hi;                  /* Highest no. of  spectral channels in 2D mask */
    int hist_size;           /* Length of histogram array */
-   int i;                   /* Pixel index on 1st pixel axis */
-   int inside[ 2 ];         /* Spatial pixel indices at clump peak */
-   int j;                   /* Pixel index on 2nd pixel axis */
-   int k;                   /* Pixel index on 3rd pixel axis */
    int lo;                  /* Lowest no. of  spectral channels in 2D mask */
    int max;                 /* Maximum mask value */
-   int nel;                 /* Number of elements in 2D mask */
    int nvert;               /* Number of vertices in Polygon */
-   int nx;                  /* X dimension of 2D mask */
-   int ny;                  /* Y dimension of 2D mask */
    int target;              /* Threshold for no. of spectral channels */
    int tot;                 /* Total no. of  spectral channels in 2D mask */
    int v;                   /* Current mask value */
+   size_t *pix;             /* Pointer to X spatial index in 3D data */
+   size_t *piy;             /* Pointer to Y spatial index in 3D data */
+   size_t dim[ 3 ];         /* Array pixel dimensions */
+   size_t i;                /* Pixel index on 1st pixel axis */
+   size_t j;                /* Pixel index on 2nd pixel axis */
+   size_t k;                /* Pixel index on 3rd pixel axis */
+   size_t nel;              /* Number of elements in 2D mask */
+   size_t nx;               /* X dimension of 2D mask */
+   size_t ny;               /* Y dimension of 2D mask */
 
 /* Abort if an error has already occurred, or if the data is
    one-dimensional. */
@@ -272,7 +272,7 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
 
 /* Create a Polygon with up to 15 vertices, enclosing the non-zero pixels
    around the clump peak. */
-      polygon = astOutlineI( 0, AST__NE, ipm, lbnd, ubnd, 1.0, 15, inside, 1 );
+      polygon = astOutline8I( 0, AST__NE, ipm, lbnd, ubnd, 1.0, 15, inside, 1 );
 
 /* If required, transform the polygon vertices into WCS. */
       if( wcsmap ) {

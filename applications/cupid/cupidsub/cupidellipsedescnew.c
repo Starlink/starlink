@@ -5,12 +5,12 @@
 #include "cupid.h"
 #include "prm_par.h"
 
-static void cupid1FitParabola( int nbin, double *hist, int box, int oper, int *icen,
-                               double *vcen, int *status );
+static void cupid1FitParabola( int nbin, double *hist, int box, int oper,
+                               hdsdim *icen, double *vcen, int *status );
 
 AstRegion *cupidEllipseDescNew( AstFrame *pixel_frm, double *ipd, int velax,
                                 double *cent, int space_axes[ 2 ], int ndim,
-                                int *lbnd, int *ubnd, AstMapping *wcsmap,
+                                hdsdim *lbnd, hdsdim *ubnd, AstMapping *wcsmap,
                                 AstFrame *space_frm, AstMapping *space_map,
                                 int weight, int *status ){
 /*
@@ -27,7 +27,7 @@ AstRegion *cupidEllipseDescNew( AstFrame *pixel_frm, double *ipd, int velax,
 *  Synopsis:
 *     AstRegion *cupidEllipseDescNew( AstFrame *pixel_frm, double *ipd, int velax,
 *                                     double *cent, int space_axes[ 2 ], int ndim,
-*                                     int *lbnd, int *ubnd, AstMapping *wcsmap,
+*                                     hdsdim *lbnd, hdsdim *ubnd, AstMapping *wcsmap,
 *                                     AstFrame *space_frm, AstMapping *space_map,
 *                                     int weight, int *status )
 
@@ -163,18 +163,18 @@ AstRegion *cupidEllipseDescNew( AstFrame *pixel_frm, double *ipd, int velax,
    double x[3];
    double xblo;
    double y[3];
-   int *spax1;
-   int *spax2;
-   int i;
-   int ib0;
-   int ib;
-   int ibhi;
-   int iblo;
-   int ibmax;
+   hdsdim *spax2;
+   hdsdim *spax1;
+   hdsdim i;
+   hdsdim ib0;
+   hdsdim ib;
+   hdsdim ibhi;
+   hdsdim iblo;
+   hdsdim ibmax;
+   hdsdim j;
+   hdsdim k;
    int ii;
-   int j;
    int jj;
-   int k;
    int ns;
    int sorted;
 
@@ -467,7 +467,7 @@ AstRegion *cupidEllipseDescNew( AstFrame *pixel_frm, double *ipd, int velax,
 
 
 static void cupid1FitParabola( int nbin, double *hist, int box, int oper,
-                               int *icen, double *vcen, int *status ){
+                               hdsdim *icen, double *vcen, int *status ){
 
 /* Local Variables: */
    double a;
@@ -491,14 +491,14 @@ static void cupid1FitParabola( int nbin, double *hist, int box, int oper,
    double x;
    double xmax;
    double y;
+   hdsdim ihi;
+   hdsdim ilo;
+   hdsdim n;
+   hdsdim nrej;
    int i;
-   int ihi;
-   int ilo;
    int iter;
    int j;
-   int n;
    int niter = 3;
-   int nrej;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;

@@ -3,7 +3,7 @@
 #include "mers.h"
 
 void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
-                       int *lbnd, double rms, int *status ){
+                       hdsdim *lbnd, double rms, int *status ){
 /*
 *+
 *  Name:
@@ -17,7 +17,7 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 
 *  Synopsis:
 *     void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
-*                            int *lbnd, double rms,
+*                            hdsdim *lbnd, double rms,
 *                            int *status )
 
 *  Description:

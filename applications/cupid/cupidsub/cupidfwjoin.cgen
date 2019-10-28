@@ -5,8 +5,8 @@
 #include <string.h>
 #include <math.h>
 
-void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
-                                 int dims[ 3 ], int skip[ 3 ], double rms,
+void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, size_t nel, int ndim,
+                                 hdsdim dims[ 3 ], size_t skip[ 3 ], double rms,
                                  AstKeyMap *config, int *ipa, int *npeak,
                                  int perspectrum, int *status ){
 /*
@@ -21,8 +21,8 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidFWJoin<X>( CGEN_TYPE *array, int nel, int ndim,
-*                          int dims[ 3 ], int skip[ 3 ], double rms,
+*     void cupidFWJoin<X>( CGEN_TYPE *array, size_t nel, int ndim,
+*                          hdsdim dims[ 3 ], size_t skip[ 3 ], double rms,
 *                          AstKeyMap *config, int *ipa, int *npeak,
 *                          int perspectrum, int *status )
 

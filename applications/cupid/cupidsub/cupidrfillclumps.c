@@ -2,8 +2,8 @@
 #include "cupid.h"
 #include <limits.h>
 
-int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
-                      int dims[ 3 ], int peakval, int *status ){
+int cupidRFillClumps( int *ipa, int *out, size_t nel, int ndim, size_t skip[ 3 ],
+                      hdsdim dims[ 3 ], int peakval, int *status ){
 /*
 *+
 *  Name:
@@ -17,8 +17,8 @@ int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 *     Starlink C
 
 *  Synopsis:
-*     int cupidRFillClumps( int *ipa, int *out, int nel, int ndim,
-*                           int skip[ 3 ], int dims[ 3 ], int peakval,
+*     int cupidRFillClumps( int *ipa, int *out, size_t nel, int ndim,
+*                           size_t skip[ 3 ], hdsdim dims[ 3 ], int peakval,
 *                           int *status )
 
 *  Description:
@@ -107,16 +107,15 @@ int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 */
 
 /* Local Variables: */
-
+   hdsdim *gpeak[ 3 ];   /* Pointers to arrays of peak axis values */
+   hdsdim gp[ 3 ];       /* Grid coords of peak position */
+   hdsdim ix;            /* The X Grid coord of the current pixel */
+   hdsdim iy;            /* The Y Grid coord of the current pixel */
+   hdsdim iz;            /* The Z Grid coord of the current pixel */
    int *pa;              /* Pointer to next "ipa" element */
-   int gp[ 3 ];          /* Grid coords of peak position */
-   int i;                /* Index of next "ipa" element */
    int ipeak;            /* Index of next clump */
-   int ix;               /* The X Grid coord of the current pixel */
-   int iy;               /* The Y Grid coord of the current pixel */
-   int iz;               /* The Z Grid coord of the current pixel */
    int npeak;            /* Number of peaks being produced */
-   int *gpeak[ 3 ];      /* Pointers to arrays of peak axis values */
+   size_t i;             /* Index of next "ipa" element */
 
 /* Initialise */
    ipeak = -1;
@@ -129,9 +128,9 @@ int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 
 /* So far we have no peaks */
    npeak = 0;
-   gpeak[ 0 ] = astMalloc( sizeof( int )*30 );
-   gpeak[ 1 ] = astMalloc( sizeof( int )*30 );
-   gpeak[ 2 ] = astMalloc( sizeof( int )*30 );
+   gpeak[ 0 ] = astMalloc( sizeof(**gpeak)*30 );
+   gpeak[ 1 ] = astMalloc( sizeof(**gpeak)*30 );
+   gpeak[ 2 ] = astMalloc( sizeof(**gpeak)*30 );
 
 /* Scan the ipa array looking for peaks. */
    pa = ipa;
@@ -147,9 +146,9 @@ int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 
 /* Save thre grid coords of the peak in the gpeak array, extending it if
    necessary to make room. */
-               gpeak[ 0 ] = astGrow( gpeak[ 0 ], npeak, sizeof( int ) );
-               gpeak[ 1 ] = astGrow( gpeak[ 1 ], npeak, sizeof( int ) );
-               gpeak[ 2 ] = astGrow( gpeak[ 2 ], npeak, sizeof( int ) );
+               gpeak[ 0 ] = astGrow( gpeak[ 0 ], npeak, sizeof(**gpeak) );
+               gpeak[ 1 ] = astGrow( gpeak[ 1 ], npeak, sizeof(**gpeak) );
+               gpeak[ 2 ] = astGrow( gpeak[ 2 ], npeak, sizeof(**gpeak) );
                if( gpeak[ 2 ] ) {
                   gpeak[ 0 ][ ipeak ] = ix;
                   gpeak[ 1 ][ ipeak ] = iy;

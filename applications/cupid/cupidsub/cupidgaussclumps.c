@@ -22,7 +22,7 @@ jmp_buf CupidGCHere;
    this structure are initialised in cupidSetInit. */
 CupidGC cupidGC;
 
-HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
+HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *ipd,
                           double *ipv, double rms, AstKeyMap *config, int velax,
                           double beamcorr[ 3 ], int *status ){
 /*
@@ -38,7 +38,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     Starlink C
 
 *  Synopsis:
-*     HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd,
+*     HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd,
 *                               void *ipd, double *ipv, double rms,
 *                               AstKeyMap *config, int velax,
 *                               double beamcorr[ 3 ], int *status )
@@ -176,10 +176,11 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 */
 
 /* Local Variables: */
-   char buf[30];        /* File name buffer */
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
+   char buf[30];        /* File name buffer */
    double *peaks;       /* Holds the "npeak" most recently fitted peak values */
    double chisq;        /* Chi-squared value of most recently fitted Gaussian */
+   double maxbad;       /* Max fraction of bad pixels allowed in a clump */
    double mean_peak;    /* The mean of the values within "peaks" */
    double mlim;         /* Truncation level for Gaussians */
    double new_peak;     /* The value most recently added to "peaks" */
@@ -187,32 +188,31 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    double old_peak;     /* The oldest value within "peaks" */
    double peak_thresh;  /* The lower threshold for clump peak values */
    double sigma_peak;   /* The standard deviation of the values within "peaks" */
-   double sumdata;      /* Sum of the supplied data values */
    double sum_peak2;    /* Sum of the squares of the values in "peaks" */
    double sum_peak;     /* Sum of the values in "peaks" */
    double sumclumps;    /* Sum of the values in all the used clumps so far */
+   double sumdata;      /* Sum of the supplied data values */
    double x[ CUPID__GCNP3 ]; /* Parameters describing new Gaussian clump */
-   int *dims;           /* Pointer to array of array dimensions */
+   hdsdim *dims;        /* Pointer to array of array dimensions */
    int allbad;          /* Are all the residuals bad? */
-   int area;            /* Number of pixels contributing to the clump */
-   int area_thresh;     /* The lower threshold for clump areas */
    int excols;          /* Are extra output columns required? */
-   int el;              /* Number of elements in array */
-   size_t i;            /* Loop count */
-   size_t iclump;       /* Number of clumps found so far */
-   int imax;            /* Index of element with largest residual */
-   size_t ipeak;        /* Index within "peaks" at which to store the new peak */
    int iter;            /* Continue finding more clumps? */
-   double maxbad;       /* Max fraction of bad pixels allowed in a clump */
-   size_t maxclump;     /* Max no. of clumps */
    int maxskip;         /* Max no. of failed fits between good fits */
-   size_t nclump;       /* Number of usable clumps */
    int niter;           /* Iterations performed so far */
    int npad;            /* No. of peaks below threshold for temination */
-   size_t npeak;        /* The number of elements in the "peaks" array. */
    int nskip;           /* No. of failed fits since last good fit */
-   int area_below;      /* Count of consecutive clump areas below the threshold */
    int peaks_below;     /* Count of consecutive peaks below the threshold */
+   size_t area;         /* Number of pixels contributing to the clump */
+   size_t area_below;   /* Count of consecutive clump areas below the threshold */
+   size_t area_thresh;  /* The lower threshold for clump areas */
+   size_t el;           /* Number of elements in array */
+   size_t i;            /* Loop count */
+   size_t iclump;       /* Number of clumps found so far */
+   size_t imax;         /* Index of element with largest residual */
+   size_t ipeak;        /* Index within "peaks" at which to store the new peak */
+   size_t maxclump;     /* Max no. of clumps */
+   size_t nclump;       /* Number of usable clumps */
+   size_t npeak;        /* The number of elements in the "peaks" array. */
    void *res;           /* Pointer to residuals array */
 
 /* Initialise */

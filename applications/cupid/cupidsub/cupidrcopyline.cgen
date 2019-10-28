@@ -2,9 +2,9 @@
 #include "cupid.h"
 #include "prm_par.h"
 
-int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, int *vout,
-                                   int x0[3], int iv0, int vskip,
-                                   int xskip[3], int dims[3],
+int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, size_t *vout,
+                                   hdsdim x0[3], size_t iv0, size_t vskip,
+                                   int xskip[3], hdsdim dims[3],
                                    int *status ){
 /*
 *+
@@ -19,9 +19,9 @@ int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, int *vout,
 *     Starlink C
 
 *  Synopsis:
-*     int cupidRCopyLine<X>( CGEN_TYPE *in, double *dout, int *vout,
-*                            int x0[3], int iv0, int vskip, int xskip[3],
-*                            int dims[3], int *status )
+*     int cupidRCopyLine<X>( CGEN_TYPE *in, double *dout, size_t *vout,
+*                            hdsdim x0[3], size_t iv0, size_t vskip,
+*                            int xskip[3], hdsdim dims[3], int *status )
 
 *  Description:
 *     This functions copies a line of data from the input 3D array into
@@ -50,7 +50,7 @@ int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, int *vout,
 *     vskip
 *        The skip in 1D vector index (within "in") between pixels in the line.
 *     xskip
-*        The skips in 3D GRID indices between pixels in the line.
+*        The skips in 3D GRID indices between pixels in the line. +1, 0 or -1.
 *     dims
 *        The number of pixels along each of the GRID axes in the 3D array.
 *     status
@@ -103,10 +103,9 @@ int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, int *vout,
 */
 
 /* Local Variables: */
-
-   int i;                 /* Index into returned arrays */
-   int iv;                /* 1D vector index into supplied array */
-   int x[ 3 ];            /* 3D GRID indices into supplied array */
+   size_t i;              /* Index into returned arrays */
+   size_t iv;             /* 1D vector index into supplied array */
+   hdsdim x[ 3 ];         /* 3D GRID indices into supplied array */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return 0;

@@ -17,7 +17,7 @@ extern CupidGC cupidGC;
 
 
 void CGEN_FUNCTION(cupidGCDump)( msglev_t msglev, CGEN_TYPE *array, int ndim,
-                                 const int *dims, const char *aname, int *status ){
+                                 const hdsdim *dims, const char *aname, int *status ){
 /*
 *+
 *  Name:
@@ -31,7 +31,7 @@ void CGEN_FUNCTION(cupidGCDump)( msglev_t msglev, CGEN_TYPE *array, int ndim,
 
 *  Synopsis:
 *     void cupidGCDump<X>( msglev_t msglev, CGEN_TYPE *array, int ndim,
-*         const int *dims, const char *aname, int *status )
+*                          const hdsdim *dims, const char *aname, int *status )
 
 *  Description:
 *     This function is a diagnostic function which dumps the supplied
@@ -95,7 +95,9 @@ void CGEN_FUNCTION(cupidGCDump)( msglev_t msglev, CGEN_TYPE *array, int ndim,
 /* Local Variables: */
 
    CGEN_TYPE *adata;
-   int indf, place, i, el, lbnd[3], ubnd[3], np;
+   int indf, place;
+   hdsdim lbnd[3], ubnd[3];
+   size_t i, el;
    double *data;
    static int jj = 0;
    char name[ 100 ];
@@ -138,11 +140,6 @@ void CGEN_FUNCTION(cupidGCDump)( msglev_t msglev, CGEN_TYPE *array, int ndim,
                cupidGC.pars[6]*AST__DR2D );
       }
       fclose( fd );
-
-
-      np = (cupidGC.ndim==1) ? CUPID__GCNP1 :
-           ( (cupidGC.ndim==2) ? CUPID__GCNP2 : CUPID__GCNP3 );
-
 
       for( i = 0; i < cupidGC.ndim; i++ ) {
          lbnd[ i ] = cupidGC.lbnd[ i ] - 1 + cupidGC.slbnd[ i ];

@@ -36,7 +36,8 @@ noinst_LTLIBRARIES = libcupidsub.la
 
 libcupidsub_la_SOURCES = $(C_ROUTINES) $(CGENERIC_ROUTINES)
 
-AM_CFLAGS = -I.. -std=c99
+## Ensure we use the 8-byte NDF interface
+AM_CFLAGS = -I.. -std=c99 -DNDF_I8
 
 $(C_ROUTINES:.c=.o): ../cupid.h
 

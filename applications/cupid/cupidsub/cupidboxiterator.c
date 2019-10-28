@@ -2,8 +2,8 @@
 #include "ast.h"
 #include "cupid.h"
 
-CupidBoxIter *cupidBoxIterator( CupidBoxIter *iter, int dim[3], int lbnd[3],
-                                int ubnd[3], int gap, int *status ){
+CupidBoxIter *cupidBoxIterator( CupidBoxIter *iter, hdsdim dim[3], hdsdim lbnd[3],
+                                hdsdim ubnd[3], int gap, int *status ){
 /*
 *+
 *  Name:
@@ -17,8 +17,8 @@ CupidBoxIter *cupidBoxIterator( CupidBoxIter *iter, int dim[3], int lbnd[3],
 *     Starlink C
 
 *  Synopsis:
-*     CupidBoxIter *cupidBoxIterator( CupidBoxIter *iter, int dim[3],
-*                                     int lbnd[3], int ubnd[3], int gap,
+*     CupidBoxIter *cupidBoxIterator( CupidBoxIter *iter, hdsdim dim[3],
+*                                     hdsdim lbnd[3], hdsdim ubnd[3], int gap,
 *                                     int *status )
 
 *  Description:
@@ -105,8 +105,8 @@ CupidBoxIter *cupidBoxIterator( CupidBoxIter *iter, int dim[3], int lbnd[3],
    CupidBoxIter *result;
    int i;
    int overlap;
-   int ovlbnd[ 3 ];
-   int ovubnd[ 3 ];
+   hdsdim ovlbnd[ 3 ];
+   hdsdim ovubnd[ 3 ];
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return NULL;

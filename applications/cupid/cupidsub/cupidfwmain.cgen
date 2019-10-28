@@ -5,8 +5,8 @@
 #include <string.h>
 #include <math.h>
 
-int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
-                                int dims[ 3 ], int skip[ 3 ], int slbnd[ 3 ],
+int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, size_t nel, int ndim,
+                                hdsdim dims[ 3 ], hdsdim skip[ 3 ], hdsdim slbnd[ 3 ],
                                 double rms, AstKeyMap *config, int *ipa,
                                 int perspectrum, int *status ){
 /*
@@ -21,8 +21,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *     Starlink C
 
 *  Synopsis:
-*     int cupidFWMain<X>( CGEN_TYPE *array, int nel, int ndim, int dims[ 3 ],
-*                         int skip[ 3 ], int slbnd[ 3 ], double rms,
+*     int cupidFWMain<X>( CGEN_TYPE *array, size_t nel, int ndim, hdsdim dims[ 3 ],
+*                         hdsdim skip[ 3 ], hdsdim slbnd[ 3 ], double rms,
 *                         AstKeyMap *config, int *ipa,
 *                         int perspectrum, int *status )
 
@@ -170,6 +170,51 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    double maxg;    /* Maximum gradient found so far */
    double noise;   /* Data value at which each route commences */
    double sea_level;/* Data values less than this are at "sea level" */
+   hdsdim count;   /* Number of pixels checked */
+   hdsdim dump_walk;  /* The starting pixel at which to dump the clump assignment array */
+   hdsdim iflat;      /* Index of next element in "flat" to be written or read */
+   hdsdim iix;        /* GRID index on 1st axis at central pixel */
+   hdsdim iiy;        /* GRID index on 2nd axis at central pixel */
+   hdsdim iiz;        /* GRID index on 3rd axis at central pixel */
+   hdsdim istep;      /* Index within "route" array */
+   hdsdim iv0;        /* 1D Vector index of starting pixel. */
+   hdsdim iv;         /* 1D Vector index of current central pixel. */
+   hdsdim ix;         /* GRID index on 1st axis at starting pixel */
+   hdsdim ixoff;      /* Offset in GRID index on 1st axis */
+   hdsdim iy;         /* GRID index on 2nd axis at starting pixel */
+   hdsdim iyoff;      /* Offset in GRID index on 2nd axis */
+   hdsdim iz;         /* GRID index on 3rd axis at starting pixel */
+   hdsdim izoff;      /* Offset in GRID index on 3rd axis */
+   hdsdim jvx;        /* Vector index at start of z plane */
+   hdsdim jvy;        /* Vector index at start of y column */
+   hdsdim jvz;        /* Vector index at start of x row */
+   hdsdim jx;         /* X plane count */
+   hdsdim jxhi;       /* Highest value for axis 1 within extended neighbourhood */
+   hdsdim jxlo;       /* Lowest value for axis 1 within extended neighbourhood */
+   hdsdim jy;         /* Y plane count */
+   hdsdim jyhi;       /* Highest value for axis 1 within extended neighbourhood */
+   hdsdim jylo;       /* Lowest value for axis 1 within extended neighbourhood */
+   hdsdim jz;         /* Z plane count */
+   hdsdim jzhi;       /* Highest value for axis 1 within extended neighbourhood */
+   hdsdim jzlo;       /* Lowest value for axis 1 within extended neighbourhood */
+   hdsdim maxjump;    /* Longest jump to a higher neighbouring pixel */
+   hdsdim mix;        /* Grid index on 1st axis of 3x3x3 pixel being tested */
+   hdsdim miy;        /* Grid index on 2nd axis of 3x3x3 pixel being tested */
+   hdsdim miz;        /* Grid index on 3rd axis of 3x3x3 pixel being tested */
+   hdsdim nflat;      /* Number of starting pixels in "route" which are flat */
+   hdsdim nix;        /* GRID index on 1st axis at central pixel */
+   hdsdim niy;        /* GRID index on 2nd axis at central pixel */
+   hdsdim niz;        /* GRID index on 3rd axis at central pixel */
+   hdsdim nsx;        /* Longest jump between peaks in the x direction */
+   hdsdim nsy;        /* Longest jump between peaks in the y direction */
+   hdsdim nsz;        /* Longest jump between peaks in the z direction */
+   hdsdim nv;         /* Vector index of next pixel along the route */
+   hdsdim route_length;/* Number of pixels stored in "route" array */
+   hdsdim skip0;      /* Total skip from centre to first 3x3x3 neighbour */
+   hdsdim skip1;      /* Total skip from centre to first extended neighbour */
+   hdsdim xlim;       /* Number of x planes in 3x3x3 neighbourhood */
+   hdsdim ylim;       /* Number of y planes in 3x3x3 neighbourhood */
+   hdsdim zlim;       /* Number of z planes in 3x3x3 neighbourhood */
    int *m1;        /* Pointer to input array */
    int *m2;        /* Pointer to output array */
    int *m3;        /* Pointer used to swap arrays */
@@ -178,61 +223,16 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    int *work;      /* Work array */
    int cleaniter;  /* Number of cleaning  iterations to perform */
    int clump_index;/* Index of the peak to which the walk ascends */
-   int count;      /* Number of pixels checked */
    int debug3;     /* Are we displaying level 3 debug info? */
    int dump_peak;  /* The clump index at which to dump the clump assignment array */
-   int dump_walk;  /* The starting pixel at which to dump the clump assignment array */
    int got_flat;   /* Has the length of the initial flat section been found? */
-   int iflat;      /* Index of next element in "flat" to be written or read */
-   int iix;        /* GRID index on 1st axis at central pixel */
-   int iiy;        /* GRID index on 2nd axis at central pixel */
-   int iiz;        /* GRID index on 3rd axis at central pixel */
-   int istep;      /* Index within "route" array */
    int iter;       /* Iteration count */
-   int iv;         /* 1D Vector index of current central pixel. */
-   int iv0;        /* 1D Vector index of starting pixel. */
-   int ix;         /* GRID index on 1st axis at starting pixel */
-   int ixoff;      /* Offset in GRID index on 1st axis */
-   int iy;         /* GRID index on 2nd axis at starting pixel */
-   int iyoff;      /* Offset in GRID index on 2nd axis */
-   int iz;         /* GRID index on 3rd axis at starting pixel */
-   int izoff;      /* Offset in GRID index on 3rd axis */
-   int jvx;        /* Vector index at start of z plane */
-   int jvy;        /* Vector index at start of y column */
-   int jvz;        /* Vector index at start of x row */
-   int jx;         /* X plane count */
-   int jxhi;       /* Highest value for axis 1 within extended neighbourhood */
-   int jxlo;       /* Lowest value for axis 1 within extended neighbourhood */
-   int jy;         /* Y plane count */
-   int jyhi;       /* Highest value for axis 1 within extended neighbourhood */
-   int jylo;       /* Lowest value for axis 1 within extended neighbourhood */
-   int jz;         /* Z plane count */
-   int jzhi;       /* Highest value for axis 1 within extended neighbourhood */
-   int jzlo;       /* Lowest value for axis 1 within extended neighbourhood */
    int lpercent;   /* Previous displayed percent value */
-   int maxjump;    /* Longest jump to a higher neighbouring pixel */
-   int mix;        /* Grid index on 1st axis of 3x3x3 pixel being tested */
-   int miy;        /* Grid index on 2nd axis of 3x3x3 pixel being tested */
-   int miz;        /* Grid index on 3rd axis of 3x3x3 pixel being tested */
    int new_peak;   /* Has this walk arrived at a new peak? */
-   int nflat;      /* Number of starting pixels in "route" which are flat */
-   int nix;        /* GRID index on 1st axis at central pixel */
-   int niy;        /* GRID index on 2nd axis at central pixel */
-   int niz;        /* GRID index on 3rd axis at central pixel */
-   int nsx;        /* Longest jump between peaks in the x direction */
-   int nsy;        /* Longest jump between peaks in the y direction */
-   int nsz;        /* Longest jump between peaks in the z direction */
-   int nv;         /* Vector index of next pixel along the route */
    int nzero;      /* No. of axes with zero displacement between pixels */
    int percent;    /* Percent of pixels done */
    int ret;        /* The highest index value in "ipa" */
-   int route_length;/* Number of pixels stored in "route" array */
-   int skip0;      /* Total skip from centre to first 3x3x3 neighbour */
-   int skip1;      /* Total skip from centre to first extended neighbour */
-   int xlim;       /* Number of x planes in 3x3x3 neighbourhood */
-   int ylim;       /* Number of y planes in 3x3x3 neighbourhood */
    int yon;        /* Is the current Y row within the bounds of the array? */
-   int zlim;       /* Number of z planes in 3x3x3 neighbourhood */
    int zon;        /* Is the current Z plane within the bounds of the array? */
 
 /* The distance from a central pixel centre to the centre of a neighbouring

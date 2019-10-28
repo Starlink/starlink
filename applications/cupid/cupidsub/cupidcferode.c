@@ -5,13 +5,13 @@
 
 typedef struct Pix {
    int ineb;
-   int iv;
-   int x[3];
+   size_t iv;
+   hdsdim x[3];
    int edge;
 } Pix;
 
-int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
-                  int skip[3], int perspectrum, int naxis,
+int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, hdsdim *dims,
+                  size_t skip[3], int perspectrum, int naxis,
                   CupidPixelSet **clumps, int *status ){
 /*
 *+
@@ -26,8 +26,8 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 *     Starlink C
 
 *  Synopsis:
-*     int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
-*                       int skip[3], int perspectrum, int naxis,
+*     int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, hdsdim *dims,
+*                       size_t skip[3], int perspectrum, int naxis,
 *                       CupidPixelSet **clumps, int *status )
 
 *  Description:
@@ -123,27 +123,27 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 /* Local Variables: */
    Pix *pix;        /* Pointer to a Pix structure describing transferred pixel */
    Pix *xflist;     /* Pointer to list of Pix structures describing transferred pixels */
+   hdsdim ix;       /* GRID index on 1st axis */
+   hdsdim iy;       /* GRID index on 2nd axis */
+   hdsdim iz;       /* GRID index on 3rd axis */
+   hdsdim lbnd[ 3 ];/* New lower bounds for eroded PixelSet */
+   hdsdim ubnd[ 3 ];/* New upper bounds for eroded PixelSet */
+   hdsdim x[ 3 ];   /* GRID indices of current array element */
    int *v1;         /* Pointer to element at start of this row */
    int *v2;         /* Pointer to element at start of this plane */
    int *v;          /* Pointer to next array element */
    int edge;        /* Pixel at upper or lower bound on any axis? */
-   int i;           /* Loop count */
    int i1[27];      /* List of adjoining PixelSet indices at this level */
    int il1;         /* Lowest index of adjoining PixelSets at this level */
    int il2;         /* Index of adjoining PixelSets at higher level */
-   int iv;          /* 1D vector index */
-   int ix;          /* GRID index on 1st axis */
-   int iy;          /* GRID index on 2nd axis */
-   int iz;          /* GRID index on 3rd axis */
-   int lbnd[ 3 ];   /* New lower bounds for eroded PixelSet */
    int n1;          /* No. of adjoining PixelSets at this level */
    int n2;          /* No. of adjoining PixelSets at higher level */
-   int ubnd[ 3 ];   /* New upper bounds for eroded PixelSet */
-   int nxf;         /* No. of pixels to transfer out of the source PixelSet */
    int old_index;   /* Original index value of the transferred pixels */
-   int x[ 3 ];      /* GRID indices of current array element */
    int yedge;       /* Pixel at upper or lower bound on 2nd axis? */
    int zedge;       /* Pixel at upper or lower bound on 3rd axis? */
+   size_t i;        /* Loop count */
+   size_t iv;       /* 1D vector index */
+   size_t nxf;      /* No. of pixels to transfer out of the source PixelSet */
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return 0;

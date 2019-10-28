@@ -16,12 +16,12 @@
    cupidGaussClumps, and its contents are initialised by this function. */
 extern CupidGC cupidGC;
 
-void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel,
-                                         int ndim, int *dims, double *par, double rms,
-                                         double mlim, int imax, double thresh,
-                                         int *lbnd, HDSLoc **ndfs, int iclump,
+void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t nel,
+                                         int ndim, hdsdim *dims, double *par, double rms,
+                                         double mlim, size_t imax, double thresh,
+                                         hdsdim *lbnd, HDSLoc **ndfs, int iclump,
                                          int excols, double mean_peak,
-                                         double maxbad, int *area, double *sumclumps,
+                                         double maxbad, size_t *area, double *sumclumps,
                                          int *status ){
 /*
 *+
@@ -35,12 +35,12 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *     Starlink C
 
 *  Synopsis:
-*     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel,
-*                                  int ndim, int *dims, double *par,
-*                                  double rms, double mlim, int imax,
-*                                  double thresh, int *lbnd, HDSLoc **ndfs,
+*     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t nel,
+*                                  int ndim, hdsdim *dims, double *par,
+*                                  double rms, double mlim, size_t imax,
+*                                  double thresh, hdsdim *lbnd, HDSLoc **ndfs,
 *                                  int iclump, int excols, double mean_peak,
-*                                  double maxbad, int *area, double *sumclumps,
+*                                  double maxbad, size_t *area, double *sumclumps,
 *                                  int *status )
 
 *  Description:
@@ -186,29 +186,29 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
    double sumr;           /* Sum of remaining residual values */
    double xx[ 3 ];        /* Internal coords of current pixel */
    double yy[ 3 ];        /* External coords of current pixel */
-   int *plist;            /* Pointer to list holding pixel indices */
-   int *pnext;            /* Pointer to next element in plist */
-   int area_off;          /* Area of clump outside the data array, in pixels */
-   int bad;               /* No of pixels that touch areas of bad pixels */
+   hdsdim *plist;         /* Pointer to list holding pixel indices */
+   hdsdim *pnext;         /* Pointer to next element in plist */
+   hdsdim lbox[ 3 ];      /* Lower bounds of model evaluation box */
+   hdsdim lface[ 3 ];     /* Lower bounds of face being evaluated */
+   hdsdim ubox[ 3 ];      /* Upper bounds of model evaluation box */
+   hdsdim uface[ 3 ];     /* Upper bounds of face being evaluated */
    int extend[ 3 ][ 2 ];  /* Flags indicating which box faces to extend */
    int face_done;         /* Has the face been evaluated? */
    int first;             /* Is this is the first model evaluation? */
-   int i;                 /* Element index */
    int iax;               /* Axis index */
    int iedge;             /* Consider the upper limit on current axis? */
-   int ilist;             /* Index into the plist and mlist arrays */
-   int j;                 /* Vector index within input array */
    int jax;               /* Axis index */
-   int lbox[ 3 ];         /* Lower bounds of model evaluation box */
-   int lface[ 3 ];        /* Lower bounds of face being evaluated */
-   int list_size;         /* Number of values stored in plist and mlist */
    int lowpeak;           /* If the peak value below the supplied threshold? */
    int more;              /* Does the evaluation box need to be extended? */
-   int nr;                /* Number of remaining residual values */
    int ok;                /* Is the pixel within the bounds of the NDF? */
    int peakok;            /* Is some of the peak usable? */
-   int ubox[ 3 ];         /* Upper bounds of model evaluation box */
-   int uface[ 3 ];        /* Upper bounds of face being evaluated */
+   size_t area_off;       /* Area of clump outside the data array, in pixels */
+   size_t bad;            /* No of pixels that touch areas of bad pixels */
+   size_t i;              /* Element index */
+   size_t ilist;          /* Index into the plist and mlist arrays */
+   size_t j;              /* Vector index within input array */
+   size_t list_size;      /* Number of values stored in plist and mlist */
+   size_t nr;             /* Number of remaining residual values */
    size_t psize;          /* Bytes required for one pixel position */
 
 /* Abort if an error has already occurred. */
@@ -224,11 +224,11 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 /* Initialise the GRID bounds of the box over which the model Gaussian is to
    be evaluated so that it covers only the pixel containing the peak of
    the model. */
-   ubox[ 0 ] = lbox[ 0 ] = (int)( par[ 2 ] + 0.5 );
+   ubox[ 0 ] = lbox[ 0 ] = (hdsdim)( par[ 2 ] + 0.5 );
    if( ndim > 1 ) {
-      ubox[ 1 ] = lbox[ 1 ] = (int)( par[ 4 ] + 0.5 );
+      ubox[ 1 ] = lbox[ 1 ] = (hdsdim)( par[ 4 ] + 0.5 );
       if( ndim > 2 ) {
-         ubox[ 2 ] = lbox[ 2 ] = (int)( par[ 7 ] + 0.5 );
+         ubox[ 2 ] = lbox[ 2 ] = (hdsdim)( par[ 7 ] + 0.5 );
       }
    }
 
@@ -250,7 +250,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 /* Reserve memory for a list of model values and associated pixel indices.
    These arrays will be extended as necessary.  */
    mlist = astMalloc( sizeof( double )*cupidGC.nel );
-   psize = sizeof( int )*ndim;
+   psize = sizeof( *plist )*ndim;
    plist = astMalloc( psize*cupidGC.nel );
    list_size = 0;
 
@@ -362,7 +362,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
                      mlist[ ilist ] = m;
                      pnext = plist + ilist*ndim;
                      for( jax = 0; jax < ndim; jax ++ ) {
-                        pnext[ jax ] = (int) ( yy[ jax ] + 0.5 );
+                        pnext[ jax ] = (hdsdim) ( yy[ jax ] + 0.5 );
                      }
 
 /* Set a flag indicating if the max value in the sampled gaussian is
@@ -442,7 +442,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 
 /* Display info */
    msgSetd( "V", sum );
-   msgSeti( "N", *area );
+   msgSetk( "N", *area );
    msgOutif( MSG__DEBUG1, "",
              "   Integrated clump intensity: ^V (in ^N pixels)", status );
 

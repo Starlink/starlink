@@ -9,9 +9,9 @@
 
 
 void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
-                    int ndim, int *lbox, int *ubox, int list_size,
-                    double *mlist, int *plist, int *lbnd, int iclump,
-                    int *dax, AstKeyMap *extra, int bad, int *status ){
+                      int ndim, hdsdim *lbox, hdsdim *ubox, size_t list_size,
+                      double *mlist, hdsdim *plist, hdsdim *lbnd, int iclump,
+                      int *dax, AstKeyMap *extra, int bad, int *status ){
 /*
 *+
 *  Name:
@@ -25,8 +25,8 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 
 *  Synopsis:
 *     void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
-*                         int ndim, int *lbox, int *ubox, int list_size,
-*                         double *mlist, int *plist, int *lbnd, int iclump,
+*                         int ndim, hdsdim *lbox, hdsdim *ubox, size_t list_size,
+*                         double *mlist, hdsdim *plist, hdsdim *lbnd, int iclump,
 *                         int *dax, AstKeyMap *extra, int bad,
 *                         int *status )
 
@@ -165,34 +165,34 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 
    HDSLoc *cloc;                /* Cell locator */
    HDSLoc *dloc;                /* Component locator */
-   HDSLoc *xloc;                /* Extension locator */
    HDSLoc *exloc;               /* Locator for structure holding extra info */
+   HDSLoc *xloc;                /* Extension locator */
    const char *key;             /* KeyMap key name */
    double *ipd;                 /* Pointer to Data array */
    double *m;                   /* Pointer to next data value */
    double dval;                 /* Double value to store */
-   int *p;                      /* Pointer to next grid axis value */
-   int el;                      /* Number of elements mapped */
-   int elb[ 3 ];                /* The lower NDF limit on each external axis */
-   int elbox[ 3 ];              /* The lower box limit on each external axis */
-   int estep[ 3 ];              /* The step size on each external axis */
-   int eub[ 3 ];                /* The upper NDF limit on each external axis */
-   int eubox[ 3 ];              /* The upper box limit on each external axis */
-   int i;                       /* Point index */
+   hdsdim *p;                   /* Pointer to next grid axis value */
+   hdsdim elb[ 3 ];             /* The lower NDF limit on each external axis */
+   hdsdim elbox[ 3 ];           /* The lower box limit on each external axis */
+   hdsdim estep[ 3 ];           /* The step size on each external axis */
+   hdsdim eub[ 3 ];             /* The upper NDF limit on each external axis */
+   hdsdim eubox[ 3 ];           /* The upper box limit on each external axis */
+   hdsdim i;                    /* Point index */
+   hdsdim iv;                   /* 1D vector index for current data value */
+   hdsdim lb[ 3 ];              /* Lower pixel index bounds of NDF */
+   hdsdim pv;                   /* Pixel offset */
+   hdsdim size[1];              /* No of elements in NDF array */
+   hdsdim step[ 3 ];            /* The step size on each internal axis */
+   hdsdim ub[ 3 ];              /* Upper pixel index bounds of NDF */
    int indf;                    /* NDF identifier */
-   int iv;                      /* 1D vector index for current data value */
    int j;                       /* Axis index */
-   int lb[ 3 ];                 /* Lower pixel index bounds of NDF */
    int nex;                     /* No. of extra items of information */
    int ok;                      /* Pixel within clump NDF? */
    int old_ghstate;             /* Non-zero if group history recording is switched on */
    int old_pvstate;             /* Non-zero if provenance recording is switched on */
    int place;                   /* NDF place holder */
-   int pv;                      /* Pixel offset */
+   size_t el;                   /* Number of elements mapped */
    size_t oldsize;              /* Size of original NDF */
-   hdsdim size[1];              /* No of elements in NDF array */
-   int step[ 3 ];               /* The step size on each internal axis */
-   int ub[ 3 ];                 /* Upper pixel index bounds of NDF */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;

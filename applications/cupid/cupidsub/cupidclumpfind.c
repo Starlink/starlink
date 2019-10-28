@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <math.h>
 
-HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
+HDSLoc *cupidClumpFind( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *ipd,
                         double *ipv, double rms, AstKeyMap *config, int velax,
                         int perspectrum, double beamcorr[ 3 ],
                         int *backoff, int *status ){
@@ -25,7 +25,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     Starlink C
 
 *  Synopsis:
-*     HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd,
+*     HDSLoc *cupidClumpFind( int type, int ndim, hdsdim *slbnd, hdsdim *subnd,
 *                             void *ipd, double *ipv, double rms,
 *                             AstKeyMap *config, int velax,
 *                             int perspectrum, double beamcorr[ 3 ],
@@ -143,7 +143,6 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 */
 
 /* Local Variables: */
-
    CupidPixelSet **clumps;/* Pointer to list of PixelSet pointers */
    CupidPixelSet *ps;   /* Pointer to PixelSet */
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
@@ -155,27 +154,27 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    double maxrem;       /* Maximum of remaining unassigned pixel values */
    double mind;         /* Minimum value in data array */
    float fd;            /* Data value */
+   hdsdim dims[3];      /* Pointer to array of array dimensions */
+   hdsdim i;            /* Loop count */
+   hdsdim j;            /* Loop index */
+   hdsdim minpix;       /* Minimum number of pixels in a clump */
+   hdsdim skip[3];      /* Pointer to array of axis skips */
    int *ipa;            /* Pointer to pixel assignment array */
    int allow_edge;      /* Are clumps allowed to touch an edge of the data array? */
-   int dims[3];         /* Pointer to array of array dimensions */
-   int el;              /* Number of elements in array */
-   int i;               /* Loop count */
    int idl;             /* Emulate the IDL clumpfind algorithm? */
    int ii;              /* Significant clump index */
    int ilev;            /* Contour index */
    int index;           /* Next PixelSet index to use */
-   int j;               /* Loop index */
-   int minpix;          /* Minimum number of pixels in a clump */
    int more;            /* Any remaining unsorted elements/ */
    int naxis;           /* Defines whether two pixels are neighbours or not */
    int nclump;          /* Number of clumps found */
    int nedge;           /* Number of clumps with edge pixels */
-   int nthin;           /* Number of clumps that span only a single pixel */
    int nlevels;         /* Number of values in "levels" */
    int nminpix;         /* Number of clumps with < MinPix pixels */
+   int nthin;           /* Number of clumps that span only a single pixel */
    int old_ghstate;     /* Non-zero if group history recording is switched on */
    int old_pvstate;     /* Non-zero if provenance recording is switched on */
-   int skip[3];         /* Pointer to array of axis skips */
+   size_t el;           /* Number of elements in array */
 
 /* Initialise */
    ret = NULL;

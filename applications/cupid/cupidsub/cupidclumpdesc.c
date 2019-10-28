@@ -125,7 +125,7 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *               created by finding many marginal profiles at 1 degree
 *               intervals and finding the longest.
 *           4 - Like 3 except the ellipse centre is at the clump peak rather
-*               than the clump centroid, and the pixel data values are used 
+*               than the clump centroid, and the pixel data values are used
 *               as weights.
 *     velax
 *        The zero-based index of the velocity pixel axis. Should be -1 if
@@ -289,24 +289,24 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
    double v;                /* Variance after corr'n for instrumental blurring */
    double wcspos[ 3 ][ 5 ]; /* WCS coord positions */
    float sig[4];            /* Clump widths on X, U, Y and V axes */
-   int i;                   /* Pixel index on 1st pixel axis */
-   int icol;                /* Index into returned column arrays */
+   hdsdim i;                /* Pixel index on 1st pixel axis */
+   hdsdim icol;             /* Index into returned column arrays */
+   hdsdim j;                /* Pixel index on 2nd pixel axis */
+   hdsdim k;                /* Pixel index on 3rd pixel axis */
+   hdsdim lbnd[ 3 ];        /* Lower NDF pixel bounds */
+   hdsdim n;                /* Number of good pixels indices */
+   hdsdim px;               /* X pixel index at peak value */
+   hdsdim py;               /* Y pixel index at peak value */
+   hdsdim pz;               /* Z pixel index at peak value */
+   hdsdim ubnd[ 3 ];        /* Upper NDF pixel bounds */
    int icomp;               /* Index into CUPID extension */
+   int idim;                /* Axis index */
    int iwarn;               /* Warning index */
-   int j;                   /* Pixel index on 2nd pixel axis */
-   int k;                   /* Pixel index on 3rd pixel axis */
-   int lbnd[ 3 ];           /* Lower NDF pixel bounds */
-   int n;                   /* Number of good pixels indices */
    int ndim;                /* Number of pixel axes */
-   int nel;                 /* Number of elements in mapped array */
    int nwarn;               /* Number of warnings to display */
    int outax[ 3 ];          /* Indices of spatial WCS axes */
-   int px;                  /* X pixel index at peak value */
-   int py;                  /* Y pixel index at peak value */
-   int pz;                  /* Z pixel index at peak value */
    int there;               /* Has the NDF got a CUPID extension? */
-   int ubnd[ 3 ];           /* Upper NDF pixel bounds */
-
+   size_t nel;              /* Number of elements in mapped array */
 
 
    static AstFrame *pixel_frm = NULL;  /* 2D spatial PIXEL Frame */
@@ -439,42 +439,42 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 
 /* Loop round all pixel axes (it is assumed that there are the same
    number of WCS axes). */
-         for( i = 1; ( i <= ndim ) && astOK; i++ ) {
+         for( idim = 1; ( idim <= ndim ) && astOK; idim++ ) {
 
 /* We want the Domain associated with the current axis, but since the
    current Frame may be a CmpFrame with its own (different) domain name,
    we need to first extract the current axis from the WCS Frame. */
-            axfrm = astPickAxes( wcsfrm, 1, &i, NULL );
+            axfrm = astPickAxes( wcsfrm, 1, &idim, NULL );
 
 /* See if the axis is a sky axis */
-            skyaxis[ i - 1 ] = !strcmp( "SKY", astGetC( axfrm, "Domain" ) );
+            skyaxis[ idim - 1 ] = !strcmp( "SKY", astGetC( axfrm, "Domain" ) );
 
 /* If so, the unit associated with the axis is set to "deg" rather
    that the normal "hh:mm:ss" style unit string returned for a SkyAxis.
    Also, set appropriate units for the size columns. */
-            if( skyaxis[ i - 1 ] ) {
-               strcpy( unit_buf[ i - 1 ], "deg" );
-               punits[ i - 1 + 2*ndim ] = "arcsec";
+            if( skyaxis[ idim - 1 ] ) {
+               strcpy( unit_buf[ idim - 1 ], "deg" );
+               punits[ idim - 1 + 2*ndim ] = "arcsec";
 
 /* Otherwise, copy the axis unit into a local buffer since AST will re-use its
    internal buffer in which astGetC returns the attribute value. */
             } else {
-               strcpy( unit_buf[ i - 1 ], astGetC( axfrm, "Unit" ) );
-               punits[ i - 1 + 2*ndim ] = unit_buf[ i - 1 ];
+               strcpy( unit_buf[ idim - 1 ], astGetC( axfrm, "Unit" ) );
+               punits[ idim - 1 + 2*ndim ] = unit_buf[ idim - 1 ];
             }
 
 /*  Annul the Frame pointer */
             axfrm = astAnnul( axfrm );
 
 /* The two clump positions are specified in the axis units chosen above. */
-            punits[ i - 1 ] = unit_buf[ i - 1 ];
-            punits[ i - 1 + ndim ] = unit_buf[ i - 1 ];
+            punits[ idim - 1 ] = unit_buf[ idim - 1 ];
+            punits[ idim - 1 + ndim ] = unit_buf[ idim - 1 ];
 
 /* Append the "size" unit to the end of the volume unit string, followed
    by a dot if this is not the last axis. */
-            strcpy( vu, punits[ i - 1 + 2*ndim ] );
-            vu += strlen( punits[ i - 1 + 2*ndim ] );
-            if( i != ndim ) {
+            strcpy( vu, punits[ idim - 1 + 2*ndim ] );
+            vu += strlen( punits[ idim - 1 + 2*ndim ] );
+            if( idim != ndim ) {
                strcpy( vu, "." );
                vu++;
             }
@@ -528,14 +528,14 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 /* Now deal with cases where the output catalogue contains column values in
    units of pixels. */
       } else {
-         for( i = 0; i < ndim; i++ ) {
-            punits[ i ] = "pixel";
-            punits[ i + ndim ] = "pixel";
-            punits[ i + 2*ndim ] = "pixel";
+         for( idim = 0; idim < ndim; idim++ ) {
+            punits[ idim ] = "pixel";
+            punits[ idim + ndim ] = "pixel";
+            punits[ idim + 2*ndim ] = "pixel";
 
             strcpy( vu, "pixel" );
             vu += 5;
-            if( i != ndim ) {
+            if( idim != ndim ) {
                strcpy( vu, "." );
                vu++;
             }
@@ -816,16 +816,16 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
    The next "ndim" positions are offset away from the peak position along
    each of the "ndim" pixel axes, the displacement along each pixel axis
    being the "size" on that axis. */
-         for( i = 0; i < ndim; i++ ) {
-            pixpos[ i ][ 0 ] = ret[ i ];
-            pixpos[ i ][ 1 ] = ret[ ndim + i ];
-            pixpos[ i ][ 2 ] = ret[ i ];
-            pixpos[ i ][ 3 ] = ret[ i ];
-            pixpos[ i ][ 4 ] = ret[ i ];
+         for( idim = 0; idim < ndim; idim++ ) {
+            pixpos[ idim ][ 0 ] = ret[ idim ];
+            pixpos[ idim ][ 1 ] = ret[ ndim + idim ];
+            pixpos[ idim ][ 2 ] = ret[ idim ];
+            pixpos[ idim ][ 3 ] = ret[ idim ];
+            pixpos[ idim ][ 4 ] = ret[ idim ];
          }
 
-         for( i = 0; i < ndim; i++ ) {
-            pixpos[ i ][ i + 2 ] += ret[ 2*ndim + i ];
+         for( idim = 0; idim < ndim; idim++ ) {
+            pixpos[ idim ][ idim + 2 ] += ret[ 2*ndim + idim ];
          }
 
 /* Transform these positions into WCS coords. */
@@ -833,9 +833,9 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
                    (double *) wcspos );
 
 /* Store the peak and centroid WCS positions in the returned array. */
-         for( i = 0; i < ndim; i++ ) {
-            ret[ i ] = wcspos[ i ][ 0 ];
-            ret[ ndim + i ] = wcspos[ i ][ 1 ];
+         for( idim = 0; idim < ndim; idim++ ) {
+            ret[ idim ] = wcspos[ idim ][ 0 ];
+            ret[ ndim + idim ] = wcspos[ idim ][ 1 ];
          }
 
 /* Normalise them. */
@@ -846,17 +846,17 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
    peak position (currently held at the start of "ret"), and the transformed
    outlier position, and store in the returned array (converting sky axes
    from radians to arc-seconds). */
-         for( i = 0; i < ndim; i++ ) {
-            for( j = 0; j < ndim; j++ ) outlier[ j ] = wcspos[ j ][ 2 + i ];
+         for( idim = 0; idim < ndim; idim++ ) {
+            for( j = 0; j < ndim; j++ ) outlier[ j ] = wcspos[ j ][ 2 + idim ];
             csw = astDistance( wcsfrm, ret, outlier );
-            if( skyaxis[ i ] ) csw *= AST__DR2D*3600.0;
-            ret[ 2*ndim + i ] = csw;
+            if( skyaxis[ idim ] ) csw *= AST__DR2D*3600.0;
+            ret[ 2*ndim + idim ] = csw;
          }
 
 /* Calculate the volume of 1 cubic pixel in WCS units. kpg1Pxscl requires
    a FrameSet so construct one from the supplied Frame and Mapping, using a
    new Frame for PIXEL coords as the Base Frame. */
-         for( i = 0; i < ndim; i++ ) at[i] = pixpos[ i ][ 0 ];
+         for( idim = 0; idim < ndim; idim++ ) at[ idim ] = pixpos[ idim ][ 0 ];
          pixfrm = astFrame( ndim, "Domain=Pixel" );
          fs = astFrameSet( pixfrm, " " );
          astAddFrame( fs, AST__BASE, wcsmap, wcsfrm );
@@ -870,19 +870,19 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 /* Multiply the pixel scales to get the pixel volume. Convert sky axes
    scales from radians to arc-seconds. */
          pixvol = 1.0;
-         for( i = 0; i < ndim; i++ ) {
-            if( skyaxis[ i ] ) pixscl[ i ] *= AST__DR2D*3600.0;
-            pixvol *= pixscl[ i ];
+         for( idim = 0; idim < ndim; idim++ ) {
+            if( skyaxis[ idim ] ) pixscl[ idim ] *= AST__DR2D*3600.0;
+            pixvol *= pixscl[ idim ];
          }
 
 /* Scale the clump volume from cubic pixel into WCS units. */
          ret[ 3*ndim + 2 ] *= pixvol;
 
 /* Convert sky positions from rads to degs. */
-         for( i = 0; i < ndim; i++ ) {
-            if( skyaxis[ i ] ) {
-               ret[ i ] *= AST__DR2D;
-               ret[ ndim + i ] *= AST__DR2D;
+         for( idim = 0; idim < ndim; idim++ ) {
+            if( skyaxis[ idim ] ) {
+               ret[ idim ] *= AST__DR2D;
+               ret[ ndim + idim ] *= AST__DR2D;
             }
          }
       }

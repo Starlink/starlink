@@ -6,7 +6,7 @@
 #include "ndf.h"
 #include <math.h>
 
-void CGEN_FUNCTION(cupidFindback1)( float wlim, int ndim, int dim[3], int lbnd[3],
+void CGEN_FUNCTION(cupidFindback1)( float wlim, int ndim, hdsdim dim[3], hdsdim lbnd[3],
                                     int box[3], double rms, CGEN_TYPE *din,
                                     CGEN_TYPE *dout, CGEN_TYPE *wa,
                                     CGEN_TYPE *wb, int alg, int *status ){
@@ -23,7 +23,7 @@ void CGEN_FUNCTION(cupidFindback1)( float wlim, int ndim, int dim[3], int lbnd[3
 *     Starlink C
 
 *  Synopsis:
-*     void cupidFindback1<X>( float wlim, int ndim, int dim[3], int lbnd[3],
+*     void cupidFindback1<X>( float wlim, int ndim, hdsdim dim[3], hdsdim lbnd[3],
 *                             int box[3], double rms, CGEN_TYPE *din,
 *                             CGEN_TYPE *dout, CGEN_TYPE *wa, CGEN_TYPE *wb,
 *                             int alg, int *status )
@@ -145,16 +145,16 @@ void CGEN_FUNCTION(cupidFindback1)( float wlim, int ndim, int dim[3], int lbnd[3
    CGEN_TYPE *p3;       /* Pointer to next array element */
    CGEN_TYPE vl;        /* Previous good value */
    double k1;           /* Value gradient */
-   int i;               /* Index of next array element */
-   int il;              /* 1D vector index of previous good value */
-   int irow;            /* Index of row */
-   int iv;              /* 1D vector index into array */
-   int ix;              /* x grid index */
-   int j;               /* 1D vector index */
+   hdsdim i;            /* Index of next array element */
+   hdsdim irow;         /* Index of row */
+   hdsdim ix;           /* x grid index */
+   hdsdim nrow;         /* Number of rows of data */
    int lbad;            /* Was previous pixel value bad? */
-   int nel;             /* Number of elements in input array */
    int newbox[ 3 ];     /* Box size for smoothing */
-   int nrow;            /* Number of rows of data */
+   size_t il;           /* 1D vector index of previous good value */
+   size_t iv;           /* 1D vector index into array */
+   size_t j;            /* 1D vector index */
+   size_t nel;          /* Number of elements in input array */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;

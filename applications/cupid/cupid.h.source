@@ -77,22 +77,22 @@
 /* A structure used to describe an iterator that iterates round the
    pixels in a rectangular subsection of a 3D array. */
 typedef struct CupidBoxIter {
-   int done;          /* Have all required pixels been visited? */
-   int xx0;           /* X grid index of current array element */
-   int xx1;           /* Y grid index of current array element */
-   int xx2;           /* Z grid index of current array element */
-   int i;             /* Index of current array element in overlap */
-   int i2;            /* Index of current xy plane in overlap */
-   int i3;            /* Index of current x row in overlap */
-   int lbnd0;         /* Lower X bounds of rectangle being processed */
-   int lbnd1;         /* Lower Y bounds of rectangle being processed */
-   int lbnd2;         /* Lower Z bounds of rectangle being processed */
-   int ubnd0;         /* Upper X bounds of rectangle being processed */
-   int ubnd1;         /* Upper Y bounds of rectangle being processed */
-   int ubnd2;         /* Upper Z bounds of rectangle being processed */
-   int xsize;         /* The X dimension of the array */
-   int xysize;        /* No. of pixels in an XY plane of the array */
-   int gap;           /* Gap between visited pixels */
+   int done;             /* Have all required pixels been visited? */
+   hdsdim xx0;           /* X grid index of current array element */
+   hdsdim xx1;           /* Y grid index of current array element */
+   hdsdim xx2;           /* Z grid index of current array element */
+   hdsdim i;             /* Index of current array element in overlap */
+   hdsdim i2;            /* Index of current xy plane in overlap */
+   hdsdim i3;            /* Index of current x row in overlap */
+   hdsdim lbnd0;         /* Lower X bounds of rectangle being processed */
+   hdsdim lbnd1;         /* Lower Y bounds of rectangle being processed */
+   hdsdim lbnd2;         /* Lower Z bounds of rectangle being processed */
+   hdsdim ubnd0;         /* Upper X bounds of rectangle being processed */
+   hdsdim ubnd1;         /* Upper Y bounds of rectangle being processed */
+   hdsdim ubnd2;         /* Upper Z bounds of rectangle being processed */
+   hdsdim xsize;         /* The X dimension of the array */
+   hdsdim xysize;        /* No. of pixels in an XY plane of the array */
+   int gap;              /* Gap between visited pixels */
 } CupidBoxIter;
 
 
@@ -131,35 +131,35 @@ typedef struct CupidGC  {
    double *model;
    double *resids;
    double chisq;
-   int slbnd[3];           /* Lower pixel bounds of user supplied NDF */
+   hdsdim slbnd[3];        /* Lower pixel bounds of user supplied NDF */
 
 } CupidGC;
 
 /* Structure used to describe a set of contiguous pixels in the ClumpFind
    and FellWalker algorithms. */
 typedef struct CupidPixelSet {
-   int index;          /* The index used to identify pixels in the set */
-   int lbnd[ 3 ];      /* Lower GRID bounds of the set bounding box */
-   int ubnd[ 3 ];      /* Upper GRID bounds of the set bounding box */
-   double vpeak;       /* Peak pixel value */
-   int peak[ 3 ];      /* Peak pixel GRID coords */
-   int pop;            /* Number of pixels assigned to the pixel set */
-   int edge;           /* Does the PixelSet touch an edge of the data array? */
-   int *nebs;          /* List of indices of neighbouring clumps */
-   int nneb;           /* Length of "nebs" list */
    double *cols;       /* FW: data value at the "col" between two neigbours */
+   double vpeak;       /* Peak pixel value */
+   hdsdim lbnd[ 3 ];      /* Lower GRID bounds of the set bounding box */
+   hdsdim peak[ 3 ];      /* Peak pixel GRID coords */
+   hdsdim ubnd[ 3 ];      /* Upper GRID bounds of the set bounding box */
+   int *nebs;          /* List of indices of neighbouring clumps */
+   int edge;           /* Does the PixelSet touch an edge of the data array? */
+   int index;          /* The index used to identify pixels in the set */
    int lneb;           /* Cached clump index */
    int lnebi;          /* Index of cached clump index within "nebs" and "cols" */
+   int nneb;           /* Length of "nebs" list */
+   int pop;            /* Number of pixels assigned to the pixel set */
 } CupidPixelSet;
 
 
 /* A structure used to store information about a group of clumps (used by
    CLUMPINFO). */
 typedef struct CupidClumpInfo {
-   int init;           /* Has the structure been initialised? */
    AstFrameSet *iwcs;  /* WCS FrameSet from main NDF */
-   int lbnd[ 3 ];      /* Lower pixel index bounds of bounding box */
-   int ubnd[ 3 ];      /* Upper pixel index bounds of bounding box */
+   hdsdim lbnd[ 3 ];   /* Lower pixel index bounds of bounding box */
+   hdsdim ubnd[ 3 ];   /* Upper pixel index bounds of bounding box */
+   int init;           /* Has the structure been initialised? */
    int npix;           /* Number of pixel axes */
    int nwcs;           /* Number of WCS axes */
 } CupidClumpInfo;
@@ -167,19 +167,19 @@ typedef struct CupidClumpInfo {
 /* A structure used to store information required by cupidFindback0 (the
    thread worker function used by the FINDBACK command). */
 typedef struct CupidFindback0Data {
-   int islice;         /* Slice index */
-   int nslice;         /* Number of slices to process */
-   int type;           /* Integer identifier for data type */
-   int ndim;           /* Total number of pixel axes in NDF */
-   int box[ 3 ];       /* Dimensions of each cell in pixels */
    double rms;         /* Global rms error in data */
+   float wlim;         /* Min. frac. of good pixels in a filter box */
+   hdsdim islice;      /* Slice index */
+   hdsdim nslice;      /* Number of slices to process */
+   hdsdim slice_dim[ 3 ]; /* Dimensions of each significant slice axis */
+   hdsdim slice_lbnd[ 3 ];/* Lower bounds of each significant slice axis */
+   hdsdim slice_size;  /* Number of pixels in each slice */
+   int box[ 3 ];       /* Dimensions of each cell in pixels */
+   int ndim;           /* Total number of pixel axes in NDF */
+   int newalg;         /* Use experimental algorithm variations? */
+   int type;           /* Integer identifier for data type */
    void *ipd1;         /* Pointer to input Data array */
    void *ipd2;         /* Pointer to output Data array */
-   int slice_dim[ 3 ]; /* Dimensions of each significant slice axis */
-   int slice_lbnd[ 3 ];/* Lower bounds of each significant slice axis */
-   int newalg;         /* Use experimental algorithm variations? */
-   int slice_size;     /* Number of pixels in each slice */
-   float wlim;         /* Min. frac. of good pixels in a filter box */
 } CupidFindback0Data;
 
 
@@ -256,17 +256,17 @@ extern int cupid_ps_cache_size;
 /* Function prototypes */
 /* ------------------  */
 AstKeyMap *cupidRetrieveConfig( HDSLoc *, int * );
-AstRegion *cupidEllipseDescNew( AstFrame *, double *ipd, int velax, double *peak, int space_axes[ 2 ], int ndim, int *lbnd, int *ubnd, AstMapping *wcsmap, AstFrame *space_frm, AstMapping *space_map, int weight, int *status );
+AstRegion *cupidEllipseDescNew( AstFrame *, double *, int, double *, int[ 2 ], int, hdsdim *, hdsdim *, AstMapping *, AstFrame *, AstMapping *, int, int * );
 AstRegion *cupidEllipseDesc( AstFrame *, int[ 2 ], double[ 3 ], double, double, double, double, double, double, float[ 4 ], int, int *, AstMapping *, AstFrame *, AstMapping *, int * );
-AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak, int space_axes[ 2 ], int ndim, int *lbnd, int *ubnd, AstMapping *wcsmap, AstFrame *space_frm, AstMapping *space_map, int *status );
-CupidBoxIter *cupidBoxIterator( CupidBoxIter *, int[3], int[3], int[3], int, int * );
+AstRegion *cupidPolygonDesc( double *, int, double *, int[ 2 ], int, hdsdim *, hdsdim *, AstMapping *, AstFrame *, AstMapping *, int * );
+CupidBoxIter *cupidBoxIterator( CupidBoxIter *, hdsdim[3], hdsdim[3], hdsdim[3], int, int * );
 CupidPixelSet *cupidCFDeletePS( CupidPixelSet *, int * );
 CupidPixelSet *cupidCFFreePS( CupidPixelSet *, int *, int, int * );
 CupidPixelSet *cupidCFMakePS( int, int * );
-HDSLoc *cupidClumpFind( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, double[3], int *, int * );
-HDSLoc *cupidFellWalker( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, double[3], int * );
-HDSLoc *cupidGaussClumps( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, double[3], int * );
-HDSLoc *cupidReinhold( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, double[3], int * );
+HDSLoc *cupidClumpFind( int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, int, double[3], int *, int * );
+HDSLoc *cupidFellWalker( int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, int, double[3], int * );
+HDSLoc *cupidGaussClumps( int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, double[3], int * );
+HDSLoc *cupidReinhold( int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, double[3], int * );
 double *cupidCFLevels( AstKeyMap *, double, double, double, int *, int * );
 double *cupidClumpDesc( int, int, AstMapping *, AstFrame *, const char *, double[ 3 ], int, int, int, double *, const char ***, const char ***, int *, int *, char **, AstRegion **, int * );
 double cupidConfigD( AstKeyMap *, const char *, double, int * );
@@ -274,32 +274,32 @@ double cupidConfigRMS( AstKeyMap *, const char *, double, double, int * );
 double cupidGCChiSq( int, double *, int, int, int * );
 double cupidGCModel( int, double *, double *, int, int, int, int * );
 float cupidRanVal( int, float[2], int * );
-int *cupidRCA( int *, int *, int, int[ 3 ], int[ 3 ], double, int, int, int, int, int * );
-int *cupidRCA2( int *, int *, int, int[ 3 ], int[ 3 ], int * );
-int cupidCFErode( CupidPixelSet *, int *, int, int *, int[3], int, int, CupidPixelSet **, int * );
+int *cupidRCA( int *, int *, size_t, hdsdim[ 3 ], size_t[ 3 ], double, int, int, int, int, int * );
+int *cupidRCA2( int *, int *, size_t, hdsdim[ 3 ], size_t[ 3 ], int * );
+int cupidCFErode( CupidPixelSet *, int *, int, hdsdim *, size_t[3], int, int, CupidPixelSet **, int * );
 int cupidCFXtend( CupidPixelSet *, CupidPixelSet *, int *, int, int *, int[3], int, CupidPixelSet **, int * );
 int cupidConfigI( AstKeyMap *, const char *, int, int * );
 int cupidDefMinPix( int, double *, double, double, int * );
-int cupidNextIt( CupidBoxIter *, int[3], int *, int * );
-int cupidRFillClumps( int *, int *, int, int, int[ 3 ], int[ 3 ], int, int * );
-void cupidCFAddPixel( int *, CupidPixelSet *, int, int[3], double, int, int * );
-void cupidCFIdl( CupidPixelSet *, int *, int, int *, int[3], int, CupidPixelSet **, int * );
+int cupidNextIt( CupidBoxIter *, hdsdim[3], hdsdim *, int * );
+int cupidRFillClumps( int *, int *, size_t, int, size_t[ 3 ], hdsdim[ 3 ], int, int * );
+void cupidCFAddPixel( int *, CupidPixelSet *, size_t, hdsdim[3], double, int, int * );
+void cupidCFIdl( CupidPixelSet *, int *, int, hdsdim *, size_t[3], int, CupidPixelSet **, int * );
 void cupidCFMerge( CupidPixelSet *, CupidPixelSet *, int *, int[3], int *, int **, int, CupidPixelSet **, int * );
-void cupidCFNebs( int *, int, int x[], int, int [3], int[3], int, int, int, int *, int *, int[27], int *, int *, CupidPixelSet **, int * );
-void cupidCFXfer( CupidPixelSet *, CupidPixelSet *, int *, int[3], int * );
+void cupidCFNebs( int *, hdsdim, hdsdim x[], int, hdsdim [3], hdsdim[3], hdsdim, int, int, int *, int *, int[27], int *, int *, CupidPixelSet **, int * );
+void cupidCFXfer( CupidPixelSet *, CupidPixelSet *, int *, size_t[3], int * );
 void cupidClumpInfo1( HDSLoc *, CupidClumpInfo *, int * );
 void cupidDatCopy( HDSLoc *, HDSLoc *, int * );
-void cupidDumpD( double *, int, int *, int *, const char *, int * );
-void cupidDumpF( float *, int, int *, int *, const char *, int * );
-void cupidDumpI( int *, int, int *, int *, const char *, int * );
-void cupidEdges( float *, int, int[3], int[3], float, float, int * );
+void cupidDumpD( double *, int, hdsdim *, hdsdim *, const char *, int * );
+void cupidDumpF( float *, int, hdsdim *, hdsdim *, const char *, int * );
+void cupidDumpI( int *, int, hdsdim *, hdsdim *, const char *, int * );
+void cupidEdges( float *, size_t, hdsdim[3], hdsdim[3], float, float, int * );
 void cupidFindback0( void *, int * );
-void cupidGCListClump( int, int, double *, double, int *, double, int * );
-void cupidGCNdfClump( HDSLoc **, double, double *, double, int, int *, int *, int, double *, int *, int *, int, int *, AstKeyMap *, int, int * );
+void cupidGCListClump( int, int, double *, double, hdsdim *, double, int * );
+void cupidGCNdfClump( HDSLoc **, double, double *, double, int, hdsdim *, hdsdim *, size_t, double *, hdsdim *, hdsdim *, int, int *, AstKeyMap *, int, int *);
 void cupidGCcalcf( int, double *, int *, double * );
 void cupidGCcalcg( int, double *, int *, double * );
-void cupidREdges( int, double *, int *, int *, int, double, double, double, double, int * );
-void cupidRFillLine( int *, int *, int, int, int[ 3 ], int[ 3 ], int[ 3 ], int, int, int, int, int *[3], int * );
+void cupidREdges( size_t, double *, size_t *, int *, int, double, double, double, double, int * );
+void cupidRFillLine( int *, int *, size_t, int, size_t[ 3 ], hdsdim[ 3 ], hdsdim[ 3 ], size_t, int, int, int, hdsdim*[3], int * );
 void cupidStoreClumps( const char *, const char *, int, HDSLoc *, HDSLoc *, int, int, int, int, int, double[ 3 ], const char *, int, AstFrameSet *, const char *, Grp *, FILE *, int *, int * );
 void cupidStoreConfig( HDSLoc *, AstKeyMap *, int * );
 

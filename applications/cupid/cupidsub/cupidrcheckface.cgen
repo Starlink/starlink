@@ -1,12 +1,11 @@
 #include "sae_par.h"
 #include "cupid.h"
 
-int CGEN_FUNCTION(cupidRCheckFace)( CGEN_TYPE *array, int nel, int axis,
-                                     int lbnd, int dims[ 3 ], int skip[ 3 ],
-                                     int xvec[ 3 ], double *work1,
-                                     int *work2, int *mask, int minpix,
-                                     double thresh, double noise,
-                                     double rms, double flatslope,
+int CGEN_FUNCTION(cupidRCheckFace)( CGEN_TYPE *array, size_t nel, int axis,
+                                     hdsdim lbnd, hdsdim dims[ 3 ], size_t skip[ 3 ],
+                                     int xvec[ 3 ], double *work1, size_t *work2,
+                                     int *mask, int minpix, double thresh,
+                                     double noise, double rms, double flatslope,
                                      int *status ){
 /*
 *+
@@ -21,9 +20,9 @@ int CGEN_FUNCTION(cupidRCheckFace)( CGEN_TYPE *array, int nel, int axis,
 *     Starlink C
 
 *  Synopsis:
-*     int cupidRCheckFace<X>( CGEN_TYPE *array, int nel, int axis, int lbnd,
-*                             int dims[ 3 ], int skip[ 3 ], int xvec[ 3 ],
-*                             double *work1, int *work2, int *mask, int minpix,
+*     int cupidRCheckFace<X>( CGEN_TYPE *array, size_t nel, int axis, hdsdim lbnd,
+*                             hdsdim dims[ 3 ], size_t skip[ 3 ], int xvec[ 3 ],
+*                             double *work1, size_t *work2, int *mask, int minpix,
 *                             double thresh, double noise, double rms,
 *                             double flatslope, int *status )
 
@@ -151,18 +150,17 @@ int CGEN_FUNCTION(cupidRCheckFace)( CGEN_TYPE *array, int nel, int axis,
 */
 
 /* Local Variables: */
-
-   int iv0;        /* 1d vector index within "array" at start of line */
-   int x0[ 3 ];    /* GRID coords within "array" at start of line */
-   int x1[ 3 ];    /* Starting values for GRID axes when scanning the face */
-   int x2[ 3 ];    /* Ending values for GRID axes when scanning the face */
-   int inc;        /* Increment in pixels between start of adjacent lines */
-   int ivz;        /* 1d vector index at start of current pixel Z plane */
-   int ivy;        /* 1d vector index at start of current pixel Y plane */
-   int ivx;        /* 1d vector index at start of current pixel X plane */
-   int vskip;      /* 1D vector index increment between pixels on line */
-   int nval;       /* No. of pixel values along the copied line */
-   int ret;        /* Number of lines scanned */
+   hdsdim nval;       /* No. of pixel values along the copied line */
+   hdsdim ret;        /* Number of lines scanned */
+   hdsdim x0[ 3 ];    /* GRID coords within "array" at start of line */
+   hdsdim x1[ 3 ];    /* Starting values for GRID axes when scanning the face */
+   hdsdim x2[ 3 ];    /* Ending values for GRID axes when scanning the face */
+   int inc;           /* Increment in pixels between start of adjacent lines */
+   size_t iv0;        /* 1d vector index within "array" at start of line */
+   size_t ivx;        /* 1d vector index at start of current pixel X plane */
+   size_t ivy;        /* 1d vector index at start of current pixel Y plane */
+   size_t ivz;        /* 1d vector index at start of current pixel Z plane */
+   size_t vskip;      /* 1D vector index increment between pixels on line */
 
 /* Initialise */
    ret = 0;

@@ -7,7 +7,7 @@
 #include "prm_par.h"
 
 
-int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
+int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, size_t nel, size_t *imax,
                                    double *sumdata, int *status ){
 /*
 *+
@@ -21,7 +21,7 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
 *     Starlink C
 
 *  Synopsis:
-*     int cupidGCFindMax<X>( CGEN_TYPE *array, int nel, int *imax,
+*     int cupidGCFindMax<X>( CGEN_TYPE *array, size_t nel, size_t *imax,
 *                            double *sumdata, int *status )
 
 *  Description:
@@ -98,10 +98,10 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
 */
 
 /* Local Variables: */
-   double sum;          /* Sum of supplied values */
-   int i;               /* Loop count */
-   int ngood;           /* Number of good array values found */
    CGEN_TYPE maxval;    /* Largest value found so far */
+   double sum;          /* Sum of supplied values */
+   size_t i;            /* Loop count */
+   size_t ngood;        /* Number of good array values found */
 
 /* Initialise. */
    *imax = -1;

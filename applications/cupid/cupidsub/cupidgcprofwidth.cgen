@@ -2,8 +2,8 @@
 #include "cupid.h"
 #include "math.h"
 
-double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
-                                        int imax, int *ax_max, int ax,
+double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, hdsdim *dims,
+                                        size_t imax, hdsdim *ax_max, int ax,
                                         double rms, double fwhm, double *off,
                                         double *cen, int *status ){
 /*
@@ -18,8 +18,8 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 *     Starlink C
 
 *  Synopsis:
-*     double cupidGCProfWidth<X>( CGEN_TYPE *array, int ndim, int *dims,
-*                                 int imax, int *ax_max, int ax, double rms,
+*     double cupidGCProfWidth<X>( CGEN_TYPE *array, int ndim, hdsdim *dims,
+*                                 size_t imax, hdsdim *ax_max, int ax, double rms,
 *                                 double fwhm, double *off, double *cen,
 *                                 int *status )
 
@@ -134,14 +134,14 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
    double v;             /* Mean value at two profile points */
    double vmax;          /* The maximum value in the clump */
    double vnorm;         /* The normalised value - 0 = background, 1 = peak */
-   int i1;               /* Vector index at lower of two profile points */
-   int i2;               /* Vector index at upper of two profile points */
-   int j1;               /* Axis value at lower of two profile points */
-   int j1low;            /* Radius at lowest pixel */
-   int j2;               /* Axis value at upper of two profile points */
-   int j2low;            /* Radius at lowest pixel */
+   hdsdim j1;            /* Axis value at lower of two profile points */
+   hdsdim j1low;         /* Radius at lowest pixel */
+   hdsdim j2;            /* Axis value at upper of two profile points */
+   hdsdim j2low;         /* Radius at lowest pixel */
    int nsum;             /* No. of pixel values summed in "sum" */
-   int step;             /* Vector step between adjacent pixels on an axis */
+   size_t i1;            /* Vector index at lower of two profile points */
+   size_t i2;            /* Vector index at upper of two profile points */
+   size_t step;          /* Vector step between adjacent pixels on an axis */
 
 /* Initialise */
    ret = 10;

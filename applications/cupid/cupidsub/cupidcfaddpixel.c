@@ -1,7 +1,7 @@
 #include "sae_par.h"
 #include "cupid.h"
 
-void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3], double d,
+void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, size_t iv, hdsdim x[3], double d,
                       int edge, int *status ){
 /*
 *+
@@ -15,7 +15,7 @@ void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3], double d,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3],
+*     void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, size_t iv, hdsdim x[3],
 *                           double d, int edge, int *status )
 
 *  Description:
@@ -81,7 +81,6 @@ void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3], double d,
 */
 
 /* Local Variables: */
-
    int i;                /* Loop count */
 
 /* Abort if an error has already occurred. */

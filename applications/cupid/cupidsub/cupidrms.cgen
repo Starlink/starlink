@@ -7,7 +7,7 @@
 #include <math.h>
 
 
-double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
+double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, size_t nel, hdsdim rowlen,
          int *status ){
 /*
 *+
@@ -21,8 +21,8 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
 *     Starlink C
 
 *  Synopsis:
-*     double cupidRms<X>( CGEN_TYPE *array, int nel, int rowlen,
-*        int *status )
+*     double cupidRms<X>( CGEN_TYPE *array, size_t nel, hdsdim rowlen,
+*                         int *status )
 
 *  Description:
 *     This functions finds an estimate of the RMS noise in the supplied
@@ -101,21 +101,20 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
 */
 
 /* Local Variables: */
-
-   CGEN_TYPE *pr;         /* Pointer to next data value */
-   CGEN_TYPE *w;          /* Pointer to work array */
-   CGEN_TYPE *wr;         /* Pointer to next work value */
+   CGEN_TYPE *pr;       /* Pointer to next data value */
+   CGEN_TYPE *w;        /* Pointer to work array */
+   CGEN_TYPE *wr;       /* Pointer to next work value */
    double ret;          /* Returned value */
    double maxv;         /* Largest data value in supplied array */
    double minv;         /* Smallest data value in supplied array */
    double sum;          /* Sum of squared residuals */
    double thresh;       /* The rejection threshold for residuals */
-   int i;               /* Element count */
-   int ipix;            /* Pixel count */
-   int irow;            /* Row counter */
-   int n;               /* Number of values summed in "sum" */
-   int nrej;            /* Number of rejections on previus loop */
-   int nrow;            /* Number of rows in supplied array */
+   hdsdim i;            /* Element count */
+   hdsdim ipix;         /* Pixel count */
+   hdsdim irow;         /* Row counter */
+   hdsdim n;            /* Number of values summed in "sum" */
+   hdsdim nrej;         /* Number of rejections on previus loop */
+   hdsdim nrow;         /* Number of rows in supplied array */
 
 /* Initialise. */
    ret = VAL__BADD;

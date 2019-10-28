@@ -2,7 +2,7 @@
 #include "ast.h"
 #include "cupid.h"
 
-int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
+int *cupidRCA( int *in, int *out, size_t nel, hdsdim dims[ 3 ], size_t skip[ 3 ],
                double thresh, int magic, int on, int off, int centre,
                int *status ){
 /*
@@ -17,7 +17,7 @@ int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
 *     Starlink C
 
 *  Synopsis:
-*     int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
+*     int *cupidRCA( int *in, int *out, size_t nel, hdsdim dims[ 3 ], size_t skip[ 3 ],
 *                    double thresh, int magic, int on, int off, int centre,
 *                    int *status )
 
@@ -109,22 +109,21 @@ int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
 */
 
 /* Local Variables: */
-
+   hdsdim ix;          /* Input pixel GRID index on axis 1 */
+   hdsdim iy;          /* Input pixel GRID index on axis 2 */
+   hdsdim iz;          /* Input pixel GRID index on axis 3 */
+   hdsdim ox;          /* Output pixel GRID index on axis 1 */
+   hdsdim oy;          /* Output pixel GRID index on axis 2 */
+   hdsdim oz;          /* Output pixel GRID index on axis 3 */
    int *pin0;          /* Pointer to input pixel [0,0,0] */
    int *pin;           /* Pointer to input pixel */
    int *piny;          /* Pointer to input pixel at start of row */
    int *pinz;          /* Pointer to input pixel at start of plane */
    int *pout;          /* Pointer to output pixel */
    int *ret;           /* Pointer to the returned array */
-   int iv;             /* Vector index into input array */
-   int ix;             /* Input pixel GRID index on axis 1 */
-   int iy;             /* Input pixel GRID index on axis 2 */
-   int iz;             /* Input pixel GRID index on axis 3 */
-   int ox;             /* Output pixel GRID index on axis 1 */
-   int oy;             /* Output pixel GRID index on axis 2 */
-   int oz;             /* Output pixel GRID index on axis 3 */
    int sum;            /* No. of edge neighbours */
    int tot;            /* Total no. of neighbours */
+   size_t iv;          /* Vector index into input array */
 
 /* Initialise */
    ret = out;
@@ -133,7 +132,7 @@ int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
    if( *status != SAI__OK ) return ret;
 
 /* If no output array was supplied, allocate one now. */
-   if( !out ) ret = astMalloc( sizeof( int )*nel );
+   if( !out ) ret = astMalloc( sizeof( *ret )*nel );
 
 /* Check the memory was allocated. */
    if( ret ) {

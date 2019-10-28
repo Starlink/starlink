@@ -13,8 +13,8 @@
 #define REINHOLD    3
 #define FELLWALKER  4
 
-void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim,
-                                    int *lbnd, int *ubnd, int nel, HDSLoc *obj,
+void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim, hdsdim *lbnd,
+                                    hdsdim *ubnd, size_t nel, HDSLoc *obj,
                                     float *rmask, void *out, const char *method,
                                     int *status ){
 /*
@@ -30,8 +30,8 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidSumClumps<X>( CGEN_TYPE *in, int ndim, int *lbnd,
-*                             int *ubnd, int nel, HDSLoc *obj, float *rmask,
+*     void cupidSumClumps<X>( CGEN_TYPE *in, int ndim, hdsdim *lbnd,
+*                             hdsdim *ubnd, size_t nel, HDSLoc *obj, float *rmask,
 *                             void *out, const char *method, int *status )
 
 *  Description:
@@ -121,29 +121,28 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim,
 */
 
 /* Local Variables: */
-
-   CGEN_TYPE *pd;       /* Pointer to next element of the "out" array */
-   HDSLoc *cloc;        /* Locator for a cell of the NDF array */
-   char unit[ 10 ];     /* NDF Unit component */
-   double *ipd;         /* Pointer to data array in clump NDF */
-   double *m;           /* Pointer to next clump data value */
-   float *r;            /* Pointer to next element of the "rmask" array */
-   int *pi;             /* Pointer to next element of the "out" array */
-   int alg;             /* Specifies the algorithm */
-   int cdim[ 3 ];       /* Pixel axis dimensions within clump NDF */
-   int clbnd[ 3 ];      /* Lower pixel bounds of clump NDF */
-   int clump_index;     /* Index for current clump */
-   int cndim;           /* Number of pixel axes in clump NDF */
-   int cubnd[ 3 ];      /* Upper pixel bounds of clump NDF */
-   int el;              /* Number of pixels in clump NDF */
-   int i;               /* 1D vector index loop count */
-   int ii;              /* 1D vector index of current "out" pixel */
-   int indf;            /* NDF identifier for clump image */
-   hdsdim j;            /* Clump loop count */
-   int k;               /* Axis loop count */
-   size_t nclump;       /* Number of clump NDFs supplied */
-   int step[ 3 ];       /* 1D step between adjacent pixels on each axis */
-   int yy[ 3 ];         /* nD pixel coords of current "out" pixel */
+   CGEN_TYPE *pd;     /* Pointer to next element of the "out" array */
+   HDSLoc *cloc;      /* Locator for a cell of the NDF array */
+   char unit[ 10 ];   /* NDF Unit component */
+   double *ipd;       /* Pointer to data array in clump NDF */
+   double *m;         /* Pointer to next clump data value */
+   float *r;          /* Pointer to next element of the "rmask" array */
+   hdsdim cdim[ 3 ];  /* Pixel axis dimensions within clump NDF */
+   hdsdim clbnd[ 3 ]; /* Lower pixel bounds of clump NDF */
+   hdsdim cubnd[ 3 ]; /* Upper pixel bounds of clump NDF */
+   hdsdim j;          /* Clump loop count */
+   hdsdim step[ 3 ];  /* 1D step between adjacent pixels on each axis */
+   hdsdim yy[ 3 ];    /* nD pixel coords of current "out" pixel */
+   int *pi;           /* Pointer to next element of the "out" array */
+   int alg;           /* Specifies the algorithm */
+   int clump_index;   /* Index for current clump */
+   int cndim;         /* Number of pixel axes in clump NDF */
+   int indf;          /* NDF identifier for clump image */
+   int k;             /* Axis loop count */
+   size_t el;         /* Number of pixels in clump NDF */
+   size_t i;          /* 1D vector index loop count */
+   size_t ii;         /* 1D vector index of current "out" pixel */
+   size_t nclump;     /* Number of clump NDFs supplied */
 
 
 /* Abort if an error has already occurred. */

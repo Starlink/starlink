@@ -6,24 +6,24 @@
 /* A structure used to describe a filter box. The "slabs" refered to are
    the single pixel thick slabs forming the 6 faces of the 3D filter box. */
 typedef struct CGEN_FUNCTION(MaxFilterBox) {
-   int lbndxu[ 3 ];    /* Lower grid index bounds of upper x slab */
-   int ubndxu[ 3 ];    /* Upper grid index bounds of upper x slab */
-   int lbndyu[ 3 ];    /* Lower grid index bounds of upper y slab */
-   int ubndyu[ 3 ];    /* Upper grid index bounds of upper y slab */
-   int lbndzu[ 3 ];    /* Lower grid index bounds of upper z slab */
-   int ubndzu[ 3 ];    /* Upper grid index bounds of upper z slab */
-   int lbndxl[ 3 ];    /* Lower grid index bounds of lower x slab */
-   int ubndxl[ 3 ];    /* Upper grid index bounds of lower x slab */
-   int lbndyl[ 3 ];    /* Lower grid index bounds of lower y slab */
-   int ubndyl[ 3 ];    /* Upper grid index bounds of lower y slab */
-   int lbndzl[ 3 ];    /* Lower grid index bounds of lower z slab */
-   int ubndzl[ 3 ];    /* Upper grid index bounds of lower z slab */
+   hdsdim lbndxu[ 3 ];    /* Lower grid index bounds of upper x slab */
+   hdsdim ubndxu[ 3 ];    /* Upper grid index bounds of upper x slab */
+   hdsdim lbndyu[ 3 ];    /* Lower grid index bounds of upper y slab */
+   hdsdim ubndyu[ 3 ];    /* Upper grid index bounds of upper y slab */
+   hdsdim lbndzu[ 3 ];    /* Lower grid index bounds of upper z slab */
+   hdsdim ubndzu[ 3 ];    /* Upper grid index bounds of upper z slab */
+   hdsdim lbndxl[ 3 ];    /* Lower grid index bounds of lower x slab */
+   hdsdim ubndxl[ 3 ];    /* Upper grid index bounds of lower x slab */
+   hdsdim lbndyl[ 3 ];    /* Lower grid index bounds of lower y slab */
+   hdsdim ubndyl[ 3 ];    /* Upper grid index bounds of lower y slab */
+   hdsdim lbndzl[ 3 ];    /* Lower grid index bounds of lower z slab */
+   hdsdim ubndzl[ 3 ];    /* Upper grid index bounds of lower z slab */
    CGEN_TYPE maxval;   /* Maximum data value in the box */
-   int maxpos[ 3 ];    /* Grid indices of the maximum value in the box */
+   hdsdim maxpos[ 3 ];    /* Grid indices of the maximum value in the box */
 } CGEN_FUNCTION(MaxFilterBox);
 
 
-CGEN_TYPE *CGEN_FUNCTION(cupidFindback10)( int dim[3], int box[3],
+CGEN_TYPE *CGEN_FUNCTION(cupidFindback10)( hdsdim dim[3], int box[3],
                                            CGEN_TYPE *din, CGEN_TYPE *dout,
                                            int *status ){
 /*
@@ -38,7 +38,7 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback10)( int dim[3], int box[3],
 *     Starlink C
 
 *  Synopsis:
-*     CGEN_TYPE *cupidFindback10<X>( int dim[3], int box[3],
+*     CGEN_TYPE *cupidFindback10<X>( hdsdim dim[3], int box[3],
 *                                    CGEN_TYPE *din, CGEN_TYPE *dout,
 *                                    int *status )
 
@@ -103,25 +103,25 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback10)( int dim[3], int box[3],
 */
 
 /* Local Variables: */
+   CGEN_FUNCTION(MaxFilterBox) *xbox; /* Structure describing x axis filter box */
    CGEN_FUNCTION(MaxFilterBox) *ybox; /* Structure describing y axis filter box */
    CGEN_FUNCTION(MaxFilterBox) *zbox; /* Structure describing z axis filter box */
-   CGEN_FUNCTION(MaxFilterBox) *xbox; /* Structure describing x axis filter box */
    CGEN_TYPE *p;               /* Pointer to next returned pixel */
    CGEN_TYPE *result;          /* Returned array */
    CGEN_TYPE val;              /* Input pixel value */
    CupidBoxIter *iter;         /* Structure for iterating round pixels */
+   hdsdim iv;                  /* 1D vector index of current pixel */
+   hdsdim ix;                  /* X axis grid index for current output pixel */
+   hdsdim iy;                  /* Y axis grid index for current output pixel */
+   hdsdim iz;                  /* Z axis grid index for current output pixel */
+   hdsdim lbnd[ 3 ];           /* Lower bounds of box centred on (0,0,0) */
+   hdsdim ubnd[ 3 ];           /* Upper bounds of box centred on (0,0,0) */
+   hdsdim xx[ 3 ];             /* Grid indices of current pixel */
    int bk1;                    /* Half the x box width */
    int bk2;                    /* Half the y box width */
    int bk3;                    /* Half the z box width */
    int full_check;             /* Check entire box for a new maximum value? */
-   int iv;                     /* 1D vector index of current pixel */
-   int ix;                     /* X axis grid index for current output pixel */
-   int iy;                     /* Y axis grid index for current output pixel */
-   int iz;                     /* Z axis grid index for current output pixel */
-   int lbnd[ 3 ];              /* Lower bounds of box centred on (0,0,0) */
-   int nel;                    /* Number of pixel in supplied array */
-   int ubnd[ 3 ];              /* Upper bounds of box centred on (0,0,0) */
-   int xx[ 3 ];                /* Grid indices of current pixel */
+   size_t nel;                 /* Number of pixel in supplied array */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return NULL;

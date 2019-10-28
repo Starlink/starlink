@@ -134,18 +134,20 @@ void clumpinfo( int *status ) {
    double fubnd[ NDF__MXDIM ]; /* Upper bounds of WCS bounding box */
    double plbnd[ NDF__MXDIM ]; /* Lower bounds of PIXEL bounding box */
    double pubnd[ NDF__MXDIM ]; /* Upper bounds of PIXEL bounding box */
+   hdsdim iclump;       /* One-based clump index */
    int *clump_flags = NULL;  /* Flags indicating if each clump is to be used */
    int *clump_indices = NULL;/* List of indices of clumps to be used */
    int i;               /* Loop count */
-   hdsdim iclump;       /* One-based clump index */
    int indf;            /* NDF identifier for input NDF */
    int ipix;            /* Index of PIXEL Frame */
-   size_t nclumps;      /* No. of clump descriptions within the supplied NDF */
+   int lbndi[ NDF__MXDIM ]; /* Lower bounds */
    int nuse;            /* Number of clumps to be used */
    int primary;         /* Value for locator primary flag */
    int quiet;           /* Supress screen output? */
-   size_t size;         /* Number of values in group "*grp" */
    int there;           /* Does the enquired object exist? */
+   int ubndi[ NDF__MXDIM ]; /* Upper bounds */
+   size_t nclumps;      /* No. of clump descriptions within the supplied NDF */
+   size_t size;         /* Number of values in group "*grp" */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -260,13 +262,17 @@ void clumpinfo( int *status ) {
    }
 
 /* Pixel index bounding box... */
-   parPut1i( "LBOUND", info.npix, info.lbnd, status );
-   parPut1i( "UBOUND", info.npix, info.ubnd, status );
+   for( i = 0; i < info.npix; i++ ) {
+      lbndi[ i ] = (int) info.lbnd[ i ];
+      ubndi[ i ] = (int) info.ubnd[ i ];
+   }
+   parPut1i( "LBOUND", info.npix, lbndi, status );
+   parPut1i( "UBOUND", info.npix, ubndi, status );
 
    if( !quiet ) {
       p = tmpstr + sprintf( tmpstr, "( " );
       for( i = 0; i < info.npix; i++) {
-         p += sprintf( p, "%d:%d", info.lbnd[ i ], info.ubnd[ i ] );
+         p += sprintf( p, "%" HDS_DIM_FORMAT ":%" HDS_DIM_FORMAT "", info.lbnd[ i ], info.ubnd[ i ] );
          if( i < info.npix - 1 ) p += sprintf( p, ", " );
       }
       p += sprintf( p, " )" );

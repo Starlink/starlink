@@ -2,7 +2,7 @@
 #include "ast.h"
 #include "cupid.h"
 
-int cupidNextIt( CupidBoxIter *iter, int xx[3], int *iv, int *status ){
+int cupidNextIt( CupidBoxIter *iter, hdsdim xx[3], hdsdim *iv, int *status ){
 /*
 *+
 *  Name:
@@ -16,7 +16,7 @@ int cupidNextIt( CupidBoxIter *iter, int xx[3], int *iv, int *status ){
 *     Starlink C
 
 *  Synopsis:
-*     int cupidNextIt( CupidBoxIter *iter, int xx[3], int *iv, int *status )
+*     int cupidNextIt( CupidBoxIter *iter, hdsdim xx[3], hdsdim *iv, int *status )
 
 *  Description:
 *     This function returns the 1D vector index and 3D grid indices of the
@@ -85,7 +85,7 @@ int cupidNextIt( CupidBoxIter *iter, int xx[3], int *iv, int *status ){
 */
 
 /* Local Variables: */
-   int t;
+   hdsdim t;
 
 /* Abort if an error has already occurred, or if the supplied iterator
    has already visited all the required pixels. . */

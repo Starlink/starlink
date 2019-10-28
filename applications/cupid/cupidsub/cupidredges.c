@@ -7,7 +7,7 @@
 /* The number of pixels used to estimate the gradient.· */
 #define GRADSTEP 3
 
-void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
+void cupidREdges( size_t nel, double *dval, size_t *dpos, int *mask, int minpix,
                   double thresh, double noise, double rms, double flatslope,
                   int *status ){
 /*
@@ -22,7 +22,7 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidREdges( int nel, double *dval, int *dpos, int *mask,
+*     void cupidREdges( size_t nel, double *dval, size_t *dpos, int *mask,
 *                       int minpix, double thresh, double noise, double rms,
 *                       double flatslope, int *status )
 
@@ -105,7 +105,6 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
 */
 
 /* Local Variables: */
-
    double *pd;        /* Pointer to next data value */
    double deltav;     /* Minimum significant change in data value */
    double maxval;     /* Maximum data value found so far */
@@ -113,16 +112,16 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
    double v;          /* Current data value */
    double vlast;      /* Previous data value */
    double vlim;       /* Data value marking start of a rise in data value */
-   int *pp;           /* Pointer to next vector index value */
    int hslok;         /* Significant slope found on upper slope? */
-   int i;             /* Index within "dlow" */
-   int ilo;           /* Index within "dlow" of lower edge */
-   int iup;           /* Index within "dlow" of upper edge */
    int lo_ok;         /* Was "ilo" found before the start of the line? */
    int lslok;         /* Significant slope found on lower slope? */
-   int maxpos;        /* Index within "dlow" of maximum data value */
-   int minpos;        /* Index within "dlow" of minimum data value */
    int up_ok;         /* Was "iup" found before the end of the line? */
+   size_t *pp;        /* Pointer to next vector index value */
+   size_t i;          /* Index within "dlow" */
+   size_t ilo;        /* Index within "dlow" of lower edge */
+   size_t iup;        /* Index within "dlow" of upper edge */
+   size_t maxpos;     /* Index within "dlow" of maximum data value */
+   size_t minpos;     /* Index within "dlow" of minimum data value */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;

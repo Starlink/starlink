@@ -390,8 +390,8 @@ void findclumps( int *status ) {
 *        the major axis. The ellipse is centred at the clump centroid.
 *
 *        - Ellipse3: The same as "Ellipse2" except that the ellipse is
-*        centred at the clump peak, rather than the clump centroid, and 
-*        the pixel data values are used as weights when forming the mean 
+*        centred at the clump peak, rather than the clump centroid, and
+*        the pixel data values are used as weights when forming the mean
 *        radial distance at each azimuth angle.
 *
 *        In general, ellipses will outline the brighter, inner regions
@@ -963,7 +963,7 @@ void findclumps( int *status ) {
    char *pname;                 /* Pointer to input NDF name */
    char *value;                 /* Pointer to GRP element buffer */
    char attr[ 30 ];             /* AST attribute name */
-   char buffer[ GRP__SZNAM ];   /* Buffer for GRP element */
+   char buffer[ GRP__SZNAM + 10 ]; /* Buffer for GRP element */
    char dataunits[ 21 ];        /* NDF data units */
    char dtype[ 20 ];            /* NDF data type */
    char itype[ 20 ];            /* NDF data type */
@@ -980,22 +980,23 @@ void findclumps( int *status ) {
    double sum;                  /* Sum of variances */
    fitsfile *fptr;              /* Pointer to FITS file structure */
    float *rmask;                /* Pointer to cump mask array */
+   hdsdim dim[ NDF__MXDIM ];    /* Pixel axis dimensions */
+   hdsdim dims[3];              /* Pointer to array of array dimensions */
+   hdsdim skip[3];              /* Pointer to array of axis skips */
+   hdsdim slbnd[ NDF__MXDIM ];  /* The lower bounds of the significant pixel axes */
+   hdsdim subnd[ NDF__MXDIM ];  /* The upper bounds of the significant pixel axes */
    int backoff;                 /* Remove background when finding clump sizes? */
    int blockf;                  /* FITS file blocking factor */
    int confpar;                 /* Is this line a config parameter setting? */
    int deconv;                  /* Should clump parameters be deconvolved? */
-   int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
-   int dims[3];                 /* Pointer to array of array dimensions */
-   int el;                      /* Number of array elements mapped */
    int gotwcs;                  /* Does input NDF contain a WCS FrameSet? */
-   int i;                       /* Loop count */
+   int i;                       /* Axis index */
    int ifr;                     /* Index of Frame within WCS FrameSet */
    int indf2;                   /* Identifier for main output NDF */
    int indf3;                   /* Identifier for Quality output NDF */
    int indf;                    /* Identifier for input NDF */
    int ishape;                  /* STC-S shape for spatial coverage */
    int jsacat;                  /* Is a JSA-style catalogue being created? */
-   int n;                       /* Number of values summed in "sum" */
    int nclumps;                 /* Number of clumps stored in output NDF */
    int ndim;                    /* Total number of pixel axes */
    int nfr;                     /* Number of Frames within WCS FrameSet */
@@ -1006,15 +1007,15 @@ void findclumps( int *status ) {
    int perspectrum;             /* Process spectra independently? */
    int repconf;                 /* Report configuration? */
    int sdim[ NDF__MXDIM ];      /* The indices of the significant pixel axes */
-   int skip[3];                 /* Pointer to array of axis skips */
-   int slbnd[ NDF__MXDIM ];     /* The lower bounds of the significant pixel axes */
-   int subnd[ NDF__MXDIM ];     /* The upper bounds of the significant pixel axes */
    int there;                   /* Does object exist? */
    int type;                    /* Integer identifier for data type */
    int usewcs;                  /* Use WCS coords in output catalogue? */
    int var;                     /* Does the i/p NDF have a Variance component? */
    int vax;                     /* Index of the velocity WCS axis (if any) */
    int velax;                   /* Index of the velocity pixel axis (if any) */
+   size_t el;                      /* Number of array elements mapped */
+   size_t iel;                  /* Element index */
+   size_t n;                    /* Number of values summed in "sum" */
    size_t size;                 /* Size of a group */
    void *ipd;                   /* Pointer to Data array */
    void *ipo;                   /* Pointer to output Data array */
@@ -1076,7 +1077,7 @@ void findclumps( int *status ) {
    }
 
 /* Get the WCS FrameSet and the significant axis bounds. */
-   kpg1Asget( indf, nsig, 1, 0, 0, sdim, slbnd, subnd, &iwcs, status );
+   kpg1Asget8( indf, nsig, 1, 0, 0, sdim, slbnd, subnd, &iwcs, status );
 
 /* Find the size of each dimension of the data array, and the skip in 1D
    vector index needed to move by pixel along an axis. */
@@ -1351,9 +1352,9 @@ void findclumps( int *status ) {
 
          sum = 0.0;
          n = 0;
-         for( i = 0; i < el; i++ ) {
-            if( ipv[ i ] != VAL__BADD ) {
-               sum += ipv[ i ];
+         for( iel = 0; iel < el; iel++ ) {
+            if( ipv[ iel ] != VAL__BADD ) {
+               sum += ipv[ iel ];
                n++;
             }
          }
@@ -1551,13 +1552,13 @@ void findclumps( int *status ) {
                 status );
 
 /* Transfer the pixel mask to the NDF quality array. */
-      irqSetqm( qlocs, 1, "BACKGROUND", el, rmask, &n, status );
-      irqSetqm( qlocs, 0, "CLUMP", el, rmask, &n, status );
+      irqSetqm8( qlocs, 1, "BACKGROUND", el, rmask, &n, status );
+      irqSetqm8( qlocs, 0, "CLUMP", el, rmask, &n, status );
 
 /* Find the edges of the clumps (all other pixels will be set to
    VAL__BADR in "rmask"), and then set the "EDGE" Quality flag. */
       cupidEdges( rmask, el, dims, skip, 1.0, VAL__BADR, status );
-      irqSetqm( qlocs, 0, "EDGE", el, rmask, &n, status );
+      irqSetqm8( qlocs, 0, "EDGE", el, rmask, &n, status );
 
 /* Store the configuration parameters relating to the used algorithm in the
    CUPID extension. We put them into a new KeyMap so that the CUPID NDF

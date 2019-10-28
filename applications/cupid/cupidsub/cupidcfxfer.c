@@ -3,7 +3,7 @@
 #include <string.h>
 
 void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
-                  int skip[3], int *status ){
+                  size_t skip[3], int *status ){
 /*
 *+
 *  Name:
@@ -17,7 +17,7 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 
 *  Synopsis:
 *     void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
-*                       int skip[3], int *status )
+*                       size_t skip[3], int *status )
 
 *  Description:
 *     This function transfer all the pixels in PixelSet "ps1" into
@@ -81,14 +81,14 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 */
 
 /* Local Variables: */
+   hdsdim i;        /* GRID axis 1 value of next array element */
+   hdsdim j;        /* GRID axis 2 value of next array element */
+   hdsdim k;        /* GRID axis 3 value of next array element */
    int *v1;         /* Pointer to element at start of this row */
    int *v2;         /* Pointer to element at start of this plane */
    int *v;          /* Pointer to next array element */
-   int i;           /* GRID axis 1 value of next array element */
    int ineb;        /* Index of neighbour in source PixelSet */
-   int j;           /* GRID axis 2 value of next array element */
    int jneb;        /* Index of neighbour in destination PixelSet */
-   int k;           /* GRID axis 3 value of next array element */
    int kneb;        /* Index of neighbour in destination PixelSet */
    int ncol;        /* Max number of col heights in merged clump */
    int neb;         /* Neighbour clump index */
@@ -166,8 +166,8 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
    if( ps1->nneb > 0 ) {
       nneb = ps1->nneb + ps2->nneb;
       ncol = ( ps1->cols && ps2->cols ) ? nneb : 0;
-      ps2->nebs = astGrow( ps2->nebs, nneb, sizeof( int ) );
-      ps2->cols = astGrow( ps2->cols, ncol, sizeof( double ) );
+      ps2->nebs = astGrow( ps2->nebs, nneb, sizeof( *(ps2->nebs) ) );
+      ps2->cols = astGrow( ps2->cols, ncol, sizeof( *(ps2->cols) ) );
       if( astOK ) {
          jneb = ps2->nneb;
          for( ineb = 0; ineb < ps1->nneb; ineb++ ) {

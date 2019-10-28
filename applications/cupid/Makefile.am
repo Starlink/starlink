@@ -12,6 +12,9 @@ bin_MONOLITHS = cupid_mon
 
 include_MESSAGES = cupid_err.h CUPID_ERR
 
+## Ensure we use the 8-byte NDF interface
+AM_CFLAGS = -DNDF_I8
+
 cupid_mon_SOURCES = \
         cupid.h \
         cupid_mon.c \

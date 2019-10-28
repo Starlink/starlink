@@ -373,39 +373,40 @@ void makeclumps( int *status ) {
    float velfwhm;                /* Value of VELFWHM parameter */
    float vgrad1[ 2 ];            /* Values for VGRAD1 parameter */
    float vgrad2[ 2 ];            /* Values for VGRAD2 parameter */
+   hdsdim dims[ 3 ];             /* Dimensions before axis permutation */
+   hdsdim grid_delta1;           /* Clump spacing on pixel axis 1 */
+   hdsdim grid_delta2;           /* Clump spacing on pixel axis 2 */
+   hdsdim grid_delta3;           /* Clump spacing on pixel axis 3 */
+   hdsdim grid_dims[ 3 ];        /* No. of clumps along each pixel axis */
+   hdsdim ix;                    /* Clump centre on pixel axis 1 */
+   hdsdim iy;                    /* Clump centre on pixel axis 2 */
+   hdsdim iz;                    /* Clump centre on pixel axis 3 */
+   hdsdim lbnd[ 3 ];             /* Lower pixel bounds */
+   hdsdim slbnd[ 3 ];            /* Lower bounds of significant pixel axes */
+   hdsdim subnd[ 3 ];            /* Upper bounds of significant pixel axes */
+   hdsdim ubnd[ 3 ];             /* Upper pixel bounds */
    int addnoise;                 /* Add Gaussian noise to output array? */
-   int area;                     /* Clump area */
    int deconv;                   /* Store deconvolved clump properties */
-   int dims[ 3 ];                /* Dimensions before axis permutation */
    int dist;                     /* Clump parameters distribution */
    int grid;                     /* Border for regular grid (-ve if random) */
-   int grid_delta1;              /* Clump spacing on pixel axis 1 */
-   int grid_delta2;              /* Clump spacing on pixel axis 2 */
-   int grid_delta3;              /* Clump spacing on pixel axis 3 */
-   int grid_dims[ 3 ];           /* No. of clumps along each pixel axis */
    int i;                        /* Loop count */
    int indf2;                    /* Identifier for output NDF without noise */
    int indf3;                    /* Identifier for input WCS NDF */
    int indf;                     /* Identifier for output NDF with noise */
    int ishape;                   /* STC-S shape for spatial coverage */
-   int ix;                       /* Clump centre on pixel axis 1 */
-   int iy;                       /* Clump centre on pixel axis 2 */
-   int iz;                       /* Clump centre on pixel axis 3 */
-   int lbnd[ 3 ];                /* Lower pixel bounds */
    int nc;                       /* Number of clumps created */
    int nclump;                   /* Number of clumps to create */
    int nclumps;                  /* Number of stored clumps */
    int ncold;                    /* Previous value of "nc" */
    int ndim;                     /* Number of pixel axes */
-   int nel;                      /* Number of elements in array */
    int nskyax;                   /* Number of sky axes in the current WCS frame */
    int nspecax;                  /* Number of spectral axes in the current WCS frame */
    int nval;                     /* Number of values supplied */
    int precat;                   /* Create catalogue before beam smoothing? */
    int sdims;                    /* Number of significant pixel axes */
-   int slbnd[ 3 ];               /* Lower bounds of significant pixel axes */
-   int subnd[ 3 ];               /* Upper bounds of significant pixel axes */
-   int ubnd[ 3 ];                /* Upper pixel bounds */
+   size_t area;                  /* Clump area */
+   size_t iel;                   /* Element count */
+   size_t nel;                   /* Number of elements in array */
    size_t st;                    /* A size_t that can be passed as an argument */
 
 /* Abort if an error has already occurred. */
@@ -430,8 +431,8 @@ void makeclumps( int *status ) {
          errAnnul( status );
       } else {
          ndfBound( indf3, 3, lbnd, ubnd, &ndim, status );
-         parDef1i( "LBND", ndim, lbnd, status );
-         parDef1i( "UBND", ndim, ubnd, status );
+         parDef1k( "LBND", ndim, lbnd, status );
+         parDef1k( "UBND", ndim, ubnd, status );
          kpg1Gtwcs( indf3, &iwcs, status );
          ndfAnnul( &indf3, status );
       }
@@ -439,11 +440,11 @@ void makeclumps( int *status ) {
 
 /* Get the required axis bounds. */
    if( iwcs ) {
-      parExaci( "LBND", ndim, lbnd, status );
+      parExack( "LBND", ndim, lbnd, status );
    } else {
-      parGet1i( "LBND", 3, lbnd, &ndim, status );
+      parGet1k( "LBND", 3, lbnd, &ndim, status );
    }
-   parExaci( "UBND", ndim, ubnd, status );
+   parExack( "UBND", ndim, ubnd, status );
 
 /* Get the indices and bounds of the significant pixel axes. */
    sdims = 0;
@@ -549,10 +550,10 @@ void makeclumps( int *status ) {
 
 /* Get the number of clumps to create. */
    if( grid >= 0 ) {
-      parExaci( "NCLUMP", ndim, grid_dims, status );
-      nclump = grid_dims[0];
-      if( ndim > 1 ) nclump *= grid_dims[1];
-      if( ndim > 2 ) nclump *= grid_dims[2];
+      parExack( "NCLUMP", ndim, grid_dims, status );
+      nclump = (int) grid_dims[0];
+      if( ndim > 1 ) nclump *= (int) grid_dims[1];
+      if( ndim > 2 ) nclump *= (int) grid_dims[2];
    } else {
       parGet0i( "NCLUMP", &nclump, status );
       grid_dims[0] = 1;
@@ -633,20 +634,20 @@ void makeclumps( int *status ) {
    dims[ 2 ] = 1;
    pos1[ 0 ] = 0.5*( dims[ 0 ]  + 1 );
    pos1[ 1 ] = 0.5*dims[ 0 ];
-   grid_delta1 = (int)( 0.5 + ( (float) dims[ 0 ] - 2*grid )/grid_dims[ 0 ] );
+   grid_delta1 = (hdsdim)( 0.5 + ( (float) dims[ 0 ] - 2*grid )/grid_dims[ 0 ] );
 
    if( sdims > 1 ) {
 
       dims[ 1 ] = subnd[ 1 ] - slbnd[ 1 ] + 1;
       pos2[ 0 ] = 0.5*( dims[ 1 ]  + 1 );
       pos2[ 1 ] = 0.5*dims[ 1 ];
-      grid_delta2 = (int)( 0.5 + ( (float) dims[ 1 ] - 2*grid )/grid_dims[ 1 ] );
+      grid_delta2 = (hdsdim)( 0.5 + ( (float) dims[ 1 ] - 2*grid )/grid_dims[ 1 ] );
 
       if( sdims > 2 ) {
          dims[ 2 ] = subnd[ 2 ] - slbnd[ 2 ] + 1;
          pos3[ 0 ] = 0.5*( dims[ 2 ]  + 1 );
          pos3[ 1 ] = 0.5*dims[ 2 ];
-         grid_delta3 = (int)( 0.5 + ( (float) dims[ 2 ] - 2*grid )/grid_dims[ 2 ] );
+         grid_delta3 = (hdsdim)( 0.5 + ( (float) dims[ 2 ] - 2*grid )/grid_dims[ 2 ] );
       }
    }
 
@@ -694,7 +695,7 @@ void makeclumps( int *status ) {
       if( grid >= 0 ) {
          par[ 2 ] = ix;
       } else {
-         par[ 2 ] = (int) cupidRanVal( 0, pos1, status );
+         par[ 2 ] = (hdsdim) cupidRanVal( 0, pos1, status );
       }
 
       par[ 3 ] = cupidRanVal( dist, fwhm1, status );
@@ -703,7 +704,7 @@ void makeclumps( int *status ) {
          if( grid >= 0 ) {
             par[ 4 ] = iy;
          } else {
-            par[ 4 ] = (int) cupidRanVal( 0, pos2, status );
+            par[ 4 ] = (hdsdim) cupidRanVal( 0, pos2, status );
          }
          par[ 5 ] = cupidRanVal( dist, fwhm2, status );
          par[ 6 ] = cupidRanVal( 0, angle, status );
@@ -712,7 +713,7 @@ void makeclumps( int *status ) {
             if( grid >= 0 ) {
                par[ 7 ] = iz;
             } else {
-               par[ 7 ] = (int) cupidRanVal( 0, pos3, status );
+               par[ 7 ] = (hdsdim) cupidRanVal( 0, pos3, status );
             }
             par[ 8 ] = cupidRanVal( dist, fwhm3, status );
             par[ 9 ] = cupidRanVal( dist, vgrad1, status );
@@ -796,7 +797,7 @@ void makeclumps( int *status ) {
       memcpy( ipd, ipd2,sizeof( float )*nel );
       if( addnoise ) {
          d = ipd;
-         for( i = 0; i < nel; i++, d++ ) {
+         for( iel = 0; iel < nel; iel++, d++ ) {
             *d +=  pdaRnnor( 0.0, rms );
          }
       }

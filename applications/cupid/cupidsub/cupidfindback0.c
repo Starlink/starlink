@@ -63,15 +63,15 @@ void cupidFindback0( void *data, int *status ){
 /* Local Variables: */
    CupidFindback0Data *pdata;/* Pointer to structure holding requied info */
    double rms;               /* Global rms error in data */
-   float wlim;              /* Min. fraction of good i/p values for a good o/p value */
+   float wlim;               /* Min. fraction of good i/p values for a good o/p value */
+   hdsdim islice;            /* Slice index */
+   hdsdim nslice;            /* Number of slices to process */
+   hdsdim slice_dim[ 3 ];    /* Dimensions of each significant slice axis */
+   hdsdim slice_lbnd[ 3 ];   /* Lower bounds of each significant slice axis */
+   hdsdim slice_size;        /* Number of pixels in each slice */
    int box[ 3 ];             /* Dimensions of each cell in pixels */
-   int islice;               /* Slice index */
    int ndim;                 /* Total number of pixel axes in NDF */
    int newalg;               /* Use experimental algorithm variations? */
-   int nslice;               /* Number of slices to process */
-   int slice_dim[ 3 ];       /* Dimensions of each significant slice axis */
-   int slice_lbnd[ 3 ];      /* Lower bounds of each significant slice axis */
-   int slice_size;           /* Number of pixels in each slice */
    int type;                 /* Integer identifier for data type */
    void *ipd1;               /* Pointer to input Data array */
    void *ipd2;               /* Pointer to output Data array */
@@ -108,7 +108,7 @@ void cupidFindback0( void *data, int *status ){
 
 /* Report the bounds of the slice if required. */
    msgBlankif( MSG__VERB, status );
-   msgOutiff( MSG__VERB, "", "   Processing slice %d of %d...", status,
+   msgOutiff( MSG__VERB, "", "   Processing slice %" HDS_DIM_FORMAT " of %" HDS_DIM_FORMAT "...", status,
               islice+1, nslice );
    msgBlankif( MSG__VERB, status );
 

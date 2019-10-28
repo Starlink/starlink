@@ -8,10 +8,9 @@
 #include "star/ndg.h"
 #include <math.h>
 
-HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
+HDSLoc *cupidFellWalker( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *ipd,
                          double *ipv, double rms, AstKeyMap *config, int velax,
-                         int perspectrum, double beamcorr[ 3 ],
-                         int *status ){
+                         int perspectrum, double beamcorr[ 3 ], int *status ){
 /*
 *+
 *  Name:
@@ -25,11 +24,10 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     Starlink C
 
 *  Synopsis:
-*     HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd,
+*     HDSLoc *cupidFellWalker( int type, int ndim, hdsdim *slbnd, hdsdim *subnd,
 *                              void *ipd, double *ipv, double rms,
-*                              AstKeyMap *config, int velax,
-*                              int perspectrum, double beamcorr[ 3 ],
-*                              int *status )
+*                              AstKeyMap *config, int velax, int perspectrum,
+*                              double beamcorr[ 3 ], int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -171,7 +169,6 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 */
 
 /* Local Variables: */
-
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
    double *pd;          /* Pointer to next element of data array */
    double *peakvals;    /* Pointer to array holding clump peak values */
@@ -180,32 +177,32 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    double noise;        /* Background data value */
    double pv;           /* Pixel value */
    float *pf;           /* Pointer to next element of data array */
-   int *clbnd;          /* Array holding lower axis bounds of all clumps */
-   int *cubnd;          /* Array holding upper axis bounds of all clumps */
+   hdsdim *clbnd;       /* Array holding lower axis bounds of all clumps */
+   hdsdim *cubnd;       /* Array holding upper axis bounds of all clumps */
+   hdsdim dims[3];      /* Pointer to array of array dimensions */
+   hdsdim ix;           /* Grid index on 1st axis */
+   hdsdim iy;           /* Grid index on 2nd axis */
+   hdsdim iz;           /* Grid index on 3rd axis */
    int *igood;          /* Pointer to array holding usable clump indices */
    int *ipa;            /* Pointer to clump assignment array */
    int *nrem;           /* Pointer to array holding clump populations */
    int *pa;             /* Pointer to next element of the ipa array */
    int allow_edge;      /* Accept clumps that touch the edge of an array? */
-   int dims[3];         /* Pointer to array of array dimensions */
-   int el;              /* Number of elements in array */
    int i;               /* Loop count */
    int ii;              /* Temp storage */
-   int ix;              /* Grid index on 1st axis */
-   int iy;              /* Grid index on 2nd axis */
-   int iz;              /* Grid index on 3rd axis */
    int j;               /* Loop count */
    int maxid;           /* Largest id for any peak (smallest is zero) */
    int minpix;          /* Minimum total size of a clump in pixels */
    int more;            /* Continue looping? */
+   int nedge;           /* Number of clumps that touch an edge of the array */
    int ngood;           /* Number of good clumps */
    int nlow;            /* Number of clumps with low peaks */
-   int nedge;           /* Number of clumps that touch an edge of the array */
-   int nthin;           /* Number of clumps that span only a single pixel */
    int nsmall;          /* Number of clumps with too few pixels */
+   int nthin;           /* Number of clumps that span only a single pixel */
    int old_ghstate;     /* Non-zero if group history recording is switched on */
    int old_pvstate;     /* Non-zero if provenance recording is switched on */
-   int skip[3];         /* Pointer to array of axis skips */
+   size_t el;           /* Number of elements in array */
+   size_t skip[3];      /* Pointer to array of axis skips */
 
 /* Initialise */
    ret = NULL;
@@ -254,7 +251,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    }
 
 /* Assign work array to hold the clump assignments. */
-   ipa = astMalloc( sizeof( int )*el );
+   ipa = astMalloc( sizeof( *ipa )*el );
 
 /* Get the RMS noise level to use. */
    rms = cupidConfigD( config, "RMS", rms, status );
@@ -274,16 +271,16 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Allocate an array used to store the number of pixels remaining in each
    clump. */
-   nrem = astMalloc( sizeof( int )*( maxid + 1 ) );
+   nrem = astMalloc( sizeof( *nrem )*( maxid + 1 ) );
 
 /* Allocate an array used to store the peak value in every clump. */
    peakvals = astMalloc( sizeof( double )*( maxid + 1 ) );
 
 /* Determine the bounding box of every clump. First allocate memory to
    hold the bounding boxes, etc. */
-   clbnd = astMalloc( sizeof( int )*( maxid + 1 )*3 );
-   cubnd = astMalloc( sizeof( int )*( maxid + 1 )*3 );
-   igood = astMalloc( sizeof( int )*( maxid + 1 ) );
+   clbnd = astMalloc( sizeof( *clbnd )*( maxid + 1 )*3 );
+   cubnd = astMalloc( sizeof( *cubnd )*( maxid + 1 )*3 );
+   igood = astMalloc( sizeof( *igood )*( maxid + 1 ) );
    if( cubnd ) {
 
 /* Get the lowest data value to be considered. */
@@ -317,8 +314,8 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Initialise the bounding boxes. */
       for( i = 0; i < 3*( maxid + 1 ); i++ ) {
-         clbnd[ i ] = VAL__MAXI;
-         cubnd[ i ] = VAL__MINI;
+         clbnd[ i ] = VAL__MAXK;
+         cubnd[ i ] = VAL__MINK;
       }
 
 /* Loop round every pixel in the final pixel assignment array. */

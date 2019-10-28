@@ -3,8 +3,8 @@
 #include "ast.h"
 #include "cupid.h"
 
-CupidPixelSet **CGEN_FUNCTION(cupidFWPixelSets)( CGEN_TYPE *array, int nel,
-                              int ndim, int dims[ 3 ], int skip[ 3 ],
+CupidPixelSet **CGEN_FUNCTION(cupidFWPixelSets)( CGEN_TYPE *array, size_t nel,
+                              int ndim, hdsdim dims[ 3 ], size_t skip[ 3 ],
                               int *ipa, int npeak, int perspectrum,
                               int *status ){
 /*
@@ -19,8 +19,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidFWPixelSets)( CGEN_TYPE *array, int nel,
 *     Starlink C
 
 *  Synopsis:
-*     CupidPixelSet **cupidFWPixelSets<X>( CGEN_TYPE *array, int nel, int ndim,
-*                                          int dims[ 3 ], int skip[ 3 ],
+*     CupidPixelSet **cupidFWPixelSets<X>( CGEN_TYPE *array, size_t nel, int ndim,
+*                                          hdsdim dims[ 3 ], size_t skip[ 3 ],
 *                                          int *ipa, int npeak, int perspectrum,
 *                                          int *status )
 
@@ -95,7 +95,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidFWPixelSets)( CGEN_TYPE *array, int nel,
 *        Original version.
 *     {enter_further_changes_here}
 *     7-NOC-2019 (DSB):
-*        Fix bug that could cause incorrect neighbours list to be 
+*        Fix bug that could cause incorrect neighbours list to be
 *        created if perspectrum is non-zero.
 
 *  Bugs:
@@ -107,12 +107,15 @@ CupidPixelSet **CGEN_FUNCTION(cupidFWPixelSets)( CGEN_TYPE *array, int nel,
 /* Local Variables: */
    CupidPixelSet **result; /* Returned pointer */
    CupidPixelSet *ps;  /* Pointer to current PointSet */
-   double dvalo;       /* Central array value */
-   double dvali;       /* Neighbouring array value */
    double col;         /* Data value at col between two neighbouring peaks */
-   int ivalo;          /* Central clump index */
-   int ivali;          /* Neighbouring clump index */
-   int ineb;           /* Index of neighbour within "nebs" and "cols" arrays */
+   double dvali;       /* Neighbouring array value */
+   double dvalo;       /* Central array value */
+   hdsdim ix;          /* Input pixel GRID index on axis 1 */
+   hdsdim iy;          /* Input pixel GRID index on axis 2 */
+   hdsdim iz;          /* Input pixel GRID index on axis 3 */
+   hdsdim ox;          /* Output pixel GRID index on axis 1 */
+   hdsdim oy;          /* Output pixel GRID index on axis 2 */
+   hdsdim oz;          /* Output pixel GRID index on axis 3 */
    int *pin0;          /* Pointer to ipa pixel [0,0,0] */
    int *pin;           /* Pointer to input pixel */
    int *piny;          /* Pointer to input pixel at start of row */
@@ -125,6 +128,10 @@ CupidPixelSet **CGEN_FUNCTION(cupidFWPixelSets)( CGEN_TYPE *array, int nel,
    int ox;             /* Output pixel GRID index on axis 1 */
    int oy;             /* Output pixel GRID index on axis 2 */
    int oz;             /* Output pixel GRID index on axis 3 */
+   int ineb;           /* Index of neighbour within "nebs" and "cols" arrays */
+   int ivali;          /* Neighbouring clump index */
+   int ivalo;          /* Central clump index */
+   size_t iv;          /* Vector index into input array */
 
 /* Initialise */
    result = NULL;

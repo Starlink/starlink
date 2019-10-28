@@ -5,12 +5,12 @@
 #include "ast.h"
 #include "mers.h"
 
-CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
-                                            int ndim, int dims[3], int skip[3],
+CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, size_t nel,
+                                            int ndim, hdsdim dims[3], hdsdim skip[3],
                                             int perspectrum, CupidPixelSet **clumps,
                                             int idl, double clevel, int *index,
                                             int naxis, int newok,
-                                            int *slbnd, double *maxpd,
+                                            hdsdim *slbnd, double *maxpd,
                                             int *status ){
 /*
 *+
@@ -24,12 +24,12 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *     Starlink C
 
 *  Synopsis:
-*     CupidPixelSet **cupidCFScan<X>( CGEN_TYPE *ipd, int *ipa, int nel,
-*                                     int ndim, int dims[3], int skip[3],
+*     CupidPixelSet **cupidCFScan<X>( CGEN_TYPE *ipd, int *ipa, size_t nel,
+*                                     int ndim, hdsdim dims[3], hdsdim skip[3],
 *                                     int perspectrum, CupidPixelSet **clumps,
 *                                     int idl, double clevel, int *index,
 *                                     int naxis, int newok,
-*                                     int *slbnd, double *maxpd, int *status )
+*                                     hdsdim *slbnd, double *maxpd, int *status )
 
 *  Description:
 *     This function scans the data array for pixels at or above the
@@ -185,27 +185,27 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    CupidPixelSet **ret;  /* The returned pointer */
    CupidPixelSet *ops;   /* Pointer to neighbouring PixelSet */
    CupidPixelSet *ps;    /* Pointer to new PixelSet */
+   hdsdim i;             /* Loop count */
+   hdsdim ii;            /* Loop count */
+   hdsdim ix;            /* GRID index on 1st axis */
+   hdsdim iy;            /* GRID index on 2nd axis */
+   hdsdim iz;            /* GRID index on 3rd axis */
+   hdsdim j;             /* Loop count */
+   hdsdim new_clumps;    /* Number of new clumps found at this level */
+   hdsdim total_pop;     /* Number of pixels checked at this level */
+   hdsdim x[3];          /* GRID coords of current pixel */
+   hdsdim yedge;         /* Pixel at upper or lower bound on 2nd axis? */
+   hdsdim zedge;         /* Pixel at upper or lower bound on 3rd axis? */
    int *new_indices;     /* Array of new clump index values */
    int *pa;              /* Pointer to next index value */
    int edge;             /* Pixel at upper or lower bound on any axis? */
    int hindex;           /* Next available index on entry */
    int i1[27];           /* List of adjoining PixelSet indices at this level */
-   int i;                /* Loop count */
-   int ii;               /* Loop count */
    int il1;              /* Lowest index of adjoining PixelSets at this level */
    int il2;              /* Index of closest adjoining PixelSet at higher level */
-   int ix;               /* GRID index on 1st axis */
-   int iy;               /* GRID index on 2nd axis */
-   int iz;               /* GRID index on 3rd axis */
-   int j;                /* Loop count */
-   int new_index;        /* New index for a clump */
    int n1;               /* No. of adjoining PixelSets at this level */
    int n2;               /* No. of adjoining PixelSets at higher levels */
-   int new_clumps;       /* Number of new clumps found at this level */
-   int total_pop;        /* Number of pixels checked at this level */
-   int x[3];             /* GRID coords of current pixel */
-   int yedge;            /* Pixel at upper or lower bound on 2nd axis? */
-   int zedge;            /* Pixel at upper or lower bound on 3rd axis? */
+   int new_index;        /* New index for a clump */
 
 /* Initialise */
    ret = clumps;

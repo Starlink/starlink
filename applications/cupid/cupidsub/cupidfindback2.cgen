@@ -2,7 +2,7 @@
 #include "cupid.h"
 #include <stdio.h>
 
-void CGEN_FUNCTION(cupidFindback2)( double rms, int dim[3], CGEN_TYPE *din,
+void CGEN_FUNCTION(cupidFindback2)( double rms, hdsdim dim[3], CGEN_TYPE *din,
                                     int *status ){
 /*
 *+
@@ -17,7 +17,7 @@ void CGEN_FUNCTION(cupidFindback2)( double rms, int dim[3], CGEN_TYPE *din,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidFindback2<X>( double rms, int dim[3], CGEN_TYPE *din,
+*     void cupidFindback2<X>( double rms, hdsdim dim[3], CGEN_TYPE *din,
 *                             int *status )
 
 *  Description:
@@ -79,8 +79,8 @@ void CGEN_FUNCTION(cupidFindback2)( double rms, int dim[3], CGEN_TYPE *din,
 /* Local Variables: */
    CGEN_TYPE *ap;
    double thresh;
-   int i;
-   int nel;
+   size_t i;
+   size_t nel;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;

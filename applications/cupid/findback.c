@@ -187,7 +187,7 @@ void findback( int *status ){
 *        monolith. And do not delete the singleton workforce.
 *     10-JUL-2013 (DSB):
 *        - Added parameter WLIM.
-*        - Fixed incorrect lower bounds when any insignificant axes are 
+*        - Fixed incorrect lower bounds when any insignificant axes are
 *        present (this only affected debugging tools).
 *     {enter_further_changes_here}
 
@@ -209,36 +209,35 @@ void findback( int *status ){
    float *pf1;               /* Pointer to single precision input data */
    float *pf2;               /* Pointer to single precision output data */
    float wlim;               /* Min. frac of good pixels required in a filter box */
+   hdsdim dim[ NDF__MXDIM ]; /* Dimensions of each NDF pixel axis */
+   hdsdim islice;            /* Slice index */
+   hdsdim iystep;            /* Index of slice in ydirection */
+   hdsdim izstep;            /* Index of slice in z direction */
+   hdsdim lbnd[ NDF__MXDIM ];/* Lower pixel bounds of slice */
+   hdsdim nslice;            /* Number of slices to process */
+   hdsdim nystep;            /* Number of independent y slices */
+   hdsdim nzstep;            /* Number of slices in z direction */
+   hdsdim sdim[ 3 ];         /* Dimensions of each significant NDF axis */
+   hdsdim slbnd[ 3 ];        /* Lower bounds of each significant NDF axis */
+   hdsdim slice_dim[ 3 ];    /* Dimensions of each significant slice axis */
+   hdsdim slice_lbnd[ 3 ];   /* Lower bounds of each significant slice axis */
+   hdsdim slice_size;        /* Number of pixels in each slice */
+   hdsdim ubnd[ NDF__MXDIM ];/* Upper pixel bounds of slice */
    int *old_status;          /* Pointer to original status value */
    int box[ 3 ];             /* Dimensions of each cell in pixels */
-   int dim[ NDF__MXDIM ];    /* Dimensions of each NDF pixel axis */
-   int el;                   /* Number of elements mapped */
    int i;                    /* Loop count */
    int indf1;                /* Identifier for input NDF */
    int indf2;                /* Identifier for output NDF */
-   int islice;               /* Slice index */
-   int iystep;               /* Index of slice in ydirection */
-   int izstep;               /* Index of slice in z direction */
-   int lbnd[ NDF__MXDIM ];   /* Lower pixel bounds of slice */
    int n;                    /* Number of values summed in "sum" */
    int ndim;                 /* Total number of pixel axes in NDF */
    int newalg;               /* Use experimental algorithm variations? */
    int nsdim;                /* Number of significant pixel axes in NDF */
-   int nslice;               /* Number of slices to process */
    int nval;                 /* Number of values supplied */
-   int nystep;               /* Number of independent y slices */
-   int nzstep;               /* Number of slices in z direction */
-   int sdim[ 3 ];            /* Dimensions of each significant NDF axis */
-   int slbnd[ 3 ];           /* Lower bounds of each significant NDF axis */
-   int slice_dim[ 3 ];       /* Dimensions of each significant slice axis */
-   int slice_lbnd[ 3 ];      /* Lower bounds of each significant slice axis */
-   int slice_size;           /* Number of pixels in each slice */
    int state;                /* Parameter state */
    int sub;                  /* Output the background-subtracted input data? */
-   int subnd[ 3 ];           /* Upper bounds of each significant NDF axis */
    int type;                 /* Integer identifier for data type */
-   int ubnd[ NDF__MXDIM ];   /* Upper pixel bounds of slice */
    int var;                  /* Does i/p NDF have a Variance component? */
+   size_t el;                /* Number of elements mapped */
    size_t size;              /* Size of GRP group */
    void *ipd1;               /* Pointer to input Data array */
    void *ipd2;               /* Pointer to output Data array */
@@ -272,7 +271,6 @@ void findback( int *status ){
       dim[ i ] = ubnd[ i ] - lbnd[ i ] + 1;
       if( dim[ i ] > 1 ) {
          slbnd[ nsdim ] = lbnd[ i ];
-         subnd[ nsdim ] = ubnd[ i ];
          sdim[ nsdim++ ] = dim[ i ];
       }
    }
@@ -286,16 +284,14 @@ void findback( int *status ){
                "application requires 1, 2 or 3.", status );
    }
 
-/* Ensure we have 3 values in sdim, slbnd and subnd (pad with trailings 1's
+/* Ensure we have 3 values in sdim and slbnd (pad with trailings 1's
    if required). */
    if( nsdim < 3 ) {
       slbnd[ 2 ] = 1;
-      subnd[ 2 ] = 1;
       sdim[ 2 ] = 1;
    }
    if( nsdim < 2 ) {
       slbnd[ 1 ] = 1;
-      subnd[ 1 ] = 1;
       sdim[ 1 ] = 1;
    }
 
