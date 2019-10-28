@@ -319,6 +319,58 @@ void irqSetqm( const IRQLocs *locs, int bad, const char *qname, int size,
    F77_FREE_REAL( MASK );
 }
 
+/* ------------------------------- */
+
+F77_SUBROUTINE(irq_setqm8)( CHARACTER_ARRAY(LOCS),
+                            LOGICAL(BAD),
+                            CHARACTER(QNAME),
+                            INTEGER8(SIZE),
+                            REAL_ARRAY(MASK),
+                            INTEGER8(SET),
+                            INTEGER(STATUS)
+                            TRAIL(LOCS)
+                            TRAIL(QNAME) );
+
+void irqSetqm8( const IRQLocs *locs, int bad, const char *qname, int64_t size,
+                float *mask, int64_t *set, int *status ){
+
+   DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);
+   DECLARE_LOGICAL(BAD);
+   DECLARE_CHARACTER_DYN(QNAME);
+   DECLARE_INTEGER8(SIZE);
+   DECLARE_REAL_ARRAY_DYN(MASK);
+   DECLARE_INTEGER8(SET);
+   DECLARE_INTEGER(STATUS);
+
+   HDS_EXPORT_CLOCATOR( locs->loc[0], LOCS[0], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[1], LOCS[1], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[2], LOCS[2], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[3], LOCS[3], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[4], LOCS[4], status );
+
+   F77_EXPORT_LOGICAL( bad, BAD );
+   F77_CREATE_EXPORT_CHARACTER( qname, QNAME );
+   F77_EXPORT_INTEGER8( size, SIZE );
+   F77_CREATE_REAL_ARRAY( MASK, size );
+   F77_EXPORT_REAL_ARRAY( mask, MASK, size );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(irq_setqm8)( CHARACTER_ARRAY_ARG(LOCS),
+                        LOGICAL_ARG(&BAD),
+                        CHARACTER_ARG(QNAME),
+                        INTEGER8_ARG(&SIZE),
+                        REAL_ARRAY_ARG(MASK),
+                        INTEGER8_ARG(&SET),
+                        INTEGER_ARG(&STATUS)
+                        TRAIL_ARG(LOCS)
+                        TRAIL_ARG(QNAME) ); )
+
+   F77_FREE_CHARACTER( QNAME );
+   F77_IMPORT_INTEGER8( SET, *set );
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_FREE_REAL( MASK );
+}
+
 
 /* ------------------------------- */
 
