@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <limits.h>
+#include <string.h>
 #include "star/util.h"
 #include "ndf_ast.h"
 
@@ -49,10 +50,11 @@ void ndf1Twrap( const char *in, int indent, size_t *fp, size_t l,
 *        on the next invocation. A value of UINT_MAX is returned if the input
 *        text is exhausted (so that no further invocations are needed).
 *     l
-*        The maximum length of an output line.
+*        The length of an output line.
 *     out
-*        Pointer to an array in which to return a null terminated string
-*        holding the variable to receive the output lines.
+*        Pointer to an array in which to return a string holding the variable
+*        to receive the output lines. Note, no terminating null characters
+*        are added - each output line is space padded to length "l".
 *     out_length
 *        The length of the supplied 'out' array.
 
@@ -83,31 +85,34 @@ void ndf1Twrap( const char *in, int indent, size_t *fp, size_t l,
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     29-OCT-2019 (DSB):
+*        Re-written with a simpler algorithm.
 
 *-
 */
 
 /* Local Variables: */
-   const char *inend;
-   const char *instart;
    char *outend;
-   char *outstart;
-   char *p;
+   char *pout;
+   char *spout;
+   const char *pin;
+   const char *spin;
+   const char *inend;
 
 /* Get a pointer to the first input character to be copied, skipping over
-   leading spaces if "indent" is negative. */
-   instart = in + *fp;
+   leading spaces if "indent" is not negative. */
+   pin = in + *fp;
    if( indent >= 0 ) {
-      while( *instart == ' ' ) instart++;
+      while( *pin == ' ' ) pin++;
    }
 
 /* Get a pointer to the last input character to be copied. This excludes
    any trailing spaces and the trailing null terminator. */
-   inend = instart + astChrLen( instart ) - 1;
+   inend = pin + astChrLen( pin ) - 1;
 
 /* Place the required number of leading spaces into the output buffer. */
-   outstart = out;
-   while( indent-- > 0 ) *(outstart++) = ' ';
+   pout = out;
+   while( indent-- > 0 ) *(pout++) = ' ';
 
 /* Get a pointer to the last output character to be filled. */
    if( l < out_length ) {
@@ -116,38 +121,36 @@ void ndf1Twrap( const char *in, int indent, size_t *fp, size_t l,
       outend = out + out_length - 1;
    }
 
-/* Copy input characters to the output until the end of either string is
-   reached. */
-   while( outstart <= outend && instart <= inend ) *(outstart++) = *(instart++);
-
-/* If the next input character is a space or the end of the input, we can
-   leave the output buffer as it is. Otherwise, we need to back up to the
-   previous space, replacing the surplus output characters with spaces. */
-   if( *instart != ' ' && *instart != 0 ) {
-      instart--;
-      outstart--;
-      while( *outstart != ' ' && outstart >= out ) {
-         *(outstart--) = ' ';
-         instart--;
+/* Copy input characters to the output until the end of either the input
+   or output is reached. Record the positions within the input and output
+   of the most recent space. */
+   spin = NULL;
+   spout = NULL;
+   while( pout <= outend && pin <= inend ) {
+      if( *pin == ' ' ) {
+         spin = pin;
+         spout = pout;
       }
+      *(pout++) = *(pin++);
    }
 
-/* Find the previous non-space character in "out". */
-   p = outstart;
-   while( *p == ' ' && p >= out ) p--;
-
-/* If the output buffer is now empty (because no space was found or there
-   were no non-space characters prior to the space), we are forced to split
-   the text at a non-space. So put it back to how it was. */
-   if( p < out ) {
-      while( outstart <= outend && instart <= inend ) *(outstart++) = *(instart++);
-   }
-
-/* Return the index of the next input character to be copied. */
-   if( instart <= inend ) {
-      *fp = instart - in;
-   } else {
+/* If we have copied all the input, indicate this by returning UINT_MAX
+   for *fp. */
+   if( pin > inend ) {
       *fp = UINT_MAX;
+
+/* If we have not yet copied all the input and a space was encountered, return
+   *fp to indicate that the first character following the most recent space
+   should be copied next. Replace any output text following the final
+   space with more spaces. */
+   } else if( spin ) {
+      *fp = spin - in + 1;
+      memset( spout, ' ', pout - spout );
+
+/* If we have not yet copied all the input but no space was encountered, return
+   *fp to indicate that the next input character should be copied next. */
+   } else {
+      *fp = pin - in;
    }
 }
 

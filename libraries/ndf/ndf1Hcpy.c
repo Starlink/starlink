@@ -67,6 +67,9 @@ void ndf1Hcpy( int nlines, size_t clen, char *hist, const char *text,
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     29-OCT-2019 (DSB):
+*        Check all characters in the suppled array, not just the first 
+*        "nlines" characters.
 
 *-
 */
@@ -80,13 +83,17 @@ void ndf1Hcpy( int nlines, size_t clen, char *hist, const char *text,
 
 /* Ensure there are no terminating nulls in the supplied text. */
    p = text;
-   for( i = 0; i < nlines; i++ ) {
+   for( i = 0; i < clen*nlines; i++ ) {
       if( *(p++) == 0 ) {
          *status = NDF__FATIN;
          errRep( " ", "ndf1Hcpy: A null character was found inside a "
                  "fixed-length string (internal NDF programming error).",
                  status );
-         errRepf( " ", "'%s'", status, text );
+         if( i > 30 ) {
+            errRepf( " ", "'...%s'", status, p - 30 );
+         } else {
+            errRepf( " ", "'%s'", status, text );
+         }
          break;
       }
    }

@@ -177,8 +177,8 @@
 *  Determine how much room is left at the end of the current line.
                   NREM = NDF__SZHMX - IAT
 
-*  If this is zero, start a new line.
-                  IF( NREM .LE. 0 ) THEN
+*  If this is too small, start a new line.
+                  IF( NREM .LE. NLEFT ) THEN
                      ILINE = ILINE + 1
                      IAT = 0
                      NREM = NDF__SZHMX
