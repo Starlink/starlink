@@ -242,8 +242,8 @@ void makeclumps( int *status ) {
 *        the major axis. The ellipse is centred at the clump centroid.
 *
 *        - Ellipse3: The same as "Ellipse2" except that the ellipse is
-*        centred at the clump peak, rather than the clump centroid, and 
-*        the pixel data values are used as weights when forming the mean 
+*        centred at the clump peak, rather than the clump centroid, and
+*        the pixel data values are used as weights when forming the mean
 *        radial distance at each azimuth angle.
 *
 *        In general, ellipses will outline the brighter, inner regions
@@ -331,6 +331,10 @@ void makeclumps( int *status ) {
 *        Added parameter PRECAT.
 *     28-MAY-2014 (DSB):
 *        Added parameter GRID.
+*     29-OCT-2019 (DSB):
+*        - Integerise the Z-axis GRID position of each clump, as is
+*        already done for the X and Y axes.
+*        - Report each clump position to the user if MSG_FILTER = VERBOSE
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -708,13 +712,16 @@ void makeclumps( int *status ) {
             if( grid >= 0 ) {
                par[ 7 ] = iz;
             } else {
-               par[ 7 ] = cupidRanVal( 0, pos3, status );
+               par[ 7 ] = (int) cupidRanVal( 0, pos3, status );
             }
             par[ 8 ] = cupidRanVal( dist, fwhm3, status );
             par[ 9 ] = cupidRanVal( dist, vgrad1, status );
             par[ 10 ] = cupidRanVal( dist, vgrad2, status );
          }
       }
+
+      msgOutiff( MSG__VERB, " ", "Creating clump %d at (%g,%g,%g)", status,
+                 nc, par[2], par[4], par[7] );
 
 /* Add the clump into the output array. This also creates a "Clump" NDF
    containing the clump data values, appended to the end of the array of
@@ -757,6 +764,11 @@ void makeclumps( int *status ) {
             if( sdims == 1 || sdims == 3 ) cupidGC.velres_sq = velfwhm*velfwhm;
             if( sdims == 2 || sdims == 3 ) cupidGC.beam_sq = beamfwhm*beamfwhm;
          }
+
+/* If no clump was created, tell the user. */
+      } else {
+         msgOutiff( MSG__VERB, " ", "  (clump removed since it touches "
+                    "the array edge)", status );
       }
 
       ncold = nc;
