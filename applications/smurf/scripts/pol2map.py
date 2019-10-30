@@ -627,6 +627,16 @@
 *    13-AUG-2019 (DSB):
 *       No need to create the coadd of I, Q or U maps if it already exists
 *       and has not been surplanted by a new set of observation maps.
+*    9-OCT-2019 (DSB):
+*       Fixed bad bug that caused output catalogue values to be completely
+*       wrong if a previously created coadd was reused AND a binned-up
+*       output catalogue is being created (i.e. CAT is non-null, BINSIZE
+*       is non-null and one or more of IOUT, QOUT and UOUT is null). The
+*       problem was that the existing coadd was not binned up prior to
+*       creating the catalogue, so the association between corresponding
+*       (I,Q,U) values was lost. In other words, the wrong set of I, Q
+*       and U values were being combined together to create each pair of
+*       (P,ANG) values.
 
 '''
 
@@ -729,6 +739,12 @@ def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, automask, obsweight ):
    for key in qui_maps:
       allmaps.append( qui_maps[key] )
       allkeys.append( key )
+
+   if len(allmaps) < 3 and mapvar:
+      raise starutil.InvalidParameterError("Cannot combine {0} maps "
+                           "using MAPVAR=YES since only {1} {0} maps "
+                           "are available".format(qui, len(allmaps) ) )
+
    allmaps = NDG( allmaps )
 
 #  No observation weighting.
@@ -1413,7 +1429,7 @@ try:
 
 #  Ensure no history record is added to the ip reference map suggesting it
 #  was created by pol2map. This would otherwise happen at cleanup. If it *is*
-#  created by pol2map (due to being the IOUT image), then a suitable history 
+#  created by pol2map (due to being the IOUT image), then a suitable history
 #  record will be created as a result of it being assigned to parameter IOUT.
       parsys["IPREF"].exists = True
    else:
@@ -2156,6 +2172,62 @@ try:
       except starutil.NoNdfError:
          coadd_exists = False
 
+#  Do we need the individual observation maps? This will be so if an
+#  output catalogue is being created with a BINSIZE greater than the map
+#  pixel size AND the MAPVAR parameter is set true. In such cases we need
+#  to bin up the individual observation maps before using them to
+#  determine the variances needed to calculate the vector uncertainties.
+      pxsize = 0.0
+      if outcat:
+
+#  If the map pixel size has not yet been determined, get it from the
+#  supplied coadd (if it exists) or use the PIXSIZE parameter otherwise.
+         if coadd_exists:
+            invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(coadd) )
+            pxsize = float(get_task_par( "FPIXSCALE(1)", "ndftrace" ))
+         else:
+            pxsize = pixsize
+
+#  If the catalogue bin size was not specified, it defaults to the map pixel
+#  size.
+         if not binsize:
+            binsize = pxsize
+
+#  Report an error if the catalogue bin size is significantly smaller than
+#  the pixel size.
+         if binsize < pxsize*0.99:
+            raise starutil.InvalidParameterError("Requested catalogue bin "
+                          "size ({0}) is smaller than the map pixel size "
+                          "({1}).".format(binsize,pxsize))
+
+#  If the catalogue bin size is almost equal to the pixel size, then we do
+#  not need the individual observation maps. Also, the catalogue will not be
+#  binned.
+         elif binsize < 1.01*pxsize:
+            cat_needs_obsmaps = False
+            binned_cat = False
+
+#  If the catalogue bin size is significantly larger than the pixel size
+#  and MAPVAR=no (i.e. we are assuming the makemap variances are accurate),
+#  then we still do not need the individual observation maps. But now the
+#  catalogue will be binned.
+         elif not mapvar:
+            cat_needs_obsmaps = False
+            binned_cat = True
+
+#  If the catalogue bin size is significantly larger than the pixel size,
+#  and MAPVAR=yes (i.e. variances are measured from the spread of values),
+#  we need the individual observation maps, and the catalogue will be binned.
+         else:
+            cat_needs_obsmaps = True
+            binned_cat = True
+
+#  If we are not creating an output catalogue then we do not need the
+#  individual observation maps for catalogue creation.
+      else:
+         cat_needs_obsmaps = False
+         binned_cat = False
+
 #  Indicate that no new maps have yet been made.
       make_new_maps = False
 
@@ -2165,8 +2237,10 @@ try:
 
 #  If the current coadd already exists and is being used as the IP
 #  reference map, we do not attempt to recreate it (or the individual
-#  observation maps), regardless of the value of parameter REUSE.
-         if coadd_exists and coadd == ipref:
+#  observation maps), regardless of the value of parameter REUSE. But
+#  we do make individual observation maps if we need them to create the
+#  catalogue.
+         if coadd_exists and coadd == ipref and not cat_needs_obsmaps:
             make_new_maps = False
 
 #  Otherwise, if all the expected maps, including the coadd, already exist,
@@ -2751,11 +2825,6 @@ try:
 #  been surplanted by a new set of observation maps.
       if coadd_exists and not make_new_maps:
          msg_out("Re-using existing {0} coadd".format(qui))
-         if outcat:
-            if trim is not None:
-               exptrim( coadd, trim, coadd_cat )
-            else:
-               invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
 
       else:
 
@@ -2763,24 +2832,6 @@ try:
          if len(qui_maps) == 0:
             raise starutil.InvalidParameterError("No usable {0} maps remains "
                                                  "to be coadded.".format(qui))
-
-#  If required, create a reference map that defines the WCS for the
-#  catalogue grid, using a pixel size of BINSIZE.
-         if outcat and binsize is not None and catref is None:
-            key = list(qui_maps)[0]
-            invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(qui_maps[key]) )
-            pxsize = float(get_task_par( "FPIXSCALE(1)", "ndftrace" ))
-            if binsize < pxsize:
-               raise starutil.InvalidParameterError("Requested catalogue bin "
-                             "size ({0}) is smaller than the map pixel size "
-                             "({1}).".format(binsize,pxsize))
-            else:
-               msg_out("The output vector catalogue will be based on maps "
-                       "that are binned up to {0} arcsec pixels.".format(binsize))
-
-            catref = NDG( 1 )
-            invoke("$KAPPA_DIR/sqorst in={0} out={1} mode=pixelscale method=near "
-                   "pixscale=\"\'{2},{2},*\'\"".format(qui_maps[key],catref,binsize))
 
 #  If skyloop was used above, the coadd will already exist. First deal
 #  with cases where skyloop was not used.
@@ -2842,41 +2893,87 @@ try:
             trimmed = exptrim( coadd, trim )
             invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(trimmed,coadd))
 
-#  If we are creating a binned up catalogue, bin the input observation maps
-#  up to the required catalogue bin size, and then coadd them. Trim the
-#  resulting coadd if required.
-         if catref:
-            temp = NDG(1)
-
-            if len(qui_maps) == 1:
-               invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
-                      "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
-                      format(qui_maps[key],temp,catref))
-            else:
-               catmaps = NDG(allmaps)
-               invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
-                      "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
-                      format(allmaps,catmaps,catref))
-               invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
-                      "conserve=no method=near variance=yes genvar={2}".
-                      format(catmaps,temp,mapvar))
-
-            if trim is not None:
-               exptrim( temp, trim, coadd_cat )
-            else:
-               invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(temp,coadd_cat))
-
-         elif outcat:
-            if trim is not None:
-               exptrim( coadd, trim, coadd_cat )
-            else:
-               invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
-
          if len( badkeys ) > 0:
-            msg_out( "\n\nThe following observations were omitted because "
-                     "their auto-masked maps look peculiar:")
+            msg_out( "\n\nWARNING: The following observations were omitted "
+                     "because their auto-masked maps look peculiar:")
             for key in badkeys:
                msg_out( key )
+
+
+
+
+
+#  -----------  CREATE THE MAP TO USE WHEN CREATING THE CATALOGUE -------------
+
+#  If an output vector catalogue is being created, we now create the I, Q
+#  or U map that will be used in the creation of the catalogue.
+      if outcat:
+
+#  If the catalogue bin size is the same as the map pixel size, we just
+#  use the above coadd when creating the catalogue.
+         if not binned_cat:
+            invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(coadd,coadd_cat))
+
+#  If the catalogue bin size is greater than the map pixel size, we need
+#  to bin the coadd up before using it to create the catalogue.
+         else:
+
+#  If we have not already done so, create a reference map defining the
+#  binned up pixel grid to be used when creating the catalogue. Do this
+#  by squashing the coadd map.
+            if not catref:
+               msg_out("The output vector catalogue will be based on maps "
+                       "that are binned up to {0} arcsec pixels.".format(binsize))
+               catref = NDG( 1 )
+               invoke("$KAPPA_DIR/sqorst in={0} out={1} mode=pixelscale "
+                      "method=near pixscale=\"\'{2},{2},*\'\"".
+                      format(coadd,catref,binsize))
+
+#  Bin the coadd created above so that it is aligned with the above reference
+#  map.
+            invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
+                   "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
+                   format(coadd,coadd_cat,catref))
+
+#  If the catalogue bin size is significantly larger than the pixel size,
+#  and MAPVAR=yes (i.e. variances are measured from the spread of values),
+#  we need to be careful about variances The noise in the coadd is correlated
+#  from pixel to pixel (i.e. we see random large scale artefacts in SCUBA-2
+#  maps). If we were just to bin the coadd in the normal way (e.g. using
+#  wcsalign or sqorst) to get the requested bin size, this correlated noise
+#  would be ignored, so the binned up variances would be too small. Instead,
+#  we need to bin up the individual observation maps first, then estimate
+#  the variances by looking at the spread of binned-up values at each point.
+            if mapvar:
+
+#  If we do not have any individual observation maps, then we can't use
+#  the MAPVAR=yes approach. In which case all we can do is retain the
+#  variances in the binned coadd, and issue a warning.
+               if len(qui_maps) == 0:
+                  msg_out("\n\nWARNING: No observation {0} maps found in "
+                          "{1} and MAPVAR=YES. Consequently the error "
+                          "estimates in the output catalogue may be too "
+                          "low.\n".format( qui, mapdir ) )
+
+#  Otherwise, bin them all up so that they are aligned with the catalogue
+#  reference map. Then make a coadd from them, generating variances at
+#  the same time from the spread of values at each pixel. Then transfer
+#  the variances into the binned-up coadd created above.
+               else:
+                  allmaps = NDG( list( qui_maps.values() ) )
+                  catmaps = NDG( allmaps )
+                  invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
+                         "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
+                         format(allmaps,catmaps,catref))
+
+                  temp = NDG(1)
+                  invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
+                         "conserve=no method=near variance=yes genvar=yes".
+                         format(catmaps,temp))
+
+                  invoke("$KAPPA_DIR/setvar ndf={0} from={1} comp=Variance".
+                         format(coadd_cat,temp))
+
 
 
 
