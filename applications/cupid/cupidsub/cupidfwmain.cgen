@@ -209,6 +209,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, size_t nel, int ndim,
    hdsdim nsy;        /* Longest jump between peaks in the y direction */
    hdsdim nsz;        /* Longest jump between peaks in the z direction */
    hdsdim nv;         /* Vector index of next pixel along the route */
+   hdsdim *route;     /* Array holding vector indices of traversed pixels */
    hdsdim route_length;/* Number of pixels stored in "route" array */
    hdsdim skip0;      /* Total skip from centre to first 3x3x3 neighbour */
    hdsdim skip1;      /* Total skip from centre to first extended neighbour */
@@ -219,7 +220,6 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, size_t nel, int ndim,
    int *m2;        /* Pointer to output array */
    int *m3;        /* Pointer used to swap arrays */
    int *pa;        /* Pointer to next "ipa" value */
-   int *route;     /* Array holding vector indices of traversed pixels */
    int *work;      /* Work array */
    int cleaniter;  /* Number of cleaning  iterations to perform */
    int clump_index;/* Index of the peak to which the walk ascends */
@@ -700,7 +700,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, size_t nel, int ndim,
    the array as necessary. */
                         iv = nv;
                         istep = route_length++;
-                        route = astGrow( route, route_length, sizeof( int ) );
+                        route = astGrow( route, route_length, sizeof( *route ) );
                         if( route ) route[ istep ] = iv;
                      }
                   }
