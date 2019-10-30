@@ -6,10 +6,17 @@
 #include "ast.h"
 #include "par.h"
 #include "star/pda.h"
+#include "star/thr.h"
 #include "cupid.h"
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
 
 /* Local Constants: */
 /* ================ */
@@ -20,6 +27,22 @@
 /* A structure holding the global parameters needed by the function
    cupidGCmodel. Is is declared in cupidGaussClumps. */
 extern CupidGC cupidGC;
+
+/* Local data types: */
+/* ================= */
+typedef struct MakeclumpsData {
+   size_t p1;
+   size_t p2;
+   float *pin;
+   float *pout;
+   gsl_rng *r;
+   float rms;
+   unsigned long int seed;
+} MakeclumpsData;
+
+/* Prototypes for local functions */
+/* ============================== */
+static void cupidMakeclumpsPar( void *job_data_ptr, int *status );
 
 void makeclumps( int *status ) {
 /*
@@ -348,10 +371,15 @@ void makeclumps( int *status ) {
    HDSLoc *obj;                  /* HDS array of NDF structures */
    HDSLoc *obj_precat;           /* HDS array of NDF structures without smoothing */
    HDSLoc *xloc;                 /* HDS locator for CUPID extension */
+   MakeclumpsData *job_data;     /* Memory for job descriptions */
+   MakeclumpsData *pdata;        /* Pointer to a single job description */
+   ThrWorkForce *wf = NULL;      /* Pointer to a pool of worker threads */
    char attr[ 11 ];              /* AST attribute name */
    char shape[ 10 ];             /* Shape for spatial STC-S regions */
    char text[ 8 ];               /* Value of PARDIST parameter */
    const char *dom;              /* Pointer to AST Domain value */
+   const char *envvar;           /* Pointer to environment variable text */
+   const gsl_rng_type *type;     /* GSL random number generator type */
    double beamcorr[ 3 ];         /* Beam widths */
    double par[ 11 ];             /* Clump parameters */
    double sum;                   /* Integrated intensity */
@@ -373,6 +401,7 @@ void makeclumps( int *status ) {
    float velfwhm;                /* Value of VELFWHM parameter */
    float vgrad1[ 2 ];            /* Values for VGRAD1 parameter */
    float vgrad2[ 2 ];            /* Values for VGRAD2 parameter */
+   gsl_rng *r;                   /* GSL random number generator */
    hdsdim dims[ 3 ];             /* Dimensions before axis permutation */
    hdsdim grid_delta1;           /* Clump spacing on pixel axis 1 */
    hdsdim grid_delta2;           /* Clump spacing on pixel axis 2 */
@@ -394,6 +423,7 @@ void makeclumps( int *status ) {
    int indf3;                    /* Identifier for input WCS NDF */
    int indf;                     /* Identifier for output NDF with noise */
    int ishape;                   /* STC-S shape for spatial coverage */
+   int iw;                       /* Index of worker thread */
    int nc;                       /* Number of clumps created */
    int nclump;                   /* Number of clumps to create */
    int nclumps;                  /* Number of stored clumps */
@@ -402,12 +432,15 @@ void makeclumps( int *status ) {
    int nskyax;                   /* Number of sky axes in the current WCS frame */
    int nspecax;                  /* Number of spectral axes in the current WCS frame */
    int nval;                     /* Number of values supplied */
+   int nw;                       /* No. of worker threads in thread pool */
    int precat;                   /* Create catalogue before beam smoothing? */
    int sdims;                    /* Number of significant pixel axes */
    size_t area;                  /* Clump area */
    size_t iel;                   /* Element count */
    size_t nel;                   /* Number of elements in array */
    size_t st;                    /* A size_t that can be passed as an argument */
+   size_t step;                  /* Number of pixels per thread */
+   unsigned long int seed;       /* Seed for random number generator */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -420,6 +453,10 @@ void makeclumps( int *status ) {
 
 /* INitialise pointers. */
    xloc = NULL;
+
+/* Find the number of cores/processors available and create a pool of
+   threads of the same size. */
+   wf = thrGetWorkforce( thrGetNThread( "CUPID_THREADS", status ), status );
 
 /* See if WCS is to be inherited from another NDF. If so, get the pixel
    bounds of the NDF and get its WCS FrameSet. Use the bounds to set the
@@ -789,18 +826,65 @@ void makeclumps( int *status ) {
 
 /* Create the output data array by summing the contents of the NDFs
    describing the beam-smoothed clumps. */
+   msgOutiff( MSG__VERB, " ", "Creating noise-free output array", status );
    cupidSumClumps( CUPID__FLOAT, NULL, sdims, slbnd, subnd, nel, obj,
                    NULL, ipd2, "GAUSSCLUMPS", status );
 
-/* Add Gaussian noise to the beam-smoothed data. */
+/* Add Gaussian noise to the beam-smoothed data. This operation is
+   multi-threaded for speed. */
+   msgOutiff( MSG__VERB, " ", "Adding noise to output array", status );
+
+/* First store the number of worker threads in the work force. */
+   nw = wf ? wf->nworker : 1;
+
+/* Allocate job data for threads */
+   job_data = astMalloc( nw*sizeof(*job_data) );
    if( *status == SAI__OK ) {
-      memcpy( ipd, ipd2,sizeof( float )*nel );
+
+/* Get the default GSL random number generator type, and the seed (read
+   the seed from environment variable STAR_SEED, or use a random seed formed
+   from the time and the process ID). */
       if( addnoise ) {
-         d = ipd;
-         for( iel = 0; iel < nel; iel++, d++ ) {
-            *d +=  pdaRnnor( 0.0, rms );
+         type = gsl_rng_default;
+         envvar = getenv( "STAR_SEED" );
+         if( envvar ) {
+            seed = strtol( envvar, NULL, 10 );
+         } else {
+            seed = (int) time( NULL ) + (int) getpid();
          }
+      } else {
+         type = NULL;
+         seed = 0;
       }
+
+/* Get the number of pixels to process in each thread. */
+      step = nel/nw;
+      if( step == 0 ) step = 1;
+
+/* Allocate job data for threads, and store the range of pixels to be
+   processed by each one. Ensure that the last thread picks up any left-over
+   pixels. Store the rest of the job description, and then submit the job
+   to the workforce. */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         pdata->p1 = iw*step;
+         if( iw < nw - 1 ) {
+            pdata->p2 = pdata->p1 + step;
+         } else {
+            pdata->p2 = nel - 1;
+         }
+
+         pdata->pin = ipd2;
+         pdata->pout = ipd;
+         pdata->r = type ? gsl_rng_alloc( type ) : NULL;
+         pdata->seed = seed + 1234*iw;
+         pdata->rms = rms;
+
+         thrAddJob( wf, 0, pdata, cupidMakeclumpsPar, 0, NULL, status );
+      }
+
+/* Wait for all the jobs to complete. */
+      thrWait( wf, status );
    }
 
 /* Create a CUPID extension in the output model NDF.*/
@@ -810,6 +894,7 @@ void makeclumps( int *status ) {
    parGet0l( "DECONV", &deconv, status );
 
 /* Store the clump properties in the output catalogue. */
+   msgOutiff( MSG__VERB, " ", "Storing clump properties in catalogue", status );
    if( precat ) {
       beamcorr[ 0 ] = 0.0;
       beamcorr[ 1 ] = 0.0;
@@ -826,7 +911,7 @@ void makeclumps( int *status ) {
                         iwcs, "", NULL, NULL, &nclumps, status );
    }
 
-/* Relase the extension locator.*/
+/* Release the extension locator.*/
    datAnnul( &xloc, status );
 
 /* Release the HDS object containing the list of NDFs describing the
@@ -834,7 +919,17 @@ void makeclumps( int *status ) {
    if( obj ) datAnnul( &obj, status );
    if( obj_precat ) datAnnul( &obj_precat, status );
 
+/* Free thread resources. */
+   if( job_data ) {
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         if( pdata->r ) gsl_rng_free( pdata->r );
+      }
+      job_data = astFree( job_data );
+   }
+
 /* End the NDF context */
+   msgOutiff( MSG__VERB, " ", "Closing NDFs", status );
    ndfEnd( status );
 
 /* End the AST context */
@@ -847,3 +942,71 @@ void makeclumps( int *status ) {
               "clump data.", status );
    }
 }
+
+
+static void cupidMakeclumpsPar( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     cupidMakeclumpsPar
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     makeclumps.
+
+*  Invocation:
+*      cupidMakeclumpsPar( void *job_data_ptr, int *status );
+
+*  Arguments:
+*     job_data_ptr = MakeclumpsData * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   MakeclumpsData *pdata;
+   float *pin;
+   float *pout;
+   float rms;
+   gsl_rng *r;
+   size_t iel;
+   size_t p1;
+   size_t p2;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (MakeclumpsData *) job_data_ptr;
+   p1 = pdata->p1;
+   p2 = pdata->p2;
+   r = pdata->r;
+   rms = pdata->rms;
+
+/* Get a pointer to the first input and output pixel to be processed by
+   this thread. */
+   pin = pdata->pin + p1;
+   pout = pdata->pout + p1;
+
+/* If no noise is to be added, just copy input to output. */
+   if( !r ) {
+      memcpy( pout, pin, sizeof( *pin )*( pout - pin + 1 ) );
+
+/* If noise is to be added, set the seed for the random number generator
+   and then add a Gaussian value - mean 0.0, sigma=rms - onto each pixle
+   to be processed by this thread. */
+   } else {
+      gsl_rng_set( r, pdata->seed );
+
+      for( iel = p1; iel <= p2; iel++ ) {
+         *(pout++) = *(pin++) + gsl_ran_gaussian( r, rms );
+      }
+   }
+
+}
+
+
+
