@@ -6192,9 +6192,10 @@ button at the right-hand end of the menu bar.
 
 There are four commands for controlling the
 \htmlref{palette}{se:coltab}\latex{ (Section~\ref{se:coltab})}, all
-beginning PAL.  If you inherit the graphics device after a non-\KAPPA\ user
-or after a device reset, you will probably have to reset
-the palette.  You can do this either by loading the default
+beginning PAL (in addition, the colours in the current palette can be
+listed using \htmlref{GDSTATE}{GDSTATE}). If you inherit the graphics
+device after a non-\KAPPA\ user or after a device reset, you will probably
+have to reset the palette.  You can do this either by loading the default
 palette---black, white, the primary then secondary colours, and eight
 equally spaced grey levels---with the command \htmlref{PALDEF}{PALDEF};
 or load a palette you've created yourself via \htmlref{PALREAD}{PALREAD}.
@@ -54077,7 +54078,7 @@ The following new applications have been added:
 \begin{description}
    \item [\htmlref{COMPLEX}{COMPLEX}] \mbox{}
    Converts between representations of complex data, such as
-   extracting or combining real and imaginary parts. 
+   extracting or combining real and imaginary parts.
    \item [\htmlref{MOCGEN}{MOCGEN}] \mbox{}
    Creates a description of selected regions in an image using the IVOA's
    Multi-Order Coverage (MOC) scheme.
