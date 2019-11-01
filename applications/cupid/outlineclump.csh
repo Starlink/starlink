@@ -333,7 +333,7 @@ set maxindex = `$HDSTOOLS_DIR/hdir ${ndf}.more.cupid.clumps | grep dimensions | 
 #
 if ( $maxindex == 1 ) then
    set ok = 1
-   set index = 1
+   set indexlist = 1
 else
    set ok = 0
    set repeat = 0
