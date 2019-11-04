@@ -1,4 +1,5 @@
-      SUBROUTINE IRQ1_QMSK( BIT, BAD, SET, SIZE, MASK, QUAL, STATUS )
+      SUBROUTINE IRQ1_QMSK( BIT, BAD, SET, INIT, SIZE, MASK, QUAL,
+     :                      NSET, NCLEAR, STATUS )
 *+
 *  Name:
 *     IRQ1_QMSK
@@ -10,7 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL IRQ1_QMSK( BIT, BAD, SET, SIZE, MASK, QUAL, STATUS )
+*     CALL IRQ1_QMSK( BIT, BAD, SET, INIT, SIZE, MASK, QUAL, NSET,
+*                     NCLEAR, STATUS )
 
 *  Description:
 *     If SET is true then selected pixels in the QUALITY vector have the
@@ -18,7 +20,9 @@
 *     the specified bit cleared. If BAD is true then pixels are selected
 *     if they correspond to bad pixels in the mask. If BAD is false then
 *     pixels are selected if they do not correspond to bad pixels in
-*     the mask.
+*     the mask. If INIT is true, then pixels which are not selected have
+*     the specified bit set to the opposite value (i.e. cleared if SET
+*     is true and set if SET is false).
 
 *  Arguments:
 *     BIT = INTEGER (Given)
@@ -36,12 +40,21 @@
 *        indicating that the corresponding quality is held.  If false,
 *        then the selected pixels have the given bit cleared,
 *        indicating that the corresponding quality is not held.
+*     INIT = LOGICAL (Given)
+*        If true, then the unselected pixels have the given bit set (if
+*        SET if false) or cleared (if SET is true). If INIT is false,
+*        unselected pixels are left unchanged.
 *     SIZE = INTEGER*8 (Given)
 *        The size of the QUAL and MASK vectors.
 *     MASK( SIZE ) = REAL (Given)
 *        The mask vector.
 *     QUAL( SIZE ) = BYTE (Given and Returned)
 *        The QUALITY vector.
+*     NSET = INTEGER*8 (Returned)
+*        No. of pixels for which the specified QUALITY bit is set on exit.
+*     NCLEAR = INTEGER*8 (Returned)
+*        No. of pixels for which the specified QUALITY bit is cleared on
+*        exit.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -51,6 +64,7 @@
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2019 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -78,6 +92,8 @@
 *        Original version.
 *     24-OCT-2019 (DSB):
 *        Change to use 8-byte SIZE.
+*     1-NOV-2019 (DSB):
+*        Added arguments INIT, NSET and NCLEAR.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -96,11 +112,16 @@
       INTEGER BIT
       LOGICAL BAD
       LOGICAL SET
+      LOGICAL INIT
       INTEGER*8 SIZE
       REAL MASK( SIZE )
 
 *  Arguments Given and Returned:
       BYTE QUAL( SIZE )
+
+*  Arguments Returned:
+      INTEGER*8 NSET
+      INTEGER*8 NCLEAR
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -113,6 +134,10 @@
       INCLUDE 'NUM_DEC_CVT'
       INCLUDE 'NUM_DEF_CVT'
 *.
+
+*  Initialise
+      NSET = 0
+      NCLEAR = 0
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -131,6 +156,13 @@
                IF( MASK( I ) .EQ. VAL__BADR ) THEN
                   QUAL( I ) = NUM_ITOUB( IBSET( NUM_UBTOI( QUAL( I ) ),
      :                                        LBIT ) )
+                  NSET = NSET + 1
+               ELSE IF( INIT ) THEN
+                  QUAL( I ) = NUM_ITOUB( IBCLR( NUM_UBTOI( QUAL( I ) ),
+     :                                        LBIT ) )
+               ELSE IF(  BTEST( NUM_UBTOI( QUAL( I ) ), LBIT ) ) THEN
+                  NSET = NSET + 1
+
                END IF
             END DO
 
@@ -142,6 +174,13 @@
                IF( MASK( I ) .NE. VAL__BADR ) THEN
                   QUAL( I ) = NUM_ITOUB( IBSET( NUM_UBTOI( QUAL( I ) ),
      :                                        LBIT ) )
+                  NSET = NSET + 1
+               ELSE IF( INIT ) THEN
+                  QUAL( I ) = NUM_ITOUB( IBCLR( NUM_UBTOI( QUAL( I ) ),
+     :                                        LBIT ) )
+               ELSE IF(  BTEST( NUM_UBTOI( QUAL( I ) ), LBIT ) ) THEN
+                  NSET = NSET + 1
+
                END IF
             END DO
 
@@ -158,6 +197,13 @@
                IF( MASK( I ) .EQ. VAL__BADR ) THEN
                   QUAL( I ) = NUM_ITOUB( IBCLR( NUM_UBTOI( QUAL( I ) ),
      :                                        LBIT ) )
+               ELSE IF( INIT ) THEN
+                  NSET = NSET + 1
+                  QUAL( I ) = NUM_ITOUB( IBSET( NUM_UBTOI( QUAL( I ) ),
+     :                                        LBIT ) )
+               ELSE IF( BTEST( NUM_UBTOI( QUAL( I ) ), LBIT ) ) THEN
+                  NSET = NSET + 1
+
                END IF
             END DO
 
@@ -169,11 +215,19 @@
                IF( MASK( I ) .NE. VAL__BADR ) THEN
                   QUAL( I ) = NUM_ITOUB( IBCLR( NUM_UBTOI( QUAL( I ) ),
      :                                        LBIT ) )
+               ELSE IF( INIT ) THEN
+                  NSET = NSET + 1
+                  QUAL( I ) = NUM_ITOUB( IBSET( NUM_UBTOI( QUAL( I ) ),
+     :                                        LBIT ) )
+               ELSE IF( BTEST( NUM_UBTOI( QUAL( I ) ), LBIT ) ) THEN
+                  NSET = NSET + 1
+
                END IF
             END DO
 
          END IF
-
       END IF
+
+      NCLEAR = SIZE - NSET
 
       END

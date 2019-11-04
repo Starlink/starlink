@@ -79,6 +79,10 @@
 *  History:
 *     24-OCT-2019 (DSB):
 *        Original version.
+*     1-NOV-2019 (DSB):
+*        Combine initialisation, masking and counting into one pass round
+*        the data array, performed by IRQ1_QMSK. This speeds things up
+*        for big arrays.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -219,22 +223,16 @@
          END IF
 
 *  If no bit plane in the QUALITY component was reserved for the
-*  quality on input, reserve one know, and initialise it to indicate
-*  that all pixels currently hold the quality.
-         IF( BIT .EQ. 0 ) THEN
-            CALL IRQ1_RBIT( LOCS, BIT, STATUS )
-            CALL IRQ1_QSET( BIT, .TRUE., SIZE, %VAL( CNF_PVAL( PNT ) ),
-     :                      STATUS )
-         END IF
+*  quality on input, reserve one now.
+         IF( BIT .EQ. 0 ) CALL IRQ1_RBIT( LOCS, BIT, STATUS )
 
-*  Reset the appropriate bit in the QUALITY array.
-         CALL IRQ1_QMSK( BIT, BAD, .FALSE., SIZE, MASK,
-     :                   %VAL( CNF_PVAL( PNT ) ),
+*  Reset the appropriate bit in the QUALITY array. If the bit is new,
+*  initialise unselected pixel to indicate they hold the quality.
+*  This returns the number of pixels which do and do not have the quality
+*  on exit.
+         CALL IRQ1_QMSK( BIT, BAD, .FALSE., (BIT.EQ.0), SIZE, MASK,
+     :                   %VAL( CNF_PVAL( PNT ) ),  SET, CLEAR,
      :                   STATUS )
-
-*  Count the number of pixels which do and do not have the quality.
-         CALL IRQ1_QCNT( BIT, NEL, %VAL( CNF_PVAL( PNT ) ),
-     :                   SET, CLEAR, STATUS )
 
 *  Unmap the QUALITY array.
          CALL NDF_UNMAP( INDF, 'QUALITY', STATUS )
