@@ -94,6 +94,9 @@ CupidPixelSet **CGEN_FUNCTION(cupidFWPixelSets)( CGEN_TYPE *array, int nel,
 *     5-OCT-2010 (DSB):
 *        Original version.
 *     {enter_further_changes_here}
+*     7-NOC-2019 (DSB):
+*        Fix bug that could cause incorrect neighbours list to be 
+*        created if perspectrum is non-zero.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -114,6 +117,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidFWPixelSets)( CGEN_TYPE *array, int nel,
    int *pin;           /* Pointer to input pixel */
    int *piny;          /* Pointer to input pixel at start of row */
    int *pinz;          /* Pointer to input pixel at start of plane */
+   int ignore;         /* Ignore this neighbour? */
    int iv;             /* Vector index into input array */
    int ix;             /* Input pixel GRID index on axis 1 */
    int iy;             /* Input pixel GRID index on axis 2 */
@@ -232,23 +236,25 @@ CupidPixelSet **CGEN_FUNCTION(cupidFWPixelSets)( CGEN_TYPE *array, int nel,
                                  for( ix = ox - 1; ix <= ox + 1; ix++ ) {
                                     if( ix >= 1 && ix <= dims[ 0 ] ) {
 
+/* Note the clump index at the current neighbouring pixel. */
+                                       ivali = *pin;
+
 /* If we are processing spectra indepently of each other, only consider the
    (two) neighbouring pixels on the spectral axis. */
                                        if( perspectrum == 1 ) {
-                                          if( iy != oy || iz != oz ) continue;
+                                          ignore = ( iy != oy || iz != oz );
                                        } else if( perspectrum == 2 ) {
-                                          if( ix != ox || iz != oz ) continue;
+                                          ignore = ( ix != ox || iz != oz );
                                        } else if( perspectrum == 3 ) {
-                                          if( ix != ox || iy != oy ) continue;
+                                          ignore = ( ix != ox || iy != oy );
+                                       } else {
+                                          ignore = 0;
                                        }
-
-/* Note the clump index at the current neighbouring pixel. */
-                                       ivali = *pin;
 
 /* If the current neighbouring pixel is in a different clump than the current
    central pixel, we need to update the height of the col between the two
    clump peaks stored in the PixelSet. */
-                                       if( ivali != ivalo && ivali != -1 ) {
+                                       if( !ignore && ivali != ivalo && ivali != -1 ) {
 
 /* Find the index of the neigbouring clump within the "nebs" and "cols"
    arrays of the current clump. First check to see if the neighbour is
