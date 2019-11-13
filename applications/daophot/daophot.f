@@ -860,7 +860,7 @@ C
 C Get the desired range of group sizes.
 C
       CALL GETDAT ('Minimum, maximum group size:', SIZE, 2)
-      IF (SIZE(1) .LT. VAL__MINR) GO TO 9010           ! CTRL-Z was entered
+      IF (SIZE(1) .LE. VAL__MINR) GO TO 9010           ! CTRL-Z was entered
       MINGRP=NINT(SIZE(1))
       MAXGRP=NINT(SIZE(2))
 C
@@ -1016,7 +1016,7 @@ C-----------------------------------------------------------------------
 C
       CALL TBLANK                                   ! Type a blank line
       CALL GETDAT ('Box size:', SIZE, 1)
-      IF (SIZE .LT. VAL__MINR) RETURN                  ! CTRL-Z was entered
+      IF (SIZE .LE. VAL__MINR) RETURN                  ! CTRL-Z was entered
       NBOX=MAX0(1, MIN0(NINT(SIZE), NSQUARE))
       NHALF=(NBOX-1)/2
 C
@@ -1127,7 +1127,7 @@ C
          DELTA(I)=0.
       END DO
       CALL GETDAT ('Additive offsets ID, DX, DY, DMAG:', DELTA, 4)
-      IF (DELTA(1) .LT. VAL__MINR) THEN
+      IF (DELTA(1) .LE. VAL__MINR) THEN
          CALL CLFILE (1)
          RETURN
       END IF

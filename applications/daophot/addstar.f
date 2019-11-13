@@ -94,7 +94,7 @@ C
          WRITE (6,610) PSFMAG
   610    FORMAT (/' Magnitude of PSF star is', F7.3/)
          CALL GETDAT ('Minimum, maximum magnitudes desired:', RMAG, 2)
-         IF (RMAG(1) .LT. VAL__MINR) RETURN            ! CTRL-Z was entered
+         IF (RMAG(1) .LE. VAL__MINR) RETURN            ! CTRL-Z was entered
 C
          CALL GETDAT ('Number of stars to add to each frame:',
      .        DATUM, 1)
@@ -102,7 +102,7 @@ C
          NSTAR=MAX0(1, NINT(DATUM))
 C
          CALL GETDAT ('Number of new frames:', DATUM, 1)
-         IF (DATUM .LT. -VAL__MINR) RETURN              ! CTRL-Z was entered
+         IF (DATUM .LE. VAL__MINR) RETURN              ! CTRL-Z was entered
          NFRAME=MAX0(1, MIN0(NINT(DATUM), 99))
          OUTSTM=' '
          CALL GETNAM ('File-name stem:', OUTSTM)

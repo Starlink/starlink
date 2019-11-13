@@ -79,7 +79,7 @@ C
      .     11X, '+/- n  By increasing/decreasing OTHER (n <= ',
      .     I2, ')'///)
       CALL GETDAT ('Which do you want?', WHICH, 1)
-      IF (WHICH .LT. VAL__MINR) RETURN                 ! CTRL-Z was entered
+      IF (WHICH .LE. VAL__MINR) RETURN                 ! CTRL-Z was entered
 C
       MODE=NINT(WHICH)
       IF ((ABS(MODE) .LT. 1) .OR. (ABS(MODE) .GT. MAXITM))
