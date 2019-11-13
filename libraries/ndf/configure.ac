@@ -44,8 +44,8 @@ AC_CHECK_FUNCS([getpwuid geteuid getlogin cuserid getusername getenv gettimeofda
 AC_CHECK_DECLS([cuserid getusername])
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build], [sae prm hds chr ems ary ast psx generic])
-STAR_DECLARE_DEPENDENCIES([link],  [psx ary hds ems chr prm ast])
+STAR_DECLARE_DEPENDENCIES([build], [pcs cnf prm hds ems mers ary ast par sae generic])
+STAR_DECLARE_DEPENDENCIES([link],  [pcs cnf prm hds ems mers ary ast par])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
