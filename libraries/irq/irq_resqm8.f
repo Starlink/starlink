@@ -230,7 +230,7 @@
 *  initialise unselected pixel to indicate they hold the quality.
 *  This returns the number of pixels which do and do not have the quality
 *  on exit.
-         CALL IRQ1_QMSK( BIT, BAD, .FALSE., (BIT.EQ.0), SIZE, MASK,
+         CALL IRQ1_QMSK( BIT, 0, BAD, .FALSE., (BIT.EQ.0), SIZE, MASK,
      :                   %VAL( CNF_PVAL( PNT ) ),  SET, CLEAR,
      :                   STATUS )
 

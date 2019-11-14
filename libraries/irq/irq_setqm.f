@@ -40,6 +40,10 @@
 *        The quality name to assign to the selected pixels. This quality
 *        name must be defined in the NDF specified by LOC. Name
 *        definitions can be added to the NDF using routine IRQ_ADDQN.
+*        The supplied string may optionally contain two names separated by
+*        a comma. In this case the first name will be assigned to the
+*        pixels selected by argument BAD and the second name will be
+*        assigned to all other pixels.
 *     SIZE = INTEGER (Given)
 *        The total number of pixels in the MASK array.
 *     MASK( SIZE ) = REAL (Given)

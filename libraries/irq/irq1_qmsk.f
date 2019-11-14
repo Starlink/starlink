@@ -1,4 +1,4 @@
-      SUBROUTINE IRQ1_QMSK( BIT, BAD, SET, INIT, SIZE, MASK, QUAL,
+      SUBROUTINE IRQ1_QMSK( BIT, BIT2, BAD, SET, INIT, SIZE, MASK, QUAL,
      :                      NSET, NCLEAR, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL IRQ1_QMSK( BIT, BAD, SET, INIT, SIZE, MASK, QUAL, NSET,
+*     CALL IRQ1_QMSK( BIT, BIT2, BAD, SET, INIT, SIZE, MASK, QUAL, NSET,
 *                     NCLEAR, STATUS )
 
 *  Description:
@@ -28,6 +28,9 @@
 *     BIT = INTEGER (Given)
 *        The bit number within the QUALITY component. The least
 *        significant bit is called bit 1 (not bit 0).
+*     BIT2 = INTEGER (Given)
+*        An optional QUALITY bit number. If non-zero, this bit is set to
+*        the opposite of BIT.
 *     BAD = LOGICAL (Given)
 *        If true, then the operation specified by SET is performed on
 *        only those pixels in the QUAL vector which correspond to bad
@@ -94,6 +97,8 @@
 *        Change to use 8-byte SIZE.
 *     1-NOV-2019 (DSB):
 *        Added arguments INIT, NSET and NCLEAR.
+*     14-NOV-2019 (DSB):
+*        Added argument BIT2.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -110,6 +115,7 @@
 
 *  Arguments Given:
       INTEGER BIT
+      INTEGER BIT2
       LOGICAL BAD
       LOGICAL SET
       LOGICAL INIT
@@ -129,6 +135,7 @@
 *  Local Variables:
       INTEGER*8 I                ! Loop count.
       INTEGER LBIT               ! Corrected bit number.
+      INTEGER LBIT2              ! Corrected bit number.
 
 *  PRIMDAT type conversion functions.
       INCLUDE 'NUM_DEC_CVT'
@@ -145,86 +152,191 @@
 *  Produce a bit number in the range 0 to (IRQ__QBITS - 1 ).
       LBIT = BIT - 1
 
+*  If BIT2 was not supplied...
+      IF( BIT2 .EQ. 0 ) THEN
+
 *  If the bit is to be set...
-      IF( SET ) THEN
+         IF( SET ) THEN
 
 *  ... and if bad pixels are to be set...
-         IF( BAD ) THEN
+            IF( BAD ) THEN
 
 *  ...loop round each pixel in the two vectors.
-            DO I = 1, SIZE
-               IF( MASK( I ) .EQ. VAL__BADR ) THEN
-                  QUAL( I ) = NUM_ITOUB( IBSET( NUM_UBTOI( QUAL( I ) ),
-     :                                        LBIT ) )
-                  NSET = NSET + 1
-               ELSE IF( INIT ) THEN
-                  QUAL( I ) = NUM_ITOUB( IBCLR( NUM_UBTOI( QUAL( I ) ),
-     :                                        LBIT ) )
-               ELSE IF(  BTEST( NUM_UBTOI( QUAL( I ) ), LBIT ) ) THEN
-                  NSET = NSET + 1
+               DO I = 1, SIZE
+                  IF( MASK( I ) .EQ. VAL__BADR ) THEN
+                     QUAL( I ) = NUM_ITOUB(
+     :                                    IBSET( NUM_UBTOI( QUAL( I ) ),
+     :                                           LBIT ) )
+                     NSET = NSET + 1
+                  ELSE IF( INIT ) THEN
+                     QUAL( I ) = NUM_ITOUB(
+     :                                    IBCLR( NUM_UBTOI( QUAL( I ) ),
+     :                                           LBIT ) )
+                  ELSE IF(  BTEST( NUM_UBTOI( QUAL( I ) ), LBIT ) ) THEN
+                     NSET = NSET + 1
 
-               END IF
-            END DO
+                  END IF
+               END DO
 
 *  If good pixels are to be set...
-         ELSE
+            ELSE
 
 *  ...loop round each pixel in the two vectors.
-            DO I = 1, SIZE
-               IF( MASK( I ) .NE. VAL__BADR ) THEN
-                  QUAL( I ) = NUM_ITOUB( IBSET( NUM_UBTOI( QUAL( I ) ),
-     :                                        LBIT ) )
-                  NSET = NSET + 1
-               ELSE IF( INIT ) THEN
-                  QUAL( I ) = NUM_ITOUB( IBCLR( NUM_UBTOI( QUAL( I ) ),
-     :                                        LBIT ) )
-               ELSE IF(  BTEST( NUM_UBTOI( QUAL( I ) ), LBIT ) ) THEN
-                  NSET = NSET + 1
+               DO I = 1, SIZE
+                  IF( MASK( I ) .NE. VAL__BADR ) THEN
+                     QUAL( I ) = NUM_ITOUB( IBSET(
+     :                                           NUM_UBTOI( QUAL( I ) ),
+     :                                           LBIT ) )
+                     NSET = NSET + 1
+                  ELSE IF( INIT ) THEN
+                     QUAL( I ) = NUM_ITOUB( IBCLR(
+     :                                           NUM_UBTOI( QUAL( I ) ),
+     :                                           LBIT ) )
+                  ELSE IF(  BTEST( NUM_UBTOI( QUAL( I ) ), LBIT ) ) THEN
+                     NSET = NSET + 1
 
-               END IF
-            END DO
+                  END IF
+               END DO
 
-         END IF
+            END IF
 
 *  If the bit is to be cleared...
-      ELSE
-
-*  ... and if bad pixels are to be cleared...
-         IF( BAD ) THEN
-
-*  ...loop round each pixel in the two vectors.
-            DO I = 1, SIZE
-               IF( MASK( I ) .EQ. VAL__BADR ) THEN
-                  QUAL( I ) = NUM_ITOUB( IBCLR( NUM_UBTOI( QUAL( I ) ),
-     :                                        LBIT ) )
-               ELSE IF( INIT ) THEN
-                  NSET = NSET + 1
-                  QUAL( I ) = NUM_ITOUB( IBSET( NUM_UBTOI( QUAL( I ) ),
-     :                                        LBIT ) )
-               ELSE IF( BTEST( NUM_UBTOI( QUAL( I ) ), LBIT ) ) THEN
-                  NSET = NSET + 1
-
-               END IF
-            END DO
-
-*  If good pixels are to be cleared...
          ELSE
 
+*  ... and if bad pixels are to be cleared...
+            IF( BAD ) THEN
+
 *  ...loop round each pixel in the two vectors.
-            DO I = 1, SIZE
-               IF( MASK( I ) .NE. VAL__BADR ) THEN
-                  QUAL( I ) = NUM_ITOUB( IBCLR( NUM_UBTOI( QUAL( I ) ),
-     :                                        LBIT ) )
-               ELSE IF( INIT ) THEN
-                  NSET = NSET + 1
-                  QUAL( I ) = NUM_ITOUB( IBSET( NUM_UBTOI( QUAL( I ) ),
-     :                                        LBIT ) )
-               ELSE IF( BTEST( NUM_UBTOI( QUAL( I ) ), LBIT ) ) THEN
-                  NSET = NSET + 1
+               DO I = 1, SIZE
+                  IF( MASK( I ) .EQ. VAL__BADR ) THEN
+                     QUAL( I ) = NUM_ITOUB( IBCLR(
+     :                                           NUM_UBTOI( QUAL( I ) ),
+     :                                           LBIT ) )
+                  ELSE IF( INIT ) THEN
+                     NSET = NSET + 1
+                     QUAL( I ) = NUM_ITOUB( IBSET(
+     :                                           NUM_UBTOI( QUAL( I ) ),
+     :                                           LBIT ) )
+                  ELSE IF( BTEST( NUM_UBTOI( QUAL( I ) ), LBIT ) ) THEN
+                     NSET = NSET + 1
 
-               END IF
-            END DO
+                  END IF
+               END DO
 
+*  If good pixels are to be cleared...
+            ELSE
+
+*  ...loop round each pixel in the two vectors.
+               DO I = 1, SIZE
+                  IF( MASK( I ) .NE. VAL__BADR ) THEN
+                     QUAL( I ) = NUM_ITOUB(
+     :                                    IBCLR( NUM_UBTOI( QUAL( I ) ),
+     :                                           LBIT ) )
+                  ELSE IF( INIT ) THEN
+                     NSET = NSET + 1
+                     QUAL( I ) = NUM_ITOUB(
+     :                                    IBSET( NUM_UBTOI( QUAL( I ) ),
+     :                                           LBIT ) )
+                  ELSE IF( BTEST( NUM_UBTOI( QUAL( I ) ), LBIT ) ) THEN
+                     NSET = NSET + 1
+
+                  END IF
+               END DO
+
+            END IF
+         END IF
+
+*  If BIT2 was not supplied...
+      ELSE
+         LBIT2 = BIT2 - 1
+
+*  If the bit is to be set...
+         IF( SET ) THEN
+
+*  ... and if bad pixels are to be set...
+            IF( BAD ) THEN
+
+*  ...loop round each pixel in the two vectors.
+               DO I = 1, SIZE
+                  IF( MASK( I ) .EQ. VAL__BADR ) THEN
+                     QUAL( I ) = NUM_ITOUB( IBCLR(
+     :                                    IBSET( NUM_UBTOI( QUAL( I ) ),
+     :                                           LBIT ), LBIT2 ) )
+                     NSET = NSET + 1
+                  ELSE IF( INIT ) THEN
+                     QUAL( I ) = NUM_ITOUB( IBSET(
+     :                                    IBCLR( NUM_UBTOI( QUAL( I ) ),
+     :                                           LBIT ), LBIT2 ) )
+                  ELSE IF(  BTEST( NUM_UBTOI( QUAL( I ) ), LBIT ) ) THEN
+                     NSET = NSET + 1
+                  END IF
+               END DO
+
+*  If good pixels are to be set...
+            ELSE
+
+*  ...loop round each pixel in the two vectors.
+               DO I = 1, SIZE
+                  IF( MASK( I ) .NE. VAL__BADR ) THEN
+                     QUAL( I ) = NUM_ITOUB( IBCLR(
+     :                                    IBSET( NUM_UBTOI( QUAL( I ) ),
+     :                                           LBIT ), LBIT2 ) )
+                     NSET = NSET + 1
+                  ELSE IF( INIT ) THEN
+                     QUAL( I ) = NUM_ITOUB( IBSET(
+     :                                    IBCLR( NUM_UBTOI( QUAL( I ) ),
+     :                                           LBIT ), LBIT2 ) )
+                  ELSE IF(  BTEST( NUM_UBTOI( QUAL( I ) ), LBIT ) ) THEN
+                     NSET = NSET + 1
+                  END IF
+               END DO
+
+            END IF
+
+*  If the bit is to be cleared...
+         ELSE
+
+*  ... and if bad pixels are to be cleared...
+            IF( BAD ) THEN
+
+*  ...loop round each pixel in the two vectors.
+               DO I = 1, SIZE
+                  IF( MASK( I ) .EQ. VAL__BADR ) THEN
+                     QUAL( I ) = NUM_ITOUB( IBSET(
+     :                                    IBCLR( NUM_UBTOI( QUAL( I ) ),
+     :                                           LBIT ), LBIT2 ) )
+                  ELSE IF( INIT ) THEN
+                     NSET = NSET + 1
+                     QUAL( I ) = NUM_ITOUB( IBCLR(
+     :                                    IBSET( NUM_UBTOI( QUAL( I ) ),
+     :                                           LBIT ), LBIT2 ) )
+                  ELSE IF( BTEST( NUM_UBTOI( QUAL( I ) ), LBIT ) ) THEN
+                     NSET = NSET + 1
+
+                  END IF
+               END DO
+
+*  If good pixels are to be cleared...
+            ELSE
+
+*  ...loop round each pixel in the two vectors.
+               DO I = 1, SIZE
+                  IF( MASK( I ) .NE. VAL__BADR ) THEN
+                     QUAL( I ) = NUM_ITOUB( IBSET(
+     :                                    IBCLR( NUM_UBTOI( QUAL( I ) ),
+     :                                           LBIT ), LBIT2 ) )
+                  ELSE IF( INIT ) THEN
+                     NSET = NSET + 1
+                     QUAL( I ) = NUM_ITOUB( IBCLR(
+     :                                    IBSET( NUM_UBTOI( QUAL( I ) ),
+     :                                           LBIT ), LBIT2 ) )
+                  ELSE IF( BTEST( NUM_UBTOI( QUAL( I ) ), LBIT ) ) THEN
+                     NSET = NSET + 1
+
+                  END IF
+               END DO
+
+            END IF
          END IF
       END IF
 
