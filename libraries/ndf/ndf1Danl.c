@@ -5,8 +5,8 @@
 #include "ary.h"
 #include "ary_err.h"
 #include "ndf_ast.h"
-#include "cnf.h"
 #include "mers.h"
+#include <string.h>
 
 void ndf1Danl( int dispos, NdfDCB **dcb, int *status ){
 /*
