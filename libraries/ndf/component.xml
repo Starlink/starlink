@@ -16,7 +16,7 @@
   additional user-defined information of any type.
     </p></abstract>
   <dependencies >
-    <build>sae</build><build>prm</build><build>hds</build><build>chr</build><build>ems</build><build>ary</build><build>ast</build><build>psx</build><build>generic</build><link>psx</link><link>ary</link><link>hds</link><link>ems</link><link>chr</link><link>prm</link><link>ast</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>pcs</build><build>cnf</build><build>prm</build><build>hds</build><build>ems</build><build>mers</build><build>ary</build><build>ast</build><build>par</build><build>sae</build><build>generic</build><link>pcs</link><link>cnf</link><link>prm</link><link>hds</link><link>ems</link><link>mers</link><link>ary</link><link>ast</link><link>par</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
