@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "dat_err.h"
-#include "hds1.h"
+#include "hds_types.h"
 #include "hds.h"
 #include "ems.h"
 #include "star/mem.h"
