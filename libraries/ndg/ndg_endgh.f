@@ -62,10 +62,10 @@
 *        New scheme for preventing a group from being written out more
 *        than once to a NDF - see NDG1_HWRGH.
 *     6-AUG-2018 (DSB):
-*        Fix bug introduced by previous change (2011!) that prevented 
-*        group history being written out to the second and subsequent 
-*        output NDFs created by an application. For instamce, this caused 
-*        no group history to be stored in "itermap" NDFs created by 
+*        Fix bug introduced by previous change (2011!) that prevented
+*        group history being written out to the second and subsequent
+*        output NDFs created by an application. For instamce, this caused
+*        no group history to be stored in "itermap" NDFs created by
 *        smurf:makemap.
 *     {enter_further_changes_here}
 
@@ -109,12 +109,21 @@
       INTEGER NPATH
       INTEGER PLACE
       LOGICAL HASHIS
+      LOGICAL UDHKMP
+      LOGICAL UGHKMP
       LOGICAL OLD
 *.
 
 *  Begin a new error reporting context (we want to clean up even if an
 *  error has occurred).
       CALL ERR_BEGIN( STATUS )
+
+*  Get sole access to the NDG globals
+      CALL NDG1_GLOCK( .TRUE. )
+
+*  Lock the global objects so they can be use by this thread.
+      CALL NDG1_ALOCK( .TRUE., DHKMP_COM2, UDHKMP, STATUS )
+      CALL NDG1_ALOCK( .TRUE., GHKMP_COM2, UGHKMP, STATUS )
 
 *  Remove the NDF event handlers needed to record the NDFs in which
 *  GRP history should be stored.
@@ -160,7 +169,7 @@
             END IF
          END IF
 
-*  Remove the current NDF path from the KeyMap. This is the key with 
+*  Remove the current NDF path from the KeyMap. This is the key with
 *  index 1, which means a new NDF path will then have index 1.
          CALL AST_MAPREMOVE( DHKMP_COM2, PATH, STATUS )
 
@@ -179,6 +188,9 @@
 * Now free the KeyMaps.
       CALL AST_ANNUL( GHKMP_COM2, STATUS )
       CALL AST_ANNUL( DHKMP_COM2, STATUS )
+
+*  Allow other threads to access the NDG globals
+      CALL NDG1_GLOCK( .FALSE. )
 
 *  End the error reporting context.
       CALL ERR_END( STATUS )

@@ -101,9 +101,22 @@
 
 *  Local Variables:
       INTEGER PKM
+      LOGICAL URDKMP             ! KeyMap unlocked on entry?
+      LOGICAL UWRKMP             ! KeyMap unlocked on entry?
+      LOGICAL UMPKMP             ! KeyMap unlocked on entry?
+      LOGICAL UDHKMP             ! KeyMap unlocked on entry?
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Lock the mutex that serialises access to NDG globals
+      CALL NDG1_GLOCK( .TRUE. )
+
+*  Now lock the required global AST objects
+      CALL NDG1_ALOCK( .TRUE., RDKMP_COM1, URDKMP, STATUS )
+      CALL NDG1_ALOCK( .TRUE., WRKMP_COM1, UWRKMP, STATUS )
+      CALL NDG1_ALOCK( .TRUE., MPKMP_COM1, UMPKMP, STATUS )
+      CALL NDG1_ALOCK( .TRUE., DHKMP_COM2, UDHKMP, STATUS )
 
 *  If the event was the opening of an input NDF( i.e. an existing NDF
 *  opened for READ or UPDATE mode), add the path to the NDF to the RDKMP_COM1
@@ -148,5 +161,15 @@
          CALL AST_MAPPUT0A( DHKMP_COM2, EVTEXT, PKM, ' ', STATUS )
          CALL AST_ANNUL( PKM, STATUS )
       END IF
+
+*  Now unlock the required global AST objects, but only if if they were
+*  unlocked on entry.
+      IF(URDKMP) CALL NDG1_ALOCK( .FALSE., RDKMP_COM1, URDKMP, STATUS )
+      IF(UWRKMP) CALL NDG1_ALOCK( .FALSE., WRKMP_COM1, UWRKMP, STATUS )
+      IF(UMPKMP) CALL NDG1_ALOCK( .FALSE., MPKMP_COM1, UMPKMP, STATUS )
+      IF(UDHKMP) CALL NDG1_ALOCK( .FALSE., DHKMP_COM2, UDHKMP, STATUS )
+
+*  Unlock the mutex that serialises access to NDG globals
+      CALL NDG1_GLOCK( .FALSE. )
 
       END

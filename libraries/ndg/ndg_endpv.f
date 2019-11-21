@@ -150,16 +150,27 @@
       LOGICAL INPRV
       LOGICAL OLD
       LOGICAL THERE
+      LOGICAL URDKMP
+      LOGICAL UWRKMP
+      LOGICAL UMPKMP
 *.
 
-*  Begin a new error reporting context (we want to clean up even if an
-*  error has occurred).
-      CALL ERR_BEGIN( STATUS )
+*  Get sole access to the NDG globals
+      CALL NDG1_GLOCK( .TRUE. )
+
+*  Lock the global objects so they can be use by this thread.
+      CALL NDG1_ALOCK( .TRUE., RDKMP_COM1, URDKMP, STATUS )
+      CALL NDG1_ALOCK( .TRUE., WRKMP_COM1, UWRKMP, STATUS )
+      CALL NDG1_ALOCK( .TRUE., MPKMP_COM1, UMPKMP, STATUS )
 
 *  Initialise things to avoid compiler warnings.
       THERE = .FALSE.
       INDF1 = NDF__NOID
       INDF2 = NDF__NOID
+
+*  Begin a new error reporting context (we want to clean up even if an
+*  error has occurred).
+      CALL ERR_BEGIN( STATUS )
 
 *  Remove the NDF event handlers needed to record the NDFs in which
 *  provenance should be stored.
@@ -370,5 +381,8 @@
       CALL AST_ANNUL( RDKMP_COM1, STATUS )
       CALL AST_ANNUL( MPKMP_COM1, STATUS )
       CALL AST_ANNUL( WRKMP_COM1, STATUS )
+
+*  Allow other threads to access the NDG globals
+      CALL NDG1_GLOCK( .FALSE. )
 
       END

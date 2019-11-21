@@ -81,10 +81,16 @@
 
 *  Local Variables:
       LOGICAL OLD
+      LOGICAL URDKMP
+      LOGICAL UWRKMP
+      LOGICAL UMPKMP
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Get sole access to the NDG globals
+      CALL NDG1_GLOCK( .TRUE. )
 
 *  Indicate that NDF event handlers needed to record the NDFs in which
 *  provenance should be stored have not yet been established, and then
@@ -109,5 +115,13 @@
 *  Create a AST KeyMap to hold the paths to the NDFs that have their Data
 *  array mapped for read or update access.
       MPKMP_COM1 = AST_KEYMAP( ' ', STATUS )
+
+*  Unlock them so they can be locked for use by another thread.
+      CALL NDG1_ALOCK( .FALSE., RDKMP_COM1, URDKMP, STATUS )
+      CALL NDG1_ALOCK( .FALSE., WRKMP_COM1, UWRKMP, STATUS )
+      CALL NDG1_ALOCK( .FALSE., MPKMP_COM1, UMPKMP, STATUS )
+
+*  Allow other threads to access the NDG globals
+      CALL NDG1_GLOCK( .FALSE. )
 
       END

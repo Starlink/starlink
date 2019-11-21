@@ -120,10 +120,19 @@
       INTEGER NPAR
       INTEGER NREM
       INTEGER PKM
+      LOGICAL UDHKMP
+      LOGICAL UGHKMP
 *.
 
 *  Check inherited status
       IF( STATUS .NE. SAI__OK ) RETURN
+
+*  Lock the mutex that serialises access to NDG globals
+      CALL NDG1_GLOCK( .TRUE. )
+
+*  Now lock the required global AST objects
+      CALL NDG1_ALOCK( .TRUE., DHKMP_COM2, UDHKMP, STATUS )
+      CALL NDG1_ALOCK( .TRUE., GHKMP_COM2, UGHKMP, STATUS )
 
 *  Get a pointer to a KeyMap holding the names of all the group parameters
 *  that have already been written out to the NDF's history component.
@@ -243,5 +252,13 @@
 
 *  Free resources.
       CALL AST_ANNUL( PKM, STATUS )
+
+*  Now unlock the global AST objects so they can be locked by another
+*  thread, but only if they were unlocked on entry.
+      IF(UDHKMP) CALL NDG1_ALOCK( .FALSE., DHKMP_COM2, UDHKMP, STATUS )
+      IF(UGHKMP) CALL NDG1_ALOCK( .FALSE., GHKMP_COM2, UGHKMP, STATUS )
+
+*  Unlock the mutex that serialises access to NDG globals
+      CALL NDG1_GLOCK( .FALSE. )
 
       END

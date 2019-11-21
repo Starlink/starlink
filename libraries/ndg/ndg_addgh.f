@@ -101,10 +101,17 @@
 *  Local Variables:
       INTEGER IGRP2
       CHARACTER CC*2
+      LOGICAL UGHKMP
 *.
 
 *  Check the inherited status
       IF( STATUS .NE. SAI__OK ) RETURN
+
+*  Lock the mutex that serialises access to NDG globals
+      CALL NDG1_GLOCK( .TRUE. )
+
+*  Now lock the required global AST objects
+      CALL NDG1_ALOCK( .TRUE., GHKMP_COM2, UGHKMP, STATUS )
 
 *  Check that GHKMP_COM2 is a valid AST KeyMap pointer. This will only be the
 *  case if NDG_BEGGH has been called previously.
@@ -145,5 +152,11 @@
          CALL ERR_ANNUL( STATUS )
 
       END IF
+
+*  Now unlock the global AST objects
+      IF(UGHKMP) CALL NDG1_ALOCK( .FALSE., GHKMP_COM2, UGHKMP, STATUS )
+
+*  Unlock the mutex that serialises access to NDG globals
+      CALL NDG1_GLOCK( .TRUE. )
 
       END

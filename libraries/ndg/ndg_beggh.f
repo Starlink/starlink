@@ -79,11 +79,16 @@
 
 *  Local Variables:
       LOGICAL OLD
+      LOGICAL UGHKMP
+      LOGICAL UDHKMP
 
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Get sole access to the NDG globals
+      CALL NDG1_GLOCK( .TRUE. )
 
 *  Record the initial value of the AUTO_HISTORY tuning parameter.
       CALL NDF_GTUNE( 'AUTO_HISTORY', AUTO_COM2, STATUS )
@@ -102,5 +107,12 @@
 *  Create a AST KeyMap to hold the paths to the NDFs to which default
 *  history has been written.
       DHKMP_COM2 = AST_KEYMAP( ' ', STATUS )
+
+*  Unlock them so they can be locked for use by another thread.
+      CALL NDG1_ALOCK( .FALSE., GHKMP_COM2, UGHKMP, STATUS )
+      CALL NDG1_ALOCK( .FALSE., DHKMP_COM2, UDHKMP, STATUS )
+
+*  Allow other threads to access the NDG globals
+      CALL NDG1_GLOCK( .FALSE. )
 
       END

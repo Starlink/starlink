@@ -82,10 +82,17 @@
 *  Local Variables:
       CHARACTER NDFNAM*255
       INTEGER NDFLEN
+      LOGICAL UDHKMP
 *.
 
 *  Check inherited status
       IF( STATUS .NE. SAI__OK ) RETURN
+
+*  Lock the mutex that serialises access to NDG globals
+      CALL NDG1_GLOCK( .TRUE. )
+
+*  Now lock the required global AST objects
+      CALL NDG1_ALOCK( .TRUE., DHKMP_COM2, UDHKMP, STATUS )
 
 *  Check that the supplied NDF is in the KeyMap holding the paths of NDFs
 *  to which default history has been written.
@@ -101,5 +108,12 @@
 
          END IF
       END IF
+
+*  Now unlock the global AST objects so that they can be used by other
+*  threads.
+      IF(UDHKMP) CALL NDG1_ALOCK( .FALSE., DHKMP_COM2, UDHKMP, STATUS )
+
+*  Unlock the mutex that serialises access to NDG globals
+      CALL NDG1_GLOCK( .TRUE. )
 
       END
