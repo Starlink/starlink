@@ -1,11 +1,31 @@
-/* -*- C -*- */
-
 #include "sae_par.h"
 #include "ndf.h"
 #include "cupid.h"
 #include "prm_par.h"
 #include "mers.h"
 #include <string.h>
+#include "star/thr.h"
+
+/* Local data types */
+typedef struct CGEN_FUNCTION(CupidSumClumpsData) {
+   CGEN_TYPE *in;
+   HDSLoc *cloc;
+   float *rmask;
+   hdsdim *clbnd;
+   hdsdim *cubnd;
+   hdsdim *lbnd;
+   hdsdim *step;
+   hdsdim iclump;
+   int alg;
+   int ndim;
+   int operation;
+   size_t p1;
+   size_t p2;
+   void *out;
+} CGEN_FUNCTION(CupidSumClumpsData);
+
+/* Prototypes for local functions */
+static void CGEN_FUNCTION(cupidSumClumpsPar)( void *job_data_ptr, int *status );
 
 /* Local Constants: */
 #define CLUMPFIND   1
@@ -13,8 +33,19 @@
 #define REINHOLD    3
 #define FELLWALKER  4
 
-void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim, hdsdim *lbnd,
-                                    hdsdim *ubnd, size_t nel, HDSLoc *obj,
+/* We only want the following to be declared once. So only declare them if
+   the current cgeneric data type is DOUBLE. */
+#if CGEN_CODE_TYPE == CGEN_DOUBLE_TYPE
+static pthread_mutex_t proceed_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t iclump_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t next_iclump = PTHREAD_COND_INITIALIZER;
+static hdsdim iclump_next = 0;
+static int clump_index = 0;
+#endif
+
+
+void CGEN_FUNCTION(cupidSumClumps)( ThrWorkForce *wf, CGEN_TYPE *in, int ndim,
+                                    hdsdim *lbnd, hdsdim *ubnd, size_t nel, HDSLoc *obj,
                                     float *rmask, void *out, const char *method,
                                     int *status ){
 /*
@@ -30,7 +61,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim, hdsdim *lbnd,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidSumClumps<X>( CGEN_TYPE *in, int ndim, hdsdim *lbnd,
+*     void cupidSumClumps<X>( ThrWorkForce *wf, CGEN_TYPE *in, int ndim, hdsdim *lbnd,
 *                             hdsdim *ubnd, size_t nel, HDSLoc *obj, float *rmask,
 *                             void *out, const char *method, int *status )
 
@@ -40,6 +71,8 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim, hdsdim *lbnd,
 *     are inside a clump.
 
 *  Parameters:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     in
 *        Pointer to the start of the input data array. May be null.
 *     ndim
@@ -82,6 +115,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim, hdsdim *lbnd,
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2019 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -112,6 +146,8 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim, hdsdim *lbnd,
 *        Plug NDF identifier leak.
 *     14-JAN-2009 (TIMJ):
 *        Use MERS for message filtering.
+*     18-NOV-2019 (DSB):
+*        Multi-threaded.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -121,29 +157,19 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim, hdsdim *lbnd,
 */
 
 /* Local Variables: */
-   CGEN_TYPE *pd;     /* Pointer to next element of the "out" array */
-   HDSLoc *cloc;      /* Locator for a cell of the NDF array */
-   char unit[ 10 ];   /* NDF Unit component */
-   double *ipd;       /* Pointer to data array in clump NDF */
-   double *m;         /* Pointer to next clump data value */
-   float *r;          /* Pointer to next element of the "rmask" array */
-   hdsdim cdim[ 3 ];  /* Pixel axis dimensions within clump NDF */
-   hdsdim clbnd[ 3 ]; /* Lower pixel bounds of clump NDF */
-   hdsdim cubnd[ 3 ]; /* Upper pixel bounds of clump NDF */
+   CGEN_FUNCTION(CupidSumClumpsData) *job_data = NULL; /* Job desriptions */
+   CGEN_FUNCTION(CupidSumClumpsData) *pdata; /* Pointer to a single job description */
+   HDSLoc *cloc = NULL;
    hdsdim j;          /* Clump loop count */
    hdsdim step[ 3 ];  /* 1D step between adjacent pixels on each axis */
-   hdsdim yy[ 3 ];    /* nD pixel coords of current "out" pixel */
-   int *pi;           /* Pointer to next element of the "out" array */
    int alg;           /* Specifies the algorithm */
-   int clump_index;   /* Index for current clump */
-   int cndim;         /* Number of pixel axes in clump NDF */
-   int indf;          /* NDF identifier for clump image */
+   int ijob;          /* Identifier for finished job */
+   int iw;            /* Index of worker thread */
+   int nfinished;     /* Number of finished jobs */
    int k;             /* Axis loop count */
-   size_t el;         /* Number of pixels in clump NDF */
-   size_t i;          /* 1D vector index loop count */
-   size_t ii;         /* 1D vector index of current "out" pixel */
+   int nw;            /* Number of worker threads */
    size_t nclump;     /* Number of clump NDFs supplied */
-
+   size_t pstep;      /* Number of pixels per thread */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -169,23 +195,57 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim, hdsdim *lbnd,
       return;
    }
 
-/* If supplied, initialise the "out" array to hold zero or bad values. */
-   pi = NULL;
-   pd = NULL;
-   if( out ) {
-      if( alg == GAUSSCLUMPS ) {
-         pd = (CGEN_TYPE *) out;
-         for( i = 0; i < nel; i++ ) *(pd++) = 0.0;
-      } else {
-         pi = (int *) out;
-         for( i = 0; i < nel; i++ ) *(pi++) = VAL__BADI;
+/* Decide how many worker threads we have. */
+   nw = wf ? wf->nworker : 1;
+
+/* Allocate job data for each worker thread. */
+   job_data = astCalloc( nw, sizeof(*job_data) );
+   if( job_data ) {
+
+/* Find how many elements to process in each  worker thread. */
+      pstep = nel/nw;
+      if( pstep == 0 ) pstep = 1;
+
+/* Store the range of elements to be processed by each one. Ensure that the
+   last thread picks up any left-over elements. */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         pdata->p1 = iw*pstep;
+         if( iw < nw - 1 ) {
+            pdata->p2 = pdata->p1 + pstep - 1;
+         } else {
+            pdata->p2 = nel - 1 ;
+         }
+         pdata->alg = alg;
       }
-   }
+
+/* If supplied, use the workforce to initialise the "out" array to hold
+   zero or bad values. */
+      if( out ) {
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->out = out;
+            pdata->operation = 1;
+            thrAddJob( wf, 0, pdata, CGEN_FUNCTION(cupidSumClumpsPar), 0, NULL,
+                       status );
+         }
+         thrWait( wf, status );
+      }
 
 /* If supplied, fill the "rmask" array with bad values. */
-   if( rmask ) {
-      r = rmask;
-      for( i = 0; i < nel; i++ ) *(r++) = VAL__BADR;
+      if( rmask ) {
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->rmask = rmask;
+            pdata->operation = 2;
+            thrAddJob( wf, 0, pdata, CGEN_FUNCTION(cupidSumClumpsPar), 0, NULL,
+                       status );
+         }
+         thrWait( wf, status );
+      }
+
+/* Free resources. */
+      job_data = astFree( job_data );
    }
 
 /* Set up the 1D vector step size for stepping between adjacent pixels on each
@@ -195,101 +255,387 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim, hdsdim *lbnd,
       step[ k ] = step[ k - 1 ]*( ubnd[ k - 1 ] - lbnd[ k - 1 ] + 1 );
    }
 
-/* Store a pointer of the relevant type to the output array. */
-   if( alg == GAUSSCLUMPS ) {
-      pd = (CGEN_TYPE *) out;
-
-   } else {
-      pi = (int *) out;
-   }
-
-/* Loop round all non-NULL clumps. */
-   clump_index = 0;
+/* Get the number of clumps in the supplied HDS object. */
    datSize( obj, &nclump, status );
+
+/* Loop round all clumps. */
+   iclump_next = 1;
+   nfinished = 0;
+   clump_index = 0;
    for( j = 1; j <= nclump; j++ ) {
-      cloc = NULL;
       datCell( obj, 1, &j, &cloc, status );
-      errBegin( status );
-      ndfFind( cloc, " ", &indf, status );
-      errEnd( status );
-      datAnnul( &cloc, status );
 
-      if( indf == NDF__NOID ) continue;
+/* We must now unlock the HDS object so that the worker threads can lock
+   it. This is because the current thread has a write lock on the object.
+   If the current thread had a read-only lock on the object it would not
+   be necessary to unlock it. */
+      datUnlock( cloc, 1, status );
 
-/* Also ignore any NDFs which have a value of "BAD" for the "Unit"
-   component. This isused as a flag for unusable clumps (e.g. clumps
-   that are smaller than the beam width or that touch areas of bad
-   pixels). */
-      unit[ 0 ]= 0;
-      ndfCget( indf, "Unit", unit, 9, status );
-      if( !strcmp( unit, "BAD" ) ) {
-         ndfAnnul( &indf, status );
-         continue;
+/* Create a structure describing the job to process the current clump. */
+      pdata = astMalloc( sizeof( *pdata ) );
+      if( pdata ) {
+         pdata->operation = 3;
+         pdata->cloc = cloc;
+         pdata->iclump = j;
+         pdata->ndim = ndim;
+         pdata->lbnd = lbnd;
+         pdata->step = step;
+         pdata->out = out;
+         pdata->in = in;
+         pdata->rmask = rmask;
+         pdata->clbnd = NULL;
+         pdata->cubnd = NULL;
+         pdata->alg = alg;
       }
 
-/* Increment the index to associate with this clump. */
-      clump_index++;
+/* Submit the job to process the current clump. Flag that the thrJobWait
+   function should wait for this job. */
+      thrAddJob( wf, THR__REPORT_JOB, pdata, CGEN_FUNCTION(cupidSumClumpsPar),
+                 0, NULL, status );
+
+/* Loop round waiting for jobs to finish until the difference between the
+   number of jobs submitted and the number of jobs completed is less than
+   four times the number of worker threads. This is to minimise resources
+   in use at any one time. */
+      while( j - nfinished > 4*nw ){
+         ijob = thrJobWait( wf, status );
+         nfinished++;
+
+/* Get the job data for the job that has just finished, re-lock the
+   object locator so that it can be access in this thread, then annull
+   the locator, then free the data structure. */
+         pdata = thrGetJobData( ijob, wf, status );
+         if( pdata ) {
+            datLock( pdata->cloc, 1, 0, status );
+            datAnnul( &(pdata->cloc), status );
+            pdata = astFree( pdata );
+         }
+      }
+   }
+
+/* Loop round wating  for the final group of clumps to be processed. */
+   ijob = thrJobWait( wf, status );
+   while( ijob != -1 ){
+
+/* Get the job data for the job that has just finished, re-lock the
+   object locator so that it can be access in this thread, then annull
+   the locator, then free the data structure. */
+      pdata = thrGetJobData( ijob, wf, status );
+      if( pdata ) {
+         datLock( pdata->cloc, 1, 0, status );
+         datAnnul( &(pdata->cloc), status );
+         pdata = astFree( pdata );
+      }
+
+/* Wait for the next job to finish. A job id of -1 is returned when there
+   are no remaining jobs. */
+      ijob = thrJobWait( wf, status );
+   }
+}
+
+static void CGEN_FUNCTION(cupidSumClumpsPar)( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     cupidSumClumpsPar<X>
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     cupidSumClumps
+
+*  Invocation:
+*     cupidSumClumpsPar<X>( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = CGEN_FUNCTION(CupidSumClumpsData) * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   CGEN_FUNCTION(CupidSumClumpsData) *jobdata;
+   CGEN_FUNCTION(CupidSumClumpsData) *pdata;
+   CGEN_TYPE *in;
+   CGEN_TYPE *pd;
+   char unit[ 10 ];   /* NDF Unit component */
+   double *ipd;       /* Pointer to data array in clump NDF */
+   double *m;         /* Pointer to next clump data value */
+   float *rmask;
+   hdsdim clbnd[ 3 ]; /* Lower pixel bounds of clump NDF */
+   hdsdim cubnd[ 3 ]; /* Upper pixel bounds of clump NDF */
+   hdsdim *lbnd;      /* Lower pixel bounds of main NDF */
+   hdsdim *step;      /* 1D step between adjacent pixels on each axis */
+   hdsdim cdim[ 3 ];  /* Pixel axis dimensions within clump NDF */
+   hdsdim iclump;
+   hdsdim yy[ 3 ];    /* nD pixel coords of current "out" pixel */
+   int *jobs;         /* List of identifiers for unfinished jobs */
+   int *pi;
+   int alg;           /* Specifies the algorithm */
+   int cndim;         /* Number of pixel axes in clump NDF */
+   int ijob;          /* Index of job within "jobs" list */
+   int indf;          /* NDF identifier for clump image */
+   int k;             /* Axis loop count */
+   int myclump_index;
+   int ndim;          /* Number of pixel axes in clump NDF */
+   int njob;          /* Length of "jobs" list */
+   int noverlap;      /* No. of existing jobs that overlap new clump */
+   int overlap;       /* Does job's clump overlap new clump? */
+   size_t el;         /* Number of pixels in clump NDF */
+   size_t i;          /* 1D vector index loop count */
+   size_t ii;         /* 1D vector index of current "out" pixel */
+   size_t p1;
+   size_t p2;
+   void *out;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (CGEN_FUNCTION(CupidSumClumpsData) *) job_data_ptr;
+
+/* Save data in local variables. */
+   alg = pdata->alg;
+
+/* Initialise the "out" array to hold  zero or bad values. */
+   if( pdata->operation == 1 ) {
+      p1 = pdata->p1;
+      p2 = pdata->p2;
+      pi = NULL;
+      pd = NULL;
+      if( alg == GAUSSCLUMPS ) {
+         pd = (CGEN_TYPE *) pdata->out;
+         for( i = p1; i <= p2; i++ ) *(pd++) = 0.0;
+      } else {
+         pi = (int *) pdata->out;
+         for( i = p1; i <= p2; i++ ) *(pi++) = VAL__BADI;
+      }
+
+/* Fill the "rmask" array with bad values. */
+   } else if( pdata->operation == 2 ) {
+      p1 = pdata->p1;
+      p2 = pdata->p2;
+      rmask = pdata->rmask;
+      for( i = p1; i <= p2; i++ ) *(rmask++) = VAL__BADR;
+
+/* Paste a clump into the output arrays */
+   } else if( pdata->operation == 3 ) {
+      iclump = pdata->iclump;
+      ndim = pdata->ndim;
+      lbnd = pdata->lbnd;
+      in = pdata->in;
+      step = pdata->step;
+      out = pdata->out;
+      rmask = pdata->rmask;
+      rmask = pdata->rmask;
+
+/* Store a pointer of the relevant type to the output array. */
+      if( alg == GAUSSCLUMPS ) {
+         pd = (CGEN_TYPE *) out;
+      } else {
+         pi = (int *) out;
+      }
+
+/* Lock the HDS object for read only access by this thread. */
+      datLock( pdata->cloc, 1, 1, status );
+
+/* Get an identifier for the NDF with index "iclump". */
+      ndfFind( pdata->cloc, " ", &indf, status );
+
+/* Annull any NDFs which have a value of "BAD" for the "Unit"
+   component. This is used as a flag for unusable clumps (e.g. clumps
+   that are smaller than the beam width or that touch areas of bad
+   pixels). */
+      if( indf != NDF__NOID ) {
+         unit[ 0 ] = 0;
+         ndfCget( indf, "Unit", unit, 9, status );
+         if( !strcmp( unit, "BAD" ) ) ndfAnnul( &indf, status );
+      }
+
+/* We now know if the NDF is unusable (indicated by its identifier being
+   NDF__NOID). If it is usable, we want to claim the next clump index.
+   Otherwise, we indicate that the next job is free to claim the next clump
+   index. This is done to ensure that there is a monotonic relationship
+   between "iclump" and "clump_index". Lock the iclump mutex. */
+      thrMutexLock( &iclump_mutex, status );
+
+/* Loop until this job has permission to claim the next clump index. The
+   "iclump_next" global holds the "iclump" value of the job that has
+   permission to claim the next clump index. */
+      while( iclump_next < iclump && *status == SAI__OK ){
+
+/* We do not yet have permission, so block until another job broadcasts
+   the "next_iclump" signal. This call will unlock the iclump mutex, go to
+   sleep, wake up and then lock the iclump_mutex.  */
+         thrCondWait( &next_iclump, &iclump_mutex, status );
+      }
+
+/* This job now has permission to claim the next clump index. If the NDF
+   is usable, get the clump index to use within this job, incrementing the
+   next available clump index. If the NDF is unusable, we leave the next
+   available clump index unchanged. */
+      myclump_index = ( indf != NDF__NOID ) ? (clump_index++) : 0;
+
+/* Modify iclump_next to indicate the job associated with the next iclump
+   value now has permission to claim the next clump index. Broadcast the
+   next_iclump signal to wake up all jobs that are waiting for permission
+   to get a clump index, then release the iclump mutex so that each of those
+   jobs can lock the mutex in turn. */
+      iclump_next++;
+      thrCondBroadcast( &next_iclump, status );
+      thrMutexUnlock( &iclump_mutex, status );
+
+/* Process the NDF if it is usable. */
+      if( indf != NDF__NOID ) {
 
 /* Get the bounds and dimensions of the clump's NDF. */
-      ndfBound( indf, 3, clbnd, cubnd, &cndim, status );
-      for( k = 0; k < ndim; k++ ) cdim[ k ] = cubnd[ k ] - clbnd[ k ] + 1;
+         ndfBound( indf, 3, clbnd, cubnd, &cndim, status );
+         for( k = 0; k < ndim; k++ ) cdim[ k ] = cubnd[ k ] - clbnd[ k ] + 1;
 
-/* Map its DATA component. */
-      ndfMap( indf, "DATA", "_DOUBLE", "READ", (void *) &ipd, &el, status );
-      if( ipd ) {
+/* We cannot proceed if any unfinished job is already writing to the same
+   part of the array covered by this clump. If any such jobs exist, we
+   block here until those jobs have finished. Lock a mutex to guard
+   against other jobs starting to write to our part of the array whilst
+   we are doing the check. */
+         thrMutexLock( &proceed_mutex, status );
+
+/* Store the bounds and the clump index in the job data. */
+         pdata->clbnd = clbnd;
+         pdata->cubnd = cubnd;
+
+/* Get a list of the submitted jobs that have not yet finished. */
+         jobs = thrGetJobs( NULL, THR__ACTIVE|THR__AVAILABLE|THR__WAITING,
+                            &njob, status );
+
+/* Loop round all the unfinished jobs, looking for any that process an
+   area overlapping the area of the current job. */
+int myjob = -2;
+         noverlap = 0;
+         for( ijob = 0; ijob < njob; ijob++ ) {
+
+/* Get a pointer to the job data structure. Ignore jobs that have not yet
+   got as far as determining their bounds (as shown by a non-NULL clbnd
+   value). Also ignore the current job. Any such job that overlaps this
+   job will only be allowed to proceed when this job has finished. */
+            jobdata = thrGetJobData( jobs[ ijob ], NULL, status );
+
+if( jobdata == pdata ) myjob = jobs[ ijob ];
+
+
+            if( jobdata && jobdata->clbnd && jobdata != pdata ) {
+
+/* See if the unfinished job's clump overlaps the current clump. */
+               overlap = 1;
+               for( k = 0; k < ndim; k++ ) {
+                  if( clbnd[ k ] > jobdata->cubnd[ k ] ||
+                      cubnd[ k ] < jobdata->clbnd[ k ] ){
+                     overlap = 0;
+                     break;
+                  }
+               }
+
+            } else {
+               overlap = 0;
+            }
+
+/* If it does not overlap, nullify the job in the list by setting its
+   identifier to -1. Count the number of overlapping clumps. */
+            if( !overlap ) {
+               jobs[ ijob ] = -1;
+            } else {
+               noverlap++;
+            }
+         }
+
+/* If the clump for the current job overlaps any unfinished clumps, the
+   current job should not proceed until all the unfinished jobs for
+   overlapping clumps have finished. Create a list of such jobs by
+   removing the "-1" values from the "jobs" list. */
+         k = -1;
+         for( ijob = 0; ijob < noverlap; ijob++ ) {
+            while( jobs[ ++k ] == -1 );
+            jobs[ ijob ] = jobs[ k ];
+         }
+
+/* Release the mutex to allow other threads to check if they are allowed
+   to proceed, then block the current thread until all unfinished jobs
+   for an overlapping area have finished. */
+         thrMutexUnlock( &proceed_mutex, status );
+         thrHaltJob( NULL, noverlap, jobs, status );
+
+/* We arrive here once there are no unfinished jobs for overlapping
+   areas, so we are free to write into the output arrays without danger
+   of other threads writing into the same pixels at the same time. Free
+   the job list. */
+         jobs = astFree( jobs );
+
+/* Map the NDFs DATA component. */
+         ndfMap( indf, "DATA", "_DOUBLE", "READ", (void *) &ipd, &el, status );
+         if( ipd ) {
 
 /* Initialise the n-D pixel coords of the first pixel in "ipd". Also, set
    the 1D vector index within "in/out/rmask" of the first pixel in
    "ipd". This assumes fortran pixel ordering. */
-         ii = 0;
-         for( k = 0; k < ndim; k++ ) {
-            yy[ k ] = clbnd[ k ];
-            ii += ( clbnd[ k ] - lbnd[ k ] )*step[ k ];
-         }
+            ii = 0;
+            for( k = 0; k < ndim; k++ ) {
+               yy[ k ] = clbnd[ k ];
+               ii += ( clbnd[ k ] - lbnd[ k ] )*step[ k ];
+            }
 
 /* Loop round every pixel in the clump image. */
-         m = ipd;
-         for( i = 0; i < el; i++, m++ ) {
+            m = ipd;
+            for( i = 0; i < el; i++, m++ ) {
 
 /* Skip bad pixels */
-            if( *m != VAL__BADD ) {
+               if( *m != VAL__BADD ) {
 
 /* If we are producing an output array and if the input pixel is good,
    modify the corresponding output pixel. */
-               if( out && ( !in || in[ ii ] != CGEN_BAD ) ) {
+                  if( out && ( !in || in[ ii ] != CGEN_BAD ) ) {
 
 /* For GaussClumps, increment the current output pixel value by the model
    value. */
-                  if( alg == GAUSSCLUMPS ) {
-                     pd[ ii ] += *m;
+                     if( alg == GAUSSCLUMPS ) {
+                        pd[ ii ] += *m;
 
 /* For ClumpFind, etc, store the clump index. */
-                  } else {
-                     pi[ ii ] = clump_index;
+                     } else {
+                        pi[ ii ] = myclump_index;
+                     }
                   }
-               }
 
 /* If required, store 1.0 in the "rmask" array. */
-               if( rmask ) rmask[ ii ] = 1.0;
-            }
+                  if( rmask ) rmask[ ii ] = 1.0;
+               }
 
 /* Move on to the next pixel. */
-            k = 0;
-            yy[ 0 ]++;
-            ii++;
-            while( yy[ k ] > cubnd[ k ] ) {
-               yy[ k ] = clbnd[ k ];
-               ii -= cdim[ k ]*step[ k ];
-               k++;
-               if( k == ndim ) break;
-               yy[ k ]++;
-               ii += step[ k ];
+               k = 0;
+               yy[ 0 ]++;
+               ii++;
+               while( yy[ k ] > cubnd[ k ] ) {
+                  yy[ k ] = clbnd[ k ];
+                  ii -= cdim[ k ]*step[ k ];
+                  k++;
+                  if( k == ndim ) break;
+                  yy[ k ]++;
+                  ii += step[ k ];
+               }
             }
          }
-      }
 
 /* Annul the NDF identifier. */
-      ndfAnnul( &indf, status );
+         ndfAnnul( &indf, status );
+      }
+
+/* Unlock the HDS object. */
+      datUnlock( pdata->cloc, 1, status );
+
+   } else {
+      *status = SAI__ERROR;
+      errRepf( "", "cupidSumClumps: Illegal operation %d (cupid programming error).",
+               status, pdata->operation );
    }
 }
 
@@ -298,3 +644,4 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim, hdsdim *lbnd,
 #undef GAUSSCLUMPS
 #undef REINHOLD
 #undef FELLWALKER
+

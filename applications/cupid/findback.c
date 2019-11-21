@@ -2,6 +2,7 @@
 #include "mers.h"
 #include "ndf.h"
 #include "star/ndg.h"
+#include "star/thr.h"
 #include "star/kaplibs.h"
 #include "star/grp.h"
 #include "star/thr.h"
@@ -189,6 +190,8 @@ void findback( int *status ){
 *        - Added parameter WLIM.
 *        - Fixed incorrect lower bounds when any insignificant axes are
 *        present (this only affected debugging tools).
+*     21-NOV-2019 (DSB):
+*        Multi-thread the noise calculation.
 *     {enter_further_changes_here}
 
 *-
@@ -406,7 +409,7 @@ void findback( int *status ){
 
       } else {
          ipv = NULL;
-         rms = cupidRms( type, ipdin, el, sdim[ 0 ], status );
+         rms = cupidRms( type, wf, ipdin, el, sdim[ 0 ], status );
       }
 
 /* Set the default RMS noise level. */

@@ -51,6 +51,7 @@
 #include "ast.h"
 #include "star/grp.h"
 #include "star/hds.h"
+#include "star/thr.h"
 #include "msg_par.h"
 
 /* Constants */
@@ -264,7 +265,7 @@ CupidPixelSet *cupidCFDeletePS( CupidPixelSet *, int * );
 CupidPixelSet *cupidCFFreePS( CupidPixelSet *, int *, int, int * );
 CupidPixelSet *cupidCFMakePS( int, int * );
 HDSLoc *cupidClumpFind( int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, int, double[3], int *, int * );
-HDSLoc *cupidFellWalker( int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, int, double[3], int * );
+HDSLoc *cupidFellWalker( ThrWorkForce *, int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, int, double[3], int * );
 HDSLoc *cupidGaussClumps( int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, double[3], int * );
 HDSLoc *cupidReinhold( int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, double[3], int * );
 double *cupidCFLevels( AstKeyMap *, double, double, double, int *, int * );
@@ -274,8 +275,8 @@ double cupidConfigRMS( AstKeyMap *, const char *, double, double, int * );
 double cupidGCChiSq( int, double *, int, int, int * );
 double cupidGCModel( int, double *, double *, int, int, int, int * );
 float cupidRanVal( int, float[2], int * );
-int *cupidRCA( int *, int *, size_t, hdsdim[ 3 ], size_t[ 3 ], double, int, int, int, int, int * );
-int *cupidRCA2( int *, int *, size_t, hdsdim[ 3 ], size_t[ 3 ], int * );
+int *cupidRCA( ThrWorkForce *, int *, int *, size_t, hdsdim[ 3 ], size_t[ 3 ], double, int, int, int, int, int * );
+int *cupidRCA2( ThrWorkForce *, int *, int *, size_t, hdsdim[ 3 ], size_t[ 3 ], int * );
 int cupidCFErode( CupidPixelSet *, int *, int, hdsdim *, size_t[3], int, int, CupidPixelSet **, int * );
 int cupidCFXtend( CupidPixelSet *, CupidPixelSet *, int *, int, int *, int[3], int, CupidPixelSet **, int * );
 int cupidConfigI( AstKeyMap *, const char *, int, int * );

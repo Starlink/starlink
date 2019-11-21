@@ -1,14 +1,66 @@
 #include "sae_par.h"
+#include "star/thr.h"
 #include "cupid.h"
 #include "ast.h"
 #include "mers.h"
 #include <string.h>
 #include <math.h>
 
-int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, size_t nel, int ndim,
-                                hdsdim dims[ 3 ], hdsdim skip[ 3 ], hdsdim slbnd[ 3 ],
-                                double rms, AstKeyMap *config, int *ipa,
-                                int perspectrum, int *status ){
+/* The following we want declared separately for each cgeneric data type */
+
+typedef struct CGEN_FUNCTION(CupidFWMainData) {
+   CGEN_TYPE *array;
+   double flat_slope;
+   double noise;
+   double sea_level;
+   hdsdim *dims;
+   hdsdim *slbnd;
+   hdsdim maxjump;
+   int *work;
+   int debug3;
+   int verb;
+   int dump_peak;
+   int ndim;
+   int operation;
+   int perspectrum;
+   size_t *skip;
+   size_t bsizex;
+   size_t bsizez;
+   size_t bsizey;
+   size_t dump_walk;
+   size_t lbnd[3];
+   size_t nel;
+   size_t p1;
+   size_t p2;
+   size_t rep_interval;
+   size_t ubnd[3];
+   int ijob;
+} CGEN_FUNCTION(CupidFWMainData);
+
+static void CGEN_FUNCTION(cupidFWMainPar)( void *job_data_ptr, int *status );
+
+
+
+/* We only want the following to be declared once. So only declare them if
+   the current cgeneric data type is DOUBLE. */
+#if CGEN_CODE_TYPE == CGEN_DOUBLE_TYPE
+static pthread_mutex_t report_mutex = PTHREAD_MUTEX_INITIALIZER;
+static size_t total = 0;  /* Number of pixels processed so far */
+static int lpercent = 0;  /* Previous displayed percent value */
+
+static pthread_mutex_t work_mutex = PTHREAD_MUTEX_INITIALIZER;
+static int ret;           /* The highest clump index value in "ipa" */
+
+#endif
+
+
+
+
+
+int CGEN_FUNCTION(cupidFWMain)( ThrWorkForce *wf, CGEN_TYPE *array, size_t nel,
+                                int ndim, hdsdim dims[ 3 ], size_t skip[ 3 ],
+                                hdsdim slbnd[ 3 ], double rms, AstKeyMap *config,
+                                int *ipa, int perspectrum, int *status ){
 /*
 *+
 *  Name:
@@ -21,10 +73,10 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, size_t nel, int ndim,
 *     Starlink C
 
 *  Synopsis:
-*     int cupidFWMain<X>( CGEN_TYPE *array, size_t nel, int ndim, hdsdim dims[ 3 ],
-*                         hdsdim skip[ 3 ], hdsdim slbnd[ 3 ], double rms,
-*                         AstKeyMap *config, int *ipa,
-*                         int perspectrum, int *status )
+*     int cupidFWMain<X>( ThrWorkForce *wf, CGEN_TYPE *array, size_t nel,
+*                         int ndim, hdsdim dims[ 3 ], size_t skip[ 3 ],
+*                         hdsdim slbnd[ 3 ], double rms, AstKeyMap *config,
+*                         int *ipa, int perspectrum, int *status )
 
 *  Description:
 *     This function decide which clump each data pixel belongs to and fills
@@ -50,6 +102,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, size_t nel, int ndim,
 *     other routes using them.
 
 *  Parameters:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     array
 *        The array containing the data to be scanned. The elements should
 *        be ordered according to Fortran order (first axis varying most
@@ -152,6 +206,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, size_t nel, int ndim,
 *        peak is first reached or after a walk from a nominated starting
 *        pixel has been completed. These are specified via new configuration
 *        parameters DUMPPEAK and DUMPWALK.
+*     21-NOV-2019 (DSB):
+*        Multi-thread.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -161,24 +217,368 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, size_t nel, int ndim,
 */
 
 /* Local Variables: */
-   CGEN_TYPE *pd;  /* Pointer to next "array" value */
-   double flat[ 3 ];/* Array containing most recent data values along route */
+   CGEN_FUNCTION(CupidFWMainData) *job_data = NULL; /* Job desriptions */
+   CGEN_FUNCTION(CupidFWMainData) *pdata; /* Pointer to a single job description */
+   double a;       /* Temporary value */
    double flat_slope;/* Lowest gradient which marks the start of the walk */
    double frac;    /* Min fraction of neighbouring good pixels */
-   double g;       /* Gradient from central pixel to neighbouring pixel */
-   double h;       /* Pixel data value (i.e. "height" of a pixel) */
-   double maxg;    /* Maximum gradient found so far */
    double noise;   /* Data value at which each route commences */
    double sea_level;/* Data values less than this are at "sea level" */
-   hdsdim count;   /* Number of pixels checked */
-   hdsdim dump_walk;  /* The starting pixel at which to dump the clump assignment array */
+   hdsdim maxjump; /* Longest jump to a higher neighbouring pixel */
+   int *m1;        /* Pointer to input array */
+   int *m2;        /* Pointer to output array */
+   int *m3;        /* Pointer used to swap arrays */
+   int *work;      /* Work array */
+   int cleaniter;  /* Number of cleaning  iterations to perform */
+   int debug3;     /* Are we displaying level 3 debug info? */
+   int verb;       /* Are we displaying verbose info? */
+   int dump_peak;  /* The clump index at which to dump the clump assignment array */
+   int ibx;        /* Index of block along X axis*/
+   int iby;        /* Index of block along Y axis*/
+   int ibz;        /* Index of block along Z axis*/
+   int iter;       /* Iteration count */
+   int iw;         /* Index of worker thread */
+   int nbx;        /* Number of blocks along X axis of the array */
+   int nby;        /* Number of blocks along Y axis of the array */
+   int nbz;        /* Number of blocks along Z axis of the array */
+   int nw;         /* Number of worker threads */
+   size_t bsizex;  /* No. o fpixels along the X axis of a single block */
+   size_t bsizey;  /* No. o fpixels along the Y axis of a single block */
+   size_t bsizez;  /* No. o fpixels along the Z axis of a single block */
+   size_t dump_walk;/* The starting pixel at which to dump the clump assignment array */
+   size_t step;    /* Elements per thread */
+
+/* Initialise */
+   ret = 0;
+
+/* For speed, get local flags indicating if we are displaying level
+   3 debugging info or verbose info. */
+   debug3 = msgFlevok( MSG__DEBUG2, status );
+   verb = msgFlevok( MSG__VERB, status );
+
+/* See if the user wants to dump the clump assignment array after a
+   specified peak is reached for the first time. The supplied value is
+   the clump index. */
+   dump_peak = cupidConfigI( config, "DUMPPEAK", 0, status );
+
+/* See if the user wants to dump the clump assignment array after the
+   walk from a specified pixel has been completed. The supplied value is
+   the zero-based vector index of the start pixel. */
+   dump_walk = (size_t) cupidConfigI( config, "DUMPWALK", -1, status );
+
+/* Abort if an error has already occurred. */
+   if( *status != SAI__OK ) return ret;
+
+/* Get the lowest data value to be considered. */
+   noise = cupidConfigRMS( config, "NOISE", rms, 2.0*rms, status );
+
+/* Get the largest jump (in pixels) which can be made from a local maximum
+   to a higher maximum in the neighbourhood of the first maximum. */
+   maxjump = cupidConfigI( config, "MAXJUMP", 4, status );
+
+/* Get the difference in data value between adjacent pixels which marks
+   the start of a walk. Any initial section of the walk which has an
+   average gradient (measured over 4 steps) less than this value is not
+   assigned to any clump. */
+   flat_slope = cupidConfigRMS( config, "FLATSLOPE", rms, rms, status );
+
+/* Walks which start at low level are ignored until they achieve the
+   gradient specified by FLATSLOPE. Walks which start at high level are
+   used in their entirety. Store the data value which marks the break
+   between high and low level. */
+   sea_level = noise + 2*rms;
+
+/* Use the supplied workforce to fill the supplied "ipa" array with -1 for
+   all pixels which are below the threshold, or are bad. Fill all other pixels
+   with zero to indicate that the pixel is "usable but not yet checked".
+   First decide how many worker threads we have. */
+   nw = wf ? wf->nworker : 1;
+
+/* Allocate job data for each worker thread. */
+   job_data = astCalloc( nw, sizeof(*job_data) );
+   if( job_data ) {
+
+/* Find how many elements to process in each worker thread. */
+      step = nel/nw;
+      if( step == 0 ) step = 1;
+
+/* Store the range of elements to be processed by each one. Ensure that the
+   last thread picks up any left-over elements. */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         pdata->p1 = iw*step;
+         if( iw < nw - 1 ) {
+            pdata->p2 = pdata->p1 + step - 1;
+         } else {
+            pdata->p2 = nel - 1 ;
+         }
+
+/* Store the other information needed to process the group of elements. */
+         pdata->array = array;
+         pdata->noise = noise;
+         pdata->work = ipa;
+         pdata->operation = 1;
+
+/* Submit the job to be processed by the next available worker thread. */
+         thrAddJob( wf, 0, pdata, CGEN_FUNCTION(cupidFWMainPar), 0, NULL,
+                    status );
+      }
+
+/* Wait for all jobs to complete. */
+      thrWait( wf, status );
+   }
+
+/* If required, dump the mask indicating which pixel are below the threshold. */
+   if( msgFlevok( MSG__DEBUG2, status ) ) {
+      cupidDumpI( ipa, ndim, dims, slbnd, "initial mask", status );
+   }
+
+/* Use a cellular automata to remove small isolated groups of usable
+   pixels from the above "ipa" array. This allocates new memory for the
+   cleaned up array. */
+   msgOutif( MSG__VERB, "", "Removing isolated pixels\n", status );
+
+   if( ndim == 1 ) {
+      frac = 0.5;
+   } else if( ndim == 2 ) {
+      frac = 0.25;
+   } else {
+      frac = 0.1;
+   }
+
+   work = cupidRCA( wf, ipa, NULL, nel, dims, skip, frac, VAL__MAXI, 0, -1, 1, status );
+
+/* If required, dump the mask resulting from the above cleaning. */
+   if( msgFlevok( MSG__DEBUG2, status ) ) {
+      cupidDumpI( work, ndim, dims, slbnd, "cleaned initial mask", status );
+   }
+
+/* Prepare progress report. */
+   msgOutif( MSG__VERB, "", "Walking...\n", status );
+
+/* Decide on the dimensions of the block to be processed by each
+   worker thread. The target is for each block to have the same shape
+   as the total cube. */
+   if( ndim == 3 ) {
+      a = nel*dims[ 0 ]*dims[ 0 ];
+      a /= nw*dims[ 1 ]*dims[ 2 ];
+      a = pow( a, 0.3333333 );
+      bsizex = (size_t)( a + 0.5 );
+      bsizey = a*dims[ 1 ]/dims[ 0 ];
+      bsizez = a*dims[ 2 ]/dims[ 0 ];
+      if( bsizex < 1 ) bsizex = 1;
+      if( bsizey < 1 ) bsizey = 1;
+      if( bsizez < 1 ) bsizez = 1;
+
+   } else if( ndim == 2 ) {
+      a = nel*dims[ 0 ];
+      a /= nw*dims[ 1 ];
+      a = pow( a, 0.5 );
+      bsizex = (size_t)( a + 0.5 );
+      bsizey = a*dims[ 1 ]/dims[ 0 ];
+      if( bsizex < 1 ) bsizex = 1;
+      if( bsizey < 1 ) bsizey = 1;
+      bsizez = 1;
+
+   } else {
+      a = nel;
+      a /= nw;
+      bsizex = (size_t)( a + 0.5 );
+      if( bsizex < 1 ) bsizex = 1;
+      bsizey = 1;
+      bsizez = 1;
+   }
+
+/* Number of blocks on each axis (round up). */
+   nbx = 1 + ( dims[ 0 ] - 1 )/bsizex;
+   nby = 1 + ( dims[ 1 ] - 1 )/bsizey;
+   nbz = 1 + ( dims[ 2 ] - 1 )/bsizez;
+
+/* Adjust the block sizes to make the block dimensions equal. */
+   bsizex = dims[ 0 ]/nbx;
+   bsizey = dims[ 1 ]/nby;
+   bsizez = dims[ 2 ]/nbz;
+
+/* Submit the jobs to the workforce to do the walking. */
+   if( *status == SAI__OK ) {
+
+/* Loop over all blocks. We submit the jobs this way because the number of
+   blocks is probably not equal to the number of worker threads. */
+int ijob = 0;
+      for( ibz = 0; ibz < nbz; ibz++ ) {
+         for( iby = 0; iby < nby; iby++ ) {
+            for( ibx = 0; ibx < nbx; ibx++ ) {
+
+/* Allocate a structure to describe the job that processes the current
+   block */
+               pdata = astMalloc( sizeof( CGEN_FUNCTION(CupidFWMainData) ) );
+               if( pdata ) {
+
+/* Get the bounds of the current block on all 3 axes. The final block on
+   any axis picks up any left over pixels */
+                  pdata->lbnd[ 0 ] = 1 + ibx*bsizex;
+                  if( ibx < nbx - 1 ) {
+                     pdata->ubnd[ 0 ] = pdata->lbnd[ 0 ] + bsizex - 1;
+                  } else {
+                     pdata->ubnd[ 0 ] = dims[ 0 ];
+                  }
+
+                  pdata->lbnd[ 1 ] = 1 + iby*bsizey;
+                  if( iby < nby - 1 ) {
+                     pdata->ubnd[ 1 ] = pdata->lbnd[ 1 ] + bsizey - 1;
+                  } else {
+                     pdata->ubnd[ 1 ] = dims[ 1 ];
+                  }
+
+                  pdata->lbnd[ 2 ] = 1 + ibz*bsizez;
+                  if( ibz < nbz - 1 ) {
+                     pdata->ubnd[ 2 ] = pdata->lbnd[ 2 ] + bsizez - 1;
+                  } else {
+                     pdata->ubnd[ 2 ] = dims[ 2 ];
+                  }
+
+/* Store other values required by the worker thread. */
+                  pdata->operation = 2;
+                  pdata->flat_slope = flat_slope;
+                  pdata->ndim = ndim;
+                  pdata->array = array;
+                  pdata->skip = skip;
+                  pdata->slbnd = slbnd;
+                  pdata->dump_peak = dump_peak;
+                  pdata->dump_walk = dump_walk;
+                  pdata->nel = nel;
+                  pdata->bsizex = bsizex;
+                  pdata->bsizey = bsizey;
+                  pdata->bsizez = bsizez;
+                  pdata->debug3 = debug3;
+                  pdata->verb = verb;
+                  pdata->perspectrum = perspectrum;
+                  pdata->maxjump = maxjump;
+                  pdata->sea_level = sea_level;
+                  pdata->work = work;
+                  pdata->dims = dims;
+                  pdata->rep_interval = (nel>100000)?(0.01*nel):1000;
+pdata->ijob = ijob++;
+
+/* Submit the job to the workforce. Flag that the job data structure
+   should be freed when the job is completed. */
+                  thrAddJob( wf, THR__FREE_JOBDATA, pdata,
+                             CGEN_FUNCTION(cupidFWMainPar), 0, NULL, status );
+               }
+            }
+         }
+      }
+
+/* Wait for all jobs to complete. */
+      thrWait( wf, status );
+   }
+
+/* Report completion of walk. */
+   msgBlankif( MSG__VERB, status );
+
+/* If required, dump the unmerged clump mask. */
+   if( msgFlevok( MSG__DEBUG2, status ) ) {
+      cupidDumpI( work, ndim, dims, slbnd, "raw clump mask", status );
+   }
+
+/* Amalgamate adjoining clumps if there is no significant dip between the
+   clumps. */
+   msgOutif( MSG__VERB, "", "Merging adjoining clumps", status );
+   CGEN_FUNCTION(cupidFWJoin)( array, nel, ndim, dims, skip, rms, config,
+                               work, &ret, perspectrum, status );
+   msgOutif( MSG__VERB, "", "Merging completed", status );
+
+/* If required, dump the merged clump mask. */
+   if( msgFlevok( MSG__DEBUG2, status ) ) {
+      cupidDumpI( work, ndim, dims, slbnd, "merged but uncleaned clump mask",
+                  status );
+   }
+
+/* Smooth the boundaries between the clumps. This cellular automata replaces
+   each output pixels by the most commonly occuring value within a 3x3x3
+   cube of input pixels centred on the output pixel. Repeat this process
+   a number of times as given by configuration parameter CleanIter. */
+   if( ! perspectrum ) {
+      cleaniter = cupidConfigI( config, "CLEANITER", 1, status );
+   } else {
+      cleaniter = 0;
+   }
+
+   msgOutif( MSG__VERB, "", "Cleaning clumps", status );
+   m1 = work;
+   m2 = ipa;
+   for( iter = 0; iter < cleaniter; iter++ ) {
+      (void) cupidRCA2( wf, m1, m2, nel, dims, skip, status );
+      m3 = m1;
+      m1 = m2;
+      m2 = m3;
+      msgSeti( "I", iter + 1 );
+      msgSeti( "J", cleaniter );
+      msgOutif( MSG__VERB, "",
+                "Completed cleaning iteration ^I of ^J", status );
+   }
+
+/* If the final results are not now in the "ipa" array, copy them to the
+   "ipa" array. */
+   if( m1 != ipa ) memcpy( ipa, work, sizeof( int )*nel );
+
+/* If required, dump the cleaned clump mask. */
+   if( msgFlevok( MSG__DEBUG2, status ) ) {
+      cupidDumpI( ipa, ndim, dims, slbnd, "cleaned clump mask", status );
+   }
+
+/* Free resources. */
+   work = astFree( work );
+   job_data = astFree( job_data );
+
+/* Return the highest clump index in "ipa". */
+   return ret;
+
+}
+
+
+
+
+
+
+static void CGEN_FUNCTION(cupidFWMainPar)( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     cupidFWMainPar<X>
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     cupidFWMain
+
+*  Invocation:
+*     cupidFWMainPar<X>( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = CGEN_FUNCTION(CupidFWMainData) * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   CGEN_FUNCTION(CupidFWMainData) *pdata; /* Structure containing job info */
+   CGEN_TYPE *array;  /* Pointer to array of data values */
+   CGEN_TYPE *pd;     /* Pointer to next "array" value */
+   double flat[ 3 ];  /* Array containing most recent data values along route */
+   double flat_slope; /* Lowest gradient which marks the start of the walk */
+   double g;          /* Gradient from central pixel to neighbouring pixel */
+   double h;          /* Pixel data value (i.e. "height" of a pixel) */
+   double maxg;       /* Maximum gradient found so far */
+   double noise;      /* Data value at which each route commences */
+   double sea_level;  /* Data values less than this are at "sea level" */
+   hdsdim *dims;      /* Array dimensions */
+   hdsdim *slbnd;     /* Lower pixel bounds of array */
    hdsdim iflat;      /* Index of next element in "flat" to be written or read */
    hdsdim iix;        /* GRID index on 1st axis at central pixel */
    hdsdim iiy;        /* GRID index on 2nd axis at central pixel */
    hdsdim iiz;        /* GRID index on 3rd axis at central pixel */
-   hdsdim istep;      /* Index within "route" array */
-   hdsdim iv0;        /* 1D Vector index of starting pixel. */
-   hdsdim iv;         /* 1D Vector index of current central pixel. */
    hdsdim ix;         /* GRID index on 1st axis at starting pixel */
    hdsdim ixoff;      /* Offset in GRID index on 1st axis */
    hdsdim iy;         /* GRID index on 2nd axis at starting pixel */
@@ -209,131 +609,101 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, size_t nel, int ndim,
    hdsdim nsy;        /* Longest jump between peaks in the y direction */
    hdsdim nsz;        /* Longest jump between peaks in the z direction */
    hdsdim nv;         /* Vector index of next pixel along the route */
-   hdsdim *route;     /* Array holding vector indices of traversed pixels */
-   hdsdim route_length;/* Number of pixels stored in "route" array */
-   hdsdim skip0;      /* Total skip from centre to first 3x3x3 neighbour */
-   hdsdim skip1;      /* Total skip from centre to first extended neighbour */
    hdsdim xlim;       /* Number of x planes in 3x3x3 neighbourhood */
    hdsdim ylim;       /* Number of y planes in 3x3x3 neighbourhood */
    hdsdim zlim;       /* Number of z planes in 3x3x3 neighbourhood */
-   int *m1;        /* Pointer to input array */
-   int *m2;        /* Pointer to output array */
-   int *m3;        /* Pointer used to swap arrays */
-   int *pa;        /* Pointer to next "ipa" value */
-   int *work;      /* Work array */
-   int cleaniter;  /* Number of cleaning  iterations to perform */
-   int clump_index;/* Index of the peak to which the walk ascends */
-   int debug3;     /* Are we displaying level 3 debug info? */
-   int dump_peak;  /* The clump index at which to dump the clump assignment array */
-   int got_flat;   /* Has the length of the initial flat section been found? */
-   int iter;       /* Iteration count */
-   int lpercent;   /* Previous displayed percent value */
-   int new_peak;   /* Has this walk arrived at a new peak? */
-   int nzero;      /* No. of axes with zero displacement between pixels */
-   int percent;    /* Percent of pixels done */
-   int ret;        /* The highest index value in "ipa" */
-   int yon;        /* Is the current Y row within the bounds of the array? */
-   int zon;        /* Is the current Z plane within the bounds of the array? */
+   int *pa;           /* Pointer to next "ipa" value */
+   int *work;         /* Work array */
+   int clump_index;   /* Index of the peak to which the walk ascends */
+   int debug3;        /* Are we displaying level 3 debug info? */
+   int verb;          /* Are we displaying verbose info? */
+   int dump_peak;     /* The clump index at which to dump the clump assignment array */
+   int got_flat;      /* Has the length of the initial flat section been found? */
+   int ndim;          /* Number of active dimensions */
+   int new_peak;      /* Has this walk arrived at a new peak? */
+   int nzero;         /* No. of axes with zero displacement between pixels */
+   int percent;       /* Percent of pixels done */
+   int perspectrum;   /* 1-based index of independent spectrum axis, if any */
+   int walk_done;     /* Has the walk been completed? */
+   int yon;           /* Is the current Y row within the bounds of the array? */
+   int zon;           /* Is the current Z plane within the bounds of the array? */
+   size_t *lbnd;      /* Lower pixel bounds of block */
+   size_t *route;     /* Array holding vector indices of traversed pixels */
+   size_t *skip;      /* Array of pixel skips */
+   size_t *ubnd;      /* Lower pixel bounds of block */
+   size_t count;      /* Count of pixels done so far */
+   size_t dump_walk;  /* The starting pixel at which to dump the clump assignment array */
+   size_t iel;        /* Index of element in array */
+   size_t istep;      /* Index within "route" array */
+   size_t iv0;        /* 1D Vector index of starting pixel. */
+   size_t iv;         /* 1D Vector index of current central pixel. */
+   size_t nbx;        /* Size of block (pixels) along X axis of the array */
+   size_t nby;        /* Size of block (pixels) along Y axis of the array */
+   size_t nel;        /* No. of elements in array */
+   size_t p2;         /* Last pixel to be processed */
+   size_t rep_interval;/* No of pixels between progress reports */
+   size_t route_length;/* Number of pixels stored in "route" array */
+   size_t skip0;      /* Total skip from centre to first 3x3x3 neighbour */
+   size_t skip1;      /* Total skip from centre to first extended neighbour */
 
 /* The distance from a central pixel centre to the centre of a neighbouring
    pixel, indexed by the number of axes (0, 1, 2 or 3) on which the two
    pixels have zero displacement  (sqrt(3), sqrt(2), sqrt(1), 0). */
    static double dist[ 4 ] = { 1.7320508, 1.4142136, 1.0, 0.0 };
 
-/* Initialise */
-   ret = 0;
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
 
-/* For speed, get a local flag indicating if we are displaying level
-   3 debugging info. */
-   debug3 = msgFlevok( MSG__DEBUG2, status );
-
-/* See if the user wants to dump the clump assignment array after a
-   specified peak is reached for the first time. The supplied value is
-   the clump index. */
-   dump_peak = cupidConfigI( config, "DUMPPEAK", 0, status );
-
-/* See if the user wants to dump the clump assignment array after the
-   walk from a specified pixel has been completed. The supplied value is
-   the zero-based vector index of the start pixel. */
-   dump_walk = cupidConfigI( config, "DUMPWALK", -1, status );
-
-/* Abort if an error has already occurred. */
-   if( *status != SAI__OK ) return ret;
-
-/* Get the lowest data value to be considered. */
-   noise = cupidConfigRMS( config, "NOISE", rms, 2.0*rms, status );
-
-/* Get the largest jump (in pixels) which can be made from a local maximum
-   to a higher maximum in the neighbourhood of the first maximum. */
-   maxjump = cupidConfigI( config, "MAXJUMP", 4, status );
-
-/* Get the difference in data value between adjacent pixels which marks
-   the start of a walk. Any initial section of the walk which has an
-   average gradient (measured over 4 steps) less than this value is not
-   assigned to any clump. */
-   flat_slope = cupidConfigRMS( config, "FLATSLOPE", rms, rms, status );
-
-/* Walks which start at low level are ignored until they achieve the
-   gradient specified by FLATSLOPE. Walks which start at high level are
-   used in their entirety. Store the data value which marks the break
-   between high and low level. */
-   sea_level = noise + 2*rms;
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (CGEN_FUNCTION(CupidFWMainData) *) job_data_ptr;
 
 /* Fill the supplied "ipa" array with -1 for all pixels which are below the
    threshold, or are bad. Fill all other pixels with zero to indicate that
    the pixel is "usable but not yet checked". */
-   pa = ipa;
-   pd = array;
-   for( iz = 1; iz <= dims[ 2 ]; iz++ ) {
-      for( iy = 1; iy <= dims[ 1 ]; iy++ ) {
-         for( ix = 1; ix <= dims[ 0 ]; ix++, pa++, pd++ ) {
-            if( *pd == CGEN_BAD ){
-               *pa = -1;
+   if( pdata->operation == 1 ) {
+      noise = pdata->noise;
+      pa = pdata->work + pdata->p1;
+      pd = pdata->array + pdata->p1;
+      p2 = pdata->p2;
 
-            } else if( *pd <= noise ){
-               *pa = -1;
+      for( iel = pdata->p1; iel <= p2; iel++,pa++,pd++ ) {
+         if( *pd == CGEN_BAD ){
+            *pa = -1;
 
-            } else {
-               *pa = 0;
-            }
+         } else if( *pd <= noise ){
+            *pa = -1;
+
+         } else {
+            *pa = 0;
          }
       }
-   }
 
-/* If required, dump the mask indicating which pixel are below the threshold. */
-   if( msgFlevok( MSG__DEBUG2, status ) ) {
-      cupidDumpI( ipa, ndim, dims, slbnd, "initial mask", status );
-   }
+/* Walk uphill to a peak starting from each pixel in the block
+   assigned to this worker thread. */
+   } else if( pdata->operation == 2 ) {
+      ndim = pdata->ndim;
+      work = pdata->work;
+      array = pdata->array;
+      dims = pdata->dims;
+      lbnd = pdata->lbnd;
+      ubnd = pdata->ubnd;
+      sea_level = pdata->sea_level;
+      maxjump = pdata->maxjump;
+      perspectrum = pdata->perspectrum;
+      flat_slope = pdata->flat_slope;
+      skip = pdata->skip;
+      slbnd = pdata->slbnd;
+      dump_peak = pdata->dump_peak;
+      dump_walk = pdata->dump_walk;
+      nel = pdata->nel;
+      debug3 = pdata->debug3;
+      verb = pdata->verb;
+      rep_interval = pdata->rep_interval;
 
-/* Use a cellular automata to remove small isolated groups of usable
-   pixels from the above "ipa" array. This allocates new memory for the
-   cleaned up array. */
-   msgOutif( MSG__VERB, "", "Removing isolated pixels\n", status );
-
-   if( ndim == 1 ) {
-      frac = 0.5;
-   } else if( ndim == 2 ) {
-      frac = 0.25;
-   } else {
-      frac = 0.1;
-   }
-
-   work = cupidRCA( ipa, NULL, nel, dims, skip, frac, VAL__MAXI, 0, -1, 1, status );
-
-/* If required, dump the mask resulting from the above cleaning. */
-   if( msgFlevok( MSG__DEBUG2, status ) ) {
-      cupidDumpI( work, ndim, dims, slbnd, "cleaned initial mask", status );
-   }
-
-/* Pre-allocate some memory for the route array which holds the 1D vector
-   indices of the pixels traversed in the route from the initial pixel to
-   the clump peak. */
-   route = astMalloc( sizeof( *route )*100 );
-   if( route ) {
-
-/* Prepare progress report. */
-      msgOutif( MSG__VERB, "", "Walking...\n", status );
-      count = 0;
+/* Dimensions of this thread's block of pixels. */
+      nbx = ubnd[ 0 ] - lbnd[ 0 ] + 1;
+      nby = ubnd[ 1 ] - lbnd[ 1 ] + 1;
 
 /* Store some useful constants. */
       if( perspectrum == 1 ) {
@@ -381,21 +751,22 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, size_t nel, int ndim,
          nsz = ( ndim > 2 ) ? maxjump : 0;
       }
 
-      lpercent = 0;
+/* Pre-allocate some memory for the route array which holds the 1D vector
+   indices of the pixels traversed in the route from the initial pixel to
+   the clump peak. */
+      route = astCalloc( 100, sizeof( *route ) );
+      if( route ) {
 
-/* Scan through the "work" array, looking for usable pixels which have not
+/* Scan through the block of the "work" array that has been assigned
+   to this worker thread, looking for usable pixels which have not
    yet been assigned to a clump (i.e. have a value of zero in "work"). */
-      pa = work;
-      for( iz = 1; iz <= dims[ 2 ]; iz++ ) {
-         for( iy = 1; iy <= dims[ 1 ]; iy++ ) {
-            for( ix = 1; ix <= dims[ 0 ]; ix++, pa++ ) {
-               if( *pa == 0 ) {
+         pa = work + (lbnd[ 0 ] - 1) + (lbnd[ 1 ] - 1)*dims[ 0 ] +
+                                       (lbnd[ 2 ] - 1)*dims[ 0 ]*dims[ 1 ];
 
-/* Indicate we have not yet arrived at a new peak on this walk. */
-                  new_peak = 0;
-
-/* Indicate we have not yet assertained which clump this pixel belongs to. */
-                  clump_index = -1;
+         count = 0;
+         for( iz = lbnd[ 2 ]; iz <= ubnd[ 2 ]; iz++ ) {
+            for( iy = lbnd[ 1 ]; iy <= ubnd[ 1 ]; iy++ ) {
+               for( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
 
 /* Save the vector index of this pixel. This is modified as we walk up hill,
    so that it always refers to the current position of the "walker". The
@@ -406,6 +777,18 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, size_t nel, int ndim,
                   iiy = iy;
                   iiz = iz;
 
+/* Skip this pixel if it has already been assigned to a clump. */
+                  if( *pa == 0 ) {
+
+/* Indicate we have not yet arrived at a new peak on this walk. */
+                     new_peak = 0;
+
+/* Indicate we have not yet assertained which clump this pixel belongs to. */
+                     clump_index = -1;
+
+/* Indicate we have not yet reached the end of hte walk. */
+                     walk_done = 0;
+
 /* We now start walking away from this pixel up hill (up the steepest
    gradient). We store the vector index of all pixels visited on this walk
    in the route array. Put the current pixel in it and initialise its length
@@ -415,410 +798,412 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, size_t nel, int ndim,
    above the gradient limit. However, this initial flat section is only
    ignored if the walk starts from "sea level". Walks which start at a
    higher altitude are used in their entirety. */
-                  route[ 0 ] = iv;
-                  route_length = 1;
+                     route[ 0 ] = iv;
+                     route_length = 1;
 
-                  nflat = 0;
-                  iflat = 0;
+                     nflat = 0;
+                     iflat = 0;
 
-                  got_flat = ( (double) array[ iv ] > sea_level );
+                     got_flat = ( (double) array[ iv ] > sea_level );
 
-                  while( clump_index == -1 ) {
+                     while( !walk_done && *status == SAI__OK ) {
 
 /* Note the data value at the current central position. */
-                     h = (double) array[ iv ];
+                        h = (double) array[ iv ];
 
 /* If we have not yet determined the length of the initial section of the
    route which is below the gradient limit, check the current average
    gradient (taken over the previous 4 steps). We skip this section once
    we have found the first "steep" section in the route. */
-                     if( !got_flat ) {
+                        if( !got_flat ) {
 
 /* Find the average gradient, if possible, over the last 4 steps, assuming
    each step is the same length. If it is above the user-supplied limit,
    indicate we have got the length of the initial flat section of the
    route. */
-                        if( h > sea_level ) {
-                           got_flat = 1;
-
-                        } else if( route_length > 3 ) {
-                           if( ( h -  flat[ iflat ] )/3 > flat_slope ) {
+                           if( h > sea_level ) {
                               got_flat = 1;
 
+                           } else if( route_length > 3 ) {
+                              if( ( h -  flat[ iflat ] )/3 > flat_slope ) {
+                                 got_flat = 1;
+
 /* Otherwise, increment the number of steps in the intial flat section. */
-                           } else {
-                              nflat = route_length;
+                              } else {
+                                 nflat = route_length;
+                              }
                            }
-                        }
 
 /* Record the current data value in an array so that it will be available to
    calculate the average gradient 4 steps later. Values are stored cyclicly
    in this array. */
-                        flat[ iflat++ ] = h;
-                        if( iflat == 3 ) iflat = 0;
-                     }
+                           flat[ iflat++ ] = h;
+                           if( iflat == 3 ) iflat = 0;
+                        }
 
 /* We will now examine the 3x3x3 cube of neighbouring pixels to determine
    where we step to next. We will choose the neighbour with the greatest
    gradient. Initialise the maximum gradient found so far to a large -ve
    value. */
-                     maxg = VAL__MIND;
+                        maxg = VAL__MIND;
 
 /* Calculating the gradient to each of the neighbouring pixel centres
    requires the distance between the cell centres. This will be either 1,
    sqrt(2) or sqrt(3) pixels, and can be determined from the number of axes
    (0, 1, 2 or 3) on which the neighbouring pixel has zero displacement from
    the central test pixel. "nzero" counts the number of such axes. */
-                     nzero = perspectrum ? 2 : 3 - ndim;
+                        nzero = perspectrum ? 2 : 3 - ndim;
 
 /* Check the 3x3x3 cube of neighbouring pixels, and determine the one
    with the highest gradient. We check them in "fortran order". Initialise
    the grid indices at the first ("bottom left") pixel of the 3x3x3 cube. */
-                     ixoff = iix - xlim/2;
-                     iyoff = iiy - ylim/2;
-                     izoff = iiz - zlim/2;
+                        ixoff = iix - xlim/2;
+                        iyoff = iiy - ylim/2;
+                        izoff = iiz - zlim/2;
 
 /* Initialise the grid coords and vector index of the pixel with the
    highest gradient. */
-                     nix = 0;
-                     niy = 0;
-                     niz = 0;
-                     nv = 0;
+                        nix = 0;
+                        niy = 0;
+                        niz = 0;
+                        nv = -1;
 
 /* Initialise the vector index of the first pixel in the box. **/
-                     jvz = iv - skip0;
+                        jvz = iv - skip0;
 
 /* Initialise the grid index on the 3rd axis of the first pixel. */
-                     miz = izoff;
+                        miz = izoff;
 
 /* Loop round all Z planes in the 3x3x3 cube, updating the Z grid index
-   of the pixel being tested (miz) on each pass. */
-                     for( jz = 0; jz < zlim; jz++,miz++ ) {
+   of the pixel being tested (miz) on each pass. Note, the box will be
+   3x1x1 if perspectrum is non-zero. */
+                        for( jz = 0; jz < zlim; jz++,miz++ ) {
 
 /* Determine if the current Z plane is within the bounds of the data
    array. */
-                        zon = ( miz >= 1 && miz <= dims[ 2 ] );
+                           zon = ( miz >= 1 && miz <= dims[ 2 ] );
 
 /* Initialise the vector index, and the grid index on the 2nd axis, of the
    first pixel in the current Z plane. Then loop round all Y rows in the
    current Z plane. */
-                        jvy = jvz;
-                        miy = iyoff;
-                        for( jy = 0; jy < ylim; jy++,miy++ ) {
+                           jvy = jvz;
+                           miy = iyoff;
+                           for( jy = 0; jy < ylim; jy++,miy++ ) {
 
 /* Determine if the current Y row is within the bounds of the data
    array. */
-                           yon = zon && ( miy >= 1 && miy <= dims[ 1 ] );
+                              yon = zon && ( miy >= 1 && miy <= dims[ 1 ] );
 
 /* Initialise the vector index, and the grid index on the 1st, of the
    first column in the current Y row. Then loop round all X columns in the
    current Y row. */
-                           jvx = jvy;
-                           mix = ixoff;
-                           for( jx = 0; jx < xlim; jx++,mix++ ) {
+                              jvx = jvy;
+                              mix = ixoff;
+                              for( jx = 0; jx < xlim; jx++,mix++ ) {
 
 /* Ignore pixels that are not within the bounds of the data array. */
-                              if( yon && mix >= 1 && mix <= dims[ 0 ] ) {
+                                 if( yon && mix >= 1 && mix <= dims[ 0 ] ) {
 
 /* Ignore unusable pixels but not pixels which have already been assigned
    to another clump. Also skip the central pixel (for which nzero is 3).
    Find the gradient to this neighbour. If it is the largest found so far,
    record its vector index and GRID coords. */
-                                 if( work[ jvx ] >= 0 && nzero < 3 ) {
-                                    g = ( (double) array[ jvx ] - h )/dist[ nzero ];
-                                    if( g > maxg ) {
-                                       maxg = g;
-                                       nv = jvx;
+                                    if( work[ jvx ] >= 0 && nzero < 3 ) {
+                                       g = ( (double) array[ jvx ] - h )/dist[ nzero ];
+                                       if( g > maxg ) {
+                                          maxg = g;
+                                          nv = jvx;
 
-                                       nix = mix;
-                                       niy = miy;
-                                       niz = miz;
+                                          nix = mix;
+                                          niy = miy;
+                                          niz = miz;
 
+                                       }
                                     }
                                  }
-                              }
 
 /* Move on to consider the next neighbour, and update the number of axes
    which have zero displacement from the current pixel to the central pixel. */
-                              jvx++;
-                              if( jx == 0 ) {
+                                 jvx++;
+                                 if( jx == 0 ) {
+                                    nzero++;
+                                 } else if( jx == 1 ){
+                                    nzero--;
+                                 }
+
+                              }
+                              jvy += skip[ 1 ];
+
+                              if( jy == 0 ) {
                                  nzero++;
-                              } else if( jx == 1 ){
+                              } else if( jy == 1 ){
                                  nzero--;
                               }
 
                            }
-                           jvy += skip[ 1 ];
+                           jvz += skip[ 2 ];
 
-                           if( jy == 0 ) {
+                           if( jz == 0 ) {
                               nzero++;
-                           } else if( jy == 1 ){
+                           } else if( jz == 1 ){
                               nzero--;
                            }
 
                         }
-                        jvz += skip[ 2 ];
-
-                        if( jz == 0 ) {
-                           nzero++;
-                        } else if( jz == 1 ){
-                           nzero--;
-                        }
-
-                     }
 
 /* If there is no upward route from the current pixel, (i.e. if it is a
    local maximum), we check the slightly more extended neighbourhood for
    a higher pixel. We do this because a local maximum could be just a
    noise spike. */
-                     if( maxg <= 0 ) {
+                        if( maxg <= 0 ) {
 
-                        msgSeti( "P", iix + slbnd[ 0 ] - 1 );
-                        if( ndim > 1 ) {
-                          msgSetc( "P", "," );
-                          msgSeti( "P", iiy + slbnd[ 1 ] - 1  );
-                          if( ndim > 2 ) {
-                            msgSetc( "P", "," );
-                            msgSeti( "P", iiz + slbnd[ 2 ] - 1 );
-                          }
-                        }
-                        msgOutif( MSG__DEBUG1, "",
-                                  "    Local max found at (^P)", status );
+                           if( debug3 ) {
+                              msgSeti( "P", iix + slbnd[ 0 ] - 1 );
+                              if( ndim > 1 ) {
+                                msgSetc( "P", "," );
+                                msgSeti( "P", iiy + slbnd[ 1 ] - 1  );
+                                if( ndim > 2 ) {
+                                  msgSetc( "P", "," );
+                                  msgSeti( "P", iiz + slbnd[ 2 ] - 1 );
+                                }
+                              }
+                              msgOut( " ", "    Local max found at (^P)", status );
+                           }
 
-                        jzlo = iiz - nsz;
-                        jzhi = iiz + nsz;
-                        jylo = iiy - nsy;
-                        jyhi = iiy + nsy;
-                        jxlo = iix - nsx;
-                        jxhi = iix + nsx;
+                           jzlo = iiz - nsz;
+                           jzhi = iiz + nsz;
+                           jylo = iiy - nsy;
+                           jyhi = iiy + nsy;
+                           jxlo = iix - nsx;
+                           jxhi = iix + nsx;
 
-                        h = VAL__MIND;
-                        jvz = iv - skip1;
-                        for( jz = jzlo; jz <= jzhi; jz++ ) {
-                           if( jz >= 1 && jz <= dims[ 2 ] ) {
+                           h = VAL__MIND;
+                           jvz = iv - skip1;
+                           for( jz = jzlo; jz <= jzhi; jz++ ) {
+                              if( jz >= 1 && jz <= dims[ 2 ] ) {
 
-                              jvy = jvz;
-                              for( jy = jylo; jy <= jyhi; jy++ ) {
-                                 if( jy >= 1 && jy <= dims[ 1 ] ) {
+                                 jvy = jvz;
+                                 for( jy = jylo; jy <= jyhi; jy++ ) {
+                                    if( jy >= 1 && jy <= dims[ 1 ] ) {
 
-                                    jvx = jvy;
-                                    for( jx = jxlo; jx <= jxhi; jx++ ) {
-                                       if( jx >= 1 && jx <= dims[ 0 ] ) {
+                                       jvx = jvy;
+                                       for( jx = jxlo; jx <= jxhi; jx++ ) {
+                                          if( jx >= 1 && jx <= dims[ 0 ] ) {
 
 
 /* Ignore unusable pixels (but not pixels which have already been
    assigned to another clump). If it is the highest found so far, record
    it. */
-                                          if( work[ jvx ] >= 0 ) {
-                                             if( (double) array[ jvx ] > h ) {
-                                                h = (double) array[ jvx ];
-                                                nv = jvx;
-                                                iix = jx;
-                                                iiy = jy;
-                                                iiz = jz;
+                                             if( work[ jvx ] >= 0 ) {
+                                                if( (double) array[ jvx ] > h ) {
+                                                   h = (double) array[ jvx ];
+                                                   nv = jvx;
+                                                   iix = jx;
+                                                   iiy = jy;
+                                                   iiz = jz;
+                                                }
                                              }
                                           }
-                                       }
 
 /* Move on to consider the next pixel in the neighbourhood. */
-                                       jvx++;
+                                          jvx++;
+                                       }
                                     }
+                                    jvy += skip[ 1 ];
                                  }
-                                 jvy += skip[ 1 ];
                               }
+                              jvz += skip[ 2 ];
                            }
-                           jvz += skip[ 2 ];
-                        }
 
 /* Tell the user if we are jumping to a near-by pixel and continuing to
    walk up hill. */
-                        if( iv != nv ) {
-                          msgSeti( "P", iix + slbnd[ 0 ] - 1 );
-                          if( ndim > 1 ) {
-                            msgSetc( "P", "," );
-                            msgSeti( "P", iiy + slbnd[ 1 ] - 1 );
-                            if( ndim > 2 ) {
-                              msgSetc( "P", "," );
-                              msgSeti( "P", iiz + slbnd[ 2 ] - 1 );
-                            }
-                          }
-                          msgOutif( MSG__DEBUG1, "",
-                                    "      (jumping to (^P))", status );
-                        }
+                           if( iv != nv && debug3 ) {
+                             msgSeti( "P", iix + slbnd[ 0 ] - 1 );
+                             if( ndim > 1 ) {
+                               msgSetc( "P", "," );
+                               msgSeti( "P", iiy + slbnd[ 1 ] - 1 );
+                               if( ndim > 2 ) {
+                                 msgSetc( "P", "," );
+                                 msgSeti( "P", iiz + slbnd[ 2 ] - 1 );
+                               }
+                             }
+                             msgOut( " ", "      (jumping to (^P))", status );
+                           }
 
-                     } else{
-                        iix = nix;
-                        iiy = niy;
-                        iiz = niz;
-                     }
+                        } else{
+                           iix = nix;
+                           iiy = niy;
+                           iiz = niz;
+                        }
 
 /* If the central pixel is the highest pixel in the more extended
    neighbourhood, we have reached a peak. If this peak has not already
    been assigned to a clump, increment the number of clumps and assign it
    the new clump index. If the entire walk is coastal, we do not assign a
    clump index to the walk. */
-                     if( iv == nv ) {
-                        if( nflat >= 0 && nflat < route_length ) {
-                           clump_index = work[ iv ];
-                           if( clump_index < 1 ) {
-                              clump_index = ++ret;
-                              new_peak = 1;
-                           }
-
-/* Report new peak. */
-                           msgSeti( "I", clump_index );
-                           msgSetr( "V", (float) array[ iv ] );
-                           msgOutif( MSG__DEBUG,"",
-                                     "      (a new peak, index = ^I, value=^V)",
-                                     status );
-                           if( debug3 ) msgOutf( "", "    Walk from pixel %d "
-                                      "terminates at this peak", status, iv0 );
+                        if( iv == nv || nv == -1 ) {
+                           if( nflat >= 0 && nflat < route_length ) {
+                              walk_done = 1;
 
 /* Assign a special value to "clump_index" that indicates that no clump
    was assigned to the current walk. */
+                           } else {
+                              walk_done = 2;
+                           }
+
+/* Otherwise, add the vector index of the next pixel to the route array,
+   extending the array as necessary. */
                         } else {
-                           clump_index = -2;
-                           if( debug3 ) msgOutf( "", "    Walk from pixel %d "
-                                              "terminates at a low-land pixel",
-                                              status, iv0 );
+                           istep = route_length++;
+                           route = astGrow( route, route_length, sizeof( *route ) );
+                           if( route ) route[ istep ] = nv;
+
+/* If the next pixel on the route is already assigned to a clump, we now know
+   what peak we are heading towards so use that clump index for the route so
+   far, and abandon the rest of the walk. */
+                           if( work[ nv ] > 0 ) {
+                              walk_done = 3;
+
+/* Otherwise, move to the next pixel on the route. */
+                           } else {
+                              iv = nv;
+                           }
                         }
+                     }
+
+/* The walk has now finished, so it is time to store the route of the
+   walk in the work array. Wait until we have write-access to the work
+   array and static variables. */
+                     thrMutexLock( &work_mutex, status );
+
+/* Decide on the value to store in the work array at all pixels along the route.
+   If the walk ended at a peak that has not already been assigned to a clump,
+   increment the number of clumps and assign it the new clump index. */
+                     if( walk_done == 1 ) {
+                        clump_index = work[ nv ];
+                        if( clump_index < 1 ) {
+                           clump_index = ++ret;
+                           new_peak = 1;
+
+/* Report new peak. */
+                           if( debug3 ) {
+                              msgSeti( "I", clump_index );
+                              msgSetr( "V", (float) array[ iv ] );
+                              msgOut( " ", "      (a new peak, index = ^I, value=^V)",
+                                     status );
+                              msgOutf( " ", "    Walk from pixel %zu "
+                                       "terminates at this peak", status, iv0 );
+                           }
+                        }
+
+/* If the entire walk is coastal, we do not assign a clump index to the walk.
+   Instead, assign a special value to "clump_index" that indicates that no clump
+   was assigned to the current walk. */
+                     } else if( walk_done == 2 ){
+                        clump_index = -2;
+                        if( debug3 ) msgOutf( "", "    Walk from pixel %zu "
+                                     "terminates at a low-land pixel",
+                                      status, iv0 );
 
 /* Otherwise, if the next pixel on the route is already assigned to a
    clump, we now know what peak we are heading towards so use that clump
    index for the route so far, and abandon the rest of the walk. */
-                     } else if( work[ nv ] > 0 ) {
+                     } else if( walk_done == 3 ) {
                         clump_index = work[ nv ];
-                        if( debug3 ) msgOutf( "", "    Walk from pixel %d "
-                                              "met clump %d after %d steps.",
+                        if( debug3 ) msgOutf( "", "    Walk from pixel %zu "
+                                              "met clump %d after %zu steps.",
                                               status, iv0, clump_index,
-                                              route_length );
+                                              route_length-1 );
 
-/* Otherwise, move to the next pixel on the route. */
-                     } else {
-
-/* Add the vector index of the next pixel to the route array, extending
-   the array as necessary. */
-                        iv = nv;
-                        istep = route_length++;
-                        route = astGrow( route, route_length, sizeof( *route ) );
-                        if( route ) route[ istep ] = iv;
+/* Report an error for any other value. */
+                     } else if( *status == SAI__OK ) {
+                        *status = SAI__ERROR;
+                        errRepf( "", "cupidFWMain: Illegal walk_done value "
+                                 "%d (cupid programming error).", status,
+                                 walk_done );
                      }
-                  }
 
-/* The walk has now finished because we have either reached a peak which
-   is the highest point in its neighbourhood, or we have joined an earlier
-   route and thus know which peak we would get to if we were to carry on.
-   We now assign the clump index found above to all the pixels visited on
+/* We now assign the clump index found above to all the pixels visited on
    the route, except for any low gradient section at the start of the route,
    which is set unusable (-1). We ignore walks that were entirely on the
    coastal plain (indicated by a value of -2 for clump_index). */
-                  for( istep = 0; istep < route_length;istep++ ) {
-                     if( istep < nflat || clump_index < 0 ) {
-                        work[ route[ istep ] ] = -1;
-                     } else {
-                        work[ route[ istep ] ] = clump_index;
+                     for( istep = 0; istep < route_length;istep++ ) {
+                        if( istep < nflat || clump_index < 0 ) {
+                           work[ route[ istep ] ] = -1;
+                        } else {
+                           work[ route[ istep ] ] = clump_index;
+                        }
                      }
-                  }
 
 /* If this is the clump specified by config parameter DUMP_PEAK, and the
    current path is the first path to reach the peak, dump the clump
    assignment array. */
-                  if( new_peak && clump_index == dump_peak ) {
-                     char text[200];
-                     sprintf( text, "first walk to peak %d", dump_peak );
-                     cupidDumpI( work, ndim, dims, slbnd, text, status );
+                     if( new_peak && clump_index == dump_peak ) {
+                        char text[200];
+                        sprintf( text, "first walk to peak %d", dump_peak );
+                        cupidDumpI( work, ndim, dims, slbnd, text, status );
 
 /* Otherwise, if this is the walk specified by config parameter DUMP_WALK,
    dump the clump assignment array. */
-                  } else if( iv0 == dump_walk ) {
-                     char text[200];
-                     sprintf( text, "walk from pixel %d", dump_walk );
-                     cupidDumpI( work, ndim, dims, slbnd, text, status );
+                     } else if( iv0 == dump_walk ) {
+                        char text[200];
+                        sprintf( text, "walk from pixel %zu", dump_walk );
+                        cupidDumpI( work, ndim, dims, slbnd, text, status );
+                     }
+
+/* Release the lock on the work array and static values. */
+                     thrMutexUnlock( &work_mutex, status );
                   }
-               }
 
 /* Issue a progress report if required.*/
-               if( ++count % 100000 == 0 && nel - count > 100000 ) {
-                 msgBlankif( MSG__DEBUG, status );
-                 percent = (int)(100*(float)count/(float)nel);
-                 if( percent > lpercent ) {
-                   msgSeti( "F", percent );
-                   msgOutif( MSG__VERB, "", "  ^F % done", status );
-                   lpercent = percent;
-                 }
+                  if( verb && ++count == rep_interval ) {
+                     thrMutexLock( &report_mutex, status );
+                     total += count;
+                     percent = (int)(100*(float)( total )/(float)nel);
+                     if( percent != lpercent ) {
+                        msgSeti( "F", percent );
+                        msgOutif( MSG__VERB, "", "  ^F % done", status );
+                        lpercent = percent;
+                     }
+                     thrMutexUnlock( &report_mutex, status );
+                     count = 0;
+                  }
+
+/* Move on to the next pixel along the x axis */
+                  pa += 1;
                }
+
+/* Move on to the first pixel in the next line */
+               pa += dims[ 0 ] - nbx;
             }
+
+/* Move on to the first pixel in the next XY plane. */
+            pa += dims[ 0 ]*dims[ 1 ] - dims[ 0 ]*nby;
+         }
+
+/* Issue a final progress report if required.*/
+         if( verb ) {
+            thrMutexLock( &report_mutex, status );
+            total += count;
+            percent = (int)(100*(float)( total )/(float)nel);
+            if( percent != lpercent ) {
+               msgSeti( "F", percent );
+               msgOutif( MSG__VERB, "", "  ^F % done", status );
+               lpercent = percent;
+            }
+            thrMutexUnlock( &report_mutex, status );
          }
       }
-   }
 
-/* Report completion of walk. */
-   msgBlankif( MSG__VERB, status );
-   msgOutif( MSG__VERB, "", "  100 % done", status );
-   msgBlankif( MSG__VERB, status );
+/* Free resource. */
+      route = astFree( route );
 
-/* If required, dump the unmerged clump mask. */
-   if( msgFlevok( MSG__DEBUG2, status ) ) {
-      cupidDumpI( work, ndim, dims, slbnd, "raw clump mask", status );
-   }
-
-/* Amalgamate adjoining clumps if there is no significant dip between the
-   clumps. */
-   msgOutif( MSG__VERB, "", "Merging adjoining clumps", status );
-   CGEN_FUNCTION(cupidFWJoin)( array, nel, ndim, dims, skip, rms, config,
-                               work, &ret, perspectrum, status );
-   msgOutif( MSG__VERB, "", "Merging completed", status );
-
-/* If required, dump the merged clump mask. */
-   if( msgFlevok( MSG__DEBUG2, status ) ) {
-      cupidDumpI( work, ndim, dims, slbnd, "merged but uncleaned clump mask",
-                  status );
-   }
-
-/* Smooth the boundaries between the clumps. This cellular automata replaces
-   each output pixels by the most commonly occuring value within a 3x3x3
-   cube of input pixels centred on the output pixel. Repeat this process
-   a number of times as given by configuration parameter CleanIter. */
-   if( ! perspectrum ) {
-      cleaniter = cupidConfigI( config, "CLEANITER", 1, status );
    } else {
-      cleaniter = 0;
+      *status = SAI__ERROR;
+      errRepf( "", "cupidFWMain: Illegal operation %d (cupid programming error).",
+               status, pdata->operation );
    }
-
-   msgOutif( MSG__VERB, "", "Cleaning clumps", status );
-   m1 = work;
-   m2 = ipa;
-   for( iter = 0; iter < cleaniter; iter++ ) {
-      (void) cupidRCA2( m1, m2, nel, dims, skip, status );
-      m3 = m1;
-      m1 = m2;
-      m2 = m3;
-      msgSeti( "I", iter + 1 );
-      msgSeti( "J", cleaniter );
-      msgOutif( MSG__VERB, "",
-                "Completed cleaning iteration ^I of ^J", status );
-   }
-
-/* If the final results are not now in the "ipa" array, copy them to the
-   "ipa" array. */
-   if( m1 != ipa ) memcpy( ipa, work, sizeof( int )*nel );
-
-/* If required, dump the cleaned clump mask. */
-   if( msgFlevok( MSG__DEBUG2, status ) ) {
-      cupidDumpI( ipa, ndim, dims, slbnd, "cleaned clump mask", status );
-   }
-
-/* Free resources. */
-   work = astFree( work );
-   route = astFree( route );
-
-/* Return the highest clump index in "ipa". */
-   return ret;
-
 }
-
-
-
 
 
 

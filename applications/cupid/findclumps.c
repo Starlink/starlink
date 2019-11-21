@@ -8,6 +8,7 @@
 #include "star/irq.h"
 #include "star/grp.h"
 #include "star/hds.h"
+#include "star/thr.h"
 #include "par.h"
 #include "prm_par.h"
 #include "cupid.h"
@@ -934,6 +935,8 @@ void findclumps( int *status ) {
 *        Ensure any pre-existing output NDF is deleted if no clumps are found.
 *     8-DEC-2017 (DSB):
 *        Add "Ellipse2" option for parameter SHAPE.
+*     21-NOV-2019 (DSB):
+*        Multi-thread.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -960,6 +963,7 @@ void findclumps( int *status ) {
    HDSLoc *xloc;                /* Locator for CUPID extension in main output */
    HDSLoc *xqnloc;              /* Locator for CUPID_NAMES component in extension */
    IRQLocs *qlocs;              /* HDS locators for quality name information */
+   ThrWorkForce *wf = NULL;     /* Pointer to a pool of worker threads */
    char *pname;                 /* Pointer to input NDF name */
    char *value;                 /* Pointer to GRP element buffer */
    char attr[ 30 ];             /* AST attribute name */
@@ -982,6 +986,7 @@ void findclumps( int *status ) {
    float *rmask;                /* Pointer to cump mask array */
    hdsdim dim[ NDF__MXDIM ];    /* Pixel axis dimensions */
    hdsdim dims[3];              /* Pointer to array of array dimensions */
+   hdsdim n;                    /* Number of values summed in "sum" */
    hdsdim skip[3];              /* Pointer to array of axis skips */
    hdsdim slbnd[ NDF__MXDIM ];  /* The lower bounds of the significant pixel axes */
    hdsdim subnd[ NDF__MXDIM ];  /* The upper bounds of the significant pixel axes */
@@ -1015,7 +1020,6 @@ void findclumps( int *status ) {
    int velax;                   /* Index of the velocity pixel axis (if any) */
    size_t el;                      /* Number of array elements mapped */
    size_t iel;                  /* Element index */
-   size_t n;                    /* Number of values summed in "sum" */
    size_t size;                 /* Size of a group */
    void *ipd;                   /* Pointer to Data array */
    void *ipo;                   /* Pointer to output Data array */
@@ -1039,6 +1043,10 @@ void findclumps( int *status ) {
 
 /* Start an NDF context */
    ndfBegin();
+
+/* Find the number of cores/processors available and create a pool of
+   threads of the same size. */
+   wf = thrGetWorkforce( thrGetNThread( "CUPID_THREADS", status ), status );
 
 /* Get an identifier for the input NDF. We use NDG (via kpg1_Rgndf)
    instead of calling ndfAssoc directly since NDF/HDS has problems with
@@ -1369,7 +1377,7 @@ void findclumps( int *status ) {
          }
 
       } else {
-         rms = cupidRms( type, ipd, el, subnd[ 0 ] - slbnd[ 0 ] + 1, status );
+         rms = cupidRms( type, wf, ipd, el, subnd[ 0 ] - slbnd[ 0 ] + 1, status );
       }
 
 /* Get the RMS noise level. */
@@ -1415,7 +1423,7 @@ void findclumps( int *status ) {
                             aconfig, velax, beamcorr, status );
 
    } else if( !strcmp( method, "FELLWALKER" ) ) {
-      ndfs = cupidFellWalker( type, nsig, slbnd, subnd, ipd, ipv, rms,
+      ndfs = cupidFellWalker( wf, type, nsig, slbnd, subnd, ipd, ipv, rms,
                               aconfig, velax, perspectrum, beamcorr,
                               status );
 
@@ -1535,7 +1543,7 @@ void findclumps( int *status ) {
 
 /* Create any output NDF by summing the contents of the NDFs describing the
    found and usable clumps. This also fills the above mask array. */
-      cupidSumClumps( type, ipd, nsig, slbnd, subnd, el, ndfs,
+      cupidSumClumps( type, wf, ipd, nsig, slbnd, subnd, el, ndfs,
                       rmask, ipo, method, status );
 
 /* Delete any existing quality name information from the output NDF, and
@@ -1552,8 +1560,7 @@ void findclumps( int *status ) {
                 status );
 
 /* Transfer the pixel mask to the NDF quality array. */
-      irqSetqm8( qlocs, 1, "BACKGROUND", el, rmask, &n, status );
-      irqSetqm8( qlocs, 0, "CLUMP", el, rmask, &n, status );
+      irqSetqm8( qlocs, 1, "BACKGROUND,CLUMP", el, rmask, &n, status );
 
 /* Find the edges of the clumps (all other pixels will be set to
    VAL__BADR in "rmask"), and then set the "EDGE" Quality flag. */

@@ -167,7 +167,7 @@ void CGEN_FUNCTION(cupidFindback1)( float wlim, int ndim, hdsdim dim[3], hdsdim 
    RMS value should be found and used independently for each slice. If so,
    find the RMS in the supplied array. */
    if( rms == VAL__BADD && *status == SAI__OK ) {
-      rms = CGEN_FUNCTION(cupidRms)( din, nel, dim[ 0 ], status );
+      rms = CGEN_FUNCTION(cupidRms)( NULL, din, nel, dim[ 0 ], status );
 
 /* If the RMS was found, report it. */
       if( *status == SAI__OK && rms != CGEN_BAD ) {

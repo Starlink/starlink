@@ -1,9 +1,28 @@
 #include "sae_par.h"
 #include "ast.h"
 #include "cupid.h"
+#include "star/thr.h"
 
-int *cupidRCA( int *in, int *out, size_t nel, hdsdim dims[ 3 ], size_t skip[ 3 ],
-               double thresh, int magic, int on, int off, int centre,
+/* Local data types */
+typedef struct CupidRCAData {
+   double thresh;
+   hdsdim *dims;
+   int *in;
+   int *ret;
+   int centre;
+   int magic;
+   int off;
+   int on;
+   size_t *skip;
+   size_t p1;
+   size_t p2;
+} CupidRCAData;
+
+/* Prototypes for local functions */
+static void cupidRCAPar( void *job_data_ptr, int *status );
+
+int *cupidRCA( ThrWorkForce *wf, int *in, int *out, size_t nel, hdsdim dims[ 3 ],
+               size_t skip[ 3 ], double thresh, int magic, int on, int off, int centre,
                int *status ){
 /*
 *+
@@ -17,9 +36,9 @@ int *cupidRCA( int *in, int *out, size_t nel, hdsdim dims[ 3 ], size_t skip[ 3 ]
 *     Starlink C
 
 *  Synopsis:
-*     int *cupidRCA( int *in, int *out, size_t nel, hdsdim dims[ 3 ], size_t skip[ 3 ],
-*                    double thresh, int magic, int on, int off, int centre,
-*                    int *status )
+*     int *cupidRCA( ThrWorkForce *wf, int *in, int *out, size_t nel, hdsdim dims[ 3 ],
+*                    size_t skip[ 3 ], double thresh, int magic, int on, int off,
+*                    int centre, int *status )
 
 *  Description:
 *     This function contracts (erodes) or expands (dilates) the pixels
@@ -39,6 +58,8 @@ int *cupidRCA( int *in, int *out, size_t nel, hdsdim dims[ 3 ], size_t skip[ 3 ]
 *     the corresponding input pixel must be on.
 
 *  Parameters:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     in
 *        The input mask array.
 *     out
@@ -75,6 +96,7 @@ int *cupidRCA( int *in, int *out, size_t nel, hdsdim dims[ 3 ], size_t skip[ 3 ]
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2019 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -100,6 +122,8 @@ int *cupidRCA( int *in, int *out, size_t nel, hdsdim dims[ 3 ], size_t skip[ 3 ]
 *  History:
 *     19-JAN-2006 (DSB):
 *        Original version.
+*     31-OCT-2019 (DSB):
+*        Multi-threaded.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -109,21 +133,12 @@ int *cupidRCA( int *in, int *out, size_t nel, hdsdim dims[ 3 ], size_t skip[ 3 ]
 */
 
 /* Local Variables: */
-   hdsdim ix;          /* Input pixel GRID index on axis 1 */
-   hdsdim iy;          /* Input pixel GRID index on axis 2 */
-   hdsdim iz;          /* Input pixel GRID index on axis 3 */
-   hdsdim ox;          /* Output pixel GRID index on axis 1 */
-   hdsdim oy;          /* Output pixel GRID index on axis 2 */
-   hdsdim oz;          /* Output pixel GRID index on axis 3 */
-   int *pin0;          /* Pointer to input pixel [0,0,0] */
-   int *pin;           /* Pointer to input pixel */
-   int *piny;          /* Pointer to input pixel at start of row */
-   int *pinz;          /* Pointer to input pixel at start of plane */
-   int *pout;          /* Pointer to output pixel */
+   CupidRCAData *pdata;
+   CupidRCAData *job_data = NULL;
    int *ret;           /* Pointer to the returned array */
-   int sum;            /* No. of edge neighbours */
-   int tot;            /* Total no. of neighbours */
-   size_t iv;          /* Vector index into input array */
+   int iw;
+   int nw;
+   size_t step;
 
 /* Initialise */
    ret = out;
@@ -134,32 +149,153 @@ int *cupidRCA( int *in, int *out, size_t nel, hdsdim dims[ 3 ], size_t skip[ 3 ]
 /* If no output array was supplied, allocate one now. */
    if( !out ) ret = astMalloc( sizeof( *ret )*nel );
 
+/* How many threads do we get to play with */
+   nw = wf ? wf->nworker : 1;
+
+/* Allocate job data for threads. */
+   job_data = astCalloc( nw, sizeof(*job_data) );
+
 /* Check the memory was allocated. */
-   if( ret ) {
+   if( job_data && ret ) {
+
+/* Find how many output pixels to process in each worker thread. */
+      step = nel/nw;
+      if( step == 0 ) step = 1;
+
+/* Store the range of output pixels to be processed by each one. Ensure that
+   the last thread picks up any left-over output pixels. */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         pdata->p1 = iw*step;
+         if( iw < nw - 1 ) {
+            pdata->p2 = pdata->p1 + step - 1;
+         } else {
+            pdata->p2 = nel - 1;
+         }
+
+/* Store the other information needed to process the group of output
+   pixels. */
+         pdata->in = in;
+         pdata->ret = ret;
+         pdata->skip = skip;
+         pdata->dims = dims;
+         pdata->thresh = thresh;
+         pdata->centre = centre;
+         pdata->magic = magic;
+         pdata->off = off;
+         pdata->on = on;
+
+/* Submit the job to be processed by the next available worker thread. */
+         thrAddJob( wf, 0, pdata, cupidRCAPar, 0, NULL, status );
+      }
+
+/* Wait for all jobs to complete. */
+      thrWait( wf, status );
+   }
+
+/* Free the job data */
+   job_data = astFree( job_data );
+
+/* Return the pointer to the output array. */
+   return ret;
+}
+
+
+
+
+static void cupidRCAPar( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     cupidRCAPar
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     cupidRCA
+
+*  Invocation:
+*     cupidRCAPar( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = CupidRCAData * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   CupidRCAData *pdata; /* Structure containing job information */
+   double thresh;
+   hdsdim *dims;       /* Pointer to array dimensions */
+   hdsdim ix;          /* Input pixel GRID index on axis 1 */
+   hdsdim iy;          /* Input pixel GRID index on axis 2 */
+   hdsdim iz;          /* Input pixel GRID index on axis 3 */
+   hdsdim ox;          /* Output pixel GRID index on axis 1 */
+   hdsdim oy;          /* Output pixel GRID index on axis 2 */
+   hdsdim oz;          /* Output pixel GRID index on axis 3 */
+   hdsdim xhi;         /* Highest usable pixel GRID index on axis 1 */
+   hdsdim xlo;         /* Lowest usable pixel GRID index on axis 1 */
+   hdsdim yhi;         /* Highest usable pixel GRID index on axis 2 */
+   hdsdim ylo;         /* Lowest usable pixel GRID index on axis 2 */
+   hdsdim zhi;         /* Highest usable pixel GRID index on axis 3 */
+   hdsdim zlo;         /* Lowest usable pixel GRID index on axis 3 */
+   int *in;
+   int *pin0;          /* Pointer to input pixel [0,0,0] */
+   int *pin;           /* Pointer to input pixel */
+   int *piny;          /* Pointer to input pixel at start of row */
+   int *pinz;          /* Pointer to input pixel at start of plane */
+   int *pout;          /* Pointer to output pixel */
+   int centre;
+   int magic;
+   int off;
+   int on;
+   int sum;            /* No. of edge neighbours */
+   int tot;            /* Total no. of neighbours */
+   size_t *skip;       /* Pointer to array of vector index increments */
+   size_t iv;          /* Vector index into input array */
+   size_t p2;          /* Vector index of last o/p pixel to process */
+   size_t remain;      /* Vector index residual after subtracting higher dims */
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (CupidRCAData *) job_data_ptr;
+
+/* Copy values form the structure into local variables */
+   p2 = pdata->p2;
+   skip = pdata->skip;
+   dims = pdata->dims;
+   thresh = pdata->thresh;
+   centre = pdata->centre;
+   magic = pdata->magic;
+   off = pdata->off;
+   on = pdata->on;
+   in = pdata->in;
 
 /* Get a pointer to the input pixel which would have GRID indices [0,0,0]
    if the input array extended that far (in fact the first pixel in the
    input array has GRID indices [1,1,1]). */
-      pin0 = in - skip[ 0 ] - skip[ 1 ] - skip[ 2 ];
+   pin0 = in - skip[ 0 ] - skip[ 1 ] - skip[ 2 ];
 
-/* Store a pointer to the first output pixel. */
-      pout = ret;
+/* Store a pointer to the first output pixel to be created by this thread. */
+   pout = pdata->ret + pdata->p1;
 
-/* Loop round all elements of the output array. */
-      iv = 0;
-      for( oz = 1; oz <= dims[ 2 ]; oz++ ) {
-         for( oy = 1; oy <= dims[ 1 ]; oy++ ) {
-            for( ox = 1; ox <= dims[ 0 ]; ox++, iv++ ) {
+/* Loop round the vector index of all output pixels to be processed by this
+   thread. */
+   for( iv = pdata->p1; iv <= p2; iv++ ){
 
 /* If the corresponding input pixel is equal to or greater than the magic
    value, copy it to the output. */
-               if( in[ iv ] >= magic ){
-                  *(pout++) = magic;
+      if( in[ iv ] >= magic ){
+         *(pout++) = magic;
 
 /* If the corresponding input pixel is off, then the output must also be
    off if "centre" is true. */
-               } else if( centre && in[ iv ] != on ){
-                  *(pout++) = off;
+      } else if( centre && in[ iv ] != on ){
+         *(pout++) = off;
 
 /* Otherwise, loop round all input pixels in the neighbourhood of the current
    output pixel, this is a cube of 3x3x3 input pixels, centred on the current
@@ -167,39 +303,68 @@ int *cupidRCA( int *in, int *out, size_t nel, hdsdim dims[ 3 ], size_t skip[ 3 ]
    the current output pixel is close to an edge of the array, there will be
    fewer than 3x3x3 pixels in the cube. Count the total number of pixels
    in the cube. */
-               } else {
-                  tot = 0;
-                  sum = 0;
-                  pinz = pin0 + iv;
-                  for( iz = oz - 1; iz <= oz + 1; iz++ ) {
-                     if( iz >= 1 && iz <= dims[ 2 ] ) {
-                        piny = pinz;
-                        for( iy = oy - 1; iy <= oy + 1; iy++ ) {
-                           if( iy >= 1 && iy <= dims[ 1 ] ) {
-                              pin = piny;
-                              for( ix = ox - 1; ix <= ox + 1; ix++ ) {
-                                 if( ix >= 1 && ix <= dims[ 0 ] ) {
-                                    tot++;
-                                    if( *pin == on ) sum++;
-                                 }
-                                 pin++;
-                              }
-                           }
-                           piny = piny + skip[ 1 ];
-                        }
-                     }
-                     pinz = pinz + skip[ 2 ];
-                  }
+      } else {
+
+/* Get the 0-based grid indices corresponding to this vector index. */
+         if( skip[ 2 ] ) {
+            oz = iv/skip[ 2 ];
+            remain = iv - oz*skip[ 2 ];
+         } else {
+            oz = 0;
+            remain = iv;
+         }
+         if( skip[ 1 ] ) {
+            oy = remain/skip[ 1 ];
+            ox = remain - oy*skip[ 1 ];
+         } else {
+            oy = 0;
+            ox = remain;
+         }
+
+/* Convert to 1-based grid indices. */
+         oz++;
+         oy++;
+         ox++;
+
+/* Get the usable bounds on each axis, cropping at the edges of the array */
+         zlo = oz - 1;
+         if( zlo < 1 ) zlo = 1;
+         zhi = oz + 1;
+         if( zhi > dims[ 2 ] ) zhi = dims[ 2 ];
+
+         ylo = oy - 1;
+         if( ylo < 1 ) ylo = 1;
+         yhi = oy + 1;
+         if( yhi > dims[ 1 ] ) yhi = dims[ 1 ];
+
+         xlo = ox - 1;
+         if( xlo < 1 ) xlo = 1;
+         xhi = ox + 1;
+         if( xhi > dims[ 0 ] ) xhi = dims[ 0 ];
+
+/* Initialise. */
+         tot = 0;
+         sum = 0;
+
+/* Loop round the usable pixels. */
+         pinz = pin0 + iv + (zlo - oz + 1 )*skip[ 2 ];
+         for( iz = zlo; iz <= zhi; iz++ ) {
+            piny = pinz + (ylo - oy + 1 )*skip[ 1 ];
+            for( iy = ylo; iy <= yhi; iy++ ) {
+               pin = piny + (xlo - ox + 1 )*skip[ 0 ];
+               for( ix = xlo; ix <= xhi; ix++ ) {
+                  tot++;
+                  if( *pin == on ) sum++;
+                  pin++;
+               }
+               piny = piny + skip[ 1 ];
+            }
+            pinz = pinz + skip[ 2 ];
+         }
 
 /* If the fraction of neighbouring on pixels is more than "thresh", set the
    output pixel on. Otherwise set it off. Move on to the next output pixel. */
-                  *(pout++) = ( ( (float) sum )/( (float) tot ) > thresh ) ? on : off;
-               }
-            }
-         }
+         *(pout++) = ( ( (float) sum )/( (float) tot ) > thresh ) ? on : off;
       }
    }
-
-/* Return the pointer to the output array. */
-   return ret;
 }

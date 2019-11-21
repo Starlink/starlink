@@ -5,6 +5,7 @@
 #include "star/kaplibs.h"
 #include "ast.h"
 #include "par.h"
+#include "prm.h"
 #include "star/pda.h"
 #include "star/thr.h"
 #include "cupid.h"
@@ -358,6 +359,8 @@ void makeclumps( int *status ) {
 *        - Integerise the Z-axis GRID position of each clump, as is
 *        already done for the X and Y axes.
 *        - Report each clump position to the user if MSG_FILTER = VERBOSE
+*     21-NOV-2019 (DSB):
+*        Multi-thread.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -383,7 +386,6 @@ void makeclumps( int *status ) {
    double beamcorr[ 3 ];         /* Beam widths */
    double par[ 11 ];             /* Clump parameters */
    double sum;                   /* Integrated intensity */
-   float *d;                     /* Pointer to next output element */
    float *ipd2;                  /* Pointer to data array */
    float *ipd;                   /* Pointer to data array */
    float angle[ 2 ];             /* Values for ANGLE parameter */
@@ -401,12 +403,10 @@ void makeclumps( int *status ) {
    float velfwhm;                /* Value of VELFWHM parameter */
    float vgrad1[ 2 ];            /* Values for VGRAD1 parameter */
    float vgrad2[ 2 ];            /* Values for VGRAD2 parameter */
-   gsl_rng *r;                   /* GSL random number generator */
    hdsdim dims[ 3 ];             /* Dimensions before axis permutation */
    hdsdim grid_delta1;           /* Clump spacing on pixel axis 1 */
    hdsdim grid_delta2;           /* Clump spacing on pixel axis 2 */
    hdsdim grid_delta3;           /* Clump spacing on pixel axis 3 */
-   hdsdim grid_dims[ 3 ];        /* No. of clumps along each pixel axis */
    hdsdim ix;                    /* Clump centre on pixel axis 1 */
    hdsdim iy;                    /* Clump centre on pixel axis 2 */
    hdsdim iz;                    /* Clump centre on pixel axis 3 */
@@ -418,11 +418,13 @@ void makeclumps( int *status ) {
    int deconv;                   /* Store deconvolved clump properties */
    int dist;                     /* Clump parameters distribution */
    int grid;                     /* Border for regular grid (-ve if random) */
+   int grid_dims[ 3 ];           /* No. of clumps along each pixel axis */
    int i;                        /* Loop count */
    int indf2;                    /* Identifier for output NDF without noise */
    int indf3;                    /* Identifier for input WCS NDF */
    int indf;                     /* Identifier for output NDF with noise */
    int ishape;                   /* STC-S shape for spatial coverage */
+   int ivals[ NDF__MXDIM ];      /* 4-byte interger bounds */
    int iw;                       /* Index of worker thread */
    int nc;                       /* Number of clumps created */
    int nclump;                   /* Number of clumps to create */
@@ -436,8 +438,9 @@ void makeclumps( int *status ) {
    int precat;                   /* Create catalogue before beam smoothing? */
    int sdims;                    /* Number of significant pixel axes */
    size_t area;                  /* Clump area */
-   size_t iel;                   /* Element count */
+   size_t ierr;                  /* Index of first conversion error */
    size_t nel;                   /* Number of elements in array */
+   size_t nerr;                  /* Count of conversion errors */
    size_t st;                    /* A size_t that can be passed as an argument */
    size_t step;                  /* Number of pixels per thread */
    unsigned long int seed;       /* Seed for random number generator */
@@ -468,8 +471,23 @@ void makeclumps( int *status ) {
          errAnnul( status );
       } else {
          ndfBound( indf3, 3, lbnd, ubnd, &ndim, status );
-         parDef1k( "LBND", ndim, lbnd, status );
-         parDef1k( "UBND", ndim, ubnd, status );
+
+         vecKtoI( 0, ndim, lbnd, ivals, &ierr, &nerr, status );
+         if( nerr > 0 && *status == SAI__OK ) {
+            errRep( " ", "Lower bounds of input NDF are too large",
+                    status );
+         }
+         parDef1i( "LBND", ndim, ivals, status );
+         vecItoK( 0, ndim, ivals, lbnd, &ierr, &nerr, status );
+
+         vecKtoI( 0, ndim, ubnd, ivals, &ierr, &nerr, status );
+         if( nerr > 0 && *status == SAI__OK ) {
+            errRep( " ", "Upper bounds of input NDF are too large",
+                    status );
+         }
+         parDef1i( "UBND", ndim, ivals, status );
+         vecItoK( 0, ndim, ivals, ubnd, &ierr, &nerr, status );
+
          kpg1Gtwcs( indf3, &iwcs, status );
          ndfAnnul( &indf3, status );
       }
@@ -477,11 +495,13 @@ void makeclumps( int *status ) {
 
 /* Get the required axis bounds. */
    if( iwcs ) {
-      parExack( "LBND", ndim, lbnd, status );
+      parExaci( "LBND", ndim, ivals, status );
    } else {
-      parGet1k( "LBND", 3, lbnd, &ndim, status );
+      parGet1i( "LBND", 3, ivals, &ndim, status );
    }
-   parExack( "UBND", ndim, ubnd, status );
+   vecItoK( 0, ndim, ivals, lbnd, &ierr, &nerr, status );
+   parExaci( "UBND", ndim, ivals, status );
+   vecItoK( 0, ndim, ivals, ubnd, &ierr, &nerr, status );
 
 /* Get the indices and bounds of the significant pixel axes. */
    sdims = 0;
@@ -587,10 +607,10 @@ void makeclumps( int *status ) {
 
 /* Get the number of clumps to create. */
    if( grid >= 0 ) {
-      parExack( "NCLUMP", ndim, grid_dims, status );
-      nclump = (int) grid_dims[0];
-      if( ndim > 1 ) nclump *= (int) grid_dims[1];
-      if( ndim > 2 ) nclump *= (int) grid_dims[2];
+      parExaci( "NCLUMP", ndim, grid_dims, status );
+      nclump = grid_dims[0];
+      if( ndim > 1 ) nclump *= grid_dims[1];
+      if( ndim > 2 ) nclump *= grid_dims[2];
    } else {
       parGet0i( "NCLUMP", &nclump, status );
       grid_dims[0] = 1;
@@ -827,7 +847,7 @@ void makeclumps( int *status ) {
 /* Create the output data array by summing the contents of the NDFs
    describing the beam-smoothed clumps. */
    msgOutiff( MSG__VERB, " ", "Creating noise-free output array", status );
-   cupidSumClumps( CUPID__FLOAT, NULL, sdims, slbnd, subnd, nel, obj,
+   cupidSumClumps( CUPID__FLOAT, wf, NULL, sdims, slbnd, subnd, nel, obj,
                    NULL, ipd2, "GAUSSCLUMPS", status );
 
 /* Add Gaussian noise to the beam-smoothed data. This operation is

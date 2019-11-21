@@ -5,10 +5,33 @@
 #include "prm_par.h"
 #include "mers.h"
 #include <math.h>
+#include "star/thr.h"
+
+/* Local data types */
+
+typedef struct CGEN_FUNCTION(CupidRmsData) {
+   int operation;
+   size_t r1;
+   size_t r2;
+   size_t rowlen;
+   CGEN_TYPE *array;
+   CGEN_TYPE *w;
+   double maxv;
+   double minv;
+   double sum;
+   size_t n;
+   size_t nrej;
+   double thresh;
+} CGEN_FUNCTION(CupidRmsData);
+
+/* Prototypes for local functions */
+static void CGEN_FUNCTION(cupidRmsPar)( void *job_data_ptr, int *status );
 
 
-double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, size_t nel, hdsdim rowlen,
-         int *status ){
+
+
+double CGEN_FUNCTION(cupidRms)( ThrWorkForce *wf, CGEN_TYPE *array, size_t nel,
+                                hdsdim rowlen, int *status ){
 /*
 *+
 *  Name:
@@ -21,8 +44,8 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, size_t nel, hdsdim rowlen,
 *     Starlink C
 
 *  Synopsis:
-*     double cupidRms<X>( CGEN_TYPE *array, size_t nel, hdsdim rowlen,
-*                         int *status )
+*     double cupidRms<X>( ThrWorkForce *wf, CGEN_TYPE *array, size_t nel,
+*                         hdsdim rowlen, int *status )
 
 *  Description:
 *     This functions finds an estimate of the RMS noise in the supplied
@@ -39,6 +62,8 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, size_t nel, hdsdim rowlen,
 *     clipping.
 
 *  Parameters:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     array
 *        Pointer to the data array. The elements should be stored in
 *        Fortran order.
@@ -62,6 +87,7 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, size_t nel, hdsdim rowlen,
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2019 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -92,6 +118,8 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, size_t nel, hdsdim rowlen,
 *        values adjacent to bad values.
 *     7-JUN-2013 (DSB):
 *        Assign bad value to work values if a neigbouring input value is bad.
+*     31-OCT-2019 (DSB):
+*        Multi-threaded.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -101,20 +129,19 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, size_t nel, hdsdim rowlen,
 */
 
 /* Local Variables: */
-   CGEN_TYPE *pr;       /* Pointer to next data value */
+   size_t nrej;
    CGEN_TYPE *w;        /* Pointer to work array */
-   CGEN_TYPE *wr;       /* Pointer to next work value */
-   double ret;          /* Returned value */
+   CGEN_FUNCTION(CupidRmsData) *job_data = NULL; /* Job desriptions */
+   CGEN_FUNCTION(CupidRmsData) *pdata; /* Point er to a single job description */
    double maxv;         /* Largest data value in supplied array */
    double minv;         /* Smallest data value in supplied array */
+   double ret;          /* Returned value */
    double sum;          /* Sum of squared residuals */
-   double thresh;       /* The rejection threshold for residuals */
-   hdsdim i;            /* Element count */
-   hdsdim ipix;         /* Pixel count */
-   hdsdim irow;         /* Row counter */
    hdsdim n;            /* Number of values summed in "sum" */
-   hdsdim nrej;         /* Number of rejections on previus loop */
    hdsdim nrow;         /* Number of rows in supplied array */
+   int iw;              /* Index of worker thread */
+   int nw;              /* Number of worker threads */
+   size_t step;         /* Rows per thread */
 
 /* Initialise. */
    ret = VAL__BADD;
@@ -122,48 +149,64 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, size_t nel, hdsdim rowlen,
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
 
-/* How many rows in the entire data array? */
-   nrow = nel/rowlen;
+/* How many threads do we get to play with */
+   nw = wf ? wf->nworker : 1;
+
+/* Allocate job data for threads. */
+   job_data = astCalloc( nw, sizeof(*job_data) );
 
 /* Allocate memory for a copy of the data array. */
-   w = astMalloc( sizeof( CGEN_TYPE )*nel );
-   if( w ) {
+   w = astCalloc( nel, sizeof( CGEN_TYPE ) );
+   if( job_data && w ) {
 
-/* Run a 1D Laplace filter (kernel = [-1,2,-1]) over the data, storing
-   the results in the work array. At the same time, find the RMS value of
-   the filtered data. A Laplace filter picks out the noise, but will also
-   include spikes due to sharp slopes (such as the edge of star profiles,
-   etc). */
-      pr = array;
-      wr = w;
-      sum = 0.0;
-      n = 0;
+/* How many rows in the entire data array? */
+      nrow = nel/rowlen;
+
+/* Find how many rows to process in each worker thread. */
+      if( nrow > nw ) {
+         step = nrow/nw;
+      } else {
+         step = 1;
+         nw = nrow;
+      }
+
+/* Store the range of rows to be processed by each one. Ensure that the
+   last thread picks up any left-over rows. */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         pdata->r1 = iw*step;
+         if( iw < nw - 1 ) {
+            pdata->r2 = pdata->r1 + step - 1;
+         } else {
+            pdata->r2 = nrow - 1 ;
+         }
+
+/* Store the other information needed to process the group of output
+   pixels. */
+         pdata->array = array;
+         pdata->w = w;
+         pdata->rowlen = rowlen;
+         pdata->operation = 1;
+
+/* Submit the job to be processed by the next available worker thread. */
+         thrAddJob( wf, 0, pdata, CGEN_FUNCTION(cupidRmsPar), 0, NULL, status );
+      }
+
+/* Wait for all jobs to complete. */
+      thrWait( wf, status );
+
+/* Find the largest and smallest data value found in any row, the total number
+   of good values and the sum of the good values. */
       maxv = CGEN_MIN;
       minv = CGEN_MAX;
-      for( irow = 0; irow < nrow; irow++ ){
-         *(wr++) = CGEN_BAD;
-         pr++;
-         for( ipix = 1; ipix < rowlen - 1; ipix++, wr++, pr++ ){
-            if( pr[ 0 ] != CGEN_BAD ) {
-
-               if( pr[ -1 ] != CGEN_BAD &&
-                   pr[ 1 ] != CGEN_BAD ){
-                  *wr = -pr[ -1 ] + 2*pr[ 0 ] - pr[ 1 ];
-                  sum += ( *wr )*( *wr );
-                  n++;
-               } else {
-                  *wr = CGEN_BAD;
-               }
-
-               if( *pr > maxv ) maxv = *pr;
-               if( *pr < minv ) minv = *pr;
-
-            } else {
-               *wr = CGEN_BAD;
-            }
-         }
-         *(wr++) = CGEN_BAD;
-         pr++;
+      n = 0;
+      sum = 0.0;
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         if( pdata->maxv > maxv ) maxv = pdata->maxv;
+         if( pdata->minv < minv ) minv = pdata->minv;
+         n += pdata->n;
+         sum += pdata->sum;
       }
 
       if( n < 2 ) {
@@ -188,25 +231,23 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, size_t nel, hdsdim rowlen,
    clipping until no further residuals are rejected. */
       nrej = 1;
       while( nrej ) {
-         sum = 0.0;
-         n = 0;
+
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->operation = 2;
+            pdata->thresh = 4*ret;
+            thrAddJob( wf, 0, pdata, CGEN_FUNCTION(cupidRmsPar), 0, NULL, status );
+         }
+         thrWait( wf, status );
+
          nrej = 0;
-         thresh = 4*ret;
-         wr = w + 2;
-         for( i = 2; i < nel - 2; i++, wr++ ){
-            if( *wr != CGEN_BAD ){
-               if( fabs( *wr ) >  thresh ) {
-                  wr[ -2 ] = CGEN_BAD;
-                  wr[ -1 ] = CGEN_BAD;
-                  wr[ 0 ] = CGEN_BAD;
-                  wr[ 1 ] = CGEN_BAD;
-                  wr[ 2 ] = CGEN_BAD;
-                  nrej++;
-               } else {
-                  sum += ( *wr )*( *wr );
-                  n++;
-               }
-            }
+         n = 0;
+         sum = 0.0;
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            n += pdata->n;
+            nrej += pdata->nrej;
+            sum += pdata->sum;
          }
 
          if( n == 0 ) {
@@ -234,6 +275,145 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, size_t nel, hdsdim rowlen,
 L999:;
    w = astFree( w );
 
+/* Free the job data */
+   job_data = astFree( job_data );
+
 /* Return the result. */
    return ret;
 }
+
+
+static void CGEN_FUNCTION(cupidRmsPar)( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     cupidRmsPar<X>
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     cupidRms
+
+*  Invocation:
+*     cupidRmsPar<X>( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = CGEN_FUNCTION(CupidRmsData) * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   CGEN_TYPE *pr;       /* Pointer to next data value */
+   CGEN_TYPE *wr;       /* Pointer to next work value */
+   CGEN_FUNCTION(CupidRmsData) *pdata; /* Structure containing job information */
+   double maxv;         /* Largest data value in supplied array */
+   double minv;         /* Smallest data value in supplied array */
+   double sum;          /* Sum of squared residuals */
+   size_t ipix;         /* Pixel count */
+   size_t irow;         /* Row counter */
+   double thresh;       /* The rejection threshold for residuals */
+   size_t nrej;         /* Number of rejections on previus loop */
+   size_t n;            /* Number of values summed in "sum" */
+   size_t i;            /* Element count */
+   size_t r2;           /* Index of final row to process */
+   size_t rowlen;       /* No. of pixels in one row */
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (CGEN_FUNCTION(CupidRmsData) *) job_data_ptr;
+
+/* Copy values form the structure into local variables */
+   r2 = pdata->r2;
+   rowlen = pdata->rowlen;
+
+/* Applying a Laplace filter to each row of data */
+   if( pdata->operation == 1 ) {
+
+/* Run a 1D Laplace filter (kernel = [-1,2,-1]) over the rows to be
+   processed by this thread, storing the results in the work array. At
+   the same time, find the RMS value of the filtered data. A Laplace filter
+   picks out the noise, but will also include spikes due to sharp slopes
+   (such as the edge of star profiles, etc). */
+      pr = pdata->array + pdata->r1*rowlen;
+      wr = pdata->w + pdata->r1*rowlen;
+      sum = 0.0;
+      n = 0;
+      maxv = CGEN_MIN;
+      minv = CGEN_MAX;
+      for( irow = pdata->r1; irow <= r2; irow++ ){
+         *(wr++) = CGEN_BAD;
+         pr++;
+         for( ipix = 1; ipix < rowlen - 1; ipix++, wr++, pr++ ){
+            if( pr[ 0 ] != CGEN_BAD ) {
+
+               if( pr[ -1 ] != CGEN_BAD &&
+                   pr[ 1 ] != CGEN_BAD ){
+                  *wr = -pr[ -1 ] + 2*pr[ 0 ] - pr[ 1 ];
+                  sum += ( *wr )*( *wr );
+                  n++;
+               } else {
+                  *wr = CGEN_BAD;
+               }
+
+               if( *pr > maxv ) maxv = *pr;
+               if( *pr < minv ) minv = *pr;
+
+            } else {
+               *wr = CGEN_BAD;
+            }
+         }
+         *(wr++) = CGEN_BAD;
+         pr++;
+      }
+
+      pdata->maxv = maxv;
+      pdata->minv = minv;
+      pdata->n = n;
+      pdata->sum = sum;
+
+/* Get rid of spikes by doing a 4-sigma clip on the residuals produced by
+   the Laplace filter. In addition, set the two neighbouring pixels on
+   either side of each rejected pixel bad. */
+   } else if( pdata->operation == 2 ) {
+      thresh = pdata->thresh;
+
+      sum = 0.0;
+      n = 0;
+      nrej = 0;
+
+      for( irow = pdata->r1; irow <= r2; irow++ ){
+         wr = pdata->w + irow*rowlen + 2;
+
+         for( i = 2; i < rowlen - 2; i++, wr++ ){
+            if( *wr != CGEN_BAD ){
+               if( fabs( *wr ) >  thresh ) {
+                  wr[ -2 ] = CGEN_BAD;
+                  wr[ -1 ] = CGEN_BAD;
+                  wr[ 0 ] = CGEN_BAD;
+                  wr[ 1 ] = CGEN_BAD;
+                  wr[ 2 ] = CGEN_BAD;
+                  nrej++;
+               } else {
+                  sum += ( *wr )*( *wr );
+                  n++;
+               }
+            }
+         }
+      }
+
+      pdata->n = n;
+      pdata->nrej = nrej;
+      pdata->sum = sum;
+
+   } else {
+      *status = SAI__ERROR;
+      errRepf( "", "cupidrms: Illegal operation %d (cupid programming error).",
+               status, pdata->operation );
+   }
+}
+

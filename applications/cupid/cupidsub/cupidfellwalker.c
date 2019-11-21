@@ -5,12 +5,14 @@
 #include "ndf.h"
 #include "prm_par.h"
 #include "star/hds.h"
+#include "star/thr.h"
 #include "star/ndg.h"
 #include <math.h>
 
-HDSLoc *cupidFellWalker( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *ipd,
-                         double *ipv, double rms, AstKeyMap *config, int velax,
-                         int perspectrum, double beamcorr[ 3 ], int *status ){
+HDSLoc *cupidFellWalker( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
+                         hdsdim *subnd, void *ipd, double *ipv, double rms,
+                         AstKeyMap *config, int velax, int perspectrum,
+                         double beamcorr[ 3 ], int *status ){
 /*
 *+
 *  Name:
@@ -24,8 +26,8 @@ HDSLoc *cupidFellWalker( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void 
 *     Starlink C
 
 *  Synopsis:
-*     HDSLoc *cupidFellWalker( int type, int ndim, hdsdim *slbnd, hdsdim *subnd,
-*                              void *ipd, double *ipv, double rms,
+*     HDSLoc *cupidFellWalker( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
+*                              hdsdim *subnd, void *ipd, double *ipv, double rms,
 *                              AstKeyMap *config, int velax, int perspectrum,
 *                              double beamcorr[ 3 ], int *status )
 
@@ -68,6 +70,8 @@ HDSLoc *cupidFellWalker( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void 
 *     configuration parameter), then the two clumps are merged together.
 
 *  Parameters:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     type
 *        An integer identifying the data type of the array values pointed to
 *        by "ipd". Must be either CUPID__DOUBLE or CUPID__FLOAT (defined in
@@ -160,6 +164,8 @@ HDSLoc *cupidFellWalker( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void 
 *        Switch off group history and provenance recording whilst creating
 *        clump NDFs. This is because it can inflate the time taken to run
 *        findclumps enormously if there are many thousands of clumps.
+*     21-NOV-2019 (DSB):
+*        Multi-thread.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -172,7 +178,6 @@ HDSLoc *cupidFellWalker( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void 
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
    double *pd;          /* Pointer to next element of data array */
    double *peakvals;    /* Pointer to array holding clump peak values */
-   double mindip;       /* Minimum dip between distinct peaks */
    double minhgt;       /* Min allowed height for a clump peak */
    double noise;        /* Background data value */
    double pv;           /* Pixel value */
@@ -183,6 +188,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void 
    hdsdim ix;           /* Grid index on 1st axis */
    hdsdim iy;           /* Grid index on 2nd axis */
    hdsdim iz;           /* Grid index on 3rd axis */
+   hdsdim skip[3];      /* Pointer to array of axis skips */
    int *igood;          /* Pointer to array holding usable clump indices */
    int *ipa;            /* Pointer to clump assignment array */
    int *nrem;           /* Pointer to array holding clump populations */
@@ -202,7 +208,6 @@ HDSLoc *cupidFellWalker( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void 
    int old_ghstate;     /* Non-zero if group history recording is switched on */
    int old_pvstate;     /* Non-zero if provenance recording is switched on */
    size_t el;           /* Number of elements in array */
-   size_t skip[3];      /* Pointer to array of axis skips */
 
 /* Initialise */
    ret = NULL;
@@ -258,8 +263,8 @@ HDSLoc *cupidFellWalker( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void 
 
 /* Assign every data pixel to a clump and stores the clumps index in the
    corresponding pixel in "ipa". */
-   maxid = cupidFWMain( type, ipd, el, ndim, dims, skip, slbnd, rms, config,
-                        ipa,
+   maxid = cupidFWMain( type, wf, ipd, el, ndim, dims, skip, slbnd, rms,
+                        config, ipa,
                         ( ndim > 2 && perspectrum ) ? velax + 1 : 0, status );
 
 /* Abort if no clumps found. */
@@ -285,10 +290,6 @@ HDSLoc *cupidFellWalker( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void 
 
 /* Get the lowest data value to be considered. */
       noise = cupidConfigRMS( config, "NOISE", rms, 2.0*rms, status );
-
-/* Get the minimum dip between two adjoining peaks necessary for the two
-   peaks to be considered distinct. */
-      mindip = cupidConfigRMS( config, "MINDIP", rms, 2.0*rms, status );
 
 /* Get the lowest allowed clump peak value. */
       minhgt = cupidConfigRMS( config, "MINHEIGHT", rms, noise, status );

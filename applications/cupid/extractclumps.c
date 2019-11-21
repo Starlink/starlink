@@ -8,6 +8,7 @@
 #include "star/irq.h"
 #include "star/grp.h"
 #include "star/hds.h"
+#include "star/thr.h"
 #include "par.h"
 #include "prm_par.h"
 #include "cupid.h"
@@ -235,6 +236,8 @@ void extractclumps( int *status ) {
 *        Add parameter JSACAT.
 *     15-OCT-2014 (SFG):
 *        Add paramter SHAPE.
+*     21-NOV-2019 (DSB):
+*        Multi-thread.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -254,6 +257,7 @@ void extractclumps( int *status ) {
    HDSLoc *ndfs;                /* Array of NDFs, one for each clump */
    HDSLoc *xloc;                /* HDS locator for CUPID extension */
    IRQLocs *qlocs;              /* HDS locators for quality name information */
+   ThrWorkForce *wf = NULL;     /* Pointer to a pool of worker threads */
    char attr[ 30 ];             /* AST attribute name */
    char buffer[ GRP__SZNAM ];    /* Buffer for GRP element */
    char dataunits[ 21 ];        /* NDF data units */
@@ -275,6 +279,7 @@ void extractclumps( int *status ) {
    hdsdim ix;                   /* GRID value on 1st axis */
    hdsdim iy;                   /* GRID value on 2nd axis */
    hdsdim iz;                   /* GRID value on 3rd axis */
+   hdsdim n;                    /* Number of values summed in "sum" */
    hdsdim skip[ 3 ];            /* Pixel axis skips */
    hdsdim slbnd[ NDF__MXDIM ];  /* The lower bounds of the significant pixel axes */
    hdsdim subnd[ NDF__MXDIM ];  /* The upper bounds of the significant pixel axes */
@@ -308,7 +313,6 @@ void extractclumps( int *status ) {
    int velax;                   /* Index of velocity pixel axis */
    size_t el;                   /* Number of array elements mapped */
    size_t iel;                  /* Element count */
-   size_t n;                    /* Number of values summed in "sum" */
    size_t size;                 /* Number of elements in "grp" */
    void *ipd;                   /* Pointer to Data array */
 
@@ -324,6 +328,10 @@ void extractclumps( int *status ) {
 
 /* Start an NDF context */
    ndfBegin();
+
+/* Find the number of cores/processors available and create a pool of
+   threads of the same size. */
+   wf = thrGetWorkforce( thrGetNThread( "CUPID_THREADS", status ), status );
 
 /* Get an identifier for the two input NDFs. We use NDG (via kpg1_Rgndf)
    instead of calling ndfAssoc directly since NDF/HDS has problems with
@@ -690,7 +698,7 @@ void extractclumps( int *status ) {
 
 /* Create the output data array by summing the contents of the NDFs describing
    the  found and usable clumps. This also fills the above mask array. */
-      cupidSumClumps( type, ipd, nsig, slbnd, subnd, el, ndfs,
+      cupidSumClumps( type, wf, ipd, nsig, slbnd, subnd, el, ndfs,
                       rmask, ipa, method, status );
 
 /* Delete any existing quality name information from the output NDF, and

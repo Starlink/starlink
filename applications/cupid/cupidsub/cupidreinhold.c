@@ -240,7 +240,7 @@ HDSLoc *cupidReinhold( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *i
    mask array in which a pixel is marked as an edge pixel if any of its
    neighbours are marked as edge pixels in the mask array created above. */
    msgOutif( MSG__DEBUG, "", "Dilating clump edges...", status );
-   mask2 = cupidRCA( mask, NULL, el, dims, skip, 0.0, peakval, CUPID__KEDGE,
+   mask2 = cupidRCA( NULL, mask, NULL, el, dims, skip, 0.0, peakval, CUPID__KEDGE,
                      CUPID__KBACK, 0, status );
 
 /* Erode the edge regions using a second cellular automata. This over-writes
@@ -251,7 +251,7 @@ HDSLoc *cupidReinhold( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *i
    m1 = mask;
    m2 = mask2;
    for( i = 0; i < caiter; i++ ) {
-      m1 = cupidRCA( m2, m1, el, dims, skip, cathresh, peakval, CUPID__KEDGE,
+      m1 = cupidRCA( NULL, m2, m1, el, dims, skip, cathresh, peakval, CUPID__KEDGE,
                      CUPID__KBACK, 0, status );
       m3 = m1;
       m1 = m2;
@@ -277,7 +277,7 @@ HDSLoc *cupidReinhold( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *i
    results back into the supplied "m1" array. */
    if( fixiter >0 ) msgOutif( MSG__DEBUG, "", "Smoothing clump boundaries...", status );
    for( i = 0; i < fixiter; i++ ) {
-      m2 = cupidRCA2( m1, m2, el, dims, skip, status );
+      m2 = cupidRCA2( NULL, m1, m2, el, dims, skip, status );
       m3 = m2;
       m2 = m1;
       m1 = m3;

@@ -751,7 +751,7 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
                   *status = SAI__ERROR;
                   errRepf( "", "cupidstoreclumps: inconsistent numbers of "
                            "clumps (%d) and STC outlines (%d) (programming "
-                           "error).", status, iclump, istc );
+                           "error).", status, (int) iclump, istc );
                }
 
             } else {
@@ -850,5 +850,4 @@ L999:
 
 /* End the AST context. */
    astEnd;
-
 }
