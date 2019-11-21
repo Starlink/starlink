@@ -883,7 +883,7 @@ void *thrGetJobData( int ijob, ThrWorkForce *workforce, int *status ){
 
 /* Local Variables: */
    AstKeyMap *globals;
-   ThrJob *job;
+   ThrJob *job = NULL;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return NULL;
@@ -900,37 +900,35 @@ void *thrGetJobData( int ijob, ThrWorkForce *workforce, int *status ){
                  status );
       }
 
-/* Get the workforce pointer out of the globals KeyMap. */
-      if( !astMapGet0P( globals, "THR_WORKFORCE", (void **) &workforce ) &&
-          *status == SAI__OK ) {
-         *status = SAI__ERROR;
-         emsRep( "", "thrGetJobData: Workforce not found in globals KeyMap (thr "
-                 "programming error).", status );
-      }
+/* Get the workforce pointer out of the globals KeyMap. There may be no
+   workforce (e.g. if the application was run wi the <PACKAGE>_THREADS
+   environment variable set to zero). */
+      astMapGet0P( globals, "THR_WORKFORCE", (void **) &workforce );
    }
 
 /* Return if no workforce is available. */
-   if( !workforce ) return NULL;
+   if( workforce ) {
 
 /* Wait in the job desk queue until we have exclusive access to the job
    desk. */
-   thrMutexLock( &( workforce->jd_mutex ), status );
+      thrMutexLock( &( workforce->jd_mutex ), status );
 
 /* Get a pointer to the structure describing the job. Search each
    list of jobs in turn. Report an error if the job is not found.
    First see if the requested job is the one being checked by the
    active worker. */
-   job = thr1FindJob( workforce->available_jobs, ijob, -1,
-                      THR__AVAILABLE, status );
-   if( !job ) job = thr1FindJob( workforce->finished_jobs, ijob, -1,
-                                 THR__FINISHED, status );
-   if( !job ) job = thr1FindJob( workforce->waiting_jobs, ijob, -1,
-                                 THR__WAITING, status );
-   if( !job ) job = thr1FindJob( workforce->active_jobs, ijob, -1,
-                                 THR__ACTIVE, status );
+      job = thr1FindJob( workforce->available_jobs, ijob, -1,
+                         THR__AVAILABLE, status );
+      if( !job ) job = thr1FindJob( workforce->finished_jobs, ijob, -1,
+                                    THR__FINISHED, status );
+      if( !job ) job = thr1FindJob( workforce->waiting_jobs, ijob, -1,
+                                    THR__WAITING, status );
+      if( !job ) job = thr1FindJob( workforce->active_jobs, ijob, -1,
+                                    THR__ACTIVE, status );
 
 /* Unlock the mutex so that the next thread can access the job desk. */
-   thrMutexUnlock( &( workforce->jd_mutex ), status );
+      thrMutexUnlock( &( workforce->jd_mutex ), status );
+   }
 
 /* Return the required pointer. */
    return job ? job->data : NULL;
