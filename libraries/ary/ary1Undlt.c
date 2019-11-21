@@ -1,3 +1,4 @@
+#include <string.h>
 #include "sae_par.h"
 #include "mers.h"
 #include "star/hds.h"
