@@ -86,6 +86,11 @@
 *        from SUBPAR on error.
 *     05-SEP-2008 (TIMJ):
 *        Rewrite in C.
+*     20-NOV-2019 (DSB):
+*        - Change || to && when testing if a valid parameter name has
+*        been supplied.
+*        - Skip leading spaces in parameter name. This means that names
+*        that are just whitespace are ignored.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -101,6 +106,7 @@
 #include "mers1.h"
 
 #include <string.h>
+#include <ctype.h>
 
 int msg1Genv(  const char * param, char *msgstr, size_t msglen ) {
 
@@ -114,8 +120,11 @@ int msg1Genv(  const char * param, char *msgstr, size_t msglen ) {
   /*  Mark a new error reporting context. */
   emsMark();
 
+  /* Skip any leading spaces in the parameter name */
+  while( isspace( *param ) ) param++;
+
   /*  Check that PARAM actually contains a parameter name. */
-  if (param || strlen(param) > 0) {
+  if (param && strlen(param) > 0) {
 
     /* PARAM does contain a parameter name, so attempt to get the
      * message text from the parameter system. */
