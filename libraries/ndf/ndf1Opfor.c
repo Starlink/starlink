@@ -85,6 +85,9 @@ void ndf1Opfor( HDSLoc *loc, const char *name, const char *mode,
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     21-NOV-2019 (DSB):
+*        Reduce the time that this function has the TCB mutex locked, so
+*        that other threads can proceed more rapidly.
 
 *-
 */
@@ -103,8 +106,10 @@ void ndf1Opfor( HDSLoc *loc, const char *name, const char *mode,
    char vmode[ NDF__SZMOD + 1 ];   /* Validated access mode string */
    int active;           /* NDF is already in use? */
    int cvt;              /* Conversion required? */
+   int direct;           /* Open th NDF directly as a native HDS object? */
    int found;            /* Input file identified? */
    int islot;            /* Slot index */
+   int keep;             /* Keep the native format object? */
    int next;             /* Next DCB entry to consider */
    int report;           /* Report error if file does not exist? */
    int url;              /* Name is URL */
@@ -146,15 +151,24 @@ void ndf1Opfor( HDSLoc *loc, const char *name, const char *mode,
    values. */
    NDF__TCB_LOCK_MUTEX;
 
-/* No foreign formats.
-   ==================
-   If an active input locator has been supplied (indicating that we
+/* If an active input locator has been supplied (indicating that we
    need not consider a foreign format file), or there are no foreign
    data formats to be recognised on input, or the "Ndf_TCB_docvt" flag is
    zero indicating that foreign format conversions are not required,
-   then open the NDF directly as a native format object. */
+   then flag that the NDF shouldbe opened directly as a native format object. */
+   direct = ( loc || !Ndf_TCB_forin || !Ndf_TCB_docvt );
+
+/* See if the native format object is to be kept. */
+   keep = Ndf_TCB_keep;
+
+/* Allow other threads to access the tuning parameters. */
+   NDF__TCB_UNLOCK_MUTEX;
+
+/* No foreign formats.
+   ==================
+   If required, open the NDF directly as a native format object. */
    if( *status == SAI__OK ) {
-      if( loc || !Ndf_TCB_forin || !Ndf_TCB_docvt ) {
+      if( direct ){
          ndf1Nfind( loc, name, vmode, acb, status );
 
 /* Foreign formats.
@@ -536,7 +550,7 @@ void ndf1Opfor( HDSLoc *loc, const char *name, const char *mode,
 /* If conversion of a foreign format file is definitely required, then
    identify the native format NDF object which is to be associated with
    it and will hold the converted data. */
-               ndf1Ntfor( forfil, fcb, Ndf_TCB_keep, &ndfloc, ndfnam,
+               ndf1Ntfor( forfil, fcb, keep, &ndfloc, ndfnam,
                           sizeof( ndfnam ), &lnam, status );
 
 /* If we are getting an "SDF" file (i.e. no file type) from a "url" there will
@@ -562,7 +576,7 @@ void ndf1Opfor( HDSLoc *loc, const char *name, const char *mode,
    is to be kept, since we will later need to delete it. */
                   if( *status == SAI__OK ) {
                      errMark();
-                     if( Ndf_TCB_keep ) {
+                     if( keep ) {
                         ndf1Nfind( ndfloc, ndfnam, vmode, acb, status );
                      } else {
                         ndf1Nfind( ndfloc, ndfnam, "UPDATE", acb, status );
@@ -621,11 +635,11 @@ void ndf1Opfor( HDSLoc *loc, const char *name, const char *mode,
                                       sizeof( dcb->forid ) );
                         dcb->fcb = fcb;
                         dcb->forex = 1;
-                        dcb->forkp = Ndf_TCB_keep;
+                        dcb->forkp = keep;
 
 /* If the converted NDF object is not being kept, then mark its file as
    a scratch file to ensure it will be deleted when finished with. */
-                        if( !Ndf_TCB_keep ) ndf1Hscrt( dcb->loc, status );
+                        if( !keep ) ndf1Hscrt( dcb->loc, status );
                      }
                   }
                }
@@ -662,9 +676,6 @@ void ndf1Opfor( HDSLoc *loc, const char *name, const char *mode,
    } else if( !strcmp( vmode, "UPDATE" ) ) {
       ndf1Event( "UPDATE_EXISTING_NDF", status );
    }
-
-/* Allow other threads to access the tuning parameters. */
-   NDF__TCB_UNLOCK_MUTEX;
 
 /* Free dynamic strings. */
    substring = astFree( substring );
