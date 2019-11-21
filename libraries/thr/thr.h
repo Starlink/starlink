@@ -43,7 +43,12 @@
 /* Macros */
 #define THR__REPORT_JOB 1
 #define THR__FREE_JOBDATA 2
-
+#define THR__NONE 0
+#define THR__ACTIVE 1
+#define THR__AVAILABLE 2
+#define THR__FINISHED 4
+#define THR__WAITING 8
+#define THR__FREE 16
 
 /* Type definitions */
 /* ---------------- */
@@ -65,13 +70,18 @@ struct ThrJob {
   void *data;                 /* Structure holding data for the worker */
   void (*func)(void *, int *);/* The function to be run by the worker */
   int nheld_up;               /* Length of "held_up" array */
-  ThrJob **held_up;           /* Jobs that cannot run until this one has finished */
+  ThrJob **held_up;           /* Jobs that cannot start running until this one finishes */
   int nwaiting_on;            /* Length of "waiting_on" array */
-  ThrJob **waiting_on;        /* Jobs that must finish before this one can run */
+  ThrJob **waiting_on;        /* Jobs that must finish before this one can start running */
   ThrJob *next;               /* Next job in list */
   ThrJob *prev;               /* Previous job in list */
   int conid;                  /* Context idenrifier for job */
   ThrJobStatus *status;       /* The error status upon completion of the job */
+  int nhalted;                /* Length of "halted" list */
+  ThrJob **halted;            /* Running jobs that are halted waiting on this job */
+  int nneeded;                /* Length of "needed" list */
+  ThrJob **needed;            /* Jobs that must finish before this running job continues */
+  int queue;                  /* Which queue is this job currently in? */
 };
 
 /* Structure describing the whole work force. */
@@ -116,6 +126,9 @@ int thrJobWait( ThrWorkForce *workforce, int *status );
 void *thrGetJobData( int ijob, ThrWorkForce *workforce, int *status );
 void thrBeginJobContext( ThrWorkForce *workforce, int *status );
 void thrEndJobContext( ThrWorkForce *workforce, int *status );
+int *thrGetJobs( ThrWorkForce *workforce, int state, int *njob, int *status );
+void thrHaltJob( ThrWorkForce *workforce, int njob, int *job_list, int *status );
+void *(*thrFreeFun( void *(*freejob)( void *, int *) ))( void *, int * );
 
 /* Prototypes for other public functions */
 int thrGetNThread( const char *env, int *status );

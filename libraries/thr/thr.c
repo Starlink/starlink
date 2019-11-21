@@ -33,18 +33,23 @@
 *     - thrCreateWorkforce: Create a new workforce with a given number
 *       of workers
 *     - thrDestroyWorkforce: Free all resources used by a workforce.
+*     - thrFreeFun: Register a function to free a job data structure.
+*     - thrGetJobData: Get the job data object for a specified job
+*     - thrGetJobs: Return a list of jobs in a given state
 *     - thrGetWorkforce: Get a pointer to an existing workforce, or
 *       create a new one if no workforce currently exists.
+*     - thrHaltJob: Halt a running job until other jobs have completed
 *     - thrJobWait: Block the calling thread until the next job has
 *       been completed.
 *     - thrThreadData: Returns an AST KeyMap associated with the running
 *       thread that can be used to store thread-speicific global data.
 *       workforce currently knows about have been completed.
-*     - thrWait: Block the calling thread until all jobs that the
-*       workforce currently knows about have been completed.
+*     - thrWait: Block the calling thread until all jobs in the current
+*       context have been completed.
 
 *  Copyright:
 *     Copyright (C) 2008-2013 Science & Technology Facilities Council.
+*     Copyright (C) 2019 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -124,6 +129,11 @@
 *        specifying zero for the number of threads.
 *     23-SEP-2013 (DSB):
 *        Added thrThreadData.
+*     18-NOV-2019 (DSB):
+*        - Added thrGetJobs, thrHaltJob and thrFreeFun.
+*        - theGetJobData no longer reports an error if the specified job is
+*        not found.
+*        - Add lots more sanity checks to the list handling functions.
 */
 
 
@@ -170,16 +180,17 @@ pthread_mutex_t fd_mutex = PTHREAD_MUTEX_INITIALIZER;
 static ThrWorkForce *singleton = NULL;
 pthread_once_t starlink_thr_globals_initialised = PTHREAD_ONCE_INIT;
 pthread_key_t starlink_thr_globals_key;
+static void *(*jobdatafreefun)( void *, int *) = NULL;
 
 
 /* Module Prototypes */
 /* ----------------- */
 static int thr1GetJobContext( ThrWorkForce *workforce, int *status );
-static int thr1ListIsEmpty( int conid, ThrJob *head, int *status );
-static ThrJob *thr1FindJob( ThrJob *head, int ijob, int conid, int *status );
+static int thr1ListIsEmpty( int conid, ThrJob *head, int queue, int *status );
+static ThrJob *thr1FindJob( ThrJob *head, int ijob, int conid, int queue, int *status );
 static ThrJob *thr1FreeJob( ThrJob *job );
-static ThrJob *thr1PopListFirst( ThrJob **head, int conid, int *status );
-static ThrJob *thr1PopListHead( ThrJob **head, int *status );
+static ThrJob *thr1PopListFirst( ThrJob **head, int conid, int queue, int *status );
+static ThrJob *thr1PopListHead( ThrJob **head, int queue, int *status );
 static ThrJobStatus *thr1CopyStatus( ThrJobStatus *status );
 static ThrJobStatus *thr1FreeStatus( ThrJobStatus *status );
 static ThrJobStatus *thr1GetStatus( int *ems_status );
@@ -187,11 +198,11 @@ static ThrJobStatus *thr1MakeStatus( void );
 static ThrJobStatus *thr1ReportStatus( ThrJobStatus *status, int *ems_status );
 static void *thr1RunWorker( void *worker_ptr );
 static void thr1ClearStatus( ThrJobStatus *status );
-static void thr1ExportJobs( ThrJob *head, int old, int new, int *status );
+static void thr1ExportJobs( ThrJob *head, int old, int new, int queue, int *status );
 static void thr1InitJobs( ThrJob *job, int *status );
-static void thr1PushListFoot( ThrJob *job, ThrJob **head, int *status );
-static void thr1PushListHead( ThrJob *job, ThrJob **head, int *status );
-static void thr1RemoveFromList( ThrJob *job, ThrJob **head, int *status );
+static void thr1PushListFoot( ThrJob *job, ThrJob **head, int queue, int *status );
+static void thr1PushListHead( ThrJob *job, ThrJob **head, int queue, int *status );
+static void thr1RemoveFromList( ThrJob *job, ThrJob **head, int queue, int *status );
 static void thr1ThreadLog_( const char *text, const char *colour, int ijob );
 static void thr1GlobalsCreateKey( void );
 static void thr1GlobalsDestroyKey( void *kmap );
@@ -241,8 +252,8 @@ int thrAddJob( ThrWorkForce *workforce, int flags, void *data,
 *     data
 *        An arbitrary data pointer that will be passed to the worker
 *        allocated to perform this job. If the THR__FREE_JOBDATA flag is
-*        set (see "flags") the pointer will be freed automatically using
-*        astFree when the job completes.
+*        set (see "flags") the pointer will be freed automatically by
+*        the function registered using thrFreeFun when the job completes.
 *     func
 *        A pointer to a function that the worker will invoke to do the
 *        job. This function takes two arguments; 1) the supplied "data"
@@ -266,12 +277,12 @@ int thrAddJob( ThrWorkForce *workforce, int flags, void *data,
 *  Job Control Flags:
 *     - THR__REPORT_JOB: Indicates that this job is to be included in the
 *     list of jobs for which thrJobWait will wait.
-*     - THR__FREE_JOBDATA: Indicates that the supplied pointer to the job
-*     data ("data") is to be freed when the job completes. This is
-*     performed simply by passing the supplied "data" pointer to astFree.
-*     Therefore, if the job data includes pointers to other memory areas,
-*     such memory areas will not themselves be freed.
-
+*     - THR__FREE_JOBDATA: Indicates that the supplied pointer to the
+*     job data ("data") is to be freed when the job completes. This
+*     is performed by passing the supplied "data" pointer to the
+*     user-supplied function registered using thrFreeFun (astFree is
+*     used if no function is registered). Note, thrFreeFun is called from
+*     within the worker thread.
 *-
 */
 
@@ -303,7 +314,7 @@ int thrAddJob( ThrWorkForce *workforce, int flags, void *data,
    If the job is being added to the singleton workforce (see
    thrGetWorkforce), then do this in an AST "permanent memory" context so
    that the memory for the job structure is not reported as a memory leak. */
-   job = thr1PopListHead( &(workforce->free_jobs), status );
+   job = thr1PopListHead( &(workforce->free_jobs), THR__FREE, status );
    if( ! job ) {
       if( workforce == singleton ) astBeginPM;
       job = astMalloc( sizeof( ThrJob ) );
@@ -320,6 +331,10 @@ int thrAddJob( ThrWorkForce *workforce, int flags, void *data,
       job->data = data;
       job->nwaiting_on = 0;
       job->nheld_up = 0;
+      job->nhalted = 0;
+      job->halted = NULL;
+      job->nneeded = 0;
+      job->needed = NULL;
 
 /* Store the current job context identifier. */
       job->conid = thr1GetJobContext( workforce, status );
@@ -333,9 +348,12 @@ int thrAddJob( ThrWorkForce *workforce, int flags, void *data,
 
 /* Get a pointer to the structure describing the job. Search the lists of
    available, waiting and active jobs. */
-            job2 = thr1FindJob( workforce->available_jobs, ijob2, -1, status );
-            if( !job2 ) job2 = thr1FindJob( workforce->waiting_jobs, ijob2, -1, status );
-            if( !job2 ) job2 = thr1FindJob( workforce->active_jobs, ijob2, -1, status );
+            job2 = thr1FindJob( workforce->available_jobs, ijob2, -1,
+                                THR__AVAILABLE, status );
+            if( !job2 ) job2 = thr1FindJob( workforce->waiting_jobs, ijob2, -1,
+                                            THR__WAITING, status );
+            if( !job2 ) job2 = thr1FindJob( workforce->active_jobs, ijob2, -1,
+                                            THR__ACTIVE, status );
 
 /* Ignore the job if it has already completed (or never existed). */
             if( job2 ) {
@@ -366,11 +384,12 @@ int thrAddJob( ThrWorkForce *workforce, int flags, void *data,
    jobs held up waiting for the job will be moved from the waiting list to
    the available list (if they are not also waiting on any other jobs). */
       if( job->nwaiting_on > 0 ) {
-         thr1PushListFoot( job, &(workforce->waiting_jobs), status );
+         thr1PushListFoot( job, &(workforce->waiting_jobs), THR__WAITING, status );
          thr1ThreadLog( "add_job: Pushed job onto waiting jobs list",
                          DESK, job->ijob );
       } else {
-         thr1PushListFoot( job, &(workforce->available_jobs), status );
+         thr1PushListFoot( job, &(workforce->available_jobs),
+                           THR__AVAILABLE, status );
          thr1ThreadLog( "add_job: Pushed job onto available jobs list",
                          DESK, job->ijob );
 
@@ -634,34 +653,34 @@ ThrWorkForce *thrDestroyWorkforce( ThrWorkForce *workforce ) {
       }
 
 /* Free the job description structures. */
-      job = thr1PopListHead( &(workforce->active_jobs), &status );
+      job = thr1PopListHead( &(workforce->active_jobs), THR__ACTIVE, &status );
       while( job ) {
          job = thr1FreeJob( job );
-         job = thr1PopListHead( &(workforce->active_jobs), &status );
+         job = thr1PopListHead( &(workforce->active_jobs), THR__ACTIVE, &status );
       }
 
-      job = thr1PopListHead( &(workforce->free_jobs), &status );
+      job = thr1PopListHead( &(workforce->free_jobs), THR__FREE, &status );
       while( job ) {
          job = thr1FreeJob( job );
-         job = thr1PopListHead( &(workforce->free_jobs), &status );
+         job = thr1PopListHead( &(workforce->free_jobs), THR__FREE, &status );
       }
 
-      job = thr1PopListHead( &(workforce->available_jobs), &status );
+      job = thr1PopListHead( &(workforce->available_jobs), THR__AVAILABLE, &status );
       while( job ) {
          job = thr1FreeJob( job );
-         job = thr1PopListHead( &(workforce->available_jobs), &status );
+         job = thr1PopListHead( &(workforce->available_jobs), THR__AVAILABLE, &status );
       }
 
-      job = thr1PopListHead( &(workforce->finished_jobs), &status );
+      job = thr1PopListHead( &(workforce->finished_jobs), THR__FINISHED, &status );
       while( job ) {
          job = thr1FreeJob( job );
-         job = thr1PopListHead( &(workforce->finished_jobs), &status );
+         job = thr1PopListHead( &(workforce->finished_jobs), THR__FINISHED, &status );
       }
 
-      job = thr1PopListHead( &(workforce->waiting_jobs), &status );
+      job = thr1PopListHead( &(workforce->waiting_jobs), THR__WAITING, &status );
       while( job ) {
          job = thr1FreeJob( job );
-         job = thr1PopListHead( &(workforce->waiting_jobs), &status );
+         job = thr1PopListHead( &(workforce->waiting_jobs), THR__WAITING, &status );
       }
 
 /* Unlock the job desk mutex prior to dstroying it. */
@@ -755,10 +774,10 @@ void thrEndJobContext( ThrWorkForce *workforce, int *status ){
       new = thr1GetJobContext( workforce, status );
 
 /* Search for jobs in the old context and assign them to the new context. */
-      thr1ExportJobs( workforce->available_jobs, old, new, status );
-      thr1ExportJobs( workforce->waiting_jobs, old, new, status );
-      thr1ExportJobs( workforce->active_jobs, old, new, status );
-      thr1ExportJobs( workforce->finished_jobs, old, new, status );
+      thr1ExportJobs( workforce->available_jobs, old, new, THR__AVAILABLE, status );
+      thr1ExportJobs( workforce->waiting_jobs, old, new, THR__WAITING, status );
+      thr1ExportJobs( workforce->active_jobs, old, new, THR__ACTIVE, status );
+      thr1ExportJobs( workforce->finished_jobs, old, new, THR__FINISHED, status );
 
 /* For safety, zero the last entry in the list of context identifiers in the
    workforce. */
@@ -767,6 +786,61 @@ void thrEndJobContext( ThrWorkForce *workforce, int *status ){
 
 /* Unlock the mutex so that the next thread can access the job desk. */
    thrMutexUnlock( &( workforce->jd_mutex ), status );
+}
+
+void *(*thrFreeFun( void *(*freejob)( void *, int *) ))( void *, int * ){
+/*
+*+
+*  Name:
+*     thrFreeFun
+
+*  Purpose:
+*     Register a function to delete a job data structure
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     void *(*thrFreeFun( void *(*freejob)( void *, int *) ))( void *, int * )
+
+*  Description:
+*     This function can be used to register a function that will be called
+*     by the thr library to delete a job data structure once a job has
+*     completed. In this context, a "job data structure" is the data
+*     structure passed to thrAddJob when a job is submitted to the
+*     workforce. The registered function will be called to delete the job
+*     data structure only if the THR__FREE_JOBDATA flag is specified when
+*     the job was submitted to the workforce using thrAddJob. If no
+*     function is registered, the astFree function will be used by
+*     default. This is only appropriate if the data structure does not
+*     contain any dynamically allocated arrays or other resources that
+*     need to be released before freeing the structure.
+*
+*     The specified function, or astFree if no function is specified, is
+*     called from within the worker thread.
+
+*  Arguments:
+*     freejob
+*        Pointer to the function to be called to free a job data
+*        structure. It should take two arguments - a "void *" pointer to the
+*        structure to be freed and an "int *" pointer to the inherited status
+*        value. It should always return a NULL pointer. If NULL is supplied
+*        FOR the function pointer (or if this function has not been called),
+*        then astFree will be used to free job data structures.
+
+*  Returned Value:
+*     The pointer to the previously registered function, or NULL if no
+*     function is currently registered.
+
+*-
+*/
+
+   void *(*result)( void *, int *) = jobdatafreefun;
+   jobdatafreefun = freejob;
+   return result;
 }
 
 void *thrGetJobData( int ijob, ThrWorkForce *workforce, int *status ){
@@ -795,41 +869,252 @@ void *thrGetJobData( int ijob, ThrWorkForce *workforce, int *status ){
 *     ijob
 *        Identifier for the job.
 *     workforce
-*        Pointer to the workforce performing the jobs. If NULL is
-*        supplied, this function returns a NULL pointer, and "ijob" is
-*        ignored.
+*        Pointer to the workforce. NULL should be supplied if this function
+*        is called from within a job executing in a worker thread.
 *     status
 *        Pointer to the inherited status value.
 
 *  Returned Value:
-*     The pointer to the job data.
+*     The pointer to the job data. NULL is returned if the job is not
+*     found, but no error is reported.
 
 *-
 */
 
 /* Local Variables: */
+   AstKeyMap *globals;
    ThrJob *job;
 
 /* Check inherited status */
-   if( *status != SAI__OK || !workforce ) return NULL;
+   if( *status != SAI__OK ) return NULL;
+
+/* If no workforce was supplied, use the current workforce stored in the
+   globals keymap. */
+   if( !workforce ) {
+
+/* Get a pointer to the KeyMap that holds global data specific to this thread. */
+      globals = thrThreadData( status );
+      if( !globals && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         emsRep( "", "thrGetJobData: No globals KeyMap found (thr programming error).",
+                 status );
+      }
+
+/* Get the workforce pointer out of the globals KeyMap. */
+      if( !astMapGet0P( globals, "THR_WORKFORCE", (void **) &workforce ) &&
+          *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         emsRep( "", "thrGetJobData: Workforce not found in globals KeyMap (thr "
+                 "programming error).", status );
+      }
+   }
+
+/* Return if no workforce is available. */
+   if( !workforce ) return NULL;
+
+/* Wait in the job desk queue until we have exclusive access to the job
+   desk. */
+   thrMutexLock( &( workforce->jd_mutex ), status );
 
 /* Get a pointer to the structure describing the job. Search each
    list of jobs in turn. Report an error if the job is not found.
    First see if the requested job is the one being checked by the
    active worker. */
-   job = thr1FindJob( workforce->available_jobs, ijob, -1, status );
-   if( !job ) job = thr1FindJob( workforce->finished_jobs, ijob, -1, status );
-   if( !job ) job = thr1FindJob( workforce->waiting_jobs, ijob, -1, status );
-   if( !job ) job = thr1FindJob( workforce->active_jobs, ijob, -1, status );
-   if( !job && *status == SAI__OK ) {
-      *status = SAI__ERROR;
-      emsSeti( "I", ijob );
-      emsRep( "", "thrGetJobData: No job with given 'job' identifier "
-              "(^I) found.", status );
-   }
+   job = thr1FindJob( workforce->available_jobs, ijob, -1,
+                      THR__AVAILABLE, status );
+   if( !job ) job = thr1FindJob( workforce->finished_jobs, ijob, -1,
+                                 THR__FINISHED, status );
+   if( !job ) job = thr1FindJob( workforce->waiting_jobs, ijob, -1,
+                                 THR__WAITING, status );
+   if( !job ) job = thr1FindJob( workforce->active_jobs, ijob, -1,
+                                 THR__ACTIVE, status );
+
+/* Unlock the mutex so that the next thread can access the job desk. */
+   thrMutexUnlock( &( workforce->jd_mutex ), status );
 
 /* Return the required pointer. */
-   return ( *status == SAI__OK ) ? job->data : NULL;
+   return job ? job->data : NULL;
+}
+
+int *thrGetJobs( ThrWorkForce *workforce, int state, int *njob, int *status ){
+/*
+*+
+*  Name:
+*     thrGetJobs
+
+*  Purpose:
+*     Return a list of jobs in a given state
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     int *thrGetJobs( ThrWorkForce *workforce, int state, int *njob,
+*                      int *status )
+
+*  Description:
+*     This function returns a list containing the identifiers for all job
+*     currently in the specified state. This is a snapshot at the moment
+*     this function is called. Jobs may have changed state by the time the
+*     calling function gets round to processing the returned list.
+
+*  Arguments:
+*     workforce
+*        Pointer to the workforce. NULL should be supplied if this function
+*        is called from within a job executing in a worker thread.
+*     state
+*        An integer in which each bit is a boolean flag indicating if
+*        jobs in a particular state should be included in the returned list.
+*        The supplied value should be the union of one or more of the
+*        following values defined in header file "thr.h":
+*
+*        THR__ACTIVE: active jobs that are currently running or halted
+*        THR__AVAILABLE: inactive jobs that have not yet been started but are
+*                        available to run as soon as a worker becomes available.
+*        THR__FINISHED: inactive jobs that have finished running and are
+*                       awaiting other jobs to finish before being freed.
+*        THR__WAITING: inactive jobs that are waiting for other jobs to finish
+*                      before being started
+*     njob
+*        Pointer to an int in which to return the length of the returned
+*        list of job identifier.
+*     status
+*        Pointer to the inherited status value.
+
+*  Returned Value:
+*     A pointer to a newly allocated list of job identifier. Its length
+*     is given by the value returned in "*njob". It should be freed using
+*     astFree when no longer needed. A NULL pointer will be returned if an
+*     error occurrs.
+
+*-
+*/
+
+/* Local Variables: */
+   AstKeyMap *globals;
+   ThrJob *head = NULL;
+   ThrJob *next = NULL;
+   int *result;
+   int iqueue;
+
+/* Initialise */
+   *njob = 0;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return NULL;
+
+/* If no workforce was supplied, use the current workforce stored in the
+   globals keymap. */
+   if( !workforce ) {
+
+/* Get a pointer to the KeyMap that holds global data specific to this thread. */
+      globals = thrThreadData( status );
+      if( !globals && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         emsRep( "", "thrGetJobs: No globals KeyMap found (thr programming error).",
+                 status );
+      }
+
+/* Get the workforce pointer out of the globals KeyMap. */
+      if( !astMapGet0P( globals, "THR_WORKFORCE", (void **) &workforce ) &&
+          *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         emsRep( "", "thrGetJobs: Workforce not found in globals KeyMap (thr "
+                 "programming error).", status );
+      }
+   }
+
+/* Return if no workforce is available. */
+   if( !workforce ) return NULL;
+
+/* Wait in the job desk queue until we have exclusive access to the job
+   desk. */
+   thrMutexLock( &( workforce->jd_mutex ), status );
+
+/* We make two passes round the job loop. On the first pass we count how
+   many jobs will be returned. We then allocate the returned array and do
+   the second pass, in which the identifiers are stored in the returned
+   array. Check each queue in turn. */
+   for( iqueue = 0; iqueue < 4; iqueue++ ) {
+
+/* If jobs in the current queue are to be included in the returned list,
+   get a pointer to the head of the queue. */
+      if( iqueue == 0 && ( state & THR__ACTIVE ) ) {
+         head = workforce->active_jobs;
+      } else if( iqueue == 1 && ( state & THR__ACTIVE ) ) {
+         head = workforce->available_jobs;
+      } else if( iqueue == 2 && ( state & THR__FINISHED ) ) {
+         head = workforce->finished_jobs;
+      } else if( iqueue == 3 && ( state & THR__WAITING ) ) {
+         head = workforce->waiting_jobs;
+      } else {
+         head = NULL;
+      }
+
+/* Loop until we end up back at the head of the queue. */
+      next = head;
+      while( next ) {
+
+/* Increment the number of job identifiers to return. */
+         (*njob)++;
+
+/* Move on to the next job in the list. */
+         next = next->next;
+
+/* If we are back at the head, leave the loop. */
+         if( next == head ) break;
+      }
+   }
+
+/* Allocate the returned array and check the pointer can be used safely. */
+   result = astMalloc( (*njob)*sizeof(*result) );
+   if( result ) {
+
+/* Re-initialise the index of the next identifier to store in the
+   returned array. */
+      *njob = 0;
+
+/* Check each queue in turn. */
+      for( iqueue = 0; iqueue < 4; iqueue++ ) {
+
+/* If jobs in the current queue are to be included in the returned list,
+   get a pointer to the head of the queue. */
+         if( iqueue == 0 && ( state & THR__ACTIVE ) ) {
+            head = workforce->active_jobs;
+         } else if( iqueue == 1 && ( state & THR__ACTIVE ) ) {
+            head = workforce->available_jobs;
+         } else if( iqueue == 2 && ( state & THR__FINISHED ) ) {
+            head = workforce->finished_jobs;
+         } else if( iqueue == 3 && ( state & THR__WAITING ) ) {
+            head = workforce->waiting_jobs;
+         } else {
+            head = NULL;
+         }
+
+/* Loop until we end up back at the head of the queue. */
+         next = head;
+         while( next ) {
+
+/* Store the job identifier in the returned array. */
+            result[ (*njob)++ ] = next->ijob;
+
+/* Move on to the next job in the list. */
+            next = next->next;
+
+/* If we are back at the head, leave the loop. */
+            if( next == head ) break;
+         }
+      }
+   }
+
+/* Unlock the mutex so that the next thread can access the job desk. */
+   thrMutexUnlock( &( workforce->jd_mutex ), status );
+
+/* Return the identifier list. */
+   return result;
 }
 
 int thrGetNThread( const char *env, int *status ){
@@ -998,6 +1283,143 @@ ThrWorkForce *thrGetWorkforce( int nworker, int *status ) {
    return singleton;
 }
 
+void thrHaltJob( ThrWorkForce *workforce, int njob, int *job_list, int *status ) {
+/*
+*+
+*  Name:
+*     thrHaltJob
+
+*  Purpose:
+*     Halt a running job until other jobs have completed
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     void thrHaltJob( ThrWorkForce *workforce, int njob, int *job_list,
+*                      int *status )
+
+*  Description:
+*     This function is intended to be called by a worker thread during
+*     the execution of a job. It blocks the current thread until a
+*     specified list of other jobs have finished, at which time the
+*     current thread resumes.
+
+*  Arguments:
+*     workforce
+*        Pointer to the workforce. NULL should be supplied if this function
+*        is called from within a job executing in a worker thread.
+*     njob
+*        The number of job identifiers in the "job_list" array.
+*     job_list
+*        A list of job identifiers. The current thread blocks until all
+*        the listed jobs have finished. Any identifiers in this list that
+*        refer to jobs that have already finished are ignored.
+*     status
+*        Pointer to the inherited status value.
+
+*-
+*/
+
+/* Local Variables: */
+   AstKeyMap *globals;
+   ThrJob *job;
+   ThrJob *this_job;
+   int i;
+   int *job_id;
+   int ineeded;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer to the KeyMap that holds global data specific to this thread. */
+   globals = thrThreadData( status );
+   if( !globals && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      emsRep( "", "thrHaltJob: No globals KeyMap found (thr programming error).",
+              status );
+   }
+
+/* If no workforce was supplied, use the current workforce stored in the
+   globals keymap. */
+   if( !workforce ) {
+      if( !astMapGet0P( globals, "THR_WORKFORCE", (void **) &workforce ) &&
+          *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         emsRep( "", "thrHaltJob: Workforce not found in globals KeyMap (thr "
+                 "programming error).", status );
+      }
+   }
+
+/* Return if no workforce is available. */
+   if( !workforce ) return;
+
+/* Wait in the job desk queue until we have exclusive access to the job
+   desk. */
+   thrMutexLock( &( workforce->jd_mutex ), status );
+
+/* Get a pointer to the structure that holds information about the
+   currently executing job. */
+   if( !astMapGet0P( globals, "THR_JOB_INFO", (void **) &this_job ) && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      emsRep( "", "thrHaltJob: Job info not found in globals KeyMap (thr "
+              "programming error).", status );
+   }
+
+/* Ensure an array exists to hold the longest possible list of job that must
+   finish before the current thread is resumed. */
+   this_job->needed = astGrow( this_job->needed, njob, sizeof(*(this_job->needed)) );
+   if( this_job->needed ) {
+      ineeded = 0;
+
+/* Loop round all supplied jobs. */
+      job_id = job_list;
+      for( i = 0; i < njob; i++, job_id++ ) {
+
+/* Check that the job is active, waiting or available. This returns a
+   pointer to the job structure. */
+         job = thr1FindJob( workforce->available_jobs, *job_id, -1,
+                            THR__AVAILABLE, status );
+         if( !job ) job = thr1FindJob( workforce->waiting_jobs, *job_id, -1,
+                            THR__WAITING, status );
+         if( !job ) job = thr1FindJob( workforce->active_jobs, *job_id, -1,
+                            THR__ACTIVE, status );
+
+/* Ignore finished or unknown jobs */
+         if( job ) {
+
+/* Add this supplied job to the list of jobs that must finish before the halted
+   job can be resumed. */
+            this_job->needed[ ineeded++ ] = job;
+
+/* Indicate that when the supplied job finishes, it should remove itself
+   from the list of needed jobs attached to the halted job. */
+            job->halted = astGrow( job->halted, ++(job->nhalted), sizeof(*(job->halted)) );
+            if( job->halted ) job->halted[ job->nhalted - 1 ] = this_job;
+         }
+      }
+
+/* Store the number of jobs that must finish before the halted job can
+   resume. */
+      this_job->nneeded = ineeded;
+
+/* If one or more jobs must finish before this job resumes, block the current
+   thread until the "job_finished" condition is broadcast. After each such
+   broadcast, check to see if this job is still waiting on one or more
+   unfinished jobs. If so, block again. If not, break out of the loop. */
+      while( this_job->nneeded && *status == SAI__OK ) {
+         thr1ThreadLog( "job_wait: Waiting for a job (any job) to complete", WAIT, -1 );
+         thrCondWait( &( workforce->job_done ), &( workforce->jd_mutex ), status );
+      }
+   }
+
+/* Unlock the mutex so that the next thread can access the job desk. */
+   thrMutexUnlock( &( workforce->jd_mutex ), status );
+}
+
 int thrJobWait( ThrWorkForce *workforce, int *status ) {
 /*
 *+
@@ -1036,7 +1458,8 @@ int thrJobWait( ThrWorkForce *workforce, int *status ) {
 *  Returned Value:
 *     The integer identifier for the completed job. This can be compared
 *     with the job identifiers returned by thrAddJob to determine which
-*     job has finished.
+*     job has finished. A value of -1 is returned if the workforce has no
+*     no remining jobs.
 
 *  Notes:
 *     - This function attempts to execute even if an error has already
@@ -1047,7 +1470,7 @@ int thrJobWait( ThrWorkForce *workforce, int *status ) {
 
 /* Local Variables: */
    int conid;
-   int result = 0;
+   int result = -1;
    ThrJob *job;
    ThrJobStatus *job_status = NULL;
 
@@ -1067,48 +1490,49 @@ int thrJobWait( ThrWorkForce *workforce, int *status ) {
    conid = thr1GetJobContext( workforce, status );
 
 /* If there are no jobs within the current job context on the finished, active
-   or available job lists, report an error. */
-   if( thr1ListIsEmpty( conid, workforce->finished_jobs, status ) &&
-       thr1ListIsEmpty( conid, workforce->active_jobs, status ) &&
-       thr1ListIsEmpty( conid, workforce->available_jobs, status ) ) {
-      *status = SAI__ERROR;
-      emsRep( "", "thrJobWait: There are no jobs to wait for.", status );
-   }
+   or available job lists, report an error, return -1. */
+   if( thr1ListIsEmpty( conid, workforce->finished_jobs, THR__FINISHED, status ) &&
+       thr1ListIsEmpty( conid, workforce->active_jobs, THR__ACTIVE, status ) &&
+       thr1ListIsEmpty( conid, workforce->available_jobs, THR__AVAILABLE, status ) ) {
+      result = -1;
 
-/* Wait until there is a job within the current context available on the finished
-   jobs list. Put it in a loop because of spurious wake ups. */
-   while( thr1ListIsEmpty( conid, workforce->finished_jobs, status ) &&
-          *status == SAI__OK ){
-      thr1ThreadLog( "job_wait: Waiting for a job (any job) to complete", WAIT, -1 );
-      thrCondWait( &( workforce->job_done ), &( workforce->jd_mutex ),
-                     status );
-   }
+/* Otherwise, wait until there is a job within the current context available
+   on the finished jobs list. Put it in a loop because of spurious wake ups. */
+   } else {
+      while( thr1ListIsEmpty( conid, workforce->finished_jobs, THR__FINISHED, status ) &&
+             *status == SAI__OK ){
+         thr1ThreadLog( "job_wait: Waiting for a job (any job) to complete", WAIT, -1 );
+         thrCondWait( &( workforce->job_done ), &( workforce->jd_mutex ),
+                        status );
+      }
 
 /* Pop the first job for the current context off the finished list, and note its
    identifier. */
-   job = thr1PopListFirst( &(workforce->finished_jobs), conid, status );
-   if( job ) {
-      result = job->ijob;
-      thr1ThreadLog( "job_wait: Job completed", DESK, result );
+      job = thr1PopListFirst( &(workforce->finished_jobs), conid, THR__FINISHED,
+                              status );
+      if( job ) {
+         result = job->ijob;
+         thr1ThreadLog( "job_wait: Job completed", DESK, result );
 
 /* Copy the details of any errors that occurred during the job to a new
    structure. We do not yet report those errors using EMS as that would
    cause remaining functions called within this function to return
    without action. */
-      job_status = thr1CopyStatus( job->status );
+         job_status = thr1CopyStatus( job->status );
 
 /* Clear the job data, and put the job structure onto the list of free
    job structures. */
-      thr1InitJobs( job, status );
-      thr1PushListHead( job, &(workforce->free_jobs), status );
+         thr1InitJobs( job, status );
+         thr1PushListHead( job, &(workforce->free_jobs), THR__FREE, status );
+      }
+
+/* Report errors using EMS if any errors occurred during the job. */
+      job_status = thr1ReportStatus( job_status, status );
    }
 
 /* Unlock the mutex so that the next thread can access the job desk. */
    thrMutexUnlock( &( workforce->jd_mutex ), status );
    thr1ThreadLog( "job_wait: Left desk", ACTIVE, result );
-
-/* Report errors using EMS if any errors occurred during the job. */
-   job_status = thr1ReportStatus( job_status, status );
 
 /* End the error reporting context. */
    emsEnd( status );
@@ -1259,9 +1683,10 @@ void thrWait( ThrWorkForce *workforce, int *status ) {
    mutex (the job desk mutex) before blocking this thread. This enables
    worker threads to access the job desk to report completion of jobs
    and to get new jobs. */
-   while( ( !thr1ListIsEmpty( conid, workforce->available_jobs, status ) ||
-            !thr1ListIsEmpty( conid, workforce->active_jobs, status ) ) &&
-          *status == SAI__OK ) {
+   while( ( !thr1ListIsEmpty( conid, workforce->available_jobs, THR__AVAILABLE,
+                              status ) ||
+            !thr1ListIsEmpty( conid, workforce->active_jobs, THR__ACTIVE,
+                              status ) ) && *status == SAI__OK ) {
       thr1ThreadLog( "wait: waiting for all done", WAIT, njob );
       thrCondWait( &( workforce->all_done ), &( workforce->jd_mutex ),
                      status );
@@ -1272,15 +1697,15 @@ void thrWait( ThrWorkForce *workforce, int *status ) {
 /* Remove jobs for the current job context from the finished job list,
    re-initialising their contents and moving them onto the free list. */
    new_finished_head = NULL;
-   job = thr1PopListHead( &(workforce->finished_jobs), status );
+   job = thr1PopListHead( &(workforce->finished_jobs), THR__FINISHED, status );
    while( job ) {
       if( job->conid == conid ) {
          thr1InitJobs( job, status );
-         thr1PushListHead( job, &(workforce->free_jobs), status );
+         thr1PushListHead( job, &(workforce->free_jobs), THR__FREE, status );
       } else {
-         thr1PushListFoot( job, &new_finished_head, status );
+         thr1PushListFoot( job, &new_finished_head, THR__FINISHED, status );
       }
-      job = thr1PopListHead( &(workforce->finished_jobs), status );
+      job = thr1PopListHead( &(workforce->finished_jobs), THR__FINISHED, status );
    }
 
 /* Restore the head of the list of remaining finished jobs (i.e. finished
@@ -1414,7 +1839,7 @@ static ThrJobStatus *thr1CopyStatus( ThrJobStatus *status ){
    return result;
 }
 
-static void thr1ExportJobs( ThrJob *head, int old, int new, int *status ){
+static void thr1ExportJobs( ThrJob *head, int old, int new, int queue, int *status ){
 /*
 *  Name:
 *     thr1ExportJobs
@@ -1429,7 +1854,7 @@ static void thr1ExportJobs( ThrJob *head, int old, int new, int *status ){
 *     C function
 
 *  Invocation:
-*     void thr1ExportJobs( ThrJob *head, int old, int new, int *status )
+*     void thr1ExportJobs( ThrJob *head, int old, int new, int queue, int *status )
 
 *  Description:
 *     This function searches the given lists of jobs for jobs belonging to the
@@ -1442,6 +1867,8 @@ static void thr1ExportJobs( ThrJob *head, int old, int new, int *status ){
 *        Identifier for the old context.
 *     new
 *        Identifier for the new context.
+*     queue
+*        Identifier for the queue to use.
 *     status
 *        Pointer to the inherited status value.
 
@@ -1458,19 +1885,27 @@ static void thr1ExportJobs( ThrJob *head, int old, int new, int *status ){
 
 /* Loop round all jobs in the list. */
    while( job ) {
+      if( job->queue != queue ) {
+         *status = SAI__ERROR;
+         errRep( " ", "thr: Cannot export a job: a job was found "
+                 "that belongs to a different queue.", status );
+         break;
 
 /* If the job belongs to the old context, assign it to the new context. */
-      if( job->conid == old ) job->conid = new;
+      } else {
+         if( job->conid == old ) job->conid = new;
 
 /* Move on to the next job in the list. */
-      job = job->next;
+         job = job->next;
 
 /* If we are back at the head, leave the loop. */
-      if( job == head ) break;
+         if( job == head ) break;
+      }
    }
 }
 
-static ThrJob *thr1FindJob( ThrJob *head, int ijob, int conid, int *status ){
+static ThrJob *thr1FindJob( ThrJob *head, int ijob, int conid, int queue,
+                            int *status ){
 /*
 *  Name:
 *     thr1FindJob
@@ -1500,6 +1935,8 @@ static ThrJob *thr1FindJob( ThrJob *head, int ijob, int conid, int *status ){
 *        The integer identifier for the job. Ignored if negative.
 *     conid
 *        The job context identifier for the job. Ignored if negative.
+*     queue
+*        The identifier for the queue to use.
 *     status
 *        Pointer to the inherited status value.
 
@@ -1522,20 +1959,40 @@ static ThrJob *thr1FindJob( ThrJob *head, int ijob, int conid, int *status ){
 /* Loop until we find a job with the given identifier. */
    while( result ) {
 
+/* Check the queue is right. */
+      if( result->queue != queue ) {
+         *status = SAI__ERROR;
+         errRep( " ", "thr: Cannot search a queue for a job: a job was found "
+                 "that belongs to a different queue.", status );
+         result = NULL;
+
+/* Check the links are right. */
+      } else if( result->prev && result->prev->next != result ) {
+         *status = SAI__ERROR;
+         errRep( " ", "thr: Cannot search a queue for a job: a job was found "
+                 "with broken previous link.", status );
+         result = NULL;
+
+      } else if( result->next && result->next->prev != result ) {
+         *status = SAI__ERROR;
+         errRep( " ", "thr: Cannot search a queue for a job: a job was found "
+                 "with broken next link.", status );
+         result = NULL;
+
 /* Break if the current job has the right identifier and context. */
-      ok = 1;
-      if( ijob >= 0 && result->ijob != ijob ) ok = 0;
-      if( conid >= 0 && result->conid != conid ) ok = 0;
-      if( ok ) break;
+      } else {
+         ok = 1;
+         if( ijob >= 0 && result->ijob != ijob ) ok = 0;
+         if( conid >= 0 && result->conid != conid ) ok = 0;
+         if( ok ) break;
 
 /* Move on to the next job in the list. */
-      result = result->next;
+         result = result->next;
 
-/* If we are back at the head, set the returned pointer to NULL and
-   leave the loop. */
-      if( result == head ) {
-         result = NULL;
-         break;
+
+/* If we are back at the head, set the returned pointer to NULL so that
+   we leave the loop. */
+         if( result == head ) result = NULL;
       }
    }
 
@@ -1570,6 +2027,11 @@ static ThrJob *thr1FreeJob( ThrJob *job ) {
       job->nwaiting_on = 0;
       job->held_up = astFree( job->held_up );
       job->nheld_up = 0;
+      job->nhalted = 0;
+      job->halted = astFree( job->halted );
+      job->nneeded = 0;
+      job->needed = astFree( job->needed );
+      job->queue = THR__NONE;
       job = astFree( job );
    }
    return job;
@@ -1779,10 +2241,15 @@ static void thr1InitJobs( ThrJob *job, int *status ){
    job->data = NULL;
    job->nwaiting_on = 0;
    job->nheld_up = 0;
+   job->needed = NULL;
+   job->nneeded = 0;
+   job->halted = NULL;
+   job->nhalted = 0;
+   job->queue = THR__NONE;
    job->status = thr1FreeStatus( job->status );
 }
 
-static int thr1ListIsEmpty( int conid, ThrJob *head, int *status ){
+static int thr1ListIsEmpty( int conid, ThrJob *head, int queue, int *status ){
 /*
 *  Name:
 *     thr1ListIsEmpty
@@ -1797,7 +2264,7 @@ static int thr1ListIsEmpty( int conid, ThrJob *head, int *status ){
 *     C function
 
 *  Invocation:
-*     iint thr1ListIsEmpty( int conid, ThrJob *head, int *status )
+*     iint thr1ListIsEmpty( int conid, ThrJob *head, int queue, int *status )
 
 *  Description:
 *     This function returns an integer indicating if the supplied list of jobs is
@@ -1808,6 +2275,8 @@ static int thr1ListIsEmpty( int conid, ThrJob *head, int *status ){
 *        The identifier for the job context to be searched for.
 *     head
 *        Pointer to the job at the head of the linked list of jobs to be searched.
+*     queue
+*        Identifier for queue to use.
 *     status
 *        Pointer to the inherited status value.
 
@@ -1827,14 +2296,24 @@ static int thr1ListIsEmpty( int conid, ThrJob *head, int *status ){
    if( *status != SAI__OK || !head ) return result;
 
 /* Check the supplied head job. */
-   if( head->conid == conid ) {
+   if( head->queue != queue ) {
+      *status = SAI__ERROR;
+      errRep( " ", "thr: Cannot check if queue is empty: the supplied head "
+              "belongs to a different queue.", status );
+
+   } else if( head->conid == conid ) {
       result = 0;
 
 /* Otherwise, check all the other jobs in the list. */
    } else {
       job = head->next;
       while( job != head ) {
-         if( job->conid == conid ) {
+         if( job->queue != queue ) {
+            *status = SAI__ERROR;
+            errRep( " ", "thr: Cannot check if queue is empty: a job was found "
+                    "that belongs to a different queue.", status );
+            break;
+         } else if( job->conid == conid ) {
             result = 0;
             break;
          }
@@ -1877,7 +2356,7 @@ static ThrJobStatus *thr1MakeStatus( void ){
    return status;
 }
 
-static ThrJob *thr1PopListFirst( ThrJob **head, int conid, int *status ){
+static ThrJob *thr1PopListFirst( ThrJob **head, int conid, int queue, int *status ){
 /*
 *  Name:
 *     thr1PopListFirst
@@ -1892,7 +2371,7 @@ static ThrJob *thr1PopListFirst( ThrJob **head, int conid, int *status ){
 *     C function
 
 *  Invocation:
-*     ThrJob *thr1PopListFirst( ThrJob **head, int conid, int *status )
+*     ThrJob *thr1PopListFirst( ThrJob **head, int conid, int queue, int *status )
 
 *  Description:
 *     This function returns a pointer to the job closest to the head of a list
@@ -1904,6 +2383,8 @@ static ThrJob *thr1PopListFirst( ThrJob **head, int conid, int *status ){
 *        the head of the list.
 *     conid
 *        The identifier for the required job context.
+*     queue
+*        The identifier for the queue to use.
 *     status
 *        Pointer to the inherited status value.
 
@@ -1931,14 +2412,28 @@ static ThrJob *thr1PopListFirst( ThrJob **head, int conid, int *status ){
 
 /* First check the supplied head job. */
    if( (*head)->conid == conid ) {
-      result = *head;
+      if( (*head)->queue != queue ) {
+         *status = SAI__ERROR;
+         errRep( " ", "thr: Cannot pop a job from a queue context: the "
+                 "supplied head belongs to a different queue.", status );
+      } else {
+         result = *head;
+      }
 
 /* Othersise, check the other jobs in the list. */
    } else {
       result = (*head)->prev;
       while( result != *head ) {
-         if( result->conid == conid ) break;
-         result = result->prev;
+         if( result->queue != queue ) {
+            result = NULL;
+            *status = SAI__ERROR;
+            errRep( " ", "thr: Cannot pop a job from a queue context: a job "
+                    "was found that belongs to a different queue.", status );
+            break;
+         } else {
+            if( result->conid == conid ) break;
+            result = result->prev;
+         }
       }
       if( result == *head ) result = NULL;
    }
@@ -1949,19 +2444,31 @@ static ThrJob *thr1PopListFirst( ThrJob **head, int conid, int *status ){
    if( result ) {
       prev = result->prev;
       next = result->next;
-      if( prev == result ) prev = NULL;
-      if( next == result ) next = NULL;
-      if( result == *head ) *head = prev;
-      if( prev ) prev->next = next;
-      if( next ) next->prev = prev;
-      result->prev = NULL;
-      result->next = NULL;
+
+      if( prev && prev->queue != queue ) {
+         *status = SAI__ERROR;
+         errRep( " ", "thr: Cannot pop a job from a queue context: the "
+                 "previous job belongs to a different queue.", status );
+      } else if( next && next->queue != queue ) {
+         *status = SAI__ERROR;
+         errRep( " ", "thr: Cannot pop a job from a queue context: the "
+                 "next job belongs to a different queue.", status );
+      } else {
+         if( prev == result ) prev = NULL;
+         if( next == result ) next = NULL;
+         if( result == *head ) *head = prev;
+         if( prev ) prev->next = next;
+         if( next ) next->prev = prev;
+         result->prev = NULL;
+         result->next = NULL;
+         result->queue = THR__NONE;
+      }
    }
 
    return result;
 }
 
-static ThrJob *thr1PopListHead( ThrJob **head, int *status ){
+static ThrJob *thr1PopListHead( ThrJob **head, int queue, int *status ){
 /*
 *  Name:
 *     thr1PopListHead
@@ -1976,7 +2483,7 @@ static ThrJob *thr1PopListHead( ThrJob **head, int *status ){
 *     C function
 
 *  Invocation:
-*     ThrJob *thr1PopListHead( ThrJob **head, int *status ){
+*     ThrJob *thr1PopListHead( ThrJob **head, int queue, int *status ){
 
 *  Description:
 *     This function returns a pointer to the job at the head of a list,
@@ -1986,6 +2493,8 @@ static ThrJob *thr1PopListHead( ThrJob **head, int *status ){
 *     head
 *        Address of a location at which is stored a pointer to the ThrJob at
 *        the head of the list.
+*     queue
+*        Identifier for the queue to use.
 *     status
 *        Pointer to the inherited status value.
 
@@ -2010,25 +2519,43 @@ static ThrJob *thr1PopListHead( ThrJob **head, int *status ){
 
    result = *head;
    if( result ) {
-      prev = result->prev;   /* Becomes new head */
-      next = result->next;   /* Is the foot */
-
-      if( prev == result ) {
-         *head = NULL;
+      if( result->queue != queue ){
+         result = NULL;
+         *status = SAI__ERROR;
+         errRep( " ", "thr: Cannot pop a job of the head of a queue: the "
+                 "supplied head belongs to a different queue.", status );
       } else {
-         prev->next = next;
-         next->prev = prev;
-         *head = prev;
-      }
 
-      result->prev = NULL;
-      result->next = NULL;
+         prev = result->prev;      /* Becomes new head */
+         next = result->next;      /* Is the foot */
+         if( prev && prev->queue != queue ) {
+            result = NULL;
+            *status = SAI__ERROR;
+            errRep( " ", "thr: Cannot pop a job of the head of a queue: the "
+                    "previous job belongs to a different queue.", status );
+         } else if( next && next->queue != queue ) {
+            result = NULL;
+            *status = SAI__ERROR;
+            errRep( " ", "thr: Cannot pop a job of the head of a queue: the "
+                    "next job belongs to a different queue.", status );
+         } else if( prev == result ) {
+            *head = NULL;
+         } else {
+            prev->next = next;
+            next->prev = prev;
+            *head = prev;
+         }
+
+         result->prev = NULL;
+         result->next = NULL;
+         result->queue= THR__NONE;
+      }
    }
 
    return result;
 }
 
-static void thr1PushListFoot( ThrJob *job, ThrJob **head, int *status ){
+static void thr1PushListFoot( ThrJob *job, ThrJob **head, int queue, int *status ){
 /*
 *  Name:
 *     thr1PushListFoot
@@ -2043,7 +2570,7 @@ static void thr1PushListFoot( ThrJob *job, ThrJob **head, int *status ){
 *     C function
 
 *  Invocation:
-*     void thr1PushListFoot( ThrJob *job, ThrJob **head, int *status )
+*     void thr1PushListFoot( ThrJob *job, ThrJob **head, int queue, int *status )
 
 *  Description:
 *     This function adds a new job to the foot of a list.
@@ -2054,6 +2581,8 @@ static void thr1PushListFoot( ThrJob *job, ThrJob **head, int *status ){
 *     head
 *        Address of a location at which is stored a pointer to the ThrJob at
 *        the head of the list.
+*     queue
+*        Identifier for the queue to use.
 *     status
 *        Pointer to the inherited status value.
 
@@ -2070,21 +2599,44 @@ static void thr1PushListFoot( ThrJob *job, ThrJob **head, int *status ){
 /* Check inherited status */
    if( *status != SAI__OK ) return;
 
-   if( *head ) {
-      foot = (*head)->next;
-      foot->prev = job;
-      job->next = foot;
-      (*head)->next = job;
-      job->prev = *head;
+   if( job->queue != THR__NONE ){
+      *status = SAI__ERROR;
+      errRep( " ", "thr: Cannot push a job to the foot of a queue: the job is "
+              "already in a queue.", status );
+   } else if( job->next || job->prev ){
+      *status = SAI__ERROR;
+      errRep( " ", "thr: Cannot push a job to the foot of a queue: the job is "
+              "already connected.", status );
+   }
 
+   if( *head ) {
+      if( (*head)->queue != queue ){
+         *status = SAI__ERROR;
+         errRep( " ", "thr: Cannot push a job to the foot of a queue: the "
+                 "supplied head belongs to a different queue.", status );
+      } else {
+         foot = (*head)->next;
+         if( foot->queue != queue ){
+            *status = SAI__ERROR;
+            errRep( " ", "thr: Cannot push a job to the foot of a queue: the "
+                    "original foot belongs to a different queue.", status );
+         } else {
+            foot->prev = job;
+            job->next = foot;
+            (*head)->next = job;
+            job->prev = *head;
+         }
+      }
    } else {
       job->next = job;
       job->prev = job;
       *head = job;
    }
+   job->queue = queue;
 }
 
-static void thr1PushListHead( ThrJob *job, ThrJob **head, int *status ){
+static void thr1PushListHead( ThrJob *job, ThrJob **head, int queue,
+                              int *status ){
 /*
 *  Name:
 *     thr1PushListHead
@@ -2099,7 +2651,7 @@ static void thr1PushListHead( ThrJob *job, ThrJob **head, int *status ){
 *     C function
 
 *  Invocation:
-*     void thr1PushListHead( ThrJob *job, ThrJob **head, int *status )
+*     void thr1PushListHead( ThrJob *job, ThrJob **head, int queue, int *status )
 
 *  Description:
 *     This function adds a new job to the head of a list.
@@ -2110,6 +2662,8 @@ static void thr1PushListHead( ThrJob *job, ThrJob **head, int *status ){
 *     head
 *        Address of a location at which is stored a pointer to the ThrJob at
 *        the head of the list.
+*     queue
+*        Identifier for the queue to use.
 *     status
 *        Pointer to the inherited status value.
 
@@ -2126,21 +2680,43 @@ static void thr1PushListHead( ThrJob *job, ThrJob **head, int *status ){
 /* Check inherited status */
    if( *status != SAI__OK ) return;
 
-   if( *head ) {
-      foot = (*head)->next;
-      foot->prev = job;
-      job->next = foot;
-      (*head)->next = job;
-      job->prev = *head;
+   if( job->queue != THR__NONE ){
+      *status = SAI__ERROR;
+      errRep( " ", "thr: Cannot push a job to the head of a queue: the job is "
+              "already in a queue.", status );
+   } else if( job->next || job->prev ){
+      *status = SAI__ERROR;
+      errRep( " ", "thr: Cannot push a job to the head of a queue: the job is "
+              "already connected.", status );
+   }
 
+   if( *head ) {
+      if( (*head)->queue != queue ){
+         *status = SAI__ERROR;
+         errRep( " ", "thr: Cannot push a job to the head of a queue: the "
+                 "supplied head belongs to a different queue.", status );
+      } else {
+         foot = (*head)->next;
+         if( foot->queue != queue ){
+            *status = SAI__ERROR;
+            errRep( " ", "thr: Cannot push a job to the head of a queue: the "
+                    "foot belongs to a different queue.", status );
+         } else {
+            foot->prev = job;
+            job->next = foot;
+            (*head)->next = job;
+            job->prev = *head;
+         }
+      }
    } else {
       job->next = job;
       job->prev = job;
    }
    *head = job;
+   job->queue = queue;
 }
 
-static void thr1RemoveFromList( ThrJob *job, ThrJob **head, int *status ){
+static void thr1RemoveFromList( ThrJob *job, ThrJob **head, int queue, int *status ){
 /*
 *  Name:
 *     thr1RemoveFromList
@@ -2155,7 +2731,7 @@ static void thr1RemoveFromList( ThrJob *job, ThrJob **head, int *status ){
 *     C function
 
 *  Invocation:
-*     void thr1RemoveFromList( ThrJob *job, ThrJob **head, int *status )
+*     void thr1RemoveFromList( ThrJob *job, ThrJob **head, int queue, int *status )
 
 *  Description:
 *     This function removes the supplied ThrJob from the specified list.
@@ -2166,6 +2742,8 @@ static void thr1RemoveFromList( ThrJob *job, ThrJob **head, int *status ){
 *     head
 *        Address of a location at which is stored a pointer to the ThrJob at
 *        the head of the list.
+*     queue
+*        Identifier for queue to use.
 *     status
 *        Pointer to the inherited status value.
 
@@ -2188,7 +2766,21 @@ static void thr1RemoveFromList( ThrJob *job, ThrJob **head, int *status ){
    next = job->next;
 
    if( prev == job ) {
-      *head = NULL;
+      if( *head == job ) {
+         *head = NULL;
+      } else {
+         *status = SAI__ERROR;
+         errRep( " ", "thr: Cannot remove a job from a queue: the job "
+                 "points to itself but is not the queue head.", status );
+      }
+   } else if( next && next->queue != queue ) {
+      *status = SAI__ERROR;
+      errRep( " ", "thr: Cannot remove a job from a queue: the next job "
+              "belongs to a different queue.", status );
+   } else if( prev && prev->queue != queue ) {
+      *status = SAI__ERROR;
+      errRep( " ", "thr: Cannot remove a job from a queue: the previous job "
+              "belongs to a different queue.", status );
    } else {
       prev->next = next;
       next->prev = prev;
@@ -2197,6 +2789,14 @@ static void thr1RemoveFromList( ThrJob *job, ThrJob **head, int *status ){
 
    job->next = NULL;
    job->prev = NULL;
+
+   if( job->queue != THR__NONE ){
+      job->queue = THR__NONE;
+   } else {
+      *status = SAI__ERROR;
+      errRep( " ", "thr: Cannot remove a job from a queue: the job is not "
+              " in a queue.", status );
+   }
 }
 
 static ThrJobStatus *thr1ReportStatus( ThrJobStatus *status, int *ems_status ){
@@ -2291,14 +2891,16 @@ static void *thr1RunWorker( void *wf_ptr ) {
 */
 
 /* Local Variables: */
+   AstKeyMap *globals;
+   ThrJob *job = NULL;
+   ThrJob *job2 = NULL;
+   ThrWorkForce *wf;
    int i;
    int j;
    int jobs_available;
    int ready;
+   int resume;
    int status;
-   ThrJob *job = NULL;
-   ThrJob *job2 = NULL;
-   ThrWorkForce *wf;
 
 /* Initialise the local status value. */
    status = SAI__OK;
@@ -2315,6 +2917,14 @@ static void *thr1RunWorker( void *wf_ptr ) {
 
 /* Tell AST to watch the local status variable. */
    astWatch( &status );
+
+/* Create a KeyMap that can hold global data specific to this thread. */
+   globals = thrThreadData( &status );
+
+/* Store a pointer to the workforce in the thread specific globals
+   keymap. This is so that functions that are called from the job code
+   can get a pointer to thte workforce. */
+   astMapPut0P( globals, "THR_WORKFORCE", wf, NULL );
 
 /* Join the end of the queue of workers at the job desk. This call will
    block until you reach the head of the queue. */
@@ -2339,10 +2949,10 @@ static void *thr1RunWorker( void *wf_ptr ) {
          if( !wf->status ) wf->status = thr1CopyStatus( job->status );
 
 /* Remove the job from the list of currently active jobs. */
-         thr1RemoveFromList( job, &(wf->active_jobs), &status );
+         thr1RemoveFromList( job, &(wf->active_jobs), THR__ACTIVE, &status );
 
-/* If any jobs are held up by the job that has just completed, see if any
-   of them can now be moveed from the list of waiting jobs and put onto
+/* If any unstarted jobs are held up by the job that has just completed, see
+   if any of them can now be moveed from the list of waiting jobs and put onto
    the list of available jobs. */
          for( i = 0; i < job->nheld_up; i++ ) {
             job2 = job->held_up[ i ];
@@ -2364,19 +2974,54 @@ static void *thr1RunWorker( void *wf_ptr ) {
 /* If job2 is now ready to run, move it off the waiting list onto the
    available list. */
             if( ready ) {
-               thr1RemoveFromList( job2, &(wf->waiting_jobs), &status );
-               thr1PushListHead( job2, &(wf->available_jobs), &status );
+               thr1RemoveFromList( job2, &(wf->waiting_jobs), THR__WAITING, &status );
+               thr1PushListHead( job2, &(wf->available_jobs),
+                                 THR__AVAILABLE, &status );
             }
          }
 
+/* If any active/running jobs are halted, waiting on the job that has just
+   completed, remove the completed job from the list of jobs upon which
+   such jobs are waiting. If the list is then empty, resume the halted
+   job. */
+         resume = 0;
+         for( i = 0; i < job->nhalted; i++ ) {
+            job2 = job->halted[ i ];
+            job->halted[ i ] = NULL;
+
+/* First remove the job that has just completed from the list of jobs
+   upon which job2 is waiting. Shuffle later jobs down to fill the gap. */
+            for( j = 0; j < job2->nneeded; j++ ) {
+               if( job2->needed[ j ] == job ) break;
+            }
+            if( j < job2->nneeded ) {
+               (job2->nneeded)--;
+               for( ; j < job2->nneeded; j++ ) {
+                  job2->needed[ j ] = job2->needed[ j + 1 ];
+               }
+               job2->needed[ j ] = NULL;
+            }
+
+/* If job2 is now ready to be resumed, flag that we need to broadcast the
+   "job_done" condition (this will cause each halted job to wake up, check its
+   "needed" list and resume if the "needed" list is empty). */
+            if( job2->nneeded == 0 ) resume = 1;
+         }
+
 /* If required, free the job data pointer. */
-         if( job->flags & THR__FREE_JOBDATA ) job->data = astFree( job->data );
+         if( job->flags & THR__FREE_JOBDATA ) {
+            if( jobdatafreefun ) {
+               job->data = (*jobdatafreefun)( job->data, &status );
+            } else {
+               job->data = astFree( job->data );
+            }
+         }
 
 /* If required, add the completed job onto the end of the "finished" list, and
-   issue the job_done signal. */
+   broadcast the "job_done" condition. signal. */
          if( job->flags & THR__REPORT_JOB ) {
-            thr1PushListFoot( job, &(wf->finished_jobs), &status );
-            thrCondSignal( &(wf->job_done), &status );
+            thr1PushListFoot( job, &(wf->finished_jobs), THR__FINISHED, &status );
+            thrCondBroadcast( &(wf->job_done), &status );
 
 /* Otherwise, clear the job data and put the job structure back onto the
    list of free job structures. */
@@ -2387,8 +3032,16 @@ static void *thr1RunWorker( void *wf_ptr ) {
             job->data = NULL;
             job->nwaiting_on = 0;
             job->nheld_up = 0;
+            job->nhalted = 0;
+            job->halted = astFree( job->halted );
+            job->nneeded = 0;
+            job->needed = astFree( job->needed );
             job->status = thr1FreeStatus( job->status );
-            thr1PushListHead( job, &(wf->free_jobs), &status );
+            thr1PushListHead( job, &(wf->free_jobs), THR__FREE, &status );
+
+/* If required, tell all halted jobs to check to see if time has come for
+   them to resume. */
+            if( resume ) thrCondBroadcast( &(wf->job_done), &status );
          }
 
 /* Indicate you now have no associated job. */
@@ -2404,7 +3057,7 @@ static void *thr1RunWorker( void *wf_ptr ) {
       }
 
 /* Acquire a new job from the list of available jobs. */
-      job = thr1PopListHead( &(wf->available_jobs), &status );
+      job = thr1PopListHead( &(wf->available_jobs), THR__AVAILABLE, &status );
 
 /* If you now have a job, prepare to perform the job. */
       if( job ) {
@@ -2420,13 +3073,18 @@ static void *thr1RunWorker( void *wf_ptr ) {
          }
 
 /* Add the job to the list of active jobs. */
-         thr1PushListHead( job, &(wf->active_jobs), &status );
+         thr1PushListHead( job, &(wf->active_jobs), THR__ACTIVE, &status );
 
 /* Leave the job desk queue, allowing the next worker to report a
    completed job and/or get a new job. */
          thrMutexUnlock( &(wf->jd_mutex), &status );
          thr1ThreadLog( "run_worker: left desk to do job", ACTIVE,
                          job->ijob );
+
+/* Store a pointer to the job structure in the thread specific globals
+   keymap. This is so that functions like thrHaltJob (which may be called
+   from the job code) can find out about the currently executing job. */
+         astMapPut0P( globals, "THR_JOB_INFO", job, NULL );
 
 /* If no error has occurred, do the job in a new AST context. */
          if( status == SAI__OK ) {
