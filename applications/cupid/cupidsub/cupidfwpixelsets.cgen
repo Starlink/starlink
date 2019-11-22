@@ -121,13 +121,6 @@ CupidPixelSet **CGEN_FUNCTION(cupidFWPixelSets)( CGEN_TYPE *array, size_t nel,
    int *piny;          /* Pointer to input pixel at start of row */
    int *pinz;          /* Pointer to input pixel at start of plane */
    int ignore;         /* Ignore this neighbour? */
-   int iv;             /* Vector index into input array */
-   int ix;             /* Input pixel GRID index on axis 1 */
-   int iy;             /* Input pixel GRID index on axis 2 */
-   int iz;             /* Input pixel GRID index on axis 3 */
-   int ox;             /* Output pixel GRID index on axis 1 */
-   int oy;             /* Output pixel GRID index on axis 2 */
-   int oz;             /* Output pixel GRID index on axis 3 */
    int ineb;           /* Index of neighbour within "nebs" and "cols" arrays */
    int ivali;          /* Neighbouring clump index */
    int ivalo;          /* Central clump index */

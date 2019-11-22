@@ -242,7 +242,7 @@ static void cupidRCA2Par( void *job_data_ptr, int *status ) {
    supplied structure. */
    pdata = (CupidRCA2Data *) job_data_ptr;
 
-/* Copy values form the structure into local variables */
+/* Copy values from the structure into local variables */
    p2 = pdata->p2;
    skip = pdata->skip;
    dims = pdata->dims;
@@ -281,7 +281,8 @@ static void cupidRCA2Par( void *job_data_ptr, int *status ) {
       oy++;
       ox++;
 
-/* Get the usable bounds on each axis, cropping at the edges of the array */
+/* Get the bounds on each axis of the 3x3x3 box centred on (ox,oy,oz), cropping
+   at the edges of the array */
       zlo = oz - 1;
       if( zlo < 1 ) zlo = 1;
       zhi = oz + 1;
@@ -302,8 +303,9 @@ static void cupidRCA2Par( void *job_data_ptr, int *status ) {
       np = 0;
 
 /* Loop round all input pixels in the neighbourhood of the current output
-   pixel, this is a cube of 3x3x3 input pixels, centred on the current
-   output pixel. */
+   pixel. This is the cube of 3x3x3 input pixels, centred on the current
+   output pixel. "pin0+iv" points at the first (i.e. bottom left) pixel in
+   the box (ignoring array edges). */
       pinz = pin0 + iv + (zlo - oz + 1 )*skip[ 2 ];
       for( iz = zlo; iz <= zhi; iz++ ) {
          piny = pinz + (ylo - oy + 1 )*skip[ 1 ];
@@ -320,9 +322,9 @@ static void cupidRCA2Par( void *job_data_ptr, int *status ) {
    votes, then it is not possible for another party to win. */
                pparty = party;
                pvotes = votes;
-               for( ip = 0; ip < np; ip++ ) {
-                  if( *(pparty++) == *pin ) {
-                     if( ++(*(pvotes++)) >= target ) {
+               for( ip = 0; ip < np; ip++,pparty++,pvotes++ ) {
+                  if( *pparty == *pin ) {
+                     if( ++(*pvotes) >= target ) {
                         winner = ip;
                         goto L20;
                      }

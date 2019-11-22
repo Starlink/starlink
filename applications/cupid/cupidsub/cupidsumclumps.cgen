@@ -407,9 +407,11 @@ static void CGEN_FUNCTION(cupidSumClumpsPar)( void *job_data_ptr, int *status ) 
       pd = NULL;
       if( alg == GAUSSCLUMPS ) {
          pd = (CGEN_TYPE *) pdata->out;
+         pd += p1;
          for( i = p1; i <= p2; i++ ) *(pd++) = 0.0;
       } else {
          pi = (int *) pdata->out;
+         pi += p1;
          for( i = p1; i <= p2; i++ ) *(pi++) = VAL__BADI;
       }
 
@@ -417,7 +419,7 @@ static void CGEN_FUNCTION(cupidSumClumpsPar)( void *job_data_ptr, int *status ) 
    } else if( pdata->operation == 2 ) {
       p1 = pdata->p1;
       p2 = pdata->p2;
-      rmask = pdata->rmask;
+      rmask = pdata->rmask + p1;
       for( i = p1; i <= p2; i++ ) *(rmask++) = VAL__BADR;
 
 /* Paste a clump into the output arrays */
@@ -476,7 +478,7 @@ static void CGEN_FUNCTION(cupidSumClumpsPar)( void *job_data_ptr, int *status ) 
    is usable, get the clump index to use within this job, incrementing the
    next available clump index. If the NDF is unusable, we leave the next
    available clump index unchanged. */
-      myclump_index = ( indf != NDF__NOID ) ? (clump_index++) : 0;
+      myclump_index = ( indf != NDF__NOID ) ? (++clump_index) : 0;
 
 /* Modify iclump_next to indicate the job associated with the next iclump
    value now has permission to claim the next clump index. Broadcast the
@@ -511,7 +513,6 @@ static void CGEN_FUNCTION(cupidSumClumpsPar)( void *job_data_ptr, int *status ) 
 
 /* Loop round all the unfinished jobs, looking for any that process an
    area overlapping the area of the current job. */
-int myjob = -2;
          noverlap = 0;
          for( ijob = 0; ijob < njob; ijob++ ) {
 
@@ -520,10 +521,6 @@ int myjob = -2;
    value). Also ignore the current job. Any such job that overlaps this
    job will only be allowed to proceed when this job has finished. */
             jobdata = thrGetJobData( jobs[ ijob ], NULL, status );
-
-if( jobdata == pdata ) myjob = jobs[ ijob ];
-
-
             if( jobdata && jobdata->clbnd && jobdata != pdata ) {
 
 /* See if the unfinished job's clump overlaps the current clump. */
