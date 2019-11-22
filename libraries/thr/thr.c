@@ -1016,13 +1016,9 @@ int *thrGetJobs( ThrWorkForce *workforce, int state, int *njob, int *status ){
                  status );
       }
 
-/* Get the workforce pointer out of the globals KeyMap. */
-      if( !astMapGet0P( globals, "THR_WORKFORCE", (void **) &workforce ) &&
-          *status == SAI__OK ) {
-         *status = SAI__ERROR;
-         emsRep( "", "thrGetJobs: Workforce not found in globals KeyMap (thr "
-                 "programming error).", status );
-      }
+/* Get the workforce pointer out of the globals KeyMap (may be NULL -
+   e.g. if <PACKAGE>_THREADS env. var. has been set to zero). */
+      astMapGet0P( globals, "THR_WORKFORCE", (void **) &workforce );
    }
 
 /* Return if no workforce is available. */
@@ -1342,14 +1338,10 @@ void thrHaltJob( ThrWorkForce *workforce, int njob, int *job_list, int *status )
    }
 
 /* If no workforce was supplied, use the current workforce stored in the
-   globals keymap. */
+   globals keymap (may be NULL - e.g. if <PACKAGE>_THREADS env. var. has
+   been set to zero). */
    if( !workforce ) {
-      if( !astMapGet0P( globals, "THR_WORKFORCE", (void **) &workforce ) &&
-          *status == SAI__OK ) {
-         *status = SAI__ERROR;
-         emsRep( "", "thrHaltJob: Workforce not found in globals KeyMap (thr "
-                 "programming error).", status );
-      }
+      astMapGet0P( globals, "THR_WORKFORCE", (void **) &workforce );
    }
 
 /* Return if no workforce is available. */
