@@ -2,6 +2,7 @@
 #include "star/hds_fortran.h"
 #include "f77.h"
 #include "ast.h"
+#include "atl.h"
 #include "sae_par.h"
 
 F77_SUBROUTINE(atl_hd2ky)( CHARACTER(LOC), INTEGER(KEYMAP), INTEGER(STATUS)

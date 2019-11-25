@@ -3,6 +3,7 @@
 #include "f77.h"
 #include "ast.h"
 #include "sae_par.h"
+#include "atl.h"
 
 F77_SUBROUTINE(atl_ky2hd)( INTEGER(KEYMAP), CHARACTER(LOC), INTEGER(STATUS)
                            TRAIL(LOC) ) {
