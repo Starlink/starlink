@@ -148,7 +148,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'ATL_PAR'          ! NDF constants
 
 *  Arguments Given:
       INTEGER IWCS
@@ -162,12 +162,12 @@
 
 *  Local Variables:
       INTEGER I
-      INTEGER*8 LBND8( NDF__MXDIM )
-      INTEGER*8 UBND8( NDF__MXDIM )
+      INTEGER*8 LBND8( ATL__MXDIM )
+      INTEGER*8 UBND8( ATL__MXDIM )
 *.
 
 *  Copy the supplied INTEGER values into local INTEGER*8 arrays.
-      DO I = 1, NDF__MXDIM
+      DO I = 1, ATL__MXDIM
          LBND8( I ) = LBND( I )
          UBND8( I ) = UBND( I )
       END DO
