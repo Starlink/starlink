@@ -199,8 +199,8 @@
 *  Remove any insignificant axes from the Current Frame. We do not do
 *  this if later code will trim the current Frame to have the required
 *  number of axes.
-      IF( .NOT. TRIM ) CALL KPG1_ASSIG( IWCS, NDIMS, LBND, UBND,
-     :                                  STATUS )
+      IF( .NOT. TRIM ) CALL KPG1_ASSIG8( IWCS, NDIMS, LBND, UBND,
+     :                                   STATUS )
 
 *  Re-map the Base (GRID) Frame by selecting the chosen axes.
 *  ==========================================================
