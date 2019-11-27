@@ -109,6 +109,10 @@ void ndf1Spfor( const char *fname, NdfFCB *fcb, size_t *d1, size_t *d2,
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     27-NOV-2019 (DSB):
+*        Correct the end of file name to exclude the dot at the start of the
+*        file type. Previously, the dot was included in both the file
+*        name and the file type.
 
 *-
 */
@@ -157,7 +161,7 @@ void ndf1Spfor( const char *fname, NdfFCB *fcb, size_t *d1, size_t *d2,
 /* If so, then correct the name and type field limits to identify it. */
             if( found ) {
                *t1 = tmin;
-               if( *n2 >= *n1 ) *n2 = NDF_MIN( *n2, *t1 );
+               if( *n2 >= *n1 ) *n2 = NDF_MIN( *n2, *t1 - 1 );
             }
          }
       }
