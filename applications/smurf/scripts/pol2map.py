@@ -637,6 +637,8 @@
 *       (I,Q,U) values was lost. In other words, the wrong set of I, Q
 *       and U values were being combined together to create each pair of
 *       (P,ANG) values.
+*    28-NOV-2019 (DSB):
+*       Ensure the returned I, Q and U maps have the same bounds.
 
 '''
 
@@ -2973,6 +2975,24 @@ try:
 
                   invoke("$KAPPA_DIR/setvar ndf={0} from={1} comp=Variance".
                          format(coadd_cat,temp))
+
+
+
+
+
+#  ------------  END OF INDIVIDUAL I,Q,U   BLOCK. ---------------------------
+
+#  Ensure the returned Q, U and I images all have the same bounds, equal to
+#  the overlap region between them. To get the overlap region, use MATHS to
+#  add them together. Then use setbound to set the bounds of each to match 
+#  the overlap area.
+   if qmap and umap and imap:
+      tmp = NDG( 1 )
+      invoke( "$KAPPA_DIR/maths exp=\"'ia+ib+ic'\" ia={0} ib={1} ic={2} out={3}".
+              format(qmap,umap,imap,tmp) )
+      invoke( "$KAPPA_DIR/setbound ndf={0} like={1}".format(qmap,tmp) )
+      invoke( "$KAPPA_DIR/setbound ndf={0} like={1}".format(umap,tmp) )
+      invoke( "$KAPPA_DIR/setbound ndf={0} like={1}".format(imap,tmp) )
 
 
 
