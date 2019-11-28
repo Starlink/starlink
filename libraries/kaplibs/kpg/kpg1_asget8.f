@@ -211,8 +211,8 @@
 *  containing the NDF-special Frames (GRID, AXIS, PIXEL and FRACTION)
 *  appropriate for an NDF with the returned bounds.
       IF( NBAX .NE. NDIM ) THEN
-         CALL KPG1_ASNDF( INDF, NDIM, SDIM, SLBND, SUBND, NEWFS,
-     :                    STATUS )
+         CALL KPG1_ASNDF8( INDF, NDIM, SDIM, SLBND, SUBND, NEWFS,
+     :                     STATUS )
 
 *  Find the indices of the NDF special Frames within this FrameSet
          IPIX1 = -1
@@ -362,7 +362,7 @@
 *  ===================================================================
       IF( TRIM ) THEN
          CALL PSX_CALLOC8( MXDIM*2, '_DOUBLE', IPWORK, STATUS )
-         CALL KPG1_ASTRM( IWCS, INPRM, SLBND, SUBND,
+         CALL KPG1_ASTRM8( IWCS, INPRM, SLBND, SUBND,
      :                    %VAL( CNF_PVAL(IPWORK) ), STATUS )
          CALL PSX_FREE( IPWORK, STATUS )
       END IF

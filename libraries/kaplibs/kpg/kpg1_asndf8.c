@@ -33,8 +33,7 @@ F77_SUBROUTINE(kpg1_asndf8)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(DIM),
 *     NDIM = INTEGER (Given)
 *        The number of pixel axes in the modified FrameSet.
 *     DIM( NDIM ) = INTEGER (Given)
-*        The indices within INDF corresponding to each of the required
-*        NDIM axes.
+*        The indices of the required NDIM axes within the NDF.
 *     LBND( NDIM ) = INTEGER*8 (Given)
 *        The lower pixel index bounds in the modified FrameSet.
 *     UBND( NDIM ) = INTEGER*8 (Given)

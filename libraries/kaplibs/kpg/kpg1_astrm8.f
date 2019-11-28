@@ -34,7 +34,7 @@
 *     UBND( * ) = INTEGER*8 (Given)
 *        The upper pixel bound on each pixel axis. Array length should be
 *        at least equal to the number of base Frame axes in IWCS.
-*     WORK( * ) = INTEGER (Given)
+*     WORK( * ) = DOUBLE PRECISION (Given)
 *        Work space. It's length should be at least twice as large as the
 *        largest pixel dimension implied by LBND and UBND.
 *     STATUS = INTEGER (Given and Returned)
