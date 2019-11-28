@@ -2984,7 +2984,7 @@ try:
 
 #  Ensure the returned Q, U and I images all have the same bounds, equal to
 #  the overlap region between them. To get the overlap region, use MATHS to
-#  add them together. Then use setbound to set the bounds of each to match 
+#  add them together. Then use setbound to set the bounds of each to match
 #  the overlap area.
    if qmap and umap and imap:
       tmp = NDG( 1 )
@@ -3072,7 +3072,7 @@ try:
 #  python traceback. To see the trace back, uncomment "raise" instead.
 except Exception as err:
 #  raise
-   msg_out( err )
+   msg_out( err, level=starutil.NOTSET )
    print( "See the end of the log file ({0}) for further details.".format(starutil.logfile) )
    cleanup()
 
