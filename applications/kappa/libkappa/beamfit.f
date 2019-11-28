@@ -973,6 +973,9 @@
 *  Note the index of the original PIXEL Frame.
       CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
 
+*  Abort if an error has occurred.
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Create a WinMap that maps the GRID array onto a rectangle centred on
 *  the origin. At the same time, modify the integer pixel bounds of the
 *  NDF to refer to the new PIXEL Frame. Also store the shifts needed to
