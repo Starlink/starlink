@@ -333,8 +333,8 @@
 *     are propagated.  TITLE is controlled by the TITLE parameter. DATA,
 *     VARIANCE, and WCS are propagated after appropriate modification.
 *     The QUALITY component is also propagated if Nearest-Neighbour
-*     interpolation is being used.  The AXIS component is not
-*     propagated.
+*     interpolation is being used (note, REBIN must be 'NO').  The AXIS 
+*     component is not propagated.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.  If REBIN is
@@ -463,6 +463,8 @@
 *     30-AUG-2012 (DSB):
 *        Changed to use AST_REBINSEQ instead of AST_REBIN, thereby
 *        introduce Parameter NORM.
+*     29-NOV-2019 (DSB):
+*        Cannot propagate QUALITY when REBIN=YES, even if METHOD=NEAREST.
 *     {enter_further_changes_here}
 
 *-
@@ -1389,8 +1391,10 @@
 
 *  If using Nearest Neighbour interpolation, resample any QUALITY array.
 *  =====================================================================
+*  Cannot rebin quality since each output quality value may receive
+*  contributions from more than one input pixel.
       CALL NDF_STATE( NDFI, 'QUALITY', HASQUA, STATUS )
-      IF( INTERP .EQ. AST__NEAREST .AND. HASQUA ) THEN
+      IF( INTERP .EQ. AST__NEAREST .AND. HASQUA .AND. .NOT. REBIN ) THEN
 
 *  Map the QUALITY array of the input and output NDFs. Note, QUALITY
 *  arrays should always be mapped as _UBYTE.
