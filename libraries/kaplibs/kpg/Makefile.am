@@ -171,6 +171,7 @@ kpg1_asttl.f \
 kpg1_astcmn.f \
 kpg1_axano.f \
 kpg1_axrng.f \
+kpg1_axrng8.f \
 kpg1_axtyp.f \
 kpg1_badbx.f \
 kpg1_bilnr.f \

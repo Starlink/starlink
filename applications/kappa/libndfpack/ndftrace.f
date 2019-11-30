@@ -91,7 +91,7 @@
 *     CURRENT = _INTEGER (Write)
 *        The integer Frame index of the current co-ordinate Frame in the
 *        WCS component.
-*     DIMS( ) = _INTEGER (Write)
+*     DIMS( ) = _INT64 (Write)
 *        The dimensions of the NDF.
 *     EXTNAME( ) = LITERAL (Write)
 *        The names of the extensions in the NDF.  It is only written
@@ -160,7 +160,7 @@
 *        Whether or not the NDF contains HISTORY records.
 *     LABEL = LITERAL (Write)
 *        The label of the NDF.
-*     LBOUND( ) = _INTEGER (Write)
+*     LBOUND( ) = _INT64 (Write)
 *        The lower bounds of the NDF.
 *     NDF = NDF (Read)
 *        The NDF data structure whose attributes are to be displayed.
@@ -186,7 +186,7 @@
 *        The title of the NDF.
 *     TYPE = LITERAL (Write)
 *        The data type of the NDF's data array.
-*     UBOUND( ) = _INTEGER (Write)
+*     UBOUND( ) = _INT64 (Write)
 *        The upper bounds of the NDF.
 *     UNITS = LITERAL (Write)
 *        The units of the NDF.
@@ -343,6 +343,8 @@
 *        Cast EL to INTEGER*8 when calling KPG1_MONOD. At some point the
 *        whole of this function (and the whole of KAPPA!) should be
 *        changed to use 8-byte dimensions and counters.
+*     30-NOV-2019 (DSB):
+*        Parameters DIMS, LBOUND, UBOUND changed from _INTEGER to _INT64.
 *     {enter_further_changes_here}
 
 *-
@@ -415,8 +417,6 @@
       INTEGER AXPNTR( 1 )        ! Pointer to axis centres
       INTEGER BBI                ! Bad-bits value as an integer
       INTEGER DIGVAL             ! Binary digit value
-      INTEGER DIM( NDF__MXDIM )  ! Dimension sizes
-      INTEGER EL                 ! Number of array elements mapped
       INTEGER FRMNAX             ! Frame dimensionality
       INTEGER I                  ! Loop counter for dimensions
       INTEGER IAT                ! Used length of string
@@ -427,7 +427,6 @@
       INTEGER IFRAME             ! Frame index
       INTEGER INDF               ! NDF identifier
       INTEGER IWCS               ! AST identifier for NDF's WCS FrameSet
-      INTEGER LBND( NDF__MXDIM ) ! Lower pixel-index bounds
       INTEGER MAP                ! GRID -> current WCS Frame Mapping
       INTEGER N                  ! Loop counter for extensions
       INTEGER NC                 ! Character count
@@ -437,8 +436,11 @@
       INTEGER NFRM               ! Indexof next WCS Frame
       INTEGER NREC               ! Number of history records
       INTEGER PNTR( 2 )          ! Pointers to axis elements
-      INTEGER SIZE               ! Total number of pixels
-      INTEGER UBND( NDF__MXDIM ) ! Upper pixel-index bounds
+      INTEGER*8 DIM( NDF__MXDIM )! Dimension sizes
+      INTEGER*8 EL               ! Number of array elements mapped
+      INTEGER*8 LBND( NDF__MXDIM ) ! Lower pixel-index bounds
+      INTEGER*8 SIZE             ! Total number of pixels
+      INTEGER*8 UBND( NDF__MXDIM ) ! Upper pixel-index bounds
       INTEGER WCSNAX( MXFRM )    ! Frame dimensionalities
       LOGICAL AVAR( NDF__MXDIM ) ! NDF axis-variance components defined?
       LOGICAL BAD                ! Bad pixel flag
@@ -537,7 +539,7 @@
 *  NDF shape:
 *  ==========
 *  Obtain the dimension sizes.
-      CALL NDF_DIM( INDF, NDF__MXDIM, DIM, NDIM, STATUS )
+      CALL NDF_DIM8( INDF, NDF__MXDIM, DIM, NDIM, STATUS )
 
 *  Display a header for this information.
       IF ( REPORT ) THEN
@@ -554,7 +556,7 @@
             NC = 0
             DO 1 I = 1, NDIM
                IF ( I .GT. 1 ) CALL CHR_PUTC( ' x ', BUF, NC )
-               CALL CHR_PUTI( DIM( I ), BUF, NC )
+               CALL CHR_PUTK( DIM( I ), BUF, NC )
     1       CONTINUE
             CALL MSG_SETC( 'DIMS', BUF( : NC ) )
          END IF
@@ -568,7 +570,7 @@
       CALL PAR_PUT0I( 'NDIM', NDIM, STATUS )
 
 *  Obtain the pixel-index bounds.
-      CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+      CALL NDF_BOUND8( INDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Construct a string showing the pixel-index bounds.
       IF ( REPORT ) THEN
@@ -576,9 +578,9 @@
             NC = 0
             DO 2 I = 1, NDIM
                IF ( I .GT. 1 ) CALL CHR_PUTC( ', ', BUF, NC )
-               CALL CHR_PUTI( LBND( I ), BUF, NC )
+               CALL CHR_PUTK( LBND( I ), BUF, NC )
                CALL CHR_PUTC( ':', BUF, NC )
-               CALL CHR_PUTI( UBND( I ), BUF, NC )
+               CALL CHR_PUTK( UBND( I ), BUF, NC )
     2       CONTINUE
             CALL MSG_SETC( 'BNDS', BUF( : NC ) )
          END IF
@@ -589,14 +591,14 @@
       END IF
 
 *  Output the dimensions and bounds.
-      CALL PAR_PUT1I( 'DIMS', NDIM, DIM, STATUS )
-      CALL PAR_PUT1I( 'LBOUND', NDIM, LBND, STATUS )
-      CALL PAR_PUT1I( 'UBOUND', NDIM, UBND, STATUS )
+      CALL PAR_PUT1K( 'DIMS', NDIM, DIM, STATUS )
+      CALL PAR_PUT1K( 'LBOUND', NDIM, LBND, STATUS )
+      CALL PAR_PUT1K( 'UBOUND', NDIM, UBND, STATUS )
 
 *  Obtain the NDF size and display this information.
       IF ( REPORT ) THEN
-         CALL NDF_SIZE( INDF, SIZE, STATUS )
-         CALL MSG_SETI( 'SIZE', SIZE )
+         CALL NDF_SIZE8( INDF, SIZE, STATUS )
+         CALL MSG_SETK( 'SIZE', SIZE )
          CALL MSG_OUT( 'SIZE',
      :     '      Total pixels     :  ^SIZE ', STATUS )
       END IF
@@ -663,7 +665,7 @@
 
 *  First check for monotonic axis centre values.  Map the axis centre
 *  array, using double precision to prevent loss of precision.
-            CALL NDF_AMAP( INDF, 'Centre', IAXIS, '_DOUBLE',
+            CALL NDF_AMAP8( INDF, 'Centre', IAXIS, '_DOUBLE',
      :                     'READ', AXPNTR, EL, STATUS )
 
 *  Are all the axes monotonic?  Start a new error context so that the
@@ -692,12 +694,12 @@
 *  Map the axis centre and width arrays and use them to determine the
 *  overall extent of the NDF along the current axis.  Unmap the arrays
 *  afterwards.
-               CALL NDF_AMAP( INDF, 'Centre,Width', IAXIS, '_DOUBLE',
+               CALL NDF_AMAP8( INDF, 'Centre,Width', IAXIS, '_DOUBLE',
      :                        'READ', PNTR, EL, STATUS )
-               CALL KPG1_AXRNG( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                          %VAL( CNF_PVAL( PNTR( 2 ) ) ),
-     :                          ASTART( IAXIS ),
-     :                          AEND( IAXIS ), STATUS )
+               CALL KPG1_AXRNG8( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                           %VAL( CNF_PVAL( PNTR( 2 ) ) ),
+     :                           ASTART( IAXIS ),
+     :                           AEND( IAXIS ), STATUS )
                CALL NDF_AUNMP( INDF, 'Centre,Width', IAXIS, STATUS )
 
 *  Determine the numeric type which should be used to display the NDF's

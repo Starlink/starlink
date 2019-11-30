@@ -1,7 +1,7 @@
-      SUBROUTINE KPG1_AXRNG( EL, CENTRE, WIDTH, ASTART, AEND, STATUS )
+      SUBROUTINE KPG1_AXRNG8( EL, CENTRE, WIDTH, ASTART, AEND, STATUS )
 *+
 *  Name:
-*     KPG1_AXRNG
+*     KPG1_AXRNG8
 
 *  Purpose:
 *     Calculates the extent of an NDF along an axis.
@@ -10,15 +10,15 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_AXRNG( EL, CENTRE, WIDTH, ASTART, AEND, STATUS )
+*     CALL KPG1_AXRNG8( EL, CENTRE, WIDTH, ASTART, AEND, STATUS )
 
 *  Description:
-*     This routine calculates the starting and ending positions of an
-*     NDF's pixels along an axis, taking account of the axis width
-*     values.
+*     This routine is equivalent to KPG1_AXRNG except that argument
+*     EL is INTEGER*8 instead of INTEGER. See KPG1_AXRNG for more
+*     information.
 
 *  Arguments:
-*     EL = INTEGER (Given)
+*     EL = INTEGER*8 (Given)
 *        The number of elements in the axis arrays.
 *     CENTRE( EL ) = DOUBLE PRECISION (Given)
 *        The centres of the pixels on the axis.
@@ -39,12 +39,8 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Notes:
-*     -  The routine KPG1_AXRNG8 is equivalent to this function but uses
-*     INTEGER*8 for the EL argument.
-
 *  Copyright:
-*     Copyright (C) 1991, 1993 Science & Engineering Research Council.
+*     Copyright (C) 2019 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -64,18 +60,13 @@
 *     02110-1301, USA.
 
 *  Authors:
-*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
-*     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
-*     29-APR-1991 (RFWS):
-*        Original version.
-*     1993 January 4 (MJC):
-*        Virually re-written, since previous method of passing the lower
-*        and upper-bound centres and widths does not work, if there is
-*        no width array and the centres are not incremented by one.
-*        Uses completely different input arguments.
+*     4-OCT-2019 (DSB):
+*        Original version, copied from KPG1_AXRNG and changed to use
+*        INTEGER*8 pixel counts.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -90,7 +81,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      INTEGER EL
+      INTEGER*8 EL
       DOUBLE PRECISION CENTRE( EL )
       DOUBLE PRECISION WIDTH ( EL )
 
@@ -101,14 +92,22 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Variables:
-      INTEGER*8 EL8
-
 *.
 
-*  Convert the supplied INTEGER value to INTEGER*8 and call the 8-byte
-*  version of this routine.
-      EL8 = EL
-      CALL KPG1_AXRNG8( EL8, CENTRE, WIDTH, ASTART, AEND, STATUS )
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  If the axis centre values increase with pixel index, then calculate
+*  the extent.
+      IF ( CENTRE( 1 ) .LE. CENTRE( EL ) ) THEN
+         ASTART = CENTRE( 1 ) - 0.5D0 * ABS( WIDTH ( 1 ) )
+         AEND = CENTRE( EL ) + 0.5D0 * ABS( WIDTH( EL ) )
+
+*  Otherwise calculate the extent appropriate to decreasing axis centre
+*  values.
+      ELSE
+         ASTART = CENTRE( 1 ) + 0.5D0 * ABS( WIDTH ( 1 ) )
+         AEND = CENTRE( EL ) - 0.5D0 * ABS( WIDTH( EL ) )
+      END IF
 
       END

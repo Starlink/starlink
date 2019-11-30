@@ -1566,7 +1566,7 @@ package kappa {
 
          parameter dims {
             size *
-            type _INTEGER
+            type _INT64
             access WRITE
             vpath INTERNAL
             helpkey *
@@ -1681,7 +1681,7 @@ package kappa {
 
          parameter lbound {
             size *
-            type _INTEGER
+            type _INT64
             access WRITE
             vpath INTERNAL
             helpkey *
@@ -1764,7 +1764,7 @@ package kappa {
 
          parameter ubound {
             size *
-            type _INTEGER
+            type _INT64
             access WRITE
             vpath INTERNAL
             helpkey *
