@@ -44,6 +44,7 @@
       INTEGER SUBPAR__REAL           ! real number
       INTEGER SUBPAR__DOUBLE         ! double precision number
       INTEGER SUBPAR__INTEGER        ! integer number
+      INTEGER SUBPAR__INT64          ! integer*8 number
       INTEGER SUBPAR__LOGICAL        ! logical value
       INTEGER SUBPAR__LITERAL        ! literal string
       INTEGER SUBPAR__NULLTYPE       ! null for default value
@@ -56,6 +57,7 @@
       PARAMETER ( SUBPAR__LOGICAL = 5 )
       PARAMETER ( SUBPAR__LITERAL = 6 )
       PARAMETER ( SUBPAR__NULLTYPE = 7 )
+      PARAMETER ( SUBPAR__INT64 = 8 )
 *
 *   Flags defining whether a constraint list stored in the internal
 *   parameter store is continous (ie. a range) or discrete (ie. a set of

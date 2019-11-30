@@ -31,8 +31,8 @@
 
 *  Algorithm:
 *     The parameter system contains the arrays CHARLIST, REALLIST,
-*     INTLIST, DOUBLELIST and LOGLIST. These are used for storing values
-*     associated with parameters, such as static and dynamic defaults
+*     INTLIST, INT64LIST, DOUBLELIST and LOGLIST. These are used for storing
+*     values associated with parameters, such as static and dynamic defaults
 *     and constraints for RANGE and IN. CONVALS provides a mechanism for
 *     extracting a set of values from one of these arrays and formatting
 *     the values into a form suitable for display to a user.
@@ -160,6 +160,13 @@
 
          DO J = FIRST, LAST
             CALL CHR_PUTI( INTLIST(J), STRING, START)
+            CALL CHR_PUTC( ',', STRING, START)
+         ENDDO
+
+      ELSE IF ( TYPE .EQ. SUBPAR__INT64 ) THEN
+
+         DO J = FIRST, LAST
+            CALL CHR_PUTK( INT64LIST(J), STRING, START)
             CALL CHR_PUTC( ',', STRING, START)
          ENDDO
 

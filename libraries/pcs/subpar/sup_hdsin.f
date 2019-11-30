@@ -181,7 +181,7 @@
       INTEGER CHR_LEN
 
 *  Local Constants:
-      CHARACTER*15 POSTYPES(5)   ! Possible primitive data types
+      CHARACTER*15 POSTYPES(8)   ! Possible primitive data types
 
 *  External Functions:
       CHARACTER*(DAT__SZGRP) SUBPAR_PARGP           ! HDS group name
@@ -206,7 +206,7 @@
 
 *  Local Data:
       DATA POSTYPES /'_CHAR*', '_REAL', '_DOUBLE', '_INTEGER',
-     :   '_LOGICAL' /
+     :   '_LOGICAL', ' ', ' ',  '_INT64' /
 
 *.
 

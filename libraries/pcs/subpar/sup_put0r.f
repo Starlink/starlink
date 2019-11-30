@@ -216,6 +216,19 @@
      :            'for parameter ^NAME - ', STATUS )
                ENDIF
 
+            ELSE IF ( TYPE .EQ. SUBPAR__INT64 ) THEN
+
+               PARINT64 ( NAMECODE ) = RVALUE
+
+               IF ( STATUS .NE. SAI__OK ) THEN
+                  STATUS = SUBPAR__CONER
+                  CALL EMS_SETC ( 'NAME', PARKEY(NAMECODE) )
+                  CALL EMS_SETR ( 'STRING', RVALUE )
+                  CALL EMS_REP ( 'SUP_PUT0R2',
+     :            'SUBPAR: Failed to convert ^STRING to _INTEGER*8 ' //
+     :            'for parameter ^NAME - ', STATUS )
+               ENDIF
+
             ELSE IF ( TYPE .EQ. SUBPAR__DOUBLE ) THEN
 
                PARDOUBLE ( NAMECODE ) = DBLE ( RVALUE )

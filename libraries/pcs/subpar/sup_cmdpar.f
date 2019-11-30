@@ -149,7 +149,7 @@
 *  Local Constants:
       INTEGER MCLENGTH           ! maximum length of string
       PARAMETER (MCLENGTH=200)
-      CHARACTER*15 POSTYPES(5)   ! Possible primitive data types
+      CHARACTER*15 POSTYPES(8)   ! Possible primitive data types
 
 *  Local Variables:
       CHARACTER*(MCLENGTH+3) COMMAND  ! command string with SPACE CR added
@@ -171,7 +171,7 @@
 
 *  Local Data:
       DATA POSTYPES /'_CHAR*132', '_REAL', '_DOUBLE', '_INTEGER',
-     :   '_LOGICAL' /
+     :   '_LOGICAL', ' ', ' ', '_INT64' /
 
 *.
 

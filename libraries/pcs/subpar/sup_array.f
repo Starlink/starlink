@@ -142,12 +142,12 @@
       INTEGER STAT                ! Temporary status
       INTEGER TACTION             ! Saved action code to derive
                                   ! type for array
-      CHARACTER*15 POSTYPES(5)    ! Possible primitive data types
+      CHARACTER*15 POSTYPES(8)    ! Possible primitive data types
       LOGICAL LVALUE              ! Conversion of logical constant
 
 *  Local Data:
       DATA POSTYPES/'_CHAR*132', '_REAL', '_DOUBLE', '_INTEGER',
-     :     '_LOGICAL'/
+     :     '_LOGICAL', ' ', ' ', '_INT64' /
 
 *.
 

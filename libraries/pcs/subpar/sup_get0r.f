@@ -149,6 +149,7 @@
       CHARACTER*132 VALUE_STRING        ! Variables to store converted
       REAL VALUE_REAL                   ! parameter value
       INTEGER VALUE_INTEGER
+      INTEGER VALUE_INT64
       DOUBLE PRECISION VALUE_DOUBLE
       INTEGER STYPE                           ! Stored type of the
                                               ! parameter.
@@ -165,6 +166,7 @@
                                               ! SUBPAR__REAL
                                               ! SUBPAR__CHAR
                                               ! SUBPAR__INTEGER
+                                              ! SUBPAR__INT64
                                               ! SUBPAR__DOUBLE
                                               ! SUBPAR__LOGICAL
 
@@ -284,6 +286,21 @@
 
                IF ( STATUS .EQ. SAI__OK ) THEN
                   RVALUE = REAL( VALUE_INTEGER )
+               ENDIF
+
+            ELSE IF ( TYPE .EQ. SUBPAR__INT64 ) THEN
+
+               IF ( INTERNAL ) THEN
+                  CALL SUBPAR_FETCHK ( NAMECODE, VALUE_INT64, STATUS )
+               ELSE
+                  CALL DAT_GETK ( LOC, 0, 0, VALUE_INT64, STATUS )
+               ENDIF
+
+               CALL SUBPAR_LIMITK ( NAMECODE, VALUE_INT64, ACCEPTED,
+     :           STATUS )
+
+               IF ( STATUS .EQ. SAI__OK ) THEN
+                  RVALUE = REAL( VALUE_INT64 )
                ENDIF
 
             ELSE IF ( TYPE .EQ. SUBPAR__DOUBLE ) THEN

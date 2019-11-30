@@ -187,6 +187,11 @@
      :    ( INTLIST(J), J=1,INTPTR )
       ENDIF
 
+      IF ( INT64PTR .GT. 0 ) THEN
+         READ ( LU, ERR=999, END=999, IOSTAT=IOSTAT )
+     :    ( INT64LIST(J), J=1,INT64PTR )
+      ENDIF
+
       IF ( REALPTR .GT. 0 ) THEN
          READ ( LU, ERR=999, END=999, IOSTAT=IOSTAT )
      :    ( REALLIST(J), J=1,REALPTR )

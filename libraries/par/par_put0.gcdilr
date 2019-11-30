@@ -27,7 +27,7 @@
 *  Notes:
 *     -  There is a routine for each of the data types character,
 *     double precision, integer, logical, and real: replace "x" in the
-*     routine name by C, D, I, L, or R respectively as appropriate.  The
+*     routine name by C, D, I, K, L, or R respectively as appropriate.  The
 *     VALUE argument must have the corresponding data type.
 *     -  A scalar (zero-dimensional) parameter is different from a
 *     vector (one-dimensional) parameter containing a single value.

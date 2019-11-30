@@ -113,6 +113,7 @@
       INTEGER TYPE               ! The type of the parameter
       REAL TREAL                 ! Temporary REAL value
       INTEGER TINT               ! Temporary INTEGER value
+      INTEGER*8 TINT64           ! Temporary INTEGER*8 value
       DOUBLE PRECISION TDOUBLE   ! Temporary DOUBLE value
       CHARACTER*(SUBPAR__STRLEN) TCHAR   ! Temporary CHARACTER value
       LOGICAL OK                 ! If value within constraints
@@ -283,6 +284,61 @@
                CALL EMS_REP( 'SUP_MAX4',
      :         'SUBPAR: Parameter ^NAME - ' //
      :         'failed to convert ^VAL to INTEGER', STATUS )
+            ENDIF
+
+         END IF
+
+      ELSEIF ( TYPE .EQ. SUBPAR__INT64 ) THEN
+*     Parameter is INTEGER*8
+*     Find storage for its MAX value
+         IF ( PARMAX(1,NAMECODE) .EQ. 0 ) THEN
+*        Space is not already allocated
+            IF ( INT64PTR .LT. SUBPAR__MAXLIMS ) THEN
+               INT64PTR = INT64PTR + 1
+               PARMAX(1, NAMECODE) = INT64PTR
+            ELSE
+               STATUS = SUBPAR__MNMXFL
+               CALL EMS_SETC( 'NAME', PARKEY(NAMECODE) )
+               CALL EMS_REP( 'SUP_MAX5', 'SUBPAR: Parameter ^NAME'
+     :         // ' - ran out of space for MAX values', STATUS )
+            END IF
+         END IF
+
+         IF ( STATUS .EQ. SAI__OK ) THEN
+*        Space is allocated
+*        Convert the value to the parameter type
+            CALL CHR_CTOK( VALUE, TINT64, STATUS )
+
+*        If successfully converted, check it's within any limits.
+            IF ( STATUS .EQ. SAI__OK ) THEN
+*           (.FALSE. means don't check existing MIN/MAX.)
+               CALL SUBPAR_RANGEK( NAMECODE, TINT64, .FALSE.,
+     :                             OK, STATUS )
+               IF ( STATUS .EQ. SAI__OK ) THEN
+*              Allowed value, set it.
+                  INT64LIST(PARMAX(1,NAMECODE)) = TINT64
+                  PARMAX(2, NAMECODE) = SUBPAR__INT64
+
+               ELSE
+*              Illegal value - outside range
+                  IF ( STATUS .EQ. SUBPAR__OUTRANGE )
+     :                 STATUS = SUBPAR__MNMXEX
+                  CALL EMS_SETC( 'NAME', PARKEY(NAMECODE) )
+                  CALL EMS_SETC( 'VAL', VALUE )
+                  CALL EMS_REP( 'SUP_MAX3',
+     :            'SUBPAR: Parameter ^NAME - ' //
+     :            'failed to define maximum value', STATUS )
+
+               END IF
+
+            ELSE
+               STATUS = SUBPAR__CONER
+               CALL EMS_SETC( 'NAME', PARKEY(NAMECODE) )
+               CALL EMS_SETC( 'VAL', VALUE )
+               CALL EMS_REP( 'SUP_MAX4',
+     :         'SUBPAR: Parameter ^NAME - ' //
+     :         'failed to convert ^VAL to INTEGER*8',
+     :          STATUS )
             ENDIF
 
          END IF

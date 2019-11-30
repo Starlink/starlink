@@ -133,6 +133,10 @@
             PARLOG(NAMECODE) =
      :        MOD( INTLIST( PARDYN(1,NAMECODE) ), 2 ) .EQ. 1
 
+         ELSE IF ( PARDYN(3,NAMECODE) .EQ. SUBPAR__INT64 ) THEN
+            PARLOG(NAMECODE) =
+     :        MOD( INT64LIST( PARDYN(1,NAMECODE) ), 2 ) .EQ. 1
+
          ELSE IF ( PARDYN(3,NAMECODE) .EQ. SUBPAR__REAL ) THEN
             PARLOG(NAMECODE) =
      :        MOD( INT( REALLIST(PARDYN(1,NAMECODE) ) ), 2 ) .EQ. 1

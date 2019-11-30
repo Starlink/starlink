@@ -4330,3 +4330,959 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
+
+
+
+/*    ---------------   K (_INT64) functions -------------------- */
+
+
+F77_SUBROUTINE(par_def0k)( CHARACTER(param),
+                           INTEGER8(value),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void parDef0k( const char *param,
+               int64_t value,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER8(fvalue);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER8(value,fvalue);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_def0k)( CHARACTER_ARG(fparam),
+                        INTEGER8_ARG(&fvalue),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_IMPORT_INTEGER(fstatus,*status);
+
+   return;
+}
+F77_SUBROUTINE(par_def1k)( CHARACTER(param),
+                           INTEGER(nval),
+                           INTEGER8_ARRAY(values),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void parDef1k( const char *param,
+               int nval,
+               const int64_t *values,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER(fnval);
+DECLARE_INTEGER8_ARRAY_DYN(fvalues);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER(nval,fnval);
+   F77_CREATE_INTEGER8_ARRAY(fvalues,nval);
+   F77_EXPORT_INTEGER8_ARRAY(values,fvalues,nval);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_def1k)( CHARACTER_ARG(fparam),
+                        INTEGER_ARG(&fnval),
+                        INTEGER8_ARRAY_ARG(fvalues),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_FREE_INTEGER8(fvalues);
+   F77_IMPORT_INTEGER(fstatus,*status);
+
+   return;
+}
+F77_SUBROUTINE(par_defnk)( CHARACTER(param),
+                           INTEGER(ndim),
+                           INTEGER_ARRAY(maxd),
+                           INTEGER8_ARRAY(values),
+                           INTEGER_ARRAY(actd),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void parDefnk( const char *param,
+               int ndim,
+               const int *maxd,
+               const int64_t *values,
+               const int *actd,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER(fndim);
+DECLARE_INTEGER_ARRAY_DYN(fmaxd);
+DECLARE_INTEGER8_ARRAY_DYN(fvalues);
+DECLARE_INTEGER_ARRAY_DYN(factd);
+DECLARE_INTEGER(fstatus);
+int i,nvalues;
+
+   if( *status != SAI__OK ) return;
+
+   for (i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER(ndim,fndim);
+   F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
+   F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
+   F77_CREATE_INTEGER8_ARRAY(fvalues,nvalues);
+   F77_EXPORT_INTEGER8_ARRAY(values,fvalues,nvalues);
+   F77_CREATE_INTEGER_ARRAY(factd,ndim);
+   F77_EXPORT_INTEGER_ARRAY(actd,factd,ndim);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_defnk)( CHARACTER_ARG(fparam),
+                        INTEGER_ARG(&fndim),
+                        INTEGER_ARRAY_ARG(fmaxd),
+                        INTEGER8_ARRAY_ARG(fvalues),
+                        INTEGER_ARRAY_ARG(factd),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_FREE_INTEGER(fmaxd);
+   F77_FREE_INTEGER8(fvalues);
+   F77_FREE_INTEGER(factd);
+   F77_IMPORT_INTEGER(fstatus,*status);
+
+   return;
+}
+F77_SUBROUTINE(par_exack)( CHARACTER(param),
+                           INTEGER(nvals),
+                           INTEGER8_ARRAY(values),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void parExack( const char *param,
+               int nvals,
+               int64_t *values,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER(fnvals);
+DECLARE_INTEGER8_ARRAY_DYN(fvalues);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER(nvals,fnvals);
+   F77_CREATE_INTEGER8_ARRAY(fvalues,nvals);
+   F77_ASSOC_INTEGER8_ARRAY(fvalues,values);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_exack)( CHARACTER_ARG(fparam),
+                        INTEGER_ARG(&fnvals),
+                        INTEGER8_ARRAY_ARG(fvalues),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_IMPORT_INTEGER8_ARRAY(fvalues,values,nvals);
+   F77_FREE_INTEGER8(fvalues);
+   F77_IMPORT_INTEGER(fstatus,*status);
+
+   return;
+}
+F77_SUBROUTINE(par_gdr0k)( CHARACTER(param),
+                           INTEGER8(defaul),
+                           INTEGER8(vmin),
+                           INTEGER8(vmax),
+                           LOGICAL(null),
+                           INTEGER8(value),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void parGdr0k( const char *param,
+               int64_t defaul,
+               int64_t vmin,
+               int64_t vmax,
+               int null,
+               int64_t *value,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER8(fdefaul);
+DECLARE_INTEGER8(fvmin);
+DECLARE_INTEGER8(fvmax);
+DECLARE_LOGICAL(fnull);
+DECLARE_INTEGER8(fvalue);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER8(defaul,fdefaul);
+   F77_EXPORT_INTEGER8(vmin,fvmin);
+   F77_EXPORT_INTEGER8(vmax,fvmax);
+   F77_EXPORT_LOGICAL(null,fnull);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_gdr0k)( CHARACTER_ARG(fparam),
+                        INTEGER8_ARG(&fdefaul),
+                        INTEGER8_ARG(&fvmin),
+                        INTEGER8_ARG(&fvmax),
+                        LOGICAL_ARG(&fnull),
+                        INTEGER8_ARG(&fvalue),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_IMPORT_INTEGER8(fvalue,*value);
+   F77_IMPORT_INTEGER(fstatus,*status);
+
+   return;
+}
+F77_SUBROUTINE(par_gdr1k)( CHARACTER(param),
+                           INTEGER(nvals),
+                           INTEGER8_ARRAY(defaul),
+                           INTEGER8(vmin),
+                           INTEGER8(vmax),
+                           LOGICAL(null),
+                           INTEGER8_ARRAY(values),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void parGdr1k( const char *param,
+               int nvals,
+               const int64_t *defaul,
+               int64_t vmin,
+               int64_t vmax,
+               int null,
+               int64_t *values,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER(fnvals);
+DECLARE_INTEGER8_ARRAY_DYN(fdefaul);
+DECLARE_INTEGER8(fvmin);
+DECLARE_INTEGER8(fvmax);
+DECLARE_LOGICAL(fnull);
+DECLARE_INTEGER8_ARRAY_DYN(fvalues);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER(nvals,fnvals);
+   F77_CREATE_INTEGER8_ARRAY(fdefaul,nvals);
+   F77_EXPORT_INTEGER8_ARRAY(defaul,fdefaul,nvals);
+   F77_EXPORT_INTEGER8(vmin,fvmin);
+   F77_EXPORT_INTEGER8(vmax,fvmax);
+   F77_EXPORT_LOGICAL(null,fnull);
+   F77_CREATE_INTEGER8_ARRAY(fvalues,nvals);
+   F77_ASSOC_INTEGER8_ARRAY(fvalues,values);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_gdr1k)( CHARACTER_ARG(fparam),
+                        INTEGER_ARG(&fnvals),
+                        INTEGER8_ARRAY_ARG(fdefaul),
+                        INTEGER8_ARG(&fvmin),
+                        INTEGER8_ARG(&fvmax),
+                        LOGICAL_ARG(&fnull),
+                        INTEGER8_ARRAY_ARG(fvalues),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_FREE_INTEGER8(fdefaul);
+   F77_IMPORT_INTEGER8_ARRAY(fvalues,values,nvals);
+   F77_FREE_INTEGER8(fvalues);
+   F77_IMPORT_INTEGER(fstatus,*status);
+
+   return;
+}
+F77_SUBROUTINE(par_gdrvk)( CHARACTER(param),
+                           INTEGER(maxval),
+                           INTEGER8(vmin),
+                           INTEGER8(vmax),
+                           INTEGER8_ARRAY(values),
+                           INTEGER(actval),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void parGdrvk( const char *param,
+               int maxval,
+               int64_t vmin,
+               int64_t vmax,
+               int64_t *values,
+               int *actval,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER(fmaxval);
+DECLARE_INTEGER8(fvmin);
+DECLARE_INTEGER8(fvmax);
+DECLARE_INTEGER8_ARRAY_DYN(fvalues);
+DECLARE_INTEGER(factval);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER(maxval,fmaxval);
+   F77_EXPORT_INTEGER8(vmin,fvmin);
+   F77_EXPORT_INTEGER8(vmax,fvmax);
+   F77_CREATE_INTEGER8_ARRAY(fvalues,maxval);
+   F77_ASSOC_INTEGER8_ARRAY(fvalues,values);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_gdrvk)( CHARACTER_ARG(fparam),
+                        INTEGER_ARG(&fmaxval),
+                        INTEGER8_ARG(&fvmin),
+                        INTEGER8_ARG(&fvmax),
+                        INTEGER8_ARRAY_ARG(fvalues),
+                        INTEGER_ARG(&factval),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_IMPORT_INTEGER(factval,*actval);
+   F77_IMPORT_INTEGER8_ARRAY(fvalues,values,*factval);
+   F77_FREE_INTEGER8(fvalues);
+   F77_IMPORT_INTEGER(fstatus,*status);
+
+   return;
+}
+F77_SUBROUTINE(par_get0k)( CHARACTER(param),
+                           INTEGER8(value),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void parGet0k( const char *param,
+               int64_t *value,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER8(fvalue);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_get0k)( CHARACTER_ARG(fparam),
+                        INTEGER8_ARG(&fvalue),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_INTEGER8(fvalue,*value);
+   }
+
+   return;
+}
+F77_SUBROUTINE(par_get1k)( CHARACTER(param),
+                           INTEGER(maxval),
+                           INTEGER8_ARRAY(values),
+                           INTEGER(actval),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void parGet1k( const char *param,
+               int maxval,
+               int64_t *values,
+               int *actval,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER(fmaxval);
+DECLARE_INTEGER8_ARRAY_DYN(fvalues);
+DECLARE_INTEGER(factval);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER(maxval,fmaxval);
+   F77_CREATE_INTEGER8_ARRAY(fvalues,maxval);
+   F77_ASSOC_INTEGER8_ARRAY(fvalues,values);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_get1k)( CHARACTER_ARG(fparam),
+                        INTEGER_ARG(&fmaxval),
+                        INTEGER8_ARRAY_ARG(fvalues),
+                        INTEGER_ARG(&factval),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_INTEGER(factval,*actval);
+     F77_IMPORT_INTEGER8_ARRAY(fvalues,values,*actval);
+   }
+   F77_FREE_INTEGER8(fvalues);
+
+   return;
+}
+F77_SUBROUTINE(par_getnk)( CHARACTER(param),
+                           INTEGER(ndim),
+                           INTEGER_ARRAY(maxd),
+                           INTEGER8_ARRAY(values),
+                           INTEGER_ARRAY(actd),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void parGetnk( const char *param,
+               int ndim,
+               const int *maxd,
+               int64_t *values,
+               int *actd,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER(fndim);
+DECLARE_INTEGER_ARRAY_DYN(fmaxd);
+DECLARE_INTEGER8_ARRAY_DYN(fvalues);
+DECLARE_INTEGER_ARRAY_DYN(factd);
+DECLARE_INTEGER(fstatus);
+int i,nvalues;
+
+   if( *status != SAI__OK ) return;
+
+   for (i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER(ndim,fndim);
+   F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
+   F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
+   F77_CREATE_INTEGER8_ARRAY(fvalues,nvalues);
+   F77_ASSOC_INTEGER8_ARRAY(fvalues,values);
+   F77_CREATE_INTEGER_ARRAY(factd,ndim);
+   F77_ASSOC_INTEGER_ARRAY(factd,actd);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_getnk)( CHARACTER_ARG(fparam),
+                        INTEGER_ARG(&fndim),
+                        INTEGER_ARRAY_ARG(fmaxd),
+                        INTEGER8_ARRAY_ARG(fvalues),
+                        INTEGER_ARRAY_ARG(factd),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_FREE_INTEGER(fmaxd);
+   F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_INTEGER8_ARRAY(fvalues,values,nvalues);
+     F77_IMPORT_INTEGER_ARRAY(factd,actd,ndim);
+   }
+   F77_FREE_INTEGER8(fvalues);
+   F77_FREE_INTEGER(factd);
+
+
+   return;
+}
+F77_SUBROUTINE(par_getvk)( CHARACTER(param),
+                           INTEGER(maxval),
+                           INTEGER8_ARRAY(values),
+                           INTEGER(actval),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void parGetvk( const char *param,
+               int maxval,
+               int64_t *values,
+               int *actval,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER(fmaxval);
+DECLARE_INTEGER8_ARRAY_DYN(fvalues);
+DECLARE_INTEGER(factval);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER(maxval,fmaxval);
+   F77_CREATE_INTEGER8_ARRAY(fvalues,maxval);
+   F77_ASSOC_INTEGER8_ARRAY(fvalues,values);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_getvk)( CHARACTER_ARG(fparam),
+                        INTEGER_ARG(&fmaxval),
+                        INTEGER8_ARRAY_ARG(fvalues),
+                        INTEGER_ARG(&factval),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_INTEGER(factval,*actval);
+     F77_IMPORT_INTEGER8_ARRAY(fvalues,values,*actval);
+   }
+   F77_FREE_INTEGER8(fvalues);
+
+   return;
+}
+F77_SUBROUTINE(par_grm1k)( CHARACTER(param),
+                           INTEGER(nvals),
+                           INTEGER8_ARRAY(defaul),
+                           INTEGER8_ARRAY(vmin),
+                           INTEGER8_ARRAY(vmax),
+                           LOGICAL(null),
+                           INTEGER8_ARRAY(values),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void parGrm1k( const char *param,
+               int nvals,
+               const int64_t *defaul,
+               const int64_t *vmin,
+               const int64_t *vmax,
+               int null,
+               int64_t *values,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER(fnvals);
+DECLARE_INTEGER8_ARRAY_DYN(fdefaul);
+DECLARE_INTEGER8_ARRAY_DYN(fvmin);
+DECLARE_INTEGER8_ARRAY_DYN(fvmax);
+DECLARE_LOGICAL(fnull);
+DECLARE_INTEGER8_ARRAY_DYN(fvalues);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER(nvals,fnvals);
+   F77_CREATE_INTEGER8_ARRAY(fdefaul,nvals);
+   F77_EXPORT_INTEGER8_ARRAY(defaul,fdefaul,nvals);
+   F77_CREATE_INTEGER8_ARRAY(fvmin,nvals);
+   F77_EXPORT_INTEGER8_ARRAY(vmin,fvmin,nvals);
+   F77_CREATE_INTEGER8_ARRAY(fvmax,nvals);
+   F77_EXPORT_INTEGER8_ARRAY(vmax,fvmax,nvals);
+   F77_EXPORT_LOGICAL(null,fnull);
+   F77_CREATE_INTEGER8_ARRAY(fvalues,nvals);
+   F77_ASSOC_INTEGER8_ARRAY(fvalues,values);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_grm1k)( CHARACTER_ARG(fparam),
+                        INTEGER_ARG(&fnvals),
+                        INTEGER8_ARRAY_ARG(fdefaul),
+                        INTEGER8_ARRAY_ARG(fvmin),
+                        INTEGER8_ARRAY_ARG(fvmax),
+                        LOGICAL_ARG(&fnull),
+                        INTEGER8_ARRAY_ARG(fvalues),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_FREE_INTEGER8(fdefaul);
+   F77_FREE_INTEGER8(fvmin);
+   F77_FREE_INTEGER8(fvmax);
+   F77_IMPORT_INTEGER8_ARRAY(fvalues,values,nvals);
+   F77_FREE_INTEGER8(fvalues);
+   F77_IMPORT_INTEGER(fstatus,*status);
+
+   return;
+}
+F77_SUBROUTINE(par_grmvk)( CHARACTER(param),
+                           INTEGER(maxval),
+                           INTEGER8_ARRAY(vmin),
+                           INTEGER8_ARRAY(vmax),
+                           INTEGER8_ARRAY(values),
+                           INTEGER(actval),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void parGrmvk( const char *param,
+               int maxval,
+               const int64_t *vmin,
+               const int64_t *vmax,
+               int64_t *values,
+               int *actval,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER(fmaxval);
+DECLARE_INTEGER8_ARRAY_DYN(fvmin);
+DECLARE_INTEGER8_ARRAY_DYN(fvmax);
+DECLARE_INTEGER8_ARRAY_DYN(fvalues);
+DECLARE_INTEGER(factval);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER(maxval,fmaxval);
+   F77_CREATE_INTEGER8_ARRAY(fvmin,maxval);
+   F77_EXPORT_INTEGER8_ARRAY(vmin,fvmin,maxval);
+   F77_CREATE_INTEGER8_ARRAY(fvmax,maxval);
+   F77_EXPORT_INTEGER8_ARRAY(vmax,fvmax,maxval);
+   F77_CREATE_INTEGER8_ARRAY(fvalues,maxval);
+   F77_ASSOC_INTEGER8_ARRAY(fvalues,values);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_grmvk)( CHARACTER_ARG(fparam),
+                        INTEGER_ARG(&fmaxval),
+                        INTEGER8_ARRAY_ARG(fvmin),
+                        INTEGER8_ARRAY_ARG(fvmax),
+                        INTEGER8_ARRAY_ARG(fvalues),
+                        INTEGER_ARG(&factval),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_FREE_INTEGER8(fvmin);
+   F77_FREE_INTEGER8(fvmax);
+   F77_IMPORT_INTEGER(factval,*actval);
+   F77_IMPORT_INTEGER8_ARRAY(fvalues,values,*actval);
+   F77_FREE_INTEGER8(fvalues);
+   F77_IMPORT_INTEGER(fstatus,*status);
+
+   return;
+}
+F77_SUBROUTINE(par_maxk)( CHARACTER(param),
+                          INTEGER8(value),
+                          INTEGER(status)
+                          TRAIL(param) );
+
+void parMaxk( const char *param,
+              int64_t value,
+              int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER8(fvalue);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER8(value,fvalue);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_maxk)( CHARACTER_ARG(fparam),
+                       INTEGER8_ARG(&fvalue),
+                       INTEGER_ARG(&fstatus)
+                       TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_IMPORT_INTEGER(fstatus,*status);
+
+   return;
+}
+F77_SUBROUTINE(par_mink)( CHARACTER(param),
+                          INTEGER8(value),
+                          INTEGER(status)
+                          TRAIL(param) );
+
+void parMink( const char *param,
+              int64_t value,
+              int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER8(fvalue);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER8(value,fvalue);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_mink)( CHARACTER_ARG(fparam),
+                       INTEGER8_ARG(&fvalue),
+                       INTEGER_ARG(&fstatus)
+                       TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_IMPORT_INTEGER(fstatus,*status);
+
+   return;
+}
+F77_SUBROUTINE(par_mix0k)( CHARACTER(param),
+                           CHARACTER(defaul),
+                           INTEGER8(vmin),
+                           INTEGER8(vmax),
+                           CHARACTER(opts),
+                           LOGICAL(null),
+                           CHARACTER(value),
+                           INTEGER(status)
+                           TRAIL(param)
+                           TRAIL(defaul)
+                           TRAIL(opts)
+                           TRAIL(value) );
+
+void parMix0k( const char *param,
+               const char *defaul,
+               int64_t vmin,
+               int64_t vmax,
+               const char *opts,
+               int null,
+               char *value,
+               int value_length,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_CHARACTER_DYN(fdefaul);
+DECLARE_INTEGER8(fvmin);
+DECLARE_INTEGER8(fvmax);
+DECLARE_CHARACTER_DYN(fopts);
+DECLARE_LOGICAL(fnull);
+DECLARE_CHARACTER_DYN(fvalue);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_CREATE_EXPORT_CHARACTER(defaul,fdefaul);
+   F77_EXPORT_INTEGER8(vmin,fvmin);
+   F77_EXPORT_INTEGER8(vmax,fvmax);
+   F77_CREATE_EXPORT_CHARACTER(opts,fopts);
+   F77_EXPORT_LOGICAL(null,fnull);
+   F77_CREATE_CHARACTER(fvalue,value_length-1);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_mix0k)( CHARACTER_ARG(fparam),
+                        CHARACTER_ARG(fdefaul),
+                        INTEGER8_ARG(&fvmin),
+                        INTEGER8_ARG(&fvmax),
+                        CHARACTER_ARG(fopts),
+                        LOGICAL_ARG(&fnull),
+                        CHARACTER_ARG(fvalue),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam)
+                        TRAIL_ARG(fdefaul)
+                        TRAIL_ARG(fopts)
+                        TRAIL_ARG(fvalue) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_FREE_CHARACTER(fdefaul);
+   F77_FREE_CHARACTER(fopts);
+   F77_IMPORT_CHARACTER(fvalue,fvalue_length,value);
+   F77_FREE_CHARACTER(fvalue);
+   F77_IMPORT_INTEGER(fstatus,*status);
+
+   return;
+}
+F77_SUBROUTINE(par_mixvk)( CHARACTER(param),
+                           INTEGER(maxval),
+                           INTEGER8(vmin),
+                           INTEGER8(vmax),
+                           CHARACTER(opts),
+                           CHARACTER_ARRAY(values),
+                           INTEGER(actval),
+                           INTEGER(status)
+                           TRAIL(param)
+                           TRAIL(opts)
+                           TRAIL(values) );
+
+void parMixvk( const char *param,
+               int maxval,
+               int64_t vmin,
+               int64_t vmax,
+               const char *opts,
+               char *const *values,
+               int values_length,
+               int *actval,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER(fmaxval);
+DECLARE_INTEGER8(fvmin);
+DECLARE_INTEGER8(fvmax);
+DECLARE_CHARACTER_DYN(fopts);
+DECLARE_CHARACTER_ARRAY_DYN(fvalues);
+DECLARE_INTEGER(factval);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER(maxval,fmaxval);
+   F77_EXPORT_INTEGER8(vmin,fvmin);
+   F77_EXPORT_INTEGER8(vmax,fvmax);
+   F77_CREATE_EXPORT_CHARACTER(opts,fopts);
+   F77_CREATE_CHARACTER_ARRAY(fvalues,values_length-1,maxval);
+   F77_EXPORT_INTEGER(*actval,factval);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_mixvk)( CHARACTER_ARG(fparam),
+                        INTEGER_ARG(&fmaxval),
+                        INTEGER8_ARG(&fvmin),
+                        INTEGER8_ARG(&fvmax),
+                        CHARACTER_ARG(fopts),
+                        CHARACTER_ARRAY_ARG(fvalues),
+                        INTEGER_ARG(&factval),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam)
+                        TRAIL_ARG(fopts)
+                        TRAIL_ARG(fvalues) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_FREE_CHARACTER(fopts);
+   F77_IMPORT_INTEGER(factval,*actval);
+   F77_IMPORT_CHARACTER_ARRAY_P(fvalues,fvalues_length,values,values_length,
+      *actval);
+   F77_FREE_CHARACTER(fvalues);
+   F77_IMPORT_INTEGER(fstatus,*status);
+
+   return;
+}
+F77_SUBROUTINE(par_put0k)( CHARACTER(param),
+                           INTEGER8(value),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void parPut0k( const char *param,
+               int64_t value,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER8(fvalue);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER8(value,fvalue);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_put0k)( CHARACTER_ARG(fparam),
+                        INTEGER8_ARG(&fvalue),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_IMPORT_INTEGER(fstatus,*status);
+
+   return;
+}
+F77_SUBROUTINE(par_put1k)( CHARACTER(param),
+                           INTEGER(nval),
+                           INTEGER8_ARRAY(values),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void parPut1k( const char *param,
+               int nval,
+               const int64_t *values,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER(fnval);
+DECLARE_INTEGER8_ARRAY_DYN(fvalues);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER(nval,fnval);
+   F77_CREATE_INTEGER8_ARRAY(fvalues,nval);
+   F77_EXPORT_INTEGER8_ARRAY(values,fvalues,nval);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_put1k)( CHARACTER_ARG(fparam),
+                        INTEGER_ARG(&fnval),
+                        INTEGER8_ARRAY_ARG(fvalues),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_FREE_INTEGER8(fvalues);
+   F77_IMPORT_INTEGER(fstatus,*status);
+
+   return;
+}
+F77_SUBROUTINE(par_putnk)( CHARACTER(param),
+                           INTEGER(ndim),
+                           INTEGER_ARRAY(maxd),
+                           INTEGER8_ARRAY(values),
+                           INTEGER_ARRAY(actd),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void parPutnk( const char *param,
+               int ndim,
+               const int *maxd,
+               const int64_t *values,
+               const int *actd,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER(fndim);
+DECLARE_INTEGER_ARRAY_DYN(fmaxd);
+DECLARE_INTEGER8_ARRAY_DYN(fvalues);
+DECLARE_INTEGER_ARRAY_DYN(factd);
+DECLARE_INTEGER(fstatus);
+int i,nvalues;
+
+   if( *status != SAI__OK ) return;
+
+   for(i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER(ndim,fndim);
+   F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
+   F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
+   F77_CREATE_INTEGER8_ARRAY(fvalues,nvalues);
+   F77_EXPORT_INTEGER8_ARRAY(values,fvalues,nvalues);
+   F77_CREATE_INTEGER_ARRAY(factd,ndim);
+   F77_EXPORT_INTEGER_ARRAY(actd,factd,ndim);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_putnk)( CHARACTER_ARG(fparam),
+                        INTEGER_ARG(&fndim),
+                        INTEGER_ARRAY_ARG(fmaxd),
+                        INTEGER8_ARRAY_ARG(fvalues),
+                        INTEGER_ARRAY_ARG(factd),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_FREE_INTEGER(fmaxd);
+   F77_FREE_INTEGER8(fvalues);
+   F77_FREE_INTEGER(factd);
+   F77_IMPORT_INTEGER(fstatus,*status);
+
+   return;
+}
+F77_SUBROUTINE(par_putvk)( CHARACTER(param),
+                           INTEGER(nval),
+                           INTEGER8_ARRAY(values),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void parPutvk( const char *param,
+               int nval,
+               const int64_t *values,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER(fnval);
+DECLARE_INTEGER8_ARRAY_DYN(fvalues);
+DECLARE_INTEGER(fstatus);
+
+   if( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_EXPORT_INTEGER(nval,fnval);
+   F77_CREATE_INTEGER8_ARRAY(fvalues,nval);
+   F77_EXPORT_INTEGER8_ARRAY(values,fvalues,nval);
+   F77_EXPORT_INTEGER(*status,fstatus);
+
+   F77_LOCK( F77_CALL(par_putvk)( CHARACTER_ARG(fparam),
+                        INTEGER_ARG(&fnval),
+                        INTEGER8_ARRAY_ARG(fvalues),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER(fparam);
+   F77_FREE_INTEGER8(fvalues);
+   F77_IMPORT_INTEGER(fstatus,*status);
+
+   return;
+}
+

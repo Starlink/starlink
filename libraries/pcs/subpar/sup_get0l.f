@@ -146,6 +146,7 @@
 
       CHARACTER*132 VALUE_STRING        ! Variables to store converted
       INTEGER VALUE_INTEGER
+      INTEGER VALUE_INT64
       LOGICAL VALUE_LOGICAL
 
       INTEGER STYPE                           ! Stored type of the
@@ -163,6 +164,7 @@
                                               ! SUBPAR__REAL
                                               ! SUBPAR__CHAR
                                               ! SUBPAR__INTEGER
+                                              ! SUBPAR__INT64
                                               ! SUBPAR__DOUBLE
                                               ! SUBPAR__LOGICAL
 
@@ -286,6 +288,26 @@
                IF ( STATUS .EQ. SAI__OK ) THEN
 *              Set TRUE if ls bit is 1, FALSE if it is 0
                   IF ( MOD(VALUE_INTEGER,2) .EQ. 0 ) THEN
+                     LVALUE = .FALSE.
+                  ELSE
+                     LVALUE = .TRUE.
+                  ENDIF
+               ENDIF
+
+            ELSE IF ( TYPE .EQ. SUBPAR__INT64 ) THEN
+
+               IF ( INTERNAL ) THEN
+                  CALL SUBPAR_FETCHK ( NAMECODE, VALUE_INT64, STATUS )
+               ELSE
+                  CALL DAT_GETK ( LOC, 0, 0, VALUE_INT64, STATUS )
+               ENDIF
+
+               CALL SUBPAR_LIMITK ( NAMECODE, VALUE_INT64, ACCEPTED,
+     :           STATUS )
+
+               IF ( STATUS .EQ. SAI__OK ) THEN
+*              Set TRUE if ls bit is 1, FALSE if it is 0
+                  IF ( MOD(VALUE_INT64,2) .EQ. 0 ) THEN
                      LVALUE = .FALSE.
                   ELSE
                      LVALUE = .TRUE.

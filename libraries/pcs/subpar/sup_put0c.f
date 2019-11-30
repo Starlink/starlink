@@ -243,6 +243,37 @@
 *           Release the error context
                CALL EMS_RLSE
 
+            ELSE IF ( TYPE .EQ. SUBPAR__INT64 ) THEN
+
+*           Set error context as we may wish to annul.
+               CALL EMS_MARK
+
+*           Try the simple conversion
+               CALL CHR_CTOK ( CVALUE, PARINT64(NAMECODE), STATUS )
+
+*           If it failed, try via DOUBLE PRECISION to cope with n.m etc.
+               IF ( STATUS .NE. SAI__OK ) THEN
+                  CALL EMS_ANNUL ( STATUS )
+                  CALL CHR_CTOD ( CVALUE, D, STATUS )
+
+*              If that worked, take integer part
+                  IF ( STATUS .EQ. SAI__OK ) THEN
+                     PARINT64(NAMECODE) = D
+
+*              If it failed, give up
+                  ELSE
+                     STATUS = SUBPAR__CONER
+                     CALL EMS_SETC ( 'NAME', PARKEY(NAMECODE) )
+                     CALL EMS_SETC ( 'STRING', CVALUE )
+                     CALL EMS_REP ( 'SUP_PUT0C2',
+     :               'SUBPAR: Failed to convert ^STRING to _INT64 ' //
+     :               'for parameter ^NAME - ', STATUS )
+                  ENDIF
+               ENDIF
+
+*           Release the error context
+               CALL EMS_RLSE
+
             ELSE IF ( TYPE .EQ. SUBPAR__DOUBLE ) THEN
 
                CALL CHR_CTOD ( CVALUE, PARDOUBLE(NAMECODE), STATUS )

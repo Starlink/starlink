@@ -105,11 +105,11 @@
       INTEGER FIELD              ! output from CHR_ITOC
 
       CHARACTER*15 HDSTYPE       ! data type
-      CHARACTER*15 POSTYPES(5)   ! possible primitive data types
+      CHARACTER*15 POSTYPES(8)   ! possible primitive data types
 
 *  Local Data:
       DATA POSTYPES / '_CHAR*', '_REAL', '_DOUBLE', '_INTEGER',
-     :  '_LOGICAL' /
+     :  '_LOGICAL', ' ',  ' ',  '_INT64' /
 
 *.
 
@@ -194,6 +194,8 @@
                   PARREAL( NAMECODE ) = REALLIST(PTR)
                ELSE IF ( TYPE .EQ. SUBPAR__INTEGER ) THEN
                   PARINT( NAMECODE ) = INTLIST(PTR)
+               ELSE IF ( TYPE .EQ. SUBPAR__INT64 ) THEN
+                  PARINT( NAMECODE ) = INT64LIST(PTR)
                ELSE IF ( TYPE .EQ. SUBPAR__DOUBLE ) THEN
                   PARDOUBLE( NAMECODE ) = DOUBLELIST(PTR)
                ELSE IF ( TYPE .EQ. SUBPAR__CHAR ) THEN
@@ -233,6 +235,8 @@
                      CALL DAT_PUT0R( LOC, REALLIST(PTR), STATUS )
                   ELSE IF ( TYPE .EQ. SUBPAR__INTEGER ) THEN
                      CALL DAT_PUT0I( LOC, INTLIST(PTR), STATUS )
+                  ELSE IF ( TYPE .EQ. SUBPAR__INT64 ) THEN
+                     CALL DAT_PUT0K( LOC, INT64LIST(PTR), STATUS )
                   ELSE IF ( TYPE .EQ. SUBPAR__DOUBLE ) THEN
                      CALL DAT_PUT0D( LOC, DOUBLELIST(PTR), STATUS )
                   ELSE IF ( TYPE .EQ. SUBPAR__CHAR ) THEN

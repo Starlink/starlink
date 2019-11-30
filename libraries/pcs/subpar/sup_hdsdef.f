@@ -118,7 +118,7 @@
       CHARACTER*15 HDSTYPE              ! data type
       INTEGER NDIMS                     ! dimensionality of data
       INTEGER FIRST                     ! index of first value stored
-      CHARACTER*15 POSTYPES(5)          ! possible primitive data types
+      CHARACTER*15 POSTYPES(8)          ! possible primitive data types
 
 *  External references:
       EXTERNAL CHR_LEN                  ! used length of string
@@ -126,7 +126,7 @@
 
 *  Local Data:
       DATA POSTYPES / '_CHAR*', '_REAL', '_DOUBLE', '_INTEGER',
-     :  '_LOGICAL' /
+     :  '_LOGICAL', ' ', ' ' , '_INT64' /
 *.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -199,6 +199,9 @@
             CALL DAT_PUTC ( LOC, NDIMS, COUNT, CHARLIST(FIRST), STATUS )
          ELSE IF ( TYPE .EQ. SUBPAR__INTEGER ) THEN
             CALL DAT_PUTI ( LOC, NDIMS, COUNT, INTLIST(FIRST), STATUS )
+         ELSE IF ( TYPE .EQ. SUBPAR__INT64 ) THEN
+            CALL DAT_PUTK ( LOC, NDIMS, COUNT, INT64LIST(FIRST),
+     :        STATUS )
          ELSE IF ( TYPE .EQ. SUBPAR__DOUBLE ) THEN
             CALL DAT_PUTD ( LOC, NDIMS, COUNT, DOUBLELIST(FIRST),
      :        STATUS )

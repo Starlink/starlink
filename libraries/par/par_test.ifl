@@ -115,4 +115,13 @@ interface PAR_TEST
       default     0.0
    endparameter
 
+   parameter      K              # Integer*8 scalar K
+      position    10
+      type        _INT64
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     -1
+      prompt      'Integer*8 scalar A'
+   endparameter
+
 endinterface

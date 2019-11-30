@@ -1,23 +1,24 @@
-      SUBROUTINE SUBPAR_PUT0D ( NAMECODE, DVALUE, STATUS )
+      SUBROUTINE SUBPAR_PUT0K ( NAMECODE, KVALUE, STATUS )
 *+
 *  Name:
-*     SUBPAR_PUT0D
+*     SUBPAR_PUT0K
 
 *  Purpose:
-*     Write scalar DOUBLE PRECISION parameter value.
+*     Write scalar INTEGER*8 parameter value.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SUBPAR_PUT0D ( NAMECODE, DVALUE, STATUS )
+*     CALL SUBPAR_PUT0K ( NAMECODE, KVALUE, STATUS )
 
 *  Description:
 *     Put a scalar value into the storage associated with the
 *     indicated parameter.
+*     There is a routine for each access type, INTEGER*8:
 
-*     If the object data type differs from the access type, DOUBLE PRECISION,
-*     type conversion is performed if possible.
+*     If the object data type differs from the access type, INTEGER*8, then
+*     conversion is performed if possible.
 
 *     Note that a Vector (1-D) object containing a single value is
 *     different from a Scalar (0-D).
@@ -25,7 +26,7 @@
 *  Arguments:
 *     NAMECODE=INTEGER (given)
 *        pointer to the parameter
-*     DVALUE=DOUBLE PRECISION
+*     KVALUE=INTEGER
 *        Value to be given to the parameter
 *     STATUS=INTEGER
 
@@ -102,7 +103,7 @@
 *  Arguments Given:
       INTEGER NAMECODE                  ! parameter number
 
-      DOUBLE PRECISION DVALUE			! Scalar to supply value
+      INTEGER*8 KVALUE			! Scalar to supply value
 
 *    Status return :
       INTEGER STATUS			! Status Return
@@ -140,9 +141,11 @@
 
       CHARACTER*(DAT__SZLOC) LOC              ! locator if value stored
                                               ! in HDS
-      INTEGER ITEMP                           ! temporary store
+
+      INTEGER ITEMP                           ! temporary integer value
 
 *.
+
 
       IF (STATUS .NE. SAI__OK) RETURN
 
@@ -182,70 +185,39 @@
 *
             IF ( .NOT. INTERNAL ) THEN
 
-               CALL DAT_PUT0D ( LOC, DVALUE, STATUS )
+               CALL DAT_PUT0K ( LOC, KVALUE, STATUS )
 
 
             ELSE IF ( TYPE .EQ. SUBPAR__REAL ) THEN
 
-               PARREAL ( NAMECODE ) = REAL ( DVALUE )
+               PARREAL ( NAMECODE ) = REAL ( KVALUE )
 
             ELSE IF ( TYPE .EQ. SUBPAR__CHAR ) THEN
 
-               CALL CHR_DTOC( DVALUE, PARVALS(NAMECODE), ITEMP )
+               CALL CHR_KTOC( KVALUE, PARVALS(NAMECODE), ITEMP )
                IF ( PARVALS(NAMECODE)(1:1) .EQ. '*' ) THEN
                   STATUS = SUBPAR__CONER
                   CALL EMS_SETC ( 'NAME', PARKEY(NAMECODE) )
                   CALL EMS_REP ( 'SUP_PUT0D1',
-     :            'SUBPAR Failed to convert DOUBLE PRECISION value '//
-     :            'to CHARACTER for parameter ^NAME', STATUS )
+     :            'SUBPAR: Failed to convert INTEGER*8 value to '//
+     :            'CHARACTER for parameter ^NAME', STATUS )
                ENDIF
 
             ELSE IF ( TYPE .EQ. SUBPAR__INTEGER ) THEN
 
-               PARINT ( NAMECODE ) = INT ( DVALUE )
-
-               IF ( STATUS .NE. SAI__OK ) THEN
-                  STATUS = SUBPAR__CONER
-                  CALL EMS_SETC ( 'NAME', PARKEY(NAMECODE) )
-                  CALL EMS_SETD ( 'STRING', DVALUE )
-                  CALL EMS_REP ( 'SUP_PUT0D2',
-     :            'SUBPAR: Failed to convert ^STRING to _INTEGER ' //
-     :            'for parameter ^NAME - ', STATUS )
-               ENDIF
+               PARINT ( NAMECODE ) = KVALUE
 
             ELSE IF ( TYPE .EQ. SUBPAR__INT64 ) THEN
 
-               PARINT64 ( NAMECODE ) = DVALUE
-
-               IF ( STATUS .NE. SAI__OK ) THEN
-                  STATUS = SUBPAR__CONER
-                  CALL EMS_SETC ( 'NAME', PARKEY(NAMECODE) )
-                  CALL EMS_SETD ( 'STRING', DVALUE )
-                  CALL EMS_REP ( 'SUP_PUT0D2',
-     :            'SUBPAR: Failed to convert ^STRING to _INT64 ' //
-     :            'for parameter ^NAME - ', STATUS )
-               ENDIF
+               PARINT64 ( NAMECODE ) = KVALUE
 
             ELSE IF ( TYPE .EQ. SUBPAR__DOUBLE ) THEN
 
-               PARDOUBLE ( NAMECODE ) = DVALUE
+               PARDOUBLE ( NAMECODE ) = DBLE ( KVALUE )
 
             ELSE IF ( TYPE .EQ. SUBPAR__LOGICAL ) THEN
 
-               ITEMP = INT ( DVALUE )
-
-               IF ( STATUS .NE. SAI__OK ) THEN
-
-                  PARLOG( NAMECODE ) = ( MOD(ITEMP,2) .EQ. 1 )
-
-               ELSE
-                  STATUS = SUBPAR__CONER
-                  CALL EMS_SETC ( 'NAME', PARKEY(NAMECODE) )
-                  CALL EMS_SETD ( 'STRING', DVALUE )
-                  CALL EMS_REP ( 'SUP_PUT0D3',
-     :            'SUBPAR: Failed to convert ^STRING to _LOGICAL ' //
-     :            'for parameter ^NAME - ', STATUS )
-               ENDIF
+                  PARLOG( NAMECODE ) = ( MOD(KVALUE,2) .EQ. 1 )
 
             ELSE
 
@@ -253,7 +225,7 @@
                CALL EMS_SETC ( 'NAME', PARKEY(NAMECODE) )
                CALL EMS_REP ( 'SUP_PUT0D4',
      :         'SUBPAR: Parameter ^NAME is non-primitive - '//
-     :         'attempted PUT0D to it', STATUS )
+     :         'attempted PUT0K to it', STATUS )
 
             ENDIF
 *

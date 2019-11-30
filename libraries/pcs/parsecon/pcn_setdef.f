@@ -121,6 +121,7 @@
 
       REAL VALUE_REAL                          ! temporary storage for
       INTEGER VALUE_INTEGER                    ! the value
+      INTEGER*8 VALUE_INT64
       DOUBLE PRECISION VALUE_DOUBLE
       LOGICAL VALUE_LOGICAL
       CHARACTER*132 VALUE_CHAR
@@ -142,7 +143,8 @@
 *   processing. - eg remove single quotes from character constant.
 *   Convert the string to the required data type.
       CALL PARSECON_CONVERT ( ENTRY, DECTYPE, VALUE_REAL, VALUE_CHAR,
-     :  VALUE_DOUBLE, VALUE_INTEGER, VALUE_LOGICAL, STRUCTURE, STATUS )
+     :  VALUE_DOUBLE, VALUE_INTEGER, VALUE_INT64, VALUE_LOGICAL,
+     :  STRUCTURE, STATUS )
 
 *   Check for acceptable type conversions between the given entry value
 *   and the declared type of the associated action.
@@ -232,6 +234,22 @@
                STATUS = PARSE__NOMEM
                CALL EMS_REP ( 'PCN_SETDEF5',
      :         'PARSECON: Exceeded storage for INTEGER defaults',
+     :          STATUS )
+            ENDIF
+
+         ELSE IF ( DECTYPE .EQ. SUBPAR__INT64 ) THEN
+
+            IF ( INT64PTR .LT. SUBPAR__MAXLIMS ) THEN
+               INT64PTR = INT64PTR + 1
+               IF ( PARDEF(1,PARPTR) .LE. 0 )
+     :           PARDEF(1,PARPTR) = INT64PTR
+               PARDEF(2,PARPTR) = INT64PTR
+               PARDEF(3,PARPTR) = DECTYPE
+               INT64LIST(INT64PTR) = VALUE_INT64
+            ELSE
+               STATUS = PARSE__NOMEM
+               CALL EMS_REP ( 'PCN_SETDEF5',
+     :         'PARSECON: Exceeded storage for INTEGER*8 defaults',
      :          STATUS )
             ENDIF
 

@@ -129,12 +129,12 @@
 
       INTEGER TYPE                      ! encoded data type
 
-      CHARACTER*15 POSTYPES(5)          ! possible primitive data types
+      CHARACTER*15 POSTYPES(8)          ! possible primitive data types
 
 
 *  Local Data:
       DATA POSTYPES / '_CHAR', '_REAL', '_DOUBLE', '_INTEGER',
-     :  '_LOGICAL' /
+     :  '_LOGICAL', ' ', ' ', '_INT64' /
 
 *.
 

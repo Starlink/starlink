@@ -221,6 +221,25 @@
 
             ENDIF
 
+         ELSE IF ( DECTYPE .EQ. SUBPAR__INT64 ) THEN
+
+            IF ( INT64PTR .LT. SUBPAR__MAXLIMS ) THEN
+
+               INT64PTR = INT64PTR + 1
+               CALL CHR_CTOK( ENTRY, INT64LIST(INT64PTR), STATUS )
+               IF ( PARLIMS(1,PARPTR) .EQ. 0 )
+     :           PARLIMS(1,PARPTR) = INT64PTR
+               PARLIMS(2,PARPTR) = INT64PTR
+
+            ELSE
+
+               STATUS = PARSE__NOMEM
+               CALL EMS_REP ( 'PCN_PARLIST6',
+     :         'PARSECON: Exceeded storage for INTEGER*8 constraints',
+     :         STATUS )
+
+            ENDIF
+
          ELSE IF ( DECTYPE .EQ. SUBPAR__LOGICAL ) THEN
 
 *         Constraints not allowed on LOGICAL parameters

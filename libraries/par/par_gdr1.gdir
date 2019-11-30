@@ -65,7 +65,7 @@
 *  Notes:
 *     -  There is a routine for each of the data types double
 *     precision integer, and real: replace "x" in the routine name by
-*     D, I, or R respectively as appropriate.  The DEFAUL, VMIN, VMAX,
+*     D, I, K, or R respectively as appropriate.  The DEFAUL, VMIN, VMAX,
 *     and VALUES arguments all must have the corresponding data type.
 *     -  If any of the values violates the constraint, the user is
 *     informed of the constraint and prompted for another vector of

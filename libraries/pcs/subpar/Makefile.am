@@ -51,6 +51,7 @@ NONGEN_F_ROUTINES = sup_accpt.f \
              sup_def1c.f \
              sup_def1d.f \
              sup_def1i.f \
+             sup_def1k.f \
              sup_def1l.f \
              sup_def1r.f \
              sup_datdef.f \
@@ -63,6 +64,7 @@ NONGEN_F_ROUTINES = sup_accpt.f \
              sup_fetchc.f \
              sup_fetchd.f \
              sup_fetchi.f \
+             sup_fetchk.f \
              sup_fetchl.f \
              sup_fetchr.f \
              sup_findact.f \
@@ -74,6 +76,7 @@ NONGEN_F_ROUTINES = sup_accpt.f \
              sup_get0c.f \
              sup_get0d.f \
              sup_get0i.f \
+             sup_get0k.f \
              sup_get0l.f \
              sup_get0r.f \
              sup_getfloc.f \
@@ -101,6 +104,7 @@ NONGEN_F_ROUTINES = sup_accpt.f \
              sup_limitc.f \
              sup_limitd.f \
              sup_limiti.f \
+             sup_limitk.f \
              sup_limitr.f \
              sup_loadifc.f \
              sup_maxc.f \
@@ -119,6 +123,7 @@ NONGEN_F_ROUTINES = sup_accpt.f \
              sup_put0c.f \
              sup_put0d.f \
              sup_put0i.f \
+             sup_put0k.f \
              sup_put0l.f \
              sup_put0r.f \
              sup_putfloc.f \
@@ -129,6 +134,7 @@ NONGEN_F_ROUTINES = sup_accpt.f \
              sup_rangec.f \
              sup_ranged.f \
              sup_rangei.f \
+             sup_rangek.f \
              sup_ranger.f \
              sup_rdif.f \
              sup_request.f \
@@ -185,9 +191,9 @@ EXTRA_DIST = subpar_err.msg
 CLEANFILES = fac_170_err SUBPAR_ERR subpar_err.h
 
 .gn.f:
-	$(FGENERIC) -t dir $<
+	$(FGENERIC) -t dirk $<
 
 .gen.f:
-	$(FGENERIC) -t cdilr $<
+	$(FGENERIC) -t cdilrk $<
 
 

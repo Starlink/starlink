@@ -25,7 +25,7 @@
 *     are used to form a message, incorporating the text and a number
 *     derived from the numerical values.
 *
-*     The value is (A+C)/B(1) + B(2)/D + H * <I>
+*     The value is (A+C)/B(1) + B(2)/D + H * <I> + K
 
 *  Usage:
 *     PAR_TEST [A] [B] [C] [D] [E] [F] [G] [H] [I]
@@ -56,6 +56,8 @@
 *     J = _REAL (Read)
 *        A real output scalar value, derived from the input values and
 *        the number of values in parameter I.
+*     K = _INT64 (Read)
+*        An integer scalar.
 *     MSG_FILTER (Read)
 *        The MSG filtering level. [NORM]
 *     [parameter_spec]...
@@ -139,6 +141,7 @@
       REAL I( MAXVAL )           ! Vector of reals between 10 and 100.
       INTEGER IVALUE             ! Loop counter for I values
       REAL J                     ! Result of the calculation
+      INTEGER*8 K                ! Value of parameter K
 
 *.
 
@@ -156,6 +159,9 @@
 
 *  Obtain an integer scalar between 1 and 10.
       CALL PAR_GDR0I( 'C', 4, 1, 10, .FALSE., C, STATUS )
+
+*  Obtain an integer*8 scalar between -10 and 10.
+      CALL PAR_GDR0K( 'K', 4, -10, 10, .FALSE., K, STATUS )
 
 *  Obtain an double-precision scalar between -1 and 1.
       CALL PAR_GDR0D( 'D', 0.5D0, -1D0, 1.D0, .FALSE., D, STATUS )
@@ -187,7 +193,7 @@
             J = J + I( IVALUE )
          END DO
          J = REAL( A + C ) / B( 1 ) + B( 2 ) / REAL( D ) + REAL( H ) *
-     :       J / REAL( ACTVI )
+     :       J / REAL( ACTVI ) + K
 
 *  Create some message tokens.
          CALL MSG_SETL( 'E', E )

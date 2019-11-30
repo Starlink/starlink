@@ -129,7 +129,7 @@
 *        the interface parser in the arrays.
             READ ( LUCON, IOSTAT=IOSTAT ) PARPTR, ACTPTR, NEEDPTR,
      :      INTPTR, REALPTR, DOUBLEPTR, CHARPTR, LOGPTR,
-     :      FACENAME, PROGNAME, EXEPATH, MONOLITH
+     :      FACENAME, PROGNAME, EXEPATH, MONOLITH, INT64PTR
          ENDIF
       ENDIF
 

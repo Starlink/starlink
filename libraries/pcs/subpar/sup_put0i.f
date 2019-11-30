@@ -207,6 +207,10 @@
 
                PARINT ( NAMECODE ) = IVALUE
 
+            ELSE IF ( TYPE .EQ. SUBPAR__INT64 ) THEN
+
+               PARINT64 ( NAMECODE ) = IVALUE
+
             ELSE IF ( TYPE .EQ. SUBPAR__DOUBLE ) THEN
 
                PARDOUBLE ( NAMECODE ) = DBLE ( IVALUE )

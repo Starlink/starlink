@@ -127,7 +127,7 @@
 *
       WRITE ( LUCON ) PARPTR, ACTPTR, NEEDPTR,
      :      INTPTR, REALPTR, DOUBLEPTR, CHARPTR, LOGPTR,
-     :      FACENAME, PROGNAME, EXEPATH, MONOLITH
+     :      FACENAME, PROGNAME, EXEPATH, MONOLITH, INT64PTR
 
 *
 *   Write the data in the arrays.
@@ -219,6 +219,10 @@
 
       IF ( INTPTR .GT. 0 ) THEN
          WRITE ( LUCON ) ( INTLIST(J), J=1,INTPTR )
+      ENDIF
+
+      IF ( INT64PTR .GT. 0 ) THEN
+         WRITE ( LUCON ) ( INT64LIST(J), J=1,INT64PTR )
       ENDIF
 
       IF ( REALPTR .GT. 0 ) THEN

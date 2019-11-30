@@ -646,4 +646,139 @@ void parUnset( const char *param,
                const char *which,
                int *status );
 
+
+
+
+/* ----- k functions (_INT64) --------------- */
+
+
+
+
+
+void parDef0k( const char *param,
+               int64_t value,
+               int *status );
+void parDef1k( const char *param,
+               int nval,
+               const int64_t *values,
+               int *status );
+
+void parDefnk( const char *param,
+               int ndim,
+               const int *maxd,
+               const int64_t *values,
+               const int *actd,
+               int *status );
+
+void parExack( const char *param,
+               int nvals,
+               int64_t *values,
+               int *status );
+
+void parGdr0k( const char *param,
+               int64_t defaul,
+               int64_t vmin,
+               int64_t vmax,
+               int null,
+               int64_t *value,
+               int *status );
+
+void parGdr1k( const char *param,
+               int nvals,
+               const int64_t *defaul,
+               int64_t vmin,
+               int64_t vmax,
+               int null,
+               int64_t *values,
+               int *status );
+
+void parGdrvk( const char *param,
+               int maxval,
+               int64_t vmin,
+               int64_t vmax,
+               int64_t *values,
+               int *actval,
+               int *status );
+
+void parGet0k( const char *param,
+               int64_t *value,
+               int *status );
+
+void parGet1k( const char *param,
+               int maxval,
+               int64_t *values,
+               int *actval,
+               int *status );
+
+void parGetnk( const char *param,
+               int ndim,
+               const int *maxd,
+               int64_t *values,
+               int *actd,
+               int *status );
+void parGetvk( const char *param,
+               int maxval,
+               int64_t *values,
+               int *actval,
+               int *status );
+
+void parGrm1k( const char *param,
+               int nvals,
+               const int64_t *defaul,
+               const int64_t *vmin,
+               const int64_t *vmax,
+               int null,
+               int64_t *values,
+               int *status );
+void parGrmvk( const char *param,
+               int maxval,
+               const int64_t *vmin,
+               const int64_t *vmax,
+               int64_t *values,
+               int *actval,
+               int *status );
+void parMaxk( const char *param,
+              int64_t value,
+              int *status );
+
+void parMink( const char *param,
+              int64_t value,
+              int *status );
+
+void parMix0k( const char *param,
+               const char *defaul,
+               int64_t vmin,
+               int64_t vmax,
+               const char *opts,
+               int null,
+               char *value,
+               int value_length,
+               int *status );
+
+void parMixvk( const char *param,
+               int maxval,
+               int64_t vmin,
+               int64_t vmax,
+               const char *opts,
+               char *const *values,
+               int values_length,
+               int *actval,
+               int *status );
+
+void parPut0k( const char *param,
+               int64_t value,
+               int *status );
+
+void parPut1k( const char *param,
+               int nval,
+               const int64_t *values,
+               int *status );
+
+void parPutnk( const char *param,
+               int ndim,
+               const int *maxd,
+               const int64_t *values,
+               const int *actd,
+               int *status );
+
 #endif  /* PARWRAP_DEFINED */

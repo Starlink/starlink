@@ -96,7 +96,7 @@
       INTEGER STRING_IANYL       ! Index to character within string
 
 *  Local Constants:
-      CHARACTER*15 POSTYPES(5)   ! Possible primitive data types
+      CHARACTER*15 POSTYPES(8)   ! Possible primitive data types
 
 *  Local Variables:
       INTEGER TYPE                ! Declared type of parameter
@@ -107,7 +107,7 @@
 
 *  Local Data:
       DATA POSTYPES/'_CHAR*', '_REAL', '_DOUBLE', '_INTEGER',
-     :     '_LOGICAL'/
+     :     '_LOGICAL', ' ', ' ', '_INT64' /
 *.
 
        IF ( STATUS .NE. SAI__OK ) RETURN

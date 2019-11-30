@@ -90,6 +90,7 @@
       ACTPTR = 0
       NEEDPTR = 0
       INTPTR = 0
+      INT64PTR = 0
       REALPTR = 0
       DOUBLEPTR = 0
       CHARPTR = 0

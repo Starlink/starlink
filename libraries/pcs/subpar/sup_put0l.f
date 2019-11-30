@@ -214,6 +214,14 @@
                   PARINT ( NAMECODE ) = 0
                ENDIF
 
+            ELSE IF ( TYPE .EQ. SUBPAR__INT64 ) THEN
+
+               IF ( LVALUE ) THEN
+                  PARINT64 ( NAMECODE ) = 1
+               ELSE
+                  PARINT64 ( NAMECODE ) = 0
+               ENDIF
+
             ELSE IF ( TYPE .EQ. SUBPAR__DOUBLE ) THEN
 
                IF ( LVALUE ) THEN

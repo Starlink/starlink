@@ -1,7 +1,8 @@
-      SUBROUTINE SUBPAR_FETCHC ( NAMECODE, VALUE, STATUS )
+*        Add DAT_PAR for SUBPAR_CMN
+      SUBROUTINE SUBPAR_FETCHK ( NAMECODE, VALUE, STATUS )
 *+
 *  Name:
-*     SUBPAR_FETCHC
+*     SUBPAR_FETCHK
 
 *  Purpose:
 *     Get a scalar value for an internal parameter.
@@ -10,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SUBPAR_FETCHC ( NAMECODE, VALUE, STATUS )
+*     CALL SUBPAR_FETCHK ( NAMECODE, VALUE, STATUS )
 
 *  Description:
 *     The value of a scalar parameter declared to have a VPATH of INTERNAL
@@ -21,7 +22,7 @@
 *  Arguments:
 *     NAMECODE=INTEGER (given)
 *        pointer to parameter
-*     VALUE=CHARACTER*(*) (returned)
+*     VALUE=INTEGER*8 (returned)
 *        parameter value
 *     STATUS=INTEGER
 
@@ -62,7 +63,7 @@
 *     22-JUL-1992 (AJC):
 *        Allow for dynamic stored in other type
 *     17-NOV-1992 (AJC):
-*        Allow for MIN/MAX
+*        Allow MIN/MAX
 *     10-MAR-1993 (AJC):
 *        Add DAT_PAR for SUBPAR_CMN
 *      9-AUG-1993 (AJC):
@@ -90,7 +91,7 @@
 
 
 *  Arguments Returned:
-      CHARACTER*(*) VALUE
+      INTEGER*8 VALUE
 
 
 *  Status:
@@ -100,8 +101,6 @@
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'
 
-*  Local Variables:
-      INTEGER NCHAR
 
 *.
 
@@ -112,7 +111,7 @@
 *
 *   Get the value from internal storage
 *
-         VALUE = PARVALS(NAMECODE)
+         VALUE = PARINT64(NAMECODE)
 
       ELSE IF ( PARSTATE(NAMECODE) .EQ. SUBPAR__MAX ) THEN
 *   The parameter was given the value MAX
@@ -120,7 +119,7 @@
          CALL SUBPAR_MNMX( NAMECODE, 'MAX', STATUS )
 *   then get it
          IF ( STATUS .EQ. SAI__OK ) THEN
-            VALUE = PARVALS(NAMECODE)
+            VALUE = PARINT64(NAMECODE)
          ENDIF
 
       ELSE IF ( PARSTATE(NAMECODE) .EQ. SUBPAR__MIN ) THEN
@@ -129,7 +128,7 @@
          CALL SUBPAR_MNMX( NAMECODE, 'MIN', STATUS )
 *   then get it
          IF ( STATUS .EQ. SAI__OK ) THEN
-            VALUE = PARVALS(NAMECODE)
+            VALUE = PARINT64(NAMECODE)
          ENDIF
 
       ELSE IF ( ( PARDYN(1,NAMECODE) .GT. 0 )
@@ -137,40 +136,40 @@
 *
 *     There is a dynamic default - convert from the stored type
 *
-         IF ( PARDYN(3,NAMECODE) .EQ. SUBPAR__CHAR ) THEN
-            PARVALS(NAMECODE) = CHARLIST(PARDYN(1,NAMECODE))
+         IF ( PARDYN(3,NAMECODE) .EQ. SUBPAR__INT64 ) THEN
+            PARINT64(NAMECODE) = INT64LIST( PARDYN(1,NAMECODE) )
+
+         ELSE IF ( PARDYN(3,NAMECODE) .EQ. SUBPAR__CHAR ) THEN
+            CALL CHR_CTOK( CHARLIST(PARDYN(1,NAMECODE)),
+     :        PARINT64(NAMECODE), STATUS )
 
          ELSE IF ( PARDYN(3,NAMECODE) .EQ. SUBPAR__DOUBLE ) THEN
-            CALL CHR_DTOC( DOUBLELIST(PARDYN(1,NAMECODE)),
-     :        PARVALS(NAMECODE), NCHAR )
+            PARINT64(NAMECODE) = DOUBLELIST(PARDYN(1,NAMECODE)) 
 
          ELSE IF ( PARDYN(3,NAMECODE) .EQ. SUBPAR__INTEGER ) THEN
-            CALL CHR_ITOC( INTLIST(PARDYN(1,NAMECODE)),
-     :        PARVALS(NAMECODE), NCHAR )
-
-         ELSE IF ( PARDYN(3,NAMECODE) .EQ. SUBPAR__INT64 ) THEN
-            CALL CHR_KTOC( INT64LIST(PARDYN(1,NAMECODE)),
-     :        PARVALS(NAMECODE), NCHAR )
+            PARINT64(NAMECODE) = INTLIST(PARDYN(1,NAMECODE)) 
 
          ELSE IF ( PARDYN(3,NAMECODE) .EQ. SUBPAR__LOGICAL ) THEN
-            CALL CHR_LTOC( LOGLIST(PARDYN(1,NAMECODE)),
-     :        PARVALS(NAMECODE), NCHAR )
+            IF ( LOGLIST( PARDYN(1,NAMECODE) ) )  THEN
+               PARINT64(NAMECODE) = 1
+            ELSE
+               PARINT64(NAMECODE) = 0
+            ENDIF
 
          ELSE IF ( PARDYN(3,NAMECODE) .EQ. SUBPAR__REAL ) THEN
-            CALL CHR_RTOC( REALLIST(PARDYN(1,NAMECODE)),
-     :        PARVALS(NAMECODE), NCHAR )
+            PARINT64(NAMECODE) = REALLIST(PARDYN(1,NAMECODE)) 
 
          END IF
 
-         VALUE = PARVALS(NAMECODE)
+         VALUE = PARINT64(NAMECODE)
          PARSTATE(NAMECODE) = SUBPAR__ACTIVE
 
-      ELSE IF ( PARDEF(3,NAMECODE) .EQ. SUBPAR__CHAR ) THEN
+      ELSE IF ( PARDEF(3,NAMECODE) .EQ. SUBPAR__INTEGER ) THEN
 *
 *   There is a static default
 *
-         PARVALS(NAMECODE) = CHARLIST(PARDEF(1,NAMECODE))
-         VALUE = PARVALS(NAMECODE)
+         PARINT64(NAMECODE) = INT64LIST(PARDEF(1,NAMECODE))
+         VALUE = PARINT64(NAMECODE)
          PARSTATE(NAMECODE) = SUBPAR__ACTIVE
 
       ELSE

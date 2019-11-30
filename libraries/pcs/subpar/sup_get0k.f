@@ -1,7 +1,7 @@
-      SUBROUTINE SUBPAR_GET0C ( NAMECODE, CVALUE, STATUS )
+      SUBROUTINE SUBPAR_GET0K ( NAMECODE, KVALUE, STATUS )
 *+
 *  Name:
-*     SUBPAR_GET0C
+*     SUBPAR_GET0K
 
 *  Purpose:
 *     Read scalar parameter value.
@@ -10,12 +10,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SUBPAR_GET0C ( NAMECODE, CVALUE, STATUS )
+*     CALL SUBPAR_GET0K ( NAMECODE, KVALUE, STATUS )
 
 *  Description:
-*     Get a scalar CHARACTER value from the storage associated with the
+*     Get a scalar INTEGER*8 value from the storage associated with the
 *     indicated parameter.
-*     If the object data type differs from the access type, CHARACTER*(*), then
+*     If the object data type differs from the access type, INTEGER*8, then
 *     conversion is performed if possible.
 
 *     Note that a Vector (1-D) object containing a single value is
@@ -24,7 +24,7 @@
 *  Arguments:
 *     NAMECODE=INTEGER (given)
 *        pointer to the parameter
-*     CVALUE=CHARACTER*(*) (returned)
+*     KVALUE=INTEGER*8 (returned)
 *        Value to be obtained from the parameter
 *     STATUS=INTEGER
 
@@ -42,9 +42,7 @@
 *     MAXTRY times.
 
 *  Copyright:
-*     Copyright (C) 1984, 1985, 1987, 1988, 1991-1994 Science & Engineering Research Council.
-*     Copyright (C) 1995, 2002 Central Laboratory of the Research Councils.
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 1984, 1985, 1987, 1988, 1991, 1992, 1993, 1994 Science & Engineering Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -67,29 +65,33 @@
 *     BDK: B D Kelly (ROE)
 *     AJC: A J Chipperfield (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
-*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
-*     24-SEP-1984 (BDK):
+*     24-SEP-1984:
 *        Original version
-*     25-MAY-1985 (BDK):
+*     25-MAY-1985:
 *        Allow for type 'UNIV'
-*     05-JUN-1985 (BDK):
+*     05-JUN-1985:
 *        do DAT_ASSOC with 'UPDATE', in case of subsequent
-*        PAR_PUTs to the parameter
-*     13-AUG-1987 (BDK):
+*        PAR_PUTs
+*        to the parameter
+*     13-AUG-1987:
 *        on out-of-range, retry
-*     16-NOV-1987 (BDK):
+*     16-NOV-1987:
 *        improve logical-to-char conversion
-*     16-FEB-1988 (BDK):
+*     16-FEB-1988:
 *        don't overwrite bad status with OUTRANGE
-*     12-AUG-1988 (AJC):
+*     12-AUG-1988:
 *        don't annul locator if not obtained
-*     09-JUL-1991 (AJC):
+*     09-JUL-1991:
 *        remove LIB$CVT_DX_DX conversion
-*     29-JUL-1991 (AJC):
+*        round down for INTEGERS
+*     29-JUL-1991:
 *        handle improved error reporting from LIMITR
+*     27-SEP-1991:
+*        Prefix messages with 'SUBPAR:'
+*        and with ! etc when flushing
 *     26-AUG-1992 (PCTR):
 *        Replaced EMS_ELOAD/SUBPAR_WRITE loop with a call to
 *        SUBPAR_EFLSH.
@@ -105,12 +107,6 @@
 *     29-SEP-1994 (AJC):
 *        Use EMS_FACER not DAT_ERMSG to report errors
 *        Don't report message associated with SUBPAR__OUTRANGE
-*     20-DEC-1995 (AJC):
-*        Don't use intermediate VALUE_STRING
-*     26-FEB-2002 (AJC):
-*        Trap truncation in the DAT_GET0C to improve error message.
-*     21-NOV-2006 (TIMJ):
-*        Initialise return value even if status is bad. Fixes valgrind warning.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -124,7 +120,6 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'DAT_ERR'
       INCLUDE 'SUBPAR_PAR'
       INCLUDE 'SUBPAR_ERR'
       INCLUDE 'SUBPAR_PARERR'
@@ -133,10 +128,10 @@
       INTEGER NAMECODE                  ! Parameter number
 
 *  Arguments Returned:
-      CHARACTER * ( * ) CVALUE          ! Value obtained
+      INTEGER*8 KVALUE                  ! Value obtained
 
 *  Status:
-      INTEGER STATUS                    ! Global status
+      INTEGER STATUS                    ! Status Return
 
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'
@@ -153,9 +148,9 @@
                                         ! in a user-specified HDS
                                         ! structure.
 
-
-      REAL VALUE_REAL                   ! Variables to store converted
-      INTEGER VALUE_INTEGER             ! parameter value
+      CHARACTER*132 VALUE_STRING        ! Variables to store converted
+      REAL VALUE_REAL                   ! parameter value
+      INTEGER VALUE_INTEGER
       INTEGER*8 VALUE_INT64
       DOUBLE PRECISION VALUE_DOUBLE
       LOGICAL VALUE_LOGICAL
@@ -175,7 +170,6 @@
                                               ! SUBPAR__REAL
                                               ! SUBPAR__CHAR
                                               ! SUBPAR__INTEGER
-                                              ! SUBPAR__INT64
                                               ! SUBPAR__DOUBLE
                                               ! SUBPAR__LOGICAL
 
@@ -183,14 +177,9 @@
       INTEGER DIMS(MAXDIM)                    ! Object dimensions
       INTEGER ACTDIM                          ! Actual number of dimensions
       INTEGER TRIES                           ! Number of tries
-      LOGICAL ACCEPTED                        ! If no reprompt required
-
-      INTEGER LENST                           ! length of string
+      LOGICAL ACCEPTED                        ! If no re-prompt required
 
 *.
-
-*  Initialise the return value
-      CVALUE = ' '
 
 *  Check the inherited status.
       IF (STATUS .NE. SAI__OK) RETURN
@@ -238,7 +227,7 @@
                IF (ACTDIM .NE. 0 ) THEN
                   STATUS = SUBPAR__ARRDIM
                   CALL EMS_SETC( 'NAME', PARKEY(NAMECODE) )
-                  CALL EMS_REP( 'SUP_GET0C1',
+                  CALL EMS_REP( 'SUP_GET0K1',
      :            'SUBPAR: Parameter ^NAME requires a scalar value',
      :             STATUS )
                ENDIF
@@ -251,44 +240,19 @@
 *
 *      Extract the data and do type conversion.
 *
-            IF ( TYPE .EQ. SUBPAR__CHAR ) THEN
+            IF ( TYPE .EQ. SUBPAR__INT64 ) THEN
 
                IF ( INTERNAL ) THEN
-                  CALL SUBPAR_FETCHC ( NAMECODE, CVALUE, STATUS )
+                  CALL SUBPAR_FETCHK ( NAMECODE, VALUE_INT64, STATUS )
                ELSE
-                  CALL DAT_GETC ( LOC, 0, 0, CVALUE, STATUS )
-                  IF ( STATUS .EQ. DAT__TRUNC ) THEN
-                     CALL EMS_ANNUL( STATUS )
-                     STATUS = SUBPAR__OUTRANGE
-                     CALL EMS_SETC( 'NAME', PARKEY(NAMECODE) )
-                     CALL EMS_SETC( 'CVALUE', CVALUE )
-                     CALL EMS_REP( 'SUP_GET0C3',
-     :               'SUBPAR: Parameter ^NAME - ' //
-     :               'value ''^CVALUE...'' is too long',
-     :                STATUS )
-                     CALL EMS_SETI( 'MAX', LEN(CVALUE) )
-                     CALL EMS_REP( 'SUP_GET0C3a',
-     :               'Maximum length allowed is ^MAX characters',
-     :                STATUS )
-                  ENDIF
+                  CALL DAT_GETK ( LOC, 0, 0, VALUE_INT64, STATUS )
                ENDIF
 
-               CALL SUBPAR_LIMITC ( NAMECODE, CVALUE, ACCEPTED,
-     :           STATUS )
-
-            ELSE IF ( TYPE .EQ. SUBPAR__REAL ) THEN
-
-               IF ( INTERNAL ) THEN
-                  CALL SUBPAR_FETCHR ( NAMECODE, VALUE_REAL, STATUS )
-               ELSE
-                  CALL DAT_GETR ( LOC, 0, 0, VALUE_REAL, STATUS )
-               ENDIF
-
-               CALL SUBPAR_LIMITR ( NAMECODE, VALUE_REAL, ACCEPTED,
+               CALL SUBPAR_LIMITK ( NAMECODE, VALUE_INT64, ACCEPTED,
      :           STATUS )
 
                IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL CHR_RTOC( VALUE_REAL, CVALUE, LENST )
+                  KVALUE = VALUE_INT64
                ENDIF
 
             ELSE IF ( TYPE .EQ. SUBPAR__INTEGER ) THEN
@@ -303,22 +267,64 @@
      :           STATUS )
 
                IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL CHR_ITOC( VALUE_INTEGER, CVALUE, LENST )
+                  KVALUE = VALUE_INTEGER
                ENDIF
 
-            ELSE IF ( TYPE .EQ. SUBPAR__INT64 ) THEN
+            ELSE IF ( TYPE .EQ. SUBPAR__REAL ) THEN
 
                IF ( INTERNAL ) THEN
-                  CALL SUBPAR_FETCHK ( NAMECODE, VALUE_INT64, STATUS )
+                  CALL SUBPAR_FETCHR ( NAMECODE, VALUE_REAL, STATUS )
                ELSE
-                  CALL DAT_GETK ( LOC, 0, 0, VALUE_INT64, STATUS )
+                  CALL DAT_GETR ( LOC, 0, 0, VALUE_REAL, STATUS )
                ENDIF
 
-               CALL SUBPAR_LIMITK ( NAMECODE, VALUE_INT64, ACCEPTED,
+               CALL SUBPAR_LIMITR ( NAMECODE, VALUE_REAL, ACCEPTED,
      :           STATUS )
 
                IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL CHR_KTOC( VALUE_INT64, CVALUE, LENST )
+                  KVALUE = VALUE_REAL
+               ENDIF
+
+            ELSE IF ( TYPE .EQ. SUBPAR__CHAR ) THEN
+
+               IF ( INTERNAL ) THEN
+                  CALL SUBPAR_FETCHC ( NAMECODE, VALUE_STRING, STATUS )
+               ELSE
+                  CALL DAT_GETC ( LOC, 0, 0, VALUE_STRING, STATUS )
+               ENDIF
+
+               CALL SUBPAR_LIMITC ( NAMECODE, VALUE_STRING, ACCEPTED,
+     :           STATUS )
+
+               IF ( STATUS .EQ. SAI__OK ) THEN
+*              Convert via a DOUBLE to get a sensible INTEGER result
+*              from any number
+                  CALL CHR_CTOD( VALUE_STRING, VALUE_DOUBLE, STATUS )
+                  IF ( STATUS .NE. SAI__OK ) THEN
+*                 See if it was a logical representation (which can be
+*                 converted to 0 or 1) before reporting an error.
+                     CALL EMS_ANNUL( STATUS )
+                     CALL CHR_CTOL( VALUE_STRING, VALUE_LOGICAL,
+     :                STATUS )
+                     IF ( STATUS .EQ. SAI__OK ) THEN
+*                    It was a valid logical string convert to INTEGER*8
+                        IF ( VALUE_LOGICAL ) THEN
+                           KVALUE = 1
+                        ELSE
+                           KVALUE = 0
+                        ENDIF
+
+                     ELSE
+*                    Can't convert the string
+                        STATUS = SUBPAR__CONER
+                        CALL EMS_SETC( 'VAL', VALUE_STRING )
+                        CALL EMS_REP( 'SUP_GET0I2',
+     :                  'SUBPAR: Error converting ^VAL to INTEGER*8',
+     :                   STATUS )
+                     ENDIF
+                  ELSE
+                     KVALUE = VALUE_DOUBLE
+                  ENDIF
                ENDIF
 
             ELSE IF ( TYPE .EQ. SUBPAR__DOUBLE ) THEN
@@ -333,7 +339,7 @@
      :           STATUS )
 
                IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL CHR_DTOC( VALUE_DOUBLE, CVALUE, LENST )
+                  KVALUE = VALUE_DOUBLE
                ENDIF
 
             ELSE IF ( TYPE .EQ. SUBPAR__LOGICAL ) THEN
@@ -344,11 +350,12 @@
                ENDIF
 *
 *            There is no limit checking for logicals
+*            Set the integer value to 1 if TRUE, 0 if false
 *
-               IF( VALUE_LOGICAL ) THEN
-                  CVALUE = 'TRUE'
+               IF ( VALUE_LOGICAL ) THEN
+                  KVALUE = 1
                ELSE
-                  CVALUE = 'FALSE'
+                  KVALUE = 0
                ENDIF
 
             ELSE
@@ -356,7 +363,7 @@
 *            The declared type is not primitive (eg. 'UNIV'). Just try
 *            to get the value from HDS.
 *
-               CALL DAT_GETC ( LOC, 0, 0, CVALUE, STATUS )
+               CALL DAT_GETK ( LOC, 0, 0, KVALUE, STATUS )
 
             ENDIF
 *
@@ -391,7 +398,7 @@
      :      .AND. ( STATUS .NE. SUBPAR__OUTRANGE )
      :      .AND. ( STATUS .NE. SUBPAR__CONER ) ) THEN
                CALL EMS_FACER( 'MESS', STATUS )
-               CALL EMS_REP( 'SUP_GET0C4', '^MESS', STATUS )
+               CALL EMS_REP( 'SUP_GET0K3', '^MESS', STATUS )
             ENDIF
 *        Cancel parameter value to force reprompt
             CALL SUBPAR_CANCL ( NAMECODE, STATUS )
@@ -406,7 +413,7 @@
                PARSTATE(NAMECODE) = SUBPAR__NULL
                CALL EMS_SETC( 'NAME', PARKEY(NAMECODE) )
                CALL EMS_SETI( 'TRIES', TRIES )
-               CALL EMS_REP( 'SUP_GET0C5', 'SUBPAR: '//
+               CALL EMS_REP( 'SUP_GET0K4', 'SUBPAR: '//
      :         '^TRIES prompts failed to get a good value for '//
      :         'parameter ^NAME - NULL assumed', STATUS )
             ENDIF

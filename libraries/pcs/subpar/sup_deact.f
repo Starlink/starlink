@@ -367,6 +367,10 @@
      :                  THEN
                            CALL DAT_PUTI ( BOTLOC, 0, 0, PARINT(J),
      :                       STATUS )
+                        ELSE IF ( PARTYPE(J) .EQ. SUBPAR__INT64 )
+     :                  THEN
+                           CALL DAT_PUTK ( BOTLOC, 0, 0, PARINT64(J),
+     :                       STATUS )
                         ELSE IF ( PARTYPE(J) .EQ. SUBPAR__DOUBLE )
      :                  THEN
                            CALL DAT_PUTD ( BOTLOC, 0, 0,

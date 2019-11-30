@@ -27,8 +27,8 @@
 *     HDS structure (arrays) or in a permanent HDS structure.
 *     (3) a CHARACTER*(SUBPAR__SZLEN) array PARVALS which holds the values of
 *     character strings OR the name of the HDS structure containing the
-*     parameter value. There are also INTEGER, REAL, DOUBLE PRECISION and
-*     LOGICAL arrays for values.
+*     parameter value. There are also INTEGER, INTEGER*8, REAL,
+*     DOUBLE PRECISION and LOGICAL arrays for values.
 *     (4) a character*80 array PARPROM which holds prompt strings for
 *     the parameters.
 *     (5) a logical array PARWRITE which has .TRUE. values for those
@@ -133,6 +133,7 @@
 *
 *   There is a list of constraints for each relevant data type -
 *     integer          - INTLIST
+*     integer*8        - INT64LIST
 *     real             - REALLIST
 *     double precision - DOUBLELIST
 *     character (*SUBPAR__STRLEN) - CHARLIST
@@ -178,12 +179,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
@@ -249,6 +250,8 @@
 *        and include SUBPAR_SYS
 *      3-SEP-1993 (AJC):
 *        Correctly SAVE SUBPARPSV (not PSAV)
+*      30-NOV-2019 (DSB):
+*        Add support for INTEGER*8 parameters.
 
 *-
 
@@ -259,8 +262,8 @@
 *
 *   Codes for value search-path
 *
-      INTEGER SUBPAR__NOPATH, SUBPAR__CURRENT, SUBPAR__DEFAULT, 
-     :  SUBPAR__DYNAMIC, SUBPAR__GLOBAL, SUBPAR__NOPROMPT, 
+      INTEGER SUBPAR__NOPATH, SUBPAR__CURRENT, SUBPAR__DEFAULT,
+     :  SUBPAR__DYNAMIC, SUBPAR__GLOBAL, SUBPAR__NOPROMPT,
      :  SUBPAR__PROMPT, SUBPAR__INTERNAL
 
       PARAMETER ( SUBPAR__NOPATH    = 0 )
@@ -300,12 +303,14 @@
 
       INTEGER PARTYPE(SUBPAR__MAXPAR)  ! parameter types
 
-      CHARACTER*(SUBPAR__STRLEN) PARVALS(SUBPAR__MAXPAR) ! parameter values OR 
+      CHARACTER*(SUBPAR__STRLEN) PARVALS(SUBPAR__MAXPAR) ! parameter values OR
                                             ! storage location
 
       CHARACTER*80 PARPROM(SUBPAR__MAXPAR)  ! prompt strings
 
       INTEGER PARINT(SUBPAR__MAXPAR)        ! integer values
+
+      INTEGER*8 PARINT64(SUBPAR__MAXPAR)    ! integer*8 values
 
       REAL PARREAL(SUBPAR__MAXPAR)          ! real values
 
@@ -316,7 +321,7 @@
       LOGICAL PARWRITE(SUBPAR__MAXPAR)      ! write access
 
       INTEGER PARLIMS(3,SUBPAR__MAXPAR)     ! data type of constraints
-                                            ! and pointers to list of 
+                                            ! and pointers to list of
                                             ! values
 
       LOGICAL PARCONT(SUBPAR__MAXPAR)       ! .TRUE. => range constraint
@@ -328,12 +333,12 @@
 
       LOGICAL PARVALID(SUBPAR__MAXPAR)      ! .TRUE. => valid locators
 
-      INTEGER PARDEF(3,SUBPAR__MAXPAR)      ! data type of static 
-                                            ! defaults and pointers to 
+      INTEGER PARDEF(3,SUBPAR__MAXPAR)      ! data type of static
+                                            ! defaults and pointers to
                                             ! list of values
 
       INTEGER PARDYN(3,SUBPAR__MAXPAR)      ! data type of dynamic
-                                            ! defaults and pointers to 
+                                            ! defaults and pointers to
                                             ! list of values
 
       INTEGER PARASSOC(2,SUBPAR__MAXPAR)    ! associated HDS structure
@@ -353,13 +358,13 @@
 
       INTEGER PARRPATH(2,SUBPAR__MAXPAR)    ! pointers to RPATH strings
 
-      LOGICAL PARLIT(SUBPAR__MAXPAR)        ! .TRUE. => literal string, 
-                                            ! ie never interpret value 
+      LOGICAL PARLIT(SUBPAR__MAXPAR)        ! .TRUE. => literal string,
+                                            ! ie never interpret value
                                             ! as HDS name
 
-      CHARACTER*80 PARERRMESS               ! error message. This can be 
-                                            ! set up by eg. SUBPAR_ASSOC 
-                                            ! and is displayed when 
+      CHARACTER*80 PARERRMESS               ! error message. This can be
+                                            ! set up by eg. SUBPAR_ASSOC
+                                            ! and is displayed when
                                             ! prompting for values.
 
       CHARACTER*(SUBPAR__NAMELEN) PARMENU(SUBPAR__MAXPAR) ! menus
@@ -379,7 +384,7 @@
       COMMON / SUBPARVALS / PARLEN, PARTYPE, PARWRITE, PARLIMS, PARCONT,
      :  PARDEF, PARDYN,  PARASSOC, PARPOS, PARRPATH, PARVPATH, PARLIT,
      :  PARCOORDS, PARPPATH
-      COMMON / SUBPARVALC / PARHELP, PARNAMES, PARPROM, PARKEY, PARPTY, 
+      COMMON / SUBPARVALC / PARHELP, PARNAMES, PARPROM, PARKEY, PARPTY,
      :  PARMENU, PARHKEY
 
 *
@@ -387,9 +392,9 @@
 *   running. This block does not need to be read from disk on program
 *   start-up.
 *
-      COMMON / SUBPARDAT / PARSTATE, PARINT, PARREAL, 
+      COMMON / SUBPARDAT / PARSTATE, PARINT, PARREAL,
      :  PARDOUBLE, PARLOG, PARVALID, PARMIN, PARMAX
-      COMMON / SUBPARDATC / PARVALS, PARLOC, PARERRMESS 
+      COMMON / SUBPARDATC / PARVALS, PARLOC, PARERRMESS
 
 *
 *   Action definitions and storage.
@@ -398,20 +403,20 @@
 
       INTEGER ACTLEN(SUBPAR__MAXACT)        ! lengths of actnames
 
-      LOGICAL MAYOB(SUBPAR__MAXACT)         ! .TRUE. => OBEY is valid 
+      LOGICAL MAYOB(SUBPAR__MAXACT)         ! .TRUE. => OBEY is valid
                                             ! for action
 
-      LOGICAL MAYCAN(SUBPAR__MAXACT)        ! .TRUE. => CANCEL is valid 
+      LOGICAL MAYCAN(SUBPAR__MAXACT)        ! .TRUE. => CANCEL is valid
                                             ! for action
 
-      INTEGER NEEDOB(2,SUBPAR__MAXACT)      ! pointers to needs list for 
+      INTEGER NEEDOB(2,SUBPAR__MAXACT)      ! pointers to needs list for
                                             ! OBEY
 
-      INTEGER NEEDCAN(2,SUBPAR__MAXACT)     ! pointers to needs list for 
+      INTEGER NEEDCAN(2,SUBPAR__MAXACT)     ! pointers to needs list for
                                             ! CANCEL
 
-      INTEGER PROGADD(2,SUBPAR__MAXACT)     ! pointers to the parameter 
-                                            ! list for individual 
+      INTEGER PROGADD(2,SUBPAR__MAXACT)     ! pointers to the parameter
+                                            ! list for individual
                                             ! programs within a monolith
 
       CHARACTER*132 ACTHELP(SUBPAR__MAXACT) ! help line
@@ -432,11 +437,11 @@
 *   Needs list - ie specification of parameters required by specific
 *   OBEY/CANCEL actions.
 *
-      INTEGER NEEDPAR(SUBPAR__MAXNEEDS)     ! pointers to required 
+      INTEGER NEEDPAR(SUBPAR__MAXNEEDS)     ! pointers to required
                                             ! parameters
 
-      INTEGER NEEDLIMS(2,SUBPAR__MAXNEEDS)  ! pointers to constraint 
-                                            ! list for required 
+      INTEGER NEEDLIMS(2,SUBPAR__MAXNEEDS)  ! pointers to constraint
+                                            ! list for required
                                             ! parameters
 
       LOGICAL NEEDCONT(SUBPAR__MAXNEEDS)    ! .TRUE. => range constraint
@@ -454,12 +459,14 @@
 *     PARVPATH.
 *
       INTEGER INTLIST(SUBPAR__MAXLIMS)
+      INTEGER*8 INT64LIST(SUBPAR__MAXLIMS)
       REAL REALLIST(SUBPAR__MAXLIMS)
       DOUBLE PRECISION DOUBLELIST(SUBPAR__MAXLIMS)
       CHARACTER*(SUBPAR__STRLEN) CHARLIST(SUBPAR__MAXLIMS)
       LOGICAL LOGLIST(SUBPAR__MAXLIMS)
 
-      COMMON / SUBPARCONST / DOUBLELIST, INTLIST, REALLIST, LOGLIST
+      COMMON / SUBPARCONST / DOUBLELIST, INTLIST, REALLIST, LOGLIST,
+     :                       INT64LIST
       COMMON / SUBPARCONSTC / CHARLIST
 
 
@@ -485,6 +492,8 @@
 
       INTEGER INTPTR             ! last entry in INTLIST
 
+      INTEGER INT64PTR           ! last entry in INT64LIST
+
       INTEGER REALPTR            ! last entry in REALLIST
 
       INTEGER DOUBLEPTR          ! last entry in DOUBLELIST
@@ -502,8 +511,8 @@
       LOGICAL MONOLITH           ! .TRUE. => monolith
 
 
-      COMMON / SUBPARPTR / PARPTR, ACTPTR, NEEDPTR, INTPTR, REALPTR, 
-     :  DOUBLEPTR, CHARPTR, LOGPTR, MONOLITH
+      COMMON / SUBPARPTR / PARPTR, ACTPTR, NEEDPTR, INTPTR, REALPTR,
+     :  DOUBLEPTR, CHARPTR, LOGPTR, MONOLITH, INT64PTR
       COMMON / SUBPARPTRC / FACENAME, PROGNAME, EXEPATH
 *
 *   The values of INTPTR, REALPTR etc. after interface file loading are save
@@ -511,12 +520,14 @@
 *   particularly important for monoliths.
 *
       INTEGER INTPSV
+      INTEGER INT64PSV
       INTEGER REALPSV
       INTEGER DOUBLEPSV
       INTEGER CHARPSV
       INTEGER LOGPSV
 
-      COMMON / SUBPARPSV / INTPSV, REALPSV, DOUBLEPSV, CHARPSV, LOGPSV
+      COMMON / SUBPARPSV / INTPSV, REALPSV, DOUBLEPSV, CHARPSV, LOGPSV,
+     :                     INT64PSV
 *
 *   The common blocks also hold four locators to HDS structures which are
 *   given values at progam activation. These are the locators to the
@@ -525,12 +536,12 @@
 *
       CHARACTER*(DAT__SZLOC) GLOBLOC    ! locator to global data storage
 
-      CHARACTER*(DAT__SZLOC) EXTTOP     ! top-level locator to external 
+      CHARACTER*(DAT__SZLOC) EXTTOP     ! top-level locator to external
                                         ! parameter storage
 
       CHARACTER*(DAT__SZLOC) EXTLOC     ! locator to external parameter storage
-                                        ! for the currently active program in a 
-                                        ! monolith. This is equal to EXTTOP for 
+                                        ! for the currently active program in a
+                                        ! monolith. This is equal to EXTTOP for
                                         ! non-monoliths
 
       CHARACTER*(DAT__SZLOC) DYNLOC     ! locator to store for dynamic defaults
@@ -572,7 +583,7 @@
 *   Flag for controlling whether the task fixed part checks items on a
 *   NEEDS list.
 *
-      LOGICAL CHECKNEEDS         ! .TRUE. => NEEDS list checked before 
+      LOGICAL CHECKNEEDS         ! .TRUE. => NEEDS list checked before
                                  ! ACT called
 
       COMMON / NEEDSFLAG / CHECKNEEDS
@@ -585,7 +596,7 @@
       INTEGER SUBPARLCNT           ! Help line down counter
 
       COMMON / SUBPARTERM / SUBPARPGSZ, SUBPARLCNT
-      
+
       SAVE / SUBPARVALS /
       SAVE / SUBPARVALC /
       SAVE / SUBPARDAT /

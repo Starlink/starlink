@@ -225,7 +225,7 @@
 *  Local Constants:
       INTEGER MAXPARS            ! maximum number of command line parame
       PARAMETER (MAXPARS=50)
-      CHARACTER*15 POSTYPES(5)   ! Possible primitive data types
+      CHARACTER*15 POSTYPES(8)   ! Possible primitive data types
 
 *  Local Variables:
       CHARACTER*(MESSYS__VAL_LEN+2) COMMAND  ! Command line with spaceCR added
@@ -253,7 +253,7 @@
 
 *  Local Data:
       DATA POSTYPES/'_CHAR*', '_REAL', '_DOUBLE', '_INTEGER',
-     :     '_LOGICAL'/
+     :     '_LOGICAL',  ' ', ' ', '_INT64' /
 *.
 
       IF ( STATUS.NE.SAI__OK ) RETURN

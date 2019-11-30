@@ -72,10 +72,10 @@ MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
 SUFFIXES = .gen .gdr .gdir .gcdir .gcdilr .gr .gbdirw .gn .f
 
 .gdir.f:
-	$(FGENERIC)  -t dir $<
+	$(FGENERIC)  -t dirk $<
 
 .gcdilr.f:
-	$(FGENERIC)  -t cdilr $<
+	$(FGENERIC)  -t cdilrk $<
 
 .gcdir.f:
-	$(FGENERIC)  -t cdir $<
+	$(FGENERIC)  -t cdirk $<

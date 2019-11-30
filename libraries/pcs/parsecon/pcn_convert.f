@@ -1,5 +1,5 @@
       SUBROUTINE PARSECON_CONVERT ( STRING, INTYPE, RVAL, CVAL, DVAL,
-     :  IVAL, LVAL, STRUCTURE, STATUS )
+     :  IVAL, I64VAL, LVAL, STRUCTURE, STATUS )
 *+
 *  Name:
 *     PARSECON_CONVERT
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL PARSECON_CONVERT ( STRING, INTYPE, RVAL, CVAL, DVAL,
-*    :  IVAL, LVAL, STRUCTURE, STATUS )
+*    :  IVAL, I64VAL, LVAL, STRUCTURE, STATUS )
 
 *  Description:
 *     Given a character string and a requested data type, the syntax of
@@ -31,6 +31,7 @@
 *             SUBPAR__CHAR
 *             SUBPAR__DOUBLE
 *             SUBPAR__INTEGER
+*             SUBPAR__INT64
 *             SUBPAR__LOGICAL
 *             SUBPAR__LITERAL
 *     RVAL=REAL (returned)
@@ -40,6 +41,8 @@
 *     DVAL=DOUBLE PRECISION (returned)
 *        variable to hold converted value
 *     IVAL=INTEGER (returned)
+*        variable to hold converted value
+*     I64VAL=INTEGER*8 (returned)
 *        variable to hold converted value
 *     LVAL=LOGICAL (returned)
 *        variable to hold converted value
@@ -119,6 +122,7 @@
       CHARACTER*(*) CVAL
       DOUBLE PRECISION DVAL
       INTEGER IVAL
+      INTEGER*8 I64VAL
       LOGICAL LVAL
       LOGICAL STRUCTURE
 
@@ -186,6 +190,9 @@
 
                ELSE IF ( INTYPE .EQ. SUBPAR__INTEGER ) THEN
                   CALL CHR_CTOI( CVAL, IVAL, STATUS )
+
+               ELSE IF ( INTYPE .EQ. SUBPAR__INT64 ) THEN
+                  CALL CHR_CTOK( CVAL, I64VAL, STATUS )
 
                ELSE IF ( INTYPE .EQ. SUBPAR__LOGICAL ) THEN
                   CALL CHR_CTOL( CVAL, LVAL, STATUS )
