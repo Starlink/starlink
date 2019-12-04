@@ -44,7 +44,9 @@
 *     to remove any residual elevation-dependence left over by the earlier
 *     primary IP correction.
 *
-*     The IP model measured and applied by this routine is of the form:
+*     The IP model measured and applied by this routine can take one of
+*     two forms (selected using the MODELTYPE parameter). Firstly, the
+*     "single component" form:
 *
 *     p = A + B*el + C*el*el
 *     Qn_fp = p*cos( -2*( el - D ) )
@@ -53,8 +55,17 @@
 *     where "el" is elevation (in radians), "p" is the fractional polarisation
 *     due to IP, (Qn_fp,Un_fp) are normalised Q and U corrections with respect
 *     to the focal plane Y axis, and (A,B,C,D) are the parameters of the model
-*     determined from the supplied input maps as described below. The corrected
-*     output Q and U values are then given by:
+*     determined from the supplied input maps as described below.
+*
+*     Secondly, the "double component" form:
+*
+*     Qn_fp = A + B*cos( -2*( el - C ) ) + D*cos( -2*( el - E ) )
+*     Un_fp = F + B*sin( -2*( el - C ) ) + D*sin( -2*( el - E ) )
+*
+*     This form has two extra free parameters (E and F) compared to the
+*     single component model.
+*
+*     For both model forms, the corrected output Q and U values are then given by:
 *
 *     Q_out = Q_in - Qn_tr*I_in
 *     U_out = U_in - Un_tr*I_in
@@ -151,6 +162,10 @@
 *        values evaluated from the fitted IP model. The file uses the
 *        TOPCAT "ascii" format, and holds the fitted model parameters in
 *        the header. [!]
+*     MODELTYPE = LITERAL (Write)
+*        Selects the mathematical form of the IP model. Can be "SINGLE"
+*        (for the single component model) or "DOUBLE" (for the double
+*        component model). ["SINGLE"]
 *     OUT = NDF (Write)
 *        An optional group of output NDFs. If null (!) is supplied, no IP
 *        corrected output maps are created. If a non-null value is supplied,
@@ -168,7 +183,7 @@
 *  Notes:
 *     - Single observation maps produced by skyloop can sometimes show IP
 *     that seems to vary with total intensity. In such cases, using a
-*     modified model in which:
+*     modified single component model in which:
 *
 *     p = A + B*el + C*el*el + E*total_intensity
 *     q = p*cos( -2( el - D ) )
@@ -182,6 +197,8 @@
 *  History:
 *     30-MAY-2019 (DSB):
 *        Original version.
+*     4-DEC-2019 (DSB):
+*        Added support for Pierre's double component model.
 
 *  Copyright:
 *     Copyright (C) 2019 East Asian Observatory.
@@ -251,6 +268,8 @@
 #define S4 1
 #define NONE 2
 #define MXBINSIZE 50
+#define SINGLE_COMP 1
+#define DOUBLE_COMP 2
 
 /* Local data types */
 typedef struct SmfPol2IpcorData {
@@ -291,6 +310,7 @@ typedef struct Params {
    const double *aw;    /* Array of weights */
    double sw;           /* Sum of the weights */
    size_t n;            /* Length of above arrays */
+   int imodel;          /* The type of model to fit */
 } Params;
 
 
@@ -301,15 +321,16 @@ static int smf1_madebyskyloop( int indf, int *status );
 static int smf1_qsort( const void *a, const void *d, void *data );
 static int smf1_qsort_bsd( void *data, const void *a, const void *d );
 static void smf1_worker( void *job_data_ptr, int *status );
-static void smf1_pol2ipcor( ThrWorkForce *wf, AstKeyMap *km, Grp *igrp3, const int *lbnd,
+static void smf1_pol2ipcor( ThrWorkForce *wf, int model, AstKeyMap *km, Grp *igrp3,
+                           const int *lbnd,
                            const int *ubnd, const int *indx, const int *binsize,
                            int nbin, int wave, FILE *fd1, FILE *fd2,
                            const double *coslist, const double *sinlist,
                            const double *ellist, const double *alist,
-                           double ippars[4], int *status );
-static void smf1_ipfit( size_t n, const double *q, const double *u,
+                           double ippars[6], int *status );
+static void smf1_ipfit( int model, size_t n, const double *q, const double *u,
                         const double *w, const double *e,
-                        int iwave, double par[5], int *status );
+                        int iwave, double par[6], int *status );
 static void smf1_df( const gsl_vector *v, void *params, gsl_vector *df );
 static void smf1_fdf( const gsl_vector *v, void *params, double *f, gsl_vector *df );
 static void smf1_linfit( size_t n, const int *xindex, const double *wlist,
@@ -355,6 +376,7 @@ void smurf_pol2ipcor( int *status ) {
    char label[70];
    char log[ GRP__SZFNM + 1 ];
    char mapdir[ GRP__SZFNM + 1 ];
+   char modeltype[ 10 ];
    char modelfile[ GRP__SZFNM + 1 ];
    char object[80];
    char obsid[ GRP__SZNAM ];;
@@ -374,6 +396,7 @@ void smurf_pol2ipcor( int *status ) {
    double a0;
    double a;
    double alpha;
+   double angle;
    double az;
    double az0;
    double azp;
@@ -383,7 +406,7 @@ void smurf_pol2ipcor( int *status ) {
    double el;
    double end;
    double epoch;
-   double ippars[4];
+   double ippars[6];
    double p;
    double qncor;
    double qncor_fp;
@@ -398,6 +421,7 @@ void smurf_pol2ipcor( int *status ) {
    int ibin;
    int iel;
    int ifile;
+   int imodel;
    int indf2;
    int indf;
    int iwave;
@@ -441,6 +465,11 @@ void smurf_pol2ipcor( int *status ) {
 /* Find the number of cores/processors available and create a pool of
    threads of the same size. */
    wf = thrGetWorkforce( thrGetNThread( SMF__THREADS, status ), status );
+
+/* Get the type of modelt to use - single component or double component. */
+   parChoic( "MODELTYPE", "SINGLE", "SINGLE,DOUBLE", 1, modeltype,
+             sizeof(modeltype), status );
+   imodel = strcmp( modeltype, "SINGLE" ) ? DOUBLE_COMP : SINGLE_COMP;
 
 /* Create a UTC TimeFrame that represents time as Julian epoch. It is used
    for converting the values of DATE-OBS and DATE-END FITS keywords to
@@ -1019,7 +1048,7 @@ void smurf_pol2ipcor( int *status ) {
 
 /* Now we have all the information we need from the input NDFs, get the
    parameters of an IP model that corrects the input maps. */
-   smf1_pol2ipcor( wf, km, igrp3, lbnd, ubnd, indx, binsize, ibin+1,
+   smf1_pol2ipcor( wf, imodel, km, igrp3, lbnd, ubnd, indx, binsize, ibin+1,
                   iwave, fd1, fd2, coslist, sinlist, ellist, alist,
                   ippars, status );
 
@@ -1069,9 +1098,18 @@ void smurf_pol2ipcor( int *status ) {
 
 /* Calculate the normalised Q and U corrections for the current
    observation, with respect to the focal plane Y axis. */
-      p = ippars[0] + ippars[1]*el + ippars[2]*el*el;
-      qncor_fp = p*cos( -2*( el - ippars[3] ) );
-      uncor_fp = p*sin( -2*( el - ippars[3] ) );
+      if( imodel == SINGLE_COMP ) {
+         p = ippars[0] + ippars[1]*el + ippars[2]*el*el;
+         qncor_fp = p*cos( -2*( el - ippars[3] ) );
+         uncor_fp = p*sin( -2*( el - ippars[3] ) );
+      } else {
+         angle = -2*( el - ippars[2] );
+         qncor_fp = ippars[0] + ippars[1]*cos( angle );
+         uncor_fp = ippars[5] + ippars[1]*sin( angle );
+         angle = -2*( el - ippars[4] );
+         qncor_fp += ippars[3]*cos( angle );
+         uncor_fp += ippars[3]*sin( angle );
+      }
 
 /* Get the constants needed to rotate the reference direction used by the
    correction to the original polarimetric reference direction. */
@@ -1187,12 +1225,12 @@ L999:
 
 
 
-static void smf1_pol2ipcor( ThrWorkForce *wf, AstKeyMap *km, Grp *igrp, const int *lbnd,
-                           const int *ubnd, const int *indx, const int *binsize,
-                           int nbin, int wave, FILE *fd1, FILE *fd2,
-                           const double *coslist, const double *sinlist,
-                           const double *ellist, const double *alist,
-                           double ippars[4], int *status ){
+static void smf1_pol2ipcor( ThrWorkForce *wf, int imodel, AstKeyMap *km,
+			    Grp *igrp, const int *lbnd, const int *ubnd,
+			    const int *indx, const int *binsize, int nbin,
+                            int wave, FILE *fd1, FILE *fd2, const double *coslist,
+                            const double *sinlist, const double *ellist,
+                            const double *alist, double ippars[6], int *status ){
 
 /* Local Variables: */
    AstKeyMap *kmcopy;
@@ -1214,6 +1252,7 @@ static void smf1_pol2ipcor( ThrWorkForce *wf, AstKeyMap *km, Grp *igrp, const in
    double *uclist;
    double *utrlist;
    double *wlist;
+   double angle;
    double bfit;
    double boffset;
    double bres;
@@ -1547,21 +1586,34 @@ static void smf1_pol2ipcor( ThrWorkForce *wf, AstKeyMap *km, Grp *igrp, const in
    }
 
 /* Do an iterative least squares fit to get the best values for the IP model parameters. */
-   smf1_ipfit( ngood, dqlist, dulist, wlist, elist, wave, ippars, status );
+   smf1_ipfit( imodel, ngood, dqlist, dulist, wlist, elist, wave, ippars, status );
 
 /* If required, create an output text file holding a table of evaluated
    model values. */
    if( fd2 ) {
       fprintf( fd2, "# wavelength = %s um\n", (wave==S4)?"450":"850" );
       fprintf( fd2, "#\n" );
-      fprintf( fd2, "# A = %g\n", ippars[ 0 ] );
-      fprintf( fd2, "# B = %g (rads^-1)\n", ippars[ 1 ] );
-      fprintf( fd2, "# C = %g (rads^-2)\n", ippars[ 2 ] );
-      fprintf( fd2, "# D = %g (rads)\n", ippars[ 3 ] );
-      fprintf( fd2, "#\n" );
-      fprintf( fd2, "# p = A + B*el_rad + C*el_rad*el_rad\n" );
-      fprintf( fd2, "# Qn = p*cos( -2*( el_rad - D ) )\n" );
-      fprintf( fd2, "# Un = p*sin( -2*( el_rad - D ) )\n" );
+      if( imodel == SINGLE_COMP ) {
+         fprintf( fd2, "# A = %g\n", ippars[ 0 ] );
+         fprintf( fd2, "# B = %g (rads^-1)\n", ippars[ 1 ] );
+         fprintf( fd2, "# C = %g (rads^-2)\n", ippars[ 2 ] );
+         fprintf( fd2, "# D = %g (rads)\n", ippars[ 3 ] );
+         fprintf( fd2, "#\n" );
+         fprintf( fd2, "# p = A + B*el_rad + C*el_rad*el_rad\n" );
+         fprintf( fd2, "# Qn = p*cos( -2*( el_rad - D ) )\n" );
+         fprintf( fd2, "# Un = p*sin( -2*( el_rad - D ) )\n" );
+      } else {
+         fprintf( fd2, "# A = %g\n", ippars[ 0 ] );
+         fprintf( fd2, "# B = %g\n", ippars[ 1 ] );
+         fprintf( fd2, "# C = %g (rads)\n", ippars[ 2 ] );
+         fprintf( fd2, "# D = %g\n", ippars[ 3 ] );
+         fprintf( fd2, "# E = %g (rads)\n", ippars[ 4 ] );
+         fprintf( fd2, "# F = %g\n", ippars[ 5 ] );
+         fprintf( fd2, "#\n" );
+         fprintf( fd2, "# Qn = A + B*cos( -2*( el_rad - C ) ) + D*cos( -2*( el_rad - E ) )\n" );
+         fprintf( fd2, "# Un = F + B*sin( -2*( el_rad - C ) ) + D*sin( -2*( el_rad - E ) )\n" );
+      }
+
       fprintf( fd2, "#\n" );
       fprintf( fd2, "# el: Elevation (degrees)\n" );
       fprintf( fd2, "# dQfp: Normalised Q correction referenced to focal plane Y axis\n" );
@@ -1569,11 +1621,22 @@ static void smf1_pol2ipcor( ThrWorkForce *wf, AstKeyMap *km, Grp *igrp, const in
       fprintf( fd2, "# p: Fractional polarisation\n" );
       fprintf( fd2, "#\n" );
       fprintf( fd2, "# el dQfp dUfp p\n" );
-      for( k = 25; k < 80; k++ ) {
+      for( k = 20; k <= 80; k++ ) {
          el = k*AST__DD2R;
-         p = ippars[ 0 ] + ippars[ 1 ]*el + ippars[ 2 ]*el*el;
-         q = p*cos( -2.0*( el - ippars[ 3 ] ) );
-         u = p*sin( -2.0*( el - ippars[ 3 ] ) );
+         if( imodel == SINGLE_COMP ) {
+            p = ippars[ 0 ] + ippars[ 1 ]*el + ippars[ 2 ]*el*el;
+            q = p*cos( -2.0*( el - ippars[ 3 ] ) );
+            u = p*sin( -2.0*( el - ippars[ 3 ] ) );
+         } else {
+            angle = -2*( el - ippars[ 2 ] );
+            q = ippars[ 0 ] + ippars[ 1 ]*cos( angle );
+            u = ippars[ 5 ] + ippars[ 1 ]*sin( angle );
+            angle = -2*( el - ippars[ 4 ] );
+            q += ippars[ 3 ]*cos( angle );
+            u += ippars[ 3 ]*sin( angle );
+            p = q*q + u*u;
+            p = ( p > 0.0 ) ? sqrt( p ) : 0.0;
+         }
          fprintf( fd2, "%d %g %g %g\n", k, q, u, p );
       }
 
@@ -2084,9 +2147,9 @@ static int smf1_qsort( const void *a, const void *b, void *data ){
    }
 }
 
-static void smf1_ipfit( size_t n, const double *q, const double *u,
-                        const double *w, const double *e,
-                        int iwave, double par[4], int *status ){
+static void smf1_ipfit( int imodel, size_t n, const double *q,
+                        const double *u, const double *w, const double *e,
+                        int iwave, double par[6], int *status ){
 
 /* Local variables; */
    Params params;
@@ -2118,7 +2181,11 @@ static void smf1_ipfit( size_t n, const double *q, const double *u,
    }
 
 /* Get the number of free parameters. */
-   npar = 4;
+   if( imodel == SINGLE_COMP ) {
+      npar = 4;
+   } else {
+      npar = 6;
+   }
 
 /* Store the starting point - zero for all parameters (i.e. no IP at all). */
    x = gsl_vector_alloc( npar );
@@ -2129,7 +2196,14 @@ static void smf1_ipfit( size_t n, const double *q, const double *u,
    angle is close to zero (as for 850) but the other best fit parameters
    result in a fractional polarisation that is negative. Starting at D=PI/2
    results in a best fit angle close to 90 degs and positive polarisation. */
-   if( iwave == S4 ) gsl_vector_set( x, 3, AST__DPIBY2 );
+   if( iwave == S4 ) {
+      if( imodel == SINGLE_COMP ) {
+         gsl_vector_set( x, 3, AST__DPIBY2 );
+      } else {
+         gsl_vector_set( x, 2, AST__DPIBY2 );
+         gsl_vector_set( x, 4, AST__DPIBY2 );
+      }
+   }
 
 /* Store details of the service routines that calculate the function to
    be minimised and its derivatives. */
@@ -2146,8 +2220,9 @@ static void smf1_ipfit( size_t n, const double *q, const double *u,
    params.ae = e;
    params.n = n;
    params.sw = sw;
+   params.imodel = imodel;
 
-/* Create a 4D minimiser. */
+/* Create a 4D or 6D minimiser. */
    s = gsl_multimin_fdfminimizer_alloc( gsl_multimin_fdfminimizer_conjugate_fr,
                                         npar );
 
@@ -2168,11 +2243,21 @@ static void smf1_ipfit( size_t n, const double *q, const double *u,
       par[ ipar ] = gsl_vector_get( s->x, ipar );
    }
 
-   msgOut( " ", "Best fit parameters:", status );
-   msgOutf( " ", "   A = %g", status, par[0] );
-   msgOutf( " ", "   B = %g (rad^-1)", status, par[1] );
-   msgOutf( " ", "   C = %g (rad^-2)", status, par[2] );
-   msgOutf( " ", "   D = %g (rad)", status, par[3] );
+   if( imodel == SINGLE_COMP ) {
+      msgOut( " ", "Best fit parameters (single component model):", status );
+      msgOutf( " ", "   A = %g", status, par[0] );
+      msgOutf( " ", "   B = %g (rad^-1)", status, par[1] );
+      msgOutf( " ", "   C = %g (rad^-2)", status, par[2] );
+      msgOutf( " ", "   D = %g (rad)", status, par[3] );
+   } else {
+      msgOut( " ", "Best fit parameters (double component model):", status );
+      msgOutf( " ", "   A = %g", status, par[0] );
+      msgOutf( " ", "   B = %g", status, par[1] );
+      msgOutf( " ", "   C = %g (rad)", status, par[2] );
+      msgOutf( " ", "   D = %g", status, par[3] );
+      msgOutf( " ", "   E = %g (rad)", status, par[4] );
+      msgOutf( " ", "   F = %g", status, par[5] );
+   }
    msgOutf( " ", "RMS = %g", status, sqrt(s->f) );
    msgBlank( status );
 
@@ -2188,8 +2273,9 @@ static void smf1_fdf( const gsl_vector *v, void *pars, double *f, gsl_vector *df
 *   parameters stored in "v".
 */
 
-   double tmp, A, B, C, D, dq, du, s1, s2, s3, s4,
-          mq, mu, mp, delta, cosdel, sindel;
+   double tmp, A, B, C, D, E, F, dq, du, s1, s2, s3, s4,
+          mq, mu, mp, delta1, delta2, cosdel1, sindel1,
+          cosdel2, sindel2, s5, s6;
    const double *pe, *pq, *pu, *pw;
    size_t n, i;
    Params *params = (Params *) pars;
@@ -2201,59 +2287,127 @@ static void smf1_fdf( const gsl_vector *v, void *pars, double *f, gsl_vector *df
    pw = params->aw;
    pe = params->ae;
 
+/* First do the calculations for a single component model. */
+   if( params->imodel == SINGLE_COMP ) {
+
 /* Get the parameters of the IP model. */
-   A = gsl_vector_get( v, 0 );
-   B = gsl_vector_get( v, 1 );
-   C = gsl_vector_get( v, 2 );
-   D = gsl_vector_get( v, 3 );
+      A = gsl_vector_get( v, 0 );
+      B = gsl_vector_get( v, 1 );
+      C = gsl_vector_get( v, 2 );
+      D = gsl_vector_get( v, 3 );
 
 /* Initialise the running sums. */
-   *f = 0.0;
-   s1 = 0.0;
-   s2 = 0.0;
-   s3 = 0.0;
-   s4 = 0.0;
+      *f = 0.0;
+      s1 = 0.0;
+      s2 = 0.0;
+      s3 = 0.0;
+      s4 = 0.0;
 
 /* Loop round every point with a positive weight. */
-   for( i = 0; i < n; i++,pu++,pq++,pw++,pe++) {
-      if( *pw > 0.0 ) {
+      for( i = 0; i < n; i++,pu++,pq++,pw++,pe++) {
+         if( *pw > 0.0 ) {
 
 /* Calculate the model Q and U values, given the current elevation and
    the IP model parameters. */
-         delta = -2*( *pe - D );
-         cosdel = cos( delta );
-         sindel = sin( delta );
-         mp = A + B*(*pe) + C*(*pe)*(*pe);
-         mq = mp*cosdel;
-         mu = mp*sindel;
+            delta1 = -2*( *pe - D );
+            cosdel1 = cos( delta1 );
+            sindel1 = sin( delta1 );
+            mp = A + B*(*pe) + C*(*pe)*(*pe);
+            mq = mp*cosdel1;
+            mu = mp*sindel1;
 
 /* Calculate the Q and U residuals at the current elevation. */
-         dq = *pq - mq;
-         du = *pu - mu;
+            dq = *pq - mq;
+            du = *pu - mu;
 
 /* Increment the sums. */
-         *f += (*pw)*( dq*dq + du*du );
-         tmp = (*pw)*( dq*cosdel + du*sindel );
-         s1 += tmp;
-         tmp *= *pe;
-         s2 += tmp;
-         tmp *= *pe;
-         s3 += tmp;
-         s4 += (*pw)*( dq*sindel - du*cosdel )*mp;
+            *f += (*pw)*( dq*dq + du*du );
+            tmp = (*pw)*( dq*cosdel1 + du*sindel1 );
+            s1 += tmp;
+            tmp *= *pe;
+            s2 += tmp;
+            tmp *= *pe;
+            s3 += tmp;
+            s4 += (*pw)*( dq*sindel1 - du*cosdel1 )*mp;
+         }
       }
+
+      *f /= params->sw;
+      s1 *= -2/params->sw;
+      s2 *= -2/params->sw;
+      s3 *= -2/params->sw;
+      s4 *= 4/params->sw;
+
+      gsl_vector_set( df, 0, s1 );
+      gsl_vector_set( df, 1, s2 );
+      gsl_vector_set( df, 2, s3 );
+      gsl_vector_set( df, 3, s4 );
+
+/* Now do the calculations for a double component model. */
+   } else {
+
+/* Get the parameters of the IP model. */
+      A = gsl_vector_get( v, 0 );
+      B = gsl_vector_get( v, 1 );
+      C = gsl_vector_get( v, 2 );
+      D = gsl_vector_get( v, 3 );
+      E = gsl_vector_get( v, 4 );
+      F = gsl_vector_get( v, 5 );
+
+/* Initialise the running sums. */
+      *f = 0.0;
+      s1 = 0.0;
+      s2 = 0.0;
+      s3 = 0.0;
+      s4 = 0.0;
+      s5 = 0.0;
+      s6 = 0.0;
+
+/* Loop round every point with a positive weight. */
+      for( i = 0; i < n; i++,pu++,pq++,pw++,pe++) {
+         if( *pw > 0.0 ) {
+
+/* Calculate the model Q and U values, given the current elevation and
+   the IP model parameters. */
+            delta1 = -2*( *pe - C );
+            cosdel1 = cos( delta1 );
+            sindel1 = sin( delta1 );
+            delta2 = -2*( *pe - E );
+            cosdel2 = cos( delta2 );
+            sindel2 = sin( delta2 );
+            mq = A + B*cosdel1 + D*cosdel2;
+            mu = F + B*sindel1 + D*sindel2;
+
+/* Calculate the Q and U residuals at the current elevation. */
+            dq = *pq - mq;
+            du = *pu - mu;
+
+/* Increment the sums. */
+            *f += (*pw)*( dq*dq + du*du );
+            s1 += (*pw)*dq;
+            s2 = (*pw)*( dq*cosdel1 + du*sindel1 );
+            s3 = (*pw)*( -dq*sindel1 + du*cosdel1 );
+            s4 = (*pw)*( dq*cosdel2 + du*sindel2 );
+            s5 = (*pw)*( -dq*sindel2 + du*cosdel2 );
+            s6 += (*pw)*du;
+         }
+      }
+
+      *f /= params->sw;
+      s1 *= -2/params->sw;
+      s2 *= -2/params->sw;
+      s3 *= -4*B/params->sw;
+      s4 *= -2/params->sw;
+      s5 *= -4*D/params->sw;
+      s6 *= -2/params->sw;
+
+      gsl_vector_set( df, 0, s1 );
+      gsl_vector_set( df, 1, s2 );
+      gsl_vector_set( df, 2, s3 );
+      gsl_vector_set( df, 3, s4 );
+      gsl_vector_set( df, 4, s5 );
+      gsl_vector_set( df, 5, s6 );
    }
-
-   *f /= params->sw;
-   s1 *= -2/params->sw;
-   s2 *= -2/params->sw;
-   s3 *= -2/params->sw;
-   s4 *= 4/params->sw;
-
-   gsl_vector_set( df, 0, s1 );
-   gsl_vector_set( df, 1, s2 );
-   gsl_vector_set( df, 2, s3 );
-   gsl_vector_set( df, 3, s4 );
-
 }
 
 static void smf1_df( const gsl_vector *v, void *pars, gsl_vector *df ){
@@ -2272,7 +2426,8 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
 *  assuming the IP model parameters stored in "v".
 */
 
-   double A, B, C, D, dq, du, mq, mu, mp, delta, cosdel, sindel, f;
+   double A, B, C, D, E, F, dq, du, mq, mu, mp, delta1, cosdel1, sindel1,
+          delta2, cosdel2, sindel2, f;
    const double *pe, *pq, *pu, *pw;
    size_t n, i;
    Params *params = (Params *) pars;
@@ -2284,34 +2439,79 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    pw = params->aw;
    pe = params->ae;
 
+/* First do the calculations for a single component model. */
+   if( params->imodel == SINGLE_COMP ) {
+
 /* Get the parameters of the IP model. */
-   A = gsl_vector_get( v, 0 );
-   B = gsl_vector_get( v, 1 );
-   C = gsl_vector_get( v, 2 );
-   D = gsl_vector_get( v, 3 );
+      A = gsl_vector_get( v, 0 );
+      B = gsl_vector_get( v, 1 );
+      C = gsl_vector_get( v, 2 );
+      D = gsl_vector_get( v, 3 );
 
 /* Initialise the returned value. */
-   f = 0.0;
+      f = 0.0;
 
 /* Loop round every point with a positive weight. */
-   for( i = 0; i < n; i++,pu++,pq++,pw++,pe++) {
-      if( *pw > 0.0 ) {
+      for( i = 0; i < n; i++,pu++,pq++,pw++,pe++) {
+         if( *pw > 0.0 ) {
 
 /* Calculate the model Q and U values, given the current elevation and
    the IP model parameters. */
-         delta = -2*( *pe - D );
-         cosdel = cos( delta );
-         sindel = sin( delta );
-         mp = A + B*(*pe) + C*(*pe)*(*pe);
-         mq = mp*cosdel;
-         mu = mp*sindel;
+            delta1 = -2*( *pe - D );
+            cosdel1 = cos( delta1 );
+            sindel1 = sin( delta1 );
+            mp = A + B*(*pe) + C*(*pe)*(*pe);
+            mq = mp*cosdel1;
+            mu = mp*sindel1;
 
 /* Calculate the Q and U residuals at the current elevation. */
-         dq = *pq - mq;
-         du = *pu - mu;
+            dq = *pq - mq;
+            du = *pu - mu;
 
 /* Increment the sum. */
-         f += (*pw)*( dq*dq + du*du );
+            f += (*pw)*( dq*dq + du*du );
+         }
+      }
+
+/* Nowdo the calculations for a double component model. */
+   } else {
+
+/* Get the parameters of the IP model. */
+      A = gsl_vector_get( v, 0 );
+      B = gsl_vector_get( v, 1 );
+      C = gsl_vector_get( v, 2 );
+      D = gsl_vector_get( v, 3 );
+      E = gsl_vector_get( v, 4 );
+      F = gsl_vector_get( v, 5 );
+
+/* Initialise the returned value. */
+      f = 0.0;
+
+/* Loop round every point with a positive weight. */
+      for( i = 0; i < n; i++,pu++,pq++,pw++,pe++) {
+         if( *pw > 0.0 ) {
+
+/* Calculate the model Q and U values, given the current elevation and
+   the IP model parameters. */
+
+/* Calculate the model Q and U values, given the current elevation and
+   the IP model parameters. */
+            delta1 = -2*( *pe - C );
+            cosdel1 = cos( delta1 );
+            sindel1 = sin( delta1 );
+            delta2 = -2*( *pe - E );
+            cosdel2 = cos( delta2 );
+            sindel2 = sin( delta2 );
+            mq = A + B*cosdel1 + D*cosdel2;
+            mu = F + B*sindel1 + D*sindel2;
+
+/* Calculate the Q and U residuals at the current elevation. */
+            dq = *pq - mq;
+            du = *pu - mu;
+
+/* Increment the sum. */
+            f += (*pw)*( dq*dq + du*du );
+         }
       }
    }
 

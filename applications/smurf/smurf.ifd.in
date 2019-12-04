@@ -4345,6 +4345,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter mapdir {
+                position 1
+                type LITERAL
+                prompt {Path to directory holding input maps}
+                ppath CURRENT DEFAULT
+                default !
+                helpkey *
+            }
+
             parameter modelfile {
                 type LITERAL
                 prompt {Text file to receive model values}
@@ -4353,13 +4362,12 @@ package @PACKAGE@ {
                 default !
                 helpkey *
             }
-
-            parameter mapdir {
-                position 1
+            parameter modeltype {
                 type LITERAL
-                prompt {Path to directory holding input maps}
+                prompt {Type of model (single or double component)}
+                vpath DEFAULT
                 ppath CURRENT DEFAULT
-                default !
+                default SINGLE
                 helpkey *
             }
 
