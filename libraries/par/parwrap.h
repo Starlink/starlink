@@ -40,6 +40,8 @@
 #ifndef PARWRAP_DEFINED
 #define PARWRAP_DEFINED
 
+#include <stdint.h>
+
 void parCancl( const char *param,
                int *status );
 
