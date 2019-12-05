@@ -639,6 +639,26 @@
 *       (P,ANG) values.
 *    28-NOV-2019 (DSB):
 *       Ensure the returned I, Q and U maps have the same bounds.
+*    5-DEC-2019 (DSB):
+*       If an existing I coadd is supplied (either explicitly or as the
+*       IP reference map), and an output catalogue is being created, and
+*       BINSIZE > PIXSIZE, and MAPVAR=yes, then the individual obs I maps
+*       are needed (they are binned up to BINSIZE before being coadded to
+*       form the I coadd used to create the catalogue). If they already
+*       exist then they are re-used (if REUSE=yes). Otherwise, they need
+*       to be re-created form the I time-series. The test to see if the
+*       individual I obs maps already exist used to test for I obs maps
+*       that cannot be created. For instance, if an observation was
+*       split into two chunks - one long and one very short - then it
+*       will probably not be possible to create an I map from the short
+*       chunk, so the test should not look for such an I map. The
+*       previous test failed in such a situation, causing all the
+*       observation I maps to be re-created unnecessarily. In fact there
+*       is no way that I can see to get a list of the expected I obs maps
+*       that is 100% reliable. So the new test just checks that I obs
+*       maps exist for more than 50% of the observation chunks. In
+*       practice, it's probably going to be a case of all exist or none
+*       exist.
 
 '''
 
@@ -2245,21 +2265,28 @@ try:
          if coadd_exists and coadd == ipref and not cat_needs_obsmaps:
             make_new_maps = False
 
-#  Otherwise, if all the expected maps, including the coadd, already exist,
-#  and REUSE is True, we do not re-create the maps. But if any maps are
-#  missing we need to re-create them all. When using skyloop we cannot
-#  re-create one without re-creating them all.
+#  Otherwise, if most of the expected maps, including the coadd, already
+#  exist and REUSE is True, we do not re-create the maps. But if most maps
+#  are missing we need to re-create them all (when using skyloop we cannot
+#  re-create some without re-creating them all). The problem here is that
+#  we cannot determine the list of "expected" maps with 100% confidence. The
+#  "qui_list" list may include very short chunks from observations/subscans
+#  that were split, and for which skyloop could not create an observation
+#  map. So we cannot just use "qui_list" to define the list of expected maps.
+#  Instead, just impose an arbitrary - but probably safe - restriction that
+#  at least 50% of the maps implied by "qui_list" must exist.
          else:
             make_new_maps = True
             if coadd_exists and reuse:
-               make_new_maps = False
+               nexist = 0
                for key in qui_list.keys():
                   obsmap_path = "{0}/{1}_{2}.sdf".format(mapdir,key,suffix)
                   if os.path.exists(obsmap_path):
                      qui_maps[key] = NDG(obsmap_path)
-                  else:
-                     make_new_maps = True
-                     break
+                     nexist += 1
+
+               if nexist < len(qui_list)/2:
+                  make_new_maps = True
 
          if not make_new_maps:
             msg_out("   Re-using previously created maps")
