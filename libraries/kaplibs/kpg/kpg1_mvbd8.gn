@@ -1,0 +1,133 @@
+      SUBROUTINE KPG1_MVBD8<T>( ELA, ARRAY, ELI, INDX, NGOOD, STATUS )
+*+
+*  Name:
+*     KPG1_MVBD8x
+
+*  Purpose:
+*     Moves bad data values to the end of an index of array values.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_MVBD8x( ELA, ARRAY, ELI, INDX, NGOOD, STATUS )
+
+*  Description:
+*     This routine modifies the supplied index array by removing indices
+*     of all bad data values and shuffling indices for good data values
+*     down to fill the gaps.
+
+*  Arguments:
+*     ELA = INTEGER*8 (Given)
+*        The size of the data array.
+*     ARRAY( ELA ) = ? (Given)
+*        The array containing the data values.
+*     ELI = INTEGER*8 (Given)
+*        The size of the index array.
+*     INDX( ELI ) = INTEGER*8 (Given and Returned)
+*        Each element of this array is an index into the ARRAY array. On
+*        exit, the contents of INDX are re-arranged so that indices that
+*        refer to bad data values are removed and indices that refer to
+*        good data values are shuffled down to fill the gaps. Any indices
+*        which are outside the bounds of the data array are treated as if
+*        they referred to bad data values (i.e. they are removed).
+*     NGOOD = INTEGER*8 (Returned)
+*        The number of indices within INDX that refer to good data values.
+*        On exit, the first NGOOD elements of INDX will contain the
+*        indices of the good data values within ARRAY. Any remaining
+*        values of INDX will retain their original values.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.
+
+*  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     DSB: David S Berry (JAC, Hawaii)
+*     {enter_new_authors_here}
+
+*  History:
+*     20-AUG-2009 (DSB):
+*        Original version.
+*     5_DEC-2019 (DSB):
+*        Support huge files.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+
+*  Arguments Given:
+      INTEGER*8 ELA
+      <TYPE> ARRAY( ELA )
+      INTEGER*8 ELI
+
+*  Arguments Given and Returned:
+      INTEGER*8 INDX( ELI )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+       INTEGER*8 I               ! Index of next INDX value to check
+       INTEGER*8 K               ! Index of next data value to check
+       INTEGER*8 NGOOD           ! Number of good values found so far
+*.
+
+*  Initialise returned value.
+      NGOOD = 0
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop round testing every value in the supplied index array.
+      DO I = 1, ELI
+
+*  Get the index of the data value, and check it is within the bounds of
+*  the data array.
+         K = INDX( I )
+         IF( K .GE. 1 .AND. K .LE. ELA ) THEN
+
+*  If the data value is good, increment the number of good values found,
+*  and store its index in the corresponding element of INDX (NGOOD will
+*  always be fewer than or equal to I and so the value of INDX( NGOOD )
+*  will already have been used and so can be over-written safely).
+            IF( ARRAY( K ) .NE. VAL__BAD<T> ) THEN
+               NGOOD = NGOOD + 1
+               INDX( NGOOD ) = K
+            END IF
+
+         END IF
+
+      END DO
+
+      END

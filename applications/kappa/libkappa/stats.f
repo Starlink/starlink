@@ -86,7 +86,7 @@
 *        of NDF dimensions.
 *     MAXIMUM = _DOUBLE (Write)
 *        The maximum pixel value found in the NDF array.
-*     MAXPOS( ) = _INTEGER (Write)
+*     MAXPOS( ) = _INT64 (Write)
 *        A one-dimensional array of pixel indices identifying the
 *        (first) maximum-valued pixel found in the NDF array.  The
 *        number of indices is equal to the number of NDF dimensions.
@@ -105,7 +105,7 @@
 *        of NDF dimensions.
 *     MINIMUM = _DOUBLE (Write)
 *        The minimum pixel value found in the NDF array.
-*     MINPOS( ) = _INTEGER (Write)
+*     MINPOS( ) = _INT64 (Write)
 *        A one-dimensional array of pixel indices identifying the
 *        (first) minimum-valued pixel found in the NDF array.  The
 *        number of indices is equal to the number of NDF dimensions.
@@ -114,14 +114,14 @@
 *        individual axis values are comma separated.
 *     NDF = NDF (Read)
 *        The NDF data structure to be analysed.
-*     NUMBAD = _INTEGER (Write)
+*     NUMBAD = _INT64 (Write)
 *        The number of pixels which were either not valid or were
 *        rejected from the statistics during iterative K-sigma
 *        clipping.
-*     NUMGOOD = _INTEGER (Write)
+*     NUMGOOD = _INT64 (Write)
 *        The number of NDF pixels which actually contributed to the
 *        computed statistics.
-*     NUMPIX = _INTEGER (Write)
+*     NUMPIX = _INT64 (Write)
 *        The total number of pixels in the NDF (both good and bad).
 *     ORDER = _LOGICAL (Read)
 *        Whether or not to calculate order statistics.  If set TRUE
@@ -249,6 +249,8 @@
 *        difference for small NDF arrays.
 *     2013 August 23 (MJC):
 *        Ordered statistics now respect sigma clipping.
+*     5-DEC-2019 (DSB):
+*        Support huge NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -310,33 +312,33 @@
       DOUBLE PRECISION STDEVC    ! Std. devn. of pixels after clipping
       DOUBLE PRECISION SUM       ! Sum of pixels in array
       DOUBLE PRECISION SUMC      ! Sum of pixels after clipping
-      INTEGER EL                 ! Number of array elements mapped
       INTEGER I                  ! Loop counter for NDF dimensions
       INTEGER ICLIP              ! Loop counter for clipping levels
       INTEGER IFIL               ! File descriptor for logfile
-      INTEGER IMAX( 1 )          ! Vector index of max. pixel
-      INTEGER IMAXC( 1 )         ! Vector index of max. clipped pixel
-      INTEGER IMIN( 1 )          ! Vector index of min. pixel
-      INTEGER IMINC( 1 )         ! Vector index of min. clipped pixel
-      INTEGER ISTAT( 3 )         ! Array of integer statistics
-      INTEGER ISTATC( 3 )        ! Array of clipped integer statistics
       INTEGER IWCS               ! Pointer to WCS FrameSet
       INTEGER J                  ! Loop counter for clipped order stats
-      INTEGER LBND( NDF__MXDIM ) ! NDF lower bounds
-      INTEGER MAXP( NDF__MXDIM ) ! Indices of maximum-valued pixel
-      INTEGER MAXPC( NDF__MXDIM ) ! Maximum pixel indices after clipping
-      INTEGER MINP( NDF__MXDIM ) ! Indices of minimum-valued pixel
-      INTEGER MINPC( NDF__MXDIM ) ! Minimum pixel indices after clipping
       INTEGER NC                 ! No. characters in text buffer
       INTEGER NCLIP              ! Number of clipping iterations
       INTEGER NDF                ! NDF identifier
       INTEGER NDIM               ! Number of NDF dimensions
-      INTEGER NGOOD              ! No. valid pixels in array
-      INTEGER NGOODC             ! No. valid pixels after clipping
       INTEGER NUMPER             ! Number of percentiles
       INTEGER NWCS               ! Number of WCS axes
       INTEGER PNTR( 1 )          ! Pointer to mapped NDF array
-      INTEGER UBND( NDF__MXDIM ) ! NDF upper bounds
+      INTEGER*8 EL               ! Number of array elements mapped
+      INTEGER*8 IMAX( 1 )        ! Vector index of max. pixel
+      INTEGER*8 IMAXC( 1 )       ! Vector index of max. clipped pixel
+      INTEGER*8 IMIN( 1 )        ! Vector index of min. pixel
+      INTEGER*8 IMINC( 1 )       ! Vector index of min. clipped pixel
+      INTEGER*8 ISTAT( 3 )       ! Array of integer statistics
+      INTEGER*8 ISTATC( 3 )      ! Array of clipped integer statistics
+      INTEGER*8 LBND( NDF__MXDIM ) ! NDF lower bounds
+      INTEGER*8 MAXP( NDF__MXDIM ) ! Indices of maximum-valued pixel
+      INTEGER*8 MAXPC( NDF__MXDIM )! Maximum pixel indices after clipping
+      INTEGER*8 MINP( NDF__MXDIM ) ! Indices of minimum-valued pixel
+      INTEGER*8 MINPC( NDF__MXDIM )! Minimum pixel indices after clipping
+      INTEGER*8 NGOOD            ! No. valid pixels in array
+      INTEGER*8 NGOODC           ! No. valid pixels after clipping
+      INTEGER*8 UBND( NDF__MXDIM )! NDF upper bounds
       LOGICAL BAD                ! Bad-pixel flag
       LOGICAL DOPRCT             ! Percentiles have been supplied?
       LOGICAL LOGFIL             ! Log file required?
@@ -495,7 +497,7 @@
 
 *  Map the array using this numeric type and see whether there may be
 *  bad pixels present.
-      CALL KPG1_MAP( NDF, MCOMP, TYPE, 'READ', PNTR, EL, STATUS )
+      CALL KPG1_MAP8( NDF, MCOMP, TYPE, 'READ', PNTR, EL, STATUS )
       IF ( COMP .EQ. 'QUALITY' ) THEN
          BAD = .FALSE.
       ELSE
@@ -504,32 +506,32 @@
 
 *  Call the appropriate routine to compute the statistics.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL KPG_OSTAB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+         CALL KPG_OSTA8B( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NCLIP, CLIP, ISTAT, DSTAT,
      :                   ISTATC, DSTATC, STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG_OSTAD( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+         CALL KPG_OSTA8D( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NCLIP, CLIP, ISTAT, DSTAT,
      :                   ISTATC, DSTATC, STATUS )
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG_OSTAI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+         CALL KPG_OSTA8I( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NCLIP, CLIP, ISTAT, DSTAT,
      :                   ISTATC, DSTATC, STATUS )
 
       ELSE IF ( TYPE .EQ. '_INT64' ) THEN
-         CALL KPG_OSTAK( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+         CALL KPG_OSTA8K( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NCLIP, CLIP, ISTAT, DSTAT,
      :                   ISTATC, DSTATC, STATUS )
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL KPG_OSTAR( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+         CALL KPG_OSTA8R( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NCLIP, CLIP, ISTAT, DSTAT,
      :                   ISTATC, DSTATC, STATUS )
 
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL KPG_OSTAW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+         CALL KPG_OSTA8W( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NCLIP, CLIP, ISTAT, DSTAT,
      :                   ISTATC, DSTATC, STATUS )
       END IF
@@ -559,12 +561,12 @@
 
 *  Obtain the NDF bounds and initialise the indices of the minimum and
 *  maximim pixel positions and co-ordinates.
-      CALL NDF_BOUND( NDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+      CALL NDF_BOUND8( NDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
       DO 1 I = 1, NDIM
-         MINP( I ) = VAL__BADI
-         MINPC( I ) = VAL__BADI
-         MAXP( I ) = VAL__BADI
-         MAXPC( I ) = VAL__BADI
+         MINP( I ) = VAL__BADK
+         MINPC( I ) = VAL__BADK
+         MAXP( I ) = VAL__BADK
+         MAXPC( I ) = VAL__BADK
          MINC( I ) = VAL__BADD
          MINCC( I ) = VAL__BADD
          MAXC( I ) = VAL__BADD
@@ -574,10 +576,10 @@
 *  If available, convert the minimum and maximum pixel locations into
 *  N-dimensional indices and then into co-ordinate values.
       IF ( NGOOD .NE. 0 ) THEN
-         CALL KPG1_VEC2N( 1, IMIN, NDIM, LBND, UBND, MINPC, STATUS )
-         CALL KPG1_VEC2N( 1, IMAX, NDIM, LBND, UBND, MAXPC, STATUS )
-         CALL KPG1_PX2AX( NDIM, MINPC, NDF, MINCC, STATUS )
-         CALL KPG1_PX2AX( NDIM, MAXPC, NDF, MAXCC, STATUS )
+         CALL KPG1_VEC2N8( 1, IMIN, NDIM, LBND, UBND, MINPC, STATUS )
+         CALL KPG1_VEC2N8( 1, IMAX, NDIM, LBND, UBND, MAXPC, STATUS )
+         CALL KPG1_PX2AX8( NDIM, MINPC, NDF, MINCC, STATUS )
+         CALL KPG1_PX2AX8( NDIM, MAXPC, NDF, MAXCC, STATUS )
 
          DO I = 1, NDIM
             MINP( I ) = MINPC( I )
@@ -612,32 +614,32 @@
          CRANGE( 1 ) = DMINC
          CRANGE( 2 ) = DMAXC
          IF ( TYPE .EQ. '_BYTE' ) THEN
-            CALL KPG_STOCB( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+            CALL KPG_STOC8B( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
      :                      NUMPER, PERCNT, CRANGE, MEDIAN, PERVAL,
      :                      STATUS )
 
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG_STOCD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+            CALL KPG_STOC8D( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
      :                      NUMPER, PERCNT, CRANGE, MEDIAN, PERVAL,
      :                      STATUS )
 
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-            CALL KPG_STOCI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+            CALL KPG_STOC8I( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
      :                      NUMPER, PERCNT, CRANGE, MEDIAN, PERVAL,
      :                      STATUS )
 
          ELSE IF ( TYPE .EQ. '_INT64' ) THEN
-            CALL KPG_STOCK( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+            CALL KPG_STOC8K( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
      :                      NUMPER, PERCNT, CRANGE, MEDIAN, PERVAL,
      :                      STATUS )
 
          ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-            CALL KPG_STOCR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+            CALL KPG_STOC8R( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
      :                      NUMPER, PERCNT, CRANGE, MEDIAN, PERVAL,
      :                      STATUS )
 
          ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-            CALL KPG_STOCW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+            CALL KPG_STOC8W( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
      :                      NUMPER, PERCNT, CRANGE, MEDIAN, PERVAL,
      :                      STATUS )
 
@@ -647,12 +649,12 @@
 *  Display the statistics, using the most appropriate floating-point
 *  precision.
       IF ( TYPE .EQ. '_DOUBLE' .OR. TYPE .EQ. '_INT64' ) THEN
-         CALL KPG1_STDSD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
+         CALL KPG1_STDS8D( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV, SKEW,
      :                    KURT, MEDIAN( 1 ), MODE, MAX( 1, NUMPER ),
      :                    PERCNT, PERVAL, MAXWCS, MINWCS, STATUS )
       ELSE
-         CALL KPG1_STDSR( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
+         CALL KPG1_STDS8R( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV, SKEW,
      :                    KURT, MEDIAN( 1 ), MODE, MAX( 1, NUMPER ),
      :                    PERCNT, PERVAL, MAXWCS, MINWCS, STATUS )
@@ -661,12 +663,12 @@
 *  Also write the statistics to the logfile, if used.
       IF ( LOGFIL ) THEN
          IF ( TYPE .EQ. '_DOUBLE' .OR. TYPE .EQ. '_INT64' ) THEN
-            CALL KPG1_STFLD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
+            CALL KPG1_STFL8D( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV, SKEW,
      :                       KURT, MEDIAN(  1 ), MODE, MAX( 1, NUMPER ),
      :                       PERCNT, PERVAL, IFIL, STATUS )
          ELSE
-            CALL KPG1_STFLR( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
+            CALL KPG1_STFL8R( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV, SKEW,
      :                       KURT, MEDIAN( 1 ), MODE, MAX( 1, NUMPER ),
      :                       PERCNT, PERVAL, IFIL, STATUS )
@@ -678,10 +680,12 @@
 *  and convert them into co-ordinate values.
       IF ( NCLIP .NE. 0 ) THEN
          IF ( NGOODC .NE. 0 ) THEN
-            CALL KPG1_VEC2N( 1, IMINC, NDIM, LBND, UBND, MINPC, STATUS )
-            CALL KPG1_VEC2N( 1, IMAXC, NDIM, LBND, UBND, MAXPC, STATUS )
-            CALL KPG1_PX2AX( NDIM, MINPC, NDF, MINCC, STATUS )
-            CALL KPG1_PX2AX( NDIM, MAXPC, NDF, MAXCC, STATUS )
+            CALL KPG1_VEC2N8( 1, IMINC, NDIM, LBND, UBND, MINPC,
+     :                        STATUS )
+            CALL KPG1_VEC2N8( 1, IMAXC, NDIM, LBND, UBND, MAXPC,
+     :                        STATUS )
+            CALL KPG1_PX2AX8( NDIM, MINPC, NDF, MINCC, STATUS )
+            CALL KPG1_PX2AX8( NDIM, MAXPC, NDF, MAXCC, STATUS )
          END IF
 
 *  Generate a heading for the clipped statistics, including a list of
@@ -702,14 +706,14 @@
 *  most appropriate floating-point precision.
          CALL MSG_OUT( 'CLIPDONE', BUF( : NC ), STATUS )
          IF ( TYPE .EQ. '_DOUBLE' .OR. TYPE .EQ. '_INT64' ) THEN
-            CALL KPG1_STDSD( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
+            CALL KPG1_STDS8D( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
      :                       MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
      :                       STDEVC, SKEWC, KURTC, MEDIAN( 2 ), MODE,
      :                       MAX( 1, NUMPER ), PERCNT,
      :                       PERVAL( 1 + NUMPER ), MAXWCS, MINWCS,
      :                       STATUS )
          ELSE
-            CALL KPG1_STDSR( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
+            CALL KPG1_STDS8R( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
      :                       MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
      :                       STDEVC, SKEWC, KURTC, MEDIAN( 2 ), MODE,
      :                       MAX( 1, NUMPER ), PERCNT,
@@ -721,14 +725,14 @@
          IF ( LOGFIL ) THEN
             CALL FIO_WRITE( IFIL, BUF( : NC ), STATUS )
             IF ( TYPE .EQ. '_DOUBLE' .OR. TYPE .EQ. '_INT64' ) THEN
-               CALL KPG1_STFLD( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
+               CALL KPG1_STFL8D( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
      :                          MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
      :                          STDEVC, SKEWC, KURTC, MEDIAN( 2 ), MODE,
      :                          MAX( 1, NUMPER ), PERCNT, PERVAL, IFIL,
      :                          MAX( 1, NUMPER ), PERCNT,
      :                          PERVAL( 1 + NUMPER ), IFIL, STATUS )
             ELSE
-               CALL KPG1_STFLR( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
+               CALL KPG1_STFL8R( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
      :                          MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
      :                          STDEVC, SKEWC, KURTC, MEDIAN( 2 ), MODE,
      :                          MAX( 1, NUMPER ), PERCNT,
@@ -747,13 +751,13 @@
       CALL PAR_PUT0D( 'SKEWNESS', SKEWC, STATUS )
       CALL PAR_PUT0D( 'KURTOSIS', KURTC, STATUS )
       CALL PAR_PUT0D( 'TOTAL', SUMC, STATUS )
-      CALL PAR_PUT0I( 'NUMBAD', EL - NGOODC, STATUS )
-      CALL PAR_PUT0I( 'NUMGOOD', NGOODC, STATUS )
-      CALL PAR_PUT0I( 'NUMPIX', EL, STATUS )
+      CALL PAR_PUT0K( 'NUMBAD', EL - NGOODC, STATUS )
+      CALL PAR_PUT0K( 'NUMGOOD', NGOODC, STATUS )
+      CALL PAR_PUT0K( 'NUMPIX', EL, STATUS )
       CALL PAR_PUT1D( 'MAXCOORD', NWCS, MAXCC, STATUS )
       CALL PAR_PUT1D( 'MINCOORD', NWCS, MINCC, STATUS )
-      CALL PAR_PUT1I( 'MAXPOS', NDIM, MAXPC, STATUS )
-      CALL PAR_PUT1I( 'MINPOS', NDIM, MINPC, STATUS )
+      CALL PAR_PUT1K( 'MAXPOS', NDIM, MAXPC, STATUS )
+      CALL PAR_PUT1K( 'MINPOS', NDIM, MINPC, STATUS )
       IF ( ORDER ) THEN
          IF ( NCLIP .NE. 0 ) THEN
             CALL PAR_PUT0D( 'MEDIAN', MEDIAN( 2 ), STATUS )

@@ -91,17 +91,19 @@ kpg1_stor.gn kpg1_tdli.gn kpg1_thrs.gn kpg1_trli.gn \
 kpg1_trsp.gn kpg1_vasv.gn kpg1_wmod.gn kpg1_mvbd.gn \
 kpg1_sclb.gn kpg1_scli.gn kpg1_scluw.gn kpg1_sclub.gn \
 kpg1_sclw.gn kpg1_sclk.gn kpg1_ptnd.gn kpg1_bbox.gn kpg_osta.gn \
-kpg_fise.gn  kpg_immm.gn kpg1_corr.gn kpg1_rms.gn kpg1_ltva.gn
+kpg_fise.gn  kpg_immm.gn kpg1_corr.gn kpg1_rms.gn kpg1_ltva.gn \
+kpg_osta8.gn kpg1_mvbd8.gn kpg1_retr8.gn kpg1_thrs8.gn
 
 # All except logical (include char)
 KPG_XL_GEN = kpg1_qsrt.gxl
 
 # All except character
-KPG_XC_GEN = kpg1_retv.gxc
+KPG_XC_GEN = kpg1_retv.gxc kpg1_retv8.gxc
 
 # All except unsigned types
 KPG_BDIKRW_GEN = kpg1_iscl.gbdikrw kpg1_flas.gbdikrw \
-                 kpg_stoc.gbdikrw kpg_stos.gbdikrw
+                 kpg_stoc.gbdikrw kpg_stos.gbdikrw \
+                 kpg_stoc8.gbdikrw
 
 # All except unsigned types and double
 KPG_BIRW_GEN =
@@ -118,7 +120,7 @@ kpg1_hcon.gdr kpg1_hmlt.gdr kpg1_hsds.gdr kpg1_hsfl.gdr \
 kpg1_hstf.gdr kpg1_is3.gdr  \
 kpg_ld2a.gdr  kpg_lr2a.gdr  kpg1_litn.gdr kpg1_ludc.gdr \
 kpg1_mdet.gdr kpg1_mono.gdr kpg1_mthe.gdr kpg1_nbad.gdr \
-kpg_norv.gdr  kpg1_pow.gdr \
+kpg_norv.gdr  kpg1_pow.gdr kpg1_stds8.gdr kpg1_stfl8.gdr \
 kpg1_prow.gdr kpg1_psfs.gdr kpg1_qntl.gdr kpg1_rfco.gdr \
 kpg1_ssaz.gdr kpg1_stds.gdr kpg1_stfl.gdr kpg1_tral.gdr \
 kpg1_trbo.gdr kpg1_trig.gdr kpg1_trpi.gdr kpg1_unz2.gdr \
@@ -219,6 +221,7 @@ kpg1_listc.f \
 kpg1_lutin.f \
 kpg1_lutk2.f \
 kpg1_map.f \
+kpg1_map8.f \
 kpg1_mxmnx.f \
 kpg1_nacvt.f \
 kpg1_nag2r.f \
@@ -239,6 +242,7 @@ kpg1_prnth.f \
 kpg1_pseed.f \
 kpg1_pvers.f \
 kpg1_px2ax.f \
+kpg1_px2ax8.f \
 kpg1_pxscl.f \
 kpg1_quote.f \
 kpg1_r2nag.f \
@@ -262,6 +266,7 @@ kpg1_srcta.f \
 kpg1_sscof.f \
 kpg_typsz.f \
 kpg1_vec2n.f \
+kpg1_vec2n8.f \
 kpg1_verb.f \
 kpg1_wcatw.f \
 kpg1_wcaxc.f \

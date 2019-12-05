@@ -1,7 +1,7 @@
-      SUBROUTINE KPG1_PX2AX( NDIM, PX, INDF, AX, STATUS )
+      SUBROUTINE KPG1_PX2AX8( NDIM, PX, INDF, AX, STATUS )
 *+
 *  Name:
-*     KPG1_PX2AX
+*     KPG1_PX2AX8
 
 *  Purpose:
 *     Converts a pixel's indices into WCS or axis co-ordinates.
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_PX2AX( NDIM, PX, INDF, AX, STATUS )
+*     CALL KPG1_PX2AX8( NDIM, PX, INDF, AX, STATUS )
 
 *  Description:
 *     This routine converts the pixel indices of an NDF pixel into the
@@ -22,7 +22,7 @@
 *  Arguments:
 *     NDIM = INTEGER (Given)
 *        Number of NDF dimensions.
-*     PX( NDIM ) = INTEGER (Given)
+*     PX( NDIM ) = INTEGER*8 (Given)
 *        Indices of the NDF's pixel.
 *     INDF = INTEGER (Given)
 *        NDF identifier.
@@ -72,8 +72,8 @@
 *        Use CNF_PVAL
 *     18-MAY-2007 (RFWS):
 *        Return WCS coords in preference to AXIS coords.
-*     4-DEC-2019 (DSB):
-*        Call KPG1_PX2AX8 to do the work.
+*     5-DEC-2019 (DSB):
+*        Support huge files.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -92,7 +92,7 @@
 
 *  Arguments Given:
       INTEGER NDIM
-      INTEGER PX( NDIM )
+      INTEGER*8 PX( NDIM )
       INTEGER INDF
 
 *  Arguments Returned:
@@ -102,20 +102,77 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER I
-      INTEGER*8 PX8( NDF__MXDIM )
+      DOUBLE PRECISION IN( NDF__MXDIM )! Input PIXEL coords
+      INTEGER*8 EL               ! Number of array elements mapped
+      INTEGER I                  ! Loop counter for dimensions
+      INTEGER IERR               ! Error location (dummy)
+      INTEGER INDFS              ! Identifier for NDF section
+      INTEGER IWCS               ! Identifier for WCS FrameSet
+      INTEGER*8 LBND( NDF__MXDIM ) ! Lower bounds of NDF section
+      INTEGER NERR               ! Error count (dummy)
+      INTEGER PIXFRM             ! Index of PIXEL Frame
+      INTEGER PNTR( 1 )          ! Pointer to mapped array
+      INTEGER*8 UBND( NDF__MXDIM ) ! Upper bounds of NDF section
+      LOGICAL GOTWCS             ! Does the NDF have a WCS FrameSet?
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Convert the supplied 32 bit integers to 64 bit.
-      DO I = 1, NDIM
-         PX8( I ) = PX( i )
-      END DO
+*  If the NDF has a defined WCS component, use it in preference to the
+*  AXIS component.
+      CALL NDF_STATE( INDF, 'WCS', GOTWCS, STATUS )
+      IF( GOTWCS ) THEN
 
-*  Call the 64-bit version of this routine.
-      CALL KPG1_PX2AX8( NDIM, PX, INDF, AX, STATUS )
+*  Get the WCS FrameSet.
+         CALL NDF_GTWCS( INDF, IWCS, STATUS )
+
+*  Find the PIXEL Frame, and make it the base Frame.
+         CALL KPG1_ASFFR( IWCS, 'PIXEL', PIXFRM, STATUS )
+         CALL AST_SETI( IWCS, 'Base', PIXFRM, STATUS )
+
+*  Use the FrameSet to transform the supplied pixel position into the
+*  current WCS Frame.
+         DO I = 1, NDIM
+            IN( I ) = DBLE( PX( I ) ) - 0.5D0
+         END DO
+         CALL AST_TRANN( IWCS, 1, NDIM, 1, IN, .TRUE.,
+     :                   AST_GETI( IWCS, 'Nout', STATUS ), 1, AX,
+     :                   STATUS )
+
+*  Free resources
+         CALL AST_ANNUL( IWCS, STATUS )
+
+*  If no WCS FrameSet was available, use AXIS components.
+      ELSE
+
+*  Set up the lower and upper bounds of an NDF section containing the
+*  pixel to be converted.
+         DO 1 I = 1, NDIM
+            LBND( I ) = PX( I )
+            UBND( I ) = PX( I )
+ 1       CONTINUE
+
+*  Create the NDF section.
+         CALL NDF_SECT8( INDF, NDIM, LBND, UBND, INDFS, STATUS )
+
+*  Loop to convert each pixel index.
+         DO 2 I = 1, NDIM
+
+*  Map the appropriate NDF section axis centre array, giving one mapped
+*  element.
+            CALL NDF_AMAP8( INDFS, 'Centre', I, '_DOUBLE', 'READ', PNTR,
+     :                      EL, STATUS )
+
+*  Extract the element's value and unmap the array.
+            CALL VEC_DTOD( .FALSE., 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                     AX( I ), IERR,
+     :                     NERR, STATUS )
+            CALL NDF_AUNMP( INDFS, 'Centre', I, STATUS )
+ 2       CONTINUE
+
+*  Annul the NDF section identifier.
+         CALL NDF_ANNUL( INDFS, STATUS )
+      END IF
 
       END
-

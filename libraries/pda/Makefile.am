@@ -96,7 +96,8 @@ GEN_F_ROUTINES = $(PDA_BDIKRW_GEN:.gbdikrw=.f)
 # output of generic
 MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
 
-PDA_BDIKRW_GEN = pda_qsia.gbdikrw pda_qsid.gbdikrw
+PDA_BDIKRW_GEN = pda_qsia.gbdikrw pda_qsid.gbdikrw \
+pda_qsia8.gbdikrw
 
 PUBLIC_F_INCLUDES =
 PUBLIC_C_INCLUDES = pda.h

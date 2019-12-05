@@ -1,0 +1,381 @@
+      SUBROUTINE KPG_OSTA8<T>( BAD, EL, DATA, NCLIP, CLIP, ISTAT, DSTAT,
+     :                        ISTATC, DSTATC, STATUS )
+*+
+*  Name:
+*     KPG_OSTA8x
+
+*  Purpose:
+*     Computes simple statistics for an array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG_OSTA8x( BAD, EL, DATA, NCLIP, CLIP, ISTAT, DSTAT,
+*                     ISTATC, DSTATC, STATUS )
+
+*  Description:
+*     This routine computes simple statistics for an array, namely: the
+*     number of valid pixels; the minimum and maximum pixel values (and
+*     their positions); the pixel sum; the mean; and the population
+*     standard deviation, skewness, and excess kurtosis.  Iterative
+*     K-sigma clipping may also be optionally applied.
+*
+*     It uses a one-pass recursive algorithm for efficiency using the
+*     formulae of Terriberry (2007).
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether checks for bad pixels should be performed on the array
+*        being analysed.
+*     EL = INTEGER*8 (Given)
+*        Number of pixels in the array.
+*     DATA( EL ) = ? (Given)
+*        Array to be analysed.
+*     NCLIP = INTEGER (Given)
+*        Number of K-sigma clipping iterations to apply (may be zero).
+*     CLIP( NCLIP ) = REAL (Given)
+*        Array of clipping limits for successive iterations, expressed
+*        as standard deviations.
+*     ISTAT( 3 ) = INTEGER*8 (Returned)
+*        The integer statistics before clipping.  The meanings of the
+*        elements in order are as follows.
+*        -  Number of valid pixels
+*        -  Index where the pixel with the lowest value was (first)
+*        found
+*        -  Index where the pixel with the highest value was (first)
+*        found
+*     DSTAT( 7 ) = DOUBLE PRECISION (Returned)
+*        The floating-point statistics before clipping derived from the
+*        valid pixel values in DATA.  The meanings of the elements in
+*        order are as follows.
+*        -  Minimum value
+*        -  Maximum value
+*        -  Sum
+*        -  Mean
+*        -  Population standard deviation
+*        -  Population skewness
+*        -  Population excess kurtosis.  This is zero for a Gaussian.
+*     ISTATC( 3 ) = INTEGER*8 (Returned)
+*        The integer statistics after clipping derived from the valid
+*        pixel values in DATA.  The attributions of the elements are
+*        the same as for argument ISTAT.  If NCLIP is zero, the
+*        array will contain the same values as ISTAT.
+*     DSTATC( 7 ) = DOUBLE PRECISION (Returned)
+*        The floating-point statistics after clipping derived from the
+*        valid pixel values in DATA.  The attributions of the elements
+*        are the same as for argument DSTAT.  If NCLIP is zero, the
+*        array will contain the same values as DSTAT.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each of the standard numeric types.
+*     Replace "x" in the routine name by D, R, I, W, UW, B or UB as
+*     appropriate. The data type of the array being analysed must match
+*     the particular routine used.
+*     -  If no clipping is performed (i.e. if NCLIP = 0) then the values
+*     of arguments which return results after clipping will be the same
+*     as for those returning results before clipping.
+*     -  If ISTAT(1) or ISTATC(1) is zero, then the values of all the
+*     derived statistics will be undefined and will be set to the "bad"
+*     value appropriate to their data type (except for the pixel sum,
+*     which will be zero).
+
+*  References:
+*     Terriberry, T.B., 2007, Computing Higher-order Moments Online,
+*     http://people.xiph.org/~tterribe/notes/homs.html.
+
+*  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2010 July 21 (MJC):
+*        Original version.
+*     2010 August 4 (MJC):
+*        Check the second moment is not zero when computing the
+*        skewness and kurtosis.
+*     2010 August 6 (MJC):
+*        Always store statistics to the returned clipped-statistics
+*        arrays.
+*     5-DEC-2019 (DSB):
+*        Support huge files.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
+
+*  Arguments Given:
+      LOGICAL BAD
+      INTEGER*8 EL
+      <TYPE> DATA( EL )
+      INTEGER NCLIP
+      REAL CLIP( * )
+
+*  Arguments Returned:
+      INTEGER*8 ISTAT( 3 )
+      DOUBLE PRECISION DSTAT( 7 )
+      INTEGER*8 ISTATC( 3 )
+      DOUBLE PRECISION DSTATC( 7 )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      INTEGER NMOM
+      PARAMETER( NMOM = 4 )
+
+*  Local Variables:
+      DOUBLE PRECISION DEV       ! Deviation from current mean
+      DOUBLE PRECISION DEVN      ! Normalised deviation
+      DOUBLE PRECISION DEVSQ     ! Normalised deviation squared
+      DOUBLE PRECISION DEVSQN    ! Normalised squared deviation
+      DOUBLE PRECISION DMAX      ! Maximum value
+      DOUBLE PRECISION DMIN      ! Minimum value
+      INTEGER*8 I                ! Loop counter for array pixels
+      INTEGER ICLIP              ! Loop counter for clipping iterations
+      INTEGER*8 IMAX             ! Pixel index of maximum value
+      INTEGER*8 IMIN             ! Pixel index of minimum value
+      DOUBLE PRECISION KURT      ! Excess kurtosis
+      DOUBLE PRECISION LLIM      ! Lower clipping limit
+      INTEGER M                  ! Loop counter for moments
+      DOUBLE PRECISION MEAN      ! Mean value of whole population
+      DOUBLE PRECISION MOMENT( NMOM ) ! The moments
+      INTEGER NCLP               ! Number of clipping iterations
+      INTEGER*8 NGOOD            ! Number of good values
+      INTEGER*8 NM1              ! NGOOD minus one
+      DOUBLE PRECISION SKEW      ! Skewness
+      DOUBLE PRECISION STDEV     ! Standard deviation
+      DOUBLE PRECISION SUM       ! Sum of good values
+      DOUBLE PRECISION SUMSQ     ! Sum of pixels squared
+      DOUBLE PRECISION ULIM      ! Upper clipping limit
+      DOUBLE PRECISION VALUE     ! Double-precision array value
+      DOUBLE PRECISION VARNCE    ! Population variance
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
+      INCLUDE 'NUM_DEF_CVT'
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop through each clipping iteration, plus an initial iteration
+*  where no clipping is applied.
+      NCLP = MAX( 0, NCLIP )
+      DO 3 ICLIP = 0, NCLP
+
+*  Initialise for forming statistics.
+         NGOOD = 0
+         SUM = 0.0D0
+         DO M = 1, 4
+            MOMENT( M ) = 0.0D0
+         END DO
+         DMIN = NUM__MAXD
+         DMAX = NUM__MIND
+
+*  If no clipping is being applied, then loop through the array,
+*  selecting all the pixels which are not bad.
+         IF ( ICLIP .EQ. 0 ) THEN
+            MEAN = 0.0D0
+            DO 1 I = 1, EL
+               IF ( ( .NOT. BAD ) .OR.
+     :              ( DATA( I ) .NE. VAL__BAD<T> ) ) THEN
+
+*  Convert the array values to double precision and count them.
+                  VALUE = NUM_<T>TOD( DATA( I ) )
+                  NGOOD = NGOOD + 1
+                  NM1 = NGOOD - 1
+                  SUM = SUM + VALUE
+
+*  Evaluate moments incrementally using the deviations about the
+*  current mean.  These are the formulae of Terriberry.
+                  DEV = VALUE - MOMENT( 1 )
+                  DEVN = DEV / DBLE( NGOOD )
+                  DEVSQ = DEVN * DEVN
+                  DEVSQN = DEV * DEVN * NM1
+                  MOMENT( 1 ) = MOMENT( 1 ) + DEVN
+                  MOMENT( 4 ) = MOMENT( 4 ) +
+     :                          DEVSQN * DEVSQ * DBLE( NGOOD * NGOOD -
+     :                          3 * NGOOD + 3 ) +
+     :                          6.0D0 * DEVSQ * MOMENT( 2 ) -
+     :                          4.0D0 * DEVN * MOMENT( 3 )
+                  MOMENT( 3 ) = MOMENT( 3 ) +
+     :                          DEVSQN * DEVN * DBLE( NGOOD - 2 ) -
+     :                          3.0D0 * DEVN * MOMENT( 2 )
+                  MOMENT( 2 ) = MOMENT( 2 ) + DEVSQN
+
+*  Note the minimum and maximum pixel values and where they occur.
+                  IF ( VALUE .LT. DMIN ) THEN
+                     DMIN = VALUE
+                     IMIN = I
+                  END IF
+                  IF ( VALUE .GT. DMAX ) THEN
+                     DMAX = VALUE
+                     IMAX = I
+                  END IF
+               END IF
+   1        CONTINUE
+
+*  If clipping is being applied, then calculate the clipping limits.
+         ELSE
+            LLIM = MEAN - STDEV * DBLE( CLIP( ICLIP ) )
+            ULIM = MEAN + STDEV * DBLE( CLIP( ICLIP ) )
+            MEAN = 0.0D0
+
+*  Loop (as above), selecting all the pixels which are not bad.
+            DO 2 I = 1, EL
+               IF ( ( .NOT. BAD ) .OR.
+     :              ( DATA( I ) .NE. VAL__BAD<T> ) ) THEN
+
+*  Convert the array values to double precision, but this time select
+*  only those which lie within the clipping limits.
+                  VALUE = NUM_<T>TOD( DATA( I ) )
+                  IF ( ( VALUE .LE. ULIM ) .AND.
+     :                 ( VALUE .GE. LLIM ) ) THEN
+
+*  Count the unclipped values.
+                     NGOOD = NGOOD + 1
+                     NM1 = NGOOD - 1
+                     SUM = SUM + VALUE
+
+*  Evaluate moments incrementally using the deviations about the
+*  current mean.  These are the formulae of Terriberry.
+                     DEV = VALUE - MOMENT( 1 )
+                     DEVN = DEV / DBLE( NGOOD )
+                     DEVSQ = DEVN * DEVN
+                     DEVSQN = DEV * DEVN * NM1
+                     MOMENT( 1 ) = MOMENT( 1 ) + DEVN
+                     MOMENT( 4 ) = MOMENT( 4 ) +
+     :                             DEVSQN * DEVSQ *
+     :                             DBLE( NGOOD * NGOOD -
+     :                                   3 * NGOOD + 3 ) +
+     :                             6.0D0 * DEVSQ * MOMENT( 2 ) -
+     :                             4.0D0 * DEVN * MOMENT( 3 )
+                     MOMENT( 3 ) = MOMENT( 3 ) +
+     :                             DEVSQN * DEVN * DBLE( NGOOD - 2 ) -
+     :                             3.0D0 * DEVN * MOMENT( 2 )
+                     MOMENT( 2 ) = MOMENT( 2 ) + DEVSQN
+
+*  Note the minimum and maximum pixel values and where they occur.
+                     IF ( VALUE .LT. DMIN ) THEN
+                        DMIN = VALUE
+                        IMIN = I
+                     END IF
+                     IF ( VALUE .GT. DMAX ) THEN
+                        DMAX = VALUE
+                        IMAX = I
+                     END IF
+                  END IF
+               END IF
+   2        CONTINUE
+         END IF
+
+*  If there were no valid pixels, then use null result values.
+         IF ( NGOOD .EQ. 0 ) THEN
+            IMIN = VAL__BADK
+            DMIN = VAL__BADD
+            IMAX = VAL__BADK
+            DMAX = VAL__BADD
+            SUM = 0.0D0
+            MEAN = VAL__BADD
+            STDEV = VAL__BADD
+            SKEW = VAL__BADD
+            KURT = VAL__BADD
+
+*  Otherwise, calculate the pixel mean.
+         ELSE
+             MEAN = MOMENT( 1 )
+
+*  Before calculating the standard deviation, check for (a) only one
+*  contributing pixel, (b) all pixels having the same value and (c)
+*  rounding errors producing a negative variance value. In all these
+*  cases, calculate a standard deviation value of zero.
+            VARNCE = MOMENT( 2 ) / DBLE( NGOOD )
+            IF ( ( NGOOD .EQ. 1 ) .OR.
+     :           ( DMIN .EQ. DMAX ) .OR.
+     :           ( VARNCE .LT. 0.0D0 ) ) THEN
+               STDEV = 0.0D0
+
+*  Otherwise, calculate the standard deviation normally.
+            ELSE
+               STDEV = SQRT( VARNCE )
+            END IF
+
+*  Evaluate the skewness and kurtosis from the moments.  Note the
+*  kurtosis is not the pure kurtosis, but the excess kurtosis.  This
+*  evaluates to zero for a Gaussian.  Protect against a zero second
+*  moment with some tolerance for rounding.
+            IF ( ABS( MOMENT( 2 ) ) .GT. 10.0D0 * VAL__EPSD ) THEN
+               SKEW = SQRT( DBLE( NGOOD ) / MOMENT( 2 ) ) *
+     :                      MOMENT( 3 ) / MOMENT( 2 )
+               KURT = DBLE( NGOOD ) * MOMENT( 4 ) /
+     :                ( MOMENT( 2 ) * MOMENT( 2 ) ) - 3.0D0
+            END IF
+         END IF
+
+*  Store the statistics in the returned arrays.  If no clipping was
+*  applied on this iteration, then set values for the un-clipped return
+*  arguments.
+         IF ( ICLIP .EQ. 0 ) THEN
+            ISTAT( 1 ) = NGOOD
+            ISTAT( 2 ) = IMIN
+            DSTAT( 1 ) = DMIN
+            ISTAT( 3 ) = IMAX
+            DSTAT( 2 ) = DMAX
+            DSTAT( 3 ) = SUM
+            DSTAT( 4 ) = MOMENT( 1 )
+            DSTAT( 5 ) = STDEV
+            DSTAT( 6 ) = SKEW
+            DSTAT( 7 ) = KURT
+         END IF
+
+         ISTATC( 1 ) = NGOOD
+         ISTATC( 2 ) = IMIN
+         DSTATC( 1 ) = DMIN
+         ISTATC( 3 ) = IMAX
+         DSTATC( 2 ) = DMAX
+         DSTATC( 3 ) = SUM
+         DSTATC( 4 ) = MOMENT( 1 )
+         DSTATC( 5 ) = STDEV
+         DSTATC( 6 ) = SKEW
+         DSTATC( 7 ) = KURT
+
+*  Quit performing clipping iterations if there are no valid pixels
+*  left.
+         IF ( NGOOD .EQ. 0 ) GO TO 4
+    3 CONTINUE
+    4 CONTINUE
+
+      END

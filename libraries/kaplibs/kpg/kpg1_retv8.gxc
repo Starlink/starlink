@@ -1,0 +1,124 @@
+      SUBROUTINE KPG1_RETV8<T>( EL, ARRAY, NVAL, INDEX, VALUES, STATUS )
+*+
+*  Name:
+*     KPG1_RETV8x
+
+*  Purpose:
+*     Retrieves values specified by index from a vector
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_RETV8x( EL, ARRAY, NVAL, INDEX, VALUES, STATUS )
+
+*  Description:
+*     This routine returns values from a vector at supplied indices.
+*     This is intended for accessing a few values from a mapped array.
+
+*  Arguments:
+*     EL = INTEGER*8 (Given)
+*        The number of elements in the array.
+*     ARRAY( EL ) = ? (Given)
+*        The input array.
+*     NVAL = INTEGER (Given)
+*        The number of element values to return.
+*     INDEX( NVAL ) = INTEGER*8 (Given)
+*        The indices of the array elements to be returned.
+*     VALUES( NVAL ) = ? (Returned)
+*        The value of the Xth array element.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Implementation Status:
+*     -  There is a routine for each of the numerics data types and
+*     logical: replace "x" in the routine name by D, R, I, K, W, UW,
+*     B, UB, L as appropriate.  The array supplied to the routine must
+*     have the data type specified.
+*     -  Bad status is returned if the supplied indices lie beyond
+*    the array bounds.
+
+*  Copyright:
+*     Copyright (C) 2005 Particle Physics & Astronomy Research
+*                   Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2005 August 12 (MJC):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER*8 EL
+      INTEGER NVAL
+      INTEGER*8 INDEX( NVAL )
+      <TYPE> ARRAY( EL )
+
+*  Arguments Returned:
+      <TYPE> VALUES( NVAL )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop counter
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Validate the supplied indices.  If they don not all lie within the
+*    array's bounds, report an the error and exit.
+      DO I = 1, NVAL
+         IF ( INDEX( I ) .LT. 1 .OR. INDEX( I ) .GT. EL ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETK( 'X', INDEX( I ) )
+            CALL MSG_SETI( 'I', I )
+            CALL MSG_SETK( 'EL', EL )
+            CALL ERR_REP( 'KPG1_RETV8x',
+     :        'Unable to return a value for index ^X.  Allowed '/
+     :        /'values are from 1 to ^EL. (Programming error)', STATUS )
+            GOTO 999
+         END IF
+      END DO
+
+*  Now fill the returned array with values.
+      DO I = 1, NVAL
+         VALUES( I ) = ARRAY( INDEX( I ) )
+      END DO
+
+  999 CONTINUE
+
+      END

@@ -17475,7 +17475,7 @@ iraf! {
 
          parameter maxpos {
             size *
-            type _INTEGER
+            type _INT64
             access WRITE
             vpath INTERNAL
             helpkey *
@@ -17515,7 +17515,7 @@ iraf! {
 
          parameter minpos {
             size *
-            type _INTEGER
+            type _INT64
             access WRITE
             vpath INTERNAL
             helpkey *
@@ -17541,7 +17541,7 @@ iraf! {
          }
 
          parameter numbad {
-            type _INTEGER
+            type _INT64
             access WRITE
             vpath DEFAULT
             default 0
@@ -17549,7 +17549,7 @@ iraf! {
          }
 
          parameter numgood {
-            type _INTEGER
+            type _INT64
             access WRITE
             vpath DEFAULT
             default 0
@@ -17557,7 +17557,7 @@ iraf! {
          }
 
          parameter numpix {
-            type _INTEGER
+            type _INT64
             access WRITE
             vpath DEFAULT
             default 0

@@ -1,0 +1,100 @@
+      SUBROUTINE KPG1_RETR8<T>( EL, INDEX, DATA, VALUE, STATUS )
+*+
+*  Name:
+*     KPG1_RETR8x
+
+*  Purpose:
+*     Retrieves a value from an array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_RETR8x( EL, INDEX, DATA, VALUE, STATUS )
+
+*  Description:
+*     The value stored at a given index within the supplied array is
+*     returned.
+
+*  Arguments:
+*     EL = INTEGER*8 (Given)
+*        The number of elements in the array.
+*     INDEX = INTEGER*8 (Given)
+*        The index within the array of the required value.
+*     DATA( EL ) = ? (Given)
+*        The input array.
+*     VALUE = ? (Returned)
+*        The returned value.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for all numeric data types: replace "x" in
+*     the routine name by B, D, I, R, UB, UW, or W as appropriate.  The
+*     VALUE and DATA arguments must have the data type specified.
+
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council.
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     12-NOV-1993 (DSB):
+*        Original version.
+*     1995 April 12 (MJC):
+*        Made generic, and renamed from KPS1_RETR8.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER*8 EL
+      INTEGER*8 INDEX
+      <TYPE> DATA( EL )
+
+*  Arguments Returned:
+      <TYPE> VALUE
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Get the required value from the supplied data array at the supplied
+*  index.
+      VALUE = DATA( INDEX )
+
+      END

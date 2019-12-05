@@ -1,0 +1,297 @@
+      SUBROUTINE KPG1_THRS8<T>( BAD, EL, INARR, THRLO, THRHI, NEWLO,
+     :                          NEWHI, OUTARR, NREPLO, NREPHI, STATUS )
+*+
+*  Name:
+*     KPG1_THRS8x
+
+*  Purpose:
+*     Sets pixels in array to defined new values outside limits.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_THRS8x( BAD, EL, INARR, THRLO, THRHI, NEWLO, NEWHI,
+*                       OUTARR, NREPLO, NREPHI, STATUS )
+
+*  Description:
+*     This routine takes an array and sets all values above a defined
+*     upper threshold to a new defined value, and sets all those below a
+*     defined lower threshold to another defined value.  In practice,
+*     all values outside the two thresholds may be set to zero or
+*     the bad value, for example.
+*
+*     If the lower threshold is greater than or equal to the upper
+*     threshold, the values between the thresholds are set to the
+*     supplied lower replacement value, and the upper replacement value
+*     is ignored. In this case the number of replaced pixels is returned
+*     in NREPLO, and NREPHI is returned as -1.
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*         The bad-pixel flag.  If it is .TRUE., tests are made for bad
+*         array values.  When .FALSE., no tests are made for bad values,
+*         and any encountered are treated literally.
+*     EL = INTEGER*8 (Given)
+*         Dimension of the input and output arrays.
+*     INARR( EL ) = ? (Given)
+*         Input data to be thresholded.
+*     THRLO = ? (Given)
+*         Upper threshold level.
+*     THRHI = ? (Given)
+*         Lower threshold level.
+*     NEWLO = ? (Given)
+*         Value to which pixels below THRLO will be set.
+*     NEWHI = ? (Given)
+*         Value to which pixels above THRHI will be set.
+*     NREPLO = ? (Returned)
+*         The number of values less than the lower threshold and
+*         substituted.
+*     NREPHI = ? (Returned)
+*         The number of values greater than the upper threshold and
+*         substituted.
+*     OUTARR( EL ) = ? (Returned)
+*         Output thresholded data.
+*     STATUS = INTEGER (Given)
+*         Global status.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
+*     arrays and values supplied to the routine must have the data type
+*     specified.
+
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 1996, 2000 Central Laboratory of the Research
+*                   Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     MJC: Malcolm Currie  (STARLINK)
+*     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1991 November 6 (MJC):
+*        Original version.
+*     1996 April 11 (MJC):
+*        Added BAD argument, and its consequences.
+*     6-DEC-2000 (DSB):
+*        Allow THRLO to be greater than THRHI.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT  NONE                 ! No default typing allowed
+
+*  Global Constants:
+      INCLUDE  'SAE_PAR'             ! SSE global definitions
+      INCLUDE  'PRM_PAR'             ! Bad-value definitions
+
+*  Arguments Given:
+      LOGICAL BAD
+      INTEGER*8 EL
+      <TYPE> INARR( EL )
+      <TYPE> THRLO
+      <TYPE> THRHI
+      <TYPE> NEWLO
+      <TYPE> NEWHI
+
+*  Arguments Returned:
+      <TYPE> OUTARR( EL )
+      INTEGER*8 NREPLO
+      INTEGER*8 NREPHI
+
+*  Status:
+      INTEGER STATUS
+
+*  Local Variables:
+      INTEGER*8 J                    ! Loop counter
+
+*.
+
+*  Check the inherited status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  First handle cases where values outside a given range are to be
+*  replaced.
+*  ***************************************************************
+      IF ( THRLO .LE. THRHI ) THEN
+
+*  Initialise the counters.
+         NREPLO = 0
+         NREPHI = 0
+
+*  Test for bad values.
+*  ====================
+         IF ( BAD ) THEN
+
+*  Loop through all pixels in the input array.
+            DO J = 1, EL
+
+*  Check for a bad pixel.
+               IF ( INARR( J ) .EQ. VAL__BAD<T> ) THEN
+                  OUTARR( J ) = VAL__BAD<T>
+
+*  Check input array value and act accordingly.
+               ELSE IF ( INARR( J ) .GT. THRHI ) THEN
+
+*  The input pixel value is greater than upper threshold---set output
+*  pixel to the given replacement value.  Increment the count of
+*  substitutions.
+                  OUTARR( J ) = NEWHI
+                  NREPHI = NREPHI + 1
+
+               ELSE IF ( INARR( J ) .LT. THRLO ) THEN
+
+*  The input pixel value is less than lower threshold---set output
+*  pixel to the given replacement value.  Increment the count of
+*  substitutions.
+                  OUTARR( J ) = NEWLO
+                  NREPLO = NREPLO + 1
+
+               ELSE
+
+*  The input pixel value lies between thresholds---just copy it into
+*  the output pixel.
+                  OUTARR( J ) = INARR( J )
+
+*  End of the check to see whether the input pixel value lies in
+*  between or beyond the range.
+               END IF
+
+*  End of loop round all pixels.
+            END DO
+
+*  Treated bad values literally.
+*  =============================
+         ELSE
+
+*  Loop through all pixels in the input array.
+            DO J = 1, EL
+
+*  Check input array value and act accordingly.
+               IF ( INARR( J ) .GT. THRHI ) THEN
+
+*  The input pixel value is greater than upper threshold---set output
+*  pixel to the given replacement value.  Increment the count of
+*  substitutions.
+                  OUTARR( J ) = NEWHI
+                  NREPHI = NREPHI + 1
+
+               ELSE IF ( INARR( J ) .LT. THRLO ) THEN
+
+*  The input pixel value is less than lower threshold---set output
+*  pixel to the given replacement value.  Increment the count of
+*  substitutions.
+                  OUTARR( J ) = NEWLO
+                  NREPLO = NREPLO + 1
+
+               ELSE
+
+*  The input pixel value lies between thresholds---just copy it into
+*  the output pixel.
+                  OUTARR( J ) = INARR( J )
+
+*  End of the check to see whether the input pixel value lies in
+*  between or beyond the range.
+               END IF
+
+*  End of loop round all pixels.
+            END DO
+
+         END IF
+
+*  Now handle cases where values inside a given range are to be
+*  replaced.
+*  ***************************************************************
+      ELSE
+
+*  Initialise the counters.
+         NREPLO = 0
+         NREPHI = -1
+
+*  Test for bad values.
+*  ====================
+         IF ( BAD ) THEN
+
+*  Loop through all pixels in the input array.
+            DO J = 1, EL
+
+*  Check for a bad pixel.
+               IF ( INARR( J ) .EQ. VAL__BAD<T> ) THEN
+                  OUTARR( J ) = VAL__BAD<T>
+
+*  Check input array value and act accordingly.
+               ELSE IF ( INARR( J ) .GT. THRHI .AND.
+     :                   INARR( J ) .LT. THRLO ) THEN
+
+*  The input pixel value is ibetween the thresholda---set output
+*  pixel to the lowere replacement value.  Increment the count of
+*  substitutions.
+                  OUTARR( J ) = NEWLO
+                  NREPLO = NREPLO + 1
+
+               ELSE
+
+*  The input pixel value lies outside the thresholds---just copy it into
+*  the output pixel.
+                  OUTARR( J ) = INARR( J )
+
+               END IF
+
+            END DO
+
+*  Treated bad values literally.
+*  =============================
+         ELSE
+
+*  Loop through all pixels in the input array.
+            DO J = 1, EL
+
+*  Check input array value and act accordingly.
+               IF ( INARR( J ) .GT. THRHI .AND.
+     :              INARR( J ) .LT. THRLO ) THEN
+
+*  The input pixel value is ibetween the thresholda---set output
+*  pixel to the lowere replacement value.  Increment the count of
+*  substitutions.
+                  OUTARR( J ) = NEWLO
+                  NREPLO = NREPLO + 1
+
+               ELSE
+
+*  The input pixel value lies between thresholds---just copy it into
+*  the output pixel.
+                  OUTARR( J ) = INARR( J )
+
+               END IF
+
+            END DO
+
+         END IF
+
+      END IF
+
+      END

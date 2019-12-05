@@ -72,12 +72,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
@@ -95,6 +95,8 @@
 *        Added BAD argument, and its consequences.
 *     6-DEC-2000 (DSB):
 *        Allow THRLO to be greater than THRHI.
+*     5-DEC-2019 (DSB):
+*        Support huge files.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -127,171 +129,16 @@
       INTEGER STATUS
 
 *  Local Variables:
-      INTEGER J                      ! Loop counter
+      INTEGER*8 EL8
+      INTEGER*8 NREPLO8
+      INTEGER*8 NREPHI8
 
 *.
 
-*  Check the inherited status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  First handle cases where values outside a given range are to be
-*  replaced.
-*  *************************************************************** 
-      IF ( THRLO .LE. THRHI ) THEN 
-
-*  Initialise the counters.
-         NREPLO = 0
-         NREPHI = 0
-
-*  Test for bad values.
-*  ====================
-         IF ( BAD ) THEN
-
-*  Loop through all pixels in the input array.
-            DO J = 1, EL
-
-*  Check for a bad pixel.
-               IF ( INARR( J ) .EQ. VAL__BAD<T> ) THEN
-                  OUTARR( J ) = VAL__BAD<T>
-
-*  Check input array value and act accordingly.
-               ELSE IF ( INARR( J ) .GT. THRHI ) THEN
- 
-*  The input pixel value is greater than upper threshold---set output
-*  pixel to the given replacement value.  Increment the count of
-*  substitutions.
-                  OUTARR( J ) = NEWHI
-                  NREPHI = NREPHI + 1
-
-               ELSE IF ( INARR( J ) .LT. THRLO ) THEN
-
-*  The input pixel value is less than lower threshold---set output
-*  pixel to the given replacement value.  Increment the count of
-*  substitutions.
-                  OUTARR( J ) = NEWLO
-                  NREPLO = NREPLO + 1
-
-               ELSE
-
-*  The input pixel value lies between thresholds---just copy it into
-*  the output pixel.
-                  OUTARR( J ) = INARR( J )
-
-*  End of the check to see whether the input pixel value lies in
-*  between or beyond the range.
-               END IF
-
-*  End of loop round all pixels.
-            END DO
-
-*  Treated bad values literally.
-*  =============================
-         ELSE
-
-*  Loop through all pixels in the input array.
-            DO J = 1, EL
-
-*  Check input array value and act accordingly.
-               IF ( INARR( J ) .GT. THRHI ) THEN
-
-*  The input pixel value is greater than upper threshold---set output
-*  pixel to the given replacement value.  Increment the count of
-*  substitutions.
-                  OUTARR( J ) = NEWHI
-                  NREPHI = NREPHI + 1
-
-               ELSE IF ( INARR( J ) .LT. THRLO ) THEN
-
-*  The input pixel value is less than lower threshold---set output
-*  pixel to the given replacement value.  Increment the count of
-*  substitutions.
-                  OUTARR( J ) = NEWLO
-                  NREPLO = NREPLO + 1
-
-               ELSE
-
-*  The input pixel value lies between thresholds---just copy it into
-*  the output pixel.
-                  OUTARR( J ) = INARR( J )
-
-*  End of the check to see whether the input pixel value lies in
-*  between or beyond the range.
-               END IF
-
-*  End of loop round all pixels.
-            END DO
-
-         END IF
-
-*  Now handle cases where values inside a given range are to be
-*  replaced.
-*  *************************************************************** 
-      ELSE
-
-*  Initialise the counters.
-         NREPLO = 0
-         NREPHI = -1
-
-*  Test for bad values.
-*  ====================
-         IF ( BAD ) THEN
-
-*  Loop through all pixels in the input array.
-            DO J = 1, EL
-
-*  Check for a bad pixel.
-               IF ( INARR( J ) .EQ. VAL__BAD<T> ) THEN
-                  OUTARR( J ) = VAL__BAD<T>
-
-*  Check input array value and act accordingly.
-               ELSE IF ( INARR( J ) .GT. THRHI .AND.
-     :                   INARR( J ) .LT. THRLO ) THEN
-
-*  The input pixel value is ibetween the thresholda---set output
-*  pixel to the lowere replacement value.  Increment the count of
-*  substitutions.
-                  OUTARR( J ) = NEWLO
-                  NREPLO = NREPLO + 1
-
-               ELSE
-
-*  The input pixel value lies outside the thresholds---just copy it into
-*  the output pixel.
-                  OUTARR( J ) = INARR( J )
-
-               END IF
-
-            END DO
-
-*  Treated bad values literally.
-*  =============================
-         ELSE
-
-*  Loop through all pixels in the input array.
-            DO J = 1, EL
-
-*  Check input array value and act accordingly.
-               IF ( INARR( J ) .GT. THRHI .AND.
-     :              INARR( J ) .LT. THRLO ) THEN
-
-*  The input pixel value is ibetween the thresholda---set output
-*  pixel to the lowere replacement value.  Increment the count of
-*  substitutions.
-                  OUTARR( J ) = NEWLO
-                  NREPLO = NREPLO + 1
-
-               ELSE
-
-*  The input pixel value lies between thresholds---just copy it into
-*  the output pixel.
-                  OUTARR( J ) = INARR( J )
-
-               END IF
-
-            END DO
-
-         END IF
-
-      END IF
+      EL8 = EL
+      CALL KPG1_THRS8<T>( BAD, EL8, INARR, THRLO, THRHI, NEWLO,
+     :                    NEWHI, OUTARR, NREPLO8, NREPHI8, STATUS )
+      NREPLO = NREPLO8
+      NREPHI = NREPHI8
 
       END
