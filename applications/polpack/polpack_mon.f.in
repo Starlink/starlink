@@ -266,6 +266,9 @@
 *  itself).
          CALL NDG_ENDPV( 'POLPACK:'//NAME, STATUS )
 
+*  Log the task and its parameters to a log file specified by enviromnent
+*  variable POLPACK_LOG.
+         CALL KPG1_LGCMD( NAME, 'POLPACK', STATUS )
       END DO
 
 *  Note the current number of active GRP identifiers. Do this in a new
