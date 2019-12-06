@@ -202,6 +202,10 @@ void cupid_mon( int *status ) {
    sprintf( buff, "CUPID:%s", name );
    ndgEndpv( buff, status );
 
+/* Log the task and its parameters to a log file specified by enviromnent
+   variable CUPID_LOG. */
+   kpg1Lgcmd( name, "CUPID", status );
+
 /* Re-instate the original value of the AST ObjectCaching tuning
    parameter. */
    astTune( "MemoryCaching", ast_caching );
