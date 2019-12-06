@@ -685,7 +685,7 @@
 
 *  Log the task and its parameters to a log file specified by enviromnent
 *  variable KAPPA_LOG.
-         CALL KPS1_LGCMD( NAME, STATUS )
+         CALL KPG1_LGCMD( NAME, 'KAPPA', STATUS )
       END DO
 
 *  Note the current number of active GRP identifiers. Do this in a new

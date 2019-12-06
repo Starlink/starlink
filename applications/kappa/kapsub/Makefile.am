@@ -27,7 +27,7 @@ kps1_gamln.f \
 kps1_gaups.f kps1_glibd.f kps1_glibr.f kps1_glidd.f kps1_glidr.f kps1_gligt.f \
 kps1_gliwd.f kps1_gliwr.f kps1_grdsc.f kps1_hscem.f kps1_icblu.f kps1_inmat.f \
 kps1_ks2tr.f kps1_kspro.f kps1_lapl.f  kps1_lfta.f  kps1_lftps.f kps1_lftsv.f \
-kps1_lgcmd.f kps1_lmkgd.f kps1_lmkpc.f kps1_lmkst.f kps1_look.f  kps1_look1.f \
+kps1_lmkgd.f kps1_lmkpc.f kps1_lmkst.f kps1_look.f  kps1_look1.f \
 kps1_look2.f kps1_lplfs.f kps1_lpllm.f kps1_lplnm.f kps1_lshcp.f \
 kps1_lshct.f kps1_lshfm.f kps1_lshpl.f kps1_ltaba.f kps1_luccp.f \
 kps1_luccs.f kps1_lucdt.f kps1_lucfp.f kps1_lucim.f kps1_lucou.f \

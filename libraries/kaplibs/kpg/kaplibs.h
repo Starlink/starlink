@@ -206,5 +206,7 @@ void kpgStati( int, int, const int[], int, const float[], int *, int *,
 
 void kpg1CrMapD( int, int, const double x[], const double y[], int, double *, int * );
 
+void kpg1Lgcmd( const char *appn, const char *pack, int *status );
+
 
 #endif

@@ -753,3 +753,31 @@ void kpg1Gtobj( const char *param, const char *class, void (*isa)( void ),
    return;
 }
 
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_lgcmd)( CHARACTER(APPN), CHARACTER(PACK),
+                            INTEGER(STATUS) TRAIL(PARAM) TRAIL(PACK) );
+
+void kpg1Lgcmd( const char *appn, const char *pack, int *status ){
+   DECLARE_CHARACTER_DYN(APPN);
+   DECLARE_CHARACTER_DYN(PACK);
+   DECLARE_INTEGER(STATUS);
+
+   if ( *status != SAI__OK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER(appn,APPN);
+   F77_CREATE_EXPORT_CHARACTER(pack,PACK);
+   F77_EXPORT_INTEGER(*status,STATUS);
+
+   F77_LOCK( F77_CALL(kpg1_lgcmd)( CHARACTER_ARG(APPN),
+                                   CHARACTER_ARG(PACK),
+                                   INTEGER_ARG(&STATUS)
+                                   TRAIL_ARG(APPN)
+                                   TRAIL_ARG(PACK) ); )
+
+   F77_FREE_CHARACTER(APPN);
+   F77_FREE_CHARACTER(PACK);
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}

@@ -1,25 +1,28 @@
-      SUBROUTINE KPS1_LGCMD( APPN, STATUS )
+      SUBROUTINE KPG1_LGCMD( APPN, PACK, STATUS )
 *+
 *  Name:
-*     KPS1_LGCMD
+*     KPG1_LGCMD
 
 *  Purpose:
-*     Log the running of a kappa command.
+*     Log the running of a command.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL  KPS1_LGCMD( APPN, STATUS )
+*     CALL  KPG1_LGCMD( APPN, PACK, STATUS )
 
 *  Description:
 *     The routine writes a record to a log file specified by environment
-*     variable KAPPA_LOG. The record includes the application name and
-*     the parameter values. No record is written if KAPPA_LOG is undefined.
+*     variable <PACK>_LOG. The record includes the application name and
+*     the parameter values. No record is written if the environment
+*     variable is undefined.
 
 *  Arguments:
 *     APPN = CHARACTER * ( * ) (Given)
 *        Name of the current application.
+*     PACK = CHARACTER * ( * ) (Given)
+*        Name of the package (e.g. "KAPPA").
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -49,6 +52,8 @@
 *  History:
 *     23-SEP-2016 (DSB):
 *        Original version, based on the NDF1_HWENV.
+*     6-DEC-2019 (DSB):
+*        Renamed from KPS1_LGCMD to KPG1_LGCMD and added PACK argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -67,6 +72,7 @@
 
 *  Arguments Given:
       CHARACTER * ( * ) APPN
+      CHARACTER * ( * ) PACK
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -86,6 +92,7 @@
 
 *  Local Variables:
       CHARACTER BUF*( MSG__SZMSG ) ! Intermediate text buffer
+      CHARACTER ENVNAM*100       ! Environment variable name
       CHARACTER FMT*6            ! Parameter message format string
       CHARACTER LOGFILE*200      ! Path to log file
       CHARACTER MSG*( MSG__SZMSG ) ! Expanded message text
@@ -94,6 +101,7 @@
       CHARACTER VALUE*( MSG__SZMSG ) ! Parameter value
       INTEGER BR                 ! Character position for breaking text
       INTEGER FD                 ! File descriptor for log file
+      INTEGER IAT                ! Current length of string
       INTEGER IPAR               ! Index into parameter names list
       INTEGER LBUF               ! No. characters used in BUF
       INTEGER LMSG               ! Length of expanded message text
@@ -110,8 +118,14 @@
 *  even if it failed.
       CALL ERR_BEGIN( STATUS )
 
+*  Create the environment variable name.
+      ENVNAM = ' '
+      IAT = 0
+      CALL CHR_APPND( PACK, ENVNAM, IAT )
+      CALL CHR_APPND( '_LOG', ENVNAM, IAT )
+
 *  Get the path to the log file, if any.
-      CALL PSX_GETENV( 'KAPPA_LOG', LOGFILE, STATUS )
+      CALL PSX_GETENV( ENVNAM, LOGFILE, STATUS )
 
 *  If there was no translation, simply annul the error.
       IF ( STATUS .EQ. PSX__NOENV ) THEN
@@ -125,9 +139,10 @@
 *  If the file could not be opened, flush the error and jump to the end.
          IF( STATUS .NE. SAI__OK ) THEN
             CALL MSG_SETC( 'A', APPN )
+            CALL MSG_SETC( 'E', ENVNAM )
             CALL ERR_REP( ' ', 'Failed to log kappa task ^A to '//
      :                    'file specified by environment variable '//
-     :                    'KAPPA_LOG.', STATUS )
+     :                    '^E.', STATUS )
             CALL ERR_FLUSH( STATUS )
          ELSE
 
