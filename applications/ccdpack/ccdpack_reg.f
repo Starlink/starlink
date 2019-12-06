@@ -177,5 +177,9 @@
 *  itself).
       CALL NDG_ENDPV( 'CCDPACK:'//ACTION, STATUS )
 
+*  Log the task and its parameters to a log file specified by enviromnent
+*  variable CCDPACK_LOG.
+      CALL KPG1_LGCMD( ACTION, 'CCDPACK', STATUS )
+
       END
 * $Id$

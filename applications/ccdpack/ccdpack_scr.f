@@ -140,4 +140,8 @@
      :                 'monolith.', STATUS )
       END IF
 
+*  Log the task and its parameters to a log file specified by enviromnent
+*  variable CCDPACK_LOG.
+      CALL KPG1_LGCMD( ACTION, 'CCDPACK', STATUS )
+
       END
