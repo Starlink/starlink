@@ -453,6 +453,10 @@ void smurf_mon( int * status ) {
   /* End the GRP NDF history block. */
   ndgEndgh( status );
 
+  /* Log the task and its parameters to a log file specified by enviromnent
+     variable CUPID_LOG. */
+  kpg1Lgcmd( taskname, "SMURF", status );
+
   /* Clear cached info from sc2ast_createwcs. */
   sc2ast_createwcs(SC2AST__NULLSUB, NULL, NULL, NULL, NO_FTS, NULL, status);
 
