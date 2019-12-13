@@ -6552,6 +6552,10 @@ package @PACKAGE@ {
         obey {python $SMURF_DIR/startester.py}
     }
 
+    command matchbeam {
+        obey {python $SMURF_DIR/matchbeam.py}
+    }
+
     icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
 
     display {
