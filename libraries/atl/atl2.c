@@ -35,6 +35,10 @@
 *  History:
 *     16-SEP-2019 (DSB):
 *        Original version.
+*     14-DEC-2019 (DSB):
+*        - Improve error mesages in ATL2_GET.
+*        - Prevent ATL2_RDFIL bug that caused input lines following a blank 
+*          line to be ignored.
 */
 
 /* Headers: */
@@ -310,16 +314,28 @@ F77_SUBROUTINE(atl2_get)( POINTER(VFS), INTEGER(INDEX), INTEGER(START),
 /* Check the arguments. */
       if( *INDEX < 1 || *INDEX > vfs->nline ) {
          *STATUS = SAI__ERROR;
-         errRepf( " ", "ATL2_GET: Invalid line number %d (must be between "
-                  "1 and %d).", STATUS, *INDEX, vfs->nline );
+         if( vfs->nline ) {
+            errRepf( " ", "ATL2_GET: Invalid line number %d (must be between "
+                     "1 and %d).", STATUS, *INDEX, vfs->nline );
+         } else {
+            errRepf( " ", "ATL2_GET: Cannot get line %d (the file is empty).",
+                     STATUS, *INDEX );
+         }
       }  else {
          iline = *INDEX - 1;
          length = vfs->lengths[ iline ];
 
-         if( *START < 1 || *START > length ) {
+         if( *START < 1 || ( *START > length && ( length > 0 || *START != 1 ))) {
             *STATUS = SAI__ERROR;
-            errRepf( " ", "ATL2_GET: Invalid line start %d (must be between "
-                    "1 and %d).", STATUS, *START, length );
+            if( length ) {
+               errRepf( " ", "ATL2_GET: Invalid line start %d (must be "
+                       "between 1 and %d).", STATUS, *START, length );
+               errRepf( " ", "ATL2_GET: Invalid line start %d (line %d "
+                        "has length %d).", STATUS, *START, *INDEX, length );
+            } else {
+               errRepf( " ", "ATL2_GET: Invalid line start %d (line %d "
+                        "has zero length).", STATUS, *START, *INDEX );
+            }
          } else {
             start = *START - 1;
 
@@ -583,18 +599,15 @@ F77_SUBROUTINE(atl2_rdfil)( CHARACTER(FILNAM), POINTER(VFS),
          szline = 20;
          line = astMalloc( szline );
          nch = 0;
-         while( line && ( (c = fgetc( fd )) != EOF ) ) {
+         while( *STATUS == SAI__OK && ( (c = fgetc( fd )) != EOF ) ) {
 
-/* If the current character is a newline, the line has ended. Truncate
-   the line memory to the required length and store it in the VFS,
-   expanding the VFS to make room for it. */
+/* If the current character is a newline, the line has ended. Store it in
+   the VFS, expanding the VFS to make room for it. */
             if( c == '\n' ) {
-               line = astRealloc( line, nch );
                atl2Append( vfs, line, nch, STATUS );
 
 /* Reset things for the next line. Retain the memory since it may
    well be appropriate for the next line. */
-               szline = nch;
                nch = 0;
 
 /* If the current character is not a carriage return, store it, expanding the
@@ -646,7 +659,7 @@ static void atl2Append( Vfs *vfs, char *text, size_t len, int *status ){
 /* Find the length of the supplied text, excluding trailing spaces. */
    l = len;
    p = text + len - 1;
-   while( p >= text && isspace( *p ) ) {
+   while( l > 0 && isspace( *p ) ) {
       p--;
       l--;
    }
