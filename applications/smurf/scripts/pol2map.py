@@ -457,6 +457,20 @@
 *        together. Therefore the value supplied for parameter REUSE will be
 *        ignored and a value of FALSE assumed if the MAPDIR directory is
 *        missing maps for any of the supplied observations. [FALSE]
+*     SMOOTH450 = _LOGICAL (Read)
+*        This parameter is only accessed if the input files specified
+*        by parameter IN contain 450 um data. If SMOOTH450 is TRUE, the
+*        450 um I, Q and U coadd maps will be smoothed prior to creating
+*        any output vector catalogue so that the smoothed maps have the
+*        850 um beam shape. This changes the resolution of the maps from
+*        (approximately) 8 arc-sec (the 450 um beam width) to
+*        (approximately) 13 arc-seconds (the 850 um beam width), and
+*        also reduces the noise. The smoothing kernel is derived from the
+*        two-component beam models described in the paper "SCUBA-2: on-sky
+*        calibration using submillimetre standard sources" (Dempsey et al,
+*        2018). If parameter MAPVAR is TRUE, the individual observation
+*        maps will be smoothed prior to determining the variances, thus
+*        ensuring that the resulting variances are still accurate. [FALSE]
 *     TRIM = _REAL (Read)
 *        This indicates how the edges of the final I, Q and U coadds should
 *        be trimmed to remove the noisey edges. If a null (!) value is
@@ -659,6 +673,10 @@
 *       maps exist for more than 50% of the observation chunks. In
 *       practice, it's probably going to be a case of all exist or none
 *       exist.
+*    16-DEC-2019 (DSB):
+*       - Bug fix for 5-Dec-2019 change (the the sense of the check was
+*       inverted).
+*       - Added parameter SMOOTH450.
 
 '''
 
@@ -681,6 +699,89 @@ from starutil import get_task_par
 
 #  Assume for the moment that we will not be retaining temporary files.
 retain = 0
+
+#  An NDG holding the smoothing kernel that smooths the 450 um beam to
+#  create the 850 um beam.
+kernel = None
+
+
+
+
+#  A function to create an NDF holding a two-component beam shape, as
+#  defined in Dempsey et al 2018, using the supplied parameter values.
+def Beam( alpha, beta, thetaM, thetaS, pixsize ):
+
+#  Create an image of the main beam using the supplied pixel size.
+#  Centre the Gaussian at the centre of pixel (1,1) (i.e. pixel
+#  coords (0.5,0.5) ). The Gaussian has a peak value of 1.0.
+   main = NDG( 1 )
+   invoke( "$KAPPA_DIR/maths exp=\"'exp(-4*pa*(fx*fx+fy*fy)/(fb*fb))'\" "
+           "fx='xa-px' fy='xb-py' fb='pb/pp' pp={0} px=0.5 py=0.5 "
+           "pa=0.6931472 pb={1} out={2} type=_double lbound=\[-63,-63\] "
+           "ubound=\[64,64\]".format( pixsize, thetaM, main ))
+
+#  Similarly create an image of the secondary beam.
+   sec = NDG( 1 )
+   invoke( "$KAPPA_DIR/maths exp=\"'exp(-4*pa*(fx*fx+fy*fy)/(fb*fb))'\" "
+           "fx='xa-px' fy='xb-py' fb='pb/pp' pp={0} px=0.5 py=0.5 "
+           "pa=0.6931472 pb={1} out={2} type=_double lbound=\[-63,-63\] "
+           "ubound=\[64,64\]".format( pixsize, thetaS, sec ))
+
+#  Combine them in the right proportions to make the total beam.
+   total = NDG( 1 )
+   invoke( "$KAPPA_DIR/maths exp="'pa*ia+pb*ib'" out={0} ia={1} ib={2} "
+           "pa={3} pb={4}".format( total, main, sec, alpha, beta ) )
+
+#  Ensure the total 450 beam has a total data sum of 1.0.
+   invoke("$KAPPA_DIR/stats ndf={0}".format(total))
+   sum = float( get_task_par( "total", "stats" ) )
+   result = NDG( 1 )
+   invoke( "$KAPPA_DIR/cdiv in={0} scalar={1} out={2}".
+           format( total, sum, result ))
+
+#  Return the final beam.
+   return result
+
+
+
+#  Function to smooth a map using a kernel that converts the 450 um
+#  beam to the 850 um beam.
+def Smooth450( inmap, outmap ):
+   global kernel
+
+#  If "in" or "out" is a string, create an NDG from it.
+   if isinstance( inmap, str):
+      inmap = NDG( inmap )
+   if isinstance( outmap, str):
+      outmap = NDG( outmap, False )
+
+#  If we have not yet created the moothing kernel, do it now.
+   if kernel is None:
+
+#  Get the input pixel size.
+      invoke("$KAPPA_DIR/ndftrace ndf={0}".format(inmap) )
+      xsize = float(get_task_par( "FPIXSCALE(1)", "ndftrace" ))
+      ysize = float(get_task_par( "FPIXSCALE(2)", "ndftrace" ))
+      pixsize = math.sqrt( xsize*ysize )
+
+#  Create a pair of NDFs holding the expected model beam shape at
+#  450 um and at 850 um. The expected beams are defined in Dempsey et al
+#  2018.
+      b450 = Beam( 0.94, 0.06, 7.9, 25.0, pixsize )
+      b850 = Beam( 0.98, 0.02, 13.0, 48.0, pixsize )
+
+#  Deconvolve the 850 um beam using the 450 um beam as the PSF. The
+#  resulting map is the kernel that smooths a 450 um map so that the
+#  result has the 850 um beam.
+      kernel = NDG( 1 )
+      invoke( "$KAPPA_DIR/wiener in={0} psf={1} out={2} xcentre=1 ycentre=1".
+              format( b850, b450, kernel ))
+
+#  Use the kernel to smooth the input map.
+   invoke( "$KAPPA_DIR/convolve in={0} out={1} psf={2} xcentre=1 ycentre=1".
+           format( inmap, outmap, kernel ))
+
+
 
 
 #  Trim a map to set pixels bad if they have an exposure time less than
@@ -1276,6 +1377,9 @@ try:
                                 "which to trim coadds", None, maxval=10.0,
                                 minval=0.0, noprompt=True))
 
+   params.append(starutil.Par0L("SMOOTH450", "Smooth 450 maps to 850 um resolution?",
+                                False, noprompt=True))
+
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
    parsys = ParSys( params )
@@ -1394,6 +1498,13 @@ try:
    if filter != 450 and filter != 850:
       raise starutil.InvalidParameterError("Invalid FILTER header value "
              "'{0} found in {1}.".format( filter, indata[0] ) )
+
+#  If we have 450 um data, see if the resulting maps and catalogues should be
+#  smoothed to the 850 um resolution.
+   if filter == 450:
+      smooth450 = parsys["SMOOTH450"].value
+   else:
+      smooth450 = False
 
 #  See if we should use skyloop instead of makemap.
    skyloop = parsys["SKYLOOP"].value
@@ -1748,8 +1859,8 @@ try:
 #  -----------  CREATE INDIVIDUAL MAPS FROM STOKES TIME SERIES DATA ---------
 
 #  Do some initialisation in case no time-series data is supplied.
-   pcathresh_i = 0.0;
-   pcathresh_qu = 0.0;
+   pcathresh_i = 0.0
+   pcathresh_qu = 0.0
 
 #  Initialise three dicts - one each for Q, U and I - holding Stokes
 #  time-stream files to be processed.
@@ -2285,8 +2396,8 @@ try:
                      qui_maps[key] = NDG(obsmap_path)
                      nexist += 1
 
-               if nexist < len(qui_list)/2:
-                  make_new_maps = True
+               if nexist > len(qui_list)/2:
+                  make_new_maps = False
 
          if not make_new_maps:
             msg_out("   Re-using previously created maps")
@@ -2547,6 +2658,14 @@ try:
                   fd.write(corrections[tai])
                fd.close()
 
+#  If we will be smoothing the map to the 850 um resolution, we need to
+#  put the original (unsmoothed) coadd in a different NDG object. The final
+#  (smoothed) coadd will be put into the NDF specified by parameter I/Q/UOUT .
+            if smooth450:
+               unsmoothed = NDG( 1 )
+            else:
+               unsmoothed = coadd
+
 #  Invoke skyloop, putting the individual observation maps in obsdir.
             old_ilevel = starutil.ilevel
             starutil.ilevel = starutil.ATASK
@@ -2558,13 +2677,13 @@ try:
             if not maskmap:
                invoke("$SMURF_DIR/skyloop.py in=^{0} config=^{1} out={2} ref={3} extra={4} "
                       "pixsize={5} {6} obsdir={7} retain={8} logfile={9}".
-                      format(inpaths,conf,coadd,ref,extra,pixsize,this_ip,obsdir,
+                      format(inpaths,conf,unsmoothed,ref,extra,pixsize,this_ip,obsdir,
                              retain,skylog),
                              msg_level=starutil.PROGRESS,cmdscreen=False)
             else:
                invoke("$SMURF_DIR/skyloop.py in=^{0} config=^{1} out={2} ref={3} extra={4} "
                       "pixsize={5} {6} {7} obsdir={8} retain={9} logfile={10}".
-                      format(inpaths,conf,coadd,astmask,extra,pixsize,this_ip,
+                      format(inpaths,conf,unsmoothed,astmask,extra,pixsize,this_ip,
                              pcamaskpar,obsdir,retain,skylog),
                              msg_level=starutil.PROGRESS,cmdscreen=False)
 
@@ -2578,9 +2697,14 @@ try:
             msg_log("\n--------------------------------------------------\n")
             msg_log("Back to pol2map...")
 
+#  Smooth the coadd to the 850 um resolution if required.
+            if smooth450:
+               Smooth450( unsmoothed, coadd )
+
 #  Modify the names of the observation maps so that they use the same scheme
 #  as those created by makemap below, and move them into the main maps
-#  directory.
+#  directory. If required, smooth them to the 850 um resolution at the
+#  same time.
             ut_previous = ""
             obs_previous = ""
             for key in sorted(qui_list.keys()):
@@ -2601,10 +2725,14 @@ try:
                   oldpath = "{0}/{1}_{2}_chunk{3}.sdf".format(obsdir,ut,obs,next_chunk)
                   next_chunk += 1
 
-#  Get the new file name and do the rename.
+#  Get the new file name and do the rename, smoothing it to the 850
+#  resolution at the same time if required.
                newpath = "{0}/{1}_{2}.sdf".format(mapdir,key,suffix)
                if os.path.exists(oldpath):
-                  shutil.move( oldpath, newpath )
+                  if smooth450:
+                     Smooth450( oldpath, newpath )
+                  else:
+                     shutil.move( oldpath, newpath )
 
 #  Add it to the dictionary of maps holding the current stokes parameter.
                   qui_maps[key] = NDG(newpath)
@@ -2715,6 +2843,15 @@ try:
                   msg_out( "   Using pre-calculated pointing corrections of ({0:5.1f},{1:5.1f}) arc-seconds".format(dx,dy) )
 
                qui_maps[key] = NDG(mapname, False)
+
+#  If we will be smoothing the map to the 850 um resolution, we need to
+#  put the original (unsmoothed) map in a different NDG object. The final
+#  (smoothed) map will be put into the MAPDIR directory.
+               if smooth450:
+                  unsmoothed = NDG( 1 )
+               else:
+                  unsmoothed = qui_maps[key]
+
                try:
 
 #  If we are using the default value for PCA.PCATHRESH (as indicated by
@@ -2745,10 +2882,10 @@ try:
 
                      if not maskmap:
                         invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
-                            "pixsize={5} {6} {7}".format(isdf,conf,qui_maps[key],ref,pntfile,pixsize,ip,abpar))
+                            "pixsize={5} {6} {7}".format(isdf,conf,unsmoothed,ref,pntfile,pixsize,ip,abpar))
                      else:
                         invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
-                            "pixsize={5} {6} {7} {8}".format(isdf,conf,qui_maps[key],astmask,pntfile,
+                            "pixsize={5} {6} {7} {8}".format(isdf,conf,unsmoothed,astmask,pntfile,
                                                            pixsize,ip,pcamaskpar,abpar))
 
 #  If we do not yet know what pcathresh value to use, see if makemap aborted
@@ -2796,6 +2933,10 @@ try:
 #  checking convergence.
                      else:
                         again = False
+
+#  If required smooth the output map to the resolution of the 850 um beam.
+                  if smooth450:
+                     Smooth450( unsmoothed, qui_maps[key] )
 
 #  Store FITS headers holding the pointing corrections that were actually used.
                   if dx is not None:
