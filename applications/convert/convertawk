@@ -1,5 +1,5 @@
 BEGIN {out=0}
-/^\!/  {if(out==0)
+/^!/  {if(out==0)
           {out=1
            print ""
            print "!! ** Error converting", fmt
