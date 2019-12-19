@@ -119,6 +119,8 @@
 *        UTRIM is initialised to FALSE, so set it TRUE if there are WCS
 *        axes to be trimmed (rather than setting it FALSE if there are
 *        no WCS axes to be trimmed).
+*     19-DEC-2019 (DSB):
+*        Support huge NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -167,8 +169,8 @@
       CHARACTER TTL*(AST__SZCHR) ! Frame title
       CHARACTER TYPE*(DAT__SZTYP)! Numerical type of array component
       INTEGER CAXES( NDF__MXDIM )! Non-degenerate current Frame axes
-      INTEGER EL                 ! Number of elements in mapped array
-      INTEGER I                  ! Loop index
+      INTEGER*8 EL               ! Number of elements in mapped array
+      INTEGER*8 I                ! Loop index
       INTEGER IAXIS( NDF__MXDIM )! Current Frame axes to retain
       INTEGER ICURR              ! Index of original current Frame
       INTEGER IERR               ! Index of first numerical error
@@ -177,7 +179,7 @@
       INTEGER IP2                ! Pointer to mapped output array
       INTEGER IPERM( NDF__MXDIM )! Output axis index for each input axis
       INTEGER IWCS               ! WCS FrameSet for output
-      INTEGER LBND( NDF__MXDIM ) ! Template NDF lower bounds
+      INTEGER*8 LBND( NDF__MXDIM ) ! Template NDF lower bounds
       INTEGER LTTL               ! Length of title
       INTEGER MAP                ! Original base->current Mapping
       INTEGER MAP2               ! Non-degenerate axes component of MAP
@@ -194,9 +196,9 @@
       INTEGER PM                 ! Axis permutation Mapping
       INTEGER SCOMP              ! Index of first component to copy
       INTEGER SIGDIM             ! Number of significant pixel indices
-      INTEGER SLBND( NDF__MXDIM )! Significant axis lower bounds
-      INTEGER SUBND( NDF__MXDIM )! Significant axis upper bounds
-      INTEGER UBND( NDF__MXDIM ) ! Template NDF upper bounds
+      INTEGER*8 SLBND( NDF__MXDIM )! Significant axis lower bounds
+      INTEGER*8 SUBND( NDF__MXDIM )! Significant axis upper bounds
+      INTEGER*8 UBND( NDF__MXDIM ) ! Template NDF upper bounds
       LOGICAL BAD                ! Bad values in the array component?
       LOGICAL DIRECT             ! One-to-one copy of array components?
       LOGICAL ISBAS              ! Is the NDF identifier for a base NDF?
@@ -220,7 +222,7 @@
 
 *  Find the number of significant axes (i.e. axes panning more than 1
 *  pixel). First find the number of dimensions.
-      CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+      CALL NDF_BOUND8( INDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Loop round each dimension, counting the significant axes. Also set up
 *  axis permutation arrays which can be used to create an AST PermMap if
@@ -238,7 +240,7 @@
          END IF
       END DO
 
-*  If there are no insignificant pixel axes, but there are excess WCS 
+*  If there are no insignificant pixel axes, but there are excess WCS
 *  axes (i.e. more WCS axes than pixel axes), then there is something
 *  to trim.
       IF( SIGDIM .EQ. NDIM ) THEN
@@ -425,7 +427,7 @@
 
 *  Modify the bounds of the output NDF so that the significant axes
 *  span Axes 1 to SIGDIM.
-            CALL NDF_SBND( SIGDIM, SLBND, SUBND, INDF2, STATUS )
+            CALL NDF_SBND8( SIGDIM, SLBND, SUBND, INDF2, STATUS )
 
 *  Store the new WCS FrameSet in the output NDF.
             CALL NDF_PTWCS( IWCS, INDF2, STATUS )
@@ -444,8 +446,8 @@
 *  changes have been made.  Before annulling the NDF, we need to map the
 *  DATA array to put it into a defined state since we are not allowed to
 *  release an NDF with an undefined DATA array.
-               CALL NDF_MAP( INDF2, 'DATA', '_BYTE', 'WRITE', IP2, EL,
-     :                       STATUS )
+               CALL NDF_MAP8( INDF2, 'DATA', '_BYTE', 'WRITE', IP2, EL,
+     :                        STATUS )
                CALL NDF_LOC( INDF2, 'READ', LOC1, STATUS )
                CALL DAT_PRMRY( .TRUE., LOC1, .TRUE., STATUS )
                CALL NDF_ANNUL( INDF2, STATUS )
@@ -568,8 +570,8 @@
 *  Obtain the data type of the array component and determine whether it
 *  contains any bad pixels without reading all its elements.
                CALL NDF_TYPE( INDF1, ICOMPN( I ), TYPE, STATUS )
-               CALL NDF_MAP( INDF1, ICOMP( I ), TYPE, 'READ', IP1, EL,
-     :                       STATUS )
+               CALL NDF_MAP8( INDF1, ICOMP( I ), TYPE, 'READ', IP1, EL,
+     :                        STATUS )
                CALL NDF_BAD( INDF1, ICOMPN( I ), .FALSE., BAD, STATUS )
 
 *  The data type may have changed if there's is a new DATA_ARRAY.  NDF
@@ -578,47 +580,47 @@
 *  the DATA_ARRAY would revert to the input component's data type.
                IF ( .NOT. DIRECT .AND. OCOMP( I ) .NE. 'QUALITY' )
      :           CALL NDF_STYPE( TYPE, INDF2, OCOMP( I ), STATUS )
-               CALL NDF_MAP( INDF2, OCOMP( I ), TYPE, 'WRITE', IP2, EL,
-     :                       STATUS )
+               CALL NDF_MAP8( INDF2, OCOMP( I ), TYPE, 'WRITE', IP2, EL,
+     :                        STATUS )
 
 *  Now actually copy the array components from input to output.
                IF( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL VEC_DTOD( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
+                  CALL VEC8_DTOD( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF( TYPE .EQ. '_REAL' ) THEN
-                  CALL VEC_RTOR( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
+                  CALL VEC8_RTOR( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-                  CALL VEC_ITOI( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
+                  CALL VEC8_ITOI( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF( TYPE .EQ. '_INT64' ) THEN
-                  CALL VEC_KTOK( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
+                  CALL VEC8_KTOK( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF( TYPE .EQ. '_WORD' ) THEN
-                  CALL VEC_WTOW( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
+                  CALL VEC8_WTOW( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF( TYPE .EQ. '_UWORD' ) THEN
-                  CALL VEC_UWTOUW( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
+                  CALL VEC8_UWTOUW( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
      :                             %VAL( CNF_PVAL( IP2 ) ),
      :                             IERR, NERR, STATUS )
 
                ELSE IF( TYPE .EQ. '_BYTE' ) THEN
-                  CALL VEC_BTOB( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
+                  CALL VEC8_BTOB( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
-                  CALL VEC_UBTOUB( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
+                  CALL VEC8_UBTOUB( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
      :                             %VAL( CNF_PVAL( IP2 ) ),
      :                             IERR, NERR, STATUS )
                END IF

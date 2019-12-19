@@ -71,6 +71,8 @@
 *     13-MAR-2015 (DSB):
 *        Handle cases where the number of pixel axes in the template and
 *        input are different.
+*     19-DEC-2019 (DSB):
+*        Support huge arrays.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -110,16 +112,16 @@
       INTEGER INAXES( NDF__MXDIM )! Input pixel axis indices
       INTEGER IWCS1               ! WCS FrameSet from input
       INTEGER IWCS2               ! WCS FrameSet from template
-      INTEGER LBND1( NDF__MXDIM ) ! Input NDF lower bounds
-      INTEGER LBND2( NDF__MXDIM ) ! Template NDF lower bounds
+      INTEGER*8 LBND1( NDF__MXDIM ) ! Input NDF lower bounds
+      INTEGER*8 LBND2( NDF__MXDIM ) ! Template NDF lower bounds
       INTEGER MAP                 ! Mapping from template to input
       INTEGER NDIM1               ! Number of input pixel axes
       INTEGER NDIM2               ! Number of template pixel axes
       INTEGER NINAX               ! No. of i/p axes driven by template
       INTEGER TMPAX               ! Template pixel axis index
       INTEGER TPAXES( NDF__MXDIM )! Template pixel axis indices
-      INTEGER UBND1( NDF__MXDIM ) ! Input NDF upper bounds
-      INTEGER UBND2( NDF__MXDIM ) ! Template NDF upper bounds
+      INTEGER*8 UBND1( NDF__MXDIM ) ! Input NDF upper bounds
+      INTEGER*8 UBND2( NDF__MXDIM ) ! Template NDF upper bounds
 *.
 
 *  Check the inherited status.
@@ -129,10 +131,10 @@
       CALL AST_BEGIN( STATUS )
 
 * Get the pixel index bounds of the input.
-      CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND1, UBND1, NDIM1, STATUS )
+      CALL NDF_BOUND8( INDF1, NDF__MXDIM, LBND1, UBND1, NDIM1, STATUS )
 
 * Get the pixel index bounds of the template.
-      CALL NDF_BOUND( INDF2, NDF__MXDIM, LBND2, UBND2, NDIM2, STATUS )
+      CALL NDF_BOUND8( INDF2, NDF__MXDIM, LBND2, UBND2, NDIM2, STATUS )
 
 *  If WCS bounds are being used, we need to transform these pixel index
 *  bounds into the PIXEL frame of INDF1, aligning in some suitable common
@@ -228,7 +230,7 @@
       END IF
 
 *  Cut the required section from INDF1.
-      CALL NDF_SECT( INDF1, NDIM1, LBND1, UBND1, INDF3, STATUS )
+      CALL NDF_SECT8( INDF1, NDIM1, LBND1, UBND1, INDF3, STATUS )
 
 *  End the AST context
       CALL AST_END( STATUS )

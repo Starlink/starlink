@@ -1,8 +1,8 @@
-      SUBROUTINE KPG1_BBOX<T>( NDIM, LBND, UBND, ARRAY, VALUE, EQUAL,
+      SUBROUTINE KPG1_BBOX8<T>( NDIM, LBND, UBND, ARRAY, VALUE, EQUAL,
      :                         BLBND, BUBND, NPASS, STATUS )
 *+
 *  Name:
-*     KPG1_BBOXx
+*     KPG1_BBOX8x
 
 *  Purpose:
 *     Determines the bounding box of selected pixels in an n-dimensional
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_BBOXx( NDIM, LBND, UBND, ARRAY, VALUE, EQUAL, BLBND,
+*     CALL KPG1_BBOX8x( NDIM, LBND, UBND, ARRAY, VALUE, EQUAL, BLBND,
 *                      BUBND, NPASS, STATUS )
 
 *  Description:
@@ -24,9 +24,9 @@
 *  Arguments:
 *     NDIM = INTEGER (Given)
 *        The dimensionality of the n-dimensional array.
-*     LBND( NDIM ) = INTEGER (Given)
+*     LBND( NDIM ) = INTEGER*8 (Given)
 *        The lower pixel index bounds of the input n-dimensional array.
-*     UBND( NDIM ) = INTEGER (Given)
+*     UBND( NDIM ) = INTEGER*8 (Given)
 *        The upper pixel index bounds of the input n-dimensional array.
 *     ARRAY( * ) = ? (Given)
 *        The input n-dimensional data array.
@@ -37,11 +37,11 @@
 *        If .TRUE., then the returned box encloses all pixels with value
 *        equal to VALUE. If .FALSE., then the returned box encloses all
 *        pixels with value not equal to VALUE.
-*     BLBND( NDIM ) = INTEGER (Returned)
+*     BLBND( NDIM ) = INTEGER*8 (Returned)
 *        The lower pixel index bounds of the required box.
-*     BUBND( NDIM ) = INTEGER (Returned)
+*     BUBND( NDIM ) = INTEGER*8 (Returned)
 *        The upper pixel index bounds of the required box.
-*     NPASS = INTEGER (Returned)
+*     NPASS = INTEGER*8 (Returned)
 *        The number of array elements that pass the test specified by
 *        VALUE and EQUAL. In general, the number of elements in the
 *        returned bounding box will be greater than NPASS.
@@ -83,6 +83,8 @@
 *        Original version.
 *     2009 September 13 (MJC):
 *        Fix bug calculating the number of elements.
+*     19-DEC-2019 (DSB):
+*        Support huge arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -99,15 +101,15 @@
 
 *  Arguments Given
       INTEGER NDIM
-      INTEGER LBND( NDIM )
-      INTEGER UBND( NDIM )
+      INTEGER*8 LBND( NDIM )
+      INTEGER*8 UBND( NDIM )
       <TYPE> ARRAY( * )
       <TYPE> VALUE
       LOGICAL EQUAL
 
 *  Arguments Returned:
-      INTEGER BLBND( NDIM )
-      INTEGER BUBND( NDIM )
+      INTEGER*8 BLBND( NDIM )
+      INTEGER*8 BUBND( NDIM )
       INTEGER NPASS
 
 *  Status:
@@ -116,9 +118,9 @@
 *  Local Variables:
       INTEGER DIM                ! Axis length
       INTEGER IDIM               ! Axis index
-      INTEGER IEL                ! Vector index of current element
-      INTEGER NEL                ! Number of elements in array
-      INTEGER PIX( NDF__MXDIM )  ! Pixel indices of current element
+      INTEGER*8 IEL              ! Vector index of current element
+      INTEGER*8 NEL              ! Number of elements in array
+      INTEGER*8 PIX( NDF__MXDIM )! Pixel indices of current element
       LOGICAL FIRST              ! First element to pass the test?
       LOGICAL INBOX              ! Does the pixel pass the test?
 *.

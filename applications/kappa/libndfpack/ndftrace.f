@@ -232,6 +232,9 @@
 *  Related Applications:
 *     KAPPA: WCSFRAME; HDSTRACE
 
+*  Implementation Status:
+*     -  Huge NDF are supported.
+
 *  Copyright:
 *     Copyright (C) 1990-1994 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1997, 1999-2000, 2003-2004 Central Laboratory

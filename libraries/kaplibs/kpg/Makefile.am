@@ -92,7 +92,8 @@ kpg1_trsp.gn kpg1_vasv.gn kpg1_wmod.gn kpg1_mvbd.gn \
 kpg1_sclb.gn kpg1_scli.gn kpg1_scluw.gn kpg1_sclub.gn \
 kpg1_sclw.gn kpg1_sclk.gn kpg1_ptnd.gn kpg1_bbox.gn kpg_osta.gn \
 kpg_fise.gn  kpg_immm.gn kpg1_corr.gn kpg1_rms.gn kpg1_ltva.gn \
-kpg_osta8.gn kpg1_mvbd8.gn kpg1_retr8.gn kpg1_thrs8.gn
+kpg_osta8.gn kpg1_mvbd8.gn kpg1_retr8.gn kpg1_thrs8.gn \
+kpg1_bbox8.gn
 
 # All except logical (include char)
 KPG_XL_GEN = kpg1_qsrt.gxl
@@ -176,6 +177,7 @@ kpg1_axrng.f \
 kpg1_axrng8.f \
 kpg1_axtyp.f \
 kpg1_badbx.f \
+kpg1_badbx8.f \
 kpg1_bilnr.f \
 kpg1_ceil.f \
 kpg1_cget.f \

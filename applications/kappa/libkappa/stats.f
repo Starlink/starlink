@@ -184,6 +184,7 @@
 *     -  All non-complex numeric data types can be handled.  Arithmetic
 *     is performed using double-precision floating point.
 *     -  Any number of NDF dimensions is supported.
+*     -  Huge NDF are supported.
 
 *  Copyright:
 *     Copyright (C) 1991-1992 Science & Engineering Research Council.

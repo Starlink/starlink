@@ -188,12 +188,13 @@
 *     KAPPA: SETBOUND; Figaro: ISUBSET.
 
 *  Implementation Status:
-*     If present, an NDF's TITLE, LABEL, UNITS, DATA, VARIANCE, QUALITY,
+*     -  If present, an NDF's TITLE, LABEL, UNITS, DATA, VARIANCE, QUALITY,
 *     AXIS WCS and HISTORY components are copied by this routine,
 *     together with all extensions.  The output NDF's title may be
 *     modified, if required, by specifying a new value via the TITLE
 *     parameter.
-
+*     -  Huge NDF are supported.
+*
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1998, 2000, 2003-2004 Central Laboratory of
@@ -273,9 +274,11 @@
 *        Add an example using TRIM and TRIMWCS.
 *     22-FEB-2019 (DSB):
 *        When changing the shape of an extension NDF, do not delete
-*        the original NDF until the new NDF has been created. Deleting 
-*        the original NDF first seem to trigger a bug in HDF5 that 
+*        the original NDF until the new NDF has been created. Deleting
+*        the original NDF first seem to trigger a bug in HDF5 that
 *        causes dat_copy to report an error.
+*     19-DEC-2019 (DSB):
+*        Add support for huge NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -299,16 +302,16 @@
       CHARACTER LOC*(DAT__SZLOC) ! Locator for output extension NDF
       CHARACTER NAME*(DAT__SZNAM)! Name for output extension NDF
       CHARACTER PLOC*(DAT__SZLOC)! Locator for LOC's parent
-      INTEGER BLBND( NDF__MXDIM )! Input base NDF low bounds
+      INTEGER*8 BLBND( NDF__MXDIM )! Input base NDF low bounds
       INTEGER BNDF               ! Base input NDF identifier
       INTEGER BNDIM              ! Dimensionality of input base NDF
       INTEGER BSIZE              ! Size of group IGRPB
-      INTEGER BUBND( NDF__MXDIM )! Input base NDF high bounds
+      INTEGER*8 BUBND( NDF__MXDIM )! Input base NDF high bounds
       INTEGER I                  ! Loop count
       INTEGER IGRP               ! Paths to output extension NDFs
       INTEGER IGRPB              ! Paths to input extension NDFs
       INTEGER J                  ! Loop count
-      INTEGER LBND( NDF__MXDIM ) ! Input extension NDF low bounds
+      INTEGER*8 LBND( NDF__MXDIM ) ! Input extension NDF low bounds
       INTEGER NDF1               ! Input NDF identifier
       INTEGER NDF2               ! Template NDF identifier
       INTEGER NDF3               ! Main output NDF identifier
@@ -318,13 +321,13 @@
       INTEGER NDF7               ! Modified output extension NDF identifier
       INTEGER NDFT               ! Temporary NDF identifier
       INTEGER NDIM               ! Dimensionality of input extension NDF
-      INTEGER NGOOD              ! No. of good data values in NDF
-      INTEGER OLBND( NDF__MXDIM )! Output NDF low bounds
+      INTEGER*8 NGOOD              ! No. of good data values in NDF
+      INTEGER*8 OLBND( NDF__MXDIM )! Output NDF low bounds
       INTEGER ONDIM              ! Dimensionality of output NDF
-      INTEGER OUBND( NDF__MXDIM )! Output NDF high bounds
+      INTEGER*8 OUBND( NDF__MXDIM )! Output NDF high bounds
       INTEGER PLACE              ! Placeholder for output NDF
       INTEGER SIZE               ! Size of group IGRP
-      INTEGER UBND( NDF__MXDIM ) ! Input extension NDF high bounds
+      INTEGER*8 UBND( NDF__MXDIM ) ! Input extension NDF high bounds
       LOGICAL EXTEN              ! Truncate outptu extension NDFs?
       LOGICAL LIKWCS             ! Match WCS bounds with template?
       LOGICAL SAME               ! Extension NDF same as base NDF?
@@ -444,11 +447,13 @@
          END IF
 
 *  Get the bounds of the main output NDF.
-         CALL NDF_BOUND( NDF3, NDF__MXDIM, OLBND, OUBND, ONDIM, STATUS )
+         CALL NDF_BOUND8( NDF3, NDF__MXDIM, OLBND, OUBND, ONDIM,
+     :                    STATUS )
 
 *  Get the bounds of the base input NDF.
          CALL NDF_BASE( NDF1, BNDF, STATUS )
-         CALL NDF_BOUND( BNDF, NDF__MXDIM, BLBND, BUBND, BNDIM, STATUS )
+         CALL NDF_BOUND8( BNDF, NDF__MXDIM, BLBND, BUBND, BNDIM,
+     :                    STATUS )
 
 *  Loop round each extension NDF. These are stored such that the higher
 *  level NDFs come first. That is, an earlier NDF may contain a later
@@ -459,7 +464,8 @@
             CALL NDG_NDFAS( IGRPB, I, 'READ', NDF4, STATUS )
 
 *  Get its bounds.
-            CALL NDF_BOUND( NDF4, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+            CALL NDF_BOUND8( NDF4, NDF__MXDIM, LBND, UBND, NDIM,
+     :                       STATUS )
 
 *  See if this NDF has the same shape as the base NDF on the pixel axes
 *  that they share in common...
@@ -481,13 +487,13 @@
 
 *  Get a section of the input extension NDF that matches the bounds of
 *  the output NDF on the pixel axes that they share in common.
-               CALL NDF_SECT( NDF4, NDIM, OLBND, OUBND, NDF5, STATUS )
+               CALL NDF_SECT8( NDF4, NDIM, OLBND, OUBND, NDF5, STATUS )
 
 *  Get an identifier for the existing output NDF that is to be replaced.
                CALL NDG_NDFAS( IGRP, I, 'WRITE', NDF6, STATUS )
 
 *  Get an HDS locator for this existing NDF, locate its parent, and
-*  get its name. Note, we do not delete the NDF here as doing so seems 
+*  get its name. Note, we do not delete the NDF here as doing so seems
 *  to trigger a bug in HDF5 that causes datCopy to report an error.
                CALL NDF_LOC( NDF6, 'WRITE', LOC, STATUS )
                CALL DAT_PAREN( LOC, PLOC, STATUS )
