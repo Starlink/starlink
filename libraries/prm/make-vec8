@@ -1,0 +1,16 @@
+
+
+
+iname=`echo $1 | sed 's#vec8_#vec_#'`
+
+echo "make-vec8: $1 from $iname"
+sed -e 's#VEC_#VEC8_#g' $iname > a
+sed -e 's# N = INTEGER# N = INTEGER*8#' a > b
+sed -e 's# IERR = INTEGER# IERR = INTEGER*8#' b > c
+sed -e 's# NERR = INTEGER# NERR = INTEGER*8#' c > d
+sed -e 's# INTEGER N # INTEGER*8 N #' d > e
+sed -e 's# INTEGER IERR # INTEGER*8 IERR #' e > f
+sed -e 's# INTEGER NERR # INTEGER*8 NERR #' f > g
+sed -e 's# INTEGER I # INTEGER*8 I #' g > $1
+
+rm -f a b c d e f g

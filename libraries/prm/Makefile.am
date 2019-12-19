@@ -39,19 +39,7 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 F_ROUTINES = $(NONGEN_F_ROUTINES) $(GEN_F_ROUTINES)
 
-NONGEN_F_ROUTINES = val_absb.f val_absd.f val_absi.f val_absk.f \
-val_absr.f val_absub.f val_absuw.f val_absw.f val_acosd.f val_acosr.f \
-val_acsdd.f val_acsdr.f val_asind.f val_asinr.f val_asndd.f \
-val_asndr.f val_at2dd.f val_at2dr.f val_atand.f val_atanr.f val_atn2d.f \
-val_atn2r.f val_atndd.f val_atndr.f val_cosd.f val_cosdd.f \
-val_cosdr.f val_coshd.f val_coshr.f val_cosr.f \
-val_negb.f val_negd.f val_negi.f val_negr.f val_negub.f val_neguw.f \
-val_negw.f val_signb.f val_signd.f \
-val_signi.f val_signr.f val_signub.f val_signuw.f val_signw.f \
-val_sind.f val_sindd.f val_sindr.f val_sinhd.f val_sinhr.f val_sinr.f \
-val_tand.f val_tandd.f val_tandr.f \
-val_tanhd.f val_tanhr.f val_tanr.f \
-vec_absb.f vec_absd.f vec_absi.f vec_absk.f vec_absr.f \
+NONGEN_VEC_ROUTINES = vec_absb.f vec_absd.f vec_absi.f vec_absk.f vec_absr.f \
 vec_absub.f vec_absuw.f vec_absw.f vec_acosd.f vec_acosr.f vec_acsdd.f \
 vec_acsdr.f vec_asind.f vec_asinr.f vec_asndd.f vec_asndr.f \
 vec_at2dd.f vec_at2dr.f vec_atand.f vec_atanr.f vec_atn2d.f vec_atn2r.f \
@@ -63,7 +51,35 @@ vec_signb.f vec_signd.f \
 vec_signi.f vec_signr.f vec_signub.f vec_signuw.f vec_signw.f \
 vec_sind.f vec_sindd.f vec_sindr.f vec_sinhd.f vec_sinhr.f vec_sinr.f \
 vec_tand.f vec_tandd.f vec_tandr.f \
-vec_tanhd.f vec_tanhr.f vec_tanr.f \
+vec_tanhd.f vec_tanhr.f vec_tanr.f
+
+NONGEN_VEC8_ROUTINES = vec8_absb.f vec8_absd.f vec8_absi.f vec8_absk.f vec8_absr.f \
+vec8_absub.f vec8_absuw.f vec8_absw.f vec8_acosd.f vec8_acosr.f vec8_acsdd.f \
+vec8_acsdr.f vec8_asind.f vec8_asinr.f vec8_asndd.f vec8_asndr.f \
+vec8_at2dd.f vec8_at2dr.f vec8_atand.f vec8_atanr.f vec8_atn2d.f vec8_atn2r.f \
+vec8_atndd.f vec8_atndr.f vec8_cosd.f vec8_cosdd.f vec8_cosdr.f \
+vec8_coshd.f vec8_coshr.f vec8_cosr.f \
+vec8_negb.f \
+vec8_negd.f vec8_negi.f vec8_negr.f vec8_negub.f vec8_neguw.f vec8_negw.f \
+vec8_signb.f vec8_signd.f \
+vec8_signi.f vec8_signr.f vec8_signub.f vec8_signuw.f vec8_signw.f \
+vec8_sind.f vec8_sindd.f vec8_sindr.f vec8_sinhd.f vec8_sinhr.f vec8_sinr.f \
+vec8_tand.f vec8_tandd.f vec8_tandr.f \
+vec8_tanhd.f vec8_tanhr.f vec8_tanr.f
+
+NONGEN_F_ROUTINES = $(NONGEN_VEC_ROUTINES) $(NONGEN_VEC8_ROUTINES) \
+val_absb.f val_absd.f val_absi.f val_absk.f \
+val_absr.f val_absub.f val_absuw.f val_absw.f val_acosd.f val_acosr.f \
+val_acsdd.f val_acsdr.f val_asind.f val_asinr.f val_asndd.f \
+val_asndr.f val_at2dd.f val_at2dr.f val_atand.f val_atanr.f val_atn2d.f \
+val_atn2r.f val_atndd.f val_atndr.f val_cosd.f val_cosdd.f \
+val_cosdr.f val_coshd.f val_coshr.f val_cosr.f \
+val_negb.f val_negd.f val_negi.f val_negr.f val_negub.f val_neguw.f \
+val_negw.f val_signb.f val_signd.f \
+val_signi.f val_signr.f val_signub.f val_signuw.f val_signw.f \
+val_sind.f val_sindd.f val_sindr.f val_sinhd.f val_sinhr.f val_sinr.f \
+val_tand.f val_tandd.f val_tandr.f \
+val_tanhd.f val_tanhr.f val_tanr.f \
 num_clearerr.f num_wasok.f num_geterr.f
 
 GEN_F_ROUTINES = $(PRM_N_GEN:.gn=.f) $(PRM_CVT_ITO_GEN:.gbBdkrwW=.f) \
@@ -72,41 +88,50 @@ $(PRM_CVT_RTO_GEN:.gbBdikwW=.f) $(PRM_CVT_WTO_GEN:.gbBdikrW=.f) \
 $(PRM_CVT_BTO_GEN:.gBdikrwW=.f) $(PRM_CVT_UBTO_GEN:.gbdikrwW=.f) \
 $(PRM_CVT_UWTO_GEN:.gbBdikrw=.f)
 
-PRM_N_GEN = \
-val_addx.gn val_dimx.gn val_divx.gn val_expx.gn  \
-val_idvx.gn val_intx.gn val_lg10x.gn val_logx.gn val_maxx.gn \
-val_minx.gn val_modx.gn val_mulx.gn val_nintx.gn val_pwrx.gn \
-val_sqrtx.gn val_subx.gn val_xtox.gn \
+VEC_N_GEN = \
 vec_addx.gn vec_dimx.gn vec_divx.gn \
 vec_expx.gn vec_idvx.gn vec_intx.gn vec_lg10x.gn vec_logx.gn \
 vec_maxx.gn vec_minx.gn vec_modx.gn vec_mulx.gn vec_nintx.gn \
 vec_pwrx.gn vec_sqrtx.gn vec_subx.gn vec_xtox.gn
 
+VEC8_N_GEN = \
+vec8_addx.gn vec8_dimx.gn vec8_divx.gn \
+vec8_expx.gn vec8_idvx.gn vec8_intx.gn vec8_lg10x.gn vec8_logx.gn \
+vec8_maxx.gn vec8_minx.gn vec8_modx.gn vec8_mulx.gn vec8_nintx.gn \
+vec8_pwrx.gn vec8_sqrtx.gn vec8_subx.gn vec8_xtox.gn
+
+PRM_N_GEN = $(VEC_N_GEN) $(VEC8_N_GEN) \
+val_addx.gn val_dimx.gn val_divx.gn val_expx.gn  \
+val_idvx.gn val_intx.gn val_lg10x.gn val_logx.gn val_maxx.gn \
+val_minx.gn val_modx.gn val_mulx.gn val_nintx.gn val_pwrx.gn \
+val_sqrtx.gn val_subx.gn val_xtox.gn
+
+
 # Each source type should be converted to all types except
 # the source type (which is handled separately)
 PRM_CVT_ITO_GEN = \
-val_itox.gbBdkrwW vec_itox.gbBdkrwW
+val_itox.gbBdkrwW vec_itox.gbBdkrwW vec8_itox.gbBdkrwW
 
 PRM_CVT_KTO_GEN = \
-val_ktox.gbBdirwW vec_ktox.gbBdirwW
+val_ktox.gbBdirwW vec_ktox.gbBdirwW vec8_ktox.gbBdirwW
 
 PRM_CVT_DTO_GEN = \
-val_dtox.gbBikrwW vec_dtox.gbBikrwW
+val_dtox.gbBikrwW vec_dtox.gbBikrwW vec8_dtox.gbBikrwW
 
 PRM_CVT_RTO_GEN = \
-val_rtox.gbBdikwW vec_rtox.gbBdikwW
+val_rtox.gbBdikwW vec_rtox.gbBdikwW vec8_rtox.gbBdikwW
 
 PRM_CVT_WTO_GEN = \
-val_wtox.gbBdikrW vec_wtox.gbBdikrW
+val_wtox.gbBdikrW vec_wtox.gbBdikrW vec8_wtox.gbBdikrW
 
 PRM_CVT_BTO_GEN = \
-val_btox.gBdikrwW vec_btox.gBdikrwW
+val_btox.gBdikrwW vec_btox.gBdikrwW vec8_btox.gBdikrwW
 
 PRM_CVT_UBTO_GEN = \
-val_ubtox.gbdikrwW vec_ubtox.gbdikrwW
+val_ubtox.gbdikrwW vec_ubtox.gbdikrwW vec8_ubtox.gbdikrwW
 
 PRM_CVT_UWTO_GEN = \
-val_uwtox.gbBdikrw vec_uwtox.gbBdikrw
+val_uwtox.gbBdikrw vec_uwtox.gbBdikrw vec8_uwtox.gbBdikrw
 
 # Module num1_cvt.c is not in fact necessary in cases where the
 # Fortran compiler supports the IZEXT (and related) intrinsic.  We
@@ -122,7 +147,6 @@ vecKtox.cgen vecFtox.cgen vecUBtox.cgen vecUWtox.cgen vecWtox.cgen
 
 # The .c files which are built from the above .cgen files.
 BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
-
 
 PLATFORM_SOURCE = num_han.c num_han.cdefault num_han.c_sun num_han.c_dec_osf \
 num_han.cmips num_han.c_sun_solaris
@@ -185,17 +209,33 @@ SUFFIXES = .F
 
 PRIVATE_INCLUDES = PRM_CONST
 
+#  vec files
+VEC_FILES = $(NONGEN_VEC_ROUTINES) $(VEC_N_GEN) \
+vec_itox.gbBdkrwW vec_ktox.gbBdirwW vec_dtox.gbBikrwW \
+vec_rtox.gbBdikwW vec_wtox.gbBdikrW vec_btox.gBdikrwW \
+vec_ubtox.gbdikrwW vec_uwtox.gbBdikrw
 
+#  Built vec8 files
+VEC8_FILES = $(NONGEN_VEC8_ROUTINES) $(VEC8_N_GEN) \
+vec8_itox.gbBdkrwW vec8_ktox.gbBdirwW vec8_dtox.gbBikrwW \
+vec8_rtox.gbBdikwW vec8_wtox.gbBdikrW vec8_btox.gBdikrwW \
+vec8_ubtox.gbdikrwW vec8_uwtox.gbBdikrw
+
+#  How to build a vec8 file from the corresponding vec file
+$(VEC8_FILES): $(VEC_FILES)
+	./make-vec8 $@
 
 # PRM_PAR and prm_par.h are generated from information in float.h and limits.h
 PRM_PAR prm_par.h: make-prm-par$(EXEEXT)
 	./make-prm-par -fPRM_PAR -cprm_par.h
 
 BUILT_SOURCES = $(include_MESSAGES) $(noinst_MESSAGES) PRM_PAR prm_par.h \
-	$(PLATFORM_INCLUDES) $(PLATFORM_PRIVATE_INCLUDES) prm_cgen.h
+	$(PLATFORM_INCLUDES) $(PLATFORM_PRIVATE_INCLUDES) prm_cgen.h \
+        $(VEC8_FILES)
 
 prm_cgen.h: prm_cgen.h.source make_h
 	./make_h
+
 
 # Tests
 
