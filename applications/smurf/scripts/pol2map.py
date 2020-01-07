@@ -677,6 +677,8 @@
 *       - Bug fix for 5-Dec-2019 change (the the sense of the check was
 *       inverted).
 *       - Added parameter SMOOTH450.
+*    7-JAN-2020 (DSB):
+*       Retain variances outside the mask if smooth450=yes and skyloop=yes
 
 '''
 
@@ -2725,10 +2727,18 @@ try:
                   oldpath = "{0}/{1}_{2}_chunk{3}.sdf".format(obsdir,ut,obs,next_chunk)
                   next_chunk += 1
 
-#  Get the new file name and do the rename, smoothing it to the 850
-#  resolution at the same time if required.
+#  Get the new file name and check the old file exists.
                newpath = "{0}/{1}_{2}.sdf".format(mapdir,key,suffix)
                if os.path.exists(oldpath):
+
+#  If so, copy quality information from the coadd created by skyloop to
+#  the old file.
+                  invoke("$KAPPA_DIR/setqual ndf={0} like={1}".format(oldpath,coadd))
+
+#  Clear its bad bits mask.
+                  invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(oldpath))
+
+#  Do the rename, smoothing it to the 850 resolution at the same time if required.
                   if smooth450:
                      Smooth450( oldpath, newpath )
                   else:
@@ -2736,12 +2746,6 @@ try:
 
 #  Add it to the dictionary of maps holding the current stokes parameter.
                   qui_maps[key] = NDG(newpath)
-
-#  Copy quality information from the coadd created by skyloop.
-                  invoke("$KAPPA_DIR/setqual ndf={0} like={1}".format(qui_maps[key],coadd))
-
-#  Clear its bad bits mask.
-                  invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(qui_maps[key]))
 
 #  Add it to the list of maps in mapdir.
                   new_maps.append( qui_maps[key] )
