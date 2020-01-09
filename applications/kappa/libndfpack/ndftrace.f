@@ -348,6 +348,9 @@
 *        changed to use 8-byte dimensions and counters.
 *     30-NOV-2019 (DSB):
 *        Parameters DIMS, LBOUND, UBOUND changed from _INTEGER to _INT64.
+*     9-JAN-2020 (DSB):
+*        Remove the cast added on 4-OCT-2019 as KPG1_MONOD has now
+*        reverted to its original 4-byte interface.
 *     {enter_further_changes_here}
 
 *-
@@ -676,7 +679,7 @@
 *  Instead we issue a warning message so that the application can
 *  continue by using world co-ordinates.
             CALL ERR_BEGIN( STATUS )
-            CALL KPG1_MONOD( .TRUE., INT8(EL),
+            CALL KPG1_MONOD( .TRUE., EL,
      :                       %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                       MONOTO( IAXIS ), STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN

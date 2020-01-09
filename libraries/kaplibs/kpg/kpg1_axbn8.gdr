@@ -1,7 +1,7 @@
-      SUBROUTINE KPG1_AXBN<T>( EL, CENTRE, AXLCO, AXUCO, STATUS )
+      SUBROUTINE KPG1_AXBN8<T>( EL, CENTRE, AXLCO, AXUCO, STATUS )
 *+
 *  Name:
-*     KPG1_AXBNx
+*     KPG1_AXBN8x
 
 *  Purpose:
 *     Finds the bounds of an NDF's axis centre co-ordinates.
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_AXBNx( EL, CENTRE, AXLCO, AXUCO, STATUS )
+*     CALL KPG1_AXBN8x( EL, CENTRE, AXLCO, AXUCO, STATUS )
 
 *  Description:
 *     This routine determines the lowest and highest centre
@@ -18,7 +18,7 @@
 *     assumes that these will be the first and last elements.
 
 *  Arguments:
-*     EL = INTEGER (Given)
+*     EL = INTEGER*8 (Given)
 *        The number of elements in the axis.
 *     CENTRE( EL ) = ? (Given)
 *        The NDF axis centre co-ordinates.
@@ -66,9 +66,10 @@
 *        Original version.
 *     1991 May 31 (MJC):
 *        Converted to generic.
+*     4-OCT-2019 (DSB):
+*        Use INTEGER*8 for EL.
 *     9-JAN-2020 (DSB):
-*        Re-instate 4-byte version (8-byte version is now in
-*        kpg1_axbn8.gdr).
+*        Rename as kpg1_axbn8.gdr.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -83,7 +84,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      INTEGER EL
+      INTEGER*8
+     :  EL
 
       <TYPE>
      :  CENTRE( EL )

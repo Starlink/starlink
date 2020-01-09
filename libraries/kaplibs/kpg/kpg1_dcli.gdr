@@ -217,8 +217,8 @@
 *  the data-co-ordinate value of the single axis position, obtained by
 *  the bounds-finding routine.
          ELSE
-            CALL KPG1_AXBN<T>( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
-     :                         DALBND( I ), DAUBND( I ), STATUS )
+            CALL KPG1_AXBN8<T>( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
+     :                          DALBND( I ), DAUBND( I ), STATUS )
             SCALE( I ) = 0<CONST>
             OFFSET( I ) = DALBND( I )
             IDENTY = .FALSE.

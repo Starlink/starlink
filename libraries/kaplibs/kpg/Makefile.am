@@ -111,7 +111,7 @@ KPG_BIRW_GEN =
 
 # Double and Real
 KPG_DR_GEN = kpg1_ainb.gdr kpg1_aind.gdr kpg1_aker.gdr \
-kpg1_axbn.gdr kpg1_axco.gdr kpg1_axex.gdr kpg1_axgv.gdr \
+kpg1_axbn.gdr kpg1_axbn8.gdr kpg1_axco.gdr kpg1_axex.gdr kpg1_axgv.gdr \
 kpg1_axlv.gdr kpg1_axvl.gdr kpg1_bloc.gdr kpg1_bmed.gdr \
 kpg1_chax.gdr kpg1_chep.gdr kpg1_chev.gdr kpg1_cmav.gdr \
 kpg1_che2.gdr kpg1_cmad.gdr kpg1_cmvd.gdr kpg1_cmvv.gdr \
@@ -120,7 +120,7 @@ kpg1_dwso.gdr kpg1_ffr.gdr  kpg1_fftf.gdr kpg1_gaus.gdr \
 kpg1_hcon.gdr kpg1_hmlt.gdr kpg1_hsds.gdr kpg1_hsfl.gdr \
 kpg1_hstf.gdr kpg1_is3.gdr  \
 kpg_ld2a.gdr  kpg_lr2a.gdr  kpg1_litn.gdr kpg1_ludc.gdr \
-kpg1_mdet.gdr kpg1_mono.gdr kpg1_mthe.gdr kpg1_nbad.gdr \
+kpg1_mdet.gdr kpg1_mono.gdr kpg1_mono8.gdr kpg1_mthe.gdr kpg1_nbad.gdr \
 kpg_norv.gdr  kpg1_pow.gdr kpg1_stds8.gdr kpg1_stfl8.gdr \
 kpg1_prow.gdr kpg1_psfs.gdr kpg1_qntl.gdr kpg1_rfco.gdr \
 kpg1_ssaz.gdr kpg1_stds.gdr kpg1_stfl.gdr kpg1_tral.gdr \
@@ -138,7 +138,7 @@ KPG_IR_GEN =
 KPG_GRAPHIC_DR_GEN = kpg1_litr.gdr kpg1_lltr.gdr
 
 # All except byte/ubyte
-KPG_NXB_GEN = kpg1_axli.gnxb
+KPG_NXB_GEN = kpg1_axli.gnxb kpg1_axli8.gnxb
 
 # Non-adam non-graphic
 KPG_NONGEN = \

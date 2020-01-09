@@ -204,6 +204,8 @@
 *        Cast EL to INTEGER*8 when calling KPG1_AXBN<x>. At some point the
 *        whole of this function (and the whole of KAPPA!) should be
 *        changed to use 8-byte dimensions and counters.
+*     9-JAN-2020 (DSB):
+*        KPG1_AXBN<x> now uses INTEGER*4 so remove the above cast.
 *     {enter_further_changes_here}
 
 *-
@@ -504,15 +506,15 @@
 
 *  Determine the bounds of the axes of the template NDF.
             IF ( ATYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_AXBNR( INT8( XDIM ), %VAL( CNF_PVAL( XPTR ) ),
+               CALL KPG1_AXBNR( XDIM, %VAL( CNF_PVAL( XPTR ) ),
      :                          XMIN, XMAX, STATUS )
-               CALL KPG1_AXBNR( INT8( YDIM ), %VAL( CNF_PVAL( YPTR ) ),
+               CALL KPG1_AXBNR( YDIM, %VAL( CNF_PVAL( YPTR ) ),
      :                          YMIN, YMAX, STATUS )
 
             ELSE
-               CALL KPG1_AXBND( INT8( XDIM ), %VAL( CNF_PVAL( XPTR ) ),
+               CALL KPG1_AXBND( XDIM, %VAL( CNF_PVAL( XPTR ) ),
      :                          DXMIN, DXMAX, STATUS )
-               CALL KPG1_AXBND( INT8( YDIM ), %VAL( CNF_PVAL( YPTR ) ),
+               CALL KPG1_AXBND( YDIM, %VAL( CNF_PVAL( YPTR ) ),
      :                          DYMIN, DYMAX, STATUS )
             END IF
 
