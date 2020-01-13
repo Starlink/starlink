@@ -1,0 +1,57 @@
+
+cat <<EOF > temp.h
+#include "cgeneric.h"
+
+#define CGEN_CODE_TYPE CGEN_DOUBLE_TYPE
+#include "cgeneric_defs.h"
+#include "kpg_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_FLOAT_TYPE
+#include "cgeneric_defs.h"
+#include "kpg_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_INT_TYPE
+#include "cgeneric_defs.h"
+#include "kpg_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_WORD_TYPE
+#include "cgeneric_defs.h"
+#include "kpg_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_UWORD_TYPE
+#include "cgeneric_defs.h"
+#include "kpg_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_BYTE_TYPE
+#include "cgeneric_defs.h"
+#include "kpg_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_UBYTE_TYPE
+#include "cgeneric_defs.h"
+#include "kpg_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_INT64_TYPE
+#include "cgeneric_defs.h"
+#include "kpg_cgen.h.source"
+#undef CGEN_CODE_TYPE
+
+EOF
+
+gcc -E -P temp.h -I. -I$STARLINK_DIR/include | grep kpg > kpg_cgen.h
+rm temp.h
+
+
+ccodes=(D F I W UW B UB K)
+fcodes=(d r i w uw b ub k)
+funlist=`./pygrep "CGEN_FUNCTION2\( *(\w+) *,_ *\)" kpg_cgen.h.source | ./pygrep "kpg\w+"`
+
+
+
+

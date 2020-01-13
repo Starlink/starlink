@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 cincludedir = $(includedir)/star
+dist_noinst_SCRIPTS = make_h pygrep
 
 lib_LTLIBRARIES = libkpg.la libkpg_adam.la libkpg_grf.la libkpg_grf_adam.la
 
@@ -10,7 +11,8 @@ libkpg_la_SOURCES = \
 	$(include_MESSAGES) \
 	$(BLOCK_DATA_FILES) \
 	$(F_ROUTINES) \
-	$(C_ROUTINES)
+	$(C_ROUTINES) \
+	$(BUILT_C_ROUTINES)
 
 libkpg_adam_la_SOURCES = \
 	$(ADAM_F_ROUTINES) \
@@ -22,18 +24,16 @@ libkpg_grf_adam_la_SOURCES = \
 libkpg_grf_la_SOURCES = \
 	$(GRAPHIC_F_ROUTINES)
 
-include_HEADERS = $(PUBLIC_F_INCLUDES)
+include_HEADERS = $(PUBLIC_INCLUDES)
 cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
 include_MESSAGES = kpg_err.h KPG_ERR
 
-PUBLIC_C_INCLUDES = kaplibs.h
+PUBLIC_C_INCLUDES = kaplibs.h kpg_cgen.h
 PUBLIC_F_INCLUDES = CTM_PAR
 PUBLIC_INCLUDES = $(PUBLIC_C_INCLUDES) $(PUBLIC_F_INCLUDES)
 
 PRIVATE_INCLUDES = KPG_PAR KPG_AST CTM_COM kaplibs_private.h
 BLOCK_DATA_FILES = ctm_xcols.f
-
-BUILT_SOURCES = $(include_MESSAGES)
 
 C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c \
 kpg1_ieeer.c  kpg1_isfinr.c kpg1_kygrp.c kpg1_kygp1.c kpg1_kymp1.c \
@@ -42,7 +42,17 @@ kpg1_hdsky.c kpg1Kyhds.c kpg1_kyhds.c kpgGetOutline.c kpgPutOutline.c \
 kpg_gtfts.c kpg_ptfts.c kpg1Ch2pm.c kpg1_ch2pm.c kpg1Chcof.c \
 kpg1Fit1d.c kpg1_fit1d.c kpg1_asndf.c kpg1_asndf8.c kpg1Asndf.c \
 kpg1Asndf8.c kpg1Axcpy.c kpg1_getoutline.c kpg1Rnorm.c kpg1_rnorm.c \
-kpg1CrMapD.c kpg1_crmapd.c
+kpg1CrMapD.c kpg1_crmapd.c kpg1_osta8.c
+
+GEN_C_ROUTINES = kpgOsta8.cgen
+
+# The .c files which are built from the above .cgen files.
+BUILT_C_ROUTINES = $(GEN_C_ROUTINES:.cgen=.c)
+
+BUILT_SOURCES = $(include_MESSAGES) $(BUILT_C_ROUTINES)
+
+kpg_cgen.h: kpg_cgen.h.source make_h pygrep
+	./make_h
 
 F_ROUTINES = $(KPG_NONGEN) $(GEN_F_ROUTINES)
 
@@ -464,3 +474,67 @@ kpg1_pltln.f
 	$(FGENERIC) $(<)
 
 AM_FCFLAGS = -I../ira
+
+# Create the .c file which defines type-specific code generated from each
+# .cgen file.
+$(GEN_C_ROUTINES:.cgen=.c): kpg_cgen.h
+	echo "/*" > $@
+	echo "*  Name:" >> $@
+	echo "*    $@" >> $@
+	echo "" >> $@
+	echo "*  Purpose:" >> $@
+	echo "*    This file expands the generic C code held in $(@:.c=.cgen) to provide" >> $@
+	echo "*    the required type-specific implementations which can be called by" >> $@
+	echo "*    other functions." >> $@
+	echo "" >> $@
+	echo "*  Notes:" >> $@
+	echo "*    - This file is generated automatically at build time (see" >> $@
+	echo "*    Makefile.am)" >> $@
+	echo "*/" >> $@
+	echo "" >> $@
+	echo "#include \"prm_par.h\"" >> $@
+	echo "#include \"cgeneric.h\"" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_DOUBLE_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_FLOAT_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_INT_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_WORD_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_UWORD_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_BYTE_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_UBYTE_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_INT64_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+
+# Need to distribute the generic files
+EXTRA_DIST = $(GEN_C_ROUTINES)

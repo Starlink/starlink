@@ -208,5 +208,7 @@ void kpg1CrMapD( int, int, const double x[], const double y[], int, double *, in
 
 void kpg1Lgcmd( const char *appn, const char *pack, int *status );
 
+/* Now include the expanded generic prototypes. */
+#include "kpg_cgen.h"
 
 #endif

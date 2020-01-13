@@ -1,0 +1,334 @@
+#include <stdint.h>
+#include <math.h>
+#include "sae_par.h"
+#include "prm_par.h"
+
+#define MAX(a,b) (((a)>(b))?(a):(b))
+
+void CGEN_FUNCTION(kpgOsta8)( int bad, int64_t el, const CGEN_TYPE *data,
+                              int nclip, const float *clip, int64_t istat[3],
+                              double dstat[7], int64_t istatc[3], double dstatc[7],
+                              int *status ){
+/*
+*+
+*  Name:
+*     kpgOsta8<T>
+
+*  Purpose:
+*     Computes simple statistics for an array.
+
+*  Synopsis:
+*     void kpgOsta8<T>( int bad, int64_t el, const <TYPE> *data, int nclip,
+*                       const float *clip, int64_t istat[3], double dstat[7],
+*                       int64_t istatc[3], double dstatc[7], int *status )
+
+*  Description:
+*     This function computes simple statistics for an array, namely: the
+*     number of valid pixels; the minimum and maximum pixel values (and
+*     their positions); the pixel sum; the mean; and the population
+*     standard deviation, skewness, and excess kurtosis.  Iterative
+*     K-sigma clipping may also be optionally applied.
+*
+*     It uses a one-pass recursive algorithm for efficiency using the
+*     formulae of Terriberry (2007).
+
+*  Arguments:
+*     bad
+*        Whether checks for bad pixels should be performed on the array
+*        being analysed.
+*     el
+*        Number of pixels in the array.
+*     data
+*        Point to array to be analysed.
+*     nclip
+*        Number of K-sigma clipping iterations to apply (may be zero).
+*     clip
+*        Pointer to array of clipping limits for successive iterations, expressed
+*        as standard deviations. Its length is given by "nclip".
+*     istat
+*        Returned holding the integer statistics before clipping.  The meanings of
+*        the elements in order are as follows.
+*        -  Number of valid pixels
+*        -  Index where the pixel with the lowest value was (first)
+*        found
+*        -  Index where the pixel with the highest value was (first)
+*        found
+*     dstat
+*        Returned holding the floating-point statistics before clipping derived
+*        from the valid pixel values in "data". The meanings of the elements in
+*        order are as follows.
+*        -  Minimum value
+*        -  Maximum value
+*        -  Sum
+*        -  Mean
+*        -  Population standard deviation
+*        -  Population skewness
+*        -  Population excess kurtosis.  This is zero for a Gaussian.
+*     istats
+*        Returned holding the integer statistics after clipping derived from
+*        the valid pixel values in "data". The attributions of the elements are
+*        the same as for argument "istat". If "nclip" is zero, the array will
+*        contain the same values as "istat".
+*     dstatc
+*        Returned holding the floating-point statistics after clipping derived
+*        from the valid pixel values in "data". The attributions of the elements
+*        are the same as for argument "dstat". If "nclip" is zero, the array will
+*        contain the same values as "dstat".
+*     status
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each of the standard numeric types.
+*     Replace "<T>" in the routine name by D, R, I, W, UW, B or UB as
+*     appropriate. The data type of the array being analysed must match
+*     the particular routine used.
+*     -  If no clipping is performed (i.e. if "nclip" = 0) then the values
+*     of arguments which return results after clipping will be the same
+*     as for those returning results before clipping.
+*     -  If "istat[0]" or "istatc[0]" is zero, then the values of all the
+*     derived statistics will be undefined and will be set to the "bad"
+*     value appropriate to their data type (except for the pixel sum,
+*     which will be zero).
+
+*  References:
+*     Terriberry, T.B., 2007, Computing Higher-order Moments Online,
+*     http://people.xiph.org/~tterribe/notes/homs.html.
+
+*  Copyright:
+*     Copyright (C) 2020 East Asian Observatory.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S Berry (EAO)
+*     {enter_new_authors_here}
+
+*  History:
+*     10-JAN-2020 (DSB):
+*        Original version transliterated from kpg_ostat8.gn (written by
+*        MJC).
+*     {enter_further_changes_here}
+
+*-
+*/
+
+/* Local Constants: */
+#define NMOM 4
+
+/* Local Variables: */
+   double dev;       /* Deviation from current mean */
+   double devn;      /* Normalised deviation */
+   double devsq;     /* Normalised deviation squared */
+   double devsqn;    /* Normalised squared deviation */
+   double dmax;      /* Maximum value */
+   double dmin;      /* Minimum value */
+   double kurt;      /* Excess kurtosis */
+   double llim;      /* Lower clipping limit */
+   double mean;      /* mean value of whole population */
+   double moment[ NMOM ]; /* The moments */
+   double skew;      /* Skewness */
+   double stdev;     /* Standard deviation */
+   double sum;       /* Sum of good values */
+   double ulim;      /* Upper clipping limit */
+   double value;     /* Double-precision array value */
+   double varnce;    /* Population variance */
+   int iclip;        /* Loop counter for clipping iterations */
+   int m;            /* Loop counter for moments */
+   int nclp;         /* Number of clipping iterations */
+   int64_t i;        /* Loop counter for array pixels */
+   int64_t imax;     /* Pixel index of maximum value */
+   int64_t imin;     /* Pixel index of minimum value */
+   int64_t ngood;    /* Number of good values */
+   int64_t nm1;      /* ngood minus one */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Loop through each clipping iteration, plus an initial iteration
+   where no clipping is applied. */
+   nclp = MAX( 0, nclip );
+   for( iclip = 0; iclip <= nclp; iclip++ ) {
+
+/* Initialise for forming statistics. */
+      ngood = 0;
+      sum = 0.0;
+      for( m = 0; m < NMOM; m++ ) moment[ m ] = 0.0;
+      dmin = VAL__MAXD;
+      dmax = VAL__MIND;
+
+/* If no clipping is being applied, then loop through the array,
+   selecting all the pixels which are not bad. */
+      if( iclip == 0 ) {
+         mean = 0.0;
+         for( i = 0; i < el; i++ ) {
+            if( !bad || data[ i ] != CGEN_BAD ) {
+
+/* Convert the array values to double precision and count them. */
+               value = (double) data[ i ];
+               ngood++;
+               nm1 = ngood - 1;
+               sum += value;
+
+/* Evaluate moments incrementally using the deviations about the
+   current mean.  These are the formulae of Terriberry. */
+               dev = value - moment[ 0 ];
+               devn = dev / (double)( ngood );
+               devsq = devn * devn;
+               devsqn = dev * devn * nm1;
+               moment[ 0 ] += devn;
+               moment[ 3 ] += devsqn * devsq * (double)( ngood * ngood -
+                              3 * ngood + 3 ) + 6.0 * devsq * moment[ 1 ] -
+                              4.0 * devn * moment[ 2 ];
+               moment[ 2 ] += devsqn * devn * (double)( ngood - 2 ) -
+                              3.0 * devn * moment[ 1 ];
+               moment[ 1 ] += devsqn;
+
+/* Note the minimum and maximum pixel values and where they occur. */
+               if( value < dmin ) {
+                  dmin = value;
+                  imin = i;
+               }
+               if( value > dmax ) {
+                  dmax = value;
+                  imax = i;
+               }
+            }
+         }
+
+/* If clipping is being applied, then calculate the clipping limits. */
+      } else {
+         llim = mean - stdev * (double)( clip[ iclip - 1 ] );
+         ulim = mean + stdev * (double)( clip[ iclip - 1 ] );
+         mean = 0.0;
+
+/* Loop (as above), selecting all the pixels which are not bad. */
+         for( i = 0; i < el; i++ ) {
+            if( !bad || data[ i ] != CGEN_BAD ) {
+
+/* Convert the array values to double precision, but this time select
+   only those which lie within the clipping limits. */
+               value = (double) data[ i ];
+               if( value <= ulim && value >= llim ) {
+
+/* Count the unclipped values. */
+                  ngood++;
+                  nm1 = ngood - 1;
+                  sum += value;
+
+/* Evaluate moments incrementally using the deviations about the
+   current mean.  These are the formulae of Terriberry. */
+                  dev = value - moment[ 0 ];
+                  devn = dev / (double)( ngood );
+                  devsq = devn * devn;
+                  devsqn = dev * devn * nm1;
+                  moment[ 0 ] += devn;
+                  moment[ 3 ] += devsqn * devsq * (double)( ngood * ngood -
+                                 3 * ngood + 3 ) + 6.0 * devsq * moment[ 1 ] -
+                                 4.0 * devn * moment[ 2 ];
+                  moment[ 2 ] += devsqn * devn * (double)( ngood - 2 ) -
+                                 3.0 * devn * moment[ 1 ];
+                  moment[ 1 ] += devsqn;
+
+/* Note the minimum and maximum pixel values and where they occur. */
+                  if( value < dmin ) {
+                     dmin = value;
+                     imin = i;
+                  }
+                  if( value > dmax ) {
+                     dmax = value;
+                     imax = i;
+                  }
+               }
+            }
+         }
+      }
+
+/* If there were no valid pixels, then use null result values. */
+      if( ngood == 0 ) {
+         imin = VAL__BADK;
+         dmin = VAL__BADD;
+         imax = VAL__BADK;
+         dmax = VAL__BADD;
+         sum = 0.0;
+         mean = VAL__BADD;
+         stdev = VAL__BADD;
+         skew = VAL__BADD;
+         kurt = VAL__BADD;
+
+/* Otherwise, calculate the pixel mean. */
+      } else {
+          mean = moment[ 0 ];
+
+/* Before calculating the standard deviation, check for (a) only one
+   contributing pixel, (b) all pixels having the same value and (c)
+   rounding errors producing a negative variance value. in all these
+   cases, calculate a standard deviation value of zero. */
+         varnce = moment[ 1 ] / (double)( ngood );
+         if( ngood == 1 || dmin == dmax || varnce < 0.0 ) {
+            stdev = 0.0;
+
+/* Otherwise, calculate the standard deviation normally. */
+         } else {
+            stdev = sqrt( varnce );
+         }
+
+/* Evaluate the skewness and kurtosis from the moments.  Note the
+   kurtosis is not the pure kurtosis, but the excess kurtosis.  This
+   evaluates to zero for a Gaussian.  Protect against a zero second
+   moment with some tolerance for rounding. */
+         if( fabs( moment[ 1 ] ) > 10.0 * VAL__EPSD ) {
+            skew = sqrt( (double)( ngood ) / moment[ 1 ] ) *
+                          moment[ 2 ] / moment[ 1 ];
+            kurt = (double)( ngood ) * moment[ 3 ] /
+                   ( moment[ 1 ] * moment[ 1 ] ) - 3.0;
+         }
+      }
+
+/* Store the statistics in the returned arrays.  if no clipping was
+   applied on this iteration, then set values for the un-clipped return
+   arguments. */
+      if( iclip == 0 ) {
+         istat[ 0 ] = ngood;
+         istat[ 1 ] = imin;
+         dstat[ 0 ] = dmin;
+         istat[ 2 ] = imax;
+         dstat[ 1 ] = dmax;
+         dstat[ 2 ] = sum;
+         dstat[ 3 ] = moment[ 0 ];
+         dstat[ 4 ] = stdev;
+         dstat[ 5 ] = skew;
+         dstat[ 6 ] = kurt;
+      }
+
+      istatc[ 0 ] = ngood;
+      istatc[ 1 ] = imin;
+      dstatc[ 0 ] = dmin;
+      istatc[ 2 ] = imax;
+      dstatc[ 1 ] = dmax;
+      dstatc[ 2 ] = sum;
+      dstatc[ 3 ] = moment[ 0 ];
+      dstatc[ 4 ] = stdev;
+      dstatc[ 5 ] = skew;
+      dstatc[ 6 ] = kurt;
+
+/* Quit performing clipping iterations if there are no valid pixels
+   left.  */
+      if( ngood == 0 ) break;
+   }
+}

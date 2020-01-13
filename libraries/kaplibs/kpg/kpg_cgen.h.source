@@ -1,0 +1,5 @@
+/* Generic prototypes for generic C functions. These are expanded at
+   make-time by script make_h to generate kpg_cgen.h, which is included in
+   kaplibs.h. */
+
+void CGEN_FUNCTION(kpgOsta8)( int bad, int64_t el, const CGEN_TYPE *data, int nclip, const float *clip, int64_t istat[3], double dstat[7], int64_t istatc[3], double dstatc[7], int *status );

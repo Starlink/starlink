@@ -505,37 +505,10 @@
          CALL NDF_BAD( NDF, COMP, .FALSE., BAD, STATUS )
       END IF
 
-*  Call the appropriate routine to compute the statistics.
-      IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL KPG_OSTA8B( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                   NCLIP, CLIP, ISTAT, DSTAT,
-     :                   ISTATC, DSTATC, STATUS )
-
-      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG_OSTA8D( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                   NCLIP, CLIP, ISTAT, DSTAT,
-     :                   ISTATC, DSTATC, STATUS )
-
-      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG_OSTA8I( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                   NCLIP, CLIP, ISTAT, DSTAT,
-     :                   ISTATC, DSTATC, STATUS )
-
-      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
-         CALL KPG_OSTA8K( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                   NCLIP, CLIP, ISTAT, DSTAT,
-     :                   ISTATC, DSTATC, STATUS )
-
-      ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL KPG_OSTA8R( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                   NCLIP, CLIP, ISTAT, DSTAT,
-     :                   ISTATC, DSTATC, STATUS )
-
-      ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL KPG_OSTA8W( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                   NCLIP, CLIP, ISTAT, DSTAT,
-     :                   ISTATC, DSTATC, STATUS )
-      END IF
+*  Compute the statistics.
+      CALL KPG1_OSTA8( TYPE, BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                 NCLIP, CLIP, ISTAT, DSTAT, ISTATC, DSTATC,
+     :                 STATUS )
 
 *  Extract the individual statistics from the arrays.
       NGOOD = ISTAT( 1 )
