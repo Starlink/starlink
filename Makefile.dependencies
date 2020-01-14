@@ -38,8 +38,12 @@ $(MANIFESTS)/acsisio: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
+		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/one \
+		$(MANIFESTS)/par \
+		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
@@ -221,6 +225,7 @@ $(MANIFESTS)/atools: \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/thr \
 		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/atools \
@@ -351,6 +356,7 @@ $(MANIFESTS)/ccdbig: \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/thr \
 		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/obsolete/ccdbig \
@@ -553,6 +559,7 @@ $(MANIFESTS)/convert: \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/thr \
 		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/convert \
@@ -742,6 +749,7 @@ $(MANIFESTS)/daophot: \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/one \
+		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pgp \
 		$(MANIFESTS)/pgplot \
@@ -835,6 +843,7 @@ $(MANIFESTS)/dipso: \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/thr \
 		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/dipso \
@@ -898,6 +907,7 @@ $(MANIFESTS)/echomop: \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/thr \
 		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/echomop \
@@ -1683,6 +1693,7 @@ $(MANIFESTS)/irq: \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/thr \
 		$(MANIFESTS)/trn
 	cd libraries/irq \
 	  && $(MAKE_CPT)
@@ -1746,6 +1757,7 @@ $(MANIFESTS)/jcmtdr: \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/thr \
 		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/obsolete/jcmtdr \
@@ -1805,6 +1817,7 @@ $(MANIFESTS)/kaplibs: \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/thr \
 		$(MANIFESTS)/trn
 	cd libraries/kaplibs \
 	  && $(MAKE_CPT)
@@ -1864,6 +1877,7 @@ $(MANIFESTS)/kappa: \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/thr \
 		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/kappa \
@@ -1924,6 +1938,7 @@ $(MANIFESTS)/kaprh: \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/thr \
 		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/obsolete/kaprh \
@@ -2080,8 +2095,12 @@ $(MANIFESTS)/ndf: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
+		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/one \
+		$(MANIFESTS)/par \
+		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
@@ -2423,6 +2442,7 @@ $(MANIFESTS)/polmap: \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/one \
+		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pgplot \
 		$(MANIFESTS)/prm \
@@ -2492,6 +2512,7 @@ $(MANIFESTS)/polpack: \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/thr \
 		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/polpack \
@@ -3036,6 +3057,7 @@ $(MANIFESTS)/starman: \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/one \
+		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pgp \
 		$(MANIFESTS)/prm \
@@ -3253,6 +3275,7 @@ $(MANIFESTS)/tsp: \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/one \
+		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
