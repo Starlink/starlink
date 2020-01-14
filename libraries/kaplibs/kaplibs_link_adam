@@ -36,7 +36,7 @@
            `ctg_link_adam` `atl_link_adam` \
            `cat_link_adam` `ndg_link_adam` \
            `ndf_link_adam` `ast_link_adam` \
-           `fio_link_adam` `thr_link` \
+           `fio_link_adam` `thr_link_adam` \
            `grp_link_adam` `trn_link_adam` \
            `prm_link_adam` \
            `psx_link_adam` `pda_link_adam` \
@@ -56,7 +56,7 @@
            `ndf_link_adam` `ast_link_adam -grf` \
            `agp_link_adam` `fio_link_adam` \
            `grp_link_adam` `trn_link_adam` \
-           `prm_link_adam` `thr_link` \
+           `prm_link_adam` `thr_link_adam` \
            `psx_link_adam` `pda_link_adam` \
             -lgsl -lgslcblas \
            `pgplot_link_adam`  `one_link_adam` \
@@ -75,7 +75,7 @@
            `ndf_link_adam` `ast_link_adam -grf` \
            `agi_link_adam` `fio_link_adam` \
            `grp_link_adam` `trn_link_adam` \
-           `prm_link_adam` `thr_link` \
+           `prm_link_adam` `thr_link_adam` \
            `psx_link_adam` `pda_link_adam` \
             -lgsl -lgslcblas \
            `pgp_link_adam`  `one_link_adam` \
