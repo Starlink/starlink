@@ -44,13 +44,17 @@ cat <<EOF > temp.h
 
 EOF
 
-gcc -E -P temp.h -I. -I$STARLINK_DIR/include | grep kpg > kpg_cgen.h
+cat > kpg_cgen.h <<EOF2
+#include "star/thr.h"
+EOF2
+
+gcc -E -P temp.h -I. -I$STARLINK_DIR/include | grep 'kpg' >> kpg_cgen.h
 rm temp.h
 
 
-ccodes=(D F I W UW B UB K)
-fcodes=(d r i w uw b ub k)
-funlist=`./pygrep "CGEN_FUNCTION2\( *(\w+) *,_ *\)" kpg_cgen.h.source | ./pygrep "kpg\w+"`
+#ccodes=(D F I W UW B UB K)
+#fcodes=(d r i w uw b ub k)
+#funlist=`./pygrep "CGEN_FUNCTION2\( *(\w+) *,_ *\)" kpg_cgen.h.source | ./pygrep "kpg\w+"`
 
 
 

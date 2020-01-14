@@ -34,7 +34,7 @@
            `irq_link` `atl_link` \
            `cat_link` `ndg_link` \
            `ndf_link` `ast_link -ems` \
-           `fio_link` \
+           `fio_link` `thr_link` \
            `grp_link` `trn_link` \
            `prm_link` \
            `psx_link` `pda_link` \
@@ -48,7 +48,7 @@
            `irq_link` `atl_link` \
            `cat_link` `ndg_link` \
            `ndf_link` `ast_link -ems -grf` \
-           `agp_link` `fio_link` \
+           `agp_link` `fio_link` `thr_link` \
            `grp_link` `trn_link` \
            `prm_link` \
            `psx_link` `pda_link` \
@@ -64,7 +64,7 @@
            `sgs_link` `ndg_link` \
            `gks_link` `gns_link` \
            `ndf_link` `ast_link -ems -grf` \
-           `agi_link` `fio_link` \
+           `agi_link` `fio_link` `thr_link` \
            `grp_link` `trn_link` \
            `prm_link` \
            `psx_link` `pda_link` \

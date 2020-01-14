@@ -3,6 +3,7 @@
 #include "kaplibs.h"
 #include "mers.h"
 #include "sae_par.h"
+#include "star/thr.h"
 
 F77_SUBROUTINE(kpg1_osta8)( CHARACTER(TYPE), LOGICAL(BAD), INTEGER8(EL),
                             const void *data, INTEGER(NCLIP), REAL_ARRAY(CLIP),
@@ -134,29 +135,36 @@ F77_SUBROUTINE(kpg1_osta8)( CHARACTER(TYPE), LOGICAL(BAD), INTEGER8(EL),
    GENPTR_DOUBLE_ARRAY(DSTATC)
    GENPTR_INTEGER(STATUS)
 
+/* Find the number of cores/processors available and create a pool of
+   threads of the same size. Assume we're being called from a KAPPA
+   application (sadly, we probably need an extra argument to indicate
+   what package is being used). */
+   ThrWorkForce *wf = thrGetWorkforce( thrGetNThread( "KAPPA_THREADS", STATUS ),
+                                       STATUS );
+
 /* Call the appropriate routine to compute the statistics. */
    if( !strncmp( TYPE, "_BYTE", 5 ) ) {
-      kpgOsta8B( F77_ISTRUE( *BAD ), *EL, data, *NCLIP, CLIP,
+      kpgOsta8B( wf, F77_ISTRUE( *BAD ), *EL, data, *NCLIP, CLIP,
                  ISTAT, DSTAT, ISTATC, DSTATC, STATUS );
 
    } else if( !strncmp( TYPE, "_DOUBLE", 7 ) ) {
-      kpgOsta8D( F77_ISTRUE( *BAD ), *EL, data, *NCLIP, CLIP,
+      kpgOsta8D( wf, F77_ISTRUE( *BAD ), *EL, data, *NCLIP, CLIP,
                  ISTAT, DSTAT, ISTATC, DSTATC, STATUS );
 
    } else if( !strncmp( TYPE, "_INTEGER", 8 ) ) {
-      kpgOsta8I( F77_ISTRUE( *BAD ), *EL, data, *NCLIP, CLIP,
+      kpgOsta8I( wf, F77_ISTRUE( *BAD ), *EL, data, *NCLIP, CLIP,
                  ISTAT, DSTAT, ISTATC, DSTATC, STATUS );
 
    } else if( !strncmp( TYPE, "_INT64", 6 ) ) {
-      kpgOsta8K( F77_ISTRUE( *BAD ), *EL, data, *NCLIP, CLIP,
+      kpgOsta8K( wf, F77_ISTRUE( *BAD ), *EL, data, *NCLIP, CLIP,
                  ISTAT, DSTAT, ISTATC, DSTATC, STATUS );
 
    } else if( !strncmp( TYPE, "_REAL", 5 ) ) {
-      kpgOsta8F( F77_ISTRUE( *BAD ), *EL, data, *NCLIP, CLIP,
+      kpgOsta8F( wf, F77_ISTRUE( *BAD ), *EL, data, *NCLIP, CLIP,
                  ISTAT, DSTAT, ISTATC, DSTATC, STATUS );
 
    } else if( !strncmp( TYPE, "_WORD", 5 ) ) {
-      kpgOsta8W( F77_ISTRUE( *BAD ), *EL, data, *NCLIP, CLIP,
+      kpgOsta8W( wf, F77_ISTRUE( *BAD ), *EL, data, *NCLIP, CLIP,
                  ISTAT, DSTAT, ISTATC, DSTATC, STATUS );
 
    } else if( *STATUS == SAI__OK ){

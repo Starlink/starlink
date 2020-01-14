@@ -218,6 +218,12 @@
 /kpg/kpg_stoc.f
 /kpg/kpg_stoc8.f
 /kpg/kpg_stos.f
+/kpg/kpgOsta8.c
+/kpg/kpg_cgen.h
+/kpg/kpg1_axbn8.f
+/kpg/kpg1_axli8.f
+/kpg/kpg1_bbox8.f
+/kpg/kpg1_mono8.f
 /kpg/notes
 /kaplibs_noadam_test
 /kaplibs_test
