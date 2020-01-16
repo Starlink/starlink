@@ -297,20 +297,22 @@ void CGEN_FUNCTION(kpgOsta8)( ThrWorkForce *wf, int bad, int64_t el,
          nA = ngood;
          ngood = nA + nB;
 
-         dev = pdata->moment[ 0 ] - moment[ 0 ];
-         devn = dev/(double)( ngood );
-         devsq = devn*devn;
-         devsqn = dev*devn*nA*nB;
-         m1A = nA*pdata->moment[1];
-         m1B = nB*moment[1];
-         moment[ 0 ] += devn*nB;
-         moment[ 3 ] += pdata->moment[ 3 ] +
-                        devsqn*devsq*(double)( nA*nA - nA*nB + nB*nB ) +
-                        6.0*devsq*( m1A*nA + m1B*nB ) -
-                        4.0*devn*( nA*pdata->moment[2] - nB*moment[2] );
-         moment[ 2 ] +=  pdata->moment[ 2 ] + devsqn * devn * ( nA - nB ) -
-                         3.0 * devn * ( m1A - m1B );
-         moment[ 1 ] += pdata->moment[ 1 ] + devsqn;
+         if( ngood > 0 ) {
+            dev = pdata->moment[ 0 ] - moment[ 0 ];
+            devn = dev/(double)( ngood );
+            devsq = devn*devn;
+            devsqn = dev*devn*nA*nB;
+            m1A = nA*pdata->moment[1];
+            m1B = nB*moment[1];
+            moment[ 0 ] += devn*nB;
+            moment[ 3 ] += pdata->moment[ 3 ] +
+                           devsqn*devsq*(double)( nA*nA - nA*nB + nB*nB ) +
+                           6.0*devsq*( m1A*nA + m1B*nB ) -
+                           4.0*devn*( nA*pdata->moment[2] - nB*moment[2] );
+            moment[ 2 ] +=  pdata->moment[ 2 ] + devsqn * devn * ( nA - nB ) -
+                            3.0 * devn * ( m1A - m1B );
+            moment[ 1 ] += pdata->moment[ 1 ] + devsqn;
+         }
       }
 
 /* If there were no valid pixels, then use null result values. */
