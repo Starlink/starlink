@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     void smf_subip( ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
-*                     int *qui, int *status )
+*                     double chunkfactor, int *qui, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -23,6 +23,10 @@
 *        Struct of pointers to information required by model calculation.
 *     keymap = AstKeyMap * (Given)
 *        A KeyMap holding all configuration parameters.
+*     chunkfactor = double (Given)
+*        The calibration correction factor to use for the current chunk.
+*        The supplied IP reference map is divided by this constant before
+*        being used to perform IP correction.
 *     qui = int * (Given)
 *        Pointer to a returned value indicating if the data is POL-2 data
 *        or not. Returned VAL__BADI for non-pol2, +1 for "Q", 0 for "I"
@@ -131,6 +135,9 @@
 *        "ipmodel" config parameter.
 *     6-AUG-2019 (DSB):
 *        Added AUG2019 IP model based on using smurf:pol2ipcor.
+*     16-JAN-2020 (DSB):
+*        - Added argument chunkfactor.
+*        - Fix compiler warnings.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -174,6 +181,7 @@
 #include "libsmf/smf_err.h"
 
 /* Local constants */
+#define UNKNOWN -1
 #define JAN2018 0
 #define APR2019 1
 #define AUG2019 2
@@ -218,7 +226,7 @@ typedef struct smfSubIPData {
 static pthread_mutex_t data_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
-                 int *qui, int *status ) {
+                 double chunkfactor, int *qui, int *status ) {
 
 /* Local Variables: */
    AstFitsChan *fc;
@@ -391,6 +399,7 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
       astMapGet0D( keymap, "IPANGOFF", &ipangoff );
 
 /* See which IP model to use. */
+      ipmodel = UNKNOWN;
       cpntr = NULL;
       astMapGet0C( keymap, "IPMODEL", &cpntr );
       if( cpntr ){
@@ -539,6 +548,13 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    *not* made from POL2 data, we need to take account of the POL2
    degradation factor. */
          if( polref ) degfac = 1.0;
+
+/* Modify the degradation factor to include the supplied chunk factor.
+   This causes the IP reference map to be normalised to the specific
+   chunk (i.e. observation) being processed, rather than to the
+   normalisation of the supplied reference map, which will usually be a
+   coadd of several chunks. */
+         degfac *= chunkfactor;
 
 /* Get a pointer to the quality array for the residuals. */
          qua_data = smf_select_qualpntr( data, NULL, status );
@@ -702,6 +718,8 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
                cb = pdata->ippars[1];
                cc = pdata->ippars[2];
                cd = pdata->ippars[3];
+               ce = 0.0;
+               cf = 0.0;
                bad = ( ca == VAL__BADD || cb == VAL__BADD ||
                        cc == VAL__BADD || cd == VAL__BADD );
             } else {

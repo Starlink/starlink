@@ -2097,7 +2097,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
                                                       msize*sizeof(*lastmap) );
 
         /* Do any required correction for instrumental polarisation. */
-        smf_subip( wf, &dat, keymap, &qui, status );
+        smf_subip( wf, &dat, keymap, chunkfactor, &qui, status );
 
         /* Return the NDF label for the output map. */
         if( qui == VAL__BADI ) {

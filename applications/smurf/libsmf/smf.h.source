@@ -2017,7 +2017,7 @@ AstKeyMap *smf_subinst_keymap( smf_subinst_t subinst, const smfData * indata,
 const char * smf_subinst_str( smf_subinst_t subinst, int * status );
 
 void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
-                 int *ispol2, int *status );
+                 double chunkfactor, int *ispol2, int *status );
 
 void smf_subtract_dark ( smfData * indata, const smfData * dark1,
                          const smfData * dark2, smf_dark_sub_meth method,
