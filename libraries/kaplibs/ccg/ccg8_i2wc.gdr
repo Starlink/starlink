@@ -1,0 +1,127 @@
+      SUBROUTINE CCG8_I2WC<T>( NPIX, NLINES, INDICE, COORDS, RESULT,
+     :                      NBAD, STATUS )
+*+
+*  Name:
+*     CCG8_I2WCx
+
+*  Purpose:
+*     Assigns world co-ordinates to an output array from an input list
+*     of indices.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG8_I2WCx( NPIX, NLINES, INDICE, COORDS, RESULT, NBAD,
+*                    STATUS )
+
+*  Description:
+*     This routine assigns world co-ordinates to an output vector
+*     from an input two-dimensional array, corresponding to a
+*     a vector for each output element.  The world co-ordinates are
+*     selected using a list of indices in each world-co-ordinate
+*     vector, there being one index per output value.  A bad value or
+*     a value outside the bounds of the array in the list of indices
+*     causes a bad value to be assigned to the output array.
+
+*  Arguments:
+*     NPIX = INTEGER*8 (Given)
+*        The number of pixels in a line of data.
+*     NLINES = INTEGER*8 (Given)
+*        The number of lines of data.
+*     INDICE( NPIX ) = INTEGER*8 (Given)
+*        The indices in the input array that point to the values to be
+*        assigned to the output vector.
+*     COORDS( NPIX, NLINES ) = ? (Given)
+*        The world co-ordinates.
+*     RESULT( NPIX ) = ? (Returned)
+*        The vector containing values copied from the input COORDS
+*        array.
+*     NBAD = INTEGER*8 (Returned)
+*        The number of bad values in the output array.
+*     STATUS = INTEGER (Given)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "x"
+*     in the routine name by D or R as appropriate.  The COORDS and
+*     RESULT supplied to the routine must have the data type specified.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2006 January 27 (MJC):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+
+*  Arguments Given:
+      INTEGER*8 NPIX
+      INTEGER*8 NLINES
+      INTEGER*8 INDICE( NPIX )
+      <TYPE> COORDS( NPIX, NLINES )
+
+*  Arguments Returned:
+      <TYPE> RESULT( NPIX )
+      INTEGER*8 NBAD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER*8 I                ! Loop counter
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise the bad-value counter.
+      NBAD = 0
+
+*  Loop around all output elements.
+      DO I = 1, MAX( NPIX, 1 )
+
+*  Check that the index is valid.  Count the number of bad values.
+         IF ( INDICE( I ) .EQ. VAL__BADK .OR. INDICE( I ) .LT. 1 .OR.
+     :        INDICE( I ) .GT. NLINES ) THEN
+            RESULT( I ) = VAL__BAD<T>
+            NBAD = NBAD + 1
+
+*  Use the index to assign an output value.
+         ELSE
+            RESULT( I ) = COORDS( I, INDICE( I ) )
+         END IF
+      END DO
+
+      END

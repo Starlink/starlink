@@ -1,0 +1,195 @@
+      SUBROUTINE CCG8_TMN2<T>( IGNORE, ORDDAT, SVAR, EL, USED, COVAR,
+     :                       TMEAN, TVAR, STATUS )
+*+
+*  Name:
+*     CCG8_TMN2x
+
+*  Purpose:
+*     Forms the n-trimmed mean of the given set of ordered data.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG8_TMN2x( IGNORE, ORDDAT, ORDVAR, EL, USED, COVAR, TMEAN,
+*                     TVAR, STATUS )
+
+*  Description:
+*     The routine forms the trimmed mean of the given dataset. The
+*     IGNORE upper and lower ordered values are removed from
+*     consideration.  Then the remaining values are added and averaged.
+*     The SVAR value is a (given) best estimate of the original
+*     un-ordered population variance. The variance of the output value
+*     is formed assuming that the original dataset was normal in
+*     distribution, and is now fairly represented by the ordered
+*     statistics variances-covariances supplied in packed form in
+*     COVAR. The values not rejected are indicated by setting the flags
+*     in array used.
+
+*  Arguments:
+*     IGNORE = INTEGER*8 (Given)
+*        The number of values to ignore from the upper and lower orders.
+*     EL = INTEGER*8 (Given)
+*        The number of entries in ORDDAT.
+*     ORDDAT( EL ) = ? (Given)
+*        The set of ordered data for which a trimmed mean is required.
+*     SVAR = DOUBLE PRECISION (Given)
+*        The variance of the unordered sample now ordered in ORDDAT.
+*     USED( EL ) = LOGICAL (Returned)
+*        Flags showing which values have not been rejected.
+*     COVAR( * ) = DOUBLE PRECISION (Given)
+*        The packed variance-covariance matrix of the order statistics
+*        from a normal distribution of size EL.
+*     TMEAN = DOUBLE PRECISION (Returned)
+*        The trimmed mean.
+*     TVAR = DOUBLE PRECISION (Returned)
+*        A variance estimate of the trimmed mean.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "x"
+*     in the routine name by D or R as appropriate.  The ORDDAT
+*     argument supplied to the routine must have the data type
+*     specified.
+
+*  Prior Requirements:
+*     -  The variance-covariance array must have been generated in a
+*     fashion similar to that of ORDVAR.
+
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     28-MAR-1991 (PDRAPER):
+*        Original version.
+*     4-APR-1991 (PDRAPER):
+*        Changed to remove n values from upper and lower orders
+*        instead of a given fraction.
+*     30-MAY-1991 (PDRAPER):
+*        Added used array.
+*     2009 July 4 (MJC):
+*        Converted to generic and renamed from CCG1_TMN2R.  Moved EL
+*        (after renaming from NSET) to the normal order in the API.
+*     2009 July 17 (MJC):
+*        Do not include collapsed data comprising only bad values
+*        in argument NBAD.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+
+*  Arguments Given:
+      INTEGER*8 IGNORE
+      INTEGER*8 EL
+      <TYPE> ORDDAT( EL )
+      DOUBLE PRECISION SVAR
+      DOUBLE PRECISION COVAR( * )
+
+*  Arguments Returned:
+      DOUBLE PRECISION TMEAN
+      DOUBLE PRECISION TVAR
+      LOGICAL USED( EL )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER*8 I                ! Loop variable
+      INTEGER*8 J                ! Loop variable
+      INTEGER*8 LBND             ! Lower index of used values
+      INTEGER*8 NLEFT            ! Number of values left to process
+      INTEGER*8 UBND             ! Upper index of used values
+      DOUBLE PRECISION VSUM      ! Sum of the variances and covariances
+                                 ! for ordered statistics
+
+*  Local References:
+      INCLUDE 'NUM_DEC_CVT'
+      INCLUDE 'NUM_DEF_CVT'      ! Primdat conversion definition
+                                 ! functions
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Make sure that there are enough variables left after ignoring the
+*  outer ones. If there are not set output values to BAD and set used
+*  to false.
+      NLEFT = EL - 2 * IGNORE
+      IF ( NLEFT .LE. 0 ) THEN
+         TMEAN = VAL__BADD
+         TVAR = VAL__BADD
+         DO 4 I = 1, EL
+            USED( I ) = .FALSE.
+    4    CONTINUE
+      ELSE
+
+*  Set the bounds
+         LBND = IGNORE + 1
+         UBND = EL - IGNORE
+
+*  Loop over all values forming the sum of values for trimmed mean.
+*  Set used flags
+         TMEAN = 0.0D0
+         DO 1 I = 1, EL
+            IF ( I .GE. LBND .AND. I .LE. UBND ) THEN
+               TMEAN = NUM_<T>TOD( ORDDAT( I ) ) + TMEAN
+               USED( I ) = .TRUE.
+            ELSE
+               USED( I ) = .FALSE.
+            END IF
+    1    CONTINUE
+         TMEAN = TMEAN / DBLE( NLEFT )
+
+*  Sum the relevant ordered statistic variances and covariances.
+*  weighting accordingly.
+         VSUM = 0.0D0
+         DO 2 I = LBND , UBND
+            DO 3 J = I, UBND
+
+*  Sum variances and twice covariances (off-diagonal elements).
+               IF( I .EQ. J ) THEN
+                  VSUM = VSUM+ COVAR( I + J * ( J - 1 ) / 2 )
+               ELSE
+                  VSUM = VSUM+ 2.0D0 * COVAR( I + J * ( J - 1 ) / 2 )
+               END IF
+    3       CONTINUE
+    2    CONTINUE
+
+*  Right make the new variance estimate. Use the sum of variances
+*  and covariances of the order statistic of the trimmed sample size
+*  Sample variance changes to EL * SVAR to represent total variance
+*  of original data.
+         TVAR = SVAR * EL * VSUM / DBLE( NLEFT * NLEFT )
+      END IF
+
+      END

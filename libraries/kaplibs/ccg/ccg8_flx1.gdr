@@ -1,0 +1,246 @@
+      SUBROUTINE CCG8_FLX1<T>( NPIX, NLINES, STACK, VARS, WIDTHS, MINPIX,
+     :                      RESULT, RESVAR, NCON, NBAD, STATUS )
+*+
+*  Name:
+*     CCG8_FLX1x
+
+*  Purpose:
+*     Combines data lines using the integrated value.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG8_FLX1x( NPIX, NLINES, STACK, VARS, WIDTHS, MINPIX,
+*                      RESULT, RESVAR, NCON, NBAD, STATUS )
+
+*  Description:
+*     This routine accepts an array consisting of a series of
+*     (vectorised) lines of data.  It forms the sum of the data values
+*     multiplied by its pixel width lines are then summed, i.e a flux.
+*     The output integrated values are returned in the array RESULT.
+*     The output variances are estimated from the VARS values and are
+*     returned in RESVAR; this assumes no errors in the widths.
+
+*  Arguments:
+*     NPIX = INTEGER*8 (Given)
+*        The number of pixels in a line of data.
+*     NLINES = INTEGER*8 (Given)
+*        The number of lines of data in the stack.
+*     STACK( NPIX, NLINES ) = ? (Given)
+*        The array of lines which are to be combined into a single line.
+*     VARS( NPIX, NLINES ) = ? (Given)
+*        The data variances.
+*     WIDTHS( NPIX, NLINES ) = ? (Given)
+*        The pixel widths in world co-ordinates.
+*     MINPIX = INTEGER*8 (Given)
+*        The minimum number of pixels required to contribute to an
+*        output pixel.
+*     RESULT( NPIX ) = <TYPE> (Returned)
+*        The output line of data.
+*     RESVAR( NPIX ) = <TYPE> (Returned)
+*        The output variances.
+*     NCON( NLINES ) = DOUBLE PRECISION (Returned)
+*        The actual number of contributing pixels from each input line
+*        to the output line.
+*     NBAD = INTEGER*8 (Returned)
+*        The number of bad values in the output RESULT array created while
+*        forming the statistics.  It excludes those bad values whose
+*        corresponding values along the collapse axis are all bad.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D or R as appropriate.  The STACK, VARS,
+*     RESULT, and RESVAR arguments supplied to the routine must have the
+*     data type specified.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009, 2014 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2006 January 6 (MJC):
+*        Original version.
+*     2006 January 26 (MJC):
+*        Added a dimension to WIDTHS to provide a width for each pixel.
+*        This avoids the assumption of a constant AXIS-like array
+*        applicable to output pixels.
+*     2006 December 23 (MJC):
+*        Separate the variance summations from the data summations.
+*     2009 July 3 (MJC):
+*        Renamed from CCG1_FLX1x.  Added NBAD argument.
+*     2009 July 4 (MJC):
+*         Made NCON Returned and therefore it is initialised.
+*     2009 July 17 (MJC):
+*        Do not include collapsed data comprising only bad values
+*        in argument NBAD.
+*     2014 April 8 (MJC):
+*        Fix bug in the variance calculations.  Error propagation rules
+*        state that multiplying a data value by a constant requires the
+*        variance to multiplied by the constant squared.  Here the
+*        constant is the width and was not being squared.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+
+*  Arguments Given:
+      INTEGER*8 NPIX
+      INTEGER*8 NLINES
+      <TYPE> STACK( NPIX, NLINES )
+      <TYPE> VARS( NPIX, NLINES )
+      <TYPE> WIDTHS( NPIX, NLINES )
+      INTEGER*8 MINPIX
+
+*  Arguments Returned:
+      <TYPE> RESULT( NPIX )
+      <TYPE> RESVAR( NPIX )
+      DOUBLE PRECISION NCON( NLINES )
+      INTEGER*8 NBAD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation OK?
+
+      EXTERNAL NUM_TRAP
+      INTEGER NUM_TRAP           ! Numerical error handler
+
+*  Local Variables:
+      INTEGER*8 I                ! Loop variable
+      INTEGER*8 J                ! Loop variable
+      INTEGER*8 NGOOD            ! Number of good pixels
+      INTEGER*8 NGOODV           ! Number of good variances
+      DOUBLE PRECISION SUM1      ! Sum of variance-width product
+      DOUBLE PRECISION SUM2      ! Sum of value-width product
+      DOUBLE PRECISION WIDTH     ! A pixel width
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
+      INCLUDE 'NUM_DEF_CVT'      ! Define functions...
+
+*.
+
+*  Initialise returned values.
+      NBAD = 0
+      DO I = 1, NLINES
+         NCON( I ) = 0.0D0
+      END DO
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Set the numeric error and set error flag value.
+      CALL NUM_HANDL( NUM_TRAP )
+
+      DO 1 I = 1, NPIX
+
+*  Loop over for all possible output pixels.
+         SUM1 = 0.0D0
+         SUM2 = 0.0D0
+         NGOOD = 0
+         NGOODV = 0
+         CALL NUM_CLEARERR()
+
+*  Loop over all possible contributing pixels forming the required
+*  sums.
+         DO 5 J = 1, NLINES
+            IF ( WIDTHS( I, J ) .NE. VAL__BAD<T> ) THEN
+               WIDTH = NUM_<T>TOD( WIDTHS( I, J ) )
+
+               IF ( STACK( I, J ) .NE. VAL__BAD<T> ) THEN
+
+*  Conversion increment good value counter.
+                  NGOOD = NGOOD + 1
+
+*  Sum the variance-width product forming the variance of the flux
+*  for the line.
+                  SUM1 = SUM1 + NUM_<T>TOD( VARS( I, J ) ) * WIDTH *
+     :                   WIDTH
+
+*  Update the contribution buffer; all values contribute when forming
+*  the flux.
+                  NCON( J ) = NCON( J ) + 1.0D0
+               END IF
+
+               IF ( VARS( I, J ) .NE. VAL__BAD<T> ) THEN
+
+*  Sum the data value-width product forming a flux for the line.
+                  NGOODV = NGOODV + 1
+                  SUM2 = SUM2 + NUM_<T>TOD( STACK( I, J ) ) * WIDTH
+               END IF
+            END IF
+    5    CONTINUE
+
+*  If there are sufficient good pixels, output the resulting value.
+         IF ( NGOOD .GE. MINPIX ) THEN
+            RESULT( I ) = NUM_DTO<T>( SUM2 )
+
+*  Trap numeric errors.
+            IF ( .NOT. NUM_WASOK() ) THEN
+               RESULT( I ) = VAL__BAD<T>
+               NBAD = NBAD + 1
+            END IF
+         ELSE
+
+*  Not enough contributing pixels, set output invalid unless all of them
+*  are bad.
+            RESULT( I ) = VAL__BAD<T>
+            IF ( NGOOD .GT. 0 ) NBAD = NBAD + 1
+         END IF
+
+*  If there are sufficient good variances, form the output variance
+*  normalised to the data value in case the releative numbers of good
+*  values and variances are disparate.
+         IF ( NGOODV .GE. MINPIX ) THEN
+            RESVAR( I ) = NUM_DTO<T>( SUM1 * DBLE( NGOOD / NGOODV ) )
+
+*  Trap numeric errors.
+            IF ( .NOT. NUM_WASOK() ) THEN
+               RESVAR( I ) = VAL__BAD<T>
+               NBAD = NBAD + 1
+            END IF
+         ELSE
+
+*  Not enough contributing pixels, set output invalid.
+            RESVAR( I ) = VAL__BAD<T>
+            NBAD = NBAD + 1
+         END IF
+
+    1 CONTINUE
+
+*  Remove the numerical error handler.
+      CALL NUM_REVRT
+
+      END

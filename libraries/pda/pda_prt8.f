@@ -1,4 +1,3 @@
-
       SUBROUTINE PDA_PRT8(N,VM,XOPT,X)
 
       DOUBLE PRECISION  VM(*), XOPT(*), X(*)

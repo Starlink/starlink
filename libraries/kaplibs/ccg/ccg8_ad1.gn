@@ -1,0 +1,209 @@
+      SUBROUTINE CCG8_AD1<T>( NPIX, NLINES, STACK, MINPIX,
+     :                     RESULT, RESVAR, NCON, NBAD, STATUS )
+*+
+*  Name:
+*     CCG8_AD1x
+
+*  Purpose:
+*     Combines data lines using absolute deviations from an unweighted
+*     mean.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG8_AD1x( NPIX, NLINES, STACK, MINPIX,
+*                    RESULT, RESVAR, NCON, NBAD, STATUS )
+
+*  Description:
+*     This routine accepts an array consisting of a series of
+*     (vectorised) lines of data. The data values in the lines are then
+*     combined to form an unweighted mean, and then the absolute mean
+*     deviation from the mean.  The output means are returned in the
+*     array RESULT.  The output variances are standard-error values and
+*     are returned in RESVAR.
+
+*  Arguments:
+*     NPIX = INTEGER*8 (Given)
+*        The number of pixels in a line of data.
+*     NLINES = INTEGER*8 (Given)
+*        The number of lines of data in the stack.
+*     STACK( NPIX, NLINES ) = ? (Given)
+*        The array of lines which are to be combined into a single line.
+*     MINPIX = INTEGER*8 (Given)
+*        The minimum number of pixels required to contribute to an
+*        output pixel.
+*     RESULT( NPIX ) = ? (Returned)
+*        The output line of data.
+*     RESVAR( NPIX ) = ? (Returned)
+*        The output variances.
+*     NCON( NLINES ) = DOUBLE PRECISION (Returned)
+*        The actual number of contributing pixels from each input line
+*        to the output line.
+*     NBAD = INTEGER*8 (Returned)
+*        The number of bad values in the output RESULT array created while
+*        forming the statistics.  It excludes those bad values whose
+*        corresponding values along the collapse axis are all bad.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2005 December 24 (MJC):
+*        Original version.
+*     2009 July 3 (MJC):
+*        Renamed from CCG1_AD1x.  Added NBAD argument.
+*     2009 July 4 (MJC):
+*         Made NCON Returned and therefore it is initialised.
+*     2009 July 17 (MJC):
+*        Do not include collapsed data comprising only bad values
+*        in argument NBAD.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+
+*  Arguments Given:
+      INTEGER*8 NPIX
+      INTEGER*8 NLINES
+      <TYPE> STACK( NPIX, NLINES )
+      INTEGER*8 MINPIX
+
+*  Arguments Returned:
+      <TYPE> RESULT( NPIX )
+      <TYPE> RESVAR( NPIX )
+      DOUBLE PRECISION NCON( NLINES )
+      INTEGER*8 NBAD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation OK?
+
+      EXTERNAL NUM_TRAP
+      INTEGER NUM_TRAP           ! Numerical error handler
+
+*  Local Variables:
+      INTEGER*8 I                ! Loop variable
+      INTEGER*8 J                ! Loop variable
+      DOUBLE PRECISION MEAN      ! Mean value
+      INTEGER*8 NGOOD            ! Number of good pixels
+      DOUBLE PRECISION SUM1      ! Sum of absolute deviations
+      DOUBLE PRECISION SUM2      ! Sum of unweighted values
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
+      INCLUDE 'NUM_DEF_CVT'      ! Define functions...
+
+*.
+
+*  Initialise returned values.
+      NBAD = 0
+      DO I = 1, NLINES
+         NCON( I ) = 0.0D0
+      END DO
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Set the numeric error and set error flag value.
+      CALL NUM_HANDL( NUM_TRAP )
+
+      DO 1 I = 1, NPIX
+
+*  Loop over for all possible output pixels.
+         SUM1 = 0.0D0
+         SUM2 = 0.0D0
+         NGOOD = 0
+         CALL NUM_CLEARERR()
+
+*  Loop over all possible contributing pixels forming the required
+*  sums.
+         DO 5 J = 1, NLINES
+            IF ( STACK( I, J ) .NE. VAL__BAD<T> ) THEN
+
+*  Conversion increment good value counter.
+               NGOOD = NGOOD + 1
+
+*  Sum the data values.
+               SUM2 = SUM2 + NUM_<T>TOD( STACK( I, J ) )
+
+*  Update the contribution buffer; all values contribute when forming
+*  the mean.
+               NCON( J ) = NCON( J ) + 1.0D0
+            END IF
+    5    CONTINUE
+
+*  If there are sufficient good pixels output the result.
+         IF ( NGOOD .GE. MINPIX ) THEN
+            MEAN = SUM2 / DBLE( NGOOD )
+
+*  Loop over all possible contributing pixels forming the required
+*  sum.
+            DO 4 J = 1, NLINES
+               IF ( STACK( I, J ) .NE. VAL__BAD<T> ) THEN
+
+*  Sum the data values.
+                  SUM1 = SUM1 + ABS( NUM_<T>TOD( STACK( I, J ) ) -
+     :                               MEAN )
+               END IF
+    4       CONTINUE
+
+*  Derive the required statistics.  The variance uses the standard
+*  error.
+            RESULT( I ) = NUM_DTO<T>( SUM1 / DBLE( NGOOD ) )
+            RESVAR( I ) = NUM_DTO<T>( SUM1 / DBLE( NGOOD * NGOOD ) )
+
+*  Trap numeric errors.
+            IF ( .NOT. NUM_WASOK() ) THEN
+               RESULT( I ) = VAL__BAD<T>
+               RESVAR( I ) = VAL__BAD<T>
+               NBAD = NBAD + 1
+            END IF
+         ELSE
+
+*  Not enough contributing pixels, set output invalid unless all of them
+*  are bad.
+            RESULT( I ) = VAL__BAD<T>
+            RESVAR( I ) = VAL__BAD<T>
+            IF ( NGOOD .GT. 0 ) NBAD = NBAD + 1
+         END IF
+
+    1 CONTINUE
+
+*  Remove the numerical error handler.
+      CALL NUM_REVRT
+
+      END

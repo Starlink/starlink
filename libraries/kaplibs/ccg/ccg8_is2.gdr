@@ -1,0 +1,142 @@
+      SUBROUTINE CCG8_IS2<T>( EL, ORDDAT, ANCDAT, STATUS )
+*+
+*  Name:
+*     CCG8_IS2x
+
+*  Purpose:
+*     Sorts a list of data into increasing order, and applies the
+*     corresponding shuffle to an ancillary list
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG8_IS2x( EL, ORDDAT, ANCDAT, STATUS )
+
+*  Description:
+*     The routine uses an insert-sort method.  This has proven itself
+*     the quickest for sorting small sets of data lots of times, as in
+*     image stacking using ordered statistics.  The method looks at the
+*     second value, compares this with the first if swaps if necessary,
+*     then it looks at the third, looks at the previous values swaps
+*     with the lowest (or not at all) and so on until all values have
+*     been passed.  It is fast (for the case above) simply because of
+*     the very few lines of operation.  The sort is extended to the
+*     ancillary data ANCDAT, this maintains its correspondence with the
+*     ORDDAT dataset on exit.
+
+*  Arguments:
+*     EL = INTEGER*8 (Given)
+*        The number of entries in ORDDAT.
+*     ORDDAT( EL ) = ? (Given and Returned)
+*        The data to order. On output it contains the data in increasing
+*        order.
+*     ANCDAT( EL ) = INTEGER*8 (Given and Returned)
+*        A list of data associated with ORDDAT which needs to retain its
+*        correspondence with the items in ORDDAT (probably pointers).
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "x"
+*     in the routine name by D or R as appropriate.  The ORDDAT
+*     argument supplied to the routine must have the data type
+*     specified.
+
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     5-APR-1991 (PDRAPER):
+*        Original version.
+*     30-MAY-1991 (PDRAPER):
+*        Added ANCDAT stuff, note ANCDAT is integer.
+*     2009 July 2 (MJC):
+*         Converted to generic and renamed from CCG1_IS2R.  Moved EL
+*         (after renaming from NENT) to the normal order in the API.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER*8 EL
+
+*  Arguments Given and Returned:
+      <TYPE> ORDDAT( EL )
+      INTEGER*8 ANCDAT( EL )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER*8 I                ! Loop variable
+      INTEGER*8 IVAL             ! Single ancillary value
+      INTEGER*8 J                ! Loop variable
+      <LTYPE> VAL                ! Single value
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Look at all values starting from 2 inserting after the first largest
+*  value.
+      DO 1 I = 2, EL
+
+*  Store the current value (on the bottom).
+         VAL = ORDDAT( I )
+         IVAL = ANCDAT( I )
+
+*  Look at all values above this one on the stack.
+         DO 2 J = I - 1, 1, -1
+            IF ( VAL .GT. ORDDAT( J ) ) GO TO 3
+
+*  Move values up one to make room for next value (VAL or ORRDAT(J)
+*  whichever is greater).
+            ORDDAT( J + 1 ) = ORDDAT( J )
+            ANCDAT( J + 1 ) = ANCDAT( J )
+    2    CONTINUE
+
+*  Nothing bigger put this one on the top.
+         J = 0
+
+*  Arrive directly here if have found one bigger, put this value below
+*  it.
+    3    CONTINUE
+
+*  Insert value below first value greater than it, or put on top if none
+*  bigger.
+         ORDDAT( J + 1 ) = VAL
+         ANCDAT( J + 1 ) = IVAL
+
+    1 CONTINUE
+      END

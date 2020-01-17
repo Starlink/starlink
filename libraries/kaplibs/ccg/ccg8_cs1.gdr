@@ -1,0 +1,372 @@
+      SUBROUTINE CCG8_CS1<T>( NSIGMA, NPIX, NLINES, STACK, VARS,
+     :                     MINPIX, NMAT, COVEC, RESULT, RESVAR, WRK1,
+     :                     WRK2, POINT, USED, NCON, NBAD, STATUS )
+*+
+*  Name:
+*     CCG8_CS1x
+
+*  Purpose:
+*     Combines data lines using a sigma-clipped standard deviation.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG8_CS1x( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX, NMAT,
+*                     COVEC, RESULT, RESVAR, WRK1, WRK2, POINT, USED,
+*                     NCON, NBAD, STATUS )
+
+*  Description:
+*     This routine accepts an array consisting a series of (vectorised)
+*     lines of data.  The weighted mean and standard deviation of each
+*     input column in STACK is then used to estimate the range of
+*     values which represent the required sigma clipping.  Values
+*     outside of this range are then rejected and the resulting output
+*     standard deviations are returned in the array RESULT.  The
+*     variances are propagated through the combination process and
+*     returned in the RESVAR array.
+
+*  Arguments:
+*     NSIGMA = REAL (Given)
+*        The number of sigma at which to reject data values.
+*     NPIX = INTEGER*8 (Given)
+*        The number of pixels in a line of data.
+*     NLINES = INTEGER*8 (Given)
+*        The number of lines of data in the stack.
+*     STACK( NPIX, NLINES ) = ? (Given)
+*        The array of lines which are to be combined into a single line.
+*     VARS( NPIX, NLINES ) = ? (Given)
+*        The data variances.
+*     MINPIX = INTEGER*8 (Given)
+*        The minimum number of pixels required to contribute to an
+*        output pixel.
+*     NMAT = INTEGER*8 (Given)
+*        Size of the first dimension of COVEC.
+*     COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given)
+*        The packed variance-covariance matrix of the order statistics
+*        from a normal distribution of sizes up to NLINES, produced by
+*        CCG8_ORVAR.
+*     RESULT( NPIX ) = ? (Returned)
+*        The output line of data, i.e. the clipped standard deviations.
+*     RESVAR( NPIX ) = ? (Returned)
+*        The output variances of the clipped standard deviations.
+*     WRK1( NLINES ) = ? (Returned)
+*        Workspace for calculations.
+*     WRK2( NLINES ) = ? (Returned)
+*        Workspace for calculations.
+*     POINT( NLINES ) = INTEGER*8 (Returned)
+*        Workspace to hold pointers to the original positions of the
+*        data before extraction and conversion in to the WRK1 array.
+*     USED( NLINES ) = LOGICAL (Returned)
+*        Workspace used to indicate which values have been used in
+*        estimating a resultant value.
+*     NCON( NLINES ) = DOUBLE PRECISION (Returned)
+*        The actual number of contributing pixels from each input line
+*        to the output line.
+*     NBAD = INTEGER*8 (Returned)
+*        The number of bad values in the output array created while
+*        forming the statistics.  It excludes those bad values whose
+*        corresponding values along the collapse axis are all bad.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "x"
+*     in the routine name by D or R as appropriate.  The STACK, VARS,
+*     RESULT, RESVAR, WRK1, and WRK2 arguments supplied to the routine
+*     must have the data type specified.
+
+*  Copyright:
+*     Copyright (C) 2008-2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2008 September 7 (MJC):
+*        Original version adapted from CCG8_SC1x.
+*     2009 July 4 (MJC):
+*        Renamed from CCG1_CS1x.  Added NBAD argument.  Moved STACK,
+*        NMAT, and NCON to the normal order in the API.  Made NCON
+*        Returned and therefore it is initialised.
+*     2009 July 17 (MJC):
+*        Do not include collapsed data comprising only bad values
+*        in argument NBAD.
+*     2009 September 6 (MJC):
+*        Change to calculate true weighted variance not "population
+*        variance" that gave the variance of the mean, and hence was
+*        not the desired sample variance for clipping.  Hence the
+*        range could be very narrow and in fact could exclude all data
+*        leading to a bad pixel.
+*     2009 November 3 (MJC):
+*        It was returning clipped variances as documented, but we want
+*        clipped standard deviations.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+
+*  Arguments Given:
+      REAL NSIGMA
+      INTEGER*8 NPIX
+      INTEGER*8 NLINES
+      <TYPE> STACK( NPIX, NLINES )
+      <TYPE> VARS( NPIX, NLINES )
+      INTEGER*8 MINPIX
+      INTEGER*8 NMAT
+      DOUBLE PRECISION COVEC( NMAT, NLINES )
+
+*  Arguments Returned:
+      <TYPE> RESULT( NPIX )
+      <TYPE> RESVAR( NPIX )
+      <TYPE> WRK1( NLINES )
+      <TYPE> WRK2( NLINES )
+      INTEGER*8 POINT( NLINES )
+      LOGICAL USED( NLINES )
+      DOUBLE PRECISION NCON( NLINES )
+      INTEGER*8 NBAD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation OK?
+
+      EXTERNAL NUM_TRAP
+      INTEGER NUM_TRAP           ! Numerical error handler
+
+*  Local Variables:
+      INTEGER*8 I                ! Loop variable
+      INTEGER*8 IGOOD            ! Number of unrejected pixels
+      INTEGER*8 J                ! Loop variable
+      INTEGER*8 K                ! Loop variable
+      INTEGER*8 LBND             ! Position of lowest value higher than
+                                 ! rejection threshold
+      <LTYPE> LOWER              ! Lower limit
+      INTEGER*8 NGOOD            ! Number of good pixels
+      DOUBLE PRECISION MEAN      ! Weighted mean
+      DOUBLE PRECISION SAMVAR    ! Sample variance before rejection
+      DOUBLE PRECISION SUM1      ! Weight sums
+      DOUBLE PRECISION SUM2      ! Weighted value sums
+      DOUBLE PRECISION SUM3      ! Weighted squared-value sums
+      DOUBLE PRECISION SUM4      ! Sum of squared weights
+      INTEGER*8 UBND             ! Position of highest value lower than
+                                 ! rejection threshold
+      <LTYPE> UPPER              ! Upper limit
+      DOUBLE PRECISION VALUE     ! Single value
+      DOUBLE PRECISION VAR       ! Population variance before rejection
+      DOUBLE PRECISION W1        ! Weights as DBLE
+      DOUBLE PRECISION W2        ! Weights as DBLE
+      DOUBLE PRECISION WEIGHT    ! Weight
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
+      INCLUDE 'NUM_DEF_CVT'      ! Define functions...
+
+*.
+
+*  Initialise returned values.
+      NBAD = 0
+      DO I = 1, NLINES
+         NCON( I ) = 0.0D0
+      END DO
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Avoid confusing the optimiser.
+      VAR = 0.0D0
+
+*  Set the numeric error and set error flag value.
+      CALL NUM_HANDL( NUM_TRAP )
+
+*  Loop over for all possible output pixels.
+      DO 1 I = 1, NPIX
+         NGOOD = 0
+         CALL NUM_CLEARERR()
+         SUM1 = 0.0D0
+         SUM2 = 0.0D0
+
+*  Loop over all possible contributing pixels.
+         DO 2 J = 1, NLINES
+            IF ( STACK( I, J ) .NE. VAL__BAD<T> .AND.
+     :            VARS( I, J ) .NE. VAL__BAD<T> .AND.
+     :            VARS( I, J ) .GT. VAL__SML<T> ) THEN
+
+*  Increment good value counter.
+               NGOOD = NGOOD + 1
+
+*  Update the pointers to the positions of the unextracted data.
+               POINT( NGOOD ) = J
+
+*  Change variance to weight.
+               WEIGHT = 1.0D0 / NUM_<T>TOD( VARS( I, J ) )
+               VALUE = NUM_<T>TOD( STACK( I, J ) )
+
+*  Increment sums.
+               SUM1 = SUM1 + WEIGHT
+               SUM2 = SUM2 + WEIGHT * VALUE
+               SUM3 = SUM3 + WEIGHT * VALUE * VALUE
+               SUM4 = SUM4 + WEIGHT * WEIGHT
+
+*  Transfer values to working buffers for the current output pixel.
+               WRK1( NGOOD ) = STACK( I, J )
+               WRK2( NGOOD ) = NUM_DTO<T>( WEIGHT )
+
+*  Set USED buffer in case no values are rejected.
+               USED( NGOOD ) = .TRUE.
+
+*  Finally trap numeric errors by rejecting all values.
+               IF ( .NOT. NUM_WASOK() ) THEN
+
+*  Decrement NGOOD, do not let it go below zero.
+                  NGOOD = MAX( 0, NGOOD - 1 )
+                  CALL NUM_CLEARERR()
+               END IF
+            END IF
+    2    CONTINUE
+
+*  Continue if more than one good value.
+         IF ( NGOOD .GT. 0 ) THEN
+
+*  Form the weighted mean and population variance.
+            MEAN = SUM2 / SUM1
+            VAR = 1.0D0 / SUM1
+
+*  Find the weighted sample variance used for clipping outliers.
+            SAMVAR = ( SUM3 * SUM1 - SUM2 * SUM2 ) / ( SUM1 * SUM1 - SUM4 )
+
+*  Sort data prior to rejection -- this is necessary as clip may be
+*  non-central for (noisy) skew distributions, so the order statistics
+*  summation will be incorrect if we procede assuming that the mean is
+*  central also for the covariances.
+            CALL CCG8_IS3<T>( NGOOD, WRK1, WRK2, POINT, STATUS )
+
+*  Set the clipping range.
+            LOWER = NUM_DTO<T>( MEAN - DBLE( NSIGMA ) * SQRT( SAMVAR ) )
+            UPPER = NUM_DTO<T>( MEAN + DBLE( NSIGMA ) * SQRT( SAMVAR ) )
+
+*  Decide which orders of data are to be rejected. Pick out the least
+*  bound greater than the lower bound and the highest bound less than
+*  the upper bound.
+            LBND = NGOOD
+            UBND = 1
+            DO 4 J = 1, NGOOD
+               IF ( WRK1( J ) .GT. LOWER ) LBND = MIN( LBND, J )
+               IF ( WRK1( J ) .LT. UPPER ) UBND = MAX( UBND, J )
+    4       CONTINUE
+
+*  Number of rejected values.
+            IGOOD = UBND - LBND + 1
+
+*  If any values have been rejected then form new mean.
+            IF ( IGOOD .GT. 0 ) THEN
+               IF ( IGOOD .NE. NGOOD ) THEN
+
+*  New mean required.
+                  SUM1 = 0.0D0
+                  SUM2 = 0.0D0
+                  DO 5 J = 1, NGOOD
+                     IF ( J .GE. LBND .AND. J .LE. UBND ) THEN
+
+*  Increment sums.
+                        W1 = NUM_<T>TOD( WRK2( J ) )
+                        SUM2 = SUM2 + NUM_<T>TOD( WRK1( J ) ) * W1
+                        SUM1 = SUM1 + W1
+                        USED( J ) = .TRUE.
+                     ELSE
+                        USED( J ) = .FALSE.
+                     END IF
+    5             CONTINUE
+
+*  New mean.
+                  MEAN = SUM2 / SUM1
+
+*  Sum variance-covariances for this population size using the weights.
+                  SUM2 = 0.0D0
+                  SUM1 = 0.0D0
+                  DO 6 J = LBND, UBND
+                     W1 = NUM_<T>TOD( WRK2( J ) )
+                     DO 7 K = J, UBND
+                        IF ( J .EQ. K ) THEN
+                           W2 = W1 * NUM_<T>TOD( WRK2( K ) )
+                        ELSE
+                           W2 = 2.0D0 * W1 * NUM_<T>TOD( WRK2( K ) )
+                        END IF
+                        SUM1 = SUM1 + W2 *
+     :                         COVEC( J + K * ( K - 1 ) / 2, NGOOD )
+                        SUM2 = SUM2 + W2
+    7                CONTINUE
+    6             CONTINUE
+
+*  Variance modification factor.
+                  SUM2 = SUM1 / SUM2
+
+*  Correct the original population variance.
+                  VAR = SUM2 * VAR * NGOOD
+               END IF
+            ELSE
+
+*  All values rejected.
+               NGOOD = 0
+            END IF
+
+*  Increment line used buffer.
+            DO 8 J = 1, NGOOD
+               IF ( USED ( J ) ) THEN
+                  NCON( POINT( J ) ) = NCON( POINT( J ) ) + 1.0D0
+               END IF
+    8       CONTINUE
+         END IF
+
+*  If there are sufficient good pixels output the standard deviation
+*  and its variance.
+         IF ( NGOOD .GE. MINPIX ) THEN
+            RESULT( I ) = NUM_DTO<T>( SQRT( VAR ) )
+            RESVAR( I ) = NUM_DTO<T>( VAR ) / REAL( NGOOD )
+
+*  Trap numeric errors.
+            IF ( .NOT. NUM_WASOK() ) THEN
+               RESULT( I ) = VAL__BAD<T>
+               RESVAR( I ) = VAL__BAD<T>
+               NBAD = NBAD + 1
+            END IF
+         ELSE
+
+*  Not enough contributing pixels, set output invalid unless all of them
+*  are bad.
+            RESULT( I ) = VAL__BAD<T>
+            RESVAR( I ) = VAL__BAD<T>
+            IF ( NGOOD .GT. 0 ) NBAD = NBAD + 1
+         END IF
+    1 CONTINUE
+
+*  Remove the numerical error handler.
+      CALL NUM_REVRT
+
+      END

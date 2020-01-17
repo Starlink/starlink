@@ -1,7 +1,7 @@
-      SUBROUTINE PDA_QSIA8<T>( EL, X, IP )
+      SUBROUTINE PDA8_QSIA<T>( EL, X, IP )
 *+
 *  Name:
-*     PDA_QSIA8x
+*     PDA8_QSIAx
 
 *  Purpose:
 *     Sort an array of pointers to access an array in ascending order.
@@ -10,7 +10,7 @@
 *     Fortran 77
 
 *  Invocation:
-*     CALL PDA_QSIA8x( EL, X, IP )
+*     CALL PDA8_QSIAx( EL, X, IP )
 
 *  Description:
 *     The routine uses the Quicksort algorithm to permute an array of

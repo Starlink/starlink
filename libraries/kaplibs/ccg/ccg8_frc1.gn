@@ -1,0 +1,150 @@
+      SUBROUTINE CCG8_FRC1<T>( IMETH, NPIX, NLINES, STACK, RESULT,
+     :                        RESVAR, NCON, NBAD, STATUS )
+*+
+*  Name:
+*     CCG8_FRC1x
+
+*  Purpose:
+*     Combines data lines by counting pixels.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG8_FRC1x( IMETH, NPIX, NLINES, STACK, RESULT, RESVAR,
+*                     NCON, NBAD, STATUS )
+
+*  Description:
+*     This routine accepts an array consisting a series of (vectorised)
+*     lines of data.  The data values in the lines are then collapsed
+*     to the fraction of good (or bad) values in each line. The output values
+*     are returned in the array RESULT.  Each output variance value is set
+*     to zero and are returned in the array RESVAR.
+
+*  Arguments:
+*     IMETH = INTEGER (Given)
+*        37 - Return the fraction of good values in each line.
+*        38 - Return the fraction of bad values in each line.
+*     NPIX = INTEGER*8 (Given)
+*        The number of pixels in a line of data.
+*     NLINES = INTEGER*8 (Given)
+*        The number of lines of data in the stack.
+*     STACK( NPIX, NLINES ) = ? (Given)
+*        The array of lines which are to be combined into a single line.
+*     RESULT( NPIX ) = ? (Returned)
+*        The output line of data.
+*     RESVAR( NPIX ) = ? (Returned)
+*        The output variances.
+*     NCON( NLINES ) = DOUBLE PRECISION (Returned)
+*        The actual number of contributing pixels from each input line
+*        to the output line. Each value in this array is set to NPIX.
+*     NBAD = INTEGER*8 (Returned)
+*        The number of bad values in the output array created while
+*        forming the statistics.  This is always returned as zero by this
+*        routine.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     STACK, RESULT and RESVAR arguments supplied to the routine must
+*     have the data type specified.
+
+*  Copyright:
+*     Copyright (C) 2012 Science & Technology Facilities Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     DSB: David S Berry (JAC, Hawaii)
+*     {enter_new_authors_here}
+
+*  History:
+*     17-JUL-2012 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+
+*  Arguments Given:
+      INTEGER IMETH
+      INTEGER*8 NPIX
+      INTEGER*8 NLINES
+      <TYPE> STACK( NPIX, NLINES )
+
+*  Arguments Returned:
+      <TYPE> RESULT( NPIX )
+      <TYPE> RESVAR( NPIX )
+      DOUBLE PRECISION NCON( NLINES )
+      INTEGER*8 NBAD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER*8 I                ! Loop variable
+      INTEGER*8 J                ! Loop variable
+      INTEGER*8 BADCNT           ! Number of bad values in a line
+*.
+
+*  Initialise returned values.
+      NBAD = 0
+      DO I = 1, NLINES
+         NCON( I ) = 0.0D0
+      END DO
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop over for all possible output pixels.
+      DO I = 1, NPIX
+
+*  Loop over all possible contributing pixels, counting the number of bad
+*  values.
+         BADCNT = 0
+         DO J = 1, NLINES
+            IF( STACK( I, J ) .EQ. VAL__BAD<T> ) BADCNT = BADCNT + 1
+         END DO
+
+*  Store the required result.
+         IF( IMETH .EQ. 37 ) THEN
+            RESULT( I ) = DBLE( NLINES - BADCNT )/DBLE( NLINES )
+         ELSE
+            RESULT( I ) = DBLE( BADCNT )/DBLE( NLINES )
+         END IF
+
+*  Variance of the result is always zero.
+         RESVAR( I ) = 0.0
+
+      END DO
+
+*  Return the NCON values. All input pixels are used, so set every element
+*  to NPIX.
+      DO J = 1, NLINES
+         NCON( J ) = NPIX
+      END DO
+
+      END

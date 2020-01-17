@@ -1,0 +1,133 @@
+      SUBROUTINE CCG8_CLIP<T>( VMIN, VMAX, EL, ARRAY, NGOOD, STATUS )
+*+
+*  Name:
+*     CCG8_CLIPx
+
+*  Purpose:
+*     Sets any data outside a given value range BAD
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG8_CLIPR( VMIN, VMAX, EL, ARRAY, NGOOD, STATUS )
+
+*  Description:
+*     This generic routine loops over all entries in RA. If any values
+*     are outside the range RMIN to VMAX then they are set BAD.
+
+*  Arguments:
+*     VMIN = ? (Given)
+*        The minimum allowed value.  All values below this are set BAD.
+*     VMAX = ? (Given)
+*        The maximum allowed value.  All values above this are set BAD.
+*     EL = INTEGER*8 (Given)
+*        The number of entries in ARRAY.
+*     ARRAY( EL ) = ? (Given and Returned)
+*        The list of values to be clipped within the given range.  On
+*        output this contains the clipped list.
+*     NGOOD = INTEGER*8 (Returned)
+*        The number of values left after rejection.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "x"
+*     in the routine name by D or R as appropriate.  The ARRAY, VMIN,
+*     and VMAX arguments supplied to the routine must have the data type
+*     specified.
+
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 1999 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     4-APR-1991 (PDRAPER):
+*        Original version.
+*     15-MAR-1999 (MBT):
+*        Modified to use PRIMDAT properly.
+*     2009 July 2 (MJC):
+*        Converted to generic and renamed from CCG1_CLIPR.  Moved EL
+*        (after renaming from NENT) to the normal order in the API.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! BAD values
+
+*  Arguments Given:
+      <TYPE> VMIN
+      <TYPE> VMAX
+      INTEGER*8 EL
+
+*  Arguments Given and Returned:
+      <TYPE> ARRAY( EL )
+
+*  Arguments Returned:
+      INTEGER*8 NGOOD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER*8 I                ! Loop variable
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! PRIMDAT generic declarations
+      INCLUDE 'NUM_DEC_<T>'      ! PRIMDAT declarations for type REAL
+      INCLUDE 'NUM_DEF_CVT'      ! PRIMDAT generic definitions
+      INCLUDE 'NUM_DEF_<T>'      ! PRIMDAT definitions for type REAL
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop for all input values
+      NGOOD = EL
+      DO 1 I = 1, EL
+
+*  If this value is not BAD then test it.
+         IF ( ARRAY( I ) .NE. VAL__BAD<T> ) THEN
+            IF ( NUM_LT<T>( ARRAY( I ), VMIN ) .OR.
+     :           NUM_GT<T>( ARRAY( I ), VMAX ) ) THEN
+
+*  Set it BAD.
+               ARRAY( I ) = VAL__BAD<T>
+
+*  Decrement the valid values counter.
+               NGOOD = NGOOD - 1
+            END IF
+         END IF
+    1 CONTINUE
+
+      END

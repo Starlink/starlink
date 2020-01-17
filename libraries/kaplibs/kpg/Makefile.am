@@ -103,7 +103,7 @@ kpg1_sclb.gn kpg1_scli.gn kpg1_scluw.gn kpg1_sclub.gn \
 kpg1_sclw.gn kpg1_sclk.gn kpg1_ptnd.gn kpg1_bbox.gn kpg_osta.gn \
 kpg_fise.gn  kpg_immm.gn kpg1_corr.gn kpg1_rms.gn kpg1_ltva.gn \
 kpg_osta8.gn kpg1_mvbd8.gn kpg1_retr8.gn kpg1_thrs8.gn \
-kpg1_bbox8.gn
+kpg1_bbox8.gn kpg1_fill8.gn kpg1_mxmn8.gn
 
 # All except logical (include char)
 KPG_XL_GEN = kpg1_qsrt.gxl
@@ -190,6 +190,7 @@ kpg1_badbx.f \
 kpg1_badbx8.f \
 kpg1_bilnr.f \
 kpg1_ceil.f \
+kpg1_ceil8.f \
 kpg1_cget.f \
 kpg1_cmuld.f \
 kpg1_cmulk.f \
@@ -215,6 +216,7 @@ kpg1_fftbd.f \
 kpg1_fftbr.f \
 kpg1_fhdat.f \
 kpg1_floor.f \
+kpg1_floor8.f \
 kpg1_flpth.f \
 kpg1_gtwcs.f \
 kpg1_h2ast.f \
@@ -283,6 +285,7 @@ kpg1_verb.f \
 kpg1_wcatw.f \
 kpg1_wcaxc.f \
 kpg1_wcfax.f \
+kpg1_wcfax8.f \
 kpg1_wrast.f \
 kpg1_wread.f \
 kpg1_wtm3d.f \

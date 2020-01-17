@@ -1,0 +1,195 @@
+      SUBROUTINE CCG8_MN1<T>( BAD, NPIX, NLINES, STACK, VARNCE, RESULT,
+     :                     RESVAR, POSIND, WRK1, NCON, NBAD, STATUS )
+*+
+*  Name:
+*     CCG8_MN1x
+
+*  Purpose:
+*     Combines data lines using the minimum value.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG8_MN1x( BAD, NPIX, NLINES, STACK, VARNCE, RESULT, RESVAR,
+*                    POSIND, WRK1, NCON, NBAD, STATUS )
+
+*  Description:
+*     This routine accepts an array consisting a series of (vectorised)
+*     lines of data.  The data values in the lines are then collapsed
+*     to the minimum value in each line.  The output minima are
+*     returned in the array RESULT.  Each output variance value is the
+*     corresponding variance of the minimum data value, propagated from
+*     the input variances given in array VARNCE and are returned in the
+*     array RESVAR.  The vectorised pixel indices corresponding to the
+*     minima are also returned in POSIND.
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        If true, there may be bad pixels present in the array.  If
+*        false, it is safe not to check for bad values.
+*     NPIX = INTEGER*8 (Given)
+*        The number of pixels in a line of data.
+*     NLINES = INTEGER*8 (Given)
+*        The number of lines of data in the stack.
+*     STACK( NPIX, NLINES ) = ? (Given)
+*        The array of lines which are to be combined into a single line.
+*     VARNCE( NPIX, NLINES ) = ? (Given)
+*        The data variances.
+*     RESULT( NPIX ) = ? (Returned)
+*        The output line of data.
+*     RESVAR( NPIX ) = ? (Returned)
+*        The output variances.
+*     POSIND( NPIX ) = INTEGER*8 (Returned)
+*        The pixel indices of the minima in each output pixel.
+*     WRK1( NLINES ) = ? (Returned)
+*        Workspace for calculations.
+*     NCON( NLINES ) = DOUBLE PRECISION (Returned)
+*        The actual number of contributing pixels from each input line
+*        to the output line.
+*     NBAD = INTEGER*8 (Returned)
+*        The number of bad values in the output array created while
+*        forming the statistics.  It excludes those bad values whose
+*        corresponding values along the collapse axis are all bad.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     STACK, VARNCE, RESULT, RESVAR, and WRK1 arguments supplied to the
+*     routine must have the data type specified.
+
+*  Copyright:
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2005 December 22 (MJC):
+*        Original version.
+*     2009 July 3 (MJC):
+*         Renamed from CCG8_MNR1x.  Added NBAD argument.
+*     2009 July 9 (MJC):
+*         Add NCON argument for consistency with other routines.
+*     2009 July 17 (MJC):
+*        Do not include collapsed data comprising only bad values
+*        in argument NBAD.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+
+*  Arguments Given:
+      LOGICAL BAD
+      INTEGER*8 NPIX
+      INTEGER*8 NLINES
+      <TYPE> STACK( NPIX, NLINES )
+      <TYPE> VARNCE( NPIX, NLINES )
+
+*  Arguments Returned:
+      <TYPE> RESULT( NPIX )
+      <TYPE> RESVAR( NPIX )
+      <TYPE> WRK1( NLINES )
+      INTEGER*8 POSIND( NPIX )
+      DOUBLE PRECISION NCON( NLINES )
+      INTEGER*8 NBAD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER*8 I                ! Loop variable
+      INTEGER*8 J                ! Loop variable
+      INTEGER*8 LBAD             ! Number of bad values in a line
+      <TYPE> MAXMUM              ! Maximum value (dummy)
+      <TYPE> MINMUM              ! Minimum value
+      INTEGER*8 MAXPOS           ! Pixel index of maximum
+      INTEGER*8 MINPOS           ! Pixel index of minimum
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
+      INCLUDE 'NUM_DEF_CVT'      ! Define functions...
+
+*.
+
+*  Initialise returned values.
+      NBAD = 0
+      DO I = 1, NLINES
+         NCON( I ) = 0.0D0
+      END DO
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop over for all possible output pixels.
+      DO 1 I = 1, NPIX
+
+*  Loop over all possible contributing pixels.
+         DO 2 J = 1, NLINES
+
+*  Copy data into work buffer, so we can process a line at a time.
+            WRK1( J ) = STACK( I, J )
+
+    2    CONTINUE
+
+*  Find the extreme values in the contributing pixels, retaining just
+*  the maximum.  Start a new error context so we can annul any errors
+*  arising the KAPLIBS routine.
+         CALL ERR_MARK
+         CALL KPG1_MXMN8<T>( BAD, NLINES, WRK1, LBAD, MAXMUM,
+     :                       MINMUM, MAXPOS, MINPOS, STATUS )
+
+*  We can cope with the error that all the supplied values are bad.
+*  The bad-value count is not incremented as it is not a bad value
+*  generated by the deriving the statistic.
+         IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+            MINMUM = VAL__BAD<T>
+         END IF
+
+*  End the error context.
+         CALL ERR_RLSE
+
+*  Trap numeric errors.
+         IF ( MINMUM .EQ. VAL__BAD<T> ) THEN
+            RESULT( I ) = VAL__BAD<T>
+            RESVAR( I ) = VAL__BAD<T>
+            NBAD = NBAD + 1
+            POSIND( I ) = VAL__BADK
+         ELSE
+            POSIND( I ) = MINPOS
+            RESULT( I ) = MINMUM
+            RESVAR( I ) = VARNCE( I, POSIND( I ) )
+            NCON( MINPOS ) = NCON( MINPOS ) + 1.0D0
+         END IF
+
+    1 CONTINUE
+
+      END

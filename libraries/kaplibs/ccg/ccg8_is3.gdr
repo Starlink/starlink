@@ -1,0 +1,149 @@
+      SUBROUTINE CCG8_IS3<T>( EL, ORDDAT, RDAT, PDAT, STATUS )
+*+
+*  Name:
+*     CCG8_IS3x
+
+*  Purpose:
+*     Sorts a list of data into increasing order, and applies the
+*     corresponding shuffle to two ancillary lists.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG8_IS3x( EL, ORDDAT, RDAT, PDAT, STATUS )
+
+*  Description:
+*     The routine uses an insert sort method.  This has proven itself
+*     the quickest for sorting small sets of data lots of times, as in
+*     image stacking using ordered statistics.  The method looks at the
+*     second value, compares this with the first if swaps if necessary,
+*     then it looks at the third, looks at the previous values swaps
+*     with the lowest (or not at all) and so on until all values have
+*     been passed. It is fast (for the case above ) simply because of
+*     the very few lines of operation.  The sort is extended to the
+*     ancillary data RDAT and PDAT that maintain their correspondence
+*     with the ORDDAT dataset on exit.
+
+*  Arguments:
+*     EL = INTEGER*8 (Given)
+*        The number of entries in ORDDAT.
+*     ORDDAT( EL ) = ? (Given and Returned)
+*        The data to order. On output it contains the data in increasing
+*        order.
+*     RDAT( EL ) = ? (Given and Returned)
+*        A list of data associated with ORDDAT which needs to retain its
+*        correspondence with the items in ORDDAT.
+*     PDAT( EL ) = INTEGER*8 (Given and Returned)
+*        A list of data associated with ORDDAT which needs to retain its
+*        correspondence with the items in ORDDAT (probably pointers).
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "x"
+*     in the routine name by D or R as appropriate.  The ORDDAT and RDAT
+*     arguments supplied to the routine must have the data type
+*     specified.
+
+*  Copyright:
+*     Copyright (C) 1991-1992 Science & Engineering Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     5-APR-1991 (PDRAPER):
+*        Original version.
+*     28-MAY-1992 (PDRAPER):
+*        Added ancilliary data sort - integer and REAL types.
+*        These are the weights and a list of pointers in CCDPACK.
+*     2009 July 2 (MJC):
+*         Converted to generic and renamed from CCG8_IS3R.  Moved EL
+*         (after renaming from NENT) to the normal order in the API.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER*8 EL
+      <TYPE> ORDDAT( EL )
+      <TYPE> RDAT( EL )
+      INTEGER*8 PDAT( EL )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER*8 I                ! Loop variable
+      INTEGER*8 IVAL             ! Single ancillary value
+      INTEGER*8 J                ! Loop variable
+      <LTYPE> VAL1               ! Single value
+      <LTYPE> VAL2               ! Single value
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Look at all values starting from 2 inserting after the first largest
+*  value.
+      DO 1 I = 2, EL
+
+*  Store the current value (on the bottom).
+         VAL1 = ORDDAT( I )
+         IVAL = PDAT( I )
+         VAL2 = RDAT( I )
+
+*  Look at all values above this one on the stack.
+         DO 2 J = I - 1, 1, -1
+            IF ( VAL1 .GT. ORDDAT( J ) ) GO TO 3
+
+*  Move values up one to make room for next value (VAL or ORRDAT(J)
+*  whichever is greater).
+            ORDDAT( J + 1 ) = ORDDAT( J )
+            PDAT( J + 1 )   = PDAT( J )
+            RDAT( J + 1 ) = RDAT( J )
+    2    CONTINUE
+
+*  Nothing bigger put this one on the top.
+         J = 0
+
+*  Arrive directly here if have found one bigger, put this value below
+*  it.
+    3    CONTINUE
+
+*  Insert val below first value greater than it, or put on top if none
+*  bigger.
+         ORDDAT( J + 1 ) = VAL1
+         PDAT( J + 1 )   = IVAL
+         RDAT( J + 1 ) = VAL2
+
+    1 CONTINUE
+      END

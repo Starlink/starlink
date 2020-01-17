@@ -303,6 +303,7 @@
 *     supported.
 *     -  All non-complex numeric data types can be handled.
 *     -  Any number of NDF dimensions is supported.
+*     -  Huge NDF are supported.
 
 *  Copyright:
 *     Copyright (C) 2000-2001, 2004 Central Laboratory of the Research
@@ -456,6 +457,8 @@
 *        Do not pass COMP=Error to NDF_MTYPE.
 *     2018 January 11 (MJC):
 *        Add "FastMed" estimator.
+*     15-JAN-2020 (DSB):
+*        Add support for huge NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -478,16 +481,16 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
-      INTEGER KPG1_FLOOR         ! Most positive integer .LE. a given
+      INTEGER KPG1_FLOOR8        ! Most positive integer*8 .LE. a given
                                  ! real
-      INTEGER KPG1_CEIL          ! Most negative integer .GE. a given
+      INTEGER KPG1_CEIL8         ! Most negative integer*8 .GE. a given
                                  ! real
 
 *  Local Constants:
       REAL CLPDEF                ! Default no. of standard deviations to
       PARAMETER( CLPDEF = 3.0 )  ! clip for mode, clipped mean & std dev
 
-      INTEGER MAXPIX             ! Maximum number of pixels in a block
+      INTEGER*8 MAXPIX           ! Maximum number of pixels in a block
       PARAMETER ( MAXPIX = 8388608 ) ! Guestimate a size: 8 mega
 
 *  Local Variables:
@@ -526,17 +529,17 @@
       DOUBLE PRECISION PIXPOS( NDF__MXDIM ) ! Valid pixel Frame position
       DOUBLE PRECISION PXHIGH    ! High pixel bound of collapse axis
       DOUBLE PRECISION PXLOW     ! Low pixel bound of collapse axis
-      INTEGER AEL                ! Number of collapse axis elements
+      INTEGER*8 AEL              ! Number of collapse axis elements
       INTEGER AXES( NDF__MXDIM ) ! A list of axis indices
       INTEGER CFRM               ! Original Current Frame pointer
-      INTEGER D                  ! A dimension size
-      INTEGER EL1                ! Number of elements in an input mapped
+      INTEGER*8 D                ! A dimension size
+      INTEGER*8 EL1              ! Number of elements in an input mapped
                                  ! array
-      INTEGER EL2                ! Number of elements in an output
+      INTEGER*8 EL2              ! Number of elements in an output
                                  ! mapped array
-      INTEGER ELO                ! Number of elements in output NDF
-      INTEGER GHI                ! High GRID index for collapse axis
-      INTEGER GLO                ! Low GRID index for collapse axis
+      INTEGER*8 ELO              ! Number of elements in output NDF
+      INTEGER*8 GHI              ! High GRID index for collapse axis
+      INTEGER*8 GLO              ! Low GRID index for collapse axis
       LOGICAL HIGHER             ! Significant dimensions above collapse
                                  ! axis?
       INTEGER I                  ! Loop count
@@ -544,9 +547,9 @@
                                  ! Frame
       INTEGER IBL                ! Identifier for input-NDF block
       INTEGER IBLOCK             ! Loop counter for the NDF blocks
-      INTEGER IBLSIZ( NDF__MXDIM ) ! Input-NDF sizes for processing
+      INTEGER*8 IBLSIZ( NDF__MXDIM ) ! Input-NDF sizes for processing
                                  ! large datasets in blocks
-      INTEGER IERR               ! Position of first numerical error
+      INTEGER*8 IERR             ! Position of first numerical error
       INTEGER INDFI              ! Input NDF identifier
       INTEGER INDFO              ! Output NDF identifier
       INTEGER INDFS              ! Input NDF-section identifier
@@ -565,15 +568,15 @@
       INTEGER J                  ! Loop count
       INTEGER JAXIS              ! Index of collapse axis within PIXEL
                                  ! Frame
-      INTEGER JHI                ! High pixel index for collapse axis
-      INTEGER JLO                ! Low pixel index for collapse axis
-      INTEGER LBND( NDF__MXDIM ) ! Lower pixel index bounds of the input
-                                 ! NDF
-      INTEGER LBNDO( NDF__MXDIM ) ! Lower pixel index bounds of the
-                                 ! output NDF
-      INTEGER LBNDS( NDF__MXDIM ) ! Lower pixel index bounds of the
-                                 ! section of the input NDF
-      INTEGER MAXSIZ             ! Maximum size of block along current
+      INTEGER*8 JHI              ! High pixel index for collapse axis
+      INTEGER*8 JLO              ! Low pixel index for collapse axis
+      INTEGER*8 LBND( NDF__MXDIM ) ! Lower pixel index bounds of the input
+                                   ! NDF
+      INTEGER*8 LBNDO( NDF__MXDIM )! Lower pixel index bounds of the
+                                   ! output NDF
+      INTEGER*8 LBNDS( NDF__MXDIM )! Lower pixel index bounds of the
+                                   ! section of the input NDF
+      INTEGER*8 MAXSIZ           ! Maximum size of block along current
                                  ! dimension
       INTEGER MAP                ! PIXEL Frame to Current Frame Mapping
                                  ! pointer
@@ -585,19 +588,19 @@
       INTEGER NDEC               ! Number of decimal places in warning
       INTEGER NDIM               ! Number of pixel axes in input NDF
       INTEGER NDIMO              ! Number of pixel axes in output NDF
-      INTEGER NERR               ! Number of numerical errors
-      INTEGER NFLAG              ! Number of WLIM-flagged o/p values
+      INTEGER*8 NERR             ! Number of numerical errors
+      INTEGER*8 NFLAG            ! Number of WLIM-flagged o/p values
       INTEGER NVAL               ! Number of values obtained (1)
       INTEGER OBL                ! Identifier for output-NDF block
-      INTEGER OBLSIZ( NDF__MXDIM ) ! Output-NDF sizes for processing
+      INTEGER*8 OBLSIZ( NDF__MXDIM ) ! Output-NDF sizes for processing
                                  ! large datasets in blocks
       INTEGER OTOMAP             ! One-to-one mapping
-      INTEGER UBND( NDF__MXDIM ) ! Upper pixel index bounds of the input
-                                 ! NDF
-      INTEGER UBNDO( NDF__MXDIM )! Upper pixel index bounds of the
-                                 ! output NDF
-      INTEGER UBNDS( NDF__MXDIM ) ! Upper pixel index bounds of the
-                                 ! section of the input NDF
+      INTEGER*8 UBND( NDF__MXDIM ) ! Upper pixel index bounds of the input
+                                   ! NDF
+      INTEGER*8 UBNDO( NDF__MXDIM )! Upper pixel index bounds of the
+                                   ! output NDF
+      INTEGER*8 UBNDS( NDF__MXDIM )! Upper pixel index bounds of the
+                                   ! section of the input NDF
       LOGICAL GOTAX              ! Does the NDF have an AXIS component?
       LOGICAL LOOP               ! Continue to loop through dimensions?
       LOGICAL NDFVAR             ! NDF contains a variance array?
@@ -628,7 +631,7 @@
       CALL LPG_ASSOC( 'IN', 'READ', INDFI, STATUS )
 
 *  Get the bounds of the NDF.
-      CALL NDF_BOUND( INDFI, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+      CALL NDF_BOUND8( INDFI, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Get the component we require.
       CALL PAR_CHOIC( 'COMP', 'DATA', 'DATA,VARIANCE,QUALITY,ERROR',
@@ -721,8 +724,8 @@
       ELSE
 
 *  Find the projection of the two test points on to the collapse axis.
-         JLO = KPG1_FLOOR( REAL( MIN( PXHIGH, PXLOW ) ) ) + 1
-         JHI = KPG1_CEIL( REAL( MAX( PXHIGH, PXLOW ) ) )
+         JLO = KPG1_FLOOR8( REAL( MIN( PXHIGH, PXLOW ) ) ) + 1
+         JHI = KPG1_CEIL8( REAL( MAX( PXHIGH, PXLOW ) ) )
 
 *  Ensure these are within the bounds of the pixel axis.
          JLO = MAX( LBND( JAXIS ), JLO )
@@ -743,8 +746,8 @@
 
 *  Tell the user the range of pixels being collapsed.
       CALL MSG_SETI( 'I', JAXIS )
-      CALL MSG_SETI( 'L', JLO )
-      CALL MSG_SETI( 'H', JHI )
+      CALL MSG_SETK( 'L', JLO )
+      CALL MSG_SETK( 'H', JHI )
       CALL MSG_OUT( 'COLLAPSE_MSG1', '   Collapsing pixel axis ^I '/
      :              /'from pixel ^L to pixel ^H inclusive...', STATUS )
       CALL MSG_BLANK( STATUS )
@@ -860,14 +863,14 @@
 
 *  Easy if we are retaining the collapsed axes....
       IF ( .NOT. TRIM ) THEN
-         CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDFO, STATUS )
+         CALL NDF_SBND8( NDIMO, LBNDO, UBNDO, INDFO, STATUS )
 
 *  Otherwise...
       ELSE
 
 *  The shape and size of the output NDF created above will be wrong,
 *  so we need to correct it by removing the collapse axis.  This is
-*  easy if it is the final axis (we would just use NDF_SBND specifying
+*  easy if it is the final axis (we would just use NDF_SBND8 specifying
 *  NDIM-1 axes), but is not so easy if the collapse axis is not the
 *  final axis.  In this case, we do the following.
 *    1) - Save copies of an AXIS structure in the output NDF (because
@@ -902,7 +905,7 @@
 *  Set the output NDF bounds to the required values.  This will change
 *  the lengths of the current AXIS arrays (but we have a copy of the
 *  originals in OLDAXIS), and reduce the dimensionality by one.
-         CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDFO, STATUS )
+         CALL NDF_SBND8( NDIMO, LBNDO, UBNDO, INDFO, STATUS )
 
 *  We now re-instate any AXIS structures, in their new order.
          IF ( GOTAX ) THEN
@@ -915,8 +918,8 @@
 *  This would result in NDF_ANNUL reporting an error, so we temporarily
 *  map the DATA array (which puts it into a defined state) to prevent
 *  this.
-            CALL NDF_MAP( INDFO, 'DATA', ITYPE, 'WRITE', IPOUT( 1 ),
-     :                    EL2, STATUS )
+            CALL NDF_MAP8( INDFO, 'DATA', ITYPE, 'WRITE', IPOUT( 1 ),
+     :                     EL2, STATUS )
 
 *  Annul the supplied NDF identifier so that we can change the contents
 *  of the NDF using HDS, without getting out of step with the NDFs
@@ -1136,11 +1139,11 @@
       IF ( USEALL ) THEN
          INDFS = INDFI
       ELSE
-         CALL NDF_SECT( INDFI, NDIM, LBNDS, UBNDS, INDFS, STATUS )
+         CALL NDF_SECT8( INDFI, NDIM, LBNDS, UBNDS, INDFS, STATUS )
       END IF
 
 *  Determine the number of blocks.
-      CALL NDF_NBLOC( INDFS, NDIM, IBLSIZ, NBLOCK, STATUS )
+      CALL NDF_NBLOC8( INDFS, NDIM, IBLSIZ, NBLOCK, STATUS )
 
 *  The total number of elements in the output array is needed for the
 *  calculation of the fraction of bad pixels generated by the
@@ -1153,15 +1156,15 @@
 
       DO IBLOCK = 1, NBLOCK
          CALL NDF_BEGIN
-         CALL NDF_BLOCK( INDFS, NDIM, IBLSIZ, IBLOCK, IBL, STATUS )
-         CALL NDF_BLOCK( INDFO, NDIMO, OBLSIZ, IBLOCK, OBL, STATUS )
+         CALL NDF_BLOCK8( INDFS, NDIM, IBLSIZ, IBLOCK, IBL, STATUS )
+         CALL NDF_BLOCK8( INDFO, NDIMO, OBLSIZ, IBLOCK, OBL, STATUS )
 
 *  Map the NDF arrays and workspace required.
 *  ==========================================
 
 *  Map the full input, and output data and (if needed) variance arrays.
-         CALL NDF_MAP( IBL, MCOMP, ITYPE, 'READ', IPIN, EL1, STATUS )
-         CALL NDF_MAP( OBL, COMPO, OTYPE, 'WRITE', IPOUT, EL2, STATUS )
+         CALL NDF_MAP8( IBL, MCOMP, ITYPE, 'READ', IPIN, EL1, STATUS )
+         CALL NDF_MAP8( OBL, COMPO, OTYPE, 'WRITE', IPOUT, EL2, STATUS )
 
          IF ( .NOT. VAR ) THEN
             IPIN( 2 ) = IPIN( 1 )
@@ -1169,15 +1172,15 @@
          END IF
 
 *  Obtain the bounds of the blocks.
-         CALL NDF_BOUND( IBL, NDF__MXDIM, LBNDS, UBNDS, NDIM, STATUS )
-         CALL NDF_BOUND( OBL, NDF__MXDIM, LBNDO, UBNDO, NDIMO, STATUS )
+         CALL NDF_BOUND8( IBL, NDF__MXDIM, LBNDS, UBNDS, NDIM, STATUS )
+         CALL NDF_BOUND8( OBL, NDF__MXDIM, LBNDO, UBNDO, NDIMO, STATUS )
 
 *  Allocate work space, unless the last axis is being collapsed (in
 *  which case no work space is needed).
          IF ( HIGHER ) THEN
-            CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW1, STATUS )
+            CALL PSX_CALLOC8( EL2 * AEL, ITYPE, IPW1, STATUS )
             IF ( VAR ) THEN
-               CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW2, STATUS )
+               CALL PSX_CALLOC8( EL2 * AEL, ITYPE, IPW2, STATUS )
             ELSE
                IPW2 = IPW1
             END IF
@@ -1199,35 +1202,35 @@
 
 *  Create workspace for the co-ordinates along a single WCS axis
 *  in the correct data type.
-            CALL PSX_CALLOC( EL1, '_DOUBLE', IPAXCO, STATUS )
-            CALL PSX_CALLOC( EL1, ITYPE, IPCO, STATUS )
-            CALL PSX_CALLOC( UBNDS( JAXIS ) - LBNDS( JAXIS ) + 1,
+            CALL PSX_CALLOC8( EL1, '_DOUBLE', IPAXCO, STATUS )
+            CALL PSX_CALLOC8( EL1, ITYPE, IPCO, STATUS )
+            CALL PSX_CALLOC8( UBNDS( JAXIS ) - LBNDS( JAXIS ) + 1,
      :                       '_DOUBLE', IPAXWO, STATUS )
 
 *  Allocate work space, unless the last pixel axis is being collapsed
 *  (in which case no work space is needed).
             IF ( HIGHER ) THEN
-               CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW3, STATUS )
+               CALL PSX_CALLOC8( EL2 * AEL, ITYPE, IPW3, STATUS )
             ELSE
                IPW3 = IPIN( 1 )
             END IF
 
 *  Obtain the double-precision co-ordinate centres along the collapse
 *  axis in the current Frame.
-            CALL KPG1_WCFAX( LBNDS, UBNDS, MAP, JAXIS, IAXIS,
+            CALL KPG1_WCFAX8( LBNDS, UBNDS, MAP, JAXIS, IAXIS,
      :                       %VAL( CNF_PVAL( IPAXCO ) ),
      :                       %VAL( CNF_PVAL( IPAXWO ) ), STATUS )
 
 *  Copy the centres to the required precision.
             IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL VEC_DTOR( .TRUE., EL1, %VAL( CNF_PVAL( IPAXCO ) ),
-     :                        %VAL( CNF_PVAL( IPCO ) ), IERR, NERR,
-     :                        STATUS )
+               CALL VEC8_DTOR( .TRUE., EL1, %VAL( CNF_PVAL( IPAXCO ) ),
+     :                         %VAL( CNF_PVAL( IPCO ) ), IERR, NERR,
+     :                         STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL VEC_DTOD( .TRUE., EL1, %VAL( CNF_PVAL( IPAXCO ) ),
-     :                        %VAL( CNF_PVAL( IPCO ) ), IERR, NERR,
-     :                        STATUS )
+               CALL VEC8_DTOD( .TRUE., EL1, %VAL( CNF_PVAL( IPAXCO ) ),
+     :                         %VAL( CNF_PVAL( IPCO ) ), IERR, NERR,
+     :                         STATUS )
 
             END IF
             CALL PSX_FREE( IPAXCO, STATUS )
@@ -1248,7 +1251,7 @@
 
 *  Allocate work space for the widths to be derived from the
 *  co-ordinates.  This assumes full filling of pixels.
-            CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPWID, STATUS )
+            CALL PSX_CALLOC8( EL2 * AEL, ITYPE, IPWID, STATUS )
 
 *  Store safe pointer value if widths are not needed.
          ELSE
@@ -1364,8 +1367,8 @@
             CALL MSG_FMTR( 'FRAC', FORMAT( :NC ),
      :                     REAL( NFLAG ) / REAL( ELO ) )
 
-            CALL MSG_SETI( 'NF', NFLAG )
-            CALL MSG_SETI( 'EL', ELO )
+            CALL MSG_SETK( 'NF', NFLAG )
+            CALL MSG_SETK( 'EL', ELO )
             IF ( WLIM .GT. 0.0 ) THEN
                CALL MSG_OUTIF( MSG__NORM, '',
      :           'WARNING: ^FRAC of the output pixels (^NF of ^EL) '/

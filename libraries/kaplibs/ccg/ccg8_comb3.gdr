@@ -1,0 +1,454 @@
+      SUBROUTINE CCG8_COMB3<T>( NPIX, NLINES, STACK, VARS, COORDS, IMETH,
+     :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
+     :                       RESULT, WIDTHS, COIND, WRK1, WRK2, POINT,
+     :                       USED, NCON, NFLAG, STATUS )
+*+
+*  Name:
+*     CCG8_COMB3x
+
+*  Purpose:
+*     Combines a stack of array lines into one line, using a variety
+*     of methods.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG8_COMB3x( NPIX, NLINES, STACK, VARS, COORDS, IMETH, MINPIX,
+*                      NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT, WIDTHS,
+*                      COIND, WRK1, WRK2, POINT, USED, NCON, NFLAG,
+*                      STATUS )
+
+*  Description:
+*     The routine works along each line of the input stack of lines,
+*     combining the data.  This variant uses a single variance for each
+*     line and and does NOT propagate it.
+*
+*     The array NCON holds the actual numbers of pixels which were used
+*     in deriving the output value plus any values already present in
+*     the array; thus a cumulative sum of contributing pixel numbers may
+*     be kept.
+
+*  Arguments:
+*     NPIX = INTEGER (Given)
+*        The number of pixels in a line of data.
+*     NLINES = INTEGER (Given)
+*        The number of lines of data in the stack.
+*     STACK( NPIX, NLINES ) = ? (Given)
+*        The array of lines which are to be combined into a single line.
+*     VARS( NLINES ) = ? (Given)
+*        The variance to to used for each line of data.
+*     COORDS( NPIX, NLINES ) = ? (Given)
+*        The co-ordinates along the collapse axis for each pixel.
+*        It is accessed only for IMETH = 22, 23, 33, 34.
+*     IMETH = INTEGER (Given)
+*        The method to use in combining the lines.  It has a code of 1
+*        to 300 which represent the following statistics.
+*        1  = Mean
+*        2  = Weighted mean
+*        3  = Median
+*        4  = Trimmed mean
+*        5  = Mode
+*        6  = Sigma-clipped mean
+*        7  = Threshold exclusion mean
+*        8  = Minmax mean
+*        9  = Broadened median
+*        10 = Sigma-clipped median
+*        11 = Fast median
+*        12 = Sum
+*        13 = Standard deviation about the mean
+*        14 = Sigma-clipped standard deviation about the mean
+*        21 = Integrated value (sum of pixel co-ordinate width times
+*             value)
+*        22 = Intensity-weighted co-ordinate
+*        23 = Intensity-weighted dispersion of the co-ordinate
+*        24 = Root mean square
+*        25 = Absolute mean deviation
+*        31 = Maximum
+*        32 = Minimum
+*        33 = Co-ordinate of maximum
+*        34 = Co-ordinate of minimum
+*        35 = Number of good pixel values
+*        36 = Number of bad pixel values
+*        37 = Fraction of good pixel values
+*        38 = Fraction of bad pixel values
+*        300 = Median, but estimating variance from mean variance
+*     MINPIX = INTEGER (Given)
+*        The minimum number of pixels required to contribute to an
+*        output pixel.
+*     NITER = INTEGER (Given)
+*        The maximum number of iterations (IMETH = 5).
+*     NSIGMA = REAL (Given)
+*        The number of sigmas to clip the data at (IMETH = 5 and 6).
+*     ALPHA = REAL (Given)
+*        The fraction of data values to remove from data (IMETH = 4).
+*     RMIN = REAL (Given)
+*        The minimum allowed data value (IMETH = 7).
+*     RMAX = REAL (Given)
+*        The maximum allowed data value (IMETH = 7).
+*     RESULT( NPIX ) = ? (Returned)
+*        The output line of data. This will always be of type _INTEGER
+*        for methods 35 (NGOOD) and 36 (NBAD). Since this routine does
+*        not actually access the array values, the mismatch in data
+*        types does not matter.
+*     WIDTHS( NPIX, NLINES ) = ? (Returned)
+*        The widths along the collapse axis for each pixel.  It is
+*        calculated only for IMETH = 21.
+*     COIND( NPIX ) = INTEGER (Returned)
+*        Workspace to hold co-ordinate indices.
+*     WRK1( NLINES ) = ? (Returned)
+*        Workspace for calculations.
+*     WRK2( NLINES ) = ? (Returned)
+*        Workspace for calculations.
+*     POINT( NLINES ) = INTEGER (Returned)
+*        Workspace to hold pointers to the original positions of the
+*        data before extraction and conversion in to the WRK1 array.
+*     USED( NLINES ) = LOGICAL (Returned)
+*        Workspace used to indicate which values have been used in
+*        estimating a resultant value.
+*     NCON( NLINES ) = DOUBLE PRECISION (Returned)
+*        The actual number of contributing pixels from each input line
+*        to the output line.
+*     NFLAG = INTEGER (Returned)
+*        Number of output pixels set to bad because insufficient pixels
+*        were present to form the statistic for the collapsed axis,
+*        provided the minimum number of contributing data values is one.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "x"
+*     in the routine name by D or R as appropriate.  The STACK, VARS,
+*     COORDS, RESULT, WIDTHS, WRK1, and WRK2 arguments supplied to the
+*     routine must have the data type specified (except for methods 35
+*     and 36 for which RESULT is always _INTEGER).
+*     - Various of the options are simply variations on a theme.  The
+*     Broadened median is just a trimmed mean with a variable trimming
+*     fraction.  The Mode is an iteratively carried out version of the
+*     sigma clipping (or more precisely the reverse).  The minmax and
+*     threshold mean are also just trimmed means, but require their own
+*     mechanisms.
+*     - No propagation of variances is performed using this routine.
+*     - Calculations are performed in double precision.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     Copyright (C) 1998, 2002 Central Laboratory of the Research
+*     Councils. Copyright (C) 2005-2006 Particle Physics & Astronomy
+*     Research Council. Copyright (C) 2007-2009 Science & Technology
+*     Facilities Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     DSB: David Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-MAY-1992 (PDRAPER):
+*        Original version with no variance propagation. Revamping of
+*        routine structure to increase efficiency.
+*     30-JAN-1998 (PDRAPER):
+*        Added sigma-clipped median.
+*     16-NOV-1998 (PDRAPER):
+*        Added fast median.
+*     9-SEP-2002 (DSB):
+*        Added unweighted mean method.
+*     2005 December 22 (MJC):
+*        Added several translations for new estimators and moments
+*        (IMETH=12 upwards except 300).
+*     2005 December 24 (MJC):
+*        Added mean absolute deviation.
+*     2005 December 27 (MJC):
+*        Added standard deviation.
+*     2005 December 28 (MJC):
+*        Added root mean square.
+*     2005 December 29 (MJC):
+*        Add summation method.
+*     2006 January 2 (MJC):
+*        Add COORDS argument.
+*     2006 January 5 (MJC):
+*        Add COIND argument.
+*     2006 January 6 (MJC):
+*        Add WIDTHS argument and calls for IMETH = 21, 22, 23.
+*     2006 January 26 (MJC):
+*        Made COORDS and WIDTHS per pixel.  Change calls to
+*        reflect new APIs for CCG1_IWC3 and CCG1_IWD3.
+*     2006 January 27 (MJC):
+*        Use CCG1_I2WC instead of KPG1_VASV to cope with the
+*        two-dimensional co-ordinate array.  Derive the widths for
+*        IMETH = 21 from the co-ordinates.
+*     2007 November 17 (MJC):
+*        WIDTHS is returned, not supplied, so move it in the API.
+*     2007 December 7 (MJC):
+*        Return number of flagged values through new argument NFLAG.
+*        Initialise count of the contributing pixels in each line.
+*     2008 September 24 (MJC):
+*        Add Option 14.
+*     2009 July 2 (MJC):
+*         Converted to generic, renamed from CCG1_CM3RR.  Invoke generic
+*         routines.  Made VARS take the generic type.  Converted to
+*         generic invoking genric routines.  Made VARS take the generic
+*         type.  Move STACK to normal order in the API.
+*     2009 July 4 (MJC):
+*         No longer initialise NCON.  This is done in the relevant
+*         routines.  Should blocking or chunking be involved in the
+*         calling application, a further summation array would be
+*         needed at the application level adding the contribution
+*         statistics for each block/chunk.  Also moved it to just
+*         before the NFLAG argument so it is the same as the statistics
+*         routines.  Use revised APIs for invoked subroutines.
+*     2009 July 9 (MJC):
+*         Use revised APIs for maxima and minima routines.
+*     2009 July 11 (MJC):
+*         Use revised API for CCG_UM3.
+*     17-JUL-2012 (DSB):
+*         Added methods 35, 36, 37 and 38.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER*8 NPIX
+      INTEGER*8 NLINES
+      <TYPE> STACK( NPIX, NLINES )
+      <TYPE> VARS( NLINES )
+      <TYPE> COORDS( NPIX, NLINES )
+      INTEGER IMETH
+      INTEGER*8 MINPIX
+      INTEGER NITER
+      REAL NSIGMA
+      REAL ALPHA
+      REAL RMIN
+      REAL RMAX
+
+*  Arguments Returned:
+      <TYPE> RESULT( NPIX )
+      <TYPE> WIDTHS( NPIX, NLINES )
+      INTEGER*8 COIND( NPIX )
+      <TYPE> WRK1( NLINES )
+      <TYPE> WRK2( NLINES )
+      INTEGER*8 POINT( NLINES )
+      LOGICAL USED( NLINES )
+      DOUBLE PRECISION NCON( NLINES )
+      INTEGER*8 NFLAG
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER*8 NBAD             ! Number of bad values
+      REAL PERCNT                ! Percentage of pixels set to bad
+
+*.
+
+*  Check inherited global status.
+      NFLAG = 0
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Branch for each method.
+      IF ( IMETH .EQ. 1 ) THEN
+
+*  Forming the unweighted mean.
+         CALL CCG8_UM3<T>( NPIX, NLINES, STACK, MINPIX,
+     :                  RESULT, NCON, NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 2 ) THEN
+
+*  Forming the weighted mean.
+         CALL CCG8_ME3<T>( NPIX, NLINES, STACK, VARS, MINPIX,
+     :                  RESULT, NCON, NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 3 ) THEN
+
+*  Forming the weighted median.
+         CALL CCG8_MD3<T>( NPIX, NLINES, STACK, VARS, MINPIX,
+     :                  RESULT, WRK1, WRK2, POINT, USED,
+     :                  NCON, NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 4 ) THEN
+
+*  Forming trimmed mean.
+          CALL CCG8_TM3<T>( ALPHA, NPIX, NLINES, STACK, MINPIX, RESULT,
+     :                   WRK1, POINT, USED, NCON, NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 5 ) THEN
+
+*  Forming the mode.
+         CALL CCG8_MO3<T>( NSIGMA, NITER, NPIX, NLINES, STACK, VARS,
+     :                  MINPIX, RESULT, WRK1, WRK2, POINT, USED, NCON,
+     :                  NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 6 ) THEN
+
+*  Forming sigma-clipped mean.
+         CALL CCG8_SC3<T>( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX,
+     :                  RESULT, WRK1, WRK2, POINT, USED, NCON,
+     :                  NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 7 ) THEN
+
+*  Forming threshold trimmed mean.
+          CALL CCG8_TC3<T>( RMIN, RMAX, NPIX, NLINES, STACK, VARS,
+     :                   MINPIX, RESULT, WRK1, WRK2, POINT, USED,
+     :                   NCON, NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 8 ) THEN
+
+*  Forming Min-Max exclusion mean.
+         CALL CCG8_MM3<T>( NPIX, NLINES, STACK, MINPIX, RESULT, WRK1,
+     :                  POINT, USED, NCON, NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 9 ) THEN
+
+*  Forming broadened median.
+         CALL CCG8_BM3<T>( NPIX, NLINES, STACK, MINPIX, RESULT, WRK1,
+     :                  POINT, USED, NCON, NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 10 ) THEN
+
+*  Forming sigma-clipped median.
+         CALL CCG8_SM3<T>( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX,
+     :                  RESULT, WRK1, WRK2, POINT, USED, NCON,
+     :                  NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 11 ) THEN
+
+*  Forming fast median (no weights).
+         CALL CCG8_FM3<T>( NPIX, NLINES, STACK, MINPIX, RESULT,
+     :                  WRK1, POINT, USED, NCON, NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 12 ) THEN
+
+*  Forming sum.
+         CALL CCG8_SUM3<T>( NPIX, NLINES, STACK, MINPIX,
+     :                   RESULT, NCON, NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 13 ) THEN
+
+*  Forming standard deviation.
+         CALL CCG8_SD3<T>( NPIX, NLINES, STACK, MINPIX, RESULT, NCON,
+     :                  NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 14 ) THEN
+
+*  Forming sigma-clipped standard deviation.
+         CALL CCG8_CS3<T>( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX,
+     :                  RESULT, WRK1, WRK2, POINT, USED,
+     :                  NCON, NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 21 ) THEN
+
+*  Create the widths from the co-ordinates assuming that there are
+*  gaps.
+         CALL CCG8_WCWI<T>( NPIX, NLINES, COORDS, WIDTHS, STATUS )
+
+*  Forming integrated value.
+         CALL CCG8_FLX3<T>( NPIX, NLINES, STACK, WIDTHS, MINPIX,
+     :                   RESULT, NCON, NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 22 ) THEN
+
+*  Forming intensity-weighted co-ordinate dispersion.
+         CALL CCG8_IWC3<T>( NPIX, NLINES, STACK, COORDS, MINPIX,
+     :                   RESULT, NCON, NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 23 ) THEN
+
+*  Forming intensity-weighted co-ordinate dispersion.
+         CALL CCG8_IWD3<T>( NPIX, NLINES, STACK, COORDS, MINPIX,
+     :                   RESULT, NCON, NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 24 ) THEN
+
+*  Forming mean absolute deviation.
+         CALL CCG8_RMS3<T>( NPIX, NLINES, STACK, MINPIX, RESULT,
+     :                   NCON, NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 25 ) THEN
+
+*  Forming mean absolute deviation.
+         CALL CCG8_AD3<T>( NPIX, NLINES, STACK, MINPIX, RESULT, NCON,
+     :                  NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 31 ) THEN
+
+*  Forming array of maxima.
+         CALL CCG8_MX3<T>( .TRUE., NPIX, NLINES, STACK, RESULT,
+     :                  COIND, WRK1, NCON, NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 32 ) THEN
+
+*  Forming array of minima.
+         CALL CCG8_MN3<T>( .TRUE., NPIX, NLINES, STACK, RESULT,
+     :                  COIND, WRK1, NCON, NBAD, STATUS )
+
+      ELSE IF ( IMETH .EQ. 33 ) THEN
+
+*  Forming array of maxima and corresponding indices.
+         CALL CCG8_MX3<T>( .TRUE., NPIX, NLINES, STACK, RESULT,
+     :                  COIND, WRK1, NCON, NBAD, STATUS )
+
+*  Convert the pixel indices of the maxima into co-ordinates stored in
+*  the RESULT array.
+         CALL CCG8_I2WC<T>( NPIX, NLINES, COIND, COORDS, RESULT, NBAD,
+     :                   STATUS )
+
+      ELSE IF ( IMETH .EQ. 34 ) THEN
+
+*  Forming array of minima and corresponding indices.
+         CALL CCG8_MN3<T>( .TRUE., NPIX, NLINES, STACK, RESULT,
+     :                  COIND, WRK1, NCON, NBAD, STATUS )
+
+*  Convert the pixel indices of the minima into co-ordinates stored in
+*  the RESULT array.
+         CALL CCG8_I2WC<T>( NPIX, NLINES, COIND, COORDS, RESULT, NBAD,
+     :                   STATUS )
+
+*  Forming array of pixel counts.
+      ELSE IF ( IMETH .EQ. 35 .OR. IMETH .EQ. 36 ) THEN
+         CALL CCG8_CNT3<T>( IMETH, NPIX, NLINES, STACK, RESULT, NCON,
+     :                     NBAD, STATUS )
+
+*  Forming array of pixel fractions.
+      ELSE IF ( IMETH .EQ. 37 .OR. IMETH .EQ. 38 ) THEN
+         CALL CCG8_FRC3<T>( IMETH, NPIX, NLINES, STACK, RESULT, NCON,
+     :                     NBAD, STATUS )
+
+       ELSE
+
+*  Invalid method report error
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'M', IMETH )
+         CALL ERR_REP( 'CCG8_COMB3x_BADMETH',
+     :                 'Bad method (^M) specified for image '/
+     :                 /'combination (invalid or not implemented)',
+     :                 STATUS )
+      END IF
+
+*  Assume these present the same statistic.
+      NFLAG = NBAD
+
+      END

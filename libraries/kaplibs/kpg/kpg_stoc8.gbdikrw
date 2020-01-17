@@ -204,7 +204,7 @@
 
 *  Call the appropriate routine to quicksort the array and then find the
 *  order statistics.
-      CALL PDA_QSIA8<T>( EL, ARRAY, %VAL( CNF_PVAL( IPNTR ) ) )
+      CALL PDA8_QSIA<T>( EL, ARRAY, %VAL( CNF_PVAL( IPNTR ) ) )
 
 *  Obtain median
 *  =============
@@ -287,7 +287,7 @@
 *  Call the appropriate routine to quicksort the array and then find the
 *  order statistics.
          IF ( NREPLO .GT. 0 .OR. NREPHI .GT. 0 ) THEN
-            CALL PDA_QSIA8<T>( EL, %VAL( CNF_PVAL( CPNTR ) ),
+            CALL PDA8_QSIA<T>( EL, %VAL( CNF_PVAL( CPNTR ) ),
      :                         %VAL( CNF_PVAL( IPNTR ) ) )
 
 *  Obtain median

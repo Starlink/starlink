@@ -26,10 +26,10 @@
 *  Arguments:
 *     AXIS = INTEGER (Given)
 *        The index of the axis to be collapsed.
-*     LO = INTEGER (Given)
+*     LO = INTEGER*8 (Given)
 *        The low pixel index bound of the range of axis AXIS to be
 *        collapsed.
-*     HI = INTEGER (Given)
+*     HI = INTEGER*8 (Given)
 *        The high pixel index bound of the range of axis AXIS to be
 *        collapsed.
 *     VAR = LOGICAL (Given)
@@ -46,14 +46,14 @@
 *     CLIP = REAL (Given)
 *        The number of standard deviations about the mean to clip
 *        outliers to form the  'MODE', 'CMEAN', or 'CSIGMA' statistics.
-*     NEL2 = INTEGER (Given)
+*     NEL2 = INTEGER*8 (Given)
 *        Total number of elements in the output array (i.e. the product
 *        of the output dimension sizes).
 *     NDIM1 = INTEGER (Given)
 *        The number of axes in the input array.
-*     LBND1( NDIM1 ) = INTEGER (Given)
+*     LBND1( NDIM1 ) = INTEGER*8 (Given)
 *        The lower pixel index bounds of the input array.
-*     UBND1( NDIM1 ) = INTEGER (Given)
+*     UBND1( NDIM1 ) = INTEGER*8 (Given)
 *        The upper pixel index bounds of the input array.
 *     DIN( * ) = ? (Given)
 *        The input data values.
@@ -66,22 +66,22 @@
 *        'IWC', 'IWD', 'COMAX', or 'COMIN'.
 *     NDIM2 = INTEGER (Given)
 *        The number of axes in the output array.
-*     LBND2( NDIM2 ) = INTEGER (Given)
+*     LBND2( NDIM2 ) = INTEGER*8 (Given)
 *        The lower pixel index bounds of the output array.
-*     UBND2( NDIM2 ) = INTEGER (Given)
+*     UBND2( NDIM2 ) = INTEGER*8 (Given)
 *        The upper pixel index bounds of the output array.
 *     USEWRK = LOGICAL (Given)
 *        Whether or not to use the work arrays.  This should be set
 *        .TRUE. if there are significant (i.e. >1) higher dimensions
 *        than the collapse axis.
-*     NFLAG = INTEGER (Given & Returned)
+*     NFLAG = INTEGER*8 (Given & Returned)
 *        Number of output pixels set to bad because insufficient pixels
 *        were present to form the statistic for the collapsed axis.
 *        The count excludes those lines where there are no good values.
 *        NFLAG  should be initialised to zero before any subdivision of
 *        the collapse by chunking.
 *     DOUT( * ) = ? (Returned)
-*        The output data values. This will always be of type _INTEGER for
+*        The output data values. This will always be of type _INTEGER*8 for
 *        methods NGOOD and NBAD. Since this routine does not actually
 *        access the array values, the mismatch in data types does not matter.
 *     VOUT( * ) = ? (Returned)
@@ -213,6 +213,8 @@
 *        Added NGood, NBad, FGood and FBad methods.
 *     2018 January 11 (MJC):
 *        Permit FastMed method.
+*     15-JAN-2020 (DSB):
+*        Added support for huge arrays.
 *     {enter_further_changes_here}
 
 *-
@@ -229,26 +231,26 @@
 
 *  Arguments Given:
       INTEGER AXIS
-      INTEGER LO
-      INTEGER HI
+      INTEGER*8 LO
+      INTEGER*8 HI
       LOGICAL VAR
       CHARACTER METH*(*)
       REAL WLIM
       REAL CLIP
-      INTEGER NEL2
+      INTEGER*8 NEL2
       INTEGER NDIM1
-      INTEGER LBND1( NDIM1 )
-      INTEGER UBND1( NDIM1 )
+      INTEGER*8 LBND1( NDIM1 )
+      INTEGER*8 UBND1( NDIM1 )
       <TYPE> DIN( * )
       <TYPE> VIN( * )
       <TYPE> CIN( * )
       INTEGER NDIM2
-      INTEGER LBND2( NDIM2 )
-      INTEGER UBND2( NDIM2 )
+      INTEGER*8 LBND2( NDIM2 )
+      INTEGER*8 UBND2( NDIM2 )
       LOGICAL USEWRK
 
 *  Arguments Given and Returned:
-      INTEGER NFLAG
+      INTEGER*8 NFLAG
 
 *  Arguments Returned:
       <TYPE> DOUT( * )
@@ -267,14 +269,14 @@
 
 *  Local Variables:
       LOGICAL CARRY              ! Increment next axis?
-      INTEGER DIM1( NDF__MXDIM ) ! Input dimension sizes
-      INTEGER DIM2( NDF__MXDIM ) ! Output dimension sizes
+      INTEGER*8 DIM1( NDF__MXDIM ) ! Input dimension sizes
+      INTEGER*8 DIM2( NDF__MXDIM ) ! Output dimension sizes
       LOGICAL HASCNT             ! Method counts contribting pixels
       INTEGER IAX1               ! Input axis index
       INTEGER IAX2               ! Output axis index
-      INTEGER IEL1               ! Index into input data vectors
-      INTEGER IEL2               ! Index into output data vectors
-      INTEGER IFLAG              ! Supplied NFLAG
+      INTEGER*8 IEL1             ! Index into input data vectors
+      INTEGER*8 IEL2             ! Index into output data vectors
+      INTEGER*8 IFLAG            ! Supplied NFLAG
       INTEGER IMETH              ! Combination method
       INTEGER IPCOIN             ! Pointer to workspace, co-ord indices
       INTEGER IPCOV              ! Pointer to workspace
@@ -285,14 +287,14 @@
       INTEGER IPVAR              ! Pointer to dummy line variances
       INTEGER IPWRK1             ! Pointer to workspace
       INTEGER IPWRK2             ! Pointer to workspace
-      INTEGER J                  ! Pixel index on collapsed axis
+      INTEGER*8 J                ! Pixel index on collapsed axis
       INTEGER K                  ! Work array index
-      INTEGER NLIN               ! No. of i/p pixels in each o/p pixel
-      INTEGER NMAT               ! Size of workspace
-      INTEGER POS1( NDF__MXDIM ) ! Input pixel indices
-      INTEGER POS2( NDF__MXDIM ) ! Output pixel indices
-      INTEGER START              ! The first input element to use
-      INTEGER STEP1              ! Vector step between collapsed pixels
+      INTEGER*8 NLIN             ! No. of i/p pixels in each o/p pixel
+      INTEGER*8 NMAT             ! Size of workspace
+      INTEGER*8 POS1( NDF__MXDIM ) ! Input pixel indices
+      INTEGER*8 POS2( NDF__MXDIM ) ! Output pixel indices
+      INTEGER*8 START            ! The first input element to use
+      INTEGER*8 STEP1            ! Vector step between collapsed pixels
       LOGICAL TRIM               ! Number of axes is trimmed?
       LOGICAL USECO              ! Method uses the co-ordinate array?
       LOGICAL USECV              ! Method uses a covariance array?
@@ -497,11 +499,11 @@
       NLIN = HI - LO + 1
       NMAT = NLIN * ( NLIN + 1 ) / 2
 
-      CALL PSX_CALLOC( NLIN, '<HTYPE>', IPWRK1, STATUS )
-      CALL PSX_CALLOC( NLIN, '<HTYPE>', IPWRK2, STATUS )
-      CALL PSX_CALLOC( NLIN, '_DOUBLE', IPNCON, STATUS )
-      CALL PSX_CALLOC( NLIN, '_INTEGER', IPPNT, STATUS )
-      CALL PSX_CALLOC( NLIN, '_LOGICAL', IPUSED, STATUS )
+      CALL PSX_CALLOC8( NLIN, '<HTYPE>', IPWRK1, STATUS )
+      CALL PSX_CALLOC8( NLIN, '<HTYPE>', IPWRK2, STATUS )
+      CALL PSX_CALLOC8( NLIN, '_DOUBLE', IPNCON, STATUS )
+      CALL PSX_CALLOC8( NLIN, '_INT64', IPPNT, STATUS )
+      CALL PSX_CALLOC8( NLIN, '_LOGICAL', IPUSED, STATUS )
 
 *  Get workspace if co-ordinates are to be derived, otherwise
 *  use a valid pointer.
@@ -510,7 +512,7 @@
 *  of the maximum or minimum values, or the intensity-weight
 *  co-ordinate or dispersion, as we can use the IPPNT array.
       IF ( USEIND ) THEN
-         CALL PSX_CALLOC( NEL2, '_INTEGER', IPCOIN, STATUS )
+         CALL PSX_CALLOC8( NEL2, '_INT64', IPCOIN, STATUS )
       ELSE
          IPCOIN = IPPNT
       END IF
@@ -564,10 +566,10 @@
          END IF
 
 *  Allocate memory.
-         CALL PSX_CALLOC( NLIN, '_DOUBLE', IPPP, STATUS )
+         CALL PSX_CALLOC8( NLIN, '_DOUBLE', IPPP, STATUS )
          NMAT = NLIN * ( NLIN + 1 ) / 2
          IF ( USECV ) THEN
-            CALL PSX_CALLOC( NLIN * NMAT, '_DOUBLE', IPCOV, STATUS )
+            CALL PSX_CALLOC8( NLIN * NMAT, '_DOUBLE', IPCOV, STATUS )
          ELSE
             IPCOV = IPPP
          END IF
@@ -575,8 +577,8 @@
 *  If the axis along which the input array was collapsed was not the
 *  last axis, we need to use the re-ordered data in the work arrays.
          IF ( USEWRK ) THEN
-            CALL CCG_COMB1<T>( NEL2, NLIN, WORK1, WORK2, WORK3, IMETH,
-     :                         MAX( 1, NINT( WLIM * REAL( NLIN ) ) ),
+            CALL CCG8_COMB1<T>( NEL2, NLIN, WORK1, WORK2, WORK3, IMETH,
+     :                         MAX( 1, NINT( WLIM * REAL( NLIN ), 8) ),
      :                         7, CLIP, 0.0, 0.0, 0.0, NMAT,
      :                         DOUT, VOUT, WOUT,
      :                         %VAL( CNF_PVAL( IPCOIN ) ),
@@ -591,9 +593,9 @@
 
 *  If the collapse axis is the last axis, we can use the original input
          ELSE
-            CALL CCG_COMB1<T>( NEL2, NLIN, DIN( START ), VIN( START ),
+            CALL CCG8_COMB1<T>( NEL2, NLIN, DIN( START ), VIN( START ),
      :                         CIN, IMETH,
-     :                         MAX( 1, NINT( WLIM * REAL( NLIN ) ) ),
+     :                         MAX( 1, NINT( WLIM * REAL( NLIN ), 8) ),
      :                         7, CLIP, 0.0, 0.0, 0.0, NMAT,
      :                         DOUT, VOUT, WOUT,
      :                         %VAL( CNF_PVAL( IPCOIN ) ),
@@ -613,16 +615,16 @@
 *  Now deal with cases where input variances are not available.  No
 *  output variances will be created.
       ELSE
-         CALL PSX_CALLOC( NLIN, '<HTYPE>', IPVAR, STATUS )
-         CALL KPG1_FILL<T>( 1<CONST>, NLIN, %VAL( CNF_PVAL( IPVAR ) ),
-     :                    STATUS )
+         CALL PSX_CALLOC8( NLIN, '<HTYPE>', IPVAR, STATUS )
+         CALL KPG1_FILL8<T>( 1<CONST>, NLIN, %VAL( CNF_PVAL( IPVAR ) ),
+     :                       STATUS )
 
 *  If the axis along which the input array was collapsed was not the
 *  last axis, we need to use the re-ordered data in the work arrays.
          IF ( USEWRK ) THEN
-            CALL CCG_COMB3<T>( NEL2, NLIN, WORK1,
+            CALL CCG8_COMB3<T>( NEL2, NLIN, WORK1,
      :                         %VAL( CNF_PVAL( IPVAR ) ), WORK3, IMETH,
-     :                         MAX( 1, NINT( WLIM * REAL( NLIN ) ) ),
+     :                         MAX( 1, NINT( WLIM * REAL( NLIN ), 8) ),
      :                         7, CLIP, 0.0, 0.0, 0.0,
      :                         DOUT, WOUT, %VAL( CNF_PVAL( IPCOIN ) ),
      :                         %VAL( CNF_PVAL( IPWRK1 ) ),
@@ -635,9 +637,9 @@
 *  If the collapse axis is the last axis, we can use the original input
 *  data.
          ELSE
-            CALL CCG_COMB3<T>( NEL2, NLIN, DIN( START ),
+            CALL CCG8_COMB3<T>( NEL2, NLIN, DIN( START ),
      :                         %VAL( CNF_PVAL( IPVAR ) ), CIN, IMETH,
-     :                         MAX( 1, NINT( WLIM * REAL( NLIN ) ) ),
+     :                         MAX( 1, NINT( WLIM * REAL( NLIN ), 8) ),
      :                         7, CLIP, 0.0, 0.0, 0.0,
      :                         DOUT, WOUT, %VAL( CNF_PVAL( IPCOIN ) ),
      :                         %VAL( CNF_PVAL( IPWRK1 ) ),

@@ -1,0 +1,279 @@
+      SUBROUTINE CCG8_WMD2<T>( EL, X, W, PBAD, NITER, TOLL, NSIGMA,
+     :                      XMODE, SIGMA, USED, NUSED, STATUS )
+*+
+*  Name:
+*     CCG8_WMD2x
+
+*  Purpose:
+*     Estimates the mean of a number of normally distributed data
+*     values, some of which may be corrupt.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*      CALL CCG8_WMD2x( EL, X, W, PBAD, NITER, TOLL, NSIGMA, XMODE,
+*                      SIGMA, USED, NUSED, STATUS )
+
+*  Description:
+*      Not available. Remember to look in EDRS.
+
+*  Arguments:
+*     EL = INTEGER*8 (Given)
+*        The number of data values.
+*     X( EL ) = ? (Given)
+*        An array of data values.
+*     W( EL ) = ? (Given)
+*        An array of data weights for each data value.  The weights are
+*        inversely proportional to the square of the relative errors on
+*        each data point.
+*     PBAD = REAL (Given)
+*        An estimate of the probability that any one data point will be
+*        corrupt.  (This value is not critical.)
+*     NITER = INTEGER (Given)
+*        The maximum number of iterations required.
+*     TOLL = REAL (Given)
+*        The absolute accuracy required in the estimate of the
+*        mean.  Iterations cease when two successive estimates
+*        differ by less than this amount.
+*     NSIGMA = REAL (Given)
+*        The sigma level to reject data values at.
+*     XMODE = DOUBLE PRECISION (Returned)
+*        The estimate of the uncorrupted mean.
+*     SIGMA = DOUBLE PRECISION (Returned)
+*        An estimate of the uncorrupted normalised standard deviation of
+*        the data points.  An estimate of the standard deviation of any
+*        one point is:  SIGMA / SQRT( W ) where W is its weight.  It is
+*        returned as the bad value should there be only one or no valid
+*        data values.
+*     USED( EL ) = LOGICAL (Returned)
+*        If a value is not rejected then its corresponding used element
+*        will be set true.
+*     NUSED = INTEGER*8 (Returned)
+*        Number of the input data values which are actually used.
+*     STATUS = INTEGER (Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "x"
+*     in the routine name by D or R as appropriate.  The X and W
+*     arguments supplied to the routine must have the data type
+*     specified.
+
+*  Copyright:
+*     Copyright (C) 1981, 1990-1991 Science & Engineering Research
+*     Council. Copyright (C) 2009, 2016 Science & Technology Facilities
+*     Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (Durham Univ.)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1981 (RFWS):
+*        Original version.
+*     1990 September 25 (MJC):
+*        Made generic, renamed from WMODE, added STATUS, commented
+*        the variables and converted the prologue.
+*     1991 April 4 (PDRAPER):
+*        Took from KAPPA and included NSIGMA argument.
+*        Changed output to double precision for compatablity.
+*     9-APR-1991 (PDRAPER):
+*        Added counter for number of points used.
+*     30-MAY-1991 (PDRAPER):
+*        Added used array to estimate statistics on image useage.
+*     2009 July 3 (MJC):
+*         Reverted to generic and renamed from CCG1_WMD2R.  Moved EL
+*         (renamed from NX) to give the normal order in the API.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Bad-pixel constants
+
+*  Arguments Given:
+      INTEGER*8 EL
+      <TYPE> X( EL )
+      <TYPE> W( EL )
+      REAL PBAD
+      INTEGER NITER
+      REAL TOLL
+      REAL NSIGMA
+
+*  Arguments Returned:
+      DOUBLE PRECISION XMODE
+      DOUBLE PRECISION SIGMA
+      LOGICAL USED( EL )
+      INTEGER*8 NUSED
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      DOUBLE PRECISION D         ! Data value
+      DOUBLE PRECISION DATA      ! Work variable
+      REAL DEV                   ! Deviation from the current mean
+      REAL DEV2                  ! Deviation from the current mean
+                                 ! squared, weighted
+      REAL DEVLIM                ! Maximum deviation to be included
+      REAL DXMODE                ! Increment to the mean
+      REAL DX2                   ! Deviation squared
+      REAL EX                    ! Probability of a point being good
+      INTEGER*8 I                ! Loop counter
+      INTEGER ITER               ! Number of iterations
+      INTEGER*8 N                ! Pixel counter
+      REAL PBNORM                ! Normalised probability
+      REAL PROB                  ! Fractional probability of a point
+                                 ! being good data
+      REAL RW                    ! Weight as REAL
+      DOUBLE PRECISION SUM1      ! Sum zero-order moment (first pass)
+      DOUBLE PRECISION SUM2      ! Sum first-order moment (first pass)
+      DOUBLE PRECISION SUM3      ! Sum second-order moment (first pass)
+      REAL SUMA                  ! Sum zero-order moment
+      REAL SUMB                  ! Sum weighted zero-order moment
+      REAL SUMC                  ! Sum first-order moment
+      REAL SUMD                  ! Sum second-order moment
+      REAL W2                    ! Work variable
+      REAL VAR                   ! Variance
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+
+*.
+
+*  Set and initilise returned variables.
+      NUSED = 0
+      XMODE = VAL__BADD
+      SIGMA = VAL__BADD
+
+      DO I = 1, EL
+         USED( I ) = .FALSE.
+      END DO
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Form the initial estimate of the mean and sigma.
+      SUM1 = 0.0D0
+      SUM2 = 0.0D0
+      SUM3 = 0.0D0
+      N = 0
+
+      DO I = 1, EL
+
+*  Ignore bad pixels.
+         IF ( X( I ) .NE. VAL__BAD<T> ) THEN
+
+*  Form sums in double precision to reduce rounding errors giving large
+*  relative uncertainities in the statistics.
+            N = N + 1
+            DATA = NUM_<T>TOD( W( I ) )
+            SUM1 = SUM1 + DATA
+            D = NUM_<T>TOD( X( I ) )
+            DATA = DATA * D
+            SUM2 = SUM2 + DATA
+            SUM3 = SUM3 + D * DATA
+         END IF
+
+      END DO
+
+*  Check that there were sufficient data before forming the first
+*  estimate of the statistics.
+      IF ( N .GT. 1 ) THEN
+         XMODE = SUM2 / SUM1
+         VAR = ( SUM3 - ( SUM2 * SUM2 ) / SUM1 ) / DBLE( N - 1 )
+         VAR = MAX( VAR, 0.0 )
+      ELSE
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'KPG1_WMODEX_INSDA',
+     :     'Insufficient data points to compute a variance.', STATUS )
+         SIGMA = VAL__BADD
+         XMODE = SUM2
+         GO TO 100
+      END IF
+
+*  Now start the iteration loop.
+      PBNORM = PBAD * 0.707107
+
+      DO ITER = 1, NITER
+         VAR = MAX( VAR, 1.0E-20 )
+         W2 = 0.5 / VAR
+
+*  Initialise sums for forming new estimate.
+         SUMA = 0.0
+         SUMB = 0.0
+         SUMC = 0.0
+         SUMD = 0.0
+
+*  Limit good value to lie within NSIGMA
+         DEVLIM = VAR * NSIGMA * NSIGMA
+
+*  Scan through the data points, forming weighted sums to calculate
+*  new mean and variance.
+         NUSED = 0
+         DO I = 1, EL
+            IF ( X( I ) .NE. VAL__BAD<T> ) THEN
+               DEV = NUM_<T>TOR( X( I ) ) - REAL( XMODE )
+               DX2 = DEV * DEV
+               RW = NUM_<T>TOR( W( I ) )
+               DEV2 = DX2 * RW
+
+*  Ignore points more than 10 sigma from the mode.
+               IF ( DEV2 .LE. DEVLIM ) THEN
+
+*  Increment the used counter and flag this value used.
+                  NUSED = NUSED + 1
+                  USED( I ) = .TRUE.
+
+*  The weights depend on the fractional probability of being good data.
+                  EX = EXP( - W2 * DEV2 )
+                  PROB = EX / ( PBNORM + EX )
+                  SUMA = SUMA + PROB
+                  SUMB = SUMB + PROB * RW
+                  SUMC = SUMC + DEV * PROB * RW
+                  SUMD = SUMD + DEV2 * PROB
+               END IF
+            END IF
+
+         END DO
+
+*  Form the new estimates for the uncorrupted mean and standard
+*  deviation.
+         SUMA = MAX( SUMA, 1.0E-20 )
+         SUMB = MAX( SUMB, 1.0E-20 )
+         XMODE = XMODE + SUMC / SUMB
+         VAR = SUMD / SUMA
+
+*  If the required accuracy has been met, return.
+         DXMODE = SUMC / SUMB
+         SIGMA = SQRT( VAR )
+         IF ( ABS( DXMODE ) .LE. TOLL ) GO TO 100
+      END DO
+
+  100 CONTINUE
+
+      END

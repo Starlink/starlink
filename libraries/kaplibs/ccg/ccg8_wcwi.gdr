@@ -1,0 +1,138 @@
+      SUBROUTINE CCG8_WCWI<T>( NPIX, NLINES, COORDS, WIDTHS, STATUS )
+*+
+*  Name:
+*     CCG8_WCWIx
+
+*  Purpose:
+*     Creates a channel-width array from the channel co-ordinates.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG8_WCWIx( NPIX, NLINES, COORDS, WIDTHS, STATUS )
+
+*  Description:
+*     This routine accepts an array consisting of a series of
+*     (vectorised) lines of co-ordinates.  For each pixel the
+*     subroutine forms a channel width by halving the difference
+*     of neighbouring co-ordinates along a line of data, i.e.
+*     it assumes that therre are no gaps.  The widths for first and
+*     last pixels are the difference with its interior neighbour.
+
+*  Arguments:
+*     NPIX = INTEGER*8 (Given)
+*        The number of pixels in a line of data.
+*     NLINES = INTEGER*8 (Given)
+*        The number of lines of data in the stack.
+*     COORDS( NPIX, NLINES ) = ? (Given)
+*        The world co-ordinates.
+*     WIDTHS( NPIX, NLINES ) = ? (Given)
+*        The chanel widths.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D or R as appropriate.  The COORDS and WIDTHS
+*     arguments supplied to the routine must have the data type
+*     specified.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2006 January 27 (MJC):
+*        Original version.
+*     2009 July 3 (MJC):
+*         Renamed from CCG1_WCWIx.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+
+*  Arguments Given:
+      INTEGER*8 NPIX
+      INTEGER*8 NLINES
+      <TYPE> COORDS( NPIX, NLINES )
+
+*  Arguments Returned:
+      <TYPE> WIDTHS( NPIX, NLINES )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER*8 I                ! Loop variable
+      INTEGER*8 J                ! Loop variable
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop over all interior pixels.
+      DO 2 J = 2, NLINES - 1
+         DO 1 I = 1, NPIX
+
+*  Both bracketing values need to be good.  Might review this
+*  later to use central co-ordinate and the good neighbour.
+            IF ( COORDS( I, J + 1 ) .EQ. VAL__BAD<T> .OR.
+     :           COORDS( I, J - 1 ) .EQ. VAL__BAD<T> ) THEN
+               WIDTHS( I, J ) = VAL__BAD<T>
+            ELSE
+               WIDTHS( I, J ) = ABS( COORDS( I, J + 1 ) -
+     :                               COORDS( I, J - 1 ) ) / 2<CONST>
+            END IF
+    1    CONTINUE
+    2 CONTINUE
+
+*  Now find the widths the first exterior element of each pixel.
+      DO 3 I = 1, NPIX
+         IF ( COORDS( I, 1 ) .EQ. VAL__BAD<T> .OR.
+     :        COORDS( I, 2 ) .EQ. VAL__BAD<T> ) THEN
+            WIDTHS( I, 1 ) = VAL__BAD<T>
+         ELSE
+            WIDTHS( I, 1 ) = ABS( COORDS( I, 2 ) - COORDS( I, 1 ) )
+         END IF
+    3 CONTINUE
+
+      DO 4 I = 1, NPIX
+         IF ( COORDS( I, NLINES ) .EQ. VAL__BAD<T> .OR.
+     :        COORDS( I, NLINES - 1 ) .EQ. VAL__BAD<T> ) THEN
+            WIDTHS( I, NLINES ) = VAL__BAD<T>
+         ELSE
+            WIDTHS( I, NLINES ) = ABS( COORDS( I, NLINES ) -
+     :                                 COORDS( I, NLINES - 1 ) )
+         END IF
+    4 CONTINUE
+
+      END

@@ -1,0 +1,184 @@
+      SUBROUTINE CCG8_TRM3<T>( ALPHA, EL, ORDDAT, USED, TMEAN, STATUS )
+*+
+*  Name:
+*     CCG8_TRM3x
+
+*  Purpose:
+*     Forms the trimmed mean of the given set of ordered data,
+*     returning flags showing which values are used. This variant does
+*     not process variances.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG8_TRM3x( ALPHA, EL, ORDDAT, USED, TMEAN, STATUS )
+
+*  Description:
+*     The routine forms the trimmed mean of the given dataset. The
+*     alpha (as a fraction) upper and lower ordered values are removed
+*     from consideration.  Then the remaining values are added and
+*     averaged. The elements of the input array which actually
+*     contribute to the final value are flagged in the used array.
+
+*  Arguments:
+*     ALPHA = REAL (Given)
+*        The fraction of data to trim from upper and lower orders.
+*        It must be greater than 0.0 and less than 0.5.
+*     EL = INTEGER*8 (Given)
+*        The number of entries in ORDDAT.
+*     ORDDAT( EL ) = ? (Given)
+*        The set of ordered data for which a trimmed mean is required.
+*     USED( EL ) = LOGICAL (Returned)
+*        If the corresponding value in ORDDAT contributes to the final
+*        value then this is set true.
+*     TMEAN = DOUBLE PRECISION (Returned)
+*        The trimmed mean.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     28-MAR-1991 (PDRAPER):
+*        Original version.
+*     30-MAY-1991 (PDRAPER):
+*        Added the used argument.
+*     20-AUG-1991 (PDRAPER):
+*        Variant of CCG1_TRM2 - no variance analysis now.
+*     2009 July 2 (MJC):
+*         Converted to generic and renamed from CCG1_TRM3R.  Moved EL
+*         (after renaming from NSET) to the normal order in the API.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      REAL ALPHA
+      INTEGER*8 EL
+      <TYPE> ORDDAT( EL )
+
+*  Arguments Returned:
+      LOGICAL USED( EL )
+      DOUBLE PRECISION TMEAN
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      REAL DENOM                 ! Divisor always checked to be.
+      REAL FRAC                  ! Fractional difference between odd
+                                 ! centered values and actual values
+      INTEGER*8 I                ! Loop variable
+      INTEGER*8 IGNORE           ! Number of eliminated measurements
+                                 ! from upper and lower orders
+      DOUBLE PRECISION INWEI     ! Inner weights
+      INTEGER*8 LBND             ! Lower index of contributing values
+      DOUBLE PRECISION OUTWEI    ! Weights for values and outer most
+                                 ! values (nominally 1/(nset-2alpha))
+      INTEGER*8 UBND             ! Upper index of contributing values
+      DOUBLE PRECISION WSUM      ! Weight sum
+
+*  Local References:
+      INCLUDE 'NUM_DEC_CVT'
+      INCLUDE 'NUM_DEF_CVT'      ! Primdat conversion definition
+                                 ! functions
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check alpha; it is essential that it is greater than zero and less
+*  than 0.5.
+      IF ( ALPHA .GT. 0.0 .AND. ALPHA .LT. 0.5 ) THEN
+
+*  How many values are to be ignored from each end of the order
+*  dataset?
+         IGNORE = INT( ALPHA * REAL( EL ) )
+
+*  Fractional difference between the idea trimmed state and the
+*  actual state. This is used in weighting the outer observations.
+         FRAC = REAL( ALPHA * REAL( EL ) - INT( ALPHA * EL ) )
+
+*  Calculate the weights for the edge values and inner values.
+         DENOM = REAL( EL ) * ( 1.0 - 2.0 * ALPHA )
+         OUTWEI = DBLE( ( 1.0 - FRAC ) / DENOM )
+         INWEI  = DBLE( 1.0 / DENOM )
+
+*  Set up the upper and lower bounds for the useful values.
+         LBND = IGNORE + 1
+         UBND = EL - IGNORE
+
+*  Loop over all values forming the sum of values for trimmed mean.
+         TMEAN = 0.0D0
+         WSUM = 0.0D0
+         DO 1 I = 1, EL
+            IF ( I .EQ. LBND .OR. I .EQ. UBND ) THEN
+
+*   Use outer weight at these extreme.
+               TMEAN = NUM_<T>TOD( ORDDAT( I ) ) * OUTWEI + TMEAN
+               WSUM = WSUM + OUTWEI
+
+*  Use inner weight for these values
+            ELSE IF ( I .GE. LBND + 1 .AND. I .LE. UBND -1 ) THEN
+               TMEAN = NUM_<T>TOD( ORDDAT( I ) ) * INWEI + TMEAN
+               WSUM = WSUM + INWEI
+            ELSE
+
+*  Ignore these values, they lie outside of IGNORE and EL-IGNORE+1.
+            END IF
+    1    CONTINUE
+
+*  Renormalise mean for unbalanced weighting (high alphas)
+         TMEAN = TMEAN / WSUM
+
+*  Set up the used variable array.
+         DO 4 I = 1, EL
+            IF ( I .GE. LBND .AND. I .LE. UBND ) THEN
+               USED( I ) = .TRUE.
+            ELSE
+               USED( I ) = .FALSE.
+            END IF
+    4    CONTINUE
+      ELSE
+
+*  Invalid alpha ...
+         CALL MSG_SETD( 'ALPHA', ALPHA )
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'CCG1_TRM3_ALPH', 'Invalid value for ALPHA '/
+     :     /'trimming fraction ^ALPHA : must be greater than 0.0 '/
+     :     /'and than 0.5.' , STATUS )
+
+      END IF
+
+      END

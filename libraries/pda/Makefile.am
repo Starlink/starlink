@@ -86,8 +86,8 @@ pda_qdrtg.f pda_stopx.f pda_vscopy.f pda_dupdu.f pda_lsqrt.f 	       \
 pda_qdrtgh.f pda_sumit.f pda_vvmulp.f pda_gqtst.f pda_lsvmin.f 	       \
 pda_reldst.f pda_sumsl.f pda_wzbfgs.f pda_humit.f pda_ltvmul.f 	       \
 pda_rmdcon.f pda_humsl.f pda_lupdat.f pda_sgrad2.f pda_v2norm.f	       \
-pda_assst.f pda_lmerr.f
-
+pda_assst.f pda_lmerr.f \
+pda8_covmat.f pda8_nscor.f pda8_correc.f pda8_v11.f pda8_rwnorm.f
 C_ROUTINES = pda.c pdaD1mach.c
 
 GEN_F_ROUTINES = $(PDA_BDIKRW_GEN:.gbdikrw=.f)
@@ -97,7 +97,7 @@ GEN_F_ROUTINES = $(PDA_BDIKRW_GEN:.gbdikrw=.f)
 MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
 
 PDA_BDIKRW_GEN = pda_qsia.gbdikrw pda_qsid.gbdikrw \
-pda_qsia8.gbdikrw
+pda8_qsia.gbdikrw
 
 PUBLIC_F_INCLUDES =
 PUBLIC_C_INCLUDES = pda.h

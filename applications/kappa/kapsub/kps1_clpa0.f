@@ -24,7 +24,7 @@
 *        Identifier for the WCS FrameSet to be modified.
 *     AXIS = INTEGER (Given)
 *        The index of the pixel axis which is to be removed.
-*     AXDIM = INTEGER (Given)
+*     AXDIM = INTEGER*8 (Given)
 *        The original number of pixels along the pixel axis which is
 *        being removed.
 *     POS( * ) = DOUBLE PRECISION (Given)
@@ -35,10 +35,10 @@
 *        from the returned FrameSet. Otherwise, they are retained and
 *        the Mapping is modified so that the collapsed WCS range maps
 *        onto the one remaining pixel.
-*     GLO = INTEGER (Given)
+*     GLO = INTEGER*8 (Given)
 *        The GRID co-ordinate of the first collapsed pixel along the
 *        collapse axis.
-*     GHI = INTEGER (Given)
+*     GHI = INTEGER*8 (Given)
 *        The GRID co-ordinate of the last collapsed pixel along the
 *        collapse axis.
 *     STATUS = INTEGER (Given)
@@ -96,6 +96,8 @@
 *        constant value or not. Before an axis was constant if its range
 *        was less than 1E-6 of its mean value. Now it is constant if its
 *        range corresponds to less than 0.25 of a pixel.
+*     15-JAN-2020 (DSB):
+*        Add support for huge arrays.
 *-
 
 *  Type Definitions:
@@ -110,11 +112,11 @@
 *  Arguments Given:
       INTEGER IWCS
       INTEGER AXIS
-      INTEGER AXDIM
+      INTEGER*8 AXDIM
       DOUBLE PRECISION POS(*)
       LOGICAL TRIM
-      INTEGER GLO
-      INTEGER GHI
+      INTEGER*8 GLO
+      INTEGER*8 GHI
 
 *  Status:
       INTEGER STATUS             ! Global status

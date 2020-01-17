@@ -1,0 +1,104 @@
+      SUBROUTINE KPG1_FILL8<T>( VALUE, EL, ARRAY, STATUS )
+*+
+*  Name:
+*     KPG1_FILL8x
+
+*  Purpose:
+*     Sets all elements in a vectorised array to a specified value.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_FILL8<T>( VALUE, EL, ARRAY, STATUS )
+
+*  Description:
+*     This routine sets all the pixels in a one-dimensional array to a
+*     specified value.
+
+*  Arguments:
+*     VALUE = ? (Given)
+*        Value to be substituted in every pixel.
+*     EL = INTEGER*8 (Given)
+*        The dimension of the array to be filled with a constant.
+*     ARRAY( EL ) = ? (Returned)
+*        The output array containing a single value.
+*     STATUS = INTEGER (Given & Returned)
+*        Global status value
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B, or UB as appropriate.  The
+*     VALUE and ARRAY arguments must have the data type specified.
+
+*  Copyright:
+*     Copyright (C) 1989 Science & Engineering Research Council.
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S Berry (EAO):
+*     {enter_new_authors_here}
+
+*  History:
+*     1989 October 31 (MJC):
+*        Original version.
+*     1995 April 25 (MJC):
+*        Renamed from SETAV, and used a modern prologue and commenting
+*        style.
+*     15-JAN-2020 (DSB):
+*        Add support for huge arrays.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT  NONE             ! No default typing allowed
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Global SSE definitions
+
+*  Arguments Given:
+      <TYPE> VALUE
+      INTEGER*8 EL
+
+*  Arguments Returned:
+      <TYPE> ARRAY( EL )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER*8 I                ! Loop counter
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Fill the array with the constant.
+      DO I = 1, EL
+         ARRAY( I ) = VALUE
+      END DO
+
+      END

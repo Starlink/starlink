@@ -1,0 +1,167 @@
+      SUBROUTINE CCG8_KTH<T>( EL, K, ARRAY, ANCDAT, VALUE, STATUS )
+*+
+*  Name:
+*     CCG8_KTHx
+
+*  Purpose:
+*     Returns the Kth smallest value in an array.
+
+*  Language:
+*     Fortran-77
+
+*  Invocation:
+*     CALL CCG8_KTHx( EL, K, ARRAY, ANCDAT, VALUE, STATUS )
+
+*  Description:
+*     This routine returns the value of the Kth smallest element in the
+*     given array.  It is an implementation of an algorithm of Niklaus
+*     Wirth from the book "Algorithms + data structures = programs".
+
+*  Arguments:
+*     EL = INTEGER*8 (Given)
+*        The number of elements in the input array.
+*     K = INTEGER*8 (Given and Returned)
+*        On entry the ordered value to be returned, on exit index of
+*        ARRAY that contain the Kth smallest value.
+*     ARRAY( EL ) = ? (Given and Returned)
+*        The array of values to be processed. Note this is modified on
+*        exit.
+*     ANCDAT( EL ) = INTEGER*8 (Given and Returned)
+*        Array of data whose association with ARRAY is to be preserved
+*        (such as a list of pointers to the original positions within
+*        ARRAY).
+*     VALUE = ? (Returned)
+*         The Kth smallest value in the input array.
+*     STATUS = INTEGER (Given)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     16-NOV-1998 (PDRAPER):
+*        Original version.
+*     2009 July 3 (MJC):
+*        Converted to generic and renamed from CCG1_KTHR.  Renamed N
+*        argument to EL.  Added comments.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE             ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER*8 EL
+      INTEGER*8 K
+
+*  Arguments Given and Returned:
+      <TYPE> ARRAY( EL )
+      INTEGER*8 ANCDAT( EL )
+
+*  Arguments Returned:
+      <TYPE> VALUE
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER*8 I                ! Current lower bound of search
+      INTEGER*8 ITMP             ! Used to swap ancillary
+      INTEGER*8 IVAL             ! Local current ancillary value
+      INTEGER*8 J                ! Current upper bound of search
+      INTEGER*8 L                ! Lower bound of search
+      <TYPE> LVAL                ! Local current value
+      INTEGER*8 M                ! Upper bound of search
+      <TYPE> TMP                 ! Used to swap values
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialization.
+      L = 1
+      M = EL
+
+*  Do while L is less than M, i.e. until we meet at the index of the
+*  desired kth value.
+    1 CONTINUE
+      IF ( L .LT. M ) THEN
+         LVAL = ARRAY( K )
+         IVAL = ANCDAT( K )
+         I = L
+         J = M
+
+*  Do until I is greater than J.
+    2    CONTINUE
+
+*  Find the next array value less than the current value
+*  moving up from the lower limit.
+    3    CONTINUE
+         IF ( ARRAY( I ) .LT. LVAL ) THEN
+            I = I + 1
+            GO TO 3
+         END IF
+
+*  Find the next array value greater than or equal to the current value
+*  moving down from the upper limit.
+    4    CONTINUE
+         IF ( LVAL .LT. ARRAY( J ) ) THEN
+            J = J - 1
+            GO TO 4
+         END IF
+
+*  Swap values and ancillary array at I and J, if needed.
+         IF ( I .LE. J ) THEN
+            TMP = ARRAY( I )
+            ARRAY( I ) = ARRAY( J )
+            ARRAY( J ) = TMP
+
+            ITMP = ANCDAT( I )
+            ANCDAT( I ) = ANCDAT( J )
+            ANCDAT( J ) = ITMP
+
+            I = I + 1
+            J = J - 1
+         END IF
+
+*  End of do until I is greater than J.
+         IF ( I .LE. J ) GO TO 2
+
+*  Taper the bounds of the search.
+         IF ( J .LT. K ) L = I
+         IF ( K .LT. I ) M = J
+         GO TO 1
+      END IF
+
+*  Return Kth smallest value.
+      VALUE = ARRAY( K )
+
+      END

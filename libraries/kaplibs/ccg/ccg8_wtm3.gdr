@@ -1,0 +1,282 @@
+      SUBROUTINE CCG8_WTM3<T>( CALCMV, EL, ORDDAT, WEIGHT, VAR,
+     :                      COVAR, USED, RESULT, RESVAR, STATUS )
+*+
+*  Name:
+*     CCG8_WTM3x
+
+*  Purpose:
+*     Forms the weighted median of a list of ordered data values.
+*     Incrementing the contributing pixel buffers and estimating the
+*     variance change.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*      CALL CCG8_WTM3x( CALCMV, EL, ORDDAT, WEIGHT, VAR, COVAR, USED,
+*                      RESULT, RESVAR, STATUS )
+
+*  Description:
+*     This routine finds a value which can be associated with the half-
+*     weight value.  It sums all weights then finds a value for the
+*     half-weight.  The comparison with the half-weight value proceeds
+*     in halves of the weights for each data point (half of the first
+*     weight, then the second half of the first weight and the first
+*     half of the second weight etc.) until the half weight is
+*     exceeded. The data values around this half weight position are
+*     then found and a linear interpolation of these values is the
+*     weighted median.  The values which contribute to the result are
+*     flagged and passed through the USED array.  This routine also
+*     uses the order statistic covariance array (for a population EL
+*     big) to estimate the change in the variance from a optimal
+*     measurement from the given population, returning the adjusted
+*     variance.
+
+*  Arguments:
+*     CALCMV = LOGICAL (Given)
+*        If .FALSE. then the output variances are estimated by scaling
+*        the variance on the weighted mean (rather than the weighted
+*        median) by pi/2.  Otherwise, the output variances are
+*        calculated using the COVEC array.
+*     EL = INTEGER*8 (Given)
+*        The number of entries in the data array.
+*     ARR( EL ) = ? (Given)
+*        The list of ordered data for which the weighted median is
+*        required
+*     WEIGHT( EL ) = ? (Given)
+*        The weights of the values.
+*     VAR = DOUBLE PRECISION (Given)
+*        The variance of the unordered sample now ordered in ARR.
+*     COVAR( * ) = DOUBLE PRECISION (Given)
+*        The packed variance-covariance matrix of the order statistics
+*        from a normal distribution of size EL. Not used if CALCMV is .FALSE.
+*     USED( EL ) = LOGICAL (Returned)
+*        If a value contributes to the median value it is flagged as
+*        true in this array, otherwise the array is set to false.
+*     RESULT = DOUBLE PRECISION (Returned)
+*        The weighted median
+*     RESVAR = DOUBLE PRECISION (Returned)
+*        The variance of result.
+*     NBAD = INTEGER*8 (Returned)
+*        The number of bad values in the output array.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "x"
+*     in the routine name by D or R as appropriate.  The ORDDAT and
+*     WEIGHT arguments supplied to the routine must have the data type
+*     specified.
+
+*  Prior Requirements:
+*     - The input data must be ordered increasing. No BAD values may be
+*     present.
+
+*  Copyright:
+*     Copyright (C) 1991-1992 Science & Engineering Research Council.
+*     Copyright (C) 2003 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     RFWS: Rodney Warren-Smith (Durham University)
+*     PDRAPER: Peter Draper (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     - (RFWS):
+*        Original version.
+*     5-APR-1991 (PDRAPER):
+*        Changed to use preordered array, changed to generic routine.
+*        Added prologue etc.
+*     30-MAY-1991 (PDRAPER):
+*        Added used array.
+*     27-MAY-1992 (PDRAPER):
+*        Added direct variance estimates.
+*     27-AUG-2003 (DSB):
+*        Added argument CALCMV.
+*     2009 July 5 (MJC):
+*         Converted to generic and renamed from CCG1_WTM3R.  Moved EL
+*         (after renaming from NENT) to the normal order in the API.
+*         Corrected which arguments are arrays or not in the prologue.
+*     2009 July 11 (MJC):
+*         Swapped COVAR and USED in the API to achieve the standard
+*         order.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      LOGICAL CALCMV
+      INTEGER*8 EL
+      <TYPE> ORDDAT( EL )
+      <TYPE> WEIGHT( EL )
+      DOUBLE PRECISION VAR
+      DOUBLE PRECISION COVAR( * )
+
+*  Arguments Returned:
+      LOGICAL USED( EL )
+      DOUBLE PRECISION RESULT
+      DOUBLE PRECISION RESVAR
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      DOUBLE PRECISION PIBY2     ! 90 degs in radians
+      PARAMETER ( PIBY2 = 1.57079632679489661923132 )
+
+*  Local Variables:
+      DOUBLE PRECISION D1        ! Value around half weight
+      DOUBLE PRECISION D2        ! Value around half weight
+      INTEGER*8 I                ! Loop variable
+      DOUBLE PRECISION IW        ! Dummy
+      INTEGER*8 J                ! Loop variable
+      DOUBLE PRECISION JW        ! Dummy
+      INTEGER*8 K                ! Loop variable
+      INTEGER*8 LBND             ! Lower sum bound
+      DOUBLE PRECISION TOTWT     ! The total value of weights
+      DOUBLE PRECISION TRGWT     ! The target value of weights
+      INTEGER*8 UBND             ! Upper sum bound
+      DOUBLE PRECISION VSUM      ! Covariance sum
+      DOUBLE PRECISION W1        ! Fractional weight of value
+      DOUBLE PRECISION W2        ! Fractional weight of value
+      DOUBLE PRECISION WTSUM     ! Current sum of weights
+      DOUBLE PRECISION WTINC     ! Increment in current wtsum
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! Numeric conversion definitions
+      INCLUDE 'NUM_DEF_CVT'      !
+
+*.
+
+*  Initialise returned values.
+      DO 5 I = 1, EL
+         USED( I ) = .FALSE.
+    5 CONTINUE
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Avoid confusing the optimiser.
+      WTINC = 0.0D0
+
+*  If only one input value has been given, do thing quickly.
+      IF ( EL .EQ. 1 ) THEN
+
+*  Just one value, copy the input values to the output values.
+         RESULT = NUM_<T>TOD( ORDDAT( 1 ) )
+         RESVAR = VAR
+         USED( 1 ) = .TRUE.
+      ELSE
+
+*  More than one value so process in earnest.
+*  Sum weights.
+         TOTWT = 0.0D0
+         DO 1 I = 1, EL
+            TOTWT = TOTWT + NUM_<T>TOD( WEIGHT( I ) )
+
+    1    CONTINUE
+
+* Search for median weight.
+         TRGWT = TOTWT * 0.5D0
+         WTSUM = 0.0D0
+
+         DO 2 I = 1, EL
+            IF ( I .EQ. 1 ) THEN
+               WTINC = NUM_<T>TOD( WEIGHT( I ) ) * 0.5D0
+            ELSE
+               WTINC = ( NUM_<T>TOD( WEIGHT( I ) + WEIGHT( I - 1 ) ) )
+     :                 *  0.5D0
+            END IF
+
+            WTSUM = WTSUM + WTINC
+            IF ( WTSUM .GT. TRGWT ) GO TO 66
+    2    CONTINUE
+   66    I = MIN( I, EL )
+
+*  Set the used array
+         USED( I ) = .TRUE.
+
+*  Bounds are present value and previous one.
+         LBND = I - 1
+         UBND = I
+         D1 = NUM_<T>TOD( ORDDAT( LBND ) )
+         D2 = NUM_<T>TOD( ORDDAT( I ) )
+
+*  Set the used array extra value.
+         USED( I - 1 ) = .TRUE.
+
+*  Set weights factors
+         W1 = ( WTSUM - TRGWT ) / MAX( WTINC, 1.0D-20 )
+         W2 = 1.0D0 - W1
+
+*  Interpolate between data values.
+         RESULT = D1 * W1 + D2 * W2
+
+*  If required, sum the relevant ordered statistic variances and covariances.
+*  weighting accordingly.
+         IF ( CALCMV ) THEN
+            VSUM = 0.0D0
+            DO 3 K = LBND, UBND
+               IF ( K .EQ. LBND ) THEN
+                  IW = W1
+               ELSE
+                  IW = W2
+               END IF
+               DO 4 J = K, UBND
+                  IF ( J .EQ. LBND ) THEN
+                     JW = W1
+                  ELSE
+                     JW = W2
+                  END IF
+
+*  Sum variances and twice covariances (off-diagonal elements).
+                  IF ( K .EQ. J ) THEN
+                     VSUM = VSUM + IW * JW *
+     :                             COVAR( K + J * ( J - 1 ) / 2 )
+                  ELSE
+                     VSUM = VSUM + 2.0D0 * IW * JW *
+     :                             COVAR( K + J * ( J - 1 ) / 2 )
+                  END IF
+    4          CONTINUE
+    3       CONTINUE
+
+*  Right make the new variance estimate. Use the sum of variances
+*  and covariances of the order statistic of the `trimmed' sample size
+*  Sample variance changes to EL * VAR to represent total variance
+*  of original data.
+            RESVAR = VAR * EL * VSUM
+
+*  If we are estimating the variance on the basis of the variance of the
+*  mean, calculate the estimate.
+         ELSE
+            RESVAR = PIBY2 / TOTWT
+         END IF
+
+      END IF
+
+      END

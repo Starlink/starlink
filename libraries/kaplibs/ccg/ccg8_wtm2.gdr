@@ -1,0 +1,184 @@
+      SUBROUTINE CCG8_WTM2<T>( EL, ORDDAT, WEIGHT, USED, RESULT,
+     :                      STATUS )
+*+
+*  Name:
+*     CCG8_WTM2x
+
+*  Purpose:
+*     Forms the weighted median of a list of ordered data values.
+*     Incrementing the contributing pixel buffers.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG8_WTM2x( EL. ORDDAT, WEIGHT, USED, RESULT, STATUS )
+
+*  Description:
+*     This routine finds a value which can be associated with the half-
+*     weight value.  It sums all weights then finds a value for the
+*     half-weight.  The comparison with the half-weight value proceeds
+*     in halves of the weights for each data point (half of the first
+*     weight, then the second half of the first weight and the first
+*     half of the second weight etc.) until the half weight is exceeded.
+*     The data values around this half weight position are then found
+*     and a linear interpolation of these values is the wtdmdn. The
+*     values which contribute to the result are flagged and passed
+*     through the USED array.
+
+*  Arguments:
+*     EL = INTEGER*8 (Given)
+*        The number of entries in the data array.
+*     ORDDAT( EL ) = ? (Given)
+*        The list of ordered data for which the weighted median is
+*        required
+*     WEIGHT( EL ) = ? (Given)
+*        The weights of the values.
+*     USED = LOGICAL (Returned)
+*        If a value contributes to the median value it is flagged as
+*        true in this array, otherwise the array is set to false.
+*     RESULT = DOUBLE PRECISION (Returned)
+*        The weighted median
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "x"
+*     in the routine name by D or R as appropriate.  The ORDDAT and
+*     WEIGHT arguments supplied to the routine must have the data type
+*     specified.
+
+*  Prior Requirements:
+*     - The input data must be ordered increasing.  No BAD values may be
+*     present.
+
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     RFWS: Rodney Warren-Smith (Durham University)
+*     PDRAPER: Peter Draper (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     - (RFWS):
+*        Original version.
+*     5-APR-1991 (PDRAPER):
+*        Changed to use preordered array, changed to generic routine.
+*        Added prologue etc.
+*     30-MAY-1991 (PDRAPER):
+*        Added used array.
+*     2009 July 2 (MJC):
+*         Converted to generic and renamed from CCG1_WTM2R.  Moved EL
+*         (after renaming from NENT) to the normal order in the API.
+*         Corrected misnamed arraty in the prologue.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER*8 EL
+      <TYPE> ORDDAT( EL )
+      <TYPE> WEIGHT( EL )
+
+*  Arguments Returned:
+      DOUBLE PRECISION RESULT
+      LOGICAL USED( EL )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER*8 I                ! Loop variable
+      DOUBLE PRECISION D1        ! Value around half weight
+      DOUBLE PRECISION D2        ! Value around half weight
+      DOUBLE PRECISION TOTWT     ! The total value of weights
+      DOUBLE PRECISION WTDIFF    ! Difference between half weight and
+                                 ! current weight (selected)
+      DOUBLE PRECISION WTINC     ! Increment in current wtsum
+      DOUBLE PRECISION WTSUM     ! Current sum of weights
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! Numeric conversion definitions
+      INCLUDE 'NUM_DEF_CVT'      !
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Avoid confusing the optimiser.
+      WTINC = 0.0D0
+
+*  Sum the weights.
+      TOTWT = 0.0D0
+      DO 1 I = 1, EL
+         TOTWT = TOTWT + NUM_<T>TOD( WEIGHT( I ) )
+
+*  Set the used array to false.
+         USED( I ) =.FALSE.
+    1 CONTINUE
+
+*  Search for the median weight.
+      TOTWT = TOTWT * 0.5D0
+      WTSUM = 0.0D0
+      DO 2 I = 1, EL
+
+         IF ( I .EQ. 1 ) THEN
+            WTINC = NUM_<T>TOD( WEIGHT( I ) ) * 0.5D0
+         ELSE
+            WTINC = ( NUM_<T>TOD( WEIGHT( I ) + WEIGHT( I-1 ) ) )* 0.5D0
+         END IF
+
+         WTSUM = WTSUM + WTINC
+         IF ( WTSUM .GT. TOTWT ) GO TO 66
+    2 CONTINUE
+
+   66 I = MIN( I, EL )
+
+*  Set the used array
+      USED( I ) = .TRUE.
+
+*  Extract adjacent data values.
+      IF ( I .EQ. 1 ) THEN
+         D1 = NUM_<T>TOD( ORDDAT( I ) )
+         D2 = D1
+
+      ELSE
+         D1 = NUM_<T>TOD( ORDDAT( I - 1 ) )
+         D2 = NUM_<T>TOD( ORDDAT( I ) )
+
+*  Set the used array extra value.
+         USED( I - 1 ) = .TRUE.
+      END IF
+
+* Interpolate between data values.
+      WTDIFF = WTSUM - TOTWT
+      RESULT = D2 - ( D2 - D1 ) * WTDIFF / MAX( WTINC, 1.0D-20 )
+
+      END

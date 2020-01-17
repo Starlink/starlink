@@ -1,0 +1,260 @@
+      SUBROUTINE CCG8_MM1<T>( NPIX, NLINES, STACK, VARS, MINPIX, NMAT,
+     :                     COVEC, RESULT, RESVAR, WRK1, POINT, USED,
+     :                     NCON, NBAD, STATUS )
+*+
+*  Name:
+*     CCG8_MM1x
+
+*  Purpose:
+*     Combines data lines using a min-max exclusion trimmed mean.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG8_MM1x( NPIX, NLINES, STACK, VARS, MINPIX, NMAT, COVEC,
+*                    RESULT, RESVAR, WRK1, POINT, USED, NCON, NBAD,
+*                    STATUS )
+
+*  Description:
+*     This routine accepts an array consisting a series of (vectorised)
+*     lines of data.  The data values in the lines are then combined to
+*     form an trimmed mean in which the minimum and maximum values are
+*     excluded.  The output means are returned in the array RESULT.  The
+*     output variances are propagated from the inverse weights given in
+*     array VARS and are returned in the array RESVAR.
+
+*  Arguments:
+*     NPIX = INTEGER*8 (Given)
+*        The number of pixels in a line of data.
+*     NLINES = INTEGER*8 (Given)
+*        The number of lines of data in the stack.
+*     STACK( NPIX, NLINES ) = ? (Given)
+*        The array of lines which are to be combined into a single line.
+*     VARS( NPIX, NLINES ) = ? (Given)
+*        The data variances.
+*     MINPIX = INTEGER*8 (Given)
+*        The minimum number of pixels required to contribute to an
+*        output pixel.
+*     NMAT = INTEGER*8 (Given)
+*        Size of the first dimension of COVEC.
+*     COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given)
+*        The packed variance-covariance matrix of the order statistics
+*        from a normal distribution of sizes up to NLINES, produced by
+*        CCG8_ORVAR.
+*     RESULT( NPIX ) = ? (Returned)
+*        The output line of data.
+*     RESVAR( NPIX ) = ? (Returned)
+*        The output variances.
+*     WRK1( NLINES ) = ? (Returned)
+*        Workspace for calculations.
+*     POINT( NLINES ) = INTEGER*8 (Returned)
+*        Workspace to hold pointers to the original positions of the
+*        data before extraction and conversion in to the WRK1 array.
+*     USED( NLINES ) = LOGICAL (Returned)
+*        Workspace used to indicate which values have been used in
+*        estimating a resultant value.
+*     NCON( NLINES ) = DOUBLE PRECISION (Returned)
+*        The actual number of contributing pixels.
+*     NBAD = INTEGER*8 (Returned)
+*        The number of bad values in the output array created while
+*        forming the statistics.  It excludes those bad values whose
+*        corresponding values along the collapse axis are all bad.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "x"
+*     in the routine name by D or R as appropriate.  The STACK, VARS,
+*     RESULT, RESVAR, and WRK1 arguments supplied to the routine
+*     must have the data type specified.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     19-MAY-1992 (PDRAPER):
+*        Original version.
+*     11-OCT-2004 (BRADC):
+*        No longer use NUM_CMN.
+*     2006 August 6 (MJC):
+*        Exclude data with non-positive variance.
+*     2009 July 4 (MJC):
+*        Converted to generic and renamed from CCG1_MMR1R.  Added NBAD
+*        argument.  Moved STACK, NMAT, and NCON to the normal order in
+*        the API.  Made NCON Returned and therefore it is initialised.
+*     2009 July 17 (MJC):
+*        Do not include collapsed data comprising only bad values
+*        in argument NBAD.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+
+*  Arguments Given:
+      INTEGER*8 NPIX
+      INTEGER*8 NLINES
+      <TYPE> STACK( NPIX, NLINES )
+      <TYPE> VARS( NPIX, NLINES )
+      INTEGER*8 MINPIX
+      INTEGER*8 NMAT
+      DOUBLE PRECISION COVEC( NMAT, NLINES )
+
+*  Arguments Returned:
+      <TYPE> RESULT( NPIX )
+      <TYPE> RESVAR( NPIX )
+      <TYPE> WRK1( NLINES )
+      <TYPE> WRK2( NLINES )
+      INTEGER*8 POINT( NLINES )
+      LOGICAL USED( NLINES )
+      DOUBLE PRECISION NCON( NLINES )
+      INTEGER*8 NBAD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation OK?
+
+      EXTERNAL NUM_TRAP
+      INTEGER NUM_TRAP           ! Numerical error handler
+
+*  Local Variables:
+      INTEGER*8 I                ! Loop variable
+      INTEGER*8 J                ! Loop variable
+      DOUBLE PRECISION VAL       ! Weighted median
+      DOUBLE PRECISION SUM       ! Inverse variance sum
+      DOUBLE PRECISION VAR       ! Population variance
+      INTEGER*8 NGOOD            ! Number of good pixels
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
+      INCLUDE 'NUM_DEF_CVT'      ! Define functions...
+
+*.
+
+*  Initialise returned values.
+      NBAD = 0
+      DO I = 1, NLINES
+         NCON( I ) = 0.0D0
+      END DO
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Set the numeric error and set error flag value.
+      CALL NUM_HANDL( NUM_TRAP )
+
+*  Loop over for all possible output pixels.
+      DO 1 I = 1, NPIX
+         NGOOD = 0
+         CALL NUM_CLEARERR()
+         SUM = 0.0D0
+
+*  Loop over all possible contributing pixels.
+         DO 2 J = 1, NLINES
+            IF ( STACK( I, J ) .NE. VAL__BAD<T> .AND.
+     :            VARS( I, J ) .NE. VAL__BAD<T> .AND.
+     :            VARS( I, J ) .GT. VAL__SML<T> ) THEN
+
+*  Increment good value counter.
+               NGOOD = NGOOD + 1
+
+*  Update the pointers to the positions of the unextracted data.
+               POINT( NGOOD ) = J
+
+*  Copy data into work buffer, so we can process a line at a time.
+               WRK1( NGOOD ) = STACK( I, J )
+
+*  Sum inverse variances (weights).
+               SUM = SUM + 1.0D0 / NUM_<T>TOD( VARS( I, J ) )
+
+*  Trap conversion failures.
+               IF ( .NOT. NUM_WASOK() ) THEN
+
+*  Decrement NGOOD, do not let it go below zero.
+                  NGOOD = MAX( 0, NGOOD - 1 )
+                  CALL NUM_CLEARERR()
+               END IF
+            END IF
+    2    CONTINUE
+
+*  Continue if more than one good value.
+         IF ( NGOOD .GT. 0 ) THEN
+
+*  Sort these values into increasing order.
+            CALL CCG8_IS2<T>( WRK1, POINT, NGOOD, STATUS )
+
+*  Get population variance.
+            SUM = 1.0D0 / SUM
+
+*  Find the min-max trimmed mean.
+            CALL CCG8_TMN2<T>( 1, NGOOD, WRK1, SUM, USED,
+     :                      COVEC( 1, NGOOD ), VAL, VAR, STATUS )
+
+*  Update the used line counters.
+            DO 3 J = 1, NGOOD
+               IF ( USED ( J ) ) THEN
+                  NCON( POINT( J ) ) = NCON( POINT( J ) ) + 1.0D0
+               END IF
+    3       CONTINUE
+         END IF
+
+*  If there are sufficient good pixels output the result.
+         IF ( NGOOD .GE. MINPIX ) THEN
+            RESULT( I ) = NUM_DTO<T>( VAL )
+            RESVAR( I ) = NUM_DTO<T>( VAR )
+
+*  Trap numeric errors.
+            IF ( .NOT. NUM_WASOK() ) THEN
+               RESULT( I ) = VAL__BAD<T>
+               RESVAR( I ) = VAL__BAD<T>
+               NBAD = NBAD + 1
+            END IF
+         ELSE
+
+*  Not enough contributing pixels, set output invalid unless all of them
+*  are bad.
+            RESULT( I ) = VAL__BAD<T>
+            RESVAR( I ) = VAL__BAD<T>
+            IF ( NGOOD .GT. 0 ) NBAD = NBAD + 1
+         END IF
+    1 CONTINUE
+
+*  Remove the numerical error handler.
+      CALL NUM_REVRT
+
+      END
