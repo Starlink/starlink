@@ -1651,13 +1651,18 @@ try:
    rawinfo = NDG.tempfile()
    missing = NDG.tempfile()
    mapinfo = NDG.tempfile()
+   msg_out( " " )
+   msg_out( "Checking the list of input data files is usable - "
+            "this may take some time... " )
    invoke("$SMURF_DIR/pol2check in={0} quiet=yes junkfile={1} mapfile={2} "
           "rawfile={3} stokesfile={4} rawinfo={5} missing={6} mapinfo={7} "
           "multiobject={8}".format(indata,junks,inmaps,inraws,inquis,rawinfo,
                                    missing,mapinfo,multiobject))
 
 #  Warn about any non-POL2 input data files that are being ignored.
+   ok = True
    if get_task_par( "JUNKFOUND", "pol2check" ):
+      ok = False
       msg_out( " ")
       msg_out( "WARNING: The following inappropriate input data files are "
                "being ignored: " )
@@ -1667,12 +1672,16 @@ try:
 
 #  Warn about any missing raw data scub-scans.
    if os.path.isfile( missing ):
+      ok = False
       msg_out( " ")
       msg_out( "WARNING: The raw data files for the following sub-scans seem "
                "to be missing from the supplied list of input files: " )
       with open( missing ) as f:
          msg_out( f.read() )
       msg_out( " ")
+
+   if ok:
+      msg_out( "The list of input data files looks OK. Continuing." )
 
 #  Initialise the list of all Stokes time-series files to be processed by
 #  makemap so that it holds any Stokes time-series files supplied by
