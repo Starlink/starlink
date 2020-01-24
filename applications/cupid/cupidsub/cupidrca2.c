@@ -140,8 +140,12 @@ int *cupidRCA2( ThrWorkForce *wf, int *in, int *out, size_t nel,
       if( dims[ 2 ] > 1 ) target = 14;
 
 /* Find how many output pixels to process in each worker thread. */
-      step = nel/nw;
-      if( step == 0 ) step = 1;
+      if( nw > nel ) {
+         nw = nel;
+         step = 1;
+      } else {
+         step = nel/nw;
+      }
 
 /* Store the range of output pixels to be processed by each one. Ensure that
    the last thread picks up any left-over output pixels. */

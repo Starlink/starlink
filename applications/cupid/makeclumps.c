@@ -878,8 +878,12 @@ void makeclumps( int *status ) {
       }
 
 /* Get the number of pixels to process in each thread. */
-      step = nel/nw;
-      if( step == 0 ) step = 1;
+      if( nw > nel ) {
+         nw = nel;
+         step = 1;
+      } else {
+         step = nel/nw;
+      }
 
 /* Allocate job data for threads, and store the range of pixels to be
    processed by each one. Ensure that the last thread picks up any left-over

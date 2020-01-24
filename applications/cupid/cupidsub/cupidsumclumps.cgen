@@ -202,9 +202,15 @@ void CGEN_FUNCTION(cupidSumClumps)( ThrWorkForce *wf, CGEN_TYPE *in, int ndim,
    job_data = astCalloc( nw, sizeof(*job_data) );
    if( job_data ) {
 
-/* Find how many elements to process in each  worker thread. */
-      pstep = nel/nw;
-      if( pstep == 0 ) pstep = 1;
+/* Find how many elements to process in each  worker thread. If there are
+   more threads than elements, restrict the number of threads so we do
+   not try to process elements that dont exist. */
+      if( nw > nel ) {
+         nw = nel;
+         pstep = 1;
+      } else {
+         pstep = nel/nw;
+      }
 
 /* Store the range of elements to be processed by each one. Ensure that the
    last thread picks up any left-over elements. */

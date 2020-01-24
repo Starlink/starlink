@@ -163,11 +163,11 @@ double CGEN_FUNCTION(cupidRms)( ThrWorkForce *wf, CGEN_TYPE *array, size_t nel,
       nrow = nel/rowlen;
 
 /* Find how many rows to process in each worker thread. */
-      if( nrow > nw ) {
-         step = nrow/nw;
-      } else {
-         step = 1;
+      if( nw > nrow ) {
          nw = nrow;
+         step = 1;
+      } else {
+         step = nrow/nw;
       }
 
 /* Store the range of rows to be processed by each one. Ensure that the

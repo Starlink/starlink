@@ -299,8 +299,12 @@ int CGEN_FUNCTION(cupidFWMain)( ThrWorkForce *wf, CGEN_TYPE *array, size_t nel,
    if( job_data ) {
 
 /* Find how many elements to process in each worker thread. */
-      step = nel/nw;
-      if( step == 0 ) step = 1;
+      if( nw > nel ) {
+         nw = nel;
+         step = 1;
+      } else {
+         step = nel/nw;
+      }
 
 /* Store the range of elements to be processed by each one. Ensure that the
    last thread picks up any left-over elements. */
