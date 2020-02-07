@@ -306,6 +306,8 @@
 *     9-SEP-2019 (DSB):
 *        Get the CONFIG group earlier, so that the VALIDATE_SCANS parameter
 *        can be used within smf_grp_related.
+*     5-FEB-2020 (DSB):
+*        Use the same array of POL_ANG values with all subarrays.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -385,6 +387,7 @@ void smurf_calcqu( int *status ) {
    HDSLoc *loci = NULL;       /* Locator for output I container file */
    HDSLoc *locq = NULL;       /* Locator for output Q container file */
    HDSLoc *locu = NULL;       /* Locator for output U container file */
+   JCMTState *state;          /* Pointer to state structure for next time slice */
    NdgProvenance *oprov;      /* Provenance to store in each output NDF */
    ThrWorkForce *wf;          /* Pointer to a pool of worker threads */
    char headval[ 81 ];        /* FITS header value */
@@ -392,8 +395,14 @@ void smurf_calcqu( int *status ) {
    char ndfname[ 30 ];        /* Name of output Q or U NDF */
    char northbuf[10];         /* Celestial system to use as ref. direction  */
    char polcrd[ 81 ];         /* FITS 'POL_CRD' header value */
+   char subarray0[ 10 ];      /* Name of first subarray (e.g. "s4a", etc) */
    char subarray[ 10 ];       /* Subarray name (e.g. "s4a", etc) */
    const char *north;         /* Celestial system to use as ref. direction  */
+   dim_t islice;              /* Index of current time slice */
+   dim_t ntslice0;            /* No of time slices in first subarray */
+   dim_t ntslice;             /* No of time slices in current subarray */
+   double *polang0;           /* Array of HWP angles at all time slices */
+   double *ptr0;              /* Pointer to next HWP angle from first subarray */
    double ang0;               /* HWP angle at start of each fitting box */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
@@ -420,6 +429,7 @@ void smurf_calcqu( int *status ) {
    int nc;                    /* Number of characters written to a string */
    int nskipped;              /* Number of skipped blocks */
    int nsubscan;              /* NSUBSCAN header from first input */
+   int obsnum;                /* Observation number */
    int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
    int polbox;                /* HWP cycles in a fitting box */
    int qplace;                /* NDF placeholder for current block's Q image */
@@ -427,6 +437,7 @@ void smurf_calcqu( int *status ) {
    int submean;               /* Subtract mean value from each time slice? */
    int total;                 /* Total number of time salices in sub-array */
    int uplace;                /* NDF placeholder for current block's U image */
+   int utdate;                /* UT date of observation */
    size_t bsize;              /* Number of files in base group */
    size_t gcount;             /* Output grp index counter */
    size_t ichunk;             /* Continuous chunk counter */
@@ -588,7 +599,6 @@ void smurf_calcqu( int *status ) {
 
 /* Display the chunk observation details. */
          if( nchunk > 1 ) {
-            int utdate, obsnum;
             smf_fits_getI( concat->sdata[ 0 ]->hdr, "UTDATE", &utdate, status );
             smf_fits_getI( concat->sdata[ 0 ]->hdr, "OBSNUM", &obsnum, status );
             msgOutf( "", "   Observation: %d   UT date: %d",
@@ -696,7 +706,83 @@ void smurf_calcqu( int *status ) {
 /* If required correct for the POL2 triggering issue. */
          if( fix ) smf_fix_pol2( wf, concat, status );
 
-/* Loop round each sub-array in the current contiguous chunk of data. */
+/* Create an array and copy the POL_ANG values from the first subarray
+   into it. Get the number of time slices and subarray name first. */
+         indata = concat->sdata[ 0 ];
+         smf_get_dims( indata, NULL, NULL, NULL, &ntslice0, NULL, NULL,
+                       NULL, status );
+         smf_find_subarray( indata->hdr, subarray0, sizeof(subarray0),
+                            NULL, status );
+         polang0 = astMalloc( ntslice0*sizeof(*polang0) );
+         if( polang0 ) {
+            state = indata->hdr->allState;
+            ptr0 = polang0;
+            for( islice = 0; islice < ntslice0; islice++ ) {
+               *(ptr0++) = (state++)->pol_ang;
+            }
+         }
+
+/* If we have more than one subarray ensure they all use the same set of
+   POL_ANG values. Any good angles for which the corresponding angle in
+   "polang0" is bad is copied into "polang0" to replace the bad angle. */
+         if( concat->ndat > 1 ) {
+
+/* Loop round all other sub-arrays in the current contiguous chunk of data. */
+            for( idx = 1; idx < concat->ndat && *status == SAI__OK; idx++ ) {
+               indata = concat->sdata[ idx ];
+
+/* Get the no. of time slices. */
+               smf_get_dims( indata, NULL, NULL, NULL, &ntslice, NULL, NULL, NULL,
+                             status );
+
+/* Report an error if the number of time slices in the current subarray
+   is different to the first subarray. */
+               if( ntslice != ntslice0 ) {
+                  smf_fits_getI( indata->hdr, "OBSNUM", &obsnum, status );
+                  smf_fits_getI( indata->hdr, "UTDATE", &utdate, status );
+                  smf_find_subarray( indata->hdr, subarray, sizeof(subarray),
+                                     NULL, status );
+
+                  *status = SAI__ERROR;
+                  errRepf( " ", "It looks like something is wrong with "
+                           "observation %d #%d:", status, utdate, obsnum );
+                  errRepf( " ", "The number of time slices in subarray '%s' "
+                           "(%zu) is different to the number in subarray '%s' "
+                           "(%zu).", status, subarray0, ntslice0, subarray,
+                           ntslice );
+                  break;
+               }
+
+/* Loop round all time slices, keeping pointers to corresponding pol_ang
+   values. */
+               state = indata->hdr->allState;
+               ptr0 = polang0;
+               for( islice = 0; islice < ntslice; islice++,state++,ptr0++ ) {
+
+                  if( *ptr0 == VAL__BADD ) {
+                     if( state->pol_ang != VAL__BADD ) {
+                        *ptr0 = state->pol_ang;
+                     }
+                  } else if( state->pol_ang != VAL__BADD &&
+                             state->pol_ang != *ptr0 ) {
+                     smf_fits_getI( indata->hdr, "OBSNUM", &obsnum, status );
+                     smf_fits_getI( indata->hdr, "UTDATE", &utdate, status );
+                     smf_find_subarray( indata->hdr, subarray, sizeof(subarray),
+                                        NULL, status );
+
+                     *status = SAI__ERROR;
+                     errRepf( " ", "It looks like something is wrong with "
+                              "observation %d #%d:", status, utdate, obsnum );
+                     errRepf( " ", "The POL_ANG value (%g) at time slice %zu "
+                              "in subarray '%s' is different to that in "
+                              "subarray '%s' (%g).", status, state->pol_ang,
+                              islice, subarray, subarray0, *ptr0 );
+                  }
+               }
+            }
+         }
+
+/* Loop again round each sub-array in the current contiguous chunk of data. */
          for( idx = 0; idx < concat->ndat && *status == SAI__OK; idx++ ) {
             data = concat->sdata[ idx ];
 
@@ -865,7 +951,7 @@ void smurf_calcqu( int *status ) {
                smf_fit_qui( wf, data, &odataq, &odatau, ogrpi ? &odatai : NULL,
                             ogrpf ? &odataf : NULL, (dim_t) polbox, ipolcrd,
                             pasign, AST__DD2R*paoff, AST__DD2R*angrot, north,
-                            harmonic, AST__DD2R*ang0, status );
+                            harmonic, AST__DD2R*ang0, polang0, status );
 
 /* Copy the smfData structures to the output NDFs. Store the output
    provenenance info at the same time. */
@@ -1076,6 +1162,7 @@ void smurf_calcqu( int *status ) {
          }
 
 /* Free resources. */
+         polang0 = astFree( polang0 );
          smf_close_related( wf, &concat, status );
       }
       config = astAnnul( config );

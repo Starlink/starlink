@@ -18,7 +18,7 @@
 *                  smfData **odatau, smfData **odatai, smfData **odataf,
 *                  dim_t box, int ipolcrd, int pasign, double paoff,
 *                  double angrot, const char *north, int harmonic,
-*                  double ang0, int *status )
+*                  double ang0, double *polang, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -72,6 +72,8 @@
 *        eigth harmonic.
 *     ang0 = double (Given)
 *        The HWP angle, in radians, at which each fitting box starts.
+*     polang = double * (Given)
+*        Array of HWP angles (POL_ANG) - one for every time slice.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -172,6 +174,14 @@
 *        important JCMTState value in the output is calculated within this
 *        function as the average of the input JCMTState values for the time
 *        slices that contibute to each output I, Q or U value.
+*     5-FEB-2020 (DSB):
+*        Added argument polang. This allows the same POL_ANG values to
+*        be used with each subarray, instead of reading them out of the
+*        JCMTState structures associated with the specific supplied subarray.
+*        This is because some observations (e.g. 20190529_00045) have
+*        blocks of bad angles in some subarrays that correspond to good
+*        angles in other arrays. This results in the output time-stream
+*        data files being of different lengths for different subarrays.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -235,6 +245,7 @@ typedef struct smfFitQUIJobData {
    double *ipq;
    double *ipu;
    double *ipv;
+   double *polang;
    double angrot;
    double paoff;
    int harmonic;
@@ -256,10 +267,9 @@ typedef struct smfFitQUIJob2Data {
 /* Prototypes for local functions */
 static void smf1_fit_qui_job( void *job_data, int *status );
 static void smf1_fit_qui_job2( void *job_data, int *status );
-static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates,
-                             double ang0, dim_t box, dim_t *ontslice,
-                             dim_t **box_starts, dim_t *lolim, dim_t *hilim,
-                             int *status );
+static void smf1_find_boxes( dim_t intslice, double ang0, dim_t box,
+                             dim_t *ontslice, dim_t **box_starts, dim_t *lolim,
+                             dim_t *hilim, double *polang, int *status );
 
 /* Number of free parameters in the fit */
 #define NPAR 10
@@ -285,7 +295,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
                   smfData **odatau, smfData **odatai, smfData **odataf,
                   dim_t box, int ipolcrd, int pasign, double paoff,
                   double angrot, const char *north, int harmonic,
-                  double ang0, int *status ){
+                  double ang0, double *polang, int *status ){
 
 /* Local Variables: */
    AstFrameSet *wcs;        /* WCS FrameSet for current time slice */
@@ -306,6 +316,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    dim_t ntime;             /* Time slices to check */
    dim_t ondata;            /* ndata of odata */
    dim_t ontslice;          /* ntslice of odata */
+   double *ptr;             /* Pointer to next POL_ANG value */
    double scale;            /* how much longer new samples are */
    int bstep;               /* Bolometer step between threads */
    int iworker;             /* Index of a worker thread */
@@ -361,10 +372,10 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    They are assumed to be in radians if no POL_ANG value is larger than
    20. This function can only handle new data. */
    ihdr = idata->hdr;
-   instate = ihdr->allState;
+   ptr = polang;
    ntime = ( intslice > 1000 ) ? 1000 : intslice;
-   for( itime = 0; itime < ntime; itime++,instate++ ) {
-      if( instate->pol_ang != VAL__BADD && instate->pol_ang > 20 ) {
+   for( itime = 0; itime < ntime; itime++,ptr++ ) {
+      if( *ptr != VAL__BADD && *ptr > 20 ) {
          *status = SAI__ERROR;
          errRep( " ","   POL2 data contains POL_ANG values in encoder "
                  "units - connot fit to such old data.", status );
@@ -374,8 +385,8 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 
 /* Find the input time slice at which each fitting box starts, and the
    length of the output time axis (in time-slices). */
-   smf1_find_boxes( intslice, ihdr->allState, ang0, box, &ontslice,
-                    &box_starts, &lolim, &hilim, status );
+   smf1_find_boxes( intslice, ang0, box, &ontslice, &box_starts, &lolim,
+                    &hilim, polang, status );
 
 /* Adjust intslice to hold the number of used input time slices rather
    than the total number of input time slices. Also record the index of the
@@ -621,6 +632,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
             pdata->pasign = pasign ? +1: -1;
             pdata->paoff = paoff;
             pdata->angrot = angrot;
+            pdata->polang = polang + istart;
             pdata->harmonic = harmonic;
             if( wcs ) {
                pdata->wcs = astCopy( wcs );
@@ -745,6 +757,8 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    double *ipv;               /* Pointer to output weights array */
    double *pfit;              /* Pointer to output fit array */
    double *pm;
+   double *ptr;
+   double *polang;
    double *ps;
    double angle;              /* Phase angle for FFT */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
@@ -825,6 +839,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    angrot = pdata->angrot;
    box_size = pdata->box_size;
    harmonic = pdata->harmonic;
+   polang = pdata->polang;
 
    wcs = pdata->wcs;
    if( wcs ) {
@@ -896,16 +911,17 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
             din = dat;
             qin = qua;
             state = allstates;
+            ptr = polang;
 
 /* Form the sums needed to calculate the best fit Q, U and I. This
    involves looping over all input samples that fall within the fitting box
    centred on the current output sample. The 44 sums are stored in the
    "sums" array. Initialise it to hold zeros.  */
             memset( sums, 0, NSUM*sizeof(*sums) );
-            for( ibox = 0; ibox <  box_size; ibox++,state++ ) {
+            for( ibox = 0; ibox <  box_size; ibox++,state++,ptr++ ) {
 
 /* Get the POL_ANG value for this time slice. */
-               angle = state->pol_ang;
+               angle = *ptr;
 
 /* Check the input sample has not been flagged during cleaning and is
    not bad. */
@@ -1229,12 +1245,13 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
                qin = qua;
                state = allstates;
                ipf = pfit;
+               ptr = polang;
 
                sum1 = 0.0;
                nsum1 = 0;
 
-               for( ibox = 0; ibox <  box_size; ibox++,state++ ) {
-                  angle = state->pol_ang;
+               for( ibox = 0; ibox <  box_size; ibox++,state++,ptr++ ) {
+                  angle = *ptr;
 
                   if( !( *qin & SMF__Q_FIT ) && *din != VAL__BADD &&
                         angle != VAL__BADD ) {
@@ -1328,10 +1345,9 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 }
 
 
-static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates,
-                             double ang0, dim_t box, dim_t *ontslice,
-                             dim_t **box_starts, dim_t *lolim, dim_t *hilim,
-                             int *status ) {
+static void smf1_find_boxes( dim_t intslice, double ang0, dim_t box,
+                             dim_t *ontslice, dim_t **box_starts, dim_t *lolim,
+                             dim_t *hilim, double *polang, int *status ) {
 /*
 *  Name:
 *     smf1_find_boxes
@@ -1347,16 +1363,13 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates,
 *     SMURF subroutine
 
 *  Invocation:
-*     void smf1_find_boxes( dim_t intslice, const JCMTState *allstates,
-*                           double ang0, dim_t box, dim_t *ontslice,
-*                           dim_t **box_starts, dim_t *lolim, dim_t *hilim,
-*                           int *status )
+*     void smf1_find_boxes( dim_t intslice, double ang0, dim_t box,
+*                           dim_t *ontslice, dim_t **box_starts, dim_t *lolim,
+*                           dim_t *hilim, double *polang, int *status )
 
 *  Arguments:
 *     intslice = dim_t (Given)
 *        Number of time slices in input.
-*     allstates = const JCMTState * (Given)
-*        Pointer to the JCMT state information for all input time slices.
 *     ang0 = double (Given)
 *        The HWP angle, in radians, at which each fitting box starts.
 *     box = dim_t (Given)
@@ -1374,6 +1387,8 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates,
 *        The lowest box length that should be used.
 *     hilim = dim_t * (Returned)
 *        The highest box length that should be used.
+*     polang = double * (Given)
+*        Array of POL_ANG values to be used.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -1387,11 +1402,11 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates,
 
 /* Local Variables: */
    char more;
-   const JCMTState *state;
    dim_t length;
    dim_t iel;
    dim_t itime;
    dim_t nrot;
+   double *ptr;
    double s1;
    double s2;
 
@@ -1406,20 +1421,20 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates,
    zero. */
    nrot = 0;
    itime = 0;
-   state = allstates;
+   ptr = polang;
    more = 1;
-   while( more && ( state->pol_ang == VAL__BADD || state->pol_ang > ang0 ) ) {
+   while( more && ( *ptr == VAL__BADD || *ptr > ang0 ) ) {
       if( ++itime == intslice ) more = 0;
-      state++;
+      ptr++;
    }
 
 /* HWP angles vary between 0 and 2*PI in a roughly linear manner, but
    with some sudden steps. When the HWP angle reaches 2*PI it wraps
    back round to zero. Find the first time slice for which the HWP
    angle is greater than "ang0" (a safe value in the middle of the range). */
-   while( more && ( state->pol_ang == VAL__BADD || state->pol_ang <= ang0 ) ) {
+   while( more && ( *ptr == VAL__BADD || *ptr <= ang0 ) ) {
       if( ++itime == intslice ) more = 0;
-      state++;
+      ptr++;
    }
 
 /* This is the start of the first box. */
@@ -1435,15 +1450,15 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates,
    while( 1 ) {
 
 /* Move on until the HWP angle wraps round back to zero. */
-      while( more && ( state->pol_ang == VAL__BADD || state->pol_ang > ang0 ) ) {
+      while( more && ( *ptr == VAL__BADD || *ptr > ang0 ) ) {
          if( ++itime == intslice ) more = 0;
-         state++;
+         ptr++;
       }
 
 /* Move on until the HWP angle again exceeds "ang0". */
-      while( more && ( state->pol_ang == VAL__BADD || state->pol_ang <= ang0 ) ) {
+      while( more && ( *ptr == VAL__BADD || *ptr <= ang0 ) ) {
          if( ++itime == intslice ) more = 0;
-         state++;
+         ptr++;
       }
 
 /* Break if we have reached the end of the time line. */
