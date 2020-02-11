@@ -362,15 +362,18 @@
 *        created. [!]
 *     NORMALISE = _LOGICAL (Read)
 *        If TRUE, scale corrections for individual observations found in
-*        any pre-existing auto-masked maps (e.g. made on a previous run of
-*        this script) are applied when creating new maps. If False, no
-*        scale corrections are applied. Scale correction factors are
+*        any pre-existing auto-masked maps (e.g. made on a previous run
+*        of this script) are applied when creating new maps. If False,
+*        no scale corrections are applied. Scale correction factors are
 *        created and stored at the same time as the pointing corrections.
 *        The correction factor for a single observation is found by comparing
 *        the data values in the map made from the single observation with
-*        those in the mean of the maps made from all observation. The
-*        factor found in this way is stored in the FITS extension of the
-*        map made  from the observation (header "CHUNKFAC"). [FALSE]
+*        those in the coadd map made from all observation. The comparison 
+*        is limited to the areas inside the AST mask, and a factor of 
+*        unity is used for any observation that is not well correlated to
+*        the coadd). The factor found in this way is stored in the FITS
+*        extension of the map made  from the observation (header "CHUNKFAC").
+*        [FALSE]
 *     NORTH = LITERAL (Read)
 *        Specifies the celestial coordinate system to use as the reference
 *        direction in any newly created Q and U time series files. For
@@ -679,6 +682,11 @@
 *       - Added parameter SMOOTH450.
 *    7-JAN-2020 (DSB):
 *       Retain variances outside the mask if smooth450=yes and skyloop=yes
+*    10-FEB-2020 (DSB):
+*       When calculating the normalisation factors to be used on a subsequent
+*       run of pol2map with NORMALISE=YES, assume a factor of 1.0 (i.e. no
+*       change) if the correlation between the coadd and the individual
+*       observation is too low (below 0.95).
 
 '''
 
@@ -1105,18 +1113,26 @@ def StoreCorrections( qui_maps, imap ):
          swgt += weights[key]
          nwgt += 1
 
-# Get the scale factor that normalises the I map to the coadded I map.
+#  Get the scale factor that normalises the I map to the coadded I map.
+#  Also get the correlation coefficient between the data values in the
+#  two maps. If the correlation is below a preset limit, indicating that
+#  the fit produced by kappa:normalize may not be reliable, then use a
+#  scale factor of 1.0.
          invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out=! device=! "
                  "zeroff=yes pcrange=\[10,99.5\]".format(aligned,imap))
-         scale = 1/float( get_task_par( "SLOPE", "normalize" ) )
+         corr = float( get_task_par( "CORR", "normalize" ) )
+         if corr < 0.95:
+            scale = 1.0
+         else:
+            scale = 1/float( get_task_par( "SLOPE", "normalize" ) )
 
 #  Ensure we don't use silly scale factors (this can happen for
 #  observations that are very different to the mean and so have very
 #  low weight).
-         if scale < 0.5:
-            scale = 0.5
-         elif scale > 2.0:
-            scale = 2.0
+            if scale < 0.5:
+               scale = 0.5
+            elif scale > 2.0:
+               scale = 2.0
 
 #  If align2d failed, use silly dx,dy values to ensure it is flagged by
 #  the following code.
