@@ -4,26 +4,34 @@
 #     generic
 
 #  Purpose:
-#     Create multiple instances of a generic FORTRAN subprogram
+#     Create multiple instances of a generic FORTRAN or C subprogram
 
 #  Language:
 #     Unix C-shell
 
 #  Invocation:
-#     generic [-t types] [-a] [-c charsize] [-s] [-sc sepchar] [-u] [-x] file1.g<types> [file2.g<types>...]
+#     generic [-t types] [-a] [-c charsize] [-s] [-sc sepchar] [-u] [-x] \
+#             file1.(g|c)<types> [file2.(g|c)<types>...]
 
 #  Description:
-#     The generic script takes FORTRAN source files that contain tokens and
-#     replaces these tokens with the appropriate words for the data type
+#     The generic script takes FORTRAN or C source files that contain tokens
+#     and replaces these tokens with the appropriate words for the data type
 #     being processed.  The data types allowed are byte, unsigned byte,
 #     character, double precision, integer, logical, real, word and unsigned
 #     word.
 #
-#     The output is piped through a filter to ensure that the token
-#     replacement has not made any FORTRAN statement longer than 72
-#     characters.  By default, all the output routines for a single input
-#     file are written to a single file.  However, optionally, they can
-#     be written to separate files.
+#     When processing a Fortran source, the output is piped through a filter
+#     to ensure that the token replacement has not made any FORTRAN statement
+#     longer than 72 characters.  By default, all the output routines for a
+#     single input file are written to a single file.  However, optionally, they
+#     can be written to separate files.
+#
+#     The ability to process C source is mainly intended for situations where
+#     there is a need to write generic C that is to be called directly from
+#     Fortran, and thus needs to use the macros defined in the "f77.h" header
+#     provided by the CNF package. For generic C code that is not to be
+#     called directly from Fortran, it is better to use the facilities of
+#     the "cgeneric" utility included in this package.
 
 #  Arguments:
 #     -t
@@ -58,13 +66,13 @@
 #     -s
 #        Write the output to separate files for each data type given by
 #        the -t argument. The output file names are the same as the input file
-#        name with the trailing .gen removed and a <T>.f appended, where <T>
-#        is the character in the -t list that is being processed, except
-#        with the -u option where B and W become ub and uw respectively.
+#        name with the trailing .gen removed and a <T>.f or <T>.c appended,
+#        where <T> is the character in the -t list that is being processed,
+#        except with the -u option where B and W become ub and uw respectively.
 #     -sc
 #        The next argument is a used to separate the base output file name
-#        from the appended <T>.f. If the -sc argumnt is given, the -s argument
-#        is superfluous.
+#        from the appended <T>.f or <T>.c. If the -sc argumnt is given, the
+#        -s argument is superfluous.
 #     -u
 #        The B and W types substitute ub and uw tokens respectively in the
 #        code and in generated filename.  This for compability with the VMS
@@ -74,17 +82,23 @@
 #     -x
 #        Removes the last x from the file name before generating the names of
 #        the output files.
-#     file1.g<types> ...
-#        A list of file names normally with a .gen suffix, containing generic
-#        FORTRAN source code.  If the suffix is not .gen, but begins
-#        with .g the remaining characters of the file extension are treated
-#        as the list of data types to be instantiated.  However, the presence
-#        of a -t option or a defined environment variable GENERIC_TYPES 
-#        takes precedence over the types specified in the file extension. 
-#        The list of data types may be formed using the values listed in the
-#        -t option.   This option allows filenames to be used to specify
-#        the intended data types for the Fortran code, and hence make building
-#        easier.
+#     file1.(g|c)<types> ...
+#        A list of input files containing generic FORTRAN or C source code.
+#        If a file suffix starts with ".g..." it is assumed to be a Fortran
+#        source file. If it starts with ".c..." it is assumed to be a C
+#        source file. For Fortran, they should normally have a .gen suffix.
+#        If the suffix is not .gen, but begins with .g the remaining
+#        characters of the file extension are treated as the list of data
+#        types to be instantiated. For C, they should normally have a
+#        .cgen suffix. If the suffix is not .cgen, but begins with .c the
+#        remaining characters of the file extension are treated as the list
+#        of data types to be instantiated. However, for both C and Fotran,
+#        the presence of a -t option or a defined environment variable
+#        GENERIC_TYPES takes precedence over the types specified in the file
+#        extension. The list of data types may be formed using the values
+#        listed in the -t option. This option allows filenames to be used to
+#        specify the intended data types for the Fortran code, and hence make
+#        building easier.
 
 #  Examples:
 #     -  generic -t cdilr sub1.gen
@@ -93,7 +107,7 @@
 #        SUBL and SUBR.
 #     -  generic -t bBwW -a -sc _ sub2.gen
 #        This will take the subroutine in the input file sub2.gen and create
-#        output files called sub2_b.f, sub2_B.f, sub2_w.f and sub2_W.f. 
+#        output files called sub2_b.f, sub2_B.f, sub2_w.f and sub2_W.f.
 #        The -a flag means that any ASTERIX tokens will be processed.
 #     -  generic -t n -s -x subx.gen
 #        This takes the subroutine in the input file subx.gen and creates
@@ -131,6 +145,7 @@
 #     one.
 
 #  Copyright:
+#     Copyright (C) 2020 East Asian Observatory
 #     Copyright (C) 2012 Science & Technology Facilities Council.
 #     Copyright (C) 1992-1994 Science & Engineering Research Council.
 #     Copyright (C) 2000, 2004 Central Laboratory of the Research
@@ -156,6 +171,7 @@
 #     PMA: Peter Allan (Starlink, RAL)
 #     MJC: Malcolm J. Currie (Starlink, RAL)
 #     TIMJ: Tim Jenness (JAC, Hawaii)
+#     DSB: David S Berry (EAO)
 #     {enter_new_authors_here}
 
 #  History:
@@ -194,6 +210,8 @@
 #        File suffices were overriding an explicit -t
 #     2012-04-23 (TIMJ):
 #        Add 64-bit integer support (K)
+#     11-FEB-2020 (DSB):
+#        Support C input files.
 #     {enter_further_changes_here}
 
 #-
@@ -222,7 +240,7 @@ set settypes = 0
 # Check that there are some arguments present.
 
 if ( $#args == 0 ) then
-   echo "Usage: generic [-t types] [-a] [-c charsize] [-s] [-sc sepchar] [-u] [-x] file1.g<types> [file2.g<types>...]"
+   echo "Usage: generic [-t types] [-a] [-c charsize] [-s] [-sc sepchar] [-u] [-x] file1.g<types> [file2.(g|c)<types>...]"
    exit
 endif
 
@@ -263,7 +281,11 @@ while ( $#args > 0 )
       set xflag = 1
       shift args
       breaksw
-   case *.g*:     # The names of the generic files.
+   case *.g*:     # The names of the Fortran generic files.
+      set gfiles = ($gfiles[1-] $args[1])
+      shift args
+      breaksw
+   case *.c*:     # The names of the C generic files.
       set gfiles = ($gfiles[1-] $args[1])
       shift args
       breaksw
@@ -277,7 +299,7 @@ end
 # Check that all arguments were valid.
 
 if ( $badarg ) then
-   echo "Usage: generic [-t types] [-a] [-c charsize] [-s] [-sc sepchar] [-u] [-x] file1.g<types> [file2.g<types>...]"
+   echo "Usage: generic [-t types] [-a] [-c charsize] [-s] [-sc sepchar] [-u] [-x] file1.g<types> [file2.(g|c)<types>...]"
    exit
 endif
 
@@ -311,7 +333,7 @@ else
    set ubtoken = "B"
    set uwtoken = "W"
 endif
-   
+
 # Create a temporary file name.
 
 set tempfile = temp$$
@@ -327,11 +349,25 @@ foreach fname ($gfiles[1-])
 # Obtain the file prefix and extension.
       set fprefix = $fname:r
       set fsuffix = $fname:e
- 
+
+# If a C file has been supplied, set "cflag" and change the file suffix
+# to the equivalent Fortran suffix.
+      set firstchar = `echo $fsuffix | awk '{print substr($0,1,1)}'`
+      if( "$firstchar" == "c" ) then
+         set cflag = 1
+         if( "$fsuffix" == "cgen" ) then
+            set fsuffix = "gen"
+         else
+            set fsuffix = `echo $fsuffix | sed -e 's#^c#g#'`
+         endif
+      else
+         set cflag = 0
+      endif
+
 # If the types have not been specified, they may be defined in the file
 # extension of the form g<types>, where <types> follows the -t values.
 
-     if ( $settypes == 0 && $fsuffix != "gen" ) then
+      if ( $settypes == 0 && $fsuffix != "gen" ) then
          set types = `echo $fsuffix | awk '{print substr($0,2)}'`
          echo "Setting types to $types"
       endif
@@ -359,17 +395,21 @@ foreach fname ($gfiles[1-])
          endif
          rm ./temp2$$
       endif
-   
+
 # If all the output routines for one input file are going to a single file,
-# make sure that the output file is empty.
+# make sure that the output file is empty. Create composite file.
 
-      if ( ( $sepflag == 0 ) && -f ${fprefix}.f ) then
-         rm ${fprefix}.f
+      if( $cflag )  then
+         if ( ( $sepflag == 0 ) && -f ${fprefix}.c ) then
+            rm ${fprefix}.c
+         endif
+         if ( $sepflag == 0 ) touch ${fprefix}.c
+      else
+         if ( ( $sepflag == 0 ) && -f ${fprefix}.f ) then
+            rm ${fprefix}.f
+         endif
+         if ( $sepflag == 0 ) touch ${fprefix}.f
       endif
-
-# Create composite file.
-
-      if ( $sepflag == 0 ) touch ${fprefix}.f
 
 # Process each data type.
 
@@ -383,9 +423,17 @@ foreach fname ($gfiles[1-])
             sed -f $GENERIC_DIR/byte $fname >$tempfile
          endif
          if ( $sepflag ) then
-            awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}b.f
+            if ( $cflag ) then
+               cp $tempfile ${fprefix}${sepchar}b.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}b.f
+            endif
          else
-            awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            if ( $cflag ) then
+               cat $tempfile >>${fprefix}.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            endif
          endif
          if ( -f $tempfile ) \rm $tempfile
       endsw
@@ -400,9 +448,17 @@ foreach fname ($gfiles[1-])
             sed -f $GENERIC_DIR/ubyte $fname >$tempfile
          endif
          if ( $sepflag ) then
-            awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}${ubtoken}.f
+            if ( $cflag ) then
+               cp $tempfile ${fprefix}${sepchar}${ubtoken}.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}${ubtoken}.f
+            endif
          else
-            awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            if ( $cflag ) then
+               cat $tempfile >>${fprefix}.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            endif
          endif
          if ( -f $tempfile ) \rm $tempfile
       endsw
@@ -419,9 +475,17 @@ foreach fname ($gfiles[1-])
             | sed "s/<CHASIZ>/$chasiz/" >$tempfile
          endif
          if ( $sepflag ) then
-            awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}c.f
+            if ( $cflag ) then
+               cp $tempfile ${fprefix}${sepchar}c.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}c.f
+            endif
          else
-            awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            if ( $cflag ) then
+               cat $tempfile >>${fprefix}.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            endif
          endif
          if ( -f $tempfile ) \rm $tempfile
       endsw
@@ -436,13 +500,21 @@ foreach fname ($gfiles[1-])
             sed -f $GENERIC_DIR/double $fname >$tempfile
          endif
          if ( $sepflag ) then
-            awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}d.f
+            if ( $cflag ) then
+               cp $tempfile ${fprefix}${sepchar}d.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}d.f
+            endif
          else
-            awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            if ( $cflag ) then
+               cat $tempfile >>${fprefix}.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            endif
          endif
          if ( -f $tempfile ) \rm $tempfile
       endsw
-   
+
       switch (i)
       case [$types]:
          if ( $astflag ) then
@@ -453,9 +525,17 @@ foreach fname ($gfiles[1-])
             sed -f $GENERIC_DIR/integer $fname >$tempfile
          endif
          if ( $sepflag ) then
-            awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}i.f
+            if ( $cflag ) then
+               cp $tempfile ${fprefix}${sepchar}i.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}i.f
+            endif
          else
-            awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            if ( $cflag ) then
+               cat $tempfile >>${fprefix}.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            endif
          endif
          if ( -f $tempfile ) \rm $tempfile
       endsw
@@ -470,13 +550,21 @@ foreach fname ($gfiles[1-])
             sed -f $GENERIC_DIR/integer8 $fname >$tempfile
          endif
          if ( $sepflag ) then
-            awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}i.f
+            if ( $cflag ) then
+               cp $tempfile ${fprefix}${sepchar}k.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}k.f
+            endif
          else
-            awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            if ( $cflag ) then
+               cat $tempfile >>${fprefix}.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            endif
          endif
          if ( -f $tempfile ) \rm $tempfile
       endsw
-   
+
       switch (l)
       case [$types]:
          if ( $astflag ) then
@@ -487,9 +575,17 @@ foreach fname ($gfiles[1-])
             sed -f $GENERIC_DIR/logical $fname >$tempfile
          endif
          if ( $sepflag ) then
-            awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}l.f
+            if ( $cflag ) then
+               cp $tempfile ${fprefix}${sepchar}l.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}l.f
+            endif
          else
-            awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            if ( $cflag ) then
+               cat $tempfile >>${fprefix}.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            endif
          endif
          if ( -f $tempfile ) \rm $tempfile
       endsw
@@ -504,13 +600,21 @@ foreach fname ($gfiles[1-])
             sed -f $GENERIC_DIR/real $fname >$tempfile
          endif
          if ( $sepflag ) then
-            awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}r.f
+            if ( $cflag ) then
+               cp $tempfile ${fprefix}${sepchar}r.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}r.f
+            endif
          else
-            awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            if ( $cflag ) then
+               cat $tempfile >>${fprefix}.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            endif
          endif
          if ( -f $tempfile ) \rm $tempfile
       endsw
-   
+
       switch (w)
       case [$types]:
          if ( $astflag ) then
@@ -521,13 +625,21 @@ foreach fname ($gfiles[1-])
             sed -f $GENERIC_DIR/word $fname >$tempfile
          endif
          if ( $sepflag ) then
-            awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}w.f
+            if ( $cflag ) then
+               cp $tempfile ${fprefix}${sepchar}w.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}w.f
+            endif
          else
-            awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            if ( $cflag ) then
+               cat $tempfile >>${fprefix}.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            endif
          endif
          if ( -f $tempfile ) \rm $tempfile
       endsw
-   
+
       switch (W)
       case [$types]:
          if ( $astflag ) then
@@ -538,14 +650,23 @@ foreach fname ($gfiles[1-])
             sed -f $GENERIC_DIR/uword $fname >$tempfile
          endif
          if ( $sepflag ) then
-            awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}${uwtoken}.f
+            if ( $cflag ) then
+               cp $tempfile ${fprefix}${sepchar}${uwtoken}.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}${uwtoken}.f
+            endif
          else
-            awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            if ( $cflag ) then
+               cat $tempfile >>${fprefix}.c
+            else
+               awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+            endif
          endif
          if ( -f $tempfile ) \rm $tempfile
       endsw
-   end
-endif
+
+   endif
+end
 
 # Delete the temporary file if it exists.
 

@@ -1,12 +1,18 @@
 s/<T>/L/g
+s/<TLC>/l/g
 s/<TYPE>/LOGICAL/g
 s/<LTYPE>/LOGICAL/g
 s/<CONST>/ /g
 s/<HTYPE>/_LOGICAL/g
+s/<CNFTYPE>/LOGICAL/g
+s/<CTYPE>/int/g
 s/<COMM>/LOGICAL/g
 s/<t>/L/g
+s/<tlc>/l/g
 s/<type>/LOGICAL/g
 s/<ltype>/LOGICAL/g
 s/<const>/ /g
 s/<htype>/_LOGICAL/g
+s/<cnftype>/_LOGICAL/g
 s/<comm>/LOGICAL/g
+s/<ctype>/int/g

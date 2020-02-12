@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="generic" support="S">
-  <version>1.3</version>
+  <version>1.4</version>
   <path>applications/generic</path>
   <description>A Utility for Compiling Generic Fortran Subroutines</description>
   <abstract><p>GENERIC is a utility which preprocesses a generic

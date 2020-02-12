@@ -1,12 +1,18 @@
 s/<T>/D/g
+s/<TLC>/d/g
 s/<TYPE>/DOUBLE PRECISION/g
 s/<LTYPE>/DOUBLE PRECISION/g
 s/<CONST>/.0D0/g
 s/<HTYPE>/_DOUBLE/g
+s/<CTYPE>/double/g
+s/<CNFTYPE>/DOUBLE/g
 s/<COMM>/DOUBLE PRECISION/g
 s/<t>/D/g
+s/<tlc>/d/g
 s/<type>/DOUBLE PRECISION/g
 s/<ltype>/DOUBLE PRECISION/g
 s/<const>/.0D0/g
 s/<htype>/_DOUBLE/g
+s/<cnftype>/DOUBLE/g
 s/<comm>/DOUBLE PRECISION/g
+s/<ctype>/double/g

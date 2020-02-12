@@ -1,3 +1,9 @@
+1 GENERIC v1.4
+
+  o  The generic utility can now be used to process generic C files that
+     contain functions designed to be called from Fortran. An example is
+     included in SUN7.
+
 1 GENERIC v1.3
 
   o  Add in64_t/INTEGER*8 support using the "k" type identifier.

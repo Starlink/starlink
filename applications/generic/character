@@ -1,12 +1,18 @@
 s/<T>/C/g
+s/<TLC>/c/g
 s/<TYPE>/CHARACTER*(*)/g
 s/<LTYPE>/CHARACTER*\(<CHASIZ>\)/g
 s/<CONST>/?/g
 s/<HTYPE>/_CHAR/g
+s/<CTYPE>/char */g
+s/<CNFTYPE>/CHARACTER/g
 s/<COMM>/CHARACTER/g
 s/<t>/C/g
+s/<tlc>/c/g
 s/<type>/CHARACTER*(*)/g
 s/<ltype>/CHARACTER*\(<CHASIZ>\)/g
 s/<const>/?/g
 s/<htype>/_CHAR/g
+s/<cnftype>/CHARACTER/g
 s/<comm>/CHARACTER/g
+s/<ctype>/char */g

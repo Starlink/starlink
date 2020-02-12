@@ -1,12 +1,18 @@
 s/<T>/K/g
+s/<TLC>/k/g
 s/<TYPE>/INTEGER*8/g
 s/<LTYPE>/INTEGER*8/g
 s/<CONST>/ /g
 s/<HTYPE>/_INT64/g
+s/<CTYPE>/int64\_t/g
+s/<CNFTYPE>/INTEGER8/g
 s/<COMM>/INTEGER*8/g
 s/<t>/K/g
+s/<tlc>/k/g
 s/<type>/INTEGER*8/g
 s/<ltype>/INTEGER*8/g
 s/<const>/ /g
 s/<htype>/_INT64/g
+s/<cnftype>/INTEGER8/g
 s/<comm>/INTEGER*8/g
+s/<ctype>/int64\_t/g

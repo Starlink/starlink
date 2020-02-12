@@ -1,12 +1,18 @@
 s/<T>/B/g
+s/<TLC>/b/g
 s/<TYPE>/BYTE/g
 s/<LTYPE>/BYTE/g
 s/<CONST>/ /g
+s/<CTYPE>/char/g
 s/<HTYPE>/_BYTE/g
+s/<CNFTYPE>/BYTE/g
 s/<COMM>/BYTE/g
 s/<t>/B/g
+s/<tlc>/b/g
 s/<type>/BYTE/g
 s/<ltype>/BYTE/g
 s/<const>/ /g
 s/<htype>/_BYTE/g
+s/<cnftype>/BYTE/g
 s/<comm>/BYTE/g
+s/<ctype>/char/g

@@ -1,12 +1,18 @@
 s/<T>/W/g
+s/<TLC>/w/g
 s/<TYPE>/INTEGER*2/g
 s/<LTYPE>/INTEGER*2/g
 s/<CONST>/ /g
 s/<HTYPE>/_WORD/g
+s/<CNFTYPE>/WORD/g
+s/<CTYPE>/short/g
 s/<COMM>/WORD/g
 s/<t>/W/g
+s/<tlc>/w/g
 s/<type>/INTEGER*2/g
 s/<ltype>/INTEGER*2/g
 s/<const>/ /g
 s/<htype>/_WORD/g
+s/<cnftype>/WORD/g
 s/<comm>/WORD/g
+s/<ctype>/short/g

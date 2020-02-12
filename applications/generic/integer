@@ -1,12 +1,18 @@
 s/<T>/I/g
+s/<TLC>/i/g
 s/<TYPE>/INTEGER/g
 s/<LTYPE>/INTEGER/g
 s/<CONST>/ /g
 s/<HTYPE>/_INTEGER/g
+s/<CTYPE>/int/g
+s/<CNFTYPE>/INTEGER/g
 s/<COMM>/INTEGER/g
 s/<t>/I/g
+s/<tlc>/i/g
 s/<type>/INTEGER/g
 s/<ltype>/INTEGER/g
 s/<const>/ /g
 s/<htype>/_INTEGER/g
+s/<cnftype>/INTEGER/g
 s/<comm>/INTEGER/g
+s/<ctype>/int/g
