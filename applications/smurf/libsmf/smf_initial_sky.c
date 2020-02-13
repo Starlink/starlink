@@ -83,6 +83,11 @@
 *        with new masks unless the mask is frozen.
 *     10-APR-2018 (DSB):
 *        Added parameter "chunkfactor".
+*     13-FEB-2020 (DSB):
+*        Annull the error if the supplied map contains a quality component 
+*        but does not contain any quality name information to define the use 
+*        of each quality bit. In such cases, the quality array is probably full
+*        of zeros and so can be ignored.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -117,6 +122,7 @@
 #include "sae_par.h"
 #include "dat_par.h"
 #include "par_err.h"
+#include "irq_err.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -290,6 +296,12 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
                   (dat->pca_mask)[ i ] = 1;
                }
             }
+
+/* If smf_qual_map failed because there was no quality name information
+   in the supplied NDF, then annull the error and proceed (i.e. ignore
+   the quality component - it is probably full of zeros). */
+         } else if( *status == IRQ__NOQNI ) {
+            errAnnul( status );
          }
          qarray = astFree( qarray );
       }
