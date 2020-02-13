@@ -70,6 +70,7 @@
 *  Authors:
 *     MBT: Mark Taylor (Starlink)
 *     MJC: Malcolm J. Currie (Starlink)
+*     DSB: David S Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -79,6 +80,8 @@
 *        Initialise returned identifiers.  Use NDF_MSG rather than
 *        GRP_GET and MSG_SETC to define tokens for the NDF names in
 *        the error message.
+*     13-FEB-2020 (DSB):
+*        Support huge NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -107,7 +110,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER DIM( NDF__MXDIM )  ! Dimensions of NDF
+      INTEGER*8 DIM( NDF__MXDIM )! Dimensions of NDF
       CHARACTER*( NDF__SZFTP ) DTYPE ! Full data type name
       INTEGER I                  ! Loop variable
       CHARACTER*( GRP__SZNAM ) NAME ! NDF name
@@ -132,7 +135,7 @@
          CALL NDG_NDFAS( IGRP, I, 'READ', INDFS( I ), STATUS )
 
 *  Find its dimensionality.
-         CALL NDF_DIM( INDFS( I ), NDF__MXDIM, DIM, NDIM, STATUS )
+         CALL NDF_DIM8( INDFS( I ), NDF__MXDIM, DIM, NDIM, STATUS )
 
 *  Check that this has the same dimensionality as the first one in the
 *  list, and bail out if not.

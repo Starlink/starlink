@@ -73,6 +73,8 @@
 *     2009 July 22 (MJC):
 *        Remove ILEVEL argument and use the current reporting level
 *        instead (set by the global MSG_FILTER environment variable).
+*     13-FEB-2020 (DSB):
+*        Support huge NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -87,7 +89,7 @@
       INCLUDE 'NDF_PAR'          ! NDF system constants
       INCLUDE 'PRM_PAR'          ! VAL__BADx constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      INCLUDE  'MSG_PAR'         ! Message-system constants
+      INCLUDE 'MSG_PAR'          ! Message-system constants
 
 *  Arguments Given:
       INTEGER IGRP
@@ -107,8 +109,8 @@
       CHARACTER NAME * ( GRP__SZNAM ) ! Name of NDF
       DOUBLE PRECISION BPOS( NDF__MXDIM ) ! Pixel position in base Frame
       DOUBLE PRECISION CPOS( NDF__MXDIM ) ! Pixel position in current Frame
-      INTEGER BDIM( NDF__MXDIM ) ! Dimensionality of base Frame
-      INTEGER EL                 ! Number of pixels
+      INTEGER*8 BDIM( NDF__MXDIM ) ! Dimensionality of base Frame
+      INTEGER*8 EL               ! Number of pixels
       INTEGER I                  ! Loop variable
       INTEGER IAT                ! Position in string buffer
       INTEGER J                  ! Loop variable
@@ -119,13 +121,13 @@
       INTEGER IPCOMP             ! Pointer to mapped array component
       INTEGER IWCS               ! AST pointer to WCS FrameSet of this NDF
       INTEGER IWCS0              ! AST pointer to WCS FrameSet of first NDF
-      INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF
+      INTEGER*8 LBND( NDF__MXDIM ) ! Lower bounds of NDF
       INTEGER NBDIM              ! Dimensionality of base Frame of this NDF
       INTEGER NCDIM              ! Dimensionality of current Frame of this NDF
       INTEGER NCDIM0             ! Dimensionality of current Frame of first NDF
       INTEGER NDIM               ! Dimensionaliry of NDF
-      INTEGER PPOS( NDF__MXDIM ) ! Pixel coordinates of chosen pixel
-      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF
+      INTEGER*8 PPOS( NDF__MXDIM ) ! Pixel coordinates of chosen pixel
+      INTEGER*8 UBND( NDF__MXDIM ) ! Upper bounds of NDF
       LOGICAL OK                 ! Is pixel within NDF?
 
 *.
@@ -206,7 +208,7 @@
 
 *  Get the dimensions of the NDF, including the dimensionality of its
 *  base Frame.
-         CALL NDF_DIM( INDF, NDF__MXDIM, BDIM, NBDIM, STATUS )
+         CALL NDF_DIM8( INDF, NDF__MXDIM, BDIM, NBDIM, STATUS )
 
 *  Get its WCS FrameSet.
          CALL KPG1_GTWCS( INDF, IWCS, STATUS )
@@ -235,10 +237,10 @@
 
 *  Determine the pixel coordinates of the point to which this position
 *  corresponds, and check whether it is within the bounds of the NDF.
-         CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+         CALL NDF_BOUND8( INDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
          OK = .TRUE.
          DO J = 1, NDIM
-            PPOS( J ) = ANINT( BPOS( J ) ) + LBND( J ) - 1
+            PPOS( J ) = ANINT( BPOS( J ),KIND=8 ) + LBND( J ) - 1
             OK = OK .AND. PPOS( J ) .GE. LBND( J )
      :              .AND. PPOS( J ) .LE. UBND( J )
          END DO
@@ -248,15 +250,15 @@
          IF ( OK ) THEN
 
 *  Create an NDF section containing just this one pixel.
-            CALL NDF_SECT( INDF, NDIM, PPOS, PPOS, INDF1, STATUS )
+            CALL NDF_SECT8( INDF, NDIM, PPOS, PPOS, INDF1, STATUS )
 
 *  Map the relevant NDF component.
-            CALL NDF_MAP( INDF1, COMP, '_DOUBLE', 'READ', IPCOMP,
-     :                    EL, STATUS )
+            CALL NDF_MAP8( INDF1, COMP, '_DOUBLE', 'READ', IPCOMP,
+     :                     EL, STATUS )
 
 *  Extract the single pixel value.
-            CALL KPG1_RETRD( EL, 1, %VAL( CNF_PVAL( IPCOMP ) ),
-     :                       PIXS( NGOOD + 1 ), STATUS )
+            CALL KPG1_RETR8D( EL, 1_8, %VAL( CNF_PVAL( IPCOMP ) ),
+     :                        PIXS( NGOOD + 1 ), STATUS )
 
 *  Check if this pixel is good.
             IF ( PIXS( NGOOD + 1 ) .NE. VAL__BADD ) THEN

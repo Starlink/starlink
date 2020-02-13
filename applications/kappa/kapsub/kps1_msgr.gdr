@@ -13,14 +13,14 @@
 *     CALL KPS1_MSGRx( NNDF, EL, COORDS, STATUS )
 
 *  Description:
-*     This routine returns GRID co-ordinates for the concatenated 
+*     This routine returns GRID co-ordinates for the concatenated
 *     array of input NDFs that MSTATS collapses.  The GRID co-ordinate
 *     is the index of the NDF for each original input pixel.
 
 *  Arguments:
 *     NNDF = INTEGER (Given)
 *        The number of NDFs to combine.
-*     EL = INTEGER (Given)
+*     EL = INTEGER*8 (Given)
 *        The number of elements in each input NDF to be combined.
 *     COORDS( NNDF * EL ) = ? (Given)
 *        The grid co-ordinates of the concatenated array
@@ -30,7 +30,7 @@
 *     Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
 *     the routine name by D or R as appropriate for dounble- or
-*     single-precision floating point respectively.  The COORDS array 
+*     single-precision floating point respectively.  The COORDS array
 *     should also have the same data type.
 
 *  Copyright:
@@ -55,11 +55,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (Starlink)
+*     DSBL David S Berry (Starlink)
 *     {enter_new_authors_here}
 
 *  History:
 *     2008 May 6 (MJC):
 *        Original version.
+*     13-FEB-2020 (DSB):
+*        Support huge NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -72,7 +75,7 @@
 
 *  Arguments Given:
       INTEGER NNDF
-      INTEGER EL
+      INTEGER*8 EL
 
 *  Arguments Returned:
       <TYPE> COORDS( EL * NNDF )
@@ -81,9 +84,9 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER I                  ! Loop variable
+      INTEGER*8 I                ! Loop variable
       INTEGER J                  ! Loop variable
-      INTEGER OFFSET             ! Offset to 
+      INTEGER*8 OFFSET           ! Offset to
 
 *.
 
@@ -97,5 +100,5 @@
             COORDS( I + OFFSET ) = J
          END DO
       END DO
-      
+
       END

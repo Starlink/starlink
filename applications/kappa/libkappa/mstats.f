@@ -275,6 +275,7 @@
 *     structures contain values with other data types, then conversion
 *     will be performed as necessary.
 *     -  Up to six NDF dimensions are supported.
+*     -  Huge NDF are supported.
 
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
@@ -341,6 +342,8 @@
 *        This preserves the pointer to the variance array.  Check for
 *        bad status after obtaining parameters to ensure the parameter
 *        values are defined before attempting to use them.
+*     13-FEB-2020 (DSB):
+*        Add support for huge NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -375,11 +378,11 @@
       REAL CLIP                  ! Value of CLIP parameter
       CHARACTER*( DAT__SZNAM ) COMP ! Name of NDF component for stats
       DOUBLE PRECISION DATUM     ! Value of pixel
-      INTEGER D                  ! A dimension size
-      INTEGER EL                 ! Number of pixels in mapped o/p array
-      INTEGER ELIN               ! Number of pixels in mapped stacked
+      INTEGER*8 D                ! A dimension size
+      INTEGER*8 EL               ! Number of pixels in mapped o/p array
+      INTEGER*8 ELIN             ! Number of pixels in mapped stacked
                                  ! input array
-      INTEGER ELO                ! Number of elements in output NDF
+      INTEGER*8 ELO              ! Number of elements in output NDF
       CHARACTER*6 ESTIM          ! Method to use to estimate combined
                                  ! values
       CHARACTER*112 ESTIMO       ! List of available estimators
@@ -387,7 +390,7 @@
                                  ! axis?
       INTEGER I                  ! Loop variable
       INTEGER IBLOCK             ! Loop counter for the NDF blocks
-      INTEGER IBLSIZ( NDF__MXDIM ) ! Input-NDF sizes for processing
+      INTEGER*8 IBLSIZ( NDF__MXDIM ) ! Input-NDF sizes for processing
                                  ! large datasets in blocks
       INTEGER IGRP               ! GRP identifier for input-NDFs group
       INTEGER IPCO               ! Pointers to mapped co-ordinate array
@@ -401,14 +404,14 @@
       INTEGER IPWID              ! Pointers to mapped width work array
       CHARACTER*( NDF__SZTYP ) ITYPE ! HDS type of output data arrays
       INTEGER J                  ! Loop count
-      INTEGER LBND( NDF__MXDIM ) ! Lower pixel index bounds of the
+      INTEGER*8 LBND( NDF__MXDIM ) ! Lower pixel index bounds of the
                                  ! output NDF
-      INTEGER LBNDO( NDF__MXDIM - 1 ) ! Lower pixel index bounds of the
+      INTEGER*8 LBNDO( NDF__MXDIM - 1 ) ! Lower pixel index bounds of the
                                  ! output NDF block
-      INTEGER LBNDS( NDF__MXDIM ) ! Lower pixel index bounds of the
+      INTEGER*8 LBNDS( NDF__MXDIM ) ! Lower pixel index bounds of the
                                  ! section of the input NDF
       LOGICAL LOOP               ! Continue to loop through dimensions?
-      INTEGER MAXSIZ             ! Maximum size of block along current
+      INTEGER*8 MAXSIZ           ! Maximum size of block along current
                                  ! dimension
       DOUBLE PRECISION MEAN      ! Average value
       DOUBLE PRECISION MED       ! Median value
@@ -417,12 +420,13 @@
       LOGICAL NDFVAR             ! NDF contains a variance array?
       INTEGER NDIM               ! Number of pixel axes in input NDF
       INTEGER NDIMO              ! Number of pixel axes in output NDF
-      INTEGER NFLAG              ! Number of WLIM-flagged o/p values
+      INTEGER*8 NFLAG            ! Number of WLIM-flagged o/p values
       INTEGER NGOOD              ! Number of non-bad pixels
       INTEGER NGOOD1             ! Number of pixels used
       INTEGER NNDF               ! The number of input NDFs
+      INTEGER*8 NNDF8            ! The number of input NDFs
       INTEGER OBL                ! Identifier for output-NDF block
-      INTEGER OBLSIZ( NDF__MXDIM ) ! Output-NDF sizes for processing
+      INTEGER*8 OBLSIZ( NDF__MXDIM ) ! Output-NDF sizes for processing
                                  ! large datasets in blocks
       INTEGER ONDF               ! NDF identifier of output NDF
       LOGICAL PVAR               ! Process variances?
@@ -431,11 +435,11 @@
       DOUBLE PRECISION SUM       ! Running total of pixel values
       DOUBLE PRECISION SUM2      ! Running total of pixel values squared
       LOGICAL TRIM               ! Will be trim or pad arrays?
-      INTEGER UBND( NDF__MXDIM ) ! Upper pixel index bounds of the
+      INTEGER*8 UBND( NDF__MXDIM ) ! Upper pixel index bounds of the
                                  ! output NDF
-      INTEGER UBNDO( NDF__MXDIM - 1 )! Upper pixel index bounds of the
+      INTEGER*8 UBNDO( NDF__MXDIM - 1 )! Upper pixel index bounds of the
                                  ! output NDF block
-      INTEGER UBNDS( NDF__MXDIM ) ! Upper pixel index bounds of the
+      INTEGER*8 UBNDS( NDF__MXDIM ) ! Upper pixel index bounds of the
                                  ! section of the input NDF
       LOGICAL USEVAR             ! Allow weights to be derived from the
                                  ! NDF's variance array (if present)
@@ -621,7 +625,7 @@
 *  of all the NDFs.
          CALL KPS1_MSBS( IGRP, NNDF, COMP, STRIM, 'OUT', ITYPE,
      :                   %VAL( CNF_PVAL( IPNDF ) ), ONDF, STATUS )
-         CALL NDF_BOUND( ONDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+         CALL NDF_BOUND8( ONDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Get a title for it from the parameter system.
          CALL NDF_CINP( 'TITLE', ONDF, 'Title', STATUS )
@@ -653,7 +657,7 @@
 *  sizes are unity.
          CAXIS = NDIM + 1
          IBLSIZ( CAXIS ) = NNDF
-         MAXSIZ = MAX( 1, MAXPIX / NNDF )
+         MAXSIZ = MAX( 1_8, MAXPIX / NNDF )
          LOOP = .TRUE.
          J = 0
          DO I = 1, NDIM
@@ -689,7 +693,7 @@
          UBNDS( CAXIS ) = NNDF
 
 *  Determine the number of blocks.
-         CALL NDF_NBLOC( ONDF, NDIM, IBLSIZ, NBLOCK, STATUS )
+         CALL NDF_NBLOC8( ONDF, NDIM, IBLSIZ, NBLOCK, STATUS )
 
 *  The total number of elements in the output array is needed for the
 *  calculation of the fraction of bad pixels generated by the
@@ -724,7 +728,7 @@
      :                             IPIN( 2 ), STATUS )
                END IF
             END IF
-            CALL NDF_BLOCK( ONDF, NDIM, OBLSIZ, IBLOCK, OBL, STATUS )
+            CALL NDF_BLOCK8( ONDF, NDIM, OBLSIZ, IBLOCK, OBL, STATUS )
 
 *  Map the NDF arrays and workspace required.
 *  ==========================================
@@ -732,7 +736,8 @@
 *  Map the full output data and (if needed) variance arrays.  Also set
 *  the number of elements in the IPIN work array of the stacked
 *  input-NDFs' blocks.
-            CALL NDF_MAP( OBL, COMP, ITYPE, 'WRITE', IPOUT, EL, STATUS )
+            CALL NDF_MAP8( OBL, COMP, ITYPE, 'WRITE', IPOUT, EL,
+     :                     STATUS )
             ELIN = EL * NNDF
 
             IF ( .NOT. PVAR ) THEN
@@ -741,8 +746,8 @@
             END IF
 
 *  Obtain the bounds of the blocks.
-            CALL NDF_BOUND( OBL, NDF__MXDIM, LBNDO, UBNDO, NDIMO,
-     :                      STATUS )
+            CALL NDF_BOUND8( OBL, NDF__MXDIM - 1, LBNDO, UBNDO, NDIMO,
+     :                       STATUS )
 
 *  Store safe pointer values as the collapse is along the final
 *  dimension of the concatenated NDF arrays, and so no additional
@@ -767,7 +772,7 @@
 *  Create workspace for the co-ordinates at each pixel in the input
 *  array along the notional axis
 *  in the correct data type.
-               CALL PSX_CALLOC( ELIN, ITYPE, IPCO, STATUS )
+               CALL PSX_CALLOC8( ELIN, ITYPE, IPCO, STATUS )
 
 *  Obtain the co-ordinate centres along the collapse axis at every
 *  element of the NDF block.
@@ -794,7 +799,7 @@
 *  Allocate work space for the widths to be derived from the
 *  co-ordinates.  These will be 1.0 for all values since the notional
 *  collapse axis has GRID co-ordinates.
-               CALL PSX_CALLOC( ELIN, ITYPE, IPWID, STATUS )
+               CALL PSX_CALLOC8( ELIN, ITYPE, IPWID, STATUS )
 
 *  Store safe pointer value if widths are not needed.
             ELSE
@@ -805,8 +810,9 @@
 *  =========
 
 *  Now do the work, using a routine appropriate to the numeric type.
+            NNDF8 = NNDF
             IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPS1_CLPSR( CAXIS, 1, NNDF, PVAR, ESTIM, WLIM,
+               CALL KPS1_CLPSR( CAXIS, 1_8, NNDF8, PVAR, ESTIM, WLIM,
      :                          CLIP, EL, NDIM, LBNDS, UBNDS,
      :                          %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                          %VAL( CNF_PVAL( IPIN( 2 ) ) ),
@@ -820,7 +826,7 @@
      :                          %VAL( CNF_PVAL( IPW3 ) ), STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPS1_CLPSD( CAXIS, 1, NNDF, PVAR, ESTIM, WLIM,
+               CALL KPS1_CLPSD( CAXIS, 1_8, NNDF8, PVAR, ESTIM, WLIM,
      :                          CLIP, EL, NDIM, LBNDS, UBNDS,
      :                          %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                          %VAL( CNF_PVAL( IPIN( 2 ) ) ),
@@ -891,8 +897,8 @@
 *  pixels along the collapse axis were bad for a given output pixel.
          ELSE IF ( NFLAG .LT. ELO ) THEN
             CALL MSG_FMTR( 'FRAC', 'F6.4', REAL( NFLAG ) / REAL( ELO ) )
-            CALL MSG_SETI( 'NF', NFLAG )
-            CALL MSG_SETI( 'EL', ELO )
+            CALL MSG_SETK( 'NF', NFLAG )
+            CALL MSG_SETK( 'EL', ELO )
             CALL MSG_OUTIF( MSG__NORM, '',
      :        'WARNING: ^FRAC of the output pixels (^NF of ^EL) are '/
      :        /'set bad due to an excessive number of bad values '/

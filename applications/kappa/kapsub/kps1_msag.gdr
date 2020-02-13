@@ -16,13 +16,13 @@
 
 *  Description:
 *     This routine concatenates the same NDF block from each of a
-*     series of NDFs, and returns a pointer to the mapped array of 
+*     series of NDFs, and returns a pointer to the mapped array of
 *     combined data.  The supplied NDFs must have matching bounds and
 *     dimensionality so that the block in each corresponds to the same
-*     section.  
+*     section.
 *
 *     This routine serves MSTATS, in effect turns an NDIM-dimensional
-*     set of NDFs into one of NDIM+1 dimensions, so that standard 
+*     set of NDFs into one of NDIM+1 dimensions, so that standard
 *     collapse code may be applied.  The processing is performed in
 *     NDF blocks to avoid excessive demands on memory.
 
@@ -36,8 +36,8 @@
 *        may be Data, Variance, Error, or Quality.
 *     NDIM = INTEGER (Given)
 *        The number of dimensions in the NDFs to concatenate.
-*     BLKSIZ( NDIM ) = INTEGER (Given)
-*        The maximum blocksizes in pixels along each dimension (as 
+*     BLKSIZ( NDIM ) = INTEGER*8 (Given)
+*        The maximum blocksizes in pixels along each dimension (as
 *        obtained from NDF_NBLOC).
 *     IBLOCK = INTEGER (Given)
 *        The index of the block currently being processed.
@@ -49,7 +49,7 @@
 
 *     Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D or R as appropriate. 
+*     the routine name by D or R as appropriate.
 
 *  Copyright:
 *     Copyright (C) 2008 Science & Technology Facilities Council.
@@ -73,11 +73,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (Starlink)
+*     DSB: David S Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
 *     2008 April 13 (MJC):
 *        Original version.
+*     13-FEB-2020 (DSB):
+*        Support huge NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -95,7 +98,7 @@
       INTEGER INDFS( NNDF )
       CHARACTER*( * ) COMP
       INTEGER NDIM
-      INTEGER BLKSIZ( NDIM )
+      INTEGER*8 BLKSIZ( NDIM )
       INTEGER IBLOCK
 
 *  Arguments Returned:
@@ -105,13 +108,13 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER EL                 ! Number of elements in a block
+      INTEGER*8 EL               ! Number of elements in a block
       INTEGER I                  ! Loop variable
       INTEGER IBL                ! Identifier for input-NDF block
-      INTEGER IDIMS( NDF__MXDIM ) ! Pasting input dimensions
+      INTEGER*8 IDIMS( NDF__MXDIM )! Pasting input dimensions
       INTEGER IPB                ! Pointer to mapped block
-      INTEGER ODIMS( NDF__MXDIM ) ! Pasting output dimensions
-      INTEGER OFFSET( NDF__MXDIM ) ! Pasting offsets
+      INTEGER*8 ODIMS( NDF__MXDIM )! Pasting output dimensions
+      INTEGER*8 OFFSET( NDF__MXDIM ) ! Pasting offsets
 
 *.
 
@@ -125,27 +128,27 @@
          IDIMS( I ) = 1
          ODIMS( I ) = 1
       END DO
-      
+
 *  Try to open all the NDFs.
       DO I = 1, NNDF
          CALL NDF_BEGIN
 
 *  Obtain an identifier to the block for the current input NDF, and
 *  map the block.
-         CALL NDF_BLOCK( INDFS( I ), NDIM, BLKSIZ, IBLOCK, IBL, STATUS )
-         CALL NDF_MAP( IBL, COMP, '<HTYPE>', 'READ', IPB, EL, STATUS )
+         CALL NDF_BLOCK8( INDFS( I ), NDIM, BLKSIZ, IBLOCK, IBL, STATUS )
+         CALL NDF_MAP8( IBL, COMP, '<HTYPE>', 'READ', IPB, EL, STATUS )
 
-*  Now we know the number of elements, set the significant paste 
+*  Now we know the number of elements, set the significant paste
 *  dimensions and offset.
          OFFSET( 1 ) = EL * ( I - 1 )
          IF ( I .EQ. 1 ) THEN
             IDIMS( 1 ) = EL
             ODIMS( 1 ) = EL * NNDF
-            CALL PSX_CALLOC( ODIMS( 1 ), '<HTYPE>', IPIN, STATUS )
+            CALL PSX_CALLOC8( ODIMS( 1 ), '<HTYPE>', IPIN, STATUS )
 
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL MSG_SETI( 'NNDF', NNDF )
-               CALL MSG_SETI( 'EL', EL )
+               CALL MSG_SETK( 'EL', EL )
                CALL ERR_REP( 'KPS1_MSAG_ERR1', 'Unable to obtain ' //
      :                       'workspace to combine ^NNDF blocks ' //
      :                       'of ^EL elements.', STATUS )
@@ -156,9 +159,9 @@
 *  Paste in the current NDF into the workspace.  Transparency is
 *  irrelevant as we are concatening into unused space.  There may be
 *  bad pixels present.
-         CALL KPG1_PAST<T>( .FALSE., .TRUE., OFFSET, IDIMS, EL, 
-     :                      %VAL( CNF_PVAL( IPB ) ), ODIMS, EL * NNDF,
-     :                      %VAL( CNF_PVAL( IPIN ) ), STATUS )
+         CALL KPG1_PAST8<T>( .FALSE., .TRUE., OFFSET, IDIMS, EL,
+     :                       %VAL( CNF_PVAL( IPB ) ), ODIMS, EL * NNDF,
+     :                       %VAL( CNF_PVAL( IPIN ) ), STATUS )
 
 *   Close NDF context.
          CALL NDF_END( STATUS )
