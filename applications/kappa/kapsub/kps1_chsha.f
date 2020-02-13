@@ -22,7 +22,7 @@
 *  Arguments:
 *     NTILE = INTEGER (Given)
 *        The number of tiles.
-*     DIMS( 2 ) = INTEGER (Given)
+*     DIMS( 2 ) = INTEGER*8 (Given)
 *        The dimensions of a tile.
 *     ASP = REAL (Given)
 *        The target aspect ratio.
@@ -64,6 +64,8 @@
 *  History:
 *     2006 April 26 (MJC):
 *        Original version.
+*     13-FEB-2020 (DSB):
+*        Support huge NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -76,7 +78,7 @@
 
 *  Arguments Given:
       INTEGER NTILE
-      INTEGER DIMS( 2 )
+      INTEGER*8 DIMS( 2 )
       REAL ASP
       REAL MARGIN
 

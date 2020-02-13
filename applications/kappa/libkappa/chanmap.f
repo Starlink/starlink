@@ -364,6 +364,8 @@
 *        require the co-ordinate value.
 *     2012 August 3 (MJC):
 *        Added "NGood", "NBad", "FGood", and "FBad" estimators.
+*     13-FEB-2020 (DSB):
+*        Support huge NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -386,9 +388,9 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
-      INTEGER KPG1_FLOOR         ! Most positive integer .LE. a given
+      INTEGER*8 KPG1_FLOOR8      ! Most positive integer .LE. a given
                                  ! real
-      INTEGER KPG1_CEIL          ! Most negative integer .GE. a given
+      INTEGER*8 KPG1_CEIL8       ! Most negative integer .GE. a given
                                  ! real
 
 *  Local Constants:
@@ -405,7 +407,7 @@
       PARAMETER( NDIM = 3 )
 
 *  Local Variables:
-      INTEGER AEL                ! Number of collapse axis elements
+      INTEGER*8 AEL              ! Number of collapse axis elements
       CHARACTER AUNITS*( 30 )    ! Units of co-ordinates
       CHARACTER ATTRIB*( 10 )    ! AST attribute name
       INTEGER AXES( NDF__MXDIM ) ! A list of axis indices
@@ -414,21 +416,21 @@
       DOUBLE PRECISION AXLOW     ! Low bound of collapse axis in current
                                  ! Frame
       LOGICAL BAD                ! Bad values may be present?
-      INTEGER CAEL               ! Number of collapse axis elements in
+      INTEGER*8 CAEL             ! Number of collapse axis elements in
                                  ! a channel
       INTEGER CBL                ! Identifier for channel block
-      INTEGER CBLSIZ( NDIM )     ! Channel-image sizes for processing
+      INTEGER*8 CBLSIZ( NDIM )   ! Channel-image sizes for processing
                                  ! large datasets in blocks
-      INTEGER CDIMS( NDF__MXDIM ) ! Channel image dimensions
+      INTEGER*8 CDIMS( NDF__MXDIM ) ! Channel image dimensions
       INTEGER CFRM               ! Original Current Frame pointer
       DOUBLE PRECISION CHAVER    ! Average channel PIXEL co-ordinate
-      INTEGER CHDIMS( NDIM - 1 ) ! Dimensions of an unblocked channel
+      INTEGER*8 CHDIMS( NDIM - 1 ) ! Dimensions of an unblocked channel
                                  ! image
       INTEGER CHIND( NDIM - 1 )  ! Channel image indices within output
                                  ! array
       REAL CLIP                  ! Value of CLIP parameter
       CHARACTER COMP * ( 13 )    ! List of components to process
-      INTEGER D                  ! A dimension size
+      INTEGER*8 D                ! A dimension size
       DOUBLE PRECISION DLBNDI( NDIM ) ! Slab inverse lower bounds in
                                  ! GRID collapsed-axis co-ords
       DOUBLE PRECISION DLBNDS( NDIM - 1 ) ! Slab lower bounds in GRID
@@ -439,11 +441,11 @@
                                  ! GRID collapsed-axis co-ords
       DOUBLE PRECISION DUBNDS( NDIM - 1 ) ! Slab upper bounds in GRID
                                  ! co-ords along uncollapsed axes
-      INTEGER ELC                ! Number of elements in a channel
+      INTEGER*8 ELC              ! Number of elements in a channel
                                  ! mapped array
-      INTEGER ELI                ! Number of elements in an input mapped
+      INTEGER*8 ELI              ! Number of elements in an input mapped
                                  ! array
-      INTEGER ELO                ! Number of elements in an output
+      INTEGER*8 ELO              ! Number of elements in an output
                                  ! mapped array
       CHARACTER ESTIM*( 6 )      ! Method to use to estimate collapsed
                                  ! values
@@ -459,11 +461,11 @@
                                  ! Frame
       INTEGER IBL                ! Identifier for input-NDF block
       INTEGER IBLOCK             ! Loop counter for the NDF blocks
-      INTEGER IBLSIZ( NDIM )     ! Input-NDF sizes for processing
+      INTEGER*8 IBLSIZ( NDIM )   ! Input-NDF sizes for processing
                                  ! large datasets in blocks
       INTEGER ICH                ! Channel counter
       INTEGER ICURR              ! Index of original current Frame
-      INTEGER IERR               ! Position of first numerical error
+      INTEGER*8 IERR             ! Position of first numerical error
       INTEGER INDFC              ! NDF identifier for single channel map
       INTEGER INDFI              ! Input NDF identifier
       INTEGER INDFO              ! Output NDF identifier
@@ -493,40 +495,41 @@
       INTEGER J                  ! Loop count
       INTEGER JAXIS              ! Index of collapse axis within PIXEL
                                  ! Frame
-      INTEGER JHI                ! High pixel index for collapse axis
-      INTEGER JLO                ! Low pixel index for collapse axis
-      INTEGER LBND( NDIM )       ! Lower pixel index bounds of the input
+      INTEGER*8 JHI              ! High pixel index for collapse axis
+      INTEGER*8 JLO              ! Low pixel index for collapse axis
+      INTEGER*8 LBND( NDIM )     ! Lower pixel index bounds of the input
                                  ! NDF
-      INTEGER LBNDBI( NDIM )     ! Lower pixel index bounds of the
+      INTEGER*8 LBNDBI( NDIM )   ! Lower pixel index bounds of the
                                  ! cube's block
-      INTEGER LBNDBO( NDIM - 1 ) ! Lower pixel index bounds of the
+      INTEGER*8 LBNDBO( NDIM - 1 ) ! Lower pixel index bounds of the
                                  ! channel-map block
-      INTEGER LBNDC( NDIM - 1 )  ! Lower pixel index bounds of the
+      INTEGER*8 LBNDC( NDIM - 1 )! Lower pixel index bounds of the
                                  ! channel section of the input NDF
-      INTEGER LBNDO( NDIM - 1 )  ! Lower pixel index bounds of the
+      INTEGER*8 LBNDO( NDIM - 1 )! Lower pixel index bounds of the
                                  ! output NDF
-      INTEGER LBNDS( NDIM )      ! Lower pixel index bounds of the
+      INTEGER*8 LBNDS( NDIM )    ! Lower pixel index bounds of the
                                  ! slab of the input NDF
       LOGICAL LOOP               ! Continue to loop through dimensions?
-      INTEGER MAXSIZ             ! Maximum size of block along current
+      INTEGER*8 MAXSIZ           ! Maximum size of block along current
                                  ! dimension
       INTEGER MAP                ! Pointer to Mapping from PIXEL Frame
                                  ! to Current Frame, input NDF
       INTEGER MAPC               ! Pointer to Compound Mapping PIXEL
                                  ! 2-D Frame to 3-D Current Frame
+      INTEGER MXCHN              ! Maximum number of channels
       INTEGER NAXC               ! Original number of current Frame axes
       INTEGER NBLOCK             ! Number of NDF blocks
       INTEGER NC                 ! Used length of string
       INTEGER ND                 ! Number of dimensions (dummy)
       INTEGER NDIMO              ! Number of pixel axes in output NDF
-      INTEGER NERR               ! Number of numerical errors
+      INTEGER*8 NERR             ! Number of numerical errors
       CHARACTER NEWDOM*( 20 )    ! Domain name for revised current Frame
       INTEGER NEWFRM             ! Pointer to revised current Frame
       INTEGER NFLAG              ! Number of WLIM-flagged o/p values
       INTEGER NOCHAN             ! Number of channels
       INTEGER NVAL               ! Number of values obtained (1)
-      INTEGER ODIMS( NDF__MXDIM ) ! Output NDF dimensions
-      INTEGER OFFSET( NDF__MXDIM ) ! Channel-image pixel offsets within
+      INTEGER*8 ODIMS( NDF__MXDIM ) ! Output NDF dimensions
+      INTEGER*8 OFFSET( NDF__MXDIM ) ! Channel-image pixel offsets within
                                  ! output array
       INTEGER OPERM( NDIM )      ! Output permutation
       INTEGER OTOMAP             ! One-to-one mapping
@@ -550,17 +553,17 @@
       INTEGER SWIMAP             ! SwitchMap pointer
       CHARACTER TTL*( 255 )      ! Tile title
       CHARACTER TTLC*( 255 )     ! Title of original current Frame
-      INTEGER UBND( NDIM )       ! Upper pixel index bounds of the input
+      INTEGER*8 UBND( NDIM )     ! Upper pixel index bounds of the input
                                  ! NDF
-      INTEGER UBNDBI( NDIM )     ! Upper pixel index bounds of the
+      INTEGER*8 UBNDBI( NDIM )   ! Upper pixel index bounds of the
                                  ! cube's block
-      INTEGER UBNDBO( NDIM - 1 ) ! Upper pixel index bounds of the
+      INTEGER*8 UBNDBO( NDIM - 1 ) ! Upper pixel index bounds of the
                                  ! channel-map block
-      INTEGER UBNDC( NDIM - 1 )  ! Upper pixel index bounds of the
+      INTEGER*8 UBNDC( NDIM - 1 )! Upper pixel index bounds of the
                                  ! channel section of the input NDF
-      INTEGER UBNDO( NDIM - 1 )  ! Upper pixel index bounds of the
+      INTEGER*8 UBNDO( NDIM - 1 )! Upper pixel index bounds of the
                                  ! output NDF
-      INTEGER UBNDS( NDIM )      ! Upper pixel index bounds of the
+      INTEGER*8 UBNDS( NDIM )    ! Upper pixel index bounds of the
                                  ! slab of the input NDF
       INTEGER UMAP               ! A two-dimensional UnitMap
       CHARACTER UNITS*( 60 )     ! Units of data
@@ -590,8 +593,8 @@
 *  Base, PIXEL and Current frames all have three dimensions.  The NDF
 *  need not have exactly three significant dimensions (i.e. axes
 *  spanning more than one pixel).
-      CALL KPG1_ASGET( INDFI, NDIM, .FALSE., .TRUE., .TRUE., SDIM,
-     :                 LBND, UBND, IWCS, STATUS )
+      CALL KPG1_ASGET8( INDFI, NDIM, .FALSE., .TRUE., .TRUE., SDIM,
+     :                  LBND, UBND, IWCS, STATUS )
 
 *  Extract the current and base Frames, and get the number of axes in
 *  the current Frame, and its title.
@@ -701,8 +704,8 @@
       ELSE
 
 *  Find the projection of the two test points on to the collapse axis.
-         JLO = KPG1_FLOOR( REAL( MIN( PXHIGH, PXLOW ) ) ) + 1
-         JHI = KPG1_CEIL( REAL( MAX( PXHIGH, PXLOW ) ) )
+         JLO = KPG1_FLOOR8( REAL( MIN( PXHIGH, PXLOW ) ) ) + 1
+         JHI = KPG1_CEIL8( REAL( MAX( PXHIGH, PXLOW ) ) )
 
 *  Ensure these are within the bounds of the pixel axis.
          JLO = MAX( LBND( JAXIS ), JLO )
@@ -723,8 +726,8 @@
 
 *  Tell the user the range of pixels being collapsed.
       CALL MSG_SETI( 'I', JAXIS )
-      CALL MSG_SETI( 'L', JLO )
-      CALL MSG_SETI( 'H', JHI )
+      CALL MSG_SETK( 'L', JLO )
+      CALL MSG_SETK( 'H', JHI )
       CALL MSG_OUTIF( MSG__NORM, 'CHANMAP_MSG1',
      :               '   Forming channel map along pixel axis ^I '/
      :               /'between pixel ^L to pixel ^H inclusive.',
@@ -759,9 +762,14 @@
 *  ====================================================
 
 *  The constraints are that the values are positive, and each
-*  channel must have at least one pixel.
-      CALL PAR_GDR0I( 'NCHAN', 6, 1, MIN( MAXCHN, AEL ), .FALSE.,
-     :                NOCHAN, STATUS )
+*  channel must have at least one pixel. Take care about integer kinds
+*  when calculating MXCHN (can't just use MIN).
+      IF( AEL .LT. MAXCHN ) THEN
+         MXCHN = AEL
+      ELSE
+         MXCHN = MAXCHN
+      END IF
+      CALL PAR_GDR0I( 'NCHAN', 6, 1, MXCHN, .FALSE., NOCHAN, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
       CALL PAR_GDR0I( 'SHAPE', 4, 1, NOCHAN, .FALSE., SHAPE( 1 ),
@@ -831,7 +839,7 @@
 *  WCS, and add the SwitchMap Frame at the end.
 
 *  Set the output NDF bounds to the required values.
-      CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDFT, STATUS )
+      CALL NDF_SBND8( NDIMO, LBNDO, UBNDO, INDFT, STATUS )
 
 *  Now copy from the adjusted temporary NDF to the user-specified
 *  output NDF, that should have the correct file size.  As the
@@ -878,16 +886,16 @@
 *  Let's define the number of pixels per channel.  First of all it's
 *  needed to restrict the options when its value is small.
       PIXPCH = REAL( AEL ) / REAL( NOCHAN )
-      IF ( INT( PIXPCH ) .GT. 3 ) THEN
+      IF ( INT8( PIXPCH ) .GT. 3 ) THEN
          ESTIMO = 'Mean,WMean,Mode,Median,Max,Min,Comax,Comin,Absdev,'/
      :            /'Cmean,Csigma,RMS,Sigma,Sum,Iwc,Iwd,Integ,FBad,'/
      :            /'FGood,NBad,NGood'
-      ELSE IF ( INT( PIXPCH ) .EQ. 1 ) THEN
+      ELSE IF ( INT8( PIXPCH ) .EQ. 1 ) THEN
          ESTIMO = 'Mean,Max,Min,Comax,Comin,Sum,Iwc,Integ'
-      ELSE IF ( INT( PIXPCH ) .EQ. 2 ) THEN
+      ELSE IF ( INT8( PIXPCH ) .EQ. 2 ) THEN
          ESTIMO = 'Mean,WMean,Max,Min,Comax,Comin,Absdev,Sum,Iwc,'/
      :            /'Integ,FBad,FGood,NBad,NGood'
-      ELSE IF ( INT( PIXPCH ) .EQ. 3 ) THEN
+      ELSE IF ( INT8( PIXPCH ) .EQ. 3 ) THEN
          ESTIMO = 'Mean,WMean,Median,Max,Min,Comax,Comin,Absdev,Sum,'/
      :            /'Iwc,Integ,FBad,FGood,NBad,NGood'
       END IF
@@ -969,7 +977,7 @@
 *  =================================
 
 *  Map the channel map.
-      CALL KPG1_MAP( INDFO, COMP, OTYPE, 'WRITE', IPOUT, ELO, STATUS )
+      CALL KPG1_MAP8( INDFO, COMP, OTYPE, 'WRITE', IPOUT, ELO, STATUS )
 
 *  There may be bad pixels present.
       BAD = .TRUE.
@@ -997,7 +1005,7 @@
 
 *  Make a temporary NDF to store a single channel's image.
       CALL NDF_TEMP( PLACE, STATUS )
-      CALL NDF_NEW( ITYPE, NDIMO, LBNDC, UBNDC, PLACE, INDFC, STATUS )
+      CALL NDF_NEW8( ITYPE, NDIMO, LBNDC, UBNDC, PLACE, INDFC, STATUS )
 
 *  Iterate through the channels.
       DO ICH = 1, NOCHAN
@@ -1006,7 +1014,7 @@
 *  we should divide the co-ordinates limits of the current WCS Frame
 *  equally and convert those channel limits to pixels.
          LBNDS( JAXIS ) = UBNDS( JAXIS ) + 1
-         UBNDS( JAXIS ) = JLO - 1 + INT( PIXPCH * REAL( ICH ) )
+         UBNDS( JAXIS ) = JLO - 1 + INT8( PIXPCH * REAL( ICH ) )
          CAEL = UBNDS( JAXIS ) - LBNDS( JAXIS ) + 1
 
 *  Obtain the indices of the tile within the large output
@@ -1055,24 +1063,24 @@
 *  NDF to derive the number of blocks.  Instead we create a subsection
 *  spanning the actual collapse limits, as if the user had supplied
 *  this section with the input NDF.
-         CALL NDF_SECT( INDFI, NDIM, LBNDS, UBNDS, INDFS, STATUS )
+         CALL NDF_SECT8( INDFI, NDIM, LBNDS, UBNDS, INDFS, STATUS )
 
 *  Determine the number of blocks.
-         CALL NDF_NBLOC( INDFS, NDIM, IBLSIZ, NBLOCK, STATUS )
+         CALL NDF_NBLOC8( INDFS, NDIM, IBLSIZ, NBLOCK, STATUS )
 
 *  Loop through each block.  Start a new NDF context.
          DO IBLOCK = 1, NBLOCK
             CALL NDF_BEGIN
-            CALL NDF_BLOCK( INDFS, NDIM, IBLSIZ, IBLOCK, IBL, STATUS )
-            CALL NDF_BLOCK( INDFC, NDIMO, CBLSIZ, IBLOCK, CBL, STATUS )
+            CALL NDF_BLOCK8( INDFS, NDIM, IBLSIZ, IBLOCK, IBL, STATUS )
+            CALL NDF_BLOCK8( INDFC, NDIMO, CBLSIZ, IBLOCK, CBL, STATUS )
 
 *  Map the NDF arrays and workspace required.
 *  ==========================================
 
 *  Map the full input, and output data and (if needed) variance arrays.
-            CALL NDF_MAP( IBL, COMP, ITYPE, 'READ', IPIN, ELI, STATUS )
-            CALL NDF_MAP( CBL, COMP, ITYPE, 'WRITE', IPCH, ELC,
-     :                    STATUS )
+            CALL NDF_MAP8( IBL, COMP, ITYPE, 'READ', IPIN, ELI, STATUS )
+            CALL NDF_MAP8( CBL, COMP, ITYPE, 'WRITE', IPCH, ELC,
+     :                     STATUS )
 
             IF ( .NOT. VAR ) THEN
                IPIN( 2 ) = IPIN( 1 )
@@ -1080,15 +1088,15 @@
             END IF
 
 *  Obtain the bounds of the blocks.
-            CALL NDF_BOUND( IBL, NDIM, LBNDBI, UBNDBI, ND, STATUS )
-            CALL NDF_BOUND( CBL, NDIMO, LBNDBO, UBNDBO, ND, STATUS )
+            CALL NDF_BOUND8( IBL, NDIM, LBNDBI, UBNDBI, ND, STATUS )
+            CALL NDF_BOUND8( CBL, NDIMO, LBNDBO, UBNDBO, ND, STATUS )
 
 *  Allocate work space, unless the last axis is being collapsed (in
 *  which case no work space is needed).
             IF ( HIGHER ) THEN
-               CALL PSX_CALLOC( ELC * CAEL, ITYPE, IPW1, STATUS )
+               CALL PSX_CALLOC8( ELC * CAEL, ITYPE, IPW1, STATUS )
                IF ( VAR ) THEN
-                  CALL PSX_CALLOC( ELC * CAEL, ITYPE, IPW2, STATUS )
+                  CALL PSX_CALLOC8( ELC * CAEL, ITYPE, IPW2, STATUS )
                ELSE
                   IPW2 = IPW1
                END IF
@@ -1110,37 +1118,37 @@
 
 *  Create workspace for the co-ordinates along a single WCS axis
 *  in the correct data type.
-               CALL PSX_CALLOC( ELI, '_DOUBLE', IPAXCO, STATUS )
-               CALL PSX_CALLOC( ELI, ITYPE, IPCO, STATUS )
-               CALL PSX_CALLOC( UBNDBI( JAXIS ) - LBNDBI( JAXIS ) + 1,
+               CALL PSX_CALLOC8( ELI, '_DOUBLE', IPAXCO, STATUS )
+               CALL PSX_CALLOC8( ELI, ITYPE, IPCO, STATUS )
+               CALL PSX_CALLOC8( UBNDBI( JAXIS ) - LBNDBI( JAXIS ) + 1,
      :                          '_DOUBLE', IPAXWO, STATUS )
 
 
 *  Allocate work space, unless the last pixel axis is being collapsed
 *  (in which case no work space is needed).
                IF ( HIGHER ) THEN
-                  CALL PSX_CALLOC( ELC * CAEL, ITYPE, IPW3, STATUS )
+                  CALL PSX_CALLOC8( ELC * CAEL, ITYPE, IPW3, STATUS )
                END IF
 
 *  Obtain the double-precision co-ordinate centres along the collapse
 *  axis in the current Frame.
-               CALL KPG1_WCFAX( LBNDBI, UBNDBI, MAP, JAXIS, IAXIS,
-     :                          %VAL( CNF_PVAL( IPAXCO ) ),
-     :                          %VAL( CNF_PVAL( IPAXWO ) ), STATUS )
+               CALL KPG1_WCFAX8( LBNDBI, UBNDBI, MAP, JAXIS, IAXIS,
+     :                           %VAL( CNF_PVAL( IPAXCO ) ),
+     :                           %VAL( CNF_PVAL( IPAXWO ) ), STATUS )
 
 
 *  Copy the centres to the required precision.
                IF ( ITYPE .EQ. '_REAL' ) THEN
-                  CALL VEC_DTOR( .TRUE., ELI,
-     :                           %VAL( CNF_PVAL( IPAXCO ) ),
-     :                           %VAL( CNF_PVAL( IPCO ) ), IERR, NERR,
-     :                           STATUS )
+                  CALL VEC8_DTOR( .TRUE., ELI,
+     :                            %VAL( CNF_PVAL( IPAXCO ) ),
+     :                            %VAL( CNF_PVAL( IPCO ) ), IERR, NERR,
+     :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                  CALL VEC_DTOD( .TRUE., ELI,
-     :                           %VAL( CNF_PVAL( IPAXCO ) ),
-     :                           %VAL( CNF_PVAL( IPCO ) ), IERR, NERR,
-     :                           STATUS )
+                  CALL VEC8_DTOD( .TRUE., ELI,
+     :                            %VAL( CNF_PVAL( IPAXCO ) ),
+     :                            %VAL( CNF_PVAL( IPCO ) ), IERR, NERR,
+     :                            STATUS )
 
                END IF
                CALL PSX_FREE( IPAXCO, STATUS )
@@ -1161,7 +1169,7 @@
 
 *  Allocate work space for thw widths to be derived from the
 *  co-ordinates.  This assumes full filling of pixels.
-               CALL PSX_CALLOC( ELC * CAEL, ITYPE, IPWID, STATUS )
+               CALL PSX_CALLOC8( ELC * CAEL, ITYPE, IPWID, STATUS )
 
 *  Store safe pointer value if widths are not needed.
             ELSE
@@ -1242,16 +1250,18 @@
 *  Call the appropriate routine that performs the pasting of the data
 *  array.
             IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_PASTR( .FALSE., BAD, OFFSET, CDIMS, ELC,
-     :                          %VAL( CNF_PVAL( IPCH( 1 ) ) ),
-     :                          ODIMS, ELO,
-     :                          %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
+               CALL KPG1_PAST8R( .FALSE., BAD, OFFSET, CDIMS, ELC,
+     :                           %VAL( CNF_PVAL( IPCH( 1 ) ) ),
+     :                           ODIMS, ELO,
+     :                           %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                           STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_PASTD( .FALSE., BAD, OFFSET, CDIMS, ELC,
-     :                          %VAL( CNF_PVAL( IPCH( 1 ) ) ),
-     :                          ODIMS, ELO,
-     :                          %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
+               CALL KPG1_PAST8D( .FALSE., BAD, OFFSET, CDIMS, ELC,
+     :                           %VAL( CNF_PVAL( IPCH( 1 ) ) ),
+     :                           ODIMS, ELO,
+     :                           %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                           STATUS )
 
             END IF
 
@@ -1262,18 +1272,18 @@
 *  Call the appropriate routine that performs the pasting of the data
 *  array.
                IF ( ITYPE .EQ. '_REAL' ) THEN
-                  CALL KPG1_PASTR( .FALSE., BAD, OFFSET, CDIMS, ELC,
-     :                             %VAL( CNF_PVAL( IPCH( 2 ) ) ),
-     :                             ODIMS, ELO,
-     :                             %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
-     :                             STATUS )
+                  CALL KPG1_PAST8R( .FALSE., BAD, OFFSET, CDIMS, ELC,
+     :                              %VAL( CNF_PVAL( IPCH( 2 ) ) ),
+     :                              ODIMS, ELO,
+     :                              %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
+     :                              STATUS )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPG1_PASTD( .FALSE., BAD, OFFSET, CDIMS, ELC,
-     :                             %VAL( CNF_PVAL( IPCH( 2 ) ) ),
-     :                             ODIMS, ELO,
-     :                             %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
-     :                             STATUS )
+                  CALL KPG1_PAST8D( .FALSE., BAD, OFFSET, CDIMS, ELC,
+     :                              %VAL( CNF_PVAL( IPCH( 2 ) ) ),
+     :                              ODIMS, ELO,
+     :                              %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
+     :                              STATUS )
                END IF
             END IF
 
@@ -1430,13 +1440,13 @@
          IAT = 5
          CALL CHR_PUTI( ICH, TTL, IAT )
          CALL CHR_APPND( ' bounds: (', TTL, IAT )
-         CALL CHR_PUTI( NINT( DLBNDS( 1 ) ), TTL, IAT )
+         CALL CHR_PUTK( NINT( DLBNDS( 1 ), KIND=8 ), TTL, IAT )
          CALL CHR_APPND( ':', TTL, IAT )
-         CALL CHR_PUTI( NINT( DUBNDS( 1 ) ), TTL, IAT )
+         CALL CHR_PUTK( NINT( DUBNDS( 1 ), KIND=8 ), TTL, IAT )
          CALL CHR_APPND( ',', TTL, IAT )
-         CALL CHR_PUTI( NINT( DLBNDS( 2 ) ), TTL, IAT )
+         CALL CHR_PUTK( NINT( DLBNDS( 2 ), KIND=8 ), TTL, IAT )
          CALL CHR_APPND( ':', TTL, IAT )
-         CALL CHR_PUTI( NINT( DUBNDS( 2 ) ), TTL, IAT )
+         CALL CHR_PUTK( NINT( DUBNDS( 2 ), KIND=8 ), TTL, IAT )
          CALL CHR_APPND( ')', TTL, IAT )
 
          CALL AST_SETC( SLABIN( ICH ), 'Title', TTL( : IAT ),
