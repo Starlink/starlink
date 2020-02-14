@@ -459,6 +459,10 @@
 *        Add "FastMed" estimator.
 *     15-JAN-2020 (DSB):
 *        Add support for huge NDFs.
+*     12-FEB-2020 (DSB):
+*        Increase max block size by a factor of ten compared to its 2006
+*        value. This speeds up the multi-threaded combination methods by
+*        about 25%.
 *     {enter_further_changes_here}
 
 *-
@@ -491,7 +495,7 @@
       PARAMETER( CLPDEF = 3.0 )  ! clip for mode, clipped mean & std dev
 
       INTEGER*8 MAXPIX           ! Maximum number of pixels in a block
-      PARAMETER ( MAXPIX = 8388608 ) ! Guestimate a size: 8 mega
+      PARAMETER ( MAXPIX = 83886080 ) ! Guestimate a size: 80 mega
 
 *  Local Variables:
       CHARACTER AUNITS*( 30 )    ! Units of co-ordinates

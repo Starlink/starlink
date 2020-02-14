@@ -26,16 +26,16 @@
 *        The number of pixels in a line of data.
 *     NLINES = INTEGER*8 (Given)
 *        The number of lines of data in the stack.
-*     STACK( NPIX, NLINES ) = ? (Given)
+*     STACK( NPIX, NLINES ) = <TYPE> (Given)
 *        The array of lines which are to be combined into a single line.
-*     VARS( NPIX, NLINES ) = ? (Given)
+*     VARS( NPIX, NLINES ) = <TYPE> (Given)
 *        The data variances.
 *     MINPIX = INTEGER*8 (Given)
 *        The minimum number of pixels required to contribute to an
 *        output pixel or variance.
-*     RESULT( NPIX ) = ? (Returned)
+*     RESULT( NPIX ) = <TYPE> (Returned)
 *        The output line of data.
-*     RESVAR( NPIX ) = ? (Returned)
+*     RESVAR( NPIX ) = <TYPE> (Returned)
 *        The output variances.
 *     NCON( NLINES ) = DOUBLE PRECISION (Returned)
 *        The actual number of contributing pixels from each input line

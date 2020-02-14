@@ -25,12 +25,12 @@
 *        The number of pixels in a line of data.
 *     NLINES = INTEGER*8 (Given)
 *        The number of lines of data in the stack.
-*     STACK( NPIX, NLINES ) = ? (Given)
+*     STACK( NPIX, NLINES ) = <TYPE> (Given)
 *        The array of lines which are to be combined into a single line.
 *     MINPIX = INTEGER*8 (Given)
 *        The minimum number of pixels required to contribute to an
 *        output pixel.
-*     RESULT( NPIX ) = ? (Returned)
+*     RESULT( NPIX ) = <TYPE> (Returned)
 *        The output line of data.
 *        to the output line.
 *     NCON( NLINES ) = DOUBLE PRECISION (Returned)

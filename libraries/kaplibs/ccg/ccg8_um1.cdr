@@ -1,0 +1,635 @@
+#include <stdint.h>
+#include "sae_par.h"
+#include "prm_par.h"
+#include "ast.h"
+#include "f77.h"
+#include "mers.h"
+#include "star/thr.h"
+
+/* Local data types */
+typedef struct  ccg8Um1Data<T> {
+   <CTYPE> *result;
+   <CTYPE> *resvar;
+   const <CTYPE> *stack;
+   const <CTYPE> *vars;
+   double *sumd;
+   double *sumv;
+   double *good;
+   double *goodv;
+   double *ncon;
+   int64_t i1;
+   int64_t npix;
+   int64_t minpix;
+   int64_t i2;
+   int64_t nbad;
+   int64_t nlines;
+   int operation;
+} ccg8Um1Data<T>;
+
+/* Prototypes for local static functions. */
+static void ccg8Um1_work<T>( void *job_data_ptr, int *status );
+
+
+F77_SUBROUTINE(ccg8_um1<TLC>)( INTEGER8(NPIX), INTEGER8(NLINES),
+                              <CNFTYPE>_ARRAY(STACK), <CNFTYPE>_ARRAY(VARS),
+                              INTEGER8(MINPIX),
+                              <CNFTYPE>_ARRAY(RESULT), <CNFTYPE>_ARRAY(RESVAR),
+                              DOUBLE_ARRAY(NCON), INTEGER8(NBAD),
+                              INTEGER(STATUS) ){
+/*
+*+
+*  Name:
+*     CCG8_UM1<T>
+
+*  Purpose:
+*     Combines data lines using an unweighted mean.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG8_UM1<TYPE>( NPIX, NLINES, STACK, VARS, MINPIX, RESULT,
+*                          RESVAR, NCON, NBAD, STATUS )
+
+*  Description:
+*     This routine accepts an array consisting of a series of
+*     (vectorised) lines of data.  The data values in the lines are then
+*     combined to form an unweighted mean.  The output means
+*     are returned in the array RESULT.  The output variances are
+*     estimated from the VARS values and are returned in RESVAR.
+
+*  Arguments:
+*     NPIX = INTEGER*8 (Given)
+*        The number of pixels in a line of data.
+*     NLINES = INTEGER*8 (Given)
+*        The number of lines of data in the stack.
+*     STACK( NPIX, NLINES ) = <TYPE> (Given)
+*        The array of lines which are to be combined into a single line.
+*     VARS( NPIX, NLINES ) = <TYPE> (Given)
+*        The data variances.
+*     MINPIX = INTEGER*8 (Given)
+*        The minimum number of pixels required to contribute to an
+*        output pixel or variance.
+*     RESULT( NPIX ) = <TYPE> (Returned)
+*        The output line of data.
+*     RESVAR( NPIX ) = <TYPE> (Returned)
+*        The output variances.
+*     NCON( NLINES ) = DOUBLE PRECISION (Returned)
+*        The actual number of contributing pixels from each input line
+*        to the output line.
+*     NBAD = INTEGER*8 (Returned)
+*        The number of bad values in the output array created while
+*        forming the statistics.  It excludes those bad values whose
+*        corresponding values along the collapse axis are all bad.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "x"
+*     in the routine name by D or R as appropriate.  The STACK, VARS,
+*     RESULT, and RESVAR arguments supplied to the routine must have the
+*     data type specified.
+*     -  This routine performs its work in double precision.
+
+*  Copyright:
+*     Copyright (C) 2020 East Asian Observatory
+*     All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or modify
+*     it under the terms of the GNU General Public License as published by
+*     the Free Software Foundation; either Version 2 of the License, or (at
+*     your option) any later version.
+*
+*     This program is distributed in the hope that it will be useful, but
+*     WITHOUT ANY WARRANTY; without even the implied warranty of
+*     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+*     General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-FEB-2020 (DSB):
+*        Original C version, based on equivalent Fortran function by
+*        DSB et al.
+
+*-
+*/
+
+/* Local Variables: */
+   ThrWorkForce *wf;         /* Pointer to workforce (a pool of threads) */
+   ccg8Um1Data<T> *job_data; /* Pointer to all job data structures */
+   ccg8Um1Data<T> *pdata;    /* Pointer to single job data structure */
+   double *good;             /* No of input values used at each pixel */
+   double *goodv;            /* No of input variance used at each pixel */
+   double *sumd;             /* Sum of data values at each pixel */
+   double *sumv;             /* Sum of data variances at each pixel */
+   int iw;                   /* Index of worker thread */
+   int ngroup;               /* Number of groups of lines */
+   int nw;                   /* Number of threads to use */
+   int64_t i;                /* Loop variable */
+   int64_t j;                /* Loop variable */
+   int64_t step;             /* Number of data elements per thread */
+
+/* Initialise returned values. */
+   *NBAD = 0;
+   for( i = 0; i < *NLINES; i++ ){
+      NCON[ i ] = 0.0;
+   }
+
+/* Check inherited global status. */
+   if( *STATUS != SAI__OK ) return;
+
+/* Find the number of cores/processors available and create a pool of
+   threads of the same size. */
+   wf = thrGetWorkforce( thrGetNThread( "KAPPA_THREADS", STATUS ), STATUS );
+
+/* How many worker threads in the workforce? May not be the same as
+   requested if the workforce already existed. */
+   nw = wf ? wf->nworker : 1;
+
+/* Allocate job data for threads. Each structure describes a single job
+   to be allocated to a single worker thread. */
+   job_data = astCalloc( nw, sizeof(*job_data) );
+   if( *STATUS == SAI__OK ) {
+
+/* The supplied STACK array is fortran ordered, which means it would be
+   inefficient to work through it pixel by pixel, combining all lines at
+   each pixel before moving on to the next pixel. It is more efficient to
+   work through it line by line. So the first stage is to divide the lines
+   up into groups and use a spearate worker thread to combine all the
+   lines in each group. The number of groups is equal to the number of
+   worker threads. But we only do this if the number of lines in each
+   group is at least two (in fact this optimisation only seems to speed
+   things up by about 15-20 % ). */
+      ngroup = nw;
+      step = *NLINES/ngroup;  /* No. of input lines per group */
+      if( step > 1 ) {
+
+/* Allocate an array to hold the sum of the data values for each pixel in
+   each group of input lines. */
+         sumd = astCalloc( ngroup*(*NPIX), sizeof(*sumd) );
+
+/* Allocate an array to hold the sum of the data variances for each pixel in
+   each group of input lines. */
+         sumv = astCalloc( ngroup*(*NPIX), sizeof(*sumv) );
+
+/* Allocate an array to hold the number of contributing input data values for
+   each pixel in each group of input lines. */
+         good = astCalloc( ngroup*(*NPIX), sizeof(*good) );
+
+/* Allocate an array to hold the number of contributing input data variances
+   for each pixel in each group of input lines. */
+         goodv = astCalloc( ngroup*(*NPIX), sizeof(*goodv) );
+
+/* Check we can use these arrays safely. */
+         if( *STATUS == SAI__OK ) {
+
+/* Store the information needed to do each job (i.e. collapse each group
+   of lines), and then submit the job to the workforce for execution by
+   the next available worker thread. */
+            for( iw = 0; iw < nw; iw++ ) {
+               pdata = job_data + iw;
+
+               pdata->i1 = iw*step;
+               if( iw < nw - 1 ) {
+                  pdata->i2 = pdata->i1 + step - 1;
+               } else {
+                  pdata->i2 = *NLINES - 1;
+               }
+
+               pdata->operation = 1;
+               pdata->minpix = *MINPIX;
+               pdata->stack = STACK;
+               pdata->vars = VARS;
+               pdata->nlines = *NLINES;
+               pdata->npix = *NPIX;
+               pdata->ncon = NCON;
+               pdata->result = RESULT;
+               pdata->resvar = RESVAR;
+               pdata->sumd = sumd + iw*(*NPIX);
+               pdata->sumv = sumv + iw*(*NPIX);
+               pdata->good = good + iw*(*NPIX);
+               pdata->goodv = goodv + iw*(*NPIX);
+
+               thrAddJob( wf, 0, pdata, ccg8Um1_work<T>, 0, NULL, STATUS );
+            }
+
+/* Put the current thread to sleep until all the above jobs have
+   completed. */
+            thrWait( wf, STATUS );
+
+/* The next stage is to combine together the results created above from each
+   group. Each worker thread processes a group of pixels to create the
+   final returned output array. If the number of pixels is very low, do all
+   the calculations in the current thread. */
+            if( *NPIX < 10*nw ) nw = 1;
+
+/* Find how many pixels to process in each worker thread. */
+            if( nw > 0 ) {
+               step = (*NPIX)/nw;
+            } else {
+               step = *NPIX;
+            }
+
+/* Store the first and last pixel indices to be processed by the worker
+   thread in each structure. The last worker picks up any remaining pixels
+   left over by the integer division used to calculate "step". Also store
+   some other required constant values in each structure, then submit the
+   job to the workforce. */
+            for( iw = 0; iw < nw; iw++ ) {
+               pdata = job_data + iw;
+               pdata->i1 = iw*step;
+               if( iw < nw - 1 ) {
+                  pdata->i2 = pdata->i1 + step - 1;
+               } else {
+                  pdata->i2 = *NPIX - 1;
+               }
+               pdata->operation = 2;
+               pdata->nlines = ngroup;
+               pdata->sumd = sumd;
+               pdata->sumv = sumv;
+               pdata->good = good;
+               pdata->goodv = goodv;
+
+               thrAddJob( wf, 0, pdata, ccg8Um1_work<T>, 0, NULL, STATUS );
+            }
+
+/* Put the current thread to sleep until all the above jobs have
+   completed. */
+            thrWait( wf, STATUS );
+
+/* Now accumulate the results returned by each worker thread. */
+            for( iw = 0; iw < nw; iw++ ) {
+               pdata = job_data + iw;
+               *NBAD += pdata->nbad;
+            }
+         }
+
+/* Free resources. */
+         sumd = astFree( sumd );
+         sumv = astFree( sumv );
+         good = astFree( good );
+         goodv = astFree( goodv );
+
+/* If there are too few lines of data to make it worthwhile dividing them
+   into groups and collapsing each group, then we process all lines
+   together. In this case each worker thread processes a group of pixels
+   from all input lines. */
+      } else {
+
+/* If the number of pixels is very low, do all the calculations in the
+   current thread. */
+         if( *NPIX < 10*nw ) nw = 1;
+
+/* Find how many pixels to process in each worker thread. */
+         if( nw > 0 ) {
+            step = (*NPIX)/nw;
+         } else {
+            step = *NPIX;
+         }
+
+/* Store the first and last pixel indices to be processed by the worker
+   thread in each structure. The last worker picks up any remaining pixels
+   left over by the integer division used to calculate "step". Also store
+   some other required constant values in each structure. */
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->i1 = iw*step;
+            if( iw < nw - 1 ) {
+               pdata->i2 = pdata->i1 + step - 1;
+            } else {
+               pdata->i2 = *NPIX - 1;
+            }
+            pdata->operation = 3;
+            pdata->stack = STACK;
+            pdata->vars = VARS;
+            pdata->nlines = *NLINES;
+            pdata->npix = *NPIX;
+            pdata->ncon = astCalloc( (*NLINES), sizeof(double) );
+            pdata->result = RESULT;
+            pdata->resvar = RESVAR;
+            pdata->minpix = *MINPIX;
+
+/* Submit the job to the workforce. */
+            thrAddJob( wf, 0, pdata, ccg8Um1_work<T>, 0, NULL, STATUS );
+         }
+
+/* Put the current thread to sleep until all the above jobs have
+   completed. */
+         thrWait( wf, STATUS );
+
+/* Now accumulate the results returned by each worker thread. */
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            *NBAD += pdata->nbad;
+            for( j = 0; j < *NLINES; j++ ){
+               NCON[ j ] += pdata->ncon[ j ];
+            }
+
+/* Free per-thread resources. */
+            pdata->ncon = astFree( pdata->ncon );
+         }
+      }
+   }
+
+/* Free global resources. */
+   job_data = astFree( job_data );
+}
+
+
+
+
+
+
+
+
+
+
+static void ccg8Um1_work<T>( void *job_data_ptr, int *status ){
+/*
+*  Name:
+*     ccg8Um1_work<T>
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     ccg8_um1<T>.
+
+*  Invocation:
+*     void ccg8Um1_work<T>( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = ccg8Um1Data<X> * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+
+/* Local Variables: */
+   <CTYPE> *presult;      /* Pointer to next result value */
+   <CTYPE> *presvar;      /* Pointer to next result variance */
+   ccg8Um1Data<T> *pdata; /* Pointer to single job data structure */
+   const <CTYPE> *pstack; /* Pointer to next input value */
+   const <CTYPE> *pvars;  /* Pointer to next input variance */
+   double ncon;           /* Line contributions */
+   double *pgood;         /* Pointer to next good value */
+   double *pgoodv;        /* Pointer to next good variance */
+   double *pncon;         /* Pointer to next ncon value */
+   double *psumd;         /* Pointer to next sumd value */
+   double *psumv;         /* Pointer to next sumv value */
+   double sumd;           /* Sum of values */
+   double sumv;           /* Sum of variances */
+   double value;          /* Output value */
+   int64_t i;             /* Loop variable */
+   int64_t j;             /* Loop variable */
+   int64_t minpix;        /* Minimum number of good pixels required */
+   int64_t nbad;          /* Number of bad results */
+   int64_t ngood;         /* Number of good data values */
+   int64_t ngoodv;        /* Number of good variances */
+   int64_t nlines;        /* Number of lines */
+   int64_t npix;          /* Number of pixels per line */
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (ccg8Um1Data<T> *) job_data_ptr;
+
+/* For convenience, copy to local variables */
+   minpix = pdata->minpix;
+   npix = pdata->npix;
+   nlines = pdata->nlines;
+
+/* Collapse a group of lines producing intermediate arrays holding the
+   required statistics at each pixel. */
+   if( pdata->operation == 1 ) {
+
+/* Loop over the lines to be collapsed by this worker thread,
+   maintaining a pointer to the next input value. */
+      pstack = pdata->stack + pdata->i1*npix;
+      pvars = pdata->vars + pdata->i1*npix;
+      pncon = pdata->ncon + pdata->i1;
+      for( i = pdata->i1; i <= pdata->i2; i++ ){
+
+/* Initialise pointers to the returned statistics arrays. */
+         psumd = pdata->sumd;
+         pgood = pdata->good;
+         psumv = pdata->sumv;
+         pgoodv = pdata->goodv;
+
+/* Loop over all pixels in the current line. */
+         ncon = 0.0;
+         for( j = 0; j < npix; j++ ){
+
+/* If it is good, increment the value for this pixel in each of the
+   returned arrays. The contents of these arrays were initialised to
+   zero when they were allocated by astCalloc. */
+            if( *pstack != VAL__BAD<T> ) {
+
+/* Array holding no. of good values at each pixel. */
+               *pgood += 1;
+
+/* Array holding sum of data values at each pixel */
+               *psumd += (double)( *pstack );
+
+/* Total contribution from each input line. */
+               ncon += 1.0;
+            }
+
+/* If the variance is good, increment the sum and count of good variances
+   for this pixel. */
+            if( *pvars != VAL__BAD<T> ) {
+
+/* Array holding no. of good values at each pixel. */
+               *pgoodv += 1;
+
+/* Array holding sum of data values at each pixel */
+               *psumv += (double)( *pvars );
+            }
+
+/* Update pointers to refer to the next pixel. */
+            psumd++;
+            psumv++;
+            pgood++;
+            pgoodv++;
+            pstack++;
+            pvars++;
+         }
+
+/* Store the total contribution made by the current line, and then
+   increment the pointer to point to the value for the next line. */
+         *(pncon++) = ncon;
+      }
+
+/* Genarate the result values for a group of output pixels previously
+   collapsed using operation 1 above. */
+   } else if( pdata->operation == 2 ) {
+
+/* Loop over the output pixels to be processed by this thread,
+   maintaining a pointer to the current output value.  */
+      nbad = 0;
+      presult = pdata->result + pdata->i1;
+      presvar = pdata->resvar + pdata->i1;
+      for( i = pdata->i1; i <= pdata->i2; i++,presult++,presvar++ ){
+
+/* Initialise sums for the current pixel. */
+         sumv = 0.0;
+         sumd = 0.0;
+         ngoodv = 0;
+         ngood = 0;
+
+/* Loop over all (previously compressed) lines of input data forming
+   weighted mean sums. */
+         pgood = pdata->good + i;
+         pgoodv = pdata->goodv + i;
+         psumv = pdata->sumv + i;
+         psumd = pdata->sumd + i;
+         for( j = 0; j < nlines; j++ ){
+
+/* Increment good value counters. */
+            ngood += *pgood;
+            ngoodv += *pgoodv;
+
+/* Increment sums. */
+            sumd += *psumd;
+            sumv += *psumv;
+
+/* Move pointers on to the value in the next input line. */
+            pgood += npix;
+            pgoodv += npix;
+            psumv += npix;
+            psumd += npix;
+         }
+
+/* If there are sufficient good pixels output the result. */
+         if( ngood >= minpix ) {
+            value = sumd/ngood;
+            *presult = (<CTYPE>) value;
+
+/* Trap numeric errors. */
+            if( *presult != (<CTYPE>) value ) {
+               *presult = VAL__BAD<T>;
+               nbad++;
+            }
+
+/* Not enough contributing pixels, set output invalid unless all of them
+   are bad. */
+         } else {
+            *presult = VAL__BAD<T>;
+            if( ngood > 0 ) nbad++;
+         }
+
+/* If there are sufficient good variances, form the output variance similarly. */
+         if( ngoodv >= minpix ) {
+            value = sumv/( ngoodv*ngoodv );
+            *presvar = (<CTYPE>) value;
+            if( *presvar != (<CTYPE>) value ) *presvar = VAL__BAD<T>;
+         } else {
+            *presvar = VAL__BAD<T>;
+         }
+      }
+
+/* Return the number of bad results generated by this worker thread. */
+      pdata->nbad = nbad;
+
+/* Genarate the result values for a group of output pixels directly from
+   the uncollpased input stack. */
+   } else if( pdata->operation == 3 ) {
+      pncon = pdata->ncon;
+
+/* Loop over the output pixels to be processed by this thread.  */
+      nbad = 0;
+      presult = pdata->result + pdata->i1;
+      presvar = pdata->resvar + pdata->i1;
+      for( i = pdata->i1; i <= pdata->i2; i++,presult++,presvar++ ){
+
+/* Initialise sums. */
+         sumv = 0.0;
+         sumd = 0.0;
+
+/* Set good pixel count. */
+         ngoodv = 0;
+         ngood = 0;
+
+/* Loop over all possible contributing pixels forming weighted mean
+   sums. */
+         pstack = pdata->stack + i;
+         pvars = pdata->vars + i;
+         for( j = 0; j < nlines; j++ ){
+            if( *pstack != VAL__BAD<T> ) {
+
+/* Increment good value counter. */
+               ngood++;
+
+/* Form weighted mean sum. */
+               sumd += (double)( *pstack );
+
+/* Update the contribution buffer---all values contribute when forming
+   mean. The contents of this array were initialised to zero by astCalloc
+   when it was allocated. */
+               pncon[ j ] += 1.0;
+            }
+
+/* Likewise increment the variance sums */
+            if( *pvars != VAL__BAD<T> ) {
+               ngoodv++;
+               sumv += (double)( *pvars );
+            }
+
+/* Move the input pointers on to the value in the next input line. */
+            pstack += npix;
+            pvars += npix;
+         }
+
+/* If there are sufficient good pixels output the result. */
+         if( ngood >= minpix ) {
+            value = sumd/ngood;
+            *presult = (<CTYPE>) value;
+
+/* Trap numeric errors. */
+            if( *presult != (<CTYPE>) value ) {
+               *presult = VAL__BAD<T>;
+               nbad++;
+            }
+
+/* Not enough contributing pixels, set output invalid unless all of them
+   are bad. */
+         } else {
+            *presult = VAL__BAD<T>;
+            if( ngood > 0 ) nbad++;
+         }
+
+/* If there are sufficient good variances, form the output variance similarly. */
+         if( ngoodv >= minpix ) {
+            value = sumv/( ngoodv*ngoodv );
+            *presvar = (<CTYPE>) value;
+            if( *presvar != (<CTYPE>) value ) *presvar = VAL__BAD<T>;
+         } else {
+            *presvar = VAL__BAD<T>;
+         }
+      }
+
+/* Return the number of bad results generated by this worker thread. */
+      pdata->nbad = nbad;
+
+/* Report an error for any other operation. */
+   } else if( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "CCG8_UM1<T>: Illegal operation %d (programming error).",
+               status, pdata->operation );
+   }
+}
+

@@ -84,7 +84,7 @@
 *     2006 January 8 (MJC):
 *        Correct variance calculation.
 *     2009 July 3 (MJC):
-*        Renamed from CCG_SUM1x.  Added NBAD argument. 
+*        Renamed from CCG_SUM1x.  Added NBAD argument.
 *     2009 July 4 (MJC):
 *         Made NCON Returned and therefore it is initialised.
 *     2009 July 17 (MJC):
@@ -177,7 +177,7 @@
                NGOOD = NGOOD + 1
 
 *  Form mean sum, and sum of the squares.
-               SUMV = SUMV + VAL 
+               SUMV = SUMV + VAL
                SUMSQ = SUMSQ + ( VAL * VAL )
 
 *  Update the contribution buffer; all values contribute when forming
@@ -193,8 +193,8 @@
             MEAN = SUMV / DBLE( NGOOD )
 
 *  Before calculating the standard deviation, check for only one
-*  contributing pixel, and rounding errors producing a negative 
-*  variance value.  In all these cases, calculate a standard 
+*  contributing pixel, and rounding errors producing a negative
+*  variance value.  In all these cases, calculate a standard
 *  deviation value of zero.
             VARNCE = SUMSQ - ( MEAN * MEAN * DBLE( NGOOD ) )
             IF ( ( NGOOD .EQ. 1 ) .OR. ( VARNCE .LT. 0.0D0 ) ) THEN
