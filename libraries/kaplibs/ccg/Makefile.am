@@ -28,7 +28,7 @@ ccg_md1.gdr   ccg_md3.gdr  ccg_me1.gdr  ccg_me3.gdr  ccg_mm1.gdr \
 ccg_mm3.gdr   ccg_mo1.gdr  ccg_mo3.gdr  ccg_sc1.gdr  ccg_sc3.gdr \
 ccg_sm1.gdr   ccg_sm3.gdr  ccg_tc1.gdr  ccg_tc3.gdr  ccg_tm1.gdr \
 ccg_tm3.gdr   ccg_tmn2.gdr ccg_tmn3.gdr ccg_trm2.gdr ccg_trm3.gdr \
-ccg_um1.gdr   ccg_wcwi.gdr ccg_wmd2.gdr ccg_wmd3.gdr \
+ccg_um1.gdr   ccg_um3.gdr   ccg_wcwi.gdr ccg_wmd2.gdr ccg_wmd3.gdr \
 ccg_wtm2.gdr  ccg_wtm3.gdr ccg_wtm4.gdr
 
 
