@@ -1,4 +1,4 @@
-dist_bin_SCRIPTS = softlink
+dist_bin_SCRIPTS = softlink starf2c
 bin_PROGRAMS = forconv
 forconv_SOURCES = forconv.c
 

@@ -1,0 +1,5844 @@
+#!/usr/bin/env python
+
+#  Usage:
+#    starf2c <input.f>
+
+#  Purpose:
+#    Reads an F77 source file in standard StarLSE format and write
+#    vaguely equivalent C code to standard output.
+
+#  Bugs:
+#    There are probably many bugs, unsupported Fotran patterns, etc,
+#    in this script. It was originally used to convert the NDF library
+#    from F77 to C, and still contains much baggage that is not relevant
+#    outside of that task. It is intended to do nothing more than take
+#    some of the donkey work out of doing an F77 to C conversion by hand.
+#    In nearly all cases the resulting C code will need to be examined
+#    carefully and changed in many ways. In particularly, character handling
+#    in Fortran is very different to C, and the resulting C code will nearly
+#    always need changing if the code involves anything other than simple
+#    assignments. Also, array indices in the C code should be checked carefully.
+
+#  Pre-requirements:
+#    A temporary version of the Fortran source file should be created
+#    before using this tool which adheres to the following requirements:
+#    - All uses of "A**B" should be replaced by "POW(A,B)"
+#    - Generic source file should use "<TYPE>" to represent the data type
+#    in the prologue and not "?".
+
+# import pdb; pdb.set_trace()
+
+import copy
+import sys
+import os
+import pwd
+import re
+import textwrap
+import time
+import datetime
+
+LINE_LEN = 74
+
+COM_ASTERISK = 0
+COM_C = 1
+COM_NONE = 2
+COM_EOL = 3
+COM_ASTERISK_WHITE = 4
+COM_C_WHITE = 5
+COM_PROLOGUE = 6
+
+TYPE_REAL = 0
+TYPE_DOUBLE = 1
+TYPE_INTEGER = 2
+TYPE_BYTE = 3
+TYPE_LOGICAL = 4
+TYPE_CHAR = 5
+TYPE_EXTERNAL = 6
+TYPE_GENERIC = 7
+TYPE_INTEGER8 = 8
+TYPE_OTHER = 9
+type_names = [ "real", "double", "integer", "byte", "logical", "char", "external", "generic", "integer*8", "other" ]
+
+READ = 0
+WRITE = 1
+READ_WRITE = 2
+
+create_prototype = False
+
+abort = True
+function_fname = None
+size_t_used = False
+
+float_re = re.compile( '[-+]?(?:(?:\d*\.\d+)|(?:\d+\.?))(?:[EeDd][+-]?\d+)?' )
+
+cgen_code = {"d":"D", "r":"F", "i":"", "b":"B", "B":"UB", "w":"W", "W":"UW", "k":"K", "c":"C", "l":"L"}
+cgen_type = { "d":"double", "r":"float", "i":"int", "b":"char", "B":"unsigned char", "w":"short int", "W":"unsigned short int", "k":"int64_t", "c":"const char *", "l":"int"}
+
+
+def getUser():
+   username = pwd.getpwuid(os.getuid())[0].upper()
+   if username == "DSB":
+      fullname = "David S. Berry"
+   else:
+      fullname = pwd.getpwuid(os.getuid())[4]
+   return [username, fullname ]
+
+def changeTypeDec( varmap, fvarname, newtype ):
+   if fvarname in varmap:
+      varmap[fvarname].changeType(newtype)
+      result = varmap[fvarname].ctype
+      if varmap[fvarname].bounds:
+         if result[-1] == "*":
+            result += "*"
+         else:
+            result += " *"
+   else:
+      Leave("What??")
+   return result
+
+#  Return the C type of a variable, converting arrays to pointers
+def exptyp( value ):
+   if isinstance( value, Variable):
+      if value.isFpointer:
+         result = "void *"
+      else:
+         result = value.ctype
+         if value.bounds:
+            if result.endswith("*"):
+               result += "*"
+            else:
+               result += " *"
+   else:
+      result = value
+
+   if result.startswith("const "):
+      result = result[6:].strip()
+
+   return result
+
+#  Convert selected numerical types to "number".
+def numberType( value ):
+   result = value
+
+   if result.startswith("int") and "64" not in result:
+      result = "number" + result[3:]
+   elif result.startswith("float"):
+      result = "number" + result[5:]
+   elif result.startswith("double"):
+      result = "number" + result[6:]
+
+   return result
+
+#  Do two C data types match? Return the wanted type string if not, 1 if
+#  they do, 2 if they do after taking the address of the "got_type" value,
+#  3 if they do after dereferencing the "got_value" pointer.
+def args_match( wanted, got_type, fvarname, varmap, funname ):
+   cast = ""
+   if fvarname and fvarname in varmap:
+      fvar = varmap[fvarname]
+   else:
+      fvar = None
+   if not isinstance( got_type, str ):
+      Leave("Unknown original type in type comparison")
+   if not wanted:
+      Leave("Unknown required type in type comparison")
+
+   if isinstance(wanted,Variable):
+      want_type = wanted.ctype
+      if wanted.bounds:
+         if want_type[-1] == '*':
+            want_type += "*"
+         else:
+            want_type += " *"
+   else:
+      want_type = wanted
+
+#   want_typen = numberType( want_type )
+   got_typen = numberType( got_type )
+
+#   if "int" in want_typen:
+#
+#      if fvar:
+#         want_typen = got_typen
+#
+#      elif got_typen.startswith("Ndf"):
+#         got_typen = changeTypeDec( varmap, fvarname, "int" )
+#         want_typen = want_typen.replace( "number", "int" )
+
+   if "int" in want_type and "64" not in want_type and "size_t" in got_type:
+
+      # For an assignment, the want variable is the same object as the
+      # fvarname variable. In such cases the "int" variable can be
+      # changed to "size_t". Otherwise (i.e. when calling a function) the
+      # variable (i.e. the function argument definition) cannot be changed.
+      if wanted is fvar:
+         want_type = changeTypeDec( varmap, fvarname, "size_t" )
+
+      # If the called function is not from the NDF library, use a cast.
+      # Otherwise, leave the rror since we should change the called frunction
+      # argument form int to size_t.
+      elif not funname.startswith("ndf"):
+         cast = "(int)"
+         want_type = want_type.replace("int","size_t")
+
+   elif "int" in want_type and "64" not in want_type and "hdsdim" in got_type:
+      if wanted is fvar:
+         want_type = changeTypeDec( varmap, fvarname, "hdsdim" )
+
+   elif "int" in want_type and "64" not in want_type and got_type[:3] == "Ndf":
+      if wanted is fvar:
+         want_type = changeTypeDec( varmap, fvarname, got_type[:6] )
+
+   elif "int" in want_type and "64" not in want_type and got_type[:3] == "Ary":
+      if wanted is fvar:
+         want_type = changeTypeDec( varmap, fvarname, "Ary" )
+
+   elif "int" in want_type and "64" not in want_type and got_type[:3] == "AryPlace":
+      if wanted is fvar:
+         want_type = changeTypeDec( varmap, fvarname, "AryPlace" )
+
+   elif "int" in want_type and "64" not in want_type and got_type[:3] == "Ast":
+      if wanted is fvar:
+         mt = re.match( r'(Ast\w+)', got_type )
+         if mt:
+            want_type = changeTypeDec( varmap, fvarname, mt.group(1) )
+         else:
+            Leave( "What???" )
+
+   elif got_type[:3] == "Ast" and want_type[:3] == "Ast":
+      if got_type != want_type:
+         if got_type[:] == "AstObject *":
+            got_type = changeTypeDec( varmap, fvarname, want_type )
+
+   elif got_type == "number":
+      return (1,"")
+
+   elif "number" in got_typen:
+      if "int64_t" in want_type:
+         got_type = got_typen.replace( "number", "int64_t" )
+      elif "int" in want_type:
+         got_type = got_typen.replace( "number", "int" )
+      elif "float" in want_type:
+         got_type = got_typen.replace( "number", "float" )
+      elif "double" in want_type:
+         got_type = got_typen.replace( "number", "double" )
+      elif "size_t" in want_type  and fvar:
+         got_type = changeTypeDec( varmap, fvarname, "size_t" )
+      elif "hdsdim" in want_type and fvar:
+         got_type = changeTypeDec( varmap, fvarname, "hdsdim" )
+      elif "hdsbool_t" in want_type and fvar:
+         got_type = changeTypeDec( varmap, fvarname, "hdsbool_t" )
+      elif "size_t" in want_type and fvar:
+         got_type = changeTypeDec( varmap, fvarname, "size_t" )
+      elif want_type.startswith("Ast") and fvar:
+         got_type = changeTypeDec( varmap, fvarname, want_type )
+      elif want_type.startswith("Ary") and fvar:
+         got_type = changeTypeDec( varmap, fvarname, want_type )
+      elif want_type.startswith("Ndf") and fvar:
+         got_type = changeTypeDec( varmap, fvarname, want_type )
+      elif want_type.startswith("void *") and got_typen == "number" and fvar:
+         got_type = changeTypeDec( varmap, fvarname, "void *" )
+
+   elif "bool" in got_type and "hds" not in got_type:
+      if want_type.startswith("hdsbool_t"):
+         if fvarname in varmap:
+            got_type = changeTypeDec( varmap, fvarname, want_type )
+         else:
+            got_type = got_type.replace( "bool", "hdsbool_t" )
+      else:
+         got_type = got_type.replace( "bool", "int" )
+
+   elif got_type.startswith("char["):
+      iend = got_type.find("]")
+      if iend+1 < len(got_type):
+         got_type = "char *"+got_type[iend+1:].strip()
+      else:
+         got_type = "char *"
+      if want_type.startswith("const"):
+         wt = want_type[5:].lstrip()
+         const = True
+      else:
+         wt = want_type
+         const = False
+      if wt.startswith("char["):
+         iend = want_type.find("]")
+         if iend+1 < len(want_type):
+            want_type = "char *"+want_type[iend+1:].lstrip()
+         else:
+            want_type = "char *"
+         if const:
+            want_type = "const "+want_type
+
+   mt = re.match(r'Ast(\w+)', got_type )
+   if mt:
+      got_class = mt.group(1)
+      got_type = re.sub( r'Ast(\w+)', 'AstObject', got_type )
+      lib = "AST"
+   else:
+      got_class = None
+
+   mt = re.match(r'Ast(\w+)', want_type )
+   if mt:
+      want_class = mt.group(1)
+      want_type = re.sub( r'Ast(\w+)', 'AstObject', want_type )
+      lib = "AST"
+   else:
+      want_class = None
+
+   mt = re.match(r'Ndf(\w+)', got_type )
+   if mt:
+      got_class = mt.group(1)
+      got_type = re.sub( r'Ndf(\w+)', 'NdfObject', got_type )
+      lib = "NDF"
+   else:
+      got_class = None
+
+   mt = re.match(r'Ndf(\w+)', want_type )
+   if mt:
+      want_class = mt.group(1)
+      want_type = re.sub( r'Ndf(\w+)', 'NdfObject', want_type )
+      lib = "NDF"
+   else:
+      want_class = None
+
+   ok = False
+   got = got_type
+   want = want_type
+   for result in range(1,4):
+      got = got.replace(" ","")
+      want = want.replace(" ","")
+
+      if want == got:
+          ok = True
+          break
+
+      if want.startswith("const"):
+         want = want[5:]
+
+      if got.startswith("const"):
+         got = got[5:]
+
+      if want == got:
+          ok = True
+          break
+
+      if want == "void*" and re.search( r'[^\*]\*$',got) or \
+         want == "void**" and re.search( r'[^\*]\*\*$',got):
+         ok = True
+         break
+
+      if got == "void*" and re.search( r'[^\*]\*$',want) or \
+         got == "void**" and re.search( r'[^\*]\*\*$',want):
+         ok = True
+         break
+
+      if want == "char*":
+         if re.match( r'char\[[^\]]*\] *$', got ):
+            ok = True
+            break
+
+      if got == "char*":
+         if re.match( r'char\[[^\]]*\] *$', want ):
+            ok = True
+            break
+
+      if result == 1:
+         got = got_type+"*"
+      else:
+         got = got_type
+         want = want_type+"*"
+
+   if not ok:
+      result = want_type
+   elif want_class and got_class:
+      if lib == "AST" and want_class == "Object" and got_class == "Mapping":
+         cast = "("+want_type.strip()+")"
+      elif lib == "NDF" and want_class == "Object" and got_class[1:] == "CB":
+         cast = "("+want_type+")"
+
+   return (result,cast)
+
+
+#  Change the F77 comment for a DCB, ACB, PCB or FCB variable.
+def ConBlockCommentupdate( name, ctype, com ):
+   com0 = com
+
+   if ctype == "NdfFCB *":
+      mt = re.match("( *)FCB code identifying(.*)", com, re.DOTALL )
+      if mt:
+         com = mt.group(1)+"Pointer to an object describing"+mt.group(2)
+         com = re.sub( "zero", "NULL", com )
+
+   elif ctype == "NdfDCB *":
+      mt = re.match("( *)Index to (.*)", com, re.DOTALL )
+      if not mt:
+         mt = re.match("( *)Index of (.*)", com, re.DOTALL )
+      if not mt:
+         mt = re.match("( *)DCB index for (.*)", com, re.DOTALL )
+      if not mt:
+         mt = re.match("( *)DCB index identifying (.*)", com, re.DOTALL )
+      if mt:
+         com = mt.group(1)+"Pointer to "+mt.group(2)
+
+   elif ctype == "NdfACB *":
+      mt = re.match("( *)Index to (.*)", com, re.DOTALL )
+      if not mt:
+         mt = re.match("( *)Index of (.*)", com, re.DOTALL )
+      if not mt:
+         mt = re.match("( *)ACB index for (.*)", com, re.DOTALL )
+      if not mt:
+         mt = re.match("( *)ACB index identifying (.*)", com, re.DOTALL )
+      if mt:
+         com = mt.group(1)+"Pointer to "+mt.group(2)
+
+   elif ctype == "NdfPCB *":
+      mt = re.match("( *)Index to (.*)", com, re.DOTALL )
+      if not mt:
+         mt = re.match("( *)Index of (.*)", com, re.DOTALL )
+      if not mt:
+         mt = re.match("( *)PCB index for (.*)", com, re.DOTALL )
+      if not mt:
+         mt = re.match("( *)PCB index identifying (.*)", com, re.DOTALL )
+      if mt:
+         com = mt.group(1)+"Pointer to "+mt.group(2)
+   else:
+      com = None
+
+   if com and com == com0:
+      Warn("Comment describing variable '{0}' is non-standard".format(name))
+
+   return com
+
+
+#  Static edits for comments and string literals.
+def LiteralEdits( text, iscomment ):
+   result = text
+
+   edits = [[r"ndfPost_","NDF_POST_"],
+            [r"ndfFrom_","NDF_FROM_"],
+            [r"ndfTo_","NDF_TO_"],
+            [r"ndfDel_","NDF_DEL_"],
+            [r"ndfFormats_","NDF_FORMATS_"],
+            [r"ndfKeep_","NDF_KEEP_"],
+            [r"ndfTemp_","NDF_TEMP_"],
+            [r"ndfImp_","NDF_IMP_"],
+            [r"ndfExp_","NDF_EXP_"],
+            [r"ndfXtn","NDF_XTN"],
+            [r"ndfPar",'"ndf.h"'],
+            [r"ndfErr",'"ndf_err.h"'],
+            [r"ARY__NOID",'NULL'],
+            [r'n"t',"n't"],
+            [r"\bargument\b","parameter"],
+            [r"\bArgument\b","Parameter"],
+            [r"\.?TRUE\.?",'non-zero'],
+            [r"routine",'function'],
+            [r"<COMM>",'generic'],
+            [r"Routine",'Function'],
+            [r"the include file",'the header file'],
+            [r"\.?FALSE\.?",'zero'],
+           ]
+
+   if iscomment:
+      result = re.sub(r"'(?!s )", '"', result)
+
+   result = re.sub(r"(?<!\w)[A-Z]{3}_[A-Z]+", lambda x: '"'+findH(x.group())+'"', result )
+   result = re.sub(r"(?<!\w)[A-Z]{3}_[A-Z]+", lambda x: CName(x.group()), result )
+
+   for edit in edits:
+      result = re.sub( edit[0], edit[1], result)
+
+   return result
+
+#  Static edits for lines of code...
+def CodeEdits( line ):
+   result = line
+   result = re.sub( r'\( *double *\)', '(double)', result )
+   result = re.sub( r'\( *float *\)', '(float)', result )
+   result = re.sub( r'\( *int *\)', '(int)', result )
+   result = re.sub( r'\*NULL', 'NULL', result )
+   result = re.sub(r'datMap(\w+)', lambda x: r'datMap{}'.format(x.group(1).upper()), result)
+   result = re.sub(r'datGet(\w+)', lambda x: r'datGet{}'.format(x.group(1).upper()), result)
+   result = re.sub(r'datPut(\w+)', lambda x: r'datPut{}'.format(x.group(1).upper()), result)
+   result = re.sub( r'#include "ast.h"', '#include "ndf_ast.h"', result )
+   return result
+
+#  Final edits after all other formatting.
+def postsubs( line ):
+   result = line
+   result = re.sub( r' *### *', '', result )
+   return result
+
+
+#  Simplify a C expression by combining any +ve and -ve numerical literals
+#  that occur at the top level.
+def Simplify( cexpr, negate=False ):
+
+   result = cexpr.strip()
+
+   if result and '"' not in result:
+      cexlen = len( result )
+
+      # Expand top level parentheses that are preceded and followed by an
+      # additive operator.
+      new = ""
+      open_at = FindOpener( result, 0 )
+      close_at = -1
+      while open_at >= 0:
+         if open_at == 0:
+            op = "+"
+         else:
+            if not new or new[-1] != ")" or result[close_at+1] != "(":
+               new += " "
+            new += result[close_at+1:open_at].strip()
+            op = new[-1]
+            new = new[:-1].rstrip()
+
+         close_at = FindCloser( result, open_at )
+
+         if close_at+1 < cexlen:
+            opend = (result[close_at+1:].lstrip())[0]
+         else:
+            opend = "+"
+
+         if op in "+-" and opend in "+-":
+            subexp = Simplify( result[open_at+1:close_at], (op == "-") )
+            if subexp[0] not in "+-" and new:
+               new += " +"
+            new += " "+subexp
+         else:
+            if not op.isalnum() and op != ")" and op != "*" and op != "/":
+               op += " "
+            new += op+result[open_at:close_at+1]
+
+         open_at = FindOpener( result, close_at )
+
+      result = new + result[close_at+1:]
+
+
+      #  Split the expression into additive terms and gather all literal
+      #  numerical terms together into a single value.
+      opat = []
+      if result[0] != '+' and result[0] != '-':
+         opat.append(-1)
+
+      for op in ['-','+']:
+         start = 0
+         while True:
+            at = FindBare( op, result, start, '"' )
+            if at is not None and at != -1:
+               opat.append(at)
+               start = at + 1
+            else:
+               break
+      if opat:
+         opat.sort()
+         words = []
+         ops = []
+         numex = ''
+         lat = opat[0]+1
+         for at in opat[1:]:
+            if lat > 0:
+               op = result[lat-1]
+            else:
+               op = '+'
+            word = result[lat:at].strip()
+            mt = re.match( float_re, word )
+            if mt and mt.end() == len(word):
+               numex += op+word.replace( "d", "e" )
+            else:
+               ops.append( op.strip() )
+               words.append( word.strip() )
+            lat = at + 1
+
+         if lat > 0:
+            op = result[lat-1]
+         else:
+            op = '+'
+         word = result[lat:].strip()
+         mt = re.match( float_re, word )
+         if mt and mt.end() == len(word):
+            numex += op+word.replace( "d", "e" )
+         else:
+            ops.append( op.strip() )
+            words.append( word.strip() )
+
+         #  Look for equal terms that can be combined.
+         nword = len(words)
+         for i in range(nword):
+            if words[i] != "":
+               n = 1 if ops[i] == "+" else -1
+
+               for j in range(i+1,nword):
+                  if words[j] == words[i]:
+                     words[j] =  ""
+                     n += 1 if ops[j] == "+" else -1
+
+               if n > 0:
+                  ops[i] = "+"
+               elif n < 0:
+                  ops[i] = "-"
+               else:
+                  ops[i] = ""
+                  words[i] = ""
+
+               if abs(n) > 1:
+                  if "+" in words[i] or "-" in words[i]:
+                     words[i] = "{0}*({1})".format(n,words[i])
+                  else:
+                     words[i] = "{0}*{1}".format(n,words[i])
+
+
+         # Concatenate all the remaining words
+         first = True
+         result = ''
+         for (op,word) in zip(ops,words):
+            if word:
+               if negate:
+                  op = "-" if op == "+" else "+"
+
+               if first:
+                  first = False
+                  if op == '-':
+                     result = '-'
+               else:
+                  result += " "+op+" "
+               result += word
+
+         #  Evaluate the literal numerical term and append it to the result.
+         if numex:
+            numval = eval(numex)
+
+            if negate:
+               numval = -numval
+
+            if numval < 0:
+               if result:
+                  result += ' - '+str(-numval)
+               else:
+                  result = '-'+str(-numval)
+
+            elif numval > 0:
+               if result:
+                  result += ' + '+str(numval)
+               else:
+                  result = str(numval)
+
+            elif not result:
+               if "." in numex:
+                  result = '0.0'
+               else:
+                  result = '0'
+         elif not result:
+            result = '0'
+
+      result = re.sub( r' *- *> *', '->', result )
+
+   return result
+
+#  If the supplied text is a reference to a character variable substring,
+#  return the C variable name, C zero-based start and end indices, and
+#  variable length (including terminating null).
+def substring( fexp, item, varmap, dtype=[""] ):
+   if item and varmap is None:
+      varmap = item.getVarMap()
+   dtype[0] = None
+   result = None
+   fltext = None
+   ischar = False
+   length = None
+   fexp = fexp.strip()
+
+   parts = FuncSplit( fexp, None, quote="'" )
+   if parts:
+      sparts = FuncSplit( parts[0], None, quote="'" )
+   else:
+      sparts = None
+
+   # form "name(...)(...)" - must be CHARACTER with substring specifier
+   if sparts:
+      tparts = substring( parts[0], item, varmap, dtype )
+      if tparts:
+         ischar = True
+         cname = tparts[0]
+         length = tparts[3]
+         fltext = parts[2]
+
+   # form "name(...)" - may be CHARACTER with substring specifier or may be
+   # array element or function call
+   elif parts:
+      fvar = parts[0]
+      var = None
+      if varmap and fvar in varmap:
+         var = varmap[ fvar ]
+
+      # Variable ref: may be an array element or a CHARACTER substring.
+      if var:
+         if var.bounds:
+            cname = CExpr( fexp, item, dtype, False, varmap, nosubstring=True )
+         else:
+            cname = CExpr( fvar, item, dtype, False, varmap, nosubstring=True )
+            if len(parts) > 2:
+               fltext = parts[2]
+         ischar = isCharType( dtype[0] )
+
+   # form "name" - may be CHARACTER variable with no substring specifier
+   elif varmap and fexp in varmap:
+      var = varmap[ fexp ]
+      if not var.bounds:
+         cname = CName( fexp, varmap )
+         ischar = isCharVar( var )
+
+   if ischar:
+      if not length and var:
+         if not dtype[0]:
+            dtype[0] = var.ctype
+         if dtype[0] == "const char *":
+            length = "strlen( "+cname+" ) + 1"
+         elif dtype[0] == "char *":
+            if isinstance( var, Argument ) and var.length_var:
+               length = var.length_var
+            else:
+               length = "strlen( "+cname+" ) + 1"
+         elif dtype[0].startswith( "char[" ):
+            length = "sizeof( "+cname+" )"
+         elif dtype[0].startswith( "const char[" ):
+            length = "sizeof( "+cname+" )"
+         else:
+            Leave(" char type of unknown length - "+dtype[0] )
+
+      if fltext:
+         parts = fltext.split( ':' )
+         if len(parts) == 1:
+            parts[0] = parts[0].strip()
+            if parts[0] in varmap:
+               varmap[parts[0]].changeType("size_t")
+            start_at = DecExpr( CExpr( parts[0], item, [""], varmap=varmap ) )
+            end_at = start_at
+
+         elif len(parts) == 2:
+            if parts[0]:
+               parts[0] = parts[0].strip()
+               if parts[0] in varmap:
+                  varmap[parts[0]].changeType("size_t")
+               start_at = DecExpr( CExpr( parts[0], item, [""], varmap=varmap ) )
+            else:
+               start_at = ""
+            if parts[1]:
+               parts[1] = parts[1].strip()
+               if parts[1] in varmap:
+                  varmap[parts[1]].changeType("size_t")
+               end_at = DecExpr( CExpr( parts[1], item, [""], varmap=varmap ) )
+            else:
+               end_at = ""
+         else:
+            Leave("More than one ':' in substring specifier")
+      else:
+         start_at = None
+         end_at = None
+
+      result = [ cname, start_at, end_at, length ]
+
+   return result
+
+
+#  Add an end-of-line comment.
+def addEOLComment( text, com ):
+   if com:
+      i = max( 25, 15 + 10*( 1 + max(len(text)-16,0)//10 ))
+      text += " " * (i-len(text)) + "/*"
+      lindent = len(text)
+      indent = " " * lindent
+      width = max( 20, LINE_LEN-len(text) )
+      first = True
+      for line in textwrap.wrap( com, width=width ):
+         if first:
+            text += line
+            first = False
+         else:
+            text += "\n"+indent+line
+      text += " */"
+   return text
+
+#  Decrement the value of a C expression by 1, and attempt to simplify it
+#  (e.g. if cexp is "fred+2", return "fred+2-1" simplified to "fred+1").
+#  The simplification options are currently very limited.
+def DecExpr( cexp ):
+   return Simplify( cexp + "-1" )
+
+#  Increment the value of a C expression by 1, and attempt to simplify it
+#  (e.g. if cexp is "fred+2", return "fred+2+1" simplified to "fred+3").
+#  The simplification options are currently very limited.
+def IncExpr( cexp ):
+   return Simplify( cexp + "+1" )
+
+#  Single statements (i.e. anythign that can come at the end of a
+#  single-line IF statement)
+def statementFactory( iline, code, funcParts, com ):
+   result = None
+
+#  subroutine call
+   if result is None and funcParts and funcParts[0].startswith("CALL ") and funcParts[1] == '':
+      result = Call( iline, code.lstrip()[5:], com )
+
+#  subroutine call (no argument list)
+   if result is None:
+      mt = re.match("^ *CALL (\w+)", code )
+      if mt:
+         result = Call( iline, code.lstrip()[5:].rstrip()+"()", com )
+
+#  Assignment
+   if result is None:
+      iat = FindBare( '=', code, 0 )
+      if iat > 0:
+         lhs = code[:iat].strip()
+         iat2 = FindBare( ' ', lhs, 0 )
+         if iat2 is None or iat2 < 0:
+            result = Equals( iline, code[:iat], code[iat+1:], com )
+
+#  GO TO
+   if result is None:
+      mt = re.match(r'^ *GO *TO *(\d+) *$', code, re.IGNORECASE)
+      if mt:
+          result = GoTo( iline, mt.group(1), com )
+
+#  RETURN
+   if result is None:
+      if code.strip().upper() == "RETURN":
+         result = Return( iline, com )
+
+   return result
+
+#  Is the supplied C type a character type?
+def isCharType( ctype ):
+   if not ctype:
+      return False
+   return ( ctype == "char *" or
+            ctype == "const char *" or
+            ( ctype.startswith( "char[" ) ) or
+            ( ctype.startswith( "const char[" ) ) )
+
+#  Is the supplied C token a character variable or a string literal?
+def isCharVar( var ):
+   if not var:
+       return False
+   if var.type_code == TYPE_CHAR or var.type_code == TYPE_OTHER:
+      return isCharType( var.ctype )
+   else:
+      return False
+
+#  Is the supplied C token a character variable or a string literal?
+def isChar( token, varmap ):
+   if token.startswith("astFormat") or token.startswith("astGetC") or token.startswith("astMapKey"):
+      return True
+
+   if token.startswith('"'):
+      return True
+   elif varmap:
+      fvar = FName( token )
+      if fvar in varmap:
+         return (varmap[fvar].type_code == TYPE_CHAR)
+      else:
+         return False
+   else:
+      return False
+
+
+def formatCode( self, text, indent ):
+   if self.label:
+      label = "L"+str(self.label)+":"
+      lablen = len(label)
+   else:
+      label = None
+   result = ""
+   if indent is not None:
+      for line in codeWrap( text, LINE_LEN - len(indent) ):
+         linetext = indent + line+"\n"
+         if label:
+            nlspace = len(linetext)-len(linetext.lstrip())
+            if nlspace > lablen:
+               linetext = label+linetext[lablen:]
+            else:
+               linetext = label+linetext[nlspace-1:]
+            label = None
+         result += linetext
+   else:
+      if label:
+         nlspace = len(text)-len(text.lstrip())
+         if nlspace > lablen:
+            text = label+text[lablen:]
+         else:
+            text = label+text[nlspace-1:]
+         label = None
+      result += text
+
+   return CodeEdits( result )
+
+#  Return the index of the character holding the closing parenethesis
+#  that matches the specified opening parenthes.
+def FindCloser( text, open_at, use="()", quote="'" ):
+   if text[open_at] != use[0]:
+      Leave("FindCloser: supplied start is not an opening parenthesis")
+   tlen = len(text)
+
+   again = True
+   while again:
+      again = False
+
+      result = -1
+      quoted = False
+      depth = 1
+      iat = open_at+1
+      while iat < tlen:
+         if text[iat] == use[0] and not quoted:
+            depth += 1
+         elif text[iat] == use[1] and not quoted:
+            depth -= 1
+            if depth == 0:
+               result = iat
+               break
+            elif depth < 0:
+               Leave("Too many closing parentheses in '{0}'".format(text))
+         elif text[iat] == quote:
+            if text[iat-1] != '\\':
+               quoted = not quoted
+         iat += 1
+
+      if result > open_at and text[:result].endswith("###"):
+         again = True
+         open_at = result + 1
+
+   return result
+
+#  Return the index of the character holding the first opening parenthesis
+#  in the string, following character "start".
+def FindOpener( text, start=0, spaces_only=False, use="(", quote="'" ):
+   again = True
+   while again:
+      again = False
+      open_at = FindBare( use, text, start, quote=quote, par=False )
+      if open_at >= 0:
+         if spaces_only and text[:open_at].strip():
+            open_at = -1
+      if open_at >= 0:
+         if text[open_at+1:].startswith("###"):
+            start = open_at + 1
+            again = True
+   return open_at
+
+#  Convert an F77 expression to C
+def CExpr( expr, item, dtype=[""], call=False, varmap=None, warglist=None, nosubstring=False ):
+   expr_type = None
+   operator_type = None
+   operand_type = None
+
+   if not varmap and item:
+      varmap = item.getVarMap()
+   if not warglist and item:
+      warglist = item.getWargList()
+   result = ''
+   rest = expr
+   elen = len(expr)
+   closepar = 0
+   substring_start = None
+   operand = None
+   close_strcat = 0
+   nc = 0
+
+   while nc < elen:
+
+#  Check the data type created by the previous operator matches that of
+#  the whole expression. Set the expression data type if it ihas not yet
+#  been determined.
+      if not expr_type:
+         expr_type = operator_type
+#      elif operator_type and operator_type != expr_type:
+#         Leave("Expected {0} but found {1} at '{2}' in expression '{3}'.".format(expr_type, operator_type, rest, expr) )
+      operator_type = None
+
+#  Remove the previous token from the start of the expression.
+      rest = rest[ nc: ]
+      restlc = rest.lower()
+      elen -= nc
+
+#  Look for recognised tokens at the start of the string. Set "nc" to the
+#  number of input characters occupied by the token. Increment "result"
+#  with the C equivalent of the token.
+
+#  Leading spaces
+      if rest[0] == ' ':
+         nc = 1
+         while nc < elen and rest[nc] == ' ':
+            nc += 1
+         continue
+
+#  Is it time to close the argument list for a string comparison function?
+      if closepar > 0:
+         closepar -= 1
+         if closepar == 1:
+
+#  Check if we are comparing single characters. Replace the string
+#  comparison function with an equality if so.
+            newtext = None
+            if "strncmp" in compfn:
+               j0 = result.rfind(compfn)
+               kk = FindBare( ',', result, j0 + len(compfn) + 1 )
+               comparg2 = result[kk+1:].strip()
+
+               if comparg2[0] == '"' and comparg2[-1] == '"':
+                  cval = comparg2[1:-1]
+                  if cval[0] == '\\':
+                     cval = cval[1:]
+
+                  mt = re.match( r'(\w+)\+(.*)$', comparg1 )
+                  if mt and len(cval) == 1:
+                     varname = mt.group(1)
+                     offset = mt.group(2)
+                     if FName(varname) in varmap:
+                        if compfn[0] == "!":
+                           newtext = "{0}[ {1} ] == '{2}'".format(varname,offset,cval)
+                        else:
+                           newtext = "{0}[ {1} ] != '{2}'".format(varname,offset,cval)
+
+               elif comparg1[0] == '"' and len(comparg1) == 3:
+                  cval = comparg1[1:-1]
+                  if cval[0] == '\\':
+                     cval = cval[1:]
+                  mt = re.match( r'(\w+)\+(.*)$', comparg2 )
+                  if mt and len(cval) == 1:
+                     varname = mt.group(1)
+                     offset = mt.group(2)
+                     if FName(varname) in varmap:
+                        if compfn[0] == "!":
+                           newtext = "'{2}' == {0}[ {1} ]".format(varname,offset,cval)
+                        else:
+                           newtext = "'{2}' != {0}[ {1} ]".format(varname,offset,cval)
+
+               if newtext is not None:
+                  if compnn != "1":
+                      newtext = None
+                  else:
+                     result = result[:j0]+newtext
+
+            if newtext is None:
+               if compnn:
+                  result += ", "+compnn
+               result += ' )'
+
+            closepar = 0
+
+# Pre-formatted C expressions
+      if rest[0] == '$':
+         close_at = FindBare( '$', rest, 1 )
+         if close_at > 0:
+            result += rest[1:close_at]
+            nc = close_at + 1
+            continue
+         else:
+            Leave( "Incomplete pre-formatted C expression in '{0}'.".format(expr))
+
+#  Logical operators.
+      if restlc.startswith( ".ne." ):
+         operator_type = "bool"
+         mt = re.match( r'.ne. *ast__null', restlc )
+         if not mt:
+            mt = re.match( r'.ne. *dat__noloc', restlc )
+         if not mt:
+            mt = re.match( r'.ne. *ary__noid', restlc )
+         if mt:
+            nc = mt.end()
+         else:
+            if isChar( operand, varmap ):
+               comparg1 = operand
+               compnn = None
+               if substring_start is not None:
+                  compfn = "strncmp"
+                  item.addH( "<string.h>")
+                  if not substring_end:
+                     compfn = "strcmp"
+                     item.addH( "<string.h>")
+                  elif substring_start:
+                     compnn = IncExpr( substring_end+"-("+substring_start+")" )
+                  else:
+                     compnn = IncExpr( substring_end )
+
+                  if substring_start:
+                     comparg1 += "+"+substring_start
+                  substring_start = None
+               else:
+                  compfn = "strcmp"
+                  item.addH( "<string.h>")
+               newtext = compfn+"( "+comparg1+", "
+               result = re.sub( re.escape(operand)+r' *$', newtext, result )
+
+               closepar = 3
+            else:
+               result += " != "
+            nc = 4
+         continue
+
+      if restlc.startswith( ".eq." ):
+         operator_type = "bool"
+         mt = re.match( r'.eq. *ast__null', restlc )
+         if not mt:
+            mt = re.match( r'.eq. *dat__noloc', restlc )
+         if not mt:
+            mt = re.match( r'.eq. *ary__noid', restlc )
+         if mt:
+            nc = mt.end()
+            newtext = "!"+operand
+            result = re.sub( re.escape(operand)+r' *$', newtext, result )
+         else:
+            if isChar( operand, varmap ):
+               comparg1 = operand
+               compnn = None
+               if substring_start is not None:
+                  compfn = "!strncmp"
+                  item.addH( "<string.h>")
+                  if not substring_end:
+                     compfn = "!strcmp"
+                     item.addH( "<string.h>")
+                  elif substring_start:
+                     compnn = IncExpr( substring_end+"-("+substring_start+")" )
+                  else:
+                     compnn = IncExpr(substring_end)
+
+                  if substring_start:
+                     comparg1 += "+"+substring_start
+                  substring_start = None
+               else:
+                  compfn = "!strcmp"
+                  item.addH( "<string.h>")
+               newtext = compfn+"( "+comparg1+", "
+               result = re.sub( re.escape(operand)+r' *$', newtext, result )
+
+               closepar = 3
+            else:
+               result += " == "
+            nc = 4
+         continue
+
+      #  CHARACTER substrings that extend to the end do not need to be
+      #  copied since they will include a terminating null.
+      if substring_start and operand.isalnum() and not substring_end:
+         operator_type = operand_type
+         newtext = operand+" + "+substring_start
+         result = re.sub( re.escape(operand)+r' *$', newtext, result )
+         operand = newtext
+         nc = 0
+         substring_start = None
+         continue
+
+      #  Other CHARACTER substrings are extracted by ndf1Strsub into a
+      #  dynamically allocated buffer.
+      if substring_start is not None:
+         newtext = "ndf1Strsub( "+operand+", "
+         if substring_start:
+            newtext += substring_start+", "
+         else:
+            newtext += "-1, "
+         if substring_end:
+            newtext += substring_end+", "
+         else:
+            newtext += "-1, "
+         newtext += "status )"
+         result = re.sub( re.escape(operand)+r' *$', newtext, result )
+         operand = newtext
+         operator_type = "char *"
+         operand_type = "char *"
+
+         substring_start = None
+         nc = 0
+         continue
+
+      if restlc.startswith( ".gt." ):
+         operator_type = "bool"
+         result += " > "
+         nc = 4
+         continue
+
+      if restlc.startswith( ".lt." ):
+         operator_type = "bool"
+         result += " < "
+         nc = 4
+         continue
+
+      if restlc.startswith( ".ge." ):
+         operator_type = "bool"
+         result += " >= "
+         nc = 4
+         continue
+
+      if restlc.startswith( ".le." ):
+         operator_type = "bool"
+         result += " <= "
+         nc = 4
+         continue
+
+      if restlc.startswith( ".or." ):
+         operator_type = "bool"
+         result += " || "
+         nc = 4
+         continue
+
+      if restlc.startswith( ".and." ):
+         operator_type = "bool"
+         result += " && "
+         nc = 5
+         continue
+
+      if restlc.startswith( ".not." ):
+         operator_type = "bool"
+         result += "!"
+         nc = 5
+         continue
+
+      if restlc.startswith( ".eqv." ):
+         operator_type = "bool"
+         result += " == "
+         nc = 5
+         continue
+
+      if restlc.startswith( ".neqv." ):
+         operator_type = "bool"
+         result += " != "
+         nc = 6
+         continue
+
+#  String operators (do this before checking for "/" - division).
+      if rest.startswith( "//" ):
+         if close_strcat == 0:
+            newtext = "ndf1Strcat( status, "+operand
+         else:
+            newtext = ", "+operand
+         result = re.sub( re.escape(operand)+r' *$', newtext, result )
+
+         nc = 2
+         close_strcat = 2
+         continue
+
+      elif close_strcat == 2:
+         close_strcat = 1
+
+      elif close_strcat == 1:
+         operand_type = "char *"
+         operator_type = "char *"
+         newtext = ", "+operand+" )"
+         result = re.sub( re.escape(operand)+r' *$', newtext, result )
+         close_strcat = 0
+
+#  Arithmetic operators.
+      if rest.startswith( "+" ):
+         operator_type = operand_type
+         result += " + "
+         nc = 1
+         continue
+
+      if rest.startswith( "-" ):
+         operator_type = operand_type
+         result += " - "
+         nc = 1
+         continue
+
+      if rest.startswith( "**" ):
+         operator_type = operand_type
+         Leave( "Unsupported '**' operator in '{0}'.".format(expr))
+
+      if rest.startswith( "*" ):
+         operator_type = operand_type
+         result += "*"
+         nc = 1
+         continue
+
+      if rest.startswith( "/" ):
+         operator_type = operand_type
+         result += "/"
+         nc = 1
+         continue
+
+#  Logical operands
+      if restlc.startswith( ".false." ):
+         operand_type = "bool"
+         operand = "0"
+         result += operand
+         nc = 7
+         continue
+
+      if restlc.startswith( ".true." ):
+         operand_type = "bool"
+         operand = "1"
+         result += operand
+         nc = 6
+         continue
+
+#  A number (integer or decimal):
+      mt = re.match( float_re, rest )
+      if mt:
+         operand = mt.group().lower()
+         operand = operand.strip().replace( "d", "e" )
+         if operand.endswith("e0"):
+            operand = operand[:-2]
+         result += operand
+         nc = mt.end()
+         operand_type = "number"
+         continue
+
+#  Open parenthesis.
+      if rest.startswith( "(" ):
+         close_at = FindCloser( rest, 0 )
+         subexp = CExpr( rest[1:close_at], item, dtype, False, varmap, warglist, nosubstring )
+         operand = "( "+subexp+" )"
+         operand_type = dtype[0]
+         result += operand
+         nc = close_at + 1
+         continue
+
+#  Quoted string.
+      if rest.startswith( "'" ):
+         nc = 0
+         while True:
+            nc += 1
+            if nc < elen and rest[nc] == "'":
+               if nc == elen-1 or rest[nc+1] != "'":
+                  break
+               else:
+                  nc += 1
+         text = rest[1:nc]
+         text = text.replace( "''", "'")
+         text = text.replace( '"', r'\"')
+         operand = LiteralEdits('"'+text+'"', False)
+         operand_type = "const char *"
+         result += operand
+         nc += 1
+         continue
+
+#  Prepare to check for various things that include an opening parenthesis....
+      substring_start = None
+      mt = re.match( r'(\w+) *\(', rest )
+      if not mt:
+         mt = re.match( r'(%VAL) *\(', rest )
+      if not mt:
+         mt = re.match( r'(\w+<T>) *\(', rest )
+      if mt:
+         token = mt.group(1)
+         open_at = mt.end() - 1
+         close_at = FindCloser( rest, open_at )
+         if close_at < 0:
+            Leave("Cannot find closing parenthesis in expresssion '{0}'.".format(expr))
+
+         # In case it's a substring of an element of a character array
+         # - e.g. "A( 2 )(1:2)" - see if there is an adjacent opening
+         # parenthesis.
+         mt = re.match(r' *\(',rest[close_at+1:])
+         if mt:
+            open_at = close_at + mt.end()
+            close_at = FindCloser( rest, open_at )
+            if close_at < 0:
+               Leave("Cannot find closing parenthesis in expresssion '{0}'.".format(expr))
+
+#  Character substring
+         if not nosubstring:
+            parts = substring( rest[:close_at+1], item, varmap, dtype )
+            if parts:
+               operand = parts[0]
+               operand_type = dtype[0]
+               substring_start = parts[1]
+               substring_end = parts[2]
+               result += operand
+               nc = close_at + 1
+               continue
+
+#  Array reference. Decrement the array index because C array indices are
+#  zero-based. Also reverse the order of indices if it is multi-dimensional.
+#  Also drop the first (Fortran) dimension if required (i.e. if it has
+#  size 1).
+         uctoken = token.upper()
+         if varmap and uctoken in varmap:
+            var = varmap[uctoken]
+            isArray = var.bounds
+            isCPointer = (var.ctype[-1] == "*")
+            if isArray or var.dropdim1 or isCPointer:
+               indices =  CommaSplit( rest[open_at+1:close_at], None )
+               if var.dropdim1:
+                  if len(indices) > 1:
+                     indices = indices[1:]
+                  else:
+                     indices = None
+
+               operand = CName(token,varmap)
+               operand_type = exptyp( var.ctype )
+
+               if not isArray and operand_type[:-1] == "*":
+                  operand_type = operand_type[:-1].rstrip()
+
+               if indices:
+                  operand += "[ "
+
+                  iarg = 0
+                  first = True
+                  for indx in reversed( indices ):
+                     subexp = CExpr( indx, item, dtype, False, varmap, warglist, nosubstring )
+                     dec = True
+                     if indx in varmap:
+                        if varmap[indx].zerobased:
+                           dec = False
+                     if dec:
+                        subexp = DecExpr( subexp )
+
+                     if var.addIndex:
+                        addindex = var.addIndex[iarg]
+                        if addindex:
+                           subexp = Simplify( "{0} + ({1})".format(subexp,addindex) )
+
+                     if first:
+                        first = False
+                     else:
+                        operand += ", "
+                     operand += subexp+" ]"
+                     iarg += 1
+
+               result += operand
+               nc = close_at + 1
+               continue
+
+#  %VAL
+         if token == "%VAL":
+            vop = FindOpener( rest, open_at+1 )
+            vcl = FindCloser( rest, vop )
+
+            mt = re.match( r' *CNF_PVAL', rest[open_at+1:] )
+            if not mt:
+               mt = re.match( r' *CNF_CVAL', rest[open_at+1:] )
+               pntr = False
+            else:
+               pntr = True
+            if mt and vop >= 0 and vcl > vop:
+               rest[vop+1:vcl]
+               mt = re.match( r' *(\w+)', rest[vop+1:vcl] )
+               if mt:
+                  varname = mt.group(1)
+               else:
+                  varname = ""
+
+               if varmap and varname in varmap:
+                  var = varmap[varname]
+
+               if var:
+                  if pntr :
+                     var.isFpointer = True
+                     operand_type = "void *"
+                  else:
+                     var.ctype = "size_t"
+                     operand_type = "size_t"
+                  var.resetCdec()
+                  operand = CExpr( rest[vop+1:vcl], item, dtype, False, varmap, warglist, nosubstring )
+                  result += operand
+                  nc = close_at + 1
+                  continue
+
+               else:
+                  Leave( "Unknown variable '{0}' referred to in '{1}'.".format(rest[vop+1:vcl],expr))
+            else:
+               Leave( "%VAL with no CNF_PVAL or CNF_CVAL in '{0}'.".format(expr))
+
+
+#  Function call.
+         operand = ""
+         if token == "LEN":
+            var = rest[open_at+1:close_at].strip()
+
+            parts = substring( var, item, varmap )
+            if parts:
+               operand = parts[3]+"-1"
+               operand_type = "size_t"
+            else:
+               Leave( "Do not know the length of character string '{0}' in '{1}'.".format(var,expr))
+
+         if operand == "":
+            if token.endswith("<T>"):
+               funname = "CGEN_FUNCTION( "+CName(token[:-3],varmap)+" )"
+            else:
+               funname = CName(token,varmap)
+
+            if funname.startswith("msg") or funname.startswith("err"):
+               item.addH( "mers.h")
+
+            elif funname.startswith("ast"):
+               item.addH( "ast.h")
+
+            elif funname.startswith("star_"):
+               item.addH( "star/util.h")
+
+            args = None
+            operand_type = None
+
+            operand = funname+"( "
+
+            isAst = operand.startswith("ast")
+
+            ischr = False
+            arg_dtypes = []
+            arg_exps = []
+            useNULL = False
+            first = True
+            expstart = open_at + 1
+            iarg = -1
+            narg = 0
+            comma = FindBare( ',', rest, expstart )
+            if comma is None or comma == -1 or comma > close_at:
+               comma = close_at
+            while comma >= 0 and comma <= close_at:
+               iarg += 1
+               fname = rest[expstart:comma].strip()
+               if "CNF_CVAL" in fname:
+                  break
+
+               subexp = CExpr( fname, item, dtype, True, varmap, warglist ).strip()
+
+               if funname == "fabs":
+                  if first and dtype[0] not in "double float":
+                     funname = "abs"
+                     operand = "abs( "
+                     item.addH( "<stdlib.h>")
+                  else:
+                     item.addH( "<math.h>")
+               elif funname == "nint":
+                  funname = "round"
+                  operand = "round( "
+                  item.addH( "<math.h>")
+               elif funname == "sqrt":
+                  item.addH( "<math.h>")
+               elif funname == "chrLen":
+                  funname = "astChrLen"
+                  operand = "astChrLen( "
+                  item.addH( "ndf_ast.h")
+               elif funname == "chrSimlr":
+                  funname = "astChrMatch"
+                  operand = "astChrMatch( "
+                  item.addH( "ndf_ast.h")
+
+               xparts = FuncSplit( fname, None )
+               if xparts and not xparts[1]:
+                  fname = xparts[0]
+                  isarray = True
+               else:
+                  isarray = False
+
+               if iarg == 0 and funname == "chrItoc":
+                  ischr = True
+                  if dtype[0] == "hdsdim":
+                     funname = "hdsDimtoc"
+                  elif dtype[0] == "size_t":
+                     funname = "chrSizetoc"
+
+                  args = None
+                  operand_type = None
+
+                  operand = funname+"( "
+
+               if funname.startswith("chr"):
+                  ischr = True
+                  item.useschr()
+
+               if fname in varmap and not varmap[fname].fixedtype:
+                  a = dtype[0]
+                  dtype[0] = exptyp(varmap[fname].ctype)
+
+                  # Variable is an array and the F token is for the whole
+                  # array, not just an element, so increase the level of pointing
+                  # in dtype so that it refers to the whole array.
+                  if varmap[fname].bounds and not isarray:
+                     if dtype[0][-1] == "*":
+                        dtype[0] += "*"
+                     else:
+                        dtype[0] += " *"
+
+                  elif isarray and varmap[fname].bounds is None:
+                     if dtype[0] == 'char *':
+                        dtype[0] = 'char'
+                     elif not varmap[fname].dropdim1 and "char" not in varmap[fname].ctype:
+                        Leave( "What?? - is {0} an array or not?".format(fname))
+
+               if iarg == 0 and ( token.startswith("ERR_REP") or token.startswith("MSG_OUT") or \
+                                  token.startswith("EMS_REP") or token.startswith("EMS_OUT")):
+                  subexp = '" "'
+
+               isStatus = ( subexp == "status" )
+               if not ( isAst and isStatus ):  # AST C functions have no status
+                  if args:
+                     if iarg >= len(args):
+                        Leave("Too many arguments supplied when calling {0}".format(funname))
+                     ival = 0
+                     cast = None
+
+                     if funname == "datNew":
+                        if iarg == 3 and fname == "0":
+                           useNULL = True
+                        elif iarg == 4 and useNULL:
+                           dtype[0] = "const hdsdim *"
+                           subexp = "NULL"
+                           useNULL = False
+
+                        if iarg == 3 and fname == "0":
+                           useNULL = True
+                        elif iarg == 4 and useNULL:
+                           dtype[0] = "const hdsdim *"
+                           subexp = "NULL"
+                           useNULL = False
+
+                     elif subexp == "0" and args[iarg].ctype.startswith("Ndf"):
+                        subexp = "NULL"
+                        ival = 1
+
+                     elif dtype[0] is None:
+                        ival =  1
+
+                     if not ival:
+                        (ival,cast) = args_match( args[iarg], dtype[0], \
+                                                  fname, varmap, funname )
+                     if isinstance( ival, str ):
+                        if ival.endswith("*") and subexp == "0":
+                           subexp = "NULL"
+                        else:
+                           Leave("Type mismatch for arg {0} ('{1}') of {2}.\n   Expected '{3}' but got '{4}'.\n   F77 argument is '{5}'. C argument is '{6}'.".format(iarg,args[iarg].cname,funname,ival,dtype[0],rest[expstart:comma],subexp))
+                     elif ival == 2:
+                        mt = re.match( r'(.*)\[([^\[]+)\]$', subexp )
+                        if mt:
+                           subexp = mt.group(1).strip() + " + " + mt.group(2).strip()
+                        else:
+
+                           if fname in varmap:
+#                              if varmap[fname].decr:
+#                                 subexp = DecExpr( subexp )
+
+                           # Character indices retruned by C chr functions are
+                           # zero-based, unlike the F77 chr functions which are one-based.
+                              if ischr and "size_t" in varmap[fname].ctype:
+                                 subexp = DecExpr( subexp )
+                                 varmap[fname].decr = True
+
+                           subexp = "&"+subexp
+
+                     elif ival == 3:
+#                        if fname in varmap:
+#                           if varmap[fname].decr:
+#                              subexp = DecExpr( subexp )
+                        subexp = "*"+subexp
+
+                     if cast and not funname.startswith("ast"):
+                        subexp = cast+" "+subexp
+
+                     if fname in varmap:
+                        if not args[iarg].ctype.startswith("const"):
+                           varmap[fname].isliteral = False
+
+                  if first:
+                     first = False
+                     if funname == "NDF_MAX" or funname == "NDF_MIN":
+                        operand_type = dtype[0]
+
+                  else:
+                     operand += ", "
+                  operand += subexp
+                  arg_exps.append( subexp )
+                  arg_dtypes.append(dtype[0])
+                  narg += 1
+
+                  if fname.startswith("IAX"):
+#                 if "funname == "ndf1Van" and ( iarg == 3 or iarg == 4 ):
+                     varmap[fname].decr = True
+                     varmap[fname].zerobased = True
+
+                  elif ( funname == "ndf1Simlr" or funname == "ndf1Chxnm" ) and iarg == 0:
+                     operand += ", 1, 0"
+                     narg += 2
+                     iarg += 2
+                     arg_exps.append( "1" )
+                     arg_exps.append( "0" )
+                     arg_dtypes.append( "size_t" )
+                     arg_dtypes.append( "size_t" )
+                  elif funname == "ndf1Pxlst" and iarg == 1:
+                     operand += ", 1, 0"
+                     narg += 2
+                     iarg += 2
+                     arg_exps.append( "1" )
+                     arg_exps.append( "0" )
+                     arg_dtypes.append( "size_t" )
+                     arg_dtypes.append( "size_t" )
+
+                  if args:
+                     if args[iarg].ctype == "char *" or args[iarg].ctype.startswith( "char["):
+                        if iarg+1 < len(args) and args[iarg+1].cname == args[iarg].cname + "_length":
+                           sparts = substring( rest[expstart:comma], item, varmap )
+                           if sparts:
+                              operand += ", "+sparts[3]
+                              arg_exps.append( sparts[3] )
+                              arg_dtypes.append( "size_t" )
+                              iarg += 1
+                              narg += 1
+                           else:
+                              Leave( "Expected char argument value at start of '{0}' in '{1}'.".format(rest[expstart:comma],expr))
+
+               else:
+                  iarg -= 1
+
+
+               if comma >= close_at:
+                  break
+               else:
+                  expstart = comma + 1
+                  comma = FindBare( ',', rest, comma+1)
+                  if comma is None or comma == -1 or comma > close_at:
+                     comma = close_at
+
+            operand +=  " )"
+
+            if args and narg != len(args):
+               Leave( "Calling {0}, {1} arguments were expected but {2} were found.".format(funname, len(args), narg ))
+
+            if funname == "index" and len(arg_exps) == 2:
+               if arg_dtypes[0] == "char *" or arg_dtypes[0] == "const char *":
+                  if arg_dtypes[1] == "char *" or arg_dtypes[1] == "const char *":
+                     operand = "chrIndex( {0}, {1} )".format( arg_exps[0], arg_exps[1] )
+                  elif arg_dtypes[1] == "char":
+                     operand = "chrCIndex( {0}, {1} )".format( arg_exps[0], arg_exps[1] )
+
+         result += operand
+         nc = close_at + 1
+         continue
+
+#  Named constants
+      if rest.startswith( "<CONST>" ):
+         operand = "<CONST>"
+         operand_type = "generic"
+
+         result += operand
+         nc = 7
+         continue
+
+      if rest.startswith( "<T>" ):
+         operand = "<T>"
+         operand_type = "generic"
+
+         result += operand
+         nc = 3
+         continue
+
+      if rest.startswith( "VAL__BAD<T>" ):
+         operand = "CGEN_BAD"
+         operand_type = "generic"
+
+         result += operand
+         nc = 11
+         continue
+
+      if rest.startswith( "DAT__ROOT" ):
+         operand = "DAT__ROOT"
+         operand_type = "HDSLoc *"
+
+         result += operand
+         nc = 9
+         continue
+
+      if rest.startswith( "DAT__NOLOC" ):
+         operand = "NULL"
+         operand_type = "HDSLoc *"
+
+         result += operand
+         nc = 10
+         continue
+
+      if rest.startswith( "AST__NULL" ):
+         operand = "NULL"
+         operand_type = "void *"
+
+         result += operand
+         nc = 9
+         continue
+
+      mt = re.match( r'(NDF__\w+)', rest )
+      if not mt:
+         mt = re.match( r'(AST__\w+)', rest )
+      if not mt:
+         mt = re.match( r'(DAT__\w+)', rest )
+      if mt:
+         operand = mt.group(1)
+
+         if operand[6:] == "CB":
+            operand += "TYPE"
+
+         operand_type = "int"
+
+         result += operand
+         nc = len(operand)
+         continue
+
+#  Variable
+      mt = re.match( r'(\w+)', rest )
+      if mt:
+         ftoken = mt.group(1)
+         if mt.end(1) < len(rest):
+            ftail = rest[mt.end(1)].strip()
+         else:
+            ftail = ""
+
+         # Precede pointer arguments with "*" to dereference them,
+         # unless the pointer is being passed to a subroutine, or if it
+         # is a fixed-length buffer to recieve a text string.
+         operand = ''
+         if ( not call or ftoken != expr.strip() ) and warglist:
+            for arg in warglist:
+               if arg.fname == ftoken and arg.length_var is None:
+                  tt = result.rstrip()
+                  if ( tt and ( tt[-1] == "*" or tt[-1] == "/" ) ) or \
+                     ( ftail and ( ftail[0] == "*" or ftail[0] == "/" )):
+                     operand = "(###*"
+                  else:
+                     operand = "*"
+                  break
+
+         ctoken = CName(ftoken,varmap)
+         operand += ctoken
+         if operand[0] == '(':
+            operand += '###)'
+
+         # Increment loop indices since loop indices are zero-based in C
+         # but one-based in F77.
+         if varmap and ftoken in varmap:
+            var = varmap[ ftoken ]
+         else:
+            var = None
+
+         if var:
+            if var.decr and not var.zerobased:
+               operand = IncExpr( operand )
+            operand_type = exptyp( var )
+         else:
+            operand_type = None
+
+         result += operand
+         nc = mt.end()
+         continue
+
+#  Abort if we do not recognise the first part of the string.
+      Leave("Unexpected stuff at start of '{0}' within '{1}'.".format(rest,expr))
+      break
+
+#  Is it time to close the argument list for a string comparison function?
+   if closepar > 0:
+      closepar -= 1
+      if closepar == 1:
+
+#  Check if we are comparing single characters. Replace the string
+#  comparison function with an equality if so.
+         newtext = None
+         if "strncmp" in compfn:
+            j0 = result.rfind(compfn)
+            kk = FindBare( ',', result, j0 + len(compfn) + 1 )
+            comparg2 = result[kk+1:].strip()
+
+            if comparg2[0] == '"' and comparg2[-1] == '"':
+               cval = comparg2[1:-1]
+               if cval[0] == '\\':
+                  cval = cval[1:]
+
+               mt = re.match( r'(\w+)\+(.*)$', comparg1 )
+               if mt and len(cval) == 1:
+                  varname = mt.group(1)
+                  offset = mt.group(2)
+                  if FName(varname) in varmap:
+                     if compfn[0] == "!":
+                        newtext = "{0}[ {1} ] == '{2}'".format(varname,offset,cval)
+                     else:
+                        newtext = "{0}[ {1} ] != '{2}'".format(varname,offset,cval)
+
+            elif comparg1[0] == '"' and len(comparg1) == 3:
+               cval = comparg1[1:-1]
+               if cval[0] == '\\':
+                  cval = cval[1:]
+
+               mt = re.match( r'(\w+)\+(.*)$', comparg2 )
+               if mt and len(cval) == 1:
+                  varname = mt.group(1)
+                  offset = mt.group(2)
+                  if FName(varname) in varmap:
+                     if compfn[0] == "!":
+                        newtext = "'{2}' == {0}[ {1} ]".format(varname,offset,cval)
+                     else:
+                        newtext = "'{2}' != {0}[ {1} ]".format(varname,offset,cval)
+
+            if newtext is not None:
+               if compnn != "1":
+                   newtext = None
+               else:
+                  result = result[:j0]+newtext
+
+         if newtext is None:
+            if compnn:
+               result += ", "+compnn
+            result += ' )'
+
+#  Do we need to finish the argument list for a ndf1Strcat call?
+   if close_strcat > 0:
+      newtext = ", "+operand+" )"
+      result = re.sub( re.escape(operand)+r' *$', newtext, result )
+      expr_type = "char *"
+
+#  CHARACTER substrings that extend to the end do not need to be
+#  copied since they will include a terminating null.
+   if substring_start and operand.isalnum() and not substring_end:
+      result += " + "+substring_start
+      substring_start = None
+
+#  Other CHARACTER substrings are extracted by ndf1Strsub into a
+#  dynamically allocated buffer.
+   if substring_start is not None:
+      newtext = "ndf1Strsub( "+operand+", "
+      if substring_start:
+         newtext += substring_start+", "
+      else:
+         newtext += "-1, "
+      if substring_end:
+         newtext += substring_end+", "
+      else:
+         newtext += "-1, "
+      newtext += "status )"
+      result = re.sub( re.escape(operand)+r' *$', newtext, result )
+      substring_start = None
+      expr_type = "char *"
+
+#  Extra  conversions.
+   result = re.sub( r'- *1 * <', '<=', result )
+   result = re.sub( r'\+ *1 * >', '>=', result )
+   mt = re.match( r'(^.*?[&|]?)([^&|><=!]+)>=([^&|><=!]+)([&|]?.*$)',result)
+   if mt:
+      rhs1 = mt.group(3).strip()
+      rhs2 = DecExpr( rhs1 )
+      if len( rhs2 ) < len( rhs1 ):
+         result = mt.group(1)+mt.group(2)+"> "+rhs2+" "+mt.group(4)
+   mt = re.match( r'(^.*?[&|]?)([^&|><=!]+)<=([^&|><=!]+)([&|]?.*$)',result)
+   if mt:
+      lhs1 = mt.group(2).strip()
+      lhs2 = DecExpr( lhs1 )
+      if len( lhs2 ) < len( lhs1 ):
+         result = mt.group(1)+" "+lhs2+" <"+mt.group(3)+mt.group(4)
+
+   if substring_start is not None:
+      Leave("Cannot handle CHARACTER substring reference in '{0}'.".format(expr))
+
+   if result.startswith("index("):
+      close_at = FindCloser( result, 5, quote='"' ) + 1
+      mt = re.match( r'index\( *ndf1Strsub\( *(\w+), *(.*), *(.*), *status *\), *"(.*)" *\)', result[:close_at] )
+      if mt:
+         result = 'chrIndexin( {0}, {1}, {2}, "{3}" ) + 1'.format( mt.group(1), mt.group(2), mt.group(3), mt.group(4) )
+
+   mt = re.match( r'ndf1Strsub\( *(\w+), *(.*), *(.*), *status *\) *$', result )
+   if mt:
+      if mt.group(2) == mt.group(3):
+         result = "{0}[ {1} ]".format(  mt.group(1), mt.group(2) )
+         expr_type = 'char'
+
+   result = re.sub( r'&\*(\w+)->(\w+)', r'&(###(###*\1###)->\2###)', result )
+   result = re.sub( r'\*(\w+)->(\w+)', r'(###*\1###)->\2', result )
+
+#  Return the data type of the expression, or the data type of the last
+#  operand if the expression type is not known.
+   if expr_type:
+      dtype[0] = expr_type
+   elif operator_type:
+      dtype[0] = operator_type
+   else:
+      dtype[0] = operand_type
+
+   return Simplify(result)
+
+
+
+#  Convert an F77 statement to C
+def CStatement( sment, item ):
+   funcParts = FuncSplit( sment, None )
+   new_item = statementFactory( None, sment, funcParts, '' )
+   if new_item:
+      new_item.parent = item
+      text = new_item.toC( "" )
+   else:
+      text = sment.lower()+";"
+   return text.strip()
+
+#  Abort with an error message.
+def Leave( text, linenum=None ):
+   global infile
+   message = infile
+   if linenum is not None:
+      message += ":{0}".format(linenum)
+   message += " : {0}\n".format( text )
+
+   if "analyse: Unclassifiable statement:" in message:
+      with open("warnings", "a") as myfile:
+         myfile.write(message+"\n")
+   elif abort:
+      sys.exit( ">>>> "+message )
+   else:
+      print( ">>>> "+message )
+
+#  Issue a warning about required manual intervention.
+def Warn( text, linenum=None ):
+   global infile
+   message = "!!! {0}: Manual intervention required".format(infile)
+   if linenum is not None:
+      message += " near line {0}".format(linenum)
+   message += ":\n"+text+"\n"
+   print( message )
+
+#  Find a C header file, returning the supplied name if not found.
+def findH( name ):
+   root = os.path.expandvars("$STARLINK_DIR/include/")
+   if not os.path.isfile(root+name) and not os.path.isfile("../"+name):
+      hfile = name
+   else:
+      hfile = name.lower()+".h"
+      if not os.path.isfile(root+hfile):
+         hfile = "star/"+hfile
+         if not os.path.isfile(root+hfile):
+            parts = hfile[5:].split("_")
+            hfile = parts[0]+".h"
+            if not os.path.isfile(root+hfile):
+               hfile = "star/"+hfile
+               if not os.path.isfile(root+hfile):
+                  hfile = name
+      elif hfile == "PSX_ERR":
+         hfile = "psx_err.h"
+   return hfile
+
+#  Find a C header file, aborting if not found.
+def findh( name ):
+   hfile = findH( name )
+   if hfile == name and hfile != "psx_err.h" and name[:4] != "NUM_":
+      Leave( "Subroutine: No .h file corresponding to {0} found "
+             "within $STARLINK_DIR/include".format(name))
+   return hfile
+
+#  Split a long line of C code into a set of smaller lines, with
+#  specified maximum line lengths. Return them in a list.
+def codeWrap( text, maxlen ):
+   if maxlen < 30:
+      maxlen = 30
+   result = []
+   text = text.strip()
+   tlen = len(text)
+   split_limit = (2*maxlen)/3
+
+   line = ''
+   linelen = 0
+   quoted = False
+   lc = ""
+
+   lcomma = -1
+   lscolon = -1
+   lspace = -1
+   lspace_quoted = -1
+
+   sublines = None
+   iat = 0
+   while iat  < tlen:
+      c = text[iat]
+
+      if c == '"':
+         if not quoted:
+            quoted = True
+         elif lc != '\\':
+            quoted = False
+
+      elif c == ' ':
+         if quoted:
+            lspace_quoted = linelen
+         else:
+            lspace = linelen
+
+      elif c == ',' and not quoted:
+         lcomma = linelen
+
+      elif c == ';' and not quoted:
+         lscolon = linelen
+
+      elif c == '=' and not quoted and lc.isspace() and text[iat+1].isspace():
+         open_at = iat
+         close_at = FindBare( ';', text, iat+1, '"' )
+         if close_at == -1:
+            close_at = tlen - 1
+         sublines = codeWrap( text[open_at+1:close_at], maxlen-linelen-2 )
+
+      elif c == '(' and not quoted and lc != "'":
+         open_at = iat
+         close_at = FindBare( ')', text, iat+1, '"' )
+         if close_at == -1:
+            Leave("No closing parenthesis found whilst wrapping '{0}'.".format(text))
+
+         newmaxlen = maxlen-linelen-2
+         if newmaxlen < 10 and not text.lstrip().startswith("if("):
+            split_quote = False
+            split_at = 0
+
+            if lcomma != -1 and split_at < split_limit:
+               split_at = lcomma
+
+            if lscolon != -1 and split_at < split_limit:
+               split_at = lscolon
+
+            if lspace != -1 and split_at < split_limit:
+               split_at = lspace
+
+            if lspace_quoted != -1 and split_at < split_limit:
+               split_at = lspace_quoted
+               split_quote = True
+
+            if split_at:
+               newline = line[:split_at+1]
+               line = line[split_at+1:]
+               if split_quote:
+                  newline += '"'
+                  line = '"' + line
+               result.append( newline.rstrip() )
+               line = line.lstrip()
+               linelen = len(line)
+
+               lcomma = -1
+               lscolon = -1
+               lspace = -1
+               lspace_quoted = -1
+
+               newmaxlen = maxlen-linelen-2
+
+         sublines = codeWrap( text[open_at+1:close_at], newmaxlen )
+
+      line += c
+      lc = c
+      linelen += 1
+      iat += 1
+
+      if sublines:
+
+         line += " "+sublines[0]
+         lc = ""
+         iat = close_at
+
+         subindent = " " * ( open_at + 2 )
+         nsub = len(sublines)
+         isub = 1
+         while isub < nsub:
+            result.append( line.rstrip() )
+            line = subindent + sublines[isub]
+            isub += 1
+
+         if text[close_at] == ')':
+            line += ' '
+         linelen = len( line )
+
+         sublines = None
+         lcomma = -1
+         lscolon = -1
+         lspace = -1
+         lspace_quoted = -1
+
+      elif linelen > maxlen and iat < tlen-3:
+
+         split_quote = False
+         split_at = 0
+
+         if lcomma != -1 and split_at < split_limit:
+            split_at = lcomma
+
+         if lscolon != -1 and split_at < split_limit:
+            split_at = lscolon
+
+         if lspace != -1 and split_at < split_limit:
+            split_at = lspace
+
+         if lspace_quoted != -1 and split_at < split_limit:
+            split_at = lspace_quoted
+            split_quote = True
+
+         if split_at:
+            newline = line[:split_at+1]
+            line = line[split_at+1:]
+            if split_quote:
+               newline += '"'
+               line = '"' + line
+            elif not line:
+               while iat < tlen and text[iat] == ' ':
+                  iat += 1
+            result.append( newline.rstrip() )
+            line = line.lstrip()
+            linelen = len(line)
+
+
+            lcomma = -1
+            lscolon = -1
+            lspace = -1
+            lspace_quoted = -1
+
+   if linelen > 0:
+      result.append( line.rstrip() )
+
+   return result
+
+
+#  Find the first occurence of a given character that is not in a single
+#  or double quoted string or (if par=True) within parentheses or square
+#  brackets. Returns -1 for "not found", and None for "error".
+def FindBare( ch, text, start, quote="'", par=True ):
+   depth = 0
+   quoted = False
+   closer = None
+   closers = []
+   inchar = False
+
+   lc = ' '
+   result = start
+   for c in text[start:]:
+
+      if quote == '"' and c == "'" and not quoted:
+         inchar = (not inchar )
+
+      if c == ch and depth == 0 and not inchar:
+         return result
+      else:
+         result += 1
+
+      if inchar:
+         pass
+
+      elif c == quote:
+         if quoted:
+            if quote != '"' or lc != '\\':
+               quoted = False
+               depth -= 1
+         elif not quoted:
+            quoted = True
+            depth += 1
+      elif not quoted:
+         if par:
+            if c == '(' or  c == "[":
+               if closer:
+                  closers.append( closer )
+               depth += 1
+               if c == '(':
+                  closer = ')'
+               else:
+                  closer = ']'
+            elif c == closer:
+               depth -= 1
+               if depth > 0:
+                  closer = closers.pop()
+               else:
+                  closer = None
+      lc = c
+      if depth < 0:
+         return None
+
+   if depth != 0:
+      return None
+
+   return -1
+
+
+#  Return the C equivalent to an F77 variable name
+def CName( fname, varmap=None ):
+   if not fname:
+      return fname
+
+   if varmap and fname in varmap:
+      return varmap[fname].cname
+
+   if function_fname == fname:
+      return "result"
+
+   if "__" in fname:
+      fname = fname.upper()
+      if fname == "AST__NULL" or fname == "DAT__NOLOC" or fname == "ARY__NOID":
+         return "NULL"
+      else:
+         return fname
+
+   fnamelc = fname.lower()
+   if fnamelc == "abs":
+      result = "fabs"
+   elif fnamelc == "zeroub":
+      result = "0"
+   elif fnamelc == "dble":
+      result = "(double)"
+   elif fnamelc == "int":
+      result = "(int)"
+   elif fnamelc == "max":
+      result = "NDF_MAX"
+   elif fnamelc == "min":
+      result = "NDF_MIN"
+   elif fnamelc.startswith("idcb"):
+      result = fnamelc[1:]
+   elif fnamelc.startswith("iacb"):
+      result = fnamelc[1:]
+   elif fnamelc.startswith("ipcb"):
+      result = fnamelc[1:]
+   elif fnamelc.startswith("iary"):
+      result = fnamelc[1:]
+   elif fnamelc.startswith("ifmt"):
+      result = "fcb"
+      if len(fnamelc) > 4:
+         result += fnamelc[4:]
+
+   else:
+      mt = re.match(r' *([adpft]cb)_(\w+) *$', fnamelc )
+      if not mt:
+         mt = re.match(r' *(apb)_(\w+) *$', fnamelc )
+      if not mt:
+         mt = re.match(r' *(tmp)_(\w+) *$', fnamelc )
+      if mt:
+         result = "Ndf_"+mt.group(1).upper()+"_"+mt.group(2)
+      else:
+         first = True
+         for c in fnamelc.split("_"):
+            if first:
+               result = c
+               first = False
+            else:
+               result += c.capitalize()
+
+   return result
+
+#  Return the F77 equivalent to a C variable name (a partial inverse of CName).
+def FName( cname ):
+   if not cname:
+      return cname
+
+   result = cname.upper()
+   if result == "RESULT":
+      result = function_fname
+   elif result == "NULL":
+      result = "0"
+   elif result == "FABS":
+      result = "ABS"
+   elif result == "(DOUBLE)":
+      result = "DBLE"
+   elif result == "(INT)":
+      result = "INT"
+   elif result == "NDF_MAX":
+      result = "MAX"
+   elif result == "NDF_MIN":
+      result = "MIN"
+   elif result.startswith("DCB"):
+      result = "I"+result
+   elif result.startswith("ACB"):
+      result = "I"+result
+   elif result.startswith("ARY"):
+      result = "I"+result
+   elif result.startswith("PCB"):
+      result = "I"+result
+   elif result.startswith("FCB"):
+      if len(result) > 3:
+         result = "IFMT"+result[3:]
+      else:
+         result = "IFMT"
+
+   elif len(cname) > 4:
+      if cname[:3].islower() and cname[3].isupper() and cname[4].islower():
+         result = result[:3]+"_"+result[3:]
+   return result
+
+#  Split string using comma as delimter, ignoring commas that are inside
+#  single quoted strings or parentheses. Trailing and leading spaces are
+#  removed from each returned word.
+def CommaSplit( text, iline, quote="'" ):
+   result = []
+   tlen = len(text)
+   istart = 0
+   while( istart < tlen ):
+      iend = FindBare( ',', text, istart, quote )
+      if iend is None:
+         Leave( "CommaSplit: Cannot parse '{0}'.".format( text ), iline )
+      elif iend == -1:
+         result.append( text[ istart : ].strip() )
+         break
+      else:
+         result.append( text[ istart : iend ].strip() )
+         istart = iend + 1
+   return result
+
+
+#  If "text" has form "prefix(part1,part2,part3...)suffix" then return a
+#  list [prefix,suffix,part1,part2,part3...] (any of these values may be
+#  a null string).  None is returned if the supplied string does not match
+#  the required form. Each item in the returned list is stripped of
+#  trailing and leading white space. If the line contains more than one
+#  pair of adjacent matching top-level parentheses, the final set is used
+#  to define the split (to handle cases such as "a = (double)( cc + 2 )" ).
+def FuncSplit( text, iline, quote="'" ):
+   result = None
+
+   open_at = -1
+   close_at = -1
+
+   iat2 = -1
+   again = True
+   while again:
+      again = False
+      iat1 = FindOpener( text, iat2+1, quote=quote )
+      if iat1 >= 0:
+         if close_at == -1 or iat1 == close_at+1 or not text[close_at+1:iat1].strip():
+            iat2 = FindCloser( text, iat1, quote=quote )
+            if iat2 >= 0:
+               open_at = iat1
+               close_at = iat2
+               again = True
+
+   if open_at >= 0 and close_at > open_at:
+      result = [text[:open_at].strip(),text[close_at+1:].strip()]
+      result.extend( CommaSplit( text[open_at+1:close_at], iline, quote ) )
+
+   return result
+
+
+#  Split a line into code and comment. Returned tuple is (code,comment,type)
+#  where type indicates the type of comment (asterisk in col1, "c" in
+#  col1 or end-of-line). Retain leading white space in code and comment.
+def FindComment( line, iline ):
+   if len(line) == 0:
+      return ( '', '', COM_NONE )
+
+   elif line[0] == "*":
+      com = line[1:].rstrip()
+      if len(com) > 0:
+         return ( '', com, COM_ASTERISK )
+      else:
+         return ( '', '', COM_ASTERISK_WHITE )
+
+   elif line[0] == "c" or line[0] == "C":
+      com = line[1:].rstrip()
+      if len(com) > 0:
+         return ( '', com, COM_C )
+      else:
+         return ( '', '', COM_C_WHITE )
+
+   else:
+      iat = FindBare( '!', line, 0, par=False )
+      if iat is None:
+          Leave( "FindComment: Cannot parse '{0}'.".format( line ), iline )
+      elif iat == -1:
+         return ( line.rstrip(), '', COM_NONE )
+      else:
+         return ( line[0:iat].rstrip(), line[iat+1:].rstrip(), COM_EOL )
+
+
+#  Check if a string is a variable size value
+def isDeclSize( code, start ):
+   size = None
+   mt = re.match(r' *\* *', code[start:] )
+   if mt:
+      start += mt.end() - mt.start()
+      if code[start] == "(":
+         close_at = FindCloser( code, start )
+      else:
+         close_at = -1
+
+      if close_at == -1:
+         mt = re.match(r'^(\w+) *', code[start:] )
+         if mt:
+            size = mt.group(1).strip()
+            start += mt.end() - mt.start()
+      else:
+         size = code[start+1:close_at].strip()
+         start = close_at + 1
+
+   return (size, start )
+
+
+#  Check if a string is a F77 data type
+def isFType( word ):
+   if word == "REAL":
+      return TYPE_REAL
+   elif word == "DOUBLE PRECISION":
+      return TYPE_DOUBLE
+   elif word == "INTEGER":
+      return TYPE_INTEGER
+   elif word == "INTEGER*8":
+      return TYPE_INTEGER8
+   elif word == "BYTE":
+      return TYPE_BYTE
+   elif word == "LOGICAL":
+      return TYPE_LOGICAL
+   elif word == "CHARACTER":
+      return TYPE_CHAR
+   elif word == "EXTERNAL":
+      return TYPE_EXTERNAL
+   elif word == "<TYPE>" or word == "<LTYPE>":
+      return TYPE_GENERIC
+   else:
+      return None
+
+#  Get the C equivalent to an F77 data type
+def CType( type, size=None ):
+   if type == TYPE_REAL:
+      if not size or size == "4":
+         return "float"
+      elif size == "8":
+         return "double"
+   elif type == TYPE_DOUBLE:
+      if not size or size == "8":
+         return "double"
+   elif type == TYPE_INTEGER:
+      if not size or size == "4":
+         return "int"
+      elif size == "2":
+         return "short int"
+      elif size == "8":
+         return "int64_t"
+   elif type == TYPE_INTEGER8:
+      if not size or size == "8":
+         return "int64_t"
+   elif type == TYPE_BYTE:
+      if not size or size == "1":
+         return "unsigned char"
+   elif type == TYPE_LOGICAL:
+      if not size:
+         return "int"
+   elif type == TYPE_CHAR:
+      if not size :
+         return "char"
+      elif size == "*":
+         return "char *"
+      elif size == "1":
+         return "char"
+      elif size.isdigit():
+         return "char[ {0} ]".format(str( int(size) + 1 ))
+      elif size == "DAT__SZLOC":
+         return "HDSLoc *"
+      else:
+         return "char[ {0} + 1 ]".format( size )
+   elif type == TYPE_EXTERNAL:
+      return "[function pointer]"
+   elif type == TYPE_GENERIC:
+      return "CGEN_TYPE"
+   else:
+      return None
+
+#  Check if a code string is an F77 variable declaration.
+def isDecl( code, iline, pro=False ):
+   type = None
+   name = None
+   bounds = None
+   size = None
+
+   typetext = None
+   if pro or code.startswith('      '):
+      code = code.strip()
+
+      if code.startswith('DOUBLE PRECISION'):
+         typetext = 'DOUBLE PRECISION'
+      elif code.startswith('<TYPE>'):
+         typetext = '<TYPE>'
+      elif code.startswith('<LTYPE>'):
+         typetext = '<LTYPE>'
+      else:
+         mt = re.match( r'^(\w+)', code )
+         if mt:
+            typetext = mt.group(1)
+
+   if typetext:
+      type = isFType( typetext )
+      if type is not None:
+         start = len(typetext)
+         ( size, start ) = isDeclSize( code, start )
+         if not pro:
+            mt = re.match(r'^ *(\w+)', code[start:] )
+            if mt:
+               name = mt.group(1)
+               start += mt.end() - mt.start()
+            else:
+               type = None
+
+         mt = re.match(r'^ *\(([^\)]*?)\) *', code[start:] )
+         if mt:
+            start += mt.end() - mt.start()
+            bounds = []
+            for axbounds in CommaSplit( mt.group(1), iline ):
+               bounds.append( axbounds.split(":") )
+
+         if size is None:
+            ( size, start ) = isDeclSize( code, start )
+
+   if name == "FUNCTION":
+      type = None
+      name = None
+      bounds = None
+      size = None
+
+   return ( type, name, bounds, size )
+
+
+
+
+
+
+# ----------------------------------------------------------------------
+#  An atomic code item (a comment, an assignment, a declaration, etc).
+class Item(object):
+   def __init__( self, com, start ):
+      self.com = com
+      self.start = start
+      self.label = None
+      self.ignore = False
+      self.parent = None
+      self.next = None
+      self.prev = None
+      self.in_use = True
+
+   def insertAfter(self,item):
+      if self.parent:
+         self.parent.insertAfter(item,self)
+      else:
+         Leave( "Cannot insert item: no parent")
+
+#  insert item immediately before self.
+   def insertBefore(self,item):
+      if self.parent:
+         self.parent.insertBefore(item,self)
+      else:
+         Leave( "Cannot insert item: no parent")
+
+   def itemString(self,indent,exclude_ignored=True):
+      if exclude_ignored and self.ignore:
+         return ""
+      result = indent+self.__class__.__name__+": "
+      if self.start:
+         result += " line:{0}".format(self.start)
+      if self.com:
+         if self.com.strip():
+            result += " comment:{0}".format(self.com.strip()[:15])
+      if self.label:
+         result += " label:{0}".format(self.label)
+      if not self.in_use:
+         result += " (not in use)"
+      if self.next and not self.next.prev == self:
+         result += " (bad next!)"
+      if self.prev and not self.prev.next == self:
+         result += " (bad prev!)"
+      if self.parent and self not in self.parent.children:
+         result += " (bad parent!)"
+      return result+"\n"
+
+   def toString(self,indent="",exclude_ignored=True):
+      return self.itemString(indent,exclude_ignored)
+
+   def printString(self,indent="",exclude_ignored=True):
+      print( self.itemString(indent,exclude_ignored ))
+      try:
+         input("Press enter to continue")
+      except (SyntaxError,NameError):
+         pass
+
+   def getNextItem(self,exclude_ignored=True):
+      item = self
+      result = self.next
+      if exclude_ignored:
+         while result and result.ignore:
+            item = result
+            result = result.next
+      if not result and self.parent and item != self.parent.head:
+         Leave("Unexpected item chain head")
+      return result
+
+   def getNextLine(self,exclude_ignored=True):
+      if isinstance( self, Unit ):
+         result = self.foot
+         if result and exclude_ignored and result.ignore:
+            result = result.getNextItem(True)
+      else:
+         result = self.getNextItem(exclude_ignored)
+
+      if not result and self.parent:
+         result = self.parent.getNextItem(exclude_ignored)
+
+      return result
+
+   def getPrevItem(self,exclude_ignored=True):
+      item = self
+      result = self.prev
+      if exclude_ignored:
+         while result and result.ignore:
+            item = result
+            result = result.prev
+      if not result and self.parent and item != self.parent.foot:
+         Leave("Unexpected item chain foot")
+      return result
+
+   def getPrevLine(self,exclude_ignored=True):
+      result = self.getPrevItem(exclude_ignored)
+      while isinstance( result, Unit ):
+         result = result.head
+         if result and exclude_ignored and result.ignore:
+            result = result.getPrevItem(True)
+
+      if not result:
+         result = self.parent
+
+      return result
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+      return "{0}<{1}>\n".format(indent,type(self).__name__)
+
+   def update( self ):
+      pass
+
+   def update2( self ):
+      pass
+
+   def containsGoto( self, label ):
+      return None
+
+   def addH( self, hfile ):
+      if self.parent:
+         self.parent.addH( hfile )
+
+   def useschr( self ):
+      if self.parent:
+         self.parent.useschr()
+
+   def getVarMap( self ):
+      if isinstance( self, Unit ):
+         result = self.variables
+      else:
+         result = {}
+
+      if len(result) == 0 and self.parent:
+         result = self.parent.getVarMap()
+
+      return result
+
+   def getWargList( self ):
+      if isinstance( self, Unit ):
+         result = self.wargs
+      else:
+         result = []
+
+      if len(result) == 0 and self.parent:
+         result = self.parent.getWargList()
+
+      return result
+
+   def addVar( self, type, name_base, init, com, reuse=False ):
+      if self.parent:
+         return self.parent.addVar( type, name_base, init, com, reuse )
+      else:
+         return None
+
+   def addTidyUp( self, code ):
+      if self.parent:
+         self.parent.addTidyUp( code )
+
+
+
+
+# ----------------------------------------------------------------------
+# A line of pre-formatted C code
+class CCode(Item):
+   def __init__( self, start, code, com ):
+      Item.__init__( self, com, start )
+      self.code = code.strip()
+      if self.code[-1] != ";":
+         Leave( "No semi-colon at end of '{0}'.".format(self.code))
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+      result = indent + self.code
+      result = addEOLComment( result, self.com )
+      return result+"\n"
+
+# ----------------------------------------------------------------------
+# A line of raw F77 code
+class FCode(Item):
+   def __init__( self, start, code, com ):
+      Item.__init__( self, com, start )
+      self.code = code.strip()
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+      result = self.code
+      if self.com:
+         result += " ! "+self.com
+      return result+"\n"
+
+
+# ----------------------------------------------------------------------
+class Self(Item):
+   def __init__( self ):
+      Item.__init__( self, None, None )
+
+# ----------------------------------------------------------------------
+class Simple(Item):
+   def __init__( self, start, fcode, com ):
+      Item.__init__( self, com, start )
+      self.fcode = fcode
+
+   def update(self):
+      #  If the item is an "IMPLICIT NONE" item, indicate it and the preceding
+      #  comment should be ignored when printing out the C code.
+      if self.fcode == "IMPLICIT NONE":
+         self.ignore = True
+         previous = self.getPrevItem()
+         if isinstance( previous, Comment ) and "type definitions" in previous.com.lower():
+            previous.ignore = True
+
+
+# ----------------------------------------------------------------------
+#  ELSE IF statement
+class ElseIf(Item):
+   def __init__( self, start, expr, com ):
+      Item.__init__( self, com, start )
+      self.If = If( start, expr, com )
+      self.If.parent = self
+
+   def update(self):
+      self.If.update()
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+      fitoc = self.If.toC( indent )
+      mt = re.match( r'(.*\{)\s*\}\s*$', fitoc, re.DOTALL )
+      return indent[3:] + "} else "+mt.group(1).strip()+"\n"
+
+
+# ----------------------------------------------------------------------
+#  ELSE statement
+class Else(Item):
+   def __init__( self, start, com ):
+      Item.__init__( self, com, start )
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+      return indent[3:] + "} else {\n"
+
+
+# ----------------------------------------------------------------------
+class Include(Item):
+   def __init__( self, start, include, com ):
+      Item.__init__( self, com, start )
+      self.include = include
+
+   def update(self):
+      #  Indicate this INCLUDE item and the preceding comment (if any)
+      #  should be ignored when printing out the C code. Include the
+      #  corresponding C header file in the list of required header files
+      #  stored in the parent unit. For "Global Variables" also ignore
+      #  all following items until a comment is found which starts with
+      #  fewer than 5 spaces.
+      self.ignore = True
+      previous = self.getPrevItem()
+      if isinstance( previous, Comment ):
+         if "global constants" in previous.com.lower():
+            previous.ignore = True
+         elif "global variables" in previous.com.lower():
+            previous.ignore = True
+            next = self.getNextItem()
+            while True:
+               if isinstance( next, Comment ):
+                  if next.com.startswith("     "):
+                     next.ignore = True
+                  else:
+                     break
+               else:
+                  next.ignore = True
+               next = next.getNextItem()
+      self.parent.addh(self.include)
+
+
+# ----------------------------------------------------------------------
+class Parameter(Item):
+   def __init__( self, start, setting, com ):
+      Item.__init__( self, com, start )
+      self.setting = setting
+      mt = re.match( r' *(\w+) *= *(.*)', setting )
+      if mt:
+         self.fvar = mt.group(1).upper()
+         self.fvalue = mt.group(2)
+      else:
+         Leave( "Bad PARAMETER: '{0}'".format(setting))
+
+   def update(self):
+      # Some parameters are not needed.
+      if self.fvar == "ZEROUB":
+         self.ignore = True
+
+      # The comment for the parameter should be the sum of the original
+      # comment plus the comment attached to the associated variable
+      #  declaration
+      varmap = self.getVarMap()
+      if self.fvar in varmap:
+         self.com += " "+varmap[ self.fvar ].com
+         self.com = self.com.strip()
+
+         # Ignore the declaration of the parameter variable
+         varmap[ self.fvar ].ignore = True
+      else:
+         Leave( "No variable declaration associated with '{0}'.".format(self.setting))
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+      varmap = self.getVarMap()
+      result = "#define {0} {1}".format(CName(self.fvar,varmap), CExpr( self.fvalue, self ))
+      if self.com:
+         result += " /* {0} */".format( self.com)
+      return result+"\n"
+
+# ----------------------------------------------------------------------
+class Call(Item):
+   def __init__( self, start, called, com ):
+      Item.__init__( self, com, start )
+      self.fcalled = called.strip()
+
+
+   def update( self ):
+      if self.fcalled.startswith("HDS_TRACE") and not self.ignore:
+         parts = FuncSplit( self.fcalled, self.start )
+         if parts and len(parts) == 7:
+            self.fcalled = self.fcalled[:-1].rstrip()+", LEN({0})+1, LEN({1})+1 )".format(parts[4],parts[5])
+         else:
+            Leave("What ???")
+
+      elif ( self.fcalled.startswith("NDF1_EXPID") or \
+           self.fcalled.startswith("NDF1_EXPPL") ) and not self.ignore:
+         parts = FuncSplit( self.fcalled, self.start )
+         if parts and len(parts) == 5:
+            fn = "NDF1_EXPID( {0}, STATUS )".format(parts[2])
+            newitem = Equals( self.start, parts[3], fn, self.com )
+            self.insertAfter(newitem)
+            self.ignore = True
+         else:
+            Leave("What ???")
+
+      elif self.fcalled.startswith("NDF1_FFS") and not self.ignore:
+         parts = FuncSplit( self.fcalled, self.start )
+         if parts and len(parts) == 5:
+            fn = "NDF1_FFS( {0}, STATUS )".format(parts[2])
+            newitem = Equals( self.start, parts[3], fn, self.com )
+            self.insertAfter(newitem)
+            self.ignore = True
+         else:
+            Leave("What ???")
+
+      elif self.fcalled.startswith("NDF1_NXTSL") and not self.ignore:
+         parts = FuncSplit( self.fcalled, self.start )
+         if parts and len(parts) == 6:
+            islotvar = self.addVar( "int", "islot", None, " Slot index", True )
+
+            lhs = parts[3]
+            rhs = self.fcalled.replace( lhs+",", islotvar.fname+"," )
+            newitem = Equals( self.start, lhs, rhs, self.com )
+            self.insertAfter(newitem)
+            self.ignore = True
+
+            prev = self.getPrevLine()
+            while prev:
+               if isinstance( prev, Equals ):
+                  if prev.lhs == lhs and prev.rhs == "0":
+                     prev.lhs = islotvar.fname
+                     prev.rhs = "-1"
+                     prev.update()
+                     break
+               prev = prev.getPrevLine()
+
+#            if not prev:
+#               Leave( "Cannot find '{0} = 0' line prior to call to NDF1_NXTSL".format(lhs))
+
+            next = newitem.getNextLine()
+            while next:
+               if isinstance( next, Equals ):
+                  if next.lhs == lhs and next.rhs == "NEXT":
+                     next.lhs = islotvar.fname
+                     next.update()
+                     break
+               next = next.getNextLine()
+
+#            if not next:
+#               Leave( "Cannot find '{0} = NEXT' line after call to NDF1_NXTSL".format(lhs))
+
+         else:
+            Leave("What ???")
+
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+      if indent is None:
+         indent = ''
+      text = indent+CExpr(self.fcalled,self)+";"
+      text = re.sub(r'astBegin\( *\)', r'astBegin', text)
+      text = re.sub(r'astEnd\( *\)', r'astEnd', text)
+      text = re.sub(r'\( *\)', r'()', text)
+#      text = re.sub(r'chrUcase\( *(\w+) *\)', r'astChrCase( NULL, \1, 1, NULL )', text)
+#      text = re.sub(r'chrLcase\( *(\w+) *\)', r'astChrCase( NULL, \1, 0, NULL )', text)
+
+      mt = re.match( r'( *)astAnnul\( (\**\w+) *\)', text )
+      if mt:
+         text = mt.group(1)+mt.group(2)+" = "+text
+
+      elif text.lstrip().startswith("aryValid"):
+         parts = FuncSplit( text, self.start, quote='"' )
+         text = indent + "{0} = aryValid( {1}, {2} );".format(parts[3],parts[2], parts[4])
+
+      return formatCode( self, text, indent )
+
+
+# ----------------------------------------------------------------------
+class Data(Item):
+   def __init__( self, start, var, values, com ):
+      Item.__init__( self, com, start )
+      self.fvar = var.strip()
+      self.fvalues = values.strip()
+
+   def update( self ):
+
+      varmap = self.getVarMap()
+      if self.fvar in varmap:
+         var = varmap[self.fvar]
+         init = ''
+         first = True
+         nval = 0
+         for value in CommaSplit( self.fvalues, self.start ):
+            nval += 1
+            if first:
+               first = False
+            else:
+               init += ", "
+            init += CExpr( value, self, [""], varmap=varmap )
+
+         if nval > 1:
+            var.init_value = "{ "+init+" }"
+         else:
+            var.init_value = init
+            if init[0] == '"' and init[-1] == '"':
+               var.isliteral = True
+               var.literalval = init
+         self.ignore = True
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+      item = Equals( self.start, self.fvar, self.fvalues, self.com )
+      item.parent = self
+      return item.toC( indent )
+
+# ----------------------------------------------------------------------
+class Equals(Item):
+   def __init__( self, start, lhs, rhs, com ):
+      Item.__init__( self, com, start )
+      self.lhs = lhs.strip()
+      self.rhs = rhs.strip()
+      self.lhstar = False
+      self.rhstar = False
+      self.cast = None
+      self.isboolptr = False
+
+   def update( self ):
+      varmap = self.getVarMap()
+
+      if self.lhs in varmap:
+         lhsvar = varmap[self.lhs]
+         if self.rhs.startswith("AST_GETC"):
+            lhsvar.changeType("const char *")
+
+         elif self.rhs != "0":
+            lhsvar.isliteral = False
+            dtype = [""]
+            expr = CExpr(self.rhs,self,dtype)
+            if dtype[0] and "char" not in dtype[0]:
+               if dtype[0] == "bool":
+                  if expr in varmap:
+                     fvar = varmap[expr]
+                  if fvar and fvar.ctype.endswith("*"):
+                     self.isboolptr = True
+                  dtype[0] = "int"
+
+               elif dtype[0] == "size_t":
+                  lhsvar.changeType("size_t")
+
+               (ival,cast) = args_match( lhsvar, dtype[0], self.lhs, varmap, "" )
+
+               self.cast = cast
+
+               if isinstance( ival, str ):
+                  Leave("Expression returns type '{0}' but is assigned to type '{1}'.\n   '{2} = {3}'".format(dtype[0],lhsvar.ctype,self.lhs,self.rhs))
+               elif ival == 2:
+                  if lhsvar.ctype[-1] == "*":
+                     self.lhstar = True
+                  else:
+                     Leave("Cannot de-reference non-pointer variable {0}".format(lhsvar.cname))
+               elif ival == 3:
+                  if dtype[0][-1] == "*":
+                     self.rhstar = True
+                  else:
+                     Leave("Cannot de-reference non-pointer expression {0}".format(expr))
+
+         elif self.rhs[0] == "'" and FindBare( "'", self.rhs, 1 ) == len(self.rhs)-1:
+            if lhsvar.isliteral is None:
+               lhsvar.isliteral = True
+               lhsvar.literalval = CExpr( self.rhs, self )
+            elif lhsvar.isliteral:
+               lhsvar.literalval = None
+         else:
+            lhsvar.isliteral = False
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+
+      varmap = self.getVarMap()
+      self.update()
+
+      if indent is None:
+         indent = ''
+      text = ""
+
+      if self.lhs in varmap:
+         lhsvar = varmap[self.lhs]
+         lhsvar.decr = False
+         text = CExpr(self.lhs,self,[""],False,varmap)
+         if self.rhs == "0":
+            if self.lhstar:
+               text = "*"+text
+            if lhsvar.ctype.endswith("*") and "*" not in text:
+               text += " = NULL;"
+               return formatCode( self, text, indent )
+
+         elif self.rhs.startswith("AST_GETC"):
+            text += " = "+CExpr( self.rhs, self )+";"
+            return formatCode( self, text, indent )
+
+
+      lparts = substring( self.lhs, self, varmap )
+      if lparts:
+         crhs = CExpr( self.rhs, self )
+
+         rparts = substring( self.rhs, self, varmap )
+         if not rparts:
+            crhs = CExpr( self.rhs, self )
+            if crhs[0] == '"' and crhs[-1] == '"':
+               rparts = [ crhs, '', '', str(len(crhs)-2) ]
+            elif crhs.startswith("ndf1Str"):
+               rparts = [ crhs, '', '', None ]
+
+         if rparts:
+            self.addH( "star/util.h")
+            text = indent + "star_strlcpy( "+lparts[0]
+            if lparts[1]:
+                text += " + " + lparts[1]
+            text += ", "+rparts[0]
+            if rparts[1]:
+                text += " + " + rparts[1]
+
+            if lparts[1]:
+               szexp = Simplify( lparts[3]+"-("+lparts[1]+")" )
+            else:
+               szexp = lparts[3]
+            text += ", "+szexp+" );"
+
+         elif not isChar( crhs, varmap ):
+            Leave( "Assigning non-char to CHARACTER in '{0} = {1}'.".format( self.lhs, self.rhs))
+
+         else:
+            text += " = "+crhs+";"
+
+      else:
+         text = indent
+         etext = CExpr( self.lhs, self )
+         if self.lhstar and etext[0] != "*":
+            text += "*"
+         text += etext
+
+         l = len(self.lhs)
+         if l < len(self.rhs):
+            rest = self.rhs[l:].strip()
+         else:
+            rest = " "
+
+         done = False
+         if self.rhs.startswith( self.lhs ) and not rest[0].isalnum():
+            done = True
+            if rest[0] == "+" or rest[0] == "-":
+               incr = CExpr(rest,self)
+               if incr[0] == "+":
+                  incr = incr[1:].lstrip()
+               elif incr[0:2] == "- ":
+                  incr = "-"+incr[1:].lstrip()
+
+               incr2 = incr.replace(" ","")
+               if incr2 == "1" or incr2 == "+1":
+                  if text.lstrip()[0] == "*":
+                     text = "(###{0}###)".format(text)
+                  text += "++;"
+               elif incr2 == "-1":
+                  if text.lstrip()[0] == "*":
+                     text = "(###{0}###)".format(text)
+                  text += "--;"
+               else:
+                  if incr[0] == "-" and "+" not in incr[1:] and "-" not in incr[1:]:
+                     text += " -= {0};".format(incr[1:])
+                  else:
+                     text += " += {0};".format(incr)
+
+            elif rest[0] == "*" and "/" not in rest and "+" not in rest and "-" not in rest:
+               fac = CExpr(rest[1:],self)
+               text += " *= {0};".format(fac)
+
+            elif rest[0] == "/" and "*" not in rest and "+" not in rest and "-" not in rest:
+               fac = CExpr(rest[1:],self)
+               text += " /= {0};".format(fac)
+            else:
+               done = False
+
+         if not done:
+            dtype = [""]
+            expr = CExpr(self.rhs,self,dtype)
+            if self.isboolptr:
+               expr = "( {0} != NULL )".format(expr)
+            if dtype[0] == "bool" and len(expr) > 1:
+               addpar = True
+               if expr[0] == '(':
+                  close_at = FindCloser( expr, 0 )
+                  if close_at == len(expr) - 1:
+                     addpar = False
+               if addpar:
+                  expr = "( "+expr+" )"
+            if self.rhstar and expr[0] != "*":
+               expr = "*"+expr
+            if self.cast:
+               expr = cast+" "+expr
+
+            text += " = "+expr+";"
+
+      return formatCode( self, text, indent )
+
+# ----------------------------------------------------------------------
+class Variable(Item):
+   def __init__( self, start, type_code, name, bounds, size, com ):
+      Item.__init__( self, com, start )
+      self.type_code = type_code
+      self.fname = name
+      self.fsize = size
+      self.cname = CName( name )
+      self.ctype = CType( type_code, size )
+      self.ctype_orig = self.ctype
+      self.cdec = None
+      self.cdecnn = None
+      self.isFpointer = False
+      self.init_value = None
+      self.decr = False
+      self.zerobased = False
+      self.dropdim1 = False
+      self.bounds = None
+      self.addIndex = None
+      self.isliteral = None
+      self.literalval = None
+      self.fixedtype = False
+      self.fixedtype = False
+
+      if self.fname.startswith("IFMT") and self.ctype == "int":
+         self.cname = "fcb"+self.fname[4:].lower()
+         self.ctype = "NdfFCB *"
+         self.type_code = TYPE_OTHER
+
+      elif self.fname.startswith("IDCB") and self.ctype == "int":
+         self.cname = "dcb"+self.fname[4:].lower()
+         self.ctype = "NdfDCB *"
+         self.type_code = TYPE_OTHER
+
+      elif self.fname.startswith("IACB") and self.ctype == "int":
+         self.cname = "acb"+self.fname[4:].lower()
+         self.ctype = "NdfACB *"
+         self.type_code = TYPE_OTHER
+
+      elif self.fname.startswith("IPCB") and self.ctype == "int":
+         self.cname = "pcb"+self.fname[4:].lower()
+         self.ctype = "NdfPCB *"
+         self.type_code = TYPE_OTHER
+
+      elif self.fname.startswith("IARY") and self.ctype == "int":
+         self.cname = "ary"+self.fname[4:].lower()
+         self.ctype = "Ary *"
+         self.type_code = TYPE_OTHER
+
+      elif "LOC" in self.fname and self.type_code == TYPE_CHAR and size == "*":
+         self.fsize = "DAT__SZLOC"
+         self.ctype = "HDSLoc *"
+
+      elif self.fname == "ZEROUB":
+         self.ignore = True
+
+
+      # N-d arrays for which the first dimension is 1 can be reduced to
+      # (N-1)-d by omitting the first dimension.
+      if bounds:
+         if bounds[0] == ['1']:
+            self.dropdim1 = True
+            if len(bounds) > 1:
+               self.bounds = bounds[1:]
+            else:
+               self.bounds = None
+         else:
+            self.bounds = bounds
+
+   def itemString(self,indent,exclude_ignored=True):
+      result = super(Variable,self).itemString( indent, exclude_ignored )
+      if result:
+         result += indent+"   ( "+self.getCdec()+" )"
+      return result+"\n"
+
+   def update2( self ):
+      if self.ctype.startswith("char[") and self.isliteral and self.literalval:
+         self.ctype = "const char *"
+         if not self.init_value:
+            self.init_value = self.literalval
+
+   def changeType(self,newtype):
+      if self.fixedtype:
+         return
+
+      if newtype == "const char *":
+         if self.type_code == TYPE_CHAR:
+            self.ctype = "const char *"
+            self.resetCdec()
+         elif newtype not in self.ctype:
+            Leave( "Variable.changeType() cannot convert '{0}' to 'const char *'".format(self.ctype))
+      elif newtype == "hdsdim":
+         if self.type_code == TYPE_INTEGER:
+            self.type_code = TYPE_OTHER
+            self.ctype = self.ctype.replace( "int", "hdsdim" )
+            self.resetCdec()
+         elif newtype not in self.ctype:
+            Leave( "Variable.changeType() cannot convert '{0}' to 'hdsdim'".format(self.ctype))
+      elif newtype == "size_t":
+         global size_t_used
+         size_t_used = True
+         if self.type_code == TYPE_INTEGER:
+            self.type_code = TYPE_OTHER
+            self.ctype = self.ctype.replace( "int", "size_t" )
+            self.resetCdec()
+         elif newtype not in self.ctype:
+            Leave( "Variable.changeType() cannot convert '{0}' to 'size_t'".format(self.ctype))
+      elif newtype == "hdsbool_t":
+         if self.type_code == TYPE_LOGICAL:
+            self.type_code = TYPE_OTHER
+            self.ctype = self.ctype.replace( "int", "hdsbool_t" )
+            self.resetCdec()
+         elif newtype not in self.ctype:
+            Leave( "Variable.changeType() cannot convert '{0}' to 'hdsbool_t'".format(self.ctype))
+      elif newtype == "void *":
+         if self.type_code == TYPE_INTEGER:
+            self.type_code = TYPE_OTHER
+            self.isFpointer = True
+            if "int" in self.ctype:
+               self.ctype = self.ctype.replace( "int", "void *" )
+               self.resetCdec()
+         elif newtype not in self.ctype:
+            Leave( "Variable.changeType() cannot convert '{0}' to '{1}'".format(self.ctype,newtype))
+      elif newtype.startswith("Ast"):
+         if self.type_code == TYPE_INTEGER:
+            self.type_code = TYPE_OTHER
+            mt = re.match(r'(\w+)',newtype)
+            if mt:
+               self.ctype = self.ctype.replace( "int", mt.group(1)+" *" )
+               self.resetCdec()
+            else:
+               Leave( "What????")
+
+         elif self.type_code == TYPE_OTHER and self.ctype[:3] == "Ast":
+            mt1 = re.match(r'(\w+)',newtype)
+            if mt1:
+               newclass = mt1.group(1)
+            mt2 = re.match(r'(\w+)',self.ctype)
+            if mt2:
+               oldclass = mt2.group(1)
+
+            if mt1 and mt2:
+               self.ctype = self.ctype.replace( oldclass, newclass )
+               self.resetCdec()
+            else:
+               Leave( "What????")
+
+         elif newtype not in self.ctype:
+            Leave( "Variable.changeType() cannot convert '{0}' to '{1}'".format(self.ctype,newtype))
+      elif newtype.startswith("Ndf"):
+         if self.type_code == TYPE_INTEGER:
+            self.type_code = TYPE_OTHER
+            mt = re.match(r'(\w+)',newtype)
+            if mt:
+               self.ctype = self.ctype.replace( "int", mt.group(1)+" *" )
+               self.resetCdec()
+            else:
+               Leave( "What????")
+         elif newtype not in self.ctype and self.ctype not in newtype:
+            Leave( "Variable.changeType() cannot convert '{0}' to '{1}'".format(self.ctype,newtype))
+
+      elif newtype.startswith( "AryPlace" ):
+         if self.type_code == TYPE_INTEGER:
+            self.type_code = TYPE_OTHER
+            self.ctype = self.ctype.replace( "int", "AryPlace *" )
+            self.resetCdec()
+         elif newtype not in self.ctype and self.ctype not in newtype:
+            Leave( "Variable.changeType() cannot convert '{0}' to '{1}'".format(self.ctype,newtype))
+
+      elif newtype.startswith( "Ary" ):
+         if self.type_code == TYPE_INTEGER:
+            self.type_code = TYPE_OTHER
+            self.ctype = self.ctype.replace( "int", "Ary *" )
+            self.resetCdec()
+         elif newtype not in self.ctype and self.ctype not in newtype:
+            Leave( "Variable.changeType() cannot convert '{0}' to '{1}'".format(self.ctype,newtype))
+
+
+      elif newtype.startswith("int"):
+         mt = re.match(r'(Ndf\w+)',self.ctype)
+         if self.type_code == TYPE_OTHER and mt:
+            self.type_code = TYPE_INTEGER
+            if self.cname.startswith("acb") or \
+               self.cname.startswith("dcb") or \
+               self.cname.startswith("fcb") or \
+               self.cname.startswith("pcb"):
+               self.cname = "i"+self.cname
+            self.ctype = self.ctype.replace( mt.group(1)+" *", "int" )
+            self.resetCdec()
+
+         elif newtype not in self.ctype:
+            Leave( "Variable.changeType() cannot convert '{0}' to '{1}'".format(self.ctype,newtype))
+
+      else:
+         Leave( "Unsupported new type in Variable.changeType(): "+newtype )
+
+#  Reset a variable's C declaration. Use this when any properties of the
+#  variable are changed.
+   def resetCdec( self ):
+      self.cdec = None
+
+   def getCdec( self, name=True, t=None ):
+
+      if name:
+         cdec = self.cdec
+         cname = self.cname
+      else:
+         cdec = self.cdecnn
+         cname = ''
+
+      if cdec is None or "CGEN_TYPE" in self.ctype:
+         reset = False
+         if self.isFpointer:
+            cdec = "void *"+cname
+         elif self.ctype.endswith("*"):
+            cdec = self.ctype+cname
+         else:
+            cdec = self.ctype+" "+cname
+
+         if cdec.startswith("const"):
+            cdec = cdec[5:].lstrip()
+            const = True
+         else:
+            const = False
+
+         mt = re.match(r'^char(\[[^\]]*\])(.*)$', cdec )
+         if mt:
+            vname = mt.group(2)
+            vlen = mt.group(1)
+            vtype = "char"
+            cdec = vtype+vname+vlen
+         else:
+            vname = ""
+            vlen = ""
+            vtype = ""
+
+         if const:
+            vcon = "const "
+         else:
+            vcon = ""
+         cdec = vcon+cdec
+
+         if self.bounds:
+            first = True
+            vbnd = "["
+
+            if isinstance( self, CVariable ):
+               use_bounds = self.bounds
+            else:
+               use_bounds = reversed(self.bounds)
+            keep = False
+            self.addIndex = []
+            newbounds = []
+            for axbounds in use_bounds:
+               if first:
+                  first = False
+               else:
+                  vbnd += ","
+
+               if len(axbounds) > 1 :
+                  if axbounds[0] != "1":
+                     ubnd = Simplify( "{0}-{1}+1".format(axbounds[1],axbounds[0]) )
+                     addIndex = CExpr( "1-{0}".format(axbounds[0]), self )
+                     keep = True
+                  else:
+                     ubnd = axbounds[1]
+                     addIndex = None
+                  reset = True
+               else:
+                  ubnd = axbounds[0]
+                  addIndex = None
+
+               self.addIndex.append( addIndex )
+               newbounds.append( [ubnd] )
+
+               if ubnd != "*" and ubnd != "":
+                  vbnd += " {0}".format(ubnd)
+
+            if not keep:
+               self.addIndex = None
+
+            if not isinstance( self, CVariable ):
+               newbounds = newbounds[::-1]
+            self.bounds = newbounds
+
+            if vbnd.endswith("["):
+               vbnd += "]"
+            else:
+               vbnd += " ]"
+
+            if vname:
+               cdec = vcon+vtype+vname+vbnd+vlen
+            else:
+               cdec += vbnd
+
+         if self.init_value:
+            cdec += " = "+self.init_value
+
+         newcom = ConBlockCommentupdate( self.fname, self.ctype, self.com )
+         if newcom:
+            self.com = newcom
+
+         if reset:
+            cdec = self.getCdec( name )
+
+         if name:
+            self.cdec = cdec
+         else:
+            self.cdecnn = cdec
+
+         if t:
+            cdec = re.sub(r'CGEN_TYPE', cgen_type[t], cdec )
+
+      return cdec
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+      result = "{0}{1}".format(indent,self.getCdec())
+      if self.ctype == "HDSLoc *":
+         result += " = NULL"
+      result += ";"
+      result = addEOLComment( result, self.com )
+      result += "\n"
+      return result
+
+# ----------------------------------------------------------------------
+# A pre-formatted C variable declaration.
+class CVariable(Variable):
+   def __init__( self, start, code, com ):
+      self.code = code.strip()
+      self.extern = False
+      self.fixedtype = True
+      init_value = None
+      ctype = None
+      cname = None
+      bounds = None
+
+      if self.code.startswith("extern "):
+         self.code = self.code[6:].lstrip()
+         self.extern = True
+
+      mt = re.match( r'(.*?)(\w+) *([=;\[])', self.code )
+      if mt:
+         ctype = mt.group(1).strip()
+         cname = mt.group(2)
+         if mt.group(3) == "=":
+            mt = re.match( r'.*=(.*);', self.code )
+            if mt:
+               init_value = mt.group(1)
+            else:
+               Leave( "Bad initial value in C code "+code)
+         elif mt.group(3) == "[":
+            mt = re.match( r'.*?(\[.*\])', self.code )
+            if mt:
+               bounds = mt.group(1)
+
+               if ctype == "char" or ctype == "const char":
+                  closer = bounds.find("]")
+                  ctype += bounds[:closer+1]
+                  if closer+1 < len(bounds):
+                     bounds = bounds[closer+1:]
+                  else:
+                     bounds = None
+
+            else:
+               Leave( "Bad bounds in C code "+code)
+
+      else:
+         Leave( "Bad variable dec in C code "+code)
+      Variable.__init__( self, start, TYPE_OTHER, cname.upper(), None, None, com )
+      self.cname = cname
+      self.cdec = self.code
+
+      if bounds:
+         self.bounds = []
+         close_at = 0
+         while True:
+            open_at = FindOpener( bounds, close_at, use="[" )
+            if open_at >= 0 :
+               close_at = FindCloser( bounds, open_at, use="[]" )
+               self.bounds.append( [bounds[open_at+1:close_at].strip()] )
+            else:
+               break
+
+      elif ctype.endswith("*") and not ctype.endswith("char *") \
+           and not re.match(r'Ndf\w+ \*',ctype) and ctype != "Ary *" \
+           and ctype != "HDSLoc *" and not re.match(r'Ast\w+ \*',ctype) \
+           and ctype != "void *":
+         self.bounds = [[""]]
+         ctype = ctype[:-1]
+      self.ctype = ctype.strip()
+
+      if "char" in self.ctype:
+         self.type_code = TYPE_CHAR
+      elif "int" in self.ctype:
+         self.type_code = TYPE_INTEGER
+      elif "float" in self.ctype:
+         self.type_code = TYPE_REAL
+      elif "double" in self.ctype:
+         self.type_code = TYPE_DOUBLE
+
+      self.init_value = init_value
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+      result = indent
+      if self.extern:
+         result += "extern "
+      result += self.code
+      result = addEOLComment( result, self.com )
+      return result+"\n"
+
+
+# ----------------------------------------------------------------------
+class Blank(Item):
+   def __init__( self, start, nline, com ):
+      Item.__init__( self, com, start )
+      self.nline = nline
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+      return "\n" * self.nline
+
+
+# ----------------------------------------------------------------------
+#  Leading spaces are retained in each comment line. All lines should be
+#  supplied concatenated into a single string using "\n" as separators.
+#  The leading comment character ("*","C" or "!") should have been
+#  removed from every line. The main principle is that leading spaces in
+#  the F77 source should eb retained in order to retain the layout of each
+#  comment block.
+class Comment(Item):
+   def __init__( self, start, com, type ):
+      Item.__init__( self, com, start )
+      self.type = type
+      self.iscode = False
+
+   def fill(self):
+      if self.type == COM_C:
+         return
+      text = None
+      para_text = []
+      para_indent = []
+      nontext0 = True
+
+      for line in self.com.split("\n"):
+         s = line.strip()
+         nnorm = sum(c.isspace() for c in s) + sum(c.isalnum() for c in s)
+         ntot = len(s)
+         s = line.lstrip()
+         nspace = len(line) - len(s)
+
+         nontext = ( ntot == 0 or nnorm < ntot/2 )
+         if nontext or nontext0 or nspace != nspace0:
+            if text is not None:
+               para_text.append( text )
+               para_indent.append( nspace0 )
+            nspace0 = nspace
+            nontext0 = nontext
+            text = s.rstrip()
+         else:
+            text += " "+s.rstrip()
+
+      para_text.append( text )
+      para_indent.append( nspace0 )
+
+      result = ""
+      for (text,indent) in zip(para_text,para_indent):
+         sindent = " " * indent
+         for line in textwrap.wrap( text, width=LINE_LEN - indent ):
+            result += sindent+line+"\n"
+      self.com = result[:-1]
+
+
+   def update( self ):
+      if self.com == ".":
+         self.ignore = True
+
+      if self.type == COM_C:
+         return
+
+      #  See if this comment is inside a prologue.
+      pro = self.parent
+      while pro and not isinstance( pro, Prologue ):
+         pro = pro.parent
+
+      # If so, see if it is a prologue section that should be protected from thye following edits.
+      protect = False
+      if pro:
+         prosec = self
+         while prosec and not isinstance( prosec, ProSection ):
+            prosec = prosec.parent
+         if prosec:
+            name = prosec.getName()
+            if name == "Authors":
+               protect = True
+
+      # Change upper-case variable names to lower case in quotes. Problem
+      # is there are sometimes options specified as upper-case character
+      # strings without surrounding quotes that are the same as variable names
+      # (e.g. ndf_hinfo).
+      if not protect:
+         for var in self.getVarMap().values():
+            if isinstance( var, Variable):
+               fname = var.fname
+               cname = var.cname
+               self.com = re.sub(r'([^"\'])\b'+fname+r'\b([^"\'])', r'\1"'+cname+r'"\2', self.com)
+
+         # Specific re-formatting rules.
+         self.com = LiteralEdits( self.com, True )
+
+         #  If this comment is not inside a prologue, ensure it is preceded
+         #  by exactly one blank line.
+         if not pro:
+            blank = self.getPrevItem()
+            if not isinstance(blank,Blank):
+               self.insertBefore(Blank(self.start,1,None))
+            else:
+               blank.nline = 1
+               blank = blank.getPrevItem()
+               while isinstance( blank, Blank ):
+                  blank.ignore = True
+                  blank = blank.getPrevItem()
+
+         #  If this is a "Local Constants:" comment, ignore it plus the
+         #  preceding Blank line.
+         if "Local Constants:" in self.com:
+            self.ignore = True
+            item = self.getPrevItem(False)
+            if isinstance( item, Blank ):
+               item.ignore = True
+
+         #  If this is an "External References:" comment, ignore it plus all
+         #  subsequent variable declarations.
+         if "External References:" in self.com:
+            self.ignore = True
+            item = self.getNextItem(False)
+            while isinstance( item, Variable ):
+               item.fixedtype = True
+               item.ignore = True
+               item = item.getNextItem(False)
+
+         #  If this is an "Internal References:" comment, ignore it , plus
+         # the preceding blank.
+         if "Internal References:" in self.com:
+            self.ignore = True
+            item = self.getPrevItem(False)
+            if isinstance( item, Blank ):
+               item.ignore = True
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ""
+
+      if self.type == COM_NONE:
+         return "\n"
+
+      if self.type == COM_ASTERISK_WHITE:
+         return "*\n"
+
+      if self.type == COM_C_WHITE:
+         return "C\n"
+
+      if self.type == COM_ASTERISK:
+         first = True
+         for line in self.com.split('\n'):
+            if first:
+               first = False
+               comtext = "/*"+line[1:]
+            else:
+               comtext += "\n "+line
+         comtext += " */\n"
+         return comtext
+
+      if self.type == COM_PROLOGUE:
+         comtext = ""
+         if self.iscode:
+            for line in codeWrap( self.com, LINE_LEN-6 ):
+               comtext += "*     "+line+"\n"
+         else:
+            self.fill()
+            for line in self.com.split('\n'):
+               comtext += "*"+line+"\n"
+         return comtext
+
+      if self.type == COM_C:
+         comtext = ""
+         for line in self.com.split('\n'):
+            comtext += "//"+line[1:]+"\n"
+         return comtext
+
+      Leave("Comment(toC): Unexpected comment type {0}".format(self.type))
+
+
+# ----------------------------------------------------------------------
+class Argument(Variable):
+   def __init__( self, start, type, name, bounds, size, com, access ):
+      Variable.__init__( self, start, type, name, bounds, size, com )
+      self.access = access
+      self.length_var = None
+      self.proarg = None
+
+      if ( name == "IAX" or name == "ICCOMP") and type == TYPE_INTEGER:
+         self.zerobased = True
+
+      # An argument which is a single element array becomes a scalar
+      # unless it is modified, in which case it becomes a pointer to a scalar.
+      if bounds and self.bounds is None and access != READ:
+         if self.ctype.endswith("*"):
+            self.ctype += "*"
+         else:
+            self.ctype += " *"
+         self.resetCdec()
+
+   def resetCdec( self ):
+      super(Argument,self).resetCdec()
+      if self.parent:
+         self.parent.resetCarglist()
+
+   def changeType(self,newtype):
+      super(Argument,self).changeType(newtype)
+      proarg = ProArgument.Find(self.fname)
+      if proarg:
+         proarg.changeType(newtype)
+      else:
+         Leave( "No ProArgument found for argument "+self.name)
+
+# ----------------------------------------------------------------------
+class ProArgument(Comment):
+
+   static_map = {}
+
+   def __init__( self, start, name, typeText, desc ):
+      Comment.__init__( self, start, desc, COM_PROLOGUE )
+      self.length_arg = None
+      makepointer = False
+      mt = re.match("^ *(\w+)(.*)$",name)
+      if mt:
+         name = mt.group(1)
+         if mt.group(2).replace(" ","") == "(1)":
+            makepointer = True
+      else:
+         Leave("ProArgument: No usable argument name found in '{0} = {1}'.".format(name,typeText),start)
+
+      typeText = typeText.strip()
+      lctypeText = typeText.lower()
+      if lctypeText.endswith("(given)"):
+         access = READ
+         typeText = typeText[:-7].strip()
+      elif lctypeText.endswith("(given and returned)"):
+         access = READ_WRITE
+         typeText = typeText[:-20].strip()
+      elif lctypeText.endswith("(returned)"):
+         access = WRITE
+         typeText = typeText[:-10].strip()
+      else:
+         access = ''
+         Leave("ProArgument: No usable access mode found in '{0} = {1}'.".format(name,typeText),start)
+
+      if typeText == "SUBROUTINE":
+         typeText = "EXTERNAL"
+
+      ( type, tname, bounds, size ) = isDecl( typeText, start, pro=True )
+      self.arg = Argument( start, type, name, bounds, size, None, access )
+
+      if makepointer and access != READ:
+         if self.arg.ctype.endswith("*"):
+            self.arg.ctype += "*"
+         else:
+            self.arg.ctype += " *"
+         self.arg.resetCdec()
+
+      ProArgument.static_map[name] = self
+
+
+   #  Return the ProArgument object that refers to a given F7 argument
+   #  name.
+   @classmethod
+   def Find(cls,fname):
+      if fname in ProArgument.static_map:
+         return ProArgument.static_map[fname]
+      else:
+         return None
+
+   def changeType(self,newtype):
+      super(Argument,self.arg).changeType(newtype)
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+      result = "*     "+self.arg.cname+"\n"
+      result += super(ProArgument,self).toC( "" )
+      if self.arg.length_var:
+         result += "*     "+self.arg.length_var+"\n"
+         result += "*        The length of the supplied '{0}' array. This should include\n".format(self.arg.cname)
+         result += "*        room for the terminating null.\n"
+      return result
+
+   def update( self ):
+      newcom = ConBlockCommentupdate( self.arg.fname, self.arg.ctype, self.com )
+      if newcom:
+         self.com = newcom
+
+      elif self.arg.fname == "IAX" and self.arg.ctype == "int":
+         mt = re.match(r'^( *)Number +(.*)$',self.com, re.DOTALL )
+         if mt:
+            self.com = mt.group(1)+"Zero-based index "+mt.group(2)
+
+      elif self.arg.ctype == "char *":
+         mt = re.match(r'^( *)(.*)$',self.com, re.DOTALL )
+         if mt:
+            rest = mt.group(2)
+            prefix = mt.group(1)+"Pointer to "
+            if self.arg.access == WRITE:
+               prefix += "an array in which to return a null terminated string holding "
+            else:
+               prefix += "a null terminated string holding "
+            if not rest.startswith("A") and not rest.startswith("The"):
+               prefix += "the "
+            if rest[:2].isupper():
+               self.com = prefix + rest
+            else:
+               self.com = prefix + rest[0].lower() + rest[1:]
+
+      elif self.arg.access == WRITE:
+         if "eturned" not in self.com:
+            mt = re.match(r'^( *)(.*)$',self.com, re.DOTALL )
+            if mt:
+               rest = mt.group(2)
+               word1 = rest.split()[0]
+               if len(word1) == 1 or not word1.isupper():
+                  add = rest[0].lower()+rest[1:]
+               else:
+                  add = rest
+               word1lc = word1.lower()
+               if word1lc == "a" or word1lc == "the":
+                  self.com = mt.group(1)+"Returned holding "+add
+               else:
+                  self.com = mt.group(1)+"Returned holding the "+add
+
+
+
+
+      super(ProArgument,self).update()
+
+   def update2( self ):
+      if self.length_arg and self.length_arg != "*":
+         self.com += ' The supplied "{0}" array should have at least "{1}" elements.'.format( self.arg.cname, self.length_arg)
+
+
+# ----------------------------------------------------------------------
+#  Single line IF statment
+class IfOne(Item):
+   def __init__( self, start, expr, statement, com ):
+      Item.__init__( self, com, start )
+      self.fexpr = expr.strip()
+      self.fstatement = statement.strip()
+
+   def containsGoto( self, label ):
+      mt = re.match(r'^GO *TO *(\d+)$', self.fstatement, re.IGNORECASE)
+      if mt:
+         if label is not None and label != int(mt.group(1)):
+            return None
+         else:
+            return self
+      else:
+         return None
+
+#  Assuming the IF statement ends with a GOTO, change the "goto" to a "break".
+   def ignoreGoto( self ):
+      if self.containsGoto(None):
+          self.fstatement = "break"
+          self.cstatement = "break;"
+      else:
+          Leave( "Request to remove GO TO from IF statement that has no GO TO")
+
+   def update(self):
+      self.cexpr = CExpr(self.fexpr,self)
+      self.cstatement = CStatement(self.fstatement,self)
+      mt = re.match( r'( *)astAnnul\( (\**\w+) *\)', self.cstatement )
+      if mt:
+         self.cstatement = mt.group(1)+mt.group(2)+" = "+self.cstatement
+
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+      self.update()
+      text = indent+"if( "+self.cexpr+" ) "+self.cstatement+"\n"
+      return formatCode( self, text, indent )
+
+# ----------------------------------------------------------------------
+#  GO TO statement
+class GoTo(Item):
+   def __init__( self, start, label, com ):
+      Item.__init__( self, com, start )
+      self.target = int(label.strip())
+
+   def containsGoto( self, label ):
+      if self.target == label and not self.ignore:
+         return self
+      else:
+         return None
+
+#  Ensure the GOTO is ignored (not printed in the C output), and insert
+#  a "break immediately after it.
+   def ignoreGoto( self ):
+      self.ignore = True
+      self.insertAfter( CCode( None, "break;", None ) )
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+      text = indent+"goto L{0};\n".format(self.target)
+      return formatCode( self, text, indent )
+
+# ----------------------------------------------------------------------
+#  Function prototype.
+class Prototype(Item):
+   def __init__( self, rettype, funname, arglist ):
+      Item.__init__( self, None, None )
+      self.rettype = rettype.strip()
+      self.funname = funname.strip()
+      self.args = []
+      for value in CommaSplit( arglist, None, '"' ):
+         self.args.append( CVariable( None, value+";", None ) )
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+      result = self.rettype+" "+self.funname+"( "
+      indent = " "*len(result)
+      first = True
+      for arg in self.args:
+         if first:
+            first = False
+         else:
+            result += ",\n"+indent
+         argdec = arg.toC( "" ).strip()[:-1]
+         result += argdec
+      result += " );\n\n"
+      return result
+
+# ----------------------------------------------------------------------
+#  A C constant definition
+class CConstant(Item):
+   def __init__( self, name, value, ctype=None ):
+      global abort
+
+      Item.__init__( self, None, None )
+      self.name = name.strip()
+      self.value = value.strip()
+
+      if self.value:
+         if ctype is None:
+            mt = re.match( float_re, self.value )
+            if mt:
+               if "." in self.value:
+                  self.ctype = "double"
+               else:
+                  self.ctype = "int"
+            elif self.value[0]=='"' and self.value[-1]=='"':
+               self.ctype = "const char *"
+            elif self.value == 'NULL':
+               self.ctype = "void *"
+            else:
+               dtype = [""]
+               cexp = CExpr( self.value, None, dtype )
+               self.ctype = dtype[0]
+         else:
+            self.ctype = ctype
+
+         if not self.ctype:
+            Leave("Unknown data type for '{0}'".format(self.toC("")))
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+      return "#define "+self.name+" "+self.value+"\n"
+
+# ----------------------------------------------------------------------
+#  CONTINUE (i.e. do nothing)
+class Continue(Item):
+   def __init__( self, start, com ):
+      Item.__init__( self, com, start )
+
+
+   def update(self):
+      nested_item = None
+
+#  If this looks like a CONTINUE that marks the start of an RFWS-style
+#  "simulated DO WHILE loop", see if it can be replaced by a real while
+#  loop.
+      if 'Start of' in self.com and 'DO WHILE' in self.com and self.label is not None:
+
+#  Search the unit for the first IF statement following this CONTINUE
+#  statement. Check that none of the intervening items contain GOTO items
+#  that refer to the loop.
+         item = self.getNextItem(False)
+         fitem = item
+         litem = None
+         while item:
+            if isinstance( item, If ):
+               break
+            elif item.containsGoto(self.label):
+               item = None
+               break
+            else:
+               litem = item
+               item = item.getNextItem(False)
+
+#  If found, check that the only goto relating to the loop's label within
+#  the IF block, is the (or is inside the) last non-blank item.
+         if item:
+            goto_item = None
+            last_has_goto = False
+            last_child = None
+            child = item.getFoot(False)
+            while child:
+               if not isinstance( child, Blank ):
+                  if last_has_goto:
+                     item = None
+                     break
+                  else:
+                     last_has_goto = child.containsGoto(self.label)
+                     if isinstance( child, GoTo ) and child.target == self.label:
+                        goto_item = child
+                  last_child = child
+               child = child.getNextItem(False)
+
+#  If so, check that none of the items that follow the IF statement contains a
+#  goto that refers to the loop.
+         if item and last_has_goto:
+            if item.restContainsGoto(self.label):
+               item = None
+         else:
+            item = None
+
+#  If the goto is inside a nested IF block...
+         if item and last_has_goto and isinstance( last_child, If ):
+
+#  Check the goto is the last non-blank item in the nested IF block, and
+#  that there are no other relevant GOTOs. If the IF block contains an
+#  ELSE, the GOTO must be the last non-blank item before the ELSE or
+#  final ENDIF (note which). We cannot proceed with this translation if
+#  the IF block contains an ELSE IF.
+            iifblock = 0
+            nifblock = 1
+            goto_item = None
+            last_has_goto = False
+            child = last_child.getFoot(False)
+            while child:
+               if isinstance( child, Else ):
+                  els = child
+                  nifblock = 2
+                  if last_has_goto:
+                     break;
+                  iifblock = 1
+
+               elif isinstance( child, ElseIf ):
+                  item = None
+                  break
+
+               elif not isinstance( child, Blank ):
+                  if last_has_goto:
+                     item = None
+                     break
+                  else:
+                     last_has_goto = child.containsGoto(self.label)
+                     if isinstance( child, GoTo ) and child.target == self.label:
+                        goto_item = child
+               child = child.getNextItem(False)
+
+#  If so, record the nested if block.
+            if item and last_has_goto and goto_item is not None:
+               nested_item = last_child
+            else:
+               item = None
+
+#  If all is OK, replace the current Continue with a DoWhile.
+         if item and goto_item:
+
+#  Create the DoWhile, using the expression from the first IF statement.
+            new_item = DoWhile( self.start, item.fexpr, None)
+
+#  If the item just before the CONTINUE is a comment, move it to be just before the
+#  first IF statement.
+            prev = self.getPrevItem()
+            if isinstance( prev, Comment ):
+               self.parent.unlink( prev )
+               self.parent.insertBefore( prev, item )
+
+#  Insert the DoWhile immediatelty before the first IF statement
+            self.parent.insertBefore( new_item, item )
+
+#  Ignore the original CONTINUE statement.
+            self.ignore = True
+
+#  Move all the children of the first IF statement into the DoWhile statement.
+            last_child = None
+            for child in item.children:
+               new_item.append( child )
+               last_child = child
+            item.empty()
+
+#  Remove the first IF statement from the parent.
+            self.parent.remove(item)
+
+#  If the GOTO was preceded by a comment, remove it, together with any
+#  preceding blank lines.
+            prev = goto_item.getPrevItem()
+            if isinstance( prev, Comment ):
+               while isinstance( prev, Comment ) or isinstance( prev, Blank ):
+                  goto_item.parent.remove( prev )
+                  prev = prev.getPrevItem()
+
+#  Remove the goto statement from the DoWhile (i.e. the goto statement that
+#  returned to the original CONTINUE statement).
+            goto_item.parent.remove( goto_item )
+
+#  If the GOTO was inside a nested IF (with no ELSE), we need to include
+#  "} else { break; }" so that the while loop is exited if the nested IF
+#  statement is false.
+            if nested_item:
+               if nifblock  == 1:
+                  els = Else( None, None )
+                  nested_item.append( els )
+                  nested_item.append( CCode( None, "break;", None ) )
+
+# If the GOTO is inside an IF and immediately before an ELSE, put a break
+# at the end of the ELSE block.
+               elif iifblock == 0:
+                  nested_item.append( CCode( None, "break;", None ) )
+
+# If the GOTO is inside an IF, at the end of an ELSE block, put a break
+# just before the "} else {". If the ELSE block is otherwise empty, delete
+# it plus any preceding comment.
+               else:
+                  els.insertBefore(CCode( None, "break;", None ))
+
+                  empty = True
+                  child = els.getNextItem(False)
+                  while child:
+                     if ( not isinstance( child, GoTo ) and
+                          not isinstance( child, Blank ) and
+                          not isinstance( child, Comment ) ):
+                        empty = False
+                        break
+                     child = child.getNextItem(False)
+
+                  if empty:
+                     child = els.getPrevItem(False)
+                     els.parent.remove(els)
+                     while child:
+                        if ( isinstance( child, Blank ) or
+                             isinstance( child, Comment ) ):
+                           child.parent.remove(child)
+                        child = child.getPrevItem(False)
+
+#  Any items that came between the CONTINUE and the first IF must be copied
+#  to the end of the while block or (if the GOTO is nested) immediately
+#  before the "else" added above.
+            if litem:
+               item = self.getNextItem()
+               while item:
+                  copied_item = copy.deepcopy( item )
+                  if nested_item:
+                     nested_item.insertBefore( copied_item, els )
+                  else:
+                     new_item.append( copied_item )
+
+                  if item == litem:
+                     break
+                  item = item.getNextItem(False)
+
+               copied_item = Blank( None, 1, None )
+               if nested_item:
+                  nested_item.insertBefore( copied_item, els )
+               else:
+                  new_item.append( copied_item )
+
+
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+
+      text = addEOLComment( "", self.com )+"\n"
+      return formatCode( self, text, None )
+
+
+# ----------------------------------------------------------------------
+#  RETURN
+class Return(Item):
+   def __init__( self, start, com ):
+      Item.__init__( self, com, start )
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+      return "return;"
+
+
+
+# ----------------------------------------------------------------------
+#  A compound code item (i.e an item that can contain other items - a
+#  subroutine, a DO-loop, etc)
+class Unit(Item):
+   def __init__( self, com, start ):
+      Item.__init__( self, com, start )
+      self.empty()
+
+   def empty(self):
+      self.children = []
+      self.head = None
+      self.foot = None
+      self.variables = {}
+      self.wargs = []
+
+   def moveup(self,item):
+      if item == self.head:
+         return
+
+      item1 = item.prev
+      item2 = item
+      item3 = item.next
+      if item3:
+         item4 = item3.next
+      else:
+         item4 = None
+
+      if item1:
+         item1.next = item3
+      if item3:
+         item3.next = item2
+      if item2:
+         item2.next = item4
+
+      if item4:
+         item4.prev = item2
+      if item2:
+         item2.prev = item3
+      if item3:
+         item3.prev = item1
+
+      if self.foot == item2:
+         self.foot = item3
+      if self.head == item3:
+         self.head = item2
+
+   def movedown(self,item):
+      if item == self.foot:
+         return
+      self.moveup( item.prev )
+
+   def _append(self,item):
+      if item not in self.children:
+         self.children.append(item)
+      if isinstance( item, Variable ) and item.fname not in self.variables:
+         self.variables[ item.fname ] = item
+      if isinstance( item, Argument ) and item.access != READ and item not in self.wargs:
+         self.wargs.append( item )
+
+   def append(self,item):
+      self.insertAfter(item,self.head)
+
+   def unlink(self,item):
+      prev = item.prev
+      next = item.next
+      if prev:
+         prev.next = next
+      if next:
+         next.prev = prev
+      if item == self.foot:
+         self.foot = next
+      if item == self.head:
+         self.head = prev
+
+   def remove(self,item):
+      self.unlink(item)
+      if isinstance( item, Variable ):
+         del self.variables[ item.fname ]
+      if isinstance( item, Argument ) and item.fname in self.wargs:
+         del self.wargs[ item.fname ]
+
+   def getFoot(self,exclude_ignored=True):
+      result = self.foot
+      if exclude_ignored:
+         while result and result.ignore:
+            result = result.next
+      return result
+
+#  insert item before "before", where "before" is a child of self.
+   def insertBefore(self,item,before):
+      item.parent = self
+      item.prev = before.prev
+      item.next = before
+      if before.prev:
+         before.prev.next = item
+      before.prev = item
+      if self.foot == before:
+         self.foot = item
+      self._append(item)
+
+   def insertAfter(self,item,after):
+      item.parent = self
+      if after:
+         item.prev = after
+         item.next = after.next
+         if after.next:
+            after.next.prev = item
+         after.next = item
+         if self.head == after:
+            self.head = item
+      else:
+         self.head = item
+         self.foot = item
+         item.prev = None
+         item.next = None
+      self._append(item)
+
+#  Remove an item from its parent, and insert all the items children in
+#  its place. Return the items in the parent that fall before and after
+#  the item removed.
+   def raiseChildren(self):
+      before = item.prev
+      after = item.next
+
+      if len(self.children) > 0:
+         first_child = self.children[0]
+         last_child = self.children[-1]
+
+         if before:
+            before.next = first_child
+         else:
+            self.foot = first_child
+         first_child.prev = before
+
+         if after:
+            after.prev = last_child
+         else:
+            self.head = last_child
+         last_child.next = after
+
+      else:
+         if before:
+            before.next = after
+         else:
+            self.foot = after
+         if after:
+            after.prev = before
+         else:
+            self.head = before
+
+      return [before,after]
+
+
+   def restContainsGoto(self, label):
+      child = self.getNextItem(False)
+      while child:
+         if child.containsGoto( label ):
+            return True
+         else:
+            child = child.getNextItem(False)
+      if self.parent:
+         return self.parent.restContainsGoto(label)
+      else:
+         return False
+
+   def containsGoto( self, label ):
+      result = None
+      child = self.getFoot(False)
+      while child:
+         result = child.containsGoto( label )
+         if result:
+            break
+         child = child.getNextItem(False)
+      return result
+
+   def toString(self,indent="",exclude_ignored=True ):
+      result = super(Unit,self).toString( indent, exclude_ignored )
+      child_indent = indent + "  "
+      child = self.getFoot(exclude_ignored)
+      while child:
+         child_text = child.toString(child_indent,exclude_ignored)
+         result += child_indent+"{0}: ".format(self.children.index(child))+child_text[len(child_indent):]
+         child = child.getNextItem(exclude_ignored)
+      return result
+
+   def printString(self,indent="",exclude_ignored=True ):
+      super(Unit,self).printString( indent, exclude_ignored )
+      child_indent = indent + "  "
+      child = self.getFoot(exclude_ignored)
+      while child:
+         child.printString(child_indent,exclude_ignored)
+         child = child.getNextItem(exclude_ignored)
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+
+      result = ""
+      child = self.getFoot()
+      while child:
+         result += child.toC( indent )
+         child = child.getNextItem()
+      return result
+
+   def update( self ):
+      child = self.getFoot(False)
+      while child:
+         child.update()
+         child = child.getNextItem(False)
+
+   def update2( self ):
+      child = self.getFoot(False)
+      while child:
+         child.update2()
+         child = child.getNextItem(False)
+
+# ----------------------------------------------------------------------
+class Prologue(Unit):
+   def __init__( self, start ):
+      Unit.__init__(self, None, start )
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+
+      result = "/*\n*+\n"
+      child = self.getFoot()
+      while child:
+         result += child.toC( "" )+"\n"
+         child = child.getNextItem()
+      return result+"*-\n*/\n"
+
+   def getSection( self, name ):
+      child = self.getFoot()
+      while child:
+         if isinstance( child, ProSection ) and child.getName() == name:
+            break
+         child = child.getNextItem()
+      return child
+
+   def setSectionBody( self, name, body ):
+      child = self.getFoot()
+      while child:
+         if isinstance( child, ProSection ) and child.getName() == name:
+            child.setBody( body )
+            break
+         child = child.getNextItem()
+
+   def getArgs( self ):
+      child = self.getFoot(False)
+      while child:
+         if isinstance( child, ProSection ):
+            secName = child.getName()
+            if secName == "Parameters" or secName == "Arguments":
+               return child.getArgs()
+         child = child.getNextItem(False)
+
+
+
+# ----------------------------------------------------------------------
+class ProSection(Unit):
+   def __init__( self, start, name ):
+      Unit.__init__(self, name, start )
+
+   def getName( self ):
+      return self.com
+
+   def setName( self, name ):
+      self.com = name
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+
+      if self.com == "Synopsis":
+         par = self.parent
+         while par and not isinstance( par, Subroutine ):
+            par = par.parent
+         if par:
+            self.setBody( par.getSynopsis("pro") )
+         self.children[0].iscode = True
+
+      result = "*  {0}:\n".format(self.com)
+      child = self.getFoot()
+      while child:
+         result += child.toC( "" )
+         child = child.getNextItem()
+
+      return result
+
+
+   def getPrologue( self ):
+      pro = self.parent
+      while pro and not isinstance( pro, Prologue ):
+         pro = pro.parent
+      return pro
+
+   def appendBody( self, body ):
+      if isinstance(body, basestring):
+         self.append( Comment( self.start, body, COM_PROLOGUE ) )
+      else:
+         for text in body:
+            self.append( Comment( self.start, text, COM_PROLOGUE ) )
+
+   def setBody( self, body ):
+      self.empty()
+      self.appendBody( body )
+
+   def getAuthors( self ):
+      authors = self.getPrologue().getSection( "Authors" ).getFoot().com.split("\n")
+      result = []
+      for a in authors:
+         a = a.strip()
+         if re.match( r'[A-Z]+:', a ):
+            result.append( a )
+      return result
+
+   def update( self ):
+      if self.com == "Language":
+         self.ignore = True
+      elif self.com == "Bugs":
+         self.ignore = True
+      elif self.com == "Algorithm":
+         self.ignore = True
+      elif self.com == "Invocation":
+         self.com = "Synopsis"
+      elif self.com == "Arguments":
+         self.com = "Parameters"
+      elif self.com == "Description":
+         self.children[0].com = re.sub(r'^( *)The routine', r'\1This function',
+                                       self.children[0].com )
+      elif self.com == "Copyright":
+         self.setBody( ["     Copyright (C) {0} East Asian Observatory".format(datetime.date.today().year),
+                        "     All rights reserved."] )
+      elif self.com == "Authors":
+         authors = self.getAuthors()
+         self.empty()
+         for author in authors:
+            self.appendBody( ["     {0}".format(author)])
+         (uname,fname) = getUser()
+         self.appendBody( ["     {0}: {1} (EAO)".format( uname, fname )])
+
+      elif self.com == "History":
+         hist = "        Original version, based on equivalent Fortran routine"
+         authors = self.getAuthors()
+         if authors:
+            mt = re.search( r'[A-Z]+:', authors[0] )
+            if mt:
+               hist += " by {0} et al".format(mt.group(0)[:-1])
+         hist += "."
+         self.setBody( ["     {0} (DSB):".format(time.strftime("%d-%b-%Y").upper()),hist])
+
+      elif self.com == "Returned Value":
+         lines =  self.children[0].com.split("\n")
+         self.setBody( ["     {0}".format( lines[1].strip())] )
+
+      child = self.getFoot(False)
+      while child:
+         child.update()
+         child = child.getNextItem(False)
+
+   def getArgs( self ):
+      result = {}
+      child = self.getFoot(False)
+      while child:
+         if isinstance( child, ProArgument ):
+            result[ child.arg.fname ] = child
+         child = child.getNextItem(False)
+      return result
+
+
+# ----------------------------------------------------------------------
+class File(Unit):
+   def __init__( self, path ):
+      Unit.__init__(self, path, 1 )
+
+# ----------------------------------------------------------------------
+class ControlBlock(Unit):
+   def __init__( self, name ):
+      Unit.__init__(self, name, 1 )
+
+#   def update( self ):
+#      if self.com == "NdfACB":
+#         var = self.variables["ACCESS"]
+#         self.remove( var )
+#         var.fname = "ACC"
+#         self.append(var)
+
+# ----------------------------------------------------------------------
+#  Multi-line IF statment
+class If(Unit):
+   def __init__( self, start, expr, com ):
+      Unit.__init__( self, com, start )
+      self.fexpr = expr.strip()
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+
+      self.cexpr = CExpr(self.fexpr,self)
+      result = indent+"if( "+self.cexpr+" ) {\n"
+      result = formatCode( self, result, indent )
+
+      nchild = 0
+      child = self.getFoot()
+      while child:
+         nchild += 1
+         childtext =  child.toC(indent+"   ")
+         childIsUnit = isinstance( child, Unit )
+         result +=  childtext
+         child = child.getNextItem()
+
+
+      if nchild == 1 and not childIsUnit:
+         result2 = indent+"if( "+self.cexpr+" ) "+childtext.lstrip()
+         if len(result2) < 1.5*LINE_LEN:
+            return formatCode( self, result2, indent )
+
+      return result+indent+"}\n"
+
+# ----------------------------------------------------------------------
+class Loop(Unit):
+   def __init__( self, com, start ):
+      Unit.__init__(self, com, start )
+
+   def update( self ):
+      super(Loop,self).update()
+
+      # See if any GOTO statements inside the loop can be turned into
+      # "break" statements. First find the next statement after the loop
+      # that is not a comment or an unlabeled blank (comments are never
+      # labelled).
+      item = self.getNextItem()
+      while item and item.label is None and ( isinstance( item, Comment ) or isinstance( item, Blank ) ):
+         item = item.getNextItem()
+
+      # If the next statement following the loop has a label...
+      if item and item.label:
+
+         # Search the loop contents for GOTO statements that relate to
+         # the same label, ignoring GOTOs that are nested inside other
+         # Loops.
+         child = self.getFoot()
+         while child:
+            if not isinstance( child, Loop ):
+               goto = child.containsGoto( item.label )
+               if goto:
+                  goto.ignoreGoto()
+            child = child.getNextItem()
+
+         #  Search the entire subroutine or function for a goto that is
+         #  not ignored and which uses the current label. If none are found,
+         #  remove the label from the statement.
+         subfun = self.parent
+         while subfun and not ( isinstance( subfun, Subroutine ) or isinstance( subfun, Function )):
+            subfun = subfun.parent
+         if subfun:
+            if not subfun.containsGoto( item.label ):
+               l = item.label
+               item.label = None
+               if isinstance( item, Continue ):
+                  item.ignore = True
+
+
+
+# ----------------------------------------------------------------------
+#  DO WHILE - real or (if "fexp" is None) simulated using RFWS's method
+class DoWhile(Loop):
+   def __init__( self, start, fexp, com ):
+      Loop.__init__( self, com, start )
+      self.fexp = fexp
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+
+      result = indent+"while( {0} ){{\n".format( CExpr(self.fexp,self) )
+      result = formatCode( self, result, indent )
+
+      child = self.getFoot()
+      while child:
+         result +=  child.toC(indent+"   ")
+         child = child.getNextItem()
+
+      return result+indent+"}\n"
+
+
+
+# ----------------------------------------------------------------------
+#  DO loop without end label
+class Do(Loop):
+   def __init__( self, start, var, control, com ):
+      Loop.__init__( self, com, start )
+      self.fvar = var.strip()
+      self.fincval = "1"
+
+      iat1 = FindBare( ',', control, 0 )
+      if iat1 > 0:
+         self.fstartval = control[:iat1].strip()
+      else:
+         Leave( "Do: no starting value found in '{0}'.".format( control ), start )
+
+      iat2 = FindBare( ',', control, iat1+1 )
+      if iat2 > 0:
+         self.fendval = control[iat1+1:iat2].strip()
+         self.fincval = control[iat2+1:].strip()
+      else:
+         self.fendval = control[iat1+1:].strip()
+
+   def toC( self, indent ):
+      if self.ignore:
+         return ''
+
+      varmap = self.getVarMap()
+
+      # indicate that the loop control variable has been decremented (i.e.
+      # was one-based in F77 but is zero-based in C)
+      varmap = self.getVarMap()
+      if self.fvar in varmap:
+         varmap[self.fvar].decr = True
+      else:
+         Leave( "DO loop variable '{0}' not declared.".format(self.fvar) )
+
+      # if the start and final values are both zerobased, then the loop
+      # variable is also zero based.
+      decstart = True
+      varmap = self.getVarMap()
+      if self.fstartval in varmap:
+         if varmap[self.fstartval].zerobased:
+             varmap[self.fvar].zerobased = True
+             decstart = False
+      decend = True
+      if self.fendval in varmap:
+         if varmap[self.fendval].zerobased:
+             varmap[self.fvar].zerobased = True
+             decend = False
+
+      self.cstartval = CExpr(self.fstartval,self)
+      if decstart:
+         self.cstartval = DecExpr( self.cstartval )
+      self.cendval = CExpr(self.fendval,self)
+      self.cincval = CExpr(self.fincval,self)
+      self.cvar = CName(self.fvar,varmap)
+
+      result = indent+"for( "+self.cvar+" = {0}; ".format(self.cstartval)
+
+      if self.fincval[0] == '-':
+         result += self.cvar+" >= "+DecExpr(self.cendval)+"; "
+      elif not decend:
+         result += self.cvar+" <= "+self.cendval+"; "
+      else:
+         result += self.cvar+" < "+self.cendval+"; "
+         result = re.sub( r' < (\w+) \+ 1;', r' <= \1;', result )
+      try:
+         aa = int(self.cincval)
+         if aa == -1:
+            result += self.cvar+"-- ){\n"
+         elif aa == 1:
+            result += self.cvar+"++ ){\n"
+         elif aa < 0:
+            result += self.cvar+" -= {0} ){{\n".format(-aa)
+         else:
+            result += self.cvar+" += {0} ){{\n".format(aa)
+      except Exception:
+         result += self.cvar+" += "+self.cincval+"){\n"
+      result = formatCode( self, result, indent )
+
+      child = self.getFoot()
+      while child:
+         result +=  child.toC(indent+"   ")
+         child = child.getNextItem()
+
+      return result+indent+"}\n"
+
+# ----------------------------------------------------------------------
+#  DO loop with end label
+class DoLabel(Do):
+   def __init__( self, start, label, var, control, com ):
+      Do.__init__( self, start, var, control, com )
+      self.endlabel = int(label)
+
+# ----------------------------------------------------------------------
+class Subroutine(Unit):
+   def __init__( self, start, defn, com, gentypes ):
+      Unit.__init__(self, com, start )
+      parts = FuncSplit( defn, start )
+      if parts and parts[0] and not parts[1] and parts[0].isalnum:
+         self.fname = parts[0]
+         self.fargnames = parts[2:]
+      else:
+         self.fname = defn
+         self.fargnames = None
+
+      if self.fname.endswith("<T>") and not gentypes:
+         Leave("Generic routine {0} has no generic types".format(self.fname))
+      elif not self.fname.endswith("<T>") and gentypes:
+         Leave("Non-generic routine {0} has generic types {1}".format(self.fname,gentypes))
+
+      if gentypes and gentypes == "n":
+         self.gentypes = "bBdirwWk"
+      elif gentypes is not None:
+         self.gentypes = gentypes
+      else:
+         self.gentypes = [None]
+
+      if gentypes:
+         self.fname = self.fname[:-3]
+
+      self.cname = CName( self.fname )
+      self.carglist = None
+      self.carglistnn = None
+      self.headers = ""
+      self.added = []
+      self.tidy = []
+      self.hasinit = False
+      self.chrisused = False
+
+   def addh(self,name):
+      hfile = findh(name)
+      self.addH( hfile )
+
+   def addH( self, hfile ):
+      if hfile not in self.headers:
+         if hfile[0] != '<':
+            self.headers = self.headers+'#include "{0}"\n'.format(hfile)
+         else:
+            self.headers = self.headers+'#include {0}\n'.format(hfile)
+
+   def useschr( self ):
+      self.chrisused = True
+
+   def getSynopsis( self, t=None ):
+      if self.gentypes[0]:
+         if t is None:
+            return "void CGEN_FUNCTION({0})( {1} )".format(self.cname,self.getCArgList())
+         elif t == "pro":
+            return "void {0}<T>( {1} )".format(self.cname,self.getCArgList())
+         elif t:
+            return "void {0}{2}( {1} )".format(self.cname,self.getCArgList(t=t),cgen_code[t])
+      else:
+         return "void {0}( {1} )".format(self.cname,self.getCArgList())
+
+
+#  Add a line of C code to the "Tidy up" block at the end of the
+#  function, but only if it is not already there.
+   def addTidyUp( self, code ):
+      if code not in self.tidy:
+         self.tidy.append( code )
+
+#  Add a new variable into the local variables list.
+   def addVar( self, ctype, cname_base, init_value, com, reuse=False ):
+
+      # Get a C name for the variable. Avoid using the name of a
+      # pre-existing variable, unless the pre-existing variable is no
+      # longer in use (i.e. was created by a previous invocation of
+      # this function and has subsequently been marked as free to be
+      # re-used) or the reuse flag is True.
+      newvar = None
+      fname = cname_base.upper()
+      if fname in self.variables:
+         newvar = self.variables[fname]
+         if newvar.in_use and not reuse:
+            newvar = None
+
+            fname_base = fname
+            suffix = 1
+            fname = fname_base + str(suffix)
+            while fname in self.variables:
+               if self.variables[fname].in_use and not reuse:
+                  suffix += 1
+                  fname = fname_base + str(suffix)
+               else:
+                  newvar = self.variables[fname]
+                  break
+
+      #  Create the Variable with initial type, add it into the
+      #  list of local variables and add it into the list of new (i.e.
+      #  temporary) items (but only do all this if we are not re-using
+      #  an existing variable).
+      if newvar is None:
+         newvar = Variable( None, TYPE_OTHER, fname, None, None, com )
+         varfoot = self.findLocalVars(True)
+         self.insertAfter( newvar, varfoot )
+         self.added.append( newvar )
+
+      #  Set the required type and indicate its initial value
+      newvar.ctype = ctype
+      newvar.init_value = init_value
+
+      #  Indicate the variable is now in use.
+      newvar.in_use = True
+
+      return newvar
+
+#  Find the "Local Variables: " comment, creating one if not found and if
+#  "create" is True.
+   def findLocalVars(self, create ):
+      varfoot = None
+      child = self.getFoot(False)
+      while child:
+         child = child.getNextItem(False)
+         if isinstance( child, Comment ):
+            if "Local Variables:" in child.com:
+               varfoot = child
+               break
+
+      if varfoot is None and create:
+         child = self.getFoot(False)
+         while child:
+            if isinstance( child, Prologue ):
+               item = Blank( None, 1, None )
+               self.insertAfter(item,child)
+               varfoot = Comment( None, "  Local Variables:", COM_ASTERISK )
+               self.insertAfter(varfoot,item)
+               break
+            child = child.getNextItem(False)
+
+      return varfoot
+
+   def getProto( self, t=None ):
+      syn = self.getSynopsis(t)
+      parts = FuncSplit( syn, None, '"' )
+      result = parts[0]+"( "
+      indent = " " * ( len(result) )
+      first = True
+      for part in parts[2:]:
+         if first:
+            first = False
+         else:
+            result += ",\n"+indent
+         result += part
+      result += " );\n"
+      return result
+
+   def toC( self, indent ):
+      global create_prototype
+      if self.ignore:
+         return ''
+
+#  Sort local variable decs into alphabetical order (unoptimised
+#  bubble sort)
+      varfoot = self.findLocalVars( False )
+      if varfoot:
+         while isinstance( varfoot, Comment ):
+            varfoot = varfoot.getNextItem()
+         sorted = False
+         while not sorted:
+            sorted = True
+            var = varfoot
+            varnext = var.getNextItem()
+            while isinstance( varnext,Variable ):
+               if var.getCdec() > varnext.getCdec():
+                  self.moveup(var)
+                  sorted = False
+                  if var == varfoot:
+                     varfoot = varnext
+               else:
+                  var = varnext
+               varnext = var.getNextItem()
+
+#  Print out the headers to include
+      global size_t_used
+      if size_t_used:
+         result = "#include <stdlib.h>\n"
+      else:
+         result = ""
+
+      if self.chrisused:
+         result += self.headers+"\n"
+      else:
+         self.headers = self.headers.replace(r'#include "chr.h"','')
+         self.headers = self.headers.replace(r'#include "cnf.h"','')
+         self.headers = self.headers.replace('\n\n','\n')
+         result += self.headers+"\n"
+
+#  Print out any constant definitions, and then set them to "ignored"
+#  so they do not appear later on.
+      nopars = True
+      child = self.getFoot()
+      while child:
+         if isinstance( child, Parameter ):
+            nopars = False
+            result +=  child.toC("   ")
+            if create_prototype:
+               child.ignore = True
+         child = child.getNextItem()
+      if not nopars:
+         result += "\n"
+
+#  Print out the function declaration.
+      synopsis = self.getSynopsis()
+      for line in codeWrap( synopsis, LINE_LEN ):
+         result += line+"\n"
+      result = result[:-1]+"{\n"
+
+#  Print out all child items.
+      child = self.getFoot()
+      while child:
+         result +=  child.toC("   ")
+         child = child.getNextItem()
+
+#  Write the protoype to the appropriate NDF header file.
+      if create_prototype and not isinstance( self, Program ):
+         for t in self.gentypes:
+            proto = self.getProto(t)
+            op = proto.find("(")
+            if "ndf" in proto[:op]:
+               with open("ndf_prototypes", "a") as myfile:
+                  myfile.write(proto+"\n")
+
+#  Indicate that any children added as a result of the conversions done
+#  in this function (declarations for new variables needed to handle
+#  string concatenations, etc) are no longer in use. This means they are
+#  free to be re-used when the next invocation of this function ("toC")
+#  is made.
+      for child in self.added:
+         child.in_use = False
+
+#  Append any "Tidy up" code.
+      if len(self.tidy) > 0:
+         result += "/* Free remaining resources allocated in this function. */\n"
+         for code in self.tidy:
+            result  += formatCode( self, code, "   " )
+
+#  Append the terminating closing brace and return the total string.
+      return result+"}\n"
+
+   def getCArgList( self, names=True, t=None ):
+      global size_t_used
+      if names:
+         arglist = self.carglist
+      else:
+         arglist = self.carglistnn
+
+      if arglist is None or self.gentypes[0] is not None:
+
+#  Get a map of arguments, indexed by C name, from the ndf1.h prototype.
+         cargs = None
+
+         if self.fargnames:
+            arglist = ""
+            first = True
+            for farg in self.fargnames:
+               if farg not in self.variables:
+                  Leave( "Subroutine: No declaration found for arg '{0}'.".format( farg ),
+                         self.start )
+               if not first:
+                  arglist += ", "
+               else:
+                  first = False
+               arg = self.variables[farg]
+
+               arg.ctype_orig = arg.ctype
+               if cargs and arg.cname in cargs and "int" in arg.ctype:
+                  if "size_t" in cargs[arg.cname].ctype:
+                     arg.ctype = arg.ctype.replace( "int", "size_t" )
+                     size_t_used = True
+                  elif "hdsdim" in cargs[arg.cname].ctype:
+                     arg.ctype = arg.ctype.replace( "int", "hdsdim" )
+
+               arglist += arg.getCdec( names, t )
+
+#  Character arguments that are returned require an extra new argument
+#  giving the length of the supplied character array.
+               if arg.access != READ and arg.ctype == "char *":
+                  if arg.fsize == "*":
+                     arg.length_var = arg.cname+"_length"
+                     if names:
+                        arglist += ", size_t "+arg.length_var
+                     else:
+                        arglist += ", size_t "
+                     size_t_used = True
+
+
+            arglist = arglist.replace( " ,", "," )
+         else:
+            arglist = "void"
+
+         if names:
+            self.carglist = arglist
+         else:
+            self.carglistnn = arglist
+
+      return arglist
+
+#  Reset an argument C declaration and and the total C argument list. Use
+#  this when any properties of the argument are changed.
+   def resetCdec( self, arg ):
+      arg.resetCdec()
+      self.resetCarglist()
+
+#  Reset the total C argument list.
+   def resetCarglist( self ):
+      self.carglist = None
+      self.carglistnn = None
+
+#  Modify the subroutine contents to be the C equivalents of the original
+#  F77 values.
+   def update( self ):
+
+#  Ensure that the C argument list has been created, so that extra
+#  arguments required to supplied the length of CHARACTER arrays, have been
+#  identifier.
+      self.getCArgList()
+
+#  Do any static changes to each item in the subroutine. These are
+#  changes that require no exchange of information between items.
+      self.chrisused = False
+      child = self.getFoot(False)
+      while child:
+         child.update()
+         child = child.getNextItem(False)
+
+#  Now do any changes that require exchange of information between items...
+#  - Change the name on the prologue. Also get dicts holding argument
+#  declarations, and argument descriptions
+      prologue = None
+      argDecs = {}
+      self.chrisused = False
+      child = self.getFoot(False)
+      while child:
+         if isinstance( child, Prologue ):
+            prologue = child
+            body = "     "+self.cname
+            if self.gentypes[0]:
+               body += "<T>"
+            child.setSectionBody( "Name", body )
+            argDescs = child.getArgs()
+         if isinstance( child, Argument ):
+            argDecs[ child.fname ] = child
+         child = child.getNextItem(False)
+      if prologue is None:
+         Leave("Subroutine: No prologue found")
+
+#  Check that the arguments defined in the prologue match the argument
+#  declarations in the subroutine body.
+      if argDecs:
+         for arg in argDecs:
+            if arg not in argDescs:
+               Leave("Subroutine: No description of argument '{0}' found in prologue".format(arg))
+            else:
+               argdec = argDecs[arg]
+               argdesc = argDescs[arg].arg
+               if argdec.ctype != argdesc.ctype and argdec.ctype_orig != argdesc.ctype:
+                  Leave("Subroutine: Type for argument '{0}' wrong in prologue".format(arg))
+               if argdec.access != argdesc.access:
+                  Leave("Subroutine: Access for argument '{0}' wrong in prologue".format(arg))
+               if argdec.fsize != argdesc.fsize:
+                  Leave("Subroutine: Size for argument '{0}' wrong in prologue".format(arg))
+
+#  Ensure the prologue includes extra arguments that give the max length of
+#  returned character strings.
+               argDescs[arg].arg.length_var = argdec.length_var
+
+#  Array arguments which have a length defined by another argument have their
+#  length removed (i.e. "value[nax]" becomes "value[]" - this uses the
+#  existing NDF convention to use "value[]" and not "*value" )
+               if argdec.bounds is not None:
+                  newbounds = []
+                  for axbounds in argdec.bounds:
+
+                     if len(axbounds) > 1:
+                        (lbnd,ubnd) = axbounds
+                        argDescs[arg].length_arg = "{0}-{1}+1".format(CName(ubnd),CName(lbnd))
+                     else:
+                        ubnd = axbounds[0]
+                        argDescs[arg].length_arg = CName( ubnd )
+
+                     newbounds.append( [""] )
+                  argdec.bounds = newbounds
+                  self.resetCdec( argdec )
+
+#  Arguments of type "int" which contain the word "pointer" in their
+#  description are turned into "void *", except for "*wcs*" and "*map*"
+#  which are turned into AstFrameSet and AstMapping pointers.
+               if argdec.type_code == TYPE_INTEGER and argdec.fsize == 4:
+                  if "pointer" in argDescs[arg].com.lower():
+                     if "wcs" in argdec.cname.lower() or "iast" == argdec.cname.lower():
+                        argdec.ctype = "AstFrameSet *"
+                     elif "keymap" in argdec.cname.lower():
+                        argdec.ctype = "AstKeyMap *"
+                     elif "map" in argdec.cname.lower():
+                        argdec.ctype = "AstMapping *"
+                     else:
+                        if "pn" not in argdec.cname.lower():
+                           Warn("The word 'pointer' was found in the prologue description of "
+                                "INTEGER argument {0} so assuming it contains a CNF "
+                                "pointer".format(argdec.fname))
+                        if argdec.ctype == "int":
+                           argdec.ctype = "void *"
+                        else:
+                           argdec.ctype = "void"+argdec.ctype[3:]
+                     self.resetCdec( argdec )
+
+#  Change arguments that return values into pointers, except for fixed
+#  size arrays and pointers to arrays
+               if argdec.access != READ:
+                  if not argdec.bounds:
+                     if argdec.ctype == "HDSLoc *":
+                        argdec.ctype = "HDSLoc **"
+                     elif argdec.ctype.startswith("Ast"):
+                        argdec.ctype += "*"
+                     elif argdec.ctype != "char *":
+                        if argdec.ctype[-1] == '*':
+                           argdec.ctype += "*"
+                        else:
+                           argdec.ctype += " *"
+
+                     if argdec.ctype != "char *":
+                        argdesc.cname = "*"+argdesc.cname
+                     self.resetCdec( argdec )
+
+#  Use "const" with read-only array arguments.
+               else:
+                  if argdec.ctype.endswith("*") or argdec.bounds:
+                     if not argdec.ctype.startswith("Ndf") and \
+                        not argdec.ctype.startswith("HDS") and \
+                        not argdec.ctype.startswith("Ary") and \
+                        not argdec.ctype.startswith("Ast"):
+                        argdec.ctype = "const "+argdec.ctype
+                        self.resetCdec( argdec )
+
+#  Change the prologue Synopsis to the C version.
+      prologue.setSectionBody( "Synopsis", "     "+self.getSynopsis("pro") )
+
+#  If this is a public function, insert the NDF initialisation call.
+      if self.fname.startswith("NDF_") and not self.hasinit:
+
+#  Find the "*." comment.
+         found = False
+         child = self.getFoot(False)
+         while child:
+            if isinstance( child, Comment ) and child.com.strip() == ".":
+               found = True
+               break
+            child = child.getNextItem(False)
+         if not found:
+            Leave("Cannot find '.' comment in "+self.fname )
+
+         dotcom = child
+
+#  Search for a one line IF statement checking the global status. If
+#  found put the call to ndf1Init after it.
+         found = False
+         while child:
+            if isinstance( child, IfOne ) and child.fexpr == "STATUS .NE. SAI__OK":
+               found = True
+               break
+            child = child.getNextItem(False)
+
+#  If not found, search for the first non-comment non-blank item
+#  following the dot comment, and put the call to ndfInit just any
+#  preceeding comment.
+         if not found:
+            child = dotcom
+            found = False
+            while child:
+               if not ( isinstance( child, Comment ) or isinstance( child, Blank ) ):
+                  child = child.getPrevItem(False)
+                  while child:
+                     if not ( isinstance( child, Comment ) or isinstance( child, Blank ) ):
+                        found = True
+                        break
+                     child = child.getPrevItem(False)
+                  break
+               child = child.getNextItem(False)
+
+#  Check we have somewhere to put it.
+         if not found:
+            Leave("Cannot decide where to put ndf1Init call in "+self.fname )
+
+#  Insert the call to ndf1Init in the place determined above.
+         item = Blank( None, 1, None )
+         self.insertAfter(item,child)
+         child = item
+
+         item = Comment( None, "  Ensure the NDF library has been initialised.", COM_ASTERISK )
+         self.insertAfter(item,child)
+         child = item
+
+         item = Call( None, "NDF1_INIT( STATUS )", None )
+         self.insertAfter(item,child)
+         child = item
+
+         self.hasinit = True
+
+#  If this is a public routine, add in the ndf.h header file.
+      if self.fname[0:3] == "NDF" and self.fname[3] != "1":
+         self.addH("ndf.h")
+
+#  Do any further static changes required now that the above changes have
+#  been made.
+      self.update2()
+
+
+# ----------------------------------------------------------------------
+class Function(Subroutine):
+   def __init__( self, start, ftype, defn, com, gentypes ):
+      global function_fname
+      Subroutine.__init__(self,  start, defn, com, gentypes )
+      function_fname = self.fname
+      ( type, tname, bounds, size ) = isDecl( "      "+ftype+" JUNK", start )
+      self.funvar = Variable( start, type, self.fname, bounds, size, " Returned value" )
+      self.variables[ self.funvar.fname ] = self.funvar
+      function_fname = None
+
+   def getSynopsis( self, t=None ):
+      global function_fname
+      old = function_fname
+      function_fname = self.fname
+      synopsis = "{0} {1}( {2} )".format(self.funvar.ctype,self.cname,self.getCArgList())
+      function_fname = old
+      return synopsis
+
+   def update( self ):
+      global function_fname
+      old = function_fname
+      function_fname = self.fname
+      varfoot = self.findLocalVars(True)
+      self.insertAfter( self.funvar, varfoot )
+      super(Function,self).update()
+      function_fname = old
+
+   def toC( self, indent ):
+      global function_fname
+      old = function_fname
+      function_fname = self.fname
+      result = super(Function,self).toC( indent )
+
+      if result.endswith("}\n"):
+         result = result[:-2]
+
+      result += "/* Return the result */\n"
+      result += "   return result;\n"
+      result += "}\n"
+
+      function_fname = old
+      return result
+
+# ----------------------------------------------------------------------
+class Program(Subroutine):
+   def __init__( self, start, name, com ):
+      Subroutine.__init__(self,  start, name, com, None )
+      self.name = name
+
+   def getSynopsis( self, t=None ):
+      return "int main()"
+
+
+
+
+#  The main function for parsing Fortran source code.
+def analyse( unit, first, last, content, gentypes, indent ):
+   global infile
+
+#  Check for termination.
+   if first > last:
+      return first
+
+#  Loop round all remaining lines of content
+   do_label = 0
+   arg_access = None
+   iline = first
+   while iline <= last:
+      line = content[ iline ].rstrip()
+
+#  Split the line into code and comment
+      (code,com,comtype) = FindComment( line, iline )
+
+#  Append any subsequent continuation lines.
+      jline = iline + 1
+      while jline <= last:
+         if content[ jline ][0:6] == "     :":
+            (tcode,tcom,tcomtype) = FindComment( content[ jline ][6:], jline )
+            code += " "+tcode.strip()
+            com += "\n"+tcom
+            jline += 1
+
+         else:
+            tt = content[ jline ].lstrip()
+            if  tt and tt[0] == "!":
+               com += "\n"+tt[1:]
+               jline += 1
+
+            else:
+               break
+
+      iline = jline - 1
+
+#  Remove string concatenation operators that have literal strings on
+#  each side.
+      code = re.sub("' *// *'", '', code )
+
+#  Remove any numerical label from the first 6 characters. Record the
+#  label for later use.
+      mt = re.match(r'^ *(\d+) *$', code[:6])
+      if mt:
+         label = int( mt.group(1) )
+         code = '      ' + code[6:]
+      else:
+         label = None
+
+#  Useful values...
+      inPrologue = isinstance( unit, Prologue )
+      inProSection = isinstance( unit, ProSection )
+      funcParts = FuncSplit( code, iline )
+
+#  Classify the current line and create a new item object to describe
+#  it.....
+      new_item = None
+
+#  Prologue start:
+      if new_item is None:
+         if line == "*+":
+            new_item = Prologue( iline )
+
+#  Prologue section:
+      if new_item is None and inPrologue:
+         mt = re.match(r'^\* +([^:]+):$', line )
+         if mt:
+            new_item = ProSection( iline, mt.group(1) )
+
+#  Prologue argument description:
+      if new_item is None and inProSection and unit.getName() == "Arguments":
+         mt = re.match(r'^(\* +)([^=]+) *=(.*)$', line )
+         if mt:
+            prefix = mt.group(1)+" "
+            lprefix = len(prefix)
+            jline = iline + 1
+            first = True
+            com = ""
+            while jline <= last:
+               if content[ jline ] == "*" or content[ jline ][:lprefix] == prefix:
+                  if first:
+                     first = False
+                  else:
+                     com += "\n"
+                  com += content[ jline ][1:].rstrip()
+                  jline += 1
+               else:
+                  break
+            iline = jline - 1
+            new_item = ProArgument( iline, mt.group(2), mt.group(3), com )
+
+#  Prologue section end:
+      if new_item is None and inProSection:
+         if len(line) == 0:
+            return iline + 1
+
+#  Prologue end:
+      if new_item is None:
+         if line == "*-":
+            if inProSection:
+               return iline
+            elif inPrologue:
+               return iline + 1
+            else:
+               Leave( "analyse: Unexpected prologue end marker encountered",iline)
+
+#  Blocks of blank lines or comments:
+      if new_item is None:
+         if len( code.strip() ) == 0:
+            jline = iline + 1
+            while jline <= last:
+               (tcode,tcom,tcomtype) = FindComment( content[ jline ], jline )
+               if len(tcode) == 0 and len(tcom) != 0 and tcomtype == comtype and not re.match("^ *- ", tcom):
+                  com += "\n"+tcom
+                  jline += 1
+               else:
+                  break
+            if comtype == COM_NONE:
+               new_item = Blank( iline, jline-iline, com )
+            else:
+               if inPrologue or inProSection:
+                  comtype = COM_PROLOGUE
+               new_item = Comment( iline, com, comtype )
+            iline = jline - 1
+
+#  Argument and Variable declarations:
+      if line == "*  Arguments Given:":
+         arg_access = READ
+      elif line == "*  Arguments Given and Returned:":
+         arg_access = READ_WRITE
+      elif line == "*  Arguments Returned:":
+         arg_access = WRITE
+      elif line == "*  Status:":
+         arg_access = READ_WRITE
+      elif line.startswith("*"):
+         arg_access = None
+
+      if new_item is None:
+
+#  If column 1 of the code is a "v", the code is a literal C variable
+#  declaration.
+         if code and code[0] == "v":
+            new_item = CVariable( iline, code[1:], com )
+         else:
+            ( type, name, bounds, size ) = isDecl( code, iline )
+            if type is not None:
+               if arg_access is None or isinstance( unit, Program ):
+                  new_item = Variable( iline, type, name, bounds, size, com )
+               else:
+                  new_item = Argument( iline, type, name, bounds, size, com, arg_access )
+                  if arg_access == READ_WRITE and name == "STATUS":
+                     arg_access = None
+                     new_item.ignore = True
+
+
+#  If column 1 of the code is a dollar, the code is already literal C
+#  code and so just
+      if new_item is None and code:
+         if code[0] == "$":
+            new_item = CCode( iline, code[1:], com )
+
+#  SUBROUTINE:
+      if new_item is None:
+         mt = re.match(r'^      SUBROUTINE +(.*)$', code, re.IGNORECASE)
+         if mt:
+            new_item = Subroutine( iline, mt.group(1), com, gentypes )
+
+#  FUNCTION:
+      if new_item is None:
+         mt = re.match(r'^      ([^(]*) FUNCTION +(.*)$', code, re.IGNORECASE)
+         if mt:
+            new_item = Function( iline, mt.group(1), mt.group(2), com, gentypes )
+
+#  PROGRAM:
+      if new_item is None:
+         mt = re.match(r'^      PROGRAM +(.*)$', code, re.IGNORECASE)
+         if mt:
+            new_item = Program( iline, mt.group(1), com )
+
+#  IMPLICIT NONE
+      if new_item is None:
+         mt = re.match(r'^      IMPLICIT +NONE$', code, re.IGNORECASE)
+         if mt:
+            new_item = Simple( iline, "IMPLICIT NONE", com )
+
+#  INCLUDE
+      if new_item is None:
+         mt = re.match(r"^      INCLUDE +'(.*)'$", code, re.IGNORECASE)
+         if mt:
+            new_item = Include( iline, mt.group(1), com )
+
+#  PARAMETER
+      if new_item is None:
+         mt = re.match(r"^      PARAMETER *\( *(.*) *\)$", code, re.IGNORECASE)
+         if mt:
+            new_item = Parameter( iline, mt.group(1), com )
+
+#  END
+      if new_item is None:
+         mt = re.match(r'^      END$', code, re.IGNORECASE)
+         if mt:
+            if isinstance( unit, Subroutine ) or isinstance( unit, Program ):
+               return iline + 1
+            else:
+               Leave( "analyse: Unexpected END encountered.",iline)
+
+#  Single-line IF
+      if new_item is None and funcParts and len(funcParts) == 3 and funcParts[0] == "IF":
+         if funcParts[1] != "THEN":
+            new_item = IfOne( iline, funcParts[2], funcParts[1], com )
+
+#  Single statements (i.e. anythign that can come at the end of a
+#  single-line IF statement)
+      if new_item is None:
+         new_item = statementFactory( iline, code, funcParts, com )
+
+#  Multi-line IF
+      if new_item is None and funcParts and len(funcParts) == 3 and funcParts[0] == "IF":
+         if funcParts[1] == "THEN":
+            new_item = If( iline, funcParts[2], com )
+
+#  ELSE IF
+      if new_item is None and funcParts and len(funcParts) == 3 and funcParts[0] == "ELSE IF" and funcParts[1] == "THEN":
+         if isinstance( unit, If ):
+            new_item = ElseIf( iline, funcParts[2], com )
+         else:
+            Leave( "analyse: Unexpected ELSE IF encountered",iline)
+
+#  ELSE
+      if new_item is None and code.strip().upper() == "ELSE":
+         if isinstance( unit, If ):
+            new_item = Else( iline, com )
+         else:
+            Leave( "analyse: Unexpected ELSE encountered",iline)
+
+#  End of multi-line IF
+      if new_item is None and ( code.strip() == "END IF" or code.strip() == "ENDIF" ):
+         if isinstance( unit, If ):
+            return iline + 1
+         else:
+            Leave( "analyse: Unexpected END IF encountered",iline)
+
+#  DATA
+      if new_item is None:
+         mt = re.match(r'^ *DATA +([^/]+) +/([^/]+)/ *$', code, re.IGNORECASE)
+         if mt:
+            new_item = Data( iline, mt.group(1), mt.group(2), com )
+
+#  Do loop (with end label):
+      if new_item is None:
+         mt = re.match(r'^ *DO (\d+) +(\w+) *= *(.*)$', code, re.IGNORECASE)
+         if mt:
+            do_label = int(mt.group(1))
+            new_item = DoLabel( iline, do_label, mt.group(2), mt.group(3), com )
+
+#  End of DO loop with end label
+      if new_item is None and label:
+         if isinstance( unit, DoLabel ) and label == unit.endlabel:
+            if code.upper().strip() != "CONTINUE":
+               item = statementFactory( iline, code, funcParts, com )
+               if item:
+                  unit.append( item )
+            return iline + 1
+
+#  Do loop (without end label):
+      if new_item is None:
+         mt = re.match(r'^ *DO +(\w+) *= *(.*)$', code, re.IGNORECASE)
+         if mt:
+            new_item = Do( iline, mt.group(1), mt.group(2), com )
+
+#  Do while:
+      if new_item is None:
+         mt = re.match(r'^ *DO +WHILE *\((.*)\) *$', code, re.IGNORECASE)
+         if mt:
+            new_item = DoWhile( iline, mt.group(1), com )
+
+#  END DO
+      if new_item is None and code.strip() == "END DO":
+         if isinstance( unit, Loop ):
+            return iline + 1
+         else:
+            Leave( "analyse: Unexpected END DO encountered",iline)
+
+#  CONTINUE
+      if new_item is None and code.strip().upper() == "CONTINUE":
+         new_item = Continue( iline, com )
+
+#  Unknown F77 code
+      if new_item is None:
+         new_item = FCode( iline, code, com )
+         Leave( "analyse: Unclassifiable statement:\n{0}".format(line),iline)
+
+#  If we have created a new item above...
+      if new_item is not None:
+
+#  Attach any required label to the item
+         new_item.label = label
+
+#  Check we only find subroutines, functions and programs at the top level.
+         if isinstance( unit, File ):
+            if not isinstance( new_item, Blank ) and not isinstance( new_item, Subroutine ) and not isinstance( new_item, Function ) and not isinstance( new_item, Program ):
+               Leave( "analyse: Unexpected '{0}' being added to '{1}'.".format( type(new_item).__name__, type(unit).__name__), iline )
+
+#  Append it to the current unit.
+         unit.append( new_item )
+
+#  Prevent the argument declarations (and associated comments) appearing
+#  in the C code.
+         if arg_access is not None:
+            new_item.ignore = True
+
+#  If the new item contains other items, call this function recursively
+#  to analyse subsequent content lines and add child items into it.
+         if isinstance( new_item, Unit):
+            iline = analyse( new_item, iline+1, last, content, gentypes, indent+"  " )
+
+#  Otherwise just increment the index of the next line to be analysed.
+         else:
+            iline += 1
+
+      else:
+         iline += 1
+
+   return iline
+
+
+
+
+
+
+
+#  MAIN ENTRY .............................
+infile = sys.argv[1]
+if len(sys.argv) > 2 and sys.argv[2] == "noabort":
+   abort = False
+
+
+
+
+#  Get the generic type codes from the file name
+gat = infile.find(".g")
+if gat > -1:
+   gentypes = infile[gat+2:]
+else:
+   gentypes = None
+
+#  Read the contents of the supplied .f file
+with open(infile) as f:
+    content = f.readlines()
+
+#  Create a tree structure from the contents of the file. Each node is a
+#  "unit" object representing an F77 construct. The top-level unit is
+#  a "File".
+file = File( infile )
+analyse( file, 0, len(content)-1, content, gentypes, "" )
+file.update()
+file.toC("")
+create_prototype = True
+print( postsubs(file.toC("")) )
+
