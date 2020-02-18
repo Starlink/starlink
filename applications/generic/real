@@ -1,4 +1,5 @@
 s/<T>/R/g
+s/<TC>/F/g
 s/<TLC>/r/g
 s/<TYPE>/REAL/g
 s/<LTYPE>/REAL/g
@@ -8,6 +9,7 @@ s/<CNFTYPE>/REAL/g
 s/<CTYPE>/float/g
 s/<COMM>/REAL/g
 s/<t>/R/g
+s/<tc>/F/g
 s/<tlc>/r/g
 s/<type>/REAL/g
 s/<ltype>/REAL/g

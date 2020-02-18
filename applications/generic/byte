@@ -1,4 +1,5 @@
 s/<T>/B/g
+s/<TC>/B/g
 s/<TLC>/b/g
 s/<TYPE>/BYTE/g
 s/<LTYPE>/BYTE/g
@@ -8,6 +9,7 @@ s/<HTYPE>/_BYTE/g
 s/<CNFTYPE>/BYTE/g
 s/<COMM>/BYTE/g
 s/<t>/B/g
+s/<tc>/B/g
 s/<tlc>/b/g
 s/<type>/BYTE/g
 s/<ltype>/BYTE/g

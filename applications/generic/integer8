@@ -1,4 +1,5 @@
 s/<T>/K/g
+s/<TC>/K/g
 s/<TLC>/k/g
 s/<TYPE>/INTEGER*8/g
 s/<LTYPE>/INTEGER*8/g
@@ -8,6 +9,7 @@ s/<CTYPE>/int64\_t/g
 s/<CNFTYPE>/INTEGER8/g
 s/<COMM>/INTEGER*8/g
 s/<t>/K/g
+s/<tc>/K/g
 s/<tlc>/k/g
 s/<type>/INTEGER*8/g
 s/<ltype>/INTEGER*8/g
