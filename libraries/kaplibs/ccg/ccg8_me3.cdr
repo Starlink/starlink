@@ -126,6 +126,7 @@ F77_SUBROUTINE(ccg8_me3<TLC>)( INTEGER8(NPIX), INTEGER8(NLINES),
    ThrWorkForce *wf;         /* Pointer to workforce (a pool of threads) */
    ccg8Me3Data<T> *job_data; /* Pointer to all job data structures */
    ccg8Me3Data<T> *pdata;    /* Pointer to single job data structure */
+   int *oldstatus;           /* Old status pointer */
    int iw;                   /* Index of worker thread */
    int ngroup;               /* Number of groups of lines */
    int nw;                   /* Number of threads to use */
@@ -144,6 +145,9 @@ F77_SUBROUTINE(ccg8_me3<TLC>)( INTEGER8(NPIX), INTEGER8(NLINES),
 
 /* Check inherited global status. */
    if( *STATUS != SAI__OK ) return;
+
+/* Ensure AST is using STATUS as the inherited status pointer */
+   oldstatus = astWatch( STATUS );
 
 /* Find the number of cores/processors available and create a pool of
    threads of the same size. */
@@ -331,6 +335,9 @@ F77_SUBROUTINE(ccg8_me3<TLC>)( INTEGER8(NPIX), INTEGER8(NLINES),
 
 /* Free global resources. */
    job_data = astFree( job_data );
+
+/* Reinstate the original AST inherited status pointer */
+   astWatch( oldstatus );
 }
 
 

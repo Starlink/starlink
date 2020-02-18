@@ -260,7 +260,6 @@
 
 *  Local Variables:
       INTEGER*8 NBAD             ! Number of bad values
-      REAL PERCNT                ! Percentage of pixels set to bad
 
 *.
 
@@ -305,8 +304,7 @@
 
 *  Forming sigma-clipped mean.
          CALL CCG8_SC3<T>( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX,
-     :                  RESULT, WRK1, WRK2, POINT, USED, NCON,
-     :                  NBAD, STATUS )
+     :                  RESULT, NCON, NBAD, STATUS )
 
       ELSE IF ( IMETH .EQ. 7 ) THEN
 

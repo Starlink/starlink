@@ -28,10 +28,10 @@
 *  Arguments:
 *     EL = INTEGER*8 (Given)
 *        The number of entries in ORDDAT.
-*     ORDDAT( EL ) = ? (Given and Returned)
+*     ORDDAT( EL ) = <TYPE> (Given and Returned)
 *        The data to order. On output it contains the data in increasing
 *        order.
-*     RDAT( EL ) = ? (Given and Returned)
+*     RDAT( EL ) = <TYPE> (Given and Returned)
 *        A list of data associated with ORDDAT which needs to retain its
 *        correspondence with the items in ORDDAT.
 *     PDAT( EL ) = INTEGER*8 (Given and Returned)
@@ -93,6 +93,8 @@
 
 *  Arguments Given:
       INTEGER*8 EL
+
+*  Arguments Given and Returned:
       <TYPE> ORDDAT( EL )
       <TYPE> RDAT( EL )
       INTEGER*8 PDAT( EL )

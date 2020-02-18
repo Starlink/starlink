@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 cincludedir = $(includedir)/star
-dist_noinst_SCRIPTS = make_h pygrep
+dist_noinst_SCRIPTS = make_h
 
 lib_LTLIBRARIES = libkpg.la libkpg_adam.la libkpg_grf.la libkpg_grf_adam.la
 
@@ -51,7 +51,7 @@ BUILT_C_ROUTINES = $(GEN_C_ROUTINES:.cgen=.c)
 
 BUILT_SOURCES = $(include_MESSAGES) $(BUILT_C_ROUTINES)
 
-kpg_cgen.h: kpg_cgen.h.source make_h pygrep
+kpg_cgen.h: kpg_cgen.h.source make_h ../pygrep
 	./make_h
 
 F_ROUTINES = $(KPG_NONGEN) $(GEN_F_ROUTINES)

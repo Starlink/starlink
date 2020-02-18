@@ -295,7 +295,6 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER I                  ! Loop counter
       INTEGER IPW1               ! Work space pointer
       INTEGER*8 NBAD             ! Number of bad values
 
@@ -354,8 +353,8 @@
 
 *  Forming sigma-clipped mean.
          CALL CCG8_SC1<T>( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX,
-     :                  NMAT, COVEC, RESULT, RESVAR, WRK1, WRK2,
-     :                  POINT, USED, NCON, NBAD, STATUS )
+     :                     NMAT, COVEC, RESULT, RESVAR, NCON, NBAD,
+     :                     STATUS )
 
       ELSE IF ( IMETH .EQ. 7 ) THEN
 

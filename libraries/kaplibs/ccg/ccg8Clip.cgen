@@ -1,0 +1,105 @@
+#include <stdint.h>
+#include "sae_par.h"
+#include "prm_par.h"
+#include "ccg_cgen.h"
+
+void CGEN_FUNCTION(ccg8Clip)( CGEN_TYPE vmin, CGEN_TYPE vmax, int64_t el,
+                              CGEN_TYPE array[], int64_t *ngood, int *status ){
+/*
+*+
+*  Name:
+*     ccg8Clip<T>
+
+*  Purpose:
+*     Sets any data outside a given value range BAD
+
+*  Synopsis:
+*     void ccg8Clip<T>( CGEN_TYPE vmin, CGEN_TYPE vmax, int64_t el,
+*                       CGEN_TYPE array[], int64_t *ngood, int *status )
+
+*  Description:
+*     This generic function loops over all entries in "array". If any values
+*     are outside the range "vmin" to "vmax" then they are set BAD.
+
+*  Parameters:
+*     vmin
+*        The minimum allowed value.  All values below this are set BAD.
+*     vmax
+*        The maximum allowed value.  All values above this are set BAD.
+*     el
+*        The number of entries in "array".
+*     array
+*        Pointer to the array of values to be clipped within the given range.
+*        On output this contains the clipped list. The supplied "array" array
+*        should have at least "el" elements.
+*     *ngood
+*        Returned holding the number of values left after rejection.
+*     *status
+*        The global status.
+
+*  Notes:
+*     -  There is a function for real and double-precision: replace "x" in
+*     the function name by D or R as appropriate.  The "array", "vmin", and
+*     "vmax" arguments supplied to the function must have the data type
+*     specified.
+
+*  Copyright:
+*     Copyright (C) 2020 East Asian Observatory
+*     All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or modify
+*     it under the terms of the GNU General Public License as published by
+*     the Free Software Foundation; either Version 2 of the License, or (at
+*     your option) any later version.
+*
+*     This program is distributed in the hope that it will be useful, but
+*     WITHOUT ANY WARRANTY; without even the implied warranty of
+*     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+*     General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     18-FEB-2020 (DSB):
+*        Original version, based on equivalent Fortran function by PDRAPER
+*        et al.
+
+*-
+*/
+
+/* Local Variables: */
+   int64_t i;            /* Loop variable */
+   CGEN_TYPE *parray;    /* Pointer to next array value */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Loop for all input values */
+   parray = array;
+   *ngood = el;
+   for( i = 0; i < el; i++,parray++ ){
+
+/* If this value is not BAD then test it. */
+      if( *parray != CGEN_BAD ) {
+         if( *parray < vmin || *parray > vmax ) {
+
+/* Set it BAD. */
+            *parray = CGEN_BAD;
+
+/* Decrement the valid values counter. */
+            (*ngood)--;
+         }
+      }
+   }
+}
+

@@ -10,7 +10,8 @@ libccg_la_SOURCES = $(PRIVATE_INCLUDES) \
                     $(CCG8_GN_GEN:.gn=.f) \
                     $(CCG8_GDR_GEN:.gdr=.f) \
                     $(CCG8_CN_GEN:.cn=.c) \
-                    $(CCG8_CDR_GEN:.cdr=.c)
+                    $(CCG8_CDR_GEN:.cdr=.c) \
+                    $(BUILT_C_ROUTINES)
 
 F_ROUTINES = ccg_orvar.f
 
@@ -40,19 +41,31 @@ ccg8_mx1.gn    ccg8_mx3.gn   ccg8_rms1.gn  ccg8_rms3.gn  \
 ccg8_sum1.gn  ccg8_sum3.gn  ccg8_cnt1.gn  ccg8_cnt3.gn \
 ccg8_frc1.gn   ccg8_frc3.gn
 
-CCG8_GDR_GEN = ccg8_bm1.gdr  ccg8_bm3.gdr  ccg8_clip.gdr ccg8_comb1.gdr \
+CCG8_GDR_GEN = ccg8_bm1.gdr  ccg8_bm3.gdr  ccg8_comb1.gdr \
 ccg8_comb3.gdr ccg8_cs1.gdr  ccg8_cs3.gdr  ccg8_flx1.gdr ccg8_flx3.gdr \
-ccg8_fm1.gdr   ccg8_fm3.gdr  ccg8_i2wc.gdr ccg8_is2.gdr  ccg8_is3.gdr \
+ccg8_fm1.gdr   ccg8_fm3.gdr  ccg8_i2wc.gdr ccg8_is2.gdr  \
 ccg8_iwc1.gdr  ccg8_iwc3.gdr ccg8_iwd1.gdr ccg8_iwd3.gdr ccg8_kth.gdr \
 ccg8_md1.gdr   ccg8_md3.gdr  ccg8_mm1.gdr \
-ccg8_mm3.gdr   ccg8_mo1.gdr  ccg8_mo3.gdr  ccg8_sc1.gdr  ccg8_sc3.gdr \
+ccg8_mm3.gdr   ccg8_mo1.gdr  ccg8_mo3.gdr  \
 ccg8_sm1.gdr   ccg8_sm3.gdr  ccg8_tc1.gdr  ccg8_tc3.gdr  ccg8_tm1.gdr \
 ccg8_tm3.gdr   ccg8_tmn2.gdr ccg8_tmn3.gdr ccg8_trm2.gdr ccg8_trm3.gdr \
 ccg8_wcwi.gdr  ccg8_wmd2.gdr ccg8_wmd3.gdr \
 ccg8_wtm2.gdr  ccg8_wtm3.gdr ccg8_wtm4.gdr
 
-CCG8_CDR_GEN = ccg8_um1.cdr ccg8_um3.cdr ccg8_me3.cdr ccg8_me1.cdr
+#  Generic C source code designed to be called from Fortran.
+CCG8_CDR_GEN = ccg8_um1.cdr ccg8_um3.cdr ccg8_me3.cdr ccg8_me1.cdr \
+ccg8_is3.cdr ccg8_sc1.cdr ccg8_sc3.cdr ccg8_clip.cdr
 CCG8_CN_GEN = ccg8_sd1.cn ccg8_sd3.cn
+
+#  Generic C source code designed to be called from C.
+GEN_C_ROUTINES = ccg8Is3.cgen ccg8Clip.cgen
+
+# The .c files which are built from the above .cgen files.
+BUILT_C_ROUTINES = $(GEN_C_ROUTINES:.cgen=.c)
+
+#  Make the header file containing prototypes for the generic C cuntions.
+ccg_cgen.h: ccg_cgen.h.source make_h ../pygrep
+	./make_h
 
 
 
@@ -76,5 +89,68 @@ MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
 
 PRIVATE_INCLUDES = CCD1_PAR
 
-EXTRA_DIST = CCD1_PAR
+
+
+# Create the .c file which defines type-specific code generated from each
+# .cgen file.
+$(GEN_C_ROUTINES:.cgen=.c): ccg_cgen.h
+	echo "/*" > $@
+	echo "*  Name:" >> $@
+	echo "*    $@" >> $@
+	echo "" >> $@
+	echo "*  Purpose:" >> $@
+	echo "*    This file expands the generic C code held in $(@:.c=.cgen) to provide" >> $@
+	echo "*    the required type-specific implementations which can be called by" >> $@
+	echo "*    other functions." >> $@
+	echo "" >> $@
+	echo "*  Notes:" >> $@
+	echo "*    - This file is generated automatically at build time (see" >> $@
+	echo "*    Makefile.am)" >> $@
+	echo "*/" >> $@
+	echo "" >> $@
+	echo "#include \"prm_par.h\"" >> $@
+	echo "#include \"cgeneric.h\"" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_DOUBLE_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_FLOAT_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_INT_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_WORD_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_UWORD_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_BYTE_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_UBYTE_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_INT64_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+
+EXTRA_DIST = CCD1_PAR $(GEN_C_ROUTINES)
 

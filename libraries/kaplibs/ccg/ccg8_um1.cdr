@@ -133,6 +133,7 @@ F77_SUBROUTINE(ccg8_um1<TLC>)( INTEGER8(NPIX), INTEGER8(NLINES),
    double *goodv;            /* No of input variance used at each pixel */
    double *sumd;             /* Sum of data values at each pixel */
    double *sumv;             /* Sum of data variances at each pixel */
+   int *oldstatus;           /* Old status pointer */
    int iw;                   /* Index of worker thread */
    int ngroup;               /* Number of groups of lines */
    int nw;                   /* Number of threads to use */
@@ -148,6 +149,9 @@ F77_SUBROUTINE(ccg8_um1<TLC>)( INTEGER8(NPIX), INTEGER8(NLINES),
 
 /* Check inherited global status. */
    if( *STATUS != SAI__OK ) return;
+
+/* Ensure AST is using STATUS as the inherited status pointer */
+   oldstatus = astWatch( STATUS );
 
 /* Find the number of cores/processors available and create a pool of
    threads of the same size. */
@@ -344,6 +348,9 @@ F77_SUBROUTINE(ccg8_um1<TLC>)( INTEGER8(NPIX), INTEGER8(NLINES),
 
 /* Free global resources. */
    job_data = astFree( job_data );
+
+/* Reinstate the original AST inherited status pointer */
+   astWatch( oldstatus );
 }
 
 

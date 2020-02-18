@@ -1,7 +1,7 @@
       SUBROUTINE CCG8_CLIP<T>( VMIN, VMAX, EL, ARRAY, NGOOD, STATUS )
 *+
 *  Name:
-*     CCG8_CLIPx
+*     CCG8_CLIP<T>
 
 *  Purpose:
 *     Sets any data outside a given value range BAD
@@ -10,20 +10,20 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG8_CLIPR( VMIN, VMAX, EL, ARRAY, NGOOD, STATUS )
+*     CALL CCG8_CLIP<T>( VMIN, VMAX, EL, ARRAY, NGOOD, STATUS )
 
 *  Description:
 *     This generic routine loops over all entries in RA. If any values
 *     are outside the range RMIN to VMAX then they are set BAD.
 
 *  Arguments:
-*     VMIN = ? (Given)
+*     VMIN = <TYPE> (Given)
 *        The minimum allowed value.  All values below this are set BAD.
-*     VMAX = ? (Given)
+*     VMAX = <TYPE> (Given)
 *        The maximum allowed value.  All values above this are set BAD.
 *     EL = INTEGER*8 (Given)
 *        The number of entries in ARRAY.
-*     ARRAY( EL ) = ? (Given and Returned)
+*     ARRAY( EL ) = <TYPE> (Given and Returned)
 *        The list of values to be clipped within the given range.  On
 *        output this contains the clipped list.
 *     NGOOD = INTEGER*8 (Returned)

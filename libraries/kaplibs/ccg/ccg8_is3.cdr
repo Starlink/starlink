@@ -1,0 +1,96 @@
+#include <stdint.h>
+#include "f77.h"
+#include "ast.h"
+#include "ccg_cgen.h"
+
+F77_SUBROUTINE(ccg8_is3<TLC>)( INTEGER8(EL), <CNFTYPE>_ARRAY(ORDDAT),
+                               <CNFTYPE>_ARRAY(RDAT), INTEGER8_ARRAY(PDAT),
+                               INTEGER(STATUS) ){
+/*
+*+
+*  Name:
+*     CCG8_IS3<T>
+
+*  Purpose:
+*     Sorts a list of data into increasing order, and applies the
+*     corresponding shuffle to two ancillary lists.
+
+*  Language:
+*     C (designed to be called from Fortran)
+
+*  Invocation:
+*     CALL CCG8_IS3<T>( EL, ORDDAT, RDAT, PDAT, STATUS )
+
+*  Description:
+*     The routine uses an insert sort method.  This has proven itself
+*     the quickest for sorting small sets of data lots of times, as in
+*     image stacking using ordered statistics.  The method looks at the
+*     second value, compares this with the first if swaps if necessary,
+*     then it looks at the third, looks at the previous values swaps
+*     with the lowest (or not at all) and so on until all values have
+*     been passed. It is fast (for the case above ) simply because of
+*     the very few lines of operation.  The sort is extended to the
+*     ancillary data RDAT and PDAT that maintain their correspondence
+*     with the ORDDAT dataset on exit.
+
+*  Arguments:
+*     EL = INTEGER*8 (Given)
+*        The number of entries in ORDDAT.
+*     ORDDAT( EL ) = <TYPE> (Given and Returned)
+*        The data to order. On output it contains the data in increasing
+*        order.
+*     RDAT( EL ) = <TYPE> (Given and Returned)
+*        A list of data associated with ORDDAT which needs to retain its
+*        correspondence with the items in ORDDAT.
+*     PDAT( EL ) = INTEGER*8 (Given and Returned)
+*        A list of data associated with ORDDAT which needs to retain its
+*        correspondence with the items in ORDDAT (probably pointers).
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "x"
+*     in the routine name by D or R as appropriate.  The ORDDAT and RDAT
+*     arguments supplied to the routine must have the data type
+*     specified.
+
+*  Copyright:
+*     Copyright (C) 2020 East Asian Observatory
+*     All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or modify
+*     it under the terms of the GNU General Public License as published by
+*     the Free Software Foundation; either Version 2 of the License, or (at
+*     your option) any later version.
+*
+*     This program is distributed in the hope that it will be useful, but
+*     WITHOUT ANY WARRANTY; without even the implied warranty of
+*     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+*     General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     17-FEB-2020 (DSB):
+*        Original C version, based on equivalent Fortran function by
+*        PDRAPER et al.
+
+*-
+*/
+
+   int *oldstatus = astWatch( STATUS );
+
+   ccg8Is3<TC>( *EL, ORDDAT, RDAT, PDAT, STATUS );
+
+   astWatch( oldstatus );
+}
+

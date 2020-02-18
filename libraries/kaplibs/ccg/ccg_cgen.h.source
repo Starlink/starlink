@@ -1,0 +1,5 @@
+/* Generic prototypes for generic C functions. These are expanded at
+   make-time by script make_h to generate ccg_cgen.h. */
+
+void CGEN_FUNCTION(ccg8Is3)( int64_t el, CGEN_TYPE orddat[], CGEN_TYPE rdat[], int64_t pdat[], int *status );
+void CGEN_FUNCTION(ccg8Clip)( CGEN_TYPE vmin, CGEN_TYPE vmax, int64_t el, CGEN_TYPE array[], int64_t *ngood, int *status );

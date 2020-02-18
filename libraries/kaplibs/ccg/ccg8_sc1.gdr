@@ -33,9 +33,9 @@
 *        The number of pixels in a line of data.
 *     NLINES = INTEGER*8 (Given)
 *        The number of lines of data in the stack.
-*     STACK( NPIX, NLINES ) = ? (Given)
+*     STACK( NPIX, NLINES ) = <TYPE> (Given)
 *        The array of lines which are to be combined into a single line.
-*     VARS( NPIX, NLINES ) = ? (Given)
+*     VARS( NPIX, NLINES ) = <TYPE> (Given)
 *        The data variances.
 *     MINPIX = INTEGER*8 (Given)
 *        The minimum number of pixels required to contribute to an
@@ -46,13 +46,13 @@
 *        The packed variance-covariance matrix of the order statistics
 *        from a normal distribution of sizes up to NLINES, produced by
 *        CCG8_ORVAR.
-*     RESULT( NPIX ) = ? (Returned)
+*     RESULT( NPIX ) = <TYPE> (Returned)
 *        The output line of data.
-*     RESVAR( NPIX ) = ? (Returned)
+*     RESVAR( NPIX ) = <TYPE> (Returned)
 *        The output population variances.
-*     WRK1( NLINES ) = ? (Returned)
+*     WRK1( NLINES ) = <TYPE> (Returned)
 *        Workspace for calculations.
-*     WRK2( NLINES ) = ? (Returned)
+*     WRK2( NLINES ) = <TYPE> (Returned)
 *        Workspace for calculations.
 *     POINT( NLINES ) = INTEGER*8 (Returned)
 *        Workspace to hold pointers to the original positions of the

@@ -1,0 +1,440 @@
+#include <stdint.h>
+#include <math.h>
+#include "sae_par.h"
+#include "prm_par.h"
+#include "ast.h"
+#include "f77.h"
+#include "mers.h"
+#include "ccg_cgen.h"
+#include "star/thr.h"
+
+/* Local data types */
+typedef struct  ccg8Sc3Data<T> {
+   <CTYPE> *result;
+   const <CTYPE> *vars;
+   const <CTYPE> *stack;
+   double *ncon;
+   double nsigma;
+   int64_t i1;
+   int64_t i2;
+   int64_t minpix;
+   int64_t nbad;
+   int64_t nlines;
+   int64_t npix;
+} ccg8Sc3Data<T>;
+
+/* Prototypes for local static functions. */
+static void ccg8Sc3_work<T>( void *job_data_ptr, int *status );
+
+
+
+F77_SUBROUTINE(ccg8_sc3<TLC>)( REAL(NSIGMA), INTEGER8(NPIX), INTEGER8(NLINES),
+                               <CNFTYPE>_ARRAY(STACK), <CNFTYPE>_ARRAY(VARS),
+                               INTEGER8(MINPIX), <CNFTYPE>_ARRAY(RESULT),
+                               DOUBLE_ARRAY(NCON), INTEGER8(NBAD), INTEGER(STATUS) ){
+/*
+*+
+*  Name:
+*     CCG8_SC3<T>
+
+*  Purpose:
+*     Combines data lines using a sigma-clipped mean.
+
+*  Language:
+*     C (designed to be called from Fortran)
+
+*  Invocation:
+*     CALL CCG8_SC3<T>( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX,
+*                       RESULT, NCON, NBAD, STATUS )
+
+*  Description:
+*     This routine accepts an array consisting a series of
+*     (vectorised) lines of data.  The weighted mean and standard
+*     deviation of each input column in STACK is then used to estimate
+*     the range of values which represent the required sigma
+*     clipping.  The standard deviation is derived from the population
+*     of values at each position along the lines (cf. each image
+*     pixel).  Values outside of this range are then rejected and the
+*     resulting output mean values are returned in the array RESULT.
+*
+*     Note that clipping will not be used when only two or three
+*     values are available (unless in the case of three values NSIGMA
+*     is less than 1.0).
+
+*  Arguments:
+*     NSIGMA = REAL (Given)
+*        The number of sigma at which to reject data values.
+*     NPIX = INTEGER*8 (Given)
+*        The number of pixels in a line of data.
+*     NLINES = INTEGER*8 (Given)
+*        The number of lines of data in the stack.
+*     STACK( NPIX, NLINES ) = <TYPE> (Given)
+*        The array of lines which are to be combined into a single line.
+*     VARS( NLINES ) = <TYPE> (Given)
+*        The variance to to used for each line of data. These are
+*        used as inverse weights when forming the mean and do not
+*        need to be real variances, as they are not propagated.
+*     MINPIX = INTEGER*8 (Given)
+*        The minimum number of pixels required to contribute to an
+*        output pixel.
+*     RESULT( NPIX ) = <TYPE> (Returned)
+*        The output line of data.
+*     NCON( NLINES ) = DOUBLE PRECISION (Returned)
+*        The actual number of contributing pixels from each input line
+*        to the output line.
+*     NBAD = INTEGER*8 (Returned)
+*        The number of bad values in the output array created while
+*        forming the statistics.  It excludes those bad values whose
+*        corresponding values along the collapse axis are all bad.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "<T>"
+*     in the routine name by D or R as appropriate.  The STACK, VARS
+*     and RESULT arguments supplied to the routine must have
+*     the data type specified.
+
+*  Copyright:
+*     Copyright (C) 2020 East Asian Observatory
+*     All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or modify
+*     it under the terms of the GNU General Public License as published by
+*     the Free Software Foundation; either Version 2 of the License, or (at
+*     your option) any later version.
+*
+*     This program is distributed in the hope that it will be useful, but
+*     WITHOUT ANY WARRANTY; without even the implied warranty of
+*     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+*     General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     18-FEB-2020 (DSB):
+*        Original C version, based on equivalent Fortran function by
+*        PDRAPER et al.
+
+*-
+*/
+
+/* Local Variables: */
+   ThrWorkForce *wf;         /* Pointer to workforce (a pool of threads) */
+   ccg8Sc3Data<T> *job_data; /* Pointer to all job data structures */
+   ccg8Sc3Data<T> *pdata;    /* Pointer to single job data structure */
+   int *oldstatus;           /* Old status pointer */
+   int iw;                   /* Index of worker thread */
+   int nw;                   /* Number of threads to use */
+   int64_t i;                /* Loop variable */
+   int64_t j;                /* Loop variable */
+   int64_t step;             /* Number of data elements per thread */
+
+/* Initialise returned values. */
+   *NBAD = 0;
+   for( i = 0; i < *NLINES; i++ ){
+      NCON[ i ] = 0.0;
+   }
+
+/* Check inherited global status. */
+   if( *STATUS != SAI__OK ) return;
+
+/* Ensure AST is using STATUS as the inherited status pointer */
+   oldstatus = astWatch( STATUS );
+
+/* Find the number of cores/processors available and create a pool of
+   threads of the same size. */
+   wf = thrGetWorkforce( thrGetNThread( "KAPPA_THREADS", STATUS ), STATUS );
+
+/* How many worker threads in the workforce? May not be the same as
+   requested if the workforce already existed. */
+   nw = wf ? wf->nworker : 1;
+
+/* Allocate job data for threads. Each structure describes a single job
+   to be allocated to a single worker thread. */
+   job_data = astCalloc( nw, sizeof(*job_data) );
+   if( *STATUS == SAI__OK ) {
+
+/* Each job processes a group of pixels from all input lines to produce
+   the corresponding group of output pixels. If the number of pixels is
+   very low, do all the calculations in the current thread. */
+      if( *NPIX < 10*nw ) nw = 1;
+
+/* Find how many pixels to process in each worker thread. */
+      if( nw > 0 ) {
+         step = (*NPIX)/nw;
+      } else {
+         step = *NPIX;
+      }
+
+/* Store the first and last pixel indices to be processed by the worker
+   thread in each structure. The last worker picks up any remaining pixels
+   left over by the integer division used to calculate "step". Also store
+   the other required values in each structure. */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         pdata->i1 = iw*step;
+         if( iw < nw - 1 ) {
+            pdata->i2 = pdata->i1 + step - 1;
+         } else {
+            pdata->i2 = *NPIX - 1;
+         }
+         pdata->stack = STACK;
+         pdata->vars = VARS;
+         pdata->nsigma = *NSIGMA;
+         pdata->nlines = *NLINES;
+         pdata->ncon = astCalloc( (*NLINES), sizeof(double) );
+         pdata->result = RESULT;
+         pdata->minpix = *MINPIX;
+         pdata->npix = *NPIX;
+
+/* Submit the job to the workforce. */
+         thrAddJob( wf, 0, pdata, ccg8Sc3_work<T>, 0, NULL, STATUS );
+      }
+
+/* Put the current thread to sleep until all the above jobs have
+   completed. */
+      thrWait( wf, STATUS );
+
+/* Now accumulate the results returned by each worker thread. */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         *NBAD += pdata->nbad;
+         for( j = 0; j < *NLINES; j++ ){
+            NCON[ j ] += pdata->ncon[ j ];
+         }
+
+/* Free per-thread resources. */
+         pdata->ncon = astFree( pdata->ncon );
+      }
+   }
+
+/* Free global resources. */
+   job_data = astFree( job_data );
+
+/* Reinstate the original AST inherited status pointer */
+   astWatch( oldstatus );
+}
+
+
+
+
+
+
+
+
+
+
+static void ccg8Sc3_work<T>( void *job_data_ptr, int *status ){
+/*
+*  Name:
+*     ccg8Sc3_work<T>
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     ccg8_sc3<T>.
+
+*  Invocation:
+*     void ccg8Sc3_work<T>( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = ccg8Sc3Data<X> * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+
+/* Local Variables: */
+   <CTYPE> *presult;      /* Pointer to next result value */
+   <CTYPE> *wrk1;         /* Workspace */
+   <CTYPE> *wrk2;         /* Workspace */
+   <CTYPE> lower;         /* Lower limit */
+   <CTYPE> upper;         /* Upper limit */
+   ccg8Sc3Data<T> *pdata; /* Pointer to single job data structure */
+   const <CTYPE> *pstack; /* Pointer to next input value */
+   const <CTYPE> *pvars;  /* Pointer to next input variance */
+   double *ncon;          /* Pointer to ncon array */
+   double delta;          /* Half of clipping range */
+   double dev;            /* Deviation from mean */
+   double mean;           /* Weighted mean */
+   double nsigma;         /* No. of sigma at which to reject data values */
+   double sum1;           /* Weight sums */
+   double sum2;           /* Weighted value sums */
+   double var;            /* Population variance before rejection */
+   double weight;         /* Weight */
+   int *used;             /* Flags indicating used values */
+   int64_t *point;        /* Original data indices before extraction */
+   int64_t i;             /* Loop variable */
+   int64_t igood;         /* Number of unrejected pixels */
+   int64_t j;             /* Loop variable */
+   int64_t minpix;        /* Minimum number of good pixels required */
+   int64_t nbad;          /* Number of bad results */
+   int64_t ngood;         /* Number of good pixels */
+   int64_t nlines;        /* Number of lines */
+   int64_t npix;          /* Number of pixels per line */
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (ccg8Sc3Data<T> *) job_data_ptr;
+
+/* For convenience, copy to local variables */
+   npix = pdata->npix;
+   minpix = pdata->minpix;
+   nlines = pdata->nlines;
+   nsigma = pdata->nsigma;
+   ncon = pdata->ncon;
+
+/* Allocate work space for this thread. */
+   point = astMalloc( nlines*sizeof(*point) );
+   wrk1 = astMalloc( nlines*sizeof(*wrk1) );
+   wrk2 = astMalloc( nlines*sizeof(*wrk2) );
+   used = astMalloc( nlines*sizeof(*used) );
+   if( *status == SAI__OK ){
+
+/* Loop over the output pixels to be processed by this thread.  */
+      nbad = 0;
+      presult = pdata->result + pdata->i1;
+      for( i = pdata->i1; i <= pdata->i2; i++,presult++ ){
+
+/* Initialise sums. */
+         ngood = 0;
+         sum1 = 0.0;
+         sum2 = 0.0;
+
+/* Loop over all possible contributing pixels. */
+         pstack = pdata->stack + i;
+         pvars = pdata->vars;
+         for( j = 0; j < nlines; j++,pvars++ ){
+            if( *pstack != VAL__BAD<T> &&
+                *pvars != VAL__BAD<T> && *pvars > VAL__SML<T> ) {
+
+/* Update the zero-based indices of the positions of the unextracted
+   data. */
+               point[ ngood ] = j;
+
+/* Change variance to weight, and get data value. */
+               var = 1.0/(*pvars);
+
+/* Increment sums. */
+               sum2 += (*pstack)*var;
+               sum1 += var;
+
+/* Transfer values to working buffers for the current output pixel. */
+               wrk1[ ngood ] = *pstack;
+               wrk2[ ngood ] = var;
+
+/* Set "used" buffer in case no values are rejected, and increment the
+   number of good points. */
+               used[ ngood++ ] = 1;
+            }
+
+/* Move the input pointer on to the value in the next input line. */
+            pstack += npix;
+         }
+
+/* Continue if more than one good value. */
+         if( ngood > 0 ) {
+            if( ngood == 1 ) {
+
+/* Just return the value. */
+               mean = wrk1[ 0 ];
+            } else {
+
+/* Form the weighted mean and population variance. */
+               mean = sum2/sum1;
+               sum1 = 0.0;
+               for( j = 0; j < ngood; j++ ) {
+                  dev = mean - wrk1[ j ];
+                  sum1 += dev*dev;
+               }
+               var = sum1/( ngood - 1 );
+
+/* Clipping range. */
+               delta = nsigma*sqrt( var );
+               lower = mean - delta;
+               upper = mean + delta;
+
+/* Clip unwanted data. */
+               ccg8Clip<TC>( lower, upper, ngood, wrk1, &igood, status );
+
+/* If any values have been rejected then form new mean. */
+               if( igood > 0 ) {
+                  if( igood != ngood ) {
+
+/* New mean required. */
+                     sum1 = 0.0;
+                     sum2 = 0.0;
+                     for( j = 0; j < ngood; j++ ){
+                        if( wrk1[ j ] != VAL__BAD<T> ) {
+
+/* Increment sums. */
+                           weight = wrk2[ j ];
+                           sum2 += wrk1[ j ]*weight;
+                           sum1 += weight;
+                           used[ j ] = 1;
+                        } else {
+                           used[ j ] = 0;
+                        }
+                     }
+
+/* New mean. */
+                     mean = sum2/sum1;
+                  }
+
+/* Increment line used buffer. */
+                  for( j = 0; j < ngood; j++ ){
+                     if( used[ j ] ) ncon[ point[ j ] ] += 1.0;
+                  }
+
+/* All values rejected. */
+               } else {
+                  ngood = 0;
+               }
+            }
+
+/* If there are sufficient good pixels output the result. */
+            if( ngood >= minpix ) {
+               *presult = (<CTYPE>) mean;
+
+/* Trap numeric errors. */
+               if( *presult != (<CTYPE>) mean ){
+                  *presult = VAL__BAD<T>;
+                  nbad++;
+               }
+
+/* Not enough contributing pixels, set output invalid unless all of them
+   are bad. */
+            } else {
+               *presult = VAL__BAD<T>;
+               if( ngood > 0 ) nbad++;
+            }
+         }
+      }
+   }
+
+/* Free work space */
+   point = astFree( point );
+   used = astFree( used );
+   wrk1 = astFree( wrk1 );
+   wrk2 = astFree( wrk2 );
+
+/* Return the number of bad results generated by this worker thread. */
+   pdata->nbad = nbad;
+}
+

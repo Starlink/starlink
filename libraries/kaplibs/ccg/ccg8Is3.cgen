@@ -1,0 +1,133 @@
+#include <stdint.h>
+#include "sae_par.h"
+
+void CGEN_FUNCTION(ccg8Is3)( int64_t el, CGEN_TYPE orddat[],
+                             CGEN_TYPE rdat[], int64_t pdat[], int *status ){
+/*
+*+
+*  Name:
+*     ccg8Is3<T>
+
+*  Purpose:
+*     Sorts a list of data into increasing order, and applies the
+*     corresponding shuffle to two ancillary lists.
+
+*  Synopsis:
+*     void ccg8Is3<T>( int64_t el, CGEN_TYPE orddat[], CGEN_TYPE rdat[],
+*                      int64_t pdat[], int *status )
+
+*  Description:
+*     This function uses an insert sort method.  This has proven itself the
+*     quickest for sorting small sets of data lots of times, as in image
+*     stacking using ordered statistics.  The method looks at the second
+*     value, compares this with the first if swaps if necessary, then it
+*     looks at the third, looks at the previous values swaps with the
+*     lowest (or not at all) and so on until all values have been passed.
+*     It is fast (for the case above ) simply because of the very few lines
+*     of operation.  The sort is extended to the ancillary data "rdat" and
+*     "pdat" that maintain their correspondence with the "orddat" dataset
+*     on exit.
+
+*  Parameters:
+*     el
+*        The number of entries in "orddat".
+*     orddat
+*        The data to order. On output it contains the data in increasing
+*        order. The supplied "orddat" array should have at least "el"
+*        elements.
+*     rdat
+*        A list of data associated with "orddat" which needs to retain its
+*        correspondence with the items in "orddat". The supplied "rdat"
+*        array should have at least "el" elements.
+*     pdat
+*        A list of data associated with "orddat" which needs to retain its
+*        correspondence with the items in "orddat" (probably pointers). The
+*        supplied "pdat" array should have at least "el" elements.
+*     *status
+*        The global status.
+
+*  Notes:
+*     -  There is a function for float and double: replace "<T>" in
+*     the function name by D or R as appropriate.  The "orddat" and "rdat"
+*     arguments supplied to the function must have the data type specified.
+
+*  Copyright:
+*     Copyright (C) 2020 East Asian Observatory
+*     All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or modify
+*     it under the terms of the GNU General Public License as published by
+*     the Free Software Foundation; either Version 2 of the License, or (at
+*     your option) any later version.
+*
+*     This program is distributed in the hope that it will be useful, but
+*     WITHOUT ANY WARRANTY; without even the implied warranty of
+*     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+*     General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     17-FEB-2020 (DSB):
+*        Original version, based on equivalent Fortran function by PDRAPER
+*        et al.
+
+*-
+*/
+
+/* Local Variables: */
+   CGEN_TYPE *porddat;   /* Pointer to orddat[j] */
+   CGEN_TYPE *prdat;     /* Pointer to rdat[j] */
+   CGEN_TYPE val1;       /* Single value */
+   CGEN_TYPE val2;       /* Single value */
+   int64_t *ppdat;       /* Pointer to pdat[j] */
+   int64_t i;            /* Loop variable */
+   int64_t ival;         /* Single ancillary value */
+   int64_t j;            /* Loop variable */
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Look at all values (starting with the second) inserting after the
+   first largest value. */
+   for( i = 1; i < el; i++ ){
+
+/* Store the current value (on the bottom). */
+      val1 = orddat[ i ];
+      ival = pdat[ i ];
+      val2 = rdat[ i ];
+
+/* Initialise pointers to the array values that may be changed. */
+      porddat = orddat + i - 1;
+      ppdat = pdat + i - 1;
+      prdat = rdat + i - 1;
+
+/* Look at all values above this one on the stack, updating the above
+   pointers. */
+      for( j = i - 1; j >= 0; j--,porddat--,ppdat--,prdat-- ){
+         if( val1 > porddat[ 0 ] ) break;
+
+/* Move values up one to make room for next value ("val" or "orrdat(j)"
+   whichever is greater). */
+         porddat[ 1 ] = porddat[ 0 ];
+         ppdat[ 1 ] = ppdat[ 0 ];
+         prdat[ 1 ] = prdat[ 0 ];
+      }
+
+/* Insert val below first value greater than it, or put on top if none
+   bigger. */
+      *(++porddat) = val1;
+      *(++ppdat) = ival;
+      *(++prdat) = val2;
+   }
+}
+

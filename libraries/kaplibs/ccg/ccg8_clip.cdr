@@ -1,0 +1,87 @@
+#include <stdint.h>
+#include "f77.h"
+#include "ast.h"
+#include "ccg_cgen.h"
+
+F77_SUBROUTINE(ccg8_clip<TLC>)( <CNFTYPE>(VMIN), <CNFTYPE>(VMAX), INTEGER8(EL),
+                                <CNFTYPE>_ARRAY(ARRAY), INTEGER8(NGOOD),
+                                INTEGER(STATUS) ){
+/*
+*+
+*  Name:
+*     CCG8_CLIP<T>
+
+*  Purpose:
+*     Sets any data outside a given value range BAD
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG8_CLIP<T>( VMIN, VMAX, EL, ARRAY, NGOOD, STATUS )
+
+*  Description:
+*     This generic routine loops over all entries in RA. If any values
+*     are outside the range RMIN to VMAX then they are set BAD.
+
+*  Arguments:
+*     VMIN = <TYPE> (Given)
+*        The minimum allowed value.  All values below this are set BAD.
+*     VMAX = <TYPE> (Given)
+*        The maximum allowed value.  All values above this are set BAD.
+*     EL = INTEGER*8 (Given)
+*        The number of entries in ARRAY.
+*     ARRAY( EL ) = <TYPE> (Given and Returned)
+*        The list of values to be clipped within the given range.  On
+*        output this contains the clipped list.
+*     NGOOD = INTEGER*8 (Returned)
+*        The number of values left after rejection.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for real and double-precision: replace "x"
+*     in the routine name by D or R as appropriate.  The ARRAY, VMIN,
+*     and VMAX arguments supplied to the routine must have the data type
+*     specified.
+
+*  Copyright:
+*     Copyright (C) 2020 East Asian Observatory
+*     All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or modify
+*     it under the terms of the GNU General Public License as published by
+*     the Free Software Foundation; either Version 2 of the License, or (at
+*     your option) any later version.
+*
+*     This program is distributed in the hope that it will be useful, but
+*     WITHOUT ANY WARRANTY; without even the implied warranty of
+*     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+*     General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     17-FEB-2020 (DSB):
+*        Original C version, based on equivalent Fortran function by
+*        PDRAPER et al.
+
+*-
+*/
+
+   int *oldstatus = astWatch( STATUS );
+
+   ccg8Clip<TC>( *VMIN, *VMAX, *EL, ARRAY, NGOOD, STATUS );
+
+   astWatch( oldstatus );
+}
+
