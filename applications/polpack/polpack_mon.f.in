@@ -80,6 +80,8 @@
 *        aboud dangling HDS locators.
 *     19-DEC-2012 (DSB):
 *        Implement LPG looping.
+*     19-FEB-2020 (DSB):
+*        Include used CPU time in logged information.
 *     {enter_further_changes_here}
 
 *-
@@ -92,6 +94,7 @@
       INCLUDE  'GRP_PAR'          ! GRP definitions
       INCLUDE  'DAT_PAR'          ! DAT definitions
       INCLUDE  'PAR_PAR'          ! Parameter system definitions
+      INCLUDE  'PRM_PAR'          ! VAL__ constants
 
 *  Status:
       INTEGER  STATUS
@@ -102,6 +105,7 @@
                                   ! any trailing blanks
 
 *  Local Variables:
+      INTEGER CPUTIM( 4 )         ! Context info for KPG1_CPUTM
       CHARACTER FILTER*( 60 )     ! HDS_INFOI filter string
       CHARACTER NAME*( PAR__SZNAM ) ! Action name
       INTEGER IPOSN               ! Position in string
@@ -157,6 +161,9 @@
 
 *  Re-read the polpack configuration file.
       CALL POL1_CNFIG( ' ', STATUS )
+
+*  Record the current CPU time in CPUTIM.
+      CALL KPG1_CPUTM( CPUTIM, VAL__BADD )
 
 *  Initialise the common blocks used to control multiple invocation of
 *  applications to process lists of NDFs.
@@ -268,7 +275,7 @@
 
 *  Log the task and its parameters to a log file specified by enviromnent
 *  variable POLPACK_LOG.
-         CALL KPG1_LGCMD( NAME, 'POLPACK', STATUS )
+         CALL KPG1_LGCMD( NAME, 'POLPACK', CPUTIM, STATUS )
       END DO
 
 *  Note the current number of active GRP identifiers. Do this in a new

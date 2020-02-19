@@ -206,7 +206,9 @@ void kpgStati( int, int, const int[], int, const float[], int *, int *,
 
 void kpg1CrMapD( int, int, const double x[], const double y[], int, double *, int * );
 
-void kpg1Lgcmd( const char *appn, const char *pack, int *status );
+void kpg1Lgcmd( const char *appn, const char *pack, int *cputim, int *status );
+
+void kpg1Cputm( int contxt[4], double *cputim );
 
 /* Now include the expanded generic prototypes. */
 #include "kpg_cgen.h"

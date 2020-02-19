@@ -173,6 +173,8 @@
 *        Call SUPERCAM2ACSIS
 *     2014-04-01 (TIMJ):
 *        Call NANTEN2ACSIS
+*     19-FEB-2020 (DSB):
+*        Include used CPU time in logged information.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -213,6 +215,7 @@
 #include "sae_par.h"
 #include "par.h"
 #include "par_par.h"
+#include "prm_par.h"
 #include "mers.h"
 #include "ndf.h"
 #include "star/grp.h"
@@ -244,6 +247,8 @@ void smurf_mon( int * status ) {
   char taskname[PAR__SZNAM+1];
   char appname[NDF__SZAPP+1];
   char filter[PAR__SZNAM+PAR__SZNAM+1];
+  double junk;                 /* An unused value */
+  int cputim[4];               /* Context info for kpg1Cputm */
   int ngrp0;                   /* Number of grp ids at start */
   int ngrp1;                   /* Number of grp ids at end */
   int nloc0;                   /* Number of active HDS Locators at start */
@@ -304,6 +309,9 @@ void smurf_mon( int * status ) {
      all SMURF routines. Unlock it so it can be accessed by any thread. */
   smurf_global_keymap = astKeyMap( "KeyCase=0" );
   astUnlock( smurf_global_keymap, 1 );
+
+  /* Record the current CPU time in CPUTIM. */
+  kpg1Cputm( cputim, &junk );
 
   /* Call the subroutine associated with the requested task */
   if (strcmp( taskname, "BADBOLOS" ) == 0 ) {
@@ -455,7 +463,7 @@ void smurf_mon( int * status ) {
 
   /* Log the task and its parameters to a log file specified by enviromnent
      variable CUPID_LOG. */
-  kpg1Lgcmd( taskname, "SMURF", status );
+  kpg1Lgcmd( taskname, "SMURF", cputim, status );
 
   /* Clear cached info from sc2ast_createwcs. */
   sc2ast_createwcs(SC2AST__NULLSUB, NULL, NULL, NULL, NO_FTS, NULL, status);
