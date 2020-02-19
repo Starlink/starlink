@@ -1593,3 +1593,12 @@ void kpg1Hsect( const HDSLoc *loc1, int ndim, int *lbnd, int *ubnd, HDSLoc *loc2
    F77_FREE_INTEGER( UBND );
 }
 
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_cputm)( INTEGER_ARRAY(CONTXT),
+                            DOUBLE(CPUTIM) );
+
+void kpg1Cputm( int contxt[4], double *cputim ){
+   F77_LOCK( F77_CALL(kpg1_cputm)( contxt, cputim ); )
+}

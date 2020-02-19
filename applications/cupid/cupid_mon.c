@@ -5,8 +5,10 @@
 #include "star/task_adam.h"
 #include "star/ndg.h"
 #include "star/one.h"
+#include "star/kaplibs.h"
 #include "ems.h"
 #include "par_par.h"
+#include "prm_par.h"
 #include "cupid.h"
 #include <string.h>
 
@@ -91,6 +93,8 @@ void cupid_mon( int *status ) {
 *        Use astCheckMemory rather than astFlushMemory since we do not want
 *        to free the memory used to hold the singleton workforce returned by
 *        thrGetWorkforce.
+*     19-FEB-2020 (DSB):
+*        Include used CPU time in logged information.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -104,7 +108,9 @@ void cupid_mon( int *status ) {
    char buff[PAR__SZNAM+7];       /* Application name for provenance handling */
    char filter[PAR__SZNAM+PAR__SZNAM+1];
    char name[PAR__SZNAM+1];       /* C character variable to hold name */
+   double junk;                   /* An unused value */
    int ast_caching;               /* Initial value of AST MemoryCaching tuning parameter */
+   int cputim[4];                 /* Context info for kpg1Cputm */
    int emslev1;                   /* EMS level on entry */
    int emslev2;                   /* EMS level on exit */
    int ngrp0;                     /* Number of grp ids at start */
@@ -156,6 +162,9 @@ void cupid_mon( int *status ) {
    block. */
    ndgBeggh( status );
 
+/* Record the current CPU time in CPUTIM. */
+   kpg1Cputm( cputim, &junk );
+
 /* Check the string against valid A-task names---if matched then call
    the relevant A-task. */
 
@@ -204,7 +213,7 @@ void cupid_mon( int *status ) {
 
 /* Log the task and its parameters to a log file specified by enviromnent
    variable CUPID_LOG. */
-   kpg1Lgcmd( name, "CUPID", status );
+   kpg1Lgcmd( name, "CUPID", cputim, status );
 
 /* Re-instate the original value of the AST ObjectCaching tuning
    parameter. */

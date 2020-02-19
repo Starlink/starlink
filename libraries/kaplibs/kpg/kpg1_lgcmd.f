@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_LGCMD( APPN, PACK, STATUS )
+      SUBROUTINE KPG1_LGCMD( APPN, PACK, CPUTIM, STATUS )
 *+
 *  Name:
 *     KPG1_LGCMD
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL  KPG1_LGCMD( APPN, PACK, STATUS )
+*     CALL  KPG1_LGCMD( APPN, PACK, CPUTIM, STATUS )
 
 *  Description:
 *     The routine writes a record to a log file specified by environment
@@ -23,11 +23,15 @@
 *        Name of the current application.
 *     PACK = CHARACTER * ( * ) (Given)
 *        Name of the package (e.g. "KAPPA").
+*     CPUTIM( 4 ) = INTEGER (Given and returned)
+*        An array holding the CPU time at the start of the command that
+*        is being logged. This should be obtained by calling KPG1_CPUTM
+*        immediately before the command starts.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2015 East Asian Observatory.
+*     Copyright (C) 2015,2020 East Asian Observatory.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -54,6 +58,8 @@
 *        Original version, based on the NDF1_HWENV.
 *     6-DEC-2019 (DSB):
 *        Renamed from KPS1_LGCMD to KPG1_LGCMD and added PACK argument.
+*     19-FEB-2020 (DSB):
+*        Added CPUTIM argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -73,6 +79,9 @@
 *  Arguments Given:
       CHARACTER * ( * ) APPN
       CHARACTER * ( * ) PACK
+
+*  Arguments Given and Returned:
+      INTEGER CPUTIM( 4 )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -99,6 +108,7 @@
       CHARACTER OUT( 1 )*( MXOUT ) ! Formatted output buffer
       CHARACTER PARAM*( PAR__SZNAM ) ! Parameter name
       CHARACTER VALUE*( MSG__SZMSG ) ! Parameter value
+      DOUBLE PRECISION CPUSEC    ! CPU time since previous call to KPG1_CPUTM
       INTEGER BR                 ! Character position for breaking text
       INTEGER FD                 ! File descriptor for log file
       INTEGER IAT                ! Current length of string
@@ -153,6 +163,17 @@
             LBUF = LBUF + 1
             CALL CHR_APPND( APPN, BUF, LBUF )
             CALL FIO_WRITE( FD, ' ', STATUS )
+            CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
+
+*  Write the CPU used to the log file, in seconds.
+            CALL KPG1_CPUTM( CPUTIM, CPUSEC )
+            BUF = ' '
+            LBUF = 0
+            CALL CHR_APPND( 'CPU used:', BUF, LBUF )
+            LBUF = LBUF + 1
+            CALL CHR_PUTD( CPUSEC, BUF, LBUF )
+            LBUF = LBUF + 1
+            CALL CHR_APPND( 'sec', BUF, LBUF )
             CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
 
 *  Initialise BUF with a heading for the list of parameters which will

@@ -113,6 +113,8 @@
 *        aboud dangling HDS locators.
 *     2016 September 30 (MJC):
 *        Invoke DSB's command-logging routine.
+*     19-FEB-2020 (DSB):
+*        Include used CPU time in logged information.
 *     {enter_further_changes_here}
 
 *-
@@ -124,6 +126,7 @@
       INCLUDE  'SAE_PAR'         ! SSE global definitions
       INCLUDE  'GRP_PAR'         ! GRP definitions
       INCLUDE  'DAT_PAR'         ! DAT definitions
+      INCLUDE  'PRM_PAR'          ! VAL__ constants
 
 *  Status:
       INTEGER  STATUS
@@ -136,6 +139,7 @@
       INTEGER CHR_LEN            ! Length of string
 
 *  Local Variables:
+      INTEGER CPUTIM( 4 )        ! Context info for KPG1_CPUTM
       REAL DELAY                 ! Delay between loops in seconds
       LOGICAL DISAB              ! Disable looping?
       CHARACTER*60 FILTER        ! HDS_INFOI filter string
@@ -213,6 +217,9 @@
 *  See if input NDFs are allowed to be overwritten by output NDFs.
       CALL KPG1_ENVDF( 'KAPPA_REPLACE', REPL, STATUS )
       CALL LPG_REPLA( REPL, STATUS )
+
+*  Record the current CPU time in CPUTIM.
+      CALL KPG1_CPUTM( CPUTIM, VAL__BADD )
 
 *  Loop round invoking the task for each set of NDFs specified by the
 *  user.
@@ -460,7 +467,7 @@
 
 *  Log the task and its parameters to a log file specified by enviromnent
 *  variable KAPPA_LOG.
-         CALL KPG1_LGCMD( NAME, 'KAPPA', STATUS )
+         CALL KPG1_LGCMD( NAME, 'KAPPA', CPUTIM, STATUS )
 
       END DO
 
