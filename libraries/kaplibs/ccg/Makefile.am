@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+BUILT_SOURCES = ccg_cgen.h
+
 lib_LTLIBRARIES = libccg.la
 
 libccg_la_SOURCES = $(PRIVATE_INCLUDES) \
