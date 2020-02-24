@@ -81,6 +81,9 @@
 *     2019-03-19 (GSB):
 *        Avoid reading beyond end of state array.  Correct sense of rts_end
 *        comparison.
+*     2020-2-24 (GSB):
+*        Ensure the header structure always contains a steptime estimate
+*        before calling smf_fix_metadata_scuba2.
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -241,6 +244,9 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
               "This can not happen", status);
       steptime = VAL__BADD;
     }
+
+    /* Now we have a step time, store it in the header structure. */
+    hdr->steptime = steptime;
   }
 
   /* Only do something for ACSIS and SCUBA-2 data. Not data matching the interface */
