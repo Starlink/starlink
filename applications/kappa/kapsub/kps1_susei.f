@@ -172,7 +172,7 @@
                                  ! the rms
       LOGICAL SCALED             ! Data are to be scaled?
       REAL SUMSQ                 ! Sum of the square of differences
-      INTEGER WORK( 16 )          ! Work array
+      REAL WORK( 16 )            ! Work array
       REAL X( 2 )                ! X co-ordinates of the coarse-bin's
                                  ! corners
       REAL Y( 2 )                ! Y co-ordinates of the coarse-bin's
@@ -217,7 +217,7 @@
 *  definition we are using a bi-cubic.
             CALL PDA_BISPEV( XKNOT, NXKNOT + 8, YKNOT, NYKNOT + 8,
      :                       COEFF, 3, 3, X, 2, Y, 2, F, WORK, 16,
-     :                       IWORK, 4, IFAIL, STATUS )
+     :                       IWORK, 4, IFAIL )
 
 *  Test for an error.
             IF ( IFAIL .NE. 0 ) THEN

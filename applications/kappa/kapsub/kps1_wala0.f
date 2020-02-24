@@ -679,7 +679,7 @@
      :                                %VAL( CNF_PVAL( IPD1 ) ),
      :                                %VAL( CNF_PVAL( IPV1 ) ), METHOD,
      :                                AST_NULL, PARAMS, FLAGS, TOL,
-     :                                MAXPIX, VAL__BADB, NDIM2, LGRID2,
+     :                                MAXPIX, VAL__BADK, NDIM2, LGRID2,
      :                                UGRID2, LGRID2, UGRID2,
      :                                %VAL( CNF_PVAL( IPD2 ) ),
      :                                %VAL( CNF_PVAL( IPV2 ) ),
@@ -810,7 +810,7 @@
      :                            %VAL( CNF_PVAL( IPQ1 ) ),
      :                            DUMMY, METHOD, AST_NULL,
      :                            PARAMS, FLAGS, TOL, MAXPIX,
-     :                            VAL__BADUW, NDIM2, LGRID2, UGRID2,
+     :                            VAL__BADUB, NDIM2, LGRID2, UGRID2,
      :                            LGRID2, UGRID2,
      :                            %VAL( CNF_PVAL( IPQ2 ) ), DUMMY,
      :                            STATUS )

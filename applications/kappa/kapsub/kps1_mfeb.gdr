@@ -23,20 +23,17 @@
 *     the unbinned data.
 
 *  Arguments:
-*     COMPRS( NDF__MXDIM ) = INTEGER (Given)
-*        The binning factors, i.e. the number of elements of the 
+*     COMPRS( NDF__MXDIM ) = INTEGER*8 (Given)
+*        The binning factors, i.e. the number of elements of the
 *        original unbinned array along each axis that were combined to
 *        form one element of ARRAY.  (Although binned elements with
 *        the highest indices may have fewer contributing unbinned
 *        elements than COMPRS, since the binned array must at least
-*        span the unbinned data, the binning factor is a constant for 
+*        span the unbinned data, the binning factor is a constant for
 *        all binned elements.)
-*     CLIP( NCLIP ) = REAL (Given)
-*        The clipping levels in standard deviations for the rejection 
-*        of outliers.
-*     DIMS( NDF__MXDIM ) = INTEGER (Given)
+*     DIMS( NDF__MXDIM ) = INTEGER*8 (Given)
 *        The dimensions of the unbinned array.
-*     BDIMS( NDF__MXDIM ) = INTEGER (Given)
+*     BDIMS( NDF__MXDIM ) = INTEGER*8 (Given)
 *        The dimensions of the binned array.
 *     BARRAY( * ) = ? (Given)
 *        The binned array.
@@ -81,7 +78,7 @@
 *        Original version.
 *     2007 September 6 (MJC):
 *        No longer write to the array itself but log the feature mask
-*        in the new BYTE MASK that replaces the ARRAY argument. 
+*        in the new BYTE MASK that replaces the ARRAY argument.
 *     2009 August 7 (MJC):
 *        Cope with extra bins in binned array for original elements
 *        beyond an integer multiple of the bin size.  Thus cannot assume
@@ -105,32 +102,32 @@
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL
 
 *  Arguments Given:
-      INTEGER COMPRS( NDF__MXDIM )
-      INTEGER DIMS( NDF__MXDIM )
-      INTEGER BDIMS( NDF__MXDIM )
+      INTEGER*8 COMPRS( NDF__MXDIM )
+      INTEGER*8 DIMS( NDF__MXDIM )
+      INTEGER*8 BDIMS( NDF__MXDIM )
       <TYPE> BARRAY( * )
 
 *  Arguments Given and Returned:
       BYTE MASK( * )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER BIND( NDF__MXDIM ) ! Indices from vectorised binned array
-      INTEGER BEL                ! Number of elements in binned array
-      INTEGER ECMPRS( NDF__MXDIM ) ! Effective compression factor
-      INTEGER EL                 ! Number of elements in unbinned array
-      INTEGER FEL                ! Number of elements in final section
-      LOGICAL FINAL              ! Final incomplete section?
-      INTEGER I                  ! Loop counter
-      INTEGER IPSECT             ! Pointer to unbinned bad section
-      INTEGER J                  ! Loop counter
-      INTEGER LBND( NDF__MXDIM ) ! Section lower bounds
-      INTEGER OFFSET( NDF__MXDIM ) ! Offset of section wrt unbinned
-      INTEGER REM                ! Number of unbinned elements stored
-                                 ! in incomplete bin along a dimension
-      INTEGER SEL                ! Maximum number of elements in section
+      INTEGER*8 BIND( NDF__MXDIM ) ! Indices from vectorised binned array
+      INTEGER*8 BEL                ! Number of elements in binned array
+      INTEGER*8 ECMPRS( NDF__MXDIM ) ! Effective compression factor
+      INTEGER*8 EL                 ! Number of elements in unbinned array
+      INTEGER*8 FEL                ! Number of elements in final section
+      LOGICAL FINAL                ! Final incomplete section?
+      INTEGER*8 I                  ! Loop counter
+      INTEGER IPSECT               ! Pointer to unbinned bad section
+      INTEGER*8 J                  ! Loop counter
+      INTEGER*8 LBND( NDF__MXDIM ) ! Section lower bounds
+      INTEGER*8 OFFSET( NDF__MXDIM ) ! Offset of section wrt unbinned
+      INTEGER*8 REM                ! Number of unbinned elements stored
+                                   ! in incomplete bin along a dimension
+      INTEGER*8 SEL                ! Maximum number of elements in section
 
 *.
 
@@ -150,10 +147,10 @@
          BEL = BEL * BDIMS( I )
          SEL = SEL * COMPRS( I )
 
-*  Determine the number of mask-array elements generated from the 
-*  final binned element.  A full bin would correspond to COMPRS( I ) 
-*  elements.  
-*  The expression will evaluate to 0 for an each match or for 
+*  Determine the number of mask-array elements generated from the
+*  final binned element.  A full bin would correspond to COMPRS( I )
+*  elements.
+*  The expression will evaluate to 0 for an each match or for
 *  uncompressed dimensions
          REM = COMPRS( I ) - ( BDIMS( I ) * COMPRS( I ) - DIMS( I ) )
          IF ( REM .GT. 0 ) THEN
@@ -161,7 +158,7 @@
          ELSE
             ECMPRS( I ) = COMPRS( I )
          END IF
-         
+
          FEL = FEL * ECMPRS( I )
       END DO
 
@@ -175,11 +172,11 @@
 *  each binned element.  The final element along a dimension may
 *  transfer fewer bad values than this because the original dimension
 *  was not an integer multiple of the compression factor.
-      CALL PSX_CALLOC( SEL, '_BYTE', IPSECT, STATUS )
+      CALL PSX_CALLOC8( SEL, '_BYTE', IPSECT, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Fill it with the bad value.
-      CALL KPG1_FILLB( VAL__BADB, SEL, %VAL( CNF_PVAL( IPSECT ) ),
+      CALL KPG1_FILL8B( VAL__BADB, SEL, %VAL( CNF_PVAL( IPSECT ) ),
      :                 STATUS )
 
 *  Search for bad pixels.  Convert the vectorised index of each bad
@@ -187,8 +184,8 @@
       I = 1
       DO WHILE ( I .LE. BEL )
          IF ( BARRAY( I ) .EQ. VAL__BAD<T> ) THEN
-            CALL KPG1_VEC2N( 1, I, NDF__MXDIM, LBND, BDIMS, BIND, 
-     :                       STATUS )
+            CALL KPG1_VEC2N8( 1, I, NDF__MXDIM, LBND, BDIMS, BIND,
+     :                        STATUS )
 
 *  Determine the offset of the section of bad pixels with respect to the
 *  origin of the unbinned array.  Also determine if it is a final
@@ -196,7 +193,7 @@
             FINAL = .FALSE.
             DO J = 1, NDF__MXDIM
                OFFSET( J ) = ( BIND( J ) - 1 ) * COMPRS( J )
-               FINAL = FINAL .OR. 
+               FINAL = FINAL .OR.
      :                 OFFSET( J ) + COMPRS( J ) .GT. DIMS( J )
             END DO
 
@@ -206,14 +203,14 @@
 
 *  Paste the bad-pixel section into the appropriate place within the
 *  unbinned array, using the smaller dimensions.
-               CALL KPG1_PASTB( .FALSE., .TRUE., OFFSET, ECMPRS, FEL,
+               CALL KPG1_PAST8B( .FALSE., .TRUE., OFFSET, ECMPRS, FEL,
      :                          %VAL( CNF_PVAL( IPSECT ) ), DIMS, EL,
      :                          MASK, STATUS )
             ELSE
 
 *  Paste the bad-pixel section into the appropriate place within the
 *  unbinned array.
-               CALL KPG1_PASTB( .FALSE., .TRUE., OFFSET, COMPRS, SEL,
+               CALL KPG1_PAST8B( .FALSE., .TRUE., OFFSET, COMPRS, SEL,
      :                          %VAL( CNF_PVAL( IPSECT ) ), DIMS, EL,
      :                          MASK, STATUS )
             END IF

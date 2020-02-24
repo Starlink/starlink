@@ -1,0 +1,187 @@
+      SUBROUTINE KPG1_CMUL8<T>( BAD, EL, A, CONST, B, NBAD, STATUS )
+*+
+*  Name:
+*     KPG1_CMUL8x
+
+*  Purpose:
+*     Multiplies each element of a vectorised array by a constant.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_CMUL8x( BAD, EL, A, CONST, B, NBAD, STATUS )
+
+*  Description:
+*     The routine multiplies each element of a vectorised array by a
+*     constant to produce a new array. Bad value checking is performed
+*     if required.
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether to check for bad values in the input array.
+*     EL = INTEGER*8 (Given)
+*        Number of array elements to process.
+*     A( EL ) = ? (Given)
+*        Input array.
+*     CONST = DOUBLE PRECISION (Given)
+*        Constant by which each array element is to be multiplied.
+*     B( EL ) = ? (Returned)
+*        Output array.
+*     NBAD = INTEGER*8 (Returned)
+*        Number of bad values in the output array B.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each numeric type except double
+*     precision: replace "x" in the routine name by R, I, W, UW, B or
+*     UB as appropriate. The arrays supplied to the routine must have
+*     the data type specified.
+*     -  This routine will handle numerical errors (i.e. overflow) by
+*     assigning the appropriate "bad" value to affected output array
+*     elements.
+
+*  Copyright:
+*     Copyright (C) 1990, 1991 Science & Engineering Research Council.
+*     Copyright (C) 1996, 2004 Central Laboratory of the Research
+*                   Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
+
+*  History:
+*     17-APR-1990 (RFWS):
+*        Original version.
+*     11-MAR-1991 (RFWS):
+*        Changed to return the total number of bad pixels in the output
+*        array.
+*     1996 May 20 (MJC):
+*        Replaced LIB$ESTABLISH and LIB$REVERT calls.
+*     2004 Oct 1 (TIMJ):
+*        Recreate generic from constituent parts.
+*        No longer use NUM_ERROR directly.
+*     20-FEB-2020 (DSB):
+*        Support huge arrays.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
+
+*  Global Variables:
+
+*  Arguments Given:
+      LOGICAL BAD
+      INTEGER*8 EL
+      <TYPE> A( EL )
+      DOUBLE PRECISION CONST
+
+*  Arguments Returned:
+      <TYPE> B( EL )
+      INTEGER*8 NBAD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      EXTERNAL NUM_TRAP
+      INTEGER NUM_TRAP           ! Numerical error handler
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation ok?
+
+*  Local Variables:
+      INTEGER*8 I                ! Loop counter for array elements
+      REAL RCONST                ! Single precision constant value
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
+      INCLUDE 'NUM_DEF_CVT'      ! Define functions...
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Obtain a single-precision version of the multiplication constant.
+      RCONST = SNGL( CONST )
+
+*  Establish a numerical error handler and initialise the error flag
+*  and error count.
+      CALL NUM_HANDL( NUM_TRAP )
+      CALL NUM_CLEARERR()
+      NBAD = 0
+
+*  No bad values present:
+*  =====================
+      IF ( .NOT. BAD ) THEN
+
+*  Multiply the array by the constant, using floating-point arithmetic.
+         DO 1 I = 1, EL
+            B( I ) = NUM_RTO<T>( RCONST * NUM_<T>TOR( A( I ) ) )
+
+*  Check for numerical errors (i.e. overflow).  If present, then assign
+*  a bad value to the output array element and count the error.  Reset
+*  the numerical error flag.
+            IF ( .NOT. NUM_WASOK() ) THEN
+               B( I ) = VAL__BAD<T>
+               NBAD = NBAD + 1
+               CALL NUM_CLEARERR()
+            END IF
+ 1       CONTINUE
+
+*  Bad values present:
+*  ==================
+      ELSE
+
+*  If the input array element is bad, then so is the output element.
+         DO 2 I = 1, EL
+            IF ( A( I ) .EQ. VAL__BAD<T> ) THEN
+               B( I ) = VAL__BAD<T>
+               NBAD = NBAD + 1
+
+*  Otherwise, multiply by the constant, again checking for numerical
+*  errors.
+            ELSE
+               B( I ) = NUM_RTO<T>( RCONST * NUM_<T>TOR( A( I ) ) )
+               IF ( .NOT. NUM_WASOK() ) THEN
+                  B( I ) = VAL__BAD<T>
+                  NBAD = NBAD + 1
+                  CALL NUM_CLEARERR()
+               END IF
+            END IF
+ 2       CONTINUE
+      END IF
+
+*  Remove the numerical error handler.
+      CALL NUM_REVRT
+
+      END

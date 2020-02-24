@@ -22,7 +22,7 @@
 *  Arguments:
 *     NUMBIN = INTEGER (Given)
 *        The number of histogram bins.
-*     HIST( NUMBIN ) = REAL (Given)
+*     HIST( NUMBIN ) = INTEGER*8 (Given)
 *        The optimally binned histogram.
 *     MAXPOS = INTEGER (Given)
 *        The bin index of the peak bin within HIST.
@@ -69,6 +69,8 @@
 *  History:
 *     2007 June 29 (MJC):
 *       Original version.
+*     20-FEB-2020 (DSB):
+*       Support huge arrays.
 *     {enter_further_changes_here}
 
 *-
@@ -82,7 +84,7 @@
 
 *  Arguments Given:
       INTEGER NUMBIN
-      INTEGER HIST( NUMBIN )
+      INTEGER*8 HIST( NUMBIN )
       INTEGER MAXPOS
       REAL FRAC
 
@@ -103,7 +105,7 @@
       REAL LFRAC                 ! Local, possible modified, FRAC
       DOUBLE PRECISION SUM       ! Sum of the weighted histogram index
       DOUBLE PRECISION SUMW      ! Sum of the weights
-      INTEGER THRESH             ! Neighbourhood population threshold
+      INTEGER*8 THRESH           ! Neighbourhood population threshold
       INTEGER UBIN               ! Neighbourhood upper bin index
 
 *.
@@ -123,7 +125,7 @@
       IF ( LFRAC .LT. 0 ) THEN
          LFRAC = 1.0 + FRAC / SQRT( REAL( HIST( MAXPOS ) ) )
       END IF
-      THRESH = INT( REAL( HIST( MAXPOS ) ) * LFRAC )
+      THRESH = INT( REAL( HIST( MAXPOS ) ) * LFRAC, KIND=8 )
 
 *   Look for a contiguous set of bins no lower than the threshold
 *   either side of the peak bin.

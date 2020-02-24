@@ -46,17 +46,17 @@
 *        The maximum number of knots along either axis.
 *     FIRST = LOGICAL (Given)
 *        If true the data values will be scaled.
-*     NWS = INTEGER (Given)
+*     NWS = INTEGER*8 (Given)
 *        The dimension of the WS work space which must be at least
 *        U*V*(2+B1+B2)+2*(U+V+4*(NBIN+NE)+NE-6)+B2+1  where
 *        U = NXKNOT + 4, V = NYKNOT + 4, NE = MAX( NXKNOT, NYKNOT ) +
 *        8.  Defining BX = 3*V+4, BY = 3*U+4, if (BX>=BY) then
 *        B1 = BY and B2 = B1+V-3, otherwise B1 = BX and B2 = B1+U-3.
-*     NLWS = INTEGER (Given)
+*     NLWS = INTEGER*8 (Given)
 *        The dimension of the LWS work space which must be at least
 *        U*V*(B2+1)+B2 where the variables are the same as those
 *        defined in the description of NWS.
-*     NIWS = INTEGER (Given)
+*     NIWS = INTEGER*8 (Given)
 *        The dimension of the IWS work space which must be at least
 *        NBIN + ( NXKNOT + 1 ) * ( NYKNOT + 1 ).
 *     MAXBIN = INTEGER (Given)
@@ -72,7 +72,7 @@
 *        The weights at the given x-y positions.
 *     BINW( MAXBIN ) = REAL (Given and returned)
 *        Workspace.
-*     NBIN = INTEGER (Given and Returned)
+*     NBIN = INTEGER*8 (Given and Returned)
 *        The number of data points to be fitted by least-squares.
 *     XKNOT( NKNOT ) = REAL (Returned)
 *        The x positions of complete set of knots associated with x.
@@ -155,6 +155,8 @@
 *        Added LWS and NWS arguments.
 *     2006 April 12 (MJC):
 *        Remove unused variables.
+*     20-FEB-2020 (DSB):
+*        Support huge arrays.
 *     {enter_further_changes_here}
 
 *-
@@ -174,9 +176,9 @@
       REAL YMIN, YMAX            ! Y bounds of the fit
       INTEGER NKNOT              ! Dimension of XKNOT, YKNOT
       LOGICAL FIRST              ! Data values are to be scaled
-      INTEGER NWS                ! Dimension of workspace
-      INTEGER NLWS               ! Dimension of workspace
-      INTEGER NIWS               ! Dimension of workspace
+      INTEGER*8 NWS              ! Dimension of workspace
+      INTEGER*8 NLWS             ! Dimension of workspace
+      INTEGER*8 NIWS             ! Dimension of workspace
       INTEGER MAXBIN             ! Dimension of the data vectors
       REAL X( MAXBIN )           ! X co-ordinates of the data
       REAL Y( MAXBIN )           ! Y co-ordinates of the data
@@ -184,7 +186,7 @@
 
 *  Arguments Given and Returned:
       REAL W( MAXBIN )           ! Data weights
-      INTEGER NBIN               ! Number of points for evaluation
+      INTEGER*8 NBIN             ! Number of points for evaluation
 
 *  Arguments Returned:
       REAL BINW( MAXBIN )        ! Workspace
@@ -203,7 +205,7 @@
 *  Local Variables:
       REAL EXR( 2 )              ! Effective x limits
       REAL EYR( 2 )              ! Effective y limits
-      INTEGER I                  ! Loop counter
+      INTEGER*8 I                ! Loop counter
       INTEGER IFAIL              ! PDA error status
       REAL MAXV                  ! Maximum data value
       REAL MINV                  ! Minimum data value
@@ -218,7 +220,7 @@
 *  error and exit.
       IF ( NBIN .LT. 1 ) THEN
          STATUS = SAI__ERROR
-         CALL MSG_SETI( 'NBIN', NBIN )
+         CALL MSG_SETK( 'NBIN', NBIN )
          CALL ERR_REP( 'KPS1_SUSF_INSFD',
      :     'KPS1_SUSF: Insufficient data --- ^NBIN bins.', STATUS )
          GO TO 999
@@ -230,7 +232,7 @@
          BINW( I ) = X( I )
       END DO
 
-      CALL PDA_QSAR( NBIN, BINW )
+      CALL PDA8_QSAR( NBIN, BINW )
 
 *  Set the interior x knots an equal number of data points apart in the
 *  x direction.
@@ -242,7 +244,7 @@
          BINW( I ) = Y( I )
       END DO
 
-      CALL PDA_QSAR( NBIN, BINW )
+      CALL PDA8_QSAR( NBIN, BINW )
 
       IF ( NYKNOT .GE. 1 )
      :   CALL KPS1_SUSKR( NBIN, BINW, NYKNOT, YKNOT( 5 ), STATUS )
@@ -298,11 +300,11 @@
 *  Obtain the bi-cubic spline coefficients of the least-squares fit.
 *  The -1 means that we supply the interior knots and a least-squares
 *  fit is performed.
-      CALL PDA_SURFIT( -1, NBIN, X, Y, Z, W, EXR( 1 ), EXR( 2 ),
-     :                 EYR( 1 ), EYR( 2 ), 3, 3, 0.0, NXKNOT + 8,
-     :                 NYKNOT + 8, NKNOT, 4.* VAL__EPSR, NXKNOT + 8,
-     :                 XKNOT, NYKNOT + 8, YKNOT, COEFF, SIGMA, WS,
-     :                 NWS, LWS, NLWS, IWS, NIWS, IFAIL )
+      CALL PDA8_SURFIT( -1, NBIN, X, Y, Z, W, EXR( 1 ), EXR( 2 ),
+     :                  EYR( 1 ), EYR( 2 ), 3, 3, 0.0, NXKNOT + 8,
+     :                  NYKNOT + 8, NKNOT, 4.* VAL__EPSR, NXKNOT + 8,
+     :                  XKNOT, NYKNOT + 8, YKNOT, COEFF, SIGMA, WS,
+     :                  NWS, LWS, NLWS, IWS, NIWS, IFAIL )
 
 *  Check for an error.
       IF ( IFAIL .GT. 0 ) THEN

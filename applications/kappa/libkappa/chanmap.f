@@ -525,7 +525,7 @@
       INTEGER*8 NERR             ! Number of numerical errors
       CHARACTER NEWDOM*( 20 )    ! Domain name for revised current Frame
       INTEGER NEWFRM             ! Pointer to revised current Frame
-      INTEGER NFLAG              ! Number of WLIM-flagged o/p values
+      INTEGER*8 NFLAG            ! Number of WLIM-flagged o/p values
       INTEGER NOCHAN             ! Number of channels
       INTEGER NVAL               ! Number of values obtained (1)
       INTEGER*8 ODIMS( NDF__MXDIM ) ! Output NDF dimensions

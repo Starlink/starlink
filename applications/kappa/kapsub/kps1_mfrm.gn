@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_MFRM<T>( AXIS, NRANGE, RANGES, CLIP, DIMS,
-     :                         USEMSK, MASK, RESIDS, RESUM, WORK, 
+     :                         USEMSK, MASK, RESIDS, RESUM, WORK,
      :                         STATUS )
 *+
 *  Name:
@@ -17,45 +17,45 @@
 *                      RESIDS, RESUM, STATUS )
 
 *  Description:
-*     This routine forms the root-mean-squared residuals for MFITTREND 
+*     This routine forms the root-mean-squared residuals for MFITTREND
 *     fits along along an axis within the fitting ranges of grid
 *     co-ordinates.  It then finds the outliers of the fits that exceed
-*     the mean rms residual plus CLIP standard deviations.  The record 
-*     of the outliers is an updated residuals array; all the residuals 
-*     comprising the rejected fit are set bad. 
+*     the mean rms residual plus CLIP standard deviations.  The record
+*     of the outliers is an updated residuals array; all the residuals
+*     comprising the rejected fit are set bad.
 
 *  Arguments:
 *     AXIS = INTEGER (Given)
 *        The axis defining the fitted lines.
 *     NRANGE = INTEGER (Given)
 *        The number of values in RANGES, must be an even number.
-*     RANGES( NRANGE ) = INTEGER (Given)
+*     RANGES( NRANGE ) = INTEGER*8 (Given)
 *        Pairs of array co-ordinates along the axis.  Only the residual
 *        within these ranges will be compare, and should be the regions
 *        used to generate the fits.
 *     CLIP = REAL (Given)
 *        Number of standard deviations about the mean beyond which the
-*        fit is deemed to be bad. 
-*     DIMS( NDF__MXDIM ) = INTEGER (Given)
+*        fit is deemed to be bad.
+*     DIMS( NDF__MXDIM ) = INTEGER*8 (Given)
 *        The dimensions of the input data.  Extra dimension should have
 *        size 1 up to NDF__MXDIM.
 *     USEMSK = LOGICAL (Given)
-*        If .TRUE. then the supplied mask (argument MASK) is used to 
+*        If .TRUE. then the supplied mask (argument MASK) is used to
 *        omit parts of the data from the fitting process.
 *     MASK( * ) = BYTE (Given)
 *        A mask in which bad values indicate that a given element of
-*        the data be ignored from the calculation of residuals.  It is 
-*        only accessed if USKMSK is .TRUE..  The array should have 
+*        the data be ignored from the calculation of residuals.  It is
+*        only accessed if USKMSK is .TRUE..  The array should have
 *        dimensions DIMS.
 *     RESID( * ) = ? (Given and Returned)
 *        The residuals with dimensions DIMS.  On exit, any residuals
 *        corresponding to rejected fits are set bad.
 *     RESUM( * ) = DOUBLE PRECISION (Returned)
-*        The summed root-mean-square residuals.  The dimension is the 
+*        The summed root-mean-square residuals.  The dimension is the
 *        product of DIMS divided by DIMS( AXIS ), i.e. there is one
 *        element for each fit.
 *     WORK( * ) = INTEGER (Returned)
-*        Workspace to store the number of good residuals.  The 
+*        Workspace to store the number of good residuals.  The
 *        dimension is the product of DIMS divided by DIMS( AXIS ).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -65,7 +65,7 @@
 *     array has actually fewer dimensions there is negligible loss of
 *     efficiency to supply dummy (=1) higher dimensions.
 *
-*     - To work as quickly as possible the residuals are summed by 
+*     - To work as quickly as possible the residuals are summed by
 *     running over the data in fast order and accumulated.
 *
 *     - There is a routine for each numeric data type: replace "x" in
@@ -118,9 +118,9 @@
 *  Arguments Given:
       INTEGER AXIS
       INTEGER NRANGE
-      INTEGER RANGES( NRANGE )
+      INTEGER*8 RANGES( NRANGE )
       REAL CLIP
-      INTEGER DIMS( NDF__MXDIM )
+      INTEGER*8 DIMS( NDF__MXDIM )
       LOGICAL USEMSK
       BYTE MASK( * )
 
@@ -132,31 +132,31 @@
       INTEGER WORK( * )
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER STATUS                ! Global status
 
 *  Local Variables:
-      INTEGER B                  ! Pixel index of work arrays
-      INTEGER DIMSB( NDF__MXDIM ) ! Dimensions excluding the axis
-      DOUBLE PRECISION DVAL      ! The current data value
-      INTEGER I( 7 )             ! Equivalences of I1-I7 loop variables
-      INTEGER I1, I2, I3, I4, I5, I6, I7 ! Loop variables
-      INTEGER IP1, IP2, IP3, IP4, IP5, IP6, IP7 ! Loop variables
-      INTEGER J                  ! Loop counter
-      INTEGER K                  ! Loop counter
-      INTEGER LB                 ! Bounds loop counter
-      INTEGER LLBND( NDF__MXDIM ) ! Loop lower bounds
-      INTEGER LUBND( NDF__MXDIM ) ! Loop upper bounds
-      DOUBLE PRECISION MEAN      ! Mean rms residual
-      INTEGER NGOOD              ! Number of good residuals
-      DOUBLE PRECISION STDEV     ! Standard deviation rms residual
-      INTEGER STRID( NDF__MXDIM ) ! Dimension strides
-      INTEGER STRIDA( NDF__MXDIM ) ! Dimension strides excluding axis
-      INTEGER STRIDB( NDF__MXDIM ) ! Dimension strides excluding axis
-      DOUBLE PRECISION SUM       ! Sum of rms residuals
-      DOUBLE PRECISION SUMSQ     ! Sum of rms residuals squared
-      DOUBLE PRECISION THRESH    ! Clipping threshold
-      <TYPE> TVAL                ! The current data value
-      INTEGER WEL                ! Workspace elements
+      INTEGER*8 B                   ! Pixel index of work arrays
+      INTEGER*8 DIMSB( NDF__MXDIM ) ! Dimensions excluding the axis
+      DOUBLE PRECISION DVAL         ! The current data value
+      INTEGER*8 I( 7 )              ! Equivalences of I1-I7 loop variables
+      INTEGER*8 I1, I2, I3, I4, I5, I6, I7 ! Loop variables
+      INTEGER*8 IP1, IP2, IP3, IP4, IP5, IP6, IP7 ! Loop variables
+      INTEGER*8 J                   ! Loop counter
+      INTEGER*8 K                   ! Loop counter
+      INTEGER*8 LB                  ! Bounds loop counter
+      INTEGER*8 LLBND( NDF__MXDIM ) ! Loop lower bounds
+      INTEGER*8 LUBND( NDF__MXDIM ) ! Loop upper bounds
+      DOUBLE PRECISION MEAN         ! Mean rms residual
+      INTEGER*8 NGOOD               ! Number of good residuals
+      DOUBLE PRECISION STDEV        ! Standard deviation rms residual
+      INTEGER*8 STRID( NDF__MXDIM ) ! Dimension strides
+      INTEGER*8 STRIDA( NDF__MXDIM )! Dimension strides excluding axis
+      INTEGER*8 STRIDB( NDF__MXDIM )! Dimension strides excluding axis
+      DOUBLE PRECISION SUM          ! Sum of rms residuals
+      DOUBLE PRECISION SUMSQ        ! Sum of rms residuals squared
+      DOUBLE PRECISION THRESH       ! Clipping threshold
+      <TYPE> TVAL                   ! The current data value
+      INTEGER*8 WEL                 ! Workspace elements
 
 *  Equivalences so we can index loop variables by AXIS.
       EQUIVALENCE( I1, I( 1 ) )
@@ -185,7 +185,7 @@
 
 *  Calculate the strides for each dimension, this time excluding AXIS
 *  so we can step around the workspace final dimension.  WEL is the
-*  total number of workspace elements.  First copy all dimensions, 
+*  total number of workspace elements.  First copy all dimensions,
 *  except that for AXIS.
       K = 1
       DO J = 1, NDF__MXDIM
@@ -265,7 +265,7 @@
                                  IF ( TVAL .NE. VAL__BAD<T> .AND.
      :                                MASK( IP1 ) .NE. VAL__BADB ) THEN
                                     DVAL = NUM_<T>TOD( TVAL )
-                                    RESUM( B ) = RESUM( B ) + 
+                                    RESUM( B ) = RESUM( B ) +
      :                                           DVAL * DVAL
                                     WORK( B ) = WORK( B ) + 1
                                  END IF
@@ -273,7 +273,7 @@
 *  Move to the next workspace pixel.
                                  B = B + STRIDA( 1 )
                               END DO
-                              B = B + STRIDA( 2 ) - 
+                              B = B + STRIDA( 2 ) -
      :                            STRIDA( 1 ) * DIMS( 1 )
                            END DO
                            B = B + STRIDA( 3 ) - STRIDA( 2 ) * DIMS( 2 )
@@ -323,7 +323,7 @@
                                  TVAL = RESIDS( IP1 )
                                  IF ( TVAL .NE. VAL__BAD<T> ) THEN
                                     DVAL = NUM_<T>TOD( TVAL )
-                                    RESUM( B ) = RESUM( B ) + 
+                                    RESUM( B ) = RESUM( B ) +
      :                                           DVAL * DVAL
                                     WORK( B ) = WORK( B ) + 1
                                  END IF
@@ -331,7 +331,7 @@
 *  Move to the next workspace pixel.
                                  B = B + STRIDA( 1 )
                               END DO
-                              B = B + STRIDA( 2 ) - 
+                              B = B + STRIDA( 2 ) -
      :                            STRIDA( 1 ) * DIMS( 1 )
                            END DO
                            B = B + STRIDA( 3 ) - STRIDA( 2 ) * DIMS( 2 )
@@ -363,7 +363,7 @@
 
       DO J = 1, WEL
          IF ( RESUM( J ) .NE. VAL__BADD ) THEN
- 
+
 *  Convert the array values to double precision, count them, and form
 *  sums for the statistics.
             NGOOD = NGOOD + 1
@@ -373,14 +373,14 @@
       END DO
 
 *  Before calculating the standard deviation, check for only one
-*  contributing pixel, and rounding errors producing a negative 
-*  variance value.  In all these cases, calculate a standard deviation 
+*  contributing pixel, and rounding errors producing a negative
+*  variance value.  In all these cases, calculate a standard deviation
 *  value of zero.
       IF ( NGOOD .GT. 0 ) MEAN = SUM / DBLE( NGOOD )
       STDEV = SUMSQ - ( MEAN * MEAN * DBLE( NGOOD ) )
       IF ( ( NGOOD .EQ. 1 ) .OR. ( STDEV .LT. 0.0D0 ) ) THEN
          STDEV = 0.0D0
- 
+
 *  Otherwise, calculate the standard deviation normally.
       ELSE
          STDEV = SQRT( STDEV / DBLE( NGOOD - 1 ) )

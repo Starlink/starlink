@@ -170,10 +170,10 @@
       CHARACTER TYPE*(DAT__SZTYP)! Numerical type of array component
       INTEGER CAXES( NDF__MXDIM )! Non-degenerate current Frame axes
       INTEGER*8 EL               ! Number of elements in mapped array
-      INTEGER*8 I                ! Loop index
+      INTEGER I                  ! Loop index
       INTEGER IAXIS( NDF__MXDIM )! Current Frame axes to retain
       INTEGER ICURR              ! Index of original current Frame
-      INTEGER IERR               ! Index of first numerical error
+      INTEGER*8 IERR             ! Index of first numerical error
       INTEGER INDF3              ! Temporary NDF identifier
       INTEGER IP1                ! Pointer to mapped input array
       INTEGER IP2                ! Pointer to mapped output array
@@ -186,7 +186,7 @@
       INTEGER MAP3               ! Axis permutation Mapping
       INTEGER NCOMP              ! No. of components in AXIS structure
       INTEGER NDIM               ! Number of template dimensions
-      INTEGER NERR               ! Number of numerical errors
+      INTEGER*8 NERR             ! Number of numerical errors
       INTEGER NEWAX              ! New output axis index
       INTEGER NEWFRM             ! Replacement Frame
       INTEGER NFC                ! Number of frame axes

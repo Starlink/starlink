@@ -36,7 +36,7 @@
 *     CLIP( NCLIP ) = REAL (Given)
 *        The clipping levels in standard deviations for the rejection
 *        of outliers.
-*     NUMBIN = INTEGER (Given)
+*     NUMBIN = INTEGER*8 (Given)
 *        The number of bins in the compressed line.  This may be set
 *        to the number of elements in the line to prevent compression.
 *     MAXRNG = INTEGER (Given)
@@ -44,7 +44,7 @@
 *     NRANGE = INTEGER (Returned)
 *        The number of ranges returned.  This is always a multiple of
 *        two, i.e pairs of lower and upper ranges.
-*     RANGES( MAXRNG ) = INTEGER (Returned)
+*     RANGES( MAXRNG ) = INTEGER*8 (Returned)
 *        The ranges to include in the detrending fits found from the
 *        averaged representative line.
 *     STATUS = INTEGER (Given and Returned)
@@ -84,6 +84,8 @@
 *        Trim two workspaces to required sizes.
 *     2007 August 10 (MJC):
 *        Add NUMBIN argument.
+*     19-FEB-2020 (DSB):
+*        Add support for huge NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -101,42 +103,42 @@
       INTEGER DTAXIS
       INTEGER NCLIP
       REAL CLIP( NCLIP )
-      INTEGER NUMBIN
+      INTEGER*8 NUMBIN
       INTEGER MAXRNG
 
 *  Arguments Returned:
       INTEGER NRANGE
-      INTEGER RANGES( MAXRNG )
+      INTEGER*8 RANGES( MAXRNG )
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER KPG1_FLOOR         ! Most positive integer .LE. given real
-      INTEGER KPG1_CEIL          ! Most negative integer .GE. given real
+      INTEGER*8 KPG1_FLOOR8      ! Most positive integer .LE. given real
+      INTEGER*8 KPG1_CEIL8       ! Most negative integer .GE. given real
 
 *  Local Variables:
-      INTEGER COMPRS( NDF__MXDIM ) ! Compression factors
-      INTEGER D                  ! No. of o/p pixels from reference to
+      INTEGER*8 COMPRS( NDF__MXDIM ) ! Compression factors
+      INTEGER*8 D                ! No. of o/p pixels from reference to
                                  ! i/p pixel 1
       CHARACTER DTYPE *( NDF__SZFTP ) ! Numeric type for output arrays
-      INTEGER EL                 ! Number of mapped elements
+      INTEGER*8 EL               ! Number of mapped elements
       INTEGER I                  ! Loop counter
-      INTEGER IDIMS( NDF__MXDIM ) ! Dimensions of input NDF
+      INTEGER*8 IDIMS( NDF__MXDIM )! Dimensions of input NDF
       INTEGER IPAL               ! Pointer to averaged line
       CHARACTER ITYPE * ( NDF__SZTYP ) ! Numeric type for processing
-      INTEGER LBND( NDF__MXDIM ) ! Lower bounds of input NDF
-      INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
-      INTEGER NBIN               ! Number of bins
+      INTEGER*8 LBND( NDF__MXDIM ) ! Lower bounds of input NDF
+      INTEGER*8 LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
+      INTEGER*8 NBIN               ! Number of bins
       INTEGER NDFS               ! Identifier to the used section of
                                  ! the input NDF
       INTEGER NDIM               ! Number of dimensions
-      INTEGER ODIMS( NDF__MXDIM )! Dimensions of output array
+      INTEGER*8 ODIMS( NDF__MXDIM )! Dimensions of output array
       INTEGER PNTRI( 1 )         ! Pointer to input array component
-      INTEGER REF( NDF__MXDIM )  ! I/p pixel co-ords at bottom left of
+      INTEGER*8 REF( NDF__MXDIM )! I/p pixel co-ords at bottom left of
                                  ! a compression box
-      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of input NDF
-      INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
+      INTEGER*8 UBND( NDF__MXDIM ) ! Upper bounds of input NDF
+      INTEGER*8 UBNDO( NDF__MXDIM )! Upper bounds of output NDF
       INTEGER WPNTR1             ! Pointer to workspace
       INTEGER WPNTR2             ! Pointer to workspace
 
@@ -146,8 +148,8 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Find the shape and bound of the section.
-      CALL NDF_DIM( INDF, NDF__MXDIM, IDIMS, NDIM, STATUS )
-      CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+      CALL NDF_DIM8( INDF, NDF__MXDIM, IDIMS, NDIM, STATUS )
+      CALL NDF_BOUND8( INDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Work out the bounds for the output array and the size of the output
 *  array from the input array dimensions, compression factor and
@@ -164,18 +166,20 @@
 *  Align with the origin.  However, leave it parameterised in case this
 *  alignment no longer is no longer the only option.
          REF( I ) = LBND( I ) - 1
-         D = KPG1_CEIL( REAL( 1 - REF( I ) ) / REAL( COMPRS( I ) ) ) - 1
+         D = KPG1_CEIL8( REAL( 1 - REF( I ) ) / REAL( COMPRS( I ) ) )
+     :                   - 1
 
 *  Pad the input image to make it a whole number of compression boxes.
-         LBNDO( I ) = KPG1_FLOOR( REAL( LBND( I ) - 1 - REF( I ) )
+         LBNDO( I ) = KPG1_FLOOR8( REAL( LBND( I ) - 1 - REF( I ) )
      :                           / REAL( COMPRS( I ) ) ) - D + 1
          UBNDO( I ) = MAX( LBNDO( I ),
-     :                     KPG1_CEIL( REAL( UBND( I ) - REF( I ) )
+     :                     KPG1_CEIL8( REAL( UBND( I ) - REF( I ) )
      :                               / REAL( COMPRS( I ) ) ) - D )
 
          ODIMS( I ) = UBNDO( I ) - LBNDO( I ) + 1
 
-         LBND( I ) = 1 + REF( I ) + COMPRS( I ) * ( LBNDO( I ) - 1 + D )
+         LBND( I ) = 1 + REF( I ) + COMPRS( I ) * ( LBNDO( I ) - 1
+     :                                              + D )
          UBND( I ) = REF( I ) + COMPRS( I ) * ( UBNDO( I ) + D )
          IDIMS( I ) = UBND( I ) - LBND( I ) + 1
       END DO
@@ -189,34 +193,34 @@
 *  Create a section of the input NDF containing the region will actually
 *  be used (i.e. excluding any pixels which lie over the edge of the
 *  output image).
-      CALL NDF_SECT( INDF, NDIM, LBND, UBND, NDFS, STATUS )
+      CALL NDF_SECT8( INDF, NDIM, LBND, UBND, NDFS, STATUS )
 
 *  Map the array component of the section.
-      CALL KPG1_MAP( NDFS, 'Data', ITYPE, 'READ', PNTRI, EL, STATUS )
+      CALL NDF_MAP8( NDFS, 'Data', ITYPE, 'READ', PNTRI, EL, STATUS )
 
 *  Obtain workspace for the averaged spectrum.
-      CALL PSX_CALLOC( ODIMS( DTAXIS ), ITYPE, IPAL, STATUS )
+      CALL PSX_CALLOC8( ODIMS( DTAXIS ), ITYPE, IPAL, STATUS )
 
 *  Obtain some workspace for the averaging and map them.  First find
 *  the quantity and the type of the counting space required.
-      CALL PSX_CALLOC( IDIMS( 1 ), ITYPE, WPNTR1, STATUS )
-      CALL PSX_CALLOC( IDIMS( 1 ), '_INTEGER', WPNTR2, STATUS )
+      CALL PSX_CALLOC8( IDIMS( 1 ), ITYPE, WPNTR1, STATUS )
+      CALL PSX_CALLOC8( IDIMS( 1 ), '_INTEGER', WPNTR2, STATUS )
 
 *  Average the lines in the section.  The routine expects at least two
 *  dimensions.
       IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_CMAVR( MAX( 2, NDIM ), IDIMS,
-     :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                    COMPRS, 1,  %VAL( CNF_PVAL( IPAL ) ),
-     :                    %VAL( CNF_PVAL( WPNTR1 ) ),
-     :                    %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
+         CALL KPG1_CMAV8R( MAX( 2, NDIM ), IDIMS,
+     :                     %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                     COMPRS, 1,  %VAL( CNF_PVAL( IPAL ) ),
+     :                     %VAL( CNF_PVAL( WPNTR1 ) ),
+     :                     %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_CMAVD( MAX( 2, NDIM ), IDIMS,
-     :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                    COMPRS, 1, %VAL( CNF_PVAL( IPAL ) ),
-     :                    %VAL( CNF_PVAL( WPNTR1 ) ),
-     :                    %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
+         CALL KPG1_CMAV8D( MAX( 2, NDIM ), IDIMS,
+     :                     %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                     COMPRS, 1, %VAL( CNF_PVAL( IPAL ) ),
+     :                     %VAL( CNF_PVAL( WPNTR1 ) ),
+     :                     %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
       END IF
 
 *  Free workspaces arrays used for compression.

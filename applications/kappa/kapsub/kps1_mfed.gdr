@@ -13,17 +13,17 @@
 *     CALL KPS1_MFED<T>( NCLIP, CLIP, EL, ARRAY, STATUS )
 
 *  Description:
-*     This routine serves MFITTREND.  It fits a straight line to 
-*     a supplied line of data, and iteratively rejects outliers, 
+*     This routine serves MFITTREND.  It fits a straight line to
+*     a supplied line of data, and iteratively rejects outliers,
 *     replacing them with bad pixels.
 
 *  Arguments:
 *     NCLIP = INTEGER (Given)
 *        The number of clipping cycles for the rejection of outliers.
 *     CLIP( NCLIP ) = REAL (Given)
-*        The clipping levels in standard deviations for the rejection 
+*        The clipping levels in standard deviations for the rejection
 *        of outliers.
-*     EL = INTEGER (Given)
+*     EL = INTEGER*8 (Given)
 *        The number of elements in the line to analysed.
 *     ARRAY( EL ) = ? (Given & Returned)
 *        The line of data being fitted.  On exit, deviant points will
@@ -38,7 +38,7 @@
 *     specified.
 
 *  Copyright:
-*     Copyright (C) 2006-2006 Particle Physics & Astronomy Research 
+*     Copyright (C) 2006-2006 Particle Physics & Astronomy Research
 *                   Council.
 *     Copyright (C) 2007-2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
@@ -86,9 +86,9 @@
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      
+
 *  Arguments Given:
-      INTEGER EL
+      INTEGER*8 EL
       INTEGER NCLIP
       REAL CLIP( NCLIP )
 
@@ -117,31 +117,31 @@
 *  Local Variables:
       DOUBLE PRECISION AS( OP1 * OP1  ) ! Workspace
       DOUBLE PRECISION COEFF( OP1 ) ! Polynomial coefficients
-      INTEGER DIMS( NDF__MXDIM ) ! Dimensions of input array
+      INTEGER*8 DIMS( NDF__MXDIM ) ! Dimensions of input array
       DOUBLE PRECISION DMAX      ! Max. value of pixels in array
       DOUBLE PRECISION DMAXC     ! Max. pixel value after clipping
       DOUBLE PRECISION DMIN      ! Min. value of pixels in array
       DOUBLE PRECISION DMINC     ! Min. pixel value after clipping
       <LTYPE> HIGH               ! Higher rejection threshold
       INTEGER I                  ! Loop counter
-      INTEGER IERR               ! Position of first error (dummy)
-      INTEGER IMAX               ! Vector index of max. pixel
-      INTEGER IMAXC              ! Vector index of max. clipped pixel
-      INTEGER IMIN               ! Vector index of min. pixel
-      INTEGER IMINC              ! Vector index of min. clipped pixel
+      INTEGER*8 IERR             ! Position of first error (dummy)
+      INTEGER*8 IMAX             ! Vector index of max. pixel
+      INTEGER*8 IMAXC            ! Vector index of max. clipped pixel
+      INTEGER*8 IMIN             ! Vector index of min. pixel
+      INTEGER*8 IMINC            ! Vector index of min. clipped pixel
       INTEGER IPRES              ! Pointer to residuals
-      INTEGER IPWORK             ! Pointer to work array 
+      INTEGER IPWORK             ! Pointer to work array
       INTEGER J                  ! Loop counter
       <LTYPE> LOW                ! Lower rejection threshold
       DOUBLE PRECISION MEAN      ! Mean of pixels in array
       DOUBLE PRECISION MEANC     ! Mean of pixels after clipping
-      INTEGER NBAD               ! Number of bad values
-      INTEGER NGOOD              ! Number of valid values
-      INTEGER NGOODC             ! Number valid values after clipping
-      INTEGER NERR               ! Number of errors
-      INTEGER NREPHI             ! Number of high residuals rejected
-      INTEGER NREPLO             ! Number of low residuals rejected
-      INTEGER RANGES( MAXRNG )   ! Exclusion ranges
+      INTEGER*8 NBAD             ! Number of bad values
+      INTEGER*8 NGOOD            ! Number of valid values
+      INTEGER*8 NGOODC           ! Number valid values after clipping
+      INTEGER*8 NERR             ! Number of errors
+      INTEGER*8 NREPHI           ! Number of high residuals rejected
+      INTEGER*8 NREPLO           ! Number of low residuals rejected
+      INTEGER*8 RANGES( MAXRNG ) ! Exclusion ranges
       DOUBLE PRECISION STDEV     ! Standard devn. of pixels in array
       DOUBLE PRECISION STDEVC    ! Std. devn. of pixels after clipping
       DOUBLE PRECISION SUM       ! Sum of pixels in array
@@ -152,7 +152,7 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
-            
+
 *.
 
 *  Check the inherited global status.
@@ -160,8 +160,8 @@
 
 *  Get some workspace for the subtracted array and a copy of the
 *  original data with rejected pixels flagged as bad.
-      CALL PSX_CALLOC( EL, '<HTYPE>', IPRES, STATUS )
-      CALL PSX_CALLOC( EL, '<HTYPE>', IPWORK, STATUS )
+      CALL PSX_CALLOC8( EL, '<HTYPE>', IPRES, STATUS )
+      CALL PSX_CALLOC8( EL, '<HTYPE>', IPWORK, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Initialise some variables for the fitting.
@@ -175,25 +175,25 @@
 
       DO J = 1, NCLIP
 
-*  Fit a linear slope to all the data. 
+*  Fit a linear slope to all the data.
          CALL KPS1_LFT<T>( ORDER, AXIS, MAXRNG, RANGES, .FALSE., ARRAY,
-     :                     .FALSE., ARRAY, DIMS, ARRAY, AS, COEFF, 
+     :                     .FALSE., ARRAY, DIMS, ARRAY, AS, COEFF,
      :                     WORK1, WORK2, STATUS )
 
 *  Copy the flagged (or the initial unflagged array on the first pass)
 *  array to what will become the subtracted-fit array.
-         CALL VEC_<T>TO<T>( BAD, EL, ARRAY, %VAL( CNF_PVAL( IPRES ) ), 
-     :                      IERR, NERR, STATUS )
+         CALL VEC8_<T>TO<T>( BAD, EL, ARRAY, %VAL( CNF_PVAL( IPRES ) ),
+     :                       IERR, NERR, STATUS )
 
 *  Form the residuals from the fit.
-         CALL KPS1_LFTS<T>( ORDER, AXIS, .TRUE., DIMS, COEFF, 
+         CALL KPS1_LFTS<T>( ORDER, AXIS, .TRUE., DIMS, COEFF,
      :                      %VAL( CNF_PVAL( IPRES ) ), STATUS )
 
 *  Derive the statistics of the residuals to the fit.
-         CALL KPG1_STAT<T>( BAD, EL, %VAL( CNF_PVAL( IPRES ) ),
-     :                      0, CLIP, NGOOD, IMIN, DMIN, IMAX, DMAX,
-     :                      SUM, MEAN, STDEV, NGOODC, IMINC, DMINC, 
-     :                      IMAXC, DMAXC, SUMC, MEANC, STDEVC, STATUS )
+         CALL KPG1_STAT8<T>( BAD, EL, %VAL( CNF_PVAL( IPRES ) ),
+     :                       0, CLIP, NGOOD, IMIN, DMIN, IMAX, DMAX,
+     :                       SUM, MEAN, STDEV, NGOODC, IMINC, DMINC,
+     :                       IMAXC, DMAXC, SUMC, MEANC, STDEVC, STATUS )
 
 *  Flag outliers beyond the clipping interval.
          LOW = NUM_DTO<T>( MEAN - DBLE( CLIP( J ) ) * STDEV )
@@ -201,26 +201,26 @@
 
 *  Replace the values in the output array outside the range with the
 *  new values, otherwise copy from the input to the output NDF.
-         CALL KPG1_THRS<T>( BAD, EL, %VAL( CNF_PVAL( IPRES ) ),
-     :                      LOW, HIGH, VAL__BAD<T>, VAL__BAD<T>,
-     :                      %VAL( CNF_PVAL( IPWORK ) ),
-     :                      NREPLO, NREPHI, STATUS )
+         CALL KPG1_THRS8<T>( BAD, EL, %VAL( CNF_PVAL( IPRES ) ),
+     :                       LOW, HIGH, VAL__BAD<T>, VAL__BAD<T>,
+     :                       %VAL( CNF_PVAL( IPWORK ) ),
+     :                       NREPLO, NREPHI, STATUS )
 
          IF ( NREPLO .GT. 0 .OR. NREPHI .GT. 0 ) THEN
 
 *  Multiply the values by 0 to form a mask of the rejected elements.
-            CALL KPG1_CMUL<T>( BAD, EL, %VAL( CNF_PVAL( IPWORK ) ), 
-     :                         0.0D0, %VAL( CNF_PVAL( IPRES ) ), NBAD,
-     :                         STATUS )
+            CALL KPG1_CMUL8<T>( BAD, EL, %VAL( CNF_PVAL( IPWORK ) ),
+     :                          0.0D0, %VAL( CNF_PVAL( IPRES ) ), NBAD,
+     :                          STATUS )
 
 *  Add the mask to the array being fitted.
-            CALL VEC_ADD<T>( BAD, EL, ARRAY, %VAL( CNF_PVAL( IPRES ) ), 
-     :                       %VAL( CNF_PVAL( IPWORK ) ), 
-     :                       IERR, NERR, STATUS )
+            CALL VEC8_ADD<T>( BAD, EL, ARRAY, %VAL( CNF_PVAL( IPRES ) ),
+     :                        %VAL( CNF_PVAL( IPWORK ) ),
+     :                        IERR, NERR, STATUS )
 
 * Copy the flagged array to the returned array.
-            CALL VEC_<T>TO<T>( BAD, EL, %VAL( CNF_PVAL( IPWORK ) ), 
-     :                         ARRAY, IERR, NERR, STATUS )
+            CALL VEC8_<T>TO<T>( BAD, EL, %VAL( CNF_PVAL( IPWORK ) ),
+     :                          ARRAY, IERR, NERR, STATUS )
          END IF
       END DO
 

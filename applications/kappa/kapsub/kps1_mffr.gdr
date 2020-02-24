@@ -1,17 +1,17 @@
-      SUBROUTINE KPS1_MFFR<T>( COMPRS, EL, ARRAY, MAXRNG, NRANGE, 
+      SUBROUTINE KPS1_MFFR<T>( COMPRS, EL, ARRAY, MAXRNG, NRANGE,
      :                       RANGES, STATUS )
 *+
 *  Name:
 *     KPS1_MFFRx
 
 *  Purpose:
-*     Determines the ranges of good pixels in an array. 
+*     Determines the ranges of good pixels in an array.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MFFRx( COMPRS, EL, ARRAY, MAXRNG, NRANGE, RANGES, 
+*     CALL KPS1_MFFRx( COMPRS, EL, ARRAY, MAXRNG, NRANGE, RANGES,
 *                     STATUS )
 
 *  Description:
@@ -19,13 +19,10 @@
 *     The ranges are rescaled by the binning factor.
 
 *  Arguments:
-*     COMPRS = INTEGER (Given)
+*     COMPRS = INTEGER*8 (Given)
 *        The binning factor, i.e. the number of elements of the original
 *        unbinned array were combined to form one element of ARRAY.
-*     CLIP( NCLIP ) = REAL (Given)
-*        The clipping levels in standard deviations for the rejection 
-*        of outliers.
-*     EL = INTEGER (Given)
+*     EL = INTEGER*8 (Given)
 *        The number of elements in the line to be analysed.
 *     ARRAY( EL ) = ? (Given)
 *        The binned and averaged array.
@@ -34,8 +31,8 @@
 *     NRANGE = INTEGER (Returned)
 *        The number of ranges returned.  This is always a multiple of
 *        two, i.e pairs of lower and upper ranges.
-*     RANGES( MAXRNG ) = INTEGER (Returned)
-*        The ranges to include in the detrending fits found from the 
+*     RANGES( MAXRNG ) = INTEGER*8 (Returned)
+*        The ranges to include in the detrending fits found from the
 *        averaged and binned representative line.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -89,22 +86,22 @@
       INCLUDE 'PRM_PAR'          ! Bad values
 
 *  Arguments Given:
-      INTEGER COMPRS
-      INTEGER EL
+      INTEGER*8 COMPRS
+      INTEGER*8 EL
       <TYPE> ARRAY( EL )
       INTEGER MAXRNG
 
 *  Arguments Returned:
       INTEGER NRANGE
-      INTEGER RANGES( MAXRNG )
-      
+      INTEGER*8 RANGES( MAXRNG )
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER I                  ! Loop counter
-      INTEGER K                  ! Loop counter
-      INTEGER R                  ! Range index
+      INTEGER*8 I                ! Loop counter
+      INTEGER*8 K                ! Loop counter
+      INTEGER*8 R                ! Range index
       LOGICAL START              ! At the start of a range?
 
 *.
@@ -151,7 +148,7 @@
             IF ( R .LE. MAXRNG / 2 ) THEN
                K = I
                START = .FALSE.
-               DO WHILE ( .NOT. START .AND. K .LE. EL ) 
+               DO WHILE ( .NOT. START .AND. K .LE. EL )
                   IF ( ARRAY( K ) .NE. VAL__BAD<T> ) THEN
                      RANGES( 2 * R - 1 ) = ( K - 1 ) * COMPRS + 1
                      START = .TRUE.

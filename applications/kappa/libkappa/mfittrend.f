@@ -356,6 +356,7 @@
 *     supported.
 *     -  All non-complex numeric data types can be handled.
 *     -  Handles data of up to 7 dimensions.
+*     -  Huge NDF are supported.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -454,6 +455,8 @@
 *     2016 March 29 (MJC):
 *        Added Parameter FOREST for automatic-mode masking of many
 *        spectral lines.
+*     19-FEB-2020 (DSB):
+*        Add support for huge NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -475,9 +478,9 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER KPG1_FLOOR         ! Most positive integer .LE. a given
+      INTEGER*8 KPG1_FLOOR8      ! Most positive integer .LE. a given
                                  ! real
-      INTEGER KPG1_CEIL          ! Most negative integer .GE. a given
+      INTEGER*8 KPG1_CEIL8       ! Most negative integer .GE. a given
                                  ! real
 
 *  Local Constants:
@@ -490,7 +493,7 @@
       INTEGER MXCLIP             ! Maximum number of clips of the data
       PARAMETER ( MXCLIP = 5 )
 
-      INTEGER OPTBIN             ! Nominal number of bins
+      INTEGER*8 OPTBIN           ! Nominal number of bins
       PARAMETER ( OPTBIN = 32 )
 
 *  TOKNOT must be at least UPKNOT.  FKNOT dimension uses TOKNOT because
@@ -503,10 +506,10 @@
       PARAMETER ( UPKNOT = 11 )  ! knots, interpolating spline
 
 *  Local Variables:
-      INTEGER AREA               ! Area of axes orthogonal to fit axis
+      INTEGER*8 AREA             ! Area of axes orthogonal to fit axis
       CHARACTER*9 ATTR           ! Name of an AST attribute
       LOGICAL AUTO               ! Determine regions automatically?
-      INTEGER BLDIMS( NDF__MXDIM ) ! NDF dimensions in current block
+      INTEGER*8 BLDIMS( NDF__MXDIM ) ! NDF dimensions in current block
       INTEGER BPV                ! Number of bytes per data value
       INTEGER CFRM               ! Current frame
       REAL CLIP( MXCLIP )        ! Clipping sigmas during binning
@@ -515,12 +518,12 @@
       CHARACTER*15 COMP          ! List of array components to process
       DOUBLE PRECISION CPOS( 2, NDF__MXDIM ) ! Two current Frame
                                  ! positions
-      INTEGER D                  ! A dimension size
-      INTEGER DIMS( NDF__MXDIM ) ! Dimensions of NDF
+      INTEGER*8 D                ! A dimension size
+      INTEGER*8 DIMS( NDF__MXDIM ) ! Dimensions of NDF
       DOUBLE PRECISION DRANGE( MAXRNG ) ! Fit ranges world co-ordinates
       DOUBLE PRECISION DKNOTS( UPKNOT ) ! Knots' world co-ordinates
-      INTEGER DSIZE              ! Number of elements in data array
-      INTEGER EL                 ! Number of mapped elements
+      INTEGER*8 DSIZE            ! Number of elements in data array
+      INTEGER*8 EL               ! Number of mapped elements
       CHARACTER*16 FITYPE        ! Type of fit ('POLYNOMIAL'|'SPLINE')
       REAL FKNOT( TOKNOT )       ! Grid co-ordinates of fixed knots
       LOGICAL FILMSK             ! Fill a mask array?
@@ -561,17 +564,17 @@
       CHARACTER*( NDF__SZTYP ) ITYPE ! Numeric type for processing
       INTEGER IWCS               ! AST FrameSet identifier
       INTEGER JAXIS              ! Index of axis within pixel Frame
-      INTEGER JHI                ! High pixel index for axis
-      INTEGER JLO                ! Low pixel index for axis
+      INTEGER*8 JHI              ! High pixel index for axis
+      INTEGER*8 JLO              ! Low pixel index for axis
       INTEGER LATTR              ! Used length of ATTR
-      INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF
+      INTEGER*8 LBND( NDF__MXDIM ) ! Lower bounds of NDF
       CHARACTER*( DAT__SZLOC ) LOC ! Locator for the input NDF
       LOGICAL LOOP               ! Continue to loop through dimensions?
       INTEGER MAP                ! PIXEL Frame to Current Frame Mapping
                                  ! pointer
-      INTEGER MAXBIN             ! Maximum number of bins for auto mode
-      INTEGER MAXSIZ             ! Maximum size of block (in pixels)
-      INTEGER MBDIMS( NDF__MXDIM ) ! Maximum NDF dimensions in a block
+      INTEGER*8 MAXBIN           ! Maximum number of bins for auto mode
+      INTEGER*8 MAXSIZ           ! Maximum size of block (in pixels)
+      INTEGER*8 MBDIMS( NDF__MXDIM ) ! Maximum NDF dimensions in a block
       INTEGER MBL                ! Identifier for mask-NDF block
       CHARACTER*9 METHOD         ! Method for determining the mode
       LOGICAL MODIN              ! Modify input NDF by subtracting fits?
@@ -589,8 +592,8 @@
       INTEGER NGOOD              ! Number of good knot positions
       INTEGER NKNOT              ! Number of interior knots
       INTEGER NRANGE             ! Number of range values (not pairs)
-      INTEGER NUMBIN             ! Number of bins in automatic mode
-      INTEGER NWS                ! Size of spline-fitting routine's
+      INTEGER*8 NUMBIN           ! Number of bins in automatic mode
+      INTEGER*8 NWS              ! Size of spline-fitting routine's
                                  ! workspace
       INTEGER OBL                ! Identifier for output-NDF block
       INTEGER ORDER              ! The order of the polynomial to fit
@@ -604,7 +607,7 @@
       DOUBLE PRECISION PXLOW     ! Low pixel bound of fitted axis
       LOGICAL PRPBAD             ! Propagate bad input values to fit?
       LOGICAL QUICK              ! Use quicker code?
-      INTEGER RANGES( MAXRNG )   ! The fit ranges pixels
+      INTEGER*8 RANGES( MAXRNG ) ! The fit ranges pixels
       LOGICAL REGION             ! Representative region auto method?
       CHARACTER*80 SECT          ! Section specifier
       LOGICAL SINGLE             ! Single-line automatic method?
@@ -613,7 +616,7 @@
       INTEGER TBL                ! Identifier for temporary-NDF block
       INTEGER TMPNDF             ! Identifier of temporary NDF
       CHARACTER*( 10*UPKNOT + 3 ) TOKEN ! List of knot grid positions
-      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF
+      INTEGER*8 UBND( NDF__MXDIM ) ! Upper bounds of NDF
       LOGICAL USEALL             ! Use the entire axis?
       LOGICAL USEVAR             ! Use variance as weights in fits?
 
@@ -705,7 +708,7 @@
       END IF
 
 *  Get the bounds and dimensionality.
-      CALL NDF_BOUND( INNDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+      CALL NDF_BOUND8( INNDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Extra dimensions have nominal size 1.
       DO I = NDIM + 1, NDF__MXDIM
@@ -840,7 +843,7 @@
 *  retain at least 16 or all the elements.
          MAXBIN = DIMS( IAXIS ) / 2
          IF ( DIMS( IAXIS ) .GE. OPTBIN ) THEN
-            CALL PAR_GDR0I( 'NUMBIN', OPTBIN, OPTBIN / 2 , MAXBIN,
+            CALL PAR_GDR0K( 'NUMBIN', OPTBIN, OPTBIN / 2 , MAXBIN,
      :                      .FALSE., NUMBIN, STATUS )
          ELSE
             NUMBIN = DIMS( IAXIS )
@@ -901,7 +904,7 @@
             END DO
 
 *  Record the ranges to a parameter.
-            CALL PAR_PUT1I( 'ARANGES', NRANGE, RANGES, STATUS )
+            CALL PAR_PUT1K( 'ARANGES', NRANGE, RANGES, STATUS )
 
 *  Single methods
 *  --------------
@@ -935,10 +938,10 @@
      :                         PPOS, STATUS )
 
 *  Find the projection of the two test points onto the axis.
-               JLO = KPG1_FLOOR( REAL( MIN( PPOS( 1, JAXIS ),
+               JLO = KPG1_FLOOR8( REAL( MIN( PPOS( 1, JAXIS ),
+     :                                       PPOS( 2, JAXIS ) ) ) )
+               JHI = KPG1_CEIL8( REAL( MAX( PPOS( 1, JAXIS ),
      :                                      PPOS( 2, JAXIS ) ) ) )
-               JHI = KPG1_CEIL( REAL( MAX( PPOS( 1, JAXIS ),
-     :                                     PPOS( 2, JAXIS ) ) ) )
 
 *  Otherwise, we use the single-input single-output Mapping that
 *  generates the requested WCS axis.
@@ -946,10 +949,10 @@
                CALL AST_TRAN1( OTOMAP, 2, DRANGE( I ), .TRUE., PRANGE,
      :                         STATUS )
 
-               JLO = KPG1_FLOOR( REAL( MIN( PRANGE( 1 ),
-     :                                      PRANGE( 2 ) ) ) )
-               JHI = KPG1_FLOOR( REAL( MAX( PRANGE( 1 ),
-     :                                      PRANGE( 2 ) ) ) )
+               JLO = KPG1_FLOOR8( REAL( MIN( PRANGE( 1 ),
+     :                                       PRANGE( 2 ) ) ) )
+               JHI = KPG1_FLOOR8( REAL( MAX( PRANGE( 1 ),
+     :                                       PRANGE( 2 ) ) ) )
             END IF
 
 *  Ensure these are within the bounds of the pixel axis.
@@ -959,8 +962,8 @@
 *  Report an error if there is no intersection.
             IF ( JLO .GT. JHI .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
-               CALL MSG_SETI( 'LO', JLO )
-               CALL MSG_SETI( 'HI', JHI )
+               CALL MSG_SETK( 'LO', JLO )
+               CALL MSG_SETK( 'HI', JHI )
                CALL ERR_REP( 'MFITTREND_ERR6', 'An axis range '//
      :                       'covers zero pixels (are the '//
      :                       'RANGE values equal or outside the '//
@@ -1027,8 +1030,8 @@
                CALL MSG_SETC( 'UNIT', AST_GETC( CFRM, ATTR( : LATTR ),
      :                        STATUS ) )
 
-               CALL MSG_SETI( 'L', RANGES( I ) )
-               CALL MSG_SETI( 'H', RANGES( I + 1 ) )
+               CALL MSG_SETK( 'L', RANGES( I ) )
+               CALL MSG_SETK( 'H', RANGES( I + 1 ) )
                CALL MSG_SETC( 'LW', AST_FORMAT( CFRM, IAXIS,
      :                        DRANGE( I ), STATUS ) )
                CALL MSG_SETC( 'HW', AST_FORMAT( CFRM, IAXIS,
@@ -1045,8 +1048,8 @@
      :                    '   Fitting NDF Axis ^I, using pixel ranges:',
      :                    STATUS )
             DO I = 1, NRANGE, 2
-               CALL MSG_SETI( 'L', RANGES( I ) )
-               CALL MSG_SETI( 'H', RANGES( I + 1 ) )
+               CALL MSG_SETK( 'L', RANGES( I ) )
+               CALL MSG_SETK( 'H', RANGES( I + 1 ) )
                CALL MSG_OUT( ' ', '      ^L : ^H ', STATUS )
             END DO
          END IF
@@ -1167,7 +1170,7 @@
 
 *  Make workspace to store a byte mask (to reduce storage required).
          IF ( GLOBAL ) THEN
-            CALL PSX_CALLOC( EL, '_BYTE', IPMASK, STATUS )
+            CALL PSX_CALLOC8( EL, '_BYTE', IPMASK, STATUS )
 
 *  Check that we obtained the workspace before attempting to use it.
             IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -1181,13 +1184,13 @@
 *  data-blocking loop.  An alternative storage is required in the shape
 *  of a temporary NDF that can be blocked too.
             CALL NDF_TEMP( PLACE, STATUS )
-            CALL NDF_NEW( '_BYTE', NDIM, LBND, UBND, PLACE, TMPNDF,
+            CALL NDF_NEW8( '_BYTE', NDIM, LBND, UBND, PLACE, TMPNDF,
      :                    STATUS )
 
 *  Copy a global-sigma-based mask array to the temporary NDF.
-            CALL KPG1_MAP( TMPNDF, 'Data', '_BYTE', 'WRITE', IPMN,
+            CALL NDF_MAP8( TMPNDF, 'Data', '_BYTE', 'WRITE', IPMN,
      :                     EL, STATUS )
-            CALL KPG1_COPY( '_BYTE', EL, IPMASK, IPMN, STATUS )
+            CALL KPG1_COPY8( '_BYTE', EL, IPMASK, IPMN, STATUS )
 
 *  Free resources.
             CALL NDF_UNMAP( TMPNDF, 'Data', STATUS )
@@ -1261,21 +1264,21 @@
       END DO
 
 *  Determine the number of blocks.
-      CALL NDF_NBLOC( INNDF, NDIM, MBDIMS, NBLOCK, STATUS )
+      CALL NDF_NBLOC8( INNDF, NDIM, MBDIMS, NBLOCK, STATUS )
 
 *  Loop through each block.  Start a new NDF context for each block.
       DO IBLOCK = 1, NBLOCK
          CALL NDF_BEGIN
-         CALL NDF_BLOCK( INNDF, NDIM, MBDIMS, IBLOCK, IBL, STATUS )
-         CALL NDF_BLOCK( OUTNDF, NDIM, MBDIMS, IBLOCK, OBL, STATUS )
+         CALL NDF_BLOCK8( INNDF, NDIM, MBDIMS, IBLOCK, IBL, STATUS )
+         CALL NDF_BLOCK8( OUTNDF, NDIM, MBDIMS, IBLOCK, OBL, STATUS )
          IF ( GLOBAL )
-     :     CALL NDF_BLOCK( TMPNDF, NDIM, MBDIMS, IBLOCK, TBL, STATUS )
+     :     CALL NDF_BLOCK8( TMPNDF, NDIM, MBDIMS, IBLOCK, TBL, STATUS )
          IF ( FILMSK )
-     :     CALL NDF_BLOCK( MSKNDF, NDIM, MBDIMS, IBLOCK, MBL, STATUS )
+     :     CALL NDF_BLOCK8( MSKNDF, NDIM, MBDIMS, IBLOCK, MBL, STATUS )
 
 *  Find the dimensions of the block, as they may be smaller than the
 *  maximum.
-         CALL NDF_DIM( IBL, NDF__MXDIM, BLDIMS, NDIM, STATUS )
+         CALL NDF_DIM8( IBL, NDF__MXDIM, BLDIMS, NDIM, STATUS )
 
 *  Map the data.
 *  =============
@@ -1285,45 +1288,45 @@
 *  allowed this to propagate).
          IF ( SUBTRA ) THEN
             IF ( .NOT. MODIN ) THEN
-               CALL NDF_MAP( IBL, 'DATA', ITYPE, 'READ', IPTMP, EL,
-     :                       STATUS )
-               CALL NDF_MAP( OBL, 'DATA', ITYPE, 'WRITE', IPDAT, EL,
-     :                       STATUS )
+               CALL NDF_MAP8( IBL, 'DATA', ITYPE, 'READ', IPTMP, EL,
+     :                        STATUS )
+               CALL NDF_MAP8( OBL, 'DATA', ITYPE, 'WRITE', IPDAT, EL,
+     :                        STATUS )
 
 *  Copy data to the output NDF.
-               CALL KPG1_COPY( ITYPE, EL, IPTMP( 1 ), IPDAT( 1 ),
-     :                         STATUS )
+               CALL KPG1_COPY8( ITYPE, EL, IPTMP( 1 ), IPDAT( 1 ),
+     :                          STATUS )
                CALL NDF_UNMAP( IBL, 'DATA', STATUS )
 
 *  Same for variances.
                IF ( USEVAR ) THEN
-                  CALL NDF_MAP( IBL, 'VARIANCE', ITYPE, 'READ', IPTMP,
-     :                          EL, STATUS )
-                  CALL NDF_MAP( OBL, 'VARIANCE', ITYPE, 'WRITE', IPVAR,
-     :                          EL, STATUS )
-                  CALL KPG1_COPY( ITYPE, EL, IPTMP( 1 ), IPVAR( 1 ),
-     :                            STATUS )
+                  CALL NDF_MAP8( IBL, 'VARIANCE', ITYPE, 'READ', IPTMP,
+     :                           EL, STATUS )
+                  CALL NDF_MAP8( OBL, 'VARIANCE', ITYPE, 'WRITE', IPVAR,
+     :                           EL, STATUS )
+                  CALL KPG1_COPY8( ITYPE, EL, IPTMP( 1 ), IPVAR( 1 ),
+     :                             STATUS )
                   CALL NDF_UNMAP( IBL, 'VARIANCE', STATUS )
                END IF
             ELSE
 
 *  Subtracting from the input DATA, just map that in update mode.
-               CALL NDF_MAP( IBL, 'DATA', ITYPE, 'UPDATE', IPDAT, EL,
-     :                       STATUS )
+               CALL NDF_MAP8( IBL, 'DATA', ITYPE, 'UPDATE', IPDAT, EL,
+     :                        STATUS )
                IF ( USEVAR ) THEN
-                  CALL NDF_MAP( IBL, 'VARIANCE', ITYPE, 'UPDATE', IPVAR,
-     :                          EL, STATUS )
+                  CALL NDF_MAP8( IBL, 'VARIANCE', ITYPE, 'UPDATE',
+     :                           IPVAR, EL, STATUS )
                END IF
             END IF
          ELSE
 
 *  No need to copy input data, will just populate output NDF data
 *  component with model values.
-            CALL NDF_MAP( IBL, 'DATA', ITYPE, 'READ', IPDAT, EL,
-     :                    STATUS )
+            CALL NDF_MAP8( IBL, 'DATA', ITYPE, 'READ', IPDAT, EL,
+     :                     STATUS )
             IF ( USEVAR ) THEN
-               CALL NDF_MAP( IBL, 'VARIANCE', ITYPE, 'READ', IPVAR, EL,
-     :                       STATUS )
+               CALL NDF_MAP8( IBL, 'VARIANCE', ITYPE, 'READ', IPVAR, EL,
+     :                        STATUS )
             END IF
          END IF
          IF ( .NOT. USEVAR ) IPVAR( 1 ) = IPDAT( 1 )
@@ -1346,7 +1349,7 @@
 *  We need space for the cumulative coefficient sums and the
 *  coefficients themselves (Ax=B).
             IF ( USEVAR .OR. HASBAD .OR. SINGLE ) THEN
-               CALL PSX_CALLOC( AREA * ( ORDER + 1 ) * ( ORDER + 1 ),
+               CALL PSX_CALLOC8( AREA * ( ORDER + 1 ) * ( ORDER + 1 ),
      :                         '_DOUBLE', IPAS, STATUS )
             ELSE
 
@@ -1356,7 +1359,7 @@
                CALL PSX_CALLOC( ( ORDER + 1 ) * ( ORDER + 1 ),
      :                          '_DOUBLE', IPAS, STATUS )
             END IF
-            CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_DOUBLE', IPBS,
+            CALL PSX_CALLOC8( AREA * ( ORDER + 1 ), '_DOUBLE', IPBS,
      :                       STATUS )
             CALL PSX_CALLOC( ORDER + 1 , '_DOUBLE', IPWRK1, STATUS )
             CALL PSX_CALLOC( ORDER + 1, '_INTEGER', IPWRK2, STATUS )
@@ -1381,24 +1384,24 @@
 *  maximum number of values which may be required is DSIZE, though the
 *  presence of bad values may mean that not all this workspace is
 *  needed.
-            CALL PSX_CALLOC( DSIZE, '_REAL', IPCO, STATUS )
-            CALL PSX_CALLOC( DSIZE, '_REAL', IPVAL, STATUS )
-            CALL PSX_CALLOC( DSIZE, '_REAL', IPWT, STATUS )
+            CALL PSX_CALLOC8( DSIZE, '_REAL', IPCO, STATUS )
+            CALL PSX_CALLOC8( DSIZE, '_REAL', IPVAL, STATUS )
+            CALL PSX_CALLOC8( DSIZE, '_REAL', IPWT, STATUS )
 
 *  Map some workspace for the coefficients, knots, scale factors,
 *  number of good values.
             NWS = MXKNOT * AREA
-            CALL PSX_CALLOC( AREA, '_INTEGER', IPGOOD, STATUS )
-            CALL PSX_CALLOC( AREA, '_INTEGER', IPNC, STATUS )
-            CALL PSX_CALLOC( NWS, '_REAL', IPCOEF, STATUS )
-            CALL PSX_CALLOC( NWS, '_REAL', IPKNOT, STATUS )
-            CALL PSX_CALLOC( AREA, '_REAL', IPSCAL, STATUS )
+            CALL PSX_CALLOC8( AREA, '_INTEGER8', IPGOOD, STATUS )
+            CALL PSX_CALLOC8( AREA, '_INTEGER', IPNC, STATUS )
+            CALL PSX_CALLOC8( NWS, '_REAL', IPCOEF, STATUS )
+            CALL PSX_CALLOC8( NWS, '_REAL', IPKNOT, STATUS )
+            CALL PSX_CALLOC8( AREA, '_REAL', IPSCAL, STATUS )
 
          END IF
 
 *  Make workspace to store a byte mask (to reduce storage required).
          IF ( SINGLE ) THEN
-            CALL PSX_CALLOC( EL, '_BYTE', IPMASK, STATUS )
+            CALL PSX_CALLOC8( EL, '_BYTE', IPMASK, STATUS )
 
 *  Create a valid pointer for KPS1_LFTx and KPS1_MFRMx calls.
          ELSE
@@ -1423,9 +1426,9 @@
 
 *  Copy the mask array block from the previously created temporary NDF
 *  of the whole mask.
-               CALL KPG1_MAP( TBL, 'Data', '_BYTE', 'READ', IPMN,
+               CALL NDF_MAP8( TBL, 'Data', '_BYTE', 'READ', IPMN,
      :                        EL, STATUS )
-               CALL KPG1_COPY( '_BYTE', EL, IPMN, IPMASK, STATUS )
+               CALL KPG1_COPY8( '_BYTE', EL, IPMN, IPMASK, STATUS )
 
 *  We are done with the temporary-NDF block.  This will unmap too.
                CALL NDF_ANNUL( TBL, STATUS )
@@ -1435,9 +1438,9 @@
             IF ( FILMSK ) THEN
 
 *  Copy the mask array to the created NDF.
-               CALL KPG1_MAP( MBL, 'Data', '_BYTE', 'WRITE', IPMN,
+               CALL NDF_MAP8( MBL, 'Data', '_BYTE', 'WRITE', IPMN,
      :                        EL, STATUS )
-               CALL KPG1_COPY( '_BYTE', EL, IPMASK, IPMN, STATUS )
+               CALL KPG1_COPY8( '_BYTE', EL, IPMASK, IPMN, STATUS )
 
 *  We are done with the mask NDF block.  This will unmap too.
                CALL NDF_ANNUL( MBL, STATUS )
@@ -1491,7 +1494,7 @@
 
 *  Report the success rate.
             CALL MSG_SETI( 'NF', NFIT )
-            CALL MSG_SETI( 'AREA' , AREA )
+            CALL MSG_SETK( 'AREA' , AREA )
             CALL MSG_OUTIF( MSG__NORM, 'MFITTREND_NFIT', 'Successful '/
      :                      /'spline fits to ^NF of ^AREA trends.',
      :                      STATUS )
@@ -1516,8 +1519,8 @@
             IF ( USEVAR ) THEN
                CALL NDF_UNMAP( IBL, 'VARIANCE', STATUS )
             END IF
-            CALL NDF_MAP( OBL, 'DATA', ITYPE, 'WRITE', IPDAT,
-     :                    EL, STATUS )
+            CALL NDF_MAP8( OBL, 'DATA', ITYPE, 'WRITE', IPDAT,
+     :                     EL, STATUS )
          END IF
 
          IF ( FITYPE( 1:3 ) .EQ. 'POL' ) THEN
@@ -1652,48 +1655,48 @@
 *  the Single method.
          IF ( CLIPRE ) THEN
             IF ( .NOT. SUBTRA ) THEN
-               CALL PSX_CALLOC( EL, ITYPE, IPRES, STATUS )
+               CALL PSX_CALLOC8( EL, ITYPE, IPRES, STATUS )
 
 *  Select the appropriate routine for the data type being processed and
 *  subtract the data arrays.
                IF ( ITYPE .EQ. '_BYTE' ) THEN
-                  CALL VEC_SUBB( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
+                  CALL VEC8_SUBB( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
      :                           %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                           %VAL( CNF_PVAL( IPRES ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-                  CALL VEC_SUBUB( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
+                  CALL VEC8_SUBUB( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
      :                            %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                            %VAL( CNF_PVAL( IPRES ) ),
      :                            IERR, NERR, STATUS )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                  CALL VEC_SUBD( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
+                  CALL VEC8_SUBD( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
      :                           %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                           %VAL( CNF_PVAL( IPRES ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-                  CALL VEC_SUBI( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
+                  CALL VEC8_SUBI( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
      :                           %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                           %VAL( CNF_PVAL( IPRES ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-                  CALL VEC_SUBR( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
+                  CALL VEC8_SUBR( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
      :                           %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                           %VAL( CNF_PVAL( IPRES ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-                  CALL VEC_SUBW( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
+                  CALL VEC8_SUBW( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
      :                           %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                           %VAL( CNF_PVAL( IPRES ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-                  CALL VEC_SUBUW( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
+                  CALL VEC8_SUBUW( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
      :                            %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                            %VAL( CNF_PVAL( IPRES ) ),
      :                            IERR, NERR, STATUS )
@@ -1705,8 +1708,8 @@
             END IF
 
 *  Obtain workspace for the JAXIS collapsed array.
-            CALL PSX_CALLOC( AREA, '_DOUBLE', IPCOL, STATUS )
-            CALL PSX_CALLOC( AREA, '_INTEGER', IPWRK3, STATUS )
+            CALL PSX_CALLOC8( AREA, '_DOUBLE', IPCOL, STATUS )
+            CALL PSX_CALLOC8( AREA, '_INTEGER', IPWRK3, STATUS )
 
 *  Derive the the rms of the residuals in the fitting ranges.
             IF ( ITYPE .EQ. '_BYTE' ) THEN
@@ -1768,43 +1771,43 @@
             IF ( PRPBAD .AND. .NOT. SUBTRA ) THEN
 
                IF ( ITYPE .EQ. '_BYTE' ) THEN
-                  CALL KPG1_CPBDB( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
+                  CALL KPG1_CPBD8B( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                             %VAL( CNF_PVAL( IPRES ) ),
      :                             %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                             STATUS )
 
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-                  CALL KPG1_CPBDUB( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
+                  CALL KPG1_CPBD8UB( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                              %VAL( CNF_PVAL( IPRES ) ),
      :                              %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                              STATUS )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPG1_CPBDD( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
+                  CALL KPG1_CPBD8D( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                             %VAL( CNF_PVAL( IPRES ) ),
      :                             %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                             STATUS )
 
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-                  CALL KPG1_CPBDI( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
+                  CALL KPG1_CPBD8I( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                             %VAL( CNF_PVAL( IPRES ) ),
      :                             %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                             STATUS )
 
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-                  CALL KPG1_CPBDR( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
+                  CALL KPG1_CPBD8R( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                             %VAL( CNF_PVAL( IPRES ) ),
      :                             %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                             STATUS )
 
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-                  CALL KPG1_CPBDW( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
+                  CALL KPG1_CPBD8W( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                             %VAL( CNF_PVAL( IPRES ) ),
      :                             %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                             STATUS )
 
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-                  CALL KPG1_CPBDUW( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
+                  CALL KPG1_CPBD8UW( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                              %VAL( CNF_PVAL( IPRES ) ),
      :                              %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                              STATUS )

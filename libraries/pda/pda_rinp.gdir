@@ -1,8 +1,7 @@
-* @(#)pda_rinpr.f   1.1   96/09/03 10:08:31   97/02/24 14:56:53
-      SUBROUTINE PDA_RINPR( PERM, N, X, IFAIL )
+      SUBROUTINE PDA_RINP<T>( PERM, N, X, IFAIL )
 *+
 *  Name:
-*     PDA_RINPR
+*     PDA_RINP<T>
 
 *  Purpose:
 *     Reorder an array in place using a permutation index.
@@ -11,12 +10,12 @@
 *     Fortran 77.
 
 *  Invocation:
-*     CALL PDA_RINPR( PERM, N, X, IFAIL )
+*     CALL PDA_RINP<T>( PERM, N, X, IFAIL )
 
 *  Description:
 *     This routine reorders an array (in place) using an permutation
 *     vector. This is most likely the output from one of the sorting
-*     routines PDA_QSI[A|D]R.
+*     routines PDA_QSI[A|D]<T>.
 
 *  Arguments:
 *     PERM( N ) = INTEGER (Given)
@@ -24,7 +23,7 @@
 *        in the same state as when input. Indices may not be negative.
 *     N = INTEGER (Given)
 *        Number of elements.
-*     X( N ) = REAL (Given and Returned)
+*     X( N ) = <TYPE> (Given and Returned)
 *        The array to reorder.
 *     IFAIL = INTEGER (Returned)
 *        Status flag. Set 0 for success, otherwise the permutation isn't
@@ -68,14 +67,14 @@
       INTEGER PERM( N )
 
 *  Arguments Given and Returned:
-      REAL X( N )
+      <TYPE> X( N )
       INTEGER IFAIL
 
 *  Local Variables:
       INTEGER I                 ! Loop variable
       INTEGER IAT               ! Current index
       INTEGER IAT0              ! Previous index
-      REAL XTEMP              ! Value from start of cycle
+      <TYPE> XTEMP              ! Value from start of cycle
 *.
 
 *  Check that PERM is a valid permutation

@@ -17,11 +17,11 @@
 
 *  Description:
 *     This routine fits polynomials, of a given order, to all lines of
-*     data that lie parallel to a given axis, and lie within ranges 
-*     along that axis.  The fits are not weighted and the data must not 
-*     contain any bad pixels.  When these conditions are true lines can 
-*     be fitted with less workspace requirements and speed ups because 
-*     the A matrix is the same for all lines (and AS is just size 
+*     data that lie parallel to a given axis, and lie within ranges
+*     along that axis.  The fits are not weighted and the data must not
+*     contain any bad pixels.  When these conditions are true lines can
+*     be fitted with less workspace requirements and speed ups because
+*     the A matrix is the same for all lines (and AS is just size
 *     (ORDER+1,ORDER+1)).
 *
 *     The polynomial coefficients are returned in the BS array.
@@ -33,10 +33,10 @@
 *        The axis defining the lines to be fit.
 *     NRANGE = INTEGER (Given)
 *        The number of values in RANGES, must be an even number.
-*     RANGES( NRANGE ) = INTEGER (Given)
+*     RANGES( NRANGE ) = INTEGER*8 (Given)
 *        Pairs of array co-ordinates along the axis.  Only data within
 *        these ranges will be used in the fit.
-*     DIMS( NDF__MXDIM ) = INTEGER (Given)
+*     DIMS( NDF__MXDIM ) = INTEGER*8 (Given)
 *        The dimensions of the input data.  Extra dimension should have
 *        size 1 up to NDF__MXDIM.
 *     DATS( * ) = ? (Given and Returned)
@@ -135,8 +135,8 @@
       INTEGER ORDER
       INTEGER AXIS
       INTEGER NRANGE
-      INTEGER RANGES( NRANGE )
-      INTEGER DIMS( NDF__MXDIM )
+      INTEGER*8 RANGES( NRANGE )
+      INTEGER*8 DIMS( NDF__MXDIM )
 
 *  Arguments Given and Returned:
       <TYPE> DATS( * )
@@ -146,27 +146,27 @@
       INTEGER WRK2( * )
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER STATUS                ! Global status
 
 *  Local Variables:
-      INTEGER B                  ! Pixel index of work arrays
-      INTEGER DIMSB( NDF__MXDIM ) ! Dimensions excluding the axis
-      DOUBLE PRECISION DVAL      ! The current data value
-      INTEGER I( 7 )            ! Equivalences of I1-I7 loop variables
-      INTEGER I1, I2, I3, I4, I5, I6, I7 ! Loop variables
-      INTEGER IP1, IP2, IP3, IP4, IP5, IP6, IP7 ! Loop variables
-      INTEGER J                  ! Loop counter
-      INTEGER K                  ! Loop counter
-      INTEGER L                  ! Loop counter
-      INTEGER LB                 ! Bounds loop counter
-      INTEGER LLBND( NDF__MXDIM ) ! Loop lower bounds
-      INTEGER LUBND( NDF__MXDIM ) ! Loop upper bounds
-      INTEGER STRID( NDF__MXDIM ) ! Dimension strides
-      INTEGER STRIDA( NDF__MXDIM ) ! Dimension strides excluding axis
-      INTEGER STRIDB( NDF__MXDIM ) ! Dimension strides excluding axis
-      <TYPE> TVAL                ! The current data value
-      INTEGER WEL                ! Workspace elements
-      DOUBLE PRECISION X         ! The pixel co-ordinate
+      INTEGER*8 B                   ! Pixel index of work arrays
+      INTEGER*8 DIMSB( NDF__MXDIM ) ! Dimensions excluding the axis
+      DOUBLE PRECISION DVAL         ! The current data value
+      INTEGER*8 I( 7 )              ! Equivalences of I1-I7 loop variables
+      INTEGER*8 I1, I2, I3, I4, I5, I6, I7 ! Loop variables
+      INTEGER*8 IP1, IP2, IP3, IP4, IP5, IP6, IP7 ! Loop variables
+      INTEGER*8 J                   ! Loop counter
+      INTEGER*8 K                   ! Loop counter
+      INTEGER*8 L                   ! Loop counter
+      INTEGER*8 LB                  ! Bounds loop counter
+      INTEGER*8 LLBND( NDF__MXDIM ) ! Loop lower bounds
+      INTEGER*8 LUBND( NDF__MXDIM ) ! Loop upper bounds
+      INTEGER*8 STRID( NDF__MXDIM ) ! Dimension strides
+      INTEGER*8 STRIDA( NDF__MXDIM )! Dimension strides excluding axis
+      INTEGER*8 STRIDB( NDF__MXDIM )! Dimension strides excluding axis
+      <TYPE> TVAL                   ! The current data value
+      INTEGER*8 WEL                 ! Workspace elements
+      DOUBLE PRECISION X            ! The pixel co-ordinate
 
 *  Equivalences so we can index loop variables by AXIS.
       EQUIVALENCE( I1, I( 1 ) )
@@ -264,10 +264,10 @@
          END DO
       END DO
 
-*  Now loop over all input pixels within the ranges.  Note we use a 
-*  fully expanded set of dimensions as we need to run over the values 
-*  in fast order and maintain an additional stepping over the workspace 
-*  sums. (The workspace stepping is done using B and the data array 
+*  Now loop over all input pixels within the ranges.  Note we use a
+*  fully expanded set of dimensions as we need to run over the values
+*  in fast order and maintain an additional stepping over the workspace
+*  sums. (The workspace stepping is done using B and the data array
 *  IP7-1).
 
 *  Outer loop is over the bounds along the selected axis.
@@ -317,13 +317,13 @@
          END DO
       END DO
 
-*  Solve linear equations and get the polynomial coefficients.  Note 
+*  Solve linear equations and get the polynomial coefficients.  Note
 *  that A is just inverted once this time.  The inversion also relies
 *  on WRK2 being unmodified.
-      CALL KPS1_LFTSV( ORDER, AS, .TRUE., BS( 1, 1 ), WRK1, WRK2, 
+      CALL KPS1_LFTSV( ORDER, AS, .TRUE., BS( 1, 1 ), WRK1, WRK2,
      :                 STATUS )
       DO J = 2, WEL
-         CALL KPS1_LFTSV( ORDER, AS, .FALSE., BS( 1, J ), WRK1, WRK2, 
+         CALL KPS1_LFTSV( ORDER, AS, .FALSE., BS( 1, J ), WRK1, WRK2,
      :                    STATUS )
       END DO
 

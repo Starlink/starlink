@@ -1,0 +1,136 @@
+      SUBROUTINE KPG1_CPND8<T>( NDIM, LBNDI, UBNDI, IN, LBNDO, UBNDO,
+     :                          OUT, EL, STATUS )
+*+
+*  Name:
+*     KPG1_CPND8x
+
+*  Purpose:
+*     Copies a section of an n-dimensional array
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_CPND8x( NDIM, LBNDI, UBNDI, IN, LBNDO, UBNDO, OUT, EL,
+*                       STATUS )
+
+*  Description:
+*     This routine copies a specified section of the supplied
+*     n-dimensional array (IN) to an output array (OUT).
+
+*  Arguments:
+*     NDIM = INTEGER (Given)
+*        The number of axes.
+*     LBNDI( NDIM ) = INTEGER*8 (Given)
+*        The lower pixel index bounds of the IN array.
+*     UBNDI( NDIM ) = INTEGER*8 (Given)
+*        The upper pixel index bounds of the IN array.
+*     IN( * ) = ? (Given)
+*        The input array. Bounds given by LBNDI and UBNDI.
+*     LBNDO( NDIM ) = INTEGER*8 (Given)
+*        The lower pixel index bounds of the area of the IN array to be
+*        copied to OUT.
+*     UBNDO( NDIM ) = INTEGER*8 (Given)
+*        The upper pixel index bounds of the area of the IN array to be
+*        copied to OUT.
+*     OUT( * ) = ? (Returned)
+*        The output array. Bounds given by LBNDO and UBNDO.
+*     EL = INTEGER*8 (Returned)
+*        The number of elements in the output array. Derived from LBNDO
+*        and UBNDO.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each numerical data type: replace "x" in
+*     the routine name by C, B, D, I, R, W, UB or UW as appropriate.  The
+*     IN and OUT arrays supplied to the routine must have the data type
+*     specified.
+*    -  If the output array is not completely contained within the input
+*    array, then the sections of the output array which fall outside the
+*    input arrays will be filled with bad values (spaces for the
+*    CHARACTER version).
+*     - For the CHARACTER version, the input and output arrays are
+*     assumed to hold EL contiguous fix-length strings, with no trailing
+*     null characters. The length of each string is determined using the
+*     Fortran built-in "LEN" function. This should work both for
+*     CHARACATER arrays created by Fortran, and for _CHAR arrays mapped
+*     by DAT_MAPV, etc.
+
+*  Copyright:
+*     Copyright (C) 1999 Central Laboratory of the Research Councils.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-JUN-1999 (DSB):
+*        Original version.
+*     2006 May 17 (MJC):
+*        Made generic version.
+*     2007 October 4 (MJC):
+*        Protect against exceeding the array bounds for
+*        NDF__MXDIM-dimensional data.
+*     4-FEB-2008 (DSB):
+*        Now a wrapper for KPG1_PTND.
+*     13-DEC-2012 (DSB):
+*        Add support for character arrays.
+*     20-FEB-2020 (DSB):
+*        Add support for huge arrays.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER NDIM
+      INTEGER*8 LBNDI( NDIM )
+      INTEGER*8 UBNDI( NDIM )
+      <TYPE> IN( * )
+      INTEGER*8 LBNDO( NDIM )
+      INTEGER*8 UBNDO( NDIM )
+
+*  Arguments Returned:
+      <TYPE> OUT( * )
+      INTEGER*8 EL
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*.
+
+*  Call KPG1_PTND to do the work, filling unused areas of the output
+*  array with bad values.
+      CALL KPG1_PTND8<T>( NDIM, LBNDI, UBNDI, IN, LBNDO, UBNDO, .TRUE.,
+     :                    OUT, EL, STATUS )
+
+      END

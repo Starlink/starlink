@@ -72,6 +72,8 @@
 *        Added support for copying character arrays.
 *     2012-05-09 (TIMJ):
 *        Add _INT64
+*     20-FEB-2020 (DSB):
+*        Call 8-byte version to do the work.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -81,10 +83,6 @@
 
 *  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
-
-*  Global Constants:
-      INCLUDE 'SAE_PAR'         ! Standard SAE constants
-      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) TYPE
@@ -98,70 +96,11 @@
       INTEGER STATUS            ! Global status
 
 *  Local Variable:
-      INTEGER IERR              ! Not used
-      INTEGER NERR              ! Not used
-      INTEGER CLEN              ! Length of character strings
+      INTEGER*8 NEL8
 *.
 
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
+*  Convert INTEGER to INTEGER*8 and call the 8-byte version.
+      NEL8 = NEL
+      CALL KPG1_COPY8( TYPE, NEL8, IPIN, IPOUT, STATUS )
 
-*  Copy data. Note BAD can be set .FALSE. or .TRUE. as that doesn't
-*  matter for data of the same type. IERR and NERR can be ignored as
-*  "conversion" is guaranteed.
-      IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL VEC_DTOD( .FALSE., NEL, %VAL( CNF_PVAL( IPIN ) ),
-     :                  %VAL( CNF_PVAL( IPOUT ) ), IERR, NERR,
-     :                  STATUS )
-
-      ELSE IF( TYPE .EQ. '_REAL' ) THEN
-         CALL VEC_RTOR( .FALSE., NEL, %VAL( CNF_PVAL( IPIN ) ),
-     :                  %VAL( CNF_PVAL( IPOUT ) ), IERR, NERR,
-     :                  STATUS )
-
-      ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL VEC_ITOI( .FALSE., NEL, %VAL( CNF_PVAL( IPIN ) ),
-     :                  %VAL( CNF_PVAL( IPOUT ) ), IERR, NERR,
-     :                  STATUS )
-
-      ELSE IF( TYPE .EQ. '_INT64' ) THEN
-         CALL VEC_KTOK( .FALSE., NEL, %VAL( CNF_PVAL( IPIN ) ),
-     :                  %VAL( CNF_PVAL( IPOUT ) ), IERR, NERR,
-     :                  STATUS )
-
-      ELSE IF( TYPE .EQ. '_WORD' ) THEN
-         CALL VEC_WTOW( .FALSE., NEL, %VAL( CNF_PVAL( IPIN ) ),
-     :                  %VAL( CNF_PVAL( IPOUT ) ), IERR, NERR,
-     :                  STATUS )
-
-      ELSE IF( TYPE .EQ. '_UWORD' ) THEN
-         CALL VEC_UWTOUW( .FALSE., NEL, %VAL( CNF_PVAL( IPIN ) ),
-     :                    %VAL( CNF_PVAL( IPOUT ) ), IERR, NERR,
-     :                    STATUS )
-
-      ELSE IF( TYPE .EQ. '_BYTE' ) THEN
-         CALL VEC_BTOB( .FALSE., NEL, %VAL( CNF_PVAL( IPIN ) ),
-     :                  %VAL( CNF_PVAL( IPOUT ) ), IERR, NERR,
-     :                  STATUS )
-
-      ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
-         CALL VEC_UBTOUB( .FALSE., NEL, %VAL( CNF_PVAL( IPIN ) ),
-     :                    %VAL( CNF_PVAL( IPOUT ) ), IERR, NERR,
-     :                    STATUS )
-
-      ELSE IF( TYPE( : 6 ) .EQ. '_CHAR*' ) THEN
-         CALL CHR_CTOI( TYPE( 7 : ), CLEN, STATUS )
-         CALL KPG1_COPYC( NEL, %VAL( CNF_PVAL( IPIN ) ),
-     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS,
-     :                    %VAL( CNF_CVAL( CLEN ) ),
-     :                    %VAL( CNF_CVAL( CLEN ) ) )
-
-      ELSE
-
-*  Bad TYPE.
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'KPG1_COPY',
-     :   'Error copying array, bad data type (possible programming'//
-     :   ' error)', STATUS )
-      END IF
       END

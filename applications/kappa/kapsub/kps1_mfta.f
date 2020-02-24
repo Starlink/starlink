@@ -65,7 +65,7 @@
 *        The axis defining the lines to be fit.
 *     NRANGE = INTEGER (Given)
 *        The number of values in RANGES, must be an even number.
-*     RANGES( NRANGE ) = INTEGER (Given)
+*     RANGES( NRANGE ) = INTEGER*8 (Given)
 *        Pairs of array coordinates along the axis.  Only data within
 *        these ranges will be used in the fit.
 *     USEVAR = LOGICAL (Given)
@@ -81,7 +81,7 @@
 *        the data be ignored from the fitting process.  It is only
 *        accessed if USEMSK is .TRUE..  The array should have dimensions
 *        matching the input data.
-*     DIMS( NDF__MXDIM ) = INTEGER (Given)
+*     DIMS( NDF__MXDIM ) = INTEGER*8 (Given)
 *        The dimensions of the input data.  Extra dimension should have
 *        size 1 up to NDF__MXDIM.
 *     IPDAT = INTEGER (Given)
@@ -101,7 +101,7 @@
 *        all the dimensions that are not the fit axis.
 *     NFIT = INTEGER (Returned)
 *        The number of trends successfully fitted.
-*     NGOOD( * ) = INTEGER (Returned)
+*     NGOOD( * ) = INTEGER*8 (Returned)
 *        Workspace to store the number of good values in each trend
 *        fit.  The dimension of this should be the product of all the
 *        dimensions that are not the fit axis.
@@ -181,12 +181,12 @@
       REAL FKNOT( NKNOT )
       INTEGER AXIS
       INTEGER NRANGE
-      INTEGER RANGES( NRANGE )
+      INTEGER*8 RANGES( NRANGE )
       LOGICAL USEVAR
       INTEGER IPVAR
       LOGICAL USEMSK
       BYTE MASK( * )
-      INTEGER DIMS( NDF__MXDIM )
+      INTEGER*8 DIMS( NDF__MXDIM )
       INTEGER IPDAT
 
 *  Arguments Returned:
@@ -194,7 +194,7 @@
       REAL Z( DIMS( AXIS ) + 2, * )
       REAL W( DIMS( AXIS ) + 2, * )
       INTEGER NFIT
-      INTEGER NGOOD( * )
+      INTEGER*8 NGOOD( * )
       REAL KNOT( MXKNOT, * )
       REAL COEFF( MXKNOT, * )
       INTEGER NCOEF( * )

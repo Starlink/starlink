@@ -83,23 +83,21 @@ MAINTAINERCLEANFILES = $(GEN_F_ROUTINES) $(ADAM_GEN_F_ROUTINES)
 # Numeric types except Double precision
 # Note that in this case the suffix is strange since a case insensitive
 # filename can not distinguish b and B or w and W
-KPG_NXDK_GEN = kpg1_cmul.gnxdk
-
-KPG_NDK_GEN = kpg1_cmul.gdk
+KPG_NXDK_GEN = kpg1_cmul.gnxdk kpg1_cmul8.gnxdk
 
 # All numeric types
 KPG_N_GEN =  kpg1_bl1d.gn kpg1_bor2.gn kpg1_cadd.gn \
-kpg1_chva.gn kpg1_cmpk.gn kpg1_cpbd.gn kpg1_cpnd.gn \
-kpg1_csub.gn kpg1_elnm.gn kpg1_expo.gn kpg1_fill.gn \
-kpg1_flip.gn kpg1_frac.gn kpg1_gauf.gn kpg1_ghst.gn \
-kpg1_hsta.gn kpg1_hstq.gn kpg1_loct.gn kpg1_loga.gn \
+kpg1_chva.gn kpg1_cmpk.gn kpg1_cpbd.gn kpg1_cpbd8.gn kpg1_cpnd.gn \
+kpg1_cpnd8.gn kpg1_csub.gn kpg1_elnm.gn kpg1_expo.gn kpg1_fill.gn \
+kpg1_flip.gn kpg1_frac.gn kpg1_frac8.gn kpg1_gauf.gn kpg1_ghst.gn \
+kpg1_ghst8.gn kpg1_hsta.gn kpg1_hstq.gn kpg1_loct.gn kpg1_loga.gn \
 kpg1_mani.gn kpg1_mean.gn kpg1_medu.gn kpg1_mode.gn \
 kpg1_mmth.gn kpg1_mxme.gn kpg1_mxmn.gn kpg1_nois.gn \
-kpg1_nthm.gn kpg1_numb.gn kpg1_past.gn kpg1_pois.gn \
-kpg1_pxdp.gn kpg1_retr.gn kpg1_rmap.gn kpg1_stat.gn \
+kpg1_nthm.gn kpg1_numb.gn kpg1_numb8.gn kpg1_past.gn kpg1_pois.gn \
+kpg1_pxdp.gn kpg1_retr.gn kpg1_rmap.gn kpg1_stat.gn kpg1_stat8.gn \
 kpg1_stor.gn kpg1_tdli.gn kpg1_thrs.gn kpg1_trli.gn \
 kpg1_trsp.gn kpg1_vasv.gn kpg1_wmod.gn kpg1_mvbd.gn \
-kpg1_sclb.gn kpg1_scli.gn kpg1_scluw.gn kpg1_sclub.gn \
+kpg1_sclb.gn kpg1_scli.gn kpg1_scluw.gn kpg1_sclub.gn kpg1_ptnd8.gn \
 kpg1_sclw.gn kpg1_sclk.gn kpg1_ptnd.gn kpg1_bbox.gn kpg_osta.gn \
 kpg_fise.gn  kpg_immm.gn kpg1_corr.gn kpg1_rms.gn kpg1_ltva.gn \
 kpg_osta8.gn kpg1_mvbd8.gn kpg1_retr8.gn kpg1_thrs8.gn \
@@ -114,7 +112,7 @@ KPG_XC_GEN = kpg1_retv.gxc kpg1_retv8.gxc
 # All except unsigned types
 KPG_BDIKRW_GEN = kpg1_iscl.gbdikrw kpg1_flas.gbdikrw \
                  kpg_stoc.gbdikrw kpg_stos.gbdikrw \
-                 kpg_stoc8.gbdikrw
+                 kpg_stoc8.gbdikrw kpg_stos8.gbdikrw
 
 # All except unsigned types and double
 KPG_BIRW_GEN =
@@ -122,13 +120,13 @@ KPG_BIRW_GEN =
 # Double and Real
 KPG_DR_GEN = kpg1_ainb.gdr kpg1_aind.gdr kpg1_aker.gdr \
 kpg1_axbn.gdr kpg1_axbn8.gdr kpg1_axco.gdr kpg1_axex.gdr kpg1_axgv.gdr \
-kpg1_axlv.gdr kpg1_axvl.gdr kpg1_bloc.gdr kpg1_bmed.gdr \
-kpg1_chax.gdr kpg1_chep.gdr kpg1_chev.gdr kpg1_cmav.gdr \
+kpg1_axlv.gdr kpg1_axvl.gdr kpg1_bloc.gdr kpg1_bloc8.gdr kpg1_bmed.gdr \
+kpg1_chax.gdr kpg1_chep.gdr kpg1_chev.gdr kpg1_cmav.gdr kpg1_cmav8.gdr \
 kpg1_che2.gdr kpg1_cmad.gdr kpg1_cmvd.gdr kpg1_cmvv.gdr \
 kpg1_d2w2.gdr kpg1_dcli.gdr kpg1_div.gdr  \
 kpg1_dwso.gdr kpg1_ffr.gdr  kpg1_fftf.gdr kpg1_gaus.gdr \
 kpg1_hcon.gdr kpg1_hmlt.gdr kpg1_hsds.gdr kpg1_hsfl.gdr \
-kpg1_hstf.gdr kpg1_is3.gdr  \
+kpg1_hstf.gdr kpg1_hstf8.gdr kpg1_is3.gdr  \
 kpg_ld2a.gdr  kpg_lr2a.gdr  kpg1_litn.gdr kpg1_ludc.gdr \
 kpg1_mdet.gdr kpg1_mono.gdr kpg1_mono8.gdr kpg1_mthe.gdr kpg1_nbad.gdr \
 kpg_norv.gdr  kpg1_pow.gdr kpg1_stds8.gdr kpg1_stfl8.gdr \
@@ -193,11 +191,14 @@ kpg1_ceil.f \
 kpg1_ceil8.f \
 kpg1_cget.f \
 kpg1_cmuld.f \
+kpg1_cmul8d.f \
 kpg1_cmulk.f \
 kpg1_cnlim.f \
 kpg1_colnm.f \
 kpg1_copy.f \
+kpg1_copy8.f \
 kpg1_copyc.f \
+kpg1_copyc8.f \
 kpg1_cpsty.f \
 kpg1_ctcpc.f \
 kpg1_ctckm.f \

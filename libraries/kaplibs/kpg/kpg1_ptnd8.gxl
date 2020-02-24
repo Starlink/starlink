@@ -1,0 +1,291 @@
+      SUBROUTINE KPG1_PTND8<T>( NDIM, LBNDI, UBNDI, IN, LBNDO, UBNDO,
+     :                         BAD, OUT, EL, STATUS )
+*+
+*  Name:
+*     KPG1_PTND8x
+
+*  Purpose:
+*     Pastes a section of an n-dimensional array into another array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_PTND8x( NDIM, LBNDI, UBNDI, IN, LBNDO, UBNDO, BAD,
+*                      OUT, EL, STATUS )
+
+*  Description:
+*     This routine pastes a specified section of the supplied
+*     n-dimensional array (IN) into an output array (OUT).
+
+*  Arguments:
+*     NDIM = INTEGER (Given)
+*        The number of axes.
+*     LBNDI( NDIM ) = INTEGER*8 (Given)
+*        The lower pixel index bounds of the IN array.
+*     UBNDI( NDIM ) = INTEGER*8 (Given)
+*        The upper pixel index bounds of the IN array.
+*     IN( * ) = ? (Given)
+*        The input array. Bounds given by LBNDI and UBNDI.
+*     LBNDO( NDIM ) = INTEGER*8 (Given)
+*        The lower pixel index bounds of the area of the IN array to be
+*        pasted into OUT.
+*     UBNDO( NDIM ) = INTEGER*8 (Given)
+*        The upper pixel index bounds of the area of the IN array to be
+*        pasted into OUT.
+*     BAD = LOGICAL (Given)
+*        If .TRUE., then any sections of the output array that fall
+*        outside the input array are filled with bad values. Otherwise,
+*        the supplied values in such output array sections are left
+*        unchanged. For the CHARACTER version, a string of spaces is used
+*        as the bad value.
+*     OUT( * ) = ? (Given and Returned)
+*        The output array. Bounds given by LBNDO and UBNDO.
+*     EL = INTEGER*8 (Returned)
+*        The number of elements in the output array. Derived from LBNDO
+*        and UBNDO.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each numerical data type: replace "x" in
+*     the routine name by C, B, D, I, R, W, UB or UW as appropriate.  The
+*     IN and OUT arrays supplied to the routine must have the data type
+*     specified.
+*     - For the CHARACTER version, the input and output arrays are
+*     assumed to hold EL contiguous fix-length strings, with no trailing
+*     null characters. The length of each string is determined using the
+*     Fortran built-in "LEN" function. This should work both for
+*     CHARACATER arrays created by Fortran, and for _CHAR arrays mapped
+*     by DAT_MAPV, etc.
+
+*  Copyright:
+*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
+
+*  History:
+*     4-FEB-2008 (DSB):
+*        Original version (copied from older KPG1_CPND).
+*     17-JUL-2009 (TIMJ):
+*        Fix loop termination condition to prevent accessing
+*        uninitialised entries in CUBND and PIX arrays.
+*     13-DEC-2012 (DSB):
+*        Add support for character arrays.
+*     20-FEB-2020 (DSB):
+*        Add support for huge arrays.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+
+*  Local Constants:
+      CHARACTER*1 VAL__BADC      ! PRM does not supply VAL__BADC
+      PARAMETER ( VAL__BADC = ' ' )
+
+*  Arguments Given:
+      INTEGER NDIM
+      INTEGER*8 LBNDI( NDIM )
+      INTEGER*8 UBNDI( NDIM )
+      <TYPE> IN( * )
+      INTEGER*8 LBNDO( NDIM )
+      INTEGER*8 UBNDO( NDIM )
+      LOGICAL BAD
+
+*  Arguments Returned:
+      <TYPE> OUT( * )
+      INTEGER*8 EL
+
+*  Status:
+      INTEGER STATUS               ! Global status
+
+*  Local Variables:
+      INTEGER*8 CDIM( NDF__MXDIM)  ! Dimensions of overlap region
+      INTEGER*8 CLBND( NDF__MXDIM) ! Lower bounds of overlap region
+      INTEGER*8 CUBND( NDF__MXDIM) ! Upper bounds of overlap region
+      INTEGER*8 IIN                ! Index into vectorised input array
+      INTEGER*8 IOUT               ! Index into vectorised output array
+      INTEGER*8 ISTRID( NDF__MXDIM)! Axis strides in input array
+      INTEGER J                    ! Axis index
+      INTEGER*8 OSTRID( NDF__MXDIM)! Axis strides in output array
+      INTEGER*8 PIX( NDF__MXDIM )  ! Pixel indices of next pixel to copy
+      LOGICAL MORE                 ! More pixels to copy?
+      LOGICAL OVLAP                ! Is there any overlap between o/p and
+                                   ! i/p?
+      LOGICAL WITHIN               ! Is o/p array completely within i/p
+                                   ! array?
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Get the bounds of the area common to the input and output arrays.
+*  Also set a flag if the entire output array falls within the input
+*  array (i.e. if no part of the output array falls outside the input
+*  array). Also set a flag if there is any overlap between the input
+*  and output arrays (i.e. if the entire output array does not fall
+*  outside the input array).
+      WITHIN = .TRUE.
+      OVLAP = .TRUE.
+
+      DO J = 1, NDIM
+
+         IF( LBNDO( J ) .LT. LBNDI( J ) ) THEN
+            CLBND( J ) = LBNDI( J )
+            WITHIN = .FALSE.
+         ELSE
+            CLBND( J ) = LBNDO( J )
+         END IF
+
+         IF( UBNDO( J ) .GT. UBNDI( J ) ) THEN
+            CUBND( J ) = UBNDI( J )
+            WITHIN = .FALSE.
+         ELSE
+            CUBND( J ) = UBNDO( J )
+         END IF
+
+         IF( CLBND( J ) .GT. CUBND( J ) ) OVLAP = .FALSE.
+
+      END DO
+
+*  Now set up the strides for each axis in the output array. To
+*  increase axis J by one in OUT move forward by OSTRID( J ) elements
+*  in the vectorised array.
+      OSTRID( 1 ) = 1
+      DO J = 1, NDIM - 1
+         OSTRID( J + 1 ) = OSTRID( J )*( UBNDO( J ) - LBNDO( J ) + 1 )
+      END DO
+
+*  Store the number of elements in the output array.
+      EL = OSTRID( NDIM )*( UBNDO( NDIM ) - LBNDO( NDIM ) + 1 )
+
+*  Only the section of the output array which falls within the input
+*  array will have values copied to it. The rest of the output array
+*  needs to be left unchanged, filled with bad values. If required,
+*  fill the entire output array with bad values now, and then replace
+*  these bad values as required. We only need to do this if some part
+*  of the output array falls outside the input arrays.
+      IF( BAD .AND. ( .NOT. WITHIN .OR. .NOT. OVLAP ) ) THEN
+         DO IOUT = 1, EL
+            OUT( IOUT ) = VAL__BAD<T>
+         END DO
+      END IF
+
+*  Skip to the end if there is no overlap between the input and
+*  output arrays, returning the bad values stored above.
+      IF( OVLAP ) THEN
+
+*  Set up the strides for each axis in the input array. To increase
+*  axis I by one in IN, move forward by ISTRID( I ) elements in the
+*  vectorised array.
+         ISTRID( 1 ) = 1
+         DO J = 1, NDIM - 1
+            ISTRID( J + 1 ) = ISTRID( J )*( UBNDI( J ) -
+     :                                      LBNDI( J ) + 1 )
+         END DO
+
+*  Store the dimensions of the area to be copied.
+         DO J = 1, NDIM
+            CDIM( J ) = CUBND( J ) - CLBND( J ) + 1
+         END DO
+
+*  Find the index within the input vectorised array corresponding to
+*  the first pixel within the section to be copied. Also, find the
+*  index within the output vectorised array corresponding to the first
+*  pixel within the section to be copied. Also, store the indices of
+*  the first pixel to be copied.
+         IIN = 1
+         IOUT = 1
+         DO J = 1, NDIM
+            IIN = IIN + ( CLBND( J ) - LBNDI( J ) )*ISTRID( J )
+            IOUT = IOUT + ( CLBND( J ) - LBNDO( J ) )*OSTRID( J )
+            PIX( J ) = CLBND( J )
+         END DO
+
+*  Loop round every pixel in the area to be copied.
+         MORE = .TRUE.
+         DO WHILE( MORE )
+
+*  Copy the current pixel.
+            OUT( IOUT ) = IN( IIN )
+
+*  Get the index on the first axis of the next pixel to be copied.
+            PIX( 1 ) = PIX( 1 ) + 1
+
+*  Correpondingly increase the vectorised indices.
+            IOUT = IOUT + 1
+            IIN = IIN + 1
+
+*  If we are now beyond the end of this axis, increment the next axis by
+*  one and reset this axis to the lower bound. Do this until an axis
+*  does not overflow, or the final axis has overflowed.
+            J = 1
+            DO WHILE( PIX( J ) .GT. CUBND( J ) .AND. MORE )
+
+*  Reset the pixel index on this axis to the lower bound.
+               PIX( J ) = CLBND( J )
+
+*  This has moved us backwards by CDIM( J ) pixels on axis J. Reduce
+*  the vector indices in the input and output arrays to take account of
+*  this.
+               IIN = IIN - CDIM( J )*ISTRID( J )
+               IOUT = IOUT - CDIM( J )*OSTRID( J )
+
+*  Move on to the next axis.
+               J = J + 1
+
+*  If there are no more axes to increment, we have reached the end of
+*  the array, so leave the loops.  Also avoid accessing outside the
+*  bounds of the PIX and CUBND arrays for an NDF__MXDIM-dimensional
+*  array, or uninitialised PIX( NDIM + 1  and CUBND( NDIM + 1 ) for
+*  NDIM < NDF__MXDIM.
+               IF( J .GT. NDIM ) THEN
+                  MORE = .FALSE.
+                  J = J - 1
+
+*  Otherwise...
+               ELSE
+
+*  Increment the pixel index on this new axis by 1.
+                  PIX( J ) = PIX( J ) + 1
+
+*  Increase the vector indices in the input and output arrays to take
+*  account of this move of one pixel.
+                  IOUT = IOUT + OSTRID( J )
+                  IIN = IIN + ISTRID( J )
+               END IF
+
+            END DO
+
+         END DO
+
+      END IF
+
+      END

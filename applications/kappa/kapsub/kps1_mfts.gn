@@ -24,14 +24,14 @@
 *     SUBTRA = LOGICAL (Given)
 *        Whether to subtract the line fits.  Otherwise the evaluations
 *        are returned.
-*     DIMS( NDF__MXDIM ) = INTEGER (Given)
+*     DIMS( NDF__MXDIM ) = INTEGER*8 (Given)
 *        The dimensions of the input data.  Extra dimension should have
 *        size 1 up to NDF__MXDIM.
 *     MXKNOT = INTEGER (Given)
 *        The maximum number of knots and coefficients per trend fit.
 *     NCOEF( * ) = INTEGER (Returned)
 *        The number coefficents of the cubic B-splines for each trend.
-*        The dimension of this should be the product of all the 
+*        The dimension of this should be the product of all the
 *        dimensions that are not the fit axis.
 *     KNOT( MXKNOT, * ) = REAL (Returned)
 *        The knot positions of the cubic B-splines for each trend.  The
@@ -43,8 +43,8 @@
 *        all the dimensions that are not the fit axis.
 *     SCALE( * ) = REAL (Returned)
 *        The scale factors of ordered trends that were used to scale
-*        each trend vector to the -1 to +1 range.  The dimension of this 
-*        should be the product of all the dimensions that are not the 
+*        each trend vector to the -1 to +1 range.  The dimension of this
+*        should be the product of all the dimensions that are not the
 *        fit axis.
 *     DATS( * ) = ? (Given and Returned)
 *        The data.  The fit will be written to, or subtracted from this.
@@ -102,7 +102,7 @@
 *  Arguments Given:
       INTEGER AXIS
       LOGICAL SUBTRA
-      INTEGER DIMS( NDF__MXDIM )
+      INTEGER*8 DIMS( NDF__MXDIM )
       INTEGER MXKNOT
       INTEGER NCOEF( * )
       REAL KNOT( MXKNOT, * )
@@ -123,20 +123,20 @@
       INTEGER NUM_TRAP           ! Numerical error handler
 
 *  Local Variables:
-      INTEGER B                  ! Pixel index of work arrays
-      INTEGER DIMSB( NDF__MXDIM ) ! Dimensions excluding the axis
-      INTEGER I( 7 )             ! Equivalences of I1-I7 loop variables
-      INTEGER I1, I2, I3, I4, I5, I6, I7 ! Loop variables
-      INTEGER IERR               ! PDA stauts
-      INTEGER IP1, IP2, IP3, IP4, IP5, IP6, IP7 ! Loop variables
-      INTEGER J                  ! Loop counter
-      INTEGER K                  ! Loop counter
-      INTEGER STRID( NDF__MXDIM ) ! Dimension strides
-      INTEGER STRIDA( NDF__MXDIM ) ! Dimension strides excluding axis
-      INTEGER STRIDB( NDF__MXDIM ) ! Dimension strides excluding axis
-      <TYPE> TVAL                ! The current data value
-      REAL VAL                   ! The current data value
-      
+      INTEGER*8 B                  ! Pixel index of work arrays
+      INTEGER*8 DIMSB( NDF__MXDIM )! Dimensions excluding the axis
+      INTEGER*8 I( 7 )             ! Equivalences of I1-I7 loop variables
+      INTEGER*8 I1, I2, I3, I4, I5, I6, I7 ! Loop variables
+      INTEGER IERR                 ! PDA stauts
+      INTEGER*8 IP1, IP2, IP3, IP4, IP5, IP6, IP7 ! Loop variables
+      INTEGER*8 J                  ! Loop counter
+      INTEGER*8 K                  ! Loop counter
+      INTEGER*8 STRID( NDF__MXDIM )! Dimension strides
+      INTEGER*8 STRIDA( NDF__MXDIM ) ! Dimension strides excluding axis
+      INTEGER*8 STRIDB( NDF__MXDIM ) ! Dimension strides excluding axis
+      <TYPE> TVAL                  ! The current data value
+      REAL VAL                     ! The current data value
+
 *  Equivalences so we can index loop variables by AXIS.
       EQUIVALENCE( I1, I( 1 ) )
       EQUIVALENCE( I2, I( 2 ) )
@@ -198,7 +198,7 @@
       CALL NUM_CLEARERR()
 
 *  Loop over the whole data array.  Move around data array using IP1 to
-*  IP7 and workspace array using B (as in related functions that pick 
+*  IP7 and workspace array using B (as in related functions that pick
 *  out ranges of one axis).
       B = 1
       DO I7 = 1, DIMS( 7 )
@@ -222,11 +222,11 @@
      :                          ABS( SCALE( B ) ) .GT. VAL__SMLR ) THEN
 
 *  Evaluate the cubic B-spline for the single trend element (hence the
-*  "3, 1"), applying the inverse scaling to restore original values.  It 
+*  "3, 1"), applying the inverse scaling to restore original values.  It
 *  would be more efficient if we could store all values of the trend in
 *  a single call...
                               CALL PDA_SPLEV( KNOT( 1, B ), NCOEF( B ),
-     :                                        COEFF( 1, B ), 3, 
+     :                                        COEFF( 1, B ), 3,
      :                                        REAL( I( AXIS ) ), VAL, 1,
      :                                        IERR )
                               VAL = VAL / SCALE( B )
@@ -239,10 +239,10 @@
                            IF ( VAL .NE. VAL__BADR ) THEN
 
 *  Subtract, or not, from data value.
-                              IF ( SUBTRA ) THEN 
-                                 DATS( IP1 ) = NUM_SUB<T>( TVAL, 
+                              IF ( SUBTRA ) THEN
+                                 DATS( IP1 ) = NUM_SUB<T>( TVAL,
      :                                         NUM_RTO<T>( VAL ) )
-                              ELSE 
+                              ELSE
                                  DATS( IP1 ) = NUM_RTO<T>( VAL )
                               END IF
 
@@ -252,7 +252,7 @@
                                  CALL NUM_CLEARERR()
                               END IF
                            END IF
-                           
+
 *  Move to the next workspace pixel and next coefficients.
                            B = B + STRIDA( 1 )
                         END DO
@@ -268,7 +268,7 @@
          END DO
          B = B + STRIDA( 7 ) - STRIDA( 6 ) * DIMS( 6 )
       END DO
-      
+
 * Remove error handler.
       CALL NUM_REVRT
 

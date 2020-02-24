@@ -307,6 +307,7 @@
       DOUBLE PRECISION DMIN      ! Min. value of pixels in array
       LOGICAL DOPRCT             ! Percentiles have been supplied
       INTEGER EL                 ! Number of array elements mapped
+      INTEGER*8 EL8              ! Number of array elements mapped
       INTEGER I                  ! Loop counter for percentiles
       INTEGER IFIL               ! File descriptor for logfile
       INTEGER IMAX( 1 )          ! Vector index of max. pixel
@@ -329,6 +330,7 @@
       INTEGER NDF                ! NDF identifier
       INTEGER NDIM               ! Number of NDF dimensions
       INTEGER NGOOD              ! No. valid pixels in array
+      INTEGER*8 NGOOD8           ! No. valid pixels in array
       INTEGER NUMPER             ! Number of percentiles
       INTEGER NWCS               ! Number of WCS axes
       REAL PERCNT( NPRCTL )      ! Percentiles
@@ -512,44 +514,46 @@
 *  derive the mode.  The optimum bin width is derived from which the
 *  optimum number of bins is derived but the user is allowed to modify
 *  that through Parameter NUMBIN.
+         NGOOD8 = NGOOD
+         EL8 = EL
          IF ( TYPE .EQ. '_BYTE' ) THEN
-             CALL KPS1_HSMOB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD,
+             CALL KPS1_HSMOB( BAD, EL8, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD8,
      :                        NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
          ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-            CALL KPS1_HSMOUB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD,
+            CALL KPS1_HSMOUB( BAD, EL8, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD8,
      :                        NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_HSMOD( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD,
+            CALL KPS1_HSMOD( BAD, EL8, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD8,
      :                       NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-            CALL KPS1_HSMOI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD,
+            CALL KPS1_HSMOI( BAD, EL8, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD8,
      :                       NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
          ELSE IF ( TYPE .EQ. '_INT64' ) THEN
-            CALL KPS1_HSMOK( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD,
+            CALL KPS1_HSMOK( BAD, EL8, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD8,
      :                       NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
          ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_HSMOR( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD,
+            CALL KPS1_HSMOR( BAD, EL8, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD8,
      :                       NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
          ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-             CALL KPS1_HSMOW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD,
+             CALL KPS1_HSMOW( BAD, EL8, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD8,
      :                        NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
          ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-            CALL KPS1_HSMOUW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD,
+            CALL KPS1_HSMOUW( BAD, EL8, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD8,
      :                        NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
          END IF

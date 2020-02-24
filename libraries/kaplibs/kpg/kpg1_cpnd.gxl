@@ -96,6 +96,8 @@
 *        Now a wrapper for KPG1_PTND.
 *     13-DEC-2012 (DSB):
 *        Add support for character arrays.
+*     20-FEB-2020 (DSB):
+*        Call 8-byte version of KPG1_PTND to do the work.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,7 +109,7 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
       INTEGER NDIM
@@ -124,11 +126,28 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  Local Variables:
+      INTEGER I
+      INTEGER*8 LBNDI8( NDF__MXDIM )
+      INTEGER*8 UBNDI8( NDF__MXDIM )
+      INTEGER*8 LBNDO8( NDF__MXDIM )
+      INTEGER*8 UBNDO8( NDF__MXDIM )
+      INTEGER*8 EL8
+
 *.
 
 *  Call KPG1_PTND to do the work, filling unused areas of the output
-*  array with bad values.
-      CALL KPG1_PTND<T>( NDIM, LBNDI, UBNDI, IN, LBNDO, UBNDO, .TRUE.,
-     :                   OUT, EL, STATUS )
+*  array with bad values. Convert between 4 and 8 byte integer arguments.
+      DO I = 1, NDIM
+         LBNDI8( I ) = LBNDI( I )
+         UBNDI8( I ) = UBNDI( I )
+         LBNDO8( I ) = LBNDO( I )
+         UBNDO8( I ) = UBNDO( I )
+      END DO
+
+      CALL KPG1_PTND8<T>( NDIM, LBNDI8, UBNDI8, IN, LBNDO8, UBNDO8,
+     :                    .TRUE., OUT, EL8, STATUS )
+
+      EL = EL8
 
       END

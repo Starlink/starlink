@@ -290,7 +290,8 @@
       REAL SIGMIN                ! Initial minor-axis standard deviation
       DOUBLE PRECISION SUM       ! Sum of values in the small region
       DOUBLE PRECISION XC( MXCOEF ) ! Free parameters
-      DOUBLE PRECISION WORK( MXCOEF ) ! Work array
+      DOUBLE PRECISION DWORK( MXCOEF ) ! Work array
+      REAL RWORK( MXCOEF )       ! Work array
 
 *.
 
@@ -358,7 +359,7 @@
          CALL KPS1_STPAD( DIMS( 1 ), DIMS( 2 ),
      :                    %VAL( CNF_PVAL( IPWD ) ), FLBND, 1,
      :                    MIN( 101, DIMS( 1 ), DIMS( 2 ) ), INIT,
-     :                    SIGMIN, AXRAT, ORIENT, NGOOD, WORK, STATUS )
+     :                    SIGMIN, AXRAT, ORIENT, NGOOD, RWORK, STATUS )
 
 *  Something went wrong, say the array supplied is too small, and revert
 *  to semi-arbitrary default initial values for the coefficients.
@@ -597,7 +598,7 @@
      :                %VAL( CNF_PVAL( IPWEF ) ), 5,
      :                %VAL( CNF_PVAL( IPDRES ) ),
      :                %VAL( CNF_PVAL( IPJAC ) ),
-     :                %VAL( CNF_PVAL( IPCURV ) ), PIVOT, WORK, SD,
+     :                %VAL( CNF_PVAL( IPCURV ) ), PIVOT, DWORK, SD,
      :                %VAL( CNF_PVAL( IPCORR ) ),
      :                %VAL( CNF_PVAL( IPCOVA ) ), FLAG, STATUS )
 

@@ -1,0 +1,417 @@
+      SUBROUTINE KPG1_GHST8<T>( BAD, SIZE, ARRAY, WGTS, WEIGHT, NUMBIN,
+     :                          CUMUL, VALMAX, VALMIN, HIST, STATUS )
+*+
+*  Name:
+*     KPG1_GHST8x
+
+*  Purpose:
+*     Calculates the histogram of an array of data.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation
+*     CALL KPG1_GHST8x( BAD, SIZE, ARRAY, WGTS, WEIGHT, NUMBIN, CUMUL,
+*    :                  VALMAX, VALMIN, HIST, STATUS )
+
+*  Description:
+*     This routine calculates the truncated histogram of an array of
+*     data between defined limits and in a defined number of bins.
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        If .TRUE., bad pixels will be processed.  This should not be
+*        set to false unless the input array contains no bad pixels.
+*     SIZE = INTEGER*8 (Given)
+*        The dimension of the array whose histogram is required.
+*     ARRAY( SIZE ) = ? (Given)
+*        The input data array.
+*     WGTS( SIZE ) = DOUBLE PRECISION (Given)
+*        The weight associed with each element of the input data array.
+*        Ignored if WEIGHT is zero.
+*     WEIGHT = DOUBLE PRECISION (Given)
+*        If non-zero, this is the increment in weight that contributes a
+*        single count to a histogram bin. This if WEIGHT is 0.1, and
+*        WGTS(10) is 0.232, the histogram bin containing the value of
+*        ARRAY(10) will be incremented by 2 (i.e. int(0.232/0.1). If
+*        WEIGHT is ZERO, then the WGTS array is ignored and every element
+*        of ARRAY is assigned a unit weight.
+*     NUMBIN = INTEGER (Given)
+*        Number of bins used in the histogram.  For integer data types
+*        this should result in a bin width of at least one unit.  So for
+*        example, byte data should never have more than 256 bins.
+*     CUMUL = LOGICAL (Given)
+*        Is a cumulative histogram required?
+*     VALMAX = ? (Given and Returned)
+*        Maximum data value included in the array.  If this is supplied
+*        as VAL__BAD<T>, then the actual maximum value in the ARRAY is
+*        found and used, and returned on exit.
+*     VALMIN = ? (Given and Returned)
+*        Minimum data value included in the array.  If this is supplied
+*        as VAL__BAD<T>, then the actual minimum value in the ARRAY is
+*        found and used, and returned on exit.
+*     HIST( NUMBIN ) = INTEGER*8 (Returned)
+*        Array containing the histogram.
+*     STATUS = INTEGER (Given and Returned)
+*        Global status value.
+
+*  Notes:
+*     - If VALMAX or VALMIN is supplied equal to VAL__BAD<T>, then the
+*     actual maximum and minimum values will be found (by searching the
+*     ARRAY), and used.
+*     -  There is a routine for all numeric data types: replace "x" in
+*     the routine name by B, D, R, I, UB, UW, or W as appropriate.  The
+*     arguments ARRAY, VALMAX, and VALMIN must have the data type
+*     specified.
+
+*  Copyright:
+*     Copyright (C) 1990, 1991 Science & Engineering Research Council.
+*     Copyright (C) 1996 Central Laboratory of the Research Councils.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research
+*                   Council.
+*     Copyright (C) 2008,2011 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (JAC)
+*     PWD: Peter W. Draper (JAC, Durham University)
+*     {enter_new_authors_here}
+
+*  History:
+*     1990 July 19 (MJC):
+*        Original version.
+*     1991 September 17 (MJC):
+*        Fixed overflow bug.
+*     1991 November 13 (MJC):
+*        Fixed a bug converting NUMBIN for calculations.
+*     1996 March 25 (MJC):
+*        Better check that the bin width is valid.
+*     1996 July 3 (MJC):
+*        Made to cope with unsigned integer types.
+*     23-FEB-2006 (DSB):
+*        Added argument CUMUL.
+*     23-APR-2008 (DSB):
+*        If VALMAX/MIN are supplied bad, then find the max/min values in
+*        ARRAY.
+*     29-APR-2008 (DSB):
+*        Report an error if VALMAX/MIN are supplied bad, and all data
+*        values are bad.
+*     15-MAY-2008 (DSB):
+*        Guard against cases where all values are equal and THRESH is
+*        zero.
+*     03-MAR-2009 (PWD):
+*        Use NUM_MIN/MAX functions to handle generic MIN/MAX (byte data
+*        types). Rename DIM argument to SIZE to avoid clash with intrinsic of
+*        same name.
+*     18-AUG-2011 (DSB):
+*        Added WEIGHT and WGTS arguments.
+*     20-FEB-2020 (DSB):
+*        Support huge arrays.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT  NONE             ! No default typing allowed
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
+
+*  Arguments Given:
+      INTEGER*8 SIZE
+      INTEGER NUMBIN
+      LOGICAL CUMUL
+      LOGICAL BAD
+      <TYPE> ARRAY( SIZE )
+      DOUBLE PRECISION WGTS( SIZE )
+      DOUBLE PRECISION WEIGHT
+
+*  Arguments Given and Returned:
+      <TYPE> VALMAX
+      <TYPE> VALMIN
+
+*  Arguments Returned:
+      INTEGER*8 HIST( NUMBIN )
+
+*  Status:
+      INTEGER STATUS
+
+*  Local Variables:
+      INTEGER DUMMY              ! Dummy used in histogram calculation
+      DOUBLE PRECISION DVMAX     ! Maximum value
+      DOUBLE PRECISION DVMIN     ! Minimum value
+      INTEGER*8 I                ! Counter
+      INTEGER INC                ! Increment for bin value
+      INTEGER*8 K                ! Counter
+      DOUBLE PRECISION SCALE     ! Scale factor used for choosing
+                                 ! correct bin
+      DOUBLE PRECISION TEMP      ! Work variable
+      DOUBLE PRECISION THRESH    ! Threshold for identical-limits test
+      DOUBLE PRECISION TNUMB     ! Number of bins
+      <TYPE> VLMAX               ! Actual max data value
+      <TYPE> VLMIN               ! Actual min data value
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEC_<T>'      ! NUM declarations for functions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+      INCLUDE 'NUM_DEF_<T>'      ! NUM definitions for functions
+*.
+
+*  Check the global inherited status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  First set the bins of the histogram to zero.
+      DO  K = 1, NUMBIN
+         HIST( K ) = 0
+      END DO
+
+*  If either max or min values were not supplied, find them now.
+      IF ( VALMAX .EQ. VAL__BAD<T> .OR.
+     :     VALMIN .EQ. VAL__BAD<T> ) THEN
+
+         VLMAX = VAL__MIN<T>
+         VLMIN = VAL__MAX<T>
+
+         IF ( BAD ) THEN
+            DO  K = 1, SIZE
+               IF ( ARRAY( K ) .NE. VAL__BAD<T> ) THEN
+                  VLMAX = NUM_MAX<T>( VLMAX, ARRAY( K ) )
+                  VLMIN = NUM_MIN<T>( VLMIN, ARRAY( K ) )
+               END IF
+            END DO
+
+         ELSE
+            DO  K = 1, SIZE
+               VLMAX = NUM_MAX<T>( VLMAX, ARRAY( K ) )
+               VLMIN = NUM_MIN<T>( VLMIN, ARRAY( K ) )
+            END DO
+
+         END IF
+
+         IF ( VLMAX .EQ. VAL__MIN<T> .OR. VLMIN .EQ. VAL__MAX<T> ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'No good data values found in the '//
+     :                    'array. No histogram formed', STATUS )
+            GO TO 999
+         END IF
+
+         IF ( VALMAX .EQ. VAL__BAD<T> ) VALMAX = VLMAX
+         IF ( VALMIN .EQ. VAL__BAD<T> ) VALMIN = VLMIN
+
+      END IF
+
+*  Assign some useful variables.
+      DVMIN = NUM_<T>TOD( VALMIN )
+      DVMAX = NUM_<T>TOD( VALMAX )
+      TNUMB = DBLE( NUMBIN )
+
+*  Set the minimum separation allowed for the data limits such that
+*  each of the histogram bins is resolvable.  The halving prevents
+*  arithmetic overflow for data with a very large dynamic range.
+      IF ( VAL__EPS<T> .LT. 1 ) THEN
+         THRESH = ( ABS( DVMAX ) / 2.0D0 + ABS( DVMIN ) / 2.0D0 ) *
+     :            NUM_<T>TOD( VAL__EPS<T> ) * TNUMB
+
+*  For integer data the bin size must be at least one.  Again the
+*  threshold is halved for the subsequent test.
+      ELSE
+         THRESH = 0.5D0
+      END IF
+
+*  Next set the scaling factor, provided the bins are resolvable.
+*  Again the halving prevents arithmetic overflow for data with a very
+*  large dynamic range.  Thus both sides of the comparison have been
+*  halved.
+      IF ( ABS( DVMAX / 2.0D0 - DVMIN / 2.0D0 ) .GT. THRESH ) THEN
+         SCALE  =  DVMAX - DVMIN
+      ELSE
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'KPG1_GHST8x_LIMITS',
+     :     'Maximum and minimum are identical or almost '/
+     :     /'the same.  No histogram formed', STATUS )
+         GOTO 999
+      END IF
+
+*  Calculate the histogram.
+*  ========================
+
+*  For processing efficiency deal with the various cases separately.
+*  These are with and without bad pixels, and unsigned integer types
+*  versus other types.  The latter difference is needed because Fortran
+*  does not support unsigned integer types, and numerical comparisons
+*  will use the signed types, and hence give the wrong answers.  Thus
+*  the comparisons are performed in floating-point.
+
+*  Bad-pixel testing to be undertaken on Fortran data types.
+*  ---------------------------------------------------------
+      IF ( '<T>' .NE. 'UB' .AND. '<T>' .NE. 'UW' ) THEN
+         IF ( BAD ) THEN
+
+*  Loop round all the elements.
+            DO I = 1, SIZE
+
+*  Test for bad pixel or pixel value outside the histogram range.
+               IF ( ARRAY( I ) .NE. VAL__BAD<T> .AND.
+     :              ARRAY( I ) .GE. VALMIN .AND.
+     :              ARRAY( I ) .LE. VALMAX ) THEN
+
+*  Find bin number for particular point.  MIN is to allow for pixel
+*  value to equal maximum.
+                  DUMMY = MIN( NUMBIN, 1 + INT( TNUMB *
+     :                    ( NUM_<T>TOD( ARRAY( I ) ) - DVMIN )
+     :                    / SCALE ) )
+
+*  Get the value by which to increment the histogram.
+                  IF( WEIGHT .EQ. 0 ) THEN
+                     INC = 1
+                  ELSE IF( WGTS( I ) .NE. VAL__BADD ) THEN
+                     INC = WGTS( I )/WEIGHT
+                  ELSE
+                     INC = 0
+                  ENDIF
+
+*  Increment the number of data in the bin by one.
+                  HIST( DUMMY )  =  HIST( DUMMY ) + INC
+               END IF
+
+*  End of loop round elements.
+            END DO
+
+*  No bad-pixel testing... on Fortran data types.
+*  ----------------------------------------------
+         ELSE
+
+*  Loop round all the elements.
+            DO I = 1, SIZE
+
+*  Test for pixel value outside the histogram range.
+               IF ( ARRAY( I ) .GE. VALMIN .AND.
+     :              ARRAY( I ) .LE. VALMAX ) THEN
+
+*  Find bin number for particular point.  MIN is to allow for pixel
+*  value to equal maximum.
+                  DUMMY = MIN( NUMBIN, 1 + INT( TNUMB *
+     :                    ( NUM_<T>TOD( ARRAY( I ) ) - DVMIN )
+     :                    / SCALE ) )
+
+*  Get the value by which to increment the histogram.
+                  IF( WEIGHT .EQ. 0 ) THEN
+                     INC = 1
+                  ELSE
+                     INC = WGTS( I )/WEIGHT
+                  ENDIF
+
+*  Increment the number of data in the bin by one.
+                  HIST( DUMMY )  =  HIST( DUMMY ) + INC
+               END IF
+
+*  End of loop round elements.
+            END DO
+
+*  End of main bad-pixels-present check
+         END IF
+
+      ELSE
+
+*  Bad-pixel testing to be undertaken on unsigned integer data types.
+*  ------------------------------------------------------------------
+         IF ( BAD ) THEN
+
+*  Loop round all the elements.
+            DO I = 1, SIZE
+
+*  Test for bad pixel or pixel value outside the histogram range.
+               TEMP = NUM_<T>TOD( ARRAY( I ) )
+               IF ( ARRAY( I ) .NE. VAL__BAD<T> .AND.
+     :              TEMP .GE. DVMIN .AND. TEMP .LE. DVMAX ) THEN
+
+*  Find bin number for particular point.  MIN is to allow for pixel
+*  value to equal maximum.
+                  DUMMY = MIN( NUMBIN, 1 + INT( TNUMB *
+     :                    ( TEMP - DVMIN ) / SCALE ) )
+
+*  Get the value by which to increment the histogram.
+                  IF( WEIGHT .EQ. 0 ) THEN
+                     INC = 1
+                  ELSE IF( WGTS( I ) .NE. VAL__BADD) THEN
+                     INC = WGTS( I )/WEIGHT
+                  ELSE
+                     INC = 0
+                  ENDIF
+
+*  Increment the number of data in the bin by one.
+                  HIST( DUMMY )  =  HIST( DUMMY ) + INC
+               END IF
+
+*  End of loop round elements.
+            END DO
+
+*  No bad-pixel testing... on unsigned integer data types.
+*  -------------------------------------------------------
+         ELSE
+
+*  Loop round all the elements.
+            DO I = 1, SIZE
+
+*  Test for pixel value outside the histogram range.
+               TEMP = NUM_<T>TOD( ARRAY( I ) )
+               IF ( TEMP .GE. DVMIN .AND. TEMP .LE. DVMAX ) THEN
+
+*  Find bin number for particular point.  MIN is to allow for pixel
+*  value to equal maximum.
+                  DUMMY = MIN( NUMBIN, 1 + INT( TNUMB *
+     :                    ( TEMP - DVMIN ) / SCALE ) )
+
+*  Get the value by which to increment the histogram.
+                  IF( WEIGHT .EQ. 0 ) THEN
+                     INC = 1
+                  ELSE
+                     INC = WGTS( I )/WEIGHT
+                  ENDIF
+
+*  Increment the number of data in the bin by one.
+                  HIST( DUMMY )  =  HIST( DUMMY ) + INC
+               END IF
+
+*  End of loop round elements.
+            END DO
+
+*  End of main bad-pixels-present check
+         END IF
+
+      END IF
+
+*  If required, convert to a cumulative histogram.
+      IF ( CUMUL ) THEN
+         DO  K = 2, NUMBIN
+            HIST( K ) = HIST( K ) + HIST( K - 1 )
+         END DO
+      END IF
+
+ 999  CONTINUE
+
+*  End and return.
+      END
+

@@ -28,7 +28,7 @@
 *  Arguments:
 *     BAD = LOGICAL (Given)
 *        If true there will be no checking for bad pixels.
-*     EL = INTEGER (Given)
+*     EL = INTEGER*8 (Given)
 *        The number of elements in the array.
 *     ARRAY( EL ) = ? (Given)
 *        The array which is to be used to form the histogram.
@@ -57,7 +57,7 @@
 *        The maximum data value in the array.
 *     DMIN = DOUBLE PRECISION (Given)
 *        The minimum data value in the array.
-*     NGOOD = INTEGER (Given)
+*     NGOOD = INTEGER*8 (Given)
 *        The number of good values used to form the histogram.
 *     NUMPER = INTEGER (Given)
 *        The number of percentiles.
@@ -145,13 +145,13 @@
 
 *  Arguments Given:
       LOGICAL BAD
-      INTEGER EL
+      INTEGER*8 EL
       <TYPE> ARRAY( EL )
       CHARACTER*( * ) PARAM
       CHARACTER*( * ) METHOD
       DOUBLE PRECISION DMAX
       DOUBLE PRECISION DMIN
-      INTEGER NGOOD
+      INTEGER*8 NGOOD
       INTEGER NUMPER
 
 *  Arguments Given and Returned:
@@ -177,9 +177,9 @@
       INTEGER I                  ! Loop counter
       LOGICAL INTTYP             ! Integer data type?
       INTEGER MAXPOS             ! Position of the maximum
-      INTEGER MAXV               ! Minimum value in the array
+      INTEGER*8 MAXV             ! Minimum value in the array
       INTEGER MINPOS             ! Position of the minimum (not used)
-      INTEGER MINV               ! Maximum value in the array
+      INTEGER*8 MINV             ! Maximum value in the array
       DOUBLE PRECISION MODEI     ! Histogram index of the mode
       INTEGER NBAD               ! Number of bad values in the histogram
       INTEGER NUMBIN             ! Number of bins in the histogram
@@ -259,11 +259,11 @@
      :                STATUS )
 
 *  Obtain work space for the histogram.
-      CALL PSX_CALLOC( NUMBIN, '_INTEGER', HPNTR, STATUS )
+      CALL PSX_CALLOC( NUMBIN, '_INT64', HPNTR, STATUS )
 
 *  Form the histogram over the data range optimally sampling the
 *  the probability density function.
-      CALL KPG1_GHST<T>( BAD, EL, ARRAY, ARRAY, 0.0D0, NUMBIN, .FALSE.,
+      CALL KPG1_GHST8<T>( BAD, EL, ARRAY, ARRAY, 0.0D0, NUMBIN, .FALSE.,
      :                   NUM_DTO<T>( DMAX ), NUM_DTO<T>( DMIN ),
      :                   %VAL( CNF_PVAL( HPNTR ) ), STATUS )
 
@@ -271,7 +271,7 @@
 *  =================
 
 *  Find the index of the peak bin.
-      CALL KPG1_MXMNI( .FALSE., NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
+      CALL KPG1_MXMNK( .FALSE., NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
      :                 NBAD, MAXV, MINV, MAXPOS, MINPOS, STATUS )
 
 *  Just check that we have a valid histogram.

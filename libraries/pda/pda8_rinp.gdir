@@ -1,8 +1,7 @@
-* @(#)pda_rinpi.f   1.1   96/09/03 10:08:30   97/02/24 14:56:53
-      SUBROUTINE PDA_RINPI( PERM, N, X, IFAIL )
+      SUBROUTINE PDA8_RINP<T>( PERM, N, X, IFAIL )
 *+
 *  Name:
-*     PDA_RINPI
+*     PDA8_RINP<T>
 
 *  Purpose:
 *     Reorder an array in place using a permutation index.
@@ -11,20 +10,20 @@
 *     Fortran 77.
 
 *  Invocation:
-*     CALL PDA_RINPI( PERM, N, X, IFAIL )
+*     CALL PDA8_RINP<T>( PERM, N, X, IFAIL )
 
 *  Description:
 *     This routine reorders an array (in place) using an permutation
 *     vector. This is most likely the output from one of the sorting
-*     routines PDA_QSI[A|D]I.
+*     routines PDA8_QSI[A|D]<T>.
 
 *  Arguments:
-*     PERM( N ) = INTEGER (Given)
+*     PERM( N ) = INTEGER*8 (Given)
 *        The index vector. Note this is modified but should be returned
 *        in the same state as when input. Indices may not be negative.
-*     N = INTEGER (Given)
+*     N = INTEGER*8 (Given)
 *        Number of elements.
-*     X( N ) = INTEGER (Given and Returned)
+*     X( N ) = <TYPE> (Given and Returned)
 *        The array to reorder.
 *     IFAIL = INTEGER (Returned)
 *        Status flag. Set 0 for success, otherwise the permutation isn't
@@ -53,6 +52,8 @@
 *  History:
 *     31-AUG-1996 (PDRAPER):
 *        Original version.
+*     20-FEB-2020 (DSB):
+*        Support huge arrays.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -64,18 +65,18 @@
       IMPLICIT NONE             ! No implicit typing
 
 *  Arguments Given:
-      INTEGER N
-      INTEGER PERM( N )
+      INTEGER*8 N
+      INTEGER*8 PERM( N )
 
 *  Arguments Given and Returned:
-      INTEGER X( N )
+      <TYPE> X( N )
       INTEGER IFAIL
 
 *  Local Variables:
-      INTEGER I                 ! Loop variable
-      INTEGER IAT               ! Current index
-      INTEGER IAT0              ! Previous index
-      INTEGER XTEMP              ! Value from start of cycle
+      INTEGER*8 I               ! Loop variable
+      INTEGER*8 IAT             ! Current index
+      INTEGER*8 IAT0            ! Previous index
+      <TYPE> XTEMP              ! Value from start of cycle
 *.
 
 *  Check that PERM is a valid permutation

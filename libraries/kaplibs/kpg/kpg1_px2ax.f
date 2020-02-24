@@ -115,7 +115,7 @@
       END DO
 
 *  Call the 64-bit version of this routine.
-      CALL KPG1_PX2AX8( NDIM, PX, INDF, AX, STATUS )
+      CALL KPG1_PX2AX8( NDIM, PX8, INDF, AX, STATUS )
 
       END
 

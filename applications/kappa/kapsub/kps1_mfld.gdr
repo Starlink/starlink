@@ -33,9 +33,9 @@
 *        If .TRUE. the data have many spectral features---a line
 *        forest---for which a revised approach using the mode of the
 *        histogram along each line of data.
-*     DIMS( NDF__MXDIM ) = INTEGER (Given)
+*     DIMS( NDF__MXDIM ) = INTEGER*8 (Given)
 *        The dimensions of the array to be analysed.
-*     ARRAY( EL ) = ? (Given & Returned)
+*     ARRAY( * ) = ? (Given & Returned)
 *        The lines of data being fitted.  On exit, deviant points will
 *        replaced with the bad-pixel value.
 *     STATUS = INTEGER (Given and Returned)
@@ -104,7 +104,7 @@
       INTEGER NCLIP
       REAL CLIP( NCLIP )
       LOGICAL FOREST
-      INTEGER DIMS( NDF__MXDIM )
+      INTEGER*8 DIMS( NDF__MXDIM )
 
 *  Arguments Given and Returned:
       <TYPE> ARRAY( * )
@@ -129,25 +129,25 @@
       PARAMETER ( ORDER = 1 )
 
 *  Local Variables:
-      INTEGER AREA               ! Number of lines to be fit at once
+      INTEGER*8 AREA             ! Number of lines to be fit at once
       REAL CLFRAC( 2 )           ! Clipped fractions
-      INTEGER DIMPRM( NDF__MXDIM ) ! Permuted dimensions
+      INTEGER*8 DIMPRM( NDF__MXDIM ) ! Permuted dimensions
       DOUBLE PRECISION DMAX      ! Max. value of pixels in array
       DOUBLE PRECISION DMIN      ! Min. value of pixels in array
-      DOUBLE PRECISION DSTAT( 7 ) ! Array of floating-point statistics
+      DOUBLE PRECISION DSTAT( 7 )! Array of floating-point statistics
       DOUBLE PRECISION DSTATC( 7 ) ! Array of clipped f.p. statistics
-      INTEGER DTEL               ! Number of elements along detrend axis
+      INTEGER*8 DTEL             ! Number of elements along detrend axis
       DOUBLE PRECISION DMODE     ! Dummy (mode of pixels in array)
       DOUBLE PRECISION DPEVAL( 4 ) ! Dummy values at percentiles
-      INTEGER EL                 ! Number of elements in supplied array
+      INTEGER*8 EL               ! Number of elements in supplied array
       REAL FRAC( 2 )             ! Percentiles for data range
       <LTYPE> GMEAN              ! Gaussian mean
-      INTEGER GNUMB              ! Number of values lower than GMEAN
+      INTEGER*8 GNUMB            ! Number of values lower than GMEAN
       <LTYPE> HIGH               ! Higher rejection threshold
       DOUBLE PRECISION HRANGE( 2 ) ! Histogram data limits
-      INTEGER I                  ! Loop counter
-      INTEGER IDIMS( NDF__MXDIM ) ! Paste-array dimensions
-      INTEGER IERR               ! Position of first error (dummy)
+      INTEGER*8 I                ! Loop counter
+      INTEGER*8 IDIMS( NDF__MXDIM ) ! Paste-array dimensions
+      INTEGER*8 IERR             ! Position of first error (dummy)
       INTEGER IMAX( 1 )          ! Vector index of max. pixel
       INTEGER IMIN( 1 )          ! Vector index of min. pixel
       INTEGER IPAS               ! Pointer to workspace for A matrix
@@ -161,30 +161,30 @@
       INTEGER IPWORK             ! Pointer to work array
       INTEGER IPWRK1             ! Pointer to workspace
       INTEGER IPWRK2             ! Pointer to workspace
-      INTEGER ISTAT( 3 )         ! Array of integer statistics
-      INTEGER ISTATC( 3 )        ! Array of clipped integer statistics
+      INTEGER*8 ISTAT( 3 )       ! Array of integer statistics
+      INTEGER*8 ISTATC( 3 )      ! Array of clipped integer statistics
       INTEGER J                  ! Loop counter
       INTEGER K                  ! Loop counter
-      INTEGER LBND( 1 )          ! Lower bound of the whole array
-      INTEGER LBNDL( 1 )         ! Lower bound of a line section
+      INTEGER*8 LBND( 1 )        ! Lower bound of the whole array
+      INTEGER*8 LBNDL( 1 )       ! Lower bound of a line section
       <LTYPE> LOW                ! Lower rejection threshold
       DOUBLE PRECISION MEAN      ! Mean of pixels in array
       DOUBLE PRECISION MEANC     ! Mean of pixels after clipping
       DOUBLE PRECISION MEDIAN    ! Median of pixels in array
       DOUBLE PRECISION MODE      ! Mode of pixels in array
-      INTEGER NBAD               ! Number of bad values
-      INTEGER NEL                ! Number of elements (not used)
-      INTEGER NGOOD              ! Number of valid values
-      INTEGER NERR               ! Number of errors
-      INTEGER NREPHI             ! Number of high residuals rejected
-      INTEGER NREPLO             ! Number of low residuals rejected
-      INTEGER ODIMS( NDF__MXDIM ) ! Base-array dimensions
-      INTEGER OFFSET( NDF__MXDIM ) ! Paste origin offsets
+      INTEGER*8 NBAD             ! Number of bad values
+      INTEGER*8 NEL              ! Number of elements (not used)
+      INTEGER*8 NGOOD            ! Number of valid values
+      INTEGER*8 NERR             ! Number of errors
+      INTEGER*8 NREPHI           ! Number of high residuals rejected
+      INTEGER*8 NREPLO           ! Number of low residuals rejected
+      INTEGER*8 ODIMS( NDF__MXDIM ) ! Base-array dimensions
+      INTEGER*8 OFFSET( NDF__MXDIM ) ! Paste origin offsets
       REAL PERCNT( 4 )           ! Quartile and +/-2-sigma percentiles
       INTEGER PERMBA( NDF__MXDIM ) ! Backward-permutation indices
       INTEGER PERMFO( NDF__MXDIM ) ! Forward-permutation indices
       DOUBLE PRECISION PERVAL( 4 ) ! Values corresponding to percentiles
-      INTEGER RANGES( MAXRNG )   ! Exclusion ranges
+      INTEGER*8 RANGES( MAXRNG ) ! Exclusion ranges
       DOUBLE PRECISION RNGAVE    ! Mean histogram limits
       DOUBLE PRECISION RNGDIF    ! Extent of histogram limits
       DOUBLE PRECISION SKEW      ! Skewness of pixels in array
@@ -192,8 +192,8 @@
       DOUBLE PRECISION STDEVM    ! One-sided standard devn. from mode
       DOUBLE PRECISION SUM       ! Sum of pixels in array
       LOGICAL TBAD               ! Modifiable flag process bad pixels?
-      INTEGER UBND( 1 )          ! Upper bound of the whole array
-      INTEGER UBNDL( 1 )         ! Upper bound of a line section
+      INTEGER*8 UBND( 1 )        ! Upper bound of the whole array
+      INTEGER*8 UBNDL( 1 )       ! Upper bound of a line section
       REAL UPECNT( 4 )           ! Used percentiles
       LOGICAL USEMOD             ! Use the mode for clipping?
 
@@ -255,24 +255,24 @@
       RANGES( 2 ) = DIMS( DTAXIS )
 
 *  Obtain the workspace for the fits.
-      CALL PSX_CALLOC( AREA * ( ORDER + 1 ) * ( ORDER + 1 ),
+      CALL PSX_CALLOC8( AREA * ( ORDER + 1 ) * ( ORDER + 1 ),
      :                 '_DOUBLE', IPAS, STATUS )
 
-      CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_DOUBLE', IPBS, STATUS )
-      CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_DOUBLE', IPWRK1, STATUS )
-      CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_INTEGER', IPWRK2,
+      CALL PSX_CALLOC8( AREA * ( ORDER + 1 ), '_DOUBLE', IPBS, STATUS )
+      CALL PSX_CALLOC8( AREA * ( ORDER + 1 ), '_DOUBLE', IPWRK1, STATUS )
+      CALL PSX_CALLOC8( AREA * ( ORDER + 1 ), '_INTEGER', IPWRK2,
      :                 STATUS )
 
 *  Get some workspace for the subtracted array and a permuted version of
 *  it and the output array, a copy of the original data with rejected
 *  pixels flagged as bad, and a mask of rejected pixels.
-      CALL PSX_CALLOC( EL, '<HTYPE>', IPRES, STATUS )
-      CALL PSX_CALLOC( EL, '<HTYPE>', IPPERM, STATUS )
-      CALL PSX_CALLOC( EL, '<HTYPE>', IPPRES, STATUS )
-      CALL PSX_CALLOC( DTEL, '<HTYPE>', IPMASK, STATUS )
-      CALL PSX_CALLOC( DTEL, '<HTYPE>', IPWORK, STATUS )
-      CALL PSX_CALLOC( DTEL, '<HTYPE>', IPRLIN, STATUS )
-      CALL PSX_CALLOC( DTEL, '<HTYPE>', IPLINE, STATUS )
+      CALL PSX_CALLOC8( EL, '<HTYPE>', IPRES, STATUS )
+      CALL PSX_CALLOC8( EL, '<HTYPE>', IPPERM, STATUS )
+      CALL PSX_CALLOC8( EL, '<HTYPE>', IPPRES, STATUS )
+      CALL PSX_CALLOC8( DTEL, '<HTYPE>', IPMASK, STATUS )
+      CALL PSX_CALLOC8( DTEL, '<HTYPE>', IPWORK, STATUS )
+      CALL PSX_CALLOC8( DTEL, '<HTYPE>', IPRLIN, STATUS )
+      CALL PSX_CALLOC8( DTEL, '<HTYPE>', IPLINE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
       TBAD = BAD
 
@@ -288,8 +288,8 @@
 
 *  Copy the flagged (or the initial unflagged array on the first pass)
 *  array to what will become the subtracted-fit array.
-         CALL VEC_<T>TO<T>( BAD, EL, ARRAY, %VAL( CNF_PVAL( IPRES ) ),
-     :                      IERR, NERR, STATUS )
+         CALL VEC8_<T>TO<T>( BAD, EL, ARRAY, %VAL( CNF_PVAL( IPRES ) ),
+     :                       IERR, NERR, STATUS )
 
 *  Form the residuals from the fit.
          CALL KPS1_LFTS<T>( ORDER, DTAXIS, .TRUE., DIMS,
@@ -328,19 +328,19 @@
 *  Extract a detrend line and its residuals.
             LBNDL( 1 ) = 1 + ( I - 1 ) * DTEL
             UBNDL( 1 ) = I * DTEL
-            CALL KPG1_CPND<T>( LINDIM, LBND, UBND,
+            CALL KPG1_CPND8<T>( LINDIM, LBND, UBND,
      :                         %VAL( CNF_PVAL( IPPRES ) ),
      :                         LBNDL, UBNDL,
      :                         %VAL( CNF_PVAL( IPRLIN ) ), NEL, STATUS )
 
-            CALL KPG1_CPND<T>( LINDIM, LBND, UBND,
+            CALL KPG1_CPND8<T>( LINDIM, LBND, UBND,
      :                         %VAL( CNF_PVAL( IPPERM ) ),
      :                         LBNDL, UBNDL,
      :                         %VAL( CNF_PVAL( IPLINE ) ), NEL, STATUS )
 
 *  Derive the statistics of the residuals to the fit.  No clipping is
 *  applied here.  First the regular statistics...
-            CALL KPG_OSTA<T>( BAD, DTEL, %VAL( CNF_PVAL( IPRLIN ) ), 0,
+            CALL KPG_OSTA8<T>( BAD, DTEL, %VAL( CNF_PVAL( IPRLIN ) ), 0,
      :                      CLIP, ISTAT, DSTAT, ISTATC, DSTATC, STATUS )
             MEAN = DSTAT( 4 )
             STDEV = DSTAT( 5 )
@@ -351,7 +351,7 @@
 *  the baseline peak of the spectrum's histogram, whereas the median is
 *  far more likely to reside in that peak.  Thus clipping about the
 *  median will be more closely with respect to the baseline, as desired.
-            CALL KPG_STOS<T>( DTEL, %VAL( CNF_PVAL( IPRLIN ) ), NGOOD,
+            CALL KPG_STOS8<T>( DTEL, %VAL( CNF_PVAL( IPRLIN ) ), NGOOD,
      :                        1, VAL__BADR, MEDIAN, PERVAL, STATUS )
 
 *  Flag outliers beyond the clipping interval.
@@ -361,9 +361,9 @@
 
 *  Obtain the percentile limits within the line, using a fine histogram
 *  with iterations if there are extreme outliers.
-                  CALL KPG1_FRAC<T>( DTEL, %VAL( CNF_PVAL( IPRLIN ) ),
-     :                               2, FRAC, TBAD, CLFRAC, HRANGE,
-     :                               STATUS )
+                  CALL KPG1_FRAC8<T>( DTEL, %VAL( CNF_PVAL( IPRLIN ) ),
+     :                                2, FRAC, TBAD, CLFRAC, HRANGE,
+     :                                STATUS )
 
 *  Determine the line's mode between those data limits by forming
 *  the zeroth moment using neighbouring histogram bins about the most
@@ -383,7 +383,7 @@
                      UPECNT( 3 ) = PERCNT( 3 )
 
 *  Obtain the percentile values.
-                     CALL KPG_STOS<T>( DTEL, %VAL( CNF_PVAL( IPRLIN ) ),
+                     CALL KPG_STOS8<T>( DTEL, %VAL( CNF_PVAL( IPRLIN ) ),
      :                                 NGOOD, 4, PERCNT, MEDIAN, PERVAL,
      :                                 STATUS )
 
@@ -415,7 +415,7 @@
 *  Call routine to count up the values.
                      GMEAN = VAL_DTO<T>( .FALSE., MODE, STATUS )
                      IF ( SKEW .GT. 0D0 ) THEN
-                        CALL KPG1_NUMB<T>( BAD, .FALSE., .FALSE., DTEL,
+                        CALL KPG1_NUMB8<T>( BAD, .FALSE., .FALSE., DTEL,
      :                                     %VAL( CNF_PVAL( IPRLIN ) ),
      :                                     GMEAN, GNUMB, STATUS )
 
@@ -432,7 +432,7 @@
      :                                     NGOOD, 3, UPECNT,
      :                                     PERVAL, DMODE, STATUS )
                      ELSE
-                        CALL KPG1_NUMB<T>( BAD, .FALSE., .TRUE., DTEL,
+                        CALL KPG1_NUMB8<T>( BAD, .FALSE., .TRUE., DTEL,
      :                                     %VAL( CNF_PVAL( IPRLIN ) ),
      :                                     GMEAN, GNUMB, STATUS )
 
@@ -474,35 +474,35 @@
 
 *  Replace the values in the output array outside the range with the
 *  new values, otherwise copy from the input to the output NDF.
-               CALL KPG1_THRS<T>( BAD, DTEL, %VAL( CNF_PVAL( IPRLIN ) ),
-     :                            LOW, HIGH, VAL__BAD<T>, VAL__BAD<T>,
-     :                            %VAL( CNF_PVAL( IPWORK ) ),
-     :                            NREPLO, NREPHI, STATUS )
+               CALL KPG1_THRS8<T>( BAD, DTEL, %VAL( CNF_PVAL( IPRLIN ) ),
+     :                             LOW, HIGH, VAL__BAD<T>, VAL__BAD<T>,
+     :                             %VAL( CNF_PVAL( IPWORK ) ),
+     :                             NREPLO, NREPHI, STATUS )
 
                IF ( NREPLO .GT. 0 .OR. NREPHI .GT. 0 ) THEN
 
 *  Multiply the values by 0 to form a mask of the rejected elements.
-                  CALL KPG1_CMUL<T>( BAD, DTEL,
-     :                               %VAL( CNF_PVAL( IPWORK ) ),
-     :                               0.0D0, %VAL( CNF_PVAL( IPMASK ) ),
-     :                               NBAD, STATUS )
+                  CALL KPG1_CMUL8<T>( BAD, DTEL,
+     :                                %VAL( CNF_PVAL( IPWORK ) ),
+     :                                0.0D0, %VAL( CNF_PVAL( IPMASK ) ),
+     :                                NBAD, STATUS )
 
 *  Add the mask to the array being fitted.
-                  CALL VEC_ADD<T>( BAD, DTEL,
+                  CALL VEC8_ADD<T>( BAD, DTEL,
      :                             %VAL( CNF_PVAL( IPLINE ) ),
      :                             %VAL( CNF_PVAL( IPMASK ) ),
      :                             %VAL( CNF_PVAL( IPWORK ) ),
      :                             IERR, NERR, STATUS )
 
 *  Copy the flagged array to the returned, but permuted, array.
-                  CALL VEC_<T>TO<T>( BAD, DTEL,
+                  CALL VEC8_<T>TO<T>( BAD, DTEL,
      :                               %VAL( CNF_PVAL( IPWORK ) ),
      :                               %VAL( CNF_PVAL( IPLINE ) ),
      :                               IERR, NERR, STATUS )
 
 *  Paste the line with flagged features back into the raw permuted data.
                   OFFSET( 1 ) = ( I - 1 ) * DTEL
-                  CALL KPG1_PAST<T>( .FALSE., .TRUE., OFFSET, IDIMS,
+                  CALL KPG1_PAST8<T>( .FALSE., .TRUE., OFFSET, IDIMS,
      :                               DTEL, %VAL( CNF_PVAL( IPLINE ) ),
      :                               ODIMS, EL,
      :                               %VAL( CNF_PVAL( IPPERM ) ),

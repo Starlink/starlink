@@ -15,7 +15,8 @@ c         subset of data points y(j) such that
 c             t(j) < y(j) < t(j+k+1), j=1,2,...,n-k-1
 c  ..
 c  ..scalar arguments..
-      integer m,n,k,ier
+      integer n,k,ier
+      integer*8 m
 c  ..array arguments..
       real x(m),t(n)
 c  ..local scalars..

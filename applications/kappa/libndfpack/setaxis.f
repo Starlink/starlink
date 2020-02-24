@@ -332,7 +332,7 @@
       DOUBLE PRECISION DVALUE    ! Replacement value for d.p. data
       DOUBLE PRECISION DWORK( 2 )! Work array for linear fitting
       INTEGER ACTVAL             ! State of parameter NEWVAL
-      INTEGER ADIMS( NDF__MXDIM )! Axis dimensions
+      INTEGER*8 ADIMS( NDF__MXDIM )! Axis dimensions
       INTEGER AXPNTR( 1 )        ! Pointer to mapped array component
       INTEGER EL                 ! Number of mapped values
       INTEGER FD                 ! File descriptor
@@ -370,7 +370,7 @@
       INTEGER PMAP2              ! PermMap to select 1 output axis from MAP0
       INTEGER PNTRA              ! Pointer to mapped axis values
       INTEGER PNTRW              ! Pointer to mapped pixel indices and/or axis centres (work space)
-      INTEGER RANGES( 2 )        ! The linear fit ranges in pixels
+      INTEGER*8 RANGES( 2 )      ! The linear fit ranges in pixels
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of the NDF
       LOGICAL LOOP               ! Loop for another section to replace
       LOGICAL SUBCEN             ! Substitute array centres in exprs?

@@ -558,7 +558,7 @@
          ROFF = 0.0D0
 
       ELSE
-         CALL PAR_GDR0I( 'BOX', 5, 3, 1E6, .FALSE., BOX, STATUS )
+         CALL PAR_GDR0I( 'BOX', 5, 3, 1000000, .FALSE., BOX, STATUS )
          CALL PSX_CALLOC( EL, '_DOUBLE', IPCR, STATUS )
 
          CALL KPG1_CRMAPD( DIMS( 1 ), DIMS( 2 ), %VAL( CNF_PVAL(IPIN) ),
@@ -771,7 +771,7 @@
          SHIFT( 1 ) = C( 1 )
          SHIFT( 2 ) = C( 4 )
          SM = AST_SHIFTMAP( 2, SHIFT, ' ', STATUS )
-         MAPIO = AST_CMPMAP( MM, SM, 1, ' ', STATUS )
+         MAPIO = AST_CMPMAP( MM, SM, .TRUE., ' ', STATUS )
 
 *  Invert it to get the input->reference Mapping.
          CALL AST_INVERT( MAPIO, STATUS )

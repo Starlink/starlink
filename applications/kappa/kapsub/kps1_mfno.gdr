@@ -16,22 +16,22 @@
 
 *  Description:
 *     This routine calculates the standard deviation in segments of a
-*     a trend vector to determine the clipped mean noise about the 
+*     a trend vector to determine the clipped mean noise about the
 *     curving trend.  This is used by MFITTREND prior to spline fitting
 *     to be able to set a sensible threshold for knot creation.
 
 *  Arguments:
-*     EL = INTEGER (Given)
+*     EL = INTEGER*8 (Given)
 *        The number of elements in the trend.
 *     ARRAY( EL ) = ? (Given)
 *        The trend array whose noise is to be determined.
 *     GRIDCO( EL ) = ? (Given)
 *        The original grid co-ordinate of the array elements.  It is
-*        used to ensure that segments contain adjacent or at least 
+*        used to ensure that segments contain adjacent or at least
 *        neighbouring elements.
-*     NSEG = INTEGER (Returned)
-*        The number of segments s to divide the trend array.  Each 
-*        segment should have a gradient that is small compared with the 
+*     NSEG = INTEGER*8 (Returned)
+*        The number of segments s to divide the trend array.  Each
+*        segment should have a gradient that is small compared with the
 *        noise over the whole of the trend.
 *     SIGMA( NSEG ) = ? (Returned)
 *        The standard deviation in each segment.
@@ -46,7 +46,7 @@
 *  Notes:
 *     - There is a routine for each numeric data type: replace "x" in
 *     the routine name by D or R as appropriate.  The ARRAY, GRIDCO,
-*     SIGMA, and NOISE arguments supplied to the routine must have the 
+*     SIGMA, and NOISE arguments supplied to the routine must have the
 *     data type specified.
 
 *  Copyright:
@@ -76,6 +76,8 @@
 *  History:
 *     2008 May 29 (MJC):
 *        Original version.
+*     20-FEB-2020 (DSB):
+*        Support huge arrays
 *     {enter_further_changes_here}
 
 *-
@@ -89,10 +91,10 @@
       INCLUDE 'NDF_PAR'          ! NDF public constants
 
 *  Arguments Given:
-      INTEGER EL
+      INTEGER*8 EL
       <TYPE> ARRAY( EL )
       <TYPE> GRIDCO( EL )
-      INTEGER NSEG
+      INTEGER*8 NSEG
 
 *  Arguments Returned:
       <TYPE> SIGMA( NSEG )
@@ -104,11 +106,11 @@
 
 *  Local Variables:
       REAL CLIP                  ! Clipping factor
-      INTEGER I                  ! Loop counter
-      INTEGER K                  ! Segment index
-      INTEGER KP                 ! Previous-segment index
+      INTEGER*8 I                ! Loop counter
+      INTEGER*8 K                ! Segment index
+      INTEGER*8 KP               ! Previous-segment index
       DOUBLE PRECISION MEAN      ! Mean rms residual
-      INTEGER NEL                ! Number of elemens in a segmwent
+      INTEGER*8 NEL              ! Number of elemens in a segmwent
       DOUBLE PRECISION STDEV     ! Standard deviation rms residual
       DOUBLE PRECISION SUM       ! Sum of rms residuals
       DOUBLE PRECISION SUMSQ     ! Sum of rms residuals squared
@@ -150,15 +152,15 @@
          IF ( K .NE. KP .OR. I .EQ. EL ) THEN
 
 *  Before calculating the standard deviation, check for only one
-*  contributing pixel, and rounding errors producing a negative 
-*  variance value.  In all these cases, calculate a standard deviation 
+*  contributing pixel, and rounding errors producing a negative
+*  variance value.  In all these cases, calculate a standard deviation
 *  value of zero.
             IF ( WEIGHT( KP ) .GT. 0 ) MEAN = SUM / DBLE( WEIGHT( KP ) )
             STDEV = SUMSQ - ( MEAN * MEAN * DBLE( WEIGHT( KP ) ) )
-            IF ( ( WEIGHT( KP ) .EQ. 1 ) .OR. 
+            IF ( ( WEIGHT( KP ) .EQ. 1 ) .OR.
      :           ( STDEV .LT. 0.0D0 ) ) THEN
                SIGMA( KP ) = VAL__BAD<T>
- 
+
 *  Otherwise, calculate the standard deviation normally.
             ELSE
                SIGMA( KP ) = SQRT( STDEV / DBLE( WEIGHT( KP ) - 1 ) )
@@ -173,7 +175,7 @@
          END IF
 
          IF ( ARRAY( I ) .NE. VAL__BAD<T> ) THEN
- 
+
 *  Convert the array values to double precision, count them, and form
 *  sums for the statistics.
             WEIGHT( K ) = WEIGHT( K ) + 1
@@ -188,7 +190,7 @@
       SUMW = 0.0D0
       DO K = 1, NSEG
          IF ( SIGMA( K ) .NE. VAL__BAD<T> ) THEN
- 
+
 *  Convert the array values to double precision, count them, and form
 *  sums for the statistics.
             SUMW = SUMW + WEIGHT( K )
@@ -198,14 +200,14 @@
       END DO
 
 *  Before calculating the standard deviation, check for only one
-*  contributing segment, and rounding errors producing a negative 
-*  variance value.  In all these cases, calculate a standard deviation 
+*  contributing segment, and rounding errors producing a negative
+*  variance value.  In all these cases, calculate a standard deviation
 *  value of zero.
       IF ( SUMW .GT. 0 ) MEAN = SUM / DBLE( SUMW )
       STDEV = SUMSQ - ( MEAN * MEAN * DBLE( SUMW ) )
       IF ( ( SUMW .EQ. 1 ) .OR. ( STDEV .LT. 0.0D0 ) ) THEN
          NOISE = VAL__BAD<T>
- 
+
 *  Otherwise, calculate the standard deviation normally.
       ELSE
          STDEV = SQRT( STDEV / DBLE( SUMW - 1 ) )
@@ -224,7 +226,7 @@
          SUMW = 0.0D0
          DO K = 1, NSEG
             IF ( SIGMA( K ) .NE. VAL__BAD<T> ) THEN
- 
+
 *  Convert the array values to double precision, count them, and form
 *  sums for the statistics.
                SUMW = SUMW + WEIGHT( K )

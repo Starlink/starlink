@@ -53,6 +53,8 @@
 *  History:
 *     21-JAN-2008 (DSB):
 *        Original version.
+*     20-FEB-2020 (DSB):
+*        Call 8-byte version to do the work.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -77,15 +79,11 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER I                  ! Array index
+      INTEGER*8 NEL8
 *.
 
-*  Check the inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Just do it.
-      DO I = 1, NEL
-         OUT( I ) = IN( I )
-      END DO
+*  Convert INTEGER to INTEGER*8 and call the 8-byte version.
+      NEL8 = NEL
+      CALL KPG1_COPYC8( NEL8, IN, OUT, STATUS )
 
       END

@@ -74,6 +74,7 @@
 *     supported.
 *     -  All non-complex numeric data types can be handled.  The data
 *     type of the input pixels is preserved in the output NDF.
+*     -  Huge NDF are supported.
 
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
@@ -118,6 +119,8 @@
 *        Trim trailing blanks from output NDF character components.
 *     2012 May 9 (MJC):
 *        Add _INT64 support.
+*     24-FEB-2020 (DSB):
+*        Support huge NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -150,31 +153,31 @@
                                  ! component of linear mapping
       DOUBLE PRECISION OFFSET( NDF__MXDIM ) ! Translation component of
                                  ! linear mapping
-      INTEGER DIM( NDF__MXDIM )  ! Input NDF dimension sizes
-      INTEGER DIMO( NDF__MXDIM ) ! Output NDF dimension sizes
-      INTEGER EL                 ! Number of elements mapped
+      INTEGER*8 DIM( NDF__MXDIM )! Input NDF dimension sizes
+      INTEGER*8 DIMO( NDF__MXDIM ) ! Output NDF dimension sizes
+      INTEGER*8 EL               ! Number of elements mapped
       INTEGER I                  ! Axis index
       INTEGER IBASE              ! Index of Base Frame
       INTEGER ICOMP              ! Loop counter for array components
       INTEGER ICURR              ! Index of original Current Frame
       INTEGER IDIM               ! Input axis index
-      INTEGER IERR               ! Index of first numerical error
+      INTEGER*8 IERR             ! Index of first numerical error
       INTEGER INDF1              ! Input NDF identifier
       INTEGER INDF2              ! Output NDF identifier
       INTEGER IP1                ! Pointer to mapped input array
       INTEGER IP2                ! Pointer to mapped output array
       INTEGER IWCS               ! WCS FrameSet pointer
       INTEGER J                  ! Axis index
-      INTEGER LBND( NDF__MXDIM ) ! Lower pixel index bounds in input
-      INTEGER LBNDO( NDF__MXDIM )! Lower pixel index bounds in output
+      INTEGER*8 LBND( NDF__MXDIM ) ! Lower pixel index bounds in input
+      INTEGER*8 LBNDO( NDF__MXDIM )! Lower pixel index bounds in output
       INTEGER MINAX              ! Minimum allowed number of Frame axes
       INTEGER NAX                ! Number of Frame axes
       INTEGER NC                 ! No. characters in text buffer
       INTEGER NDIM               ! Number of NDF dimensions
-      INTEGER NERR               ! Number of numerical errors
+      INTEGER*8 NERR             ! Number of numerical errors
       INTEGER PERM( NDF__MXDIM ) ! Axis permutation array
-      INTEGER UBND( NDF__MXDIM ) ! Upper pixel index bounds in input
-      INTEGER UBNDO( NDF__MXDIM )! Upper pixel index bounds in output
+      INTEGER*8 UBND( NDF__MXDIM ) ! Upper pixel index bounds in input
+      INTEGER*8 UBNDO( NDF__MXDIM )! Upper pixel index bounds in output
       LOGICAL BAD                ! Bad-pixel flag
       LOGICAL THERE              ! Component is defined?
 
@@ -193,7 +196,7 @@
 
 *  Obtain the input NDF and determine its bounds.
       CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
-      CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+      CALL NDF_BOUND8( INDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Get the axis permutation array.
       PERM( 1 ) = -1
@@ -230,7 +233,7 @@
       CALL LPG_PROP( INDF1, 'Units', 'OUT', INDF2, STATUS )
 
 *  Set the bounds of the output NDF.
-      CALL NDF_SBND( NDIM, LBNDO, UBNDO, INDF2, STATUS )
+      CALL NDF_SBND8( NDIM, LBNDO, UBNDO, INDF2, STATUS )
 
 *  Process the main NDF array components.
 *  =====================================
@@ -249,9 +252,9 @@
 *  arrays for access using this type.
          IF ( THERE ) THEN
             CALL NDF_TYPE( INDF1, COMP( ICOMP ), TYPE, STATUS )
-            CALL NDF_MAP( INDF1, COMP( ICOMP ), TYPE, 'READ', IP1,
+            CALL NDF_MAP8( INDF1, COMP( ICOMP ), TYPE, 'READ', IP1,
      :                     EL, STATUS )
-            CALL NDF_MAP( INDF2, COMP( ICOMP ), TYPE, 'WRITE', IP2,
+            CALL NDF_MAP8( INDF2, COMP( ICOMP ), TYPE, 'WRITE', IP2,
      :                     EL, STATUS )
 
 *  Call the appropriate routine to process the array, depending on its
@@ -340,50 +343,50 @@
             IF ( THERE ) THEN
                CALL NDF_ATYPE( INDF1, ACOMP( ICOMP ), IDIM, TYPE,
      :                         STATUS )
-               CALL NDF_AMAP( INDF1, ACOMP( ICOMP ), IDIM, TYPE, 'READ',
-     :                        IP1, EL, STATUS )
-               CALL NDF_AMAP( INDF2, ACOMP( ICOMP ), I, TYPE, 'WRITE',
-     :                        IP2, EL, STATUS )
+               CALL NDF_AMAP8( INDF1, ACOMP( ICOMP ), IDIM, TYPE,
+     :                         'READ', IP1, EL, STATUS )
+               CALL NDF_AMAP8( INDF2, ACOMP( ICOMP ), I, TYPE, 'WRITE',
+     :                         IP2, EL, STATUS )
 
 *  Call the appropriate routine to process the array, depending on its
 *  numeric type.
                IF ( TYPE .EQ. '_BYTE' ) THEN
-                  CALL VEC_BTOB( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
+                  CALL VEC8_BTOB( .FALSE., EL, %VAL( CNF_PVAL(IP1) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-                  CALL VEC_UBTOUB( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
+                  CALL VEC8_UBTOUB( .FALSE., EL, %VAL( CNF_PVAL(IP1) ),
      :                             %VAL( CNF_PVAL( IP2 ) ),
      :                             IERR, NERR, STATUS )
 
                ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL VEC_DTOD( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
+                  CALL VEC8_DTOD( .FALSE., EL, %VAL( CNF_PVAL(IP1) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-                  CALL VEC_ITOI( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
+                  CALL VEC8_ITOI( .FALSE., EL, %VAL( CNF_PVAL(IP1) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF ( TYPE .EQ. '_INT64' ) THEN
-                  CALL VEC_KTOK( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
+                  CALL VEC8_KTOK( .FALSE., EL, %VAL( CNF_PVAL(IP1) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-                  CALL VEC_RTOR( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
+                  CALL VEC8_RTOR( .FALSE., EL, %VAL( CNF_PVAL(IP1) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-                  CALL VEC_WTOW( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
+                  CALL VEC8_WTOW( .FALSE., EL, %VAL( CNF_PVAL(IP1) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-                  CALL VEC_UWTOUW( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
+                  CALL VEC8_UWTOUW( .FALSE., EL, %VAL( CNF_PVAL(IP1) ),
      :                             %VAL( CNF_PVAL( IP2 ) ),
      :                             IERR, NERR, STATUS )
 

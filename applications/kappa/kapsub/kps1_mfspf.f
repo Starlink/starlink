@@ -59,12 +59,12 @@
 *        centroid).
 *     SCALE = LOGICAL (Given)
 *        If true the data values will be scaled to -1 to +1 range.
-*     NWS = INTEGER (Given)
+*     NWS = INTEGER*8 (Given)
 *        The dimension of the WS work space which must be at least
 *        4 * (MAXVAL + 4 * NKNOT).
-*     EL = INTEGER (Given)
+*     EL = INTEGER*8 (Given)
 *        The number of data points to be fitted by least-squares.
-*     MAXVAL = INTEGER (Given)
+*     MAXVAL = INTEGER*8 (Given)
 *        The maximum dimension of the data, weight and co-ordinate
 *        vectors.  This should be no less than EL + 2.
 *     X( MAXVAL ) = REAL (Given and Returned)
@@ -73,7 +73,7 @@
 *        The values at the given positions.
 *     W( MAXVAL ) = REAL (Given and Returned)
 *        The weights at the given positions.
-*     PERM( MAXVAL ) = REAL (Given and Returned)
+*     PERM( MAXVAL ) = INTEGER*8 (Given and Returned)
 *        Workspace for permutation index need to sort the data into
 *        ascending position.
 *     KNOT( MXKNOT ) = REAL (Returned)
@@ -155,6 +155,8 @@
 *        Added FKNOT argument.
 *     2008 May 27 (MJC):
 *        Added iteration to smoothing factor.
+*     20-FEB-2020 (DSB):
+*        Support huge arrays.
 *     {enter_further_changes_here}
 
 *-
@@ -175,9 +177,9 @@
       REAL FKNOT( NKNOT )
       REAL CMIN, CMAX            ! X bounds of the fit
       LOGICAL SCALE              ! Data values are to be scaled
-      INTEGER NWS                ! Dimension of workspace
-      INTEGER EL                 ! Number of points for evaluation
-      INTEGER MAXVAL             ! Dimension of the data vectors
+      INTEGER*8 NWS              ! Dimension of workspace
+      INTEGER*8 EL               ! Number of points for evaluation
+      INTEGER*8 MAXVAL           ! Dimension of the data vectors
 
 *  Arguments Given and Returned:
       REAL X( MAXVAL )           ! Co-ordinates of the data
@@ -185,7 +187,7 @@
       REAL W( MAXVAL )           ! Data weights
 
 *  Arguments Returned:
-      INTEGER PERM( MAXVAL )     ! Workspace
+      INTEGER*8 PERM( MAXVAL )   ! Workspace
       REAL KNOT( MXKNOT )        ! Positions of the knots in x
       REAL COEFF( MXKNOT )       ! B-spline coefficients
       INTEGER NCOEF              ! Number of spline coefficients
@@ -209,15 +211,15 @@
       INTEGER CONSEQ             ! Number of consecutive s giving
                                  ! constant sum of squares of residuals
       REAL ECR( 2 )              ! Effective x limits
-      INTEGER I                  ! Loop counter
+      INTEGER*8 I                ! Loop counter
       INTEGER IFAIL              ! PDA error status
-      INTEGER IOPT               ! PDA_CURFIT flag
+      INTEGER IOPT               ! PDA8_CURFIT flag
       REAL MAXV                  ! Maximum data value
       REAL MINV                  ! Minimum data value
-      INTEGER NDAT               ! Number of data, including clamps
+      INTEGER*8 NDAT             ! Number of data, including clamps
       INTEGER NITER              ! Number of iterations
       REAL NOISE                 ! Clipped-mean noise in trend
-      INTEGER NSEG               ! Number of data, including clamps
+      INTEGER*8 NSEG             ! Number of data, including clamps
       REAL PSFACT                ! Previous smoothing factor
       REAL PSIGMA                ! Previous sum of squares of residuals
       REAL SFACT                 ! Smoothing factor (s)
@@ -242,7 +244,7 @@
 *  error and exit.  The threshold is the order plus two.
       IF ( EL .LT. 5 ) THEN
          STATUS = SAI__ERROR
-         CALL MSG_SETI( 'EL', EL )
+         CALL MSG_SETK( 'EL', EL )
          CALL ERR_REP( 'KPS1_MFSPF_INSFD',
      :     'KPS1_MFSPF: Insufficient data --- ^EL bins.', STATUS )
          GO TO 999
@@ -269,17 +271,17 @@
       ECR( 1 ) = CMIN - 1.0
       ECR( 2 ) = CMAX + 1.0
 
-*  PDA_CURFIT demands that the positions be in ascending order.
+*  PDA8_CURFIT demands that the positions be in ascending order.
 *  First find the permutation of the co-ordinates, and then apply the
 *  permutation to the co-ordinates.  This should be an inexpensive
 *  operation as the supplied co-ordinates are expected to be in
 *  ascending order already, so it should just place the (EL+1)th
 *  at the start.
       IFAIL = 0
-      CALL PDA_QSIAR( NDAT, X, PERM )
-      CALL PDA_RINPR( PERM, NDAT, X, IFAIL )
-      CALL PDA_RINPR( PERM, NDAT, Z, IFAIL )
-      CALL PDA_RINPR( PERM, NDAT, W, IFAIL )
+      CALL PDA8_QSIAR( NDAT, X, PERM )
+      CALL PDA8_RINPR( PERM, NDAT, X, IFAIL )
+      CALL PDA8_RINPR( PERM, NDAT, Z, IFAIL )
+      CALL PDA8_RINPR( PERM, NDAT, W, IFAIL )
       IF ( IFAIL .NE. 0 ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'KPS1_MFSPF_SORTERR', 'Error sorting data '/
@@ -289,7 +291,7 @@
       END IF
 
 *  Exit in case something has gone wrong before we attempt to use
-*  PDA_CURFIT.
+*  PDA8_CURFIT.
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Scale the data to improve the fitting.
@@ -343,16 +345,16 @@
 *  Obtain the cubic spline coefficients of the least-squares fit.
 *  The -1 means that we supply the interior knots and a least-squares
 *  fit is performed.  The 3 is the order.
-         CALL PDA_CURFIT( -1, NDAT, X, Z, W, ECR( 1 ), ECR( 2 ), 3,
-     :                    SFACT, MXKNOT, NCOEF, KNOT, COEFF, SIGMA, WS,
-     :                    NWS, IWS, IFAIL )
+         CALL PDA8_CURFIT( -1, NDAT, X, Z, W, ECR( 1 ), ECR( 2 ), 3,
+     :                     SFACT, MXKNOT, NCOEF, KNOT, COEFF, SIGMA, WS,
+     :                     NWS, IWS, IFAIL )
 
 *  Check for an error.
          IF ( IFAIL .GT. 0 ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETI( 'IFAIL', IFAIL )
             CALL ERR_REP( 'KPS1_MFSPF_PDAS',
-     :           'KPS1_MFSPF: Error ^IFAIL returned by PDA_CURFIT '/
+     :           'KPS1_MFSPF: Error ^IFAIL returned by PDA8_CURFIT '/
      :           /'fitting the interpolation spline curve.', STATUS )
             GO TO 999
          END IF
@@ -371,9 +373,9 @@
 *  supplying a very large smoothing factor.
          SIGMA = 0.0
          NCOEF = 0
-         CALL PDA_CURFIT( 0, NDAT, X, Z, W, ECR( 1 ), ECR( 2 ), 3,
-     :                    VAL__MAXR, MXKNOT, NCOEF, KNOT, COEFF, SMAX,
-     :                    WS, NWS, IWS, IFAIL )
+         CALL PDA8_CURFIT( 0, NDAT, X, Z, W, ECR( 1 ), ECR( 2 ), 3,
+     :                     VAL__MAXR, MXKNOT, NCOEF, KNOT, COEFF, SMAX,
+     :                     WS, NWS, IWS, IFAIL )
 
 *  We want to apply at least some smoothing.
          SMAX = SMAX * 0.99
@@ -389,8 +391,8 @@
 *  Use workspace for the calculations, although we could declare some
 *  50-element arrays.
          NSEG = MAX( 1, MIN( 50, EL / 5 ) )
-         CALL PSX_CALLOC( NSEG, '_REAL', SPTR, STATUS )
-         CALL PSX_CALLOC( NSEG, '_INTEGER', WPTR, STATUS )
+         CALL PSX_CALLOC8( NSEG, '_REAL', SPTR, STATUS )
+         CALL PSX_CALLOC8( NSEG, '_INTEGER', WPTR, STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
          CALL KPS1_MFNOR( NDAT, Z, X, NSEG, %VAL( CNF_PVAL( SPTR ) ),
@@ -421,9 +423,9 @@
          IF ( SMOOTH ) THEN
 
 *  Get workspace for the smoothing and smoothed data.
-            CALL PSX_CALLOC( NDAT, '_REAL', SMPTR, STATUS )
-            CALL PSX_CALLOC( NDAT, '_REAL', SUMPTR, STATUS )
-            CALL PSX_CALLOC( NDAT, '_INTEGER', WPTR, STATUS )
+            CALL PSX_CALLOC8( NDAT, '_REAL', SMPTR, STATUS )
+            CALL PSX_CALLOC8( NDAT, '_REAL', SUMPTR, STATUS )
+            CALL PSX_CALLOC8( NDAT, '_INTEGER', WPTR, STATUS )
             IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  This assumes adjacent pixels are contiguous, which may not be the
@@ -431,16 +433,16 @@
 *  and this approximation should not matter across the broad fit.
 *  We also assume that the smoothed trend does not have any bad
 *  pixels, since the original data will not contain any.
-            CALL KPG1_BLOCR( .FALSE., .FALSE., .FALSE., NDAT, 1, Z,
-     :                       5, 1, 1, %VAL( CNF_PVAL( SMPTR ) ),
-     :                       BADOUT, %VAL( CNF_PVAL( SUMPTR ) ),
-     :                       %VAL( CNF_PVAL( WPTR ) ), STATUS )
+            CALL KPG1_BLOC8R( .FALSE., .FALSE., .FALSE., NDAT, 1_8,
+     :                        Z, 5, 1, 1, %VAL( CNF_PVAL( SMPTR ) ),
+     :                        BADOUT, %VAL( CNF_PVAL( SUMPTR ) ),
+     :                        %VAL( CNF_PVAL( WPTR ) ), STATUS )
             CALL PSX_FREE( SUMPTR, STATUS )
             CALL PSX_FREE( WPTR, STATUS )
 
 *  Re-estimate the SMIN.
-            CALL PSX_CALLOC( NSEG, '_REAL', SPTR, STATUS )
-            CALL PSX_CALLOC( NSEG, '_INTEGER', WPTR, STATUS )
+            CALL PSX_CALLOC8( NSEG, '_REAL', SPTR, STATUS )
+            CALL PSX_CALLOC8( NSEG, '_INTEGER', WPTR, STATUS )
             IF ( STATUS .NE. SAI__OK ) GOTO 999
 
             CALL KPS1_MFNOR( NDAT, %VAL( CNF_PVAL( SMPTR ) ), X, NSEG,
@@ -459,13 +461,13 @@
 *  a) We do not want to fit to the noise hence the SMIN lower limit
 *  for the smoothing factor.
 *  b) The maximum number of knots in the calling routine is high to
-*  avoid PDA_CURFIT complaining that it does not have the workspace
+*  avoid PDA8_CURFIT complaining that it does not have the workspace
 *  capacity, but to avoid fitting to small scale features and noise
 *  restrict the actual maximum number of knots.  About 20 interior
 *  with the 8 exterior knots should be more than enough.
 *  c) The maximum number of iterations.  In practice this should not
 *  be reached.
-*  d) PDA_CURFIT does not return the error indiciating that the
+*  d) PDA8_CURFIT does not return the error indiciating that the
 *  smoothing factor is too low or the maximum number of knots is too
 *  few.
          TKNOT = NKNOT + 8
@@ -486,17 +488,19 @@
             SIGMA = 0.0
             NCOEF = 0
             IF ( SMOOTH ) THEN
-               CALL PDA_CURFIT( IOPT, NDAT, X,
-     :                          %VAL( CNF_PVAL( SMPTR ) ), W, ECR( 1 ),
-     :                          ECR( 2 ), 3, SFACT, MXKNOT, NCOEF, KNOT,
-     :                          COEFF, SIGMA, WS, NWS, IWS, IFAIL )
+               CALL PDA8_CURFIT( IOPT, NDAT, X,
+     :                           %VAL( CNF_PVAL( SMPTR ) ), W, ECR( 1 ),
+     :                           ECR( 2 ), 3, SFACT, MXKNOT, NCOEF,
+     :                           KNOT, COEFF, SIGMA, WS, NWS, IWS,
+     :                           IFAIL )
             ELSE
-               CALL PDA_CURFIT( IOPT, NDAT, X, Z, W, ECR( 1 ), ECR( 2 ),
-     :                          3, SFACT, MXKNOT, NCOEF, KNOT, COEFF,
-     :                          SIGMA, WS, NWS, IWS, IFAIL )
+               CALL PDA8_CURFIT( IOPT, NDAT, X, Z, W, ECR( 1 ),
+     :                           ECR( 2 ), 3, SFACT, MXKNOT, NCOEF,
+     :                           KNOT, COEFF, SIGMA, WS, NWS, IWS,
+     :                           IFAIL )
             END IF
 
-*  Attempt to find the best smoothing factor.  PDA_CURFIT seems to
+*  Attempt to find the best smoothing factor.  PDA8_CURFIT seems to
 *  have quanta, where a series of smoothing factors give constant
 *  fit residuals.  We want to the pick the largest factor for a
 *  constant sum of the residuals, or until the maximum number of knots
@@ -542,14 +546,14 @@
 *  Now use the roughly determined smoothing factor with recalculated
 *  knot positions.
          IF ( SMOOTH ) THEN
-            CALL PDA_CURFIT( 0, NDAT, X, %VAL( CNF_PVAL( SMPTR ) ), W,
-     :                       ECR( 1 ), ECR( 2 ), 3, SFACT, TKNOT,
-     :                       NCOEF, KNOT, COEFF, SIGMA, WS, NWS, IWS,
-     :                       IFAIL )
+            CALL PDA8_CURFIT( 0, NDAT, X, %VAL( CNF_PVAL( SMPTR ) ), W,
+     :                        ECR( 1 ), ECR( 2 ), 3, SFACT, TKNOT,
+     :                        NCOEF, KNOT, COEFF, SIGMA, WS, NWS, IWS,
+     :                        IFAIL )
          ELSE
-            CALL PDA_CURFIT( 0, NDAT, X, Z, W, ECR( 1 ), ECR( 2 ), 3,
-     :                       SFACT, TKNOT, NCOEF, KNOT, COEFF, SIGMA,
-     :                       WS, NWS, IWS, IFAIL )
+            CALL PDA8_CURFIT( 0, NDAT, X, Z, W, ECR( 1 ), ECR( 2 ), 3,
+     :                        SFACT, TKNOT, NCOEF, KNOT, COEFF, SIGMA,
+     :                        WS, NWS, IWS, IFAIL )
          END IF
 
 *  Check for an error.
@@ -557,7 +561,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETI( 'IFAIL', IFAIL )
             CALL ERR_REP( 'KPS1_MFSPF_PDA',
-     :           'KPS1_MFSPF: Error ^IFAIL returned by PDA_CURFIT '/
+     :           'KPS1_MFSPF: Error ^IFAIL returned by PDA8_CURFIT '/
      :           /'fitting the smoothing spline curve.', STATUS )
             GO TO 999
          END IF

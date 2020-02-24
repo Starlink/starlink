@@ -33,7 +33,7 @@
 *        The axis index of the dimension that is being detrended.
 *     NDIM = INTEGER (Given)
 *        The number of NDF dimensions.
-*     DIMS( NDIM ) = INTEGER (Given)
+*     DIMS( NDIM ) = INTEGER*8 (Given)
 *        The dimensions of the NDF.
 *     NCSECT = INTEGER (Given)
 *        The number of characters in the returned section.
@@ -93,7 +93,7 @@
       CHARACTER * ( * ) PARNAM
       INTEGER AXIS
       INTEGER NDIM
-      INTEGER DIMS( NDIM )
+      INTEGER*8 DIMS( NDIM )
 
 *  Arguments Returned:
       INTEGER NCSECT

@@ -1,0 +1,261 @@
+      SUBROUTINE KPG_STOS8<T>( EL, ARRAY, NGOOD, NUMPER, PERCNT, MEDIAN,
+     :                        PERVAL, STATUS )
+*+
+*  Name:
+*     KPG_STOS8x
+
+*  Purpose:
+*     Calculates accurate order statistics by sorting an array
+
+*  Language:
+*     Starlink Fortran 77.
+
+*  Invocation:
+*     CALL KPG_STOS8x( EL, ARRAY, NGOOD, NUMPER, PERCNT,
+*                     MEDIAN, PERVAL, STATUS )
+
+*  Description:
+*     This routine calculates the median and optionally up to
+*     one-hundred percentiles.  It achieves this by using Quicksort
+*     to order the good array values, and hence provide correct values
+*     (unlike the faster histogram approximation used by KPG1_HSTAx).
+
+*  Arguments:
+*     EL = INTEGER*8 (Given)
+*        Total number of pixels in the array.
+*     ARRAY( EL ) = ? (Given)
+*        The vectorised array of values whose ordered statistics are
+*        to be calculated.
+*     NGOOD = INTEGER*8 (Given)
+*        Number of valid pixels which contributed to the statistics.
+*     NUMPER = INTEGER (Given)
+*        Number of percentiles values to report.  This should be in
+*        the range 1 to 100.  Set this to 1 and PERCNT(1) to VAL__BADR
+*        if percentiles are not required.
+*     PERCNT( NUMPER ) = REAL (Given)
+*        The percentiles to derive.  Valid percentiles must be in the
+*        range 0.0 to 100.0, and preferably in ascending order.  If the
+*        first element is set to the bad value, then no percentiles are
+*        calculated.
+*     MEDIAN = DOUBLE PRECISION (Returned)
+*        Median value.  If there is an even number of good values
+*        present in the array, the median is the average of the middle
+*        pair.
+*     PERVAL( NUMPER ) = DOUBLE PRECISION (Returned)
+*        Percentile values corresponding to the percentile fractions
+*        in PERCNT.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for byte, double-precision, integer, 64-bit
+*     integer, real, and word data types: replace "x" in the routine name
+*     by B, D, I, K, R, or W as  appropriate.  The data type of the
+*     ARRAY argument must match the particular routine used.
+*     -  If the value of NGOOD is not at least two, then this routine
+*     will abort.  The median and percentiles will have the bad value.
+*     -  The sorting is recorded in an index leaving the order of the
+*     supplied array values intact.
+
+*  Copyright:
+*     Copyright (C) 2009, 2013 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2009 August 20 (MJC):
+*        Original version adapted from KAPPA STATS.
+*     2009 August 21 (MJC):
+*        Exclude one- and two-byte integer types as sorting code
+*        does not support them.  Fix pasting bug involving KPG1_FLOOR.
+*     2009 September 28 (MJC):
+*        Do not report an error when NGOOD is too small.
+*     2013 January 4 (MJC):
+*        Protect against an index of zero for low percentiles.
+*     2013 August 23 (MJC):
+*        Do not revise readonly argument NGOOD; use a local variable
+*        instead.  Determine the indices of the percentiles after
+*        shifting the index array for all the bad values.
+*     20-FEB-2020 (DSB):
+*        Support huge arrays.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing allowed
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMSDAT public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'MSG_PAR'          ! MSG_ constants
+
+*  Arguments Given:
+      INTEGER*8 EL
+      <TYPE> ARRAY
+      INTEGER*8 NGOOD
+      INTEGER NUMPER
+      REAL PERCNT( NUMPER )
+
+*  Arguments Returned:
+      DOUBLE PRECISION MEDIAN
+      DOUBLE PRECISION PERVAL( NUMPER )
+
+*  Status:
+      INTEGER  STATUS
+
+*  External References:
+      INTEGER KPG1_FLOOR         ! Most positive integer .LE. a given
+                                 ! real
+
+*  Local Constants:
+      INTEGER NPRCTL             ! Maximum number of percentiles
+      PARAMETER( NPRCTL = 100 )
+
+*  Local Variables:
+      LOGICAL DOPRCT             ! Calculate percentiles?
+      INTEGER I                  ! Loop counter
+      LOGICAL INTYPE             ! Integer data type?
+      INTEGER IPNTR              ! Pointer to sorted index
+      DOUBLE PRECISION MEDIUN    ! Median of even no. of pixels in array
+      INTEGER*8 NBGOOD           ! Number of good values after further
+                                 ! bad values removed
+      INTEGER NPERC              ! Constrained number of percentiles
+      INTEGER*8 PERIND( NPRCTL ) ! Percentile indices in sorted array
+      <TYPE> QUANT( NPRCTL )     ! Quantiles
+      INTEGER*8 UPERIN( NPRCTL ) ! Percentile indices in unsorted array
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! Declarations of conversion routines
+      INCLUDE 'NUM_DEF_CVT'      ! Definitions of conversion routines
+
+*.
+
+*  Initialise returned values.
+      MEDIAN = VAL__BADD
+      DO I = 1, MIN( NPRCTL, MAX( 1, NUMPER ) )
+         PERVAL( I ) = VAL__BADD
+      END DO
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Validate that there are sufficient valid values.
+      IF ( NGOOD .LT. 2 ) THEN
+         GOTO 999
+      END IF
+
+*  Can only calculate up to NPRCTL percentiles.
+      IF ( NUMPER .GT. NPRCTL ) THEN
+         CALL MSG_SETI( 'N', NUMPER )
+         CALL MSG_SETI( 'NP', NPRCTL )
+         CALL MSG_OUTIF( MSG__NORM, 'KPG_STOS8x_TOOMANY',
+     :                   'You supplied ^N percentiles.  Only '/
+     :                   /'the first ^NP are calculated.', STATUS )
+      END IF
+      NPERC = MIN( NUMPER, NPRCTL )
+
+*  Use a brute-force sort of the data.
+*  ===================================
+
+*  Obtain workspace for pointers.
+      CALL PSX_CALLOC8( EL, '_INT64', IPNTR, STATUS )
+      INTYPE = '<T>' .EQ. 'I'
+
+*  First check that percentiles have been supplied.
+      DOPRCT = PERCNT( 1 ) .NE. VAL__BADR .AND. NUMPER .GT. 0
+
+*  Call the appropriate routine to quicksort the array and then find the
+*  order statistics.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL PDA8_QSIA<T>( EL, ARRAY, %VAL( CNF_PVAL( IPNTR ) ) )
+      END IF
+
+*  Obtain median
+*  =============
+
+*  Remove indices for any bad data values from the index array.  Indices
+*  for good data values are shuffled down towards the start of the index
+*  array to fill the gaps.  The order of the good data values is
+*  unchanged by this.
+      CALL KPG1_MVBD8<T>( EL, ARRAY, EL, %VAL( CNF_PVAL( IPNTR ) ),
+     :                    NBGOOD, STATUS )
+
+*  Extract the index of the median good value.
+      CALL KPG1_RETR8K( EL, NBGOOD / 2 + 1, %VAL( CNF_PVAL( IPNTR ) ),
+     :                  UPERIN( 1 ), STATUS )
+
+*  Extract the median from the unsorted array.
+      CALL KPG1_RETR8<T>( EL, UPERIN( 1 ), ARRAY, QUANT( 1 ), STATUS )
+      MEDIAN = NUM_<T>TOD( QUANT( 1 ) )
+
+*  Average the middle two of an even-numbered sample.
+      IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
+         CALL KPG1_RETR8K( EL, NBGOOD / 2, %VAL( CNF_PVAL( IPNTR ) ),
+     :                     UPERIN( 1 ), STATUS )
+         CALL KPG1_RETR8<T>( EL, UPERIN( 1 ), ARRAY, QUANT( 2 ), STATUS )
+
+         MEDIUN = NUM_<T>TOD( QUANT( 2 ) )
+         MEDIAN = 0.5D0 * ( MEDIAN + MEDIUN )
+
+         IF ( INTYPE ) THEN
+            MEDIAN = DBLE( KPG1_FLOOR( REAL( MEDIAN ) ) )
+         END IF
+      END IF
+
+*  Extract the percentiles.
+*  ========================
+
+*  Adopt the same approach as before, but now obtain multiple values.
+      IF ( DOPRCT ) THEN
+
+*  Convert to indices within the sorted array of good data values.
+         DO I = 1, NPERC
+            PERIND( I ) = INT( PERCNT( I ) * 0.01 * REAL( NBGOOD ),
+     :                         KIND=8 ) + 1
+         END DO
+
+         CALL KPG1_RETV8K( EL, %VAL( CNF_PVAL( IPNTR ) ), NPERC,
+     :                     PERIND, UPERIN, STATUS )
+         CALL KPG1_RETV8<T>( EL, ARRAY, NPERC, UPERIN, QUANT, STATUS )
+
+*  Convert to a whole number value in the double-precision PERVAL array
+*  for an integer data array.
+         IF ( INTYPE ) THEN
+            DO I = 1, NPERC
+               PERVAL( I ) = DBLE(
+     :                       KPG1_FLOOR( NUM_<T>TOR( QUANT( I ) ) ) )
+            END DO
+         ELSE
+            DO I = 1, NPERC
+               PERVAL( I ) = NUM_<T>TOD( QUANT( I ) )
+            END DO
+         END IF
+      END IF
+
+*  Release index workspace.
+      CALL PSX_FREE( IPNTR, STATUS )
+
+  999 CONTINUE
+
+      END

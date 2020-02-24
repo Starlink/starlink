@@ -56,6 +56,9 @@
 *        Global status value.
 
 *  Notes:
+*     - This 4-byte version is independent of the 8-byte version. The
+*     two versions are coded separately in order to avoid the need to
+*     allocate and convert an 8-byte histogram array within this file.
 *     - If VALMAX or VALMIN is supplied equal to VAL__BAD<T>, then the
 *     actual maximum and minimum values will be found (by searching the
 *     ARRAY), and used.

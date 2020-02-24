@@ -147,7 +147,7 @@
                                  ! the rms
       REAL SUMSQ                 ! Sum of the square of differences
       LOGICAL SCALED             ! Data are scaled
-      INTEGER WORK( 8 )          ! Work array
+      REAL WORK( 8 )             ! Work array
 
 *.
 
@@ -168,7 +168,7 @@
 *  known and can be declared explicitly in this routine.
          CALL PDA_BISPEV( XKNOT, NXKNOT + 8, YKNOT, NYKNOT + 8, COEFF,
      :                    3, 3, X( I ), 1, Y( I ), 1, FIT( I ), WORK, 8,
-     :                    IWORK, 2, IFAIL, STATUS )
+     :                    IWORK, 2, IFAIL )
 
 *  Test for an error.
          IF ( IFAIL .NE. 0 ) THEN

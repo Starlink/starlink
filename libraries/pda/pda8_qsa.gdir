@@ -1,16 +1,16 @@
-      SUBROUTINE PDA_QSAI( EL, X )
+      SUBROUTINE PDA8_QSA<T>( EL, X )
 *+
 *  Name:
-*     PDA_QSAI
+*     PDA8_QSA<T>
 
 *  Purpose:
-*     Sort an INTEGER array into ascending order.
+*     Sort a <TYPE> array into ascending order.
 
 *  Language:
-*     Fortran 77
+*     Starlink Fortran 77
 
 *  Invocation:
-*     CALL PDA_QSAI( EL, X )
+*     CALL PDA8_QSA<T>( EL, X )
 
 *  Description:
 *     The routine uses the QUICKSORT algorithm to sort an array of values
@@ -19,9 +19,9 @@
 *     of QUICKSORT.
 
 *  Arguments:
-*     EL = INTEGER (Given)
+*     EL = INTEGER*8 (Given)
 *        The number of elements of X to sort.
-*     X( EL ) = INTEGER (Given and Returned)
+*     X( EL ) = <TYPE> (Given and Returned)
 *        The array to be sorted.
 
 *  References:
@@ -60,6 +60,8 @@
 *     8-NOV-1995 (PDRAPER):
 *        Renamed to PDA_QSA (Quick Sort Ascending) and changed
 *        to sort elements rather than index.
+*     20-FEB-2020 (DSB):
+*        Support huge arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -71,10 +73,10 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Arguments Given:
-      INTEGER EL
+      INTEGER*8 EL
 
 *  Arguments Given and Returned:
-      INTEGER X( EL )
+      <TYPE> X( EL )
 
 *  Local Constants:
       INTEGER MXSTK             ! Size of the recursion stack (log
@@ -83,19 +85,19 @@
       PARAMETER ( MXSTK = 64 )
 
 *  Local Variables:
-      INTEGER XPART             ! Partition value
-      INTEGER XTMP              ! Storage for swaping values.
-      INTEGER I                 ! Index to pointer array
-      INTEGER I1                ! Pointer index of partition value?
-      INTEGER I2                ! Pointer index of partition value?
-      INTEGER I3                ! Pointer index of partition value?
-      INTEGER ITMP              ! Temporary storage for pointers
-      INTEGER J                 ! Index to pointer array
-      INTEGER L                 ! Left hand pointer element in sub-file
-      INTEGER LL( MXSTK )       ! Stack for left sub-file limits
-      INTEGER R                 ! Right pointer element in sub-file
-      INTEGER RR( MXSTK )       ! Stack for right sub-file limits
-      INTEGER STK               ! Recursion stack pointer
+      <TYPE> XPART              ! Partition value
+      <TYPE> XTMP               ! Storage for swaping values.
+      INTEGER*8 I               ! Index to pointer array
+      INTEGER*8 I1              ! Pointer index of partition value?
+      INTEGER*8 I2              ! Pointer index of partition value?
+      INTEGER*8 I3              ! Pointer index of partition value?
+      INTEGER*8 ITMP            ! Temporary storage for pointers
+      INTEGER*8 J               ! Index to pointer array
+      INTEGER*8 L               ! Left hand pointer element in sub-file
+      INTEGER*8 LL( MXSTK )     ! Stack for left sub-file limits
+      INTEGER*8 R               ! Right pointer element in sub-file
+      INTEGER*8 RR( MXSTK )     ! Stack for right sub-file limits
+      INTEGER*8 STK             ! Recursion stack pointer
 
 *.
 
@@ -198,4 +200,3 @@
       END IF
 
       END
-* @(#)pda_qsai.f   1.2   95/11/10 10:03:18   95/11/10 10:03:51

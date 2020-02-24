@@ -108,6 +108,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMSDAT public constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'MSG_PAR'          ! MSG_ constants
 
 *  Arguments Given:
       INTEGER*8 EL
@@ -179,7 +180,7 @@
       IF ( NUMPER .GT. NPRCTL ) THEN
          CALL MSG_SETI( 'N', NUMPER )
          CALL MSG_SETI( 'NP', NPRCTL )
-         CALL MSG_OUTIF( 'MSG_NORM', 'KPG_STOC8x_TOOMANY',
+         CALL MSG_OUTIF( MSG__NORM, 'KPG_STOC8x_TOOMANY',
      :                   'You supplied ^N percentiles.  Only '/
      :                   /'the first ^NP are calculated.', STATUS )
       END IF

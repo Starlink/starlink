@@ -1,0 +1,90 @@
+      SUBROUTINE PDA_QSA<T>( EL, X )
+*+
+*  Name:
+*     PDA_QSA<T>
+
+*  Purpose:
+*     Sort a <TYPE> array into ascending order.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL PDA_QSA<T>( EL, X )
+
+*  Description:
+*     The routine uses the QUICKSORT algorithm to sort an array of values
+*     into ascending order. The "median of three" modification is included
+*     to reduce the likelihood of encountering the worst-case behaviour
+*     of QUICKSORT.
+
+*  Arguments:
+*     EL = INTEGER (Given)
+*        The number of elements of X to sort.
+*     X( EL ) = <TYPE> (Given and Returned)
+*        The array to be sorted.
+
+*  References:
+*     -  Sedgwick, R., 1988, "Algorithms" (Addison-Wesley).
+
+*  Timing:
+*     If N elements are to be sorted, the average time goes as N.ln(N).
+*     The worst-case time goes as N**2.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     PDRAPER: P.W. Draper (STARLINK, Durham University)
+*     {enter_new_authors_here}
+
+*  History:
+*     11-Jan-1991 (MJC):
+*        Original version.
+*     29-MAY-1992 (RFWS):
+*        Modified to permute a separate pointer array. Also added the
+*        "median of three" enhancement and the use of a sentinel value
+*        to avoid having to check array bounds within the innermost
+*        loop.
+*     1-JUN-1992 (RFWS):
+*        Added exchange sort to find the median of three partition
+*        element.
+*     6-AUG-1992 (RFWS):
+*        Rationalised the inner loop to improve performance.
+*     8-NOV-1995 (PDRAPER):
+*        Renamed to PDA_QSIA (Quick Sort Indexed Ascending) for
+*        the PDA library. Now returns the index of the first 1..N
+*        elements of X.
+*     8-NOV-1995 (PDRAPER):
+*        Renamed to PDA_QSA (Quick Sort Ascending) and changed
+*        to sort elements rather than index.
+*     20-FEB-2020 (DSB):
+*        Call 8-byte interface to do the work.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Arguments Given:
+      INTEGER EL
+
+*  Arguments Given and Returned:
+      <TYPE> X( EL )
+
+*  Local Variables:
+      INTEGER*8 EL8
+
+*.
+
+*  Call the 8-byte version to do the work.
+      EL8 = EL
+      CALL PDA8_QSA<T>( EL8, X )
+
+      END

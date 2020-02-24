@@ -20,13 +20,13 @@
 *     NDIM = INTEGER (Given)
 *        Number of array dimensions.  This must be no greater than
 *        NDF__MXDIM.
-*     DIM( NDIM ) = INTEGER (Given)
+*     DIM( NDIM ) = INTEGER*8 (Given)
 *        Input array dimensions.
-*     DIMO( NDIM ) = INTEGER (Given)
+*     DIMO( NDIM ) = INTEGER*8 (Given)
 *        Output array dimensions.
 *     PERM( NDIM ) = INTEGER (Given)
-*        The first element is the index of the pixel axis within the 
-*        input that is to become axis 1 in the output.  The second 
+*        The first element is the index of the pixel axis within the
+*        input that is to become axis 1 in the output.  The second
 *        element is the index of the pixel axis within the input that is
 *        to become axis 2 in the output, etc.  Axes are numbered from 1.
 *     IN( * ) = <TYPE> (Given)
@@ -71,48 +71,50 @@
 *     2007 October 4 (MJC):
 *        Protect against exceeding various array bounds for
 *        NDF__MXDIM-dimensional data.
+*     20-FEB-2020 (DSB):
+*        Support huge arrays.
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF__ constants
- 
+
 *  Arguments Given:
       INTEGER NDIM
-      INTEGER DIM( NDIM )
-      INTEGER DIMO( NDIM )
+      INTEGER*8 DIM( NDIM )
+      INTEGER*8 DIMO( NDIM )
       INTEGER PERM( NDIM )
       <TYPE> IN( * )
- 
+
 *  Arguments Returned:
       <TYPE> OUT( * )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
-      INTEGER EL                 ! No. of pixels in array
-      INTEGER I                  ! Axis index
-      INTEGER IOUT( NDF__MXDIM + 1 ) ! Output pixel indices
-      INTEGER J                  ! Index of output pixel
-      INTEGER K                  ! Index of input pixel
-      INTEGER LDIM( NDF__MXDIM + 1 ) ! Copy of o/p dimensions plus dummy
-      INTEGER STEPI( NDF__MXDIM ) ! Input steps indexed by input axis
-      INTEGER STEP( NDF__MXDIM + 1 ) ! Input steps indexed by output
+      INTEGER*8 EL               ! No. of pixels in array
+      INTEGER*8 I                ! Axis index
+      INTEGER*8 IOUT( NDF__MXDIM + 1 ) ! Output pixel indices
+      INTEGER*8 J                ! Index of output pixel
+      INTEGER*8 K                ! Index of input pixel
+      INTEGER*8 LDIM( NDF__MXDIM + 1 ) ! Copy of o/p dimensions plus dummy
+      INTEGER*8 STEPI( NDF__MXDIM ) ! Input steps indexed by input axis
+      INTEGER*8 STEP( NDF__MXDIM + 1 ) ! Input steps indexed by output
                                  ! axis
 
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Find the vector steps within the input array for unit increment along
-*  each input axis, find the total number of pixels in the array, and 
+*  each input axis, find the total number of pixels in the array, and
 *  initialise the indices of the current output pixel.
       EL = 1
       DO I = 1, NDIM
@@ -124,14 +126,14 @@
       IOUT( NDIM + 1 ) = 1
       LDIM( NDIM + 1 ) = 1
 
-*  Permute the step array so that it is indexed by output axis instead 
+*  Permute the step array so that it is indexed by output axis instead
 *  of input axis.
       DO I = 1, NDIM
          STEP( I ) = STEPI( PERM( I ) )
       END DO
       STEP( NDIM + 1 ) = EL
 
-*  Initialise the vector index within the input array of the current 
+*  Initialise the vector index within the input array of the current
 *  output pixel.
       K = 1
 

@@ -415,6 +415,7 @@
                                  ! NYPAR
       INTEGER MPTR               ! Pointer to SVD V matrix
       INTEGER NBIN               ! No. of bins with defined statistics
+      INTEGER*8 NBIN8            ! No. of bins with defined statistics
       INTEGER NC                 ! Character column counter
       INTEGER NCI                ! Character column counter of image
                                  ! names
@@ -429,14 +430,14 @@
       INTEGER NEQPTR             ! Mnemonic pointer to normal-equation
                                  ! workspace
       INTEGER NINVAL             ! Number of bad values
-      INTEGER NIWS               ! Storage space size for spline fit
+      INTEGER*8 NIWS             ! Storage space size for spline fit
       INTEGER NKNOT( NDIM )      ! Number of knots in each direction
-      INTEGER NLWS               ! Storage space size to allow for A
+      INTEGER*8 NLWS             ! Storage space size to allow for A
                                  ! rank-deficiency system
       INTEGER NPOINT             ! Storage space size for spline eval
       INTEGER NWORK              ! Number of d.p. work arrays required
                                  ! to store information about each bin
-      INTEGER NWS                ! Size of spline-fitting routine's
+      INTEGER*8 NWS              ! Size of spline-fitting routine's
                                  ! workspace
       INTEGER NX, NY             ! Number of bins in the x and y dirns
       INTEGER NXKNOT             ! Number of knots in x direction
@@ -1082,7 +1083,7 @@
          END IF
 
 *  Get workspace for spline fitting.
-         CALL PSX_CALLOC( NWS, '_REAL', WPNTR( WOBT + 1 ), STATUS )
+         CALL PSX_CALLOC8( NWS, '_REAL', WPNTR( WOBT + 1 ), STATUS )
 
          IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -1093,7 +1094,7 @@
          END IF
 
 *  Get more workspace for spline fitting.
-         CALL PSX_CALLOC( NIWS, '_INTEGER', WPNTR( WOBT + 1 ), STATUS )
+         CALL PSX_CALLOC8( NIWS, '_INTEGER', WPNTR( WOBT + 1 ), STATUS )
 
          IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -1104,7 +1105,7 @@
          END IF
 
 *  Get workspace to allow for rank-deficient system in spline fitting.
-         CALL PSX_CALLOC( NLWS, '_REAL', WPNTR( WOBT + 1 ), STATUS )
+         CALL PSX_CALLOC8( NLWS, '_REAL', WPNTR( WOBT + 1 ), STATUS )
 
          IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -1431,6 +1432,7 @@
          YMIN = 1.0
          YMAX = REAL( DIMS( 2 ) )
          FIRST = .TRUE.
+         NBIN8 = NBIN
 
          DO M = 0, NCLIPF
 
@@ -1441,7 +1443,7 @@
      :                      %VAL( CNF_PVAL( YPTR ) ),
      :                      %VAL( CNF_PVAL( ZPTR ) ),
      :                      %VAL( CNF_PVAL( WPTR ) ),
-     :                      %VAL( CNF_PVAL( GPTR ) ), NBIN,
+     :                      %VAL( CNF_PVAL( GPTR ) ), NBIN8,
      :                      XKNOT, YKNOT, %VAL( CNF_PVAL( SWPTR ) ),
      :                      %VAL( CNF_PVAL( SLWPTR ) ),
      :                      %VAL( CNF_PVAL( SIWPTR ) ),

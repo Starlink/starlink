@@ -1,0 +1,114 @@
+      SUBROUTINE KPG1_CPBD8<T>( N, D1, D2, OUT, STATUS )
+*+
+*  Name:
+*     KPG1_CPBD8x
+
+*  Purpose:
+*     Copies bad pixels.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_CPBD8x( N, D1, D2, OUT, STATUS )
+
+*  Description:
+*     This routine copies the bad pixels from one array into another.
+
+*  Arguments:
+*     N = INTEGER*8 (Given)
+*        Number of points.
+*     D1( N ) = ? (Given)
+*        The original data values.
+*     D2( N ) = ? (Given)
+*        An associated mask array.
+*     OUT( N ) = ? (Given)
+*        The returned array. Equal to D1 if both D1 and D2 are good (bad
+*        if either D1 or D2 is bad).
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     input and output data arrays plus the mask array must have the
+*     data type specified.
+
+*  Copyright:
+*     Copyright (C) 1999 Central Laboratory of the Research Councils.
+*     Copyright (C) 2006--2007 Particle Physics & Astronomy Research
+*     Council.  All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     DSB: D.S. Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     28-SEP-1999 (DSB):
+*        Original version.
+*     2006 May 17 (MJC):
+*        Made generic version.
+*     2007 January 11 (MJC):
+*        Extended to all numeric types.
+*     20-FEB-2020 (DSB):
+*        Support huge arrays.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+
+*  Arguments Given:
+      INTEGER*8 N
+      <TYPE> D1( N )
+      <TYPE> D2( N )
+
+*  Arguments Returned:
+      <TYPE> OUT( N )
+
+*  Status:
+      INTEGER STATUS          ! Global status
+
+*  Local Variables:
+      INTEGER*8 I               ! Loop count
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Just do it.
+      DO I = 1, N
+         IF ( D2( I ) .NE. VAL__BAD<T> ) THEN
+            OUT( I ) = D1( I )
+         ELSE
+            OUT( I ) = VAL__BAD<T>
+         END IF
+      END DO
+
+      END

@@ -343,12 +343,13 @@
       INTEGER NDFI               ! Identifier for NDF
       LOGICAL NDFVAR             ! NDF contains a variance array?
       INTEGER NGOOD              ! Number of good pixels
+      INTEGER*8 NGOOD8           ! Number of good pixels
       INTEGER NINVAL             ! Number of bad values
-      INTEGER NIWS               ! Storage space size for spline fit
+      INTEGER*8 NIWS             ! Storage space size for spline fit
       INTEGER NKNOT( NDIM )      ! Number of knots in each direction
-      INTEGER NLWS               ! Storage space size to allow for A
+      INTEGER*8 NLWS             ! Storage space size to allow for A
                                  ! rank-deficiency system
-      INTEGER NWS                ! Size of spline-fitting routine's
+      INTEGER*8 NWS              ! Size of spline-fitting routine's
                                  ! workspace
       INTEGER NXKNOT             ! Number of knots in x direction
       INTEGER NXPAR              ! Number of fitting parameters in x
@@ -636,11 +637,11 @@
          CALL PSX_CALLOC( DSIZE, ITYPE, GPTR, STATUS )
 
 *  Get workspace for spline evaluation and fitting.
-         CALL PSX_CALLOC( NWS, '_REAL', SWPTR, STATUS )
-         CALL PSX_CALLOC( NIWS, '_INTEGER', SIWPTR, STATUS )
+         CALL PSX_CALLOC8( NWS, '_REAL', SWPTR, STATUS )
+         CALL PSX_CALLOC8( NIWS, '_INTEGER', SIWPTR, STATUS )
 
 *  Get workspace to allow for rank-deficient system in spline fitting.
-         CALL PSX_CALLOC( NLWS, '_REAL', SLWPTR, STATUS )
+         CALL PSX_CALLOC8( NLWS, '_REAL', SLWPTR, STATUS )
 
       END IF
 
@@ -757,13 +758,14 @@
          YMAX = SNGL( DYMAX )
 
 *  Fit the bi-cubic-spline surface to the binned array.
+         NGOOD8 = NGOOD
          CALL KPS1_SUSF( NXKNOT, NYKNOT, XMIN, XMAX, YMIN, YMAX,
      :                   MTKNOT, .TRUE., NWS, NLWS, NIWS, DSIZE,
      :                   %VAL( CNF_PVAL( XPTR ) ),
      :                   %VAL( CNF_PVAL( YPTR ) ),
      :                   %VAL( CNF_PVAL( ZPTR ) ),
      :                   %VAL( CNF_PVAL( WPTR ) ),
-     :                   %VAL( CNF_PVAL( GPTR ) ), NGOOD,
+     :                   %VAL( CNF_PVAL( GPTR ) ), NGOOD8,
      :                   XKNOT, YKNOT, %VAL( CNF_PVAL( SWPTR ) ),
      :                   %VAL( CNF_PVAL( SLWPTR ) ),
      :                   %VAL( CNF_PVAL( SIWPTR ) ),
