@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_iteratemap(ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
-*                    const Grp *bolrootgrp, const Grp *shortrootgrp,
+*                    const Grp *bolrootgrp, const Grp *shortrootgrp, const Grp *cyclerootgrp,
 *                    const Grp *flagrootgrp, const Grp *samprootgrp,
 *                    AstKeyMap *akeymap,
 *                    const smfArray * darks, const smfArray *bbms,
@@ -41,6 +41,9 @@
 *        path to an HDS container.
 *     shortrootgrp = const Grp * (Given)
 *        Root name to use for short output maps (if required). Can be a
+*        path to an HDS container.
+*     cyclerootgrp = const Grp * (Given)
+*        Root name to use for cycle output maps (if required). Can be a
 *        path to an HDS container.
 *     flagrootgrp = const Grp * (Given)
 *        Root name to use for flag output maps (if required). Can be a
@@ -542,6 +545,9 @@
 *        If a continuous chunk fails for any reason, flush the error and
 *        proceed to map any remaining chunks. Only flush the error if
 *        there is more than one continuous chunk.
+*     2020-03-05 (GSB):
+*        Use the new config parameter CYCLEMAP to detemine whether
+*        period-based cycle maps are required.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -647,7 +653,7 @@ volatile sig_atomic_t smf_interupt = 0;
 
 /* Main routine */
 void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
-                     const Grp *bolrootgrp, const Grp *shortrootgrp,
+                     const Grp *bolrootgrp, const Grp *shortrootgrp, const Grp *cyclerootgrp,
                      const Grp *flagrootgrp, const Grp *samprootgrp,
                      AstKeyMap *akeymap,
                      const smfArray *darks, const smfArray *bbms,
@@ -799,6 +805,11 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
   int sampcube;                 /* write SAMPCUBES extensions? */
   double scalevar=0;            /* scale factor for variance */
   int shortmap=0;               /* If set, produce maps every shortmap tslices*/
+  double cyclemap_par[3];       /* Cyclemap parameters */
+  int cyclemap_n;               /* Number of cyclemap parameters given */
+  int cyclemap=0;               /* If set, produce this many cycle maps */
+  double cycleperiod=0.0;       /* Period of cycle maps (if cyclemap is set) */
+  double cyclestart=0.0;        /* Start time of cycle maps (if cyclemap is set) */
   double srate_maxlen=0;        /* Sample rate used to calc maxlen in samples */
   double steptime;              /* Length of a sample in seconds */
   double sumchunkweights;       /* Sum of all chunk weights */
@@ -3159,7 +3170,33 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
            shortmap = dimval;
         }
 
-        if( bolomap || shortmap || sampcube ) {
+        if( astMapGet1D( keymap, "CYCLEMAP", 3, &cyclemap_n, cyclemap_par ) ) {
+          if( ( cyclemap_n > 1 ) && ( cyclemap_n < 4 ) ) {
+            cyclemap = (int) cyclemap_par[0];
+            cycleperiod = cyclemap_par[1];
+            cyclestart = VAL__BADD;
+            if( cyclemap_n > 2 ) {
+              cyclestart = cyclemap_par[2];
+            }
+          }
+          else if( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRepf( " ", "Bad number of values (%d) for config parameter "
+                     "CYCLEMAP - must be 2 to 3.", status, cyclemap_n );
+          }
+          if( ( cyclemap == 0 ) && ( *status == SAI__OK ) ) {
+            *status = SAI__ERROR;
+            errRepf( " ", "Bad value for config parameter "
+                     "CYCLEMAP(1) - must not be 0.", status );
+          }
+          if( ( cycleperiod == 0.0 ) && ( *status == SAI__OK ) ) {
+            *status = SAI__ERROR;
+            errRepf( " ", "Bad value for config parameter "
+                     "CYCLEMAP(2) - must not be 0.0.", status );
+          }
+        }
+
+        if( bolomap || shortmap || sampcube || cyclemap ) {
 
           /* Ensure we use the RES model ordering. */
           smf_model_dataOrder( wf, &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
@@ -3201,12 +3238,24 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
         /* Create short maps using every SHORTMAP samples if requested */
 
         if( shortmap ) {
-          smf_write_shortmap( wf, shortmap, res[0], lut[0], qua[0], &dat,
+          smf_write_shortmap( wf, shortmap, 0.0, 0.0, res[0], lut[0], qua[0], &dat,
                               msize, shortrootgrp, contchunk, varmapmethod,
                               lbnd_out, ubnd_out, outfset, chunkfactor, status );
           /*** TIMER ***/
           msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                      ": ** %f s writing shortmap",
+                     status, smf_timerupdate(&tv1,&tv2,status) );
+        }
+
+        /* Create cycle maps if requested */
+
+        if( cyclemap ) {
+          smf_write_shortmap( wf, cyclemap, cycleperiod, cyclestart, res[0], lut[0], qua[0], &dat,
+                              msize, cyclerootgrp, contchunk, varmapmethod,
+                              lbnd_out, ubnd_out, outfset, chunkfactor, status );
+          /*** TIMER ***/
+          msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                     ": ** %f s writing cyclemap",
                      status, smf_timerupdate(&tv1,&tv2,status) );
         }
 
@@ -3240,7 +3289,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
 
         /* Now we can remove AST from RES again before continuing */
 
-        if( bolomap || shortmap || sampcube ) {
+        if( bolomap || shortmap || sampcube || cyclemap ) {
 
           /* Ensure we use the RES model ordering.  */
           smf_model_dataOrder( wf, &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,

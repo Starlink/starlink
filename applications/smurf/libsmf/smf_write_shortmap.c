@@ -13,7 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res,
+*     smf_write_shortmap( ThrWorkForce *wf, int shortmap, double cycleperiod,
+*                         double cyclestart, smfArray *res,
 *                         smfArray *lut, smfArray *qua, smfDIMMData *dat,
 *                         dim_t msize, const Grp *shortrootgrp,size_t contchunk,
 *                         int varmapmethod, const int *lbnd_out,
@@ -27,6 +28,12 @@
 *        Number of time slices per short map, or if set to -1, create a map
 *        each time TCS_INDEX is incremented (i.e., produce a map each time
 *        a full pass through the scan pattern is completed).
+*     cycleperiod = double (Given)
+*        Period over which maps should be folded.  If non-zero then
+*        folding will be performed and the shortmap parameter should give
+*        the number of cycle maps desired.
+*     cyclestart = double (Given)
+*        Start time for period-based cycle maps.
 *     res = smfArray* (Given)
 *        RES model smfArray to be rebeinned
 *     lut = smfArray* (Given)
@@ -90,6 +97,9 @@
 *        this some rainy day...
 *     2018-04-10 (DSB):
 *        Added parameter chunkfactor.
+*     2020-03-05 (GSB):
+*        Added parameters cycleperiod and cyclestart to allow for
+*        period-folded cycle maps.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -134,7 +144,8 @@
 
 #define FUNC_NAME "smf_write_shortmap"
 
-void smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res,
+void smf_write_shortmap( ThrWorkForce *wf, int shortmap, double cycleperiod,
+                         double cyclestart, smfArray *res,
                          smfArray *lut, smfArray *qua, smfDIMMData *dat,
                          dim_t msize, const Grp *shortrootgrp, size_t contchunk,
                          int varmapmethod, const int *lbnd_out,
@@ -160,6 +171,12 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res,
   size_t shortstart;            /* first time slice of short map */
   size_t shortend;              /* last time slice of short map */
   size_t tstride;               /* Time stride */
+  int rebinflag=0;              /* Rebinning flags */
+  double cycletime=0.0;         /* Time [s] from cyclestart */
+  int cycle_bin=0;              /* Cycle map number */
+  int cycle_bin_prev=0;         /* Previous cycle map number */
+  size_t cycle_nhit=0;          /* Number of sections of data for current cycle map */
+  size_t cycle_i_prev=0;        /* Data index at start of bin */
 
   if( *status != SAI__OK ) return;
 
@@ -197,7 +214,18 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res,
   shortstart = istart;
 
   if( *status == SAI__OK ) {
-    if( shortmap == -1 ) {
+    if( cycleperiod != 0.0 ) {
+      nshort = shortmap;
+      /*gsb_period = 5.54126;*/
+      /*gsb_period = 5.54252569671184;*/
+      if( cyclestart == VAL__BADD ) {
+        cyclestart = floor(res->sdata[idx]->hdr->allState[istart].rts_end);
+      }
+      msgOutf( "", FUNC_NAME
+               ": writing %zu cycle maps, folded at a period of %f s starting at %.9f d.",
+               status, nshort, cycleperiod, cyclestart );
+
+    } else if( shortmap == -1 ) {
       nshort = res->sdata[idx]->hdr->allState[iend].tcs_index -
         res->sdata[idx]->hdr->allState[istart].tcs_index + 1;
 
@@ -256,9 +284,24 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res,
                        status);
 
     /* Time slice indices for start and end of short map -- common to
-       all subarrays */
-
-    if( shortmap > 0) {
+       all subarrays.
+       In the case of cycle maps, we will be rebinning multiple sections
+       into each map.  Instead of determining time slice indices in
+       advance, we count the number of "hits" for the map. */
+    if( cycleperiod != 0.0 ) {
+      cycle_bin_prev = -1;
+      cycle_nhit = 0;
+      for(i=istart; i<=iend; i++) {
+        cycletime = 86400.0 * (res->sdata[0]->hdr->allState[i].rts_end - cyclestart);
+        cycle_bin = (int)(nshort * fmod(cycletime, cycleperiod) / cycleperiod);
+        if (cycle_bin != cycle_bin_prev) {
+          cycle_bin_prev = cycle_bin;
+          if (cycle_bin == sc) {
+            cycle_nhit += 1;
+          }
+        }
+      }
+    } else if( shortmap > 0) {
       /* Evenly-spaced shortmaps in time */
       shortstart = istart+sc*shortmap;
       shortend = istart+(sc+1)*shortmap-1;
@@ -284,10 +327,10 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res,
       break;
     }
 
+    rebinflag = AST__REBININIT;
+
     /* Loop over subgroup index (subarray) */
     for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
-      int rebinflag = 0;
-
       /* Pointers to everything we need */
       res_data = (res->sdata[idx]->pntr)[0];
       lut_data = (lut->sdata[idx]->pntr)[0];
@@ -296,51 +339,96 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res,
       smf_get_dims( res->sdata[idx], NULL, NULL, NULL, &ntslice,
                     &dsize, NULL, &tstride, status );
 
-      /* Rebin the data for this range of tslices. */
-      if( idx == 0 ) {
-        rebinflag |= AST__REBININIT;
-      }
+      if( cycleperiod != 0.0 ) {
+        cycle_bin_prev = -1;
+        cycle_i_prev = istart;
 
-      if( idx == (res->ndat-1) ) {
-        rebinflag |= AST__REBINEND;
-      }
+        for(i=istart; i<=iend; i++) {
+          cycletime = 86400.0 * (res->sdata[0]->hdr->allState[i].rts_end - cyclestart);
+          cycle_bin = (int)(nshort * fmod(cycletime, cycleperiod) / cycleperiod);
 
-      smf_rebinmap1( NULL, res->sdata[idx],
-                     dat->noi ? dat->noi[0]->sdata[idx] : NULL,
-                     lut_data, shortstart, shortend, 1, NULL, 0,
-                     SMF__Q_GOOD, varmapmethod,
-                     rebinflag,
-                     mapdata->pntr[0],
-                     shortmapweight, shortmapweightsq, shorthitsmap,
-                     mapdata->pntr[1], msize, chunkfactor, NULL,
-                     status );
+          if (cycle_bin_prev == -1) {
+            cycle_bin_prev = cycle_bin;
+            cycle_i_prev = i;
+            continue;
+          } else if ((cycle_bin != cycle_bin_prev) || i == iend) {
+            if (cycle_bin_prev == sc) {
+              shortstart = cycle_i_prev;
+              shortend = (i == iend) ? i : i - 1;
 
-      /* Write out FITS header */
-      if( (*status == SAI__OK) && res->sdata[idx]->hdr &&
-          res->sdata[idx]->hdr->allState ) {
-        AstFitsChan *fitschan=NULL;
-        JCMTState *allState = res->sdata[idx]->hdr->allState;
-        size_t midpnt = (shortstart + shortend) / 2;
+              if( idx == (res->ndat-1) ) {
+                cycle_nhit --;
+                if (! cycle_nhit) {
+                  rebinflag |= AST__REBINEND;
+                }
+              }
 
-        fitschan = astFitsChan ( NULL, NULL, " " );
+              smf_rebinmap1( NULL, res->sdata[idx],
+                             dat->noi ? dat->noi[0]->sdata[idx] : NULL,
+                             lut_data, shortstart, shortend, 1, NULL, 0,
+                             SMF__Q_GOOD, varmapmethod,
+                             rebinflag,
+                             mapdata->pntr[0],
+                             shortmapweight, shortmapweightsq, shorthitsmap,
+                             mapdata->pntr[1], msize, chunkfactor, NULL,
+                             status );
 
-        atlPtfti( fitschan, "SEQSTART", allState[shortstart].rts_num,
-                  "RTS index number of first frame", status );
-        atlPtfti( fitschan, "SEQEND", allState[shortend].rts_num,
-                  "RTS index number of last frame", status);
-        atlPtftd( fitschan, "MJD-AVG", allState[midpnt].rts_end,
-                  "Average MJD of this map", status );
-        atlPtfts( fitschan, "TIMESYS", "TAI", "Time system for MJD-AVG",
-                  status );
-        atlPtfti( fitschan, "TCSINDST", allState[shortstart].tcs_index,
-                  "TCS index of first frame", status );
-        atlPtfti( fitschan, "TCSINDEN", allState[shortend].tcs_index,
-                  "TCS index of last frame", status );
+              rebinflag = 0;
+            }
+
+            cycle_bin_prev = cycle_bin;
+            cycle_i_prev = i;
+          }
+        }
+      } else {
+        /* Rebin the data for this range of tslices. */
+        rebinflag = 0;
+
+        if( idx == 0 ) {
+          rebinflag |= AST__REBININIT;
+        }
+
+        if( idx == (res->ndat-1) ) {
+          rebinflag |= AST__REBINEND;
+        }
+
+        smf_rebinmap1( NULL, res->sdata[idx],
+                       dat->noi ? dat->noi[0]->sdata[idx] : NULL,
+                       lut_data, shortstart, shortend, 1, NULL, 0,
+                       SMF__Q_GOOD, varmapmethod,
+                       rebinflag,
+                       mapdata->pntr[0],
+                       shortmapweight, shortmapweightsq, shorthitsmap,
+                       mapdata->pntr[1], msize, chunkfactor, NULL,
+                       status );
+
+        /* Write out FITS header */
+        if( (*status == SAI__OK) && res->sdata[idx]->hdr &&
+            res->sdata[idx]->hdr->allState ) {
+          AstFitsChan *fitschan=NULL;
+          JCMTState *allState = res->sdata[idx]->hdr->allState;
+          size_t midpnt = (shortstart + shortend) / 2;
+
+          fitschan = astFitsChan ( NULL, NULL, " " );
+
+          atlPtfti( fitschan, "SEQSTART", allState[shortstart].rts_num,
+                    "RTS index number of first frame", status );
+          atlPtfti( fitschan, "SEQEND", allState[shortend].rts_num,
+                    "RTS index number of last frame", status);
+          atlPtftd( fitschan, "MJD-AVG", allState[midpnt].rts_end,
+                    "Average MJD of this map", status );
+          atlPtfts( fitschan, "TIMESYS", "TAI", "Time system for MJD-AVG",
+                    status );
+          atlPtfti( fitschan, "TCSINDST", allState[shortstart].tcs_index,
+                    "TCS index of first frame", status );
+          atlPtfti( fitschan, "TCSINDEN", allState[shortend].tcs_index,
+                    "TCS index of last frame", status );
 
 
-        kpgPtfts( mapdata->file->ndfid, fitschan, status );
+          kpgPtfts( mapdata->file->ndfid, fitschan, status );
 
-        if( fitschan ) fitschan = astAnnul( fitschan );
+          if( fitschan ) fitschan = astAnnul( fitschan );
+        }
       }
     }
 

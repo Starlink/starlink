@@ -1663,6 +1663,7 @@ void smurf_makemap( int *status ) {
     Grp *iterrootgrp = NULL;
     Grp *samprootgrp = NULL;
     Grp *shortrootgrp = NULL;
+    Grp *cyclerootgrp = NULL;
     char tempfile[GRP__SZNAM+1];
     double nboloeff = 0.0;
     size_t ncontchunks=0;
@@ -1717,6 +1718,12 @@ void smurf_makemap( int *status ) {
     one_strlcat( tempfile, ".MORE.SMURF.SHORTMAPS", sizeof(tempfile), status);
     shortrootgrp = grpNew( "shortmap root", status );
     grpPut1( shortrootgrp, tempfile, 0, status );
+
+    /* Work out the name for the root file path if cyclemaps are being created */
+    grpGet( ogrp, 1, 1, &pname, sizeof(tempfile), status );
+    one_strlcat( tempfile, ".MORE.SMURF.CYCLEMAPS", sizeof(tempfile), status);
+    cyclerootgrp = grpNew( "shortmap root", status );
+    grpPut1( cyclerootgrp, tempfile, 0, status );
 
     /* Work out the name for the root file path if flagmaps are being created*/
     grpGet( ogrp, 1, 1, &pname, sizeof(tempfile), status );
@@ -1803,7 +1810,7 @@ void smurf_makemap( int *status ) {
     for( irun = 0; irun < nrun; irun++ ) {
 
       /* Call the low-level iterative map-maker */
-      smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, shortrootgrp,
+      smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, shortrootgrp, cyclerootgrp,
                       flagrootgrp, samprootgrp, keymap, NULL, bbms, flatramps,
                       heateffmap, outfset, moving, lbnd_out, ubnd_out,
                       fts_port, maxmem-mapmem, abortsoon, &abortedat,
@@ -1889,6 +1896,7 @@ void smurf_makemap( int *status ) {
     if( bolrootgrp ) grpDelet( &bolrootgrp, status );
     if( iterrootgrp ) grpDelet( &iterrootgrp, status );
     if( shortrootgrp ) grpDelet( &shortrootgrp, status );
+    if( cyclerootgrp ) grpDelet( &cyclerootgrp, status );
     if( flagrootgrp ) grpDelet( &flagrootgrp, status );
     if( samprootgrp ) grpDelet( &samprootgrp, status );
 

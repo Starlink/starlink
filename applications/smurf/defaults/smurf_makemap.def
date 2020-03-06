@@ -2554,6 +2554,19 @@ sampcube = 0
 shortmap = 0
 
 #-----------------------------------------------------------------
+#  Name: 	cyclemap
+#  Type: 	real
+#  Default: 	<undef>
+#  Purpose: 	Produce cycle-folded maps to visualize periodic signals.
+#  Description: If defined, an extension called .MORE.SMURF.CYCLEMAPS is
+#               added to the output map NDF.  This parameter should consist
+#               of two or three comma-separated values in parentheses.
+#               These are the number of maps desired, the cycle period
+#               (in seconds) and (optionally) the cycle start time
+#               (as TAI MJD, otherwise the start of this TAI MJD).
+cyclemap = <undef>
+
+#-----------------------------------------------------------------
 #  Name: 	smo.boxcar
 #  Type: 	real
 #  Default: 	-10 (for 450 um), -3 (for 850 um)

@@ -1537,7 +1537,7 @@ int smf_isfft( const smfData *indata, dim_t rdims[2], dim_t *nbolo,
                dim_t fdims[2], double df[2], size_t *ndims, int *status );
 
 void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
-                     const Grp *bolrootgrp, const Grp *shortrootgrp,
+                     const Grp *bolrootgrp, const Grp *shortrootgrp, const Grp *cyclerootgrp,
                      const Grp *flagrootgrp, const Grp *samprootgrp,
                      AstKeyMap *keymap,
                      const smfArray *darks, const smfArray *bbms,
@@ -2124,7 +2124,8 @@ void smf_write_sampcube( ThrWorkForce *wf, const smfArray *res, const smfArray *
                          size_t contchunk, const int *lbnd, const int *ubnd,
                          int *status );
 
-void smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res, smfArray *lut,
+void smf_write_shortmap( ThrWorkForce *wf, int shortmap, double cycleperiod, double cyclestart,
+                         smfArray *res, smfArray *lut,
                          smfArray *qua, smfDIMMData *dat,
                          dim_t msize, const Grp *shortrootgrp, size_t contchunk,
                          int varmapmethod, const int *lbnd_out,
