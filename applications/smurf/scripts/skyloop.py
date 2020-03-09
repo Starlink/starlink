@@ -118,8 +118,8 @@
 *           pln.notfirst = 0
 *           smo.notfirst = 0
 *           itermap=0
-*           shortmap=0
-*           bolomap=0
+*           shortmap=<value specified by parameter CONFIG>
+*           bolomap=<value specified by parameter CONFIG>
 *           flagmap=<undef>
 *           sampcube=0
 *           diag.append=1
@@ -363,6 +363,10 @@
 *        Put the temporary NDFs created by makemap (models, cleaned data,
 *        etc) in the temporary directory rather than in the current
 *        directory.
+*     9-MAR-2020 (DSB):
+*        Allow shortmaps and bolomaps to be created. If they are requested
+*        in the config supplied via parameter CONFIG, then they are created on 
+*        the final iteration.
 *-
 '''
 
@@ -600,6 +604,16 @@ try:
                                "defaults=$SMURF_DIR/smurf_makemap.def "
                                "select=\"\'450=0,850=1\'\" defval=0.0".format(config)))
 
+#  See if shortmaps are to be created on the final iteration.
+   shortmap = float( invoke( "$KAPPA_DIR/configecho name=shortmap config={0} "
+                             "defaults=$SMURF_DIR/smurf_makemap.def "
+                             "select=\"\'450=0,850=1\'\" defval=0.0".format(config)))
+
+#  See if bolomaps are to be created on the final iteration.
+   bolomap = myint( invoke( "$KAPPA_DIR/configecho name=bolomap config={0} "
+                            "defaults=$SMURF_DIR/smurf_makemap.def "
+                            "select=\"\'450=0,850=1\'\" defval=0.0".format(config)))
+
 #  Create a directory in which makemap should store the dumped models, cleaned data,
 #  etc.
    dumpdir = NDG.subdir()
@@ -641,8 +655,8 @@ try:
    fd.write("numiter={0}\n".format(niter0))    # MAKEMAP should do only one
                               # iteration (plus any skipped iterations).
    fd.write("itermap=0\n")    # Itermaps don't make sense
-   fd.write("bolomap=0\n")    # Bolomaps don't make sense
-   fd.write("shortmap=0\n")   # Shortmaps don't make sense
+   fd.write("bolomap=0\n")    # Bolomaps only make sense on the last iteration
+   fd.write("shortmap=0\n")   # Shortmaps only make sense on the last iteration
    fd.write("flagmap=<undef>\n")# Flagmaps don't make sense
    fd.write("sampcube=0\n")   # Sampcubes don't make sense
    fd.write("dumpdir={0}\n".format(dumpdir)) # Where to dump models, cleaned data etc
@@ -863,6 +877,18 @@ try:
 #  changes from the map.
             if ast_filt_diff != 0.0:
                add["ast.filt_diff"] = 0.0
+               newcon = 1
+
+#  Also, if this is the last iteration, create shortmaps if requested in
+#  the user-supplied config.
+            if shortmap != 0.0:
+               add["shortmap"] = shortmap
+               newcon = 1
+
+#  Also, if this is the last iteration, create bolomaps if requested in
+#  the user-supplied config.
+            if bolomap != 0:
+               add["bolomap"] = bolomap
                newcon = 1
 
 #  Also override the normal values for parameters that have a
