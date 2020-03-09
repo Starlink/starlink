@@ -5561,7 +5561,7 @@ def analyse( unit, first, last, content, gentypes, indent ):
             first = True
             com = ""
             while jline <= last:
-               if content[ jline ] == "*" or content[ jline ][:lprefix] == prefix:
+               if content[ jline ].rstrip() == "*" or content[ jline ][:lprefix] == prefix:
                   if first:
                      first = False
                   else:
