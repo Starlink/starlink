@@ -90,7 +90,8 @@ pda_assst.f pda_lmerr.f pda8_fpchec.f pda8_fpknot.f pda8_curfit.f \
 pda8_covmat.f pda8_nscor.f pda8_correc.f pda8_v11.f pda8_rwnorm.f \
 pda8_fpcurf.f pda8_surfit.f
 
-C_ROUTINES = pda.c pdaD1mach.c
+C_ROUTINES = pda.c pdaD1mach.c pdaDdot.c pdaDaxpy.c pdaDgesl.c pdaDgefs.c \
+pdaDgefa.c pdaDgesld.c pdaDscal.c pdaIdamax.c pdaXermsg.c pdaErmsg.c
 
 GEN_F_ROUTINES = $(PDA_BDIKRW_GEN:.gbdikrw=.f) \
                  $(PDA_DIR_GEN:.gdir=.f)

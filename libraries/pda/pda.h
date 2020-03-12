@@ -64,6 +64,8 @@
 *-
 */
 
+void pdaErmsg( const char *, int, int, const char *, char );
+void pdaXermsg( const char *, const char *, const char *, int, int, int * );
 void pdaSumsl( int, double *, double *,
                void (*)( int, double *, int *, double * ),
                void (*)( int, double *, int *, double * ),
@@ -73,4 +75,13 @@ float pdaRand( void );
 float pdaRnnor( float, float );
 double pdaD1mach( int );
 int pdaRnpoi( float );
+double pdaDdot( long, double[], long, double[], long );
+long pdaIdamax( long, double[], long );
+void pdaDaxpy( long, double, double[], long, double[], long );
+void pdaDgefa( double*, long, long, long[], long* );
+void pdaDgefs( double*, long, long, double*, long, long, long[], long* );
+void pdaDgesl( double*, long, long, long[], double[], long );
+void pdaDgesld( double*, long, long, long[], double[] );
+void pdaDscal( long, double, double[], long );
+
 #endif
