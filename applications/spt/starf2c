@@ -22,6 +22,10 @@
 #  Pre-requirements:
 #    A temporary version of the Fortran source file should be created
 #    before using this tool which adheres to the following requirements:
+#    - A minimal starLSE format prologue should be created if one does not
+#      already exist, containing at least the following sections -
+#      "Name:", "Arguments:", "Authors:".
+#    - All arguments should be declared using the standard starLSE comments.
 #    - All uses of "A**B" should be replaced by "POW(A,B)"
 #    - Generic source file should use "<TYPE>" to represent the data type
 #    in the prologue and not "?".
@@ -4681,9 +4685,12 @@ class ProSection(Unit):
          hist += "."
          self.setBody( ["     {0} (DSB):".format(time.strftime("%d-%b-%Y").upper()),hist])
 
-      elif self.com == "Returned Value":
+      elif self.com.lower() == "returned value" or self.com.lower() == "function value":
          lines =  self.children[0].com.split("\n")
-         self.setBody( ["     {0}".format( lines[1].strip())] )
+         if len(lines) > 1:
+            self.setBody( ["     {0}".format( lines[1].strip())] )
+         else:
+            Leave( "'{0}' section in prologue has too few lines.".format( self.com ) )
 
       child = self.getFoot(False)
       while child:
@@ -5626,12 +5633,12 @@ def analyse( unit, first, last, content, gentypes, indent ):
          if code and code[0] == "v":
             new_item = CVariable( iline, code[1:], com )
          else:
-            ( type, name, bounds, size ) = isDecl( code, iline )
-            if type is not None:
+            ( dtype, name, bounds, size ) = isDecl( code, iline )
+            if dtype is not None:
                if arg_access is None or isinstance( unit, Program ):
-                  new_item = Variable( iline, type, name, bounds, size, com )
+                  new_item = Variable( iline, dtype, name, bounds, size, com )
                else:
-                  new_item = Argument( iline, type, name, bounds, size, com, arg_access )
+                  new_item = Argument( iline, dtype, name, bounds, size, com, arg_access )
                   if arg_access == READ_WRITE and name == "STATUS":
                      arg_access = None
                      new_item.ignore = True
@@ -5783,7 +5790,9 @@ def analyse( unit, first, last, content, gentypes, indent ):
 #  Check we only find subroutines, functions and programs at the top level.
          if isinstance( unit, File ):
             if not isinstance( new_item, Blank ) and not isinstance( new_item, Subroutine ) and not isinstance( new_item, Function ) and not isinstance( new_item, Program ):
-               Leave( "analyse: Unexpected '{0}' being added to '{1}'.".format( type(new_item).__name__, type(unit).__name__), iline )
+               Leave( "analyse: Unexpected '{0}' being added to '{1}'\n"
+                      "Expected subroutine, function or program.".
+                      format( type(new_item).__name__, type(unit).__name__), iline )
 
 #  Append it to the current unit.
          unit.append( new_item )
