@@ -5,7 +5,7 @@ noinst_LTLIBRARIES = libpolsub.la
 libpolsub_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES)
 
 F_ROUTINES = pol1_ctclm.f  pol1_hist2.f  pol1_sngad.f  pol1_stkim.f \
-pol1_ctprp.f  pol1_hist.f   pol1_sngbm.f  pol1_stknm.f \
+pol1_ctclmd.f  pol1_ctprp.f  pol1_hist.f   pol1_sngbm.f  pol1_stknm.f \
 pol1_dbeam.f  pol1_sngcl.f  pol1_stksm.f \
 pol1_deftb.f  pol1_imprt.f  pol1_sngct.f  pol1_subst.f \
 pol1_dftab.f  pol1_knext.f  pol1_sngfl.f  pol1_tiqac.f \

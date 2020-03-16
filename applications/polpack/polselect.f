@@ -58,8 +58,11 @@
 *        This parameter is only used if parameter MODE is set to "MASK".
 *        It specifies the two-dimensional NDF to be used as a mask to
 *        select the required vectors. Vectors corresponding to good pixel
-*        values in the mask are selected. The mask is assumed to be
-*        aligned with the catalogue in pixel coordinates.
+*        values in the mask are selected. If the WCS in the mask NDF
+*        defines any celestial coordinates, and if the supplied vector
+*        catalogue contains sky coordinate columns, then the mask NDF and
+*        the catalogue are aligned in sky coordinates.  Otherwise, the
+*        mask is aligned with the catalogue in pixel coordinates.
 *     MODE = LITERAL (Read)
 *        Specifies the manner in which the vectors are selected:
 *
@@ -102,6 +105,10 @@
 *  History:
 *     22-MAY-2018 (DSB):
 *        Original version.
+*     16-MAR-2020 (DSB):
+*        Changed so that the MASK NDF is aligned with the catalogue in sky
+*        coordinates rather than pixel coordinates (if and only if the
+*        NDF WCS contains any sky coordinates).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -133,6 +140,8 @@
       CHARACTER FILNAM*(GRP__SZFNM)! Name of ARD file
       CHARACTER FSYM(NSYM)*5     ! Equivalent F77 operators
       CHARACTER MODE*10          ! How to define selected vectors
+      CHARACTER NAME1*10         ! Name of first sky column
+      CHARACTER NAME2*10         ! Name of second sky column
       CHARACTER NEWEXP*255       ! Modified selection expression
       CHARACTER ONAME*250        ! Path to output catalogue
       CHARACTER PAT*20           ! Substitution pattern
@@ -143,10 +152,13 @@
       INTEGER EL                 ! No. of mapped elements
       INTEGER FD                 ! File descriptor
       INTEGER FS                 ! FrameSet connectig region and pixel
+      INTEGER P2SMAP             ! PIXEL->SKY Mapping
       INTEGER GI(2)              ! Identifiers for X and Y columns
+      INTEGER GIS(2)             ! Identifiers for sky columns
       INTEGER I                  ! Loop count
       INTEGER IAT                ! Used length of string
       INTEGER IBASE              ! Original index of base Frame
+      INTEGER IERR, NERR         ! primdat error information
       INTEGER IGRP               ! Group identifier
       INTEGER INDFM              ! Identifier for mask NDF
       INTEGER INDFR              ! Identifier for reference NDF
@@ -154,7 +166,9 @@
       INTEGER IPIX               ! Index of PIXEL Frame
       INTEGER IPLIST             ! Pointer to selected row list
       INTEGER IPMASK             ! Pointer to pixle mask
+      INTEGER IPSKY              ! Pointer to sky column values
       INTEGER IPXY               ! Pointer to X and Y column values
+      INTEGER IPXYD              ! Pointer to double precision X/Y values
       INTEGER IREG               ! AST pointer for supplied Region
       INTEGER ISYM               ! Symbol index
       INTEGER IWCS               ! Pointer to AST FrameSet read from catalogue
@@ -167,6 +181,7 @@
       INTEGER MLBND(2)           ! Lower pixel bounds of catalogue
       INTEGER MUBND(2)           ! Upper pixel bounds of catalogue
       INTEGER NBAD               ! No. of bad values
+      INTEGER NDIM               ! No. of dimensions
       INTEGER NFRM               ! No. of frames in FrameSet
       INTEGER NROWIN             ! No. of input rows
       INTEGER NUMREJ             ! No. of rejected rows
@@ -177,8 +192,10 @@
       INTEGER SDIM(2)            ! Indicies of significiant pixel axes
       INTEGER SI                 ! Selection identifier
       INTEGER SIR                ! Rejection identifier
+      INTEGER SKYFRM             ! SkyFrame in catalogue WCS
       INTEGER SLBND(2)           ! Lower bounds of significiant pixel axes
       INTEGER SUBND(2)           ! Upper bounds of significiant pixel axes
+      INTEGER TEMPLT             ! Template SkyFrame
       INTEGER UBNDE(2)           ! Upper pixel bounds of external box
       INTEGER UBNDI(2)           ! Upper pixel bounds of internal box
       INTEGER XOFF               ! Offset to start of X values
@@ -399,9 +416,108 @@
 
 * Now deal with selection by mask.
          ELSE IF( MODE .EQ. 'MASK' ) THEN
+
+*  Get an NDF identifier for the mask NDF.
             CALL NDF_ASSOC( 'MASK', 'READ', INDFM, STATUS )
-            CALL NDF_SECT( INDFM, 2, MLBND, MUBND, INDFS, STATUS )
-            CALL NDF_MAP( INDFS, 'Data', '_INTEGER', 'Read', IPMASK, EL,
+
+*  Search the catalogue FrameSet for a sky coordinate frame.
+            TEMPLT = AST_SKYFRAME( 'MaxAxes=100', STATUS )
+            FS = AST_FINDFRAME( IWCS, TEMPLT, ' ', STATUS )
+
+*  If found, get a pointer to the SkyFrame in the catalogue wcs.
+            P2SMAP = AST__NULL
+            IF( FS .NE. AST__NULL ) THEN
+               SKYFRM = AST_GETFRAME( FS, AST__CURRENT, STATUS )
+
+*  Get an AST pointer to a FrameSet describing the co-ordinate Frames
+*  present in the NDF's WCS component.  Always ensure that the Base,
+*  PIXEL and Current frames all have two dimensions.  The NDF must
+*  have no more than two significant pixel axes (i.e. pixel axes
+*  spanning more than one pixel).  A single significant pixel axis
+*  is allowed. The inverse transformation (sky->pixel) must be defined
+               CALL KPG1_ASGET( INDFM, 2, .FALSE., .TRUE., .TRUE., SDIM,
+     :                          SLBND, SUBND, IWCSR, STATUS )
+
+*  Change the base frame to be PIXEL so that the FrameSet returned by
+*  AST_FINDFRAME will return PIXEL->SKY mapping, rather than GRID->SKY
+*  Mapping.
+               CALL KPG1_ASFFR( IWCSR, 'PIXEL', IPIX, STATUS )
+               CALL AST_SETI( IWCSR, 'Base', IPIX, STATUS )
+
+*  Attempt to get a Mapping from PIXEL coords in the NDF to the sky
+*  coordinate Frame in the catalogue.
+               FS = AST_FINDFRAME( IWCSR, SKYFRM, ' ', STATUS )
+               IF( FS .NE. AST__NULL ) THEN
+                  P2SMAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT,
+     :                                     STATUS )
+               END IF
+            END IF
+
+*  If we are aligning the mask and catalogue in sky coordinates, get work
+*  arrays holding the sky position of each catalogue row.
+            IF( P2SMAP .NE. AST__NULL ) THEN
+
+*  Allocate work space to hold the data from the sky columns.
+               CALL PSX_CALLOC( NROWIN*2, '_DOUBLE', IPSKY, STATUS )
+
+*  Allocate work space to hold the double precision pixel coords.
+               CALL PSX_CALLOC( NROWIN*2, '_DOUBLE', IPXYD, STATUS )
+
+*  Get the names of the sky columns.
+               NAME1 = AST_GETC( SKYFRM, 'Symbol(1)', STATUS )
+               NAME2 = AST_GETC( SKYFRM, 'Symbol(2)', STATUS )
+
+*  Read these columns from the catalogue into the work arrays allocated
+*  above. This is done in a single pass through the catalogue in order
+*  to speed it up a bit.
+               CALL CAT_TIDNT( CIIN, NAME1, GIS(1), STATUS )
+               CALL CAT_TIDNT( CIIN, NAME2, GIS(2), STATUS )
+               CALL POL1_CTCLMD( CIIN, NROWIN, 2, GIS,
+     :                           %VAL( CNF_PVAL( IPSKY ) ), STATUS )
+
+*  Transform these sky coordinates into double precision pixel coords within
+*  the mask NDF.
+               CALL AST_TRAN2( P2SMAP, NROWIN,
+     :                      %VAL( CNF_PVAL( IPSKY ) ),
+     :                      %VAL( CNF_PVAL( IPSKY ) + NROWIN*VAL__NBD ),
+     :                      .FALSE.,
+     :                      %VAL( CNF_PVAL( IPXYD ) ),
+     :                      %VAL( CNF_PVAL( IPXYD ) + NROWIN*VAL__NBD ),
+     :                      STATUS )
+
+*  Free resources that are no longer needed.
+               CALL PSX_FREE( IPSKY, STATUS )
+               CALL CAT_TRLSE( GIS( 1 ), STATUS )
+               CALL CAT_TRLSE( GIS( 2 ), STATUS )
+
+*  Copy double precision pixel coords to single precicision.
+               CALL VEC_DTOR( .TRUE., NROWIN, %VAL( CNF_PVAL( IPXYD ) ),
+     :                      %VAL( CNF_PVAL( IPXY ) + XOFF ), IERR, NERR,
+     :                      STATUS )
+               CALL VEC_DTOR( .TRUE., NROWIN,
+     :                      %VAL( CNF_PVAL( IPXYD ) + NROWIN*VAL__NBD ),
+     :                      %VAL( CNF_PVAL( IPXY ) + YOFF ), IERR, NERR,
+     :                      STATUS )
+
+*  Free more resources.
+               CALL PSX_FREE( IPXYD, STATUS )
+
+*  Get the bounds of the mask NDFs.
+               CALL NDF_BOUND( INDFM, 2, MLBND, MUBND, NDIM, STATUS )
+
+*  If we are aligning in pixel coordinates, get a section of the mask NDF
+*  that matches the pixel bounds of the catalogue.
+            ELSE
+               CALL NDF_SECT( INDFM, 2, MLBND, MUBND, INDFS, STATUS )
+
+*  We no longer need the original NDF identifier, so we can replace it
+*  with the sectin identifier.
+               INDFM = INDFS
+
+            END IF
+
+*  Map the mask array.
+            CALL NDF_MAP( INDFM, 'Data', '_INTEGER', 'Read', IPMASK, EL,
      :                    STATUS )
             BADVAL = VAL__BADI
          END IF
