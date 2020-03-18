@@ -1,0 +1,542 @@
+#include "sae_par.h"
+#include "prm_par.h"
+#include "kaplibs.h"
+#include "mers.h"
+#include "ast.h"
+#include <stdint.h>
+#include <math.h>
+#include "star/thr.h"
+
+#define NITER 3
+
+/* Local data types */
+typedef struct  CGEN_FUNCTION(kpg1SymFitData) {
+   const CGEN_TYPE *x;
+   const CGEN_TYPE *y;
+   double b1;
+   double b2;
+   double b;
+   double m1;
+   double m2;
+   double m;
+   double sres1;
+   double sres2;
+   double sx;
+   double sxx;
+   double sxy;
+   double sy;
+   double syy;
+   double thresh;
+   int iter;
+   int ngood;
+   int operation;
+   int64_t p1;
+   int64_t p2;
+} CGEN_FUNCTION(kpg1SymFitData);
+
+/* Prototypes for local static functions. */
+static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status );
+
+
+void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *y,
+                                int clip, double *m, double *b, double *rms,
+                                int *status ){
+/*
+*+
+*  Name:
+*     kpg1SymFit
+
+*  Purpose:
+*     Do a symetric least squares linear fit between two arrays
+
+*  Language:
+*     C.
+
+*  Invocation:
+*     void kpg1SymFit<T>( int64_t n, const <TYPE> *x, const <TYPE> *y, int clip,
+*                         double *m, double *b, double *rms, int *status )
+
+*  Description:
+*     This function does a least squares linear fit on the X and Y arrays
+*     to return "m" and "b" where the best fitting line is:
+*
+*        Y = m*X + b
+*
+*     The fit done by this function minimises the sum of the squared
+*     residuals between the points and the fitted line. The residual used
+*     is the distance from a point to the nearest point on the fitted
+*     line. This is different to other similar function that use the vertical
+*     (Y) displacement between the point and the line as the residual.
+*     This means that the fit produced by this function is symetric -
+*     fitting the Y values to the X values should give the algebraic inversion
+*     of the line produced by fitting X values to Y values. This is not
+*     generally true for fitting functions that use the Y displacement as
+*     the residual.
+
+*  Arguments:
+*     n
+*        The length of the "x" and "Y" arrays.
+*     x
+*        Pointer to array of "n" X values.
+*     y
+*        Pointer to array of "n" Y values.
+*     clip
+*        If non-zero, outliers are identified and excluded from the fit.
+*        Otherwise the fit includes all points. The initial identification
+*        of outliers is performed by 3 iterations of sigma-clipping. The
+*        first iteration clips the data at 1 sigma - subsequent iterations
+*        clip at 3 sigma. Note, points rejected on an earlier iteration
+*        may be re-instated on a lter iteration if they are found to lie
+*        sufficiently close to the current best fit line.
+*     m
+*        Pointer to location at which to return the value of constant "m".
+*        VAL__BADD is returned if it cannot be determined.
+*     b
+*        Pointer to location at which to return the value of constant "b".
+*        VAL__BADD is returned if it cannot be determined.
+*     rms
+*        Pointer to location at which to return the RMS residual. VAL__BADD
+*        is returned if it cannot be determined. Note, any clipped points
+*        are excluded from this estimate of the RMS.
+*     status
+*        The inherited status.
+
+*  Copyright:
+*     Copyright (C) 2020 East Asian Observatory
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     DSB: David Berry (JAC, Hawaii)
+*     {enter_new_authors_here}
+
+*  History:
+*     16-MAR-2020 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+
+/* Local Variables: */
+   ThrWorkForce *wf;
+   CGEN_FUNCTION(kpg1SymFitData) *job_data;
+   CGEN_FUNCTION(kpg1SymFitData) *pdata;
+   double A;
+   double B;
+   double C;
+   double b1;
+   double b2;
+   double m1;
+   double m2;
+   double sres1;
+   double sres2;
+   double sqres;
+   double sx;
+   double sxx;
+   double sxy;
+   double sy;
+   double syy;
+   double t1;
+   double thresh;
+   int iter;
+   int64_t ngood;
+   int64_t ngood_prev;
+   int64_t ngood0;
+   int iw;
+   int nw;
+   int64_t step;
+
+/* Clipping levels (in sigma) at each iteration (element zero is ignored). */
+   double nsigma[ NITER ] = { 1.0, 3.0, 3.0 };
+
+/* Initialise */
+   *m = VAL__BADD;
+   *b = VAL__BADD;
+   *rms = VAL__BADD;
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Find the number of cores/processors available and create a pool of
+   threads of the same size. Assume we're being called from a KAPPA
+   application (sadly, we probably need an extra argument to indicate
+   what package is being used - or maybe there should be a global
+   variable in thr that can be set to the package name?). */
+   wf = thrGetWorkforce( thrGetNThread( "KAPPA_THREADS", status ),
+                         status );
+
+/* How many worker threads in the workforce? If the number of pixels is
+   very low, do all the calculations in the current thread. */
+   nw = wf ? wf->nworker : 1;
+   if( n < 10*nw ) nw = 1;
+
+/* Find how many pixels to process in each worker thread. Must be at
+   least one. */
+   if( nw > 0 ) {
+      step = n/nw;
+   } else {
+      step = n;
+   }
+
+/* Allocate job data for threads. Each structure describes a single job
+   to be allocated to a single worker thread. */
+   job_data = astCalloc( nw, sizeof(*job_data) );
+   if( *status == SAI__OK ) {
+
+/* Store information needed to do each job. This includes the first and
+   last pixel to be processed by each thread (the last thread picks up
+   any left over pixels). */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+
+         pdata->p1 = iw*step;
+         if( iw < nw - 1 ) {
+            pdata->p2 = pdata->p1 + step - 1;
+         } else {
+            pdata->p2 = n - 1;
+         }
+
+         pdata->x = x;
+         pdata->y = y;
+      }
+
+/* Preset the residuals and threshold to be used on the first iteration so
+   that all points are accepted. */
+      thresh = VAL__MAXD;
+      ngood_prev = -1;
+
+/* Loop over clipping iterations. */
+      iter = -1;
+      while( iter < NITER ) {
+
+/* Submit jobs to the workforce to form the required running sums. Each worker
+   calculates the running sums for its own allocated range of pixels, and
+   then these are added together afterwards. */
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->operation = 1;
+            pdata->thresh = thresh;
+            pdata->iter = iter;
+            pdata->b = *b;
+            pdata->m = *m;
+            thrAddJob( wf, 0, pdata, CGEN_FUNCTION(kpg1SymFit_work), 0, NULL,
+                       status );
+         }
+
+/* Put the current thread to sleep until all the above jobs have
+   completed. */
+         thrWait( wf, status );
+
+/* Accumulate the running sums from all threads. */
+         sx = 0.0;
+         sy = 0.0;
+         sxy = 0.0;
+         sxx = 0.0;
+         syy = 0.0;
+         ngood = 0;
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+
+            sx += pdata->sx;
+            sy += pdata->sy;
+            sxx += pdata->sxx;
+            sxy += pdata->sxy;
+            syy += pdata->syy;
+            ngood += pdata->ngood;
+         }
+
+/* Record the number of good points before any are rejected. */
+         if( iter == -1 ) ngood0 = ngood;
+
+/* If no extra points have been clipped (compared to the previous iteration),
+   then we can leave the iteration loop with the current solution. Otherwise,
+   record the number of good points for use on the next iteration. Only
+   do this if the clipping level has not changed. */
+         if( ngood == ngood_prev && iter > 0 &&
+             nsigma[ iter ] == nsigma[ iter - 1 ] ) {
+            break;
+         } else {
+            ngood_prev = ngood;
+         }
+
+/* Calculate the coefficients of the quadratic that give "m". */
+         if( ngood > 1 ) {
+            sx /= ngood;
+            sy /= ngood;
+            sxy /= ngood;
+            sxx /= ngood;
+            syy /= ngood;
+
+            A = sxy - sx*sy;
+            B = sxx - syy + sy*sy - sx*sx;
+            C = sx*sy - sxy;
+
+/* Calculate the two roots of A*m*m + B*m + C (the two possible values of m). */
+            t1 = B*B - 4*A*C;
+            if( t1 >= 0.0 ) {
+               t1 = sqrt( t1 );
+               m1 = ( -B + t1 )/(2*A);
+               m2 = ( -B - t1 )/(2*A);
+
+/* Find the corresponding values of b using the fact that the centroid is
+   on the best fit line. */
+               b1 = sy - m1*sx;
+               b2 = sy - m2*sx;
+
+/* Submit jobs to the workforce to form the form the sum of the squared
+   residuals. Each worker calculates the sum for its own allocated range
+   of pixels, and then these are added together afterwards. */
+               for( iw = 0; iw < nw; iw++ ) {
+                  pdata = job_data + iw;
+                  pdata->operation = 2;
+                  pdata->b1 = b1;
+                  pdata->b2 = b2;
+                  pdata->m1 = m1;
+                  pdata->m2 = m2;
+                  thrAddJob( wf, 0, pdata, CGEN_FUNCTION(kpg1SymFit_work), 0, NULL,
+                             status );
+               }
+
+/* Put the current thread to sleep until all the above jobs have
+   completed. */
+               thrWait( wf, status );
+
+/* Accumulate the sums from all threads. */
+               sres1 = 0.0;
+               sres2 = 0.0;
+               for( iw = 0; iw < nw; iw++ ) {
+                  pdata = job_data + iw;
+                  sres1 += pdata->sres1;
+                  sres2 += pdata->sres2;
+               }
+
+/* Get the mean squared residuals. */
+               sres1 /= ngood0;
+               sres2 /= ngood0;
+
+/* Choose the fit that gives the smallest RMS. */
+               if( sres1 < sres2 ) {
+                  *m = m1;
+                  *b = b1;
+                  sqres = sres1;
+               } else {
+                  *m = m2;
+                  *b = b2;
+                  sqres = sres2;
+               }
+               *rms = sqrt( sqres );
+
+/* Increment the iteration number. */
+               iter++;
+
+/* Set the threshold on acceptable squared residual at which to clip on
+   the next iteration. */
+               thresh = sqres*nsigma[ iter ]*nsigma[ iter ];
+
+/* Report progress. */
+               if( iter >= 0 ) {
+                  msgOutiff( MSG__DEBUG, " ", "Iteration %d: %" PRId64 " of %"
+                             PRId64 " points rejected at %g sigma (m:%g b:%g rms:%g)",
+                             status, iter + 1, ngood0 - ngood, ngood0, nsigma[ iter ],
+                             *m, *b, *rms );
+               } else {
+                  msgOutiff( MSG__DEBUG, " ", "Initially: %" PRId64 " good "
+                             "points found for fit (m:%g b:%g rms:%g).", status,
+                             ngood, *m, *b, *rms );
+               }
+
+/* Set bad return values and break if the roots cannot be found. */
+            } else {
+               msgOutiff( MSG__DEBUG, " ", "Cannot find roots", status );
+               *m = VAL__BADD;
+               *b = VAL__BADD;
+               *rms = VAL__BADD;
+               break;
+            }
+
+/* Set bad return values and break if no good points remain */
+         } else {
+            msgOutiff( MSG__DEBUG, " ", "All good points rejected", status );
+            *m = VAL__BADD;
+            *b = VAL__BADD;
+            *rms = VAL__BADD;
+            break;
+         }
+
+/* If no clipping is to be performed, break out of the iteration loop at
+   the end of the first pass. */
+         if( !clip ) break;
+      }
+   }
+
+/* Free resources. */
+   job_data = astFree( job_data );
+}
+
+static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status ){
+/*
+*  Name:
+*     kpg1SymFit_work<X>
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     kpg1SymFit.
+
+*  Invocation:
+*     void kpg1SymFit_work<X>( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = kpg1SymFitData<X> * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   CGEN_FUNCTION(kpg1SymFitData) *pdata;
+   const CGEN_TYPE *px;
+   const CGEN_TYPE *py;
+   double b;
+   double b1;
+   double b2;
+   double m;
+   double m1;
+   double m2;
+   double sqres;
+   double sres1;
+   double sres2;
+   double sx;
+   double sxx;
+   double sxy;
+   double sy;
+   double syy;
+   double t1;
+   double t2;
+   double thresh;
+   int iter;
+   int64_t i;
+   int64_t ngood;
+   int64_t p1;
+   int64_t p2;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (CGEN_FUNCTION(kpg1SymFitData) *) job_data_ptr;
+
+/* For convenience, store commonly used values in local variables */
+   p1 = pdata->p1;
+   p2 = pdata->p2;
+   thresh = pdata->thresh;
+
+/* Form running sums. */
+   if( pdata->operation == 1 ) {
+      iter = pdata->iter;
+      b = pdata->b;
+      m = pdata->m;
+
+/* Initialise them. */
+      sqres = 0.0;
+      sx = 0.0;
+      sy = 0.0;
+      sxy = 0.0;
+      sxx = 0.0;
+      syy = 0.0;
+      ngood = 0;
+
+      px = pdata->x + p1;
+      py = pdata->y + p1;
+
+      for( i = p1; i <= p2; i++,px++,py++ ) {
+         if( *px != CGEN_BAD && *py != CGEN_BAD ) {
+
+/* On the second and subsequent iterations, get the squared distance of the
+   current point from the nearest point on the previously fitted line. Use
+   the preset sqres and thresh values on the first iteration so that all
+   points are accepted. */
+            if( iter >= 0 ) {
+               t1 = *py - b;
+               t2 = *px + m*( *py - b );
+               sqres = (*px)*(*px) + t1*t1 - t2*t2/( 1.0 + m*m );
+            }
+
+/* Update the running sums if the squared residual for this point is below
+   the threshold. */
+            if( sqres < thresh ) {
+               ngood++;
+               sx += *px;
+               sy += *py;
+               sxy += (*px)*(*py);
+               sxx += (*px)*(*px);
+               syy += (*py)*(*py);
+            }
+         }
+      }
+
+/* Return the running sums in the job structure. */
+      pdata->sx = sx;
+      pdata->sy = sy;
+      pdata->sxy = sxy;
+      pdata->sxx = sxx;
+      pdata->syy = syy;
+      pdata->ngood = ngood;
+
+/* Find the RMS residual of the points from each of the two possible
+   lines. Exclude points that are too far from the new fitted line. */
+   } else if( pdata->operation == 2 ) {
+      b1 = pdata->b1;
+      m1 = pdata->m1;
+      b2 = pdata->b2;
+      m2 = pdata->m2;
+
+      sres1 = 0.0;
+      sres2 = 0.0;
+
+      px = pdata->x + p1;
+      py = pdata->y + p1;
+
+      for( i = p1; i <= p2; i++,px++,py++ ) {
+         if( *px != CGEN_BAD && *py != CGEN_BAD ) {
+            t1 = *py - b1;
+            t2 = *px + m1*( *py - b1 );
+            sqres = (*px)*(*px) + t1*t1 - t2*t2/( 1.0 + m1*m1 );
+            if( sqres > 0.0 ) sres1 += sqres;
+
+            t1 = *py - b2;
+            t2 = *px + m2*( *py - b2 );
+            sqres = (*px)*(*px) + t1*t1 - t2*t2/( 1.0 + m2*m2 );
+            if( sqres > 0.0 ) sres2 += sqres;
+         }
+      }
+
+/* Return the sums in the job structure. */
+      pdata->sres1 = sres1;
+      pdata->sres2 = sres2;
+
+/* Report an error if the requested operation is unknown. */
+   } else if( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "kpg1SymFit_work: Unknown operation '%d'.", status,
+               pdata->operation );
+   }
+}

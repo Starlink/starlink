@@ -42,9 +42,9 @@ kpg1_hdsky.c kpg1Kyhds.c kpg1_kyhds.c kpgGetOutline.c kpgPutOutline.c \
 kpg_gtfts.c kpg_ptfts.c kpg1Ch2pm.c kpg1_ch2pm.c kpg1Chcof.c \
 kpg1Fit1d.c kpg1_fit1d.c kpg1_asndf.c kpg1_asndf8.c kpg1Asndf.c \
 kpg1Asndf8.c kpg1Axcpy.c kpg1_getoutline.c kpg1Rnorm.c kpg1_rnorm.c \
-kpg1CrMapD.c kpg1_crmapd.c kpg1_osta8.c kpg1_cputm.c
+kpg1CrMapD.c kpg1_crmapd.c kpg1_osta8.c kpg1_cputm.c kpg1_symfit.c
 
-GEN_C_ROUTINES = kpgOsta8.cgen
+GEN_C_ROUTINES = kpgOsta8.cgen kpg1SymFit.cgen
 
 # The .c files which are built from the above .cgen files.
 BUILT_C_ROUTINES = $(GEN_C_ROUTINES:.cgen=.c)
