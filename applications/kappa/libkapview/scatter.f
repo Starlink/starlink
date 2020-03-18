@@ -37,6 +37,9 @@
 *
 *     The Pearson correlation coefficient of the displayed scatter plot is
 *     also calculated and displayed, and written to output parameter CORR.
+*
+*     A linear fit to the data can be calculated and displayed (see
+*     Parameter FIT).
 
 *  Usage:
 *     scatter in1 in2 comp1 comp2 device
@@ -81,13 +84,21 @@
 *        supplied is smaller than the number of axes, the final value
 *        supplied is duplicated for the remaining axes.  [1]
 *     CORR = _DOUBLE (Write)
-*        The Pearson correlation coefficient of the points in the scatter
-*        plot. A value of zero is stored if the correlation coefficient
-*        cannot be calculated.
+*        The Pearson correlation coefficient of all the points in the scatter
+*        plot (not just the visible points). A value of zero is stored if the
+*        correlation coefficient cannot be calculated.
 *     DEVICE = DEVICE (Read)
 *        The graphics workstation on which to produce the plot.  If a
 *        null value (!) is supplied no plot will be made. [Current graphics
 *        device]
+*     FIT = _LOGICAL (Read)
+*        If TRUE, then a linear fit to the scatter points is added to the
+*        plot. The slope and offset of this fit is displayed on the screen
+*        and written to output parameter SLOPE, OFFSET and RMS. A symetric
+*        linear fit algorithm is used, which caters for the presence of
+*        noise in both X and Y values. Outliers are identified and
+*        ignored. Note, the fit is based on all the points in the scatter
+*        plot, not just the visible points. [current value]
 *     IN1 = NDF (Read)
 *        The NDF to be displayed on the horizontal axis.
 *     IN2 = NDF (Read)
@@ -109,6 +120,9 @@
 *        equal to -31.  [current value]
 *     NPIX = _INTEGER (Write)
 *        The number of points used to form the correlation coefficient.
+*     OFFSET = _DOUBLE (Write)
+*        An output parameter giving the offset in the linear fit:
+*        IN2 = SLOPE * IN1 + OFFSET. Only used if Parameter FIT is TRUE.
 *     PERC1( 2 ) = _REAL (Read)
 *        The percentiles that define the default values for XLEFT and
 *        XRIGHT. For example, [5,95] would result in the lowest and
@@ -121,6 +135,12 @@
 *        highest 5% of the data value in IN2 being excluded from the plot
 *        if the default values are accepted for YBOT and YTOP.
 *        [current value]
+*     RMS = _DOUBLE (Write)
+*        An output parameter giving the RMS residual of the data (excluding
+*        outliers) about the linear fit. Only used if Parameter FIT is TRUE.
+*     SLOPE = _DOUBLE (Write)
+*        An output parameter giving the slope of the linear fit:
+*        IN2 = SLOPE * IN1 + OFFSET. Only used if Parameter  FIT is TRUE.
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to use
 *        when drawing the annotated axes, and markers.
@@ -266,6 +286,8 @@
 *        Added calculation of correlation coefficient.
 *     5-SEP-2013 (DSB):
 *        Added output parameter NPIX.
+*     18-MAR-2020 (DSB):
+*        Added parameters FIT, SLOPE, OFFSET and RMS.
 *     {enter_further_changes_here}
 
 *-
@@ -299,6 +321,9 @@
       CHARACTER UNITS2*30        ! Units string from NDF IN2
       DOUBLE PRECISION BSCALE( 2 )! Scaling for plot labels
       DOUBLE PRECISION R         ! Correlation coefficient
+      DOUBLE PRECISION SLOPE     ! Slope of linear fit
+      DOUBLE PRECISION OFFSET    ! Offset of linear fit
+      DOUBLE PRECISION RMS       ! RMS residual of linear fit
       INTEGER CMPRS( NDF__MXDIM )! Compression factors for each axis
       INTEGER CDIM( NDF__MXDIM ) ! Dimensions of compressed array
       INTEGER CEL                ! No of elements in compressed array
@@ -326,11 +351,13 @@
       INTEGER NCU2               ! Used length of UNITS2
       INTEGER NDIM               ! No. of dimensions in array
       INTEGER NEL                ! No. of elements mapped from the NDFs
+      INTEGER*8 NEL8             ! No. of elements mapped from the NDFs
       INTEGER NERR               ! Number of numerical errors
       INTEGER NINVAL             ! Number of invalid values
       INTEGER NMLEN              ! Used length of NDFNAM
       INTEGER NPIX               ! Number of values used in corr. coeff.
       INTEGER NVAL               ! Number of supplied values
+      LOGICAL FIT                ! Calculate and display a linear fit?
       LOGICAL BLAV               ! Do block averaging?
       REAL PERC1( 2 )            ! Percentiles defining default IN1 data range
       REAL PERC2( 2 )            ! Percentiles defining default IN1 data range
@@ -557,11 +584,11 @@
      :                 %VAL( CNF_PVAL( IPW4 ) ), R, NPIX, STATUS )
       IF( R .NE. VAL__BADD ) THEN
          CALL MSG_SETD( 'R', R )
-         CALL MSG_OUT( ' ', '   Correlation coefficient: ^R', STATUS )
+         CALL MSG_OUT( ' ', '  Correlation coefficient: ^R', STATUS )
          CALL PAR_PUT0D( 'CORR', R, STATUS )
          CALL PAR_PUT0I( 'NPIX', NPIX, STATUS )
       ELSE
-         CALL MSG_OUT( ' ', '   Correlation coefficient: <bad>',
+         CALL MSG_OUT( ' ', '  Correlation coefficient: <bad>',
      :                 STATUS )
          CALL PAR_PUT0D( 'CORR', 0.0D0, STATUS )
          CALL PAR_PUT0I( 'NPIX', 0, STATUS )
@@ -602,6 +629,29 @@
      :                 PERV1( 2 ), PERV2( 1 ), PERV2( 2 ),
      :                 'KAPPA_SCATTER', .FALSE., .FALSE., BSCALE,
      :                 IPLOT, STATUS )
+
+
+*  If required, add  a linear fit to the plot.
+      CALL PAR_GET0L( 'FIT', FIT, STATUS )
+      IF( FIT ) THEN
+         NEL8 = NEL
+         CALL KPG1_DRFIT(  NEL8, %VAL( CNF_PVAL( IPW3 ) ),
+     :                     %VAL( CNF_PVAL( IPW4 ) ), IPLOT,
+     :                     SLOPE, OFFSET, RMS, STATUS )
+
+         CALL MSG_BLANK( STATUS )
+         CALL MSG_SETR( 'M', REAL(SLOPE) )
+         CALL MSG_SETR( 'B', REAL(OFFSET) )
+         CALL MSG_OUT( ' ', '  Best fit line is:  Y = ( ^M )*X + '//
+     :                 '( ^B )', STATUS )
+         CALL MSG_SETR( 'R', REAL(RMS) )
+         CALL MSG_OUT( ' ', '  RMS residual from line is: ^R', STATUS )
+         CALL MSG_BLANK( STATUS )
+
+         CALL PAR_PUT0D( 'SLOPE', SLOPE, STATUS )
+         CALL PAR_PUT0D( 'OFFSET', OFFSET, STATUS )
+         CALL PAR_PUT0D( 'RMS', RMS, STATUS )
+      END IF
 
 *  Close the workstation.
       IF( IPLOT .NE. AST__NULL ) CALL KPG1_PGCLS( 'DEVICE', .FALSE.,

@@ -210,6 +210,7 @@ kpg1_debug.f \
 kpg_dimls.f \
 kpg1_dnag2r.f \
 kpg1_dr2nag.f \
+kpg1_drfit.f \
 kpg1_dsfr1.f \
 kpg1_elgau.f \
 kpg1_envdf.f \

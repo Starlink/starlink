@@ -7292,6 +7292,15 @@ package kappa {
             helpkey *
          }
 
+         parameter fit {
+            type _LOGICAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Display a linear fit?}
+            helpkey *
+         }
+
          parameter in1 {
             position 1
             type NDF
@@ -7341,6 +7350,14 @@ package kappa {
             helpkey *
          }
 
+         parameter offset {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            helpkey *
+            default 0.0
+         }
+
          parameter perc1 {
             type _REAL
             vpath CURRENT DEFAULT
@@ -7359,6 +7376,22 @@ package kappa {
             default (5 95)
             helpkey *
             size *
+         }
+
+         parameter rms {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            helpkey *
+            default 0.0
+         }
+
+         parameter slope {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            helpkey *
+            default 0.0
          }
 
          parameter style {
