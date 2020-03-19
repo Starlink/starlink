@@ -181,7 +181,7 @@
 *     MODE = INTEGER (Given)
 *        Determines the way in which the data points are represented.
 *           1 -- A "staircase" histogram, in which each horizontal line
-*                is centred on the X position. Bad values are flanked by 
+*                is centred on the X position. Bad values are flanked by
 *                vertical lines drawn down to the lower edge of the viewport.
 *           2 -- The points are joined by straight lines.
 *           3 -- A marker is placed at each point.
@@ -318,6 +318,8 @@
 *        graphics apps such as NORMALIZE can work with "device=!".
 *     11-FEB-2016 (DSB):
 *        Added mode 7.
+*     19-MAR-2020 (DSB):
+*        Change screen report to give number of visible plotted points.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -383,11 +385,12 @@
       INTEGER IPICF           ! AGI picture id for FRAME picture
       INTEGER IPLOT2          ! Plot with requested axis scalings
       INTEGER IVAL            ! Unused integer argument
-      INTEGER NGOOD           ! No. of points to plot
+      INTEGER NGOOD           ! No. of visible points
       INTEGER NMARG           ! No. of supplied margin widths
       LOGICAL AXES            ! Draw axes?
       LOGICAL CLEAR           ! Clear old picture first?
       LOGICAL LVAL            ! Unused logical argument
+      LOGICAL VISIBLE         ! Is point visible?
       REAL DEFMAR             ! Default margin value
       REAL MARGIN( 4 )        ! Margins for plot annotation
       REAL XLEFT              ! X at left edge
@@ -477,20 +480,26 @@
 
             IF( XX .NE. VAL__BADR ) THEN
                DX( I ) = DBLE( XX )
-               IF( YY .NE. VAL__BADR ) NGOOD = NGOOD + 1
+               VISIBLE = ( XX .GE. XLEFT .AND. XX .LE. XRIGHT )
             ELSE
                DX( I ) = AST__BAD
+               VISIBLE = .FALSE.
             END IF
 
             IF( YY .NE. VAL__BADR ) THEN
                DY( I ) = DBLE( YY )
                DBAR( I, 1 ) = DBLE( YY - NSIGMA*YSIGMA( I ) )
                DBAR( I, 2 ) = DBLE( YY + NSIGMA*YSIGMA( I ) )
+               VISIBLE = VISIBLE .AND. ( YY .GE. YBOT .AND.
+     :                                   YY .LE. YTOP )
             ELSE
                DY( I ) = AST__BAD
                DBAR( I, 1 ) = AST__BAD
                DBAR( I, 2 ) = AST__BAD
+               VISIBLE = .FALSE.
             END IF
+
+            IF( VISIBLE ) NGOOD = NGOOD + 1
 
          END DO
 
@@ -502,16 +511,22 @@
 
             IF( XX .NE. VAL__BADR ) THEN
                DX( I ) = DBLE( XX )
-               IF( YY .NE. VAL__BADR ) NGOOD = NGOOD + 1
+               VISIBLE = ( XX .GE. XLEFT .AND. XX .LE. XRIGHT )
             ELSE
                DX( I ) = AST__BAD
+               VISIBLE = .FALSE.
             END IF
 
             IF( YY .NE. VAL__BADR ) THEN
                DY( I ) = DBLE( YY )
+               VISIBLE = VISIBLE .AND. ( YY .GE. YBOT .AND.
+     :                                   YY .LE. YTOP )
             ELSE
                DY( I ) = AST__BAD
+               VISIBLE = .FALSE.
             END IF
+
+            IF( VISIBLE ) NGOOD = NGOOD + 1
 
          END DO
 
@@ -668,12 +683,12 @@
      :                       ' All the data was either bad or outside'//
      :                       ' the range of the axes.', STATUS )
             ELSE IF( NGOOD .EQ. 1 ) THEN
-               CALL MSG_OUT( 'KPG1_GRPHW_MSG2', '  One point plotted.',
-     :                       STATUS )
+               CALL MSG_OUT( 'KPG1_GRPHW_MSG2', '  One visible point '//
+     :                       'plotted.', STATUS )
             ELSE
                CALL MSG_SETI( 'NG', NGOOD )
-               CALL MSG_OUT( 'KPG1_GRPHW_MSG3', '  ^NG points plotted.',
-     :                       STATUS )
+               CALL MSG_OUT( 'KPG1_GRPHW_MSG3', '  ^NG visible points'//
+     :                       ' plotted.', STATUS )
             END IF
 
          END IF
