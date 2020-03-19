@@ -30,6 +30,16 @@
       increase from right to left, depending on the nature of the
       WCS.
 
+   o  SCATTER
+
+      -  A new parameter called FIT allows a linear fit to the scatter
+      plot to be calculated and displayed.
+      -  The correlation coefficient is now calculated from the
+      visible points alone. Any points outside the bounds of the
+      plot are ignored. Previously, such points were not ignored.
+      -  The reported number of points plotted now ignores any
+      points outside the bounds of the plot.
+
    o  SUBSTITUTE
 
       -  A new parameter called LUT allows multiple values to be

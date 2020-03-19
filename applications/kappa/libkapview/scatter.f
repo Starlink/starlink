@@ -38,8 +38,8 @@
 *     The Pearson correlation coefficient of the displayed scatter plot is
 *     also calculated and displayed, and written to output parameter CORR.
 *
-*     A linear fit to the data can be calculated and displayed (see
-*     Parameter FIT).
+*     A linear fit to the data in the scatter plot can be calculated and
+*     displayed (see Parameter FIT).
 
 *  Usage:
 *     scatter in1 in2 comp1 comp2 device
@@ -84,9 +84,9 @@
 *        supplied is smaller than the number of axes, the final value
 *        supplied is duplicated for the remaining axes.  [1]
 *     CORR = _DOUBLE (Write)
-*        The Pearson correlation coefficient of all the points in the scatter
-*        plot (not just the visible points). A value of zero is stored if the
-*        correlation coefficient cannot be calculated.
+*        The Pearson correlation coefficient of the visible points in the
+*        scatter plot (points outside the plot are ignored). A value of
+*        zero is stored if the correlation coefficient cannot be calculated.
 *     DEVICE = DEVICE (Read)
 *        The graphics workstation on which to produce the plot.  If a
 *        null value (!) is supplied no plot will be made. [Current graphics
@@ -97,8 +97,9 @@
 *        and written to output parameter SLOPE, OFFSET and RMS. A symetric
 *        linear fit algorithm is used, which caters for the presence of
 *        noise in both X and Y values. Outliers are identified and
-*        ignored. Note, the fit is based on all the points in the scatter
-*        plot, not just the visible points. [current value]
+*        ignored. Note, the fit is based on just those points that are
+*        visible in the scatter plot. Points outside the bounds of the
+*        plot are ignored. [current value]
 *     IN1 = NDF (Read)
 *        The NDF to be displayed on the horizontal axis.
 *     IN2 = NDF (Read)
@@ -288,6 +289,9 @@
 *        Added output parameter NPIX.
 *     18-MAR-2020 (DSB):
 *        Added parameters FIT, SLOPE, OFFSET and RMS.
+*     19-MAR-2020 (DSB):
+*        Change the FIT and CORR parameters to ignore points outside
+*        the bounds of the plot.
 *     {enter_further_changes_here}
 
 *-
@@ -581,7 +585,9 @@
 
 *  Calculate the correlation coefficient.
       CALL KPG1_CORRR( NEL, %VAL( CNF_PVAL( IPW3 ) ),
-     :                 %VAL( CNF_PVAL( IPW4 ) ), R, NPIX, STATUS )
+     :                 %VAL( CNF_PVAL( IPW4 ) ), PERV1( 1 ),
+     :                 PERV1( 2 ), PERV2( 1 ), PERV2( 2 ), R, NPIX,
+     :                 STATUS )
       IF( R .NE. VAL__BADD ) THEN
          CALL MSG_SETD( 'R', R )
          CALL MSG_OUT( ' ', '  Correlation coefficient: ^R', STATUS )
@@ -636,7 +642,8 @@
       IF( FIT ) THEN
          NEL8 = NEL
          CALL KPG1_DRFIT(  NEL8, %VAL( CNF_PVAL( IPW3 ) ),
-     :                     %VAL( CNF_PVAL( IPW4 ) ), IPLOT,
+     :                     %VAL( CNF_PVAL( IPW4 ) ), PERV1( 1 ),
+     :                     PERV1( 2 ), PERV2( 1 ), PERV2( 2 ), IPLOT,
      :                     SLOPE, OFFSET, RMS, STATUS )
 
          CALL MSG_BLANK( STATUS )

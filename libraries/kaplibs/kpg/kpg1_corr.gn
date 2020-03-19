@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_CORR<T>( EL, X, Y, R, N, STATUS )
+      SUBROUTINE KPG1_CORR<T>( EL, X, Y, XLO, XHI, YLO, YHI, R, N, STATUS )
 *+
 *  Name:
 *     KPG1_CORRx
@@ -10,11 +10,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_CORR<T>( EL, X, Y, R, N, STATUS )
+*     CALL KPG1_CORR<T>( EL, X, Y, XLO, XHI, YLO, YHI, R, N, STATUS )
 
 *  Description:
 *     The routine calculates the sample Pearson correlation coefficient
-*     between the two supplied arrays.
+*     between the two supplied arrays. The values used from each array
+*     may be limited to those falling within a given range.
 
 *  Arguments:
 *     EL = INTEGER (Given)
@@ -23,6 +24,16 @@
 *        First input array.
 *     Y( EL ) = ? (Given)
 *        First input array.
+*     XLO = ? (Given)
+*        The lowest X value to include. See also XHI.
+*     XHI = ? (Given)
+*        The highest X value to include. All X values are used
+*        if XHI is less than or equal to XLO.
+*     YLO = ? (Given)
+*        The lowest Y value to include. See also YHI.
+*     YHI = ? (Given)
+*        The highest Y value to include. All Y values are used
+*        if YHI is less than or equal to YLO.
 *     R = DOUBLE PRECISION (Returned)
 *        The correlation coefficient.
 *     N = INTEGER (Returned)
@@ -65,6 +76,8 @@
 *        Original version.
 *     5-SEP-2013 (DSB):
 *        Added argument N.
+*     19-MAR-2020 (DSB):
+*        Added arguments XLO, XHI, YLO and YHI.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -85,6 +98,10 @@
       INTEGER EL
       <TYPE> X( EL )
       <TYPE> Y( EL )
+      <TYPE> XLO
+      <TYPE> XHI
+      <TYPE> YLO
+      <TYPE> YHI
 
 *  Arguments Returned:
       DOUBLE PRECISION R
@@ -96,6 +113,10 @@
 *  Local Variables:
       DOUBLE PRECISION ALIM      ! Largest safe value
       DOUBLE PRECISION DENOM     ! Denominator value
+      DOUBLE PRECISION HIX       ! Highest acceptable X value
+      DOUBLE PRECISION HIY       ! Highest acceptable Y value
+      DOUBLE PRECISION LOX       ! Lowest acceptable X value
+      DOUBLE PRECISION LOY       ! Lowest acceptable Y value
       DOUBLE PRECISION SX        ! Sum of X values
       DOUBLE PRECISION SXX       ! Sum of squared X values
       DOUBLE PRECISION SXY       ! Sum of X*Y values
@@ -119,6 +140,22 @@
 *  safely.
       ALIM = SQRT( DBLE( VAL__MAX<T> )/EL )
 
+*  Get the X limits to use.
+      HIX = ALIM
+      LOX = -ALIM
+      IF( XHI .GT. XLO ) THEN
+         IF( DBLE( XHI ) .LT. HIX ) HIX = DBLE( XHI )
+         IF( DBLE( XLO ) .GT. LOX ) LOX = DBLE( XLO )
+      END IF
+
+*  Check Y values?
+      HIY = ALIM
+      LOY = -ALIM
+      IF( YHI .GT. YLO ) THEN
+         IF( DBLE( YHI ) .LT. HIY ) HIY = DBLE( YHI )
+         IF( DBLE( YLO ) .GT. LOY ) LOY = DBLE( YLO )
+      END IF
+
 *  Intialise sums
       SXY = 0.0D0
       SX = 0.0D0
@@ -129,13 +166,15 @@
 *  Loop round every pair of values
       DO I = 1, EL
 
-*  Check both are good.
+*  Check both are good and within the acceptable range.
          IF( X( I ) .NE. VAL__BAD<T> .AND. Y( I ) .NE. VAL__BAD<T> ) THEN
 
-*  Convert to double precision and check they are safe to use.
+*  Convert to double precision and check they are within the acceptable
+*  range.
             VX = DBLE( X( I ) )
             VY = DBLE( Y( I ) )
-            IF( ABS( VX ) .LT. ALIM .AND. ABS( VY ) .LT. ALIM ) THEN
+            IF( VX .GE. LOX .AND. VX .LE. HIX .AND.
+     :          VY .GE. LOY .AND. VY .LE. HIY ) THEN
 
 *  Increment the sums
                SXY = SXY +VX*VY
