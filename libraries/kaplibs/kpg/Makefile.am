@@ -42,12 +42,12 @@ kpg1_hdsky.c kpg1Kyhds.c kpg1_kyhds.c kpgGetOutline.c kpgPutOutline.c \
 kpg_gtfts.c kpg_ptfts.c kpg1Ch2pm.c kpg1_ch2pm.c kpg1Chcof.c \
 kpg1Fit1d.c kpg1_fit1d.c kpg1_asndf.c kpg1_asndf8.c kpg1Asndf.c \
 kpg1Asndf8.c kpg1Axcpy.c kpg1_getoutline.c kpg1Rnorm.c kpg1_rnorm.c \
-kpg1CrMapD.c kpg1_crmapd.c kpg1_osta8.c kpg1_cputm.c kpg1_symfit.c
+kpg1CrMapD.c kpg1_crmapd.c kpg1_osta8.c kpg1_cputm.c
 
-GEN_C_ROUTINES = kpgOsta8.cgen kpg1SymFit.cgen
+CGEN_ROUTINES = kpgOsta8.cgen kpg1SymFit.cgen
 
 # The .c files which are built from the above .cgen files.
-BUILT_C_ROUTINES = $(GEN_C_ROUTINES:.cgen=.c)
+BUILT_C_ROUTINES = $(CGEN_ROUTINES:.cgen=.c) $(KPG_N_CGEN:.cn=.c)
 
 BUILT_SOURCES = $(include_MESSAGES) $(BUILT_C_ROUTINES)
 
@@ -78,7 +78,8 @@ ADAM_GEN_F_ROUTINES = $(KPG_ADAM_DR_GEN:.gdr=.f) \
 
 # Need to make sure that a maintainer clean really removes the
 # output of generic
-MAINTAINERCLEANFILES = $(GEN_F_ROUTINES) $(ADAM_GEN_F_ROUTINES)
+MAINTAINERCLEANFILES = $(GEN_F_ROUTINES) $(ADAM_GEN_F_ROUTINES) \
+                       $(BUILT_C_ROUTINES)
 
 # Numeric types except Double precision
 # Note that in this case the suffix is strange since a case insensitive
@@ -102,6 +103,8 @@ kpg1_sclw.gn kpg1_sclk.gn kpg1_ptnd.gn kpg1_bbox.gn kpg_osta.gn \
 kpg_fise.gn  kpg_immm.gn kpg1_corr.gn kpg1_rms.gn kpg1_ltva.gn \
 kpg_osta8.gn kpg1_mvbd8.gn kpg1_retr8.gn kpg1_thrs8.gn \
 kpg1_bbox8.gn kpg1_fill8.gn kpg1_mxmn8.gn kpg1_past8.gn
+
+KPG_N_CGEN = kpg1_symfit.cn
 
 # All except logical (include char)
 KPG_XL_GEN = kpg1_qsrt.gxl
@@ -423,7 +426,8 @@ kpg1_plotp.f \
 kpg1_plots.f \
 kpg1_pltln.f
 
-
+.cn.c:
+	$(FGENERIC)  -t n $<
 
 .gn.f:
 	$(FGENERIC) $(<)
@@ -482,7 +486,7 @@ AM_FCFLAGS = -I../ira
 
 # Create the .c file which defines type-specific code generated from each
 # .cgen file.
-$(GEN_C_ROUTINES:.cgen=.c): kpg_cgen.h
+$(CGEN_ROUTINES:.cgen=.c): kpg_cgen.h
 	echo "/*" > $@
 	echo "*  Name:" >> $@
 	echo "*    $@" >> $@
@@ -542,4 +546,4 @@ $(GEN_C_ROUTINES:.cgen=.c): kpg_cgen.h
 	echo "" >> $@
 
 # Need to distribute the generic files
-EXTRA_DIST = $(GEN_C_ROUTINES)
+EXTRA_DIST = $(CGEN_ROUTINES)

@@ -1,5 +1,5 @@
-      SUBROUTINE KPG1_DRFIT( N, X, Y, IPLOT, SLOPE, OFFSET, RMS,
-     :                       STATUS )
+      SUBROUTINE KPG1_DRFIT( N, X, Y, XLO, XHI, YLO, YHI, IPLOT, SLOPE,
+     :                       OFFSET, RMS, STATUS )
 *+
 *  Name:
 *     KPG1_DRFIT
@@ -11,12 +11,14 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_DRFIT( N, X, Y, IPLOT, SLOPE, OFFSET, RMS, STATUS )
+*     CALL KPG1_DRFIT( N, X, Y, XLO, XHI, YLO, YHI, IPLOT, SLOPE, OFFSET,
+*                      RMS, STATUS )
 
 *  Description:
 *     This routine does a symetric least squares linear fit to the supplied
 *     X and Y values, draws it on the supplied plot, and returns the
 *     slope, offset and RMS residual. Outliers are identified and removed.
+*     See KPG1_SYMFIT for more information about how the fit is done.
 
 *  Arguments:
 *     N = INTEGER*8 (Given)
@@ -27,6 +29,16 @@
 *        Y value at each point.
 *        suppresses error bars. Otherwise error bars are drawn which extend
 *        by from Y - NSIGMA*YSIGMA to Y + NSIGMA*YSIGMA.
+*     XLO = REAL (Given)
+*        The lowest X value to include in the fit. See also XHI.
+*     XHI = REAL (Given)
+*        The highest X value to include in the fit. All X values are used
+*        if XHI is less than or equal to XLO.
+*     YLO = REAL (Given)
+*        The lowest Y value to include in the fit. See also YHI.
+*     YHI = REAL (Given)
+*        The highest Y value to include in the fit. All Y values are used
+*        if YHI is less than or equal to YLO.
 *     IPLOT = INTEGER (Given)
 *        An AST Plot that can be used to draw the line. No line is drawn
 *        if this is AST__NULL, but the parameters of the line are still
@@ -68,6 +80,8 @@
 *  History:
 *     18-MAR-2020 (DSB):
 *        Original version.
+*     19-MAR-2020 (DSB):
+*        Added arguments XLO, XHI, YLO and YHI.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -87,6 +101,10 @@
       INTEGER*8 N
       REAL X( N )
       REAL Y( N )
+      REAL XLO
+      REAL XHI
+      REAL YLO
+      REAL YHI
       INTEGER IPLOT
 
 *  Arguments Returned:
@@ -115,8 +133,8 @@
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Calculate the fit parameters.
-      CALL KPG1_SYMFIT( '_REAL', N, X, Y, .TRUE., SLOPE, OFFSET, RMS,
-     :                  STATUS )
+      CALL KPG1_SYMFITR( N, X, Y, XLO, XHI, YLO, YHI, .TRUE.,
+     :                   SLOPE, OFFSET, RMS, STATUS )
 
 *  If required, draw the fit.
       IF( IPLOT .NE. AST__NULL .AND. SLOPE .NE. VAL__BADD ) THEN

@@ -13,6 +13,10 @@
 typedef struct  CGEN_FUNCTION(kpg1SymFitData) {
    const CGEN_TYPE *x;
    const CGEN_TYPE *y;
+   CGEN_TYPE xlo;
+   CGEN_TYPE xhi;
+   CGEN_TYPE ylo;
+   CGEN_TYPE yhi;
    double b1;
    double b2;
    double b;
@@ -39,8 +43,9 @@ static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status );
 
 
 void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *y,
-                                int clip, double *m, double *b, double *rms,
-                                int *status ){
+                                CGEN_TYPE xlo, CGEN_TYPE xhi, CGEN_TYPE ylo,
+                                CGEN_TYPE yhi, int clip, double *m, double *b,
+                                double *rms, int *status ){
 /*
 *+
 *  Name:
@@ -53,8 +58,10 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
 *     C.
 
 *  Invocation:
-*     void kpg1SymFit<T>( int64_t n, const <TYPE> *x, const <TYPE> *y, int clip,
-*                         double *m, double *b, double *rms, int *status )
+*     void kpg1SymFit<T>( int64_t n, const <TYPE> *x, const <TYPE> *y,
+*                         <TYPE> xlo, <TYPE> xhi, <TYPE> ylo, <TYPE> yhi,
+*                         int clip, double *m, double *b, double *rms,
+*                         int *status )
 
 *  Description:
 *     This function does a least squares linear fit on the X and Y arrays
@@ -71,7 +78,11 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
 *     fitting the Y values to the X values should give the algebraic inversion
 *     of the line produced by fitting X values to Y values. This is not
 *     generally true for fitting functions that use the Y displacement as
-*     the residual.
+*     the residual. A symetric fit is better for cases where both X and Y
+*     are subject to random error.
+*
+*     The i'th (x,y) point is included in the fit only if both x and y
+*     are good and fall within the ranges specified by xlo, xhi, ylo and yhi.
 
 *  Arguments:
 *     n
@@ -80,6 +91,16 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
 *        Pointer to array of "n" X values.
 *     y
 *        Pointer to array of "n" Y values.
+*     xlo
+*        The lowest X value to include in the fit. See also xhi.
+*     xhi
+*        The highest X value to include in the fit. All X values are used
+*        if xhi is less than or equal to xlo.
+*     ylo
+*        The lowest Y value to include in the fit. See also yhi.
+*     yhi
+*        The highest Y value to include in the fit. All Y values are used
+*        if yhi is less than or equal to ylo.
 *     clip
 *        If non-zero, outliers are identified and excluded from the fit.
 *        Otherwise the fit includes all points. The initial identification
@@ -128,6 +149,8 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
 *  History:
 *     16-MAR-2020 (DSB):
 *        Original version.
+*     19-MAR-2020 (DSB):
+*        Added arguments xlo, xhi, ylo and yhi.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -176,6 +199,17 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
 
+/* Change the limits so that they can be used without being tested for
+   reversal. */
+   if( xlo >= xhi ) {
+      xlo = CGEN_MIN;
+      xhi = CGEN_MAX;
+   }
+   if( ylo >= yhi ) {
+      ylo = CGEN_MIN;
+      yhi = CGEN_MAX;
+   }
+
 /* Find the number of cores/processors available and create a pool of
    threads of the same size. Assume we're being called from a KAPPA
    application (sadly, we probably need an extra argument to indicate
@@ -217,6 +251,10 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
 
          pdata->x = x;
          pdata->y = y;
+         pdata->xlo = xlo;
+         pdata->xhi = xhi;
+         pdata->ylo = ylo;
+         pdata->yhi = yhi;
       }
 
 /* Preset the residuals and threshold to be used on the first iteration so
@@ -345,13 +383,6 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
                }
                *rms = sqrt( sqres );
 
-/* Increment the iteration number. */
-               iter++;
-
-/* Set the threshold on acceptable squared residual at which to clip on
-   the next iteration. */
-               thresh = sqres*nsigma[ iter ]*nsigma[ iter ];
-
 /* Report progress. */
                if( iter >= 0 ) {
                   msgOutiff( MSG__DEBUG, " ", "Iteration %d: %" PRId64 " of %"
@@ -363,6 +394,15 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
                              "points found for fit (m:%g b:%g rms:%g).", status,
                              ngood, *m, *b, *rms );
                }
+
+/* Increment the iteration number. Break out of the iteration loop if we
+   have done all iterations. */
+               iter++;
+               if( iter == NITER ) break;
+
+/* Set the threshold on acceptable squared residual at which to clip on
+   the next iteration. */
+               thresh = sqres*nsigma[ iter ]*nsigma[ iter ];
 
 /* Set bad return values and break if the roots cannot be found. */
             } else {
@@ -417,6 +457,10 @@ static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status ){
    CGEN_FUNCTION(kpg1SymFitData) *pdata;
    const CGEN_TYPE *px;
    const CGEN_TYPE *py;
+   CGEN_TYPE xlo;
+   CGEN_TYPE xhi;
+   CGEN_TYPE ylo;
+   CGEN_TYPE yhi;
    double b;
    double b1;
    double b2;
@@ -448,6 +492,10 @@ static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status ){
    p1 = pdata->p1;
    p2 = pdata->p2;
    thresh = pdata->thresh;
+   xlo = pdata->xlo;
+   xhi = pdata->xhi;
+   ylo = pdata->ylo;
+   yhi = pdata->yhi;
 
 /* Form running sums. */
    if( pdata->operation == 1 ) {
@@ -468,7 +516,8 @@ static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status ){
       py = pdata->y + p1;
 
       for( i = p1; i <= p2; i++,px++,py++ ) {
-         if( *px != CGEN_BAD && *py != CGEN_BAD ) {
+         if( *px != CGEN_BAD && *py != CGEN_BAD &&
+             *px < xhi && *px > xlo && *py < yhi && *py > ylo ){
 
 /* On the second and subsequent iterations, get the squared distance of the
    current point from the nearest point on the previously fitted line. Use
@@ -516,7 +565,8 @@ static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status ){
       py = pdata->y + p1;
 
       for( i = p1; i <= p2; i++,px++,py++ ) {
-         if( *px != CGEN_BAD && *py != CGEN_BAD ) {
+         if( *px != CGEN_BAD && *py != CGEN_BAD &&
+             *px < xhi && *px > xlo && *py < yhi && *py > ylo ){
             t1 = *py - b1;
             t2 = *px + m1*( *py - b1 );
             sqres = (*px)*(*px) + t1*t1 - t2*t2/( 1.0 + m1*m1 );

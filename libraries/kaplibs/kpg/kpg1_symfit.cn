@@ -1,16 +1,10 @@
-#include <string.h>
 #include "f77.h"
 #include "kaplibs.h"
-#include "mers.h"
-#include "sae_par.h"
 
-F77_SUBROUTINE(kpg1_symfit)( CHARACTER(TYPE), INTEGER8(N), const void *x,
-                             const void *y, LOGICAL(CLIP), DOUBLE(M), DOUBLE(B),
-                             DOUBLE(RMS), INTEGER(STATUS) TRAIL(TYPE) ) {
 /*
 *+
 *  Name:
-*     KPG1_SYMFIT
+*     KPG1_SYMFIT<T>
 
 *  Purpose:
 *     Do a symetric least squares linear fit between two arrays
@@ -19,7 +13,8 @@ F77_SUBROUTINE(kpg1_symfit)( CHARACTER(TYPE), INTEGER8(N), const void *x,
 *     C, designed to be called from Fortran.
 
 *  Invocation:
-*     CALL KPG_SYMFIT( TYPE, N, X, Y, CLIP, M, B, RMS, STATUS )
+*     CALL KPG_SYMFIT<T>( N, X, Y, XLO, XHI, YLO, YHI, CLIP, M, B, RMS,
+*                         STATUS )
 
 *  Description:
 *     This routine does a least squares linear fit on the X and Y arrays
@@ -36,18 +31,30 @@ F77_SUBROUTINE(kpg1_symfit)( CHARACTER(TYPE), INTEGER8(N), const void *x,
 *     fitting the Y values to the X values should give the algebraic inversion
 *     of the line produced by fitting X values to Y values. This is not
 *     generally true for fitting functions that use the Y displacement as
-*     the residual.
+*     the residual. A symetric fit is better for cases where both X and Y
+*     are subject to random error.
+*
+*     The i'th (x,y) point is included in the fit only if both x and y
+*     are good and fall within the ranges specified by xlo, xhi, ylo and
+*     yhi.
 
 *  Arguments:
-*     TYPE = CHARACTER*(*) (Given)
-*        The HDS type of the DATA array. Must be one of "_BYTE",
-*        "_DOUBLE", "_INTEGER", "_INT64", "_REAL", "_WORD".
 *     N = INTEGER*8 (Given)
 *        The length of the X and Y arrays.
 *     X( N ) = ? (Given)
 *        Array of X values.
 *     Y( N ) = ? (Given)
 *        Array of Y values.
+*     XLO = ? (Given)
+*        The lowest X value to include in the fit. See also XHI.
+*     XHI = ? (Given)
+*        The highest X value to include in the fit. All X values are used
+*        if XHI is less than or equal to XLO.
+*     YLO = ? (Given)
+*        The lowest Y value to include in the fit. See also YHI.
+*     YHI = ? (Given)
+*        The highest Y value to include in the fit. All Y values are used
+*        if YHI is less than or equal to YLO.
 *     CLIP = LOGICAL (Given)
 *        If .TRUE., outliers are identified and excluded from the fit.
 *        Otherwise the fit includes all points. The initial identification
@@ -94,7 +101,7 @@ F77_SUBROUTINE(kpg1_symfit)( CHARACTER(TYPE), INTEGER8(N), const void *x,
 *     {enter_new_authors_here}
 
 *  History:
-*     18-MAR-2020 (DSB):
+*     19-MAR-2020 (DSB):
 *        Original version.
 *     {enter_further_changes_here}
 
@@ -102,37 +109,12 @@ F77_SUBROUTINE(kpg1_symfit)( CHARACTER(TYPE), INTEGER8(N), const void *x,
 *     {note_any_bugs_here}
 *-
 */
-   GENPTR_CHARACTER(TYPE)
-   GENPTR_INTEGER8(N)
-   GENPTR_LOGICAL(CLIP)
-   GENPTR_DOUBLE(M)
-   GENPTR_DOUBLE(B)
-   GENPTR_DOUBLE(RMS)
-   GENPTR_INTEGER(STATUS)
 
-/* Call the appropriate routine to compute the statistics. */
-   if( !strncmp( TYPE, "_BYTE", 5 ) ) {
-      kpg1SymFitB( *N, x, y, F77_ISTRUE( *CLIP ), M, B, RMS, STATUS );
-
-   } else if( !strncmp( TYPE, "_DOUBLE", 7 ) ) {
-      kpg1SymFitD( *N, x, y, F77_ISTRUE( *CLIP ), M, B, RMS, STATUS );
-
-   } else if( !strncmp( TYPE, "_INTEGER", 8 ) ) {
-      kpg1SymFitI( *N, x, y, F77_ISTRUE( *CLIP ), M, B, RMS, STATUS );
-
-   } else if( !strncmp( TYPE, "_INT64", 6 ) ) {
-      kpg1SymFitK( *N, x, y, F77_ISTRUE( *CLIP ), M, B, RMS, STATUS );
-
-   } else if( !strncmp( TYPE, "_REAL", 5 ) ) {
-      kpg1SymFitF( *N, x, y, F77_ISTRUE( *CLIP ), M, B, RMS, STATUS );
-
-   } else if( !strncmp( TYPE, "_WORD", 5 ) ) {
-      kpg1SymFitW( *N, x, y, F77_ISTRUE( *CLIP ), M, B, RMS, STATUS );
-
-   } else if( *STATUS == SAI__OK ){
-      *STATUS = SAI__ERROR;
-      errRepf( " ", "KPG1_SYMFIT: Unknown HDS data type '%.*s'.", STATUS,
-               TYPE_length, TYPE );
-   }
-
+F77_SUBROUTINE(kpg1_symfit<TLC>)( INTEGER8(N), <CNFTYPE>_ARRAY(X),
+                                  <CNFTYPE>_ARRAY(Y), <CNFTYPE>(XLO),
+                                  <CNFTYPE>(XHI), <CNFTYPE>(YLO),
+                                  <CNFTYPE>(YHI), LOGICAL(CLIP), DOUBLE(M),
+                                  DOUBLE(B), DOUBLE(RMS), INTEGER(STATUS) ) {
+   kpg1SymFit<TC>( *N, X, Y, *XLO, *XHI, *YLO, *YHI, F77_ISTRUE(*CLIP), M,
+                   B, RMS, STATUS );
 }
