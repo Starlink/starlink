@@ -1,6 +1,6 @@
       SUBROUTINE KPG1_GRPHW( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL,
-     :                       XSYM, YSYM, MODE, NULL, XL, XR, YB, YT,
-     :                       APP, QUIET, LMODE, BSCALE, DX, DY, DBAR,
+     :                       XSYM, YSYM, MODE, NULL, APP, QUIET, LMODE,
+     :                       BSCALE, DX, DY, DBAR, XL, XR, YB, YT,
      :                       IPLOT, STATUS )
 *+
 *  Name:
@@ -13,9 +13,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_GRPHW( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL,
-*                      XSYM, YSYM, MODE, NULL, XL, XR, YB, YT, APP,
-*                      QUIET, LMODE, BSCALE, DX, DY, DBAR, IPLOT, STATUS )
+*     CALL KPG1_GRPHW( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL, XSYM,
+*                      YSYM, MODE, NULL, APP, QUIET, LMODE, BSCALE,
+*                      DX, DY, DBAR, XL, XR, YB, YT, IPLOT, STATUS )
 
 *  Description:
 *     Opens a graphics device and draws a graph displaying a supplied
@@ -199,22 +199,6 @@
 *        nothing is to be plotted. In this case, no error is returned.
 *        Otherwise, a PAR__NULL error status is returned if a null
 *        value is supplied.
-*     XL = REAL (Given)
-*        The default value for the XLEFT parameter. If VAL__BADR is
-*        supplied, the minimum of the X values is used (plus a small
-*        margin).
-*     XR = REAL (Given)
-*        The default value for the XRIGHT parameter. If VAL__BADR is
-*        supplied, the maximum of the X values is used (plus a small
-*        margin).
-*     YB = REAL (Given)
-*        The default value for the YBOT parameter. If VAL__BADR is
-*        supplied, the minimum of the low end of the Y error bars is
-*        used (plus a small margin).
-*     YT = REAL (Given)
-*        The default value for the YTOP parameter. If VAL__BADR is
-*        supplied, the maximum of the high end of the Y error bars is
-*        used (plus a small margin).
 *     APP = CHARACTER * ( * ) (Given)
 *        The name of the application in the form
 *        "<package>_<application>", for instance "KAPPA_NORMALIZE".
@@ -238,6 +222,22 @@
 *        Work space.
 *     DBAR( N, 2 ) = DOUBLE PRECISION (Given and Returned)
 *        Work space. Not accessed if NSIGMA is zero.
+*     XL = REAL (Given and Returned)
+*        The default value for the XLEFT parameter. If VAL__BADR is
+*        supplied, the minimum of the X values is used (plus a small
+*        margin). The actual value used is returned on exit.
+*     XR = REAL (Given and Returned)
+*        The default value for the XRIGHT parameter. If VAL__BADR is
+*        supplied, the maximum of the X values is used (plus a small
+*        margin). The actual value used is returned on exit.
+*     YB = REAL (Given and Returned)
+*        The default value for the YBOT parameter. If VAL__BADR is
+*        supplied, the minimum of the low end of the Y error bars is
+*        used (plus a small margin). The actual value used is returned on exit.
+*     YT = REAL (Given and Returned)
+*        The default value for the YTOP parameter. If VAL__BADR is
+*        supplied, the maximum of the high end of the Y error bars is
+*        used (plus a small margin). The actual value used is returned on exit.
 *     IPLOT = INTEGER (Given and Returned)
 *        On entry, this can either be AST_NULL or a pointer to a
 *        two-dimensional Frame. If AST__NULL, the supplied values for
@@ -320,6 +320,8 @@
 *        Added mode 7.
 *     19-MAR-2020 (DSB):
 *        Change screen report to give number of visible plotted points.
+*     20-MAR-2020 (DSB):
+*        Arguments XL, XR, YB and YT now return the used graph limits.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -349,10 +351,6 @@
       CHARACTER YSYM*(*)
       INTEGER MODE
       LOGICAL NULL
-      REAL XL
-      REAL XR
-      REAL YB
-      REAL YT
       CHARACTER APP*(*)
       LOGICAL QUIET
       LOGICAL LMODE
@@ -362,6 +360,10 @@
       DOUBLE PRECISION DX( N )
       DOUBLE PRECISION DY( N )
       DOUBLE PRECISION DBAR( N, 2 )
+      REAL XL
+      REAL XR
+      REAL YB
+      REAL YT
 
 *  Arguments Returned:
       INTEGER IPLOT
@@ -469,6 +471,12 @@
       BOX( 2 ) = DBLE( YBOT )
       BOX( 3 ) = DBLE( XRIGHT )
       BOX( 4 ) = DBLE( YTOP )
+
+*  Return them.
+      XL = XLEFT
+      XR = XRIGHT
+      YT = YTOP
+      YB = YBOT
 
 *  Copy the supplied data to the double precision work arrays.
       NGOOD = 0

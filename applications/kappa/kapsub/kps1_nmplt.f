@@ -147,6 +147,8 @@
 *        Added argument CORR.
 *     11-FEB-2016 (DSB):
 *        Added argument DRWMRK and DRWERR.
+*     20-MAR-2020 (DSB):
+*        Changed KPG1_GRAPH API.
 *     {enter_further_changes_here}
 
 *-
@@ -193,8 +195,8 @@
 *  Local Variables:
       CHARACTER NDFNAM*( 255 )   ! Base name of NDF (possibly with HDS
                                  ! component path)
-      CHARACTER XL*( 255 )       ! Default Xaxis label
-      CHARACTER YL*( 255 )       ! Default Y-axis label
+      CHARACTER XLAB*( 255 )     ! Default Xaxis label
+      CHARACTER YLAB*( 255 )     ! Default Y-axis label
       DOUBLE PRECISION ABOT      ! Lowest vector A value actually used
       DOUBLE PRECISION ATOP      ! Highest vector A value actually used
       DOUBLE PRECISION BSCALE( 2 )! Scaling for plot labels
@@ -220,8 +222,8 @@
       INTEGER IBIN               ! Current bin
       INTEGER IPLOT              ! AST Plot pointer
       INTEGER ITER               ! Iteration counter
-      INTEGER LENXL              ! Used length of XL
-      INTEGER LENYL              ! Used length of YL
+      INTEGER LENXL              ! Used length of XLAB
+      INTEGER LENYL              ! Used length of YLAB
       INTEGER MODE               ! Plotting mode
       INTEGER NDATA              ! Number of non-empty bins
       INTEGER NMLEN              ! Used length of NDFNAM
@@ -238,7 +240,10 @@
       REAL NSIGMA                ! No. of sigmas for error bars
       REAL Q0                    ! Min. possible variance for a bin
       REAL WTMAX                 ! Max. allowed bin weight
-
+      REAL XL                    ! Left X limit
+      REAL XR                    ! Right X limit
+      REAL YB                    ! Bottom Y limit
+      REAL YT                    ! Top Y limit
 *.
 
 *  Check inherited global status.
@@ -486,13 +491,13 @@
 *  Construct the default label for the X axis.
             CALL KPG1_NDFNM( NDFA, NDFNAM, NMLEN, STATUS )
             CALL MSG_SETC( 'NDF', NDFNAM )
-            CALL MSG_LOAD( ' ', 'Data value in ^NDF', XL, LENXL,
+            CALL MSG_LOAD( ' ', 'Data value in ^NDF', XLAB, LENXL,
      :                     STATUS )
 
 *  Construct the default label for the Y axis.
             CALL KPG1_NDFNM( NDFB, NDFNAM, NMLEN, STATUS )
             CALL MSG_SETC( 'NDF', NDFNAM )
-            CALL MSG_LOAD( ' ', 'Data value in ^NDF', YL, LENYL,
+            CALL MSG_LOAD( ' ', 'Data value in ^NDF', YLAB, LENYL,
      :                     STATUS )
 
 *  Set KPG1_GRAPH argument values depending on what is to be drawn.
@@ -512,12 +517,16 @@
             IPLOT = AST__NULL
             BSCALE( 1 ) = 1.0D0
             BSCALE( 2 ) = 1.0D0
+            XL = VAL__BADR
+            XR = VAL__BADR
+            YT = VAL__BADR
+            YB = VAL__BADR
             CALL KPG1_GRAPH( NDATA, ASUM, BSUM, NSIGMA, VARLIM,
-     :                       XL( : LENXL ), YL( : LENYL ),
+     :                       XLAB( : LENXL ), YLAB( : LENYL ),
      :                       'Normalization plot', 'XDATA', 'YDATA',
-     :                       MODE, .TRUE., VAL__BADR, VAL__BADR,
-     :                       VAL__BADR, VAL__BADR, 'KAPPA_NORMALIZE',
-     :                       .TRUE., .FALSE., BSCALE, IPLOT, STATUS )
+     :                       MODE, .TRUE., 'KAPPA_NORMALIZE',
+     :                       .TRUE., .FALSE., BSCALE, IPLOT, XL, XR,
+     :                       YT, YB, STATUS )
 
 *  If a Plot was produced, we need to draw the best fitting straight
 *  line over it.

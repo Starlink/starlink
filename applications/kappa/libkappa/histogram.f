@@ -366,6 +366,8 @@
 *        Add _INT64 support.
 *     2014 April 26 (MJC):
 *        Add Parameter WIDTH.
+*     20-MAR-2020 (DSB):
+*        Changed KPG1_GRAPH API.
 *     {enter_further_changes_here}
 
 *-
@@ -453,10 +455,14 @@
       DOUBLE PRECISION WEIGHT    ! Value of WEIGHTSTEP parameter
       DOUBLE PRECISION WIDTH     ! Bin width
       INTEGER WPNTR              ! Pointer to weights array
-      CHARACTER * ( 255 ) XL     ! Default X axis label
+      CHARACTER * ( 255 ) XLAB   ! Default X axis label
       LOGICAL XLOG               ! X axis of plot is logarithmic
-      CHARACTER * ( 255 ) YL     ! Default Y axis label
+      CHARACTER * ( 255 ) YLAB   ! Default Y axis label
       LOGICAL YLOG               ! Y axis of plot is logarithmic
+      REAL XL                    ! Left X limit
+      REAL XR                    ! Right X limit
+      REAL YB                    ! Bottom Y limit
+      REAL YT                    ! Top Y limit
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
@@ -956,12 +962,16 @@
 *  limits are defined. Use a default value of 0.0 for the bottom of the
 *  vertical axis.  This accesses Parameters AXES, CLEAR, DEVICE,
 *  MARGIN, STYLE, XLEFT, XRIGHT, YBOT, and YLEFT.
+         XL = VAL__BADR
+         XR = VAL__BADR
+         YB = 0.0
+         YT = VAL__BADR
          CALL KPG1_GRAPH( NUMBIN, %VAL( CNF_PVAL( HPPTR1 ) ),
      :                    %VAL( CNF_PVAL( HPPTR2 ) ),
-     :                    0.0, 0.0,  XL, YL, ' ', ' ',
-     :                    ' ', 1, .TRUE., VAL__BADR, VAL__BADR,
-     :                    0.0, VAL__BADR, 'KAPPA_HISTOGRAM', .TRUE.,
-     :                    .FALSE., BSCALE, FRAME, STATUS )
+     :                    0.0, 0.0,  XLAB, YLAB, ' ', ' ',
+     :                    ' ', 1, .TRUE., 'KAPPA_HISTOGRAM', .TRUE.,
+     :                    .FALSE., BSCALE, FRAME, XL, XR, YB, YT,
+     :                    STATUS )
 
 *  If anything was plotted, shut down the graphics workstation and
 *  database.

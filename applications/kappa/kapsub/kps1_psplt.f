@@ -144,6 +144,8 @@
 *        by NORMALIZE. At some point NORMALIZE should be changed to handle
 *        data that exceeds the range of a REAL (as has been done to
 *        HISTOGRAM).
+*     20-MAR-2020 (DSB):
+*        Changed KPG1_GRAPH API.
 *     {enter_further_changes_here}
 
 *-
@@ -211,6 +213,8 @@
       REAL RADIUS                ! Current mean profile radius
       REAL RAXIS                 ! Profile axis-ratio normalisation
       REAL RMAX                  ! Maximum radius mean profile
+      REAL XL                    ! Left X limit
+      REAL XR                    ! Right X limit
 *.
 
 *  Check inherited global status.
@@ -346,12 +350,13 @@
       IPLOT = AST__NULL
       BSCALE( 1 ) = 1.0D0
       BSCALE( 2 ) = 1.0D0
+      XL = 0.0
+      XR = VAL__BADR
       CALL KPG1_GRAPH( NDATA + 1, PROFR, PROFIL, 0.0, 0.0,
      :                 DEFLBX( : IATX ), DEFLBY( : IATY ),
      :                 DEFTTL( : IATTTL ), 'XDATA', 'YDATA', 3,
-     :                 .TRUE., 0.0, VAL__BADR, DMIN, DMAX,
-     :                 'KAPPA_PSF', .TRUE., .FALSE., BSCALE, IPLOT,
-     :                 STATUS )
+     :                 .TRUE., 'KAPPA_PSF', .TRUE., .FALSE.,
+     :                 BSCALE, IPLOT, XL, XR, DMIN, DMAX, STATUS )
 
 *  Only proceed if a plot was produced.
       IF ( IPLOT .NE. AST__NULL ) THEN

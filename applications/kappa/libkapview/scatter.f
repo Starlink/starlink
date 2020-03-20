@@ -292,6 +292,8 @@
 *     19-MAR-2020 (DSB):
 *        Change the FIT and CORR parameters to ignore points outside
 *        the bounds of the plot.
+*     20-MAR-2020 (DSB):
+*        Changed KPG1_GRAPH API.
 *     {enter_further_changes_here}
 
 *-
@@ -631,11 +633,9 @@
       CALL KPG1_GRAPH( NEL, %VAL( CNF_PVAL( IPW3 ) ),
      :                 %VAL( CNF_PVAL( IPW4 ) ), 0.0, 0.0,
      :                 LAB1( : LEN1 ), LAB2( : LEN2 ), 'Scatter plot',
-     :                 'XDATA', 'YDATA', 3, .TRUE., PERV1( 1 ),
-     :                 PERV1( 2 ), PERV2( 1 ), PERV2( 2 ),
-     :                 'KAPPA_SCATTER', .FALSE., .FALSE., BSCALE,
-     :                 IPLOT, STATUS )
-
+     :                 'XDATA', 'YDATA', 3, .TRUE., 'KAPPA_SCATTER',
+     :                 .FALSE., .FALSE., BSCALE, IPLOT, PERV1( 1 ),
+     :                 PERV1( 2 ), PERV2( 1 ), PERV2( 2 ),STATUS )
 
 *  If required, add  a linear fit to the plot.
       CALL PAR_GET0L( 'FIT', FIT, STATUS )

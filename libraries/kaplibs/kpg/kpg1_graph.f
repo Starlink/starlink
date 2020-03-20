@@ -1,6 +1,6 @@
       SUBROUTINE KPG1_GRAPH( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL,
-     :                       XSYM, YSYM, MODE, NULL, XL, XR, YB, YT,
-     :                       APP, QUIET, LMODE, BSCALE, IPLOT, STATUS )
+     :                       XSYM, YSYM, MODE, NULL, APP, QUIET, LMODE,
+     :                       BSCALE, IPLOT, XL, XR, YB, YT, STATUS )
 *+
 *  Name:
 *     KPG1_GRAPH
@@ -13,8 +13,8 @@
 
 *  Invocation:
 *     CALL KPG1_GRAPH( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL, XSYM,
-*                      YSYM, MODE, NULL, XL, XR, YB, YT, APP, QUIET,
-*                      LMODE, BSCALE, IPLOT, STATUS )
+*                      YSYM, MODE, NULL, APP, QUIET, LMODE, BSCALE, IPLOT,
+*                      XL, XR, YB, YT, STATUS )
 
 *  Description:
 *     Opens a graphics device and draws a graph displaying a supplied
@@ -94,22 +94,6 @@
 *        parameters accessed by this routine to indicate that nothing is to
 *        be plotted. In this case, no error is returned. Otherwise, a
 *        PAR__NULL error status is returned if a null value is supplied.
-*     XL = REAL (Given)
-*        The default value for the XLEFT parameter. If VAL__BADR is
-*        supplied, the minimum of the X values is used (plus a small
-*        margin).
-*     XR = REAL (Given)
-*        The default value for the XRIGHT parameter. If VAL__BADR is
-*        supplied, the maximum of the X values is used (plus a small
-*        margin).
-*     YB = REAL (Given)
-*        The default value for the YBOT parameter. If VAL__BADR is
-*        supplied, the minimum of the low end of the Y error bars is
-*        used (plus a small margin).
-*     YT = REAL (Given)
-*        The default value for the YTOP parameter. If VAL__BADR is
-*        supplied, the maximum of the high end of the Y error bars is
-*        used (plus a small margin).
 *     APP = CHARACTER * ( * ) (Given)
 *        The name of the application in the form "<package>_<application>".
 *        E.g. "KAPPA_NORMALIZE".
@@ -136,6 +120,22 @@
 *        YSYM (which are then ignored). Any supplied Frame pointer is
 *        annulled before returning, and a pointer to the Plot used to
 *        draw the axes is returned.
+*     XL = REAL (Given and Returned)
+*        The default value for the XLEFT parameter. If VAL__BADR is
+*        supplied, the minimum of the X values is used (plus a small
+*        margin). The actual value used is returned on exit.
+*     XR = REAL (Given and Returned)
+*        The default value for the XRIGHT parameter. If VAL__BADR is
+*        supplied, the maximum of the X values is used (plus a small
+*        margin). The actual value used is returned on exit.
+*     YB = REAL (Given and Returned)
+*        The default value for the YBOT parameter. If VAL__BADR is
+*        supplied, the minimum of the low end of the Y error bars is
+*        used (plus a small margin). The actual value used is returned on exit.
+*     YT = REAL (Given and Returned)
+*        The default value for the YTOP parameter. If VAL__BADR is
+*        supplied, the maximum of the high end of the Y error bars is
+*        used (plus a small margin). The actual value used is returned on exit.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -183,6 +183,8 @@
 *        Added argument BSCALE.
 *     11-FEB-2016 (DSB):
 *        Added mode 7.
+*     20-MAR-2020 (DSB):
+*        Arguments XL, XR, YB and YT now return the used graph limits.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -210,14 +212,16 @@
       CHARACTER YSYM*(*)
       INTEGER MODE
       LOGICAL NULL
-      REAL XL
-      REAL XR
-      REAL YB
-      REAL YT
       CHARACTER APP*(*)
       LOGICAL QUIET
       LOGICAL LMODE
       DOUBLE PRECISION BSCALE( 2 )
+
+*  Arguments Given and Returned:
+      REAL XL
+      REAL XR
+      REAL YB
+      REAL YT
 
 *  Arguments Returned:
       INTEGER IPLOT
@@ -246,10 +250,11 @@
 
 *  Draw the graph.
       CALL KPG1_GRPHW( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL,
-     :                 XSYM, YSYM, MODE, NULL, XL, XR, YB, YT, APP,
+     :                 XSYM, YSYM, MODE, NULL, APP,
      :                 QUIET, LMODE, BSCALE, %VAL( CNF_PVAL( IPW1 ) ),
      :                 %VAL( CNF_PVAL( IPW2 ) ),
-     :                 %VAL( CNF_PVAL( IPW3 ) ), IPLOT, STATUS )
+     :                 %VAL( CNF_PVAL( IPW3 ) ), XL, XR, YB, YT, IPLOT,
+     :                 STATUS )
 
 *  Free the work space.
       CALL PSX_FREE( IPW1, STATUS )
