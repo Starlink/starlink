@@ -162,6 +162,10 @@
 *        normalised values. But this complication was ignored. and so
 *        the error values were wrong. Now base values on supplied Q and U
 *        without normalisation.
+*     23-MAR-2020 (DSB):
+*        Store negative I values in the output catalogue but continue to
+*        store bad values for P at such points. We need negative I values
+*        to be stored so that the noise in vbackground regions looks right.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -415,9 +419,9 @@
                   UIN = STOKE( PIX, ROW, Z, JU )
                   IF( VAR ) VUIN = VSTOKE( PIX, ROW, Z, JU )
 
-*  If any of the intensities are bad, or if I is negative, store bad results.
+*  If any of the intensities are bad, store bad results.
                   IF ( IIN .EQ. VAL__BADR .OR. QIN .EQ. VAL__BADR .OR.
-     :                 UIN .EQ. VAL__BADR .OR. IIN .LT. 0.0 ) THEN
+     :                 UIN .EQ. VAL__BADR ) THEN
 
                      IP = VAL__BADR
                      I = VAL__BADR
@@ -430,8 +434,8 @@
                         VT = VAL__BADR
                      END IF
 
-*  If the total intensity is zero, store bad values for P and T, and zero
-*  for I and IP.
+*  If the total intensity is zero or negative, store bad values for P and T,
+*  and zero for I and IP.
                   ELSE IF( IIN .EQ. 0.0 ) THEN
                      IP = 0.0
                      I = 0.0
@@ -476,20 +480,29 @@
                      END IF
 
 *  Percentage polarisation.
-                     P = 100 * IP / I
+                     IF( I .GT. 0.0 ) THEN
+                        P = 100 * IP / I
+                     ELSE
+                        P = VAL__BADR
+                     END IF
 
 *  Now produced variances if required.
                      IF ( VAR ) THEN
 
 *  If any of the input variances are bad, or if the percentage polarisation
-*  is zero, store bad output variances.
+*  is zero, store bad output variances. In this case we can't debias and
+*  so store bad IP and P values.
                         IF( VIIN .EQ. VAL__BADR .OR. VQIN .EQ. VAL__BADR
-     :                      .OR. VUIN .EQ. VAL__BADR .OR. I .EQ. 0.0
+     :                      .OR. VUIN .EQ. VAL__BADR .OR. I .LE. 0.0
      :                      .OR. IP2 .EQ. 0.0 ) THEN
 
                            VIP = VAL__BADR
                            VP = VAL__BADR
                            VT = VAL__BADR
+                           IF ( DEBIAS ) THEN
+                              IP = VAL__BADR
+                              P = VAL__BADR
+                           END IF
 
 *  Otherwise, calculate the variances.
                         ELSE

@@ -10,10 +10,10 @@
 \stardocsource      {sun\stardocnumber}
 \stardocnumber      {223.7}
 \stardocauthors     {D.S. Berry \& T.M. Gledhill }
-\stardocdate        {22nd May 2018}
+\stardocdate        {24th March 2020}
 \stardoctitle       {POLPACK \\
                             An Imaging Polarimetry Reduction Package}
-\stardocversion     {Version 3.6-0}
+\stardocversion     {Version 3.6-1}
 \stardocmanual      {Users' Manual}
 \startitlepic {\includegraphics[clip,width=0.75\textwidth]{sun223_figures/fig}}
 \stardocabstract  {POLPACK is a package of applications for
@@ -6185,6 +6185,14 @@ assumed that the reference direction is parallel to the first image axis).
 \section{\label{APP:HISTORY}History}
 This section describes the major changes introduced at each release of
 POLPACK.
+
+\subsection{V3.6-1}
+
+\begin{itemize}
+ \item  Catalogues created by POLVEC now include valid I, Q, U and PI values
+ for rows that have negative total intensity. The P and ANG values remain
+ bad for such rows.
+\end{itemize}
 
 \subsection{V3.6-0}
 
