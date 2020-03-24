@@ -341,8 +341,9 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
                b2 = sy - m2*sx;
 
 /* Submit jobs to the workforce to form the form the sum of the squared
-   residuals. Each worker calculates the sum for its own allocated range
-   of pixels, and then these are added together afterwards. */
+   residuals including all points (even outliers). Each worker calculates
+   the sum for its own allocated range of pixels, and then these are added
+   together afterwards. */
                for( iw = 0; iw < nw; iw++ ) {
                   pdata = job_data + iw;
                   pdata->operation = 2;
@@ -409,7 +410,6 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
                msgOutiff( MSG__DEBUG, " ", "Cannot find roots", status );
                *m = VAL__BADD;
                *b = VAL__BADD;
-               *rms = VAL__BADD;
                break;
             }
 
@@ -418,13 +418,40 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
             msgOutiff( MSG__DEBUG, " ", "All good points rejected", status );
             *m = VAL__BADD;
             *b = VAL__BADD;
-            *rms = VAL__BADD;
             break;
          }
 
 /* If no clipping is to be performed, break out of the iteration loop at
    the end of the first pass. */
          if( !clip ) break;
+      }
+
+/* If we have a fit, find the RMS redidual excluding outliers. */
+      if( *m != VAL__BADD ) {
+
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->operation = 3;
+            pdata->b1 = *b;
+            pdata->m1 = *m;
+            thrAddJob( wf, 0, pdata, CGEN_FUNCTION(kpg1SymFit_work), 0, NULL,
+                       status );
+         }
+
+         thrWait( wf, status );
+
+         sres1 = 0.0;
+         ngood = 0;
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            sres1 += pdata->sres1;
+            ngood += pdata->ngood;
+         }
+
+         *rms = sqrt( sres1/ngood );
+
+      } else {
+         *rms = VAL__BADD;
       }
    }
 
@@ -551,7 +578,7 @@ static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status ){
       pdata->ngood = ngood;
 
 /* Find the RMS residual of the points from each of the two possible
-   lines. Exclude points that are too far from the new fitted line. */
+   lines. Do not exclude points that are far from the fitted line. */
    } else if( pdata->operation == 2 ) {
       b1 = pdata->b1;
       m1 = pdata->m1;
@@ -582,6 +609,34 @@ static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status ){
 /* Return the sums in the job structure. */
       pdata->sres1 = sres1;
       pdata->sres2 = sres2;
+
+/* Find the RMS residual of the points from the best line. Exclude points
+   that are too far from the best line. */
+   } else if( pdata->operation == 3 ) {
+      b1 = pdata->b1;
+      m1 = pdata->m1;
+
+      sres1 = 0.0;
+      ngood = 0;
+
+      px = pdata->x + p1;
+      py = pdata->y + p1;
+
+      for( i = p1; i <= p2; i++,px++,py++ ) {
+         if( *px != CGEN_BAD && *py != CGEN_BAD &&
+             *px < xhi && *px > xlo && *py < yhi && *py > ylo ){
+            t1 = *py - b1;
+            t2 = *px + m1*( *py - b1 );
+            sqres = (*px)*(*px) + t1*t1 - t2*t2/( 1.0 + m1*m1 );
+            if( sqres < thresh ) {
+               sres1 += sqres;
+               ngood++;
+            }
+         }
+      }
+
+      pdata->sres1 = sres1;
+      pdata->ngood = ngood;
 
 /* Report an error if the requested operation is unknown. */
    } else if( *status == SAI__OK ) {
