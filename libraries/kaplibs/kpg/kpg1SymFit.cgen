@@ -629,7 +629,7 @@ static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status ){
             t2 = *px + m1*( *py - b1 );
             sqres = (*px)*(*px) + t1*t1 - t2*t2/( 1.0 + m1*m1 );
             if( sqres < thresh ) {
-               sres1 += sqres;
+               if( sqres > 0.0 ) sres1 += sqres;
                ngood++;
             }
          }
