@@ -29,7 +29,7 @@
 *        The dimensions of the input n-dimensional array.
 *     INARR( * ) = ? (Given)
 *        The input n-dimensional data array.
-*     COMPRS( NDIM ) = REAL (Given)
+*     COMPRS( NDIM ) = INTEGER (Given)
 *        The factors along each dimension by which the input array is
 *        compressed to form the output array.
 *     NLIM = INTEGER (Given)
@@ -150,6 +150,8 @@
 *        NDIM is <3.
 *     20-FEB-2020 (DSB):
 *        Call the 8-byte version to do the work.
+*     31-MAR-2020 (DSB):
+*        Convert COMPRS from 4 to 8 byte before calling 8-byte version.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -180,6 +182,7 @@
       INTEGER STATUS
 
 *  Local Variables:
+      INTEGER*8 COMPRS8( NDF__MXDIM )
       INTEGER*8 DIMS8( NDF__MXDIM )
       INTEGER I
 
@@ -191,10 +194,11 @@
 *  Convert INTEGER dims to INTEGER*8 dims
       DO I = 1, NDIM
          DIMS8( I ) = DIMS( I )
+         COMPRS8( I ) = COMPRS( I )
       END DO
 
 *  Call the 8-byte version to do the work.
-      CALL KPG1_CMAV8<T>( NDIM, DIMS8, INARR, COMPRS, NLIM,
+      CALL KPG1_CMAV8<T>( NDIM, DIMS8, INARR, COMPRS8, NLIM,
      :                    OUTARR, SUM, NUM, STATUS )
 
       END
