@@ -150,7 +150,21 @@
 *     DEBIAS = LOGICAL (Given)
 *        TRUE if a correction for statistical bias is to be made to
 *        percentage polarization and polarized intensity in the output
-*        vector catalogue specified by parameter CAT. [FALSE]
+*        vector catalogue specified by parameter CAT. The bias estimator
+*        to use is given by parameter DEBIASTYPE. [FALSE]
+*     DEBIASTYPE = LOGICAL (Given)
+*        Only used if DEBIAS is TRUE. It gives the type of bias estimator
+*        to use, using the nomeclature of Montier at al "Polarization
+*        measurements analysis II. Best estimators of polarization
+*        fraction and angle" (A&A, 2018):
+*          - "AS": The asymptotic estimator. See section 2.3 of Montier
+*             et al. This estimator produces bad P and PI values if the
+*             squared PI value is less than the variance in PI.
+*          - "MAS": The modified asymptotic estimator. See section 2.5 of
+*             Montier et al. This estimator does not produces bad P and PI
+*             values, even if the squared PI value is less than the
+*             variance in PI.
+*        ["AS"]
 *     FCF = _REAL (Read)
 *        The FCF value that is used to convert I, Q and U values from pW
 *        to Jy/Beam. If a null (!) value is supplied a default value is
@@ -368,8 +382,8 @@
 *        created and stored at the same time as the pointing corrections.
 *        The correction factor for a single observation is found by comparing
 *        the data values in the map made from the single observation with
-*        those in the coadd map made from all observation. The comparison 
-*        is limited to the areas inside the AST mask, and a factor of 
+*        those in the coadd map made from all observation. The comparison
+*        is limited to the areas inside the AST mask, and a factor of
 *        unity is used for any observation that is not well correlated to
 *        the coadd). The factor found in this way is stored in the FITS
 *        extension of the map made  from the observation (header "CHUNKFAC").
@@ -687,6 +701,8 @@
 *       run of pol2map with NORMALISE=YES, assume a factor of 1.0 (i.e. no
 *       change) if the correlation between the coadd and the individual
 *       observation is too low (below 0.95).
+*    1-APR-2020 (DSB):
+*       Added parameter DEBIASTYPE.
 
 '''
 
@@ -1344,6 +1360,10 @@ try:
    params.append(starutil.Par0L("DEBIAS", "Remove statistical bias from P"
                                 "and PI?", False, noprompt=True))
 
+   params.append(starutil.ParChoice("DEBIASTYPE", ("AS","MAS"),
+                                    "Bias estimator to be used",
+                                    "AS", noprompt=True ))
+
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
 
@@ -1615,13 +1635,10 @@ try:
 #  Get the binsize for the catalogue.
       binsize = parsys["BINSIZE"].value
 
-#  See if statistical debiasing is to be performed.
+#  See if statistical debiasing is to be performed, and see which bias
+#  estimator is to be used.
    debias = parsys["DEBIAS"].value
-
-
-
-
-
+   debiastype = parsys["DEBIASTYPE"].value
 
 #  See where to put new Q, U and I maps for individual observations, and
 #  ensure the directory exists.
@@ -3248,8 +3265,8 @@ try:
 
 #  Create a FITS catalogue containing the polarisation vectors.
          msg_out( "Creating the output catalogue: '{0}'...".format(outcat) )
-         msg = invoke( "$POLPACK_DIR/polvec {0} cat={1} debias={2} "
-                       "radec=yes refupdate=no".format(cube,outcat,debias) )
+         msg = invoke( "$POLPACK_DIR/polvec {0} cat={1} debias={2} debiastype={3} "
+                       "radec=yes refupdate=no".format(cube,outcat,debias,debiastype) )
          msg_out( "\n{0}\n".format(msg) )
 
 
