@@ -53,9 +53,26 @@
 *        percentage polarization and polarized intensity. The returned
 *        variance values are unchanged. This correction only applies to
 *        calculations of linear polarization, and cannot be used if the
-*        input catalogue does not contain variance values. If a null value
+*        input cube does not contain variance values. If a null value
 *        (!) is supplied, then the correction is applied if output variances
-*        are being created, and not otherwise.           [!]
+*        are being created, and not otherwise. The type of de-biasing to
+*        use is specified by parameter DEBIASTYPE. [!]
+*     DEBIASTYPE = LITERAL (Read)
+*        Only used if DEBIAS is TRUE. It gives the type of bias estimator
+*        to use, using the nomeclature of Montier at al "Polarization
+*        measurements analysis II. Best estimators of polarization
+*        fraction and angle" (A&A, 2018):
+*          - "AS": The asymptotic estimator. See section 2.3 of Montier
+*             et al. This estimator produces bad P and PI values if the
+*             squared PI value is less than the variance in PI.
+*          - "MAS": The modified asymptotic estimator. See section 2.5 of
+*             Montier et al. This estimator does not produces bad P and PI
+*             values, even if the squared PI value is less than the
+*             variance in PI.
+*        This parameter was introduced at version 3.6.2 of POLPACK.
+*        Earlier versions always used the "AS" estimator if de-biasing
+*        was requested. The dynamic default is the current value, which
+*        is initially "AS". []
 *     IN = LITERAL (Read)
 *        The name of the input catalogue. A file type of .FIT is assumed
 *        if none is provided.
@@ -148,6 +165,8 @@
 *        Correct use of CNF_PVAL
 *     13-JUL-2009 (DSB):
 *        Changed IPVAR array from DOUBLE PRECISION to REAL.
+*     1-APR-2020 (DSB):
+*        Added parameter DEBIASTYPE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -179,6 +198,7 @@
       PARAMETER ( MAX_ID = 11 )
 
 *  Local Variables:
+      CHARACTER CVAL*6           ! Character value
       CHARACTER FIELDS( 5 )*50   ! Individual fields of catalogue specification
       CHARACTER METH*6           ! Binning method
       CHARACTER NAME*(CAT__SZCMP)! CAT column name
@@ -197,6 +217,7 @@
       INTEGER GI( MAX_ID )       ! CAT identifiers for columns to be read
       INTEGER GTTL               ! CAT identifier for TITLE parameter
       INTEGER IBNOFF             ! Offset to binned I values
+      INTEGER IDEBIAS            ! De-biasing estimator identifier
       INTEGER IOFF               ! Offset to i/p I values
       INTEGER IP                 ! Pointers to arrays to be filled
       INTEGER IPBIN              ! Pointer to binned Stokes parameters
@@ -1063,6 +1084,19 @@
          IPW2 = IP
       END IF
 
+*  If de-biasing is required, see what bias estimator is to be used.
+      IF( DEBIAS ) THEN
+         CALL PAR_CHOIC( 'DEBIASTYPE', 'AS', 'AS,MAS', .FALSE.,
+     :                   CVAL, STATUS )
+         IF( CVAL .EQ. 'AS' ) THEN
+            IDEBIAS = 1
+         ELSE
+            IDEBIAS = 2
+         END IF
+      ELSE
+         IDEBIAS = 0
+      END IF
+
 *  Calculate the polarization vectors. POL1_PLVEC has the cabability to
 *  produce output images containing the polarization parameters, These
 *  are not wanted here, but pointers still have to be given even though
@@ -1070,7 +1104,7 @@
       CALL POL1_PLVEC( TR2, EQMAP, NXBIN, NYBIN, NZBIN, NSTOKE,
      :                 NXBIN*NYBIN, %VAL( CNF_PVAL( IPBIN ) ),
      :                 %VAL( CNF_PVAL( IPVBIN ) ),
-     :                 STOKES, DEBIAS, VAR, ANGROT, ANGRT, NDIMO,
+     :                 STOKES, IDEBIAS, VAR, ANGROT, ANGRT, NDIMO,
      :                 .FALSE., .FALSE., .FALSE., .FALSE.,
      :                 .FALSE., .FALSE., .FALSE., .TRUE., CIOUT,
      :                 %VAL( CNF_PVAL( IP ) ),

@@ -107,7 +107,24 @@
 *        calculations of linear polarization, and cannot be used if the
 *        input cube does not contain variance values. If a null value
 *        (!) is supplied, then the correction is applied if output variances
-*        are being created, and not otherwise.           [!]
+*        are being created, and not otherwise. The type of de-biasing to
+*        use is specified by parameter DEBIASTYPE. [!]
+*     DEBIASTYPE = LITERAL (Read)
+*        Only used if DEBIAS is TRUE. It gives the type of bias estimator
+*        to use, using the nomeclature of Montier at al "Polarization
+*        measurements analysis II. Best estimators of polarization
+*        fraction and angle" (A&A, 2018):
+*          - "AS": The asymptotic estimator. See section 2.3 of Montier
+*             et al. This estimator produces bad P and PI values if the
+*             squared PI value is less than the variance in PI.
+*          - "MAS": The modified asymptotic estimator. See section 2.5 of
+*             Montier et al. This estimator does not produces bad P and PI
+*             values, even if the squared PI value is less than the
+*             variance in PI.
+*        This parameter was introduced at version 3.6.2 of POLPACK.
+*        Earlier versions always used the "AS" estimator if de-biasing
+*        was requested. The dynamic default is the current value, which
+*        is initially "AS". []
 *     I = NDF (Write)
 *        An output NDF holding the total intensity. A null value can be
 *        supplied if this output image is not required. [!]
@@ -213,6 +230,8 @@
 *        Delete output catalogue if it contains no vectors.
 *     16-OCT-2016 (DSB):
 *        Added parameter REFUPDATE.
+*     1-APR-2020 (DSB):
+*        Added parameter DEBIASTYPE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -236,6 +255,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER CVAL*6           ! Character value
       CHARACTER METH*6           ! Binning method
       CHARACTER ONAME*256        ! Full file spec for output catalogue
       CHARACTER STOKES*(NDF__MXDIM) ! Identifiers for each plane of input
@@ -250,6 +270,7 @@
       INTEGER EQMAP              ! (X,Y)->(RA,DEC) Mapping, or AST__NULL
       INTEGER I                  ! Loop count
       INTEGER ICURR              ! Index of PIXEL Frame
+      INTEGER IDEBIAS            ! De-biasing estimator identifier
       INTEGER INDF1              ! Identifier for input Stokes cube
       INTEGER INDFI              ! Identifier for total intensity output
       INTEGER INDFIP             ! Identifier for polarised int. output
@@ -875,12 +896,25 @@
          IPW = IPI
       END IF
 
+*  If de-biasing is required, see what bias estimator is to be used.
+      IF( DEBIAS ) THEN
+         CALL PAR_CHOIC( 'DEBIASTYPE', 'AS', 'AS,MAS', .FALSE.,
+     :                   CVAL, STATUS )
+         IF( CVAL .EQ. 'AS' ) THEN
+            IDEBIAS = 1
+         ELSE
+            IDEBIAS = 2
+         END IF
+      ELSE
+         IDEBIAS = 0
+      END IF
+
 *  Call the routine to do the work.
       CALL POL1_PLVEC( TR2, EQMAP, NXBIN, NYBIN, NZBIN, NSTOKE,
      :                 NXBIN*NYBIN, %VAL( CNF_PVAL( IPDBIN ) ),
      :                 %VAL( CNF_PVAL( IPVBIN ) ),
-     :                 STOKES, DEBIAS, VAR, ANGROT, ANGRT, NDIMO, MAKEI,
-     :                 MAKEP, MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV,
+     :                 STOKES, IDEBIAS, VAR, ANGROT, ANGRT, NDIMO,
+     :                 MAKEI, MAKEP, MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV,
      :                 MAKECT, CI, %VAL( CNF_PVAL( IPI ) ),
      :                 %VAL( CNF_PVAL( IPP ) ),
      :                 %VAL( CNF_PVAL( IPT ) ),

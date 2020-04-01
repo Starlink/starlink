@@ -1,9 +1,15 @@
 1 POLPACK
 
- Version 3.6.1 of POLPACK (an applications package for processing imaging
+ Version 3.6.2 of POLPACK (an applications package for processing imaging
  polarimetry data) is now available. It is fully documented in SUN/223.
 
- The main changes since V3.6 are:
+ The main changes since V3.6.1 are:
+
+ o  The POLVEC and POLBIN commands now let you choose between two
+ different de-biasing methods using a new parameter called DEBIASTYPE.
+
+
+ The main changes between V3.6 and V3.6.1 were:
 
  o  Catalogues created by POLVEC now include valid I, Q, U and PI values
  for rows that have negative total intensity. The P and ANG values remain

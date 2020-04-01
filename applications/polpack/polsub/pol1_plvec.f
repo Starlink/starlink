@@ -55,11 +55,14 @@
 *        A string of characters identifying each Stokes-cube of the input
 *        arrays. The first character applies to cube 1, the second to cube 2,
 *        etc. Each character should be one of I, Q, U or V.
-*     DEBIAS = LOGICAL (Given)
-*        It is .TRUE. if the effects of biassing caused by the
-*        asymmetric distribution of percentage polarisation is to be
-*        removed.  The returned variance values are unaffected by this
-*        value.
+*     DEBIAS = INTEGER (Given)
+*        If 0, no de-biasing is performed. If 1, de-biasing is performed
+*        using the "asymptotic estimator". Any other non-zero value causes
+*        de-biasing to be performed using the "modified asymptotic
+*        estimator". See sections 2.3 and 2.5 of Montier et al "Polarization
+*        measurements analysis II. Best estimators of polarization fraction
+*        and angle" (A&A 2018). The returned variances are unaffected by
+*        this value.
 *     VAR = LOGICAL (Given)
 *        It is .TRUE. if output variance values are to be returned.
 *     ANGROT = REAL (Given)
@@ -166,6 +169,9 @@
 *        Store negative I values in the output catalogue but continue to
 *        store bad values for P at such points. We need negative I values
 *        to be stored so that the noise in vbackground regions looks right.
+*     1-APR-2020 (DSB):
+*        Provide option to do de-biasing using the "modified asymptotic
+*        estimator".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -193,7 +199,7 @@
       REAL STOKE( NPIX, NROW, NZ, NSTOKE )
       REAL VSTOKE( NPIX, NROW, NZ, NSTOKE )
       CHARACTER STKID*(*)
-      LOGICAL DEBIAS
+      INTEGER DEBIAS
       LOGICAL VAR
       REAL ANGROT
       REAL ANGRT
@@ -434,20 +440,6 @@
                         VT = VAL__BADR
                      END IF
 
-*  If the total intensity is zero or negative, store bad values for P and T,
-*  and zero for I and IP.
-                  ELSE IF( IIN .EQ. 0.0 ) THEN
-                     IP = 0.0
-                     I = 0.0
-                     P = VAL__BADR
-                     T = VAL__BADR
-
-                     IF ( VAR ) THEN
-                        VIP = VAL__BADR
-                        VP = VAL__BADR
-                        VT = VAL__BADR
-                     END IF
-
 *  Otherwise, calculate everything.
                   ELSE
 
@@ -468,7 +460,7 @@
                      Q2 = QIN * QIN
                      U2 = UIN * UIN
 
-*  Polarised intensity.
+*  Polarised intensity (without any de-biasing).
                      IP2 = Q2 + U2
                      IP = SQRT( MAX( 0.0, IP2 ) )
 
@@ -479,7 +471,7 @@
                         T = VAL__BADR
                      END IF
 
-*  Percentage polarisation.
+*  Percentage polarisation (without any de-biasing).
                      IF( I .GT. 0.0 ) THEN
                         P = 100 * IP / I
                      ELSE
@@ -499,7 +491,7 @@
                            VIP = VAL__BADR
                            VP = VAL__BADR
                            VT = VAL__BADR
-                           IF ( DEBIAS ) THEN
+                           IF ( DEBIAS .NE. 0 ) THEN
                               IP = VAL__BADR
                               P = VAL__BADR
                            END IF
@@ -534,13 +526,21 @@
 
 *  If required, make an estimate of the percentage polarisation and
 *  polarised intensity excluding the bias introduced because of the
-*  distribution of P being non-symmetric.
-                           ELSE
-                              IF ( DEBIAS ) THEN
-                                 IP = SQRT( MAX( 0.0, IP2 - VIP ) )
-                                 P = 100 * IP / I
-                              END IF
+*  distribution of P being non-symmetric. First deal with the traditional
+*  asymptotic estimator.
+                           ELSE IF ( DEBIAS .EQ. 1 ) THEN
+                              IP = SQRT( MAX( 0.0, IP2 - VIP ) )
+                              P = 100 * IP / I
 
+*  Now deal with the modified asymptotic estimator described in section
+*  2.5 of Montier et al.
+                           ELSE IF ( DEBIAS .NE. 0 ) THEN
+                              IF( IP .GT. 0.0 ) THEN
+                                 IP = IP - 0.5*VIP*( 1.0 -
+     :                                              EXP( -IP2/VIP ) )/IP
+                              ELSE
+                                 IP = 0.0
+                              END IF
                            END IF
 
                         END IF

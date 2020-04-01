@@ -61,6 +61,15 @@ package polpack {
             helpkey *
           }
 
+         parameter debiastype {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default AS
+            prompt {De-biasing method}
+            helpkey *
+          }
+
          parameter integrate {
             type _LOGICAL
             vpath DEFAULT
@@ -2009,6 +2018,15 @@ package polpack {
             ppath DEFAULT
             default !
             prompt {Remove statistical bias?}
+            helpkey *
+          }
+
+         parameter debiastype {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default AS
+            prompt {De-biasing method}
             helpkey *
           }
 

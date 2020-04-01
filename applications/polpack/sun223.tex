@@ -10,10 +10,10 @@
 \stardocsource      {sun\stardocnumber}
 \stardocnumber      {223.7}
 \stardocauthors     {D.S. Berry \& T.M. Gledhill }
-\stardocdate        {24th March 2020}
+\stardocdate        {1st April 2020}
 \stardoctitle       {POLPACK \\
                             An Imaging Polarimetry Reduction Package}
-\stardocversion     {Version 3.6-1}
+\stardocversion     {Version 3.6-2}
 \stardocmanual      {Users' Manual}
 \startitlepic {\includegraphics[clip,width=0.75\textwidth]{sun223_figures/fig}}
 \stardocabstract  {POLPACK is a package of applications for
@@ -1873,11 +1873,13 @@ environment variable.
 intensity values in it''] - POLVEC can apply a correction to to the values
 of percentage polarization and polarized intensity to remove statistical
 bias introduced by the squaring and adding of the Stokes parameters $Q$ and
-$U$ (see \htmlref{POLVEC}{POLVEC} parameter DEBIAS). This can result in
+$U$ (see \htmlref{POLVEC}{POLVEC} parameter DEBIAS and DEBIASTYPE). If
+the "AS" (asymptotic) estimator is used, this can result in
 corrected percentage polarization values which are identically equal to zero
 if the original percentage polarizations are small and the corresponding
 variances are large. These zero percentage polarization values then result in
-zero polarized intensity values. Note, the $Q$ and $U$ values are
+zero polarized intensity values. This problem can be avoided by using the
+"MAS" (modified asymptotic) estimator. Note, the $Q$ and $U$ values are
 \emph{not} corrected in any way, since they already give unbiased
 estimates of the required quantities.
 
@@ -1980,7 +1982,7 @@ for NDF applications.
          BOX( 2 ) = \_REAL (Read)
       }{
          The x and y bin sizes. These values refer to the coordinate Frame
-         defined by columns \texttt{"}X\texttt{"} and \texttt{"}Y\texttt{"} and will usually be in units of pixels.
+         defined by columns \texttt{"} X\texttt{"}  and \texttt{"} Y\texttt{"}  and will usually be in units of pixels.
          This parameter is not accessed if parameter INTEGRATE is TRUE.
          Parameter ZBOX specifies binning along the frequency axis when
          dealing with spectropolarimeter data.
@@ -1992,9 +1994,36 @@ for NDF applications.
          percentage polarization and polarized intensity. The returned
          variance values are unchanged. This correction only applies to
          calculations of linear polarization, and cannot be used if the
-         input catalogue does not contain variance values. If a null value
+         input cube does not contain variance values. If a null value
          (!) is supplied, then the correction is applied if output variances
-         are being created, and not otherwise.           [!]
+         are being created, and not otherwise. The type of de-biasing to
+         use is specified by parameter DEBIASTYPE. [!]
+      }
+      \sstsubsection{
+         DEBIASTYPE = LITERAL (Read)
+      }{
+         Only used if DEBIAS is TRUE. It gives the type of bias estimator
+         to use, using the nomeclature of Montier at al \texttt{"} Polarization
+         measurements analysis II. Best estimators of polarization
+         fraction and angle\texttt{"}  (A\&A, 2018):
+         \sstitemlist{
+
+            \sstitem
+               \texttt{"} AS\texttt{"} : The asymptotic estimator. See section 2.3 of Montier
+                 et al. This estimator produces bad P and PI values if the
+                 squared PI value is less than the variance in PI.
+
+            \sstitem
+               \texttt{"} MAS\texttt{"} : The modified asymptotic estimator. See section 2.5 of
+                 Montier et al. This estimator does not produces bad P and PI
+                 values, even if the squared PI value is less than the
+                 variance in PI.
+         }
+
+         This parameter was introduced at version 3.6.2 of POLPACK.
+         Earlier versions always used the \texttt{"} AS\texttt{"}  estimator if de-biasing
+         was requested. The dynamic default is the current value, which
+         is initially \texttt{"} AS\texttt{"} . []
       }
       \sstsubsection{
          IN = LITERAL (Read)
@@ -2014,18 +2043,23 @@ for NDF applications.
       }{
          The method to be used when binning Stokes parameters. This may be
          set to any unique abbreviation of the following:
+
          \sstitemlist{
 
             \sstitem
-               MEAN      -- Mean of the input data values
+                MEAN      -- Mean of the input data values
 
             \sstitem
-               MEDIAN    -- Median of the input data values
+                MEDIAN    -- Median of the input data values
 
             \sstitem
-               SIGMA     -- A sigma clipped mean
-            [MEDIAN]
+                SIGMA     -- A sigma clipped mean
+
          }
+         In all cases, if variances are available for the input Stokes
+         parameters, then the reciprocals of these variances will be used
+         to weight the input Stokes parameters when forming the output
+         Stokes parameters using the selected method. [MEDIAN]
       }
       \sstsubsection{
          MINVAL = \_INTEGER (Read)
@@ -2052,7 +2086,7 @@ for NDF applications.
          SIGMAS = \_REAL (Read)
       }{
          Number of standard deviations to reject data at. Only used if
-         METHOD is set to \texttt{"}SIGMA\texttt{"}. [4.0]
+         METHOD is set to \texttt{"} SIGMA\texttt{"} . [4.0]
       }
       \sstsubsection{
          ZBOX = \_REAL (Read)
@@ -2067,8 +2101,8 @@ for NDF applications.
       \sstexamplesubsection{
          polbin intab outtab 4
       }{
-         Bins the Stokes parameters in catalogue \texttt{"}intab.FIT\texttt{"} and produces
-         catalogue \texttt{"}outtab.FIT\texttt{"} containing binned Stokes parameters and
+         Bins the Stokes parameters in catalogue \texttt{"} intab.FIT\texttt{"}  and produces
+         catalogue \texttt{"} outtab.FIT\texttt{"}  containing binned Stokes parameters and
          corresponding polarization parameters. Each bin measures 4 pixels
          along both the X and Y axes, and has a value based on the median
          of the corresponding input Stokes values.
@@ -2078,7 +2112,7 @@ for NDF applications.
       \sstitemlist{
 
          \sstitem
-         The reference direction for the Stokes vectors and polarization
+          The reference direction for the Stokes vectors and polarization
          vectors in the output catalogue will be north if the input catalogue
          has a celestial co-ordinate Frame within its WCS information. Otherwise,
          the reference direction will be the second pixel axis. The POLANAL
@@ -2086,15 +2120,10 @@ for NDF applications.
          describe the new reference direction.
 
          \sstitem
-         The bottom left corner of each bin is chosen so that the origin
+          The bottom left corner of each bin is chosen so that the origin
          of the (X,Y) Frame (or (X,Y,Z) Frame if the data is 3D) would
          correspond to a bin corner.
       }
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2001 Central Laboratory of the Research Councils
    }
 }
 \sstroutine{
@@ -5018,6 +5047,9 @@ for NDF applications.
       have been created by POLKA or POLCAL). These calculated values may
       be stored either in a series of output NDFs, or in a single
       catalogue.
+
+      The reference direction of the output catalogue and NDFs is
+      determined by parameter REFUPDATE.
    }
    \sstusage{
       polvec in cat [p] [ang] [i] [ip] [q] [u] [v]
@@ -5061,33 +5093,33 @@ for NDF applications.
          \sstitemlist{
 
             \sstitem
-               X  -- The pixel X coordinate at the tabulated point.
+                X  -- The pixel X coordinate at the tabulated point.
 
             \sstitem
-               Y  -- The pixel Y coordinate at the tabulated point.
+                Y  -- The pixel Y coordinate at the tabulated point.
 
             \sstitem
-               Z  -- The pixel Z coordinate at the tabulated point (this
+                Z  -- The pixel Z coordinate at the tabulated point (this
                        is only included if the input NDF is 4D).
 
             \sstitem
-               I  -- The total intensity.
+                I  -- The total intensity.
 
             \sstitem
-               Q  -- The Stokes Q parameter.
+                Q  -- The Stokes Q parameter.
 
             \sstitem
-               U  -- The Stokes U parameter.
+                U  -- The Stokes U parameter.
 
             \sstitem
-               P  -- The percentage polarization.
+                P  -- The percentage polarization.
 
             \sstitem
-               ANG  -- The polarization angle (anti-clockwise from the
+                ANG  -- The polarization angle (anti-clockwise from the
                reference direction to the plane of polarization - in degrees).
 
             \sstitem
-               PI -- The polarized intensity.
+                PI -- The polarized intensity.
 
          }
          If VARIANCE is TRUE, then the catalogue will also contain
@@ -5112,10 +5144,10 @@ for NDF applications.
          coordinates and any other known coordinate Frames will be stored in
          the catalogue in textual form, as an AST FrameSet (see SUN/210).
 
-         The storage format of the catalogue is determined by the \texttt{"}file
-         type\texttt{"} specified with the file name. If no file type is supplied,
+         The storage format of the catalogue is determined by the \texttt{"} file
+         type\texttt{"}  specified with the file name. If no file type is supplied,
          the catalogue will be stored in the form of a FITS binary table
-         with file extension \texttt{"}.FIT\texttt{"}. Other possibilities are described in
+         with file extension \texttt{"} .FIT\texttt{"} . Other possibilities are described in
          SUN/190.
       }
       \sstsubsection{
@@ -5127,7 +5159,34 @@ for NDF applications.
          calculations of linear polarization, and cannot be used if the
          input cube does not contain variance values. If a null value
          (!) is supplied, then the correction is applied if output variances
-         are being created, and not otherwise.           [!]
+         are being created, and not otherwise. The type of de-biasing to
+         use is specified by parameter DEBIASTYPE. [!]
+      }
+      \sstsubsection{
+         DEBIASTYPE = LITERAL (Read)
+      }{
+         Only used if DEBIAS is TRUE. It gives the type of bias estimator
+         to use, using the nomeclature of Montier at al \texttt{"} Polarization
+         measurements analysis II. Best estimators of polarization
+         fraction and angle\texttt{"}  (A\&A, 2018):
+         \sstitemlist{
+
+            \sstitem
+               \texttt{"} AS\texttt{"} : The asymptotic estimator. See section 2.3 of Montier
+                 et al. This estimator produces bad P and PI values if the
+                 squared PI value is less than the variance in PI.
+
+            \sstitem
+               \texttt{"} MAS\texttt{"} : The modified asymptotic estimator. See section 2.5 of
+                 Montier et al. This estimator does not produces bad P and PI
+                 values, even if the squared PI value is less than the
+                 variance in PI.
+         }
+
+         This parameter was introduced at version 3.6.2 of POLPACK.
+         Earlier versions always used the \texttt{"} AS\texttt{"}  estimator if de-biasing
+         was requested. The dynamic default is the current value, which
+         is initially \texttt{"} AS\texttt{"} . []
       }
       \sstsubsection{
          I = NDF (Write)
@@ -5155,13 +5214,13 @@ for NDF applications.
          \sstitemlist{
 
             \sstitem
-               MEAN      -- Mean of the input data values
+                MEAN      -- Mean of the input data values
 
             \sstitem
-               MEDIAN    -- Median of the input data values
+                MEDIAN    -- Median of the input data values
 
             \sstitem
-               SIGMA     -- A sigma clipped mean
+                SIGMA     -- A sigma clipped mean
             Note, only the MEAN method may be used with bins containing more
             than 100 values. [MEDIAN]
          }
@@ -5188,10 +5247,23 @@ for NDF applications.
          significant delay. [current value]
       }
       \sstsubsection{
+         REFUPDATE = \_LOGICAL (Read)
+      }{
+         Determines the reference direction in the output catalogue and
+         NDFs. If REFUPDATE is TRUE, the output reference direction will
+         be north if the input NDF has a celestial co-ordinate Frame within
+         its WCS component (teh direction of north is determined at the
+         centre of the image). Otherwise, the reference direction will be
+         the second pixel axis. The POLANAL Frame in the WCS information
+         of the output catalogue or NDFs is updated to describe the new
+         reference direction.  If REFUPDATE is FALSE, the output reference
+         direction will be the same as the input reference direction. [TRUE]
+      }
+      \sstsubsection{
          SIGMAS = \_REAL (Read)
       }{
          Number of standard deviations to reject data at. Only used if
-         METHOD is set to \texttt{"}SIGMA\texttt{"}. [4.0]
+         METHOD is set to \texttt{"} SIGMA\texttt{"} . [4.0]
       }
       \sstsubsection{
          U = NDF (Write)
@@ -5235,22 +5307,9 @@ for NDF applications.
       \sstitemlist{
 
          \sstitem
-         The output NDFs are deleted if there is an error during the
+          The output NDFs are deleted if there is an error during the
          formation of the polarization parameters.
-
-         \sstitem
-         The reference direction for the Stokes vectors and polarization
-         vectors in the output catalogue and NDFs will be north if the input NDF
-         has a celestial co-ordinate Frame within its WCS component. Otherwise,
-         the reference direction will be the second pixel axis. The POLANAL
-         Frame in the WCS information of the output catalogue or NDFs is
-         updated to describe the new reference direction.
       }
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2001 Central Laboratory of the Research Councils
    }
 }
 \sstroutine{
@@ -6185,6 +6244,17 @@ assumed that the reference direction is parallel to the first image axis).
 \section{\label{APP:HISTORY}History}
 This section describes the major changes introduced at each release of
 POLPACK.
+
+\subsection{V3.6-2}
+
+\begin{itemize}
+ \item  The POLVEC and POLBIN commands have a new parameter called
+ DEBIASTYPE that can be used to select the de-biasing estimator to use.
+ The traditional ``asymptotic'' estimator is still available (option ``AS''),
+ but a ``modified asymptotic'' estimator (option ``MAS'') is now available
+ that avoids the generation of PI values that are bad or identically
+ equal to zero.
+\end{itemize}
 
 \subsection{V3.6-1}
 
