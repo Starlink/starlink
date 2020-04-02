@@ -13,6 +13,7 @@ pol2map.py \
 pol2sim.py \
 pol2ip.py \
 pol2stack.py \
+pol2noise.py \
 pol2scan.py \
 matchbeam.py
 

@@ -6500,6 +6500,10 @@ package @PACKAGE@ {
         obey {python $SMURF_DIR/pol2map.py}
     }
 
+    command pol2noise {
+        obey {python $SMURF_DIR/pol2noise.py}
+    }
+
     command pol2sim {
         obey {python $SMURF_DIR/pol2sim.py}
     }
