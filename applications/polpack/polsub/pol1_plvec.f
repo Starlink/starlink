@@ -172,6 +172,13 @@
 *     1-APR-2020 (DSB):
 *        Provide option to do de-biasing using the "modified asymptotic
 *        estimator".
+*     2-APR-2020 (DSB):
+*        - If MAS debiasing, ensure the P value is modified as well as
+*        the IP value.
+*        - Do not store bad values for columns simply because I is negative.
+*        For instance, the PI column has a well defined value even if I is
+*        negative. Only store bad values for column that cannot be
+*        calculated if I is negative (e.g. P).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -481,12 +488,10 @@
 *  Now produced variances if required.
                      IF ( VAR ) THEN
 
-*  If any of the input variances are bad, or if the percentage polarisation
-*  is zero, store bad output variances. In this case we can't debias and
-*  so store bad IP and P values.
+*  If any of the input variances are bad store bad output variances. In this
+*  case we can't debias and so store bad IP and P values.
                         IF( VIIN .EQ. VAL__BADR .OR. VQIN .EQ. VAL__BADR
-     :                      .OR. VUIN .EQ. VAL__BADR .OR. I .LE. 0.0
-     :                      .OR. IP2 .EQ. 0.0 ) THEN
+     :                      .OR. VUIN .EQ. VAL__BADR ) THEN
 
                            VIP = VAL__BADR
                            VP = VAL__BADR
@@ -508,38 +513,58 @@
                            END IF
 
 *  Polarised intensity
-                           VIP = ( Q2 * VQIN + U2 * VUIN )/IP2
+                           IF( IP2 .NE. 0.0 ) THEN
+                              VIP = ( Q2 * VQIN + U2 * VUIN )/IP2
+                              IF( VIP .LT. 0.0 ) VIP = 0.0
+                           ELSE
+                              VIP = VAL__BADR
+                           END IF
 
 *  Percentage polarisation
-                           VP = 10000.0*( VIP/(I**2) + VIIN*IP2/(I**4) )
+                           IF( I .GT. 0.0 ) THEN
+                              VP = 10000.0*( VIP/(I**2) +
+     :                                       VIIN*IP2/(I**4) )
+                              IF( VP .LT. 0.0 ) VP = 0.0
+                           ELSE
+                              VP = VAL__BADR
+                           END IF
 
 *  Polarisation angle (degs).
-                           VT = RTOD*RTOD*( Q2*VUIN + U2*VQIN )/
-     :                                    ( 4.0*IP2*IP2 )
-
-*  If any of the variances are negative store bad results.
-                           IF ( VIP .LT. 0.0 .OR. VP .LT. 0.0 .OR.
-     :                          VT .LT. 0.0 ) THEN
-                              VIP = VAL__BADR
-                              VP = VAL__BADR
+                           IF( IP2 .NE. 0.0 ) THEN
+                              VT = RTOD*RTOD*( Q2*VUIN + U2*VQIN )/
+     :                                       ( 4.0*IP2*IP2 )
+                              IF( VT .LT. 0.0 ) VT = 0.0
+                           ELSE
                               VT = VAL__BADR
+                           END IF
 
 *  If required, make an estimate of the percentage polarisation and
 *  polarised intensity excluding the bias introduced because of the
 *  distribution of P being non-symmetric. First deal with the traditional
 *  asymptotic estimator.
-                           ELSE IF ( DEBIAS .EQ. 1 ) THEN
+                           IF( DEBIAS .EQ. 1 ) THEN
                               IP = SQRT( MAX( 0.0, IP2 - VIP ) )
-                              P = 100 * IP / I
+
+                              IF( I .GT. 0.0 ) THEN
+                                 P = 100 * IP / I
+                              ELSE
+                                 P = VAL__BADR
+                              END IF
 
 *  Now deal with the modified asymptotic estimator described in section
 *  2.5 of Montier et al.
-                           ELSE IF ( DEBIAS .NE. 0 ) THEN
+                           ELSE IF( DEBIAS .NE. 0 ) THEN
                               IF( IP .GT. 0.0 ) THEN
                                  IP = IP - 0.5*VIP*( 1.0 -
      :                                              EXP( -IP2/VIP ) )/IP
                               ELSE
                                  IP = 0.0
+                              END IF
+
+                              IF( I .GT. 0.0 ) THEN
+                                 P = 100 * IP / I
+                              ELSE
+                                 P = VAL__BADR
                               END IF
                            END IF
 
