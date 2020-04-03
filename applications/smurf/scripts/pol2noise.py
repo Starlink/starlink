@@ -63,7 +63,7 @@
 *     on the two maps.
 
 *  Usage:
-*     pol2noise cat column [perc] [presmooth] [device]
+*     pol2noise cat column [perc] [presmooth] [style] [device]
 
 *  ADAM Parameters:
 *     CAT = LITERAL (Read)
@@ -142,6 +142,36 @@
 *        created by this script be retained? If not, it will be deleted
 *        before the script exits. If retained, a message will be
 *        displayed at the end specifying the path to the directory. [FALSE]
+*     STYLE = LITERAL (Read)
+*        A group of attribute settings describing the plotting style to
+*        use for the annotated axes, etc.
+*
+*        A comma-separated list of strings should be given in which each
+*        string is either an attribute setting, or the name of a text
+*        file preceded by an up-arrow character "^".  Such text files
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are
+*        applied in the order in which they occur within the list, with
+*        later settings overriding any earlier settings given for the
+*        same attribute.
+*
+*        Each individual attribute setting should be of the form:
+*
+*           <name>=<value>
+*
+*        where <name> is the name of a plotting attribute, and <value>
+*        is the value to assign to the attribute.  Default values will
+*        be used for any unspecified attributes.  All attributes will be
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported). The appearance of the markers in
+*        the scatter plot is controlled by the attributes "Colour(Markers)",
+*        "Width(Markers)", etc. Likewise the appearance of the best fit
+*        line (and the contour lines) is controlled using "Colour(Curves)",
+*        "Width(Curves)", etc. [current value]
 
 *  Copyright:
 *     Copyright (C) 2020 East Asian Observatory
@@ -170,6 +200,8 @@
 *  History:
 *     25-MAR-2020 (DSB):
 *        Original version.
+*     3-APR-2020 (DSB):
+*        Add parameter STYLE.
 *-
 '''
 
@@ -228,6 +260,8 @@ try:
                                 default=60.0, noprompt=True ))
    params.append(starutil.Par0F("PRESMOOTH", "FWHM (pixels) for pre-smoothing",
                                 default=None, noprompt=True ))
+   params.append(starutil.ParGrp("STYLE", "Graphics style parameters",
+                                 "def", noprompt=True))
    params.append(starutil.Par0S("DEVICE", "Input vector catalogue",
                                 default=None, noprompt=True ))
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
@@ -253,8 +287,8 @@ try:
 #  values read from the catalogue.
    presmooth = parsys["PRESMOOTH"].value
 
-#  Get the current graphics device from the user's GLOBAL.sdf file.
-   device = get_task_par( "graphics_device", "GLOBAL", default=None, user=True )
+#  Get the current graphics device.
+   device = get_task_par( "graphics_device", "GLOBAL", default=None )
 
 #  If it is defined, use it as the default for the DEVICE parameter, and
 #  indicate the user should not be prompted. Otherwise, set "xw" as the
@@ -268,6 +302,9 @@ try:
 
 #  Get the graphics device to use.
    device = parsys["DEVICE"].value
+
+#  The graphics style.
+   style = parsys["STYLE"].value
 
 #  See if temp files are to be retained.
    retain = parsys["RETAIN"].value
@@ -439,6 +476,10 @@ try:
       fd.write( "MajTickLen=0\n" )
       fd.write( "MinTickLen=0\n" )
 
+#  Include any user-supplied style first.
+      if style and style != "def":
+         fd.write( "{0}\n".format(style) )
+
 #  Set the graphics device, clear it and divide its area into three pictures.
    invoke( "$KAPPA_DIR/gdset device={0}".format(device), buffer=True )
    invoke( "$KAPPA_DIR/gdclear", buffer=True )
@@ -448,8 +489,7 @@ try:
 #  Display the first error estimate map in the first picture.
    invoke( "$KAPPA_DIR/picsel label=a1", buffer=True )
    with open( stylefile, "a" ) as fd:
-      fd.write( "NumLab=0\n" )
-      fd.write( "title=Errors from local variations of {0}".format(col) )
+      fd.write( "title=Errors from local variations of {0}\n".format(col) )
    invoke( "$KAPPA_DIR/display in={0} mode=perc percentiles=\[2,80\] "
            "style=^{1} margin=0.1 badcol=blue4".format(temp5,stylefile), buffer=True )
 
@@ -463,8 +503,7 @@ try:
 #  Display the second error estimate map in the second picture.
    invoke( "$KAPPA_DIR/picsel label=a2", buffer=True )
    with open( stylefile, "a" ) as fd:
-      fd.write( "NumLab=0\n" )
-      fd.write( "title=Errors from D{0} column".format(col) )
+      fd.write( "title=Errors from D{0} column\n".format(col) )
    invoke( "$KAPPA_DIR/display in={0} mode=cur style=^{1} margin=0.1".
            format(temp2,stylefile), buffer=True )
 
@@ -472,8 +511,13 @@ try:
 #  plot (controlled by PERC), and draw a contour at that height over the map.
    invoke( "$KAPPA_DIR/histat ndf={0} percentiles={1}".format(temp2,perc) )
    ytop = get_task_par( "perval(1)", "histat" )
+   stylefile = NDG.tempfile()
+   with open( stylefile, "w" ) as fd:
+      fd.write("colour(curve)=red\n" )
+      if style and style != "def":
+         fd.write( "{0}\n".format(style) )
    invoke( "$KAPPA_DIR/contour ndf={0} clear=no key=no mode=free heights={1} "
-           "style=\"'colour=red'\"".format(temp2,ytop))
+           "style=^{2}".format(temp2,ytop,stylefile))
 
 #  Display the scatter plot in the third picture. To avoid a tall thin
 #  plot, create a square picture inside the third picture.
@@ -482,6 +526,8 @@ try:
    stylefile = NDG.tempfile()
    with open( stylefile, "w" ) as fd:
       fd.write("colour(curve)=red\n" )
+      if style and style != "def":
+         fd.write( "{0}\n".format(style) )
       fd.write("Label(1)=Errors from local variations in {0} ({1})\n".format(col,units))
       fd.write("Label(2)=Errors from D{0} column ({1})\n".format(col,units))
       fd.write("Title=Errors in {0}\n".format(col) )
