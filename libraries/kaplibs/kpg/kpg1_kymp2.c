@@ -51,7 +51,7 @@ void kpg1Kymp2( const char *string, const char *ind, AstKeyMap *keymap,
 *     - If the string has the form "keyword=<def>" (case insensitive), then
 *     any entry for the specified keyword is removed from the KeyMap.
 *     - Component names must contain only alphanumerical characters,
-*     underscores, plus and minus signs [a-zA-Z0-9_+\-],
+*     underscores, parentheses, plus and minus signs [a-zA-Z0-9_+\-],
 *     - Any lower case characters contained in a component name will be
 *     translated to the upper case equivalent.
 
@@ -98,6 +98,9 @@ void kpg1Kymp2( const char *string, const char *ind, AstKeyMap *keymap,
 *        be in an undefined state.
 *     29-MAY-2012 (DSB):
 *        Added "ind" argument.
+*     3-APR-2020 (DSB):
+*        Parentheses are legal in component names (e.g. they are used in
+*        the names of graphics attributes).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -169,7 +172,8 @@ void kpg1Kymp2( const char *string, const char *ind, AstKeyMap *keymap,
    clen = 0;
    for( c = string; c < cend; c++ ) {
       if( !isspace( *c ) ) {
-         if( !isalnum( *c ) && *c != '_' && *c != '-' && *c != '+' ) {
+         if( !isalnum( *c ) && *c != '_' && *c != '-' && *c != '+' &&
+             *c != '(' && *c != ')' ) {
             *status = SAI__ERROR;
             buf[ 0 ] = *c;
             buf[ 1 ] = 0;
