@@ -2006,7 +2006,7 @@ ipangoff = 0.0
 #-----------------------------------------------------------------
 #  Name: 	ipmodel
 #  Type: 	string
-#  Default: 	JAN2018
+#  Default: 	AUG2019
 #  Purpose: 	Specify the Instrumental Polarisation model to use.
 #  Description: This parameter is only used when processing POL2 Q or U
 #               time-streams as created by SMURF:CALCQU, and if a value
@@ -2021,7 +2021,10 @@ ipangoff = 0.0
 #               - "APR2019": See email from Pierre, sent to DSB and PF on
 #               15th April 2019 - subject "850 IP model". Note, this model
 #               only covers 850 data at the moment.
-ipmodel = JAN2018
+#
+#               - "AUG2019": See post "New IP models for POL2 data"
+#               posted 9th August 2019 on the JCMT software blog.
+ipmodel = AUG2019
 
 #-----------------------------------------------------------------
 #  Name: 	ipoffset
