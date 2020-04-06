@@ -1006,7 +1006,6 @@ class ParSys(object):
       old_adam_user = get_adam_user()
 
       #  Create a new ADAM directory in the NDG temp directory.
-      import pdb; pdb.set_trace()
       if ParSys.adamdir is None:
          ParSys.adamdir = tempfile.mkdtemp( prefix="adam_", suffix="_py",
                                             dir=NDG._gettmpdir() )
