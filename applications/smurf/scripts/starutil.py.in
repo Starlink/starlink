@@ -532,7 +532,7 @@ def get_task_par( parname, taskname, **kwargs ):
    Get the current value of an ATASK parameter.
 
    Invocation:
-      value = get_task_par( parname, taskname, default=??? )
+      value = get_task_par( parname, taskname, default=???, user=??? )
 
    Arguments:
       parname = string
@@ -546,12 +546,21 @@ def get_task_par( parname, taskname, **kwargs ):
          accessed (e.g. if the parameter file does not exist, or does not
          contain the required parameter). If "default" is not supplied,
          an exception will be raised if the parameter cannot be accessed.
+      user = boolean
+         If False or if not supplied, the parameter value is obtained
+         from the temporary ADAM directory created when the ParSys
+         object was created. If True, the parameter value is obtained
+         from the user's original ADAM directory.
 
    Returned Value:
       The parameter value. This will be a single value if the task parameter
       is a scalar value, and a list if the task parameter is a vector.
 
    """
+
+   if 'user' in kwargs and kwargs['user']:
+      old_adam_user = os.environ["ADAM_USER"]
+      os.environ["ADAM_USER"] = get_adam_user()
 
    cmd = "$KAPPA_DIR/parget parname={0} applic={1} vector=yes".format( shell_quote(parname),taskname)
 
@@ -570,6 +579,9 @@ def get_task_par( parname, taskname, **kwargs ):
       text = text.replace('TRUE', 'True' )
       text = text.replace('FALSE', 'False' )
       result = eval( text )
+
+   if 'user' in kwargs and kwargs['user']:
+      os.environ["ADAM_USER"] = old_adam_user
 
    return result
 
@@ -991,12 +1003,25 @@ class ParSys(object):
       glevel = _getLevel(self.params["GLEVEL"].value)
 
       #  Ensure the original ADAM directory is recorded
-      get_adam_user()
+      old_adam_user = get_adam_user()
 
       #  Create a new ADAM directory in the NDG temp directory.
+      import pdb; pdb.set_trace()
       if ParSys.adamdir is None:
          ParSys.adamdir = tempfile.mkdtemp( prefix="adam_", suffix="_py",
                                             dir=NDG._gettmpdir() )
+
+      # Copy the kappa pallette and global settings to the new ADAM directory.
+         old_palette = "{0}/kappa_palette.sdf".format(old_adam_user)
+         if os.path.exists( old_palette ):
+            shutil.copyfile( old_palette,
+                             "{0}/kappa_palette.sdf".format(ParSys.adamdir) )
+         old_globals = "{0}/GLOBAL.sdf".format(old_adam_user)
+         if os.path.exists( old_globals ):
+            shutil.copyfile( old_globals,
+                             "{0}/GLOBAL.sdf".format(ParSys.adamdir) )
+
+
       msg_out( "Setting ADAM_USER to {0}".format(ParSys.adamdir), ATASK )
       os.environ["ADAM_USER"] = ParSys.adamdir
 
