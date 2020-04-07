@@ -83,6 +83,8 @@
 *        Original version.
 *     1997 January 10 (MJC):
 *        Replaced NAG calls.
+*     7-APR-2020 (DSB):
+*        PDA_RNNOR requires DOUBLE PRECISION arguments, not REAL.
 *     {enter_further_changes_here}
 
 *-
@@ -147,7 +149,7 @@
       LOLIM = MAX( NUM_<T>TOD( VAL__MIN<T> ), DATMIN )
 
 *  Report an error and abort if the high limit is less than or equal to
-*  the low limit. 
+*  the low limit.
       IF ( HILIM .LE. LOLIM ) THEN
          STATUS = SAI__ERROR
 
@@ -161,7 +163,7 @@
             CALL MSG_SETR( 'HI', NUM_DTOR( HILIM ) )
             CALL MSG_SETR( 'LO', NUM_DTOR( LOLIM ) )
 
-         ELSE 
+         ELSE
             CALL MSG_SETD( 'HI', HILIM )
             CALL MSG_SETD( 'LO', LOLIM )
 
@@ -200,7 +202,7 @@
 
 *  A match has been found.  Get a random sample from a normal
 *  distribution to replace it.
-            DVAL = DBLE( PDA_RNNOR( MEAN, SIGMA ) )
+            DVAL = DBLE( PDA_RNNOR( REAL(MEAN), REAL(SIGMA) ) )
 
 *  Check that this sample is within the allowed data range.  If it is
 *  not, get a new one.  Quit after MAXTRY attempts have been made to
@@ -208,8 +210,8 @@
             NTRY = 1
             DO WHILE ( ( DVAL .GE. HILIM .OR. DVAL .LE. LOLIM ) .AND.
      :                 NTRY .LT. MAXTRY )
-               NTRY = NTRY + 1            
-               DVAL = DBLE( PDA_RNNOR( MEAN, SIGMA ) )
+               NTRY = NTRY + 1
+               DVAL = DBLE( PDA_RNNOR( REAL(MEAN), REAL(SIGMA) ) )
             END DO
 
 *  Report an error an abort if too many attempts have been made to get
