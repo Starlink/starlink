@@ -33,7 +33,7 @@
 *     MEAN = DOUBLE PRECISION (Given)
 *        Mean of the new values to be substituted for the old value.
 *     SIGMA = DOUBLE PRECISION (Given)
-*        Standard deviation of the new values to be substituted for the 
+*        Standard deviation of the new values to be substituted for the
 *        old value.
 *     DATMIN = DOUBLE PRECISION (Given)
 *        The minimum new value allowed.
@@ -84,7 +84,7 @@
 *     1997 January 10 (MJC):
 *        Replaced NAG calls.
 *     7-APR-2020 (DSB):
-*        PDA_RNNOR requires DOUBLE PRECISION arguments, not REAL.
+*        PDA_RNNOR requires REAL arguments, not DOUBLE PRECISION.
 *     {enter_further_changes_here}
 
 *-
@@ -123,7 +123,7 @@
 
 *  Local Variables:
       DOUBLE PRECISION DIFF      ! Normalised maximum difference between
-                                 ! data value and the value to change 
+                                 ! data value and the value to change
                                  ! for them to be regarded as identical
       DOUBLE PRECISION DVAL      ! Random sample value
       DOUBLE PRECISION FPOLD     ! Floating-point value to be replaced
