@@ -9,7 +9,7 @@
                     \& East Asian Observatory}
 \stardocnumber      {20.2}
 \stardocauthors     {H.\ S.\ Thomas, Malcolm J.\ Currie, \& H.\ A.\ L.\ Parsons}
-\stardocdate        {2019 November 7}
+\stardocdate        {2020 April 8}
 \stardoctitle       {The Heterodyne Data Reduction Cookbook}
 \stardocversion     {1.2}
 \stardocmanual      {\ }
@@ -4929,6 +4929,78 @@ SIDEBAND\_CORR\_FACTOR & This allows you to override the sideband-correction fac
   available for instrument RxA3M. These corrections do not affect reductions done with \continuum,
   but will be used in all other RxA3M science reductions, and in the \picard\ recipe
   \calibratesideband. The CALCULATE\_STANDARD\_ALWAYS flag will also affect the non-continuum recipes.}
+\end{table}
+
+
+\begin{table}[h!]
+\begin{small}
+\begin{tabular}{|p{6.8cm}|p{8.6cm}|}
+\hline
+\textbf{Parameter} & \textbf{Description} \\
+\hline
+
+SUBTRACT\_REF\_EMISSION & If true, the recipe will attempt to locate and
+                           remove reference (off-position) signal that
+                           appears as absorption lines. \\
+
+REF\_EMISSION\_BOXSIZE & The width (in channels) of the largest reference-spectrum line
+                         expected, used to find the background before finding spectral
+                         lines.  If no value is supplied, an iterative approach determines
+                         the largest line width. \smallskip  \\
+
+REF\_EMISSION\_COMBINE\_DETECTORS & If true, combine all detectors to form the
+                                    reference spectrum.  While it can improve the
+                                    signal to noise, receptors are strictly viewing
+                                    slightly different locations and hence each
+                                    receptor's reference spectrum will be different.  \\
+
+REF\_EMISSION\_COMBINE\_REFPOS & Whether to combine observations by their
+                                 reference position (\texttt{1}), or by observation date
+                                 (\texttt{0}). \\
+
+REF\_EMISSION\_MASK\_SOURCE & This controls the use of the mask of source emission
+                              already detected for baseline estimation.  There are pros
+                              and cons both using the mask (\texttt{1}) or not using it (\texttt{0}).
+                              The final option, \texttt{Both}, attempts to combine the benefits of
+                              both methods: the masked spectrum locates the lines, but the unmasked
+                              modal spectrum determine the line strengths. \\
+
+REF\_EMISSION\_REGIONS & Instead of automated identification of absorption lines, supply
+                         a comma-separated list of line extents ($v$1:$v$2).  These regions
+                         are masked and interpolated, the background determined and subtracted
+                         from the unmasked representative spectrum to form an approximation to
+                         the reference spectrum. \\
+
+\hline
+
+SUBTRACT\_REF\_SPECTRUM & If true, the recipe will interpolate across the extents
+                          of reference (off-position) lines that you specify, applied
+                          to each (reference position or date and/or detector) median
+                          spectrum to estimate the respective reference spectrum. \\
+
+
+REF\_SPECTRUM\_COMBINE\_DETECTORS & If true, combine all detectors to form the
+                                    reference spectrum.  While it can improve the
+                                    signal to noise, receptors are strictly viewing
+                                    slightly different locations and hence each
+                                    receptor's reference spectrum will be
+                                    different. \\
+
+REF\_SPECTRUM\_COMBINE\_REFPOS & Whether to combine observations by their
+                                 reference position (\texttt{1}), or by observation
+                                 date \texttt{0}. \\
+
+
+REF\_SPECTRUM\_REGIONS & A comma-separated list of line extents ($v$2:$v$2) of the locations of
+                         absorptions lines to excise. \\
+\hline
+\end{tabular}
+\end{small}
+\caption{\label{tab:bll_params}
+  The recipe parameters associated with the filtering of reference-spectrum absorption-line
+  artefacts, either automatically or specified manually.  These methods are still experimental,
+  although the manual identication is more reliable for known lines.  Therefore these parameters
+  are currently available only in the \narrowline\ recipe.}
 \end{table}
 
 
