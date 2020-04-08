@@ -4553,8 +4553,8 @@ The parameters are classified for easier identification.
 \hline
 \textbf{Parameter} & \textbf{Description} \\
 \hline
-CLUMP\_METHOD & Method for identifying emission clumps: Clumpfind,
-                Fellwalker, or Thresh.\\
+CLUMP\_METHOD & Method for identifying emission clumps: \texttt{Clumpfind},
+                \texttt{Fellwalker}, or \texttt{Thresh}.\\
 \hline
 CUBE\_WCS & The co-ordinate system in which to regrid cubes.\\
 \hline
@@ -4639,13 +4639,13 @@ BASELINE\_EDGES & Percentage of the full range to fit on either edge of the spec
                   value, BASELINE\_REGIONS, if it is defined, will be used instead to
                   specify where to determine the baseline. \\
 \hline
-BASELINE\_METHOD & Source of the baseline region.  Currently only \texttt{"auto"}
+BASELINE\_METHOD & Source of the baseline region.  Currently only \texttt{auto}
                    is recognised.  This requests the automated mode where the emission
                    is detected and masked before baseline fitting.  Otherwise
                    BASELINE\_EDGES or BASELINE\_REGIONS (q.v.) will be used. \\
 \hline
 BASELINE\_NUMBIN & The number of channels to which the spectral axis is compressed
-                    for automated masking of emission when BASELINE\_METHOD=\texttt{"auto"}. \\
+                    for automated masking of emission when BASELINE\_METHOD=\texttt{auto}. \\
 \hline
 BASELINE\_ORDER & The polynomial order to use when baselining cubes.\\
 \hline
@@ -4653,7 +4653,7 @@ BASELINE\_REGIONS & A comma-separated list of velocity ranges each in the format
                     $v1:v2$, from where the baseline should be estimated.  It is
                     countermanded should BASELINE\_EDGES be positive.  These can also
                     be used to define where to test baseline linearity if
-                    BASELINE\_LINEARITY\_LINEWIDTH is set to \texttt{"base"}. \\
+                    BASELINE\_LINEARITY\_LINEWIDTH is set to \texttt{base}. \\
 \hline
 FREQUENCY\_SMOOTH & The number of channels to smooth in the frequency axis when
                     smoothing to determine baselines.  This number should be small
@@ -4693,7 +4693,7 @@ LV\_IMAGE & Permits creation of a longitude-velocity map via primitive \_CREATE\
 LV\_AXIS & Specify the axis to collapse in the creation of the longitude-velocity map.\\
 LV\_ESTIMATOR & Specify the collapse statistic in the creation of the longitude-velocity map.\\
 \hline
-CREATE\_MOMENTS\_USING\_SNR & If set to true (1), moments maps will be created using a
+CREATE\_MOMENTS\_USING\_SNR & If set to true (\texttt{1}), moments maps will be created using a
                               signal-to-noise map to find emission regions. This is useful
                               when observations were taken under differing sky conditions
                               and have different noise levels.\\
@@ -4746,7 +4746,7 @@ DESPIKE\_BOX & The size, in pixels, of the box used to both find the "background
 DESPIKE\_CLIP & The clip standard deviations to use when finding spikes in the
                 background-subtracted RMS spectrum.\\
 DESPIKE\_PER\_DETECTOR & If a spike is not seen in all detectors, consider setting this
-                         value to 1.\\
+                         value to \texttt{1}.\\
 \hline
 \end{tabular}
 \end{small}
@@ -4763,7 +4763,7 @@ DESPIKE\_PER\_DETECTOR & If a spike is not seen in all detectors, consider setti
 CHUNKSIZE & Maximum sized chunk used for the group cube.\\
 CUBE\_MAXSIZE & Controls the maximum size of the reduced cube. \\
 \hline
-TILE & A true value (1) performs tiling of the cube to restrict the memory requirements.
+TILE & A true value (\texttt{1}) performs tiling of the cube to restrict the memory requirements.
        Such tiled cubes abut each other in pixel co-ordinates and may be pasted together
        to form the complete spectral cube. \\
 \hline
@@ -4780,7 +4780,7 @@ TILE & A true value (1) performs tiling of the cube to restrict the memory requi
 \hline
 \textbf{Parameter} & \textbf{Description} \\
 \hline
-HIGHFREQ\_INTERFERENCE & If set to true (1) the spectra for each receptor are analysed to
+HIGHFREQ\_INTERFERENCE & If set to true (\texttt{1}) the spectra for each receptor are analysed to
                          detect high-frequency interference noise, and those spectra deemed
                          too noisy are excluded from the reduced products.\\
 HIGHFREQ\_INTERFERENCE\_EDGE\_CLIP & Used to reject spectra with high-frequency noise.  It
@@ -4814,7 +4814,7 @@ HIGHFREQ\_RINGING\_MIN\_SPECTRA & Minimum number of good spectra for ringing fil
 \hline
 \textbf{Parameter} & \textbf{Description} \\
 \hline
-LOWFREQ\_INTERFERENCE & If set to true (1), the spectra for each receptor are
+LOWFREQ\_INTERFERENCE & If set to true (\texttt{1}), the spectra for each receptor are
                         analysed to detect low-frequency local interference
                         ripples or bad baselines, and those spectra deemed too
                         deviant from linearity are excluded from the reduced
@@ -4900,16 +4900,16 @@ BASELINE\_LINEARITY\_SCALELENGTH & This is used to reject receptors that have no
 \hline
 \textbf{Parameter} & \textbf{Description} \\
 \hline
-CALCULATE\_STANDARD\_ALWAYS & If set true (1), this will ensure that the \file{log.standard}
+CALCULATE\_STANDARD\_ALWAYS & If set true (\texttt{1}), this will ensure that the \file{log.standard}
                               file will be created even if the source, molecule, and
                               transition combination is not present in the list of
                               known standard sources. This will affect most
                               non-continuum heterodyne recipes.\\
 \hline
-NOSIDEBANDCORR & If set to 1, this will prevent any sideband-calibration correction
+NOSIDEBANDCORR & If set to \texttt{1}, this will prevent any sideband-calibration correction
                  factor from being applied to the data.\\
 
-SIDEBAND &  Set the sideband (e.g. USB or LSB) to use when applying the sideband
+SIDEBAND &  Set the sideband (e.g. \texttt{USB} or \texttt{LSB}) to use when applying the sideband
             correction. By default the system will use the sideband of the observation,
             but this recipe parameter can override that default if you are interested
             in a line in the image sideband. \\
