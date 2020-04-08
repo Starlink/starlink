@@ -132,6 +132,8 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 *        all normalised weights falling below wmin (and thus being set to
 *        zero), if the NDF variance array includes one or two values very
 *        close to zero (resulting in huge absolute weights).
+*     8-APR-2020 (DSB):
+*        Initialise new parameter "rfctol".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -197,6 +199,10 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 /* Maximum number of function evaluations to be used when fitting an
    individual clump. */
       cupidGC.maxnf = cupidConfigI( config, "MAXNF", 100, status );
+
+/* The relative function change that marks convergence of the
+   minimisation process. */
+      cupidGC.rfctol = cupidConfigD( config, "RFCTOL", 1.0E-6, status );
 
 /* See if a value has been supplied for the initial guess at the ratio
    of the clump velocity width to the velocity resolution. */

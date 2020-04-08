@@ -108,6 +108,7 @@ typedef struct CupidGC  {
    double lbnd[ 3 ];       /* Lower grid bounds of section being fitted */
    double maxwf;           /* Maximum factor for modifying weights */
    double minwf;           /* Minimum factor for modifying weights */
+   double rfctol;          /* Relative function change for convergence */
    double s0p1;            /* Chi-square stiffness parameter s0, minus 1.0 */
    double sa;              /* Chi-square stiffness parameter sa */
    double sb;              /* Chi-square stiffness parameter sb */

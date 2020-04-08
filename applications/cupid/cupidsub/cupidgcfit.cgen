@@ -122,6 +122,8 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 *        Use MERS for message filtering.
 *     14-FEB-2011 (DSB):
 *        Ensure returned spatial position angle is in the range +/- PI.
+*     8-APR-2020 (DSB):
+*        Set the relative function change convergence criterion.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -214,6 +216,9 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 
 /* Override the default for the maximum number of function evaluations allow. */
    iv[ 16 ] = cupidGC.maxnf;
+
+/* Store the relative function change convergence criterion. */
+   v[ 31 ] = cupidGC.rfctol;
 
 /* Call the minimisation function. */
    pdaSumsl( n, d, x, cupidGCcalcf, cupidGCcalcg, iv, LIV, LV, v );

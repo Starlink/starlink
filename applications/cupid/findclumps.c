@@ -547,6 +547,10 @@ void findclumps( int *status ) {
 *        consecutive clumps have been fitted all of which have peak values less
 *        than the threshold value specified by the "Thresh" parameter, or
 *        when one of the other termination criteria is met. [10]
+*     GaussClumps.RFCTol:
+*        The relative function change that indicates convergence of the
+*        minimisation process used to fit each Gaussian. It should take a
+*        value between 0.0 and 1.0. [1.0E-6]
 *     GaussClumps.RMS:
 *        The global RMS noise level in the data. The
 *        default value is the value supplied for parameter RMS. []
@@ -937,6 +941,8 @@ void findclumps( int *status ) {
 *        Add "Ellipse2" option for parameter SHAPE.
 *     21-NOV-2019 (DSB):
 *        Multi-thread.
+*     8-APR-2020 (DSB):
+*        Add configuration parameter GaussClumps.RFCTol.
 *     {enter_further_changes_here}
 
 *  Bugs:
