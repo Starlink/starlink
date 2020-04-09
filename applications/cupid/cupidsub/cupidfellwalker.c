@@ -12,7 +12,7 @@
 HDSLoc *cupidFellWalker( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
                          hdsdim *subnd, void *ipd, double *ipv, double rms,
                          AstKeyMap *config, int velax, int perspectrum,
-                         double beamcorr[ 3 ], int *status ){
+                         double beamcorr[ 3 ], int *nrej, int *status ){
 /*
 *+
 *  Name:
@@ -29,7 +29,7 @@ HDSLoc *cupidFellWalker( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
 *     HDSLoc *cupidFellWalker( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
 *                              hdsdim *subnd, void *ipd, double *ipv, double rms,
 *                              AstKeyMap *config, int velax, int perspectrum,
-*                              double beamcorr[ 3 ], int *status )
+*                              double beamcorr[ 3 ], int *nrej, int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -108,6 +108,8 @@ HDSLoc *cupidFellWalker( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
 *        instrumental smoothing along each pixel axis. The clump widths
 *        stored in the output catalogue are reduced to correct for this
 *        smoothing.
+*     nrej
+*        Returned holding the number of rejected clumps.
 *     status
 *        Pointer to the inherited status value.
 
@@ -166,6 +168,8 @@ HDSLoc *cupidFellWalker( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
 *        findclumps enormously if there are many thousands of clumps.
 *     21-NOV-2019 (DSB):
 *        Multi-thread.
+*     9-APR-2020 (DSB):
+*        Added argument nrej.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -211,6 +215,7 @@ HDSLoc *cupidFellWalker( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
 
 /* Initialise */
    ret = NULL;
+   *nrej = 0;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
@@ -405,19 +410,23 @@ HDSLoc *cupidFellWalker( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
          }
       }
 
+
       if( ngood == 0 ) msgOutif( MSG__NORM, "", "No usable clumps found.", status );
+      *nrej = nsmall;
       if( nsmall == 1 ){
         msgOutif( MSG__NORM, "", "One clump rejected because it contains too few pixels.", status );
       } else if( nsmall > 0 ){
         msgSeti( "N", nsmall );
         msgOutif( MSG__NORM, "", "^N clumps rejected because they contain too few pixels.", status );
       }
+      *nrej += nlow;
       if( nlow == 1 ){
         msgOutif( MSG__NORM, "", "One clump rejected because its peak is too low.", status );
       } else if( nlow > 0 ){
         msgSeti( "N", nlow );
         msgOutif( MSG__NORM, "", "^N clumps rejected because the peaks are too low.", status );
       }
+      *nrej += nthin;
       if( nthin == 1 ) {
         msgOutif( MSG__NORM, "", "1 clump rejected because it spans only a single "
                 "pixel along one or more axes.", status );
@@ -427,6 +436,7 @@ HDSLoc *cupidFellWalker( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
         msgOutif( MSG__NORM, "", "^N clumps rejected because they spans only a single "
                 "pixel along one or more axes.", status );
       }
+      *nrej += nedge;
       if( nedge == 1 ) {
         msgOutif( MSG__NORM, "", "1 clump rejected because it touches an edge "
                 "of the array.", status );

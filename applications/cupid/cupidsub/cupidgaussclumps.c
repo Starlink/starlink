@@ -24,7 +24,7 @@ CupidGC cupidGC;
 
 HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *ipd,
                           double *ipv, double rms, AstKeyMap *config, int velax,
-                          double beamcorr[ 3 ], int *status ){
+                          double beamcorr[ 3 ], int *nrej, int *status ){
 /*
 *+
 *  Name:
@@ -41,7 +41,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void
 *     HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd,
 *                               void *ipd, double *ipv, double rms,
 *                               AstKeyMap *config, int velax,
-*                               double beamcorr[ 3 ], int *status )
+*                               double beamcorr[ 3 ], int *nrej, int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -100,6 +100,8 @@ HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void
 *        instrumental smoothing along each pixel axis. The clump widths
 *        stored in the output catalogue are reduced to correct for this
 *        smoothing.
+*     nrej
+*        Returned holding the number of rejected clumps.
 *     status
 *        Pointer to the inherited status value.
 
@@ -167,6 +169,9 @@ HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void
 *     20-NOV-2013 (DSB):
 *        Supplied config KeyMap now holds the method parameters directly,
 *        rather than holding them in a sub-KeyMap.
+*     9-APR-2020 (DSB):
+*        - Allow edge clumps to be retained using config parameter AllowEdge.
+*        - Added argument nrej.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -178,6 +183,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void
 /* Local Variables: */
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
    char buf[30];        /* File name buffer */
+   const char *text;    /* Pointer to error message text */
    double *peaks;       /* Holds the "npeak" most recently fitted peak values */
    double chisq;        /* Chi-squared value of most recently fitted Gaussian */
    double maxbad;       /* Max fraction of bad pixels allowed in a clump */
@@ -195,6 +201,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void
    double x[ CUPID__GCNP3 ]; /* Parameters describing new Gaussian clump */
    hdsdim *dims;        /* Pointer to array of array dimensions */
    int allbad;          /* Are all the residuals bad? */
+   int allowedge;       /* Retain clumps that touch the array edges? */
    int excols;          /* Are extra output columns required? */
    int iter;            /* Continue finding more clumps? */
    int maxskip;         /* Max no. of failed fits between good fits */
@@ -217,6 +224,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void
 
 /* Initialise */
    ret = NULL;
+   *nrej = 0;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
@@ -279,13 +287,17 @@ HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void
    res = cupidStore( NULL, ipd, el, type, "cupidGaussClumps" );
    if( res ) {
 
-/* Set the lower threshold for clump peaks to a user-specified multiple
+/* Get the lower threshold for clump peaks to a user-specified multiple
    of the RMS noise. */
       peak_thresh = cupidConfigD( config, "THRESH", 2.0, status );
 
-/* Set the lower threshold for clump area to a user-specified number of
+/* Get the lower threshold for clump area to a user-specified number of
    pixels. */
       area_thresh = cupidConfigI( config, "MINPIX", 3, status );
+
+/* Get a flag indicating if clumps that touch the edge of the data array
+   are to be retained. */
+      allowedge = cupidConfigI( config, "ALLOWEDGE", 0, status );
 
 /* Get the lowest value (normalised to the RMS noise level) at which
    model Gaussians should be evaluated. */
@@ -415,9 +427,9 @@ HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void
    with the clump. This NDF is stored in the HDS array of NDFs in the
    returned HDS object. The standard deviation of the new residuals is
    returned. */
-                  cupidGCUpdateArrays( type, res, ipd, el, ndim, dims,
-                                       x, rms, mlim, imax, peak_thresh, slbnd,
-                                       &ret, iclump, excols, mean_peak,
+                  cupidGCUpdateArrays( type, res, ipd, el, ndim, dims, x, rms,
+                                       mlim, imax, peak_thresh, allowedge,
+                                       slbnd, &ret, iclump, excols, mean_peak,
                                        maxbad, &area, &sumclumps, status );
 
 /* Dump the modified residuals if required. */
@@ -546,15 +558,16 @@ HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void
 
       if( nclump == 0 ) msgOutif( MSG__NORM, "", "No usable clumps found.", status );
 
+      *nrej =  iclump - nclump;
       if( iclump - nclump == 1 ) {
-        msgOutif( MSG__NORM, "",
-                  "1 clump rejected because it touches an edge of "
-                  "the data array or was below the threshold.", status );
+        text = allowedge ? "" : "touches an edge of the data array or ";
+        msgOutiff( MSG__NORM, "", "1 clump rejected because it %swas below "
+                   "the threshold.", status, text );
       } else if( iclump - nclump > 1 ) {
-        msgOutiff( MSG__NORM, "",
-                   "%d clumps rejected because they touch an edge of "
-                   "the data array or were below the threshold.", status,
-                   (int)( iclump - nclump ) );
+        text = allowedge ? "" : "touch an edge of the data array or ";
+        msgOutiff( MSG__NORM, "", "%d clumps rejected because they %swere "
+                   "below the threshold.", status, (int)( iclump - nclump ),
+                   text );
       }
 
 /* Tell the user how many iterations have been performed (i.e. how many

@@ -6,6 +6,20 @@
  and  analyse clumps of emission within 2- or 3- dimensional
  data arrays.
 
+Changes introduced at V2.6
+
+   - The FINDCLUMPS GaussClumps algorithm has a new configuration
+   parameter called GaussClumps.RFCTol, which gives the relative
+   function change required for convergence of a single Gaussian clump.
+   Previously a very low figure (1E-10) was used, often causing
+   convergence to fail. The default for the new parameter is 1E-6.
+
+   - The FINDCLUMPS GaussClumps algorithm has a new configuration
+   parameter called GaussClumps.AllowEdge. Setting it to zero (the
+   default and also the behaviour in previous versions of CUPID) causes
+   clumps that touch an edge of the data array to be rejected. Setting it
+   to a non-zero value causes such clumps to be retained.
+
 Changes introduced at V2.5
 
    - The FINDCLUMPS SHAPE parameter can now be set to "Ellipse2". This is

@@ -11,7 +11,7 @@
 HDSLoc *cupidClumpFind( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *ipd,
                         double *ipv, double rms, AstKeyMap *config, int velax,
                         int perspectrum, double beamcorr[ 3 ],
-                        int *backoff, int *status ){
+                        int *backoff, int *nrej, int *status ){
 /*
 *+
 *  Name:
@@ -29,7 +29,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *
 *                             void *ipd, double *ipv, double rms,
 *                             AstKeyMap *config, int velax,
 *                             int perspectrum, double beamcorr[ 3 ],
-*                             int *backoff, int *status )
+*                             int *backoff, int *nrej, int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -80,6 +80,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *
 *     backoff
 *        Location at which to return the default value to use for the
 *        BACKOFF parameter.
+*     nrej
+*        Returned holding the number of rejected clumps.
 *     status
 *        Pointer to the inherited status value.
 
@@ -134,6 +136,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *
 *        Switch off group history and provenance recording whilst creating
 *        clump NDFs. This is because it can inflate the time taken to run
 *        findclumps enormously if there are many thousands of clumps.
+*     9-APR-2020 (DSB):
+*        Added argument nrej.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -178,6 +182,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *
 
 /* Initialise */
    ret = NULL;
+   *nrej = 0;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
@@ -387,6 +392,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *
          if( nclump == 0 ) msgOutif( MSG__NORM, "",
                                      "No usable clumps found.", status );
 
+         *nrej = nminpix;
          msgSeti( "M", minpix );
          if( nminpix == 1 ) {
            msgOutif( MSG__NORM,"", "1 clump rejected because it contains fewer "
@@ -398,6 +404,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *
                    "than MinPix (^M) pixels.", status );
          }
 
+         *nrej += nedge;
          if( nedge == 1 ) {
            msgOutif( MSG__NORM, "",
                      "1 clump rejected because it touches an edge of "
@@ -409,6 +416,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *
                      "the data array.", status );
          }
 
+         *nrej += nthin;
          if( nthin == 1 ) {
            msgOutif( MSG__NORM, "",
                    "1 clump rejected because it spans only a single "

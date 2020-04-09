@@ -25,7 +25,7 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
                        int backoff, int stccol, int velax, double beamcorr[ 3 ],
                        const char *ttl, int usewcs, AstFrameSet *iwcs,
                        const char *dataunits, Grp *hist,
-                       FILE *logfile, int *nclumps, int *status ){
+                       FILE *logfile, int nrej, int *nclumps, int *status ){
 /*
 *+
 *  Name:
@@ -43,7 +43,8 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 *                            int backoff, int stccol, int velax,
 *                            double beamcorr[ 3 ], const char *ttl, int usewcs,
 *                            AstFrameSet *iwcs, const char *dataunits,
-*                            Grp *hist, FILE *logfile, int *nclumps, int *status )
+*                            Grp *hist, FILE *logfile, int nrej, int *nclumps,
+*                            int *status )
 
 *  Description:
 *     This function optionally saves the clump properties in an output
@@ -126,6 +127,9 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 *        catalogue has history information.
 *     logfile
 *        Pointer to a file identifier for the output log file, or NULL.
+*     nrej
+*        The number of clumps that have already been rejected prior to
+*        calling this function.
 *     nclumps
 *        Pointer to an int in which to return the number of clumps stored
 *        in the output NDF.
@@ -201,6 +205,8 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 *        Switch off group history and provenance recording during this
 *        function. This is because it can inflate the time taken to run
 *        findclumps enormously if there are many thousands of clumps.
+*     9-APR-2020 (DSB):
+*        Added argument nrej.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -239,6 +245,7 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
    const char **units;      /* Component units */
    const char *cname;       /* Pointer to column name string */
    const char *dom;         /* Pointer to domain string */
+   const char *text;        /* Pointer to message text */
    double *cpars;           /* Array of parameters for a single clump */
    double *t;               /* Pointer to next table value */
    double *tab;             /* Pointer to catalogue table */
@@ -543,37 +550,39 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 /* Tell the user how many usable clumps there are and how many were rejected
    due to being smaller than the beam size. */
 
+   text = ( nrej == 0 ) ? "" : "further ";
    if( nsmall1 == 1 ) {
-      msgOutiff( MSG__NORM, "", "1 further clump rejected because it "
-                 "is smaller than the spatial beam width.", status );
+      msgOutiff( MSG__NORM, "", "1 %sclump rejected because it "
+                 "is smaller than the spatial beam width.", status, text );
    } else if( nsmall1 > 1 ) {
-      msgOutiff( MSG__NORM, "", "%d further clumps rejected because "
+      msgOutiff( MSG__NORM, "", "%d %sclumps rejected because "
                  "they are smaller than the spatial beam width.",
-                 status, nsmall1 );
+                 status, nsmall1, text );
    }
 
    if( nsmall2 == 1 ) {
       msgSetc( "W", ( ndim > 1 ) ? "(this clump may also "
                "be smaller than the spatial beam width)" : "" );
-      msgOutiff( MSG__NORM, "", "1 further clump rejected because it "
-                 "is smaller than the spectral resolution ^W.", status );
+      msgOutiff( MSG__NORM, "", "1 %sclump rejected because it "
+                 "is smaller than the spectral resolution ^W.", status,
+                 text );
 
    } else if( nsmall2 > 1 ) {
       msgSeti( "N", nsmall2 );
       msgSetc( "W", ( ndim > 1 ) ? "(some of these may also "
                "be smaller than the spatial beam width)" : "" );
-      msgOutif( MSG__NORM, "", "^N further clumps rejected because "
+      msgOutiff( MSG__NORM, "", "^N %sclumps rejected because "
                  "they are smaller than the spectral resolution ^W.",
-                 status );
+                 status, text );
    }
 
    if( nbad == 1 ) {
-     msgOutif( MSG__NORM, "", "1 further clump rejected because it includes "
-             "too many bad pixels.", status );
+     msgOutiff( MSG__NORM, "", "1 %sclump rejected because it includes "
+             "too many bad pixels.", status, text );
    } else if( nbad > 1 ) {
      msgSeti( "N", nbad );
-     msgOutif( MSG__NORM, "", "^N further clumps rejected because they include "
-             "too many bad pixels.", status );
+     msgOutiff( MSG__NORM, "", "^N %sclumps rejected because they include "
+             "too many bad pixels.", status, text );
    }
 
    if( iclump == 0 ) {

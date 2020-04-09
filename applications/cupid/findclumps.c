@@ -492,6 +492,10 @@ void findclumps( int *status ) {
 *     information on this algorithm.
 
 *  GaussClumps Configuration Parameters:
+*     GaussClumps.AllowEdge:
+*        If set to a zero value, then clumps are rejected if they touch any
+*        edge of the data array. If non-zero, then such clumps are retained.
+*        [0]
 *     GaussClumps.ExtraCols:
 *        If set to a positive integer, then extra method-specific columns
 *        are added to the output catalogue. If set to 1, then the catalogue
@@ -943,6 +947,8 @@ void findclumps( int *status ) {
 *        Multi-thread.
 *     8-APR-2020 (DSB):
 *        Add configuration parameter GaussClumps.RFCTol.
+*     9-APR-2020 (DSB):
+*        Add configuration parameter GaussClumps.AllowEdge.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1011,6 +1017,7 @@ void findclumps( int *status ) {
    int nclumps;                 /* Number of clumps stored in output NDF */
    int ndim;                    /* Total number of pixel axes */
    int nfr;                     /* Number of Frames within WCS FrameSet */
+   int nrej;                    /* No. of clumps rejected in main algorithm function */
    int nsig;                    /* Number of significant pixel axes */
    int nskyax;                  /* No. of sky axes in current WCS Frame */
    int nspecax;                 /* No. of spectral axes in current WCS Frame */
@@ -1417,20 +1424,20 @@ void findclumps( int *status ) {
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
       ndfs = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                               aconfig, velax, beamcorr, status );
+                               aconfig, velax, beamcorr, &nrej, status );
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
       ndfs = cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rms,
                              aconfig, velax, perspectrum, beamcorr,
-                             &backoff, status );
+                             &backoff, &nrej, status );
 
    } else if( !strcmp( method, "REINHOLD" ) ) {
       ndfs = cupidReinhold( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                            aconfig, velax, beamcorr, status );
+                            aconfig, velax, beamcorr, &nrej, status );
 
    } else if( !strcmp( method, "FELLWALKER" ) ) {
       ndfs = cupidFellWalker( wf, type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              aconfig, velax, perspectrum, beamcorr,
+                              aconfig, velax, perspectrum, beamcorr, &nrej,
                               status );
 
    } else if( *status == SAI__OK ) {
@@ -1539,7 +1546,7 @@ void findclumps( int *status ) {
                         backoff, ishape, velax, beamcorr,
                         "Output from CUPID:FINDCLUMPS", usewcs,
                         gotwcs ? iwcs : NULL, dataunits, confgrp, logfile,
-                        &nclumps, status );
+                        nrej, &nclumps, status );
 
       if( logfile ) fprintf( logfile, "\n\n" );
 

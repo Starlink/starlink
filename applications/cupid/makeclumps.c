@@ -785,7 +785,7 @@ void makeclumps( int *status ) {
    containing the clump data values, appended to the end of the array of
    NDF structures in the HDS object located by "obj". */
       cupidGCUpdateArraysF( NULL, NULL, nel, sdims, dims, par, rms, trunc, 0,
-                            0.0, slbnd, &obj, i, 0, 0.0, 0, &area, &sum, status );
+                            0.0, 0, slbnd, &obj, i, 0, 0.0, 0, &area, &sum, status );
 
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];
@@ -806,7 +806,7 @@ void makeclumps( int *status ) {
 /* Create the clump, appending it to the end of the array of NDF structures
    in the HDS object located by "obj_precat". */
             cupidGCUpdateArraysF( NULL, NULL, nel, sdims, dims, par, rms,
-                                  trunc, 0, 0.0, slbnd, &obj_precat, i, 0,
+                                  trunc, 0, 0.0, 0, slbnd, &obj_precat, i, 0,
                                   0.0, 0, &area, &sum, status );
 
 /* Check we have the same number of NDFs as in the main HDS array. */
@@ -925,14 +925,14 @@ void makeclumps( int *status ) {
       beamcorr[ 2 ] = 0.0;
       cupidStoreClumps( "OUTCAT", NULL, NDF__NOID, xloc, obj_precat, sdims, 0,
                         1, ishape, 2, beamcorr, "Output from CUPID:MAKECLUMPS",
-                        1, iwcs, "", NULL, NULL, &nclumps, status );
+                        1, iwcs, "", NULL, NULL, 0, &nclumps, status );
    } else {
       beamcorr[ 0 ] = beamfwhm;
       beamcorr[ 1 ] = beamfwhm;
       beamcorr[ 2 ] = velfwhm;
       cupidStoreClumps( "OUTCAT", NULL, NDF__NOID, xloc, obj, sdims, deconv, 1,
                         ishape, 2, beamcorr, "Output from CUPID:MAKECLUMPS", 1,
-                        iwcs, "", NULL, NULL, &nclumps, status );
+                        iwcs, "", NULL, NULL, 0, &nclumps, status );
    }
 
 /* Release the extension locator.*/

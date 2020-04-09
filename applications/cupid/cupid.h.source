@@ -265,10 +265,10 @@ CupidBoxIter *cupidBoxIterator( CupidBoxIter *, hdsdim[3], hdsdim[3], hdsdim[3],
 CupidPixelSet *cupidCFDeletePS( CupidPixelSet *, int * );
 CupidPixelSet *cupidCFFreePS( CupidPixelSet *, int *, int, int * );
 CupidPixelSet *cupidCFMakePS( int, int * );
-HDSLoc *cupidClumpFind( int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, int, double[3], int *, int * );
-HDSLoc *cupidFellWalker( ThrWorkForce *, int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, int, double[3], int * );
-HDSLoc *cupidGaussClumps( int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, double[3], int * );
-HDSLoc *cupidReinhold( int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, double[3], int * );
+HDSLoc *cupidClumpFind( int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, int, double[3], int *, int *, int * );
+HDSLoc *cupidFellWalker( ThrWorkForce *, int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, int, double[3], int *, int * );
+HDSLoc *cupidGaussClumps( int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, double[3], int *, int * );
+HDSLoc *cupidReinhold( int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, double[3], int *, int * );
 double *cupidCFLevels( AstKeyMap *, double, double, double, int *, int * );
 double *cupidClumpDesc( int, int, AstMapping *, AstFrame *, const char *, double[ 3 ], int, int, int, double *, const char ***, const char ***, int *, int *, char **, AstRegion **, int * );
 double cupidConfigD( AstKeyMap *, const char *, double, int * );
@@ -302,7 +302,7 @@ void cupidGCcalcf( int, double *, int *, double * );
 void cupidGCcalcg( int, double *, int *, double * );
 void cupidREdges( size_t, double *, size_t *, int *, int, double, double, double, double, int * );
 void cupidRFillLine( int *, int *, size_t, int, size_t[ 3 ], hdsdim[ 3 ], hdsdim[ 3 ], size_t, int, int, int, hdsdim*[3], int * );
-void cupidStoreClumps( const char *, const char *, int, HDSLoc *, HDSLoc *, int, int, int, int, int, double[ 3 ], const char *, int, AstFrameSet *, const char *, Grp *, FILE *, int *, int * );
+void cupidStoreClumps( const char *, const char *, int, HDSLoc *, HDSLoc *, int, int, int, int, int, double[ 3 ], const char *, int, AstFrameSet *, const char *, Grp *, FILE *, int, int *, int * );
 void cupidStoreConfig( HDSLoc *, AstKeyMap *, int * );
 
 void findback( int * );

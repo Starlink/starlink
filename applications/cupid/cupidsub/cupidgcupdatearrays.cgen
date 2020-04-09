@@ -19,8 +19,8 @@ extern CupidGC cupidGC;
 void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t nel,
                                          int ndim, hdsdim *dims, double *par, double rms,
                                          double mlim, size_t imax, double thresh,
-                                         hdsdim *lbnd, HDSLoc **ndfs, int iclump,
-                                         int excols, double mean_peak,
+                                         int allowedge, hdsdim *lbnd, HDSLoc **ndfs,
+                                         int iclump, int excols, double mean_peak,
                                          double maxbad, size_t *area, double *sumclumps,
                                          int *status ){
 /*
@@ -36,9 +36,9 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
 
 *  Synopsis:
 *     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t nel,
-*                                  int ndim, hdsdim *dims, double *par,
-*                                  double rms, double mlim, size_t imax,
-*                                  double thresh, hdsdim *lbnd, HDSLoc **ndfs,
+*                                  int ndim, hdsdim *dims, double *par, double rms,
+*                                  double mlim, size_t imax, double thresh,
+*                                  int allowedge, hdsdim *lbnd, HDSLoc **ndfs,
 *                                  int iclump, int excols, double mean_peak,
 *                                  double maxbad, size_t *area, double *sumclumps,
 *                                  int *status )
@@ -61,7 +61,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
 *        The number of pixels on each pixel axis of the array, using
 *        external axis ordering (i.e. the axis ordering within the data file).
 *     par
-*        Pointer to an array holding the parameters describing thw Gaussian
+*        Pointer to an array holding the parameters describing the Gaussian
 *        clump to be removed from the residuals array.
 *     rms
 *        The RMS noise level.
@@ -75,6 +75,9 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
 *        Peaks lower than "thresh" are not include din the output
 *        catalogue or NDF. Note, "thresh" is given in units of the RMS
 *        noise.
+*     allowedge
+*        If zero, clumps are rejected if they touch any edge of the data array.
+*        If non-zero, then such clumps are retained.
 *     lbnd
 *        Pointer to array holding the pixel indices of the first pixel in
 *        the user-supplied NDF.
@@ -159,6 +162,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
 *        values, so all faces should continue to be checked.
 *     26-SEP-2011 (DSB):
 *        Add argument "thresh".
+*     9-APR-2020 (DSB):
+*        Add argument "allowedge".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -472,7 +477,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
 
 /* If required, create an NDF holding the clump data values so long as
    the clump does not touch the edge of the data array. */
-   if( ndfs && area_off == 0 && ! lowpeak ) {
+   if( ndfs && ( area_off == 0 || allowedge ) && ! lowpeak ) {
 
 /* Modify the box to exclude the border of bad pixels. */
       for( jax = 0; jax < ndim; jax++ ) {

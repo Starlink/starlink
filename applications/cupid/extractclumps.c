@@ -685,8 +685,8 @@ void extractclumps( int *status ) {
       msgBlank( status );
       cupidStoreClumps( "OUTCAT", "JSACAT", indf1, xloc, ndfs, nsig, deconv,
                         backoff, ishape, velax, beamcorr, "Output from CUPID:EXTRACTCLUMPS",
-                        usewcs, gotwcs ? iwcs : NULL, dataunits, NULL, logfile,
-                        &nclumps, status );
+                        usewcs, gotwcs ? iwcs : NULL, dataunits, NULL,
+                        logfile, 0, &nclumps, status );
 
 /* Map the output pixel assignment array. */
       ndfMap( indf3, "DATA", "_INTEGER", "WRITE", (void *) &ipa, &el, status );
