@@ -26,6 +26,10 @@
 
 2 Modified_applications
 
+   o  ARDMASK
+
+      -  It can now process complex data.
+
    o  CHPIX
 
       -  It is easier now to make several edits by supplying the NDF
