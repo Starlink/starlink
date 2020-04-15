@@ -48,7 +48,8 @@ F_ROUTINES = $(CCDPACK_F_ROUTINES) \
 POLPACK_F1_ROUTINES = polbin.f polcal.f polcent.f polexp.f polexpx.f \
 polext.f polhelp.f polimage.f polimp.f polimpx.f polka.f polplot.f \
 polprep.f polrdtcl.f polsim.f polstack.f polvec.f polversion.f \
-polwrtcl.f polzconv.f polrotref.f polwcscopy.f polconcat.f polselect.f
+polwrtcl.f polzconv.f polrotref.f polwcscopy.f polconcat.f polselect.f \
+poledit.f
 
 #  polpack routines for which the atask action name can be derived from the
 #  the f file name by remving the .f file suffix.
@@ -132,14 +133,15 @@ polimp.ifc polimpx.ifc polka.ifc polplot.ifc \
 polprep.ifc polrdtcl.ifc polsim.ifc polstack.ifc \
 polvec.ifc polversion.ifc polwrtcl.ifc polzconv.ifc \
 polpack_mon.ifc polrotref.ifc polwcscopy.ifc polconcat.ifc \
-polselect.ifc
+polselect.ifc poledit.ifc
 
 BUILT_IFL_FILES = polbin.ifl polcal.ifl polcent.ifl polexp.ifl \
 polexpx.ifl polext.ifl polhelp.ifl polimage.ifl \
 polimp.ifl polimpx.ifl polka.ifl polpack_mon.ifl \
 polplot.ifl polprep.ifl polrdtcl.ifl polsim.ifl \
 polstack.ifl polvec.ifl polversion.ifl polwrtcl.ifl \
-polzconv.ifl polrotref.ifl polwcscopy.ifl polconcat.ifl polselect.ifl
+polzconv.ifl polrotref.ifl polwcscopy.ifl polconcat.ifl \
+polselect.ifl poledit.ifl
 
 EXTRA_DIST = polpack_master.hlp polka.htx_tar
 

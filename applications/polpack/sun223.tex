@@ -10,7 +10,7 @@
 \stardocsource      {sun\stardocnumber}
 \stardocnumber      {223.7}
 \stardocauthors     {D.S. Berry \& T.M. Gledhill }
-\stardocdate        {1st April 2020}
+\stardocdate        {15th April 2020}
 \stardoctitle       {POLPACK \\
                             An Imaging Polarimetry Reduction Package}
 \stardocversion     {Version 3.6-2}
@@ -1912,6 +1912,8 @@ POLPACK is registered with the Astrophysics Source Code Library as entry
 
 \quickdes{POLCONCAT}{Concatenates two or more POLPACK vector catalogues.}{POLCONCAT}
 
+\quickdes{POLEDIT}{Modifies a POLPACK vector catalogue in several different ways.}{POLEDIT}
+
 \quickdes{POLEXP}{Exports POLPACK information within an NDF to a FITS extension.}{POLEXP}
 
 \quickdes{POLEXT}{Sets explicit values in the POLPACK extension.}{POLEXT}
@@ -2687,6 +2689,240 @@ for NDF applications.
          input catalogues must contain variance columns. If the first input
          catalogue does not contains variance columns, then none of the
          input catalogues must contain variance columns.
+      }
+   }
+}
+\sstroutine{
+   POLEDIT
+}{
+   Change the values in a vector catalogue
+}{
+   \sstdescription{
+      This application creates an output vector catalogue containing a
+      copy of the input catalogue supplied by parameter IN. The changes
+      specified by parameter MODE are made to the output catalogue.
+   }
+   \sstusage{
+      poledit in out mode
+   }
+   \sstparameters{
+      \sstsubsection{
+         COL = LITERAL (Read)
+      }{
+         The name of the catalogue column to use. If parameter MODE is
+         \texttt{"} ChangeColVals\texttt{"}  the name of an existing column must be supplied
+         (a list of available column names is displayed if a non-existent
+         column name is given). If parameter MODE is \texttt{"} AddColumn\texttt{"}  the name
+         of the new column must be supplied (an error will be reported if
+         the column already exists).
+      }
+      \sstsubsection{
+         COL1 = LITERAL (Read)
+      }{
+         The name of the catalogue column which gives the first coordinate
+         of each data value. A list of available column names is displayed
+         if a non-existent column name is given. [\texttt{"} RA\texttt{"} ]
+      }
+      \sstsubsection{
+         COL2 = LITERAL (Read)
+      }{
+         The name of the catalogue column which gives the first coordinate
+         of each data value. A list of available column names is displayed
+         if a non-existent column name is given. [\texttt{"} DEC\texttt{"} ]
+      }
+      \sstsubsection{
+         COMMENT = LITERAL (Read)
+      }{
+         A descriptive comment to store with the  new column if parameter
+         MODE is \texttt{"} AddColumn\texttt{"} . The suggested default is the Label value from
+         the NDF specified by parameter NDF.
+      }
+      \sstsubsection{
+         DEBIASTYPE = LITERAL (Read)
+      }{
+         Only used if parameter MODE is \texttt{"} Debias\texttt{"} . It gives the type of bias
+         estimator to use when creating the new P and PI values, using the
+         nomeclature of Montier at al \texttt{"} Polarization measurements analysis II.
+         Best estimators of polarization fraction and angle\texttt{"}  (A\&A, 2018):
+         \sstitemlist{
+
+            \sstitem
+               \texttt{"} AS\texttt{"} : The asymptotic estimator. See section 2.3 of Montier
+                 et al. This estimator produces bad P and PI values if the
+                 squared PI value is less than the variance in PI.
+
+            \sstitem
+               \texttt{"} MAS\texttt{"} : The modified asymptotic estimator. See section 2.5 of
+                 Montier et al. This estimator does not produces bad P and PI
+                 values, even if the squared PI value is less than the
+                 variance in PI.
+
+            \sstitem
+               \texttt{"} None\texttt{"} : No de-bising is applied.
+         }
+      }
+      \sstsubsection{
+         IN = LITERAL (Read)
+      }{
+         The input catalogue.
+      }
+      \sstsubsection{
+         MASKCOL = \_LOGICAL (Read)
+      }{
+         Determines how the NDF specified by parameter NDF is used to
+         generate the new column values (only used if parameter MODE is
+         \texttt{"} AddColumn\texttt{"} ). If parameter MASKCOL is FALSE (the default), the
+         NDF\texttt{'} s pixel array is sampled at the positions given in the
+         catalogue columns specified by parameters COL1 and COL2, using
+         the interpolation method specified by parameter METHOD, and the
+         sampled values are stored in the new column. The data type of
+         the new column is set to the data type of the NDF. If parameter
+         MASKCOL is TRUE, the new column holds integer values - 1 if the
+         corresponding pixel in the NDF array is good and 0 otherwise.
+         Parameters COL1 and COL2 again specify the catalogue columns
+         that hold the position for each row. The nearest pixel to
+         the resulting position is tested by comparing it with the
+         appropriate Starlink \texttt{"} bad\texttt{"}  value. [FALSE]
+      }
+      \sstsubsection{
+         METHOD = LITERAL (Read)
+      }{
+         Only used if parameter MODE is set to \texttt{"} ChangeColVals\texttt{"}  or \texttt{"} AddColumn\texttt{"} .
+         It gives the method to use when sampling the NDF pixel array to
+         generate the new catalogue column values. For details on these
+         schemes, see the descriptions of routines AST\_RESAMPLEx in SUN/210.
+         METHOD can take the following values.
+
+         \sstitemlist{
+
+            \sstitem
+             \texttt{"} Bilinear\texttt{"}  -- The new column values are calculated by bi-linear
+            interpolation among the four nearest pixels values in the input NDF.
+            Produces smoother output NDFs than the nearest-neighbour scheme, but
+            is marginally slower.
+
+            \sstitem
+             \texttt{"} Nearest\texttt{"}  -- The new column values are assigned the value  of the
+            single nearest input pixel.
+
+            \sstitem
+             \texttt{"} Sinc\texttt{"}  -- The new column values are calculated using the sinc(pi$*$x)
+            kernel, where x is the pixel offset from the interpolation point and
+            sinc(z)=sin(z)/z. Use of this scheme is not recommended.
+
+            \sstitem
+             \texttt{"} SincSinc\texttt{"}  -- Uses the sinc(pi$*$x)sinc(k$*$pi$*$x) kernel. A
+            valuable general-purpose scheme, intermediate in its visual
+            effect between the bilinear and nearest-neighbour schemes.
+
+            \sstitem
+             \texttt{"} SincCos\texttt{"}  -- Uses the sinc(pi$*$x)cos(k$*$pi$*$x) kernel. Gives
+            similar results to the \texttt{"} Sincsinc\texttt{"}  scheme.
+
+            \sstitem
+             \texttt{"} SincGauss\texttt{"}  -- Uses the sinc(pi$*$x)exp(-k$*$x$*$x) kernel. Good
+            results can be obtained by matching the FWHM of the envelope
+            function to the point-spread function of the input data (see
+            Parameter PARAMS).
+
+            \sstitem
+             \texttt{"} Somb\texttt{"}  -- Uses the somb(pi$*$x) kernel, where x is the pixel
+            offset from the interpolation point and somb(z)=2$*$J1(z)/z (J1 is
+            the first-order Bessel function of the first kind. This scheme
+            is similar to the \texttt{"} Sinc\texttt{"}  scheme.
+
+            \sstitem
+             \texttt{"} SombCos\texttt{"}  -- Uses the somb(pi$*$x)cos(k$*$pi$*$x) kernel. This
+            scheme is similar to the \texttt{"} SincCos\texttt{"}  scheme.
+
+            \sstitem
+             \texttt{"} Gauss\texttt{"}  -- Uses the exp(-k$*$x$*$x) kernel. The FWHM of the Gaussian
+            is given by Parameter PARAMS(2), and the point at which to truncate
+            the Gaussian to zero is given by Parameter PARAMS(1).
+
+         }
+         The initial default is \texttt{"} Nearest\texttt{"} .  [current value]
+      }
+      \sstsubsection{
+         MODE = LITERAL (Read)
+      }{
+         The type of edit to apply. Must be one of the following values:
+
+         \sstitemlist{
+
+            \sstitem
+             \texttt{"} AddColumn\texttt{"} : A new column is added to the catalogue. The name
+            of the new column is given by parameter COL. The values to store
+            in the column are obtained from the NDF specified by parameter
+            NDF in a manner determined by parameter MASKCOL.
+
+            \sstitem
+             \texttt{"} Debias\texttt{"} : New debiased values are written to the P (percentage
+            polarisation) and PI (polarised intensity) columns based on the
+            values in the Q, U, I and DPI columns. The form of de-biasing to
+            use is specified by parameter DEBIASTYPE.
+
+            \sstitem
+             \texttt{"} ChangeColVals\texttt{"} : The values in the column specified by parameter
+            COL are changed to the values read from the NDF specified by
+            parameter NDF. The NDF is sampled at the positions stored in the
+            catalogue columns specified by parameters COL1 and COL2, using the
+            interpolation method specified by parameter METHOD.
+         }
+      }
+      \sstsubsection{
+         NDF = NDF (Read)
+      }{
+         The input NDF to use when parameter MODE is \texttt{"} ChangeColVals\texttt{"}  or
+         \texttt{"} AddColumn\texttt{"} .
+      }
+      \sstsubsection{
+         OUT = LITERAL (Read)
+      }{
+         The output catalogue.
+      }
+      \sstsubsection{
+         PARAMS( 2 ) = \_DOUBLE (Read)
+      }{
+         An optional array which consists of additional parameters
+         required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
+         SombCos and Gauss methods (see parameter METHOD).
+
+         PARAMS( 1 ) is required by all the above schemes. It is used to
+         specify how many pixels are to contribute to the interpolated
+         result on either side of the interpolation in each dimension.
+         Typically, a value of 2 is appropriate and the minimum allowed
+         value is 1 (i.e. one pixel on each side). A value of zero or
+         fewer indicates that a suitable number of pixels should be
+         calculated automatically. [0]
+
+         PARAMS( 2 ) is required only by the Gauss, SombCos, SincSinc,
+         SincCos, and SincGauss schemes. For the SombCos, SincSinc and
+         SincCos schemes, it specifies the number of pixels at which the
+         envelope of the function goes to zero. The minimum value is
+         1.0, and the run-time default value is 2.0. For the Gauss and
+         SincGauss scheme, it specifies the full-width at half-maximum
+         (FWHM) of the Gaussian envelope measured in output pixels.  The
+         minimum value is 0.1, and the run-time default is 1.0.  On
+         astronomical NDFs and spectra, good results are often obtained
+         by approximately matching the FWHM of the envelope function,
+         given by PARAMS(2), to the point-spread function of the input
+         data. []
+      }
+      \sstsubsection{
+         UNITS = LITERAL (Read)
+      }{
+         A string giving the units used by the  new column if parameter
+         MODE is \texttt{"} AddColumn\texttt{"} . The suggested default is the Units value from
+         the NDF specified by parameter NDF.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          The input catalogue must contain WCS information (i.e. it must
+         have been created using polpack).
       }
    }
 }
@@ -6643,6 +6879,8 @@ the vector map.
 \quickdes{POLCAL}{Calculates Stokes vectors from a set of aligned intensity images.}{POLCAL}
 
 \quickdes{POLCONCAT}{Concatenates two or more POLPACK vector catalogues.}{POLCONCAT}
+
+\quickdes{POLEDIT}{Modifies a POLPACK vector catalogue in several different ways.}{POLEDIT}
 
 \quickdes{POLEXP}{Exports POLPACK information within an NDF to a FITS extension.}{POLEXP}
 

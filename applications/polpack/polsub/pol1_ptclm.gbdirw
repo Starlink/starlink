@@ -1,0 +1,136 @@
+      SUBROUTINE POL1_PTCLM<T>( CI, NROW, NCOL, GI, MASK, IN, STATUS )
+*+
+*  Name:
+*     POL1_PTCLM<T>
+
+*  Purpose:
+*     Store new values for one or more catalogue columns.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL POL1_PTCLM<T>( CI, NROW, NCOL, GI, MASK, IN, STATUS )
+
+*  Description:
+*     This routine stores NROW new values from each of NCOL columns in a
+*     catalogue, copying values from the IN array.
+
+*  Arguments:
+*     CI = INTEGER (Given)
+*        The CAT identifier for the catalogue.
+*     NROW = INTEGER (Given)
+*        The number of rows to be stored (starting at row 1).
+*     NCOL = INTEGER (Given)
+*        The number of columns to be updated.
+*     GI( NCOL ) = INTEGER (Given)
+*        The CAT identifiers (within CI) for the columns to be modified.
+*        Any CAT__NOID values in this array will result in the corresponding
+*        values in IN being ignored.
+*     MASK = LOGICAL (Given)
+*        If .FALSE., store the IN values as supplied. If .TRUE., store an
+*        integer value of 1 if the corresponding IN value is good, and 0
+*        otherwise.
+*     IN( NROW, NCOL ) = <TYPE> (Given)
+*        The new values to store.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 2020 East Asian Observatory.
+
+*  Authors:
+*     DSB: David S. Berry (EAO)
+*     {enter_new_authors_here}
+
+*  History:
+*     13-APR-2020 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'CAT_PAR'          ! CAT__ constants
+
+*  Arguments Given:
+      INTEGER CI
+      INTEGER NROW
+      INTEGER NCOL
+      INTEGER GI( NCOL )
+      LOGICAL MASK
+      <TYPE> IN( NROW, NCOL )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Row index
+      INTEGER J                  ! Column index
+      INTEGER ROWS               ! No. of rows in catalogue
+      LOGICAL BAD                ! Did an error occurred finding the column?
+      LOGICAL NULL               ! Was no value available?
+      <TYPE> V                   ! New column value
+
+      integer pmap
+
+*.
+
+*  Check the inherited status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Get the number of rows in the catalogue. Report an error if the
+*  supplied NROW value is wrong.
+      CALL CAT_TROWS( CI, ROWS, STATUS )
+      IF( ROWS .NE. NROW .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'N', NROW )
+         CALL MSG_SETI( 'M', ROWS )
+         CALL ERR_REP( ' ', 'POL1_PTCLM: Bad number of rows '//
+     :                 'supplied (^N). Should be ^M.', STATUS )
+      END IF
+
+*  If all is OK, loop round each row.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         DO I = 1, NROW
+
+*  Read the input row into the CAT current row buffer.
+            CALL CAT_RGET( CI, I, STATUS )
+
+*  Loop round each column.
+            DO J = 1, NCOL
+
+*  If the column identifier is not null, put the new value for this
+*  column into the current row buffer. If required convert the supplied
+*  value into a boolean flag (0 or 1).
+               IF( GI( J ) .NE. CAT__NOID ) THEN
+                  V = IN( I, J )
+                  NULL = ( V .EQ. VAL__BAD<T> )
+
+                  IF( MASK ) THEN
+                     IF( NULL ) THEN
+                        CALL CAT_PUT0I( GI( J ), 0, .FALSE., STATUS )
+                     ELSE
+                        CALL CAT_PUT0I( GI( J ), 1, .FALSE., STATUS )
+                     END IF
+                  ELSE
+                     CALL CAT_PUT0<T>( GI( J ), V, NULL, STATUS )
+                  END IF
+
+               END IF
+
+            END DO
+
+         END DO
+
+      END IF
+
+      END

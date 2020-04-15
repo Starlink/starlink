@@ -24,11 +24,17 @@
 *     CIOUT  =  INTEGER (Given)
 *        Identifier to the output catalogue.
 *     NUMCOL  =  INTEGER (Given)
-*        Number of columns in the input (and hence output) catalogue.
+*        Number of columns to copy. If this is zero, then the number of
+*        columns copied is the minimum of the number of columns in the
+*        input and output catalogue.
 *     FIIN(NUMCOL)  =  INTEGER (Given)
-*        Identifiers for the columns in the input catalogue.
+*        Identifiers for the columns in the input catalogue. If NUMCOL is
+*        zero, FIIN is ignored and the column identifiers are obtained
+*        directly from CIIN.
 *     FIOUT(NUMCOL)  =  INTEGER (Given)
-*        Identifiers for the columns in the output catalogue.
+*        Identifiers for the columns in the output catalogue. If NUMCOL is
+*        zero, FIOUT is ignored and the column identifiers are obtained
+*        directly from CIOUT.
 *     TWCS = INTEGER (Given)
 *        An identifier for an AST FrameSet, or AST__NULL. If not AST__NULL,
 *        and if the input catalogue contains columns named "X" and "Y",
@@ -62,6 +68,8 @@
 *        Original version, based on cap_cptab.f by ACD.
 *     28-SEP-2017 (DSB):
 *        Added argument TWCS.
+*     14-APR-2020 (DSB):
+*        Allow NUMCOL to be zero.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -118,6 +126,9 @@
      :  FIINE,  ! Identifier to current input  scalar or vector element.
      :  FIOUTE, !     "      "     "    output   "    "    "       "   .
      :  IPT,    ! Pointer to table of modified polpack values
+     :  NCIN,   ! Number of columns in input
+     :  NCOUT,  ! Number of columns in output
+     :  NUMUSE, ! Number of columns to copy
      :  ROWS,   ! Number of rows in the input catalogue.
      :  ROW,    ! Current row.
      :  TROW    ! Index of row in IPT holding modified column values
@@ -141,6 +152,7 @@
      :  ENAME*(CAT__SZCMP)   ! Name of the current vector element.
 
       LOGICAL
+     :  GETFI,  ! Flag; get the column identifiers here?
      :  NULFLG  ! Flag; is the current field null?
 
 *  The following values hold the value read (and written) for the current
@@ -168,13 +180,33 @@
       DUID = CAT__NOID
       DANGID = CAT__NOID
 
+*  If NUMCOL is supplied as zero, find the minimum of the number of
+*  columns in input and output.
+      IF( NUMCOL .EQ. 0 ) THEN
+         GETFI = .TRUE.
+         CALL CAT_TCOLS( CIIN, CAT__GPHYS, NCIN, STATUS )
+         CALL CAT_TCOLS( CIOUT, CAT__GPHYS, NCOUT, STATUS )
+         NUMUSE = MIN( NCIN, NCOUT )
+      ELSE
+         GETFI = .FALSE.
+         NUMUSE = NUMCOL
+      END IF
+
 *  Determine the data type and dimensionality of every column in the input
 *  catalogue.  If the column is a vector then get identifiers for all the
 *  individual elements.
       NUMID = 0
-      DO CURCOL = 1, NUMCOL
-         FIINC = FIIN(CURCOL)
-         FIOUTC = FIOUT(CURCOL)
+      DO CURCOL = 1, NUMUSE
+
+*  Get the column identifiers. Either get them directly from the
+*  catalogues, or use the values supplied in the FIIN and FIOUT arrays.
+         IF( GETFI ) THEN
+            CALL CAT_TNDNT( CIIN, CAT__FITYP, CURCOL, FIINC, STATUS )
+            CALL CAT_TNDNT( CIOUT, CAT__FITYP, CURCOL, FIOUTC, STATUS )
+         ELSE
+            FIINC = FIIN(CURCOL)
+            FIOUTC = FIOUT(CURCOL)
+         END IF
 
 *  Get the column name.
          CALL CAT_TIQAC( FIINC, 'NAME', FNAME, STATUS )

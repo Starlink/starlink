@@ -226,7 +226,7 @@
          END IF
 
 *  Append the input to the output.
-         CALL POL1_CPCAT( CI, CIOUT, TWCS, STATUS )
+         CALL POL1_CPCAT( CI, CIOUT, TWCS, .TRUE., STATUS )
 
 *  Release the identifier for the first input catalogue.
          CALL CAT_TRLSE( CI, STATUS )

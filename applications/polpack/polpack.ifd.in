@@ -487,6 +487,131 @@ package polpack {
           }
 
       }
+
+
+      action poledit {
+
+         helplib {$POLPACK_HELP}
+
+         parameter col {
+            type LITERAL
+            ppath CURRENT
+            prompt {Name of catalogue column to change}
+            helpkey *
+          }
+
+         parameter col1 {
+            type LITERAL
+            ppath CURRENT DYNAMIC
+            vpath DYNAMIC
+            prompt {Name of catalogue column holding axis 1 positions}
+            helpkey *
+          }
+
+         parameter col2 {
+            type LITERAL
+            ppath CURRENT DYNAMIC
+            vpath DYNAMIC
+            prompt {Name of catalogue column holding axis 2 positions}
+            helpkey *
+          }
+
+         parameter comment {
+            type LITERAL
+            ppath DYNAMIC
+            prompt {Descriptive comment for new column}
+            helpkey *
+          }
+
+         parameter debiastype {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            default AS
+            prompt {De-biasing method}
+            helpkey *
+          }
+
+         parameter in {
+            position 1
+            type LITERAL
+            ppath GLOBAL
+            association <-GLOBAL.CATALOGUE
+            prompt {Input catalogue}
+            helpkey *
+          }
+
+         parameter maskcol {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Do the new column values form a boolean mask?}
+            helpkey *
+          }
+
+         parameter method {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default Nearest
+            prompt {Interpolation method}
+            helpkey *
+         }
+
+         parameter mode {
+            position 3
+            type LITERAL
+            ppath CURRENT DEFAULT
+            default ColFromNDF
+            prompt {Edit to perform}
+            helpkey *
+          }
+
+         parameter ndf {
+            type NDF
+            access READ
+            association <-GLOBAL.DATA_ARRAY
+            ppath GLOBAL
+            prompt {Input NDF}
+            helpkey *
+          }
+
+         parameter out {
+            position 2
+            type LITERAL
+            ppath GLOBAL
+            association ->GLOBAL.CATALOGUE
+            prompt {Output catalogue}
+            helpkey *
+          }
+
+         parameter params {
+            type _DOUBLE
+            access READ
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Interpolation parameters}
+            helpkey *
+         }
+
+         parameter units {
+            type LITERAL
+            ppath DYNAMIC
+            prompt {Units string for new column}
+            helpkey *
+          }
+
+         parameter useaxis {
+            type LITERAL
+            vpath DEFAULT
+            ppath DYNAMIC DEFAULT
+            default !
+            prompt {The WCS axes spanning the spatial plane}
+            helpkey *
+         }
+      }
+
+
 #+
 #  Name:
 #     POLEXP.IFL

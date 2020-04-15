@@ -191,6 +191,9 @@
          ELSE IF ( NAME .EQ. 'POLCONCAT' ) THEN
             CALL POLCONCAT( STATUS )
 
+         ELSE IF ( NAME .EQ. 'POLEDIT' ) THEN
+            CALL POLEDIT( STATUS )
+
          ELSE IF ( NAME .EQ. 'POLEXP' ) THEN
             CALL POLEXP( STATUS )
 

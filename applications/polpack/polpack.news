@@ -8,6 +8,9 @@
  o  The POLVEC and POLBIN commands now let you choose between two
  different de-biasing methods using a new parameter called DEBIASTYPE.
 
+ o  A new command called POLEDIT has been added that allows a catalogue
+ to be modified in various ways.
+
 
  The main changes between V3.6 and V3.6.1 were:
 

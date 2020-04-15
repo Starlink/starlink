@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_CPCAT( CIIN, CIOUT, TWCS, STATUS )
+      SUBROUTINE POL1_CPCAT( CIIN, CIOUT, TWCS, CPROWS, STATUS )
 *+
 *  Name:
 *     POL1_CPCAT
@@ -10,12 +10,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_CPCAT( CIIN, CIOUT, TWCS, STATUS )
+*     CALL POL1_CPCAT( CIIN, CIOUT, TWCS, CPROWS, STATUS )
 
 *  Description:
 *     This routine copies an entire catalogue, excluding the textual
-*     information, appending the rows to the end of any rows already
-*     present in the supplied output catalogue.
+*     information, optionally appending the row data to the end of any
+*     rows already present in the supplied output catalogue.
 *
 *     If, on entry, the output catalogue contains no columns, then
 *     columns are created corresponding to each column in the input
@@ -46,6 +46,14 @@
 *
 *        If AST__NULL is supplied for TWCS, all values are copied from
 *        input to output without any change.
+*     CPROWS = LOGICAL (Given)
+*        Should the row data be copied from input to output? If the row
+*        data is copied, then no further changes can be made to the
+*        catalogue structure (e.g. no new columns may be added). So if
+*        any new columns are to be added subsequent to calling this
+*        routine, then CPROWS should be .FALSE.. In this case, a call
+*        to POL2_CPTAB should be made to copy the row data once the new
+*        columns have been defined.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -62,6 +70,8 @@
 *     28-SEP-2017 (DSB):
 *        Added argument TWCS, and allow input catalogue to be appended to
 *        the end of the excisting output catalogue.
+*     14-APR-2020 (DSB):
+*        Added argument CPROWS.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -80,6 +90,7 @@
       INTEGER CIIN
       INTEGER CIOUT
       INTEGER TWCS
+      LOGICAL CPROWS
 
 *  Status:
       INTEGER STATUS            ! Global status
@@ -116,18 +127,19 @@
       CALL CAT_TDETL( CIOUT, CAT__GPHYS, NROW, NCOL, NIND, NPAR, DATE,
      :                STATUS)
 
-*  If there are any columns already in the output catalogue, indicate that
+*  If there are any rows already in the output catalogue, indicate that
 *  any differences between input and output columns/parameters should be
 *  cause an error.
       REPORT = ( NROW .GT. 0 )
 
 *  Copy information to the output catalogue.  First ensure the output has
 *  columns corresponding to the input catalogue, then ensure the output
-*  catalogue contains the same parameters as the input, then append the
-*  table data to the end of the output catalogue.
+*  catalogue contains the same parameters as the input, then (if required)
+*  append the table data to the end of the output catalogue.
       CALL POL1_CPCOL( CIP, CIOUT, CAT__MXCOL, REPORT, NUMCOL, FIIN,
      :                 FIOUT, STATUS)
       CALL POL1_CPPAR( CIP, CIOUT, REPORT, STATUS )
-      CALL POL1_CPTAB( CIIN, CIOUT, NUMCOL, FIIN, FIOUT, TWCS, STATUS )
+      IF( CPROWS ) CALL POL1_CPTAB( CIIN, CIOUT, NUMCOL, FIIN, FIOUT,
+     :                              TWCS, STATUS )
 
       END

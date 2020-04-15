@@ -575,7 +575,7 @@
 
 * Copy the selected rows to the output catalogue, excluding textual
 * information. Then release the selection identifier.
-      CALL POL1_CPCAT( SI, CIOUT, AST__NULL, STATUS )
+      CALL POL1_CPCAT( SI, CIOUT, AST__NULL, .TRUE., STATUS )
       CALL CAT_TRLSE( SI, STATUS )
 
 *  Arrive here if an error occurs.
