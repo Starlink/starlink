@@ -132,13 +132,22 @@
 *        - "Debias": New debiased values are written to the P (percentage
 *        polarisation) and PI (polarised intensity) columns based on the
 *        values in the Q, U, I and DPI columns. The form of de-biasing to
-*        use is specified by parameter DEBIASTYPE.
+*        use is specified by parameter DEBIASTYPE. This option is the same
+*        as the "Recalc" option except that only the P and PI columns are
+*        recalculated.
 *
 *        - "ChangeColVals": The values in the column specified by parameter
 *        COL are changed to the values read from the NDF specified by
 *        parameter NDF. The NDF is sampled at the positions stored in the
 *        catalogue columns specified by parameters COL1 and COL2, using the
 *        interpolation method specified by parameter METHOD.
+*
+*        - "Recalc": All columns that are derived from the Stokes parameter
+*        columns are re-calculated. In other words, the P, PI, ANG, DP, DPI
+*        and DANG columns are recalculated on the basis of the curent values
+*        in the I, Q, U, DI, DQ and DU columns. The form of de-biasing to
+*        use is specified by parameter DEBIASTYPE.
+*
 *     NDF = NDF (Read)
 *        The input NDF to use when parameter MODE is "ChangeColVals" or
 *        "AddColumn".
@@ -312,7 +321,7 @@
 
 *  Get the edit mode.
       CALL PAR_CHOIC( 'MODE', 'CHANGECOLVALS', 'CHANGECOLVALS,'//
-     :                'ADDCOLUMN,DEBIAS', .FALSE., MODE, STATUS )
+     :                'ADDCOLUMN,DEBIAS,RECALC', .FALSE., MODE, STATUS )
 
 *  Replace column values or add a new column with values read from an
 *  input NDF.
@@ -730,9 +739,9 @@
          CALL PSX_FREE( IPLUT, STATUS )
          CALL PSX_FREE( IPCOL, STATUS )
 
-*  Re-create P and PI using specified de-biasing.
-*  ----------------------------------------------
-      ELSE IF( MODE .EQ. 'DEBIAS' ) THEN
+*  Re-calculate derived columns using specified de-biasing.
+*  --------------------------------------------------------
+      ELSE IF( MODE .EQ. 'DEBIAS' .OR. MODE .EQ. 'RECALC' ) THEN
 
 *  Get the type of de-biasing to use.
          CALL PAR_CHOIC( 'DEBIASTYPE', 'NONE', 'None,AS,MAS', .TRUE.,
@@ -744,7 +753,7 @@
          CALL POL1_CPCAT( CIIN, CIOUT, AST__NULL, .TRUE., STATUS )
 
 *  Modify the output values.
-         CALL POL1_DEBIAS( CIOUT, DBTYPE, STATUS )
+         CALL POL1_RECALC( CIOUT, DBTYPE, (MODE .EQ. 'RECALC'), STATUS )
 
 *  Report an error if the edit mode has not yet been implemented.
 *  --------------------------------------------------------------

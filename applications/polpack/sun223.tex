@@ -2860,7 +2860,9 @@ for NDF applications.
              \texttt{"} Debias\texttt{"} : New debiased values are written to the P (percentage
             polarisation) and PI (polarised intensity) columns based on the
             values in the Q, U, I and DPI columns. The form of de-biasing to
-            use is specified by parameter DEBIASTYPE.
+            use is specified by parameter DEBIASTYPE. This option is the same
+            as the \texttt{"} Recalc\texttt{"}  option except that only the P and PI columns are
+            recalculated.
 
             \sstitem
              \texttt{"} ChangeColVals\texttt{"} : The values in the column specified by parameter
@@ -2868,6 +2870,13 @@ for NDF applications.
             parameter NDF. The NDF is sampled at the positions stored in the
             catalogue columns specified by parameters COL1 and COL2, using the
             interpolation method specified by parameter METHOD.
+
+            \sstitem
+             \texttt{"} Recalc\texttt{"} : All columns that are derived from the Stokes parameter
+            columns are re-calculated. In other words, the P, PI, ANG, DP, DPI
+            and DANG columns are recalculated on the basis of the curent values
+            in the I, Q, U, DI, DQ and DU columns. The form of de-biasing to
+            use is specified by parameter DEBIASTYPE.
          }
       }
       \sstsubsection{

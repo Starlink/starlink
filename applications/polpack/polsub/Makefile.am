@@ -27,7 +27,7 @@ pol1_cpctd.f  pol1_gtvrs.f  pol1_setft.f  pol1_stk2.f \
 pol1_cpctr.f  pol1_gtwcs.f  pol1_simcl.f  pol1_stk.f pol1_putd.f \
 pol1_cpcat.f  pol1_cpcol.f  pol1_cppar.f  pol1_cptab.f pol1_cpvrc.f \
 pol1_get2d.f  pol1_cpmod.f  pol1_cpmd1.f  pol1_cpmd2.f pol1_cpmd3.f  \
-pol1_cpmd4.f  pol1_mask.f   pol1_ctcld.f  pol1_nwctc.f pol1_debias.f
+pol1_cpmd4.f  pol1_mask.f   pol1_ctcld.f  pol1_nwctc.f pol1_recalc.f
 
 C_ROUTINES = polpack.c pol1_ceval.c pol1Pa2gr.c pol1_rotrf.c pol1Rotrf.c
 
