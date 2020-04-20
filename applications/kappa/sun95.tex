@@ -41781,8 +41781,12 @@ KAPPA: \htmlref{FLIP}{FLIP},
          and written to output Parameter SLOPE, OFFSET and RMS. A symetric
          linear fit algorithm is used, which caters for the presence of
          noise in both X and Y values. Outliers are identified and
-         ignored. Note, the fit is based on all the points in the scatter
-         plot, not just the visible points. \texttt{[}current value\texttt{{]}}
+         ignored. Note, the fit is based on just those points that are
+         visible in the scatter plot. Points outside the bounds of the
+         plot are ignored. Points that are inside the plot are also ignored
+         if their reflection through the best fit line are outside the plot.
+         This avoids biasing the fit if the plot bounds omit more points on
+         one side of the line than the other. \texttt{[}current value\texttt{{]}}
       }
       \sstsubsection{
          IN1 = NDF (Read)
@@ -41908,9 +41912,9 @@ KAPPA: \htmlref{FLIP}{FLIP},
       \sstsubsection{
          CORR = \_DOUBLE (Write)
       }{
-         The Pearson correlation coefficient of all the points in the scatter
-         plot (not just the visible points). A value of zero is stored if the
-         correlation coefficient cannot be calculated.
+         The Pearson correlation coefficient of the visible points in the
+         scatter plot (points outside the plot are ignored). A value of
+         zero is stored if the correlation coefficient cannot be calculated.
       }
       \sstsubsection{
          NPIX = \_INTEGER (Write)

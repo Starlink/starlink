@@ -7,7 +7,7 @@
 #include <math.h>
 #include "star/thr.h"
 
-#define NITER 3
+#define NITER 50
 
 /* Local data types */
 typedef struct  CGEN_FUNCTION(kpg1SymFitData) {
@@ -32,8 +32,10 @@ typedef struct  CGEN_FUNCTION(kpg1SymFitData) {
    double syy;
    double thresh;
    int iter;
-   int ngood;
    int operation;
+   int64_t ngood;
+   int64_t ngood2;
+   int64_t ngood1;
    int64_t p1;
    int64_t p2;
 } CGEN_FUNCTION(kpg1SymFitData);
@@ -83,6 +85,10 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
 *
 *     The i'th (x,y) point is included in the fit only if both x and y
 *     are good and fall within the ranges specified by xlo, xhi, ylo and yhi.
+*     Also, the reflection of the point about the current estimate of the
+*     best fit line must fall within the ranges specified by xlo, xhi, ylo
+*     and yhi (this is to avoid bias when the xlo, xhi, ylo and yhi
+*     values exclude more points from one side of the line than the other).
 
 *  Arguments:
 *     n
@@ -163,17 +169,19 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
    ThrWorkForce *wf;
    CGEN_FUNCTION(kpg1SymFitData) *job_data;
    CGEN_FUNCTION(kpg1SymFitData) *pdata;
-   double A;
-   double B;
-   double C;
+   double sres2;
    double b1;
-   double b2;
+   double nsigma[ NITER ];
+   double sx;
+   double sqres;
    double m1;
    double m2;
+   double C;
+   double A;
+   double b2;
+   double B;
+   double mlast;
    double sres1;
-   double sres2;
-   double sqres;
-   double sx;
    double sxx;
    double sxy;
    double sy;
@@ -181,15 +189,15 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
    double t1;
    double thresh;
    int iter;
+   int iw;
+   int nw;
+   int root1;
    int64_t ngood;
    int64_t ngood_prev;
    int64_t ngood0;
-   int iw;
-   int nw;
+   int64_t ngood1;
+   int64_t ngood2;
    int64_t step;
-
-/* Clipping levels (in sigma) at each iteration (element zero is ignored). */
-   double nsigma[ NITER ] = { 1.0, 3.0, 3.0 };
 
 /* Initialise */
    *m = VAL__BADD;
@@ -198,6 +206,10 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
+
+/* Initialise the clipping levels (in sigma) at each iteration. */
+   for( iter = 0; iter < NITER; iter++ ) nsigma[ iter ] = 3.0;
+   nsigma[ 0 ] = 1.0;
 
 /* Change the limits so that they can be used without being tested for
    reversal. */
@@ -261,6 +273,7 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
    that all points are accepted. */
       thresh = VAL__MAXD;
       ngood_prev = -1;
+      mlast = 0.0;
 
 /* Loop over clipping iterations. */
       iter = -1;
@@ -341,7 +354,8 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
                b2 = sy - m2*sx;
 
 /* Submit jobs to the workforce to form the form the sum of the squared
-   residuals including all points (even outliers). Each worker calculates
+   residuals including all points (outliers but not points that are out
+   of bounds after reflection through the line). Each worker calculates
    the sum for its own allocated range of pixels, and then these are added
    together afterwards. */
                for( iw = 0; iw < nw; iw++ ) {
@@ -362,18 +376,24 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
 /* Accumulate the sums from all threads. */
                sres1 = 0.0;
                sres2 = 0.0;
+               ngood1 = 0;
+               ngood2 = 0;
                for( iw = 0; iw < nw; iw++ ) {
                   pdata = job_data + iw;
                   sres1 += pdata->sres1;
                   sres2 += pdata->sres2;
+                  ngood1 += pdata->ngood1;
+                  ngood2 += pdata->ngood2;
                }
 
 /* Get the mean squared residuals. */
-               sres1 /= ngood0;
-               sres2 /= ngood0;
+               sres1 /= ngood1;
+               sres2 /= ngood2;
 
-/* Choose the fit that gives the smallest RMS. */
-               if( sres1 < sres2 ) {
+/* On the first iteration, choose the fit that gives the smallest RMS. On
+   subsequent iterations, choose the same one as on the first iteration. */
+               if( iter == -1 ) root1 = ( sres1 < sres2 );
+               if( root1 ) {
                   *m = m1;
                   *b = b1;
                   sqres = sres1;
@@ -395,6 +415,10 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
                              "points found for fit (m:%g b:%g rms:%g).", status,
                              ngood, *m, *b, *rms );
                }
+
+/* If the slope has changed by less than 0.05%, leave the loop. */
+               if( mlast != 0.0 && fabs( *m - mlast ) < 0.0005*mlast ) break;
+               mlast = fabs( *m );
 
 /* Increment the iteration number. Break out of the iteration loop if we
    have done all iterations. */
@@ -426,7 +450,7 @@ void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *
          if( !clip ) break;
       }
 
-/* If we have a fit, find the RMS redidual excluding outliers. */
+/* If we have a fit, find the RMS residual excluding outliers. */
       if( *m != VAL__BADD ) {
 
          for( iw = 0; iw < nw; iw++ ) {
@@ -488,15 +512,17 @@ static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status ){
    CGEN_TYPE xhi;
    CGEN_TYPE ylo;
    CGEN_TYPE yhi;
-   double b;
    double b1;
    double b2;
-   double m;
+   double b;
    double m1;
    double m2;
+   double m;
+   double rx;
+   double ry;
    double sqres;
-   double sres1;
    double sres2;
+   double sres1;
    double sx;
    double sxx;
    double sxy;
@@ -504,10 +530,13 @@ static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status ){
    double syy;
    double t1;
    double t2;
+   double t3;
    double thresh;
    int iter;
    int64_t i;
    int64_t ngood;
+   int64_t ngood1;
+   int64_t ngood2;
    int64_t p1;
    int64_t p2;
 
@@ -553,7 +582,19 @@ static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status ){
             if( iter >= 0 ) {
                t1 = *py - b;
                t2 = *px + m*( *py - b );
-               sqres = (*px)*(*px) + t1*t1 - t2*t2/( 1.0 + m*m );
+               t3 = t2/( 1.0 + m*m );
+               sqres = (*px)*(*px) + t1*t1 - t2*t3;
+
+/* The point that is the reflection of (px,py) across the line. */
+               t3 *= 2;
+               rx = t3 - *px;
+               ry = m*t3 +2*b - *py;
+
+/* If the reflected point is not within the bounds, set sqres so that the
+   point will be ignored. */
+               if( rx >= xhi || rx <= xlo || ry >= yhi || ry <= ylo ){
+                  sqres = VAL__MAXD;
+               }
             }
 
 /* Update the running sums if the squared residual for this point is below
@@ -578,7 +619,8 @@ static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status ){
       pdata->ngood = ngood;
 
 /* Find the RMS residual of the points from each of the two possible
-   lines. Do not exclude points that are far from the fitted line. */
+   lines. Do not exclude points that are far from the fitted line but do
+   exclude points that are out of bounds after reflection through the line. */
    } else if( pdata->operation == 2 ) {
       b1 = pdata->b1;
       m1 = pdata->m1;
@@ -588,6 +630,9 @@ static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status ){
       sres1 = 0.0;
       sres2 = 0.0;
 
+      ngood1 = 0.0;
+      ngood2 = 0.0;
+
       px = pdata->x + p1;
       py = pdata->y + p1;
 
@@ -596,13 +641,27 @@ static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status ){
              *px < xhi && *px > xlo && *py < yhi && *py > ylo ){
             t1 = *py - b1;
             t2 = *px + m1*( *py - b1 );
-            sqres = (*px)*(*px) + t1*t1 - t2*t2/( 1.0 + m1*m1 );
-            if( sqres > 0.0 ) sres1 += sqres;
+            t3 = t2/( 1.0 + m1*m1 );
+            sqres = (*px)*(*px) + t1*t1 - t2*t3;
+            t3 *= 2;
+            rx = t3 - *px;
+            ry = m1*t3 +2*b1 - *py;
+            if( rx < xhi && rx > xlo && ry < yhi && ry > ylo ){
+               if( sqres > 0.0 ) sres1 += sqres;
+               ngood1++;
+            }
 
             t1 = *py - b2;
             t2 = *px + m2*( *py - b2 );
-            sqres = (*px)*(*px) + t1*t1 - t2*t2/( 1.0 + m2*m2 );
-            if( sqres > 0.0 ) sres2 += sqres;
+            t3 = t2/( 1.0 + m2*m2 );
+            sqres = (*px)*(*px) + t1*t1 - t2*t3;
+            t3 *= 2;
+            rx = t3 - *px;
+            ry = m2*t3 +2*b2 - *py;
+            if( rx < xhi && rx > xlo && ry < yhi && ry > ylo ){
+               if( sqres > 0.0 ) sres2 += sqres;
+               ngood2++;
+            }
          }
       }
 
@@ -610,8 +669,12 @@ static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status ){
       pdata->sres1 = sres1;
       pdata->sres2 = sres2;
 
+      pdata->ngood1 = ngood1;
+      pdata->ngood2 = ngood2;
+
 /* Find the RMS residual of the points from the best line. Exclude points
-   that are too far from the best line. */
+   that are too far from the best line and points that are out of bounds
+   after reflection through the line. */
    } else if( pdata->operation == 3 ) {
       b1 = pdata->b1;
       m1 = pdata->m1;
@@ -627,8 +690,13 @@ static void CGEN_FUNCTION(kpg1SymFit_work)( void *job_data_ptr, int *status ){
              *px < xhi && *px > xlo && *py < yhi && *py > ylo ){
             t1 = *py - b1;
             t2 = *px + m1*( *py - b1 );
-            sqres = (*px)*(*px) + t1*t1 - t2*t2/( 1.0 + m1*m1 );
-            if( sqres < thresh ) {
+            t3 = t2/( 1.0 + m1*m1 );
+            sqres = (*px)*(*px) + t1*t1 - t2*t3;
+            t3 *= 2;
+            rx = t3 - *px;
+            ry = m1*t3 +2*b1 - *py;
+            if( rx < xhi && rx > xlo && ry < yhi && ry > ylo &&
+                sqres < thresh ) {
                if( sqres > 0.0 ) sres1 += sqres;
                ngood++;
             }

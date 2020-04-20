@@ -99,7 +99,10 @@
 *        noise in both X and Y values. Outliers are identified and
 *        ignored. Note, the fit is based on just those points that are
 *        visible in the scatter plot. Points outside the bounds of the
-*        plot are ignored. [current value]
+*        plot are ignored. Points that are inside the plot are also ignored
+*        if their reflection through the best fit line are outside the plot.
+*        This avoids biasing the fit if the plot bounds omit more points on
+*        one side of the line than the other. [current value]
 *     IN1 = NDF (Read)
 *        The NDF to be displayed on the horizontal axis.
 *     IN2 = NDF (Read)
