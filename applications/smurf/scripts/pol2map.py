@@ -41,7 +41,11 @@
 *        The output FITS vector catalogue. No catalogue is created if
 *        null (!) is supplied. The Q, U  and PI values in this catalogue
 *        will be in units of pW or mJy/beam, as selected using parameter
-*        JY . The bin size is specified by parameter BINSIZE. [!]
+*        JY . The bin size is specified by parameter BINSIZE. An extra
+*        column named "AST" is added to this catalogue in addition to those 
+*        created by the polpack:polvec command. The AST column that holds a
+*        non-zero integer for each row that corresponds to a point inside
+*        the AST mask (i.e. a source point), and zero for all other rows. [!]
 *     CONFIG = LITERAL (Read)
 *        Extra parameter values to include in the MAKEMAP configuration
 *        used to create both the I maps and the Q/U maps.
@@ -703,6 +707,8 @@
 *       observation is too low (below 0.95).
 *    1-APR-2020 (DSB):
 *       Added parameter DEBIASTYPE.
+*    20-APR-2020 (DSB):
+*       Add column AST to the output catalogue if an AST mask is available.
 
 '''
 
@@ -1466,6 +1472,7 @@ try:
    mask = parsys["MASK"].value
    upmask = mask.upper()
 
+   astmask = None
    pcamask = None
    pcamaskpar = ""
 
@@ -3264,12 +3271,26 @@ try:
             cube = tcube
 
 #  Create a FITS catalogue containing the polarisation vectors.
+         if astmask is None:
+            tcat = outcat
+         else:
+            tcat = NDG.tempfile(".FIT")
+
          msg_out( "Creating the output catalogue: '{0}'...".format(outcat) )
          msg = invoke( "$POLPACK_DIR/polvec {0} cat={1} debias={2} debiastype={3} "
-                       "radec=yes refupdate=no".format(cube,outcat,debias,debiastype) )
+                       "radec=yes refupdate=no".format(cube,tcat,debias,debiastype) )
          msg_out( "\n{0}\n".format(msg) )
 
-
+#  If we have an AST mask, add a column (called "AST") to the catalogue
+#  containing a non-zero value for all the source vectors inside the AST mask.
+         if astmask is not None:
+            try:
+               temp = NDG( astmask, "*" )
+               invoke( "$POLPACK_DIR/poledit in={0} out={1} ndf={2} mode=addcol "
+                       "col=AST maskcol=yes comment=\"'Flags indicating AST mask'\"".
+                       format(tcat,outcat,astmask) )
+            except starutil.NoNdfError:
+               pass
 
 #  -----------  TIDY UP ------------------------
 
