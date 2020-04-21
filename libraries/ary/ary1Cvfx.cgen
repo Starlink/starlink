@@ -7,10 +7,11 @@
 
 #define JOIN4(a,b,c,d) a##b##c##d
 #define NAME(tin,tout) JOIN4(vec,tin,to,tout)
+#define NAME2(tin,tout) JOIN4(vec,tin,2,tout)
 
 void CGEN_FUNCTION(ary1Cvf)( int bad, size_t n, const CGEN_TYPE *array,
-                             const char *type, void *pntr, int *dce,
-                             int *status ) {
+                             const char *type, int round,void *pntr,
+                             int *dce, int *status ) {
 /*
 *+
 *  Name:
@@ -21,8 +22,8 @@ void CGEN_FUNCTION(ary1Cvf)( int bad, size_t n, const CGEN_TYPE *array,
 
 *  Synopsis:
 *     void CGEN_FUNCTION(ary1Cvf)( int bad, size_t n, const CGEN_TYPE *array,
-*                                  const char *type, void *pntr, int *dce,
-*                                  int *status )
+*                                  const char *type, int round, void *pntr,
+*                                  int *dce, int *status )
 
 *  Description:
 *     This function routine converts a vectorised array from the supplied data
@@ -41,6 +42,11 @@ void CGEN_FUNCTION(ary1Cvf)( int bad, size_t n, const CGEN_TYPE *array,
 *        The data type of the output vectorised array. This value must
 *        be one of the HDS primitive numeric data type strings and must
 *        be supplied in upper case.
+*     round
+*        Controls how to convert floating point values to integer values.
+*        If non-zero, floating point values are rounded to the nearest
+*        integer. Otherwise, floating point values are truncated towards
+*        zero.
 *     pntr
 *        Pointer to the output vectorised array.
 *     dce
@@ -77,6 +83,8 @@ void CGEN_FUNCTION(ary1Cvf)( int bad, size_t n, const CGEN_TYPE *array,
 *  History:
 *     28-AUG-2017 (DSB):
 *        Original version, based on equivalent Fortran routine by RFWS.
+*     21-APR-2020 (DSB):
+*        Added argument "round".
 
 *-
 */
@@ -94,35 +102,72 @@ void CGEN_FUNCTION(ary1Cvf)( int bad, size_t n, const CGEN_TYPE *array,
    nerr = 0;
    errMark();
 
-/* Test for each valid output data type in turn and call the appropriate
-   conversion routine ("vec<Tin>to<Tout>"). */
-   if( !strcmp( type, "_BYTE" ) ){
-     NAME(CGEN_CODE,B)( bad, n, array, pntr, &ierr, &nerr, status );
+/* First handle rounding cases. */
+   if( round && ( CGEN_CODE_TYPE == CGEN_DOUBLE_TYPE ||
+                  CGEN_CODE_TYPE == CGEN_FLOAT_TYPE ) ){
 
-   } else if( !strcmp( type, "_UBYTE" ) ){
-     NAME(CGEN_CODE,UB)( bad, n, array, pntr, &ierr, &nerr, status );
+      if( !strcmp( type, "_BYTE" ) ){
+        NAME2(CGEN_CODE,B)( bad, n, array, pntr, &ierr, &nerr, status );
 
-   } else if( !strcmp( type, "_DOUBLE" ) ){
-     NAME(CGEN_CODE,D)( bad, n, array, pntr, &ierr, &nerr, status );
+      } else if( !strcmp( type, "_UBYTE" ) ){
+        NAME2(CGEN_CODE,UB)( bad, n, array, pntr, &ierr, &nerr, status );
 
-   } else if( !strcmp( type, "_INTEGER" ) ){
-     NAME(CGEN_CODE,I)( bad, n, array, pntr, &ierr, &nerr, status );
+      } else if( !strcmp( type, "_DOUBLE" ) ){
+        NAME2(CGEN_CODE,D)( bad, n, array, pntr, &ierr, &nerr, status );
 
-   } else if( !strcmp( type, "_REAL" ) ){
-     NAME(CGEN_CODE,F)( bad, n, array, pntr, &ierr, &nerr, status );
+      } else if( !strcmp( type, "_INTEGER" ) ){
+        NAME2(CGEN_CODE,I)( bad, n, array, pntr, &ierr, &nerr, status );
 
-   } else if( !strcmp( type, "_WORD" ) ){
-     NAME(CGEN_CODE,W)( bad, n, array, pntr, &ierr, &nerr, status );
+      } else if( !strcmp( type, "_REAL" ) ){
+        NAME2(CGEN_CODE,F)( bad, n, array, pntr, &ierr, &nerr, status );
 
-   } else if( !strcmp( type, "_UWORD" ) ){
-     NAME(CGEN_CODE,UW)( bad, n, array, pntr, &ierr, &nerr, status );
+      } else if( !strcmp( type, "_WORD" ) ){
+        NAME2(CGEN_CODE,W)( bad, n, array, pntr, &ierr, &nerr, status );
 
-   } else if( !strcmp( type, "_INT64" ) ){
-     NAME(CGEN_CODE,K)( bad, n, array, pntr, &ierr, &nerr, status );
+      } else if( !strcmp( type, "_UWORD" ) ){
+        NAME2(CGEN_CODE,UW)( bad, n, array, pntr, &ierr, &nerr, status );
+
+      } else if( !strcmp( type, "_INT64" ) ){
+        NAME2(CGEN_CODE,K)( bad, n, array, pntr, &ierr, &nerr, status );
 
 /* Note if the output data type specified is not valid. */
+      } else {
+         typok = 0;
+      }
+
+/* Now do all other cases. */
    } else {
-      typok = 0;
+
+/* Test for each valid output data type in turn and call the appropriate
+   conversion routine ("vec<Tin>to<Tout>"). */
+      if( !strcmp( type, "_BYTE" ) ){
+        NAME(CGEN_CODE,B)( bad, n, array, pntr, &ierr, &nerr, status );
+
+      } else if( !strcmp( type, "_UBYTE" ) ){
+        NAME(CGEN_CODE,UB)( bad, n, array, pntr, &ierr, &nerr, status );
+
+      } else if( !strcmp( type, "_DOUBLE" ) ){
+        NAME(CGEN_CODE,D)( bad, n, array, pntr, &ierr, &nerr, status );
+
+      } else if( !strcmp( type, "_INTEGER" ) ){
+        NAME(CGEN_CODE,I)( bad, n, array, pntr, &ierr, &nerr, status );
+
+      } else if( !strcmp( type, "_REAL" ) ){
+        NAME(CGEN_CODE,F)( bad, n, array, pntr, &ierr, &nerr, status );
+
+      } else if( !strcmp( type, "_WORD" ) ){
+        NAME(CGEN_CODE,W)( bad, n, array, pntr, &ierr, &nerr, status );
+
+      } else if( !strcmp( type, "_UWORD" ) ){
+        NAME(CGEN_CODE,UW)( bad, n, array, pntr, &ierr, &nerr, status );
+
+      } else if( !strcmp( type, "_INT64" ) ){
+        NAME(CGEN_CODE,K)( bad, n, array, pntr, &ierr, &nerr, status );
+
+/* Note if the output data type specified is not valid. */
+      } else {
+         typok = 0;
+      }
    }
 
 /* If a data conversion error occurred, then annul any error reports it

@@ -5909,6 +5909,41 @@ than as character strings.
 }
 \newpage
 \sstroutine{
+   aryRound
+}{
+   Set the internal ARY\_ system rouding flag
+}{
+   \sstdescription{
+      This function sets an internal flag in the ARY\_ system that
+      controls how floating point values are converted to integer
+      values when doing array type conversion. If the flag is non-zero
+      floating point values are rounded to the nearest integer value.
+      Otherwise, floating point values are truncated towards zero.
+   }
+   \sstinvocation{
+      int aryRound( int newflg )
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          By default, the rounding flag is set to zero, so floating point
+         values are truncated towards zero when being converted to integers.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         newflg
+      }{
+         The new value to be set for the rounding flag. If a negative
+         value is supplied, the existing value is left unchanged.
+      }
+   }
+}
+\newpage
+\sstroutine{
    arySame
 }{
    Enquire if two arrays are part of the same base array

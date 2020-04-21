@@ -4,7 +4,7 @@
 #include <string.h>
 
 void CGEN_FUNCTION(ary1Gt1)( int bad, HDSLoc *loc, const char *type,
-                             size_t el, int doscl, CGEN_TYPE scale,
+                             int round, size_t el, int doscl, CGEN_TYPE scale,
                              CGEN_TYPE zero, CGEN_TYPE *result, int *dce,
                              int *status ) {
 /*
@@ -17,9 +17,9 @@ void CGEN_FUNCTION(ary1Gt1)( int bad, HDSLoc *loc, const char *type,
 
 *  Synopsis:
 *     void CGEN_FUNCTION(ary1Gt1)( int bad, HDSLoc *loc, const char *type,
-*                                size_t el, int doscl, CGEN_TYPE scale,
-*                                CGEN_TYPE zero, CGEN_TYPE *result, int *dce,
-*                                int *status )
+*                                  int round, size_t el, int doscl,
+*                                  CGEN_TYPE scale, CGEN_TYPE zero,
+*                                  CGEN_TYPE *result, int *dce, int *status )
 
 *  Description:
 *     This function reads a 1-dimensional array of values from an
@@ -36,6 +36,9 @@ void CGEN_FUNCTION(ary1Gt1)( int bad, HDSLoc *loc, const char *type,
 *     type
 *        HDS data type of the object to be read. This must be in upper
 *        case.
+*     round
+*        If non-zero, floating point values are rounded to the nearest
+*        integer. Otherwise, they are truncated towards zero.
 *     el
 *        Number of array elements to be read.
 *     doscl
@@ -81,6 +84,8 @@ void CGEN_FUNCTION(ary1Gt1)( int bad, HDSLoc *loc, const char *type,
 *  History:
 *     12-SEP-2017 (DSB):
 *        Original version, based on equivalent Fortran routine by RFWS.
+*     21-APR-2020 (DSB):
+*        Added argument "round".
 
 *-
 */
@@ -110,7 +115,7 @@ void CGEN_FUNCTION(ary1Gt1)( int bad, HDSLoc *loc, const char *type,
    conversion, perform the type conversion explicitly and unmap the data. */
    } else {
       datMap( loc, type, "READ", 1, &dim, &pntr, status );
-      CGEN_FUNCTION(ary1Cvt)( bad, el, type, pntr, result, dce, status );
+      CGEN_FUNCTION(ary1Cvt)( bad, el, type, round, pntr, result, dce, status );
       ary1Hunmp( loc, status );
    }
 

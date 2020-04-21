@@ -202,6 +202,7 @@ void CGEN_FUNCTION(ary1Gtn)( int bad, const char *htype, HDSLoc *loc,
    int dcontg;                /* Dimension containing contiguous data */
    int doscl;                 /* Should scaling be applied? */
    int i;                     /* (Current) dimension count */
+   int round;                 /* Round floating point values? */
    size_t ea;                 /* End of "bad" output array region */
    size_t ed;                 /* End of "bad" (unwanted) data region */
    size_t ncontg;             /* Number of contiguous data values */
@@ -223,6 +224,10 @@ void CGEN_FUNCTION(ary1Gtn)( int bad, const char *htype, HDSLoc *loc,
               "'^BADHTYPE' (internal programming error).", status );
       return;
    }
+
+/* See if floating point values should be rounded or truncated when
+   converting them to integers. */
+   round = aryRound( -1 );
 
 /* Extract the scale and zero values from the supplied HDS object,
    converting them to the required data type. */
@@ -333,8 +338,9 @@ L3:
 
 /* Transfer the data to the appropriate part of the output array and annul
    the slice. Note if a data conversion error occurred. */
-            CGEN_FUNCTION(ary1Gt1)( bad, slice, type, ncontg, doscl, scale,
-                                    zero, array + ea + 1, &dceslc, status );
+            CGEN_FUNCTION(ary1Gt1)( bad, slice, type, round, ncontg, doscl,
+                                    scale, zero, array + ea + 1, &dceslc,
+                                    status );
             datAnnul( &slice, status );
             if( *status != SAI__OK ) goto L999;
             *dce = *dce || dceslc;

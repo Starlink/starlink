@@ -7,9 +7,11 @@
 
 #define JOIN4(a,b,c,d) a##b##c##d
 #define NAME(tin,tout) JOIN4(vec,tin,to,tout)
+#define NAME2(tin,tout) JOIN4(vec,tin,2,tout)
 
-void CGEN_FUNCTION(ary1Cvt)( int bad, size_t n, const char *type, void *pntr,
-                             CGEN_TYPE *result, int *dce, int *status ) {
+void CGEN_FUNCTION(ary1Cvt)( int bad, size_t n, const char *type, int round,
+                             void *pntr, CGEN_TYPE *result, int *dce,
+                             int *status ) {
 /*
 *+
 *  Name:
@@ -19,8 +21,8 @@ void CGEN_FUNCTION(ary1Cvt)( int bad, size_t n, const char *type, void *pntr,
 *     Convert a vectorised array from one data type to another.
 
 *  Synopsis:
-*     void ary1Cvt<T>( int bad, size_t n, const char *type, void *pntr,
-*                      CGEN_TYPE *result, int *dce, int *status )
+*     void ary1Cvt<T>( int bad, size_t n, const char *type, int round,
+*                      void *pntr, CGEN_TYPE *result, int *dce, int *status )
 
 *  Description:
 *     This function converts a vectorised array of any primitive numeric
@@ -37,6 +39,11 @@ void CGEN_FUNCTION(ary1Cvt)( int bad, size_t n, const char *type, void *pntr,
 *        The data type of the input vectorised array. This value must be
 *        one of the HDS primitive numeric data type strings and must be
 *        supplied in upper case.
+*     round
+*        Controls how to convert floating point values to integer values.
+*        If non-zero, floating point values are rounded to the nearest
+*        integer. Otherwise, floating point values are truncated towards
+*        zero.
 *     pntr
 *        Pointer to the input vectorised array.
 *     result
@@ -75,6 +82,8 @@ void CGEN_FUNCTION(ary1Cvt)( int bad, size_t n, const char *type, void *pntr,
 *  History:
 *     12-SEP-2017 (DSB):
 *        Original version, based on equivalent Fortran routine by RFWS.
+*     21-APR-2020 (DSB):
+*        Added argument "round".
 
 *-
 */
@@ -101,13 +110,21 @@ void CGEN_FUNCTION(ary1Cvt)( int bad, size_t n, const char *type, void *pntr,
       NAME(UB,CGEN_CODE)( bad, n, pntr, result, &ierr, &nerr, status );
 
    } else if( !strcmp( type, "_DOUBLE" )){
-      NAME(D,CGEN_CODE)( bad, n, pntr, result, &ierr, &nerr, status );
+      if( round ) {
+         NAME2(D,CGEN_CODE)( bad, n, pntr, result, &ierr, &nerr, status );
+      } else {
+         NAME(D,CGEN_CODE)( bad, n, pntr, result, &ierr, &nerr, status );
+      }
 
    } else if( !strcmp( type, "_INTEGER" )){
       NAME(I,CGEN_CODE)( bad, n, pntr, result, &ierr, &nerr, status );
 
    } else if( !strcmp( type, "_REAL" )){
-      NAME(F,CGEN_CODE)( bad, n, pntr, result, &ierr, &nerr, status );
+      if( round ) {
+         NAME2(F,CGEN_CODE)( bad, n, pntr, result, &ierr, &nerr, status );
+      } else {
+         NAME(F,CGEN_CODE)( bad, n, pntr, result, &ierr, &nerr, status );
+      }
 
    } else if( !strcmp( type, "_WORD" )){
       NAME(W,CGEN_CODE)( bad, n, pntr, result, &ierr, &nerr, status );

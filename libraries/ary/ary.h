@@ -71,6 +71,7 @@ extern AryIdUnion work3;
 
 /* Prototypes for public functions */
 int aryLocked( const Ary *ary, int *status );
+int aryRound( int newflg );
 int aryTrace( int newflg );
 int aryValid( Ary *ary, int *status );
 void aryAnnul( Ary **ary, int *status );

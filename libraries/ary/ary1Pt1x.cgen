@@ -4,8 +4,8 @@
 #include <string.h>
 
 void CGEN_FUNCTION(ary1Pt1)( int bad, size_t el, const CGEN_TYPE *array,
-                             const char *type, HDSLoc *loc, int *dce,
-                             int *status ) {
+                             const char *type, int round, HDSLoc *loc,
+                             int *dce, int *status ) {
 /*
 *+
 *  Name:
@@ -16,8 +16,8 @@ void CGEN_FUNCTION(ary1Pt1)( int bad, size_t el, const CGEN_TYPE *array,
 
 *  Synopsis:
 *     void ary1Pt1<T>( int bad, size_t el, const CGEN_TYPE *array,
-*                      const char *type, HDSLoc *loc, int *dce,
-*                      int *status )
+*                      const char *type, int round, HDSLoc *loc,
+*                      int *dce, int *status )
 
 *  Description:
 *     The routine writes a 1-dimensional array of values to an
@@ -36,6 +36,9 @@ void CGEN_FUNCTION(ary1Pt1)( int bad, size_t el, const CGEN_TYPE *array,
 *     type
 *        HDS data type of the object to be written. This must be in
 *        upper case.
+*     round
+*        If non-zero, round floating point values to the nearest integer.
+*        Otherwise, truncate them towards zero.
 *     loc
 *        Locator to 1-dimensional HDS object to receive the data.
 *     dce
@@ -96,7 +99,7 @@ void CGEN_FUNCTION(ary1Pt1)( int bad, size_t el, const CGEN_TYPE *array,
    conversion, perform the type conversion explicitly and unmap the data. */
    } else {
       datMap( loc, type, "WRITE", 1, &dim, &pntr, status );
-      CGEN_FUNCTION(ary1Cvf)( bad, el, array, type, pntr, dce, status );
+      CGEN_FUNCTION(ary1Cvf)( bad, el, array, type, round, pntr, dce, status );
       ary1Hunmp( loc, status );
    }
 

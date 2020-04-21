@@ -179,6 +179,7 @@ void CGEN_FUNCTION(ary1Ptn)( int bad, int ndim, const hdsdim *lbnda,
    int dceslc;                /* Data conversion error in slice? */
    int dcontg;                /* Dimension containing contiguous data */
    int i;                     /* (Current) dimension count */
+   int round;                 /* Round floating point values? */
    size_t ea;                 /* End of input array region to skip */
    size_t ed;                 /* End of output data region to skip */
    size_t ncontg;             /* Number of contiguous data values */
@@ -199,6 +200,10 @@ void CGEN_FUNCTION(ary1Ptn)( int bad, int ndim, const hdsdim *lbnda,
               "'^BADHTYPE' (internal programming error).", status );
       return;
    }
+
+/* See if floating point values should be rounded or truncated when
+   converting them to integers. */
+   round = aryRound( -1 );
 
 /* Initialise the stride of dimension no. 1 for the input array and the
    output object. (The stride for a dimension is the amount by which the
@@ -285,7 +290,7 @@ L3:
 /* Transfer the data from the appropriate part of the input array and annul
    the slice. Note if a data conversion error occurred. */
             CGEN_FUNCTION(ary1Pt1)( bad, ncontg, array + ea + 1, type,
-                                    slice, &dceslc, status );
+                                    round, slice, &dceslc, status );
             datAnnul( &slice, status );
             if( *status != SAI__OK ) goto L999;
             *dce = ( *dce || dceslc );

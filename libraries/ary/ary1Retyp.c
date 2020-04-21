@@ -110,6 +110,7 @@ void ary1Retyp( HDSLoc *paren, const char *name, const char *type,
    HDSLoc *tloc=NULL;         /* Locator to temporary structure */
    hdsdim dummy;              /* Dummy dimension array */
    int i;                     /* Loop counter for dimensions */
+   int round;                 /* Round floating point values? */
    int there;                 /* Does the named component exist? */
    size_t el;                 /* Number of data elements to convert */
    void *oldptr;              /* Pointer to mapped old data */
@@ -165,31 +166,35 @@ void ary1Retyp( HDSLoc *paren, const char *name, const char *type,
             el *= dim[ i ];
          }
 
+/* See if floating point values should be rounded or truncated when
+   converting them to integers. */
+         round = aryRound( -1 );
+
 /* Compare the new data type with each permitted value in turn and call the
    appropriate routine to convert the old data into the new type. */
          if(!strcasecmp( ntype, "_BYTE" ) ){
-            ary1CvtB( bad, el, type, oldptr, pntr, dce, status );
+            ary1CvtB( bad, el, type, round, oldptr, pntr, dce, status );
 
          } else if(!strcasecmp( ntype, "_UBYTE" ) ){
-            ary1CvtUB( bad, el, type, oldptr, pntr, dce, status );
+            ary1CvtUB( bad, el, type, round, oldptr, pntr, dce, status );
 
          } else if(!strcasecmp( ntype, "_DOUBLE" ) ){
-            ary1CvtD( bad, el, type, oldptr, pntr, dce, status );
+            ary1CvtD( bad, el, type, round, oldptr, pntr, dce, status );
 
          } else if(!strcasecmp( ntype, "_INTEGER" ) ){
-            ary1CvtI( bad, el, type, oldptr, pntr, dce, status );
+            ary1CvtI( bad, el, type, round, oldptr, pntr, dce, status );
 
          } else if(!strcasecmp( ntype, "_REAL" ) ){
-            ary1CvtF( bad, el, type, oldptr, pntr, dce, status );
+            ary1CvtF( bad, el, type, round, oldptr, pntr, dce, status );
 
          } else if(!strcasecmp( ntype, "_WORD" ) ){
-            ary1CvtW( bad, el, type, oldptr, pntr, dce, status );
+            ary1CvtW( bad, el, type, round, oldptr, pntr, dce, status );
 
          } else if(!strcasecmp( ntype, "_UWORD" ) ){
-            ary1CvtUW( bad, el, type, oldptr, pntr, dce, status );
+            ary1CvtUW( bad, el, type, round, oldptr, pntr, dce, status );
 
          } else if(!strcasecmp( ntype, "_INT64" ) ){
-            ary1CvtK( bad, el, type, oldptr, pntr, dce, status );
+            ary1CvtK( bad, el, type, round, oldptr, pntr, dce, status );
 
          } else if( *status == SAI__OK ) {
             *status = ARY__FATIN;
