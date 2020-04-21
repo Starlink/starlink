@@ -18,7 +18,7 @@ void ndfGtune_( const char *tpar, int *value, int *status ){
 *  Purpose:
 *     Obtain the value of an NDF_ system tuning parameter.
 
-*  Synopsis:
+*  Invocation:
 *     void ndfGtune( const char *tpar, int *value, int *status )
 
 *  Description:
@@ -68,6 +68,8 @@ void ndfGtune_( const char *tpar, int *value, int *status ){
 *        Original version, based on equivalent Fortran function by RFWS.
 *     26-APR-2019 (DSB):
 *        Add the FIXSW tuning parameter.
+*     21-APR-2020 (DSB):
+*        Add the ROUND tuning parameter.
 
 *-
 */
@@ -195,6 +197,11 @@ void ndfGtune_( const char *tpar, int *value, int *status ){
    ================================================== */
       } else if( ndf1Simlr( tpar, 1, 0, "FIXSW", NDF__MINAB ) ) {
          *value = Ndf_TCB_fixsw;
+
+/* Round floating-point values to the nearest integer.
+   ================================================== */
+      } else if( ndf1Simlr( tpar, 1, 0, "ROUND", NDF__MINAB ) ) {
+         *value = Ndf_TCB_round;
 
 /* Unknown tuning parameter.
    ========================

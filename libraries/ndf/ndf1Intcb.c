@@ -60,6 +60,8 @@ void ndf1Intcb( int *status ){
 *        Support for VMS has been removed.
 *     26-APR-2019 (DSB):
 *        Add FIXSW.
+*     21-APR-2020 (DSB):
+*        Add ROUND.
 
 *-
 */
@@ -81,6 +83,7 @@ void ndf1Intcb( int *status ){
    Ndf_TCB_forin = 0;
    Ndf_TCB_fixdt = 0;
    Ndf_TCB_fixsw = 0;
+   Ndf_TCB_round = 0;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
@@ -160,6 +163,13 @@ void ndf1Intcb( int *status ){
    ndf1Rdtun( "NDF_FIXSW", 0, &ival, status );
    if( *status == SAI__OK ) Ndf_TCB_fixsw = ( ival == 1 );
 
+/* Round floating-point values to the nearest integer?
+*  ==================================================== */
+   ndf1Rdtun( "NDF_ROUND", 0, &ival, status );
+   if( *status == SAI__OK ) {
+      Ndf_TCB_round = ( ival == 1 );
+      aryRound( Ndf_TCB_round );
+   }
 
 /* Exit the function (note we do not call the ndf1Trace error tracing
    function here, as this could result in recursion). */

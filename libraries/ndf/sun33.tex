@@ -10,11 +10,11 @@
 \stardocsource      {sun\stardocnumber}
 \stardocnumber      {33.12}
 \stardocauthors     {R.F.~Warren-Smith \& D.S.~Berry}
-\stardocdate        {3rd April 2019}
+\stardocdate        {21st April 2020}
 \stardoctitle       {NDF \\ [\latex{1ex}]
                                 Routines for Accessing the\\
                                 Extensible N-Dimensional Data Format}
-\stardocversion     {Version 2.0}
+\stardocversion     {Version 2.1}
 \stardocmanual      {Programmer's Manual}
 
 \stardocabstract{%
@@ -8568,6 +8568,13 @@ avoids having to convert them on each occasion.
 The value of KEEP may be changed at any time. It is the value current
 when a foreign format file is first accessed by the NDF\_ library
 which is significant.
+
+\item[\textbf{ROUND:}]\mbox{}\\
+Specifies the way in which floating-point values should be converted to
+integer during automatic type conversion. If ROUND is set to 1, then
+floating-point values are rounded to the nearest integer value. If ROUND
+is set to 0 (the default), floating-point values are truncated towards
+zero.
 
 \item[\textbf{SECMAX:}]\mbox{}\\
 Specifies the maximum number of pixels allowed in an NDF section, in
@@ -17447,6 +17454,13 @@ locator}{sun92}{using_locators}}
          first accessed by the NDF\_ library which is significant.
 
          \sstitem
+         \texttt{'}ROUND\texttt{'}: Specifies the way in which floating-point
+         values should be converted to integer during automatic type
+         conversion. If ROUND is set to 1, then floating-point values are
+         rounded to the nearest integer value. If ROUND is set to 0 (the
+         default), floating-point values are truncated towards zero.
+
+         \sstitem
          \texttt{'}SHCVT\texttt{'}: Controls whether diagnostic information is displayed
          to show the actions being taken to convert to and from foreign
          data formats (using the facilities described in SSN/20). If SHCVT
@@ -19530,10 +19544,10 @@ the NDF\_ system between versions V1.12 and V1.13 (the current version):
 No changes to existing applications should be required, nor is any
 re-compilation or re-linking essential.
 
-\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V2.0}
+\subsection{Changes Introduced in V2.0}
 
 The following describes the most significant changes that occurred in
-the NDF\_ system between versions V1.13 and V2.0 (the current version):
+the NDF\_ system between versions V1.13 and V2.0:
 
 \begin{enumerate}
    \item  The NDF library is now written entirely in C. However, the Fortran
@@ -19545,6 +19559,17 @@ automatically when an application first calls an NDF function.
    \item The C interface is now thread safe.
    \item New functions are provided in the C interface to allow each NDF
 to be locked for exclusive access by a single thread.
+\end{enumerate}
+
+\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V2.1}
+
+The following describes the most significant changes that occurred in
+the NDF\_ system between versions V2.0 and V2.1 (the current version):
+
+\begin{enumerate}
+   \item  A new tuning parameter called ROUND has been added that
+          controls how floating-point values are converted to integer
+          during automatic type conversion.
 \end{enumerate}
 
 Existing applications should be re-compiled and re-linked.

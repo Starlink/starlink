@@ -1270,6 +1270,9 @@ extern int Ndf_TCB_fixdt;
 /* Blank out the path in the software strings stored in history records?: */
 extern int Ndf_TCB_fixsw;
 
+/* Round floating-point values to the nearest integer. */
+extern int Ndf_TCB_round;
+
 #endif
 
 

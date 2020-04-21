@@ -17,7 +17,7 @@ void ndfTune_( int value, const char *tpar, int *status ){
 *  Purpose:
 *     Set an NDF_ system tuning parameter.
 
-*  Synopsis:
+*  Invocation:
 *     void ndfTune( int value, const char *tpar, int *status )
 
 *  Description:
@@ -65,6 +65,11 @@ void ndfTune_( int value, const char *tpar, int *status ){
 *     of KEEP may be changed at any time. It is the value current when a
 *     foreign format file is first accessed by the NDF_ library which is
 *     significant.
+*     -  "ROUND": Controls the conversion of floating point values to
+*     integer values when doing automatic array type conversion. If ROUND
+*     is set to 1, then floating point values will be rounded to the
+*     nearest integer. If ROUND is set to 0 (the default), then floating
+*     point values will be truncated towards zero.
 *     -  "SECMAX": Gives the largest size of an NDF section, in units of
 *     maga-pixels. An error is reported if a section is requested that
 *     contains more than this number of pixels. The purpose of this
@@ -146,6 +151,8 @@ void ndfTune_( int value, const char *tpar, int *status ){
 *        Original version, based on equivalent Fortran function by RFWS.
 *     26-APR-2019 (DSB):
 *        Add the FIXSW tuning parameter.
+*     21-APR-2020 (DSB):
+*        Add the ROUND tuning parameter.
 
 *-
 */
@@ -354,6 +361,27 @@ void ndfTune_( int value, const char *tpar, int *status ){
             msgSeti( "VALUE", value );
             errRep( " ", "The value ^VALUE is not valid for the tuning "
                     "parameter FIXSW; it should be 0 or 1 (possible "
+                    "programming error).", status );
+         }
+
+/* Round floating point values to the nearest integer.
+   ====================================================
+   If ROUND was specified, then set the "round floating-point values" flag
+   appropriately. */
+      } else if( ndf1Simlr( tpar, 1, 0, "ROUND", NDF__MINAB ) ) {
+         if( value == 0 ) {
+            Ndf_TCB_round = 0;
+            aryRound( 0 );
+         } else if( value == 1 ) {
+            Ndf_TCB_round = 1;
+            aryRound( 1 );
+
+/* If the value supplied is not valid, then report an error. */
+         } else {
+            *status = NDF__TPVIN;
+            msgSeti( "VALUE", value );
+            errRep( " ", "The value ^VALUE is not valid for the tuning "
+                    "parameter ROUND; it should be 0 or 1 (possible "
                     "programming error).", status );
          }
 

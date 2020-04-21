@@ -88,6 +88,9 @@ void ndf1Aump( int iaxis, NdfACB *acb, const char *comp, int *status ){
    int ncomp;            /* Number non-blank names specified */
    int tstat;            /* Temporary status variable */
 
+/* Return immediately if no ACB was supplied. */
+   if( !acb ) return;
+
 /* Save the "status" value and mark the error stack. */
    tstat = *status;
    errMark();

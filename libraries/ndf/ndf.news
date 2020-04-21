@@ -1,17 +1,8 @@
 NDF Library
 -----------
 
-V2.0
+V2.1
 
-- The NDF library is now written entirely in C. However, the Fortran
-interface has not changed and is provided by a thin layer on top of the C
-library.
-
-- The only change to the C interface is that there is now no need to call
-ndfInit to initialise the library. This is done automatically when an
-application first calls an NDF function.
-
-- The C interface is now thread safe.
-
-- New functions are provided in the C interface to allow each NDF to be
-locked for exclusive access by a single thread.
+- A new tuning parameter called ROUND has been added that controls how
+floating-point values are converted to integer during automatic type
+conversion.
