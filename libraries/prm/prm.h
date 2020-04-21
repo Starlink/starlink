@@ -42,8 +42,9 @@
 */
 
 
-
-
+/* Required by prm_cgen.h */
+#include <stddef.h>
+#include <stdint.h>
 
 /* Include the expanded generic prototypes. */
 #include "prm_cgen.h"

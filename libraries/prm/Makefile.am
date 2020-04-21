@@ -143,7 +143,8 @@ PLATFORM_C = num_han.c num1_cvt.c
 
 #  Generic C functions.
 CGENERIC_ROUTINES = vecBtox.cgen vecDtox.cgen vecItox.cgen \
-vecKtox.cgen vecFtox.cgen vecUBtox.cgen vecUWtox.cgen vecWtox.cgen
+vecKtox.cgen vecFtox.cgen vecUBtox.cgen vecUWtox.cgen vecWtox.cgen \
+vecF2x.cgen vecD2x.cgen
 
 # The .c files which are built from the above .cgen files.
 BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
