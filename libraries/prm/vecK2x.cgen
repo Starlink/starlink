@@ -1,0 +1,90 @@
+#include "sae_par.h"
+#include "prm.h"
+
+void CGEN_FUNCTION(vecK2)( char bad, size_t n, const int64_t *argv,
+                           CGEN_TYPE *resv, size_t *ierr, size_t *nerr,
+                           int *status ){
+/*
+*+
+*  Name:
+*     vecK2<t>
+
+*  Purpose:
+*     Convert vectorised _INT64 values to another data type.
+
+*  Synopsis:
+*     void vecK2<T>( char bad, size_t n, const int64_t *argv,
+*                    CGEN_TYPE *resv, size_t *ierr, size_t *nerr,
+*                    int *status )
+
+*  Description:
+*     The function performs type conversion on a vectorised array
+*     of _INT64 values, converting them to equivalent values of type <T>.
+*     If numerical errors occur, the value VAL__BAD<T> is returned in
+*     appropriate elements of the result array and a "status" value is
+*     set.
+*
+*     This function is identical to vecKto<T>. The only reason for
+*     providing it is so that we have a complete set of vec<T>2<T>
+*     functions for use within other generic functions.
+
+*  Arguments:
+*     bad
+*        A boolean value indicating whether the argument values ("argv")
+*        may be "bad".
+*     n
+*        The number of values to be processed.  If "n" is zero the function
+*        returns with "ierr" and "nerr" set to zero, but without converting
+*        any values.
+*     argv
+*        A vectorised (1-dimensional) array of size "n" containing the
+*        values to be converted.
+*     resv
+*        A vectoried (1-dimensional) array of at least "n" elements to
+*        receive the converted values.  The value VAL__BAD<T> will be
+*        set in appropriate elements of "resv" under error conditions.
+*     ierr
+*        Returned holding the index of the first input array element to
+*        generate a numerical error.  Zero is returned if no errors occur.
+*     nerr
+*        Returned holding a count of the number of numerical errors that
+*        occur.
+*     status
+*        This should be set to SAI__OK on entry, otherwise the routine
+*        returns without action.  A "status" value will be set by this
+*        function if any numerical errors occur.
+
+*  Copyright:
+*     Copyright (C) 2020 East Asian Observatory.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     22-APR-2020 (DSB):
+*        Original version.
+
+*-
+*/
+
+/* No rounding ever occurs when converting to _INT64 so just call the
+   corresponding vecKto<t> function. */
+   CGEN_FUNCTION(vecKto)( bad, n, argv, resv, ierr, nerr, status );
+}

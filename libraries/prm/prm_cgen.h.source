@@ -11,3 +11,9 @@ void CGEN_FUNCTION(vecUWto)( char bad, size_t n, const unsigned short int *argv,
 void CGEN_FUNCTION(vecWto)( char bad, size_t n, const short int *argv, CGEN_TYPE *resv, size_t *ierr, size_t *nerr, int *status );
 void CGEN_FUNCTION(vecF2)( char bad, size_t n, const float *argv, CGEN_TYPE *resv, size_t *ierr, size_t *nerr, int *status );
 void CGEN_FUNCTION(vecD2)( char bad, size_t n, const double *argv, CGEN_TYPE *resv, size_t *ierr, size_t *nerr, int *status );
+void CGEN_FUNCTION(vecB2)( char bad, size_t n, const char *argv, CGEN_TYPE *resv, size_t *ierr, size_t *nerr, int *status );
+void CGEN_FUNCTION(vecI2)( char bad, size_t n, const int *argv, CGEN_TYPE *resv, size_t *ierr, size_t *nerr, int *status );
+void CGEN_FUNCTION(vecK2)( char bad, size_t n, const int64_t *argv, CGEN_TYPE *resv, size_t *ierr, size_t *nerr, int *status );
+void CGEN_FUNCTION(vecUB2)( char bad, size_t n, const unsigned char *argv, CGEN_TYPE *resv, size_t *ierr, size_t *nerr, int *status );
+void CGEN_FUNCTION(vecUW2)( char bad, size_t n, const unsigned short int *argv, CGEN_TYPE *resv, size_t *ierr, size_t *nerr, int *status );
+void CGEN_FUNCTION(vecW2)( char bad, size_t n, const short int *argv, CGEN_TYPE *resv, size_t *ierr, size_t *nerr, int *status );
