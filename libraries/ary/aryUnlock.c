@@ -72,6 +72,8 @@ void aryUnlock( Ary *ary, int *status ) {
 *  History:
 *     27-JUL-2017 (DSB):
 *        Initial version
+*     22-APR-2020 (DSB):
+*        Lock the MCB as well as the DCB.
 *     {enter_further_changes_here}
 
 *-
@@ -92,6 +94,7 @@ void aryUnlock( Ary *ary, int *status ) {
    it is safe to deference "acb". */
    if( *status == SAI__OK ) {
       (void) ary1DCBLock( acb->dcb, 3, 0, status );
+      (void) ary1MCBLock( acb->mcb, 3, 0, status );
    }
 
 /* If an error occurred, then report context information and call the

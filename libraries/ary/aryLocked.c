@@ -100,6 +100,8 @@ int aryLocked( const Ary *ary, int *status ) {
 *  History:
 *     27-JUL-2017 (DSB):
 *        Initial version
+*     23-APR-2020 (DSB):
+*        Report an error if the MCB is not locked in the same way as the DCB.
 *     {enter_further_changes_here}
 
 *-
@@ -108,6 +110,7 @@ int aryLocked( const Ary *ary, int *status ) {
 /* Local Variables; */
    AryACB *acb;
    int result = 0;
+   int result_mcb = 0;
 
 /* Check inherited status. */
    if (*status != SAI__OK) return result;
@@ -118,9 +121,26 @@ int aryLocked( const Ary *ary, int *status ) {
    acb = (AryACB *) ary1Impid( ary, 0, 0, 1, status );
 
 /* Get the value to return. Test status first so that we know it is safe
-   to deference "acb". */
+   to deference "acb". Assume the MCB has the same lock as the DCB. */
    if( *status == SAI__OK ) {
+
+/* Get the lock state of the DCB (there should always be a DCB). */
       result = ary1DCBLock( acb->dcb, 1, 0, status );
+
+/* If there is an MCB, then we need to check its state too. */
+      if( acb->mcb ) {
+         result_mcb = ary1MCBLock( acb->mcb, 1, 0, status );
+
+/* If the MCB and DCB have differing states, report an error. */
+         if( result_mcb  != result ) {
+            *status = SAI__ERROR;
+            datMsg( "ARRAY", acb->dcb->loc );
+            msgSeti( "I", result );
+            msgSeti( "J", result_mcb );
+            errRep( " ", "The array structure ^ARRAY has different locks "
+                    "for the DCB (^I) and MCB (^J)", status );
+         }
+      }
    }
 
 /* If an error occurred, then report context information and call the

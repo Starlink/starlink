@@ -19,8 +19,7 @@ void ndf1LockAry( Ary *ary, int *status ){
 
 *  Description:
 *     This function attempts to lock the supplied ARY identifier. It is a
-*     wrapper for aryLock that does nothing if the identifier is already
-*     locked (aryLock reports an error).
+*     wrapper for aryLock.
 
 *  Parameters:
 *     ary
@@ -58,6 +57,11 @@ void ndf1LockAry( Ary *ary, int *status ){
 *  History:
 *     27-FEB-2019 (DSB):
 *        Original version.
+*     23-APR-2020 (DSB):
+*        Do not test the lock first since the test ignores the MCB within
+*        the ARY object. Instead just lock the ARY regardless of its
+*        initial lock state (ARY will not report an error if it is already
+*        locked).
 
 *-
 */
@@ -74,20 +78,17 @@ void ndf1LockAry( Ary *ary, int *status ){
    errMark();
    *status = SAI__OK;
 
-/* See if the identifier is locked by the current thread. */
+/* Attempt to lock the ARY for read/write. This will do nothing if it is
+   already locked by the current thread. */
+   aryLock( ary, 0, status );
+
+/* See if the identifier is now locked by the current thread. */
    ival = aryLocked( ary, status );
-
-/* If it is unlocked, lock it. */
-   if( ival == 0 ) {
-      aryLock( ary, 0, status );
-
-/* Report an error unless the identifier is already locked by the current
-   thread. */
-   } else if( ival != -1 && ival != 1 && *status == SAI__OK ) {
+   if( ival != 1 && *status == SAI__OK ) {
       *status = ARY__THREAD;
       aryMsg( "O", ary );
-      errRep( " ", "ARY array '^O' cannot be locked - it is already "
-              "locked by a different thread. ", status );
+      errRep( " ", "Failed to lock ARY array '^O' (NDF programming "
+              "error).", status );
    }
 
 /* Annul any error if STATUS was previously bad, otherwise let the new

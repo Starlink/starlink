@@ -37,7 +37,7 @@ void aryLock( Ary *ary, int readonly, int *status ) {
 *     read-only access to the array), this function will report an error
 *     only if another thread currently has a read-write lock on the array.
 *
-*     The current thread must unlock the array using datUnlock before it
+*     The current thread must unlock the array using aryUnlock before it
 *     can be locked for use by another thread. All arrays are initially
 *     locked by the current thread when they are created or opened. The
 *     type of access available to the array ("Read", "Write" or "Update")
@@ -92,12 +92,14 @@ void aryLock( Ary *ary, int readonly, int *status ) {
 *     02110-1301, USA
 
 *  Authors:
-*     DSB: David S Berry (DSB)
+*     DSB: David S Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
 *     10-JUL-2017 (DSB):
 *        Initial version
+*     22-APR-2020 (DSB):
+*        Unlock the MCB as well as the DCB.
 *     {enter_further_changes_here}
 
 *-
@@ -117,10 +119,15 @@ void aryLock( Ary *ary, int readonly, int *status ) {
 /* Check we can de-reference "acb" safely. */
    if( *status == SAI__OK ) {
 
-/* Attempt to lock the specified array. An error will be reported if the
-   array could not be locked because it was already locked by another
+/* Attempt to lock the DCB in the specified array. An error will be reported
+   if the DCB could not be locked because it was already locked by another
    thread. */
       ary1DCBLock( acb->dcb, 2, readonly, status );
+
+/* Attempt to lock the MCB in the specified array. An error will be reported
+   if the MCB could not be locked because it was already locked by another
+   thread. */
+      ary1MCBLock( acb->mcb, 2, readonly, status );
    }
 
 /* If an error occurred, then report context information and call the

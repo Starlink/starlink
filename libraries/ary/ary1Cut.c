@@ -82,7 +82,8 @@ void ary1Cut( AryACB *acb1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd,
 *  History:
 *     03-JUL-2017 (DSB):
 *        Original version, based on equivalent Fortran routine by RFWS.
-
+*     23-APR-2020 (DSB):
+*        Lock the MCB as well as the DCB.
 *-
 */
 
@@ -107,6 +108,7 @@ void ary1Cut( AryACB *acb1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd,
    needed because the mata-data of the returned cut can be modified. */
       dcb = acb1->dcb;
       ary1DCBLock( dcb, 2, 0, status );
+      ary1MCBLock( acb1->mcb, 2, 0, status );
 
 /* Mark the new entry as a cut. */
       (*acb2)->cut = 1;

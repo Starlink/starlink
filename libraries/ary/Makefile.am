@@ -53,7 +53,7 @@ aryMapz.c aryMsg.c aryNdim.c aryNew.c aryNewp.c aryNoacc.c aryOffs.c \
 aryPlace.c aryReset.c arySame.c arySbad.c arySbnd.c arySctyp.c \
 arySect.c aryShift.c arySize.c arySsect.c aryState.c aryStype.c \
 aryTemp.c aryTrace.c aryType.c aryUnlock.c aryUnmap.c aryValid.c \
-aryVerfy.c aryRound.c fortran_interface.c
+aryVerfy.c aryRound.c fortran_interface.c ary1MCBLock.c
 
 CGENERIC_ROUTINES = ary1Badx.cgen ary1Zerx.cgen ary1Ptnx.cgen \
 ary1Pt1x.cgen ary1Cvfx.cgen ary1Gtnx.cgen ary1Gt1x.cgen ary1Cvtx.cgen \

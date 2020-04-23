@@ -56,6 +56,7 @@ AryObject *ary1Id2ac( const void *id_ptr, int isacb );
 AryObject *ary1Impid( const void *id_ptr, int checklock, int readonly, int isacb, int *status );
 char *ary1Get0C( const HDSLoc *loc, int *status );
 int ary1DCBLock( AryDCB *DCB, int oper, int rdonly, int *status );
+int ary1MCBLock( AryMCB *MCB, int oper, int rdonly, int *status );
 int ary1Defr( const AryDCB *dcb, int *status );
 int ary1Intyp( const char *type, int *status );
 int ary1IsValid( AryObject *object, int *status );

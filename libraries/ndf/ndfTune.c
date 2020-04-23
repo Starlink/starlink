@@ -74,7 +74,7 @@ void ndfTune_( int value, const char *tpar, int *status ){
 *     maga-pixels. An error is reported if a section is requested that
 *     contains more than this number of pixels. The purpose of this
 *     parameter is to help guard against accidental use of incorrect units
-*     within NDF sections specified by the user. The default value is 1E10.
+*     within NDF sections specified by the user. The default value is 2147.
 *     -  "SHCVT": Controls whether diagnostic information is displayed to
 *     show the actions being taken to convert to and from foreign data
 *     formats (using the facilities described in SSN/20). If SHCVT is set

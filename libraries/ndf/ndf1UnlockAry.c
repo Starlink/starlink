@@ -19,8 +19,7 @@ void ndf1UnlockAry( Ary *ary, int *status ){
 
 *  Description:
 *     This function attempts to unlock the supplied ARY identifier. It is a
-*     wrapper for aryUnlock that does nothing if the identifier is already
-*     unlocked (aryUnlock reports an error).
+*     wrapper for aryUnlock.
 
 *  Parameters:
 *     ary
@@ -58,6 +57,11 @@ void ndf1UnlockAry( Ary *ary, int *status ){
 *  History:
 *     27-FEB-2019 (DSB):
 *        Original version.
+*     23-APR-2020 (DSB):
+*        Do not test the lock first since the test ignores the MCB within
+*        the ARY object. Instead just unlock the ARY regardless of its
+*        initial lock state (ARY will not report an error if it is already
+*        unlocked).
 
 *-
 */
@@ -74,12 +78,19 @@ void ndf1UnlockAry( Ary *ary, int *status ){
    errMark();
    *status = SAI__OK;
 
-/* See if the identifier is locked by the current thread. */
+/* Attempt to unlock the ARY. This will do nothing if it is not locked by
+   the current thread. */
+   aryUnlock( ary, status );
+
+/* Check it is now unlocked. */
    ival = aryLocked( ary, status );
 
-/* If it is locked by the current thread, unlock it. */
-   if( ival == 1 || ival == 3 ) {
-      aryUnlock( ary, status );
+/* If it is locked by the current thread, report an error. */
+   if( ival == 1 || ival == 3 && *status == SAI__OK ) {
+      *status = ARY__THREAD;
+      aryMsg( "O", ary );
+      errRep( " ", "Attempt to unlock ARY array '^O' failed (NDF "
+              "programming error).", status );
 
 /* If it is locked by a different thread, report an error. */
    } else if( ival != -1 && ival != 0 && *status == SAI__OK ) {
