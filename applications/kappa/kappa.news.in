@@ -12,6 +12,11 @@
       -  Creates a description of selected regions in an image using
          the IVOA's Multi-Order Coverage (MOC) scheme.
 
+   o  PIXBIN
+
+      - Places each input pixel into a bin defined by one or more index
+        NDFs and creates an output NDF holding all the values in each bin.
+
 2 Modified_applications
 
    o  CHPIX

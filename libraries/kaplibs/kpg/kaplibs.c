@@ -1602,3 +1602,33 @@ F77_SUBROUTINE(kpg1_cputm)( INTEGER_ARRAY(CONTXT),
 void kpg1Cputm( int contxt[4], double *cputim ){
    F77_LOCK( F77_CALL(kpg1_cputm)( contxt, cputim ); )
 }
+
+
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_typsz)( CHARACTER(TYPE),
+                            INTEGER(NBYTES),
+                            INTEGER(STATUS)
+                            TRAIL(TYPE) );
+
+size_t kpg1Typsz( const char *type, int *status ){
+   DECLARE_CHARACTER_DYN(TYPE);
+   DECLARE_INTEGER(STATUS);
+   DECLARE_INTEGER(NBYTES);
+
+   F77_CREATE_EXPORT_CHARACTER( type, TYPE );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(kpg_typsz)( CHARACTER_ARG(TYPE),
+                                  INTEGER_ARG(&NBYTES),
+                                  INTEGER_ARG(&STATUS)
+                                  TRAIL_ARG(TYPE) ); )
+
+   F77_FREE_CHARACTER( TYPE );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return NBYTES;
+}
+
+

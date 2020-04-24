@@ -552,6 +552,10 @@
          ELSE IF ( NAME .EQ. 'PERMAXES' ) THEN
             CALL PERMAXES ( STATUS )
 
+*  Organise pixels into bins.
+         ELSE IF ( NAME .EQ. 'PIXBIN' ) THEN
+            CALL PIXBIN ( STATUS )
+
 *  Expands an NDF by pixel duplication.
          ELSE IF ( NAME .EQ. 'PIXDUPE' ) THEN
             CALL PIXDUPE ( STATUS )

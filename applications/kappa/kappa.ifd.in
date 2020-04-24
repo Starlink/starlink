@@ -15730,6 +15730,42 @@ iraf! {
          }
       }
 
+      action pixbin {
+         alias {pixb(in)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {NDF to be binned}
+            helpkey *
+         }
+
+         parameter index {
+            position 3
+            type NDF
+            access READ
+            prompt {A group of index NDFs}
+            helpkey *
+         }
+
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output NDF}
+            helpkey *
+         }
+
+      }
+
       action pixdupe {
          alias {pixd(upe)}
 

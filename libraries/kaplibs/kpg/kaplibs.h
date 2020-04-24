@@ -210,6 +210,10 @@ void kpg1Lgcmd( const char *appn, const char *pack, int *cputim, int *status );
 
 void kpg1Cputm( int contxt[4], double *cputim );
 
+size_t kpg1Typsz( const char *type, int *status );
+
+void kpg1Badbits( const char *type, char buf[8], size_t *nb, int *status );
+
 /* Now include the expanded generic prototypes. */
 #include "kpg_cgen.h"
 
