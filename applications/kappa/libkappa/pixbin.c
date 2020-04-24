@@ -80,9 +80,9 @@ F77_SUBROUTINE(pixbin)( INTEGER(status) ){
 *
 *     There are many possible ways in which the input pixels values
 *     that fall in a single bin could be combined to create a single
-*     representative output value for each bin. For instance the output
+*     representative output value for each bin. For instance, the output
 *     NDF could contain the mean of the input values that fall in each
-*     bin, or the maximum or the standard deviation, etc. However, this
+*     bin, or the maximum, or the standard deviation, etc. However, this
 *     application does not store a single representative value for each bin.
 *     Instead it stores all the separate input pixel values that fall in
 *     each bin. This requires an extra trailing pixel axis in the output
@@ -102,8 +102,8 @@ F77_SUBROUTINE(pixbin)( INTEGER(status) ){
 *     IN = NDF (Read)
 *        The input N-dimensional NDF.
 *     INDEX = NDF (Read)
-*        A group of index NDFs (all with N-dimensions). The number of
-*        index NDFs supplied should be in the range 1-6 and determines
+*        A group of index NDFs (all with N dimensions). The number of
+*        index NDFs supplied should be in the range 1--6 and determines
 *        the dimensionality of the output NDF. A section is taken from
 *        each one so that it matches the input NDF supplied by Parameter
 *        IN. The data values in the J'th index NDF are converted to
@@ -118,11 +118,11 @@ F77_SUBROUTINE(pixbin)( INTEGER(status) ){
 
 *  Examples:
 *     pixbin m31 binned radius
-*        Here the pixel values in a 2-dimensional NDF called "m31" are
-*        placed into bins as defined by the contents of a single 2-dimensional
-*        NDF called "radius", to create a 2-dimensional output NDF called
-*        "binned" (the number of pixel axes in the output is always one
-*        more than the number of index NDFs). The data values in "radius"
+*        Here the pixel values in a two-dimensional NDF called "m31" are
+*        placed into bins as defined by the contents of a single two-dimensional
+*        NDF called "radius", to create a two-dimensional output NDF called
+*        "binned". (The number of pixel axes in the output is always one
+*        more than the number of index NDFs.) The data values in "radius"
 *        are used as the pixel indices along the first axis of the output
 *        NDF, at which to store each input pixel value. Each column in the
 *        output NDF contains the individual input pixel values assigned

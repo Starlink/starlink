@@ -38223,6 +38223,116 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
 \htmlref{PICSEL}{PICSEL}.
    }
 }
+
+\sstroutine{
+   PIXBIN
+}{
+   Places each pixel value in an input NDF into an output bin
+}{
+   \sstdescription{
+      This application collects selected pixel values together from an
+      input NDF and places them into a single column of an output NDF.
+      Each such output column represents a ``bin'' into
+      which a subset of the input pixels is placed.
+
+      If the input NDF has $N$ pixel axes, the user provides a set of $M$
+      $N$-dimensional ``index'' NDFs (where $M$ is between 1
+      and 6). For each pixel in the input NDF, the corresponding value in
+      each of the $M$ index NDFs is found. This vector of $M$ values is used
+      (after rounding them to the nearest integer) to determine the pixel
+      indices within the output ($M$-dimensional) NDF at which to store
+      the input pixel value. Thus each output pixel corresponds to a bin
+      into which one or more input pixels can be placed, as selected by
+      the index NDFs.
+
+      There are many possible ways in which the input pixels values
+      that fall in a single bin could be combined to create a single
+      representative output value for each bin. For instance, the output
+      NDF could contain the mean of the input values that fall in each
+      bin, or the maximum, or the standard deviation, etc. However, this
+      application does not store a single representative value for each bin.
+      Instead it stores all the separate input pixel values that fall in
+      each bin. This requires an extra trailing pixel axis in the output
+      NDF, with a lower pixel bounds of 1 and and upper pixel bound equal to
+      the maximum population of any bin. Each ``column'' of values parallel
+      to this final output pixel axis represents one bin, and
+      contains the corresponding input pixel values at its lower end, with
+      bad values filling any unused higher pixels. The
+      \htmlref{COLLAPSE}{COLLAPSE} application
+      could then be used to get a representative value for each bin by
+      collapsing this final pixel axis using any of the many estimators
+      provided by COLLAPSE.
+   }
+   \sstusage{
+      pixbin in out index
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The input $N$-dimensional NDF.
+      }
+      \sstsubsection{
+         INDEX = NDF (Read)
+      }{
+         A group of index NDFs (all with $N$ dimensions). The number of
+         index NDFs supplied should be in the range 1--6 and determines
+         the dimensionality of the output NDF. A section is taken from
+         each one so that it matches the input NDF supplied by Parameter
+         IN. The data values in the $J$th index NDF are converted to
+         \_INTEGER (by finding the nearest integer) and then used as the
+         pixel indices on the $J$th output pixel axis.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The output NDF containing all the values from the input NDF
+         collected into a set of bins. This NDF will have $M+$1 pixel axes,
+         where $M$ is the number of index NDF supplied using Parameter INDEX.
+         The final pixel axis enumerates the individual input pixels that
+         fall within each bin.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         pixbin m31 binned radius
+      }{
+         Here the pixel values in a two-dimensional NDF called m31 are
+         placed into bins as defined by the contents of a single two-dimensional
+         NDF called radius, to create a two-dimensional output NDF called
+         binned.  (The number of pixel axes in the output is always one
+         more than the number of index NDFs.) The data values in NDF radius
+         are used as the pixel indices along the first axis of the output
+         NDF, at which to store each input pixel value. Each column in the
+         output NDF contains the individual input pixel values assigned
+         to that bin, padded with bad values if necessary to fill the
+         column.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: \htmlref{COLLAPSE}{COLLAPSE}
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         This routine correctly processes the DATA, \htmlref{QUALITY}{apndf:quality},
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title},
+         \htmlref{UNITS}{apndf:units}, and \htmlref{HISTORY}{apndf:history}, components of the input NDF
+         and propagates all \htmlref{extensions}{apndf:extensions}.
+
+         \sstitem
+          Processing of bad pixels and automatic quality masking are
+         supported.
+
+         \sstitem
+          All non-complex numeric data types can be handled.
+      }
+   }
+}
+
 \sstroutine{
    PIXDUPE
 }{
@@ -38344,113 +38454,6 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
 
          \sstitem
          Any number of NDF dimensions is supported.
-      }
-   }
-}
-
-\sstroutine{
-   PIXBIN
-}{
-   Places each pixel value in an input NDF into an output bin
-}{
-   \sstdescription{
-      This application collects selected pixel values together from an
-      input NDF and places them into a single column of an output NDF.
-      Each such output column represents a \texttt{"} bin\texttt{"}  into
-      which a subset of the input pixels is placed.
-
-      If the input NDF has N pixel axes, the user provides a set of M
-      N-dimensional \texttt{"} index\texttt{"}  NDFs (where M is between 1
-      and 6). For each pixel in the input NDF, the corresponding value in
-      each of the M index NDFs is found. This vector of M values is used
-      (after rounding them to the nearest integer) to determine the pixel
-      indices within the output (M-dimensional) NDF at which to store
-      the input pixel value. Thus each output pixel corresponds to a bin
-      into which one or more input pixels can be placed, as selected by
-      the index NDFs.
-
-      There are many possible ways in which the input pixels values
-      that fall in a single bin could be combined to create a single
-      representative output value for each bin. For instance the output
-      NDF could contain the mean of the input values that fall in each
-      bin, or the maximum or the standard deviation, etc. However, this
-      application does not store a single representative value for each bin.
-      Instead it stores all the separate input pixel values that fall in
-      each bin. This requires an extra trailing pixel axis in the output
-      NDF, with a lower pixel bounds of 1 and and upper pixel bound equal to
-      the maximum population of any bin. Each \texttt{"} column\texttt{"}  of
-      values parallel to this final output pixel axis represents one bin and
-      contains the corresponding input pixel values at its lower end, with
-      bad values filling any unused higher pixels. The COLLAPSE application
-      could then be used to get a representative value for each bin by
-      collapsing this final pixel axis using any of the many estimators
-      provided by COLLAPSE.
-   }
-   \sstusage{
-      pixbin in out index
-   }
-   \sstparameters{
-      \sstsubsection{
-         IN = NDF (Read)
-      }{
-         The input N-dimensional NDF.
-      }
-      \sstsubsection{
-         INDEX = NDF (Read)
-      }{
-         A group of index NDFs (all with N-dimensions). The number of
-         index NDFs supplied should be in the range 1-6 and determines
-         the dimensionality of the output NDF. A section is taken from
-         each one so that it matches the input NDF supplied by Parameter
-         IN. The data values in the J\texttt{'} th index NDF are converted to
-         \_INTEGER (by finding the nearest integer) and then used as the
-         pixel indices on the J\texttt{'} th output pixel axis.
-      }
-      \sstsubsection{
-         OUT = NDF (Write)
-      }{
-         The output NDF containing all the values from the input NDF
-         collected into a set of bins. This NDF will have M$+$1 pixel axes,
-         where M is the number of index NDF supplied using Parameter INDEX.
-         The final pixel axis enumerates the individual input pixels that
-         fall within each bin.
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         pixbin m31 binned radius
-      }{
-         Here the pixel values in a 2-dimensional NDF called \texttt{"} m31\texttt{"}  are
-         placed into bins as defined by the contents of a single 2-dimensional
-         NDF called \texttt{"} radius\texttt{"} , to create a 2-dimensional output NDF called
-         \texttt{"} binned\texttt{"}  (the number of pixel axes in the output is always one
-         more than the number of index NDFs). The data values in \texttt{"} radius\texttt{"}
-         are used as the pixel indices along the first axis of the output
-         NDF, at which to store each input pixel value. Each column in the
-         output NDF contains the individual input pixel values assigned
-         to that bin, padded with bad values if necessary to fill the
-         column.
-      }
-   }
-   \sstdiytopic{
-      Related Applications
-   }{
-      KAPPA: COLLAPSE
-   }
-   \sstimplementationstatus{
-      \sstitemlist{
-
-         \sstitem
-          This routine correctly processes the DATA, QUALITY, VARIANCE, LABEL,
-         TITLE, UNITS and HISTORY components of the input NDF and propagates all
-         extensions.
-
-         \sstitem
-          Processing of bad pixels and automatic quality masking are
-         supported.
-
-         \sstitem
-          All non-complex numeric data types can be handled.
       }
    }
 }
@@ -54236,7 +54239,7 @@ The following new applications have been added:
    \item [\htmlref{MOCGEN}{MOCGEN}] \mbox{}
    Creates a description of selected regions in an image using the IVOA's
    Multi-Order Coverage (MOC) scheme.
-   \item [\htmlref{PIXMAP}{PIXMAP}] \mbox{}
+   \item [\htmlref{PIXBIN}{PIXBIN}] \mbox{}
    Places each input pixel into a bin defined by one or more index NDFs
    and creates an output NDF holding all the values in each bin.
 \end{description}
