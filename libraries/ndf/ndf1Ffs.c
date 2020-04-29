@@ -78,6 +78,9 @@ void *ndf1Ffs( NdfBlockType type, int *status ) {
 *  History:
 *     14-MAY-2018 (DSB):
 *        Original version.
+*     29-APR-2020 (DSB):
+*        Change the depth at which the mutex is unlocked so that it matches
+*        the depth at which it is locked.
 
 *-
 */
@@ -227,11 +230,11 @@ void *ndf1Ffs( NdfBlockType type, int *status ) {
             }
          }
       }
-   }
 
 /* Release the lock on the array, this allowing any waiting threads
    to proceed. */
-   pthread_mutex_unlock( mutex );
+      pthread_mutex_unlock( mutex );
+   }
 
 /* Initialise the returned object. */
    if( *status == SAI__OK ) {

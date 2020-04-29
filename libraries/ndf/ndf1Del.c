@@ -67,6 +67,9 @@ void ndf1Del( NdfACB **acb, int *status ){
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     29-APR-2020 (DSB):
+*        Unlock the mutex before calling ndf1ANl as it may attempt to
+*        lock the mutex.
 
 *-
 */
@@ -105,11 +108,14 @@ void ndf1Del( NdfACB **acb, int *status ){
          islot = next;
 
 /* Select those entries which refer to the data object to be erased and
-   annul them. This process eventually reduces the object's reference
-   count to zero, causing it to be erased. */
+   annul them (unlocking the mutex first since ndf1Anl may attempt to lock
+   it). This process eventually reduces the object's reference count to
+   zero, causing it to be erased. */
          if( acbt->dcb == dcb ) {
             acba = acbt;
+            NDF__ACB_UNLOCK_MUTEX;
             ndf1Anl( &acba, status );
+            NDF__ACB_LOCK_MUTEX;
          }
          acbt = ndf1Nxtsl( NDF__ACBTYPE, islot, &next, status );
       }

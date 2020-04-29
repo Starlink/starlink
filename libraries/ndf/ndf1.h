@@ -887,8 +887,7 @@ int ndf1Isnam( const char *string,
                size_t start,
                size_t end );
 
-int ndf1IsValid( NdfObject *object,
-                 int *status );
+int ndf1IsValid( NdfObject *object );
 
 int ndf1Locked( NdfACB *acb );
 

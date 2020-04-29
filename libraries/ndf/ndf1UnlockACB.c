@@ -61,7 +61,9 @@ void ndf1UnlockACB( NdfACB *acb, int *status ){
 *  History:
 *     27-FEB-2019 (DSB):
 *        Original version.
-
+*     29_APR-2020 (DSB):
+*        Unlock the mutex before calling ndf1Anl as it may attempt to
+*        lock the mutex.
 *-
 */
 
@@ -92,7 +94,11 @@ void ndf1UnlockACB( NdfACB *acb, int *status ){
    acbt = ndf1Nxtsl( NDF__ACBTYPE, islot, &next, status );
    while( ( *status == SAI__OK ) && ( next != -1 ) ){
       islot = next;
-      if( acbt != acb && acbt->dcb == acb->dcb ) ndf1Anl( &acbt, &astat );
+      if( acbt != acb && acbt->dcb == acb->dcb ) {
+         NDF__ACB_UNLOCK_MUTEX;
+         ndf1Anl( &acbt, &astat );
+         NDF__ACB_LOCK_MUTEX;
+      }
       acbt = ndf1Nxtsl( NDF__ACBTYPE, islot, &next, status );
    }
    NDF__ACB_UNLOCK_MUTEX;

@@ -64,7 +64,9 @@ void ndfEnd_( int *status ){
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
-
+*     29-APR-2020 (DSB):
+*        Unlock the mutex before calling ndf1Anl as it may attempt to
+*        lock the mutex.
 *-
 */
 
@@ -118,7 +120,11 @@ void ndfEnd_( int *status ){
 
 /* If the context level at which the ACB was made exceeds the new
    "current" context level, then annul the ACB. */
-            if( acbt->ctx > NDF_TSD(acbIdctx) ) ndf1Anl( &acbt, &astat );
+            if( acbt->ctx > NDF_TSD(acbIdctx) ) {
+               NDF__ACB_UNLOCK_MUTEX;
+               ndf1Anl( &acbt, &astat );
+               NDF__ACB_LOCK_MUTEX;
+            }
          }
 
 /* Get the next active ACB. */

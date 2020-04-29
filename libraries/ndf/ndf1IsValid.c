@@ -10,7 +10,7 @@ extern NdfACB **Ndf_ACB;  /* Pointer to array of all ACB pointers */
 extern NdfFCB **Ndf_FCB;  /* Pointer to array of all FCB pointers */
 extern NdfPCB **Ndf_PCB;  /* Pointer to array of all PCB pointers */
 
-int ndf1IsValid( NdfObject *object, int *status ) {
+int ndf1IsValid( NdfObject *object ) {
 /*
 *+
 *  Name:
@@ -20,7 +20,7 @@ int ndf1IsValid( NdfObject *object, int *status ) {
 *     Checks that the supplied object (DCB, ACB, FCB or PCB) is valid.
 
 *  Synopsis:
-*     int ndf1IsValid( NdfObject *object, int *status )
+*     int ndf1IsValid( NdfObject *object )
 
 *  Description:
 *     The routine returns a flag indicating if the supplied object
@@ -30,18 +30,16 @@ int ndf1IsValid( NdfObject *object, int *status ) {
 *     object
 *        Pointer to the object to check. It should be of type NdfDCB,
 *        NdfACB, NdfFCB or NdfPCB.
-*     status
-*        The global status.
 
 *  Returned function value:
 *     A non-zero value is returned if the supplied object is valid, and
 *     zero if it is invalid.
 
 *  Notes:
-*     -  No error is reported if the supplied object is not valid.
+*     -  This function does not check the error status or report any error.
 
 *  Copyright:
-*      Copyright (C) 2017 East Asian Observatory
+*      Copyright (C) 2017-2019 East Asian Observatory
 *      All rights reserved.
 
 *  Licence:
@@ -66,6 +64,8 @@ int ndf1IsValid( NdfObject *object, int *status ) {
 *  History:
 *     31-JUL-2017 (DSB):
 *        Original version.
+*     29-APR-2020 (DSB):
+*        Remove error checking so that it can be used within clear-up code.
 
 *-
 */
@@ -78,8 +78,8 @@ int ndf1IsValid( NdfObject *object, int *status ) {
 /* Initialise */
    result = 0;
 
-/* Check inherited global status. */
-   if( *status != SAI__OK ) return result;
+/* Check the supplied pointer. */
+   if( !object ) return result;
 
 /* Get the type of the supplied object - DCB, ACB, FCB or PCB. This also
    helps to guard against random addresses being supplied since such are

@@ -108,7 +108,7 @@ int ndf1Expid( NdfObject *object, int *status ) {
 
 /* Chack that the supplied Object is valid and report an
    error if it is not. */
-   if( !ndf1IsValid( object, status ) ) {
+   if( !ndf1IsValid( object ) ) {
       *status = NDF__FATIN;
       errRep( " ", "Function ndf1Expid called with an invalid pointer "
               " (internal programming error).", status );
