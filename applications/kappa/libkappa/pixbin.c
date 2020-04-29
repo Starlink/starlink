@@ -450,13 +450,13 @@ F77_SUBROUTINE(pixbin)( INTEGER(status) ){
       iwcs = astFrameSet( astFrame( m + 1, "Domain=GRID" ), " " );
       astAddFrame( iwcs, AST__BASE, wcsmap, wcsfrm );
 
+/* Free the group. */
+      grpDelet( &grp, status );
+
 /* Store a null  FrameSet pointer if no WCS is required in the output. */
    } else {
       iwcs = NULL;
    }
-
-/* Free the group. */
-   grpDelet( &grp, status );
 
 /* To speed things up, create an array with the shape and size of the
    input array, holding the zero-based vector index of the m-dimensional
