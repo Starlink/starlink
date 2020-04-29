@@ -38230,10 +38230,10 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
    Places each pixel value in an input NDF into an output bin
 }{
    \sstdescription{
-      This application collects selected pixel values together from an
-      input NDF and places them into a single column of an output NDF.
-      Each such output column represents a ``bin'' into
-      which a subset of the input pixels is placed.
+      This application collects groups of pixel values together from an
+      input NDF and places each group into a single column of an output
+      NDF. Each such output column represents a ``bin'' into
+      which a group of input pixels is placed.
 
       If the input NDF has $N$ pixel axes, the user provides a set of $M$
       $N$-dimensional ``index'' NDFs (where $M$ is between 1
@@ -38262,9 +38262,12 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
       could then be used to get a representative value for each bin by
       collapsing this final pixel axis using any of the many estimators
       provided by COLLAPSE.
+
+      An extra group of $M$ NDFs can be supplied that define the WCS to
+      be stored in the output NDF --- see Parameter WCS.
    }
    \sstusage{
-      pixbin in out index
+      pixbin in out index [wcs]
    }
    \sstparameters{
       \sstsubsection{
@@ -38275,22 +38278,41 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
       \sstsubsection{
          INDEX = NDF (Read)
       }{
-         A group of index NDFs (all with $N$ dimensions). The number of
-         index NDFs supplied should be in the range 1--6 and determines
-         the dimensionality of the output NDF. A section is taken from
-         each one so that it matches the input NDF supplied by Parameter
-         IN. The data values in the $J$th index NDF are converted to
-         \_INTEGER (by finding the nearest integer) and then used as the
-         pixel indices on the $J$th output pixel axis.
+         A group of index NDFs (all with $N$-dimensions). The number of index
+         NDFs (referred to below as ``$M$'') supplied should be in the range
+         1-6 and determines the dimensionality of the output NDF. A section
+         is taken from each one so that it matches the input NDF supplied by
+         Parameter IN. The data values in the $J$th index NDF are
+         converted to \_INTEGER (by finding the nearest integer) and then
+         used as the pixel indices on the $J$th output pixel axis.
       }
       \sstsubsection{
          OUT = NDF (Write)
       }{
          The output NDF containing all the values from the input NDF
-         collected into a set of bins. This NDF will have $M+$1 pixel axes,
+         collected into a set of bins. This NDF will have $M+1$ pixel axes,
          where $M$ is the number of index NDF supplied using Parameter INDEX.
          The final pixel axis enumerates the individual input pixels that
          fall within each bin.
+      }
+      \sstsubsection{
+         WCS = NDF (Read)
+      }{
+         An optional group of NDFs (all with $N$-dimensions) that define the
+         WCS to be stored in the output NDF. The number of NDFs in this
+         group should be $M$, the number of index NDFs (see Parameter INDEX).
+         The data values in the $J$th WCS NDF determine the values
+         to be stored for the $J$th axis in the WCS of the output
+         NDF (the WCS values on the final trailing axis in the output NDF,
+         axis $M+1$, are just equal to pixel index). If a null (\texttt{!})
+         value is supplied, no WCS is stored in the output NDF. The WCS
+         values for each of the first $M$ output axes are described using a
+         look-up-table (one for each axis) that converts value in an index
+         NDF into the corresponding value in a WCS NDF. For all pixels with
+         the same integer index value, the mean of the corresponding WCS
+         values is found and stored in the look-up-table. The label and unit
+         for each axis is taken from the Label and Unit components of the
+         corresponding WCS NDF. \texttt{[!]}
       }
    }
    \sstexamples{

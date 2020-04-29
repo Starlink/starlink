@@ -15764,6 +15764,17 @@ iraf! {
             helpkey *
          }
 
+         parameter wcs {
+            position 4
+            type NDF
+            access READ
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            default !
+            prompt {A group of wcs NDFs}
+            helpkey *
+         }
+
       }
 
       action pixdupe {

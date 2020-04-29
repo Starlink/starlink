@@ -17,6 +17,7 @@
 
 /* Local data types */
 typedef struct  PixbinData {
+   double *lut;
    hdsdim *lbnd;
    hdsdim *olbnds;
    hdsdim *ubnd;
@@ -63,10 +64,10 @@ F77_SUBROUTINE(pixbin)( INTEGER(status) ){
 *        The global status.
 
 *  Description:
-*     This application collects selected pixel values together from an
-*     input NDF and places them into a single column of an output NDF.
-*     Each such output column represents a "bin" into which a subset
-*     of the input pixels is placed.
+*     This application collects groups of pixel values together from an
+*     input NDF and places each group into a single column of an output
+*     NDF. Each such output column represents a "bin" into which a group
+*     of input pixels is placed.
 *
 *     If the input NDF has N pixel axes, the user provides a set of M
 *     N-dimensional "index" NDFs (where M is between 1 and 6). For each
@@ -94,20 +95,23 @@ F77_SUBROUTINE(pixbin)( INTEGER(status) ){
 *     then be used to get a representative value for each bin by
 *     collapsing this final pixel axis using any of the many estimators
 *     provided by COLLAPSE.
+*
+*     An extra group of M NDFs can be supplied that define the WCS to
+*     be stored in the output NDF - see Parameter WCS.
 
 *  Usage:
-*     pixbin in out index
+*     pixbin in out index [wcs]
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *        The input N-dimensional NDF.
 *     INDEX = NDF (Read)
-*        A group of index NDFs (all with N dimensions). The number of
-*        index NDFs supplied should be in the range 1--6 and determines
-*        the dimensionality of the output NDF. A section is taken from
-*        each one so that it matches the input NDF supplied by Parameter
-*        IN. The data values in the J'th index NDF are converted to
-*        _INTEGER (by finding the nearest integer) and then used as the
+*        A group of index NDFs (all with N-dimensions). The number of index
+*        NDFs supplied (refered to below as M) should be in the range 1-6
+*        and determines the dimensionality of the output NDF. A section is
+*        taken from each one so that it matches the input NDF supplied by
+*        Parameter IN. The data values in the J'th index NDF are converted
+*        to _INTEGER (by finding the nearest integer) and then used as the
 *        pixel indices on the J'th output pixel axis.
 *     OUT = NDF (Write)
 *        The output NDF containing all the values from the input NDF
@@ -115,6 +119,22 @@ F77_SUBROUTINE(pixbin)( INTEGER(status) ){
 *        where M is the number of index NDF supplied using Parameter INDEX.
 *        The final pixel axis enumerates the individual input pixels that
 *        fall within each bin.
+*     WCS = NDF (Read)
+*        An optional group of NDFs (all with N-dimensions) that define the
+*        WCS to be stored in the output NDF. The number of NDFs in this group
+*        should be M, the number of index NDFs (see Parameter INDEX). The
+*        data values in the J'th WCS NDF determine the values to
+*        be stored for the J'th axis in the WCS of the output NDF (the WCS
+*        values on the final trailing axis in the output NDF - axis M+1 -
+*        are just equal to pixel index). If a null (!) value is supplied, no
+*        WCS is stored in the output NDF. The WCS values for each of the first
+*        M output axes are described using a look-up-table (one for each
+*        axis) that converts value in an index NDF into the corresponding
+*        value in a WCS NDF. For all pixels with the same integer index
+*        value, the mean of the corresponding WCS values is found and
+*        stored in the look-up-table. The label and unit for each axis is
+*        taken from the Label and Unit components of the corresponding WCS
+*        NDF. [!]
 
 *  Examples:
 *     pixbin m31 binned radius
@@ -167,12 +187,18 @@ F77_SUBROUTINE(pixbin)( INTEGER(status) ){
 *  History:
 *     21-APR-2020 (DSB):
 *        Original version.
+*     29-APR-2020 (DSB):
+*        Added parameter WCS.
 *     {enter_further_changes_here}
 
 *-
 */
 
 /* Local Variables: */
+   AstFrame *wcsfrm;         /* WCS Frame for output WCS FrameSet */
+   AstFrameSet *iwcs;        /* Output WCS FrameSet */
+   AstMapping *lm;           /* A single axis LutMap */
+   AstMapping *wcsmap;       /* GRID->WCS Mapping for output WCS FrameSet */
    Grp *grp;                 /* GRP identifier for configuration settings */
    PixbinData *job_data;     /* Pointer to all job data structures */
    PixbinData *pdata;        /* Pointer to single job data structure */
@@ -180,9 +206,12 @@ F77_SUBROUTINE(pixbin)( INTEGER(status) ){
    char *comps[ 3 ] = {"Data", "Variance", "Quality"}; /* Array names */
    char *ptrin;              /* Pointer to input array */
    char *ptrout;             /* Pointer to output array */
+   char attr[ 20 ];          /* AST attribute name */
    char badbuf[ 8 ];         /* Buffer for bad value bit pattern */
+   char cval[ 100 ];         /* Buffer for character string */
    char type[ DAT__SZTYP + 1 ];/* NDF data type */
    hdsdim lbnd[ NDF__MXDIM ];/* Lower pixel bounds of input NDF */
+   hdsdim odim[ NDF__MXDIM ];/* Length of each pixel axis in output NDF */
    hdsdim olbnd[ NDF__MXDIM ];/* Lower pixel bounds of output NDF */
    hdsdim oubnd[ NDF__MXDIM ];/* Upper pixel bounds of output NDF */
    hdsdim ubnd[ NDF__MXDIM ];/* Upper pixel bounds of input NDF */
@@ -296,7 +325,8 @@ F77_SUBROUTINE(pixbin)( INTEGER(status) ){
    error if the axis has zero length. */
          olbnd[ i ] = pdata->olbnd;
          oubnd[ i ] = pdata->oubnd;
-         if( olbnd[ i ] > oubnd[ i ] && *status == SAI__OK ) {
+         odim[ i ] = oubnd[ i ] - olbnd[ i ] + 1;
+         if( odim[ i ] < 1 && *status == SAI__OK ) {
             *status = SAI__ERROR;
             ndfMsg( "N", pdata->sndf );
             errRep( " ", "The parts of index NDF '^N' that overlap the "
@@ -308,20 +338,125 @@ F77_SUBROUTINE(pixbin)( INTEGER(status) ){
          pindex[ i ] = pdata->pindex;
 
 /* Update the total number of bins in the output NDF. */
-         nbin *= ( oubnd[ i ] - olbnd[ i ] + 1 );
+         nbin *= odim[ i ];
 
 /* Store the vector index strides between adjacent pixels on each output
    axis. */
          if( i == 0 ) {
             stride[ i ] = 1;
          } else {
-            stride[ i ] = stride[ i - 1 ]*( oubnd[ i - 1 ] - olbnd[ i - 1 ] + 1 );
+            stride[ i ] = stride[ i - 1 ]*odim[ i - 1 ];
          }
       }
    }
 
+/* Free the group. */
+   grpDelet( &grp, status );
+
 /* Re-instate the original value of the NDF rounding flag. */
    ndfTune( round, "ROUND", status );
+
+/* Get a group of WCS NDFs, anulling the error if null (!) is supplied. */
+   if( *status == SAI__OK ) {
+      kpg1Rgndf( "WCS", m, m, "", &grp, &size, status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+         size= 0;
+      }
+   } else {
+      size = 0;
+   }
+
+/* If a set of WCS NDFs was supplied, form the FrameSet to store in the
+   WCS component of the output NDF. */
+   if( size > 0 ) {
+
+/* Loop round each pair of (index,wcs) NDFs. */
+      for( i = 0; i < m; i++ ) {
+
+/* Get an identifier for the i'th WCS NDF (note, NDG uses one-based
+   indices). Unlock it so that the worker thread can lock it for its own
+   use. */
+         ndgNdfas( grp, i + 1, "READ", &tndf, status );
+         ndfUnlock( tndf, status );
+
+/* Store information to be passed to the worker thread. */
+         pdata = job_data + i;
+         pdata->operation = 3;
+         pdata->pindex = pindex[ i ];
+         pdata->tndf = tndf;
+         pdata->n = n;
+         pdata->lbnd = lbnd;
+         pdata->ubnd = ubnd;
+         pdata->olbnd = olbnd[ i ];
+         pdata->oubnd = oubnd[ i ];
+
+/* Submit the job to the worker thread. */
+         thrAddJob( wf, 0, pdata, pixbin_work, 0, NULL, status );
+      }
+
+/* Put the current thread to sleep until all the above jobs have
+   completed. */
+      thrWait( wf, status );
+
+/* Create a Frame to represent the WCS for all output axes. */
+      wcsfrm = astFrame( m + 1, "Domain=INDEX" );
+
+/* Gather results from all worker threads. */
+      for( i = 0; i < m; i++ ) {
+         pdata = job_data + i;
+
+/* Lock the NDF identifiers for use by this thread. */
+         ndfLock( pdata->tndf, status );
+
+/* Create a LutMap from the lut created by the worker thread. The input
+   to this Mapping is index value on axis "i" and the output is the
+   corresponding mean WCS value. */
+         lm = (AstMapping *) astLutMap( odim[ i ], pdata->lut, olbnd[ i ],
+                                        1.0, " " );
+
+/* Add it in parallel with the LutMaps from the previous axes. */
+         if( i == 0 ) {
+            wcsmap = lm;
+         } else {
+            wcsmap = (AstMapping *) astCmpMap( wcsmap, lm, 0, " " );
+         }
+
+/* Get the Label and Units from the WCS NDF and store them in the WCS
+   Frame. */
+         cval[ 0 ] = 0;
+         ndfCget( pdata->tndf, "Units", cval, sizeof(cval), status );
+         if( cval[ 0 ] ) {
+            sprintf( attr, "Unit(%d)", (int) i + 1 );
+            astSetC( wcsfrm, attr, cval );
+         }
+
+         cval[ 0 ] = 0;
+         ndfCget( pdata->tndf, "Label", cval, sizeof(cval), status );
+         if( cval[ 0 ] ) {
+            sprintf( attr, "Label(%d)", (int) i + 1 );
+            astSetC( wcsfrm, attr, cval );
+         }
+      }
+
+/* Store the label and Mapping for the final pixel axis in the output
+   NDF. */
+      sprintf( attr, "Label(%d)", (int) m + 1 );
+      astSetC( wcsfrm, attr, "Bin index" );
+      wcsmap = (AstMapping *) astCmpMap( wcsmap, astUnitMap( 1, " " ), 0, " " );
+
+/* Create A GRID Frame, put it into a new FrameSet and then add in the
+   WCS Frame. */
+      iwcs = astFrameSet( astFrame( m + 1, "Domain=GRID" ), " " );
+      astAddFrame( iwcs, AST__BASE, wcsmap, wcsfrm );
+
+/* Store a null  FrameSet pointer if no WCS is required in the output. */
+   } else {
+      iwcs = NULL;
+   }
+
+/* Free the group. */
+   grpDelet( &grp, status );
 
 /* To speed things up, create an array with the shape and size of the
    input array, holding the zero-based vector index of the m-dimensional
@@ -485,8 +620,10 @@ F77_SUBROUTINE(pixbin)( INTEGER(status) ){
       ndfSbnd( m + 1, olbnd, oubnd, indf2, status );
    }
 
+/* Store the output WCS FrameSet, if available. */
+   if( iwcs ) ndfPtwcs( iwcs, indf2, status );
+
 /* Free resources. */
-   grpDelet( &grp, status );
    binpop = astFree( binpop );
    job_data = astFree( job_data );
    vindex = astFree( vindex );
@@ -536,15 +673,21 @@ static void pixbin_work( void *job_data_ptr, int *status ){
 
 /* Local Variables: */
    PixbinData *pdata;
+   double *lut;
+   double *pw;
+   double *wcsptr;
    hdsdim *olbnd;
    int *pi;
    int *pin[ NDF__MXDIM ];
+   int *pop;
+   int dim;
    int hi;
    int i;
    int ii;
    int ix;
    int lo;
    int m;
+   int sndf;
    size_t *pvindex;
    size_t *stride;
    size_t el;
@@ -615,7 +758,6 @@ static void pixbin_work( void *job_data_ptr, int *status ){
          iv = 0;
          for( i = 0; i < m; i++ ) {
 
-
 /* Get the pixel index on output axis "i" for the current input pixel.
    Increment the pointer ready for the next input pixel. */
             ix = *( pin[ i ]++ );
@@ -636,6 +778,74 @@ static void pixbin_work( void *job_data_ptr, int *status ){
    ready for the next input pixel. */
          *(pvindex++) = iv;
       }
+
+/* Create a look-up-table giving WCS value on an output axis as a
+   function of integer index value on the axis. */
+   } else if( pdata->operation == 3 ) {
+
+/* Loak the supplied NDF identifier so it can be used in this thread. */
+      ndfLock( pdata->tndf, status );
+
+/* Get a section from it that matches the corresponding index array, and
+   map it's Data array as _DOUBLE. */
+      ndfSect( pdata->tndf, pdata->n, pdata->lbnd, pdata->ubnd, &sndf,
+               status );
+      ndfMap( sndf, "Data", "_DOUBLE", "Read", (void **) &wcsptr, &el,
+              status );
+
+/* Get the pixel index bounds of the corresponding output axis and its
+   length. */
+      lo = pdata->olbnd;
+      hi = pdata->oubnd;
+      dim = hi - lo + 1;
+
+/* Allocate an array to hold the sum of the WCS values corresponding to
+   each index value. Allocate a second array to count the number of
+   values summed for each index value. Use astCalloc so that they are
+   automatically initialised to hold zero. */
+      lut = astCalloc( dim, sizeof(*lut) );
+      pop = astCalloc( dim, sizeof(*pop) );
+
+/* Check we canb use the pointers safely. */
+      if( *status == SAI__OK ) {
+
+/* Loop round each pixel ihe (index,wcs) pair. */
+         pi = pdata->pindex;
+         pw = wcsptr;
+         for( j = 0; j < el; j++,pi++,pw++ ) {
+
+/* If both are good, increment the running sums needed to find the mean
+   WCS value for each index value. */
+            if( *pi != VAL__BADI && *pw != VAL__BADD ) {
+               if( *pi >= lo && *pi <= hi ) {
+                  lut[ *pi - lo ] += *pw;
+                  pop[ *pi - lo ]++;
+               }
+            }
+         }
+
+/* Normalise the lut values so that they become the mean WCS value for
+   each index value. */
+         for( j = 0; j < dim; j++ ) {
+            if( pop[ j ] > 0 ) {
+               lut[ j ] /= pop[ j ];
+            } else {
+               lut[ j ] = AST__BAD;
+            }
+         }
+      }
+
+/* Return the normalised lut and free the population array. */
+      pdata->lut = lut;
+      pop = astFree( pop );
+
+/* The tndf and sndf identifiers refer to the same base NDF. So unlocking
+   one (using ndfUnlock) will annull the other. The main thread needs to
+   make further use of tndf, so we unlock tndf. We also annull sndf for
+   good measure, although it is not strictly necessary since unlocking
+   tndf will annull sndf. */
+      ndfAnnul( &sndf, status );
+      ndfUnlock( pdata->tndf, status );
 
 /* Report an error for any other operation. */
    } else if( *status == SAI__OK ) {
