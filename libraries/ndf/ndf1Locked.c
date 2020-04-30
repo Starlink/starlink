@@ -18,7 +18,9 @@ int ndf1Locked( NdfACB *acb ){
 
 *  Description:
 *     This functions returns information about any lock on the
-*     supplied ACB.
+*     supplied ACB. The lock status of an ACB is inherited from the
+*     associated DCB. This means that all ACBs associated with the same
+*     DCB will have the same lock status.
 
 *  Parameters:
 *     acb

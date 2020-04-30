@@ -6,3 +6,8 @@ V2.1
 - A new tuning parameter called ROUND has been added that controls how
 floating-point values are converted to integer during automatic type
 conversion.
+
+- The behaviour of ndfUnlock has changed. Previously, calling ndfUnlock
+would automatically annull all other identifiers associated with the same
+base NDF. This no longer happens. Such identifiers can now be used safely
+once the original thread has regained the lock on the base NDF.

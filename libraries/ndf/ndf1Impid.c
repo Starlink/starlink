@@ -70,7 +70,7 @@ void ndf1Impid( int indf, NdfACB **acb, int *status ){
    *acb = (NdfACB *) ndf1Id2ac( indf, 1 );
 
 /* If a valid ACB pointer was not returned, then report an error. */
-   if( *acb == NULL ) {
+   if( !ndf1IsValid( (NdfObject *) *acb ) ) {
       *status = NDF__IDINV;
       msgSeti( "INDF", indf );
       errRep( " ", "NDF identifier invalid; its value is ^INDF (possible "

@@ -73,7 +73,7 @@ void ndfValid_( int indf, int *valid, int *status ){
 
 /* Note whether the attempt succeeded; it did not if a NULL value
    was returned. */
-   *valid = ( acb != NULL );
+   *valid = ndf1IsValid( (NdfObject *) acb );
 
 /* Restablish the original AST status pointer */
    NDF_FINAL

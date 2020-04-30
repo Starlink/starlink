@@ -10,7 +10,7 @@
 \stardocsource      {sun\stardocnumber}
 \stardocnumber      {33.12}
 \stardocauthors     {R.F.~Warren-Smith \& D.S.~Berry}
-\stardocdate        {21st April 2020}
+\stardocdate        {30st April 2020}
 \stardoctitle       {NDF \\ [\latex{1ex}]
                                 Routines for Accessing the\\
                                 Extensible N-Dimensional Data Format}
@@ -18633,30 +18633,34 @@ A locking contract means that:
 \item if a thread attempts to invoke a public NDF function to read, write
   or modify an NDF which it has not locked, an error is reported. The
   only exception is that ndfLock can be called on an NDF that is
-  not locked by any thread (i.e. has been unlocked previously using
-  ndfUnlock).
+  not locked by any thread (i.e. the identifier passed to ndfLock
+  has been unlocked previously using ndfUnlock).
 \end{itemize}
 
 Upon creation, an NDF is always locked by the current thread. The locker
 thread can at any time unlock the NDF by calling ndfUnlock on any
-identifier for the NDF (all other identifiers referring to the same base
-NDF are annulled at that point), allowing another thread subsequently to
-lock the NDF by calling ndfLock on the same identifier. An error is
-reported if the NDF is currently locked by a different thread. ndfUnlock
-will unlock both the NDF and (implicitly) all associated identifiers - an error
-is reported if the NDF is currently locked by another thread.
+identifier for the NDF\footnote{All other identifiers referring to the
+same base NDF remain valid but cannot be used without error until the
+original locker thread has regained the lock.}, allowing another thread
+subsequently to lock the NDF by calling ndfLock on the same identifier.
+An error is reported if the NDF is currently locked by a different thread.
+Calling ndfUnlock will unlock both the supplied identifier and the
+associated base NDF - an error is reported if the NDF is currently
+locked by another thread.
 
 A consequence of this is that an NDF identifier will become unsable
-if another identifier for the same base NDF is unlocked.
+if another identifier for the same base NDF is unlocked. However, the
+identifier will become usable again if the original thread regains the
+lock on the NDF.
 
 When an NDF identifier is unlocked, its associated context level is set
 to a special value indicating it is not in any context. All other
-identifiers for the same base NDF are annulled regardless of their
-context level. When an NDF identifier is locked, its associated context
-level is set to the current context level in the thread that locks it.
-The ndfEnd function only annuls NDF identifiers for base NDFs that are
-locked by the current thread. The function ndfReport will report the lock
-state of all currently active NDF identifiers.
+identifiers for the same base NDF are left unchanged. When an NDF
+identifier is locked, its associated context level is set to the current
+context level in the thread that locks it. The ndfEnd function only annuls
+NDF identifiers for base NDFs that are locked by the current thread. The
+function ndfReport will report the lock state of all currently active NDF
+identifiers.
 
 
 
@@ -18668,28 +18672,17 @@ in the C interface.
 \sstroutine{
    ndfLock
 }{
-   Lock an NDF for use by the current hread
+   Lock an NDF for use by the current thread
 }{
    \sstdescription{
-      This function locks the base NDF associated with the supplied
-      NDF identifier for sole use by the current thread. An error will
-      be reported if another thread subsequently attempts to access the
-      base NDF through any identifier.
+      This function locks the supplied NDF (both the supplied identifier
+      and the associated base NDF) for sole use by the current thread. An
+      error will be reported if the NDF is currently locked by another
+      thread. Consequently, the NDF should be unlocked using ndfUnlock
+      before calling this function.
    }
    \sstinvocation{
       void ndfLock( int indf, int $*$status )
-   }
-   \sstarguments{
-      \sstsubsection{
-         indf
-      }{
-         NDF identifier.
-      }
-      \sstsubsection{
-         $*$status
-      }{
-         The global status.
-      }
    }
    \sstnotes{
       \sstitemlist{
@@ -18699,10 +18692,6 @@ in the C interface.
          locked by the currently running thread.
 
          \sstitem
-          This function will report an error if the supplied NDF has not
-         previously been unlocked by calling function ndfUnlock.
-
-         \sstitem
           The supplied NDF identifier will be imported into the current NDF
          context within the currently running thread.
 
@@ -18710,6 +18699,20 @@ in the C interface.
           This function attempts to execute even if \texttt{"} status\texttt{"}  is set on
          entry, although no further error report will be made if it
          subsequently fails under these circumstances.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         indf
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         $*$status
+      }{
+         The global status.
       }
    }
 }
@@ -18810,28 +18813,26 @@ in the C interface.
    Unlock an NDF so it can then be locked by another thread
 }{
    \sstdescription{
-      This function unlocks the base NDF associated with the supplied
-      NDF identifier so that another thread can then lock it for its
-      own use using function ndfLock. An error will be reported if the
-      supplied NDF is currently locked by another thread.
+      This function unlocks the supplied NDF (both the supplied
+      identifier and the associated base NDF) so that another thread
+      can then lock it for its own use using function ndfLock. After
+      calling this function, an error will be reported if an attempt
+      is made to access the NDF in any way, either through the supplied
+      identifier or any other identifier that refers to the same base
+      NDF. There are however two exceptions to this rule:
 
-      All other NDF identifiers associated with the same base NDF are
-      annulled on exit from this function.
+      \sstitemlist{
+
+         \sstitem
+          An unlocked NDF identifier can be locked using ndfLock, allowing
+         the thread full access to the NDF using the locked identifier.
+
+         \sstitem
+          An unlocked NDF identifier can be annulled using ndfAnnul.
+      }
    }
    \sstinvocation{
       void ndfUnlock( int indf, int $*$status )
-   }
-   \sstarguments{
-      \sstsubsection{
-         indf
-      }{
-         NDF identifier.
-      }
-      \sstsubsection{
-         $*$status
-      }{
-         The global status.
-      }
    }
    \sstnotes{
       \sstitemlist{
@@ -18848,13 +18849,27 @@ in the C interface.
           The supplied NDF identifier will be removed from the NDF context
          associated with the currently running thread, and placed in a
          \texttt{"} null\texttt{"}  context that is ignored by the ndfEnd function. The
-         ndfReport function can be used to determine if any NDF
-         identifiers are currently in this \texttt{"} null\texttt{"}  context.
+         ndfReport function can be used to determine if any NDF identifiers
+         are currently in this \texttt{"} null\texttt{"}  context.
 
          \sstitem
           This function attempts to execute even if \texttt{"} status\texttt{"}  is set on
          entry, although no further error report will be made if it
          subsequently fails under these circumstances.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         indf
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         $*$status
+      }{
+         The global status.
       }
    }
 }
@@ -19561,7 +19576,7 @@ automatically when an application first calls an NDF function.
 to be locked for exclusive access by a single thread.
 \end{enumerate}
 
-\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V2.1}
+\subsection{Changes Introduced in V2.1}
 
 The following describes the most significant changes that occurred in
 the NDF\_ system between versions V2.0 and V2.1 (the current version):
@@ -19570,6 +19585,11 @@ the NDF\_ system between versions V2.0 and V2.1 (the current version):
    \item  A new tuning parameter called ROUND has been added that
           controls how floating-point values are converted to integer
           during automatic type conversion.
+   \item  The behaviour of ndfUnlock has changed. Previously, calling
+          ndfUnlock would automatically annull all other identifiers
+          associated with the same base NDF. This no longer happens.
+          Such identifiers can now be used safely once the original
+          thread has regained the lock on the base NDF.
 \end{enumerate}
 
 Existing applications should be re-compiled and re-linked.

@@ -77,8 +77,20 @@ void ndf1LockACB( NdfACB *acb, int *status ){
    errMark();
    *status = SAI__OK;
 
-/* Attempt to lock the DCB associated with the ACB. */
-   ndf1LockDCB( acb->dcb, status );
+/* Unlocking an ACB puts it into the INLIMBO context. If the supplied ACB
+   is in some other context, then it is currently locked. Report an error
+   unless it is locked by the current thread. */
+   if( acb->ctx != NDF__INLIMBO && ndf1Locked( acb ) != 1 ){
+      *status = NDF__THREAD;
+      ndf1Amsg( "NDF", acb );
+      errRepf( " ", "The supplied identifier (%d) for NDF '^NDF' has not "
+              "been unlocked (programming error).", status,
+              ((NdfObject *)acb)->check );
+
+/* Othrwise, attempt to lock the DCB associated with the ACB. */
+   } else {
+      ndf1LockDCB( acb->dcb, status );
+   }
 
 /* If successfull, lock all the ARY and HDS objects in the ACB. */
    if( *status == SAI__OK ) {

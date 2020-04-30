@@ -20,10 +20,9 @@ void ndf1UnlockACB( NdfACB *acb, int *status ){
 *     This function attempts to unlock the DCB associated with the
 *     supplied ACB so it can later be locked using ndf1LockACB by another
 *     thread. An error is reported if the DCB is currently locked by a
-*     thread other than the current thread. If successfull, all other
-*     ACBs associated with the same DCB are annulled. The context level
-*     stored in the supplied ACB is set to a special value, NDF__INLIMBO,
-*     indicating that the ACB is not in any context.
+*     thread other than the current thread. The context level stored in
+*     the supplied ACB is set to a special value, NDF__INLIMBO, indicating
+*     that the ACB is not in any context.
 
 *  Parameters:
 *     acb
@@ -64,15 +63,15 @@ void ndf1UnlockACB( NdfACB *acb, int *status ){
 *     29_APR-2020 (DSB):
 *        Unlock the mutex before calling ndf1Anl as it may attempt to
 *        lock the mutex.
+*     30-APR-2020 (DSB):
+*        Do not annull other ACBs that relate to the same DCB. Doing
+*        so causes too much unexpected behaviour at the application level.
 *-
 */
 
 /* Local variables: */
-   NdfACB *acbt;
    int astat;
    int i;
-   int islot;
-   int next;
    int tstat;
 
 /* Check an ACB pointer was supplied. */
@@ -85,23 +84,6 @@ void ndf1UnlockACB( NdfACB *acb, int *status ){
    tstat = *status;
    errMark();
    *status = SAI__OK;
-
-/* Loop to examine each active ACB, annulling any that refer to the
-   same DCB as the supplied ACB (except the supplied ACB itself). */
-   next = 0;
-   islot = -1;
-   NDF__ACB_LOCK_MUTEX;
-   acbt = ndf1Nxtsl( NDF__ACBTYPE, islot, &next, status );
-   while( ( *status == SAI__OK ) && ( next != -1 ) ){
-      islot = next;
-      if( acbt != acb && acbt->dcb == acb->dcb ) {
-         NDF__ACB_UNLOCK_MUTEX;
-         ndf1Anl( &acbt, &astat );
-         NDF__ACB_LOCK_MUTEX;
-      }
-      acbt = ndf1Nxtsl( NDF__ACBTYPE, islot, &next, status );
-   }
-   NDF__ACB_UNLOCK_MUTEX;
 
 /* Attempt to unlock the DCB associated with the ACB. */
    ndf1UnlockDCB( acb->dcb, status );

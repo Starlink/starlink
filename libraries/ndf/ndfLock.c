@@ -13,14 +13,15 @@ void ndfLock_( int indf, int *status ){
 *  Purpose:
 *     Lock an NDF for use by the current thread.
 
-*  Synopsis:
+*  Invocation:
 *     void ndfLock( int indf, int *status )
 
 *  Description:
-*     This function locks the base NDF associated with the supplied
-*     NDF identifier for sole use by the current thread. An error will
-*     be reported if another thread subsequently attempts to access the
-*     base NDF through any identifier.
+*     This function locks the supplied NDF (both the supplied identifier
+*     and the associated base NDF) for sole use by the current thread. An
+*     error will be reported if the NDF is currently locked by another
+*     thread. Consequently, the NDF should be unlocked using ndfUnlock
+*     before calling this function.
 
 *  Parameters:
 *     indf
@@ -31,8 +32,6 @@ void ndfLock_( int indf, int *status ){
 *  Notes:
 *     - This function returns without action if the NDF is already
 *     locked by the currently running thread.
-*     - This function will report an error if the supplied NDF has not
-*     previously been unlocked by calling function ndfUnlock.
 *     - The supplied NDF identifier will be imported into the current NDF
 *     context within the currently running thread.
 *     -  This function attempts to execute even if "status" is set on
@@ -84,7 +83,7 @@ void ndfLock_( int indf, int *status ){
    acb = (NdfACB *) ndf1Id2ac( indf, 1 );
 
 /* If a valid ACB pointer was not returned, then report an error. */
-   if( acb == NULL ) {
+   if( !ndf1IsValid( (NdfObject *) acb ) ) {
       *status = NDF__IDINV;
       msgSeti( "INDF", indf );
       errRep( " ", "NDF identifier invalid; its value is ^INDF (possible "

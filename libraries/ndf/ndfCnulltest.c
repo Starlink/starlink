@@ -64,7 +64,8 @@ int main( int argc, char *argv[] )
     name = "ndf_test";
     ndfOpen( NULL, name, "write", "new", &indf, &place, &status );
     ndfNewp( "_REAL", 2, dim, &place, &indf, &status );
-    ndfMap( indf, "Data", "_real", "write", &pntr, &el, &status );
+    printf("NDF Id is %d\n", indf );
+    ndfMap( indf, "Data", "_real", "write/zero", &pntr, &el, &status );
 
 
     /* Access some in-out parameters in dangerous ways */

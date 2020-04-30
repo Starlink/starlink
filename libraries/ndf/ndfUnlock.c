@@ -13,17 +13,22 @@ void ndfUnlock_( int indf, int *status ){
 *  Purpose:
 *     Unlock an NDF so it can then be locked by another thread.
 
-*  Synopsis:
+*  Invocation:
 *     void ndfUnlock( int indf, int *status )
 
 *  Description:
-*     This function unlocks the base NDF associated with the supplied
-*     NDF identifier so that another thread can then lock it for its
-*     own use using function ndfLock. An error will be reported if the
-*     supplied NDF is currently locked by another thread.
+*     This function unlocks the supplied NDF (both the supplied
+*     identifier and the associated base NDF) so that another thread
+*     can then lock it for its own use using function ndfLock. After
+*     calling this function, an error will be reported if an attempt
+*     is made to access the NDF in any way, either through the supplied
+*     identifier or any other identifier that refers to the same base
+*     NDF. There are however two exceptions to this rule:
 *
-*     All other NDF identifiers associated with the same base NDF are
-*     annulled on exit from this function.
+*     - An unlocked NDF identifier can be locked using ndfLock, allowing
+*     the thread full access to the NDF using the locked identifier.
+*
+*     - An unlocked NDF identifier can be annulled using ndfAnnul.
 
 *  Parameters:
 *     indf
@@ -39,8 +44,8 @@ void ndfUnlock_( int indf, int *status ){
 *     - The supplied NDF identifier will be removed from the NDF context
 *     associated with the currently running thread, and placed in a
 *     "null" context that is ignored by the ndfEnd function. The
-*     ndfReport function can be used to determine if any NDF
-*     identifiers are currently in this "null" context.
+*     ndfReport function can be used to determine if any NDF identifiers
+*     are currently in this "null" context.
 *     -  This function attempts to execute even if "status" is set on
 *     entry, although no further error report will be made if it
 *     subsequently fails under these circumstances.
@@ -71,6 +76,10 @@ void ndfUnlock_( int indf, int *status ){
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version.
+*     30-APR-2020 (DSB):
+*        Do not annull other identifiers that relate to the same base
+*        NDF. Doing so causes too much unexpected behaviour at the
+*        application level.
 
 *-
 */
@@ -87,8 +96,11 @@ void ndfUnlock_( int indf, int *status ){
 /* Import the NDF identifier. */
    ndf1Impid( indf, &acb, status );
 
-/* Attempt to unlock the ACB. */
-   ndf1UnlockACB( acb, status );
+/* Attempt to unlock the ACB. This will attempt to function even if an
+   error occurred in ndf1Impid above. But if the identifier is invalid
+   then we should not try to change it. So check the error status
+   explicitly before calling ndf1UnlockACB. */
+   if( *status == SAI__OK ) ndf1UnlockACB( acb, status );
 
 /* If an error occurred, report context information and call the error
    tracing function. */

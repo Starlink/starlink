@@ -170,7 +170,8 @@ int main( int argc, char *argv[] ) {
 /* Unlock the NDF so  it can be accessed from another thread. */
    ndfUnlock( indf, &status );
 
-/* Check an error is reported if we now access the NDF in this thread. */
+/* Check an error is reported if we now access the NDF using the same
+   identifier in this thread. */
    if( status == SAI__OK ) {
       ndfSize( indf, &el, &status );
       if( status == NDF__THREAD ) {
@@ -187,17 +188,54 @@ int main( int argc, char *argv[] ) {
       }
    }
 
-/* Check the cloned identifier is no longer valid, now that the base NDF
-   has been unlocked. */
+/* Check the cloned identifier is still valid, even though the base NDF
+   has been unlocked. The id is still valid but using it will result in
+   an error because the base NDF is unlocked. */
    ndfValid( indf2, &valid, &status );
-   if( valid && status == SAI__OK ) {
+   if( !valid && status == SAI__OK ) {
       status = SAI__ERROR;
-      errRep( " ", "NDF is unexpectedly valid.", &status );
+      errRep( " ", "NDF is unexpectedly invalid.", &status );
    }
 
-/* Do something with the NDF in another thread. Use the identifier that
-   was unlocked - it should be the only identifier for the NDF that is
-   still valid. */
+/* Check an error is reported if we now access the NDF using the clone
+   identifier in this thread. */
+   if( status == SAI__OK ) {
+      ndfSize( indf2, &el, &status );
+      if( status == NDF__THREAD ) {
+         errAnnul( &status );
+      } else if( status != SAI__OK ){
+         errFlush( &status );
+         status = SAI__ERROR;
+         errRep( " ", "Expected error NDF__THREAD from cloned id but got a different error.",
+                 &status );
+      } else {
+         status = SAI__ERROR;
+         errRep( " ", "Expected error NDF__THREAD from cloned id but got no error.",
+                 &status );
+      }
+   }
+
+/* Try to do something with the NDF in another thread using the cloned
+   identifier. It should report an error because the cloned identifier has
+   not been unlocked. */
+   if( status == SAI__OK ) {
+      UseInThread( indf2, &status );
+      if( status == NDF__THREAD ){
+         errAnnul( &status );
+      } else if( status != SAI__OK ){
+         errFlush( &status );
+         status = SAI__ERROR;
+         errRep( " ", "Expected error NDF__THREAD but got a different error.",
+                 &status );
+      } else {
+         status = SAI__ERROR;
+         errRep( " ", "Expected error NDF__THREAD but got no error.",
+                 &status );
+      }
+   }
+
+/* Do something with the NDF in another thread using the identifier that
+   was unlocked. This should work OK. */
    UseInThread( indf, &status );
 
 /* Check an error is still reported if we access the NDF in this thread. */
@@ -220,8 +258,10 @@ int main( int argc, char *argv[] ) {
 /* Lock the NDF so it can be accessed from this thread. */
    ndfLock( indf, &status );
 
-/* Check no error is reported if we access the NDF in this thread. */
+/* Check no error is reported if we access the NDF in this thread, using
+   either identifer. */
    ndfSize( indf, &el, &status );
+   ndfSize( indf2, &el, &status );
 
 /* Clean up.                                                                */
    ndfAnnul( &indf, &status );
@@ -365,7 +405,7 @@ static void *threadLocking( void *data ) {
    int ival;
    int status = SAI__OK;
 
-/* Check the NDF is not locked. */
+/* Check the base NDF is not locked. */
    if( ndfLocked( tdata->indf, &status ) != 0 ) {
       if( status == SAI__OK ) {
          status = SAI__ERROR;
@@ -379,12 +419,12 @@ static void *threadLocking( void *data ) {
 /* Unless this is test0, lock it for use by the current thread. */
    if( tdata->test > 0 ) ndfLock( tdata->indf, &status );
 
-/* Check we have one active NDF identifier. */
+/* Check we have two active NDF identifiers. */
    ival = ndfReport( 1, &status );
-   if( ival != 1 && status == SAI__OK ){
+   if( ival != 2 && status == SAI__OK ){
       status = SAI__ERROR;
       msgSeti( "N", ival );
-      errRep( " ", "Incorrect no. of active NDFs (^N != 1 ).", &status );
+      errRep( " ", "Incorrect no. of active NDFs (^N != 2 ).", &status );
    }
 
 /* Check that the form is still SCALED. */
