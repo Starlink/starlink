@@ -96,7 +96,7 @@
 *        only a mildly skew unimodal distribution.  This often applies
 *        to an image of the sky.
 *
-*        ["Moments"]
+*        ["Pearson"]
 *     MINCOORD( ) = _DOUBLE (Write)
 *        A one-dimensional array of values giving the WCS co-ordinates
 *        of the centre of the (first) minimum-valued pixel found in the
