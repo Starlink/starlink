@@ -1061,9 +1061,10 @@ try:
          invoke( "$POLPACK_DIR/polimage in={0} out={1} coldat=D{2} box=1".
                  format( cat, dvcat, iqu ) )
 
-#  Get the data units string.
+#  Get the data units string and pixel size (in arc-sec).
          invoke( "$KAPPA_DIR/ndftrace ndf={0}".format(dvcat) )
          units = get_task_par( "units", "ndftrace" )
+         pixsize = float( get_task_par( "fpixscale(1)", "ndftrace" ) )
 
 #  If this is the first Stokes parameter, align the exposure time map
 #  with the catalogue map (since it may use a different pixel size).
@@ -1106,7 +1107,7 @@ try:
 
 #  Now get the stats of the remaining values, doing a single 3-sigma clip to
 #  remove outliers.
-         invoke( "$KAPPA_DIR/stats ndf={0} clip=3".format(exptime) )
+         invoke( "$KAPPA_DIR/stats ndf={0} clip=3".format(snr_cut) )
          sigma = float( get_task_par( "sigma", "stats" ) )
 
 #  Now fill holes in the original SNR map (mainly the blanks map corners)
@@ -1194,13 +1195,26 @@ try:
 #  Get the residual noise values left after subtracting the background
 #  component from the original noise values, and convert them into
 #  relative values (i.e. fractions of the background component value).
+#  Mask using the exposure time mask. This removes a thin rim round the
+#  edges of the map.
          resids = NDG( 1 )
-         invoke( "$KAPPA_DIR/maths exp=\"'(ia-ib)/ib'\" ia={0} "
-                 "ib={1} out={2}". format( dvcat, background_comp, resids ) )
+         invoke( "$KAPPA_DIR/maths exp=\"'(ia-ib)/ib+0*ic'\" ia={0} "
+                 "ib={1} ic={2} out={3}". format( dvcat, background_comp,
+                                                  expmask, resids ) )
 
-#  Get an estimate of the background noise in the resids map.
-         invoke( "$KAPPA_DIR/stats ndf={0} clip=\[2,2,2\]".format(resids) )
+#  Get an estimate of the background noise in the resids map, first
+#  masking it to remove the source regions.
+         resids2 = NDG(1)
+         invoke( "$KAPPA_DIR/copybad in={0} out={1} ref={2}".
+                 format(resids,resids2,dvcat_masked) )
+         invoke( "$KAPPA_DIR/stats ndf={0} clip=\[2,2,2\]".format(resids2) )
          sigma = float( get_task_par( "sigma", "stats" ) )
+
+#  Remove all background pixels from the original resids map produced by
+#  maths above (i.e. before the sources were masked out).
+         resids3 = NDG(1)
+         invoke( "$KAPPA_DIR/copybad in={0} out={1} invert=yes ref={2}".
+                 format(resids,resids3,mask0) )
 
 #  Use FellWalker to find islands of significant emission in the resids
 #  map.
@@ -1212,11 +1226,13 @@ try:
          fd.write("FellWalker.MaxJump=1\n")
          fd.write("FellWalker.MaxBad=0.1\n")
          fd.write("FellWalker.MinHeight=4*RMS\n")
+         fd.write("FellWalker.Fwhmbeam={0}\n".format(12/pixsize))
+         fd.write("FellWalker.MinPix={0}\n".format(round(4*((12/pixsize)**2))))
          fd.close()
          islands = NDG( 1 )
          invoke("$CUPID_DIR/findclumps in={0} out={1} method=fellwalker "
                 "rms={2} outcat=! config=^{3}".
-                format( resids, islands, sigma, conf_fw ))
+                format( resids3, islands, sigma, conf_fw ))
 
 #  See how many islands were found.
          nisland = int( get_task_par( "nclumps", "findclumps" ) )
@@ -1225,11 +1241,13 @@ try:
          conf_gc = NDG.tempfile()
          fd = open( conf_gc, "w" )
          fd.write( "GaussClumps.allowedge=1\n" )
-         fd.write( "GaussClumps.maxbad=0.9\n" )
+         fd.write( "GaussClumps.maxbad=1\n" )
          fd.write( "GaussClumps.rfctol=0.001\n" )
+         fd.write( "GaussClumps.sa=2\n" )
          fd.write( "GaussClumps.maxfn=200\n" )
-         fd.write( "GaussClumps.fwhmbeam=1.2\n" )
-         fd.write( "GaussClumps.thresh=1\n" )
+         fd.write( "GaussClumps.fwhmbeam=0.4\n")
+         fd.write( "GaussClumps.thresh=0.5\n" )
+         fd.write( "GaussClumps.modellim=0.1\n" )
          fd.close()
 
 #  Loop round each island found by fellwalker
