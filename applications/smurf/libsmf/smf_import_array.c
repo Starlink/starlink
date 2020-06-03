@@ -16,7 +16,7 @@
 *     void smf_import_array( ThrWorkForce *wf, smfData *refdata,
 *                            const char *dumpdir, const char *name, int bad,
 *                            int expand, smf_dtype type, void *dataptr,
-*                            int *status )
+*                            int *lut_lbnd, int *lut_ubnd, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -48,6 +48,16 @@
 *        The array in which to store the imported NDF data values. Must
 *        have the same dimensions as "refdata" (butmay have a different
 *        data type).
+*     lut_lbnd = int * (Given)
+*        If a LUT is being imported, this should be a pointer to the
+*        lower bounds of the map to which the values in the LUT refer.
+*        An error is reported if the supplied NDF holds a LUT that refers
+*        to a map with different bounds. Ignored if NULL.
+*     lut_ubnd = int * (Given)
+*        If a LUT is being imported, this should be a pointer to the
+*        upper bounds of the map to which the values in the LUT refer.
+*        An error is reported if the supplied NDF holds a LUT that refers
+*        to a map with different bounds. Ignored if NULL.
 *     status = int * (Given and Returned)
 *        Pointer to global status.
 
@@ -88,6 +98,8 @@
 *        array using linear interpolation. This bug could cause catastrophically
 *        bad values to be inserted into the EXT model when running
 *        skyloop, if the original EXT model had any bad values.
+*     3-JUN-2020 (DSB):
+*        Added arguments lut_lbnd and lut_ubnd.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -146,21 +158,25 @@ typedef struct smfImportArrayData {
 
 void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *dumpdir,
                        const char *name, int bad, int expand, smf_dtype type,
-                       void *dataptr, int *status ){
+                       void *dataptr, int *lut_lbnd, int *lut_ubnd, int *status ){
 
 /* Local Variables: */
    Grp *igrp;                  /* Group holding NDF name */
-   SmfImportArrayData *job_data = NULL;
    SmfImportArrayData *pdata;
-   const char *cname;
+   SmfImportArrayData *job_data = NULL;
    char *ename;
    const char *bn;
+   const char *cname;
    dim_t nbolo;                /* Number of bolometers */
    dim_t nel;                  /* Number of elements in array */
    dim_t ntslice;              /* Number of time slices */
-   int nc;
    int iw;
+   int lbndx;
+   int lbndy;
+   int nc;
    int nw;
+   int ubndx;
+   int ubndy;
    size_t bstride;             /* Stride between bolometer values */
    size_t i;                   /* Loop count */
    size_t istep;
@@ -250,6 +266,41 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *dumpdir,
                errRepf( " ", "NDF '%s' has incorrect lower bound %d on "
                         "pixel axis %zu - should be %d.", status,
                         cname, data->lbnd[i], i + 1, refdata->lbnd[i] );
+            }
+         }
+      }
+
+/* If LUT bounds have been supplied, check the bounds in the supplied NDF
+   match the supplied bounds. */
+      if( lut_lbnd || lut_ubnd ) {
+         if( !lut_lbnd || !lut_ubnd ) {
+            if( *status == SAI__OK ) {
+               *status = SAI__ERROR;
+               errRep( " ", "smf_import_array: called with one and only "
+                       "one of lut_lbnd and lut_ubnd supplied - "
+                       "programming error.", status );
+            }
+
+         } else {
+            ndfXgt0i( data->file->ndfid, SMURF__EXTNAME, "LUT_LBNDX",
+                      &lbndx, status );
+            ndfXgt0i( data->file->ndfid, SMURF__EXTNAME, "LUT_LBNDY",
+                      &lbndy, status );
+            ndfXgt0i( data->file->ndfid, SMURF__EXTNAME, "LUT_UBNDX",
+                      &ubndx, status );
+            ndfXgt0i( data->file->ndfid, SMURF__EXTNAME, "LUT_UBNDY",
+                      &ubndy, status );
+
+            if( lbndx != lut_lbnd[ 0 ] || ubndx != lut_ubnd[ 0 ] ||
+                lbndy != lut_lbnd[ 1 ] || ubndy != lut_ubnd[ 1 ] ){
+               if( *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  errRepf( " ", "NDF '%s' holds a LUT that refers to a map "
+                           "with bounds (%d:%d,%d:%d) but the map being created "
+                           "has bounds (%d:%d,%d:%d).", status, cname, lbndx,
+                            ubndx, lbndy, ubndy, lut_lbnd[ 0 ], lut_ubnd[ 0 ],
+                            lut_lbnd[ 1 ], lut_ubnd[ 1 ] );
+               }
             }
          }
       }

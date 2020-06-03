@@ -1513,7 +1513,8 @@ void smf_history_read( smfData* data, int *status);
 void smf_history_write( const smfData* data, int *status);
 
 void smf_import_array( ThrWorkForce *wf,  smfData *refdata, const char *dumpdir, const char *name, int bad,
-                       int expand, smf_dtype type, void *dataptr, int *status );
+                       int expand, smf_dtype type, void *dataptr, int *lut_lbnd,
+                       int *lut_ubnd, int *status );
 
 int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
                     smfData *qua, double *dataptr, int *status );

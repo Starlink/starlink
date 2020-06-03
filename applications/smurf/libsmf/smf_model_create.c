@@ -233,8 +233,8 @@
 *     2015-06-15 (DSB):
 *        Added PCA.
 *     2018-03-15 (DSB):
-*        Read existing model data from NDFs stored in the directory specified 
-*        by the config parameter "dumpdir", rather than from the current 
+*        Read existing model data from NDFs stored in the directory specified
+*        by the config parameter "dumpdir", rather than from the current
 *        directory.
 *     {enter_further_changes_here}
 
@@ -557,7 +557,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                  msgOutiff( MSG__VERB, "", FUNC_NAME ": using external LUT "
                            "model imported from '%s'.", status, ename );
                  smf_import_array( wf, idata, dumpdir, ename, 0, 0, SMF__INTEGER,
-                                   idata->lut, status );
+                                   idata->lut, lbnd_out, ubnd_out, status );
                  ename = astFree( ename );
 
               /* If calculating new LUT values here... */
@@ -1165,7 +1165,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                  msgOutiff( MSG__VERB, "", FUNC_NAME ": using external EXT "
                            "model imported from '%s'.", status, ename );
                  smf_import_array( wf, idata, dumpdir, ename, 2, 1, idata->dtype,
-                                   dataptr, status );
+                                   dataptr, NULL, NULL, status );
                  ename = astFree( ename );
 
               /* If calculating new EXT values here... */

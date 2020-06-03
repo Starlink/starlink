@@ -628,6 +628,7 @@ void _smf_iteratemap_showmem( int *status ) {
 
 /* Prototypes for local static functions. */
 static void smf1_iteratemap( void *job_data_ptr, int *status );
+static void smf1_storebnds( ThrWorkForce *wf, int indf, void *info, int *status );
 
 /* Local data types */
 typedef struct smfIterateMapData {
@@ -3443,12 +3444,14 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
               }
 
 
-            /* LUT is stored in a separate NDF. */
+            /* LUT is stored in a separate NDF. Store the pixel bounds of
+               the map to which the LUT relates inside the SMURF
+               extension of the NDF. */
               lut_data = (lut[0]->sdata[idx]->pntr)[0];
 
               if( exportNDF_which[nmodels+2] ) {
                 if( (res[0]->sdata[idx]->file->name)[0] ) {
-
+                  int *info[2];
                   smf_model_createHdr( lut[0]->sdata[idx], SMF__RES, refdata,
                                        status );
                   *name = 0;
@@ -3456,8 +3459,11 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
                   smf_stripsuffix( res[0]->sdata[idx]->file->name,
                                    SMF__DIMM_SUFFIX, name + strlen(name), status );
                   one_strlcat( name, "_lut", sizeof( name ), status );
+                  info[ 0 ] = lbnd_out;
+                  info[ 1 ] = ubnd_out;
                   smf_write_smfData( wf, lut[0]->sdata[idx], NULL, name, NULL, 0,
-                                     NDF__NOID, MSG__VERB, 0, NULL, NULL, status );
+                                     NDF__NOID, MSG__VERB, 0, smf1_storebnds, info,
+                                     status );
                 } else {
                   msgOut( " ",
                           "SMF__ITERATEMAP: Can't export LUT -- NULL filename",
@@ -3992,5 +3998,59 @@ static void smf1_iteratemap( void *job_data_ptr, int *status ) {
                status, pdata->operation );
    }
 
+}
+
+
+static void smf1_storebnds( ThrWorkForce *wf, int indf, void *info,
+                            int *status ){
+/*
+*  Name:
+*     smf1_storebnds
+
+*  Purpose:
+*     Called by smf_write_smfArray to store the map bounds in the
+*     SMURF extension of an output NDF.
+
+*  Invocation:
+*     smf1_storebnds( ThrWorkForce *wf, int indf, void *info, int *status )
+
+*  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
+*     indf = ThrWorkForce * (Given)
+*        The identifier for the NDF in which to store the extra info.
+*     info = void * (Given)
+*        Pointer to the info to store. This should be a pointer to an
+*        array of two "dim_t *" pointers. The first should point to an
+*        array of 2 lower bounds, and the second to an array of 2 upper bounds.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   HDSLoc *xloc = NULL;
+   int **bnds;
+   int there;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Create the extension if it does not already exist. */
+   ndfXstat( indf, SMURF__EXTNAME, &there, status );
+   if( !there ) {
+      ndfXnew( indf, SMURF__EXTNAME, SMURF__EXTTYPE,
+               0, NULL, &xloc, status );
+      datAnnul( &xloc, status );
+   }
+
+/* Store the bounds in the SMURF extension. */
+   bnds = (int **) info;
+   ndfXpt0i( bnds[ 0 ][ 0 ], indf, SMURF__EXTNAME, "LUT_LBNDX", status );
+   ndfXpt0i( bnds[ 0 ][ 1 ], indf, SMURF__EXTNAME, "LUT_LBNDY", status );
+   ndfXpt0i( bnds[ 1 ][ 0 ], indf, SMURF__EXTNAME, "LUT_UBNDX", status );
+   ndfXpt0i( bnds[ 1 ][ 1 ], indf, SMURF__EXTNAME, "LUT_UBNDY", status );
+
+/* Annul the locator/. */
 }
 

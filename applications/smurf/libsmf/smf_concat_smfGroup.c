@@ -1312,7 +1312,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
         msgOutiff( MSG__VERB, "", FUNC_NAME ": using external LUT "
                   "model imported from '%s'.", status, ename );
         smf_import_array( wf, data, dumpdir, ename, 0, 0, SMF__INTEGER,
-                          data->lut, status );
+                          data->lut, lbnd_out, ubnd_out, status );
         ename = astFree( ename );
         data->onmap = 1;
       }
