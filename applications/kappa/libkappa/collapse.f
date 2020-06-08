@@ -109,7 +109,8 @@
 *          "FGood"  -- Fraction of good pixel values.
 *          "Integ"  -- Integrated value, being the sum of the products
 *                      of the value and pixel width in world
-*                      co-ordinates.
+*                      co-ordinates.  Note that for sky co-ordinates the
+*                      pixel width is measured in radians.
 *          "Iwc"    -- Intensity-weighted co-ordinate, being the sum of
 *                      each value times its co-ordinate, all divided by
 *                      the integrated value (see the "Integ" option).
