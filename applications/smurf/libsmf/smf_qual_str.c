@@ -74,6 +74,9 @@
 *     2015-010-12 (DSB):
 *        Define SMF__Q_FILT and SMF__Q_BADEF to be the same value
 *        (SMF__Q_GENERIC) in order to keep total number of bits below 17).
+*     2020-06-08 (DSB):
+*        Correct comments stored with FLT, COM and PCA mask quality bit
+*        definitions.
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Science & Technology Facilities Council.
@@ -232,17 +235,17 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
 
     case SMF__MAPQ_FLT:
       retval = "FLT";
-      ldescr = "Set iff FLT model is blanked at the output pixel";
+      ldescr = "Set iff FLT model is not blanked at the output pixel";
       break;
 
     case SMF__MAPQ_COM:
       retval = "COM";
-      ldescr = "Set iff COM model is blanked at the output pixel";
+      ldescr = "Set iff COM model is not blanked at the output pixel";
       break;
 
     case SMF__MAPQ_PCA:
       retval = "PCA";
-      ldescr = "Set iff PCA model is blanked at the output pixel";
+      ldescr = "Set iff PCA model is not blanked at the output pixel";
       break;
 
     default:
