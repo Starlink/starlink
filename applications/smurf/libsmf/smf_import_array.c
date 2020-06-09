@@ -282,17 +282,29 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *dumpdir,
             }
 
          } else {
+            lbndx = VAL__BADI;
             ndfXgt0i( data->file->ndfid, SMURF__EXTNAME, "LUT_LBNDX",
                       &lbndx, status );
+            lbndy = VAL__BADI;
             ndfXgt0i( data->file->ndfid, SMURF__EXTNAME, "LUT_LBNDY",
                       &lbndy, status );
+            ubndx = VAL__BADI;
             ndfXgt0i( data->file->ndfid, SMURF__EXTNAME, "LUT_UBNDX",
                       &ubndx, status );
+            ubndy = VAL__BADI;
             ndfXgt0i( data->file->ndfid, SMURF__EXTNAME, "LUT_UBNDY",
                       &ubndy, status );
 
-            if( lbndx != lut_lbnd[ 0 ] || ubndx != lut_ubnd[ 0 ] ||
-                lbndy != lut_lbnd[ 1 ] || ubndy != lut_ubnd[ 1 ] ){
+            if( lbndx == VAL__BADI || lbndy == VAL__BADI ||
+                ubndx == VAL__BADI || ubndy == VAL__BADI ) {
+               if( *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  errRepf( " ", "NDF '%s' holds a LUT but does not "
+                           "contain the LUT bounds.", status );
+               }
+
+            } else if( lbndx != lut_lbnd[ 0 ] || ubndx != lut_ubnd[ 0 ] ||
+                       lbndy != lut_lbnd[ 1 ] || ubndy != lut_ubnd[ 1 ] ){
                if( *status == SAI__OK ) {
                   *status = SAI__ERROR;
                   errRepf( " ", "NDF '%s' holds a LUT that refers to a map "
