@@ -4051,6 +4051,5 @@ static void smf1_storebnds( ThrWorkForce *wf, int indf, void *info,
    ndfXpt0i( bnds[ 1 ][ 0 ], indf, SMURF__EXTNAME, "LUT_UBNDX", status );
    ndfXpt0i( bnds[ 1 ][ 1 ], indf, SMURF__EXTNAME, "LUT_UBNDY", status );
 
-/* Annul the locator/. */
 }
 
