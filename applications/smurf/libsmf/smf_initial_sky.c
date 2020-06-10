@@ -84,10 +84,17 @@
 *     10-APR-2018 (DSB):
 *        Added parameter "chunkfactor".
 *     13-FEB-2020 (DSB):
-*        Annull the error if the supplied map contains a quality component 
-*        but does not contain any quality name information to define the use 
+*        Annull the error if the supplied map contains a quality component
+*        but does not contain any quality name information to define the use
 *        of each quality bit. In such cases, the quality array is probably full
 *        of zeros and so can be ignored.
+*     10-JUN-2020 (DSB):
+*        - Ignore quality values that do not correspond to a good data
+*        value. This is because they can be spurious (e.g. created by
+*        mosaicing a set of other maps using picard) but will still trigger
+*        the creating of a mask, which may mask out the bulk of the map.
+*        - Use sections from the WEIGHTS and EXP_TIME NDFs that match the
+*        main NDF.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -227,6 +234,7 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
       if( there ) {
          double *tptr;
          int tndf;
+         int tndf2;
          HDSLoc *xloc = NULL;
          ndfXgt0i( indf1, SMURF__EXTNAME, "NUMITER", iters, status );
 
@@ -235,23 +243,27 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
 
 /* Copy the WEIGHTS NDF from the SMURF extension to the mapweight buffer in "dat". */
          ndfFind( xloc, "WEIGHTS", &tndf, status );
-         ndfMap( tndf, "DATA", "_DOUBLE", "READ", (void **) &tptr, &nel, status );
+         ndfSect( tndf, 2, dat->lbnd_out, dat->ubnd_out, &tndf2, status );
+         ndfMap( tndf2, "DATA", "_DOUBLE", "READ", (void **) &tptr, &nel, status );
          if( *status == SAI__OK ) {
             memcpy( dat->mapweight, tptr, dat->msize*sizeof(*tptr));
          }
+         ndfAnnul( &tndf2, status );
          ndfAnnul( &tndf, status );
 
 /* Copy the EXP_TIME NDF from the SMURF extension to the hitsmaps buffer in
    "dat". Use the step time in the supplied smfData to convert from time
    to hits. */
          ndfFind( xloc, "EXP_TIME", &tndf, status );
-         ndfMap( tndf, "DATA", "_DOUBLE", "READ", (void **) &tptr, &nel, status );
+         ndfSect( tndf, 2, dat->lbnd_out, dat->ubnd_out, &tndf2, status );
+         ndfMap( tndf2, "DATA", "_DOUBLE", "READ", (void **) &tptr, &nel, status );
          if( *status == SAI__OK ) {
             double steptime = dat->res[0]->sdata[0]->hdr->steptime;
             for( i = 0; i < dat->msize; i++ ) {
                dat->hitsmap[ i ] =  (int) ( tptr[ i ]/steptime + 0.5 );
             }
          }
+         ndfAnnul( &tndf2, status );
          ndfAnnul( &tndf, status );
 
 /* Annul the SMURF extension locator. */
@@ -265,35 +277,38 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
    over-written if the masks have been frozen by xxx.zero_freeze. */
       ndfState( indf2, "Quality", &there, status );
       if( there && dat->mapqual ) {
+         ptr = dat->map;
          smf_qual_t *qarray = smf_qual_map( wf, indf2, "Read", NULL, &junk,
                                             status );
          if( *status == SAI__OK ) {
             smf_qual_t *pq = qarray;
-            for( i = 0; i < dat->msize; i++,pq++ ) {
-               if( *pq & SMF__MAPQ_AST ) {
-                  if( !dat->ast_mask ) dat->ast_mask = astCalloc( dat->msize,
-                                                  sizeof( *(dat->ast_mask) ) );
-                  (dat->ast_mask)[ i ] = 1;
-               }
-               if( *pq & SMF__MAPQ_FLT ) {
-                  if( !dat->flt_mask ) dat->flt_mask = astCalloc( dat->msize,
-                                                  sizeof( *(dat->flt_mask) ) );
-                  (dat->flt_mask)[ i ] = 1;
-               }
-               if( *pq & SMF__MAPQ_COM ) {
-                  if( !dat->com_mask ) dat->com_mask = astCalloc( dat->msize,
-                                                  sizeof( *(dat->com_mask) ) );
-                  (dat->com_mask)[ i ] = 1;
-               }
-               if( *pq & SMF__MAPQ_SSN ) {
-                  if( !dat->ssn_mask ) dat->ssn_mask = astCalloc( dat->msize,
-                                                  sizeof( *(dat->ssn_mask) ) );
-                  (dat->ssn_mask)[ i ] = 1;
-               }
-               if( *pq & SMF__MAPQ_PCA ) {
-                  if( !dat->pca_mask ) dat->pca_mask = astCalloc( dat->msize,
-                                                  sizeof( *(dat->pca_mask) ) );
-                  (dat->pca_mask)[ i ] = 1;
+            for( i = 0; i < dat->msize; i++,pq++,ptr++ ) {
+               if( *ptr != VAL__BADD ) {
+                  if( *pq & SMF__MAPQ_AST ) {
+                     if( !dat->ast_mask ) dat->ast_mask = astCalloc( dat->msize,
+                                                     sizeof( *(dat->ast_mask) ) );
+                     (dat->ast_mask)[ i ] = 1;
+                  }
+                  if( *pq & SMF__MAPQ_FLT ) {
+                     if( !dat->flt_mask ) dat->flt_mask = astCalloc( dat->msize,
+                                                     sizeof( *(dat->flt_mask) ) );
+                     (dat->flt_mask)[ i ] = 1;
+                  }
+                  if( *pq & SMF__MAPQ_COM ) {
+                     if( !dat->com_mask ) dat->com_mask = astCalloc( dat->msize,
+                                                     sizeof( *(dat->com_mask) ) );
+                     (dat->com_mask)[ i ] = 1;
+                  }
+                  if( *pq & SMF__MAPQ_SSN ) {
+                     if( !dat->ssn_mask ) dat->ssn_mask = astCalloc( dat->msize,
+                                                     sizeof( *(dat->ssn_mask) ) );
+                     (dat->ssn_mask)[ i ] = 1;
+                  }
+                  if( *pq & SMF__MAPQ_PCA ) {
+                     if( !dat->pca_mask ) dat->pca_mask = astCalloc( dat->msize,
+                                                     sizeof( *(dat->pca_mask) ) );
+                     (dat->pca_mask)[ i ] = 1;
+                  }
                }
             }
 
