@@ -491,6 +491,21 @@ Fedora:
    texlive-tocloft.noarch
    texlive-eqparbox.noarch
 
+Fedora 31:
+   flex
+   byacc
+   bison
+   libXt-devel
+   libXau-devel
+   libXext-devel
+   imake
+   libpng-devel
+   openssl-devel
+   expat-devel
+   texi2html
+   texinfo
+   texlive-scheme-full (a subset may be sufficient)
+
 
 Debian 10:
    This list (kindly provided by Paul Kerry), may not be complete and
