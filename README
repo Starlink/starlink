@@ -506,6 +506,11 @@ Fedora 31:
    texinfo
    texlive-scheme-full (a subset may be sufficient)
 
+   To build perl-JCMT-Tau package in perlmods, the following packages may
+   need to be added to the text file thirdparty/perlsys/perlmods/cpan_deps.
+
+   XML::Parser
+   SOAP::Lite
 
 Debian 10:
    This list (kindly provided by Paul Kerry), may not be complete and
