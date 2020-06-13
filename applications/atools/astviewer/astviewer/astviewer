@@ -103,6 +103,10 @@ DOWN = 2
 LEFT = 3
 RIGHT = 4
 
+CMPMAP_TYPE = 0
+TRANMAP_TYPE = 1
+ATOMIC_TYPE = 2
+
 #  Invoke a starlink command
 def invoke(command):
    os.environ["ADAM_NOPROMPT"] = "1"
@@ -136,6 +140,17 @@ def invoke(command):
 
    return outtxt
 
+
+#  Return the two Mappings in a TranMap in the order (forward,inverse).
+#  The returned list contains deep copies of the Mappings, with the
+#  Invert flags set to the value it had when the TranMap was created.
+def tranlist( mapping ):
+   (map1, map2, isseries, invert1, invert2)= mapping.decompose()
+   map1 = map1.copy()
+   map1.Invert = invert1
+   map2 = map2.copy()
+   map2.Invert = invert2
+   return (map1,map2)
 
 #  Expand a Mapping into a list of component Mappings to be applied in
 #  series or in parallel. The list contains deep copies of the Mappings,
@@ -1265,7 +1280,7 @@ class MappingWidget(ObjectWidget):
          self.layout.addWidget( QLabel("The inverse transformation of the {0} is undefined".format(object.Class) ))
 
       if isinstance( object, Ast.CmpMap ):
-         self.compound = True
+         self.compound_type = CMPMAP_TYPE
          self.title = "Component Mappings"
          ( self.list, self.series ) = maplist( object )
          self.nmap = len( self.list )
@@ -1277,8 +1292,20 @@ class MappingWidget(ObjectWidget):
             widget = self.parallelWidget( )
          self.layout.addWidget( QLabel( header ) )
          simplify_target = "whole CmpMap"
+
+      elif isinstance( object, Ast.TranMap ):
+         self.compound_type = TRANMAP_TYPE
+         self.title = "Component Mappings"
+         self.list = tranlist( object )
+         self.series = 0
+         self.nmap = 2
+         header = "<h4>Separate forward and inverse Mappings:</h4>"
+         widget = self.tranWidget( )
+         self.layout.addWidget( QLabel( header ) )
+         simplify_target = "TranMap"
+
       else:
-         self.compound = False
+         self.compound_type = ATOMIC_TYPE
          self.title = "Atomic Mapping"
          self.list = [object]
          self.series = False
@@ -1330,7 +1357,7 @@ class MappingWidget(ObjectWidget):
                                         "new mapping list is the first modified mapping."
                                         .format( result + 1, mlist[result].Class ),
                                          QMessageBox.Ok )
-            elif self.compound:
+            elif self.compound_type == CMPMAP_TYPE:
                QMessageBox.information( self, ttl, "The merge resulted in a "
                                         "single {0}".format( new.Class ),
                                         QMessageBox.Ok )
@@ -1357,6 +1384,133 @@ class MappingWidget(ObjectWidget):
    def initFocus(self):
       if self.input_edits:
          self.input_edits[0].setFocus()
+
+   def tranWidget( self ):
+      result = QWidget(self)
+      self.grid = ArrowLayout()
+      result.setLayout( self.grid )
+
+      self.input_edits = []
+      self.output_edits = []
+
+      iin = 1
+      iout = 1
+      comp = self.object
+
+      inaxes = []
+      iplayout = QGridLayout()
+      for i in range(comp.Nin-1,-1,-1):
+         col = 0
+
+         lab = QLabel( str(iin) )
+         lab.setFixedWidth( 15 )
+         iplayout.addWidget( lab, i, col, Qt.AlignLeft )
+         col += 1
+
+         if self.input_frame:
+            sym = self.input_frame.get( "Symbol({0})".format(iin) )
+            lab = self.input_frame.get( "Label({0})".format(iin) )
+            w = LinkLabel( "({0})".format(sym), result, True, self )
+            if lab:
+               setTip( w, lab  )
+            else:
+               setTip( w, "Click to see details of the input axes"  )
+            iplayout.addWidget( w, i, col, Qt.AlignLeft )
+            col += 1
+
+         edit = ValueEdit(result, [True,iin,0] )
+         setTip( edit, "Enter value for input {0}. Press <return> to forward transform.".format(iin)  )
+         edit.editingFinished.connect(self.ptransform)
+         self.input_edits.append( edit )
+         iplayout.addWidget( edit, i, col, Qt.AlignHCenter )
+         inaxes.append( iin )
+         iin += 1
+      self.grid.addLayout( iplayout, 1, 0 )
+
+      comp_edits = []
+      outaxes = []
+      oplayout = QGridLayout()
+      for i in range(comp.Nout-1,-1,-1):
+         edit = ValueEdit(result, [False,iout,0] )
+         setTip( edit, "Enter value for output {0}. Press <return> to inverse transform.".format(iout)  )
+         edit.editingFinished.connect(self.ptransform)
+         self.output_edits.append( edit )
+         comp_edits.append( edit )
+         oplayout.addWidget( edit, i, 0, Qt.AlignHCenter )
+         lab = QLabel( str(iout) )
+         lab.setFixedWidth( 13 )
+         oplayout.addWidget( lab, i, 1 )
+         outaxes.append( iout )
+
+         if self.output_frame:
+            sym = self.output_frame.get( "Symbol({0})".format(iout) )
+            lab = self.output_frame.get( "Label({0})".format(iout) )
+            w = LinkLabel( "({0})".format(sym), result, False, self )
+            if lab:
+               setTip( w, lab  )
+            else:
+               setTip( w, "Click to see details of the output axes"  )
+            oplayout.addWidget( w, i, 2 )
+
+         iout += 1
+
+      self.grid.addLayout( oplayout, 1, 2 )
+
+      blayout = QVBoxLayout()
+      blayout.setContentsMargins( 0, 0, 0, 0 )
+      blayout.setSpacing( 0 )
+      blayout.addWidget( Line(result),Qt.AlignTop )
+
+
+      inframe = None
+      outframe = None
+      if self.input_frame:
+         ( inframe, junk ) = self.input_frame.pickaxes( inaxes )
+      if self.output_frame:
+         ( outframe, junk ) = self.output_frame.pickaxes( outaxes )
+
+      button = DataButton( "Fwd: {0}".format(self.list[0].Class), result, [self.list[0],inframe,outframe,comp_edits,0] )
+      setTip( button, "Forward Mapping. Click to see details of the {0}".format(self.list[0].Class)  )
+      button.clicked.connect(self.mapClicked)
+      button.setStyleSheet("QPushButton { margin: 10px 20px 10px 20px }")
+      blayout.addWidget( button )
+
+      button = DataButton( "Inv: {0}".format(self.list[1].Class), result, [self.list[1],inframe,outframe,comp_edits,0] )
+      setTip( button, "Inverse Mapping. Click to see details of the {0}".format(self.list[1].Class)  )
+      button.clicked.connect(self.mapClicked)
+      button.setStyleSheet("QPushButton { margin: 5px 20px 5px 20px }")
+      blayout.addWidget( button )
+
+      blayout.addWidget( Line(result),Qt.AlignBottom )
+      self.grid.addLayout( blayout, 1, 1)
+
+      if self.input_frame:
+         w = LinkLabel( "Inputs", result, True, self )
+         setTip( w, "Click to see details of the input axes"  )
+      else:
+         w = QLabel( "Inputs" )
+         setTip( w, "No Frame is associated with the input axes"  )
+      self.grid.addWidget( w, 0, 0, Qt.AlignHCenter )
+
+      self.grid.addArrow( 0, 1, None )
+
+      if self.output_frame:
+         w = LinkLabel( "Outputs", result, False, self )
+         setTip( w, "Click to see details of the output axes"  )
+      else:
+         w = QLabel( "Outputs" )
+         setTip( w, "No Frame is associated with the output axes"  )
+      self.grid.addWidget( w, 0, 2, Qt.AlignHCenter )
+
+      prevtab = edit
+      for edit in self.input_edits:
+         QWidget.setTabOrder( prevtab, edit )
+         prevtab = edit
+      for edit in self.output_edits:
+         QWidget.setTabOrder( prevtab, edit )
+         prevtab = edit
+
+      return result
 
    def parallelWidget( self ):
       result = QWidget(self)
@@ -1435,7 +1589,7 @@ class MappingWidget(ObjectWidget):
          blayout.setContentsMargins( 0, 0, 0, 0 )
          blayout.setSpacing( 0 )
          blayout.addWidget( Line(result),Qt.AlignTop )
-         if self.compound:
+         if self.compound_type == CMPMAP_TYPE:
 
             inframe = None
             outframe = None
@@ -1551,7 +1705,7 @@ class MappingWidget(ObjectWidget):
             col += 1
          self.output_edits.append( edits )
 
-         if self.compound:
+         if self.compound_type == CMPMAP_TYPE:
             button = DataButton( comp.Class, result, [comp,inframe,outframe,edits,icomp] )
             setTip( button, "Mapping {0}. Click to see details of the {1}".format(icomp+1,comp.Class)  )
             button.clicked.connect(self.mapClicked)

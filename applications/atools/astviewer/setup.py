@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
       name='starlink-astviewer',
-      version='1.0.8',
+      version='1.0.9',
       packages=['astviewer'],
       package_data={'':['*.html','*.png']},
       eager_resources={'astviewer/astviewer.html','astviewer/example-frameset.png'},

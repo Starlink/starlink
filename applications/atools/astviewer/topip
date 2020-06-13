@@ -1,7 +1,11 @@
 #!/bin/tcsh
 
+mv ~/.pypirc.save ~/.pypirc
+
 rm dist/*
 python3 setup.py sdist bdist_wheel
 twine upload dist/*
 
 # dsberry cap B
+
+mv ~/.pypirc ~/.pypirc.save
