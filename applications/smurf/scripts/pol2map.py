@@ -42,7 +42,7 @@
 *        null (!) is supplied. The Q, U  and PI values in this catalogue
 *        will be in units of pW or mJy/beam, as selected using parameter
 *        JY . The bin size is specified by parameter BINSIZE. An extra
-*        column named "AST" is added to this catalogue in addition to those 
+*        column named "AST" is added to this catalogue in addition to those
 *        created by the polpack:polvec command. The AST column that holds a
 *        non-zero integer for each row that corresponds to a point inside
 *        the AST mask (i.e. a source point), and zero for all other rows. [!]
@@ -151,6 +151,9 @@
 *        ---
 *        If null (!) or "def" is supplied, the above set of default
 *        configuration parameters are used without change. ["def"]
+*     CALCQUCONFIG = LITERAL (Read)
+*        Extra parameter values to include in the CALCQU configuration
+*        used to create the I, Q and U time-streams. [!]
 *     DEBIAS = LOGICAL (Given)
 *        TRUE if a correction for statistical bias is to be made to
 *        percentage polarization and polarized intensity in the output
@@ -709,6 +712,8 @@
 *       Added parameter DEBIASTYPE.
 *    20-APR-2020 (DSB):
 *       Add column AST to the output catalogue if an AST mask is available.
+*    15-APR-2020 (DSB):
+*       Added parameter CALCQUCONFIG.
 
 '''
 
@@ -1424,6 +1429,9 @@ try:
    params.append(starutil.Par0L("SMOOTH450", "Smooth 450 maps to 850 um resolution?",
                                 False, noprompt=True))
 
+   params.append(starutil.ParGrp("CALCQUCONFIG", "CALCQU tuning parameters",
+                                 "def", noprompt=True))
+
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
    parsys = ParSys( params )
@@ -1441,6 +1449,9 @@ try:
    imap = parsys["IOUT"].value
    qmap = parsys["QOUT"].value
    umap = parsys["UOUT"].value
+
+#  The user-supplied calcqu config.
+   calcquconfig = parsys["CALCQUCONFIG"].value
 
 #  The user-supplied makemap configs, and pixel size.
    config = parsys["CONFIG"].value
@@ -1883,10 +1894,10 @@ try:
             except starutil.NoNdfError:
                msg_out("   {0}/{1}: Processing {2} raw data files from observation {3} ... ".
                        format(iobs,nobs,len(rawlist[ id ]), id ) )
-               invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config=def outq={1}/\*_QT "
+               invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config={6} outq={1}/\*_QT "
                       "outu={1}/\*_UT outi={1}/\*_IT fix=yes north={2} outfilesi={3} "
                       "outfilesq={4} outfilesu={5}".
-                      format( rawdata, qudir, north, new_i, new_q, new_u ) )
+                      format( rawdata, qudir, north, new_i, new_q, new_u, calcquconfig ) )
 
 #  Append the new Stokes parameter time series files created above to the
 #  list of all Stokes parameter time series files.
