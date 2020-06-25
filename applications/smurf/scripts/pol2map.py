@@ -431,9 +431,12 @@
 *        aberrant observations to be identified with a reasonable degree
 *        of confidence. [FALSE]
 *     PIXSIZE = _REAL (Read)
-*        Pixel dimensions in the output I, Q and U maps, in arcsec. The default
-*        is 4 arc-sec for both 450 and 850 um data. The bin size for the output
-*        catalogue can be specified separately - see parameter BINSIZE and CAT. [4]
+*        Pixel dimensions in the output I, Q and U maps, in arcsec. The
+*        default is 4 arc-sec for both 450 and 850 um data. The bin size for
+*        the output catalogue can be specified separately - see parameter
+*        BINSIZE and CAT.  Note if a map is supplied for either parameter
+*        REF or parameter MASK, then PIXSIZE is ignored and the pixel size
+*        in the supplied map is used. [4]
 *     QOUT = NDF (Write)
 *        The output NDF in which to return the Q map including all supplied
 *        observations. This will be in units of pW. Supply null (!) if no Q
@@ -452,7 +455,9 @@
 *        An optional map defining the pixel grid for the output maps,
 *        and which is used to determine pointing corrections. If null
 *        (!) is supplied, then the map (if any) specified by parameter
-*        MASK is used. See also parameter REFFCF. [!]
+*        MASK is used. See also parameter REFFCF. Note, if a map is
+*        supplied for either REF or MASK, then the PIXSIZE parameter is
+*        ignored and the pixel size in the supplied map is used. [!]
 *     REFFCF = _REAL (Read)
 *        The FCF that should be used to convert the supplied REF map
 *        to pW. This parameter is only used if the supplied REF map is
@@ -2376,9 +2381,13 @@ try:
       if outcat:
 
 #  If the map pixel size has not yet been determined, get it from the
-#  supplied coadd (if it exists) or use the PIXSIZE parameter otherwise.
+#  supplied coadd (if it exists) or the reference map (if it exists)
+#  or use the PIXSIZE parameter otherwise.
          if coadd_exists:
             invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(coadd) )
+            pxsize = float(get_task_par( "FPIXSCALE(1)", "ndftrace" ))
+         elif ref != "!":
+            invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(ref) )
             pxsize = float(get_task_par( "FPIXSCALE(1)", "ndftrace" ))
          else:
             pxsize = pixsize
