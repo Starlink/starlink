@@ -561,9 +561,9 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
   validate_scans = smf_get_global0I( "VALIDATE_SCANS", 0, status );
   if ( validate_scans && !smf__validate_scan( hdr, (validate_scans==2), status ) ) {
     if( validate_scans == -1 ) {
-      *status = SMF__REJECT;
       if( data->file && data->file->ndfid ) {
         smf_smfFile_msg( data->file, "N", 1, "<unknown>" );
+        *status = SMF__REJECT;
         errRep( "", INDENT "Rejecting subscan ^N due to extreme excursion",
                 status );
       } else if( data->hdr && data->hdr->fitshdr ){
@@ -573,9 +573,11 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
         smf_getfitsi( data->hdr, "NSUBSCAN", &subscan, status );
         smf_getfitsi( data->hdr, "UTDATE", &ut, status );
         smf_getfitsi( data->hdr, "OBSNUM", &obs, status );
+        *status = SMF__REJECT;
         errRepf( "", INDENT "%s %d #%d - Rejecting subscan %d due to extreme excursion",
                 status, buffer, ut, obs, subscan);
       } else {
+        *status = SMF__REJECT;
         errRep( "", INDENT "Rejecting subscan due to extreme excursion",
                 status );
       }
