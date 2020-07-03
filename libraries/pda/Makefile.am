@@ -68,7 +68,7 @@ pda_v11.f pda_curfit.f pda_dc2nag.f pda_dgesl.f pda_dpssb5.f	       \
 pda_drffti.f pda_fpknot.f pda_iperm.f pda_optstd.f pda_qrax1d.f	       \
 pda_radf4.f pda_saacr.f pda_var.f pda_d1fcnd.f pda_dcfftb.f	       \
 pda_dgstpd.f pda_dpssf.f pda_drftb1.f pda_fporde.f pda_ivout.f	       \
-pda_order.f pda_qrax2d.f pda_radf5.f pda_saard.f pda_xermsg.f	       \
+pda_order.f pda_qrax2d.f pda_radf5.f pda_saard.f 	       \
 pda_d2fcnd.f pda_dcfftf.f pda_dh12.f pda_dpssf2.f pda_drftf1.f	       \
 pda_fprank.f pda_lltsld.f pda_partx.f pda_qrfac.f pda_radfg.f	       \
 pda_saari.f pda_xerrwv.f pda_d9b1mp.f pda_dcffti.f pda_dintrv.f	       \
@@ -91,7 +91,8 @@ pda8_covmat.f pda8_nscor.f pda8_correc.f pda8_v11.f pda8_rwnorm.f \
 pda8_fpcurf.f pda8_surfit.f
 
 C_ROUTINES = pda.c pdaD1mach.c pdaDdot.c pdaDaxpy.c pdaDgesl.c pdaDgefs.c \
-pdaDgefa.c pdaDgesld.c pdaDscal.c pdaIdamax.c pdaXermsg.c pdaErmsg.c
+pdaDgefa.c pdaDgesld.c pdaDscal.c pdaIdamax.c pdaXermsg.c pdaErmsg.c \
+pda_xermsg.c
 
 GEN_F_ROUTINES = $(PDA_BDIKRW_GEN:.gbdikrw=.f) \
                  $(PDA_DIR_GEN:.gdir=.f)

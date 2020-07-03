@@ -1,5 +1,13 @@
-      SUBROUTINE PDA_XERMSG( LIBRAR, SUBROU, MESSG, NERR, LEVEL,
-     :   STATUS )
+#include "f77.h"
+#include "ems.h"
+
+#define BUFLEN 500
+
+F77_SUBROUTINE(pda_xermsg)( CHARACTER(LIBRAR), CHARACTER(SUBROU),
+                            CHARACTER(MESSG), INTEGER(NERR), INTEGER(LEVEL),
+                            INTEGER(STATUS) TRAIL(LIBRAR) TRAIL(SUBROU)
+                            TRAIL(MESSG) ) {
+/*
 *+
 *  Name:
 *     PDA_XERMSG
@@ -130,35 +138,66 @@
 *        On advice from Starlink, use ERR_REP instead of MSG_OUT.
 *     14 Feb 1997 (dsb):
 *        On advice from Starlink, use EMS_REP instead of ERR_REP.
-*     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
-
+*     3 Jul 2020 (dsb):
+*        Speed it up by re-writing it in C and using a local buffer to
+*        format the message.
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+   GENPTR_CHARACTER(LIBRAR)
+   GENPTR_CHARACTER(SUBROU)
+   GENPTR_CHARACTER(MESSG)
+   GENPTR_INTEGER(NERR)
+   GENPTR_INTEGER(LEVEL)
+   GENPTR_INTEGER(STATUS)
 
-*  Arguments Given:
-      CHARACTER * ( * ) LIBRAR, SUBROU, MESSG
-      INTEGER NERR, LEVEL
+/* Local Variables: */
+   char buf[ BUFLEN + 1 ];
+   char *p;
+   int nleft;
+   int nc;
 
-*  Arguments Returned:
-      INTEGER STATUS             ! Status
+/* Set the returned status. */
+   *STATUS = 1;
 
-*.
+/* For speed, format the error message in a local buffer. */
+   p = buf;
+   nleft = BUFLEN;
 
-*  Set the returned status.
-      STATUS = 1
+   nc = ( LIBRAR_length < nleft ) ? LIBRAR_length : nleft;
+   strncpy( p, LIBRAR, nc );
+   p += nc;
+   nleft -= nc;
 
-*  Report the error.
-      CALL EMS_SETC( 'PDA_XERMSG', LIBRAR )
-      CALL EMS_SETC( 'PDA_XERMSG', '/' )
-      CALL EMS_SETC( 'PDA_XERMSG', SUBROU )
-      CALL EMS_SETC( 'PDA_XERMSG', ': ' )
-      CALL EMS_SETC( 'PDA_XERMSG', MESSG )
-      CALL EMS_REP( 'PDA_XERMSG', '^PDA_XERMSG', STATUS )
+   if( nleft > 0 ) {
+      *(p++) = '/';
+      nleft--;
+   }
 
-*  Return.
-      END
+   nc = ( SUBROU_length < nleft ) ? SUBROU_length : nleft;
+   if( nc ) {
+      strncpy( p, SUBROU, nc );
+      p += nc;
+      nleft -= nc;
+   }
+
+   if( nleft > 1 ) {
+      *(p++) = ':';
+      *(p++) = ' ';
+      nleft -= 2;
+   }
+
+   nc = ( MESSG_length < nleft ) ? MESSG_length : nleft;
+   if( nc ) {
+      strncpy( p, MESSG, nc );
+      p += nc;
+      nleft -= nc;
+   }
+
+   *p = 0;
+
+/* Report the error. */
+   emsRep( " ", buf, STATUS );
+
+}
+
