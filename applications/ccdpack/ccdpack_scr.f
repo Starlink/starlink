@@ -55,6 +55,8 @@
 *  History:
 *     3-JUN-1997 (PDRAPER):
 *        Original version.
+*     06-JUL-2020 (GSB):
+*        Update KPG1_LGCMD call adding new CPUTIM argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -80,6 +82,7 @@
       CHARACTER * ( VAL__SZI ) PID ! PID for any process
       CHARACTER * ( PAR__SZNAM ) ACTION ! Action name
       INTEGER NVAL              ! Number of characters
+      INTEGER CPUTIM( 4 )       ! Context info for KPG1_CPUTM
 
 *.
 
@@ -119,6 +122,9 @@
 *  Tweak the numerics on a RedHat 7 Linux system.
       CALL CCD1_LINFLT
 
+*  Record the current CPU time in CPUTIM.
+      CALL KPG1_CPUTM( CPUTIM, VAL__BADD )
+
 *  Test the action name against each valid value in turn, calling the
 *  appropriate routine...
       IF ( ACTION .EQ. 'CCDALIGN' ) THEN
@@ -142,6 +148,6 @@
 
 *  Log the task and its parameters to a log file specified by enviromnent
 *  variable CCDPACK_LOG.
-      CALL KPG1_LGCMD( ACTION, 'CCDPACK', STATUS )
+      CALL KPG1_LGCMD( ACTION, 'CCDPACK', CPUTIM, STATUS )
 
       END

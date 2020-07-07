@@ -54,6 +54,8 @@
 *        Added MAKESET, SHOWSET entries.
 *     27-NOV-2007 (DSB):
 *        Use NDG_BEGPV/ENDPV to provide automatic provenance propagation.
+*     06-JUL-2020 (GSB):
+*        Update KPG1_LGCMD call adding new CPUTIM argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -68,6 +70,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_PAR'          ! Parameter system constants
       INCLUDE 'CCD1_PAR'         ! VERS value.
+      INCLUDE 'PRM_PAR'          ! Primitive data constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -77,6 +80,7 @@
 
 *  Local variables:
       CHARACTER * ( PAR__SZNAM ) ACTION ! Action name
+      INTEGER CPUTIM( 4 )               ! Context info for KPG1_CPUTM
 
 *.
 
@@ -91,6 +95,9 @@
 
 *  Tweak the numerics on a RedHat 7 Linux system.
       CALL CCD1_LINFLT
+
+*  Record the current CPU time in CPUTIM.
+      CALL KPG1_CPUTM( CPUTIM, VAL__BADD )
 
 *  Begin a provenance block. This causes event handlers to be registered
 *  with the NDF library so that a handler routine in NDG is called every
@@ -164,7 +171,7 @@
 
 *  Log the task and its parameters to a log file specified by enviromnent
 *  variable CCDPACK_LOG.
-      CALL KPG1_LGCMD( ACTION, 'CCDPACK', STATUS )
+      CALL KPG1_LGCMD( ACTION, 'CCDPACK', CPUTIM, STATUS )
 
       END
 * $Id$
