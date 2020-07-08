@@ -56,9 +56,12 @@
 
 #include <GaiaArray.h>
 #include <gaiaUtils.h>
+extern "C" {
 #include <prm_par.h>
 #include <cnf.h>
+#include <star/ard.h>
 #include "byteswap.h"
+}
 
 #define MIN(a,b) ( (a) < (b) ? (a) : (b) )
 #define MAX(a,b) ( (a) > (b) ? (a) : (b) )
@@ -1349,7 +1352,35 @@ void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
     }
     fullMaskPtr = (int *) malloc( planeSize * sizeof( int ) );
     lbnd[0] = ubnd[0] = lbnd[1] = ubnd[1] = 0;
-    if ( gaiaUtilsCreateArdMask( region, fullMaskPtr, mdims, lbnd, ubnd,
+    
+    /* ARD can only handle strings of length 255/GRP__SZNAM characters. */
+    int rlen = strlen( region );
+    char *newregion = NULL;
+    if ( rlen >= ( GRP__SZNAM - 2 ) ) {
+
+      /* Count the commas. */
+      count = 0;
+      for ( i = 0; i < rlen; i++ ) {
+        if ( region[i] == ',' ) count++;
+      }
+      newregion = (char *) malloc( rlen + count + 1);
+
+      /* Now split with a newline at all the commas. */
+      j = 0;
+      for ( i = 0; i < rlen; i++ ) {
+        if ( region[i] == ',' ) {
+          newregion[j] = '\n';
+          j++;
+        }
+        newregion[j] = region[i];
+        j++;
+      }
+      newregion[j] = '\0';
+
+    } else {
+      newregion = strdup( region );
+    }
+    if ( gaiaUtilsCreateArdMask( newregion, fullMaskPtr, mdims, lbnd, ubnd,
                                  &error_mess ) != 1 ) {
 
         /* ARD description failed, so just return an empty spectrum */
@@ -1363,6 +1394,7 @@ void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
         memset( *outPtr, 0, length );
         return;
     }
+    free( newregion );
 
     /*  ARD bounds are off by 1 pixel, why? */
     lbnd[0]--;
