@@ -120,7 +120,7 @@ itcl::class gaia::StarArdPoly {
       process_coords_ $coords
       set desc "POLYGON("
       foreach {p1 p2} $vertices {
-         append desc "$p1,$p2\n"
+         append desc "$p1,$p2,\n"
       }
       set desc "[string trim $desc ",\n"])"
       return "$desc"
