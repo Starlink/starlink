@@ -66,6 +66,9 @@
 *        Add DAT_PAR for SUBPAR_CMN
 *     16-DEC-1998 (AJC):
 *        Create _CHAR storage of sufficient size
+*     22-JUL-2020 (DSB):
+*        Correct assignment of _INT64 internal value to PARINT64 rather
+*        than PARINT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -195,7 +198,7 @@
                ELSE IF ( TYPE .EQ. SUBPAR__INTEGER ) THEN
                   PARINT( NAMECODE ) = INTLIST(PTR)
                ELSE IF ( TYPE .EQ. SUBPAR__INT64 ) THEN
-                  PARINT( NAMECODE ) = INT64LIST(PTR)
+                  PARINT64( NAMECODE ) = INT64LIST(PTR)
                ELSE IF ( TYPE .EQ. SUBPAR__DOUBLE ) THEN
                   PARDOUBLE( NAMECODE ) = DOUBLELIST(PTR)
                ELSE IF ( TYPE .EQ. SUBPAR__CHAR ) THEN

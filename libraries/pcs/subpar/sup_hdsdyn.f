@@ -79,6 +79,8 @@
 *      1-FEB-1996 (AJC):
 *        Create storage of appropriate size for CHARACTER strings
 *        (min 132).
+*     22-JUL-2020 (DSB):
+*        Use DAT_PUTK rather than DAT_PUTI when storing _INT64 values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -193,7 +195,7 @@
          ELSE IF ( TYPE .EQ. SUBPAR__INTEGER ) THEN
             CALL DAT_PUTI ( LOC, NDIMS, COUNT, INTLIST(FIRST), STATUS )
          ELSE IF ( TYPE .EQ. SUBPAR__INT64 ) THEN
-            CALL DAT_PUTI ( LOC, NDIMS, COUNT, INT64LIST(FIRST),
+            CALL DAT_PUTK ( LOC, NDIMS, COUNT, INT64LIST(FIRST),
      :        STATUS )
          ELSE IF ( TYPE .EQ. SUBPAR__DOUBLE ) THEN
             CALL DAT_PUTD ( LOC, NDIMS, COUNT, DOUBLELIST(FIRST),
