@@ -100,7 +100,6 @@ cat1_bhopx.gen \
 cat1_dcnlx.gen \
 cat1_ecnlx.gen \
 cat1_fiox.gen \
-cat1_nlckx.gen \
 cat1_putx.gen \
 cat3_fiox.gen \
 cat3_gvalx.gen \
@@ -127,7 +126,8 @@ ant_sevalx.gn
 
 # All except LOGICAL
 CAT_GCN_ROUTINES = \
-cat1_eqckx.gcn
+cat1_eqckx.gcn \
+cat1_nlckx.gcn
 
 BLOCK_DATA_FILES = ant_block.f attrbb.f catsb.f ctrlb.f idsb.f
 

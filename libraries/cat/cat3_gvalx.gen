@@ -77,6 +77,8 @@
 *     2/2/94  (ACD): Added handling of vector column elements.
 *     7/5/94  (ACD): Re-written to handle complex columns and properly
 *       handle scaled columns.
+*     27/7/20 (DSB): Report an error if a null LOGICAL value is
+*       encountered.
 *  Bugs:
 *     None known
 *-
@@ -125,6 +127,8 @@
      :  ERRMSG*75  ! Text for error message.
       INTEGER
      :  ERRPOS     ! Length of ERRMSG (excl. trail. blanks).
+      LOGICAL
+     :  CAT1__DNULL ! An unused variable included to avoid compiler errors
 *.
 
       IF (STATUS .EQ. CAT__OK) THEN
@@ -225,10 +229,20 @@
 
 *
 *       If the null flag has been set then set the returned value to
-*       the standard Starlink null value.
-
+*       the standard Starlink null value. CAT does not support LOGICAL
+*       null values, so report an error if such a request is made. The
+*       comparison of literal strings should be optimised out by the
+*       compiler and so should not impact execution times.
          IF (NULFLG) THEN
-            VALUE<T> = CAT1__DNUL<T>
+            IF( "<T>" .NE. "L" ) THEN
+               VALUE<T> = CAT1__DNUL<T>
+            ELSE IF (STATUS .EQ. CAT__OK ) then
+               STATUS = CAT__INVNL
+               CALL CAT1_ERREP (' ', 'A null LOGICAL value '//
+     :                          'encountered - the CAT library does '//
+     :                          'not support null LOGICAL values.',
+     :                          STATUS)
+            END IF
          END IF
 
       END IF

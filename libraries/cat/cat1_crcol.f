@@ -84,6 +84,7 @@
 *     26/5/97 (ACD): Made appropriate keyword values case insensitive.
 *     20/7/00  (ACD): Added checks that the column external formats
 *       read from the table are valid.
+*     27/7/20 (DSB): Force LOGICAL columns to use locum instead of null.
 *  Bugs:
 *     None known
 *-
@@ -217,6 +218,7 @@
 
                ELSE IF (CURVUP .EQ. 'LOGICAL') THEN
                   FDTYPE = CAT__TYPEL
+                  FNULL = CAT__LOCUM
 
                ELSE IF (CURVUP(1 : 5) .EQ. 'CHAR*') THEN
                   FDTYPE = CAT__TYPEC

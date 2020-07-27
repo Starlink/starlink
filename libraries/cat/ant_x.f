@@ -662,8 +662,7 @@ C        WRITE(*,*)'!ANT_XSTORD: too many constants to store', VALUE
          ID     = NCLOG
 ***         print *,'Stored ', VALUE, ' as Lconst', ID
       ELSE
-         CALL ANT_ERRD ('ANT_XSTORL: too many constants to store,',
-     $     VALUE)
+         CALL ANT_ERR ('ANT_XSTORL: too many constants to store,')
 C        WRITE(*,*)'!ANT_XSTORL: too many constants to store', VALUE
          STATUS = -9
       END IF

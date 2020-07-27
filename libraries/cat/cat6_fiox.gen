@@ -85,6 +85,7 @@
 *  History:
 *     15/6/99 (ACD): Original version (from CAT5_FIOT.GEN).
 *     15/6/99 (ACD): First stable version.
+*     27/7/20 (DSB): Null logical values no longer supported.
 *  Bugs:
 *     None known
 *-
@@ -119,7 +120,8 @@
       INTEGER CHR_LEN
 *  Local Variables:
       LOGICAL
-     :  CONVOK    ! Flag; converted between data types ok?
+     :  CONVOK,   ! Flag; converted between data types ok?
+     :  CAT1__DNULL! Unused variable included to avoid compiler errors
       INTEGER
      :  FDIM,     ! Dimensionality of the column.
      :  FIC,      ! Identifier for the column or array element.
@@ -274,20 +276,33 @@ C4200       format(1x, 'rows: ', i5)
                   END IF
 
                   CALL CAT1_TCNVT (FDTYPE, UBVALI, BVALI, UWVALI,
-     :              WVALI, IVALI, RVALI, DVALI, LVALI, CVALI,
+     :              WVALI, IVALI, KVALI, RVALI, DVALI, LVALI, CVALI,
      :              CAT__TYPE<T>, UBVALO, BVALO, UWVALO, WVALO,
-     :              IVALO, RVALO, DVALO, LVALO, CVALO, CONVOK,
+     :              IVALO, KVALO, RVALO, DVALO, LVALO, CVALO, CONVOK,
      :              STATUS)
 
-                  IF (CONVOK) THEN
+                  IF (CONVOK ) THEN
                      VALUE = <T>VALO
-                  ELSE
+                  ELSE IF( "<T>" .NE. "L" ) THEN
                      NULFLG = .TRUE.
                      VALUE = CAT1__DNUL<T>
+                  ELSE IF (STATUS .EQ. CAT__OK ) then
+                     STATUS = CAT__INVNL
+                     CALL CAT1_ERREP (' ', 'A null LOGICAL value '//
+     :                           'encountered - the CAT library does '//
+     :                           'not support null LOGICAL values.',
+     :                           STATUS)
                   END IF
 
-               ELSE
+               ELSE IF( "<T>" .NE. "L" ) THEN
                   VALUE = CAT1__DNUL<T>
+
+               ELSE IF (STATUS .EQ. CAT__OK ) then
+                  STATUS = CAT__INVNL
+                  CALL CAT1_ERREP (' ', 'A null LOGICAL value '//
+     :                           'encountered - the CAT library does '//
+     :                           'not support null LOGICAL values.',
+     :                           STATUS)
                END IF
 
             ELSE

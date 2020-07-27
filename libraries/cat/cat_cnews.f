@@ -80,6 +80,8 @@
 *        names to use the correct parametric contstant (CAT__SZCMP).
 *     21/12/99 (ACD): Added check that the given column or name is unique,
 *        ie. does not alreay exist in the catalogue.
+*     27/7/20 (DSB): Must use locom values, not null values, with
+*                    _LOGICAL columns.
 *  Bugs:
 *     None known
 *-
@@ -172,6 +174,7 @@
      :           FDIM, FSIZE, FNULL, FXCEPT, FSCALE, FZERO, FORDER,
      :           FDATE, FUNIT, FXFMT, FPDISP, FCOMM, STATUS)
 
+
 *
 *             Replace the defaults with the actual values for those
 *             attributes which are passed as arguments.
@@ -182,6 +185,10 @@
                FUNIT = UNITS
                FXFMT = EXTFMT
                FCOMM = COMM
+
+*
+*             Must use locum values, not nulls, with _LOGICAL columns
+               IF( FDTYPE .EQ. CAT__TYPEL ) FNULL = CAT__LOCUM
 
 *
 *             Create the attributes (they are all mutable at this stage

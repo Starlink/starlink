@@ -321,7 +321,9 @@
                END IF
             END IF
 
-*
+*          Must use LOCUM with logical columns.
+            IF( FDTYPE .EQ. CAT__TYPEL ) FNULL = CAT__LOCUM
+
 *          Create the column.
 
             CALL CAT1_ADDCL (CI, FNAME, FGENUS, FEXP, FDTYPE, FCSIZE,

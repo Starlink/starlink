@@ -34,7 +34,7 @@
 *        Dimensionality of the column.  The permitted values are:
 *        CAT__SCALR  -  scalar,
 *        CAT__VECTR  -  vector.
-*     SIZEA(1)  =  INTEGER (Given)
+*     SIZEA  =  INTEGER (Given)
 *        If the column is a vector this attribute should be set to the
 *        number of elements in the vector.  For a scalar it should be
 *        set to one.
@@ -131,7 +131,7 @@
      :  DTYPE,
      :  CSIZE,
      :  DIMS,
-     :  SIZEA(1),
+     :  SIZEA,
      :  NULL,
      :  ORDER
       CHARACTER
@@ -168,7 +168,19 @@
 
       IF (STATUS .EQ. CAT__OK) THEN
 
-*
+*       Report an error and return if an attempt it made to create a
+*       _LOGICAL column with null values.
+         IF( DTYPE .EQ. CAT__TYPEL .AND. NULL .NE. CAT__LOCUM ) THEN
+            STATUS = CAT__INVNL
+            CALL CAT1_ERREP (' ', 'Attempt to create a _LOGICAL '//
+     :                       'column with null values.', STATUS )
+            CALL CAT1_ERREP (' ', 'The CAT library does not support '//
+     :                       '_LOGICAL columns with null values.',
+     :                       STATUS )
+
+            RETURN
+         END IF
+
 *       Check whether the given column name is unique, ie. whether a
 *       column or parameter of this name already exists in the catalogue,
 *       and proceed if the name is unique.

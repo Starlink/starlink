@@ -1,5 +1,9 @@
 1 CAT_library
 
+  Version 9.0
+
+  o Null values are no longer supported for _LOGICAL columns.
+
   Version 8.4
 
   o Catalogue name may now include non-alphanumeric characters.

@@ -19,7 +19,7 @@
 %
 % Set the CAT version number.
 
-\providecommand{\CATversion}{8.1~}
+\providecommand{\CATversion}{9.0~}
 
 %
 % Commands for displaying sexagesimal angles.
@@ -48,7 +48,7 @@
 
 \stardocnumber      {181.12}
 \stardocauthors     {A.C.~Davenhall \& D.S.~Berry}
-\stardocdate        {17th January 2017}
+\stardocdate        {27th July 2020}
 \stardoctitle       {CAT \\ [\latex{1ex}]
                               Catalogue and Table Manipulation Library}
 \stardocversion     {Version \CATversion\ }
@@ -234,6 +234,9 @@ Saint Edmund's Day 1994}
   \item 17th January 2017: Modified for release 8.4 of the CAT library.
    Catalogues can now be stored in files with names that include
    non-alphanumeric characters. (DSB)
+
+  \item 27th July 2020: Modified for release 9.0 of the CAT library.
+   Null values are no longer supported for _LOGICAL columns. (DSB)
 
 \end{enumerate}
 
@@ -3192,7 +3195,6 @@ was specified for null values in CAT:
 \_INTEGER    & VAL\_\_BADI  \\
 \_REAL       & VAL\_\_BADR  \\
 \_DOUBLE     & VAL\_\_BADD  \\
-\_LOGICAL    & -            \\
 \_CHAR[$*n$] & -            \\
 \end{tabular}
 \end{center}
@@ -3209,8 +3211,7 @@ was specified for null values in CAT:
 \_INTEGER    & '80000000'X         & '80000000'X         &   \\
 \_REAL       & 'FF7FFFFF'X         & 'FF7FFFFF'X         &   \\
 \_DOUBLE     & 'FFEFFFFFFFFFFFFF'X & 'FFEFFFFFFFFFFFFF'X &   \\
-\_LOGICAL    & 'A55A5AA5'X         &'A55A5AA5'X          & 1 \\
-\_CHAR[$*n$] & '0'X                & '0'X                & 2 \\
+\_CHAR[$*n$] & '0'X                & '0'X                & 1 \\
 \end{tabular}
 \end{center} }
 
@@ -3218,11 +3219,10 @@ was specified for null values in CAT:
 
 \begin{enumerate}
 
-  \item Chosen to be a palindrome and therefore not affected by the byte
-   order.
-
   \item The ASCII standard defines a byte with a value of 0 (that is,
    all bits set to 0) as a null character.
+  \item No NULL value is defined for the \_LOGICAL data type since by
+   definition a \_LOGICAL value can only take two values (true or false).
 
 \end{enumerate}
 

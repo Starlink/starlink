@@ -28,7 +28,7 @@
 *     DIMS  =  INTEGER (Given)
 *        Dimensionality of the parameter.  Currently the only permitted
 *        value is CAT__SCALR, corresponding to a scalar.
-*     SIZEA(1)  =  INTEGER (Given)
+*     SIZEA  =  INTEGER (Given)
 *        For vector parameters this attribute would be set to the
 *        number of elements in the vector.  However, currently only
 *        scalar parameters are supported and it should be set to one.
@@ -102,7 +102,7 @@
      :  CI,
      :  CSIZE,
      :  DIMS,
-     :  SIZEA(1)
+     :  SIZEA
       CHARACTER
      :  QNAME*(*),
      :  UNITS*(*),

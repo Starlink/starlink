@@ -226,6 +226,9 @@
 *    INTEGER data types are permitted to have six characters in the
 *    main body of the name (that is, excluding the prefix).
 
+      INTEGER CAT__TYPENON ! An unspecified type
+      PARAMETER (CAT__TYPENON = 0)
+
       INTEGER CAT__TYPEUB  ! Unsigned byte.
       PARAMETER (CAT__TYPEUB = 1)
 

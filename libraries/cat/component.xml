@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="cat" support="S">
-  <version>8.4</version>
+  <version>9.0</version>
   <path>libraries/cat</path>
   <description>CAT -- Catalogue and Table Manipulation Library</description>
   <abstract><p>

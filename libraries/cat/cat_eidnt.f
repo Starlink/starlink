@@ -79,6 +79,10 @@
 *     13/8/96 (ACD): Improved the error reporting.
 *     28/3/97 (ACD): Changed the definition of column and parameter
 *        names to use the correct parametric contstant (CAT__SZCMP).
+*     27/7/20 (DSB): Must use locom values, not null values, with
+*                    _LOGICAL expressions.
+
+
 *  Bugs:
 *     None known
 *-
@@ -221,6 +225,11 @@
                   ECSIZE = 1          ! ?????????????????????????????
                   EXFMT = EXTFMT
                   EEXP = EXPR
+
+*
+*                Must use locom values, not null values, with _LOGICAL
+*                expressions.
+                  IF( EDTYPE .EQ. CAT__TYPEL ) ENULL = CAT__LOCUM
 
 *
 *                Add these attributes to the list of attributes

@@ -99,6 +99,9 @@
 *     13/12/96 (ACD): Removed non-standard use of the relational
 *       operators in the LOGICAL instantiation of the routine (which
 *       had been revealed by the port to Linux).
+*     27/7/20 (DSB): Rename so that the logical instantiation is not
+*       produced. A separate source file (cat1_nlckl.f) is now used
+*       instead.
 *  Bugs:
 *     None known
 *-

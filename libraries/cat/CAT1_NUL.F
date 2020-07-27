@@ -40,11 +40,13 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1996 Central Laboratory of the Research Councils.
 *     Copyright (C) 2007 Particle Physics and Astronomy Research Council
+*     Copyright (C) 2020 East Asian Observatory
 *     All Rights Reserved.
 
 *  Authors:
 *     ACD: A C Davenhall (Leicester)
 *     PWD: Peter W. Draper (JAC, Durham University)
+*     DSB: David S Berry (EAO)
 *  History:
 *     27/1/94  (ACD): Original version.
 *     11/4/95  (ACD): Changed the name given in the 'Name:' section of
@@ -54,6 +56,10 @@
 *     28-FEB-2007 (PWD):
 *        Make a BOZ assignments when there's no typeless support.
 *        Better than nothing.
+*     27-JUL-2020 (DSB):
+*        Remove support for NULL logical values, since there seems to be
+*        no portable way to provide a distinct third value for a Fortran
+*        LOGICAL.
 *  Global Constants:
 C      INCLUDE 'PRM_PAR'
 *-
@@ -87,21 +93,9 @@ C      INCLUDE 'PRM_PAR'
       PARAMETER (CAT1__DNULD = VAL__BADD)
 
 *
-*    Null values for the non-numeric data types.  There are no Starlink
-*    null values for these data types, so local values are used.  Note
-*    that the ASCII standard defines a byte with a value of 0 (that is,
-*    all its bits set to zero) as null.  This value is adopted as the
-*    default for data type CHARACTER.
-      LOGICAL CAT1__DNULL
-#if HAVE_TYPELESS_BOZ
-      PARAMETER (CAT1__DNULL = X'A55A5AA5')
-#elif HAVE_OLD_TYPELESS_BOZ
-      PARAMETER (CAT1__DNULL = 'A55A5AA5'X )
-#elif HAVE_BOZ
-      PARAMETER (CAT1__DNULL = Z'A55A5AA5' )
-#else
-      Error Do not have BOZ support.
-#endif
+*    Null character value. The ASCII standard defines a byte with a value
+*    of 0 (that is, all its bits set to zero) as null.  This value is
+*    adopted as the default for data type CHARACTER.
 
       CHARACTER CAT1__DNULC*1
 *     PARAMETER (CAT1__DNULC = CHAR(0) )
