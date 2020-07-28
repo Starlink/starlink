@@ -36,10 +36,10 @@ dnl    Added -disable-model-fitting so that we can build the basic
 dnl    SExtractor without requiring an ATLAS library.
 (
     cd extract
-    ./configure --prefix=$prefix --cache-file=config.cache -disable-model-fitting STARLINK=$STARLINK
+    ./configure --prefix=$prefix --cache-file=config.cache -disable-model-fitting STARLINK=$STARLINK CFLAGS="-g -O2 -fcommon"
     cd ..
     cd sextractor
-    ./configure --prefix=$prefix --cache-file=config.cache -disable-model-fitting
+    ./configure --prefix=$prefix --cache-file=config.cache -disable-model-fitting  CFLAGS="-g -O2 -fcommon"
 )
 
 dnl    Declare the build and use dependencies for this package
