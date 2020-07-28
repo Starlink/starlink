@@ -611,6 +611,8 @@ AC_DEFUN([STAR_CNF_BLANK_COMMON],
        if test "$ac_cv_fc_compiler_gnu" = yes; then
             if "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*[[4-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
                 star_cv_blank_common_symbol=__BLNK__
+            elif "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*1[[0-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
+                star_cv_blank_common_symbol=__BLNK__
             fi
        fi])
     AC_SUBST([BLANK_COMMON_SYMBOL], $star_cv_blank_common_symbol )
@@ -1662,6 +1664,8 @@ AC_DEFUN([STAR_INITIALISE_FORTRAN_RTL],
             if "$FC" --version 2>&1 < /dev/null | grep 'G95' > /dev/null; then
                 star_cv_initialise_fortran=g95-start
             elif "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*[[4-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
+                star_cv_initialise_fortran=gfortran-setarg
+            elif "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*1[[0-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
                 star_cv_initialise_fortran=gfortran-setarg
             else
                 star_cv_initialise_fortran=g77-setarg
