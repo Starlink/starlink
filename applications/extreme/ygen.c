@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+#define DEFINE_GLOBALS 1
 #include "ygen.h"
 
 

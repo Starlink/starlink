@@ -18,8 +18,19 @@
 *        Initial revision.
 *     24-JAN-2000 (MBT):
 *        Adapted to use for EXTREME.
+*     28-JUL-2020 (DSB):
+*        Only define the globals if requested. Otherwise just declare
+*        them. Previous behaves causes errors with gcc 10.
 *-
 */
+
+/* Set the value of macro EXTERN so that the variables are either
+   defined or declared, as required. */
+#ifdef DEFINE_GLOBALS
+#define CEXTERN
+#else
+#define CEXTERN  extern
+#endif
 
 /* Functions for keeping track of whitespace-type characters to be put
    into yylval but not yytext. */
@@ -27,6 +38,7 @@
       void cappend( char c );
 
 /* Utility functions. */
+      int yylex();
       void *memok( void *ptr );
       char *filter( int argc, char **argv );
 
@@ -42,11 +54,11 @@
       typedef struct element ELEMENT;
 
 /* Name of the executable. */
-      char *name;
+CEXTERN      char *name;
 
 /* Start of part of yylval string which actually matches the token, rather
    than the preceding fluff. */
-      char *ymatst;
+CEXTERN      char *ymatst;
 
 /* Useful macros. */
 #define MAXIMUM(x,y) ((x) > (y) ? (x) : (y))
@@ -67,9 +79,9 @@
 *  The routines which modify these keep the amount of space allocated
 *  and the length values up to date.
 */
-   char *preval;
-   int preleng;
-   int prealloc;
+CEXTERN   char *preval;
+CEXTERN   int preleng;
+CEXTERN   int prealloc;
 
 /* Amount by which to increase the preval buffer each time it needs
    increasing.  Its value affects only time/memory efficiency. */
@@ -78,7 +90,7 @@
 /* Define type of yylval lex global. */
 typedef char * STRING;
 #define YYSTYPE STRING
-   YYSTYPE yylval;
+CEXTERN   YYSTYPE yylval;
 
 
 
