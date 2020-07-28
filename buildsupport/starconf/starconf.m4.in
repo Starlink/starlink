@@ -623,7 +623,8 @@ float fred_() {
 # Define the global symbol used to access the Fortran blank common block.
 # Usually under UNIX this is _BLNK__, but gfortran uses __BLNK__, so we
 # need to check for that. Gfortran is just detected by being a GNU compiler
-# and having "Fortran (GCC) 4.x[x].x[x]" as part of its --version output.
+# and having "Fortran (GCC) 4.x[x].x[x]" (or 1x.x[x].x[x]) as part of
+# its --version output.
 #
 # The effect of this macro is to substitute BLANK_COMMON_SYMBOL with
 # the expected value.
@@ -635,6 +636,8 @@ AC_DEFUN([STAR_CNF_BLANK_COMMON],
        star_cv_blank_common_symbol=_BLNK__
        if test "$ac_cv_fc_compiler_gnu" = yes; then
             if "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*[[4-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
+                star_cv_blank_common_symbol=__BLNK__
+            elif "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*1[[0-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
                 star_cv_blank_common_symbol=__BLNK__
             fi
        fi])
@@ -1687,6 +1690,8 @@ AC_DEFUN([STAR_INITIALISE_FORTRAN_RTL],
             if "$FC" --version 2>&1 < /dev/null | grep 'G95' > /dev/null; then
                 star_cv_initialise_fortran=g95-start
             elif "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*[[4-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
+                star_cv_initialise_fortran=gfortran-setarg
+            elif "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*1[[0-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
                 star_cv_initialise_fortran=gfortran-setarg
             else
                 star_cv_initialise_fortran=g77-setarg
