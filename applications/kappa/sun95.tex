@@ -10481,11 +10481,11 @@ KAPPA: \htmlref{STATS}{STATS},
 
             \sstitem
             \texttt{"Combine"} --- Combine two previously defined regions
-	    into a single region using a Boolean operator, or invert a
-	    previously defined region using a Boolean .NOT. operator.
-	    See parameters OPERANDS and OPERATOR.  The original
-	    regions are deleted and the new combined (or inverted)
-	    region is added to the end of the list of defined regions.
+            into a single region using a Boolean operator, or invert a
+            previously defined region using a Boolean .NOT. operator.
+            See parameters OPERANDS and OPERATOR.  The original
+            regions are deleted and the new combined (or inverted)
+            region is added to the end of the list of defined regions.
 
             \sstitem
             \texttt{"Delete"} --- Delete previously defined regions, see parameter
@@ -10501,29 +10501,29 @@ KAPPA: \htmlref{STATS}{STATS},
 
             \sstitem
             \texttt{"List"} --- List the textual descriptions of the
-	    currently defined regions on the screen.  Each region is
-	    described by an index value, a \emph{keyword}
-	    corresponding to the shape, and various arguments
-	    describing the extent and position of the shape. These
-	    arguments are described in the
-	    \htmlref{``Notes''}{notes:ardgen} section below.
+            currently defined regions on the screen.  Each region is
+            described by an index value, a \emph{keyword}
+            corresponding to the shape, and various arguments
+            describing the extent and position of the shape. These
+            arguments are described in the
+            \htmlref{``Notes''}{notes:ardgen} section below.
 
             \sstitem
             \texttt{"Multi"} --- The cursor is displayed and you can then
-	    identify multiple regions of the current shape, without
-	    being re-prompted for OPTION after each one.  These
-	    regions are added to the end of the list of currently
-	    defined regions.  If the current shape is \texttt{"Polygon"},
-	    \texttt{"Frame"} or \texttt{"Whole"} (see Parameter SHAPE) then
-	    multiple regions cannot be defined and the selected option
-	    automatically reverts to \texttt{"Single"}.
+            identify multiple regions of the current shape, without
+            being re-prompted for OPTION after each one.  These
+            regions are added to the end of the list of currently
+            defined regions.  If the current shape is \texttt{"Polygon"},
+            \texttt{"Frame"} or \texttt{"Whole"} (see Parameter SHAPE) then
+            multiple regions cannot be defined and the selected option
+            automatically reverts to \texttt{"Single"}.
 
             \sstitem
             \texttt{"Single"} --- The cursor is displayed and you can
-	    then identify a single region of the current shape.  You
-	    are re-prompted for Parameter OPTION once you have defined
-	    the region.  The identified region is added to the end of
-	    the list of currently defined regions.
+            then identify a single region of the current shape.  You
+            are re-prompted for Parameter OPTION once you have defined
+            the region.  The identified region is added to the end of
+            the list of currently defined regions.
 
             \sstitem
             \texttt{"Shape"} --- Change the shape of the regions created by the
@@ -11607,12 +11607,12 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          POS2-POS5 = LITERAL (Read)
       }{
          When MODE = \texttt{"Interface"} these parameters specify the
-	 co-ordinates of the secondary beam positions.  These should
-	 lie within the bounds of the NDF.  For each parameter the
-	 supplied location may be merely an initial guess for the fit,
-	 or if Parameter FIXPOS is \texttt{TRUE}, it defines a fixed
-	 location, unless Parameter FIXSEP is \texttt{TRUE}, whereupon it
-	 defines a fixed separation from the primary beam.
+         co-ordinates of the secondary beam positions.  These should
+         lie within the bounds of the NDF.  For each parameter the
+         supplied location may be merely an initial guess for the fit,
+         or if Parameter FIXPOS is \texttt{TRUE}, it defines a fixed
+         location, unless Parameter FIXSEP is \texttt{TRUE}, whereupon it
+         defines a fixed separation from the primary beam.
 
          For POLAR = \texttt{FALSE} each distance should be given as a single
          literal string containing a space- or comma-separated list of
@@ -13604,9 +13604,9 @@ KAPPA: \htmlref{PASTE}{PASTE},
          or fewer pixels.  For instance, measures of dispersion like
          \texttt{"Sigma"} and \texttt{"Iwd"} are meaningless for single-pixel
          channels. The minimum number of pixels per channel for each estimator
-	 is given in parentheses in the list above.  Where there is no number,
-	 there is no restriction.  If you supply an unavailable option, you
-	 will be informed, and presented with the available options. \texttt{["Mean"]}
+         is given in parentheses in the list above.  Where there is no number,
+         there is no restriction.  If you supply an unavailable option, you
+         will be informed, and presented with the available options. \texttt{["Mean"]}
       }
       \sstsubsection{
          HIGH = LITERAL (Read)
@@ -16326,8 +16326,8 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          SORT = \_LOGICAL (Read)
       }{
          If \texttt{TRUE} then sort the listed parameters in to alphabetical order.
-         Otherwise, retain the order they have in the supplied
-	 configuration.  Only used if a null (\texttt{{!}}) value is supplied for
+         Otherwise, retain the order they have in the
+         configuration.  Only used if a null (\texttt{{!}}) value is supplied for
          Parameter NAME.  \texttt{[FALSE]}
       }
 
@@ -22314,17 +22314,17 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          READONLY = \_LOGICAL (Read)
       }{
          Determines if read or write access is requested for the NDF. If
-	 a \texttt{TRUE} value is supplied for READONLY, the NDF is opened for
-	 reading only. An error will then be reported if any of the
-	 requested editing operations would change the contents of the
-	 NDF. If a \texttt{FALSE} value is supplied for READONLY, the NDF is
-	 opened for both reading and writing, but an error will be
-	 reported if the NDF file is write-protected on disk. If the MODE
-	 parameter is set to \texttt{"File"}, the dynamic default value for
-	 READONLY is \texttt{FALSE}. If MODE is set to \texttt{"Interface"}, the
-	 dynamic default value for READONLY depends on the value of the
-	 EDIT parameter: \texttt{TRUE} for \texttt{"Print"} and \texttt{"Exist"}, and
-	 \texttt{FALSE} for all other editing commands.  \texttt{[]}
+         a \texttt{TRUE} value is supplied for READONLY, the NDF is opened for
+         reading only. An error will then be reported if any of the
+         requested editing operations would change the contents of the
+         NDF. If a \texttt{FALSE} value is supplied for READONLY, the NDF is
+         opened for both reading and writing, but an error will be
+         reported if the NDF file is write-protected on disk. If the MODE
+         parameter is set to \texttt{"File"}, the dynamic default value for
+         READONLY is \texttt{FALSE}. If MODE is set to \texttt{"Interface"}, the
+         dynamic default value for READONLY depends on the value of the
+         EDIT parameter: \texttt{TRUE} for \texttt{"Print"} and \texttt{"Exist"}, and
+         \texttt{FALSE} for all other editing commands.  \texttt{[]}
       }
       \sstsubsection{
          STRING = \_LOGICAL (Read)
@@ -22606,12 +22606,12 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
             from the value itself.  See topic \texttt{"Value Data Type"}.
 
             For the \texttt{Update}, \texttt{Write}, and \texttt{Amend} modifications
-	    there is a special value, \texttt{\$V}, which means use the current
-	    value of the edited keyword, provided that keyword exists.  This
-	    makes it possible to modify a comment, leaving the value
-	    unaltered.  In addition \texttt{\$V(}keyword\texttt{)} requests that
-	    the value of the keyword given between the parentheses be
-	    assigned to the keyword being edited.
+            there is a special value, \texttt{\$V}, which means use the current
+            value of the edited keyword, provided that keyword exists.  This
+            makes it possible to modify a comment, leaving the value
+            unaltered.  In addition \texttt{\$V(}keyword\texttt{)} requests that
+            the value of the keyword given between the parentheses be
+            assigned to the keyword being edited.
 
             The value field is ignored when the keyword is COMMENT,
             HISTORY or blank, and the modification is to \texttt{Update},
@@ -31786,17 +31786,17 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          KNOTS = \_INTEGER (Read)
       }{
          The number of interior knots used for the cubic-spline fit
-	 along the trend axis.  Increasing this parameter value
-	 increases the flexibility of the surface.  KNOTS is only
-	 accessed when FITTYPE=\texttt{"Spline"}.  See INTERPOL for how
-	 the knots are arranged.  The default is the current value.
+         along the trend axis.  Increasing this parameter value
+         increases the flexibility of the surface.  KNOTS is only
+         accessed when FITTYPE=\texttt{"Spline"}.  See INTERPOL for how
+         the knots are arranged.  The default is the current value.
 
          For INTERPOL=\texttt{TRUE}, the value must be in the range 1 to
-	 11, and \texttt{4} is a reasonable value for flatish trends.  The
-	 initial default is \texttt{4}.
+         11, and \texttt{4} is a reasonable value for flatish trends.  The
+         initial default is \texttt{4}.
 
          For INTERPOL=\texttt{FALSE} the allowed range is 1 to 60 with an
-	 initial default of \texttt{8}.  In this mode, KNOTS is the
+         initial default of \texttt{8}.  In this mode, KNOTS is the
          maximum number of interior knots.
 
          The upper limit of acceptable values for a trend axis is no
@@ -31815,20 +31815,20 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          The type of spline fit to use when FITTYPE=\texttt{"Spline"}.
 
          If set \texttt{TRUE}, an interpolating spline is fitted by least
-	 squares that ensures the fit is exact at the knots.
-	 Therefore the knot locations may be set by the POSKNOT
-	 parameter.
+         squares that ensures the fit is exact at the knots.
+         Therefore the knot locations may be set by the POSKNOT
+         parameter.
 
          If set \texttt{FALSE}, a smoothing spline is fitted.  A
-	 smoothing factor controls the degree of smoothing.  The
-	 factor is determined iteratively between limits, hence it is
-	 the slower option of the two, but generally gives better
-	 fits, especially for curvy trends.  The location of of the
-	 knots is decided automatically by Dierckx's algorithm,
-	 governed where they are most needed.  Knots are added when
-	 the weighted sum of the squared residuals exceeds the
-	 smoothing factor.  A final fit is made with the chosen
-	 smoothing, but finding the knots afresh.
+         smoothing factor controls the degree of smoothing.  The
+         factor is determined iteratively between limits, hence it is
+         the slower option of the two, but generally gives better
+         fits, especially for curvy trends.  The location of of the
+         knots is decided automatically by Dierckx's algorithm,
+         governed where they are most needed.  Knots are added when
+         the weighted sum of the squared residuals exceeds the
+         smoothing factor.  A final fit is made with the chosen
+         smoothing, but finding the knots afresh.
 
          The few iterations commence from the upper limit and progress
          more slowly at each iteration towards the lower limit.  The
@@ -32050,7 +32050,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
       }{
          As the previous example except that interpolation cubic-spline
          fits with four equally spaced interior knots are used
-	 to characterise the trends.
+         to characterise the trends.
       }
       \sstexamplesubsection{
          mfittrend m51 3 out=m51\_bsl mask=m51\_msk auto fittype=spl
@@ -33092,21 +33092,21 @@ KAPPA: \htmlref{CLINPLOT}{CLINPLOT},
             \texttt{"Sum"}    --- The total value.
          }
 
-          Where needed, the co-ordinates are the indices of the input
-          NDFs in the supplied order.  Thus the calculations behave like
-          the NDFs were stacked one upon another to form an extra axis,
-          and that axis had GRID co-ordinates.  Care using wildcards is
-          necessary, to achieve a specific order, say for a time series,
-          and hence assign the desired co-ordinate for a each NDF.
-          Indirection through a text file is recommended.
+         Where needed, the co-ordinates are the indices of the input
+         NDFs in the supplied order.  Thus the calculations behave like
+         the NDFs were stacked one upon another to form an extra axis,
+         and that axis had GRID co-ordinates.  Care using wildcards is
+         necessary, to achieve a specific order, say for a time series,
+         and hence assign the desired co-ordinate for a each NDF.
+         Indirection through a text file is recommended.
 
-          The selection is restricted if there are only a few input NDFs. For
-	  instance, measures of dispersion like \texttt{"Sigma"} and \texttt{"Iwd"}
-	  are meaningless for combining only two NDFs.  The minimum number of
-	  input NDFs for each estimator is given in parentheses in the list
-	  above.  Where there is no number, there is no restriction.  If you
-	  supply an unavailable option, you will be informed, and presented
-	  with the available options.   \texttt{["Mean"]}
+         The selection is restricted if there are only a few input NDFs. For
+         instance, measures of dispersion like \texttt{"Sigma"} and \texttt{"Iwd"}
+         are meaningless for combining only two NDFs.  The minimum number of
+         input NDFs for each estimator is given in parentheses in the list
+         above.  Where there is no number, there is no restriction.  If you
+         supply an unavailable option, you will be informed, and presented
+         with the available options.   \texttt{["Mean"]}
       }
       \sstsubsection{
          IN = \htmlref{GROUP}{se:groups} (Read)
@@ -34178,10 +34178,10 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
 
          \sstitem
          If the NDFs are specified via the NDF parameter,
-	 then the NDFs must exist and be accessible (an error is reported
-	 otherwise). The NDF names obtained can then be modified by
-	 supplying a suitable GRP modification expression such as
-	 \texttt{"$*$\_A"} for Parameter MOD.
+         then the NDFs must exist and be accessible (an error is reported
+         otherwise). The NDF names obtained can then be modified by
+         supplying a suitable GRP modification expression such as
+         \texttt{"$*$\_A"} for Parameter MOD.
 
          \sstitem
          To list NDFs that may not exist, supply a null (\texttt{{!}}) value for
@@ -34214,11 +34214,11 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          LAST = \_INTEGER (Read)
       }{
          The index of the last NDF to be tested. If a non-null value is
-	 supplied for FIRST, then the run-time default for LAST is equal
-	 to the supplied FIRST value (so that only a single NDF will be
-	 tested). If a null value is supplied for FIRST, then the
-	 run-time default for LAST is the last NDF in the supplied group.
-	 \texttt{[]}
+         supplied for FIRST, then the run-time default for LAST is equal
+         to the supplied FIRST value (so that only a single NDF will be
+         tested). If a null value is supplied for FIRST, then the
+         run-time default for LAST is the last NDF in the supplied group.
+         \texttt{[]}
       }
       \sstsubsection{
          LOGFILE = FILENAME (Write)
@@ -34230,15 +34230,15 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          MOD = LITERAL (Read)
       }{
          An optional GRP modification expression that will be used to
-	 modify any names obtained via the NDF parameter.  For instance,
+         modify any names obtained via the NDF parameter.  For instance,
          if MOD is \texttt{"$*$\_A"} then the supplied NDF names will be
          modified by appending \texttt{"\_A"} to them. No modification occurs
          if a null (\texttt{{!}}) value is supplied.
 
          If a null value is supplied for Parameter NDF then the value
-	 supplied for Parameter MOD should not include an asterisk,
-	 since there are no names to be modified. Instead, the
-	 MOD value should specify an explicit group of NDF
+         supplied for Parameter MOD should not include an asterisk,
+         since there are no names to be modified. Instead, the
+         MOD value should specify an explicit group of NDF
          names do not need to exist.
 
          The list can be filtered to remove any NDFs that do not exist
@@ -34335,7 +34335,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          SIZE = \_INTEGER (Write)
       }{
          An output parameter to which is written the total number of NDFs
-	 in the specified group.
+         in the specified group.
       }
       \sstsubsection{
          VALUE = LITERAL (Write)
@@ -35170,16 +35170,16 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
           LOOP = \_LOGICAL (Read)
       }{
          If both IN1 and IN2 are two-dimensional, but one of them spans
-	 only a single row or column, then setting LOOP to \texttt{TRUE} will
-	 cause every row or column in to be normalised independently of
-	 each other. Specifically, if IN2 spans only a single row or
-	 column, then it will be used to normalise each row or column of
-	 IN1 in turn. Any output NDF (see parameter OUT) will have the
-	 shape and size of IN1. If IN1 spans only a single row or column,
-	 then it will be normalised in turn by each row or column of IN2.
-	 Any output NDF (see parameter OUT) will then have the shape and
-	 size of IN2. In either case, the details of the fit for each row
-	 or column will be displayed separately.  Also see Parameters
+         only a single row or column, then setting LOOP to \texttt{TRUE} will
+         cause every row or column in to be normalised independently of
+         each other. Specifically, if IN2 spans only a single row or
+         column, then it will be used to normalise each row or column of
+         IN1 in turn. Any output NDF (see parameter OUT) will have the
+         shape and size of IN1. If IN1 spans only a single row or column,
+         then it will be normalised in turn by each row or column of IN2.
+         Any output NDF (see parameter OUT) will then have the shape and
+         size of IN2. In either case, the details of the fit for each row
+         or column will be displayed separately.  Also see Parameters
          OUTSLOPE, OUTOFFSET and OUTCORR. \texttt{[FALSE]}
       }
       \sstsubsection{
@@ -36311,11 +36311,11 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
          VECTOR = \_LOGICAL (Read)
       }{
          If \texttt{TRUE}, then vector parameters will be displayed as a
-	 comma-separated list of values enclosed in square brackets. If
-	 FALSE, vector values are printed as a space-separated list with
-	 no enclosing brackets. Additionally, if VECTOR is TRUE, string
-	 values (whether vector or scalar) are enclosed in single quotes
-	 and any embedded quotes are escaped using a backslash. \texttt{[FALSE]}
+         comma-separated list of values enclosed in square brackets. If
+         FALSE, vector values are printed as a space-separated list with
+         no enclosing brackets. Additionally, if VECTOR is TRUE, string
+         values (whether vector or scalar) are enclosed in single quotes
+         and any embedded quotes are escaped using a backslash. \texttt{[FALSE]}
       }
    }
    \sstexamples{
@@ -40075,11 +40075,11 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          \sstitem
 
          An input NDF is included in the provenance of an output NDF only
-	 if the DATA component of the input NDF is mapped for read or
-	 update access by the application. In other words, input NDFs
-	 which are accessed only for their metadata (\emph{e.g.} WCS
-	 information) are not included in the output provenance of an
-	 application.
+         if the DATA component of the input NDF is mapped for read or
+         update access by the application. In other words, input NDFs
+         which are accessed only for their metadata (\emph{e.g.} WCS
+         information) are not included in the output provenance of an
+         application.
 
          \sstitem
 
@@ -40868,13 +40868,13 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       }{
          The name of a file containing the Mapping to be used, or null (\texttt{{!}})
          if the input NDF is to be mapped into its own
-	 \htmlref{current Frame}{se:domains}.  If a file is supplied,
-	 the forward direction of the Mapping should transform pixel
-	 co-ordinates in the input NDF into the corresponding pixel
-	 co-ordinates in the output NDF. If only a subset of pixel
-	 axes are being re-gridded, then the inputs to the Mapping
-	 should correspond to the pixel axes specified via parameter
-	 AXES.  The file may be one of the following.
+         \htmlref{current Frame}{se:domains}.  If a file is supplied,
+         the forward direction of the Mapping should transform pixel
+         co-ordinates in the input NDF into the corresponding pixel
+         co-ordinates in the output NDF. If only a subset of pixel
+         axes are being re-gridded, then the inputs to the Mapping
+         should correspond to the pixel axes specified via parameter
+         AXES.  The file may be one of the following.
 
          \ssthitemlist{
 
@@ -47448,9 +47448,9 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
          stripped of spaces, and converted to upper case before being used.
 
          Note, if parameter MAPTYPE is set to ``REFNDF'', then the value
-	 supplied for parameter DOMAIN indicates the Domain of the Frame
-	 within the reference NDF that is to be copied (see parameter
-	 REFNDF).
+         supplied for parameter DOMAIN indicates the Domain of the Frame
+         within the reference NDF that is to be copied (see parameter
+         REFNDF).
       }
       \sstsubsection{
          EPOCH = \_DOUBLE (Read)
@@ -47533,9 +47533,9 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
          }
 
          Note, if parameter MAPTYPE is set to ``REFNDF'', then parameter
-	 FRMTYPE will not be used - the Frame used will instead always be
-	 a copy of the Frame from the reference NDF (as selected by
-	 parameter DOMAIN). \texttt{[!]}
+         FRMTYPE will not be used - the Frame used will instead always be
+         a copy of the Frame from the reference NDF (as selected by
+         parameter DOMAIN). \texttt{[!]}
       }
       \sstsubsection{
          INVEXP = LITERAL (Read)
@@ -47624,17 +47624,17 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
          REFNDF = NDF (Read)
       }{
          A reference NDF from which to obtain the Mapping and Frame. The
-	 NDFs specified by parameters NDF and REFNDF are aligned in a
-	 suitable co-ordinate system (usually their current Frames - an
-	 error is reported if the two NDFs cannot be aligned). The
-	 Mapping from the basis Frame in ``NDF'' (specified by parameter
-	 FRAME) to the required Frame in ``REFNDF'' (specified by parameter
-	 DOMAIN) is then found and used. The Frame added into ``NDF'' is
-	 always a copy of the reference Frame - regardless of the setting
-	 of parameter FRMTYPE. Parameter REFNDF is only used when
-	 parameter MAPTYPE is set to ``REFNDF'', in which case a value must
-	 also be supplied for parameter NDF (an error will be reported
-	 otherwise).
+         NDFs specified by parameters NDF and REFNDF are aligned in a
+         suitable co-ordinate system (usually their current Frames - an
+         error is reported if the two NDFs cannot be aligned). The
+         Mapping from the basis Frame in ``NDF'' (specified by parameter
+         FRAME) to the required Frame in ``REFNDF'' (specified by parameter
+         DOMAIN) is then found and used. The Frame added into ``NDF'' is
+         always a copy of the reference Frame - regardless of the setting
+         of parameter FRMTYPE. Parameter REFNDF is only used when
+         parameter MAPTYPE is set to ``REFNDF'', in which case a value must
+         also be supplied for parameter NDF (an error will be reported
+         otherwise).
       }
       \sstsubsection{
          RETAIN = \_LOGICAL (Read)
@@ -51809,21 +51809,21 @@ of an NDF, and change the values of those that are not read-only.
          }
 
          The default value for the \att{Unit} attribute for each system is
-	 shown in parentheses. Strictly, these systems should not allow
-	 changes to be made to the units. For instance, the usual
-	 definition of \texttt{{"}}MJD\texttt{{"}} and \texttt{{"}}JD\texttt{{"}} include
-	 the statement that the values will be in units of days. However,
-	 AST does allow the use of other units with all the above
-	 supported systems (except BEPOCH), on the understanding that
-	 conversion to the \texttt{{"}}correct\texttt{{"}} units involves nothing
-	 more than a simple scaling (1 yr = 365.25 d, 1 d = 24 h, 1 h =
-	 60 min, 1 min = 60 s). Besselian epoch values are defined in
-	 terms of tropical years of 365.2422 days, rather than the usual
-	 Julian year of 365.25 days. Therefore, to avoid any confusion,
-	 the \att{Unit} attribute is automatically cleared to
-	 \texttt{{"}}yr\texttt{{"}} when a System value of BEPOCH System is
-	 selected, and an error is reported if any attempt is
-	 subsequently made to change the \att{Unit} attribute.
+         shown in parentheses. Strictly, these systems should not allow
+         changes to be made to the units. For instance, the usual
+         definition of \texttt{{"}}MJD\texttt{{"}} and \texttt{{"}}JD\texttt{{"}} include
+         the statement that the values will be in units of days. However,
+         AST does allow the use of other units with all the above
+         supported systems (except BEPOCH), on the understanding that
+         conversion to the \texttt{{"}}correct\texttt{{"}} units involves nothing
+         more than a simple scaling (1 yr = 365.25 d, 1 d = 24 h, 1 h =
+         60 min, 1 min = 60 s). Besselian epoch values are defined in
+         terms of tropical years of 365.2422 days, rather than the usual
+         Julian year of 365.25 days. Therefore, to avoid any confusion,
+         the \att{Unit} attribute is automatically cleared to
+         \texttt{{"}}yr\texttt{{"}} when a System value of BEPOCH System is
+         selected, and an error is reported if any attempt is
+         subsequently made to change the \att{Unit} attribute.
       }
    }
 }
@@ -54283,9 +54283,9 @@ The following applications have been modified:
       \begin{itemize}
         \item The XMAP parameter now has a new option called \texttt{"LRLinear"},
         which causes the $X$ axis to be annotated linearly increasing from
-	left to right. This differs from the existing \texttt{"Linear"} option,
-	which may sometimes produce annotated values that increase from
-	right to left, depending on the nature of the WCS.
+        left to right. This differs from the existing \texttt{"Linear"} option,
+        which may sometimes produce annotated values that increase from
+        right to left, depending on the nature of the WCS.
       \end{itemize}
 
    \item [\htmlref{SCATTER}{SCATTER}]\mbox{}
@@ -54410,17 +54410,17 @@ The following applications have been modified:
    \item [\htmlref{BEAMFIT}{BEAMFIT}]\mbox{}
       \begin{itemize}
         \item There is now more control of the initial or fixed sizes
-	and shapes of the beams.  Note that {\bf this has involved a
-	change of the type and function of Parameter FIXFWHM}.
-	FIXFWHM like other FIX- parameters is \_LOGICAL; it just
-	constrains whether the FWHM values should be fixed.  A new
-	parameter called FWHM allows you to set either initial values,
-	or when FIXFWHM is also set \texttt{TRUE}, it sets fixed FWHM
-	values.  The interpretation of FWHM values depends on a new
-	CIRCULAR parameter, which constrains the fit to be circular
-	thus there is no minor axis and orientation derived.  In
-	combination it is possible to give a list of circular or
-	elliptical FWHMs.
+        and shapes of the beams.  Note that {\bf this has involved a
+        change of the type and function of Parameter FIXFWHM}.
+        FIXFWHM like other FIX- parameters is \_LOGICAL; it just
+        constrains whether the FWHM values should be fixed.  A new
+        parameter called FWHM allows you to set either initial values,
+        or when FIXFWHM is also set \texttt{TRUE}, it sets fixed FWHM
+        values.  The interpretation of FWHM values depends on a new
+        CIRCULAR parameter, which constrains the fit to be circular
+        thus there is no minor axis and orientation derived.  In
+        combination it is possible to give a list of circular or
+        elliptical FWHMs.
         \item The output parameters now store the statistics of every
         fitted beam, not just those of the primary beam.
       \end{itemize}
