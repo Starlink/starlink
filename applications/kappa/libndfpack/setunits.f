@@ -27,7 +27,7 @@
 *     UNITS parameter, then the NDF's UNITS component will be erased.
 *
 *     There is also an option to modify the pixel values within the NDF
-*     to reflect the change in units (see parameter MODIFY).
+*     to reflect the change in units (see Parameter MODIFY).
 
 *  Usage:
 *     setunits ndf units
@@ -43,7 +43,7 @@
 *        Units value in the NDF and the new Units value must both correspond
 *        to the format for units strings described in the FITS WCS standard
 *        (see "Representations of world coordinates in FITS", Greisen &
-*        Calabretta, 2002, A&A - available at http://www.aoc.nrao.edu/~egreisen/wcs_AA.ps.gz)
+*        Calabretta, 2002, A&A---available at http://www.aoc.nrao.edu/~egreisen/wcs_AA.ps.gz)
 *        If either of the two units strings are not of this form, or if it is
 *        not possible to find a transformation between them (for instance,
 *        because they represent different quantities), an error is

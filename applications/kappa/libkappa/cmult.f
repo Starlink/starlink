@@ -36,7 +36,7 @@
 *        The value by which the NDF's pixels are to be multiplied.
 *     TITLE = LITERAL (Read)
 *        A title for the output NDF.  A null value will cause the title
-*        of the NDF supplied for parameter IN to be used instead.
+*        of the NDF supplied for Parameter IN to be used instead.
 *        [!]
 
 *  Examples:

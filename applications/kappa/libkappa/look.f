@@ -141,10 +141,10 @@
 *        - "All" -- The entire NDF is used.
 *
 *        - "Centre" -- The centre and size of the region are specified
-*        using parameters CENTRE and SIZE.
+*        using Parameters CENTRE and SIZE.
 *
 *        - "Bounds" -- The bounds of the region are specified using
-*        parameters LBOUND and UBOUND.
+*        Parameters LBOUND and UBOUND.
 *
 *        - "ARDFile" -- The region is given by an `ARD Description'
 *        supplied within a text file specified using Parameter ARDFILE.
@@ -161,7 +161,7 @@
 *     SIZE( 2 ) = _INTEGER (Read)
 *        The dimensions of the rectangular area to be displayed, in
 *        pixels. If a single value is given, it is used for both axes.
-*        The area is centred on the position specified by parameter
+*        The area is centred on the position specified by Parameter
 *        CENTRE.   It is only accessed if MODE is "Centre". [7]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the format to use
@@ -203,7 +203,7 @@
 *        USEAXIS is only accessed if the current co-ordinate Frame of
 *        the NDF has more than two axes.  A group of two strings should
 *        be supplied specifying the two axes which are to be used when
-*        supplying positions for parameters CENTRE, LBOUND and UBOUND.
+*        supplying positions for Parameters CENTRE, LBOUND, and UBOUND.
 *        Each axis can be specified using one of the following options.
 *
 *        - Its integer index within the current Frame of the input
@@ -235,7 +235,7 @@
 *        assumes that the current co-ordinate Frame in the NDF is pixel
 *        co-ordinates). The listing is displayed on the screen only.
 *     look ngc6872 "10 11" 1
-*        Stores the value of pixel (10,11) in output parameter VALUE,
+*        Stores the value of pixel (10,11) in output Parameter VALUE,
 *        but does not store it in a log file. This assumes that the
 *        current co-ordinate Frame in the NDF is pixel co-ordinates.
 *     look ngc6872 mode=ard arddesc="circle(1:27:23,-22:41:12,0:0:10)"

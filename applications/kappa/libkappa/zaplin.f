@@ -131,7 +131,7 @@
 *        replaced.  The supplied string can be one of the following
 *        options.
 *
-*        - "Interface" -- bounds are obtained using Parameters COLUMNS,
+*        - "Interface" -- bounds are obtained using Parameters COLUMNS
 *        and LINES.  The type of area to be replaced is specified using
 *        Parameter LINCOL.
 *
@@ -512,7 +512,7 @@
       INTEGER IPOUT( 2 )         ! Pointer to output DATA_ARRAY
                                  ! component
       INTEGER IWCS               ! WCS FrameSet for output NDF
-      INTEGER LCSTA              ! The state of parameter LINCOL
+      INTEGER LCSTA              ! The state of Parameter LINCOL
       INTEGER LINES              ! Non-zero if a line is to be drawn
       INTEGER MAP                ! Mapping from supplied Frame to PIXEL
                                  ! Frame

@@ -88,7 +88,7 @@
 *        equal-sized cells that cover the entire picture.  This may cause
 *        them to be drawn at spatial positions that do not correspond to
 *        their actual spatial positions within the supplied cube.  The
-*        dynamic default is TRUE if parameter CLEAR is TRUE and there is
+*        dynamic default is TRUE if Parameter CLEAR is TRUE and there is
 *        an existing DATA picture on the graphics device. []
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes describing the spatial

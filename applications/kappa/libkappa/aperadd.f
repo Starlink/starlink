@@ -132,7 +132,7 @@
 *        USEAXIS is only accessed if the current co-ordinate Frame of
 *        the NDF has too many axes. A group of strings should be
 *        supplied specifying the axes which are to be used when
-*        specifying the aperture using Parameters ARDFILE, CENTRE and
+*        specifying the aperture using Parameters ARDFILE, CENTRE, and
 *        DIAM.  Each axis can be specified using one of the following
 *        options.
 *

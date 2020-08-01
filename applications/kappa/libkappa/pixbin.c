@@ -97,7 +97,7 @@ F77_SUBROUTINE(pixbin)( INTEGER(status) ){
 *     provided by COLLAPSE.
 *
 *     An extra group of M NDFs can be supplied that define the WCS to
-*     be stored in the output NDF - see Parameter WCS.
+*     be stored in the output NDF---see Parameter WCS.
 
 *  Usage:
 *     pixbin in out index [wcs]
@@ -107,7 +107,7 @@ F77_SUBROUTINE(pixbin)( INTEGER(status) ){
 *        The input N-dimensional NDF.
 *     INDEX = NDF (Read)
 *        A group of index NDFs (all with N-dimensions). The number of index
-*        NDFs supplied (refered to below as M) should be in the range 1-6
+*        NDFs supplied (refered to below as M) should be in the range 1--6
 *        and determines the dimensionality of the output NDF. A section is
 *        taken from each one so that it matches the input NDF supplied by
 *        Parameter IN. The data values in the J'th index NDF are converted
@@ -188,7 +188,7 @@ F77_SUBROUTINE(pixbin)( INTEGER(status) ){
 *     21-APR-2020 (DSB):
 *        Original version.
 *     29-APR-2020 (DSB):
-*        Added parameter WCS.
+*        Added Parameter WCS.
 *     {enter_further_changes_here}
 
 *-

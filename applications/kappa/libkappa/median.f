@@ -24,7 +24,7 @@
 *     structure with a Weighted Median Filter (WMF) in a 3-by-3-pixel
 *     kernel to create a new NDF.  There are a number of predefined
 *     weighting functions and parameters that permit other symmetric
-*     weighting functions.  See parameter MODE and the topic
+*     weighting functions.  See Parameter MODE and the topic
 *     "User-defined Weighting Functions".
 *
 *     A threshold for replacement of a value by the median can be set.
@@ -104,7 +104,7 @@
 *        described below.
 *
 *          "Specified"   - You specify the number of iterations
-*                          at each step size in the parameter NUMIT.
+*                          at each step size in the Parameter NUMIT.
 *
 *          "Continuous"  - The filter iterates continuously until
 *                          convergence is achieved and the array is no
@@ -159,7 +159,7 @@
 *        [1]
 *     TITLE = LITERAL (Read)
 *        Value for the title of the output NDF.  A null value will cause
-*        the title of the NDF supplied for parameter IN to be used
+*        the title of the NDF supplied for Parameter IN to be used
 *        instead. [!]
 
 *  Examples:
@@ -323,7 +323,7 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     7-SEP-2006 (DSB):
-*        Initialise NSTEP before getting parameter STEP, in order to avoid
+*        Initialise NSTEP before getting Parameter STEP, in order to avoid
 *        seg faults in the event of an earlier error.
 *     2012 May 8 (MJC):
 *        Add _INT64 support.
@@ -488,7 +488,7 @@
          BIGSTP = MAX( BIGSTP, STEP(IS) )
       END DO
 
-*  Value for  parameter DIFF must be in the range 0.0 to a huge
+*  Value for Parameter DIFF must be in the range 0.0 to a huge
 *  number.
       CALL PAR_GDR0D( 'DIFF', DDIFF, 0.0D0, VAL__MAXD, .TRUE., DIFF,
      :                STATUS )

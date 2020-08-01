@@ -175,7 +175,7 @@
 *        Title for the histogram NDF.  ["KAPPA - Histogram"]
 *     WEIGHTS = NDF (Read)
 *        An optional NDF holding weights associated with each input pixel
-*        value (supplied via parameter IN). Together with parameter
+*        value (supplied via Parameter IN). Together with Parameter
 *        WEIGHTSTEP, these determine the count added to the corresponding
 *        histogram bin for each input pixel value. For instance, weights
 *        could be related to the variance of the data values, or to the
@@ -184,10 +184,10 @@
 *        one to the corresponding histogram bin. If an NDF is supplied, the
 *        histogram count for a particular input pixel is formed by dividing
 *        its weight value (supplied in the WEIGHTS NDF) by the value of
-*        parameter WEIGHTSTEP, and then taking the nearest integer. Input
+*        Parameter WEIGHTSTEP, and then taking the nearest integer. Input
 *        pixels with bad or zero weights are excluded from the histogram. [!]
 *     WEIGHTSTEP = _DOUBLE (Read)
-*        Only accessed if a value is supplied for parameter WEIGHTS.
+*        Only accessed if a value is supplied for Parameter WEIGHTS.
 *        WEIGHTSTEP is the increment in weight value that corresponds to
 *        a unit increment in histogram count.
 *     WIDTH = _DOUBLE (Read)

@@ -105,12 +105,12 @@
 *        - "Combine" -- Combine two previously defined regions into a
 *        single region using a Boolean operator, or invert
 *        a previously defined region using a Boolean .NOT.
-*        operator.  See parameters OPERANDS and OPERATOR.  The
+*        operator.  See Parameters OPERANDS and OPERATOR.  The
 *        original regions are deleted and the new combined
 *        (or inverted) region is added to the end of the
 *        list of defined regions.
 *
-*        - "Delete" -- Delete previously defined regions, see parameter
+*        - "Delete" -- Delete previously defined regions, see Parameter
 *        REGIONS.
 *
 *        - "Draw" -- Draw the outline of the union of one or more
@@ -545,7 +545,7 @@
      :           SHAPE .EQ. 'FRAME' ) ) OPTION = 'SINGLE'
 
 *  Loop round until all regions have been given.  Only loop once if
-*  SINGLE was selected for parameter OPTION.
+*  SINGLE was selected for Parameter OPTION.
             REGION = .TRUE.
             DO WHILE ( REGION .AND. STATUS .EQ. SAI__OK )
 

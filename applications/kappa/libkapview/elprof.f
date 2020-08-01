@@ -23,27 +23,27 @@
 *     This application will bin the input image into elliptical annuli,
 *     or into a `fan' of adjacent sectors, centred on a specified
 *     position.  The typical data values in each bin are found (see
-*     parameter ESTIMATOR), and stored in a 1-dimensional NDF which
-*     can be examined using LINPLOT, INSPECT, etc.  A 2-dimensional mask
-*     image can optionally be produced indicating which bin each input
-*     pixel was placed in.
+*     Parameter ESTIMATOR), and stored in a one-dimensional NDF which
+*     can be examined using LINPLOT, INSPECT, etc.  A two-dimensional
+*     mask image can optionally be produced indicating which bin each
+*     input pixel was placed in.
 *
 *     The area of the input image which is to be binned is the annulus
-*     enclosed between the two concentric ellipses defined by parameter
-*     RATIO, ANGMAJ, RMIN and RMAX. The binned area can be restricted to
-*     an azimuthal section of this annulus using parameter ANGLIM. Input
+*     enclosed between the two concentric ellipses defined by Parameters
+*     RATIO, ANGMAJ, RMIN, and RMAX. The binned area can be restricted to
+*     an azimuthal section of this annulus using Parameter ANGLIM. Input
 *     data outside the area selected by these parameters is ignored. The
-*     selected area can be binned in two ways, specified by parameter
+*     selected area can be binned in two ways, specified by Parameter
 *     RADIAL:
 *
 *     - If radial binning is selected (the default), then each bin is
 *     an elliptical annulus concentric with the ellipses bounding the
-*     binned area. The number of bins is specified by parameter NBIN
+*     binned area. The number of bins is specified by Parameter NBIN
 *     and the radial thickness of each bin is specified by WIDTH.
 *
 *     - If azimuthal binning is selected, then each bin is a sector
 *     (i.e. a wedge-shape), with its vertex given by parameters XC and
-*     YC, and its opening angle given by parameters WIDTH.  The number of
+*     YC, and its opening angle given by Parameter WIDTH.  The number of
 *     bins is specified by NBIN.
 
 *  Usage:
@@ -123,7 +123,7 @@
 *        Elprof"]
 *     WIDTH = _REAL (Read)
 *        The width of each bin.  If a radial profile is being created
-*        (see parameter RADIAL) this is the width of each annulus in
+*        (see Parameter RADIAL) this is the width of each annulus in
 *        pixels (measured on the major axis).  If an azimuthal profile
 *        is being created, it is the opening angle of each sector, in
 *        degrees.  If a null (!) value is supplied, the value used is chosen
@@ -161,7 +161,7 @@
 *        width (opening angle) of 36 degrees (so that 360 degrees are
 *        covered in total).  Only the section of each sector bounded by
 *        radii of 50 and 60 pixels is included in the profile.  In this
-*        case the default value of 1.0 is accepted for parameter RATIO
+*        case the default value of 1.0 is accepted for Parameter RATIO
 *        and so the bins will form a circular annulus of width 10
 *        pixels.
 
@@ -214,7 +214,7 @@
 *        Changed the defaulting for ANGMAJ, RATIO, RMAX, RMIN and WIDTH
 *        to avoid vpath=dynamic parameters.
 *     13-JUN-2001 (DSB):
-*        Added parameter ESTIMATOR.
+*        Added Parameter ESTIMATOR.
 *     24-FEB-2004 (DSB):
 *        Added propagation of WCS to output and mask.
 *     2004 September 3 (TIMJ):

@@ -25,7 +25,7 @@
 *     for instance, by applications LISTMAKE and CURSOR.  By default all
 *     positions in the catalogue are reported, but a subset may be
 *     reported by specifying a range of "position identifiers" (see
-*     Parameters FIRST, LAST and STEP).
+*     Parameters FIRST, LAST, and STEP).
 *
 *     Positions may be reported in a range of co-ordinate Frames
 *     dependent on the information stored in the supplied positions
@@ -219,7 +219,7 @@
 *
 *        - "Chain" -- This is a combination of "Mark" and "Poly".  Each
 *        position is marked by a marker and joined by a line to the
-*        previous position.  Parameters MARKER, GEODESIC and CLOSE are
+*        previous position.  Parameters MARKER, GEODESIC, and CLOSE are
 *        used to specify the markers and lines to use.
 *
 *        - "Box" -- A rectangular box with edges parallel to the edges

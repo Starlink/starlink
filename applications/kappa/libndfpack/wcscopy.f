@@ -42,15 +42,15 @@
 *     NDF = NDF (Read and Write)
 *        The input NDF data structure in which the WCS information is to
 *        be stored. Any existing WCS component is over-written (see
-*        parameter CONFIRM).
+*        Parameter CONFIRM).
 *     OK = _LOGICAL (Read)
 *        This parameter is used to get a confirmation that an existing
 *        WCS component within the input NDF can be over-written.
 *     TR( ) = _DOUBLE (Read)
 *        The values of this parameter are the coefficients of a linear
 *        transformation from pixel co-ordinates in the reference NDF
-*        given for parameter LIKE, to pixel co-ordinates in the input
-*        NDF given for parameter NDF. For instance, if a feature has
+*        given for Parameter LIKE, to pixel co-ordinates in the input
+*        NDF given for Parameter NDF. For instance, if a feature has
 *        pixel co-ordinates (X,Y,Z,...) in the reference NDF, and pixel
 *        co-ordinates (U,V,W,...) in the input NDF, then the following
 *        transformations would be used, depending on how many axes each
@@ -102,7 +102,7 @@
 *        assume the first axis of NDF m51 has pixel-index bounds of
 *        I1:I2 (these values can be found using NDFTRACE). If the first
 *        axis in the squashed NDF m51_sqorst spans M pixels (where M is
-*        the value assigned to SQORST parameter XDIM), then it will have
+*        the value assigned to SQORST Parameter XDIM), then it will have
 *        pixel-index bounds of 1:M. Note, the lower bound is 1 since the
 *        pixel origin has been reset by SQORST. The squashing factor for
 *        the first axis is then:
@@ -114,7 +114,7 @@
 *                SX = FX*( 1 - I1 )
 *
 *        Likewise, if the bounds of the second axis in m51 are J1:J2,
-*        and SQORST parameter YDIM is set to N, then the squashing
+*        and SQORST Parameter YDIM is set to N, then the squashing
 *        factor for the second axis is:
 *
 *                FY = N/(J2 - J1 + 1)
@@ -123,7 +123,7 @@
 *
 *                SY = FY*( 1 - J1 )
 *
-*        You would then use the following values for parameter TR when
+*        You would then use the following values for Parameter TR when
 *        running WCSCOPY:
 *
 *                TR = [SX, FX, 0.0, SY, 0.0, FY]
@@ -136,7 +136,7 @@
 
 *  Notes:
 *     -  An error is reported if the transformation supplied using
-*     parameter TR is singular.
+*     Parameter TR is singular.
 *     -  The pixel with pixel index I spans a range of pixel co-ordinate
 *     from (I - 1.0) to (I).
 *     -  The pixel indices of the bottom left pixel in an NDF is called
@@ -144,7 +144,7 @@
 *     origin can be examined using application NDFTRACE and set using
 *     application SETORIGIN. WCSCOPY takes account of the pixel origins
 *     in the two NDFs when modifying the WCS component. Thus, if a null
-*     value is given for parameter TR, the supplied WCS component may
+*     value is given for Parameter TR, the supplied WCS component may
 *     still be modified if the two NDFs have different pixel origins.
 
 *  Related Applications:

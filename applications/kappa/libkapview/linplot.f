@@ -35,7 +35,7 @@
 *     text size, etc.) may be specified in detail using Parameter STYLE.
 *
 *     The bounds of the plot on both axes can be specified using
-*     Parameters XLEFT, XRIGHT, YBOT and YTOP.  If not specified they
+*     Parameters XLEFT, XRIGHT, YBOT, and YTOP.  If not specified they
 *     take default values which encompass the entire supplied data set.
 *     The current picture is usually cleared before plotting the new
 *     picture, but Parameter CLEAR can be used to prevent this, allowing
@@ -708,7 +708,7 @@
       PARAMETER ( KW = 0.1 )     ! current picture.
 
 *  Local Variables:
-      CHARACTER CIAXIS*( 8 )     ! String obtained for parameter USEAXIS
+      CHARACTER CIAXIS*( 8 )     ! String obtained for Parameter USEAXIS
       CHARACTER COMP*( 8 )       ! Component to be displayed
       CHARACTER KEYLN1*( 80 )    ! First line of key text
       CHARACTER KEYLN2*( 80 )    ! Second line of key text

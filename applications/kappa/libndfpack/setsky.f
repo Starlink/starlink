@@ -23,13 +23,13 @@
 *     This application adds WCS information describing a celestial sky
 *     co-ordinate system to a two-dimensional NDF. This information can
 *     be stored either in the form of a standard NDF WCS component, or
-*     in the form of an "IRAS90 astrometry structure" (see parameter
+*     in the form of an "IRAS90 astrometry structure" (see Parameter
 *     IRAS90).
 *
 *     The astrometry is determined either by you supplying explicit
 *     values for certain projection parameters, or by you providing the
 *     sky and corresponding image co-ordinates for a set of positions
-*     (see parameter POSITIONS).  In the latter case, the projection
+*     (see Parameter POSITIONS).  In the latter case, the projection
 *     parameters are determined automatically by searching through
 *     parameter space in order to minimise the sum of the squared
 *     residuals between the supplied pixel co-ordinates and the
@@ -77,7 +77,7 @@
 *        FALSE value will be used. [!]
 *     LAT = LITERAL (Read)
 *        The latitude of the reference point, in the co-ordinate system
-*        specified by parameter COORDS.  For example, if COORDS is
+*        specified by Parameter COORDS.  For example, if COORDS is
 *        "Equatorial", LAT is the Declination.  See SUN/163, Section
 *        4.7.2 for full details of the allowed syntax for specifying
 *        this position.  For convenience here are some examples how you
@@ -85,24 +85,24 @@
 *        00", "-45 12", "-45d 12m", "-45.2d", "-451200", "-0.78888r".
 *        The last of these is a radians value.  A null value causes the
 *        latitude of the reference point to be estimated automatically
-*        from the data supplied for parameter POSITIONS. [!]
+*        from the data supplied for Parameter POSITIONS. [!]
 *     LOGFILE = FILENAME (Read)
 *        Name of the text file to log the final projection parameter
 *        values and the residual at each supplied position.  If null,
 *        there will be no logging.  This parameter is ignored if a null
-*        value is given to parameter POSITIONS. [!]
+*        value is given to Parameter POSITIONS. [!]
 *     LON= LITERAL (Read)
 *        The longitude of the reference point, in the co-ordinate
-*        system specified by parameter COORDS.  For example, if COORDS
+*        system specified by Parameter COORDS.  For example, if COORDS
 *        is "Equatorial", LON is the Right Ascension.  See SUN/163,
 *        Section 4.7.2 for full details of the allowed syntax for
 *        specifying this position.  For convenience here are some
 *        examples how you may specify the Right Ascension 11 hours, 34
 *        minutes, and 56.2 seconds: "11 34 56.2", "11h 34m 56.2s", "11
-*        34.9366", "11.58228", "113456.2".  See parameter LAT for
+*        34.9366", "11.58228", "113456.2".  See Parameter LAT for
 *        examples of specifying a non-equatorial longitude.  A null
 *        value causes the longitude of the reference point to be
-*        estimated automatically from the data supplied for parameter
+*        estimated automatically from the data supplied for Parameter
 *        POSITIONS. [!]
 *     NDF = NDF (Read and Write)
 *        The NDF in which to store the WCS information.
@@ -113,22 +113,22 @@
 *        direction of increasing sky longitude.  Values are constrained
 *        to the range 0 to two-pi radians.  A null value causes the
 *        position angle to be estimated automatically from the data
-*        supplied for parameter POSITIONS. [!]
+*        supplied for Parameter POSITIONS. [!]
 *     PIXELREF( 2 ) = REAL (Read)
 *        The pixel co-ordinates of the reference pixel (x then y).
 *        This parameter is ignored unless REFCODE = "Pixel".  Remember
 *        that the centre of a pixel at indices i,j is (i-0.5,j-0.5).  A
 *        null value causes the pixel co-ordinates of the reference
 *        point to be estimated automatically from the data supplied for
-*        parameter POSITIONS. [!]
+*        Parameter POSITIONS. [!]
 *     PIXELSIZE( 2 ) = _REAL (Read)
 *        The x and y pixel sizes at the reference position.  If only
 *        one value is given, the pixel is deemed to be square.  Values
-*        may be given in a variety of units (see parameter LAT).  For
+*        may be given in a variety of units (see Parameter LAT).  For
 *        example, 0.54 arcseconds could be specified as "0.54s" or
 *        "0.009m" or "2.618E-6r".  A null value causes the pixel
 *        dimensions to be estimated automatically from the data
-*        supplied for parameter POSITIONS. [!]
+*        supplied for Parameter POSITIONS. [!]
 *     POSITIONS = LITERAL (Read)
 *        A list of sky co-ordinates and corresponding image
 *        co-ordinates for the set of positions which are to be used to
@@ -136,8 +136,8 @@
 *        astrometry is determined by the explicit values you supply for
 *        each of the other parameters.  Each position is defined by
 *        four values, the sky longitude (in the same format as for
-*        parameter LON), the sky latitude (in the same format as for
-*        parameter LAT), the image pixel x co-ordinate and the image
+*        Parameter LON), the sky latitude (in the same format as for
+*        Parameter LAT), the image pixel x co-ordinate and the image
 *        pixel y co-ordinate (both decimal values).  These should be
 *        supplied (in the order stated) for each position.  These
 *        values are given in the form of a `group expression' (see
@@ -163,11 +163,11 @@
 *
 *        See SUN/163 for descriptions of these projections.  A null
 *        value causes the projection to be determined automatically
-*        from the data supplied for parameter POSITIONS. [!]
+*        from the data supplied for Parameter POSITIONS. [!]
 *     REFCODE = LITERAL (Read)
 *        The code for the reference pixel.  If it has value "Pixel"
 *        this requests that pixel co-ordinates for the reference point
-*        be obtained through parameter PIXELREF.  The other options are
+*        be obtained through Parameter PIXELREF.  The other options are
 *        locations specified by two characters, the first corresponding
 *        to the vertical position and the second the horizontal.  For
 *        the vertical, valid positions are T(op), B(ottom), or
@@ -177,7 +177,7 @@
 *        that the reference position is at the centre of the
 *        bottom-left pixel in the image.  A null value causes the pixel
 *        co-ordinates of the reference point to be estimated
-*        automatically from the data supplied for parameter POSITIONS.
+*        automatically from the data supplied for Parameter POSITIONS.
 *        [!]
 *     TILT = LITERAL (Read)
 *        The angle through which the celestial sphere is to be rotated
@@ -186,17 +186,17 @@
 *        in an anti-clockwise sense when looking from the reference
 *        point towards the centre of the celestial sphere.  In common
 *        circumstances this can be set to zero.  Values may be given in
-*        a variety of units (see parameter LAT).  Values are
+*        a variety of units (see Parameter LAT).  Values are
 *        constrained to the range 0 to two-pi radians.  A null value
 *        causes the latitude of the reference point to be estimated
-*        automatically from the data supplied for parameter POSITIONS.
+*        automatically from the data supplied for Parameter POSITIONS.
 *        ["0.0"]
 
 *  Examples:
 *     setsky m51 ^stars.lis ecl(j1994.0) 1994.0 logfile=m51.log
 *        This creates a WCS component to a two-dimensional NDF called
-*        m51.  The values for parameters PROJTYPE, LON, LAT, PIXELREF,
-*        PIXELSIZE and ORIENT are determined automatically so
+*        m51.  The values for Parameters PROJTYPE, LON, LAT, PIXELREF,
+*        PIXELSIZE, and ORIENT are determined automatically so
 *        that they minimised the sum of the squared residuals (in
 *        pixels) at each of the positions specified in the file
 *        stars.lis.  This file contains a line for each position, each
@@ -209,11 +209,11 @@
 *        to file m51.log.
 *     setsky m51 ^stars.lis ecl(j1994.0) 1994.0 orient=0 projtype=orth
 *        This creates a WCS component within the two-dimensional NDF
-*        called m51.  The values for parameters PROJTYPE, LON, LAT,
-*        PIXELREF and PIXELSIZE are determined automatically as in
+*        called m51.  The values for Parameters PROJTYPE, LON, LAT,
+*        PIXELREF, and PIXELSIZE are determined automatically as in
 *        the previous example.  In this example however, an Orthographic
 *        projection is forced, and the value zero is assigned to
-*        parameter ORIENT, resulting in north being `upwards' in the image.
+*        Parameter ORIENT, resulting in north being `upwards' in the image.
 *     setsky virgo "!" eq(j2000.0) 1989.3 gn "12 29" "+12 30" bl 1.1s 0.0d
 *        This creates a WCS component within the two-dimensional
 *        NDF called virgo.  It is a gnomonic projection in the
@@ -252,13 +252,13 @@
 *     support the complete range or projections or sky co-ordinate systems
 *     which may be represented by the more general NDF WCS component.
 *     - If WCS information is stored in the form of an IRAS90 astrometry
-*     structure (see parameter IRAS90), it will in general be invalidated
+*     structure (see Parameter IRAS90), it will in general be invalidated
 *     by any subsequent KAPPA commands which modify the transformation
 *     between sky and pixel coordinates. For instance, if the image is
 *     moved using SLIDE (for example), then the IRAS90 astrometry
 *     structure will no longer correctly describe the sky co-ordinates
 *     associated with each pixel. For this reason (amongst others) it is
-*     better to set parameter IRAS90 to a false value.
+*     better to set Parameter IRAS90 to a false value.
 
 *  Related Applications:
 *     ASTROM; IRAS90: SKYALIGN, SKYBOX, SKYGRID, SKYLINE, SKYMARK,
@@ -294,7 +294,7 @@
 *     1994 April 13 (MJC):
 *        Original version.
 *     28-OCT-1994 (DSB):
-*        Added parameters POSITIONS and LOGFILE.  Modified to determine
+*        Added Parameters POSITIONS and LOGFILE.  Modified to determine
 *        projection parameters automatically from the data supplied for
 *        POSITIONS.
 *     1995 February 13 (MJC):
@@ -302,7 +302,7 @@
 *        pixel size in arcseconds if appropriate.  Validated the
 *        extension locator before annulling it.
 *     26-NOV-2001 (DSB):
-*        Added parameter IRAS90.
+*        Added Parameter IRAS90.
 *     {enter_further_changes_here}
 
 *-
@@ -443,7 +443,7 @@
          IF( SIZE .EQ. 0 ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'SETSKY_ERR1', 'No values were supplied '/
-     :                    /'for parameter ''%POSITIONS''.', STATUS )
+     :                    /'for Parameter ''%POSITIONS''.', STATUS )
             GOTO 999
          END IF
 
@@ -461,7 +461,7 @@
             CALL MSG_SETI( 'N', SIZE )
             STATUS = SAI__ERROR
             CALL ERR_REP( 'SETSKY_ERR2', 'An incomplete list of '/
-     :        /'positions was supplied for parameter ''%POSITIONS''. '/
+     :        /'positions was supplied for Parameter ''%POSITIONS''. '/
      :        /' ^N values supplied.', STATUS )
             GOTO 999
          END IF

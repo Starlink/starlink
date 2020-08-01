@@ -54,7 +54,7 @@
 *  ADAM Parameters:
 *     AEND( ) = _DOUBLE (Write)
 *        The axis upper extents of the NDF.  For non-monotonic axes,
-*        zero is used.  See parameter AMONO.  This is not assigned if
+*        zero is used.  See Parameter AMONO.  This is not assigned if
 *        AXIS is FALSE.
 *     AFORM( ) = LITERAL (Write)
 *        The storage forms of the axis centres of the NDF.  This is
@@ -70,7 +70,7 @@
 *        when FULLAXIS is TRUE and AXIS is TRUE.
 *     ASTART( ) = _DOUBLE (Write)
 *        The axis lower extents of the NDF.  For non-monotonic axes,
-*        zero is used.  See parameter AMONO.  This is not assigned if
+*        zero is used.  See Parameter AMONO.  This is not assigned if
 *        AXIS is FALSE.
 *     ATYPE( ) = LITERAL (Write)
 *        The data types of the axis centres of the NDF.  This is only
@@ -169,7 +169,7 @@
 *     NEXTN = _INTEGER (Write)
 *        The number of extensions in the NDF.
 *     NFRAME = _INTEGER (Write)
-*        The number of WCS Frames described by parameters FDIM, FDOMAIN
+*        The number of WCS Frames described by parameters FDIM, FDOMAIN,
 *        and FTITLE.  Set to zero if WCS is FALSE.
 *     QUALITY = _LOGICAL (Write)
 *        Whether or not the NDF contains a QUALITY array.
@@ -322,13 +322,13 @@
 *        Add control string to KPG1_DSFRM calls that indicates that the
 *        call is being made from NDFTRACE. This causes extra output
 *        parameters to be written within KPG1_DSFRM. Specifically, the
-*        WCS pixel scales are written to the new output parameter FPIXSCALE.
+*        WCS pixel scales are written to the new output Parameter FPIXSCALE.
 *     2009 July 24 (MJC):
 *        Remove QUIET parameter and use the current reporting level
 *        instead (set by the global MSG_FILTER environment variable).
 *     13-APR-2010 (DSB):
 *        Always call KPG1_DSFRM, even if reporting is switched off, since
-*        it writes out the out value for output parameter FPIXSCALE.
+*        it writes out the out value for output Parameter FPIXSCALE.
 *     8-NOV-2010 (DSB):
 *        Add support for DELTA storage form.
 *     16-MAR-2011 (DSB):
@@ -1158,7 +1158,7 @@
 *  If required (i.e. if this is the current Frame or we are displaying
 *  all Frames), display the Frame description. We need to call KPG1_DSFRM
 *  even if we are not reporting (e.g. due to QUIET=YES), because
-*  KPG1_DSFRM writes out the value to output parameter FPIXSCALE. Note,
+*  KPG1_DSFRM writes out the value to output Parameter FPIXSCALE. Note,
 *  only include the "NDFTRACE:" prefix (which causes KPG1_DSFRM to write
 *  out the FPIXSCALE parameter value) if we are displaying the current
 *  Frame.
@@ -1188,7 +1188,7 @@
             END IF
 
 *  The rest we only do if we are reporting information on the screen.
-*  Only display the Current Frame if parameter FULLWCS is FALSE.
+*  Only display the Current Frame if Parameter FULLWCS is FALSE.
             IF ( REPORT .AND. ( FULLWC .OR. IFRAME .EQ. ICURR ) ) THEN
 
 *  Display the bounds of the NDF in this Frame if full frame information

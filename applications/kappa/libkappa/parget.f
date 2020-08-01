@@ -43,7 +43,7 @@
 *     would assign elements of the shell array perval[1], perval[2],
 *     etc. to the last-computed percentile values of HISTAT. For other
 *     scripting languages such as Python, the alternative vector
-*     format produced by setting parameter VECTOR to TRUE may be more
+*     format produced by setting Parameter VECTOR to TRUE may be more
 *     appropriate.
 *
 *     Single elements of an parameter array may also be accessed using
@@ -67,12 +67,12 @@
 
 *  Examples:
 *     parget mean stats
-*        Report the value of parameter MEAN for the application STATS.
+*        Report the value of Parameter MEAN for the application STATS.
 *     parget mincoord \
-*        This reports the values of parameter MINCOORD of the current
+*        This reports the values of Parameter MINCOORD of the current
 *        application, in this case STATS.
 *     parget applic=ndftrace parname=flabel(2)
-*        This reports the value of the second element of parameter
+*        This reports the value of the second element of Parameter
 *        FLABEL for the application NDFTRACE.
 
 *  Notes:
@@ -124,14 +124,14 @@
 *     4-OCT-2004 (TIMJ):
 *        Use ONE_SCRSZ rather than KPG1_SCRSZ.
 *     2005 September 2 (MJC):
-*        Use internal parameter OBJECT to obtain a pointer to the
+*        Use internal Parameter OBJECT to obtain a pointer to the
 *        full path, such that an array index can be appended to
 *        access a single element of an array of parameter values.
 *        Increase the maximum path length.
 *     2-FEB-2006 (TIMJ):
 *        Use HDS_FIND rather than attempting to kluge DAT_ASSOC.
 *     9-OCT-2012 (DSB):
-*        Added parameter VECTOR.
+*        Added Parameter VECTOR.
 *     {enter_further_changes_here}
 
 *-
@@ -240,7 +240,7 @@
             CALL MSG_SETC( 'PAR', PARNAM )
             CALL MSG_SETC( 'PATH', FILE )
             CALL ERR_REP( 'PARGET_NOOBJ',
-     :        'There is no parameter ^PAR in file ^PATH.', STATUS )
+     :        'There is no Parameter ^PAR in file ^PATH.', STATUS )
             GOTO 999
          END IF
 

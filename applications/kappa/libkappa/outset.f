@@ -64,8 +64,8 @@
 *     USEAXIS = GROUP (Read)
 *        USEAXIS is only accessed if the current co-ordinate Frame of
 *        the NDF has more than two axes. A group of strings should be
-*        supplied specifying the axes which are to be used when
-*        specifying the circle parameters CENTRE and DIAM.  Each axis
+*        supplied designating the axes that are to be used when
+*        specifying the circle via Parameters CENTRE and DIAM.  Each axis
 *        can be specified using one of the following options.
 *
 *        - Its integer index within the current Frame of the input

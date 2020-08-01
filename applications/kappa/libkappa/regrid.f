@@ -27,7 +27,7 @@
 *
 *     By default, the bounds of the output pixel grid are chosen so that
 *     they just encompass all the transformed input data, but they can
-*     be set explicitly using parameters LBOUND and UBOUND.
+*     be set explicitly using Parameters LBOUND and UBOUND.
 *
 *     Two algorithms are available for determining the output pixel
 *     values: resampling and rebinning (the algorithm used is determined
@@ -83,7 +83,7 @@
 *        into the corresponding pixel co-ordinates in the output NDF.
 *        If only a subset of pixel axes are being re-gridded, then the
 *        inputs to the Mapping should correspond to the pixel axes
-*        specified via parameter AXES.  The file may be one of the
+*        specified via Parameter AXES.  The file may be one of the
 *        following.
 *
 *        - A text file containing a textual representation of the AST
@@ -633,7 +633,7 @@
                STATUS = SAI__ERROR
                CALL MSG_SETI( 'I', PAXES( I ) )
                CALL ERR_REP( 'REGRID_ERR0', 'Pixel axis ^I specified '//
-     :                       'more than once by parameter AXES.',
+     :                       'more than once by Parameter AXES.',
      :                       STATUS )
             END IF
          END DO
@@ -684,7 +684,7 @@
             IF( TMAP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL ERR_REP( ' ', 'The WCS axes corresponding to the '//
-     :                       'pixel axes specified by parameter AXES '//
+     :                       'pixel axes specified by Parameter AXES '//
      :                       'cannot be split from the other WCS axes.',
      :                       STATUS )
             END IF
@@ -758,7 +758,7 @@
          IF( TMAP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'The WCS axes corresponding to the '//
-     :                    'pixel axes specified by parameter AXES '//
+     :                    'pixel axes specified by Parameter AXES '//
      :                    'cannot be split from the other WCS axes.',
      :                    STATUS )
          ELSE
@@ -770,7 +770,7 @@
          IF( TMAP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'The WCS axes corresponding to the '//
-     :                    'pixel axes specified by parameter AXES '//
+     :                    'pixel axes specified by Parameter AXES '//
      :                    'cannot be split from the other WCS axes.',
      :                    STATUS )
          ELSE

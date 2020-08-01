@@ -23,7 +23,7 @@
 *     This application resamples or rebins a group of input NDFs,
 *     producing corresponding output NDFs which are aligned
 *     pixel-for-pixel with a specified reference NDF, or POLPACK
-*     catalogue (see parameter REFCAT).
+*     catalogue (see Parameter REFCAT).
 *
 *     If an input NDF has more pixel axes than the reference NDF, then
 *     the extra pixel axes are retained unchanged in the output NDF.
@@ -300,7 +300,7 @@
 *     PARAMS( 2 ) = _DOUBLE (Read)
 *        An optional array which consists of additional parameters
 *        required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
-*        SombCos and Gauss methods.
+*        SombCos, and Gauss methods.
 *
 *        PARAMS( 1 ) is required by all the above schemes.
 *        It is used to specify how many pixels are to contribute to the
@@ -333,11 +333,11 @@
 *        The NDF to which all the input NDFs are to be aligned. If a
 *        null value is supplied for this parameter, the first NDF
 *        supplied for Parameter IN is used. This parameter is only used
-*        if no catalogue is supplied for parameter REFCAT.
+*        if no catalogue is supplied for Parameter REFCAT.
 *     REFCAT = NDF (Read)
 *        A POLPACK catalogue defining the WCS to which all the input NDFs
 *        are to be aligned. If a null value is supplied for this parameter,
-*        the WCS will be obtained from an NDF using parameter REF. [!]
+*        the WCS will be obtained from an NDF using Parameter REF. [!]
 *     UBND() = _INTEGER (Read)
 *        An array of values giving the upper pixel-index bound on each
 *        axis for the output NDFs. The number of values supplied should
@@ -513,7 +513,7 @@
 *     6-DEC-2013 (DSB):
 *        No longer any reason prevent Gauss kernel being used with REBIN=NO.
 *     1-DEC-2014 (DSB):
-*        Added parameter ALIGNREF.
+*        Added Parameter ALIGNREF.
 *     {enter_further_changes_here}
 
 *-
@@ -623,7 +623,7 @@
             CALL KPG1_ASFFR( IWCSR, 'PIXEL', IPIX, STATUS )
             IF( IPIX .EQ. AST__NOFRAME .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP( ' ', 'Catalogue supplied for parameter '//
+               CALL ERR_REP( ' ', 'Catalogue supplied for Parameter '//
      :                       'REFCAT has no suitable WCS', status )
             ELSE
                ICUR = AST_GETI( IWCSR, 'Current', STATUS )
