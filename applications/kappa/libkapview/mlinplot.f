@@ -52,7 +52,7 @@
 *     Parameter ZMARK).
 *
 *     The bounds of the plot on both axes can be specified using
-*     parameters XLEFT, XRIGHT, YBOT and YTOP.  If not specified they
+*     Parameters XLEFT, XRIGHT, YBOT, and YTOP.  If not specified they
 *     take default values which encompass the entire supplied data set.
 *     The current picture is usually cleared before plotting the new
 *     picture, but Parameter CLEAR can be used to prevent this, allowing

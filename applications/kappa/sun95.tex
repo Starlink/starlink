@@ -1952,8 +1952,8 @@ you can escape commas within text strings using this method.
 
 If a group expression is used to specify a list of input data files
 (\xref{NDFs}{sun33}{overview_of_an_ndf} or positions lists), then file
-names may be specified that contain wild card characters
-(\verb+"*"+ and \texttt{"?"} -- character classes can also be matched using
+names may be specified that contain wild-card characters
+(\verb+"*"+ and \texttt{"?"}---character classes can also be matched using
 strings such as \texttt{"[0-9]"}, \texttt{"[abcd]"}).  These will be
 expanded into a list of explicit file names before returning the group
 to the application.
@@ -7108,7 +7108,7 @@ Most applications that re-use one or more parameters during a single
 invocation have some similar means of indicating that you do not want to
 be prompted for a new value.  For some (like CENTROID), putting the
 parameter value on the command line accomplishes this.  Some others (such
-as SETEXT) have a LOOP parameter that can be set FALSE to indicate that
+as SETEXT) have a LOOP parameter that can be set \texttt{FALSE} to indicate that
 parameters should not be accessed more than once.  The reference
 documentation for each command should be consulted for details.
 
@@ -9711,7 +9711,7 @@ KAPPA: \htmlref{CADD}{CADD},
       \sstsubsection{
          CONSERVE = \_LOGICAL (Read)
       }{
-         If set TRUE, then the output pixel values will be scaled in
+         If set \texttt{TRUE}, then the output pixel values will be scaled in
          such a way as to preserve the total data value in a feature on
          the sky.  The scaling factor is the ratio of the output pixel
          size to the input pixel size.  This option can only be used if
@@ -9724,7 +9724,7 @@ KAPPA: \htmlref{CADD}{CADD},
          panel of the piece-wise linear approximation to the Mapping,
          and is assumed to be constant for all output pixels in the
          panel.  This parameter is ignored if the NORM parameter is set
-         FALSE.   \texttt{[TRUE]}
+         \texttt{FALSE}.   \texttt{[TRUE]}
       }
       \sstsubsection{
          CORLIMIT = \_REAL (Read)
@@ -9885,7 +9885,7 @@ KAPPA: \htmlref{CADD}{CADD},
       }{
          An optional output NDF to contain a copy of IN aligned with OUT.
          No output is created if null (\texttt{!}) is supplied. If FITVALS
-         is TRUE, the output data values will be scaled so that they have
+         is \texttt{TRUE}, the output data values will be scaled so that they have
          the same normalisation as the reference values.
       }
       \sstsubsection{
@@ -10074,8 +10074,8 @@ KAPPA: \htmlref{CADD}{CADD},
    \sstdescription{
       This routine displays statistics for pixels that lie within a
       specified aperture of an \NDFref{NDF}.  The aperture can either be circular
-      (specified by parameters CENTRE and DIAM), or arbitrary (specified
-      by Parameter ARDFILE).  If the aperture is specified using parameters
+      (specified by Parameters CENTRE and DIAM), or arbitrary (specified
+      by Parameter ARDFILE).  If the aperture is specified using Parameters
       CENTRE and DIAM, then it must be either one- or  two-dimensional.
 
       The following statistics are displayed:
@@ -10111,7 +10111,7 @@ KAPPA: \htmlref{CADD}{CADD},
       (\emph{i.e.} if it has no \htmlref{VARIANCE}{apndf:variance}~ component), then each pixel is assumed to
       have a constant variance equal to the variance of the pixel values
       within the aperture.  There is an option to weight pixels so that
-      pixels with larger variances are given less weight (see parameter
+      pixels with larger variances are given less weight (see Parameter
       WEIGHT).  The statistics are displayed on the screen and written to
       output parameters.  They may also be written to a log file.
 
@@ -10131,7 +10131,7 @@ KAPPA: \htmlref{CADD}{CADD},
          The name of an ARD file containing a description of the aperture.
          This allows apertures of almost any shape to be used.  If a null
          (\texttt{{!}}) value is supplied then the aperture is assumed to be circular
-         with centre and diameter given by parameters CENTRE and DIAM.  ARD
+         with centre and diameter given by Parameters CENTRE and DIAM.  ARD
          files can be created either `by hand' using an editor, or using a
          specialist application such as \htmlref{ARDGEN}{ARDGEN}.
 
@@ -10153,14 +10153,14 @@ KAPPA: \htmlref{CADD}{CADD},
          given in the current \htmlref{co-ordinate Frame}{se:domains}~  of the NDF (supplying
          a colon \texttt{":"} will display details of the current co-ordinate
          Frame).  The position should be supplied as a list of formatted
-         axis values separated by spaces or commas.  See also parameter
+         axis values separated by spaces or commas.  See also Parameter
          USEAXIS.  The current co-ordinate Frame can be changed using
          application \htmlref{WCSFRAME}{WCSFRAME}.
       }
       \sstsubsection{
          DIAM = LITERAL (Read)
       }{
-         The diameter of the circular aperture.  Only used if parameter
+         The diameter of the circular aperture.  Only used if Parameter
          ARDFILE is set to null.  If the \htmlref{current co-ordinate
          Frame}{se:curframe}~ of the NDF is a SKY Frame (\emph{e.g.} RA and
          DEC), then the value should be supplied as an increment of celestial
@@ -10244,7 +10244,7 @@ KAPPA: \htmlref{CADD}{CADD},
          USEAXIS is only accessed if the current co-ordinate Frame of the
          NDF has too many axes.  A group of strings should be supplied
          specifying the axes which are to be used when specifying the
-         aperture using parameters ARDFILE, CENTRE and DIAM.  Each axis can
+         aperture using Parameters ARDFILE, CENTRE, and DIAM.  Each axis can
          be specified using one of the following options.
 
          \ssthitemlist{
@@ -10483,12 +10483,12 @@ KAPPA: \htmlref{STATS}{STATS},
             \texttt{"Combine"} --- Combine two previously defined regions
             into a single region using a Boolean operator, or invert a
             previously defined region using a Boolean .NOT. operator.
-            See parameters OPERANDS and OPERATOR.  The original
+            See Parameters OPERANDS and OPERATOR.  The original
             regions are deleted and the new combined (or inverted)
             region is added to the end of the list of defined regions.
 
             \sstitem
-            \texttt{"Delete"} --- Delete previously defined regions, see parameter
+            \texttt{"Delete"} --- Delete previously defined regions, see Parameter
             REGIONS.
 
             \sstitem
@@ -10877,11 +10877,11 @@ KAPPA: \htmlref{ARDGEN}{ARDGEN},
       the graphics device, the outlines are drawn over the top of the
       previously displayed picture, aligned (if possible) in the current
       co-ordinate Frame of the previously drawn picture.  If the graphics
-      device is empty (or if the CLEAR parameter is set TRUE) the
-      outlines are drawn using a default projection - the size of the
+      device is empty (or if the CLEAR parameter is set \texttt{TRUE}) the
+      outlines are drawn using a default projection---the size of the
       area plotted can be controlled by the SIZE parameter. Note, the
       facility to plot on an empty device is currently only available for
-      two-dimensional regions specified using parameter REGION.
+      two-dimensional regions specified using Parameter REGION.
    }
    \sstusage{
       ardplot ardfile [device] [regval]
@@ -10905,7 +10905,7 @@ KAPPA: \htmlref{ARDGEN}{ARDGEN},
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
       }{
-         TRUE if the current picture is to be cleared before the Region
+         \texttt{TRUE} if the current picture is to be cleared before the Region
          is display. \texttt{[FALSE]}
       }
       \sstsubsection{
@@ -11255,7 +11255,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       In the first two modes the application loops, asking for new
       feature co-ordinates until it is told to quit or encounters an
       error or the maximum number of features is reached.  The last is
-      five, unless parameters POS2---POS5 define the location of the
+      five, unless Parameters POS2---POS5 define the location of the
       secondary beams and then only the primary beam's position is
       demanded.
 
@@ -11265,7 +11265,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       the primary beam, and the offset of the primary beam from a
       reference position.  Also a listing of the fit results may be
       written to a log file geared more towards human readers,
-      including details of the input parameters (see parameter
+      including details of the input parameters (see Parameter
       LOGFILE).
    }
    \sstusage{
@@ -11334,7 +11334,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          DEVICE = DEVICE (Read)
       }{
          The graphics device which is to be used to give the initial
-         guesses at the beam positions.  Only accessed if parameter
+         guesses at the beam positions.  Only accessed if Parameter
          MODE is given the value \texttt{"Cursor"}.
          \texttt{[}Current graphics device\texttt{{]}}
       }
@@ -11386,7 +11386,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          FIXSEP = \_LOGICAL (Read)
       }{
          If \texttt{TRUE}, the separations of secondary beams from the primary
-         beam are fixed, and this takes precedence over parameter
+         beam are fixed, and this takes precedence over Parameter
          FIXPOS.  If \texttt{FALSE}, the beam separations are free to be fitted
          (although it is actually the centres being fit).
          It is advisable not to use this option in the inaccurate
@@ -11405,17 +11405,17 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
             A single value gives the same circular FWHM for all beams.
 
             \sstitem
-            When Parameter CIRCULAR is TRUE, supply a list of values one
+            When Parameter CIRCULAR is \texttt{TRUE}, supply a list of values one
             for each of the number of beams.  These should be supplied in
             the same order as the corresponding beam positions.
 
             \sstitem
             A pair of values sets the major- and minor-axis values for
-            all beams, provided Parameter CIRCULAR is FALSE.
+            all beams, provided Parameter CIRCULAR is \texttt{FALSE}.
 
             \sstitem
             Major- and minor-axis pairs, whose order should match that
-            of the corresponding beams.  Again CIRCULAR should be FALSE.
+            of the corresponding beams.  Again CIRCULAR should be \texttt{FALSE}.
          }
 
          Multiple values are separated by commas.  An error is issued
@@ -12749,7 +12749,7 @@ KAPPA: \htmlref{VECPLOT}{VECPLOT};
 
          }
          The limits adopted for the data value axis are reported unless
-         parameter RANGE is specified on the command line.  In this case
+         Parameter RANGE is specified on the command line.  In this case
          values are only calculated where necessary for the chosen method.
 
          The method name can be abbreviated to a single character, and
@@ -12916,7 +12916,7 @@ KAPPA: \htmlref{ADD}{ADD},
       The results may optionally be written to an output positions list
       which can be used to pass the positions on to another application
       (see Parameter OUTCAT), or to a log file geared more towards human
-      readers, including details of the input parameters (see parameter
+      readers, including details of the input parameters (see Parameter
       LOGFILE).
 
       The uncertainty in the centroid positions may be estimated if
@@ -12939,7 +12939,7 @@ KAPPA: \htmlref{ADD}{ADD},
          CATFRAME = LITERAL (Read)
       }{
          A string determining the \htmlref{co-ordinate Frame}{se:domains}~  in which positions are
-         to be stored in the output catalogue associated with parameter
+         to be stored in the output catalogue associated with Parameter
          OUTCAT.  The string supplied for CATFRAME can be one of the
          following options.
 
@@ -13000,7 +13000,7 @@ KAPPA: \htmlref{ADD}{ADD},
          DEVICE = \htmlref{DEVICE}{se:selgradev} (Read)
       }{
          The graphics device which is to be used to give the initial
-         guesses at the centroid positions.  Only accessed if parameter
+         guesses at the centroid positions.  Only accessed if Parameter
          MODE is given the value \texttt{"Cursor"}.  \texttt{[}Current graphics device\texttt{{]}}
       }
       \sstsubsection{
@@ -13015,7 +13015,7 @@ KAPPA: \htmlref{ADD}{ADD},
       }{
          A catalogue containing a positions list giving the initial
          guesses at the centroid positions, such as produced by
-         applications CURSOR, LISTMAKE.  Only accessed if parameter
+         applications CURSOR, LISTMAKE.  Only accessed if Parameter
          MODE is given the value \texttt{"Catalogue"}.
       }
       \sstsubsection{
@@ -14129,7 +14129,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          of equal-sized cells that cover the entire picture.  This may cause
          them to be drawn at spatial positions that do not correspond to
          their actual spatial positions within the supplied cube.  The
-         dynamic default is \texttt{TRUE} if parameter CLEAR is \texttt{TRUE} and
+         dynamic default is \texttt{TRUE} if Parameter CLEAR is \texttt{TRUE} and
          there is an existing DATA picture on the graphics device.  \texttt{[]}
       }
       \sstsubsection{
@@ -14685,7 +14685,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          TITLE = LITERAL (Read)
       }{
          A \htmlref{title}{apndf:title} for the output NDF.  A null value will cause the title
-         of the NDF supplied for parameter IN to be used instead.
+         of the NDF supplied for Parameter IN to be used instead.
          \texttt{[!]}
       }
    }
@@ -15206,7 +15206,7 @@ XV; PBMPLUS; NETPBM.
          Frame, then a pixel co-ordinate value would be required for the
          third axis (note, the pixel with index I covers a range of pixel
          co-ordinates from $(I-1)$ to $I$).  Together with Parameter LOW, this
-         Parameter gives the range of axis values to be compressed.  Note,
+         parameter gives the range of axis values to be compressed.  Note,
          HIGH and LOW should not be equal since.  If a null value (\texttt{{!}}) is
          supplied for either HIGH or LOW, the entire range of the axis
          is collapsed.  \texttt{[!]}
@@ -15268,10 +15268,10 @@ XV; PBMPLUS; NETPBM.
          statistic, and to derive output variance.  If VARIANCE is \texttt{TRUE}
          and the NDF contains a variance array, this array will be
          used to define the weights, otherwise all the weights will be
-         set equal.  By definition this parameter is set to FALSE when
+         set equal.  By definition this parameter is set to \texttt{FALSE} when
          COMP is \texttt{"Variance"} or \texttt{"Error"}.
 
-         The VARIANCE parameter is ignored and set to FALSE when there
+         The VARIANCE parameter is ignored and set to \texttt{FALSE} when there
          are more than 300 pixels along the collapse axis and
          ESTIMATOR is \texttt{"Median"}, \texttt{"Mode"}, \texttt{"Cmean"}, or
          \texttt{"Csigma"}.  This prevents the covariance matrix from being
@@ -15394,7 +15394,7 @@ XV; PBMPLUS; NETPBM.
          co-ordinates of the central pixel are undefined).  Two
          current-Frame positions are then generated by substituting in
          turn into this central position each of the HIGH and LOW
-         values for the current-Frame axis specified by parameter
+         values for the current-Frame axis specified by Parameter
          AXIS.  These two current-Frame positions are transformed into
          pixel co-ordinates, and the projections of the vector joining
          these two pixel positions on to the pixel axes are found.  The
@@ -15408,7 +15408,7 @@ XV; PBMPLUS; NETPBM.
          contributing data values.  This reports the fraction of flagged
          output data generated by the WLIM parameter's threshold.
 
-         No warning is given when Parameter WLIM=0.  Input data
+         No warning is given when Parameter WLIM=\texttt{0}.  Input data
          containing only bad values are not counted in the flagged
          fraction, since no potential good output value has been lost.
       }
@@ -15555,7 +15555,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
          If the input data type is to be preserved on output then this
          parameter should be set \texttt{TRUE}.  However, this may result in
          overflows for integer types and hence additional bad values
-         written to the output NDF.  If this parameter is set false
+         written to the output NDF.  If this parameter is set \texttt{FALSE}
          then the output data type will be one of \_REAL or \_DOUBLE,
          depending on the input type.  \texttt{[FALSE]}
       }
@@ -16969,7 +16969,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
       This application smooths a one- or two-dimensional \NDFref{NDF} using a
       Point-Spread Function given by a second NDF.  The output NDF is
       normalised to the same mean data value as the input NDF (if Parameter
-      NORM is set to TRUE), and is the same size as the input NDF.
+      NORM is set to \texttt{TRUE}), and is the same size as the input NDF.
    }
    \sstusage{
       convolve in psf out xcentre ycentre
@@ -17162,7 +17162,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       is set bad in the DATA array of REF, is also set bad in the DATA
       and \htmlref{VARIANCE}{apndf:variance}~ (if available) arrays in OUT.
 
-      By setting the INVERT Parameter TRUE, the opposite effect can be
+      By setting the INVERT Parameter \texttt{TRUE}, the opposite effect can be
       produced (\emph{i.e.} any pixel that is not set bad in the DATA array
       of REF, is set bad in OUT and the others are left unchanged).
    }
@@ -17178,7 +17178,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       \sstsubsection{
          INVERT = \_LOGICAL (Read)
       }{
-         If TRUE, then the bad and good pixels within the reference NDF
+         If \texttt{TRUE}, then the bad and good pixels within the reference NDF
          specified by Parameter REF are inverted before being used (that
          is, good pixels are treated as bad and bad pixels are treated as
          good).  \texttt{[FALSE]}
@@ -18601,8 +18601,8 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          are fractional values where zero corresponds to the lowest available
          colour index and 1.0 corresponds to the highest available colour
          index. The default value of \texttt{[0.0,1.0]} thus causes the full range
-         of colour indicies to be used. Note, if parameter LUT is null
-         (!) or parameter SCALE is FALSE then this parameter is ignored
+         of colour indices to be used. Note, if Parameter LUT is null
+         (!) or Parameter SCALE is \texttt{FALSE} then this parameter is ignored
          and the fill range of pens is used. \texttt{[0.0,1.0]}
       }
       \sstsubsection{
@@ -18619,7 +18619,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          Parameter MODE.  If it is \texttt{FALSE}, MODE is ignored, and the input
          data are displayed as is (\emph{i.e.} the data values are simply converted
          to integer type and used as indices into the colour table).  A value
-         of zero refers to the first pen following the palette.  A FALSE
+         of zero refers to the first pen following the palette.  A \texttt{FALSE}
          value is intended to be used with data previously scaled by this
          or similar applications which have already performed the required
          scaling (see Parameter OUT).  It provides the quickest method of
@@ -19509,8 +19509,8 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM},
      pixel was placed in.
 
       The area of the input image which is to be binned is the annulus
-      enclosed between the two concentric ellipses defined by Parameter
-      RATIO, ANGMAJ, RMIN and RMAX.  The binned area can be restricted to
+      enclosed between the two concentric ellipses defined by Parameters
+      RATIO, ANGMAJ, RMIN, and RMAX.  The binned area can be restricted to
       an azimuthal section of this annulus using Parameter ANGLIM.  Input
       data outside the area selected by these parameters is ignored.  The
       selected area can be binned in two ways, specified by Parameter
@@ -19527,7 +19527,7 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM},
          \sstitem
          If azimuthal binning is selected, then each bin is a sector
          (\emph{i.e.} a wedge-shape), with its vertex given by Parameters XC and
-         YC, and its opening angle given by Parameters WIDTH.  The number of
+         YC, and its opening angle given by Parameter WIDTH.  The number of
          bins is specified by NBIN.
       }
    }
@@ -22217,7 +22217,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
             displayed to standard output.  This will be a blank for a comment
             card.
 
-            \item \texttt{"Rename"} --- renames a keyword, using parameter
+            \item \texttt{"Rename"} --- renames a keyword, using Parameter
             NEWKEY to obtain the new keyword.
 
             \item \texttt{"Update"} --- revises the value and/or the comment.
@@ -23628,7 +23628,7 @@ KAPPA: \htmlref{ROTATE}{ROTATE},
          transform.  If a null is given then an image of zeros is
          assumed unless a null is also given for PHASEIN, in which
          case the application quits.  This parameter is only available
-         if HERMIN, REALIN and IMAGIN are all not used.  One way to
+         if HERMIN, REALIN, and IMAGIN are all not used.  One way to
          achieve that is to supply PHASEIN, but none of the
          aforementioned parameters, on the command line.  This
          parameter is only relevant for an inverse transformation.
@@ -23648,7 +23648,7 @@ KAPPA: \htmlref{ROTATE}{ROTATE},
          power rather than the power itself.  If a null is given then an
          image of zeros is assumed unless a null is also given for
          PHASEIN, in which case the application quits.  This parameter
-         is only available if HERMIN, REALIN and IMAGIN are all not
+         is only available if HERMIN, REALIN, and IMAGIN are all not
          used.  One way to achieve that is to supply POWERIN, but none
          of the aforementioned parameters, on the command line.  This
          parameter is only relevant for an inverse transformation.
@@ -24592,10 +24592,10 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
       }{
          The application name to be recorded in the new history record.
          If a null value (\texttt{{!}}) is supplied, a default of
-         ``HISCOM'' is used and the new history record describes the
+         \texttt{"HISCOM"} is used and the new history record describes the
          parameter values supplied when HISCOM was invoked. If a non-null
          value is supplied, the new history record refers to the specified
-         application name instead of ``HISCOM'' and does not describe the
+         application name instead of \texttt{"HISCOM"} and does not describe the
          HISCOM parameter values. \texttt{[!]}
       }
       \sstsubsection{
@@ -25551,7 +25551,7 @@ KAPPA: \htmlref{LAPLACE}{LAPLACE},
          WEIGHTS = NDF (Read)
       }{
          An optional NDF holding weights associated with each input pixel
-         value (supplied via parameter IN). Together with parameter
+         value (supplied via Parameter IN). Together with Parameter
          WEIGHTSTEP, these determine the count added to the corresponding
          histogram bin for each input pixel value. For instance, weights
          could be related to the variance of the data values, or to the
@@ -25567,7 +25567,7 @@ KAPPA: \htmlref{LAPLACE}{LAPLACE},
       \sstsubsection{
          WEIGHTSTEP = \_DOUBLE (Read)
       }{
-         Only accessed if a value is supplied for parameter WEIGHTS.
+         Only accessed if a value is supplied for Parameter WEIGHTS.
          WEIGHTSTEP is the increment in weight value that corresponds to
          a unit increment in histogram count.
       }
@@ -26442,7 +26442,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
       detail using Parameter STYLE.
 
       The bounds of the plot on both axes can be specified using
-      Parameters XLEFT, XRIGHT, YBOT and YTOP.  If not specified they take
+      Parameters XLEFT, XRIGHT, YBOT, and YTOP.  If not specified they take
       default values which encompass the entire supplied data set.  The
       current picture is usually cleared before plotting the new picture,
       but Parameter CLEAR can be used to prevent this, allowing several
@@ -26480,7 +26480,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          parameters are ignored and the bounds of the existing plot are used
          instead.  If ALIGN is \texttt{FALSE}, the new \textit{x} axis values are used without
          change.  The bounds of the new plot are specified using Parameters
-         XLEFT, XRIGHT, YBOT and YTOP as usual, and these bounds are mapped
+         XLEFT, XRIGHT, YBOT, and YTOP as usual, and these bounds are mapped
          to the edges of the existing picture.  The ALIGN parameter is only
          accessed if Parameter CLEAR is \texttt{FALSE}, and if there is another line
          plot within the current picture.  If a null (\texttt{{!}}) value is supplied,
@@ -27400,7 +27400,7 @@ KAPPA: \htmlref{PROFILE}{PROFILE},
          \xref{formatted axis values}{sun210}{AST_UNFORMAT} separated
          by white space. You are prompted for new values for this
          parameter until a null value is entered.  It is only accessed
-         if parameter MODE is given the value \texttt{"Interface"}.
+         if Parameter MODE is given the value \texttt{"Interface"}.
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -27779,7 +27779,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
             \sstitem
             \texttt{"Chain"} --- This is a combination of \texttt{"Mark"} and \texttt{"Poly"}.  Each
             position is marked by a marker and joined by a line to the previous
-            position.  Parameters MARKER, GEODESIC and CLOSE are used to
+            position.  Parameters MARKER, GEODESIC, and CLOSE are used to
             specify the markers and lines to use.
 
             \sstitem
@@ -27800,7 +27800,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
             \sstitem
             \texttt{"STCS"} --- Indicates that each position should be
             marked using the two-dimensional STC-S shape read from the
-            catalogue column specified by parameter STCSCOL.
+            catalogue column specified by Parameter STCSCOL.
 
             \sstitem
             \texttt{"Text"} --- A text string is used to mark each position.  The string
@@ -28507,7 +28507,7 @@ KAPPA: \htmlref{LOG10}{LOG10},
          USEAXIS is only accessed if the current co-ordinate Frame of the
          NDF has more than two axes.  A group of two strings should be
          supplied specifying the two axes which are to be used when supplying
-         positions for Parameters CENTRE, LBOUND and UBOUND.  Each axis can
+         positions for Parameters CENTRE, LBOUND, and UBOUND.  Each axis can
          be specified using one of the following options.
 
          \ssthitemlist{
@@ -30326,7 +30326,7 @@ KAPPA: \htmlref{FITSURFACE}{FITSURFACE},
 
       The shape of the output NDF is specified using Parameter AXES.  This
       is a list of integers, each element of which identifies the source
-      of the corresponding axis of the output - either the index of one of
+      of the corresponding axis of the output---either the index of one of
       the pixel axes of the input, or a zero indicating that the input
       should be expanded with copies of itself along that axis.  If any
       axis of the input NDF is not referenced in the AXES list, the
@@ -30763,18 +30763,18 @@ KAPPA: \htmlref{COLLAPSE}{COLLAPSE},
          \sstitem
          There are additional tokens which can appear in the expression.
 
-         The set of 7 tokens named CA, CB, \ldots CG is used to obtain the
+         The set of seven tokens named CA, CB, \ldots CG is used to obtain the
          data co-ordinates from the primary input NDF data structure.  Any
-         of the 7 parameters may appear in the expression.  The order
+         of the seven parameters may appear in the expression.  The order
          defines which axis is which, so for example, \texttt{"2$*$CF$+$CB$*$CB"} means
          the first-axis data co-ordinates squared, plus twice the
          co-ordinates along the second axis.  There must be at least one
          input NDF in the expression to use the CA-CG tokens, and it must
          have dimensionality of at least the number of CA-CG tokens given.
 
-         The set of 7 tokens named XA, XB, \ldots XG is used to obtain the
+         The set of seven tokens named XA, XB, \ldots XG is used to obtain the
          pixel co-ordinates from the primary input NDF data structure.  Any
-         of the 7 parameters may appear in the expression.  The order
+         of the seven parameters may appear in the expression.  The order
          defines which axis is which, so for example, \texttt{"SQRT(XE)$+$XC"} means
          the first-axis pixel co-ordinates plus the square root of the
          co-ordinates along the second axis.  Here no input NDF need be
@@ -31100,7 +31100,7 @@ and numerous arithmetic tasks;
          TITLE = LITERAL (Read)
       }{
          The title for the output NDF.  A null value will cause
-         the title of the NDF supplied for parameter IN to be used
+         the title of the NDF supplied for Parameter IN to be used
          instead.  \texttt{[!]}
       }
    }
@@ -31989,10 +31989,10 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          than 1.  The value is defined as an NDF section, so that
          ranges can be defined along any axis, and be given as pixel
          indices or axis (data) co-ordinates.  The pixel axis
-         corresponding to parameter AXIS is ignored.  So for example,
-         if the pixel axis were 3 in a cube, the value \texttt{"3:5,4,"}
-         would average all the lines in elements in columns 3 to 5 and
-         row 4.  See \slhyperref{NDF Sections}{Section~}{}{se:ndfsect}
+         corresponding to Parameter AXIS is ignored.  So for example,
+         if the pixel axis were three in a cube, the value \texttt{"3:5,4,"}
+         would average all the lines in elements in Columns 3 to 5 and
+         Row 4.  See \slhyperref{NDF Sections}{Section~}{}{se:ndfsect}
          for details.
 
          A null value (\texttt{{!}}) requests that a representative region
@@ -32177,7 +32177,7 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
       drawn within the main plot (see Parameter ZMARK).
 
       The bounds of the plot on both axes can be specified using
-      Parameters XLEFT, XRIGHT, YBOT and YTOP.  If not specified they take
+      Parameters XLEFT, XRIGHT, YBOT, and YTOP.  If not specified they take
       default values which encompass the entire supplied data set.  The
       current picture is usually cleared before plotting the new picture,
       but Parameter CLEAR can be used to prevent this, allowing several
@@ -33187,7 +33187,7 @@ KAPPA: \htmlref{CLINPLOT}{CLINPLOT},
          A flag indicating whether a variance array present in the
          NDF is used to weight the array values while forming the
          estimator's statistic, and to derive output variance.  If
-         VARIANCE is TRUE and all the input NDFs contain a variance
+         VARIANCE is \texttt{TRUE} and all the input NDFs contain a variance
          array, this array will be used to define the weights, otherwise
          all the weights will be set equal.  \texttt{[TRUE]}
       }
@@ -33745,12 +33745,12 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
             \sstitem
             \texttt{"SCALED"} --- A lossy compression scheme for all data types. See
             \htmlref{``Scaled Compression''}{scaled_compression:ndfcompress}
-            below, and Parameters DSCALE, DZERO, VSCALE, VZERO and SCALEDTYPE.
+            below, and Parameters DSCALE, DZERO, VSCALE, VZERO, and SCALEDTYPE.
 
             \sstitem
             \texttt{"DELTA"} --- A lossless compression scheme for integer data types.
             See \htmlref{``Delta Compression''}{delta_compression:ndfcompress}
-            below, and Parameters ZAXIS, ZMINRATIO and ZTYPE.
+            below, and Parameters ZAXIS, ZMINRATIO, and ZTYPE.
          }
          The current value is the default, which is initially \texttt{"DELTA"}.  \texttt{[]}
       }
@@ -33867,7 +33867,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       be close in value, and so differences between adjacent values can be
       represented in fewer bits than the absolute values themselves. The
       differences are taken along a nominated pixel axis within the
-      supplied array (specified by parameter ZAXIS). Any input value that
+      supplied array (specified by Parameter ZAXIS). Any input value that
       differs from its earlier neighbour by more than the data range of
       the selected data type is stored explicitly using the data type of
       the input array.
@@ -33991,7 +33991,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          place.  By default, no template will be used and the shape of
          the output NDF will therefore match that of the input NDF (or
          NDF section). The shape of the template in either pixel indices
-         or the current WCS Frame may be used, as selected by parameter
+         or the current WCS Frame may be used, as selected by Parameter
          LIKEWCS.  \texttt{[!]}
       }
       \sstsubsection{
@@ -34201,7 +34201,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
       \sstsubsection{
          EXISTS = \_LOGICAL (Read)
       }{
-         If \texttt{TRUE}, then only display paths for NDFs specified by parameter
+         If \texttt{TRUE}, then only display paths for NDFs specified by Parameter
          MOD that actually exist and are accessible. \texttt{[FALSE]}
       }
       \sstsubsection{
@@ -34242,7 +34242,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          names do not need to exist.
 
          The list can be filtered to remove any NDFs that do not exist
-         (see parameter EXISTS). \texttt{[!]}
+         (see Parameter EXISTS). \texttt{[!]}
       }
       \sstsubsection{
          NDF = NDF (Read)
@@ -34780,7 +34780,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
       \sstsubsection{
          NFRAME = \_INTEGER (Write)
       }{
-         The number of \htmlref{WCS domains}{se:domains} described by Parameters FDIM, FDOMAIN and
+         The number of \htmlref{WCS domains}{se:domains} described by Parameters FDIM, FDOMAIN, and
          FTITLE.  Set to zero if WCS is \texttt{FALSE}.
       }
       \sstsubsection{
@@ -35111,8 +35111,8 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          plot.  The width of the margins left for the annotation may be
          controlled using Parameter MARGIN.  The appearance of the axes
          (colours, founts, \emph{etc.}) can be controlled using the Parameter
-         STYLE.  The dynamic default is TRUE if CLEAR is TRUE, and FALSE
-         otherwise. \texttt{[]}
+         STYLE.  The dynamic default is \texttt{TRUE} if CLEAR is
+         \texttt{TRUE}, and \texttt{FALSE} otherwise. \texttt{[]}
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
@@ -35174,20 +35174,20 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          cause every row or column in to be normalised independently of
          each other. Specifically, if IN2 spans only a single row or
          column, then it will be used to normalise each row or column of
-         IN1 in turn. Any output NDF (see parameter OUT) will have the
+         IN1 in turn. Any output NDF (see Parameter OUT) will have the
          shape and size of IN1. If IN1 spans only a single row or column,
          then it will be normalised in turn by each row or column of IN2.
-         Any output NDF (see parameter OUT) will then have the shape and
+         Any output NDF (see Parameter OUT) will then have the shape and
          size of IN2. In either case, the details of the fit for each row
          or column will be displayed separately.  Also see Parameters
-         OUTSLOPE, OUTOFFSET and OUTCORR. \texttt{[FALSE]}
+         OUTSLOPE, OUTOFFSET, and OUTCORR. \texttt{[FALSE]}
       }
       \sstsubsection{
          MARGIN( 4 ) = \_REAL (Read)
       }{
          The widths of the margins to leave for axis annotation, given
          as fractions of the corresponding dimension of the current picture.
-         Four values may be given, in the order - bottom, right, top, left.
+         Four values may be given, in the order bottom, right, top, left.
          If fewer than four values are given, extra values are used equal to
          the first supplied value.  If these margins are too narrow any axis
          annotation may be clipped.  If a null (\texttt{{!}}) value is supplied, the
@@ -35233,7 +35233,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
       }{
          An optional output NDF to hold a version of IN1 which is
          normalised to IN2.  A null (\texttt{{!}}) value indicates that an output
-         NDF is not required. See also parameter LOOP.
+         NDF is not required. See also Parameter LOOP.
       }
       \sstsubsection{
          OUTCORR = NDF (Write)
@@ -35363,7 +35363,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
       \sstsubsection{
          ZEROFF = \_LOGICAL (Read)
       }{
-         If TRUE, the offset of the linear fit is constrained to be
+         If \texttt{TRUE}, the offset of the linear fit is constrained to be
          zero.  \texttt{[FALSE]}
       }
    }
@@ -35758,7 +35758,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          axis annotation.  The widths should be given as fractions of the
          corresponding dimension of the current picture.  The actual margins
          used may be increased to preserve the aspect ratio of the DATA
-         picture.  Four values may be given, in the order; bottom, right,
+         picture.  Four values may be given, in the order bottom, right,
          top, left.  If fewer than four values are given, extra values are
          used equal to the first supplied value.  If these margins are too
          narrow any axis annotation may be clipped.  If a null (\texttt{{!}}) value is
@@ -35896,8 +35896,8 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
      }{
          USEAXIS is only accessed if the current co-ordinate Frame of
          the NDF has more than two axes. A group of strings should be
-         supplied specifying the axes which are to be used when
-         specifying the circle parameters CENTRE and DIAM.  Each axis
+         supplied designating the axes that are to be used when
+         specifying the circle via Parameters CENTRE and DIAM.  Each axis
          can be specified using one of the following options.
 
          \ssthitemlist{
@@ -36287,7 +36287,7 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
       would assign elements of the shell array perval[1], perval[2],
       \emph{etc.}\ to the last-computed percentile values of HISTAT.
       For other scripting languages such as Python, the alternative
-      vector format produced by setting parameter VECTOR to \texttt{TRUE}
+      vector format produced by setting Parameter VECTOR to \texttt{TRUE}
       may be more appropriate.
 
       Single elements of an parameter array may also be accessed using
@@ -36312,8 +36312,8 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
       }{
          If \texttt{TRUE}, then vector parameters will be displayed as a
          comma-separated list of values enclosed in square brackets. If
-         FALSE, vector values are printed as a space-separated list with
-         no enclosing brackets. Additionally, if VECTOR is TRUE, string
+         \texttt{FALSE}, vector values are printed as a space-separated list with
+         no enclosing brackets. Additionally, if VECTOR is \texttt{TRUE}, string
          values (whether vector or scalar) are enclosed in single quotes
          and any embedded quotes are escaped using a backslash. \texttt{[FALSE]}
       }
@@ -38265,7 +38265,7 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
       provided by COLLAPSE.
 
       An extra group of $M$ NDFs can be supplied that define the WCS to
-      be stored in the output NDF --- see Parameter WCS.
+      be stored in the output NDF---see Parameter WCS.
    }
    \sstusage{
       pixbin in out index [wcs]
@@ -38281,7 +38281,7 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
       }{
          A group of index NDFs (all with $N$-dimensions). The number of index
          NDFs (referred to below as ``$M$'') supplied should be in the range
-         1-6 and determines the dimensionality of the output NDF. A section
+         1--6 and determines the dimensionality of the output NDF. A section
          is taken from each one so that it matches the input NDF supplied by
          Parameter IN. The data values in the $J$th index NDF are
          converted to \_INTEGER (by finding the nearest integer) and then
@@ -38597,7 +38597,7 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
       \sstsubsection{
          DESCRIBE = \_LOGICAL (Read)
       }{
-         If TRUE, a detailed description of the co-ordinate Frame in
+         If \texttt{TRUE}, a detailed description of the co-ordinate Frame in
          which the fixed co-ordinates are to be supplied is displayed
          before the positions themselves.  It is ignored if
          MODE=\texttt{"Catalogue"}.  \texttt{[}current value\texttt{{]}}
@@ -39473,7 +39473,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
    \sstdiytopic{
       Substitution Syntax
    }{
-      The syntax for the CREATOR, DATE and PATH parameter values is a
+      The syntax for the CREATOR, DATE, and PATH parameter values is a
       minimal form of regular expression.  The following atoms are
       allowed.
 
@@ -39995,10 +39995,10 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          INEXT = LITERAL (Read)
       }{
         Determines which ancestor to display next. Only used if
-        parameter SHOW is set to ``Tree''. The user is re-prompted for
+        Parameter SHOW is set to \texttt{"Tree"}. The user is re-prompted for
         a new value for this parameter after each NDF is displayed. The
         new value should be the integer identifier for one of the parents
-        of the currently displayed NDF. Alternatively, the string ``up''
+        of the currently displayed NDF. Alternatively, the string \texttt{"up"}
         can be supplied, causing the previously displayed NDF to be
         displayed again.
       }
@@ -40041,7 +40041,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
             \sstitem
             \texttt{"Tree"} --- Display the top level NDF and then asks the
                                 user which parent to display next (see
-                                parameter INEXT). The whole family tree can
+                                Parameter INEXT). The whole family tree can
                                 be navigated in this way.
          }
          \texttt{["All"]}
@@ -40153,8 +40153,8 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          plot.  The width of the margins left for the annotation may be
          controlled using Parameter MARGIN.  The appearance of the axes
          (colours, founts, \emph{etc.}) can be controlled using the Parameter
-         STYLE.  The dynamic default is TRUE if CLEAR is TRUE, and FALSE
-         otherwise. \texttt{[]}
+         STYLE.  The dynamic default is \texttt{TRUE} if CLEAR is \texttt{TRUE}, and
+         \texttt{FALSE} otherwise. \texttt{[]}
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
@@ -40731,7 +40731,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       \sstsubsection{
          INSIDE = \_LOGICAL (Read)
       }{
-         If a TRUE value is supplied, the constant value is assigned
+         If a \texttt{TRUE} value is supplied, the constant value is assigned
          to the inside of the region. Otherwise, it is assigned to the
          outside.  \texttt{[TRUE]}
       }
@@ -40873,7 +40873,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          co-ordinates in the input NDF into the corresponding pixel
          co-ordinates in the output NDF. If only a subset of pixel
          axes are being re-gridded, then the inputs to the Mapping
-         should correspond to the pixel axes specified via parameter
+         should correspond to the pixel axes specified via Parameter
          AXES.  The file may be one of the following.
 
          \ssthitemlist{
@@ -41833,7 +41833,7 @@ KAPPA: \htmlref{FLIP}{FLIP},
       either axis (see Parameters COMP1 and COMP2).  A symbol is displayed
       at an appropriate position in the plot for each pixel which has a
       good value in both NDFs, and falls within the bounds specified by
-      Parameter XLEFT, XRIGHT, YBOT and YTOP.  The type of symbol may be
+      Parameters XLEFT, XRIGHT, YBOT, and YTOP.  The type of symbol may be
       specified using Parameter MARKER.
 
       The supplied arrays may be compressed prior to display (see Parameter
@@ -41857,8 +41857,8 @@ KAPPA: \htmlref{FLIP}{FLIP},
          plot.  The width of the margins left for the annotation may be
          controlled using Parameter MARGIN.  The appearance of the axes
          (colours, founts, \emph{etc.}) can be controlled using the Parameter
-         STYLE.  The dynamic default is TRUE if CLEAR is TRUE, and FALSE
-         otherwise. \texttt{[]}
+         STYLE.  The dynamic default is \texttt{TRUE} if CLEAR is \texttt{TRUE},
+         and \texttt{FALSE} otherwise. \texttt{[]}
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
@@ -41913,9 +41913,9 @@ KAPPA: \htmlref{FLIP}{FLIP},
       \sstsubsection{
          FIT = \_LOGICAL (Read)
       }{
-         If TRUE, then a linear fit to the scatter points is added to the
+         If \texttt{TRUE}, then a linear fit to the scatter points is added to the
          plot. The slope and offset of this fit is displayed on the screen
-         and written to output Parameter SLOPE, OFFSET and RMS. A symetric
+         and written to output Parameters SLOPE, OFFSET, and RMS. A symetric
          linear fit algorithm is used, which caters for the presence of
          noise in both X and Y values. Outliers are identified and
          ignored. Note, the fit is based on just those points that are
@@ -41940,7 +41940,7 @@ KAPPA: \htmlref{FLIP}{FLIP},
       }{
          The widths of the margins to leave for axis annotation, given
          as fractions of the corresponding dimension of the current picture.
-         Four values may be given, in the order - bottom, right, top, left.
+         Four values may be given, in the order bottom, right, top, left.
          If fewer than four values are given, extra values are used equal to
          the first supplied value.  If these margins are too narrow any axis
          annotation may be clipped.  If a null (\texttt{{!}}) value is supplied, the
@@ -42062,19 +42062,19 @@ KAPPA: \htmlref{FLIP}{FLIP},
          OFFSET = \_DOUBLE (Write)
       }{
          An output parameter giving the offset in the linear fit:
-         IN2 = SLOPE $*$ IN1 $+$ OFFSET. Only used if Parameter FIT is TRUE.
+         IN2 = SLOPE $*$ IN1 $+$ OFFSET. Only used if Parameter FIT is \texttt{TRUE}.
       }
       \sstsubsection{
          RMS = \_DOUBLE (Write)
       }{
          An output parameter giving the RMS residual of the data (excluding
-         outliers) about the linear fit. Only used if Parameter FIT is TRUE.
+         outliers) about the linear fit. Only used if Parameter FIT is \texttt{TRUE}.
       }
       \sstsubsection{
          SLOPE = \_DOUBLE (Write)
       }{
          An output parameter giving the slope of the linear fit:
-         IN2 = SLOPE $*$ IN1 $+$ OFFSET. Only used if Parameter  FIT is TRUE.
+         IN2 = SLOPE $*$ IN1 $+$ OFFSET. Only used if Parameter FIT is \texttt{TRUE}.
       }
    }
    \sstexamples{
@@ -44024,7 +44024,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
       \sstsubsection{
          READONLY = \_LOGICAL (Read)
       }{
-         If TRUE, then an error will be reported if any attempt is
+         If \texttt{TRUE}, then an error will be reported if any attempt is
          subsequently made to remove the quality name (\emph{e.g.} using
          REMQUAL).  \texttt{[FALSE]}
       }
@@ -44335,7 +44335,7 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
       }{
          This creates a WCS component to a two-dimensional NDF called
          m51.  The values for Parameters PROJTYPE, LON, LAT, PIXELREF,
-         PIXELSIZE and ORIENT are determined automatically so
+         PIXELSIZE, and ORIENT are determined automatically so
          that they minimised the sum of the squared residuals (in
          pixels) at each of the positions specified in the file
          \texttt{stars.lis}.  This file contains a line for each position, each
@@ -44352,7 +44352,7 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
       }{
          This creates a WCS component within the two-dimensional NDF
          called m51.  The values for Parameters PROJTYPE, LON, LAT,
-         PIXELREF and PIXELSIZE are determined automatically as in
+         PIXELREF, and PIXELSIZE are determined automatically as in
          the previous example.  In this example however, an Orthographic
          projection is forced, and the value zero is assigned to
          Parameter ORIENT, resulting in north being `upwards' in the image.
@@ -44626,7 +44626,7 @@ KAPPA: \htmlref{SETLABEL}{SETLABEL},
          Units value in the NDF and the new Units value must both correspond
          to the format for units strings described in the FITS WCS standard
          (see \texttt{"Representations of world coordinates in FITS"}, Greisen \&
-         Calabretta, 2002, A\&A - available at
+         Calabretta, 2002, A\&A---available at
          (\htmladdnormallink{http://www.aoc.nrao.edu/$\sim$egreisen/wcs\_AA.ps.gz}{http://www.aoc.nrao.edu/$\sim$egreisen/wcs\_AA.ps.gz})
          If either of the two units strings are not of this form, or if it is
          not possible to find a transformation between them (for instance,
@@ -44975,9 +44975,9 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          of values supplied must match the number of pixel axes in the NDF.
          It is only used if STYPE=\texttt{"Relative"}.
 
-         An object centred at the pixel co-ordinates given by parameter
+         An object centred at the pixel co-ordinates given by Parameter
          OBJ in the input NDF will be centred at the pixel co-ordinates
-         given by parameter FID in the output NDF.
+         given by Parameter FID in the output NDF.
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -45036,9 +45036,9 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          of values supplied must match the number of pixel axes in the NDF.
          It is only used if STYPE=\texttt{"Relative"}.
 
-         An object centred at the pixel co-ordinates given by parameter
+         An object centred at the pixel co-ordinates given by Parameter
          OBJ in the input NDF will be centred at the pixel co-ordinates
-         given by parameter FID in the output NDF.
+         given by Parameter FID in the output NDF.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -46166,12 +46166,12 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          the image.  Both values must be in the range 0 to 11.  If you
          supply a single value, it applies to both axes.  Thus \texttt{1}
          creates one interior knot, \texttt{[5,4]} gives 5 along the \textit{x} axis and
-         4 along the \textit{y} direction.  Increasing this parameter values
+         4 along the \textit{y} direction.  Increasing this parameter's values
          increases the flexibility of the surface.  Normally, \texttt{4} is a
          reasonable value.  The upper limit of acceptable values will
          be reduced along each axis when its binned array dimension is
          fewer than 29.  KNOTS is only accessed when FITTYPE=\texttt{"Spline"}.
-         The default is the current value, which is 4 initially.  \texttt{[]}
+         The default is the current value, which is \texttt{4} initially.  \texttt{[]}
       }
       \sstsubsection{
          ORDER( 2 ) = \_INTEGER (Read)
@@ -46180,7 +46180,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          values must be in the range 0 to 14.  If you supply a single
          single value, it applies to both axes.  Thus \texttt{0} gives a
          constant, \texttt{[3,1]} gives a cubic along the \textit{x} direction and a
-         linear fit along the \textit{y} axis.  Increasing this parameter values
+         linear fit along the \textit{y} axis.  Increasing this parameter's values
          increases the flexibility of the surface.  The upper limit of
          acceptable values will be reduced along each axis when its
          binned array dimension is fewer than 29.  ORDER is only
@@ -46992,7 +46992,7 @@ KAPPA: \htmlref{ADD}{ADD},
       }{
          \texttt{TRUE} if labelled and annotated axes are to be drawn around the
          vector map.  These display co-ordinates in the current co-ordinate
-         Frame NDF1 - which may be changed using application \htmlref{WCSFRAME}{WCSFRAME}
+         Frame NDF1, which may be changed using application \htmlref{WCSFRAME}{WCSFRAME}
          (see also Parameter USEAXIS).  The width of the margins left for
          the annotation may be controlled using Parameter MARGIN.  The
          appearance of the axes (colours, founts, \emph{etc.}) can be controlled
@@ -47370,7 +47370,7 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
       the new Frame can be specified using Parameter DOMAIN.  Other attribute
       values for the new Frame may be specified using Parameter ATTRS.  The
       new Frame becomes the current co-ordinate Frame in the NDF (unless
-      parameter RETAIN is set TRUE).
+      Parameter RETAIN is set \texttt{TRUE}).
 
       WCSADD will only generate Mappings with the same number of
       input and output axes; this number is determined by the number
@@ -47444,12 +47444,12 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
          will usually mean avoiding any domain names that are already in
          use within the WCS component, particularly the
          \htmlref{standard domain names}{se:domains}~
-         such as GRID, FRACTION, PIXEL, AXIS and GRAPHICS.  The supplied value is
+         such as GRID, FRACTION, PIXEL, AXIS, and GRAPHICS.  The supplied value is
          stripped of spaces, and converted to upper case before being used.
 
-         Note, if parameter MAPTYPE is set to ``REFNDF'', then the value
-         supplied for parameter DOMAIN indicates the Domain of the Frame
-         within the reference NDF that is to be copied (see parameter
+         Note, if Parameter MAPTYPE is set to \texttt{"REFNDF"}, then the value
+         supplied for Parameter DOMAIN indicates the Domain of the Frame
+         within the reference NDF that is to be copied (see Parameter
          REFNDF).
       }
       \sstsubsection{
@@ -47532,10 +47532,10 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
                             moments in time.
          }
 
-         Note, if parameter MAPTYPE is set to ``REFNDF'', then parameter
-         FRMTYPE will not be used - the Frame used will instead always be
+         Note, if Parameter MAPTYPE is set to \texttt{"REFNDF"}, then Parameter
+         FRMTYPE will not be used---the Frame used will instead always be
          a copy of the Frame from the reference NDF (as selected by
-         parameter DOMAIN). \texttt{[!]}
+         Parameter DOMAIN). \texttt{[!]}
       }
       \sstsubsection{
          INVEXP = LITERAL (Read)
@@ -47624,24 +47624,24 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
          REFNDF = NDF (Read)
       }{
          A reference NDF from which to obtain the Mapping and Frame. The
-         NDFs specified by parameters NDF and REFNDF are aligned in a
-         suitable co-ordinate system (usually their current Frames - an
+         NDFs specified by Parameters NDF and REFNDF are aligned in a
+         suitable co-ordinate system (usually their current Frames---an
          error is reported if the two NDFs cannot be aligned). The
-         Mapping from the basis Frame in ``NDF'' (specified by parameter
-         FRAME) to the required Frame in ``REFNDF'' (specified by parameter
+         Mapping from the basis Frame in ``NDF'' (specified by Parameter
+         FRAME) to the required Frame in ``REFNDF'' (specified by Parameter
          DOMAIN) is then found and used. The Frame added into ``NDF'' is
-         always a copy of the reference Frame - regardless of the setting
-         of parameter FRMTYPE. Parameter REFNDF is only used when
-         parameter MAPTYPE is set to ``REFNDF'', in which case a value must
-         also be supplied for parameter NDF (an error will be reported
+         always a copy of the reference Frame---regardless of the setting
+         of Parameter FRMTYPE. Parameter REFNDF is only used when
+         Parameter MAPTYPE is set to \texttt{"REFNDF"}, in which case a value must
+         also be supplied for Parameter NDF (an error will be reported
          otherwise).
       }
       \sstsubsection{
          RETAIN = \_LOGICAL (Read)
       }{
          Indicates whether the original current Frame should be retained
-         within the WCS FrameSet of the modified NDF (see parameter NDF).
-         If FALSE, the newly added Frame is the current Frame on exit.
+         within the WCS FrameSet of the modified NDF (see Parameter NDF).
+         If \texttt{FALSE}, the newly added Frame is the current Frame on exit.
          Otherwise, the original current Frame is retained on exit. \texttt{[FALSE]}
       }
       \sstsubsection{
@@ -47706,7 +47706,7 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
       }{
          If \texttt{TRUE}, attributes which have explicitly set values in the basis
          Frame (specified by Parameter FRAME) are transferred to the new
-         Frame (Specified by Parameter FRMTYPE), if they are applicable
+         Frame (specified by Parameter FRMTYPE), if they are applicable
          to the new Frame. If \texttt{FALSE}, no attribute values are transferred.
          The dynamic default is \texttt{TRUE} if and only if the two Frames are
          of the same class and have the same value for their \att{Domain}
@@ -47852,7 +47852,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
    \sstdescription{
       This application resamples or rebins a group of input \NDFref{NDFs},
       producing corresponding output NDFs which are aligned pixel-for-pixel
-      with a specified reference NDF, or POLPACK catalogue (see parameter
+      with a specified reference NDF, or POLPACK catalogue (see Parameter
       REFCAT).
 
       If an input NDF has more pixel axes than the reference NDF, then
@@ -47964,7 +47964,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          LSRK frequency in the other image, regardless of the different sky
          positions. But if ALIGNREF is \texttt{FALSE}, then a given input frequency
          will first be converted to Heliocentric frequency (the default
-         value for AlignStdOfRest is ``Heliocentric''), and will be mapped
+         value for AlignStdOfRest is \texttt{"Heliocentric"}), and will be mapped
          onto the output channel that has the same Heliocentric frequency.
          Thus the differecen in sky positions will result in an additional
          shift.   \texttt{[FALSE]}
@@ -48181,7 +48181,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       }{
          An optional array which consists of additional parameters
          required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
-         SombCos and Gauss methods.
+         SombCos, and Gauss methods.
 
          PARAMS(1) is required by all the above schemes. It is used to
          specify how many pixels are to contribute to the interpolated
@@ -48221,14 +48221,14 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          The NDF to which all the input NDFs are to be aligned. If a null
          value is supplied for this parameter, the first NDF supplied for
          Parameter IN is used. This parameter is only used if no catalogue
-         is supplied for parameter REFCAT.
+         is supplied for Parameter REFCAT.
       }
       \sstsubsection{
          REFCAT = FILENAME (Read)
       }{
          A POLPACK catalogue defining the WCS to which all the input NDFs
          are to be aligned. If a null value is supplied for this parameter,
-         the WCS will be obtained from an NDF using parameter REF. \texttt{[!]}
+         the WCS will be obtained from an NDF using Parameter REF. \texttt{[!]}
       }
       \sstsubsection{
          UBND() = \_INTEGER (Read)
@@ -48505,7 +48505,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          from \texttt{ "FK5"} to \texttt{ "Galactic"}, then the Mappings which connect
          the SKY Frame to the other Frames (\emph{e.g.} PIXEL, AXIS) will be
          modified so that each pixel corresponds to the correct Galactic
-         co-ordinates.  If REMAP is \texttt{ FALSE}, then the Mappings will not be
+         co-ordinates.  If REMAP is \texttt{FALSE}, then the Mappings will not be
          changed.  This can be useful if the FrameSet has incorrect attribute
          values for some reason, which need to be corrected without altering
          the Mappings to take account of the change.  \texttt{ [TRUE]}
@@ -48679,7 +48679,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          NDF = NDF (Read and Write)
       }{
          The input NDF data structure in which the WCS information is to be
-         stored.  Any existing WCS component is over-written (see parameter
+         stored.  Any existing WCS component is over-written (see Parameter
          CONFIRM).
       }
       \sstsubsection{
@@ -49098,7 +49098,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          LSRK frequency in the other image, regardless of the different sky
          positions. But if ALIGNREF is \texttt{FALSE}, then a given input frequency
          will first be converted to Heliocentric frequency (the default
-         value for AlignStdOfRest is ``Heliocentric''), and will be mapped
+         value for AlignStdOfRest is \texttt{Heliocentric"}), and will be mapped
          onto the output channel that has the same Heliocentric frequency.
          Thus the difference in sky positions will result in an additional
          shift.   \texttt{[FALSE]}
@@ -49292,7 +49292,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       }{
          An optional array which consists of additional parameters
          required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
-         SombCos and Gauss methods.
+         SombCos, and Gauss methods.
 
          PARAMS(1) is required by all the above schemes.  It is used
          to specify how many output pixels on either side of the
@@ -49350,7 +49350,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          WEIGHTS = LITERAL (Read)
       }{
          An optional group of numerical weights, one for each of the input
-         NDFs specified by parameter IN. If VARIANCE is TRUE, the weight
+         NDFs specified by Parameter IN. If VARIANCE is \texttt{TRUE}, the weight
          assigned to each input pixel is the value supplied in this group
          correspoinding to the appropriate input NDF, divided by the variance
          of the pixel value. An error is reported if the number of supplied
@@ -50347,7 +50347,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          \ssthitemlist{
 
             \sstitem
-            \texttt{"Interface"} --- Bounds are obtained using Parameters COLUMNS,
+            \texttt{"Interface"} --- Bounds are obtained using Parameters COLUMNS
             and LINES.  The type of area to be replaced is specified using
             Parameter LINCOL.
 
@@ -51947,42 +51947,43 @@ of an NDF, and change the values of those that are not read-only.
       \sstitemlist{
 
          \sstitem
-         \texttt{{"}}TAI\texttt{{"}} - International Atomic Time
+         \texttt{"TAI"} -- International Atomic Time
 
          \sstitem
-         \texttt{{"}}UTC\texttt{{"}} - Coordinated Universal Time
+         \texttt{"UTC"} -- Coordinated Universal Time
 
          \sstitem
-         \texttt{{"}}UT1\texttt{{"}} - Universal Time
+         \texttt{"UT1"} -- Universal Time
 
          \sstitem
-         \texttt{{"}}GMST\texttt{{"}} - Greenwich Mean Sidereal Time
+         \texttt{"GMST"} -- Greenwich Mean Sidereal Time
 
          \sstitem
-         \texttt{{"}}LAST\texttt{{"}} - Local Apparent Sidereal Time
+         \texttt{"LAST"} -- Local Apparent Sidereal Time
 
          \sstitem
-         \texttt{{"}}LMST\texttt{{"}} - Local Mean Sidereal Time
+         \texttt{"LMST"} -- Local Mean Sidereal Time
 
          \sstitem
-         \texttt{{"}}TT\texttt{{"}} - Terrestrial Time
+         \texttt{"TT"} -- Terrestrial Time
 
          \sstitem
-         \texttt{{"}}TDB\texttt{{"}} - Barycentric Dynamical Time
+         \texttt{"TDB"} -- Barycentric Dynamical Time
 
          \sstitem
-         \texttt{{"}}TCB\texttt{{"}} - Barycentric Coordinate Time
+         \texttt{"TCB"} -- Barycentric Coordinate Time
 
          \sstitem
-         \texttt{{"}}TCG\texttt{{"}} - Geocentric Coordinate Time
+         \texttt{"TCG"} -- Geocentric Coordinate Time
 
          \sstitem
-         \texttt{{"}}LT\texttt{{"}} - Local Time (the offset from UTC is given by
+         \texttt{"LT"} -- Local Time (the offset from UTC is given by
           attribute LTOffset)
 
       }
-      An very informative description of these and other time scales is
-      available at http://www.ucolick.org/$\sim$sla/leapsecs/timescales.html.
+      An very informative description of these and other time scales is available at \newline
+      \htmladdnormallink{\texttt{http://www.ucolick.org/$\sim$sla/leapsecs/timescales.htm}}
+      {http://www.ucolick.org/$\sim$sla/leapsecs/timescales.htm}.
    }
    \sstdiytopic{
       UTC Warnings
@@ -52808,7 +52809,7 @@ It is often useful to specify values for some of the attributes of the current
 }{
    \sstdescription{
       This attribute determines the background colour index to use when
-      drawing textual strings - the foreground colour is determined by
+      drawing textual strings---the foreground colour is determined by
       the \htmlattref{Colour(strings)}{Colour(element)}~ attribute.  Standard
       X colour names can also be specified, and the nearest colour will be used
       if the requested colour is not currently in the palette.
@@ -54405,7 +54406,7 @@ The following applications have been modified:
         \item Can now display the outline of a Region even if no picture has
          been displayed previously on the graphics device. The size of
          the plot is controlled by the new SIZE parameter. Any existing
-         picture can be ignored by setting the new CLEAR parameter to TRUE.
+         picture can be ignored by setting the new CLEAR parameter to \texttt{TRUE}.
       \end{itemize}
    \item [\htmlref{BEAMFIT}{BEAMFIT}]\mbox{}
       \begin{itemize}
@@ -54690,17 +54691,17 @@ The following applications have been modified:
 
    \item [\htmlref{PROVSHOW}{PROVSHOW}]\mbox{}
       \begin{itemize}
-        \item Has a new option SHOW=TREE, which allows the family tree to
+        \item Has a new option SHOW=\texttt{"TREE"}, which allows the family tree to
               be stepped through in an interactive manner, with the user
               choosing which parent is to be displayed next.
       \end{itemize}
 
    \item [\htmlref{WCSADD}{WCSADD}]\mbox{}
       \begin{itemize}
-        \item Has a new option MAPTYPE=REFNDF, which causes a copy of a
+        \item Has a new option MAPTYPE=\texttt{"REFNDF"}, which causes a copy of a
               co-ordinate Frame read from a reference NDF to be added
               into the modified NDF.
-        \item New parameter RETAIN allows control over whether or not the
+        \item New Parameter RETAIN allows control over whether or not the
               new Frame becomes the current Frame in the modified NDF on
               exit.
       \end{itemize}
@@ -54815,7 +54816,7 @@ The following applications have been modified:
    \item [\htmlref{WCSALIGN}{WCSALIGN}]\mbox{}
       \begin{itemize}
         \item The input NDFs can now be aligned with a specified POLPACK
-         catalogue - see new parameter REFCAT.
+         catalogue---see new Parameter REFCAT.
       \end{itemize}
 
    \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}]\mbox{}

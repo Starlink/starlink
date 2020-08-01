@@ -74,7 +74,7 @@
 *     Parameter GENVAR). Any input variances can also be used to weight
 *     the input data (see Parameter VARIANCE).  By default, all input
 *     data is given equal weight. An additional weight for each NDF can be
-*     specified using parameter WEIGHTS.
+*     specified using Parameter WEIGHTS.
 *
 *     The transformations needed to produce alignment are derived from
 *     the co-ordinate system information stored in the WCS components of
@@ -307,7 +307,7 @@
 *     PARAMS( 2 ) = _DOUBLE (Read)
 *        An optional array which consists of additional parameters
 *        required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
-*        SombCos and Gauss methods.
+*        SombCos, and Gauss methods.
 *
 *        PARAMS( 1 ) is required by all the above schemes.  It is used
 *        to specify how many output pixels on either side of the central
@@ -355,7 +355,7 @@
 *        output variances) is fulfilled by the GENVAR parameter. [FALSE]
 *     WEIGHTS = LITERAL (Read)
 *        An optional group of numerical weights, one for each of the input
-*        NDFs specified by parameter IN. If VARIANCE is TRUE, the weight
+*        NDFs specified by Parameter IN. If VARIANCE is TRUE, the weight
 *        assigned to each input pixel is the value supplied in this group
 *        correspoinding to the appropriate input NDF, divided by the variance
 *        of the pixel value. An error is reported if the number of supplied
@@ -441,7 +441,7 @@
 *        Modified the prologue to clarify the need for an inverse
 *        WCS transformation in the reference NDF.
 *     8-FEB-2007 (DSB):
-*        Added parameters LBOUND and UBOUND.
+*        Added Parameters LBOUND and UBOUND.
 *     13-FEB-2007 (DSB):
 *        Remove C-like semi-colon line terminators.
 *     13-MAR-2007 (DSB):
@@ -467,9 +467,9 @@
 *     30-AUG-2012 (DSB):
 *        Added Parameters CONSERVE and NORM.
 *     1-DEC-2014 (DSB):
-*        Added parameter ALIGNREF.
+*        Added Parameter ALIGNREF.
 *     9-MAR-2018 (DSB):
-*        Added parameter WEIGHTS.
+*        Added Parameter WEIGHTS.
 *     {enter_further_changes_here}
 
 *-
@@ -786,7 +786,7 @@
             CALL MSG_SETI( 'N', SIZE )
             CALL MSG_SETI( 'W', WSIZE )
             STATUS = SAI__ERROR
-            CALL ERR_REP( ' ', 'No. of values supplied for parameter '//
+            CALL ERR_REP( ' ', 'No. of values supplied for Parameter '//
      :                    'WEIGHTS (^W) is not the same as the number'//
      :                    ' of input NDFs (^N).', STATUS )
 
@@ -927,14 +927,14 @@
                STATUS = ISTAT
                CALL MSG_SETC( 'V', TEXT )
                CALL ERR_REP( ' ', 'Invalid numerical value ''^V'' '//
-     :                       'supplied for parameter WEIGHTS.',
+     :                       'supplied for Parameter WEIGHTS.',
      :                       STATUS )
             ELSE IF( PARAMS( 1 ) .LE. 0.0 .AND.
      :               STATUS .EQ. SAI__OK ) THEN
                STATUS = ISTAT
                CALL MSG_SETC( 'V', TEXT )
                CALL ERR_REP( ' ', 'Zero or negative value ''^V'' '//
-     :                       'supplied for parameter WEIGHTS.',
+     :                       'supplied for Parameter WEIGHTS.',
      :                       STATUS )
             END IF
          END IF

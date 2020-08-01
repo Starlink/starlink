@@ -122,7 +122,7 @@ F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
 *        both default to "3.0".
 *
 *        The limits adopted for the data value axis are reported unless
-*        parameter RANGE is specified on the command line.  In this case
+*        Parameter RANGE is specified on the command line.  In this case
 *        values are only calculated where necessary for the chosen method.
 *
 *        The method name can be abbreviated to a single character, and
@@ -268,7 +268,7 @@ F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
             ndfMsg( "NDF", indf1 );
             *STATUS = SAI__ERROR;
             errRep( " ", "The NDF '^NDF' has no VARIANCE component but a "
-                    "null value was supplied for parameter SIGMA.", STATUS );
+                    "null value was supplied for Parameter SIGMA.", STATUS );
          }
       }
 

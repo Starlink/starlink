@@ -44,7 +44,7 @@
 *        If TRUE, any relative NDF paths are converted to absolute,
 *        using the current working directory. [FALSE]
 *     EXISTS = _LOGICAL (Read)
-*        If TRUE, then only display paths for NDFs specified by parameter
+*        If TRUE, then only display paths for NDFs specified by Parameter
 *        MOD that actually exist and are accessible. [FALSE]
 *     FIRST = _INTEGER (Read)
 *        The index of the first NDF to be tested. A null (!) value
@@ -73,7 +73,7 @@
 *        to exist.
 *
 *        The list can be filtered to remove any NDFs that do not exist
-*        (see parameter EXISTS). [!]
+*        (see Parameter EXISTS). [!]
 *     NDF = NDF (Read)
 *        A group of existing NDFs, or null (!).  This should be given as
 *        a comma-separated list, in which each list element can be one

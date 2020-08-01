@@ -27,7 +27,7 @@
 *     straight-line is then fitted to the relationship between the two
 *     sets of data values in order to determine the relative scale
 *     factor and any zero-level offset between the NDFs (the offset may
-*     optionally be fixed at zero - see parameter ZEROFF).  To reduce
+*     optionally be fixed at zero---see Parameter ZEROFF).  To reduce
 *     computation time, the data points are binned according to the
 *     data value in the second NDF.  The mean data value within each bin
 *     is used to find the fit and weights are applied according to the
@@ -105,13 +105,13 @@
 *        every row or column in to be normalised independently of each other.
 *        Specifically, if IN2 spans only a single row or column, then it
 *        will be used to normalise each row or column of IN1 in turn. Any
-*        output NDF (see parameter OUT) will have the shape and size of
+*        output NDF (see Parameter OUT) will have the shape and size of
 *        IN1. If IN1 spans only a single row or column, then it will be
 *        normalised in turn by each row or column of IN2. Any output NDF
-*        (see parameter OUT) will then have the shape and size of IN2. In
+*        (see Parameter OUT) will then have the shape and size of IN2. In
 *        either case, the details of the fit for each row or column will
 *        be displayed separately.  Also see Parameters OUTSLOPE,
-*        OUTOFFSET and OUTCORR. [FALSE]
+*        OUTOFFSET, and OUTCORR. [FALSE]
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave for axis annotation, given
 *        as fractions of the corresponding dimension of the current
@@ -147,18 +147,18 @@
 *     OUT = NDF (Write)
 *        An optional output NDF to hold a version of IN1 which is
 *        normalised to IN2.  A null (!) value indicates that an output
-*        NDF is not required. See also parameter LOOP.
+*        NDF is not required. See also Parameter LOOP.
 *     OUTCORR = NDF (Write)
 *        An optional 1-dimensonal output NDF to hold the correlation
-*        coefficient for each row or column when LOOP=YES. See parameter
+*        coefficient for each row or column when LOOP=YES. See Parameter
 *        CORR. Ignored if LOOP=NO.
 *     OUTOFFSET = NDF (Write)
 *        An optional 1-dimensonal output NDF to hold the offset used for
-*        each row or column when LOOP=YES. See parameter OFFSET. Ignored
+*        each row or column when LOOP=YES. See Parameter OFFSET. Ignored
 *        if LOOP=NO.
 *     OUTSLOPE = NDF (Write)
 *        An optional 1-dimensonal output NDF to hold the slope used for
-*        each row or column when LOOP=YES. See parameter SLOPE. Ignored
+*        each row or column when LOOP=YES. See Parameter SLOPE. Ignored
 *        if LOOP=NO.
 *     PCRANGE( 2 ) = _REAL (Read)
 *        This parameter takes two real values in the range 0 to 100 and

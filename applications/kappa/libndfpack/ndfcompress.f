@@ -56,7 +56,7 @@
 *
 *        - "DELTA" -- A lossless compression scheme for integer data
 *        types. See "Delta Compression" below, and Parameters ZAXIS,
-*        ZMINRATIO and ZTYPE.
+*        ZMINRATIO, and ZTYPE.
 *
 *        The current value is the default, which is initially "DELTA".
 *        []
@@ -128,7 +128,7 @@
 *     be close in value, and so differences between adjacent values can be
 *     represented in fewer bits than the absolute values themselves. The
 *     differences are taken along a nominated pixel axis within the
-*     supplied array (specified by parameter ZAXIS). Any input value that
+*     supplied array (specified by Parameter ZAXIS). Any input value that
 *     differs from its earlier neighbour by more than the data range of
 *     the selected data type is stored explicitly using the data type of
 *     the input array.

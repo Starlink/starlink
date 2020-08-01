@@ -81,7 +81,7 @@
 *        define bounds and data type of the new NDF, when the expression
 *        does not contain a reference to an NDF.  If a null response
 *        (!) is given the bounds are obtained via parameters LBOUND
-*        and UBOUND, and the data type through parameter TYPE. [!]
+*        and UBOUND, and the data type through Parameter TYPE. [!]
 *     OUT = NDF (Write)
 *        Output NDF to contain the result of evaluating the expression
 *        at each pixel.
@@ -144,10 +144,10 @@
 *        The set of 26 parameters named VA, VB, ... VZ is used to
 *        obtain the input NDF variance array(s) to which the
 *        mathematical expression is to be applied.  The variance VA
-*        corresponds to the data array specified by parameter IA, and
+*        corresponds to the data array specified by Parameter IA, and
 *        so on.  Only those parameters which actually appear in the
 *        expression, and do not have their corresponding data-array
-*        parameter IA-IZ present, have their values obtained in
+*        Parameter IA-IZ present, have their values obtained in
 *        alphabetical order.  For instance, if the expression were
 *        "IB+SQRT(VB+VA)", then the parameters VA and IB would be used
 *        (in this order) to obtain the two input NDF data structures.

@@ -67,7 +67,7 @@
 *        is supplied, the DATE item is left unchanged.  [!]
 *     MORETEXT = GROUP (Read)
 *        This parameter is accessed only if a single ancestor is being
-*        modified (see parameter ANCESTORS). It gives information to
+*        modified (see Parameter ANCESTORS). It gives information to
 *        store in the MORE component of the ancestor (any existing
 *        information is first removed). If a null (!) value is supplied,
 *        then existing MORE component is left unchanged.
@@ -130,7 +130,7 @@
 *        the initial quantifier ".*?" is not greedy).
 
 *  Substitution Syntax:
-*     The syntax for the CREATOR, DATE and PATH parameter values is a
+*     The syntax for the CREATOR, DATE, and PATH parameter values is a
 *     minimal form of regular expression.  The following atoms are
 *     allowed.
 *
@@ -228,7 +228,7 @@
 *        Allow new values to be speicfied literally as well as by
 *        substitution.
 *     29-APR-2008 (DSB):
-*        Added parameter MORETEXT.
+*        Added Parameter MORETEXT.
 *     25-JUN-2009 (DSB):
 *        Updated to use new provenance API.
 *     7-DEC-2010 (DSB):

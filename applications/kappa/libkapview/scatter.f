@@ -28,7 +28,7 @@
 *     either axis (see Parameters COMP1 and COMP2). A symbol is displayed
 *     at an appropriate position in the plot for each pixel which has a
 *     good value in both NDFs, and falls within the bounds specified by
-*     Parameter XLEFT, XRIGHT, YBOT and YTOP. The type of symbol may be
+*     Parameters XLEFT, XRIGHT, YBOT, and YTOP. The type of symbol may be
 *     specified using Parameter MARKER.
 *
 *     The supplied arrays may be compressed prior to display (see Parameter
@@ -36,7 +36,7 @@
 *     also reduces the noise in the data.
 *
 *     The Pearson correlation coefficient of the displayed scatter plot is
-*     also calculated and displayed, and written to output parameter CORR.
+*     also calculated and displayed, and written to output Parameter CORR.
 *
 *     A linear fit to the data in the scatter plot can be calculated and
 *     displayed (see Parameter FIT).
@@ -94,7 +94,7 @@
 *     FIT = _LOGICAL (Read)
 *        If TRUE, then a linear fit to the scatter points is added to the
 *        plot. The slope and offset of this fit is displayed on the screen
-*        and written to output parameter SLOPE, OFFSET and RMS. A symetric
+*        and written to output Parameters SLOPE, OFFSET, and RMS. A symetric
 *        linear fit algorithm is used, which caters for the presence of
 *        noise in both X and Y values. Outliers are identified and
 *        ignored. Note, the fit is based on just those points that are
@@ -110,7 +110,7 @@
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave for axis annotation, given
 *        as fractions of the corresponding dimension of the current picture.
-*        Four values may be given, in the order - bottom, right, top, left.
+*        Four values may be given, in the order bottom, right, top, left.
 *        If less than four values are given, extra values are used equal to
 *        the first supplied value. If these margins are too narrow any axis
 *        annotation may be clipped. If a null (!) value is supplied, the
@@ -144,7 +144,7 @@
 *        outliers) about the linear fit. Only used if Parameter FIT is TRUE.
 *     SLOPE = _DOUBLE (Write)
 *        An output parameter giving the slope of the linear fit:
-*        IN2 = SLOPE * IN1 + OFFSET. Only used if Parameter  FIT is TRUE.
+*        IN2 = SLOPE * IN1 + OFFSET. Only used if Parameter FIT is TRUE.
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to use
 *        when drawing the annotated axes, and markers.
@@ -289,9 +289,9 @@
 *     15-SEP-2011 (DSB):
 *        Added calculation of correlation coefficient.
 *     5-SEP-2013 (DSB):
-*        Added output parameter NPIX.
+*        Added output Parameter NPIX.
 *     18-MAR-2020 (DSB):
-*        Added parameters FIT, SLOPE, OFFSET and RMS.
+*        Added Parameters FIT, SLOPE, OFFSET and RMS.
 *     19-MAR-2020 (DSB):
 *        Change the FIT and CORR parameters to ignore points outside
 *        the bounds of the plot.

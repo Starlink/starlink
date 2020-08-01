@@ -26,7 +26,7 @@
 *     immediate parent NDFs and older ancestor NDFs (i.e. the parents of
 *     the parents, etc.).
 *
-*     Each displayed NDF (see parameter SHOW) is described in a
+*     Each displayed NDF (see Parameter SHOW) is described in a
 *     block of lines. The first line holds an integer index for the NDF
 *     followed by the path to that NDF. Note, this path is where the NDF
 *     was when the provenance information was recorded. It is of course
@@ -51,7 +51,7 @@
 *       on a single line.  If the NDF has no extra information, this item
 *       will not be present.
 *
-*       "History" -- This is only displayed if parameter HISTORY is set
+*       "History" -- This is only displayed if Parameter HISTORY is set
 *       to a TRUE value. It contains information copied from the History
 *       component of the ancestor NDF. See Parameter HISTORY.
 *
@@ -91,7 +91,7 @@
 *        ancestors of the existing NDF are not copied. [FALSE]
 *     INEXT = LITERAL (Read)
 *        Determines which ancestor to display next. Only used if
-*        parameter SHOW is set to "Tree". The user is re-prompted for
+*        Parameter SHOW is set to "Tree". The user is re-prompted for
 *        a new value for this parameter after each NDF is displayed. The
 *        new value should be the integer identifier for one of the parents
 *        of the currently displayed NDF. Alternatively, the string "up"
@@ -119,7 +119,7 @@
 *                       NDF. The supplied NDF itself is not displayed.
 *
 *        - "Tree" -- Display the top level NDF and then asks the user
-*                    which parent to display next (see parameter INEXT).
+*                    which parent to display next (see Parameter INEXT).
 *                    The whole family tree can be navigated in this way.
 *
 *        ["All"]
@@ -390,7 +390,7 @@
          END IF
 
 *  Decide if this ancestor should be displayed. This depends on the value
-*  supplied for parameter SHOW. If "ROOT" then only display this ancestor
+*  supplied for Parameter SHOW. If "ROOT" then only display this ancestor
 *  if it has no direct parents.
          IF( SHOW .EQ. 'ROOTS' ) THEN
             USE = ( PARIDS .EQ. '<unknown>' )

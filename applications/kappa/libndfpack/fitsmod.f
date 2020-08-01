@@ -61,10 +61,10 @@
 *
 *        "Exist" reports TRUE to standard output if the named keyword
 *        exists in the header, and FALSE if the keyword is not present.
-*        The same value is also stored in output parameter EXISTS.
+*        The same value is also stored in output Parameter EXISTS.
 *
 *        "Move" relocates a named keyword to be immediately before a
-*        second keyword (see parameter POSITION).  When this positional
+*        second keyword (see Parameter POSITION).  When this positional
 *        keyword is not supplied, it defaults to the END card, and if
 *        the END card is absent, the new location is at the end of the
 *        headers.
@@ -75,7 +75,7 @@
 *        "Print" causes the value of a named keyword to be displayed to
 *        standard output.  This will be a blank for a comment card.
 *
-*        "Rename" renames a keyword, using parameter NEWKEY to obtain
+*        "Rename" renames a keyword, using Parameter NEWKEY to obtain
 *        the new keyword.
 *
 *        "Update" revises the value and/or the comment.  If a secondary
@@ -90,7 +90,7 @@
 *        exist.
 *     EXISTS = _LOGICAL (Write)
 *        An output parameter which is set to the result of the final
-*        "Exist" operation (see parameter EDIT).
+*        "Exist" operation (see Parameter EDIT).
 *     KEYWORD = LITERAL (Read)
 *        The name of the keyword to be edited in the FITS extension.  A
 *        name may be compound to handle hierarchical keywords, and it
@@ -139,7 +139,7 @@
 *        keywords per FITS card is twenty.  Each keyword must be no
 *        longer than eight characters.  When locating the position card,
 *        comparisons are made in uppercase and with the blanks removed.
-*        An occurrence may be specified (see parameter KEYWORD for
+*        An occurrence may be specified (see Parameter KEYWORD for
 *        details).
 *
 *        The new keywords are inserted immediately before each
@@ -169,7 +169,7 @@
 *     STRING = _LOGICAL (Read)
 *        When STRING is FALSE, inferred data typing is used for the
 *        "Write", "Update", and "Amend" editing commands.  So for
-*        instance, if parameter VALUE = "Y", it would appears as
+*        instance, if Parameter VALUE = "Y", it would appears as
 *        logical TRUE rather than the string 'Y       ' in the FITS
 *        header.  See topic "Value Data Type".  When STRING is TRUE, the
 *        value will be treated as a string for the purpose of writing
@@ -461,7 +461,7 @@
 *        quotes (") are strings.  Note that numeric or logical string
 *        values must be quoted to prevent them being converted to a
 *        numeric or logical value in the FITS extension.
-*        -  For prompting the value is a string when parameter STRING
+*        -  For prompting the value is a string when Parameter STRING
 *        is TRUE.
 *        -  Otherwise type conversions of the first word after the
 *        keywords are made to integer, double precision, and logical

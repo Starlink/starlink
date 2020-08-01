@@ -21,16 +21,16 @@
 
 *  Description:
 *     This application draws the outlines of regions described in
-*     a supplied two-dimensional ARD file (an `ARD Description'--see
+*     a supplied two-dimensional ARD file (an `ARD Description'---see
 *     SUN/183). If there is an existing picture on the graphics device,
 *     the outlines are drawn over the top of the previously displayed
 *     picture, aligned (if possible) in the current co-ordinate Frame
 *     of the previously drawn picture. If the graphics device is empty
 *     (or if the CLEAR parameter is set TRUE) the outlines are drawn
-*     using a default projection - the size of the area plotted can be
+*     using a default projection---the size of the area plotted can be
 *     controlled by the SIZE parameter. Note, the facility to plot on
 *     an empty device is currently only available for two-dimensional
-*     regions specified using parameter REGION.
+*     regions specified using Parameter REGION.
 
 *  Usage:
 *     ardplot ardfile [device] [regval]

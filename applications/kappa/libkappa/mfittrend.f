@@ -62,7 +62,7 @@
 *        comprise pairs of pixel co-ordinates.
 *     AUTO = _LOGICAL (Read)
 *        If TRUE, the ranges that define the trends are determined
-*        automatically, and parameter RANGES is ignored.  [FALSE]
+*        automatically, and Parameter RANGES is ignored.  [FALSE]
 *     AXIS = LITERAL (Read)
 *        The axis of the current co-ordinate system that defines the
 *        direction of the trends.  This is specified using one of the
@@ -177,14 +177,14 @@
 *        mode.  Allowed values are as follows.
 *
 *        - "Region" -- This averages trend lines from a selected
-*        representative region given by parameter SECTION and bins
+*        representative region given by Parameter SECTION and bins
 *        neighbouring elements within this average line.  Then it
 *        performs a linear fit upon the binned line, and rejects the
 *        outliers, iteratively with standard-deviation clipping
 *        (parameter CLIP).  The standard deviation is that of the
 *        average line within the region.  The ranges are the
 *        intervals between the rejected points, rescaled to the
-*        original pixels.  They are returned in parameter ARANGES.
+*        original pixels.  They are returned in Parameter ARANGES.
 *
 *        This is best suited to a low dispersion along the trend axis
 *        and a single concentrated region containing the bulk of the
@@ -269,10 +269,10 @@
 *        the dimensionality of the input NDF is more than 1.  The value
 *        is defined as an NDF section, so that ranges can be defined
 *        along any axis, and be given as pixel indices or axis (data)
-*        co-ordinates.  The pixel axis corresponding to parameter AXIS
+*        co-ordinates.  The pixel axis corresponding to Parameter AXIS
 *        is ignored.   So for example, if the pixel axis were 3 in a
 *        cube, the value "3:5,4," would average all the lines
-*        in elements in columns 3 to 5 and row 4.  See "NDF sections"
+*        in elements in Columns 3 to 5 and Row 4.  See "NDF sections"
 *        in SUN/95, or the online documentation for details.
 *
 *        A null value (!) requests that a representative region around
@@ -283,7 +283,7 @@
 *        NDF (see also Parameter PROPBAD). [FALSE]
 *     TITLE = LITERAL (Read)
 *        Value for the title of the output NDF.  A null value will cause
-*        the title of the NDF supplied for parameter IN to be used
+*        the title of the NDF supplied for Parameter IN to be used
 *        instead.  [!]
 *     VARIANCE = _LOGICAL (Read)
 *        If TRUE and the input NDF contains variances, then the
@@ -399,7 +399,7 @@
 *     2007 January 18 (MJC):
 *        Constrain the automatic ranges to be within the NDF's bounds.
 *        Record automatically determined fitting regions to output
-*        parameter ARANGES.
+*        Parameter ARANGES.
 *     5-MAR-2007 (DSB):
 *        Add code to identify the required pixel axis in cases where the
 *        WCS->pixel transformation is not defined.
@@ -423,7 +423,7 @@
 *        the data.
 *     2007 September 10 (MJC):
 *        Allow the feature mask to be stored in an output NDF given by
-*        new parameter MASK.  Output the selected regions in the current
+*        new Parameter MASK.  Output the selected regions in the current
 *        co-ordinate Frame.
 *     2007 October 3 (MJC):
 *        Make the original Single method Global, and introduce a new
@@ -451,7 +451,7 @@
 *     2012 May 8 (MJC):
 *        Add _INT64 support.
 *     10-SEP-2013 (DSB):
-*        Added parameter PROPBAD.
+*        Added Parameter PROPBAD.
 *     2016 March 29 (MJC):
 *        Added Parameter FOREST for automatic-mode masking of many
 *        spectral lines.

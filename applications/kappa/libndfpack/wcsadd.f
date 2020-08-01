@@ -23,24 +23,24 @@
 *  Description:
 *     This application can be used to create a new AST Mapping and
 *     optionally use the Mapping to add a new co-ordinate Frame into
-*     the WCS component of an NDF (see parameter NDF). An output text
+*     the WCS component of an NDF (see Parameter NDF). An output text
 *     file may also be created holding a textual representation of the
 *     Mapping for future use by other applications such as REGRID (see
-*     parameter MAPOUT). A number of different types of Mapping can be
-*     used (see parameter MAPTYPE).
+*     Parameter MAPOUT). A number of different types of Mapping can be
+*     used (see Parameter MAPTYPE).
 *
 *     When adding a new Frame to a WCS component, the Mapping is used
 *     to connect the new Frame to an existing one (called the "basis"
-*     Frame: see parameter FRAME). The specific type of Frame to add is
-*     specified using parameter FRMTYPE (the default is to simply copy
-*     the basis Frame). Optionally (see parameter TRANSFER), attributes
+*     Frame: see Parameter FRAME). The specific type of Frame to add is
+*     specified using Parameter FRMTYPE (the default is to simply copy
+*     the basis Frame). Optionally (see Parameter TRANSFER), attributes
 *     which have been assigned an explicit value in the basis Frame are
 *     transferred to the new Frame (but only if they are relevant to the
 *     type of the new Frame). The value of the Domain attribute for the
-*     new Frame can be specified using parameter DOMAIN. Other attribute
-*     values for the new Frame may be specified using parameters ATTRS.
+*     new Frame can be specified using Parameter DOMAIN. Other attribute
+*     values for the new Frame may be specified using Parameter ATTRS.
 *     The new Frame becomes the current co-ordinate Frame in the NDF
-*     (unless parameter RETAIN is set TRUE).
+*     (unless Parameter RETAIN is set TRUE).
 *
 *     WCSADD will only generate Mappings with the same number of
 *     input and output axes; this number is determined by the number
@@ -69,7 +69,7 @@
 *           <name>=<value>
 *
 *        where <name> is the name of an attribute appropriate to the
-*        type of Frame specified by parameter FRMTYPE (see SUN/210 for
+*        type of Frame specified by Parameter FRMTYPE (see SUN/210 for
 *        a complete description of all attributes), and <value> is the
 *        value to assign to the attribute. Default values will be used
 *        for any unspecified attributes---these defaults are inherited
@@ -106,14 +106,14 @@
 *        and GRAPHICS. The supplied value is stripped of spaces, and
 *        converted to upper case before being used.
 *
-*        Note, if parameter MAPTYPE is set to "REFNDF", then the value
-*        supplied for parameter "DOMAIN" indicates the Domain of the
+*        Note, if Parameter MAPTYPE is set to "REFNDF", then the value
+*        supplied for Parameter DOMAIN indicates the Domain of the
 *        Frame within the reference NDF that is to be copied (see
-*        parameter REFNDF).
+*        Parameter REFNDF).
 *     EPOCH = _DOUBLE (Read)
 *        If the basis Frame is specified using a "Sky Co-ordinate
 *        System" specification for a celestial co-ordinate system (see
-*        parameter FRAME), then an epoch value is needed to qualify it.
+*        Parameter FRAME), then an epoch value is needed to qualify it.
 *        This is the epoch at which the supplied sky positions were
 *        determined. It should be given as a decimal-years value, with
 *        or without decimal places ("1996.8" for example). Such values
@@ -155,25 +155,25 @@
 *     FRMTYPE = LITERAL (Read)
 *        The type of Frame to add to the NDF. If a null (!) value is
 *        supplied, a copy of the basis Frame is used (as modified by
-*        parameters ATTRS and DOMAIN). The allows values are:
+*        Parameters ATTRS and DOMAIN). The allows values are:
 *
-*        - FRAME      -- A simple Cartesian Frame (the number of axes is
-*                        equal to the number of outputs from the
-*                        Mapping)
+*        - "FRAME"     -- A simple Cartesian Frame (the number of axes is
+*                         equal to the number of outputs from the
+*                         Mapping)
 *
-*        - SKYFRAME   -- A two-dimensional Frame representing positions
-*                        on the celestial sphere.
+*        - "SKYFRAME"  -- A two-dimensional Frame representing positions
+*                         on the celestial sphere.
 *
-*        - SPECFRAME  -- A one-dimensional Frame representing positions
-*                        within an electromagnetic spectrum.
+*        - "SPECFRAME" -- A one-dimensional Frame representing positions
+*                         within an electromagnetic spectrum.
 *
-*        - TIMEFRAME  -- A one-dimensional Frame representing moments
-*                        in time.
+*        - "TIMEFRAME" -- A one-dimensional Frame representing moments
+*                         in time.
 *
-*        Note, if parameter MAPTYPE is set to "REFNDF", then parameter
-*        "FRMTYPE" will not be used - the Frame used will instead always
+*        Note, if Parameter MAPTYPE is set to "REFNDF", then Parameter
+*        "FRMTYPE" will not be used---the Frame used will instead always
 *        be a copy of the Frame from the reference NDF (as selected by
-*        parameter DOMAIN). [!]
+*        Parameter DOMAIN). [!]
 *     INVEXP = LITERAL (Read)
 *        The expressions to be used for the inverse co-ordinate
 *        transformations in a MathMap. See FOREXP.  INVEXP is only used
@@ -196,36 +196,36 @@
 *        basis Frame. It must be one of the following strings, each
 *        of which require some additional parameters as indicated:
 *
-*        - DIAGONAL   -- A linear mapping with no translation
-*                        of off-diagonal coefficients (see parameter
+*        - "DIAGONAL" -- A linear mapping with no translation
+*                        of off-diagonal coefficients (see Parameter
 *                        DIAG)
 *
-*        - FILE       -- A mapping defined by an AST Mapping supplied
-*                        in a separate file (see parameter MAPIN)
+*        - "FILE"     -- A mapping defined by an AST Mapping supplied
+*                        in a separate file (see Parameter MAPIN)
 *
-*        - LINEAR     -- A general linear mapping (see parameter TR)
+*        - "LINEAR"   -- A general linear mapping (see Parameter TR)
 *
-*        - MATH       -- A general algebraically defined mapping
-*                        (see parameters FOREXP, INVEXP, SIMPFI, SIMPIF)
+*        - "MATH"     -- A general algebraically defined mapping
+*                        (see Parameters FOREXP, INVEXP, SIMPFI, SIMPIF)
 *
-*        - PINCUSHION -- A pincushion/barrel distortion (see parameters
+*        - "PINCUSHION" -- A pincushion/barrel distortion (see Parameters
 *                        DISCO and CENTRE)
 *
-*        - REFNDF     -- The Mapping is obtained by aligning the NDF
-*                        with a second reference NDF (see parameters
+*        - "REFNDF"   -- The Mapping is obtained by aligning the NDF
+*                        with a second reference NDF (see Parameters
 *                        REFNDF)
 *
-*        - SHIFT      -- A translation (see parameter SHIFT)
+*        - "SHIFT"    -- A translation (see Parameter SHIFT)
 *
-*        - UNIT       -- A unit mapping
+*        - "UNIT"     -- A unit mapping
 *
-*        - ZOOM       -- A uniform expansion/contraction (see parameter
+*        - "ZOOM"     -- A uniform expansion/contraction (see Parameter
 *                        ZOOM)
 *
 *        ["LINEAR"]
 *     NAXES = _INTEGER (Read)
 *        The number of input and output axes which the Mapping will
-*        have. Only used if a null value is supplied for parameter NDF.
+*        have. Only used if a null value is supplied for Parameter NDF.
 *     NDF = NDF (Read and Write)
 *        The NDF in which to store a new co-ordinate Frame. Supply a
 *        null (!) value if you do not wish to add a Frame to an NDF (you
@@ -233,19 +233,19 @@
 *        text file).
 *     REFNDF = NDF (Read)
 *        A reference NDF from which to obtain the Mapping and Frame. The
-*        NDFs specified by parameters NDF and REFNDF are aligned in a
+*        NDFs specified by Parameters NDF and REFNDF are aligned in a
 *        suitable coordinate system (usually their current Frames - an
 *        error is reported if the two NDFs cannot be aligned). The Mapping
-*        from the basis Frame in "NDF" (specified by parameter FRAME) to
-*        the required Frame in "REFNDF" (specified by parameter DOMAIN) is
+*        from the basis Frame in "NDF" (specified by Parameter FRAME) to
+*        the required Frame in "REFNDF" (specified by Parameter DOMAIN) is
 *        then found and used. The Frame added into "NDF" is always a copy
-*        of the reference Frame - regardless of the setting of parameter
-*        FRMTYPE. Parameter REFNDF is only used when parameter MAPTYPE is
+*        of the reference Frame - regardless of the setting of Parameter
+*        FRMTYPE. Parameter REFNDF is only used when Parameter MAPTYPE is
 *        set to "REFNDF", in which case a value must also be supplied for
-*        parameter NDF (an error will be reported otherwise).
+*        Parameter NDF (an error will be reported otherwise).
 *     RETAIN = _LOGICAL (Read)
 *        Indicates whether the original current Frame should be retained
-*        within the WCS FrameSet of the modified NDF (see parameter NDF).
+*        within the WCS FrameSet of the modified NDF (see Parameter NDF).
 *        If FALSE, the newly added Frame is the current Frame on exit.
 *        Otherwise, the original current Frame is retained on exit. [FALSE]
 *     SHIFT( ) = _DOUBLE (Read)
@@ -264,7 +264,7 @@
 *        only used when MAPTYPE="MATH".  [TRUE]
 *     TR( ) = _DOUBLE (Read)
 *        The values of this parameter are the coefficients of a linear
-*        transformation from the basis Frame specified by parameter
+*        transformation from the basis Frame specified by Parameter
 *        FRAME to the new Frame. This parameter is only used when
 *        MAPTYPE="LINEAR". For instance, if a feature has co-ordinates
 *        (X,Y,Z,...) in the basis Frame, and co-ordinates (U,V,W,...) in
@@ -297,8 +297,8 @@
 *        This parameter is only used when MAPTYPE="LINEAR". [!]
 *     TRANSFER = _LOGICAL (Read)
 *        If TRUE, attributes which have explicitly set values in the basis
-*        Frame (specified by parameter FRAME) are transferred to the new
-*        Frame (Specified by parameter FRMTYPE), if they are applicable
+*        Frame (specified by Parameter FRAME) are transferred to the new
+*        Frame (specified by Parameter FRMTYPE), if they are applicable
 *        to the new Frame. If FALSE, no attribute values are transferred.
 *        The dynamic default is TRUE if and only if the two Frames are
 *        of the same class and have the same value for their Domain
@@ -383,7 +383,7 @@
 *  Notes:
 *     -  The new Frame has the same number of axes as the basis Frame.
 *     -  An error is reported if the transformation supplied using
-*     parameter TR is singular.
+*     Parameter TR is singular.
 
 *  Related Applications:
 *     KAPPA: NDFTRACE, REGRID, WCSFRAME, WCSREMOVE, WCSATTRIB;

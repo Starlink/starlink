@@ -264,7 +264,7 @@
 *        annotations, given as fractions of the corresponding dimension
 *        of the current picture.  The actual margins used may be
 *        increased to preserve the aspect ratio of the data.  Four
-*        values may be given, in the order: bottom, right, top, left.
+*        values may be given, in the order bottom, right, top, left.
 *        If fewer than four values are given, extra values are used
 *        equal to the first supplied value.  If these margins are too
 *        narrow any axis annotation may be clipped.  If a null (!) value
@@ -328,8 +328,8 @@
 *        are fractional values where zero corresponds to the lowest available
 *        colour index and 1.0 corresponds to the highest available colour
 *        index. The default value of [0.0,1.0] thus causes the full range
-*        of colour indicies to be used. Note, if parameter LUT is null
-*        (!) or parameter SCALE is FALSE then this parameter is ignored
+*        of colour indices to be used. Note, if Parameter LUT is null
+*        (!) or Parameter SCALE is FALSE then this parameter is ignored
 *        and the fill range of pens is used. [0.0,1.0]
 *     PERCENTILES( 2 ) = _REAL (Read)
 *        The percentiles that define the scaling limits. For example,

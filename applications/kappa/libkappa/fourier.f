@@ -114,7 +114,7 @@
 *        transform.  If a null is given then an image of zeros is
 *        assumed unless a null is also given for PHASEIN, in which
 *        case the application quits.  This parameter is only available
-*        if HERMIN, REALIN and IMAGIN are all not used.   One way to
+*        if HERMIN, REALIN, and IMAGIN are all not used.   One way to
 *        achieve that is to supply PHASEIN, but none of the
 *        aforementioned parameters, on the command line.  This
 *        parameter is only relevant for an inverse transformation.
@@ -128,7 +128,7 @@
 *        power rather than the power itself.  If a null is given then an
 *        image of zeros is assumed unless a null is also given for
 *        PHASEIN, in which case the application quits.  This parameter
-*        is only available if HERMIN, REALIN and IMAGIN are all not
+*        is only available if HERMIN, REALIN, and IMAGIN are all not
 *        used.  One way to achieve that is to supply POWERIN, but none
 *        of the aforementioned parameters, on the command line.  This
 *        parameter is only relevant for an inverse transformation.

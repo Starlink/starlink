@@ -106,7 +106,7 @@
 *        the image.  Both values must be in the range 0 to 11.  If you
 *        supply a single value, it applies to both axes.  Thus 1
 *        creates one interior knot, [5,4] gives 5 along the x axis and
-*        4 along the y direction.  Increasing this parameter values
+*        4 along the y direction.  Increasing this parameter's values
 *        increases the flexibility of the surface.  Normally, 4 is a
 *        reasonable value.  The upper limit of acceptable values will
 *        be reduced along each axis when its binned array dimension is
@@ -117,7 +117,7 @@
 *        values must be in the range 0 to 14.  If you supply a single
 *        single value, it applies to both axes.  Thus 0 gives a
 *        constant, [3,1] gives a cubic along the x direction and a
-*        linear fit along the y.  Increasing this parameter values
+*        linear fit along the y.  Increasing this parameter's values
 *        increases the flexibility of the surface.  The upper limit of
 *        acceptable values will be reduced along each axis when its
 *        binned array dimension is fewer than 29.  ORDER is only
@@ -138,7 +138,7 @@
 *        is null (!) there will be no lower threshold.  [!]
 *     TITLE = LITERAL (Read)
 *        Value for the title of the output NDF.  A null value will cause
-*        the title of the NDF supplied for parameter IN to be used
+*        the title of the NDF supplied for Parameter IN to be used
 *        instead.  [!]
 *     WLIM = _REAL (Read)
 *        The minimum fraction of good pixels in a bin that permits the
@@ -241,7 +241,7 @@
 *     3-FEB-2000 (DSB):
 *        Replace AIF_FLNAM calls with NDF_MSG.
 *     12-APR-2000 (DSB):
-*        Added parameter RMS.
+*        Added Parameter RMS.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
 *     2007 June 28 (MJC):
@@ -256,7 +256,7 @@
 *        Add GENVAR parameter and evaluate pixel-by-pixel variance.
 *     2008 January 5 (MJC):
 *        Write a constant variance array using the mean square residual
-*        of the fit when parameter GENVAR is TRUE.
+*        of the fit when Parameter GENVAR is TRUE.
 *     2009 December 19 (MJC):
 *        Fix two bugs: one in the calculation of required workspace
 *        for splines when the number of knots are different along the
