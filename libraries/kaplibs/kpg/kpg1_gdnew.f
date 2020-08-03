@@ -45,7 +45,7 @@
 *     COMMENT = CHARACTER * ( * ) (Given)
 *        A comment to store with the new pictures added to the AGI
 *        database. This will usually by an indication of the application
-*        being run (egKAPPA_DISPLAY).
+*        being run (e.g. KAPPA_DISPLAY).
 *     MARGIN( 4 ) = REAL (Given)
 *        The width of the borders to leave round the DATA picture, given
 *        as fractions of the corresponding dimension of the current picture.
