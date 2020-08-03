@@ -273,7 +273,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'NAME', PNAME( I ) )
             CALL MSG_SETC( 'SIDE', PSIDE( I ) )
-            CALL ERR_REP( 'KPG1_GDDAT_1', 'KPG1_GDDAT: Invalid '//
+            CALL ERR_REP( 'KPG1_GDOLD_1', 'KPG1_GDOLD: Invalid '//
      :                    'side ''^SIDE'' requested for ^NAME '//
      :                    'picture (programming error).', STATUS )
             GO TO 999
