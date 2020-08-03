@@ -4,6 +4,7 @@
 /polpack.sh
 /polpack_link_adam
 /polpack_mon.f
+/polsub/pol1_ptclm.f
 /polsub/pol1_ptvrc.f
 /polsub/pol1_ptvrs.f
 /sun223.pdf
