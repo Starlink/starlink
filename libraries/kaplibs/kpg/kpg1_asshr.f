@@ -19,9 +19,10 @@
 *     This routine creates a new Plot covering the same window as the
 *     current PGPLOT window, but the window is shrunk in GRAPHICS space
 *     so that all the annotation produced by AST_GRID falls within the PGPLOT
-*     viewport which is current on entry. The sizes of annotations, gaps,
-*     etc. are shrunk if this is necessary in order to fit the annotations
-*     within the current PGPLOT viewport.
+*     viewport that is current on entry. (However, see Argument RJUST
+*     for a way to prevent shrinkage along an axis.)  The sizes of
+*     annotations, gaps, etc. are shrunk if this is necessary in order
+*     to fit the annotations within the current PGPLOT viewport.
 
 *  Arguments:
 *     ASP = LOGICAL (Given)
@@ -56,12 +57,14 @@
 *        used instead. Other unrecognised values are treated as "C".
 *     RJUST( 2 ) = REAL (Given)
 *        Each element is used only if the corresponding element in JUST
-*        is a apce. The first element gives the fractional vertical position
+*        is a space. The first element gives the fractional vertical position
 *        of the new plot: 0.0 means put the new plot as low as possible, 1.0
 *        means put it as high as possible. The second element gives the
 *        fractional horizontal position of the new plot: 0.0 means put the
 *        new plot as far to the left as possible, 1.0 means put it as far
-*        to the right as possible.
+*        to the right as possible.  A negative value requests that no
+*        space be allocated for annotations, tick marks, gaps etc. along
+*        the respective axis.
 *     IPLOT = INTEGER (Given and Returned)
 *        The Plot. The supplied Plot is annulled and a new one is
 *        returned in its place. The new Plot contains all the Frames of
@@ -76,6 +79,8 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
+*     Copyright (C) 2016, East Asian Observatory.
+*     Copyright (C) 2020 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -96,6 +101,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -103,7 +109,11 @@
 *        Original version.
 *     6-DEC-2016 (DSB):
 *        Added argument RJUST.
-*     {enter_changes_here}
+*     2020 July 30 (MJC):
+*        Negative RJUST values make the Plot fill the current viewport
+*        along the respective axis, i.e. ignore creating room for
+*        annotations, tick marks, and gaps.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -586,6 +596,16 @@
          END DO
 
       END DO
+
+      IF ( JUST( 1:1 ) .EQ. ' ' .AND. RJUST( 1 ) .LT. 0.0 ) THEN
+         GBOX( 2 ) = TBOX( 2 )
+         GBOX( 4 ) = TBOX( 4 )
+      END IF
+
+      IF ( JUST( 2:2 ) .EQ. ' ' .AND. RJUST( 2 ) .LT. 0.0 ) THEN
+         GBOX( 1 ) = TBOX( 1 )
+         GBOX( 3 ) = TBOX( 3 )
+      END IF
 
 *  Check that the plotting area found above has significant width and height
 *  (more than 2mm).

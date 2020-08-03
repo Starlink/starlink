@@ -59,7 +59,7 @@
 *     PNAME( NP ) = CHARACTER * ( * ) (Given)
 *        The names to store in the AGI database with the NP extra pictures.
 *     PSIDE( NP ) = CHARACTER * 1 (Given)
-*        Each element of this array should be one of L, R, T or B. It
+*        Each element of this array should be one of L, R, T, B, or D. It
 *        indicates which side of the FRAME picture an extra picture is to be
 *        placed. For Left and Right, the extra picture occupies the full
 *        height of the DATA picture, margins, and any previously created
@@ -67,7 +67,10 @@
 *        all previously created pictures. For Top or Bottom, the extra picture
 *        occupies the full width of the DATA picture, margins, and any
 *        previously created extra pictures. The picture is placed at the top or
-*        bottom of all previously created pictures. Ignored if NP is zero.
+*        bottom of all previously created pictures.  D is a variant of
+*        R, where the plot is to the right, but the vertical extent is
+*        that of the DATA picture instead of the FRAME picture. This
+*        argument is ignored if NP is zero.
 *     PSIZE( NP ) = REAL (Given)
 *        The size of each extra picture. For Left and Right pictures, this
 *        is the width of the picture, and the value is given as a fraction
@@ -114,6 +117,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998, 1999, 2000 Central Laboratory of the Research Councils.
+*     Copyright (C) 2006, 2020 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -134,6 +138,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -145,8 +150,10 @@
 *     10-AUG-2000 (DSB):
 *        Modified to allow negative margins.
 *     23-AUG-2006 (DSB):
-*        When checking foir zero-sized boxes, include effects of truncation
+*        When checking for zero-sized boxes, include effects of truncation
 *        from double to single precision.
+*     2020 July 30 (MJC):
+*        Introduced D option in PSIDE.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -281,7 +288,7 @@
 
          IF( PSIDE( I ) .EQ. 'L' ) THEN
             FXL = MIN( FXR, FXL + ABS( PSIZE( I )*CXI ) )
-         ELSE IF( PSIDE( I ) .EQ. 'R' ) THEN
+         ELSE IF( PSIDE( I ) .EQ. 'R' .OR. PSIDE( I ) .EQ. 'D' ) THEN
             FXR = MAX( FXL, FXR - ABS( PSIZE( I )*CXI ) )
          ELSE IF( PSIDE( I ) .EQ. 'T' ) THEN
             FYT = MAX( FYB, FYT - ABS( PSIZE( I )*CYI ) )
@@ -373,7 +380,7 @@
 
          IF( PSIDE( I ) .EQ. 'L' ) THEN
             SXL = SXL - ABS( PSIZE( I )*CXI )
-         ELSE IF( PSIDE( I ) .EQ. 'R' ) THEN
+         ELSE IF( PSIDE( I ) .EQ. 'R' .OR. PSIDE( I ) .EQ. 'D' ) THEN
             SXR = SXR + ABS( PSIZE( I )*CXI )
          ELSE IF( PSIDE( I ) .EQ. 'T' ) THEN
             SYT = SYT + ABS( PSIZE( I )*CYI )
@@ -470,6 +477,14 @@
             PXR = SXR
             PYB = SYB
             PYT = SYT
+
+            SXR = PXL
+
+         ELSE IF( PSIDE( I ) .EQ. 'D' ) THEN
+            PXL = MAX( SXL, SXR - ABS( PSIZE( I )*CXI ) )
+            PXR = SXR
+            PYB = DYB
+            PYT = DYT
 
             SXR = PXL
 

@@ -184,9 +184,14 @@
 *        of the width of the current picture.  If a key is produced,
 *        then the right-hand margin specified by Parameter MARGIN is
 *        ignored, and the value supplied for KEYPOS is used instead.
+*
 *        The second element gives the vertical position of the key as a
 *        fractional value in the range zero to one: zero puts the key as
-*        low as possible, one puts it as high as possible. [current value]
+*        low as possible, one puts it as high as possible.  A negative
+*        value (no lower than -1) causes the key to match the height of
+*        the display image.  This may mean any text, like a label, for
+*        the horizontal axis may not appear, though if AXES is TRUE there
+*        is usually room.  [current value]
 *     KEYSTYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
 *        use for the key (see Parameter KEY).
@@ -466,6 +471,12 @@
 *        wider than normal. The scaling is between the -1 and +7
 *        standard deviations of the image around its mean.  The scaled
 *        data are stored in an NDF called video.
+*     display kn26 axes key keypos=[0.0,-1.0] keystyle=^key.sty \
+*        Displays the NDF called kn26 using the current scaling,
+*        surrounded by axes.  It adds a colour-table key to the right
+*        that abuts the data picture and is aligned vertically with
+*        the image.  The plot attributes set in the text file key.sty
+*        controls the appearance of the key.
 *     display video noscale \
 *        Displays the DATA component of the NDF called video (created
 *        in the previous example) without scaling within the current
@@ -505,12 +516,13 @@
 *     NDF is used as the default title.
 *     -  The application stores a number of pictures in the graphics
 *     database in the following order: a FRAME picture containing the
-*     annotated axes, the image area, and the border; a DATA picture
-*     containing just the image area.  Note, the FRAME picture is only
-*     created if annotated axes or a border have been drawn, or if
-*     non-zero margins were specified using Parameter MARGIN.  The world
-*     co-ordinates in the DATA picture will be pixel co-ordinates.  A
-*     reference to the supplied NDF, together with a copy of the WCS
+*     annotated axes, the image area, and the border; if there is a key,
+*     a KEY picture encompassing the key and its annotations; and a DATA
+*     picture containing just the image area.  Note, the FRAME picture
+*     is only created if annotated axes or a border have been drawn, or
+*     if non-zero margins were specified using Parameter MARGIN.  The
+*     world co-ordinates in the DATA picture will be pixel co-ordinates.
+*     A reference to the supplied NDF, together with a copy of the WCS
 *     information in the NDF are stored in the DATA picture.  On exit
 *     the current database picture for the chosen device reverts to the
 *     input picture.
@@ -525,7 +537,8 @@
 *     therefore only NDF-compliant applications can process it.
 
 *  Related Applications:
-*     KAPPA: WCSFRAME, PICDEF; Figaro: IGREY, IMAGE; SPECDRE: MOVIE.
+*     KAPPA: WCSFRAME, PICDEF, LUTVIEW; Figaro: IGREY, IMAGE;
+*     SPECDRE: MOVIE.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
@@ -543,8 +556,9 @@
 *     Copyright (C) 1995, 1997-1999, 2001, 2004 Central Laboratory of
 *     the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007, 2009, 2010, 2012 Science & Technology
+*     Copyright (C) 2007, 2009, 2010-2015, 2020 Science & Technology
 *     Facilities Council.
+*     Copyright (C) 2016-2018 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -677,10 +691,15 @@
 *        Frame. So now we need to extract a pointer to the current Frame
 *        before setting the Ident attribute.
 *     6-DEC-2016 (DSB):
-*        Modify parameter KEYPOS to allow it to set the vertical key
+*        Modify Parameter KEYPOS to allow it to set the vertical key
 *        position as well as the horizontal position.
 *     12-DEC-2017 (DSB):
-*        Add parameter PENRANGE.
+*        Add Parameter PENRANGE.
+*     2020 July 30 (MJC)
+*        Allow placement of the key to match the image via negative
+*        Paramter KEYPOS's second value.  Fix bug in call to KPG1_LUTKY.
+*        Added note on the AGI KEY picture, and an example using this
+*        new feature.
 *     {enter_further_changes_here}
 
 *-
@@ -714,9 +733,10 @@
       PARAMETER( NDIM = 2 )
 
 *  Local Variables:
-      CHARACTER COMP*8           ! Component to be displayed
+      CHARACTER COMP*8         ! Component to be displayed
       CHARACTER FORM*( NDF__SZFRM ) ! Form of the output data array
       CHARACTER IDENT*20       ! Ident attribute for a Frame
+      CHARACTER KPLACE*1       ! KEY placement code
       CHARACTER LABEL*255      ! Label for key
       CHARACTER MCOMP*8        ! Component to be mapped
       CHARACTER NDFNAM*255     ! Full NDF specification
@@ -789,6 +809,7 @@
       LOGICAL BAD              ! Bad pixels are present in the image?
       LOGICAL BORDER           ! Border to be drawn?
       LOGICAL CLIPAX           ! Should annotated axes be clipped?
+      LOGICAL DATKEY           ! Should key position align with image?
       LOGICAL DEVCAN           ! Cancel DEVICE parameter?
       LOGICAL KEY              ! Produce a colour ramp as a key?
       LOGICAL NN               ! Map the LUT via nearest-neighbour?
@@ -801,6 +822,7 @@
       REAL GLBND( NDIM )       ! Low grid co-ord bounds of PGPLOT window
       REAL GUBND( NDIM )       ! Hi grid co-ord bounds of PGPLOT window
       REAL KEYPOS( 2 )         ! Horizontal and vertical position of key
+      REAL KJUST( 2 )          ! Fractionl justifications of key
       REAL KWID                ! Width to reserve for the KEY (if any)
       REAL MARGIN( 4 )         ! Width of margins round DATA picture
       REAL OPLBND( NDIM )      ! Low pixel co-ord bounds of NDF overlap
@@ -1042,16 +1064,20 @@
       CALL PAR_GET0L( 'KEY', KEY, STATUS )
 
 *  If so, see how large a gap is required between the DATA picture and
-*  the key. This replaces the MARGIN value for the right hand edge.
+*  the key. This replaces the MARGIN value for the right-hand edge.
+*  Also allow for the case where the user wants to have a key that
+*  matches the height of the image, selected by a negative vertical
+*  position.
+      DATKEY = .FALSE.
       IF( KEY ) THEN
          KEYPOS( 1 ) = 0.0
          KEYPOS( 2 ) = 0.5
          CALL PAR_GDR1R( 'KEYPOS', 2, KEYPOS, -1.0, 1.0, .FALSE.,
      :                   KEYPOS, STATUS )
 
-         KEYPOS( 1 ) = MIN( KEYPOS( 1 ), 0.99 - MARGIN( 4 ) - KW )
-         KEYPOS( 2 ) = MAX( KEYPOS( 2 ), 0.0 )
+         DATKEY = KEYPOS( 2 ) .LT. 0.0
 
+         KEYPOS( 1 ) = MIN( KEYPOS( 1 ), 0.99 - MARGIN( 4 ) - KW )
          IF( KEYPOS( 1 ) .GE. 0.0 ) THEN
             MARGIN( 2 ) = KEYPOS( 1 )
          ELSE
@@ -1372,9 +1398,17 @@
 *  First deal with cases where a key is required...
       IF( KEY ) THEN
 
+*  Set the key's alignment to the right, and optionally its vertical
+*  placement to match the data region.  In the latter case the AGI
+*  FRAME picture for the key only extends vertically to match the DATA
+*  picture.  The default case is that the KEY FRAME's vertical extent
+*  matches the main FRAME picture that surrounds the DATA picture.
+         KPLACE = 'R'
+         IF ( DATKEY ) KPLACE = 'D'
+
 *  Start up the graphics system, creating a KEY picture.
          CALL KPG1_PLOT( IWCS, 'NEW', 'KAPPA_DISPLAY', NDFNAM( : NC ),
-     :                   MARGIN, 1, 'KEY', 'R', KW, ASPECT, 'PIXEL',
+     :                   MARGIN, 1, 'KEY', KPLACE, KW, ASPECT, 'PIXEL',
      :                   BOX, IPICD, IPICF, IPICK, IPLOT, NFRM, ALIGN,
      :                   STATUS )
 
@@ -1603,12 +1637,26 @@
          CALL PSX_CALLOC( UP - LP + 1, '_INTEGER', IPWORK, STATUS )
 
 *  Create the key.  The plus sign before the KEYSTYLE requests that
-*  temporary attributes be recognised.
-         CALL KPG1_LUTKY( IPICK, '+KEYSTYLE', REAL( DHI ), REAL( DLO ),
-     :                    LABEL( : NC ), 'KAPPA_DISPLAY', LP, UP, 0.1,
-     :                    ( Y2 - Y1 ) * 0.1, ( Y2 - Y1 ) * 0.1, ' L',
-     :                    KEYPOS(2), NX*NY, %VAL( CNF_PVAL( IPCOL ) ),
-     :                    STATUS )
+*  temporary attributes be recognised.  Either use a shortened key
+*  to permit all annotations to fit with vertical alignment controlled
+*  by Paramter KEYPOS(2), or a key with zero gap size aligned with
+*  thwe DATA picture.
+         KJUST( 1 ) = KEYPOS( 2 )
+         KJUST( 2 ) = 0.0
+         IF ( DATKEY ) THEN
+            CALL KPG1_LUTKY( IPICK, '+KEYSTYLE', REAL( DHI ),
+     :                       REAL( DLO ), LABEL( : NC ),
+     :                       'KAPPA_DISPLAY', LP, UP, 0.1,
+     :                       0.0, 0.0, ' L', KJUST, NX * NY,
+     :                       %VAL( CNF_PVAL( IPCOL ) ), STATUS )
+         ELSE
+            CALL KPG1_LUTKY( IPICK, '+KEYSTYLE', REAL( DHI ),
+     :                       REAL( DLO ), LABEL( : NC ),
+     :                       'KAPPA_DISPLAY', LP, UP, 0.1,
+     :                       ( Y2 - Y1 ) * 0.1, ( Y2 - Y1 ) * 0.1, ' L',
+     :                       KJUST, NX * NY, %VAL( CNF_PVAL( IPCOL ) ),
+     :                       STATUS )
+         END IF
 
 *  Report a context message if anything went wrong.
          IF( STATUS .NE. SAI__OK ) THEN

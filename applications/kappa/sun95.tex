@@ -6,9 +6,9 @@
 \stardocsource    {sun95.44}
 \stardocnumber    {95.44}
 \stardocauthors   {Malcolm J. Currie \& David S. Berry}
-\stardocdate      {2020 April 24}
+\stardocdate      {2020 August 1}
 \stardoctitle     {KAPPA --- Kernel Application Package}
-\stardocversion   {2.6-7}
+\stardocversion   {2.6-8}
 \stardocmanual    {User's Guide}
 % -----------------------------------------------------------------------------
 \stardocabstract{
@@ -18417,14 +18417,20 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
       \sstsubsection{
          KEYPOS( 2 ) = \_REAL (Read)
       }{
-        The first element gives the gap between the right-hand edge of
-        the display and the left-hand edge of the key, as a fraction
-        of the width of the current picture.  If a key is produced,
-        then the right-hand margin specified by Parameter MARGIN is
-        ignored, and the value supplied for KEYPOS is used instead.
-        The second element gives the vertical position of the key as a
-        fractional value in the range zero to one: zero puts the key as
-        low as possible, one puts it as high as possible. \texttt{[}current value\texttt{{]}}
+         The first element gives the gap between the right-hand edge of
+         the display and the left-hand edge of the key, as a fraction
+         of the width of the current picture.  If a key is produced,
+         then the right-hand margin specified by Parameter MARGIN is
+         ignored, and the value supplied for KEYPOS is used instead.
+
+         The second element gives the vertical position of the key as a
+         fractional value in the range zero to one: zero puts the key
+         as low as possible, one puts it as high as possible.  A
+         negative value (no lower than \texttt{-1}) causes the key to
+         match the height of the display image. This may mean any text,
+         like a label, for the horizontal axis may not appear, though
+         if AXES is \texttt{TRUE} there is usually room.
+         \texttt{[}current value\texttt{{]}}
       }
       \sstsubsection{
          KEYSTYLE = \htmlref{GROUP}{se:groups} (Read)
@@ -18791,6 +18797,15 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          stored in an NDF called video.
       }
       \sstexamplesubsection{
+         display kn26 axes key keypos=[0.0,-1.0] keystyle=$\wedge$key.sty $\backslash$
+      }{
+         Displays the NDF called kn26 using the current scaling,
+         surrounded by axes.  It adds a colour-table key to the right
+         that abuts the data picture and is aligned vertically with
+         the image.  The plot attributes set in the text file \texttt{key.sty}
+         controls the appearance of the key.
+      }
+      \sstexamplesubsection{
          display video noscale $\backslash$
       }{
          Displays the DATA component of the NDF called video (created
@@ -18850,14 +18865,16 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          \sstitem
          The application stores a number of pictures in the graphics
          database in the following order: a FRAME picture containing the
-         annotated axes, the image area, and the border; a DATA picture
-         containing just the image area.  Note, the FRAME picture is only
-         created if annotated axes or a border have been drawn, or if non-zero
-         margins were specified using Parameter MARGIN.  The world co-ordinates
-         in the DATA picture will be pixel co-ordinates.  A reference to the
-         supplied NDF, together with a copy of the \htmlref{WCS}{apndf:wcs} information in the NDF
-         are stored in the DATA picture.  On exit the current database picture
-         for the chosen device reverts to the input picture.
+         annotated axes, the image area, and the border; if there is a key,
+         a KEY picture encompassing the key and its annotations; and a DATA
+         picture containing just the image area.  Note, the FRAME picture
+         is only created if annotated axes or a border have been drawn, or
+         if non-zero margins were specified using Parameter MARGIN.  The
+         world co-ordinates in the DATA picture will be pixel co-ordinates.
+         A reference to the supplied NDF, together with a copy of the \htmlref{WCS}{apndf:wcs}
+         information in the NDF are stored in the DATA picture.  On exit
+         the current database picture for the chosen device reverts to the
+         input picture.
 
          \sstitem
          The data type of the output NDF depends on the number of colour
@@ -18876,7 +18893,8 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
       Related Applications
    }{
 KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
-\htmlref{PICDEF}{PICDEF};
+\htmlref{PICDEF}{PICDEF},
+\htmlref{LUTVIEW}{LUTVIEW};
 \xref{FIGARO}{sun86}{}: \xref{IGREY}{sun86}{IGREY},
 \xref{IMAGE}{sun86}{IMAGE},
 \xref{MOVIE}{sun86}{MOVIE}.
@@ -54278,6 +54296,15 @@ The following applications have been modified:
         NDF sections and fill values in a text file.   This is made
         possible new parameters called MODE and FILE.  The default
         for MODE preserves the historic interactive behaviour.
+      \end{itemize}
+
+   \item [\htmlref{DISPLAY}{DISPLAY}]\mbox{}
+      \begin{itemize}
+        \item Parameter KEYPOS(2) accepts negative values to instruct DISPLAY
+        to plot the key aligned with the image.  Thus setting KEY=\texttt{TRUE}
+        and KEYPOS=\texttt{[0,-1]} will draw the colour-table ramp so that it
+        abuts the image with its vertical extent matching the image,
+        as commonly needed for journal graphics.
       \end{itemize}
 
    \item [\htmlref{LINPLOT}{LINPLOT}]\mbox{}
