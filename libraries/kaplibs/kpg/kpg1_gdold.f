@@ -48,7 +48,7 @@
 *     PNAME( NP ) = CHARACTER * ( * ) (Given)
 *        The names to store in the AGI database with the NP extra pictures.
 *     PSIDE( NP ) = CHARACTER * 1 (Given)
-*        Each element of this array should be one of L, R, T or B. It
+*        Each element of this array should be one of L, R, T, B, or D. It
 *        indicates which side of the FRAME picture an extra picture is to be
 *        placed. For Left and Right, the extra picture occupies the full
 *        height of the DATA picture, margins, and any previously created
@@ -56,7 +56,10 @@
 *        all previously created pictures. For Top or Bottom, the extra picture
 *        occupies the full width of the DATA picture, margins, and any
 *        previously created extra pictures. The picture is placed at the top or
-*        bottom of all previously created pictures. Ignored if NP is zero.
+*        bottom of all previously created pictures.  D is a variant of
+*        R, where the plot is to the right, but the vertical extent is
+*        that of the DATA picture instead of the FRAME picture. This
+*        argument is ignored if NP is zero.
 *     PSIZE( NP ) = REAL (Given)
 *        The size of each extra picture. For Left and Right pictures, this is
 *        the width of the picture, and the value is given as a fraction of
@@ -90,6 +93,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998, 1999, 2000, 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2020 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -110,6 +114,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -123,6 +128,8 @@
 *     9-JAN-2001 (DSB):
 *        Clip ancillary pictures so that they are contained within the Frame
 *        picture, not the original current picture.
+*     2020 July 30 (MJC):
+*        Introduced D option in PSIDE.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -251,6 +258,12 @@
             PYB = SYB
             PYT = SYT
 
+         ELSE IF ( PSIDE( I ) .EQ. 'D' ) THEN
+            PXL = SXR
+            PXR = SXR + ABS( PSIZE( I )*CXI )
+            PYB = DYB
+            PYT = DYT
+
          ELSE IF( PSIDE( I ) .EQ. 'L' ) THEN
             PXL = SXL - ABS( PSIZE( I )*CXI )
             PXR = SXL
@@ -354,6 +367,12 @@
             PXR = SXR + ABS( PSIZE( I )*CXI )
             PYB = SYB
             PYT = SYT
+
+         ELSE IF ( PSIDE( I ) .EQ. 'D' ) THEN
+            PXL = SXR
+            PXR = SXR + ABS( PSIZE( I )*CXI )
+            PYB = DYB
+            PYT = DYT
 
          ELSE IF( PSIDE( I ) .EQ. 'L' ) THEN
             PXL = SXL - ABS( PSIZE( I )*CXI )

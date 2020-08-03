@@ -26,6 +26,14 @@
       new parameters called MODE and FILE.  The default for MODE
       preserves the historic interactive behaviour.
 
+   o  DISPLAY
+
+      -  Parameter KEYPOS(2) accepts negative values to instruct
+      DISPLAY to plot the key aligned with the image.  Thus setting
+      KEY=TRUE and KEYPOS=[0,-1] will draw the colour-table ramp so
+      that it  abuts the image with its vertical extent matching the
+      image, as commonly needed for journal graphics.
+
    o  LINPLOT
 
       -  The XMAP parameter now has a new option called "LRLinear",
