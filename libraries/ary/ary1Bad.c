@@ -61,6 +61,9 @@ void ary1Bad( AryACB *acb, int check, int *bad, int *status ) {
 *  History:
 *     03-JUL-2017 (DSB):
 *        Original version, based on equivalent Fortran routine by RFWS.
+*     5-AUG-2020 (DSB):
+*        Fix bug that could result in bad values to be treated literally, caused 
+*        by failing to dereference "bad".
 
 *-
 */
@@ -143,7 +146,7 @@ void ary1Bad( AryACB *acb, int check, int *bad, int *status ) {
    made to see whether the data would be padded (with "bad" values) if it
    were accessed. Obtain mapping region bounds information for the ACB
    entry, as if the array were going to be mapped. */
-            if( !bad ){
+            if( !*bad ){
                ary1Gmrb( acb, &mtrex, &mrfull, &whole, lmrb, umrb, lmtr,
                          umtr, status );
 
