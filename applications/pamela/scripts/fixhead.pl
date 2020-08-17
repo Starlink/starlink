@@ -463,6 +463,8 @@ while(<LOG>){
             $date{$file} = "$3/$2/$1";
         }elsif(/\'ROTSKYPA\s*=\s*$float\s*\//){
             $slitpa{$file} = $1;
+        }elsif(/\'OBSTYPE\s*=\s*\'\s*([^\']*?)\s*\'/){
+            $source{$file} = $1;
         }
 
     }elsif($format == 8){

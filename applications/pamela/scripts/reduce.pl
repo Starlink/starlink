@@ -744,66 +744,68 @@ my (%arcs, %flats_before, %flats_after, $obj, $arc, $narc, $flat);
 
 foreach $obj (@files){
     if($obj =~ /\S/ && $source{$obj} eq 'DATA'){
-	$narc = 0;
-	foreach $arc (@files){
-	    if($arc =~ /\S/ && $source{$arc} eq 'ARC'){
+        $narc = 0;
+        foreach $arc (@files){
+            if($arc =~ /\S/ && $source{$arc} eq 'ARC'){
 
-		if(defined $ra{$arc} && defined $ra{$obj}){
-		    $rdiff = $ra{$arc}-$ra{$obj};
-		}else{
-		    $rdiff = 0.;
-		}
+                if(defined $ra{$arc} && defined $ra{$obj}){
+                    $rdiff = $ra{$arc}-$ra{$obj};
+                }else{
+                    $rdiff = 0.;
+                }
 
-		if(defined $dec{$arc} && defined $dec{$obj}){
-		    $ddiff = $dec{$arc}-$dec{$obj};
-		    $cosd  = cos($twopi*$dec{$obj}/360.);
-		    $pdiff = sqrt(($rdiff*$cosd)**2 + $ddiff**2);
-		}else{
-		    $ddiff = 0.;
-		    $pdiff = 0.;
-		}
+                if(defined $dec{$arc} && defined $dec{$obj}){
+                    $ddiff = $dec{$arc}-$dec{$obj};
+                    $cosd  = cos($twopi*$dec{$obj}/360.);
+                    $pdiff = sqrt(($rdiff*$cosd)**2 + $ddiff**2);
+                }else{
+                    $ddiff = 0.;
+                    $pdiff = 0.;
+                }
 
-		if(defined $slitpa{$arc} && defined $slitpa{$obj}){
-		    $padiff = abs($slitpa{$arc}-$slitpa{$obj});
-		}else{
-		    $padiff = 0.;
-		}
+                if(defined $slitpa{$arc} && defined $slitpa{$obj}){
+                    $padiff = abs($slitpa{$arc}-$slitpa{$obj});
+                }else{
+                    $padiff = 0.;
+                }
 
+                if(defined $time{$arc} && defined $time{$obj}){
+                    $tdiff = 24.*60.*abs($time{$arc}-$time{$obj});
+                }else{
+                    $tdiff = 0.;
+                }
 
-		if(defined $time{$arc} && defined $time{$obj}){
-		    $tdiff = 24.*60.*abs($time{$arc}-$time{$obj});
-		}else{
-		    $tdiff = 0.;
-		}
+                if($arc_pos_tol <= 0. || ($pdiff < $arc_pos_tol && $padiff < $arc_pa_tol && $tdiff < $arc_time_tol)){
 
-		if($pdiff < $arc_pos_tol && $padiff < $arc_pa_tol && $tdiff < $arc_time_tol){
+                    # We now have a possible arc but we now check that there are no
+                    # exposures between it (in time) and the object at a different position
+                    # and or slit PA (override if arc_pos_tolerance <= 0)
 
-# We now have a possible arc but we now check that there are no
-# exposures between it (in time) and the object at a different position
-# and or slit PA
-
-		    $ok = 1;
-		    foreach $slew (@files){
-			if($slew =~ /\S/){
-			    if(defined $time{$slew} && defined $time{$arc} && defined $time{obj} &&
-			       (($time{$slew} > $time{$arc} && $time{$slew} < $time{$obj}) ||
-				($time{$slew} < $time{$arc} && $time{$slew} > $time{$obj}))){
-				$rdiff = $ra{$slew}-$ra{$obj};
-				$ddiff = $dec{$slew}-$dec{$obj};
-				$pdiff = sqrt(($rdiff*$cosd)**2 + $ddiff**2);
-				$padiff= abs($slitpa{$arc}-$slitpa{$obj});
-				if($pdiff > $arc_pos_tol || $padiff > $arc_pa_tol){
-				    $ok = 0;
-				}
-			    }
-			}
-		    }
-		    if($ok){
-			$arcs{$obj}[$narc++] = $arc;
-		    }
-		}
-	    }
-	}
+                    $ok = 1;
+                    if($arc_pos_tol > 0.){
+                        foreach $slew (@files){
+                            if($slew =~ /\S/){
+                                if(defined $time{$slew} && defined $time{$arc} && defined $time{obj} &&
+                                   (($time{$slew} > $time{$arc} && $time{$slew} < $time{$obj}) ||
+                                    ($time{$slew} < $time{$arc} && $time{$slew} > $time{$obj}))){
+                                    $rdiff = $ra{$slew}-$ra{$obj};
+                                    $ddiff = $dec{$slew}-$dec{$obj};
+                                    $pdiff = sqrt(($rdiff*$cosd)**2 + $ddiff**2);
+                                    $padiff= abs($slitpa{$arc}-$slitpa{$obj});
+                                    if($pdiff > $arc_pos_tol || $padiff > $arc_pa_tol){
+                                        $ok = 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    # add to list of arcs
+                    if($ok){
+                        $arcs{$obj}[$narc++] = $arc;
+                    }
+                }
+            }
+        }
 
 	if($nearflat eq "true"){
 	    $nbefore = $nafter = 0;
