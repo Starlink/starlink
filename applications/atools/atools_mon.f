@@ -349,6 +349,9 @@
       ELSE IF ( NAME .EQ. 'ASTADDREGION' ) THEN
          CALL ASTADDREGION( STATUS )
 
+      ELSE IF ( NAME .EQ. 'ASTGETREGDISC' ) THEN
+         CALL ASTGETREGDISC( STATUS )
+
 *  If the action name is not recognised, then report an error.
       ELSE
          STATUS = SAI__ERROR

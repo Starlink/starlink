@@ -2597,6 +2597,39 @@ iraf! {
           }
       }
 
+      action astgetregdisc {
+         helplib {$ATOOLS_HELP}
+         parameter fmt {
+            type LITERAL
+            prompt {Format for output text file}
+            ppath DEFAULT
+            vpath DEFAULT
+            default AST
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Region}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter centre {
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+         parameter radius {
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+      }
+
       action astgetregframe {
          helplib {$ATOOLS_HELP}
          parameter fmt {
