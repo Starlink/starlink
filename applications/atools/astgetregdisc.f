@@ -118,16 +118,25 @@
 
 *  Display the results.
       CALL MSG_BLANK( STATUS )
-      CALL MSG_SETD( 'CX', CENTRE( 1 ) )
-      CALL MSG_SETD( 'CY', CENTRE( 2 ) )
-      CALL MSG_OUT( ' ', 'Centre of bounding disc: (^CX,^CY)', STATUS )
-      CALL PAR_PUT1D( 'CENTRE', 2, CENTRE, STATUS )
-
-      CALL MSG_SETD( 'R', RADIUS )
-      CALL MSG_OUT( ' ', 'Radius of bounding disc: ^R', STATUS )
-      CALL PAR_PUT0D( 'RADIUS', RADIUS, STATUS )
-
+      IF( RADIUS .NE. AST__BAD ) THEN
+         CALL MSG_SETD( 'CX', CENTRE( 1 ) )
+         CALL MSG_SETD( 'CY', CENTRE( 2 ) )
+         CALL MSG_OUT( ' ', 'Centre of bounding disc: (^CX,^CY)',
+     :                 STATUS )
+         CALL MSG_SETD( 'R', RADIUS )
+         CALL MSG_OUT( ' ', 'Radius of bounding disc: ^R', STATUS )
+      ELSE
+         CALL MSG_OUT( ' ', 'Centre of bounding disc: (<bad>,<bad>)',
+     :                 STATUS )
+         CALL MSG_OUT( ' ', 'Radius of bounding disc: <bad>', STATUS )
+         CENTRE( 1 ) = AST__BAD
+         CENTRE( 2 ) = AST__BAD
+      END IF
       CALL MSG_BLANK( STATUS )
+
+*  Store the results in output parameters.
+      CALL PAR_PUT1D( 'CENTRE', 2, CENTRE, STATUS )
+      CALL PAR_PUT0D( 'RADIUS', RADIUS, STATUS )
 
 *  Tidy up.
  999  CONTINUE
