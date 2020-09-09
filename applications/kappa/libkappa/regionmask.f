@@ -49,12 +49,12 @@
 *        sub-class of Region may be supplied - e.g. Box, Polygon, CmpRegion,
 *        Prism, etc.), or any file that can be converted automatically to
 *        an AST Region (for instance an IVOA MOC in text or FITS format,
-*        an IVOA STC-S region). An NDF may also be supplied, in which case
-*        the rectangular boundary of the NDF is used as the Region. If the
-*        axes spanned by the Region are not the same as those of the current
-*        WCS Frame in the input NDF, an attempt will be made to create an
-*        equivalent new Region that does match the current WCS Frame. An
-*        error will be reported if this is not possible.
+*        an IVOA STC-S region in text format). An NDF may also be supplied,
+*        in which case the rectangular boundary of the NDF is used as the
+*        Region. If the axes spanned by the Region are not the same as those
+*        of the current WCS Frame in the input NDF, an attempt will be made
+*        to create an equivalent new Region that does match the current WCS
+*        Frame. An error will be reported if this is not possible.
 
 *  Examples:
 *     regionmask a1060 galaxies.txt a1060_sky
