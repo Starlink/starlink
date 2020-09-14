@@ -134,6 +134,8 @@
 *        - theGetJobData no longer reports an error if the specified job is
 *        not found.
 *        - Add lots more sanity checks to the list handling functions.
+*     14-SEP-2020 (DSB):
+*        Some extra defensive checks.
 */
 
 
@@ -405,7 +407,7 @@ int thrAddJob( ThrWorkForce *workforce, int flags, void *data,
    thr1ThreadLog( "add_job: Job added", ACTIVE, job->ijob );
 
 /* Return the job identifier. */
-   return job->ijob;
+   return job ? job->ijob : 0;
 }
 
 void thrBeginJobContext( ThrWorkForce *workforce, int *status ){
@@ -452,6 +454,7 @@ void thrBeginJobContext( ThrWorkForce *workforce, int *status ){
    thrGetWorkforce), then do this in an AST "permanent memory" context
    so that the allocated memory is not reported as a leak. */
    if( workforce == singleton ) astBeginPM;
+
    workforce->contexts = astGrow( workforce->contexts, workforce->condepth, sizeof( int ) );
    if( workforce == singleton ) astEndPM;
 
@@ -1809,18 +1812,20 @@ static ThrJobStatus *thr1CopyStatus( ThrJobStatus *status ){
 
 /* Create a new ThrJobStatus structure. */
    result = thr1MakeStatus();
+   if( result ) {
 
 /* Copy details from the supplied ThrJobStatus. */
-   result->ems_status = status->ems_status;
-   result->messages = astMalloc( sizeof( char *)*status->nmessage );
-   if( astOK ) {
-      result->nmessage = status->nmessage;
-      for( i = 0; i < status->nmessage; i++ ) {
-         mess = (status->messages)[ i ];
-         if( mess ) {
-            (result->messages)[ i ] = astStore( NULL, mess, strlen( mess ) + 1 );
-         } else {
-            (result->messages)[ i ] = NULL;
+      result->ems_status = status->ems_status;
+      result->messages = astMalloc( sizeof( char *)*status->nmessage );
+      if( astOK ) {
+         result->nmessage = status->nmessage;
+         for( i = 0; i < status->nmessage; i++ ) {
+            mess = (status->messages)[ i ];
+            if( mess ) {
+               (result->messages)[ i ] = astStore( NULL, mess, strlen( mess ) + 1 );
+            } else {
+               (result->messages)[ i ] = NULL;
+            }
          }
       }
    }
@@ -3314,10 +3319,11 @@ void thrMutexLock( pthread_mutex_t *mutex, int *status ) {
 */
    if( *status != SAI__OK ) return;
 
-   if( pthread_mutex_lock( mutex ) ) {
+   int errval = pthread_mutex_lock( mutex );
+   if( errval ) {
       *status = SAI__ERROR;
-      emsRep( "", "Failed to lock a pthreads mutex",
-               status );
+      emsRepf( "", "Failed to lock a pthreads mutex (pthreads error %d)",
+               status, errval );
    }
 }
 
