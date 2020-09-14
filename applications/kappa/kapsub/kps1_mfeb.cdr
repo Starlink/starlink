@@ -1,0 +1,299 @@
+#include "sae_par.h"
+#include "prm_par.h"
+#include "ndf.h"
+#include "f77.h"
+#include "ast.h"
+#include "mers.h"
+#include "star/thr.h"
+#include <stdlib.h>
+
+/* Local data types */
+typedef struct  kps1MfebData<T> {
+   const <CTYPE> *barray;
+   const int64_t *bdims;
+   const int64_t *dims;
+   const int64_t *stride;
+   const int64_t *bstride;
+   const int64_t *comprs;
+   int ndim;
+   int64_t p1;
+   int64_t p2;
+   signed char *mask;
+} kps1MfebData<T>;
+
+/* Prototypes for local static functions. */
+static void kps1Mfeb_work<T>( void *job_data_ptr, int *status );
+
+
+F77_SUBROUTINE(kps1_mfeb<TLC>)( INTEGER8_ARRAY(COMPRS),
+                                INTEGER8_ARRAY(DIMS),
+                                INTEGER8_ARRAY(BDIMS),
+                                <CNFTYPE>_ARRAY(BARRAY),
+                                BYTE_ARRAY(MASK),
+                                INTEGER(STATUS) ){
+/*
+*+
+*  Name:
+*     KPS1_MFEB<T>
+
+*  Purpose:
+*     Transfers bad pixels from an array binned along one or more
+*     axes to an unbinned mask.
+
+*  Language:
+*     C (designed to be called from Fortran 77)
+
+*  Invocation:
+*     CALL KPS1_MFEB<T>( COMPRS, DIMS, BDIMS, BARRAY, MASK, STATUS )
+
+*  Description:
+*     This transfers bad pixels from the supplied binned array
+*     to sections within the supplied unbinned array.  It is assumed
+*     that the binned and unbinned arrays have the same origin, and that
+*     the binned array fully covers the unbinned array.  The routine
+*     accounts for the case where binned elements extend beyond the
+*     the unbinned data.
+
+*  Arguments:
+*     COMPRS( NDF__MXDIM ) = INTEGER*8 (Given)
+*        The binning factors, i.e. the number of elements of the
+*        original unbinned array along each axis that were combined to
+*        form one element of ARRAY.  (Although binned elements with
+*        the highest indices may have fewer contributing unbinned
+*        elements than COMPRS, since the binned array must at least
+*        span the unbinned data, the binning factor is a constant for
+*        all binned elements.)
+*     DIMS( NDF__MXDIM ) = INTEGER*8 (Given)
+*        The dimensions of the unbinned array.
+*     BDIMS( NDF__MXDIM ) = INTEGER*8 (Given)
+*        The dimensions of the binned array.
+*     BARRAY( * ) = ? (Given)
+*        The binned array.
+*     MASK( * ) = BYTE (Returned)
+*        The unbinned mask array. On exist, each value in the array is
+*        either VAL__BADB or zero.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for double-precision and real data types:
+*     replace "<T>" in the routine name by D or R as appropriate.  The
+*     BARRAY argument supplied to the routine must have the data type
+*     specified.
+
+*  Copyright:
+*     Copyright (C) 2020 East Asian Observatory
+*     All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or modify
+*     it under the terms of the GNU General Public License as published by
+*     the Free Software Foundation; either Version 2 of the License, or (at
+*     your option) any later version.
+*
+*     This program is distributed in the hope that it will be useful, but
+*     WITHOUT ANY WARRANTY; without even the implied warranty of
+*     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+*     General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (Starlink)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     23-JUN-2020 (DSB):
+*        Original version, based on equivalent Fortran function by MJC.
+
+*-
+*/
+
+/* Local Variables: */
+   ThrWorkForce *wf;
+   int iw;
+   int ndim;                   /* Number of significant dimensions */
+   int nw;
+   int64_t el;                 /* Number of elements in unbinned array */
+   int64_t i;                  /* Loop counter */
+   int64_t rem;                /* Number of unbinned elements stored in incomplete bin along a dimension */
+   int64_t step;
+   int64_t bstride[ NDF__MXDIM ];/* Strides in binned arrays */
+   int64_t stride[ NDF__MXDIM ]; /* Strides in unbinned arrays */
+   kps1MfebData<T> *job_data;
+   kps1MfebData<T> *pdata;
+
+/* Check the inherited global status. */
+   if( *STATUS != SAI__OK ) return;
+
+/* Obtain the total number of elements (el) in the unbinned array, the
+   strides (bstride) between adjacent elements on each axis in the binned
+   array, the strides (stride) between adjacent elements on each axis in
+   the unbinned array, and the number of significant dimensions (ndim). */
+   el = 1;
+   ndim = 0;
+   for( i = 0; i < NDF__MXDIM; i++ ) {
+      if( DIMS[ i ] > 1 ) ndim = i + 1;
+      el *= DIMS[ i ];
+      if( i == 0 ) {
+         stride[ 0 ] = 1;
+         bstride[ 0 ] = 1;
+      } else {
+         stride[ i ] = stride[ i - 1 ]*DIMS[ i - 1 ];
+         bstride[ i ] = bstride[ i - 1 ]*BDIMS[ i - 1 ];
+      }
+   }
+
+/* Initialise the MASK. */
+   memset( MASK, 0, el*sizeof(*MASK) );
+
+/* Find the number of cores/processors available and create a pool of
+   threads of the same size. */
+   wf = thrGetWorkforce( thrGetNThread( "KAPPA_THREADS", STATUS ), STATUS );
+
+/* How many worker threads in the workforce? May not be the same as
+   requested if the workforce already existed. */
+   nw = wf ? wf->nworker : 1;
+
+/* Allocate job data for threads. Each structure describes a single job
+   to be allocated to a single worker thread. */
+   job_data = astCalloc( nw, sizeof(*job_data) );
+   if( *STATUS == SAI__OK ) {
+
+/* Calculate the number of original (unbinned) pixels to be processed by
+   each thread. */
+      if( el > nw ) {
+         step = el/nw;
+      } else {
+         step = 1;
+         nw = el;
+      }
+
+/* Store the index of the first and last unbinned pixel to be processed
+   by each worker thread. The last worker picks up any remaining pixels
+   left over by the integer division used to calculate "step". Also store
+   some other required constant values in each structure. */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         pdata->p1 = iw*step;
+         if( iw < nw - 1 ) {
+            pdata->p2 = pdata->p1 + step - 1;
+         } else {
+            pdata->p2 = el - 1;
+         }
+
+         pdata->barray = BARRAY;
+         pdata->mask = MASK;
+         pdata->dims = DIMS;
+         pdata->bdims = BDIMS;
+         pdata->comprs = COMPRS;
+         pdata->ndim = ndim;
+         pdata->stride = stride;
+         pdata->bstride = bstride;
+
+/* Submit a job to the workforce to process the binned pixels assigned to
+   the current worker. */
+         thrAddJob( wf, 0, pdata, kps1Mfeb_work<T>, 0, NULL, STATUS );
+      }
+
+/* Put the current thread to sleep until all the above jobs have
+   completed. */
+      thrWait( wf, STATUS );
+   }
+
+/* Free resources. */
+   job_data = astFree( job_data );
+}
+
+static void kps1Mfeb_work<T>( void *job_data_ptr, int *status ){
+/*
+*  Name:
+*     kps1Mfeb_work<T>
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     kps1_mfeb<T>.
+
+*  Invocation:
+*     void kps1Mfeb_work<T>( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = kps1MfebData<X> * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   const <CTYPE> *pb;
+   const int64_t *bstride;
+   const int64_t *bdims;
+   const int64_t *comprs;
+   const int64_t *dims;
+   const int64_t *stride;
+   int i;
+   int ndim;
+   int64_t ipix;
+   int64_t iv;
+   int64_t j;
+   int64_t p1;
+   int64_t p2;
+   int64_t pos[ NDF__MXDIM ];
+   kps1MfebData<T> *pdata;
+   signed char *pm;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (kps1MfebData<T> *) job_data_ptr;
+
+/* For convenience, copy to local variables */
+   stride = pdata->stride;
+   bstride = pdata->bstride;
+   comprs = pdata->comprs;
+   p1 = pdata->p1;
+   p2 = pdata->p2;
+   ndim = pdata->ndim;
+   dims = pdata->dims;
+   bdims = pdata->bdims;
+
+/* Loop round all unbinned pixels to be processed by this thread . */
+   pm = pdata->mask + p1;
+   for( ipix = p1; ipix <= p2; ipix++,pm++ ) {
+
+/* Skip pixels in the unbinned array that are already bad. */
+      if( *pm != VAL__BADB ) {
+
+/* Get the zero-based indices of the current pixel in the unbinned array. */
+         iv = ipix;
+         i = ndim;
+         while( i-- > 0 ){
+            j = iv/stride[ i ];
+            pos[ i ] = j;
+            iv -= j*stride[ i ];
+         }
+
+/* Get the  zero-based indices of the corresponding pixel in the binned
+   array. Thus get a pointer to the corresponding pixel in the binned
+   array. */
+         pb = pdata->barray;
+         for( i = 0; i < ndim; i++ ) {
+            j = pos[ i ]/comprs[ i ];
+            if( j >= bdims[ i ] ) j = bdims[ i ] - 1;
+            pb += j*bstride[ i ];
+         }
+
+/* If the pixel in the bined array is bad, set the corresponding pixel
+   in the unbinned array bad. */
+         if( *pb == VAL__BAD<T> ) *pm = VAL__BADB;
+      }
+   }
+}
+

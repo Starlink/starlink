@@ -2,7 +2,8 @@
 
 noinst_LTLIBRARIES = libkapsub.la libkapsub_tk.la
 
-libkapsub_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES) $(GEN_F_ROUTINES)
+libkapsub_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES) $(GEN_F_ROUTINES) \
+                       $(GEN_C_ROUTINES)
 
 libkapsub_tk_la_CFLAGS = $(X_CFLAGS)
 libkapsub_tk_la_SOURCES = $(TK_C_ROUTINES)
@@ -75,6 +76,8 @@ GEN_F_ROUTINES = $(KPG_N_GEN:.gen=.f) $(KPG_DR_GEN:.gdr=.f) \
                  $(KPG_BDIKRW_GEN:.gbdikrw=.f) $(KPG_R_GEN:.gr=.f) \
                  $(KPG_GN_GEN:.gn=.f) $(KPG_DIKR_GEN:.gdikr=.f)
 
+GEN_C_ROUTINES = $(KPG_CDR_GEN:.cdr=.c) $(KPG_CN_GEN:.cn=.c)
+
 ## Generic
 
 KPG_N_GEN = kps1_apad.gen kps1_ardm.gen kps1_lapl.gen kps1_prmx.gen \
@@ -86,7 +89,7 @@ KPG_DR_GEN = kps1_med.gdr kps1_mmv.gdr kps1_clps.gdr kps1_subi.gdr \
              kps1_oea.gdr kps1_cpwd.gdr kps1_bfre.gdr kps1_bafi.gdr \
              kps1_fofo.gdr kps1_fohe.gdr kps1_fopp.gdr kps1_fopr.gdr \
              kps1_foqu.gdr kps1_fore.gdr kps1_fori.gdr kps1_heqp.gdr \
-             kps1_mfad.gdr kps1_mfeb.gdr kps1_sucl.gdr kps1_susk.gdr \
+             kps1_mfad.gdr kps1_sucl.gdr kps1_susk.gdr \
              kps1_xyzw.gdr kps1_mfld.gdr kps1_bafn.gdr kps1_msag.gdr \
              kps1_msgr.gdr kps1_mfno.gdr kps1_cff2.gdr
 
@@ -95,7 +98,7 @@ KPG_DIKR_GEN = kps1_trdr.gdikr kps1_trnd.gdikr kps1_trnv.gdikr
 KPG_BDIKRW_GEN = kps1_dscl.gbdikrw kps1_fain.gbdikrw
 
 KPG_GN_GEN = kps1_clns.gn kps1_hsmo.gn kps1_inle.gn kps1_inli.gn \
-             kps1_inls.gn kps1_lft.gn  kps1_lftq.gn kps1_lfts.gn \
+             kps1_inls.gn kps1_lftq.gn kps1_lfts.gn \
              kps1_mfrm.gn kps1_mdrf.gn kps1_mdrp.gn kps1_mdwt.gn \
              kps1_mft.gn  kps1_mftq.gn kps1_mfts.gn \
              kps1_mspa.gn kps1_mssa.gn kps1_nom1.gn kps1_plcp.gn \
@@ -105,11 +108,18 @@ KPG_GN_GEN = kps1_clns.gn kps1_hsmo.gn kps1_inle.gn kps1_inli.gn \
 
 KPG_R_GEN = kps1_pgft.gr
 
-SUFFIXES = .gen .gdr .gdir .gr .gbdirw .gn .f .gdikr .gbdikrw
+#  Generic C source code designed to be called from Fortran.
+KPG_CDR_GEN = kps1_mfeb.cdr
+
+KPG_CN_GEN = kps1_lft.cn
+
+
+
+SUFFIXES = .gen .gdr .gdir .gr .gbdirw .gn .f .gdikr .gbdikrw .cdr .cn .c
 
 # Need to make sure that a maintainer clean really removes the
 # output of generic
-MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
+MAINTAINERCLEANFILES = $(GEN_F_ROUTINES) ${GEN_C_ROUTINES)
 
 #  Run generic to get numeric types.
 .gen.f:
@@ -135,6 +145,13 @@ MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
 
 .gbdikrw.f:
 	$(FGENERIC)  -t bdikrw $<
+
+.cdr.c:
+	$(FGENERIC)  -t dr $<
+
+.cn.c:
+	$(FGENERIC)  -t n $<
+
 
 # We need KAP_ERR
 AM_FCFLAGS = -I.. @TCL_CFLAGS@ @TK_CFLAGS@

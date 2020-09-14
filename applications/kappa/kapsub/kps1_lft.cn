@@ -1,0 +1,713 @@
+#include "star/pda.h"
+#include "sae_par.h"
+#include "prm_par.h"
+#include "ndf.h"
+#include "f77.h"
+#include "ast.h"
+#include "mers.h"
+#include "star/thr.h"
+#include <stdlib.h>
+
+/* Local data types */
+typedef struct  kps1LftData<T> {
+   const <CTYPE> *data;
+   const <CTYPE> *var;
+   const char *mask;
+   const int64_t *dims;
+   const int64_t *ranges;
+   double *as;
+   double *bs;
+   int axis;
+   int ndim;
+   int nrange;
+   int order;
+   int64_t p1;
+   int64_t p2;
+   int operation;
+} kps1LftData<T>;
+
+/* Prototypes for local static functions. */
+static void kps1Lft_work<T>( void *job_data_ptr, int *status );
+static int comp<T>(  const void *a, const void *b );
+
+
+F77_SUBROUTINE(kps1_lft<TLC>)( INTEGER(ORDER), INTEGER(AXIS), INTEGER(NRANGE),
+                               INTEGER8_ARRAY(RANGES), LOGICAL(USEVAR),
+                               <CNFTYPE>_ARRAY(VARS), LOGICAL(USEMSK),
+                               BYTE_ARRAY(MASK), INTEGER8_ARRAY(DIMS),
+                               <CNFTYPE>_ARRAY(DATS), DOUBLE_ARRAY(AS),
+                               DOUBLE_ARRAY(BS), DOUBLE_ARRAY(WRK1),
+                               INTEGER_ARRAY(WRK2), INTEGER(STATUS) ){
+/*
+*+
+*  Name:
+*     KPS1_LFT<T>
+
+*  Purpose:
+*     Fits polynomials to all lines of data that lie parallel to
+*     an axis.
+
+*  Language:
+*     C (designed to be called from Fortran 77)
+
+*  Invocation:
+*     CALL KPS1_LFT<T>( ORDER, AXIS, NRANGE, RANGES, USEVAR, VARS,
+*                       USEMSK, MASK, DIMS, DATS, AS, BS, WRK1, WRK2,
+*                       STATUS )
+
+*  Description:
+*     This routine fits polynomials, of a given order, to all lines of
+*     data that lie parallel to a given, and lie within ranges along
+*     that axis. The fits can be weighted by the inverse values of the
+*     associated variances.  Features can also be excluded using a mask.
+*
+*     The polynomial coefficients returned in the BS array.
+
+*  Arguments:
+*     ORDER = INTEGER (Given)
+*        The order of polynomial to fit.  Starts at 0 for a constant.
+*     AXIS = INTEGER (Given)
+*        The axis defining the lines to be fit.
+*     NRANGE = INTEGER (Given)
+*        The number of values in RANGES, must be an even number.
+*     RANGES( NRANGE ) = INTEGER*8 (Given)
+*        Pairs of array coordinates along the axis.  Only data within
+*        these ranges will be used in the fit.
+*     USEVAR = LOGICAL (Given)
+*        If .TRUE., then the variances will be used to weight the fits.
+*     VARS( * ) = <TYPE> (Given)
+*        The variances of the data.  These will be used to weight the
+*        fits if USEVAR is true.
+*     USEMSK = LOGICAL (Given)
+*        If .TRUE. then the supplied mask (argument MASK) is used to
+*        omit parts of the data from the fitting process.
+*     MASK( * ) = BYTE (Given)
+*        A mask in which bad values indicate that a given element of
+*        the data be ignored from the fitting process.  It is only
+*        accessed if USKMSK is .TRUE..  The array should have dimensions
+*        matching the input data.
+*     DIMS( NDF__MXDIM ) = INTEGER*8 (Given)
+*        The dimensions of the input data.  Extra dimension should have
+*        size 1 up to NDF__MXDIM.
+*     DATS( * ) = <TYPE> (Given and Returned)
+*        The data with dimensions DIMS.  The fit will be subtracted from
+*        this if requested.
+*     AS( ORDER + 1, ORDER + 1, * ) = DOUBLE PRECISION (Returned)
+*        Workspace for least-squares A matrices of cumulative sums.
+*        The size of the last dimension of this should be the product of
+*        all the dimensions that are not the fit axis.
+*     BS( ORDER + 1, * ) = DOUBLE PRECISION (Returned)
+*        Workspace for least-squares B vectors cumulative sums.
+*        On exit this contains the coefficients of the polynomials.
+*
+*        Since there are ORDER + 1 of these for each line, the size of
+*        the last dimension of this should be the product of all the
+*        dimensions that are not the fit axis.  The coefficients will be
+*        accessed in Fortran order for the axis, for instance if the
+*        third axis if fitted in a cube then this array has an effective
+*        shape of (ORDER+1,NX,NY), if the second axis is chosen then the
+*        shape is (ORDER+1,NX,NZ) etc.
+*     WRK1( ORDER + 1 ) = DOUBLE PRECISION (Returned)
+*        Workspace.
+*     WRK2( ORDER + 1 ) = INTEGER (Returned)
+*        Workspace.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  This routine works in n-D, where n is 1 to 7.  Even if the
+*     array has actually fewer dimensions there is negligible loss of
+*     efficiency to supply dummy (=1) higher dimensions.
+*
+*     - To work as quickly as possible the fits are performed by running
+*     over the data in fast order and accumulating the least squares
+*     matrices for each line as and when the data are encountered. The
+*     solutions are then determined in a single separate section. This
+*     requires a lot of workspace (order side**(ndims-1)).
+*
+*     - There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
+*     base and arrays supplied to the routine must have the data type
+*     specified.
+
+*  Copyright:
+*     Copyright (C) 2020 East Asian Observatory
+*     All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or modify
+*     it under the terms of the GNU General Public License as published by
+*     the Free Software Foundation; either Version 2 of the License, or (at
+*     your option) any later version.
+*
+*     This program is distributed in the hope that it will be useful, but
+*     WITHOUT ANY WARRANTY; without even the implied warranty of
+*     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+*     General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     PWD: Peter W. Draper (JAC, Durham University)
+*     MJC: Malcolm J. Currie (Starlink)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     09-MAR-2020 (DSB):
+*        Original version, based on equivalent Fortran function by PWD et
+*        al.
+
+*-
+*/
+
+/* Local Variables: */
+   ThrWorkForce *wf;
+   kps1LftData<T> *job_data;
+   kps1LftData<T> *pdata;
+   int64_t step;
+   int64_t nel;
+   int j;
+   int ndim;
+   int iw;
+   int nw;
+   size_t i;
+   size_t nfit;
+   size_t asize;
+   size_t bsize;
+   double *pw;
+   double *pr;
+
+/* Check the inherited global status. */
+   if( *STATUS != SAI__OK ) return;
+
+/* Find the number of cores/processors available and create a pool of
+   threads of the same size. */
+   wf = thrGetWorkforce( thrGetNThread( "KAPPA_THREADS", STATUS ), STATUS );
+
+/* How many worker threads in the workforce? May not be equal to the value
+   of KAPPA_THREADS if the workforce already existed. */
+   nw = wf ? wf->nworker : 1;
+
+/* Allocate job data for threads. Each structure describes a single job
+   to be allocated to a single worker thread. */
+   job_data = astCalloc( nw, sizeof(*job_data) );
+   if( *STATUS == SAI__OK ) {
+
+/* Sort the ranges into ascending order. */
+      qsort( RANGES, *NRANGE, sizeof(int64_t), comp<T> );
+
+/* Calculate the total number of pixels in the supplied array, and find
+   the number of used dimensions. */
+      nel = 1;
+      for( j = 0; j < NDF__MXDIM; j++ ){
+         nel *= DIMS[ j ];
+         if( DIMS[ j ] > 1 ) ndim = j + 1;
+      }
+
+/* Calculate the number of elements in the "as" and "bs" arrays and fill
+   them with zeros. */
+      nfit = nel/DIMS[ *AXIS - 1 ];
+      bsize = ( *ORDER + 1 )*nfit;
+      memset( BS, 0, bsize*sizeof(*BS) );
+      asize = bsize*( *ORDER + 1 );
+      memset( AS, 0, asize*sizeof(*AS) );
+
+/* Calculate the number of pixels to be processed by each thread whilst
+   accumulating the running sums needed to perform the fits. */
+      if( nel > nw ) {
+         step = nel/nw;
+      } else {
+         step = 1;
+         nw = nel;
+      }
+
+/* Store the index of the first and last pixel to be processed by the worker
+   thread in each structure. The last worker picks up any remaining pixels
+   left over by the integer division used to calculate "step". Also store
+   some other required constant values in each structure. */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         pdata->p1 = iw*step;
+         if( iw < nw - 1 ) {
+            pdata->p2 = pdata->p1 + step - 1;
+         } else {
+            pdata->p2 = nel - 1;
+         }
+
+         pdata->operation = 1;
+         pdata->axis = *AXIS - 1;
+         pdata->data = DATS;
+
+/* Work space. The first thread uses the supplied AS and BS arrays. Later
+   threads have temp space allocated here. */
+         if( iw == 0 ) {
+            pdata->as = AS;
+            pdata->bs = BS;
+         } else {
+            pdata->as = astCalloc( asize, sizeof(double) );
+            pdata->bs = astCalloc( bsize, sizeof(double) );
+         }
+
+         pdata->dims = DIMS;
+         pdata->mask = F77_ISTRUE(*USEMSK) ? MASK : NULL;
+         pdata->ndim = ndim;
+         pdata->nrange = *NRANGE;
+         pdata->order = *ORDER;
+         pdata->ranges = RANGES;
+         pdata->var = F77_ISTRUE(*USEVAR) ? VARS : NULL;
+
+
+/* Submit a job to the workforce to accumulate the requires running sums
+   over the group of pixels that have been assigned to the job. */
+         thrAddJob( wf, 0, pdata, kps1Lft_work<T>, 0, NULL, STATUS );
+      }
+
+/* Put the current thread to sleep until all the above jobs have
+   completed. */
+      thrWait( wf, STATUS );
+
+/* Loop round all threads, accumulating the AS and BS values from all
+   threads in the supplied AS and BS arrays. These arrays currently hold
+   the values from worker thread 0 so we start with worker thread 1.
+   Also free the temporary arrays. */
+      for( iw = 1; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+
+         pw = AS;
+         pr= pdata->as;
+         for( i = 0; i < asize; i++ ) *(pw++) += *(pr++);
+         pdata->as = astFree( pdata->as );
+
+         pw = BS;
+         pr= pdata->bs;
+         for( i = 0; i < bsize; i++ ) *(pw++) += *(pr++);
+         pdata->bs = astFree( pdata->bs );
+      }
+
+/* Now we have the running sums for each fit, we can do the fits. Calculate
+   the number of fits to be done by each thread. */
+      if( nfit > nw ) {
+         step = nfit/nw;
+      } else {
+         step = 1;
+         nw = nfit;
+      }
+
+/* Store the index of the first and last fit to be done by the worker
+   thread in each structure. The last worker picks up any remaining fits
+   left over by the integer division used to calculate "step". Also store
+   some other required constant values in each structure. */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         pdata->p1 = iw*step;
+         if( iw < nw - 1 ) {
+            pdata->p2 = pdata->p1 + step - 1;
+         } else {
+            pdata->p2 = nfit - 1;
+         }
+
+         pdata->operation = 2;
+         pdata->as = AS;
+         pdata->bs = BS;
+
+/* Submit a job to the workforce to accumulate the requires running sums
+   over the group of pixels that have been assigned to the job. */
+         thrAddJob( wf, 0, pdata, kps1Lft_work<T>, 0, NULL, STATUS );
+      }
+
+/* Put the current thread to sleep until all the above jobs have
+   completed. */
+      thrWait( wf, STATUS );
+   }
+
+/* Free global resources. */
+   job_data = astFree( job_data );
+}
+
+
+
+
+
+static void kps1Lft_work<T>( void *job_data_ptr, int *status ){
+/*
+*  Name:
+*     kps1Lft_work<T>
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     ccg8_sd3<T>.
+
+*  Invocation:
+*     void kps1Lft_work<T>( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = kps1LftData<X> * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   const <CTYPE> *pv;
+   const <CTYPE> *pd;
+   const char *pm;
+   const int64_t *ranges;
+   const int64_t *dims;
+   const int64_t *prange0;
+   const int64_t *prange;
+   double *pa;
+   double *pb;
+   double v;
+   double w;
+   double x;
+   double y;
+   int axis;
+   int fitsizeb;
+   int fitsizea;
+   int idim;
+   int inside;
+   int inside0;
+   int irange;
+   int j;
+   int k;
+   int ndim;
+   int nrange;
+   int order;
+   int64_t grid[ NDF__MXDIM ];
+   int64_t i;
+   int64_t irem;
+   int64_t p1;
+   int64_t p2;
+   int64_t toggle_before;
+   int64_t toggle_before0;
+   kps1LftData<T> *pdata;
+   long *ipvt;
+   long info;
+   size_t *ps;
+   size_t dimsb[ NDF__MXDIM ];
+   size_t iv;
+   size_t stride[ NDF__MXDIM ];
+   size_t strideb[ NDF__MXDIM ];
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (kps1LftData<T> *) job_data_ptr;
+
+/* For convenience, copy to local variables */
+   axis = pdata->axis;
+   dims = pdata->dims;
+   ndim = pdata->ndim;
+   nrange = pdata->nrange;
+   p1 = pdata->p1;
+   p2 = pdata->p2;
+   ranges = pdata->ranges;
+   order = pdata->order;
+
+/* The numbers of values in the "as" and "bs" arrays needed to store the
+   running sums for a single fit. */
+   fitsizeb = order + 1;
+   fitsizea = fitsizeb*fitsizeb;
+
+/* Accumulate runnings sums if required. */
+   if( pdata->operation == 1 ) {
+
+/* Calculate the vector stride between adjacent elements on each axis. */
+      stride[ 0 ] = 1;
+      for( idim = 1; idim < ndim; idim++ ) {
+         stride[ idim ] = stride[ idim - 1 ]*dims[ idim - 1 ];
+      }
+
+/* Get the dimensions and strides for the array of fits. This array has
+   one fewer dimension than the pixel array (the fitted dimension is
+   omitted). Each fit corresponds to one fitted line in the pixel array. */
+      k = 0;
+      for( j = 0; j < ndim; j++ ) {
+         if( j != axis ) dimsb[ k++ ] = dims[ j ];
+      }
+
+      strideb[ 0 ] = 1;
+      for( j = 1; j < k; j++ ) {
+         strideb[ j ] = strideb[ j - 1 ]*dimsb[ j - 1 ];
+      }
+
+/* See if grid index 1 on the fitted axis is inside or outside any of the
+   specified axis ranges. */
+      inside0 = 0;
+      toggle_before0 = dims[ axis ] + 1;
+      prange0 = ranges;
+      for( irange = 0; irange < nrange; irange += 2 ){
+
+/* If the first pixel is inside the current range, indicate that we are
+   inside a range, and set the index of the next pixel that is not inside
+   the range (where we toggle to being outside). Then leave the range loop. */
+         if( 1 >= prange0[ 0 ] && 1 <= prange0[ 1 ] ) {
+            inside0 = 1;
+            toggle_before0 = prange0[ 1 ] + 1;
+            break;
+
+/* If the start of the current range is later than the first pixel then we
+   know the pixel is outside a range. Set the index of the next pixel
+   that is inside a range (where we toggle to being outside). Then leave
+   the range loop. */
+         } else if( 1 < prange0[ 0 ] ) {
+            inside0 = 0;
+            toggle_before0 = prange0[ 0 ];
+            break;
+         }
+
+/* Move on to the next range. */
+         prange0 += 2;
+      }
+
+/* Initialise the grid indices at the first pixel to be processed by this
+   thread. */
+      irem = p1;
+      for( idim = ndim - 1; idim >= 0; idim-- ) {
+         i = irem/stride[ idim ];
+         irem -= i*stride[ idim ];
+         grid[ idim ] = i + 1;
+      }
+
+/* See if the first pixel to be processed by this thread is inside or outside
+   any of the specified axis ranges. */
+      inside = 0;
+      toggle_before = dims[ axis ] + 1;
+      prange = ranges;
+      for( irange = 0; irange < nrange; irange += 2 ){
+
+/* If the first pixel is inside the current range, indicate that we are
+   inside a range, and set the index of the next pixel that is not inside
+   the range (where we toggle to being outside). Then leave the range loop. */
+         if( grid[ axis ] >= prange[ 0 ] && grid[ axis ] <= prange[ 1 ] ) {
+            inside = 1;
+            toggle_before = prange[ 1 ] + 1;
+            break;
+
+/* If the start of the current range is later than the first pixel then we
+   know the pixel is outside a range. Set the index of the next pixel
+   that is inside a range (where we toggle to being outside). Then leave
+   the range loop. */
+         } else if( grid[ axis ] < prange[ 0 ] ) {
+            inside = 0;
+            toggle_before = prange[ 0 ];
+            break;
+         }
+
+/* Move on to the next range. */
+         prange += 2;
+      }
+
+/* Loop round all pixels to be processed by this thread. */
+      pd = pdata->data + p1;
+      pv = pdata->var ? pdata->var + p1 : NULL;
+      pm = pdata->mask ? pdata->mask + p1 : NULL;
+      for( i = p1; i <= p2; i++ ) {
+
+/* If this pixel is inside one of the specified ranges, is not masked and
+   is good, add it into the appropriate running sums. */
+         if( inside && *pd != VAL__BAD<T> ){
+            if( !pm || *pm != VAL__BADB ){
+
+/* Get the weight for the input pixel. The reciprocal of the variance, if
+   the variance is available, is not bad and is greater than zero. Unity
+   otherwise. */
+               w = ( pv && *pv > 0.0 && *pv != VAL__BAD<T> ) ? 1.0/(double)*pv : 1.0;
+
+/* Save the X and Y values to use i the fit. */
+               x = grid[ axis ];
+               y = *pd;
+
+/* Get the vector index of the fit to which this pixel contributes. */
+               iv = 0;
+               ps = strideb;
+               for( idim = 0; idim < ndim; idim++ ){
+                  if( idim != axis ) iv += ( grid[ idim ] - 1 )*(*(ps++));
+               }
+
+/* Get pointers to the starts of the contiguous section of the "as" and
+   "bs" arrays that holds the running sums for the fit to which this pixel
+   contributes. */
+               pa = pdata->as + iv*fitsizea;
+               pb = pdata->bs + iv*fitsizeb;
+
+/* Update the running sums in the "bs" array - Y times power X sums (B in
+   Ax=B). */
+               v = y*w;
+               for( k = 0; k <= order; k++ ) {
+                  *(pb++) += v;
+                  v *= x;
+               }
+
+/* Update the running sums in the "as" array -  a matrix holding power X
+   sums (A in Ax=B). First do the top left half of the matrix. Each value
+   of k corresponds to one diagonal (bottom left to top right). The sum
+   of the powers is constant along each such diagonal, and equal to k.
+   The j variable is used to step along the diagonal from top left to bottom
+   right. The pa pointer points to the top left diagonal element, which
+   progresses from left to right along the top of the matrix. */
+               v = w;
+               for( k = 0; k <= order; k++ ) {
+                  for( j = 0; j <= k; j++ ) pa[ j*order ] += v;
+                  pa++;
+                  v *= x;
+               }
+
+/* Now do the bottom right half of the matrix in the same way. The pa
+   pointer this time progresses from top to bottom down the right edge
+   of the matrix. */
+               pa += order;
+               for( ; k <= 2*order; k++ ) {
+                  for( j = 0; j <= 2*order - k; j++ ) pa[ j*order ] += v;
+                  pa += order + 1;
+                  v *= x;
+               }
+            }
+         }
+
+/* Increment the pointers to the input array(s) so that they refer to
+   the next pixel to be processed. */
+         pd++;
+         if( pv ) pv++;
+         if( pm ) pm++;
+
+/* Increment the grid indicies of the next pixel to be processed. First
+   increment the position on the first (zeroth) axis. */
+         idim = 0;
+         grid[ 0 ]++;
+
+/* If the first axis is the fitted axis, toggle the "inside" flag, which
+   indicates if the next pixel is inside any of the specified axis ranges,
+   if we have reached the next toggle point. */
+         if( axis == 0 ) {
+            if( toggle_before == grid[ 0 ] ) {
+
+/* If we were previously inside a range, we are now outside. Find the
+   axis value at which we enter the next range. */
+               if( inside ) {
+                  inside = 0;
+                  prange += 2;
+                  toggle_before = prange[ 0 ];
+
+/* If we were previously outside a range, we are now inside. Find the
+   axis value at which we leave the current range. */
+               } else {
+                  inside = 1;
+                  toggle_before = prange[ 1 ] + 1;
+               }
+            }
+         }
+
+/* If incrementing the current axis causes the position to overflow beyond
+   the end of the axis, reset it to the start of the axis and increment the
+   next higher axis. Loop until we find an axis that does not overflow. */
+         while( grid[ idim ] > dims[ idim ] ) {
+            grid[ idim ] = 1;
+
+/* If we have just reset the axis that is being fitted, reset the inside
+   flag, the grid index at which we next toggle the flag and the pointer
+   to the current range. */
+            if( axis == idim ) {
+               inside = inside0;
+               toggle_before = toggle_before0;
+               prange = prange0;
+            }
+
+/* Increment the axis index. Leave the loop if we have now done all axes. */
+            if( ++idim == ndim ) {
+               break;
+
+/* Otherwise, increment the value on the next axis. */
+            } else {
+               grid[ idim ]++;
+
+/* If the new axis is the fitted axis, toggle the "inside" flag if we
+   have reached the next toggle point. */
+               if( axis == idim ) {
+                  if( toggle_before == grid[ idim ] ) {
+
+/* If we were previously inside a range, we are now outside. Find the
+   axis value at which we enter the next range. */
+                     if( inside ) {
+                        inside = 0;
+                        prange += 2;
+                        toggle_before = prange[ 0 ];
+
+/* If we were previously outside a range, we are now inside. Find the
+   axis value at which we leave the current range. */
+                     } else {
+                        inside = 1;
+                        toggle_before = prange[ 1 ] + 1;
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+/* Do a set of fits. */
+   } else if( pdata->operation == 2 ) {
+
+/* Allocate work space. */
+      ipvt = astMalloc( ( order + 1 )*sizeof(*ipvt) );
+      if( *status == SAI__OK ) {
+
+/* Get pointers to the starts of the contiguous section of the "as" and
+   "bs" arrays that holds the running sums for the first fit to be
+   performed by this worker thread. */
+         pa = pdata->as + p1*fitsizea;
+         pb = pdata->bs + p1*fitsizeb;
+
+/* Loop round all the fits to be performed by this worker thread. */
+         for( iv = p1; iv <= p2; iv++ ) {
+
+/* Do the fit. */
+            pdaDgefs( pa, order + 1, order + 1, pb, order + 1, 1, ipvt,
+                      &info );
+
+/* Zero the returned coefficients if the fit failed. */
+            if( info ) memset( pb, 0, ( order + 1 )*sizeof(*pb) );
+
+/* Get pointers to the starts of the contiguous section of the "as" and
+   "bs" arrays that holds the running sums for the next fit to be
+   performed by this worker thread. */
+            pa += fitsizea;
+            pb += fitsizeb;
+         }
+      }
+
+/* Free resources. */
+      ipvt = astFree( ipvt );
+
+/* Report an error if the requested operation is unknown. */
+   } else if( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "kps1Lft_work: Unknown operation '%d'.", status,
+               pdata->operation );
+   }
+}
+
+
+/* Service function for "qsort" function. It accepts points to two
+   "int64_t" vaalues and returns an integer indicatig if the first is
+   smaller than, equal to, or greater than the second. */
+static int comp<T>(  const void *a, const void *b ) {
+   const int64_t *ia = (int64_t *) a;
+   const int64_t *ib = (int64_t *) b;
+
+   if( *ia < *ib ) {
+      return -1;
+   } else if( *ia > *ib ) {
+      return 1;
+   } else {
+      return 0;
+   }
+
+}
