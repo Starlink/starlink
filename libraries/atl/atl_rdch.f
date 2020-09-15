@@ -331,6 +331,11 @@
                   L = 14
                   READCH = .TRUE.
 
+               ELSE IF( BUF( 7 : 20 ) .EQ. 'YamlChan(Read)' ) THEN
+                  BUF = 'Begin YamlChan'
+                  L = 14
+                  READCH = .TRUE.
+
                ELSE IF( BUF( 7 : 19 ) .EQ. 'MocChan(Read)' ) THEN
                   BUF = 'Begin MocChan'
                   L = 13

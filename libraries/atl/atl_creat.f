@@ -25,6 +25,7 @@
 *        required for the output text file:
 *
 *        "AST:"      - AST_SHOW format
+*        "ASDF:"     - STSci ASDF format
 *        "STCS:"     - STCS format
 *        "MOC-JSON:" - MOC JSON format
 *        "MOC"       - MOC "string" format
@@ -156,6 +157,10 @@
 *  Create an AST Channel of the appropriate class to write to the file.
       IF( FMT .EQ. 'AST' ) THEN
          CHAN = AST_CHANNEL( AST_NULL, ATL_SNK, ' ', STATUS )
+
+      ELSE IF( FMT .EQ. 'ASDF' ) THEN
+         CHAN = AST_YAMLCHAN( AST_NULL, ATL_SNK, 'YamlEncoding=ASDF',
+     :                        STATUS )
 
       ELSE IF( FMT .EQ. 'STCS' ) THEN
          CHAN = AST_STCSCHAN( AST_NULL, ATL_SNK, 'Indent=1,'//

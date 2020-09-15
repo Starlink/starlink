@@ -69,6 +69,8 @@
 *  History:
 *     16-SEP-2019 (DSB):
 *        Original version, based on ATL_RDGRP.
+*     15-SEP2020 (DSB):
+*        Add support for ASDF files.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -102,6 +104,7 @@
       INTEGER J
       INTEGER SIZE
       INTEGER TLEN
+      LOGICAL ASDF
       LOGICAL ALPHA
       LOGICAL DUMP
       LOGICAL FITSWCS
@@ -120,11 +123,13 @@
 *  Determine the most likely format of the text in the VFS. If the
 *  VFS contains a line beginning with the word "Begin" it is probably a
 *  dump of an AST object produced by AST_SHOW. If it contains the string
-*  CRPIX, CRVAL or CTYPE it is probably a set of FITS_WCS headers. Also
-*  note if any alphabetical characters are found in the text.
+*  CRPIX, CRVAL or CTYPE it is probably a set of FITS_WCS headers. If it
+*  contains the string YAML or ASDF, it is probably ASDF. Also note if
+*  any alphabetical characters are found in the text.
       CALL ATL2_GTSIZ( VFS, SIZE, STATUS )
       DUMP = .FALSE.
       FITSWCS = .FALSE.
+      ASDF = .FALSE.
       ALPHA = .FALSE.
       DO I = 1, SIZE
          CALL ATL2_GET( VFS, I, 1, TEXT, TRUNC, STATUS )
@@ -138,6 +143,13 @@
      :              INDEX( TEXT, 'CTYPE' ) .NE. 0 ) .AND.
      :            .NOT. TRUNC ) THEN
             FITSWCS = .TRUE.
+            GO TO 10
+
+         ELSE IF( INDEX( TEXT, 'YAML' ) .NE. 0 .OR.
+     :            INDEX( TEXT, 'ASDF' ) .NE. 0 .OR.
+     :            INDEX( TEXT, 'yaml' ) .NE. 0 .OR.
+     :            INDEX( TEXT, 'asdf' ) .NE. 0 ) THEN
+            ASDF = .TRUE.
             GO TO 10
 
          ELSE IF( .NOT. ALPHA ) THEN
@@ -157,8 +169,9 @@
 
 *  If the file probably contains a dump of an AST object, try to read it
 *  first as a set of FITS headers, then as a MOC, then as an STC-S
-*  description, then as a object dump. This means that any errors produced
-*  while reading it asan object dump will be reported to the user.
+*  description, then as ASDF, then as a object dump. This means that any
+*  errors produced while reading it as an object dump will be reported to the
+*  user.
       IF( DUMP ) THEN
          CALL ATL_RDFCH( VFS, IAST, STATUS )
 
@@ -169,12 +182,15 @@
          IF( IAST .EQ. AST__NULL ) CALL ATL_RDSTCS( VFS, IAST, STATUS )
 
          IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         IF( IAST .EQ. AST__NULL ) CALL ATL_RDASDF( VFS, IAST, STATUS )
+
+         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          IF( IAST .EQ. AST__NULL ) CALL ATL_RDCH( VFS, IAST, STATUS )
 
 *  If the file probably contains FITS headers, try to read it
 *  first as an Object dump, then as a MOC, then as an STC-S description,
-*  then as a set of FITS headers. This means that any errors produced
-*  while reading it as a FITS file will be reported to the user.
+*  then as ASDF, then as a set of FITS headers. This means that any errors
+*  produced while reading it as a FITS file will be reported to the user.
       ELSE IF( FITSWCS ) THEN
          CALL ATL_RDCH( VFS, IAST, STATUS )
 
@@ -185,20 +201,45 @@
          IF( IAST .EQ. AST__NULL ) CALL ATL_RDSTCS( VFS, IAST, STATUS )
 
          IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         IF( IAST .EQ. AST__NULL ) CALL ATL_RDASDF( VFS, IAST, STATUS )
+
+         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          IF( IAST .EQ. AST__NULL ) CALL ATL_RDFCH( VFS, IAST, STATUS )
+
+*  If the file probably contains ASDF text, try to read it first as an Object
+*  dump, then as a MOC, then as an STC-S description, then as ASDF, then as a
+*  set of FITS headers, then as ASDF. This means that any errors produced
+*  while reading it as ASDF will be reported to the user.
+      ELSE IF( ASDF ) THEN
+         CALL ATL_RDCH( VFS, IAST, STATUS )
+
+         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         IF( IAST .EQ. AST__NULL ) CALL ATL_RDMOC( VFS, IAST, STATUS )
+
+         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         IF( IAST .EQ. AST__NULL ) CALL ATL_RDSTCS( VFS, IAST, STATUS )
+
+         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         IF( IAST .EQ. AST__NULL ) CALL ATL_RDFCH( VFS, IAST, STATUS )
+
+         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         IF( IAST .EQ. AST__NULL ) CALL ATL_RDASDF( VFS, IAST, STATUS )
 
 *  If not an AST dump or a set of FITS-WCS headers, the file may contain a
 *  MOC or an STC-S description. If any alphabetical characters were found
 *  in the text, it is more likely to be an STC-S description than a MOC, so
 *  try to read it first as an Object dump, then as a set of FITS headers,
-*  then as a MOC and then as an STC-S description. This means that any
-*  errors produced while reading it as an STC-S description will be reported
-*  to the user.
+*  then as ASDF, then as a MOC and then as an STC-S description. This means
+*  that any errors produced while reading it as an STC-S description will
+*  be reported to the user.
       ELSE IF( ALPHA ) THEN
          CALL ATL_RDCH( VFS, IAST, STATUS )
 
          IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          IF( IAST .EQ. AST__NULL ) CALL ATL_RDFCH( VFS, IAST, STATUS )
+
+         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         IF( IAST .EQ. AST__NULL ) CALL ATL_RDASDF( VFS, IAST, STATUS )
 
          IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          IF( IAST .EQ. AST__NULL ) CALL ATL_RDMOC( VFS, IAST, STATUS )
@@ -207,14 +248,17 @@
          IF( IAST .EQ. AST__NULL ) CALL ATL_RDSTCS( VFS, IAST, STATUS )
 
 *  Otherwise, it's most likely to be a MOC, so try to read it first as an
-*  Object dump, then as a set of FITS headers, then as STC-S description
-*  and then as a MOC. This means that any errors produced while reading it
-*  as a MOC will be reported to the user.
+*  Object dump, then as a set of FITS headers, then as ASDF, then as
+*  STC-S description and then as a MOC. This means that any errors produced
+*  while reading it as a MOC will be reported to the user.
       ELSE
          CALL ATL_RDCH( VFS, IAST, STATUS )
 
          IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          IF( IAST .EQ. AST__NULL ) CALL ATL_RDFCH( VFS, IAST, STATUS )
+
+         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         IF( IAST .EQ. AST__NULL ) CALL ATL_RDASDF( VFS, IAST, STATUS )
 
          IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          IF( IAST .EQ. AST__NULL ) CALL ATL_RDSTCS( VFS, IAST, STATUS )

@@ -47,7 +47,7 @@ atl_rdgrp.f atl_rdfch.f atl_rdch.f atl_fspec.f atl_plroi.f atl_cutpl.f \
 atl_cppla.f atl_ttlpl.f atl_mgfts.f atl_ptftr.f atl_ptftd.f atl_pxdup.f \
 atl_ptfts.f atl_ptfti.f atl_ptftl.f atl_tolut.f atl_findsky.f atl_wcspx.f \
 atl_kychk.f atl_rdstcs.f atl_rmblft.f atl_rdmoc.f atl_mocft.f atl_frvfs.f \
-atl_rdvfs.f atl2_g2vfs.f atl_axtrm8.f
+atl_rdvfs.f atl2_g2vfs.f atl_axtrm8.f atl_rdasdf.f
 
 #  Additional Fortran routines required for the ADAM library.
 ADAM_F_ROUTINES = atl_creat.f atl_gtgrp.f atl_gtvfs.f

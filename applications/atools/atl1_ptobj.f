@@ -30,6 +30,7 @@
 *     - This routine uses an ADAM parameter with hard-wired name "FMT" to
 *     get the format for the output text file. It may be one of:
 *
+*        "ASDF:"     - STSci ASDF format
 *        "AST:"      - AST_SHOW format (the default)
 *        "STCS:"     - STCS format
 *        "MOC-JSON:" - MOC JSON format
@@ -41,6 +42,7 @@
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
 *     Copyright (C) 2011 Science & Technology Facilities Council.
+*     Copyright (C) 2020 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -72,6 +74,8 @@
 *        Allow Moc's to be written out to FITS binary tables.
 *     9-MAY-2019 (DSB):
 *        Allow Moc's to be written out as text files.
+*     15-SEP-2020 (DSB):
+*        Allow FrameSets to be written out as ASDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -228,7 +232,7 @@
 *  Get the format to use.
          CALL PAR_CHOIC( 'FMT', 'AST', 'AST,STCS,XML,NATIVE,FITS-WCS,'//
      :                   'FITS-PC,FITS-IRAF,FITS-AIPS,FITS-AIPS++,'//
-     :                   'FITS-CLASS,MOC,MOC-JSON', .TRUE., FPARAM,
+     :                   'FITS-CLASS,MOC,MOC-JSON,ASDF', .TRUE., FPARAM,
      :                   STATUS )
 
 *  Construct a string of the form "<fmt>:<param>".
