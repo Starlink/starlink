@@ -27543,6 +27543,12 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
       specifying a range of \emph{position identifiers}~ (see Parameters FIRST,
       LAST, and STEP).
 
+      An NDF may be supplied (see Parameter NDF) in which case the NDF
+      pixel values at the positions listed in the catalogue are reported,
+      using the interpolation method specified by Parameter METHOD. The
+      pixel values are also written to an output parameter (see Parameter
+      PIXVALS).
+
       Positions may be reported in a range of \htmlref{co-ordinate Frames}{se:domains}~ dependent
       on the information stored in the supplied positions list (see Parameter
       FRAME).  The selected positions are written to an output parameter
@@ -27592,6 +27598,12 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          This parameter is only accessed if Parameter PLOT is set to
          \texttt{"Chain"} or \texttt{"Poly"}.  If \texttt{TRUE}, polgons will be closed by joining
          the first position to the last position.   \texttt{[}current value\texttt{{]}}
+      }
+      \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The NDF array component to be displayed if a non-null value is
+         supplied for Parameter NDF. \texttt{["DATA"]}
       }
       \sstsubsection{
          DESCRIBE = \_LOGICAL (Read)
@@ -27751,6 +27763,69 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          to $-$31.  \texttt{[}current value\texttt{{]}}
       }
       \sstsubsection{
+         METHOD = LITERAL (Read)
+      }{
+         The method to use when sampling the input NDF (if any) specified
+         by Parameter NDF at each of the positions in the catalogue. For
+         details on these schemes, see the description of routine
+         \xref{AST\_RESAMPLEx}{sun210}{AST_RESAMPLE\$<X>\$} in
+         \xref{SUN/210}{sun210}{}. Note, 'Nearest' is always used if
+         Parameter COMP is \texttt{'} Quality\texttt{'} . METHOD can take
+         the following values:
+
+         \sstitemlist{
+
+            \sstitem
+             \texttt{"} Bilinear\texttt{"}  -- The displayed pixel values are calculated by
+            bi-linear interpolation among the four nearest pixels values
+            in the input NDF. Produces smoother output NDFs than the
+            nearest-neighbour scheme, but is marginally slower.
+
+            \sstitem
+             \texttt{"} Nearest\texttt{"}  -- Each displayed pixel value is the value of the
+            nearest input pixel.
+
+            \sstitem
+             \texttt{"} Sinc\texttt{"}  -- Uses the sinc(pi$*$x) kernel, where x is the pixel
+            offset from the interpolation point, and sinc(z)=sin(z)/z. Use
+            of this scheme is not recommended.
+
+            \sstitem
+             \texttt{"} SincSinc\texttt{"}  -- Uses the sinc(pi$*$x)sinc(k$*$pi$*$x) kernel. A
+            valuable general-purpose scheme, intermediate in its visual
+            effect on NDFs between the bilinear and nearest-neighbour
+            schemes.
+
+            \sstitem
+             \texttt{"} SincCos\texttt{"}  -- Uses the sinc(pi$*$x)cos(k$*$pi$*$x) kernel. Gives
+            similar results to the \texttt{"} Sincsinc\texttt{"}  scheme.
+
+            \sstitem
+             \texttt{"} SincGauss\texttt{"}  -- Uses the sinc(pi$*$x)exp(-k$*$x$*$x) kernel. Good
+            results can be obtained by matching the FWHM of the
+            envelope function to the point-spread function of the
+            input data (see Parameter PARAMS).
+
+            \sstitem
+             \texttt{"} Somb\texttt{"}  -- Uses the somb(pi$*$x) kernel, where x is the pixel
+            offset from the interpolation point (resampling) or transformed
+            input pixel centre (rebinning), and somb(z)=2$*$J1(z)/z (J1 is
+            the first-order Bessel function of the first kind. This scheme
+            is similar to the \texttt{"} Sinc\texttt{"}  scheme.
+
+            \sstitem
+             \texttt{"} SombCos\texttt{"}  -- Uses the somb(pi$*$x)cos(k$*$pi$*$x) kernel. This
+            scheme is similar to the \texttt{"} SincCos\texttt{"}  scheme.
+
+            \sstitem
+             \texttt{"} Gauss\texttt{"}  -- Uses the exp(-k$*$x$*$x) kernel. The FWHM of the Gaussian
+            is given by Parameter PARAMS(2), and the point at which to truncate
+            the Gaussian to zero is given by Parameter PARAMS(1).
+
+         }
+         The initial default is \texttt{"} Nearest\texttt{"} .  [current value]
+      }
+      \sstsubsection{
          NAME = LITERAL (Read)
       }{
          Determines the graphics database picture with which the supplied
@@ -27764,11 +27839,50 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          general fall within the current picture.  \texttt{["DATA"]}
       }
       \sstsubsection{
+         NDF = NDF (Read)
+      }{
+         If an NDF is supplied, the values within the NDF at the positions
+         specified in the input catalogue are displayed on the screen and
+         written to output parameter PIXVALS. The displayed values are
+         calculated by interpolating between the NDF pixel values using
+         the interpolation method specified by Parameter METHOD. The NDF
+         array component to be displayed is specified by Parameter COMP. [!]
+      }
+      \sstsubsection{
          OUTCAT = FILENAME (Write)
       }{
          The output catalogue in which to store the selected positions.
          If a null value is supplied, no output catalogue is produced.  See
          Parameter COLFRAME.  \texttt{[!]}
+      }
+      \sstsubsection{
+         PARAMS( 2 ) = \_DOUBLE (Read)
+      }{
+         An optional array which consists of additional parameters
+         required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
+         SombCos, and Gauss methods (see Parameter METHOD).
+
+         PARAMS( 1 ) is required by all the above schemes.
+         It is used to specify how many pixels are to contribute to the
+         interpolated result on either side of the interpolation or
+         binning point in each dimension. Typically, a value of 2 is
+         appropriate and the minimum allowed value is 1 (i.e. one pixel
+         on each side). A value of zero or fewer indicates that a
+         suitable number of pixels should be calculated automatically.
+         [0]
+
+         PARAMS( 2 ) is required only by the Gauss, SombCos, SincSinc,
+         SincCos, and SincGauss schemes. For the SombCos, SincSinc and
+         SincCos schemes, it specifies the number of pixels at which the
+         envelope of the function goes to zero. The minimum value is
+         1.0, and the run-time default value is 2.0. For the Gauss and
+         SincGauss scheme, it specifies the full-width at half-maximum
+         (FWHM) of the Gaussian envelope measured in output pixels.  The
+         minimum value is 0.1, and the run-time default is 1.0.  On
+         astronomical NDFs and spectra, good results are often obtained
+         by approximately matching the FWHM of the envelope function,
+         given by PARAMS(2), to the point-spread function of the input
+         data. []
       }
       \sstsubsection{
          PLOT = \htmlref{LITERAL}{se:parmenu} (Read)
@@ -27836,6 +27950,12 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          }
          Each position may also be separately labelled with its integer
          identifier value by giving a \texttt{TRUE} value for Parameter LABEL.  \texttt{["None"!]}
+      }
+      \sstsubsection{
+         PIXVALS() = \_DOUBLE (Write)
+      }{
+         The pixel values at the listed positions. Only used if a
+         non-null value is supplied for Parameter NDF.
       }
       \sstsubsection{
          POSNS() = \_DOUBLE (Write)
@@ -54831,6 +54951,12 @@ The following applications have been modified:
         \item There is a new estimator option, \texttt{"FastMed"},
         that offers a substantially faster calculation of unweighted
         medians.
+      \end{itemize}
+
+   \item [\htmlref{LISTSHOW}{LISTSHOW}]\mbox{}
+      \begin{itemize}
+        \item A new parameter called NDF allows the data values at the
+        catalogued positions within a specified NDF to be displayed.
       \end{itemize}
 
    \item [\htmlref{SETAXIS}{SETAXIS}]\mbox{}

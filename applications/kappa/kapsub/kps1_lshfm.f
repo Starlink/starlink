@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_LSHFM( FRM, NPOS, NAX, ID, POS, IGRP1, IGRP2,
-     :                       STATUS )
+     :                       SHOWPV, PIXVALS, STATUS )
 
 *+
 *  Name:
@@ -12,7 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_LSHFM( FRM, NPOS, NAX, ID, POS, IGRP1, IGRP2, STATUS )
+*     CALL KPS1_LSHFM( FRM, NPOS, NAX, ID, POS, IGRP1, IGRP2,
+*                      SHOWPV, PIXVALS, STATUS )
 
 *  Description:
 *     This routine formats the supplied positions, identifiers and labels,
@@ -35,6 +36,11 @@
 *        to GRP__NOID if there are no labels.
 *     IGRP2 = INTEGER (Given)
 *        A GRP identifier for the group to receive the formatted positions.
+*     SHOWPV = LOGICAL (Given)
+*        If .TRUE., include the pixel values supplied in the PIXVALS
+*        arrays in the returned formatted positions.
+*     PIXVALS( NPOS ) = DOUBLE PRECISION (Given)
+*        The pixel values at eahc position. Only used if SHOWPV is .TRUE.,
 *     STATUS = INTEGER (Given)
 *        Global status value.
 
@@ -74,6 +80,8 @@
 *        displayed).
 *     21-NOV-2006 (DSB):
 *        Added IGRP1 argument.
+*     18-SEP-2020 (DSB):
+*        Added SHOWPV and PIXVALS.
 *     {enter_further_changes_here}
 
 *-
@@ -85,6 +93,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'PRM_PAR'          ! VAL constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Arguments Given:
@@ -94,6 +103,8 @@
       INTEGER ID( NPOS )
       INTEGER IGRP1
       INTEGER IGRP2
+      LOGICAL SHOWPV
+      DOUBLE PRECISION PIXVALS( NPOS )
 
 *  Arguments Given and Returned:
       DOUBLE PRECISION POS( NPOS, NAX )
@@ -204,10 +215,6 @@
          TAB( I ) = TAB( I - 1 ) + MXWID( I - 1 ) + NSP
       END DO
 
-*  Store the full used length of each line (i.e. minus the trailing
-*  spaces).
-      BLEN = TAB( NAX + 1 ) - NSP
-
 *  Create the header, putting each word in the middle of the corresponding
 *  field...
 *  =======================================================================
@@ -238,7 +245,11 @@
          LINE( IAT : ) = TEXT
       END DO
 
-      CALL GRP_PUT( IGRP2, 1, LINE( : BLEN ), 0, STATUS )
+      IF( SHOWPV ) THEN
+         LINE( TAB( NAX + 1 ) : ) = 'Pixel'
+      END IF
+
+      CALL GRP_PUT( IGRP2, 1, LINE( : CHR_LEN(LINE) ), 0, STATUS )
 
 *  Second line: "identifier" and axis units (if any).
       LINE = ' '
@@ -262,6 +273,11 @@
          LINE( IAT : ) = TEXT
       END DO
 
+      IF( SHOWPV ) THEN
+         LINE( TAB( NAX + 1 ) : ) = 'value'
+      END IF
+
+      BLEN = CHR_LEN( LINE )
       CALL GRP_PUT( IGRP2, 1, LINE( : BLEN ), 0, STATUS )
 
 *  Separator lines.
@@ -297,8 +313,18 @@
      :                                       STATUS )
          END DO
 
+*  Append any pixel value
+         IF( SHOWPV ) THEN
+            IF( PIXVALS( K ) .NE. VAL__BADD ) THEN
+               CALL CHR_DTOC( PIXVALS( K ), TEXT, IAT )
+            ELSE
+               TEXT = '<BAD>'
+            END IF
+            LINE( TAB( NAX + 1 ) : ) = TEXT
+         END IF
+
 *  Store the buffer in the group.
-         CALL GRP_PUT( IGRP2, 1, LINE( : BLEN ), 0, STATUS )
+         CALL GRP_PUT( IGRP2, 1, LINE( : CHR_LEN(LINE) ), 0, STATUS )
 
       END DO
 

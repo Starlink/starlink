@@ -27,6 +27,12 @@
 *     reported by specifying a range of "position identifiers" (see
 *     Parameters FIRST, LAST, and STEP).
 *
+*     An NDF may be supplied (see Parameter NDF) in which case the NDF
+*     pixel values at the positions listed in the catalogue are reported,
+*     using the interpolation method specified by Parameter METHOD. The
+*     pixel values are also written to an output parameter (see Parameter
+*     PIXVALS).
+*
 *     Positions may be reported in a range of co-ordinate Frames
 *     dependent on the information stored in the supplied positions
 *     list (see Parameter FRAME).  The selected positions are written
@@ -70,6 +76,9 @@
 *        This parameter is only accessed if Parameter PLOT is set to
 *        "Chain" or "Poly".  If TRUE, polgons will be closed by joining
 *        the first position to the last position.  [Current value]
+*     COMP = LITERAL (Read)
+*        The NDF array component to be displayed if a non-null value is
+*        supplied for Parameter NDF. ["Data"]
 *     DESCRIBE = LOGICAL (Read)
 *        If TRUE, a detailed description of the co-ordinate Frame in
 *        which the positions will be reported is displayed before the
@@ -183,6 +192,53 @@
 *        gives a dot, 2 gives a cross, 3 gives an asterisk, 7 gives a
 *        triangle.  The value must be larger than or equal to -31.
 *        [current value]
+*     METHOD = LITERAL (Read)
+*        The method to use when sampling the input NDF (if any) specified
+*        by Parameter NDF at each of the positions in the catalogue. For
+*        details on these schemes, see the description of routine
+*        AST_RESAMPLEx in SUN/210. Note, 'Nearest' is always used if
+*        Parameter COMP is 'Quality'. METHOD can take the following
+*        values:
+*
+*        - "Bilinear" -- The displayed pixel values are calculated by
+*        bi-linear interpolation among the four nearest pixels values
+*        in the input NDF. Produces smoother output NDFs than the
+*        nearest-neighbour scheme, but is marginally slower.
+*
+*        - "Nearest" -- Each displayed pixel value is the value of the
+*        nearest input pixel.
+*
+*        - "Sinc" -- Uses the sinc(pi*x) kernel, where x is the pixel
+*        offset from the interpolation point, and sinc(z)=sin(z)/z. Use
+*        of this scheme is not recommended.
+*
+*        - "SincSinc" -- Uses the sinc(pi*x)sinc(k*pi*x) kernel. A
+*        valuable general-purpose scheme, intermediate in its visual
+*        effect on NDFs between the bilinear and nearest-neighbour
+*        schemes.
+*
+*        - "SincCos" -- Uses the sinc(pi*x)cos(k*pi*x) kernel. Gives
+*        similar results to the "Sincsinc" scheme.
+*
+*        - "SincGauss" -- Uses the sinc(pi*x)exp(-k*x*x) kernel. Good
+*        results can be obtained by matching the FWHM of the
+*        envelope function to the point-spread function of the
+*        input data (see Parameter PARAMS).
+*
+*        - "Somb" -- Uses the somb(pi*x) kernel, where x is the pixel
+*        offset from the interpolation point (resampling) or transformed
+*        input pixel centre (rebinning), and somb(z)=2*J1(z)/z (J1 is
+*        the first-order Bessel function of the first kind. This scheme
+*        is similar to the "Sinc" scheme.
+*
+*        - "SombCos" -- Uses the somb(pi*x)cos(k*pi*x) kernel. This
+*        scheme is similar to the "SincCos" scheme.
+*
+*        - "Gauss" -- Uses the exp(-k*x*x) kernel. The FWHM of the Gaussian
+*        is given by Parameter PARAMS(2), and the point at which to truncate
+*        the Gaussian to zero is given by Parameter PARAMS(1).
+*
+*        The initial default is "Nearest".  [current value]
 *     NAME = LITERAL (Read)
 *        Determines the graphics database picture with which the
 *        supplied positions are to be aligned.  Only accessed if
@@ -194,12 +250,45 @@
 *        can also be supplied as a special case, which causes the BASE
 *        picture to be used even though it will not in general fall
 *        within the current picture.  ["DATA"]
+*     NDF = NDF (Read)
+*        If an NDF is supplied, the values within the NDF at the positions
+*        specified in the input catalogue are displayed on the screen and
+*        written to output parameter PIXVALS. The displayed values are
+*        calculated by interpolating between the NDF pixel values using
+*        the interpolation method specified by Parameter METHOD. The NDF
+*        array component to be displayed is specified by Parameter COMP. [!]
 *     NUMBER = _INTEGER (Write)
 *        The number of positions selected.
 *     OUTCAT = FILENAME (Write)
 *        The output catalogue in which to store the selected positions.
 *        If a null value is supplied, no output catalogue is produced.
 *        See Parameter COLFRAME.  [!]
+*     PARAMS( 2 ) = _DOUBLE (Read)
+*        An optional array which consists of additional parameters
+*        required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
+*        SombCos, and Gauss methods (see parameter METHOD).
+*
+*        PARAMS( 1 ) is required by all the above schemes.
+*        It is used to specify how many pixels are to contribute to the
+*        interpolated result on either side of the interpolation or
+*        binning point in each dimension. Typically, a value of 2 is
+*        appropriate and the minimum allowed value is 1 (i.e. one pixel
+*        on each side). A value of zero or fewer indicates that a
+*        suitable number of pixels should be calculated automatically.
+*        [0]
+*
+*        PARAMS( 2 ) is required only by the Gauss, SombCos, SincSinc,
+*        SincCos, and SincGauss schemes. For the SombCos, SincSinc and
+*        SincCos schemes, it specifies the number of pixels at which the
+*        envelope of the function goes to zero. The minimum value is
+*        1.0, and the run-time default value is 2.0. For the Gauss and
+*        SincGauss scheme, it specifies the full-width at half-maximum
+*        (FWHM) of the Gaussian envelope measured in output pixels.  The
+*        minimum value is 0.1, and the run-time default is 1.0.  On
+*        astronomical NDFs and spectra, good results are often obtained
+*        by approximately matching the FWHM of the envelope function,
+*        given by PARAMS(2), to the point-spread function of the input
+*        data. []
 *     PLOT = LITERAL (Read)
 *        The type of graphics to be used to mark the positions on the
 *        graphics device specified by Parameter DEVICE.  The appearance
@@ -252,6 +341,9 @@
 *        Each position may also be separately labelled with its integer
 *        identifier value by giving a TRUE value for Parameter LABEL.
 *        ["None"]
+*     PIXVALS() = _DOUBLE (Write)
+*        The pixel values at the listed positions. Only used if a
+*        non-null value is supplied for Parameter NDF.
 *     POSNS() = _DOUBLE (Write)
 *        The unformatted co-ordinates of the positions selected by
 *        Parameters FIRST and LAST, in the co-ordinate Frame selected by
@@ -452,8 +544,10 @@
 *        Use KPG_GDFND in place of KPG1_AGFND in case the most recent
 *        data picture had no WCS.
 *     6-DEC-2017 (DSB):
-*        Pass the array of selected position identifiers to KPS1_LSHPL, 
+*        Pass the array of selected position identifiers to KPS1_LSHPL,
 *        rather than the array of all position identifiers.
+*     19-SEP-2020 (DSB):
+*        Added parameters NDF, COMP, METHOD, PARAMS, PIXVALS.
 *     {enter_further_changes_here}
 
 *-
@@ -466,6 +560,7 @@
       INCLUDE 'AST_PAR'          ! AST constants and function
                                  ! declarations
       INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
@@ -478,46 +573,71 @@
       INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Variables:
+      CHARACTER COMP*10          ! NDF component from IN1 to be unmapped
       CHARACTER JUST*2           ! Justification for text strings
       CHARACTER LABTYP*5         ! Type of labels to display
+      CHARACTER MCOMP*10         ! NDF component from IN1 to be mapped
+      CHARACTER METHOD*13        ! Interpolation method to use.
       CHARACTER PICNAM*15        ! AGI picture name.
       CHARACTER PLOT*15          ! Nature of required graphics
       CHARACTER STCSCN*30        ! Name of STCS description column
       CHARACTER TEXT*(GRP__SZNAM)! Text buffer
       CHARACTER TITLE*80         ! Title from positions list
+      DOUBLE PRECISION PARAMS( 2 ) ! Param. values passed to AST_RESAMPLE<x>
       INTEGER BFRM               ! Copy of original Frame
       INTEGER BINDEX             ! Frame index for supplied positions
+      INTEGER DIMS( NDF__MXDIM ) ! Length of each pixel axis in NDF
       INTEGER F                  ! Index of first non-blank character
       INTEGER FIRST              ! Lowest position identifier to display
       INTEGER FSTPOS             ! Position of lowest identifier
       INTEGER I                  ! Loop count
+      INTEGER IERR               ! Index of first conversion error
+      INTEGER IGAX               ! Index of GRID axis
       INTEGER IGRP1              ! GRP id for formatted co-ord values
       INTEGER IGRP2              ! GRP id for marker strings group
       INTEGER IGRP3              ! GRP group containing all labels
       INTEGER IGRP4              ! GRP group containing selected labels
       INTEGER IMARK              ! PGPLOT marker type
+      INTEGER INDF               ! NDF identifier
+      INTEGER INPERM( NDF__MXDIM )! Input permutation array
       INTEGER IPIC               ! AGI id for selected picture
       INTEGER IPIC0              ! Current (input) picture identifier
       INTEGER IPID               ! Pointer to original identifiers
       INTEGER IPLOT              ! AST pointer to Plot
+      INTEGER IPNDF              ! Pointer to NDF array
       INTEGER IPPOS              ! P'nter to original positions
+      INTEGER IPQ                ! Pointer to NDF Quality array
       INTEGER IPW0               ! P'nter to array of selected id's
       INTEGER IPW1               ! P'nter to array of selected positions
       INTEGER IPW2               ! P'nter to array of selected positions
       INTEGER IPW3               ! P'nter to array of GRAPHICS positions
+      INTEGER IPW4               ! P'nter to array of pixel values
       INTEGER IWCS               ! AST pointer to FrameSet
+      INTEGER IWCS2              ! NDFs WCS FrameSet
       INTEGER L                  ! Length of a string
       INTEGER LAST               ! Highest position id to display
+      INTEGER LBND( NDF__MXDIM ) ! Array lower bounds
+      INTEGER LM                 ! LutMap
       INTEGER LSTPOS             ! Position of highest identifier
       INTEGER MAP                ! AST Mapping original -> requested
+      INTEGER METHOD_CODE        ! Integer corresponding to interp. method
+      INTEGER NBAD               ! No. of bad output values
       INTEGER NBAX               ! No. of axes in original Frame
-      INTEGER NFRM               ! Number of Frames in Plot
       INTEGER NDISP              ! Number of selected positions
+      INTEGER NEL                ! No. of mapped elements
+      INTEGER NERR               ! Number of conversion errors
+      INTEGER NFRM               ! Number of Frames in Plot
+      INTEGER NGAX               ! No. of GRID axes
       INTEGER NINVAL             ! Number of invalid identifiers
+      INTEGER NPAR               ! No. of parameters required
       INTEGER NPOS               ! Total number of positions
       INTEGER NRAX               ! Number of axes in requested Frame
       INTEGER NSTR               ! Number of marker strings supplied
+      INTEGER OUTPERM( NDF__MXDIM )! Output permutation array
+      INTEGER PM                 ! Parallel CmpMap
+      INTEGER PRM                ! PermMap
       INTEGER SIZE               ! Number of elements in group
+      INTEGER SM                 ! Serial CmpMap
       INTEGER STCSKM             ! KeyMap holding STCS descriptions
       INTEGER STEP               ! Increment between displayed positions
       LOGICAL CLOSE              ! Close the polygon?
@@ -525,8 +645,10 @@
       LOGICAL GEO                ! Draw geodesic polygon?
       LOGICAL GRAPH              ! Plotting?
       LOGICAL LABEL              ! Label positions on graphics device?
-      LOGICAL QUIET              ! Run quietly?
       LOGICAL PGBUF              ! PG buffering context started?
+      LOGICAL QUIET              ! Run quietly?
+      LOGICAL SHOWPV             ! Show pixel values?
+
 *.
 
 *  Check the inherited global status.
@@ -741,7 +863,7 @@
 *  TRANSFORM structure stored with the picture in the database).
          CALL KPG1_GDGET( -1, AST__NULL, .TRUE., IPLOT, STATUS )
 
-*  Note the number of Frame sin the Plot.
+*  Note the number of Frames in the Plot.
          NFRM = AST_GETI( IPLOT, 'NFRAME', STATUS )
 
 *  Merge the FrameSet read from the positions list with the Plot
@@ -877,6 +999,238 @@
 *  Write the number of axes per position to DIM.
       CALL PAR_PUT0I( 'DIM', NRAX, STATUS )
 
+*  See if we are to display the pixel values within a supplied NDF at each
+*  position in the list.
+      CALL AST_BEGIN( STATUS )
+      CALL NDF_BEGIN
+
+      IPW4 = 0
+      SHOWPV = .FALSE.
+
+      INDF = NDF__NOID
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL NDF_ASSOC( 'NDF', 'READ', INDF, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+      END IF
+      IF( INDF .NE. NDF__NOID ) THEN
+
+*  Get the dimensions of the NDF.
+         CALL NDF_DIM( INDF, NDF__MXDIM, DIMS, NGAX, STATUS )
+
+*  Get the WCS FrameSet from the NDF.
+         CALL KPG1_GTWCS( INDF, IWCS2, STATUS )
+
+*  Note the number of frames in the NDF's WCS FrameSet.
+         NFRM = AST_GETI( IWCS2, 'NFRAME', STATUS )
+
+*  Attempt to merge the NDFs WCS FrameSet with the FrameSet associated
+*  with the position list. This will add all the Frames in "IWCS" into
+*  "IWCS2".
+         CALL KPG1_ASMRG( IWCS2, IWCS, ' ', .FALSE., 3, STATUS )
+
+*  Get the Mapping from the Frame in which the positions list is
+*  defined, to GRID coordinates (which we know is the Base Frame) in
+*  the NDF.
+         MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS2, BINDEX + NFRM,
+     :                                       AST__BASE, STATUS ),
+     :                       STATUS )
+
+*  Allocate a work array to hold the GRID coords at each position.
+         CALL PSX_CALLOC( NGAX*NDISP, '_DOUBLE', IPW3, STATUS )
+
+*  Use the Mapping to get the NDF's GRID coords corresponding to each
+*  position in the list.
+         CALL AST_TRANN( MAP, NDISP, NBAX, NDISP, %VAL(CNF_PVAL(IPW1)),
+     :                   .TRUE., NGAX, NDISP, %VAL(CNF_PVAL(IPW3)),
+     :                   STATUS )
+
+*  For each GRID axis, create a LutMap that gives the GRID axis value as a
+*  function of (one-based) index within the list. Combine them in parallel
+*  into a CmpMap.
+         DO IGAX = 1, NGAX
+            LM = AST_LUTMAP( NDISP, %VAL( CNF_PVAL( IPW3 ) +
+     :                                   ( IGAX - 1 )*NDISP*VAL__NBD),
+     :                       1.0D0, 1.0D0, 'LutInterp=1', STATUS )
+            IF( IGAX .EQ. 1 ) THEN
+               PM = LM
+            ELSE
+               PM = AST_CMPMAP( PM, LM, .FALSE., ' ', STATUS )
+            END IF
+
+            OUTPERM( IGAX ) = 1
+         END DO
+
+*  Create a (1-input,NGAX-output) PermMap that duplicates its single
+*  input NGAX times. Use this PermMap to feed the NGAX inputs of the
+*  above parallel CmpMap. The resulting serial CmpMap transforms one-based
+*  index within the position list into NDF GRID coords.
+         INPERM( 1 ) = 1
+         PRM = AST_PERMMAP( 1, INPERM, NGAX, OUTPERM, 0.0D0, ' ',
+     :                      STATUS )
+         SM = AST_CMPMAP( PRM, PM, .TRUE., ' ', STATUS )
+
+*  Invert this Mapping as required by AST_RESAMPLE, so that the forward
+*  transform would (if it were defined) go from GRID coords to position
+*  list index. AST_RESAMPLE will only use the inverse of this Mapping
+*  (i.e. from position list index ot GRID coords).
+         CALL AST_INVERT( SM, STATUS )
+
+*  Find which NDF component to use.
+         CALL KPG1_ARCOG( 'COMP', INDF, MCOMP, COMP, STATUS )
+
+*  Map the required NDF array. First deal with DATA, VARIANCE and ERROR
+*  (i.e. everything except QUALITY).
+         IF( MCOMP( 1 : 1 ) .NE. 'Q' ) THEN
+
+*  Just map these components as _DOUBLE.
+            CALL NDF_MAP( INDF, MCOMP, '_DOUBLE', 'READ', IPNDF, NEL,
+     :                    STATUS )
+
+*  Quality arrays have to be handled a bit differently because they can
+*  only be accessed as _UBYTE arrays. Therefore, we need to map them as
+*  _UBYTE, and then convert them explicitly to _REAL, allocating storage
+*  for the result.
+         ELSE
+            CALL NDF_MAP( INDF, 'QUALITY', '_UBYTE', 'READ', IPQ, NEL,
+     :                    STATUS )
+            CALL PSX_CALLOC( NEL, '_DOUBLE', IPNDF, STATUS )
+            CALL VEC_UBTOD( .FALSE., NEL, %VAL( CNF_PVAL( IPQ ) ),
+     :                      %VAL( CNF_PVAL( IPNDF ) ), IERR, NERR,
+     :                      STATUS )
+            CALL NDF_UNMAP( INDF, '*', STATUS )
+         END IF
+
+*  Allocate room to hold the pixel values.
+         CALL PSX_CALLOC( NDISP, '_DOUBLE', IPW4, STATUS )
+
+*  Get the interpolation method to be used.
+         CALL PAR_CHOIC( 'METHOD', 'SincSinc', 'Nearest,Bilinear,'//
+     :                'Sinc,Gauss,SincSinc,SincCos,SincGauss,'//
+     :                'Somb,SombCos', .TRUE., METHOD, STATUS )
+
+*  We cannot interpolate between quality values, so ensure nearest
+*  neighbour is used.
+         IF( MCOMP( 1 : 1 ) .EQ. 'Q' .AND.
+     :       METHOD( 1 : 1 ) .NE. 'N' ) THEN
+            METHOD = 'NEAREST'
+            CALL MSG_OUT( ' ', 'WARNING: Displaying NDF quality '//
+     :                    'values so Nearest Neighbour interpolation '//
+     :                    'must be used.', STATUS )
+         END IF
+
+*  Convert the METHOD string to an integer code recognised by AST, and
+*  tell the user which scheme is being used. Also, get the number of
+*  parameters required by the method.
+         NPAR = 0
+         IF( METHOD( 1 : 1 ) .EQ. 'N' ) THEN
+            METHOD_CODE = AST__NEAREST
+            CALL MSG_OUT( 'WCSALIGN_MSG1',
+     :                    '  Using nearest neighbour interpolation.',
+     :                    STATUS )
+
+         ELSE IF( METHOD( 1 : 2 ) .EQ. 'BI' ) THEN
+            METHOD_CODE = AST__LINEAR
+            CALL MSG_OUT( 'WCSALIGN_MSG2',
+     :                    '  Using bi-linear interpolation.', STATUS )
+
+         ELSE IF( METHOD( 1 : 1 ) .EQ. 'G' ) THEN
+            NPAR = 2
+            PARAMS( 1 ) = 0.0
+            PARAMS( 2 ) = 2.0
+            METHOD_CODE = AST__GAUSS
+            CALL MSG_OUT( 'WCSALIGN_MSG2',
+     :                    '  Using a Gaussian interpolation.', STATUS )
+
+         ELSE IF ( METHOD( 1 : 4 ) .EQ. 'SINC' ) THEN
+            NPAR = 2
+            PARAMS( 1 ) = 0.0
+            PARAMS( 2 ) = 2.0
+
+            IF ( METHOD( 5 : 5 ) .EQ. 'S' ) THEN
+               METHOD_CODE = AST__SINCSINC
+               CALL MSG_OUT( 'WCSALIGN_MSG3',
+     :                       '  Using sincsinc interpolation.', STATUS )
+
+            ELSE IF( METHOD( 5 : 5 ) .EQ. 'C' ) THEN
+               METHOD_CODE = AST__SINCCOS
+               CALL MSG_OUT( 'WCSALIGN_MSG4',
+     :                       '  Using sinccos interpolation.', STATUS )
+
+            ELSE IF( METHOD( 5 : 5 ) .EQ. 'G' ) THEN
+               METHOD_CODE = AST__SINCGAUSS
+               PARAMS( 2 ) = 1.0
+               CALL MSG_OUT( 'WCSALIGN_MSG5',
+     :                      '  Using sincgauss interpolation.', STATUS )
+
+            ELSE
+               NPAR = 1
+               METHOD_CODE = AST__SINC
+               CALL MSG_OUT( 'WCSALIGN_MSG6',
+     :                       '  Using sinc interpolation.', STATUS )
+
+            END IF
+
+         ELSE IF ( METHOD( 1 : 4 ) .EQ. 'SOMB' ) THEN
+            NPAR = 2
+            PARAMS( 1 ) = 0.0
+            PARAMS( 2 ) = 2.0
+
+            IF( METHOD( 5 : 5 ) .EQ. 'C' ) THEN
+               METHOD_CODE = AST__SOMBCOS
+               CALL MSG_OUT( 'WCSALIGN_MSG7',
+     :                       '  Using sombcos interpolation.', STATUS )
+
+            ELSE
+               NPAR = 1
+               METHOD_CODE = AST__SOMB
+               CALL MSG_OUT( 'WCSALIGN_MSG8',
+     :                       '  Using somb interpolation.', STATUS )
+
+            END IF
+
+         END IF
+
+*  If required, set the dynamic defaults for PARAMS then get the
+*  required number of interpolation parameters.
+         IF( NPAR .GT. 0 ) THEN
+            CALL PAR_DEF1D( 'PARAMS', NPAR, PARAMS, STATUS )
+            CALL PAR_EXACD( 'PARAMS', NPAR, PARAMS, STATUS )
+         END IF
+
+*  Since we are transforming from GRID coords, each axis has a lower
+*  bound of 1.0
+         DO IGAX = 1, NGAX
+            LBND( IGAX ) = 1
+         END DO
+
+*  Resample the supplied NDF at the positions in the positions list. This
+*  leaves the NDF pixel values in the IPW4 array.
+         NBAD = AST_RESAMPLED( SM, NGAX, LBND, DIMS,
+     :                         %VAL( CNF_PVAL(IPNDF) ),
+     :                         0.0D0, METHOD_CODE, AST_NULL, PARAMS,
+     :                         AST__USEBAD, 0.0D0, 100, VAL__BADD, 1, 1,
+     :                         NDISP, 1, NDISP, %VAL( CNF_PVAL(IPW4) ),
+     :                         0.0D0, STATUS )
+
+*  Free the array holding the GRID coords. */
+         CALL PSX_FREE( IPW3, STATUS )
+
+*  Free the array holding the QUality valies. */
+         IF( MCOMP( 1 : 1 ) .EQ. 'Q' ) CALL PSX_FREE( IPNDF, STATUS )
+
+*  Write the pixel values to the output parameter.
+         CALL PAR_PUT1D( 'PIXVALS', NDISP, %VAL( CNF_PVAL( IPW4 ) ),
+     :                   STATUS )
+
+*  Indicate we have pixel values to display.
+         SHOWPV = .TRUE.
+      END IF
+
+*  Free all NDF and AST resources allocated in the current NDF and AST
+*  context.
+      CALL NDF_END( STATUS )
+      CALL AST_END( STATUS )
+
 *  Set the Style of the FrameSet or Plot using the STYLE parameter.
 *  The plus sign requests support of temporary attributes.
       CALL KPG1_ASSET( 'LISTSHOW', '+STYLE', IWCS, STATUS )
@@ -892,7 +1246,7 @@
       CALL KPS1_LSHFM( AST_GETFRAME( IWCS, AST__CURRENT, STATUS ),
      :                 NDISP, NRAX, %VAL( CNF_PVAL( IPW0 ) ),
      :                 %VAL( CNF_PVAL( IPW2 ) ), IGRP4, IGRP1,
-     :                 STATUS )
+     :                 SHOWPV, %VAL( CNF_PVAL( IPW4 ) ), STATUS )
 
 *  Save the number of positions in the list.
       CALL GRP_GRPSZ( IGRP1, SIZE, STATUS )

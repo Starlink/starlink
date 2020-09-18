@@ -18742,6 +18742,16 @@ iraf! {
             helpkey *
          }
 
+         parameter comp {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {NDF component to display}
+            helpkey *
+            default DATA
+         }
+
          parameter describe {
             type _LOGICAL
             prompt {Is the co-ordinate Frame to be described?}
@@ -18873,6 +18883,15 @@ iraf! {
             helpkey *
          }
 
+         parameter method {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Re-sampling method}
+            helpkey *
+            default {Nearest}
+         }
+
          parameter name {
             type LITERAL
             ppath CURRENT DEFAULT
@@ -18880,6 +18899,16 @@ iraf! {
             prompt {Name of picture with which to align positions}
             helpkey *
             default DATA
+         }
+
+         parameter ndf {
+            type NDF
+            access READ
+            vpath DEFAULT
+            prompt {Input NDF}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
          }
 
          parameter number {
@@ -18897,6 +18926,23 @@ iraf! {
             association ->GLOBAL.CATALOGUE
             prompt {Output positions list}
             default !
+            helpkey *
+         }
+
+         parameter params {
+            size *
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Auxiliary resampling parameters}
+            helpkey *
+         }
+
+         parameter pixvals {
+            size *
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
             helpkey *
          }
 
