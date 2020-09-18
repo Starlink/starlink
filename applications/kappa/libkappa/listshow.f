@@ -78,7 +78,8 @@
 *        the first position to the last position.  [Current value]
 *     COMP = LITERAL (Read)
 *        The NDF array component to be displayed if a non-null value is
-*        supplied for Parameter NDF. ["Data"]
+*        supplied for Parameter NDF.  It may be "Data", Variance",
+*        "Error", or "Quality".  ["Data"]
 *     DESCRIBE = LOGICAL (Read)
 *        If TRUE, a detailed description of the co-ordinate Frame in
 *        which the positions will be reported is displayed before the
@@ -124,7 +125,7 @@
 *        available within the positions list.  The range of Frames
 *        available will include all those read from the supplied
 *        positions list.  In addition, if a graphics device is opened
-*        (i.e. if Parameter PLOT is set to anything other than NONE),
+*        (i.e. if Parameter PLOT is set to anything other than "None"),
 *        then all the Frames associated with the picture specified by
 *        Parameter NAME will also be available.  [!]
 *     GEODESIC = LOGICAL (Read)
@@ -138,7 +139,7 @@
 *        positions in a non-linear projection.  [FALSE]
 *     INCAT = FILENAME (Read)
 *        A catalogue containing a positions list such as produced by
-*        applications LISTMAKE, CURSOR, etc.
+*        applications LISTMAKE and CURSOR.
 *     JUST = LITERAL (Read)
 *        A string specifying the justification to be used when
 *        displaying text strings at the supplied positions.  This
@@ -198,7 +199,7 @@
 *        details on these schemes, see the description of routine
 *        AST_RESAMPLEx in SUN/210. Note, 'Nearest' is always used if
 *        Parameter COMP is 'Quality'. METHOD can take the following
-*        values:
+*        values.
 *
 *        - "Bilinear" -- The displayed pixel values are calculated by
 *        bi-linear interpolation among the four nearest pixels values
@@ -226,10 +227,9 @@
 *        input data (see Parameter PARAMS).
 *
 *        - "Somb" -- Uses the somb(pi*x) kernel, where x is the pixel
-*        offset from the interpolation point (resampling) or transformed
-*        input pixel centre (rebinning), and somb(z)=2*J1(z)/z (J1 is
-*        the first-order Bessel function of the first kind. This scheme
-*        is similar to the "Sinc" scheme.
+*        offset from the interpolation point, and somb(z)=2*J1(z)/z (J1
+*        is the first-order Bessel function of the first kind. This
+*        scheme is similar to the "Sinc" scheme.
 *
 *        - "SombCos" -- Uses the somb(pi*x)cos(k*pi*x) kernel. This
 *        scheme is similar to the "SincCos" scheme.
@@ -253,7 +253,7 @@
 *     NDF = NDF (Read)
 *        If an NDF is supplied, the values within the NDF at the positions
 *        specified in the input catalogue are displayed on the screen and
-*        written to output parameter PIXVALS. The displayed values are
+*        written to Output Parameter PIXVALS. The displayed values are
 *        calculated by interpolating between the NDF pixel values using
 *        the interpolation method specified by Parameter METHOD. The NDF
 *        array component to be displayed is specified by Parameter COMP. [!]
@@ -278,11 +278,11 @@
 *        [0]
 *
 *        PARAMS( 2 ) is required only by the Gauss, SombCos, SincSinc,
-*        SincCos, and SincGauss schemes. For the SombCos, SincSinc and
+*        SincCos, and SincGauss schemes. For the SombCos, SincSinc, and
 *        SincCos schemes, it specifies the number of pixels at which the
 *        envelope of the function goes to zero. The minimum value is
 *        1.0, and the run-time default value is 2.0. For the Gauss and
-*        SincGauss scheme, it specifies the full-width at half-maximum
+*        SincGauss schemes, it specifies the full-width at half-maximum
 *        (FWHM) of the Gaussian envelope measured in output pixels.  The
 *        minimum value is 0.1, and the run-time default is 1.0.  On
 *        astronomical NDFs and spectra, good results are often obtained

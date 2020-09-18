@@ -6,9 +6,9 @@
 \stardocsource    {sun95.44}
 \stardocnumber    {95.44}
 \stardocauthors   {Malcolm J. Currie \& David S. Berry}
-\stardocdate      {2020 August 1}
+\stardocdate      {2020 September 18}
 \stardoctitle     {KAPPA --- Kernel Application Package}
-\stardocversion   {2.6-8}
+\stardocversion   {2.6-9}
 \stardocmanual    {User's Guide}
 % -----------------------------------------------------------------------------
 \stardocabstract{
@@ -27538,12 +27538,13 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
    \sstdescription{
       This application reports positions contained in a catalogue.  The
       catalogue should have the form of a positions list as produced, for
-      instance, by applications LISTMAKE and CURSOR.  By default all positions
+      instance, by applications \htmlref{LISTMAKE}{LISTMAKE} and
+      \htmlref{CURSOR}{CURSOR}.  By default all positions
       in the catalogue are reported, but a subset may be reported by
       specifying a range of \emph{position identifiers}~ (see Parameters FIRST,
       LAST, and STEP).
 
-      An NDF may be supplied (see Parameter NDF) in which case the NDF
+      An \NDFref{NDF} may be supplied (see Parameter NDF) in which case the NDF
       pixel values at the positions listed in the catalogue are reported,
       using the interpolation method specified by Parameter METHOD. The
       pixel values are also written to an output parameter (see Parameter
@@ -27603,7 +27604,8 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          COMP = LITERAL (Read)
       }{
          The NDF array component to be displayed if a non-null value is
-         supplied for Parameter NDF. \texttt{["DATA"]}
+         supplied for Parameter NDF. It may be \texttt{"Data"},
+         \texttt{"Variance"}, \texttt{"Error"}, or \texttt{"Quality"}. \texttt{["Data"]}
       }
       \sstsubsection{
          DESCRIBE = \_LOGICAL (Read)
@@ -27684,7 +27686,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          INCAT = FILENAME (Read)
       }{
          A catalogue containing a positions list such as produced by
-         applications LISTMAKE, CURSOR.
+         applications LISTMAKE and CURSOR.
       }
       \sstsubsection{
          JUST = LITERAL (Read)
@@ -27769,58 +27771,58 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          by Parameter NDF at each of the positions in the catalogue. For
          details on these schemes, see the description of routine
          \xref{AST\_RESAMPLEx}{sun210}{AST_RESAMPLE\$<X>\$} in
-         \xref{SUN/210}{sun210}{}. Note, 'Nearest' is always used if
-         Parameter COMP is \texttt{'} Quality\texttt{'} . METHOD can take
-         the following values:
+         \xref{SUN/210}{sun210}{}. Note, \texttt{"Nearest"} is always used if
+         Parameter COMP is \texttt{"Quality"} . METHOD can take
+         the following values.
 
          \sstitemlist{
 
             \sstitem
-             \texttt{"} Bilinear\texttt{"}  -- The displayed pixel values are calculated by
+            \texttt{"Bilinear"} --- The displayed pixel values are calculated by
             bi-linear interpolation among the four nearest pixels values
-            in the input NDF. Produces smoother output NDFs than the
+            in the input NDF.  This produces smoother output NDFs than the
             nearest-neighbour scheme, but is marginally slower.
 
             \sstitem
-             \texttt{"} Nearest\texttt{"}  -- Each displayed pixel value is the value of the
+            \texttt{"Nearest"} --- Each displayed pixel value is the value of the
             nearest input pixel.
 
             \sstitem
-             \texttt{"} Sinc\texttt{"}  -- Uses the sinc(pi$*$x) kernel, where x is the pixel
-            offset from the interpolation point, and sinc(z)=sin(z)/z. Use
-            of this scheme is not recommended.
+            \texttt{"Sinc"} --- Uses the ${\textrm{sinc}}({\pi}x)$ kernel, where
+            $x$ is the pixel offset from the interpolation point, and
+            ${\textrm{sinc}}(z)=\sin(z)/z$.  Use of this scheme is not recommended.
 
             \sstitem
-             \texttt{"} SincSinc\texttt{"}  -- Uses the sinc(pi$*$x)sinc(k$*$pi$*$x) kernel. A
-            valuable general-purpose scheme, intermediate in its visual
-            effect on NDFs between the bilinear and nearest-neighbour
-            schemes.
+            \texttt{"SincSinc"} --- Uses the ${\textrm{sinc}}({\pi}x){\textrm{sinc}}(k{\pi}x)$
+            A valuable general-purpose scheme, intermediate in its visual
+            effect on NDFs between the bi-linear and nearest-neighbour schemes.
 
             \sstitem
-             \texttt{"} SincCos\texttt{"}  -- Uses the sinc(pi$*$x)cos(k$*$pi$*$x) kernel. Gives
-            similar results to the \texttt{"} Sincsinc\texttt{"}  scheme.
+            \texttt{"SincCos"} --- Uses the ${\textrm{sinc}}({\pi}x)\cos(k{\pi}x)$
+            kernel.  Gives similar results to the \texttt{"SincSinc"} scheme.
 
             \sstitem
-             \texttt{"} SincGauss\texttt{"}  -- Uses the sinc(pi$*$x)exp(-k$*$x$*$x) kernel. Good
-            results can be obtained by matching the FWHM of the
+            \texttt{"SincGauss"} --- Uses the ${\textrm{sinc}}({\pi}x)e^{-kx^2}$
+            kernel.  Good results can be obtained by matching the FWHM of the
             envelope function to the point-spread function of the
             input data (see Parameter PARAMS).
 
             \sstitem
-             \texttt{"} Somb\texttt{"}  -- Uses the somb(pi$*$x) kernel, where x is the pixel
-            offset from the interpolation point (resampling) or transformed
-            input pixel centre (rebinning), and somb(z)=2$*$J1(z)/z (J1 is
-            the first-order Bessel function of the first kind. This scheme
-            is similar to the \texttt{"} Sinc\texttt{"}  scheme.
+            \texttt{"Somb"} --- Uses the  ${\textrm{somb}}({\pi}x)$ kernel, where
+            $x$ is the pixel offset from the interpolation point, and
+            ${\textrm{somb}}(z)=2*J_{1}(z)/z$. $J_1$ is the first-order Bessel
+            function of the first kind.  This scheme is similar to the
+            \texttt{"Sinc"} scheme.
 
             \sstitem
-             \texttt{"} SombCos\texttt{"}  -- Uses the somb(pi$*$x)cos(k$*$pi$*$x) kernel. This
-            scheme is similar to the \texttt{"} SincCos\texttt{"}  scheme.
+            \texttt{"SombCos"} --- Uses the ${\textrm{somb}}({\pi}x)\cos(k{\pi}x)$
+            kernel.  This scheme is similar to the \texttt{"SincCos"} scheme.
 
             \sstitem
-             \texttt{"} Gauss\texttt{"}  -- Uses the exp(-k$*$x$*$x) kernel. The FWHM of the Gaussian
-            is given by Parameter PARAMS(2), and the point at which to truncate
-            the Gaussian to zero is given by Parameter PARAMS(1).
+            \texttt{"Gauss"} --- Uses the $e^{-kx^2}$ kernel.  The FWHM of the
+            Gaussian is given by Parameter PARAMS(2), and the point at
+            which to truncate the Gaussian to zero is given by Parameter
+            PARAMS(1).
 
          }
          The initial default is \texttt{"} Nearest\texttt{"} .  [current value]
@@ -27843,7 +27845,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
       }{
          If an NDF is supplied, the values within the NDF at the positions
          specified in the input catalogue are displayed on the screen and
-         written to output parameter PIXVALS. The displayed values are
+         written to Output Parameter PIXVALS. The displayed values are
          calculated by interpolating between the NDF pixel values using
          the interpolation method specified by Parameter METHOD. The NDF
          array component to be displayed is specified by Parameter COMP. [!]
@@ -27865,20 +27867,20 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          PARAMS( 1 ) is required by all the above schemes.
          It is used to specify how many pixels are to contribute to the
          interpolated result on either side of the interpolation or
-         binning point in each dimension. Typically, a value of 2 is
-         appropriate and the minimum allowed value is 1 (i.e. one pixel
+         binning point in each dimension. Typically, a value of \texttt{2} is
+         appropriate and the minimum allowed value is \texttt{1} (i.e. one pixel
          on each side). A value of zero or fewer indicates that a
          suitable number of pixels should be calculated automatically.
          [0]
 
          PARAMS( 2 ) is required only by the Gauss, SombCos, SincSinc,
-         SincCos, and SincGauss schemes. For the SombCos, SincSinc and
+         SincCos, and SincGauss schemes. For the SombCos, SincSinc, and
          SincCos schemes, it specifies the number of pixels at which the
          envelope of the function goes to zero. The minimum value is
-         1.0, and the run-time default value is 2.0. For the Gauss and
-         SincGauss scheme, it specifies the full-width at half-maximum
+         \texttt{1.0}, and the run-time default value is \texttt{2.0}. For the Gauss and
+         SincGauss schemes, it specifies the full-width at half-maximum
          (FWHM) of the Gaussian envelope measured in output pixels.  The
-         minimum value is 0.1, and the run-time default is 1.0.  On
+         minimum value is \texttt{0.1}, and the run-time default is \texttt{1.0}.  On
          astronomical NDFs and spectra, good results are often obtained
          by approximately matching the FWHM of the envelope function,
          given by PARAMS(2), to the point-spread function of the input
@@ -27949,13 +27951,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
 
          }
          Each position may also be separately labelled with its integer
-         identifier value by giving a \texttt{TRUE} value for Parameter LABEL.  \texttt{["None"!]}
-      }
-      \sstsubsection{
-         PIXVALS() = \_DOUBLE (Write)
-      }{
-         The pixel values at the listed positions. Only used if a
-         non-null value is supplied for Parameter NDF.
+         identifier value by giving a \texttt{TRUE} value for Parameter LABEL.  \texttt{["None"]}
       }
       \sstsubsection{
          POSNS() = \_DOUBLE (Write)
@@ -28071,6 +28067,12 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          NUMBER = \_INTEGER (Write)
       }{
          The number of positions selected.
+      }
+      \sstsubsection{
+         PIXVALS() = \_DOUBLE (Write)
+      }{
+         The pixel values at the listed positions. Only used if a
+         non-null value is supplied for Parameter NDF.
       }
    }
    \sstexamples{
@@ -38866,7 +38868,7 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
          SincCos schemes, it specifies the number of pixels at which the
          envelope of the function goes to zero.  The minimum value is
          \texttt{1.0}, and the run-time default value is \texttt{2.0}.  For the
-         Gauss and SincGauss scheme, it specifies the full-width at half-maximum
+         Gauss and SincGauss schemes, it specifies the full-width at half-maximum
          (FWHM) of the Gaussian envelope.  The minimum value is \texttt{0.1}, and
          the run-time default is \texttt{1.0}.  On astronomical images and
          spectra, good results are often obtained by approximately
@@ -41175,7 +41177,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          SincCos schemes, it specifies the number of pixels at which
          the envelope of the function goes to zero.  The minimum value
          is \texttt{1.0}, and the run-time default value is \texttt{2.0}.
-         For the Gauss and SincGauss scheme, it specifies the
+         For the Gauss and SincGauss schemes, it specifies the
          full-width at half-maximum (FWHM) of the Gaussian envelope
          measured in output pixels.
          The minimum value is \texttt{0.1}, and the run-time default is
@@ -48335,7 +48337,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          and SincCos schemes, it specifies the number of pixels at
          which the envelope of the function goes to zero.  The minimum
          value is \texttt{1.0}, and the run-time default value is \texttt{
-         2.0}.  For the Gauss and SincGauss scheme, it specifies the
+         2.0}.  For the Gauss and SincGauss schemes, it specifies the
          full-width at half-maximum (FWHM) of the Gaussian envelope
          measured in output pixels.
          The minimum value is \texttt{0.1}, and the run-time default is
@@ -49446,7 +49448,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          SincCos schemes, it specifies the number of output pixels at
          which the envelope of the function goes to zero.  The minimum
          value is \texttt{1.0}, and the run-time default value is \texttt{
-         2.0}.  For the Gauss and SincGauss scheme, it specifies the
+         2.0}.  For the Gauss and SincGauss schemes, it specifies the
          full-width at half-maximum (FWHM) of the Gaussian envelope
          measured in output pixels.
          The minimum value is \texttt{0.1}, and the run-time default is
@@ -54436,6 +54438,15 @@ The following applications have been modified:
         right to left, depending on the nature of the WCS.
       \end{itemize}
 
+   \item [\htmlref{LISTSHOW}{LISTSHOW}]\mbox{}
+      \begin{itemize}
+        \item New parameters called NDF and COMP allow the data, error,
+        or variance values at the catalogued positions within a chosen
+        NDF to be displayed.  These use the interpolation method specified
+        by the new Parameters METHOD and PARAMS.  The pixel values are also
+        written to a new output parameter called PIXVALS.
+      \end{itemize}
+
    \item [\htmlref{SCATTER}{SCATTER}]\mbox{}
       \begin{itemize}
         \item A new parameter called FIT allows a linear fit to the scatter
@@ -54951,12 +54962,6 @@ The following applications have been modified:
         \item There is a new estimator option, \texttt{"FastMed"},
         that offers a substantially faster calculation of unweighted
         medians.
-      \end{itemize}
-
-   \item [\htmlref{LISTSHOW}{LISTSHOW}]\mbox{}
-      \begin{itemize}
-        \item A new parameter called NDF allows the data values at the
-        catalogued positions within a specified NDF to be displayed.
       \end{itemize}
 
    \item [\htmlref{SETAXIS}{SETAXIS}]\mbox{}

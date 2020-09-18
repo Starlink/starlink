@@ -18749,7 +18749,7 @@ iraf! {
             ppath DEFAULT
             prompt {NDF component to display}
             helpkey *
-            default DATA
+            default Data
          }
 
          parameter describe {

@@ -43,6 +43,15 @@
       increase from right to left, depending on the nature of the
       WCS.
 
+   o  LISTSHOW
+
+      - New parameters called NDF and COMP allow the data, error, or
+      variance values at the catalogued positions within a chosen
+      NDF to be displayed.  These use the interpolation method
+      specified  by the new Parameters METHOD and PARAMS.  The pixel
+      values are also written to a new output parameter called
+      PIXVALS.
+
    o  SCATTER
 
       -  A new parameter called FIT allows a linear fit to the scatter
