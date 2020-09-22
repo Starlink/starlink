@@ -3063,6 +3063,8 @@ class Equals(Item):
                if dtype[0] == "bool":
                   if expr in varmap:
                      fvar = varmap[expr]
+                  else:
+                     fvar = None
                   if fvar and fvar.ctype.endswith("*"):
                      self.isboolptr = True
                   dtype[0] = "int"
@@ -4631,7 +4633,7 @@ class ProSection(Unit):
       return pro
 
    def appendBody( self, body ):
-      if isinstance(body, basestring):
+      if isinstance(body, str):
          self.append( Comment( self.start, body, COM_PROLOGUE ) )
       else:
          for text in body:
