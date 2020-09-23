@@ -44,7 +44,7 @@ kpg1Fit1d.c kpg1_fit1d.c kpg1_asndf.c kpg1_asndf8.c kpg1Asndf.c \
 kpg1Asndf8.c kpg1Axcpy.c kpg1_getoutline.c kpg1Rnorm.c kpg1_rnorm.c \
 kpg1CrMapD.c kpg1_crmapd.c kpg1_osta8.c kpg1_cputm.c kpg1Badbits.c
 
-CGEN_ROUTINES = kpgOsta8.cgen kpg1SymFit.cgen
+CGEN_ROUTINES = kpgOsta8.cgen kpg1SymFit.cgen kpgMul.cgen kpgDiv.cgen
 
 # The .c files which are built from the above .cgen files.
 BUILT_C_ROUTINES = $(CGEN_ROUTINES:.cgen=.c) $(KPG_N_CGEN:.cn=.c)

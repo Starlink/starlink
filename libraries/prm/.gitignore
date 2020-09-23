@@ -78,3 +78,7 @@
 /vecW2x.c
 /vecWtox.c
 /vec8*
+/vecAddx.c
+/vecDivx.c
+/vecMulx.c
+/vecSubx.c

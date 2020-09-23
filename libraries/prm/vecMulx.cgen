@@ -1,0 +1,165 @@
+#include <stddef.h>
+#include "sae_par.h"
+
+void CGEN_FUNCTION(vecMul)( char bad, size_t n, const CGEN_TYPE *argv1,
+                            const CGEN_TYPE *argv2, CGEN_TYPE *resv,
+                            size_t *ierr, size_t *nerr, int *status ){
+/*
+*+
+*  Name:
+*     vecMul<t>
+
+*  Purpose:
+*     Vectorised CGEN_TYPE multiplication operation.
+
+*  Synopsis:
+*     void CGEN_FUNCTION(vecMul)( char bad, size_t n, const CGEN_TYPE *argv1,
+*                                 const CGEN_TYPE *argv2, CGEN_TYPE *resv,
+*                                 size_t *ierr, size_t *nerr, int *status )
+
+*  Description:
+*     The routine performs an arithmetic multiplication operation between
+*     two vectorised arrays ARGV1 and ARGV2 of CGEN_TYPE values.  If
+*     numerical errors occur, the value VAL__BAD<T> is returned in
+*     appropriate elements of the result array RESV (but no STATUS value
+*     is set).
+
+*  Arguments:
+*     bad
+*        A boolean value indicating whether the argument values ("argv")
+*        may be "bad".
+*     n
+*        The number of values to be processed.  If "n" is zero the function
+*        returns with "ierr" and "nerr" set to zero, but without converting
+*        any values.
+*     argv1
+*        The first array of "n" values for the multiplication operation.
+*     argv2
+*        The second array of "n" values for the multiplication operation.
+*     resv
+*        A vectoried (1-dimensional) array of at least "n" elements to
+*        receive the results. Each element "i" of "resv" receives the
+*        CGEN_TYPE value:
+*
+*           resv[ i ] = argv1[ i ] * argv2[ i ]
+*
+*        for i = 1 to n.  The value VAL__BAD<T> will be set in
+*        appropriate elements of "resv" under error conditions.
+*     ierr
+*        Returned holding the index of the first input array element to
+*        generate a numerical error.  Zero is returned if no errors occur.
+*     nerr
+*        Returned holding a count of the number of numerical errors that
+*        occur.
+*     status
+*        This should be set to SAI__OK on entry, otherwise the routine
+*        returns without action.
+
+*  Copyright:
+*     Copyright (C) 2020 East Asian Observatory.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     22-SEP-2020 (DSB):
+*        Original C version.
+
+*-
+*/
+
+/* Local Variables: */
+   CGEN_TYPE *pout;      /* Pointer to next output value */
+   CGEN_BIG_TYPE res;    /* Pointer to next output value */
+   const CGEN_TYPE *pin1;/* Pointer to first input value */
+   const CGEN_TYPE *pin2;/* Pointer to second input value */
+   size_t i;             /* Loop counter */
+
+/* Initialise the numerical error pointer and the error count. */
+   *ierr = 0;
+   *nerr = 0;
+
+/* Check status. */
+   if( *status != SAI__OK ) return;
+
+/* Initialise pointers to the next input and output values. */
+   pin1 = argv1;
+   pin2 = argv2;
+   pout = resv;
+
+/* If the bad data flag is set:
+   ---------------------------
+   Loop to process each element of the input array in turn. */
+   if( bad ) {
+      for( i = 0; i < n; i++,pin1++,pin2++,pout++ ) {
+
+/* Check if either input value is bad.  If it is, then put a value of
+   VAL__BAD<T> in the corresponding element of the result array. */
+         if( *pin1 == CGEN_BAD || *pin2 == CGEN_BAD ) {
+            *pout = CGEN_BAD;
+
+/* Otherwise do the sum. */
+         } else {
+
+/* To ensure no overflow occurs, use a result that has a bigger type. */
+            res = ((CGEN_BIG_TYPE) *pin1) * ((CGEN_BIG_TYPE) *pin2);
+
+/* Check the result is within the valid data range. If not, indicate a
+   numerical error has occurred. */
+            if( res > (CGEN_BIG_TYPE) CGEN_MIN &&
+                res < (CGEN_BIG_TYPE) CGEN_MAX ){
+               *pout = (CGEN_TYPE) res;
+
+            } else {
+               *pout = CGEN_BAD;
+               (*nerr)++;
+
+/* Set the first error pointer if this is the first error. */
+               if( *nerr == 1 ) *ierr = i;
+            }
+         }
+      }
+
+/* If the bad data flag is not set,
+   -------------------------------
+   Loop to process each element of the input array in turn. */
+   } else {
+      for( i = 0; i < n; i++,pin1++,pin2++,pout++ ) {
+
+/* Do the sum. To ensure no overflow occurs, use a result that has a
+   bigger type. */
+         res = ((CGEN_BIG_TYPE) *pin1) * ((CGEN_BIG_TYPE) *pin2);
+
+/* Check the result is within the valid data range. If not, indicate a
+   numerical error has occurred. */
+         if( res > (CGEN_BIG_TYPE) CGEN_MIN &&
+             res < (CGEN_BIG_TYPE) CGEN_MAX ){
+            *pout = (CGEN_TYPE) res;
+         } else {
+            *pout = CGEN_BAD;
+            (*nerr)++;
+
+/* Set the first error pointer if this is the first error. */
+            if( *nerr == 1 ) *ierr = i;
+         }
+      }
+   }
+}
+

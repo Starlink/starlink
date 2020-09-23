@@ -4,3 +4,5 @@
 
 void CGEN_FUNCTION(kpgOsta8)( ThrWorkForce *wf, int bad, int64_t el, const CGEN_TYPE *data, int nclip, const float *clip, int64_t istat[3], double dstat[7], int64_t istatc[3], double dstatc[7], int *status );
 void CGEN_FUNCTION(kpg1SymFit)( int64_t n, const CGEN_TYPE *x, const CGEN_TYPE *y, CGEN_TYPE xlo, CGEN_TYPE xhi, CGEN_TYPE ylo, CGEN_TYPE yhi, int clip, double *m, double *b, double *rms, int *status );
+void CGEN_FUNCTION(kpgMul)( ThrWorkForce *wf, int bad, int var, size_t el, const CGEN_TYPE *a, const CGEN_TYPE *va, const CGEN_TYPE *b, const CGEN_TYPE *vb, CGEN_TYPE *c, CGEN_TYPE *vc, size_t *nerr, int *status );
+void CGEN_FUNCTION(kpgDiv)( ThrWorkForce *wf, int bad, int var, size_t el, const CGEN_TYPE *a, const CGEN_TYPE *va, const CGEN_TYPE *b, const CGEN_TYPE *vb, CGEN_TYPE *c, CGEN_TYPE *vc, size_t *nerr, int *status );

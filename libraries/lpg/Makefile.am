@@ -2,6 +2,9 @@
 
 dist_bin_SCRIPTS = lpg_link_adam
 
+cincludedir = $(includedir)/star
+cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
+
 lib_LTLIBRARIES = liblpg.la
 
 liblpg_la_SOURCES = \
@@ -12,10 +15,11 @@ liblpg_la_SOURCES = \
 
 PRIVATE_INCLUDES = LPG_COM LPG_CONST
 BLOCK_DATA_FILES = lpg1_init.f
+PUBLIC_C_INCLUDES = lpg.h
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
-C_ROUTINES = lpg1_sleep.c lpg1_tmpnm.c
+C_ROUTINES = lpg1_sleep.c lpg1_tmpnm.c lpg.c
 
 F_ROUTINES = \
 lpg1_addtm.f lpg1_ptpar.f lpg1_tidy.f lpg1_tmpcp.f lpg_again.f \

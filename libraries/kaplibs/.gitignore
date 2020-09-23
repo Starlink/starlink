@@ -320,4 +320,6 @@
 /kpg/kpg_stos.f
 /kpg/kpg_stos8.f
 /kpg/notes
+/kpg/kpgMul.c
+/kpg/kpgDiv.c
 /sun238.pdf
