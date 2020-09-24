@@ -356,7 +356,7 @@
 *     supported.
 *     -  All non-complex numeric data types can be handled.
 *     -  Handles data of up to 7 dimensions.
-*     -  Huge NDF are supported.
+*     -  Huge NDFs are supported.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research

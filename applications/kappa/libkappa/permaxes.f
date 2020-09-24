@@ -74,7 +74,7 @@
 *     supported.
 *     -  All non-complex numeric data types can be handled.  The data
 *     type of the input pixels is preserved in the output NDF.
-*     -  Huge NDF are supported.
+*     -  Huge NDFs are supported.
 
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research

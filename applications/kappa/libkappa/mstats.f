@@ -276,7 +276,7 @@
 *     structures contain values with other data types, then conversion
 *     will be performed as necessary.
 *     -  Up to six NDF dimensions are supported.
-*     -  Huge NDF are supported.
+*     -  Huge NDFs are supported.
 
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research

@@ -193,7 +193,7 @@
 *     together with all extensions.  The output NDF's title may be
 *     modified, if required, by specifying a new value via the TITLE
 *     parameter.
-*     -  Huge NDF are supported.
+*     -  Huge NDFs are supported.
 *
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.

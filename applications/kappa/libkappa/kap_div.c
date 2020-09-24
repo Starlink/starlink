@@ -80,6 +80,7 @@ F77_SUBROUTINE(kap_div)( INTEGER(STATUS) ){
 *     precision arithmetic, whichever is more appropriate.  If the
 *     input NDF structures contain values with other data types, then
 *     conversion will be performed as necessary.
+*     -  Huge NDFs are supported.
 
 *  Copyright:
 *     Copyright (C) 2020 East Asian Observatory

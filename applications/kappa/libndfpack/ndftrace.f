@@ -233,7 +233,7 @@
 *     KAPPA: WCSFRAME; HDSTRACE
 
 *  Implementation Status:
-*     -  Huge NDF are supported.
+*     -  Huge NDFs are supported.
 
 *  Copyright:
 *     Copyright (C) 1990-1994 Science & Engineering Research Council.

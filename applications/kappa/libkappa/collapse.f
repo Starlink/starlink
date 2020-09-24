@@ -304,7 +304,7 @@
 *     supported.
 *     -  All non-complex numeric data types can be handled.
 *     -  Any number of NDF dimensions is supported.
-*     -  Huge NDF are supported.
+*     -  Huge NDFs are supported.
 
 *  Copyright:
 *     Copyright (C) 2000-2001, 2004 Central Laboratory of the Research

@@ -91,6 +91,7 @@ F77_SUBROUTINE(sub)( INTEGER(STATUS) ){
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.
+*     -  Huge NDFs are supported.
 
 *  Copyright:
 *     Copyright (C) 2020 East Asian Observatory
