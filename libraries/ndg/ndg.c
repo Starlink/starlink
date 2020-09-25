@@ -142,6 +142,49 @@ void ndgNdfcr( const Grp* igrp, size_t index, const char ftype[], int ndim,
 		       INTEGER_ARG(&INDF), INTEGER_ARG(&STATUS)
 		       TRAIL_ARG(FTYPE) ); )
 
+  F77_FREE_INTEGER( LBND );
+  F77_FREE_INTEGER( UBND );
+
+  F77_IMPORT_INTEGER( STATUS, *status );
+  F77_IMPORT_INTEGER( INDF, *indf );
+
+}
+
+F77_SUBROUTINE(ndg_ndfcr8)( INTEGER(IGRP), INTEGER(INDEX), CHARACTER(FTYPE), INTEGER(NDIM),
+                            INTEGER8(LBND), INTEGER8(UBND), INTEGER(INDF), INTEGER(STATUS)
+			    TRAIL(FTYPE) );
+
+void ndgNdfcr8( const Grp* igrp, size_t index, const char ftype[], int ndim,
+	        const hdsdim lbnd[], const hdsdim ubnd[], int * indf,
+                int * status ) {
+
+  DECLARE_INTEGER(IGRP);
+  DECLARE_INTEGER(INDEX);
+  DECLARE_CHARACTER(FTYPE, NDF__SZFTP);
+  DECLARE_INTEGER(NDIM);
+  DECLARE_INTEGER8_ARRAY_DYN(LBND);
+  DECLARE_INTEGER8_ARRAY_DYN(UBND);
+  DECLARE_INTEGER(INDF);
+  DECLARE_INTEGER(STATUS);
+
+  F77_CREATE_INTEGER8_ARRAY( LBND, ndim );
+  F77_EXPORT_INTEGER8_ARRAY( lbnd, LBND, ndim );
+  F77_CREATE_INTEGER8_ARRAY( UBND, ndim );
+  F77_EXPORT_INTEGER8_ARRAY( ubnd, UBND, ndim );
+  IGRP = grpC2F( igrp, status );
+  F77_EXPORT_INTEGER( index, INDEX );
+  F77_EXPORT_CHARACTER( ftype, FTYPE, NDF__SZFTP );
+  F77_EXPORT_INTEGER( ndim, NDIM );
+  F77_EXPORT_INTEGER(*status, STATUS );
+
+  F77_LOCK( F77_CALL(ndg_ndfcr)( INTEGER_ARG(&IGRP), INTEGER_ARG(&INDEX), CHARACTER_ARG(FTYPE),
+		       INTEGER_ARG(&NDIM), INTEGER_ARRAY_ARG(LBND), INTEGER_ARRAY_ARG(UBND),
+		       INTEGER_ARG(&INDF), INTEGER_ARG(&STATUS)
+		       TRAIL_ARG(FTYPE) ); )
+
+  F77_FREE_INTEGER8( LBND );
+  F77_FREE_INTEGER8( UBND );
+
   F77_IMPORT_INTEGER( STATUS, *status );
   F77_IMPORT_INTEGER( INDF, *indf );
 

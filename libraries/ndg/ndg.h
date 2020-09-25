@@ -110,6 +110,7 @@ void ndgHideProv( NdgProvenance *, int, int * );
 void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km, int *status );
 void ndgNdfas( const Grp *igrp, size_t index, const char mode[], int *indf, int *status );
 void ndgNdfcr( const Grp *igrp, size_t index, const char ftype[], int ndim, const int lbnd[], const int ubnd[], int *indf, int *status );
+void ndgNdfcr8( const Grp *igrp, size_t index, const char ftype[], int ndim, const hdsdim lbnd[], const hdsdim ubnd[], int *indf, int *status );
 void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, size_t index, int *indf2, int *status);
 void ndgNdfco( int indf1, const Grp *igrp, size_t index, int *indf2, int *status);
 void ndgPutProv( NdgProvenance *prov, int indf, AstKeyMap *more, int isroot, int *status );

@@ -1,8 +1,8 @@
-      SUBROUTINE NDG_NDFCR( IGRP, INDEX, FTYPE, NDIM, LBND, UBND, INDF,
+      SUBROUTINE NDG_NDFCR8( IGRP, INDEX, FTYPE, NDIM, LBND, UBND, INDF,
      :                      STATUS )
 *+
 *  Name:
-*     NDG_NDFCR
+*     NDG_NDFCR8
 
 *  Purpose:
 *     Obtain an NDF identifier for a new simple NDF.
@@ -11,13 +11,13 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDG_NDFCR( IGRP, INDEX, FTYPE, NDIM, LBND, UBND, INDF,
+*     CALL NDG_NDFCR8( IGRP, INDEX, FTYPE, NDIM, LBND, UBND, INDF,
 *                     STATUS )
 
 *  Description:
-*     The routine returns an NDF identifier for a new simple NDF created
-*     with the specified attributes. The name of the new NDF is held
-*     at a given index within a given group. It is equivalent to NDF_CREAT.
+*     This routine is equivalent to NDG_NDFCR except that arguments
+*     LBND and UBND are INTEGER*8 instead of INTEGER. See NDG_NDFCR for
+*     more information.
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
@@ -32,9 +32,9 @@
 *        'COMPLEX_REAL').
 *     NDIM = INTEGER (Given)
 *        Number of NDF dimensions.
-*     LBND( NDIM ) = INTEGER (Given)
+*     LBND( NDIM ) = INTEGER*8 (Given)
 *        Lower pixel-index bounds of the NDF.
-*     UBND( NDIM ) = INTEGER (Given)
+*     UBND( NDIM ) = INTEGER*8 (Given)
 *        Upper pixel-index bounds of the NDF.
 *     INDF = INTEGER (Returned)
 *        NDF identifier.
@@ -42,10 +42,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
-*     Copyright (C) 1992 Science & Engineering Research Council.
-*     Copyright (C) 1997 Central Laboratory of the Research Councils.
-*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2020 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -65,23 +62,13 @@
 *     02110-1301, USA
 
 *  Authors:
-*     DSB: D.S. Berry (STARLINK)
-*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: D.S. Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
-*     12-AUG-1992 (DSB):
-*        Original version.
-*     29-AUG-1997 (DSB):
-*        Modified to use automatica NDF data conversion.
-*     7-MAR-2006 (DSB):
-*        Switch off interpretation of shell metacharacters by HDS.
-*     2010-03-18 (TIMJ):
-*        Use PSX_WORDEXP instead of ONE_SHELL_ECHO
-*     2011-03-08 (TIMJ):
-*        Use ONE_WORDEXP_NOGLOB
 *     25-SEP-2020 (DSB):
-*        Changed to be a thin wrapper round NDG_NDFCP8.
+*        Original version, copied from NDG_NDFCR and changed to use
+*        INTEGER*8 bounds.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -94,15 +81,18 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! DAT constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'GRP_PAR'          ! GRP constants.
+      INCLUDE 'NDG_CONST'          ! NDG constants.
 
 *  Arguments Given:
       INTEGER IGRP
       INTEGER INDEX
       CHARACTER FTYPE*(*)
       INTEGER NDIM
-      INTEGER LBND( NDIM )
-      INTEGER UBND( NDIM )
+      INTEGER*8 LBND( NDIM )
+      INTEGER*8 UBND( NDIM )
 
 *  Arguments Returned:
       INTEGER INDF
@@ -111,9 +101,10 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER I
-      INTEGER*8 LBND8( NDF__MXDIM )
-      INTEGER*8 UBND8( NDF__MXDIM )
+      CHARACTER NAME*(GRP__SZNAM)! NDF file name (without file type).
+      CHARACTER ENAME*(GRP__SZNAM)! Expanded NDF file name
+      INTEGER PLACE              ! NDF placeholder.
+      INTEGER SHELL              ! Original value of HDS SHELL tuning param
 *.
 
 *  Set an initial value for the INDF argument.
@@ -122,14 +113,53 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Convert the supplied INTEGER bounds to INTEGER*8
-      DO I = 1, NDIM
-         LBND8( I ) = LBND( I )
-         UBND8( I ) = UBND( I )
-      END DO
+*  Set the group case insensitive if the host file system is case
+*  insensitive.
+      IF( NDG__UCASE ) CALL GRP_SETCS( IGRP, .FALSE., STATUS )
 
-*  Call the 8-byte version of this routine.
-      CALL NDG_NDFCR8( IGRP, INDEX, FTYPE, NDIM, LBND8, UBND8, INDF,
-     :                 STATUS )
+*  Get the required name.
+      CALL GRP_GET( IGRP, INDEX, 1, NAME, STATUS )
+
+*  If the name could not be obtained, set the name blank and abort.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         NAME = ' '
+         GO TO 999
+      END IF
+
+*  Expand any shell metacharacters in it. Having done this we can safely
+*  switch off HDS metacharacter interpretation, since HDS has problems
+*  with spaces in file names.
+      CALL ONE_WORDEXP_NOGLOB( NAME, ENAME, STATUS )
+      CALL HDS_GTUNE( 'SHELL', SHELL, STATUS )
+      CALL HDS_TUNE( 'SHELL', -1, STATUS )
+
+*  Create the NDF place holder.
+      CALL NDG1_OPEN( ENAME, PLACE, STATUS )
+
+*  Create the NDF.
+      CALL NDF_NEW8( FTYPE, NDIM, LBND, UBND, PLACE, INDF, STATUS)
+
+*  Re-instate the original HDS SHELL value.
+      CALL ERR_BEGIN( STATUS )
+      CALL HDS_TUNE( 'SHELL', SHELL, STATUS )
+      CALL ERR_END( STATUS )
+
+*  If an error occured, add context information.
+ 999  CONTINUE
+
+      IF ( STATUS .NE. SAI__OK ) THEN
+
+         IF( NAME .NE. ' ' ) THEN
+            CALL MSG_SETC( 'NAME', NAME )
+            CALL ERR_REP( 'NDG_NDFCR8_ERR1', 'Unable to get an NDF '//
+     :                    'identifier for ''^NAME''.', STATUS )
+
+         ELSE
+            CALL ERR_REP( 'NDG_NDFCR8_ERR2', 'Unable to get an NDF '//
+     :                    'identifier for a new data set.', STATUS )
+
+         END IF
+
+      END IF
 
       END

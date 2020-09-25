@@ -358,6 +358,10 @@
 
 /* Include files. */
 /* -------------- */
+
+/* Use the 8-byte NDF interface. */
+#define NDF_I8 1
+
 /* Starlink packages. */
 #include "star/hds.h"
 #include "star/hds_fortran.h"
