@@ -18,5 +18,5 @@ SCALE	<Current mapping is not isotropic>
 BLANK   <Blank ARD expression supplied>
 NOPIX   <No PIXEL coordinate Frame supplied>
 NOTST   <Cannot find a good test point>
-
+TOOBG   <Input bounds are too big>
 .END

@@ -61,6 +61,20 @@ void ardWork( const Grp *grp,
               int *ubnde,
               int *status );
 
+void ardWork8( const Grp *grp,
+              int ndim,
+              const int64_t *lbnd,
+              const int64_t *ubnd,
+              const float *trcoef,
+              int concat,
+              int *regval,
+              int *mask,
+              int64_t *lbndi,
+              int64_t *ubndi,
+              int64_t *lbnde,
+              int64_t *ubnde,
+              int *status );
+
 void ardGrpex( const char *desc,
                const Grp *grp1,
                Grp **grp2,
