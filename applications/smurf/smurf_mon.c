@@ -311,6 +311,7 @@ void smurf_mon( int * status ) {
   astUnlock( smurf_global_keymap, 1 );
 
   /* Record the current CPU time in CPUTIM. */
+  junk = VAL__BADD;
   kpg1Cputm( cputim, &junk );
 
   /* Call the subroutine associated with the requested task */
