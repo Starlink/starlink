@@ -10,7 +10,7 @@
 
 HDSLoc *cupidReinhold( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *ipd,
                      double *ipv, double rms, AstKeyMap *config, int velax,
-                     double beamcorr[ 3 ], int *nrej, int *status ){
+                     double beamcorr[ 3 ], size_t *nrej, int *status ){
 /*
 *+
 *  Name:
@@ -27,7 +27,7 @@ HDSLoc *cupidReinhold( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *i
 *     HDSLoc *cupidReinhold( int type, int ndim, hdsdim *slbnd, hdsdim *subnd,
 *                          void *ipd, double *ipv, double rms,
 *                          AstKeyMap *config, int velax,
-*                          double beamcorr[ 3 ], int *nrej, int *status )
+*                          double beamcorr[ 3 ], size_t *nrej, int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data

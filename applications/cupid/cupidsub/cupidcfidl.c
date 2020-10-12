@@ -102,6 +102,7 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, hdsdim *dims,
 
 /* Local Variables: */
    hdsdim *p;       /* Pointer to array of GRID coords at clump peak */
+   hdsdim d;        /* Axis increment from peak to pixel */
    hdsdim ix;       /* GRID index on 1st axis */
    hdsdim iy;       /* GRID index on 2nd axis */
    hdsdim iz;       /* GRID index on 3rd axis */
@@ -112,7 +113,6 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, hdsdim *dims,
    int *v;          /* Pointer to next array element */
    int d2;          /* Squared distance from peak to pixel */
    int d2min;       /* Minimum squared distance found so far */
-   int d;           /* Axis increment from peak to pixel */
    int edge;        /* Pixel at upper or lower bound on any axis? */
    int i;           /* Loop count */
    int iclump;      /* Clump index */

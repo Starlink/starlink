@@ -7,7 +7,7 @@
 #include "star/ndg.h"
 
 HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, size_t nel,
-                                  int ndim, hdsdim dims[ 3 ], hdsdim skip[ 3 ],
+                                  int ndim, hdsdim dims[ 3 ], size_t skip[ 3 ],
                                   hdsdim slbnd[ 3 ], int index, hdsdim clbnd[ 3 ],
                                   hdsdim cubnd[ 3 ], AstKeyMap *extra,
                                   HDSLoc *obj, double maxbad, int *status ){
@@ -24,7 +24,7 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, size_t nel,
 
 *  Synopsis:
 *     HDSLoc *cupidNdfClump<X>( CGEN_TYPE *ipd, int *ipa, size_t nel, int ndim,
-*                            hdsdim dims[ 3 ], hdsdim skip[ 3 ], hdsdim slbnd[ 3 ],
+*                            hdsdim dims[ 3 ], size_t skip[ 3 ], hdsdim slbnd[ 3 ],
 *                            int index, hdsdim clbnd[ 3 ], hdsdim cubnd[ 3 ],
 *                            AstKeyMap *extra, HDSLoc *obj, double maxbad,
 *                            int *status )

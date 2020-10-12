@@ -125,15 +125,15 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
    double *pm;      /* Pointer to next value in "mlist" */
    double d;        /* Pixel value */
    double vmin;     /* Minimum value in the clump */
+   hdsdim i;        /* GRID axis 1 value of next array element */
+   hdsdim j;        /* GRID axis 2 value of next array element */
+   hdsdim k;        /* GRID axis 3 value of next array element */
    int *pp;         /* Pointer to next value in "plist" */
    int *v1;         /* Pointer to element at start of this row */
    int *v2;         /* Pointer to element at start of this plane */
    int *v;          /* Pointer to next array element */
    int bel;         /* No. of elements in PixelSet bounding box */
-   int i;           /* GRID axis 1 value of next array element */
    int index;       /* Index value of the supplied PixelSet */
-   int j;           /* GRID axis 2 value of next array element */
-   int k;           /* GRID axis 3 value of next array element */
 
 /* Initialise */
    *list_size = 0;

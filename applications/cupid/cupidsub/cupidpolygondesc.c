@@ -113,26 +113,26 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
    double *verts;           /* Pointer to memory holding vertex axis values */
    double pos[ 2 ];         /* Normalised vertex position */
    hdsdim inside[ 2 ];      /* Spatial pixel indices at clump peak */
-   int *iph;                /* Pointer to histogram array */
    int *ipm;                /* Pointer to 2D mask array */
    int *pm;                 /* Pointer to next 2D mask element */
-   int hi;                  /* Highest no. of  spectral channels in 2D mask */
-   int hist_size;           /* Length of histogram array */
-   int lo;                  /* Lowest no. of  spectral channels in 2D mask */
    int max;                 /* Maximum mask value */
    int nvert;               /* Number of vertices in Polygon */
-   int target;              /* Threshold for no. of spectral channels */
-   int tot;                 /* Total no. of  spectral channels in 2D mask */
    int v;                   /* Current mask value */
+   size_t *iph;             /* Pointer to histogram array */
    size_t *pix;             /* Pointer to X spatial index in 3D data */
    size_t *piy;             /* Pointer to Y spatial index in 3D data */
    size_t dim[ 3 ];         /* Array pixel dimensions */
+   size_t hi;               /* Highest no. of  spectral channels in 2D mask */
+   size_t hist_size;        /* Length of histogram array */
    size_t i;                /* Pixel index on 1st pixel axis */
    size_t j;                /* Pixel index on 2nd pixel axis */
    size_t k;                /* Pixel index on 3rd pixel axis */
+   size_t lo;               /* Lowest no. of  spectral channels in 2D mask */
    size_t nel;              /* Number of elements in 2D mask */
    size_t nx;               /* X dimension of 2D mask */
    size_t ny;               /* Y dimension of 2D mask */
+   size_t target;           /* Threshold for no. of spectral channels */
+   size_t tot;              /* Total no. of  spectral channels in 2D mask */
 
 /* Abort if an error has already occurred, or if the data is
    one-dimensional. */
@@ -168,8 +168,8 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
          }
 
 /* Store the pixel indices of the clump peak. */
-         inside[ 0 ] = (int)floor( peak[ space_axes[ 0 ] ] + 1.0 );
-         inside[ 1 ] = (int)floor( peak[ space_axes[ 1 ] ] + 1.0 );
+         inside[ 0 ] = (hdsdim)floor( peak[ space_axes[ 0 ] ] + 1.0 );
+         inside[ 1 ] = (hdsdim)floor( peak[ space_axes[ 1 ] ] + 1.0 );
 
 /* If the data is 3D, we need to collapse the supplied 3D mask array along
    the spectral axis to get a 2D mask. */

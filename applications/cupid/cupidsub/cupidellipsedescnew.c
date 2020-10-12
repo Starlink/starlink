@@ -156,8 +156,6 @@ AstRegion *cupidEllipseDescNew( AstFrame *pixel_frm, double *ipd, int velax,
    double rmin1;
    double rmin2;
    double rmin;
-   double s1;
-   double s2;
    double t;
    double theta;
    double x[3];
@@ -175,7 +173,6 @@ AstRegion *cupidEllipseDescNew( AstFrame *pixel_frm, double *ipd, int velax,
    hdsdim k;
    int ii;
    int jj;
-   int ns;
    int sorted;
 
 /* Abort if an error has already occurred, or if the data is
@@ -491,13 +488,13 @@ static void cupid1FitParabola( int nbin, double *hist, int box, int oper,
    double x;
    double xmax;
    double y;
+   hdsdim i;
    hdsdim ihi;
    hdsdim ilo;
+   hdsdim j;
    hdsdim n;
    hdsdim nrej;
-   int i;
    int iter;
-   int j;
    int niter = 3;
 
 /* Check inherited status */

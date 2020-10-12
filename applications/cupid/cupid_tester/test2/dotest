@@ -1,7 +1,7 @@
 #!/bin/tcsh
 #
 #  Test Description:
-#     GaussClumps: 1D data containing 3 low noise gaussians, two of which 
+#     GaussClumps: 1D data containing 3 low noise gaussians, two of which
 #     overlap.
 #
 #  Test Notes:
@@ -16,16 +16,16 @@ $CUPID_DIR/findclumps in="testdata" \
                       deconv=no \
                       outcat=testout.FIT \
                       repconf=no \
-                      ilevel=0 \
+                      quiet \
                       accept
 
 $KAPPA_DIR/sub testout testmodel diff
 $KAPPA_DIR/stats diff > /dev/null
 
-set wantsum=5.10479342518374
-set wantmin=-0.296462535858154
-set wantmax=0.354020118713379
-set wantsigma=0.0487489646473199
+set wantsum=5.03490463085473
+set wantmin=-0.262732982635498
+set wantmax=0.345757007598877
+set wantsigma=0.0492382170247626
 set wantngood=1001
 
 set got=`$KAPPA_DIR/parget total stats`

@@ -4,7 +4,7 @@
 #include "mers.h"
 #include <float.h>
 
-CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel,
+CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, size_t nel,
          int *status ){
 /*
 *+
@@ -18,7 +18,7 @@ CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel,
 *     Starlink C
 
 *  Synopsis:
-*     CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel,
+*     CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, size_t nel,
 *        int *status )
 
 *  Description:
@@ -79,9 +79,9 @@ CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel,
 */
 
 /* Local Variables: */
+   size_t i;              /* Index of neighbouring PixelSet */
 
-   int i;              /* Index of neighbouring PixelSet */
-
+/* Check a PixelSet was supplied. */
    if( !ps ) return NULL;
 
 /* If required, check that no pixels are still assigned to the PixelSet

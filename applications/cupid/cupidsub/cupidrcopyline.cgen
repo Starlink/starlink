@@ -2,10 +2,10 @@
 #include "cupid.h"
 #include "prm_par.h"
 
-int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, size_t *vout,
-                                   hdsdim x0[3], size_t iv0, size_t vskip,
-                                   int xskip[3], hdsdim dims[3],
-                                   int *status ){
+size_t CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, size_t *vout,
+                                      hdsdim x0[3], size_t iv0, size_t vskip,
+                                      int xskip[3], hdsdim dims[3],
+                                      int *status ){
 /*
 *+
 *  Name:
@@ -19,9 +19,9 @@ int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, size_t *vout,
 *     Starlink C
 
 *  Synopsis:
-*     int cupidRCopyLine<X>( CGEN_TYPE *in, double *dout, size_t *vout,
-*                            hdsdim x0[3], size_t iv0, size_t vskip,
-*                            int xskip[3], hdsdim dims[3], int *status )
+*     size_t cupidRCopyLine<X>( CGEN_TYPE *in, double *dout, size_t *vout,
+*                               hdsdim x0[3], size_t iv0, size_t vskip,
+*                               int xskip[3], hdsdim dims[3], int *status )
 
 *  Description:
 *     This functions copies a line of data from the input 3D array into

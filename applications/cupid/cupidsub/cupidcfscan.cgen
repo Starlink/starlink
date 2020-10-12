@@ -6,7 +6,7 @@
 #include "mers.h"
 
 CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, size_t nel,
-                                            int ndim, hdsdim dims[3], hdsdim skip[3],
+                                            int ndim, hdsdim dims[3], size_t skip[3],
                                             int perspectrum, CupidPixelSet **clumps,
                                             int idl, double clevel, int *index,
                                             int naxis, int newok,
@@ -25,7 +25,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, size_t nel
 
 *  Synopsis:
 *     CupidPixelSet **cupidCFScan<X>( CGEN_TYPE *ipd, int *ipa, size_t nel,
-*                                     int ndim, hdsdim dims[3], hdsdim skip[3],
+*                                     int ndim, hdsdim dims[3], size_t skip[3],
 *                                     int perspectrum, CupidPixelSet **clumps,
 *                                     int idl, double clevel, int *index,
 *                                     int naxis, int newok,

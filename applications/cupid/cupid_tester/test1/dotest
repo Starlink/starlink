@@ -1,17 +1,17 @@
 #!/bin/tcsh
 #
 #  Test Description:
-#     GaussClumps: 1D data containing a few well separated gaussians with 
+#     GaussClumps: 1D data containing a few well separated gaussians with
 #     high noise.
 #
 #  Test Notes:
-#     - The high noise level means that the highest pixel value can be some 
-#     way from the real clump peak. The default values of 1.0 for "sa" and 
+#     - The high noise level means that the highest pixel value can be some
+#     way from the real clump peak. The default values of 1.0 for "sa" and
 #     "sc" prevent the fitted peak from moving far from the actual peak value
-#     (the default values are high in order to prevent overlapping gaussians 
-#     being fitted as a single Gaussian). The lower values used in this test 
-#     for "sa" and "sc" improve the fitted peak position. Using values of 
-#     zero for "sa" and "sc" produced better fits, but this would be no good 
+#     (the default values are high in order to prevent overlapping gaussians
+#     being fitted as a single Gaussian). The lower values used in this test
+#     for "sa" and "sc" improve the fitted peak position. Using values of
+#     zero for "sa" and "sc" produced better fits, but this would be no good
 #     for data with overlapping Gaussians.
 
 
@@ -24,18 +24,18 @@ $CUPID_DIR/findclumps in="testdata" \
                       deconv=no \
                       outcat=testout.FIT \
                       repconf=no \
-                      ilevel=0 \
+                      quiet \
                       accept
 
 $KAPPA_DIR/sub testout testmodel diff
 $KAPPA_DIR/stats diff > /dev/null
 
-set wantsum=-36.4288777709007
-set wantmin=-1.67177844047546
-set wantmax=0.739926815032959
-set wantsigma=0.223978479465678
+set wantsum=-40.9929569065571
+set wantmin=-2.35204172134399
+set wantmax=2.52372455596924
+set wantsigma=0.304939922477751
 set wantngood=1001
-set wantnclump=4
+set wantnclump=6
 
 set got=`$KAPPA_DIR/parget total stats`
 set err=`$KAPPA_DIR/calc "'qif(2*abs(pa-pb)/abs(pa+pb)>0.001,1,0)'" pa=$got pb=$wantsum`
@@ -82,5 +82,5 @@ if( "$nrow" != "$wantnclump" ) then
 endif
 
 
-rm diff.sdf testout.sdf testout.FIT
+#rm diff.sdf testout.sdf testout.FIT
 

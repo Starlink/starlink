@@ -18,7 +18,7 @@
 extern CupidGC cupidGC;
 
 
-int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
+int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, double *x,
                                double *chisq, int *status ){
 /*
 *+
@@ -32,7 +32,7 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 *     Starlink C
 
 *  Synopsis:
-*     int cupidGCFit<X>( CGEN_TYPE *res, int imax, double *x, double *chisq,
+*     int cupidGCFit<X>( CGEN_TYPE *res, double *x, double *chisq,
 *        int *status )
 
 *  Description:
@@ -43,9 +43,6 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 *     res
 *        Pointer to the start of the 1D array containing the current
 *        residuals.
-*     imax
-*        The index within the supplied array of the element with the largest
-*        value.
 *     x
 *        A pointer to an array containing the initial guess at the
 *        Gaussian parameters. The array is returned holding the best fit

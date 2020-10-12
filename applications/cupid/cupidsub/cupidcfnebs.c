@@ -99,7 +99,7 @@
 
 
 void cupidCFNebs( int *ipa, hdsdim iv, hdsdim x[3], int ndim, hdsdim dims[3],
-                  hdsdim skip[3], hdsdim hindex, int perspectrum, int naxis,
+                  size_t skip[3], hdsdim hindex, int perspectrum, int naxis,
                   int *n1, int *il1, int i1[27], int *n2, int *il2,
                   CupidPixelSet **clumps, int *status ){
 /*
@@ -115,7 +115,7 @@ void cupidCFNebs( int *ipa, hdsdim iv, hdsdim x[3], int ndim, hdsdim dims[3],
 
 *  Synopsis:
 *     void cupidCFNebs( int *ipa, hdsdim iv, hdsdim x[3], int ndim, hdsdim dims[3],
-*                       hdsdim skip[3], hdsdim hindex, int perspectrum, int naxis,
+*                       size_t skip[3], hdsdim hindex, int perspectrum, int naxis,
 *                       int *n1, int *il1, int i1[27], int *n2, int *il2,
 *                       CupidPixelSet **clumps, int *status )
 
@@ -241,7 +241,6 @@ void cupidCFNebs( int *ipa, hdsdim iv, hdsdim x[3], int ndim, hdsdim dims[3],
    double dy;           /* Y offset between pixel and PixelSet peak */
    double dz;           /* Z offset between pixel and PixelSet peak */
    hdsdim *p;           /* Pointer to array holding peak position */
-   hdsdim i0;           /* 1D vector index of central pixel */
    int clump_index;     /* Index of neighbouring clump */
    int i;               /* Axis index */
    int velax;           /* Zero based velocity axis index */
@@ -258,9 +257,6 @@ void cupidCFNebs( int *ipa, hdsdim iv, hdsdim x[3], int ndim, hdsdim dims[3],
 
 /* Store the zero based velocity axis index, if needed. */
    velax = perspectrum - 1;
-
-/* Save the 1D vector index of the point whose neighbours are being tested. */
-   i0 = iv;
 
 /* We now check each immediate neighbour of the supplied pixel. First
    check the pixels which are 1 pixel away along only one of the three axes.

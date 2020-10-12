@@ -10,7 +10,7 @@
 
 void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
                       int ndim, hdsdim *lbox, hdsdim *ubox, size_t list_size,
-                      double *mlist, hdsdim *plist, hdsdim *lbnd, int iclump,
+                      double *mlist, hdsdim *plist, hdsdim *lbnd, size_t iclump,
                       int *dax, AstKeyMap *extra, int bad, int *status ){
 /*
 *+
@@ -26,8 +26,8 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 *  Synopsis:
 *     void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 *                         int ndim, hdsdim *lbox, hdsdim *ubox, size_t list_size,
-*                         double *mlist, hdsdim *plist, hdsdim *lbnd, int iclump,
-*                         int *dax, AstKeyMap *extra, int bad,
+*                         double *mlist, hdsdim *plist, hdsdim *lbnd,
+*                         size_t iclump, int *dax, AstKeyMap *extra, int bad,
 *                         int *status )
 
 *  Description:
@@ -373,7 +373,7 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 
          nex = astMapSize( extra );
          for( i = 0; i < nex; i++ ) {
-            key = astMapKey( extra, i );
+            key = astMapKey( extra, (int) i );
             if( astMapGet0D( extra, key, &dval ) ) {
                datNew( exloc, key, "_DOUBLE", 0, NULL, status );
                datFind( exloc, key, &dloc, status );

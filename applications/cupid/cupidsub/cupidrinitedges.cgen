@@ -153,7 +153,6 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, size_t nel, int ndim,
    size_t i;          /* The index into the mask array */
    size_t iv;         /* The count of scan line vectors checked so far */
    size_t ivlim;      /* Max count of scan line vectors to be checked */
-   size_t nl;         /* Number of lines scanned. */
    size_t wsize;      /* Length of work arrays */
 
 /* Initialise */
@@ -223,8 +222,8 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, size_t nel, int ndim,
    specified by "axis" and "lbnd", and which extend in the direction
    given by "xvec". Edges of any peaks found along these scan lines are
    marked by 1's in the mask array. */
-                        nl = CGEN_FUNCTION(cupidRCheckFace)( array, nel,
-                                                         axis, lbnd, dims, skip,
+                        (void) CGEN_FUNCTION(cupidRCheckFace)( array, nel,
+                                                        axis, lbnd, dims, skip,
                                                         xvec, work1, work2,
                                                         ret, minpix, thresh,
                                                         noise, rms, flatslope, status );

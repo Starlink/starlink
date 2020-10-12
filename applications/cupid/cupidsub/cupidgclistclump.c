@@ -2,7 +2,7 @@
 #include "cupid.h"
 #include "mers.h"
 
-void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
+void cupidGCListClump( size_t iclump, int ndim, double *par, double chisq,
                        hdsdim *lbnd, double rms, int *status ){
 /*
 *+
@@ -16,7 +16,7 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
+*     void cupidGCListClump( size_t iclump, int ndim, double *par, double chisq,
 *                            hdsdim *lbnd, double rms,
 *                            int *status )
 
@@ -80,30 +80,19 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 */
 
 /* Local Variables: */
-
-   int np;              /* Number of parameters */
    msglev_t curlev;     /* Current message filter level */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
-/* Determine the number of significant parameters for the Gaussian model. */
-   if( ndim == 1 ) {
-      np = CUPID__GCNP1;
-   } else if( ndim == 2 ) {
-      np = CUPID__GCNP2;
-   } else {
-      np = CUPID__GCNP3;
-   }
-
 /* Report information to standard output if requested. */
    curlev = msgIflev( NULL, status );
    if( curlev == MSG__VERB || curlev == MSG__DEBUG ) {
      msgBlankif( MSG__DEBUG, status );
-     msgSeti( "N", iclump );
+     msgSetk( "N", iclump );
      msgOutif( MSG__VERB, "", "Clump ^N:", status );
    } else {
-      msgSeti( "N", iclump );
+      msgSetk( "N", iclump );
       msgOutif( MSG__DEBUG1, "", "   Storing clump ^N:", status );
    }
 
@@ -114,13 +103,13 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
    msgOutif( MSG__DEBUG, "", "   Peak intensity: ^V", status );
    msgSetd( "V", par[ 1 ]*rms );
    msgOutif( MSG__DEBUG, "", "   Constant background: ^V", status );
-   msgSetd( "V", par[ 2 ] + lbnd[ 0 ] - 1.5 );
+   msgSetd( "V", par[ 2 ] + (double) lbnd[ 0 ] - 1.5 );
    msgOutif( MSG__DEBUG, "", "   Centre on 1st axis: ^V", status );
    msgSetd( "V", par[ 3 ] );
    msgOutif( MSG__DEBUG, "", "   FWHM on 1st axis: ^V", status );
 
    if( ndim > 1 ) {
-     msgSetd( "V", par[ 4 ] + lbnd[ 1 ] - 1.5 );
+     msgSetd( "V", par[ 4 ] + (double) lbnd[ 1 ] - 1.5 );
      msgOutif( MSG__DEBUG, "", "   Centre on 2nd axis: ^V", status );
      msgSetd( "V", par[ 5 ] );
      msgOutif( MSG__DEBUG, "", "   FWHM on 2nd axis: ^V", status );
@@ -128,7 +117,7 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
      msgOutif( MSG__DEBUG, "", "   Position angle: ^V", status );
 
      if( ndim > 2 ) {
-       msgSetd( "V", par[ 7 ] + lbnd[ 2 ] - 1.5 );
+       msgSetd( "V", par[ 7 ] + (double) lbnd[ 2 ] - 1.5 );
        msgOutif( MSG__DEBUG, "", "   Centre on vel axis: ^V", status );
        msgSetd( "V", par[ 8 ] );
        msgOutif( MSG__DEBUG, "", "   FWHM on vel axis: ^V", status );

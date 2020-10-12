@@ -24,7 +24,7 @@ CupidGC cupidGC;
 
 HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *ipd,
                           double *ipv, double rms, AstKeyMap *config, int velax,
-                          double beamcorr[ 3 ], int *nrej, int *status ){
+                          double beamcorr[ 3 ], size_t *nrej, int *status ){
 /*
 *+
 *  Name:
@@ -41,7 +41,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void
 *     HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd,
 *                               void *ipd, double *ipv, double rms,
 *                               AstKeyMap *config, int velax,
-*                               double beamcorr[ 3 ], int *nrej, int *status )
+*                               double beamcorr[ 3 ], size_t *nrej, int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -390,7 +390,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void
 
 /* Find the best fitting parameters, starting from the above initial guess.
    This returns a function value of zero if no fit could be performed. */
-            if( cupidGCFit( type, res, imax, x, &chisq, status ) ) {
+            if( cupidGCFit( type, res, x, &chisq, status ) ) {
 
 /* Skip this fit if we have an estimate of the standard deviation of the
    "npeak" most recent clump peak values, and the peak value of the clump

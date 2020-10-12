@@ -20,7 +20,7 @@ typedef struct CGEN_FUNCTION(MinFilterBox) {
    hdsdim ubndzl[ 3 ];    /* Upper grid index bounds of lower z slab */
    CGEN_TYPE minval;      /* Minimum data value in the box */
    hdsdim minpos[ 3 ];    /* Grid indices of the minimum value in the box */
-   int pop;               /* Number of good values in the filter box */
+   hdsdim pop;            /* Number of good values in the filter box */
 } CGEN_FUNCTION(MinFilterBox);
 
 
@@ -118,19 +118,19 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( float wlim, hdsdim dim[3], int box[3],
    CGEN_TYPE *result;          /* Returned array */
    CGEN_TYPE val;              /* Input pixel value */
    CupidBoxIter *iter;         /* Structure for iterating round pixels */
-   int bk1;                    /* Half the x box width */
-   int bk2;                    /* Half the y box width */
-   int bk3;                    /* Half the z box width */
-   int full_check;             /* Check entire box for a new minimum value? */
-   int poplim;                 /* Min. no. of good pixels required in a box */
    hdsdim iv;                  /* 1D vector index of current pixel */
    hdsdim ix;                  /* X axis grid index for current output pixel */
    hdsdim iy;                  /* Y axis grid index for current output pixel */
    hdsdim iz;                  /* Z axis grid index for current output pixel */
    hdsdim lbnd[ 3 ];           /* Lower bounds of box centred on (0,0,0) */
-   size_t nel;                 /* Number of pixel in supplied array */
    hdsdim ubnd[ 3 ];           /* Upper bounds of box centred on (0,0,0) */
    hdsdim xx[ 3 ];             /* Grid indices of current pixel */
+   int bk1;                    /* Half the x box width */
+   int bk2;                    /* Half the y box width */
+   int bk3;                    /* Half the z box width */
+   int full_check;             /* Check entire box for a new minimum value? */
+   size_t nel;                 /* Number of pixel in supplied array */
+   size_t poplim;              /* Min. no. of good pixels required in a box */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return NULL;
@@ -154,7 +154,7 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( float wlim, hdsdim dim[3], int box[3],
 /* Form the minimum number of good values required in a filter box to create
    a good output value. */
    nel = box[ 0 ]*box[ 1 ]*box[ 2 ];
-   poplim = (int) ( nel*wlim + 0.5 );
+   poplim = (size_t) ( nel*wlim + 0.5 );
    if( poplim > nel ) poplim = nel;
 
 /* Create a MinFilterBox structure to describe a filter box that progress

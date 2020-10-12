@@ -1,7 +1,7 @@
 #!/bin/tcsh
 #
 #  Test Description:
-#     FellWalker: 2D data containing a mix of well separated gaussians and 
+#     FellWalker: 2D data containing a mix of well separated gaussians and
 #     overlapping Gaussians, with high noise.
 #
 #  Test Notes:
@@ -15,18 +15,18 @@ $CUPID_DIR/findclumps in="testdata" \
                       deconv=no \
                       outcat=testout.FIT \
                       repconf=no \
-                      ilevel=0 \
+                      quiet \
                       accept
 
 $KAPPA_DIR/sub testout testmodel diff
 $KAPPA_DIR/stats diff > /dev/null
 
-set wantsum=0
-set wantmin=0
-set wantmax=0
-set wantsigma=0
-set wantngood=11972
-set wantnclump=34
+set wantsum=23370
+set wantmin=-16
+set wantmax=34
+set wantsigma=5.38082675595839
+set wantngood=11284
+set wantnclump=48
 
 set got=`$KAPPA_DIR/parget total stats`
 set err=`$KAPPA_DIR/calc "'qif(2*abs(pa-pb)/abs(pa+pb)>0.001,1,0)'" pa=$got pb=$wantsum`
@@ -73,5 +73,5 @@ if( "$nrow" != "$wantnclump" ) then
 endif
 
 
-rm diff.sdf testout.sdf testout.FIT
+#rm diff.sdf testout.sdf testout.FIT
 

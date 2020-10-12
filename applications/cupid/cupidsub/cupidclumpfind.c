@@ -11,7 +11,7 @@
 HDSLoc *cupidClumpFind( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *ipd,
                         double *ipv, double rms, AstKeyMap *config, int velax,
                         int perspectrum, double beamcorr[ 3 ],
-                        int *backoff, int *nrej, int *status ){
+                        int *backoff, size_t *nrej, int *status ){
 /*
 *+
 *  Name:
@@ -29,7 +29,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *
 *                             void *ipd, double *ipv, double rms,
 *                             AstKeyMap *config, int velax,
 *                             int perspectrum, double beamcorr[ 3 ],
-*                             int *backoff, int *nrej, int *status )
+*                             int *backoff, size_t *nrej, int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -162,16 +162,14 @@ HDSLoc *cupidClumpFind( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *
    hdsdim i;            /* Loop count */
    hdsdim j;            /* Loop index */
    hdsdim minpix;       /* Minimum number of pixels in a clump */
-   hdsdim skip[3];      /* Pointer to array of axis skips */
    int *ipa;            /* Pointer to pixel assignment array */
    int allow_edge;      /* Are clumps allowed to touch an edge of the data array? */
    int idl;             /* Emulate the IDL clumpfind algorithm? */
-   int ii;              /* Significant clump index */
+   size_t ii;           /* Significant clump index */
    int ilev;            /* Contour index */
    int index;           /* Next PixelSet index to use */
    int more;            /* Any remaining unsorted elements/ */
    int naxis;           /* Defines whether two pixels are neighbours or not */
-   int nclump;          /* Number of clumps found */
    int nedge;           /* Number of clumps with edge pixels */
    int nlevels;         /* Number of values in "levels" */
    int nminpix;         /* Number of clumps with < MinPix pixels */
@@ -179,6 +177,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *
    int old_ghstate;     /* Non-zero if group history recording is switched on */
    int old_pvstate;     /* Non-zero if provenance recording is switched on */
    size_t el;           /* Number of elements in array */
+   size_t nclump;       /* Number of clumps found */
+   size_t skip[3];      /* Pointer to array of axis skips */
 
 /* Initialise */
    ret = NULL;

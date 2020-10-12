@@ -12,7 +12,7 @@
 HDSLoc *cupidFellWalker( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
                          hdsdim *subnd, void *ipd, double *ipv, double rms,
                          AstKeyMap *config, int velax, int perspectrum,
-                         double beamcorr[ 3 ], int *nrej, int *status ){
+                         double beamcorr[ 3 ], size_t *nrej, int *status ){
 /*
 *+
 *  Name:
@@ -29,7 +29,7 @@ HDSLoc *cupidFellWalker( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
 *     HDSLoc *cupidFellWalker( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
 *                              hdsdim *subnd, void *ipd, double *ipv, double rms,
 *                              AstKeyMap *config, int velax, int perspectrum,
-*                              double beamcorr[ 3 ], int *nrej, int *status )
+*                              double beamcorr[ 3 ], size_t *nrej, int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -192,7 +192,6 @@ HDSLoc *cupidFellWalker( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
    hdsdim ix;           /* Grid index on 1st axis */
    hdsdim iy;           /* Grid index on 2nd axis */
    hdsdim iz;           /* Grid index on 3rd axis */
-   hdsdim skip[3];      /* Pointer to array of axis skips */
    int *igood;          /* Pointer to array holding usable clump indices */
    int *ipa;            /* Pointer to clump assignment array */
    int *nrem;           /* Pointer to array holding clump populations */
@@ -212,6 +211,7 @@ HDSLoc *cupidFellWalker( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
    int old_ghstate;     /* Non-zero if group history recording is switched on */
    int old_pvstate;     /* Non-zero if provenance recording is switched on */
    size_t el;           /* Number of elements in array */
+   size_t skip[3];      /* Pointer to array of axis skips */
 
 /* Initialise */
    ret = NULL;

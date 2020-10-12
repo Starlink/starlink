@@ -20,7 +20,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
                                          int ndim, hdsdim *dims, double *par, double rms,
                                          double mlim, size_t imax, double thresh,
                                          int allowedge, hdsdim *lbnd, HDSLoc **ndfs,
-                                         int iclump, int excols, double mean_peak,
+                                         size_t iclump, int excols, double mean_peak,
                                          double maxbad, size_t *area, double *sumclumps,
                                          int *status ){
 /*
@@ -39,7 +39,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
 *                                  int ndim, hdsdim *dims, double *par, double rms,
 *                                  double mlim, size_t imax, double thresh,
 *                                  int allowedge, hdsdim *lbnd, HDSLoc **ndfs,
-*                                  int iclump, int excols, double mean_peak,
+*                                  size_t iclump, int excols, double mean_peak,
 *                                  double maxbad, size_t *area, double *sumclumps,
 *                                  int *status )
 
@@ -472,7 +472,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
    msgOutif( MSG__DEBUG1, "", "   Residual sigma: ^M", status );
 
 /* Dump the residuals to disk if required. */
-   sprintf( name, "clump_residuals%d", iclump );
+   sprintf( name, "clump_residuals%zu", iclump );
    CGEN_FUNCTION(cupidGCDump)( MSG__DEBUG2, res, ndim, dims, name, status );
 
 /* If required, create an NDF holding the clump data values so long as

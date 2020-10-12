@@ -1,14 +1,14 @@
 #!/bin/tcsh
 #
 #  Test Description:
-#     GaussClumps: 2D data containing a mix of well separated gaussians and 
+#     GaussClumps: 2D data containing a mix of well separated gaussians and
 #     overlapping Gaussians, with high noise.
 #
 #  Test Notes:
-#     - The purpose of the stiffness parameters (sc,sa,s0,etc) is to keep the 
-#     Gaussian fit close to the initial guess. But if the noise is high, as 
+#     - The purpose of the stiffness parameters (sc,sa,s0,etc) is to keep the
+#     Gaussian fit close to the initial guess. But if the noise is high, as
 #     in this test, the initial guess will be heavily influenced by noise.
-#     In this case, better fits are obtained by removing the stiffness 
+#     In this case, better fits are obtained by removing the stiffness
 #     constraints. Also, ModelLim needs to be reduced because the higher RMS
 #     means that the Gaussians are truncated very early.
 
@@ -21,18 +21,18 @@ $CUPID_DIR/findclumps in="testdata" \
                       deconv=no \
                       outcat=testout.FIT \
                       repconf=no \
-                      ilevel=0 \
+                      quiet \
                       accept
 
 $KAPPA_DIR/sub testout testmodel diff
 $KAPPA_DIR/stats diff > /dev/null
 
-set wantsum=-10571.376290217
-set wantmin=-1.88472604751587
-set wantmax=1.50211131572723
-set wantsigma=0.202951831949992
+set wantsum=-22897.8074682653
+set wantmin=-3.07357478141785
+set wantmax=0.959551632404327
+set wantsigma=0.325914586360204
 set wantngood=160801
-set wantnclump=102
+set wantnclump=54
 
 
 set got=`$KAPPA_DIR/parget total stats`
@@ -80,5 +80,5 @@ if( "$nrow" != "$wantnclump" ) then
 endif
 
 
-rm diff.sdf testout.sdf testout.FIT
+#rm diff.sdf testout.sdf testout.FIT
 

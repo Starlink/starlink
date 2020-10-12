@@ -280,7 +280,6 @@ void extractclumps( int *status ) {
    hdsdim iy;                   /* GRID value on 2nd axis */
    hdsdim iz;                   /* GRID value on 3rd axis */
    hdsdim n;                    /* Number of values summed in "sum" */
-   hdsdim skip[ 3 ];            /* Pixel axis skips */
    hdsdim slbnd[ NDF__MXDIM ];  /* The lower bounds of the significant pixel axes */
    hdsdim subnd[ NDF__MXDIM ];  /* The upper bounds of the significant pixel axes */
    int *ipa;                    /* Pointer to pixel assignment array */
@@ -314,6 +313,7 @@ void extractclumps( int *status ) {
    size_t el;                   /* Number of array elements mapped */
    size_t iel;                  /* Element count */
    size_t size;                 /* Number of elements in "grp" */
+   size_t skip[ 3 ];            /* Pixel axis skips */
    void *ipd;                   /* Pointer to Data array */
 
 /* Abort if an error has already occurred. */

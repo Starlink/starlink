@@ -999,7 +999,6 @@ void findclumps( int *status ) {
    hdsdim dim[ NDF__MXDIM ];    /* Pixel axis dimensions */
    hdsdim dims[3];              /* Pointer to array of array dimensions */
    hdsdim n;                    /* Number of values summed in "sum" */
-   hdsdim skip[3];              /* Pointer to array of axis skips */
    hdsdim slbnd[ NDF__MXDIM ];  /* The lower bounds of the significant pixel axes */
    hdsdim subnd[ NDF__MXDIM ];  /* The upper bounds of the significant pixel axes */
    int backoff;                 /* Remove background when finding clump sizes? */
@@ -1017,7 +1016,6 @@ void findclumps( int *status ) {
    int nclumps;                 /* Number of clumps stored in output NDF */
    int ndim;                    /* Total number of pixel axes */
    int nfr;                     /* Number of Frames within WCS FrameSet */
-   int nrej;                    /* No. of clumps rejected in main algorithm function */
    int nsig;                    /* Number of significant pixel axes */
    int nskyax;                  /* No. of sky axes in current WCS Frame */
    int nspecax;                 /* No. of spectral axes in current WCS Frame */
@@ -1033,7 +1031,9 @@ void findclumps( int *status ) {
    int velax;                   /* Index of the velocity pixel axis (if any) */
    size_t el;                      /* Number of array elements mapped */
    size_t iel;                  /* Element index */
+   size_t nrej;                 /* No. of clumps rejected in main algorithm function */
    size_t size;                 /* Size of a group */
+   size_t skip[3];              /* Pointer to array of axis skips */
    void *ipd;                   /* Pointer to Data array */
    void *ipo;                   /* Pointer to output Data array */
 
