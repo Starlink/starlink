@@ -71,6 +71,7 @@
       INCLUDE 'DAT_PAR'          ! HDS constants.
       INCLUDE 'NDF_PAR'          ! NDF constants.
       INCLUDE 'DAT_ERR'          ! HDS error constants.
+      INCLUDE 'NDF_ERR'          ! NDF error constants.
 
 *  Arguments Given:
       CHARACTER NAME*(*)
@@ -104,7 +105,8 @@
 *  error, ensure that the structure required to contain the NDF exists,
 *  and try to get the place holder again.
       IF( STATUS .EQ. DAT__FILNF .OR.   ! Container file not found
-     :    STATUS .EQ. DAT__NAMIN ) THEN ! One of more parent objects not found
+     :    STATUS .EQ. DAT__NAMIN .OR.   ! One of more parent objects not found
+     :    STATUS .EQ. NDF__INUSE ) THEN ! Over-write existing component
          CALL ERR_ANNUL( STATUS )
          CALL NDG1_CRPTH( NAME, STATUS )
          CALL NDF_OPEN( DAT__ROOT, NAME, 'WRITE', 'NEW', INDF, PLACE,
