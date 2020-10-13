@@ -52,6 +52,10 @@
 *  History:
 *     21-DEC-1999 (DSB):
 *        Original version.
+*     13-OCT-2020 (DSB):
+*        Only annull the error if it indicates that one or more of the
+*        required parent structures do not exit. This avoids loosing
+*        other useful error messages.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -66,6 +70,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS constants.
       INCLUDE 'NDF_PAR'          ! NDF constants.
+      INCLUDE 'DAT_ERR'          ! HDS error constants.
 
 *  Arguments Given:
       CHARACTER NAME*(*)
@@ -94,10 +99,12 @@
       CALL NDF_OPEN( DAT__ROOT, NAME, 'WRITE', 'NEW', INDF, PLACE,
      :               STATUS )
 
-*  If an error was reported, annul the error, check that the structure
-*  required to contain the NDF exists, and try to get the place holder
-*  again.
-      IF( STATUS .NE. SAI__OK ) THEN
+*  If an error was reported indicating that the named NDF cannot be
+*  created because one or more of its parents do not exist, annul the
+*  error, ensure that the structure required to contain the NDF exists,
+*  and try to get the place holder again.
+      IF( STATUS .EQ. DAT__FILNF .OR.   ! Container file not found
+     :    STATUS .EQ. DAT__NAMIN ) THEN ! One of more parent objects not found
          CALL ERR_ANNUL( STATUS )
          CALL NDG1_CRPTH( NAME, STATUS )
          CALL NDF_OPEN( DAT__ROOT, NAME, 'WRITE', 'NEW', INDF, PLACE,
