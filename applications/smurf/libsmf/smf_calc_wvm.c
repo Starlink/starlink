@@ -186,14 +186,14 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars,
   /* do not allow null pointer */
   if (!hdr) {
     *status = SAI__ERROR;
-    errRep( "", "hdr is NULL for calc_wvm. Possible programming error.", status );
+    errRep( " ", "hdr is NULL for calc_wvm. Possible programming error.", status );
     return VAL__BADD;
   }
 
   /* Sane airmass */
   if (approxam < 1.000 && approxam != VAL__BADD) {
     *status = SAI__ERROR;
-    errRep( "", "approxam has an invalid value. Must be >= 1.00 or BAD."
+    errRep( " ", "approxam has an invalid value. Must be >= 1.00 or BAD."
             " Possible programming error.", status );
     return VAL__BADD;
   }
@@ -202,8 +202,8 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars,
      KeyMap. */
   if (!cache) {
      astBeginPM;
-     cache = astKeyMap( "" );
-     astMapPut0A( thrThreadData( status ), CACHE_NAME, cache, "" );
+     cache = astKeyMap( " " );
+     astMapPut0A( thrThreadData( status ), CACHE_NAME, cache, " " );
      astEndPM;
   }
 
@@ -254,11 +254,10 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars,
 
     if (airmass == VAL__BADD) {
       *status = SAI__ERROR;
-      errRep( "", "Unable to determine airmass so can not calculate WVM opacity at zenith",
+      errRep( " ", "Unable to determine airmass so can not calculate WVM opacity at zenith",
               status);
     } else {
       float rms;
-      struct timeval tv1, tv2;
       char cachekey[100];
 
       /* This is quite a costly operation but is predictable given the inputs.
@@ -283,7 +282,7 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars,
 
         /* Store the result in the cache */
         astBeginPM;
-        astMapPut0D( cache, cachekey, tau225, "" );
+        astMapPut0D( cache, cachekey, tau225, " " );
         astEndPM;
 
       }

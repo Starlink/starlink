@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     size_t smf_pca( ThrWorkForce *wf, smfData *data, smfData *lut,
+*     dim_t smf_pca( ThrWorkForce *wf, smfData *data, smfData *lut,
 *                     unsigned char *mask, double corlim, int *status )
 
 *  Arguments:
@@ -131,28 +131,32 @@ typedef struct smfPCAData {
    double *pcomp;
    double *sigmas;
    double *v;
-   int *badbol;
+   dim_t *badbol;
    int *lut;
    int oper;
-   size_t bstride;
-   size_t t_first;
-   size_t t_last;
-   size_t tstride;
+   dim_t bstride;
+   dim_t t_first;
+   dim_t t_last;
+   dim_t tstride;
    smf_qual_t *qua;
    unsigned char *mask;
 } SmfPCAData;
 
 
-size_t smf_pca( ThrWorkForce *wf, smfData *data, smfData *lut, unsigned char *mask,
+dim_t smf_pca( ThrWorkForce *wf, smfData *data, smfData *lut, unsigned char *mask,
                 double corlim, int *status ){
 
 /* Local Variables: */
    SmfPCAData *job_data = NULL;
    SmfPCAData *pdata;
+   dim_t *badbol;
+   dim_t bstep;
+   dim_t bstride;
    dim_t i;
    dim_t ireject;
    dim_t j;
    dim_t nb;
+   dim_t nbad;
    dim_t nbolo;
    dim_t ncheck;
    dim_t ndata;
@@ -160,26 +164,22 @@ size_t smf_pca( ThrWorkForce *wf, smfData *data, smfData *lut, unsigned char *ma
    dim_t npair;
    dim_t ntslice;
    dim_t ntused;
+   dim_t pstep;
+   dim_t t_first;
+   dim_t t_last;
+   dim_t tstep;
+   dim_t tstride;
    double *c;
    double *cnew;
    double *dp = NULL;
+   double *ev;
    double *means;
    double *old_data;
    double *pcomp;
    double *sigmas;
-   double *ev;
    double evlim;
-   int *badbol;
    int iw;
-   int nbad;
    int nw;
-   size_t bstep;
-   size_t bstride;
-   size_t pstep;
-   size_t t_first;
-   size_t t_last;
-   size_t tstep;
-   size_t tstride;
    smf_qual_t *qua;
 
 /* Check inherited status. */
@@ -388,7 +388,7 @@ size_t smf_pca( ThrWorkForce *wf, smfData *data, smfData *lut, unsigned char *ma
          } else if( badbol[ i ] != -1 ) {
             *status = SAI__ERROR;
             errRepf( "", "smf_pca: unexpected badbol value %d for bolo %zu "
-                     "(programming error).", status, badbol[ i ], i );
+                     "(programming error).", status, (int) badbol[ i ], i );
             break;
          }
       }
@@ -573,6 +573,8 @@ static void smf1_pca( void *job_data_ptr, int *status ) {
    SmfPCAData *pdata;
    dim_t b1;
    dim_t b2;
+   dim_t b;
+   dim_t bstride;
    dim_t i;
    dim_t ibolo;
    dim_t inc;
@@ -587,6 +589,7 @@ static void smf1_pca( void *job_data_ptr, int *status ) {
    dim_t t2;
    dim_t t_first;
    dim_t t_last;
+   dim_t tstride;
    double *pc;
    double *pdi;
    double *pdj;
@@ -606,10 +609,7 @@ static void smf1_pca( void *job_data_ptr, int *status ) {
    double var;
    int *pli;
    int *plj;
-   int b;
    int mask;
-   size_t bstride;
-   size_t tstride;
    smf_qual_t *pqi;
    smf_qual_t *pqj;
 

@@ -270,8 +270,8 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
   /* Add the model name to the FITS header and the bolometer dimensions */
   fits = model->hdr->fitshdr;
   if( fits ) {
-    dim_t nrows, ncols, ntslice;
-    int lbnd_r, lbnd_c, lbnd_t;
+
+    dim_t ntslice, nrows, ncols, lbnd_r, lbnd_c, lbnd_t;
 
     smf_get_dims( refdata, &nrows, &ncols, NULL, &ntslice, NULL, NULL,
                   NULL, status );
@@ -289,18 +289,18 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
     atlPtfts( fits, "SMFMODEL", smf_model_getname(type,status),
               "SMURF Iterative model component", status );
 
-    atlPtfti( fits, "SMFDIMR", nrows,
+    atlPtfti( fits, "SMFDIMR", (int) nrows,
               "SMURF row dimension length for raw data", status );
-    atlPtfti( fits, "SMFDIMC", ncols,
+    atlPtfti( fits, "SMFDIMC", (int) ncols,
               "SMURF col dimension length for raw data", status );
-    atlPtfti( fits, "SMFDIMT", ntslice,
+    atlPtfti( fits, "SMFDIMT", (int) ntslice,
               "SMURF time dimension length for raw data", status );
 
-    atlPtfti( fits, "SMFLBNDR", lbnd_r,
+    atlPtfti( fits, "SMFLBNDR", (int) lbnd_r,
               "SMURF row dimension lower bound for raw data", status );
-    atlPtfti( fits, "SMFLBNDC", lbnd_c,
+    atlPtfti( fits, "SMFLBNDC", (int) lbnd_c,
               "SMURF col dimension lower bound for raw data", status );
-    atlPtfti( fits, "SMFLBNDT", lbnd_t,
+    atlPtfti( fits, "SMFLBNDT", (int) lbnd_t,
               "SMURF time dimension lower bound for raw data", status );
   }
 

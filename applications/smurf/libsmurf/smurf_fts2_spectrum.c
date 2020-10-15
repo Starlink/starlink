@@ -184,8 +184,7 @@ void smurf_fts2_spectrum(int* status)
     double resolution_override= 0.0;            /* Spectral Resolution override */
     int i                     = 0;              /* Counter */
     int j                     = 0;              /* Counter */
-    int k                     = 0;              /* Counter */
-    int l                     = 0;              /* Counter */
+    dim_t k                   = 0;              /* Counter */
     double fNyquist           = 0.0;            /* Nyquist frequency */
     double fNyquistin         = 0.0;            /* Nyquist frequency input */
     double fNyquistzp         = 0.0;            /* Nyquist frequency zero padded */
@@ -220,32 +219,29 @@ void smurf_fts2_spectrum(int* status)
     size_t nFiles             = 0;              /* Size of the input group */
     size_t nOutFiles          = 0;              /* Size of the output group */
     size_t nSFPFiles          = 0;              /* Size of the SFP group */
-    size_t nSfp               = 89;             /* Number of SFP calibration file values */
     size_t fIndex             = 0;              /* File index */
-    size_t nWidth             = 32;             /* Data cube width */
-    size_t nHeight            = 40;             /* Data cube height */
-    size_t nFrames            = 0;              /* Data cube depth */
-    size_t nPixels            = nWidth*nHeight; /* Number of bolometers in the subarray */
+
+    dim_t nSfp               = 89;             /* Number of SFP calibration file values */
+    dim_t nWidth             = 32;             /* Data cube width */
+    dim_t nHeight            = 40;             /* Data cube height */
+    dim_t nFrames            = 0;              /* Data cube depth */
+    dim_t nPixels            = nWidth*nHeight; /* Number of bolometers in the subarray */
+    dim_t N2in                = 0;                /* N/2 input */
+    dim_t bolIndex            = 0;
 
     double dIntensity         = 0;
-    int N                     = 0;
-    int Nin                   = 0;                /* N input */
-    int Nzp                   = 0;                /* N zero padded */
-    int N2                    = 0;
-    int N2in                  = 0;                /* N/2 input */
-    int N2zp                  = 0;                /* N/2 zero padded */
-    int bolIndex              = 0;
-    int cubeIndex             = 0;
+    dim_t N                   = 0;
+    dim_t Nin                 = 0;                /* N input */
+    dim_t Nzp                 = 0;                /* N zero padded */
+    dim_t N2                  = 0;
+    dim_t N2zp                = 0;                /* N/2 zero padded */
+    dim_t cubeIndex           = 0;
     int badPixel              = 0;
-    int indexZPD              = 0;
-    int indexZPDin            = 0;
-    int indexZPDzp            = 0;
-    int pad                   = 0;               /* zero padding (difference between input and zero padded interferogram length) */
-    int pad2                  = 0;               /* zero padding / 2 */
-    double dx                 = 0.0;             /* Delta x */
+    dim_t indexZPD            = 0;
+    dim_t indexZPDin          = 0;
+    dim_t indexZPDzp          = 0;
     double dxin               = 0.0;             /* Delta x input */
     double dxzp               = 0.0;             /* Delta x zero padded */
-    double OPDMax             = 0.0;             /* OPD max in cm */
     double OPDMaxin           = 0.0;             /* OPD max in cm input */
     double OPDMaxzp           = 0.0;             /* OPD max in cm zero padded */
     double s                  = 0.0;             /* spectrum value */
@@ -355,7 +351,6 @@ void smurf_fts2_spectrum(int* status)
       /*printf("%s: wnSfpF=%f, wnSfpL=%f\n", TASK_NAME, wnSfpF, wnSfpL);*/
 
         fNyquistin = fNyquistzp = 0.0;
-        dx = dxin = dxzp = 0.0;
         N2 = N2in = N2zp = 0;
         indexZPD = indexZPDin = indexZPDzp = 0;
         N = Nin = Nzp = 0;
@@ -430,8 +425,6 @@ void smurf_fts2_spectrum(int* status)
             indexZPD = indexZPDzp;
             dSigma = dSigmazp;
             fNyquist = fNyquistzp;
-            dx = dxzp;
-            OPDMax = OPDMaxzp;
             resolution = resolutionzp;
         } else {
             N = Nin;
@@ -439,8 +432,6 @@ void smurf_fts2_spectrum(int* status)
             indexZPD = indexZPDin;
             dSigma = dSigmain;
             fNyquist = fNyquistin;
-            dx = dxin;
-            OPDMax = OPDMaxin;
             resolution = resolutionin;
         }
 
@@ -449,7 +440,7 @@ void smurf_fts2_spectrum(int* status)
 
         /* TODO: Update mirror positions */
         smf_fits_updateI(inData->hdr, "MIRSTART", 0, "Frame index in which the mirror starts moving", status);
-        smf_fits_updateI(inData->hdr, "MIRSTOP", N2, "Frame index in which the mirror stops moving", status);
+        smf_fits_updateI(inData->hdr, "MIRSTOP", (int) N2, "Frame index in which the mirror stops moving", status);
       /*smf_fits_updateD(inData->hdr, "OPDMIN", OPD_EVEN[0], "Minimum OPD", status);
         smf_fits_updateD(inData->hdr, "OPDSTEP", dx, "OPD step size", status);*/
 
@@ -557,8 +548,6 @@ void smurf_fts2_spectrum(int* status)
 
                 /* Double-Sided interferogram */
                 if(zeropad) {
-                    pad = Nzp - Nin;
-                    pad2 = pad / 2;
                     /* Copy the right half of the input into the left half of this IFG, zero padded in the middle */
                     for(k=indexZPDin; k<Nin; k++) {
                         /*printf("%s: IFG: indexZPDin=%d, indexZPDzp=%d, Nin=%d, Nzp=%d, k=%d, l=%d\n", TASK_NAME, indexZPDin, indexZPDzp, Nin, Nzp, k, l);*/
@@ -569,7 +558,7 @@ void smurf_fts2_spectrum(int* status)
                         }*/
                     }
                     /* Copy the left half of the input into the right half of this IFG, zero padded in the middle */
-                    for(k=0,l=0; k<indexZPDin; k++) {
+                    for(k=0; k<indexZPDin; k++) {
                         IFG[Nzp - indexZPDin + k] =  *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
                       /*if(i==16 && j==25) {
                             printf("%s: Pixel[%d,%d]: (L->R) IFG[Nzp(%d)-indexZPDin(%d)+k(%d)=%d] = inData->pntr[bolIndex(%d)+k(%d)*nPixels(%d)=%d] = %g\n",
@@ -624,7 +613,7 @@ void smurf_fts2_spectrum(int* status)
                 } */
 
                 /* FFT Double-sided complex-valued interferogram */
-                plan = fftw_plan_dft_1d(N, DSIN, SPEC, FFTW_FORWARD, FFTW_ESTIMATE);
+                plan = fftw_plan_dft_1d( (int) N, DSIN, SPEC, FFTW_FORWARD, FFTW_ESTIMATE);
                 fftw_execute(plan);
 
                 /* Normalize spectrum */

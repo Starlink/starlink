@@ -89,8 +89,8 @@ typedef struct smfAddComData {
    dim_t nbolo;
    double comval;
    double *out;
-   size_t t1;
-   size_t t2;
+   dim_t t1;
+   dim_t t2;
 } smfAddComData;
 
 /* Prototypes for local functions. */

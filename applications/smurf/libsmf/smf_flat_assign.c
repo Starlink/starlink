@@ -100,7 +100,7 @@ void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, double inrefres,
                        const smfData * powval, const smfData * bolval,
                        smfData * updata, int *status ) {
 
-  size_t nbols = 0;        /* Number of bolometers */
+  dim_t nbols = 0;        /* Number of bolometers */
   smfDA * outda = NULL;    /* Pointer to output smfDA */
 
   /* Local copies of incoming flatfield values */
@@ -109,7 +109,7 @@ void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, double inrefres,
   double * flatpar = NULL;
   int nflat = 0;
   double * heatval = NULL;
-  int nheat = 0;
+  dim_t nheat = 0;
   double refres = VAL__BADD;
 
   if (*status != SAI__OK) return;
@@ -154,7 +154,7 @@ void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, double inrefres,
     /* Get values from the smfDatas */
     flatmeth = inflatmeth;
     refres = inrefres;
-    nflat = (bolval->dims)[2];
+    nflat = (int) (bolval->dims)[2];
     flatpar = (powval->pntr)[0];
     flatcal = (bolval->pntr)[0];
 

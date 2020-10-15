@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     void smf_fit_poly1d ( size_t order, size_t nelem, double clip,
+*     void smf_fit_poly1d ( dim_t order, dim_t nelem, double clip,
 *                           int maxiter,
 *                           const double x[], const double y[],
 *                           const double vary[], const smf_qual_t qual[],
@@ -22,9 +22,9 @@
 *                           int *status );
 
 *  Arguments:
-*     order = size_t (Given)
+*     order = dim_t (Given)
 *        Order of polynomial to use for the fit.
-*     nelem = size_t (Given)
+*     nelem = dim_t (Given)
 *        Number of elements in x, y and dy.
 *     clip = double (Given)
 *        Sigma clipping level. The fit is calculated and then the
@@ -131,14 +131,14 @@
 #include "gsl/gsl_fit.h"
 #include "gsl/gsl_multifit.h"
 
-void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
+void smf__fit_poly1d ( dim_t order, dim_t nelem, const double x[],
                        const double y[], const double vary[],
                        const smf_qual_t qual[], double coeffs[],
                        double varcoeffs[], double polydata[], int64_t *nused,
                        double * rchisq, int *status );
 
 /* Expose alternate function that returns chi^2 value, but without clipping */
-void smf_fit_poly1d_chisq ( size_t order, size_t nelem, const double x[],
+void smf_fit_poly1d_chisq ( dim_t order, dim_t nelem, const double x[],
                             const double y[], const double vary[],
                             const smf_qual_t qual[], double coeffs[],
                             double varcoeffs[], double polydata[], int64_t *nused,
@@ -149,13 +149,13 @@ void smf_fit_poly1d_chisq ( size_t order, size_t nelem, const double x[],
 
 }
 
-void smf_fit_poly1d ( size_t order, size_t nelem, double clip, int maxiter,
+void smf_fit_poly1d ( dim_t order, dim_t nelem, double clip, int maxiter,
                       const double x[], const double y[], const double vary[],
                       const smf_qual_t qual[], double coeffs[],
                       double varcoeffs[], double polydata[], int64_t * nused,
                       int *status ) {
   int niter;
-  size_t i;
+  dim_t i;
   double rchisq;     /* Reduced chisq of fit */
 
   /* initialise to bad */
@@ -214,12 +214,10 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, int maxiter,
       niter++;
       double mean;
       double stdev;
-      size_t ngood;
+      dim_t ngood;
       double thresh;
-      size_t nclipped;
-      size_t maxidx;
+      dim_t nclipped;
       double maxresid;
-      double prevchisq = VAL__BADD;
 
       /* calculate the fit */
       smf__fit_poly1d ( order, nelem, x, y, varptr, qual, coeffs, varcoeffs,
@@ -233,7 +231,6 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, int maxiter,
       /* calculate the residuals */
       ngood = 0;
       maxresid = 0.0;
-      maxidx = VAL__BADI;
       for (i=0; i<nelem; i++) {
         if ( y[i] != VAL__BADD && pptr[i] != VAL__BADD && varptr[i] != VAL__BADD
              && varptr[i] != 0.0 && (qual ? !(qual[i]&SMF__Q_FIT) : 1) ) {
@@ -241,7 +238,6 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, int maxiter,
           ngood++;
           if (resid[i] > maxresid) {
             maxresid = resid[i];
-            maxidx = i;
           }
         } else {
           resid[i] = VAL__BADD;
@@ -271,7 +267,6 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, int maxiter,
       }
 
       if ( nclipped == 0 ) iterating = 0;
-      prevchisq = rchisq;
     }
 
     /* clean up resources */
@@ -285,7 +280,7 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, int maxiter,
 
 /* internal implementation to simplify the iterative clipping routine */
 
-void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
+void smf__fit_poly1d ( dim_t order, dim_t nelem, const double x[],
                        const double y[], const double vary[],
                        const smf_qual_t qual[], double coeffs[],
                        double varcoeffs[], double polydata[], int64_t *nused,
@@ -293,7 +288,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
 
   const double * xx = NULL;
   double * xptr = NULL;
-  size_t i;
+  dim_t i;
 
   if (rchisq) *rchisq = VAL__BADD;
 
@@ -320,7 +315,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
 
   if (order == 0 ) {
     /* Special case: a simple mean ********************************************/
-    size_t nrgood = 0;
+    dim_t nrgood = 0;
     double res_sq = 0;
 
     if (vary) {
@@ -403,7 +398,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
     /* Report the fit details */
     if (msgFlevok( MSG__DEBUG2, status ) ) {
       if (nrgood == nelem) {
-        msgSeti( "NVAL", nrgood);
+        msgSetk( "NVAL", nrgood);
       } else {
         msgFmt( "NVAL", "%zd/%zd", nrgood, nelem);
       }
@@ -419,7 +414,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
   } else if (order == 1 ) {
     /* Special case: a first order linear regression **************************/
     double c0, c1, cov00, cov01, cov11, chisq;
-    size_t nrgood = 0;
+    dim_t nrgood = 0;
 
     if (vary) {
       /* Space for the weights */
@@ -487,7 +482,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
     /* Report the fit details */
     if (msgFlevok( MSG__DEBUG2, status ) ) {
       if (nrgood == nelem) {
-        msgSeti( "NVAL", nrgood);
+        msgSetk( "NVAL", nrgood);
       } else {
         msgFmt( "NVAL", "%zd/%zd", nrgood, nelem);
       }
@@ -511,7 +506,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
       } else {
         var = astCalloc( order+1, sizeof(*var) );
       }
-      sc2math_cubfit( nelem, (double*)x, (double*)y, coeffs, var, status);
+      sc2math_cubfit( nelem, x, y, coeffs, var, status);
       if (var && !varcoeffs) var = astFree( var );
 
       /* sc2math assumes all the points are good so if we seriously
@@ -521,16 +516,16 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
 
     } else {
       /* GSL method */
-      size_t k;
+      dim_t k;
       gsl_vector * mcoeffs = NULL;
       gsl_matrix * mcov = NULL;
-      size_t ncoeff = order + 1;
+      dim_t ncoeff = order + 1;
       gsl_vector * W = NULL;
       gsl_matrix * X = NULL;
       gsl_vector * Y = NULL;
       gsl_multifit_linear_workspace *work = NULL;
       double chisq;
-      size_t nrgood = 0;
+      dim_t nrgood = 0;
 
       /* allocate space */
       work = gsl_multifit_linear_alloc( nelem, ncoeff );

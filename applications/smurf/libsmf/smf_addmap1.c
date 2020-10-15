@@ -13,14 +13,14 @@
 *     C function
 
 *  Invocation:
-*     smf_addmap1( int contchunk, double *map1, double *mapweight1,
+*     smf_addmap1( dim_t contchunk, double *map1, double *mapweight1,
 *                  double *boloweight1, int *hitsmap1, double *mapvar1,
 *                  smf_qual_t *mapqual1, double *map2, double *boloweight2,
 *                  int *hitsmap2, double *mapvar2, smf_qual_t *mapqual2,
 *                  dim_t msize, double chunkweight2, int *status ) {
 
 *  Arguments:
-*     contchunk = int (Given)
+*     contchunk = dim_t (Given)
 *        The zero-based index of the chunk being added.
 *     map1 = double* (Given and Returned)
 *        The first map
@@ -125,7 +125,7 @@
 
 #define FUNC_NAME "smf_addmap1"
 
-void smf_addmap1( int contchunk, double *map1, double *mapweight1, double *boloweight1,
+void smf_addmap1( dim_t contchunk, double *map1, double *mapweight1, double *boloweight1,
                   int *hitsmap1, double *mapvar1, smf_qual_t *mapqual1,
                   double *map2, double *boloweight2, int *hitsmap2,
                   double *mapvar2, smf_qual_t *mapqual2, dim_t msize,

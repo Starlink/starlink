@@ -116,7 +116,7 @@ void smurf_rawunpress( int *status ) {
   smfData *data = NULL;     /* Pointer to input data struct */
   size_t i = 0;             /* Counter, index */
   int indf;                 /* NDF identifier for input file */
-  int nout;                 /* Number of data points in output data file */
+  size_t nout;              /* Number of data points in output data file */
   Grp *igrp = NULL;         /* Input group of files */
   Grp *ogrp = NULL;         /* Output group of files */
   void *outdata[1];         /* Pointer to array of output mapped pointers*/

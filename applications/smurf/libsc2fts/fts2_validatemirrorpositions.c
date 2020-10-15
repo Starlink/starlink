@@ -124,10 +124,11 @@ void fts2_validatemirrorpositions(double* positions, double* times, int count, i
   s = v*t;
   double EPSILON = s/2.0;
 
-  int i,j,x,y = 0;
+  int i,j;
+  size_t x,y = 0;
   int scanDir      = 0;             /* Mirror scan direction forward==1, reverse==-1 */
 
-  double * copyData;                /* Array of pointers to DATA/VARIANCE/QUALITY */
+  double * copyData = NULL;         /* Array of pointers to DATA/VARIANCE/QUALITY */
   size_t nWidth             = 0;
   size_t nHeight            = 0;
   size_t nFrames            = 0;

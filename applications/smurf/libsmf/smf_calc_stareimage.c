@@ -108,14 +108,14 @@
 void smf_calc_stareimage( smfData *data, const int naver, int *status) {
 
   double *avdata = NULL;           /* Pointer to averaged data */
-  int dims[2];                     /* Dimensions of the stored image */
+  dim_t dims[2];                   /* Dimensions of the stored image */
   smfHead *hdr;                    /* Header information */
   int j;                           /* Loop counter */
-  size_t npts;                     /* Number of points in the averaged data */
+  dim_t npts;                      /* Number of points in the averaged data */
   int numaver;                     /* Number of samples to average */
   int numimages;                   /* Number of output STARE images */
-  int numsamples;                  /* Number of time slices (samples) */
-  int remainder;                   /* Remainder from dividing no of timeslices
+  dim_t numsamples;                /* Number of time slices (samples) */
+  dim_t remainder;                 /* Remainder from dividing no of timeslices
 				      by number of frames to average */
   HDSLoc *scu2redloc = NULL;       /* Locator to SCU2RED extension */
   double steptime;                 /* Step time per sample, sec */
@@ -160,25 +160,25 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
       numaver = 1.0 / steptime;
     } else if ( naver > numsamples ) {
       msgOutif(MSG__NORM, "", "Warning: NAVER exceeds the number of samples - will average entire time stream to create a single image", status);
-      numaver = numsamples;
+      numaver = (int) numsamples;
     } else {
       numaver = naver;
     }
 
-    numimages = numsamples / numaver;
+    numimages = (int) ( numsamples / numaver );
 
     /* Warn user if the number to average is not a factor of the
        number of time slices  */
     remainder = numsamples % numaver;
     if ( remainder != 0 ) {
-      msgSeti("R", remainder);
-      msgSeti("N", numaver);
-      msgSeti("T", numsamples);
+      msgSetk("R", remainder);
+      msgSetk("N", numaver);
+      msgSetk("T", numsamples);
       msgOutif(MSG__NORM, "", "Warning: NAVER (^N) is not a factor of the number of time slices (^T): final ^R samples will not be included in an image", status);
     }
 
     /* Helpful info for the user */
-    msgSeti("N",numimages);
+    msgSetk("N",numimages);
     if ( numimages == 1 ) {
       msgSetc("IM","image");
     } else {

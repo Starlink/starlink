@@ -176,16 +176,16 @@
 void smf_close_file( ThrWorkForce *wf, smfData ** data, int * status ) {
 
   void *buf=NULL;         /* Buffer pointer */
-  size_t buflen=0;        /* Size of buffer */
+  dim_t buflen=0;        /* Size of buffer */
   smfDA   * da;           /* pointer to smfDA in smfData */
   smfFts* fts;            /* pointer to smfFts in smfData */
-  size_t datalen=0;       /* Size of data buffer in bytes */
+  dim_t datalen=0;       /* Size of data buffer in bytes */
   smfDream *dream = NULL; /* Pointer to smfDream in smfData */
   smfFile * file;         /* pointer to smfFile in smfData */
   int       freedata = 0; /* should the data arrays be freed? */
   smfHead * hdr;          /* pointer to smfHead in smfData */
-  size_t headlen=0;       /* Size of header (mmap'd files) in bytes */
-  size_t       i;         /* loop counter */
+  dim_t headlen=0;       /* Size of header (mmap'd files) in bytes */
+  dim_t       i;         /* loop counter */
   smfDIMMHead *temphead=NULL; /* Pointer to DIMM header */
 
 

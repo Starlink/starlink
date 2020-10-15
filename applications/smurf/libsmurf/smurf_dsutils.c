@@ -331,14 +331,14 @@ typedef struct SliceInfo {
 } SliceInfo;
 
 static AstFrameSet *GetFPFrameSet( const char *name, int *status );
-static void PasteNDF( const char *subarray, int *lb, int *ub, int nvals,
+static void PasteNDF( const char *subarray, dim_t *lb, dim_t *ub, int nvals,
                       double *xvals,
                       double *yvals, double *datvals, double *varvals,
                       AstMapping *map, AstFrameSet *wcs, int niter,
                       int genvar, double wlim, const char *param, int *status );
-static void Filter( int n, double *flags, double *vals, double nsigma,
+static void Filter( dim_t n, double *flags, double *vals, double nsigma,
                     const char *title, int * status );
-static void Filter2( int n, double *flags, double *vals, double nsigma,
+static void Filter2( dim_t n, double *flags, double *vals, double nsigma,
                      const char *title, int * status );
 static int SaveBoloMapping( const char *param, smfData *data, int *status );
 static int SaveTimeSlice( const char *param1, const char *param2, smfData *data, int *status );
@@ -348,8 +348,8 @@ static void AddColName( AstKeyMap *header, const char *colname, const char *desc
                         int *status );
 static void PutHeader( FILE *fp, AstKeyMap *header, int *status );
 static AstPolyMap *FindPolyMap( AstMapping *map, int *status );
-static double *SmoothZ( int zbox, int nrow, double *in_vals, double *iz_vals, int *status );
-static double Mode( int n, double *vals, double *dev, int * status );
+static double *SmoothZ( dim_t zbox, dim_t nrow, double *in_vals, double *iz_vals, int *status );
+static double Mode( dim_t n, double *vals, double *dev, int * status );
 static int FindSlices( const char *pxbol, const char *pybol, const char *pradius, smfData *data, int *status );
 static int ShowSlices( const char *param, smfData *data, int *status );
 
@@ -389,14 +389,25 @@ void smurf_dsutils( int *status ) {
    char outcode[ MAXPATH ];  /* Name of output file to hold C source code */
    char subarray[ 9 ];       /* Name of subarray */
    const char *skyrefis;     /* Original value of SkyRefIs in sky frame */
-   const char *start;        /* Pointer to next character to read */
    dim_t border;             /* Width of excluded border, in pixels */
+   dim_t gxoff;
+   dim_t gyoff;
+   dim_t irow;               /* Row index */
    dim_t itime;              /* Grid index on the third pixel axis */
+   dim_t ix;                 /* Grid index on the first pixel axis */
+   dim_t iy;                 /* Grid index on the second pixel axis */
+   dim_t iz;
+   dim_t lbnd[ 2 ];          /* Pixel index lower bounds in input array */
+   dim_t lbnd_out[ 2 ];      /* Pixel index lower bounds in output NDF */
+   dim_t nrow;               /* Number of usable rows */
    dim_t ntime;              /* Length of the third pixel axis */
    dim_t nx;                 /* Length of the first pixel axis */
    dim_t ny;                 /* Length of the second pixel axis */
    dim_t peakx;              /* Index on the first pixel axis at peak */
    dim_t peaky;              /* Index on the second pixel axis at peak */
+   dim_t ubnd[ 2 ];          /* Pixel index upper bounds in input NDF */
+   dim_t ubnd_out[ 2 ];      /* Pixel index upper bounds in output NDF */
+   dim_t zbox;
    double *amp_vals = NULL;
    double *bc1_vals = NULL;  /* Pointer to BC1 column values */
    double *bc2_vals = NULL;  /* Pointer to BC2 column values */
@@ -411,10 +422,10 @@ void smurf_dsutils( int *status ) {
    double *dpx_vals = NULL;  /* Pointer to pixel X offset values */
    double *dpy_vals = NULL;  /* Pointer to pixel Y offset values */
    double *extra_vals = NULL;
-   double *fx_vals = NULL;   /* Pointer to focal plane X values */
-   double *fy_vals = NULL;   /* Pointer to focal plane Y values */
    double *f1_vals = NULL;   /* Pointer to F1 column values */
    double *f2_vals = NULL;   /* Pointer to F2 column values */
+   double *fx_vals = NULL;   /* Pointer to focal plane X values */
+   double *fy_vals = NULL;   /* Pointer to focal plane Y values */
    double *iz_vals = NULL;
    double *p1x;
    double *p1y;
@@ -473,7 +484,6 @@ void smurf_dsutils( int *status ) {
    double sx;
    double sy2;
    double sy;
-   double wlim;              /* Min weight for a valid output pixel */
    double xin[ 2 ];          /* Pixel coord X positions */
    double xout[ 2 ];         /* Focal plane X positions (mm) */
    double yin[ 2 ];          /* Pixel coord Y positions */
@@ -483,39 +493,24 @@ void smurf_dsutils( int *status ) {
    int col[ 20 ];            /* Indices of required input catalogue columns */
    int forward;
    int genvar;
-   int gxoff;
-   int gyoff;
-   int i;                    /* Loop count */
+   int i;
    int icurr;                /* Index of current Frame in FrameSet */
    int indf1;                /* Identifier for NDF */
    int indf2;                /* Identifier for NDF */
-   int irow;                 /* Row index */
    int ival;                 /* Temporary integer value storage */
-   int ix;                   /* Grid index on the first pixel axis */
-   int iy;                   /* Grid index on the second pixel axis */
-   int iz;
    int l;                    /* Input line number */
-   int lbnd[ 2 ];            /* Pixel index lower bounds in input array */
-   int lbnd_out[ 2 ];        /* Pixel index lower bounds in output NDF */
    int ncoeff_f, nin;
-   int nel;
-   int ngood;                /* Number of usable time slices */
    int niter;                /* Number of sigma-clips to perform */
-   int nrow;                 /* Number of usable rows */
-   int nword;                /* Number of words in line of text */
    int ns;
-   int nxy;                  /* Number of elements in a time slice */
-   int nxyz;                 /* Number of elements in whole cube */
+   int nword;                /* Number of words in line of text */
    int ok;                   /* Was the row good */
-   int ubnd[ 2 ];            /* Pixel index upper bounds in input NDF */
-   int ubnd_out[ 2 ];        /* Pixel index upper bounds in output NDF */
-   int used;                 /* Was the time slice usable? */
-   int zbox;
    sc2ast_subarray_t subnum;
+   size_t j;                 /* Loop count */
+   size_t nel;
+   size_t nxy;               /* Number of elements in a time slice */
    size_t size;              /* Number of files in input group */
    smfData *data = NULL;     /* Pointer to data struct for input file */
    smfFile *file = NULL;     /* Pointer to file struct for input file */
-
    smfHead *hdr = NULL;      /* Pointer to data header for time slice */
 
    const char *sa_name[] = { "s8a", "s8b", "s8c", "s8d",
@@ -646,13 +641,13 @@ void smurf_dsutils( int *status ) {
       lbnd_out[ 1 ] = 1;
       ubnd_out[ 0 ] = ( ubnd[ 0 ] - lbnd[ 0 ] + 1 );
       ubnd_out[ 1 ] = ( ubnd[ 1 ] - lbnd[ 1 ] + 1 );
-      astTranGrid( fp_map, 2, lbnd_out, ubnd_out, 0.0, 0, 1, 2,
-                   nel, worka );
+      astTranGrid8( fp_map, 2, lbnd_out, ubnd_out, 0.0, 0, 1, 2,
+                    nel, worka );
 
 /* Transform these focal plane (X,Y) values into corrected focal plane
    (X,Y) values using the polymap, storeing the results in the second work
    array. */
-      astTran2( polymap, nel, worka, worka + nel, 1, workb, workb + nel );
+      astTran28( polymap, nel, worka, worka + nel, 1, workb, workb + nel );
 
 /* Get the focal plane coords for the point that defines the global offset to be
    removed (if any). */
@@ -668,7 +663,7 @@ void smurf_dsutils( int *status ) {
          } else {
 
 /* Convert to grid coords. */
-            astTran2( wcs, 1, &fxoff, &fyoff, 0, &fxoff, &fyoff );
+            astTran28( wcs, 1, &fxoff, &fyoff, 0, &fxoff, &fyoff );
 
 /* Convert to GRID indices. */
             if( fxoff > 0.0 ) {
@@ -706,7 +701,7 @@ void smurf_dsutils( int *status ) {
          p2y = p2x + nel;
          p3 = data1;
          p4 = data2;
-         for( i = 0; i < nel; i++ ) {
+         for( j = 0; j < nel; j++ ) {
             dx = *(p2x++) - *(p1x++) - dx0;
             dy = *(p2y++) - *(p1y++) - dy0;
             *(p3++) = sqrt( dx*dx + dy*dy );
@@ -752,7 +747,7 @@ void smurf_dsutils( int *status ) {
       nxy *= ( ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1 );
       worka = astMalloc( 2*nxy*sizeof( double ) ) ;
       map = astGetMapping( fp_fset, AST__BASE, AST__CURRENT );
-      astTranGrid( map, 2, lbnd_out, ubnd_out, 0.0, 0, 1, 2, nxy, worka );
+      astTranGrid8( map, 2, lbnd_out, ubnd_out, 0.0, 0, 1, 2, nxy, worka );
 
 /* Store the subarray. */
       ndfXnew( indf1, "DSUTILS", "DSUTILS", 0, NULL, &xloc1, status );
@@ -773,7 +768,7 @@ void smurf_dsutils( int *status ) {
       if( *status == SAI__OK ) {
          double *p1 = worka;
          double *p2 = worka + nxy;
-         for( i = 0; i < nxy; i++ ) {
+         for( j = 0; j < nxy; j++ ) {
             *(data1++) = *(p1++);
             *(data2++) = *(p2++);
          }
@@ -988,7 +983,7 @@ void smurf_dsutils( int *status ) {
          nxy = ( ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1 );
          nxy *= ( ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1 );
          worka = astMalloc( 2*nxy*sizeof( double ) ) ;
-         astTranGrid( map2, 2, lbnd_out, ubnd_out, 0.0, 0, 1, 2, nxy, worka );
+         astTranGrid8( map2, 2, lbnd_out, ubnd_out, 0.0, 0, 1, 2, nxy, worka );
 
 /* Combine the two Mappings to get the expanded GRID->corrected (Fx,Fy) Mapping. */
          map = (AstMapping *) astCmpMap( map2, polymap, 1, " " );
@@ -996,15 +991,15 @@ void smurf_dsutils( int *status ) {
 /* Create arrays holding the corrected focal plane coords for every tenth
    of a bolometer. */
          workb = astMalloc( 2*nxy*sizeof( double ) ) ;
-         astTranGrid( map, 2, lbnd_out, ubnd_out, 0.0, 0, 1, 2, nxy, workb );
+         astTranGrid8( map, 2, lbnd_out, ubnd_out, 0.0, 0, 1, 2, nxy, workb );
 
 /* Subtract the corrected focal plane X coords from the real focal plane
    X coords. Correct the Y coords in the same way. This gives us the
    deltas needed to to convert corrected focal plane coords to real focal
    plane coords. */
-         for( i = 0; i < nxy; i++ ) {
-            worka[ i ] -= workb[ i ];
-            worka[ i + nxy ] -= workb[ i + nxy ];
+         for( j = 0; j < nxy; j++ ) {
+            worka[ j ] -= workb[ j ];
+            worka[ j + nxy ] -= workb[ j + nxy ];
          }
 
 /* Create an NDF by pasting the X deltas into an image with axes which are
@@ -1015,12 +1010,12 @@ void smurf_dsutils( int *status ) {
          lbnd_out[ 1 ] = -EXPAND + 1;
          ubnd_out[ 1 ] = lbnd_out[ 1 ] + 40*EXPAND - 1;
          astInvert( map2 );
-         PasteNDF( subarray, lbnd_out, ubnd_out, nxy, workb, workb + nxy, worka, NULL,
+         PasteNDF( subarray, lbnd_out, ubnd_out, (int) nxy, workb, workb + nxy, worka, NULL,
                    map2, fp_fset, 0, 0, 0.0, "OUTDX", status );
 
 /* Create another NDF by pasting the Y deltas into an image with axes which
    are a linear function of corrected focal plane axes. */
-         PasteNDF( subarray, lbnd_out, ubnd_out, nxy, workb, workb + nxy, worka + nxy,
+         PasteNDF( subarray, lbnd_out, ubnd_out, (int) nxy, workb, workb + nxy, worka + nxy,
                    NULL, map2, fp_fset, 0, 0, 0.0, "OUTDY", status );
          astInvert( map2 );
 
@@ -1136,7 +1131,7 @@ void smurf_dsutils( int *status ) {
    get the index of the time slice index column. */
       col[ IZ ] = -1;
       if( *status == SAI__OK ) {
-         parGet0i( "ZBOX", &zbox, status );
+         parGet0k( "ZBOX", &zbox, status );
          if( *status == PAR__NULL ) {
             errAnnul( status );
          } else {
@@ -1167,7 +1162,6 @@ void smurf_dsutils( int *status ) {
          words = astChrSplit( buf, &nword );
 
 /* Loop round all the words (i.e. columns) in this line. */
-         start = buf;
          for( i = 0; i < nword; i++ ) {
             p = NULL;
 
@@ -1268,7 +1262,7 @@ void smurf_dsutils( int *status ) {
             yin[ 0 ] = bc2_vals[ nrow ] - lbnd[ 1 ] + 1.5;
             xin[ 1 ] = f1_vals[ nrow ] - lbnd[ 0 ] + 1.5;
             yin[ 1 ] = f2_vals[ nrow ] - lbnd[ 1 ] + 1.5;
-            astTran2( fp_map, 2, xin, yin, 1, xout, yout ) ;
+            astTran28( fp_map, 2, xin, yin, 1, xout, yout ) ;
 
 /* Store the offsets in focal plane coords at the current focal plane
    feature position. */
@@ -1340,7 +1334,7 @@ void smurf_dsutils( int *status ) {
 
       if( *status != SAI__OK ) goto L999;
 
-      printf( "%d bad rows\n", l - nrow );
+      printf( "%" DIM_T_FMT " bad rows\n", l - nrow );
 
 /* Flag unusual rows by storing a bad value for each in "bc1_vals". */
       Filter2( nrow, bc1_vals, amp_vals, 3.0, "AMP", status );
@@ -1412,16 +1406,16 @@ void smurf_dsutils( int *status ) {
       map = (AstMapping *) astShiftMap( 2, shift, " " );
 
 /* Paste the X offset values into an output NDF. */
-      PasteNDF( subarray, NULL, NULL, nrow, f1_vals, f2_vals, bc1_vals, dbf1_vals, map,
+      PasteNDF( subarray, NULL, NULL, (int)nrow, f1_vals, f2_vals, bc1_vals, dbf1_vals, map,
                 fp_fset, niter, genvar, 0.5, "OUTDX", status );
 
 /* Create the Y offset NDF in the same way. */
-      PasteNDF( subarray, NULL, NULL, nrow, f1_vals, f2_vals, bc2_vals, dbf2_vals, map,
+      PasteNDF( subarray, NULL, NULL, (int)nrow, f1_vals, f2_vals, bc2_vals, dbf2_vals, map,
                 fp_fset, niter, genvar, 0.5, "OUTDY", status );
 
 /* Create an NDF holding any extra required column in the same way. */
       if( extra_vals ) {
-         PasteNDF( subarray, NULL, NULL, nrow, f1_vals, f2_vals, extra_vals,
+         PasteNDF( subarray, NULL, NULL, (int)nrow, f1_vals, f2_vals, extra_vals,
                    dbf1_vals, map, fp_fset, niter, genvar, 0.5, "COLNDF", status );
       }
 
@@ -1516,7 +1510,6 @@ void smurf_dsutils( int *status ) {
       ny = data->dims[ 1 ];
       ntime = data->dims[ 2 ];
       nxy = nx*ny;
-      nxyz = nxy*ntime;
 
 /* Store the upper pixel index bounds of each time slice. */
       ubnd[ 0 ] = data->lbnd[ 0 ] + nx - 1;
@@ -1581,7 +1574,7 @@ void smurf_dsutils( int *status ) {
    GRID coords. */
          ox = 0.0;
          oy = 0.0;
-         astTran2( swcsin, 1, &ox, &oy, 0, &gx, &gy );
+         astTran28( swcsin, 1, &ox, &oy, 0, &gx, &gy );
 
 /* Convert from GRID to PIXEL coords. */
          bcx = gx + data->lbnd[ 0 ] - 1.5;
@@ -1697,11 +1690,8 @@ void smurf_dsutils( int *status ) {
       }
 
 /* Loop round each time slice. */
-      ngood = 0;
-      wlim = 0.0;
       slice = slices;
       for( itime = 0; itime < ntime && *status == SAI__OK; itime++,slice++ ) {
-         used = 0;
 
 /* Skip this time slice if its total data sum is not acceptable. Also
    skip it if the x or y displacement is more than 3*sigma from the mean. */
@@ -1873,7 +1863,7 @@ static AstFrameSet *GetFPFrameSet( const char *name, int *status ){
 /* Create an output NDF and paste a list of data values into its data array.
    --------------------------------------------------------------------- */
 
-static void PasteNDF( const char *subarray, int *lb, int *ub, int nvals,
+static void PasteNDF( const char *subarray, dim_t *lb, dim_t *ub, int nvals,
                       double *xvals, double *yvals, double *datvals,
                       double *varvals, AstMapping *map, AstFrameSet *wcs,
                       int niter, int genvar, double wlim, const char *param,
@@ -1885,25 +1875,25 @@ static void PasteNDF( const char *subarray, int *lb, int *ub, int nvals,
    AstMapping *tmap;
    AstPermMap *pmap;
    HDSLoc *xloc = NULL;
+   dim_t lbnd[ 2 ];
+   dim_t rlbnd[ 1 ];
+   dim_t rubnd[ 1 ];
+   dim_t ubnd[ 2 ];
    double *data;
    double *var;
-   double *work;
-   double *work2v;
    double *work2d;
+   double *work2v;
+   double *work;
    double dx;
    int flags;
    int indf;
    int inperm[ 1 ];
    int irow;
    int iter;
-   int lbnd[ 2 ];
-   int nel;
    int nrej;
-   int64_t nused;
    int outperm[ 2 ];
-   int rlbnd[ 1 ];
-   int rubnd[ 1 ];
-   int ubnd[ 2 ];
+   int64_t nused;
+   size_t nel;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -1992,21 +1982,21 @@ static void PasteNDF( const char *subarray, int *lb, int *ub, int nvals,
 /* Bin the values array into the output pixel grid, forming variances from
    the spread of values if required. We use astRebinSeq because astRebin does
    not have a GENVAR facility. */
-         astRebinSeqD( tmap, wlim, 1, rlbnd, rubnd, datvals, varvals, AST__LINEAR,
-                       NULL, (AST__REBININIT | flags ), 0.0, 0, VAL__BADD, 2,
-                       lbnd, ubnd, rlbnd, rubnd, data, var, work, &nused );
-         astRebinSeqD( tmap, wlim, 1, rlbnd, rubnd, NULL, NULL, AST__LINEAR,
-                       NULL, (AST__REBINEND | flags), 0.0, 0, VAL__BADD, 2,
-                       lbnd, ubnd, rlbnd, rubnd, data, var, work, &nused );
+         astRebinSeq8D( tmap, wlim, 1, rlbnd, rubnd, datvals, varvals, AST__LINEAR,
+                        NULL, (AST__REBININIT | flags ), 0.0, 0, VAL__BADD, 2,
+                        lbnd, ubnd, rlbnd, rubnd, data, var, work, &nused );
+         astRebinSeq8D( tmap, wlim, 1, rlbnd, rubnd, NULL, NULL, AST__LINEAR,
+                        NULL, (AST__REBINEND | flags), 0.0, 0, VAL__BADD, 2,
+                        lbnd, ubnd, rlbnd, rubnd, data, var, work, &nused );
 
 /* Quit if we have reached the end or if we have no variances. */
          if( iter == niter || !genvar ) break;
 
 /* Resample the binned offset image back into the supplied array format. */
          astInvert( tmap );
-         astResampleD( tmap, 2, lbnd, ubnd, data, var, AST__LINEAR, NULL, NULL,
-                       AST__USEBAD, 0.0, 0, VAL__BADD, 1, rlbnd, rubnd,
-                       rlbnd, rubnd, work2d, work2v );
+         astResample8D( tmap, 2, lbnd, ubnd, data, var, AST__LINEAR, NULL, NULL,
+                        AST__USEBAD, 0.0, 0, VAL__BADD, 1, rlbnd, rubnd,
+                        rlbnd, rubnd, work2d, work2v );
          astInvert( tmap );
 
 /* Reject any rows where the resampled row value is more than 3*sigma
@@ -2037,19 +2027,19 @@ static void PasteNDF( const char *subarray, int *lb, int *ub, int nvals,
 /* Perform sigma-clipping to identify outlying values in a list of values.
    --------------------------------------------------------------------- */
 
-static void Filter( int n, double *flags, double *vals, double nsigma,
+static void Filter( dim_t n, double *flags, double *vals, double nsigma,
                     const char *title, int * status ) {
 
 /* Local Variables: */
-   int done;
-   int nrej;
-   int ninc;
-   int i;
+   dim_t i;
+   dim_t ninc;
+   dim_t nrej;
+   double mean;
+   double sigma;
    double sum1;
    double sum2;
-   double mean;
    double var;
-   double sigma;
+   int done;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -2100,7 +2090,7 @@ static void Filter( int n, double *flags, double *vals, double nsigma,
 
    }
 
-   printf("Filtering %s removed %d rows\n", title, nrej );
+   printf("Filtering %s removed %d rows\n", title, (int) nrej );
 
 }
 
@@ -2167,7 +2157,7 @@ static int SaveBoloMapping( const char *param, smfData *data, int *status ){
    GRID coords. */
    ox = 0.0;
    oy = 0.0;
-   astTran2( swcsin, 1, &ox, &oy, 0, &gx, &gy );
+   astTran28( swcsin, 1, &ox, &oy, 0, &gx, &gy );
 
 /* We want to define a translated version of GRID coords (a form of PIXEL
    coords) in which the pixel origin corresponds to the sky reference
@@ -2210,21 +2200,21 @@ static int SaveTimeSlice( const char *param1, const char *param2,
                           smfData *data, int *status ){
 
 /* Local Variables: */
+   dim_t bstride;
    dim_t itime;
+   dim_t lbnd[ 3 ];
    dim_t ntslice;
+   dim_t tstride;
+   dim_t ubnd[ 3 ];
    double *d_data = NULL;
    double *ipd = NULL;
    int *i_data = NULL;
    int *ipi = NULL;
-   int el;
-   int i;
    int indf = NDF__NOID;
    int ival;
-   int lbnd[ 3 ];
    int result;
-   int ubnd[ 3 ];
-   size_t bstride;
-   size_t tstride;
+   size_t el;
+   size_t i;
 
 /* Initialise */
    result = 0;
@@ -2558,12 +2548,12 @@ static AstPolyMap *FindPolyMap( AstMapping *map, int *status ){
 
 /* Smooth the supplied 1D vals arrays with a box filter.
    ---------------------------------------------------------- */
-static double *SmoothZ( int zbox, int nrow, double *in_vals, double *iz_vals,
+static double *SmoothZ( dim_t zbox, dim_t nrow, double *in_vals, double *iz_vals,
                         int *status ){
 
 /* Local Variables; */
+   dim_t n1, irow, irow0;
    double *result;
-   int n1, irow, irow0;
    double z0, s1, s2, mean, sig;
 
 /* Check inherited status */
@@ -2625,15 +2615,15 @@ static double *SmoothZ( int zbox, int nrow, double *in_vals, double *iz_vals,
    return result;
 }
 
-static double Mode( int n, double *vals, double *dev, int * status ) {
+static double Mode( dim_t n, double *vals, double *dev, int * status ) {
 
 #define NBIN 10
 
 /* Local Variables: */
-   int i;
-   int ns;
-   int hist[ NBIN ];
-   int ibin;
+   dim_t i;
+   dim_t ns;
+   dim_t hist[ NBIN ];
+   dim_t ibin;
    double s1;
    double s2;
    double mean;
@@ -2668,7 +2658,7 @@ static double Mode( int n, double *vals, double *dev, int * status ) {
    delta = 4*sigma/NBIN;
 
 /* Initialise histogram. */
-   memset( hist, 0, sizeof( int )*NBIN );
+   memset( hist, 0, sizeof( dim_t )*NBIN );
 
 /* Form histogram. */
    a = 1.0/delta;
@@ -2682,7 +2672,7 @@ static double Mode( int n, double *vals, double *dev, int * status ) {
    }
 
 /* Find mode. */
-   int imax = 0;
+   dim_t imax = 0;
    for( i = 0; i < NBIN; i++ ) {
       if( hist[ i ] > hist[ imax ] ) imax = i;
    }
@@ -2710,15 +2700,16 @@ static double Mode( int n, double *vals, double *dev, int * status ) {
 /* Perform sigma-clipping to identify outlying values in a list of values.
    --------------------------------------------------------------------- */
 
-static void Filter2( int n, double *flags, double *vals, double nsigma,
+static void Filter2( dim_t n, double *flags, double *vals, double nsigma,
                      const char *title, int * status ) {
 
 /* Local Variables: */
-   int nrej;
-   int i, iter;
-   double mode;
-   double dev;
+   dim_t i;
+   dim_t nrej;
    double *p;
+   double dev;
+   double mode;
+   int iter;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -2745,7 +2736,7 @@ static void Filter2( int n, double *flags, double *vals, double nsigma,
       }
    }
 
-   printf("Mode filtering %s removed %d rows\n", title, nrej );
+   printf("Mode filtering %s removed %d rows\n", title, (int) nrej );
 
 }
 
@@ -2803,7 +2794,7 @@ static int FindSlices( const char *pxbol, const char *pybol, const char *pradius
 /* Get the grid coords of the reference poition. */
       ox = 0.0;
       oy = 0.0;
-      astTran2( swcsin, 1, &ox, &oy, 0, &gx, &gy );
+      astTran28( swcsin, 1, &ox, &oy, 0, &gx, &gy );
 
       astSetC( swcsin, "SkyRefIs", srefis );
 
@@ -2886,7 +2877,7 @@ static int ShowSlices( const char *param, smfData *data, int *status ) {
 /* Get the grid coords of the reference poition. */
       ox = 0.0;
       oy = 0.0;
-      astTran2( swcsin, 1, &ox, &oy, 0, &gx, &gy );
+      astTran28( swcsin, 1, &ox, &oy, 0, &gx, &gy );
 
 /* Reset SkyRefIs. */
       astSetC( swcsin, "SkyRefIs", srefis );

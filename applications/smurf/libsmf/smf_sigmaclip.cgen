@@ -14,12 +14,12 @@
 *     C function
 
 *  Invocation:
-*     double smf_sigmaclip<X>( int nval, const CGEN_TYPE *val, double *wgt,
+*     double smf_sigmaclip<X>( dim_t nval, const CGEN_TYPE *val, double *wgt,
 *                              double nsigma, int niter, double *stddev,
 *                              int *status )
 
 *  Arguments:
-*     nval = int (Given)
+*     nval = dim_t (Given)
 *        The number of points supplied.
 *     val = const CGEN_TYPE* (Given)
 *        Pointer to the array of "nval" values.
@@ -94,7 +94,7 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-double CGEN_FUNCTION(smf_sigmaclip)( int nval,  const CGEN_TYPE *val,
+double CGEN_FUNCTION(smf_sigmaclip)( dim_t nval,  const CGEN_TYPE *val,
                                      double *wgt, double nsigma, int niter,
                                      double *stddev, int *status ){
 
@@ -103,6 +103,7 @@ double CGEN_FUNCTION(smf_sigmaclip)( int nval,  const CGEN_TYPE *val,
    const CGEN_TYPE *pv;
    CGEN_TYPE hilim;
    CGEN_TYPE lolim;
+   dim_t ival;
    double result;
    double sigma;
    double swv;
@@ -110,7 +111,6 @@ double CGEN_FUNCTION(smf_sigmaclip)( int nval,  const CGEN_TYPE *val,
    double sw;
    double wv;
    int iter;
-   int ival;
 
 /* Initialise */
    result = VAL__BADD;

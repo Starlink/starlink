@@ -133,7 +133,7 @@
 *     9-DEC-2011 (DSB):
 *        Added MEANSHIFT parameter.
 *     24-MAY-2012 (DSB):
-*        Added NREJEDCTED and NFIXED parameters.
+*        Added NREJECTED and NFIXED parameters.
 
 *  Copyright:
 *     Copyright (C) 2010-2012 Science and Technology Facilities Council.
@@ -188,23 +188,23 @@
 
 /* Prototypes for local functions: */
 static int smf1_check_steps( const char *param, int first, dim_t nx,
-                             double sizetol, int nold, int nnew,
+                             double sizetol, int nold, dim_t nnew,
                              smfStepFix *oldsteps, smfStepFix *newsteps,
                              int *status );
 
-static void smf1_write_steps( FILE *fd, smfData *data, int nstep,
+static void smf1_write_steps( FILE *fd, smfData *data, dim_t nstep,
                               smfStepFix *steps, double dcthresh,
-                              dim_t dcsmooth, dim_t dcfitbox,
-                              int dcmaxsteps, int dclimcorr, size_t nrej,
+                              int dcsmooth, int dcfitbox,
+                              int dcmaxsteps, int dclimcorr, dim_t nrej,
                               int *status );
 
 static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
                                     dim_t dcsmooth0, dim_t dcfitbox0,
                                     int dcmaxsteps0, int dclimcorr0,
-                                    size_t nrej0, int nstep0, int *nstep,
+                                    dim_t nrej0, dim_t nstep0, int *nstep,
                                     int *status );
 
-static double smf1_get_rmssize( int nstep, smfStepFix *steps, int *status );
+static double smf1_get_rmssize( dim_t nstep, smfStepFix *steps, int *status );
 
 /* Main entry */
 void smurf_fixsteps( int *status ) {
@@ -215,27 +215,27 @@ void smurf_fixsteps( int *status ) {
    FILE *fd = NULL;          /* File descriptor */
    Grp *igrp = NULL;         /* Input group of files */
    Grp *ogrp = NULL;         /* Output group of files */
-   dim_t dcfitbox;           /* DCFITBOX config parameter */
-   dim_t dcsmooth;           /* DCSMOOTH config parameter */
+   ThrWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
+   dim_t nrej;               /* Number of rejected bolometers */
    dim_t nx;                 /* Length of first pixel axis */
    double dcthresh;          /* DCTHRESH config parameter */
    double sizetol;           /* Tolerance allowed on step height */
    int changed;              /* Have any step fixes changed? */
+   int dcfitbox;             /* DCFITBOX config parameter */
    int dclimcorr;            /* DCLIMCORR config parameter */
    int dcmaxsteps;           /* DCMAXSTEPS config parameter */
+   int dcsmooth;             /* DCSMOOTH config parameter */
    int first;                /* Index of first change to report */
    int itemp;                /* Intermediate value */
    int meanshift;            /* Use a mean shift filter? */
-   int nnew;                 /* Number of new step fixes */
+   dim_t nnew;               /* Number of new step fixes */
    int nold;                 /* Number of old step fixes */
-   size_t nrej;              /* Number of rejected bolometers */
    size_t outsize;           /* Total number of NDF names in the output group */
    size_t size;              /* Number of files in input group */
    smfData *data = NULL;     /* Output smfData */
    smfData *indata = NULL;   /* Input smfData */
    smfStepFix *newsteps = NULL; /* New step fix descriptions */
    smfStepFix *oldsteps = NULL; /* Old step fix descriptions */
-   ThrWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
 
 /* Check inherited status */
    if (*status != SAI__OK) return;
@@ -314,20 +314,20 @@ void smurf_fixsteps( int *status ) {
    } else if( nrej == 1 ) {
       msgOut( "", "One bolometer was rejected", status );
    } else {
-      msgSeti( "NREJ", nrej );
+      msgSetk( "NREJ", nrej );
       msgOut( "", "^NREJ bolometers were rejected", status );
    }
-   parPut0i( "NREJECTED", nrej, status );
+   parPut0k( "NREJECTED", nrej, status );
 
    if( nnew == 0 ) {
       msgOut( "", "No steps were fixed", status );
    } else if( nnew == 1 ) {
       msgOut( "", "One step was fixed", status );
    } else {
-      msgSeti( "NNEW", nnew );
+      msgSetk( "NNEW", nnew );
       msgOut( "", "^NNEW steps were fixed", status );
    }
-   parPut0i( "NFIXED", nnew, status );
+   parPut0k( "NFIXED", nnew, status );
 
 /* If required, write out to a text file details of the steps that were
    fixed. */
@@ -408,7 +408,7 @@ void smurf_fixsteps( int *status ) {
 static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
                                     dim_t dcsmooth0, dim_t dcfitbox0,
                                     int dcmaxsteps0, int dclimcorr0,
-                                    size_t nrej0, int nstep0, int *nstep,
+                                    dim_t nrej0, dim_t nstep0, int *nstep,
                                     int *status ) {
 /*
 *  Name:
@@ -421,7 +421,7 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
 *     smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
 *                                  dim_t dcsmooth0, dim_t dcfitbox0,
 *                                  int dcmaxsteps0, int dclimcorr0,
-*                                  size_t nrej0, int nstep0, int *nstep,
+*                                  dim_t nrej0, dim_t nstep0, int *nstep,
 *                                  int *status )
 
 *  Arguments:
@@ -438,9 +438,9 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
 *        Expected value of DCMAXSTEPS.
 *     dclimcorr = int (Given)
 *        Expected value of DCLIMCORR.
-*     nrej0 = size_t (Given)
+*     nrej0 = dim_t (Given)
 *        The expected number of bolometers rejected.
-*     nstep0 = int (Given)
+*     nstep0 = dim_t (Given)
 *        The expected number of step fixes.
 *     nstep = int * (Returned)
 *        The number of steps fixes read from the file.
@@ -464,6 +464,7 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
    smfStepFix *result;
    char buf[ 256 ];
    char *c;
+   int ival;
    double dval;
    double size;
    int bad;
@@ -472,7 +473,6 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
    int ibolo;
    int iline;
    int istep;
-   int ival;
    int nc;
    int nold;
    int stage;
@@ -520,9 +520,9 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
 
          if( sscanf( buf, "# Number of steps fixed = %d%n", &ival, &nc )
                      && nc > 26 ) {
-            if( ival != nstep0 ) {
+            if( (dim_t) ival != nstep0 ) {
                msgSeti( "O", ival );
-               msgSeti( "N", nstep0 );
+               msgSetk( "N", nstep0 );
                msgOut( "", "No. of steps fixed changed from ^O to ^N",
                        status );
             }
@@ -532,38 +532,38 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
          } else if( sscanf( buf, "# Number of bolometers rejected = %d%n",
                             &ival, &nc ) && nc > 34 ) {
             if( ival != (int) nrej0 ) {
-               msgSeti( "O", ival );
-               msgSeti( "N", nrej0 );
+               msgSetk( "O", ival );
+               msgSetk( "N", nrej0 );
                msgOut( "", "No. of bolometers rejected changed from ^O to ^N",
                        status );
             }
 
          } else if( sscanf( buf, "# DCFITBOX = %d%n", &ival, &nc ) && nc > 13 ) {
             if( ival != (int) dcfitbox0 ) {
-               msgSeti( "O", ival );
-               msgSeti( "N", dcfitbox0 );
+               msgSetk( "O", ival );
+               msgSetk( "N", dcfitbox0 );
                msgOut( "", "Warning: DCFITBOX changed from ^O to ^N", status );
             }
 
          } else if( sscanf( buf, "# DCMAXSTEPS = %d%n", &ival, &nc ) && nc > 14 ) {
             if( ival != dcmaxsteps0 ) {
-               msgSeti( "O", ival );
-               msgSeti( "N", dcmaxsteps0 );
+               msgSetk( "O", ival );
+               msgSetk( "N", dcmaxsteps0 );
                msgOut( "", "Warning: DCMAXSTEPS changed from ^O to ^N", status );
             }
 
          } else if( sscanf( buf, "# DCLIMCORR = %d%n", &ival, &nc ) && nc > 14 ) {
             if( ival != dclimcorr0 ) {
-               msgSeti( "O", ival );
-               msgSeti( "N", dclimcorr0 );
+               msgSetk( "O", ival );
+               msgSetk( "N", dclimcorr0 );
                msgOut( "", "Warning: DCLIMCORR changed from ^O to ^N", status );
             }
 
          } else if( sscanf( buf, "# DCSMOOTH = %d%n", &ival, &nc )
                     && nc > 18 ) {
             if( ival != (int) dcsmooth0 ) {
-               msgSeti( "O", ival );
-               msgSeti( "N", dcsmooth0 );
+               msgSetk( "O", ival );
+               msgSetk( "N", dcsmooth0 );
                msgOut( "", "Warning: DCSMOOTH changed from ^O to ^N", status );
             }
 
@@ -600,7 +600,7 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
    missing from the supplied file). */
             if( ival != istep ) {
                *status = SAI__ERROR;
-               msgSeti( "I", istep );
+               msgSetk( "I", istep );
                errRep( "", "Step ^I data not found in old steps file:", status );
                bad = 1;
 
@@ -628,7 +628,7 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
 /* Report an error if the last line read was illegal. */
    if( bad ) {
       *status = SAI__ERROR;
-      msgSeti( "I", iline );
+      msgSetk( "I", iline );
       errRep( "", "Illegal line found in old steps file (line ^I):", status );
       msgSetc( "L", buf );
       errRep( "", "'^L'", status );
@@ -644,8 +644,8 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
       *status = SAI__ERROR;
       errRep( "", "Incorrect number of step descriptions in old steps file.",
               status );
-      msgSeti( "I", istep );
-      msgSeti( "N", nold );
+      msgSetk( "I", istep );
+      msgSetk( "N", nold );
       errRep( "", "Header says file contains ^N steps but data for ^I "
               "steps was found.", status );
    }
@@ -655,7 +655,7 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
 
 
 static int smf1_check_steps( const char *param, int first, dim_t nx,
-                             double sizetol, int nold, int nnew,
+                             double sizetol, int nold, dim_t nnew,
                              smfStepFix *oldsteps, smfStepFix *newsteps,
                              int *status ){
 /*
@@ -668,7 +668,7 @@ static int smf1_check_steps( const char *param, int first, dim_t nx,
 
 *  Invocation:
 *     int smf1_check_steps( const char *param, int first, dim_t nx,
-*                           double sizetol, int nold, int nnew,
+*                           double sizetol, int nold, dim_t nnew,
 *                           smfStepFix *oldsteps, smfStepFix *newsteps,
 *                           int *status )
 
@@ -684,7 +684,7 @@ static int smf1_check_steps( const char *param, int first, dim_t nx,
 *        The minimum significant relative error in step size.
 *     nold = int (Given)
 *        The number of steps in the "oldsteps" array.
-*     nnew = int (Given)
+*     nnew = dim_t (Given)
 *        The number of steps in the "newsteps" array.
 *     oldsteps = smfStepFix * (Given and Returned)
 *        A pointer to the first element of an array of smfStepFix structures
@@ -713,15 +713,15 @@ static int smf1_check_steps( const char *param, int first, dim_t nx,
 */
 
 /* Local Variables: */
+   dim_t inew;
+   dim_t jnew;
    double abslim;
    double dsize;
    double dsize_min;
    int *fnew;
    int *new_flags;
    int cont;
-   int inew;
    int iold;
-   int jnew;
    int match;
    int result;
    smfStepFix *pnew;
@@ -813,18 +813,18 @@ static int smf1_check_steps( const char *param, int first, dim_t nx,
                   result++;
 
                   if( result >= first ) {
-                     msgSeti( "N", result );
-                     msgSeti( "I", pold->id );
+                     msgSetk( "N", result );
+                     msgSetk( "I", pold->id );
                      msgSetc( "W", pold->corr ? "secondary" : "primary" );
                      msgOut( "", "^N: An old ^W step (index ^I) is no longer found:", status );
 
-                     msgSeti( "B", pold->ibolo );
-                     msgSeti( "X", pold->ibolo % nx );
-                     msgSeti( "Y", pold->ibolo / nx );
+                     msgSetk( "B", pold->ibolo );
+                     msgSetk( "X", pold->ibolo % nx );
+                     msgSetk( "Y", pold->ibolo / nx );
                      msgOut( "", "   Bolometer = ^B (^X,^Y)", status );
 
-                     msgSeti( "S", pold->start );
-                     msgSeti( "E", pold->end );
+                     msgSetk( "S", pold->start );
+                     msgSetk( "E", pold->end );
                      msgOut( "", "   Time slice range = ^S:^E", status );
 
                      msgSetd( "H", pold->size );
@@ -846,30 +846,30 @@ static int smf1_check_steps( const char *param, int first, dim_t nx,
                result++;
 
                if( result >= first ) {
-                  msgSeti( "I", result );
+                  msgSetk( "I", result );
                   msgSetd( "O", pold->size );
                   msgSetd( "N", pnew->size );
                   msgOut( "", "^I: Step size changed from ^O to ^N:", status );
 
-                  msgSeti( "I", pnew->id );
+                  msgSetk( "I", pnew->id );
                   msgSetc( "W", pnew->corr ? "secondary" : "primary" );
                   msgOut( "", "   New index = ^I (^W)", status );
 
-                  msgSeti( "I", pold->id );
+                  msgSetk( "I", pold->id );
                   msgSetc( "W", pold->corr ? "secondary" : "primary" );
                   msgOut( "", "   Old index = ^I (^W)", status );
 
-                  msgSeti( "B", pold->ibolo );
-                  msgSeti( "X", pold->ibolo % nx );
-                  msgSeti( "Y", pold->ibolo / nx );
+                  msgSetk( "B", pold->ibolo );
+                  msgSetk( "X", pold->ibolo % nx );
+                  msgSetk( "Y", pold->ibolo / nx );
                   msgOut( "", "   Bolometer = ^B (^X,^Y)", status );
 
-                  msgSeti( "S", pold->start );
-                  msgSeti( "E", pold->end );
+                  msgSetk( "S", pold->start );
+                  msgSetk( "E", pold->end );
                   msgOut( "", "   Old time slice range = ^S:^E", status );
 
-                  msgSeti( "S", pnew->start );
-                  msgSeti( "E", pnew->end );
+                  msgSetk( "S", pnew->start );
+                  msgSetk( "E", pnew->end );
                   msgOut( "", "   New time slice range = ^S:^E", status );
 
                   parGet0l( param, &cont, status );
@@ -894,18 +894,18 @@ static int smf1_check_steps( const char *param, int first, dim_t nx,
                result++;
 
                if( result >= first ) {
-                  msgSeti( "N", result );
-                  msgSeti( "I", pnew->id );
+                  msgSetk( "N", result );
+                  msgSetk( "I", pnew->id );
                   msgSetc( "W", pnew->corr ? "secondary" : "primary" );
                   msgOut( "", "^N: A new ^W step (index ^I) was found:", status );
 
-                  msgSeti( "B", pnew->ibolo );
-                  msgSeti( "X", pnew->ibolo % nx );
-                  msgSeti( "Y", pnew->ibolo / nx );
+                  msgSetk( "B", pnew->ibolo );
+                  msgSetk( "X", pnew->ibolo % nx );
+                  msgSetk( "Y", pnew->ibolo / nx );
                   msgOut( "", "   Bolometer = ^B (^X,^Y)", status );
 
-                  msgSeti( "S", pnew->start );
-                  msgSeti( "E", pnew->end );
+                  msgSetk( "S", pnew->start );
+                  msgSetk( "E", pnew->end );
                   msgOut( "", "   Time slice range = ^S:^E", status );
 
                   msgSetd( "H", pnew->size );
@@ -929,10 +929,10 @@ static int smf1_check_steps( const char *param, int first, dim_t nx,
 }
 
 
-static void smf1_write_steps( FILE *fd, smfData *data, int nstep,
+static void smf1_write_steps( FILE *fd, smfData *data, dim_t nstep,
                               smfStepFix *steps, double dcthresh,
-                              dim_t dcsmooth, dim_t dcfitbox, int dcmaxsteps,
-                              int dclimcorr, size_t nrej, int *status ) {
+                              int dcsmooth, int dcfitbox, int dcmaxsteps,
+                              int dclimcorr, dim_t nrej, int *status ) {
 /*
 *  Name:
 *     smf1_write_steps
@@ -941,10 +941,10 @@ static void smf1_write_steps( FILE *fd, smfData *data, int nstep,
 *     Write an array of step descriptions to a disk file.
 
 *  Invocation:
-*     void smf1_write_steps( FILE *fd, smfData *data, int nstep,
+*     void smf1_write_steps( FILE *fd, smfData *data, dim_t nstep,
 *                            smfStepFix *steps, double dcthresh,
 *                            dim_t dcsmooth, dim_t dcfitbox, int dcmaxsteps,
-*                            int dclimcorr, size_t nrej, int *status )
+*                            int dclimcorr, dim_t nrej, int *status )
 
 *  Arguments:
 *     fd = FILE * (Given)
@@ -952,7 +952,7 @@ static void smf1_write_steps( FILE *fd, smfData *data, int nstep,
 *        written.
 *     data = smfData * (Given)
 *        The smfData containing the data that was fixed.
-*     nstep = int (Given)
+*     nstep = dim_t (Given)
 *        The number of steps to write.
 *     steps = smfStepFix * (Given)
 *        A pointer to the first element of an array of smfStepFix structures
@@ -968,7 +968,7 @@ static void smf1_write_steps( FILE *fd, smfData *data, int nstep,
 *        Value of DCMAXSTEPS used to create the step fixes.
 *     dclimcorr = int (Given)
 *        Value of DCLIMCORR used to create the step fixes.
-*     nrej = size_t (Given)
+*     nrej = dim_t (Given)
 *        The number of bolometers rejected.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -982,7 +982,7 @@ static void smf1_write_steps( FILE *fd, smfData *data, int nstep,
 */
 
 /* Local Variables: */
-   int istep;
+   dim_t istep;
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
@@ -1005,16 +1005,16 @@ static void smf1_write_steps( FILE *fd, smfData *data, int nstep,
 /* Write out the details of each step. */
    for( istep = 0; istep < nstep; istep++ ) {
       fprintf( fd, "%d %d %d %d %.*g %d\n",
-                                    ( steps[ istep ] ).id,
-                                    ( steps[ istep ] ).start,
-                                    ( steps[ istep ] ).end,
-                                    ( steps[ istep ] ).ibolo,
+                                    (int)( steps[ istep ] ).id,
+                                    (int)( steps[ istep ] ).start,
+                                    (int)( steps[ istep ] ).end,
+                                    (int)( steps[ istep ] ).ibolo,
                            DBL_DIG, ( steps[ istep ] ).size,
                                     ( steps[ istep ] ).corr );
    }
 }
 
-static double smf1_get_rmssize( int nstep, smfStepFix *steps, int *status ){
+static double smf1_get_rmssize( dim_t nstep, smfStepFix *steps, int *status ){
 /*
 *  Name:
 *     smf1_get_rmssize
@@ -1023,10 +1023,10 @@ static double smf1_get_rmssize( int nstep, smfStepFix *steps, int *status ){
 *     Get the clipped RMS step size.
 
 *  Invocation:
-*     double smf1_get_rmssize( int nstep, smfStepFix *steps, int *status )
+*     double smf1_get_rmssize( dim_t nstep, smfStepFix *steps, int *status )
 
 *  Arguments:
-*     nstep = int (Given)
+*     nstep = dim_t (Given)
 *        Length of the "steps" array.
 *     steps = smfStepFix * (Given)
 *        Pointer to an array of step fix structures.
@@ -1048,7 +1048,7 @@ static double smf1_get_rmssize( int nstep, smfStepFix *steps, int *status ){
    double size;
    double sum2;
    double threshold;
-   int istep;
+   dim_t istep;
    int iter;
    int nsum;
    smfStepFix *step;

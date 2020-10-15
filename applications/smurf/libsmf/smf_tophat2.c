@@ -127,8 +127,8 @@ double *smf_tophat2( ThrWorkForce *wf, const double *map, const dim_t dims[2],
    int nw;
    int iter;
    int iw;
-   int rowstep;
-   int colstep;
+   dim_t rowstep;
+   dim_t colstep;
    double *temp1 = NULL;
    double *temp2 = NULL;
    const double *in = NULL;
@@ -257,20 +257,20 @@ static void smf1_tophat2_job( void *job_data, int *status ) {
    const double *pwb;
    const double *pwin;
    const double *pwt;
+   dim_t cl;
+   dim_t cr;
    dim_t icol;
    dim_t irow;
    dim_t ncol;
+   dim_t offset;
+   dim_t rb;
+   dim_t rt;
    double *pdout;
    double *pwout;
    double *work;
    double sum;
    double wlim;
    double wsum;
-   int cl;
-   int cr;
-   int rb;
-   int rt;
-   size_t offset;
    smfTophat2JobData *pdata;
 
 /* Check inherited status */
@@ -330,7 +330,7 @@ static void smf1_tophat2_job( void *job_data, int *status ) {
 /* Add the next right value into the box. */
             pr++;
             cr++;
-            if( cr < (int) pdata->ncol && *pr != VAL__BADD ) {
+            if( cr < pdata->ncol && *pr != VAL__BADD ) {
                sum += *pr;
                wsum += 1.0;
             }
@@ -437,7 +437,7 @@ static void smf1_tophat2_job( void *job_data, int *status ) {
                pdt += ncol;
                pwt += ncol;
                rt++;
-               if( rt < (int) pdata->nrow ) {
+               if( rt < pdata->nrow ) {
                   sum += *pdt;
                   wsum += *pwt;
                }

@@ -296,7 +296,6 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    float *pdata;         /* Pointer to next data sample */
    float rtsys;          /* Tsys value */
    float telres=0;       /* Telescope resolution in radians */
-   int found;            /* Was current detector name found in detgrp? */
    int good;             /* Are there any good detector samples? */
    int ibasein;          /* Index of base Frame in input FrameSet */
    int ifile;            /* Index of current input file */
@@ -305,9 +304,10 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    int nallpos;          /* Number of positions */
    int outcat;           /* Produce an output catalogue holding sample positions? */
    int useauto;          /* Are autogrid default projection parameters being used? */
-   size_t irec;          /* Index of current input detector */
-   size_t itime;         /* Index of current time slice */
-   size_t ispec;         /* Index of current spectral sample */
+   dim_t irec;           /* Index of current input detector */
+   dim_t itime;          /* Index of current time slice */
+   dim_t ispec;          /* Index of current spectral sample */
+   size_t found;         /* Was current detector name found in detgrp? */
    size_t nexcol;        /* Number of extra columsn for catalogue */
    smfData *data = NULL; /* Pointer to data struct for current input file */
    smfFile *file = NULL; /* Pointer to file struct for current input file */

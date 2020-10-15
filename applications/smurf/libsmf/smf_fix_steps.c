@@ -14,9 +14,9 @@
 
 *  Invocation:
 *     void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
-*                         dim_t dcsmooth, dim_t dcfitbox, int dcmaxsteps,
-*                         int dclimcorr, int meanshift, size_t *nrej,
-*                         smfStepFix **steps, int *nsteps, int *status )
+*                         int dcsmooth, int dcfitbox, int dcmaxsteps,
+*                         int dclimcorr, int meanshift, dim_t *nrej,
+*                         smfStepFix **steps, dim_t *nsteps, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -28,11 +28,11 @@
 *        The minimum ratio of (residual difference between adjacent
 *        median-smoothed samples) to (the local RMS in the residual
 *        differences) for a real jump. Should be of the order ot 20-30.
-*     dcsmooth = dim_t (Given)
+*     dcsmooth = int (Given)
 *        The width in samples of the box to use when median smoothing the
 *        original bolometer data. Should be not much larger than the
 *        expected maximum width of a step (say 50).
-*     dcfitbox = dim_t (Given)
+*     dcfitbox = int (Given)
 *        Length of box (in samples) over which each linear fit is
 *        performed. If zero, no steps will be corrected. Should be
 *        smallish (say 40).
@@ -59,7 +59,7 @@
 *        spatial width of the filter is given by dcsmooth, and the range of
 *        data values accepted by the filter is 5 times the local RMS in
 *        the original time stream.
-*     nrej = size_t * (Returned)
+*     nrej = dim_t * (Returned)
 *        The number of bolometers rejected due to having too many steps.
 *     steps = smfStepFix ** (Returned)
 *        Address of a pointer to the first element of an array of
@@ -72,9 +72,9 @@
 *        On exit, the number of elements in the array (if it exists) will
 *        be equal to the value of "*nstep". Each element is a smfStepFix
 *        structure that describes a single fixed step.
-*     nstep = int * (Returned)
+*     nstep = dim_t * (Returned)
 *        The number of fixed steps.
-*     status = int* (Given and Returned)
+*     status = int * (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
@@ -282,8 +282,8 @@
 typedef struct smfFixStepsJobData {
    dim_t b1;
    dim_t b2;
-   dim_t dcfitbox;
-   dim_t dcsmooth;
+   int dcfitbox;
+   int dcsmooth;
    dim_t nbolo;
    dim_t ntslice;
    double *bolonoise;
@@ -292,18 +292,18 @@ typedef struct smfFixStepsJobData {
    double dcthresh2;
    double dcthresh3;
    double dcthresh;
-   int *bcount;
-   int dcfill;
+   dim_t *bcount;
+   dim_t dcfill;
    int dclimcorr;
    int dcmaxsteps;
-   int dcmaxwidth;
+   dim_t dcmaxwidth;
    int dcsmooth2;
    int meanshift;
-   int nfixed;
-   int nstep;
-   size_t bstride;
-   size_t nrej;
-   size_t tstride;
+   dim_t nfixed;
+   dim_t nstep;
+   dim_t bstride;
+   dim_t nrej;
+   dim_t tstride;
    smfStepFix *steps;
    smf_qual_t *qua;
    smfData *data;
@@ -323,12 +323,12 @@ typedef struct Step {
 #ifdef DEBUG_STEPS
    double error;
    double jump;
-   int ok;
-   int ibolo;
-   int peak;
+   dim_t ok;
+   dim_t ibolo;
+   dim_t peak;
    double peak1;
    double peak2;
-   int peakwidth;
+   dim_t peakwidth;
    double vlo;
    double vlo_mean;
    double vlo_sigma;
@@ -345,11 +345,11 @@ typedef struct Step {
 #ifdef DEBUG_STEPS
 
 #ifdef RECORDED_BOLO
-static int debug_bolo = RECORDED_BOLO;
+static dim_t debug_bolo = RECORDED_BOLO;
 #else
-static int debug_bolo = -1;
+static dim_t debug_bolo = -1;
 #endif
-static int get_debug_bolo( void );
+static dim_t get_debug_bolo( void );
 
 #define RECORD_BOLO (get_debug_bolo()==ibolo)
 
@@ -365,10 +365,10 @@ static int get_debug_bolo( void );
 
 typedef struct TimeData {
    double indata;
-   int inquality;
+   dim_t inquality;
    double outdata;
-   int outquality;
-   int ibolo;
+   dim_t outquality;
+   dim_t ibolo;
    double median;
    double meanshift;
    double diff;
@@ -379,8 +379,8 @@ typedef struct TimeData {
    double mdiff2;
    double diff2;
    double rms;
-   int instep;
-   int step_width;
+   dim_t instep;
+   dim_t step_width;
    double total;
    double snr;
 } TimeData;
@@ -392,13 +392,13 @@ typedef struct TimeData {
 
 /* Prototypes for private functions defined in this file. */
 
-static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
-                               size_t tstride, double *median, double *snr,
-                               dim_t dcfitbox, double dcthresh2,
-                               int nbstep, Step *bsteps, int ibolo,
+static dim_t smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
+                               dim_t tstride, double *median, double *snr,
+                               int dcfitbox, double dcthresh2,
+                               dim_t nbstep, Step *bsteps, dim_t ibolo,
                                int meanshift, double steptime,
-                               smfStepFix **steps, int *nsteps,
-                               double *grad, double *off, int *bcount,
+                               smfStepFix **steps, dim_t *nsteps,
+                               double *grad, double *off, dim_t *bcount,
                                int *status );
 
 static void smf1_fix_steps_job( void *job_data, int *status );
@@ -409,24 +409,24 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status );
 /* Main entry point. */
 
 void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
-                    dim_t dcsmooth, dim_t dcfitbox, int dcmaxsteps,
-                    int dclimcorr, int meanshift, size_t *nrej,
-                    smfStepFix **steps, int *nstep, int *status ) {
+                    int dcsmooth, int dcfitbox, int dcmaxsteps,
+                    int dclimcorr, int meanshift, dim_t *nrej,
+                    smfStepFix **steps, dim_t *nstep, int *status ) {
 
 /* Local Variables */
+   dim_t *bcount;
+   dim_t bstep;
+   dim_t bstride;
+   dim_t istep;
    dim_t itime;
+   dim_t iworker;
    dim_t nbolo;
+   dim_t nfixed;
    dim_t ntslice;
+   dim_t nworker;
+   dim_t tstride;
    double *bolonoise = NULL;
    double *dat = NULL;
-   int *bcount;
-   int bstep;
-   int istep;
-   int iworker;
-   int nfixed;
-   int nworker;
-   size_t bstride;
-   size_t tstride;
    smfFixStepsJobData *job_data = NULL;
    smfFixStepsJobData *pdata = NULL;
    smf_qual_t *qua = NULL;
@@ -434,11 +434,11 @@ void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
 /* The minimum number of samples between steps. Large differences that
    are separated by less than "dcfill" samples are considered to be part of
    the same jump. */
-   int dcfill = 100;
+   dim_t dcfill = 100;
 
 /* The maximum width of a step. Candidate steps that are wider than this
    number of samples are left uncorrected. */
-   int dcmaxwidth = 2*dcfill;
+   dim_t dcmaxwidth = 2*dcfill;
 
 /* The size of the median filter to use when estimating the local RMS at
    each point. */
@@ -471,7 +471,7 @@ void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
    be time ordered, otherwise errors occurr when smf_open_file opens the
    file. */
 #ifdef DUMP_INPUT
-   int isT = data->isTordered;
+   dim_t isT = data->isTordered;
    msgOut( "", "Dumping smf_fix_steps input data to NDF 'fix_steps_input.sdf'.",
            status );
    smf_dataOrder( wf, data, 1, status );
@@ -508,10 +508,10 @@ void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
 /* Report an error if the data stream is too short for the box size. */
    if( dcfitbox*2 > ntslice && *status == SAI__OK ) {
       *status = SAI__ERROR;
-      msgSeti( "NTSLICE", ntslice );
-      msgSeti( "dcfitbox", dcfitbox );
+      msgSetk( "NTSLICE", ntslice );
+      msgSeti( "DCFITBOX", dcfitbox );
       errRep( " ", "smf_fix_steps: Can't find jumps: ntslice=^NTSLICE, "
-              "must be > dcfitbox (=^dcfitbox)*2", status );
+              "must be > dcfitbox (=^DCFITBOX)*2", status );
    }
 
 /* Check for valid threshold */
@@ -539,7 +539,7 @@ void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
 /* The minimum number of samples between steps. Large differences that
    are separated by less than "dcfill" samples are considered to be part of
    the same jump. */
-      dcfill = (int)( 0.5 + dcfill/(320.0*data->hdr->steptime ) );
+      dcfill = 0.5 + dcfill/(320.0*data->hdr->steptime );
       if( dcfill < 3 ) dcfill = 3;
 
 /* The maximum width of a step. Candidate steps that are wider than this
@@ -695,7 +695,7 @@ void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
 
 /* Report the number of fixed steps */
    msgOutiff( MSG__VERB, " ", "smf_fix_steps: fixed %d steps.",
-              status, nfixed );
+              status, (int) nfixed );
 
 /* Report the number of rejected bolometers. */
    if( *nrej > 0 ) {
@@ -728,7 +728,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
 *     job_data = void * (Given)
 *        Pointer to the data needed by the job. Should be a pointer to a
 *        smfFixStepsJobData structure.
-*     status = int * (Given and Returned)
+*     status = dim_t * (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
@@ -739,14 +739,42 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
 
 /* Local Variables: */
    Step *bsteps = NULL;
+   dim_t *bcount;
+   dim_t *mw2;
+   dim_t *mw3;
+   dim_t allequal;
    dim_t b1;
    dim_t b2;
-   dim_t dcfitbox;
-   dim_t dcsmooth;
+   dim_t base;
+   dim_t bstride;
+   dim_t dcfill;
+   dim_t dcmaxwidth;
+   dim_t gap_start;
    dim_t ibolo;
+   dim_t ibstep;
+   dim_t iter;
    dim_t itime;
+   dim_t jhi;
+   dim_t jlo;
+   dim_t jtime;
+   dim_t lbad;
+   dim_t maxsteps;
+   dim_t mbstep;
+   dim_t msize;
    dim_t nbolo;
+   dim_t nbstep;
+   dim_t nfixed;
+   dim_t nrej;
+   dim_t nstep;
+   dim_t nsum;
    dim_t ntslice;
+   dim_t pad;
+   dim_t step_end;
+   dim_t step_limit;
+   dim_t step_start;
+   dim_t step_width;
+   dim_t tstride;
+   double *bolonoise;
    double *dat = NULL;
    double *mw1;
    double *pd;
@@ -760,7 +788,6 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
    double *w3;
    double *w4;
    double *w5;
-   double *bolonoise;
    double dccut;
    double dcthresh2;
    double dcthresh3;
@@ -778,38 +805,11 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
    double thresh;
    double total;
    double vlo;
-   int *mw3;
-   int *bcount;
-   int allequal;
-   int dcfill;
+   int dcfitbox;
    int dcmaxsteps;
-   int dcmaxwidth;
    int dcsmooth2;
-   int gap_start;
-   int ibstep;
-   int iter;
-   int jhi;
-   int jlo;
-   int jtime;
-   int lbad;
-   int maxsteps;
-   int mbstep;
+   int dcsmooth;
    int meanshift;
-   int msize;
-   int nbstep;
-   int nfixed;
-   int nrej;
-   int nstep;
-   int nsum;
-   int pad;
-   int step_end;
-   int step_limit;
-   int step_start;
-   int step_width;
-   size_t *mw2;
-   size_t base;
-   size_t bstride;
-   size_t tstride;
    smfData *data = NULL;
    smfFixStepsJobData *pdata;
    smfStepFix *steps;
@@ -819,7 +819,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
    struct timeval tv1;
    struct timeval tv2;
 
-   int dcgappad = 50;
+   dim_t dcgappad = 50;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -883,7 +883,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
 
 /* Allocate work arrays. */
       msize = 3*dcfitbox;
-      if( (int) ntslice > msize ) msize = ntslice;
+      if( ntslice > msize ) msize = ntslice;
       w1 = astMalloc( sizeof( *w1 )*msize );
       w2 = astMalloc( sizeof( *w2 )*msize );
       w3 = astMalloc( sizeof( *w3 )*msize );
@@ -1105,7 +1105,7 @@ if( RECORD_BOLO ) {
                      if( pad > 100 ) pad = 100;
 
                      jhi = jhi + pad;
-                     if( jhi >= (int) ntslice ) jhi = ntslice - 1;
+                     if( jhi >= ntslice ) jhi = ntslice - 1;
 
                      jlo = jlo - pad;
                      if( jlo < 0 ) jlo = 0;
@@ -1209,7 +1209,7 @@ if( RECORD_BOLO ) {
                   if( gap_start != -1 && vlo != VAL__BADD ) {
 
                      delta = ( *pw3 - vlo )/( itime - gap_start + 1 );
-                     for( jtime = gap_start; jtime < (int) itime; jtime++ ) {
+                     for( jtime = gap_start; jtime < itime; jtime++ ) {
                         vlo += delta;
                         w3[ jtime ] = vlo;
                      }
@@ -1317,7 +1317,7 @@ if( RECORD_BOLO ) {
 /* If the current residual difference is small, and we have had "dcfill"
    small residuals since the end of the last group, we now know where the
    last group ended so we can go on to process the group. */
-                  } else if( (int) itime == step_limit ) {
+                  } else if( itime == step_limit ) {
 
 /* Check the group is not too wide, and that the total jump in value is not
    too small. */
@@ -1509,13 +1509,13 @@ if( RECORD_BOLO ) {
 
 
 
-static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
-                               size_t tstride, double *median, double *snr,
-                               dim_t dcfitbox, double dcthresh2, int nbstep,
-                               Step *bsteps, int ibolo, int meanshift,
+static dim_t smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
+                               dim_t tstride, double *median, double *snr,
+                               int dcfitbox, double dcthresh2, dim_t nbstep,
+                               Step *bsteps, dim_t ibolo, int meanshift,
                                double steptime, smfStepFix **steps,
-                               int *nsteps, double *grad, double *off,
-                               int *bcount, int *status ){
+                               dim_t *nsteps, double *grad, double *off,
+                               dim_t *bcount, int *status ){
 /*
 *  Name:
 *     smf1_correct_steps
@@ -1525,13 +1525,13 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 *     bolometer data.
 
 *  Invocation:
-*     int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
-*                             size_t tstride, double *median, double *snr,
-*                             dim_t dcfitbox, double dcthresh2, int nbstep,
-*                             Step *bsteps, int ibolo, int meanshift,
+*     dim_t smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
+*                             dim_t tstride, double *median, double *snr,
+*                             int dcfitbox, double dcthresh2, dim_t nbstep,
+*                             Step *bsteps, dim_t ibolo, int meanshift,
 *                             double steptime, smfStepFix **steps,
-*                             int *nsteps, double *grad, double *off,
-*                             int *bcount, int *status )
+*                             dim_t *nsteps, double *grad, double *off,
+*                             dim_t *bcount, int *status )
 
 *  Arguments:
 *     ntslice = dim_t (Given)
@@ -1543,7 +1543,7 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 *     qua = smf_qual_t * (Given and Returned)
 *        The bolometer quality. On exit, each step within a succesfully
 *        measured jump is flagged with SMF__Q_JUMP.
-*     tstride = size_t (Given)
+*     tstride = dim_t (Given)
 *        The the number of elements in "dat" between adjacent bolometer
 *        samples.
 *     median = double * (Given)
@@ -1552,7 +1552,7 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 *     snr = double * (Given)
 *        The ratio of the residual difference to the local RMS at every
 *        sample. May be NULL.
-*     dcfitbox = dim_t (Given)
+*     dcfitbox = int (Given)
 *        Length of box (in samples) over which each linear fit is
 *        performed. Two fits are performed - one just below the step and
 *        one just above. These are used to determine the height of the jump.
@@ -1560,11 +1560,11 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 *        N-sigma threshold for acceptable jumps. A jump must be more than
 *        dcthresh2 times the larger of the RMS deviations in the two
 *        linear fits.
-*     nbstep = int (Given)
+*     nbstep = dim_t (Given)
 *        The number of candidate steps to be measured.
 *     bsteps = Step * (given)
 *        An array of structures describing each candidate step.
-*     ibolo = int (Given)
+*     ibolo = dim_t (Given)
 *        The index of the bolometer being fixed.
 *     steptime = double (Given)
 *        The time between samples, in seconds.
@@ -1583,14 +1583,14 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 *        description of each sucessfully fixed step. The supplied array
 *        (if any) is extended on exit to hold descriptions of the steps
 *        fixed by the current invocation of this function.
-*     nsteps = int * (Given and Returned)
+*     nsteps = dim_t * (Given and Returned)
 *        On entry, the number of elements in the supplied "steps" array.
 *        On exit, the number of elements in the returned "steps" array.
 *     grad = double * (Given and Returned)
 *        Pointer to a work array with at least 3*dcfitbox elements.
 *     off = double * (Given and Returned)
 *        Pointer to a work array with at least 3*dcfitbox elements.
-*     bcount = int * (Given and Returned)
+*     bcount = dim_t * (Given and Returned)
 *        Pointer to a work array with one element for each time slice.
 *        Each element holds the number of bolometers found to be within a
 *        step at the corresponding time slice. May be NULL.
@@ -1623,7 +1623,21 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 
 /* Local Variables: */
    Step *step;
+   dim_t at_peak;
+   dim_t count;
+   dim_t ibstep;
    dim_t itime;
+   dim_t jhi;
+   dim_t jhilim;
+   dim_t jlo;
+   dim_t jlolim;
+   dim_t jmax;
+   dim_t jmin;
+   dim_t jtime;
+   dim_t ncorr;
+   dim_t nsum;
+   dim_t peakwidth;
+   dim_t result;
    dim_t step_centre;
    dim_t step_end;
    dim_t step_start;
@@ -1642,8 +1656,6 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
    double error;
    double jump;
    double mean;
-   double peak1;
-   double peak2;
    double scorr;
    double snrv;
    double sum1;
@@ -1655,33 +1667,23 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
    double vlo;
    double vlo_mean;
    double vlo_var;
-   int at_peak;
-   int count;
-   int ibstep;
-   int jhi;
-   int jhilim;
-   int jlo;
-   int jlolim;
-   int jmax;
-   int jmin;
-   int jtime;
-   int lstep_end;
-   int ncorr;
-   int nsum;
-   int peakwidth;
-   int result;
-   smf_qual_t *pq;
    smf_qual_t *pq2;
+   smf_qual_t *pq;
+
+#ifdef DEBUG_STEPS
+   double peak1;
+   double peak2;
+#endif
 
 /* Provate configuration parameters */
    double dcnbox = 3.5;
-   int dcnlow = 5;
+   dim_t dcnlow = 5;
    double dcsiglow = 8.0;
-   int dcpeakoff = 20;
-   int dcpeakwidth = 150;
+   dim_t dcpeakoff = 20;
+   dim_t dcpeakwidth = 150;
    double dcpeakthresh1 = meanshift ? 10.0 : 1.0;
    double dcpeakthresh2 = 2.5;
-   int dcpeakminwidth = 5;
+   dim_t dcpeakminwidth = 5;
 
 /* Initialise result prior to checking status. */
    result = 0;
@@ -1705,7 +1707,6 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
    corr = 0.0;
    scorr = 0.0;
    ncorr = 0;
-   lstep_end = 0;
 
 /* Loop round each candidate step. */
    step = bsteps;
@@ -1960,7 +1961,9 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
    5) the peak width is not tiny (i.e. a spike)
 */
 
+#ifdef DEBUG_STEPS
             peak1 = peak2 = VAL__BADD;
+#endif
             at_peak = 1;
             if( dmax != VAL__MIND && dminlo != VAL__MIND && dminhi != VAL__MIND ){
                at_peak = 0;
@@ -1978,8 +1981,10 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
                       dbig < dcpeakthresh2*dsmall &&
                       peakwidth > dcpeakminwidth ) at_peak = 1;
 
+#ifdef DEBUG_STEPS
                   peak1 = dsmall/step->minjump;
                   peak2 = dbig/dsmall;
+#endif
                }
             }
          }
@@ -2004,6 +2009,7 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
    }
 #endif
 
+      vlo = 0.0;
       if( !at_peak ) {
 
 /* Perform linear least squares fits to the median-smoothed data for a
@@ -2022,7 +2028,6 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
             sum1 = 0.0;
             sum2 = 0.0;
             nsum = 0;
-            vlo = 0.0;
 
             pg = grad;
             po = off;
@@ -2153,14 +2158,14 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 
 /* Flag the samples with high SNR. */
                pq2 = qua + step_start*tstride;
-               for( jtime = step_start; jtime <= (int) step_end; jtime++ ) {
+               for( jtime = step_start; jtime <= step_end; jtime++ ) {
                    *pq2 |= SMF__Q_JUMP;
                    pq2 += tstride;
                }
 
 /* Increment the number of bolometers that have a step at each time slice. */
                if( bcount ) {
-                  for( jtime = step->start; jtime <= (int) step->end; jtime++ ) {
+                  for( jtime = step->start; jtime <= step->end; jtime++ ) {
                      bcount[ jtime ]++;
                   }
                }
@@ -2233,7 +2238,7 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
 *     job_data = void * (Given)
 *        Pointer to the data needed by the job. Should be a pointer to a
 *        smfFixStepsJobData structure.
-*     status = int * (Given and Returned)
+*     status = dim_t * (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
@@ -2244,14 +2249,32 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
 
 /* Local Variables: */
    Step *bsteps = NULL;
+   dim_t *bcount;
+   dim_t *mw2;
+   dim_t *mw3;
+   dim_t *pbc;
    dim_t b1;
    dim_t b2;
-   dim_t dcfitbox;
-   dim_t dcsmooth;
+   dim_t base;
+   dim_t bstride;
+   dim_t dcfill;
+   dim_t dcmaxwidth;
    dim_t ibolo;
+   dim_t ibstep;
    dim_t itime;
+   dim_t mbstep;
+   dim_t msize;
    dim_t nbolo;
+   dim_t nbstep;
+   dim_t nfixed;
+   dim_t nstep;
    dim_t ntslice;
+   dim_t old_jump;
+   dim_t step_end;
+   dim_t step_limit;
+   dim_t step_start;
+   dim_t step_width;
+   dim_t tstride;
    double *bolonoise;
    double *dat = NULL;
    double *mw1;
@@ -2261,28 +2284,10 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
    double dcthresh2;
    double dcthresh3;
    double rms;
-   int *bcount;
-   int *mw3;
-   int *pbc;
-   int dcfill;
+   int dcfitbox;
    int dclimcorr;
-   int dcmaxwidth;
-   int ibstep;
-   int mbstep;
+   int dcsmooth;
    int meanshift;
-   int msize;
-   int nbstep;
-   int nfixed;
-   int nstep;
-   int old_jump;
-   int step_end;
-   int step_limit;
-   int step_start;
-   int step_width;
-   size_t *mw2;
-   size_t base;
-   size_t bstride;
-   size_t tstride;
    smfData *data;
    smfFixStepsJobData *pdata;
    smfStepFix *steps;
@@ -2350,7 +2355,7 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
 
 /* Allocate work arrays. */
       msize = 3*dcfitbox;
-      if( (int) ntslice > msize ) msize = ntslice;
+      if( ntslice > msize ) msize = ntslice;
       w1 = astMalloc( sizeof( *w1 )*msize );
       w4 = astMalloc( sizeof( *w4 )*msize );
       w5 = astMalloc( sizeof( *w5 )*msize );
@@ -2501,7 +2506,7 @@ if( RECORD_BOLO ) {
 /* If the current bcount value is small, and we have had "dcfill" small
    values since the end of the last group, we now know where the last
    group ended so we can go on to process the group. */
-               } else if( (int) itime == step_limit ) {
+               } else if( itime == step_limit ) {
 
 /* Check the group is not too wide, and that it does not include a
    previously corrected jump. */
@@ -2509,7 +2514,7 @@ if( RECORD_BOLO ) {
 
 #ifdef DEBUG_STEPS
    if( RECORD_BOLO ) {
-      int jtime;
+      dim_t jtime;
       for( jtime = step_start; jtime <= step_end; jtime++ ) {
          timedata[ jtime ].step_width = step_width;
       }
@@ -2529,7 +2534,7 @@ if( RECORD_BOLO ) {
 
 #ifdef DEBUG_STEPS
    if( RECORD_BOLO ) {
-      int jtime;
+      dim_t jtime;
       for( jtime = step_start; jtime <= step_end; jtime++ ) {
          timedata[ jtime ].instep = 1;
       }
@@ -2644,7 +2649,7 @@ if( RECORD_BOLO ) {
 
 
 #ifdef DEBUG_STEPS
-static int get_debug_bolo( void ) {
+static dim_t get_debug_bolo( void ) {
    while( debug_bolo < 0 ) {
       printf("Enter zero-based index of bolometer to record: ");
       scanf( "%d", &debug_bolo );

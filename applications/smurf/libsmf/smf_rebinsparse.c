@@ -13,9 +13,9 @@
 *     C function
 
 *  Invocation:
-*     smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
+*     smf_rebinsparse( smfData *data, int first, dim_t *ptime, AstFrame *ospecfrm,
 *                      AstMapping *ospecmap, AstSkyFrame *oskyframe,
-*                      Grp **detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ],
+*                      Grp **detgrp, dim_t lbnd_out[ 3 ], dim_t ubnd_out[ 3 ],
 *                      int genvar, float *data_array, float *var_array,
 *                      int *ispec, float *texp_array, float *teff_array,
 *                      double *fcon, int *status );
@@ -26,12 +26,12 @@
 *     first = int (Given)
 *        Is this the first call to this routine for the current output
 *        cube?
-*     ptime = int * (Given)
+*     ptime = dim_t * (Given)
 *        Pointer to an array of integers, each one being the index of a
 *        time slice that is to be pasted into the output cube. If this is
 *        NULL, then all time slices are used. The values in the array
 *        should be monotonic increasing and should be terminated by a value
-*        of VAL__MAXI.
+*        of VAL__MAXK.
 *     ospecfrm = AstFrame * (Given)
 *        Pointer to the SpecFrame within the current Frame of the output WCS
 *        Frameset.
@@ -172,9 +172,9 @@
 
 #define FUNC_NAME "smf_rebinsparse"
 
-void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
+void smf_rebinsparse( smfData *data, int first, dim_t *ptime, AstFrame *ospecfrm,
                       AstMapping *ospecmap, AstSkyFrame *oskyframe,
-                      Grp **detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ],
+                      Grp **detgrp, dim_t lbnd_out[ 3 ], dim_t ubnd_out[ 3 ],
                       int genvar, float *data_array, float *var_array,
                       int *ispec, float *texp_array, float *teff_array,
                       double *fcon, int *status ){
@@ -189,12 +189,18 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
    AstFrameSet *swcsin = NULL;  /* FrameSet describing spatial input WCS */
    AstMapping *fsmap = NULL;    /* Base->Current Mapping extracted from a FrameSet */
    AstMapping *smap = NULL;     /* Simplified Mapping */
-   AstMapping *tmap = NULL;     /* Temporary Mapping */
    AstMapping *specmap = NULL;  /* PIXEL -> Spec mapping in input FrameSet */
    char *detflags;       /* Flags indicating if each detector was used */
+   AstMapping *tmap = NULL;     /* Temporary Mapping */
    char *fftwin = NULL;  /* Name of FFT windowing function */
    const char *name = NULL; /* Pointer to current detector name */
    const double *tsys=NULL; /* Pointer to Tsys value for first detector */
+   dim_t dim[ 3 ];       /* Output array dimensions */
+   dim_t irec;           /* Index of current input detector */
+   dim_t itime;          /* Index of current time slice */
+   dim_t iv;             /* Offset to next element */
+   dim_t iz;             /* Output grid index on axis 3 */
+   dim_t nchan;          /* Number of input spectral channels */
    dim_t timeslice_size; /* No of detector values in one time slice */
    double *spectab = NULL;/* Workspace for spectral output grid positions */
    double *xin = NULL;   /* Workspace for detector input grid positions */
@@ -213,19 +219,13 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
    float texp;           /* Total time ( = ton + toff ) */
    float toff;           /* Off time */
    float ton;            /* On time */
-   int *nexttime = NULL; /* Pointer to next time slice index to use */
-   int dim[ 3 ];         /* Output array dimensions */
+   dim_t *nexttime = NULL; /* Pointer to next time slice index to use */
    int found;            /* Was current detector name found in detgrp? */
    int good;             /* Are there any good detector samples? */
    int ibasein;          /* Index of base Frame in input FrameSet */
    int ichan;            /* Index of current channel */
-   int iv;               /* Offset to next element */
-   int iz;               /* Output grid index on axis 3 */
-   int nchan;            /* Number of input spectral channels */
    int pixax[ 3 ];       /* The output fed by each selected mapping input */
    int specax;           /* Index of spectral axis in input FrameSet */
-   size_t irec;          /* Index of current input detector */
-   size_t itime;         /* Index of current time slice */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
 
 /* Check inherited status */
@@ -343,7 +343,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
 /* If a group of detectors to be used was supplied, search the group for
    the name of the current detector. If not found, set the GRID coords bad. */
       if( *detgrp ) {
-         found = grpIndex( name, *detgrp, 1, status );
+         found = (int) grpIndex( name, *detgrp, 1, status );
          if( !found ) {
             xin[ irec ] = AST__BAD;
             yin[ irec ] = AST__BAD;
@@ -553,7 +553,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
 
                } else if( *status == SAI__OK ){
                   *status = SAI__ERROR;
-                  msgSeti( "DIM", dim[ 0 ] );
+                  msgSetk( "DIM", dim[ 0 ] );
                   errRep( " ", "Too many spectra (more than ^DIM) for "
                           "the output NDF (programming error).", status );
                   break;

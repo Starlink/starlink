@@ -16,7 +16,7 @@
 *     smf_write_sampcube( ThrWorkForce *wf,  const smfArray *res, const smfArray *lut,
 *                         const smfArray *qua, const smfDIMMData *dat,
 *                         const int *hits, const Grp *samprootgrp,
-*                         size_t contchunk, const int *lbnd, const int *ubnd,
+*                         dim_t contchunk, const dim_t *lbnd, const dim_t *ubnd,
 *                         int *status );
 
 *  Arguments:
@@ -34,11 +34,11 @@
 *        Hits map
 *     samprootgrp = const Grp* (Given)
 *        Root name for sampcube. Can be path to HDS container.
-*     contchunk = size_t (Given)
+*     contchunk = dim_t (Given)
 *        Continuous chunk number
-*     lbnd = const int* (Given)
+*     lbnd = const dim_t * (Given)
 *        2-element array pixel coord. for the lower bounds of the map
-*     ubnd = const int* (Given)
+*     ubnd = const dim_t * (Given)
 *        2-element array pixel coord. for the upper bounds of the map
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -116,43 +116,43 @@
 void smf_write_sampcube( ThrWorkForce *wf, const smfArray *res, const smfArray *lut,
                          const smfArray *qua, const smfDIMMData *dat,
                          const int *hits, const Grp *samprootgrp,
-                         size_t contchunk, const int *lbnd, const int *ubnd,
+                         dim_t contchunk, const dim_t *lbnd, const dim_t *ubnd,
                          int *status ) {
 
-  size_t bstride;               /* Time series cube bolo stride */
-  double *data=NULL;            /* Data buffer */
-  size_t di;                    /* data time series cube index */
+  dim_t *hitscount=NULL;        /* Local 2d hits counter */
+  dim_t bstride;                /* Time series cube bolo stride */
+  dim_t di;                     /* data time series cube index */
   dim_t dsize;                  /* Number of elements in data buffer */
-  size_t height;                /* Height of the map */
-  size_t *hitscount=NULL;       /* Local 2d hits counter */
-  size_t i;                     /* loop counter */
-  size_t idx=0;                 /* index within subgroup */
-  size_t j;                     /* loop counter */
-  int lbnd_out[3];              /* Lower bounds of output cube */
-  int *lut_data=NULL;           /* Pointer to DATA component of lut */
-  int maxhits=0;                /* Maximum of hits map */
-  size_t msize;                 /* Size of the maps */
+  dim_t height;                 /* Height of the map */
+  dim_t i;                      /* loop counter */
+  dim_t idx=0;                  /* index within subgroup */
+  dim_t j;                      /* loop counter */
+  dim_t lbnd_out[3];            /* Lower bounds of output cube */
+  dim_t msize;                  /* Size of the maps */
   dim_t nbolo;                  /* Number of bolometers */
-  smfArray *noi=NULL;           /* Pointer to noi if it exists */
-  double *noi_data=NULL;        /* Pointer to DATA component of noi */
   dim_t ntslice;                /* Number of time slices */
-  smf_qual_t *qua_data=NULL;    /* Pointer to DATA component of qua */
-  double *res_data=NULL;        /* Pointer to DATA component of res */
-  smfData *sampcube=NULL;       /* smfData to store sampcube */
-  size_t sstride;               /* sample stride in output cube */
-  size_t tstride;               /* Time series cube time stride */
-  int ubnd_out[3];              /* dims of output cube */
-  double *var=NULL;             /* Variance buffer */
-  size_t vbstride;              /* bolo stride of variance */
-  size_t vi=0;                  /* variance time series cube index */
+  dim_t sstride;                /* sample stride in output cube */
+  dim_t tstride;                /* Time series cube time stride */
+  dim_t ubnd_out[3];            /* dims of output cube */
+  dim_t vbstride;               /* bolo stride of variance */
+  dim_t vi=0;                   /* variance time series cube index */
   dim_t vnbolo=0;               /* number of bolos in variance */
   dim_t vntslice=0;             /* number of bolos in variance */
-  size_t vtstride=0;            /* tstride of variance */
-  size_t width;                 /* Width of the map */
-  size_t x;                     /* x-location of sample */
-  size_t xstride;               /* x stride in output cube */
-  size_t y;                     /* y-location of sample */
-  size_t ystride;               /* y stride in output cube */
+  dim_t vtstride=0;             /* tstride of variance */
+  dim_t width;                  /* Width of the map */
+  dim_t x;                      /* x-location of sample */
+  dim_t xstride;                /* x stride in output cube */
+  dim_t y;                      /* y-location of sample */
+  dim_t ystride;                /* y stride in output cube */
+  double *data=NULL;            /* Data buffer */
+  double *noi_data=NULL;        /* Pointer to DATA component of noi */
+  double *res_data=NULL;        /* Pointer to DATA component of res */
+  double *var=NULL;             /* Variance buffer */
+  int *lut_data=NULL;           /* Pointer to DATA component of lut */
+  int maxhits=0;                /* Maximum of hits map */
+  smfArray *noi=NULL;           /* Pointer to noi if it exists */
+  smfData *sampcube=NULL;       /* smfData to store sampcube */
+  smf_qual_t *qua_data=NULL;    /* Pointer to DATA component of qua */
 
   if( *status != SAI__OK ) return;
 
@@ -283,7 +283,7 @@ void smf_write_sampcube( ThrWorkForce *wf, const smfArray *res, const smfArray *
 
           if( y<height ) {
             /* What sample count are we up to in this pixel? */
-            size_t samp = hitscount[x*xstride + y*ystride];
+            dim_t samp = hitscount[x*xstride + y*ystride];
 
             /* place data and noise values into the respective cubes */
             data[x*xstride + y*ystride + samp*sstride] = res_data[di];

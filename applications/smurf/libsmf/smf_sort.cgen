@@ -4,7 +4,7 @@
 *     smf_sort<X>
 
 *  Purpose:
-*     Create a sorted index for an array of int values.
+*     Create a sorted index for an array of values.
 
 *  Language:
 *     Starlink ANSI C
@@ -13,11 +13,11 @@
 *     C function
 
 *  Invocation:
-*     int* smf_sort<X>( size_t nel, const CGEN_TYPE *array, int *sorted,
-*                        int *status );
+*     dim_t *smf_sort<X>( dim_t nel, const CGEN_TYPE *array, int *sorted,
+*                         int *status );
 
 *  Arguments:
-*     nel = size_t (Given)
+*     nel = dim_t (Given)
 *        Number of elements in "array". If this is 1, then "sorted" is
 *        returned as +1, and the returned function value is a single
 *        element array holding the value zero.
@@ -88,18 +88,18 @@
 
 #include "smf.h"
 
-int* CGEN_FUNCTION(smf_sort)( size_t nel, const CGEN_TYPE *array, int *sorted, int *status ){
+dim_t *CGEN_FUNCTION(smf_sort)( dim_t nel, const CGEN_TYPE *array, int *sorted, int *status ){
 
 /* Local Variables */
-   const CGEN_TYPE *dp = NULL;
    const CGEN_TYPE *dq = NULL;
-   int *p = NULL;
-   int *q = NULL;
-   int *r = NULL;
-   int *result = NULL;
+   const CGEN_TYPE *dp = NULL;
+   dim_t *p = NULL;
+   dim_t *q = NULL;
+   dim_t *r = NULL;
+   dim_t *result = NULL;
+   dim_t i;
+   dim_t temp;
    int done;
-   size_t i;
-   int temp;
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return NULL;

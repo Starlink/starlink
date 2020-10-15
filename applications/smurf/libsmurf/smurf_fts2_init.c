@@ -180,16 +180,17 @@ void smurf_fts2_init(int* status)
   size_t nOutFiles          = 0;        /* Size of the output group */
   size_t nZPDFiles          = 0;        /* Size of the ZPD group */
   size_t fIndex             = 0;        /* File index */
-  size_t nWidth             = 0;        /* Data cube width */
-  size_t nHeight            = 0;        /* Data cube height */
-  size_t nFrames            = 0;        /* Data cube depth */
-  size_t nPixels            = 0;        /* Number of bolometers in the subarray */
+  int nWidth                = 0;        /* Data cube width */
+  int nHeight               = 0;        /* Data cube height */
+  int nFrames               = 0;        /* Data cube depth */
+  dim_t nPixels             = 0;        /* Number of bolometers in the subarray */
 
   char object[SZFITSTR];
   char subarray[SZFITSTR];
   char obsID[SZFITSTR];
   char scanMode[SZFITSTR];
 
+  dim_t index               = 0;
   double scanVel            = 0.0;      /* Mirror speed in mm/sec */
   double stepTime           = 0.0;      /* RTS step time, average sample rate */
   double minOPD             = 0;        /* OPD minimum */
@@ -199,7 +200,6 @@ void smurf_fts2_init(int* status)
   int nMax                  = 0;
   int nOPD                  = 0;
   int bolIndex              = 0;
-  int index                 = 0;
   int badPixel              = 0;
   int k0                    = 0;
   int indexZPD              = 0;
@@ -265,9 +265,9 @@ void smurf_fts2_init(int* status)
     }
 
     /* Data cube dimensions */
-    nWidth  = inData->dims[0];
-    nHeight = inData->dims[1];
-    nFrames = inData->dims[2];
+    nWidth  = (int) inData->dims[0];
+    nHeight = (int) inData->dims[1];
+    nFrames = (int) inData->dims[2];
     nPixels = nWidth * nHeight;
 
     /* Mirror positions in mm and times in sec*/
@@ -300,6 +300,8 @@ void smurf_fts2_init(int* status)
     minLenLeft = minLenRight = STAGE_CENTER * 2;
 
     /* Find the minimum distance between the set of ZPD values and the nearest mirror track endpoints */
+    minZPD = 0.0;
+    maxZPD = 0.0;
     for(i = 0; i < nWidth; i++) {
         for(j = 0; j < nHeight; j++) {
             bolIndex = i + j * nWidth;

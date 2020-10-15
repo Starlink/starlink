@@ -101,11 +101,10 @@ void smf_calcmodel_dks( ThrWorkForce *wf __attribute__((unused)),
                         int *status) {
 
   /* Local Variables */
-  size_t bolcounter;            /* bolometer counter */
+  dim_t bolcounter;            /* bolometer counter */
   dim_t boxcar=0;               /* Size of boxcar smooth window */
-  size_t bstride;               /* bolo stride */
+  dim_t bstride;               /* bolo stride */
   double *cdksquid=NULL;        /* Pointer to current dark squid (copy) */
-  double *corrbuf=NULL;         /* Array of corr coeffs all bolos in this col */
   double *cgainbuf=NULL;        /* Array gains for bolos in this col (copy) */
   double *coffsetbuf=NULL;      /* Array offsets for bolos in this col (copy) */
   double dchisq=0;              /* this - last model residual chi^2 */
@@ -115,10 +114,10 @@ void smf_calcmodel_dks( ThrWorkForce *wf __attribute__((unused)),
   dim_t idx=0;                  /* Index within subgroup */
   dim_t index;                  /* index into data buffer */
   dim_t j;                      /* Loop counter */
-  size_t jt1;
-  size_t jt2;
-  size_t jf1;                   /* Starting tslice that should be fit */
-  size_t jf2;                   /* Final tslice that should be fit */
+  dim_t jt1;
+  dim_t jt2;
+  dim_t jf1;                   /* Starting tslice that should be fit */
+  dim_t jf2;                   /* Final tslice that should be fit */
   dim_t k;                      /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Local keymap */
   smfArray *model=NULL;         /* Pointer to model at chunk */
@@ -127,23 +126,22 @@ void smf_calcmodel_dks( ThrWorkForce *wf __attribute__((unused)),
   dim_t nbolo=0;                /* Number of bolometers */
   dim_t ncol;                   /* Number of columns */
   dim_t ndata=0;                /* Total number of data points */
-  size_t ndchisq=0;             /* number of elements contributing to dchisq */
-  size_t nfit;                  /* number of samples over good range to fit */
+  dim_t ndchisq=0;             /* number of elements contributing to dchisq */
   dim_t nmodel=0;               /* Total number of elements in model buffer */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
   double *noi_data=NULL;        /* Pointer to DATA component of model */
-  size_t noibstride;            /* bolo stride for noise */
+  dim_t noibstride;            /* bolo stride for noise */
   dim_t nointslice;             /* number of time slices for noise */
-  size_t noitstride;            /* Time stride for noise */
+  dim_t noitstride;            /* Time stride for noise */
   dim_t nrow;                   /* Number of rows */
-  size_t ntot;                  /* total good excluding padding */
+  dim_t ntot;                  /* total good excluding padding */
   dim_t ntslice=0;              /* Number of time slices */
   double *offsetbuf=NULL;       /* Array of offsets for all bolos in this col */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  size_t tstride;               /* time stride */
+  dim_t tstride;               /* time stride */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -196,7 +194,6 @@ void smf_calcmodel_dks( ThrWorkForce *wf __attribute__((unused)),
       jf1 = 0;
       jf2 = ntslice-1;
     }
-    nfit = jf2-jf1+1;
 
     /* Total total range only using SMF__Q_PAD */
     if( qua ) {
@@ -227,12 +224,11 @@ void smf_calcmodel_dks( ThrWorkForce *wf __attribute__((unused)),
         dksquid += i*(ntslice+nrow*3);
         gainbuf = dksquid + ntslice;
         offsetbuf = gainbuf + nrow;
-        corrbuf = offsetbuf + nrow;
 
         /* For the first iteration we need to do some pre-processing */
         if( (flags&SMF__DIMM_FIRSTITER) ) {
           /* boxcar smooth */
-          smf_tophat1D( &dksquid[jt1], ntot, (int) boxcar, NULL, 0, 0.0,
+          smf_tophat1D( &dksquid[jt1], ntot, boxcar, NULL, 0, 0.0,
                         status );
         }
 

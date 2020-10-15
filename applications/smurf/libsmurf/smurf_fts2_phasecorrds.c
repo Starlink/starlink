@@ -231,7 +231,6 @@ void smurf_fts2_phasecorrds(int* status)
     int pDegree               = 0;                  /* Degree of the polynomial used to fit phase */
     int i                     = 0;                  /* Counter */
     int j                     = 0;                  /* Counter */
-    int k                     = 0;                  /* Counter */
     double wnLower            = 0.0;                /* Lower bound of wave number range */
     double wnUpper            = 0.0;                /* Upper bound of wave number range */
     double fNyquist           = 0.0;                /* Nyquist frequency */
@@ -266,24 +265,25 @@ void smurf_fts2_phasecorrds(int* status)
     size_t nFiles             = 0;                  /* Size of the input group */
     size_t nOutFiles          = 0;                  /* Size of the output group */
     size_t fIndex             = 0;                  /* File index */
-    size_t nWidth             = 0;                  /* Data cube width */
-    size_t nHeight            = 0;                  /* Data cube height */
-    size_t nFrames            = 0;                  /* Data cube depth */
-    size_t nFrames2           = 0;
-    size_t nPixels            = 0;                  /* Number of bolometers in the subarray */
-    size_t wnL                = 0;
-    size_t wnU                = 0;
+    dim_t bolIndex            = 0;
+    dim_t index               = 0;
+    dim_t indexZPD            = 0;
+    dim_t k                   = 0;                  /* Counter */
+    dim_t nFrames2            = 0;
+    dim_t nPixels             = 0;                  /* Number of bolometers in the subarray */
+    dim_t wnL                 = 0;
+    dim_t wnU                 = 0;
+    dim_t M                   = 0;
   /*double wnTrim             = WAVE_NUMBER_RANGE;*//* Trim the first wnTrim wave numbers (zero Real part of spectrum) */
 
     double dSigma             = 0;
     double sum                = 0;
     double error              = 0;
     int coeffLength           = 0;
-    int bolIndex              = 0;
-    int index                 = 0;
+    int nWidth                = 0;                  /* Data cube width */
+    int nHeight               = 0;                  /* Data cube height */
+    int nFrames               = 0;                  /* Data cube depth */
     int badPixel              = 0;
-    int M                     = 0;
-    int indexZPD              = 0;
     int W                     = 1;
 
 #if DEBUG
@@ -293,7 +293,7 @@ void smurf_fts2_phasecorrds(int* status)
 
     /* DF: Digital Filter */
     double peakIFG            = 0.0;              /* Value of interferogram peak */
-    int peakIFGIndex          = 0;                /* Index of interferogram peak */
+    dim_t peakIFGIndex        = 0;                /* Index of interferogram peak */
     double phaseDiff          = 0.0;              /* Difference of phase between consecutive values */
     double phaseRollover      = 0.0;              /* Phase rollover accumulator */
     double rchisq             = 0.0;              /* Reduced chisq of fit */
@@ -348,13 +348,13 @@ void smurf_fts2_phasecorrds(int* status)
         }
 
         /* Data cube dimensions */
-        nWidth  = inData->dims[0];
-        nHeight = inData->dims[1];
-        nFrames = inData->dims[2];
+        nWidth  = (int) inData->dims[0];
+        nHeight = (int) inData->dims[1];
+        nFrames = (int) inData->dims[2];
         nFrames2= nFrames / 2;
         nPixels = nWidth * nHeight;
-        wnL = (size_t) (nFrames2 * wnLower / fNyquist);
-        wnU = (size_t) (nFrames2 * wnUpper / fNyquist);
+        wnL = (dim_t) (nFrames2 * wnLower / fNyquist);
+        wnU = (dim_t) (nFrames2 * wnUpper / fNyquist);
 
         dSigma = fNyquist / nFrames2;      /* Spectral sampling interval */
 
@@ -744,7 +744,7 @@ void smurf_fts2_phasecorrds(int* status)
 
                 /* DF: TODO: Save problem flagged pixels to a bolometer mask array */
                 /* DF: TODO: Make peak test more robust so as to handle noisy data better */
-                if(!badPixel && abs(indexZPD - peakIFGIndex) * dz > IFG_PEAK_THRESHOLD){  /* TODO: use dSigma instead of dz? */
+                if(!badPixel && labs(indexZPD - peakIFGIndex) * dz > IFG_PEAK_THRESHOLD){  /* TODO: use dSigma instead of dz? */
                     /*badPixel = 1;*/
                     /*printf("%s DEBUG: Flagging bad pixel[%d,%d] having peak: %f at index %d too far (%f cm) from ZPD index: %d\n",
                            TASK_NAME, i, j, peakIFG, peakIFGIndex, (abs(indexZPD - peakIFGIndex) * dz), indexZPD);*/

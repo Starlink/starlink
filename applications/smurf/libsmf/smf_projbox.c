@@ -15,8 +15,8 @@
 
 *  Invocation:
 *     void smf_projbox( Grp *igrp, AstFrameSet *refwcs,
-*                       int lbnd[ NDF__MXDIM ], int ubnd[ NDF__MXDIM ],
-*                       int dims[ NDF__MXDIM ], int *status )
+*                       dim_t lbnd[ NDF__MXDIM ], dim_t ubnd[ NDF__MXDIM ],
+*                       dim_t dims[ NDF__MXDIM ], int *status )
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -25,13 +25,13 @@
 *        The WCS FrameSet for the required output projection. The current
 *        Frame must have Domain "SKY", and the base Frame must have
 *        Domain "PIXEL" abd be 2-dimensional.
-*     lbnd = int * (Returned)
+*     lbnd = dim_t * (Returned)
 *        The lower pixel index bounds within the output projection that
 *        just encloses all the input NDFs. May be NULL.
-*     ubnd = int * (Returned)
+*     ubnd = dim_t * (Returned)
 *        The upper pixel index bounds within the output projection that
 *        just encloses all the input NDFs. May be NULL.
-*     dims = int * (Returned)
+*     dims = dim_t * (Returned)
 *        The dimensions of the boundiong box within the output projection
 *        that just encloses all the input NDFs. May be NULL.
 *     status = int * (Given)
@@ -87,8 +87,8 @@
 #include "libsmf/smf.h"
 
 /* Main entry */
-void smf_projbox( Grp *igrp, AstFrameSet *refwcs, int lbnd[ NDF__MXDIM ],
-                  int ubnd[ NDF__MXDIM ], int dims[ NDF__MXDIM ],
+void smf_projbox( Grp *igrp, AstFrameSet *refwcs, dim_t lbnd[ NDF__MXDIM ],
+                  dim_t ubnd[ NDF__MXDIM ], dim_t dims[ NDF__MXDIM ],
                   int *status ){
 
 /* Local Variables: */
@@ -101,17 +101,17 @@ void smf_projbox( Grp *igrp, AstFrameSet *refwcs, int lbnd[ NDF__MXDIM ],
    double dubnd_out[ 2 ];
    int *pixaxes;
    int idim;
-   int ilbnd[ NDF__MXDIM ];
+   dim_t ilbnd[ NDF__MXDIM ];
    int index;
    int indf;
    int indim;
-   int iubnd[ NDF__MXDIM ];
-   int lbnd_box[ NDF__MXDIM ];
+   dim_t iubnd[ NDF__MXDIM ];
+   dim_t lbnd_box[ NDF__MXDIM ];
    int ndim = 0;
    int nndf;
    int spax1 = 0;
    int spax2 = 0;
-   int ubnd_box[ NDF__MXDIM ];
+   dim_t ubnd_box[ NDF__MXDIM ];
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -145,7 +145,7 @@ void smf_projbox( Grp *igrp, AstFrameSet *refwcs, int lbnd[ NDF__MXDIM ],
    }
 
 /* See how many NDFs there are. */
-   nndf = grpGrpsz( igrp, status );
+   nndf = (int) grpGrpsz( igrp, status );
 
 /* Loop round each NDF. */
    for( index = 0; index < nndf && *status == SAI__OK; index++ ) {

@@ -144,10 +144,10 @@ void smurf_supercam2acsis( int *status ) {
   AstFrameSet * wcsframe = NULL;  /* For conversion of offset to absolute coordinates */
   double * xin = NULL;            /* Space to hold input X coordinates */
   double * yin = NULL;            /* Space to hold input Y coordinates */
-  double * xout = NULL;            /* Space to hold output X coordinates */
-  double * yout = NULL;            /* Space to hold output Y coordinates */
+  double * xout = NULL;           /* Space to hold output X coordinates */
+  double * yout = NULL;           /* Space to hold output Y coordinates */
 
-  size_t obsnum = 0;                 /* Current observation number */
+  dim_t obsnum = 0;               /* Current observation number */
   int isopen = 0;                 /* Is an output data file open? */
 
   /* Check inherited status */
@@ -192,9 +192,9 @@ void smurf_supercam2acsis( int *status ) {
     SupercamSpecHdr * hdr = NULL;  /* Per spectrum header information */
     size_t thisRows = 0;           /* Number of rows from this file */
     size_t thisChans = 0;          /* Number of channels from this file */
-    size_t thisobsnum = 0;         /* Observation number of this file */
-    const char ** recepnames = NULL; /* All the receptor names for this observation */
-    size_t nrecep = 0;             /* Number of active receptors */
+    dim_t thisobsnum = 0;          /* Observation number of this file */
+    const char **recepnames = NULL;/* All the receptor names for this observation */
+    dim_t nrecep = 0;              /* Number of active receptors */
     float * fplanex = NULL;        /* Focal plany X coordinates */
     float * fplaney = NULL;        /* Focal plane Y coordinates */
     JCMTState record;              /* Per-time slice information */
@@ -394,9 +394,11 @@ void smurf_supercam2acsis( int *status ) {
       astGetFitsI( acsisfits, "OBSNUM", &obsnum );
       astGetFitsI( acsisfits, "UTDATE", &utdate );
 
+      #pragma GCC diagnostic ignored "-Wcast-qual"
       acsSpecOpenTS( directory, utdate, obsnum, nrecep, NSUBSYS,
                      (char**)recepnames, "DIRECT", fplanex, fplaney,
                      "<OCSCONFIG />", status );
+      #pragma GCC diagnostic pop
       if (*status == SAI__OK) isopen = 1;
     }
 
@@ -453,7 +455,7 @@ void smurf_supercam2acsis( int *status ) {
     /* For efficiency transform all the coordinates at once */
     {
       smfHead ihdr;
-      size_t counter = 0;
+      dim_t counter = 0;
       double cdelt2;
       double cdelt3;
 
@@ -487,7 +489,7 @@ void smurf_supercam2acsis( int *status ) {
          which happens to be in INSTAP. We now know its coordinate. */
       {
         char * stemp = NULL;
-        int fidnum;
+        size_t fidnum;
         double coords[2];
         AstFrameSet * tmpwcs = NULL;
         double azin[1];

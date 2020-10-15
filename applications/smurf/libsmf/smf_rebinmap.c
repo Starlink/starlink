@@ -16,7 +16,7 @@
 *     smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
 *                   int index, int size, AstFrameSet *outfset, int spread,
 *                   const double params[], int moving, int genvar,
-*                   int *lbnd_out, int *ubnd_out, double *map, *variance,
+*                   dim_t *lbnd_out, dim_t *ubnd_out, double *map, *variance,
 *                   double *weights, int64_t *nused, fts2Port fts_port,
 *                   int *status );
 
@@ -47,9 +47,9 @@
 *        If zero, no output variances are calculated. Otherwise, output
 *        variances are calculated on the basis of the spread of input
 *        data values.
-*     lbnd_out = double * (Given)
+*     lbnd_out = dim_t * (Given)
 *        2-element array pixel coord. for the lower bounds of the output map
-*     ubnd_out = double * (Given)
+*     ubnd_out = dim_t * (Given)
 *        2-element array pixel coord. for the upper bounds of the output map
 *     map = double* (Returned)
 *        A pointer to an array containing room for "nw" contiguous versions
@@ -178,7 +178,7 @@
 void smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
                    int index, int size, AstFrameSet *outfset, int spread,
                    const double params[], int moving, int genvar,
-                   int *lbnd_out, int *ubnd_out, double *map, double *variance,
+                   dim_t *lbnd_out, dim_t *ubnd_out, double *map, double *variance,
                    double *weights, int64_t *nused, fts2Port fts_port,
                    int *status ) {
 
@@ -188,18 +188,18 @@ void smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
    AstSkyFrame *abskyfrm = NULL; /* Output SkyFrame (always absolute) */
    AstSkyFrame *oskyfrm = NULL;  /* SkyFrame from the output WCS Frameset */
    dim_t i;                      /* Loop counter */
+   dim_t ldim[ 2 ];              /* Output array lower GRID bounds */
    double *p1;                   /* Pointer to next data value */
    double *p;                    /* Pointer to next data value */
    int ijob;                     /* Job identifier */
    int j;                        /* Worker index */
-   int ldim[ 2 ];                /* Output array lower GRID bounds */
    int nw;                       /* Number of worker threads */
    smfRebinMapData *pdata = NULL;/* Pointer to data for a single thread */
 
    static dim_t nel;             /* # of elements in output map/var array */
    static dim_t nelw;            /* # of elements in output weights array */
    static int rebinflags;        /* Control the rebinning procedure */
-   static int udim[ 2 ];         /* Output array upper GRID bounds */
+   static dim_t udim[ 2 ];       /* Output array upper GRID bounds */
    static smfRebinMapData *job_data = NULL; /* Data for all jobs */
 
 /* Check the inherited status */
@@ -433,10 +433,10 @@ void smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
       ldim[ 0 ] = 1;
       ldim[ 1 ] = 1;
       dummy = (AstMapping *) astUnitMap( 2, " " );
-      astRebinSeqD( dummy, 0.0, 2, NULL, NULL, NULL, NULL, spread,
-                    params, AST__REBINEND | rebinflags, 0.1, 1000000,
-                    VAL__BADD, 2, ldim, udim, NULL, NULL, map,
-                    variance, weights, nused );
+      astRebinSeq8D( dummy, 0.0, 2, NULL, NULL, NULL, NULL, spread,
+                     params, AST__REBINEND | rebinflags, 0.1, 1000000,
+                     VAL__BADD, 2, ldim, udim, NULL, NULL, map,
+                     variance, weights, nused );
       dummy = astAnnul( dummy );
    }
 }

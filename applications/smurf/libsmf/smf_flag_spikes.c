@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_flag_spikes( ThrWorkForce *wf, smfData *data, smf_qual_t mask,
-*                       double thresh, size_t box, size_t *nflagged,
+*                       double thresh, dim_t box, dim_t *nflagged,
 *                       int *status )
 
 *  Arguments:
@@ -28,9 +28,9 @@
 *        the calculation.
 *     thresh = double (Given)
 *        Number of standard deviations at which to clip spikes.
-*     box = size_t (Given)
+*     box = dim_t (Given)
 *        The number of time slices to include in the median filter box.
-*     nflagged = size_t * (Returned)
+*     nflagged = dim_t * (Returned)
 *        The number of new samples that were flagged. May be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -118,19 +118,19 @@
 /* Structure containing information about blocks of bolos that each
    thread will process */
 typedef struct {
-  size_t b1;               /* Index of first bolometer of block */
-  size_t b2;               /* Index of last bolometer of block */
-  size_t box;              /* box size */
-  size_t bstride;          /* bolometer stride for res/qua */
+  dim_t b1;               /* Index of first bolometer of block */
+  dim_t b2;               /* Index of last bolometer of block */
+  dim_t box;              /* box size */
+  dim_t bstride;          /* bolometer stride for res/qua */
   double *dat;             /* pointer to the bolometer data */
   int ijob;                /* Job identifier */
   smf_qual_t mask;         /* quality bit mask */
   dim_t nbolo;             /* number of bolometers */
-  size_t nflag;            /* number of spikes flagged in this block */
+  dim_t nflag;            /* number of spikes flagged in this block */
   dim_t ntime;             /* number of time slices */
   smf_qual_t *qua;         /* pointer to the quality array */
   double thresh;           /* threshold for spikes */
-  size_t tstride;          /* time stride for res/qua */
+  dim_t tstride;          /* time stride for res/qua */
 } smfFlagSpikesData;
 
 /* Function to be executed in thread: find spikes in block of bolos */
@@ -138,26 +138,25 @@ typedef struct {
 static void smfFlagSpikesPar( void *job_data_ptr, int *status );
 
 static void smfFlagSpikesPar( void *job_data_ptr, int *status ) {
-   size_t box;                 /* Box size */
-   size_t bstride;             /* Vector stride between bolometer samples */
+   dim_t box;                  /* Box size */
+   dim_t bstride;              /* Vector stride between bolometer samples */
    double *dat = NULL;         /* Pointer to bolo data */
    double dnew;                /* Data value being added into the filter box */
    double dold;                /* Data value being removed from the filter box*/
-   int iadd;                   /* Index within box at which to store new value*/
+   dim_t iadd;                 /* Index within box at which to store new value*/
    dim_t ibolo;                /* Bolometer index */
    dim_t ibox;                 /* Index within box */
    dim_t iold;                 /* Index of oldest value in "w2" */
    dim_t inbox;                /* Number of values in current filter box */
    int inoise;                 /* Index within noisebox element to be removed */
-   int iremove;                /* Index within box of element to be removed */
+   dim_t iremove;              /* Index within box of element to be removed */
    dim_t itime;                /* Time-slice index */
    dim_t lasttime;             /* Last time-slice index to check for spikes */
    double lmedian;             /* Median value in previous filter box */
    smf_qual_t mask;            /* quality bit mask */
    double median;              /* Median value in current filter box */
-   dim_t nbolo;                /* Number of bolometers */
-   size_t newstride;           /* Vector stride to new time sample */
-   size_t nflag;               /* Number of samples flagged */
+   dim_t newstride;            /* Vector stride to new time sample */
+   dim_t nflag;                /* Number of samples flagged */
    int nn;                     /* Number of good values in noise box */
    double noise;               /* Local noise estimate */
    double *noisebox = NULL;    /* Pointer to array holding values for
@@ -178,7 +177,7 @@ static void smfFlagSpikesPar( void *job_data_ptr, int *status ) {
    smf_qual_t *qua = NULL;     /* Pointer to quality flags */
    int spike;                  /* Is current time slice a spike? */
    double thresh;              /* threshold for spikes */
-   size_t tstride;             /* Vector stride between time samples */
+   dim_t tstride;             /* Vector stride between time samples */
    double umedian;             /* Lagged median value */
    double *w1 = NULL;          /* Array holding sorted data values */
    double *w2 = NULL;          /* Array holding un-sorted data values */
@@ -189,7 +188,6 @@ static void smfFlagSpikesPar( void *job_data_ptr, int *status ) {
    bstride = pdata->bstride;
    dat = pdata->dat;
    mask = pdata->mask;
-   nbolo = pdata->nbolo;
    ntime = pdata->ntime;
    qua = pdata->qua;
    thresh = pdata->thresh;
@@ -265,7 +263,7 @@ static void smfFlagSpikesPar( void *job_data_ptr, int *status ) {
 
 /* Also store values these data values in the second half of the noise
    box. Check we have not reached the end of the noise box. */
-            if( pn - noisebox < (int) box ) {
+            if( pn - noisebox < box ) {
 
 /* Store the value in the next element of the noise box, and if the value is
    good, update the running sums used for calculating the noise level. */
@@ -306,7 +304,7 @@ static void smfFlagSpikesPar( void *job_data_ptr, int *status ) {
          iold = 0;
 
 /* Note the number of good values stored in the filter box. */
-         inbox = (int)( pw1 - w1 );
+         inbox = pw1 - w1;
 
 /* If there are any bad data values, pad out the w1 array with bad
    values. */
@@ -419,7 +417,7 @@ static void smfFlagSpikesPar( void *job_data_ptr, int *status ) {
                      }
 
                   } else {
-                     for( iadd = 0; iadd < (int) inbox; iadd++ ) {
+                     for( iadd = 0; iadd < inbox; iadd++ ) {
                         if( w1[ iadd ] >= dnew ) break;
                      }
                   }
@@ -432,7 +430,7 @@ static void smfFlagSpikesPar( void *job_data_ptr, int *status ) {
    than the new value up one element, and increment the number of good
    values for this bolometer box. */
                   if( iremove == -1 ) {
-                     for( ibox = inbox; (int) ibox > iadd; ibox-- ) {
+                     for( ibox = inbox; ibox > iadd; ibox-- ) {
                         w1[ ibox ] = w1[ ibox - 1 ];
                      }
                      inbox++;
@@ -440,8 +438,8 @@ static void smfFlagSpikesPar( void *job_data_ptr, int *status ) {
 /* If the value being removed is good and the value being added is greater
    than the value being removed, shuffle all the intermediate values down
    one element within the box. */
-                  } else if( (int) iadd > iremove ) {
-                     for( ibox = iremove; (int) ibox < iadd - 1; ibox++ ) {
+                  } else if( iadd > iremove ) {
+                     for( ibox = iremove; ibox < iadd - 1; ibox++ ) {
                         w1[ ibox ] = w1[ ibox + 1 ];
                      }
                      iadd--;
@@ -450,7 +448,7 @@ static void smfFlagSpikesPar( void *job_data_ptr, int *status ) {
    than or equal to the value being removed, shuffle all the intermediate
    values up one element within the box. */
                   } else {
-                     for( ibox = iremove; (int) ibox > iadd; ibox-- ) {
+                     for( ibox = iremove; ibox > iadd; ibox-- ) {
                         w1[ ibox ] = w1[ ibox - 1 ];
                      }
                   }
@@ -464,13 +462,13 @@ static void smfFlagSpikesPar( void *job_data_ptr, int *status ) {
 /* Find the index (iremove) within the w1 box at which is stored the value
    that is leaving the box. */
                   iremove = -1;
-                  for( iremove = 0; iremove < (int) inbox; iremove++ ) {
+                  for( iremove = 0; iremove < inbox; iremove++ ) {
                      if( w1[ iremove ] == dold ) break;
                   }
 
 /* Move all the larger values down one element in "w1" to fill the gap
    left by the removal. */
-                  for( iremove++; iremove < (int) inbox; iremove++ ) {
+                  for( iremove++; iremove < inbox; iremove++ ) {
                      w1[ iremove - 1 ] = w1[ iremove ];
                   }
 
@@ -527,7 +525,7 @@ static void smfFlagSpikesPar( void *job_data_ptr, int *status ) {
    and increment the index at which to store the next value. If the index
    reaches the end of the array, wrap around to the start of the array. */
                noisebox[ inoise++ ] = dnew;
-               if( inoise == (int) box ) inoise = 0;
+               if( inoise == box ) inoise = 0;
             }
 
 /* Get pointers to the next central data and quality value for the current
@@ -567,7 +565,7 @@ static void smfFlagSpikesPar( void *job_data_ptr, int *status ) {
 #define FUNC_NAME "smf_flag_spikes"
 
 void smf_flag_spikes( ThrWorkForce *wf, smfData *data, smf_qual_t mask,
-                      double thresh, size_t box, size_t *nflagged,
+                      double thresh, dim_t box, dim_t *nflagged,
                       int *status ){
 
 /* Local Variables */
@@ -578,11 +576,11 @@ void smf_flag_spikes( ThrWorkForce *wf, smfData *data, smf_qual_t mask,
    double *dat = NULL;         /* Pointer to bolo data */
    smfFlagSpikesData *pdata=NULL;/* Pointer to job data */
    int nw;                     /* Number of worker threads */
-   size_t bstride;             /* Vector stride between bolometer samples */
-   size_t nflag;               /* Number of samples flagged */
-   size_t tstride;             /* Vector stride between time samples */
+   dim_t bstride;             /* Vector stride between bolometer samples */
+   dim_t nflag;               /* Number of samples flagged */
+   dim_t tstride;             /* Vector stride between time samples */
    smf_qual_t *qua = NULL;     /* Pointer to quality flags */
-   size_t step;                /* step size for dividing up work */
+   dim_t step;                /* step size for dividing up work */
    int njobs=0;                /* Number of jobs to be processed */
 
 /* Check inherited status. Also return immediately if no spike flagging
@@ -624,7 +622,7 @@ void smf_flag_spikes( ThrWorkForce *wf, smfData *data, smf_qual_t mask,
 /* Check the supplied box value is valid. */
    if( box <= 2 && *status == SAI__OK ) {
       *status = SAI__ERROR;
-      msgSeti( "BOX", box );
+      msgSetk( "BOX", box );
       errRep( " ", FUNC_NAME ": Can't find spikes: box=^BOX, must be > 2",
               status);
    }
@@ -638,8 +636,8 @@ void smf_flag_spikes( ThrWorkForce *wf, smfData *data, smf_qual_t mask,
 /* Check we have room for at least 3 boxes along the time axis. */
    if( 3*box > ntime && *status == SAI__OK ) {
       *status = SAI__ERROR;
-      msgSeti( "BOX", box );
-      msgSeti( "MAX", ntime/3 - 1 );
+      msgSetk( "BOX", box );
+      msgSetk( "MAX", ntime/3 - 1 );
       errRep( " ", FUNC_NAME ": Can't find spikes: box=^BOX is too large, "
               " must be < ^MAX.", status);
    }
@@ -682,7 +680,6 @@ void smf_flag_spikes( ThrWorkForce *wf, smfData *data, smf_qual_t mask,
      pdata->dat = dat;
      pdata->mask = mask;
      pdata->thresh = thresh;
-     pdata->nbolo = nbolo;
      pdata->ntime = ntime;
      pdata->qua = qua;
      pdata->tstride = tstride;

@@ -119,26 +119,26 @@
 
 #define FUNC_NAME "smf_downsamp_smfData"
 
-void smf_downsamp_smfData( ThrWorkForce *wf, const smfData *idata,
+void smf_downsamp_smfData( ThrWorkForce *wf, smfData *idata,
                            smfData **odata, dim_t ontslice, int todouble,
                            int method, int *status ) {
 
-  size_t i;                /* loop counter */
-  size_t ibstride;         /* bstride of idata */
+  dim_t i;                 /* loop counter */
+  dim_t ibstride;          /* bstride of idata */
   smfData *indksquid=NULL; /* Pointer to input dksquid data */
   JCMTState *instate=NULL; /* Pointer to input JCMTState */
   dim_t intslice;          /* ntslice of idata */
-  size_t itstride;         /* tstride of idata */
-  size_t j;                /* loop counter */
+  dim_t itstride;          /* tstride of idata */
+  dim_t j;                 /* loop counter */
   dim_t nbolo;             /* number of bolos */
   dim_t ncols;             /* number of columns */
   dim_t nrows;             /* number of rows */
-  size_t obstride;         /* bstride of odata */
+  dim_t obstride;          /* bstride of odata */
   dim_t ondata;            /* ndata of odata */
-  size_t otstride;         /* tstride of odata */
+  dim_t otstride;          /* tstride of odata */
   JCMTState *outstate=NULL;/* Pointer to output JCMTState */
   double scale;            /* how much longer new samples are */
-  int size;                /* size of array element in bytes */
+  size_t size;             /* size of array element in bytes */
 
 
 
@@ -271,8 +271,8 @@ void smf_downsamp_smfData( ThrWorkForce *wf, const smfData *idata,
       }
 
       if( *status == SAI__OK ) {
-        size_t co_i = nf_i*nbolo;           /* Component offset input */
-        size_t co_o = nf_o*nbolo;           /* Component offset output */
+        dim_t co_i = nf_i*nbolo;           /* Component offset input */
+        dim_t co_o = nf_o*nbolo;           /* Component offset output */
         double *ip = fft_idata->pntr[0];    /* Pointer to input data */
         double *op = fft_odata->pntr[0];    /* Pointer to output data */
 
@@ -394,10 +394,10 @@ void smf_downsamp_smfData( ThrWorkForce *wf, const smfData *idata,
       outstate = hdr->allState;
 
       if( *status == SAI__OK ) {
-        size_t frame;  /* index of nearest neighbour JCMTState */
+        dim_t frame;  /* index of nearest neighbour JCMTState */
 
         for( i=0; i<ontslice; i++ ) {
-          frame = (size_t) round(((double) i + 0.5)*scale);
+          frame = (dim_t) round(((double) i + 0.5)*scale);
           memcpy( outstate + i, instate + frame, sizeof(*instate) );
         }
 

@@ -104,8 +104,8 @@ void smf_find_airmass_interval( const smfHead *hdr, double * oamstart, double *o
   */
   if (hdr->allState) {
     JCMTState * curstate = hdr->allState;
-    size_t nframes = hdr->nframes;
-    size_t k;
+    dim_t nframes = hdr->nframes;
+    dim_t k;
     for ( k=0; k<nframes && (*status == SAI__OK) ; k++) {
       amstart = curstate->tcs_airmass;
       elstart = curstate->tcs_az_ac2;

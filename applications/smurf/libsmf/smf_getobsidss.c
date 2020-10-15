@@ -14,18 +14,18 @@
 
 *  Invocation:
 *     result = smf_getobsidss( AstFitsChan *hdr, char * obsid,
-*              size_t szobs, char * obsidss, size_t szss, int *status );
+*              dim_t szobs, char * obsidss, dim_t szss, int *status );
 
 *  Arguments:
 *     hdr = AstFitsChan * (Given)
 *        The FITS header to be read.
 *     obsid = char * (Given)
 *        Buffer to receive Observation ID. Can be NULL.
-*     szobs = size_t (Given)
+*     szobs = dim_t (Given)
 *        Size of "obsid" buffer.
 *     obsidss = char * (Given)
 *        Buffer to receive subsystem observation ID. Can be NULL.
-*     szss = size_t (Given)
+*     szss = dim_t (Given)
 *        Size of "obsidss" buffer.
 *     status = int * (Given and Returned)
 *        Pointer to inherited status.
@@ -95,13 +95,13 @@
 
 #define FUNC_NAME "smf_getobsidss"
 
-char *smf_getobsidss( AstFitsChan *hdr, char * obsid, size_t szobs,
-                      char * obsidss, size_t szss, int *status ) {
+char *smf_getobsidss( AstFitsChan *hdr, char * obsid, dim_t szobs,
+                      char * obsidss, dim_t szss, int *status ) {
 
 /* Local Variables: */
   char lobsid[SZFITSTR];  /* somewhere to put the obsid */
   char *obspnt = NULL;    /* Local buffer or supplied buffer */
-  size_t size;            /* Size of obsid buffer */
+  dim_t size;            /* Size of obsid buffer */
   char *value = NULL;     /* Pointer to static buffer containing header value */
 
    /* Check the inherited status */

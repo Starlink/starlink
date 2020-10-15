@@ -15,8 +15,8 @@
 
 *  Invocation:
 *     smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
-*                    AstFrameSet *refwcs, int alignsys, int *lbnd_out,
-*                    int *ubnd_out, AstFrameSet **outframeset, int *moving,
+*                    AstFrameSet *refwcs, int alignsys, dim_t *lbnd_out,
+*                    dim_t *ubnd_out, AstFrameSet **outframeset, int *moving,
 *                    smfBox ** boxes, fts2Port fts_port, AstKeyMap *config,
 *                    int *status );
 
@@ -38,9 +38,9 @@
 *        If non-zero, then the input data will be aligned in the coordinate
 *        system specified by "system" rather than in the default system
 *        (ICRS).
-*     lbnd_out = double* (Returned)
+*     lbnd_out = dim_t * (Returned)
 *        2-element array pixel coord. for the lower bounds of the output map
-*     ubnd_out = double* (Returned)
+*     ubnd_out = dim_t * (Returned)
 *        2-element array pixel coord. for the upper bounds of the output map
 *     outframeset = AstFrameSet** (Returned)
 *        Frameset containing the sky->output map mapping
@@ -245,8 +245,8 @@
 #define MAX_DIM 20000
 
 void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
-                    AstFrameSet *spacerefwcs, int alignsys, int *lbnd_out,
-                    int *ubnd_out, AstFrameSet **outframeset, int *moving,
+                    AstFrameSet *spacerefwcs, int alignsys, dim_t *lbnd_out,
+                    dim_t *ubnd_out, AstFrameSet **outframeset, int *moving,
                     smfBox ** boxes, fts2Port fts_port, AstKeyMap *config,
                     int *status ) {
 
@@ -271,7 +271,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   dim_t j;                     /* Loop counter */
   AstSkyFrame *junksky = NULL; /* Unused SkyFrame argument */
   dim_t k;                     /* Loop counter */
-  int lbnd0[ 2 ];              /* Defaults for LBND parameter */
+  dim_t lbnd0[ 2 ];            /* Defaults for LBND parameter */
   double map_pa=0;             /* Map PA in output coord system (rads) */
   dim_t maxloop;               /* Number of times to go round the time slice loop */
   dim_t nbadt  = 0;            /* Number of bad time slices */
@@ -290,7 +290,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   struct timeval tv2;          /* Timer */
   AstMapping *tmap;            /* Temporary Mapping */
   int trim;                    /* Trim borders of bad pixels from o/p image? */
-  int ubnd0[ 2 ];              /* Defaults for UBND parameter */
+  dim_t ubnd0[ 2 ];            /* Defaults for UBND parameter */
   double x_array_corners[4];   /* X-Indices for corner bolos in array */
   double x_map[4];             /* Projected X-coordinates of corner bolos */
   double y_array_corners[4];   /* Y-Indices for corner pixels in array */
@@ -442,7 +442,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
     }
 
     if( *status == SAI__OK) {
-      size_t goodidx = SMF__BADSZT;
+      dim_t goodidx = SMF__BADSZT;
 
       /* Need to build up a frameset based on good telescope position.
          We can not assume that we the first step will be a good TCS position
@@ -689,7 +689,7 @@ status );
           flbnd[ 1 ] = VAL__MAXD;
           fubnd[ 0 ] = VAL__MIND;
           fubnd[ 1 ] = VAL__MIND;
-          for( j = 0; j < 4; j++ ) textreme[ j ] = (dim_t) VAL__BADI;
+          for( j = 0; j < 4; j++ ) textreme[ j ] = (dim_t) VAL__BADK;
 
           if( *status == SAI__OK ) {
              p1 = ac1list;
@@ -729,7 +729,7 @@ status );
         if (fast) {
           /* get the index but make sure it is good */
           ts = textreme[j];
-          if (ts == (dim_t)VAL__BADI) continue;
+          if (ts == VAL__BADK) continue;
         } else {
           ts = j;
         }
@@ -799,7 +799,7 @@ status );
   if (nbadt > 0) {
     msgOutf( "", "   Processed %zu time slices to calculate bounds,"
              " of which %zu had bad telescope data and were skipped",
-             status, (size_t)(ngoodt+nbadt), (size_t)nbadt );
+             status, (dim_t)(ngoodt+nbadt), (dim_t)nbadt );
   }
 
   /* If spatial reference wcs was supplied, store par values that result in
@@ -833,27 +833,27 @@ status );
   /* Set the dynamic defaults for lbnd/ubnd */
   lbnd0[ 0 ] = lbnd_out[ 0 ];
   lbnd0[ 1 ] = lbnd_out[ 1 ];
-  parDef1i( "LBND", 2, lbnd0, status );
+  parDef1k( "LBND", 2, lbnd0, status );
 
   ubnd0[ 0 ] = ubnd_out[ 0 ];
   ubnd0[ 1 ] = ubnd_out[ 1 ];
-  parDef1i( "UBND", 2, ubnd0, status );
+  parDef1k( "UBND", 2, ubnd0, status );
 
-  parGet1i( "LBND", 2, lbnd_out, &actval, status );
+  parGet1k( "LBND", 2, lbnd_out, &actval, status );
   if( actval == 1 ) lbnd_out[ 1 ] = lbnd_out[ 0 ];
 
-  parGet1i( "UBND", 2, ubnd_out, &actval, status );
+  parGet1k( "UBND", 2, ubnd_out, &actval, status );
   if( actval == 1 ) ubnd_out[ 1 ] = ubnd_out[ 0 ];
 
   /* Ensure the bounds are the right way round. */
   if( lbnd_out[ 0 ] > ubnd_out[ 0 ] ) {
-    int itmp = lbnd_out[ 0 ];
+    dim_t itmp = lbnd_out[ 0 ];
     lbnd_out[ 0 ] = ubnd_out[ 0 ];
     ubnd_out[ 0 ] = itmp;
   }
 
   if( lbnd_out[ 1 ] > ubnd_out[ 1 ] ) {
-    int itmp = lbnd_out[ 1 ];
+    dim_t itmp = lbnd_out[ 1 ];
     lbnd_out[ 1 ] = ubnd_out[ 1 ];
     ubnd_out[ 1 ] = itmp;
   }
@@ -880,10 +880,10 @@ status );
 /* Report the pixel bounds of the cube. */
   if( *status == SAI__OK ) {
     msgOutif( MSG__NORM, " ", " ", status );
-    msgSeti( "XL", lbnd_out[ 0 ] );
-    msgSeti( "YL", lbnd_out[ 1 ] );
-    msgSeti( "XU", ubnd_out[ 0 ] );
-    msgSeti( "YU", ubnd_out[ 1 ] );
+    msgSetk( "XL", lbnd_out[ 0 ] );
+    msgSetk( "YL", lbnd_out[ 1 ] );
+    msgSetk( "XU", ubnd_out[ 0 ] );
+    msgSetk( "YU", ubnd_out[ 1 ] );
     msgOutif( MSG__NORM, " ", "   Output map pixel bounds: ( ^XL:^XU, ^YL:^YU )",
               status );
 

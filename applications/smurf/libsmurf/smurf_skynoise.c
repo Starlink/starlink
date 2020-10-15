@@ -184,8 +184,8 @@ void smurf_skynoise ( int *status ) {
    FILE *fp;                       /* file pointer */
    char file_name[SC2SIM__FLEN];   /* output file name */
    int indf;                       /* NDF identifier */
-   int lbnd[2];                    /* lower bounds of pixel array */
-   int n;                          /* Number of elements mapped */
+   dim_t lbnd[2];                  /* lower bounds of pixel array */
+   size_t n;                       /* Number of elements mapped */
    Grp *obsGrp = NULL;             /* Group containing obs parameter file */
    AstKeyMap *obskeymap=NULL;      /* AstKeyMap for obs parameters */
    size_t osize = 0;               /* Size of obsGrp */
@@ -193,11 +193,11 @@ void smurf_skynoise ( int *status ) {
    int rseed;                      /* seed for random number generator */
    Grp *simGrp = NULL;             /* Group containing sim parameter file */
    AstKeyMap *simkeymap=NULL;      /* AstKeyMap for sim parameters */
-   int size;                       /* width of square area in pixels */
+   size_t size;                    /* width of square area in pixels */
    double *spectrum;               /* complex array for holding 2D spectrum */
    size_t ssize = 0;               /* Size of simGrp */
    struct timeval time;            /* Structure for system time */
-   int ubnd[2];                    /* Upper bounds of pixel array */
+   dim_t ubnd[2];                  /* Upper bounds of pixel array */
 
    ndfBegin ();
 
@@ -214,7 +214,7 @@ void smurf_skynoise ( int *status ) {
    if ( *status == PAR__NULL ) {
       errAnnul ( status );
       gettimeofday ( &time, NULL );
-      rseed = ( time.tv_sec * 1000 ) + ( time.tv_usec / 1000 );
+      rseed = (int)( ( time.tv_sec * 1000 ) + ( time.tv_usec / 1000 ) );
       msgOutif(MSG__VERB," ",
                "Seeding random numbers with clock time", status);
    } else {
@@ -242,7 +242,7 @@ void smurf_skynoise ( int *status ) {
    pixsize = 2500.0; /* Arcsec */
    size = 512; /* Surely this should be a parameter? */
    corner = ( sinx.atmrefnu * 15.0 ) / ( sinx.atmrefvel * 5156.0 );
-   spectrum = astCalloc( (size_t)(size*size*2), sizeof(*spectrum) );
+   spectrum = astCalloc( (dim_t)(size*size*2), sizeof(*spectrum) );
 
    lbnd[0] = 1;
    lbnd[1] = 1;
@@ -255,7 +255,7 @@ void smurf_skynoise ( int *status ) {
    atmsim = atmpntr[0];
 
    /* Calculate the 2-D noise field */
-   sc2sim_invf2d ( corner, exp, pixsize, size, atmsim, spectrum, status );
+   sc2sim_invf2d ( corner, exp, pixsize, (int) size, atmsim, spectrum, status );
 
    /* Add the FITS data to the output file */
    fitschan = astFitsChan ( NULL, NULL, " " );

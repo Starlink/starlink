@@ -125,13 +125,21 @@ static int smf1_hasmoved( double alpha_start, double beta_start, double ang_star
                           double *angle, int *status );
 
 
-int smf_block_end( smfData *data, int *block_start0, float arcerror,
-                   int maxsize, int *status ){
+dim_t smf_block_end( smfData *data, dim_t *block_start0, float arcerror,
+                     dim_t maxsize, int *status ){
 
 /* Local Variables: */
    const JCMTState *state;    /* JCMTState info for current time slice */
    const char *usesys;        /* Used system string */
+   dim_t block_start;         /* Used value of block start */
+   dim_t hitime;              /* Highest time slice index to use */
+   dim_t ifail;               /* Index of last time slice to fail the test */
+   dim_t inc;                 /* No. of time slices between tests */
+   dim_t ipass;               /* Index of last time slice to pass the test */
+   dim_t itime;               /* Time slice index at next test */
+   dim_t ntime;               /* Number of time slices to check */
    dim_t ntslice;             /* Number of time-slices in data */
+   dim_t result;              /* The returned time slice index at block end */
    double aalpha;
    double aang;
    double abeta;
@@ -142,17 +150,9 @@ int smf_block_end( smfData *data, int *block_start0, float arcerror,
    double end_wang;           /* Half-waveplate angle at end of block */
    double prev_wang;          /* Half-waveplate angle at previous time slice */
    double start_wang;         /* Half-waveplate angle at start of block */
-   int hitime;                /* Highest time slice index to use */
-   int ifail;                 /* Index of last time slice to fail the test */
-   int inc;                   /* No. of time slices between tests */
-   int ipass;                 /* Index of last time slice to pass the test */
-   int itime;                 /* Time slice index at next test */
    int moving;                /* Is the object moving? */
-   int ntime;                 /* Number of time slices to check */
    int old;                   /* Data has old-style POL_ANG values? */
-   int result;                /* The returned time slice index at block end */
    int spinning;              /* Is half-waveplate spinning? */
-   int block_start;           /* Used value of block start */
    smfHead *hdr;              /* Pointer to data header this time slice */
 
 /* Initialise */
@@ -172,7 +172,7 @@ int smf_block_end( smfData *data, int *block_start0, float arcerror,
                  status );
 
 /* Check that we have not used all time slices. */
-   if( block_start >= 0 && block_start < (int) ntslice ) {
+   if( block_start >= 0 && block_start < ntslice ) {
 
 /* Go through the first thousand POL_ANG values to see if they are in
    units of radians (new data) or arbitrary encoder units (old data).
@@ -254,7 +254,7 @@ int smf_block_end( smfData *data, int *block_start0, float arcerror,
       ifail = -1;
       inc = 1;
       itime = block_start + inc;
-      while( itime < (int) hitime ) {
+      while( itime < hitime ) {
          state = (hdr->allState) + itime;
 
 /* The test fails if the actual telescope position in the tracking system

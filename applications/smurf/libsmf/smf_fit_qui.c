@@ -258,8 +258,8 @@ typedef struct smfFitQUIJobData {
 } smfFitQUIJobData;
 
 typedef struct smfFitQUIJob2Data {
-   size_t nstep;
-   size_t bytestride;
+   dim_t nstep;
+   dim_t bytestride;
    char *pntstart;
    int isang;
    double *result;
@@ -306,9 +306,11 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    const char *usesys;      /* Tracking system */
    dim_t *box_starts;       /* Array holding time slice at start of each box */
    dim_t box_size;          /* First time slice in box */
-   dim_t hilim=0;           /* Max no. of samples in a box */
-   dim_t intslice;          /* ntslice of idata */
+   dim_t bstep;             /* Bolometer step between threads */
+   dim_t hilim;             /* Max no. of samples in a box */
+   dim_t i;                 /* loop counter */
    dim_t iend;              /* Input time index at start of next fitting box */
+   dim_t intslice;          /* ntslice of idata */
    dim_t istart;            /* Input time index at start of fitting box */
    dim_t itime;             /* Time slice index */
    dim_t itstart;           /* Index of first used input time slice */
@@ -319,19 +321,17 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    dim_t ondata;            /* ndata of odata */
    dim_t ontslice;          /* ntslice of odata */
    double *ptr;             /* Pointer to next POL_ANG value */
-   double scale=1.0;        /* Mean no. of input samples per output sample */
-   int bstep;               /* Bolometer step between threads */
+   double scale;            /* how much longer new samples are */
    int iworker;             /* Index of a worker thread */
-   int nodd;                /* No. of straneg box lengths found and ignored */
+   int nodd;                /* No. of strange box lengths found and ignored */
    int nworker;             /* No. of worker threads */
    int setbad;              /* Set all output values bad for this slice? */
-   size_t i;                /* loop counter */
    smfData *indksquid=NULL; /* Pointer to input dksquid data */
+   smfFitQUIJob2Data *p2data = NULL; /* Pointer to JCMTState resampling data */
    smfFitQUIJobData *job_data = NULL; /* Pointer to all job data */
    smfFitQUIJobData *pdata = NULL;/* Pointer to next job data */
-   smfFitQUIJob2Data *p2data = NULL; /* Pointer to JCMTState resampling data */
-   smfHead *ihdr;           /* Pointer to input data header */
    smfHead *ghdr;           /* Pointer to other data header */
+   smfHead *ihdr;           /* Pointer to input data header */
    smfHead *ohdr;           /* Pointer to output data header */
    smf_qual_t *qua;         /* Input quality pointer */
 
@@ -480,7 +480,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
       outstate = ohdr->allState;
 
       if( *status == SAI__OK ) {
-         size_t frame;  /* index of nearest neighbour JCMTState */
+         dim_t frame;  /* index of nearest neighbour JCMTState */
 
          for( i=0; i<ontslice; i++ ) {
             frame = ( box_starts[ i ] + box_starts[ i + 1 ] )/2;
@@ -1551,10 +1551,10 @@ static void smf1_fit_qui_job2( void *job_data, int *status ) {
    double centre;
    double sum;
    double val;
-   size_t bytestride;
-   size_t istep;
-   size_t nstep;
-   size_t nsum;
+   dim_t bytestride;
+   dim_t istep;
+   dim_t nstep;
+   dim_t nsum;
    smfFitQUIJob2Data *pdata;
 
 /* Check inherited status */

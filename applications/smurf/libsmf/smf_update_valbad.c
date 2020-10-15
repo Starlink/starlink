@@ -15,8 +15,8 @@
 
 *  Invocation:
 *     smf_update_valbad( smfData *data, smf_modeltype mtype,
-*                        const smf_qual_t *qual, size_t qbstride,
-*                        size_t qtstride, smf_qual_t mask,
+*                        const smf_qual_t *qual, dim_t qbstride,
+*                        dim_t qtstride, smf_qual_t mask,
 *                        int *status )
 
 *  Arguments:
@@ -30,10 +30,10 @@
 *     qual = const smf_qual_t* (Given)
 *        This quality will be used if mtype is not SMF__NUL.
 *        Both qbstride and qtstride must be set.
-*     qbstride = size_t (Given)
+*     qbstride = dim_t (Given)
 *        If mtype is set, provide the bolometer stride for the qual array.
 *        Otherwise ignored.
-*     qtstride = size_t (Given)
+*     qtstride = dim_t (Given)
 *        If mtype is set, provide the time slice stride for the qual array.
 *        Otherwise ignored.
 *     mask = smf_qual_t (Given)
@@ -107,17 +107,17 @@
 #define FUNC_NAME "smf_update_valbad"
 
 void smf_update_valbad( smfData *data, smf_modeltype mtype, const smf_qual_t *qual,
-                        size_t qbstride, size_t qtstride, smf_qual_t mask,
+                        dim_t qbstride, dim_t qtstride, smf_qual_t mask,
                         int *status ) {
 
-  size_t bstride;               /* data bolo stride */
+  dim_t bstride;               /* data bolo stride */
   dim_t i;                      /* loop counter */
   dim_t j;                      /* loop counter */
-  size_t offset;                /* array index */
+  dim_t offset;                /* array index */
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
   dim_t ntslice;                /* Number of time slices */
-  size_t tstride;               /* data time stride */
+  dim_t tstride;               /* data time stride */
 
   if ( *status != SAI__OK ) return;
 

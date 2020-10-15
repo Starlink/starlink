@@ -16,7 +16,7 @@
 *  Invocation:
 *     void smf_dtype_arraycopy( void *ary_out, const smf_dtype dtype_out,
 *                               void *ary_in, const smf_dtype dtype_in,
-*                               int nelem, int *status );
+*                               dim_t nelem, int *status );
 
 *  Arguments:
 *     ary_out = void * ( Given and Returned )
@@ -27,7 +27,7 @@
 *        Pointer to input array
 *     dtype_in = const smf_dtype (Given)
 *        Data type to convert from
-*     nelem = int ( Given )
+*     nelem = dim_t ( Given )
 *        Number of elements to copy
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -87,7 +87,7 @@
 
 void smf_dtype_arraycopy( void *ary_out, const smf_dtype dtype_out,
                           void *ary_in, const smf_dtype dtype_in,
-                          int nelem, int *status )
+                          dim_t nelem, int *status )
 {
 
   double         *ary_double;        /* Pointer to a double array used for
@@ -125,7 +125,7 @@ void smf_dtype_arraycopy( void *ary_out, const smf_dtype dtype_out,
   /* UP-CONVERT TO DOUBLES */
 
   /* Initialize output array to BAD values */
-  for ( int i = 0; i < nelem; i++ ) {
+  for ( dim_t i = 0; i < nelem; i++ ) {
     ary_double[i] = VAL__BADD;
   }
 
@@ -134,28 +134,28 @@ void smf_dtype_arraycopy( void *ary_out, const smf_dtype dtype_out,
   switch( dtype_in ) {
   case SMF__FLOAT:
     ary_float = ary_in;
-    for ( int i = 0; i < nelem; i++ ) {
+    for ( dim_t i = 0; i < nelem; i++ ) {
       if ( ary_float[i] != VAL__BADR )
 	ary_double[i] = (double) ary_float[i];
     }
     break;
   case SMF__INTEGER:
     ary_int = ary_in;
-    for ( int i = 0; i < nelem; i++ ) {
+    for ( dim_t i = 0; i < nelem; i++ ) {
       if ( ary_int[i] != VAL__BADI )
 	ary_double[i] = (double) ary_int[i];
     }
     break;
   case SMF__USHORT:
     ary_ushort = ary_in;
-    for ( int i = 0; i < nelem; i++ ) {
+    for ( dim_t i = 0; i < nelem; i++ ) {
       if ( ary_ushort[i] != VAL__BADUW )
 	ary_double[i] = (double) ary_ushort[i];
     }
     break;
   case SMF__UBYTE:
     ary_ubyte = ary_in;
-    for ( int i = 0; i < nelem; i++ ) {
+    for ( dim_t i = 0; i < nelem; i++ ) {
       if ( ary_ubyte[i] != VAL__BADUB )
 	ary_double[i] = (double) ary_ubyte[i];
     }
@@ -180,7 +180,7 @@ void smf_dtype_arraycopy( void *ary_out, const smf_dtype dtype_out,
   switch( dtype_out ) {
   case SMF__FLOAT:
     ary_float = ary_out;
-    for ( int i = 0; i < nelem; i++ ) {
+    for ( dim_t i = 0; i < nelem; i++ ) {
       if ( ary_double[i] != VAL__BADD ) {
 	ary_float[i] = (float) ary_double[i];
       } else {
@@ -190,7 +190,7 @@ void smf_dtype_arraycopy( void *ary_out, const smf_dtype dtype_out,
     break;
   case SMF__INTEGER:
     ary_int = ary_out;
-    for ( int i = 0; i < nelem; i++ ) {
+    for ( dim_t i = 0; i < nelem; i++ ) {
       if ( ary_double[i] != VAL__BADD ) {
 	ary_int[i] = (int) NINT(ary_double[i]);
       } else {
@@ -200,7 +200,7 @@ void smf_dtype_arraycopy( void *ary_out, const smf_dtype dtype_out,
     break;
   case SMF__USHORT:
     ary_ushort = ary_out;
-    for ( int i = 0; i < nelem; i++ ) {
+    for ( dim_t i = 0; i < nelem; i++ ) {
       if ( ary_double[i] != VAL__BADD ) {
 	ary_ushort[i] = (unsigned short) NINT( fabs(ary_double[i]) );
       } else {
@@ -210,7 +210,7 @@ void smf_dtype_arraycopy( void *ary_out, const smf_dtype dtype_out,
     break;
   case SMF__UBYTE:
     ary_ubyte = ary_out;
-    for ( int i = 0; i < nelem; i++ ) {
+    for ( dim_t i = 0; i < nelem; i++ ) {
       if ( ary_double[i] != VAL__BADD ) {
 	ary_ubyte[i] = (unsigned char) NINT( fabs(ary_double[i]) );
       } else {

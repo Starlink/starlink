@@ -77,9 +77,9 @@ void smf_remove_grp_metadata( Grp *grp, const char *name, int *status ){
    Grp *slave;                   /* Slave group */
    char buff[ GRP__SZNAM  + 1 ]; /* Buffer for group element text */
    int changed;                  /* Have slave group been changed? */
-   size_t i;                     /* Index of current group element */
-   size_t nlen;                  /* Length of supplied name */
-   size_t size;                  /* Size of slave group */
+   dim_t i;                     /* Index of current group element */
+   dim_t nlen;                  /* Length of supplied name */
+   dim_t size;                  /* Size of slave group */
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;

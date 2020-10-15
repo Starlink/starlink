@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_write_bolotable( const smfData *data, const char *filename,
-*                          dim_t ibolo, const int *lbnd, const dim_t *dims,
+*                          dim_t ibolo, const dim_t *lbnd, const dim_t *dims,
 *                          int *status )
 
 *  Arguments:
@@ -24,7 +24,7 @@
 *        Name of output text file.
 *     ibolo = dim_t (Given)
 *        Zero-based index of bolometer to dump.
-*     lbnd = const int * (Given):
+*     lbnd = const dim_t * (Given):
 *        Lower pixel index bounds of output map.
 *     dims = const dim_t * (Given):
 *        Dimensions of output map, in pixels.
@@ -88,7 +88,7 @@
 
 
 void smf_write_bolotable( const smfData *data, const char *filename,
-                          dim_t ibolo, const int *lbnd, const dim_t *dims,
+                          dim_t ibolo, const dim_t *lbnd, const dim_t *dims,
                           int *status ){
 
 /* Local Variables */
@@ -96,17 +96,17 @@ void smf_write_bolotable( const smfData *data, const char *filename,
    JCMTState *state;
    char buf[200];
    const smf_qual_t *qual;
+   dim_t bstride;
    dim_t itime;
+   dim_t ix;
+   dim_t iy;
    dim_t nbolo;
+   dim_t nc;
    dim_t ntslice;
+   dim_t tstride;
    double *dat;
    double *var;
    int *lut;
-   int ix;
-   int iy;
-   size_t bstride;
-   size_t nc;
-   size_t tstride;
    smfHead *hdr;
    smf_qfam_t qfamily = SMF__QFAM_NULL;
 
@@ -200,7 +200,7 @@ void smf_write_bolotable( const smfData *data, const char *filename,
          ix = *lut - iy*dims[0];
          ix += lbnd[ 0 ];
          iy += lbnd[ 1 ];
-         nc += sprintf( buf + nc, " %d %d", ix, iy );
+         nc += sprintf( buf + nc, " %d %d", (int) ix, (int) iy );
       } else {
          nc += sprintf( buf + nc, " null null" );
       }

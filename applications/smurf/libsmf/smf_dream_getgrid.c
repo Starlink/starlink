@@ -13,7 +13,7 @@
  *     Subroutine
 
  *  Invocation:
- *     smf_dream_getgrid ( const AstKeyMap *keymap, double * gridstep, int * ngrid,
+ *     smf_dream_getgrid ( AstKeyMap *keymap, double * gridstep, int * ngrid,
  *                        int gridminmax[4], int gridpts[DREAM__MXGRID][2],
  *                        int *status )
 
@@ -103,7 +103,7 @@
 #define YMIN 2
 #define YMAX 3
 
-void smf_dream_getgrid( const AstKeyMap *keymap, double *gridstep, int *ngrid,
+void smf_dream_getgrid( AstKeyMap *keymap, double *gridstep, int *ngrid,
                         int gridminmax[4], int gridpts[DREAM__MXGRID][2],
                         int *status) {
 

@@ -13,7 +13,7 @@
  *     Subroutine
 
  *  Invocation:
- *     sc2sim_getast_wcs ( size_t colsize, size_t rowsize, const double *xbolo,
+ *     sc2sim_getast_wcs ( dim_t colsize, dim_t rowsize, const double *xbolo,
  *                         const double *ybolo, AstCmpMap *bolo2map, const double *astsim,
  *                         const int astnaxes[2], int interp, const double *params,
  *                         double *dbuf, int *status )
@@ -110,10 +110,10 @@
 
 void sc2sim_getast_wcs
 (
- size_t colsize,              /* number of bolometers in column (given) */
- size_t rowsize,              /* number of bolometers in row (given) */
- const double *xbolo,         /* x-bolometer coordinates for array (given) */
- const double *ybolo,         /* y-bolometer coordinates for array (given) */
+ dim_t colsize,              /* number of bolometers in column (given) */
+ dim_t rowsize,              /* number of bolometers in row (given) */
+ const double *xbolo __attribute__((unused)), /* x-bolometer coordinates for array (given) */
+ const double *ybolo __attribute__((unused)), /* y-bolometer coordinates for array (given) */
  AstCmpMap *bolo2map,         /* mapping bolo->sky image coordinates (given ) */
  const double *astsim,        /* astronomical image (given) */
  const int astnaxes[2],       /* dimensions of simulated image (given) */

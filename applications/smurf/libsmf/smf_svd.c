@@ -104,7 +104,7 @@
 
 /* Prototypes for local static functions. */
 static void smf1_svd( void *job_data_ptr, int *status );
-static void smf1_roundrobin( dim_t p, int *up, int *dn );
+static void smf1_roundrobin( dim_t p, dim_t *up, dim_t *dn );
 static int smf1_compare( const void *a, const void *b );
 
 static double *Sigma_array = NULL;
@@ -140,13 +140,15 @@ void smf_svd( ThrWorkForce *wf, dim_t n, double *a, double *sigma,
 /* Local Variables */
    SmfSvdData *job_data = NULL;
    SmfSvdData *pdata = NULL;
+   dim_t *dn = NULL;
    dim_t *sobhigh = NULL;
    dim_t *soblow = NULL;
+   dim_t *up = NULL;
    dim_t i;
-   dim_t j;
-   dim_t k;
    dim_t irow;
    dim_t iter;
+   dim_t j;
+   dim_t k;
    dim_t nbig;
    dim_t nsmall;
    dim_t nstep;
@@ -154,10 +156,8 @@ void smf_svd( ThrWorkForce *wf, dim_t n, double *a, double *sigma,
    dim_t rpb;
    dim_t s;
    double *aorig;
-   double sigold;
    double delta;
-   int *dn = NULL;
-   int *up = NULL;
+   double sigold;
    int converged;
    int nsweep;
 
@@ -367,7 +367,7 @@ void smf_svd( ThrWorkForce *wf, dim_t n, double *a, double *sigma,
          Sigma_array = sigma;
 
          double *arowold = astMalloc( n*sizeof( *arowold ) );
-         int *index = astMalloc( n*sizeof( *index ) );
+         dim_t *index = astMalloc( n*sizeof( *index ) );
          if( *status == SAI__OK ) {
 
             for( i = 0; i < n; i++ ) index[ i ] = i;
@@ -639,10 +639,10 @@ static void smf1_svd( void *job_data_ptr, int *status ) {
    }
 }
 
-static void smf1_roundrobin( dim_t p, int *up, int *dn ){
+static void smf1_roundrobin( dim_t p, dim_t *up, dim_t *dn ){
    double saved;
-   int i;
-   int pp = (int) p;
+   dim_t i;
+   dim_t pp = p;
 
    saved = up[ 0 ];
 

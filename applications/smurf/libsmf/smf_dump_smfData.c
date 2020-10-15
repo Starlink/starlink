@@ -122,9 +122,8 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
   smfFile *file;                /* File struct within smfData */
   smfHead *hdr;                 /* Header struct within smfData */
   smfDA *da;                    /* DA struct within smfData */
-  smfDream *dream;              /* DREAM struct within smfData */
-  size_t i;                     /* Loop counter */
-  size_t ndims;                 /* Number of dimensions in data */
+  dim_t i;                     /* Loop counter */
+  dim_t ndims;                 /* Number of dimensions in data */
   char string[SZFITSTR];        /* General purpose string used for printing */
   const char * tempstr = NULL;  /* temp string for obsmode and type */
 
@@ -170,7 +169,7 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
   /* Size of array in each dimension */
   if (ndims <= DAT__MXDIM) {
     for ( i=0; i< ndims; i++) {
-      sprintf( string, "%d", (data->lbnd)[i]);
+      sprintf( string, "%" DIM_T_FMT, (data->lbnd)[i]);
       msgSetc("D", string);
       if ( i != ndims-1 ) {
         msgSetc("D", ",");
@@ -221,7 +220,7 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
     msgSetc("P","OK");
   }
   msgOut("", "  poly = ^P", status);
-  msgSeti("N",data->ncoeff);
+  msgSetk("N",data->ncoeff);
   msgOut("", "  ncoeff = ^N", status);
 
   /* Do we have a pointing lookup table? */
@@ -236,12 +235,12 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
   if ( data->history == NULL ) {
     msgOut("", "  history = NULL", status );
   } else {
-    size_t nrec = astMapSize( data->history );
+    dim_t nrec = astMapSize( data->history );
     if (nrec == 0) {
       msgOut( "", "  history = empty", status );
     } else {
       for ( i = 0; i < nrec; i++) {
-        msgSetc( "H", astMapKey( data->history, i ) );
+        msgSetc( "H", astMapKey( data->history, (int) i ) );
         if (i != (nrec-1)) msgSetc( "H", ",");
       }
       msgOut( "", "  history = ^H", status );
@@ -462,7 +461,6 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
     msgOut("", "  dream = NULL", status);
   } else {
     msgOut("", "  dream = OK", status);
-    dream = data->dream;
   }
 
 

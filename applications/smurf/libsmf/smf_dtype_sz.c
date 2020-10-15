@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     size_t smf_dtype_sz( const smf_dtype dtype, int * status );
+*     dim_t smf_dtype_sz( const smf_dtype dtype, int * status );
 
 *  Arguments:
 *     dtype = const smf_dtype (Given)
@@ -22,7 +22,7 @@
 *        Pointer to global status.
 
 *  Return Value:
-*     size_t smf_dtype_size
+*     dim_t smf_dtype_size
 *        Number of bytes used to represent the data type. Returns 0
 *        if data type not recognized.
 
@@ -81,9 +81,9 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_dtype_sz"
 
-size_t smf_dtype_sz( const smf_dtype dtype, int *status ) {
+dim_t smf_dtype_sz( const smf_dtype dtype, int *status ) {
 
-  size_t retval = 0;
+  dim_t retval = 0;
 
   if (*status != SAI__OK) return retval;
 

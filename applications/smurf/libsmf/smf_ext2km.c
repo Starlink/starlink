@@ -127,19 +127,19 @@ void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap,
    HDSLoc *sloc = NULL;
    HDSLoc *xloc = NULL;
    const char *key = NULL;
-   hdsdim diml[NDF__MXDIM];
-   hdsdim dimu[NDF__MXDIM];
-   hdsdim dim[ NDF__MXDIM ];
+   dim_t dim[ NDF__MXDIM ];
+   dim_t diml[NDF__MXDIM];
+   dim_t dimu[NDF__MXDIM];
+   dim_t lbnd[ NDF__MXDIM ];
+   dim_t ubnd[ NDF__MXDIM ];
    int i;
    int idim;
-   int lbnd[ NDF__MXDIM ];
    int ncomp;
    int ndim;
    int nentry;
-   int ntime = 0;
+   dim_t ntime = 0;
    int prim;
    int there;
-   int ubnd[ NDF__MXDIM ];
    size_t ndet;
 
 /* Check the inherited status */
@@ -188,11 +188,11 @@ void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap,
       datFind( xloc, "RECEPTORS", &cloc, status );
       datSize( cloc, &ndet, status );
       datAnnul( &cloc, status );
-      if( ( lbnd[ 1 ] != 1 || ubnd[ 1 ] != (int) ndet ) && *status == SAI__OK ) {
+      if( ( lbnd[ 1 ] != 1 || ubnd[ 1 ] != (dim_t) ndet ) && *status == SAI__OK ) {
          *status = SAI__ERROR;
-         msgSeti( "L", lbnd[ 1 ] );
-         msgSeti( "U", ubnd[ 1 ] );
-         msgSeti( "N", ndet );
+         msgSetk( "L", lbnd[ 1 ] );
+         msgSetk( "U", ubnd[ 1 ] );
+         msgSetk( "N", (dim_t) ndet );
          ndfMsg( "F", indf );
          errRep( " ", "Unexpected pixel index bounds (^L:^U) on the detector "
                   "axis (axis 2) of '^F'. The bounds on the detector axis "

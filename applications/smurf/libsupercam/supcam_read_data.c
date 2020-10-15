@@ -97,8 +97,10 @@ supcam_read_data( fitsfile * fits, size_t * numRows, size_t * numChans, int * st
 
   /* Find DATA column and check its repeat count */
   /* cast because cfitsio does not use const */
+  #pragma GCC diagnostic ignored "-Wcast-qual"
   CALLCFITSIO( fits_get_colnum(fits, CASEINSEN, (char *)"DATA", &colnum, &fitsStatus),
                "Error getting column number for DATA" );
+  #pragma GCC diagnostic pop
   CALLCFITSIO( fits_get_coltype(fits, colnum, &typecode, &nChans, &dummy, &fitsStatus),
                "Error getting column information" );
   if (*status != SAI__OK) return NULL;

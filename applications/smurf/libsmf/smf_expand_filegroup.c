@@ -87,9 +87,9 @@ Grp *
 smf_expand_filegroup( const Grp * igrp, int * status ) {
 
   Grp * ogrp = NULL;
-  size_t grpsize = 0;
+  dim_t grpsize = 0;
   char grpentry[GRP__SZNAM+1];
-  size_t i;
+  dim_t i;
 
   if (*status != SAI__OK) return ogrp;
 

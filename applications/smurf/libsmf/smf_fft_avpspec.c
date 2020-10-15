@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     pntr = smf_fft_avpspec( const smfData *pspec,
-*                             smf_qual_t *quality, size_t qstride,
+*                             smf_qual_t *quality, dim_t qstride,
 *                             smf_qual_t mask, double *weights, int *status ) {
 
 *  Arguments:
@@ -24,7 +24,7 @@
 *        If specified, use this QUALITY array to decide which bolometers
 *        to use (provided mask). Otherwise data are only ignored if set
 *        to VAL__BADD.
-*     qstride = size_t (Given)
+*     qstride = dim_t (Given)
 *        Bolo stride for quality. If 0 assumed to be same stride as pspec.
 *     mask = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
@@ -111,17 +111,16 @@
 #define FUNC_NAME "smf_fft_avpspec"
 
 smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
-                          size_t qstride, smf_qual_t mask, double *weights,
+                          dim_t qstride, smf_qual_t mask, double *weights,
                           int *status ) {
 
   dim_t fdims[2];               /* Lengths of frequency-space axes */
-  size_t i;                     /* Loop counter */
+  dim_t i;                     /* Loop counter */
   double *idptr=NULL;           /* Pointer to input data */
   double mean;                  /* Mean value at time slice */
   dim_t nbolo=0;                /* Number of detectors  */
-  size_t ngood;                 /* Number of good samples */
-  size_t ndata;                 /* Total number of data points */
-  dim_t ntslice=0;              /* Number of time slices */
+  dim_t ngood;                 /* Number of good samples */
+  dim_t ndata;                 /* Total number of data points */
   dim_t nf=0;                   /* Number of frequencies in FFT */
   double *odptr=NULL;           /* Pointer to output data */
   double *ovptr=NULL;           /* Pointer to output variance */
@@ -144,7 +143,6 @@ smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
     errRep( "", FUNC_NAME ": Input data are not FFT!", status );
     return NULL;
   }
-  ntslice = rdims[0];
   nf = fdims[0];
 
   /* Check that we don't have a 1-d input power spectrum */

@@ -163,7 +163,7 @@ void smurf_rawpress( int *status ) {
     int * idksquid = NULL;
     int indf;                 /* Input NDF identifier */
     int isthere = 0;
-    size_t ncards = 0;
+    dim_t ncards = 0;
     dim_t nframes;
     int outndf;               /* Output NDF identifier */
     char *pname;              /* Pointer to input filename */
@@ -187,7 +187,7 @@ void smurf_rawpress( int *status ) {
     /* Convert the dark squids back to integers */
     idksquid = astMalloc( (nframes*rowsize)*sizeof(*idksquid) );
     if (idksquid) {
-      size_t j;
+      dim_t j;
       double * dkpntr = (data->da->dksquid->pntr)[0];
       for (j=0; j<(nframes*rowsize); j++) {
         idksquid[j] = dkpntr[j];

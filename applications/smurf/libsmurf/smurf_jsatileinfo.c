@@ -224,13 +224,21 @@ void smurf_jsatileinfo( int *status ) {
    AstFitsChan *fc;
    AstFrameSet *fs;
    AstObject *obj;
-   AstRegion *region;
    AstRegion *target;
+   AstRegion *region;
    HDSLoc *cloc = NULL;
    HDSLoc *xloc = NULL;
    char *jcmt_tiles;
    char *tilendf = NULL;
    char text[ 200 ];
+   dim_t iv;
+   dim_t lbnd[ 2 ];
+   dim_t tlbnd[ 2 ];
+   dim_t tubnd[ 2 ];
+   dim_t ubnd[ 2 ];
+   int xt;
+   int yt;
+   double dec0;
    double dec[ 8 ];
    double dist;
    double dlbnd[ 2 ];
@@ -239,16 +247,14 @@ void smurf_jsatileinfo( int *status ) {
    double gy[ 8 ];
    double maxdist;
    double norm_radec[2];
-   double point1[ 2 ];
    double point2[ 2 ];
-   double ra[ 8 ];
+   double point1[ 2 ];
    double ra0;
-   double dec0;
+   double ra[ 8 ];
    int *ipntr;
    int axes[ 2 ];
    int create;
    int dirlen;
-   int el;
    int exists;
    int flag;
    int i;
@@ -256,19 +262,13 @@ void smurf_jsatileinfo( int *status ) {
    int indf2;
    int indf3;
    int itile;
-   int iv;
    int jtile;
-   int lbnd[ 2 ];
    int local_origin;
    int nc;
    int place;
-   int tlbnd[ 2 ];
-   int tubnd[ 2 ];
-   int ubnd[ 2 ];
-   smf_jsaproj_t proj;
-   int xt;
-   int yt;
+   size_t el;
    smfJSATiling skytiling;
+   smf_jsaproj_t proj;
    void *pntr;
 
 /* Check inherited status */
@@ -408,14 +408,14 @@ void smurf_jsatileinfo( int *status ) {
    }
 
 /* Store the lower and upper pixel bounds of the tile. */
-   parPut1i( "LBND", 2, lbnd, status );
-   parPut1i( "UBND", 2, ubnd, status );
+   parPut1k( "LBND", 2, lbnd, status );
+   parPut1k( "UBND", 2, ubnd, status );
 
 /* Display pixel bounds on the screen. */
-   msgSeti( "XL", lbnd[ 0 ] );
-   msgSeti( "XU", ubnd[ 0 ] );
-   msgSeti( "YL", lbnd[ 1 ] );
-   msgSeti( "YU", ubnd[ 1 ] );
+   msgSetk( "XL", lbnd[ 0 ] );
+   msgSetk( "XU", ubnd[ 0 ] );
+   msgSetk( "YL", lbnd[ 1 ] );
+   msgSetk( "YU", ubnd[ 1 ] );
    msgOut( " ", "      Pixel bounds: (^XL:^XU,^YL:^YU)", status );
 
 /* Get the RA,Dec at the tile centre. */
@@ -709,15 +709,15 @@ void smurf_jsatileinfo( int *status ) {
             tubnd[ 0 ] += lbnd[ 0 ] - 1;
             tubnd[ 1 ] += lbnd[ 1 ] - 1;
 
-            msgOutf( "", "      The target overlaps section (%d:%d,%d:%d).",
+            msgOutf( "", "      The target overlaps section (%" DIM_T_FMT ":%" DIM_T_FMT ",%" DIM_T_FMT ":%" DIM_T_FMT ").",
                      status, tlbnd[ 0 ], tubnd[ 0 ], tlbnd[ 1 ], tubnd[ 1 ] );
          }
       }
    }
 
 /* Store the pixel index bounds of the tiles overlap with the target. */
-   parPut1i( "TLBND", 2, tlbnd, status );
-   parPut1i( "TUBND", 2, tubnd, status );
+   parPut1k( "TLBND", 2, tlbnd, status );
+   parPut1k( "TUBND", 2, tubnd, status );
 
 /* Arrive here if an error occurs. */
    L999:;

@@ -183,15 +183,15 @@ void smurf_jsatilelist( int *status ) {
    AstRegion *region;
    Grp *igrp = NULL;
    ThrWorkForce *wf = NULL;
+   dim_t lbnd[2];
+   dim_t ubnd[2];
    double vertex_data[ 2*MAXVERT ];
    int *tiles = NULL;
    int i;
    int indf;
-   int lbnd[2];
    int ntile;
    int nvert_dec;
    int nvert_ra;
-   int ubnd[2];
    size_t size;
    smfJSATiling tiling;
    smf_jsaproj_t proj;

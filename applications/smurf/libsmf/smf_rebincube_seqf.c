@@ -15,14 +15,14 @@
 *  Invocation:
 *     void smf_rebincube_seqf( ThrWorkForce *workforce, int njobs,
 *                              double *blk_bot, AstMapping *this, double wlim,
-*                              int ndim_in, const int lbnd_in[],
-*                              const int ubnd_in[], const float in[],
+*                              int ndim_in, const dim_t lbnd_in[],
+*                              const dim_t ubnd_in[], const float in[],
 *                              const float in_var[], int spread,
 *                              const double params[], int flags,
 *                              double tol, int maxpix, float badval,
-*                              int ndim_out, const int lbnd_out[],
-*                              const int ubnd_out[], const int lbnd[],
-*                              const int ubnd[], float out[], float out_var[],
+*                              int ndim_out, const dim_t lbnd_out[],
+*                              const dim_t ubnd_out[], const dim_t lbnd[],
+*                              const dim_t ubnd[], float out[], float out_var[],
 *                              double weights[], int64_t *nused, int *status );
 
 *  Arguments:
@@ -117,24 +117,24 @@
 
 void smf_rebincube_seqf( ThrWorkForce *workforce, int njobs,
                          double *blk_bot, AstMapping *this, double wlim,
-                         int ndim_in, const int lbnd_in[],
-                         const int ubnd_in[], const float in[],
+                         int ndim_in, const dim_t lbnd_in[],
+                         const dim_t ubnd_in[], const float in[],
                          const float in_var[], int spread,
                          const double params[], int flags,
                          double tol, int maxpix, float badval,
-                         int ndim_out, const int lbnd_out[],
-                         const int ubnd_out[], const int lbnd[],
-                         const int ubnd[], float out[], float out_var[],
+                         int ndim_out, const dim_t lbnd_out[],
+                         const dim_t ubnd_out[], const dim_t lbnd[],
+                         const dim_t ubnd[], float out[], float out_var[],
                          double weights[], int64_t *nused, int *status ){
 
 /* Local Variables */
    int i;                            /* Thread index */
    int j;                            /* Axis index */
-   int lbndt[ 3 ];                   /* Lower bounds of input block */
-   int ubndt[ 3 ];                   /* Upper bounds of input block */
+   dim_t lbndt[ 3 ];                 /* Lower bounds of input block */
+   dim_t ubndt[ 3 ];                 /* Upper bounds of input block */
    smfRebinSeqArgs *data = NULL;     /* Pointer to data for a single thread */
-   static int *block_lbnd = NULL;    /* Lower bounds of input block */
-   static int *block_ubnd = NULL;    /* Upper bounds of input block */
+   static dim_t *block_lbnd = NULL;  /* Lower bounds of input block */
+   static dim_t *block_ubnd = NULL;  /* Upper bounds of input block */
    static smfRebinSeqArgs *job_data = NULL; /* Data for all jobs */
 
 /* Check the inherited status. */
@@ -144,17 +144,17 @@ void smf_rebincube_seqf( ThrWorkForce *workforce, int njobs,
    input spectral range to the supplied block. */
    if( njobs == 1 ) {
 
-      lbndt[ 0 ] = (int) ( blk_bot[ 0 ] + 0.5 );
-      ubndt[ 0 ] = (int) ( blk_bot[ 1 ] - 0.5 );
+      lbndt[ 0 ] = (dim_t) ( blk_bot[ 0 ] + 0.5 );
+      ubndt[ 0 ] = (dim_t) ( blk_bot[ 1 ] - 0.5 );
 
       for( j = 1; j < ndim_in; j++ ) {
          lbndt[ j ] = lbnd[ j ];
          ubndt[ j ] = ubnd[ j ];
       }
 
-      astRebinSeqF( this, wlim, ndim_in, lbnd_in, ubnd_in, in, in_var, spread,
-                    params, flags, tol, maxpix, badval, ndim_out, lbnd_out,
-                    ubnd_out, lbndt, ubndt, out, out_var, weights, nused );
+      astRebinSeq8F( this, wlim, ndim_in, lbnd_in, ubnd_in, in, in_var, spread,
+                     params, flags, tol, maxpix, badval, ndim_out, lbnd_out,
+                     ubnd_out, lbndt, ubndt, out, out_var, weights, nused );
 
 /* If handling multiple threads... */
    } else {
@@ -171,8 +171,8 @@ void smf_rebincube_seqf( ThrWorkForce *workforce, int njobs,
    spectral block being processed. */
       job_data = astGrow( job_data, sizeof( smfRebinSeqArgs ), njobs );
 
-      block_lbnd = astGrow( block_lbnd, sizeof( int ), njobs*ndim_in );
-      block_ubnd = astGrow( block_ubnd, sizeof( int ), njobs*ndim_in );
+      block_lbnd = astGrow( block_lbnd, sizeof( *block_lbnd ), njobs*ndim_in );
+      block_ubnd = astGrow( block_ubnd, sizeof( *block_ubnd ), njobs*ndim_in );
 
 /* Check pointers can be used safely. */
       if( astOK ) {
@@ -189,8 +189,8 @@ void smf_rebincube_seqf( ThrWorkForce *workforce, int njobs,
             data->ndim_in = ndim_in;
             data->lbnd_in = lbnd_in;
             data->ubnd_in = ubnd_in;
-            data->in = (void *) in;
-            data->in_var = (void *) in_var;
+            data->in = in;
+            data->in_var = in_var;
             data->spread = spread;
             data->params = params;
             data->flags = flags;
@@ -220,8 +220,8 @@ void smf_rebincube_seqf( ThrWorkForce *workforce, int njobs,
    spectral blocks. */
             data->lbnd = block_lbnd + i*ndim_in;
             data->ubnd = block_ubnd + i*ndim_in;
-            (data->lbnd)[ 0 ] = (int)( blk_bot[ 2*i ] + 0.5 );
-            (data->ubnd)[ 0 ] = (int)( blk_bot[ 2*i + 1 ] - 0.5 );
+            (data->lbnd)[ 0 ] = (dim_t)( blk_bot[ 2*i ] + 0.5 );
+            (data->ubnd)[ 0 ] = (dim_t)( blk_bot[ 2*i + 1 ] - 0.5 );
 
 /* Set the bounds on the other axes so that it covers the whole range of
    that axis. */
@@ -275,8 +275,8 @@ void smf_rebincube_seqf( ThrWorkForce *workforce, int njobs,
 /* Set the bounds on the first (i.e. spectral) axis of the input block to be
    processed by each job so that it covers the second of the two adjacent
    spectral blocks. */
-               (data->lbnd)[ 0 ] = (int)( blk_bot[ 2*i + 1 ] + 0.5 );
-               (data->ubnd)[ 0 ] = (int)( blk_bot[ 2*i + 2 ] - 0.5 );
+               (data->lbnd)[ 0 ] = (dim_t)( blk_bot[ 2*i + 1 ] + 0.5 );
+               (data->ubnd)[ 0 ] = (dim_t)( blk_bot[ 2*i + 2 ] - 0.5 );
 
 /* Skip empty blocks. */
                if( (data->ubnd)[ 0 ] >= (data->lbnd)[ 0 ] ) {

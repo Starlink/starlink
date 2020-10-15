@@ -125,11 +125,11 @@
 /* Structure used to pass data divided into time-chunks to different threads */
 typedef struct smfTimeChunkData {
   int type;                 /* 0=reorder, 1=boxcar smooth */
-  size_t chunk1;            /* Index of first chunk handled by this thread */
-  size_t chunk2;            /* Index of last chunk handled by this thread */
+  dim_t chunk1;            /* Index of first chunk handled by this thread */
+  dim_t chunk2;            /* Index of last chunk handled by this thread */
   smfArray **data;          /* Pointer to master array of smfArrays */
   int ijob;                 /* Job identifier */
-  size_t nchunks;           /* Total number of chunks in data */
+  dim_t nchunks;           /* Total number of chunks in data */
 } smfTimeChunkData;
 
 
@@ -143,9 +143,9 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
   smfArray **array=NULL;       /* array of smfArrays that we're working on */
   smfTimeChunkData *data=NULL; /* Pointer to job data */
   smfFilter *filt=NULL;        /* Frequency domain filter */
-  size_t i;                    /* Loop counter */
-  size_t j;                    /* Loop counter */
-  size_t k;                    /* Loop counter */
+  dim_t i;                    /* Loop counter */
+  dim_t j;                    /* Loop counter */
+  dim_t k;                    /* Loop counter */
   dim_t nbolo;                 /* Number of bolos in smfData */
   dim_t ndata;                 /* Size of DATA component in smfData */
   dim_t ntslice;               /* Number of time slices in smfData */
@@ -171,8 +171,8 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
   }
 
   /* Message indicating the thread started */
-  msgSeti( "C1", data->chunk1);
-  msgSeti( "C2", data->chunk2);
+  msgSetk( "C1", data->chunk1);
+  msgSetk( "C2", data->chunk2);
   msgOutif( MSG__DEBUG, "",
             "-- parallel time: thread starting on chunks ^C1 -- ^C2",
             status );
@@ -224,8 +224,8 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
 
 
   /* Message indicating the thread started */
-  msgSeti( "C1", data->chunk1);
-  msgSeti( "C2", data->chunk2);
+  msgSetk( "C1", data->chunk1);
+  msgSetk( "C2", data->chunk2);
   msgOutif( MSG__DEBUG, "",
             "-- parallel time: thread finished chunks ^C1 -- ^C2",
             status );
@@ -245,17 +245,17 @@ void smurf_sc2threadtest( int *status ) {
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
   dim_t datalen;             /* Number of data points */
   smfFilter *filt=NULL;      /* Frequency domain filter */
-  size_t i;                  /* Loop counter */
-  size_t j;                  /* Loop counter */
+  dim_t i;                  /* Loop counter */
+  dim_t j;                  /* Loop counter */
   smfTimeChunkData *job_data=NULL; /* Array of pointers for job data */
-  size_t joblen;             /* Number of chunks per job */
-  size_t k;                  /* Loop counter */
-  size_t nchunks;            /* Number of chunks */
-  size_t nsub;               /* Number of subarrays */
+  dim_t joblen;             /* Number of chunks per job */
+  dim_t k;                  /* Loop counter */
+  dim_t nchunks;            /* Number of chunks */
+  dim_t nsub;               /* Number of subarrays */
   int nthread;               /* Number of threads */
   smfTimeChunkData *pdata=NULL; /* Pointer to data for single job */
   int temp;                  /* Temporary integer */
-  size_t tsteps;             /* How many time steps in chunk */
+  dim_t tsteps;             /* How many time steps in chunk */
   struct timeval tv1, tv2;   /* Timers */
   ThrWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
 
@@ -263,8 +263,8 @@ void smurf_sc2threadtest( int *status ) {
   dim_t nbolo;
   dim_t ntslice;
   dim_t ndata;
-  size_t bstride;
-  size_t tstride;
+  dim_t bstride;
+  dim_t tstride;
   dim_t offset;
 
   if (*status != SAI__OK) return;
@@ -272,11 +272,11 @@ void smurf_sc2threadtest( int *status ) {
   /* Get input parameters */
   parGdr0i( "NTHREAD", 1, 1, NUM__MAXI, 1, &nthread, status );
   parGdr0i( "TSTEPS", 6000, 0, NUM__MAXI, 1, &temp, status );
-  tsteps = (size_t) temp;
+  tsteps = (dim_t) temp;
   parGdr0i( "NCHUNKS", 1, 1, NUM__MAXI, 1, &temp, status );
-  nchunks = (size_t) temp;
+  nchunks = (dim_t) temp;
   parGdr0i( "NSUB", 1, 1, 4, 1, &temp, status );
-  nsub = (size_t) temp;
+  nsub = (dim_t) temp;
 
   msgSeti("N",nthread);
   msgOut( "", TASK_NAME ": Running test with ^N threads", status );
@@ -286,9 +286,9 @@ void smurf_sc2threadtest( int *status ) {
 
   /* Create some fake test data in the form of an array of smfArrays */
 
-  msgSeti("T",tsteps);
-  msgSeti("C",nchunks);
-  msgSeti("NS",nsub);
+  msgSetk("T",tsteps);
+  msgSetk("C",nchunks);
+  msgSetk("NS",nsub);
   msgOut( "", TASK_NAME
           ": Creating ^NS subarrays of data with ^C chunks * ^T samples",
           status );
@@ -348,7 +348,7 @@ void smurf_sc2threadtest( int *status ) {
 
   job_data = astCalloc( nthread, sizeof(*job_data) );
 
-  for( i=0; (i<(size_t)nthread) && (*status==SAI__OK); i++ ) {
+  for( i=0; (i<(dim_t)nthread) && (*status==SAI__OK); i++ ) {
     pdata = job_data + i;
 
     pdata->type = 0;                /* Start with a data re-order */
@@ -358,7 +358,7 @@ void smurf_sc2threadtest( int *status ) {
     pdata->ijob = -1;               /* Flag job as available to do work */
 
     /* The last thread has to pick up the remainder of chunks */
-    if( i==(size_t)(nthread-1) ) pdata->chunk2=nchunks-1;
+    if( i==(dim_t)(nthread-1) ) pdata->chunk2=nchunks-1;
     else pdata->chunk2 = (i+1)*joblen-1; /* Index of last chunk for job */
 
     /* Ensure a valid chunk range, or set to a length that we know to ignore */
@@ -371,7 +371,7 @@ void smurf_sc2threadtest( int *status ) {
 
     if( pdata->chunk1 >= nchunks ) {
       /* Nothing for this thread to do */
-      msgSeti( "W", i+1);
+      msgSetk( "W", i+1);
       msgOutif( MSG__DEBUG, "",
                 "-- parallel time: skipping thread ^W, nothing to do",
                 status);
@@ -406,14 +406,14 @@ void smurf_sc2threadtest( int *status ) {
   msgOut( "", TASK_NAME
           ": Starting test 2 __parallel time: boxcar smooth__", status );
 
-  for( i=0; (i<(size_t)nthread) && (*status==SAI__OK); i++ ) {
+  for( i=0; (i<(dim_t)nthread) && (*status==SAI__OK); i++ ) {
     pdata = job_data + i;
 
     pdata->type = 1;                /* Boxcar smooth */
 
     if( pdata->chunk1 >= nchunks ) {
       /* Nothing for this thread to do */
-      msgSeti( "W", i+1);
+      msgSetk( "W", i+1);
       msgOutif( MSG__DEBUG, "",
                 "-- parallel time: skipping thread ^W, nothing to do",
                 status);
@@ -444,14 +444,14 @@ void smurf_sc2threadtest( int *status ) {
     msgOut( "", TASK_NAME
             ": Starting test 3 __parallel time: FFT filter__", status );
 
-    for( i=0; (i<(size_t)nthread) && (*status==SAI__OK); i++ ) {
+    for( i=0; (i<(dim_t)nthread) && (*status==SAI__OK); i++ ) {
       pdata = job_data + i;
 
       pdata->type = 2;                /* FFT filter */
 
       if( pdata->chunk1 >= nchunks ) {
         /* Nothing for this thread to do */
-        msgSeti( "W", i+1);
+        msgSetk( "W", i+1);
         msgOutif( MSG__DEBUG, "",
                   "-- parallel time: skipping thread ^W, nothing to do",
                   status);

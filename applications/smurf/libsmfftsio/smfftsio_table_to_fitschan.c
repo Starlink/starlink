@@ -35,7 +35,7 @@
 *     {enter_new_authors_here}
 
 *  Notes:
-*     
+*
 
 *  History:
 *     2014-04-08 (TIMJ):
@@ -121,7 +121,7 @@ smfftsio_table_to_fitschan( fitsfile *fptr, size_t rownum, AstFitsChan * fitscha
     switch (typecode) {
       int ivalue[1];
       double dvalue[1];
-      char * svalue = NULL;
+      char * svalue;
       char * stemp[1];
       char nullarray[1];
       int anynul[1];

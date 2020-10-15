@@ -13,12 +13,12 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_fit_circle( size_t n, double *ax, double *ay, double *wx,
+*     smf_fit_circle( dim_t n, double *ax, double *ay, double *wx,
 *                     double *wy, double *rad, double *xc, double *yc,
 *                     double *rms, int *status )
 
 *  Arguments:
-*     n = size_t (Given)
+*     n = dim_t (Given)
 *        The number of points supplied in arrays ax and ay.
 *     ax = double * (Given)
 *        Pointer to an array of "n" X values.
@@ -108,7 +108,7 @@
 
 #define IterMAX 99
 
-static void smf1_init_guess( size_t n, double *ax, double *ay, double *wx,
+static void smf1_init_guess( dim_t n, double *ax, double *ay, double *wx,
                              double *wy, double *rad, double *xc, double *yc,
                              int *status );
 static double smf1_f( const gsl_vector *v, void *pars );
@@ -122,7 +122,7 @@ typedef struct Params {
    double *w;     /* Array of weights */
    double eps;    /* Minimum significant distance */
    double sw;     /* Sum of the weights */
-   size_t n;      /* Length of above arrays */
+   dim_t n;      /* Length of above arrays */
 } Params;
 
 /* Length of the following tables */
@@ -150,7 +150,7 @@ static double Gain[NDEB] = { 1.54923, 1.44032, 1.35224, 1.27921, 1.22039,
 
 
 
-void smf_fit_circle( size_t n, double *ax, double *ay, double *wx, double *wy,
+void smf_fit_circle( dim_t n, double *ax, double *ay, double *wx, double *wy,
                      double *rad, double *xc, double *yc, double *rms, int *status ){
 
 /* Local Variables: */
@@ -170,7 +170,7 @@ void smf_fit_circle( size_t n, double *ax, double *ay, double *wx, double *wy,
    gsl_vector *x;
    int gsl_status;
    int iter;
-   size_t i;
+   dim_t i;
 
 /* Initialise returned values */
    *rad = VAL__BADD;
@@ -278,7 +278,7 @@ void smf_fit_circle( size_t n, double *ax, double *ay, double *wx, double *wy,
 
 
 
-static void smf1_init_guess( size_t n, double *ax, double *ay, double *wx,
+static void smf1_init_guess( dim_t n, double *ax, double *ay, double *wx,
                              double *wy, double *rad, double *xc, double *yc,
                              int *status ){
 /*
@@ -338,7 +338,7 @@ static void smf1_init_guess( size_t n, double *ax, double *ay, double *wx,
    double ywgt;
    double zwgt;
    int iter;
-   size_t i;
+   dim_t i;
 
 /* Initialise returned values */
    *rad = VAL__BADD;
@@ -439,7 +439,7 @@ static void smf1_init_guess( size_t n, double *ax, double *ay, double *wx,
          xnew = x - y/Dy;
          if( xnew == x || !isfinite(xnew) ) break;
          ynew = A0 + xnew*(A1 + xnew*(A2 + xnew*A3));
-         if( abs(ynew) >= abs(y) )  break;
+         if( fabs(ynew) >= fabs(y) )  break;
          x = xnew;
          y = ynew;
       }
@@ -466,7 +466,7 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
 
    double rad, xc, yc, f, dx, dy, resid;
    double *px, *py, *pw;
-   size_t n, i;
+   dim_t n, i;
    Params *params = (Params *) pars;
 
    n = params->n;
@@ -504,7 +504,7 @@ static void smf1_df( const gsl_vector *v, void *pars, gsl_vector *df ){
 
    double rad, xc, yc, dx, dy, resid, wres, s1, s2, s3, this_rad;
    double *px, *py, *pw;
-   size_t n, i;
+   dim_t n, i;
    Params *params = (Params  *) pars;
 
    n = params->n;
@@ -559,7 +559,7 @@ static void smf1_fdf( const gsl_vector *v, void *pars, double *f, gsl_vector *df
 
    double rad, wres, xc, yc, dx, dy, resid, s1, s2, s3, this_rad;
    double *px, *py, *pw;
-   size_t n, i;
+   dim_t n, i;
    Params *params = (Params *) pars;
 
    n = params->n;

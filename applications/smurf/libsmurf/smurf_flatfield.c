@@ -184,7 +184,7 @@
 
 void smurf_flatfield( int *status ) {
 
-  smfArray *bbms = NULL;     /* Bad bolometer masks */
+  smfArray *bbms = NULL;    /* Bad bolometer masks */
   smfData *ffdata = NULL;   /* Pointer to output data struct */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   smfArray *flatramps = NULL;/* Flatfield ramps */
@@ -230,13 +230,13 @@ void smurf_flatfield( int *status ) {
     if (*status != SAI__OK) break;
 
     /* Call flatfield routine */
-    didflat = smf_open_and_flatfield( NULL, igrp, ogrp, i, NULL, flatramps,
+    didflat = smf_open_and_flatfield( NULL, igrp, ogrp, (int) i, NULL, flatramps,
                                       heateffmap, &ffdata, status);
 
     /* Report failure by adding a message indicating which file failed */
-    msgSeti("I",i);
+    msgSetk("I",i);
     if (*status != SAI__OK) {
-      msgSeti("N",size);
+      msgSetk("N",size);
       errRep(FUNC_NAME,	"Unable to flatfield data from file ^I of ^N", status);
       break;
     }

@@ -118,7 +118,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
 
   /* Local variables */
   int cycle;                       /* Cycle counter */
-  int dims[2];                     /* Dimensions of output image */
+  dim_t dims[2];                   /* Dimensions of output image */
   smfDream *dream = NULL;          /* DREAM parameters */
   HDSLoc *drmloc;                  /* Locator to DEAM extension */
   char drmwghts[SZFITSTR];         /* Name of DREAM weights file */
@@ -128,21 +128,21 @@ void smf_dreamsolve( smfData *data, int *status ) {
   smfHead *hdr = NULL;             /* Header information for input data */
   double *interpwt = NULL;         /* Interpolation weights */
   double *invmat = NULL;           /* Inverted matrix */
-  int lbnd[2];                     /* Lower bounds */
+  dim_t lbnd[2];                   /* Lower bounds */
   int nbol;                        /* Total number of bolometers */
   int ncycles;                     /* Number of DREAM cycles in data stream */
-  size_t nelem;                    /* Total number of points */
+  dim_t nelem;                     /* Total number of points */
   int ngrid;                       /* Number of grid points in output map */
   int nimages;                     /* Number of images to write to output file */
   int nframes;                     /* Number of time samples */
-  int npts;                        /* Total number of points (int version) */
+  size_t npts;                     /* Total number of points (int version) */
   int nsampcycle;                  /* Number of samples per DREAM cycle */
   smfFile *ofile;                  /* Output file information */
   double *pbolzero = NULL;         /* Bolometer zero points */
   double *psbuf = NULL;            /* */
   HDSLoc *scu2redloc = NULL;       /* Locator to SCU2RED extension */
   double *tstream = NULL;          /* Pointer to time series data */
-  int ubnd[2];                     /* Upper bounds */
+  dim_t ubnd[2];                   /* Upper bounds */
   int naver;                       /* Temporary value... */
   int jigext[4] = { -1, 1, -1, 1 };/* Table of SMU pattern extents for a
                                       single bolometer */
@@ -186,14 +186,14 @@ void smf_dreamsolve( smfData *data, int *status ) {
     dream = data->dream;
 
     /* OK we have DREAM data - retrieve various values - CHECK FOR NON-NULL!! */
-    nframes = (data->dims)[2];
-    nbol = (data->dims)[0]*(data->dims)[1];
-    ngrid = dream->ngrid;
-    nsampcycle = dream->nsampcycle;
+    nframes = (int)(data->dims)[2];
+    nbol = (int)((data->dims)[0]*(data->dims)[1]);
+    ngrid = (int)dream->ngrid;
+    nsampcycle = (int)dream->nsampcycle;
     ncycles = nframes / nsampcycle;
 
     /* HACK - DEFINE!! */
-    qual = astCalloc( nbol, sizeof(int) );
+    qual = astCalloc( nbol, sizeof(*qual) );
 
     /* Pointers to the weights arrays. If either of these are NULL
        then it means we were not able to find the weights file */
@@ -235,17 +235,17 @@ void smf_dreamsolve( smfData *data, int *status ) {
                               0, NULL, status);
 
     /* Allocate memory for resources */
-    psbuf = astCalloc( (size_t)(nsampcycle * nbol), sizeof(double) );
+    psbuf = astCalloc( (dim_t)(nsampcycle * nbol), sizeof(*psbuf) );
     if ( *status == SMF__NOMEM ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to allocate memory for psbuf", status);
     }
-    pbolzero = astCalloc( (size_t)nbol, sizeof(double) );
+    pbolzero = astCalloc( (dim_t)nbol, sizeof(*pbolzero) );
     if ( *status == SMF__NOMEM ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to allocate memory for polzero", status);
     }
-    map = astCalloc( (size_t)maxmap, sizeof(double) );
+    map = astCalloc( (dim_t)maxmap, sizeof(*map) );
     if ( *status == SMF__NOMEM ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to allocate memory for map", status);
@@ -269,8 +269,8 @@ void smf_dreamsolve( smfData *data, int *status ) {
         sc2math_get_cycle ( cycle, nsampcycle, ncycles, nbol,
                             tstream, psbuf, status );
 
-        sc2math_mapsolve( nsampcycle, (data->dims)[0], (data->dims)[1], gridext,
-                          dream->gridstep, jigext, dream->jigscal, interpwt,
+        sc2math_mapsolve( nsampcycle, (int)(data->dims)[0], (int)(data->dims)[1],
+                          gridext, dream->gridstep, jigext, dream->jigscal, interpwt,
                           invmat, qual, psbuf, maxmap, dims, map, pbolzero,
                           status );
 

@@ -122,7 +122,7 @@ typedef struct smfFFTCart2PolData {
    double df;
    int inverse;
    int power;
-   size_t ntransforms;
+   dim_t ntransforms;
 } SmfFFTCart2PolData;
 
 #define FUNC_NAME "smf_fft_cart2pol"
@@ -133,10 +133,10 @@ void smf_fft_cart2pol( ThrWorkForce *wf, smfData *data, int inverse, int power,
   double df;                    /* Product of df all axes */
   double df_data[2]={1,1};      /* frequency steps in Hz, or (1/arcsec)^2 */
   dim_t fdims[2];               /* Lengths of frequency-space axes */
-  size_t i;                     /* Loop counter */
+  dim_t i;                      /* Loop counter */
   dim_t nbolo=0;                /* Number of detectors  */
-  size_t ndims;                 /* Number of real-space dimensions */
-  size_t ntransforms;           /* Number of transforms in the data */
+  int ndims;                    /* Number of real-space dimensions */
+  dim_t ntransforms;            /* Number of transforms in the data */
   dim_t nf=0;                   /* Number of frequencies in FFT */
   dim_t rdims[2];               /* Lengths of real-space axes */
   int nw;                       /* Number of worker threads */
@@ -179,7 +179,7 @@ void smf_fft_cart2pol( ThrWorkForce *wf, smfData *data, int inverse, int power,
   transtep = ntransforms/nw;
   if( transtep == 0 ) {
      transtep = 1;
-     nw = ntransforms;
+     nw = (int) ntransforms;
   }
 
   /* Allocate job data for threads, and store the range of bolos to be

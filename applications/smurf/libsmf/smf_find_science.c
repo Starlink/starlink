@@ -234,16 +234,15 @@
 
 #define FUNC_NAME "smf_find_science"
 
-static size_t
+static dim_t
 smf__addto_sortinfo ( const smfData * indata, smfSortInfo allinfo[],
-                      size_t index,
-size_t counter, const char * type, int *status );
+                      int index, dim_t counter, const char * type, int *status );
 
 static void
 smf__addto_durations( const smfData *indata, double * duration,
-                      size_t * nsteps, int *status );
+                      dim_t * nsteps, int *status );
 
-static void smf__calc_flatobskey( smfHead *hdr, char * keystr, size_t keylen,
+static void smf__calc_flatobskey( smfHead *hdr, char * keystr, dim_t keylen,
                                   int *status );
 
 static int smf__is_file_junk(smfData* data, int* status);
@@ -256,24 +255,24 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
 
   smfSortInfo *alldarks; /* array of sort structs for darks */
   smfSortInfo *allfflats; /* array of fast flat info */
-  Grp * dgrp = NULL;  /* Internal dark group */
+  Grp * dgrp = NULL;   /* Internal dark group */
   double duration_darks = 0.0; /* total duration of all darks */
   double duration_sci = 0.0;  /* Duration of all science observations */
-  size_t dkcount = 0; /* Dark counter */
-  size_t ffcount = 0; /* Fast flat counter */
-  Grp * fgrp = NULL;  /* Fast flat group */
-  size_t i;           /* loop counter */
+  dim_t dkcount = 0;   /* Dark counter */
+  dim_t ffcount = 0;   /* Fast flat counter */
+  Grp * fgrp = NULL;   /* Fast flat group */
+  int i;               /* loop counter */
   smfData *infile = NULL; /* input file */
-  size_t insize;     /* number of input files */
-  size_t nsteps_dark = 0;    /* Total number of steps for darks */
-  size_t nsteps_sci = 0;     /* Total number of steps for science */
+  dim_t insize;        /* number of input files */
+  dim_t nsteps_dark = 0;    /* Total number of steps for darks */
+  dim_t nsteps_sci = 0;     /* Total number of steps for science */
   AstKeyMap * heatermap = NULL; /* Heater efficiency map */
   AstKeyMap * obsmap = NULL; /* Info from all observations */
   AstKeyMap * objmap = NULL; /* All the object names used */
   AstKeyMap * scimap = NULL; /* All non-flat obs indexed by unique key */
-  Grp *ogrp = NULL;   /* local copy of output group */
-  size_t sccount = 0; /* Number of accepted science files */
-  size_t junkcount = 0;
+  Grp *ogrp = NULL;    /* local copy of output group */
+  dim_t sccount = 0;   /* Number of accepted science files */
+  dim_t junkcount = 0;
   struct timeval tv1;  /* Timer */
   struct timeval tv2;  /* Timer */
 
@@ -453,7 +452,7 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
 
     /* now open the flats and store them if requested */
     if (*status == SAI__OK && array && ffcount) {
-      size_t start_ffcount = ffcount;
+      dim_t start_ffcount = ffcount;
       AstKeyMap * flatmap = NULL;
 
       if (calcflat) {
@@ -469,7 +468,7 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
       */
 
       for (i = 0; i < start_ffcount; i++ ) {
-        size_t ori_index =  (allfflats[i]).index;
+        dim_t ori_index =  (allfflats[i]).index;
         smfData * outfile = NULL;
         char keystr[100];
         AstKeyMap * infomap = astKeyMap( "KeyError=1" );
@@ -526,7 +525,7 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
           infile = outfile;
 
           if (calcflat) {
-            size_t ngood = 0;
+            dim_t ngood = 0;
             smfData * curresp = NULL;
             int utdate;
 
@@ -559,8 +558,8 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
               astMapPut0P( infomap, "RESP", curresp, "" );
               astMapPut0I( infomap, "UTDATE", utdate, "" );
               astMapPut0I( infomap, "ISGOOD", 1, "" );
-              astMapPut0I( infomap, "NGOOD", ngood, "" );
-              astMapPut0I( infomap, "GRPINDEX", ori_index, "" );
+              astMapPut0K( infomap, "NGOOD", ngood, "" );
+              astMapPut0K( infomap, "GRPINDEX", ori_index, "" );
               astMapPut0I( infomap, "SMFTYP", infile->hdr->obstype, "" );
               astMapPutElemA( flatmap, keystr, -1, infomap );
 
@@ -571,7 +570,7 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
             smf_addto_smfArray( array, infile, status );
 
             /* Copy the group info */
-            ndgCpsup( ingrp, ori_index, fgrp, status );
+            ndgCpsup( ingrp, (int) ori_index, fgrp, status );
 
           }
 
@@ -586,7 +585,7 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
          bolometers that are not good and also decide whether we
          need to set status to bad. */
       if (*status == SAI__OK && calcflat ) {
-        size_t nkeys = astMapSize( flatmap );
+        dim_t nkeys = astMapSize( flatmap );
         for (i = 0; i < nkeys; i++ ) {
           const char *key = astMapKey( flatmap, i );
           int nf = 0;
@@ -603,7 +602,7 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
 
             if (isgood) {
               /* The flatfield worked */
-              size_t ngood = 0;
+              dim_t ngood = 0;
               int itemp;
               int utdate = 0;
               int ratioFlats = 0;
@@ -643,16 +642,16 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
                 smfData * nextresp = NULL;
                 smfData * curflat = NULL;
                 void *tmpvar = NULL;
-                size_t bol = 0;
+                dim_t bol = 0;
                 smfData * ratio = NULL;
                 double *in1 = NULL;
                 double *in2 = NULL;
                 double mean = VAL__BADD;
-                size_t nbolo;
+                dim_t nbolo;
                 double *out = NULL;
                 double sigma = VAL__BADD;
                 float clips[] = { 5.0, 5.0 }; /* 5.0 sigma iterative clip */
-                size_t ngoodz = 0;
+                dim_t ngoodz = 0;
 
                 astMapGet0C( nextmap, "FILENAME", &nextfname );
                 astMapGet0C( infomap, "FILENAME", &fname );
@@ -705,7 +704,7 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
                   const double pmrange = 0.10;
                   double thrlo = 1.0 - pmrange;
                   double thrhi = 1.0 + pmrange;
-                  size_t nmasked = 0;
+                  dim_t nmasked = 0;
                   double *flatcal = curflat->da->flatcal;
 
                   msgOutiff( MSG__DEBUG, "", "Flatfield fast ramp ratio mean = %g +/- %g (%zu bolometers)",
@@ -762,8 +761,8 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
                     astMapGet0P( infomap, "CALCFLAT", &tmpvar );
                     curflat = tmpvar;
                     if (curflat && curflat->da) {
-                      size_t bol;
-                      size_t nbolo = (curflat->dims)[0] * (curflat->dims)[1];
+                      dim_t bol;
+                      dim_t nbolo = (curflat->dims)[0] * (curflat->dims)[1];
                       double *flatcal = curflat->da->flatcal;
                       for (bol=0; bol<nbolo; bol++) {
                         /* Just need to set the first element to bad */
@@ -794,13 +793,13 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
             /* We are storing flats even if they failed. Let the downstream
                software worry about it */
             {
-              int ori_index;
+              dim_t ori_index;
               smfData * flatfile = NULL;
               void *tmpvar = NULL;
 
               /* Store in the output group */
-              astMapGet0I( infomap, "GRPINDEX", &ori_index );
-              ndgCpsup( ingrp, ori_index, fgrp, status );
+              astMapGet0K( infomap, "GRPINDEX", &ori_index );
+              ndgCpsup( ingrp, (int) ori_index, fgrp, status );
 
               /* And store in the smfArray */
               astMapGet0P( infomap, "CALCFLAT", &tmpvar );
@@ -843,10 +842,10 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
     /* now open the darks and store them if requested */
     if (*status == SAI__OK) {
       for (i = 0; i < dkcount; i++ ) {
-        size_t ori_index =  (alldarks[i]).index;
+        dim_t ori_index =  (alldarks[i]).index;
 
          /* Store the entry in the output group */
-        ndgCpsup( ingrp, ori_index, dgrp, status );
+        ndgCpsup( ingrp, (int) ori_index, dgrp, status );
 
         if (darks) {
 
@@ -919,11 +918,11 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
     if (meanstep && nsteps_sci > 0) *meanstep = duration_sci / nsteps_sci;
   }
 
-  msgSeti( "ND", sccount );
-  msgSeti( "DK", dkcount );
-  msgSeti( "FF", ffcount );
-  msgSeti( "JK", junkcount );
-  msgSeti( "TOT", insize );
+  msgSetk( "ND", sccount );
+  msgSetk( "DK", dkcount );
+  msgSetk( "FF", ffcount );
+  msgSetk( "JK", junkcount );
+  msgSetk( "TOT", insize );
   if ( insize == 1 ) {
     if (dkcount == 1) {
       msgOutif( MSG__VERB, " ", "Single input file was a dark",
@@ -994,9 +993,9 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
    in the input group. "counter" is the current position to use to store
    the item. Returns the next index to be used (ie updated counter). */
 
-static size_t
-smf__addto_sortinfo ( const smfData * indata, smfSortInfo allinfo[], size_t this_index,
-                      size_t counter, const char * type, int *status ) {
+static dim_t
+smf__addto_sortinfo ( const smfData * indata, smfSortInfo allinfo[], int this_index,
+                      dim_t counter, const char * type, int *status ) {
   smfSortInfo * sortinfo = NULL;
 
   if (*status != SAI__OK) return counter;
@@ -1017,7 +1016,7 @@ smf__addto_sortinfo ( const smfData * indata, smfSortInfo allinfo[], size_t this
    file to a running total */
 
 static void smf__addto_durations ( const smfData *indata, double *duration,
-                                   size_t *nsteps, int *status ) {
+                                   dim_t *nsteps, int *status ) {
   if (*status != SAI__OK) return;
   if (!indata) return;
   if (!indata->hdr) return;
@@ -1030,14 +1029,14 @@ static void smf__addto_durations ( const smfData *indata, double *duration,
   return;
 }
 
-static void smf__calc_flatobskey( smfHead *hdr, char * keystr, size_t keylen,
+static void smf__calc_flatobskey( smfHead *hdr, char * keystr, dim_t keylen,
                                   int *status ) {
 
   int curheat = 0;
   int detbias = 0;
   char subarray[10];
   double shutter = 0.0;
-  size_t nwrite = 0;
+  dim_t nwrite = 0;
   int utdate = 0;
 
   if (*status != SAI__OK) return;
@@ -1118,7 +1117,7 @@ static int smf__is_file_junk(smfData* data, int* status) {
         {0, 0, 0},
     };
 
-    for (size_t i = 0; junk[i].obsidss; i ++) {
+    for (dim_t i = 0; junk[i].obsidss; i ++) {
         if ((subscan >= junk[i].ss_start)
                 && (subscan <= junk[i].ss_end)
                 && ! strcmp(junk[i].obsidss, obsidss)) {

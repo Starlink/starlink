@@ -101,49 +101,49 @@ void smurf_fts2_transcorr(int* status)
 {
   if( *status != SAI__OK ) { return; }
 
-  char filename[GRP__SZNAM+1]; /* Filename */
+  Grp* inGrp         = NULL; /* Input group */
+  Grp* outGrp        = NULL; /* Output group */
+  Grp* tauGrp        = NULL; /* TAU WET group */
+  HDSLoc* loc        = NULL; /* HDS location */
   char *pname        = NULL; /* Pointer to filename */
-  int bolCount       = 0;    /* Number of bolometers */
-  int bolIndex       = 0;    /* Bolometer index */
-  int count;
-  int dims[NDF__MXDIM];
-  int debug          = 0;    /* If not debug, include dry component */
-  int ftsExists      = 0;
-  int index          = 0;
-  int indf;                  /* NDF identifier for TAU file */
-  int KERNELLENGTH   = 101;
-  int nbolX          = 0;    /* Width of the source subarray */
-  int nbolY          = 0;    /* Height of the source subarray */
-  int ndfTau;
-  int ndim;
-  int nPWV           = 0;
-  int nWN            = 0;
-  int N              = 0;    /* Sample count */
-  int i              = 0;    /* Index */
-  int j              = 0;    /* Index */
-  int k              = 0;    /* Index */
-  int place;
+  char filename[GRP__SZNAM+1]; /* Filename */
+  dim_t dims[NDF__MXDIM];
   double AM          = 0.0;  /* Airmass at ZPD */
   double DELTAPWV    = 0.0;
-  double PWV0        = 0.0;
   double PWV         = 0.0;  /* PWV at ZPD */
+  double PWV0        = 0.0;
   double wnFact      = 0.0;  /* Wave number factor */
-  double* inPntr     = NULL; /* Pointer to the input data */
-  double* outPntr    = NULL; /* Pointer to the output data */
-  double* wnScan     = NULL;
-  double* wnTau      = NULL;
-  double* TAtm       = NULL;
-  double* TAtmNew    = NULL;
   double* GAUSSIANKERNEL = NULL;
   double* PWVARR     = NULL;
   double* PWVNEW     = NULL;
   double* TAUNEW     = NULL;
   double* TAUWET     = NULL;
+  double* TAtm       = NULL;
+  double* TAtmNew    = NULL;
   double* TMPARR     = NULL;
-  Grp* inGrp         = NULL; /* Input group */
-  Grp* outGrp        = NULL; /* Output group */
-  Grp* tauGrp        = NULL; /* TAU WET group */
-  HDSLoc* loc        = NULL; /* HDS location */
+  double* inPntr     = NULL; /* Pointer to the input data */
+  double* outPntr    = NULL; /* Pointer to the output data */
+  double* wnScan     = NULL;
+  double* wnTau      = NULL;
+  int KERNELLENGTH   = 101;
+  int N              = 0;    /* Sample count */
+  int bolCount       = 0;    /* Number of bolometers */
+  int bolIndex       = 0;    /* Bolometer index */
+  int debug          = 0;    /* If not debug, include dry component */
+  int ftsExists      = 0;
+  int i              = 0;    /* Index */
+  int index          = 0;
+  int indf;                  /* NDF identifier for TAU file */
+  int j              = 0;    /* Index */
+  int k              = 0;    /* Index */
+  int nPWV           = 0;
+  int nWN            = 0;
+  int nbolX          = 0;    /* Width of the source subarray */
+  int nbolY          = 0;    /* Height of the source subarray */
+  int ndfTau;
+  int ndim;
+  int place;
+  size_t count;
   size_t fIndex      = 0;    /* File loop counter */
   size_t inSize      = 0;    /* Size of the input group */
   size_t outSize     = 0;    /* Size of the output group */
@@ -223,8 +223,8 @@ void smurf_fts2_transcorr(int* status)
     return;
   }
 
-  nWN  = dims[0];
-  nPWV = dims[1];
+  nWN  = (int) dims[0];
+  nPWV = (int) dims[1];
   PWVARR = astMalloc(nPWV * sizeof(*PWVARR));
   for(i = 0; i < nPWV; i++) {
     PWVARR[i] = PWV0 + i * DELTAPWV;
@@ -246,10 +246,10 @@ void smurf_fts2_transcorr(int* status)
 
     outData = smf_deepcopy_smfData(NULL, inData, 0, SMF__NOCREATE_DATA, 0, 0, status);
     if(*status == SAI__OK) {
-      inPntr   = inData->pntr[0];
-      nbolX    = inData->dims[0];
-      nbolY    = inData->dims[1];
-      N        = inData->dims[2];
+      inPntr   = (double *) inData->pntr[0];
+      nbolX    = (int) inData->dims[0];
+      nbolY    = (int) inData->dims[1];
+      N        = (int) inData->dims[2];
       bolCount = nbolX * nbolY;
 
       outData->dtype   = SMF__DOUBLE;
@@ -371,7 +371,6 @@ void smurf_fts2_transcorr(int* status)
     }
   }
 
-  CLEANUP:
     ndfEnd(status);
     astFree(PWVARR);
     astFree(PWVNEW);

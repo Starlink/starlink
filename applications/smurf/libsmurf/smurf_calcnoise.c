@@ -300,14 +300,14 @@
 #define CREATOR PACKAGE_UPCASE ":" TASK_NAME
 
 static smfData *
-smf__create_bolfile_extension( ThrWorkForce *wf, const Grp * ogrp, size_t gcount,
+smf__create_bolfile_extension( ThrWorkForce *wf, const Grp * ogrp, dim_t gcount,
                                const smfData *refdata, const char hdspath[],
                                const char datalabel[], const char units[],
                                int * status );
 
 static void
 smf__write_effnoise( const smfData * data, const char * noisekey,
-                     const char * units, size_t ngood, double noisesum,
+                     const char * units, dim_t ngood, double noisesum,
                      int *status );
 
 void smurf_calcnoise( int *status ) {
@@ -316,31 +316,31 @@ void smurf_calcnoise( int *status ) {
   Grp * basegrp = NULL;     /* Basis group for output filenames */
   int calc_effnoise = 1;    /* Can we calculate the effective noise? */
   smfArray *concat=NULL;    /* Pointer to a smfArray */
-  size_t contchunk;         /* Continuous chunk counter */
+  dim_t contchunk;          /* Continuous chunk counter */
   int dkclean;              /* Clean dark squids? */
   int doclean = 0;          /* Do we clean the time series? */
   double downsampscale;     /* Downsample factor to preserve this scale */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   smfData *firstdata=NULL;  /* First smfData in the current chunk */
   smfArray * flatramps = NULL; /* Flatfield ramps */
-  size_t gcount=0;          /* Grp index counter */
-  size_t i=0;               /* Counter, index */
+  dim_t gcount=0;           /* Grp index counter */
+  dim_t i=0;                /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
   smfGroup *igroup=NULL;    /* smfGroup corresponding to igrp */
   AstKeyMap *keymap=NULL;   /* KeyMap holding configuration parameters */
   dim_t maxconcat=0;        /* Longest continuous chunk length in samples */
-  size_t ncontchunks=0;     /* Number continuous chunks outside iter loop */
-  size_t nepbolo;           /* Number of bolometers in NEP map */
+  dim_t ncontchunks=0;      /* Number continuous chunks outside iter loop */
+  dim_t nepbolo;            /* Number of bolometers in NEP map */
   double nepcliphigh=VAL__BADD; /* Clip high NEP values */
   double nepcliplow=VAL__BADD;  /* Clip low NEP values */
   int nepcliplog=1;             /* Clip based on log(NEP) */
-  size_t nepgoodbol = 0;    /* Number of bolometers used in eff NEP calc */
+  dim_t nepgoodbol = 0;     /* Number of bolometers used in eff NEP calc */
   double nepsum = 0.0;      /* Sum of weights for effective NEP calculation */
-  size_t noisebolo;         /* Number of bolometers in noise map*/
+  dim_t noisebolo;          /* Number of bolometers in noise map*/
   double noicliphigh=VAL__BADD; /* Clip high noise values */
   double noicliplow=VAL__BADD;  /* Clip low noise values */
-  int noicliplog=1;             /* Clip based on log(NOISE) */
-  size_t noisegoodbol = 0;  /* Number of bolometers used in eff noise calc */
+  int noicliplog=1;         /* Clip based on log(NOISE) */
+  dim_t noisegoodbol = 0;   /* Number of bolometers used in eff noise calc */
   double noisesum = 0.0;    /* Sum of weights for effective noise calculation */
   smfData *odata = NULL;    /* Pointer to output data struct */
   Grp *ogrp = NULL;         /* Output group of files */
@@ -501,7 +501,7 @@ void smurf_calcnoise( int *status ) {
   pad = 0;
   gcount = 1;
   for( contchunk=0;(*status==SAI__OK)&&contchunk<ncontchunks; contchunk++ ) {
-    size_t idx;
+    dim_t idx;
 
     if (doclean) {
       /* Get the first smfData that will contribute to this continuous chunk,
@@ -585,8 +585,8 @@ void smurf_calcnoise( int *status ) {
 
       /* Report statistics (currently need a smfArray for that) */
       if (*status == SAI__OK) {
-        size_t last_qcount[SMF__NQBITS];
-        size_t last_nmap = 0;
+        dim_t last_qcount[SMF__NQBITS];
+        dim_t last_nmap = 0;
         smf_qualstats_report( wf, MSG__VERB, SMF__QFAM_TSERIES, 1, concat,
                               last_qcount, &last_nmap, 1, NULL, NULL, NULL,
                               status );
@@ -601,7 +601,7 @@ void smurf_calcnoise( int *status ) {
         smfData *outdata = NULL;
         smfData *ratdata = NULL;
         smfData *powdata = NULL;
-        size_t thisnoisegoodbol = 0;
+        dim_t thisnoisegoodbol = 0;
         double thisnoisesum = 0.0;
         int do_nep = 1;
         char noiseunits[SMF__CHARLABEL];
@@ -708,7 +708,7 @@ void smurf_calcnoise( int *status ) {
            the data with working bolometers */
         if (*status == SAI__OK) {
           smfDA *da = thedata->da;
-          size_t ngood = 0;
+          dim_t ngood = 0;
           smfData * respmap = NULL;
 
           if (da && da->nflat) {
@@ -763,7 +763,7 @@ void smurf_calcnoise( int *status ) {
               double * noise = (outdata->pntr)[0];
               double * resp = (respmap->pntr)[0];
               double * nep  = (nepdata->pntr)[0];
-              size_t thisnepgoodbol = 0;
+              dim_t thisnepgoodbol = 0;
               double thisnepsum = 0.0;
 
               nepbolo = (nepdata->dims)[0]*(nepdata->dims)[1];
@@ -891,10 +891,10 @@ void smurf_calcnoise( int *status ) {
     msgOutf( "", "Effective noise = %g %s from %zu bolometers",
              status, noiseeff, refunits, noisegoodbol );
     parPut0d( "EFFNOISE", noiseeff, status );
-    parPut0i( "NOISEGOODBOL", noisegoodbol, status );
+    parPut0k( "NOISEGOODBOL", noisegoodbol, status );
   } else {
     parPut0d( "EFFNOISE", VAL__BADD, status );
-    parPut0i( "NOISEGOODBOL", VAL__BADI, status );
+    parPut0k( "NOISEGOODBOL", VAL__BADI, status );
   }
   if (calc_effnoise && nepgoodbol) {
     double nepeff;
@@ -902,10 +902,10 @@ void smurf_calcnoise( int *status ) {
     msgOutf( "", "Effective NEP = %g %s from %zu bolometers",
              status, nepeff, refnepunits, nepgoodbol );
     parPut0d( "EFFNEP", nepeff, status );
-    parPut0i( "NEPGOODBOL", nepgoodbol, status );
+    parPut0k( "NEPGOODBOL", nepgoodbol, status );
   } else {
     parPut0d( "EFFNEP", VAL__BADD, status );
-    parPut0i( "NEPGOODBOL", VAL__BADI, status );
+    parPut0k( "NEPGOODBOL", VAL__BADI, status );
   }
 
 
@@ -934,7 +934,7 @@ void smurf_calcnoise( int *status ) {
 }
 
 static smfData *
-smf__create_bolfile_extension( ThrWorkForce *wf, const Grp * ogrp, size_t gcount,
+smf__create_bolfile_extension( ThrWorkForce *wf, const Grp * ogrp, dim_t gcount,
                                const smfData *refdata, const char hdspath[],
                                const char datalabel[], const char units[],
                                int * status ) {
@@ -960,7 +960,7 @@ smf__create_bolfile_extension( ThrWorkForce *wf, const Grp * ogrp, size_t gcount
 
 static void
 smf__write_effnoise( const smfData * data, const char * noisekey,
-                     const char * units, size_t ngood, double noisesum,
+                     const char * units, dim_t ngood, double noisesum,
                      int *status ) {
 
   double noiseeff = 0.0;
@@ -978,7 +978,7 @@ smf__write_effnoise( const smfData * data, const char * noisekey,
   fchan = data->hdr->fitshdr;
 
   /* Add the relevant headers */
-  atlPtfti( fchan, "NBOLO", ngood, "Number of bolometers used in eff noise stats",
+  atlPtfti( fchan, "NBOLO", (int) ngood, "Number of bolometers used in eff noise stats",
             status );
 
   sprintf( noisecom, "[%s] Effective noise in image", units );

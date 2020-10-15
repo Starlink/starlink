@@ -127,8 +127,8 @@ void smurf_sc2filtermap( int *status ) {
   Grp *igrp = NULL;         /* Input group of files */
   int isfft=0;              /* Are data fft or real space? */
   int *mask=NULL;           /* Mask indicating where bad data are */
-  size_t ndata=0;           /* Number of pixels in the map */
-  size_t ndims;             /* Number of real space dimensions */
+  dim_t ndata=0;            /* Number of pixels in the map */
+  int ndims;                /* Number of real space dimensions */
   smfData *odata=NULL;      /* Pointer to output smfData to be exported */
   Grp *ogrp = NULL;         /* Output group of files */
   size_t outsize;           /* Number of files in output group */
@@ -198,7 +198,7 @@ void smurf_sc2filtermap( int *status ) {
     /* Set VAL__BADD to zero if requested */
     if( (*status==SAI__OK) && zerobad ) {
       double *d=NULL;
-      size_t j;
+      dim_t j;
 
       ndata=1;
       for( j=0; j<wrefmap->ndims; j++ ) ndata *= wrefmap->dims[j];
@@ -242,7 +242,7 @@ void smurf_sc2filtermap( int *status ) {
     /* Set VAL__BADD to zero if requested */
     if( (*status==SAI__OK) && zerobad ) {
       double *d=NULL;
-      size_t j, k;
+      dim_t j, k;
 
       ndata=1;
       for( j=0; j<odata->ndims; j++ ) ndata *= odata->dims[j];
@@ -299,7 +299,7 @@ void smurf_sc2filtermap( int *status ) {
     /* Set bad values from the mask */
     if( mask ) {
       double *d=NULL;
-      size_t j, k;
+      dim_t j, k;
 
       /* Do both DATA and VARIANCE */
       for( k=0; k<2; k++ ) {

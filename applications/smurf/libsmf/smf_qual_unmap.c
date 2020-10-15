@@ -132,13 +132,13 @@ static void smf1_qual_unmap( void *job_data_ptr, int *status );
 /* Local data types */
 typedef struct smfQualUnmapData {
    int operation;
-   size_t highbit;
-   size_t i1;
-   size_t i2;
-   size_t lowbit;
+   dim_t highbit;
+   dim_t i1;
+   dim_t i2;
+   dim_t lowbit;
    size_t nout;
-   size_t nqbits;
-   size_t qcount[SMF__NQBITS];
+   dim_t nqbits;
+   dim_t qcount[SMF__NQBITS];
    smf_qual_t *qual;
    unsigned char *qmap;
 } SmfQualUnmapData;
@@ -146,11 +146,11 @@ typedef struct smfQualUnmapData {
 smf_qual_t * smf_qual_unmap( ThrWorkForce *wf, int indf, smf_qfam_t family,
                              smf_qual_t * qual, smf_qual_t mask, int * status ) {
   int canwrite = 0;   /* can we write to the file? */
-  size_t nqbits = 0;  /* Number of quality bits in this family */
+  dim_t nqbits = 0;     /* Number of quality bits in this family */
   SmfQualUnmapData *job_data = NULL;
   SmfQualUnmapData *pdata;
   int nw;
-  size_t step;
+  dim_t step;
   int iw;
 
   if (*status != SAI__OK) goto CLEANUP;
@@ -169,14 +169,14 @@ smf_qual_t * smf_qual_unmap( ThrWorkForce *wf, int indf, smf_qfam_t family,
      If the data were mapped we still have to make sure the quality names
      are stored. */
   if ( canwrite && qual ) {
-    int highbit = -1; /* highest bit used */
+    dim_t highbit = -1; /* highest bit used */
     size_t i;
-    int itemp;
-    int lowbit = -1;  /* Lowest bit used */
+    size_t itemp;
+    dim_t lowbit = -1;  /* Lowest bit used */
     size_t nout;
     int nqual = 0;
     void *qpntr[1];
-    size_t qcount[SMF__NQBITS]; /* statically allocate the largest array */
+    dim_t qcount[SMF__NQBITS]; /* statically allocate the largest array */
     IRQLocs *qlocs;
     unsigned char * qmap;
     int there;
@@ -251,7 +251,7 @@ smf_qual_t * smf_qual_unmap( ThrWorkForce *wf, int indf, smf_qfam_t family,
 
     /* Work out which bits are actually used */
     if (*status == SAI__OK) {
-      size_t k;
+      dim_t k;
       /* now we try to be a bit clever. It may be a mistake since we have to
          do multiple passes through "qual". First determine how many quality
          bits are actually set. */
@@ -309,7 +309,7 @@ smf_qual_t * smf_qual_unmap( ThrWorkForce *wf, int indf, smf_qfam_t family,
 
     /* we assume the number of elements in "qual" is the same as in "qmap" */
     if (*status == SAI__OK) {
-      size_t k;
+      dim_t k;
 
       /* if we only have 8 or fewer bits active we can just compress
          by mapping them to the lower 8 bits. This will work if we also
@@ -318,18 +318,18 @@ smf_qual_t * smf_qual_unmap( ThrWorkForce *wf, int indf, smf_qfam_t family,
         /* easy */
         memset( qmap, 0, nout * smf_dtype_sz( SMF__UBYTE, status ) );
       } else if ( nqual <= 8 ) {
-        size_t curbit = 0;
+        int curbit = 0;
 
         /* and the quality names. Start at lowbit and go to highbit
            knowing that we have shifted them down so that lowbit in qual
            is bit 0 in NDF. */
-        for (k=lowbit; k<=(size_t)highbit; k++) {
+        for (k=lowbit; k<=(dim_t)highbit; k++) {
           if (qcount[k]) {
             int fixed = 0;             /* is bit fixed? */
             const char * qdesc = NULL; /* Description of quality */
             const char * qstr = NULL;  /* Quality string identifier */
             curbit++;
-            qstr = smf_qual_str( family, 1, k, &qdesc, status );
+            qstr = smf_qual_str( family, 1, (int) k, &qdesc, status );
 
             irqAddqn( qlocs, qstr, 0, qdesc, status );
             irqFxbit( qlocs, qstr, curbit, &fixed, status );
@@ -351,7 +351,7 @@ smf_qual_t * smf_qual_unmap( ThrWorkForce *wf, int indf, smf_qfam_t family,
         thrWait( wf, status );
 
       } else {
-        size_t curbit = 0;
+        int curbit = 0;
 
         /* Quality names are now needed and we have to write them
            all out because we have not compressed the bits in the
@@ -366,7 +366,7 @@ smf_qual_t * smf_qual_unmap( ThrWorkForce *wf, int indf, smf_qfam_t family,
           int fixed = 0;
           const char * qdesc = NULL; /* Description of quality */
           const char * qstr = NULL;  /* Quality string identifier */
-          qstr = smf_qual_str( SMF__QFAM_TCOMP, 1, k, &qdesc, status );
+          qstr = smf_qual_str( SMF__QFAM_TCOMP, 1, (int) k, &qdesc, status );
 
           /* Set the quality name */
           irqAddqn( qlocs, qstr, 0, qdesc, status );
@@ -432,12 +432,12 @@ static void smf1_qual_unmap( void *job_data_ptr, int *status ) {
 
 /* Local Variables: */
    SmfQualUnmapData *pdata;
-   size_t *qcount;
-   size_t i1;
-   size_t i2;
-   size_t i;
-   size_t k;
-   size_t nqbits;
+   dim_t *qcount;
+   dim_t i1;
+   dim_t i2;
+   dim_t i;
+   dim_t k;
+   dim_t nqbits;
    smf_qual_t *p1;
    unsigned char *p2;
 
@@ -468,9 +468,9 @@ static void smf1_qual_unmap( void *job_data_ptr, int *status ) {
       }
 
    } else if( pdata->operation == 2 ){
-      size_t curbit;
-      size_t lowbit = pdata->lowbit;
-      size_t highbit = pdata->highbit;
+      int curbit;
+      dim_t lowbit = pdata->lowbit;
+      dim_t highbit = pdata->highbit;
       p1 = pdata->qual + i1;
       p2 = pdata->qmap + i1;
       for( i = i1; i <= i2; i++,p1++,p2++) {

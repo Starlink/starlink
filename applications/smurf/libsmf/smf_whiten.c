@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
+*     smf_whiten( double *re, double *im, double df, dim_t nf, dim_t box,
 *                 int complement, int *status );
 
 *  Arguments:
@@ -25,7 +25,7 @@
 *        Frequency step size in FFT
 *     nf = dim_t (Given)
 *        number of frequencies in the FFT
-*     box = size_t (Given)
+*     box = dim_t (Given)
 *        rolling box size for identifying 1/f region
 *     complement = int (Given)
 *        If set, apply the complement of the whitening filter.
@@ -105,12 +105,12 @@
 
 #define FUNC_NAME "smf_whiten"
 
-void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
+void smf_whiten( double *re, double *im, double df, dim_t nf, dim_t box,
                  int complement, int *status ) {
 
   double A;              /* Amplitude of 1/f component */
   double B;              /* Exponent of 1/f component */
-  size_t i;              /* Loop counter */
+  dim_t i;              /* Loop counter */
   double *pspec=NULL;    /* Power spectrum of the bolometer */
   double white;          /* White noise level */
 

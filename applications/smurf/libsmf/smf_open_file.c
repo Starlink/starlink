@@ -13,7 +13,7 @@
  *     Library routine
 
  *  Invocation:
- *     smf_open_file( ThrWorkForce *wf, const Grp * ingrp, size_t index,
+ *     smf_open_file( ThrWorkForce *wf, const Grp * ingrp, dim_t index,
  *                    const char * mode, int flags, smfData ** data,
  *                    int *status);
 
@@ -22,7 +22,7 @@
  *        Pointer to a pool of worker threads
  *     ingrp = const Grp * (Given)
  *        NDG group identifier
- *     index = size_t (Given)
+ *     index = dim_t (Given)
  *        Index corresponding to required file in group
  *     mode = const char * (Given)
  *        File access mode
@@ -149,7 +149,7 @@
  *     2007-10-29 (EC):
  *        Add flag controlling header read.
  *     2007-10-31 (TIMJ):
- *        Use size_t following changes to sc2store.
+ *        Use dim_t following changes to sc2store.
  *     2007-11-28 (EC):
  *        Add check for TORDERED keyword in FITS header
  *     2007-11-28 (TIMJ):
@@ -182,7 +182,7 @@
  *     2008-07-10 (TIMJ):
  *        Read dark squid information.
  *     2008-07-18 (TIMJ):
- *        Use size_t
+ *        Use dim_t
  *     2008-07-24 (TIMJ):
  *        Calculate obs mode.
  *     2008-07-28 (TIMJ):
@@ -327,7 +327,7 @@ static void smf1_open_file_caller( void *data, int *status );
 
 typedef struct smfOpenFileData {
    const Grp *grp;
-   size_t index;
+   dim_t index;
    const char *mode;
    int flags;
    smfData **data;
@@ -335,7 +335,7 @@ typedef struct smfOpenFileData {
 
 #define FUNC_NAME "smf_open_file"
 
-void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
+void smf_open_file( ThrWorkForce *wf, const Grp * igrp, dim_t index,
                     const char * mode, int flags, smfData ** data,
                     int *status) {
 
@@ -344,9 +344,9 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
   char dtype[NDF__SZTYP+1];  /* String for DATA/VARIANCE type */
   int indf = NDF__NOID;      /* NDF identified for input file */
   int isFFT;                 /* FFT data? */
-  int lbnd[NDF__MXDIM];      /* Lower pixel bounds of NDF */
-  int ubnd[NDF__MXDIM];      /* Upper pixel bounds of NDF */
-  int ndfdims[NDF__MXDIM];   /* Array containing size of each axis of array */
+  dim_t lbnd[NDF__MXDIM];    /* Lower pixel bounds of NDF */
+  dim_t ubnd[NDF__MXDIM];    /* Upper pixel bounds of NDF */
+  dim_t ndfdims[NDF__MXDIM]; /* Array containing size of each axis of array */
   int ndims;                 /* Number of dimensions in data */
   int qexists;               /* Boolean for presence of QUALITY component */
   int vexists;               /* Boolean for presence of VARIANCE component */
@@ -362,8 +362,8 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
   int isTseries = 0;         /* Flag to specify whether the data are
                                 in time series format */
   smf_dtype itype = SMF__NULL; /* Data type for DATA (and VARIANCE) array(s) */
-  size_t i;                  /* Loop counter */
-  int nout;                  /* Number of output pixels */
+  dim_t i;                   /* Loop counter */
+  size_t nout;               /* Number of output pixels */
   int **ptdata;              /* Pointer to raw time series data (DATA cpt) */
   int *rawts;                /* Raw time series via sc2store */
   smfFile *file = NULL;      /* pointer to smfFile struct */
@@ -386,29 +386,30 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
   int *jigvert = NULL;       /* Pointer to jiggle vertices in DREAM pattern */
   double *jigpath = NULL;    /* Pointer to jiggle path */
   smfDream *dream = NULL;    /* Pointer to DREAM parameters */
-  size_t nsampcycle;         /* Number of positions in jiggle path */
-  size_t nvert;              /* Number of vertices in DREAM pattern */
+  dim_t nsampcycle;          /* Number of positions in jiggle path */
+  int nvert;                 /* Number of vertices in DREAM pattern */
   int jigvndf;               /* NDF identifier for jiggle vertices */
   int jigpndf;               /* NDF identifier for SMU path */
   smfData *jigvdata = NULL;  /* Jiggle vertex data */
   smfData *jigpdata = NULL;  /* SMU path data */
 
   /* Pasted from readsc2ndf */
-  size_t colsize;               /* number of pixels in column */
+  dim_t colsize;             /* number of pixels in column */
   char fitsrec[SC2STORE__MAXFITS*SZFITSCARD+1];   /* FITS headers read from sc2store */
-  size_t nfits;              /* number of FITS headers */
-  size_t nframes;            /* number of frames */
-  size_t rowsize;            /* number of pixels in row (returned) */
+  dim_t nfits;               /* number of FITS headers */
+  dim_t nframes;             /* number of frames */
+  dim_t rowsize;             /* number of pixels in row (returned) */
   int createflags = 0;       /* Flags for smf_create_smfData */
 
   int gndf;                  /* General purpose NDF identifier (SCU2RED & DREAM) */
   int place;                 /* NDF placeholder for SCANFIT extension */
-  int npoly;                 /* Number points in polynomial coeff array */
+  size_t npoly;              /* Number points in polynomial coeff array */
   void *tpoly[1] = { NULL }; /* Temp array of void for ndfMap */
   double *poly = NULL;       /* Pointer to array of polynomial coefficients */
   double *opoly;             /* Pointer to store in output struct */
   int npdims;                /* Number of dimensions in the polynomial array */
-  int pdims[NDF__MXDIM];     /* Size of each dimension */
+  dim_t pdims[NDF__MXDIM];   /* Size of each dimension */
+  size_t temp;               /* Temporary buffer for size_t value */
 
   /* make sure return pointer is initialised */
   *data = NULL;
@@ -431,12 +432,12 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
 
   /* Get filename from the group */
   pname = filename;
-  grpGet( igrp, index, 1, &pname, sizeof(filename), status);
+  grpGet( igrp, (int) index, 1, &pname, sizeof(filename), status);
 
   /* Return the NDF identifier */
   if (*status == SAI__OK) {
-    ndgNdfas( igrp, index, mode, &indf, status );
-    grpMsg( "F", igrp, index );
+    ndgNdfas( igrp, (int) index, mode, &indf, status );
+    grpMsg( "F", igrp, (int) index );
     if ( indf == NDF__NOID ) {
       if (*status == SAI__OK) *status = SAI__ERROR;
       errRep("", FUNC_NAME ": Could not locate file ^F", status);
@@ -547,7 +548,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
                     status );
             poly = tpoly[0];
             ndfDim( gndf, NDF__MXDIM, pdims, &npdims, status );
-            (*data)->ncoeff = pdims[2];
+            (*data)->ncoeff = (int) pdims[2];
             /* Allocate memory for poly coeffs & copy over */
             opoly = astMalloc( npoly*sizeof( *opoly ) );
             memcpy( opoly, poly, npoly*sizeof( *opoly ) );
@@ -576,11 +577,11 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
     // READ IN FTS2 DATA IF EXISTS
     if(!(flags & SMF__NOCREATE_FTS)) {
       int CREATEFLAG = 0;
-      int dimsFTS[NDF__MXDIM];
+      dim_t dimsFTS[NDF__MXDIM];
       int hasFTS     = 0;
       int ndfFTS     = 0;
       int ndimsFTS   = 0;
-      int nmapFTS    = 0;
+      size_t nmapFTS = 0;
       int placeFTS   = 0;
       HDSLoc* hdsFTS = NULL;
       void* pntr     = NULL;
@@ -609,7 +610,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
               if(*status == SAI__OK) {
                 fts->zpd = smf_create_smfData(CREATEFLAG, status);
                 if(*status == SAI__OK) {
-                  size_t count;
+                  dim_t count;
                   fts->zpd->dtype   = SMF__INTEGER;
                   fts->zpd->ndims   = ndimsFTS;
                   fts->zpd->dims[0] = dimsFTS[0];
@@ -641,7 +642,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
               if(*status == SAI__OK) {
                 fts->fpm = smf_create_smfData(CREATEFLAG, status);
                 if(*status == SAI__OK) {
-                  size_t count;
+                  dim_t count;
                   fts->fpm->dtype   = SMF__DOUBLE;
                   fts->fpm->ndims   = ndimsFTS;
                   fts->fpm->dims[0] = dimsFTS[0];
@@ -675,7 +676,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
               if(*status == SAI__OK) {
                 fts->sigma = smf_create_smfData(CREATEFLAG, status);
                 if(*status == SAI__OK) {
-                  size_t count;
+                  dim_t count;
                   fts->sigma->dtype   = SMF__DOUBLE;
                   fts->sigma->ndims   = ndimsFTS;
                   fts->sigma->dims[0] = dimsFTS[0];
@@ -707,7 +708,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
                   if(*status == SAI__OK) {
                       fts->dead = smf_create_smfData(CREATEFLAG, status);
                       if(*status == SAI__OK) {
-                          size_t count;
+                          dim_t count;
                           fts->dead->dtype   = SMF__INTEGER;
                           fts->dead->ndims   = ndimsFTS;
                           fts->dead->dims[0] = dimsFTS[0];
@@ -739,7 +740,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
                     if(*status == SAI__OK) {
                         fts->a = smf_create_smfData(CREATEFLAG, status);
                         if(*status == SAI__OK) {
-                            size_t count;
+                            dim_t count;
                             fts->a->dtype   = SMF__DOUBLE;
                             fts->a->ndims   = ndimsFTS;
                             fts->a->dims[0] = dimsFTS[0];
@@ -771,7 +772,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
                     if(*status == SAI__OK) {
                          fts->b = smf_create_smfData(CREATEFLAG, status);
                         if(*status == SAI__OK) {
-                            size_t count;
+                            dim_t count;
                             fts->b->dtype   = SMF__DOUBLE;
                             fts->b->ndims   = ndimsFTS;
                             fts->b->dims[0] = dimsFTS[0];
@@ -803,7 +804,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
                     if(*status == SAI__OK) {
                         fts->c = smf_create_smfData(CREATEFLAG, status);
                         if(*status == SAI__OK) {
-                            size_t count;
+                            dim_t count;
                             fts->c->dtype   = SMF__DOUBLE;
                             fts->c->ndims   = ndimsFTS;
                             fts->c->dims[0] = dimsFTS[0];
@@ -835,7 +836,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
                     if(*status == SAI__OK) {
                         fts->d = smf_create_smfData(CREATEFLAG, status);
                         if(*status == SAI__OK) {
-                            size_t count;
+                            dim_t count;
                             fts->d->dtype   = SMF__DOUBLE;
                             fts->d->ndims   = ndimsFTS;
                             fts->d->dims[0] = dimsFTS[0];
@@ -867,7 +868,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
                     if(*status == SAI__OK) {
                         fts->phaseFit = smf_create_smfData(CREATEFLAG, status);
                         if(*status == SAI__OK) {
-                            size_t count;
+                            dim_t count;
                             fts->phaseFit->dtype   = SMF__DOUBLE;
                             fts->phaseFit->ndims   = ndimsFTS;
                             fts->phaseFit->dims[0] = dimsFTS[0];
@@ -899,7 +900,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
                     if(*status == SAI__OK) {
                         fts->cosmicRays = smf_create_smfData(CREATEFLAG, status);
                         if(*status == SAI__OK) {
-                            size_t count;
+                            dim_t count;
                             fts->cosmicRays->dtype   = SMF__INTEGER;
                             fts->cosmicRays->ndims   = ndimsFTS;
                             fts->cosmicRays->dims[0] = dimsFTS[0];
@@ -931,7 +932,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
                     if(*status == SAI__OK) {
                         fts->fluxJumps = smf_create_smfData(CREATEFLAG, status);
                         if(*status == SAI__OK) {
-                            size_t count;
+                            dim_t count;
                             fts->fluxJumps->dtype   = SMF__INTEGER;
                             fts->fluxJumps->ndims   = ndimsFTS;
                             fts->fluxJumps->dims[0] = dimsFTS[0];
@@ -969,7 +970,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
 
         if ( !(flags & SMF__NOCREATE_QUALITY) &&
              ( qexists || canwrite ) ) {
-          size_t nqout;
+          dim_t nqout;
           char qmode[NDF__SZMMD+1];
 
           /* Now map the data with the appropriate mode */
@@ -1001,14 +1002,14 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
       /* Map the DA information (just dksquid at present) */
       if ( !(flags & SMF__NOCREATE_DA) && (*data)->da ) {
         HDSLoc *dkloc=NULL;
-        int dkdims[NDF__MXDIM];
+        dim_t dkdims[NDF__MXDIM];
         smfFile *dkfile=NULL;
         int dkndims;
         int dkndf;
         int dkplace;
         int dqexists;
         char qmode[NDF__SZMMD+1];
-        int nmap;
+        size_t nmap;
         void *dpntr[] = {NULL,NULL};
         smf_qual_t * qpntr = NULL;
 
@@ -1047,7 +1048,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
                       status);
           }
           if (strlen(qmode)) {
-            size_t nqmap;
+            dim_t nqmap;
             qpntr = smf_qual_map( wf, dkndf, qmode, NULL, &nqmap, status );
           }
 
@@ -1154,7 +1155,8 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
                  is more annoying than it should be because we have to open up
                  one of the state entries, close it and then reopen it again. */
               datFind( xloc, "RTS_END", &tloc, status );
-              datSize( tloc, &nframes, status );
+              datSize( tloc, &temp, status );
+              nframes = (dim_t) temp;
               datAnnul( &tloc, status );
 
             }
@@ -1257,7 +1259,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
       char units[SC2STORE_UNITLEN];
       char dlabel[SC2STORE_LABLEN];
       char flatname[SC2STORE_FLATLEN];
-      size_t nflat = 0;
+      dim_t nflat = 0;
       double refres = VAL__BADD;
 
       /* Get the time series WCS if header exists */
@@ -1464,22 +1466,22 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
         /* Verify that ndfdims matches row, col, nframes */
         /* Should probably inform user of the filename too */
         if (ndfdims[SC2STORE__ROW_INDEX] != (int)colsize) {
-          msgSeti( "NR", colsize);
-          msgSeti( "DIMS", ndfdims[0]);
+          msgSetk( "NR", colsize);
+          msgSetk( "DIMS", ndfdims[0]);
           *status = SAI__ERROR;
           errRep( "", FUNC_NAME ": Number of input rows not equal to the "
                   "number of output rows (^NR != ^DIMS)",status);
         }
         if (ndfdims[SC2STORE__COL_INDEX] != (int)rowsize) {
-          msgSeti( "NC", rowsize);
-          msgSeti( "DIMS", ndfdims[1]);
+          msgSetk( "NC", rowsize);
+          msgSetk( "DIMS", ndfdims[1]);
           *status = SAI__ERROR;
           errRep( "", FUNC_NAME ":Number of input columns not equal to the "
                   "number of output columns (^NC != ^DIMS)",status);
         }
         if (ndfdims[2] != (int)nframes) {
-          msgSeti( "NF", nframes);
-          msgSeti( "DIMS", ndfdims[2]);
+          msgSetk( "NF", nframes);
+          msgSetk( "DIMS", ndfdims[2]);
           *status = SAI__ERROR;
           errRep( "", FUNC_NAME ": Number of input timeslices not equal to "
                   "the number of output timeslices (^NF != ^DIMS)",status);
@@ -1526,7 +1528,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
       }
       /* Store the dimensions, bounds and the size of each axis */
       (*data)->ndims = ndims;
-      for (i=0; i< (size_t)ndims; i++) {
+      for (i=0; i< (dim_t)ndims; i++) {
         ((*data)->dims)[i] = (dim_t)ndfdims[i];
         ((*data)->lbnd)[i] = lbnd[i];
       }
@@ -1688,7 +1690,7 @@ static char * smf__read_ocsconfig ( int ndfid, int *status) {
       HDSLoc * configloc = NULL;
       size_t size;
       size_t clen;
-      hdsdim dims[1];
+      dim_t dims[1];
       ndfXloc( ndfid, "JCMTOCS", "READ", &jcmtocs, status );
       datFind( jcmtocs, "CONFIG", &configloc, status );
       datAnnul( &jcmtocs, status );
@@ -1702,7 +1704,7 @@ static char * smf__read_ocsconfig ( int ndfid, int *status) {
       dims[0] = size;
       datGetC( configloc, 1, dims, ocscfg, clen, status );
       /* _CHAR buffer will not be terminated */
-      cnfImprt( ocscfg, (size * clen) + 1, ocscfg );
+      cnfImprt( ocscfg, (int)( (size * clen) + 1 ), ocscfg );
       datAnnul( &configloc, status );
     }
   }
@@ -1711,7 +1713,7 @@ static char * smf__read_ocsconfig ( int ndfid, int *status) {
 
 
 void smf_open_file_job( ThrWorkForce *wf, int wait, const Grp *grp,
-                        size_t index, const char *mode, int flags,
+                        dim_t index, const char *mode, int flags,
                         smfData **data, int *status ) {
 /*
  *+
@@ -1729,7 +1731,7 @@ void smf_open_file_job( ThrWorkForce *wf, int wait, const Grp *grp,
 
  *  Invocation:
  *     smf_open_file_job( ThrWorkForce *wf, int wait, const Grp *grp,
- *                        size_t index, const char *mode, int flags,
+ *                        dim_t index, const char *mode, int flags,
  *                        smfData **data, int *status )
 
  *  Arguments:
@@ -1743,7 +1745,7 @@ void smf_open_file_job( ThrWorkForce *wf, int wait, const Grp *grp,
  *        when the job eventually completes.
  *     grp = const Grp * (Given)
  *        NDG group identifier
- *     index = size_t (Given)
+ *     index = dim_t (Given)
  *        Index corresponding to required file in group
  *     mode = const char * (Given)
  *        File access mode

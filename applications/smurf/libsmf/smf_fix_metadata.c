@@ -209,7 +209,7 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
 
           /* Skip any initial padding that will have a constant value for
              rts_num. */
-          size_t islice = 1;
+          dim_t islice = 1;
           while( islice < hdr->nframes-11 && tmpState[islice-1].rts_num >= tmpState[islice].rts_num ) {
              islice++;
           }

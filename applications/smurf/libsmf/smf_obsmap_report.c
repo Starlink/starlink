@@ -111,12 +111,12 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
 
   int beamflag = 0;   /* True if we have an inbeam mismatch */
   int beamref = -1;    /* a reference inbeam value */
-  size_t i;
+  int i;
   AstKeyMap * instmap = NULL; /* instrument information */
-  size_t ninst;       /* number of instruments */
-  size_t nobs;        /* number of distinct observations */
-  size_t nobj;        /* number of distinct objects */
-  size_t nsim = 0;    /* number of simulated observations */
+  dim_t ninst;       /* number of instruments */
+  dim_t nobs;        /* number of distinct observations */
+  dim_t nobj;        /* number of distinct objects */
+  dim_t nsim = 0;    /* number of simulated observations */
   AstKeyMap * obsinfo = NULL; /* observation information */
   smfSortInfo * obslist = NULL; /* Sorted struct array */
   const char * str = NULL; /* temp string pointer */
@@ -179,9 +179,8 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
     /* Now do the actual summarizing */
     msgOutif(msglev, " ", "Processing data ^INST ^OBJ from the following observation^S :", status);
     for (i = 0; i < nobs; i++) {
-      AstObject * ao = NULL;
-      int mapindex;
-      mapindex = obslist[i].index;
+      AstObject *ao = NULL;
+      int mapindex = (int) obslist[i].index;
 
       if (astMapGet0A( obsmap, astMapKey(obsmap, mapindex ), &ao )) {
         const char * ctemp;

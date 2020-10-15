@@ -219,7 +219,7 @@
 *     24-FEB-2017 (DSB):
 *        If bit 0 of the supplied flags is set (i.e. do not flag bad
 *        bolo-blocks), then ensure bad bolo blocks are not flagged (i.e.
-*        make sure the behaviour is the same as if the NOFLAG config 
+*        make sure the behaviour is the same as if the NOFLAG config
 *        parameter is set).
 *     {enter_further_changes_here}
 
@@ -268,14 +268,14 @@
 typedef struct smfFindGainsJobData {
    dim_t b1;
    dim_t b2;
-   size_t bstride;
+   dim_t bstride;
    int *converged;
    double *dat;
    dim_t fit_box;
    double *gai;
    dim_t gain_box;
-   size_t gbstride;
-   size_t gcstride;
+   dim_t gbstride;
+   dim_t gcstride;
    smf_qual_t goodqual;
    dim_t nblock;
    dim_t nbolo;
@@ -284,7 +284,7 @@ typedef struct smfFindGainsJobData {
    dim_t ntslice;
    smf_qual_t *qua;
    double *template;
-   size_t tstride;
+   dim_t tstride;
    const unsigned char *mask;
    const int *lut_data;
 } smfFindGainsJobData;
@@ -303,19 +303,33 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
 /* Local Variables: */
    const int *lut_data = NULL;
    dim_t block_size;
+   dim_t bstride;
+   dim_t cgood;
    dim_t corr_offset;
    dim_t fit_box;
    dim_t gain_box;
+   dim_t gbstride;
+   dim_t gcstride;
+   dim_t ggood;
    dim_t glim;
+   dim_t ib;
+   dim_t ib_hi;
+   dim_t ib_lo;
+   dim_t ibase;
    dim_t iblock;
    dim_t ibolo;
+   dim_t igbase;
    dim_t itime;
    dim_t jblock;
    dim_t nblock;
+   dim_t nboff;
    dim_t nbolo;
    dim_t ntime;
    dim_t ntslice;
    dim_t off_offset;
+   dim_t reason[ NREASON ];
+   dim_t step;
+   dim_t tstride;
    double *corr;
    double *dat;
    double *gai;
@@ -350,32 +364,18 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
    int badbol;
    int conv;
    int gain_positive;
-   int ib;
-   int ib_hi;
-   int ib_lo;
    int ireason;
    int iworker;
    int nbad;
-   int nboff;
    int nconverged;
    int noflag;
    int nogains;
    int nooffs;
    int nworker;
-   int prevblock;
-   int reason[ NREASON ];
-   int step;
+   dim_t prevblock;
    int totgood;
-   size_t bstride;
-   size_t cgood;
-   size_t gbstride;
-   size_t gcstride;
-   size_t ggood;
-   size_t ibase;
-   size_t igbase;
-   size_t tstride;
-   smfFindGainsJobData *job_data;
    smfFindGainsJobData *pdata;
+   smfFindGainsJobData *job_data;
    smf_qual_t *qua;
 
    const char *reason_text[ NREASON ] = {
@@ -459,8 +459,8 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
    smf_get_nsamp( keymap, "FIT_BOX", data, &fit_box, status );
    if( fit_box < gain_box && *status == SAI__OK ) {
       *status = SAI__ERROR;
-     msgSeti( "F", (int) fit_box );
-     msgSeti( "G", (int) gain_box );
+     msgSetk( "F", fit_box );
+     msgSetk( "G", gain_box );
      errRep( "", "FIT_BOX (^F samples) must not be smaller than GAIN_BOX "
              "(^G samples)", status );
    }
@@ -509,7 +509,7 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
             if( ib_lo < 0 ) ib_lo = 0;
 
             ib_hi = iblock + nboff;
-            if( ib_hi >= (int) nblock ) ib_hi = nblock - 1;
+            if( ib_hi >= nblock ) ib_hi = nblock - 1;
 
             conv = 1;
             for( ib = ib_lo; ib <= ib_hi; ib++ ) {
@@ -862,7 +862,7 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
                 if( ib_lo < 0 ) ib_lo = 0;
 
                 ib_hi = iblock + nboff;
-                if( ib_hi >= (int) nblock ) ib_hi = nblock - 1;
+                if( ib_hi >= nblock ) ib_hi = nblock - 1;
 
                 conv = 1;
                 for( ib = ib_lo; ib <= ib_hi; ib++ ) {
@@ -874,7 +874,7 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
 /* Display it. */
              if( !( flags & 2 ) ) {
                 msgSeti( "N", nconverged );
-                msgSeti( "M", nblock );
+                msgSetk( "M", nblock );
                 msgOutif( MSG__VERB, "",
                           "    ^N out of ^M time-slice blocks have now converged", status );
              }
@@ -886,7 +886,7 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
 
           for( ireason = 0; ireason < NREASON; ireason++ ) {
              if( reason[ ireason ] > 0 ) {
-                msgSeti( "N", reason[ ireason ] );
+                msgSetk( "N", reason[ ireason ] );
                 msgSetc( "T", reason_text[ ireason ] );
                 msgOutif( MSG__DEBUG, "",
                           "       (^N were flagged because ^T)", status );
@@ -894,7 +894,7 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
           }
 
           msgSeti( "NG", totgood );
-          msgSeti( "T", nblock*nbolo );
+          msgSetk( "T", nblock*nbolo );
           msgOutif( MSG__VERB, "",
                     "    Out of ^T, ^NG bolo time-slice blocks are still good",
                     status );
@@ -978,7 +978,7 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
 /* If one or more blocks at the end of the time stream were rejected,
    replace their gains and offsets with the gains and offsets of the
    previous good block. */
-           if( prevblock < (int) nblock - 1 ) {
+           if( prevblock < nblock - 1 ) {
               pg = gai + ibolo*gbstride + (prevblock + 1)*gcstride;
               for( jblock = prevblock + 1; jblock < nblock; jblock++ ) {
                  pg[ 0 ] = prevgain;
@@ -1035,37 +1035,37 @@ static void smf1_find_gains_job( void *job_data, int *status ) {
    dim_t block_cstride;
    dim_t block_size;
    dim_t block_tstride;
+   dim_t box_end;
+   dim_t box_start;
+   dim_t bstride;
+   dim_t corr_offset;
+   dim_t delta_box;
    dim_t fit_box;
+   dim_t fit_end;
+   dim_t fit_off;
+   dim_t fit_size;
+   dim_t fit_start;
    dim_t gain_box;
+   dim_t gbstride;
+   dim_t gcstride;
+   dim_t ibase;
+   dim_t ibase_box;
    dim_t iblock;
    dim_t ibolo;
+   dim_t igbase;
    dim_t nblock;
    dim_t nbolo;
    dim_t ntime;
    dim_t ntslice;
+   dim_t tstride;
    double *dat;
    double *gai;
    double *m;
    double *m_box;
    double *template;
    int *converged;
-   int delta_box;
-   dim_t corr_offset;
-   int fit_end;
-   int fit_off;
-   int fit_size;
-   int fit_start;
    int nogains;
    int nooffs;
-   size_t box_end;
-   size_t box_start;
-   size_t bstride;
-   size_t gbstride;
-   size_t gcstride;
-   size_t ibase;
-   size_t ibase_box;
-   size_t igbase;
-   size_t tstride;
    smfFindGainsJobData *pdata;
    smf_qual_t *qua;
    smf_qual_t goodqual;
@@ -1167,7 +1167,7 @@ static void smf1_find_gains_job( void *job_data, int *status ) {
                   fit_end = box_end + delta_box;
 
                   if( fit_start < 0 ) fit_start = 0;
-                  if( fit_end >= (int) ntslice ) fit_end = ntslice - 1;
+                  if( fit_end >= ntslice ) fit_end = ntslice - 1;
 
                   fit_off = box_start - fit_start;
                   fit_size = fit_end - fit_start + 1;

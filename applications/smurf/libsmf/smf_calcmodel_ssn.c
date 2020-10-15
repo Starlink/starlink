@@ -151,10 +151,10 @@ typedef struct smfCalcModelSSNData {
    int *lut_data;
    int kernel_length;
    int oper;
-   size_t bstride;
-   size_t tstride;
-   size_t vbstride;
-   size_t vtstride;
+   dim_t bstride;
+   dim_t tstride;
+   dim_t vbstride;
+   dim_t vtstride;
    smfHead *hdr;
    smf_qual_t *qua_data;
    unsigned char *mask;
@@ -173,26 +173,29 @@ void smf_calcmodel_ssn( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    SmfCalcModelSSNData *pdata;
    SmfCalcModelSSNData *job_data = NULL;
    dim_t bstep;
+   dim_t bstride;
    dim_t idx;
+   dim_t ipix;
    dim_t itime;
+   dim_t itime_last;
    dim_t nbolo;
    dim_t ndata;
+   dim_t nsection;
    dim_t ntslice;
    dim_t nzero;
    dim_t seclen;
    dim_t tstep;
+   dim_t tstride;
+   dim_t vbstride;
    dim_t vntslice;
+   dim_t vtstride;
    double *kernel;
    double *model_data;
    double *noi_data;
-   double daz_ave;
-   double daz_last;
-   int ispos;
-   dim_t itime_last;
-   double psum;
-   int np;
    double *res_data;
    double binsize;
+   double daz_ave;
+   double daz_last;
    double dazhi;
    double dazlo;
    double delhi;
@@ -200,19 +203,16 @@ void smf_calcmodel_ssn( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    double ksigma;
    double ksum;
    double period;
+   double psum;
    double thresh;
    int *lut_data=NULL;
    int ibin;
+   int ispos;
    int iw;
    int kernel_length;
    int notfirst;
-   int nsection;
+   int np;
    int nw;
-   size_t bstride;
-   size_t ipix;
-   size_t tstride;
-   size_t vbstride;
-   size_t vtstride;
    smfArray *lut=NULL;
    smfArray *model;
    smfArray *noi;
@@ -398,6 +398,7 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
          }
       } else {
          kernel = NULL;
+         kernel_length = 0;
       }
 
 /* Find the extreme limits of azimith and elevation offset, in radians.
@@ -450,7 +451,7 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
          seclen = ntslice/nsection;
          msgOutiff( MSG__DEBUG, "", "    Splitting time stream into %d "
                     "sections each of length %zu time slices.", status,
-                     nsection, seclen );
+                     (int) nsection, seclen );
       } else {
          nsection = 1;
          seclen = ntslice;
@@ -560,6 +561,7 @@ static void smf1_calcmodel_ssn( void *job_data_ptr, int *status ) {
    dim_t b1;
    dim_t b2;
    dim_t ibolo;
+   dim_t isection;
    dim_t itime;
    dim_t itime_hi;
    dim_t itime_lo;
@@ -619,22 +621,21 @@ static void smf1_calcmodel_ssn( void *job_data_ptr, int *status ) {
    int ibin_lo;
    int ihi;
    int ilo;
-   int isection;
    int jbin;
    int kernel_length;
    int msum;
    int nbin;
    int nbin_az;
    int nbin_el;
+   dim_t bstride;
+   dim_t ibase0;
+   dim_t ibase;
+   dim_t ivbase;
+   dim_t nsection;
+   dim_t tstride;
+   dim_t vbstride;
+   dim_t vtstride;
    int ngood;
-   int nsection;
-   size_t bstride;
-   size_t ibase0;
-   size_t ibase;
-   size_t ivbase;
-   size_t tstride;
-   size_t vbstride;
-   size_t vtstride;
    smfHead *hdr;
    smf_qual_t *pq;
    unsigned char *mask;
@@ -1245,14 +1246,14 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
    between sections. */
                      if( wgt_az[ ilo ] != VAL__BADD ) {
                         vlo = prof_azlo[ ilo ] + wgt_az[ ilo ]*
-                                          ( (int) itime - (int) itime_lo );
+                                          ( itime - itime_lo );
                      } else {
                         vlo = VAL__BADD;
                      }
 
                      if( wgt_az[ ihi ] != VAL__BADD ) {
                         vhi = prof_azlo[ ihi ] + wgt_az[ ihi ]*
-                                          ( (int) itime - (int) itime_lo );
+                                          ( itime - itime_lo );
                      } else {
                         vhi = VAL__BADD;
                      }

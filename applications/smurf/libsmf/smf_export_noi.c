@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     void smf_export_noi( smfData *noi, const char *name, int boxsize,
+*     void smf_export_noi( smfData *noi, const char *name, dim_t boxsize,
 *                          int *status )
 
 *  Arguments:
@@ -21,7 +21,7 @@
 *        The NOI model.
 *     name = const char * (Given)
 *        The name of the NDF to create.
-*     boxsize = int (Given)
+*     boxsize = dim_t (Given)
 *        The number of adjacent times slices that have the same noise value.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -78,29 +78,29 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-void smf_export_noi( smfData *noi, const char *name, int boxsize, int *status ){
+void smf_export_noi( smfData *noi, const char *name, dim_t boxsize, int *status ){
 
 /* Local Variables */
    HDSLoc *xloc = NULL;
-   dim_t ntslice;
-   dim_t nrows;
-   dim_t ncols;
+   dim_t bstride;
+   dim_t ibolo;
+   dim_t iz;
+   dim_t lbnd[ 3 ];
    dim_t nbolo;
-   double *ip;
+   dim_t ncols;
+   dim_t nrows;
+   dim_t ntslice;
+   dim_t nz;
+   dim_t tstride;
+   dim_t ubnd[ 3 ];
+   dim_t itime;
    double *dataptr;
    double *dp;
+   double *ip;
    double *pd;
-   int el;
-   int ibolo;
    int indf;
-   int itime;
-   int lbnd[ 3 ];
-   int nz;
    int place;
-   int ubnd[ 3 ];
-   size_t bstride;
-   size_t tstride;
-   int iz;
+   size_t el;
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return;
@@ -129,7 +129,7 @@ void smf_export_noi( smfData *noi, const char *name, int boxsize, int *status ){
    if( nz <= 0 && *status == SAI__OK ){
       *status = SAI__ERROR;
       errRepf("", "smf_export_noi: boxsize (%d) and ntslice (%d) are "
-              "inconsistent (programming error).", status, boxsize,
+              "inconsistent (programming error).", status, (int) boxsize,
               (int) ntslice );
    }
 
@@ -159,7 +159,7 @@ void smf_export_noi( smfData *noi, const char *name, int boxsize, int *status ){
       pd = ip;
 
 /* Loop round each bolometer. */
-      for( ibolo = 0; ibolo < (int) nbolo; ibolo++ ) {
+      for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
 
 /* Get a pointer to the noise value for the current bolometer at the
    centre of the first box. */
@@ -180,7 +180,7 @@ void smf_export_noi( smfData *noi, const char *name, int boxsize, int *status ){
 
 /* Store the box size as an extension item in the NDF. */
       ndfXnew( indf, SMURF__EXTNAME, SMURF__EXTTYPE, 0, NULL, &xloc, status );
-      ndfXpt0i( boxsize, indf, SMURF__EXTNAME, "NOI_BOXSIZE", status );
+      ndfXpt0k( boxsize, indf, SMURF__EXTNAME, "NOI_BOXSIZE", status );
       datAnnul( &xloc, status );
    }
 

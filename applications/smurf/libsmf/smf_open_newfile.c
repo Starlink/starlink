@@ -13,8 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     smf_open_newfile( ThrWorkForce *wf, const Grp * ingrp, int index, smf_dtype dtype,
-*                       int ndims, const int lbnd[], const inst ubnd[],
+*     smf_open_newfile( ThrWorkForce *wf, const Grp * ingrp, dim_t index, smf_dtype dtype,
+*                       int ndims, const dim_t lbnd[], const dim_t ubnd[],
 *                       int flags, smfData ** data,
 *                       int *status);
 
@@ -23,15 +23,15 @@
 *        Pointer to a pool of worker threads
 *     ingrp = const Grp * (Given)
 *        NDG group identifier
-*     index = int (Given)
+*     index = dim_t (Given)
 *        Index corresponding to required file in group
 *     dtype = smf_dtype (Given)
 *        Data type of this smfData. Unsupported types result in an error.
 *     ndims = int (Given)
 *        Number of dimensions in dims[]. Maximum of NDF__MXDIM.
-*     lbnd[] = const int (Given)
+*     lbnd[] = const dim_t (Given)
 *        Lower pixel bounds of output file.
-*     ubnd[] = const int (Given)
+*     ubnd[] = const dim_t (Given)
 *        Upper pixel bounds of output file.
 *     flags = int (Given)
 *        Flags to denote whether to create variance or quality arrays. Default
@@ -147,8 +147,8 @@
 
 #define FUNC_NAME "smf_open_newfile"
 
-void smf_open_newfile( ThrWorkForce *wf, const Grp * igrp, int index, smf_dtype dtype, const int ndims,
-		       const int *lbnd, const int *ubnd, int flags, smfData ** data,
+void smf_open_newfile( ThrWorkForce *wf, const Grp * igrp, dim_t index, smf_dtype dtype, const int ndims,
+		       const dim_t *lbnd, const dim_t *ubnd, int flags, smfData ** data,
 		       int *status) {
 
   /* Local variables */
@@ -156,9 +156,8 @@ void smf_open_newfile( ThrWorkForce *wf, const Grp * igrp, int index, smf_dtype 
   smfFile *file = NULL;         /* Pointer to smfFile struct */
   char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
   int i;                        /* Loop counter */
-  int isNDF = 1;                /* Flag to denote whether data are 1 or 2-D */
   int isTstream = 0;            /* Flag to denote time series (3-D) data */
-  int nel;                      /* Number of mapped elements */
+  size_t nel;                   /* Number of mapped elements */
   int newndf;                   /* NDF identified for new file */
   char *pname = NULL;           /* Pointer to filename */
   void *pntr[] = { NULL, NULL }; /* Array of pointers for smfData */
@@ -183,18 +182,11 @@ void smf_open_newfile( ThrWorkForce *wf, const Grp * igrp, int index, smf_dtype 
 
   /* Check requested dimensionality: currently only up to 3 dimensions */
   if (ndims == 2 || ndims == 1) {
-    isNDF = 1;
     isTstream = 0; /* Data are not in time series format */
   } else if (ndims == 3) { /* Time series data */
     /* Check if we want to write raw timeseries */
-    if ( dtype == SMF__USHORT ) {
-      isNDF = 0;   /* Data have not been flatfielded */
-    } else {
-      isNDF = 1;   /* Data have been flatfielded */
-    }
     isTstream = 1; /* Data are in `time series' format */
   } else if (ndims == 4) {/* FFT of a data cube */
-    isNDF = 0;
     isTstream = 0;
   } else {
     /* Report an error due to an unsupported number of dimensions */
@@ -219,7 +211,7 @@ void smf_open_newfile( ThrWorkForce *wf, const Grp * igrp, int index, smf_dtype 
   }
 
   /* Create new simple NDF */
-  ndgNdfcr( igrp, index, datatype, ndims, lbnd, ubnd, &newndf, status );
+  ndgNdfcr8( igrp, (int) index, datatype, ndims, lbnd, ubnd, &newndf, status );
   if ( *status != SAI__OK ) {
     errRep(FUNC_NAME, "Unable to create new file", status);
     goto CLEANUP;
@@ -239,7 +231,7 @@ void smf_open_newfile( ThrWorkForce *wf, const Grp * igrp, int index, smf_dtype 
   }
   if ( flags & SMF__MAP_QUAL ) {
     /* this is a clean slate so no need to worry about quality family */
-    size_t nqout;
+    dim_t nqout;
     qual = smf_qual_map( wf, newndf, "WRITE/ZERO", NULL, &nqout, status );
 
     if ( *status != SAI__OK ) {
@@ -253,7 +245,7 @@ void smf_open_newfile( ThrWorkForce *wf, const Grp * igrp, int index, smf_dtype 
 
   /* Get filename from the group */
   pname = filename;
-  grpGet( igrp, index, 1, &pname, SMF_PATH_MAX, status);
+  grpGet( igrp, (int) index, 1, &pname, SMF_PATH_MAX, status);
   if ( *status != SAI__OK ) {
     errRep(FUNC_NAME, "Unable to retrieve file name", status);
     goto CLEANUP;

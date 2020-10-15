@@ -251,7 +251,7 @@
  *     2007-10-29 (EC):
  *        Modified interface to smf_open_file.
  *     2007-10-31 (TIMJ):
- *        use size_t for some variables following sc2store mods
+ *        use dim_t for some variables following sc2store mods
  *     2007-12-18 (AGG):
  *        Update to use new smf_free behaviour
  *     2008-01-30 (AGG):
@@ -379,7 +379,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                        int *status ) {
 
   double accel[2];                /* telescope accelerations (arcsec) */
-  double aeff[3];                  /* output of wvmOpt */
+  double aeff[3];                 /* output of wvmOpt */
   double *airmass=NULL;           /* mean airmass of observation */
   double amprms[21];              /* AMPRMS parameters for SLALIB routines */
   smfData *astdata=NULL;          /* pointer to SCUBA2 data struct */
@@ -406,7 +406,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double bor_x_nas=0;             /* boresight x-nasmyth tanplane offset */
   int chunks;                     /* number of chunks of size maxwrite
                                      needed to complete the simulation */
-  size_t colsize;                 /* column size for flatfield */
+  dim_t colsize;                  /* column size for flatfield */
   double corner;                  /* corner frequency in Hz */
   int count;                      /* number of samples in full pattern */
   int curchunk;                   /* current chunk of simulation */
@@ -442,7 +442,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   char flatname[8][SC2STORE_FLATLEN];/* flatfield algorithm names for
                                         all subarrays */
   double *flatpar[8];             /* flatfield parameters for all subarrays */
-  size_t focidx;                  /* Focus position counter */
+  dim_t focidx;                   /* Focus position counter */
   double focposn;                 /* SMU focus position */
   int frame;                      /* frame counter */
   int frameoffset;                /* Frame offset into time stream for current file */
@@ -457,9 +457,9 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int ihmsf[4];                   /* H, M, S and fractional seconds */
   double instap[2];               /* Focal plane instrument offsets */
   int j;                          /* loop counter */
-  double jigpat[SC2SIM__MXSIM][2]; /* pointing: nas jiggle offsets from cen.
+  double jigpat[SC2SIM__MXSIM][2];/* pointing: nas jiggle offsets from cen.
                                       in ARCSEC */
-  size_t jigsamples=1;            /* number of samples in jiggle pattern */
+  dim_t jigsamples=1;             /* number of samples in jiggle pattern */
   double *jig_y_hor=NULL;         /* jiggle y-horizontal tanplane offset (radians) */
   double *jig_x_hor=NULL;         /* jiggle x-horizontal tanplane offset (radians) */
   int k;                          /* loop counter */
@@ -470,7 +470,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   char lststart[SZFITSTR] = "\0"; /* LST at start of sub-scan */
   double meanatm;                 /* Atmos. emission at start airmass */
   double *mjuldate=NULL;          /* Modified Julian date each sample - UT1 */
-  size_t nflat[8];                /* number of flat coeffs per bol */
+  dim_t nflat[8];                 /* number of flat coeffs per bol */
   int nimage = 0;                 /* Number of subimages within subscan */
   static double noisecoeffs[SC2SIM__MXBOL*3*60]; /* noise coefficients */
   int noutfiles = 1;              /* Total number of output files per subarray */
@@ -489,34 +489,32 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double raapp;                   /* Apparent RA */
   double raapp1;                  /* Recalculated apparent RA */
   double refres[8];               /* Reference resistance used for flatfield */
-  size_t rowsize;                 /* row size for flatfield */
+  dim_t rowsize;                  /* row size for flatfield */
   char scancrd[SZFITSTR];         /* SCAN coordinate frame */
   double sigma;                   /* instrumental white noise */
   char sign[2];                   /* Sign of angle (+/-) */
   Grp *skygrp = NULL;             /* Group of input files */
   AstMapping *sky2map=NULL;       /* Mapping celestial->map coordinates */
-  double sky_az=0;                /* effective az on sky (bor+jig) */
   double sky_el=0;                /* effective el on sky (bor+jig) */
   double sky_x_hor=0;             /* effective x hor. off. on sky (bor+jig) */
   double sky_y_hor=0;             /* effective y hor. off. on sky (bor+jig) */
   double skytrans;                /* sky transmission */
   JCMTState state;                /* Telescope state at one time slice */
   double start_time=0.0;          /* UTC time of start of current scan */
-  size_t steps_per_map = 0;       /* Number of steps in single pass of scan map */
+  dim_t steps_per_map = 0;        /* Number of steps in single pass of scan map */
   int subnum;                     /* Subarray number */
   int subscanno = 0;              /* Sub-scan number (last number in output filanem)*/
   double taiutc;                  /* Difference between TAI and UTC time (TAI-UTC s) */
   double tauCSO=0;                /* CSO zenith optical depth */
-  double tbri[3];                  /* simulated wvm measurements */
-  double teff[3];                  /* output of wvmOpt */
+  double tbri[3];                 /* simulated wvm measurements */
+  double teff[3];                 /* output of wvmOpt */
   double temp1;                   /* store temporary values */
   double temp2;                   /* store temporary values */
   double temp3;                   /* store temporary values */
   double timesincestart = 0.0;    /* Time since start of simulation */
   double totaltime;               /* Total integration time */
-  double tt;                      /* Terrestrial Time (TT) for
-                                     calculating planet position */
-  double ttau[3];                  /* output of wvmOpt */
+  double tt;                      /* Terrestrial Time (TT) for calculating planet position */
+  double ttau[3];                 /* output of wvmOpt */
   double twater;                  /* water line temp. for WVM simulation */
   char utdate[SZFITSTR] = "\0";   /* UT date in YYYYMMDD form */
   double vmax[2];                 /* telescope maximum velocities (arcsec) */
@@ -1224,7 +1222,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
             astTran2( fs, 1, &sky_x_hor, &sky_y_hor, 1, &temp1, &temp2 );
 
-            sky_az = fmod(temp1+2.*AST__DPI,2.*AST__DPI);
             sky_el = fmod(temp2+2.*AST__DPI,2.*AST__DPI);
 
             if( !astOK ) {
@@ -1355,7 +1352,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
               /* Percentage complete */
               switch( mode ) {
-                size_t percent;
+                dim_t percent;
 
               case MODE__STARE:
               case MODE__NOISE:

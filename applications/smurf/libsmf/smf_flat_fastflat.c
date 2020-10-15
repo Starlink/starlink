@@ -114,28 +114,28 @@
 #include "smf_err.h"
 
 static int smf__sort_ints ( const void * a, const void * b );
-static double smf__calc_refheat_meas ( int indata[], size_t boloffset, size_t tstride, size_t nframes,
-                                       double heatdata[], double buffer[], size_t nmeas, int heatref,
+static double smf__calc_refheat_meas ( int indata[], dim_t boloffset, dim_t tstride, dim_t nframes,
+                                       double heatdata[], double buffer[], dim_t nmeas, int heatref,
                                        int forward, int *status );
 
 void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) {
 
-  size_t bstride = 0;         /* Bolometer stride */
+  dim_t bstride = 0;          /* Bolometer stride */
   smfHead * hdr = NULL;       /* Local header of fflat */
   int heatbounds[] = {0,0,0,0}; /* first and last two heater values in ramps */
   AstKeyMap * heatmap = NULL; /* KeyMap of heater settings */
   int heatref = 0;            /* Reference heater setting */
   char heatstr[20];           /* Buffer for heater settings as strings */
   int * heatval = NULL;       /* Heater values in sorted order */
-  size_t i = 0;
-  size_t maxfound = 0;        /* Maximum number found */
-  size_t meas_per_heat = 1;   /* Measurements per single heater value per ramp */
+  dim_t i = 0;
+  int maxfound = 0;           /* Maximum number found */
+  dim_t meas_per_heat = 1;    /* Measurements per single heater value per ramp */
   dim_t nbols = 0;            /* number of bolometers */
-  size_t nheat = 0;           /* Number of distinct heater settings */
+  int nheat = 0;              /* Number of distinct heater settings */
   dim_t nframes = 0;          /* Total number of frames in fflat */
-  const size_t skyorder = 3;  /* Order to use for sky correction */
+  const dim_t skyorder = 3;   /* Order to use for sky correction */
 
-  size_t tstride = 0;         /* Time stride */
+  dim_t tstride = 0;          /* Time stride */
 
   if (*status != SAI__OK) return;
 
@@ -174,11 +174,11 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
   maxfound = 0;
   for ( i = 0; i < nframes; i++ ) {
     JCMTState * tmpstate = &(hdr->allState)[i];
-    size_t counter = 0;
+    int counter = 0;
     sprintf( heatstr, "%d", tmpstate->sc2_heat );
 
     /* push the current index on to the end */
-    astMapPutElemI( heatmap, heatstr, -1, i );
+    astMapPutElemK( heatmap, heatstr, -1, i );
 
     /* and ask how many elements we have now */
     counter = astMapLength( heatmap, heatstr );
@@ -225,7 +225,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
     }
   }
 
-  msgOutiff( MSG__VERB, "", "Flatfield ramp used %d heater settings of step %d, each of %zd measurements in groups of %zd",
+  msgOutiff( MSG__VERB, "", "Flatfield ramp used %d heater settings of step %d, each of %d measurements in groups of %zd",
              status, astMapSize( heatmap ), abs(heatbounds[1]-heatbounds[0]), maxfound, meas_per_heat );
 
   /* See how many distinct heater values we have */
@@ -234,13 +234,14 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
   /* sort the heater settings in an integer array */
   heatval = astCalloc( nheat, sizeof(*heatval) );
   if (*status == SAI__OK) {
-    for (i = 0; i < nheat; i++ ) {
+    int iheat;
+    for (iheat = 0; iheat < nheat; iheat++ ) {
       int h;
-      const char * key = astMapKey( heatmap, i );
+      const char * key = astMapKey( heatmap, iheat );
       char * endptr = NULL;
       /* this must work, we can miss this step if we had another
          keymap that had this key and an integer value ! */
-      h = strtol( key, &endptr, 0 );
+      h = (int) strtol( key, &endptr, 0 );
 
       /* should never get a 0 for heater value but some buggy files
          do have it so we use the correct test */
@@ -251,7 +252,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
         break;
       }
 
-      heatval[i] = h;
+      heatval[iheat] = h;
 
     }
 
@@ -278,7 +279,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
     double * skycoeffs = NULL;
     double * skycoeffsvar = NULL;
     int nind = 0;
-    size_t bol;
+    dim_t bol;
 
     /* get some memory for the indices */
     indices = astCalloc( maxfound, sizeof(*indices) );
@@ -305,8 +306,8 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
     if (*status == SAI__OK) {
       double * ddata = NULL;
       double * dindices = NULL;
-      size_t extras = 0;    /* extra space required */
-      const size_t szfit = 30; /* number of points to use for ref heat extrapolation */
+      dim_t extras = 0;    /* extra space required */
+      const dim_t szfit = 30; /* number of points to use for ref heat extrapolation */
       double * before_heat = NULL;
       double * after_heat = NULL;
       double * heatmeas = NULL;
@@ -351,13 +352,13 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
 
       if (*status == SAI__OK) {
         for (bol = 0; bol < nbols; bol++) {
-          size_t idx;
+          dim_t idx;
           int64_t nused;
-          size_t ndata = nind;
+          dim_t ndata = nind;
 
           /* copy over the relevant data for this bolometer */
           for (idx = 0; idx < ndata; idx++) {
-            size_t slice = indices[idx];
+            dim_t slice = indices[idx];
             ddata[idx] = ffdata[ bol * bstride + slice*tstride ];
             dindices[idx] = slice;
           }
@@ -449,8 +450,8 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
         for ( bol = 0; bol < nbols; bol++) {
           double mean = VAL__BADD;
           double sigma = VAL__BADD;
-          size_t ngood = 0;
-          size_t idx;
+          dim_t ngood = 0;
+          dim_t idx;
           double skyoffset = 0.0;
 
           /* Get the polynomial data */
@@ -460,8 +461,8 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
           }
 
           /* Obtain the measurements for that bolometer */
-          for (idx = 0; idx < (size_t)nind; idx++ ) {
-            size_t slice = indices[idx];
+          for (idx = 0; idx < (dim_t)nind; idx++ ) {
+            dim_t slice = indices[idx];
             int thisdata = ffdata[ bol*bstride + slice*tstride ];
 
             if (thisdata != VAL__BADI) {
@@ -496,7 +497,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
             double maxval = VAL__BADD;
             double isum = 0.0;
 
-            for (idx=0; idx < (size_t)ngood; idx++) {
+            for (idx=0; idx < (dim_t)ngood; idx++) {
               if (idata[idx] != VAL__BADI) {
                 if (minval == VAL__BADD) {
                   minval = idata[idx];
@@ -606,18 +607,18 @@ int smf__sort_ints ( const void * a, const void * b ) {
 
 /* Calculate the reference heater value by extrapolation */
 
-double smf__calc_refheat_meas ( int indata[], size_t boloffset, size_t tstride, size_t nframes,
-                                double heatdata[], double buffer[], size_t nmeas, int heatref,
+double smf__calc_refheat_meas ( int indata[], dim_t boloffset, dim_t tstride, dim_t nframes,
+                                double heatdata[], double buffer[], dim_t nmeas, int heatref,
                                 int forward, int *status ) {
   double result = VAL__BADD;
   int64_t nused;
   double coeff[2];
-  size_t i;
+  dim_t i;
 
   if (*status != SAI__OK) return result;
 
   for (i = 0; i<nmeas; i++) {
-    size_t htindex;
+    dim_t htindex;
     if (forward) {
       htindex = i;
     } else {

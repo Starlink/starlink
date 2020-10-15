@@ -123,13 +123,13 @@ smf_deepcopy_smfDA( ThrWorkForce *wf, const smfData *old, int cpdks, int * statu
   double *heatval = NULL; /* pointer to heater values */
   double refres = VAL__BADD; /* Reference heater resistance */
   smf_flatmeth flatmeth;  /* Flatfield method */
-  size_t nheat;           /* number of entries in heatval */
-  size_t nflat;           /* number of flat coeffs per bol */
+  dim_t nheat;            /* number of entries in heatval */
+  int nflat;              /* number of flat coeffs per bol */
   dim_t nbol;             /* Number of bolometers */
   dim_t ncol;             /* Number of columns */
   dim_t ntslice;          /* NUmber of time slices */
-  smfDA *newda = NULL;             /* Pointer to new smfDA struct */
-  smfDA *oldda = NULL;             /* Pointer to new smfDA struct */
+  smfDA *newda = NULL;    /* Pointer to new smfDA struct */
+  smfDA *oldda = NULL;    /* Pointer to new smfDA struct */
 
   if (*status != SAI__OK) return NULL;
 

@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     void smf_flat_fitpoly ( const smfData * powval, const smfData * bolval,
-*                             double snrmin, size_t order, smfData ** coeffs,
+*                             double snrmin, dim_t order, smfData ** coeffs,
 *                             smfData ** polyfit, int *status );
 
 *  Arguments:
@@ -27,7 +27,7 @@
 *        Minimum acceptable signal-to-noise ratio for the gradient.
 *        Below this value the fit will be treated as bad and the bolometer
 *        will be disabled. Only used when doing a linear fit.
-*     order = size_t (Given)
+*     order = dim_t (Given)
 *        Order of fit. Must lie between 1 (linear) and 3 (cubic).
 *     coeffs = smfData ** (Returned)
 *        smfData of coefficients. Will be returned with 6 entries even if order
@@ -113,10 +113,10 @@
 #include "gsl/gsl_fit.h"
 
 void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
-                        double snrmin, size_t order, smfData **coeffs,
+                        double snrmin, dim_t order, smfData **coeffs,
                         smfData **polyfit, int *status ) {
 
-  size_t bol;               /* bolometer index */
+  dim_t bol;               /* bolometer index */
   double * bolval = NULL;   /* Pointer to bolvald smfData */
   double * bolvar = NULL;   /* Pointer to bolvald variance */
   const double CLIP = 3.0;  /* Sigma clipping for polynomial fit */
@@ -124,16 +124,16 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   double * corrs = NULL;    /* correlation coefficients for each bolometer */
   double corr_thresh = 0.0; /* threshold for correlation coefficient thresholding */
   double * goodht = NULL;   /* Heater values for good measurements */
-  size_t * goodidx = NULL;  /* Indices of good measurements */
+  dim_t * goodidx = NULL;  /* Indices of good measurements */
   double * ht = NULL;       /* Heater values corrected for reference */
-  size_t iref;              /* Index of reference measurement */
-  size_t ireflo;            /* Lowest allowed index for reference measurement */
-  size_t j;
-  const size_t NCOEFF = 6;  /* Max number of coefficients per bolometer */
-  size_t nbol = 0;          /* Number of bolometers */
-  size_t ncorr = 0;         /* Number of bolometers flagged due to bad correlation coefficient */
-  size_t nheat = 0;         /* Number of measurements */
-  size_t nsnr = 0;          /* Number of bolometers flagged by SNR limit */
+  dim_t iref;              /* Index of reference measurement */
+  dim_t ireflo;            /* Lowest allowed index for reference measurement */
+  dim_t j;
+  const dim_t NCOEFF = 6;  /* Max number of coefficients per bolometer */
+  dim_t nbol = 0;          /* Number of bolometers */
+  dim_t ncorr = 0;         /* Number of bolometers flagged due to bad correlation coefficient */
+  dim_t nheat = 0;         /* Number of measurements */
+  dim_t nsnr = 0;          /* Number of bolometers flagged by SNR limit */
   double *poly = NULL;      /* polynomial expansion of each fit */
   double *polybol = NULL;   /* polynomial expansion for all bolometers */
   double * powval = NULL;   /* Pointer to powvald smfData */
@@ -177,7 +177,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   {
     void * pntr[2];
     dim_t dims[3];
-    int lbnd[3];
+    dim_t lbnd[3];
     pntr[0] = coptr;
     pntr[1] = NULL;
     dims[0] = (bolvald->dims)[0];
@@ -233,8 +233,8 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
     }
 
     double refvar = 0.0;
-    size_t i;
-    size_t nrgood = 0;
+    dim_t i;
+    dim_t nrgood = 0;
 
     /* initialise the correlation coefficients array */
     if (corrs) corrs[bol] = VAL__BADD;
@@ -309,7 +309,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
             polybol[i*nbol+bol] = VAL__BADD;
           }
           for (i=0; i<nrgood; i++) {
-            size_t idx = goodidx[i];
+            dim_t idx = goodidx[i];
             if (!isnan(poly[i]) && poly[i] != VAL__BADD) polybol[idx*nbol+bol] = poly[i] + refval;
           }
         }
@@ -402,7 +402,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   if (corrs && *status == SAI__OK) {
     double csig = VAL__BADD;
     double cmean = VAL__BADD;
-    size_t ngood = 0;
+    dim_t ngood = 0;
     double corr_bigtol = 3.0;
     double corr_smalltol = 0.75;
     double delta_mean = 0.0;
@@ -430,7 +430,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
       corr_thresh = cmean - ( csig * corr_thresh );
       for ( bol = 0; bol < nbol; bol++ ) {
         if (corrs[bol] != VAL__BADD && corrs[bol] < corr_thresh ) {
-          size_t i;
+          dim_t i;
           ncorr++;
           /* blank that bolometer */
           for (i=0; i<NCOEFF;i++) {

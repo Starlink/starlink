@@ -183,23 +183,23 @@ void smurf_sc2concat( int *status ) {
 
   /* Local Variables */
   Grp *basegrp=NULL;         /* Grp containing first file each chunk */
-  size_t basesize;           /* Number of files in base group */
+  dim_t basesize;            /* Number of files in base group */
   smfArray *concat=NULL;     /* Pointer to a smfArray */
-  size_t contchunk;          /* Continuous chunk counter */
+  dim_t contchunk;           /* Continuous chunk counter */
   smfArray *darks = NULL;    /* dark frames */
   int ensureflat;            /* Flag for flatfielding data */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
   smfArray * flatramps = NULL; /* Flatfield ramps */
   AstKeyMap *heateffmap = NULL;    /* Heater efficiency data */
-  size_t gcount=0;           /* Grp index counter */
-  size_t idx;                /* Subarray counter */
+  dim_t gcount=0;            /* Grp index counter */
+  dim_t idx;                 /* Subarray counter */
   int usedarks;              /* flag for using darks */
   Grp *igrp = NULL;          /* Group of input files */
   smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */
   size_t isize;              /* Number of files in input group */
   dim_t maxconcat=0;         /* Longest continuous chunk length in samples */
   double maxlen;             /* Constrain maxconcat to this many seconds */
-  size_t ncontchunks=0;      /* Number continuous chunks outside iter loop */
+  dim_t ncontchunks=0;       /* Number continuous chunks outside iter loop */
   Grp *ogrp = NULL;          /* Output files  */
   size_t osize;              /* Number of files in input group */
   char outbase[ 200 ];       /* Base name for output NDFs */

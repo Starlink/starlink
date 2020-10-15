@@ -153,8 +153,8 @@ void smurf_copyflat( int *status ) {
 
   for (i = 1; i <= size; i++ ) {
     char *pname = filename;
-    size_t colsize = (refdata->dims)[SC2STORE__ROW_INDEX];
-    size_t rowsize = (refdata->dims)[SC2STORE__COL_INDEX];
+    dim_t colsize = (refdata->dims)[SC2STORE__ROW_INDEX];
+    dim_t rowsize = (refdata->dims)[SC2STORE__COL_INDEX];
     smfData * moddata = NULL;
     char subarray[SUB__MAXNAM+1];
     AstFitsChan * fitshdr = NULL;
@@ -163,7 +163,7 @@ void smurf_copyflat( int *status ) {
 
     /* need to open the file ourselves to work out the
        subarray and get the FITS header */
-    smf_open_file( NULL, flatgrp, i, "READ", SMF__NOCREATE_DATA,
+    smf_open_file( NULL, flatgrp, (int) i, "READ", SMF__NOCREATE_DATA,
                    &moddata, status );
 
     if (*status != SAI__OK) break;

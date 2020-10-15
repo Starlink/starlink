@@ -136,7 +136,7 @@ void smf_jsatilei2xy( int itile, smfJSATiling *skytiling, int *xt, int *yt,
    if( itile >= 0 && itile < 12*nsq ){
 
 /* Get the zero-based index of the facet contained the tile. */
-      fi = itile / nsq;
+      fi = (int) ( itile / nsq );
 
 /* Get the offset in tiles into this facet of the required tile. */
       tj = itile - fi*nsq;

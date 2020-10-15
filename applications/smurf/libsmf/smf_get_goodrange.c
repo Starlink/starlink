@@ -14,22 +14,22 @@
 
 *  Invocation:
 *     void smf_get_goodrange( const smf_qual_t *quality, dim_t ntslice,
-*                             size_t tstride, smf_qual_t mask,
-*                             size_t *istart, size_t *iend, int *status );
+*                             dim_t tstride, smf_qual_t mask,
+*                             dim_t *istart, dim_t *iend, int *status );
 
 *  Arguments:
 *     quality = const smf_qual_t *(Given)
 *        Pointer to quality array
 *     ntslice = dim_t (Given)
 *        Number of tslices.
-*     tstride = size_t (Given)
+*     tstride = dim_t (Given)
 *        How many elements to skip to get to the next time slice for the
 *        current bolometer in quality
 *     mask = smf_qual_t (Given)
 *        Which quality bits used to determine the range.
-*     istart = size_t (Returned)
+*     istart = dim_t (Returned)
 *        Starting good index along the time axis
-*     iend = size_t (Returned)
+*     iend = dim_t (Returned)
 *        Ending good index along the time axis.
 *     status = int * (Given and Returned)
 *        Pointer to inherited status.
@@ -86,12 +86,12 @@
 #define FUNC_NAME "smf_get_goodrange"
 
 void smf_get_goodrange( const smf_qual_t *quality, dim_t ntslice,
-                        size_t tstride, smf_qual_t mask,
-                        size_t *istart, size_t *iend, int *status ) {
+                        dim_t tstride, smf_qual_t mask,
+                        dim_t *istart, dim_t *iend, int *status ) {
 
-  size_t i1;
-  size_t i2;
-  size_t i;
+  dim_t i1;
+  dim_t i2;
+  dim_t i;
 
    /* Check the inherited status */
    if ( *status != SAI__OK ) return;

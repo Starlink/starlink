@@ -16,7 +16,7 @@
 *     void smf_collapse( ThrWorkForce *wf, const double *array,
 *                        const smf_qual_t *qua, smf_qual_t mask, dim_t nx,
 *                        dim_t ny, dim_t nz, int axis, double **mean,
-*                        double **sigma, int **ngood, int *status )
+*                        double **sigma, dim_t **ngood, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -49,7 +49,7 @@
 *        returned (which should be freed using astFree when no longer
 *        needed). If "sigma" itself is NULL, no standard deviations are
 *         =returned.
-*     ngood = int ** (Returned)
+*     ngood = dim_t ** (Returned)
 *        Address of a variable holding a pointer to a 2D array to receive
 *        the number of good values in each collapse column. If the pointer
 *        in the variable is NULL, a new array will be allocated and returned
@@ -118,19 +118,19 @@ typedef struct smfCollapseJobData {
    const double *array;
    double *mean;
    double *sigma;
-   int *ngood;
+   dim_t *ngood;
    dim_t nb1;
    dim_t ntime;
-   size_t bstride1;
-   size_t bstride2;
-   size_t tstride;
+   dim_t bstride1;
+   dim_t bstride2;
+   dim_t tstride;
 } smfCollapseJobData;
 
 static void smf1_collapse_job( void *job_data, int *status );
 
 void smf_collapse( ThrWorkForce *wf, const double *array, const smf_qual_t *qua,
                    const smf_qual_t mask, dim_t nx, dim_t ny, dim_t nz, int axis,
-                   double **mean, double **sigma, int **ngood, int *status ){
+                   double **mean, double **sigma, dim_t **ngood, int *status ){
 
 /* Local Variables */
    dim_t bstep;
@@ -140,12 +140,12 @@ void smf_collapse( ThrWorkForce *wf, const double *array, const smf_qual_t *qua,
    dim_t ntime;
    double *wmean;
    double *wsigma;
-   int *wngood;
+   dim_t *wngood;
    int iworker;
    int nworker;
-   size_t bstride1;
-   size_t bstride2;
-   size_t tstride;
+   dim_t bstride1;
+   dim_t bstride2;
+   dim_t tstride;
    smfCollapseJobData *job_data;
    smfCollapseJobData *pdata;
 
@@ -316,11 +316,11 @@ static void smf1_collapse_job( void *job_data, int *status ) {
    double s1;
    double s2;
    double sval;
-   int *ngood;
-   size_t bstride1;
-   size_t bstride2;
-   size_t iv;
-   size_t tstride;
+   dim_t *ngood;
+   dim_t bstride1;
+   dim_t bstride2;
+   dim_t iv;
+   dim_t tstride;
    smfCollapseJobData *pdata;
 
 /* Check inherited status */

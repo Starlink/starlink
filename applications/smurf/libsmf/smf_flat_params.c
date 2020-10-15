@@ -136,15 +136,17 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
                  int * order, double * snrmin, smfData ** heateff,
                  int * status ) {
 
-  dim_t datarows = 0;       /* Number of rows in refdata */
-  dim_t datacols = 0;       /* Number of columns in refdata */
-  size_t j = 0;             /* Counter, index */
+  int datarows = 0;         /* Number of rows in refdata */
+  int datacols = 0;         /* Number of columns in refdata */
+  dim_t temp1;              /* Temporary value */
+  dim_t temp2;              /* Temporary value */
+  dim_t j = 0;              /* Counter, index */
   char method[SC2STORE_FLATLEN]; /* flatfield method string */
-  size_t nbols;              /* Number of bolometers */
-  double refohmsval = 0.0;   /* Internal version of refohms */
-  AstKeyMap * resmap = NULL; /* Resistor map */
+  dim_t nbols;              /* Number of bolometers */
+  double refohmsval = 0.0;  /* Internal version of refohms */
+  AstKeyMap * resmap = NULL;/* Resistor map */
   AstKeyMap * subarrays = NULL; /* Subarray lookup table */
-  char thissub[32];          /* This sub-instrument string */
+  char thissub[32];         /* This sub-instrument string */
 
   if (resistance) *resistance = NULL;
 
@@ -177,7 +179,7 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
   /* and indicate which subarray we are interested in (uppercased) */
   smf_fits_getS( refdata->hdr, "ARRAYID", thissub, sizeof(thissub), status );
   { /* need to uppercase */
-    size_t l = strlen(thissub);
+    dim_t l = strlen(thissub);
     for (j=0;j<l;j++) {
       thissub[j] = toupper(thissub[j]);
     }
@@ -207,12 +209,14 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
      per-bol resistance array with the reference resistance which
      effectively disables smf_flat_standardpow */
 
-  smf_get_dims( refdata, &datarows, &datacols, NULL, NULL, NULL, NULL, NULL, status );
+  smf_get_dims( refdata, &temp1, &temp2, NULL, NULL, NULL, NULL, NULL, status );
+  datarows = (int) temp1;
+  datacols = (int) temp2;
   nbols = datacols * datarows;
 
   if (*status == SAI__OK && resistance ) {
     *resistance = astMalloc( nbols*sizeof(**resistance) );
-    for (j = 0; j < (size_t)nbols; j++) {
+    for (j = 0; j < (dim_t)nbols; j++) {
       (*resistance)[j] = refohmsval;
     }
   }
@@ -249,8 +253,8 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
             *status = SAI__ERROR;
             errRepf( "", "Dimensions of heater efficiency file %s are (%zu, %zu)"
                      " but flatfield has dimensions (%zu, %zu)",
-                     status, heateffstr, (size_t)heatrows, (size_t)heatcols,
-                     (size_t)datarows, (size_t)datacols);
+                     status, heateffstr, (dim_t)heatrows, (dim_t)heatcols,
+                     (dim_t)datarows, (dim_t)datacols);
           }
         }
 

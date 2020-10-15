@@ -113,7 +113,7 @@
 
 #if defined (TESTBED)
 #define VAL__BADD -1.7976931348623157e+308
-#define NINT(x) ( ( (x) > 0 ) ? (int)( (x) + 0.5 ) : (int)( (x) - 0.5 ) )
+#define NINT(x) ( ( (x) > 0 ) ? (dim_t)( (x) + 0.5 ) : (dim_t)( (x) - 0.5 ) )
 #else
 /* Starlink includes */
 #include "sae_par.h"
@@ -147,10 +147,10 @@ typedef struct {
 
 static int compar( const void *v1, const void *v2 )
 {
-   par_struct   *p1, *p2;                       /* the types */
+   const par_struct   *p1, *p2;                       /* the types */
 
-   p1 = (par_struct *) v1;                      /* assign component 1 */
-   p2 = (par_struct *) v2;                      /* assign component 2 */
+   p1 = (const par_struct *) v1;                      /* assign component 1 */
+   p2 = (const par_struct *) v2;                      /* assign component 2 */
    if (p1->a > p2->a) {                         /* one > two */
       return( -1 );
    } else if (p1->a < p2->a) {                  /* one < two */
@@ -167,6 +167,7 @@ static int compar( const void *v1, const void *v2 )
  * window.
  */
 
+#ifdef  WITHWINDOW
 static int window( const double  y[],           /* the profile */
                    int     n,                   /* length of profile */
                    double  cutoff,              /* the critical level */
@@ -223,7 +224,7 @@ static int window( const double  y[],           /* the profile */
    }
    return( nw );                                /* return width of window */
 }
-
+#endif
 
 /*
  * findc2 calculates the second derivative of the profile inside the
@@ -234,12 +235,12 @@ static int window( const double  y[],           /* the profile */
 
 static void findc2( const double  y[],          /* the profile */
                     double  work[],             /* the derivative */
-                    int     n,                  /* length of profile */
-                    int     iwlo,               /* start of window */
-                    int     iwhi,               /* end of window */
+                    dim_t   n,                  /* length of profile */
+                    dim_t   iwlo,               /* start of window */
+                    dim_t   iwhi,               /* end of window */
                     int     q )                 /* smoothing parameter */
 {
-   int          i, j;                           /* loop counters */
+   dim_t        i, j;                           /* loop counters */
    static int   oldq = 1;                       /* save this q */
    static double        a = 3.0, b = 0.6666667;         /* save a and b */
 
@@ -249,11 +250,11 @@ static void findc2( const double  y[],          /* the profile */
       oldq = q;
    }
    for (i = iwlo; i <= iwhi; i++) {             /* loop over window */
-      double    m0 = 0.0;                       /* reset zeroeth moment */
+      double     m0 = 0.0;                      /* reset zeroeth moment */
       double     m2 = 0.0;                      /* reset second moment */
 
       for (j = -q; j <= q; j++) {               /* width is 2 * q + 1 */
-         int    k = i + j;
+         dim_t   k = i + j;
 
          if (k >= 0 && k < n) {                 /* inside range */
             double      yi = y[k];              /* value from profile */
@@ -274,17 +275,17 @@ static void findc2( const double  y[],          /* the profile */
  */
 
 static int findga( const double  y[],           /* the profile */
-                   double  work[],             /* the derivative */
-                   int     n,                   /* length of profile */
-                   int     iwlo,                /* start of window */
-                   int     iwhi,                /* end of window */
+                   double  work[],              /* the derivative */
+                   dim_t   n,                   /* length of profile */
+                   dim_t   iwlo,                /* start of window */
+                   dim_t   iwhi,                /* end of window */
                    double  cutoff,              /* critical level */
                    double   sigmin,             /* minimum value for sigma */
                    par_struct  *pars )          /* contains the parameters */
 {
-   int  i;                                      /* loop counter */
-   int  iclo, ichi;                             /* window on gaussian */
-   int  nmax = 0;                               /* peak counter */
+   dim_t i;                                     /* loop counter */
+   dim_t iclo, ichi;                            /* window on gaussian */
+   dim_t nmax = 0;                              /* peak counter */
    int  r = 0;                                  /* return value */
 
    iclo = iwlo;                                 /* reset */
@@ -306,9 +307,9 @@ static int findga( const double  y[],           /* the profile */
             break;
          }
          case 2: {                              /* we have a gaussian */
-            int         ic;                     /* loop counter */
+            dim_t       ic;                     /* loop counter */
             double      a, b;
-            double       det;                   /* determinant */
+            double      det;                    /* determinant */
             double      m0m, m0, m1, m2;        /* some moments */
 
             ichi = i;                           /* end of gauss window */
@@ -368,17 +369,17 @@ static int findga( const double  y[],           /* the profile */
  * the works
  */
 
-int smf_gauest( const double    y[],                 /* profile data */
-                int       n,                   /* number of points */
+int smf_gauest( const double    y[],           /* profile data */
+                dim_t n,                       /* number of points */
                 double   *p,                   /* parameter estimates */
                 int       np,                  /* number of parameters */
-                double    rms,                 /* rms noise level */
+                double    rms __attribute__((unused)), /* rms noise level */
                 double    cutoff,              /* cutoff level */
                 double    minsig,              /* minimum width of gaussians */
                 int       q )                  /* smoothing parameter */
 {
-   int          iwhi, iwlo;                    /* window limits */
-   int          l, m;                          /* loop counters */
+   dim_t        iwhi, iwlo;                    /* window limits */
+   dim_t        l, m;                          /* loop counters */
    int          r = 0;                         /* return value */
    par_struct   pars[MAXPAR];                  /* contains the parameters */
    double       *work;                         /* Work array for 2nd derv */

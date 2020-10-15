@@ -171,15 +171,15 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
       if ( ohdr->nframes != (odata->dims)[2]) {
         if ( *status == SAI__OK) {
           *status = SAI__ERROR;
-          msgSeti("NF1", (odata->dims)[2]);
-          msgSeti("NF2", ohdr->nframes);
+          msgSetk("NF1", (odata->dims)[2]);
+          msgSetk("NF2", ohdr->nframes);
           errRep(FUNC_NAME, "Number of frames, ^NF2, does not equal size of third dimension of data array, ^NF1. Possible programming error.", status);
         }
       }
     } else {
       /* For 2-D data nframes should always be 1 */
       if ( ohdr->nframes != 1 ) {
-        msgSeti("NF",ohdr->nframes);
+        msgSetk("NF",ohdr->nframes);
         msgOutif(MSG__DEBUG," ", "2-D data claims to have ^NF frames: overriding and setting to 1 now", status);
         ohdr->nframes = 1;
       }

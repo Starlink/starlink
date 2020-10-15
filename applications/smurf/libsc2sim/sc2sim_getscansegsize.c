@@ -102,7 +102,6 @@ void sc2sim_getscansegsize
   double dtotal;      /* total distance along path */
   double eps;         /* small number to trap angles */
   int jend;           /* count at end of scan */
-  int jmax;           /* count at maximum velocity */
   double midway;      /* midway position along scan */
   double theta;       /* angle of path relative to coordinate [0] */
   double raccel;      /* acceleration along path */
@@ -178,7 +177,6 @@ void sc2sim_getscansegsize
 
       /* Need to accelerate, coast, then decelerate */
       tmaxvel = fabs ( rmaxvel / raccel );
-      jmax = (int) ( tmaxvel / samptime );
       rmax  = 0.5 * raccel * tmaxvel * tmaxvel;
       tmidway = tmaxvel + fabs ( ( midway - rmax ) / rmaxvel );
       jend = (int) ( 2.0 * tmidway / samptime );

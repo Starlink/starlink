@@ -96,8 +96,8 @@ void smf_filter2d_gauss( smfFilter *filt, double fwhm, int *status ) {
   double dsq;                   /* magnitude^2 spatial frequency */
   double fwhm_f;                /* fwhm in frequency space */
   double g;                     /* Gaussian evaluated at d */
-  size_t i;                     /* Loop counter */
-  size_t j;                     /* Loop counter */
+  dim_t i;                     /* Loop counter */
+  dim_t j;                     /* Loop counter */
   double sig_f;                 /* sigma in frequency space */
   double sig_f_sq;              /* sig_f squared */
   double x;                     /* x-component spatial frequency */

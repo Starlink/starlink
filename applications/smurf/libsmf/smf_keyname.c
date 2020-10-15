@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     const char *smf_keyname( AstKeyMap *keymap, const char *basename,
-*                              const char *qualifier, char *buf, size_t lbuf,
+*                              const char *qualifier, char *buf, dim_t lbuf,
 *                              int *status )
 
 *  Arguments:
@@ -28,7 +28,7 @@
 *     buf = char * (Returned)
 *        A buffer in which to store the full config parameter name, with
 *        qualifier.
-*     lbuf = size_t (Given)
+*     lbuf = dim_t (Given)
 *        The length of "buf".
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -87,7 +87,7 @@
 #include "libsmf/smf.h"
 
 const char *smf_keyname( AstKeyMap *keymap, const char *basename,
-                         const char *qualifier, char *buf, size_t lbuf,
+                         const char *qualifier, char *buf, dim_t lbuf,
                          int *status ){
 
 /* Local Variables */

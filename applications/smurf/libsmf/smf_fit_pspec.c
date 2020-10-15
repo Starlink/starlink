@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
+*     smf_fit_pspec( const double *pspec, dim_t nf, dim_t box, double df,
 *                    double minfreq, double whitefreq, double maxfreq,
 *                    double *a, double *b, double *w, int *status );
 
@@ -23,7 +23,7 @@
 *        with length nf)
 *     nf = dim_t (Given)
 *        number of discrete frequencies in pspec
-*     box = size_t (Given)
+*     box = dim_t (Given)
 *        rolling box size for identifying 1/f region
 *     df = double (Given)
 *        Frequency step size in pspec
@@ -127,7 +127,7 @@
 #define FUNC_NAME "smf_fit_pspec"
 
 
-void smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
+void smf_fit_pspec( const double *pspec, dim_t nf, dim_t box, double df,
                     double minfreq, double whitefreq, double maxfreq,
                     double *a, double *b, double *w, int *status ) {
 
@@ -135,14 +135,14 @@ void smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
   double B=VAL__BADD;    /* Exponent of 1/f component */
   int converged;         /* Has white noise level calc converged? */
   double fit[2];         /* fit coefficients */
-  size_t i;              /* Loop counter */
-  size_t i_flo;          /* Index of lowest frequency for calculating 1/f  */
-  size_t i_whi;          /* Index of high-freq. edge for white-noise level */
-  size_t i_wlo;          /* Index of low-freq. edge for white-noise level */
-  size_t nbad;           /* Number of outliers in white noise calc */
+  dim_t i;              /* Loop counter */
+  dim_t i_flo;          /* Index of lowest frequency for calculating 1/f  */
+  dim_t i_whi;          /* Index of high-freq. edge for white-noise level */
+  dim_t i_wlo;          /* Index of low-freq. edge for white-noise level */
+  dim_t nbad;           /* Number of outliers in white noise calc */
   smf_qual_t *qual=NULL; /* Quality to go with pspec */
   double sigma;          /* Uncertainty in white noise level */
-  size_t thisnbad;       /* Outliers in white noise calc, this iteration */
+  dim_t thisnbad;       /* Outliers in white noise calc, this iteration */
   double white=VAL__BADD;/* White noise level */
   double *x=NULL;        /* Independent axis for 1/f fit */
   double *y=NULL;        /* Dependent axis for 1/f fit */
@@ -221,8 +221,8 @@ void smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
      We then fit a straight line to the logarithm of the x- and y-axes. */
 
   if( *status == SAI__OK ) {
-    size_t nfit;
-    size_t ngood = 0;
+    dim_t nfit;
+    dim_t ngood = 0;
     int64_t nused;
     double thresh = white + SMF__FPSPEC_KNEESNR*sigma;
 

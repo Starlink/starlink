@@ -153,7 +153,10 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
 
 /* Local Variables; */
    dim_t cc_offset;         /* Offset from gradient to corr. coeff value */
+   dim_t dt;                /* No. of time slices in section */
+   dim_t igbase;            /* Index of first gain value */
    dim_t isection;          /* Index of block at end of *next* section. */
+   dim_t itime;             /* Time slice index */
    dim_t next_section;      /* Index of the first time slice in next section */
    dim_t off_offset;        /* Offset from gradient to offset value */
    double *cc;              /* Pointer to next correlation coefficient */
@@ -173,9 +176,6 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
    double off0;             /* Offset at start of interpolation section */
    double off1;             /* Offset at end of interpolation section */
    double start_time;       /* Time at start of interpolation section */
-   int dt;                  /* No. of time slices in section */
-   size_t igbase;           /* Index of first gain value */
-   size_t itime;            /* Time slice index */
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;

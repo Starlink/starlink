@@ -13,13 +13,13 @@
 *     C function
 
 *  Invocation:
-*     smf_open_model( Grp *igrp, int index, const char *mode, smfData **data,
+*     smf_open_model( Grp *igrp, dim_t index, const char *mode, smfData **data,
 *                     int *status ) {
 
 *  Arguments:
 *     ingrp = const Grp * (Given)
 *        NDG group identifier
-*     index = int (Given)
+*     index = dim_t (Given)
 *        Index corresponding to required file in group
 *     mode = const char * (Given)
 *        File access mode. "R" for read-only otherwise assumed to be read/write
@@ -109,15 +109,15 @@
 
 #define FUNC_NAME "smf_open_model"
 
-void smf_open_model( const Grp *igrp, int index, const char *mode,
+void smf_open_model( const Grp *igrp, dim_t index, const char *mode,
                      smfData **data, int *status ) {
 
   void *buf=NULL;               /* Pointer to total container buffer */
-  size_t buflen = 0;            /* datalen + headlen */
-  size_t datalen=0;             /* Size of data buffer in bytes */
+  dim_t buflen = 0;             /* datalen + headlen */
+  dim_t datalen=0;              /* Size of data buffer in bytes */
   int fd=0;                     /* File descriptor */
   smfDIMMHead head;             /* Header for the file */
-  size_t headlen=0;             /* Size of header in bytes */
+  dim_t headlen=0;              /* Size of header in bytes */
   int mflags=0;                 /* bit flags for mmap */
   char name[GRP__SZNAM+1];      /* Name of container file */
   int oflags=0;                 /* bit flags for open */
@@ -127,7 +127,7 @@ void smf_open_model( const Grp *igrp, int index, const char *mode,
 
   /* Obtain the file name */
   pname = name;
-  grpGet( igrp, index, 1, &pname, GRP__SZNAM, status );
+  grpGet( igrp, (int) index, 1, &pname, GRP__SZNAM, status );
 
   /* Open the template file */
 

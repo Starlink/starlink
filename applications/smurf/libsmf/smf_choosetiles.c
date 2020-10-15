@@ -14,10 +14,10 @@
 *     C function
 
 *  Invocation:
-*     tiles = smf_choosetiles( Grp *igrp,  int size, int *lbnd, int *ubnd,
+*     tiles = smf_choosetiles( Grp *igrp,  int size, dim_t *lbnd, dim_t *ubnd,
 *                              smfBox *boxes, int spread, const double params[],
 *                              AstFrameSet *wcsout, int tile_size[2],
-*                              int trim, int border, size_t *ntiles,
+*                              int trim, int border, dim_t *ntiles,
 *                              int *status )
 
 *  Arguments:
@@ -25,10 +25,10 @@
 *        Group of input NDFs.
 *     size = int (Given)
 *        Number of elements in igrp
-*     lbnd = int * (Given)
+*     lbnd = dim_t * (Given)
 *        Pointer to an array holding the lower pixel index bounds of the
 *        full size output grid.
-*     ubnd = int * (Given)
+*     ubnd = dim_t * (Given)
 *        Pointer to an array holding the upper pixel index bounds of the
 *        full size output grid.
 *     boxes = smfBox * (Given)
@@ -68,7 +68,7 @@
 *        width of the spreading kernel) in order to avoid edge effects.
 *        However, the extra border (the spreading width) will be trimmed
 *        off the tiles before the application terminates.
-*     ntiles = size_t * (Returned)
+*     ntiles = dim_t * (Returned)
 *        Pointer to an int in which to return the number of tiles needed
 *        to cover the full size grid.
 
@@ -201,44 +201,44 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
-                          int *ubnd, smfBox *boxes, int spread,
+smfTile *smf_choosetiles( Grp *igrp,  int size, dim_t *lbnd,
+                          dim_t *ubnd, smfBox *boxes, int spread,
                           const double params[], AstFrameSet *wcsout,
                           int tile_size[ 2 ], int trim, int border,
-                          size_t *ntiles, int *status ){
+                          dim_t *ntiles, int *status ){
 
 /* Local Variables */
    AstUnitMap *umap = NULL;
    char *pname = NULL;
    char filename[ GRP__SZNAM + 1 ];
+   dim_t ix;
+   dim_t iy;
+   dim_t numtile[ 2 ];
+   dim_t plbnd[ 2 ];
+   dim_t pubnd[ 2 ];
+   dim_t refpixind;
+   dim_t tlbnd[ 3 ];
+   dim_t tubnd[ 3 ];
    double refpix[ 3 ];
    double refwcs[ 3 ];
    double shift[ 3 ];
    float *w = NULL;
    float *work = NULL;
    float val;
-   int extend = 0;
+   int adjust[ 2 ];
+   dim_t extend = 0;
    int i;
    int indims;
-   size_t ix;
-   size_t iy;
-   int adjust[ 2 ];
    int lbin;
    int lbout;
    int lfat[ 2 ];
-   size_t numtile[ 2 ];
-   int plbnd[ 2 ];
-   int pubnd[ 2 ];
-   int refpixind;
-   int tlbnd[ 3 ];
-   int tubnd[ 3 ];
    int ubin;
    int ubout;
    int ufat[ 2 ];
-   int xlo;
-   int xhi;
-   int yhi;
-   int ylo;
+   dim_t xhi;
+   dim_t xlo;
+   dim_t yhi;
+   dim_t ylo;
    smfBox *box = NULL;
    smfTile *result = NULL;
    smfTile *tile = NULL;
@@ -269,7 +269,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
    enough to hold the entire output array. */
    if( tile_size[ 0 ] == 0 ) {
       *ntiles = 1;
-      result = astMalloc( sizeof( smfTile ) );
+      result = astMalloc( sizeof( *result ) );
       if( result ) {
 
 /* Store the bordered tile area. */
@@ -359,7 +359,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
       for( i = 0; i < 2; i++ ) {
 
 /* Get the pixel index of the pixel containing the reference point. */
-         refpixind = (int) ceil( refpix[ i ] );
+         refpixind = ceil( refpix[ i ] );
 
 /* Find the pixel bounds of a tile centred on this pixel. If the
    tile size is even, we place the reference pixel on the higher of the
@@ -434,7 +434,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 
       lbout = -1000;
       ubout = 1000;
-      work = astMalloc( sizeof( float )*( ubout - lbout + 1 ) );
+      work = astMalloc( sizeof( *work )*( ubout - lbout + 1 ) );
       if( work ) {
          astRebinF( umap, 0.0, 1, &lbin, &ubin, &val, NULL, spread, params, 0,
                     0.0, 0, VAL__BADR, 1, &lbout, &ubout, &lbin, &ubin, work,
@@ -450,7 +450,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 
 /* Return the total number of tiles, and create the returned array. */
       *ntiles = numtile[ 0 ]*numtile[ 1 ];
-      result = astMalloc( sizeof( smfTile ) * (*ntiles ) );
+      result = astMalloc( sizeof( *result ) * (*ntiles ) );
 
 /* Store a pointer to the next tile desription to create. */
       tile = result;
@@ -543,7 +543,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 /* Create a GRP group to hold the names of the input files that have data
    that falls within the bounds of the extended tile area. */
             tile->grp = smf_grp_new( igrp, "", status );
-            tile->jndf = astMalloc( sizeof( int )* size );
+            tile->jndf = astMalloc( sizeof( *(tile->jndf) )* size );
             if( tile->jndf ) {
 
 /* Find the input files that may overlap the current extended tile area. */

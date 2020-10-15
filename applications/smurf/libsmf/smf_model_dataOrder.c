@@ -90,7 +90,7 @@
 
 #define REORDER( TYP, ARR )                                             \
   {                                                                     \
-    size_t idx;                                                         \
+    dim_t idx;                                                         \
     for (idx = 0; idx < ARR->ndat; idx++) {                             \
       int waschanged = 0;                                               \
       int old_order = 0;                                                \

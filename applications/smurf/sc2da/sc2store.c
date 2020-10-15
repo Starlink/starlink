@@ -11,7 +11,7 @@
     15May2007 : declare global HDSLOCs static (bdk)
     12Jul2007 : change names of static variables by prefixing them all with
                 sc2store_ (bdk)
-    30Oct2007 : standardise on size_t where possible for variables representing
+    30Oct2007 : standardise on dim_t where possible for variables representing
                 number of items (bdk)
     05Nov2007 : add sc2store_bscale and sc2store_compflag (bdk)
     09Nov2007 : have separate sc2store_rdbscale and _wrbscale (bdk)
@@ -64,8 +64,8 @@
 /* Private functions */
 static double sc2store_tzoffset(void);
 static void sc2store_initialise ( int *status );
-static void sc2store_fillbounds( size_t colsize, size_t rowsize, size_t dim3,
-                                 int lbnd[], int ubnd[], int * status );
+static void sc2store_fillbounds( dim_t colsize, dim_t rowsize, dim_t dim3,
+                                 dim_t lbnd[], dim_t ubnd[], int * status );
 
 /* Private globals */
 
@@ -123,12 +123,12 @@ static int sc2store_zindf = NDF__NOID;       /* NDF identifier for compression z
 
 void sc2store_compress
 (
-size_t nval,            /* number of values in frame (given) */
+dim_t nval,            /* number of values in frame (given) */
 const int stackz[],     /* stackzero frame to be subtracted (given) */
 int digits[],           /* integer values (given and returned) */
 int *bzero,             /* zero offset for compressed values (returned) */
 short data[],           /* compressed values (returned) */
-size_t *npix,           /* number of incompressible values (returned) */
+dim_t *npix,           /* number of incompressible values (returned) */
 int pixnum[],           /* indices of incompressible values (returned) */
 int pixval[],           /* incompressible values (returned) */
 int *status             /* global status (given and returned) */
@@ -151,7 +151,6 @@ int *status             /* global status (given and returned) */
 {
    int j;               /* loop counter */
    int temp;            /* intermediate compressed value */
-   int bmax;            /* maximum data value */
 
    if ( !StatusOkP(status) ) return;
 
@@ -164,12 +163,10 @@ int *status             /* global status (given and returned) */
    }
 
    *bzero = digits[0];
-   bmax = digits[0];
 /*
    for ( j=0; j<nval; j++ )
    {
       if ( *bzero > digits[j] ) (*bzero) = digits[j];
-      if ( bmax <digits[j] ) bmax = digits[j];
    }
 */
    *bzero = 0;
@@ -241,10 +238,10 @@ double gridsize,           /* size in arcsec of grid step (given) */
 const int *jigext,               /* Table of SMU pattern extents for a single
                               bolometer (given) */
 double jigsize,            /* size in arcsec of SMU step (given) */
-const int gridwtsdim[],          /* dimensions of grid interpolation weights
+const dim_t gridwtsdim[],          /* dimensions of grid interpolation weights
                               (given) */
 const double *gridwts,           /* grid interpolation weights (given) */
-int invmatdim,             /* dimension of inverted matrix (given) */
+dim_t invmatdim,             /* dimension of inverted matrix (given) */
 const double *invmat,            /* inverted matrix (given) */
 const int qualdim[],             /* dimensions of quality mask (given) */
 const int *qual,                 /* bolometer quality mask (given) */
@@ -259,22 +256,22 @@ int *status                /* global status (given and returned) */
 */
 {
    int *data;                  /* pointer to top-level NDF data */
-   int el;                     /* number of elements */
+   size_t el;                  /* number of elements */
    HDSLoc *gridszloc = NULL;   /* HDS locator to grid step size */
    HDSLoc *jigszloc = NULL;    /* HDS locator to DREAM step size */
-   int lbnd[3];                /* lower dimension bounds */
+   dim_t lbnd[3];              /* lower dimension bounds */
    int ndim;                   /* number of dimensions */
    int place;                  /* NDF placeholder */
-   size_t *tgridext;           /* Table of grid extents for a single
+   dim_t *tgridext;            /* Table of grid extents for a single
                                   bolometer */
    double *tinterpwt;          /* pointer to interpolation data */
    double *tinvmat;            /* pointer to inverted matrix */
-   size_t *tjigext;            /* Table of SMU pattern extents for a single
+   dim_t *tjigext;             /* Table of SMU pattern extents for a single
                                   bolometer */
    int *tqual;                 /* pointer to quality array */
-   size_t *twindext;           /* Table of window extents for the DREAM
+   dim_t *twindext;            /* Table of window extents for the DREAM
                                   solution */
-   int ubnd[3];                /* upper dimension bounds */
+   dim_t ubnd[3];              /* upper dimension bounds */
 
 
    if ( *status != SAI__OK ) return;
@@ -416,11 +413,11 @@ int *status                /* global status (given and returned) */
 
 void sc2store_decompress
 (
-size_t nval,                  /* number of values in frame (given) */
+dim_t nval,                  /* number of values in frame (given) */
 const int stackz[],           /* stackzero frame to be added (given) */
 int bzero,                    /* zero offset for compressed values (given) */
 const short data[],           /* compressed values (given) */
-size_t npix,                  /* number of incompressible values (given) */
+dim_t npix,                  /* number of incompressible values (given) */
 const int pixnum[],           /* indices of incompressible values (given) */
 const int pixval[],           /* incompressible values (given) */
 int digits[],                 /* integer values (returned) */
@@ -528,7 +525,7 @@ int *status
 
 void sc2store_free
 (
-int *status          /* global status (given and returned) */
+int *status __attribute__((unused)) /* global status (given and returned) */
 )
 /*
    History :
@@ -647,7 +644,7 @@ int *status          /* global status (given and returned) */
 void sc2store_getincomp
 (
 int frame,         /* frame index (given) */
-size_t *npix,      /* number of incompressible pixels (returned) */
+dim_t *npix,      /* number of incompressible pixels (returned) */
 int pixnum[],      /* indices of incompressible pixels (returned) */
 int pixval[],      /* values of incompressible pixels (returned) */
 int *status        /* global status (given and returned) */
@@ -659,15 +656,15 @@ int *status        /* global status (given and returned) */
     23Oct2007 : rename structure for incompressible pixels to INCOMPS (bdk)
 */
 {
-   int dim[2];             /* sizes of dimensions */
-   int el;                 /* number of elements mapped */
+   dim_t dim[2];           /* sizes of dimensions */
+   size_t el;              /* number of elements mapped */
    int *incomp;            /* pointer to incompressible values */
    int j;                  /* loop counter */
    HDSLoc* loc2 = NULL;    /* HDS locator */
    int ndim;               /* number of dimensions */
    int ndimx;              /* max number of dimensions */
    int place;              /* NDF placeholder */
-   hdsdim strnum;          /* structure element number */
+   dim_t strnum;           /* structure element number */
    int there;              /* existence flag */
    int uindf;              /* NDF identifier */
 
@@ -726,7 +723,7 @@ int *status        /* global status (given and returned) */
 
 void sc2store_headget
 (
-int frame,                    /* frame index (given) */
+dim_t frame,                  /* frame index (given) */
 JCMTState *head,              /* header data for the frame (returned) */
 int *status                   /* global status (given and returned) */
 )
@@ -756,7 +753,7 @@ int *status                   /* global status (given and returned) */
 
 #define RETRIEVE_STATE(state, index, type, bad )                 \
    if ( sc2store_ptr[index] ) {                                  \
-     size_t findex;                                              \
+     dim_t findex;                                              \
      if (sc2store_array[index]) {                                \
        findex = frame;                                           \
      } else {                                                    \
@@ -842,7 +839,7 @@ int *status                   /* global status (given and returned) */
 
 #define RETRIEVE_CHAR( state, index, len )                              \
    if ( sc2store_ptr[index] ) {                                         \
-     size_t findex;                                                     \
+     dim_t findex;                                                     \
      if (sc2store_array[index] ) {                                      \
        findex = frame;                                                  \
      } else {                                                           \
@@ -872,7 +869,7 @@ int *status                   /* global status (given and returned) */
 void sc2store_headcremap
 (
 const HDSLoc *headloc,           /* HDS locator (given) */
-size_t nframes,                  /* number of frames to be created (given) */
+dim_t nframes,                  /* number of frames to be created (given) */
 inst_t instrument,               /* instrument code (given) */
 int *status                      /* global status (given and returned) */
 )
@@ -893,7 +890,7 @@ int *status                      /* global status (given and returned) */
     20Mar2007 : use const in signature (timj)
 */
 {
-   hdsdim dim[2];
+   dim_t dim[2];
    int j;
    int ndim;
    int pos;
@@ -962,7 +959,7 @@ int *status                      /* global status (given and returned) */
 
 void sc2store_putjcmtstate
 (
-size_t nframes,             /* number of frames (given) */
+dim_t nframes,             /* number of frames (given) */
 const JCMTState head[],     /* header data for each frame (given) */
 int *status                 /* global status (given and returned) */
 )
@@ -974,7 +971,7 @@ int *status                 /* global status (given and returned) */
 */
 {
 
-   size_t j;
+   dim_t j;
 
    if ( *status != SAI__OK ) return;
 
@@ -989,7 +986,7 @@ int *status                 /* global status (given and returned) */
 
 void sc2store_headput
 (
-int frame,                    /* frame index (given) */
+dim_t frame,                  /* frame index (given) */
 JCMTState head,               /* header data for the frame (given) */
 int *status                   /* global status (given and returned) */
 )
@@ -1092,7 +1089,7 @@ int *status                   /* global status (given and returned) */
 void sc2store_headrmap
 (
 const HDSLoc *headloc,        /* HDS locator (given) */
-size_t nframes,               /* number of frames expected (given) */
+dim_t nframes,               /* number of frames expected (given) */
 inst_t instrument,            /* instrument code (given) */
 int *status                   /* global status (given and returned) */
 )
@@ -1114,7 +1111,7 @@ int *status                   /* global status (given and returned) */
     20Mar2007 : Use const in signature (TIMJ)
 */
 {
-   hdsdim dim[2];
+   dim_t dim[2];
    int j;
    int ndim;
    int pos;
@@ -1137,7 +1134,7 @@ int *status                   /* global status (given and returned) */
      datThere( headloc, hdsRecords[j].name, &isthere, status );
      if (isthere) {
        int actdim = 0;
-       hdsdim dims[1];
+       dim_t dims[1];
 
        datFind ( headloc, hdsRecords[j].name, &(sc2store_loc[pos]),
 		 status );
@@ -1242,12 +1239,12 @@ double *gridsize,          /* size in arcsec of grid step (returned) */
 int **jigext,               /* Table of SMU pattern extents for a single
                               bolometer (returned) */
 double *jigsize,           /* size in arcsec of SMU step (returned) */
-int gridwtsdim[],          /* dimensions of grid interpolation weights
+dim_t gridwtsdim[],          /* dimensions of grid interpolation weights
                               (returned) */
 double **gridwts,          /* grid interpolation weights (returned) */
-int *invmatdim,            /* dimension of inverted matrix (returned) */
+dim_t *invmatdim,            /* dimension of inverted matrix (returned) */
 double **invmat,           /* inverted matrix (returned) */
-int qualdim[],             /* dimensions of quality mask (returned) */
+dim_t qualdim[],           /* dimensions of quality mask (returned) */
 int **qual,                /* bolometer quality mask (returned) */
 int *status                /* global status (given and returned) */
 )
@@ -1264,7 +1261,7 @@ int *status                /* global status (given and returned) */
 {
    HDSLoc *gridszloc = NULL;   /* HDS locator to grid step size */
    HDSLoc *jigszloc = NULL;    /* HDS locator to DREAM step size */
-   int el;                     /* number of elements */
+   size_t el;                  /* number of elements */
    int ndim;                   /* actual number of dimensions queried */
    int ndimx;                  /* maximum number of dimensions queried */
    int place;                  /* NDF placeholder */
@@ -1421,9 +1418,9 @@ void sc2store_open
 (
 const char *filename,    /* name of HDS container file (given) */
 const char *access,      /* "READ" or "UPDATE" access (given) */
-size_t *colsize,         /* number of pixels in column (returned) */
-size_t *rowsize,         /* number of pixels in row (returned) */
-size_t *nframes,         /* number of frames (returned) */
+dim_t *colsize,         /* number of pixels in column (returned) */
+dim_t *rowsize,         /* number of pixels in row (returned) */
+dim_t *nframes,         /* number of frames (returned) */
 int *status              /* global status (given and returned) */
 )
 /*
@@ -1433,7 +1430,7 @@ int *status              /* global status (given and returned) */
     16Nov2007 : original (bdk)
 */
 {
-   int dim[3];                 /* dimensions */
+   dim_t dim[3];               /* dimensions */
    int ndim;                   /* number of dimensions */
    int ndimx;                  /* max number of dimensions */
    int place;                  /* NDF placeholder */
@@ -1475,15 +1472,15 @@ int frame,               /* frame index (given) */
 const AstFrameSet *fset, /* World coordinate transformations (given) */
 int ndim,                /* dimensionality of image (given) */
 const int dims[],        /* dimensions of image (given) */
-size_t colsize,          /* number of pixels in a column (given) */
-size_t rowsize,          /* number of pixels in a row (given) */
+dim_t colsize,          /* number of pixels in a column (given) */
+dim_t rowsize,          /* number of pixels in a row (given) */
 const double *image,     /* constructed image (given) */
 const double *zero,      /* bolometer zero values [can be null pointer] (given) */
 const char * obsidss,    /* OBSIDSS string for provenance (given) */
 const char * creator,    /* Creator application for provenance (given) */
 const char *fitshd,      /* string of concatenated FITS header records to
                             write (given) */
-size_t nrec,             /* Number of FITS records */
+dim_t nrec,             /* Number of FITS records */
 int *status              /* global status (given and returned) */
 )
 /* Method :
@@ -1516,18 +1513,18 @@ int *status              /* global status (given and returned) */
    HDSLoc *bz_imloc = NULL;/* HDS locator */
    int bsc2store_zindf;    /* NDF identifier */
    double *bzptr = NULL;   /* pointer to mapped space for zero points */
-   int el;                 /* number of elements mapped */
+   size_t el;              /* number of elements mapped */
    char imname[DAT__SZNAM];/* name of structure for image */
    double *imptr;          /* pointer to mapped space for image */
    int j;                  /* loop counter */
-   int lbnd[7];            /* lower dimension bounds */
+   dim_t lbnd[7];          /* lower dimension bounds */
    int ntot;               /* total number of elements */
    int place;              /* NDF placeholder */
    AstKeyMap *pkm = NULL;  /* KeyMap holding provenance contents of MORE */
    NdgProvenance *prov = NULL;  /* Pointer to provenance structure */
    int strnum;             /* structure element number */
    int uindf;              /* NDF identifier */
-   int ubnd[7];            /* upper dimension bounds */
+   dim_t ubnd[7];          /* upper dimension bounds */
 #ifdef SC2STORE_WRITE_HISTORY
    const char * const history[1] = { "Write reconstructed image." };
 #endif
@@ -1649,7 +1646,7 @@ int *status              /* global status (given and returned) */
 void sc2store_putincomp
 (
 int frame,            /* frame index (given) */
-size_t npix,          /* number of incompressible pixels (given) */
+dim_t npix,          /* number of incompressible pixels (given) */
 const int pixnum[],   /* indices of incompressible pixels (given) */
 const int pixval[],   /* values of incompressible pixels (given) */
 int *status           /* global status (given and returned) */
@@ -1666,15 +1663,15 @@ int *status           /* global status (given and returned) */
 */
 {
 
-   int el;                 /* number of elements mapped */
+   size_t el;              /* number of elements mapped */
    int *incomp;            /* pointer to incompressible values */
    int j;                  /* loop counter */
-   int lbnd[3];            /* lower dimension bounds */
+   dim_t lbnd[3];          /* lower dimension bounds */
    HDSLoc *loc2 = NULL;    /* HDS locator */
    int place;              /* NDF placeholder */
-   hdsdim strnum;          /* structure element number */
+   dim_t strnum;           /* structure element number */
    int uindf;              /* NDF identifier */
-   int ubnd[3];            /* upper dimension bounds */
+   dim_t ubnd[3];          /* upper dimension bounds */
 
 
    if ( *status != SAI__OK ) return;
@@ -1727,9 +1724,9 @@ int *status           /* global status (given and returned) */
 
 void sc2store_putscanfit
 (
-size_t colsize,       /* number of bolometers in a column (given) */
-size_t rowsize,       /* number of bolometers in a row (given) */
-size_t ncoeff,        /* number of coefficients (given) */
+dim_t colsize,       /* number of bolometers in a column (given) */
+dim_t rowsize,       /* number of bolometers in a row (given) */
+dim_t ncoeff,        /* number of coefficients (given) */
 const double *coptr,  /* coefficients (given) */
 int *status           /* global status (given and returned) */
 )
@@ -1745,13 +1742,12 @@ int *status           /* global status (given and returned) */
 */
 {
 
-   int el;                 /* number of elements mapped */
+   size_t el;              /* number of elements mapped */
    double *imptr;          /* pointer to mapped space for image */
-   int j;                  /* loop counter */
-   int lbnd[3];            /* lower dimension bounds */
+   dim_t lbnd[3];          /* lower dimension bounds */
    int place;              /* NDF placeholder */
    int uindf;              /* NDF identifier */
-   int ubnd[3];            /* upper dimension bounds */
+   dim_t ubnd[3];          /* upper dimension bounds */
 
 
    if ( *status != SAI__OK ) return;
@@ -1795,10 +1791,10 @@ int *status           /* global status (given and returned) */
 void sc2store_rdflatcal
 (
 const char *filename,    /* name of HDS container file (given) */
-size_t flatlen,          /* length of space for flatfield name (given) */
-size_t *colsize,         /* number of pixels in column (returned) */
-size_t *rowsize,         /* number of pixels in row (returned) */
-size_t *nflat,           /* number of flat coeffs per bol (returned) */
+dim_t flatlen,           /* length of space for flatfield name (given) */
+dim_t *colsize,          /* number of pixels in column (returned) */
+dim_t *rowsize,          /* number of pixels in row (returned) */
+dim_t *nflat,            /* number of flat coeffs per bol (returned) */
 double *refres,          /* Reference resistor used to create flatfield (returned) */
 char *flatname,          /* name of flatfield algorithm (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
@@ -1826,8 +1822,8 @@ int *status              /* global status (given and returned) */
 {
    double *fcal;              /* mapped flatfield calibration */
    double *fpar;              /* mapped flatfield parameters */
-   int nbol;                  /* number of bolometers */
-   size_t nframes;            /* number of data frames */
+   dim_t nbol;                /* number of bolometers */
+   dim_t nframes;             /* number of data frames */
 
    if ( !StatusOkP(status) ) return;
 
@@ -1876,16 +1872,16 @@ void sc2store_rdtstream
 (
 const char *filename,    /* name of HDS container file (given) */
 const char *access,      /* "READ" or "UPDATE" access (given) */
-size_t flatlen,          /* length of space for flatfield name (given) */
-size_t maxfits,          /* max number of FITS headers (given) */
-size_t *nrec,            /* actual number of FITS records (returned) */
+dim_t flatlen,           /* length of space for flatfield name (given) */
+dim_t maxfits,           /* max number of FITS headers (given) */
+dim_t *nrec,             /* actual number of FITS records (returned) */
 char *fitshead,          /* up to maxfits FITS header records (returned) */
 char units[SC2STORE_UNITLEN],/* data units. can be NULL (returned) */
 char label[SC2STORE_LABLEN], /* data label. Can be NULL (returned) */
-size_t *colsize,         /* number of pixels in column (returned) */
-size_t *rowsize,         /* number of pixels in row (returned) */
-size_t *nframes,         /* number of frames (returned) */
-size_t *nflat,           /* number of flat coeffs per bol (returned) */
+dim_t *colsize,          /* number of pixels in column (returned) */
+dim_t *rowsize,          /* number of pixels in row (returned) */
+dim_t *nframes,          /* number of frames (returned) */
+dim_t *nflat,            /* number of flat coeffs per bol (returned) */
 double *refres,          /* Reference resistor used to create flatfield (returned) */
 char *flatname,          /* name of flatfield algorithm (returned) */
 JCMTState *frhead[],     /* header data for each frame (returned) */
@@ -1894,9 +1890,9 @@ int **dksquid,           /* pointer to dark SQUID values (returned), or NULL */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
 int **jigvert,           /* pointer to DREAM jiggle vertices (returned) */
-size_t *nvert,           /* Number of vertices in jiggle pattern (returned) */
+int *nvert,              /* Number of vertices in jiggle pattern (returned) */
 double **jigpath,        /* pointer to path of SMU over jiggle pattern (returned) */
-size_t *npath,           /* Number of points in SMU path (returned) */
+dim_t *npath,            /* Number of points in SMU path (returned) */
 int *status              /* global status (given and returned) */
 )
 
@@ -1922,7 +1918,7 @@ int *status              /* global status (given and returned) */
     24Apr2007 : change declaration of fitsrec and remove maxlen to match
                 change to rdfitshead (bdk)
 
-    23Oct2007 : make nfits size_t instead of unsigned int (bdk)
+    23Oct2007 : make nfits dim_t instead of unsigned int (bdk)
     31Oct2007 : change name nfits to nrec (bdk)
     11Nov2007 : make compressed data short instead of unsigned short (bdk)
     16Nov2007 : restructure on top of sc2store_readraw() (bdk)
@@ -1931,6 +1927,7 @@ int *status              /* global status (given and returned) */
 */
 
 {
+   size_t size_t_val;
 
    if (units) units[0] = '\0';
    if (label) label[0] = '\0';
@@ -1981,7 +1978,8 @@ int *status              /* global status (given and returned) */
 
 /* Read the FITS headers */
 
-   sc2store_readfitshead ( maxfits, nrec, fitshead, status );
+   sc2store_readfitshead ( maxfits, &size_t_val, fitshead, status );
+   *nrec = size_t_val;
 
    sc2store_sc2open = 1;
 }
@@ -2002,11 +2000,11 @@ int *status              /* global status (given and returned) */
     12Aug2004 : original (bdk)
     23Nov2005 : Use Official C HDS interface (TIMJ)
     24Apr2007 : change headers to char* (bdk)
-    23Oct2007 : make nfits size_t instead of unsigned int (bdk)
+    23Oct2007 : make nfits dim_t instead of unsigned int (bdk)
     31Oct2007 : change name nfits to nrec (bdk)
 */
 {
-   hdsdim dim[1];             /* number of FITS entries */
+   dim_t dim[1];             /* number of FITS entries */
    HDSLoc *fitsloc = NULL;    /* HDS locator to FITS headers */
    void *fptr = NULL;         /* Pointer to the mapped FITS header */
    int ndim;                  /* number of dimensions in query */
@@ -2047,8 +2045,8 @@ int *status              /* global status (given and returned) */
 void sc2store_readflatcal
 (
 const char *access,      /* "READ" or "UPDATE" access (given) */
-size_t flatlen,          /* length of space for flatfield name (given) */
-size_t *nflat,           /* number of flat coeffs per bol (returned) */
+dim_t flatlen,           /* length of space for flatfield name (given) */
+dim_t *nflat,            /* number of flat coeffs per bol (returned) */
 double *refres,          /* Reference resistor used to create flatfield (returned) */
 char *flatname,          /* name of flatfield algorithm (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
@@ -2062,10 +2060,10 @@ int *status              /* global status (given and returned) */
     16Nov2006 : original (bdk)
 */
 {
-   int el;                     /* number of elements mapped */
+   size_t el;                  /* number of elements mapped */
    int isthere = 0;            /* Is component present? */
    int nfdim;                  /* number of flatpar dimensions */
-   hdsdim fdims[1];            /* flatpar dimensios */
+   dim_t fdims[1];             /* flatpar dimensios */
    int place;                  /* NDF placeholder */
 
 
@@ -2107,7 +2105,7 @@ int *status              /* global status (given and returned) */
 
 void sc2store_readframehead
 (
-size_t nframes,          /* number of data frames (given) */
+dim_t nframes,          /* number of data frames (given) */
 JCMTState *frhead[],     /* header data for each frame (returned) */
 int *status              /* global status (given and returned) */
 )
@@ -2170,9 +2168,9 @@ void sc2store_readjig
 (
 const char *access,      /* "READ" or "UPDATE" access (given) */
 int **jigvert,           /* pointer to DREAM jiggle vertices (returned) */
-size_t *nvert,           /* Number of vertices in jiggle pattern (returned) */
+int *nvert,              /* Number of vertices in jiggle pattern (returned) */
 double **jigpath,        /* pointer to path of SMU over jiggle pattern (returned) */
-size_t *npath,           /* Number of points in SMU path (returned) */
+dim_t *npath,            /* Number of points in SMU path (returned) */
 int *status              /* global status (given and returned) */
 )
 /*
@@ -2182,7 +2180,7 @@ int *status              /* global status (given and returned) */
     16Nov2007 : original (bdk)
 */
 {
-   int el;                     /* number of elements mapped */
+   size_t el;                     /* number of elements mapped */
    int isthere = 0;            /* is an extension present? */
    int place;                  /* NDF placeholder */
 
@@ -2198,7 +2196,7 @@ int *status              /* global status (given and returned) */
         &place, status );
       ndfMap ( sc2store_jigvndf, "DATA", "_INTEGER", access, (void *)jigvert,
         &el, status );
-      *nvert = el/2;
+      *nvert = (int) el/2;
       ndfOpen ( sc2store_drmloc, "JIGPATH", access, "OLD", &sc2store_jigpndf,
         &place, status );
       ndfMap ( sc2store_jigpndf, "DATA", "_DOUBLE", access, (void *)jigpath,
@@ -2228,10 +2226,10 @@ int *status              /* global status (given and returned) */
 
 void sc2store_readraw
 (
-const char *access,      /* "READ" or "UPDATE" access (given) */
-size_t colsize,          /* number of pixels in column (given) */
-size_t rowsize,          /* number of pixels in row (given) */
-size_t nframes,          /* number of frames (given) */
+const char *access __attribute__((unused)), /* "READ" or "UPDATE" access (given) */
+dim_t colsize,          /* number of pixels in column (given) */
+dim_t rowsize,          /* number of pixels in row (given) */
+dim_t nframes,          /* number of frames (given) */
 char units[SC2STORE_UNITLEN],/* data units. can be NULL (returned) */
 char label[SC2STORE_LABLEN], /* data label. Can be NULL (returned) */
 int **rawdata,           /* raw timestream data. Can be NULL (returned) */
@@ -2253,14 +2251,14 @@ int *status              /* global status (given and returned) */
 {
    int *bzero;                 /* pointer to compression offset values */
    short *data;                /* pointer to compressed data array */
-   int el;                     /* number of elements mapped */
+   size_t el;                  /* number of elements mapped */
    int hasunits = 0;           /* are units defined? */
    int haslabel = 0;           /* is the data label defined? */
    int isthere = 0;            /* is an extension present? */
    int j;                      /* loop counter */
-   int nbol;                   /* number of bolometers */
+   dim_t nbol;                 /* number of bolometers */
    int place;                  /* NDF placeholder */
-   size_t npix;                /* number of incompressible pixels */
+   dim_t npix;                 /* number of incompressible pixels */
    static int pixnum[DREAM__MXBOL];  /* indices of incompressible pixels */
    static int pixval[DREAM__MXBOL];  /* values of incompressible pixels */
    int *stackz;                /* pointer to subtracted frame in compression */
@@ -2444,19 +2442,18 @@ int *status              /* Global status (given and returned) */
    HDSLoc *xloc2 = NULL;
    int isthere;
    int j;
-   int lbnd[ 3 ];
+   dim_t lbnd[ 3 ];
    int ndim;
-   int ubnd[ 3 ];
+   dim_t ubnd[ 3 ];
    int update;
    size_t nslice;
 
 /* variables only needed in SMURF */
 
 #ifdef PACKAGE_UPCASE
-   HDSLoc *xloc3 = NULL;
    char name[ DAT__SZNAM + 1 ];
-   int lower[ 1 ];
-   int upper[ 1 ];
+   dim_t lower[ 1 ];
+   dim_t upper[ 1 ];
    int ncomp;
 #endif
 
@@ -2494,7 +2491,7 @@ int *status              /* Global status (given and returned) */
                if( isthere ) {
                   datFind( *xloc, hdsRecords[ j ].name, &xloc2, status );
                   datSize( xloc2, &nslice, status );
-                  update = ( nslice != ubnd[ 2 ] );
+                  update = ( nslice != (size_t) ubnd[ 2 ] );
                   datAnnul( &xloc2, status );
                   break;
                }
@@ -2546,8 +2543,8 @@ int *status              /* Global status (given and returned) */
 /* Extract a slice of this array that matches the pixel bounds of the NDF
    on the third pixel axis, and copy it to a new component in the returned
    temporary HDS object. */
-                  kpg1Hsect( xloc2, 1, lower, upper, *yloc, hdsRecords[ j ].name,
-                             status );
+                  kpg1Hsect8( xloc2, 1, lower, upper, *yloc, hdsRecords[ j ].name,
+                              status );
 
                }
                datAnnul( &xloc2, status );
@@ -2625,7 +2622,7 @@ int *status                /* global status (given and returned) */
 
 void sc2store_unmapwts
 (
-int *status               /* global status (given and returned) */
+int *status __attribute__((unused))            /* global status (given and returned) */
 )
 /*
    Method :
@@ -2703,10 +2700,10 @@ int *status           /* global status (given and returned) */
    FILE *fd = NULL;                       /* descriptor for XML file */
    HDSLoc *xloc = NULL;                   /* locator to NDF extension */
    HDSLoc *temploc = NULL;                /* HDS locator */
-   size_t nlines;                         /* number of lines to be written */
-   size_t nchars = 72;                    /* Standard internet line width */
-   size_t inlen;                          /* number of bytes in XML file */
-   hdsdim dims[1];                        /* number of lines to be written */
+   dim_t nlines;                         /* number of lines to be written */
+   dim_t nchars = 72;                    /* Standard internet line width */
+   dim_t inlen;                          /* number of bytes in XML file */
+   dim_t dims[1];                        /* number of lines to be written */
    char *tempstr;                         /* padded storage */
    static const char *def = "<OCS_CONFIG></OCS_CONFIG>"; /* default string */
 
@@ -2732,7 +2729,7 @@ int *status           /* global status (given and returned) */
 
       if (inlen > nchars)
       {
-         nlines = (size_t)ceil( (double)inlen / (double)nchars );
+         nlines = (dim_t)ceil( (double)inlen / (double)nchars );
       }
       else
       {
@@ -2815,7 +2812,7 @@ int *status           /* global status (given and returned) */
 {
    HDSLoc *fitsloc = NULL;    /* HDS locator to FITS headers */
    char *fptr;                /* Pointer to mapped FITS header */
-   int nnew;                  /* size of vector requested */
+   dim_t nnew;                /* size of vector requested */
    size_t nvec;               /* size of vector mapped */
    void *vptr;                /* dummy void pointer */
 
@@ -2847,14 +2844,14 @@ int *status           /* global status (given and returned) */
 
 void sc2store_writeflatcal
 (
-size_t colsize,             /* number of pixels in a column (given) */
-size_t rowsize,             /* number of pixels in a row (given) */
-size_t nflat,               /* number of flat coeffs per bol (given) */
-double refres,              /* Reference resistor used to create flatfield (given) */
-const char *flatname,       /* name of flatfield algorithm (given) */
-const double *flatcal,      /* flat-field calibration (given) */
-const double *flatpar,      /* flat-field parameters (given) */
-int *status              /* global status (given and returned) */
+dim_t colsize,             /* number of pixels in a column (given) */
+dim_t rowsize,             /* number of pixels in a row (given) */
+int nflat,                 /* number of flat coeffs per bol (given) */
+double refres,             /* Reference resistor used to create flatfield (given) */
+const char *flatname,      /* name of flatfield algorithm (given) */
+const double *flatcal,     /* flat-field calibration (given) */
+const double *flatpar,     /* flat-field parameters (given) */
+int *status                /* global status (given and returned) */
 )
 /*
    History :
@@ -2862,14 +2859,14 @@ int *status              /* global status (given and returned) */
 */
 
 {
-   int el;                     /* number of elements mapped */
+   size_t el;                     /* number of elements mapped */
    double *fcal;               /* pointer to flatfield calibration */
    double *fpar;               /* pointer to flatfield parameters */
    int j;                      /* loop counter */
-   int lbnd[3];                /* lower dimension bounds */
+   dim_t lbnd[3];              /* lower dimension bounds */
    int place;                  /* NDF placeholder */
-   hdsdim tdims[1];            /* temporary dimension store */
-   int ubnd[3];                /* upper dimension bounds */
+   dim_t tdims[1];             /* temporary dimension store */
+   dim_t ubnd[3];              /* upper dimension bounds */
 
 
    if ( *status != SAI__OK ) return;
@@ -2932,7 +2929,7 @@ int *status              /* global status (given and returned) */
 
 void sc2store_writeframehead
 (
-size_t nframes,             /* number of frames (given) */
+dim_t nframes,             /* number of frames (given) */
 const JCMTState head[],     /* header data for each frame (given) */
 int *status                 /* global status (given and returned) */
 )
@@ -2948,8 +2945,6 @@ int *status                 /* global status (given and returned) */
 */
 
 {
-   int j;                             /* loop counter */
-
    if ( !StatusOkP(status) ) return;
 
    if ( !head ) return; /* disable JCMTSTATE writing if null pointer */
@@ -2973,7 +2968,7 @@ int *status                 /* global status (given and returned) */
 void sc2store_writejcmtstate
 (
 int indf,                   /* NDF identifier (can be NDF__NOID) */
-size_t nframes,             /* number of frames (given) */
+dim_t nframes,             /* number of frames (given) */
 const JCMTState head[],     /* header data for each frame (given) */
 int *status                 /* global status (given and returned) */
 )
@@ -3005,7 +3000,7 @@ int *status                 /* global status (given and returned) */
   float * fbuff = NULL;
   unsigned short * usbuff = NULL;
   char * strbuff = NULL;
-  size_t i = 0;
+  dim_t i = 0;
   int thisndf = NDF__NOID;
 
   /* Use the external one if defined */
@@ -3034,10 +3029,10 @@ int *status                 /* global status (given and returned) */
   /* Macro to create items in HDS and copy the values. */
 #define STORE_STATE( ITEM, ITEMSTR, HDSTYPE, TYPE, BUFFER, DIFFERENT ) \
   if (*status == SAI__OK) {                                            \
-    hdsdim dim[1];                                                        \
+    dim_t dim[1];                                                      \
     int different = DIFFERENT;                                         \
     int ndim;                                                          \
-    int nwrite;                                                        \
+    dim_t nwrite;                                                      \
     HDSLoc * tloc = NULL;                                              \
     TYPE previous;                                                     \
     void * mapped = NULL;                                              \
@@ -3076,10 +3071,10 @@ int *status                 /* global status (given and returned) */
 
 #define STORE_CHAR( ITEM, ITEMSTR, ITEMLEN )                            \
   if (*status == SAI__OK) {                                             \
-    hdsdim dim[1];                                                         \
+    dim_t dim[1];                                                       \
     int different = 0;                                                  \
     int ndim;                                                           \
-    int nwrite;                                                         \
+    dim_t nwrite;                                                       \
     HDSLoc * tloc = NULL;                                               \
     char previous[ITEMLEN + 1];                                         \
     void * mapped = NULL;                                               \
@@ -3185,10 +3180,10 @@ int *status                 /* global status (given and returned) */
 void sc2store_writejig
 (
 int jigvert[][2],           /* Array of jiggle vertices (given) */
-size_t nvert,               /* Number of jiggle vertices (given) */
+int nvert,                  /* Number of jiggle vertices (given) */
 double jigpath[][2],        /* Path of SMU during jiggle cycle (given) */
-size_t npath,               /* Number of positions in jiggle path (given) */
-int *status              /* Global status (given and returned) */
+dim_t npath,                /* Number of positions in jiggle path (given) */
+int *status                 /* Global status (given and returned) */
 )
 /*
   History :
@@ -3196,12 +3191,12 @@ int *status              /* Global status (given and returned) */
    21Nov2007 : write values as well as creating structure (bdk)
 */
 {
-   int el;               /* number of mapped elements */
+   size_t el;               /* number of mapped elements */
    int j;                /* loop counter */
    int *jvert;           /* Pointer to stored jiggle vertices */
    double *jpath;        /* Pointer to stored jiggle path */
-   int lbnd[2];          /* lower bounds of mapped array */
-   int ubnd[2];          /* upper bounds of mapped array */
+   dim_t lbnd[2];        /* lower bounds of mapped array */
+   dim_t ubnd[2];        /* upper bounds of mapped array */
    int place;            /* NDF placeholder */
 
 
@@ -3327,10 +3322,10 @@ int *status              /* Global status (given and returned) */
 void sc2store_writeraw
 (
 const char *filename,    /* name of HDS container file (given) */
-size_t colsize,          /* number of pixels in a column (given) */
-size_t rowsize,          /* number of pixels in a row (given) */
-size_t nframes,          /* number of frames (given) */
-size_t ntrack,           /* number of bolometers used for heater tracking (given) */
+dim_t colsize,          /* number of pixels in a column (given) */
+dim_t rowsize,          /* number of pixels in a row (given) */
+dim_t nframes,          /* number of frames (given) */
+dim_t ntrack,           /* number of bolometers used for heater tracking (given) */
 const int *dbuf,         /* time stream data (given) */
 const int *dksquid,      /* dark SQUID time stream data (given) */
 const int *trackinfo,    /* 3xntrack int array with (col,row,heat) groups (given) */
@@ -3359,22 +3354,22 @@ int *status              /* global status (given and returned) */
    int *bzero;                 /* pointer to subtracted offset values */
    int *darksquid;             /* pointer to dark SQUID values */
    static int digits[2*DREAM__MXBOL]; /* copy of each frame */
-   int el;                     /* number of elements mapped */
-   size_t framesize;           /* number of values per frame */
+   size_t el;                     /* number of elements mapped */
+   dim_t framesize;            /* number of values per frame */
    int i;                      /* loop counter */
    int *idata;                 /* pointer to uncompressed data array */
    int j;                      /* loop counter */
-   int lbnd[3];                /* lower dimension bounds */
-   size_t npix;                       /* number of incompressible pixels */
+   dim_t lbnd[3];              /* lower dimension bounds */
+   dim_t npix;                 /* number of incompressible pixels */
    static int pixnum[DREAM__MXBOL];   /* indices of incompressible pixels */
    static int pixval[DREAM__MXBOL];   /* values of incompressible pixels */
    int place;                  /* Placeholder for final NDF */
    short *sdata;               /* pointer to compressed data array */
    int *stackz;                /* pointer to subtracted frame */
-   int tdims[1];               /* temporary dimension store */
+   dim_t tdims[1];               /* temporary dimension store */
    int tmp_place;              /* Placeholder for temporary NDF */
    int tmp_indf;               /* Temporary NDF identifier */
-   int ubnd[3];                /* upper dimension bounds */
+   dim_t ubnd[3];              /* upper dimension bounds */
    float zratio;               /* Compression ratio achieved */
 #ifdef SC2STORE_WRITE_HISTORY
    const char * const history[1] = { "Write raw data." };
@@ -3549,9 +3544,9 @@ int *status              /* global status (given and returned) */
    if (ntrack > 0 && trackinfo ) {
      const int * thistrack = trackinfo;
      int * hpntr = NULL;
-     int sdims[2];  /* number of dimensions in subset of image */
-     int maxbnd[2];
-     int minbnd[2];
+     dim_t sdims[2];  /* number of dimensions in subset of image */
+     dim_t maxbnd[2];
+     dim_t minbnd[2];
 
      minbnd[0] = SC2STORE__BOL_LBND;
      minbnd[1] = SC2STORE__BOL_LBND;
@@ -3581,8 +3576,8 @@ int *status              /* global status (given and returned) */
            ubnd[0] < minbnd[0] || ubnd[0] > maxbnd[0] ||
            ubnd[1] < minbnd[1] || ubnd[1] > maxbnd[1] ) {
          *status = SAI__ERROR;
-         errRepf( "", "Calculated pixel bounds (%d,%d) -> (%d,%d) are out of "
-                  "expected range (%d,%d) -> (%d,%d)", status,
+         errRepf( "", "Calculated pixel bounds (%" DIM_T_FMT ",%" DIM_T_FMT ") -> (%" DIM_T_FMT ",%" DIM_T_FMT ") are out of "
+                  "expected range (%" DIM_T_FMT ",%" DIM_T_FMT ") -> (%" DIM_T_FMT ",%" DIM_T_FMT ")", status,
                   lbnd[0],lbnd[1],ubnd[0],ubnd[1],
                   minbnd[0],minbnd[1],maxbnd[0],maxbnd[1]);
        }
@@ -3604,9 +3599,9 @@ int *status              /* global status (given and returned) */
      if (*status == SAI__OK) {
        thistrack = trackinfo;
        for ( j = 0; j < ntrack; j++ ) {
-         int colnum = thistrack[0];
-         int rownum = thistrack[1];
-         int offset = 0;
+         dim_t colnum = thistrack[0];
+         dim_t rownum = thistrack[1];
+         dim_t offset = 0;
 
          /* offset into data array must take into account the lbnd */
          colnum -= lbnd[SC2STORE__COL_INDEX];
@@ -3618,10 +3613,10 @@ int *status              /* global status (given and returned) */
            offset = rownum + (colnum * sdims[0]);
          }
 
-         if (offset < 0 || offset > el ) {
+         if (offset < 0 || offset > (dim_t) el ) {
            *status = SAI__ERROR;
            errRepf( "", "Calculated offset for heater tracking information is out of bounds"
-                    " ( 0 < %d < %d )", status, offset, el );
+                    " ( 0 < %zu < %zu )", status, offset, el );
            break;
          }
 
@@ -3709,14 +3704,14 @@ void sc2store_wrtstream
 (
 const char filename[],      /* output file name (given) */
 sc2ast_subarray_t subnum,   /* Sub-array number (given) */
-size_t nrec,                /* number of FITS header records (given) */
+dim_t nrec,                 /* number of FITS header records (given) */
 const char *fitsrec,        /* contiguous 80-byte FITS records (given) */
-size_t colsize,             /* number of bolometers in column (given) */
-size_t rowsize,             /* number of bolometers in row (given) */
-size_t nframes,             /* number of frames (given) */
-size_t nflat,               /* number of flat coeffs per bol (given) */
+dim_t colsize,              /* number of bolometers in column (given) */
+dim_t rowsize,              /* number of bolometers in row (given) */
+dim_t nframes,              /* number of frames (given) */
+int nflat,                  /* number of flat coeffs per bol (given) */
 double refres,              /* Reference resistor used to create flatfield (given) */
-size_t ntrack,              /* number of bolometers used for heater tracking (given) */
+dim_t ntrack,               /* number of bolometers used for heater tracking (given) */
 const char *flatname,       /* name of flatfield algorithm (given) */
 const JCMTState head[],     /* header data for each frame (given) */
 const SC2STORETelpar* telpar, /* Additional telescope information (given) */
@@ -3728,9 +3723,9 @@ const char *obsmode,        /* Observing mode (given) */
 AstKeyMap *mcehead,         /* MCE header (given) */
 const int *trackinfo,       /* 3xntrack int array with (col,row,heat) groups (given) */
 int jigvert[][2],           /* Array of jiggle vertices (given) */
-size_t nvert,               /* Number of jiggle vertices (given) */
+int nvert,                  /* Number of jiggle vertices (given) */
 double jigpath[][2],        /* Path of SMU during jiggle cycle (given) */
-size_t npath,               /* Number of positions in jiggle path (given) */
+dim_t npath,                /* Number of positions in jiggle path (given) */
 const char *xmlfile,        /* name of CONFIGURE XML file (given) */
 int *status                 /* global status (given and returned) */
 )
@@ -3762,7 +3757,7 @@ int *status                 /* global status (given and returned) */
 */
 
 {
-   size_t i = 0;                      /* Loop counter */
+   dim_t i = 0;                      /* Loop counter */
    AstFrameSet * wcs=NULL;            /* World Coordinates frame set */
    int *oldstat=NULL;                 /* Previous status used by AST */
    double * rts_end = NULL;           /* Place to store the times */
@@ -3842,9 +3837,9 @@ int *status                 /* global status (given and returned) */
 void sc2store_updflatcal
 (
 const char filename[],      /* name of file to update (given) */
-size_t colsize,             /* number of bolometers in column (given) */
-size_t rowsize,             /* number of bolometers in row (given) */
-size_t nflat,               /* number of flat coeffs per bol (given) */
+dim_t colsize,              /* number of bolometers in column (given) */
+dim_t rowsize,              /* number of bolometers in row (given) */
+int nflat,                  /* number of flat coeffs per bol (given) */
 double refres,              /* Reference resistor used to create flatfield (given) */
 const char *flatname,       /* name of flatfield algorithm (given) */
 const double *flatcal,      /* flat-field calibration (given) */
@@ -3868,9 +3863,9 @@ int *status                 /* global status (given and returned) */
 
 {
 
-   size_t refcolsize = 0;
-   size_t refrowsize = 0;
-   size_t nframes = 0;
+   dim_t refcolsize = 0;
+   dim_t refrowsize = 0;
+   dim_t nframes = 0;
    int isthere = 0;
 
    if ( !StatusOkP(status) ) return;
@@ -3944,7 +3939,7 @@ int *status                 /* global status (given and returned) */
 AstFrameSet *sc2store_timeWcs
 (
  sc2ast_subarray_t subnum,
- int ntime,
+ dim_t ntime,
  int use_tlut,
  const SC2STORETelpar* telpar,
  const double times[],
@@ -3959,7 +3954,7 @@ AstFrameSet *sc2store_timeWcs
 *     Calculate frameset for time series.
 
 *  Prototype:
-*     AstFrameSet *sc2store_timeWcs( sc2ast_subarray_t subnum, int ntime,
+*     AstFrameSet *sc2store_timeWcs( sc2ast_subarray_t subnum, dim_t ntime,
 *                const SC2STORETelpar * telpar,const double times[],
 *                int * status );
 
@@ -3975,7 +3970,7 @@ AstFrameSet *sc2store_timeWcs
 *  Parameters:
 *     subnum = sc2ast_subarray_t (Given)
 *        Subarray index
-*     ntime = int (Given)
+*     ntime = dim_t (Given)
 *        The number of time values supplied in "times".
 *     use_tlut = int (Given)
 *        If true use an accurate LutMap for the time axis. If false
@@ -4093,7 +4088,7 @@ AstFrameSet *sc2store_timeWcs
        ltimes = tcopy;
        ntime = 2;
      } else {
-       int i;
+       dim_t i;
        /* copy values and remove integer part of day */
        ltimes = malloc( sizeof(*ltimes) * ntime );
        if (ltimes) malloced = 1;
@@ -4102,7 +4097,7 @@ AstFrameSet *sc2store_timeWcs
          ltimes[i] = times[i] - origin;
        }
      }
-     timemap = (AstMapping*)astLutMap( ntime, ltimes, 1.0, 1.0, " " );
+     timemap = (AstMapping*)astLutMap( (int) ntime, ltimes, 1.0, 1.0, " " );
 
      if (malloced) free( ltimes );
    } else {
@@ -4167,27 +4162,19 @@ static double sc2store_tzoffset( void ) {
   return (diff/3600.0);
 }
 
-/* initialise ERR and NDF */
+/* initialise ERR */
 
 static void sc2store_initialise ( int * status ) {
-
-  static const char *const argv[] = {
-    APPNAME
-  };
-
-   if ( sc2store_initialised == 0 )
-   {
+   if ( sc2store_initialised == 0 ) {
       errBegin ( status );
-      ndfInit ( 1, (char * const *)argv, status );
       sc2store_initialised = 1;
    }
-
 }
 
 /* Fill NDF bounds array with colsize and rowsize dimensionality:
    set dim3 to 0 if only have two dimensions */
-static void sc2store_fillbounds( size_t colsize, size_t rowsize, size_t dim3,
-                                 int lbnd[], int ubnd[], int * status ) {
+static void sc2store_fillbounds( dim_t colsize, dim_t rowsize, dim_t dim3,
+                                 dim_t lbnd[], dim_t ubnd[], int * status ) {
   if (*status != SAI__OK) return;
   ubnd[SC2STORE__ROW_INDEX] = colsize + SC2STORE__BOL_LBND - 1;
   lbnd[SC2STORE__ROW_INDEX] = SC2STORE__BOL_LBND;

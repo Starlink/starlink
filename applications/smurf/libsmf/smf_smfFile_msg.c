@@ -138,7 +138,7 @@ smf_smfFile_msg( const smfFile * file, const char token[],
   /* if "path" has stuff in it we are meant to strip it and we have not
      set the token yet */
   if (strlen(path) > 0 ) {
-    size_t length = strlen(path);
+    dim_t length = strlen(path);
     char *endp = &path[length-1];
 
     /* Do not use the POSIX basename() function here because it does not

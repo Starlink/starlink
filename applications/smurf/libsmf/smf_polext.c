@@ -120,7 +120,7 @@ void smf_polext( int ondf, int store_angle, double angle, const char *domain,
    AstMapping *map = NULL;
    HDSLoc *loc = NULL;
    double matrix[ NDF__MXDIM*NDF__MXDIM ];
-   int dummy;
+   dim_t dummy;
    int iaxis;
    int icur;
    int ifrm;

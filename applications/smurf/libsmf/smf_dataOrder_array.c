@@ -15,9 +15,9 @@
 *  Invocation:
 *     newbuf = smf_dataOrder_array( ThrWorkForce *wf, void * oldbuf,
 *                                   smf_dtype oldtype, smf_dtype newtype,
-*                                   size_t ndata, size_t ntslice,
-*                                   size_t nbolo, size_t tstr1, size_t bstr1,
-*                                   size_t tstr2, size_t bstr2, int inPlace,
+*                                   dim_t ndata, dim_t ntslice,
+*                                   dim_t nbolo, dim_t tstr1, dim_t bstr1,
+*                                   dim_t tstr2, dim_t bstr2, int inPlace,
 *                                   int freeOld, int * status )
 
 *  Arguments:
@@ -32,19 +32,19 @@
 *        Data type of the original buffer
 *     newtype = smf_dtype (Given)
 *        Data type of the target buffer
-*     ndata = size_t (Given)
+*     ndata = dim_t (Given)
 *        Number of elements in oldbuf
-*     ntslice = size_t (Given)
+*     ntslice = dim_t (Given)
 *        Number of time slices in oldbuf
-*     nbolo = size_t (Given)
+*     nbolo = dim_t (Given)
 *        Number of bolometers in oldbuf
-*     tstr1 = size_t (Given)
+*     tstr1 = dim_t (Given)
 *        Time stride of oldbuf
-*     bstr1 = size_t (Given)
+*     bstr1 = dim_t (Given)
 *        Bolo stride of oldbuf
-*     tstr2 = size_t (Given)
+*     tstr2 = dim_t (Given)
 *        Time stride of re-ordered buffer
-*     bstr2 = size_t (Given)
+*     bstr2 = dim_t (Given)
 *        Bolo stride of re-ordered buffer
 *     inPlace = int (Given)
 *        If set replace the contents of oldbuf with the re-ordered data.
@@ -130,13 +130,13 @@ static void smf1_dataOrder_array( void *job_data_ptr, int *status );
 
 /* Local data types */
 typedef struct smfDataOrderArrayData {
-   size_t itime1;
-   size_t itime2;
+   dim_t itime1;
+   dim_t itime2;
    dim_t nbolo;
-   size_t bstr1;
-   size_t tstr1;
-   size_t bstr2;
-   size_t tstr2;
+   dim_t bstr1;
+   dim_t tstr1;
+   dim_t bstr2;
+   dim_t tstr2;
    smf_dtype newtype;
    smf_dtype oldtype;
    void *oldbuf;
@@ -185,17 +185,17 @@ typedef struct smfDataOrderArrayData {
 
 
 void * smf_dataOrder_array( ThrWorkForce *wf, void * oldbuf, smf_dtype oldtype,
-                            smf_dtype newtype, size_t ndata, size_t ntslice,
-                            size_t nbolo, size_t tstr1, size_t bstr1,
-                            size_t tstr2, size_t bstr2, int inPlace,
+                            smf_dtype newtype, dim_t ndata, dim_t ntslice,
+                            dim_t nbolo, dim_t tstr1, dim_t bstr1,
+                            dim_t tstr2, dim_t bstr2, int inPlace,
                             int freeOld, int * status ) {
-  size_t sznew = 0;        /* Size of new data type */
+  dim_t sznew = 0;        /* Size of new data type */
   void * newbuf = NULL;    /* Space to do the reordering */
   void * retval = NULL;    /* Return value with reordered buffer */
   SmfDataOrderArrayData *job_data = NULL;
   SmfDataOrderArrayData *pdata;
   int nw;
-  size_t step;
+  dim_t step;
   int iw;
 
   retval = oldbuf;
@@ -344,10 +344,10 @@ static void smf1_dataOrder_array( void *job_data_ptr, int *status ) {
    dim_t ibolo;
    dim_t itime1;
    dim_t itime2;
-   size_t bstr1;
-   size_t tstr1;
-   size_t bstr2;
-   size_t tstr2;
+   dim_t bstr1;
+   dim_t tstr1;
+   dim_t bstr2;
+   dim_t tstr2;
    dim_t nbolo;
 
 /* Check inherited status */

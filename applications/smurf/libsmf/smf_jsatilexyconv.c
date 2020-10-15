@@ -162,7 +162,7 @@ void smf_jsatilexyconv( smfJSATiling *skytiling, smf_jsaproj_t proj,
          if( proj == SMF__JSA_XPHN || proj == SMF__JSA_XPHS ) {
 
 /* Find the zero-based index of the gore containing the tile. */
-            igore = ( xpy - skytiling->ntpf + 1 )/( 2*skytiling->ntpf );
+            igore = (int)( ( xpy - skytiling->ntpf + 1 )/( 2*skytiling->ntpf ) );
 
 /* Find the (x,y) offsets of the tile away from the bottom left corner of
    the square enclosing the gore within the HPX projection. */

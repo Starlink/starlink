@@ -14,7 +14,7 @@
 *     C function
 
 *  Invocation:
-*     smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
+*     smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, dim_t index, double dut1,
 *                                 double dtai, const double telpos[3],
 *                                 AstFrameSet **fset, smfDetposWcsCache *cache,
 *                                 int *status );
@@ -22,7 +22,7 @@
 *  Arguments:
 *     hdr = smfHead * (Given & Returned)
 *        The smfHead structure containing the detector positions.
-*     index = int (Given)
+*     index = dim_t (Given)
 *        Index into the time series data (the 3rd dimension). Call with a
 *        negative index value to free cached resources (a NULL pointer
 *        will then be returned as the function value).
@@ -134,7 +134,7 @@
 /* Seconds per day */
 #define SPD 86400.0
 
-smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
+smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, dim_t index, double dut1,
                                    double dtai, const double telpos[3],
                                    AstFrameSet **fset, smfDetposWcsCache *cache,
                                    int *status ) {
@@ -146,10 +146,10 @@ smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
    AstMapping *map = NULL;     /* GRID->SKY Mapping */
    AstSkyFrame *csky = NULL;   /* SkyFrame to put in returned FrameSet */
    const double *p1;           /* Pointer to next lon or lat value to copy */
+   dim_t i;                    /* Index of current detector */
+   dim_t nrec;                 /* Number of detectors */
    double *p2;                 /* Pointer to next lon value */
    double *p3;                 /* Pointer to next lat value */
-   int i;                      /* Index of current detector */
-   int nrec;                   /* Number of detectors */
    int outperm[ 2 ];           /* Axis permutation */
    smfDetposWcsCache *result;  /* Pointer to returned cache structure */
 
@@ -223,8 +223,8 @@ smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
    duplicate the detector index, followed by 2 LutMaps in parallel to
    generate the lon and lat values. Set the LutInterpattribute in these
    LutMaps so that they use nearest neighbour interpolation. */
-         lonmap = astLutMap( nrec, cache->lonlut, 1.0, 1.0, "LutInterp=1" );
-         latmap = astLutMap( nrec, cache->latlut, 1.0, 1.0, "LutInterp=1" );
+         lonmap = astLutMap( (int) nrec, cache->lonlut, 1.0, 1.0, "LutInterp=1" );
+         latmap = astLutMap( (int) nrec, cache->latlut, 1.0, 1.0, "LutInterp=1" );
          cmap1 = astCmpMap( lonmap, latmap, 0, " " );
 
          latmap = astAnnul( latmap );

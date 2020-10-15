@@ -11,18 +11,12 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_fit_profile( smfData *data, int axis, int *range, int ncomp,
-*                      smfArray *pardata, void *pfcntrl, int *status );
+*     smf_fit_profile( smfData  *data, smfArray *pardata, void *pfcntrl,
+*                      int *status )
 
 *  Arguments:
 *     data = smfData* (Given and Returned)
 *        Pointer to input data struct
-*     axis = int (Given)
-*        Axis to fit along
-*     range = int * (Given & Returned)
-*        Range of pixels to use in fit (default all: 1..ndim)
-*     ncomp = int (Given)
-*        Number of functions to fit along each profile
 *     pardata = smfArray* (Given and returned)
 *        Array with data structs to parameter ndfs
 *     pfcntrl = fitStruct* (Given)
@@ -161,21 +155,21 @@
 /* Structure containing information about blocks of profiles that each
    thread will process */
 typedef struct {
-  int        ijob;                 /* Job identifier */
-  int        threads;              /* Number of jobs/threads */
-  smfData   *data;                 /* Pointer to SMF data struct */
-  size_t     istart;               /* Start index into data for thread */
-  size_t     dstride;              /* Data stride: 1 unless single thread */
-  size_t     nprofiles;            /* Number of profiles to process */
-  size_t     firstid;              /* Id number for first profile */
-  size_t     npts;                 /* Number of data points in profile */
-  int        range[2];             /* Range of pixels to use for fit */
-  int        ncomp;                /* Number of functions in each profile */
-  fitStruct *fcntrl;               /* Pointer fit control struct */
-  smfArray  *pardata;              /* Array with parameter ndf data structs */
+  int        ijob;                /* Job identifier */
+  int        threads;             /* Number of jobs/threads */
+  smfData   *data;                /* Pointer to SMF data struct */
+  dim_t      istart;              /* Start index into data for thread */
+  dim_t      dstride;             /* Data stride: 1 unless single thread */
+  dim_t      nprofiles;           /* Number of profiles to process */
+  dim_t      firstid;             /* Id number for first profile */
+  dim_t      npts;                /* Number of data points in profile */
+  dim_t      range[2];            /* Range of pixels to use for fit */
+  int        ncomp;               /* Number of functions in each profile */
+  fitStruct *fcntrl;              /* Pointer fit control struct */
+  smfArray  *pardata;             /* Array with parameter ndf data structs */
 } fitProfileData;
 
-typedef struct                     /* 'qsort' struct for comparisons */
+typedef struct                    /* 'qsort' struct for comparisons */
 {
    double par[MAXPAR];
    double err[MAXPAR];
@@ -187,20 +181,20 @@ static void FitProfileThread( void *job_data_ptr, int *status );
 
 static void generalize_gauss_fit( void *pfcntrl, int *status );
 
-static int getestimates( const double fdata[], const float weight[], int ndat,
+static int getestimates( const double fdata[], const float weight[], dim_t ndat,
                          double *parlist, int npar, int ncomp, void *pfcntrl,
                          const int smoothingpar[], int numq );
 
 static int dolsqfit(  smf_math_function fid, const double pcoord[],
-                      const double fdata[], float *weight,  int npts,
+                      const double fdata[], float *weight,  dim_t npts,
                       double *parlist, double *errlist, const int fixmask[],
                       int npar, int *ncomp, void *pfcntrl, int *fitopt );
 
 static void adjustestimates( smf_math_function fid, int nfound,
                              double *parlist, int npar );
 
-static int fillfromparndf( void *pfcntrl, const smfArray *pardata, int pbase,
-                           int dstride, int nfound,
+static int fillfromparndf( void *pfcntrl, const smfArray *pardata, dim_t pbase,
+                           dim_t dstride, int nfound,
 			   double *parlist, double *errlist, int npar );
 
 static double amp2area( double aD, double aL );
@@ -213,7 +207,7 @@ int comp11( const void *s1, const void *s2 );
 int comp2(  const void *s1, const void *s2 );
 int comp21( const void *s1, const void *s2 );
 
-static double getresidual( const double fdata[], int ndat,
+static double getresidual( const double fdata[], dim_t ndat,
                            int gaussiansfound, double *Destimates,
 			   double zerolev );
 
@@ -226,28 +220,28 @@ void smf_fit_profile( smfData  *data, smfArray *pardata, void *pfcntrl,
 */
 {
   /* Local variables */
-  size_t     i, k;                    /* Loop counters */
-  size_t     iaxis;                   /* Index nr axis to fit */
-  size_t     ndata = 1;               /* Length data array */
-  smfData   *cdata;                   /* Pointer to data struct in par ndf */
-  size_t     pdata = 1;               /* Length parameter ndf data array */
-  size_t     dstride = 1;             /* Data stride */
-  size_t     nprofiles = 0;           /* Number of profiles */
-  size_t     npts;                    /* Number of data points */
-  size_t     didRotate = 0;           /* Rotated to fast axis or not */
-  fitStruct *fcntrl=NULL;             /* Pointer to fit control struct */
+  dim_t     i, k;                    /* Loop counters */
+  dim_t     iaxis;                   /* Index nr axis to fit */
+  dim_t     ndata = 1;               /* Length data array */
+  smfData   *cdata;                  /* Pointer to data struct in par ndf */
+  dim_t     pdata = 1;               /* Length parameter ndf data array */
+  dim_t     dstride = 1;             /* Data stride */
+  dim_t     nprofiles = 0;           /* Number of profiles */
+  dim_t     npts;                    /* Number of data points */
+  dim_t     didRotate = 0;           /* Rotated to fast axis or not */
+  fitStruct *fcntrl=NULL;            /* Pointer to fit control struct */
 
   /* Threads related processing */
-  ThrWorkForce   *wf = NULL;          /* Pointer to a pool of worker threads */
-  size_t          nw = 1;             /* Number of threads */
-  size_t          njobs = 0;          /* Number of jobs to be processed */
-  size_t          njobprofs;          /* Number of profiles for each job */
-  fitProfileData *job_data=NULL;      /* Pointer to job data array*/
-  fitProfileData *jdata=NULL;         /* Pointer to job data */
-  size_t          step;               /* step size for dividing up work */
-  size_t          perm[NDF__MXDIM];   /* Axes permutation array */
-  dim_t           pdims[NDF__MXDIM];  /* Dimensions permutated data */
-  dim_t           cdims[NDF__MXDIM];  /* Dimensions permutated param data */
+  ThrWorkForce   *wf = NULL;         /* Pointer to a pool of worker threads */
+  int            nw = 1;             /* Number of threads */
+  int            njobs = 0;          /* Number of jobs to be processed */
+  dim_t          njobprofs;          /* Number of profiles for each job */
+  fitProfileData *job_data=NULL;     /* Pointer to job data array*/
+  fitProfileData *jdata=NULL;        /* Pointer to job data */
+  dim_t          step;               /* step size for dividing up work */
+  dim_t          perm[NDF__MXDIM];   /* Axes permutation array */
+  dim_t          pdims[NDF__MXDIM];  /* Dimensions permutated data */
+  dim_t          cdims[NDF__MXDIM];  /* Dimensions permutated param data */
 
 
   /* Check status */
@@ -282,7 +276,7 @@ void smf_fit_profile( smfData  *data, smfArray *pardata, void *pfcntrl,
   /* Which axis */
   iaxis = axis-1;
   npts = (data->dims)[ (int) (iaxis) ];
-  int range[2] = { 1, npts };
+  dim_t range[2] = { 1, npts };
   if ( fcntrl->lolimit[1] != 0 && fcntrl->lolimit[1] != VAL__BADI ) {
     range[0] = NINT(fcntrl->lolimit[1]);
   }
@@ -291,7 +285,7 @@ void smf_fit_profile( smfData  *data, smfArray *pardata, void *pfcntrl,
   }
 
   /* Sanity check: make sure the axis has any extent */
-  if ( (abs(range[1]-range[0])+1) < 2 ) {
+  if ( (llabs(range[1]-range[0])+1) < 2 ) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME,
             "Number of points to fit along 1 or less", status );
@@ -300,7 +294,7 @@ void smf_fit_profile( smfData  *data, smfArray *pardata, void *pfcntrl,
   /* Tell user what we're fitting */
   msgOutf(" ", "Fitting data using %d %s(s) over pixel range [%d,%d]",
 	    status, ncomp, smf_mathfunc_str(fcntrl->fid, status),
-            range[0],range[1]);
+            (int) range[0], (int) range[1]);
 
 
   /*
@@ -436,9 +430,10 @@ void smf_fit_profile( smfData  *data, smfArray *pardata, void *pfcntrl,
     jdata->fcntrl = fcntrl;
     jdata->pardata = pardata;
 
+    msgSetk( "I", jdata->istart );
     msgOutiff(MSG__DEBUG," ",
-	  "...thread %d will handle %d profiles (from index %d)", status,
-          (int) jdata->ijob, (int) jdata->nprofiles, (int) jdata->istart );
+	  "...thread %d will handle %d profiles (from index ^I)", status,
+          (int) jdata->ijob, (int) jdata->nprofiles );
 
   }
 
@@ -536,36 +531,36 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
   */
 
   fitProfileData *jdata=NULL;        /* Pointer to job data */
-  size_t          i, j, k, l;        /* Loop counters */
+  dim_t          i, j, k, l;         /* Loop counters */
   int             ijob;              /* Job identifier */
   int             threads;           /* Number of threads (jobs) */
-  size_t          profid;            /* ID number Profile */
-  size_t          iprof = 0;         /* Profile counter */
+  dim_t          profid;             /* ID number Profile */
+  dim_t          iprof = 0;          /* Profile counter */
   smfData        *data;              /* SMF data struct to be fitted */
   void           *indata;            /* Pointer to sdata array */
-  int             istart = 0;        /* Index number into data for thread */
-  int             range[2];          /* Pixel range to fit over */
+  dim_t          istart = 0;         /* Index number into data for thread */
+  dim_t          range[2];           /* Pixel range to fit over */
   smf_math_function fid;             /* Integer id for function */
   int             ncomp = 1;         /* Number of functions in each profile */
   smfArray       *pardata = NULL;    /* Array with parameter data pointers */
   double         *fitval, *fiterr;   /* Pointers into parameter data */
-  size_t          base = 0;          /* Starting point for index into arrays */
-  size_t          pbase = 0;         /* Same for parameter data arrays */
-  size_t          index;             /* Current index into array */
-  size_t          dstride;           /* Data stride: 1 unless single thread */
-  size_t          nsubcubes = 1;     /* Number of strides subcubes */
-  size_t          nprofiles = 0;     /* Number of profiles */
-  size_t          npts;              /* Number of data points */
+  dim_t          base = 0;           /* Starting point for index into arrays */
+  dim_t          pbase = 0;          /* Same for parameter data arrays */
+  dim_t          index;              /* Current index into array */
+  dim_t          dstride;            /* Data stride: 1 unless single thread */
+  dim_t          nsubcubes = 1;      /* Number of strides subcubes */
+  dim_t          nprofiles = 0;      /* Number of profiles */
+  dim_t          npts;               /* Number of data points */
   fitStruct      *fcntrl=NULL;       /* Pointer to fit control struct */
 
   /* Moments and initial estimates parameters */
   double          value;             /* Local variable for data value */
-  size_t          zeronum = 0;       /* Number of points in zerolevel rim */
+  dim_t          zeronum = 0;        /* Number of points in zerolevel rim */
   double          zerolev = 0.0;     /* Zero level */
 
   /* Initial estimates */
   int             smoothingpar[6] = { 1, 2, 3, 5, 10, 20 };
-  int             numq = sizeof((int *)smoothingpar)/sizeof(smoothingpar[0]);
+  int             numq = sizeof(smoothingpar)/sizeof(smoothingpar[0]);
   double          maxval = VAL__BADD;
   int             posmax = -1;
 
@@ -699,7 +694,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
       posmax = 0;
       zerolev = 0.0;
       zeronum = 0;
-      size_t nbad = 0;
+      dim_t nbad = 0;
 
       for ( i = 0; i < npts && model_only != YES; i++ ) {
 
@@ -784,7 +779,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 	}
 
         /* Now that we got the zerolevel disable points outside range */
-        if ( i < (size_t) (range[0]-1) || i > (size_t) (range[1]-1) ) {
+        if ( i < (dim_t) (range[0]-1) || i > (dim_t) (range[1]-1) ) {
 	  weight[i] = 0.0;
         }
 
@@ -1118,7 +1113,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 
 
 static int dolsqfit( smf_math_function fid, const double pcoord[],
-                     const double fdata[], float *weight,  int npts,
+                     const double fdata[], float *weight,  dim_t npts,
                      double *parlist, double *errlist, const int fixmask[],
                      int npar, int *ncomp, void *pfcntrl, int *fitopt )
 /*------------------------------------------------------------*/
@@ -1136,7 +1131,7 @@ static int dolsqfit( smf_math_function fid, const double pcoord[],
    int          sortopt = 0;              /* By default sort in amplitude */
    int          i,j;
    int          tpar;
-   int          ndat = npts;
+   dim_t        ndat = npts;
    int          xdim = 1;                             /* Dimension of fit */
    int          iters = 0;
    int          nfound = *ncomp;
@@ -1510,7 +1505,7 @@ static void generalize_gauss_fit( void *pfcntrl,  int *status )
 
 
 
-static int getestimates( const double fdata[], const float weight[], int npts,
+static int getestimates( const double fdata[], const float weight[], dim_t npts,
 			 double *parlist, int npar, int ncomp, void *pfcntrl,
 			 const int smoothingpar[], int numq)
 /*------------------------------------------------------------*/
@@ -1523,7 +1518,6 @@ static int getestimates( const double fdata[], const float weight[], int npts,
    double       Destimates[MAXPAR];
 
    int          gaussiansfound;
-   float        usedQ;
    double       * work;
 
    fitStruct *fcntrl = (fitStruct *) pfcntrl; /* Pointer fit control struct */
@@ -1545,7 +1539,6 @@ static int getestimates( const double fdata[], const float weight[], int npts,
 #endif
 
    double rms = fabs( fcntrl->rms );
-   usedQ = VAL__BADR;
 
    /*--------------------------------------------------*/
    /* Next, check the other parameters. The critical   */
@@ -1637,7 +1630,6 @@ static int getestimates( const double fdata[], const float weight[], int npts,
 	    goto CLEANUP;
 	  } else {
 	    gaussiansfound = 1;
-	    usedQ = 1;
 	    special = YES;
 	  }
 	}
@@ -1731,7 +1723,6 @@ static int getestimates( const double fdata[], const float weight[], int npts,
 	  gaussiansfound = 0;
 	  goto CLEANUP;
 	}
-	usedQ = (float) smoothingpar[minindx];
       }
 
       /* Copy the  estimates */
@@ -1799,8 +1790,8 @@ static void adjustestimates( smf_math_function fid, int nfound, double *parlist,
    }
 }
 
-static int fillfromparndf( void *pfcntrl, const smfArray *pardata, int pbase,
-                           int dstride, int nfound,
+static int fillfromparndf( void *pfcntrl, const smfArray *pardata, dim_t pbase,
+                           dim_t dstride, int nfound,
                            double *parlist, double *errlist, int npar )
 /*------------------------------------------------------------*/
 /* PURPOSE: Replace estimates in parlist (and errlist) with   */
@@ -1811,7 +1802,7 @@ static int fillfromparndf( void *pfcntrl, const smfArray *pardata, int pbase,
 
   int     pfound;                 /* parndf: nr fitted */
   double *fitval, *fiterr;        /* Pointer to supplied data */
-  size_t  index;                  /* Current index into array */
+  dim_t  index;                  /* Current index into array */
 
   int     ufound = 0;             /* User supplied values */
   double *fixval;                 /* Fixed values         */
@@ -1824,7 +1815,7 @@ static int fillfromparndf( void *pfcntrl, const smfArray *pardata, int pbase,
 
   /* Substitute externally supplied estimates or fixed values */
 
-  int nrndf = pardata->ndat;
+  dim_t nrndf = pardata->ndat;
 
   /* Diagnostics and baselines in COMP_0 */
   fitval = (pardata->sdata[0]->pntr)[0];
@@ -2026,7 +2017,7 @@ static void mysort( int sortopt, double refpix, double *parlist,
 
 
 static double getresidual( const double fdata[],
-                           int         npts,
+                           dim_t       npts,
                            int         gaussiansfound,
                            double     *Destimates,
                            double      zerolev )
@@ -2041,7 +2032,7 @@ static double getresidual( const double fdata[],
    int     npar = 3;    /* It is always a standard gauss -> npar=3 */
    int     nvar;        /* Total number of variables */
    int     iopt[1];     /* Option array for smf_math_functions */
-   int     i;
+   dim_t   i;
    double  chi2 = 0.0;
 
    /* Note that the number of gaussians found in the estimate */

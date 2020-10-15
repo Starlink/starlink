@@ -93,7 +93,7 @@
 
 void smf_filter_ident( smfFilter *filt, int complex, int *status ) {
   dim_t i;         /* Loop counter */
-  size_t nfdata;   /* Number of frequency-space data values */
+  dim_t nfdata;   /* Number of frequency-space data values */
 
   if (*status != SAI__OK) return;
 

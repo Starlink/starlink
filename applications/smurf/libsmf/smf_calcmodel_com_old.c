@@ -240,13 +240,13 @@
 /* Structure containing information about blocks of bolos that each
    thread will process */
 typedef struct smfCalcmodelComData {
-  size_t b1;               /* Index of first bolometer of block */
-  size_t b2;               /* Index of last bolometer of block */
-  size_t bstride;          /* bolometer stride for res/qua */
+  dim_t b1;               /* Index of first bolometer of block */
+  dim_t b2;               /* Index of last bolometer of block */
+  dim_t bstride;          /* bolometer stride for res/qua */
   double *gai_data;        /* pointer to gain model (can be NULL) data */
   dim_t gain_box;          /* Number of time slices per block */
-  size_t gbstride;         /* gain bolo stride */
-  size_t gcstride;         /* gain coefficient stride */
+  dim_t gbstride;         /* gain bolo stride */
+  dim_t gcstride;         /* gain coefficient stride */
   int gflat;               /* correct flatfield using GAI */
   dim_t idx;               /* Index within subgroup */
   int ijob;                /* Job identifier */
@@ -259,9 +259,9 @@ typedef struct smfCalcmodelComData {
   dim_t ntslice;           /* number of time slices */
   int operation;           /* 0=undo COM, 1=new COM, 2=fit COM */
   double *res_data;        /* Pointer to common residual data */
-  size_t t1;               /* Index of first timeslice of block */
-  size_t t2;               /* Index of last timeslice of block */
-  size_t tstride;          /* time stride for res/qua */
+  dim_t t1;               /* Index of first timeslice of block */
+  dim_t t2;               /* Index of last timeslice of block */
+  dim_t tstride;          /* time stride for res/qua */
   smf_qual_t *qua_data;    /* Pointer to common quality data */
   double *weight;          /* Weight at each point in model */
 } smfCalcmodelComData;
@@ -273,15 +273,15 @@ typedef struct smfCalcmodelComData {
 void smfCalcmodelComPar( void *job_data_ptr, int *status );
 
 void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
-  size_t bstride;          /* bolometer stride for res/qua */
+  dim_t bstride;          /* bolometer stride for res/qua */
   double *gai_data;        /* pointer to gain model (can be NULL) data */
   double gain;             /* Gain value */
   dim_t gain_box;          /* Nominal number of time slices per block */
-  size_t gbstride;         /* gain bolo stride */
-  size_t gcstride;         /* gain coefficient stride */
-  size_t i;                /* Loop counter */
+  dim_t gbstride;         /* gain bolo stride */
+  dim_t gcstride;         /* gain coefficient stride */
+  dim_t i;                /* Loop counter */
   dim_t idx;               /* Index within subgroup */
-  size_t j;                /* Loop counter */
+  dim_t j;                /* Loop counter */
   int *lut_data;           /* Array holding themap index for each sample */
   unsigned char *mask;     /* Pointer to 2D mask map */
   double *model_data;      /* pointer to common mode data */
@@ -293,7 +293,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   smfCalcmodelComData *pdata=NULL; /* Pointer to job data */
   double *res_data;        /* Pointer to common residual data */
   double sum;              /* Running sum of values */
-  size_t tstride;          /* time stride for res/qua */
+  dim_t tstride;          /* time stride for res/qua */
   smf_qual_t *qua_data;    /* Pointer to common quality data */
   double *weight=NULL;     /* Weight at each point in model */
   double *wg;              /* Work array holding gain values */
@@ -361,7 +361,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
     for( j = pdata->b1; j <= pdata->b2 && *status == SAI__OK; j++ ) {
       /* Initialise the index of the first time slice for the current
          bolometer within the res_data and qua_data arrays. */
-      size_t ijindex = j*bstride;
+      dim_t ijindex = j*bstride;
 
       /* Initialise sums iused to fidn RMS bolometer value. */
       sum = 0.0;
@@ -470,7 +470,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
 
       /* Initialise the index of the first time slice for the current
          bolometer within the res_data and qua_data arrays. */
-      size_t ijindex = j*bstride;
+      dim_t ijindex = j*bstride;
 
       /* Skip bad bolometers */
       if( !(qua_data[ ijindex ] & SMF__Q_BADB ) ) {
@@ -528,7 +528,7 @@ void smf_calcmodel_com_old( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                             int *status) {
 
   /* Local Variables */
-  size_t bstride;               /* Bolometer stride in data array */
+  dim_t bstride;               /* Bolometer stride in data array */
   dim_t boxcar=0;               /* width in samples of boxcar filter */
   double boxcard=0;             /* double precision version of boxcar */
   double boxfact=0;             /* Box width damping parameter */
@@ -545,8 +545,8 @@ void smf_calcmodel_com_old( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   double *gai_data=NULL;        /* Pointer to DATA component of GAI */
   double **gai_data_copy=NULL;  /* copy of gai_data for all subarrays */
   double *gai_copy=NULL;        /* copy of gai_data for one subarray */
-  size_t gbstride;              /* GAIn bolo stride */
-  size_t gcstride;              /* GAIn coeff stride */
+  dim_t gbstride;              /* GAIn bolo stride */
+  dim_t gcstride;              /* GAIn coeff stride */
   AstKeyMap *gkmap=NULL;        /* Local GAIn keymap */
   dim_t i;                      /* Loop counter */
   dim_t iblock;                 /* Index of time block */
@@ -568,18 +568,18 @@ void smf_calcmodel_com_old( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   int nbad;                     /* Number of rejected bolo-blocks */
   dim_t nbolo=0;                /* Number of bolometers */
   dim_t nblock=0;               /* Number of time blocks */
-  int ncom;                     /* Number of COM models */
+  dim_t ncom;                   /* Number of COM models */
   dim_t ndata=0;                /* Total number of data points */
   int *nrej=NULL;               /* Array holding no. of rejections per block */
   int nogains;                  /* Force all gains to unity? */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
   double *noi_data=NULL;        /* Pointer to DATA component of model */
-  size_t noibstride;            /* bolo stride for noise */
+  dim_t noibstride;            /* bolo stride for noise */
   dim_t nointslice;             /* number of time slices for noise */
-  size_t noitstride;            /* Time stride for noise */
+  dim_t noitstride;            /* Time stride for noise */
   int noremove=0;               /* Don't remove COM from time-series */
   int notfirst=0;               /* flag for delaying until after 1st iter */
-  size_t ndchisq=0;             /* number of elements contributing to dchisq */
+  dim_t ndchisq=0;             /* number of elements contributing to dchisq */
   dim_t ntslice=0;              /* Number of time slices */
   int nw;                       /* Number of worker threads */
   AstObject *obj=NULL;          /* Used to avoid "type-punned" compiler warnings */
@@ -592,11 +592,11 @@ void smf_calcmodel_com_old( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  size_t step;                  /* step size for dividing up work */
+  dim_t step;                  /* step size for dividing up work */
   dim_t thisnbolo=0;            /* Check each file same dims as first */
   dim_t thisndata=0;            /* "                                  */
   dim_t thisntslice=0;          /* "                                  */
-  size_t tstride;               /* Time slice stride in data array */
+  dim_t tstride;               /* Time slice stride in data array */
   double *weight=NULL;          /* Weight at each point in model */
   double *wg;                   /* Work array holding gain values */
   double *woff;                 /* Work array holding offset values */
@@ -654,7 +654,7 @@ void smf_calcmodel_com_old( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   smf_get_nsamp( kmap, "BOXCAR", res->sdata[0], &boxcar, status );
   if( boxcar > 0 ) {
     do_boxcar = 1;
-    msgSeti("BOX",boxcar);
+    msgSetk("BOX",boxcar);
     msgOutif(MSG__VERB, " ", "    boxcar width ^BOX", status);
   }
 
@@ -738,7 +738,7 @@ void smf_calcmodel_com_old( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
        idx_lo = icom;
        idx_hi = icom;
        msgSeti( "I", icom + 1 );
-       msgSeti( "N", ncom );
+       msgSetk( "N", ncom );
        msgOutif( MSG__VERB, "", "  Calculating COM model for array ^I of ^N",
                  status );
     } else {
@@ -1083,11 +1083,11 @@ void smf_calcmodel_com_old( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
           /* Initialise the index of the first time slice for the current
              bolometer within the res_data and qua_data arrays. */
-          size_t ijindex = j*bstride;
+          dim_t ijindex = j*bstride;
 
           /* Skip bad bolometers */
           if( !(qua_data[ ijindex ] & SMF__Q_BADB ) ) {
-            size_t inbase = j*noibstride;
+            dim_t inbase = j*noibstride;
 
             /* Get the gain and offset for each time slice. */
             smf_gandoff( j, 0, ntslice-1, ntslice, gbstride, gcstride,

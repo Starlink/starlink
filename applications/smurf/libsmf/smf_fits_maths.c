@@ -129,7 +129,7 @@ AstKeyMap *smf_fits_maths( AstKeyMap *maths, const char *exp,
    int i;
    int ival;
    int nname;
-   size_t namlen;
+   dim_t namlen;
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return result;
@@ -246,7 +246,9 @@ AstKeyMap *smf_fits_maths( AstKeyMap *maths, const char *exp,
       ucexp = astFree( ucexp );
       token = astFree( token );
       if( tokens ) {
+         #pragma GCC diagnostic ignored "-Wcast-qual"
          for( i = 0; i < nname; i++ ) tokens[ i ] = astFree( (void *) tokens[ i ] );
+         #pragma GCC diagnostic pop
          tokens = astFree( tokens );
       }
 
@@ -293,7 +295,9 @@ AstKeyMap *smf_fits_maths( AstKeyMap *maths, const char *exp,
       names_buffer = astFree( names_buffer );
    } else if( names ){
       for( i = 0; i < nname; i++ ) {
+         #pragma GCC diagnostic ignored "-Wcast-qual"
          names[ i ] = astFree( (void *) names[ i ] );
+         #pragma GCC diagnostic pop
       }
       names = astFree( names );
    }

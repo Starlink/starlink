@@ -83,7 +83,7 @@
 
 #define FUNC_NAME "smf_free_smfFilter"
 
-smfFilter *smf_free_smfFilter( smfFilter *filt, int *status ) {
+smfFilter *smf_free_smfFilter( smfFilter *filt, int *status __attribute__((unused)) ) {
 
   /* Try to free filt even if bad status on entry */
 

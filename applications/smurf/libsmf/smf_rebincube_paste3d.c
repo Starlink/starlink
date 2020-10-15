@@ -15,7 +15,7 @@
 *     C function
 
 *  Invocation:
-*     int smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab,
+*     int smf_rebincube_paste3d( dim_t nchan, dim_t nout, dim_t *spectab,
 *                                dim_t iv0, dim_t nxy, double wgt,
 *                                int genvar, double invar, float *ddata,
 *                                float *data_array, float *var_array,
@@ -27,7 +27,7 @@
 *        Number of spectral channels in input cube.
 *     nout = dim_t (Given)
 *        Number of elements in output cube.
-*     spectab = int * (Given)
+*     spectab = dim_t * (Given)
 *        This array should have "nchan" elements, and each element should
 *        hold the integer index (zero-based) of the nearest neighbouring
 *        output channel. A value of -1 should flag input channels that do
@@ -130,7 +130,7 @@
 
 #define FUNC_NAME "smf_rebincube_paste3d"
 
-int smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab, dim_t iv0,
+int smf_rebincube_paste3d( dim_t nchan, dim_t nout, dim_t *spectab, dim_t iv0,
                            dim_t nxy, double wgt, int genvar, double invar,
                            float *ddata, float *data_array,
                            float *var_array, double *wgt_array, int64_t *nused,

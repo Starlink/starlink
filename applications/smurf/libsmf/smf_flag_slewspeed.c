@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_flag_slewspeed( smfData *data, double smin, double smax,
-*                          size_t *nflagged, double *average_speed,
+*                          dim_t *nflagged, double *average_speed,
 *                          int *status )
 
 *  Arguments:
@@ -26,7 +26,7 @@
 *     smax = double (Given)
 *        Speed threshold (arcsec/sec) above which data are flagged. Ignored
 *        if set to 0.
-*     nflagged = size_t * (Returned)
+*     nflagged = dim_t * (Returned)
 *        The number of new time samples that were flagged. May be NULL.
 *     average_speed = double * (Returned)
 *        Average speed of the telescope in arcsec/sec in non-flagegd region.
@@ -73,8 +73,8 @@
 *        Quality array is not needed if smin and smax indicate no flagging
 *        is required.
 *     2018-08-24 (DSB):
-*        Modified so that the smfData dimensions are only accessed if 
-*        smin and smax indicate flagging is required. The number of 
+*        Modified so that the smfData dimensions are only accessed if
+*        smin and smax indicate flagging is required. The number of
 *        time slices is now obtained from the smfHead rather than from
 *        smfData->dims.
 
@@ -123,14 +123,13 @@
 #define FUNC_NAME "smf_flag_slewspeed"
 
 void smf_flag_slewspeed( smfData *data, double smin, double smax,
-                         size_t *nflagged, double *average_speed,
+                         dim_t *nflagged, double *average_speed,
                          int *status ) {
 
   /* Local Variables */
-  double accel;                 /* Current acceleration */
   JCMTState *allState=NULL;     /* JCMT state information */
   double avspeed=0;             /* average speed in arcsec/sec */
-  size_t bstride;               /* Bolometers stride */
+  dim_t bstride;               /* Bolometers stride */
   smf_qual_t *flag=NULL;        /* Array indicating which samples to flag */
   dim_t i;                      /* Loop Counter */
   dim_t j;                      /* Loop Counter */
@@ -140,15 +139,15 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
   double pos2_ac2=0;            /* "                                     */
   double pos3_ac1;              /* "                                     */
   double pos3_ac2;              /* "                                     */
-  size_t navspeed=0;            /* Number of samples to calc avspeed */
+  dim_t navspeed=0;            /* Number of samples to calc avspeed */
   dim_t nbolo=0;                /* Number of bolometers */
-  size_t nflag=0;               /* Number of new flagged samples */
+  dim_t nflag=0;               /* Number of new flagged samples */
   dim_t ntslice=0;              /* Number of time slices */
   smf_qual_t *qua=NULL;         /* Pointer to quality flags */
   double sep1;                  /* Angular separation between samples */
   double sep2;                  /* Angular separation between samples */
   double speed;                 /* Current speed */
-  size_t tstride;               /* Time stride */
+  dim_t tstride;               /* Time stride */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -209,6 +208,9 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
     pos2_ac2 = allState[1].tcs_tr_ac2;
   }
 
+  pos3_ac1 = VAL__BADD;
+  pos3_ac2 = VAL__BADD;
+
   /* Loop over time slice */
   for( i=1; (*status==SAI__OK)&&i<(ntslice-1); i++ ) {
 
@@ -239,10 +241,8 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
        /* Average speed in arcsec/sec */
          speed = (sep1 + sep2)/(steptime1+steptime2);
 
-       /* Acceleration magnitude in arcsec/sec^2 (currently ignored) */
-         accel = fabs( (sep2-sep1)/(steptime1*steptime2) );
        } else {
-         accel = speed = 0.0;
+         speed = 0.0;
        }
 
        if( (smin && (speed < smin)) || (smax && (speed > smax)) ) {

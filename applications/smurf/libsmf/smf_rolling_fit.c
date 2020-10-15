@@ -121,6 +121,14 @@ void smf_rolling_fit( dim_t box, float wlim, dim_t el, dim_t start,
    const double *pcen;         /* Pointer to central data value */
    const double *pnew;         /* Pointer to next data value */
    const double *pold;         /* Pointer to oldest data value */
+   dim_t hb;                   /* Half box size */
+   dim_t i;                    /* Index into input/output arrays */
+   dim_t ihi;                  /* Highest index to include in box */
+   dim_t ilo;                  /* Lowest index to include in box */
+   dim_t inew;                 /* Index of *pnew value */
+   dim_t iold;                 /* Index of *pold value */
+   dim_t minpop;               /* Min no of valid i/p values for a valid o/p value */
+   dim_t pop;                  /* Number of good values in box */
    double *pg;                 /* Pointer to next output gradient value */
    double *po;                 /* Pointer to next output offset value */
    double *pr;                 /* Pointer to next output RMS value */
@@ -133,14 +141,6 @@ void smf_rolling_fit( dim_t box, float wlim, dim_t el, dim_t start,
    double sxy;                 /* Sum of data*index values */
    double sy;                  /* Sum of data values */
    double syy;                 /* Sum of data*data values */
-   int i;                      /* Index into input/output arrays */
-   int ihi;                    /* Highest index to include in box */
-   int ilo;                    /* Lowest index to include in box */
-   int inew;                   /* Index of *pnew value */
-   int iold;                   /* Index of *pold value */
-   int minpop;                 /* Min no of valid i/p values for a valid o/p value */
-   int pop;                    /* Number of good values in box */
-   size_t hb;                  /* Half box size */
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -155,7 +155,7 @@ void smf_rolling_fit( dim_t box, float wlim, dim_t el, dim_t start,
       minpop = wlim*box + 0.5;
       if( minpop == 0 ) {
          minpop = 1;
-      } else if( minpop > (int) box ) {
+      } else if( minpop > box ) {
          minpop = box;
       }
    } else {
@@ -179,7 +179,7 @@ void smf_rolling_fit( dim_t box, float wlim, dim_t el, dim_t start,
    if( ilo < 0 ) ilo = 0;
 
    ihi = start + hb;
-   if( ihi >= (int) el ) ihi = el - 1;
+   if( ihi >= el ) ihi = el - 1;
 
    pnew = dat + ilo;
    for( i = ilo; i <= ihi; i++,pnew++ ) {
@@ -214,7 +214,7 @@ void smf_rolling_fit( dim_t box, float wlim, dim_t el, dim_t start,
    pr = rms;
 
 /* Calculate the gradient, offset and RMS for each required point. */
-   for( i = start; i <= (int) end; i++,pold++,pcen++,pnew++,iold++,inew++ ) {
+   for( i = start; i <= end; i++,pold++,pcen++,pnew++,iold++,inew++ ) {
 
 /* Calculate the gradient, offset and RMS deviation of the least squares
    fit to the data currently in the fittting box. The offset here ("c") is
@@ -267,10 +267,10 @@ void smf_rolling_fit( dim_t box, float wlim, dim_t el, dim_t start,
       }
 
 /* If there will be another pass through the "i" loop... */
-      if( i < (int) end ) {
+      if( i < end ) {
 
 /* Add the next input value into the running sums. */
-         if( inew < (int) el && *pnew != VAL__BADD ) {
+         if( inew < el && *pnew != VAL__BADD ) {
             sy += *pnew;
             sx += inew;
             sxy += inew*( *pnew );

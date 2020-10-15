@@ -13,11 +13,11 @@
 *     SMURF subroutine
 
 *  Invocation:
-*    void smf_flat_malloc( size_t nheat, const smfData * refdata,
+*    void smf_flat_malloc( dim_t nheat, const smfData * refdata,
 *             smfData ** powvald, smfData ** bolvald, int *status );
 
 *  Arguments:
-*     nheat = size_t (Given)
+*     nheat = dim_t (Given)
 *        Size of powvald and size of 3rd dimension for bolvald.
 *     refdata = const smfData * (Given)
 *        Template smfData used to obtain bolometer dimensions and
@@ -102,25 +102,25 @@
 #include "smf.h"
 #include "smf_typ.h"
 
-void smf_flat_malloc( size_t nheat, const smfData * refdata,
+void smf_flat_malloc( dim_t nheat, const smfData * refdata,
                       smfData **powvald, smfData **bolvald, int *status ) {
 
-  size_t rowidx = SC2STORE__ROW_INDEX;
-  size_t colidx = SC2STORE__COL_INDEX;
+  dim_t rowidx = SC2STORE__ROW_INDEX;
+  dim_t colidx = SC2STORE__COL_INDEX;
   double * bolval = NULL; /* Data array inside bolrefd */
-  double * bolvalvar = NULL; /* Variance inside bolrefd */
-  dim_t dims[] = { 1, 1, 1 }; /* Default dimensions */
-  smfHead * hdr = NULL;      /* New header */
-  int lbnd[] = { 1, 1, 1 };  /* Default pixel lower bounds */
-  size_t nelem = 0;      /* Number of elements in first two dimensions of refdims */
-  smfHead * oldhdr = NULL;   /* header from refdata */
-  void *pntr[] = { NULL, NULL };          /* pointers for smfData */
+  double * bolvalvar = NULL;     /* Variance inside bolrefd */
+  dim_t dims[] = { 1, 1, 1 };    /* Default dimensions */
+  smfHead * hdr = NULL;   /* New header */
+  dim_t lbnd[] = { 1, 1, 1 };    /* Default pixel lower bounds */
+  dim_t nelem = 0;        /* Number of elements in first two dimensions of refdims */
+  smfHead * oldhdr = NULL;/* header from refdata */
+  void *pntr[] = { NULL, NULL }; /* pointers for smfData */
   double * powval = NULL; /* Data array inside powrefd */
   const char *dom;        /* Domain of axis 1 */
   AstFrameSet *new_fs;    /* New FrameSet for returned *bolvald */
   AstMapping *map;        /* Mapping from pixel index 3 to heater index */
   AstFrame *frm;          /* Frame describing heater index */
-  int ubnd[ 1 ];          /* Upper bound on heater index */
+  dim_t ubnd[ 1 ];        /* Upper bound on heater index */
 
   if (bolvald) *bolvald = NULL;
   if (powvald) *powvald = NULL;
@@ -208,7 +208,7 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
          map = (AstMapping *) astUnitMap( 1, " " );
          frm = astFrame( 1, "Domain=HEATER_INDEX" );
          ubnd[ 0 ] = nheat;
-         atlAddWcsAxis(  new_fs, map, frm, NULL, ubnd, status );
+         atlAddWcsAxis8(  new_fs, map, frm, NULL, ubnd, status );
          map = astAnnul( map );
          frm = astAnnul( frm );
 

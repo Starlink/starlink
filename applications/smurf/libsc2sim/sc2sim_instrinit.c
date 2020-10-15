@@ -155,7 +155,8 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
                        struct sc2sim_sim_struct *sinx,
                        AstKeyMap *obskeymap, AstKeyMap *simkeymap,
                        double coeffs[SC2SIM__NCOEFFS], double *digcurrent,
-                       double *digmean, double *digscale, double *elevation,
+                       double *digmean, double *digscale,
+                       double *elevation __attribute__((unused)),
                        double weights[], double **heater, double **pzero,
                        double **xbc, double **ybc, double **xbolo,
                        double **ybolo, int *status ) {
@@ -167,7 +168,6 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
   int j;                         /* loop counter */
   int nbol=0;                    /* total number of bolometers */
   double photonsigma;            /* typical photon noise level in pW */
-  double samptime;               /* sample time in sec */
   double startatm;               /* mean expected atmospheric signal (pW) */
   JCMTState state;               /* Telescope state at one time slice */
   sc2ast_subarray_t subnum;      /* subarray number */
@@ -178,9 +178,6 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
 
   sc2sim_getobspar ( obskeymap, inx, status );
   sc2sim_getsimpar ( simkeymap, sinx, status );
-
-  /* Get the sample interval time in seconds */
-  samptime = inx->steptime;
 
   /* Get the bolometer information */
   if( *status == SAI__OK ) {

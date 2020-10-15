@@ -54,7 +54,7 @@ dnl    support that, so need to check that. SMURF is using C99 features
 dnl    so we always ask that they are supported by GCC.
 SMURF_CFLAGS="-std=c99 -Wall -Wextra -Wcast-qual -Wcast-align -Wwrite-strings \
 -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
--Wredundant-decls"
+-Wredundant-decls -DNDF_I8"
 
 if test "$GCC" = "yes"; then
     have_fsp=yes

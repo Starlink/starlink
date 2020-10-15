@@ -51,11 +51,11 @@ void         smf_jsainstrument( const char *param, AstFitsChan *fc,
                                 int *status );
 void         smf_jsadicer( int indf, const char *base, int trim,
                            smf_inst_t instrument, smf_jsaproj_t proj,
-                           size_t *ntile, Grp *grp, int *status );
+                           int *ntile, Grp *grp, int *status );
 void         smf_jsatile( int itile, smfJSATiling *jsatiling, int local_origin,
                           smf_jsaproj_t proj, AstFitsChan **fc,
-                          AstFrameSet **fs, AstRegion **region, int lbnd[2],
-                          int ubnd[2], int *status );
+                          AstFrameSet **fs, AstRegion **region, dim_t lbnd[2],
+                          dim_t ubnd[2], int *status );
 AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
                                 int local_origin, smf_jsaproj_t proj,
                                 int *move, int *status );
@@ -63,7 +63,7 @@ void         smf_jsatilei2xy( int itile, smfJSATiling *jsatiling, int *xt,
                               int *yt, int *fi, int *status );
 int *        smf_jsatiles_region( AstRegion *region, smfJSATiling *tiling,
                                   int *ntile, int *status );
-int *        smf_jsatiles_data( ThrWorkForce *wf, Grp *igrp, size_t size,
+int *        smf_jsatiles_data( ThrWorkForce *wf, Grp *igrp, dim_t size,
                                 smfJSATiling *tiling, int *ntile, int *status );
 int          smf_jsatilexy2i( int xt, int yt, smfJSATiling *jsatiling,
                               int *status );
@@ -75,4 +75,4 @@ void         smf_jsatiling( smf_inst_t instrument, smfJSATiling *jsatiling,
 smf_jsaproj_t smf_jsaproj( int ntile, const int *tiles,
                            smfJSATiling *skytiling, int *status );
 smf_jsaproj_t smf_jsaproj_fromstr( const char *str, int rep, int *status );
-const char * smf_jsaproj_tostr( smf_jsaproj_t proj );
+                           const char * smf_jsaproj_tostr( smf_jsaproj_t proj );

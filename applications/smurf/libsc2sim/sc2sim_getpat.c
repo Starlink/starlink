@@ -15,7 +15,7 @@
  *     sc2sim_getpat ( int nvert, int smu_samples, double steptime,
  *                     double smu_offset, int conv-shape, double conv_sig,
  *                     int move_code, double jig_stepx, double jig_stepy,
- *                     int jig_vert[][2], size_t *cycle_samples,
+ *                     int jig_vert[][2], dim_t *cycle_samples,
  *                     double pattern[][2], int *status )
 
  *  Arguments:
@@ -38,7 +38,7 @@
  *     jig_vert = int[][2] (Given)
  *        Array with relative jiggle coordinates in units
  *        of jiggle steps in case jiggle positions are visited
- *     cycle_samples = size_t* (Returned)
+ *     cycle_samples = dim_t* (Returned)
  *        The number of samples per cycle
  *     pattern = double[][2] (Returned)
  *        The array to hold the coordinates of the jiggle
@@ -68,7 +68,7 @@
  *     2006-09-22 (JB):
  *        Removed DREAM specific code.
  *     2007-10-31 (TIMJ):
- *        Use size_t
+ *        Use dim_t
 
  *  Copyright:
  *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -109,15 +109,15 @@ void sc2sim_getpat
  int smu_samples,      /* number of samples between vertices (given) */
  double steptime,      /* time between data samples in sec (given) */
  double smu_offset,    /* smu timing offset in msec (given) */
- int conv_shape,       /* choice of convolution function (given) */
- double conv_sig,      /* convolution parameter (given) */
+ int conv_shape __attribute__((unused)), /* choice of convolution function (given) */
+ double conv_sig __attribute__((unused)), /* convolution parameter (given) */
  int move_code,        /* SMU waveform choice (given) */
  double jig_stepx,     /* X interval in arcsec (given) */
  double jig_stepy,     /* Y interval in arcsec (given) */
  int jig_vert[][2],    /* Array with relative jiggle coordinates in units of
                           jiggle steps in case jiggle positions are
                           visited (given) */
- size_t *cycle_samples,   /* The number of samples per cycle (returned) */
+ dim_t *cycle_samples,   /* The number of samples per cycle (returned) */
  double pattern[][2],  /* The array to hold the coordinates of the jiggle
                           offsets in arcsec. There are cycle_samples entries
                           filled. (returned) */
@@ -126,7 +126,7 @@ void sc2sim_getpat
 
 {
   /* Local variables */
-  size_t j;
+  dim_t j;
   double frac;
   double vertex_t;    /* time interval between jiggle vertices in msec */
 

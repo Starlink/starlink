@@ -183,8 +183,8 @@ void smurf_calcflat( int *status ) {
   smfArray * darks = NULL;  /* Darks */
   Grp * dkgrp = NULL;       /* Group of darks */
   char defname[GRP__SZNAM+1]; /* default output file name */
-  int isfastramp = 0;        /* are we processing a fast ramp? */
-  smfArray * fflats = NULL;  /* Fast flatfield ramps */
+  int isfastramp = 0;       /* are we processing a fast ramp? */
+  smfArray * fflats = NULL; /* Fast flatfield ramps */
   char flatname[GRP__SZNAM+1]; /* Actual output file name */
   smfArray * flatfiles = NULL; /* Flatfield data from all files */
   Grp *flatgrp = NULL;      /* Output flatfield group */
@@ -193,17 +193,18 @@ void smurf_calcflat( int *status ) {
   Grp * fgrp = NULL;        /* Filtered group */
   double heatref;           /* Reference heater setting */
   size_t i = 0;             /* Counter, index */
+  dim_t j = 0;              /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
-  size_t nflatfiles;        /* Number of flatfield files to process */
-  size_t ngood;             /* Number of good responsivities */
+  dim_t nflatfiles;         /* Number of flatfield files to process */
+  dim_t ngood;              /* Number of good responsivities */
   int obsnum;               /* Observation number */
   double *pixheat = NULL;   /* Pixel heater settings for each input file */
   char *pname = NULL;       /* Temporary pointer */
 
-  size_t size;               /* Number of files in input group */
-  char subarray[9];          /* subarray name */
-  sc2ast_subarray_t subnum;  /* subarray number */
-  int utdate;                /* UTdate of observation */
+  size_t size;              /* Number of files in input group */
+  char subarray[9];         /* subarray name */
+  sc2ast_subarray_t subnum; /* subarray number */
+  int utdate;               /* UTdate of observation */
 
   /* Main routine */
   ndfBegin();
@@ -233,7 +234,7 @@ void smurf_calcflat( int *status ) {
   /* See whether we had all darks or science + dark or fast flatfields. For some reason
      grpGrpsz returns 1 if status is bad */
   if ( *status == SAI__OK && grpGrpsz( ffgrp, status ) > 0 && fflats ) {
-    size_t fsize = grpGrpsz( ffgrp, status );
+    dim_t fsize = grpGrpsz( ffgrp, status );
 
     if (fsize > 1) {
       if (*status == SAI__OK) {
@@ -274,7 +275,7 @@ void smurf_calcflat( int *status ) {
         smfData *outfile = NULL;
         smfData *infile = NULL;
         if (*status != SAI__OK) break;
-        smf_open_file( NULL, igrp, i, "READ", 0, &infile, status );
+        smf_open_file( NULL, igrp, (int) i, "READ", 0, &infile, status );
 
         if (*status == SAI__OK && infile
             && infile->hdr->obstype != SMF__TYP_FLATFIELD) {
@@ -309,18 +310,18 @@ void smurf_calcflat( int *status ) {
       if (*status != SAI__OK) goto CLEANUP;
 
       /* check that we are all from the same observation and same subarray */
-      for (i = 1; i < flatfiles->ndat; i++) {
+      for (j = 1; j < flatfiles->ndat; j++) {
         int nsub;
 
         if (strcmp( (flatfiles->sdata)[0]->hdr->obsidss,
-                    (flatfiles->sdata)[i]->hdr->obsidss ) != 0 ) {
+                    (flatfiles->sdata)[j]->hdr->obsidss ) != 0 ) {
           *status = SAI__ERROR;
           errRep(" ", "Flatfield can not be calculated from multiple observations",
                  status);
           goto CLEANUP;
         }
 
-        smf_find_subarray( (flatfiles->sdata)[i]->hdr, NULL, 0, &nsub, status );
+        smf_find_subarray( (flatfiles->sdata)[j]->hdr, NULL, 0, &nsub, status );
         if (nsub != subnum) {
           *status = SAI__ERROR;
           errRep( " ", "Flatfield command does not yet handle multiple subarrays in a single call",
@@ -360,22 +361,22 @@ void smurf_calcflat( int *status ) {
       /* Loop over every other frame. Assumes start and end on dark
          but note that this branch assumes all files are flatfield observations but with
          varying PIXHEAT */
-      for (i = 1; i < nflatfiles; i+=2) {
+      for (j = 1; j < nflatfiles; j+=2) {
         double heater;
         double ref1;
         double ref2;
 
         /* get the pixel heater settings and make sure they are consistent */
-        smf_fits_getD( (flatfiles->sdata)[i]->hdr, "PIXHEAT", &heater,
+        smf_fits_getD( (flatfiles->sdata)[j]->hdr, "PIXHEAT", &heater,
                        status );
 
         msgSetd( "PX", heater );
         msgOutif( MSG__NORM, " ", "Processing heater setting ^PX", status );
 
         /* Get reference */
-        smf_fits_getD( (flatfiles->sdata)[i-1]->hdr, "PIXHEAT", &ref1,
+        smf_fits_getD( (flatfiles->sdata)[j-1]->hdr, "PIXHEAT", &ref1,
                        status );
-        smf_fits_getD( (flatfiles->sdata)[i+1]->hdr, "PIXHEAT", &ref2,
+        smf_fits_getD( (flatfiles->sdata)[j+1]->hdr, "PIXHEAT", &ref2,
                        status );
 
         if (ref1 != heatref || ref2 != heatref) {
@@ -391,11 +392,11 @@ void smurf_calcflat( int *status ) {
         }
 
         /* Subtract bracketing files using MEAN */
-        smf_subtract_dark( (flatfiles->sdata)[i], (flatfiles->sdata)[i-1],
-                           (flatfiles->sdata)[i+1], SMF__DKSUB_MEAN, status);
+        smf_subtract_dark( (flatfiles->sdata)[j], (flatfiles->sdata)[i-1],
+                           (flatfiles->sdata)[j+1], SMF__DKSUB_MEAN, status);
 
         /* Store the frame for later */
-        smf_addto_smfArray( bbhtframe, (flatfiles->sdata)[i], status );
+        smf_addto_smfArray( bbhtframe, (flatfiles->sdata)[j], status );
 
         pixheat[bbhtframe->ndat - 1] = heater;
 
@@ -438,7 +439,7 @@ void smurf_calcflat( int *status ) {
 
     ngood = smf_flat_calcflat( NULL, MSG__NORM, flatname, "RESIST", "METHOD", "ORDER",
                                "RESP", "RESPMASK", "SNRMIN", igrp, bolval, NULL, status );
-    parPut0i( "NGOOD", ngood, status );
+    parPut0k( "NGOOD", ngood, status );
 
   }
 

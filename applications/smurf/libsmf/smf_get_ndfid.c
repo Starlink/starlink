@@ -16,7 +16,7 @@
 *     ndfid = int smf_get_ndfid ( const HDSLoc *loc, const char *name,
 *                   const char *accmode,
 *		    const char *state, const char *dattype, const int ndims,
-*		    const int *lbnd, const int *ubnd, int *status )
+*		    const dim_t *lbnd, const dim_t *ubnd, int *status )
 
 *  Arguments:
 *     loc = HDSLoc* (Given)
@@ -31,9 +31,9 @@
 *        Data type to be stored in NDF
 *     ndims = const int (Given)
 *        Number of dimensions in new locator
-*     lbnd = const int* (Given)
+*     lbnd = const dim_t * (Given)
 *        Pointer to array containing lower bounds for each axis
-*     ubnd = const int* (Given)
+*     ubnd = const dim_t * (Given)
 *        Pointer to array containing upper bounds for each axis
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -118,7 +118,7 @@
 
 int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
 		    const char *state, const char *dattype, const int ndims,
-		    const int *lbnd, const int *ubnd, int *status ) {
+		    const dim_t *lbnd, const dim_t *ubnd, int *status ) {
 
   /* Local variables */
   int ndfid;                /* NDF identifier for named component */

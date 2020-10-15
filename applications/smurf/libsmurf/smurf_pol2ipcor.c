@@ -276,8 +276,8 @@ typedef struct SmfPol2IpcorData {
    AstKeyMap *km;
    const int *binsize;
    const int *indx;
-   const int *lbnd;
-   const int *ubnd;
+   const dim_t *lbnd;
+   const dim_t *ubnd;
    double *beta;
    double *cor;
    double *dq;
@@ -290,17 +290,17 @@ typedef struct SmfPol2IpcorData {
    double *uc;
    double *utr;
    double *wgt;
+   dim_t *px;
+   dim_t *py;
    int *obs;
-   int *px;
-   int *py;
    int nbin;
    int nobs;
    int operation;
-   int r1;
-   int r2;
+   dim_t r1;
+   dim_t r2;
    int wave;
-   size_t ngood;
-   size_t npix_good;
+   dim_t ngood;
+   dim_t npix_good;
 } SmfPol2IpcorData;
 
 typedef struct Params {
@@ -309,7 +309,7 @@ typedef struct Params {
    const double *au;    /* Array of normalised U values */
    const double *aw;    /* Array of weights */
    double sw;           /* Sum of the weights */
-   size_t n;            /* Length of above arrays */
+   dim_t n;            /* Length of above arrays */
    int imodel;          /* The type of model to fit */
 } Params;
 
@@ -318,26 +318,29 @@ typedef struct Params {
 /* Prototypes for local functions. */
 static double smf1_f( const gsl_vector *v, void *pars );
 static int smf1_madebyskyloop( int indf, int *status );
-static int smf1_qsort( const void *a, const void *d, void *data );
+#ifdef HAVE_QSORT_R_BSD
 static int smf1_qsort_bsd( void *data, const void *a, const void *d );
+#else
+static int smf1_qsort( const void *a, const void *d, void *data );
+#endif
 static void smf1_worker( void *job_data_ptr, int *status );
 static void smf1_pol2ipcor( ThrWorkForce *wf, int model, AstKeyMap *km, Grp *igrp3,
-                           const int *lbnd,
-                           const int *ubnd, const int *indx, const int *binsize,
+                           const dim_t *lbnd,
+                           const dim_t *ubnd, const int *indx, const int *binsize,
                            int nbin, int wave, FILE *fd1, FILE *fd2,
                            const double *coslist, const double *sinlist,
                            const double *ellist, const double *alist,
                            double ippars[6], int *status );
-static void smf1_ipfit( int model, size_t n, const double *q, const double *u,
+static void smf1_ipfit( int model, dim_t n, const double *q, const double *u,
                         const double *w, const double *e,
                         int iwave, double par[6], int *status );
 static void smf1_df( const gsl_vector *v, void *params, gsl_vector *df );
 static void smf1_fdf( const gsl_vector *v, void *params, double *f, gsl_vector *df );
-static void smf1_linfit( size_t n, const int *xindex, const double *wlist,
+static void smf1_linfit( dim_t n, const int *xindex, const double *wlist,
                          const double *xlist, const double *ylist, double *slope,
                          double *offset, double *rms, double *cor, int *status );
 static void smf1_reject( int binsize, double *vals, int *status );
-static void smf1_logread( const char *path, size_t *n, double **q, double **u,
+static void smf1_logread( const char *path, dim_t *n, double **q, double **u,
                           double **w, double **e, int *iwave, int *status );
 static void smf1_circle_fitter( int nobs, double *qn, double *un,
                                 double *unw, double *qnw, int nbin,
@@ -376,29 +379,31 @@ void smurf_pol2ipcor( int *status ) {
    char label[70];
    char log[ GRP__SZFNM + 1 ];
    char mapdir[ GRP__SZFNM + 1 ];
-   char modeltype[ 10 ];
    char modelfile[ GRP__SZFNM + 1 ];
+   char modeltype[ 10 ];
    char object[80];
    char obsid[ GRP__SZNAM ];;
    const char *key;
    const char *obj;
    const char *wave;
+   dim_t lbnd[ NDF__MXDIM ];
+   dim_t ubnd[ NDF__MXDIM ];
    double *alist;
-   double *ellist;
    double *coslist;
-   double *sinlist;
+   double *ellist;
    double *pid;
    double *piv;
    double *pqd;
    double *pqv;
    double *pud;
    double *puv;
+   double *sinlist;
    double a0;
    double a;
    double alpha;
    double angle;
-   double az;
    double az0;
+   double az;
    double azp;
    double b0;
    double b;
@@ -418,34 +423,32 @@ void smurf_pol2ipcor( int *status ) {
    int *indx;
    int binsize[ MAXBIN ];
    int flag;
-   int ibin;
-   int iel;
+   int ibin = 0;
+   int i;
    int ifile;
    int imodel;
    int indf2;
    int indf;
    int iwave;
-   int lbnd[ NDF__MXDIM ];
    int ndims;
    int need_epochs;
-   int nel;
    int nobs;
    int obs;
    int obsstep;
    int qndf2;
    int qndf;
    int there;
+   int thiswindblind = 0;
    int tndf;
-   int ubnd[ NDF__MXDIM ];
    int undf2;
    int undf;
-   int thiswindblind;
-   int windblind;
    int utdate;
    int verb;
-   size_t i;
+   int windblind;
+   size_t iel;
    size_t isize1;
    size_t isize3;
+   size_t nel;
    size_t outsize;
    void *pntrs[6];
 
@@ -547,7 +550,7 @@ void smurf_pol2ipcor( int *status ) {
    iwave = NONE;
    *object = 0;
    windblind = -1;
-   for( i = 1; i <= isize1 && *status == SAI__OK; i++ ) {
+   for( i = 1; i <= (int) isize1 && *status == SAI__OK; i++ ) {
 
 /* Get the NDF path from the group. */
       pname = filepath;
@@ -799,8 +802,8 @@ void smurf_pol2ipcor( int *status ) {
 
 /* Loop round each observation. */
    az0 = 0.0;
-   for( i = 0; i < (size_t) nobs && *status == SAI__OK; i++ ) {
-      msgOutiff( MSG__DEBUG, " ", "Observation %zu:\n", status, i );
+   for( i = 0; i < (int) nobs && *status == SAI__OK; i++ ) {
+      msgOutiff( MSG__DEBUG, " ", "Observation %d:\n", status, i );
 
 /* Get the KeyMap holding information about all the input NDFs related to the
    current observation. */
@@ -911,7 +914,7 @@ void smurf_pol2ipcor( int *status ) {
    within "km". */
    indx = astMalloc( nobs*sizeof(*indx) );
    if( *status == SAI__OK && nobs ) {
-      for( i = 0; (int) i < nobs; i++ ) indx[ i ] = i;
+      for( i = 0; i < nobs; i++ ) indx[ i ] = i;
 
 #ifdef HAVE_QSORT_R_BSD
       qsort_r( indx, nobs, sizeof(*indx), alist, smf1_qsort_bsd );
@@ -937,7 +940,7 @@ void smurf_pol2ipcor( int *status ) {
 
 /* Then loop round all remaining azimuth values, using the "indx" array
    to access them in increasing order. */
-      for( i = 1; (int) i < nobs; i++ ) {
+      for( i = 1; i < nobs; i++ ) {
 
 /* If the current azimuth is more than 45 degrees above the lowest
    azimuth value in the bin, or if the current bin is full, start a new
@@ -988,7 +991,7 @@ void smurf_pol2ipcor( int *status ) {
       fprintf( fd1, "# object = %s\n", object );
       fprintf( fd1, "# wave = %s\n", wave );
       fprintf( fd1, "#\n" );
-      for( i = 0; i < (size_t) nobs && *status == SAI__OK; i++ ) {
+      for( i = 0; i < (int) nobs && *status == SAI__OK; i++ ) {
          key = astMapKey( km, i );
          if( key ) {
             strcpy( obsid, key );
@@ -1000,7 +1003,7 @@ void smurf_pol2ipcor( int *status ) {
             astMapGet0D( obskm, "WVM", &wvm );
             obskm = astAnnul( obskm );
 
-            fprintf( fd1, "# Observation %zu:\n", i );
+            fprintf( fd1, "# Observation %d:\n", i );
             fprintf( fd1, "#    id: %s\n", obsid );
             fprintf( fd1, "#    epoch: %.20g\n", epoch );
             fprintf( fd1, "#    elevation: %g\n", el*AST__DR2D );
@@ -1065,7 +1068,7 @@ void smurf_pol2ipcor( int *status ) {
                          &igrp2, &outsize, status );
 
 /* Produce the IP corrected output maps for each observation. */
-   for( i = 0; i < (size_t) nobs && *status == SAI__OK; i++ ) {
+   for( i = 0; i < nobs && *status == SAI__OK; i++ ) {
 
 /* Get the KeyMap holding information about all the input NDFs related to the
    current observation. */
@@ -1226,7 +1229,7 @@ L999:
 
 
 static void smf1_pol2ipcor( ThrWorkForce *wf, int imodel, AstKeyMap *km,
-			    Grp *igrp, const int *lbnd, const int *ubnd,
+			    Grp *igrp, const dim_t *lbnd, const dim_t *ubnd,
 			    const int *indx, const int *binsize, int nbin,
                             int wave, FILE *fd1, FILE *fd2, const double *coslist,
                             const double *sinlist, const double *ellist,
@@ -1234,16 +1237,23 @@ static void smf1_pol2ipcor( ThrWorkForce *wf, int imodel, AstKeyMap *km,
 
 /* Local Variables: */
    AstKeyMap *kmcopy;
-   SmfPol2IpcorData *pdata = NULL;
    SmfPol2IpcorData *job_data = NULL;
+   SmfPol2IpcorData *pdata = NULL;
    char *pname;
    char filepath[ GRP__SZFNM + 1 ];
-   double *flist;
+   dim_t *pxlist;
+   dim_t *pylist;
+   dim_t igood;
+   dim_t ngood;
+   dim_t npix_good;
+   dim_t nrej;
+   dim_t rowstep;
    double *blist;
    double *corlist;
    double *dqlist;
    double *dulist;
    double *elist;
+   double *flist;
    double *ilist;
    double *qclist;
    double *qtrlist;
@@ -1270,22 +1280,15 @@ static void smf1_pol2ipcor( ThrWorkForce *wf, int imodel, AstKeyMap *km,
    double rms;
    double u;
    double uc;
-   int again;
    int *olist;
-   int *pxlist;
-   int *pylist;
+   int again;
    int i;
-   int ilog;
    int iw;
    int k;
-   int nlog;
    int nobs;
    int nw;
-   size_t igood;
-   size_t ngood;
-   size_t npix_good;
-   size_t nrej;
-   size_t rowstep;
+   size_t ilog;
+   size_t nlog;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -1518,7 +1521,7 @@ static void smf1_pol2ipcor( ThrWorkForce *wf, int imodel, AstKeyMap *km,
             if( fd1 ) {
                for( igood = 0; igood < ngood; igood++ ) {
                   k = olist[ igood ];
-                  fprintf( fd1, "%d %d %d %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g\n",
+                  fprintf( fd1, "%d %" DIM_T_FMT " %" DIM_T_FMT " %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g\n",
                            k, pxlist[igood], pylist[igood], ilist[igood],
                            qtrlist[igood], utrlist[igood], dqlist[igood],
                            dulist[igood], qclist[igood], uclist[igood],
@@ -1727,7 +1730,7 @@ static void smf1_worker( void *job_data_ptr, int *status ) {
    double Qc;
    double Rad;
    double Rms;
-   double sigma;
+   double sigma = 0.0;
    double sq2;
    double sq;
    double su2;
@@ -1746,22 +1749,22 @@ static void smf1_worker( void *job_data_ptr, int *status ) {
    double vun;
    double w;
    int *obs;
-   int *px;
-   int *py;
+   dim_t *px;
+   dim_t *py;
    int ibin;
-   int ix;
-   int iy;
+   dim_t ix;
+   dim_t iy;
    int k;
    int nbin;
    int nobs;
    int nuse;
    int nval;
-   int xhi;
-   int xlo;
-   size_t newsize;
-   size_t ngood;
-   size_t npix_good;
-   size_t offset;
+   dim_t xhi;
+   dim_t xlo;
+   dim_t newsize;
+   dim_t ngood;
+   dim_t npix_good;
+   dim_t offset;
    void *pntrs[6];
 
 /* Check inherited status */
@@ -2130,10 +2133,11 @@ static void smf1_worker( void *job_data_ptr, int *status ) {
 }
 
 
+#ifdef HAVE_QSORT_R_BSD
 static int smf1_qsort_bsd( void *data, const void *a, const void *b ){
    return smf1_qsort( a, b, data );
 }
-
+#else
 static int smf1_qsort( const void *a, const void *b, void *data ){
    int ia = *((const int *) a);
    int ib = *((const int *) b);
@@ -2146,8 +2150,9 @@ static int smf1_qsort( const void *a, const void *b, void *data ){
       return 0;
    }
 }
+#endif
 
-static void smf1_ipfit( int imodel, size_t n, const double *q,
+static void smf1_ipfit( int imodel, dim_t n, const double *q,
                         const double *u, const double *w, const double *e,
                         int iwave, double par[6], int *status ){
 
@@ -2161,7 +2166,7 @@ static void smf1_ipfit( int imodel, size_t n, const double *q,
    int ipar;
    int iter;
    int npar;
-   size_t i;
+   dim_t i;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -2277,7 +2282,7 @@ static void smf1_fdf( const gsl_vector *v, void *pars, double *f, gsl_vector *df
           mq, mu, mp, delta1, delta2, cosdel1, sindel1,
           cosdel2, sindel2, s5, s6;
    const double *pe, *pq, *pu, *pw;
-   size_t n, i;
+   dim_t n, i;
    Params *params = (Params *) pars;
 
 /* Get pointers to the first I, Q, U, weight and elevation value. */
@@ -2429,7 +2434,7 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    double A, B, C, D, E, F, dq, du, mq, mu, mp, delta1, cosdel1, sindel1,
           delta2, cosdel2, sindel2, f;
    const double *pe, *pq, *pu, *pw;
-   size_t n, i;
+   dim_t n, i;
    Params *params = (Params *) pars;
 
 /* Get pointers to the first Q, U, weight and elevation value. */
@@ -2522,7 +2527,7 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
 
 
 
-static void smf1_linfit( size_t n, const int *xindex, const double *wlist,
+static void smf1_linfit( dim_t n, const int *xindex, const double *wlist,
                          const double *xlist, const double *ylist, double *slope,
                          double *offset, double *rms, double *cor, int *status ){
 
@@ -2540,7 +2545,7 @@ static void smf1_linfit( size_t n, const int *xindex, const double *wlist,
    double y;
    int iter;
    int ok;
-   size_t i;
+   dim_t i;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -2725,7 +2730,7 @@ static int smf1_madebyskyloop( int indf, int *status ){
 
 
 
-static void smf1_logread( const char *path, size_t *n, double **q, double **u,
+static void smf1_logread( const char *path, dim_t *n, double **q, double **u,
                           double **w, double **e, int *iwave, int *status ){
 
 /* Local variables; */

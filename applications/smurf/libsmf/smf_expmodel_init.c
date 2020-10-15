@@ -92,7 +92,7 @@ void smf_expmodel_init( const smfData *indata, smfData **outdata, int *status) {
   /* Local Variables */
   double *d=NULL;               /* pointer to data array */
   smfData *data=NULL;           /* newly created smfData */
-  size_t i;                     /* Loop counter */
+  dim_t i;                     /* Loop counter */
   smfHead *inhdr=NULL;          /* input smfHead pointer */
   int lbnd_c;
   int lbnd_r;

@@ -95,7 +95,7 @@
 #include <string.h>
 #include "smf.h"
 
-void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits,
+void smf_fits_crchan( dim_t nfits, const char * headrec, AstFitsChan ** fits,
 		      int *status ) {
 
   /* Sc2store header records are each null terminated at the last non-whitespace
@@ -105,10 +105,9 @@ void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits,
   */
 
   const char *card = NULL;
-  size_t i;
-  size_t step = 0;
-  size_t single_buffer = 0;
-  size_t len;
+  dim_t i;
+  dim_t step = 0;
+  dim_t len;
 
   if (*status != SAI__OK) return;
 
@@ -117,14 +116,12 @@ void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits,
   if ( len <= SZFITSCARD + 1 ) {
     /* individually terminated or a single string */
     step = SZFITSCARD + 1;
-    single_buffer = 0;
 
     /* nfits can not be trusted */
     if (nfits == 0) nfits = 1;
 
   } else {
     step = SZFITSCARD;
-    single_buffer = 1;
 
     /* check nfits */
     if ( (nfits * SZFITSCARD) > len ) nfits = 0;

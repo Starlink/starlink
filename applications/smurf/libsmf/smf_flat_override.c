@@ -85,7 +85,7 @@
 int smf_flat_override ( const smfArray *flats, smfData * indata,
                         int *status ) {
 
-  size_t flatidx = SMF__BADIDX;
+  dim_t flatidx = SMF__BADIDX;
   int retval = 0;
 
   if (*status != SAI__OK) return retval;

@@ -116,15 +116,15 @@ void smf_open_ndf( const int newndf, const char accmode[],
   /* Local variables */
   void *datarr[] = { NULL, NULL }; /* Pointers for data */
   const char *datatype;         /* String for data type */
-  int dims[NDF__MXDIM];         /* Extent of each dimension */
+  dim_t dims[NDF__MXDIM];       /* Extent of each dimension */
   int flags = 0;                /* Flags for creating smfDA, smfFile and
 				   smfHead components in the output smfData */
-  int lbnd[NDF__MXDIM];         /* Lower pixel bounds of NDF */
-  int ndat;                     /* Number of elements mapped in the requested NDF */
+  dim_t lbnd[NDF__MXDIM];       /* Lower pixel bounds of NDF */
+  size_t ndat;                  /* Number of elements mapped in the requested NDF */
   int ndims;                    /* Number of dimensions in the requested NDF */
   smfFile *newfile = NULL;      /* New smfFile with details of requested NDF */
   int i;                        /* loop counter */
-  int ubnd[NDF__MXDIM];         /* Upper pixel bounds of NDF */
+  dim_t ubnd[NDF__MXDIM];       /* Upper pixel bounds of NDF */
 
   if ( *status != SAI__OK ) return;
 

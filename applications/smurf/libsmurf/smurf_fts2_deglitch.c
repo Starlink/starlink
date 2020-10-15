@@ -131,7 +131,6 @@ void smurf_fts2_deglitch(int* status)
   int k                   = 0;    // Loop counter
   int ii                  = 0;    // Loop counter
   int jj                  = 0;    // Loop counter
-  int index               = 0;    // Index
   int zpdIndex            = 0;    // ZPD Index
   int srcH                = 0;    // Height of the subarray
   int srcW                = 0;    // Width of the subarray
@@ -150,6 +149,7 @@ void smurf_fts2_deglitch(int* status)
   double* cMEAN           = NULL; // Array of cluster mean
   double* cSDEV           = NULL; // Array of cluster sdev
   size_t fileIndex        = 0;    // File loop counter
+  size_t index            = 0;    // Index
   size_t numInputFile     = 0;    // Size of the input group
   size_t numOutputFile    = 0;    // Size of the output group
   smfData* inputData      = NULL; // Pointer to input data
@@ -176,7 +176,7 @@ void smurf_fts2_deglitch(int* status)
   // LOOP THROUGH EACH NDF FILE IN THE INPUT GROUP
   // ===========================================================================
   for(fileIndex = 1; fileIndex <= numInputFile; fileIndex++) {
-    smf_open_and_flatfield(NULL, grpInput, grpOutput, fileIndex, NULL, NULL, NULL, &inputData, status);
+    smf_open_and_flatfield(NULL, grpInput, grpOutput, (int) fileIndex, NULL, NULL, NULL, &inputData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open source file!", status);
@@ -193,9 +193,9 @@ void smurf_fts2_deglitch(int* status)
     }
 
     // INPUT FILE DIMENSIONS
-    srcW = inputData->dims[0];
-    srcH = inputData->dims[1];
-    srcN = inputData->dims[2];
+    srcW = (int) inputData->dims[0];
+    srcH = (int) inputData->dims[1];
+    srcN = (int) inputData->dims[2];
     numBol = srcW * srcH;
 
     // LOOP THROUGH THE SUBARRAY
@@ -287,13 +287,13 @@ void smurf_fts2_deglitch(int* status)
           START = zpdIndex - dsLength2;
           STOP 	= zpdIndex + dsLength2;
           for(ii = START; ii <= STOP; ii++) {
-            double t = abs((ii - zpdIndex) * Fc);
+            double t = fabs((ii - zpdIndex) * Fc);
             double y = (t < AST__DPI / 2.0) ? ((t > SMF__DEGLITCH_THRESHOLD) ?
                                                     Ampc * sin(t) / t :
                                                     Ampc) :
                                               (Ampc / t);
             double ERROR = IFG[ii] - MEAN;
-            if(abs(ERROR) > 2.0 * y) {
+            if(fabs(ERROR) > 2.0 * y) {
               if(ERROR > 0) IFG[ii] = MEAN + y;
               if(ERROR < 0) IFG[ii] = MEAN - y;
             }

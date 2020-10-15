@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     didflat = smf_open_and_flatfield( ThrWorkForce *wf, const Grp *igrp,
-*                             const Grp *ogrp, size_t index, const smfArray* darks,
+*                             const Grp *ogrp, dim_t index, const smfArray* darks,
 *                             const smfArray* flatramps, AstKeyMap * heateffmap,
 *                             smfData **data, int *status );
 
@@ -25,7 +25,7 @@
 *        Pointer to an input group
 *     ogrp = const Grp* (Given)
 *        Pointer to an output group
-*     index = size_t (Given)
+*     index = dim_t (Given)
 *        Index into the group
 *     darks = const smfArray* (Given)
 *        Set of darks that could be applied. Can be NULL.
@@ -101,7 +101,7 @@
 *        Store the input filename in the smfFile even if there is no
 *        output group. This simplifies filename retrieval enormously
 *     2008-07-18 (TIMJ):
-*        Use size_t and const.
+*        Use dim_t and const.
 *        Pass in smfArray of darks.
 *     2008-11-24 (TIMJ):
 *        Pass in smfArray of bad pixel masks.
@@ -177,17 +177,17 @@
 
 #define FUNC_NAME "smf_open_and_flatfield"
 
-int smf_open_and_flatfield ( ThrWorkForce *wf, const Grp *igrp, const Grp *ogrp, size_t index,
+int smf_open_and_flatfield ( ThrWorkForce *wf, const Grp *igrp, const Grp *ogrp, dim_t index,
                              const smfArray *darks, const smfArray * flatramps,
                              AstKeyMap * heateffmap, smfData **ffdata, int *status) {
 
   smfData *data = NULL;     /* Pointer to input data struct */
   smfFile *file = NULL;     /* Pointer to input file struct */
   int indf;                 /* NDF identifier for input file */
-  int nout;                 /* Number of data points in output data file */
+  size_t nout;              /* Number of data points in output data file */
   void *outdata[1] = { NULL };/* Pointer to array of output mapped pointers*/
   int outndf;               /* Output NDF identifier */
-  size_t npts = 0;          /* Number of data points */
+  dim_t npts = 0;           /* Number of data points */
   int flags = 0;            /* Flags for creating smfFile and smfHead */
   char prvname[2*PAR__SZNAM+1]; /* provenance ID string */
   int retval = 0;           /* True if flatfielded */
@@ -199,10 +199,10 @@ int smf_open_and_flatfield ( ThrWorkForce *wf, const Grp *igrp, const Grp *ogrp,
 
   if ( ogrp != NULL ) {
     /* Open the input file solely to propagate it to the output file */
-    ndgNdfas( igrp, index, "READ", &indf, status );
+    ndgNdfas( igrp, (int) index, "READ", &indf, status );
     /* We want QUALITY too if it's available */
     ndgNdfpr( indf, "WCS,QUALITY,UNITS,TITLE,LABEL,NOEXTENSION(PROVENANCE)",
-              ogrp, index, &outndf, status );
+              ogrp, (int) index, &outndf, status );
     ndfAnnul( &indf, status);
 
     /* Set parameters of the DATA array in the output file */

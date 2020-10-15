@@ -120,7 +120,7 @@ void smf_mask_noisy( ThrWorkForce *wf, smfData *data, AstKeyMap *kmap,
                      smfData **noise, double sigcliphigh, double sigcliplow,
                      int cliplog, int zeropad, int * status ){
 
-  size_t i;
+  dim_t i;
   dim_t nbolo = 0;             /* Number of bolometers */
   double *noisedata = NULL;    /* Pointer to the noise data array */
   smfData * noisemap = NULL;   /* Somewhere to receive the result */

@@ -116,7 +116,7 @@ int smf_history_check( const smfData* data, const char * appl, int *status) {
   int i = 0;           /* Loop counter */
   int nrec = 0;        /* Number of history records */
   int retval = 0;      /* Return value */
-  size_t nc;           /* Number of characters to compare */
+  dim_t nc;           /* Number of characters to compare */
 
   /* Check entry status */
   if (*status != SAI__OK) return retval;

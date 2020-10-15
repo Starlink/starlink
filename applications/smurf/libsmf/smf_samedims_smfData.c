@@ -75,7 +75,7 @@
 int smf_samedims_smfData( const smfData *data1, const smfData *data2,
                            int *status ) {
 
-  size_t i;
+  dim_t i;
   int retval=0;
 
    /* Check the inherited status */

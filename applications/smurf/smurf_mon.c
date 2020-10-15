@@ -284,6 +284,11 @@ void smurf_mon( int * status ) {
      function. */
   ndfCancl( "*", status );
 
+  /* SMURF uses 64 bit ints to count pixels and so we are not limited to
+     2147 mega-pixels in a single NDF section. Arbitrarily set the limit
+     to 50000 mega-pixels. */
+  ndfTune( 50000, "SECMAX", status );
+
   /* Find out the task name and provenance name we were invoked with */
   smf_get_taskname( taskname, NULL, status );
 
@@ -560,7 +565,7 @@ void smurf_mon( int * status ) {
      to see how much memory usage SMURF hit at its peak */
   /*
   {
-    size_t memcurrent,mempeak;
+    dim_t memcurrent,mempeak;
     astMemoryStats( 0, &mempeak, &memcurrent );
     msgOutf( "", "SMURF: === current /peak memory usage: %zu / %zu MiB ===",
              status, memcurrent/SMF__MIB, mempeak/SMF__MIB );

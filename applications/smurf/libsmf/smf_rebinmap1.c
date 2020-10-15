@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_rebinmap1( ThrWorkForce *wf, smfData *data, smfData *variance, int *lut,
-*                    size_t tslice1, size_t tslice2, int trange, int *whichmap,
+*                    dim_t tslice1, dim_t tslice2, int trange, int *whichmap,
 *                    dim_t nmap, smf_qual_t mask, int sampvar, int flags,
 *                    double *map, double *mapweight, double *mapweightsq,
 *                    int *hitsmap, double *mapvar, dim_t msize,
@@ -33,9 +33,9 @@
 *        created by smf_model_create).
 *     lut = int* (Given)
 *        1-d LUT for indices of data points in map (same dimensions as data)
-*     tslice1 = size_t (Given)
+*     tslice1 = dim_t (Given)
 *        If tslice2 >= tslice1 and trange set, regrid to tslice1 to tslice2
-*     tslice2 = size_t (Given)
+*     tslice2 = dim_t (Given)
 *        If tslice2 >= tslice1 and trange set, regrid to tslice1 to tslice2
 *     trange = int (Given)
 *        If set, regrid from tslice1 to tslice2
@@ -263,12 +263,12 @@ typedef struct smfRebinMap1Data {
    int *lut;
    int *whichmap;
    int operation;
-   size_t dbstride;
-   size_t dtstride;
-   size_t p1;
-   size_t p2;
-   size_t vbstride;
-   size_t vtstride;
+   dim_t dbstride;
+   dim_t dtstride;
+   dim_t p1;
+   dim_t p2;
+   dim_t vbstride;
+   dim_t vtstride;
    smf_qual_t *qual;
    smf_qual_t mask;
    int nw;
@@ -281,7 +281,7 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status );
 #define FUNC_NAME "smf_rebinmap1"
 
 void smf_rebinmap1( ThrWorkForce *wf, smfData *data, smfData *variance, int *lut,
-                    size_t tslice1, size_t tslice2, int trange, int *whichmap,
+                    dim_t tslice1, dim_t tslice2, int trange, int *whichmap,
                     dim_t nmap, smf_qual_t mask, int sampvar, int flags,
                     double *map, double *mapweight, double *mapweightsq,
                     int *hitsmap, double *mapvar, dim_t msize,
@@ -291,24 +291,24 @@ void smf_rebinmap1( ThrWorkForce *wf, smfData *data, smfData *variance, int *lut
   SmfRebinMap1Data *job_data = NULL;
   SmfRebinMap1Data *pdata;
   double *dat=NULL;          /* Pointer to data array */
-  size_t dbstride;           /* bolo stride of data */
-  size_t dtstride;           /* tstride of data */
+  dim_t dbstride;           /* bolo stride of data */
+  dim_t dtstride;           /* tstride of data */
   int iw;                    /* Thread index */
   dim_t mbufsize;            /* Size of full (multi-map) map buffers */
   dim_t nbolo;               /* number of bolos */
   dim_t ntslice;             /* number of time slices */
   int nw;                    /* Number of worker threads */
-  size_t pixstep;            /* Number of map pixels per thread */
+  dim_t pixstep;            /* Number of map pixels per thread */
   dim_t bolostep;            /* Number of bolos per thread */
   smf_qual_t * qual = NULL;  /* Quality pointer */
   double scalevar;           /* variance scale factor */
   double scaleweight;        /* weights for calculating scalevar */
-  size_t t1, t2;             /* range of time slices to re-grid */
+  dim_t t1, t2;             /* range of time slices to re-grid */
   double *var=NULL;          /* Pointer to variance array */
-  size_t vbstride;           /* bolo stride of variance */
+  dim_t vbstride;           /* bolo stride of variance */
   dim_t vnbolo;              /* number of bolos in variance */
   dim_t vntslice;            /* number of bolos in variance */
-  size_t vtstride;           /* tstride of variance */
+  dim_t vtstride;           /* tstride of variance */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -393,7 +393,7 @@ void smf_rebinmap1( ThrWorkForce *wf, smfData *data, smfData *variance, int *lut
   bolostep = nbolo/nw;
   if ( bolostep == 0 ) {
     bolostep = 1;
-    nw = nbolo;
+    nw = (int) nbolo;
   }
 
   /* Allocate job data for threads, and store the range of bolos to be
@@ -594,11 +594,11 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
    double weightsqacc;        /* weights squared accumulator */
    int hitsacc;               /* hits accumulator */
    int imap;                  /* Submap index */
-   size_t ibolo;              /* Bolometer index */
-   size_t ipix;               /* Map pixel index */
-   size_t itime;              /* Time slice index */
-   size_t tipix;              /* index into sub map */
-   size_t tmap0;              /* index for start of current submap */
+   dim_t ibolo;              /* Bolometer index */
+   dim_t ipix;               /* Map pixel index */
+   dim_t itime;              /* Time slice index */
+   dim_t tipix;              /* index into sub map */
+   dim_t tmap0;              /* index for start of current submap */
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;

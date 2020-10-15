@@ -95,7 +95,6 @@
 void smurf_rawfixmeta( int * status ) {
 
   smfData *data=NULL;        /* Data file to be tested */
-  int fixed;                 /* Was the metadata updated */
   size_t i;
   Grp *igrp = NULL;          /* Input group */
   size_t size;               /* Number of files in input group */
@@ -114,7 +113,7 @@ void smurf_rawfixmeta( int * status ) {
     smf_open_file( NULL, igrp, i, "READ", SMF__NOCREATE_DATA | SMF__NOFIX_METADATA, &data, status );
 
     /* see if things need fixing */
-    fixed = smf_fix_metadata( MSG__NORM, data, status );
+    (void) smf_fix_metadata( MSG__NORM, data, status );
 
     /* if we have modified the smfData we need to write out the results.
        Might be handy to know which bit has been changed (FitsChan,

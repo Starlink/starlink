@@ -82,21 +82,21 @@
 
 void smf_expmodel_dks( const smfData *indata, smfData **outdata, int *status) {
   /* Local Variables */
-  size_t bolo;                  /* bolo number */
-  size_t bstride;               /* bolo stride */
+  dim_t bolo;                  /* bolo number */
+  dim_t bstride;               /* bolo stride */
   double *d=NULL;               /* pointer to data array */
   smfData *data=NULL;           /* newly created smfData */
   double *dksquid=NULL;         /* Pointer to current dark squid */
   double *gainbuf=NULL;         /* Array of gains for all bolos in this col */
-  size_t i;                     /* Loop counter */
-  size_t j;                     /* Loop counter */
-  size_t k;                     /* Loop counter */
+  dim_t i;                     /* Loop counter */
+  dim_t j;                     /* Loop counter */
+  dim_t k;                     /* Loop counter */
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ncol;                   /* Number of columns */
   dim_t nrow;                   /* Number of rows */
   dim_t ntslice;                /* Number of time slices */
   double *offsetbuf=NULL;       /* Array of offsets for all bolos in this col */
-  size_t tstride;               /* time stride */
+  dim_t tstride;               /* time stride */
 
   /* Main routine */
   if (*status != SAI__OK) return;

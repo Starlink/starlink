@@ -267,8 +267,8 @@ typedef struct smfCorrectExtinctionData {
    double *wvmtau;
    double amstart;
    double amfirst;
-   int *lbnd;
-   int *ubnd;
+   dim_t *lbnd;
+   dim_t *ubnd;
    int isTordered;
    int ndims;
    int allquick;
@@ -297,21 +297,21 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausr
   smfHead *hdr = NULL;     /* Pointer to full header struct */
   double *indata = NULL;   /* Pointer to data array */
   int isTordered;          /* data order of input data */
-  int lbnd[2];             /* Lower bound */
-  size_t ndims;            /* Number of dimensions in input data */
+  dim_t lbnd[2];           /* Lower bound */
+  int ndims;               /* Number of dimensions in input data */
   dim_t nframes = 0;       /* Number of frames */
   dim_t npts = 0;          /* Number of data points */
   dim_t nx = 0;            /* # pixels in x-direction */
   dim_t ny = 0;            /* # pixels in y-direction */
   smf_tausrc tausrc;       /* Local copy of tausrc value */
-  int ubnd[2];             /* Upper bound */
+  dim_t ubnd[2];           /* Upper bound */
   double *vardata = NULL;  /* Pointer to variance array */
   double * wvmtau = NULL;  /* WVM tau (smoothed or not) for these data */
   int nw;                  /* Number of worker threads */
   int iw;                  /* Thread index */
   SmfCorrectExtinctionData *job_data = NULL;  /* Array of job descriptions */
   SmfCorrectExtinctionData *pdata;   /* Pointer to next job description */
-  size_t framestep;         /* Number of frames per thread */
+  dim_t framestep;         /* Number of frames per thread */
 
   /* Check status */
   if (*status != SAI__OK) return allquick;
@@ -412,7 +412,7 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausr
   } else if (ndims < 2 || ndims > 3) {
     if (*status == SAI__OK) {
       *status = SAI__ERROR;
-      errRepf( FUNC_NAME, "Can not extinction correct data with %zd dimension(s)", status,
+      errRepf( FUNC_NAME, "Cannot extinction-correct data with %d dimension(s)", status,
               ndims );
       return allquick;
     }
@@ -436,9 +436,9 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausr
   }
 
   if (!wvmtau && tausrc == SMF__TAUSRC_WVMRAW) {
-    size_t ntotaltau = 0;
-    size_t ngoodtau = 0;
-    size_t ngood_pre_despike = 0;
+    dim_t ntotaltau = 0;
+    dim_t ngoodtau = 0;
+    dim_t ngood_pre_despike = 0;
     smf_calc_smoothedwvm( wf, NULL, data, extpars, &wvmtau, &ntotaltau,
                           &ngoodtau, &ngood_pre_despike, status );
     smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
@@ -501,9 +501,9 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausr
       if (smf_is_wvm_usable( data->hdr, status ) ) {
 
         /* Calculate the WVM tau data and see if we have enough good data */
-        size_t ngoodtau = 0;
-        size_t ngood_pre_despike = 0;
-        size_t ntotaltau = 0;
+        dim_t ngoodtau = 0;
+        dim_t ngood_pre_despike = 0;
+        dim_t ntotaltau = 0;
         smf_calc_smoothedwvm( wf, NULL, data, extpars, &wvmtau, &ntotaltau,
                               &ngoodtau, &ngood_pre_despike, status );
         percentgood = 100.0 * ((double)ngoodtau / (double)ntotaltau);
@@ -656,7 +656,7 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausr
   framestep = nframes/nw;
   if( framestep == 0 ) {
     framestep = 1;
-    nw = nframes;
+    nw = (int) nframes;
   }
 
   /* Allocate job data for threads, and store the range of frames to be
@@ -806,11 +806,11 @@ static void smf1_correct_extinction( void *job_data_ptr, int *status ) {
   /* Local Variables: */
   SmfCorrectExtinctionData *pdata;
   double airmass;          /* Airmass */
-  double state_airmass;    /* Airmass read from header */
-  double state_az_ac2;     /* Elevation read from header */
+  double state_airmass = 0.0;/* Airmass read from header */
+  double state_az_ac2 = 0.0; /* Elevation read from header */
   double amprev;           /* Previous airmass in loop */
   double *azel = NULL;     /* AZEL coordinates */
-  size_t base;             /* Offset into 3d data array */
+  dim_t base;              /* Offset into 3d data array */
   double extcorr = 1.0;    /* Extinction correction factor */
   dim_t i;                 /* Loop counter */
   dim_t k;                 /* Loop counter */
@@ -946,7 +946,7 @@ static void smf1_correct_extinction( void *job_data_ptr, int *status ) {
           astSet( wcs, "SYSTEM=AZEL"  );
         }
         /* Transfrom from pixels to AZEL */
-        astTranGrid( wcs, 2, pdata->lbnd, pdata->ubnd, 0.1, 1000000, 1, 2,
+        astTranGrid8( wcs, 2, pdata->lbnd, pdata->ubnd, 0.1, 1000000, 1, 2,
                      pdata->npts, azel );
       } else {
         /* this time slice may have bad telescope data so we trap for this and re-enable
@@ -964,7 +964,7 @@ static void smf1_correct_extinction( void *job_data_ptr, int *status ) {
     for (i=0; i < pdata->npts && ( *status == SAI__OK ); i++ ) {
       /* calculate array indices - assumes that astTranGrid fills up
          azel[] array in same order as bolometer data are aligned */
-      size_t index;
+      dim_t index;
       if ( pdata->isTordered ) {
         index = base + i;
       } else {

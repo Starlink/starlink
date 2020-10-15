@@ -130,12 +130,12 @@
 
 void smurf_calcresp( int *status ) {
 
-  size_t i = 0;             /* Counter, index */
-  int *ngood = NULL;        /* Number of good responsivities in each output image */
-  Grp *igrp = NULL;         /* Input group of files */
-  Grp *ogrp = NULL;         /* Output group of files */
-  size_t size;               /* Number of files in input group */
-  size_t outsize;            /* Number of files in output group */
+  size_t i = 0;          /* Counter, index */
+  dim_t *ngood = NULL;   /* Number of good responsivities in each output image */
+  Grp *igrp = NULL;      /* Input group of files */
+  Grp *ogrp = NULL;      /* Output group of files */
+  size_t size;           /* Number of files in input group */
+  size_t outsize;        /* Number of files in output group */
 
   /* Main routine */
   ndfBegin();
@@ -160,11 +160,11 @@ void smurf_calcresp( int *status ) {
 
 
     /* We do *not* need the data array itself, just flatfield information */
-    smf_open_file( NULL, igrp, i, "READ", SMF__NOCREATE_DATA, &idata, status);
+    smf_open_file( NULL, igrp, (int) i, "READ", SMF__NOCREATE_DATA, &idata, status);
 
     /* Abort if we have no flatfield information */
     if (*status == SAI__OK && ! idata->da ) {
-      msgSeti( "I", i);
+      msgSetk( "I", i);
       *status = SAI__ERROR;
       errRep("", "Unable to read flatfield information from input file ^I", status);
     }
@@ -195,12 +195,12 @@ void smurf_calcresp( int *status ) {
       /* Report the number of good responsivities */
       if (flatmethod == SMF__FLATMETH_TABLE) {
         msgOutiff( MSG__NORM, "",
-                   "Number of responsivities with S/N ratio > %.1f for file %zu: %zu",
-                   status, snrmin, i, ngood[i-1] );
+                   "Number of responsivities with S/N ratio > %.1f for file %zu: %d",
+                   status, snrmin, i, (int) ngood[i-1] );
       } else {
         msgOutiff( MSG__NORM, "",
-                   "Number of responsivities for file %zu: %zu",
-                   status, i, ngood[i-1] );
+                   "Number of responsivities for file %zu: %d",
+                   status, i, (int) ngood[i-1] );
       }
     }
 
@@ -211,7 +211,7 @@ void smurf_calcresp( int *status ) {
   }
 
   /* store number of good bolometers */
-  parPut1i( "NGOOD", size, ngood, status);
+  parPut1k( "NGOOD", (int) size, ngood, status);
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */
  CLEANUP:

@@ -13,16 +13,16 @@
 *     C function
 
 *  Invocation:
-*     smf_reorder( type, void *in, int len, int ndim, int *dims_in,
-*                  int axis, int *index, int maxis, int *mask, void *out,
+*     smf_reorder( type, void *in, int len, int ndim, dim_t *dims_in,
+*                  int axis, dim_t *index, int maxis, dim_t *mask, void *out,
 *                  int *status );
 *
-*     smf_reorder<x>( <type> *in, int ndim, int *dims_in, int axis,
-*                     int *index, int maxis, int *mask, <type> *out,
+*     smf_reorder<x>( <type> *in, int ndim, dim_t *dims_in, int axis,
+*                     dim_t *index, int maxis, dim_t *mask, <type> *out,
 *                     int *status );
 *
-*     smf_reorderc( char *in, int len, int ndim, int *dims_in, int axis,
-*                   int *index, int maxis, int *mask, char *out,
+*     smf_reorderc( char *in, int len, int ndim, dim_t *dims_in, int axis,
+*                   dim_t *index, int maxis, dim_t *mask, char *out,
 *                   int *status );
 
 *  Arguments:
@@ -39,7 +39,7 @@
 *        the supplied value if "type" indicates a non-character data type.
 *     ndim = int (Given)
 *        Number of array axes in "in" and "out".
-*     dims_in = int * (Given)
+*     dims_in = dim_t * (Given)
 *        Pointer to an array of "ndim" values, each being the length of
 *        the corresponding dimension of the "in" array. The dimensions of
 *        the "out" array should be the same as those of the "in" array,
@@ -143,8 +143,8 @@
 #include "mers.h"
 #include "smf.h"
 
-void smf_reorder( const char *type, void *in, int len, int ndim, int *dims_in,
-                  int axis, int *index, int maxis, int *mask, void *out,
+void smf_reorder( const char *type, void *in, int len, int ndim, dim_t *dims_in,
+                  int axis, dim_t *index, int maxis, dim_t *mask, void *out,
                   int *status ){
 
 /* Check inherited status */

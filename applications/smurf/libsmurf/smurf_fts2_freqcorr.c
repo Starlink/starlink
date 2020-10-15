@@ -102,7 +102,6 @@ void smurf_fts2_freqcorr(int* status)
 
   int bolCount       = 0;    /* Number of bolometers */
   int bolIndex       = 0;    /* Bolometer index */
-  int fIndex         = 0;    /* File loop counter */
   int nbolX          = 0;    /* Width of the source subarray */
   int nbolY          = 0;    /* Height of the source subarray */
   int N              = 0;    /* Sample count */
@@ -119,6 +118,7 @@ void smurf_fts2_freqcorr(int* status)
   size_t calSize     = 0;    /* Theta group size */
   size_t outSize     = 0;    /* Output group size */
   size_t inSize      = 0;    /* Input group size */
+  size_t fIndex      = 0;    /* File loop counter */
   smfData* calData   = NULL; /* Pointer to theta data */
   smfData* inData    = NULL; /* Pointer to input data */
   smfData* outData   = NULL; /* Pointer to output data */
@@ -168,9 +168,9 @@ void smurf_fts2_freqcorr(int* status)
 
     if(*status == SAI__OK) {
       inPntr   = inData->pntr[0];
-      nbolX    = inData->dims[0];
-      nbolY    = inData->dims[1];
-      N        = inData->dims[2];
+      nbolX    = (int) inData->dims[0];
+      nbolY    = (int) inData->dims[1];
+      N        = (int) inData->dims[2];
       bolCount = nbolX * nbolY;
 
       outData->dtype   = SMF__DOUBLE;

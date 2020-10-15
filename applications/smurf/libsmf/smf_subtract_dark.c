@@ -126,9 +126,9 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
   double *dkbuf = NULL; /* malloced buffer for dark */
   double *dkvbuf = NULL; /* malloced buffer for dark variance */
 
-  size_t i;             /* loop counter */
-  size_t nbols;         /* number of bolometers */
-  size_t nslices;       /* number of time slices in input data */
+  dim_t i;             /* loop counter */
+  dim_t nbols;         /* number of bolometers */
+  dim_t nslices;       /* number of time slices in input data */
 
 
   if (*status != SAI__OK) return;
@@ -349,8 +349,8 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
         double * dvar;
         int * idata;
         int * ivar;
-        size_t j;
-        size_t startidx;
+        dim_t j;
+        dim_t startidx;
 
         /* get the correct input data pointer */
         smf_select_pntr( indata->pntr, indata->dtype, &ddata, &dvar,

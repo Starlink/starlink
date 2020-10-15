@@ -82,16 +82,16 @@
 void smf_summarize_obs( const Grp * igrp, int * status ) {
 
   smfData *data = NULL;      /* Input data file */
-  size_t i;
+  int i;
   AstKeyMap * obsmap = NULL; /* Info from all observations */
   AstKeyMap * objmap = NULL; /* All the object names used */
-  size_t size;               /* Size of input group */
+  int size;                  /* Size of input group */
 
   if (*status != SAI__OK) return;
 
   obsmap = astKeyMap( " " );
   objmap = astKeyMap( " " );
-  size = grpGrpsz( igrp, status );
+  size = (int) grpGrpsz( igrp, status );
 
   for (i = 1; i <= size; i++) {
     /* open the file but just to get the header */

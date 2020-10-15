@@ -84,7 +84,7 @@
 void sc2sim_response
 (
  double lambda,     /* wavelength in metres (given) */
- int ncoeffs,       /* number of coefficients to be returned (given) */
+ int ncoeffs __attribute__((unused)), /* number of coefficients to be returned (given) */
  double coeffs[],   /* array to hold returned coefficients (returned) */
  int *status        /* global status (given and returned) */
  )

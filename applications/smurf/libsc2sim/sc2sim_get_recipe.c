@@ -14,14 +14,14 @@
 
  *  Invocation:
  *     sc2sim_get_recipe ( const struct sc2sim_obs_struct *inx, char *recipe,
- *                         size_t reclen, int *status )
+ *                         dim_t reclen, int *status )
 
  *  Arguments:
  *     inx = const sc2sim_obs_struct* (Given)
  *        Pointer to observation struct
  *     recipe = char* (Returned)
  *        Name of recipe
- *     reclen = size_t (Given)
+ *     reclen = dim_t (Given)
  *        Allocated size of "recipe".
  *     status = int* (Given and Returned)
  *        Pointer to global status.
@@ -87,7 +87,7 @@
 #include "sc2sim.h"
 
 void sc2sim_get_recipe ( const struct sc2sim_obs_struct *inx, char *recipe,
-                         size_t reclen, int *status ) {
+                         dim_t reclen, int *status ) {
 
   /* Local variable */
   int scan = 0;           /* Flag to denote SCAN mode data*/

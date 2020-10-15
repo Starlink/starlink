@@ -30,6 +30,9 @@
  *        Fixed format string macro
  *     2010-11-16 (EC):
  *        Add SMF__BADDIMT
+ *     2020-10-14 (DSB):
+ *        Redefine dim_t to be signed 64 bit int, preparatory to
+ *        replacing most uses of int with dim_t.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -60,8 +63,11 @@
 #ifndef SMURF_TYP_DEFINED
 #define SMURF_TYP_DEFINED
 
-#define DIM_T_FMT "lu"
-typedef unsigned long dim_t;
-#define SMF__BADDIMT (((dim_t) 0) - 1)
+#include <inttypes.h>
+#include "prm_par.h"
+
+#define DIM_T_FMT PRId64
+typedef int64_t dim_t;
+#define SMF__BADDIMT VAL__BADK
 
 #endif /* SMURF_TYP_DEFINED */

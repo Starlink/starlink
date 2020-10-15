@@ -13,7 +13,7 @@
  *     SMURF subroutine
 
  *  Invocation:
- *     smf_grp_related( Grp *igrp, const size_t grpsize,
+ *     smf_grp_related( Grp *igrp, const dim_t grpsize,
  *                      const int grouping, const int checksubinst,
  *                      double maxlen_s, double *srate_maxlen,
  *                      AstKeyMap *keymap, dim_t *maxconcatlen,
@@ -24,7 +24,7 @@
  *     igrp = Grp* (Given)
  *        Input Grp. The entries in this Grp for any rejected subscans will
  *        be set to a blank string on exit.
- *     grpsize = const size_t (Given)
+ *     grpsize = const dim_t (Given)
  *        Size of input Grp
  *     grouping = const int (Given)
  *        Flag describing how to group the data: 0 = all data taken
@@ -79,7 +79,7 @@
  *
  *     The constructed smfGroup stores the indices of the file as they occur
  *     in the supplied Grp in the smfGroup.subgroups array which is an array
- *     of size_t pointers indexed by group number and then number of related
+ *     of dim_t pointers indexed by group number and then number of related
  *     files. If an entry is zero there is no corresponding file for that
  *     slot (since there are at most 4 or 8 files but there does not need
  *     to be that many for each group).
@@ -262,7 +262,7 @@
 
 #define FUNC_NAME "smf_grp_related"
 
-void smf_grp_related( Grp *igrp, const size_t grpsize,
+void smf_grp_related( Grp *igrp, const dim_t grpsize,
                       const int grouping, const int checksubinst,
                       double maxlen_s, double *srate_maxlen,
                       AstKeyMap *keymap, dim_t *maxconcatlen,
@@ -270,33 +270,33 @@ void smf_grp_related( Grp *igrp, const size_t grpsize,
                       Grp **basegrp, dim_t *pad, int *status ) {
 
   /* Local variables */
-  size_t *chunk=NULL;         /* Array of flags for continuous chunks */
-  dim_t * chunklen = NULL;    /* Length of continuous chunk */
-  dim_t chunkminlen;          /* Min length of continuous chunk */
-  size_t currentindex = 0;    /* Counter */
-  char cwave[10];             /* String containing wavelength */
-  smfData *data = NULL;       /* Current smfData */
-  double downsampscale=0;     /* Angular scale downsampling size */
-  double downsampfreq=0;      /* Target downsampling frequency */
   AstKeyMap * grouped = NULL; /* Primary AstKeyMap for grouping */
-  size_t i;                   /* Loop counter for index into Grp */
-  int isFFT=0;                /* Set if data are 4d FFT */
-  size_t j;                   /* Loop counter */
-  int *keepchunk=NULL;        /* Flag for chunks that will be kept */
+  char cwave[10];             /* String containing wavelength */
+  dim_t *chunklen = NULL;     /* Length of continuous chunk */
+  dim_t *piecelen = NULL;     /* Length of single file */
+  dim_t *new_tlen=NULL;       /* tlens for new_subgroup */
+  dim_t chunkminlen;          /* Min length of continuous chunk */
+  dim_t currentindex = 0;     /* Counter */
   dim_t maxconcat=0;          /* Longest continuous chunk length */
   dim_t maxflen=0;            /* Max file length in time steps */
   dim_t maxlen=0;             /* Maximum concat length in samples */
-  int maxlen_scaled=0;        /* Set once maxlen has been scaled, if needed */
   dim_t maxpad=0;             /* Maximum padding neeed for any input file */
-  size_t maxrelated = 0;      /* Keep track of max number of related items */
-  size_t *new_chunk=NULL;     /* keeper chunks associated with subgroups */
-  dim_t *new_tlen=NULL;       /* tlens for new_subgroup */
-  size_t ngroups = 0;         /* Counter for subgroups to be stored */
-  size_t nkeep = 0;           /* Number of chunks to keep */
-  dim_t * piecelen = NULL;    /* Length of single file */
+  double downsampfreq=0;      /* Target downsampling frequency */
+  double downsampscale=0;     /* Angular scale downsampling size */
+  int **subgroups = NULL;     /* Array containing index arrays to parent Grp */
+  int *chunk=NULL;            /* Array of flags for continuous chunks */
+  int *keepchunk=NULL;        /* Flag for chunks that will be kept */
+  int *new_chunk=NULL;        /* keeper chunks associated with subgroups */
+  int i;                      /* Loop counter for index into Grp */
+  int isFFT=0;                /* Set if data are 4d FFT */
+  int j;                      /* Loop counter */
+  int maxlen_scaled=0;        /* Set once maxlen has been scaled, if needed */
+  int maxrelated = 0;         /* Keep track of max number of related items */
+  int ngroups = 0;            /* Counter for subgroups to be stored */
+  int nkeep = 0;              /* Number of chunks to keep */
   int pol2;                   /* Got pol2 stokes parameter data? */
+  smfData *data = NULL;       /* Current smfData */
   smf_subinst_t refsubinst;   /* Subinst of first file */
-  size_t **subgroups = NULL;  /* Array containing index arrays to parent Grp */
   smf_subinst_t subinst;      /* Subinst of current file */
 
   if ( *status != SAI__OK ) return;
@@ -334,7 +334,7 @@ void smf_grp_related( Grp *igrp, const size_t grpsize,
     char newkey[128];
     char dateobs[81];
     char subarray[10];
-    size_t nrelated = 0;
+    int nrelated = 0;
     AstKeyMap * filemap = NULL;
     AstKeyMap * indexmap = NULL;
 
@@ -475,7 +475,7 @@ void smf_grp_related( Grp *igrp, const size_t grpsize,
           /* If no SCAN_VEL value was read from the FITS header,
              calculate a scan velocity from the pointing information. */
           if( data->hdr->scanvel == VAL__BADD ) {
-             size_t nflagged;
+             dim_t nflagged;
              smf_flag_slewspeed( data, 0.0, 0.0, &nflagged,
                                  &data->hdr->scanvel, status );
              if( data->hdr->scanvel != VAL__BADD ) {
@@ -540,8 +540,8 @@ void smf_grp_related( Grp *igrp, const size_t grpsize,
          files are all the same) */
       if( maxlen && (ntslice > maxlen) && *status == SAI__OK) {
         *status = SAI__ERROR;
-        msgSeti("NTSLICE",ntslice);
-        msgSeti("MAXLEN",maxlen);
+        msgSetk("NTSLICE",ntslice);
+        msgSetk("MAXLEN",maxlen);
         smf_smfFile_msg( data->file, "FILE", 1, "" );
         errRep(FUNC_NAME,
                "Number of time steps in file ^FILE time exceeds maximum "
@@ -549,7 +549,7 @@ void smf_grp_related( Grp *igrp, const size_t grpsize,
       }
 
       /* Scaled values of ntslice and maximum length */
-      astMapPut0I( filemap, "NTSLICE", ntslice, NULL );
+      astMapPut0K( filemap, "NTSLICE", ntslice, NULL );
 
       /* Work out the padding needed for this file including downsampling. */
       if( keymap ) {
@@ -558,7 +558,7 @@ void smf_grp_related( Grp *igrp, const size_t grpsize,
       } else {
         thispad = 0;
       }
-      astMapPut0I( filemap, "PADDING", thispad, NULL );
+      astMapPut0K( filemap, "PADDING", thispad, NULL );
 
       /* Update maxflen */
       if( ntslice > maxflen ) {
@@ -581,7 +581,7 @@ void smf_grp_related( Grp *igrp, const size_t grpsize,
       astMapPut0A( filemap, "GRPINDICES", indexmap, NULL );
     }
 
-    astMapPut0I( indexmap, subarray, i, NULL );
+    astMapPut0K( indexmap, subarray, i, NULL );
 
     /* Need to track the largest number of related subarrays in a single slot */
     nrelated = astMapSize( indexmap );
@@ -612,7 +612,7 @@ void smf_grp_related( Grp *igrp, const size_t grpsize,
     smfCompareSeq current;
     smfCompareSeq previous;
     dim_t totlen = 0;
-    size_t thischunk;
+    int thischunk;
 
     /* Get the chunk flags and also store the size of the chunk */
     chunk = astCalloc( ngroups, sizeof(*chunk) );
@@ -625,7 +625,7 @@ void smf_grp_related( Grp *igrp, const size_t grpsize,
       AstKeyMap * grpindices = NULL;
       const char * tempstr = NULL;
       int thistlen = 0;
-      size_t nsubarrays = 0;
+      dim_t nsubarrays = 0;
 
       /* Get the keymap entry for this slot */
       astMapGet0A( grouped, astMapKey(grouped, i), &thismap );
@@ -699,13 +699,13 @@ void smf_grp_related( Grp *igrp, const size_t grpsize,
   nkeep = 0;
   keepchunk = astMalloc( ngroups*sizeof(*keepchunk) );
   for (i=0; i<ngroups; i++) {
-    size_t thischunk;
+    dim_t thischunk;
 
     thischunk = chunk[i];
     if ( chunklen[thischunk] < chunkminlen ) {
       /* Warning message */
-      msgSeti("LEN",chunklen[thischunk]);
-      msgSeti("MIN", chunkminlen );
+      msgSetk("LEN",chunklen[thischunk]);
+      msgSetk("MIN", chunkminlen );
       msgOut( " ", "SMF_GRP_RELATED: ignoring short chunk (^LEN<^MIN)",
               status);
       keepchunk[i] = 0;
@@ -735,8 +735,8 @@ void smf_grp_related( Grp *igrp, const size_t grpsize,
   for (i=0;i<ngroups;i++) {
     AstKeyMap * thismap = NULL;
     AstKeyMap * grpindices = NULL;
-    size_t nsubarrays = 0;
-    size_t *indices = astCalloc( maxrelated, sizeof(*indices) );
+    dim_t nsubarrays = 0;
+    int *indices = astCalloc( maxrelated, sizeof(*indices) );
 
     /* skip if we are dropping this chunk */
     if (!keepchunk[i]) continue;
@@ -783,12 +783,12 @@ void smf_grp_related( Grp *igrp, const size_t grpsize,
 
     /* Loop over time chunks */
     for( i=0; (*status==SAI__OK)&&(i<(*group)->ngroups); i++ ) {
-      size_t idx;
+      dim_t idx;
       /* Check for new continuous chunk */
       if( i==0 || ( (*group)->chunk[i] != (*group)->chunk[i-1]) ) {
         /* Loop over subarray */
         for( idx=0; idx<(*group)->nrelated; idx++ ) {
-          size_t grpindex = (*group)->subgroups[i][idx];
+          dim_t grpindex = (*group)->subgroups[i][idx];
           if ( grpindex > 0 ) {
             ndgCpsup( (*group)->grp, grpindex, *basegrp, status );
           }
@@ -814,7 +814,7 @@ void smf_grp_related( Grp *igrp, const size_t grpsize,
       new_chunk = astFree( new_chunk );
       new_tlen = astFree( new_tlen );
       if( subgroups ) {
-        size_t isub;
+        dim_t isub;
         for( isub=0; isub<nkeep; isub++ ) {
           subgroups[isub] = astFree( subgroups[isub] );
         }

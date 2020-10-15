@@ -207,7 +207,7 @@
 
 void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
                      const int nSubsys, const int obsNum,
-                     const int utDate, const int nSteps,
+                     const int utDate, const int nSteps __attribute__((unused)),
                      const char *backend, const int recepsUsed,
                      char *recepNames[], const char *samMode,
                      const char *obsType, const dateVars *dateVars,
@@ -247,7 +247,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   char recipe[25];            /* ORAC-DR recipe name */
   char recptors[SZFITSTR];    /* active FE receptor IDs for this obs */
   double refChan;             /* reference IF channel no. */
-  char sbMode[7];             /* Side band */
+  char sbMode[8];             /* Side band */
   int seeingok;               /* True if the seeing measurement is okay */
   char seeDatSt[SZFITSTR];    /* time of seeingSt in format
                                  YYYY-MM-DDTHH:MM:SS */
@@ -301,7 +301,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   }
 
   /* Copy the obsID into the obsIDSS and add the subsystem number. */
-  sprintf ( obsIDSS, "%s_%i", dateVars->obsID,
+  sprintf ( obsIDSS, "%.55s_%i", dateVars->obsID,
             subBandNum % nSubsys + 1 );
 
 

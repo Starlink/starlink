@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_accumulate_prov( const smfData * data, const Grp * igrp,
-*                    size_t index, int ondf, const char * creator,
+*                    dim_t index, int ondf, const char * creator,
 *                    NdgProvenance * modprov, int * status );
 
 *  Arguments:
@@ -114,7 +114,7 @@
 #include "sae_par.h"
 
 void
-smf_accumulate_prov( const smfData * data, const Grp* igrp, size_t index,
+smf_accumulate_prov( const smfData * data, const Grp* igrp, dim_t index,
                      int ondf, const char *creator, NdgProvenance ** modprov,
                      int * status ) {
 

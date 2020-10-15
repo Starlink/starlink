@@ -13,7 +13,7 @@
  *     SMURF subroutine
 
  *  Invocation:
- *     smf_open_asdouble( ThrWorkForce *wf, const Grp *igrp, size_t index, const smfArray* darks,
+ *     smf_open_asdouble( ThrWorkForce *wf, const Grp *igrp, dim_t index, const smfArray* darks,
  *                        const smfArray* flatramps, AstKeyMap * heateffmap,
  *                        int ensureflat, smfData **data, int *status );
 
@@ -22,7 +22,7 @@
  *        Pointer to a pool of worker threads
  *     igrp = const Grp* (Given)
  *        Pointer to an input group
- *     index = size_t (Given)
+ *     index = dim_t (Given)
  *        Index into the group
  *     darks = const smfArray* (Given)
  *        Set of darks that could be applied. Can be NULL.
@@ -91,7 +91,7 @@
 
 #define FUNC_NAME "smf_open_asdouble"
 
-void smf_open_asdouble( ThrWorkForce *wf, const Grp *igrp, size_t index, const smfArray* darks,
+void smf_open_asdouble( ThrWorkForce *wf, const Grp *igrp, dim_t index, const smfArray* darks,
                         const smfArray* flatramps, AstKeyMap * heateffmap,
                         int ensureflat, smfData **data, int *status ) {
 

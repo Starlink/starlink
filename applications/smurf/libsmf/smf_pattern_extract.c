@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     int smf_pattern_extract ( const char * sourcestr, const char * pattern,
-*                  double *dresult, char * sresult, size_t szstr, int * status );
+*                  double *dresult, char * sresult, dim_t szstr, int * status );
 
 *  Arguments:
 *     sourcestr = const char * (Given)
@@ -28,7 +28,7 @@
 *     sresult = char * (Returned)
 *        If non-null the result from the pattern match will be copied to
 *        this buffer.
-*     szstr = size_t (Given)
+*     szstr = dim_t (Given)
 *        Allocated size of sresult buffer.
 *     status = int * (Given & Returned)
 *        Pointer to global status
@@ -91,7 +91,7 @@
 #include <stdlib.h>
 
 int smf_pattern_extract ( const char * sourcestr, const char * pattern,
-                          double *dresult, char * sresult, size_t szstr, int * status ) {
+                          double *dresult, char * sresult, dim_t szstr, int * status ) {
 
   int i;
   int retval = 0;

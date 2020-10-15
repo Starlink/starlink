@@ -13,18 +13,18 @@
 *     C function
 
 *  Invocation:
-*     smf_expand_tilegroup( Grp * ogrp, size_t ntile, size_t npbin,
-*                           size_t * outsize, int *status);
+*     smf_expand_tilegroup( Grp * ogrp, dim_t ntile, dim_t npbin,
+*                           dim_t * outsize, int *status);
 
 *  Arguments:
 *     ogrp = Grp* (Given and Returned)
 *        The initial output group. It will be modified to contain the
 *        expanded filenames. Previous entries will be removed.
-*     ntile = size_t (Given)
+*     ntile = dim_t (Given)
 *        Number of tiles.
-*     npbin = size_t (Given)
+*     npbin = dim_t (Given)
 *        Number of polarimetry bins.
-*     outside = size_t * (Returned)
+*     outside = dim_t * (Returned)
 *        Size of the newly modified output group.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -43,7 +43,7 @@
 *     2008-06-05 (TIMJ):
 *        Initial version taken from smurf_makecube
 *     2008-07-24 (TIMJ):
-*        Use size_t
+*        Use dim_t
 *     2009-09-29 (TIMJ):
 *        Use ndgCopy rather than smf_grpCopy
 *     {enter_further_changes_here}
@@ -88,15 +88,15 @@
 #include "smf.h"
 
 void
-smf_expand_tilegroup ( Grp * ogrp, size_t ntile, int npbin, size_t * outsize,
+smf_expand_tilegroup ( Grp * ogrp, dim_t ntile, int npbin, dim_t * outsize,
                        int * status) {
 
   char basename[ GRP__SZNAM + 1 ]; /* Output base file name */
-  int blen;                  /* Used length of the "basename" string */
-  int ipbin;              /* Loop pol bin counter */
-  size_t itile;              /* Loop tile counter */
-  char *pname = NULL;        /* Name of currently opened data file */
-  Grp *tgrp = NULL;     /* Temporary group */
+  size_t blen;              /* Used length of the "basename" string */
+  int ipbin;                /* Loop pol bin counter */
+  dim_t itile;              /* Loop tile counter */
+  char *pname = NULL;       /* Name of currently opened data file */
+  Grp *tgrp = NULL;         /* Temporary group */
 
   if (*status != SAI__OK) return;
 

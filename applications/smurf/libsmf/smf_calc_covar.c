@@ -13,19 +13,19 @@
 *     Subroutine
 
 *  Invocation:
-*     covar = smf_calc_covar ( const smfData *data, const int i, const int j,
-*                      int lo, int hi, int *status )
+*     covar = smf_calc_covar ( const smfData *data, dim_t i, dim_t j,
+*                              dim_t lo, dim_t hi, int *status )
 
 *  Arguments:
 *     data = const smfData* (Given)
 *        Pointer to input data struct
-*     i = const int (Given)
+*     i = dim_t (Given)
 *        Index of bolometer 1
-*     j = const int (Given)
+*     j = dim_t (Given)
 *        Index of bolometer 2
-*     lo = int (Given)
+*     lo = dim_t (Given)
 *        Lower index bound into array
-*     hi = int (Given)
+*     hi = dim_t (Given)
 *        Upper index bound into array
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -99,18 +99,18 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_calc_covar"
 
-double smf_calc_covar ( const smfData *data, const size_t i, const size_t j,
-			size_t lo, size_t hi, int *status) {
+double smf_calc_covar ( const smfData *data, dim_t i, dim_t j,
+			dim_t lo, dim_t hi, int *status) {
 
   /* Local variables */
   double *indata = NULL;      /* Pointer to input data array */
-  size_t k;                   /* Loop counter */
+  dim_t k;                    /* Loop counter */
   dim_t nframes;              /* Max number of data points*/
-  size_t npts;                   /* Number of points in timeseries */
+  dim_t npts;                 /* Number of points in timeseries */
   dim_t nbol;                 /* Number of bolometers */
   double *idata = NULL;       /* Pointer to array for bolometer 1 data */
   double *jdata = NULL;       /* Pointer to array for bolometer 2 data */
-  size_t temp;                   /* Temporary variable */
+  dim_t temp;                 /* Temporary variable */
   double covar = VAL__BADD;   /* Covariance, initialuzed to bad */
 
   /* Check status */
@@ -126,8 +126,8 @@ double smf_calc_covar ( const smfData *data, const size_t i, const size_t j,
   /* Check bolometer indices are in range */
   if ( i > nframes ) {
     if ( *status == SAI__OK) {
-      msgSeti("I", i);
-      msgSeti("N", nframes);
+      msgSetk("I", i);
+      msgSetk("N", nframes);
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Requested bolometer index, ^I, is out of range (0 < i < ^N).", status);
       return covar;
@@ -135,8 +135,8 @@ double smf_calc_covar ( const smfData *data, const size_t i, const size_t j,
   }
   if ( j > nframes ) {
     if ( *status == SAI__OK) {
-      msgSeti("I", j);
-      msgSeti("N", nframes);
+      msgSetk("I", j);
+      msgSetk("N", nframes);
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Requested bolometer index, ^I, is out of range (0 < i < ^N).", status);
       return covar;
@@ -146,8 +146,8 @@ double smf_calc_covar ( const smfData *data, const size_t i, const size_t j,
   /* Check requested range is valid */
   if ( lo > nframes ) {
     if ( *status == SAI__OK) {
-      msgSeti("J", lo);
-      msgSeti("N", nframes);
+      msgSetk("J", lo);
+      msgSetk("N", nframes);
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Requested sample, ^J, is out of range (0 < lo < ^N).", status);
       return covar;
@@ -155,8 +155,8 @@ double smf_calc_covar ( const smfData *data, const size_t i, const size_t j,
   }
   if ( hi > nframes ) {
     if ( *status == SAI__OK) {
-      msgSeti("J", hi);
-      msgSeti("N", nframes);
+      msgSetk("J", hi);
+      msgSetk("N", nframes);
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Requested sample, ^J, is out of range (0 < hi < ^N).", status);
       return covar;
@@ -178,15 +178,15 @@ double smf_calc_covar ( const smfData *data, const size_t i, const size_t j,
 
   /* Allocate memory for data */
   npts = hi - lo + 1;
-  idata = astCalloc( npts, sizeof(double) );
+  idata = astCalloc( npts, sizeof(*idata) );
   if ( idata == NULL ) {
-    msgSeti("N",i);
+    msgSetk("N",i);
     errRep( FUNC_NAME, "Unable to allocate memory for bolometer ^N timeseries", status );
     return covar;
   }
-  jdata = astCalloc( npts, sizeof(double) );
+  jdata = astCalloc( npts, sizeof(*jdata) );
   if ( jdata == NULL ) {
-    msgSeti("N",j);
+    msgSetk("N",j);
     errRep( FUNC_NAME, "Unable to allocate memory for bolometer ^N timeseries", status );
     return covar;
   }

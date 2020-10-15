@@ -458,9 +458,17 @@ void smurf_unmakemap( int *status ) {
    char pabuf[ 10 ];          /* Text buffer for parameter value */
    char subarray[ 5 ];        /* Name of SCUBA-2 subarray (s8a,s8b,etc) */
    char units[100];           /* Units string from input sky map */
+   dim_t cdims[ 3 ];          /* Common-mode NDF dimensions */
+   dim_t dims[ NDF__MXDIM ];  /* NDF dimensions */
+   dim_t gdims[ 3 ];          /* GAI model NDF dimensions */
    dim_t iel;                 /* Index of next element */
+   dim_t lbndc[ 3 ];          /* Array of lower bounds of COM NDF */
    dim_t ndata;               /* Number of elements in array */
+   dim_t ngood;               /* No. of good values in output cube */
    dim_t ntslice;             /* Number of time slices in array */
+   dim_t slbnd[ 2 ];          /* Array of lower bounds of input map */
+   dim_t subnd[ 2 ];          /* Array of upper bounds of input map */
+   dim_t ubndc[ 3 ];          /* Array of upper bounds of COM NDF */
    double *ang_data = NULL;   /* Pointer to the FP orientation angles */
    double *angc_data = NULL;  /* Pointer to the instrumental ANGC data */
    double *c0_data = NULL;    /* Pointer to the instrumental C0 data */
@@ -494,10 +502,7 @@ void smurf_unmakemap( int *status ) {
    double pldata[4];          /* Parameters of the PL1 PL2 or PL3 IP model */
    double sigma;              /* Standard deviation of noise to add to output */
    int alignsys;              /* Align data in the map's system? */
-   int cdims[ 3 ];            /* Common-mode NDF dimensions */
-   int dims[ NDF__MXDIM ];    /* NDF dimensions */
    int flag;                  /* Was the group expression flagged? */
-   int gdims[ 3 ];            /* GAI model NDF dimensions */
    int harmonic;              /* The requested harmonic */
    int ifile;                 /* Input file index */
    int indf;                  /* Input sky map NDF identifier */
@@ -516,24 +521,19 @@ void smurf_unmakemap( int *status ) {
    int indfu;                 /* Input U map NDF identifier */
    int interp = 0;            /* Pixel interpolation method */
    int ipform = 0;            /* IP model in use */
-   int lbndc[ 3 ];            /* Array of lower bounds of COM NDF */
    int moving;                /* Is the telescope base position changing? */
    int ndim;                  /* Number of pixel axes in NDF */
    int ndimc;                 /* Number of pixel axes in common-mode NDF */
    int ndimg;                 /* Number of pixel axes in GAI NDF */
-   int nel;                   /* Number of elements in array */
-   int nelc;                  /* Number of elements in COM array */
-   int nelg;                  /* Number of elements in GAI array */
-   int nelqu;                 /* Number of elements in Q or U array */
-   int ngood;                 /* No. of good values in putput cube */
    int nparam = 0;            /* No. of parameters required for interpolation scheme */
    int nval;                  /* Number of values obtained for a parameter */
    int pasign;                /* Indicates sense of POL_ANG value */
    int sdim[ 2 ];             /* Array of significant pixel axes */
-   int slbnd[ 2 ];            /* Array of lower bounds of input map */
-   int subnd[ 2 ];            /* Array of upper bounds of input map */
-   int ubndc[ 3 ];            /* Array of upper bounds of COM NDF */
    size_t ncom;               /* Number of com files */
+   size_t nel;                /* Number of elements in array */
+   size_t nelc;               /* Number of elements in COM array */
+   size_t nelg;               /* Number of elements in GAI array */
+   size_t nelqu;              /* Number of elements in Q or U array */
    size_t ngai;               /* Number of gai files */
    size_t nskymap;            /* Number of supplied sky cubes */
    size_t outsize;            /* Number of files in output group */
@@ -566,7 +566,7 @@ void smurf_unmakemap( int *status ) {
 
 /* Get the WCS FrameSet from the sky map, together with its pixel index
    bounds. */
-   kpg1Asget( indf, 2, 0, 1, 1, sdim, slbnd, subnd, &wcsin, status );
+   kpg1Asget8( indf, 2, 0, 1, 1, sdim, slbnd, subnd, &wcsin, status );
 
 /* Check the current Frame is a SKY frame. */
    skyfrm = astGetFrame( wcsin, AST__CURRENT );
@@ -801,7 +801,7 @@ void smurf_unmakemap( int *status ) {
 
       ndfMsg( "FILE", indfin );
       msgSeti( "THISFILE", ifile );
-      msgSeti( "NUMFILES", size );
+      msgSetk( "NUMFILES", size );
       msgOutif( MSG__NORM, " ", "Simulating ^THISFILE/^NUMFILES ^FILE",
                 status );
 
@@ -917,8 +917,8 @@ void smurf_unmakemap( int *status ) {
                   *status = SAI__ERROR;
                   ndfMsg( "C", indfc );
                   ndfMsg( "R", indfin );
-                  msgSeti( "N", cdims[ 0 ] );
-                  msgSeti( "M", ntslice );
+                  msgSetk( "N", cdims[ 0 ] );
+                  msgSetk( "M", ntslice );
                   errRep( " ", "Supplied COM file (^C) has ^N time-slices, but "
                           "the reference NDF (^R) has ^M time-slices.", status );
                } else {
@@ -937,8 +937,8 @@ void smurf_unmakemap( int *status ) {
                   *status = SAI__ERROR;
                   ndfMsg( "C", indfc );
                   ndfMsg( "R", indfin );
-                  msgSeti( "N", cdims[ 2 ] );
-                  msgSeti( "M", ntslice );
+                  msgSetk( "N", cdims[ 2 ] );
+                  msgSetk( "M", ntslice );
                   errRep( " ", "Supplied COM file (^C) has ^N time-slices, but "
                           "the reference NDF (^R) has ^M time-slices.", status );
                } else {

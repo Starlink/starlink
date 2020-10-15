@@ -15,7 +15,7 @@
  *  Invocation:
  *     xloc = smf_get_xloc( const smfData *data, const char *extname,
  *                      const char *extype, const char *accmode,
- *                      const int ndims, const int *dims, int *status );
+ *                      const int ndims, const dim_t *dims, int *status );
 
  *  Arguments:
  *     data = const smfData* (Given)
@@ -28,7 +28,7 @@
  *        Access mode for locator (READ, WRITE or UPDATE)
  *     ndims = const int (Given)
  *        Number of dimensions in new locator
- *     dims = const int* (Given)
+ *     dims = const dim_t * (Given)
  *        Pointer to array containing size of each axis
  *     status = int* (Given and Returned)
  *        Pointer to global status.
@@ -132,7 +132,7 @@
 
 HDSLoc * smf_get_xloc ( const smfData *data, const char *extname,
                         const char *extype, const char *accmode,
-                        const int ndims, const int *dims, int *status ) {
+                        const int ndims, const dim_t *dims, int *status ) {
 
   int indf;                 /* NDF identifier for input file */
   HDSLoc *loc = NULL;       /* Locator to return */

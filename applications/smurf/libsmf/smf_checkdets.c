@@ -84,11 +84,11 @@ void smf_checkdets( Grp *detgrp, smfData *data, int *status ){
    char *buf = NULL;          /* A buffer for a text pointer */
    char detname[ GRP__SZNAM ];/* Detector name */
    const char *lab = NULL;    /* Pointer to start of next detector name */
+   dim_t irec;                /* Index of current input detector */
+   dim_t ndetgrp;             /* Size of "detgrp" group */
    int baddetslen;            /* Used length of "baddets" string */
    int exclude;               /* Exclude the listed detectors? */
-   int found;                 /* Was current detector name found in detgrp? */
-   size_t irec;               /* Index of current input detector */
-   size_t ndetgrp;            /* Size of "detgrp" group */
+   size_t found;              /* Was current detector name found in detgrp? */
 
 /* Check inherited status. Also check a group was supplied. */
    if( *status != SAI__OK || !detgrp ) return;

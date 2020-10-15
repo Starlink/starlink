@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_sparsebounds( ThrWorkForce *wf, Grp *igrp,  int size, AstSkyFrame *oskyframe,
-*                       int usedetpos, Grp *detgrp, int lbnd[ 3 ],
-*                       int ubnd[ 3 ], AstFrameSet **wcsout, int *hasoffexp,
+*                       int usedetpos, Grp *detgrp, dim_t lbnd[ 3 ],
+*                       dim_t ubnd[ 3 ], AstFrameSet **wcsout, int *hasoffexp,
 *                       int *polobs, int *status )
 
 *  Arguments:
@@ -36,9 +36,9 @@
 *     detgrp = Grp * (Given)
 *        A Group containing the names of the detectors to be used. All
 *        detectors will be used if this group is empty.
-*     lbnd = int [ 3 ] (Returned)
+*     lbnd = dim_t [ 3 ] (Returned)
 *        The lower pixel index bounds of the output cube.
-*     ubnd = int [ 3 ] (Returned)
+*     ubnd = dim_t [ 3 ] (Returned)
 *        The upper pixel index bounds of the output cube.
 *     wcsout = AstFrameSet ** (Returned)
 *        A pointer to a location at which to return a pointer to an AST
@@ -137,8 +137,8 @@
 #define FUNC_NAME "smf_sparsebounds"
 
 void smf_sparsebounds( ThrWorkForce *wf, Grp *igrp,  int size, AstSkyFrame *oskyframe,
-                       int usedetpos, Grp *detgrp, int lbnd[ 3 ],
-                       int ubnd[ 3 ], AstFrameSet **wcsout, int *hasoffexp,
+                       int usedetpos, Grp *detgrp, dim_t lbnd[ 3 ],
+                       dim_t ubnd[ 3 ], AstFrameSet **wcsout, int *hasoffexp,
                        int *polobs, int *status ){
 
 /* Local Variables */
@@ -154,13 +154,17 @@ void smf_sparsebounds( ThrWorkForce *wf, Grp *igrp,  int size, AstSkyFrame *osky
    AstFrameSet *swcsin = NULL;  /* FrameSet describing spatial input WCS */
    AstLutMap *lutmap1;          /* Longitude LutMap */
    AstLutMap *lutmap2;          /* Latitude LutMap */
-   AstMapping *smap = NULL;     /* Simplified Mapping */
-   AstMapping *tmap = NULL;     /* Temporary Mapping */
    AstMapping *fsmap = NULL;    /* Base->Current Mapping extracted from a FrameSet */
    AstMapping *ospecmap = NULL; /* Spec <> PIXEL mapping in output FrameSet */
+   AstMapping *smap = NULL;     /* Simplified Mapping */
    AstMapping *specmap = NULL;  /* PIXEL -> Spec mapping in input FrameSet */
+   AstMapping *tmap = NULL;     /* Temporary Mapping */
    AstPermMap *pmap = NULL;     /* Axis permutation */
    const char *name;     /* Pointer to current detector name */
+   dim_t ishift;         /* Shift to put pixel origin at centre */
+   dim_t ispec;          /* Index of current spectral sample */
+   dim_t itime;          /* Index of current time slice */
+   dim_t npix;           /* Number of pixels along axis */
    double *latlut = NULL;/* Workspace to hold latitude values */
    double *lonlut = NULL;/* Workspace to hold longitude values */
    double *xin = NULL;   /* Workspace for detector input grid positions */
@@ -182,11 +186,7 @@ void smf_sparsebounds( ThrWorkForce *wf, Grp *igrp,  int size, AstSkyFrame *osky
    int ifile;            /* Index of current input file */
    int inperm[ 2 ];      /* Input axis permutation array */
    int irec;             /* Index of current input detector */
-   int ishift;           /* Shift to put pixel origin at centre */
-   int ispec;            /* Index of current spectral sample */
-   int itime;            /* Index of current time slice */
    int lutsize;          /* No. of values in lonlut and latlut */
-   int npix;             /* Number of pixels along axis */
    int nval;             /* Number of values supplied */
    int outperm[ 2 ];     /* Output axis permutation array */
    int pixax[ 3 ];       /* The output fed by each selected mapping input */
@@ -443,7 +443,7 @@ void smf_sparsebounds( ThrWorkForce *wf, Grp *igrp,  int size, AstSkyFrame *osky
 /* If a group of detectors to be used was supplied, search the group for
    the name of the current detector. If not found, set the GRID coords bad. */
          if( detgrp ) {
-            found = grpIndex( name, detgrp, 1, status );
+            found = (int) grpIndex( name, detgrp, 1, status );
             if( !found ) {
                xin[ irec ] = AST__BAD;
                yin[ irec ] = AST__BAD;
@@ -676,12 +676,12 @@ void smf_sparsebounds( ThrWorkForce *wf, Grp *igrp,  int size, AstSkyFrame *osky
    if( *status == SAI__OK ) {
       msgOutif( MSG__NORM, " ", " ", status );
 
-      msgSeti( "XL", lbnd[ 0 ] );
-      msgSeti( "YL", lbnd[ 1 ] );
-      msgSeti( "ZL", lbnd[ 2 ] );
-      msgSeti( "XU", ubnd[ 0 ] );
-      msgSeti( "YU", ubnd[ 1 ] );
-      msgSeti( "ZU", ubnd[ 2 ] );
+      msgSetk( "XL", lbnd[ 0 ] );
+      msgSetk( "YL", lbnd[ 1 ] );
+      msgSetk( "ZL", lbnd[ 2 ] );
+      msgSetk( "XU", ubnd[ 0 ] );
+      msgSetk( "YU", ubnd[ 1 ] );
+      msgSetk( "ZU", ubnd[ 2 ] );
       msgOutif( MSG__NORM, " ", "   Output cube bounds: ( ^XL:^XU, ^YL:^YU, ^ZL:^ZU )",
                 status );
 

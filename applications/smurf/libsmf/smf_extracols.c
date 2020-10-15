@@ -111,8 +111,8 @@ typedef struct ExtracColsStore {
    char **data;          /* Array of pointers to column data values ( "char *"
                             is used instead of "void *" since pointer arithmetic
                             is not allowed with "void *" pointers. */
-   size_t *size;         /* Array of column data sizes */
-   size_t *offset;       /* Array of offsets from start of JCMTState to item */
+   int *size;            /* Array of column data sizes */
+   dim_t *offset;        /* Array of offsets from start of JCMTState to item */
    int ncol;             /* Number of columns */
    int nrow;             /* Number of values stored for each column */
 } ExtraColsStore;
@@ -127,11 +127,11 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
    char *pbuf = NULL;
    const char *state_ptr;
    char buf[ GRP__SZNAM + 1 ];
-   int icol;
-   int irow;
-   int maxcol;
-   int nrem;
-   size_t size;
+   dim_t icol;
+   dim_t irow;
+   dim_t maxcol;
+   dim_t nrem;
+   dim_t size;
 
 /* Check inherited status. Also check we have a group of column names.
    If an error has occurred, we should still attempt to free the store
@@ -144,10 +144,10 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
          store = astMalloc( sizeof( ExtraColsStore ) );
          if( store ) {
             maxcol = grpGrpsz( colgrp, status );
-            store->name = astMalloc( sizeof( const char * )*maxcol );
-            store->type = astMalloc( sizeof( int )*maxcol );
-            store->size = astMalloc( sizeof( size_t )*maxcol );
-            store->offset = astMalloc( sizeof( size_t )*maxcol );
+            store->name = astMalloc( sizeof( *(store->name) )*maxcol );
+            store->type = astMalloc( sizeof( *(store->type) )*maxcol );
+            store->size = astMalloc( sizeof( *(store->size) )*maxcol );
+            store->offset = astMalloc( sizeof( *(store->offset) )*maxcol );
             store->data = astMalloc( sizeof( char * )*maxcol );
             store->ncol = 0;
             store->nrow = 0;

@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     ptime = smf_freepolbins( int nndf, int npbin, double **pangle,
-*                              int ***ptime, int *status )
+*                              dim_t ***ptime, int *status )
 
 *  Arguments:
 *     nndf = int (Given)
@@ -25,7 +25,7 @@
 *        Pointer to a location holding a pointer to an array of "npbin"
 *        polarisation angles. The memory used to hold this array is freed
 *        and a NULL pointer is placed at *pangle.
-*     ptime = int *** (Given)
+*     ptime = dim_t *** (Given)
 *        Pointer to an array holding lists of time slice indices for each
 *        polarisation angle and input NDF, as created by smf_choosepolbins.
 *        The memory used to store these lists (and the associated arrays
@@ -83,7 +83,7 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-int ***smf_freepolbins( int nndf, int npbin, double **pangle, int ***ptime,
+dim_t ***smf_freepolbins( int nndf, int npbin, double **pangle, dim_t ***ptime,
                         int *status __attribute__((unused)) ){
 
 /* Local Variables */

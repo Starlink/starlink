@@ -107,7 +107,7 @@ void smf_filter_mce( smfFilter *filt, int noinverse, int *status ) {
 
   double datechange;     /* UTC MJD for change in MCE filter parameters */
   AstTimeFrame *tf=NULL; /* time frame for date conversion */
-  size_t i;              /* Loop counter */
+  dim_t i;              /* Loop counter */
 
   if( *status != SAI__OK ) return;
 

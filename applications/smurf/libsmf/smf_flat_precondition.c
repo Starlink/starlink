@@ -85,22 +85,20 @@
 void
 smf_flat_precondition( int allbad, smfData * powvald, smfData * bolvald, int *status ) {
 
-  size_t bol;                  /* bolometer index */
+  dim_t bol;                  /* bolometer index */
   double *grad = NULL;         /* calculated gradient for each point */
-  size_t k;                    /* loop counter */
-  size_t nbol;                 /* number of bolometers */
-  size_t nheat;                /* number of heater measurements */
+  dim_t k;                    /* loop counter */
+  dim_t nbol;                 /* number of bolometers */
+  dim_t nheat;                /* number of heater measurements */
 
   double * powval = NULL;      /* pointer to data in smfData */
   double * bolval = NULL;      /* pointer to data in smfData */
-  double * bolvalvar = NULL;   /* pointer to variance in smfData bolvald */
 
   if (*status != SAI__OK) return;
 
   /* Extract relevant information from the smfData */
   powval = (powvald->pntr)[0];
   bolval = (bolvald->pntr)[0];
-  bolvalvar = (bolvald->pntr)[1];
 
   nheat = (powvald->dims)[0];
   nbol = (bolvald->dims)[0] * (bolvald->dims)[1];

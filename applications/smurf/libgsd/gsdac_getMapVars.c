@@ -189,9 +189,9 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
                sizeof(mapVars->loclCrd), status );
 
   /* Convert to ACSIS formatted string. */
-  sprintf ( mapVars->skyRefX, "[OFFSET] %.0f [%s]",
+  sprintf ( mapVars->skyRefX, "[OFFSET] %.0f [%.55s]",
             gsdVars->referenceX, mapVars->loclCrd );
-  sprintf ( mapVars->skyRefY, "[OFFSET] %.0f [%s]",
+  sprintf ( mapVars->skyRefY, "[OFFSET] %.0f [%.55s]",
             gsdVars->referenceY, mapVars->loclCrd );
 
   /* Get the scanning coordinates. */

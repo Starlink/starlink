@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
+*     smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, dim_t chunklen,
 *                           double thresh, int submean, int sub, AstKeyMap *keymap,
 *                           int *status )
 
@@ -26,7 +26,7 @@
 *        interpolated values are included in the analysis). The mean
 *        bolometer values need not have been removed prior to calling
 *        this function, as the means are removed following gap-filling.
-*     chunklen = size_t (Given)
+*     chunklen = dim_t (Given)
 *        Chunk length for the PCA cleaning in time slices. If zero, a
 *        single chunk covering the whole time series is used.
 *     thresh = double (Given)
@@ -115,8 +115,8 @@ typedef struct smfPCAChunkData {
   double thresh;          /* PCA threshold */
   int oper;               /* Operation to perform */
   int sub;                /* Return cleaned data? (return components otherwise) */
-  size_t t1;              /* Index of first time slice for chunk */
-  size_t t2;              /* Index of last time slice */
+  dim_t t1;              /* Index of first time slice for chunk */
+  dim_t t2;              /* Index of last time slice */
   smfData *data;          /* The data to be processed */
 } smfPCAChunkData;
 
@@ -124,7 +124,7 @@ void smfPCAChunkParallel( void *job_data_ptr, int *status );
 
 void smfPCAChunkParallel( void *job_data_ptr, int *status ) {
   dim_t ntslice;
-  size_t bstride;
+  dim_t bstride;
 
   smfPCAChunkData *pdata;
 
@@ -187,12 +187,12 @@ void smfPCAChunkParallel( void *job_data_ptr, int *status ) {
 
 #define FUNC_NAME "smf_clean_pca_chunks"
 
-void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
+void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, dim_t chunklen,
                            double thresh, int sub, AstKeyMap *keymap, int *status ) {
 
   dim_t ntslice;                 /* Number of time slices */
-  size_t i;                      /* Loop counter */
-  size_t nchunks;                /* Number of chunks */
+  dim_t i;                      /* Loop counter */
+  dim_t nchunks;                /* Number of chunks */
   smfPCAChunkData *job_data=NULL;/* job data */
   smfPCAChunkData *pdata=NULL;   /* Pointer to job data */
 

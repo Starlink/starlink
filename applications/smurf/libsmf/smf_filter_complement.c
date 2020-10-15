@@ -87,8 +87,8 @@
 #define FUNC_NAME "smf_filter_complement"
 
 void smf_filter_complement( smfFilter *filt, int *status ) {
-  size_t i;         /* Loop counter */
-  size_t nfdata;    /* Number of frequency-space data points */
+  dim_t i;         /* Loop counter */
+  dim_t nfdata;    /* Number of frequency-space data points */
   double ref;       /* Reference value for complement */
 
   if (*status != SAI__OK) return;

@@ -15,8 +15,8 @@
 *  Invocation:
 
 *     newbuf =  smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype,
-*                                    size_t ndata, size_t ndims,
-*                                    const dim_t dims[], const size_t perm[],
+*                                    dim_t ndata, dim_t ndims,
+*                                    const dim_t dims[], const dim_t perm[],
 *                                    int inPlace, int freeOld,
 *                                    int * status )
 
@@ -26,14 +26,14 @@
 *        re-ordered data if inPlace=1
 *     dtype = smf_dtype (Given)
 *        Data type of the buffer
-*     ndata = size_t (Given)
+*     ndata = dim_t (Given)
 *        Number of elements in oldbuf
-*     ndims = size_t (Given)
+*     ndims = dim_t (Given)
 *        Number of dimensions
 *     dims = const dim_t [] (Given)
 *        Number of pixels along each dimension in input data. Array
 *        of dimension ndims.
-*     perm = const size_t [] (Given)
+*     perm = const dim_t [] (Given)
 *        Permutation array: new order of dimensions in terms
 *        of old dimensions (1.n). E.g. 3,1,2. Array of dimension
 *        ndims.
@@ -106,29 +106,29 @@
 
 #define FUNC_NAME "smf_dataOrder_ndims"
 
-void * smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype, size_t ndata,
-                            size_t ndims, const dim_t dims[], const size_t perm[],
+void * smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype, dim_t ndata,
+                            dim_t ndims, const dim_t dims[], const dim_t perm[],
                             int inPlace, int freeOld, int * status ) {
 
-  size_t sz = 0;        /* Size of data type */
+  dim_t sz = 0;        /* Size of data type */
   void * newbuf = NULL; /* Space to do the reordering */
   void * retval = NULL; /* Return value with reordered buffer */
 
-  size_t i;             /* Counter */
-  size_t j;             /* Counter */
-  size_t k;             /* Counter */
+  dim_t i;             /* Counter */
+  dim_t j;             /* Counter */
+  dim_t k;             /* Counter */
 
-  size_t iout[ndims+1]; /* Output pixel indices */
-  size_t odim[ndims+1]; /* Copy of o/p dimensions plus dummy */
-  size_t stepi[ndims];  /* Input steps indexed by input axis */
-  size_t step[ndims+1]; /*  Input steps indexed by output axis */
+  dim_t iout[ndims+1]; /* Output pixel indices */
+  dim_t odim[ndims+1]; /* Copy of o/p dimensions plus dummy */
+  dim_t stepi[ndims];  /* Input steps indexed by input axis */
+  dim_t step[ndims+1]; /*  Input steps indexed by output axis */
 
   retval = oldbuf;
   if (*status != SAI__OK) return retval;
   if (!retval) return retval;
 
 
-  /*  
+  /*
   ** msgOutiff( MSG__DEBUG, "",
   **           "%s dtype: %s, ndata: %d, ndims: %d, inPlace: %d, freeOld %d",
   **           status, FUNC_NAME, smf_dtype_str(dtype, status), (int) ndata,
@@ -136,16 +136,18 @@ void * smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype, size_t ndata,
   */
 
   char str1[24] = "";
-  char str2[24] = ""; 
+  char str2[24] = "";
+  size_t nc1 = 0;
+  size_t nc2 = 0;
 
   for ( i=0; i<ndims; i++ ) {
     if ( perm[i] < 1 || perm[i] > ndims ) {
       msgOutf( "","Permutation axis %d value %d not in range 1..%d",
                status, (int) (i+1), (int) perm[i], (int) ndims );
-      *status = SAI__ERROR;    
+      *status = SAI__ERROR;
     }
-    sprintf( str1, "%s,%d", str1, (int) dims[(perm[i]-1)] );
-    sprintf( str2, "%s,%d", str2, (int) perm[i] );
+    nc1 += sprintf( str1 + nc1, ",%d", (int) dims[(perm[i]-1)] );
+    nc2 += sprintf( str2 + nc2, ",%d", (int) perm[i] );
   }
   msgOutiff(  MSG__DEBUG, "","%s: new cube dims [%s] with original axes [%s]",
 	      status, FUNC_NAME, str1+1, str2+1);

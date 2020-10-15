@@ -114,7 +114,7 @@ void smurf_fts2_maskmap(int* status) {
    dim_t r;
    dim_t c;
    dim_t iel;                 /* Index of element */
-   int icd;
+   dim_t icd;
    dim_t nrows;
    dim_t ncols;
    dim_t ndata;               /* Number of elements in array */
@@ -130,8 +130,8 @@ void smurf_fts2_maskmap(int* status) {
    int isInteger = 0;         /* Data is INTEGER (non-flatfielded) */
    size_t outsize;            /* Number of files in output group */
    size_t size;               /* Number of files in input group */
-   size_t bstride;            /* Bolometer stride */
-   size_t tstride;            /* Timeslice stride */
+   dim_t bstride;             /* Bolometer stride */
+   dim_t tstride;             /* Timeslice stride */
    smfData* odata = NULL;     /* Pointer to output data struct */
    smfHead *hdr = NULL;       /* Pointer to data header */
    double coord[2 * 32 * 40];

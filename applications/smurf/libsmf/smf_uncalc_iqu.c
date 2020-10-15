@@ -202,37 +202,37 @@
 /* Local data types: */
 typedef struct smfUncalcIQUJobData {
    const JCMTState *allstates;
-   const double *angc;
+   const double *qinst;
+   const double *pldata;
+   const double *uinst;
    const double *c0;
    const double *p0;
    const double *p1;
-   const double *pldata;
-   const double *qinst;
-   const double *uinst;
+   const double *angc;
    dim_t b1;
    dim_t b2;
+   dim_t bstride;
    dim_t nbolo;
+   dim_t ntslice;
+   dim_t tstride;
    double *ipang;
    double *ipi;
    double *ipq;
    double *ipu;
-   double angfac;
-   double angrot;
-   double paoff;
+   double amp16;
    double amp2;
    double amp4;
-   double amp16;
+   double angfac;
+   double angrot;
    double offset;
+   double paoff;
+   double phase16;
    double phase2;
    double phase4;
-   double phase16;
    int ipform;
    int ipolcrd;
-   int ntslice;
    int old;
    int pasign;
-   size_t bstride;
-   size_t tstride;
 } smfUncalcIQUJobData;
 
 /* Prototypes for local functions */
@@ -255,22 +255,22 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
                      int harmonic, double offset, int *status ){
 
 /* Local Variables: */
+   char headval[ 81 ];        /* FITS header value */
    const JCMTState *state;    /* JCMTState info for current time slice */
+   dim_t bstep;               /* Bolometer step between threads */
+   dim_t bstride;             /* Stride between adjacent bolometer values */
+   dim_t itime;               /* Time slice index */
    dim_t nbolo;               /* No. of bolometers */
+   dim_t ntime;               /* Time slices to check */
    dim_t ntslice;             /* Number of time-slices in data */
-   int bstep;                 /* Bolometer step between threads */
-   int itime;                 /* Time slice index */
+   dim_t tstride;             /* Stride between adjacent time slice values */
+   int ipolcrd;               /* Reference direction for waveplate angles */
    int iworker;               /* Index of a worker thread */
-   int ntime;                 /* Time slices to check */
    int nworker;               /* No. of worker threads */
    int old;                   /* Data has old-style POL_ANG values? */
-   size_t bstride;            /* Stride between adjacent bolometer values */
-   size_t tstride;            /* Stride between adjacent time slice values */
    smfHead *hdr;              /* Pointer to data header this time slice */
    smfUncalcIQUJobData *job_data = NULL; /* Pointer to all job data */
    smfUncalcIQUJobData *pdata = NULL;/* Pointer to next job data */
-   char headval[ 81 ];        /* FITS header value */
-   int ipolcrd;               /* Reference direction for waveplate angles */
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
@@ -442,8 +442,12 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    const JCMTState *state;    /* JCMTState info for current time slice */
    dim_t b1;                  /* First bolometer index */
    dim_t b2;                  /* Last bolometer index */
+   dim_t bstride;             /* Stride between adjacent bolometer values */
    dim_t ibolo;               /* Bolometer index */
+   dim_t itime;               /* Time slice index */
    dim_t nbolo;               /* Total number of bolometers */
+   dim_t ntslice;             /* Number of time slices */
+   dim_t tstride;             /* Stride between adjacent time slice values */
    double *iin;               /* Pointer to I array for each bolometer*/
    double *ipang;             /* Pointer to supplied FP orientation array */
    double *ipi0;              /* Pointer to input I array for 1st time */
@@ -483,12 +487,8 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    double wplate;             /* Angle from fixed analyser to have-wave plate */
    int ipform;
    int ipolcrd;               /* Reference direction for pol_ang */
-   int itime;                 /* Time slice index */
-   int ntslice;               /* Number of time slices */
    int old;                   /* Data has old-style POL_ANG values? */
    int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
-   size_t bstride;            /* Stride between adjacent bolometer values */
-   size_t tstride;            /* Stride between adjacent time slice values */
    smfUncalcIQUJobData *pdata;   /* Pointer to job data */
 
 /* Check inherited status */

@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_open_related( ThrWorkForce *wf, const smfGroup *group,
-*                       const dim_t subindex, const char *accmode,
+*                       dim_t subindex, const char *accmode,
 *                       smfArray **relfiles, int *status );
 
 *  Arguments:
@@ -22,7 +22,7 @@
 *        Pointer to a pool of worker threads
 *     group = const smfGroup* (Given)
 *        Input smfGroup
-*     subindex = const dim_t (Given)
+*     subindex = dim_t (Given)
 *        Subgroup index
 *     accmode = const char* (Given)
 *        Access mode for opened files
@@ -58,7 +58,7 @@
 *     2008-07-03 (EC):
 *        Use dim_t for subindex
 *     2011-02-10 (COBA):
-*        Changed data type of indices and subgroups from dim_t to size_t
+*        Changed data type of indices and subgroups from dim_t to dim_t
 *     2014-01-10 (DSB):
 *        Added argument wf.
 
@@ -113,17 +113,17 @@
 #define FUNC_NAME "smf_open_related"
 
 void smf_open_related ( ThrWorkForce *wf, const smfGroup *group,
-                        const dim_t subindex, const char *accmode,
+                        dim_t subindex, const char *accmode,
                         smfArray **relfiles, int *status ) {
 
   /* Local variables */
-  smfData *data = NULL;      /* Data struct for file */
-  Grp *grp = NULL;           /* Grp stored within smfGroup */
+  smfData *data = NULL;     /* Data struct for file */
+  Grp *grp = NULL;          /* Grp stored within smfGroup */
   dim_t i;                  /* Loop counter */
-  size_t *indices = NULL;    /* Array of indices */
-  dim_t nrelated;           /* Number of related files */
-  dim_t index;              /* Index into the subgroups within the group */
-  size_t **subgroups = NULL; /* Pointer to array of subgroups */
+  int *indices = NULL;      /* Array of indices */
+  int nrelated;             /* Number of related files */
+  int index;                /* Index into the subgroups within the group */
+  int **subgroups = NULL;   /* Pointer to array of subgroups */
 
   if ( *status != SAI__OK ) return;
 

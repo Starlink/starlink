@@ -181,7 +181,6 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
   double date_df;                 /* day fraction corresponding to MJD */
   int date_mo;                    /* month corresponding to MJD */
   int date_yr;                    /* year corresponding to MJD */
-  int date_status;                /* status of mjd->calendar date conversion */
   double *dbuf=NULL;              /* simulated data buffer */
   int *digits=NULL;               /* output data buffer */
   int *dksquid=NULL;              /* dark squid values */
@@ -208,8 +207,8 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
   sc2store_force_initialised( status );
 
   /* Calculate year/month/day corresponding to MJD at start */
-  date_status = iauJd2cal( DJM0, inx->mjdaystart, &date_yr, &date_mo,
-                           &date_da, &date_df );
+  (void) iauJd2cal( DJM0, inx->mjdaystart, &date_yr, &date_mo,
+                    &date_da, &date_df );
 
   numsamples = inx->heatnum;
 

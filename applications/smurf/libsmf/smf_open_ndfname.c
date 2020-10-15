@@ -16,8 +16,8 @@
 *     smf_open_ndfname( const HDSLoc *loc, const char accmode[],
 *                       const char extname[],
 *		        const char state[], const char dattype[], const int ndims,
-*		        const int lbnd[], const int ubnd[], const char datalabel[],
-*                       const char dataunits[], const AstFrameSet * wcs,
+*		        const dim_t lbnd[], const dim_t ubnd[], const char datalabel[],
+*                       const char dataunits[], AstFrameSet * wcs,
 *                       smfData **ndfdata,
 *                       int *status);
 
@@ -35,9 +35,9 @@
 *        Data type to be stored in NDF
 *     ndims = const int (Given)
 *        Number of dimensions in new locator
-*     lbnd = const int[] (Given)
+*     lbnd = const dim_t [] (Given)
 *        Pointer to array containing lower bounds for each axis
-*     ubnd = const int[] (Given)
+*     ubnd = const dim_t [] (Given)
 *        Pointer to array containing upper bounds for each axis
 *     datalabel = const char[] (Given)
 *        Data label to associate with this extension.  Only accessed if access mode is
@@ -45,7 +45,7 @@
 *     dataunits = const char[] (Given)
 *        Units of the data in this extension. Only accessed if access mode is
 *        WRITE or UPDATE. Can be NULL.
-*     wcs = const AstFrameSet * (Given)
+*     wcs = AstFrameSet * (Given)
 *        World coordinates associated with this data. Only accessed if
 *        access mode is WRITE or UPDATE. Can be NULL.
 *     ndfdata = smfData** (Returned)
@@ -147,20 +147,18 @@
 
 void smf_open_ndfname( const HDSLoc *loc, const char accmode[],
                        const char extname[], const char state[], const char dattype[],
-                       const int ndims, const int lbnd[], const int ubnd[],
+                       const int ndims, const dim_t lbnd[], const dim_t ubnd[],
                        const char datalabel[], const char dataunits[],
-                       const AstFrameSet* wcs,
-                       smfData **ndfdata,
-                       int *status) {
+                       AstFrameSet* wcs, smfData **ndfdata, int *status) {
 
   /* Local variables */
   void *datarr[] = { NULL, NULL }; /* Pointers for data */
-  int dims[NDF__MXDIM];         /* Extent of each dimension */
+  dim_t dims[NDF__MXDIM];       /* Extent of each dimension */
   smf_dtype dtype;              /* Data type */
   int flags = 0;                /* Flags for creating smfDA, smfFile and
 				   smfHead components in the output smfData */
   int i;
-  int ndat;                     /* Number of elements mapped in the requested NDF */
+  size_t ndat;                  /* Number of elements mapped in the requested NDF */
   char ndfaccmode[NDF__SZMMD+1];/* Access mode to use to open the file */
   int ndimsmapped;              /* Number of dimensions in mapped NDF */
   int ndfid;                    /* NDF identifier */

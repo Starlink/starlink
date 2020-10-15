@@ -18,8 +18,8 @@
 *                       const smfArray *bbms, const smfArray* flatramps,
 *                       AstKeyMap * heateffmap, const smfArray *noisemaps,
 *                       dim_t nchunks, smf_modeltype mtype, int isTordered,
-*                       AstFrameSet *outfset, int moving, int *lbnd_out,
-*                       int *ubnd_out, fts2Port fts_port, smfArray **qua,
+*                       AstFrameSet *outfset, int moving, dim_t *lbnd_out,
+*                       dim_t *ubnd_out, fts2Port fts_port, smfArray **qua,
 *                       smfGroup **mgroup, smfArray **mdata,
 *                       AstKeyMap *keymap, int *status )
 
@@ -57,10 +57,10 @@
 *        pointing LUT on-the-fly. Ignored if not creating SMF__LUT.
 *     moving = int (Given)
 *        Is coordinate system tracking moving object? (if outfset specified)
-*     lbnd_out = double* (Given)
+*     lbnd_out = dim_t * (Given)
 *        2-element array pixel coord. for the lower bounds of the output map
 *        (if outfset specified)
-*     ubnd_out = double* (Given)
+*     ubnd_out = dim_t * (Given)
 *        2-element array pixel coord. for the upper bounds of the output map
 *        (if outfset specified)
 *     fts_port = fts2Port (Given)
@@ -298,17 +298,17 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                        AstKeyMap * heateffmap, const smfArray *noisemaps,
                        dim_t nchunks, smf_modeltype mtype, int isTordered,
                        AstFrameSet *outfset, int moving,
-                       int *lbnd_out, int *ubnd_out, fts2Port fts_port,
+                       dim_t *lbnd_out, dim_t *ubnd_out, fts2Port fts_port,
                        smfArray **qua, smfGroup **mgroup, smfArray **mdata,
                        AstKeyMap *keymap, int *status ) {
 
   /* Local Variables */
-  size_t bstride;               /* Bolometer stride in data array */
-  size_t buflen = 0;            /* datalen + headlen */
+  dim_t bstride;                /* Bolometer stride in data array */
+  dim_t buflen = 0;             /* datalen + headlen */
   int calcfirst = 0;            /* Value of NOI.CALCFIRST */
   int copyinput=0;              /* If set, container is copy of input */
   smfData *data = NULL;         /* Data struct for file */
-  size_t datalen=0;             /* Size of data buffer in bytes */
+  dim_t datalen=0;              /* Size of data buffer in bytes */
   void *dataptr=NULL;           /* Pointer to data portion of buffer */
   char *dumpdir=NULL;           /* Directory for exported models etc */
   char *ename = NULL;           /* Name of file to import */
@@ -318,7 +318,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
   char fname_grpex[GRP__SZNAM+1];/* String for holding filename grpex */
   dim_t gain_box=0;             /* No. of time slices in a block */
   smfDIMMHead head;             /* Header for the file */
-  size_t headlen=0;             /* Size of header in bytes */
+  dim_t headlen=0;              /* Size of header in bytes */
   dim_t i;                      /* Loop counter */
   dim_t ibase;                  /* Base offset */
   smfData *idata=NULL;          /* Pointer to input smfdata data */
@@ -328,10 +328,10 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
   size_t isize=0;               /* Number of files in input group */
   int is_initialised = 0;       /* Is buffer initialised ? */
   dim_t j;                      /* Loop counter */
-  size_t k;                     /* Loop counter */
+  dim_t k;                      /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Local keymap */
   dim_t l;                      /* Loop counter */
-  size_t len = 0;               /* size of buffer */
+  dim_t len = 0;                /* size of buffer */
   Grp *mgrp=NULL;               /* Temporary group to hold model names */
   const char *mname=NULL;       /* String model component name */
   size_t msize=0;               /* Number of files in model group */
@@ -350,7 +350,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
   double tau;                   /* tau */
   smf_tausrc tausrc;            /* Type of tau monitor */
   dim_t thisnrel;               /* Number of related items for this model */
-  size_t tstride;               /* Time slice stride in data array */
+  dim_t tstride;                /* Time slice stride in data array */
   struct timeval tv1;           /* Timer */
   struct timeval tv2;           /* Timer */
   int usevar = 0;               /* Value of NOI.USEVAR */
@@ -370,7 +370,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
              status);
     } else if( nchunks <= 0 ) {
       *status = SAI__ERROR;
-      msgSeti("NCHUNKS",nchunks);
+      msgSetk("NCHUNKS",nchunks);
       errRep(FUNC_NAME,
              "iarray specified but invalid number of chunks, ^NCHUNKS",
              status);
@@ -403,7 +403,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
   tempstr = NULL;
   astMapGet0C( keymap, "DUMPDIR", &tempstr );
   if( tempstr ) {
-     size_t clen = strlen( tempstr );
+     dim_t clen = strlen( tempstr );
      dumpdir = astStore( NULL, tempstr, clen + 2 );
      if( dumpdir[clen-1] != '/' ) strcpy( dumpdir + clen, "/" );
   }
@@ -550,7 +550,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                                NULL, NULL, status);
                  idata->lut = astMalloc( (nbolo*ntslice)*sizeof(*(idata->lut)) );
 
-                 nc = strstr( name, "_con" ) - name + 4;
+                 nc = (int) ( strstr( name, "_con" ) - name + 4 );
                  ename = astStore( NULL, name, nc + 1 );
                  ename[ nc ] = 0;
                  ename = astAppendString( ename, &nc, "_lut" );
@@ -1158,7 +1158,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
 
               /* If importing the EXT values from an NDF... */
               if( import ) {
-                 nc = strstr( name, "_con" ) - name + 4;
+                 nc = (int) ( strstr( name, "_con" ) - name + 4 );
                  ename = astStore( NULL, name, nc + 1 );
                  ename[ nc ] = 0;
                  ename = astAppendString( ename, &nc, "_ext" );

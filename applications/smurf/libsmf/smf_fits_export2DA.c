@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_fits_export2DA ( const AstFitsChan *fitschan, size_t *ncards,
+*     smf_fits_export2DA ( const AstFitsChan *fitschan, dim_t *ncards,
 *                          char *fitsrec,
 *                          int *status )
 
@@ -43,7 +43,7 @@
 *     2007-10-22 (TIMJ):
 *        Tweak for new sc2store interface.
 *     2007-10-31 (TIMJ):
-*        Use size_t to match sc2store.
+*        Use dim_t to match sc2store.
 *     2012-01-20 (TIMJ):
 *        Some files have many consecutive blank lines that make the
 *        header longer than sc2store can handle. We give ourselves
@@ -96,7 +96,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_fits_export2DA"
 
-void smf_fits_export2DA ( AstFitsChan *fitschan, size_t *ncards,
+void smf_fits_export2DA ( AstFitsChan *fitschan, dim_t *ncards,
                           char *fitsrec,
                           int *status ) {
 
@@ -104,9 +104,9 @@ void smf_fits_export2DA ( AstFitsChan *fitschan, size_t *ncards,
   char blank[SZFITSCARD+1];/* Reference blank card */
   char card[SZFITSCARD+1];/* temporary buffer for current card */
   int found;              /* Boolean to indicate if a card was found */
-  size_t i;               /* Loop counter */
-  size_t ncopied = 0;     /* How many cards were copied */
-  size_t numcards = 0;    /* How many cards are in the FitsChan */
+  dim_t i;               /* Loop counter */
+  dim_t ncopied = 0;     /* How many cards were copied */
+  dim_t numcards = 0;    /* How many cards are in the FitsChan */
   char *outpos = NULL;    /* current position in output buffer */
   int prevblank = 0;      /* Was this previously blank? */
   char *tempfits = NULL;  /* intermediate buffer for FITS cards */
@@ -147,8 +147,16 @@ void smf_fits_export2DA ( AstFitsChan *fitschan, size_t *ncards,
          if (isblank && prevblank) continue;
          prevblank = isblank;
 
+         /* Need to suppress warnings about bad pragmas temporarily since
+            "-Wstringop-truncation" (used below0 was not recognised by earlier
+            versions of gcc */
+         #pragma GCC diagnostic ignored "-Wpragmas"
+
          /* Now copy in the card and increment the pointer */
+         #pragma GCC diagnostic ignored "-Wstringop-truncation"
          strncpy ( outpos, card, SZFITSCARD );
+         #pragma GCC diagnostic pop
+
          ncopied++;
          outpos += SZFITSCARD;
        } else {

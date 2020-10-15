@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_fits_getS( const smfHead * hdr, const char * name, char * result,
-*                    size_t len, int * status );
+*                    dim_t len, int * status );
 
 *  Arguments:
 *     hdr = const smfHdr* (Given)
@@ -24,7 +24,7 @@
 *     result = char * (Returned)
 *        Pointer to string buffer. To guarantee it is large enough
 *        to recieve the result, allocate at least 72 characters.
-*     len = size_t (Given)
+*     len = dim_t (Given)
 *        Allocated length of "result" buffer. Including space for NUL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -103,7 +103,7 @@
 #define FUNC_NAME "smf_fits_getS"
 
 void smf_fits_getS (const smfHead *hdr, const char * name, char * result,
-		    size_t len, int * status ) {
+		    dim_t len, int * status ) {
   char * astres; /* Pointer to AST static buffer */
   int i;         /* Loop counter */
 
@@ -127,7 +127,7 @@ void smf_fits_getS (const smfHead *hdr, const char * name, char * result,
   one_strlcpy( result, astres, len, status );
   if (*status == SAI__OK) {
       /* AST does not seem to trim trailing spaces from FITS cards */
-      for (i=strlen(astres); i >= 0; i--) {
+      for (i=(int)strlen(astres); i >= 0; i--) {
         /* if we are not at a space or nul break from loop */
         if ( result[i] != ' ' && result[i] != '\0') {
           break;

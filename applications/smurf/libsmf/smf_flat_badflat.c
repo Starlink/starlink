@@ -75,7 +75,7 @@ void
 smf_flat_badflat( ThrWorkForce *wf, smfData * refdata, smfData ** resp, int * status ) {
   smfData * bolrefd = NULL;
   smfData * powrefd = NULL;
-  size_t nheat = 1;
+  dim_t nheat = 1;
 
   if (*status != SAI__OK) return;
   if (!refdata) return;
@@ -124,7 +124,7 @@ smf__fill_smfData ( smfData * data, double dval, int *status ) {
   }
   if (*status == SAI__OK) {
     double *dpntr = (data->pntr)[0];
-    size_t i;
+    dim_t i;
     for (i=0; i<ndata; i++) {
       dpntr[i] = dval;
     }

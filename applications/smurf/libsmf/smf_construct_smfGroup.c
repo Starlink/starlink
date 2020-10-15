@@ -13,26 +13,26 @@
  *     SMURF subroutine
 
  *  Invocation:
- *     smfGroup* = smf_construct_smfGroup( const Grp *igrp, size_t **subgroups,
- *                                         size_t *chunk,
+ *     smfGroup* = smf_construct_smfGroup( const Grp *igrp, int **subgroups,
+ *                                         int *chunk,
  *                                         dim_t *tlen,
- *                                         const dim_t ngroups,
- *                                         const dim_t nrelated,
- *                                         const int copy,
+ *                                         int ngroups,
+ *                                         int nrelated,
+ *                                         int copy,
  *                                         int *status );
 
  *  Arguments:
  *     igrp = const Grp* (Given)
  *        Input Grp to be copied
- *     subgroups = size_t** (Given)
+ *     subgroups = int ** (Given)
  *        Pointer to array of pointers to arrays of indices into Grp
- *     chunk = size_t* (Given)
+ *     chunk = int * (Given)
  *        Array of length ngroups flagging which subgroups are continuous
- *     tlen = dim_t* (Given)
+ *     tlen = dim_t * (Given)
  *        Length of each subgroup in time slices
- *     ngroups = dim_t (Given)
+ *     ngroups = int (Given)
  *        Number of subgroups in the smfGroup
- *     nrelated = dim_t (Given)
+ *     nrelated = int (Given)
  *        Maximum number of related files in the smfGroup
  *     copy = int (Given)
  *        If non-zero copy subgroups & chunk. Otherwise use in-place.
@@ -123,16 +123,16 @@
 
 #define FUNC_NAME "smf_construct_smfGroup"
 
-smfGroup *smf_construct_smfGroup( const Grp *igrp, size_t **subgroups,
-                                  size_t *chunk, dim_t *tlen,
-                                  const size_t ngroups,  const size_t nrelated,
-                                  const int copy, int *status ) {
+smfGroup *smf_construct_smfGroup( const Grp *igrp, int **subgroups,
+                                  int *chunk, dim_t *tlen,
+                                  int ngroups,  int nrelated,
+                                  int copy, int *status ) {
 
   /* Local variables */
   smfGroup *group = NULL;
-  size_t isize;
-  size_t i;
-  size_t **newsubgroups=NULL;
+  dim_t isize;
+  dim_t i;
+  int **newsubgroups=NULL;
 
   if ( *status != SAI__OK ) return NULL;
 

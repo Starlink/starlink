@@ -295,13 +295,13 @@ static int  invmat( lsqData *lsq )
 static void getmat( smf_math_function fid ,
                     lsqData *lsq ,
                     const double   xdat[] ,
-                    int      xdim ,
+                    dim_t xdim ,
                     const double   ydat[] ,
                     const float    wdat[] ,
-                    int      ndat ,
+                    dim_t ndat ,
                     const double   fpar[] ,
                     double  *epar ,
-                    int      npar ,
+                    int      npar  __attribute__((unused)),
                     int      ncomp ,
                     const int    iopt[] ,
                     const double dopt[] )
@@ -312,9 +312,9 @@ static void getmat( smf_math_function fid ,
    double wd;
    double wn;
    double yd;
-   int    i;
-   int    j;
-   int    n;
+   dim_t i;
+   dim_t j;
+   dim_t n;
 
    for (j = 0; j < lsq->nfree; j++) {
       lsq->vector[j] = 0.0;			/* zero lsq->vector ... */
@@ -345,10 +345,10 @@ static void getmat( smf_math_function fid ,
 static int  getvec( smf_math_function fid ,
                     lsqData *lsq ,
                     const double xdat[] ,
-                    int    xdim ,
+                    dim_t xdim ,
                     const double ydat[] ,
                     const float  wdat[] ,
-                    int    ndat ,
+                    dim_t ndat ,
                     const double fpar[] ,
                     double *epar ,
                     int    npar ,
@@ -369,10 +369,10 @@ static int  getvec( smf_math_function fid ,
    double mji;
    double mjj;
    double wn;
-   int    i;
-   int    j;
-   int    n;
-   int    r;
+   dim_t   i;
+   dim_t   j;
+   dim_t   n;
+   int     r;
 
    for (j = 0; j < lsq->nfree; j++) {		/* loop to modify and ... */
       mjj = lsq->matrix1[j][j];			/* scale the matrix */
@@ -416,7 +416,7 @@ int  smf_lsqfit( smf_math_function fid ,
 		 int    xdim ,
 		 const double ydat[] ,
 		 const float  wdat[] ,
-		 int    ndat ,
+		 dim_t  ndat ,
 		 double fpar[] ,
 		 double *epar ,
 		 const int    mpar[] ,
@@ -435,7 +435,7 @@ int  smf_lsqfit( smf_math_function fid ,
    lsqData lsqdata;                             /* Common parameter struct */
    lsqData *lsq;                                /* Pointer to block        */
    int    i;
-   int    n;
+   dim_t  n;
    int    r;
 
    lsq = &lsqdata;

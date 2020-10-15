@@ -16,7 +16,7 @@
 *     void smf_templateFit1<X>( CGEN_TYPE *data, smf_qual_t *qual,
 *                               const unsigned char *mask, const int *lut,
 *                               smf_qual_t mask_meas, smf_qual_t mask_cor,
-*                               const size_t n, const size_t stride,
+*                               const dim_t n, const dim_t stride,
 *                               const double *template, int remove,
 *                               int nooffset, double *gain, double *offset,
 *                               double *corr, int *status )
@@ -42,9 +42,9 @@
 *     mask_cor = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data when removing fitted template (see remove flag).
-*     n = const size_t (Given)
+*     n = const dim_t (Given)
 *        Number of points in the input data
-*     stride = const size_t (Given)
+*     stride = const dim_t (Given)
 *        If adjacent data points not stored contiguously, use stride > 1
 *     template = const double* (Given)
 *        1-d array containing template to be fit (VAL__BADD samples ignored)
@@ -166,8 +166,8 @@
 void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, smf_qual_t *qual,
                                       const unsigned char *mask,
                                       const int *lut, smf_qual_t mask_meas,
-                                      smf_qual_t mask_cor, const size_t n,
-                                      const size_t stride,
+                                      smf_qual_t mask_cor, const dim_t n,
+                                      const dim_t stride,
                                       const double *template, int remove,
                                       int nooffset, double *gain, double *offset,
                                       double *corr, int *status ) {
@@ -176,9 +176,9 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, smf_qual_t *qual,
   double a;                   /* Gain coefficient */
   double b;                   /* Offset coefficient */
   double c;                   /* Correlation coefficient */
-  size_t off;                 /* offset from loop counter to modified sample */
-  size_t i;                   /* Loop counter */
-  size_t ngood=0;             /* Number of good samples */
+  dim_t off;                 /* offset from loop counter to modified sample */
+  dim_t i;                   /* Loop counter */
+  dim_t ngood=0;             /* Number of good samples */
   double s_d=0;               /* Sum of the data points */
   double s_dsq=0;             /* Sum of the squares of the data points */
   double s_dt=0;              /* Sum of the data * template */

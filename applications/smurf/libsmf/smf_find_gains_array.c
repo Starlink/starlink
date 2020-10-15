@@ -232,9 +232,9 @@ int smf_find_gains_array( ThrWorkForce *wf, int flags, smfArray *data,
    int iblock;
    int isub;
    int nbad;
-   int nblock;
    int nsub;
-   size_t nrej_size;
+   dim_t nblock;
+   dim_t nrej_size;
 
 /* Initialise */
    nbad = 0;
@@ -245,7 +245,7 @@ int smf_find_gains_array( ThrWorkForce *wf, int flags, smfArray *data,
 /* Get the number of sub-arrays within the supplied data smfArray (it is
    assumed that the quality and gain smfArrays contain the same number of
    sub-arrays). */
-   nsub = data->ndat;
+   nsub = (int) data->ndat;
 
 /* If there is only one sub-array, just call smf_find_gains. */
    if( nsub == 1 ) {

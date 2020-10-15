@@ -148,10 +148,10 @@ void smf_history_write( const smfData* data, int *status) {
     if (data->history) {
       HDSLoc * shloc = NULL; /* Locator to SMURHIST component */
 
-      size_t nrec = astMapSize( data->history );
+      dim_t nrec = astMapSize( data->history );
       if (nrec > 0) {
-	size_t maxlen = 0;
-	size_t i;
+	dim_t maxlen = 0;
+	int i;
 	char ** array = NULL;
 	/* Create a char** array and attach strings. Also find the
 	   longest string as we go */
@@ -159,7 +159,7 @@ void smf_history_write( const smfData* data, int *status) {
 	if (array) {
 	  for ( i=0; i<nrec; i++ ) {
 	    const char *key = NULL;
-	    size_t len = 0;
+	    dim_t len = 0;
 	    key = astMapKey( data->history, i );
 	    len = strlen( key );
 	    if ( len > maxlen ) maxlen = len;
@@ -172,7 +172,9 @@ void smf_history_write( const smfData* data, int *status) {
 	/* Create new history array and copy in the values */
 	datNew1C( sloc, SMURF__HISTEXT, maxlen, nrec, status );
 	datFind( sloc, SMURF__HISTEXT, &shloc, status );
+        #pragma GCC diagnostic ignored "-Wcast-qual"
 	datPut1C( shloc, nrec, (const char**)array, status );
+        #pragma GCC diagnostic pop
 
 	/* free everything */
 	for ( i=0; i<nrec; i++ ) {

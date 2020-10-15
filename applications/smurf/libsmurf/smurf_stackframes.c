@@ -153,8 +153,8 @@ void smurf_stackframes( int *status ) {
   size_t i;                      /* counter */
   Grp *igrp = NULL;              /* Input files */
   int indf;                      /* Input NDF identifer */
-  int itemp;                     /* Temporary int */
-  int lbnd[NDF__MXDIM];          /* Lower bounds of output */
+  int  itemp;                    /* Temporary int */
+  dim_t lbnd[NDF__MXDIM];        /* Lower bounds of output */
   char ndftype[NDF__SZTYP+1];    /* type of data array */
   Grp *ogrp = NULL;              /* Output group */
   char * odatad = NULL;          /* Output data array as bytes */
@@ -166,19 +166,20 @@ void smurf_stackframes( int *status ) {
   AstFrameSet *outwcs;           /* Output frameset */
   void * pntr[3];                /* for ndfMap */
   dim_t refdims[NDF__MXDIM];     /* Reference dimensions */
-  size_t refndims = 0;           /* Number of dims in first image */
+  dim_t refndims = 0;            /* Number of dims in first image */
   char reftype[NDF__SZTYP+1];    /* reference data type */
   size_t size;                   /* Size of intput group */
   char sortby[10];               /* Header item to sort by */
   int sortbytime = 0;            /* Are we sorting by time? */
   smfSortInfo * sortinfo = NULL; /* For sorting */
-  size_t szplane = 0;            /* Number of elements in a plane */
-  size_t szplaneb = 0;           /* Number of bytes in plane */
-  size_t sztype = 0;             /* Number of bytes in the primitive data type */
+  size_t stemp;                  /* Temporary size_t */
+  dim_t szplane = 0;             /* Number of elements in a plane */
+  dim_t szplaneb = 0;            /* Number of bytes in plane */
+  dim_t sztype = 0;              /* Number of bytes in the primitive data type */
   AstTimeFrame * timefrm = NULL; /* Timeframe */
   AstLutMap *timemap = NULL;     /* Output time mapping */
   double * times = NULL;         /* Array of MJDs for each input file */
-  int ubnd[NDF__MXDIM];          /* Upper bounds of output */
+  dim_t ubnd[NDF__MXDIM];        /* Upper bounds of output */
 
   if (*status != SAI__OK) return;
 
@@ -210,8 +211,8 @@ void smurf_stackframes( int *status ) {
     smf_open_file( NULL, igrp, i, "READ", SMF__NOCREATE_DATA|SMF__NOTTSERIES, &data, status);
     if (*status == SAI__OK) {
       /* Remove trailing dims that are size 1 */
-      size_t j;
-      size_t ndims = 1;
+      dim_t j;
+      dim_t ndims = 1;
       for (j=data->ndims; j > 0; j--) {
 	/* Loop until we don't have a size 1 */
 	if (data->dims[j-1] != 1) {
@@ -220,7 +221,7 @@ void smurf_stackframes( int *status ) {
 	}
       }
       for (j = 1; j<=ndims; j++) {
-	msgSeti( "DIMS", data->dims[j-1] );
+	msgSetk( "DIMS", data->dims[j-1] );
 	if (j != ndims) msgSetc("DIMS", "x" );
       }
       msgOutiff( MSG__DEBUG, " ",
@@ -355,7 +356,7 @@ void smurf_stackframes( int *status ) {
   }
 
   msgOutf( " ", "All %zu input files have dimensions of %zu x %zu", status,
-	   size, (size_t)refdims[0], (size_t)refdims[1] );
+	   size, (dim_t)refdims[0], (dim_t)refdims[1] );
 
   /* Now need to sort the files into time order. We have the dates and indices */
   if (dosort) qsort( sortinfo, size, sizeof(*sortinfo), smf_sort_bydouble );
@@ -381,7 +382,7 @@ void smurf_stackframes( int *status ) {
   /* need to convince NDF that we have defined the data array
    and VARIANCE - and use the native type to avoid type conversion. */
   ndfType( outndf, "DATA", ndftype, sizeof(ndftype), status );
-  ndfMap(outndf, "VARIANCE,DATA", ndftype, "WRITE/BAD", pntr, &itemp, status  );
+  ndfMap(outndf, "VARIANCE,DATA", ndftype, "WRITE/BAD", pntr, &stemp, status  );
   ndfAnnul( &outndf, status );
 
   /* Now reopen it with smf_open_file and copy all the data over
@@ -462,7 +463,7 @@ void smurf_stackframes( int *status ) {
     for (i = 0; i < size; i++ ) {
       times[i] = times[i] - origin;
     }
-    timemap = astLutMap( size, times, 1.0, 1.0, " " );
+    timemap = astLutMap( (int) size, times, 1.0, 1.0, " " );
   } else {
     timefrm = (AstTimeFrame*)astFrame( 1, "Domain=INDEX,Unit(1)=pixel,Label(1)=File Number");
     timemap = (AstLutMap*)astUnitMap( 1, " ");

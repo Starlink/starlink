@@ -125,16 +125,16 @@
 void smurf_dreamsolve ( int *status ) {
 
   /* Local Variables */
-  smfArray *darks = NULL;          /* Dark data */
-  Grp *fgrp = NULL;          /* Filtered group, no darks */
-  smfArray *flatramps = NULL;      /* Flatfield ramps */
-  AstKeyMap *heateffmap = NULL;    /* Heater efficiency data */
-  size_t i;                        /* Loop counter */
-  Grp *igrp = NULL;                /* Input files */
-  Grp *ogrp = NULL;                /* Output files */
-  size_t size;                     /* Size of input Grp */
-  size_t outsize;                  /* Size of output Grp */
-  smfData *data = NULL;            /* Input data */
+  smfArray *darks = NULL;        /* Dark data */
+  Grp *fgrp = NULL;              /* Filtered group, no darks */
+  smfArray *flatramps = NULL;    /* Flatfield ramps */
+  AstKeyMap *heateffmap = NULL;  /* Heater efficiency data */
+  size_t i;                      /* Loop counter */
+  Grp *igrp = NULL;              /* Input files */
+  Grp *ogrp = NULL;              /* Output files */
+  size_t size;                   /* Size of input Grp */
+  size_t outsize;                /* Size of output Grp */
+  smfData *data = NULL;          /* Input data */
 
   /* Main routine */
   ndfBegin();
@@ -165,15 +165,15 @@ void smurf_dreamsolve ( int *status ) {
   /* Loop over number of files */
   for ( i=1; i<=size; i++) {
     /* Open file and flatfield the data */
-    smf_open_and_flatfield( NULL, igrp, ogrp, i, darks, flatramps, heateffmap,
+    smf_open_and_flatfield( NULL, igrp, ogrp, (int) i, darks, flatramps, heateffmap,
                             &data, status );
     smf_dreamsolve( data, status );
 
     /* Check status to see if there was a problem */
     if (*status != SAI__OK) {
       /* Tell the user which file it was... */
-      msgSeti("I",i);
-      msgSeti("N",size);
+      msgSetk("I",i);
+      msgSetk("N",size);
       errRep(FUNC_NAME,
              "Unable to apply DREAM solution to data from file ^I of ^N", status);
     } else {

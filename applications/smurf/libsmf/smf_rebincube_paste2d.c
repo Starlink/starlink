@@ -14,12 +14,12 @@
 *     C function
 
 *  Invocation:
-*     int smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
+*     int smf_rebincube_paste2d( int badmask, dim_t nchan, dim_t nchanout,
 *                                int *spectab, int *specpop, dim_t iv0,
 *                                dim_t nxy, double wgt, int genvar,
 *                                double invar, float *ddata,
 *                                float *data_array, float *var_array,
-*                                double *wgt_array, int *pop_array,
+*                                double *wgt_array, dim_t *pop_array,
 *                                int64_t *nused, int *nreject, int *naccept,
 *                                float *work, int *status );
 
@@ -86,7 +86,7 @@
 *        cube (all planes in the output cube will have the same weight). If
 *        "genvar" is 2, this array should be big enough to hold two spatial
 *        planes from the output cube.
-*     pop_array = int * (Given and Returned)
+*     pop_array = dim_t * (Given and Returned)
 *        An array in which to store the number of input spectra pasted into
 *        each output spectrum. It should be the same size as "var_array".
 *     nused = int64_t * (Given and Returned)
@@ -164,23 +164,23 @@
 
 #define FUNC_NAME "smf_rebincube_paste2d"
 
-int smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
-                           int *spectab, int *specpop, dim_t iv0,
+int smf_rebincube_paste2d( int badmask, dim_t nchan, dim_t nchanout,
+                           dim_t *spectab, dim_t *specpop, dim_t iv0,
                            dim_t nxy, double wgt, int genvar,
                            double invar, float *ddata,
                            float *data_array, float *var_array,
-                           double *wgt_array, int *pop_array,
-                           int64_t *nused, int *nreject, int *naccept,
+                           double *wgt_array, dim_t *pop_array,
+                           int64_t *nused, dim_t *nreject, dim_t *naccept,
                            float *work, int *status ){
 
 /* Local Variables */
+   dim_t ichan;                /* Index of input channel */
    dim_t iv;                   /* Vector index into output 3D array */
+   dim_t nspecused;            /* No of input values pasted into output spectrum */
+   dim_t ochan;                /* Index of output channel */
    float *qdata = NULL;        /* Pointer to next input data value */
    float swdd;                 /* Sum of squared input data value times weight */
-   dim_t ichan;                /* Index of input channel */
-   int ochan;                  /* Index of output channel */
    int ignore;                 /* Ignore this time slice? */
-   int64_t nspecused;          /* No of input values pasted into output spectrum */
    int result = 0;             /* Returned flag */
 
 /* Check the inherited status. */

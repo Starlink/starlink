@@ -16,7 +16,7 @@
 *     void smf_import_array( ThrWorkForce *wf, smfData *refdata,
 *                            const char *dumpdir, const char *name, int bad,
 *                            int expand, smf_dtype type, void *dataptr,
-*                            int *lut_lbnd, int *lut_ubnd, int *status )
+*                            dim_t *lut_lbnd, dim_t *lut_ubnd, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -48,12 +48,12 @@
 *        The array in which to store the imported NDF data values. Must
 *        have the same dimensions as "refdata" (butmay have a different
 *        data type).
-*     lut_lbnd = int * (Given)
+*     lut_lbnd = dim_t * (Given)
 *        If a LUT is being imported, this should be a pointer to the
 *        lower bounds of the map to which the values in the LUT refer.
 *        An error is reported if the supplied NDF holds a LUT that refers
 *        to a map with different bounds. Ignored if NULL.
-*     lut_ubnd = int * (Given)
+*     lut_ubnd = dim_t * (Given)
 *        If a LUT is being imported, this should be a pointer to the
 *        upper bounds of the map to which the values in the LUT refer.
 *        An error is reported if the supplied NDF holds a LUT that refers
@@ -152,12 +152,12 @@ static void smf1_import_array( void *job_data_ptr, int *status );
 typedef struct smfImportArrayData {
    const char *name;
    int operation;
-   size_t i1;
-   size_t i2;
-   size_t t1;
-   size_t t2;
-   size_t bstride;
-   size_t tstride;
+   dim_t i1;
+   dim_t i2;
+   dim_t t1;
+   dim_t t2;
+   dim_t bstride;
+   dim_t tstride;
    dim_t nbolo;
    smf_dtype type;
    void *din;
@@ -166,31 +166,31 @@ typedef struct smfImportArrayData {
 
 void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *dumpdir,
                        const char *name, int bad, int expand, smf_dtype type,
-                       void *dataptr, int *lut_lbnd, int *lut_ubnd, int *status ){
+                       void *dataptr, dim_t *lut_lbnd, dim_t *lut_ubnd, int *status ){
 
 /* Local Variables: */
-   Grp *igrp;                  /* Group holding NDF name */
-   SmfImportArrayData *pdata;
+   Grp *igrp;                 /* Group holding NDF name */
    SmfImportArrayData *job_data = NULL;
+   SmfImportArrayData *pdata;
    char *ename;
    const char *bn;
    const char *cname;
-   dim_t nbolo;                /* Number of bolometers */
-   dim_t nel;                  /* Number of elements in array */
-   dim_t ntslice;              /* Number of time slices */
+   dim_t bstride;             /* Stride between bolometer values */
+   dim_t i;                   /* Loop count */
+   dim_t istep;
+   dim_t lbndx;
+   dim_t lbndy;
+   dim_t nbolo;               /* Number of bolometers */
+   dim_t nel;                 /* Number of elements in array */
+   dim_t ntslice;             /* Number of time slices */
+   dim_t tstep;
+   dim_t tstride;             /* Stride between time slices */
+   dim_t ubndx;
+   dim_t ubndy;
    int iw;
-   int lbndx;
-   int lbndy;
-   int nc;
    int nw;
-   int ubndx;
-   int ubndy;
-   size_t bstride;             /* Stride between bolometer values */
-   size_t i;                   /* Loop count */
-   size_t istep;
-   size_t tstep;
-   size_t tstride;             /* Stride between time slices */
-   smfData *data;              /* Model for one sub-array */
+   int nc;
+   smfData *data;             /* Model for one sub-array */
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return;
@@ -198,7 +198,7 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *dumpdir,
 /* If a value is supplied for "dumpdir", use it to replace any directory
    specification in "name". */
    if( dumpdir ) {
-      nc = strlen( dumpdir );
+      nc = (int) strlen( dumpdir );
       ename = astStore( NULL, dumpdir, nc+1 );
 
       bn = strrchr( name, '/' );
@@ -235,7 +235,7 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *dumpdir,
 
       } else if( data->ndims != refdata->ndims ) {
          *status = SAI__ERROR;
-         errRepf( " ", "NDF '%s' is %zu dimensional - must be %zu "
+         errRepf( " ", "NDF '%s' is %d dimensional - must be %d "
                   "dimensional.", status, cname, data->ndims, refdata->ndims );
 
       } else if( !expand || refdata->ndims != 3 ) {
@@ -251,8 +251,8 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *dumpdir,
             } else if( data->lbnd[i] != refdata->lbnd[i] &&
                 *status == SAI__OK ){
                *status = SAI__ERROR;
-               errRepf( " ", "NDF '%s' has incorrect lower bound %d on "
-                        "pixel axis %zu - should be %d.", status,
+               errRepf( " ", "NDF '%s' has incorrect lower bound %" DIM_T_FMT " on "
+                        "pixel axis %zu - should be %" DIM_T_FMT ".", status,
                         cname, data->lbnd[i], i + 1, refdata->lbnd[i] );
             }
          }
@@ -271,8 +271,8 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *dumpdir,
             } else if( data->lbnd[i] != refdata->lbnd[i] &&
                 *status == SAI__OK ){
                *status = SAI__ERROR;
-               errRepf( " ", "NDF '%s' has incorrect lower bound %d on "
-                        "pixel axis %zu - should be %d.", status,
+               errRepf( " ", "NDF '%s' has incorrect lower bound %" DIM_T_FMT " on "
+                        "pixel axis %zu - should be %" DIM_T_FMT ".", status,
                         cname, data->lbnd[i], i + 1, refdata->lbnd[i] );
             }
          }
@@ -290,21 +290,21 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *dumpdir,
             }
 
          } else {
-            lbndx = VAL__BADI;
-            ndfXgt0i( data->file->ndfid, SMURF__EXTNAME, "LUT_LBNDX",
+            lbndx = VAL__BADK;
+            ndfXgt0k( data->file->ndfid, SMURF__EXTNAME, "LUT_LBNDX",
                       &lbndx, status );
-            lbndy = VAL__BADI;
-            ndfXgt0i( data->file->ndfid, SMURF__EXTNAME, "LUT_LBNDY",
+            lbndy = VAL__BADK;
+            ndfXgt0k( data->file->ndfid, SMURF__EXTNAME, "LUT_LBNDY",
                       &lbndy, status );
-            ubndx = VAL__BADI;
-            ndfXgt0i( data->file->ndfid, SMURF__EXTNAME, "LUT_UBNDX",
+            ubndx = VAL__BADK;
+            ndfXgt0k( data->file->ndfid, SMURF__EXTNAME, "LUT_UBNDX",
                       &ubndx, status );
-            ubndy = VAL__BADI;
-            ndfXgt0i( data->file->ndfid, SMURF__EXTNAME, "LUT_UBNDY",
+            ubndy = VAL__BADK;
+            ndfXgt0k( data->file->ndfid, SMURF__EXTNAME, "LUT_UBNDY",
                       &ubndy, status );
 
-            if( lbndx == VAL__BADI || lbndy == VAL__BADI ||
-                ubndx == VAL__BADI || ubndy == VAL__BADI ) {
+            if( lbndx == VAL__BADK || lbndy == VAL__BADK ||
+                ubndx == VAL__BADK || ubndy == VAL__BADK ) {
                if( *status == SAI__OK ) {
                   *status = SAI__ERROR;
                   errRepf( " ", "NDF '%s' holds a LUT but does not "
@@ -316,8 +316,8 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *dumpdir,
                if( *status == SAI__OK ) {
                   *status = SAI__ERROR;
                   errRepf( " ", "NDF '%s' holds a LUT that refers to a map "
-                           "with bounds (%d:%d,%d:%d) but the map being created "
-                           "has bounds (%d:%d,%d:%d).", status, cname, lbndx,
+                           "with bounds (%" DIM_T_FMT ":%" DIM_T_FMT ",%" DIM_T_FMT ":%" DIM_T_FMT ") but the map being created "
+                           "has bounds (%" DIM_T_FMT ":%" DIM_T_FMT ",%" DIM_T_FMT ":%" DIM_T_FMT ").", status, cname, lbndx,
                             ubndx, lbndy, ubndy, lut_lbnd[ 0 ], lut_ubnd[ 0 ],
                             lut_lbnd[ 1 ], lut_ubnd[ 1 ] );
                }
@@ -457,14 +457,14 @@ static void smf1_import_array( void *job_data_ptr, int *status ) {
    int badmean;
    int *ipin;
    int *ipout;
-   size_t bstride;
-   size_t i1;
-   size_t i2;
-   size_t i;
-   size_t j;
-   size_t t1;
-   size_t t2;
-   size_t tstride;
+   dim_t bstride;
+   dim_t i1;
+   dim_t i2;
+   dim_t i;
+   dim_t j;
+   dim_t t1;
+   dim_t t2;
+   dim_t tstride;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -538,6 +538,9 @@ static void smf1_import_array( void *job_data_ptr, int *status ) {
       }
 
    } else if( pdata->operation == 3 ){
+      dim_t *nbad;
+      dim_t gap;
+      dim_t ngood;
       double *mean;
       double *pend;
       double *pnext;
@@ -545,12 +548,9 @@ static void smf1_import_array( void *job_data_ptr, int *status ) {
       double vnext;
       double vprev;
       double vsum;
-      int gap;
-      size_t *nbad;
-      size_t ngood;
 
       double *means = astMalloc((t2-t1+1)*sizeof(*means));
-      size_t *nbads = astMalloc((t2-t1+1)*sizeof(*nbads));
+      dim_t *nbads = astMalloc((t2-t1+1)*sizeof(*nbads));
       if( means && nbads ) {
          pend = means + t2 - t1;  /* Pointer to final "means" value */
 

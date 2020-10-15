@@ -179,10 +179,10 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
   double badfrac;           /* Fraction of bad samples to flag bad bolo */
   smfData *data=NULL;       /* Pointer to individual smfData */
   int compreprocess;        /* COMmon-mode cleaning as pre-processing step */
-  dim_t dcfitbox;           /* width of box for measuring DC steps */
+  int dcfitbox;             /* width of box for measuring DC steps */
   int dclimcorr;            /* Min number of correlated steps */
   int dcmaxsteps;           /* number of DC steps/min. to flag bolo bad */
-  dim_t dcsmooth;           /* median filter width before finding DC steps */
+  int dcsmooth;             /* median filter width before finding DC steps */
   double dcthresh;          /* n-sigma threshold for primary DC steps */
   int deconvmce;            /* Remove the effects of the MCE anti-alias filter? */
   double delay;             /* Delay, in seconds */
@@ -192,7 +192,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
   double flagfast;          /* Threshold for flagging slow slews */
   double flagslow;          /* Threshold for flagging slow slews */
   dim_t idx;                /* Index within subgroup */
-  size_t nflag;             /* Number of elements flagged */
+  dim_t nflag;             /* Number of elements flagged */
   double noisecliphigh = 0; /* Sigma clip high-noise outlier bolos */
   double noisecliplow = 0;  /* Sigma clip low-noise outlier bolos */
   int noiseclipprecom = 0;  /* Noise clipping before common-mode cleaning? */
@@ -224,7 +224,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
 
   if( array->sdata[0]->ndims != 3 ) {
     *status = SMF__WDIM;
-    errRepf( "", FUNC_NAME ": Supplied smfData has %zu dims, needs 3", status,
+    errRepf( "", FUNC_NAME ": Supplied smfData has %d dims, needs 3", status,
              data->ndims );
     return;
   }
@@ -289,9 +289,8 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
     /* Fix DC steps */
     if( dcthresh && dcfitbox ) {
       msgOutiff(MSG__VERB, "", FUNC_NAME
-                ": Flagging bolos with %lf-sigma DC steps in %" DIM_T_FMT " "
-                "samples as bad, using %" DIM_T_FMT
-                "-sample median filter and max %d "
+                ": Flagging bolos with %lf-sigma DC steps in %d "
+                "samples as bad, using %d-sample median filter and max %d "
                 "DC steps per min before flagging entire bolo bad...", status,
                 dcthresh, dcfitbox, dcsmooth, dcmaxsteps);
 

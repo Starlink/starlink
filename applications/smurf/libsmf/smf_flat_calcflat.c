@@ -13,7 +13,7 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     size_t smf_flat_calcflat( ThrWorkForce *wf, msglev_t msglev,
+*     dim_t smf_flat_calcflat( ThrWorkForce *wf, msglev_t msglev,
 *                   const char flatname[], const char resistpar[],
 *                   const char methpar[], const char orderpar[],
 *                   const char resppar[], const char respmaskpar[],
@@ -59,7 +59,7 @@
 *        Pointer to global status.
 
 *  Returned Value:
-*     size_t = number of bolometers with good flatfields.
+*     dim_t = number of bolometers with good flatfields.
 
 *  Description:
 *     Calculate the flatfield from the supplied data. The parameter names are provided
@@ -133,7 +133,7 @@
 #include "smf.h"
 #include "smf_typ.h"
 
-size_t
+dim_t
 smf_flat_calcflat( ThrWorkForce *wf, msglev_t msglev, const char flatname[],
                    const char resistpar[],
                    const char methpar[], const char orderpar[],
@@ -144,11 +144,11 @@ smf_flat_calcflat( ThrWorkForce *wf, msglev_t msglev, const char flatname[],
   smfData * bolref = NULL;  /* Corrected bolometer data */
   smf_flatmeth flatmeth;    /* Flatfielding method */
   smfData * flatpoly = NULL;/* Polynomial expansion of fit */
-  size_t i = 0;             /* Counter, index */
-  size_t j;                 /* Counter */
+  dim_t i = 0;             /* Counter, index */
+  dim_t j;                 /* Counter */
   int order;                /* Order for polynomial flatfielding */
-  size_t nbols = 0;         /* Number of bolometers */
-  size_t ngood = 0;         /* Number of good responsivities */
+  dim_t nbols = 0;         /* Number of bolometers */
+  dim_t ngood = 0;         /* Number of good responsivities */
   smfData * powref = NULL;  /* Heater power as a smfData */
   double refohms;           /* Reference resistance (ohms) */
   double *resistance = NULL;/* Resistance data for each bolometer */
@@ -238,8 +238,8 @@ smf_flat_calcflat( ThrWorkForce *wf, msglev_t msglev, const char flatname[],
      to disable completely without being required to set the filter level */
   if (*status == SAI__OK) nbols = (bolref->dims)[0] * (bolref->dims)[1];
   if (msglev != MSG__NONE) {
-    msgSeti( "NG", ngood );
-    msgSeti( "NTOT", nbols );
+    msgSetk( "NG", ngood );
+    msgSetk( "NTOT", nbols );
     msgOutif( msglev, "",
               "Number of good responsivities: ^NG out of ^NTOT", status);
   }
@@ -247,8 +247,8 @@ smf_flat_calcflat( ThrWorkForce *wf, msglev_t msglev, const char flatname[],
   /* Optionally discard the calibration if the responsivity is bad */
   parGet0l( respmaskpar, &respmask, status );
   if (respmask  && *status == SAI__OK ) {
-    size_t nmask = 0;
-    size_t thisbol = 0;
+    dim_t nmask = 0;
+    dim_t thisbol = 0;
     double *respdata = (respmap->pntr)[0];
     for (i = 0; i < nbols; i++ ) {
       if ( respdata[i] == VAL__BADD) {
@@ -266,7 +266,7 @@ smf_flat_calcflat( ThrWorkForce *wf, msglev_t msglev, const char flatname[],
       }
     }
     if (msglev != MSG__NONE) {
-      msgSeti( "NM", nmask);
+      msgSetk( "NM", nmask);
       msgOutif( msglev, "",
                 "Responsivity mask has removed an additional ^NM bolometers from the flatfield",
                 status);

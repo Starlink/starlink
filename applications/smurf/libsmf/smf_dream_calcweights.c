@@ -151,17 +151,15 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
   smfDream *dream = NULL;       /* DREAM parameters obtained from input data file */
   char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
   double *gridwts = NULL;       /* Pointer to array of grid weights */
-  int gridwtsdim[DREAM__MXGRID];/* Dimensions of grid weights array*/
+  dim_t gridwtsdim[DREAM__MXGRID];/* Dimensions of grid weights array*/
   smfHead *hdr = NULL;          /* Header for input data */
   double *invmat = NULL;        /* Pointer to inverted matrix */
   int invmatdim;                /* Size of inverted matrix */
   int jigext[4] = {-1, 1, -1, 1}; /* Extents in the X, Y directions of the
                                      jiggle pattern */
-  int nbol;                     /* Total number of bolometers */
   int nbolx;                    /* Number of bolometers in X direction */
   int nboly;                    /* Number of bolometers in Y direction */
-  int nframes;                  /* Number of timeslices in input data */
-  int nsampcycle;               /* Number of samples in a jiggle cycle */
+  dim_t nsampcycle;             /* Number of samples in a jiggle cycle */
   char *pname = NULL;           /* Pointer to filename string */
   int *qual = NULL;             /* True/false `quality' array (not NDF quality) */
   int qualdim[2];               /* Dimensions of quality array */
@@ -176,7 +174,6 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
 
   /* Check it's 3-d time series */
   if ( data->ndims == 3) {
-    nframes = (data->dims)[2];
 
     /* Check we have a DREAM observation */
     hdr = data->hdr;
@@ -196,14 +193,13 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
       msgOutif(MSG__VERB," ", "Beginning weights calculation for file ^I: this will take some time (~5-10 mins)", status);
 
       /* Some useful shortcuts. Maybe. */
-      nbolx = (data->dims)[0];
-      nboly = (data->dims)[1];
-      nbol = nbolx * nboly;
+      nbolx = (int)(data->dims)[0];
+      nboly = (int)(data->dims)[1];
 
       /* Allocate quality array */
       qualdim[0] = nbolx;
       qualdim[1] = nboly;
-      qual = astCalloc( qualdim[0]*qualdim[1], sizeof(int) );
+      qual = astCalloc( qualdim[0]*qualdim[1], sizeof(*qual) );
 
 
       sc2math_calcmapwt( subarray, nbolx, nboly,
@@ -215,9 +211,9 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
 
       /* Dummy definition of window - this must be derived somehow TBD */
       windext[0] = 0;
-      windext[1] = (data->dims)[0] - 1;
+      windext[1] = (int)(data->dims)[0] - 1;
       windext[2] = 0;
-      windext[3] = (data->dims)[1] - 1;
+      windext[3] = (int)(data->dims)[1] - 1;
 
       /* Obtain filename to write weights into */
       pname = filename;

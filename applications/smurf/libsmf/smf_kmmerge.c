@@ -14,9 +14,9 @@
 *     C function
 
 *  Invocation:
-*     void smf_kmmerge( const char *xname, AstKeyMap *keymap, int *index,
-*                       int ndet, int *mask, int nts, int *rts, int j0,
-*                       int j1, int *status )
+*     void smf_kmmerge( const char *xname, AstKeyMap *keymap, dim_t *index,
+*                       int ndet, int *mask, dim_t nts, int *rts, dim_t j0,
+*                       dim_t j1, int *status )
 
 *  Arguments:
 *     xname = const char * (Given)
@@ -25,7 +25,7 @@
 *        An AST keyMap holding the primitive array values copied from the
 *        NDF extension (see smf_ext2km). Only time-indexed extension items
 *        are stored in this KeyMap.
-*     index = int * (Given)
+*     index = dim_t * (Given)
 *        A pointer to an  array of integers with "nts" element (i.e. an
 *        element for each input time slice). The value held in an element
 *        of this array is an index into the "rts" array. Traversing this
@@ -38,15 +38,15 @@
 *        Pointer to an array with "nts" elements. Each element is a bit
 *        mask in which each bit is set if there are any good data values in
 *        the data from the corresponding detector.
-*     nts = int (Given)
+*     nts = dim_t (Given)
 *        The total number of input time slices described by the keyMap.
 *        (i.e. the total number of time slices read from all input NDFs).
 *     rts = int * (Given)
 *        The RTS_NUM value associated with each input time slice. The length
 *        of this array should be "nts".
-*     j0 = int (Given)
+*     j0 = dim_t (Given)
 *        The index of the first time slice to use.
-*     j1 = int (Given)
+*     j1 = dim_t (Given)
 *        The index of the last time slice to use.
 *     status = int * (Given and Returned)
 *        Inherited status value.
@@ -134,13 +134,13 @@
 #define DOTYPE(Type,Sym1,Sym2,Sym3) \
 \
 /* Allocate a buffer to hold the values and then get them. */ \
-   values##Sym3 = astGrow( values##Sym3, veclen, sizeof( Type ) ); \
+   values##Sym3 = astGrow( values##Sym3, (size_t) veclen, sizeof( Type ) ); \
    (void) astMapGet1##Sym1( keymap, key, veclen, &veclen, values##Sym3 ); \
    if( astOK ) { \
 \
 /* If the vector length equals the number of time slices, just report an \
    error if the value in the two time slices differ. */ \
-      if( veclen == nts ) { \
+      if( (dim_t) veclen == nts ) { \
 \
 /* Get the index of the element corresponding to the lowest RTS_NUM \
    value. If any subsequent input time slices refer to the same RTS_NUM \
@@ -186,7 +186,7 @@
 /* Each contiguous section of the vector is assumed to refer to a single \
    detector. Check the length of each section is a multiple of the number \
    of detectors. */ \
-         seclen = veclen/nts; \
+         seclen = (int)( veclen/nts ); \
          if( seclen % ndet == 0 ) { \
 \
 /* Find the number of values per detector. */ \
@@ -297,7 +297,7 @@
       } else { \
          msgSetc( "K", key ); \
          msgSeti( "V", veclen ); \
-         msgSeti( "N", nts ); \
+         msgSetk( "N", nts ); \
          msgOut( " ", "Unexpected vector length (^V) for ^K - it is not a " \
                  "multiple of the number of input time slices (^N) (possible " \
                  "programming error).", status ); \
@@ -317,9 +317,9 @@
 
 
 
-void smf_kmmerge( const char *xname, AstKeyMap *keymap, int *index,
-                  int ndet, int *mask, int nts, int *rts, int j0,
-                  int j1, int *status ){
+void smf_kmmerge( const char *xname, AstKeyMap *keymap, dim_t *index,
+                  int ndet, int *mask, dim_t nts, int *rts, dim_t j0,
+                  dim_t j1, int *status ){
 
 /* Local Variables */
    const char *key = NULL;
@@ -337,20 +337,20 @@ void smf_kmmerge( const char *xname, AstKeyMap *keymap, int *index,
    int *valuesI = NULL;
    int changed;
    int detbit;
-   int from;
+   dim_t from;
    int i;
    int idet;
    int ignore;
-   int into;
-   int j;
+   dim_t into;
+   dim_t j;
    int k;
    int nentry;
    int rts_num0;
    int rts_num;
    int seclen;
    int type;
-   int veclen;
    int vpd;
+   int veclen;
 
 /* Check the inherited status */
    if( *status != SAI__OK ) return;
@@ -361,7 +361,7 @@ void smf_kmmerge( const char *xname, AstKeyMap *keymap, int *index,
       key = astMapKey( keymap, i );
 
 /* Ignore discrepancies in ENVIRO_ items. */
-      ignore = key || strncmp( key, "ENVIRO_", 7 );
+      ignore = (!key) || strncmp( key, "ENVIRO_", 7 );
 
 /* Get the length of the vector of values in the KeyMap. */
       veclen = astMapLength( keymap, key );

@@ -131,13 +131,13 @@
 /* Data types */
 typedef struct smfSnrMaskJobData {
    int operation;
-   int *cindex;
+   dim_t *cindex;
    dim_t jlo;
    dim_t jhi;
    dim_t rowlen;
    unsigned char *mask;
    unsigned char *maskold;
-   int *table;
+   dim_t *table;
 } smfSnrMaskJobData;
 
 /* Prototypes for local functions */
@@ -159,23 +159,23 @@ void smf_snrmask( ThrWorkForce *wf, int abssnr, unsigned char *oldmask,
    dim_t i;
    dim_t j;
    double snr;
-   int *cindex = NULL;
-   int *ps = NULL;
-   int *psn = NULL;
-   int *table = NULL;
-   int iass;
-   int iclean;
-   int iclump;
-   int ineb;
-   int itemp;
-   int itop1;
-   int itop2;
+   dim_t *cindex = NULL;
+   dim_t *ps = NULL;
+   dim_t *psn = NULL;
+   dim_t *table = NULL;
+   dim_t iass;
+   dim_t iclean;
+   dim_t iclump;
+   dim_t ineb;
+   dim_t itemp;
+   dim_t itop1;
+   dim_t itop2;
    int iworker;
-   int neb_offset[ 4 ];
+   dim_t neb_offset[ 4 ];
    int nworker;
    int ok;
-   int rowstep;
-   int top;
+   dim_t rowstep;
+   dim_t top;
    smfSnrMaskJobData *job_data = NULL;
    smfSnrMaskJobData *pdata = NULL;
    unsigned char *maskold = NULL;
@@ -300,7 +300,7 @@ void smf_snrmask( ThrWorkForce *wf, int abssnr, unsigned char *oldmask,
 /* Assign the next clump index to the current pixel, and then increment
    the next clump index. Report an error if we have reached the max
    allowable clump index value. */
-               if( top == INT_MAX ) {
+               if( top == VAL__MAXK ) {
                   *status = SAI__ERROR;
                   errRep( "", "smf_snrmask: Too many low-SNR clumps found.",
                           status );
@@ -419,7 +419,7 @@ void smf_snrmask( ThrWorkForce *wf, int abssnr, unsigned char *oldmask,
    in each thread and so we can reduce the number of threads used to
    equal the number of rows. */
    nworker = wf ? wf->nworker : 1;
-   if( nworker > (int) dims[ 1 ] ) nworker = dims[ 1 ];
+   if( nworker > (int) dims[ 1 ] ) nworker = (int) dims[ 1 ];
    job_data = astMalloc( nworker*sizeof( *job_data ) );
 
 /* Check we can de-reference the job data pointer safely. */
@@ -538,10 +538,10 @@ static void smf1_snrmask_job( void *job_data, int *status ) {
 /* Local Variables: */
    dim_t i;
    dim_t j;
-   int *ps;
-   int bgcount;
-   int ineb;
-   int neb_offset[ 8 ];
+   dim_t *ps;
+   dim_t bgcount;
+   dim_t ineb;
+   dim_t neb_offset[ 8 ];
    smfSnrMaskJobData *pdata;
    unsigned char *pk;
    unsigned char *po;

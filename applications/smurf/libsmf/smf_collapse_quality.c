@@ -15,7 +15,7 @@
 *  Invocation:
 *     smf_collapse_quality( const smf_qual_t *inqual, smf_qfam_t qfamily,
 *                           dim_t nbolo, dim_t ntslice,
-*                           size_t bstride, size_t tstride,
+*                           dim_t bstride, dim_t tstride,
 *                           int collapse_time, smf_qual_t **outqual,
 *                           int *status )
 
@@ -28,10 +28,10 @@
 *        Number of bolometers
 *     ntslice = dim_t (Given)
 *        Number of time slices
-*     bstride = size_t (Given)
+*     bstride = dim_t (Given)
 *        How many elements to skip to get to the next bolometer at a given
 *        time slice.
-*     tstride = size_t (Given)
+*     tstride = dim_t (Given)
 *        How many elements to skip to get to the next time slice for the
 *        current bolometer.
 *     collapse_time = int (Given)
@@ -113,19 +113,18 @@
 
 void smf_collapse_quality( const smf_qual_t *inqual, smf_qfam_t qfamily,
                            dim_t nbolo, dim_t ntslice,
-                           size_t bstride, size_t tstride,
+                           dim_t bstride, dim_t tstride,
                            int collapse_time, smf_qual_t **outqual,
                            int *status ) {
 
-  size_t clen;                  /* length collapsed axis */
-  size_t cstride;               /* stride collapsed axis */
-  size_t i;                     /* loop counter */
-  size_t j;                     /* loop counter */
-  size_t len;                   /* length non-collapsed axis */
+  dim_t clen;                  /* length collapsed axis */
+  dim_t i;                     /* loop counter */
+  dim_t j;                     /* loop counter */
+  dim_t len;                   /* length non-collapsed axis */
   smf_qual_t mask = 0;          /* All bits set */
-  size_t nqbits = 0;            /* Number of quality bits in family */
+  dim_t nqbits = 0;            /* Number of quality bits in family */
   smf_qual_t *qual=NULL;     /* collapsed quality */
-  size_t stride;                /* stride non-collapsed axis */
+  dim_t stride;                /* stride non-collapsed axis */
 
   /* Check for valid input pointers */
   if( !inqual || !outqual ) {
@@ -136,12 +135,10 @@ void smf_collapse_quality( const smf_qual_t *inqual, smf_qfam_t qfamily,
 
   if( collapse_time ) {
     clen = ntslice;
-    cstride = tstride;
     len = nbolo;
     stride = bstride;
   } else {
     clen = nbolo;
-    cstride = bstride;
     len = ntslice;
     stride = tstride;
   }

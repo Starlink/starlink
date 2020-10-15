@@ -19,7 +19,7 @@
 *                             dim_t dim[3], AstMapping *ssmap,
 *                             AstSkyFrame *abskyfrm, AstMapping *iskymap,
 *                             Grp *detgrp, int moving, float *in_data,
-*                             float *out_data, int overlap, int *status );
+*                             float *out_data, int *overlap, int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -136,20 +136,20 @@ void smf_resampcube_nn( smfData *data, dim_t nchan,
 /* Local Variables */
    AstMapping *totmap = NULL;  /* WCS->GRID Mapping from template WCS FrameSet */
    const char *name = NULL;    /* Pointer to current detector name */
-   dim_t timeslice_size;       /* No of detector values in one time slice */
-   double *detxtemplt = NULL;  /* Work space for template X grid coords */
-   double *detxskycube = NULL; /* Work space for sky cube X grid coords */
-   double *detytemplt = NULL;  /* Work space for template Y grid coords */
-   double *detyskycube = NULL; /* Work space for sky cube Y grid coords */
-   float *ddata = NULL;        /* Pointer to start of output detector data */
-   float *tdata = NULL;        /* Pointer to start of sky cube time slice data */
-   int *spectab = NULL;        /* Template->sky cube channel number conversion table */
-   int found;                  /* Was current detector name found in detgrp? */
+   dim_t *spectab = NULL;      /* Template->sky cube channel number conversion table */
    dim_t gxsky;                /* Sky cube X grid index */
    dim_t gysky;                /* Sky cube Y grid index */
    dim_t idet;                 /* Detector index */
    dim_t itime;                /* Index of current time slice */
-   int iv0;                    /* Offset for pixel in 1st sky cube spectral channel */
+   dim_t iv0;                  /* Offset for pixel in 1st sky cube spectral channel */
+   dim_t timeslice_size;       /* No of detector values in one time slice */
+   double *detxskycube = NULL; /* Work space for sky cube X grid coords */
+   double *detxtemplt = NULL;  /* Work space for template X grid coords */
+   double *detyskycube = NULL; /* Work space for sky cube Y grid coords */
+   double *detytemplt = NULL;  /* Work space for template Y grid coords */
+   float *ddata = NULL;        /* Pointer to start of output detector data */
+   float *tdata = NULL;        /* Pointer to start of sky cube time slice data */
+   int found;                  /* Was current detector name found in detgrp? */
    smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
 
 /* Initialise */
@@ -189,7 +189,7 @@ void smf_resampcube_nn( smfData *data, dim_t nchan,
    the name of the current detector. If not found, set the GRID coord
    bad. */
       if( detgrp ) {
-         found = grpIndex( name, detgrp, 1, status );
+         found = (int) grpIndex( name, detgrp, 1, status );
          if( !found ) {
             detxtemplt[ idet ] = AST__BAD;
             detytemplt[ idet ] = AST__BAD;

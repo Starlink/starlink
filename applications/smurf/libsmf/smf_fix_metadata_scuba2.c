@@ -166,7 +166,7 @@ struct FitsHeaderStruct {
 };
 
 /* Local helper routines */
-static void smf__calc_wvm_index( smfHead * hdr, const char * amhdr, size_t index, double *tau, double * time, int * status );
+static void smf__calc_wvm_index( smfHead * hdr, const char * amhdr, dim_t index, double *tau, double * time, int * status );
 static int smf__validate_scan( smfHead *hdr, int setbad, int *status );
 
 
@@ -175,7 +175,8 @@ static int smf__validate_scan( smfHead *hdr, int setbad, int *status );
 /* Indent for informational messages */
 #define INDENT "   "
 
-int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, int *ncards, int * status ) {
+int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed,
+                              int *ncards __attribute__((unused)), int * status ) {
 
   AstFitsChan * fits = NULL; /* FITS header (FitsChan) */
   struct FitsHeaderStruct fitsvals; /* Quick access Fits header struct */
@@ -217,15 +218,15 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
      ACSIS). */
   if (hdr->allState) {
     /* it will be odd if it is not there */
-    size_t nframes = hdr->nframes;
+    dim_t nframes = hdr->nframes;
 
-    size_t istart = 0;
+    dim_t istart = 0;
     double start_time = (hdr->allState)[istart].rts_end;
     while( start_time == VAL__BADD && ++istart < nframes ) {
       start_time = (hdr->allState)[istart].rts_end;
     }
 
-    size_t iend = nframes - 1;
+    dim_t iend = nframes - 1;
     double end_time = (hdr->allState)[iend].rts_end;
     while( end_time == VAL__BADD && iend-- > 0 ) {
       end_time = (hdr->allState)[iend].rts_end;
@@ -285,7 +286,7 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     smf_getfitsd( hdr, "SCAN_VEL", &scanvel, status );
     if( *status != SAI__OK || scanvel == VAL__BADD ) {
       if( *status != SAI__OK ) errAnnul( status );
-      size_t nflagged;
+      dim_t nflagged;
       smf_flag_slewspeed( data, 0.0, 0.0, &nflagged, &scanvel, status );
       if( scanvel != VAL__BADD ) {
         msgOutiff( msglev, "", INDENT "Recalculated scan velocity as %g "
@@ -360,14 +361,14 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
      filled with zeroes. Just assume that a zero in RTS_NUM is always
      indicative of a private sequence. */
   if (fitsvals.utdate < 20110401) {
-    size_t nframes = hdr->nframes;
+    dim_t nframes = hdr->nframes;
     JCMTState * curstate = &((hdr->allState)[0]);
     JCMTState * endstate = &((hdr->allState)[nframes-1]);
     if (curstate->rts_num == 0 && endstate->rts_num == 0) {
       /* have to set the values from the SEQSTART and SEQEND headers
          since those were set correctly (although any value would
          do of course apart from the sanity check in smf_find_science. */
-      size_t i;
+      dim_t i;
       int seqnum = 1;
       smf_fits_getI( hdr, "SEQSTART", &seqnum, status );
       for ( i=0; i<nframes; i++) {
@@ -412,9 +413,9 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
       */
 
       {
-        size_t i;
+        dim_t i;
         int pixheat = 0;
-        size_t nframes = hdr->nframes;
+        dim_t nframes = hdr->nframes;
         smf_getfitsi( hdr, "PIXHEAT", &pixheat, status );
 
         /* shift everything up by 2 */
@@ -465,8 +466,8 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
 
     if (strcasecmp( obstype, "focus") != 0) {
 
-      size_t i;
-      size_t nframes = hdr->nframes;
+      dim_t i;
+      dim_t nframes = hdr->nframes;
       double starttau = VAL__BADD;
       double starttime = VAL__BADD;
       double endtau = VAL__BADD;
@@ -582,9 +583,9 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
                 status );
       }
     } else {
-      size_t nframes = hdr->nframes;
+      dim_t nframes = hdr->nframes;
       JCMTState * curstate;
-      size_t i;
+      dim_t i;
       for ( i=0; i<nframes; i++ ) {
         curstate = &((hdr->allState)[i]);
         curstate->jos_drcontrol |= DRCNTRL__PTCS_BIT;
@@ -629,8 +630,8 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
           errAnnul( status );
         }
         if (!have_fixed_pntg) {
-          size_t nframes = hdr->nframes;
-          size_t i;
+          dim_t nframes = hdr->nframes;
+          dim_t i;
           const double dlon = 0.0;
           const double dlat = -16.83; /* From making maps of each half */
           /* Correct the pointing */
@@ -668,7 +669,7 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
 }
 
 
-static void smf__calc_wvm_index( smfHead * hdr, const char * amhdr, size_t index, double *tau, double * time, int * status ) {
+static void smf__calc_wvm_index( smfHead * hdr, const char * amhdr, dim_t index, double *tau, double * time, int * status ) {
   double approxam = VAL__BADD;
   *tau = VAL__BADD;
   *time = VAL__BADD;

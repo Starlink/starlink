@@ -16,8 +16,8 @@
 *     pntr = smf_construct_smfData( smfData * tofill, smfFile * file,
 *                      smfHead * hdr, smfDA * da, smfFts* fts, smf_dtype dtype,
 *                      void * pntr[2], smf_qual_t qual, smf_qfam_t qfamily,
-*                      smfData * sidequal, int isFFT, int isTordered,
-*                      const dim_t dims[], const int lbnd[], int ndims,
+*                      smfData * sidequal, dim_t isFFT, int isTordered,
+*                      const dim_t dims[], const dim_t lbnd[], int ndims,
 *                      int virtual, int ncoeff, double * poly,
 *                      AstKeyMap * history, int * status );
 
@@ -53,7 +53,7 @@
 *        This pointer will be copied and it is assumed that the smfData
 *        will be freed in another location. See smf_select_qualpntr to determine
 *        which pointer to use for quality.
-*     isFFT = int (Given)
+*     isFFT = dim_t (Given)
 *        Set to -1 if don't know, 0 if real-space data, value > 0 giving the
 *        length of the last transformed axis in real space if frequency-space
 *        data.
@@ -177,8 +177,8 @@ smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
                        smfDA * da, smfFts* fts, smf_dtype dtype, void * pntr[2],
                        smf_qual_t * qual, smf_qfam_t qfamily,
-                       smfData * sidequal, int isFFT, int isTordered,
-                       const dim_t dims[], const int lbnd[], int ndims,
+                       smfData * sidequal, dim_t isFFT, int isTordered,
+                       const dim_t dims[], const dim_t lbnd[], int ndims,
                        int virtual, int ncoeff, double *poly,
                        AstKeyMap *history, int * status ) {
 

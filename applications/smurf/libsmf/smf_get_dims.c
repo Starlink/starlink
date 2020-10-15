@@ -15,7 +15,7 @@
 *  Invocation:
 *     void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
 *                        dim_t *nbolo, dim_t *ntslice, dim_t *ndata,
-*                        size_t *bstride, size_t *tstride, int *status );
+*                        dim_t *bstride, dim_t *tstride, int *status );
 
 *  Arguments:
 *     data = const smfData *data (Given)
@@ -30,10 +30,10 @@
 *        Number of time slices
 *     ndata = dim_t* (Returned)
 *        Total number of data points (nbolo*ntslice)
-*     bstride = size_t* (Returned)
+*     bstride = dim_t* (Returned)
 *        How many elements to skip to get to the next bolometer at a given
 *        time slice.
-*     tstride = size_t* (Returned)
+*     tstride = dim_t* (Returned)
 *        How many elements to skip to get to the next time slice for the
 *        current bolometer.
 *     status = int * (Given and Returned)
@@ -117,14 +117,14 @@
 
 void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
                    dim_t *nbolo, dim_t *ntslice, dim_t *ndata,
-                   size_t *bstride, size_t *tstride, int *status ) {
+                   dim_t *bstride, dim_t *tstride, int *status ) {
 
-  size_t bs = 0;
-  size_t i = 0;
+  dim_t bs = 0;
+  dim_t i = 0;
   dim_t nb = 0;
   dim_t nt = 0;
   dim_t nd = 0;
-  size_t ts = 0;
+  dim_t ts = 0;
   dim_t nr = 0;
   dim_t nc = 0;
   dim_t nf = 0;

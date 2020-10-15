@@ -157,8 +157,8 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    int nw;
    int proceed;
    int skip_defined;
-   size_t ipix;
-   size_t nsetbad;
+   dim_t ipix;
+   dim_t nsetbad;
    smfArray **oldres;
    smfArray **oldgai;
    smfArray *lut=NULL;
@@ -168,7 +168,7 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    unsigned char *mask = NULL;
 
    static int lmask = 1;
-   static int ncomp[4] = {0,0,0,0};
+   static dim_t ncomp[4] = {0,0,0,0};
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return;
@@ -317,7 +317,7 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    "pcathresh" to -1 to indicate that he values in "ncomp" should be used,
    rather than determining new values using the sigma-clipping algorithm.  */
       if( pcathresh < -1.0 ) {
-         ncomp[0] = ncomp[1] = ncomp[2] = ncomp[3] = (int)( -pcathresh + 0.5 );
+         ncomp[0] = ncomp[1] = ncomp[2] = ncomp[3] = (dim_t)( -pcathresh + 0.5 );
          pcathresh = -1.0;
 
 /* If we are using the nsigma-clipping algorithm, get the value that
@@ -678,7 +678,7 @@ static void smf1_calcmodel_pca( void *job_data_ptr, int *status ) {
    double coeffs[3];
    int *pl;
    int64_t nused;
-   size_t ibase;
+   dim_t ibase;
    smf_qual_t *pq;
 
 /* Check inherited status */

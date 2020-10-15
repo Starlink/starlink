@@ -144,12 +144,12 @@ typedef struct smfUpdateQualityData {
    int *idata;
    int operation;
    int syncbad;
-   size_t b1;
-   size_t b2;
-   size_t bstride;
-   size_t i1;
-   size_t i2;
-   size_t tstride;
+   dim_t b1;
+   dim_t b2;
+   dim_t bstride;
+   dim_t i1;
+   dim_t i2;
+   dim_t tstride;
    smf_qual_t *qual;
    smf_qual_t addqual;
 } SmfUpdateQualityData;
@@ -163,14 +163,14 @@ void smf_update_quality( ThrWorkForce *wf, smfData *data, int syncbad,
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
   dim_t ntslice;                /* Number of time slices */
-  size_t bstride;               /* bol stride */
-  size_t tstride;               /* time slice stride */
+  dim_t bstride;               /* bol stride */
+  dim_t tstride;               /* time slice stride */
   smf_qual_t *qual=NULL;        /* Pointer to the QUALITY array */
   SmfUpdateQualityData *job_data = NULL;
   SmfUpdateQualityData *pdata;
   int nw;
-  size_t istep;
-  size_t bstep;
+  dim_t istep;
+  dim_t bstep;
   int iw;
 
   if ( *status != SAI__OK ) return;
@@ -335,11 +335,11 @@ static void smf1_update_quality( void *job_data_ptr, int *status ) {
    const int *p4;
    double *p1;
    int *p3;
-   size_t b1;
-   size_t b2;
-   size_t i1;
-   size_t i2;
-   size_t i;
+   dim_t b1;
+   dim_t b2;
+   dim_t i1;
+   dim_t i2;
+   dim_t i;
    smf_qual_t *p2;
 
 /* Check inherited status */
@@ -382,8 +382,8 @@ static void smf1_update_quality( void *job_data_ptr, int *status ) {
       dim_t nbad;
       dim_t ntslice = pdata->ntslice;
       int syncbad = pdata->syncbad;
-      size_t bstride = pdata->bstride;
-      size_t tstride = pdata->tstride;
+      dim_t bstride = pdata->bstride;
+      dim_t tstride = pdata->tstride;
       smf_qual_t addqual = pdata->addqual;
 
 /* Loop over detector */
@@ -406,7 +406,7 @@ static void smf1_update_quality( void *job_data_ptr, int *status ) {
 /* Loop over samples and count the number with SMF__Q_BADDA set. Note that
    if syncbad is false we also check the data array. */
             for( j = 0; j < ntslice; j++ ) {
-               size_t ind = tstride*j + c;
+               dim_t ind = tstride*j + c;
                if( p2[ ind ] & SMF__Q_BADDA ) {
                   nbad++;
                } else if( !syncbad ) {

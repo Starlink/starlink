@@ -15,8 +15,8 @@
 
 *  Invocation:
 *     smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
-*                        AstFrameSet *outfset, int moving, int *lbnd_out,
-*                        int *ubnd_out, fts2Port fts_port, int flags,
+*                        AstFrameSet *outfset, int moving, dim_t *lbnd_out,
+*                        dim_t *ubnd_out, fts2Port fts_port, int flags,
 *                        int *status );
 
 *  Arguments:
@@ -33,9 +33,9 @@
 *        Frameset containing the sky->output map mapping
 *     moving = int (Given)
 *        Is coordinate system tracking moving object? (if outfset specified)
-*     lbnd_out = double* (Given)
+*     lbnd_out = dim_t * (Given)
 *        2-element array pixel coord. for the lower bounds of the output map
-*     ubnd_out = double* (Given)
+*     ubnd_out = dim_t * (Given)
 *        2-element array pixel coord. for the upper bounds of the output map
 *     fts_port = fts2Port (Given)
 *        FTS-2 port.
@@ -164,22 +164,22 @@ static double *smf1_calc_mapcoord1( smfData *data, dim_t nbolo,
 /* Structure containing information about blocks of time slices that each
  thread will process*/
 typedef struct smfCalcMapcoordData {
-  AstSkyFrame *abskyfrm;
-  smfData *data;           /* Pointer to local smfData with copy of header */
-  int ijob;                /* Job identifier */
-  int *lut;
-  int *lbnd_out;
-  int moving;
-  dim_t onmap;
   AstMapping *sky2map;
-  size_t t1;               /* Index of first timeslice of block */
-  size_t t2;               /* Index of last timeslice of block */
-  int *ubnd_out;
-  double *theta;
-  int tstep;
+  AstSkyFrame *abskyfrm;
+  dim_t *lbnd_out;
+  dim_t *ubnd_out;
+  dim_t onmap;
+  dim_t t1;               /* Index of first timeslice of block */
+  dim_t t2;               /* Index of last timeslice of block */
+  dim_t tstep;
   double *lat_ptr;
   double *lon_ptr;
+  double *theta;
   fts2Port fts_port;
+  int *lut;
+  int ijob;                /* Job identifier */
+  int moving;
+  smfData *data;           /* Pointer to local smfData with copy of header */
 } smfCalcMapcoordData;
 
 /* Function to be executed in thread: coordinates for blocks of tslices*/
@@ -190,11 +190,11 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
   AstSkyFrame *abskyfrm=NULL;
   smfData *data=NULL;
   fts2Port fts_port;
-  int *lbnd_out=NULL;
+  dim_t *lbnd_out=NULL;
   int *lut=NULL;
   int moving;
   dim_t onmap;
-  int *ubnd_out=NULL;
+  dim_t *ubnd_out=NULL;
   dim_t nbolo;             /* number of bolometers */
   dim_t ntslice;           /* number of time slices */
   smfCalcMapcoordData *pdata=NULL; /* Pointer to job data */
@@ -278,55 +278,54 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
 #define FUNC_NAME "smf_calc_mapcoord"
 
 void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
-                        AstFrameSet *outfset, int moving, int *lbnd_out,
-                        int *ubnd_out, fts2Port fts_port, int flags,
+                        AstFrameSet *outfset, int moving, dim_t *lbnd_out,
+                        dim_t *ubnd_out, fts2Port fts_port, int flags,
                         int *status ) {
 
   /* Local Variables */
-
-  AstSkyFrame *abskyfrm = NULL;/* Output SkyFrame (always absolute) */
-  AstMapping *bolo2map=NULL;   /* Combined mapping bolo->map coordinates */
-  int bndndf=NDF__NOID;        /* NDF identifier for map bounds */
-  void *data_pntr[1];          /* Array of pointers to mapped arrays in ndf */
-  int *data_index;             /* Mapped DATA_ARRAY part of NDF */
-  int docalc=1;                /* If set calculate the LUT */
-  int doextension=0;           /* Try to write LUT to MAPCOORD extension */
-  smfFile *file=NULL;          /* smfFile pointer */
-  AstObject *fstemp = NULL;    /* AstObject version of outfset */
-  int ii;                      /* loop counter */
-  int indf_lat = NDF__NOID;    /* Identifier for NDF to receive lat values */
-  int indf_lon = NDF__NOID;    /* Identifier for NDF to receive lon values */
-  smfCalcMapcoordData *job_data=NULL; /* Array of job */
-  int lbnd[1];                 /* Pixel bounds for 1d pointing array */
-  int lbnd_old[2];             /* Pixel bounds for existing LUT */
-  int lbnd_temp[1];            /* Bounds for bounds NDF component */
-  int lutndf=NDF__NOID;        /* NDF identifier for coordinates */
-  AstMapping *map2sky_old=NULL;/* Existing mapping map->celestial coord. */
-  HDSLoc *mapcoordloc=NULL;    /* HDS locator to the MAPCOORD extension */
-  int nw;                      /* Number of worker threads */
+  AstCmpMap *testcmpmap=NULL;  /* Combined forward/inverse mapping */
   AstFrameSet *oldfset=NULL;   /* Pointer to existing WCS info */
+  AstMapping *bolo2map=NULL;   /* Combined mapping bolo->map coordinates */
+  AstMapping *map2sky_old=NULL;/* Existing mapping map->celestial coord. */
+  AstMapping *sky2map=NULL;    /* Mapping celestial->map coordinates */
+  AstMapping *testsimpmap=NULL;/* Simplified testcmpmap */
+  AstObject *fstemp = NULL;    /* AstObject version of outfset */
+  AstSkyFrame *abskyfrm = NULL;/* Output SkyFrame (always absolute) */
   AstSkyFrame *oskyfrm = NULL; /* SkyFrame from the output WCS Frameset */
-  smfCalcMapcoordData *pdata=NULL; /* Pointer to job data */
-  double *lat_ptr = NULL;      /* Pointer to array to receive lat values */
-  double *lon_ptr = NULL;      /* Pointer to array to receive lon values */
-  int ubnd[1];                 /* Pixel bounds for 1d pointing array */
-  int ubnd_old[2];             /* Pixel bounds for existing LUT */
-  int ubnd_temp[1];            /* Bounds for bounds NDF component */
-  int *lut = NULL;             /* The lookup table */
+  HDSLoc *mapcoordloc=NULL;    /* HDS locator to the MAPCOORD extension */
+  HDSLoc *tloc=NULL;           /* Temporary HDS locator */
+  dim_t lbnd[1];               /* Pixel bounds for 1d pointing array */
+  dim_t lbnd_old[2];           /* Pixel bounds for existing LUT */
+  dim_t lbnd_temp[1];          /* Bounds for bounds NDF component */
   dim_t nbolo=0;               /* Number of bolometers */
   dim_t ndata=0;               /* Number of samples */
   dim_t ntslice=0;             /* Number of time slices */
-  int nmap;                    /* Number of mapped elements */
   dim_t onmap;                 /* Number of samples that fall within the map */
-  AstMapping *sky2map=NULL;    /* Mapping celestial->map coordinates */
-  size_t step;                 /* step size for dividing up work */
-  AstCmpMap *testcmpmap=NULL;  /* Combined forward/inverse mapping */
-  AstMapping *testsimpmap=NULL;/* Simplified testcmpmap */
-  int there;                   /* Does component exist? */
+  dim_t step;                  /* step size for dividing up work */
+  dim_t tstep;                 /* Time slices between full Mapping calculations */
+  dim_t ubnd[1];               /* Pixel bounds for 1d pointing array */
+  dim_t ubnd_old[2];           /* Pixel bounds for existing LUT */
+  dim_t ubnd_temp[1];          /* Bounds for bounds NDF component */
+  double *lat_ptr = NULL;      /* Pointer to array to receive lat values */
+  double *lon_ptr = NULL;      /* Pointer to array to receive lon values */
   double *theta = NULL;        /* Scan direction at each time slice */
-  HDSLoc *tloc=NULL;           /* Temporary HDS locator */
-  int tstep;                   /* Time slices between full Mapping calculations */
+  int *data_index;             /* Mapped DATA_ARRAY part of NDF */
+  int *lut = NULL;             /* The lookup table */
+  int bndndf=NDF__NOID;        /* NDF identifier for map bounds */
+  int docalc=1;                /* If set calculate the LUT */
+  int doextension=0;           /* Try to write LUT to MAPCOORD extension */
   int exportlonlat;            /* Dump longitude and latitude values? */
+  int ii;                      /* loop counter */
+  int indf_lat = NDF__NOID;    /* Identifier for NDF to receive lat values */
+  int indf_lon = NDF__NOID;    /* Identifier for NDF to receive lon values */
+  int lutndf=NDF__NOID;        /* NDF identifier for coordinates */
+  int nw;                      /* Number of worker threads */
+  int there;                   /* Does component exist? */
+  size_t nmap;                 /* Number of mapped elements */
+  smfCalcMapcoordData *job_data=NULL; /* Array of job */
+  smfCalcMapcoordData *pdata=NULL; /* Pointer to job data */
+  smfFile *file=NULL;          /* smfFile pointer */
+  void *data_pntr[1];          /* Array of pointers to mapped arrays in ndf */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -662,8 +661,8 @@ void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
                 status );
         data_index = data_pntr[0];
         if( *status == SAI__OK ) {
-          data_index[0] = lbnd_out[0];
-          data_index[1] = lbnd_out[1];
+          data_index[0] = (int) lbnd_out[0];
+          data_index[1] = (int) lbnd_out[1];
         } else {
           errRep( FUNC_NAME, "Unable to map LBND in MAPCOORD extension",
                   status);
@@ -677,8 +676,8 @@ void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
                 status );
         data_index = data_pntr[0];
         if( *status == SAI__OK ) {
-          data_index[0] = ubnd_out[0];
-          data_index[1] = ubnd_out[1];
+          data_index[0] = (int) ubnd_out[0];
+          data_index[1] = (int) ubnd_out[1];
         } else {
           errRep( FUNC_NAME, "Unable to map UBND in MAPCOORD extension",
                   status);
@@ -805,10 +804,10 @@ static double *smf1_calc_mapcoord1( smfData *data, dim_t nbolo,
    const char *label = NULL;
    const char *ttl = NULL;
    double *result = NULL;
-   int el;
+   size_t el;
    int place;
-   int pos_lbnd[2];
-   int pos_ubnd[2];
+   dim_t pos_lbnd[2];
+   dim_t pos_ubnd[2];
 
 /* Check inherited status */
    if( *status != SAI__OK ) return result;

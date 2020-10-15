@@ -99,26 +99,26 @@ void smf_fill2d( int mingood, int box, double fillval, dim_t nx,
                  dim_t ny, double *data, double *work, int *status ){
 
 /* Local Variables. */
+   dim_t el;
+   dim_t hbox;
+   dim_t iel;
+   dim_t ix;
+   dim_t iy;
+   dim_t jx;
+   dim_t jxhi;
+   dim_t jxlo;
+   dim_t jy;
+   dim_t jyhi;
+   dim_t jylo;
+   dim_t mx;
+   dim_t ngood;
+   dim_t nsum;
+   double *p0;
    double *pin;
    double *pout;
-   double *p0;
    double sum;
-   int el;
-   int hbox;
-   int iel;
    int iter;
-   int ix;
-   int iy;
-   int jx;
-   int jxhi;
-   int jxlo;
-   int jy;
-   int jyhi;
-   int jylo;
    int more;
-   int mx;
-   int ngood;
-   int nsum;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -176,9 +176,9 @@ void smf_fill2d( int mingood, int box, double fillval, dim_t nx,
             jyhi = iy + hbox;
 
             if( jxlo < 0 ) jxlo = 0;
-            if( jxhi >= (int) nx ) jxhi = nx - 1;
+            if( jxhi >= nx ) jxhi = nx - 1;
             if( jylo < 0 ) jylo = 0;
-            if( jyhi >= (int) ny ) jyhi = ny - 1;
+            if( jyhi >= ny ) jyhi = ny - 1;
 
 /* Convert the bounds to be relative to the central pixel. */
             jxlo -= ix;
@@ -230,7 +230,7 @@ void smf_fill2d( int mingood, int box, double fillval, dim_t nx,
          }
 
 /* Update the 2D grid indices of the next pixel. */
-         if( ++ix == (int) nx ) {
+         if( ++ix == nx ) {
             ix = 0;
             iy++;
          }

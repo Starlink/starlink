@@ -128,8 +128,8 @@ void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
   dim_t dims[2];      /* dimensions of data array */
   smfHead *hdr = NULL; /* copy of header */
   AstKeyMap * history = NULL; /* history */
-  size_t nbperel;  /* Number of bytes in dtype */
-  size_t nelem;   /* number of elements in mean image */
+  dim_t nbperel;  /* Number of bytes in dtype */
+  dim_t nelem;   /* number of elements in mean image */
   void *pntr[] = { NULL, NULL }; /* pointers to data */
 
   if (*status != SAI__OK) return;

@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     void smf_average_data<X>( const smfData *data, dim_t start, dim_t nslice,
-*                       const dim_t interval, CGEN_TYPE **avdata, size_t *nelem,
+*                       const dim_t interval, CGEN_TYPE **avdata, dim_t *nelem,
 *                       int *status);
 
 *  Arguments:
@@ -29,7 +29,7 @@
 *     avdata = CGEN_TYPE ** (Returned)
 *        Pointer to 2 or 3-D array of averaged data. Must be freed by
 *        caller.
-*     nelem = size_t * (Returned)
+*     nelem = dim_t * (Returned)
 *        Number of elements in the averaged data
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -119,22 +119,22 @@
 
 void CGEN_FUNCTION(smf_average_data)( const smfData *data, dim_t start,  dim_t nslice,
                                       const dim_t interval, CGEN_TYPE **avdata,
-                                      size_t *nelem, int *status) {
+                                      dim_t *nelem, int *status) {
 
-  int base;                 /* Base index */
+  CGEN_BIG_TYPE sum;        /* Sum of input data */
+  CGEN_TYPE *tstream = NULL;/* Pointer to input data stream */
   CGEN_TYPE currentdata;    /* Value of current data point */
+  dim_t base;               /* Base index */
   dim_t i;                  /* Loop counter */
   dim_t j;                  /* Loop counter */
   dim_t k;                  /* Loop counter */
   dim_t lastslice;          /* Index of the last time slice in the current sum */
-  size_t nbad;		          /* Number of data points with a bad value */
+  dim_t nbad;		    /* Number of data points with a bad value */
   dim_t nbol;               /* Number of data points per timeslice (bolometers) */
   dim_t nframes;            /* Number of time slices in input data */
-  dim_t nsamples;           /* Number of time slices in the average */
   dim_t noutslice = 1;      /* Number of output time slices */
+  dim_t nsamples;           /* Number of time slices in the average */
   dim_t offset;             /* Offset into output array for current data value */
-  CGEN_BIG_TYPE sum;        /* Sum of input data */
-  CGEN_TYPE *tstream = NULL;/* Pointer to input data stream */
 
   if ( *status != SAI__OK ) return;
 
@@ -148,8 +148,8 @@ void CGEN_FUNCTION(smf_average_data)( const smfData *data, dim_t start,  dim_t n
   if ( start > nframes-1 ) {
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;
-      msgSeti("I",start);
-      msgSeti("N",nframes-1);
+      msgSetk("I",start);
+      msgSetk("N",nframes-1);
       errRep( FUNC_NAME,
               "Starting index, ^I, out of range (must lie between 0 and ^N)",
               status );
@@ -164,8 +164,8 @@ void CGEN_FUNCTION(smf_average_data)( const smfData *data, dim_t start,  dim_t n
     } else {
       if ( *status == SAI__OK ) {
         *status = SAI__ERROR;
-        msgSeti("I",nslice);
-        msgSeti("N",nframes);
+        msgSetk("I",nslice);
+        msgSetk("N",nframes);
         errRep( FUNC_NAME,
                 "Number of time slices to average, ^I, out of range (must lie between 1 and ^N)",
                 status );
@@ -177,8 +177,8 @@ void CGEN_FUNCTION(smf_average_data)( const smfData *data, dim_t start,  dim_t n
   if ( interval < 1 || interval > nframes ) {
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;
-      msgSeti("I",interval);
-      msgSeti("N",nframes);
+      msgSetk("I",interval);
+      msgSetk("N",nframes);
       errRep( FUNC_NAME,
               "Averaging interval, ^I, out of range (must lie between 1 and ^N)",
               status );
@@ -196,9 +196,9 @@ void CGEN_FUNCTION(smf_average_data)( const smfData *data, dim_t start,  dim_t n
     if ( noutslice != nframes%nslice ) {
       /* Tell user - would be good to store this knowledge in the
          output file somehow */
-      msgSeti("S",nslice);
-      msgSeti("N",noutslice);
-      msgSeti("F",nframes);
+      msgSetk("S",nslice);
+      msgSetk("N",noutslice);
+      msgSetk("F",nframes);
       msgOutif(MSG__VERB, FUNC_NAME,
                "Warning: time stream does not contain an integer number of output time slices: noutslice * nslice (^N * ^S) != nframes (^F)",
                status);
@@ -250,7 +250,7 @@ void CGEN_FUNCTION(smf_average_data)( const smfData *data, dim_t start,  dim_t n
           (*avdata)[j + offset] = CGEN_BAD;
         } else {
           sum /= nsamples;
-          (*avdata)[j + offset] = sum;
+          (*avdata)[j + offset] = (CGEN_TYPE) sum;
         }
       }
     }

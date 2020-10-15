@@ -119,9 +119,9 @@ typedef struct smfCalcmodelSmoJobData {
    double *model_data;
    double *res_data;
    smf_filt_t filter_type;
-   size_t boxcar;
-   size_t bstride;
-   size_t tstride;
+   dim_t boxcar;
+   dim_t bstride;
+   dim_t tstride;
    smf_qual_t *qua_data;
 } smfCalcmodelSmoJobData;
 
@@ -135,10 +135,10 @@ void smf_calcmodel_smo( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         int *status) {
 
   /* Local Variables */
-  size_t bstride;               /* bolo stride */
+  dim_t bstride;                /* bolo stride */
   dim_t boxcar = 0;             /* size of boxcar smooth window */
   smf_filt_t filter_type;       /* The type of smoothing to perform */
-  size_t i;                     /* Loop counter */
+  dim_t i;                      /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
   int iworker;                  /* Owkrer index */
   smfCalcmodelSmoJobData *job_data=NULL; /* Pointer to all job data structures */
@@ -153,11 +153,11 @@ void smf_calcmodel_smo( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   int nworker;                  /* No. of worker threads in supplied Workforce */
   smfCalcmodelSmoJobData *pdata=NULL; /* Pointer to current data structure */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
-  smf_qual_t *qua_data=NULL; /* Pointer to quality data */
+  smf_qual_t *qua_data=NULL;    /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  int step;                     /* Number of bolometers per thread */
-  size_t tstride;               /* Time slice stride in data array */
+  dim_t step;                   /* Number of bolometers per thread */
+  dim_t tstride;                /* Time slice stride in data array */
   const char * typestr = NULL;  /* smo.type value */
 
   /* Main routine */
@@ -349,12 +349,12 @@ static void smf1_calcmodel_smo_job( void *job_data, int *status ) {
    double *model_data;
    double *res_data;
    double *w1 = NULL;
-   int *w3 = NULL;
+   dim_t *w3 = NULL;
    smf_filt_t filter_type;
-   size_t boxcar;
-   size_t bstride;
-   size_t tstride;
-   size_t *w2 = NULL;
+   dim_t boxcar;
+   dim_t bstride;
+   dim_t tstride;
+   dim_t *w2 = NULL;
    smfCalcmodelSmoJobData *pdata;
    smf_qual_t *bolqua = NULL;
    smf_qual_t *qua_data;
@@ -402,12 +402,12 @@ static void smf1_calcmodel_smo_job( void *job_data, int *status ) {
       for( i = b1; i <= b2 && *status == SAI__OK; i++ ) {
 
         /* Smooth the data and subtract it from res */
-        size_t j;
-        size_t boloff = i*bstride;
+        dim_t j;
+        dim_t boloff = i*bstride;
 
         /* Copy the data for this bolometer into a temporary buffer */
         for (j=0; j<ntslice; j++) {
-          size_t thisidx = boloff+j*tstride;
+          dim_t thisidx = boloff+j*tstride;
           boldata[j] = res_data[thisidx];
           bolqua[j] = qua_data[thisidx];
         }
@@ -424,7 +424,7 @@ static void smf1_calcmodel_smo_job( void *job_data, int *status ) {
 
         /* Remove this model from the residual data and copy the data to the model */
         for (j=0; j<ntslice; j++) {
-          size_t thisidx = boloff+j*tstride;
+          dim_t thisidx = boloff+j*tstride;
 
           /* Modify RES if this section has smoothable quality */
           if (! (qua_data[thisidx] & SMF__Q_FIT) ) {

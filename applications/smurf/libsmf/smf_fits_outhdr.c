@@ -278,7 +278,7 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
 static void
 smf__fits_copy_items( AstFitsChan * fromfits, AstFitsChan * tofits,
                       const char ** items, int * status ) {
-  size_t i = 0;
+  dim_t i = 0;
   double value;
 
   if (*status != SAI__OK) return;

@@ -96,8 +96,8 @@ double *smf_smoothmask( ThrWorkForce *wf, smf_qual_t qual,
 
 /* Local Variables: */
    double *result;
-   size_t ixy;
-   size_t nxy;
+   dim_t ixy;
+   dim_t nxy;
 
 /* Check the inherited status */
    if( *status != SAI__OK ) return NULL;

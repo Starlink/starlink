@@ -13,13 +13,13 @@
 *     C function
 
 *  Invocation:
-*     void smf_maskacsis( int *ndf, int *mask, int *status );
+*     void smf_maskacsis( int *ndf, dim_t *mask, int *status );
 
 *  Arguments:
 *     indf = Grp * (Given)
 *        The NDF identifier. The NDF should already contains an ACSIS
 *        extension. The ACSIS extension will be modified on exit.
-*     mask = int * (Given)
+*     mask = dim_t * (Given)
 *        Pointer to an array which defines which detectors to remove from
 *        the ACSIS extension. The length of the array should be equal to
 *        the number of detectors described by the ACSIS extension in the
@@ -75,7 +75,7 @@
 #define NCOMP 6
 #define TEMP_NAME "SMURF_TEMP"
 
-void smf_maskacsis( int indf, int *mask, int *status ){
+void smf_maskacsis( int indf, dim_t *mask, int *status ){
 
 
 /* Local Variables */
@@ -83,13 +83,13 @@ void smf_maskacsis( int indf, int *mask, int *status ){
    HDSLoc *loc2 = NULL;
    HDSLoc *loc3 = NULL;
    char type[ DAT__SZNAM + 1 ];
-   hdsdim dims_in[ NDF__MXDIM ];
-   hdsdim dims_out[ NDF__MXDIM ];
+   dim_t dims_in[ NDF__MXDIM ];
+   dim_t dims_out[ NDF__MXDIM ];
+   dim_t ndet_in;
+   dim_t ndet_out;
    int i;
    int j;
    int maxis;
-   int ndet_in;
-   int ndet_out;
    int ndim;
    size_t el;
    size_t len;
@@ -149,7 +149,7 @@ void smf_maskacsis( int indf, int *mask, int *status ){
 /* Copy the required data from the mapped input array to the mapped
    output array. */
       datLen( loc3, &len, status );
-      smf_detmask( type, pin, len, ndim, dims_in, maxis, mask, pout, status );
+      smf_detmask( type, pin, (int) len, ndim, dims_in, maxis, mask, pout, status );
 
 /* Erase the original component. */
       datAnnul( &loc2, status );

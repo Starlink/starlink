@@ -13,14 +13,14 @@
 *     Library routine
 
 *  Invocation:
-*     smf_clipnoise( double *clipdata, size_t ndata, int cliplog,
-*                    double cliplow, double cliphigh, size_t *nclipped,
+*     smf_clipnoise( double *clipdata, dim_t ndata, int cliplog,
+*                    double cliplow, double cliphigh, dim_t *nclipped,
 *                    int *status )
 
 *  Arguments:
 *     clipdata = double * (Given)
 *        Buffer containing values to be clipped (ignore values with VAL__BADD)
-*     ndata = size_t (Given)
+*     ndata = dim_t (Given)
 *        Number of elements in data
 *     cliplog = int (Given)
 *        If set do clipping based on log of data instead of data
@@ -30,7 +30,7 @@
 *     cliphigh = double (Given)
 *        Throw out values this many standard deviations above median. Set to
 *        value <= 0 to disable high-outlier clipping.
-*     nclipped = size_t * (Given and Returned)
+*     nclipped = dim_t * (Given and Returned)
 *        Number of values that were clipped (can be NULL)
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -94,15 +94,15 @@
 
 #define FUNC_NAME "smf_clipnoise"
 
-void smf_clipnoise( double *clipdata, size_t ndata, int cliplog,
-                    double cliplow, double cliphigh, size_t *nclipped,
+void smf_clipnoise( double *clipdata, dim_t ndata, int cliplog,
+                    double cliplow, double cliphigh, dim_t *nclipped,
                     int *status ) {
 
   const float clips[] = {5,3,1};
-  const size_t nclips = sizeof(clips)/sizeof(*clips);
-  size_t i;
-  size_t nlow=0;
-  size_t nhigh=0;
+  const dim_t nclips = sizeof(clips)/sizeof(*clips);
+  dim_t i;
+  dim_t nlow=0;
+  dim_t nhigh=0;
   double *work=NULL;
   double median, mean, sigma;
 

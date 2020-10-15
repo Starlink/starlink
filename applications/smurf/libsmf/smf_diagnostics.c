@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
-*		       int chunk, AstKeyMap *keymap, smfArray **allmodel,
+*		       dim_t chunk, AstKeyMap *keymap, smfArray **allmodel,
 *                      smf_modeltype type, int flags, double chunkfactor,
 *                      int *status )
 
@@ -37,7 +37,7 @@
 *
 *     dat = smfDIMMData * (Given)
 *        Struct of pointers to information required by model calculation
-*     chunk = int (Given)
+*     chunk = dim_t (Given)
 *        Index of the contiguous chunk of time-series data being processed.
 *     keymap = AstKeyMap * (Given)
 *        Parameters that control the iterative map-maker. It should
@@ -220,7 +220,7 @@
 #define MODEL_NAMELEN 4
 
 void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
-                      int chunk, AstKeyMap *keymap, smfArray **allmodel,
+                      dim_t chunk, AstKeyMap *keymap, smfArray **allmodel,
                       smf_modeltype type, int flags, double chunkfactor,
                       int *status ){
 
@@ -239,6 +239,9 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    const char *modname;
    const char *out;
    const char *table = NULL;
+   dim_t ibolo = -4;
+   dim_t isub;
+   dim_t nsub;
    double mingood;
    int addqual;
    int append;
@@ -246,17 +249,14 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    int cube;
    int history;
    int hits;
-   int ibolo = -4;
    int imodel;
    int irow;
-   int isub;
    int ivals[ 2 ];
    int lastonly;
    int map;
    int mask;
    int new;
    int nmodel;
-   int nsub;
    int nval;
    int power;
    int repbolo;
@@ -511,10 +511,10 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
             }
 
             if( btable ){
-               sprintf( broot, "%s_%d_cln.asc", btable, chunk );
+               sprintf( broot, "%s_%d_cln.asc", btable, (int) chunk );
             }
 
-            sprintf( root, "cln_%d", chunk );
+            sprintf( root, "cln_%d", (int) chunk );
             smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                       dat, SMF__RES, NULL, 1, root, 0, mingood, cube,
                       map, addqual, tabdata, chunkfactor,
@@ -547,11 +547,11 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                               status, modname );
 
                      if( btable ){
-                        sprintf( broot, "%s_%d_%d_%s_bef.asc", btable, chunk,
+                        sprintf( broot, "%s_%d_%d_%s_bef.asc", btable, (int) chunk,
                                  dat->iter, modname );
                      }
 
-                     sprintf( root, "bef_%d", chunk );
+                     sprintf( root, "bef_%d", (int) chunk );
                      smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                                dat, type, NULL, 1, root, 0, mingood, cube,
                                map, addqual, tabdata, chunkfactor,
@@ -562,13 +562,12 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    model, then dump the model and also dump the residuals if requested. */
                } else if( where == 1 ) {
                   msgOutf( "", "Diagnostics: Dumping %s model", status, modname );
-                  sprintf( root, "mod_%d", chunk );
+                  sprintf( root, "mod_%d", (int) chunk );
 
                   if( btable ){
                      sprintf( broot, "%s_%d_%d_%s_mod.asc", btable, chunk,
                               dat->iter, modname );
                   }
-
                   smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                             dat, type, allmodel ? allmodel[ 0 ] : NULL,
                             hits?-999:0, root, mask, mingood, cube, map, addqual,
@@ -576,7 +575,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                   if( res_after && type != SMF__RES ) {
                      msgOutf( "", "Diagnostics: Dumping residuals after subtraction of %s",
                               status, modname );
-                     sprintf( root, "aft_%d", chunk );
+                     sprintf( root, "aft_%d", (int) chunk );
 
                      if( btable ){
                         sprintf( broot, "%s_%d_%d_%s_aft.asc", btable, chunk,
@@ -602,13 +601,11 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 /* Report the chosen typical bolometer if required, and store it in the
    KeyMap in place of the original BOLO value, in order to ensure that the
    same bolometer is chosen in future. */
-               if( repbolo && ibolo >= 0 ) {
-                  astMapPut0I( kmap, "BOLO", ibolo, NULL );
-                  msgOutf( "", "Diagnostics: using \"typical\" bolometer %d.",
-                           status, ibolo );
-                  repbolo = 0;
-               }
-
+            if( repbolo && ibolo >= 0 ) {
+               astMapPut0K( kmap, "BOLO", ibolo, NULL );
+               msgOutf( "", "Diagnostics: using \"typical\" bolometer %d.",
+                        status, (int) ibolo );
+               repbolo = 0;
             }
          }
       }
@@ -626,7 +623,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                } else {
                   datNew0I( cloc, "BOLO", status );
                   datFind( cloc, "BOLO", &dloc, status );
-                  datPut0I( dloc, ibolo, status );
+                  datPut0K( dloc, ibolo, status );
                }
                datAnnul( &dloc, status );
             }

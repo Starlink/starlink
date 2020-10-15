@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_find_subarray( const smfHead * hdr, char subarray[],
-*                        size_t buflen, sc2ast_subarray_t *subnum, int *status );
+*                        dim_t buflen, sc2ast_subarray_t *subnum, int *status );
 
 *  Arguments:
 *     hdr = const smfHead * (Given)
@@ -22,7 +22,7 @@
 *     subarray = char[] (Given and Returned)
 *        Buffer to receive the subarray name. Of size "buflen". Can be
 *        NULL.
-*     buflen = size_t (Given)
+*     buflen = dim_t (Given)
 *        Allocate size of "subarray", including nul.
 *     subnum = sc2ast_subarray_t* (Returned)
 *        Pointer to int to contain the subarray number. Can be NULL.
@@ -86,7 +86,7 @@
 #define FUNC_NAME "smf_find_subarray"
 
 void smf_find_subarray ( const smfHead * hdr, char subarray[],
-                         size_t buflen, sc2ast_subarray_t *subnum, int *status ) {
+                         dim_t buflen, sc2ast_subarray_t *subnum, int *status ) {
   char buffer[81];  /* for FITS header */
 
   /* Fill in some defaults */

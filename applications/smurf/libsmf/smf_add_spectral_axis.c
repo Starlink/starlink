@@ -92,9 +92,9 @@ void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status ){
    double spec_hi;         /* Wavelength at upper edge of spectral pixel */
    double spec_lo;         /* Wavelength at lower edge of spectral pixel */
    double wavelen;         /* Central wavelength, in metres */
-   int lbnd[ NDF__MXDIM ]; /* Original lower pixel bounds of the NDF */
+   dim_t lbnd[ NDF__MXDIM ]; /* Original lower pixel bounds of the NDF */
+   dim_t ubnd[ NDF__MXDIM ]; /* Original lower pixel bounds of the NDF */
    int ndim;               /* Original number of pixel axis in the the NDF */
-   int ubnd[ NDF__MXDIM ]; /* Original lower pixel bounds of the NDF */
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
