@@ -65,6 +65,10 @@ void ndf1Annpl( int erase, NdfPCB **pcb, int *status ){
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     15-OCT-2020 (DSB):
+*        Re-instate the check on the input PCB. This check was present in
+*        the Fortran code (ndf1_annpl.f) but was mistakenly omitted in the
+*        translation to C.
 
 *-
 */
@@ -72,19 +76,32 @@ void ndf1Annpl( int erase, NdfPCB **pcb, int *status ){
 /* Begin a new error reporting environment. */
    errBegin( status );
 
+/* Check that the PCB supplied is valid and report an error if it is not. */
+   if( ! (*pcb) ){
+      *status = NDF__FATIN;
+      msgSetc( "ROUTINE", "ndf1Annpl" );
+      errRep( "NDF1_ANNPL_IPCB", "Routine ^ROUTINE called with an "
+              "invalid '*pcb' argument of NULL - internal programming "
+              "error.", status );
+
 /* If required, and the placeholder object is a new one created by the
    NDF_ system, then delete the associated object, annulling its locator
    in the process. */
-   if( erase && (*pcb)->new ) {
-      ndf1Delob( &(*pcb)->loc, status );
+   } else {
+      if( erase && (*pcb)->new ) {
+         ndf1Delob( &(*pcb)->loc, status );
 
 /* Otherwise, simply annul the locator. */
-   } else {
-      datAnnul( &(*pcb)->loc, status );
-   }
+      } else {
+         datAnnul( &(*pcb)->loc, status );
+      }
 
 /* Release the PCB slot. */
-   *pcb = ndf1Rls( ( NdfObject * ) *pcb, status );
+      *pcb = ndf1Rls( ( NdfObject * ) *pcb, status );
+   }
+
+/* Reset the PCB index. */
+   *pcb = NULL;
 
 /* Call error tracing function. */
    if( *status != SAI__OK ) ndf1Trace( "ndf1Annpl", status );
