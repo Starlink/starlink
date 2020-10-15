@@ -3529,20 +3529,31 @@ hdsLock(const HDSLoc *locator, int *status) {
 int
 hdsNew(const char *file_str, const char *name_str, const char *type_str, int ndim, const hdsdim dims[], HDSLoc **locator, int *status) {
   int retval = 0;
+  int isopen = 0;
   int instat = *status;
   const char * used = "(none)";
   EnterCheck("hdsNew",*status);
   if (*status != SAI__OK) return *status;
   if (hds1UseVersion5()) {
-    retval = hdsNew_v5(file_str, name_str, type_str, ndim, dims, locator, status);
+    hdsIsOpen_v4( file_str, &isopen, status );
+    if( !isopen ) retval = hdsNew_v5(file_str, name_str, type_str, ndim, dims, locator, status);
     used = "(v5)";
   } else {
-    hdsdim_v4 *dims_v4 = dat1ExportV4Dims( "hdsNew", ndim, dims, status );
-    LOCK_MUTEX;
-    retval = hdsNew_v4(file_str, name_str, type_str, ndim, (hdsdim *) dims_v4, locator, status);
-    UNLOCK_MUTEX;
-    if( dims_v4 ) starFree( dims_v4 );
+    hdsIsOpen_v5( file_str, &isopen, status );
+    if( !isopen ) {
+       hdsdim_v4 *dims_v4 = dat1ExportV4Dims( "hdsNew", ndim, dims, status );
+       LOCK_MUTEX;
+       retval = hdsNew_v4(file_str, name_str, type_str, ndim, (hdsdim *) dims_v4, locator, status);
+       UNLOCK_MUTEX;
+       if( dims_v4 ) starFree( dims_v4 );
+    }
     used = "(v4)";
+  }
+  if( isopen && *status == SAI__OK ) {
+     retval = *status = DAT__FILIN;
+     emsRepf( " ", "The file %s is already in use by HDS; this name "
+              "cannot be used to create a new container file.", status,
+              file_str );
   }
   HDS_CHECK_STATUS("hdsNew", used);
   return retval;
