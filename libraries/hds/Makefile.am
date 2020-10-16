@@ -6,8 +6,8 @@ noinst_PROGRAMS = dat_par_f make-hds-types
 # libhdsf is for fortran interface
 lib_LTLIBRARIES = libhds.la libhdsf.la
 
-TESTS = hds_test hds_test8 hdsTest
-check_PROGRAMS = hds_test hds_test8 hdsTest
+TESTS = hds_test hdsTest
+check_PROGRAMS = hds_test hdsTest
 
 libhds_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
@@ -46,9 +46,7 @@ make_hds_types_SOURCES = make-hds-types.c
 dat_par_f_DEPENDENCIES = hds_types.h hds1_types.h dat_par.h
 
 hds_test_SOURCES = hds_test.f
-hds_test8_SOURCES = hds_test8.f
 hds_test_LDADD = libhdsf.la
-hds_test8_LDADD = libhdsf.la
 
 hdsTest_SOURCES = hdsTest.c
 hdsTest_LDADD = libhds.la
