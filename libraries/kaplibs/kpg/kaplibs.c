@@ -560,6 +560,197 @@ void kpgStati( int bad, int el, const int data[], int nclip, const float clip[],
 
 /* ------------------------------- */
 
+F77_SUBROUTINE(kpg1_stat8d)( LOGICAL(BAD), INTEGER8(EL), DOUBLE_ARRAY(DATA),
+ 			    INTEGER(NCLIP), REAL_ARRAY(CLIP), INTEGER8(NGOOD),
+ 			    INTEGER8(IMIN), DOUBLE(DMIN), INTEGER8(IMAX),
+ 			    DOUBLE(DMAX), DOUBLE(SUM), DOUBLE(MEAN), DOUBLE(STDEV),
+ 			    INTEGER8(NGOODC), INTEGER8(IMINC), DOUBLE(DMINC),
+			    INTEGER8(IMAXC), DOUBLE(DMAXC), DOUBLE(SUMC), DOUBLE(MEANC),
+			    DOUBLE(STDEVC), INTEGER(STATUS) );
+
+void kpgStat8d( int bad, hdsdim el, const double data[], int nclip, const float clip[],
+ 	        hdsdim *ngood, hdsdim *imin, double *dmin, hdsdim *imax,
+ 	        double *dmax, double *sum, double *mean, double *stdev,
+ 	        hdsdim *ngoodc, hdsdim *iminc, double *dminc, hdsdim *imaxc,
+                double *dmaxc, double *sumc, double *meanc, double *stdevc,
+                int *status ) {
+
+  DECLARE_LOGICAL(BAD);
+  DECLARE_INTEGER8(EL);
+  DECLARE_DOUBLE_ARRAY_DYN(DATA);
+  DECLARE_INTEGER(NCLIP);
+  DECLARE_REAL_ARRAY_DYN(CLIP);
+  DECLARE_INTEGER8(NGOOD);
+  DECLARE_INTEGER8(IMIN);
+  DECLARE_DOUBLE(DMIN);
+  DECLARE_INTEGER8(IMAX);
+  DECLARE_DOUBLE(DMAX);
+  DECLARE_DOUBLE(SUM);
+  DECLARE_DOUBLE(MEAN);
+  DECLARE_DOUBLE(STDEV);
+  DECLARE_INTEGER8(NGOODC);
+  DECLARE_INTEGER8(IMINC);
+  DECLARE_DOUBLE(DMINC);
+  DECLARE_INTEGER8(IMAXC);
+  DECLARE_DOUBLE(DMAXC);
+  DECLARE_DOUBLE(SUMC);
+  DECLARE_DOUBLE(MEANC);
+  DECLARE_DOUBLE(STDEVC);
+  DECLARE_INTEGER(STATUS);
+
+  F77_CREATE_DOUBLE_ARRAY( DATA, el );
+  F77_CREATE_REAL_ARRAY( CLIP, nclip );
+
+  F77_EXPORT_LOGICAL( bad, BAD );
+  F77_EXPORT_INTEGER8( el, EL );
+  F77_EXPORT_DOUBLE_ARRAY( data, DATA, el );
+  F77_EXPORT_INTEGER( nclip, NCLIP );
+  F77_EXPORT_REAL_ARRAY( clip, CLIP, nclip );
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  F77_LOCK( F77_CALL(kpg1_stat8d)( LOGICAL_ARG(&BAD),
+			INTEGER8_ARG(&EL),
+			DOUBLE_ARRAY_ARG(DATA),
+			INTEGER_ARG(&NCLIP),
+			REAL_ARRAY_ARG(CLIP),
+			INTEGER8_ARG(&NGOOD),
+			INTEGER8_ARG(&IMIN),
+			DOUBLE_ARG(&DMIN),
+			INTEGER8_ARG(&IMAX),
+			DOUBLE_ARG(&DMAX),
+			DOUBLE_ARG(&SUM),
+			DOUBLE_ARG(&MEAN),
+			DOUBLE_ARG(&STDEV),
+			INTEGER8_ARG(&NGOODC),
+			INTEGER8_ARG(&IMINC),
+			DOUBLE_ARG(&DMINC),
+			INTEGER8_ARG(&IMAXC),
+			DOUBLE_ARG(&DMAXC),
+			DOUBLE_ARG(&SUMC),
+			DOUBLE_ARG(&MEANC),
+			DOUBLE_ARG(&STDEVC),
+			INTEGER_ARG(&STATUS) ); )
+
+  F77_IMPORT_INTEGER( STATUS, *status );
+  F77_IMPORT_INTEGER8( NGOOD, *ngood );
+  F77_IMPORT_INTEGER8( IMIN, *imin );
+  F77_IMPORT_DOUBLE( DMIN, *dmin );
+  F77_IMPORT_INTEGER8( IMAX, *imax );
+  F77_IMPORT_DOUBLE( DMAX, *dmax );
+  F77_IMPORT_DOUBLE( SUM, *sum );
+  F77_IMPORT_DOUBLE( MEAN, *mean );
+  F77_IMPORT_DOUBLE( STDEV, *stdev );
+  F77_IMPORT_INTEGER8( NGOODC, *ngoodc );
+  F77_IMPORT_INTEGER8( IMINC, *iminc );
+  F77_IMPORT_DOUBLE( DMINC, *dminc );
+  F77_IMPORT_INTEGER8( IMAXC, *imaxc );
+  F77_IMPORT_DOUBLE( DMAXC, *dmaxc );
+  F77_IMPORT_DOUBLE( SUMC, *sumc );
+  F77_IMPORT_DOUBLE( MEANC, *meanc );
+  F77_IMPORT_DOUBLE( STDEVC, *stdevc );
+
+  F77_FREE_DOUBLE( DATA );
+  F77_FREE_REAL( CLIP );
+
+}
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_stat8i)( LOGICAL(BAD), INTEGER8(EL), INTEGER_ARRAY(DATA),
+			    INTEGER(NCLIP), REAL_ARRAY(CLIP), INTEGER8(NGOOD),
+			    INTEGER8(IMIN), DOUBLE(DMIN), INTEGER8(IMAX),
+			    DOUBLE(DMAX), DOUBLE(SUM), DOUBLE(MEAN), DOUBLE(STDEV),
+			    INTEGER8(NGOODC), INTEGER8(IMINC), DOUBLE(DMINC),
+			    INTEGER8(IMAXC), DOUBLE(DMAXC), DOUBLE(SUMC), DOUBLE(MEANC),
+			    DOUBLE(STDEVC), INTEGER(STATUS) );
+
+void kpgStat8i( int bad, hdsdim el, const int data[], int nclip, const float clip[],
+	       hdsdim *ngood, hdsdim *imin, double *dmin, hdsdim *imax,
+	       double *dmax, double *sum, double *mean, double *stdev,
+	       hdsdim *ngoodc, hdsdim *iminc, double *dminc, hdsdim *imaxc, double *dmaxc,
+	       double *sumc, double *meanc, double *stdevc, int *status ) {
+
+  DECLARE_LOGICAL(BAD);
+  DECLARE_INTEGER8(EL);
+  DECLARE_INTEGER_ARRAY_DYN(DATA);
+  DECLARE_INTEGER(NCLIP);
+  DECLARE_REAL_ARRAY_DYN(CLIP);
+  DECLARE_INTEGER8(NGOOD);
+  DECLARE_INTEGER8(IMIN);
+  DECLARE_DOUBLE(DMIN);
+  DECLARE_INTEGER8(IMAX);
+  DECLARE_DOUBLE(DMAX);
+  DECLARE_DOUBLE(SUM);
+  DECLARE_DOUBLE(MEAN);
+  DECLARE_DOUBLE(STDEV);
+  DECLARE_INTEGER8(NGOODC);
+  DECLARE_INTEGER8(IMINC);
+  DECLARE_DOUBLE(DMINC);
+  DECLARE_INTEGER8(IMAXC);
+  DECLARE_DOUBLE(DMAXC);
+  DECLARE_DOUBLE(SUMC);
+  DECLARE_DOUBLE(MEANC);
+  DECLARE_DOUBLE(STDEVC);
+  DECLARE_INTEGER(STATUS);
+
+  F77_CREATE_INTEGER_ARRAY( DATA, el );
+  F77_CREATE_REAL_ARRAY( CLIP, nclip );
+
+  F77_EXPORT_LOGICAL( bad, BAD );
+  F77_EXPORT_INTEGER8( el, EL );
+  F77_EXPORT_INTEGER_ARRAY( data, DATA, el );
+  F77_EXPORT_INTEGER( nclip, NCLIP );
+  F77_EXPORT_REAL_ARRAY( clip, CLIP, nclip );
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  F77_LOCK( F77_CALL(kpg1_stat8i)( LOGICAL_ARG(&BAD),
+			INTEGER8_ARG(&EL),
+			INTEGER_ARRAY_ARG(DATA),
+			INTEGER_ARG(&NCLIP),
+			REAL_ARRAY_ARG(CLIP),
+			INTEGER8_ARG(&NGOOD),
+			INTEGER8_ARG(&IMIN),
+			DOUBLE_ARG(&DMIN),
+			INTEGER8_ARG(&IMAX),
+			DOUBLE_ARG(&DMAX),
+			DOUBLE_ARG(&SUM),
+			DOUBLE_ARG(&MEAN),
+			DOUBLE_ARG(&STDEV),
+			INTEGER8_ARG(&NGOODC),
+			INTEGER8_ARG(&IMINC),
+			DOUBLE_ARG(&DMINC),
+			INTEGER8_ARG(&IMAXC),
+			DOUBLE_ARG(&DMAXC),
+			DOUBLE_ARG(&SUMC),
+			DOUBLE_ARG(&MEANC),
+			DOUBLE_ARG(&STDEVC),
+			INTEGER_ARG(&STATUS) ); )
+
+  F77_IMPORT_INTEGER( STATUS, *status );
+  F77_IMPORT_INTEGER8( NGOOD, *ngood );
+  F77_IMPORT_INTEGER8( IMIN, *imin );
+  F77_IMPORT_DOUBLE( DMIN, *dmin );
+  F77_IMPORT_INTEGER8( IMAX, *imax );
+  F77_IMPORT_DOUBLE( DMAX, *dmax );
+  F77_IMPORT_DOUBLE( SUM, *sum );
+  F77_IMPORT_DOUBLE( MEAN, *mean );
+  F77_IMPORT_DOUBLE( STDEV, *stdev );
+  F77_IMPORT_INTEGER8( NGOODC, *ngoodc );
+  F77_IMPORT_INTEGER8( IMINC, *iminc );
+  F77_IMPORT_DOUBLE( DMINC, *dminc );
+  F77_IMPORT_INTEGER8( IMAXC, *imaxc );
+  F77_IMPORT_DOUBLE( DMAXC, *dmaxc );
+  F77_IMPORT_DOUBLE( SUMC, *sumc );
+  F77_IMPORT_DOUBLE( MEANC, *meanc );
+  F77_IMPORT_DOUBLE( STDEVC, *stdevc );
+
+  F77_FREE_DOUBLE( DATA );
+  F77_FREE_REAL( CLIP );
+
+}
+
+/* ------------------------------- */
+
 F77_SUBROUTINE(kpg1_wwrt)( INTEGER(IAST),
                            CHARACTER(NAME),
                            CHARACTER(LOC),

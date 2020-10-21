@@ -203,6 +203,14 @@ void kpgStati( int, int, const int[], int, const float[], int *, int *,
                double *, int *, double *, double *, double *, double *,
                int *, int *, double *, int *, double *, double *, double *,
                double * , int * );
+void kpgStat8d( int, hdsdim, const double[], int, const float[], hdsdim *,
+                hdsdim *, double *, hdsdim *, double *, double *, double *,
+                double *, hdsdim *, hdsdim *, double *, hdsdim *, double *,
+                double *, double *, double * , int * );
+void kpgStat8i( int, hdsdim, const int[], int, const float[], hdsdim *,
+                hdsdim *, double *, hdsdim *, double *, double *, double *,
+                double *, hdsdim *, hdsdim *, double *, hdsdim *, double *,
+                double *, double *, double * , int * );
 
 void kpg1CrMapD( int, int, const double x[], const double y[], int, double *, int * );
 
