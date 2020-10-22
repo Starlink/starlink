@@ -17,6 +17,13 @@
       - Places each input pixel into a bin defined by one or more index
         NDFs and creates an output NDF holding all the values in each bin.
 
+2 General_changes
+
+     The following applications now support huge NDFs: ADD, COLLAPSE,
+     DIV, MFITTREND, MSTATS, MULT NDFCOPY, NDFTRACE, PERMAXES, STATS, and
+     SUB.  Huge means more than 2,147,483,647 elements in an array
+     component.
+
 2 Modified_applications
 
    o  CHPIX
