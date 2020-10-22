@@ -15444,6 +15444,9 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
 
          \sstitem
          Any number of NDF dimensions is supported.
+
+         \sstitem
+         Huge NDFs are supported.
       }
    }
 }
@@ -34303,11 +34306,18 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
 \xref{FIGARO}{sun86}{}: \xref{ISUBSET}{sun86}{ISUBSET}.
    }
    \sstimplementationstatus{
-      If present, an NDF's \htmlref{TITLE}{apndf:title}, \htmlref{LABEL}{apndf:label}, \htmlref{UNITS}{apndf:units}, DATA, \htmlref{VARIANCE}{apndf:variance},
-      \htmlref{QUALITY}{apndf:quality}, \htmlref{AXIS}{apndf:axis}~ \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components are copied by this routine,
-      together with all \htmlref{extensions}{apndf:extensions}.  The output NDF's title may be
-      modified, if required, by specifying a new value via the TITLE
-      parameter.
+      \sstitemlist{
+         \sstitem
+         If present, an NDF's \htmlref{TITLE}{apndf:title}, \htmlref{LABEL}{apndf:label},
+         \htmlref{UNITS}{apndf:units}, DATA, \htmlref{VARIANCE}{apndf:variance},
+         \htmlref{QUALITY}{apndf:quality}, \htmlref{AXIS}{apndf:axis}~ \htmlref{WCS}{apndf:wcs},
+         and \htmlref{HISTORY}{apndf:history}~ components are copied by this routine,
+         together with all \htmlref{extensions}{apndf:extensions}.  The output NDF's title may
+         be modified, if required, by specifying a new value via the TITLE parameter.
+
+         \sstitem
+         Huge NDFs are supported.
+      }
    }
 }
 \sstroutine{
@@ -35024,6 +35034,9 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
 KAPPA: \htmlref{FITSLIST}{FITSLIST},
 \htmlref{WCSFRAME}{WCSFRAME};
 \xref{HDSTRACE}{sun102}{}.
+   }
+   \sstimplementationstatus{
+      Huge NDFs are supported.
    }
 }
 \sstroutine{
@@ -36802,6 +36815,9 @@ KAPPA: \htmlref{ROTATE}{ROTATE},
          \sstitem
          All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.  The data
          type of the input pixels is preserved in the output NDF.
+
+         \sstitem
+         Huge NDFs are supported.
       }
    }
 }
