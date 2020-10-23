@@ -160,10 +160,16 @@
 *     12-JUN-2019 (DSB):
 *        Replace spaces with underscores in keys of the form
 *        "<OBJECT>_<DATE-OBS>" (the OBJECT name may contain spaces).
+*     23-OCT-2020 (DSB):
+*        It seems that occasioannly the NSUBSCAN FITS header in the final
+*        scan can be wrong - it can sometimes be a copy of the NSUBSCAN
+*        value from the previous scan (i.e. for some reason it has not
+*        been incremented). Try to handle this in the code that checks if
+*        any subscans are missing.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2016-2017 East Asian Observatory
+*     Copyright (C) 2016-2020 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -542,7 +548,15 @@ void smurf_pol2check( int *status ) {
          if( ssptr->sc_count ) ssptr->sc_count = ssptr->maxscan - ssptr->sc_count;
          if( ssptr->sd_count ) ssptr->sd_count = ssptr->maxscan - ssptr->sd_count;
 
-         if( ssptr->sa_count || ssptr->sb_count || ssptr->sc_count || ssptr->sd_count ) {
+         int max_count = ssptr->sa_count;
+         if( ssptr->sb_count > max_count ) max_count = ssptr->sb_count;
+         if( ssptr->sc_count > max_count ) max_count = ssptr->sc_count;
+         if( ssptr->sd_count > max_count ) max_count = ssptr->sd_count;
+
+         if( ssptr->sa_count > 0 || ssptr->sb_count > 0 ||
+             ssptr->sc_count > 0 || ssptr->sd_count > 0 ||
+             ssptr->sa_count < max_count || ssptr->sb_count < max_count ||
+             ssptr->sc_count < max_count || ssptr->sd_count < max_count ) {
 
             if( !fd ) {
                parGet0c( "MISSING", filepath, sizeof(filepath), status );
