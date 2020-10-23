@@ -35,6 +35,21 @@ static pthread_mutex_t  Ndf_Routin_mutex = PTHREAD_MUTEX_INITIALIZER;
    "routin". */
 void ndf1RoutinWrap( int nlines, char *const text[], int *status );
 
+/* A wrapper for cnfCreim that returns a null-terminated string holding a
+   single space (rather than a null string) if the input string consists
+   entirely of spaces. */
+char *ndf1Creim( const char *source_f, int source_len );
+char *ndf1Creim( const char *source_f, int source_len ){
+   char *result = cnfCreim( source_f, source_len );
+   if( strlen(result) == 0 ) {
+      cnfFree( result );
+      result = (char *)starMallocAtomic( 2 );
+      result[ 0 ] = ' ';
+      result[ 1 ] = 0;
+   }
+   return result;
+}
+
 
 
 /* -------  Routines that have no pixel count arguments -------------- */
@@ -52,7 +67,7 @@ F77_SUBROUTINE(ndf_acget)( INTEGER(INDF),
    GENPTR_INTEGER(IAXIS)
    GENPTR_CHARACTER(VALUE)
    GENPTR_INTEGER(STATUS)
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    char *value = malloc( VALUE_length+1 );
    if( value ) {
       strcpy( value, "<null>" );
@@ -78,7 +93,7 @@ F77_SUBROUTINE(ndf_aclen)( INTEGER(INDF),
    GENPTR_INTEGER(STATUS)
    size_t length;
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfAclen_( *INDF, comp, *IAXIS, &length, STATUS );
    *LENGTH = length;
    cnfFree( comp );
@@ -97,8 +112,8 @@ F77_SUBROUTINE(ndf_acput)( CHARACTER(VALUE),
    GENPTR_INTEGER(IAXIS)
    GENPTR_INTEGER(STATUS)
 
-   char *value = cnfCreim( VALUE, VALUE_length );
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *value = ndf1Creim( VALUE, VALUE_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfAcput_( value, *INDF, comp, *IAXIS, STATUS );
    cnfFree( value );
    cnfFree( comp );
@@ -126,7 +141,7 @@ F77_SUBROUTINE(ndf_aform)( INTEGER(INDF),
    GENPTR_INTEGER(STATUS)
    char form[NDF__SZFRM+1];
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfAform_( *INDF, comp, *IAXIS, form, sizeof(form), STATUS );
    cnfFree( comp );
 
@@ -160,7 +175,7 @@ F77_SUBROUTINE(ndf_amap)( INTEGER(INDF),
 
    cnfImpn( TYPE, TYPE_length, DAT__SZTYP, type );
    cnfImpn( MMOD, MMOD_length, NDF__SZMMD, mmod );
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
 
    ndfAmap_( *INDF, comp, *IAXIS, type, mmod, pntr, &el, STATUS );
 
@@ -205,7 +220,7 @@ F77_SUBROUTINE(ndf_arest)( INTEGER(INDF),
    GENPTR_INTEGER(IAXIS)
    GENPTR_INTEGER(STATUS)
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfArest_( *INDF, comp, *IAXIS, STATUS );
    cnfFree( comp );
 }
@@ -234,7 +249,7 @@ F77_SUBROUTINE(ndf_astat)( INTEGER(INDF),
    GENPTR_INTEGER(STATUS)
    int state;
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfAstat_( *INDF, comp, *IAXIS, &state, STATUS );
    cnfFree( comp );
    *STATE = state ? F77_TRUE : F77_FALSE;
@@ -255,7 +270,7 @@ F77_SUBROUTINE(ndf_astyp)( CHARACTER(FTYPE),
    char ftype[ NDF__SZFTP + 1 ];
    cnfImpn( FTYPE, FTYPE_length, NDF__SZFTP, ftype );
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfAstyp_( ftype, *INDF, comp, *IAXIS, STATUS );
    cnfFree( comp );
 
@@ -275,7 +290,7 @@ F77_SUBROUTINE(ndf_atype)( INTEGER(INDF),
    GENPTR_INTEGER(STATUS)
    char type[DAT__SZTYP+1];
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfAtype_( *INDF, comp, *IAXIS, type, sizeof(type), STATUS );
    cnfFree( comp );
 
@@ -292,7 +307,7 @@ F77_SUBROUTINE(ndf_aunmp)( INTEGER(INDF),
    GENPTR_INTEGER(IAXIS)
    GENPTR_INTEGER(STATUS)
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfAunmp_( *INDF, comp, *IAXIS, STATUS );
    cnfFree( comp );
 
@@ -310,7 +325,7 @@ F77_SUBROUTINE(ndf_bad)( INTEGER(INDF),
    GENPTR_LOGICAL(BAD)
    GENPTR_INTEGER(STATUS)
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    int bad;
 
    ndfBad_( *INDF, comp, F77_ISTRUE(*CHECK)?1:0, &bad, STATUS );
@@ -373,7 +388,7 @@ F77_SUBROUTINE(ndf_cget)( INTEGER(INDF),
    GENPTR_CHARACTER(COMP)
    GENPTR_CHARACTER(VALUE)
    GENPTR_INTEGER(STATUS)
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    char *value = malloc( VALUE_length+1 );
    if( value ) {
       strcpy( value, "<null>" );
@@ -412,7 +427,7 @@ F77_SUBROUTINE(ndf_clen)( INTEGER(INDF),
    GENPTR_INTEGER(STATUS)
    size_t length;
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfClen_( *INDF, comp, &length, STATUS );
    *LENGTH = length;
    cnfFree( comp );
@@ -436,7 +451,7 @@ F77_SUBROUTINE(ndf_cmplx)( INTEGER(INDF),
    GENPTR_CHARACTER(COMP)
    GENPTR_LOGICAL(CMPLX)
    GENPTR_INTEGER(STATUS)
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    int cmplx;
    ndfCmplx_( *INDF, comp, &cmplx, STATUS );
    *CMPLX = cmplx ? F77_TRUE : F77_FALSE;
@@ -454,8 +469,8 @@ F77_SUBROUTINE(ndf_cmsg)( CHARACTER(TOKEN),
    GENPTR_CHARACTER(COMP)
    GENPTR_INTEGER(STATUS)
 
-   char *token = cnfCreim( TOKEN, TOKEN_length );
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *token = ndf1Creim( TOKEN, TOKEN_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfCmsg_( token, *INDF, comp, STATUS );
    cnfFree( comp );
    cnfFree( token );
@@ -483,8 +498,8 @@ F77_SUBROUTINE(ndf_cput)( CHARACTER(VALUE),
    GENPTR_CHARACTER(COMP)
    GENPTR_INTEGER(STATUS)
 
-   char *value = cnfCreim( VALUE, VALUE_length );
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *value = ndf1Creim( VALUE, VALUE_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfCput_( value, *INDF, comp, STATUS );
    cnfFree( value );
    cnfFree( comp );
@@ -516,7 +531,7 @@ F77_SUBROUTINE(ndf_find)( CHARACTER(LOC),
    if( strncmp( DAT__ROOT, LOC, LOC_length ) ) {
       datImportFloc( LOC, LOC_length, &loc, STATUS );
    }
-   char *name = cnfCreim( NAME, NAME_length );
+   char *name = ndf1Creim( NAME, NAME_length );
    ndfFind_( loc, name, INDF, STATUS );
    cnfFree( name );
 }
@@ -532,7 +547,7 @@ F77_SUBROUTINE(ndf_ftype)( INTEGER(INDF),
    GENPTR_CHARACTER(FTYPE)
    GENPTR_INTEGER(STATUS)
    char ftype[NDF__SZFTP+1];
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
 
    ndfFtype_( *INDF, comp, ftype, sizeof(ftype), STATUS );
    cnfExprt( ftype, FTYPE, FTYPE_length );
@@ -545,7 +560,7 @@ F77_SUBROUTINE(ndf_happn)( CHARACTER(APPN),
                            TRAIL(APPN) ) {
    GENPTR_CHARACTER(APPN)
    GENPTR_INTEGER(STATUS)
-   char *appn = cnfCreim( APPN, APPN_length );
+   char *appn = ndf1Creim( APPN, APPN_length );
    ndfHappn_( appn, STATUS );
    cnfFree( appn );
 }
@@ -564,7 +579,7 @@ F77_SUBROUTINE(ndf_hdef)( INTEGER(INDF),
    GENPTR_INTEGER(INDF)
    GENPTR_CHARACTER(APPN)
    GENPTR_INTEGER(STATUS)
-   char *appn = cnfCreim( APPN, APPN_length );
+   char *appn = ndf1Creim( APPN, APPN_length );
    ndfHdef_( *INDF, appn, STATUS );
    cnfFree( appn );
 }
@@ -601,7 +616,7 @@ F77_SUBROUTINE(ndf_hinfo)( INTEGER(INDF),
    GENPTR_INTEGER(IREC)
    GENPTR_CHARACTER(VALUE)
    GENPTR_INTEGER(STATUS)
-   char *item = cnfCreim( ITEM, ITEM_length );
+   char *item = ndf1Creim( ITEM, ITEM_length );
    char *value = malloc( VALUE_length + 1 );
    if( value ) {
       strcpy( value, "<null>" );
@@ -623,7 +638,7 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
    GENPTR_CHARACTER(EVNAME)
    GENPTR_LOGICAL(SET)
    GENPTR_INTEGER(STATUS)
-   char *evname = cnfCreim( EVNAME, EVNAME_length );
+   char *evname = ndf1Creim( EVNAME, EVNAME_length );
    ndfHndlr_( evname, HANDLR, F77_ISTRUE(*SET)?1:0, STATUS );
    cnfFree( evname );
 }
@@ -732,8 +747,8 @@ F77_SUBROUTINE(ndf_hput)( CHARACTER(HMODE),
    GENPTR_INTEGER(STATUS)
    int i;
 
-   char *hmode = cnfCreim( HMODE, HMODE_length );
-   char *appn = cnfCreim( APPN, APPN_length );
+   char *hmode = ndf1Creim( HMODE, HMODE_length );
+   char *appn = ndf1Creim( APPN, APPN_length );
 
    char **parray = calloc( *NLINES, sizeof(*parray) );
    if( parray ) {
@@ -760,7 +775,7 @@ F77_SUBROUTINE(ndf_hsdat)( CHARACTER(DATE),
    GENPTR_INTEGER(INDF)
    GENPTR_INTEGER(STATUS)
 
-   char *date = cnfCreim( DATE, DATE_length );
+   char *date = ndf1Creim( DATE, DATE_length );
    ndfHsdat_( date, *INDF, STATUS );
    cnfFree( date );
 }
@@ -773,7 +788,7 @@ F77_SUBROUTINE(ndf_hsmod)( CHARACTER(HMODE),
    GENPTR_INTEGER(INDF)
    GENPTR_INTEGER(STATUS)
 
-   char *hmode = cnfCreim( HMODE, HMODE_length );
+   char *hmode = ndf1Creim( HMODE, HMODE_length );
    ndfHsmod_( hmode, *INDF, STATUS );
    cnfFree( hmode );
 }
@@ -790,7 +805,7 @@ F77_SUBROUTINE(ndf_loc)( INTEGER(INDF),
    GENPTR_INTEGER(STATUS)
 
    HDSLoc *loc = NULL;
-   char *mode = cnfCreim( MODE, MODE_length );
+   char *mode = ndf1Creim( MODE, MODE_length );
 
    ndfLoc_( *INDF, mode, &loc, STATUS );
    datExportFloc( &loc, 1, LOC_length, LOC, STATUS );
@@ -813,7 +828,7 @@ F77_SUBROUTINE(ndf_mbad)( LOGICAL(BADOK),
    GENPTR_LOGICAL(BAD)
    GENPTR_INTEGER(STATUS)
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    int bad;
 
    ndfMbad_( F77_ISTRUE(*BADOK)?1:0, *INDF1, *INDF2, comp,
@@ -839,7 +854,7 @@ F77_SUBROUTINE(ndf_mbadn)( LOGICAL(BADOK),
    GENPTR_LOGICAL(BAD)
    GENPTR_INTEGER(STATUS)
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    int bad;
 
    ndfMbadn_( F77_ISTRUE(*BADOK)?1:0, *N, INDFS, comp,
@@ -859,7 +874,7 @@ F77_SUBROUTINE(ndf_mbnd)( CHARACTER(OPTION),
    GENPTR_INTEGER(INDF2)
    GENPTR_INTEGER(STATUS)
 
-   char *option = cnfCreim( OPTION, OPTION_length );
+   char *option = ndf1Creim( OPTION, OPTION_length );
    ndfMbnd_( option, INDF1, INDF2, STATUS );
    cnfFree( option );
 }
@@ -874,7 +889,7 @@ F77_SUBROUTINE(ndf_mbndn)( CHARACTER(OPTION),
    GENPTR_INTEGER(NDFS)
    GENPTR_INTEGER(STATUS)
 
-   char *option = cnfCreim( OPTION, OPTION_length );
+   char *option = ndf1Creim( OPTION, OPTION_length );
    ndfMbndn_( option, *N, NDFS, STATUS );
    cnfFree( option );
 }
@@ -884,7 +899,7 @@ F77_SUBROUTINE(ndf_msg)( CHARACTER(TOKEN),
                          TRAIL(TOKEN) ) {
    GENPTR_CHARACTER(TOKEN)
    GENPTR_INTEGER(INDF)
-   char *token = cnfCreim( TOKEN, TOKEN_length );
+   char *token = ndf1Creim( TOKEN, TOKEN_length );
    ndfMsg_( token, *INDF );
    cnfFree( token );
 }
@@ -910,8 +925,8 @@ F77_SUBROUTINE(ndf_mtype)( CHARACTER(TYPLST),
    char itype[NDF__SZTYP+1];
    char dtype[NDF__SZFTP+1];
 
-   char *typlst = cnfCreim( TYPLST, TYPLST_length );
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *typlst = ndf1Creim( TYPLST, TYPLST_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfMtype_( typlst, *INDF1, *INDF2, comp, itype, sizeof(itype),
               dtype, sizeof(dtype), STATUS );
    cnfFree( comp );
@@ -942,8 +957,8 @@ F77_SUBROUTINE(ndf_mtypn)( CHARACTER(TYPLST),
    char itype[NDF__SZTYP+1];
    char dtype[NDF__SZFTP+1];
 
-   char *typlst = cnfCreim( TYPLST, TYPLST_length );
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *typlst = ndf1Creim( TYPLST, TYPLST_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfMtypn_( typlst, *N, NDFS, comp, itype, sizeof(itype),
               dtype, sizeof(dtype), STATUS );
    cnfFree( comp );
@@ -978,9 +993,9 @@ F77_SUBROUTINE(ndf_open)( CHARACTER(LOC),
       datImportFloc( LOC, LOC_length, &loc, STATUS );
    }
 
-   char *name = cnfCreim( NAME, NAME_length );
-   char *mode = cnfCreim( MODE, MODE_length );
-   char *stat = cnfCreim( STAT, STAT_length );
+   char *name = ndf1Creim( NAME, NAME_length );
+   char *mode = ndf1Creim( MODE, MODE_length );
+   char *stat = ndf1Creim( STAT, STAT_length );
 
    ndfOpen_( loc, name, mode, stat, INDF, PLACE, STATUS );
 
@@ -1028,7 +1043,7 @@ F77_SUBROUTINE(ndf_form)( INTEGER(INDF),
    GENPTR_INTEGER(STATUS)
    char form[NDF__SZFRM+1];
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfForm_( *INDF, comp, form, sizeof(form), STATUS );
    cnfFree( comp );
 
@@ -1051,7 +1066,7 @@ F77_SUBROUTINE(ndf_gtdlt)( INTEGER(INDF),
    GENPTR_INTEGER(STATUS)
    char ztype[DAT__SZTYP+1];
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfGtdlt_( *INDF, comp, ZAXIS, ztype, sizeof( ztype ), ZRATIO, STATUS );
    cnfFree( comp );
 
@@ -1167,7 +1182,7 @@ F77_SUBROUTINE(ndf_place)( CHARACTER(LOC),
       datImportFloc( LOC, LOC_length, &loc, STATUS );
    }
 
-   char *name = cnfCreim( NAME, NAME_length );
+   char *name = ndf1Creim( NAME, NAME_length );
    ndfPlace_( loc, name, IPLACE, STATUS );
    cnfFree( name );
 }
@@ -1190,7 +1205,7 @@ F77_SUBROUTINE(ndf_reset)( INTEGER(INDF),
    GENPTR_CHARACTER(COMP)
    GENPTR_INTEGER(STATUS)
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfReset_( *INDF, comp, STATUS );
    cnfFree( comp );
 }
@@ -1205,7 +1220,7 @@ F77_SUBROUTINE(ndf_sbad)( LOGICAL(BAD),
    GENPTR_CHARACTER(COMP)
    GENPTR_INTEGER(STATUS)
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfSbad_( (*BAD == F77_TRUE), *INDF, comp, STATUS );
    cnfFree( comp );
 }
@@ -1231,7 +1246,7 @@ F77_SUBROUTINE(ndf_scopy)( INTEGER(INDF1),
    GENPTR_INTEGER(INDF2)
    GENPTR_INTEGER(STATUS)
 
-   char *clist = cnfCreim( CLIST, CLIST_length );
+   char *clist = ndf1Creim( CLIST, CLIST_length );
    ndfScopy_( *INDF1, clist, PLACE, INDF2, STATUS );
    cnfFree( clist );
 }
@@ -1253,7 +1268,7 @@ F77_SUBROUTINE(ndf_gtune)( CHARACTER(TPAR),
    GENPTR_INTEGER(VALUE)
    GENPTR_INTEGER(STATUS)
 
-   char *tpar = cnfCreim( TPAR, TPAR_length );
+   char *tpar = ndf1Creim( TPAR, TPAR_length );
    ndfGtune_( tpar, VALUE, STATUS );
    cnfFree( tpar );
 }
@@ -1281,7 +1296,7 @@ F77_SUBROUTINE(ndf_sctyp)( INTEGER(INDF),
    GENPTR_INTEGER(STATUS)
    char type[DAT__SZTYP+1];
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfSctyp_( *INDF, comp, type, sizeof(type), STATUS );
    cnfFree( comp );
 
@@ -1300,7 +1315,7 @@ F77_SUBROUTINE(ndf_state)( INTEGER(INDF),
    GENPTR_INTEGER(STATUS)
    int state;
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfState_( *INDF, comp, &state, STATUS );
    cnfFree( comp );
    *STATE = state ? F77_TRUE : F77_FALSE;
@@ -1319,7 +1334,7 @@ F77_SUBROUTINE(ndf_stype)( CHARACTER(FTYPE),
    char ftype[ NDF__SZFTP + 1 ];
    cnfImpn( FTYPE, FTYPE_length, NDF__SZFTP, ftype );
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfStype_( ftype, *INDF, comp, STATUS );
    cnfFree( comp );
 
@@ -1351,7 +1366,7 @@ F77_SUBROUTINE(ndf_tune)( INTEGER(VALUE),
    GENPTR_CHARACTER(TPAR)
    GENPTR_INTEGER(STATUS)
 
-   char *tpar = cnfCreim( TPAR, TPAR_length );
+   char *tpar = ndf1Creim( TPAR, TPAR_length );
    ndfTune_( *VALUE, tpar, STATUS );
    cnfFree( tpar );
 }
@@ -1368,7 +1383,7 @@ F77_SUBROUTINE(ndf_type)( INTEGER(INDF),
    GENPTR_INTEGER(STATUS)
    char type[DAT__SZTYP+1];
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfType_( *INDF, comp, type, sizeof(type), STATUS );
    cnfFree( comp );
 
@@ -1383,7 +1398,7 @@ F77_SUBROUTINE(ndf_unmap)( INTEGER(INDF),
    GENPTR_CHARACTER(COMP)
    GENPTR_INTEGER(STATUS)
 
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfUnmap_( *INDF, comp, STATUS );
    cnfFree( comp );
 
@@ -1409,7 +1424,7 @@ F77_SUBROUTINE(ndf_xdel)( INTEGER(INDF),
    GENPTR_CHARACTER(XNAME)
    GENPTR_INTEGER(STATUS)
 
-   char *xname = cnfCreim( XNAME, XNAME_length );
+   char *xname = ndf1Creim( XNAME, XNAME_length );
    ndfXdel_( *INDF, xname, STATUS );
    cnfFree( xname );
 }
@@ -1427,8 +1442,8 @@ F77_SUBROUTINE(ndf_xgt0c)( INTEGER(INDF),
    GENPTR_CHARACTER(CMPT)
    GENPTR_CHARACTER(VALUE)
    GENPTR_INTEGER(STATUS)
-   char *xname = cnfCreim( XNAME, XNAME_length );
-   char *cmpt = cnfCreim( CMPT, CMPT_length );
+   char *xname = ndf1Creim( XNAME, XNAME_length );
+   char *cmpt = ndf1Creim( CMPT, CMPT_length );
    char *value = malloc( VALUE_length+1 );
    if( value ) {
       strcpy( value, "<null>" );
@@ -1456,8 +1471,8 @@ F77_SUBROUTINE(ndf_xgt0l)( INTEGER(INDF),
    GENPTR_INTEGER(STATUS)
    int value;
 
-   char *xname = cnfCreim( XNAME, XNAME_length );
-   char *cmpt = cnfCreim( CMPT, CMPT_length );
+   char *xname = ndf1Creim( XNAME, XNAME_length );
+   char *cmpt = ndf1Creim( CMPT, CMPT_length );
    ndfXgt0l_( *INDF, xname, cmpt, &value, STATUS );
    *VALUE = value ? F77_TRUE : F77_FALSE;
    cnfFree( cmpt );
@@ -1479,8 +1494,8 @@ F77_SUBROUTINE(ndf_xgt0##FT)( INTEGER(INDF), \
    GENPTR_##FTYPE(VALUE) \
    GENPTR_INTEGER(STATUS) \
 \
-   char *xname = cnfCreim( XNAME, XNAME_length ); \
-   char *cmpt = cnfCreim( CMPT, CMPT_length ); \
+   char *xname = ndf1Creim( XNAME, XNAME_length ); \
+   char *cmpt = ndf1Creim( CMPT, CMPT_length ); \
    ndfXgt0##CT##_( *INDF, xname, cmpt, VALUE, STATUS ); \
    cnfFree( cmpt ); \
    cnfFree( xname ); \
@@ -1513,8 +1528,8 @@ F77_SUBROUTINE(ndf_xloc)( INTEGER(INDF),
    GENPTR_INTEGER(STATUS)
 
    HDSLoc *loc = NULL;
-   char *xname = cnfCreim( XNAME, XNAME_length );
-   char *mode = cnfCreim( MODE, MODE_length );
+   char *xname = ndf1Creim( XNAME, XNAME_length );
+   char *mode = ndf1Creim( MODE, MODE_length );
 
    ndfXloc_( *INDF, xname, mode, &loc, STATUS );
    datExportFloc( &loc, 1, LOC_length, LOC, STATUS );
@@ -1539,9 +1554,9 @@ F77_SUBROUTINE(ndf_xiary)( INTEGER(INDF),
    GENPTR_INTEGER(STATUS)
 
    Ary *ary = NULL;
-   char *xname = cnfCreim( XNAME, XNAME_length );
-   char *cmpt = cnfCreim( CMPT, CMPT_length );
-   char *mode = cnfCreim( MODE, MODE_length );
+   char *xname = ndf1Creim( XNAME, XNAME_length );
+   char *cmpt = ndf1Creim( CMPT, CMPT_length );
+   char *mode = ndf1Creim( MODE, MODE_length );
 
    ndfXiary_( *INDF, xname, cmpt, mode, &ary, STATUS );
    *IARY = aryA2I(ary);
@@ -1587,8 +1602,8 @@ F77_SUBROUTINE(ndf_xnew)( INTEGER(INDF),
    int i;
 
    HDSLoc *loc = NULL;
-   char *xname = cnfCreim( XNAME, XNAME_length );
-   char *type = cnfCreim( TYPE, TYPE_length );
+   char *xname = ndf1Creim( XNAME, XNAME_length );
+   char *type = ndf1Creim( TYPE, TYPE_length );
 
    hdsdim dim[NDF__MXDIM];
    int ndim = ( *NDIM < NDF__MXDIM ) ? *NDIM : NDF__MXDIM;
@@ -1624,9 +1639,9 @@ F77_SUBROUTINE(ndf_xpt0c)( CHARACTER(VALUE),
    GENPTR_CHARACTER(XNAME)
    GENPTR_CHARACTER(CMPT)
    GENPTR_INTEGER(STATUS)
-   char *value = cnfCreim( VALUE, VALUE_length );
-   char *xname = cnfCreim( XNAME, XNAME_length );
-   char *cmpt = cnfCreim( CMPT, CMPT_length );
+   char *value = ndf1Creim( VALUE, VALUE_length );
+   char *xname = ndf1Creim( XNAME, XNAME_length );
+   char *cmpt = ndf1Creim( CMPT, CMPT_length );
    ndfXpt0c_( value, *INDF, xname, cmpt, STATUS );
    cnfFree( cmpt );
    cnfFree( xname );
@@ -1645,8 +1660,8 @@ F77_SUBROUTINE(ndf_xpt0l)( LOGICAL(VALUE),
    GENPTR_CHARACTER(XNAME)
    GENPTR_CHARACTER(CMPT)
    GENPTR_INTEGER(STATUS)
-   char *xname = cnfCreim( XNAME, XNAME_length );
-   char *cmpt = cnfCreim( CMPT, CMPT_length );
+   char *xname = ndf1Creim( XNAME, XNAME_length );
+   char *cmpt = ndf1Creim( CMPT, CMPT_length );
    ndfXpt0l_( F77_ISTRUE(*VALUE)?1:0, *INDF, xname, cmpt, STATUS );
    cnfFree( cmpt );
    cnfFree( xname );
@@ -1666,8 +1681,8 @@ F77_SUBROUTINE(ndf_xpt0##FT)( FTYPE(VALUE), \
    GENPTR_CHARACTER(CMPT) \
    GENPTR_INTEGER(STATUS) \
 \
-   char *xname = cnfCreim( XNAME, XNAME_length ); \
-   char *cmpt = cnfCreim( CMPT, CMPT_length ); \
+   char *xname = ndf1Creim( XNAME, XNAME_length ); \
+   char *cmpt = ndf1Creim( CMPT, CMPT_length ); \
    ndfXpt0##CT##_( *VALUE, *INDF, xname, cmpt, STATUS ); \
    cnfFree( cmpt ); \
    cnfFree( xname ); \
@@ -1695,7 +1710,7 @@ F77_SUBROUTINE(ndf_xstat)( INTEGER(INDF),
    GENPTR_INTEGER(STATUS)
    int there;
 
-   char *xname = cnfCreim( XNAME, XNAME_length );
+   char *xname = ndf1Creim( XNAME, XNAME_length );
    ndfXstat_( *INDF, xname, &there, STATUS );
    cnfFree( xname );
    *THERE = there ? F77_TRUE : F77_FALSE;
@@ -1722,8 +1737,8 @@ F77_SUBROUTINE(ndf_zdelt)( INTEGER(INDF1),
    GENPTR_REAL(ZRATIO)
    GENPTR_INTEGER(STATUS)
 
-   char *comp = cnfCreim( COMP, COMP_length );
-   char *type = cnfCreim( TYPE, TYPE_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
+   char *type = ndf1Creim( TYPE, TYPE_length );
 
    ndfZdelt_( *INDF1, comp, *MINRAT, *ZAXIS, type, PLACE, \
               INDF2, ZRATIO, STATUS );
@@ -1745,7 +1760,7 @@ F77_SUBROUTINE(ndf_gtsz##FT)( INTEGER(INDF), \
    GENPTR_##FTYPE(ZERO) \
    GENPTR_INTEGER(STATUS) \
 \
-   char *comp = cnfCreim( COMP, COMP_length ); \
+   char *comp = ndf1Creim( COMP, COMP_length ); \
    ndfGtsz##CT##_( *INDF, comp, SCALE, ZERO, STATUS ); \
    cnfFree( comp ); \
 }
@@ -1775,7 +1790,7 @@ F77_SUBROUTINE(ndf_ptsz##FT)( FTYPE(SCALE), \
    GENPTR_CHARACTER(COMP) \
    GENPTR_INTEGER(STATUS) \
 \
-   char *comp = cnfCreim( COMP, COMP_length ); \
+   char *comp = ndf1Creim( COMP, COMP_length ); \
    ndfPtsz##CT##_( *SCALE, *ZERO, *INDF, comp, STATUS ); \
    cnfFree( comp ); \
 }
@@ -1824,7 +1839,7 @@ F77_SUBROUTINE(ndf_amap8)( INTEGER(INDF),
 
    cnfImpn( TYPE, TYPE_length, DAT__SZTYP, type );
    cnfImpn( MMOD, MMOD_length, NDF__SZMMD, mmod );
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
 
    ndfAmap_( *INDF, comp, *IAXIS, type, mmod, pntr, &el, STATUS );
 
@@ -1950,7 +1965,7 @@ F77_SUBROUTINE(ndf_map8)( INTEGER(INDF),
 
    cnfImpn( TYPE, TYPE_length, DAT__SZTYP, type );
    cnfImpn( MMOD, MMOD_length, NDF__SZMMD, mmod );
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
 
    ndfMap_( *INDF, comp, type, mmod, pntr, &el, STATUS );
 
@@ -1991,7 +2006,7 @@ F77_SUBROUTINE(ndf_mapz8)( INTEGER(INDF),
 
    cnfImpn( TYPE, TYPE_length, DAT__SZTYP, type );
    cnfImpn( MMOD, MMOD_length, NDF__SZMMD, mmod );
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
 
    ndfMapz_( *INDF, comp, type, mmod, rpntr, ipntr, &el, STATUS );
 
@@ -2206,8 +2221,8 @@ F77_SUBROUTINE(ndf_xnew8)( INTEGER(INDF),
    int i;
 
    HDSLoc *loc = NULL;
-   char *xname = cnfCreim( XNAME, XNAME_length );
-   char *type = cnfCreim( TYPE, TYPE_length );
+   char *xname = ndf1Creim( XNAME, XNAME_length );
+   char *type = ndf1Creim( TYPE, TYPE_length );
 
    hdsdim dim[NDF__MXDIM];
    int ndim = ( *NDIM < NDF__MXDIM ) ? *NDIM : NDF__MXDIM;
@@ -2305,7 +2320,7 @@ F77_SUBROUTINE(ndf_map)( INTEGER(INDF),
 
    cnfImpn( TYPE, TYPE_length, DAT__SZTYP, type );
    cnfImpn( MMOD, MMOD_length, NDF__SZMMD, mmod );
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
 
    ndfMap_( *INDF, comp, type, mmod, pntr, &el, STATUS );
 
@@ -2347,7 +2362,7 @@ F77_SUBROUTINE(ndf_mapz)( INTEGER(INDF),
 
    cnfImpn( TYPE, TYPE_length, DAT__SZTYP, type );
    cnfImpn( MMOD, MMOD_length, NDF__SZMMD, mmod );
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
 
    ndfMapz_( *INDF, comp, type, mmod, rpntr, ipntr, &el, STATUS );
 
@@ -2602,8 +2617,8 @@ F77_SUBROUTINE(ndf_acmsg)( CHARACTER(TOKEN),
    GENPTR_INTEGER(IAXIS)
    GENPTR_INTEGER(STATUS)
 
-   char *token = cnfCreim( TOKEN, TOKEN_length );
-   char *comp = cnfCreim( COMP, COMP_length );
+   char *token = ndf1Creim( TOKEN, TOKEN_length );
+   char *comp = ndf1Creim( COMP, COMP_length );
    ndfAcmsg_( token, *INDF, comp, *IAXIS, STATUS );
    cnfFree( comp );
    cnfFree( token );
