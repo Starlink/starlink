@@ -377,6 +377,33 @@
 *          Pixel dimensions in the output image, in arcseconds. If only one
 *          value is supplied, the same value will be used for both axes. The
 *          dynamic default value is determined by the AUTOGRID parameter. []
+*     POINTING = LITERAL (Read)
+*          The name of a text file containing corrections to the pointing read
+*          from the input data files. If null (!) is supplied, no corrections
+*          are used. Note - this parameter is ignored unless parameter
+*          USEDETPOS is set to FALSE. If a file is supplied, it should start
+*          with one or more lines containing "#" in column one. These are
+*          comment lines, but if any comment line has the form "# SYSTEM=AZEL"
+*          or "# SYSTEM=TRACKING" then it determines the system in which the
+*          pointing correction are specified (SYSTEM defaults to AZEL). The
+*          last comment line should be a space-separated list of column names,
+*          including "TAI", "DLON" and "DLAT". Each remaining line should
+*          contain numerical values for each column, separated by white space.
+*          The TAI column should contain the TAI time given as an MJD. The
+*          DLON and DLAT columns should give arc-distance offsets parallel
+*          to the longitude and latitude axes, in arc-seconds. The TAI values
+*          should be monotonic increasing with row number. The longitude and
+*          latitude axes are either AZEL or TRACKING as determined by the
+*          SYSTEM value in the header comments. Blank lines are ignored.
+*          The DLON and DLAT values are added onto the SMU jiggle positions
+*          stored in the JCMTSTATE extension of the input NDFs. DLON and DLAT
+*          values for non-tabulated times are determined by interpolation.
+*
+*          If you need to apply two sets of pointing corrections, one in
+*          TRACKING and one in AZEL, you can include two tables (one for
+*          each system) in a single text file. Both tables should use the
+*          format described above. The two tables must be separated by a line
+*          containing two or more minus signs with no leading spaces. [!]
 *     POLBINSIZE = _REAL (Read)
 *          This parameter is only prompted for if the input files contain
 *          polarisation data. The supplied value is used as the bin size
@@ -902,7 +929,8 @@
 *     11-MAY-2017 (DSB):
 *        Add parameter POSERRMAX.
 *     29-OCT-2020 (DSB):
-*        Added output FITS header RECPUSED.
+*        - Added output FITS header RECPUSED.
+*        - Added parameter POINTING.
 
 *  Copyright:
 *     Copyright (C) 2017 East Asian Observatory.
@@ -1124,6 +1152,11 @@ void smurf_makecube( int *status ) {
 
 /* Get a group of input files */
    ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
+
+/* Allow the user to specify a text file containing a table of pointing
+   corrections. Corresponding Mappings are created from the column data
+   and stored in the "igrp" group as items of metadata. */
+   smf_pread( igrp, "POINTING", status );
 
 /* Report observation details early */
    smf_summarize_obs( igrp, status );

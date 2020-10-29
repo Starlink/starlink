@@ -3418,6 +3418,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter pointing {
+                type _CHAR
+                prompt {Text file containing pointing corrections}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                helpkey *
+            }
+
             parameter polbinsize {
                 type _REAL
                 prompt {Angular size of analyser angle bins (degs)}
