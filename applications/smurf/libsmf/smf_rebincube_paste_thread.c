@@ -85,22 +85,22 @@ void smf_rebincube_paste_thread( void *data_ptr, int *status ){
 
 /* 2D algorithm... */
    if( cdata->is2d ) {
-      smf_rebincube_paste2d( cdata->badmask, cdata->nchan, cdata->nchanout,
-                             cdata->spectab, cdata->specpop, data->iv0,
-                             cdata->nxy, data->wgt, cdata->genvar,
-                             data->invar, data->ddata, cdata->data_array,
-                             cdata->var_array, cdata->wgt_array,
-                             cdata->pop_array, &(data->nused),
-                             &(data->nreject), &(data->naccept), data->work,
-                             status );
+      data->used = smf_rebincube_paste2d( cdata->badmask, cdata->nchan, cdata->nchanout,
+                                          cdata->spectab, cdata->specpop, data->iv0,
+                                          cdata->nxy, data->wgt, cdata->genvar,
+                                          data->invar, data->ddata, cdata->data_array,
+                                          cdata->var_array, cdata->wgt_array,
+                                          cdata->pop_array, &(data->nused),
+                                          &(data->nreject), &(data->naccept), data->work,
+                                          status );
 
 /* 3D algorithm... */
    } else {
-      smf_rebincube_paste3d( cdata->nchan, cdata->nout, cdata->spectab,
-                             data->iv0, cdata->nxy, data->wgt,
-                             cdata->genvar, data->invar, data->ddata,
-                             cdata->data_array, cdata->var_array,
-                             cdata->wgt_array, &(data->nused), status );
+      data->used = smf_rebincube_paste3d( cdata->nchan, cdata->nout, cdata->spectab,
+                                          data->iv0, cdata->nxy, data->wgt,
+                                          cdata->genvar, data->invar, data->ddata,
+                                          cdata->data_array, cdata->var_array,
+                                          cdata->wgt_array, &(data->nused), status );
       data->naccept++;
    }
 }

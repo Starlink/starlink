@@ -20,7 +20,7 @@
 *                       dim_t nxy, dim_t nout, dim_t dim[3],
 *                       int badmask, int is2d, AstMapping *ssmap,
 *                       AstSkyFrame *abskyfrm, AstMapping *oskymap,
-*                       Grp *detgrp, int moving, int usewgt, int genvar,
+*                       Grp **detgrp, int moving, int usewgt, int genvar,
 *                       double tfac, double fcon, float *data_array,
 *                       float *var_array, double *wgt_array,
 *                       float *texp_array, float *teff_array, int64_t *nused,
@@ -86,9 +86,12 @@
 *     oskymap = AstFrameSet * (Given)
 *        A Mapping from 2D sky coordinates in the output cube to 2D
 *        spatial grid coordinates in the output cube.
-*     detgrp = Grp * (Given)
-*        A Group containing the names of the detectors to be used. All
-*        detectors will be used if this group is empty.
+*     detgrp = Grp ** (Given)
+*        On entry, a Group containing the names of the detectors to be
+*        used. All detectors will be used if this group is empty (or NULL).
+*        On exit, the supplied group (if any) is deleted, and a new group
+*        is created and return holding the names of the detectors that
+*        contributed good data to the output cube.
 *     moving = int (Given)
 *        A flag indicating if the telescope is tracking a moving object. If
 *        so, each time slice is shifted so that the position specified by
@@ -240,7 +243,7 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
                        dim_t nxy, dim_t nout, dim_t dim[3],
                        int badmask, int is2d, AstMapping *ssmap,
                        AstSkyFrame *abskyfrm, AstMapping *oskymap,
-                       Grp *detgrp, int moving, int usewgt, int genvar,
+                       Grp **detgrp, int moving, int usewgt, int genvar,
                        double tfac, double fcon, float *data_array,
                        float *var_array, double *wgt_array,
                        float *texp_array, float *teff_array, int64_t *nused,
@@ -249,6 +252,7 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
 
 /* Local Variables */
    AstMapping *totmap = NULL;  /* WCS->GRID Mapping from input WCS FrameSet */
+   char *detflags;             /* Flags indicating if each detector was used */
    const char *name = NULL;    /* Pointer to current detector name */
    const double *tsys = NULL;  /* Pointer to Tsys value for first detector */
    dim_t gxout;                /* Output X grid index */
@@ -352,8 +356,8 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
 /* If a group of detectors to be used was supplied, search the group for
    the name of the current detector. If not found, set the GRID coord
    bad. */
-      if( detgrp ) {
-         found = grpIndex( name, detgrp, 1, status );
+      if( *detgrp ) {
+         found = grpIndex( name, *detgrp, 1, status );
          if( !found ) {
             detxin[ idet ] = AST__BAD;
             detyin[ idet ] = AST__BAD;
@@ -363,6 +367,11 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
 /* Move on to the next available detector name. */
       name += strlen( name ) + 1;
    }
+
+/* Allocate and initialise an array of flags, one for each detector, that
+   will be used to indicate which detectors contibute data to the output
+   cube. */
+   detflags = astCalloc( (data->dims)[ 1 ], sizeof( *detflags ) );
 
 /* Initialise a pointer to the ntex time slice index to be used. */
    nexttime = ptime;
@@ -604,17 +613,17 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
                      naccept_old = *naccept;
 
                      if( is2d ) {
-                        smf_rebincube_paste2d( badmask, nchan, nchanout, spectab,
-                                               specpop, iv0, nxy, wgt, genvar,
-                                               invar, ddata, data_array,
-                                               var_array, wgt_array, pop_array,
-                                               nused, nreject, naccept, work,
-                                               status );
+                       if( smf_rebincube_paste2d( badmask, nchan, nchanout, spectab,
+                                                  specpop, iv0, nxy, wgt, genvar,
+                                                  invar, ddata, data_array,
+                                                  var_array, wgt_array, pop_array,
+                                                  nused, nreject, naccept, work,
+                                                  status ) ) detflags[ idet ] = 1;
                      } else {
-                        smf_rebincube_paste3d( nchan, nout, spectab, iv0, nxy,
-                                               wgt, genvar, invar, ddata,
-                                               data_array, var_array,
-                                               wgt_array, nused, status );
+                        if( smf_rebincube_paste3d( nchan, nout, spectab, iv0, nxy, wgt,
+                                                   genvar, invar, ddata, data_array,
+                                                   var_array, wgt_array, nused,
+                                                   status ) ) detflags[ idet ] = 1;
                         (*naccept)++;
                      }
 
@@ -681,6 +690,9 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
                   texp_array[ detector_data[ idet ].iv0 ] += texp*tfac;
                   teff_array[ detector_data[ idet ].iv0 ] += teff*tfac;
                }
+
+               if( detector_data[ idet ].used ) detflags[ idet ] = 1;
+
             }
          }
       }
@@ -690,6 +702,26 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
 
 /* End the AST context. */
       astEnd;
+   }
+
+/* Delete the supplied detector group and create a new one to hold the names
+   of the detectors for which good data was found and used. */
+   if( *detgrp ) grpDelet( detgrp, status );
+   *detgrp = grpNew( "Used detectors", status );
+
+/* Initialise a string to point to the name of the first detector for which
+   data is available */
+   name = hdr->detname;
+
+/* Loop round all detectors. */
+   for( idet = 0; idet < ndet; idet++ ) {
+
+/* If the current detector contributed any good data to the cube, store
+   its name in the group. */
+      if( detflags[ idet ] ) grpPut1( *detgrp, name, 0, status );
+
+/* Move on to the next available detector name. */
+      name += strlen( name ) + 1;
    }
 
 /* If this is the final pass through this function, normalise the returned
@@ -717,6 +749,7 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
 
 /* Free non-static resources. */
 L999:;
+   detflags = astFree( detflags );
    work = astFree( work );
    spectab = astFree( spectab );
    specpop = astFree( specpop );

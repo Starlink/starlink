@@ -1802,7 +1802,7 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
 void smf_rebincube( ThrWorkForce *wf, smfData *data, int first, int last,
                     int *ptime, int badmask, int is2d, AstSkyFrame *abskyfrm,
                     AstMapping *oskymap, AstFrame *ospecfrm,
-                    AstMapping *ospecmap, Grp *detgrp, int moving, int usewgt,
+                    AstMapping *ospecmap, Grp **detgrp, int moving, int usewgt,
                     int lbnd_out[ 3 ], int ubnd_out[ 3 ], int spread,
                     const double params[], int genvar, float *data_array,
                     float *var_array, double *wgt_array, float *texp_array,
@@ -1813,7 +1813,7 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
                         int *ptime, dim_t nchan, dim_t ndet, dim_t nslice,
                         dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3],
                         AstMapping *ssmap, AstSkyFrame *abskyfrm,
-                        AstMapping *oskymap, Grp *detgrp, int moving,
+                        AstMapping *oskymap, Grp **detgrp, int moving,
                         int usewgt, int spread, const double params[],
                         int genvar, double tfac, double fcon,
                         float *data_array, float *var_array,
@@ -1831,7 +1831,7 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
                        dim_t nxy, dim_t nout, dim_t dim[3],
                        int badmask, int is2d, AstMapping *ssmap,
                        AstSkyFrame *abskyfrm, AstMapping *oskymap,
-                       Grp *detgrp, int moving, int usewgt, int genvar,
+                       Grp **detgrp, int moving, int usewgt, int genvar,
                        double tcon, double fcon, float *data_array,
                        float *var_array, double *wgt_array, float *texp_array,
                        float *teff_array, int64_t *nused, int *nreject,
@@ -1844,20 +1844,20 @@ void smf_rebincube_norm2d( dim_t nout, dim_t nxy, int genvar,
 void smf_rebincube_norm3d( dim_t nout, int genvar, int64_t nused, float *data_array,
                            float *var_array, double *wgt_array, int *status );
 
-void smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
-                            int *spectab, int *specpop, dim_t iv0,
-                            dim_t nxy, double wgt, int genvar,
-                            double invar, float *ddata,
-                            float *data_array, float *var_array,
-                            double *wgt_array, int *pop_array,
+int smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
+                           int *spectab, int *specpop, dim_t iv0,
+                           dim_t nxy, double wgt, int genvar,
+                           double invar, float *ddata,
+                           float *data_array, float *var_array,
+                           double *wgt_array, int *pop_array,
                            int64_t *nused, int *nreject, int *naccept,
-                            float *work, int *status );
+                           float *work, int *status );
 
-void smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab, dim_t iv0,
-                            dim_t nxy, double wgt, int genvar, double invar,
-                            float *pdata, float *data_array,
-                            float *var_array, double *wgt_array, int64_t *nused,
-                            int *status );
+int smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab, dim_t iv0,
+                           dim_t nxy, double wgt, int genvar, double invar,
+                           float *pdata, float *data_array,
+                           float *var_array, double *wgt_array, int64_t *nused,
+                           int *status );
 
 void smf_rebincube_paste_thread( void *data, int *status );
 
@@ -1900,7 +1900,7 @@ void smf_rebinslices( void *job_data_ptr, int *status );
 
 void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
                       AstMapping *ospecmap, AstSkyFrame *oskyframe,
-                      Grp *detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ],
+                      Grp **detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ],
                       int genvar, float *data_array, float *var_array,
                       int *ispec, float *texp_array, float *ton_array,
                       double *fcon, int *status );

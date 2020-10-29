@@ -901,6 +901,8 @@
 *        absolute sky coords (e.g. when creating JSA tiles for moving targets).
 *     11-MAY-2017 (DSB):
 *        Add parameter POSERRMAX.
+*     29-OCT-2020 (DSB):
+*        Added output FITS header RECPUSED.
 
 *  Copyright:
 *     Copyright (C) 2017 East Asian Observatory.
@@ -991,8 +993,10 @@ void smurf_makecube( int *status ) {
    HDSLoc *smurf_xloc = NULL; /* HDS locator for output SMURF extension */
    HDSLoc *weightsloc = NULL; /* HDS locator of weights array */
    ThrWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
+   char *detlist = NULL;      /* Space-spearated list of used detector names */
    char *pname = NULL;        /* Name of currently opened data file */
    char basename[ GRP__SZNAM + 1 ]; /* Output base file name */
+   char detname[ GRP__SZNAM ];/* Detector name */
    char oname[SMF_PATH_MAX+1];/* Name of output NDF */
    char pabuf[ 10 ];          /* Text buffer for parameter value */
    char system[ 10 ];         /* Celestial coord system for output cube */
@@ -1049,6 +1053,7 @@ void smurf_makecube( int *status ) {
    int moving;                /* Is the telescope base position changing? */
    int naccept;               /* Number of accepted input spectra */
    int nbad;                  /* No. of o/p pixels with good data but bad variance */
+   int nc;                    /* Length of string */
    int nel;                   /* Number of elements in 3D array */
    int ngood;                 /* No. of o/p pixels with good data */
    int nparam = 0;            /* No. of parameters required for spreading scheme */
@@ -1078,8 +1083,9 @@ void smurf_makecube( int *status ) {
    int usedetpos;             /* Should the detpos array be used? */
    int64_t wgtsize;           /* No. of elements in the weights array */
    int64_t nused;             /* No. of input samples pasted into output cube */
+   size_t idet;               /* Detector index */
    size_t itile;              /* Output tile index */
-   size_t ndet;               /* Number of detectors supplied for "DETECTORS" */
+   size_t ndet;               /* Number of detectors */
    size_t njsatile;           /* Number of output JSA tiles */
    size_t ntile;              /* Number of output tiles */
    size_t outsize;            /* Number of files in output group */
@@ -1841,14 +1847,14 @@ void smurf_makecube( int *status ) {
                if( !sparse ) {
                   smf_rebincube( wf, data, first, (ifile == ilast ), pt, badmask,
                                  is2d, abskyfrm, tskymap, ospecfrm, ospecmap,
-                                 detgrp, moving, use_wgt, tile->elbnd,
+                                 &detgrp, moving, use_wgt, tile->elbnd,
                                  tile->eubnd, spread, params, genvar, data_array,
                                  var_array, wgt_array, exp_array, eff_array, &fcon,
                                  &nused, &nreject, &naccept, status );
 
                } else {
                   smf_rebinsparse( data, first, pt, ospecfrm, ospecmap,
-                                   abskyfrm, detgrp, tile->elbnd, tile->eubnd,
+                                   abskyfrm, &detgrp, tile->elbnd, tile->eubnd,
                                    genvar, data_array, var_array, &ispec,
                                    exp_array, eff_array, &fcon, status );
                }
@@ -2127,6 +2133,23 @@ void smurf_makecube( int *status ) {
                       "No. of tiles covering the field", status );
             atlPtfti( fchan, "TILENUM", itile,
                       "Index of this tile (1->NUMTILES)", status );
+         }
+
+/* Store the names of the detectors that contributed good data to the
+   output cube as a space-separated list. */
+         ndet = detgrp ? grpGrpsz( detgrp, status ) : 0;
+         if( ndet > 0 ) {
+            detlist = NULL;
+            nc = 0;
+            for( idet = 1; idet <= ndet; idet++ ) {
+               grpInfoc( detgrp, idet, "NAME", detname, sizeof( detname ),
+                         status );
+               astChrRemoveBlanks( detname );
+               detlist = astAppendStringf( detlist, &nc, " %s", detname );
+            }
+            atlPtfts( fchan, "RECPUSED", detlist + 1, "Used receptor IDs",
+                      status );
+            detlist = astFree( detlist );
          }
 
 /* If the FitsChan is not empty, store it in the FITS extension of the

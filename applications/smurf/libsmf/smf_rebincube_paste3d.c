@@ -15,12 +15,12 @@
 *     C function
 
 *  Invocation:
-*     void smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab,
-*                                 dim_t iv0, dim_t nxy, double wgt,
-*                                 int genvar, double invar, float *ddata,
-*                                 float *data_array, float *var_array,
-*                                 double *wgt_array, int64_t *nused,
-*                                 int *status );
+*     int smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab,
+*                                dim_t iv0, dim_t nxy, double wgt,
+*                                int genvar, double invar, float *ddata,
+*                                float *data_array, float *var_array,
+*                                double *wgt_array, int64_t *nused,
+*                                int *status );
 
 *  Arguments:
 *     nchan = dim_t (Given)
@@ -73,6 +73,10 @@
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
+*  Returned Function Value:
+*     A flag that is non-zero if and only if at least one good value from
+*     the input spectrum was pasted into the output spectrum.
+
 *  Description:
 *     Paste a single input spectrum into the output cube using nearest
 *     neighbour rebinning and a 2D weights array.
@@ -84,6 +88,8 @@
 *  History:
 *     23-APR-2006 (DSB):
 *        Initial version.
+*     29-OCT-2020 (DSB):
+*        Return a flag indicating if the spectrum was used.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -124,18 +130,19 @@
 
 #define FUNC_NAME "smf_rebincube_paste3d"
 
-void smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab, dim_t iv0,
-                            dim_t nxy, double wgt, int genvar, double invar,
-                            float *ddata, float *data_array,
-                            float *var_array, double *wgt_array, int64_t *nused,
-                            int *status ){
+int smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab, dim_t iv0,
+                           dim_t nxy, double wgt, int genvar, double invar,
+                           float *ddata, float *data_array,
+                           float *var_array, double *wgt_array, int64_t *nused,
+                           int *status ){
 
 /* Local Variables */
    dim_t iv;                   /* Vector index into output 3D array */
    dim_t ichan;                /* Index of current channel */
+   int result = 0;             /* Returned flag */
 
 /* Check the inherited status. */
-   if( *status != SAI__OK ) return;
+   if( *status != SAI__OK ) return result;
 
 /* Loop round all spectral channels. */
    for( ichan = 0; ichan < nchan; ichan++, ddata++ ) {
@@ -143,6 +150,7 @@ void smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab, dim_t iv0,
 /* If this input data value is good, and has a valid spectral position in
    the output cube, add it into the output arrays. */
       if( *ddata != VAL__BADR && spectab[ ichan ] >= 0 ) {
+         result = 1;
 
 /* Get the offset within the output arrays to the value to be incremented. */
          iv = iv0 + spectab[ ichan ]*nxy;
@@ -171,5 +179,7 @@ void smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab, dim_t iv0,
          }
       }
    }
+
+   return result;
 }
 

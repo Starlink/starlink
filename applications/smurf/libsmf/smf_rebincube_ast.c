@@ -17,7 +17,7 @@
 *                        int *ptime, dim_t nchan, dim_t ndet, dim_t nslice,
 *                        dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3],
 *                        AstMapping *ssmap, AstSkyFrame *abskyfrm,
-*                        AstMapping *oskymap, Grp *detgrp, int moving,
+*                        AstMapping *oskymap, Grp **detgrp, int moving,
 *                        int usewgt, int spread, const double params[],
 *                        int genvar, double tfac, double fcon,
 *                        float *data_array, float *var_array,
@@ -67,9 +67,12 @@
 *     oskymap = AstFrameSet * (Given)
 *        A Mapping from 2D sky coordinates in the output cube to 2D
 *        spatial pixel coordinates in the output cube.
-*     detgrp = Grp * (Given)
-*        A Group containing the names of the detectors to be used. All
-*        detectors will be used if this group is empty.
+*     detgrp = Grp ** (Given)
+*        On entry, a Group containing the names of the detectors to be
+*        used. All detectors will be used if this group is empty (or NULL).
+*        On exit, the supplied group (if any) is deleted, and a new group
+*        is created and return holding the names of the detectors that
+*        contributed any good data to the output cube.
 *     moving = int (Given)
 *        A flag indicating if the telescope is tracking a moving object. If
 *        so, each time slice is shifted so that the position specified by
@@ -178,6 +181,9 @@
 *     14-MAY-2014 (DSB):
 *        Do not attempt to normalise empty cubes, but issue a warning
 *        instead.
+*     29-OCT-2020 (DSB):
+*        "detgrp" is now used to return the names of the detectors that
+*        contributed good data to the cube.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -226,12 +232,24 @@
 
 #define MAXTHREADS 20
 
+/* Local data types */
+typedef struct smfRebinCubeAstData {
+   float *data;
+   size_t stride;
+   int lbnd;
+   int ubnd;
+   char used;
+} SmfRebinCubeAstData;
+
+/* Prototypes for local functions */
+static void smf1_rebincube_ast( void *job_data_ptr, int *status );
+
 
 void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
                       int *ptime, dim_t nchan, dim_t ndet, dim_t nslice,
                       dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3],
                       AstMapping *ssmap, AstSkyFrame *abskyfrm,
-                      AstMapping *oskymap, Grp *detgrp, int moving,
+                      AstMapping *oskymap, Grp **detgrp, int moving,
                       int usewgt, int spread, const double params[],
                       int genvar, double tfac, double fcon,
                       float *data_array, float *var_array,
@@ -240,6 +258,8 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
                       int *status ){
 
 /* Local Variables */
+   SmfRebinCubeAstData *pdata;
+   SmfRebinCubeAstData *job_data = NULL;
    AstCmpMap *detmap = NULL;   /* Mapping from 1D det. index to 2D i/p "grid" coords */
    AstMapping *dtotmap = NULL; /* 1D det index->o/p GRID Mapping */
    AstMapping *fullmap = NULL; /* WCS->GRID LutMap from input WCS FrameSet */
@@ -248,6 +268,8 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
    AstMapping *sslut = NULL;   /* Spectral LutMap */
    AstMapping *totmap = NULL;  /* WCS->GRID Mapping from input WCS FrameSet */
    AstPermMap *pmap;           /* Mapping to rearrange output axes */
+   Grp *usedetgrp = NULL;      /* Returned group holding used detectors. */
+   char *detflags;             /* Flags indicating if each detector was used */
    const char *name = NULL;    /* Pointer to current detector name */
    const double *tsys = NULL;  /* Pointer to Tsys value for first detector */
    dim_t iv;                   /* Vector index into output 3D array */
@@ -255,6 +277,8 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
    double blk_bot[ 2*MAXTHREADS + 1 ]; /* First o/p channel no. in each block */
    double con;                 /* Constant value */
    double dtemp;               /* Temporary value */
+   double gin[ 2 ];            /* Spectral grid index bounds in input */
+   double gout[ 2 ];           /* Spectral grid index bounds in output */
    double tcon;                /* Variance factor for whole time slice */
    float *detwork = NULL;      /* Work array for detector values */
    float *tdata = NULL;        /* Pointer to start of input time slice data */
@@ -347,12 +371,26 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
                  "from data file '%s'.", status, ndet, data->file->name );
    }
 
-/* If we are dealing with more than 1 detector, create a LutMap that holds
-   the input GRID index of every detector to be included in the output, and
-   AST__BAD for every detector that is not to be included in the output cube.
-   First allocate the work space for the LUT. */
-   if( ndet > 1 ) {
-      detlut = astMalloc( ndet*sizeof( double ) );
+/* Create a group to hold the used detectors. */
+   usedetgrp = grpNew( "Used detectors", status );
+
+/* Transform the spectral grid index bounds of the output cube into the input cube. */
+   gout[ 0 ] = 0.5;
+   gout[ 1 ] = dim[ 2 ] + 0.5;
+   astTran1( sslut, 2, gout, 0, gin );
+
+/* Create a LutMap that holds the input GRID index of every detector to be included
+   in the output, and AST__BAD for every detector that is not to be included in the
+   output cube. First allocate the work space for the LUT. */
+   detlut = astMalloc( ndet*sizeof( double ) );
+
+/* Allocate memory to hold the data needed by each job used to determine
+   if a detector has any good values in the input array. This will fill them
+   with zeros. */
+   job_data = astCalloc( ndet, sizeof( *job_data ) );
+
+/* Check memory was allocated successfully. */
+   if( *status == SAI__OK ) {
 
 /* Initialise a string to point to the name of the first detector for which
    data is available */
@@ -368,21 +406,46 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
 /* If a group of detectors to be used was supplied, search the group for
    the name of the current detector. If not found, set the GRID coord bad.
    This will cause astRebinSeq to ignore data from the detector. */
-         if( detgrp ) {
-            found = grpIndex( name, detgrp, 1, status );
+         if( *detgrp ) {
+            found = grpIndex( name, *detgrp, 1, status );
             if( !found ) detlut[ idet ] = AST__BAD;
+         }
+
+/* If the detector is being used, submit a job to the workforce to
+   determine if the detector has any good values in the input array. */
+         if( detlut[ idet ] != AST__BAD) {
+            pdata = job_data + idet;
+            pdata->data = ( (float *) (data->pntr)[ 0 ] ) + idet*nchan;
+            pdata->stride = timeslice_size;
+            pdata->lbnd = floor( gin[ 0 ] );
+            pdata->ubnd = ceil( gin[ 1 ] );
+            thrAddJob( wf, 0, pdata, smf1_rebincube_ast, 0, NULL, status );
          }
 
 /* Move on to the next available detector name. */
          name += strlen( name ) + 1;
       }
 
-/* Create the LutMap. */
-      lutmap = (AstMapping *) astLutMap( ndet, detlut, 1.0, 1.0,
-                                         "LutInterp=1" );
+/* Wait for the workforce jobs to comnplete. */
+      thrWait( wf, status );
 
-/* If we only have 1 detector, use a UnitMap instead of a LutMap (lutMaps
-   must have 2 or more table entries). */
+/* Now see which detectors contain any good input data and store the
+   names of such detectors in the returned group. */
+      name = hdr->detname;
+      for( idet = 0; idet < ndet; idet++ ) {
+         pdata = job_data + idet ;
+         if( pdata->used ) grpPut1( usedetgrp, name, 0, status );
+         name += strlen( name ) + 1;
+      }
+   }
+
+/* Free resources. */
+   job_data = astFree( job_data );
+
+/* Create the LutMap. If we only have 1 detector, use a UnitMap instead of a LutMap
+   (lutMaps must have 2 or more table entries). */
+   if( ndet > 1 ) {
+      lutmap = (AstMapping *) astLutMap( ndet, detlut, 1.0, 1.0, "LutInterp=1" );
    } else {
       lutmap = (AstMapping *) astUnitMap( 1, " " );
    }
@@ -523,6 +586,11 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
                     data->file->name );
       }
    }
+
+/* Allocate and initialise an array of flags, one for each detector, that
+   will be used to indicate which detectors contibute data to the output
+   cube. */
+   detflags = astCalloc( (data->dims)[ 1 ], sizeof( *detflags ) );
 
 /* Initialise a pointer to the next time slice index to be used. */
    nexttime = ptime;
@@ -699,9 +767,70 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
       }
    }
 
+/* Delete the supplied detector group and return the used detector group
+   in its place. */
+   if( *detgrp ) grpDelet( detgrp, status );
+   *detgrp = usedetgrp;
+
 /* Free resources. */
    detlut = astFree( detlut );
    detwork = astFree( detwork );
    varwork = astFree( varwork );
 }
 
+static void smf1_rebincube_ast( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     smf1_rebincube_ast
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     smf_rebincube_ast.
+
+*  Invocation:
+*     smf1_rebincube_ast( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = SmfRebinCubeAstData * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   SmfRebinCubeAstData *pdata;
+   float *pd;
+   size_t stride;
+   int islice;
+   int ubnd;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (SmfRebinCubeAstData *) job_data_ptr;
+
+/* Store some loal convenience values. */
+   stride = pdata->stride;
+   ubnd = pdata->ubnd;
+
+/* Initialise the flag to indicate no good data values have been found
+   (not really necessary since the job data structure was initialised to
+   hold zeros when it was allocated). */
+   pdata->used = 1;
+
+/* Loop round all the channels in the supplied spectrum tinil a good data
+   value is found. */
+   pd = pdata->data;
+   for( islice = pdata->lbnd; islice < ubnd; islice++ ) {
+      if( *pd != VAL__BADR ) {
+         pdata->used = 1;
+         break;
+      }
+      pd += stride;
+   }
+
+}

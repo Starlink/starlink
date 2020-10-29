@@ -14,14 +14,14 @@
 *     C function
 
 *  Invocation:
-*     void smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
-*                                 int *spectab, int *specpop, dim_t iv0,
-*                                 dim_t nxy, double wgt, int genvar,
-*                                 double invar, float *ddata,
-*                                 float *data_array, float *var_array,
-*                                 double *wgt_array, int *pop_array,
-*                                 int64_t *nused, int *nreject, int *naccept,
-*                                 float *work, int *status );
+*     int smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
+*                                int *spectab, int *specpop, dim_t iv0,
+*                                dim_t nxy, double wgt, int genvar,
+*                                double invar, float *ddata,
+*                                float *data_array, float *var_array,
+*                                double *wgt_array, int *pop_array,
+*                                int64_t *nused, int *nreject, int *naccept,
+*                                float *work, int *status );
 
 *  Arguments:
 *     badmask = int (Given)
@@ -103,6 +103,10 @@
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
+*  Returned Function Value:
+*     A flag that is non-zero if and only if at least one good value from
+*     the input spectrum was pasted into the output spectrum.
+
 *  Description:
 *     Paste a single input spectrum into the output cube using nearest
 *     neighbour rebinning and a 2D weights array.
@@ -118,6 +122,8 @@
 *        Added parameter naccept.
 *     16-JUL-2007 (DSB):
 *        Ignore input spectra that contain no good data.
+*     29-OCT-2020 (DSB):
+*        Return a flag indicating if the spectrum was used.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -158,14 +164,14 @@
 
 #define FUNC_NAME "smf_rebincube_paste2d"
 
-void smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
-                            int *spectab, int *specpop, dim_t iv0,
-                            dim_t nxy, double wgt, int genvar,
-                            double invar, float *ddata,
-                            float *data_array, float *var_array,
-                            double *wgt_array, int *pop_array,
-                            int64_t *nused, int *nreject, int *naccept,
-                            float *work, int *status ){
+int smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
+                           int *spectab, int *specpop, dim_t iv0,
+                           dim_t nxy, double wgt, int genvar,
+                           double invar, float *ddata,
+                           float *data_array, float *var_array,
+                           double *wgt_array, int *pop_array,
+                           int64_t *nused, int *nreject, int *naccept,
+                           float *work, int *status ){
 
 /* Local Variables */
    dim_t iv;                   /* Vector index into output 3D array */
@@ -175,9 +181,10 @@ void smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
    int ochan;                  /* Index of output channel */
    int ignore;                 /* Ignore this time slice? */
    int64_t nspecused;          /* No of input values pasted into output spectrum */
+   int result = 0;             /* Returned flag */
 
 /* Check the inherited status. */
-   if( *status != SAI__OK ) return;
+   if( *status != SAI__OK ) return result;
 
 /* We first paste the input spectrum into the work array, which is used
    as a temporary staging area for the input spectrum, prior to pasting it
@@ -219,6 +226,7 @@ void smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
    channels that contribute to the output channel. */
             } else {
                work[ ochan ] += ( *qdata )/specpop[ ochan ];
+               result = 1;
             }
          }
       }
@@ -342,4 +350,6 @@ void smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
          (*nused) += nspecused;
       }
    }
+
+   return result;
 }

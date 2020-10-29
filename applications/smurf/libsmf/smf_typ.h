@@ -944,6 +944,7 @@ typedef struct smfRebincubeNNArgs2 {
   int64_t nused;
   int nreject;
   int naccept;
+  int used;
 } smfRebincubeNNArgs2;
 
 typedef struct smfRebinMapData {

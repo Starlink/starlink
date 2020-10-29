@@ -18,7 +18,7 @@
 *                    int *ptime, int badmask, int is2d,
 *                    AstSkyFrame *abskyfrm, AstMapping *oskymap,
 *                    AstFrame *ospecfrm, AstMapping *ospecmap,
-*                    Grp *detgrp, int moving, int usewgt, int spread,
+*                    Grp **detgrp, int moving, int usewgt, int spread,
 *                    const double params[], int lbnd_out[ 3 ],
 *                    int ubnd_out[ 3 ], int genvar, float *data_array,
 *                    float *var_array, double *wgt_array, float *texp_array,
@@ -75,9 +75,12 @@
 *     ospecmap = AstMapping * (Given)
 *        Pointer to the Mapping from the SpecFrame to the third GRID axis
 *        within the current Frame of the output WCS Frameset.
-*     detgrp = Grp * (Given)
-*        A Group containing the names of the detectors to be used. All
-*        detectors will be used if this group is empty.
+*     detgrp = Grp ** (Given)
+*        On entry, a Group containing the names of the detectors to be
+*        used. All detectors will be used if this group is empty (or NULL).
+*        On exit, the supplied group (if any) is deleted, and a new group
+*        is created and return holding the names of the detectors that
+*        contributed good data to the output cube.
 *     moving = int (Given)
 *        A flag indicating if the telescope is tracking a moving object. If
 *        so, each time slice is shifted so that the position specified by
@@ -238,7 +241,7 @@ void  smf_rebincube( ThrWorkForce *wf, smfData *data, int first, int last,
                      int *ptime, int badmask, int is2d,
                      AstSkyFrame *abskyfrm, AstMapping *oskymap,
                      AstFrame *ospecfrm, AstMapping *ospecmap,
-                     Grp *detgrp, int moving, int usewgt, int lbnd_out[ 3 ],
+                     Grp **detgrp, int moving, int usewgt, int lbnd_out[ 3 ],
                      int ubnd_out[ 3 ], int spread,
                      const double params[], int genvar, float *data_array,
                      float *var_array, double *wgt_array, float *texp_array,

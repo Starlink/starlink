@@ -15,7 +15,7 @@
 *  Invocation:
 *     smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
 *                      AstMapping *ospecmap, AstSkyFrame *oskyframe,
-*                      Grp *detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ],
+*                      Grp **detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ],
 *                      int genvar, float *data_array, float *var_array,
 *                      int *ispec, float *texp_array, float *teff_array,
 *                      double *fcon, int *status );
@@ -40,9 +40,12 @@
 *        within the current Frame of the output WCS Frameset.
 *     oskyframe = AstFrame * (Given)
 *        Pointer to the SkyFrame in the output WCS FrameSet.
-*     detgrp = Grp * (Given)
-*        A Group containing the names of the detectors to be used. All
-*        detectors will be used if this group is empty.
+*     detgrp = Grp ** (Given)
+*        On entry, a Group containing the names of the detectors to be
+*        used. All detectors will be used if this group is empty (or NULL).
+*        On exit, the supplied group (if any) is deleted, and a new group
+*        is created and return holding the names of the detectors that
+*        contributed good data to the output cube.
 *     lbnd_out = dim_t [ 3 ] (Given)
 *        The lower pixel index bounds of the output cube.
 *     ubnd_out = dim_t [ 3 ] (Given)
@@ -122,11 +125,15 @@
 *        input file or ending at the last.
 *     11-FEB-2009 (DSB):
 *        Ignore negative or zero input Tsys values.
+*     29-OCT-2020 (DSB):
+*        "detgrp" is now used to return the names of the detectors that
+*        contributed good data to the cube.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2008-2009 Science & Technology Facilities Council.
+*     Copyright (C) 2020 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -167,7 +174,7 @@
 
 void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
                       AstMapping *ospecmap, AstSkyFrame *oskyframe,
-                      Grp *detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ],
+                      Grp **detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ],
                       int genvar, float *data_array, float *var_array,
                       int *ispec, float *texp_array, float *teff_array,
                       double *fcon, int *status ){
@@ -184,6 +191,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
    AstMapping *smap = NULL;     /* Simplified Mapping */
    AstMapping *tmap = NULL;     /* Temporary Mapping */
    AstMapping *specmap = NULL;  /* PIXEL -> Spec mapping in input FrameSet */
+   char *detflags;       /* Flags indicating if each detector was used */
    char *fftwin = NULL;  /* Name of FFT windowing function */
    const char *name = NULL; /* Pointer to current detector name */
    const double *tsys=NULL; /* Pointer to Tsys value for first detector */
@@ -334,8 +342,8 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
 
 /* If a group of detectors to be used was supplied, search the group for
    the name of the current detector. If not found, set the GRID coords bad. */
-      if( detgrp ) {
-         found = grpIndex( name, detgrp, 1, status );
+      if( *detgrp ) {
+         found = grpIndex( name, *detgrp, 1, status );
          if( !found ) {
             xin[ irec ] = AST__BAD;
             yin[ irec ] = AST__BAD;
@@ -409,6 +417,12 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
    } else if( fcon2 != *fcon ) {
       *fcon = VAL__BADD;
    }
+
+
+/* Allocate and initialise an array of flags, one for each detector, that
+   will be used to indicate which detectors contibute data to the output
+   cube. */
+   detflags = astCalloc( (data->dims)[ 1 ], sizeof( *detflags ) );
 
 /* Initialise a pointer to the next time slice index to be used. */
    nexttime = ptime;
@@ -534,6 +548,9 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
 
                   (*ispec)++;
 
+/* Flag that the current detector contributed some good data to the output cube. */
+                  detflags[ irec ] = 1;
+
                } else if( *status == SAI__OK ){
                   *status = SAI__ERROR;
                   msgSeti( "DIM", dim[ 0 ] );
@@ -562,7 +579,28 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
       tmap = astAnnul( tmap );
    }
 
+/* Delete the supplied detector group and create a new one to hold the names
+   of the detectors for which good data was found and used. */
+   if( *detgrp ) grpDelet( detgrp, status );
+   *detgrp = grpNew( "Used detectors", status );
+
+/* Initialise a string to point to the name of the first detector for which
+   data is available */
+   name = hdr->detname;
+
+/* Loop round all detectors. */
+   for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
+
+/* If the current detector contributed any good data to the cube, store
+   its name in the group. */
+      if( detflags[ irec ] ) grpPut1( *detgrp, name, 0, status );
+
+/* Move on to the next available detector name. */
+      name += strlen( name ) + 1;
+   }
+
 /* Free resources */
+   detflags = astFree( detflags );
    spectab = astFree( spectab );
    xin = astFree( xin );
    yin = astFree( yin );
