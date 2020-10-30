@@ -85,7 +85,7 @@ AstTable *atlReadTable( const char *fname, int *status ) {
 *     16-MAR-2016 (DSB):
 *        Added the SubTable facility.
 *     22-NOV-2016 (DSB):
-*        Report error if file has no column headers. Previously this 
+*        Report error if file has no column headers. Previously this
 *        caused a seg fault.
 *     {enter_further_changes_here}
 
@@ -226,6 +226,7 @@ static AstTable *ReadNextTable( FILE *fd, const char *fname, int *iline,
    line_len = 0;
    more = 1;
    last_com = NULL;
+   ncol = 0;
    cols = NULL;
    first = 1;
    irow = 0;
