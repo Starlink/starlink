@@ -72,11 +72,11 @@
 *        - "XOR": The modified Moc is the exclusive disjunction of the
 *        original Moc and the selected pixels.
 *     FMT = LITERAL (Read)
-*        The format in which to store output objects. Can be "AST", "XML",
-*        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
-*        if the output object is written to a text file. An error is
-*        reported if the output object cannot be written using the
-*        requested format. ["AST"]
+*        The format in which to store output objects. For allowed values,
+*        see the top level help for the ATOOLS package using command
+*        'atlhelp'. Only used if the output object is written to a text
+*        file. An error is reported if the output object cannot be written
+*        using the requested format. ["AST"]
 *     OPER = LITERAL (Read)
 *        Indicates how the VALUE parameter is used to select the outlined
 *        pixels. It can have any of the following values:

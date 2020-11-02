@@ -121,11 +121,11 @@
 *        contain NOUT elements. Only accessed if a non-null value is
 *        supplied for COEFF_I.
 *     FMT = LITERAL (Read)
-*        The format in which to store output objects. Can be "AST", "XML",
-*        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
-*        if the output object is written to a text file. An error is
-*        reported if the output object cannot be written using the
-*        requested format. ["AST"]
+*        The format in which to store output objects. For allowed values,
+*        see the top level help for the ATOOLS package using command
+*        'atlhelp'. Only used if the output object is written to a text
+*        file. An error is reported if the output object cannot be written
+*        using the requested format. ["AST"]
 *     NIN = _INTEGER (Read)
 *        The number of input coordinates.
 *     NOUT = INTEGER (Read)

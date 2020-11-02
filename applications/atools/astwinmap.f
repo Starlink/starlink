@@ -35,11 +35,11 @@
 
 *  ADAM Parameters:
 *     FMT = LITERAL (Read)
-*        The format in which to store output objects. Can be "AST", "XML",
-*        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
-*        if the output object is written to a text file. An error is
-*        reported if the output object cannot be written using the
-*        requested format. ["AST"]
+*        The format in which to store output objects. For allowed values,
+*        see the top level help for the ATOOLS package using command
+*        'atlhelp'. Only used if the output object is written to a text
+*        file. An error is reported if the output object cannot be written
+*        using the requested format. ["AST"]
 *     INA() = _DOUBLE (Read)
 *        The coordinates of corner A of the window in the input
 *        coordinate system.

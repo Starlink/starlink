@@ -34,11 +34,11 @@
 *        values are: "Frame", "Mapping", "FrameSet", "Region", "Object".
 *        ["Object"]
 *     FMT = LITERAL (Read)
-*        The format in which to store output objects. Can be "AST", "XML",
-*        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
-*        if the output object is written to a text file. An error is
-*        reported if the output object cannot be written using the
-*        requested format. ["AST"]
+*        The format in which to store output objects. For allowed values,
+*        see the top level help for the ATOOLS package using command
+*        'atlhelp'. Only used if the output object is written to a text
+*        file. An error is reported if the output object cannot be written
+*        using the requested format. ["AST"]
 *     RESULT = LITERAL (Read)
 *        A text file or NDF to receive the Object.
 *     THIS = LITERAL (Read)
@@ -115,7 +115,7 @@
 
 *  Get the object to copy.
       IF( CLASS .EQ. 'FRAME' ) THEN
-         CALL KPG1_GTOBJ( 'THIS', 'Frame', AST_FRAME, THIS,
+         CALL KPG1_GTOBJ( 'THIS', 'Frame', AST_ISAFRAME, THIS,
      :                    STATUS )
       ELSE IF( CLASS .EQ. 'FRAMESET' ) THEN
          CALL KPG1_GTOBJ( 'THIS', 'FrameSet', AST_ISAFRAMESET, THIS,

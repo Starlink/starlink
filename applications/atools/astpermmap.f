@@ -48,11 +48,11 @@
 *        not used if the INPERM and OUTPERM arrays do not contain negative
 *        values. Supply a null value (!) if no constants are needed.
 *     FMT = LITERAL (Read)
-*        The format in which to store output objects. Can be "AST", "XML",
-*        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
-*        if the output object is written to a text file. An error is
-*        reported if the output object cannot be written using the
-*        requested format. ["AST"]
+*        The format in which to store output objects. For allowed values,
+*        see the top level help for the ATOOLS package using command
+*        'atlhelp'. Only used if the output object is written to a text
+*        file. An error is reported if the output object cannot be written
+*        using the requested format. ["AST"]
 *     INPERM() = _INTEGER (Read)
 *        An array of integers which, for each input coordinate, should
 *        contain the number of the output coordinate whose value is to be

@@ -59,11 +59,11 @@
 *        value on any axis. Anything containing the string "bad" (case
 *        insensitive) will be treated as AST__BAD.
 *     FMT = LITERAL (Read)
-*        The format in which to store output objects. Can be "AST", "XML",
-*        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
-*        if the output object is written to a text file. An error is
-*        reported if the output object cannot be written using the
-*        requested format. ["AST"]
+*        The format in which to store output objects. For allowed values,
+*        see the top level help for the ATOOLS package using command
+*        'atlhelp'. Only used if the output object is written to a text
+*        file. An error is reported if the output object cannot be written
+*        using the requested format. ["AST"]
 *     REG1-REG25 = LITERAL (Given)
 *        A set of 25 parameters associated with the NDFs or text files holding
 *        the Regions. All the supplied Regions must relate to the same

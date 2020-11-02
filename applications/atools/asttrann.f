@@ -29,12 +29,6 @@
 *     asttrann this incols in forward outcols out
 
 *  ADAM Parameters:
-*     FMT = LITERAL (Read)
-*        The format in which to store output objects. Can be "AST", "XML",
-*        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
-*        if the output object is written to a text file. An error is
-*        reported if the output object cannot be written using the
-*        requested format. ["AST"]
 *     FORWARD = _LOGICAL (Read)
 *        A TRUE value indicates that the Mapping's forward coordinate
 *        transformaton is to be used (in which case the number of values

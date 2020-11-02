@@ -50,12 +50,6 @@
 *        Y_out = fit(7) + fit(8)*X_in + fit(9)*Y_in + fit(10)*X_in*Y_in +
 *                fit(11)*X_in*X_in + fit(12)*Y_in*Y_in
 *
-*     FMT = LITERAL (Read)
-*        The format in which to store output objects. Can be "AST", "XML",
-*        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
-*        if the output object is written to a text file. An error is
-*        reported if the output object cannot be written using the
-*        requested format. ["AST"]
 *     THIS = LITERAL (Read)
 *        An NDF or text file holding the Mapping. If an NDF is supplied,
 *        the Mapping from the base Frame of the WCS FrameSet to the

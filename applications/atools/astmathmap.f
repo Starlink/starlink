@@ -43,19 +43,19 @@
 
 *  ADAM Parameters:
 *     FMT = LITERAL (Read)
-*        The format in which to store output objects. Can be "AST", "XML",
-*        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
-*        if the output object is written to a text file. An error is
-*        reported if the output object cannot be written using the
-*        requested format. ["AST"]
-*     FWD =  (Read)
+*        The format in which to store output objects. For allowed values,
+*        see the top level help for the ATOOLS package using command
+*        'atlhelp'. Only used if the output object is written to a text
+*        file. An error is reported if the output object cannot be written
+*        using the requested format. ["AST"]
+*     FWD = LITERAL (Read)
 *        A group expression specifying the expressions defining the forward
 *        transformation. The number of forward transformation functions
 *        supplied must be at least equal to NOUT, but may be increased to
 *        accommodate any additional expressions which define intermediate
 *        variables for the forward transformation. The syntax of these
 *        expressions is described in SUN/210
-*     INV =  (Read)
+*     INV = LITERAL (Read)
 *        A group expression specifying the expressions defining the inverse
 *        transformation. The number of inverse transformation functions
 *        supplied must be at least equal to NIN, but may be increased to

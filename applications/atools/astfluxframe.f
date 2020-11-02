@@ -39,11 +39,11 @@
 
 *  ADAM Parameters:
 *     FMT = LITERAL (Read)
-*        The format in which to store output objects. Can be "AST", "XML",
-*        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
-*        if the output object is written to a text file. An error is
-*        reported if the output object cannot be written using the
-*        requested format. ["AST"]
+*        The format in which to store output objects. For allowed values,
+*        see the top level help for the ATOOLS package using command
+*        'atlhelp'. Only used if the output object is written to a text
+*        file. An error is reported if the output object cannot be written
+*        using the requested format. ["AST"]
 *     SPECFRM = LITERAL (Read)
 *        An NDF or text file holding a SpecFrame describing the spectral
 *        coordinate system in which the SPECVAL parameter is given. Only

@@ -35,11 +35,11 @@
 *         The number of the Frame axis for which formatting is to be
 *         performed (axis numbering starts at 1 for the first axis).
 *     FMT = LITERAL (Read)
-*        The format in which to store output objects. Can be "AST", "XML",
-*        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
-*        if the output object is written to a text file. An error is
-*        reported if the output object cannot be written using the
-*        requested format. ["AST"]
+*        The format in which to store output objects. For allowed values,
+*        see the top level help for the ATOOLS package using command
+*        'atlhelp'. Only used if the output object is written to a text
+*        file. An error is reported if the output object cannot be written
+*        using the requested format. ["AST"]
 *     THIS = LITERAL (Read)
 *        An NDF, FITS file or text file holding the Frame. If an NDF is
 *        supplied, the current Frame of the WCS FrameSet will be used. If a

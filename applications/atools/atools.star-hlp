@@ -29,6 +29,8 @@
 
  - as a MOC stored in either string or JSON format in a text file.
 
+ - as an ASDF WCS object stored in a yaml text file.
+
 
  Many of the ATOOLS commands create new AST Objects as output. These will
  be stored in one of the manners described below:
@@ -45,6 +47,7 @@
  is "AST"):
 
  - AST:      AST native format
+ - ASDF:     StScI ASDF format in a yaml text file
  - STCS:     STCS format
  - MOC-JSON: MOC JSON format
  - MOC:      MOC string format
