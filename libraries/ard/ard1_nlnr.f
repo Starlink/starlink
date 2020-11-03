@@ -107,6 +107,10 @@
 *        Original version.
 *     26-JUN-2001 (DSB):
 *        Modified for ARD version 2.0.
+*     3-NOV-2020 (DSB):
+*        Fix a bug in the handling of regions that completely enclose the supplied 
+*        array. Previously, the array was returned filled with exterior values in 
+*        such cases. Now. it is returned filled with interior values.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -354,17 +358,25 @@
      :                       IWCS, NPAR, PAR, IPB, LBINTB, UBINTB,
      :                       STATUS )
 
-*  Reset all pixels so that they hold exterior values.
-            CALL ARD1_BXSET( NDIM, LBND, UBND, MSKSIZ, 0, LBINTB,
-     :                       UBINTB, %VAL( CNF_PVAL( IPB ) ), STATUS )
+*  If the region encloses the whole array, fill the array with the
+*  interior value.
+            IF( LBINTB( 1 ) .EQ. VAL__MAXI ) THEN
+               CALL ARD1_BXSET( NDIM, LBND, UBND, MSKSIZ, RINDEX,
+     :                          LBND, UBND, %VAL( CNF_PVAL( IPB ) ),
+     :                          STATUS )
 
-*  Extend the bounding box by a safety margin of 2 pixels.
-            IF( LBINTB( 1 ) .NE. VAL__MINI .AND.
-     :          LBINTB( 1 ) .NE. VAL__MAXI ) THEN
-               LBINTB( 1 ) = LBINTB( 1 ) - 2
-               UBINTB( 1 ) = UBINTB( 1 ) + 2
-               LBINTB( 2 ) = LBINTB( 2 ) - 2
-               UBINTB( 2 ) = UBINTB( 2 ) + 2
+*  Otherwise, reset all pixels so that they hold exterior values and then
+*  extend the bounding box by a safety margin of 2 pixels.
+            ELSE
+               CALL ARD1_BXSET( NDIM, LBND, UBND, MSKSIZ, 0, LBINTB,
+     :                          UBINTB, %VAL( CNF_PVAL( IPB ) ),
+     :                          STATUS )
+               IF( LBINTB( 1 ) .NE. VAL__MINI ) THEN
+                  LBINTB( 1 ) = LBINTB( 1 ) - 2
+                  UBINTB( 1 ) = UBINTB( 1 ) + 2
+                  LBINTB( 2 ) = LBINTB( 2 ) - 2
+                  UBINTB( 2 ) = UBINTB( 2 ) + 2
+               END IF
             END IF
 
 *  For any other class of user coords, we cannot confidently find a
@@ -378,20 +390,26 @@
          END IF
 
 *  Ensure that the bounding box does not exceed the bounds of the mask.
-         DO I = 1, NDIM
-            LBINTB( I ) = MAX( LBINTB( I ), LBND( I ) )
-            UBINTB( I ) = MIN( UBINTB( I ), UBND( I ) )
+         IF( LBINTB( 1 ) .NE. VAL__MINI .AND.
+     :       LBINTB( 1 ) .NE. VAL__MAXI ) THEN
+
+            DO I = 1, NDIM
+               LBINTB( I ) = MAX( LBINTB( I ), LBND( I ) )
+               UBINTB( I ) = MIN( UBINTB( I ), UBND( I ) )
 
 *  If the lower bound is higher than the upper bound, use a null box
-            IF( LBINTB( I ) .GT. UBINTB( I ) ) THEN
-               LBINTB( 1 ) = VAL__MINI
-            END IF
+               IF( LBINTB( I ) .GT. UBINTB( I ) ) THEN
+                  LBINTB( 1 ) = VAL__MINI
+               END IF
 
-         END DO
+            END DO
+         END IF
 
-*  If the interior bounding box is now null, there are no interior points
-*  so return with the mask as it is (full of exterior values).
-         IF( LBINTB( 1 ) .NE. VAL__MINI ) THEN
+*  If the interior bounding box is now null or infinite, no change needs
+*  to be made so return with the mask as it is (full of exterior or
+*  interior values).
+         IF( LBINTB( 1 ) .NE. VAL__MINI .AND.
+     :       LBINTB( 1 ) .NE. VAL__MAXI ) THEN
 
 *  AST_RESAMPLE requires the mapping from user coords to "GRIXEL" coords
 *  (which are like PIXEL coords except that the centre of pixel index I

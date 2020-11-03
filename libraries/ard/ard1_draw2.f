@@ -95,6 +95,11 @@
 *        Original version.
 *     15-OCT-2011 (DSB):
 *        Register a GRF "capabilities" function with AST before plotting.
+*     3-NOV-2020 (DSB):
+*        Test the central pixel in the array to differentiate between
+*        regions that enclose the whole array and regions that do not
+*        intersect the array. Previously, it was always assumed that the
+*        region did not intersect the array.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -161,6 +166,7 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
+      LOGICAL ARD1_INTR          ! Is the point an interior point?
       EXTERNAL ARD1_INTRA
       EXTERNAL ARD1_GLINE
       EXTERNAL ARD1_GATTR
@@ -168,7 +174,9 @@
 
 *  Local Variables:
       DOUBLE PRECISION
-     :        BBOX( 4 )          ! The PIXEL bounds of B
+     :        BBOX( 4 ),         ! The PIXEL bounds of B
+     :        PC( 2 ),           ! PIXEL coords at test point
+     :        UC( 2 )            ! User coords at test point
 
       INTEGER
      :        I,                 ! Loop count
@@ -274,11 +282,37 @@
 *  Now draw the curve.
       CALL AST_GENCURVE( IPLOT, IMAP, STATUS )
 
-*  Update the returned interior bounding box.
-      DO I = 1, 2
-         LBINTB( I ) = CMN_LBIBC( I )
-         UBINTB( I ) = CMN_UBIBC( I )
-      END DO
+*  If the curve did not intersect the array, it may be either because the
+*  array is completely inside the region, or completely outside the region.
+*  To distinguish between these two cases, we test the central pixel of
+*  the array to see if it is inside the region.
+      IF( CMN_LBIBC( 1 ) .EQ. VAL__MAXI .OR.
+     :    CMN_LBIBC( 1 ) .EQ. VAL__MINI ) THEN
+
+* Get the PIXEL coords at the centre of the B array.
+        PC( 1 ) = 0.5*( LBND( 1 ) - 1 + UBND( 1 ) )
+        PC( 2 ) = 0.5*( LBND( 2 ) - 1 + UBND( 2 ) )
+
+*  Transform to user coords.
+        CALL AST_TRAN2( IWCS, 1, PC( 1 ), PC( 2 ), .TRUE., UC( 1 ),
+     :                  UC( 2 ), STATUS )
+
+*  Test if this position is inside the region. If so, set the returned
+*  interior bounding box to be infinite. Otherwise, set it to be null.
+        IF( ARD1_INTR( CMN_FRMC, TYPE, 2, NPAR, PAR, UC, .FALSE.,
+     :                 STATUS ) ) THEN
+           LBINTB( 1 ) = VAL__MAXI
+        ELSE
+           LBINTB( 1 ) = VAL__MINI
+        END IF
+
+*  Otherwise, update the returned interior bounding box.
+      ELSE
+         DO I = 1, 2
+            LBINTB( I ) = CMN_LBIBC( I )
+            UBINTB( I ) = CMN_UBIBC( I )
+         END DO
+      END IF
 
 *  Annul the Plot.
       CALL AST_ANNUL( IPLOT, STATUS )
