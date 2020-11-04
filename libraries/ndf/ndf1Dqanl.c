@@ -1,6 +1,7 @@
 #include "sae_par.h"
 #include "dat_par.h"
 #include "ndf1.h"
+#include "ndf_err.h"
 #include "mers.h"
 
 void ndf1Dqanl( NdfDCB *dcb, int del, int *status ){
@@ -69,6 +70,7 @@ void ndf1Dqanl( NdfDCB *dcb, int del, int *status ){
 */
 
 /* Local Variables: */
+   int isacc;            /* Is delete access available? */
    int state;            /* Whether array is in defined state */
    int tstat;            /* Temporary status variable */
    int valid;            /* Whether array identifier is valid */
@@ -117,7 +119,14 @@ void ndf1Dqanl( NdfDCB *dcb, int del, int *status ){
    within the quality structure is not allowed (this should never
    actually need to be done). */
                      } else {
-                        aryDelet( &dcb->qid, status );
+                        aryIsacc( dcb->qid, "DELETE", &isacc, status );
+                        if( isacc ) {
+                           aryDelet( &dcb->qid, status );
+                        } else if( *status == SAI__OK ){
+                           *status = NDF__QUDEF;
+                           errRep( " ", "Undefined Quality array encountered "
+                                   "in read-only NDF.", status );
+                        }
                         ndf1Antmp( &dcb->qloc, status );
                      }
                   }

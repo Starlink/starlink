@@ -1,6 +1,7 @@
 #include "sae_par.h"
 #include "dat_par.h"
 #include "ndf1.h"
+#include "ndf_err.h"
 #include "mers.h"
 
 void ndf1Dvanl( NdfDCB *dcb, int del, int *status ){
@@ -69,6 +70,7 @@ void ndf1Dvanl( NdfDCB *dcb, int del, int *status ){
 */
 
 /* Local Variables: */
+   int isacc;            /* Is delete access available? */
    int state;            /* Whether array is in defined state */
    int tstat;            /* Temporary status variable */
    int valid;            /* Whether array identifier is valid */
@@ -106,7 +108,14 @@ void ndf1Dvanl( NdfDCB *dcb, int del, int *status ){
 /* Otherwise, it must be deleted as an undefined array is not allowed
    (this should never actually need to be done). */
                   } else {
-                     aryDelet( &dcb->vid, status );
+                     aryIsacc( dcb->vid, "DELETE", &isacc, status );
+                     if( isacc ) {
+                        aryDelet( &dcb->vid, status );
+                     } else if( *status == SAI__OK ){
+                        *status = NDF__VUDEF;
+                        errRep( " ", "Undefined Variance array encountered "
+                                "in read-only NDF.", status );
+                     }
                   }
                }
             }
