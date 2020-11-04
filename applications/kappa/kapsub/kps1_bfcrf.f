@@ -323,11 +323,11 @@
 
 *  If no errors have been supplied, we only need to do one test set up
 *  above. So check that at least one of the errors has been supplied.
-         IF( SIGMA1 .EQ. VAL__BADD .AND.
-     :       SIGMA2 .EQ. VAL__BADD .AND.
-     :       SIGMA3 .EQ. VAL__BADD .AND.
-     :       SIGMA4 .EQ. VAL__BADD .AND.
-     :       SIGMA5 .EQ. VAL__BADD ) THEN
+         IF ( SIGMA1 .EQ. VAL__BADD .AND.
+     :        SIGMA2 .EQ. VAL__BADD .AND.
+     :        SIGMA3 .EQ. VAL__BADD .AND.
+     :        SIGMA4 .EQ. VAL__BADD .AND.
+     :        SIGMA5 .EQ. VAL__BADD ) THEN
             NTEST = 1
          ELSE
             NTEST = MXTEST
@@ -343,42 +343,42 @@
 
 *  Get the X pixel position at the centre, including a random
 *  perturbation if the parameter has an associated noise value.
-               IF( SIGMA1 .EQ. VAL__BADD ) THEN
+               IF ( SIGMA1 .EQ. VAL__BADD ) THEN
                   XC = PP( 1, IB )
                ELSE
-                  XC = PP( 1, IB ) + PDA_RNNOR( 0.0, REAL(SIGMA1))
+                  XC = PP( 1, IB ) + PDA_RNNOR( 0.0, REAL( SIGMA1 ) )
                END IF
 
 *  Get the Y pixel position at the centre, including a random
 *  perturbation if the parameter has an associated noise value.
-               IF( SIGMA2 .EQ. VAL__BADD ) THEN
+               IF ( SIGMA2 .EQ. VAL__BADD ) THEN
                   YC = PP( 2, IB )
                ELSE
-                  YC = PP( 2, IB ) + PDA_RNNOR( 0.0, REAL(SIGMA2))
+                  YC = PP( 2, IB ) + PDA_RNNOR( 0.0, REAL( SIGMA2 ) )
                END IF
 
 *  Get the first semi-axis width, including a random perturbation
 *  if the parameter has an associated noise value.
-               IF( SIGMA3 .EQ. VAL__BADD ) THEN
+               IF ( SIGMA3 .EQ. VAL__BADD ) THEN
                   WIDTH1 = PP( 3, IB )
                ELSE
-                  WIDTH1 = PP( 3, IB ) + PDA_RNNOR( 0.0, REAL(SIGMA3))
+                  WIDTH1 = PP( 3, IB ) + PDA_RNNOR( 0.0, REAL(SIGMA3) )
                END IF
 
 *  Get the second semi-axis width, including a random perturbation
 *  if the parameter has an associated noise value.
-               IF( SIGMA4 .EQ. VAL__BADD ) THEN
+               IF ( SIGMA4 .EQ. VAL__BADD ) THEN
                   WIDTH2 = PP( 4, IB )
                ELSE
-                  WIDTH2 = PP( 4, IB ) + PDA_RNNOR( 0.0, REAL(SIGMA4))
+                  WIDTH2 = PP( 4, IB ) + PDA_RNNOR( 0.0, REAL(SIGMA4) )
                END IF
 
 *  Get the cosine and sine of the orientation, including a random
 *  perturbation if the parameter has an associated noise value (if not,
 *  we retain the cosine and sine values set up before the "I" loop was
 *  entered).
-               IF( SIGMA5 .NE. VAL__BADD ) THEN
-                  ANGLE = PP( 5, IB ) + PDA_RNNOR( 0.0, REAL(SIGMA5))
+               IF ( SIGMA5 .NE. VAL__BADD ) THEN
+                  ANGLE = PP( 5, IB ) + PDA_RNNOR( 0.0, REAL(SIGMA5) )
                   COSVAL = COS( ANGLE )
                   SINVAL = SIN( ANGLE )
                END IF
@@ -388,12 +388,12 @@
                YPOS( J ) = YC
                J = J + 1
 
-               XPOS( J ) = XC + WIDTH1*COSVAL
-               YPOS( J ) = YC + WIDTH1*SINVAL
+               XPOS( J ) = XC + WIDTH1 * COSVAL
+               YPOS( J ) = YC + WIDTH1 * SINVAL
                J = J + 1
 
-               XPOS( J ) = XC - WIDTH2*SINVAL
-               YPOS( J ) = YC + WIDTH2*COSVAL
+               XPOS( J ) = XC - WIDTH2 * SINVAL
+               YPOS( J ) = YC + WIDTH2 * COSVAL
                J = J + 1
 
             END DO
@@ -421,7 +421,7 @@
          SWAP = ( WIDTH1 .LT. WIDTH2 )
          RP( 1, IB ) = A( 1 )
          RP( 2, IB ) = A( 2 )
-         IF( SWAP ) THEN
+         IF ( SWAP ) THEN
             RP( 3, IB ) = WIDTH2
             RP( 4, IB ) = WIDTH1
          ELSE
@@ -431,8 +431,8 @@
          RP( 5, IB ) = ANGLE
 
 *  If required find the errors on the returned parameters by looking at
-         IF( NTEST .EQ. MXTEST ) THEN
 *  the spead of values in WCS co-ordinates.
+         IF ( NTEST .EQ. MXTEST ) THEN
 
 *  Initialise the required running sums to hold just the unperturbed
 *  values found above. We use Welford's method for computing variance,
@@ -472,38 +472,38 @@
                WIDTH2 = AST_DISTANCE( CFRM, A, B, STATUS )
 
 *  Mind the gap---ensure the angle is close to the unperturbed value.
-               IF( ANGLE .GT. RP( 5, IB ) + PI ) THEN
-                  ANGLE = ANGLE - 2*PI
-               ELSE IF( ANGLE .LT. RP( 5, IB ) - PI ) THEN
-                  ANGLE = ANGLE + 2*PI
+               IF ( ANGLE .GT. RP( 5, IB ) + PI ) THEN
+                  ANGLE = ANGLE - 2.0D0 * PI
+               ELSE IF ( ANGLE .LT. RP( 5, IB ) - PI ) THEN
+                  ANGLE = ANGLE + 2.0D0 * PI
                END IF
 
 *  Increment the running sums.
                DELTA = A( 1 ) - WM1
-               WM1 = WM1 + DELTA/I
+               WM1 = WM1 + DELTA / I
                WS1 = WS1 + DELTA**2
                DELTA = A( 2 ) - WM2
-               WM2 = WM2 + DELTA/I
+               WM2 = WM2 + DELTA / I
                WS2 = WS2 + DELTA**2
 
-               IF( SWAP ) THEN
+               IF ( SWAP ) THEN
                   DELTA = WIDTH2 - WM3
-                  WM3 = WM3 + DELTA/I
+                  WM3 = WM3 + DELTA / I
                   WS3 = WS3 + DELTA**2
                   DELTA = WIDTH1 - WM4
-                  WM4 = WM4 + DELTA/I
+                  WM4 = WM4 + DELTA / I
                   WS4 = WS4 + DELTA**2
                ELSE
                   DELTA = WIDTH1 - WM3
-                  WM3 = WM3 + DELTA/I
+                  WM3 = WM3 + DELTA / I
                   WS3 = WS3 + DELTA**2
                   DELTA = WIDTH2 - WM4
-                  WM4 = WM4 + DELTA/I
+                  WM4 = WM4 + DELTA / I
                   WS4 = WS4 + DELTA**2
                END IF
 
                DELTA = ANGLE - WM5
-               WM5 = WM5 + DELTA/I
+               WM5 = WM5 + DELTA / I
                WS5 = WS5 + DELTA**2
 
             END DO
@@ -511,34 +511,34 @@
 *  Now calculate the standard deviations of the WCS parameter values.
 *  Do not assign errors to parameters that did not originally have an
 *  error.
-            IF( PSIGMA( 1, IB ) .NE. VAL__BADD ) THEN
-               RSIGMA( 1, IB ) = SQRT( WS1/(NTEST - 1) )
+            IF ( PSIGMA( 1, IB ) .NE. VAL__BADD ) THEN
+               RSIGMA( 1, IB ) = SQRT( WS1/( NTEST - 1 ) )
             ELSE
                RSIGMA( 1, IB ) = VAL__BADD
             END IF
 
-            IF( PSIGMA( 2, IB ) .NE. VAL__BADD ) THEN
-               RSIGMA( 2, IB ) = SQRT( WS2/(NTEST - 1) )
+            IF ( PSIGMA( 2, IB ) .NE. VAL__BADD ) THEN
+               RSIGMA( 2, IB ) = SQRT( WS2/( NTEST - 1 ) )
             ELSE
                RSIGMA( 2, IB ) = VAL__BADD
             END IF
 
-            IF( ( .NOT. SWAP .AND. PSIGMA( 3, IB ) .NE. VAL__BADD ) .OR.
-     :          ( SWAP .AND. PSIGMA( 4, IB ) .NE. VAL__BADD ) ) THEN
-               RSIGMA( 3, IB ) = SQRT( WS3/(NTEST - 1) )
+            IF ( ( .NOT. SWAP .AND. PSIGMA( 3, IB ) .NE. VAL__BADD ).OR.
+     :           ( SWAP .AND. PSIGMA( 4, IB ) .NE. VAL__BADD ) ) THEN
+               RSIGMA( 3, IB ) = SQRT( WS3 / ( NTEST - 1 ) )
             ELSE
                RSIGMA( 3, IB ) = VAL__BADD
             END IF
 
-            IF( ( .NOT. SWAP .AND. PSIGMA( 4, IB ) .NE. VAL__BADD ) .OR.
-     :          ( SWAP .AND. PSIGMA( 3, IB ) .NE. VAL__BADD ) ) THEN
-               RSIGMA( 4, IB ) = SQRT( WS4/(NTEST - 1) )
+            IF ( ( .NOT. SWAP .AND. PSIGMA( 4, IB ) .NE. VAL__BADD ).OR.
+     :           ( SWAP .AND. PSIGMA( 3, IB ) .NE. VAL__BADD ) ) THEN
+               RSIGMA( 4, IB ) = SQRT( WS4 / ( NTEST - 1 ) )
             ELSE
                RSIGMA( 4, IB ) = VAL__BADD
             END IF
 
-            IF( PSIGMA( 5, IB ) .NE. VAL__BADD ) THEN
-               RSIGMA( 5, IB ) = SQRT( WS5/(NTEST - 1) )
+            IF ( PSIGMA( 5, IB ) .NE. VAL__BADD ) THEN
+               RSIGMA( 5, IB ) = SQRT( WS5 / ( NTEST - 1 ) )
             ELSE
                RSIGMA( 5, IB ) = VAL__BADD
             END IF
@@ -559,17 +559,17 @@
          RP( 1, IB ) = A( 1 )
          RP( 2, IB ) = A( 2 )
 
-         IF( .NOT. ISSKY ) RP( 5, IB ) = -RP( 5, IB )
 *  We need to negate the WCS angle if the WCS Frame is not a SkyFrame,
 *  in order to get the advertised sign convention for the returned
 *  value.
+         IF ( .NOT. ISSKY ) RP( 5, IB ) = -RP( 5, IB )
 
 *  Ensure the returned WCS angle is in range 0 to PI radians.
-         DO WHILE(  RP( 5, IB ) .GT. PI )
+         DO WHILE ( RP( 5, IB ) .GT. PI )
             RP( 5, IB ) = RP( 5, IB ) - PI
          END DO
 
-         DO WHILE(  RP( 5, IB ) .LT. 0.0 )
+         DO WHILE ( RP( 5, IB ) .LT. 0.0 )
             RP( 5, IB ) = RP( 5, IB ) + PI
          END DO
 
