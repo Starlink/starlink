@@ -9,7 +9,7 @@
                     \& East Asian Observatory}
 \stardocnumber      {20.2}
 \stardocauthors     {H.\ S.\ Thomas, Malcolm J.\ Currie, \& H.\ A.\ L.\ Parsons}
-\stardocdate        {2020 April 8}
+\stardocdate        {2020 November 4}
 \stardoctitle       {The Heterodyne Data Reduction Cookbook}
 \stardocversion     {1.2}
 \stardocmanual      {\ }
@@ -3913,19 +3913,33 @@ the moments map.
 \\\\
 \textbf{Recipe options:}
 \begin{itemize}
+
+\item BASELINE\_ORDER: The polynomial order for baseline fitting
+\param{[1]}
+
+\item CLUMP\_METHOD: Method to find emission in the data
+(\param{clumpfind}/\param{fellwalker}/\param{thresh}) \param{[clumpfind]}
+
+\item FREQUENCY\_SMOOTH: Smoothing kernel size in channels along the
+frequency axis for baseline determination \param{[25]}
+
 \item MOMENTS:  Which moments maps to create (\param{integ}/\param{iwc}/\param{itd})
 \param{[integ]}
 
-\item MOMENTS\_LOWER: An optional lower velocity in \kms, below which
-no data will be used when creating the moments map.  \param{[undef]}
+\item MOMENTS\_LOWER\_VELOCITY: An optional lower velocity in \kms, below which
+no data will be used when creating the moments map \param{[undef]}
 
-\item MOMENTS\_UPPER: An optional upper velocity in \kms, above which
-no data will be used when creating the moments map. \param{[undef]}
+\item MOMENTS\_UPPER\_VELOCITY: An optional upper velocity in \kms, above which
+no data will be used when creating the moments map \param{[undef]}
 
-\item MOMENTS\_SNR: Whether or not to do clump detection on an
+\item MOMENTS\_SNR: Selects whether or not to do clump detection on an
 signal-to-noise cube instead of the signal cube. Enabling this is
 useful for data taken in varying conditions. \param{[0]}
+
+\item SPATIAL\_SMOOTH: Smoothing kernel size in pixels along both
+spatial axes for baseline determination \param{[3]}
 \end{itemize}
+
 
 \section{MOSAIC\_JCMT\_IMAGES}
 
