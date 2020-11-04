@@ -4567,6 +4567,8 @@ The parameters are classified for easier identification.
 \hline
 \textbf{Parameter} & \textbf{Description} \\
 \hline
+ALIGN\_SIDE\_BAND & Whether or not to combine sidebands in \makecube.\\
+\hline
 CLUMP\_METHOD & Method for identifying emission clumps: \texttt{Clumpfind},
                 \texttt{Fellwalker}, or \texttt{Thresh}.\\
 \hline
@@ -5002,8 +5004,11 @@ REF\_SPECTRUM\_COMBINE\_DETECTORS & If true, combine all detectors to form the
 
 REF\_SPECTRUM\_COMBINE\_REFPOS & Whether to combine observations by their
                                  reference position (\texttt{1}), or by observation
-                                 date \texttt{0}. \\
+                                 date (\texttt{0}). \\
 
+REF\_SPECTRUM\_FILE & An estimated reference spectrum in absorption, with other values
+                      set to zero, to remove reference lines that other methods fail
+                      to excise. \\
 
 REF\_SPECTRUM\_REGIONS & A comma-separated list of line extents ($v$2:$v$2) of the locations of
                          absorptions lines to excise. \\
