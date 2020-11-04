@@ -201,6 +201,7 @@
 *  Local Variables:
       CHARACTER*9 ATTR           ! Name of an AST attribute
       CHARACTER*100 BUF          ! Output buffer
+      LOGICAL EQUNIT             ! Same unit for both sky axes?
       CHARACTER*4 FORMAT         ! Orientation format
       INTEGER FRM2               ! Copied reporting Frame
       DOUBLE PRECISION FWHM      ! Full-width half maximum
@@ -216,6 +217,8 @@
       INTEGER REPAX              ! Axis used for reporting distances
       DOUBLE PRECISION S2FWHM    ! Standard deviation to FWHM
       DOUBLE PRECISION THETA     ! Orientation in degrees
+      CHARACTER*30 UNIT1         ! Units for first sky axis
+      CHARACTER*30 UNIT2         ! Units for second sky axis
 
 *.
 
@@ -299,7 +302,15 @@
 *  It would be messy inserting both of the expected sexagesimal formats.
 *  Report errors in arcseconds.
             ELSE
-               CALL MSG_SETC( 'UNIT', 'arcsec' )
+               UNIT1 = AST_GETC( CFRM, 'UNIT(1)', STATUS )
+               UNIT2 = AST_GETC( CFRM, 'UNIT(2)', STATUS )
+               EQUNIT = UNIT1 .EQ. UNIT2
+               IF ( EQUNIT ) THEN
+                  CALL MSG_SETC( 'UNIT', UNIT1 )
+               ELSE
+                  CALL MSG_SETC( 'UNIT', '' )
+               END IF
+               CALL MSG_SETC( 'EUNIT', 'arcsec' )
             END IF
          END IF
 
@@ -333,8 +344,8 @@
                END IF
             END IF
             CALL MSG_LOAD( 'KPS1_BFLOG_MSG2E', '    Centre      '/
-     :                     /'    : (^XP,^YP) +/- (^XE,^YE) ^UNIT',
-     :                     BUF, LBUF, STATUS )
+     :                     /'    : (^XP,^YP) ^UNIT +/- (^XE,^YE) '/
+     :                     /'^EUNIT', BUF, LBUF, STATUS )
          END IF
          IF ( LOGF ) CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
          CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
