@@ -38,8 +38,7 @@
 *        The AST Mapping from the PIXEL Frame of the NDF to the
 *        reporting Frame.
 *     CFRM = INTEGER (Given)
-*        A pointer to the current Frame of the NDF.  This argument is
-*        ignored if PIXEL is FALSE.
+*        A pointer to the current Frame of the NDF.
 *     NBEAM = INTEGER (Given)
 *        The number of beams fitted.
 *     NCOEF = INTEGER (Given)

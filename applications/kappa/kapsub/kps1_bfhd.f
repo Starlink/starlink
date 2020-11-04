@@ -13,7 +13,7 @@
 *     CALL KPS1_BFHD( CFRM, LOGF, FDL, NAXC, TITLE, STATUS )
 
 *  Description:
-*     This routine dislays an initial header for BEAMFIT.  It reports
+*     This routine displays an initial header for BEAMFIT.  It reports
 *     the co-ordinate system of the centre and FWHM before BEAMFIT
 *     displays a list of fitted beams.
 
