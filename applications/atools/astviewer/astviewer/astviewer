@@ -10,9 +10,10 @@
 
 import os
 import sys
-from PyQt4 import QtCore, QtGui, QtOpenGL
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5 import QtCore, QtGui, QtOpenGL
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from math import *
 import starlink.Ast as Ast
 import random
@@ -27,7 +28,7 @@ except ImportError:
 
 # If we are using Python3 QString is not defined
 try:
-    from PyQt4.QtCore import QString
+    from PyQt5.QtCore import QString
     py3 = False
 except ImportError:
     QString = type("")
@@ -3344,7 +3345,7 @@ class AstViewer(QMainWindow):
 
 #  ================================================================
 if __name__ == "__main__":
-   app = QtGui.QApplication(sys.argv)
+   app = QApplication(sys.argv)
 
    if len(sys.argv) > 1:
       infile = sys.argv[1]
