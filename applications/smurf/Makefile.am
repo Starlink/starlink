@@ -55,6 +55,7 @@ fts2portimbal \
 fts2removebse \
 fts2spectrum \
 fts2transcorr \
+gau2fit \
 gsd2acsis \
 gsdshow \
 impaztec \

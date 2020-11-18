@@ -162,6 +162,7 @@ void smurf_fts2_removebse( int * );
 void smurf_fts2_spatialwcs( int * );
 void smurf_fts2_spectrum( int * );
 void smurf_fts2_transcorr( int * );
+void smurf_gau2fit( int * );
 void smurf_gsd2acsis( int * );
 void smurf_gsdshow( int * );
 void smurf_impaztec( int * );

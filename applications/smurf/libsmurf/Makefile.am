@@ -35,6 +35,7 @@ smurf_fts2_removebse.c \
 smurf_fts2_spectrum.c \
 smurf_fts2_split.c \
 smurf_fts2_transcorr.c \
+smurf_gau2fit.c \
 smurf_gsd2acsis.c \
 smurf_gsdshow.c \
 smurf_impaztec.c \

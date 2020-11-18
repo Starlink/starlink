@@ -375,6 +375,8 @@ void smurf_mon( int * status ) {
     smurf_fts2_spectrum( status );
   } else if (strcmp( taskname, "FTS2TRANSCORR" ) == 0 ) {
     smurf_fts2_transcorr( status );
+  } else if (strcmp( taskname, "GAU2FIT" ) == 0 ) {
+    smurf_gau2fit( status );
   } else if (strcmp( taskname, "GSD2ACSIS" ) == 0 ) {
     smurf_gsd2acsis( status );
   } else if (strcmp( taskname, "GSDSHOW" ) == 0 ) {

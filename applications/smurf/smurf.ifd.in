@@ -2711,6 +2711,132 @@ package @PACKAGE@ {
             }
         }
 
+        action gau2fit {
+
+            helplib {$SMURF_HELP}
+
+            parameter amp1 {
+                type _DOUBLE
+                access WRITE
+                vpath DEFAULT
+                prompt {Amplitude of first Gaussian}
+                default 0
+                helpkey *
+            }
+
+            parameter amp2 {
+                type _DOUBLE
+                access WRITE
+                vpath DEFAULT
+                prompt {Amplitude of second Gaussian}
+                default 0
+                helpkey *
+            }
+
+            parameter back {
+                type _DOUBLE
+                access WRITE
+                vpath DEFAULT
+                prompt {Background level}
+                default 0
+                helpkey *
+            }
+
+            parameter centre {
+                type LITERAL
+                access WRITE
+                vpath DEFAULT
+                default { }
+                helpkey *
+            }
+
+            parameter fitback {
+                type _LOGICAL
+                access READ
+                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                default TRUE
+                prompt {Allow the background level to vary?}
+                helpkey *
+            }
+
+            parameter fwhm1 {
+                type _DOUBLE
+                access WRITE
+                vpath DEFAULT
+                prompt {FWHM of first Gaussian (arc-sec)}
+                default 0
+                helpkey *
+            }
+
+            parameter fwhm2 {
+                type _DOUBLE
+                access WRITE
+                vpath DEFAULT
+                prompt {FWHM of second Gaussian (arc-sec)}
+                default 0
+                helpkey *
+            }
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input NDF data structure}
+                helpkey *
+            }
+
+            parameter initcentre {
+                type LITERAL
+                access READ
+                ppath DYNAMIC CURRENT
+                vpath PROMPT
+                prompt {WCS coords at initial source centre}
+                helpkey *
+            }
+
+            parameter logfile {
+                type LITERAL
+                access READ
+                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                prompt {Name of log file}
+                default !
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Output data files}
+                helpkey *
+            }
+
+            parameter radius {
+                type _DOUBLE
+                size *
+                access READ
+                prompt {Source radius (arc-sec)}
+                helpkey *
+            }
+
+            parameter rms {
+                type _DOUBLE
+                access WRITE
+                vpath DEFAULT
+                prompt {RMS residual}
+                default 0
+                helpkey *
+            }
+
+        }
+
         action gsd2acsis {
             helplib {$SMURF_HELP}
 
