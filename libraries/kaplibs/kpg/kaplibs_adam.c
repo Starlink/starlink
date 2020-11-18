@@ -788,3 +788,52 @@ void kpg1Lgcmd( const char *appn, const char *pack, int *cputim, int *status ){
 
    return;
 }
+
+/* ------------------------------- */
+
+
+F77_SUBROUTINE(kpg1_gtpos)( CHARACTER(PARAM),
+                            INTEGER(IWCS),
+                            LOGICAL(PNULL),
+                            DOUBLE_ARRAY(CC),
+                            DOUBLE_ARRAY(BC),
+                            INTEGER(STATUS)
+                            TRAIL(PARAM) );
+
+void kpg1Gtpos( const char *param, AstFrameSet *iwcs, int null,
+                double *cc, double *bc, int *status ){
+   DECLARE_CHARACTER_DYN(PARAM);
+   DECLARE_INTEGER(IWCS);
+   DECLARE_LOGICAL(PNULL);
+   DECLARE_DOUBLE_ARRAY_DYN(CC);
+   DECLARE_DOUBLE_ARRAY_DYN(BC);
+   DECLARE_INTEGER(STATUS);
+
+   int nb = astGetI( iwcs, "Nin" );
+   int nc = astGetI( iwcs, "Nout" );
+
+   F77_CREATE_EXPORT_CHARACTER( param, PARAM );
+   F77_EXPORT_INTEGER( astP2I( iwcs ), IWCS );
+   F77_EXPORT_LOGICAL( null, PNULL );
+   F77_EXPORT_INTEGER( *status, STATUS );
+   F77_CREATE_DOUBLE_ARRAY( CC, nc );
+   F77_CREATE_DOUBLE_ARRAY( BC, nb );
+   F77_ASSOC_DOUBLE_ARRAY( CC, cc );
+   F77_ASSOC_DOUBLE_ARRAY( BC, bc );
+
+   F77_LOCK( F77_CALL(kpg1_gtpos)( CHARACTER_ARG(PARAM),
+                                   INTEGER_ARG(&IWCS),
+                                   LOGICAL_ARG(&PNULL),
+                                   DOUBLE_ARRAY_ARG(CC),
+                                   DOUBLE_ARRAY_ARG(BC),
+                                   INTEGER_ARG(&STATUS)
+                                   TRAIL_ARG(PARAM) ); )
+
+   F77_IMPORT_DOUBLE_ARRAY( BC, bc, nb );
+   F77_IMPORT_DOUBLE_ARRAY( CC, cc, nc );
+   F77_FREE_CHARACTER( PARAM );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+

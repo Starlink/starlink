@@ -222,6 +222,9 @@ size_t kpg1Typsz( const char *type, int *status );
 
 void kpg1Badbits( const char *type, char buf[8], size_t *nb, int *status );
 
+void kpg1Gtpos( const char *param, AstFrameSet *iwcs, int null,
+                double *cc, double *bc, int *status );
+
 /* Now include the expanded generic prototypes. */
 #include "kpg_cgen.h"
 
