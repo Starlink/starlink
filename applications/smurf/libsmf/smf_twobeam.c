@@ -428,8 +428,10 @@ static void smf1_init_guess( Params *params, double cx, double cy,
    double dmin;
    double s1;
    double s2;
+   double s3;
    double radsq;
    gsl_vector *x;
+   int s4;
 
 /* Initialise returned values */
    *a1 = VAL__BADD;
@@ -454,6 +456,8 @@ static void smf1_init_guess( Params *params, double cx, double cy,
    dmin = VAL__MAXD;
    s1 = 0.0;
    s2 = 0.0;
+   s3 = 0.0;
+   s4 = 0;
    for( iy = 1; iy <= ny; iy++ ) {
       for( ix = 1; ix <= nx; ix++,pa++ ) {
          if( *pa != VAL__BADD ) {
@@ -471,9 +475,11 @@ static void smf1_init_guess( Params *params, double cx, double cy,
             if( *pa < dmin ) dmin = *pa;
 
 /* Also update the sums needed to find the weighted mean of the squared
-   radius, where the weight is the data value. */
+   radius, where the weight is the data value minus the minimum data value. */
             s1 += (*pa)*radsq;
             s2 += (*pa);
+            s3 += radsq;
+            s4++;
          }
       }
    }
@@ -485,7 +491,7 @@ static void smf1_init_guess( Params *params, double cx, double cy,
 /* Find the square root of half the weighted mean of the squared radius. If
    the source were a single Gaussian, this would be equal to the standard
    deviation of the source. Convert to FWHM and return. */
-   *fwhm1 = sqrt( s1/(2*s2) )*S2F;
+   *fwhm1 = sqrt( 0.5*(s1 - dmin*s3)/(s2 - s4*dmin) );
 
 /* Since the second Gaussian has amplitude zero, its FWHM is immaterial.
    Arbitrarily set it to twice the FWHM of the first Gaussian. */
@@ -541,10 +547,10 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    double beamrad;
    double bsum;
    double cx;
+   double fac;
    double cy;
    double f;
    double pixsize;
-   double reldiff;
    double sigma1;
    double sigma2;
    double srchgt;
@@ -602,6 +608,7 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    centred on the centre of a pixel. The fine grid has a pixel size of
    PSIZE arc-sec and the beam is centred on the centre of the fine grid. */
    nxb = 2*(int)(beamrad/PSIZE) + 1;
+   if( nxb < 100 ) nxb = 100;
 
 /* Set the constant row offset between the centre of the beam array and
    source array. */
@@ -739,18 +746,20 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
 /* If the two Gaussians have the same width, they become redundant. So
    encourage larger differences in the widths by increasing the cost if
    the two widths are close to each other. */
-#define THRESH 0.2
-      if( sigma1 <= 0.0 ){
-         f = VAL__MAXD;
+#define SIGMA_TOL 5.0
+#define BIGFAC 100.0
+      if( sigma2 - sigma1 <= 0.0 ) {
+         f *= BIGFAC;
       } else {
-         reldiff = ( sigma2 - sigma1 )/sigma1;
-         if( reldiff == 0.0 ) {
-            f = VAL__MAXD;
-         } else if( reldiff < THRESH ){
-            f *= THRESH/reldiff;
+         fac = SIGMA_TOL/( sigma2 - sigma1 );
+         if( fac > BIGFAC ) {
+            f *= BIGFAC;
+         } else if( fac > 1.0 ) {
+            f *= fac;
          }
       }
-#undef THRESH
+#undef SIGMA_TOL
+#undef BIGFAC
 
 /* If required, print a line holding the interesting values to the log
    file. */
@@ -1083,60 +1092,64 @@ static void smf1_twobeam( void *job_data_ptr, int *status ) {
    centre to each pixel centre, in arc-sec. */
       nv = (l2 - l1 + 1 )*nx;
       radii = astMalloc( nv*sizeof(*radii) );
-      pr = radii;
-      pa = pdata->array + ( l1 - 1 )*nx;
-      for( iy = l1; iy <= l2; iy++ ) {
-         for( ix = 1; ix <= nx; ix++,pa++,pr++) {
-            if( *pa != VAL__BADD ) {
-               dx = ix - cx;
-               dy = iy - cy;
-               *pr = sqrt( dx*dx + dy*dy )*pixsize;
-            } else {
-               *pr = AST__BAD;
+      if( radii ) {
+         pr = radii;
+         pa = pdata->array + ( l1 - 1 )*nx;
+         for( iy = l1; iy <= l2; iy++ ) {
+            for( ix = 1; ix <= nx; ix++,pa++,pr++) {
+               if( *pa != VAL__BADD ) {
+                  dx = ix - cx;
+                  dy = iy - cy;
+                  *pr = sqrt( dx*dx + dy*dy )*pixsize;
+               } else {
+                  *pr = AST__BAD;
+               }
             }
          }
-      }
 
 /* Allocate an array to store the corresponding LUT values and
    use the lutmap to transform the radii values into LUT values. */
-      lutvals = astMalloc( nv*sizeof(*lutvals) );
-      astTran1( lutmap, nv, radii, 1, lutvals );
+         lutvals = astMalloc( nv*sizeof(*lutvals) );
+         astTran1( lutmap, nv, radii, 1, lutvals );
 
 /* Calculate the residual at each good pixel in the data array. */
-      nsum = 0;
-      pl = lutvals;
-      pa = pdata->array + ( l1 - 1 )*nx;
-      po = pdata->out + ( l1 - 1 )*nx;
-      f = 0.0;
-      for( iy = l1; iy <= l2; iy++ ) {
-         for( ix = 1; ix <= nx; ix++,pa++,po++,pl++) {
-            if( *pa != VAL__BADD ) {
+         nsum = 0;
+         pl = lutvals;
+         pr = radii;
+         pa = pdata->array + ( l1 - 1 )*nx;
+         po = pdata->out + ( l1 - 1 )*nx;
+         f = 0.0;
+         for( iy = l1; iy <= l2; iy++ ) {
+            for( ix = 1; ix <= nx; ix++,pa++,po++,pl++,pr++) {
+               if( *pa != VAL__BADD ) {
 
 /* Get the corresponding LUT value (the convolution of the beam and the
    source at this radius), add on the background and store it in the
    returned model array. */
-               m = *pl + back;
-               *po = m;
-               if( m > maxm  ) maxm = m;
+                  m = *pl + back;
+                  *po = m;
+                  if( m > maxm  ) maxm = m;
 
 /* Calculate the residual between the convolution value and the data
    value and increment the sum of the squared residuals. */
-               res = *pa - m;
-               f += res*res;
-               nsum++;
+                  res = *pa - m;
+                  f += res*res);
+                  nsum++;
 
-            } else {
-               *po = VAL__BADD;
+               } else {
+                  *po = VAL__BADD;
+               }
             }
          }
+
+         pdata->f = f;
+         pdata->nsum = nsum;
+         pdata->maxm = maxm;
+         lutvals = astFree( lutvals );
       }
 
       radii = astFree( radii );
-      lutvals = astFree( lutvals );
       lutmap = astAnnul( lutmap );
-      pdata->f = f;
-      pdata->nsum = nsum;
-      pdata->maxm = maxm;
 
 
 /* Calculate the current beam on a fine grid.
