@@ -2145,7 +2145,7 @@ void smf_write_smfFilter( ThrWorkForce *wf, const smfFilter *filt, const char *f
 
 void smf_twobeam( ThrWorkForce *wf, double *array, dim_t nx, dim_t ny, double pixsize,
                   double *cx, double *cy, double radius, const char *log,
-                  int fitback, double *a1, double *a2, double *fwhm1,
+                  int fitback, int fittwo, double *a1, double *a2, double *fwhm1,
                   double *fwhm2, double *back, double *model, double *rms,
                   int *status );
 

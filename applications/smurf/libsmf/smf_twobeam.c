@@ -16,7 +16,7 @@
 *  Invocation:
 *     smf_twobeam( ThrWorkForce *wf, double *array, dim_t nx, dim_t ny,
 *                  double pixsize, double *cx, double *cy, double radius,
-*                  const char *log, int fitback, double *a1, double *a2,
+*                  const char *log, int fitback, int fittwo, double *a1, double *a2,
 *                  double *fwhm1, double *fwhm2, double *back, double *resids,
 *                  double *rms, int *status )
 
@@ -47,16 +47,20 @@
 *        If non-zero, the background level is included in the fitting
 *        process as a free parameter. If zero, the background level is
 *        fixed at zero.
+*     fittwo = int (Given)
+*        If non-zero, two Gaussians are used in the fit. Otherwise, only
+*        one Gaussian is fitted.
 *     a1 = double * (Returned)
 *        Returned holding the amplitude of the first component Gaussian.
 *     a2 = double * (Returned)
 *        Returned holding the amplitude of the second component Gaussian.
+*        Zero is always returned if "fittwo" is zero.
 *     fwhm1 = double * (Returned)
 *        Returned holding the FWHM (arc-sec) of the first component
 *        Gaussian.
 *     fwhm2 = double * (Returned)
 *        Returned holding the FWHM (arc-sec) of the second component
-*        Gaussian.
+*        Gaussian.  Zero is always returned if "fittwo" is zero.
 *     back = double * (Returned)
 *        Returned holding the background level. This will be zero if
 *        "fitback" is zero.
@@ -70,12 +74,12 @@
 *        Pointer to global status.
 
 *  Description:
-*     This routine finds the parameters of a two-component Gaussian beam
-*     by doing a least squares fit to a supplied 2D NDF containing an
-*     image of a compact source. The source need not be a point source -
-*     it is assumed to be a sharp-edged circular disc of specified radius.
-*     On each iteration of the fitting process, this source is convolved
-*     with the candidate two-component beam and the residuals with the
+*     This routine finds the parameters of a two-component (or one-component
+*     if "fittwo" is zero) Gaussian beam by doing a least squares fit to a
+*     supplied 2D NDF containing an image of a compact source. The source
+*     need not be a point source - it is assumed to be a sharp-edged circular
+*     disc of specified radius. On each iteration of the fitting process, this
+*     source is convolved with the candidate beam and the residuals with the
 *     supplied image are then found. The parameters of the beam are modified
 *     on each iteration to minimise the sum of the squared residuals. The
 *     beam consists of two concentric Gaussians added together. The first
@@ -83,10 +87,10 @@
 *     varied during the minimisation process:
 *
 *     - The FWHM of the first Gaussian.
-*     - The FWHM and amplitude of the second Gaussian.
+*     - The FWHM and amplitude of the second Gaussian (if "fittwo" is non-zero)
 *     - The centre position of the beam within the supplied image.
 *     - The peak value in the source.
-*     - The background level (optional - see "fitback" above)
+*     - The background level (if "fitback" is non-zero)
 
 *  Authors:
 *     DSB: David Berry (EAO)
@@ -144,53 +148,55 @@
 
 /* Local data types; */
 typedef struct Params {
+   FILE *fd;
    ThrWorkForce *wf;
    double *array;  /* Array of data values */
-   hdsdim nx;      /* Length of above arrays */
-   hdsdim ny;      /* Length of above arrays */
-   double srcrad;  /* Radius of tophat source (arc-sec) */
-   hdsdim nxs;
-   int dims[2];
+   double *out;
    double *source;
-   FILE *fd;
+   double maxm;
    double ms;
    double pixsize;
-   double *out;
+   double srcrad;  /* Radius of tophat source (arc-sec) */
+   hdsdim nx;      /* Length of above arrays */
+   hdsdim nxs;
+   hdsdim ny;      /* Length of above arrays */
+   int dims[2];
    int fitback;
-   double maxm;
+   int fittwo;
 } Params;
 
 typedef struct SmfTwoBeamData {
-   int operation;
-   hdsdim nxb;
-   hdsdim nxs;
-   hdsdim nx;
-   hdsdim l1;
-   hdsdim l2;
-   hdsdim yoff;
+   double *array;
    double *beam;
+   double *grid;
    double *lut;
+   double *out;
+   double *result;
    double *source;
-   double srchgt;
+   double a1;
+   double a2;
+   double back;
    double bsum;
    double cx;
    double cy;
-   double pixsize;
-   double back;
-   double *out;
-   double *array;
    double f;
-   double ms;
-   hdsdim nsum;
-   double a1;
-   double a2;
    double fac1;
    double fac2;
-   double sigma1;
-   double sigma2;
-   double *result;
+   double fpsize;
    double maxm;
-   double psl;
+   double sigma2;
+   double sigma1;
+   double srchgt;
+   hdsdim l1;
+   hdsdim l2;
+   hdsdim nsum;
+   hdsdim nx;
+   hdsdim nxb;
+   hdsdim nxf;
+   hdsdim nxs;
+   hdsdim yoff;
+   int ncomp;
+   int operation;
 } SmfTwoBeamData;
 
 
@@ -219,7 +225,7 @@ static double smf1_domin( Params *params, double *srchgt, double *a1,
 /* Main entry point */
 void smf_twobeam( ThrWorkForce *wf, double *array, dim_t nx, dim_t ny,
                   double pixsize, double *cx, double *cy, double radius,
-                  const char *log, int fitback, double *a1, double *a2,
+                  const char *log, int fitback, int fittwo, double *a1, double *a2,
                   double *fwhm1, double *fwhm2, double *back, double *resids,
                   double *rms, int *status ){
 
@@ -252,6 +258,7 @@ void smf_twobeam( ThrWorkForce *wf, double *array, dim_t nx, dim_t ny,
    params.srcrad = radius;
    params.source = smf1_source( radius, &(params.nxs), status );
    params.fitback = fitback;
+   params.fittwo = fittwo;
    params.fd = NULL;
 
 /* Get an initial guess at the beam parameters. */
@@ -325,7 +332,8 @@ static double smf1_domin( Params *params, double *srchgt, double *a1,
 
 /* Store details of the service routines that calculate the function to
    be minimised and its derivatives. */
-   my_func.n = params->fitback ? 7 : 6;
+   my_func.n = params->fitback ? 5 : 4;
+   if( params->fittwo ) my_func.n += 2;
    my_func.f = &smf1_f;
    my_func.params = (void *) params;
 
@@ -335,23 +343,39 @@ static double smf1_domin( Params *params, double *srchgt, double *a1,
    (plus the beam centre, the two Gaussian widths and - maybe - background
    level). */
    x = gsl_vector_alloc( my_func.n );
-   gsl_vector_set( x, 0, *a2 );
-   gsl_vector_set( x, 1, *srchgt );
-   gsl_vector_set( x, 2, (*fwhm1)/S2F );
-   gsl_vector_set( x, 3, (*fwhm2)/S2F );
-   gsl_vector_set( x, 4, *cx );
-   gsl_vector_set( x, 5, *cy );
-   if( params->fitback ) gsl_vector_set( x, 6, *back );
+   if( params->fittwo ) {
+      gsl_vector_set( x, 0, *a2 );
+      gsl_vector_set( x, 1, *srchgt );
+      gsl_vector_set( x, 2, (*fwhm1)/S2F );
+      gsl_vector_set( x, 3, (*fwhm2)/S2F );
+      gsl_vector_set( x, 4, *cx );
+      gsl_vector_set( x, 5, *cy );
+      if( params->fitback ) gsl_vector_set( x, 6, *back );
+   } else {
+      gsl_vector_set( x, 0, *srchgt );
+      gsl_vector_set( x, 1, (*fwhm1)/S2F );
+      gsl_vector_set( x, 2, *cx );
+      gsl_vector_set( x, 3, *cy );
+      if( params->fitback ) gsl_vector_set( x, 4, *back );
+   }
 
 /* Store the initial step sizes. */
    step_size = gsl_vector_alloc( my_func.n );
-   gsl_vector_set( step_size, 0, 0.1 );
-   gsl_vector_set( step_size, 1, 0.1*(*srchgt) );
-   gsl_vector_set( step_size, 2, params->pixsize );
-   gsl_vector_set( step_size, 3, params->pixsize );
-   gsl_vector_set( step_size, 4, params->pixsize );
-   gsl_vector_set( step_size, 5, params->pixsize );
-   if( params->fitback ) gsl_vector_set( step_size, 6, 0.1*(*srchgt) );
+   if( params->fittwo ) {
+      gsl_vector_set( step_size, 0, 0.1 );
+      gsl_vector_set( step_size, 1, 0.1*(*srchgt) );
+      gsl_vector_set( step_size, 2, params->pixsize );
+      gsl_vector_set( step_size, 3, params->pixsize );
+      gsl_vector_set( step_size, 4, params->pixsize );
+      gsl_vector_set( step_size, 5, params->pixsize );
+      if( params->fitback ) gsl_vector_set( step_size, 6, 0.1*(*srchgt) );
+   } else {
+      gsl_vector_set( step_size, 0, 0.1*(*srchgt) );
+      gsl_vector_set( step_size, 1, params->pixsize );
+      gsl_vector_set( step_size, 2, params->pixsize );
+      gsl_vector_set( step_size, 3, params->pixsize );
+      if( params->fitback ) gsl_vector_set( step_size, 4, 0.1*(*srchgt) );
+   }
 
 /* Create a minimiser. */
    s = gsl_multimin_fminimizer_alloc( gsl_multimin_fminimizer_nmsimplex2,
@@ -377,14 +401,24 @@ static double smf1_domin( Params *params, double *srchgt, double *a1,
             cost, size );
 
 /* Get the beam parameters. */
-   *a2 = gsl_vector_get( s->x, 0 );
    *a1 = 1.0;
-   *srchgt = gsl_vector_get( s->x, 1 );
-   sigma1 = gsl_vector_get( s->x, 2 );
-   sigma2 = gsl_vector_get( s->x, 3 );
-   *cx = gsl_vector_get( s->x, 4 );
-   *cy = gsl_vector_get( s->x, 5 );
-   if( params->fitback ) *back = gsl_vector_get( s->x, 6 );
+   if( params->fittwo ) {
+      *a2 = gsl_vector_get( s->x, 0 );
+      *srchgt = gsl_vector_get( s->x, 1 );
+      sigma1 = gsl_vector_get( s->x, 2 );
+      sigma2 = gsl_vector_get( s->x, 3 );
+      *cx = gsl_vector_get( s->x, 4 );
+      *cy = gsl_vector_get( s->x, 5 );
+      if( params->fitback ) *back = gsl_vector_get( s->x, 6 );
+   } else {
+      *a2 = 0.0;
+      *srchgt = gsl_vector_get( s->x, 0 );
+      sigma1 = gsl_vector_get( s->x, 1 );
+      sigma2 = 0.0;
+      *cx = gsl_vector_get( s->x, 2 );
+      *cy = gsl_vector_get( s->x, 3 );
+      if( params->fitback ) *back = gsl_vector_get( s->x, 4 );
+   }
 
 /* Convert standard deviations to FWHMs. */
    *fwhm1 = sigma1*S2F;
@@ -504,14 +538,23 @@ static void smf1_init_guess( Params *params, double cx, double cy,
 
 /* Use the cost function to get the maximum value in the model implied by
    the initial guess beam parameters. */
-   x = gsl_vector_alloc( params->fitback ? 7 : 6 );
-   gsl_vector_set( x, 0, *a2 );
-   gsl_vector_set( x, 1, *srchgt );
-   gsl_vector_set( x, 2, (*fwhm1)/S2F );
-   gsl_vector_set( x, 3, (*fwhm2)/S2F );
-   gsl_vector_set( x, 4, cx );
-   gsl_vector_set( x, 5, cy );
-   if( params->fitback ) gsl_vector_set( x, 6, *back );
+   if( params->fittwo ){
+      x = gsl_vector_alloc( params->fitback ? 7 : 6 );
+      gsl_vector_set( x, 0, *a2 );
+      gsl_vector_set( x, 1, *srchgt );
+      gsl_vector_set( x, 2, (*fwhm1)/S2F );
+      gsl_vector_set( x, 3, (*fwhm2)/S2F );
+      gsl_vector_set( x, 4, cx );
+      gsl_vector_set( x, 5, cy );
+      if( params->fitback ) gsl_vector_set( x, 6, *back );
+   } else {
+      x = gsl_vector_alloc( params->fitback ? 5 : 4 );
+      gsl_vector_set( x, 0, *srchgt );
+      gsl_vector_set( x, 1, (*fwhm1)/S2F );
+      gsl_vector_set( x, 2, cx );
+      gsl_vector_set( x, 3, cy );
+      if( params->fitback ) gsl_vector_set( x, 4, *back );
+   }
    (void) smf1_f( x, params );
    gsl_vector_free( x );
 
@@ -536,10 +579,8 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    SmfTwoBeamData *pdata;
    ThrWorkForce *wf;
    double *beam = NULL;
+   double *grid = NULL;
    double *lut = NULL;
-   double *lut2 = NULL;
-   double *pl2;
-   double *pl;
    double *source;
    double a1;
    double a2;
@@ -547,26 +588,26 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    double beamrad;
    double bsum;
    double cx;
-   double fac;
    double cy;
    double f;
+   double fac;
+   double fpsize;
    double pixsize;
    double sigma1;
    double sigma2;
    double srchgt;
-   double sum;
-   hdsdim nl;
    hdsdim nsum;
    hdsdim nx;
    hdsdim nxb;
+   hdsdim nxf;
    hdsdim nxs;
    hdsdim ny;
+   hdsdim nyf;
    hdsdim step;
    hdsdim yoff;
-   int compress;
-   int i;
+   int fittwo;
    int iw;
-   int j;
+   int ncomp;
    int nw0;
    int nw;
    int status = SAI__OK;
@@ -584,29 +625,45 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    nxs = params->nxs;
    pixsize = params->pixsize;
    wf = params->wf;
+   fittwo = params->fittwo;
 
 /* Get the current parameters of the beam. */
-   a2 = gsl_vector_get( v, 0 );
    a1 = 1.0;
-   srchgt = gsl_vector_get( v, 1 );
-   sigma1 = gsl_vector_get( v, 2 );
-   sigma2 = gsl_vector_get( v, 3 );
-   cx = gsl_vector_get( v, 4 );
-   cy = gsl_vector_get( v, 5 );
-   back = params->fitback ? gsl_vector_get( v, 6 ) : 0.0;
-
-/* Get three times the larger of the two beam widths, in arcsec. The beam
-   is assumed to have insignificant value beyond this radius. */
-   if( sigma1 > sigma2 ) {
-      beamrad = 3*sigma1;
+   if( fittwo ){
+      a2 = gsl_vector_get( v, 0 );
+      srchgt = gsl_vector_get( v, 1 );
+      sigma1 = gsl_vector_get( v, 2 );
+      sigma2 = gsl_vector_get( v, 3 );
+      cx = gsl_vector_get( v, 4 );
+      cy = gsl_vector_get( v, 5 );
+      back = params->fitback ? gsl_vector_get( v, 6 ) : 0.0;
    } else {
-      beamrad = 3*sigma2;
+      a2 = 0.0;
+      srchgt = gsl_vector_get( v, 0 );
+      sigma1 = gsl_vector_get( v, 1 );
+      sigma2 = sigma1*2;
+      cx = gsl_vector_get( v, 2 );
+      cy = gsl_vector_get( v, 3 );
+      back = params->fitback ? gsl_vector_get( v, 4 ) : 0.0;
+   }
+
+/* Get the radius (in arc-sec) at which the wider of the two two Gaussians fall to
+   0.1% of the peak value of the total beam. */
+   if( a1 == 0.0 ) {
+      beamrad = sigma2*sqrt( 2*log( a2/0.001 ) );
+   } else if( a2 == 0.0 ) {
+      beamrad = sigma1*sqrt( 2*log( a1/0.001 ) );
+   } else if( sigma2 > sigma1 ) {
+      beamrad = sigma2*sqrt( 2*log( a2/( 0.001*( a1 + a2 ) ) ) );
+   } else {
+      beamrad = sigma1*sqrt( 2*log( a1/( 0.001*( a1 + a2 ) ) ) );
    }
 
 /* Get the number of pixels on the fine grid to use to represent the full
-   significant width of the beam. Ensure this is odd so that the beam is
-   centred on the centre of a pixel. The fine grid has a pixel size of
-   PSIZE arc-sec and the beam is centred on the centre of the fine grid. */
+   significant width of the beam determined above. Ensure this is odd so
+   that the beam is centred on the centre of a pixel. The fine grid has a
+   pixel size of PSIZE arc-sec and the beam is centred on the centre of
+   the fine grid. */
    nxb = 2*(int)(beamrad/PSIZE) + 1;
    if( nxb < 100 ) nxb = 100;
 
@@ -621,8 +678,8 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    job_data = astCalloc( nw, sizeof(*job_data) );
    if( job_data ) {
 
-/* Create a square array holding the candidate beam values on thsi fine
-   grid. */
+/* Create a square array holding the candidate beam values on this fine
+   grid. This returns the total data sum in the beam array. */
       beam = smf1_beam( wf, job_data, nxb, a1, a2, sigma1, sigma2, &bsum,
                         &status );
 
@@ -631,7 +688,9 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    the source centre and beam centre. The source and beam are both circular
    and so there should be azimuthal symetry. The x separation between source
    and beam changes on each pass round this loop but the y separation remains
-   constant at zero. Initially, the beam and source are concentric. */
+   constant at zero. Initially, the beam and source are concentric (i.e.
+   the first element in this LUT corresponds to zero separation between
+   beam centres and source centre). */
       lut = astMalloc( nxb*sizeof( *lut ) );
 
 /* Find how many LUT entries to process in each worker thread. */
@@ -672,24 +731,45 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
 /* Wait until all jobs have been completed. */
       thrWait( wf, &status );
 
-/* Reduce the resolution of the LUT to match the pixel size of the map
-   (roughly) by averaging an integer number of the PSIZE bins into each
-   new bin. */
-      compress = (int)( 0.5 + pixsize/PSIZE );
-      nl = nxb/compress;
-      lut2 = astMalloc( nl*sizeof( *lut2 ) );
+/* Allocate a grid that has the same size as the data array in arc-sec,
+   but which uses a pixel size close to PSIZE. Each data pixel corresponds
+   to a square of (ncomp,ncomp) pixels in this fine grid and each pixel in
+   the grid has size "fpsize" arc-sec. */
+      ncomp = pixsize/PSIZE;
+      fpsize = pixsize/ncomp;
+      nxf = nx*ncomp;
+      nyf = ny*ncomp;
+      grid = astMalloc( nxf*nyf*sizeof(*grid) );
 
-      pl = lut;
-      pl2 = lut2;
-      for( i = 0; i < nl; i++ ) {
-         sum = *(pl++);
-         for( j = 1; j < compress; j++ ) sum += *(pl++);
-         *(pl2++) = sum/compress;
+/* Fill this grid with the value of the convolution of the source centred
+   at (cx,cy) with the current beam. */
+      if( nyf <= nw ) {
+         step = 1;
+         nw0 = nyf;
+      } else {
+         step = nyf/nw;
+         nw0 = nw;
       }
+      for( iw = 0; iw < nw0; iw++ ) {
+         pdata = job_data + iw;
+         pdata->l1 = iw*step;
+         if( iw < nw0 - 1 ) {
+            pdata->l2 = pdata->l1 + step - 1;
+         } else {
+            pdata->l2 = nyf - 1 ;
+         }
+         pdata->nxf = nxf;
+         pdata->grid = grid;
+         pdata->fpsize = fpsize;
+         pdata->cx = (cx - 0.5)*ncomp + 0.5;
+         pdata->cy = (cy - 0.5)*ncomp + 0.5;
+         pdata->operation = 2;
+         thrAddJob( wf, 0, pdata, smf1_twobeam, 0, NULL, &status );
+      }
+      thrWait( wf, &status );
 
-/* Now use this LUT to create the model - a map of the source smoothed
-   with the current beam. Each thread creates a range of lines in the map.
-   Determine the number of lines per thread. */
+/* Bin this fine grid back to the pixel size of the data array, and find
+   the residuals between the binned convolution and the data array. */
       if( ny <= nw ) {
          step = 1;
          nw0 = ny;
@@ -697,9 +777,6 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
          step = ny/nw;
          nw0 = nw;
       }
-
-/* Store the range of lines to be processed by each one. Ensure that the last
-   thread picks up any left-over lines. */
       for( iw = 0; iw < nw0; iw++ ) {
          pdata = job_data + iw;
          pdata->l1 = iw*step;
@@ -708,24 +785,16 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
          } else {
             pdata->l2 = ny - 1 ;
          }
+         pdata->operation = 3;
 
-         pdata->operation = 2;
          pdata->nx = nx;
-         pdata->cx = cx;
-         pdata->cy = cy;
-         pdata->pixsize = pixsize;
+         pdata->ncomp = ncomp;
          pdata->back = back;
          pdata->out = params->out;
          pdata->array = params->array;
-         pdata->lut = lut2;
-         pdata->nxb = nl;
-         pdata->psl = PSIZE*compress;
 
-/* Submit the job to the worker thread. */
          thrAddJob( wf, 0, pdata, smf1_twobeam, 0, NULL, &status );
       }
-
-/* Wait until all jobs have been completed. */
       thrWait( wf, &status );
 
 /* Add up the running sums returned by each thread and find the max model
@@ -748,14 +817,16 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    the two widths are close to each other. */
 #define SIGMA_TOL 5.0
 #define BIGFAC 100.0
-      if( sigma2 - sigma1 <= 0.0 ) {
-         f *= BIGFAC;
-      } else {
-         fac = SIGMA_TOL/( sigma2 - sigma1 );
-         if( fac > BIGFAC ) {
+      if( params->fittwo ){
+         if( sigma2 - sigma1 <= 0.0 ) {
             f *= BIGFAC;
-         } else if( fac > 1.0 ) {
-            f *= fac;
+         } else {
+            fac = SIGMA_TOL/( sigma2 - sigma1 );
+            if( fac > BIGFAC ) {
+               f *= BIGFAC;
+            } else if( fac > 1.0 ) {
+               f *= fac;
+            }
          }
       }
 #undef SIGMA_TOL
@@ -772,7 +843,7 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
 
 /* Free resources */
    lut = astFree( lut );
-   lut2 = astFree( lut2 );
+   grid = astFree( grid );
    beam = astFree( beam );
    job_data = astFree( job_data );
 
@@ -784,7 +855,9 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
 /*-------------------------------------------------------------------------
    Create a 2D array with fine pixels (size given by PSIZE) holding the
    beam shape specified by the supplied parameters. The beam is centred
-   on the centre of the array, which is square with dimension "nxb".
+   on the centre of the array, which is square with dimension "nxb". The
+   total data sum in the array is returned in "*beamsum". The returned
+   pointer should be freed using astFree when no longer needed.
 */
 static double *smf1_beam( ThrWorkForce *wf, SmfTwoBeamData *job_data,
                           hdsdim nxb, double a1, double a2,
@@ -818,7 +891,12 @@ static double *smf1_beam( ThrWorkForce *wf, SmfTwoBeamData *job_data,
       nw = wf ? wf->nworker : 1;
 
 /* How many array lines are to be processed by each worker thread. */
-      step = nxb/nw;
+      if( nxb < nw ) {
+         step = 1;
+         nw = nxb;
+      } else {
+         step = nxb/nw;
+      }
 
 /* Store the range of array lines to be processed by each worker thread.
    Ensure that the last thread picks up any left-over lines. */
@@ -828,7 +906,7 @@ static double *smf1_beam( ThrWorkForce *wf, SmfTwoBeamData *job_data,
          if( iw < nw - 1 ) {
             pdata->l2 = pdata->l1 + step - 1;
          } else {
-            pdata->l2 = nxb - 1 ;
+            pdata->l2 = nxb - 1;
          }
 
 /* Store other info needed by the worker thread. */
@@ -840,7 +918,7 @@ static double *smf1_beam( ThrWorkForce *wf, SmfTwoBeamData *job_data,
          pdata->sigma1 = sigma1;
          pdata->sigma2 = sigma2;
          pdata->result = result;
-         pdata->operation = 3;
+         pdata->operation = 4;
 
 /* Submit the job to the worker thread. */
          thrAddJob( wf, 0, pdata, smf1_twobeam, 0, NULL, status );
@@ -942,15 +1020,15 @@ static void smf1_twobeam( void *job_data_ptr, int *status ) {
    AstLutMap *lutmap;
    SmfTwoBeamData *pdata;
    double *beam;
-   double *lutvals;
    double *pa;
    double *pb0;
    double *pb;
+   double *pg;
    double *pl;
-   double *po;
+   double *pm0;
+   double *pm1;
    double *pr;
    double *ps;
-   double *radii;
    double *source;
    double a1;
    double a2;
@@ -961,12 +1039,12 @@ static void smf1_twobeam( void *job_data_ptr, int *status ) {
    double dx;
    double dy;
    double f;
-   double fac2;
    double fac1;
+   double fac2;
+   double fac;
+   double fpsize;
    double m;
    double maxm;
-   double pixsize;
-   double psl;
    double radsq;
    double res;
    double srchgt;
@@ -983,16 +1061,23 @@ static void smf1_twobeam( void *job_data_ptr, int *status ) {
    hdsdim iy;
    hdsdim iyb;
    hdsdim iyc;
+   hdsdim iyf;
    hdsdim iys;
    hdsdim l1;
    hdsdim l2;
+   hdsdim lf1;
+   hdsdim lf2;
    hdsdim nsum;
    hdsdim nx;
    hdsdim nxb;
+   hdsdim nxf;
    hdsdim nxs;
    hdsdim xoff;
    hdsdim yoff;
+   int ic;
+   int ncomp;
    int nv;
+
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -1069,8 +1154,9 @@ static void smf1_twobeam( void *job_data_ptr, int *status ) {
          }
       }
 
-/* Produce the map holding the source convolved with the current beam.
-   ================================================================== */
+
+/* Store the convolution value on a fine grid.
+   ========================================== */
    } else if( pdata->operation == 2 ) {
 
 /* Copy stuff into local variables for convenience. */
@@ -1078,83 +1164,112 @@ static void smf1_twobeam( void *job_data_ptr, int *status ) {
       cy = pdata->cy;
       l1 = pdata->l1 + 1;
       l2 = pdata->l2 + 1;
-      back = pdata->back;
-      pixsize = pdata->pixsize;
-      nx = pdata->nx;
-      psl = pdata->psl;
-      maxm = VAL__MIND;
+      fpsize = pdata->fpsize;
+      nxf = pdata->nxf;
 
-/* Use a LutMap to look up values in the lut, since this gives us linear
-   interpolation for free. */
-      lutmap = astLutMap( pdata->nxb, pdata->lut, 0.5*psl, psl, " " );
-
-/* Allocate an array and store in it the radial distance from the source
-   centre to each pixel centre, in arc-sec. */
-      nv = (l2 - l1 + 1 )*nx;
-      radii = astMalloc( nv*sizeof(*radii) );
-      if( radii ) {
-         pr = radii;
-         pa = pdata->array + ( l1 - 1 )*nx;
-         for( iy = l1; iy <= l2; iy++ ) {
-            for( ix = 1; ix <= nx; ix++,pa++,pr++) {
-               if( *pa != VAL__BADD ) {
-                  dx = ix - cx;
-                  dy = iy - cy;
-                  *pr = sqrt( dx*dx + dy*dy )*pixsize;
-               } else {
-                  *pr = AST__BAD;
-               }
-            }
+/* Loop over the lines of the fine grid to be processed by this thread,
+   storing the radial distance from the source centre to each pixel centre,
+   in arc-sec. Note, (ix,iy) are the GRID coords of the pixel centre in
+   the fine grid. */
+      pg = pdata->grid + ( l1 - 1 )*nxf;
+      for( iy = l1; iy <= l2; iy++ ) {
+         for( ix = 1; ix <= nxf; ix++,pg++) {
+            dx = ix - cx;
+            dy = iy - cy;
+            *pg = sqrt( dx*dx + dy*dy )*fpsize;
          }
-
-/* Allocate an array to store the corresponding LUT values and
-   use the lutmap to transform the radii values into LUT values. */
-         lutvals = astMalloc( nv*sizeof(*lutvals) );
-         astTran1( lutmap, nv, radii, 1, lutvals );
-
-/* Calculate the residual at each good pixel in the data array. */
-         nsum = 0;
-         pl = lutvals;
-         pr = radii;
-         pa = pdata->array + ( l1 - 1 )*nx;
-         po = pdata->out + ( l1 - 1 )*nx;
-         f = 0.0;
-         for( iy = l1; iy <= l2; iy++ ) {
-            for( ix = 1; ix <= nx; ix++,pa++,po++,pl++,pr++) {
-               if( *pa != VAL__BADD ) {
-
-/* Get the corresponding LUT value (the convolution of the beam and the
-   source at this radius), add on the background and store it in the
-   returned model array. */
-                  m = *pl + back;
-                  *po = m;
-                  if( m > maxm  ) maxm = m;
-
-/* Calculate the residual between the convolution value and the data
-   value and increment the sum of the squared residuals. */
-                  res = *pa - m;
-                  f += res*res;
-                  nsum++;
-
-               } else {
-                  *po = VAL__BADD;
-               }
-            }
-         }
-
-         pdata->f = f;
-         pdata->nsum = nsum;
-         pdata->maxm = maxm;
-         lutvals = astFree( lutvals );
       }
 
-      radii = astFree( radii );
-      lutmap = astAnnul( lutmap );
+/* Use a LutMap to look up values in the lut, since this gives us linear
+   interpolation for free. The first value in the LUT corresponds to zero
+   separation between beam and source. Note, the spacing in the LUT is
+   "PSIZE", not "fpsize". */
+      lutmap = astLutMap( pdata->nxb, pdata->lut, 0.0, PSIZE, " " );
+      nv = ( l2 - l1 + 1 )*nxf;
+      pg = pdata->grid + ( l1 - 1 )*nxf;
+      astTran1( lutmap, nv, pg, 1, pg );
+
+
+/* Bin the convolution values in the fine grid up to the resolution of
+   the data grid and find the residuals between the binned convolution
+   values and the data array.
+   ============================================================== */
+   } else if( pdata->operation == 3 ) {
+      l1 = pdata->l1;       /* First zero-based data array row index to process */
+      l2 = pdata->l2;       /* Last zero-based data array row index to process */
+      back = pdata->back;   /* Background level */
+      nx = pdata->nx;       /* Length of one row in the data array */
+      nxf = pdata->nxf;     /* Length of one row in the fine array */
+      ncomp = pdata->ncomp; /* Number of fine pixels along each data pixel */
+      fac = 1.0/( ncomp * ncomp ); /* Normalisation factor */
+
+
+fac = 1.0;
+int icen = ncomp/2;
+
+
+/* Initialise the section of the output data array used to accumulate the
+   coresponding values from the fine grid. */
+      pm0 = pdata->out + l1*nx; /* Pointer to first pixel in current output data row */
+      memset( pm0, 0, nx*( l2 - l1 + 1 )*sizeof(*pm0) );
+
+/* Loop round all the data rows being processed by this thread, keeping
+   track of the range of rows in the fine grid that fall in the current
+   data row. */
+      maxm = VAL__MIND;  /* Maximum output data value found so far */
+      nsum = 0;          /* Total number of values summed in "f" */
+      f = 0.0;           /* Sum of squared residuals */
+      lf1 = l1*ncomp;    /* Zero-based index of first fine row in current data row */
+      lf2 = lf1 + ncomp; /* Zero-based index of first fine row NOT in current data row */
+      pg = pdata->grid + lf1*nxf; /* Pointer to first pixel in current fine row */
+      pa = pdata->array + l1*nx;  /* Pointer to first pixel in current input data row */
+      for( iy = l1; iy <= l2; iy++ ) {   /* Index of current data row */
+
+/* Loop round all the rows of the fine grid that fall in the current row
+   of the data grid. */
+int jc = 0;
+         for( iyf = lf1; iyf < lf2; iyf++,jc++ ) { /* Index of current fine row */
+
+/* Loop round all pixels in the current row of the output data grid. */
+            pm1 = pm0;
+            for( ix = 0; ix < nx; ix++,pm1++ ){
+
+/* Add all the elements of the fine grid into the output data grid. */
+               for( ic = 0; ic < ncomp; ic++ ) {
+                  if( ic == icen && jc == icen ) {
+                     *pm1 += *(pg++);
+                  } else {
+                     pg++;
+                  }
+               }
+            }
+         }
+
+/* Normalise the data grid values formed above for the current data row, add on the
+   background and find the residual from the supplied data  grid. */
+         for( ix = 0; ix < nx; ix++,pm0++,pa++ ){
+            m = *pm0*fac + back;
+            *pm0 = m;
+            if( *pa != VAL__BADD ) {
+               res = *pa - m;
+               f += res*res;
+               nsum++;
+               if( m > maxm  ) maxm = m;
+            }
+         }
+
+         lf1 += ncomp;
+         lf2 += ncomp;
+      }
+
+      pdata->f = f;
+      pdata->nsum = nsum;
+      pdata->maxm = maxm;
 
 
 /* Calculate the current beam on a fine grid.
    ================================================================== */
-   } else if( pdata->operation == 3 ) {
+   } else if( pdata->operation == 4 ) {
 
 /* Copy stuff into local variables for convenience. */
       a1 = pdata->a1;

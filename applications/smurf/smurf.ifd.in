@@ -2760,6 +2760,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter fittwo {
+                type _LOGICAL
+                access READ
+                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                default TRUE
+                prompt {Use a two-component beam?}
+                helpkey *
+            }
+
             parameter fwhm1 {
                 type _DOUBLE
                 access WRITE

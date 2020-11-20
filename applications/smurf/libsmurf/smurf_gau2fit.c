@@ -19,20 +19,20 @@
 *        Pointer to global status.
 
 *  Description:
-*     This routine finds the parameters of a two-component Gaussian beam
-*     by doing a least squares fit to a supplied 2D NDF containing an
+*     This routine finds the parameters of a one- or two-component Gaussian
+*     beam by doing a least squares fit to a supplied 2D NDF containing an
 *     image of a compact source. The source need not be a point source
 *     - it is assumed to be a sharp-edged circular disc of specified radius.
 *     On each iteration of the fitting process, this simplified source
-*     model is convolved with the candidate two-component beam and the
-*     residuals with the supplied image are then found. The parameters of
-*     the beam are modified on each iteration to minimise the sum of the
-*     squared residuals. The beam consists of two concentric Gaussians added
+*     model is convolved with the candidate beam and the residuals with the
+*     supplied image are then found. The parameters of the beam are modified
+*     on each iteration to minimise the sum of the squared residuals. The beam
+*     consists of one or two (see parameter FITTWO) concentric Gaussians added
 *     together. The first Gaussian has a fixed amplitude of 1.0. The following
 *     parameters are varied during the minimisation process:
 *
 *     - The FWHM of the first Gaussian.
-*     - The FWHM and amplitude of the second Gaussian.
+*     - The FWHM and amplitude of the second Gaussian (if used).
 *     - The centre position of the beam within the supplied image.
 *     - The peak value in the source.
 *     - The background level (but only if parameter FITBACK is TRUE).
@@ -65,6 +65,9 @@
 *          If FALSE, the background level is fixed at zero throughout the
 *          minimisation. If TRUE, the background level is included as
 *          one of the free parameters in the fit. [TRUE]
+*     FITTWO = _LOGICAL (Read)
+*          If TRUE, the beam consists of two Gaussians. Otherwise only
+*          one Gaussian is used. [TRUE]
 *     FWHM1 = _DOUBLE (Write)
 *          An output parameter holding the FWHM of the first fitted Gaussian
 *          in arc-sec.
@@ -173,6 +176,7 @@ void smurf_gau2fit( int *status ) {
    hdsdim lbnd[ 2 ];
    hdsdim ubnd[ 2 ];
    int fitback;
+   int fittwo;
    int indf;
    int indfo;
    int isky;
@@ -248,6 +252,9 @@ void smurf_gau2fit( int *status ) {
 /* See if the background level is to be fixed at zero. */
    parGet0l( "FITBACK", &fitback, status );
 
+/* See if the beam consists of two Gaissans or one. */
+   parGet0l( "FITTWO", &fittwo, status );
+
 /* Get the log file, if any. */
    if( *status == SAI__OK ) {
       parGet0c( "LOGFILE", logfile, sizeof(logfile), status );
@@ -259,8 +266,8 @@ void smurf_gau2fit( int *status ) {
 
 /* Fit a 2-component Gaussian to the source in the supplied NDF. */
    smf_twobeam( wf, ipd, dims[ 0 ], dims[ 1 ], pixsize, bc + 0, bc + 1,
-                radius, logfile, fitback, &a1, &a2, &fwhm1, &fwhm2, &back,
-                ipo, &rms, status );
+                radius, logfile, fitback, fittwo, &a1, &a2, &fwhm1, &fwhm2,
+                &back, ipo, &rms, status );
 
 /* Convert centre grid coords to current frame. */
    astTran2( iwcs, 1, bc, bc + 1, 1, &a, &b );
@@ -277,10 +284,12 @@ void smurf_gau2fit( int *status ) {
    msgOut( " ", "First component:", status );
    msgOutf( " ", "   Amplitude: %g", status, a1 );
    msgOutf( " ", "   FWHM: %g arc-sec", status, fwhm1 );
-   msgBlank( status );
-   msgOut( " ", "Second component:", status );
-   msgOutf( " ", "   Amplitude: %g", status, a2 );
-   msgOutf( " ", "   FWHM: %g arc-sec", status, fwhm2 );
+   if( fittwo ){
+      msgBlank( status );
+      msgOut( " ", "Second component:", status );
+      msgOutf( " ", "   Amplitude: %g", status, a2 );
+      msgOutf( " ", "   FWHM: %g arc-sec", status, fwhm2 );
+   }
    msgBlank( status );
    msgOut( " ", "Background:", status );
    msgOutf( " ", "   %g", status, back );
