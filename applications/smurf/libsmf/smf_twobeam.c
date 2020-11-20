@@ -1133,7 +1133,7 @@ static void smf1_twobeam( void *job_data_ptr, int *status ) {
 /* Calculate the residual between the convolution value and the data
    value and increment the sum of the squared residuals. */
                   res = *pa - m;
-                  f += res*res);
+                  f += res*res;
                   nsum++;
 
                } else {
