@@ -172,7 +172,6 @@ typedef struct Params {
 typedef struct SmfTwoBeamData {
    double *array;
    double *beam;
-   double *grid;
    double *lut;
    double *out;
    double *result;
@@ -186,7 +185,7 @@ typedef struct SmfTwoBeamData {
    double f;
    double fac1;
    double fac2;
-   double fpsize;
+   double pixsize;
    double maxm;
    double sigma2;
    double sigma1;
@@ -630,22 +629,18 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    double cy;
    double f;
    double fac;
-   double fpsize;
    double pixsize;
    double sigma1;
    double sigma2;
    double srchgt;
    hdsdim nx;
    hdsdim nxb;
-   hdsdim nxf;
    hdsdim nxs;
    hdsdim ny;
-   hdsdim nyf;
    hdsdim step;
    hdsdim yoff;
    int fittwo;
    int iw;
-   int ncomp;
    int nw0;
    int nw;
    int status = SAI__OK;
@@ -764,45 +759,8 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
 /* Wait until all jobs have been completed. */
       thrWait( wf, &status );
 
-/* Allocate a grid that has the same size as the data array in arc-sec,
-   but which uses a pixel size close to PSIZE. Each data pixel corresponds
-   to a square of (ncomp,ncomp) pixels in this fine grid and each pixel in
-   the grid has size "fpsize" arc-sec. */
-      ncomp = pixsize/PSIZE;
-      fpsize = pixsize/ncomp;
-      nxf = nx*ncomp;
-      nyf = ny*ncomp;
-      grid = astMalloc( nxf*nyf*sizeof(*grid) );
-
-/* Fill this grid with the value of the convolution of the source centred
-   at (cx,cy) with the current beam. */
-      if( nyf <= nw ) {
-         step = 1;
-         nw0 = nyf;
-      } else {
-         step = nyf/nw;
-         nw0 = nw;
-      }
-      for( iw = 0; iw < nw0; iw++ ) {
-         pdata = job_data + iw;
-         pdata->l1 = iw*step;
-         if( iw < nw0 - 1 ) {
-            pdata->l2 = pdata->l1 + step - 1;
-         } else {
-            pdata->l2 = nyf - 1 ;
-         }
-         pdata->nxf = nxf;
-         pdata->grid = grid;
-         pdata->fpsize = fpsize;
-         pdata->cx = (cx - 0.5)*ncomp + 0.5;
-         pdata->cy = (cy - 0.5)*ncomp + 0.5;
-         pdata->operation = 2;
-         thrAddJob( wf, 0, pdata, smf1_twobeam, 0, NULL, &status );
-      }
-      thrWait( wf, &status );
-
-/* Bin this fine grid back to the pixel size of the data array, and find
-   the residuals between the binned convolution and the data array. */
+/* Fill the model grid with the value of the convolution of the source centred
+   at (cx,cy) with the current beam, and add on the background. */
       if( ny <= nw ) {
          step = 1;
          nw0 = ny;
@@ -818,14 +776,15 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
          } else {
             pdata->l2 = ny - 1 ;
          }
-         pdata->operation = 3;
 
+         pdata->cx = cx;
+         pdata->cy = cy;
+         pdata->pixsize = pixsize;
          pdata->nx = nx;
-         pdata->ncomp = ncomp;
          pdata->back = back;
          pdata->out = params->out;
          pdata->array = params->array;
-
+         pdata->operation = 2;
          thrAddJob( wf, 0, pdata, smf1_twobeam, 0, NULL, &status );
       }
       thrWait( wf, &status );
@@ -960,7 +919,7 @@ static double *smf1_beam( ThrWorkForce *wf, SmfTwoBeamData *job_data,
          pdata->sigma1 = sigma1;
          pdata->sigma2 = sigma2;
          pdata->result = result;
-         pdata->operation = 4;
+         pdata->operation = 3;
 
 /* Submit the job to the worker thread. */
          thrAddJob( wf, 0, pdata, smf1_twobeam, 0, NULL, status );
@@ -1067,8 +1026,6 @@ static void smf1_twobeam( void *job_data_ptr, int *status ) {
    double *pb;
    double *pg;
    double *pl;
-   double *pm0;
-   double *pm1;
    double *pr;
    double *ps;
    double *source;
@@ -1080,13 +1037,13 @@ static void smf1_twobeam( void *job_data_ptr, int *status ) {
    double cy;
    double dx;
    double dy;
+   double dy2;
    double f;
    double fac1;
    double fac2;
-   double fac;
-   double fpsize;
    double m;
    double maxm;
+   double pixsize;
    double radsq;
    double res;
    double srchgt;
@@ -1103,20 +1060,14 @@ static void smf1_twobeam( void *job_data_ptr, int *status ) {
    hdsdim iy;
    hdsdim iyb;
    hdsdim iyc;
-   hdsdim iyf;
    hdsdim iys;
    hdsdim l1;
    hdsdim l2;
-   hdsdim lf1;
-   hdsdim lf2;
    hdsdim nx;
    hdsdim nxb;
-   hdsdim nxf;
    hdsdim nxs;
    hdsdim xoff;
    hdsdim yoff;
-   int ic;
-   int ncomp;
    int nv;
 
 
@@ -1205,113 +1156,61 @@ static void smf1_twobeam( void *job_data_ptr, int *status ) {
       cy = pdata->cy;
       l1 = pdata->l1 + 1;
       l2 = pdata->l2 + 1;
-      fpsize = pdata->fpsize;
-      nxf = pdata->nxf;
+      nx = pdata->nx;
+      back = pdata->back;
+      pixsize = pdata->pixsize;
 
-/* Loop over the lines of the fine grid to be processed by this thread,
+/* Loop over the lines of the data array to be processed by this thread,
    storing the radial distance from the source centre to each pixel centre,
    in arc-sec. Note, (ix,iy) are the GRID coords of the pixel centre in
-   the fine grid. */
-      pg = pdata->grid + ( l1 - 1 )*nxf;
+   the data array. */
+      pg = pdata->out + ( l1 - 1 )*nx;
       for( iy = l1; iy <= l2; iy++ ) {
-         for( ix = 1; ix <= nxf; ix++,pg++) {
+         dy = iy - cy;
+         dy2 = dy*dy;
+         for( ix = 1; ix <= nx; ix++,pg++) {
             dx = ix - cx;
-            dy = iy - cy;
-            *pg = sqrt( dx*dx + dy*dy )*fpsize;
+            *pg = sqrt( dx*dx + dy2 )*pixsize;
          }
       }
 
 /* Use a LutMap to look up values in the lut, since this gives us linear
    interpolation for free. The first value in the LUT corresponds to zero
    separation between beam and source. Note, the spacing in the LUT is
-   "PSIZE", not "fpsize". */
+   "PSIZE", not "pixsize". */
       lutmap = astLutMap( pdata->nxb, pdata->lut, 0.0, PSIZE, " " );
-      nv = ( l2 - l1 + 1 )*nxf;
-      pg = pdata->grid + ( l1 - 1 )*nxf;
+      nv = ( l2 - l1 + 1 )*nx;
+      pg = pdata->out + ( l1 - 1 )*nx;
       astTran1( lutmap, nv, pg, 1, pg );
 
-
-/* Bin the convolution values in the fine grid up to the resolution of
-   the data grid and find the residuals between the binned convolution
-   values and the data array.
-   ============================================================== */
-   } else if( pdata->operation == 3 ) {
-      l1 = pdata->l1;       /* First zero-based data array row index to process */
-      l2 = pdata->l2;       /* Last zero-based data array row index to process */
-      back = pdata->back;   /* Background level */
-      nx = pdata->nx;       /* Length of one row in the data array */
-      nxf = pdata->nxf;     /* Length of one row in the fine array */
-      ncomp = pdata->ncomp; /* Number of fine pixels along each data pixel */
-      fac = 1.0/( ncomp * ncomp ); /* Normalisation factor */
-
-
-fac = 1.0;
-int icen = ncomp/2;
-
-
-/* Initialise the section of the output data array used to accumulate the
-   coresponding values from the fine grid. */
-      pm0 = pdata->out + l1*nx; /* Pointer to first pixel in current output data row */
-      memset( pm0, 0, nx*( l2 - l1 + 1 )*sizeof(*pm0) );
-
-/* Loop round all the data rows being processed by this thread, keeping
-   track of the range of rows in the fine grid that fall in the current
-   data row. */
+/* Initialise things. */
       maxm = VAL__MIND;  /* Maximum output data value found so far */
       f = 0.0;           /* Sum of squared residuals */
-      lf1 = l1*ncomp;    /* Zero-based index of first fine row in current data row */
-      lf2 = lf1 + ncomp; /* Zero-based index of first fine row NOT in current data row */
-      pg = pdata->grid + lf1*nxf; /* Pointer to first pixel in current fine row */
-      pa = pdata->array + l1*nx;  /* Pointer to first pixel in current input data row */
-      for( iy = l1; iy <= l2; iy++ ) {   /* Index of current data row */
 
-/* Loop round all the rows of the fine grid that fall in the current row
-   of the data grid. */
-int jc = 0;
-         for( iyf = lf1; iyf < lf2; iyf++,jc++ ) { /* Index of current fine row */
-
-/* Loop round all pixels in the current row of the output data grid. */
-            pm1 = pm0;
-            for( ix = 0; ix < nx; ix++,pm1++ ){
-
-/* Add all the elements of the fine grid into the output data grid. */
-               for( ic = 0; ic < ncomp; ic++ ) {
-                  *pm1 += *(pg++);
-/*
-if( ic == icen && jc == icen ) {
-   *pm1 += *(pg++);
-} else {
-   pg++;
-}
-*/
-
-               }
-            }
-         }
-
-/* Normalise the data grid values formed above for the current data row, add on the
-   background and find the residual from the supplied data  grid. */
-         for( ix = 0; ix < nx; ix++,pm0++,pa++ ){
-            m = *pm0*fac + back;
-            *pm0 = m;
-            if( *pa != VAL__BADD ) {
+/* Loop again over the lines of the data array to be processed by this thread,
+   forming the model value at each pixel and summing the squared
+   residuals. */
+      pa = pdata->array + ( l1 - 1 )*nx;
+      pg = pdata->out + ( l1 - 1 )*nx;
+      for( iy = l1; iy <= l2; iy++ ) {
+         for( ix = 1; ix <= nx; ix++,pg++,pa++) {
+            m = ( *pg += back );
+            if( *pa != VAL__BADD ){
                res = *pa - m;
                f += res*res;
                if( m > maxm  ) maxm = m;
             }
          }
-
-         lf1 += ncomp;
-         lf2 += ncomp;
       }
 
       pdata->f = f;
       pdata->maxm = maxm;
 
 
+
 /* Calculate the current beam on a fine grid.
    ================================================================== */
-   } else if( pdata->operation == 4 ) {
+   } else if( pdata->operation == 3 ) {
 
 /* Copy stuff into local variables for convenience. */
       a1 = pdata->a1;
