@@ -4,6 +4,7 @@
 *     GAU2FIT
 
 *  Purpose:
+*     Fit a two-component Gausian to a map of an extended source.
 
 *  Language:
 *     Starlink ANSI C
