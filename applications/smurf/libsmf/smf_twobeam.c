@@ -153,8 +153,10 @@ typedef struct Params {
    double *array;  /* Array of data values */
    double *out;
    double *source;
+   double beamrad;
    double maxm;
-   double ms;
+   double fmin;
+   double ssr;
    double pixsize;
    double srcrad;  /* Radius of tophat source (arc-sec) */
    hdsdim nx;      /* Length of above arrays */
@@ -163,6 +165,8 @@ typedef struct Params {
    int dims[2];
    int fitback;
    int fittwo;
+   int last_is_best;
+   int reset;
 } Params;
 
 typedef struct SmfTwoBeamData {
@@ -189,7 +193,6 @@ typedef struct SmfTwoBeamData {
    double srchgt;
    hdsdim l1;
    hdsdim l2;
-   hdsdim nsum;
    hdsdim nx;
    hdsdim nxb;
    hdsdim nxf;
@@ -208,13 +211,13 @@ static double *smf1_source( double radius, hdsdim *nxs, int *status );
 static void smf1_init_guess( Params *params, double cx, double cy,
                              double *a1, double *a2, double *srchgt,
                              double *fwhm1, double *fwhm2, double *back,
-                             int *status );
+                             hdsdim *ngood, int *status );
 static double smf1_f( const gsl_vector *v, void *pars );
 static double *smf1_beam( ThrWorkForce *wf, SmfTwoBeamData *job_data,
                           hdsdim nxb, double a1, double a2,
                           double sigma1, double sigma2, double *beamsum,
                           int *status );
-static double smf1_domin( Params *params, double *srchgt, double *a1,
+static double smf1_domin( Params *params, hdsdim ngood, double *srchgt, double *a1,
                           double *a2, double *fwhm1, double *fwhm2,
                           double *back, double *cx, double *cy, double *rms,
                           int *iter, int *status );
@@ -230,12 +233,15 @@ void smf_twobeam( ThrWorkForce *wf, double *array, dim_t nx, dim_t ny,
                   double *rms, int *status ){
 
 /* Local Variables: */
-   FILE *fd;
+   FILE *fd = NULL;
    Params params;
    double f;
    double f_last;
    double srchgt;
+   hdsdim ngood;
+   int ifit;
    int iter;
+   int nfit;
 
 /* Initialise returned values */
    *a1 = VAL__BADD;
@@ -258,12 +264,12 @@ void smf_twobeam( ThrWorkForce *wf, double *array, dim_t nx, dim_t ny,
    params.srcrad = radius;
    params.source = smf1_source( radius, &(params.nxs), status );
    params.fitback = fitback;
-   params.fittwo = fittwo;
    params.fd = NULL;
 
-/* Get an initial guess at the beam parameters. */
+/* Get an initial guess at the beam parameters (an analytical single Gaussian
+   approximation to a point source). */
    smf1_init_guess( &params, *cx, *cy, a1, a2, &srchgt, fwhm1, fwhm2, back,
-                    status );
+                    &ngood, status );
 
 /* Check a reasonable initial guess was obtained. */
    if( srchgt == VAL__BADD || *fwhm1 > 1000.0 || *fwhm2 > 1000.0 ){
@@ -272,30 +278,52 @@ void smf_twobeam( ThrWorkForce *wf, double *array, dim_t nx, dim_t ny,
          errRep( " ", "Could not get a believable initial guess at the "
                  "beam size.", status );
       }
-
-/* If so, open and initialise any log file. */
    } else {
-      if( log[ 0 ] ) {
-         fd = fopen( log, "w" );
-         fprintf( fd, "# Iter srchgt a1 a2 sigma1 sigma2 back f cx cy\n" );
-      } else {
-         fd = NULL;
-      }
-      params.fd = fd;
+
+/* If we are fitting two Gaussian, we do an initial fit with only one
+   Gaussian, then do a subsequent second fit with two Gaussian that uses the
+   result of the first fit as the initial guess at the parameters. */
+      nfit = fittwo ? 2 : 1;
+      for( ifit = 0; ifit < nfit; ifit++ ){
+         params.fittwo = ifit;
+         params.reset = 1;
+         if( fittwo ){
+            if( ifit == 0 ) {
+               msgOut(" ", "Doing initial single Gaussian fit...", status );
+            } else {
+               msgOut(" ", "Doing full two Gaussian fit...", status );
+
+/* Set an initial guess at the width of the second Gaussian. Using zero
+   produces a bad fit. */
+               *fwhm2 = 2*(*fwhm1);
+            }
+         }
+
+/* If this is the last fit, open the log file if required. */
+         if( ifit == nfit - 1 ){
+            if( log[ 0 ] ) {
+               fd = fopen( log, "w" );
+               fprintf( fd, "# Iter srchgt a1 a2 sigma1 sigma2 back f cx cy\n" );
+            } else {
+               fd = NULL;
+            }
+            params.fd = fd;
+         }
 
 /* Do an initial minimisation, starting from the guess found above. */
-      iter = 0;
-      f = smf1_domin( &params, &srchgt, a1,  a2, fwhm1, fwhm2, back, cx, cy,
-                      rms, &iter, status );
+         iter = 0;
+         f = smf1_domin( &params, ngood, &srchgt, a1,  a2, fwhm1, fwhm2, back, cx, cy,
+                         rms, &iter, status );
 
 /* If the above minimisation managed to reduce the cost to less than 0.9 of
    its original value, then do another minimisation starting from the best
    point found in the previous minimisation. */
-      f_last = 2*f;
-      while( f < 0.9*f_last && *status == SAI__OK ) {
-         f_last = f;
-         f = smf1_domin( &params, &srchgt, a1,  a2, fwhm1, fwhm2, back, cx, cy,
-                         rms, &iter, status );
+         f_last = 2*f;
+         while( f < 0.9*f_last && *status == SAI__OK ) {
+            f_last = f;
+            f = smf1_domin( &params, ngood, &srchgt, a1,  a2, fwhm1, fwhm2, back, cx, cy,
+                            rms, &iter, status );
+         }
       }
 
 /* Clean up. */
@@ -310,7 +338,7 @@ void smf_twobeam( ThrWorkForce *wf, double *array, dim_t nx, dim_t ny,
 /*-------------------------------------------------------------------------
   Do a single minimisation, starting from the supplied parameter values
 */
-static double smf1_domin( Params *params, double *srchgt, double *a1,
+static double smf1_domin( Params *params, hdsdim ngood, double *srchgt, double *a1,
                           double *a2, double *fwhm1, double *fwhm2,
                           double *back, double *cx, double *cy, double *rms,
                           int *iter, int *status ){
@@ -400,6 +428,12 @@ static double smf1_domin( Params *params, double *srchgt, double *a1,
    msgOutf( " ", "Iter: %d  cost: %g  size: %g", status, thisiter,
             cost, size );
 
+/* If the final call to smf1_f was not the call that generated the best
+   fit, the values in params will refer to some sub-optimal fit. In this
+   case call smf_f again to generate the values for the optimal fit,
+   which we return to the caller. */
+   if( !params->last_is_best ) (void) smf1_f( x, params );
+
 /* Get the beam parameters. */
    *a1 = 1.0;
    if( params->fittwo ) {
@@ -427,8 +461,8 @@ static double smf1_domin( Params *params, double *srchgt, double *a1,
 /* Return the minimum cost. */
    *iter = thisiter;
 
-/* Return the RMS residual. */
-   *rms = sqrt( params->ms );
+/* Return the minimum RMS residual. */
+   *rms = sqrt( params->ssr/ngood );
 
 /* Clean up. */
    gsl_multimin_fminimizer_free( s );
@@ -447,7 +481,7 @@ static double smf1_domin( Params *params, double *srchgt, double *a1,
 static void smf1_init_guess( Params *params, double cx, double cy,
                              double *a1, double *a2, double *srchgt,
                              double *fwhm1, double *fwhm2, double *back,
-                             int *status ){
+                             hdsdim *ngood, int *status ){
 
 /* Local Variables: */
    dim_t ix;
@@ -474,6 +508,7 @@ static void smf1_init_guess( Params *params, double cx, double cy,
    *back = VAL__BADD;
    *fwhm1 = VAL__BADD;
    *fwhm2 = VAL__BADD;
+   *ngood = 0;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -495,6 +530,7 @@ static void smf1_init_guess( Params *params, double cx, double cy,
    for( iy = 1; iy <= ny; iy++ ) {
       for( ix = 1; ix <= nx; ix++,pa++ ) {
          if( *pa != VAL__BADD ) {
+            (*ngood)++;
 
 /* Calculate the squared radius (i.e. the distance from the source centre)
    in arc-sec at the centre of the current pixel. Note, the centre position
@@ -563,6 +599,10 @@ static void smf1_init_guess( Params *params, double cx, double cy,
    value will be higher than the observed peak value by a factor that
    depends on how heavy the smoothing is. */
    *srchgt *= *srchgt/( params->maxm - *back );
+
+/* Store the radius, in arc-sec, of the circle in which the beam has a
+   significant value. */
+   params->beamrad = 6*(*fwhm1);
 }
 
 
@@ -585,7 +625,6 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    double a1;
    double a2;
    double back;
-   double beamrad;
    double bsum;
    double cx;
    double cy;
@@ -596,7 +635,6 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    double sigma1;
    double sigma2;
    double srchgt;
-   hdsdim nsum;
    hdsdim nx;
    hdsdim nxb;
    hdsdim nxf;
@@ -611,9 +649,7 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    int nw0;
    int nw;
    int status = SAI__OK;
-
    static int iter = 0;
-   iter++;
 
 /* Initialise */
    f = 0.0;
@@ -626,6 +662,15 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    pixsize = params->pixsize;
    wf = params->wf;
    fittwo = params->fittwo;
+
+/* Reset the iteration number of we have started a new fit. */
+   if( params->reset ) {
+      iter = 1;
+      params->fmin = VAL__MAXD;
+      params->reset = 0;
+   } else {
+      iter++;
+   }
 
 /* Get the current parameters of the beam. */
    a1 = 1.0;
@@ -647,24 +692,12 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
       back = params->fitback ? gsl_vector_get( v, 4 ) : 0.0;
    }
 
-/* Get the radius (in arc-sec) at which the wider of the two two Gaussians fall to
-   0.1% of the peak value of the total beam. */
-   if( a1 == 0.0 ) {
-      beamrad = sigma2*sqrt( 2*log( a2/0.001 ) );
-   } else if( a2 == 0.0 ) {
-      beamrad = sigma1*sqrt( 2*log( a1/0.001 ) );
-   } else if( sigma2 > sigma1 ) {
-      beamrad = sigma2*sqrt( 2*log( a2/( 0.001*( a1 + a2 ) ) ) );
-   } else {
-      beamrad = sigma1*sqrt( 2*log( a1/( 0.001*( a1 + a2 ) ) ) );
-   }
-
 /* Get the number of pixels on the fine grid to use to represent the full
    significant width of the beam determined above. Ensure this is odd so
    that the beam is centred on the centre of a pixel. The fine grid has a
    pixel size of PSIZE arc-sec and the beam is centred on the centre of
    the fine grid. */
-   nxb = 2*(int)(beamrad/PSIZE) + 1;
+   nxb = 2*(int)(params->beamrad/PSIZE) + 1;
    if( nxb < 100 ) nxb = 100;
 
 /* Set the constant row offset between the centre of the beam array and
@@ -800,17 +833,17 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
 /* Add up the running sums returned by each thread and find the max model
    value. */
       f = 0.0;
-      nsum = 0.0;
       params->maxm = VAL__MIND;
       for( iw = 0; iw < nw0; iw++ ) {
          pdata = job_data + iw;
          f += pdata->f;
-         nsum += pdata->nsum;
          if( pdata->maxm > params->maxm ) params->maxm = pdata->maxm;
       }
 
-/* Return the mean squared residual. */
-      params->ms = f/nsum;
+/* Record the cost function (i.e. the sum of the squared residuals) before
+   we apply the following tension factor. This can be used to get the RMS
+   residual. */
+     params->ssr = f;
 
 /* If the two Gaussians have the same width, they become redundant. So
    encourage larger differences in the widths by increasing the cost if
@@ -839,6 +872,15 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
 
 /* Tell the user the cost. */
       msgOutiff( MSG__DEBUG, " ", "   Call: %d   normalised cost: %g", &status, iter, f );
+
+/* If the cost function is lower than the previous lowest, then the
+   contents of params will now describe the best fit. */
+      if( f < params->fmin ){
+         params->fmin = f;
+         params->last_is_best = 1;
+      } else {
+         params->last_is_best = 0;
+      }
    }
 
 /* Free resources */
@@ -1067,7 +1109,6 @@ static void smf1_twobeam( void *job_data_ptr, int *status ) {
    hdsdim l2;
    hdsdim lf1;
    hdsdim lf2;
-   hdsdim nsum;
    hdsdim nx;
    hdsdim nxb;
    hdsdim nxf;
@@ -1217,7 +1258,6 @@ int icen = ncomp/2;
    track of the range of rows in the fine grid that fall in the current
    data row. */
       maxm = VAL__MIND;  /* Maximum output data value found so far */
-      nsum = 0;          /* Total number of values summed in "f" */
       f = 0.0;           /* Sum of squared residuals */
       lf1 = l1*ncomp;    /* Zero-based index of first fine row in current data row */
       lf2 = lf1 + ncomp; /* Zero-based index of first fine row NOT in current data row */
@@ -1236,11 +1276,15 @@ int jc = 0;
 
 /* Add all the elements of the fine grid into the output data grid. */
                for( ic = 0; ic < ncomp; ic++ ) {
-                  if( ic == icen && jc == icen ) {
-                     *pm1 += *(pg++);
-                  } else {
-                     pg++;
-                  }
+                  *pm1 += *(pg++);
+/*
+if( ic == icen && jc == icen ) {
+   *pm1 += *(pg++);
+} else {
+   pg++;
+}
+*/
+
                }
             }
          }
@@ -1253,7 +1297,6 @@ int jc = 0;
             if( *pa != VAL__BADD ) {
                res = *pa - m;
                f += res*res;
-               nsum++;
                if( m > maxm  ) maxm = m;
             }
          }
@@ -1263,7 +1306,6 @@ int jc = 0;
       }
 
       pdata->f = f;
-      pdata->nsum = nsum;
       pdata->maxm = maxm;
 
 
