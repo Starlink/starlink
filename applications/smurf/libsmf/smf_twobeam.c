@@ -805,8 +805,8 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
      params->ssr = f;
 
 /* If the two Gaussians have the same width, they become redundant. So
-   encourage larger differences in the widths by increasing the cost if
-   the two widths are close to each other. */
+   encourage the second Gaussian to be significantly wider than the
+   first. */
 #define SIGMA_TOL 5.0
 #define BIGFAC 100.0
       if( params->fittwo ){
@@ -820,6 +820,16 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
                f *= fac;
             }
          }
+
+/* The second Gaussian and the background level become redunant if the
+   width of the second gaussian is comparable to or larger than the width of
+   the array. So encourage the second Gaussian to be no more than the average
+   of the FWHM of the first Gaussian and the width of the array. */
+         fac = 2*sigma2/( sqrt(nx*ny)*pixsize/S2F + sigma1 );
+         if( fac > 1 ) f *= BIGFAC*fac;
+
+/* Encourage smaller aplitude second Gaussian. */
+         f *= ( 1.0 + 0.5*fabs(a2) );
       }
 #undef SIGMA_TOL
 #undef BIGFAC
