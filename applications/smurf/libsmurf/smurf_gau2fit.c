@@ -22,15 +22,17 @@
 *  Description:
 *     This routine finds the parameters of a one- or two-component Gaussian
 *     beam by doing a least squares fit to a supplied 2D NDF containing an
-*     image of a compact source. The source need not be a point source
-*     - it is assumed to be a sharp-edged circular disc of specified radius.
-*     On each iteration of the fitting process, this simplified source
-*     model is convolved with the candidate beam and the residuals with the
-*     supplied image are then found. The parameters of the beam are modified
-*     on each iteration to minimise the sum of the squared residuals. The beam
-*     consists of one or two (see parameter FITTWO) concentric Gaussians added
-*     together. The first Gaussian has a fixed amplitude of 1.0. The following
-*     parameters are varied during the minimisation process:
+*     image of a compact source. The source need not be a point source - the
+*     source is assumed to be a sharp-edged circular disc of specified radius
+*     (i.e. a simple model of a planet). On each iteration of the fitting
+*     process, this source model is convolved with the candidate beam and the
+*     residuals with the supplied image are then found. The parameters of the
+*     beam are modified on each iteration to minimise the sum of the squared
+*     residuals. The beam consists of one or two (see parameter FITTWO)
+*     concentric Gaussians added together. The first Gaussian has a fixed
+*     amplitude of 1.0. Each candidate beam is normalised to a total data
+*     sum of unity before being used. The following parameters are
+*     varied during the minimisation process:
 *
 *     - The FWHM of the first Gaussian.
 *     - The FWHM and amplitude of the second Gaussian (if used).
@@ -46,14 +48,24 @@
 *     increases the cost as the FWHM for the two beams becomes more
 *     similar. Consequently the second component will always have a larger
 *     FWHM than the first beam.
+*
+*     In addition, if parameter FITBACK is TRUE and the FWHM of the second
+*     component is similar in size to (or larger than) the data array, it
+*     becomes difficult for the minimisation process to distinguish between
+*     the second component and a constant background level, again making
+*     minimisation difficult. For this reason very wide second components
+*     are discouraged by increasing the cost if the second component FWHM
+*     is similar to (or larger than) the size of the array.
+*
+*     In addition large amplitude second components are discouraged by
+*     increasing the cost for large amplitude second components.
 
 *  ADAM Parameters:
-*     AMP1 = _DOUBLE (Write)
-*          An output parameter holding the amplitude of the first fitted
-*          Gaussian (always 1.0).
 *     AMP2 = _DOUBLE (Write)
 *          An output parameter holding the amplitude of the second fitted
-*          Gaussian.
+*          Gaussian relative to the first. For instance, if AMP2 is 0.15
+*          it means that the amplitude of the second component is 15% of the
+*          amplitude of the first component.
 *     BACK = _DOUBLE (Write)
 *          An output parameter holding the fitted background level. This
 *          will be set to zero if FITBACK is FALSE.
@@ -300,7 +312,6 @@ void smurf_gau2fit( int *status ) {
    msgBlank( status );
 
 /* Write the fitted values to the output parameters. */
-   parPut0d( "AMP1", a1, status );
    parPut0d( "AMP2", a2, status );
    parPut0d( "BACK", back, status );
    parPut0d( "FWHM1", fwhm1, status );

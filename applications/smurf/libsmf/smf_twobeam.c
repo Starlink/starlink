@@ -825,8 +825,10 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    width of the second gaussian is comparable to or larger than the width of
    the array. So encourage the second Gaussian to be no more than the average
    of the FWHM of the first Gaussian and the width of the array. */
-         fac = 2*sigma2/( sqrt(nx*ny)*pixsize/S2F + sigma1 );
-         if( fac > 1 ) f *= BIGFAC*fac;
+         if( params->fitback ) {
+            fac = 2*sigma2/( sqrt(nx*ny)*pixsize/S2F + sigma1 );
+            if( fac > 1 ) f *= BIGFAC*fac;
+         }
 
 /* Encourage smaller aplitude second Gaussian. */
          f *= ( 1.0 + 0.5*fabs(a2) );

@@ -2715,15 +2715,6 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
-            parameter amp1 {
-                type _DOUBLE
-                access WRITE
-                vpath DEFAULT
-                prompt {Amplitude of first Gaussian}
-                default 0
-                helpkey *
-            }
-
             parameter amp2 {
                 type _DOUBLE
                 access WRITE
