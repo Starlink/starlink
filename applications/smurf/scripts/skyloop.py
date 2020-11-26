@@ -158,6 +158,14 @@
 *        ["PROGRESS"]
 *     IN = NDF (Read)
 *        The group of time series NDFs to include in the output map.
+*     INITIALSKY = NDF (Read)
+*        An NDF holding an initial guess at the final map. This should
+*        contain any a priori expectations of what the final map should look
+*        like. It is used to define the starting point for the iterative map-making 
+*        algorithm, in place of the usual flat map full of zeros. The data units 
+*        in the supplied NDF must be "pW". If an NDF is supplied, it is also used 
+*        to define the WCS and pixel bounds of the output map (any NDF supplied 
+*        for parameter REF is then ignored). [!]
 *     IPREF = NDF (Read)
 *        An existing NDF that is to be used to define the correction
 *        to be made for instrumental polarisation (IP). It is only
@@ -236,6 +244,10 @@
 *        In addition, this NDF can be used to mask the AST, PCA, FLT or COM
 *        model. See configuration parameters AST.ZERO_MASK, PCA.ZERO_MASK,
 *        FLT.ZERO_MASK and COM.ZERO_MASK.
+*
+*        This parameter is only accessed if a null value is supplied for
+*        INITIALSKY. Otherwise, the NDF supplied as the initial sky is
+*        used to define the output grid.
 *
 *        On the second and subsequent invocations of MAKEMAP, any
 *        supplied REF image is replaced by the map created by the previous
@@ -365,8 +377,10 @@
 *        directory.
 *     9-MAR-2020 (DSB):
 *        Allow shortmaps and bolomaps to be created. If they are requested
-*        in the config supplied via parameter CONFIG, then they are created on 
+*        in the config supplied via parameter CONFIG, then they are created on
 *        the final iteration.
+*     26-NOV-2020 (DSB):
+*        Add parameter INITIALSKY.
 *-
 '''
 
@@ -469,6 +483,8 @@ try:
                                 "made from individual observations", None,
                                 noprompt=True))
 
+   params.append(starutil.ParNDG("INITIALSKY", "An a priori guess at final map",
+                                 default=None, minsize=0, maxsize=1, noprompt=True ))
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line. This automatically adds definitions for the additional parameters
@@ -492,7 +508,6 @@ try:
    niter = parsys["NITER"].value
    pixsize = parsys["PIXSIZE"].value
    config = parsys["CONFIG"].value
-   ref = parsys["REF"].value
    mask2 = parsys["MASK2"].value
    mask3 = parsys["MASK3"].value
    extra = parsys["EXTRA"].value
@@ -500,6 +515,26 @@ try:
    itermap = parsys["ITERMAP"].value
    obsdir =  parsys["OBSDIR"].value
    chunkwgt =  parsys["CHUNKWGT"].value
+
+#  If no initial sky is supplied, get a reference NDF.
+   initsky = parsys["INITIALSKY"].value
+   if initsky is None:
+      ref = parsys["REF"].value
+
+#  Otherwise, use it as the reference NDF and check it has units of "pW".
+#  Also ensure the map created by makemap has the same pixel bounds as the
+#  initial sky.
+   else:
+      ref = initsky
+      invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(initsky) )
+      units = starutil.get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
+      if units != "pW":
+         raise starutil.InvalidParameterError("Initial sky map {0} has "
+                       "units '{1}' - units must be 'pW'".format(initsky,units))
+      lx = starutil.get_task_par( "lbound(1)", "ndftrace" )
+      ly = starutil.get_task_par( "lbound(2)", "ndftrace" )
+      ux = starutil.get_task_par( "ubound(1)", "ndftrace" )
+      uy = starutil.get_task_par( "ubound(2)", "ndftrace" )
 
 #  See if we are using pre-cleaned data, in which case there is no need
 #  to export the cleaned data on the first iteration. Note we need to
@@ -690,8 +725,12 @@ try:
    fd.write("flt.whiten_last=<undef>\n")               # case they are set in
    fd.write("com.perarray_last=<undef>\n")             # the supplied config.
    if precleaned:
-      fd.write("downsampscale = 0\n")   # Cleaned data will have been downsampled already.
+      fd.write("downsampscale = 0\n") # Cleaned data will have been downsampled already.
       fd.write("downsampfreq = 0\n")
+
+   if initsky:
+      fd.write("importsky = ref\n")   # If an initial sky was supplied use it.
+
    fd.close()                 # Close the config file.
 
 #  Get the name of a temporary NDF that can be used to store the first
@@ -741,13 +780,17 @@ try:
          cmd += " "+extra
       if ipref and not precleaned:
          cmd += " ipref={0}".format(ipref)
+      if initsky:
+         cmd += " lbnd=\[{0},{1}\] ubnd=\[{2},{3}\]".format(lx,ly,ux,uy)
       invoke(cmd)
 
-#  Get the pixel index bounds of the map.
-      lx = starutil.get_task_par( "lbound(1)", "makemap" )
-      ly = starutil.get_task_par( "lbound(2)", "makemap" )
-      ux = starutil.get_task_par( "ubound(1)", "makemap" )
-      uy = starutil.get_task_par( "ubound(2)", "makemap" )
+#  Get the pixel index bounds of the map (we already know these if an
+#  initial sky was supplied).
+      if not initsky:
+         lx = starutil.get_task_par( "lbound(1)", "makemap" )
+         ly = starutil.get_task_par( "lbound(2)", "makemap" )
+         ux = starutil.get_task_par( "ubound(1)", "makemap" )
+         uy = starutil.get_task_par( "ubound(2)", "makemap" )
 
 #  Get the paths to the cleaned files. Also get the paths to the
 #  files holding the quality flags at the end of each invocation of
