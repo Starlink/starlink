@@ -719,6 +719,13 @@
 *       Add column AST to the output catalogue if an AST mask is available.
 *    15-APR-2020 (DSB):
 *       Added parameter CALCQUCONFIG.
+*    27-NOV-2020 (DSB):
+*       When using sqorst to create the catalogue reference map, use
+*       "centre=origin" so that he pixel origin retains ist sky position.
+*       Without this, changes in map bounds (such as seen between 450 and 850
+*       maps from the same observation) could cause the vector catalogues
+*       to use slightly different vector positions.
+
 
 '''
 
@@ -3169,7 +3176,7 @@ try:
                        "that are binned up to {0} arcsec pixels.".format(binsize))
                catref = NDG( 1 )
                invoke("$KAPPA_DIR/sqorst in={0} out={1} mode=pixelscale "
-                      "method=near pixscale=\"\'{2},{2},*\'\"".
+                      "method=near centre=origin pixscale=\"\'{2},{2},*\'\"".
                       format(coadd,catref,binsize))
 
 #  Bin the coadd created above so that it is aligned with the above reference
