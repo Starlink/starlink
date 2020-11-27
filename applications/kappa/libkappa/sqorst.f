@@ -46,6 +46,19 @@
 *        be left unchanged.  If MODE is set to "PixelScale" then the
 *        supplied value should be the index of a WCS axis.  Otherwise
 *        it should be the index of a pixel axis.  [!]
+*     CENTRE = LITERAL (Read)
+*        Determines the centre about which the WCS co-ordinates are
+*        stretching or squashing. The following values are permitted.
+*
+*        -  "Centre"    -- The WCS co-ordinates at the centre of the
+*                          output NDF are the same as those at the centre
+*                          of the input NDF.
+*
+*        -  "Origin"    -- The WCS co-ordinates at the pixel origin of the
+*                          output NDF are the same as those at the pixel
+*                          origin of the input NDF.
+*
+*        ["Centre"]
 *     CONSERVE = _LOGICAL (Read)
 *        If set TRUE, then the output pixel values will be scaled in
 *        such a way as to preserve the total data value in a feature on
@@ -280,6 +293,15 @@
 *        Allow an asterisk to be supplied instead of a numerical value
 *        in Parameter PIXSCALE, to indicate that the axis should retain
 *        its current scale.
+*     27-NOV-2020 (DSB):
+*        - Added parameter CENTRE. The original centring method (zooming
+*        around the centre of the array rather than the pixel origin) seems
+*        like a bug to me. But some users may have now got code that
+*        depends on that behaviour, so add the new improved centring method
+*        as an option, defaulting to the old method.
+*        - Ensure that the same mapping that is used to modify the WCS
+*        FrameSet is also used to do the resampling. Without this, it is
+*        possible for the two Mapping to get out of sync.
 *     {enter_further_changes_here}
 
 *-
@@ -302,6 +324,7 @@
       INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Variables:
+      CHARACTER CENTRE*6         ! Zoom centre position
       CHARACTER DTYPE*( NDF__SZFTP ) ! Full data type name
       CHARACTER FPIXSC( NDF__MXDIM )*15 ! Formatted pixel scales
       CHARACTER ITYPE*( NDF__SZTYP ) ! HDS Data type name
@@ -318,6 +341,7 @@
       DOUBLE PRECISION PIXSC( NDF__MXDIM )! Original pixel scales
       DOUBLE PRECISION POA( NDF__MXDIM ) ! First output point
       DOUBLE PRECISION POB( NDF__MXDIM ) ! Second output point
+      DOUBLE PRECISION SHIFT( NDF__MXDIM ) ! GIRD <> PIXEL shift
       DOUBLE PRECISION ZOOM      ! Zoom factor for 1d expansion
       INTEGER AXIS               ! Axis to squash or stretch
       INTEGER BMAX( NDF__MXDIM ) ! Maximum values for pixel index bounds
@@ -330,6 +354,7 @@
       INTEGER EL                 ! Number of elements in array
       INTEGER EL2                ! Number of elements in output array
       INTEGER F                  ! Index of first non-nlank character
+      INTEGER GMAP               ! Mapping from input GRID to output GRID
       INTEGER I                  ! Loop variable
       INTEGER IAT                ! String length
       INTEGER INTERP             ! Resampling scheme identifier
@@ -365,8 +390,10 @@
       INTEGER NDIM               ! Number of dimensions of NDFs
       INTEGER NPARAM             ! Number of auxiliary resampling parameters
       INTEGER NWCS               ! No. of WCS axes
+      INTEGER SMAP               ! A ShiftMap
       INTEGER START              ! Index of start of numerical value
       INTEGER TLEN               ! String length
+      INTEGER TMAP               ! Mapping from input GRID to output PIXEL
       INTEGER UBNDI( NDF__MXDIM ) ! Upper bounds of input NDF
       INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
       LOGICAL BAD                ! May there be bad pixels?
@@ -734,20 +761,50 @@
 *  Put the correct WCS FrameSet in the new NDF.
 *  ============================================
 
-*  Construct a Mapping representing the transformation between the
-*  old pixel coordinates and the new ones.  This is just used to
-*  fix up the WCS FrameSet, the resampling routine generates its
-*  own Mappings.
-      DO I = 1, NDIM
-         PIA( I ) = 0.5D0*DBLE( LBNDI( I ) - 1 + UBNDI( I ) )
-         PIB( I ) = DBLE( UBNDI( I ) )
-         POA( I ) = 0.5D0*DBLE( LBNDO( I ) - 1 + UBNDO( I ) )
-         POB( I ) = ( PIB( I ) - PIA( I ) )*FACTS( I ) + POA( I )
-      END DO
-      MAP = AST_WINMAP( NDIM, PIA, PIB, POA, POB, ' ', STATUS )
+*  Find out where the stretching or squashing is to be cenetred.
+      CALL PAR_CHOIC( 'CENTRE', 'CENTRE', 'CENTRE,ORIGIN', .FALSE.,
+     :                CENTRE, STATUS )
+
+*  Construct a Mapping representing the transformation from the
+*  old pixel coordinates to the new ones.  This is used here to
+*  fix up the WCS FrameSet, and is also passed to the resampling
+*  routine to ensure the same Mapping is used in both places. The
+*  first option is effectively a zoom about the centre of the
+*  input array.
+      IF( CENTRE .EQ. 'CENTRE' ) then
+         DO I = 1, NDIM
+            PIA( I ) = 0.5D0*DBLE( LBNDI( I ) - 1 + UBNDI( I ) )
+            PIB( I ) = DBLE( UBNDI( I ) )
+            POA( I ) = 0.5D0*DBLE( LBNDO( I ) - 1 + UBNDO( I ) )
+            POB( I ) = ( PIB( I ) - PIA( I ) )*FACTS( I ) + POA( I )
+         END DO
+         MAP = AST_WINMAP( NDIM, PIA, PIB, POA, POB, ' ', STATUS )
+
+*  The second option is a zoom about the pixel origin.
+      ELSE
+         MAP = AST_MATRIXMAP( NDIM, NDIM, 1, FACTS, ' ', STATUS )
+      ENDIF
 
 *  Fix it up according to the changes we will make.
       CALL KPG1_ASFIX( MAP, NDFI, NDFO, STATUS )
+
+*  The above Mapping connects input and output PIXEL co-cordinates.
+*  Modify it so that it connects GRID co-ordinates, as required by the
+*  resampling routines. To do this, precede the above Mapping with a
+*  ShiftMap that converts from input GRID to input PIXEL, and follow
+*  it with a ShiftMap that converts from output PIXEL to output GRID.
+      DO I = 1, NDIM
+         SHIFT( I ) = DBLE( LBNDI( I ) ) - 1.5D0
+      END DO
+      SMAP = AST_SHIFTMAP( NDIM, SHIFT, ' ', STATUS )
+      TMAP = AST_CMPMAP( SMAP, MAP, .TRUE., ' ', STATUS )
+
+      DO I = 1, NDIM
+         SHIFT( I ) = -( DBLE( LBNDO( I ) ) - 1.5D0 )
+      END DO
+      SMAP = AST_SHIFTMAP( NDIM, SHIFT, ' ', STATUS )
+      GMAP = AST_CMPMAP( TMAP, SMAP, .TRUE., ' ', STATUS )
+
 
 *  Check if any resampling is required.
       IF ( LASTDM .GT. 0 ) THEN
@@ -870,7 +927,7 @@
 
 *  Do the resampling along the current dimension.
                IF ( ITYPE .EQ. '_BYTE' ) THEN
-                  CALL KPS1_RS1B( NDIM, I, FACTS,
+                  CALL KPS1_RS1B( NDIM, I, GMAP,
      :                            DIM1, DIM2, INTERP, PARAMS,
      :                            CONSRV, HASVAR, HASQUA, HASAXI,
      :                            %VAL( CNF_PVAL( IPDAT1 ) ),
@@ -890,7 +947,7 @@
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-                  CALL KPS1_RS1UB( NDIM, I, FACTS,
+                  CALL KPS1_RS1UB( NDIM, I, GMAP,
      :                            DIM1, DIM2, INTERP, PARAMS,
      :                            CONSRV, HASVAR, HASQUA, HASAXI,
      :                            %VAL( CNF_PVAL( IPDAT1 ) ),
@@ -910,7 +967,7 @@
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-                  CALL KPS1_RS1W( NDIM, I, FACTS,
+                  CALL KPS1_RS1W( NDIM, I, GMAP,
      :                            DIM1, DIM2, INTERP, PARAMS,
      :                            CONSRV, HASVAR, HASQUA, HASAXI,
      :                            %VAL( CNF_PVAL( IPDAT1 ) ),
@@ -930,7 +987,7 @@
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-                  CALL KPS1_RS1UW( NDIM, I, FACTS,
+                  CALL KPS1_RS1UW( NDIM, I, GMAP,
      :                            DIM1, DIM2, INTERP, PARAMS,
      :                            CONSRV, HASVAR, HASQUA, HASAXI,
      :                            %VAL( CNF_PVAL( IPDAT1 ) ),
@@ -950,7 +1007,7 @@
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-                  CALL KPS1_RS1I( NDIM, I, FACTS,
+                  CALL KPS1_RS1I( NDIM, I, GMAP,
      :                            DIM1, DIM2, INTERP, PARAMS,
      :                            CONSRV, HASVAR, HASQUA, HASAXI,
      :                            %VAL( CNF_PVAL( IPDAT1 ) ),
@@ -970,7 +1027,7 @@
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
-                  CALL KPS1_RS1K( NDIM, I, FACTS,
+                  CALL KPS1_RS1K( NDIM, I, GMAP,
      :                            DIM1, DIM2, INTERP, PARAMS,
      :                            CONSRV, HASVAR, HASQUA, HASAXI,
      :                            %VAL( CNF_PVAL( IPDAT1 ) ),
@@ -990,7 +1047,7 @@
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-                  CALL KPS1_RS1R( NDIM, I, FACTS,
+                  CALL KPS1_RS1R( NDIM, I, GMAP,
      :                            DIM1, DIM2, INTERP, PARAMS,
      :                            CONSRV, HASVAR, HASQUA, HASAXI,
      :                            %VAL( CNF_PVAL( IPDAT1 ) ),
@@ -1010,7 +1067,7 @@
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPS1_RS1D( NDIM, I, FACTS,
+                  CALL KPS1_RS1D( NDIM, I, GMAP,
      :                            DIM1, DIM2, INTERP, PARAMS,
      :                            CONSRV, HASVAR, HASQUA, HASAXI,
      :                            %VAL( CNF_PVAL( IPDAT1 ) ),

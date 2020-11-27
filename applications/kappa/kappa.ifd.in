@@ -17372,6 +17372,16 @@ iraf! {
             helpkey *
         }
 
+         parameter centre {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Position about which to zoom the WCS coordinates}
+            helpkey *
+            default CENTRE
+        }
+
          parameter conserve {
             type _LOGICAL
             vpath DEFAULT

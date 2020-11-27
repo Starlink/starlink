@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_RS1<T>( NDIM, IDIM, FACTS, DIMI, DIMO, INTERP,
+      SUBROUTINE KPS1_RS1<T>( NDIM, IDIM, MAP, DIMI, DIMO, INTERP,
      :                        PARAMS, CONSRV, HASVAR, HASQUA, HASAXI,
      :                        DATI, VARI, QUAI, AXI, BAD, DATWKI,
      :                        VARWKI, QUAWKI, DATWKO, VARWKO, QUAWKO,
@@ -14,7 +14,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_RS1<T>( NDIM, IDIM, FACTS, DIMI, DIMO, INTERP, PARAMS,
+*     CALL KPS1_RS1<T>( NDIM, IDIM, MAP, DIMI, DIMO, INTERP, PARAMS,
 *                       CONSRV, HASVAR, HASQUA, HASAXI, DATI, VARI,
 *                       QUAI, AXI, BAD, DATWKI, VARWKI, QUAWKI,
 *                       DATWKO, VARWKO, QUAWKO, DATO, VARO,
@@ -30,8 +30,9 @@
 *        The number of dimensions in the arrays.
 *     IDIM = INTEGER (Given)
 *        The index of the dimension along which to resample.
-*     FACTS( NDIM ) = DOUBLE PRECISION (Given)
-*        The expansion factors for each axis.
+*     MAP = INTEGER (Given)
+*        The Mapping from input GRID co-ordinates to output GRID
+*        co-ordsinates. This should have NDIM inputs and NDIM outputs.
 *     DIMI( NDIM ) = INTEGER (Given)
 *        The dimensions of the input arrays DATI and VARI.
 *     DIMO( NDIM ) = INTEGER (Given)
@@ -93,6 +94,7 @@
 *     Copyright (C) 2002 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2020 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -130,6 +132,10 @@
 *        Corrected calculation of the Mapping parameters.
 *     30-AUG-2012 (DSB):
 *        Added CONSRV argument.
+*     27-NOV-2020 (DSB):
+*        Replace argument FACTS with MAP. This is to ensure that the same
+*        Mapping that is used to modify the WCS FrameSet (as created in
+*        the main SQORST routine) is also used to do the resampling.
 *     {enter_further_changes_here}
 
 *-
@@ -146,7 +152,7 @@
 *  Arguments Given:
       INTEGER NDIM
       INTEGER IDIM
-      DOUBLE PRECISION FACTS( NDIM )
+      INTEGER MAP
       INTEGER DIMI( NDIM )
       INTEGER DIMO( NDIM )
       INTEGER INTERP
@@ -180,14 +186,14 @@
 
 *  Local Variables:
       DOUBLE PRECISION TOL       ! Tolerance for AST_RESAMPLE<T>
-      DOUBLE PRECISION T1, T2, T3! Temporary storage
       INTEGER FLAGS              ! Flags for AST_RESAMPLE<T>
       INTEGER I                  ! Loop variable
+      INTEGER IMAP               ! AST Mapping for 1d resample
       INTEGER IO                 ! Offset into array
       INTEGER J                  ! Loop variable
-      INTEGER MAP                ! AST Mapping for 1d resample
       INTEGER MAXPIX             ! Maximum linear approximation scale
       INTEGER NBAD               ! Number of bad pixels
+      INTEGER ODIM               ! Output axis corresponding to input IDIM
       INTEGER OFFI               ! Offset into input arrays
       INTEGER OFFO               ! Offset into output arrays
       INTEGER POS( NDF__MXDIM )  ! Position in arrays
@@ -200,120 +206,32 @@
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Construct a Mapping to do the transformation.  It must map between
-*  coordinate systems in which the coordinate of the centre of a pixel
-*  is given by its pixel index.
-      T1 = 0.5D0*DBLE( DIMI( IDIM ) + 1 )
-      T2 = 0.5D0*DBLE( DIMO( IDIM ) + 1 )
-      T3 = DBLE( DIMI( IDIM ) ) + 0.5D0
-      MAP = AST_WINMAP( 1, T1, T3, T2, ( T3 - T1 )*FACTS( IDIM ) + T2,
-     :                  ' ', STATUS )
-      MAP = AST_SIMPLIFY( MAP, STATUS )
+*  Extract the Mapping for the single axis being transformed from the
+*  supplied NDIM-dimensional Mapping. This goes from input GRID axis
+*  IDIM to output GRID axis ODIM.
+      CALL AST_MAPSPLIT( MAP, 1, IDIM, ODIM, IMAP, STATUS )
+
+*  Sanity check. Input IDIM should always feed output IDIM for the sort
+*  of linear Mappings expected here.
+      IF( ODIM .NE. IDIM .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'I', IDIM )
+         CALL MSG_SETI( 'O', ODIM )
+         CALL ERR_REP( ' ', 'KPS1_RS1: Invalid Mapping supplied: '//
+     :                 'Input ^I feed output ^O (programming error).',
+     :                 STATUS )
+      ELSE
 
 *  Get the strides along each dimension of the input and output arrays.
-      STRIDI( 1 ) = 1
-      STRIDO( 1 ) = 1
-      DO I = 2, NDIM
-         STRIDI( I ) = STRIDI( I - 1 ) * DIMI( I - 1 )
-         STRIDO( I ) = STRIDO( I - 1 ) * DIMO( I - 1 )
-      END DO
+         STRIDI( 1 ) = 1
+         STRIDO( 1 ) = 1
+         DO I = 2, NDIM
+            STRIDI( I ) = STRIDI( I - 1 ) * DIMI( I - 1 )
+            STRIDO( I ) = STRIDO( I - 1 ) * DIMO( I - 1 )
+         END DO
 
 *  Resample the Data and Variance arrays.
 *  ======================================
-
-*  Initialise the offsets into the input and output arrays.
-      OFFI = 1
-      OFFO = 1
-
-*  Set the initial position in the array.
-      DO I = 1, NDIM
-         POS( I ) = 1
-      END DO
-
-*  Set constant values for the resampling routine.
-      FLAGS = 0
-      IF ( CONSRV ) FLAGS = FLAGS + AST__CONSERVEFLUX
-      IF ( HASVAR ) FLAGS = FLAGS + AST__USEVAR
-      IF ( BAD ) FLAGS = FLAGS + AST__USEBAD
-      TOL = 0.1D0
-      MAXPIX = DIMI( IDIM ) + DIMO( IDIM )
-
-*  Loop over all the lines along the resampling dimension.
-      NBAD = 0
-      DONE = .FALSE.
-      DO WHILE ( .NOT. DONE )
-
-*  Copy the line we will resample from the input arrays into work
-*  buffers.
-         IO = OFFI
-         IF ( HASVAR ) THEN
-            DO I = 1, DIMI( IDIM )
-               DATWKI( I ) = DATI( IO )
-               VARWKI( I ) = VARI( IO )
-               IO = IO + STRIDI( IDIM )
-            END DO
-         ELSE
-            DO I = 1, DIMI( IDIM )
-               DATWKI( I ) = DATI( IO )
-               IO = IO + STRIDI( IDIM )
-            END DO
-         END IF
-
-*  Perform the one-dimensional resampling.
-         NBAD = NBAD + AST_RESAMPLE<T>( MAP, 1, 1, DIMI( IDIM ), DATWKI,
-     :                                  VARWKI, INTERP, AST_NULL,
-     :                                  PARAMS, FLAGS, TOL, MAXPIX,
-     :                                  VAL__BAD<T>, 1, 1, DIMO( IDIM ),
-     :                                  1, DIMO( IDIM ), DATWKO, VARWKO,
-     :                                  STATUS )
-
-*  Copy the resampled line from work buffers into the output arrays.
-         IO = OFFO
-         IF ( HASVAR ) THEN
-            DO I = 1, DIMO( IDIM )
-               DATO( IO ) = DATWKO( I )
-               VARO( IO ) = VARWKO( I )
-               IO = IO + STRIDO( IDIM )
-            END DO
-         ELSE
-            DO I = 1, DIMO( IDIM )
-               DATO( IO ) = DATWKO( I )
-               IO = IO + STRIDO( IDIM )
-            END DO
-         END IF
-
-*  Locate the start of the next line in the input arrays.
-         J = 1
-   1     CONTINUE
-         IF ( J .LE. NDIM ) THEN
-            IF ( J .EQ. IDIM ) THEN
-               J = J + 1
-               GO TO 1
-            ELSE
-               IF ( POS( J ) .LT. DIMI( J ) ) THEN
-                  OFFI = OFFI + STRIDI( J )
-                  OFFO = OFFO + STRIDO( J )
-                  POS( J ) = POS( J ) + 1
-               ELSE
-                  OFFI = OFFI - ( DIMI( J ) - 1 ) * STRIDI( J )
-                  OFFO = OFFO - ( DIMO( J ) - 1 ) * STRIDO( J )
-                  POS( J ) = 1
-                  J = J + 1
-                  GO TO 1
-               END IF
-            END IF
-         ELSE
-            DONE = .TRUE.
-         END IF
-      END DO
-
-*  Update information about whether the output array contains bad
-*  pixels.
-      BAD = NBAD .GT. 0
-
-*  Resample the Quality array.
-*  ===========================
-      IF( HASQUA ) THEN
 
 *  Initialise the offsets into the input and output arrays.
          OFFI = 1
@@ -326,6 +244,9 @@
 
 *  Set constant values for the resampling routine.
          FLAGS = 0
+         IF ( CONSRV ) FLAGS = FLAGS + AST__CONSERVEFLUX
+         IF ( HASVAR ) FLAGS = FLAGS + AST__USEVAR
+         IF ( BAD ) FLAGS = FLAGS + AST__USEBAD
          TOL = 0.1D0
          MAXPIX = DIMI( IDIM ) + DIMO( IDIM )
 
@@ -337,33 +258,49 @@
 *  Copy the line we will resample from the input arrays into work
 *  buffers.
             IO = OFFI
-            DO I = 1, DIMI( IDIM )
-               QUAWKI( I ) = QUAI( IO )
-               IO = IO + STRIDI( IDIM )
-            END DO
+            IF ( HASVAR ) THEN
+               DO I = 1, DIMI( IDIM )
+                  DATWKI( I ) = DATI( IO )
+                  VARWKI( I ) = VARI( IO )
+                  IO = IO + STRIDI( IDIM )
+               END DO
+            ELSE
+               DO I = 1, DIMI( IDIM )
+                  DATWKI( I ) = DATI( IO )
+                  IO = IO + STRIDI( IDIM )
+               END DO
+            END IF
 
 *  Perform the one-dimensional resampling.
-            NBAD = NBAD + AST_RESAMPLEUB( MAP, 1, 1, DIMI( IDIM ),
-     :                                    QUAWKI, QUAWKI, INTERP,
-     :                                    AST_NULL, PARAMS, FLAGS, TOL,
-     :                                    MAXPIX, VAL__BADUB, 1, 1,
-     :                                    DIMO( IDIM ), 1, DIMO( IDIM ),
-     :                                    QUAWKO, QUAWKO, STATUS )
+            NBAD = NBAD + AST_RESAMPLE<T>( IMAP, 1, 1, DIMI( IDIM ),
+     :                                     DATWKI, VARWKI, INTERP,
+     :                                     AST_NULL,PARAMS, FLAGS, TOL,
+     :                                     MAXPIX,VAL__BAD<T>, 1, 1,
+     :                                     DIMO( IDIM ),1, DIMO( IDIM ),
+     :                                     DATWKO, VARWKO, STATUS )
 
 *  Copy the resampled line from work buffers into the output arrays.
             IO = OFFO
-            DO I = 1, DIMO( IDIM )
-               QUAO( IO ) = QUAWKO( I )
-               IO = IO + STRIDO( IDIM )
-            END DO
+            IF ( HASVAR ) THEN
+               DO I = 1, DIMO( IDIM )
+                  DATO( IO ) = DATWKO( I )
+                  VARO( IO ) = VARWKO( I )
+                  IO = IO + STRIDO( IDIM )
+               END DO
+            ELSE
+               DO I = 1, DIMO( IDIM )
+                  DATO( IO ) = DATWKO( I )
+                  IO = IO + STRIDO( IDIM )
+               END DO
+            END IF
 
 *  Locate the start of the next line in the input arrays.
             J = 1
-   2        CONTINUE
+   1        CONTINUE
             IF ( J .LE. NDIM ) THEN
                IF ( J .EQ. IDIM ) THEN
                   J = J + 1
-                  GO TO 2
+                  GO TO 1
                ELSE
                   IF ( POS( J ) .LT. DIMI( J ) ) THEN
                      OFFI = OFFI + STRIDI( J )
@@ -374,7 +311,7 @@
                      OFFO = OFFO - ( DIMO( J ) - 1 ) * STRIDO( J )
                      POS( J ) = 1
                      J = J + 1
-                     GO TO 2
+                     GO TO 1
                   END IF
                END IF
             ELSE
@@ -382,16 +319,96 @@
             END IF
          END DO
 
-      END IF
+*  Update information about whether the output array contains bad
+*  pixels.
+         BAD = NBAD .GT. 0
+
+*  Resample the Quality array.
+*  ===========================
+         IF( HASQUA ) THEN
+
+*  Initialise the offsets into the input and output arrays.
+            OFFI = 1
+            OFFO = 1
+
+*  Set the initial position in the array.
+            DO I = 1, NDIM
+               POS( I ) = 1
+            END DO
+
+*  Set constant values for the resampling routine.
+            FLAGS = 0
+            TOL = 0.1D0
+            MAXPIX = DIMI( IDIM ) + DIMO( IDIM )
+
+*  Loop over all the lines along the resampling dimension.
+            NBAD = 0
+            DONE = .FALSE.
+            DO WHILE ( .NOT. DONE )
+
+*  Copy the line we will resample from the input arrays into work
+*  buffers.
+               IO = OFFI
+               DO I = 1, DIMI( IDIM )
+                  QUAWKI( I ) = QUAI( IO )
+                  IO = IO + STRIDI( IDIM )
+               END DO
+
+*  Perform the one-dimensional resampling.
+               NBAD = NBAD + AST_RESAMPLEUB( IMAP, 1, 1, DIMI( IDIM ),
+     :                                       QUAWKI, QUAWKI, INTERP,
+     :                                       AST_NULL, PARAMS, FLAGS,
+     :                                       TOL, MAXPIX, VAL__BADUB, 1,
+     :                                       1, DIMO( IDIM ), 1,
+     :                                       DIMO( IDIM ), QUAWKO,
+     :                                       QUAWKO, STATUS )
+
+*  Copy the resampled line from work buffers into the output arrays.
+               IO = OFFO
+               DO I = 1, DIMO( IDIM )
+                  QUAO( IO ) = QUAWKO( I )
+                  IO = IO + STRIDO( IDIM )
+               END DO
+
+*  Locate the start of the next line in the input arrays.
+               J = 1
+   2           CONTINUE
+               IF ( J .LE. NDIM ) THEN
+                  IF ( J .EQ. IDIM ) THEN
+                     J = J + 1
+                     GO TO 2
+                  ELSE
+                     IF ( POS( J ) .LT. DIMI( J ) ) THEN
+                        OFFI = OFFI + STRIDI( J )
+                        OFFO = OFFO + STRIDO( J )
+                        POS( J ) = POS( J ) + 1
+                     ELSE
+                        OFFI = OFFI - ( DIMI( J ) - 1 ) * STRIDI( J )
+                        OFFO = OFFO - ( DIMO( J ) - 1 ) * STRIDO( J )
+                        POS( J ) = 1
+                        J = J + 1
+                        GO TO 2
+                     END IF
+                  END IF
+               ELSE
+                  DONE = .TRUE.
+               END IF
+            END DO
+
+         END IF
 
 *  Resample the Axis array.
 *  ========================
-      IF( HASAXI ) THEN
-         FLAGS = AST__USEBAD
-         NBAD = AST_RESAMPLED( MAP, 1, 1, DIMI( IDIM ), AXI, AXI,
-     :                         INTERP, AST_NULL, PARAMS, FLAGS, TOL,
-     :                         MAXPIX, VAL__BADD, 1, 1, DIMO( IDIM ),
-     :                         1, DIMO( IDIM ), AXO, AXO, STATUS )
+         IF( HASAXI ) THEN
+            FLAGS = AST__USEBAD
+            NBAD = AST_RESAMPLED( IMAP, 1, 1, DIMI( IDIM ), AXI, AXI,
+     :                            INTERP, AST_NULL, PARAMS, FLAGS, TOL,
+     :                            MAXPIX, VAL__BADD, 1, 1, DIMO( IDIM ),
+     :                            1, DIMO( IDIM ), AXO, AXO, STATUS )
+         END IF
       END IF
+
+*  Free resources
+      CALL AST_ANNUL( IMAP, STATUS )
 
       END

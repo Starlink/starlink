@@ -45359,6 +45359,27 @@ KAPPA: \htmlref{REGRID}{REGRID},
          axis.  \texttt{[!]}
      }
       \sstsubsection{
+         CENTRE = LITERAL (Read)
+      }{
+         Determines the centre about which the WCS co-ordinates are
+         stretching or squashing. The following values are permitted.
+
+         \sstitemlist{
+
+            \sstitem
+             \texttt{"Centre"} --- The WCS co-ordinates at the centre of the
+                              output NDF are the same as those at the centre
+                              of the input NDF.
+
+            \sstitem
+             \texttt{"Origin"} --- The WCS co-ordinates at the pixel origin of the
+                              output NDF are the same as those at the pixel
+                              origin of the input NDF.
+
+         }
+         \texttt{["Centre"]}
+      }
+      \sstsubsection{
          CONSERVE = \_LOGICAL (Read)
       }{
          If set \texttt{TRUE}, then the output pixel values will be scaled in
@@ -55008,6 +55029,12 @@ The following applications have been modified:
         \item There is a new mode, \texttt{"NDF"}.  It assigns the axis
         values using the data values in another NDF, specified by a
         parameter called AXISNDF.
+      \end{itemize}
+
+   \item [\htmlref{SQORST}{SQORST}]\mbox{}
+      \begin{itemize}
+        \item Has a new Parameter CENTRE, which specifies the centre
+        about which the WCS co-ordinates are stretched or squashed.
       \end{itemize}
 
    \item [\htmlref{WCSALIGN}{WCSALIGN}]\mbox{}

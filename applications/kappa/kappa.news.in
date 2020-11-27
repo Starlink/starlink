@@ -69,6 +69,11 @@
       -  The reported number of points plotted now ignores any
       points outside the bounds of the plot.
 
+   o  SQORST
+
+      -  A new parameter called CENTRE specifies the centre about
+      which the WCS co-ordinates are stretched or squashed.
+
    o  SUBSTITUTE
 
       -  A new parameter called LUT allows multiple values to be
