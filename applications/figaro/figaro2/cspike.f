@@ -54,10 +54,15 @@ C     17th May 2001  ACD / UoE, Starlink.  Revised obtaining the
 C                    exposure time with DSA_GET_EXPOSURE.
 C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
 C                    mapped data.
+C     2020 Nov 29    MJC / Starlink  Pass the correct maximum number
+C                    of dimensions to DTA_SZVAR.
 C+
       IMPLICIT NONE
 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+
+      INTEGER MAXDIM             ! Maximum number of data dimensions
+      PARAMETER ( MAXDIM = 2 )
 C
 C     Functions
 C
@@ -67,7 +72,7 @@ C     Local variables
 C
       REAL      BANDW            ! Bandwidth
       CHARACTER CITEMS(2)*32     ! Axis character items retrieved
-      INTEGER   DIMS(2)          ! Dimensions
+      INTEGER   DIMS(MAXDIM)     ! Dimensions
       REAL      DLAMB            ! Doubling wavelength
       CHARACTER DNAME*72         ! DTA name
       INTEGER   DSTAT            ! Status for DTA routines
@@ -195,7 +200,7 @@ C
       CALL DSA_ELEMENT_NAME('SPIKE','TABLE_DATA',DNAME,STATUS)
       IF(STATUS.NE.0)GOTO 500
 
-      CALL DTA_SZVAR(DNAME,10,NDIM,DIMS,DSTAT)
+      CALL DTA_SZVAR(DNAME,MAXDIM,NDIM,DIMS,DSTAT)
       TABLED=DSTAT.EQ.0
       IF (TABLED) THEN
          NTAB=DIMS(1)
