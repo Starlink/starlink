@@ -94,7 +94,7 @@ void kpg1Axcpy( int indf1, int indf2, int ax1, int ax2, int *status ){
    char type[ NDF__SZTYP + 1 ];
    const char *acomp[ NACOMP ] = { "Centre", "Variance", "Width" };
    const char *ccomp[ NCCOMP ] = { "Label", "Unit" };
-   hdsdim el;
+   size_t el;
    hdsdim lbnd1[ NDF__MXDIM ];
    hdsdim lbnd2[ NDF__MXDIM ];
    hdsdim ubnd1[ NDF__MXDIM ];
