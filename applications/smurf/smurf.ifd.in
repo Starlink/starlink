@@ -4224,6 +4224,14 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter wchisq {
+                type _DOUBLE
+                access WRITE
+                vpath DEFAULT
+                default 0.0
+                helpkey *
+            }
+
             parameter wvmlog {
                 type LITERAL
                 prompt {Text file in which to write processed WVM data}

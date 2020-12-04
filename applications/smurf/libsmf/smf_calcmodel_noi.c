@@ -147,9 +147,16 @@
 *        Ensure dat->noi_boxsize is assigned a value even if the NOI model
 *        has been pre-calculated as part of the cleaning phase (i.e. if
 *        model_data[ 0 ] is not 1.0 on entry on the first iteration).
+*     2020-12-4 (DSB):
+*        Add a facility to return the weighted chisquared, where each sample is
+*        weighted by the squared SNR in the corresponding map pixel. This should
+*        give a general measure of the goodness of the fit in the source regions.
+*        The established "chisquared" value includes background regions too, which
+*        reduces its usefulness as a measure of the goodness of fit in the region
+*        of interest.
 
 *  Copyright:
-*     Copyright (C) 2016 East Asian Observatory.
+*     Copyright (C) 2016-2020 East Asian Observatory.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2010 University of British Columbia.
 *     Copyright (C) 2010-2012 Science & Technology Facilities Council.
@@ -198,10 +205,15 @@ typedef struct smfCalcModelNoiData {
    dim_t box;
    dim_t mntslice;
    dim_t ntslice;
+   double *map;
+   double *mapvar;
    double *model_data;
    double *res_data;
    double chisquared;
+   double wchisquared;
+   double wchisq;
    int chisq;
+   int *lut_data;
    int operation;
    size_t bstride;
    size_t mbstride;
@@ -245,6 +257,8 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   int iw;                       /* Thread index */
   dim_t j;                      /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Local keymap */
+  smfArray *lut=NULL;           /* Pointer to LUT at chunk */
+  int *lut_data=NULL;           /* Pointer to DATA component of lut */
   size_t mbstride;              /* model bolometer stride */
   dim_t mntslice;               /* Number of model time slices */
   size_t mtstride;              /* model time slice stride */
@@ -290,6 +304,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   res = dat->res[chunk];
   qua = dat->qua[chunk];
   model = allmodel[chunk];
+  lut = dat->lut[chunk];
 
   /* Get the raw data dimensions */
   smf_get_dims( res->sdata[idx], NULL, NULL, &nbolo, &ntslice, &ndata,
@@ -351,6 +366,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
     res_data = (res->sdata[idx]->pntr)[0];
     model_data = (model->sdata[idx]->pntr)[0];
     qua_data = (qua->sdata[idx]->pntr)[0];
+    lut_data = (lut->sdata[idx]->pntr)[0];
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
@@ -669,6 +685,9 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
            pdata->res_data = res_data;
            pdata->mbstride = mbstride;
            pdata->mtstride = mtstride;
+           pdata->lut_data = lut_data;
+           pdata->map = dat->map;
+           pdata->mapvar = dat->mapvar;
            pdata->operation = 1;
 
            /* Submit the job to the workforce. */
@@ -683,6 +702,8 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
            pdata = job_data + iw;
            dat->chisquared[chunk] += pdata->chisquared;
            nchisq += pdata->nchisq;
+           dat->wchisquared[chunk] += pdata->wchisquared;
+           dat->wchisq[chunk] += pdata->wchisq;
         }
 
       }
@@ -737,11 +758,16 @@ static void smf1_calcmodel_noi( void *job_data_ptr, int *status ) {
    SmfCalcModelNoiData *pdata;
    dim_t ibolo;
    dim_t itime;
+   dim_t nsum;
    double *pm;
    double *pr;
+   double chisq;
+   double dval;
    double mean;
    double sum;
-   dim_t nsum;
+   double vval;
+   double wgt;
+   int *pl;
    size_t ibase;
    smf_qual_t *pq;
 
@@ -758,19 +784,24 @@ static void smf1_calcmodel_noi( void *job_data_ptr, int *status ) {
       pdata->chisquared = 0.0;
       pdata->nchisq = 0;
 
+/* Initialise returned weighted chisquared increment and sum of weights. */
+      pdata->wchisquared = 0.0;
+      pdata->wchisq = 0.0;
+
 /* Loop round all bolos to be processed by this thread, maintaining the
    index of the first time slice for the current bolo. */
       ibase = pdata->b1*pdata->bstride;
       for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++ ) {
 
-/* Get a pointer ot the first quality value for the current bolo, and
+/* Get a pointer to the first quality value for the current bolo, and
    check that the whole bolometer has not been flagged as bad. */
          pq = pdata->qua_data + ibase;
          if( !( *pq & SMF__Q_BADB ) ) {
 
-/* Get a pointer to the first residual for the current bolo, and then
-   loop round all time slices. */
+/* Get a pointer to the first residual and LUT value for the current bolo,
+   and then loop round all time slices. */
             pr = pdata->res_data + ibase;
+            pl = pdata->lut_data + ibase;
             for( itime = 0; itime < pdata->ntslice; itime++ ) {
 
 /* Get a pointer to the model value (noise) to be used with the current
@@ -784,14 +815,33 @@ static void smf1_calcmodel_noi( void *job_data_ptr, int *status ) {
 /* If the noise is positive and the bolometer sample is good, increment
    the chi-squared value and the number of samples included in the sum. */
                if( *pm > 0 && !(*pq & SMF__Q_GOOD) ) {
-                 pdata->chisquared += (*pr)*(*pr) / (*pm);
-                 pdata->nchisq++;
+                  chisq = (*pr)*(*pr) / (*pm);
+                  pdata->chisquared += chisq;
+                  pdata->nchisq++;
+
+/* Now form the chi-squared in the source regions. If the lut has a bad
+   value, the sample is off the edge of the map. */
+                  if( *pl != VAL__BADI ) {
+
+/* If the map pixel that contains the current pixel has good data and
+   variance values, get its SNR and use this as a weight to find
+   the sum of weighted squared residuals. */
+                     dval = pdata->map[ *pl ];
+                     vval = pdata->mapvar[ *pl ];
+
+                     if( dval != VAL__BADD && vval != VAL__BADD &&
+                         vval > 0.0 ) {
+                        wgt = fabs( dval )/sqrt( vval );
+                        pdata->wchisquared += wgt*chisq;
+                        pdata->wchisq += wgt;
+                     }
+                  }
                }
 
-/* Move residual and quality pointers on to the next time slice. */
+/* Move residual, lut and quality pointers on to the next time slice. */
                pq += pdata->tstride;
+               pl += pdata->tstride;
                pr += pdata->tstride;
-
             }
          }
 

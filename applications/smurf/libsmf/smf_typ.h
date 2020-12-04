@@ -808,6 +808,8 @@ typedef struct smfDIMMData {
   dim_t mdims[2];            /* dimensions of map */
   dim_t msize;               /* number of elements in map */
   double *chisquared;        /* total chisquared at each chunk */
+  double *wchisquared;       /* total weighted unnormalised chisquared at each chunk */
+  double *wchisq;            /* total chisquared weights at each chunk */
   AstFrameSet *outfset;      /* contains map->sky transformation */
   int *lbnd_out;             /* map lower bounds */
   int *ubnd_out;             /* map upper bounds */

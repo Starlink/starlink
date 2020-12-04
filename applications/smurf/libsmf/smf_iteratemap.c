@@ -548,6 +548,9 @@
 *     2020-03-05 (GSB):
 *        Use the new config parameter CYCLEMAP to detemine whether
 *        period-based cycle maps are required.
+*     2020-12-04 (DSB):
+*        Calculate and report the weighted chi-squared, summed over all chunks.
+*        This primarily gives the chi-squared in the source regions.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -673,6 +676,8 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
   int bolomap=0;                /* If set, produce single bolo maps */
   size_t bstride;               /* Bolometer stride */
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
+  double sumwchisq1;            /* Sum of unnormalised weighted chisquareds for all chunks */
+  double sumwchisq2;            /* Sum of weights for weighted chisquared for all chunks */
   double chitol=VAL__BADD;      /* chisquared change tolerance for stopping */
   double *chunkchange;          /* Holds final mapchange value for each chunk */
   int chunking;                 /* Will we be chunking due to low memory? */
@@ -1687,6 +1692,8 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
    *************************************************************************** */
   sumchunkweights = 0.0;
   *totexp = 0.0;
+  sumwchisq1 = 0.0;
+  sumwchisq2 = 0.0;
 
   for( contchunk=0; contchunk<ncontchunks  && !smf_interupt && *status == SAI__OK;
        contchunk++ ) {
@@ -2060,6 +2067,8 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
         dat.lbnd_out = lbnd_out;
         dat.ubnd_out = ubnd_out;
         dat.chisquared = chisquared;
+        dat.wchisquared = &sumwchisq1;
+        dat.wchisq = &sumwchisq2;
         dat.pixsize = pixsize;
         if( havenoi ) {
           dat.noi = model[whichnoi];
@@ -2097,8 +2106,8 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
         if( noisemaps ) smf_close_related( wf, &noisemaps, status );
 
         /* Allow an initial guess at the sky brightness to be supplied, in
-           which case copy it into "thismap", sample it and subtract it from
-           the cleaned data. The initial guess is returned in "lastmap". */
+           which case copy it into "dat.map", sample it and subtract it from
+           the cleaned data. */
         importsky = smf_initial_sky( wf, keymap, &dat, chunkfactor, &itsdone,
                                      status );
 
@@ -3798,8 +3807,18 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
 
   }
 
-  /* Normalise the returned exposure times to a mean chunk weight of unity. */
+  /* Normalise the weighted chi-squared, display it and write it out to a
+     parameter. */
   if( *status == SAI__OK ) {
+     double wchisq = 0.0;
+     if( sumwchisq2 > 0.0 ){
+        wchisq = sumwchisq1/sumwchisq2;
+        msgOutf( " ", "Normalised chi-squared in source regions: %g",
+                 status, wchisq );
+     }
+     parPut0d( "WCHISQ", wchisq, status );
+
+  /* Normalise the returned exposure times to a mean chunk weight of unity. */
     double meanw = sumchunkweights/ncontchunks;
     for (ipix = 0; ipix < msize; ipix++ ) {
        exp_time[ipix] /= meanw;
