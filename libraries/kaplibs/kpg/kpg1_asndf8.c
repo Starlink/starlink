@@ -1,6 +1,8 @@
 #include "f77.h"
 #include "kaplibs.h"
 #include "ast.h"
+#include "ndf.h"
+#include "mers.h"
 #include "sae_par.h"
 
 F77_SUBROUTINE(kpg1_asndf8)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(DIM),
@@ -73,6 +75,9 @@ F77_SUBROUTINE(kpg1_asndf8)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(DIM),
 *     4-OCT-2019 (DSB):
 *        Original version, copied from KPG1_ASNDF and changed to use
 *        INTEGER*8 bounds and dimensions.
+*     8-DEC-2020 (DSB):
+*        Convert supplied INTEGER*8 bounds to type hdsdim before use
+*        (hdsdim may be only 4 bytes).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -88,8 +93,26 @@ F77_SUBROUTINE(kpg1_asndf8)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(DIM),
    GENPTR_INTEGER(STATUS)
 
    AstFrameSet *iwcs;
+   int i, ndim;
+   hdsdim lbnd[NDF__MXDIM];
+   hdsdim ubnd[NDF__MXDIM];
 
-   kpg1Asndf8( *INDF, *NDIM, DIM, LBND, UBND, &iwcs, STATUS );
+   if( *STATUS == SAI__OK ) {
+      ndim = ( *NDIM < NDF__MXDIM ) ? *NDIM : NDF__MXDIM;
+      for( i = 0; i < ndim; i++ ) {
+         lbnd[ i ] = LBND[ i ];
+         ubnd[ i ] = UBND[ i ];
+         if( (F77_INTEGER8_TYPE) lbnd[ i ] != LBND[ i ] ||
+             (F77_INTEGER8_TYPE) ubnd[ i ] != UBND[ i ] ){
+            *STATUS = SAI__ERROR;
+            errRepf( " ", "KPG1_ASNDF8: Supplied bounds on axis %d are "
+                     "too big for HDS to handle.", STATUS, i + 1 );
+            break;
+         }
+      }
+   }
+
+   kpg1Asndf8( *INDF, *NDIM, DIM, lbnd, ubnd, &iwcs, STATUS );
    F77_EXPORT_INTEGER( astP2I( iwcs ), *IWCS );
 
 }
