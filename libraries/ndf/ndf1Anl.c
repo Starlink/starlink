@@ -76,7 +76,7 @@ void ndf1Anl( NdfACB **acb, int *status ){
 
 /* Check that the ACB supplied is valid and report an error if it
    is not. */
-   if( !ndf1IsValid( *acb ) ) {
+   if( !ndf1IsValid( (NdfObject *) *acb ) ) {
       *status = NDF__FATIN;
       msgSetc( "ROUTINE", "ndf1Anl" );
       errRep( " ", "Function ^ROUTINE called with an invalid 'acb' "
