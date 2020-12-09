@@ -76,6 +76,8 @@ void kpg1Axcpy( int indf1, int indf2, int ax1, int ax2, int *status ){
 *        Add _INT64
 *     4-OCT-2019 (DSB):
 *        Use 8-byte NDF interface.
+*     9-DEC-2020 (DSB):
+*        Fix bug that caused the wrong axis to have its bounds changed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -127,9 +129,9 @@ void kpg1Axcpy( int indf1, int indf2, int ax1, int ax2, int *status ){
    ndfBound( indf1, NDF__MXDIM, lbnd1, ubnd1, &ndim, status );
 
 /* Change the bounds on the required input axis to match those of the
-   output axis. */
-   lbnd1[ ax1 ] = lbnd2[ ax2 ];
-   ubnd1[ ax1 ] = ubnd2[ ax2 ];
+   output axis. Note, ax1 and ax2 are 1-based, not 0-based, so subtract 1. */
+   lbnd1[ ax1 - 1 ] = lbnd2[ ax2 - 1 ];
+   ubnd1[ ax1 - 1 ] = ubnd2[ ax2 - 1 ];
 
 /* Get a section of the input NDF with these bounds. */
    ndfSect( indf1, ndim, lbnd1, ubnd1, &indf3, status );
