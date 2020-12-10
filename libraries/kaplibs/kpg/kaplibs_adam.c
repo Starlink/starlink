@@ -59,6 +59,8 @@
 *        const and size_t to match Grp
 *     24-JUL-2008 (TIMJ):
 *        Use more robust F77_CREATE_EXPORT_CHARACTER.
+*     10-DEC-2020 (DSB):
+*        kpg1Asget8 modified to handle 4-byte hdsdim case.
 *     {enter_further_changes_here}
 
 *-
@@ -69,6 +71,7 @@
 #include "sae_par.h"
 #include "ast.h"
 #include "f77.h"
+#include "mers.h"
 #include "star/grp.h"
 #include "kaplibs.h"
 #include "kaplibs_private.h"
@@ -154,10 +157,11 @@ void kpg1Asget8( int indf, int ndim, int exact, int trim, int reqinv,
    DECLARE_LOGICAL(TRIM);
    DECLARE_LOGICAL(REQINV);
    DECLARE_INTEGER_ARRAY_DYN(SDIM);
-   DECLARE_INTEGER8_ARRAY_DYN(SLBND);
-   DECLARE_INTEGER8_ARRAY_DYN(SUBND);
+   DECLARE_INTEGER8_ARRAY(SLBND,ndim);
+   DECLARE_INTEGER8_ARRAY(SUBND,ndim);
    DECLARE_INTEGER(IWCS);
    DECLARE_INTEGER(STATUS);
+   int i;
 
    F77_EXPORT_INTEGER( indf, INDF );
    F77_EXPORT_INTEGER( ndim, NDIM );
@@ -166,10 +170,6 @@ void kpg1Asget8( int indf, int ndim, int exact, int trim, int reqinv,
    F77_EXPORT_LOGICAL( reqinv, REQINV );
    F77_CREATE_INTEGER_ARRAY( SDIM, ndim );
    F77_ASSOC_INTEGER_ARRAY( SDIM, sdim );
-   F77_CREATE_INTEGER8_ARRAY( SLBND, ndim );
-   F77_ASSOC_INTEGER8_ARRAY( SLBND, slbnd );
-   F77_CREATE_INTEGER8_ARRAY( SUBND, ndim );
-   F77_ASSOC_INTEGER8_ARRAY( SUBND, subnd );
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_LOCK( F77_CALL(kpg1_asget8)( INTEGER_ARG(&INDF),
@@ -192,11 +192,17 @@ void kpg1Asget8( int indf, int ndim, int exact, int trim, int reqinv,
    F77_IMPORT_INTEGER_ARRAY( SDIM, sdim, ndim );
    F77_FREE_INTEGER( SDIM );
 
-   F77_IMPORT_INTEGER8_ARRAY( SLBND, slbnd, ndim );
-   F77_FREE_INTEGER8( SLBND );
-
-   F77_IMPORT_INTEGER8_ARRAY( SUBND, subnd, ndim );
-   F77_FREE_INTEGER8( SUBND );
+   for( i = 0; i < ndim; i++ ){
+      slbnd[ i ] = SLBND[ i ];
+      subnd[ i ] = SUBND[ i ];
+      if( (F77_INTEGER8_TYPE)slbnd[ i ] != SLBND[ i ] ||
+          (F77_INTEGER8_TYPE)subnd[ i ] != SUBND[ i ] ){
+         *status = SAI__ERROR;
+         errRepf( " ", "kpg1Asget8: Supplied bounds on axis %d are "
+                  "too big for HDS to handle.", status, i + 1 );
+         break;
+      }
+   }
 
    F77_IMPORT_INTEGER( STATUS, *status );
 
