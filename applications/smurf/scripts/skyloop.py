@@ -161,10 +161,10 @@
 *     INITIALSKY = NDF (Read)
 *        An NDF holding an initial guess at the final map. This should
 *        contain any a priori expectations of what the final map should look
-*        like. It is used to define the starting point for the iterative map-making 
-*        algorithm, in place of the usual flat map full of zeros. The data units 
-*        in the supplied NDF must be "pW". If an NDF is supplied, it is also used 
-*        to define the WCS and pixel bounds of the output map (any NDF supplied 
+*        like. It is used to define the starting point for the iterative map-making
+*        algorithm, in place of the usual flat map full of zeros. The data units
+*        in the supplied NDF must be "pW". If an NDF is supplied, it is also used
+*        to define the WCS and pixel bounds of the output map (any NDF supplied
 *        for parameter REF is then ignored). [!]
 *     IPREF = NDF (Read)
 *        An existing NDF that is to be used to define the correction
@@ -525,7 +525,6 @@ try:
 #  Also ensure the map created by makemap has the same pixel bounds as the
 #  initial sky.
    else:
-      ref = initsky
       invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(initsky) )
       units = starutil.get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
       if units != "pW":
@@ -535,6 +534,23 @@ try:
       ly = starutil.get_task_par( "lbound(2)", "ndftrace" )
       ux = starutil.get_task_par( "ubound(1)", "ndftrace" )
       uy = starutil.get_task_par( "ubound(2)", "ndftrace" )
+
+#  The supplied initial sky map may have been created by makemap or
+#  skyloop, in which case it may contain components that would affect the
+#  behaviour of makemap now. For instance, the initial sky map may
+#  contain a quality component containing an AST mask. If this were
+#  passed on to makemap unchanged, it would cause makemap to use the AST
+#  mask in the supplied initial sky map, rather than the AST mask implied by
+#  the config parameters. The same sort of thing applies to the Variance
+#  component and any NDFs contained in the SMURF extension. So take a
+#  copy of the supplied initial sky NDF and delete all these components.
+      tsky = NDG( 1 )
+      invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(initsky,tsky) )
+      invoke("$KAPPA_DIR/erase object={0}.Variance ok=yes report=no".format(tsky) )
+      invoke("$KAPPA_DIR/erase object={0}.Quality ok=yes report=no".format(tsky) )
+      invoke("$KAPPA_DIR/erase object={0}.more.smurf ok=yes report=no".format(tsky) )
+      initsky = tsky
+      ref = initsky
 
 #  See if we are using pre-cleaned data, in which case there is no need
 #  to export the cleaned data on the first iteration. Note we need to
