@@ -95,6 +95,9 @@
 *        the creating of a mask, which may mask out the bulk of the map.
 *        - Use sections from the WEIGHTS and EXP_TIME NDFs that match the
 *        main NDF.
+*     11-DEC-2020 (DSB):
+*        Cater for cases wher the supplied map does not have the expected NDFs
+*        in the SMURF extension.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -242,33 +245,38 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
          ndfXloc( indf1, SMURF__EXTNAME, "READ", &xloc, status );
 
 /* Copy the WEIGHTS NDF from the SMURF extension to the mapweight buffer in "dat". */
-         ndfFind( xloc, "WEIGHTS", &tndf, status );
-         ndfSect( tndf, 2, dat->lbnd_out, dat->ubnd_out, &tndf2, status );
-         ndfMap( tndf2, "DATA", "_DOUBLE", "READ", (void **) &tptr, &nel, status );
-         if( *status == SAI__OK ) {
-            memcpy( dat->mapweight, tptr, dat->msize*sizeof(*tptr));
+         datThere( xloc, "WEIGHTS", &there, status );
+         if( there ) {
+            ndfFind( xloc, "WEIGHTS", &tndf, status );
+            ndfSect( tndf, 2, dat->lbnd_out, dat->ubnd_out, &tndf2, status );
+            ndfMap( tndf2, "DATA", "_DOUBLE", "READ", (void **) &tptr, &nel, status );
+            if( *status == SAI__OK ) {
+               memcpy( dat->mapweight, tptr, dat->msize*sizeof(*tptr));
+            }
+            ndfAnnul( &tndf2, status );
+            ndfAnnul( &tndf, status );
          }
-         ndfAnnul( &tndf2, status );
-         ndfAnnul( &tndf, status );
 
 /* Copy the EXP_TIME NDF from the SMURF extension to the hitsmaps buffer in
    "dat". Use the step time in the supplied smfData to convert from time
    to hits. */
-         ndfFind( xloc, "EXP_TIME", &tndf, status );
-         ndfSect( tndf, 2, dat->lbnd_out, dat->ubnd_out, &tndf2, status );
-         ndfMap( tndf2, "DATA", "_DOUBLE", "READ", (void **) &tptr, &nel, status );
-         if( *status == SAI__OK ) {
-            double steptime = dat->res[0]->sdata[0]->hdr->steptime;
-            for( i = 0; i < dat->msize; i++ ) {
-               dat->hitsmap[ i ] =  (int) ( tptr[ i ]/steptime + 0.5 );
+         datThere( xloc, "EXP_TIME", &there, status );
+         if( there ) {
+            ndfFind( xloc, "EXP_TIME", &tndf, status );
+            ndfSect( tndf, 2, dat->lbnd_out, dat->ubnd_out, &tndf2, status );
+            ndfMap( tndf2, "DATA", "_DOUBLE", "READ", (void **) &tptr, &nel, status );
+            if( *status == SAI__OK ) {
+               double steptime = dat->res[0]->sdata[0]->hdr->steptime;
+               for( i = 0; i < dat->msize; i++ ) {
+                  dat->hitsmap[ i ] =  (int) ( tptr[ i ]/steptime + 0.5 );
+               }
             }
+            ndfAnnul( &tndf2, status );
+            ndfAnnul( &tndf, status );
          }
-         ndfAnnul( &tndf2, status );
-         ndfAnnul( &tndf, status );
 
 /* Annul the SMURF extension locator. */
          datAnnul( &xloc, status );
-
       }
 
 /* If the NDF has a Quality component, import it and create initial AST,
