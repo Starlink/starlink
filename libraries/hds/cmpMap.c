@@ -2,6 +2,7 @@
 #include <string.h>
 #include "sae_par.h"
 #include "hds.h"
+#include "ems.h"
 #include "dat_par.h"
 #include "cmp_err.h"
 
