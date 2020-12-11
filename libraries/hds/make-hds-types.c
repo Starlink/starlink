@@ -66,8 +66,12 @@
  *     2017-Nov-16 (DSB):
  *        Change HDS(_)DIM_TYPE to HDS(_)DIM_CODE, and add a new macro
  *        HDS_DIM_TYPE that holds the full HDS name for the dimension type.
+ *     2020-Dec-11 (DSB):
+ *        - Add HDSDIM_LCODE and remove unnecessary junk.
+ *        - Add HDS_DIM_SIZEOF
 
  *  Copyright:
+ *     Copyright (C) 2017-2020 East Asian Observatory
  *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
  *     All Rights Reserved.
 
@@ -166,6 +170,7 @@ error unable to find an 8 byte integer type
 #if BIGDIM
 #define DIM_TYPE INT_BIG
 #define HDS_DIM_CODE "K"
+#define HDS_DIM_LCODE "k"
 #define HDS_DIM_TYPE "_INT64"
 #define SIZEOF_DIM 8
 #define DIM_FORMAT INT_BIG_S
@@ -173,6 +178,7 @@ error unable to find an 8 byte integer type
 #else
 #define DIM_TYPE STD_INT
 #define HDS_DIM_CODE "I"
+#define HDS_DIM_LCODE "i"
 #define HDS_DIM_TYPE "_INTEGER"
 #define SIZEOF_DIM 4
 #define DIM_FORMAT STD_INT_FMT
@@ -352,8 +358,10 @@ int main (int argc, char ** argv ) {
            "typedef %s hdsdim;\n"
            "#define HDS_DIM_FORMAT \"%s\"\n"
            "#define HDS_DIM_TYPE \"%s\"\n"
-           "#define HDS_DIM_CODE %s\n\n",
-           DIM_TYPE, DIM_FORMAT, HDS_DIM_TYPE, HDS_DIM_CODE );
+           "#define HDS_DIM_SIZEOF %d\n"
+           "#define HDS_DIM_CODE %s\n"
+           "#define HDS_DIM_LCODE %s\n\n",
+           DIM_TYPE, DIM_FORMAT, HDS_DIM_TYPE, SIZEOF_DIM, HDS_DIM_CODE, HDS_DIM_LCODE );
 
   fprintf( OutputFile,
            "/* Helper macros for HDS dimensions. For instance HDSDIM_CODE(datFred)\n"
@@ -363,11 +371,9 @@ int main (int argc, char ** argv ) {
            "#define HDSDIM_CODE(a) HDS_GLUE(a,HDS_DIM_CODE)\n\n");
 
   fprintf( OutputFile,
-           "/* Helper macros for HDS dimensions. For instance HDSDIM_TYPE(datFred)\n"
-           "   expands to datFredK or datFredI, as required. */\n"
-           "#define HDS_GLUE_HELPER(a,b) a##b\n"
-           "#define HDS_GLUE(a,b) HDS_GLUE_HELPER(a,b)\n"
-           "#define HDSDIM_TYPE(a) HDS_GLUE(a,HDS_DIM_TYPE)\n\n");
+           "/* Lower case version of HDSDIM_CODE. For instance HDSDIM_LCODE(datFred)\n"
+           "   expands to datFredk or datFredi, as required. */\n"
+           "#define HDSDIM_LCODE(a) HDS_GLUE(a,HDS_DIM_LCODE)\n\n");
 
   fprintf( POutputFile,
 	   "/* Private types and sizes relating to dimensions */\n"
