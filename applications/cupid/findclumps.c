@@ -16,6 +16,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 
 /* A string used to mark the end of the configuration parameters and the
    start of the ADAM parameters within the group of history text lines. */
@@ -998,7 +999,7 @@ void findclumps( int *status ) {
    float *rmask;                /* Pointer to cump mask array */
    hdsdim dim[ NDF__MXDIM ];    /* Pixel axis dimensions */
    hdsdim dims[3];              /* Pointer to array of array dimensions */
-   hdsdim n;                    /* Number of values summed in "sum" */
+   int64_t n;                   /* Number of values summed in "sum" */
    hdsdim slbnd[ NDF__MXDIM ];  /* The lower bounds of the significant pixel axes */
    hdsdim subnd[ NDF__MXDIM ];  /* The upper bounds of the significant pixel axes */
    int backoff;                 /* Remove background when finding clump sizes? */

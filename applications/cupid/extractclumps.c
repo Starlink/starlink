@@ -15,6 +15,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 
 
 void extractclumps( int *status ) {
@@ -279,7 +280,7 @@ void extractclumps( int *status ) {
    hdsdim ix;                   /* GRID value on 1st axis */
    hdsdim iy;                   /* GRID value on 2nd axis */
    hdsdim iz;                   /* GRID value on 3rd axis */
-   hdsdim n;                    /* Number of values summed in "sum" */
+   int64_t n;                   /* Number of values summed in "sum" */
    hdsdim slbnd[ NDF__MXDIM ];  /* The lower bounds of the significant pixel axes */
    hdsdim subnd[ NDF__MXDIM ];  /* The upper bounds of the significant pixel axes */
    int *ipa;                    /* Pointer to pixel assignment array */

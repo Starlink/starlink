@@ -312,8 +312,8 @@ HDSLoc *cupidReinhold( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *i
 
 /* Initialise the bounding boxes. */
       for( i = 0; i < 3*( maxid + 1 ); i++ ) {
-         clbnd[ i ] = VAL__MAXK;
-         cubnd[ i ] = VAL__MINK;
+         clbnd[ i ] = HDSDIM_CODE(VAL__MAX);
+         cubnd[ i ] = HDSDIM_CODE(VAL__MIN);
       }
 
 /* Loop round every pixel in the final pixel assignment array. */
