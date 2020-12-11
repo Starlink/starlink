@@ -123,18 +123,18 @@
 *        masks from the NDF, and the following parameters are added
 *        to the above default config:
 *        ---
-*           ast.zero_mask = ref
-*           pca.zero_mask = mask2
-*           com.zero_mask = mask2
-*           flt.zero_mask = mask2
+*           ast.zero_mask = mask2
+*           pca.zero_mask = mask3
+*           com.zero_mask = mask3
+*           flt.zero_mask = mask3
 *        ---
-*        The above "ref" mask consists of clumps of pixel with SNR greater
-*        than 3, extended down to an SNR level of 2. The "mask2" mask
+*        The above "mask2" mask consists of clumps of pixel with SNR greater
+*        than 3, extended down to an SNR level of 2. The "mask3" mask
 *        consists of clumps of pixel with SNR greater than 5, extended
 *        down to an SNR level of 3. However, the above SNR levels are
 *        raised if necessary to ensure that the source occupies no more
 *        than 20% of the pixels within the "ref" mask, and 10% of the
-*        pixels within the "mask2" mask.
+*        pixels within the "mask3" mask.
 *
 *        The same configuration is used for all three Stokes parameters -
 *        I, Q and U with the exception that "com.noflag=1" is added to
@@ -242,6 +242,24 @@
 *        already exist in the directory specified by parameter MAPDIR
 *        are re-used rather than being re-created from the corresponding
 *        input data.
+*     INITSKYI = NDF (Read)
+*        An NDF holding an initial guess at the final I map. This should
+*        contain any a priori expectations of what the final I map should look
+*        like. It is used to define the starting point for the iterative map-making
+*        algorithm, in place of the usual flat map full of zeros. The data units
+*        in the supplied NDF must be "pW". See also parameter REF. [!]
+*     INITSKYQ = NDF (Read)
+*        An NDF holding an initial guess at the final Q map. This should
+*        contain any a priori expectations of what the final Q map should look
+*        like. It is used to define the starting point for the iterative map-making
+*        algorithm, in place of the usual flat map full of zeros. The data units
+*        in the supplied NDF must be "pW". See also parameter REF. [!]
+*     INITSKYU = NDF (Read)
+*        An NDF holding an initial guess at the final U map. This should
+*        contain any a priori expectations of what the final U map should look
+*        like. It is used to define the starting point for the iterative map-making
+*        algorithm, in place of the usual flat map full of zeros. The data units
+*        in the supplied NDF must be "pW". See also parameter REF. [!]
 *     IOUT = NDF (Write)
 *        The output NDF in which to return the total intensity (I) map
 *        including all supplied observations. This will be in units of pW.
@@ -457,7 +475,12 @@
 *        (!) is supplied, then the map (if any) specified by parameter
 *        MASK is used. See also parameter REFFCF. Note, if a map is
 *        supplied for either REF or MASK, then the PIXSIZE parameter is
-*        ignored and the pixel size in the supplied map is used. [!]
+*        ignored and the pixel size in the supplied map is used.
+*
+*        The value of the REF parameter is ignored if an NDF is supplied
+*        for one or more of parameters INITSKYI, INITSKYQ or INITSKYU. In
+*        such cases the first such NDF is used to define the pixel grid
+*        for all output maps. [!]
 *     REFFCF = _REAL (Read)
 *        The FCF that should be used to convert the supplied REF map
 *        to pW. This parameter is only used if the supplied REF map is
@@ -1444,6 +1467,15 @@ try:
    params.append(starutil.ParGrp("CALCQUCONFIG", "CALCQU tuning parameters",
                                  "def", noprompt=True))
 
+   params.append(starutil.ParNDG( "INITSKYI", "The initial I map", default=None,
+                                  minsize=0, maxsize=1, noprompt=True ))
+
+   params.append(starutil.ParNDG( "INITSKYQ", "The initial Q map", default=None,
+                                  minsize=0, maxsize=1, noprompt=True ))
+
+   params.append(starutil.ParNDG( "INITSKYU", "The initial U map", default=None,
+                                  minsize=0, maxsize=1, noprompt=True ))
+
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
    parsys = ParSys( params )
@@ -1539,8 +1571,33 @@ try:
          msg_out("AST mask: {0}.".format(astmask))
          msg_out("PCA mask: {0}.".format(pcamask))
 
-#  Get the reference map
-   ref = parsys["REF"].value
+#  Get the initial sky maps. Check they are all in units of pW. Get the
+#  pixel bounds of the first.
+   ref = None
+   first = True
+   initskys = {}
+   for qui in ('I', 'Q', 'U'):
+      param = "INITSKY"+qui
+      initskys[qui] = parsys[param].value
+      if initskys[qui]:
+         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(initskys[qui]) )
+         if first:
+            first = False
+            ref = initskys[qui]
+            lx = starutil.get_task_par( "lbound(1)", "ndftrace" )
+            ly = starutil.get_task_par( "lbound(2)", "ndftrace" )
+            ux = starutil.get_task_par( "ubound(1)", "ndftrace" )
+            uy = starutil.get_task_par( "ubound(2)", "ndftrace" )
+
+         units = starutil.get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
+         if units != "pW":
+            raise starutil.InvalidParameterError("Map supplied for parameter {0}"
+                          " ({1}) has units '{2}' - units must be 'pW'".
+                          format(param,initskys[qui],units))
+
+#  If no initial sky maps were supplied, get the reference map
+   if ref is None:
+      ref = parsys["REF"].value
    if not ref:
       if maskmap is not None:
          ref = maskmap[0]
@@ -2239,12 +2296,12 @@ try:
          fd.write("flt.zero_circle = (0.0083)\n")
 
       else:
-         fd.write("ast.zero_mask = ref\n")
+         fd.write("ast.zero_mask = mask2\n")
          if pcamask:
-            pcamaskpar = "mask2={0}".format(pcamask)
-            fd.write("pca.zero_mask = mask2\n")
-            fd.write("com.zero_mask = mask2\n")
-            fd.write("flt.zero_mask = mask2\n")
+            pcamaskpar = "mask3={0}".format(pcamask)
+            fd.write("pca.zero_mask = mask3\n")
+            fd.write("com.zero_mask = mask3\n")
+            fd.write("flt.zero_mask = mask3\n")
 
 #  If the user supplied extra config parameters, append them to the
 #  config file. Note, "config" will include any required "^" character and
@@ -2288,7 +2345,6 @@ try:
          fd.write("pca.zero_snr=0\n")
          fd.write("flt.zero_snr=0\n")
          fd.write("com.zero_snr=0\n")
-
       fd.close()
 
 #  Create the QU config file in the same way. For Q and U maps, the
@@ -2351,6 +2407,28 @@ try:
             this_ip = ip
          else:
             continue
+
+
+#  Set up the parameter string describing the initial sky map (if any),
+#  together with (if not using skyloop) the map to use as the reference.
+      initsky = ""
+      if skyloop:
+         if initskys[qui]:
+            initsky = "initialsky={0}".format(initskys[qui])
+      else:
+         if initskys[qui]:
+            tref = initskys[qui]
+            fd = open( conf, "a" )
+            fd.write('importsky=ref\n')
+            fd.close()
+            initsky = "lbnd=\[{0},{1}\] ubnd=\[{2},{3}\]".format(lx,ly,ux,uy)
+         elif maskmap:
+            tref = astmask
+         else:
+            tref = ref
+
+      if maskmap:
+         initsky += " mask2={0}".format(astmask)
 
 #  Get the suffix to append to the end of individual observation maps
 #  created below (e.g. "_Imap" for ext-masked I maps or "_imap" for
@@ -2754,15 +2832,15 @@ try:
             msg_out("\n--------------------------------------------------\n")
             if not maskmap:
                invoke("$SMURF_DIR/skyloop.py in=^{0} config=^{1} out={2} ref={3} extra={4} "
-                      "pixsize={5} {6} obsdir={7} retain={8} logfile={9}".
+                      "pixsize={5} {6} obsdir={7} retain={8} logfile={9} {10}".
                       format(inpaths,conf,unsmoothed,ref,extra,pixsize,this_ip,obsdir,
-                             retain,skylog),
+                             retain,skylog,initsky),
                              msg_level=starutil.PROGRESS,cmdscreen=False)
             else:
                invoke("$SMURF_DIR/skyloop.py in=^{0} config=^{1} out={2} ref={3} extra={4} "
-                      "pixsize={5} {6} {7} obsdir={8} retain={9} logfile={10}".
+                      "pixsize={5} {6} {7} obsdir={8} retain={9} logfile={10} {11}".
                       format(inpaths,conf,unsmoothed,astmask,extra,pixsize,this_ip,
-                             pcamaskpar,obsdir,retain,skylog),
+                             pcamaskpar,obsdir,retain,skylog,initsky),
                              msg_level=starutil.PROGRESS,cmdscreen=False)
 
             starutil.ilevel = old_ilevel
@@ -2962,11 +3040,11 @@ try:
 
                      if not maskmap:
                         invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
-                            "pixsize={5} {6} {7}".format(isdf,conf,unsmoothed,ref,pntfile,pixsize,ip,abpar))
+                               "pixsize={5} {6} {7} {8}".format(isdf,conf,unsmoothed,tref,pntfile,pixsize,ip,abpar,initsky))
                      else:
                         invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
-                            "pixsize={5} {6} {7} {8}".format(isdf,conf,unsmoothed,astmask,pntfile,
-                                                           pixsize,ip,pcamaskpar,abpar))
+                            "pixsize={5} {6} {7} {8} {9}".format(isdf,conf,unsmoothed,tref,pntfile,
+                                                                 pixsize,ip,pcamaskpar,abpar,initsky))
 
 #  If we do not yet know what pcathresh value to use, see if makemap aborted
 #  due to slow convergence. If so, reduce the number of PCA components
