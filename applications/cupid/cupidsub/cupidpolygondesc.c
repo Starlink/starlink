@@ -272,7 +272,11 @@ AstRegion *cupidPolygonDesc( double *ipd, int velax, double *peak,
 
 /* Create a Polygon with up to 15 vertices, enclosing the non-zero pixels
    around the clump peak. */
-      polygon = astOutline8I( 0, AST__NE, ipm, lbnd, ubnd, 1.0, 15, inside, 1 );
+#if HDS_DIM_SIZEOF == 8
+         polygon = astOutline8I( 0, AST__NE, ipm, lbnd, ubnd, 1.0, 15, inside, 1 );
+#else
+         polygon = astOutlineI( 0, AST__NE, ipm, lbnd, ubnd, 1.0, 15, inside, 1 );
+#endif
 
 /* If required, transform the polygon vertices into WCS. */
       if( wcsmap ) {

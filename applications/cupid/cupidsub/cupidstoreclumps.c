@@ -25,7 +25,7 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
                        int backoff, int stccol, int velax, double beamcorr[ 3 ],
                        const char *ttl, int usewcs, AstFrameSet *iwcs,
                        const char *dataunits, Grp *hist,
-                       FILE *logfile, int nrej, int *nclumps, int *status ){
+                       FILE *logfile, size_t nrej, int *nclumps, int *status ){
 /*
 *+
 *  Name:
@@ -43,7 +43,7 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 *                            int backoff, int stccol, int velax,
 *                            double beamcorr[ 3 ], const char *ttl, int usewcs,
 *                            AstFrameSet *iwcs, const char *dataunits,
-*                            Grp *hist, FILE *logfile, int nrej, int *nclumps,
+*                            Grp *hist, FILE *logfile, size_t nrej, int *nclumps,
 *                            int *status )
 
 *  Description:

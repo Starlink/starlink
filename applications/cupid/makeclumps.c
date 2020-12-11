@@ -361,6 +361,8 @@ void makeclumps( int *status ) {
 *        - Report each clump position to the user if MSG_FILTER = VERBOSE
 *     21-NOV-2019 (DSB):
 *        Multi-thread.
+*     12-DEC-2020 (DSB):
+*        Cater for 4-byte hdsdim case.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -424,7 +426,6 @@ void makeclumps( int *status ) {
    int indf3;                    /* Identifier for input WCS NDF */
    int indf;                     /* Identifier for output NDF with noise */
    int ishape;                   /* STC-S shape for spatial coverage */
-   int ivals[ NDF__MXDIM ];      /* 4-byte interger bounds */
    int iw;                       /* Index of worker thread */
    int nc;                       /* Number of clumps created */
    int nclump;                   /* Number of clumps to create */
@@ -438,9 +439,7 @@ void makeclumps( int *status ) {
    int precat;                   /* Create catalogue before beam smoothing? */
    int sdims;                    /* Number of significant pixel axes */
    size_t area;                  /* Clump area */
-   size_t ierr;                  /* Index of first conversion error */
    size_t nel;                   /* Number of elements in array */
-   size_t nerr;                  /* Count of conversion errors */
    size_t st;                    /* A size_t that can be passed as an argument */
    size_t step;                  /* Number of pixels per thread */
    unsigned long int seed;       /* Seed for random number generator */
@@ -471,22 +470,8 @@ void makeclumps( int *status ) {
          errAnnul( status );
       } else {
          ndfBound( indf3, 3, lbnd, ubnd, &ndim, status );
-
-         vecKtoI( 0, ndim, lbnd, ivals, &ierr, &nerr, status );
-         if( nerr > 0 && *status == SAI__OK ) {
-            errRep( " ", "Lower bounds of input NDF are too large",
-                    status );
-         }
-         parDef1i( "LBND", ndim, ivals, status );
-         vecItoK( 0, ndim, ivals, lbnd, &ierr, &nerr, status );
-
-         vecKtoI( 0, ndim, ubnd, ivals, &ierr, &nerr, status );
-         if( nerr > 0 && *status == SAI__OK ) {
-            errRep( " ", "Upper bounds of input NDF are too large",
-                    status );
-         }
-         parDef1i( "UBND", ndim, ivals, status );
-         vecItoK( 0, ndim, ivals, ubnd, &ierr, &nerr, status );
+         HDSDIM_LCODE(parDef1)( "LBND", ndim, lbnd, status );
+         HDSDIM_LCODE(parDef1)( "UBND", ndim, ubnd, status );
 
          kpg1Gtwcs( indf3, &iwcs, status );
          ndfAnnul( &indf3, status );
@@ -495,13 +480,11 @@ void makeclumps( int *status ) {
 
 /* Get the required axis bounds. */
    if( iwcs ) {
-      parExaci( "LBND", ndim, ivals, status );
+      HDSDIM_LCODE(parExac)( "LBND", ndim, lbnd, status );
    } else {
-      parGet1i( "LBND", 3, ivals, &ndim, status );
+      HDSDIM_LCODE(parGet1)( "LBND", 3, lbnd, &ndim, status );
    }
-   vecItoK( 0, ndim, ivals, lbnd, &ierr, &nerr, status );
-   parExaci( "UBND", ndim, ivals, status );
-   vecItoK( 0, ndim, ivals, ubnd, &ierr, &nerr, status );
+   HDSDIM_LCODE(parExac)( "UBND", ndim, ubnd, status );
 
 /* Get the indices and bounds of the significant pixel axes. */
    sdims = 0;

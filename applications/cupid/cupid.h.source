@@ -302,7 +302,7 @@ void cupidGCcalcf( int, double *, int *, double * );
 void cupidGCcalcg( int, double *, int *, double * );
 void cupidREdges( size_t, double *, size_t *, int *, int, double, double, double, double, int * );
 void cupidRFillLine( int *, int *, size_t, int, size_t[ 3 ], hdsdim[ 3 ], hdsdim[ 3 ], size_t, int, int, int, hdsdim*[3], int * );
-void cupidStoreClumps( const char *, const char *, int, HDSLoc *, HDSLoc *, int, int, int, int, int, double[ 3 ], const char *, int, AstFrameSet *, const char *, Grp *, FILE *, int, int *, int * );
+void cupidStoreClumps( const char *, const char *, int, HDSLoc *, HDSLoc *, int, int, int, int, int, double[ 3 ], const char *, int, AstFrameSet *, const char *, Grp *, FILE *, size_t, int *, int * );
 void cupidStoreConfig( HDSLoc *, AstKeyMap *, int * );
 
 void findback( int * );
