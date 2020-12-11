@@ -269,6 +269,7 @@ void CGEN_FUNCTION(cupidSumClumps)( ThrWorkForce *wf, CGEN_TYPE *in, int ndim,
    nfinished = 0;
    clump_index = 0;
    for( j = 1; j <= nclump; j++ ) {
+      cloc = NULL;
       datCell( obj, 1, &j, &cloc, status );
 
 /* We must now unlock the HDS object so that the worker threads can lock
