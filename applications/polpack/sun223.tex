@@ -10,10 +10,10 @@
 \stardocsource      {sun\stardocnumber}
 \stardocnumber      {223.7}
 \stardocauthors     {D.S. Berry \& T.M. Gledhill }
-\stardocdate        {15th April 2020}
+\stardocdate        {14th December 2020}
 \stardoctitle       {POLPACK \\
                             An Imaging Polarimetry Reduction Package}
-\stardocversion     {Version 3.6-2}
+\stardocversion     {Version 3.6-3}
 \stardocmanual      {Users' Manual}
 \startitlepic {\includegraphics[clip,width=0.75\textwidth]{sun223_figures/fig}}
 \stardocabstract  {POLPACK is a package of applications for
@@ -4728,7 +4728,9 @@ for NDF applications.
       }{
          The scale to be used for the vectors.  The supplied value
          should give the data value corresponding to a vector length of
-         one centimetre.  []
+         one centimetre.  If a negative value is supplied, all vectors
+         will be drawn with the same length (the fixed vector length is
+         proportional to the supplied VSCALE value). []
       }
       \sstsubsection{
          ZAXVAL = LITERAL (Read)

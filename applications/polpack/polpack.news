@@ -1,9 +1,16 @@
 1 POLPACK
 
- Version 3.6.2 of POLPACK (an applications package for processing imaging
+ Version 3.6.3 of POLPACK (an applications package for processing imaging
  polarimetry data) is now available. It is fully documented in SUN/223.
 
- The main changes since V3.6.1 are:
+ The main changes since V3.6.3 are:
+
+ o  The POLPLOT command can now plot vectors with a constant length by
+ giving a negative value for the VSCALE parameter. The length of the
+ plotted vectors is then proportional to the supplied VSCALE value.
+
+
+ The main changes between V3.6.1 and V3.6.2 were:
 
  o  The POLVEC and POLBIN commands now let you choose between two
  different de-biasing methods using a new parameter called DEBIASTYPE.

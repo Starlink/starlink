@@ -281,7 +281,9 @@
 *     VSCALE = _REAL (Read)
 *        The scale to be used for the vectors.  The supplied value
 *        should give the data value corresponding to a vector length of
-*        one centimetre.  []
+*        one centimetre.  If a negative value is supplied, all vectors
+*        will be drawn with the same length (the fixed vector length is
+*        proportional to the supplied VSCALE value). []
 *     ZAXVAL = LITERAL (Read)
 *        Specifies the Z axis value for the vectors to be displayed. The
 *        given value should be in the current coordinate Frame of the
@@ -426,6 +428,9 @@
 *        AGP_DEASS, which doesn't seem to clear the AGI database properly.
 *     13-APR-2007 (DSB):
 *        Allow the key to be transparent.
+*     14-DEC-2020 (DSB):
+*        Allow negative VSCALE values to be used to indicate that all
+*        vectors should be drawn with the same length.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1208,18 +1213,23 @@
 
 *  Establish the default value for the vector scaling factor such that
 *  a typical data value corresponds to a vector equal to one 15th of
-*  the smallest DATA zone dimension, and then get a new (positive) value.
-*  If a value of zero is supplied, use the default value.  XM is measured in
-*  metres so 100 time converts to centimetres.
+*  the smallest DATA zone dimension, and then get a new value. If a value of
+*  zero is supplied, use the default value.  XM is measured in metres so 100
+*  time converts to centimetres. If a negative scale is supplied, all
+*  vectors are drawn with the same length.
       DEFSCA = ABS( NVEC0 * TYPDAT / ( 100.0 * MIN( XM, YM ) ) )
       CALL PAR_DEF0R( 'VSCALE', DEFSCA, STATUS )
       CALL PAR_GET0R( 'VSCALE', VSCALE, STATUS )
-      VSCALE = ABS( VSCALE )
-      IF ( VSCALE .LE. VAL__SMLR ) VSCALE = VAL__SMLR
+      IF ( VSCALE .GE. 0.0 .AND.
+     :     VSCALE .LE. VAL__SMLR ) VSCALE = VAL__SMLR
 
 *  Convert VSCALE so that it gives data units per unit distance in the
 *  graphics world coordinate system, rather than data units per centimetre.
-      DSCALE = VSCALE * 100.0 * XM / ( X2 - X1 )
+      IF( VSCALE .GE. 0.0 ) THEN
+         DSCALE = VSCALE * 100.0 * XM / ( X2 - X1 )
+      ELSE
+         DSCALE = VSCALE
+      END IF
 
 *  Get the vector justification to be used.
       CALL PAR_CHOIC( 'JUST', 'CENTRE', 'CENTRE,START,END', .TRUE.,

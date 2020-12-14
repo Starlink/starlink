@@ -39,7 +39,9 @@
 *        An ACW angle to add on to each orientation, in radians.
 *     DSCALE = REAL (Given)
 *        A factor which converts data values in VECMAG into
-*        corresponding vector lengths in centimetres.
+*        corresponding vector lengths in centimetres. If this is
+*        negative, all vectors are drawn with the same length regardless
+*        of the value of VECMAG.
 *     AHSIZE = REAL (Given)
 *        The length of each stroke of the arrowhead placed at the end
 *        of the vector, in pixels.  A value of zero causes no arrowhead
@@ -76,6 +78,8 @@
 *        over-writing the border.
 *     12-MAY-1999 (DSB):
 *        Added argument REFANG.
+*     14-DEC-2020 (DSB):
+*        If DSCALE is negative, draw all vectors with the same lenbgth.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -113,15 +117,22 @@
       PARAMETER ( PIBY2 = 1.5707963268 )
 
 *  Local Variables:
+      DOUBLE PRECISION LX        ! Lower bounds on X axis
+      DOUBLE PRECISION LY        ! Lower bounds on Y axis
+      DOUBLE PRECISION SIZEX     ! Bounding box size on X axis
+      DOUBLE PRECISION SIZEY     ! Bounding box size on Y axis
+      DOUBLE PRECISION UX        ! Upper bounds on X axis
+      DOUBLE PRECISION UY        ! Upper bounds on Y axis
       INTEGER I                  ! Vector index
-      INTEGER NPLOT              ! No. of vectors plotted
+      INTEGER NPLOT              ! No. of vectors to plot
+      REAL D                     ! Change to axis extent
       REAL VECANG                ! Vector position angle in radians
       REAL VECLEN                ! Vector length in pixels
-      REAL D                     ! Change to axis extent
       REAL X1                    ! X coordinate at bottom left corner
       REAL X2                    ! X coordinate at top right corner
       REAL Y1                    ! Y coordinate at bottom left corner
       REAL Y2                    ! Y coordinate at top right corner
+
 *.
 
 *  Check inherited global status.
@@ -164,6 +175,48 @@
 *  Establish the new window.
       CALL PGSWIN( X1, X2, Y1, Y2 )
 
+
+*  Next determine the length for vectors if DSCALE is negative.
+*  ============================================================
+      IF( DSCALE .LT. 0.0 ) THEN
+
+*  Find the bounding box enclosing all good vectors. Also count the
+*  number of good vectors.
+         LX = VAL__MAXD
+         UX = VAL__MIND
+         LY = VAL__MAXD
+         UY = VAL__MIND
+         NPLOT = 0
+
+         DO I = 1, NVEC
+            IF ( VECMAG( I ) .NE. VAL__BADR .AND.
+     :           VECORN( I ) .NE. VAL__BADR .AND.
+     :           X( I ) .NE. VAL__BADD .AND.
+     :           Y( I ) .NE. VAL__BADD ) THEN
+               LX = MIN( LX, X( I ) )
+               UX = MAX( UX, X( I ) )
+               LY = MIN( LY, Y( I ) )
+               UY = MAX( UY, Y( I ) )
+               NPLOT = NPLOT + 1
+            END IF
+         END DO
+
+*  Find the mean screen area per good vector. Take its square root to get
+*  the mean distance between good vectors. Multiple DSCALE by this value.
+         IF( NPLOT .GT. 0 ) THEN
+            SIZEX = UX - LX
+            SIZEY = UY - LY
+            IF( SIZEX .GT. 0.0 .AND. SIZEY .GT. 0.0 ) THEN
+               DSCALE = DSCALE*SQRT( SIZEX*SIZEY/NPLOT )
+            ELSE IF( SIZEX .GT. 0.0 ) THEN
+               DSCALE = DSCALE*SIZEX/NPLOT
+            ELSE IF( SIZEY .GT. 0.0 ) THEN
+               DSCALE = DSCALE*SIZEY/NPLOT
+            END IF
+         END IF
+      END IF
+
+
 *  Now draw the vectors.
 *  =====================
 
@@ -180,7 +233,11 @@
      :        Y( I ) .NE. VAL__BADD ) THEN
 
 *  Calculate the length of the vector in units of pixels.
-            VECLEN = VECMAG( I ) / DSCALE
+            IF( DSCALE .GE. 0.0 ) THEN
+               VECLEN = VECMAG( I ) / DSCALE
+            ELSE
+               VECLEN = -DSCALE
+            END IF
 
 *  Calculate the vector orientation, in radians. Within POL1_VECT, the
 *  vector orientations are measured from the Y axis, but the supplied
