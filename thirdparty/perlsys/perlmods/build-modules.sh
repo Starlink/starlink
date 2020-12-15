@@ -31,7 +31,7 @@ do
     if [ -e $root ]
     then
         echo Installing modules from $root
-        for i in `cat $root`
+        for i in `grep -v '^#' $root`
         do
             if grep -x "$i" cpan.skip-test > /dev/null
             then
@@ -54,7 +54,7 @@ done
 
 # CPANM rebuilds all of these each time it runs
 
-for i in `cat ./perlmods-order.txt`
+for i in `grep -v '^#' ./perlmods-order.txt`
 do
     if [ -d ./$i ]
     then
