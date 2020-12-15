@@ -66,7 +66,7 @@
 #include "star/mem.h"
 #include "ems.h"
 
-#include <strings.h>
+#include <string.h>
 #include <wordexp.h>
 
 void one_wordexp_noglob( const char * words, char * expan, size_t expanlen, int * status ) {
