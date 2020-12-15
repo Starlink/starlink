@@ -41,7 +41,8 @@
 *        A factor which converts data values in VECMAG into
 *        corresponding vector lengths in centimetres. If this is
 *        negative, all vectors are drawn with the same length regardless
-*        of the value of VECMAG.
+*        of the value of VECMAG (a value of -1 causes the length of each
+*        vector to be roughly equal to the typical distance between vectors).
 *     AHSIZE = REAL (Given)
 *        The length of each stroke of the arrowhead placed at the end
 *        of the vector, in pixels.  A value of zero causes no arrowhead
@@ -80,6 +81,9 @@
 *        Added argument REFANG.
 *     14-DEC-2020 (DSB):
 *        If DSCALE is negative, draw all vectors with the same lenbgth.
+*     15-DEC-2020 (DSB):
+*        Improve the negative DSCALE algorithm to produce better spacing
+*        in the case of long thin bounding boxes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -117,6 +121,8 @@
       PARAMETER ( PIBY2 = 1.5707963268 )
 
 *  Local Variables:
+      DOUBLE PRECISION ARATIO    ! Aspect ratio of the vector bounding box
+      DOUBLE PRECISION AREA      ! Mean screen area per vector
       DOUBLE PRECISION LX        ! Lower bounds on X axis
       DOUBLE PRECISION LY        ! Lower bounds on Y axis
       DOUBLE PRECISION SIZEX     ! Bounding box size on X axis
@@ -201,17 +207,32 @@
             END IF
          END DO
 
-*  Find the mean screen area per good vector. Take its square root to get
-*  the mean distance between good vectors. Multiple DSCALE by this value.
+*  If we have some good vectors, find the mean screen area per good vector.
          IF( NPLOT .GT. 0 ) THEN
             SIZEX = UX - LX
             SIZEY = UY - LY
             IF( SIZEX .GT. 0.0 .AND. SIZEY .GT. 0.0 ) THEN
-               DSCALE = DSCALE*SQRT( SIZEX*SIZEY/NPLOT )
+               AREA = SIZEX*SIZEY/NPLOT
+
+*  Find the dimensions of a rectangle that has the above area and has the
+*  same aspect ratio as the bounding box.
+               ARATIO = SIZEY/SIZEX
+               SIZEX = SQRT( AREA/ ARATIO )
+               SIZEY = ARATIO*SIZEY
+
+*  Multiple DSCALE by the length of the diagonal of this rectangle. This
+*  means that a supplied DSCALE value of -1 becomes (minus) the mean
+*  distance between vectors.
+               DSCALE = DSCALE * SQRT( SIZEX*SIZEX + SIZEY*SIZEY )
+
+*  If the bounding box has zero area, we cannot do the above. Instead we
+*  just use the mean distance between vectors along the non-zero axis.
             ELSE IF( SIZEX .GT. 0.0 ) THEN
                DSCALE = DSCALE*SIZEX/NPLOT
+
             ELSE IF( SIZEY .GT. 0.0 ) THEN
                DSCALE = DSCALE*SIZEY/NPLOT
+
             END IF
          END IF
       END IF

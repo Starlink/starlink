@@ -282,8 +282,10 @@
 *        The scale to be used for the vectors.  The supplied value
 *        should give the data value corresponding to a vector length of
 *        one centimetre.  If a negative value is supplied, all vectors
-*        will be drawn with the same length (the fixed vector length is
-*        proportional to the supplied VSCALE value). []
+*        will be drawn with the same length. A value of -1 will cause the
+*        fixed vector length to be roughly equal to the typical spacing
+*        between vectors, but other lengths can be used by changing the
+*        (negative) value supplied for VSCALE. []
 *     ZAXVAL = LITERAL (Read)
 *        Specifies the Z axis value for the vectors to be displayed. The
 *        given value should be in the current coordinate Frame of the
