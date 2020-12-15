@@ -33,6 +33,7 @@
 */
 
 #include <ctype.h>
+#include <stdio.h>
 
 #include <f77.h>		/* CNF macros */
 
