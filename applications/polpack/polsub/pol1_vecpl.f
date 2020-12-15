@@ -218,12 +218,16 @@
 *  same aspect ratio as the bounding box.
                ARATIO = SIZEY/SIZEX
                SIZEX = SQRT( AREA/ ARATIO )
-               SIZEY = ARATIO*SIZEY
+               SIZEY = ARATIO*SIZEX
 
-*  Multiple DSCALE by the length of the diagonal of this rectangle. This
+*  Multiple DSCALE by the larger dimension of this rectangle. This
 *  means that a supplied DSCALE value of -1 becomes (minus) the mean
 *  distance between vectors.
-               DSCALE = DSCALE * SQRT( SIZEX*SIZEX + SIZEY*SIZEY )
+               IF( SIZEX .GE. SIZEY ) THEN
+                  DSCALE = DSCALE * SIZEX
+               ELSE
+                  DSCALE = DSCALE * SIZEY
+               END IF
 
 *  If the bounding box has zero area, we cannot do the above. Instead we
 *  just use the mean distance between vectors along the non-zero axis.
