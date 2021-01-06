@@ -1,56 +1,58 @@
 #include "atl.h"
+#include "f77.h"
 #include "ast.h"
 #include "mers.h"
 #include "sae_par.h"
 
-void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
-                    int *lbnd, int *ubnd, int *status ){
+F77_SUBROUTINE(atl_addwcsaxis8)( INTEGER(WCS), INTEGER(MAP), INTEGER(FRM),
+                                 INTEGER8_ARRAY(LBND), INTEGER8_ARRAY(UBND),
+                                 INTEGER(STATUS) ) {
 /*
 *+
 *  Name:
-*     atlAddWcsAxis
+*     ATL_ADDWCSAXIS8
 
 *  Purpose:
 *     Add one or more axes to an NDFs WCS FrameSet.
 
 *  Language:
-*     C.
+*     C, designed to be called from Fortran.
 
 *  Invocation:
-*     void atlAddWcsAxis(  AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
-*                          int *lbnd, int *ubnd, int *status )
+*     CALL ATL_ADDWCSAXIS8( WCS, MAP, FRM, LBND, UBND, STATUS )
 
 *  Description:
-*     This function adds one or more new axes to all the Frames in an NDF
+*     This routine adds one or more new axes to all the Frames in an NDF
 *     WCS FrameSet. Frames that are known to be NDF-special (e.g. GRID,
 *     AXIS, PIXEL and FRACTION) are expanded to include a number of extra
 *     appropriate axes equal to the Nin attribute of the supplied Mapping.
-*     All other Frames in the FrameSet are replaced by CmpFrames holding the
+*     all other Frames in the FrameSet are replaced by CmpFrames holding the
 *     original Frame and the supplied Frame. These new axes are connected to
 *     the new GRID axes using the supplied Mapping.
 
 *  Arguments:
-*     wcs
+*     WCS = INTEGER (Given)
 *        A pointer to a FrameSet that is to be used as the WCS FrameSet in
 *        an NDF. This imposes the restriction that the base Frame must
 *        have Domain GRID.
-*     map
+*     MAP = INTEGER (Given)
 *        A pointer to a Mapping. The forward transformation should transform
 *        the new GRID axes into the new WCS axes.
-*     frm
+*     FRM = INTEGER (Given)
 *        A pointer to a Frame defining the new WCS axes.
-*     lbnd
+*     LBND() = INTEGER*8 (Given)
 *        An array holding the lower pixel index bounds on the new axes.
-*        If a NULL pointer is supplied, a value of 1 is assumed for all
-*        the new axes.
-*     ubnd
+*        The length of this array should beq aual to the Nin attribute of
+*        the MAP Mapping.
+*     UBND() = INTEGER*8 (Given)
 *        An array holding the upper pixel index bounds on the new axes.
-*        If a NULL pointer is supplied, any FRACTION Frame in the
-*        supplied FrameSet is removed.
-*     status
-*        Pointer to the global status variable.
+*        The length of this array should beq aual to the Nin attribute of
+*        the MAP Mapping.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
 *  Notes:
+*     - This routine is just a wrapper around the C function atlAddWcsAxis8.
 *     - The new axes are appended to the end of the existing axes, so the
 *     axis indices associated with the new axes will extend from "nold+1"
 *     to "nold+nnew", where "nold" is the number of axes in the original
@@ -59,7 +61,7 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
 *     different to the Naxes attribute of "frm".
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2021 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -79,17 +81,12 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
 *     02110-1301, USA
 
 *  Authors:
-*     DSB: David S. Berry  (JAC, HAwaii)
+*     DSB: David S. Berry  (EAO)
 *     {enter_new_authors_here}
 
 *  History:
-*     29-OCT-2009 (DSB):
+*     6-JAN-2021 (DSB):
 *        Original version.
-*     20-NOV-2009 (DSB):
-*        Treat all NDF Frames (PIXEL, AXIS and FRACTION in addition to
-*        GRID) as special. Requires new arguments "lbnd" and "ubnd".
-*     28-SEP-2020 (DSB):
-*        Changed to be a thin wrapper around atlAddWcsAxis8.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -99,36 +96,15 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
 */
 
 /* Local Variables: */
-   int64_t lbnd8[ ATL__MXDIM ];
-   int64_t ubnd8[ ATL__MXDIM ];
-   int64_t *pl;
-   int64_t *pu;
-   int i;
+   GENPTR_INTEGER(WCS)
+   GENPTR_INTEGER(MAP)
+   GENPTR_INTEGER(FRM)
+   GENPTR_INTEGER8_ARRAY(LBND)
+   GENPTR_INTEGER8_ARRAY(UBND)
+   GENPTR_INTEGER(STATUS)
 
-/* Check inherited status */
-   if( *status != SAI__OK ) return;
+   atlAddWcsAxis8( astI2P( *WCS ), astI2P( *MAP ), astI2P( *FRM ),
+                   LBND, UBND, STATUS );
 
-/* Convert the supplied 4-byte integer values to 8-byte integers. */
-   if( lbnd ) {
-      for( i = 0; i < ATL__MXDIM; i++ ){
-         lbnd8[ i ] = lbnd[ i ];
-      }
-      pl = lbnd8;
-   } else {
-      pl = NULL;
-   }
-
-   if( ubnd ) {
-      for( i = 0; i < ATL__MXDIM; i++ ){
-         ubnd8[ i ] = ubnd[ i ];
-      }
-      pu = ubnd8;
-   } else {
-      pu = NULL;
-   }
-
-
-/* Call the 8-byte version of this function. */
-   atlAddWcsAxis8( wcs, map, frm, pl, pu, status );
 }
 

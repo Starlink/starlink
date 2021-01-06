@@ -35,7 +35,8 @@ PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
 #  List of C functions required by both ADAM and standalone
 #  libraries.
 BASIC_C_ROUTINES = atl.c atl2.c atlMapGet1C.c atlMapPut1C.c atlShow.c \
-atlMatchRegion.c atlAddWcsAxis.c atlReadFile.c atl_addwcsaxis.c \
+atlMatchRegion.c atlAddWcsAxis8.c atlAddWcsAxis.c atlReadFile.c \
+atl_addwcsaxis.c atl_addwcsaxis8.c \
 atlReadTable.c atlTableLutMap.c atl_chrsplitre.c atlKy2hd.c \
 atl_ky2hd.c atlHd2ky.c atl_hd2ky.c atlFindMap.c atlPairAxes.c \
 atlGetPixelParams.c atl_getpixelparams.c atlFrameSetSplit.c
