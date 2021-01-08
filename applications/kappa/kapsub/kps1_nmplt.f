@@ -149,6 +149,8 @@
 *        Added argument DRWMRK and DRWERR.
 *     20-MAR-2020 (DSB):
 *        Changed KPG1_GRAPH API.
+*     8-JAN-2021 (DSB):
+*        Correct equation used to determine the length of the vertical error bars.
 *     {enter_further_changes_here}
 
 *-
@@ -478,9 +480,10 @@
 
                   ASUM( NDATA ) = ASUM( I ) / DBLE( NSUM( I ) )
                   BSUM( NDATA ) = BSUM( I ) / DBLE( NSUM( I ) )
+                  B2SUM( NDATA ) = B2SUM( I ) / DBLE( NSUM( I ) )
 
                   VARLIM( NDATA ) = SQRT( MAX( 0.0D0,
-     :                 ( B2SUM( I ) - ( BSUM( I )**2 ) *
+     :                   ( ( B2SUM( NDATA ) - BSUM( NDATA )**2 ) *
      :                   DBLE( NSUM( I ) ) ) /
      :                   MAX( 1.0D0, DBLE( NSUM( I ) - 1 ) ) ) )
 
