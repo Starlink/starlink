@@ -234,11 +234,15 @@
 *        Use smf_set_moving to assign attributes for a moving target,
 *        rather than just setting SkyRefIs (smf_set_moving also sets
 *        AlignOffset).
+*     22-JAN-2021 (DSB):
+*        Report an error if the cube exceeds 5000 pixels on either of the
+*        two spatial axes.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2007-2011 Science and Technology Facilities Council.
 *     Copyright (C) 2006, 2007 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2021 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -282,6 +286,7 @@
 #include "sc2da/sc2ast.h"
 
 #define FUNC_NAME "smf_cubebounds"
+#define MAX_DIM 5000
 
 void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                      int autogrid, int usedetpos, AstFrameSet *spacerefwcs,
@@ -1175,6 +1180,16 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       msgSeti( "ZU", ubnd[ 2 ] );
       msgOutif( MSG__NORM, " ", "   Output cube pixel bounds: ( ^XL:^XU, ^YL:^YU, ^ZL:^ZU )",
                 status );
+
+/* Report an error if the bounds look too big (this can happen if the
+   telescope looses its mind during an observation). */
+      if( ( ubnd[ 0 ] - lbnd[ 0 ] + 1 ) > MAX_DIM ||
+          ( ubnd[ 1 ] - lbnd[ 1 ] + 1 ) > MAX_DIM ){
+         *status = SAI__ERROR;
+         errRep( "", FUNC_NAME ": The spatial extent of the cube is too large. "
+                 "Check your list of input data files does not include widely "
+                 "separated observations.", status );
+      }
    }
 
 /* If no error has occurred, export the returned FrameSet pointer from the
