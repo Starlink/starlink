@@ -9,10 +9,10 @@
 \stardocsource      {sun213.4}
 \stardocnumber      {213.4}
 \stardocauthors     {G. Privett, T. Jenness, H. Matthews, V. Barnard}
-\stardocdate        {10 August 2012}
+\stardocdate        {26 January 2021}
 \stardoctitle     {FLUXES\\[1ex]
                                 JCMT Position and Flux Density Calibration}
-\stardocversion     {Version 1.1}
+\stardocversion     {Version 1.2}
 \stardocmanual      {User's Manual}
 \stardocabstract  {
 FLUXES calculates approximate \textbf{topocentric positions} of the planets and also
@@ -75,6 +75,7 @@ text files:
 \item [ukt14\_old.dat] -- for dates before 7-Aug-92.
 \item [ukt14.dat] -- for the period 7-Aug-92 to 23-May-96.
 \item [scuba.dat] -- for dates after 23-May-96.
+\item [scuba2.dat] -- for dates after 1-Jan-2007.
 \end{description}
 \end{description}
 
@@ -84,6 +85,39 @@ The differences mainly reflect changes in detector/telescope hardware.
 The program selects the appropriate \texttt{.dat} file to use, based on the date
 you specify.
 The calculated temperature has an rms error of about 0.13K (negligible).
+
+Alternatively, if the ADAM parameter ``FILTER'' is set to \texttt{CUSTOM}
+on the command line, then the the parameters of a single filter to use
+are obtained from the user using a set of environment parameters, rather
+than being read from a file as described above. The planetary brightness
+temperature can either be supplied explicitly or can be looked up from a
+specified NDF using the supplied frequency as the index (the FLUXES
+package includes files \texttt{esa2\_uranus.sdf} and \texttt{esa4\_uranus.sdf}
+that can be used for this purpose). See parameter BTEMP below. The following
+parameters are used:
+\begin{description}
+\item[FREQ:] The central frequency of the filter in GHz.
+\item[NB:] The number of Gaussian components to the beam - must 1be 1 or 2.
+\item[HPBW1:] Half-power beam width of the first Gaussian component of the
+beam, in arcsec.
+\item[HPBW2:] Half-power beam width of the second Gaussian component of the
+beam, in arcsec. Unused if NB is 1.
+\item[AMP1:] Amplitude of the first Gaussian component of the beam, in
+arcsec, normalised so that AMP1 plus AMP2 is one. Unused if NB is 1.
+\item[AMP2:] Amplitude of the second Gaussian component of the beam, in
+arcsec, normalised so that AMP1 plus AMP2 is one. Unused if NB is 1.
+\item[BTEMP:] Either the numerical planetary brightness temperature at the
+required frequency, in K, or the name of a 1-dimensional NDF. If an NDF
+name is given, it should contain the required brightness temperature
+as a function of frequency. The current WCS Frame should contain a spectral
+axis giving frerquency in units of GHz. The NDF is used to look up the
+required temperature at the frequency specified by parameter FREQ. Note,
+this parameter is not used if Mars is the selected planet (see appendix
+\ref{sec:marsbright} for a description of the brightness temperature used
+for Mars).
+\item[NOTE:] A group of lines of explanatory text to display. Defaults to
+none.
+\end{description}
 
 Bear in mind that Saturn can only be used for calibration when the
 rings are not open, and the Martian brightness temperatures are probably

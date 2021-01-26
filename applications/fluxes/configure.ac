@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT([fluxes],[1.4-1],[starlink@jiscmail.ac.uk])
+AC_INIT([fluxes],[1.5-0],[starlink@jiscmail.ac.uk])
 AC_CONFIG_AUX_DIR([build-aux])
 
 dnl    Require autoconf-2.50 at least
@@ -23,10 +23,10 @@ STAR_MONOLITHS
 STAR_CHECK_PROGS(csh)
 
 dnl    Build dependencies for this package.
-dnl    Includes: fio, par, sae; 
+dnl    Includes: fio, par, sae;
 dnl    links to: chr, mers, fio, psx, task jpl.
 STAR_DECLARE_DEPENDENCIES([build], [sae mers fio par sla])
-STAR_DECLARE_DEPENDENCIES([link], [fio sla mers])
+STAR_DECLARE_DEPENDENCIES([link], [fio sla mers grp kaplibs])
 
 dnl    No use dependencies
 

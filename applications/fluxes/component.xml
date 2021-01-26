@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="fluxes" support="S">
-  <version>1.4-1</version>
+  <version>1.5-0</version>
   <path>applications/fluxes</path>
   <description>FLUXES - JCMT Postion and Flux Density Calibration</description>
   <abstract><p>
@@ -14,7 +14,7 @@ beam-sizes employed by the UKT14 and SCUBA receivers on the
 JCMT telescope based on Mauna Kea, Hawaii.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>sae</build><build>mers</build><build>fio</build><build>par</build><build>sla</build><link>fio</link><link>sla</link><link>mers</link><sourceset>star2html</sourceset>
+    <build>pcs</build><build>sae</build><build>mers</build><build>fio</build><build>par</build><build>sla</build><link>fio</link><link>sla</link><link>mers</link><link>grp</link><link>kaplibs</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

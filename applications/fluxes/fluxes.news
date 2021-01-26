@@ -1,6 +1,17 @@
 FLUXES -- JCMT planetary position and flux density calibration
                                                             Expires: ??.??.??
 
+Version 1.5
+
+   - Adding "FILTER=CUSTOM" to the command line now causes the filter
+     details to be specified by the user via a set of environment
+     parameters, rather than using hardcoded values read from a text
+     file. The planetary brightness temperature to use can either be
+     supplied explicitly or can be looked up from a specified NDF using
+     the supplied frequency as the index (the FLUXES package includes
+     files esa2_uranus.sd$ and esa4_uranus.sdf that can be used for this
+     purpose).
+
 Version 1.4
 
    - No longer use the JPL ephemeris to calculate planetary positions.

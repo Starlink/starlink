@@ -18,7 +18,7 @@ sun213_fig2.pdf
 # The path here is ignored for the install location
 filterdir = $(bindir)
 dist_filter_DATA = data/scuba.dat data/ukt14.dat data/ukt14_old.dat \
-	data/scuba2.dat
+	data/scuba2.dat data/esa2_uranus.sdf data/esa4_uranus.sdf
 
 
 # IFL files

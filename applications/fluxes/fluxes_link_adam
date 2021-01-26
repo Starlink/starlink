@@ -12,8 +12,8 @@
 
 #  Description:
 #     This script should be invoked by those building ADAM applications
-#     which use FLUXES in order to generate the correct arguments for the 
-#     compiler (or ld) command. The arguments generated are written to 
+#     which use FLUXES in order to generate the correct arguments for the
+#     compiler (or ld) command. The arguments generated are written to
 #     the standard output.
 
 #  Invocation:
@@ -54,6 +54,7 @@
 
 
       echo `fio_link_adam` `sla_link_adam` `err_link_adam`\
+           `kaplibs_link_adam -nogrf` `ndf_link_adam` `ast_link_adam` `grp_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

@@ -23,6 +23,7 @@
 
 *     Modifications:
 
+*     26 Jan 2021 : DSB- Add custom filter support
 *     22 Jun 12 : TIMJ- Add two component gaussian beam support
 *     30 Aug 11 : TIMJ- Add simple SCUBA-2
 *     31 Mar 05 : TIMJ- Fix infinite loop when time invalid
@@ -116,8 +117,17 @@
 
 *     Arrays of effective frequencies and half-power beam-widths
 *     for filters and brightness temperatures for planets (except Mars) are
-*     read from a file (UKT14.DAT). Brightness temperatures and errors given
+*     read from a file (UKT14.DAT) . Brightness temperatures and errors given
 *     by Matt Griffin. HPBW's due to G. Sandell.
+
+*     Alternatively, if "FILTER=CUSTOM" is included on the command line,
+*     the parameters of a single filter to use are obtained from the user
+*     using a set of environment parameters, rather than being read from
+*     a file. The planetary brightness temperature can either be supplied
+*     explicitly or can be looked up from a specified NDF using the supplied
+*     frequency as the index (the FLUXES package includes files esa2_uranus.sdf
+*     and esa4_uranus.sdf that can be used for this purpose). See parameter
+*     BTEMP.
 
 
 *     Description of (non-ADAM) Parameters:
@@ -681,10 +691,16 @@ C     The system time in seconds
          LEN=CHR_LEN(REQFILT)
 
          VALID = .FALSE.
-         IF(REQFILT.EQ.'ALL' .OR. REQFILT.EQ.'all'
-     :        .OR. REQFILT.EQ. '   ') THEN
+         IF(REQFILT.EQ.'CUSTOM' ) THEN
+            CALL CUSTOMFILT( REQBODY, FNAME, NF, NB, FREQ, HPBW, HPBW2,
+     :                       AMP1, AMP2, TBNORM(1,IQ), ERROR(1,IQ),
+     :                       INOTE, NOTE, VALID, STATUS )
+            FREQ(1,2) = 0.0D0
+
+         ELSE IF(REQFILT.EQ.'ALL' .OR. REQFILT.EQ. '   ') THEN
             REQFILT = 'ALL'
             VALID = .TRUE.
+
          ELSE
             DO II = 1,NF
                FILT = FNAME(II)
@@ -993,7 +1009,11 @@ C     The system time in seconds
             ELSE
 
 *     Create output string.
-               CALL CHR_CTOI(FNAME(I),K,STATUS)
+               IF( FNAME(I) .EQ. 'CUSTOM' ) THEN
+                  K = -1
+               ELSE
+                  CALL CHR_CTOI(FNAME(I),K,STATUS)
+               END IF
 
                IF (FILTER .NE. 'ALL') THEN
                   CALL PAR_PUT0D('F_CENTRE', FREQ(I,1), STATUS)
@@ -1005,7 +1025,11 @@ C     The system time in seconds
                   CALL PAR_PUT0D('HPBW', HPBW(I), STATUS)
                ENDIF
 
-               CALL MSG_FMTI('P1','I4',K)
+               IF( K .EQ. -1 ) THEN
+                  CALL MSG_SETC('P1','custom')
+               ELSE
+                  CALL MSG_FMTI('P1','I4',K)
+               END IF
                CALL MSG_FMTD('P2','F6.1',FREQ(I,1))
                CALL MSG_FMTD('P3','F5.1',FREQ(I,2))
                CALL MSG_FMTD('P4','F9.2',FLUX(I))
@@ -2422,6 +2446,265 @@ C     These are the new numbers from astro-ph/0703640
  999  CONTINUE
 
       END
+
+
+
+
+
+      SUBROUTINE CUSTOMFILT( REQBODY, FNAME, NF, NB, FREQ, HPBW1, HPBW2,
+     :                       AMP1, AMP2, TBNORM, ERROR, INOTE, NOTE,
+     :                       VALID, STATUS )
+*+
+*  Name:
+*     CUSTOMFILT
+
+*  Purpose:
+*     Get the properties of a custom filter using environment parameters.
+
+*  Invocation:
+*     CALL CUSTOMFILT( REQBODY, FNAME, NF, NB, FREQ, HPBW1, HPBW2, AMP1, AMP2,
+*                      TBNORM, ERROR, INOTE, NOTE, VALID, STATUS )
+
+*  Description:
+*     This routine gets the properties of a custom filter, using a set of
+*     environment parameters, which correspond to the columns in the
+*     scuba2.dat file. This is mainly intended for sitiuations where a
+*     arbitrary centra frequency needs to be specified.
+
+*  Arguments:
+*     REQBODY = CHARACTER * ( * ) (Given)
+*        Name of the planet for which fluxes are being calculated.
+*     FNAME = CHARACTER * ( * ) (Returned)
+*        The name of the custom filter. This will always be 'CUSTOM'.
+*     NF = INTEGER (Returned)
+*        The number of filtered defined by the returned arguments. This
+*        will always be one.
+*     NB = INTEGER (Returned)
+*        The number of Gaussian components used to model the instrument beam.
+*        Will be either 1 or 2.
+*     FREQ = DOUBLE PRECISION (Returned)
+*        FREQ be returned holding the central frequency of the
+*        filter in GHz.
+*     HPBW1 = DOUBLE PRECISION (Returned)
+*        Half-power beam width of the first Gaussian component of the
+*        beam, in arcsec.
+*     HPBW2 = DOUBLE PRECISION (Returned)
+*        Half-power beam width of the second Gaussian component of the
+*        beam, in arcsec. Returned holding zero if NB is one.
+*     AMP1 = DOUBLE PRECISION (Returned)
+*        Amplitude of the first Gaussian component of the beam, in
+*        arcsec. Normalised so that AMP1 plus AMP2 is one.
+*     AMP2 = DOUBLE PRECISION (Returned)
+*        Amplitude of the second Gaussian component of the beam, in
+*        arcsec. Normalised so that AMP1 plus AMP2 is one. Returned equal
+*        to zero if NB is one.
+*     TBNORM = DOUBLE PRECISION (Returned)
+*        Either the numerical planetary brightness temperature at the
+*        required frequency, or the name of a 1-dimensional NDF. If an NDF
+*        name is given, it chould contain the required brightness temperature
+*        as a function of frequency. The current WCS Frame should contain
+*        a single spectral axis giving frerquency in units of GHz. The
+*        NDF is used to look up the required temperature at the frequency
+*        specified by parameter FREQ.
+*     ERROR = DOUBLE PRECISION (Returned)
+*        Error in TBNORM. Always returned equal to zero.
+*     INOTE = INTEGER (Returned)
+*        The number of elements returned in the NOTE array.
+*     NOTE( 50 ) = CHARACTER*(*) (Returned)
+*        The number of elements returned in the NOTE array.
+*     VALID = LOGICAL (Returned)
+*        Returned .FALSE. if any of the user-supplied values were
+*        invalid, in which case all the environment parameters used by
+*        this routine are cancelled.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'GRP_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
+      INCLUDE 'PAR_ERR'
+
+*  Arguments Given:
+      CHARACTER REQBODY*(*)
+
+*  Arguments Returned:
+      CHARACTER FNAME(*)*(*)
+      INTEGER NF
+      INTEGER NB
+      DOUBLE PRECISION FREQ(*)
+      DOUBLE PRECISION HPBW1(*)
+      DOUBLE PRECISION HPBW2(*)
+      DOUBLE PRECISION AMP1(*)
+      DOUBLE PRECISION AMP2(*)
+      DOUBLE PRECISION TBNORM(*)
+      DOUBLE PRECISION ERROR(*)
+      INTEGER INOTE
+      CHARACTER NOTE( 50 )*(*)
+      LOGICAL VALID
+
+*  Status:
+      INTEGER STATUS
+
+*  Local Variables:
+      CHARACTER TEXT*255
+      DOUBLE PRECISION X
+      DOUBLE PRECISION Y
+      INTEGER DIM
+      INTEGER IGRP
+      INTEGER INDF
+      INTEGER IPD
+      INTEGER IWCS
+      INTEGER NDIM
+      INTEGER NEL
+      LOGICAL FIRST
+      REAL TB
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      IF( REQBODY .EQ. 'ALL' ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( ' ', 'CUSTOM filters can only be used with a'//
+     :                 'single planet - not ALL.', STATUS )
+      END IF
+
+      FIRST = .TRUE.
+
+      FNAME(1) = 'CUSTOM'
+      NF = 1
+      ERROR(1) = 0.0D0
+
+      CALL HELPER( 'NB', REQBODY, FIRST, STATUS )
+      CALL PAR_GDR0I( 'NB', 1, 1, 2, .FALSE., NB, STATUS )
+
+      CALL HELPER( 'FREQ', REQBODY, FIRST, STATUS )
+      CALL PAR_GDR0D( 'FREQ', 1.0D0, 1.0D0, 1.0D5, .FALSE., FREQ,
+     :                STATUS )
+
+      CALL HELPER( 'HPBW1', REQBODY, FIRST, STATUS )
+      CALL PAR_GDR0D( 'HPBW1', 0.0D0, 0.0D0, 1.0D3, .FALSE., HPBW1,
+     :                STATUS )
+
+      CALL HELPER( 'AMP1', REQBODY, FIRST, STATUS )
+      CALL PAR_GDR0D( 'AMP1', -1.0D3, -1.0D3, 1.0D3, .FALSE., AMP1,
+     :                STATUS )
+
+      IF( NB .EQ. 2 ) THEN
+         CALL HELPER( 'HPBW2', REQBODY, FIRST, STATUS )
+         CALL PAR_GDR0D( 'HPBW2', 0.0D0, 0.0D0, 1.0D3, .FALSE., HPBW2,
+     :                   STATUS )
+
+         CALL HELPER( 'AMP2', REQBODY, FIRST, STATUS )
+         CALL PAR_GDR0D( 'AMP2', -1.0D3, -1.0D3, 1.0D3, .FALSE., AMP2,
+     :                   STATUS )
+      END IF
+
+      IF( REQBODY .NE. 'MARS' ) THEN
+         CALL HELPER( 'BTEMP', REQBODY, FIRST, STATUS )
+         CALL PAR_GET0C( 'BTEMP', TEXT, STATUS )
+         IF( STATUS .EQ. SAI__OK ) THEN
+            CALL CHR_CTOD( TEXT, TBNORM(1), STATUS )
+            IF( STATUS .NE. SAI__OK ) THEN
+               STATUS = SAI__OK
+               CALL NDF_FIND( DAT__ROOT, TEXT, INDF, STATUS )
+               CALL NDF_MAP( INDF, 'DATA', '_REAL', 'READ', IPD, NEL,
+     :                       STATUS )
+               CALL NDF_DIM( INDF, 1, DIM, NDIM, STATUS )
+               CALL NDF_GTWCS( INDF, IWCS, STATUS )
+               IF( AST_GETC( IWCS, 'UNIT(1)', STATUS ) .EQ. 'GHz' ) THEN
+                  CALL AST_TRAN1( IWCS, 1, FREQ, .FALSE., X, STATUS )
+                  CALL INTERP( DIM, X, %VAL(CNF_PVAL(IPD)), TBNORM,
+     :                         STATUS )
+               ELSE IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = SAI__ERROR
+                  CALL NDF_MSG( 'N', INDF )
+                  CALL MSG_SETC( 'U', AST_GETC( IWCS, 'UNIT(1)',
+     :                                          STATUS ) )
+                  CALL ERR_REP( ' ', 'Supplied NDF ''^N'' has axis '//
+     :                          'units ''^U'' - must be ''GHz''.',
+     :                          STATUS )
+               END IF
+
+               CALL AST_ANNUL( IWCS, STATUS )
+               CALL NDF_ANNUL( INDF, STATUS )
+            END IF
+         END IF
+      END IF
+
+      INOTE = 0
+      IF( STATUS .EQ. SAI__OK ) THEN
+         IGRP = GRP__NOID
+         CALL KPG1_GTGRP( 'NOTE', IGRP, INOTE, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+         ELSE
+            INOTE = MIN( INOTE, 50 )
+            CALL GRP_GET( IGRP, 1, INOTE, NOTE, STATUS )
+            CALL GRP_DELET( IGRP, STATUS )
+         END IF
+      END IF
+
+      VALID = ( STATUS .EQ. SAI__OK )
+
+      END
+
+
+*  Issue a helpful message if required. Used when getting the details of
+*  a custom filter.
+      SUBROUTINE HELPER( PARAM, REQBODY, FIRST, STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PAR_PAR'
+
+      CHARACTER PARAM*(*), REQBODY*(*)
+      LOGICAL FIRST
+      INTEGER STATUS, STATE
+
+      CALL PAR_STATE( PARAM, STATE, STATUS )
+      IF(  STATE .NE. PAR__ACTIVE .AND. FIRST ) THEN
+         CALL MSG_SETC( 'P', REQBODY )
+         CALL MSG_OUT( ' ', 'Please enter details of custom filter'//
+     :                 ' for ^P:', STATUS )
+         FIRST = .FALSE.
+      END IF
+
+      END
+
+      SUBROUTINE INTERP( DIM, X, ARRAY, TBNORM, STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+
+      INTEGER DIM
+      DOUBLE PRECISION X
+      REAL ARRAY( * )
+      DOUBLE PRECISION TBNORM
+      INTEGER STATUS
+
+      REAL A
+      INTEGER LO
+
+      IF( STATUS .NE. SAI__OK ) RETURN
+
+      IF( X .LE. 1.0D0 ) THEN
+         TBNORM = ARRAY( 1 )
+      ELSE IF( X .GE. DBLE( DIM ) ) THEN
+         TBNORM = ARRAY( DIM )
+      ELSE
+         LO = INT( X )
+         A = X - LO
+         TBNORM = ( 1.0D0 - A )*ARRAY( LO ) + A*ARRAY( LO + 1 )
+      END IF
+
+      END
+
 
 
 ************************************************************************

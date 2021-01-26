@@ -26,7 +26,7 @@
 #        Change default value for MSG_FILTER to !
 #     {enter_changes_here}
 
-#-    
+#-
 
 interface FLUXES
 
@@ -69,8 +69,8 @@ interface FLUXES
     vpath 'prompt'
     default Y
   endparameter
- 
-  parameter SCREEN        # Display to terminal? 
+
+  parameter SCREEN        # Display to terminal?
     type '_LOGICAL'
     access 'read'
     keyword 'SCREEN'
@@ -80,7 +80,7 @@ interface FLUXES
     default Y
   endparameter
 
-  parameter OFL           # Store to file? 
+  parameter OFL           # Store to file?
     type '_LOGICAL'
     access 'read'
     keyword 'OFL'
@@ -90,7 +90,7 @@ interface FLUXES
     default N
   endparameter
 
-  parameter NOW       # Use current date/time? 
+  parameter NOW       # Use current date/time?
     type '_LOGICAL'
     access 'read'
     keyword 'NOW'
@@ -99,8 +99,8 @@ interface FLUXES
     vpath 'prompt'
     default Y
   endparameter
- 
-  parameter PREVUT       # Use previous UT date/time? 
+
+  parameter PREVUT       # Use previous UT date/time?
     type '_LOGICAL'
     access 'read'
     keyword 'PREVUT'
@@ -109,8 +109,8 @@ interface FLUXES
     vpath 'prompt'
     default Y
   endparameter
- 
-  parameter SAMETIME       # Same time as previously? 
+
+  parameter SAMETIME       # Same time as previously?
     type '_LOGICAL'
     access 'read'
     keyword 'SAMETIME'
@@ -120,7 +120,7 @@ interface FLUXES
     default Y
   endparameter
 
-  parameter SAMEDATE       # Same date as previously? 
+  parameter SAMEDATE       # Same date as previously?
     type '_LOGICAL'
     access 'read'
     keyword 'SAMEDATE'
@@ -130,7 +130,7 @@ interface FLUXES
     default Y
   endparameter
 
-  parameter DATE       # Date? 
+  parameter DATE       # Date?
     type '_CHAR'
     access 'update'
     keyword 'DATE'
@@ -139,8 +139,8 @@ interface FLUXES
     vpath 'prompt'
     default '        '
   endparameter
- 
-  parameter TIME       # Time? 
+
+  parameter TIME       # Time?
     type '_CHAR'
     access 'update'
     keyword 'TIME'
@@ -149,8 +149,8 @@ interface FLUXES
     vpath 'prompt'
     default '        '
   endparameter
- 
-  parameter OUTFILE       # Output filename. 
+
+  parameter OUTFILE       # Output filename.
     type '_CHAR'
     access 'update'
     keyword 'OUTFILE'
@@ -159,8 +159,8 @@ interface FLUXES
     default 'fluxes.dat'
     vpath 'prompt'
   endparameter
- 
-  parameter PLANET       # Planet? 
+
+  parameter PLANET       # Planet?
     type '_CHAR'
     access 'update'
     keyword 'PLANET'
@@ -170,7 +170,7 @@ interface FLUXES
     default 'ALL'
   endparameter
 
-  parameter FILTER       # Filter? 
+  parameter FILTER       # Filter?
     type '_CHAR'
     access 'update'
     keyword 'FILTER'
@@ -259,6 +259,71 @@ interface FLUXES
     helpkey '*'
     vpath  'default'
     access write
+  endparameter
+
+#  Custom filter parameters:
+
+  parameter NB
+    type '_INTEGER'
+    prompt 'Number of Gaussian components in the beam'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 2
+  endparameter
+
+  parameter FREQ
+    type '_DOUBLE'
+    prompt 'Central frequency of filter (GHz)'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 350.0
+  endparameter
+
+  parameter HPBW1
+    type '_DOUBLE'
+    prompt 'FWHM of first Gaussian component (arcsec)'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 14.0
+  endparameter
+
+  parameter HPBW2
+    type '_DOUBLE'
+    prompt 'FWHM of second Gaussian component (arcsec)'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 14.0
+  endparameter
+
+  parameter AMP1
+    type '_DOUBLE'
+    prompt 'Amplitude of first Gaussian component (0.0-1.0)'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 1.0
+  endparameter
+
+  parameter AMP2
+    type '_DOUBLE'
+    prompt 'Amplitude of second Gaussian component (0.0-1.0)'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 0.0
+  endparameter
+
+  parameter BTEMP
+    type 'LITERAL'
+    prompt 'Brightness temperature of planet at filter frequency (K)'
+    ppath 'current'
+    vpath 'prompt'
+  endparameter
+
+  parameter NOTE
+    type 'LITERAL'
+    prompt 'Group of lines of text',
+    ppath 'current,default'
+    vpath 'default'
+    default !
   endparameter
 
 endinterface
