@@ -87,6 +87,9 @@ void ndf1Forxt( const char *name, size_t start, size_t end, size_t *x1,
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     28-JAN-2021 (DSB):
+*        Fix bugs caused by errors in moving from 1-based indices to
+*        zero-based indices.
 
 *-
 */
@@ -97,11 +100,11 @@ void ndf1Forxt( const char *name, size_t start, size_t end, size_t *x1,
 
 /* Set initial values for the "x1" and "x2" arguments. */
    if( start > end ) {
-      *x1 = astChrLen( name ) + 1;
+      *x1 = astChrLen( name );
       *x2 = 0;
       start = 0;
    } else {
-      *x1 = end + 2;
+      *x1 = end + 1;
       *x2 = start;
    }
 
@@ -109,7 +112,7 @@ void ndf1Forxt( const char *name, size_t start, size_t end, size_t *x1,
    if( *status != SAI__OK ) return;
 
 /* Save the used length of the string. */
-   ln = *x1 - 1;
+   ln = *x1;
 
 /* Any NDF slice specification should have been removed from "name" prior
    to calling this function. Therefore, if there is a foreign extension

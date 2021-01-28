@@ -113,6 +113,8 @@ void ndf1Spfor( const char *fname, NdfFCB *fcb, size_t *d1, size_t *d2,
 *        Correct the end of file name to exclude the dot at the start of the
 *        file type. Previously, the dot was included in both the file
 *        name and the file type.
+*     28-JAN-2021 (DSB):
+*        Correct the end of foreign extension specifier.
 
 *-
 */
@@ -125,14 +127,13 @@ void ndf1Spfor( const char *fname, NdfFCB *fcb, size_t *d1, size_t *d2,
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
 
-/* Locate any foreign extension specifier. "x1" is returned equal to one
-   more than the used length of the string if no foreign extension specifier
-   is present. */
+/* Locate any foreign extension specifier. "x1" is returned equal to the used
+   length of the string if no foreign extension specifier is present. */
    ndf1Forxt( fname, 1, 0, x1, x2, status );
 
 /* Split the preceeding file name into its directory, name, type and
    version fields, using the file name syntax rules for the host machine. */
-   ndf1Fsplt( fname, 0, *x1 - 2, d1, d2, n1, n2, t1, t2, v1, v2, status );
+   ndf1Fsplt( fname, 0, *x1 - 1, d1, d2, n1, n2, t1, t2, v1, v2, status );
    if( *status == SAI__OK ) {
 
 /* If a file type extension appears to be present, then obtain the
