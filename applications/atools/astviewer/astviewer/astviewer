@@ -2197,7 +2197,7 @@ class FrameIcon(QGraphicsRectItem):
          if self.rb:
             self.scene.removeItem( self.rb )
 
-         it = self.scene.itemAt( event.scenePos() )
+         it = self.scene.itemAt( event.scenePos(), QTransform() )
          if it and isinstance( it, QGraphicsSimpleTextItem ):
             it = it.parentItem()
 
