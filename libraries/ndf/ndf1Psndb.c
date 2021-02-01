@@ -4,12 +4,14 @@
 #include "ndf_err.h"
 #include "ndf_ast.h"
 #include "ndf1.h"
+#include "ast.h"
 #include <string.h>
 #include "mers.h"
 #include "star/util.h"
 
 void ndf1Psndb( const char *str, double def, int axis, AstFrameSet *iwcs,
-                int wcssec, double *value, int *frame, int *isdef, int *status ){
+                int wcssec, double *value, int *frame, int *isdef,
+                int *isgeo, int *status ){
 /*
 *+
 *  Name:
@@ -21,7 +23,7 @@ void ndf1Psndb( const char *str, double def, int axis, AstFrameSet *iwcs,
 *  Synopsis:
 *     void ndf1Psndb( const char *str, double def, int axis,
 *                     AstFrameSet *iwcs, int wcssec, double *value,
-*                     int *frame, int *isdef, int *status )
+*                     int *frame, int *isdef, int *isgeo, int *status )
 
 *  Description:
 *     This function parses a string representing an upper or lower
@@ -62,11 +64,18 @@ void ndf1Psndb( const char *str, double def, int axis, AstFrameSet *iwcs,
 *        Returned holding the non-zero ==> the "value" value is a default
 *        value and was not specified in the supplied string. zero ==>
 *        "value" was specified explicitly in the supplied string.
+*     *isgeo
+*        If the bounds for the axis are defined by a centre value and
+*        width and the width value is a WCS value, then the value
+*        returned in "*isgeo" indicates if the width in "*value2" is a
+*        geodesic distance. If not, it will be an axis increment. For
+*        instance an RA increment will correspond to a different geodesic
+*        distance at different Declinations.
 *     *status
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2018 East Asian Observatory
+*     Copyright (C) 2018-2021 East Asian Observatory
 *     All rights reserved.
 
 *  Licence:
@@ -92,6 +101,8 @@ void ndf1Psndb( const char *str, double def, int axis, AstFrameSet *iwcs,
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     29-JAN-2021 (DSB):
+*        Added argument "isgeo".
 
 *-
 */
@@ -99,6 +110,7 @@ void ndf1Psndb( const char *str, double def, int axis, AstFrameSet *iwcs,
 /* Local Variables: */
    char *lstr;           /* Copy of str without leading or trailing spaces */
    char attr[ 20 ];      /* AST attribute name */
+   const char *domain;   /* Pointer to axis Domain name string */
    int ncused;           /* No. of characters read from STR */
    size_t nc;            /* No. of characters in "lstr" excluding null */
 
@@ -108,6 +120,9 @@ void ndf1Psndb( const char *str, double def, int axis, AstFrameSet *iwcs,
 /* Create a copy of the string excluding any leading or trailing spaces. */
    lstr = ndf1Strip( NULL, str, 1, 0, &nc, NULL, status );
    if( *status == SAI__OK ) {
+
+/* Initialise "isgeo" to indicate that "value" is not a geodesic distance. */
+      *isgeo = 0;
 
 /* If the input string is blank, then return the default value. */
       *isdef = ( nc == 0 );
@@ -159,21 +174,56 @@ void ndf1Psndb( const char *str, double def, int axis, AstFrameSet *iwcs,
          }
 
 /* If the value is not a pixel index, and is not a FRACTION value, we
-   interpret the string using the "astUnformat" method of the supplied
-   FrameSet. */
+   interpret the string as a numerical geodesic distance or as a formated
+   axis value. */
          if( *frame == 0 ) {
 
+/* If the value ends with "as", "am", or "ad", interpret the value as an
+   geodesic distance in arcseconds, arcminutes or arcdegrees. */
+            if( lstr[ nc - 2 ] == 'a' ) {
+
+               sprintf( attr, "Domain(%d)", axis );
+               domain = astGetC( iwcs, attr );
+
+               lstr[ nc - 2 ] = 0;
+               *value = astChr2Double( lstr );
+               lstr[ nc - 2 ] = 'a';
+
+               if( *value != AST__BAD && domain && !strcmp( domain, "SKY" ) ) {
+                  if( lstr[ nc - 1 ] == 's' ) {
+                     *value *= AST__DD2R/3600.0;
+                  } else if( lstr[ nc - 1 ] == 'm' ) {
+                     *value *= AST__DD2R/60.0;
+                  } else if( lstr[ nc - 1 ] == 'd' ) {
+                     *value *= AST__DD2R;
+                  }
+                  *isgeo = 1;
+
+               } else if( astOK ) {
+                  sprintf( attr, "Label(%d)", axis );
+                  msgSetc( "L", astGetC( iwcs, attr ) );
+                  msgSetc( "BADBOUND", str );
+                  *status = NDF__BNDIN;
+                  errRep( " ", "Invalid ^L bound '^BADBOUND' specified; bad "
+                          "syntax.", status );
+               }
+
+/* If it is not a geodesic distance, interpret the value using the
+   astUnformat method. */
+            } else {
+
 /* Now read the value from the formatted text. */
-            ncused = astUnformat( iwcs, axis, str, value );
+               ncused = astUnformat( iwcs, axis, str, value );
 
 /* Report an error if there was any spurious text in the string. */
-            if( ncused < strlen( str ) && *status == SAI__OK ) {
-               sprintf( attr, "Label(%d)", axis );
-               msgSetc( "L", astGetC( iwcs, attr ) );
-               msgSetc( "BADBOUND", str );
-               *status = NDF__BNDIN;
-               errRep( " ", "Invalid ^L bound '^BADBOUND' specified; bad "
-                       "syntax.", status );
+               if( ncused < strlen( str ) && *status == SAI__OK ) {
+                  sprintf( attr, "Label(%d)", axis );
+                  msgSetc( "L", astGetC( iwcs, attr ) );
+                  msgSetc( "BADBOUND", str );
+                  *status = NDF__BNDIN;
+                  errRep( " ", "Invalid ^L bound '^BADBOUND' specified; bad "
+                          "syntax.", status );
+               }
             }
          }
       }

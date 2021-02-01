@@ -4,12 +4,12 @@
 #include "ndf_ast.h"
 #include "ndf_err.h"
 #include "mers.h"
-#include <math.h>
+#include <string.h>
 
 void ndf1Wclim( AstFrameSet *iwcs, int nax, int ndim, const hdsdim nlbnd[],
                 const hdsdim nubnd[], const int isdef1[], const int isdef2[],
-                double value1[], double value2[], int isbnd[], hdsdim lbnd[],
-                hdsdim ubnd[], int *status ){
+                double value1[], double value2[], int isgeo[], int isbnd[],
+                hdsdim lbnd[], hdsdim ubnd[], int *status ){
 /*
 *+
 *  Name:
@@ -22,8 +22,8 @@ void ndf1Wclim( AstFrameSet *iwcs, int nax, int ndim, const hdsdim nlbnd[],
 *     void ndf1Wclim( AstFrameSet *iwcs, int nax, int ndim,
 *                     const hdsdim nlbnd[], const hdsdim nubnd[],
 *                     const int isdef1[], const int isdef2[],
-*                     double value1[], double value2[], int isbnd[],
-*                     hdsdim lbnd[], hdsdim ubnd[], int *status )
+*                     double value1[], double value2[], int isgeo[],
+*                     int isbnd[], hdsdim lbnd[], hdsdim ubnd[], int *status )
 
 *  Description:
 *     This function accepts values which have been supplied as WCS
@@ -61,6 +61,15 @@ void ndf1Wclim( AstFrameSet *iwcs, int nax, int ndim, const hdsdim nlbnd[],
 *        positions are normalised using the "astNorm" method of the current
 *        WCS Frame. The supplied "value2" array should have at least "nax"
 *        elements.
+*     isgeo
+*        If the bounds for an axis are defined by a centre value and
+*        width (i.e. if "isbnd" is zero) and the width value is a WCS
+*        value (i.e. if "ispix2" is zero), then "isgeo" indicates if the
+*        width supplied in "value2" is geodesic distance. If not, it
+*        will be an axis increment. For instance an RA increment will
+*        correspond to a different geodesic distance at different
+*        Declinations. The supplied value of "isgeo" is ignored if "isbnd"
+*        or "ispix2" is not zero.
 *     isbnd
 *        Whether "value1" and "value2" specify the lower and upper bounds
 *        directly (as opposed to specifying the centre and width). On exit,
@@ -76,7 +85,7 @@ void ndf1Wclim( AstFrameSet *iwcs, int nax, int ndim, const hdsdim nlbnd[],
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2018 East Asian Observatory
+*     Copyright (C) 2018-2021 East Asian Observatory
 *     All rights reserved.
 
 *  Licence:
@@ -102,6 +111,8 @@ void ndf1Wclim( AstFrameSet *iwcs, int nax, int ndim, const hdsdim nlbnd[],
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     29-JAN-2021 (DSB):
+*        Added argument "isgeo".
 
 *-
 */
@@ -119,6 +130,9 @@ void ndf1Wclim( AstFrameSet *iwcs, int nax, int ndim, const hdsdim nlbnd[],
    double dubnd;
    double ndl[ NDF__MXDIM ];
    double ndu[ NDF__MXDIM ];
+   double p2[ NDF__MXDIM ];
+   double p3[ NDF__MXDIM ];
+   double p4[ NDF__MXDIM ];
    double plbnd[ NDF__MXDIM ];
    double pubnd[ NDF__MXDIM ];
    double v1;
@@ -153,17 +167,25 @@ void ndf1Wclim( AstFrameSet *iwcs, int nax, int ndim, const hdsdim nlbnd[],
       def = 0;
 
       for( i = 0; i < nwcs; i++ ){
-
          if( !isbnd[ i ] ) {
-            value1[ i ] = astAxOffset( cfrm, i + 1, value1[ i ],
-                                       -0.5*value2[ i ] );
-            value2[ i ] = astAxOffset( cfrm, i + 1, value1[ i ], value2[ i ] );
-            isbnd[ i ] = 1;
+            if( !isgeo[ i ] ){
+               value1[ i ] = astAxOffset( cfrm, i + 1, value1[ i ],
+                                          -0.5*value2[ i ] );
+               value2[ i ] = astAxOffset( cfrm, i + 1, value1[ i ], value2[ i ] );
 
+            } else {
+               memcpy( p2, value1, nwcs*sizeof(*p2) );
+               p2[ i ] += value2[ i ];
+               astOffset( cfrm, value1, p2, -0.5*value2[ i ], p3 );
+               astOffset( cfrm, value1, p2, 0.5*value2[ i ], p4 );
+               value1[ i ] = p3[ i ];
+               value2[ i ] = p4[ i ];
+            }
+
+            isbnd[ i ] = 1;
          } else if( isdef1[ i ] || isdef2[ i ] ) {
             def = 1;
          }
-
       }
 
 /* Get the (current Frame)->PIXEL mapping from the FrameSet, and check it
@@ -187,7 +209,7 @@ void ndf1Wclim( AstFrameSet *iwcs, int nax, int ndim, const hdsdim nlbnd[],
 
 /* The AST Box class knows nothing about axis normalisation. To avoid
    problems ensure that the upper and lower axis values are in the same
-   "cylce". This applied particularly to RA values where the lower limit
+   "cycle". This applied particularly to RA values where the lower limit
    may have a value of (say) 359 degrees and the upper limit be (say) 2
    degrees. In this example the following code converts the upper limit
    to 361 degrees. */

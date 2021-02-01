@@ -4938,7 +4938,7 @@ will continue to use this convention if the NDF has an explicitly
 defined \st{axis\/} coordinate system. Otherwise, non-integer values will
 be interpreted as  current WCS Frame values.
 
-The \xref{FrameSet}{sun210}{AST_UNFORMAT} method is used to read each
+The \xref{AST\_UNFORMAT}{sun210}{AST_UNFORMAT} method is used to read each
 string representing an axis value. Thus the strings should be supplied in
 a format which AST\_UNFORMAT can understand. Some classes of coordinate
 system (\st{e.g.\/} celestial longitude and latitude, or time) can use a
@@ -4970,6 +4970,44 @@ non-integer, they will be interpreted as values for WCS axis $i$. The
 distinction between WCS axis $I$ and pixel axis $I$ is important since
 pixel axis $I$ does not necessarily correspond to WCS axis $I$ (for
 instance the WCS axes may be rotated or permuted).
+
+If the section is specified by centre and extent
+(see \S\ref{ss:specifying_centre_and_extent}), the extent will be
+interpreted as a number of pixels if it is an integer value with no
+decimal point. Otherwise it will be interpreted as an increment on the
+corresponding WCS axis. Thus, if the current WCS Frame of NDF ``image''
+describes (RA,Dec) axes:
+
+\small
+\begin{quote}
+\begin{center}
+\hi{image(10:00:00}$\sim$\hi{0:0:10, -24:00:00}$\sim$\hi{0:10:00)}
+\end{center}
+\end{quote}
+\normalsize
+
+could be used to refer to region centred at (RA,Dec) (10:00:00,-24:00:00)
+and covering an extent of 10 seconds on the RA axis and 10 arc-minutes on
+the Dec axis. Note, the RA extent is not an arc-distance, it is an
+increment in Right Ascension value. So the corresponding arc-distance
+will depend on the declination and will become smaller as either pole is
+approached. However, it is possible to indicate that the extent is an
+arc-distance by appending one of the three string ``as'' (arc-seconds),
+``am'' (arc-minutes) or ``ad'' (arc-degrees) to the end of the extent
+specifier. For instance:
+
+\small
+\begin{quote}
+\begin{center}
+\hi{image(10:00:00}$\sim$\hi{10am, -24:00:00}$\sim$\hi{50as)}
+\end{center}
+\end{quote}
+\normalsize
+
+will cause the section to cover an RA extent corresponding to 10
+arc-minutes and a Dec extent corresponding to 50 arc-seconds. An error
+will be reported if the current WCS Frame is not suitable (i.e. is not a
+SkyFrame).
 
 If the WCS axes are rotated, the NDF section actually used will be a box
 just large enough to hold the requested range of WCS axis values.
@@ -5013,7 +5051,7 @@ programming interface when \htmlref{NDF\_SECT}{NDF_SECT} is called (see
 
 \subsection{\xlabel{mixing_bounds_expressions}Mixing Bounds Expressions}
 
-WCS (or \st{axis\/} coordinates can be mixed with pixel indices in the same
+WCS (or \st{axis\/}) coordinates can be mixed with pixel indices in the same
 subscript expression. In fact, any of
 the features described earlier may be combined when specifying an NDF section,
 the only restrictions being:
@@ -19579,7 +19617,7 @@ to be locked for exclusive access by a single thread.
 \subsection{Changes Introduced in V2.1}
 
 The following describes the most significant changes that occurred in
-the NDF\_ system between versions V2.0 and V2.1 (the current version):
+the NDF\_ system between versions V2.0 and V2.1:
 
 \begin{enumerate}
    \item  A new tuning parameter called ROUND has been added that
@@ -19590,6 +19628,16 @@ the NDF\_ system between versions V2.0 and V2.1 (the current version):
           associated with the same base NDF. This no longer happens.
           Such identifiers can now be used safely once the original
           thread has regained the lock on the base NDF.
+\end{enumerate}
+
+\subsection{Changes Introduced in V2.2}
+
+The following describes the most significant changes that occurred in
+the NDF\_ system between versions V2.1 and V2.2 (the current version):
+
+\begin{enumerate}
+   \item  It is now possible to specifiy the extent of an NDF section
+          using arc-distance values (see \S\ref{ss:using_axis_coordinates_to_specify_sections}).
 \end{enumerate}
 
 Existing applications should be re-compiled and re-linked.

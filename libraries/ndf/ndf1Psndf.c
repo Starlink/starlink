@@ -11,7 +11,7 @@
 
 void ndf1Psndf( const char *str, double lbnd, double ubnd, int axis,
                 AstFrameSet *iwcs, int wcssec, double *value1, double *value2,
-                int *frame1, int *frame2, int *isbnd, int *isdef1,
+                int *frame1, int *frame2, int *isgeo, int *isbnd, int *isdef1,
                 int *isdef2, int *status ){
 /*
 *+
@@ -24,8 +24,8 @@ void ndf1Psndf( const char *str, double lbnd, double ubnd, int axis,
 *  Synopsis:
 *     void ndf1Psndf( const char *str, double lbnd, double ubnd, int axis,
 *                     AstFrameSet *iwcs, int wcssec, double *value1,
-*                     double *value2, int *frame1, int *frame2, int *isbnd,
-*                     int *isdef1, int *isdef2, int *status )
+*                     double *value2, int *frame1, int *frame2, int *isgeo,
+*                     int *isbnd, int *isdef1, int *isdef2, int *status )
 
 *  Description:
 *     This function parses a dimension bound field for an NDF to determine
@@ -83,6 +83,13 @@ void ndf1Psndf( const char *str, double lbnd, double ubnd, int axis,
 *        Returned holding the 0 ==> "value2" is to be interpreted as a WCS
 *        or axis coordinate value, 1 ==> it is a pixel index, 2 ==> it is a
 *        FRACTION value.
+*     *isgeo
+*        If the bounds for the axis are defined by a centre value and
+*        width and the width value is a WCS value, then the value
+*        returned in "*isgeo" indicates if the width in "*value2" is a
+*        geodesic distance. If not, it will be an axis increment. For
+*        instance an RA increment will correspond to a different geodesic
+*        distance at different Declinations.
 *     *isbnd
 *        Returned holding the whether "value1" and "value2" specify the
 *        lower and upper bounds directly (i.e. non-zero ==> a ":" separator
@@ -104,7 +111,7 @@ void ndf1Psndf( const char *str, double lbnd, double ubnd, int axis,
 *     the upper bound.
 
 *  Copyright:
-*     Copyright (C) 2018 East Asian Observatory
+*     Copyright (C) 2018-2021 East Asian Observatory
 *     All rights reserved.
 
 *  Licence:
@@ -130,6 +137,8 @@ void ndf1Psndf( const char *str, double lbnd, double ubnd, int axis,
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     29-JAN-2021 (DSB):
+*        Added argument "isgeo".
 
 *-
 */
@@ -151,6 +160,9 @@ void ndf1Psndf( const char *str, double lbnd, double ubnd, int axis,
 /* Create a copy of the string excluding any leading or trailing spaces. */
    lstr = ndf1Strip( NULL, str, 1, 0, &l, &f, status );
    if( *status == SAI__OK ) {
+
+/* Initialise "isgeo" to indicate that "value" is not a geodesic distance. */
+      *isgeo = 0;
 
 /* If the string is blank, then return the default field values (a ":"
    separator being implied). */
@@ -227,7 +239,7 @@ void ndf1Psndf( const char *str, double lbnd, double ubnd, int axis,
             c = lstr[ isep ];
             lstr[ isep ] = 0;
             ndf1Psndb( lstr, def1, axis, iwcs, wcssec, value1, frame1,
-                       isdef1, status );
+                       isdef1, isgeo, status );
             lstr[ isep ] = c;
          }
 
@@ -255,7 +267,7 @@ void ndf1Psndf( const char *str, double lbnd, double ubnd, int axis,
    the second value. */
          } else {
             ndf1Psndb( lstr + isep + 1, def2, axis, iwcs, wcssec, value2,
-                       frame2, isdef2, status );
+                       frame2, isdef2, isgeo, status );
          }
       }
 

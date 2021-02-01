@@ -1,8 +1,14 @@
 NDF Library
 -----------
 
-V2.1
+V2.2
 
+- NDF sections specified by centre and extent can now indicate that an
+extent is an arc-distance by appending one of the strings "as", "am" or "ad"
+to the end of the numerical value (e.g. "10:00:00~30am,-24:20:12~30am").
+
+
+V2.1
 - A new tuning parameter called ROUND has been added that controls how
 floating-point values are converted to integer during automatic type
 conversion.

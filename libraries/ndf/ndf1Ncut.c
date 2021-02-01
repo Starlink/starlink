@@ -74,6 +74,8 @@ void ndf1Ncut( NdfACB *acb1, const char *str, NdfACB **acb2, int *status ){
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     29-JAN-2021 (DSB):
+*        Add support for section widths specified by geodesic distances.
 
 *-
 */
@@ -101,6 +103,7 @@ void ndf1Ncut( NdfACB *acb1, const char *str, NdfACB **acb2, int *status ){
    int isbnd[ NDF__MXDIM ];        /* Are VALUEs explicit bounds? */
    int isdef1[ NDF__MXDIM ];       /* Is VALUE1 a defalut value? */
    int isdef2[ NDF__MXDIM ];       /* Is VALUE2 a defalut value? */
+   int isgeo[ NDF__MXDIM ];        /* Are VALUE2 widths geodesic distances? */
    int nax;              /* No. of axes in chosen coord system */
    int ndim;             /* Number of section dimensions */
    int ndimd;            /* Input NDF number of dimensions */
@@ -201,12 +204,12 @@ void ndf1Ncut( NdfACB *acb1, const char *str, NdfACB **acb2, int *status ){
    if "()" was specified) and parse the dimension bounds expression. */
             if( !strcmp( lstr, "()" ) ) {
                ndf1Psnde( " ", nax, dflbnd, dfubnd, iwcs, wcssec, value1,
-                          value2, &ndim, frame1, frame2, isbnd, isdef1,
+                          value2, &ndim, frame1, frame2, isgeo, isbnd, isdef1,
                           isdef2, status );
             } else {
                lstr[ slen - 1 ] = 0;
                ndf1Psnde( lstr + 1, nax, dflbnd, dfubnd, iwcs, wcssec, value1,
-                          value2, &ndim, frame1, frame2, isbnd, isdef1, isdef2,
+                          value2, &ndim, frame1, frame2, isgeo, isbnd, isdef1, isdef2,
                           status );
                lstr[ slen - 1 ] = ')';
             }
@@ -228,7 +231,7 @@ void ndf1Ncut( NdfACB *acb1, const char *str, NdfACB **acb2, int *status ){
 /* If we are using WCS syntax, we do all axes together, */
                if( wcssec ) {
                   ndf1Wclim( iwcs, ndim, ndimd, lbndd, ubndd, isdef1, isdef2,
-                             value1, value2, isbnd, lbnd, ubnd, status );
+                             value1, value2, isgeo, isbnd, lbnd, ubnd, status );
 
 /* For the old pixel/axis syntax, do each axis independently unless
    floating point values are being interpreted as WCS values */
@@ -253,7 +256,8 @@ void ndf1Ncut( NdfACB *acb1, const char *str, NdfACB **acb2, int *status ){
    interpretde as WCS values... */
                } else {
                   ndf1Wplim( iwcs, ndim, lbndd, ubndd, value1, value2, frame1,
-                             frame2, isbnd, isdef1, isdef2, lbnd, ubnd, status );
+                             frame2, isbnd, isgeo, isdef1, isdef2, lbnd, ubnd,
+                             status );
                }
 
 /* Select the section from the NDF. */

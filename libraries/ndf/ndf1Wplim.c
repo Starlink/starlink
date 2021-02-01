@@ -5,12 +5,14 @@
 #include "prm_par.h"
 #include <math.h>
 #include "mers.h"
+#include <string.h>
 
 void ndf1Wplim( AstFrameSet *iwcs, int nax, const hdsdim lbndd[],
                 const hdsdim ubndd[], double value1[], const double
                 value2[], int ispix1[], const int ispix2[],
-                const int isbnd[], const int isdef1[], const int isdef2[],
-                hdsdim lbnd[], hdsdim ubnd[], int *status ){
+                const int isbnd[], const int isgeo[], const int isdef1[],
+                const int isdef2[], hdsdim lbnd[], hdsdim ubnd[],
+                int *status ){
 /*
 *+
 *  Name:
@@ -24,8 +26,9 @@ void ndf1Wplim( AstFrameSet *iwcs, int nax, const hdsdim lbndd[],
 *                     const hdsdim ubndd[], double value1[],
 *                     const double value2[], int ispix1[],
 *                     const int ispix2[], const int isbnd[],
-*                     const int isdef1[], const int isdef2[], hdsdim lbnd[],
-*                     hdsdim ubnd[], int *status )
+*                     const int isgeo[], const int isdef1[],
+*                     const int isdef2[], hdsdim lbnd[], hdsdim ubnd[],
+*                     int *status )
 
 *  Description:
 *     This function accepts values which have been supplied as either pixel
@@ -57,6 +60,15 @@ void ndf1Wplim( AstFrameSet *iwcs, int nax, const hdsdim lbndd[],
 *        Whether "value1" and "value2" specify the lower and upper bounds
 *        directly (as opposed to specifying the centre and width). The
 *        supplied "isbnd" array should have at least "nax" elements.
+*     isgeo
+*        If the bounds for an axis are defined by a centre value and
+*        width (i.e. if "isbnd" is zero) and the width value is a WCS
+*        value (i.e. if "ispix2" is zero), then "isgeo" indicates if the
+*        width supplied in "value2" is geodesic distance. If not, it
+*        will be an axis increment. For instance an RA increment will
+*        correspond to a different geodesic distance at different
+*        Declinations. The supplied value of "isgeo" is ignored if "isbnd"
+*        or "ispix2" is not zero.
 *     isdef1
 *        Is the value supplied "value1" a default value? The supplied
 *        "isdef1" array should have at least "nax" elements.
@@ -73,7 +85,7 @@ void ndf1Wplim( AstFrameSet *iwcs, int nax, const hdsdim lbndd[],
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2018 East Asian Observatory
+*     Copyright (C) 2018-2021 East Asian Observatory
 *     All rights reserved.
 
 *  Licence:
@@ -99,6 +111,8 @@ void ndf1Wplim( AstFrameSet *iwcs, int nax, const hdsdim lbndd[],
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     29-JAN-2021 (DSB):
+*        Added argument "isgeo".
 
 *-
 */
@@ -122,6 +136,9 @@ void ndf1Wplim( AstFrameSet *iwcs, int nax, const hdsdim lbndd[],
    double delta;
    double dlbndd[ NDF__MXDIM ];
    double dubndd[ NDF__MXDIM ];
+   double p1[ NDF__MXDIM ];
+   double p2[ NDF__MXDIM ];
+   double p3[ NDF__MXDIM ];
    double plbnd2[ NDF__MXDIM ];
    double plbnd[ NDF__MXDIM ];
    double pubnd2[ NDF__MXDIM ];
@@ -374,9 +391,25 @@ void ndf1Wplim( AstFrameSet *iwcs, int nax, const hdsdim lbndd[],
                delta = 0.5*value2[ i ];
                plbnd[ i ] = dlbndd[ i ];
                pubnd[ i ] = dubndd[ i ];
+               allpix = 0;
+
+/* If the width is given as a geodesic distance, offset along the current
+   WCS axis by the specified geodesic distance and then find the axis
+   increment from the centre position to the offset position. */
+               if( isgeo[ i ] ) {
+                  for( j = 0; j < nax; j++ ) {
+                     p1[ perm[ j ] - 1 ] = value1[ j ];
+                     p2[ perm[ j ] - 1 ] = value1[ j ];
+                  }
+                  j = perm[ i ] - 1;
+                  p2[ j ] += delta;
+                  astOffset( cfrm, p1, p2, delta, p3 );
+                  delta = astAxDistance( cfrm, j + 1, p1[ j ], p3[ j ] );
+               }
+
+/* Find the WCS bounds of the axis interval. */
                wlbnd[ perm[ i ] - 1 ] = value1[ i ] - delta;
                wubnd[ perm[ i ] - 1 ] = value1[ i ] + delta;
-               allpix = 0;
 
             } else if( *status == SAI__OK ) {
                *status = NDF__WCSIN;
@@ -485,9 +518,22 @@ void ndf1Wplim( AstFrameSet *iwcs, int nax, const hdsdim lbndd[],
 /* Re-calculate the WCS bounds using the central WCS value and the
    supplied WCS width. */
                      ispix1[ i ] = 0;
-                     value1[ i ] = cenwcs[ perm[ i ] - 1 ];
-
+                     j =  perm[ i ] - 1;
+                     value1[ i ] = cenwcs[ j ];
                      delta = 0.5*value2[ i ];
+
+/* If the width is given as a geodesic distance, offset along the current
+   WCS axis by the specified geodesic distance and then find the axis
+   increment from the centre position to the offset position. */
+                     if( isgeo[ i ] ) {
+                        memcpy( p2, cenwcs, nwcs*sizeof(*p2) );
+                        p2[ j ] += delta;
+                        astOffset( cfrm, cenwcs, p2, delta, p3 );
+                        delta = astAxDistance( cfrm, j + 1, cenwcs[ j ],
+                                               p3[ j ] );
+                     }
+
+/* Store the WCS bounds of the axis interval. */
                      wlbnd[ perm[ i ] - 1 ] = value1[ i ] - delta;
                      wubnd[ perm[ i ] - 1 ] = value1[ i ] + delta;
                      allpix = 0;

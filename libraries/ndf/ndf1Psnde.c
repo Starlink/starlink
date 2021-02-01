@@ -10,8 +10,8 @@
 void ndf1Psnde( const char *str, int nax, const double lbnd[],
                 const double ubnd[], AstFrameSet *iwcs, int wcssec,
                 double value1[], double value2[], int *nval, int frame1[],
-                int frame2[], int isbnd[], int isdef1[], int isdef2[],
-                int *status ){
+                int frame2[], int isgeo[], int isbnd[], int isdef1[],
+                int isdef2[], int *status ){
 /*
 *+
 *  Name:
@@ -24,8 +24,8 @@ void ndf1Psnde( const char *str, int nax, const double lbnd[],
 *     void ndf1Psnde( const char *str, int nax, const double lbnd[],
 *                     const double ubnd[], AstFrameSet *iwcs, int wcssec,
 *                     double value1[], double value2[], int *nval,
-*                     int frame1[], int frame2[], int isbnd[],
-*                     int isdef1[], int isdef2[], int *status )
+*                     int frame1[], int frame2[], int isgeo[],
+*                     int isbnd[], int isdef1[], int isdef2[], int *status )
 
 *  Description:
 *     This function parses an NDF section bound expression (such as
@@ -86,6 +86,14 @@ void ndf1Psnde( const char *str, int nax, const double lbnd[],
 *        be interpreted as a WCS or axis coordinate value, 1 ==> it is a
 *        pixel index, 2 ==> it is a FRACTION value. The supplied "frame2"
 *        array should have at least "NDF__MXDIM" elements.
+*     isgeo
+*        If the bounds for an axis are defined by a centre value and
+*        width and the width value is a WCS value, then the value
+*        returned in "isgeo" indicates if the width in "value2" is a
+*        geodesic distance. If not, it will be an axis increment. For
+*        instance an RA increment will correspond to a different geodesic
+*        distance at different Declinations. The supplied "isgeo" array
+*        should have at least "NDF__MXDIM" elements.
 *     isbnd
 *        Returned holding the non-zero ==> the corresponding "value1" and
 *        "value2" values specify the lower and upper bounds of the section
@@ -115,7 +123,7 @@ void ndf1Psnde( const char *str, int nax, const double lbnd[],
 *     need not match the number of NDF dimensions supplied.
 
 *  Copyright:
-*     Copyright (C) 2018 East Asian Observatory
+*     Copyright (C) 2018-2021 East Asian Observatory
 *     All rights reserved.
 
 *  Licence:
@@ -141,6 +149,8 @@ void ndf1Psnde( const char *str, int nax, const double lbnd[],
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     29-JAN-2021 (DSB):
+*        Added argument "isgeo".
 
 *-
 */
@@ -219,6 +229,9 @@ void ndf1Psnde( const char *str, int nax, const double lbnd[],
             ubnd0 = 1.0;
          }
 
+/* Initialise "isgeo" to indicate that "value" is not a geodesic distance. */
+         isgeo[ ival ] = 0;
+
 /* If the field does not exist (i.e. there are two consecutive commas
    or a comma at the start or end of the string) then use the default
    values for the current dimension. */
@@ -265,8 +278,8 @@ void ndf1Psnde( const char *str, int nax, const double lbnd[],
             } else {
                ndf1Psndf( fld, lbnd0, ubnd0, *nval, iwcs, wcssec,
                           value1 + ival, value2 + ival, frame1 + ival,
-                          frame2 + ival, isbnd + ival, isdef1 + ival,
-                          isdef2 + ival, status );
+                          frame2 + ival, isgeo + ival, isbnd + ival,
+                          isdef1 + ival, isdef2 + ival, status );
 
 /* Make a contextual error report if an error occurs. */
                if( *status != SAI__OK ) {
