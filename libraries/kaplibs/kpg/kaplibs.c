@@ -1378,6 +1378,134 @@ void kpg1Ghstr( int bad, int dim, const float *array,  const double *wgts,
 
 /* ------------------------------- */
 
+F77_SUBROUTINE(kpg1_ghst8d)( LOGICAL(BAD),
+                             INTEGER8(DIM),
+                             DOUBLE_ARRAY(ARRAY),
+                             DOUBLE_ARRAY(WGTS),
+                             DOUBLE(WEIGHT),
+                             INTEGER(NUMBIN),
+                             LOGICAL(CUMUL),
+                             DOUBLE(VALMAX),
+                             DOUBLE(VALMIN),
+                             INTEGER8_ARRAY(HIST),
+                             INTEGER(STATUS) );
+
+void kpg1Ghst8d( int bad, hdsdim dim, const double *array, const double *wgts,
+                 double weight, int numbin, int cumul,
+                 double *valmax, double *valmin, hdsdim *hist, int *status ){
+   DECLARE_LOGICAL(BAD);
+   DECLARE_INTEGER8(DIM);
+   DECLARE_DOUBLE_ARRAY_DYN(ARRAY);
+   DECLARE_DOUBLE_ARRAY_DYN(WGTS);
+   DECLARE_DOUBLE(WEIGHT);
+   DECLARE_INTEGER(NUMBIN);
+   DECLARE_LOGICAL(CUMUL);
+   DECLARE_DOUBLE(VALMAX);
+   DECLARE_DOUBLE(VALMIN);
+   DECLARE_INTEGER8_ARRAY_DYN(HIST);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_LOGICAL( bad, BAD );
+   F77_EXPORT_INTEGER8( dim, DIM );
+   F77_CREATE_DOUBLE_ARRAY( ARRAY, dim );
+   F77_EXPORT_DOUBLE_ARRAY( array, ARRAY, dim );
+   F77_CREATE_DOUBLE_ARRAY( WGTS, dim );
+   F77_EXPORT_DOUBLE_ARRAY( wgts, WGTS, dim );
+   F77_EXPORT_DOUBLE( weight, WEIGHT );
+   F77_EXPORT_INTEGER( numbin, NUMBIN );
+   F77_EXPORT_LOGICAL( cumul, CUMUL );
+   F77_EXPORT_DOUBLE( *valmax, VALMAX );
+   F77_EXPORT_DOUBLE( *valmin, VALMIN );
+   F77_CREATE_INTEGER8_ARRAY( HIST, numbin );
+   F77_ASSOC_INTEGER8_ARRAY( HIST, hist );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(kpg1_ghst8d)( LOGICAL_ARG(&BAD),
+                         INTEGER8_ARG(&DIM),
+                         DOUBLE_ARRAY_ARG(ARRAY),
+                         DOUBLE_ARRAY_ARG(WGTS),
+                         DOUBLE_ARG(&WEIGHT),
+                         INTEGER_ARG(&NUMBIN),
+                         LOGICAL_ARG(&CUMUL),
+                         DOUBLE_ARG(&VALMAX),
+                         DOUBLE_ARG(&VALMIN),
+                         INTEGER8_ARRAY_ARG(HIST),
+                         INTEGER_ARG(&STATUS) ); )
+
+   F77_IMPORT_DOUBLE( VALMAX, *valmax );
+   F77_IMPORT_DOUBLE( VALMIN, *valmin );
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_INTEGER8_ARRAY( HIST, hist, numbin );
+   F77_FREE_INTEGER( ARRAY );
+   F77_FREE_INTEGER8( HIST );
+}
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_ghst8r)( LOGICAL(BAD),
+                             INTEGER8(DIM),
+                             REAL_ARRAY(ARRAY),
+                             DOUBLE_ARRAY(WGTS),
+                             DOUBLE(WEIGHT),
+                             INTEGER(NUMBIN),
+                             LOGICAL(CUMUL),
+                             REAL(VALMAX),
+                             REAL(VALMIN),
+                             INTEGER8_ARRAY(HIST),
+                             INTEGER(STATUS) );
+
+void kpg1Ghst8r( int bad, hdsdim dim, const float *array,  const double *wgts,
+                double weight, int numbin, int cumul,
+                float *valmax, float *valmin, hdsdim *hist, int *status ){
+   DECLARE_LOGICAL(BAD);
+   DECLARE_INTEGER8(DIM);
+   DECLARE_REAL_ARRAY_DYN(ARRAY);
+   DECLARE_DOUBLE_ARRAY_DYN(WGTS);
+   DECLARE_DOUBLE(WEIGHT);
+   DECLARE_INTEGER(NUMBIN);
+   DECLARE_LOGICAL(CUMUL);
+   DECLARE_REAL(VALMAX);
+   DECLARE_REAL(VALMIN);
+   DECLARE_INTEGER8_ARRAY_DYN(HIST);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_LOGICAL( bad, BAD );
+   F77_EXPORT_INTEGER8( dim, DIM );
+   F77_CREATE_REAL_ARRAY( ARRAY, dim );
+   F77_EXPORT_REAL_ARRAY( array, ARRAY, dim );
+   F77_CREATE_DOUBLE_ARRAY( WGTS, dim );
+   F77_EXPORT_DOUBLE_ARRAY( wgts, WGTS, dim );
+   F77_EXPORT_DOUBLE( weight, WEIGHT );
+   F77_EXPORT_INTEGER( numbin, NUMBIN );
+   F77_EXPORT_LOGICAL( cumul, CUMUL );
+   F77_EXPORT_REAL( *valmax, VALMAX );
+   F77_EXPORT_REAL( *valmin, VALMIN );
+   F77_CREATE_INTEGER8_ARRAY( HIST, numbin );
+   F77_ASSOC_INTEGER8_ARRAY( HIST, hist );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(kpg1_ghst8r)( LOGICAL_ARG(&BAD),
+                         INTEGER8_ARG(&DIM),
+                         REAL_ARRAY_ARG(ARRAY),
+                         DOUBLE_ARRAY_ARG(WGTS),
+                         DOUBLE_ARG(&WEIGHT),
+                         INTEGER_ARG(&NUMBIN),
+                         LOGICAL_ARG(&CUMUL),
+                         REAL_ARG(&VALMAX),
+                         REAL_ARG(&VALMIN),
+                         INTEGER8_ARRAY_ARG(HIST),
+                         INTEGER_ARG(&STATUS) ); )
+
+   F77_IMPORT_REAL( VALMAX, *valmax );
+   F77_IMPORT_REAL( VALMIN, *valmin );
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_INTEGER8_ARRAY( HIST, hist, numbin );
+   F77_FREE_INTEGER( ARRAY );
+   F77_FREE_INTEGER8( HIST );
+}
+
+/* ------------------------------- */
+
 F77_SUBROUTINE(kpg1_hsstp)( INTEGER(NUMBIN),
                             INTEGER_ARRAY(HIST),
                             DOUBLE(VALMAX),

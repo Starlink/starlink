@@ -143,6 +143,8 @@ void kpg1Gausr( float, int, int, float, int, int, int, int, float *, float *, in
 AstRegion *kpgGetOutline( int, int * );
 void kpg1Ghstd( int, int, const double *, const double *, double, int, int, double *, double *, int *, int * );
 void kpg1Ghstr( int, int, const float *, const double *, double, int, int, float *, float *, int *, int * );
+void kpg1Ghst8d( int, hdsdim, const double *, const double *, double, int, int, double *, double *, hdsdim *, int * );
+void kpg1Ghst8r( int, hdsdim, const float *, const double *, double, int, int, float *, float *, hdsdim *, int * );
 void kpg1Gilst( int, int, int, const char *, int *, int *, int *, int * );
 void kpg1Gtaxv( const char *, int, int, AstFrame *, int, double *, int *, int * );
 void kpg1Gtgrp( const char *, Grp **, size_t*, int * );
