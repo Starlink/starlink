@@ -1798,10 +1798,10 @@ void kpg1Cputm( int contxt[4], double *cputim ){
 
 /* ------------------------------- */
 
-F77_SUBROUTINE(kpg1_typsz)( CHARACTER(TYPE),
-                            INTEGER(NBYTES),
-                            INTEGER(STATUS)
-                            TRAIL(TYPE) );
+F77_SUBROUTINE(kpg_typsz)( CHARACTER(TYPE),
+                           INTEGER(NBYTES),
+                           INTEGER(STATUS)
+                           TRAIL(TYPE) );
 
 size_t kpg1Typsz( const char *type, int *status ){
    DECLARE_CHARACTER_DYN(TYPE);
