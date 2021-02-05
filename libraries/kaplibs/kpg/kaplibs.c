@@ -1427,6 +1427,56 @@ void kpg1Hsstp( int numbin, const int *hist, double valmax, double valmin,
 }
 
 /* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_hsstp8)( INTEGER(NUMBIN),
+                             INTEGER8_ARRAY(HIST),
+                             DOUBLE(VALMAX),
+                             DOUBLE(VALMIN),
+                             DOUBLE(SUM),
+                             DOUBLE(MEAN),
+                             DOUBLE(MEDIAN),
+                             DOUBLE(MODE),
+                             INTEGER(STATUS) );
+
+void kpg1Hsstp8( int numbin, const hdsdim *hist, double valmax, double valmin,
+                 double *sum, double *mean, double *median, double *mode,
+                 int *status ){
+   DECLARE_INTEGER(NUMBIN);
+   DECLARE_INTEGER8_ARRAY_DYN(HIST);
+   DECLARE_DOUBLE(VALMAX);
+   DECLARE_DOUBLE(VALMIN);
+   DECLARE_DOUBLE(SUM);
+   DECLARE_DOUBLE(MEAN);
+   DECLARE_DOUBLE(MEDIAN);
+   DECLARE_DOUBLE(MODE);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( numbin, NUMBIN );
+   F77_CREATE_INTEGER8_ARRAY( HIST, numbin );
+   F77_EXPORT_INTEGER8_ARRAY( hist, HIST, numbin );
+   F77_EXPORT_DOUBLE( valmax, VALMAX );
+   F77_EXPORT_DOUBLE( valmin, VALMIN );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(kpg1_hsstp8)( INTEGER_ARG(&NUMBIN),
+                         INTEGER8_ARRAY_ARG(HIST),
+                         DOUBLE_ARG(&VALMAX),
+                         DOUBLE_ARG(&VALMIN),
+                         DOUBLE_ARG(&SUM),
+                         DOUBLE_ARG(&MEAN),
+                         DOUBLE_ARG(&MEDIAN),
+                         DOUBLE_ARG(&MODE),
+                         INTEGER_ARG(&STATUS) ); )
+
+   F77_IMPORT_DOUBLE( SUM, *sum );
+   F77_IMPORT_DOUBLE( MEAN, *mean );
+   F77_IMPORT_DOUBLE( MEDIAN, *median );
+   F77_IMPORT_DOUBLE( MODE, *mode );
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_FREE_INTEGER8( HIST );
+}
+
+/* ------------------------------- */
 F77_SUBROUTINE(fts1_astwn)( INTEGER(FC),
                             INTEGER(INDF),
                             INTEGER(STATUS) );
