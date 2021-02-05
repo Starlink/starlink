@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_cso2filt_coeff( const smfHead *hdr, AstKeyMap *extpars,
-*                         size_t nvals, double coeffs[2], size_t *ncoeff, int * status );
+*                         size_t nvals, double coeffs[3], size_t *ncoeff, int * status );
 
 *  Arguments:
 *     hdr = const smfHead* (Given)
@@ -26,8 +26,8 @@
 *        containing the parameters for the specific filter.
 *     nvals = size_t (Given)
 *        Number of elements in coeff[] array.
-*     coeff = double [2] (Given & Returned)
-*        Array to receive coefficients. Should be sized to at least 2 elements.
+*     coeff = double [3] (Given & Returned)
+*        Array to receive coefficients. Should be sized to at least 3 elements.
 *     ncoeff = size_t * (Returned)
 *        Number of coefficients stored in coeff[] array.
 *     status = int* (Given and Returned)
@@ -40,9 +40,9 @@
 
 *  Notes:
 *     - The tau relation is formulated as:
-*          tau_filt = a ( tau_cso + b )
+*          tau_filt = a ( tau_cso + b + c sqrt(tau_cso) )
 *       and the keymap should contain an entry named "taurelation_FILT"
-*       containing "a" and "b".
+*       containing "a", "b" and "c".
 *     - The routine will not attempt to guess a tau relation.
 *     - Use smf_cso2filt_applycoeff to apply the coefficients.
 *     - Use smf_cso2filt_tau to retrieve coefficients and apply them in
@@ -55,6 +55,8 @@
 *  History:
 *     2013-05-12 (TIMJ):
 *        Initial version derived from smf_cso2filt_tau
+*     2021-02-04 (GSB)
+*        Increase number of coefficients to 3 and default any unspecified.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -90,6 +92,9 @@
 /* SMURF includes */
 #include "smf.h"
 
+static const double default_coeffs[] = {1.0, 0.0, 0.0};
+static const size_t n_default_coeffs = sizeof(default_coeffs) / sizeof(*default_coeffs);
+
 void smf_cso2filt_coeff( const smfHead *hdr,  AstKeyMap * extpars,
                          size_t nvals, double coeffs[], size_t *ncoeff, int *status) {
   char filter[81];         /* somewhere for the filter name */
@@ -114,6 +119,9 @@ void smf_cso2filt_coeff( const smfHead *hdr,  AstKeyMap * extpars,
   ast_nvals = nvals;
   if (astMapGet1D( taumap, filter, ast_nvals, &ast_ncoeff, coeffs )) {
     *ncoeff = ast_ncoeff;
+
+    if (nvals > n_default_coeffs) nvals = n_default_coeffs;
+    for (; nvals > *ncoeff; ++ *ncoeff) coeffs[*ncoeff] = default_coeffs[*ncoeff];
 
   } else {
     if (*status == SAI__OK) *status = SAI__ERROR;
