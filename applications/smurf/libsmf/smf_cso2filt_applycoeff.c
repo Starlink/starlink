@@ -13,14 +13,14 @@
 *     Subroutine
 
 *  Invocation:
-*     double smf_cso2filt_applycoeff( double csotau, const double coeffs[2],
+*     double smf_cso2filt_applycoeff( double csotau, const double coeffs[3],
 *                                     int *status );
 
 *  Arguments:
 *     csotau = double (Given)
 *        225GHz tau value. Returns VAL__BADD if it is bad. Returns zero if it
 *        is zero.
-*     coeffs = double[2] (Given)
+*     coeffs = double[3] (Given)
 *        Conversion Coefficients obtained by calling smf_cso2filt_coeff().
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -33,7 +33,7 @@
 *  Notes:
 *     - Returns a value of VAL__BADD if status is set bad on entry
 *     - The tau relation is formulated as:
-*          tau_filt = a ( tau_cso + b )
+*          tau_filt = a ( tau_cso + b + c sqrt(tau_cso) )
 *     - Since "b" is usually negative, the calculation is skipped if the
 *       CSO tau is zero. The routine returns a tau of 0.0.
 *     - Coefficients should be obtained by calling smf_cso2filt_coeff
@@ -46,6 +46,8 @@
 *  History:
 *     2013-05-12 (TIMJ):
 *        Initial version, derived from smf_cso2filt_tau
+*     2021-02-04 (GSB)
+*        Add third coefficient for sqrt(tau_cso) term.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -73,6 +75,9 @@
 *-
 */
 
+/* Standard includes */
+#include <math.h>
+
 /* Starlink includes */
 #include "sae_par.h"
 #include "prm_par.h"
@@ -81,7 +86,7 @@
 /* SMURF includes */
 #include "smf.h"
 
-double smf_cso2filt_applycoeff( double csotau, const double coeffs[2],
+double smf_cso2filt_applycoeff( double csotau, const double coeffs[3],
                                 int *status ) {
   double tau = VAL__BADD;  /* return filter tau */
 
@@ -91,7 +96,7 @@ double smf_cso2filt_applycoeff( double csotau, const double coeffs[2],
     return VAL__BADD;
   }
 
-  tau = coeffs[0] * ( csotau + coeffs[1] );
+  tau = coeffs[0] * ( csotau + coeffs[1] + coeffs[2] * sqrt(csotau) );
 
   return tau;
 }

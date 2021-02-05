@@ -185,11 +185,11 @@ void smf_calc_taufit( const smfData * data, smf_tausrc tausrc,
       size_t i;
       double curepoch;
       csofit2_poly_t *polys;
-      double coeffs[2];
+      double coeffs[3];
       size_t ncoeffs = 0;
 
       /* Get the filter conversion factors */
-      smf_cso2filt_coeff( data->hdr, extpars, 2, coeffs, &ncoeffs, status );
+      smf_cso2filt_coeff( data->hdr, extpars, 3, coeffs, &ncoeffs, status );
 
       polys = &(subset->polys[0]);
 
