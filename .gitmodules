@@ -172,3 +172,6 @@
 [submodule "libext/hds-v4"]
 	path = libext/hds-v4
 	url = ../hds-v4.git
+[submodule "applications/smurf/wvm"]
+	path = applications/smurf/wvm
+	url = git://github.com/eaobservatory/jcmt-wvm.git
