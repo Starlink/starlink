@@ -227,6 +227,7 @@ kpg1_h2ast.f \
 kpg1_hmsg.f \
 kpg1_hrcpr.f \
 kpg1_hsect.f \
+kpg1_hsect8.f \
 kpg1_hsstp.f \
 kpg1_hsstp8.f \
 kpg1_hstlo.f \

@@ -154,6 +154,7 @@ void kpg1Gtwcs( int, AstFrameSet **, int * );
 
 void kpg1Hdsky( const HDSLoc *, AstKeyMap *, int, int, int * );
 void kpg1Hsect( const HDSLoc *, int, int *, int *, HDSLoc *, const char *, int * );
+void kpg1Hsect8( const HDSLoc *, int, hdsdim *, hdsdim *, HDSLoc *, const char *, int * );
 void kpg1Hsstp( int, const int *, double, double, double *, double *, double *, double *, int * );
 void kpg1Hsstp8( int, const hdsdim *, double, double, double *, double *, double *, double *, int * );
 
