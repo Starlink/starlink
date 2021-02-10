@@ -100,10 +100,18 @@
 *        skyloop, if the original EXT model had any bad values.
 *     3-JUN-2020 (DSB):
 *        Added arguments lut_lbnd and lut_ubnd.
+*     10-FEB-2021 (DSB):
+*        When replacing bad values by the mean time slice value, use only
+*        3 worker threads. This means that each worker gets a longer section
+*        of time slices to process, thus increasing the chances of there
+*        being at least one good time slice in each section. Failure to
+*        find a single good time slice in a section causes the appliction
+*        to abort.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2012-2014 Science & Technology Facilities Council.
+*     Copyright (C) 2021 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -300,7 +308,7 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *dumpdir,
                if( *status == SAI__OK ) {
                   *status = SAI__ERROR;
                   errRepf( " ", "NDF '%s' holds a LUT but does not "
-                           "contain the LUT bounds.", status );
+                           "contain the LUT bounds.", status, cname );
                }
 
             } else if( lbndx != lut_lbnd[ 0 ] || ubndx != lut_ubnd[ 0 ] ||
@@ -388,10 +396,24 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *dumpdir,
 
 /* Replace bad values with the mean value in the time slice, or with the
    mean value in the closest non-bad time slice if the whole time slice
-   is bad. */
+   is bad. Here we use a limited number of worker threads (3) in order to
+   reduce the chances of any single thread finding no good values in its
+   section of the array. */
          } else if( bad == 2 )  {
+            if( nw > 3 ) nw = 3;
+
+            tstep = ntslice/nw;
+            if( tstep == 0 ) tstep = 1;
+
             for( iw = 0; iw < nw; iw++ ) {
                pdata = job_data + iw;
+               pdata->t1 = iw*tstep;
+               if( iw < nw - 1 ) {
+                  pdata->t2 = pdata->t1 + tstep - 1;
+               } else {
+                  pdata->t2 = ntslice - 1;
+               }
+
                pdata->operation = 3;
                thrAddJob( wf, 0, pdata, smf1_import_array, 0, NULL, status );
             }
