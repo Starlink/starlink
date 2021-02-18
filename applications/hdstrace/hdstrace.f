@@ -79,7 +79,7 @@
 
 *  Usage:
 *     hdstrace object [full] [nlines] [typind] [valind] [logfile]
-*        [eachline] [newline] [width] [widepage] [version]
+*        [eachline] [newline] [width] [widepage] [version] [sort]
 
 *  ADAM Parameters:
 *     EACHLINE = _LOGICAL (Read)
@@ -115,6 +115,8 @@
 *        a whole structure if the name of the container file is given,
 *        or it may be an object within the container file, or even a
 *        sub-section of an array component.
+*     SORTED = _LOGICAL (Read)
+*        If true, list structure components in sorted order.  [FALSE]
 *     TYPIND = _INTEGER (Read)
 *        Column indentation of the component's type with respect to
 *        the current indentation of the component's name.  If the name
@@ -291,8 +293,9 @@
      :  PRIM,                  ! Object is primitive
      :  QUIET,                 ! Will screen output be suppressed?
      :  VERSIO,                ! Display the HDS version number?
-     :  WIDEPG                 ! A wide page (132 character) is produced
+     :  WIDEPG,                ! A wide page (132 character) is produced
                                ! rather than default 80
+     :  SORTED                 ! Structure components to be sorted?
 
       INTEGER
      :  CMNTYP,                ! Indentation for type
@@ -403,6 +406,10 @@
 *    Get the switch for displaying the HDS version number.
 
       CALL PAR_GET0L( 'VERSION', VERSIO, STATUS )
+
+*    Get the switch for sorting the structure components.
+
+      CALL PAR_GET0L( 'SORTED', SORTED, STATUS )
 
 *    Something has gone wrong obtaining the parameters.  Tidy the
 *    locator and exit.
@@ -536,8 +543,8 @@
 *       Examine the scalar structure using the recursive routine.
 
             CALL TRA1_THIER( OBJLOC, INDENT, FULL, STEP, CMNTYP,
-     :                       CMNVAL, NEWLIN, NLINES, ONEPLN, LOGEXM,
-     :                       FD, LINE( : WIDTH ), STATUS )
+     :                       CMNVAL, NEWLIN, NLINES, ONEPLN, SORTED,
+     :                       LOGEXM, FD, LINE( : WIDTH ), STATUS )
 
          END IF
 

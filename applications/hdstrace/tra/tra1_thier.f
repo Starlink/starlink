@@ -1,6 +1,6 @@
       SUBROUTINE TRA1_THIER( LOC, INDENT, FULL, STEP, CMNTYP, CMNVAL,
-     :                       NEWLIN, NLINES, ONEPLN, LOGEXM, FD, LINE,
-     :                       STATUS )
+     :                       NEWLIN, NLINES, ONEPLN, SORTED, LOGEXM,
+     :                       FD, LINE, STATUS )
 *+
 *  Name:
 *     TRA1_THIER
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL TRA1_THIER( LOC, INDENT, FULL, STEP, CMNTYP, CMNVAL, NEWLIN,
-*                      NLINES, ONEPLN, LOGEXM, FD, LINE, STATUS )
+*                      NLINES, ONEPLN, SORTED, LOGEXM, FD, LINE, STATUS )
 
 *  Description:
 *     The routine recursively descends an HDS object hierarchy,
@@ -41,6 +41,8 @@
 *     ONEPLN = LOGICAL (Given)
 *        If true the elements of a character array each appear on a
 *        separate line.
+*     SORTED = LOGICAL (Given)
+*        If true, list structure components in sorted order.
 *     LOGEXM = LOGICAL (Given)
 *        If true a log of the header records is written to an ASCII
 *        file.
@@ -93,6 +95,8 @@
 *  History:
 *     1992 September 24 (MJC):
 *        Original version based on RFWS's KPG1_NACVT.
+*     2021 February 17 (GSB):
+*        Addition of option for sorting structure components.
 *     {enter_further_changes_here}
 
 *-
@@ -120,6 +124,7 @@
       LOGICAL NEWLIN             ! Values start on a new line
       LOGICAL ONEPLN             ! Elements of a character array each
                                  ! appear on a new line
+      LOGICAL SORTED             ! Structure components to be sorted?
 
 *  Arguments Returned:
       CHARACTER * ( * ) LINE     ! Line string
@@ -134,6 +139,9 @@
 *  Local Constants:
       INTEGER MXSTK              ! Recursion stack size
       PARAMETER ( MXSTK = 200 )
+
+      INTEGER MXSORT             ! Maximum sortable components
+      PARAMETER ( MXSORT = 100 )
 
 *  Local Variables:
       CHARACTER * ( DAT__SZLOC ) LCELL( MXSTK ) ! Array cell locator
@@ -161,6 +169,15 @@
       LOGICAL LAST               ! Final object in the structure?
       LOGICAL PRIM               ! Object primitive?
       LOGICAL SARRAY( MXSTK )    ! Object an array of structures?
+
+      CHARACTER * ( DAT__SZNAM ) THISCMPNAM ! Sorting comp. name
+      CHARACTER * ( DAT__SZNAM ) THATCMPNAM ! Sorting comp. name
+      CHARACTER * ( DAT__SZNAM ) CMPNAME( MXSORT ) ! Component names
+      INTEGER SORTI                   ! Sorting operation index
+      INTEGER SORTO( MXSTK, MXSORT )  ! Sort ordering array
+      INTEGER SORTX                   ! Sort swap variable
+      LOGICAL SWAPPED                 ! Did a swap occur?
+      INTEGER THISICMP                ! Current component index
 
 *.
 
@@ -286,6 +303,48 @@
 
                         ELSE
 
+*  If sorting was requested, and this component is small enough,
+*  prepare sorting information: first extract names, then sort.
+                           IF ( SORTED .AND. ( NCMP( STK ) .LE.
+     :                          MXSORT ) ) THEN
+                              SORTI = 0
+                              DO WHILE ( ( SORTI .LT. NCMP( STK ) )
+     :                                   .AND. ( STATUS .EQ. SAI__OK ) )
+                                 SORTI = SORTI + 1
+                                 CALL DAT_INDEX( LCELL( STK ), SORTI,
+     :                                           LCMP( STK ), STATUS )
+
+                                 CALL DAT_NAME( LCMP( STK ), THISCMPNAM,
+     :                                          STATUS )
+                                 CMPNAME( SORTI ) = THISCMPNAM
+                                 SORTO( STK, SORTI ) = SORTI
+
+                                 CALL DAT_ANNUL( LCMP( STK ), STATUS )
+                              END DO
+
+                              SWAPPED = .TRUE.
+                              DO WHILE ( SWAPPED .AND.
+     :                                   ( STATUS .EQ. SAI__OK ) )
+                                 SWAPPED = .FALSE.
+                                 SORTI = 1
+                                 DO WHILE ( SORTI .LT. NCMP( STK ) )
+                                    SORTI = SORTI + 1
+                                    THISCMPNAM = CMPNAME(
+     :                                 SORTO ( STK, SORTI ) )
+                                    THATCMPNAM = CMPNAME(
+     :                                 SORTO ( STK, SORTI - 1 ) )
+                                    IF ( THATCMPNAM .GT. THISCMPNAM )
+     :                                    THEN
+                                       SORTX = SORTO ( STK, SORTI )
+                                       SORTO ( STK, SORTI ) = SORTO (
+     :                                    STK, SORTI - 1 )
+                                       SORTO ( STK, SORTI - 1 ) = SORTX
+                                       SWAPPED = .TRUE.
+                                    END IF
+                                 END DO
+                              END DO
+                           END IF
+
 *  Loop to process each structure component, obtaining a locator for
 *  it.
                            ICMP( STK ) = 0
@@ -293,7 +352,13 @@
                            IF ( ( ICMP( STK ) .LT. NCMP( STK ) ) .AND.
      :                          ( STATUS .EQ. SAI__OK ) ) THEN
                               ICMP( STK ) = ICMP( STK ) + 1
-                              CALL DAT_INDEX( LCELL( STK ), ICMP( STK ),
+                              IF ( SORTED .AND. ( NCMP( STK ) .LE.
+     :                             MXSORT ) ) THEN
+                                 THISICMP = SORTO( STK, ICMP( STK ) )
+                              ELSE
+                                 THISICMP = ICMP( STK )
+                              END IF
+                              CALL DAT_INDEX( LCELL( STK ), THISICMP,
      :                                        LCMP( STK ), STATUS )
 
 *  We must now recursively invoke the original algorithm to convert the

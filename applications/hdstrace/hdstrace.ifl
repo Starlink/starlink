@@ -175,6 +175,15 @@ interface HDSTRACE
       helpkey     *
    endparameter
 
-
+   parameter      SORTED         # Sort structure components?
+      position    12
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      default     NO
+      ppath       'CURRENT,DEFAULT'
+      prompt      'List structure components in sorted order?'
+      helpkey     *
+   endparameter
 
 endinterface
