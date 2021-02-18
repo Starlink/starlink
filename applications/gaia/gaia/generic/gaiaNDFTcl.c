@@ -47,6 +47,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <float.h>
+#include <limits.h>
 
 #include <tcl.h>
 #include <ndf.h>
@@ -1524,7 +1525,7 @@ static int gaiaNDFTclGetPropertyDims( ClientData clientData,
     char *error_mess;
     const char *extension;
     const char *name;
-    int dims[NDF__MXDIM];
+    hdsdim dims[NDF__MXDIM];
     int ndim;
     int i;
     int result;
@@ -1553,10 +1554,22 @@ static int gaiaNDFTclGetPropertyDims( ClientData clientData,
                                          dims, &ndim, &error_mess );
 
         if ( result == TCL_OK && ndim > 0 ) {
-            resultObj = Tcl_GetObjResult( interp );
             for ( i = 0; i < ndim; i++ ) {
-                Tcl_ListObjAppendElement( interp, resultObj,
-                                          Tcl_NewIntObj( dims[i] ) );
+                if ( ( dims[i] < INT_MIN ) || ( dims[i] > INT_MAX ) ) {
+                    Tcl_SetResult( interp,
+                                   "Get extension component dimension is too large",
+                                   TCL_VOLATILE );
+                    result = TCL_ERROR;
+                    break;
+                }
+            }
+
+            if ( result == TCL_OK ) {
+                resultObj = Tcl_GetObjResult( interp );
+                for ( i = 0; i < ndim; i++ ) {
+                    Tcl_ListObjAppendElement( interp, resultObj,
+                                              Tcl_NewIntObj( (int) dims[i] ) );
+                }
             }
         }
         else {

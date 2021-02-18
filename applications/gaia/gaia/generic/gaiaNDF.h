@@ -165,7 +165,7 @@ extern "C" {
 
     /* Get dimensions of a property in a named extension */
     int gaiaNDFGetPropertyDims( int ndfid, const char *extension,
-                                const char *name, int dims[], int *ndim,
+                                const char *name, hdsdim dims[], int *ndim,
                                 char **error_mess );
 
     /* Search a given HDS path for the first child that is an NDF. */

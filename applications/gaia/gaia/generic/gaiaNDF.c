@@ -2020,7 +2020,7 @@ int gaiaNDFGetDoubleProperty( int ndfid, const char *extension,
  *    are returned in the dims array which should be at least NDF__MXDIM.
  */
 int gaiaNDFGetPropertyDims( int ndfid, const char *extension,
-                            const char *name, int dims[], int *ndim,
+                            const char *name, hdsdim dims[], int *ndim,
                             char **error_mess )
 {
     HDSLoc *extloc = NULL;
