@@ -89,6 +89,9 @@ void CGEN_FUNCTION2(ndfXpt0,_)( CGEN_TYPE value, int indf,
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*    19-FEB-2021 (DSB):
+*        Initialise and finalise the library correctly in order to avoid
+*        loosing the AST status value.
 
 *-
 */
@@ -108,7 +111,7 @@ void CGEN_FUNCTION2(ndfXpt0,_)( CGEN_TYPE value, int indf,
    if( *status != SAI__OK ) return;
 
 /* Ensure the NDF library has been initialised. */
-   ndf1Init( status );
+   NDF_INIT( status );
 
 /* Import the NDF identifier. */
    ndf1Impid( indf, &acb, status );
@@ -235,6 +238,9 @@ void CGEN_FUNCTION2(ndfXpt0,_)( CGEN_TYPE value, int indf,
               "component within a named NDF extension.", status );
       ndf1Trace( "ndfXpt0<T>", status );
    }
+
+/* Restablish the original AST status pointer */
+   NDF_FINAL
 
 }
 
