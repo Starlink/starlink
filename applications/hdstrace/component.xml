@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="hdstrace" support="S">
-  <version>1.2-4</version>
+  <version>1.2-5</version>
   <path>applications/hdstrace</path>
   <description>HDSTRACE - Trace an HDS file</description>
   <abstract><p>
