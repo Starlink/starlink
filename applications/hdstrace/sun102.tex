@@ -584,14 +584,14 @@ would give a full trace of the last object traced.
       This improves readability for long strings.
    }
    \sstusage{
-      hdstrace object [full] [nlines] [typind] [valind] [logfile]
-         [eachline] [newline] [width] [widepage]
+      hdstrace object [full] [nlines] [typind] [valind] [logfile] [eachline] [newline] \newline
+      \hspace*{4em} [width] [widepage] [version] [sorted]
    }
    \sstparameters{
       \sstsubsection{
          EACHLINE = \_LOGICAL (Read)
       }{
-         If \texttt{true} the elements of a character array will each appear on
+         If \texttt{true}, the elements of a character array will each appear on
          a separate line.  Otherwise elements fill the available space
          and may span several lines, paragraph style. \texttt{[FALSE]}
       }
@@ -645,6 +645,11 @@ would give a full trace of the last object traced.
          sub-section of an array component.
       }
       \sstsubsection{
+         SORTED = \_LOGICAL (Read)
+      }{
+         If \texttt{true}, list structure components in sorted order. \texttt{[FALSE]}
+      }
+      \sstsubsection{
          TYPIND = \_INTEGER (Read)
       }{
          Column indentation of the component's type with respect to
@@ -667,7 +672,6 @@ would give a full trace of the last object traced.
          there be a gap of at least two columns.  HDS types can be up
          to 15 characters. \texttt{[15]}
       }
-
       \sstsubsection{
          VERSION = \_LOGICAL (Read)
       }{
@@ -675,7 +679,6 @@ would give a full trace of the last object traced.
          used by the supplied file is appended to the end of the trace.
          It is also stored in output parameter HDSVERSION. \texttt{[FALSE]}
       }
-
       \sstsubsection{
          WIDEPAGE = \_LOGICAL (Read)
       }{
