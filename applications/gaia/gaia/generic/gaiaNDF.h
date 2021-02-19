@@ -13,6 +13,7 @@ extern "C" {
 #endif
 
 #include <ast.h>
+#include <star/hds.h>
 
 /*  Single NDF interface */
 /*  ==================== */
