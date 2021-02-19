@@ -79,11 +79,11 @@
 
 *  Usage:
 *     hdstrace object [full] [nlines] [typind] [valind] [logfile]
-*        [eachline] [newline] [width] [widepage] [version] [sort]
+*        [eachline] [newline] [width] [widepage] [version] [sorted]
 
 *  ADAM Parameters:
 *     EACHLINE = _LOGICAL (Read)
-*        If true the elements of a character array will each appear on
+*        If true, the elements of a character array will each appear on
 *        a separate line.  Otherwise elements fill the available space
 *        and may span several lines, paragraph style. [FALSE]
 *     FULL = _LOGICAL (Read)
@@ -201,6 +201,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S Berry (EAO)
+*     GSB: Graham Bell (EAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -235,6 +236,8 @@
 *        compatibility.
 *     2017 May 16 (DSB):
 *        Added VERSION and HDSVERSION parameters.
+*     2021 February 18 (GSB):
+*        Added SORTED parameter.
 *     {enter_further_changes_here}
 
 *-
