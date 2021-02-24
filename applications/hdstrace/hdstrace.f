@@ -351,7 +351,7 @@
 
 *    Get the maximum number of lines of values for each object.
 
-      CALL PAR_MIX0I( 'NLINES', '1', 1, 10000, 'ALL,ONE', .FALSE.,
+      CALL PAR_MIX0I( 'NLINES', '1', 1, 10000, 'ALL', .FALSE.,
      :                NLC, STATUS )
 
 *    Convert the string to an integer.  The 'ALL' option converts to the
