@@ -6,7 +6,7 @@
 \stardocnumber      {102.4}
 \stardocsource      {sun\stardocnumber}
 \stardocauthors     {Malcolm J. Currie}
-\stardocdate        {2017 May 16}
+\stardocdate        {2021 February 25}
 \stardoctitle       {HDSTRACE --- Listing HDS Data Files}
 \stardocversion     {1.2}
 \stardocmanual      {User's Guide}
@@ -690,7 +690,8 @@ would give a full trace of the last object traced.
          WIDTH = \_INTEGER (Read)
       }{
          Maximum width of the the output in characters.  The default is
-         the screen width of a terminal and 80 for a file.  \texttt{[]}
+         the screen width of a terminal (up to the maximum message
+         buffer, currently 300 characters), and 80 for a file.  \texttt{[]}
       }
    }
    \sstnotes{

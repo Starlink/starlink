@@ -144,7 +144,8 @@
 *        It is only accessed if WIDTH is null.  [FALSE]
 *     WIDTH = _INTEGER (Read)
 *        Maximum width of the the output in characters.  The default is
-*        the screen width of a terminal and 80 for a file.  []
+*        the screen width of a terminal (up to the maximum message
+*        buffer, currently 300 characters), and 80 for a file.  []
 
 *  Notes:
 *     This application allows far more flexibility in layout than
@@ -179,7 +180,8 @@
 *  Copyright:
 *     Copyright (C) 1989, 1991-1993 Science & Engineering Research
 *     Council.
-*     Copyright (C) 2014 Science and Technology Facilities Council.
+*     Copyright (C) 2014, 2021 Science and Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -238,6 +240,12 @@
 *        Added VERSION and HDSVERSION parameters.
 *     2021 February 18 (GSB):
 *        Added SORTED parameter.
+*     2021 February 25 (MJC):
+*        Scale the maximum number of lines of output correctly to avoid
+*        numeric wraparound leading to an attempt to print a negative
+*        number of values when NLINES=ALL.  Reset and document the
+*        maximum output width to MSG__SZMSG, rather than the previous
+*        arbitrary 512 characters.
 *     {enter_further_changes_here}
 
 *-
@@ -261,11 +269,9 @@
 *  Local Constants:
       INTEGER
      :  LNSIZE,                ! Length of message buffer
-     :  MAXWID,                ! Maximum width of output in characters
      :  STEP,                  ! Indentation step size
      :  WDSIZE                 ! Length of wide message buffer
       PARAMETER ( LNSIZE = 78 )
-      PARAMETER ( MAXWID = 512 )
       PARAMETER ( STEP = 3 )
       PARAMETER ( WDSIZE = 130 )
 
@@ -276,7 +282,7 @@
      :  TYPE                   ! Type of the object
       CHARACTER * ( DAT__SZNAM )
      :  NAME                   ! Name of the object
-      CHARACTER * ( MAXWID )
+      CHARACTER * ( MSG__SZMSG )
      :  DUMMY,                 ! Buffer for output of labels to logfile
      :  LINE                   ! Message buffer
 
@@ -355,12 +361,13 @@
      :                NLC, STATUS )
 
 *    Convert the string to an integer.  The 'ALL' option converts to the
-*    largest integer.  The minus one is needed because the subroutines
+*    largest integer.  The scaling is needed because the subroutines
 *    evaluate an expression involving line length/2 * NLINES to find
-*    the maximum number of values.
+*    the maximum number of values.  The factor allows a minimum of
+*    ten characters for indentation, name, and dimensions.
 
       IF ( NLC( 1:3 ) .EQ. 'ALL' ) THEN
-         NLINES = VAL__MAXI / 64
+         NLINES = VAL__MAXI / ( ( MSG__SZMSG - 10 ) / 2 )
       ELSE
          CALL CHR_CTOI( NLC, NLINES, STATUS )
       END IF
@@ -369,12 +376,13 @@
 *    otherwise.
 
       CALL ONE_SCRSZ( TWIDTH, THEIGH, STATUS )
+      TWIDTH = MIN( MSG__SZMSG, TWIDTH )
 
 *    Obtain the desired width, defaulting to the terminal width.  A null
 *    return asks that the old WIDEPAGE parameter be used.
 
       CALL ERR_MARK
-      CALL PAR_GDR0I( 'WIDTH', TWIDTH, MIN( TWIDTH, 60 ), MAXWID,
+      CALL PAR_GDR0I( 'WIDTH', TWIDTH, MIN( TWIDTH, 60 ), MSG__SZMSG,
      :                 .FALSE., WIDTH, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL ( STATUS )
