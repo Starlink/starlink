@@ -518,10 +518,9 @@ sub acsis_header {
     do {foreach (keys %$fitsitem) { print "$_\n";}} if (defined $debug && $debug > 1);
 
     my $rx     = lc($fitsitem->{INSTRUME});
-    $rx     =~ s/harpb/ha/;
     $rx     =~ s/^fe_//;
     $rx     =~ s/^rx//i;
-    $rx     =~ s/^scuba-2/scu/i;
+    $rx     = sprintf('%.2s', $rx);
     my $freq   = sprintf("%.1f", $fitsitem->{RESTFREQ});
     my $cfreq  = "${rx}/${freq}";
     my $fmt = '%.2f';
