@@ -1148,7 +1148,7 @@ exportndf = 0
 #               will be exported, with consequent possible lossy compression.
 #               Otherwise the parameter should be a comma-separated list
 #               of quality names, enclosed in parentheses. Valid quality
-#               names are: BADDA, BADB, SPIKE, DCJUMP, PAD, APOD, STAT, COM,
+#               names are: BADDA, BADBOL, SPIKE, DCJUMP, PAD, APOD, STAT, COM,
 #               FILT, NOISE, EXT, LOWAP, BADEF, RING, SSN, PCA, IP.
 exportqbits = <undef>
 
@@ -1290,7 +1290,7 @@ fakescale = 1
 #		time-series data, each containing a count of the number
 #		of samples with a quality bit matching at least one of the
 #		specified flags. Any of the standard quality names can be
-#               specified. These are: BADDA, BADB, SPIKE, DCJUMP, PAD, APOD,
+#               specified. These are: BADDA, BADBOL, SPIKE, DCJUMP, PAD, APOD,
 #               STAT, COM, NOISE, EXT, LOWAP, RING, SSN, PCA, IP.
 #
 #		Note: If BADBOL is set the behaviour is slightly different than
