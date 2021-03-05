@@ -236,8 +236,25 @@ ast.zero_lowhits = 0
 # 		with the output image in pixel coordinates). The pixels in
 #		the map that are to be constrained to 0 should be set to the
 #		bad value in the mask. All other pixels will be allowed to
-#		vary during map-making.
+#		vary during map-making. The mask for the first iteration
+#               can be set separately using parameter "ast.zero_mask0".
 ast.zero_mask = 0
+
+#-----------------------------------------------------------------
+#  Name: 	ast.zero_mask0
+#  Type: 	integer or string
+#  Default: 	<undef>
+#  Purpose: 	Reduces spurious large scale structure in the final map
+#		within fixed regions specified by an external mask.
+#  Description: This parameter allows an alternative mask to be used on
+#               the first iteration. If a value is supplied for
+#               "ast.zero_mask0", it will be used in place of parameter
+#               "ast.zero_mask" on the first iteration only. If no value
+#               is supplied for "ast.zero_mask0", the value supplied for
+#               "ast.zero_mask" will be used on all iterations including
+#               the first. Setting "ast.zero_mask0" to zero will cause no
+#               masking to be used on the first iteration.
+ast.zero_mask0 = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	ast.zero_niter
@@ -572,8 +589,26 @@ com.zero_lowhits = 0
 # 		with the output image in pixel coordinates). The pixels in
 #		the map that are to be included in the common-mode
 #               estimation should be set to the bad value in the mask. All
-#               other pixels will be excluded from the COM estimation.
+#               other pixels will be excluded from the COM estimation. The
+#               mask for the first iteration can be set separately using
+#               parameter "com.zero_mask0".
 com.zero_mask = 0
+
+#-----------------------------------------------------------------
+#  Name: 	com.zero_mask0
+#  Type: 	integer or string
+#  Default: 	<undef>
+#  Purpose: 	Reduces spurious large scale structure in the final map
+#		within fixed regions specified by an external mask.
+#  Description: This parameter allows an alternative mask to be used on
+#               the first iteration. If a value is supplied for
+#               "com.zero_mask0", it will be used in place of parameter
+#               "com.zero_mask" on the first iteration only. If no value
+#               is supplied for "com.zero_mask0", the value supplied for
+#               "com.zero_mask" will be used on all iterations including
+#               the first. Setting "com.zero_mask0" to zero will cause no
+#               masking to be used on the first iteration.
+com.zero_mask0 = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	com.zero_niter
@@ -1772,8 +1807,25 @@ flt.zero_lowhits = 0
 #               the FLT model should be set to the bad value in the mask. All
 #               other pixels will be excluded from the filtering (i.e.
 #		they will be replaced by artifical data interpolated from the
-#		adjacent data).
+#		adjacent data). The mask for the first iteration can be set
+#               separately using parameter "flt.zero_mask0".
 flt.zero_mask = 0
+
+#-----------------------------------------------------------------
+#  Name: 	flt.zero_mask0
+#  Type: 	integer or string
+#  Default: 	<undef>
+#  Purpose: 	Reduces spurious large scale structure in the final map
+#		within fixed regions specified by an external mask.
+#  Description: This parameter allows an alternative mask to be used on
+#               the first iteration. If a value is supplied for
+#               "flt.zero_mask0", it will be used in place of parameter
+#               "flt.zero_mask" on the first iteration only. If no value
+#               is supplied for "flt.zero_mask0", the value supplied for
+#               "flt.zero_mask" will be used on all iterations including
+#               the first. Setting "flt.zero_mask0" to zero will cause no
+#               masking to be used on the first iteration.
+flt.zero_mask0 = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	flt.zero_niter
@@ -2749,6 +2801,7 @@ ssn.zero_lowhits = 0
 #               SSN model should be set to the bad value in the mask. All
 #               other pixels will be excluded from the model.
 ssn.zero_mask = 0
+ssn.zero_mask0 = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	ssn.zero_niter
@@ -3199,6 +3252,7 @@ pca.zero_circle = <undef>
 pca.zero_freeze = 0.0
 pca.zero_lowhits = 0
 pca.zero_mask = 0
+pca.zero_mask0 = <undef>
 pca.zero_niter = 0
 pca.zero_notlast = 1
 pca.zero_snr = 0.0

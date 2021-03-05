@@ -87,6 +87,10 @@
 *           flt.zero_notlast = 0
 *           com.zero_notlast = 0
 *           pca.zero_notlast = 0
+*           ast.zero_mask0 = <undef>
+*           flt.zero_mask0 = <undef>
+*           com.zero_mask0 = <undef>
+*           pca.zero_mask0 = <undef>
 *           flt.notfirst = 0
 *           pca.notfirst = 0
 *           pln.notfirst = 0
@@ -381,6 +385,8 @@
 *        the final iteration.
 *     26-NOV-2020 (DSB):
 *        Add parameter INITIALSKY.
+*     5-MAR-2021 (DSB):
+*        Support config parameter XXX.ZERO_MASK0
 *-
 '''
 
@@ -846,6 +852,8 @@ try:
       add["downsampfreq"] = 0  # must not further downsampling because the cache files
                                # are only appropriate for the origin downsampling.
       add["fakemap"] = "<undef>" # Iter. 1 added any required fakemap.
+      for model in ["ast", "com", "flt", "pca"]:
+         add["{0}.zero_mask0".format(model)] = "<undef>"
 
 #  Now create the config, inheriting the config from the first invocation.
       iconf = 1

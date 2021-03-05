@@ -150,10 +150,14 @@
 *     23-JAN-2018 (DSB):
 *        A negative value for ZERO_NITER now disables all masking for the
 *        specified model.
+*     5-MAR-2021 (DSB):
+*        Added parameter XXX.ZERO_MASK0 - specifies a different NDF mask
+*        for iteration zero.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2012-2014 Science & Technology Facilities Council.
+*     Copyright (C) 2021 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -206,9 +210,11 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    AstKeyMap *akm;            /* KeyMap holding AST config values */
    AstKeyMap *subkm;          /* KeyMap holding model config values */
    char refparam[ DAT__SZNAM ];/* Name for reference NDF parameter */
+   char refparam0[ DAT__SZNAM ];/* Name for reference NDF parameter on 1st iter */
    char words[100];           /* Buffer for variable message words */
    const char *cval;          /* The ZERO_MASK string value */
    const char *modname;       /* The name of the model  being masked */
+   const char *pref;          /* The "refparam" value to use */
    const char *skyrefis;      /* Pointer to SkyRefIs attribute value */
    dim_t i;                   /* Pixel index */
    double *mapuse;            /* Map to use for SNR mask */
@@ -228,6 +234,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    double zero_snrlo;         /* Lower SNR at which to threshold */
    int *ph;                   /* Pointer to next hits value */
    int abssnr;                /* Can sources be negative as well as positive? */
+   int changed;               /* Has NDF parameter changed since last iter? */
    int domask;                /* Apply a mask? */
    int have_mask;             /* Did a mask already exist on entry? */
    int hipass;                /* mask filter size in pixels */
@@ -388,6 +395,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
             }
          }
 
+         strcpy( refparam, "NONE" );
          cval = NULL;
          astMapGet0C( subkm, "ZERO_MASK", &cval );
          if( cval ) {
@@ -401,6 +409,27 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                strcpy( refparam, cval );
                astChrCase( NULL, refparam, 1, 0 );
                mask_types[ nmask++] = REFNDF;
+            }
+         }
+
+         strcpy( refparam0, refparam );
+         cval = NULL;
+         astMapGet0C( subkm, "ZERO_MASK0", &cval );
+         if( cval ) {
+            if( !astChrMatch( cval, "REF" ) &&
+                !astChrMatch( cval, "MASK2" ) &&
+                !astChrMatch( cval, "MASK3" ) ) {
+               astMapGet0I( subkm, "ZERO_MASK0", &zero_mask );
+               cval = ( zero_mask > 0 ) ? "REF" : NULL;
+            }
+            if( cval ) {
+               strcpy( refparam0, cval );
+               astChrCase( NULL, refparam0, 1, 0 );
+               if( mask_types[ nmask - 1 ] != REFNDF ) {
+                  mask_types[ nmask++] = REFNDF;
+               }
+            } else {
+               strcpy( refparam0, "NONE" );
             }
          }
 
@@ -583,16 +612,37 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* Reference NDF masking... */
                } else if( mask_types[ imask ] == REFNDF ) {
 
+/* Get the ref parameter to use and see if it has changed since last time.
+   On the first iteration an alternative mask may be specified using
+   parameter "zero_mask0".  */
+                  if( dat->iter == 0 ) {
+                     pref = refparam0;
+                     changed = 0;
+                  } else if( dat->iter == 1 ){
+                     pref = refparam;
+                     changed = strcmp( refparam, refparam0 );
+                  } else {
+                     pref = refparam;
+                     changed = 0;
+                  }
+
+/* If we are not doing any NDF based masking on this iteration, ensure
+   the mask is full of zeros. */
+                  if( !strcmp( pref, "NONE" ) ){
+                     pn = newmask;
+                     for( i = 0; i < dat->msize; i++ ) *(pn++) = 0;
+
 /* If we had a mask on entry, then there is no need to create a new one
    since it will not have changed. But we need to recalculate the NDF
-   mask if are combining it with any non-static masks. */
-                  if( ! have_mask || ! isstatic ) {
+   mask if are combining it with any non-static masks or the mask has
+   changed since the last iteration. */
+                  } else if( !have_mask || !isstatic || changed  ){
 
 /* Begin an NDF context. */
                      ndfBegin();
 
 /* Get an identifier for the NDF using the associated ADAM parameter. */
-                     ndfAssoc( refparam, "READ", &indf1, status );
+                     ndfAssoc( pref, "READ", &indf1, status );
 
 /* Get a section from this NDF that matches the bounds of the map. */
                      ndfSect( indf1, 2, dat->lbnd_out, dat->ubnd_out, &indf2,
@@ -614,7 +664,12 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* Report masking info. */
                         ndfMsg( "N", indf2 );
                         msgSetc( "M", modname );
-                        if( zero_niter == 0 ) {
+                        if( dat->iter == 0 && strcmp( refparam, refparam0 ) ){
+                           msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The ^M "
+                                      "model will be masked on the first iteration "
+                                      "using the bad pixels in NDF '^N'.",
+                                      status );
+                        } else if( zero_niter == 0 ) {
                            msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The ^M "
                                       "model will be masked on each iteration "
                                       "using the bad pixels in NDF '^N'.",
