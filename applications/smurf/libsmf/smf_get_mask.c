@@ -627,10 +627,12 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                   }
 
 /* If we are not doing any NDF based masking on this iteration, ensure
-   the mask is full of zeros. */
+   the mask is full of the value that will produce no masking (which
+   depends on which model is being masked). */
                   if( !strcmp( pref, "NONE" ) ){
+                     int fillval = ( mtype == SMF__AST ) ? 0 : 1;
                      pn = newmask;
-                     for( i = 0; i < dat->msize; i++ ) *(pn++) = 0;
+                     for( i = 0; i < dat->msize; i++ ) *(pn++) = fillval;
 
 /* If we had a mask on entry, then there is no need to create a new one
    since it will not have changed. But we need to recalculate the NDF
