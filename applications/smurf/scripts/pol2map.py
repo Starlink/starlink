@@ -748,7 +748,10 @@
 *       Without this, changes in map bounds (such as seen between 450 and 850
 *       maps from the same observation) could cause the vector catalogues
 *       to use slightly different vector positions.
-
+*    9-MAR-2021 (DSB):
+*       When using makemap (i.e. not skyloop), we do not need to re-create
+*       the observation maps if the coadd already exists and the observation
+*       maps are not needed to create the catalogue.
 
 '''
 
@@ -2911,8 +2914,13 @@ try:
 
 
 #  If we are using makemap to generate the observation maps...
+#
+#  If the current coadd already exists we do not attempt to recreate it (or
+#  the individual observation maps), regardless of the value of parameter
+#  REUSE. But we do make individual observation maps if we need them to
+#  create the catalogue.
 #  -----------------------------------------------------------
-      else:
+      elif ( not coadd_exists ) or cat_needs_obsmaps:
 
 #  Loop over all the time series files for the current Stokes parameter. Each
 #  separate observation will usually have one time series file (although
