@@ -387,6 +387,8 @@
 *        Add parameter INITIALSKY.
 *     5-MAR-2021 (DSB):
 *        Support config parameter XXX.ZERO_MASK0
+*     10-MAR-2021 (DSB):
+*        Support config parameter AST.MAPSPIKE_FREEZE
 *-
 '''
 
@@ -607,7 +609,11 @@ try:
                                        "defaults=$SMURF_DIR/smurf_makemap.def "
                                        "select=\"\'450=0,850=1\'\"".format(model,config)))
 
-#  Similarly, we need to record com.freeze_flags and flt.ring_freeze.
+#  Similarly, we need to record ast.mapspike_freeze, com.freeze_flags and
+#  flt.ring_freeze.
+   ast_mapspike_freeze = float( invoke( "$KAPPA_DIR/configecho name=ast.mapspike_freeze config={0} "
+                                   "defaults=$SMURF_DIR/smurf_makemap.def "
+                                   "select=\"\'450=0,850=1\'\"".format(config)))
    com_freeze_flags = myint( invoke( "$KAPPA_DIR/configecho name=com.freeze_flags config={0} "
                                    "defaults=$SMURF_DIR/smurf_makemap.def "
                                    "select=\"\'450=0,850=1\'\"".format(config)))
@@ -698,6 +704,9 @@ try:
 
       if flt_ring_freeze > 0:
          flt_ring_freeze += ast_skip
+
+      if ast_mapspike_freeze >= 1.0:
+         ast_mapspike_freeze += ast_skip
 
 #  On the first invocation of makemap, we use the raw data files specified
 #  by the IN parameter to create an initial estimate of the sky. We also
@@ -918,6 +927,15 @@ try:
          if flt_ring_freeze > 0 and iter > flt_ring_freeze + 1:
             flt_ring_freeze = 0
             add[ "flt.ring_freeze" ] = -1
+            newcon = 1
+
+#  When "ast_mapspike_freeze" invocations have been performed, switch off the
+#  map spike detection algorithm.
+         if ast_mapspike_freeze > 0 and (
+            ( ast_mapspike_freeze < 1.0 and meanchange <= ast_mapspike_freeze ) or
+            ( ast_mapspike_freeze >= 1.0 and iter > ast_mapspike_freeze ) ):
+            ast_mapspike_freeze = 0
+            add[ "ast.mapspike" ] = 0
             newcon = 1
 
 #  If this is the last iteration, put the output map in the NDF specified
