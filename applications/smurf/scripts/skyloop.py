@@ -390,9 +390,10 @@
 *     10-MAR-2021 (DSB):
 *        Support config parameter AST.MAPSPIKE_FREEZE
 *     11-MAR-2021 (DSB):
-*        Ensure the quality masks are switched off in the output map created 
-*        by the first invocation of makemap. Otherwise, they can affect the 
+*        - Ensure the quality masks are switched off in the output map created
+*        by the first invocation of makemap. Otherwise, they can affect the
 *        normalised map change calculated after the second invocation of makemap.
+*        - Correct handling of XXX.ZERO_MASK0.
 *-
 '''
 
@@ -602,6 +603,7 @@ try:
    zero_niter = {}
    zero_notlast = {}
    zero_freeze = {}
+   zero_mask0 = {}
    for model in ["ast", "com", "flt", "pca"]:
       zero_niter[model] = float( invoke( "$KAPPA_DIR/configecho name={0}.zero_niter config={1} "
                                          "defaults=$SMURF_DIR/smurf_makemap.def "
@@ -612,6 +614,9 @@ try:
       zero_freeze[model] = myint( invoke( "$KAPPA_DIR/configecho name={0}.zero_freeze config={1} "
                                        "defaults=$SMURF_DIR/smurf_makemap.def "
                                        "select=\"\'450=0,850=1\'\"".format(model,config)))
+      zero_mask0[model] = invoke( "$KAPPA_DIR/configecho name={0}.zero_mask0 config={1} "
+                                  "defaults=$SMURF_DIR/smurf_makemap.def "
+                                  "select=\"\'450=0,850=1\'\"".format(model,config))
 
 #  Similarly, we need to record ast.mapspike_freeze, com.freeze_flags and
 #  flt.ring_freeze.
@@ -820,10 +825,21 @@ try:
       invoke(cmd)
 
 #  Ensure all quality masks are off (makemap will have left them on
-#  because of ast.zero_notlast being set to 0 above). This is needed 
-#  as otherwise, the quality mask will affect the normalised map change 
+#  because of ast.zero_notlast being set to 0 above). This is needed
+#  as otherwise, the quality mask will affect the normalised map change
 #  calculated after the next invocation of makemap.
       invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(newmap) )
+
+#  If a separate mask was specified for the first iteration using config
+#  param "xxx.zero_mask0" then we need to remove the corresponding
+#  quality name from the map created above so that the mask created on the
+#  first iteration will not get re-used on subsequent iterations.
+      qnames = ""
+      for model in ["ast", "com", "flt", "pca"]:
+         if zero_mask0[model] != "<***>":
+            qnames += "{0},".format(model)
+      if qnames != "":
+         invoke("$KAPPA_DIR/remqual ndf={0} qnames=\"'{1}'\" clear=yes".format(newmap,qnames[:-1]) )
 
 #  Get the pixel index bounds of the map (we already know these if an
 #  initial sky was supplied).
