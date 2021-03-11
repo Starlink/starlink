@@ -1862,6 +1862,15 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+         parameter clear {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Clear the corresponding bits in the Quality array?}
+            helpkey *
+         }
+
          parameter ndf {
             position 1
             type NDF

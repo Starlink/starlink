@@ -59,6 +59,11 @@
       values are also written to a new output parameter called
       PIXVALS.
 
+   o  REMQUAL
+
+      - A new parameter called CLEAR allows the corresponding bit within
+      the NDF's Quality array to be cleared.
+
    o  SCATTER
 
       -  A new parameter called FIT allows a linear fit to the scatter

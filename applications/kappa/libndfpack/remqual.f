@@ -20,9 +20,10 @@
 *        The global status.
 
 *  Description:
-*     This routine removes selected quality name definitions from an
-*     NDF (see task SETQUAL).  All quality names information may
-*     be removed by specifying a quality name of "ANY".
+*     This routine removes selected quality name definitions from an NDF
+*     (see task SETQUAL) and optionally clears the corresponding bit
+*     in the Quality array of the supplied NDF.  All quality names
+*     information may be removed by specifying a quality name of "ANY".
 *
 *     An error will be reported if an attempt is made to remove a quality
 *     name that has been flagged as "read-only" (e.g. using the READONLY
@@ -32,6 +33,10 @@
 *     remqual ndf qnames
 
 *  ADAM Parameters:
+*     CLEAR = _LOGICAL (Update)
+*        If TRUE, the bits in the NDF's Quality array that correspond to
+*        the removed quality names will be cleared. If FALSE, no change
+*        will be made to the Quality array. [FALSE]
 *     NDF = NDF (Update)
 *        The NDF to be modified.
 *     QNAMES = LITERAL (Read)
@@ -57,6 +62,7 @@
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 2002 Central Laboratory of the Research Councils.
 *     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2021 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -86,6 +92,8 @@
 *        Brought into KAPPA.
 *     15-FEB-2008 (DSB):
 *        Initialise NNAMES.
+*     11-MAR-2021 (DSB):
+*        Added parameter CLEAR.
 *     {enter_further_changes_here}
 
 *-
@@ -118,6 +126,7 @@
       INTEGER INAME              ! Name count
       INTEGER NDFIN              ! Identifier for the input NDF
       INTEGER NNAMES             ! No. of quality names to be removed
+      LOGICAL CLEAR              ! Clear bits in the NDFs Quality array?
       LOGICAL FLAG               ! Group expression terminated by a minus sign?
 *.
 
@@ -129,6 +138,9 @@
 
 *  Get the input NDF.
       CALL LPG_ASSOC( 'NDF', 'UPDATE', NDFIN, STATUS )
+
+*  See if bits are to be cleared in the NDFs Quality array.
+      CALL PAR_GET0L( 'CLEAR', CLEAR, STATUS )
 
 *  Create a group to hold the quality names which are to be removed.
       CALL GRP_NEW( 'QUALITY NAMES', IGRP, STATUS )
@@ -212,8 +224,10 @@
 *  Get the next quality name.
          CALL GRP_GET( IGRP, INAME, 1, QNAME, STATUS )
 
-*  Remove the quality name.
+*  If required, clear the corresponding bit in the Quality array and then
+*  remove the quality name.
          IF( STATUS .EQ. SAI__OK ) THEN
+            IF( CLEAR ) CALL IRQ_RESQ( LOCS, QNAME, STATUS )
             CALL IRQ_REMQN( LOCS, QNAME, STATUS )
 
 *  If the quality name was not found, annul the error and give a warning

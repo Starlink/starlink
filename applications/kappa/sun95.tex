@@ -41468,7 +41468,8 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
 }{
    \sstdescription{
       This routine removes selected \htmlref{quality name}{se:qnames}~ definitions
-      from an \NDFref{NDF}~ (see task SETQUAL).  All quality names information may
+      from an \NDFref{NDF}~ (see task SETQUAL) and optionally clears the corresponding bit
+      in the Quality array of the supplied NDF.  All quality names information may
       be removed by specifying a quality name of \texttt{"ANY"}.
 
       An error will be reported if an attempt is made to remove a quality
@@ -41479,6 +41480,13 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       remqual ndf qnames
    }
    \sstparameters{
+      \sstsubsection{
+         CLEAR = \_LOGICAL (Read)
+      }{
+         If \texttt{TRUE}, the bits in the NDF's Quality array that correspond to
+         the removed quality names will be cleared. If \texttt{FALSE}, no change
+         will be made to the Quality array. \texttt{[FALSE]}
+      }
       \sstsubsection{
          NDF = NDF (Update)
       }{
@@ -54505,6 +54513,12 @@ The following applications have been modified:
         NDF to be displayed.  These use the interpolation method specified
         by the new Parameters METHOD and PARAMS.  The pixel values are also
         written to a new output parameter called PIXVALS.
+      \end{itemize}
+
+   \item [\htmlref{REMQUAL}{REMQUAL}]\mbox{}
+      \begin{itemize}
+        \item A new parameter called CLEAR allows the corresponding bit within
+        the NDF's Quality array to be cleared.
       \end{itemize}
 
    \item [\htmlref{SCATTER}{SCATTER}]\mbox{}
