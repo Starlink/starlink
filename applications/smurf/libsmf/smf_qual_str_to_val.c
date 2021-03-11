@@ -51,10 +51,16 @@
 *        Add SMF__Q_LOWAP
 *     2011-09-19 (DSB):
 *        Add SMF__Q_BADEF
+*     2021-03-11 (DSB):
+*        Rename time-series "COM" and "PCA" to "COM_TS" and "PCA_TS" and
+*        add new map qualities "COM" and "PCA". This clears up the
+*        previous ambiguity about how a quality called "COM" (or "PCS")
+*        should be interpreted.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Science and Technology Facilities Council.
+*     Copyright (C) 2021 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -116,6 +122,9 @@ smf_qual_t smf_qual_str_to_val( const char *qname, smf_qfam_t * family, int * st
     retval = SMF__Q_STAT;
     lfamily = SMF__QFAM_TSERIES;
   } else if ( strcmp(qname, "COM") == 0 ) {
+    retval = SMF__MAPQ_COM;
+    lfamily = SMF__QFAM_MAP;
+  } else if ( strcmp(qname, "COM_TS") == 0 ) {
     retval = SMF__Q_COM;
     lfamily = SMF__QFAM_TSERIES;
   } else if ( strcmp(qname, "FILT") == 0 ) {
@@ -167,6 +176,9 @@ smf_qual_t smf_qual_str_to_val( const char *qname, smf_qfam_t * family, int * st
     retval = SMF__Q_SSN;
     lfamily = SMF__QFAM_TSERIES;
   } else if ( strcmp(qname, "PCA") == 0 ) {
+    retval = SMF__MAPQ_PCA;
+    lfamily = SMF__QFAM_MAP;
+  } else if ( strcmp(qname, "PCA_TS") == 0 ) {
     retval = SMF__Q_PCA;
     lfamily = SMF__QFAM_TSERIES;
   } else if ( strcmp(qname, "IP") == 0 ) {

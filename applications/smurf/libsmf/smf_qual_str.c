@@ -77,10 +77,14 @@
 *     2020-06-08 (DSB):
 *        Correct comments stored with FLT, COM and PCA mask quality bit
 *        definitions.
+*     2021-03-11 (DSB):
+*        Rename time-series "COM" and "PCA" to "COM_TS" and "PCA_TS" to
+*        distinguish them from the map "COM" and "PCA" qualities.
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Science & Technology Facilities Council.
 *     Copyright (C) 2010 University of British Columbia.
+*     Copyright (C) 2021 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -177,7 +181,7 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
       break;
 
     case SMF__Q_COM:
-      retval = "COM";
+      retval = "COM_TS";
       ldescr = "Set iff data common-mode rejected";
       break;
 
@@ -212,7 +216,7 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
       break;
 
     case SMF__Q_PCA:
-      retval = "PCA";
+      retval = "PCA_TS";
       ldescr = "Set iff samples flag as bad by the PCA model";
       break;
 
