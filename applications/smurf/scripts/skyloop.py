@@ -389,6 +389,10 @@
 *        Support config parameter XXX.ZERO_MASK0
 *     10-MAR-2021 (DSB):
 *        Support config parameter AST.MAPSPIKE_FREEZE
+*     11-MAR-2021 (DSB):
+*        Ensure the quality masks are switched off in the output map created 
+*        by the first invocation of makemap. Otherwise, they can affect the 
+*        normalised map change calculated after the second invocation of makemap.
 *-
 '''
 
@@ -814,6 +818,12 @@ try:
       if initsky:
          cmd += " lbnd=\[{0},{1}\] ubnd=\[{2},{3}\]".format(lx,ly,ux,uy)
       invoke(cmd)
+
+#  Ensure all quality masks are off (makemap will have left them on
+#  because of ast.zero_notlast being set to 0 above). This is needed 
+#  as otherwise, the quality mask will affect the normalised map change 
+#  calculated after the next invocation of makemap.
+      invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(newmap) )
 
 #  Get the pixel index bounds of the map (we already know these if an
 #  initial sky was supplied).
