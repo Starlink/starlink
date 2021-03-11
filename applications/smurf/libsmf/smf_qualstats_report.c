@@ -136,12 +136,17 @@
 
 #define FUNC_NAME "smf_qualstats_report"
 
+/* Prototypes for local functions. */
+static const char *smf1_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
+                                  const char **descr, char *buf, int *status );
+
 void smf_qualstats_report( ThrWorkForce *wf, msglev_t msglev, smf_qfam_t qfamily, int nopad,
                            const smfArray *qua, size_t last_qcount[SMF__NQBITS],
                            size_t *last_nmap, int init, size_t *ngood_tslice,
                            size_t *numdata, double *exptime, int *status ) {
 
   /* Local Variables */
+  char buf[50];                 /* Buffer for quality name */
   size_t i;                     /* loop counter */
   size_t nbolo_tot;             /* total bolos in all subarrays */
   size_t ndata;                 /* total number of data points */
@@ -269,14 +274,14 @@ void smf_qualstats_report( ThrWorkForce *wf, msglev_t msglev, smf_qfam_t qfamily
 
       if( init ) {
         msgOutiff(msglev, "","%6s: %10zu (%5.2lf%%),%20s", status,
-                  smf_qual_str(qfamily, 1, i, NULL, status),
+                  smf1_qual_str(qfamily, 1, i, NULL, buf, status),
                   qcount[i],
                   100. * (double) qcount[i] / (double) ndata,
                   scalestr);
       } else {
         msgOutiff(msglev, "","%6s: %10zu (%5.2lf%%),%20s,change %10li (%+.2lf%%)",
                   status,
-                  smf_qual_str(qfamily, 1, i, NULL, status),
+                  smf1_qual_str(qfamily, 1, i, NULL, buf, status),
                   qcount[i],
                   100. * (double) qcount[i] / (double) ndata,
                   scalestr,
@@ -316,3 +321,24 @@ void smf_qualstats_report( ThrWorkForce *wf, msglev_t msglev, smf_qfam_t qfamily
   }
 
 }
+
+
+
+
+/* A wrapper for smf_qual_str that removes the "_TS" suffix from any
+   quality names. The returned pointer points to the supplied buffer. */
+
+static const char *smf1_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
+                                  const char **descr, char *buf, int *status ) {
+   const char *result = "";
+   const char *basic = smf_qual_str( family, usebit, bit_or_val, descr, status );
+   if( basic ) {
+      strcpy( buf, basic );
+      char *p = strstr( buf, "_TS" );
+      if( p ) *p = 0;
+      result = buf;
+   }
+   return result;
+}
+
+
