@@ -394,6 +394,8 @@
 *        by the first invocation of makemap. Otherwise, they can affect the
 *        normalised map change calculated after the second invocation of makemap.
 *        - Correct handling of XXX.ZERO_MASK0.
+*        - Support COM.FREEZE_FLAGS values that are specified as a maptol value 
+*        (i.e. fractional values between zero and one).
 *-
 '''
 
@@ -623,7 +625,7 @@ try:
    ast_mapspike_freeze = float( invoke( "$KAPPA_DIR/configecho name=ast.mapspike_freeze config={0} "
                                    "defaults=$SMURF_DIR/smurf_makemap.def "
                                    "select=\"\'450=0,850=1\'\"".format(config)))
-   com_freeze_flags = myint( invoke( "$KAPPA_DIR/configecho name=com.freeze_flags config={0} "
+   com_freeze_flags = float( invoke( "$KAPPA_DIR/configecho name=com.freeze_flags config={0} "
                                    "defaults=$SMURF_DIR/smurf_makemap.def "
                                    "select=\"\'450=0,850=1\'\"".format(config)))
    flt_ring_freeze = myint( invoke( "$KAPPA_DIR/configecho name=flt.ring_freeze config={0} "
@@ -708,7 +710,7 @@ try:
          if zero_freeze[model] > 0:
             zero_freeze[model] += ast_skip;
 
-      if com_freeze_flags > 0:
+      if com_freeze_flags >= 1.0:
          com_freeze_flags += ast_skip
 
       if flt_ring_freeze > 0:
@@ -943,7 +945,9 @@ try:
 
 #  When "com_freeze_flags" invocations have been performed, freeze the
 #  COM flags (so long as com_freeze_flags > 0).
-         if com_freeze_flags > 0 and iter > com_freeze_flags + 1:
+         if com_freeze_flags > 0 and (
+            ( com_freeze_flags < 1.0 and meanchange <= com_freeze_flags ) or
+            ( com_freeze_flags >= 1.0 and iter > com_freeze_flags ) ):
             com_freeze_flags = 0
             add[ "com.freeze_flags" ] = -1
             newcon = 1
