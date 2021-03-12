@@ -25,7 +25,7 @@ Astro::Coords
 Astro::FITS::HdrTrans
 Astro::FITS::Header
 Astro::WaveBand
-HTTPS::Daemon
+HTTP::Daemon
 Astro::Catalog
 App::SourcePlot
 
