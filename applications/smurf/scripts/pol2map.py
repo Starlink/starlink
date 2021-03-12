@@ -27,7 +27,7 @@
 
 *  Usage:
 *     pol2map in iout qout uout [cat] [config] [pixsize] [qudir] [mapdir]
-*             [mask] [masktype] [ipcor] [ipref] [reuse] [ref] [north] [reffcf]
+*             [mask] [masktype] [ipcor] [ipref] [reuse] [ref] [north]
 *             [debias] [retain] [maskout1] [maskout2] [msg_filter] [ilevel]
 *             [glevel] [logfile]
 
@@ -473,22 +473,14 @@
 *        An optional map defining the pixel grid for the output maps,
 *        and which is used to determine pointing corrections. If null
 *        (!) is supplied, then the map (if any) specified by parameter
-*        MASK is used. See also parameter REFFCF. Note, if a map is
-*        supplied for either REF or MASK, then the PIXSIZE parameter is
-*        ignored and the pixel size in the supplied map is used.
+*        MASK is used. Note, if a map is supplied for either REF or MASK,
+*        then the PIXSIZE parameter is ignored and the pixel size in the
+*        supplied map is used.
 *
 *        The value of the REF parameter is ignored if an NDF is supplied
 *        for one or more of parameters INITSKYI, INITSKYQ or INITSKYU. In
 *        such cases the first such NDF is used to define the pixel grid
 *        for all output maps. [!]
-*     REFFCF = _REAL (Read)
-*        The FCF that should be used to convert the supplied REF map
-*        to pW. This parameter is only used if the supplied REF map is
-*        not already in units of pW. The default is the FCF value stored
-*        in the FITS extension of the map, or the standard FCF for the
-*        band concerned (450 or 840) if there is no FCF value in the FITS
-*        header. Specify a new value on the pol2map command line if the
-*        default value described above is inappropriate. []
 *     REUSE = _LOGICAL (Read)
 *        If TRUE, then any output maps or time-treams that already exist
 *        (for instance, created by a previous run of this script) are re-used
@@ -752,6 +744,10 @@
 *       When using makemap (i.e. not skyloop), we do not need to re-create
 *       the observation maps if the coadd already exists and the observation
 *       maps are not needed to create the catalogue.
+*    12-MAR-2021 (DSB):
+*       - Remove unused REFFCF parameter.
+*       - Incorporate POL-2 degradation factor of 1.35 when converting
+*       non-POL2 I maps from pW to mJy/beam prior to creating the catalogue.
 
 '''
 
@@ -1401,10 +1397,6 @@ try:
                                      "ECLIPTIC"), "Celestial system to "
                                      "use as reference direction", "TRACKING",
                                      noprompt=True ))
-
-   params.append(starutil.Par0F("REFFCF",
-                                 "FCF needed to convert REF map to pW",
-                                 None, noprompt=True))
 
    params.append(starutil.Par0L("DEBIAS", "Remove statistical bias from P"
                                 "and PI?", False, noprompt=True))
@@ -3237,8 +3229,6 @@ try:
 
 
 
-
-
 #  -----------  CREATE THE MAP TO USE WHEN CREATING THE CATALOGUE -------------
 
 #  If an output vector catalogue is being created, we now create the I, Q
@@ -3340,6 +3330,15 @@ try:
 #  We need I, Q and U maps to create a catalogue. The pixel size in
 #  these maps will be equal to the value of parameter BINSIZE.
       if imap_cat and qmap_cat and umap_cat:
+
+#  If the I coadd was created from non-POL2 data incorporate the POL2
+#  degradation factor.
+         inbeam = get_fits_header( imap_cat, "INBEAM" )
+         if not inbeam or ("pol" not in inbeam):
+            tmp = NDG( 1 )
+            invoke( "$KAPPA_DIR/cdiv in={0} out={1} scalar=1.35".
+                 format(imap_cat,tmp )
+            imap_cat = tmp
 
 #  Ensure the Q, U and I images all have the same bounds, equal to the
 #  overlap region between them. To get the overlap region, use MATHS to
