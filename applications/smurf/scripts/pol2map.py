@@ -3337,7 +3337,7 @@ try:
          if not inbeam or ("pol" not in inbeam):
             tmp = NDG( 1 )
             invoke( "$KAPPA_DIR/cdiv in={0} out={1} scalar=1.35".
-                 format(imap_cat,tmp )
+                 format(imap_cat,tmp ))
             imap_cat = tmp
 
 #  Ensure the Q, U and I images all have the same bounds, equal to the
