@@ -649,18 +649,25 @@
      :                     PERV1( 2 ), PERV2( 1 ), PERV2( 2 ), IPLOT,
      :                     SLOPE, OFFSET, RMS, STATUS )
 
-         CALL MSG_BLANK( STATUS )
-         CALL MSG_SETR( 'M', REAL(SLOPE) )
-         CALL MSG_SETR( 'B', REAL(OFFSET) )
-         CALL MSG_OUT( ' ', '  Best fit line is:  Y = ( ^M )*X + '//
-     :                 '( ^B )', STATUS )
-         CALL MSG_SETR( 'R', REAL(RMS) )
-         CALL MSG_OUT( ' ', '  RMS residual from line is: ^R', STATUS )
-         CALL MSG_BLANK( STATUS )
+         IF( SLOPE .EQ. VAL__BADD .OR. OFFSET .EQ. VAL__BADD ) THEN
+            CALL MSG_OUT( ' ', '  Line of best fit cannot be drawn '//
+     :                    'since all points have been rejected.',
+     :                    STATUS )
+         ELSE
+            CALL MSG_BLANK( STATUS )
+            CALL MSG_SETR( 'M', REAL(SLOPE) )
+            CALL MSG_SETR( 'B', REAL(OFFSET) )
+            CALL MSG_OUT( ' ', '  Best fit line is:  Y = ( ^M )*X + '//
+     :                    '( ^B )', STATUS )
+            CALL MSG_SETR( 'R', REAL(RMS) )
+            CALL MSG_OUT( ' ', '  RMS residual from line is: ^R',
+     :                    STATUS )
+            CALL MSG_BLANK( STATUS )
 
-         CALL PAR_PUT0D( 'SLOPE', SLOPE, STATUS )
-         CALL PAR_PUT0D( 'OFFSET', OFFSET, STATUS )
-         CALL PAR_PUT0D( 'RMS', RMS, STATUS )
+            CALL PAR_PUT0D( 'SLOPE', SLOPE, STATUS )
+            CALL PAR_PUT0D( 'OFFSET', OFFSET, STATUS )
+            CALL PAR_PUT0D( 'RMS', RMS, STATUS )
+         END IF
       END IF
 
 *  Close the workstation.
