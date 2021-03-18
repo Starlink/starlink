@@ -18,14 +18,15 @@
 *               smf_modeltype type, smfArray *model, int res,
 *               const char *root, int mask, double mingood, int cube,
 *               int map, int addqual, smfSampleTable *table,
-*               double chunkfactor, int *status )
+*               double chunkfactor, const char *btable, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads
 *     HDSLoc = *loc (Given)
 *        Locator for the HDS container file to which the diagniostic
-*        info should be appended.
+*        info should be appended. May be NULL if no data is to be written
+*        to an HDS container file.
 *     ibolo = int * (Given and Returned)
 *        On entry: If larger than or equal to zero, this is the zero based
 *        index of the bolometer to dump. If -1, dump the mean of all
@@ -82,6 +83,9 @@
 *        values falling in a specified map pixel, or NULL.
 *     chunkfactor = double (Given)
 *        The scale factor for the current chunk.
+*     btable = const char * (Given)
+*        If not NULL, this is the root name for the ascii files to be
+*        created holding the selected bolometer values.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -104,9 +108,13 @@
 *        Added parameter "chunkfactor".
 *     4-OCT-2018 (DSB):
 *        Fix memory leak associated with variable "name".
+*     18-MAR-2021 (DSB):
+*        - Allow "loc" to be NULL.
+*        - Add argument btable.
 
 *  Copyright:
 *     Copyright (C) 2013,2015 Science and Technology Facilities Council.
+*     Copyright (C) 2021 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -172,7 +180,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                smf_modeltype type, smfArray *model, int res,
                const char *root, int mask, double mingood, int cube,
                int map, int addqual, smfSampleTable *table, double chunkfactor,
-               int *status ){
+               const char *btable, int *status ){
 
 /* Local Variables: */
    AstCmpFrame *totfrm;
@@ -407,8 +415,21 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 
          if( ngood < mingood*ntslice && *status == SAI__OK ) {
             *status = SAI__ERROR;
-            errRep( "", "smf_diag: Failed to dump diagnostic data since "
-                    "selected bolometer has too few good values.", status );
+            errRepf( "", "smf_diag: Failed to dump diagnostic data since "
+                     "selected bolometer (%d) has too few good values (%d < %d).",
+                     status, usebolo, (int) ngood, (int) (mingood*ntslice) );
+         }
+
+/* Produce an ascii table of the bolometer values if required. */
+         if( btable ) {
+            int *oldlut = data->lut;
+            smfHead *oldhead = data->hdr;
+            data->lut = dat->lut[0]->sdata[isub]->pntr[0];
+            data->hdr = dat->res[0]->sdata[isub]->hdr;
+            smf_write_bolotable( data, btable, usebolo, dat->lbnd_out,
+                                 dat->mdims, status );
+            data->lut = oldlut;
+            data->hdr = oldhead;
          }
 
 /* If the mean or weighted mean bolometer, or a typical bolometer, is
@@ -479,6 +500,18 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                   errRep( "", "smf_diag: Failed to dump diagnostic data since "
                           "selected bolometer has too few good values.", status );
                }
+
+/* Produce an ascii table of the bolometer values if required. */
+               if( btable ) {
+                  int *oldlut = data->lut;
+                  smfHead *oldhead = data->hdr;
+                  data->lut = dat->lut[0]->sdata[isub]->pntr[0];
+                  data->hdr = dat->res[0]->sdata[isub]->hdr;
+                  smf_write_bolotable( data, btable, usebolo, dat->lbnd_out,
+                                       dat->mdims, status );
+                  data->lut = oldlut;
+                  data->hdr = oldhead;
+               }
             }
             index = astFree( index );
 
@@ -509,6 +542,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 /* If we are dumping the power spectrum, replace the time series with the
    power spectrum within "buffer". Temporarily hijack the COM model for
    this (we choose COM since it has only one bolometer). */
+         ndata = ntslice;
          if( i == 1 ) {
             if( dat->com ) {
                data_tmp = dat->com[ 0 ]->sdata[ isub ];
@@ -613,116 +647,115 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                errRepf( "", "smf_diag: Cannot dump power spectra since "
                         "no COM model is being used.", status );
             }
-
-         } else {
-            ndata = ntslice;
          }
 
 /* Form the name of the NDF to receive the data. */
-         name = astFree( name );
-         nc = 0;
-         name = astAppendString( name, &nc, root );
-         name = astAppendString( name, &nc, i ? "_power" : "_time" );
+         if( loc ) {
+            name = astFree( name );
+            nc = 0;
+            name = astAppendString( name, &nc, root );
+            name = astAppendString( name, &nc, i ? "_power" : "_time" );
 
 /* Open the NDF, creating it if necesary. Ensure its bounds encompass the
    requested row. */
-         ndfOpen( loc, name, "UPDATE", "UNKNOWN", &indf, &place, status );
-         if( place != NDF__NOPL ) {
-            lbnd[ 0 ] = 1;
-            ubnd[ 0 ] = ndata;
-            lbnd[ 1 ] = irow + 1;
-            ubnd[ 1 ] = irow + 1;
-            ndfNew( "_DOUBLE", 2, lbnd, ubnd, &place, &indf, status );
-            mode = "Write";
+            ndfOpen( loc, name, "UPDATE", "UNKNOWN", &indf, &place, status );
+            if( place != NDF__NOPL ) {
+               lbnd[ 0 ] = 1;
+               ubnd[ 0 ] = ndata;
+               lbnd[ 1 ] = irow + 1;
+               ubnd[ 1 ] = irow + 1;
+               ndfNew( "_DOUBLE", 2, lbnd, ubnd, &place, &indf, status );
+               mode = "Write";
 
 /* Since a new NDF was created, add WCS if available. */
-            if( wcs ) {
+               if( wcs ) {
 
 /* If storing power spectra, the FrameSet created by smf_fft_data is for a
    4D NDF, so we need to modify it for out 2D NDFs.  */
-               if( i == 1 ) {
+                  if( i == 1 ) {
 
 /* Search for the frequency axis. */
-                  nax = astGetI( wcs, "NAXES" );
-                  for( iax = 1; iax <= nax; iax++ ) {
-                     sprintf( attr, "Domain(%d)", iax );
-                     dom = astGetC( wcs, attr );
-                     if( astChrMatch( dom, "SPECTRUM" ) ) {
+                     nax = astGetI( wcs, "NAXES" );
+                     for( iax = 1; iax <= nax; iax++ ) {
+                        sprintf( attr, "Domain(%d)", iax );
+                        dom = astGetC( wcs, attr );
+                        if( astChrMatch( dom, "SPECTRUM" ) ) {
 
 /* Frequency axis found. Extract the grid->freq mapping, and get the
    SpecFrame. */
-                        astMapSplit( wcs, 1, &iax, &fax, &fmap );
-                        if( fmap ) {
-                           ffrm = astPickAxes( wcs, 1, &fax, NULL );
+                           astMapSplit( wcs, 1, &iax, &fax, &fmap );
+                           if( fmap ) {
+                              ffrm = astPickAxes( wcs, 1, &fax, NULL );
 
 /* Create a 2D WCS by combining the above frequency axis with a simple 1D
    axis describing iteration number. */
-                           (void) astAnnul( wcs );
-                           wcs = astFrameSet( astFrame( 2, "Domain=GRID" ), " " );
-                           totmap = astCmpMap( fmap, astUnitMap( 1, " " ), 0, " " );
-                           totfrm = astCmpFrame( ffrm, astFrame( 1, "Domain=ITERATION"
-                             ",Label(1)=Iteration number,Symbol(1)=Iter" ), " " );
-                           astAddFrame( wcs, AST__BASE, totmap, totfrm );
+                              (void) astAnnul( wcs );
+                              wcs = astFrameSet( astFrame( 2, "Domain=GRID" ), " " );
+                              totmap = astCmpMap( fmap, astUnitMap( 1, " " ), 0, " " );
+                              totfrm = astCmpFrame( ffrm, astFrame( 1, "Domain=ITERATION"
+                                ",Label(1)=Iteration number,Symbol(1)=Iter" ), " " );
+                              astAddFrame( wcs, AST__BASE, totmap, totfrm );
 
-                        } else if( *status == SAI__OK ) {
-                           *status = SAI__ERROR;
-                           errRep( "", "smf_diag: Cannot extract the frequency axis "
-                                   "from the power spectrum wcs.", status );
-                        }
+                           } else if( *status == SAI__OK ) {
+                              *status = SAI__ERROR;
+                              errRep( "", "smf_diag: Cannot extract the frequency axis "
+                                      "from the power spectrum wcs.", status );
+                           }
 
 /* Do not need to check any more axes so break. */
-                        break;
+                           break;
+                        }
                      }
-                  }
 
 /* Report an error if no frequency axis was found. */
-                  if( iax == nax && *status == SAI__OK ) {
-                     *status = SAI__ERROR;
-                     errRep( "", "smf_diag: No frequency axis found in the "
-                             "power spectrum wcs.", status );
+                     if( iax == nax && *status == SAI__OK ) {
+                        *status = SAI__ERROR;
+                        errRep( "", "smf_diag: No frequency axis found in the "
+                                "power spectrum wcs.", status );
+                     }
                   }
+                  ndfPtwcs( wcs, indf, status );
+                  wcs = astAnnul( wcs );
                }
-               ndfPtwcs( wcs, indf, status );
-               wcs = astAnnul( wcs );
-            }
 
 /* If using an existing NDF, modify its bounds to encompass the new row
    and indicate it should be opened in update mode. */
-         } else {
-            ndfBound( indf, 2, lbnd, ubnd, &ndim, status );
-            lbnd[ 0 ] = 1;
-            ubnd[ 0 ] = ndata;
-            if( lbnd[ 1 ] > irow + 1 ) lbnd[ 1 ] = irow + 1;
-            if( ubnd[ 1 ] < irow + 1 ) ubnd[ 1 ] = irow + 1;
-            ndfSbnd( 2, lbnd, ubnd, indf, status );
-            mode = "Update";
-         }
+            } else {
+               ndfBound( indf, 2, lbnd, ubnd, &ndim, status );
+               lbnd[ 0 ] = 1;
+               ubnd[ 0 ] = ndata;
+               if( lbnd[ 1 ] > irow + 1 ) lbnd[ 1 ] = irow + 1;
+               if( ubnd[ 1 ] < irow + 1 ) ubnd[ 1 ] = irow + 1;
+               ndfSbnd( 2, lbnd, ubnd, indf, status );
+               mode = "Update";
+            }
 
 /* Map the data array and copy the values. */
-         ndfMap( indf, "DATA", "_DOUBLE", mode, (void **) &ip, &el,
-                 status );
-         if( *status == SAI__OK ) memcpy( ip + ( irow + 1 - lbnd[1] )*ndata,
-                                          buffer, sizeof(double)*ndata );
+            ndfMap( indf, "DATA", "_DOUBLE", mode, (void **) &ip, &el,
+                    status );
+            if( *status == SAI__OK ) memcpy( ip + ( irow + 1 - lbnd[1] )*ndata,
+                                             buffer, sizeof(double)*ndata );
 
 /* If required, map the Quality array and copy the values, then unmap it. */
-         if( qbuffer ) {
-            qua = smf_qual_map( wf, indf, mode, NULL, &nmap, status );
-            if( *status == SAI__OK ) memcpy( qua + ( irow + 1 - lbnd[1] )*ndata,
-                                             qbuffer, sizeof(*qua)*ndata );
-            smf_qual_unmap( wf, indf, SMF__QFAM_TSERIES, qua, data->qbits, status );
+            if( qbuffer ) {
+               qua = smf_qual_map( wf, indf, mode, NULL, &nmap, status );
+               if( *status == SAI__OK ) memcpy( qua + ( irow + 1 - lbnd[1] )*ndata,
+                                                qbuffer, sizeof(*qua)*ndata );
+               smf_qual_unmap( wf, indf, SMF__QFAM_TSERIES, qua, data->qbits, status );
 
 /* Set the bad bits mask so that the data array will not be masked when
    it is mapped when dumping diagnostics for the next iteration. */
-            ndfSbb( 0, indf, status );
-         }
+               ndfSbb( 0, indf, status );
+            }
 
 /* Free resources. */
-         ndfAnnul( &indf, status );
-         name = astFree( name );
+            ndfAnnul( &indf, status );
+            name = astFree( name );
+         }
       }
 
 /* Return the used bolometer, if required. */
-      if( *ibolo == -3 ) *ibolo = usebolo;
+      if( *ibolo == -3 && nbolo > 1 ) *ibolo = usebolo;
 
 /* Free resources. */
       buffer = astFree( buffer );
@@ -871,7 +904,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 
 /* If required, add new columns to the table holding information about
    each sample that falls in a given map pixel. */
-   if( table ) {
+   if( table && loc ) {
       int *pi0, *pi, jj, nc;
       dim_t jcol, jrow;
       dim_t ibol, ipix, itime;

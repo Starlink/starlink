@@ -803,6 +803,37 @@ diag.array = <undef>
 diag.bolo = WMEAN
 
 #-----------------------------------------------------------------
+#  Name: 	diag.btable
+#  Type: 	string
+#  Default: 	<undef>
+#  Purpose: 	Qualifies the required dignostic information.
+#  Description: If supplied, a set of text files is created, each
+#               containing a table in TOPCAT "ascii" format with columns
+#               that hold the data values in a single bolometer (see
+#	        parameter "diag.bolo"). Each row corresponds to a single
+#	        time slice. The columns are:
+#
+#               - ITIME: The time slice index
+#               - RTS_NUM: The RTS_NUM value of the time slice
+#               - IX: The X pixel index of the map pixel into which the bolometer sample falls.
+#               - IY: The Y pixel index of the map pixel into which the bolometer sample falls.
+#               - DATA: The Data value of the bolometer sample.
+#               - VAR: The Variance of the bolometer sample (if available).
+#               - QUAL: The Quality of the bolometer sample (if available).
+#
+#               Each file has a name of the format
+#               "<name>_<chunk>_<iter>_<mod>_<when>.asc"
+#               where:
+#
+#               - <name> is the value of the parameter diag.btable.
+#               - <chunk> is the chunk index
+#               - <iter> is the iteration number
+#               - <mod> is the model name (COM, FLT, PCA, etc)
+#               - <when> is "BEF", "AFT" or "MOD", indicating when the
+#                 bolometer values were dumped.
+diag.btable = <undef>
+
+#-----------------------------------------------------------------
 #  Name: 	diag.cube
 #  Type: 	int
 #  Default: 	0

@@ -1030,7 +1030,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                smf_modeltype type, smfArray *model, int res,
                const char *root, int mask, double mingood, int cube,
                int map, int addqual, smfSampleTable *table,
-               double chunkfactor, int *status );
+               double chunkfactor, const char *btable, int *status );
 
 void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                       int chunk, AstKeyMap *keymap, smfArray **allmodel,
@@ -2103,6 +2103,10 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
                         const int *lbnd_out, const int *ubnd_out,
                         AstFrameSet *outfset, const char *root,
                         double chunkfactor, int *status );
+
+void smf_write_bolotable( const smfData *data, const char *filename,
+                          dim_t ibolo, const int *lbnd, const dim_t *dims,
+                          int *status );
 
 void smf_write_clabels( const smfData* data, int * status );
 

@@ -167,9 +167,11 @@
 *        Make the inclusion of data for a specific bolometer optional.
 *     10-APR-2018 (DSB):
 *        Added parameter "chunkfactor".
+*     18-MAR-2021 (DSB):
+*        Added parameter "btable".
 
 *  Copyright:
-*     Copyright (C) 2018 East Asian Observatory.
+*     Copyright (C) 2018-2021 East Asian Observatory.
 *     Copyright (C) 2013-2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -217,6 +219,8 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    HDSLoc *cloc = NULL;
    HDSLoc *dloc = NULL;
    HDSLoc *mloc = NULL;
+   char *btable = NULL;
+   char broot[ 200 ];
    char modelnames[ SMF_MODEL_MAX*MODEL_NAMELEN ];
    char root[ 20 ];
    char subarray[ SUB_NAMELEN + 1 ];
@@ -272,11 +276,16 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 /* See if diagnostics are to be created only for the final iteration. */
    astMapGet0I( kmap, "LASTONLY", &lastonly );
 
-/* Get the name of the HDS container file in which to store the
-   diagnostics info. Skip to the end if none is specified, or if
-   diagnostics are not needed for this iteration. */
-   if( astMapGet0C( kmap, "OUT", &out ) &&
-       ( !lastonly || (flags & SMF__DIMM_LASTITER)    ) ) {
+/* See if a table of bolometer values is to be created. */
+   astMapGet0C( kmap, "BTABLE", &table );
+   if( table ) btable = astStore( NULL, table, strlen(table) + 1 );
+
+/* Get the name of any output HDS container file to create. */
+   if( !astMapGet0C( kmap, "OUT", &out ) ) out = NULL;
+
+/* Skip to the end if no dignostics are required, or if diagnostics are
+   not needed for this iteration. */
+   if( ( out || btable ) && ( !lastonly || (flags & SMF__DIMM_LASTITER) ) ) {
 
 /* See if we should append data for the current run of makemap to NDFs
    created by a previous run (e.g. when running the skyloop script). */
@@ -308,51 +317,55 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 /* If we are appending to previously created NDFs, attempt to open the
    pre-existing container file. */
       new = 0;
-      if( append ) {
-         if( *status == SAI__OK ) {
-            hdsOpen( out, "UPDATE", &cloc, status );
-            if( *status != SAI__OK ) {
-               errRepf( "", "Failed to append new makemap diagnostic "
-                        "info to existing container file \"%s\".", status,
-                        out );
-            }
+      if( out ) {
+         if( append ) {
+            if( *status == SAI__OK ) {
+               hdsOpen( out, "UPDATE", &cloc, status );
+               if( *status != SAI__OK ) {
+                  errRepf( "", "Failed to append new makemap diagnostic "
+                           "info to existing container file \"%s\".", status,
+                           out );
+               }
 
 /* Get the starting row number from the KeyMap. If it is not in the
    KeyMap, get it form the HDS file and copy it into the KeyMap. */
-            if( astMapHasKey( kmap, "ROWOFFSET" ) ) {
-               astMapGet0I( kmap, "ROWOFFSET", &rowoffset );
-            } else {
-               datFind( cloc, "NROW", &dloc, status );
-               datGet0I( dloc, &rowoffset, status );
-               datAnnul( &dloc, status );
-               astSetI( kmap, "MapLocked", 0 );
-               astMapPut0I( kmap, "ROWOFFSET", rowoffset, NULL );
-               astSetI( kmap, "MapLocked", 1 );
+               if( astMapHasKey( kmap, "ROWOFFSET" ) ) {
+                  astMapGet0I( kmap, "ROWOFFSET", &rowoffset );
+               } else {
+                  datFind( cloc, "NROW", &dloc, status );
+                  datGet0I( dloc, &rowoffset, status );
+                  datAnnul( &dloc, status );
+                  astSetI( kmap, "MapLocked", 0 );
+                  astMapPut0I( kmap, "ROWOFFSET", rowoffset, NULL );
+                  astSetI( kmap, "MapLocked", 1 );
+               }
+            }
+
+/* Otherwise, create a new container file, and use zero as the row
+   offset. Also indicate that subsequent iteration should append. */
+         } else if( *status == SAI__OK ) {
+
+            rowoffset = 0;
+            astSetI( kmap, "MapLocked", 0 );
+            astMapPut0I( kmap, "ROWOFFSET", rowoffset, NULL );
+            astMapPut0I( kmap, "APPEND", 1, NULL );
+            astSetI( kmap, "MapLocked", 1 );
+
+            new = 1;
+            hdsNew( out, "DIAGNOSTICS", "DIAGNOSTICS", 0, NULL, &cloc,
+                    status );
+            if( *status != SAI__OK ) {
+               errRepf( "", "Failed to write new makemap diagnostic "
+                        "info to new container file \"%s\".", status,
+                        out );
             }
          }
 
-/* Otherwise, create a new container file, and use zero as the row
-   offset. ALso indicate that subsequent iteration should append. */
-      } else if( *status == SAI__OK ) {
-
-         rowoffset = 0;
-         astSetI( kmap, "MapLocked", 0 );
-         astMapPut0I( kmap, "ROWOFFSET", rowoffset, NULL );
-         astMapPut0I( kmap, "APPEND", 1, NULL );
-         astSetI( kmap, "MapLocked", 1 );
-
-         new = 1;
-         hdsNew( out, "DIAGNOSTICS", "DIAGNOSTICS", 0, NULL, &cloc,
-                 status );
-         if( *status != SAI__OK ) {
-            errRepf( "", "Failed to write new makemap diagnostic "
-                     "info to new container file \"%s\".", status,
-                     out );
-         }
-      }
-
 /* Get the index of the row to add to the container file. */
-      irow = dat->iter + rowoffset;
+         irow = dat->iter + rowoffset;
+      } else {
+         irow = 0;
+      }
 
 /* Get the  other required items from the KeyMap. */
       astMapGet1C( kmap, "MODELS", MODEL_NAMELEN, SMF_MODEL_MAX, &nmodel,
@@ -445,8 +458,10 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
       }
 
 /* No need for history in the NDFs so switch it off. */
-      ndfGtune( "AUTO_HISTORY", &history, status );
-      ndfTune( 0, "AUTO_HISTORY", status );
+      if( out ) {
+         ndfGtune( "AUTO_HISTORY", &history, status );
+         ndfTune( 0, "AUTO_HISTORY", status );
+      }
 
 /* We report the used bolometer if the initial bolometer setting
    indicates that a typical bolometer is to be chosen and used
@@ -461,10 +476,12 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 
 /* Ensure we have a component for this model within the container file. */
             modname = smf_model_getname( type, status );
-            datThere( cloc, modname, &there, status );
-            if( !there ) datNew( cloc, modname, "DIAGNOSTICS", 0, NULL,
-                                 status );
-            datFind( cloc, modname, &mloc, status );
+            if( out ) {
+               datThere( cloc, modname, &there, status );
+               if( !there ) datNew( cloc, modname, "DIAGNOSTICS", 0, NULL,
+                                    status );
+               datFind( cloc, modname, &mloc, status );
+            }
 
 /* If this function has been called immediately before estimating the new
    model, then dump the residuals if requested. */
@@ -472,10 +489,17 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                if( res_before && type != SMF__RES ) {
                   msgOutf( "", "Diagnostics: Dumping residuals before subtraction of %s",
                            status, modname );
+
+                  if( btable ){
+                     sprintf( broot, "%s_%d_%d_%s_bef.asc", btable, chunk,
+                              dat->iter, modname );
+                  }
+
                   sprintf( root, "bef_%d", chunk );
                   smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                             dat, type, NULL, 1, root, 0, mingood, cube,
-                            map, addqual, tabdata, chunkfactor, status );
+                            map, addqual, tabdata, chunkfactor,
+                            btable?broot:NULL, status );
                }
 
 /* If this function has been called immediately after estimating the new
@@ -483,17 +507,30 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
             } else if( where == 1 ) {
                msgOutf( "", "Diagnostics: Dumping %s model", status, modname );
                sprintf( root, "mod_%d", chunk );
+
+               if( btable ){
+                  sprintf( broot, "%s_%d_%d_%s_mod.asc", btable, chunk,
+                           dat->iter, modname );
+               }
+
                smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                          dat, type, allmodel ? allmodel[ 0 ] : NULL,
                          0, root, mask, mingood, cube, map, addqual,
-                         tabdata, chunkfactor, status );
+                         tabdata, chunkfactor, btable?broot:NULL, status );
                if( res_after && type != SMF__RES ) {
                   msgOutf( "", "Diagnostics: Dumping residuals after subtraction of %s",
                            status, modname );
                   sprintf( root, "aft_%d", chunk );
+
+                  if( btable ){
+                     sprintf( broot, "%s_%d_%d_%s_aft.asc", btable, chunk,
+                              dat->iter, modname );
+                  }
+
                   smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                             dat, type, NULL, 1, root, 0, mingood, cube,
-                            map, addqual, tabdata, chunkfactor, status );
+                            map, addqual, tabdata, chunkfactor,
+                            btable?broot:NULL, status );
                }
 
 /* Any other "where" value is currently an error. */
@@ -504,12 +541,12 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
             }
 
 /* Annul ther locator for the model info in the container file. */
-            datAnnul( &mloc, status );
+            if( out ) datAnnul( &mloc, status );
 
 /* Report the chosen typical bolometer if required, and store it in the
    KeyMap in place of the original BOLO value, in order to ensure that the
    same bolometer is chosen in future. */
-            if( repbolo ) {
+            if( repbolo && ibolo >= 0 ) {
                astMapPut0I( kmap, "BOLO", ibolo, NULL );
                msgOutf( "", "Diagnostics: using \"typical\" bolometer %d.",
                         status, ibolo );
@@ -521,45 +558,50 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 
 /* Add extra information to the top level of the container file, if it
    has just been created. */
-      if( new ) {
-         if( ibolo != -4 ) {
-            if( ibolo < 0 ) {
-               cval = ( ibolo == -1 ) ? "MEAN" : "WMEAN";
-               datNew0C( cloc, "BOLO", strlen(cval), status );
-               datFind( cloc, "BOLO", &dloc, status );
-               datPut0C( dloc, cval, status );
-            } else {
-               datNew0I( cloc, "BOLO", status );
-               datFind( cloc, "BOLO", &dloc, status );
-               datPut0I( dloc, ibolo, status );
+      if( out ) {
+         if( new ) {
+            if( ibolo != -4 ) {
+               if( ibolo < 0 ) {
+                  cval = ( ibolo == -1 ) ? "MEAN" : "WMEAN";
+                  datNew0C( cloc, "BOLO", strlen(cval), status );
+                  datFind( cloc, "BOLO", &dloc, status );
+                  datPut0C( dloc, cval, status );
+               } else {
+                  datNew0I( cloc, "BOLO", status );
+                  datFind( cloc, "BOLO", &dloc, status );
+                  datPut0I( dloc, ibolo, status );
+               }
+               datAnnul( &dloc, status );
             }
+
+            datNew0C( cloc, "ARRAY", strlen(subarray), status );
+            datFind( cloc, "ARRAY", &dloc, status );
+            datPut0C( dloc, subarray, status );
             datAnnul( &dloc, status );
+
+            datNew0I( cloc, "MASK", status );
+            datFind( cloc, "MASK", &dloc, status );
+            datPut0I( dloc, mask, status );
+            datAnnul( &dloc, status );
+
+            datNew0I( cloc, "NROW", status );
          }
 
-         datNew0C( cloc, "ARRAY", strlen(subarray), status );
-         datFind( cloc, "ARRAY", &dloc, status );
-         datPut0C( dloc, subarray, status );
-         datAnnul( &dloc, status );
-
-         datNew0I( cloc, "MASK", status );
-         datFind( cloc, "MASK", &dloc, status );
-         datPut0I( dloc, mask, status );
-         datAnnul( &dloc, status );
-
-         datNew0I( cloc, "NROW", status );
-      }
-
 /* Store the number of rows of diagnostics currently stored in the container file. */
-      datFind( cloc, "NROW", &dloc, status );
-      datPut0I( dloc, irow + 1, status );
-      datAnnul( &dloc, status );
+         datFind( cloc, "NROW", &dloc, status );
+         datPut0I( dloc, irow + 1, status );
+         datAnnul( &dloc, status );
 
 /* Re-instate the original NDF history tuning parameter. */
-      ndfTune( history, "AUTO_HISTORY", status );
+         ndfTune( history, "AUTO_HISTORY", status );
 
 /* Close the container file. */
-      datAnnul( &cloc, status );
+         datAnnul( &cloc, status );
+      }
    }
+
+/* Free resources. */
+   btable = astFree( btable );
 
 /* End the AST context, thus deleting any AST objects created in this
    function. */
