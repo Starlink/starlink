@@ -307,8 +307,8 @@
 *     REF = NDF (Read)
 *          A group of existing time series data cubes. These act as templates
 *          for the new time series cubes created by this application, and
-*          specified via parameter OUT. They should contain _DOUBLE (i.e.
-*          flat-fielded) data values.
+*          specified via parameter OUT. They may contain either raw
+*          (_INTEGER) or flat-fielded (_DOUBLE) data values.
 *     SIGMA = _DOUBLE (Read)
 *          The standard deviation of the Gaussian noise to add to the
 *          output data. [0.0]
