@@ -373,10 +373,15 @@
 *        emission. See parameter COMVAL.
 *     21-FEB-2017 (DSB):
 *        Add parameter PERROR.
+*     30-MAR-2021 (DSB):
+*        - Allow the input reference time-series to be _integer raw data as
+*        well as _double flat-fielded data.
+*        - Propagate output data units form input sky map, not the input
+*        time-series.
 
 *  Copyright:
 *     Copyright (C) 2011 Science and Technology Facilities Council.
-*     Copyright (C) 2015-2017 East Asian Observatory.
+*     Copyright (C) 2015-2021 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -452,6 +457,7 @@ void smurf_unmakemap( int *status ) {
    char jkdata[ 200 ];        /* Text buffer for JKDATA value */
    char pabuf[ 10 ];          /* Text buffer for parameter value */
    char subarray[ 5 ];        /* Name of SCUBA-2 subarray (s8a,s8b,etc) */
+   char units[100];           /* Units string from input sky map */
    dim_t iel;                 /* Index of next element */
    dim_t ndata;               /* Number of elements in array */
    dim_t ntslice;             /* Number of time slices in array */
@@ -553,9 +559,10 @@ void smurf_unmakemap( int *status ) {
    kpg1Rgndf( "IN", 1, 1, "", &igrp1, &nskymap, status );
    ndgNdfas( igrp1, 1, "READ", &indf, status );
 
-/* Map the data array in the input sky map. */
+/* Map the data array in the input sky map and get its units string. */
    ndfMap( indf, "DATA", "_DOUBLE", "READ", (void **) &in_data, &nel,
            status );
+   ndfCget( indf, "UNITS", units, sizeof(units), status );
 
 /* Get the WCS FrameSet from the sky map, together with its pixel index
    bounds. */
@@ -788,7 +795,8 @@ void smurf_unmakemap( int *status ) {
       ndfBegin();
 
 /* Create the output NDF by propagating everything from the input, except
-   for quality and variance. */
+   for units (which is inherited from the input sky map) quality and
+   variance. */
       ndgNdfas( igrp2, ifile, "READ", &indfin, status );
 
       ndfMsg( "FILE", indfin );
@@ -797,8 +805,15 @@ void smurf_unmakemap( int *status ) {
       msgOutif( MSG__NORM, " ", "Simulating ^THISFILE/^NUMFILES ^FILE",
                 status );
 
-      ndgNdfpr( indfin, "DATA,HISTORY,LABEL,TITLE,WCS,UNITS,EXTENSION(*)",
+      ndgNdfpr( indfin, "DATA,HISTORY,LABEL,TITLE,WCS,EXTENSION(*)",
                 ogrp, ifile, &indfout, status );
+
+/* Ensure the output NDF has type _DOUBLE and store the Units value from
+   the input sky map. */
+      ndfStype( "_DOUBLE", indfout, "Data,Variance", status );
+      ndfCput( units, indfout, "UNITS", status );
+
+/* Free both input and output NDF. */
       ndfAnnul( &indfin, status );
       ndfAnnul( &indfout, status );
 
