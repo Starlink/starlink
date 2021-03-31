@@ -80,7 +80,7 @@
 *     SASPEC = REAL (Given)
 *        The aspect ratio with which a new DATA picture should be created.
 *        This is the height divided by the width of the DATA picture,
-*        assuming equal scales on each axis (egmetres). A value of zero
+*        assuming equal scales on each axis (e.g. metres). A value of zero
 *        causes the DATA picture to have the aspect ratio which produces
 *        the largest picture. The actual value used will depend on the
 *        value supplied for the FILL parameter (see above).

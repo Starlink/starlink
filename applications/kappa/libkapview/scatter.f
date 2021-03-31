@@ -94,13 +94,13 @@
 *     FIT = _LOGICAL (Read)
 *        If TRUE, then a linear fit to the scatter points is added to the
 *        plot. The slope and offset of this fit is displayed on the screen
-*        and written to output Parameters SLOPE, OFFSET, and RMS. A symetric
-*        linear fit algorithm is used, which caters for the presence of
-*        noise in both X and Y values. Outliers are identified and
-*        ignored. Note, the fit is based on just those points that are
+*        and written to output Parameters SLOPE, OFFSET, and RMS. A
+*        symmetric linear-fit algorithm is used, which caters for the
+*        presence of noise in both X and Y values. Outliers are identified
+*        and ignored. Note, the fit is based on just those points that are
 *        visible in the scatter plot. Points outside the bounds of the
 *        plot are ignored. Points that are inside the plot are also ignored
-*        if their reflection through the best fit line are outside the plot.
+*        if their reflection through the best-fit line are outside the plot.
 *        This avoids biasing the fit if the plot bounds omit more points on
 *        one side of the line than the other. [current value]
 *     IN1 = NDF (Read)
