@@ -250,7 +250,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     &dofft, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                    NULL, status );
+                    NULL, NULL, status );
 
   /* Calculate memory usage of static model components: -------------------- */
 

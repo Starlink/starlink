@@ -204,6 +204,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
   double pcathresh;         /* n-sigma threshold for PCA cleaning */
   double spikethresh;       /* Threshold for finding spikes */
   dim_t spikebox=0;         /* Box size for spike finder */
+  dim_t startup;            /* No. of samples to blank at start of time stream */
   struct timeval tv1, tv2;  /* Timers */
   int whiten;               /* Apply whitening filter? */
   int zeropad;              /* Pad with zeros? */
@@ -241,7 +242,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
                     NULL, NULL, NULL, &flagslow, &flagfast, &order,
                     &spikethresh, &spikebox, &noisecliphigh, &noisecliplow,
                     NULL, &compreprocess, &pcalen, &pcathresh, NULL, NULL, NULL,
-                    &noiseclipprecom, &deconvmce, &delay, NULL, status );
+                    &noiseclipprecom, &deconvmce, &delay, NULL, &startup, status );
 
   /* Loop over subarray */
   for( idx=0; (idx<array->ndat)&&(*status==SAI__OK); idx++ ) {
@@ -274,6 +275,15 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
          smf_filter_execute( wf, data, filt, 0, 0, status );
        }
        filt = smf_free_smfFilter( filt, status );
+    }
+
+    /* Blank samples at start of time stream, before the scan pattern has
+       been properly established.  */
+    if( startup ) {
+      msgOutiff(MSG__VERB, "", FUNC_NAME
+                ": Flagging first %d startup samples...", status, (int) startup );
+
+      smf_startup( data, startup, status );
     }
 
     /* Fix DC steps */

@@ -314,7 +314,7 @@ void smf_grp_related( Grp *igrp, const size_t grpsize,
                       NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                       NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                       NULL, NULL, NULL, NULL, &downsampscale, &downsampfreq,
-                      NULL, NULL, NULL, NULL, status );
+                      NULL, NULL, NULL, NULL, NULL, status );
 
     if( downsampscale && downsampfreq ) {
       *status = SAI__ERROR;

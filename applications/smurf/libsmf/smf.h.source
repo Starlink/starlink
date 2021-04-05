@@ -1410,7 +1410,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, const char *qualifier,
                        double *pcathresh, int *groupsubarray,
                        double *downsampscale, double *downsampfreq,
                        int *noiseclipprecom, int *deconvmce, double *delay,
-                       int *filt_order, int *status );
+                       int *filt_order, dim_t *startup, int *status );
 
 void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
                    dim_t *nbolo, dim_t *ntslice, dim_t *ndata,
@@ -1999,6 +1999,8 @@ void smf_sparsebounds( ThrWorkForce * wf, Grp *igrp,  int size, AstSkyFrame *osk
                        int *status );
 
 int smf_spreadwidth( int spread, const double params[], int *status );
+
+void smf_startup( smfData *data, dim_t startup, int *status );
 
 void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
                       int dims[], int nsampcycle, int vxmin, int vymin,

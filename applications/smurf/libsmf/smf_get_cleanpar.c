@@ -28,7 +28,7 @@
 *                       dim_t *pcalen, double *pcathresh, int groupsubarray,
 *                       double *downsampscale, double *downsampfreq,
 *                       int *noiseclipprecom, int *deconvmce, double delay,
-*                       int *filt_order, int *status )
+*                       int *filt_order, dim_t *startup, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -142,6 +142,11 @@
 *        each sample to be associated with a different position on the sky.
 *     filt_order = int * (Returned)
 *        Order of Butterworth filter to use (0=hard-edged).
+*     filt_order = int * (Returned)
+*        Order of Butterworth filter to use (0=hard-edged).
+*     startup = dim_t * (Returned)
+*        The number of time slices to blank at the start of the
+*        observation.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -219,6 +224,8 @@
 *        Added argument "qualifier".
 *     2013-10-21 (DSB):
 *        Changed argument "filt_edgewidth" to "filt_order".
+*     2021-4-5 (DSB):
+*        Added "startup".
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -282,7 +289,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, const char *qualifier,
                        int *groupsubarray, double *downsampscale,
                        double *downsampfreq, int *noiseclipprecom,
                        int *deconvmce, double *delay, int *filt_order,
-                       int *status ) {
+                       dim_t *startup, int *status ) {
 
   char buf[255];                /* Buffer for qualified parameter names */
   const char *key;              /* Pointer to used parameter name */
@@ -714,5 +721,11 @@ void smf_get_cleanpar( AstKeyMap *keymap, const char *qualifier,
                *delay );
   }
 
+  if( startup ) {
+    *startup = 0;
+    smf_get_nsamp( keymap, "STARTUP", data, startup, status );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%" DIM_T_FMT, status,
+               "STARTUP", *startup );
+  }
 
 }

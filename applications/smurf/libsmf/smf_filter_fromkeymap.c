@@ -162,7 +162,7 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, const char *qual
                     &f_edgelarge, f_notchlow, f_notchhigh, &f_nnotch, &dofft,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, &whitening, NULL,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &f_order,
-                    status );
+                    NULL, status );
 
   /* Modify edge filters if spacial scales were requested */
   smf_scale2freq( f_edgesmall, f_edgelarge, hdr, &f_edgelow, &f_edgehigh, status );

@@ -347,7 +347,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                     &dcsmooth, &dclimcorr, NULL, &fillgaps, &zeropad, NULL,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     &spikethresh, &spikebox, NULL, NULL, NULL, NULL, NULL, NULL,
-                    NULL, NULL, NULL, NULL, NULL, NULL, NULL, status );
+                    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, status );
 
   /* Did we already calculate the noise on each detector? */
   astMapGet0I( kmap, "CALCFIRST", &calcfirst );

@@ -2968,6 +2968,20 @@ ssn.zero_snrlo = <undef>
 ssn.zero_union = 1
 
 #-----------------------------------------------------------------
+#  Name: 	startup
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Blanks initial section of time-stream
+#  Description: This specifies the number of initial time slices that
+#               are to be excluded from the map. This can be used to
+#               exclude the data at the start of each observation during
+#               which the telescope is getting up to speed and establishing the
+#               required scan pattern. If positive, the value is the number of
+#               (down-sampled) time slices. If negative, the absolute value is
+#               a number of seconds.
+startup = 0
+
+#-----------------------------------------------------------------
 #  Name: 	tmp.docos
 #  Type: 	integer
 #  Default: 	0

@@ -427,6 +427,7 @@ smf_smoothmask.c \
 smf_sort_bydouble.c \
 smf_sparsebounds.c \
 smf_spreadwidth.c \
+smf_startup.c \
 smf_store_image.c \
 smf_store_outputbounds.c \
 smf_stripsuffix.c \

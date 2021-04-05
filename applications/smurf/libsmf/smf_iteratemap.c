@@ -1437,7 +1437,8 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
   smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                    &groupsubarray, NULL, NULL, NULL, NULL, NULL, NULL, status );
+                    &groupsubarray, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                    status );
 
   smf_grp_related( igrp, isize, 1+groupsubarray, 1, maxlen, &srate_maxlen,
                    keymap, &maxconcat, &maxfile, &igroup, NULL, &pad, status );

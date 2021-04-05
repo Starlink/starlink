@@ -412,7 +412,7 @@ void smurf_sc2clean( int *status ) {
                         &dkclean, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                        NULL, NULL, NULL, status );
+                        NULL, NULL, NULL, NULL, status );
 
       for( idx=0; dkclean&&(*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
         odata = concat->sdata[idx];
