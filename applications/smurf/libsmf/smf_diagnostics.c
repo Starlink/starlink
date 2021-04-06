@@ -233,6 +233,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    int append;
    int cube;
    int history;
+   int hits;
    int ibolo = -4;
    int imodel;
    int irow;
@@ -297,6 +298,14 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 
 /* See if a 2D map of each model is required at each iteration. */
       astMapGet0I( kmap, "MAP", &map );
+
+/* See if the AST model is to be dumped as a set of pixel data values or as a
+   set of hits values. */
+      if( type == SMF__AST ) {
+         astMapGet0I( kmap, "ASTHITS", &hits );
+      } else {
+         hits = 0;
+      }
 
 /* See if NDFs are to include Quality arrays. */
       astMapGet0I( kmap, "QUAL", &addqual );
@@ -515,7 +524,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 
                smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                          dat, type, allmodel ? allmodel[ 0 ] : NULL,
-                         0, root, mask, mingood, cube, map, addqual,
+                         hits?-999:0, root, mask, mingood, cube, map, addqual,
                          tabdata, chunkfactor, btable?broot:NULL, status );
                if( res_after && type != SMF__RES ) {
                   msgOutf( "", "Diagnostics: Dumping residuals after subtraction of %s",

@@ -53,7 +53,10 @@
 *        A smfArray holding the model data to be dumped. If NULL, then
 *        the residuals are dumped.
 *     res = int (Given)
-*        If non-zero dump the residuals. Otherwise dump the model.
+*        If non-zero dump the residuals. Otherwise dump the model. If
+*        "type" is SMF__AST, the hits info is dumped (as a time stream)
+*        in place of the actual AST model or residual data values if
+*        "res" is -999.
 *     root = const char * (Given)
 *        The root name for the NDFs to hold the data within the container
 *        file. The string "_time" and/or "_power" (depending on arguments
@@ -111,6 +114,9 @@
 *     18-MAR-2021 (DSB):
 *        - Allow "loc" to be NULL.
 *        - Add argument btable.
+*     6-APR-2021 (DSB):
+*        Allow AST hits info to be dumped as a time-stream (see argument
+*        "res" above).
 
 *  Copyright:
 *     Copyright (C) 2013,2015 Science and Technology Facilities Council.
@@ -165,6 +171,7 @@ typedef struct smfDiagData {
    double *map;
    double *out;
    double *var;
+   int *imap;
    int *lut;
    int mask;
    int oper;
@@ -220,6 +227,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    int bolostep;
    int el;
    int fax;
+   int hits;
    int i;
    int iax;
    int idx;
@@ -269,6 +277,14 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 /* Allocate job data for threads. */
    job_data = astCalloc( nw, sizeof(*job_data) );
 
+/* Are the map hits to be dumped as a time-stream? */
+   if( res == -999 ){
+      res = 0;
+      hits = ( type == SMF__AST );
+   } else {
+      hits = 0;
+   }
+
 /* Get a pointer to the smfArray containing the data to be dumped. */
    array = NULL;
    if( res || type == SMF__RES ) {
@@ -313,7 +329,8 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
          pdata->qua = dat->qua[0]->sdata[isub]->pntr[0];
          pdata->out = data->pntr[0];
          pdata->lut = dat->lut[0]->sdata[isub]->pntr[0];
-         pdata->map = dat->map;
+         pdata->map = hits?NULL:dat->map;
+         pdata->imap = hits?dat->hitsmap:NULL;
          pdata->mapqual = dat->mapqual;
          pdata->mask = mask;
          pdata->oper = 0;
@@ -1067,29 +1084,30 @@ static void smf1_diag( void *job_data_ptr, int *status ) {
 
 /* Local Variables: */
    SmfDiagData *pdata;
+   const double *pd;
+   const double *in;
    dim_t ibolo;
    dim_t idata;
    dim_t itime;
    dim_t nbolo;
-   int oper;
    dim_t t1;
    dim_t t2;
-   double *var;
    double *out;
+   double *po;
+   double *var;
+   double ast_data;
+   double sum;
+   double w;
+   double wsum;
+   int *pl;
+   int n;
+   int oper;
    size_t bstride;
    size_t tstride;
-   smf_qual_t *qua;
    smf_qual_t *qua_out;
-   const double *in;
-   double sum;
-   double wsum;
-   double w;
-   int n;
-   const double *pd;
-   smf_qual_t *pq;
+   smf_qual_t *qua;
    smf_qual_t *pq2;
-   double *po;
-   int *pl;
+   smf_qual_t *pq;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -1118,7 +1136,15 @@ static void smf1_diag( void *job_data_ptr, int *status ) {
       pl = pdata->lut +  pdata->s1;
       for( idata = pdata->s1; idata <= pdata->s2; idata++,pq++,pl++,po++ ) {
          if( !( *pq & SMF__Q_MOD ) && *pl != VAL__BADI ) {
-            double ast_data = pdata->map[ *pl ];
+
+            if( pdata->map ) {
+               ast_data = pdata->map[ *pl ];
+            } else if( pdata->imap[ *pl ] != VAL__BADI ){
+               ast_data = (double) pdata->imap[ *pl ];
+            } else {
+               ast_data = VAL__BADD;
+            }
+
             if( ast_data != VAL__BADD &&
                 ( !(pdata->mapqual[ *pl ] & SMF__MAPQ_AST ) || !pdata->mask ) ) {
                *po = ast_data;

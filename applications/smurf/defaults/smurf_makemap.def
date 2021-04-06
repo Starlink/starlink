@@ -766,6 +766,17 @@ diag.append = 0
 diag.array = <undef>
 
 #-----------------------------------------------------------------
+#  Name: 	diag.asthits
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Qualifies the required dignostic information.
+#  Description: If non-zero, the AST model time-stream values dumped to
+#               the file specified by parameter "diag.out" will be the
+#               corresponding hits value rather than the actual AST data
+#               values.
+diag.asthits = 0
+
+#-----------------------------------------------------------------
 #  Name: 	diag.bolo
 #  Type: 	integer or string
 #  Default: 	WMEAN
