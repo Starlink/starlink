@@ -148,8 +148,9 @@
             CALL CAT_EGT0R( IDDU, DU, NULL, STATUS )
             IF( NULL ) DU = VAL__BADR
          ELSE
-            CALL CAT_EGT0R( IDDPI, DPI, NULL, STATUS )
-            IF( NULL ) DPI = VAL__BADR
+            DQ = VAL__BADR
+            DU = VAL__BADR
+            DI = VAL__BADR
          END IF
 
 *  Calculate the new values
@@ -174,6 +175,19 @@
                   VU = VAL__BADR
                   VIP = VAL__BADR
                END IF
+
+            ELSE
+               VQ = VAL__BADR
+               VU = VAL__BADR
+
+               CALL CAT_EGT0R( IDDPI, DPI, NULL, STATUS )
+               IF( NULL ) THEN
+                  DPI = VAL__BADR
+                  VIP = VAL__BADR
+               ELSE
+                  VIP = DPI*DPI
+               END IF
+
             END IF
 
 *  De-bias the polarised intensity.
