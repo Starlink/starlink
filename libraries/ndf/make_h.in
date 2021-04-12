@@ -1,3 +1,4 @@
+#!/bin/sh
 
 cat <<EOF > temp.h
 #include "cgeneric.h"
@@ -44,7 +45,13 @@ cat <<EOF > temp.h
 
 EOF
 
-@CPP@ -P temp.h -I. -I$STARLINK_DIR/include | grep ndf1 > ndf1_cgen.h
+#  Look for include files in $STARCONF_DEFAULT_PREFIX if defined.
+#  Otherwise look in $STARLINK_DIR if defined. otherwise look in "/star".
+star=${STARLINK_DIR:-/star}
+star=${STARCONF_DEFAULT_PREFIX:-$star}
+
+
+@CPP@ -P temp.h -I. -I$star/include | grep ndf1 > ndf1_cgen.h
 rm temp.h
 
 
@@ -98,7 +105,7 @@ cat <<EOF > temp.h
 
 EOF
 
-@CPP@ -P temp.h -I. -I$STARLINK_DIR/include | grep ndf > ndf_cgen.h
+@CPP@ -P temp.h -I. -I$star/include | grep ndf > ndf_cgen.h
 rm temp.h
 
 
