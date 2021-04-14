@@ -103,7 +103,7 @@
 *     data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
-*     -  All non-complex numeric data types can be handled.
+*     -  All numeric data types can be handled.
 
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
@@ -174,6 +174,8 @@
 *        default.
 *     2012 May 8 (MJC):
 *        Add _INT64 support.
+*     2021 Apr 14 (GSB):
+*        Added support for complex data.
 *     {enter_further_changes_here}
 
 *-
@@ -201,6 +203,7 @@
       INTEGER AWCS               ! New application FrameSet
       INTEGER AXLOOP             ! Grid axis to be looped over
       INTEGER AXVAL              ! Pixel index on axis being looped over
+      LOGICAL CMPLX              ! NDF holds complex values?
       INTEGER EL                 ! Total number of pixels in the image
       INTEGER FD                 ! File descriptor
       INTEGER PFRM               ! Reduced PIXEL frame
@@ -213,6 +216,7 @@
       INTEGER IPIX               ! Index of PIXEL Frame within IWCS
       INTEGER IPMASK             ! Pointer to ARD logical mask
       INTEGER IPOUT( 2 )         ! Pointers to masked comp.s of o/p NDF
+      INTEGER IPOUTI( 2 )        ! Pointers to masked imaginary comp.s of o/p NDF
       INTEGER IWCS               ! NDF WCS FrameSet
       INTEGER J                  ! Loop count
       INTEGER JUNK               ! Unused Mapping
@@ -299,8 +303,10 @@
 
       END IF
 
-*  Obtain the numeric type of the NDF array component to be masked.
+*  Obtain the numeric type of the NDF array component to be masked
+*  and whether it is complex.
       CALL NDF_TYPE( INDF1, COMP, TYPE, STATUS )
+      CALL NDF_CMPLX( INDF1, COMP, CMPLX, STATUS )
 
 *  Get the image bounds and also the size of the axes in pixels.
       CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
@@ -473,8 +479,13 @@
          END IF
 
 *  Map the output NDF section for updating.
-         CALL NDF_MAP( INDFS, COMP, TYPE, 'UPDATE', IPOUT, EL,
-     :                 STATUS )
+         IF ( CMPLX ) THEN
+            CALL NDF_MAPZ( INDFS, COMP, TYPE, 'UPDATE',
+     :                     IPOUT, IPOUTI, EL, STATUS )
+         ELSE
+            CALL NDF_MAP( INDFS, COMP, TYPE, 'UPDATE',
+     :                    IPOUT, EL, STATUS )
+         END IF
 
 *  Mask each required component.
          DO ICOMP = 1, NCOMP
@@ -487,11 +498,25 @@
      :                          %VAL( CNF_PVAL( IPOUT( ICOMP ) ) ),
      :                          STATUS )
 
+               IF ( CMPLX ) THEN
+                  CALL KPS1_ARDMR( BAD, CONST, INSIDE, EL,
+     :                             %VAL( CNF_PVAL( IPMASK ) ),
+     :                             %VAL( CNF_PVAL( IPOUTI( ICOMP ) ) ),
+     :                             STATUS )
+               END IF
+
             ELSE IF( TYPE .EQ. '_BYTE' ) THEN
                CALL KPS1_ARDMB( BAD, CONST, INSIDE, EL,
      :                          %VAL( CNF_PVAL( IPMASK ) ),
      :                          %VAL( CNF_PVAL( IPOUT( ICOMP ) ) ),
      :                          STATUS )
+
+               IF ( CMPLX ) THEN
+                  CALL KPS1_ARDMB( BAD, CONST, INSIDE, EL,
+     :                             %VAL( CNF_PVAL( IPMASK ) ),
+     :                             %VAL( CNF_PVAL( IPOUTI( ICOMP ) ) ),
+     :                             STATUS )
+               END IF
 
             ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
                CALL KPS1_ARDMD( BAD, CONST, INSIDE, EL,
@@ -499,11 +524,26 @@
      :                          %VAL( CNF_PVAL( IPOUT( ICOMP ) ) ),
      :                          STATUS )
 
+               IF ( CMPLX ) THEN
+                  CALL KPS1_ARDMD( BAD, CONST, INSIDE, EL,
+     :                             %VAL( CNF_PVAL( IPMASK ) ),
+     :                             %VAL( CNF_PVAL( IPOUTI( ICOMP ) ) ),
+     :                             STATUS )
+               END IF
+
+
             ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
                CALL KPS1_ARDMI( BAD, CONST, INSIDE, EL,
      :                          %VAL( CNF_PVAL( IPMASK ) ),
      :                          %VAL( CNF_PVAL( IPOUT( ICOMP ) ) ),
      :                          STATUS )
+
+               IF ( CMPLX ) THEN
+                  CALL KPS1_ARDMI( BAD, CONST, INSIDE, EL,
+     :                             %VAL( CNF_PVAL( IPMASK ) ),
+     :                             %VAL( CNF_PVAL( IPOUTI( ICOMP ) ) ),
+     :                             STATUS )
+               END IF
 
             ELSE IF( TYPE .EQ. '_INT64' ) THEN
                CALL KPS1_ARDMK( BAD, CONST, INSIDE, EL,
@@ -511,11 +551,25 @@
      :                          %VAL( CNF_PVAL( IPOUT( ICOMP ) ) ),
      :                          STATUS )
 
+               IF ( CMPLX ) THEN
+                  CALL KPS1_ARDMK( BAD, CONST, INSIDE, EL,
+     :                             %VAL( CNF_PVAL( IPMASK ) ),
+     :                             %VAL( CNF_PVAL( IPOUTI( ICOMP ) ) ),
+     :                             STATUS )
+               END IF
+
             ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
                CALL KPS1_ARDMUB( BAD, CONST, INSIDE, EL,
      :                           %VAL( CNF_PVAL( IPMASK ) ),
      :                          %VAL( CNF_PVAL( IPOUT( ICOMP ) ) ),
      :                          STATUS )
+
+               IF ( CMPLX ) THEN
+                  CALL KPS1_ARDMUB( BAD, CONST, INSIDE, EL,
+     :                              %VAL( CNF_PVAL( IPMASK ) ),
+     :                              %VAL( CNF_PVAL( IPOUTI( ICOMP ) ) ),
+     :                              STATUS )
+               END IF
 
             ELSE IF( TYPE .EQ. '_UWORD' ) THEN
                CALL KPS1_ARDMUW( BAD, CONST, INSIDE, EL,
@@ -523,11 +577,25 @@
      :                          %VAL( CNF_PVAL( IPOUT( ICOMP ) ) ),
      :                          STATUS )
 
+               IF ( CMPLX ) THEN
+                  CALL KPS1_ARDMUW( BAD, CONST, INSIDE, EL,
+     :                              %VAL( CNF_PVAL( IPMASK ) ),
+     :                              %VAL( CNF_PVAL( IPOUTI( ICOMP ) ) ),
+     :                              STATUS )
+               END IF
+
             ELSE IF( TYPE .EQ. '_WORD' ) THEN
                CALL KPS1_ARDMW( BAD, CONST, INSIDE, EL,
      :                          %VAL( CNF_PVAL( IPMASK ) ),
      :                          %VAL( CNF_PVAL( IPOUT( ICOMP ) ) ),
      :                          STATUS )
+
+               IF ( CMPLX ) THEN
+                  CALL KPS1_ARDMW( BAD, CONST, INSIDE, EL,
+     :                             %VAL( CNF_PVAL( IPMASK ) ),
+     :                             %VAL( CNF_PVAL( IPOUTI( ICOMP ) ) ),
+     :                             STATUS )
+               END IF
 
             END IF
          END DO
