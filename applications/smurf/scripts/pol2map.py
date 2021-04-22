@@ -748,6 +748,11 @@
 *       - Remove unused REFFCF parameter.
 *       - Incorporate POL-2 degradation factor of 1.35 when converting
 *       non-POL2 I maps from pW to mJy/beam prior to creating the catalogue.
+*    22-APR-2021 (DSB):
+*       The AST column in the final catalogue now contains distinct non-zero
+*       integers for vectors within each island of emission in the AST mask,
+*       and FITS null values for vectors not within any AST island. Previously,
+*       all islands used the same value "1" and background vectors used "0".
 
 '''
 
@@ -3399,7 +3404,7 @@ try:
             try:
                temp = NDG( astmask, "*" )
                invoke( "$POLPACK_DIR/poledit in={0} out={1} ndf={2} mode=addcol "
-                       "col=AST maskcol=yes comment=\"'Flags indicating AST mask'\"".
+                       "col=AST maskcol=no units=\"' '\" comment=\"'Flags indicating AST mask'\"".
                        format(tcat,outcat,astmask) )
             except starutil.NoNdfError:
                pass
