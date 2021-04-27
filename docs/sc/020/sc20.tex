@@ -1305,16 +1305,16 @@ followed by the options you wish to specify in the following format:
 [REDUCE_SCIENCE_NARROWLINE]
 MOMENTS_LOWER_VELOCITY = -30.0
 MOMENTS_UPPER_VELOCITY = 155.0
-PIXEL_SCALE = 6.0,10.0
+PIXEL_SCALE = 6.0
 SPREAD_METHOD = gauss
 SPREAD_WIDTH = 9
 SPREAD_FWHM_OR_ZERO = 6
-REBIN = 2
+REBIN = 0.635,2.0
 \end{terminalv}
 
-Notice the two values given for the \param{PIXEL\_SCALE} option. This
-means that two maps will be produced, one at each of the specified
-pixel scales. See Appendix~\ref{app:params} for a full list of recipe
+Notice the two values given for the \param{REBIN} option. This means
+that two maps will be produced, one at each of the specified velocity
+resolutions. See Appendix~\ref{app:params} for a full list of recipe
 parameters.
 
 The \file{.ini} file can contain an arbitrary number of \param{[]}
