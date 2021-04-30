@@ -226,6 +226,9 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        of astMapGet0C has been changed to astMapGetC to fix this bug.
 *     8-MAY-2017 (DSB):
 *        Fix bug that prevented vector values being displayed.
+*     30-APR-2021 (GSB):
+*        Allow CONFIG to be NULL as described in the documentation if
+*        NDF or DEFAULTS is given.
 *     {enter_further_changes_here}
 
 *-
@@ -305,14 +308,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 /* Create a KeyMap holding the selected alternative for each keyword, and
    also supply defaults for any missing values (if a defaults file was
    supplied by the user). */
-   keymap = kpg1Config( "CONFIG", defs[0]?defs:NULL, keymap2, 0, STATUS );
-
-/* Allow it to be NULL if we're reading an NDF because we'll replace
-   keymap with historyConfig later if necessary. */
-   if( indf && *STATUS == PAR__NULL ) {
-      errAnnul(STATUS);
-      keymap = NULL;
-   }
+   keymap = kpg1Config( "CONFIG", defs[0]?defs:NULL, keymap2, ((defs[0] || indf) ? 1 : 0), STATUS );
 
 /* Abort if an error has occurred. */
    if( *STATUS != SAI__OK ) goto L999;
