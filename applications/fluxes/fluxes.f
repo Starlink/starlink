@@ -112,13 +112,12 @@
 *     Purpose:
 *     This program calculates the positions of the planets and/or
 *     the fluxes of five planetery calibrators for the effective
-*     frequencies and beam-sizes of the UKT14 bolometer receiver
-*     on the JCMT.
+*     frequencies and beam-sizes of various receivers on the JCMT.
 
 *     Arrays of effective frequencies and half-power beam-widths
 *     for filters and brightness temperatures for planets (except Mars) are
-*     read from a file (UKT14.DAT) . Brightness temperatures and errors given
-*     by Matt Griffin. HPBW's due to G. Sandell.
+*     read from a file (e.g. UKT14.DAT) . Brightness temperatures and errors
+*     given by Matt Griffin. HPBW's due to G. Sandell.
 
 *     Alternatively, if "FILTER=CUSTOM" is included on the command line,
 *     the parameters of a single filter to use are obtained from the user

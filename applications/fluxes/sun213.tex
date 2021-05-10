@@ -9,7 +9,7 @@
 \stardocsource      {sun213.4}
 \stardocnumber      {213.4}
 \stardocauthors     {G. Privett, T. Jenness, H. Matthews, V. Barnard}
-\stardocdate        {26 January 2021}
+\stardocdate        {10 May 2021}
 \stardoctitle     {FLUXES\\[1ex]
                                 JCMT Position and Flux Density Calibration}
 \stardocversion     {Version 1.2}
@@ -18,8 +18,8 @@
 FLUXES calculates approximate \textbf{topocentric positions} of the planets and also
 \textbf{integrated flux densities} of five of them at several wavelengths.
 These provide calibration information at the effective frequencies and
-beam-sizes employed by the UKT14 and SCUBA receivers on the
-JCMT telescope based on Mauna Kea, Hawaii.
+beam-sizes employed by receivers on the JCMT telescope based on Mauna Kea,
+Hawaii.
 
 The FLUXNOW command, runs FLUXES for the current time and date.
 This allows you to obtain planetary positions and flux levels quickly.
@@ -44,8 +44,7 @@ also \textbf{integrated flux densities} of five of them at a number of
 wavelengths for the
 \htmladdnormallink{JCMT telescope}{http://www.eaobservatory.org/jcmt/}
 on Mauna Kea, Hawaii.  These provide calibration information at the effective
-frequencies and beam-sizes employed by the UKT14, SCUBA and SCUBA-2
-receivers on this telescope.
+frequencies and beam-sizes employed by receivers on this telescope.
 
 The filter centre and widths are shown for each wavelength used.  The filter
 frequencies are the effective frequencies for 1mm of water vapour.
@@ -91,10 +90,21 @@ on the command line, then the the parameters of a single filter to use
 are obtained from the user using a set of environment parameters, rather
 than being read from a file as described above. The planetary brightness
 temperature can either be supplied explicitly or can be looked up from a
-specified NDF using the supplied frequency as the index (the FLUXES
-package includes files \texttt{esa2\_uranus.sdf} and \texttt{esa4\_uranus.sdf}
-that can be used for this purpose). See parameter BTEMP below. The following
-parameters are used:
+specified NDF using the supplied frequency as the index (see parameter
+BTEMP below).  For the case of Uranus, the FLUXES package includes two
+files that can be used for this purpose, both produced as part of the
+calibration effort for Herschel SPIRE spectroscopy:
+\begin{description}
+\item[\texttt{esa2\_uranus.sdf}:] The initial Uranus model at Herschel launch.
+\item[\texttt{esa4\_uranus.sdf}:] An updated model that includes Spitzer
+data for constraining the continuum, but no lines.
+\end{description}
+See
+\htmladdnormallink{Herschel Planetary Calibrator Models release notes}{
+http://archives.esac.esa.int/hsa/legacy/ADP/PlanetaryModels/ReleaseNote_Herschel_Planetary_Calibrator_Models.pdf}
+for more information on these models.
+
+The following parameters are used to describe the custom filter:
 \begin{description}
 \item[FREQ:] The central frequency of the filter in GHz.
 \item[NB:] The number of Gaussian components to the beam - must 1be 1 or 2.
@@ -189,39 +199,40 @@ Planetary Submillimetre Fluxes for the JCMT
 
 UT:  11:25:55       UT Date:18-Sep-1996     HST: 1:25:55
 
-LST:  0:53:52.8981  Julian:  2450344.976  Epoch: 1996.7145
+LST: 00:54:39.1699  MJD (TT):    50344.477  Epoch: 1996.7145
 
 Body         RA        TRIMRA         Dec       TRIMDEC        GD     AMASS
            (h m s)  (arcsec/sec)    (d m s)  (arcsec/sec)     (au)
-SUN     11 44 39.7958  0.0379   + 1 39 35.6411  -0.0161    1.004696  13.375
-MERCURY 11 33 12.7569 -0.0334   - 0 15 11.0814   0.0277    0.652113  13.375
-VENUS    8 57 54.0821  0.0475   +16 20 20.0995  -0.0096    0.931408  13.375
-MARS     8 32  2.5581  0.0268   +19 56 37.7140  -0.0057    2.022076  13.375
-JUPITER 18 35 37.5441  0.0021   -23 23 38.9082   0.0001    4.866561  13.375
-SATURN   0 21  4.1782 -0.0030   - 0 33 48.7199  -0.0013    8.508145   1.078
-URANUS  20 12 44.5684 -0.0008   -20 33 32.2338  -0.0001   19.189787   5.468
-NEPTUNE 19 47 41.0764 -0.0004   -20 39 32.1751  -0.0001   29.655347  10.395
-PLUTO   16  4 56.5905  0.0008   - 7 52 56.4430  -0.0005   30.327917  13.375
-MOON    15 54 32.2690  0.7373   -16 17 35.4393  -0.0368    0.002580  13.375
+SUN     11 44 40.1798  0.0379   + 1 39 33.4379  -0.0161    1.004691  13.375
+MERCURY 11 33 12.9974 -0.0334   - 0 15 11.5562   0.0277    0.652112  13.375
+VENUS    8 57 54.4433  0.0475   +16 20 19.3720  -0.0096    0.931404  13.375
+MARS     8 32  2.6334  0.0268   +19 56 37.9464  -0.0057    2.022026  13.375
+JUPITER 18 35 36.7652  0.0021   -23 23 39.5939   0.0001    4.866478  13.375
+SATURN   0 21  4.4782 -0.0030   - 0 33 58.9245  -0.0013    8.508262   1.078
+URANUS  20 12 46.1430 -0.0008   -20 33 30.0554  -0.0001   19.190398   5.546
+NEPTUNE 19 47 41.0331 -0.0004   -20 39 31.4554  -0.0001   29.655142  10.659
+PLUTO   16  4 56.6035  0.0008   - 7 52 56.8739  -0.0005   30.327774  13.375
+MOON    15 54 23.9864  0.7379   -16 17  3.6688  -0.0371    0.002580  13.375
 \end{terminalv}
 \end{small}
 
 \begin{small}
 \begin{terminalv}
-Mars
+MARS
 South pole is Earth-facing; Inclination Angle =  73.30 degrees
 Semi-diameter =  2.31 arcsecs    Solid angle =  3.95E-10 sterads
-Filter    Centre   Filter   Total   Flux in    Brightness          HPBW
-Wavel.     Freq     Width    Flux    beam      Temperature       assumed
-micron     (GHz)    (GHz)    (Jy)     (Jy)          (K)          (arcsecs)
- 2000     146.0    39.0     52.15     51.81    205.1 +-  0.0       33.8
- 1300     221.0    60.0    119.62    117.85    207.1 +-  0.0       22.3
- 1100     264.0    60.0    170.56    167.00    208.0 +-  0.0       18.7
-  850     350.0    30.0    298.80    287.78    209.3 +-  0.0       14.0
-  750     407.0    30.0    402.83    383.11    210.0 +-  0.0       12.1
-  600     483.0    51.0    564.65    526.27    210.9 +-  0.0       10.2
-  450     677.0    30.0   1093.57    954.64    212.5 +-  0.0        7.3
-  350     866.0    30.0   1761.21   1414.15    213.7 +-  0.0        5.7
+Filter    Centre   Filter   Total    Flux in    Brightness         HPBW
+Wavel.     Freq     Width    Flux     beam      Temperature       assumed
+micron     (GHz)    (GHz)    (Jy)      (Jy)         (K)          (arcsecs)
+ 2000      146.0    39.0     52.15     51.82    205.1 +-  0.0       33.8
+ 1300      221.0    60.0    119.63    117.86    207.1 +-  0.0       22.3
+ 1100      264.0    60.0    170.57    167.01    208.0 +-  0.0       18.7
+  850      350.0    30.0    298.81    287.79    209.3 +-  0.0       14.0
+  750      407.0    30.0    402.85    383.13    210.0 +-  0.0       12.1
+  600      483.0    51.0    564.68    526.30    210.9 +-  0.0       10.2
+  450      677.0    30.0   1093.62    954.69    212.5 +-  0.0        7.3
+  350      866.0    30.0   1761.30   1414.23    213.7 +-  0.0        5.7
+  200     1490.0    72.0   4915.53   3946.91    216.3 +-  0.0        5.7
 \end{terminalv}
 \end{small}
 and so on....
@@ -253,7 +264,7 @@ at the frequency being used.
 This is done by FLUXES and FLUXNOW.
 
 Historically, FLUXES was developed for use with the bolometer UKT14.
-For each of the presently available UKT14 filters the brightness temperature
+For each of the available UKT14 filters the brightness temperature
 and total flux density of the planet is calculated, along with the flux density
 visible to a 65mm aperture (the standard detector width) -- shown in the
 tables under the heading \texttt{Flux in beam}.
@@ -345,77 +356,6 @@ of \htmladdnormallink{HM Nautical Almanac Office}{http://www.ast.cam.ac.uk/}.
 \clearpage
 
 \appendix
-\section{Installation}
-\xlabel{INSTALLATION}
-\label{sec:installation}
-
-Most of what follows is likely to be of interest to site system managers only
-and may be skipped by the rest of us.
-
-The FLUXES/FLUXNOW code and associated files are supplied as a compressed
-tar file: \texttt{fluxes.tar.Z}.  To install FLUXES/FLUXNOW the file must be
-uncompressed and the contents extracted to a suitable directory.  On
-Starlink systems, this would normally be directory \texttt{/star/fluxes}. The
-operation is:
-
-\begin{terminalv}
-% cd /star/fluxes           (or some directory you specify)
-% zcat /tmp/fluxes.tar.Z | tar xvf -
-\end{terminalv}
-
-You must then set an environment variable to identify the type of operating
-system you are using. The example given below shows the value of
-\texttt{SYSTEM} needed to create a Solaris version of the software. The values
-required for other Starlink supported systems may be found in the files
-\texttt{mk} and \texttt{makefile}.
-
-\begin{terminalv}
-% setenv SYSTEM sun4_Solaris
-\end{terminalv}
-
-The UNIX `make' facility may then be employed to generate FLUXES in the
-current directory, clean up after itself and move the run time system
-to the directory from which it will normally be run.  Note that you must
-set the environmental variable \texttt{INSTALL} to reflect the directory
-above that in which you want FLUXES and FLUXNOW to be installed. On
-most Starlink system this will be directory \texttt{/star}:
-
-\begin{terminalv}
-% setenv INSTALL /star
-% ./mk build
-% ./mk clean strip
-% ./mk install
-\end{terminalv}
-
-Once this is done you can make FLUXES and FLUXNOW available to you
-by inserting:
-
-\begin{terminalv}
-if ( -e /star/bin/fluxes/fluxes) then
-   alias fluxes /star/bin/fluxes/fluxes.csh
-   alias fluxnow /star/bin/fluxes/fluxnow.csh
-else
-   alias fluxes cat /star/etc/not_installed
-   alias fluxnow cat /star/etc/not_installed
-endif
-\end{terminalv}
-
-into your \texttt{/star/etc/cshrc} file.  The example given assumes that
-you have chosen to have the FLUXES executable installed in directory
-\texttt{/star/bin/fluxes}.  Obviously you will need to change this if you
-have placed it elsewhere.   On Starlink systems, the
-\texttt{/star/etc/cshrc} file is already set up to run FLUXES.
-
-In addition, the environmental variable \texttt{FLUXES\_DIR} in \texttt{fluxes.csh}
-and \texttt{fluxnow.csh} must be set to name of the directory where the FLUXES
-executable resides.  The Starlink installations of FLUXES have this set
-automatically during installation.
-
-This behaviour is not the same as that employed for most other Starlink
-programs and reflects a compromise between the requirements of the JCMT
-observatory and normal Starlink practice.
-
-
 \section{Running in batch mode}
 \xlabel{batch_mode}
 \label{sec:batchmode}
