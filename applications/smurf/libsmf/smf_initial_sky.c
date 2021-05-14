@@ -268,7 +268,11 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
             if( *status == SAI__OK ) {
                double steptime = dat->res[0]->sdata[0]->hdr->steptime;
                for( i = 0; i < dat->msize; i++ ) {
-                  dat->hitsmap[ i ] =  (int) ( tptr[ i ]/steptime + 0.5 );
+                  if( tptr[ i ] != VAL__BADD ) {
+                     dat->hitsmap[ i ] = (int) ( tptr[ i ]/steptime + 0.5 );
+                  } else {
+                     dat->hitsmap[ i ] = 0;
+                  }
                }
             }
             ndfAnnul( &tndf2, status );
