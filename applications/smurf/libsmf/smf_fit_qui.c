@@ -89,16 +89,17 @@
 *     For each bolometer, the data within each "box" rotations of the
 *     waveplate is fitted using the following function ("w" is the angle
 *     of the waveplate, and "itime" is the zero-based offset of the time
-*     slice into the box):
+*     slice into the section of fitted data):
 *
 *        y = A*sin(4*w) + B*cos(4*w) + C*sin(2*w) + D*cos(2*w) +
 *            E*sin(w) + F*cos(w) + G*itime + H + J*sin(8*w) + K*cos(8*w)
 *
-*     The returned Q, U and I values are then:
+*     If NT is the number of time slices in the section of fitted data, the
+*     returned Q, U and I values are then:
 *
 *        U = 2*A
 *        Q = 2*B
-*        I = 2*( G*box/2 + H )
+*        I = 2*( G*NT/2 + H )
 *
 *     This is assuming "harmonic" is supplied set to 4. If it is set to
 *     1, the returned Q/U values are (I remains unchanged):
@@ -120,8 +121,8 @@
 *     focal plane Y axis (see argument "north").
 *
 *     Care is taken to ensure that each fitting box spans exactly the same
-*     range of "w" values. This is needed because the POL_ANG values are
-*     not exactly regular.
+*     range of "w" values. This is needed because neither the HWP rotation
+*     speed nor the sampling rate are exactly constant.
 *
 *     The residuals of the fit in each box are used to determine
 *     notional variances for the retruned Q, U and I. These are not
@@ -159,7 +160,7 @@
 *        Resample the JCMTState info using the correct scaling factor.
 *        Previously, the scaling factor did not take account of the fact
 *        that some input time slices are not used. This resulted in the
-*        wrong pointing info besing assigned to samples, with an
+*        wrong pointing info being assigned to samples, with an
 *        increasing error along the time stream, resulting in the source
 *        being smeared. The degree of smearing was related to how many input
 *        slices were unused and so varied from observation to observation.
@@ -269,7 +270,8 @@ static void smf1_fit_qui_job( void *job_data, int *status );
 static void smf1_fit_qui_job2( void *job_data, int *status );
 static void smf1_find_boxes( dim_t intslice, double ang0, dim_t box,
                              dim_t *ontslice, dim_t **box_starts, dim_t *lolim,
-                             dim_t *hilim, double *polang, int *status );
+                             dim_t *hilim, double *polang, double *scale,
+                             int *status );
 
 /* Number of free parameters in the fit */
 #define NPAR 10
@@ -304,20 +306,20 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    const char *usesys;      /* Tracking system */
    dim_t *box_starts;       /* Array holding time slice at start of each box */
    dim_t box_size;          /* First time slice in box */
-   dim_t hilim;             /* Max no. of samples in a box */
+   dim_t hilim=0;           /* Max no. of samples in a box */
    dim_t intslice;          /* ntslice of idata */
    dim_t iend;              /* Input time index at start of next fitting box */
    dim_t istart;            /* Input time index at start of fitting box */
    dim_t itime;             /* Time slice index */
    dim_t itstart;           /* Index of first used input time slice */
-   dim_t lolim;             /* Min no. of samples in a box */
+   dim_t lolim=0;           /* Min no. of samples in a box */
    dim_t nbolo;             /* No. of bolometers */
    dim_t ncol;              /* No. of columns of bolometers in the array */
    dim_t ntime;             /* Time slices to check */
    dim_t ondata;            /* ndata of odata */
    dim_t ontslice;          /* ntslice of odata */
    double *ptr;             /* Pointer to next POL_ANG value */
-   double scale;            /* how much longer new samples are */
+   double scale=1.0;        /* Mean no. of input samples per output sample */
    int bstep;               /* Bolometer step between threads */
    int iworker;             /* Index of a worker thread */
    int nodd;                /* No. of straneg box lengths found and ignored */
@@ -386,16 +388,13 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 /* Find the input time slice at which each fitting box starts, and the
    length of the output time axis (in time-slices). */
    smf1_find_boxes( intslice, ang0, box, &ontslice, &box_starts, &lolim,
-                    &hilim, polang, status );
+                    &hilim, polang, &scale, status );
 
 /* Adjust intslice to hold the number of used input time slices rather
    than the total number of input time slices. Also record the index of the
    first used input time slice. */
    itstart = box_starts[ 0 ];
    intslice = box_starts[ ontslice ] - itstart;
-
-/* Time axis scaling factor. */
-   scale = (double)intslice/(double) ontslice;
 
 /* First copy everything from input to output except for the data that needs
    to be downsampled */
@@ -463,9 +462,9 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    if( odatai ) (*odatai)->pntr[1] = astCalloc( ondata, sizeof(double) );
 
 /* Down-sample all the JCMTState values in the smfHead by selecting the
-   input time slice that is closest to the nominal box centre. These
-   approximate values will be replaced by more accurate value for the
-   important, fast-changing, fields later. */
+   input time slice that is closest to the box centre. These approximate
+   values will be replaced by more accurate value for the important,
+   fast-changing, fields later. */
    ohdr = (*odataq)->hdr;
 
    ohdr->curframe = (dim_t) (((double) ohdr->curframe + 0.5) / scale);
@@ -484,7 +483,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
          size_t frame;  /* index of nearest neighbour JCMTState */
 
          for( i=0; i<ontslice; i++ ) {
-            frame = (size_t) round(((double) i + 0.5)*scale) + itstart;
+            frame = ( box_starts[ i ] + box_starts[ i + 1 ] )/2;
             memcpy( outstate + i, instate + frame, sizeof(*instate) );
          }
       }
@@ -517,7 +516,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
          istart = box_starts[ itime ];
 
 /* Get the number of input time slices that contribute to the output time
-   slice. */
+   slice (iend is the index of the first sample in the next box). */
          iend = box_starts[ itime + 1 ];
          box_size = iend - istart;
 
@@ -1347,7 +1346,8 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 
 static void smf1_find_boxes( dim_t intslice, double ang0, dim_t box,
                              dim_t *ontslice, dim_t **box_starts, dim_t *lolim,
-                             dim_t *hilim, double *polang, int *status ) {
+                             dim_t *hilim, double *polang, double *scale,
+                             int *status ) {
 /*
 *  Name:
 *     smf1_find_boxes
@@ -1365,7 +1365,8 @@ static void smf1_find_boxes( dim_t intslice, double ang0, dim_t box,
 *  Invocation:
 *     void smf1_find_boxes( dim_t intslice, double ang0, dim_t box,
 *                           dim_t *ontslice, dim_t **box_starts, dim_t *lolim,
-*                           dim_t *hilim, double *polang, int *status )
+*                           dim_t *hilim, double *polang, double *scale,
+*                           int *status )
 
 *  Arguments:
 *     intslice = dim_t (Given)
@@ -1384,19 +1385,25 @@ static void smf1_find_boxes( dim_t intslice, double ang0, dim_t box,
 *        of the first input time slice beyond the end of the last fitting
 *        box.
 *     lolim = dim_t * (Returned)
-*        The lowest box length that should be used.
+*        The lowest box length that should be used, as a number of time
+*        slices.
 *     hilim = dim_t * (Returned)
-*        The highest box length that should be used.
+*        The highest box length that should be used, as a number of time
+*        slices.
 *     polang = double * (Given)
 *        Array of POL_ANG values to be used.
+*     scale = double * (Given)
+*        Returned holding the mean number of input slices per output
+*        slice, averaged over just those output slices with lengths
+*        between *lolim and *hilim.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
 *     This routine determines the start and end of each box over which
-*     to perform a least squares fit. It is needed because the
-*     half-waveplate (HWP) angles (the POL_ANG values in the JCMT state
-*     array) are not completely regular.
+*     to perform a least squares fit. It is needed because the sampling
+*     rate and half-waveplate (HWP) rotation speed are not necessarily
+*     constant.
 
 */
 
@@ -1489,18 +1496,32 @@ static void smf1_find_boxes( dim_t intslice, double ang0, dim_t box,
    of the last box. */
    (*ontslice)--;
 
-/* Find the mean and standard deviation of the box lengths. */
+/* Find the mean and standard deviation of the box lengths (measured as a
+   number of time slices). */
    s1 /= (*ontslice);
    s2 = s2/(*ontslice) - s1*s1;
    s2 = ( s2 > 0.0 ) ? sqrt( s2 ) : 0.0;
+
+   msgOutiff( MSG__VERB, " ", "Mean POL_ANG block length: %g", status, s1 );
+   msgOutiff( MSG__VERB, " ", "Sigma of POL_ANG block lengths: %g", status, s2 );
 
 /* Return the limits for usable box lengths. */
    *lolim = (dim_t) ( s1 - 3.0*s2 );
    *hilim = (dim_t) ( s1 + 3.0*s2 );
 
-   msgOutiff( MSG__VERB, " ", "Mean POL_ANG block length: %g", status, s1 );
-   msgOutiff( MSG__VERB, " ", "Sigma of POL_ANG block lengths: %g", status, s2 );
-
+/* Find and return the mean length of the usable boxes. */
+   s1 = 0.0;
+   s2 = 0.0;
+   for( iel = 0; iel < *ontslice; iel++ ){
+      length = (*box_starts)[ iel + 1 ] - (*box_starts)[ iel ];
+      if( length >= *lolim && length <= *hilim ){
+         s1 += length;
+         s2 += 1.0;
+      }
+   }
+   *scale = s1/s2;
+   msgOutiff( MSG__VERB, " ", "Mean POL_ANG block length (excluding unusual blocks): %g",
+              status, *scale );
 }
 
 
