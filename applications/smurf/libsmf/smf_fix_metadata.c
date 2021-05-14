@@ -208,9 +208,9 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
             && tmpState[1].rts_end != VAL__BADD) {
 
           /* Skip any initial padding that will have a constant value for
-             rts_end. */
+             rts_num. */
           size_t islice = 1;
-          while( islice < hdr->nframes-11 && tmpState[islice-1].rts_end >= tmpState[islice].rts_end ) {
+          while( islice < hdr->nframes-11 && tmpState[islice-1].rts_num >= tmpState[islice].rts_num ) {
              islice++;
           }
 
@@ -218,12 +218,20 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
           steptime *= SPD;
 
           /* Correct for actual number of steps */
-          steptime /= (tmpState[islice+10].rts_num - tmpState[islice].rts_num );
+          if( tmpState[islice+10].rts_num > tmpState[islice].rts_num ){
+             steptime /= (tmpState[islice+10].rts_num - tmpState[islice].rts_num );
+             msgSetd("STP", steptime);
+             msgOutif(MSG__VERB, " ", "WARNING: Determined step time to be ^STP"
+                      " by examining state information", status );
 
-          msgSetd("STP", steptime);
-          msgOutif(MSG__VERB, " ", "WARNING: Determined step time to be ^STP"
-                   " by examining state information", status );
-        } else {
+          } else if( *status == SAI__OK ) {
+             steptime = VAL__BADD;
+             *status = SAI__ERROR;
+             errRep( "", FUNC_NAME ": Unable to determine step time from header or "
+                     " from state information", status );
+          }
+
+        } else if( *status == SAI__OK ){
           /* no idea - make this fatal for now */
           steptime = VAL__BADD;
           *status = SAI__ERROR;
