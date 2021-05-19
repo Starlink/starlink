@@ -229,6 +229,11 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *     30-APR-2021 (GSB):
 *        Allow CONFIG to be NULL as described in the documentation if
 *        NDF or DEFAULTS is given.
+*     19-MAY-2021 (DSB):
+*        Modify 20-APR-2021 change to prevent config differences being
+*        displayed in cases where an NDF is supplied and CONFIG is set
+*        null (config differences should only be displayed if non-null
+*        values are supplied for both NDF and CONFIG).
 *     {enter_further_changes_here}
 
 *-
@@ -305,10 +310,43 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
       grpDelet( &grp, STATUS );
    }
 
+/* Abort if an error has occurred (to avoid eariler PAR__NULL errors being cancelled
+   by mistake below). */
+   if( *STATUS != SAI__OK ) goto L999;
+
 /* Create a KeyMap holding the selected alternative for each keyword, and
-   also supply defaults for any missing values (if a defaults file was
-   supplied by the user). */
-   keymap = kpg1Config( "CONFIG", defs[0]?defs:NULL, keymap2, ((defs[0] || indf) ? 1 : 0), STATUS );
+   also supply defaults for any missing values (if a defaults file was supplied
+   by the user). CONFIG may be null (!) if a config has been supplied using
+   either NDF or DEFAULTS. But we need to be able to distinguish between three cases:
+   1) NDF and CONFIG both supplied (in which case the reported output will include
+   the differences between the two configs)
+   2) NDF supplied but CONFIG not supplied (in which case the reported output
+   includes just the values read from the NDF)
+   3) NDF not supplied but CONFIG supplied (in which case the reported output
+   includes just the values from CONFIG).
+   To do this we need to be able to tell whether an explicit value was supplied
+   for CONFIG or whether CONFIG was set null and thus assumed the config specified
+   by DEFAULT. If no NDF was supplied then "historyConfig" will be null and so we can
+   just set "keymap" to the value specified by CONFIG or DEFAULTS (we need not
+   distinguish between these two cases - the fact that historyConfig is null will
+   prevent any config differences being displayed). If an NDF was supplied, then we
+   need to be able to tell whether the value returned in "keymap" came from CONFIG or
+   from DEFAULTS (in the former case we display config differences, but in the later
+   case we do not). For this reason we tell kpg1Config to accept the supplied defaults
+   if CONFIG is set null only if default were supplied AND no NDF was supplied. If an
+   NDF was supplied, then kpg1Config returns an error status if CONFIG is null, allowing
+   us subsequently to set "keymap" null and thus suppress the display of config
+   differences). */
+   keymap = kpg1Config( "CONFIG", defs[0]?defs:NULL, keymap2, ((defs[0] && !indf) ? 1 : 0),
+                        STATUS );
+
+/* If a null value was supplied for CONFIG and an NDF has been supplied, then annull
+   the error end ensure "keymap" is NULL. This ensures that only one of "keymap" and
+   "historyConfig" is non-NULL, thus preventing the display of config differences below. */
+   if( indf && *STATUS == PAR__NULL ) {
+      errAnnul(STATUS);
+      keymap = NULL;
+   }
 
 /* Abort if an error has occurred. */
    if( *STATUS != SAI__OK ) goto L999;
