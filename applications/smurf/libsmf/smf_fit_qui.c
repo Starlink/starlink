@@ -569,15 +569,9 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 /* Check this box is of a usable length. If not, set the box size to zero
    and increment the number of strange boxes. */
          if( box_size < lolim || box_size > hilim ) {
-            if( box_size < lolim ) {
-               msgOutiff( MSG__VERB, " ", "Unusually short POL_ANG block "
-                          "between time slice %zu and %zu.", status, istart,
-                          box_starts[ itime + 1 ] );
-            } else {
-               msgOutiff( MSG__VERB, " ", "Unusally long POL_ANG block "
-                          "between time slice %zu and %zu.", status, istart,
-                          box_starts[ itime + 1 ] );
-            }
+            msgOutiff( MSG__VERB, " ", "%s POL_ANG block: input samples %zu to %zu "
+                       "(output sample %zu).", status, (box_size < lolim)?"Short":"Long",
+                       istart, box_starts[ itime + 1 ], itime );
             nodd++;
             box_size = 0;
          }

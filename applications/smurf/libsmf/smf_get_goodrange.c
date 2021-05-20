@@ -113,8 +113,8 @@ void smf_get_goodrange( const smf_qual_t *quality, dim_t ntslice,
 
    if( i==ntslice ) {
      *status=SAI__ERROR;
-     errRep( "", FUNC_NAME ": Entire array is flagged!",
-             status );
+     errRepf( "", FUNC_NAME ": Entire array (%zu slices) is flagged!",
+             status, ntslice );
    } else {
      i1 = i;
      /* Last sample if first was found */
