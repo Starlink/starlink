@@ -50,6 +50,12 @@
 *     METHOD = LITERAL (Read)
 *        The compression method to use.  The options are as follows.
 *
+*        - "BOTH" -- A lossy compression scheme for all data types.
+*        It first creates an intermediate NDF from the supplied NDF using
+*        "SCALED" compression and then creates the final ouput NDF by
+*        applying "DELTA" compression to the intermediate NDF. The
+*        intermediate NDF is then deleted.
+*
 *        - "SCALED" -- A lossy compression scheme for all data types.
 *        See "Scaled Compression" below, and Parameters DSCALE, DZERO,
 *        VSCALE, VZERO, and SCALEDTYPE.
@@ -177,6 +183,7 @@
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2021 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -210,6 +217,8 @@
 *        used, use unity instead.
 *     3-NOV-2010 (DSB):
 *        Include support for delta compressed arrays.
+*     21-MAY-2021 (DSB):
+*        Added method "BOTH".
 *     {enter_further_changes_here}
 
 *-
@@ -240,6 +249,7 @@
       CHARACTER COMP(3)*8        ! NDF array component names
       CHARACTER COMPS*30         ! List of NDF components to compress
       CHARACTER FORM*(NDF__SZFRM)! Array storage form
+      CHARACTER CMPRS( 2 )*5     ! Explicit compression method
       CHARACTER METHOD*5         ! Compression method
       CHARACTER SCLPAR(2)*6      ! Parameters for getting scale values
       CHARACTER STYPE*(DAT__SZTYP)! Numerical type of scaled array
@@ -257,16 +267,20 @@
       INTEGER I                  ! Loop index
       INTEGER IAT                ! Number of characters in the string
       INTEGER ICOMP              ! Component index
+      INTEGER ICMPR              ! Compression  method index
       INTEGER INDF1              ! Input NDF identifier
       INTEGER INDF2              ! Template NDF identifier
+      INTEGER INDFIN             ! Input NDF for current compression
       INTEGER IP1                ! Pointer to mapped input array
       INTEGER IP2                ! Pointer to mapped output array
       INTEGER MAXPOS             ! Index of elements with max value
       INTEGER MINPOS             ! Index of elements with min value
       INTEGER NBAD               ! Number of unaccommodated input pixels
+      INTEGER NCMPR              ! No. of compressions to apply
       INTEGER NDIM               ! Number of input NDF dimensions
       INTEGER NINVAL             ! Number of bad values found
-      INTEGER PLACE              ! NDF Placeholder for output NDF
+      INTEGER PLACE              ! Placeholder for current compression output
+      INTEGER PLACE2             ! Placeholder for final output NDF
       INTEGER ZAXIS              ! Delta compression axis
       LOGICAL BAD                ! Bad values in input array component?
       LOGICAL BADOUT             ! Bad values in output array component?
@@ -288,290 +302,341 @@
 *  Obtain the input NDF.
       CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
 
+*  Obtain a placeholder for the output NDF.
+      CALL LPG_CREPL( 'OUT', PLACE2, STATUS )
+
 *  Obtain the compression method.
-      CALL PAR_CHOIC( 'METHOD', METHOD, 'SCALE,DELTA', .TRUE., METHOD,
-     :                STATUS )
+      CALL PAR_CHOIC( 'METHOD', METHOD, 'SCALE,DELTA,BOTH', .TRUE.,
+     :                 METHOD, STATUS )
+
+*  Store the required compressions
+      IF( METHOD .EQ. 'BOTH' ) THEN
+         NCMPR = 2
+         CMPRS( 1 ) = 'SCALE'
+         CMPRS( 2 ) = 'DELTA'
+      ELSE
+         NCMPR = 1
+         CMPRS( 1 ) = METHOD
+      END IF
+
+*  Loop over the required compression methods.
+      DO ICMPR = 1, NCMPR
+
+*  Note the identifier for the NDF containing the data to be compressed.
+*  On the first pass it is the input NDF specified by parameter IN. On
+*  subsequent passes it is the output from the previous pass.
+         IF( ICMPR .EQ. 1 ) THEN
+            INDFIN = INDF1
+         ELSE
+            INDFIN = INDF2
+            INDF2 = NDF__NOID
+         END IF
+
+*  Get a placeholder for a new NDF to receive the output from the
+*  current compression. The output from the final compression goes into
+*  the NDF specified by parameter OUT. Earlier compressions go into
+*  temporary NDFs.
+         IF( ICMPR .EQ. NCMPR ) THEN
+            PLACE = PLACE2
+         ELSE
+            CALL NDF_TEMP( PLACE, STATUS )
+         END IF
+
+*  Tell the user which compression is being performed.
+         IF( NCMPR .GT. 1 ) THEN
+            CALL MSG_SETC( 'C', CMPRS( ICMPR ) )
+            CALL MSG_OUT( ' ','Performing ^C compression...', STATUS )
+         END IF
 
 *  First deal with SCALE compression.
-      IF( METHOD .EQ. 'SCALE' ) THEN
+         IF( CMPRS( ICMPR ) .EQ. 'SCALE' ) THEN
 
 *  Create the output NDF by propagating everything except the Data and
 *  Variance arrays.
-         CALL LPG_PROP( INDF1, 'Title,Label,Units,Quality,Axis,' //
-     :                  'History,WCS', 'OUT', INDF2, STATUS )
+            CALL NDF_SCOPY( INDFIN, 'Title,Label,Units,Quality,Axis,' //
+     :                     'History,WCS', PLACE, INDF2, STATUS )
 
 *  Get the data type for the scaled values in the output NDF.
-         CALL PAR_CHOIC( 'SCALEDTYPE', STYPE, '_INTEGER,_WORD,_UWORD,'//
-     :                   '_BYTE,_UBYTE', .TRUE., STYPE, STATUS )
+            CALL PAR_CHOIC( 'SCALEDTYPE', STYPE, '_INTEGER,_WORD,'//
+     :                      '_UWORD,_BYTE,_UBYTE', .TRUE., STYPE,
+     :                      STATUS )
 
 *  Set the output NDF to have the selected data type.
-         CALL NDF_STYPE( STYPE, INDF2, 'Data,Variance', STATUS )
+            CALL NDF_STYPE( STYPE, INDF2, 'Data,Variance', STATUS )
 
 *  Loop round the Data and Variance arrays.
-         CALL MSG_BLANK( STATUS )
-         DO I = 1, 2
+            CALL MSG_BLANK( STATUS )
+            DO I = 1, 2
 
 *  Pass on if the component is not defined in the input NDF.
-            CALL NDF_STATE( INDF1, COMP( I ), THERE, STATUS )
-            IF( THERE ) THEN
+               CALL NDF_STATE( INDFIN, COMP( I ), THERE, STATUS )
+               IF( THERE ) THEN
 
 *  Get the data type of the input NDF array component.
-               CALL NDF_TYPE( INDF1, COMP( I ), TYPE, STATUS )
+                  CALL NDF_TYPE( INDFIN, COMP( I ), TYPE, STATUS )
 
 *  Map the input array, and see if there may be any bad values in the
 *  mapped array.
-               CALL NDF_MAP( INDF1, COMP( I ), TYPE, 'READ', IP1, EL,
-     :                       STATUS )
-               CALL NDF_BAD( INDF1, COMP( I ), .FALSE., BAD, STATUS )
+                  CALL NDF_MAP( INDFIN, COMP( I ), TYPE, 'READ', IP1,
+     :                          EL, STATUS )
+                  CALL NDF_BAD( INDFIN, COMP( I ), .FALSE., BAD,
+     :                          STATUS )
 
 *  Check that no error has occurred.  This is so that we can be sure
 *  that  any PAR__NULL error following the next two PAR_GET0D calls was
 *  generated  by one of the two PAR calls.
-               IF( STATUS .NE. SAI__OK ) GO TO 999
+                  IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the scale and zero values from the user.
-               CALL PAR_GET0D( SCLPAR( I ), SCALE, STATUS )
-               CALL PAR_GET0D( ZERPAR( I ), ZERO, STATUS )
+                  CALL PAR_GET0D( SCLPAR( I ), SCALE, STATUS )
+                  CALL PAR_GET0D( ZERPAR( I ), ZERO, STATUS )
 
 *  If a null value was supplied for either, annul the error and
 *  calculate default values.
-               IF( STATUS .EQ. PAR__NULL ) THEN
-                  CALL ERR_ANNUL( STATUS )
+                  IF( STATUS .EQ. PAR__NULL ) THEN
+                     CALL ERR_ANNUL( STATUS )
 
 *  Get the max and min data values in the input array.
-                  CALL KPG1_MXMNX( TYPE, BAD, EL, IP1, NINVAL, MAXVAL,
-     :                             MINVAL, MAXPOS, MINPOS, STATUS )
+                     CALL KPG1_MXMNX( TYPE, BAD, EL, IP1, NINVAL,
+     :                                MAXVAL, MINVAL, MAXPOS, MINPOS,
+     :                                STATUS )
 
 *  Get the maximum and minimum data values representable by the selected
 *  scaled data type.
-                  IF( STYPE .EQ. '_INTEGER' ) THEN
-                     VMX = VAL_ITOD( .FALSE., VAL__MAXI, STATUS )
-                     VMN = VAL_ITOD( .FALSE., VAL__MINI, STATUS )
+                     IF( STYPE .EQ. '_INTEGER' ) THEN
+                        VMX = VAL_ITOD( .FALSE., VAL__MAXI, STATUS )
+                        VMN = VAL_ITOD( .FALSE., VAL__MINI, STATUS )
 
-                  ELSE IF( STYPE .EQ. '_WORD' ) THEN
-                     VMX = VAL_WTOD( .FALSE., VAL__MAXW, STATUS )
-                     VMN = VAL_WTOD( .FALSE., VAL__MINW, STATUS )
+                     ELSE IF( STYPE .EQ. '_WORD' ) THEN
+                        VMX = VAL_WTOD( .FALSE., VAL__MAXW, STATUS )
+                        VMN = VAL_WTOD( .FALSE., VAL__MINW, STATUS )
 
-                  ELSE IF( STYPE .EQ. '_UWORD' ) THEN
-                     VMX = VAL_UWTOD( .FALSE., VAL__MAXUW, STATUS )
-                     VMN = VAL_UWTOD( .FALSE., VAL__MINUW, STATUS )
+                     ELSE IF( STYPE .EQ. '_UWORD' ) THEN
+                        VMX = VAL_UWTOD( .FALSE., VAL__MAXUW, STATUS )
+                        VMN = VAL_UWTOD( .FALSE., VAL__MINUW, STATUS )
 
-                  ELSE IF( STYPE .EQ. '_BYTE' ) THEN
-                     VMX = VAL_BTOD( .FALSE., VAL__MAXB, STATUS )
-                     VMN = VAL_BTOD( .FALSE., VAL__MINB, STATUS )
+                     ELSE IF( STYPE .EQ. '_BYTE' ) THEN
+                        VMX = VAL_BTOD( .FALSE., VAL__MAXB, STATUS )
+                        VMN = VAL_BTOD( .FALSE., VAL__MINB, STATUS )
 
-                  ELSE IF( STYPE .EQ. '_UBYTE' ) THEN
-                     VMX = VAL_UBTOD( .FALSE., VAL__MAXUB, STATUS )
-                     VMN = VAL_UBTOD( .FALSE., VAL__MINUB, STATUS )
+                     ELSE IF( STYPE .EQ. '_UBYTE' ) THEN
+                        VMX = VAL_UBTOD( .FALSE., VAL__MAXUB, STATUS )
+                        VMN = VAL_UBTOD( .FALSE., VAL__MINUB, STATUS )
 
-                  ELSE IF( STATUS .EQ. SAI__OK ) THEN
-                     STATUS = SAI__ERROR
-                     CALL MSG_SETC( 'T', TYPE )
-                     CALL ERR_REP( 'NDFCOMP_ERR1', 'NDFCOMPRESS: '//
-     :                             'Unsupported data type ''^T'' '//
-     :                             '(programming error).', STATUS )
-                  END IF
+                     ELSE IF( STATUS .EQ. SAI__OK ) THEN
+                        STATUS = SAI__ERROR
+                        CALL MSG_SETC( 'T', TYPE )
+                        CALL ERR_REP( 'NDFCOMP_ERR1', 'NDFCOMPRESS: '//
+     :                                'Unsupported data type ''^T'' '//
+     :                                '(programming error).', STATUS )
+                     END IF
 
 *  Calculate the "wide" default scale and zero values so that the scaled
 *  values cover 96% of the available scaled data range.
-                  IF( MAXVAL .NE. MINVAL ) THEN
-                     SCALE = ( MAXVAL - MINVAL )/( 0.96*( VMX - VMN ) )
-                  ELSE
-                     SCALE = 1.0D0
-                  END IF
+                     IF( MAXVAL .NE. MINVAL ) THEN
+                        SCALE = ( MAXVAL - MINVAL )/
+     :                          ( 0.96*( VMX - VMN ) )
+                     ELSE
+                        SCALE = 1.0D0
+                     END IF
 
 *  Calculate the ZERO that causes the middle input data value to be mapped
 *  onto the mid point of the avilable output data range.
-                  ZERO = 0.5*( MAXVAL + MINVAL ) -
-     :                   SCALE*0.5*( VMX + VMN )
+                     ZERO = 0.5*( MAXVAL + MINVAL ) -
+     :                      SCALE*0.5*( VMX + VMN )
 
-               END IF
+                  END IF
 
 *  Convert the scale and zero to the data type of the output NDF, and
 *  tell the user what values are being used.
-               IF( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL MSG_SETD( 'S', SCALE )
-                  CALL MSG_SETD( 'Z', ZERO )
+                  IF( TYPE .EQ. '_DOUBLE' ) THEN
+                     CALL MSG_SETD( 'S', SCALE )
+                     CALL MSG_SETD( 'Z', ZERO )
 
-               ELSE IF( TYPE .EQ. '_REAL' ) THEN
-                  SCALE = REAL( SCALE )
-                  IF( SCALE .EQ. 0.0 ) SCALE = 1.0
-                  ZERO = REAL( ZERO )
-                  CALL MSG_SETR( 'S', REAL( SCALE ) )
-                  CALL MSG_SETR( 'Z', REAL( ZERO ) )
+                  ELSE IF( TYPE .EQ. '_REAL' ) THEN
+                     SCALE = REAL( SCALE )
+                     IF( SCALE .EQ. 0.0 ) SCALE = 1.0
+                     ZERO = REAL( ZERO )
+                     CALL MSG_SETR( 'S', REAL( SCALE ) )
+                     CALL MSG_SETR( 'Z', REAL( ZERO ) )
 
-               ELSE
-                  SCALE = NINT( SCALE )
-                  ZERO = NINT( ZERO )
-                  IF( SCALE .EQ. 0 ) SCALE = 1
-                  CALL MSG_SETI( 'S', NINT( SCALE ) )
-                  CALL MSG_SETI( 'Z', NINT( ZERO ) )
+                  ELSE
+                     SCALE = NINT( SCALE )
+                     ZERO = NINT( ZERO )
+                     IF( SCALE .EQ. 0 ) SCALE = 1
+                     CALL MSG_SETI( 'S', NINT( SCALE ) )
+                     CALL MSG_SETI( 'Z', NINT( ZERO ) )
 
-               END IF
+                  END IF
 
-               CALL MSG_SETC( 'C', COMP( I ) )
-               CALL MSG_OUT( 'NDFCOMP_MSG1', '  ^C component: '//
-     :                          'using Scale=^S   Zero=^z', STATUS )
+                  CALL MSG_SETC( 'C', COMP( I ) )
+                  CALL MSG_OUT( 'NDFCOMP_MSG1', '  ^C component: '//
+     :                             'using Scale=^S   Zero=^z', STATUS )
 
 *  Map the output array into which will be put the scaled values.
-               CALL NDF_MAP( INDF2, COMP( I ), STYPE, 'WRITE', IP2, EL,
-     :                       STATUS )
+                  CALL NDF_MAP( INDF2, COMP( I ), STYPE, 'WRITE', IP2,
+     :                          EL, STATUS )
 
 *  Copy the input array to the output array, scaling them in the
 *  process.
-               CALL KPG1_SCALX( SCALE, ZERO, BAD, EL, TYPE, IP1,
-     :                          STYPE, IP2, BADOUT, NBAD, STATUS )
+                  CALL KPG1_SCALX( SCALE, ZERO, BAD, EL, TYPE, IP1,
+     :                             STYPE, IP2, BADOUT, NBAD, STATUS )
 
 *  Unmap the output array, since the scale and zero values cannot be
 *  set if the array is mapped.
-               CALL NDF_UNMAP( INDF2, COMP( I ), STATUS )
+                  CALL NDF_UNMAP( INDF2, COMP( I ), STATUS )
 
 *  Set the output bad-pixel flag.
-               CALL NDF_SBAD( BADOUT, INDF2, COMP( I ), STATUS )
+                  CALL NDF_SBAD( BADOUT, INDF2, COMP( I ), STATUS )
 
 *  Give a warning if any input pixel values did not fit into the output
 *  data range.
-               IF( NBAD .EQ. 1 ) THEN
-                  CALL MSG_OUT( 'NDFCOMP_MSG2', '  One pixel did not '//
-     :                          'fit into the scaled data range.',
-     :                          STATUS )
-                  CALL MSG_BLANK( STATUS )
+                  IF( NBAD .EQ. 1 ) THEN
+                     CALL MSG_OUT( 'NDFCOMP_MSG2', '  One pixel did '//
+     :                            'not fit into the scaled data range.',
+     :                             STATUS )
+                     CALL MSG_BLANK( STATUS )
 
-               ELSE IF( NBAD .GT. 1 ) THEN
-                  CALL MSG_SETI( 'N', NBAD )
-                  CALL MSG_OUT( 'NDFCOMP_MSG3', '  ^N pixels did not '//
-     :                          'fit into the scaled data range.',
-     :                          STATUS )
-                  CALL MSG_BLANK( STATUS )
-               END IF
+                  ELSE IF( NBAD .GT. 1 ) THEN
+                     CALL MSG_SETI( 'N', NBAD )
+                     CALL MSG_OUT( 'NDFCOMP_MSG3', '  ^N pixels did '//
+     :                            'not fit into the scaled data range.',
+     :                             STATUS )
+                     CALL MSG_BLANK( STATUS )
+                  END IF
 
 *  Store the scale and zero terms in the output NDF. This will convert
 *  its storage form from simple to scaled, and change the data type of
 *  the NDF to the data type of the scale and zero terms.
-               IF( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL NDF_PTSZD( SCALE, ZERO, INDF2, COMP( I ),
-     :                            STATUS )
+                  IF( TYPE .EQ. '_DOUBLE' ) THEN
+                     CALL NDF_PTSZD( SCALE, ZERO, INDF2, COMP( I ),
+     :                               STATUS )
 
-               ELSE IF( TYPE .EQ. '_REAL' ) THEN
-                  CALL NDF_PTSZR( VAL_DTOR( .FALSE., SCALE, STATUS ),
-     :                           VAL_DTOR( .FALSE., ZERO, STATUS ),
-     :                           INDF2, COMP( I ), STATUS )
+                  ELSE IF( TYPE .EQ. '_REAL' ) THEN
+                     CALL NDF_PTSZR( VAL_DTOR( .FALSE., SCALE, STATUS ),
+     :                              VAL_DTOR( .FALSE., ZERO, STATUS ),
+     :                              INDF2, COMP( I ), STATUS )
 
-               ELSE
-                  CALL NDF_PTSZI( VAL_DTOI( .FALSE., SCALE, STATUS ),
-     :                           VAL_DTOI( .FALSE., ZERO, STATUS ),
-     :                           INDF2, COMP( I ), STATUS )
+                  ELSE
+                     CALL NDF_PTSZI( VAL_DTOI( .FALSE., SCALE, STATUS ),
+     :                              VAL_DTOI( .FALSE., ZERO, STATUS ),
+     :                              INDF2, COMP( I ), STATUS )
+                  END IF
+
                END IF
-
-            END IF
-         END DO
-         CALL MSG_BLANK( STATUS )
+            END DO
+            CALL MSG_BLANK( STATUS )
 
 *  Now deal with DELTA compression.
-      ELSE IF( METHOD .EQ. 'DELTA' ) THEN
+         ELSE IF( CMPRS( ICMPR ) .EQ. 'DELTA' ) THEN
 
 *  First form a comma-separated list of the components to be compressed.
 *  Loop round each possible array component. Skip components that do no
 *  exist in the NDF or contain floating point data. For scaled arrays,
 *  the data type used is the internal (scaled) data type.
-         COMPS = ' '
-         IAT = 0
-         DO ICOMP = 1, 3
-            CALL NDF_STATE( INDF1, COMP( ICOMP ), THERE, STATUS )
-            IF( THERE ) THEN
+            COMPS = ' '
+            IAT = 0
+            DO ICOMP = 1, 3
+               CALL NDF_STATE( INDFIN, COMP( ICOMP ), THERE, STATUS )
+               IF( THERE ) THEN
 
-               CALL NDF_FORM( INDF1, COMP( ICOMP ), FORM, STATUS )
-               IF( FORM .EQ. 'SCALED' .AND. ICOMP .NE. 3 ) THEN
-                  CALL NDF_SCTYP( INDF1, COMP( ICOMP ), TYPE, STATUS )
-               ELSE
-                  CALL NDF_TYPE( INDF1, COMP( ICOMP ), TYPE, STATUS )
+                  CALL NDF_FORM( INDFIN, COMP( ICOMP ), FORM, STATUS )
+                  IF( FORM .EQ. 'SCALED' .AND. ICOMP .NE. 3 ) THEN
+                     CALL NDF_SCTYP( INDFIN, COMP( ICOMP ), TYPE,
+     :                               STATUS )
+                  ELSE
+                     CALL NDF_TYPE( INDFIN, COMP( ICOMP ), TYPE,
+     :                              STATUS )
+                  END IF
+
+                  IF( TYPE .NE. '_REAL' .AND. TYPE .NE. '_DOUBLE' ) THEN
+                     IF( IAT .GT. 0 ) CALL CHR_APPND( ',', COMPS, IAT )
+                     CALL CHR_APPND( COMP( ICOMP ), COMPS, IAT )
+                  END IF
+
                END IF
-
-               IF( TYPE .NE. '_REAL' .AND. TYPE .NE. '_DOUBLE' ) THEN
-                  IF( IAT .GT. 0 ) CALL CHR_APPND( ',', COMPS, IAT )
-                  CALL CHR_APPND( COMP( ICOMP ), COMPS, IAT )
-               END IF
-
-            END IF
-         END DO
+            END DO
 
 *  Report an error if there is nothing to compress.
-         IF( IAT .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
-            STATUS = SAI__ERROR
-            CALL NDF_MSG( 'N', INDF1 )
-            CALL ERR_REP( ' ', 'The NDF ''^N'' contains floating '//
-     :                    'point data and so cannot be DELTA '//
-     :                    'compressed.', STATUS )
-            GO TO 999
-         END IF
-
-*  Get a placeholder for the output NDF.
-         CALL LPG_CREPL( 'OUT', PLACE, STATUS )
+            IF( IAT .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL NDF_MSG( 'N', INDFIN )
+               CALL ERR_REP( ' ', 'The NDF ''^N'' contains floating '//
+     :                       'point data and so cannot be DELTA '//
+     :                       'compressed.', STATUS )
+               GO TO 999
+            END IF
 
 *  Get the data type in which to store the differences between adjacent
 *  uncompressed data values. Use a blank default which causes NDF_ZSCAL
 *  to choose the best data type.
-         ZTYPE = ' '
-         CALL PAR_CHOIC( 'ZTYPE', ZTYPE, '_INTEGER,_WORD,_BYTE,',
-     :                   .TRUE., ZTYPE, STATUS )
+            ZTYPE = ' '
+            CALL PAR_CHOIC( 'ZTYPE', ZTYPE, '_INTEGER,_WORD,_BYTE,',
+     :                      .TRUE., ZTYPE, STATUS )
 
 *  Get the minimum acceptable compression ratio.
-         CALL PAR_GET0R( 'ZMINRATIO', MINRAT, STATUS )
+            CALL PAR_GET0R( 'ZMINRATIO', MINRAT, STATUS )
 
 *  Get the compression axis. Use a zero default which causes NDF_ZSCAL
 *  to choose the best compression axis.
-         CALL NDF_DIM( INDF1, NDF__MXDIM, DIMS, NDIM, STATUS )
-         CALL PAR_GDR0I( 'ZAXIS', 0, 0, NDIM, .TRUE., ZAXIS, STATUS )
+            CALL NDF_DIM( INDFIN, NDF__MXDIM, DIMS, NDIM, STATUS )
+            CALL PAR_GDR0I( 'ZAXIS', 0, 0, NDIM, .TRUE., ZAXIS, STATUS )
 
 *  Create a copy of the input NDF in which the array components selected
 *  above are delta compressed.
-         CALL NDF_ZDELT( INDF1, COMPS( : IAT ), MINRAT, ZAXIS, ZTYPE,
-     :                   PLACE, INDF2, ZRATIO, STATUS )
+            CALL NDF_ZDELT( INDFIN, COMPS( : IAT ), MINRAT, ZAXIS,
+     :                      ZTYPE, PLACE, INDF2, ZRATIO, STATUS )
 
 *  Report details of the compression applied to each array component in
 *  the output NDF.
-         CALL MSG_BLANK( STATUS )
-         CALL NDF_MSG( 'N', INDF2 )
-         CALL MSG_OUT( ' ', '   Details of delta compression in ^N:',
-     :                 STATUS )
-         CALL MSG_BLANK( STATUS )
+            CALL MSG_BLANK( STATUS )
+            CALL NDF_MSG( 'N', INDF2 )
+            CALL MSG_OUT( ' ', '   Details of delta compression in ^N:',
+     :                    STATUS )
+            CALL MSG_BLANK( STATUS )
 
-         DO ICOMP = 1, 3
-            CALL NDF_STATE( INDF2, COMP( ICOMP ), THERE, STATUS )
-            IF( THERE ) THEN
+            DO ICOMP = 1, 3
+               CALL NDF_STATE( INDF2, COMP( ICOMP ), THERE, STATUS )
+               IF( THERE ) THEN
 
-               CALL CHR_LCASE( COMP( ICOMP )( 2 : ) )
-               CALL MSG_SETC( 'T', COMP( ICOMP ) )
-               CALL MSG_OUT( ' ', '   ^T:', STATUS )
+                  CALL CHR_LCASE( COMP( ICOMP )( 2 : ) )
+                  CALL MSG_SETC( 'T', COMP( ICOMP ) )
+                  CALL MSG_OUT( ' ', '   ^T:', STATUS )
 
-               CALL NDF_GTDLT( INDF2, COMP( ICOMP ), ZAXIS, ZTYPE,
-     :                         ZRATIO, STATUS )
-               IF( ZAXIS .GT. 0 ) THEN
-                  CALL MSG_SETI( 'T', ZAXIS )
-                  CALL MSG_OUT( ' ', '      Compression axis: ^T',
-     :                          STATUS )
-                  CALL MSG_SETC( 'T', ZTYPE )
-                  CALL MSG_OUT( ' ', '      Compressed data type: ^T',
-     :                          STATUS )
-                  CALL MSG_SETR( 'T', ZRATIO )
-                  CALL MSG_OUT( ' ', '      Compression ratio: ^T',
-     :                          STATUS )
-               ELSE
-                  CALL MSG_OUT( ' ', '      Uncompressed', STATUS )
+                  CALL NDF_GTDLT( INDF2, COMP( ICOMP ), ZAXIS, ZTYPE,
+     :                            ZRATIO, STATUS )
+                  IF( ZAXIS .GT. 0 ) THEN
+                     CALL MSG_SETI( 'T', ZAXIS )
+                     CALL MSG_OUT( ' ', '      Compression axis: ^T',
+     :                             STATUS )
+                     CALL MSG_SETC( 'T', ZTYPE )
+                     CALL MSG_OUT( ' ', '      Compressed data type:'//
+     :                             ' ^T', STATUS )
+                     CALL MSG_SETR( 'T', ZRATIO )
+                     CALL MSG_OUT( ' ', '      Compression ratio: ^T',
+     :                             STATUS )
+                  ELSE
+                     CALL MSG_OUT( ' ', '      Uncompressed', STATUS )
+                  END IF
+
                END IF
+            END DO
 
-            END IF
-         END DO
-
-         CALL MSG_BLANK( STATUS )
+            CALL MSG_BLANK( STATUS )
 
 *  Report an error if the compression method is not recognised.
-      ELSE IF( STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL MSG_SETC( 'M', METHOD )
-         CALL ERR_REP( 'NDFCOMP_ERR3', 'The ^M method has not yet '//
-     :                 'been implemented.', STATUS )
-      END IF
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'M', CMPRS( ICMPR ) )
+            CALL ERR_REP( 'NDFCOMP_ERR3', 'The ^M method has not yet '//
+     :                    'been implemented.', STATUS )
+         END IF
+
+*  If the input to the compression just completed was a temporary NDF,
+*  delete it.
+         IF( ICMPR .GT. 1 ) CALL NDF_DELET( INDFIN, STATUS )
+
+      END DO
 
 *  Tidy up
  999  CONTINUE
