@@ -1,0 +1,268 @@
+#include "sae_par.h"
+#include "star/thr.h"
+#include "prm.h"
+
+
+/* Local data types */
+typedef struct  CGEN_FUNCTION(kpgCmultData) {
+   size_t i1;
+   size_t i2;
+   size_t nerr;
+   double cons;
+   int bad;
+   const CGEN_TYPE *a;
+   CGEN_TYPE *b;
+} CGEN_FUNCTION(kpgCmultData);
+
+/* Prototypes for local static functions. */
+static void CGEN_FUNCTION(kpgCmult_work)( void *job_data_ptr, int *status );
+
+
+void CGEN_FUNCTION(kpgCmult)( ThrWorkForce *wf, int bad, size_t el,
+                             const CGEN_TYPE *a, double cons, CGEN_TYPE *b,
+                             size_t *nerr, int *status ){
+/*
+*+
+*  Name:
+*     kpgCmult<T>
+
+*  Purpose:
+*     Multiply a vectorised array by a constant
+
+*  Synopsis:
+*     void kpgCmult<T>( ThrWorkForce *wf, int bad, size_t el,
+*                      const CGEN_TYPE *a, double cons, CGEN_TYPE *b,
+*                      size_t *nerr, int *status )
+
+*  Description:
+*     This function multiplies a vectorised array by a constant.
+*     Bad value checking is also performed if required.
+
+*  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads (see thrGetWorkForce in the
+*        Starlink "thr" library). If NULL is supplied, all calculations
+*        will be done in the current thread.
+*     bad
+*        Whether it is necessary to check for bad values in the input
+*        array.  The routine will execute more rapidly if this checking
+*        can be omitted.
+*     el
+*        Number of array elements to process.
+*     a
+*        Pointer to the input array of data.
+*     cons
+*        The constant factor by which to multiple "a".
+*     b
+*        Pointer to array holding result of multipling "a" by "cons".
+*     nerr
+*        Pointer to value in which to return the number of numerical errors
+*        that occurred during the calculations.
+*     status
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each of the standard numeric types.
+*     Replace "<T>" in the routine name by D, R, I, W, UW, B or UB as
+*     appropriate.
+
+*  Copyright:
+*     Copyright (C) 2021 East Asian Observatory.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     DSB: David S Berry (EAO)
+*     {enter_new_authors_here}
+
+*  History:
+*     21-MAY-2021 (DSB):
+*        Original C version.
+*     {enter_further_changes_here}
+
+*-
+*/
+
+/* Local Variables: */
+   CGEN_FUNCTION(kpgCmultData) *pdata; /* Pointer to single job data structure */
+   CGEN_FUNCTION(kpgCmultData) *job_data; /* Pointer to all job data structures */
+   int iw;           /* Index of worker thread */
+   int nw;           /* Number of threads to use */
+   size_t step;      /* Number of data elements per thread */
+
+/* Initialise */
+   *nerr = 0;
+
+/* Check inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* How many worker threads in the workforce? If the number of pixels is
+   very low, do all the calculations in the current thread. */
+   nw = wf ? wf->nworker : 1;
+   if( el < 100*nw ) nw = 1;
+
+/* Find how many data elements to process in each worker thread. Must be
+   at least one. */
+   if( nw > 0 ) {
+      step = el/nw;
+   } else {
+      step = el;
+   }
+
+/* Allocate job data for threads. Each structure describes a single job
+   to process a subset of the pixels, and will be allocated to a single
+   worker thread. Store the first and last array elements to be processed
+   by the worker thread in each structure. The last worker picks up any
+   remaining elements left over by the integer division used to calculate
+   "step". Also store some other required constant values in each structure. */
+   job_data = astCalloc( nw, sizeof(*job_data) );
+   if( *status == SAI__OK ) {
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         pdata->i1 = iw*step;
+         if( iw < nw - 1 ) {
+            pdata->i2 = pdata->i1 + step - 1;
+         } else {
+            pdata->i2 = el - 1;
+         }
+
+         pdata->a = a;
+         pdata->b = b;
+         pdata->cons = cons;
+         pdata->bad = bad;
+
+/* Submit the job to the workforce. */
+         thrAddJob( wf, 0, pdata, CGEN_FUNCTION(kpgCmult_work), 0, NULL,
+                    status );
+      }
+
+/* Put the current thread to sleep until all the above jobs have completed. */
+      thrWait( wf, status );
+
+/* Now combine the nerr values returned by each worker thread for its own
+   section of the data array to get the total nerr value. */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         *nerr += pdata->nerr;
+      }
+   }
+
+/* Free resources. */
+   job_data = astFree( job_data );
+}
+
+
+
+
+static void CGEN_FUNCTION(kpgCmult_work)( void *job_data_ptr, int *status ){
+/*
+*  Name:
+*     kpgCmult_work<X>
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     kpgCmult.
+
+*  Invocation:
+*     void kpgCmult_work<X>( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = kpgCmultData<X> * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   CGEN_FUNCTION(kpgCmultData) *pdata; /* Pointer to job description */
+   CGEN_BIG_TYPE res;     /* Pointer to next output value */
+   const CGEN_TYPE *pa;   /* Pointer to current element of "a" array */
+   CGEN_TYPE *pb;         /* Pointer to current element of "b" array */
+   double cons;           /* Constant value */
+   size_t i;              /* Loop counter for array pixels */
+   size_t ierr;           /* Index of first numerical error */
+   size_t nerr;           /* Number of numerical errors */
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (CGEN_FUNCTION(kpgCmultData) *) job_data_ptr;
+   cons = pdata->cons;
+
+/* Bad pixels present. */
+   if( pdata->bad ){
+
+/* Loop round all the array elements to be processed by this worker. */
+      nerr = 0;
+      pa = pdata->a + pdata->i1;
+      pb = pdata->b + pdata->i1;
+      for( i = pdata->i1; i <= pdata->i2; i++,pa++,pb++ ) {
+
+/* See if the input data value is bad.  If so, then set a bad output value. */
+         if( *pa == CGEN_BAD ) {
+            *pb = CGEN_BAD;
+
+/* Apply the factor. To ensure no overflow occurs, use a result
+   that has a bigger type. */
+         } else {
+            res = ((CGEN_BIG_TYPE) *pa) * ((CGEN_BIG_TYPE) cons);
+
+/* Check the result is within the valid data range. If not, indicate a
+   numerical error has occurred. */
+            if( res > (CGEN_BIG_TYPE) CGEN_MIN &&
+                res < (CGEN_BIG_TYPE) CGEN_MAX ){
+               *pb = (CGEN_TYPE) res;
+            } else {
+               *pb = CGEN_BAD;
+               nerr++;
+            }
+         }
+      }
+
+/* Variance but no bad pixels present. */
+   } else {
+
+/* Loop round all the array elements to be processed by this worker. */
+      nerr = 0;
+      pa = pdata->a + pdata->i1;
+      pb = pdata->b + pdata->i1;
+      for( i = pdata->i1; i <= pdata->i2; i++,pa++,pb++ ) {
+
+/* Apply the factor. To ensure no overflow occurs, use a result
+   that has a bigger type. */
+         res = ((CGEN_BIG_TYPE) *pa) * ((CGEN_BIG_TYPE) cons);
+
+/* Check the result is within the valid data range. If not, indicate a
+   numerical error has occurred. */
+         if( res > (CGEN_BIG_TYPE) CGEN_MIN &&
+             res < (CGEN_BIG_TYPE) CGEN_MAX ){
+            *pb = (CGEN_TYPE) res;
+         } else {
+            *pb = CGEN_BAD;
+            nerr++;
+         }
+      }
+   }
+
+/* Return the number of numerical errors. */
+   pdata->nerr = nerr;
+}

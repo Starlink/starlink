@@ -130,17 +130,14 @@ F77_SUBROUTINE(mult)( INTEGER(STATUS) ){
    const char *clist;    /* List of NDF components to copy */
    int bad;              /* Need to check for bad pixels? */
    int iat;              /* String length */
-   int iw;               /* Index of worker thread */
    int ndf1;             /* Identifier for 1st NDF (input) */
    int ndf2;             /* Identifier for 2nd NDF (input) */
    int ndf3;             /* Identifier for 3rd NDF (output) */
-   int nw;               /* Number of worker threads to use */
    int var1;             /* Variance component in 1st input NDF? */
    int var2;             /* Variance component in 2nd input NDF? */
    int var;              /* Process variance? */
    size_t el;            /* Number of mapped elements */
    size_t nerr;          /* Number of errors */
-   size_t step;          /* Number of pixels per worker thread */
    void *pntr1[ 2 ];     /* Pointers to 1st NDF mapped arrays */
    void *pntr2[ 2 ];     /* Pointers to 2nd NDF mapped arrays */
    void *pntr3[ 2 ];     /* Pointers to 3rd NDF mapped arrays */
