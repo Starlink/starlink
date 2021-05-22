@@ -19,11 +19,9 @@
 *               Capitaine, N. & Gontier, A.-M., Astron. Astrophys.,
 *               275, 645-650 (1993)
 *
-*  Called:  sla_NUTC
+*  Called:  sla_NUTC80
 *
-*  Patrick Wallace   Starlink   23 August 1996
-*
-*  Copyright (C) 1996 Rutherford Appleton Laboratory
+*  Patrick Wallace   Starlink   23 August 1996, amended 22 May 2021
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -65,7 +63,7 @@
      :         +(7.455D0+0.008D0*T)*T)*T)
 
 *  Nutation
-      CALL sla_NUTC(DATE,DPSI,DEPS,EPS0)
+      CALL sla_NUTC80(DATE,DPSI,DEPS,EPS0)
 
 *  Equation of the equinoxes
       sla_EQEQX=DPSI*COS(EPS0)+AS2R*(0.00264D0*SIN(OM)+
