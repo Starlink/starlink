@@ -6,7 +6,7 @@
 *     CONFIGMELD
 
 *  Purpose:
-*     Compare two MAKEMAP configs using a visual file comparison tool.
+*     Compare two configs using a visual file comparison tool.
 
 *  Language:
 *     python (2.7 or 3.*)
@@ -15,34 +15,44 @@
 *     This script uses a visual file comparison tool such as "meld", to
 *     display two sets of configuration parameters, highlighting the
 *     differences between them. Each config may be supplied directly, as
-*     is done when running MAKEMAP, or can be read from the History
-*     component of an NDF that was created by MAKEMAP.
+*     is done when running a SMURF command such as MAKEMAP, or can be read
+*     from the History component of an NDF that was created by a command
+*     that has a CONFIG parameter (such as SMURF:MAKEMAP).
+*
+*     Maps created using SKYLOOP contain configs for both SKYLOOP and
+*     MAKEMAP. By defaut, the MAKEMAP config will be displayed. To See
+*     the SKYLOOP config instead, run this script with "app=skyloop".
 
 *  Usage:
-*     configmeld config1 config2 waveband defaults tool
+*     configmeld config1 config2 app waveband defaults tool
 
 *  ADAM Parameters:
+*     APP = LITERAL (Read)
+*        The application for which configuration parameters should be
+*        displayed. Only used if CONFIG1 or CONFIG2 is an NDF ["MAKEMAP"]
 *     CONFIG1 = LITERAL (Read)
 *        The first configuration. This can be a normal config such as is
-*        supplied for the CONFIG parameter of MAKEMAP, or an NDF created
-*        by MAKEMAP.
+*        supplied for the CONFIG parameter of a SMURF application, or an
+*        NDF created by the application specified by parameter APP.
 *     CONFIG2 = LITERAL (Read)
-*        The first configuration. This can be a normal config such as is
-*        supplied for the CONFIG parameter of MAKEMAP, or an NDF created
-*        by MAKEMAP. If a value is supplied for PARAM, then CONFIG2
-*        defaults to null (!). []
+*        The second configuration. This can be a normal config such as is
+*        supplied for the CONFIG parameter of a SMURF application, or an
+*        NDF created by the application specified by parameter APP. If a
+*        value is supplied for PARAM, then CONFIG2 defaults to null (!). []
 *     WAVEBAND = LITERAL (Read)
-*        This parameter is not used if either CONFIG1 or CONFIG2 is
-*        an NDF created by MAKEMAP. It should be one of "450" or "850". It
-*        specifies which value should be displayed for configuration
+*        This parameter is not used if either CONFIG1 or CONFIG2 is an NDF
+*        created by a SMURF command. It should be one of "450" or "850".
+*        It specifies which value should be displayed for configuration
 *        parameters that have separate values for 450 and 850 um. If either
-*        CONFIG1 or CONFIG2 is an NDF created by MAKEMAP, then the
-*        wavebands to use are determined from the headers in the NDFs.
+*        CONFIG1 or CONFIG2 is an NDF, then the wavebands to use are
+*        determined from the headers in the NDFs.
 *     DEFAULTS = _LOGICAL (Read)
 *        If TRUE, then each supplied configuration (CONFIG1 and CONFIG2)
-*        is extended to include default values are any MAKEMAP parameters
-*        that it does not specify. These defaults are read from file
-*        "$SMURF_DIR/smurf_makemap.def". [TRUE]
+*        is extended to include default values for any config parameters
+*        that it does not specify. These defaults are read from the
+*        application's defaults file (e.g. "$SMURF_DIR/smurf_makemap.def").
+*        The dynamic default is TRUE if a defaults file can be found and
+*        FALSE otherwise. []
 *     PARAM = LITERAL (Read)
 *        If supplied, then the value used for the specified parameter
 *        is displayed on standard output, and no visual comparison is
@@ -143,6 +153,7 @@ try:
    params = []
    params.append(starutil.Par0S("CONFIG1", "The first config" ))
    params.append(starutil.Par0S("CONFIG2", "The second config" ))
+   params.append(starutil.Par0S("APP", "Command defining the config", "MAKEMAP", True ))
    params.append(starutil.ParChoice("WAVEBAND", ("450","850"),
                                     "The waveband to display - 450 or 850",
                                     "850" ))
@@ -182,11 +193,15 @@ try:
       parsys["CONFIG2"].default = None
       parsys["CONFIG2"].noprompt = True
 
+#  Get the command to use.
+   app = parsys["APP"].value
+   app = app.upper()
+   app_lc = app.lower()
+
 #  Note the path to the defaults file, if required.
-   defs = parsys["DEFAULTS"].value
-   if parsys["DEFAULTS"].value:
-      defs = "$SMURF_DIR/smurf_makemap.def"
-   else:
+   defs = "$SMURF_DIR/smurf_{0}.def".format(app_lc)
+   parsys["DEFAULTS"].default = os.path.isfile(defs)
+   if not parsys["DEFAULTS"].value:
       defs = "!"
 
 #  Get the first config string.
@@ -234,7 +249,8 @@ try:
    if isndf1:
       if subarray is None:
          msg_out("Cannot determine the SCUBA-2 waveband for NDF '{0}' "
-                 "- was it really created by MAKEMAP?".format(config1), starutil.CRITICAL )
+                 "- was it really created by {1}?".format(config1,app),
+                 starutil.CRITICAL )
          waveband1 = None
       elif subarray[1:2] == "4":
          waveband1 = "450"
@@ -291,7 +307,8 @@ try:
       if isndf2:
          if subarray is None:
             msg_out("Cannot determine the SCUBA-2 waveband for NDF '{0}' "
-                    "- was it really created by MAKEMAP?".format(config2), starutil.CRITICAL )
+                    "- was it really created by {1}?".format(config2,app),
+                    starutil.CRITICAL )
             waveband2 = None
          elif subarray[1:2] == "4":
             waveband2 = "450"
@@ -341,14 +358,14 @@ try:
 
 #  List the configuration parameters in alphabetical order to a text file.
       if isndf1:
-         conf1 = invoke("$KAPPA_DIR/configecho ndf={0} application=makemap "
+         conf1 = invoke("$KAPPA_DIR/configecho ndf={0} application={3} "
                         "config=! name=! sort=yes defaults={1} select={2}".
-                        format(config1,defs,select) )
+                        format(config1,defs,select,app_lc) )
       else:
          config1 = starutil.shell_quote( config1 )
-         conf1 = invoke("$KAPPA_DIR/configecho ndf=! application=makemap "
+         conf1 = invoke("$KAPPA_DIR/configecho ndf=! application={3} "
                         "config={0} name=! sort=yes defaults={1} select={2}".
-                        format(config1,defs,select) )
+                        format(config1,defs,select,app_lc) )
 
 #  Write the config parameters to a disk file.
       fd = open( "config1.tmp", "w" )
@@ -362,14 +379,14 @@ try:
          select = starutil.shell_quote( '"850=1,450=0"' )
 
       if isndf2:
-         conf2 = invoke("$KAPPA_DIR/configecho ndf={0} application=makemap "
+         conf2 = invoke("$KAPPA_DIR/configecho ndf={0} application={3} "
                         "config=! name=! sort=yes defaults={1} select={2}".
-                        format(config2,defs,select) )
+                        format(config2,defs,select,app_lc) )
       else:
          config2 = starutil.shell_quote( config2 )
-         conf2 = invoke("$KAPPA_DIR/configecho ndf=! application=makemap "
+         conf2 = invoke("$KAPPA_DIR/configecho ndf=! application={3} "
                         "config={0} name=! sort=yes defaults={1} select={2}".
-                        format(config2,defs,select) )
+                        format(config2,defs,select,app_lc) )
 
       fd = open( "config2.tmp", "w" )
       fd.write( conf2 )
@@ -387,26 +404,26 @@ try:
 
 #  Get the value of the requested parameter fro config1.
       if isndf1:
-         value1 = invoke("$KAPPA_DIR/configecho ndf={0} application=makemap "
+         value1 = invoke("$KAPPA_DIR/configecho ndf={0} application={3} "
                         "config=! name={3} defaults={1} select={2}".
-                        format(config1,defs,select,param) )
+                        format(config1,defs,select,param,app_lc) )
       else:
          config1 = starutil.shell_quote( config1 )
-         value1 = invoke("$KAPPA_DIR/configecho ndf=! application=makemap "
+         value1 = invoke("$KAPPA_DIR/configecho ndf=! application={3} "
                         "config={0} name={3} defaults={1} select={2}".
-                        format(config1,defs,select,param) )
+                        format(config1,defs,select,param,app_lc) )
 
 #  Get the value of the requested parameter fro config2 (if supplied).
       if config2 is not None:
          if isndf2:
-            value2 = invoke("$KAPPA_DIR/configecho ndf={0} application=makemap "
+            value2 = invoke("$KAPPA_DIR/configecho ndf={0} application={4} "
                            "config=! name={3} defaults={1} select={2}".
-                           format(config2,defs,select,param) )
+                           format(config2,defs,select,param,app_lc) )
          else:
             config2 = starutil.shell_quote( config2 )
-            value2 = invoke("$KAPPA_DIR/configecho ndf=! application=makemap "
+            value2 = invoke("$KAPPA_DIR/configecho ndf=! application={4} "
                            "config={0} name={3} defaults={1} select={2}".
-                           format(config2,defs,select,param) )
+                           format(config2,defs,select,param,app_lc) )
       else:
          value2 = None
 
