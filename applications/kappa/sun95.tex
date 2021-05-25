@@ -6,9 +6,9 @@
 \stardocsource    {sun95.44}
 \stardocnumber    {95.44}
 \stardocauthors   {Malcolm J. Currie \& David S. Berry}
-\stardocdate      {2021 March 11}
+\stardocdate      {2021 May 21}
 \stardoctitle     {KAPPA --- Kernel Application Package}
-\stardocversion   {2.6-11}
+\stardocversion   {2.6-12}
 \stardocmanual    {User's Guide}
 % -----------------------------------------------------------------------------
 \stardocabstract{
@@ -54485,7 +54485,9 @@ The following new applications have been added:
 
 \subsection{General Changes}
 The following applications now support huge NDFs:
-\htmlref{ADD}{ADD}, \htmlref{COLLAPSE}{COLLAPSE}, \htmlref{DIV}{DIV},
+\htmlref{ADD}{ADD}, \htmlref{ADD}{CADD}, \htmlref{CDIV}{CDIV},
+\htmlref{CMULT}{CMULT}, \htmlref{CSUB}{CSUB},
+\htmlref{COLLAPSE}{COLLAPSE}, \htmlref{DIV}{DIV},
 \htmlref{MFITTREND}{MFITTREND}, \htmlref{MSTATS}{MSTATS}, \htmlref{MULT}{MULT}
 \htmlref{NDFCOPY}{NDFCOPY}, \htmlref{NDFTRACE}{NDFTRACE},
 \htmlref{PERMAXES}{PERMAXES}, \htmlref{STATS}{STATS}, and
@@ -54535,6 +54537,12 @@ The following applications have been modified:
         NDF to be displayed.  These use the interpolation method specified
         by the new Parameters METHOD and PARAMS.  The pixel values are also
         written to a new output parameter called PIXVALS.
+      \end{itemize}
+
+   \item [\htmlref{NDFCOMPRESS}{NDFCOMPRESS}]\mbox{}
+      \begin{itemize}
+        \item Parameter METHOD has a new option \texttt{"BOTH"} that compresses
+        first with the SCALED scheme then applies the DELTA scheme.
       \end{itemize}
 
    \item [\htmlref{REMQUAL}{REMQUAL}]\mbox{}

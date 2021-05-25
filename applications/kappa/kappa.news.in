@@ -19,10 +19,10 @@
 
 2 General_changes
 
-     The following applications now support huge NDFs: ADD, COLLAPSE,
-     DIV, MFITTREND, MSTATS, MULT NDFCOPY, NDFTRACE, PERMAXES, STATS, and
-     SUB.  Huge means more than 2,147,483,647 elements in an array
-     component.
+     The following applications now support huge NDFs: ADD, CADD,
+     CDIV, CMULT, CSUB. COLLAPSE, DIV, MFITTREND, MSTATS, MULT,
+     NDFCOPY, NDFTRACE, PERMAXES, STATS, and SUB.  Huge means more
+     than 2,147,483,647 elements in an array component.
 
 2 Modified_applications
 
@@ -62,6 +62,11 @@
       specified  by the new Parameters METHOD and PARAMS.  The pixel
       values are also written to a new output parameter called
       PIXVALS.
+
+   o  NDFCOMPRESS
+
+      - Parameter METHOD has a new option "BOTH" that compresses
+      first with the SCALED scheme then applies the DELTA scheme.
 
    o  REMQUAL
 
