@@ -6,9 +6,9 @@
 \stardocsource    {sun95.44}
 \stardocnumber    {95.44}
 \stardocauthors   {Malcolm J. Currie \& David S. Berry}
-\stardocdate      {2020 November 27}
+\stardocdate      {2021 March 11}
 \stardoctitle     {KAPPA --- Kernel Application Package}
-\stardocversion   {2.6-10}
+\stardocversion   {2.6-11}
 \stardocmanual    {User's Guide}
 % -----------------------------------------------------------------------------
 \stardocabstract{
@@ -10863,7 +10863,7 @@ KAPPA: \htmlref{ARDGEN}{ARDGEN},
          supported.
 
          \sstitem
-         All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.
+         All \htmlref{numeric data types}{ap:HDStypes} can be handled.
       }
    }
 }
@@ -16339,7 +16339,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          SORT = \_LOGICAL (Read)
       }{
          If \texttt{TRUE} then sort the listed parameters in to alphabetical order.
-         Otherwise, retain the order they have in the
+         Otherwise, retain the order they have in the supplied
          configuration.  Only used if a null (\texttt{{!}}) value is supplied for
          Parameter NAME.  \texttt{[FALSE]}
       }
@@ -31911,7 +31911,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
 
          Pixels are rejected at the $i$th clipping cycle if they lie
          beyond plus or minus CLIP($i$) times the dispersion about the
-         mediaan of the remaining good pixels.  Thus lower values of CLIP
+         median of the remaining good pixels.  Thus lower values of CLIP
          will reject more pixels.  The normal approach is to start low
          and progressivley increase the clipping factors, as the
          dispersion decreases after the exclusion of features.  The
@@ -41485,7 +41485,8 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
 }{
    \sstdescription{
       This routine removes selected \htmlref{quality name}{se:qnames}~ definitions
-      from an \NDFref{NDF}~ (see task SETQUAL).  All quality names information may
+      from an \NDFref{NDF}~ (see Task SETQUAL) and optionally clears the corresponding bit
+      in the QUALITY array of the supplied NDF.  All quality names information may
       be removed by specifying a quality name of \texttt{"ANY"}.
 
       An error will be reported if an attempt is made to remove a quality
@@ -41496,6 +41497,13 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       remqual ndf qnames
    }
    \sstparameters{
+       \sstsubsection{
+          CLEAR = \_LOGICAL (Read)
+       }{
+         If \texttt{TRUE}, the bits in the NDF's QUALITY array that correspond to
+         the removed quality names will be cleared. If \texttt{FALSE}, no change
+         will be made to the QUALITY array. \texttt{[FALSE]}
+      }
       \sstsubsection{
          NDF = NDF (Update)
       }{
@@ -42098,13 +42106,13 @@ KAPPA: \htmlref{FLIP}{FLIP},
       }{
          If \texttt{TRUE}, then a linear fit to the scatter points is added to the
          plot. The slope and offset of this fit is displayed on the screen
-         and written to output Parameters SLOPE, OFFSET, and RMS. A symetric
-         linear fit algorithm is used, which caters for the presence of
-         noise in both X and Y values. Outliers are identified and
+         and written to output Parameters SLOPE, OFFSET, and RMS.  A symmetric
+         linear-fit algorithm is used, which caters for the presence of
+         noise in both $X$ and $Y$ values. Outliers are identified and
          ignored. Note, the fit is based on just those points that are
          visible in the scatter plot. Points outside the bounds of the
          plot are ignored. Points that are inside the plot are also ignored
-         if their reflection through the best fit line are outside the plot.
+         if their reflection through the best-fit line are outside the plot.
          This avoids biasing the fit if the plot bounds omit more points on
          one side of the line than the other. \texttt{[}current value\texttt{{]}}
       }
@@ -54489,6 +54497,11 @@ array component.
 The following applications have been modified:
 \begin{description}[style=nextline]
 
+   \item [\htmlref{ARDMASK}{ARDMASK}]\mbox{}
+      \begin{itemize}
+         \item It can now process complex data.
+      \end{itemize}
+
    \item [\htmlref{CHPIX}{CHPIX}]\mbox{}
       \begin{itemize}
         \item It is easier now to make several edits by supplying the
@@ -54522,6 +54535,12 @@ The following applications have been modified:
         NDF to be displayed.  These use the interpolation method specified
         by the new Parameters METHOD and PARAMS.  The pixel values are also
         written to a new output parameter called PIXVALS.
+      \end{itemize}
+
+   \item [\htmlref{REMQUAL}{REMQUAL}]\mbox{}
+      \begin{itemize}
+        \item A new parameter called CLEAR allows the corresponding bit within
+        the NDF's QUALITY array to be cleared.
       \end{itemize}
 
    \item [\htmlref{SCATTER}{SCATTER}]\mbox{}
