@@ -10,12 +10,13 @@
    o  MOCGEN
 
       -  Creates a description of selected regions in an image using
-         the IVOA's Multi-Order Coverage (MOC) scheme.
+      the IVOA's Multi-Order Coverage (MOC) scheme.
 
    o  PIXBIN
 
-      - Places each input pixel into a bin defined by one or more index
-        NDFs and creates an output NDF holding all the values in each bin.
+      -  Places each input pixel into a bin defined by one or more
+      index NDFs, and creates an output NDF holding all the values
+      in each bin.
 
 2 General_changes
 
@@ -70,8 +71,8 @@
 
    o  REMQUAL
 
-      - A new parameter called CLEAR allows the corresponding bit within
-      the NDF's Quality array to be cleared.
+      - A new parameter called CLEAR allows the corresponding bit
+      within the NDF's QUALITY array to be cleared.
 
    o  SCATTER
 
