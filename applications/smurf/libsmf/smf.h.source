@@ -1030,7 +1030,8 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                smf_modeltype type, smfArray *model, int res,
                const char *root, int mask, double mingood, int cube,
                int map, int addqual, smfSampleTable *table,
-               double chunkfactor, const char *btable, int *status );
+               double chunkfactor, const char *btable, AstKeyMap *keymap,
+               int *status );
 
 void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                       int chunk, AstKeyMap *keymap, smfArray **allmodel,
@@ -1878,6 +1879,11 @@ void smf_rebincube_spectab( dim_t nchan, dim_t nchanout, AstMapping *ssmap,
 const double *smf_rebincube_tcon( smfHead *hdr, dim_t itime, double fcon,
                                   float *texp, float *teff, double *tcon,
                                   int *status );
+
+void smf_rebincom( ThrWorkForce *wf, smfData *comdata, smfData *gaidata,
+                   smf_qual_t *qual, smfData *lutdata, int flags, double *map,
+                   double *mapwgt, double *mapvar, dim_t msize, dim_t gain_box,
+                   int *status );
 
 void smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
                    int index, int size, AstFrameSet *outfset, int spread,

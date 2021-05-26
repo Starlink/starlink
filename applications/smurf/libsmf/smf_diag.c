@@ -18,7 +18,8 @@
 *               smf_modeltype type, smfArray *model, int res,
 *               const char *root, int mask, double mingood, int cube,
 *               int map, int addqual, smfSampleTable *table,
-*               double chunkfactor, const char *btable, int *status )
+*               double chunkfactor, const char *btable,
+*               AstKeyMap *keymap, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -89,6 +90,8 @@
 *     btable = const char * (Given)
 *        If not NULL, this is the root name for the ascii files to be
 *        created holding the selected bolometer values.
+*     keymap = AstKeyMap * (Given)
+*        A keymap holding the makemap config in use.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -117,6 +120,9 @@
 *     6-APR-2021 (DSB):
 *        Allow AST hits info to be dumped as a time-stream (see argument
 *        "res" above).
+*     26-MAY-2021 (DSB):
+*        Dump the COM model as a full 2D map including all bolometers rather
+*        than a 2D representation of a single 1D common-mode time-series.
 
 *  Copyright:
 *     Copyright (C) 2013,2015 Science and Technology Facilities Council.
@@ -187,7 +193,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                smf_modeltype type, smfArray *model, int res,
                const char *root, int mask, double mingood, int cube,
                int map, int addqual, smfSampleTable *table, double chunkfactor,
-               const char *btable, int *status ){
+               const char *btable, AstKeyMap *keymap, int *status ){
 
 /* Local Variables: */
    AstCmpFrame *totfrm;
@@ -893,13 +899,30 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                noi = NULL;
             }
 
-/* Rebin the residual + astronomical signal into a map */
-            smf_rebinmap1( wf, array->sdata[ idx ], noi, dat->lut[0]->sdata[idx]->pntr[0],
+/* Rebin the residual + astronomical signal into a map. COM must be
+   handled separately since the COM model is 1-dimensional.  */
+            if( type == SMF__COM && !res ) {
+               AstObject *obj;
+               astMapGet0A( keymap, "COM", &obj );
+               dim_t gain_box;
+               smf_get_nsamp( (AstKeyMap *) obj, "GAIN_BOX",
+                              dat->res[ 0 ]->sdata[ idx ], &gain_box, status );
+               obj = astAnnul( obj );
+               smf_rebincom( wf, array->sdata[ idx ],
+                             dat->gai[ 0 ]->sdata[ idx ],
+                             smf_select_qualpntr( dat->res[ 0 ]->sdata[ idx ],
+                                                  NULL, status ),
+                             dat->lut[0]->sdata[idx], rebinflags,
+                             wf_map, wf_mapwgt, wf_mapvar, dat->msize,
+                             gain_box, status );
+            } else {
+               smf_rebinmap1( wf, array->sdata[ idx ], noi, dat->lut[0]->sdata[idx]->pntr[0],
                            0, 0, 0, NULL, 0, SMF__Q_GOOD, 1, rebinflags,
                            wf_map, wf_mapwgt, wf_mapwgtsq, wf_hitsmap,
                            wf_mapvar, dat->msize, chunkfactor, &scalevar,
                            status );
-          }
+            }
+         }
 
 /* Copy the data and variance arrays to the NDF. */
          if( *status == SAI__OK ) {

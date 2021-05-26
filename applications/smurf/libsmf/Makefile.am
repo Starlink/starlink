@@ -395,6 +395,7 @@ smf_rebincube_paste_thread.c \
 smf_rebincube_seqf.c \
 smf_rebincube_spectab.c \
 smf_rebincube_tcon.c \
+smf_rebincom.c \
 smf_rebinmap.c \
 smf_rebinmap1.c \
 smf_rebinseq_thread.c \

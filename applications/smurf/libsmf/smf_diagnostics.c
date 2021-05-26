@@ -508,7 +508,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                   smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                             dat, type, NULL, 1, root, 0, mingood, cube,
                             map, addqual, tabdata, chunkfactor,
-                            btable?broot:NULL, status );
+                            btable?broot:NULL, keymap, status );
                }
 
 /* If this function has been called immediately after estimating the new
@@ -525,7 +525,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                          dat, type, allmodel ? allmodel[ 0 ] : NULL,
                          hits?-999:0, root, mask, mingood, cube, map, addqual,
-                         tabdata, chunkfactor, btable?broot:NULL, status );
+                         tabdata, chunkfactor, btable?broot:NULL, keymap, status );
                if( res_after && type != SMF__RES ) {
                   msgOutf( "", "Diagnostics: Dumping residuals after subtraction of %s",
                            status, modname );
@@ -539,7 +539,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                   smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                             dat, type, NULL, 1, root, 0, mingood, cube,
                             map, addqual, tabdata, chunkfactor,
-                            btable?broot:NULL, status );
+                            btable?broot:NULL, keymap, status );
                }
 
 /* Any other "where" value is currently an error. */
