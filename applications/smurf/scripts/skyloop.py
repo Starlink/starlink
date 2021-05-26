@@ -396,6 +396,8 @@
 *        - Correct handling of XXX.ZERO_MASK0.
 *        - Support COM.FREEZE_FLAGS values that are specified as a maptol value 
 *        (i.e. fractional values between zero and one).
+*     26-MAY-2021 (DSB):
+*        Honour the diag.lastonly configuration parameter.
 *-
 '''
 
@@ -658,6 +660,17 @@ try:
                                "defaults=$SMURF_DIR/smurf_makemap.def "
                                "select=\"\'450=0,850=1\'\" defval=-1".format(config)))
 
+#  See if diagnostic output is to be supressed on all but the last iteration
+#  and get the name of the output diagnostics file.
+   diag_lastonly = myint( invoke( "$KAPPA_DIR/configecho name=diag.lastonly "
+                           "config={0} defaults=$SMURF_DIR/smurf_makemap.def "
+                           "select=\"\'450=0,850=1\'\"".format(config)))
+   diag_lastonly = ( diag_lastonly != 0 )
+
+   diag_out = invoke( "$KAPPA_DIR/configecho name=diag.out config={0} "
+                      "defaults=$SMURF_DIR/smurf_makemap.def "
+                      "select=\"\'450=0,850=1\'\"".format(config))
+
 #  Get the number of iterations for which no AST model should be used.
    ast_skip = myint( invoke( "$KAPPA_DIR/configecho name=ast.skip config={0} "
                            "defaults=$SMURF_DIR/smurf_makemap.def "
@@ -773,6 +786,9 @@ try:
    if initsky:
       fd.write("importsky = ref\n")   # If an initial sky was supplied use it.
 
+   if diag_lastonly:
+      fd.write("diag.out=<undef>\n")  # If required supress diagnostic output
+                                      # on all but the last iteration
    fd.close()                 # Close the config file.
 
 #  Get the name of a temporary NDF that can be used to store the first
@@ -1034,6 +1050,11 @@ try:
 
 #  No need to export quality flags on the last iteration.
             add["exportNDF"] = 0
+
+#  If required, re-instate the requested diagnostics output file.
+            if diag_lastonly:
+               add["diag.out"] = diag_out
+               add["diag.append"] = 0
 
 #  If this is not the last iteration, get the name of a temporary NDF that
 #  can be used to store the current iteration's map. This NDF is put in
