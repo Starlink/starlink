@@ -394,10 +394,12 @@
 *        by the first invocation of makemap. Otherwise, they can affect the
 *        normalised map change calculated after the second invocation of makemap.
 *        - Correct handling of XXX.ZERO_MASK0.
-*        - Support COM.FREEZE_FLAGS values that are specified as a maptol value 
+*        - Support COM.FREEZE_FLAGS values that are specified as a maptol value
 *        (i.e. fractional values between zero and one).
 *     26-MAY-2021 (DSB):
 *        Honour the diag.lastonly configuration parameter.
+*     27-MAY-2021 (DSB):
+*        Honour the diag.cleaned configuration parameter.
 *-
 '''
 
@@ -671,6 +673,19 @@ try:
                       "defaults=$SMURF_DIR/smurf_makemap.def "
                       "select=\"\'450=0,850=1\'\"".format(config))
 
+#  See if the cleaned data is to be dumped at the start of the first
+#  iteration. If so, get the list of models to be dumped.
+   diag_cleaned = myint( invoke( "$KAPPA_DIR/configecho name=diag.cleaned "
+                           "config={0} defaults=$SMURF_DIR/smurf_makemap.def "
+                           "select=\"\'450=0,850=1\'\"".format(config)))
+   diag_cleaned = ( diag_cleaned != 0 )
+   if diag_cleaned:
+      diag_models = invoke( "$KAPPA_DIR/configecho name=diag.models "
+                            "config={0} defaults=$SMURF_DIR/smurf_makemap.def "
+                            "select=\"\'450=0,850=1\'\"".format(config))
+   else:
+      diag_models = None
+
 #  Get the number of iterations for which no AST model should be used.
    ast_skip = myint( invoke( "$KAPPA_DIR/configecho name=ast.skip config={0} "
                            "defaults=$SMURF_DIR/smurf_makemap.def "
@@ -786,9 +801,16 @@ try:
    if initsky:
       fd.write("importsky = ref\n")   # If an initial sky was supplied use it.
 
+#  If diag.lastonly is non-zero, then we usually suppress all diagnostic info
+#  initially by setting diag.out to undef. However, if cleaned data is to
+#  be dumped, then delay this for one iteration, ensuring that no other
+#  data is dumped in addition to the cleaned data.
    if diag_lastonly:
-      fd.write("diag.out=<undef>\n")  # If required supress diagnostic output
-                                      # on all but the last iteration
+      if diag_cleaned:
+         fd.write("diag.models=<undef>\n")
+      else:
+         fd.write("diag.out=<undef>\n")
+
    fd.close()                 # Close the config file.
 
 #  Get the name of a temporary NDF that can be used to store the first
@@ -896,6 +918,7 @@ try:
       add["smo.notfirst"] = 0  # Ensure we use SMO on 2nd and subsequent invocations
       add["diag.append"] = 1   # Ensure we append diagnostics to the file
                                # created on the first iteration.
+      add["diag.cleaned"] = 0  # Cleaned data is dumped only on the first iter
       add["ast.skip"] = 0      # Ensure we do not skip any more AST models
       add["noi.import"] = 1    # Use the NOI model created by iteration 1
       add["noi.export"] = 0    # No need to export the NOI model again
@@ -907,6 +930,10 @@ try:
       add["fakemap"] = "<undef>" # Iter. 1 added any required fakemap.
       for model in ["ast", "com", "flt", "pca"]:
          add["{0}.zero_mask0".format(model)] = "<undef>"
+
+      if diag_lastonly and diag_cleaned:
+         add["diag.models"] = diag_models
+         add["diag.out"] = "<undef>"
 
 #  Now create the config, inheriting the config from the first invocation.
       iconf = 1
@@ -1051,10 +1078,13 @@ try:
 #  No need to export quality flags on the last iteration.
             add["exportNDF"] = 0
 
-#  If required, re-instate the requested diagnostics output file.
+#  If required, re-instate the requested diagnostics output file. Ensure
+#  a new file is started unless it was started previously when the initial
+#  cleaned data was stored in it.
             if diag_lastonly:
                add["diag.out"] = diag_out
-               add["diag.append"] = 0
+               if not diag_cleaned:
+                   add["diag.append"] = 0
 
 #  If this is not the last iteration, get the name of a temporary NDF that
 #  can be used to store the current iteration's map. This NDF is put in
