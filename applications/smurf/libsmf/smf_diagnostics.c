@@ -65,7 +65,8 @@
 *        deleted before storing new diagnostics information in it.
 *
 *        CLEANED - If non-zero, the cleaned data is dumped at the start
-*        of the first iteration.
+*        of the first iteration. Note initial cleaned data is still dumped
+*        if CLEANED is non-zero, even if LASTONLY is non-zero.
 *
 *        CUBE - If non-zero, a full cube containing time-ordered data for
 *        all bolometers is created at each iteration, for each required
@@ -143,7 +144,8 @@
 *
 *        LASTONLY - If non-zero, then diagnostics are only created for
 *        the last iteration. If zero, then diagnostics are created for
-*        all iterations.
+*        all iterations. Note initial cleaned data is still dumped if
+*        CLEANED is non-zero, even if LASTONLY is non-zero.
 *
 *     allmodel = smfArray ** (Returned)
 *        Array of smfArrays holding the model. Only element zero is used.
@@ -287,6 +289,13 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 /* See if diagnostics are to be created only for the final iteration. */
    astMapGet0I( kmap, "LASTONLY", &lastonly );
 
+/* See if initial cleaned data is to be dumped. */
+   astMapGet0I( kmap, "CLEANED", &cleaned );
+
+/* If we are dumping the initial cleaned data, then ignore "lastonly" for
+   this call. */
+   if( cleaned && where == -1 ) lastonly = 0;
+
 /* See if a table of bolometer values is to be created. */
    astMapGet0C( kmap, "BTABLE", &table );
    if( table ) btable = astStore( NULL, table, strlen(table) + 1 );
@@ -389,7 +398,6 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 /* Get the  other required items from the KeyMap. */
       astMapGet1C( kmap, "MODELS", MODEL_NAMELEN, SMF_MODEL_MAX, &nmodel,
                    modelnames );
-      astMapGet0I( kmap, "CLEANED", &cleaned );
       astMapGet0I( kmap, "POWER", &power );
       astMapGet0I( kmap, "TIME", &time );
       astMapGet0I( kmap, "RES_BEFORE", &res_before );

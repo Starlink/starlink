@@ -852,7 +852,9 @@ diag.btable = <undef>
 #  Description: If non-zero, the cleaned data at the start of the first
 #               iteration is dumped. The data is stored in the same way
 #               as the models specified by parameter "diag.models" using
-#               the psuedo-model name "CLN".
+#               the psuedo-model name "CLN". Note, if diag.cleaned is
+#               non-zero, the initial cleaned data is dumped even if
+#               parameter "diag.lastonly" is non-zero.
 diag.cleaned = 0
 
 #-----------------------------------------------------------------
@@ -876,7 +878,9 @@ diag.cube = 0
 #  Purpose: 	Qualifies the required dignostic information.
 #  Description: If non-zero, diagnotics information is dumped only for
 #               the last iteration. Otherwise, information is dumped on
-#               all iterations.
+#               all iterations. Note, if parameter "diag.cleaned" is
+#               non-zero, the initial cleaned data is still dumped even
+#               if diag.lastonly is non-zero.
 diag.lastonly = 0
 
 #-----------------------------------------------------------------
