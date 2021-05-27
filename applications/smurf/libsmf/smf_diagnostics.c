@@ -26,6 +26,9 @@
 *        which is used to determine what information to dump to disk.
 *        Current options are:
 *
+*        -1: This function is being called immediately after cleaning the
+*        data and before the start of the first iteration.
+*
 *        0: This function is being called immediately before estimating
 *        a new model and subtracting it from the residuals.
 *
@@ -60,6 +63,9 @@
 *        appended to the container file specified by diag.out, which should
 *        already exist. If zero, then  any existing container file is first
 *        deleted before storing new diagnostics information in it.
+*
+*        CLEANED - If non-zero, the cleaned data is dumped at the start
+*        of the first iteration.
 *
 *        CUBE - If non-zero, a full cube containing time-ordered data for
 *        all bolometers is created at each iteration, for each required
@@ -141,7 +147,8 @@
 *
 *     allmodel = smfArray ** (Returned)
 *        Array of smfArrays holding the model. Only element zero is used.
-*        Should be NULL if the AST model is being dumped.
+*        Should be NULL if the AST model is being dumped or the initial
+         cleaned data is being dumped.
 *     type = smf_modeltype (Given)
 *        Indicates which model is to be dumped.
 *     flags = int (Given)
@@ -169,6 +176,8 @@
 *        Added parameter "chunkfactor".
 *     18-MAR-2021 (DSB):
 *        Added parameter "btable".
+*     27-MAY-2021 (DSB):
+*        Allow initial cleaned data to be dumped.
 
 *  Copyright:
 *     Copyright (C) 2018-2021 East Asian Observatory.
@@ -231,6 +240,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    double mingood;
    int addqual;
    int append;
+   int cleaned;
    int cube;
    int history;
    int hits;
@@ -379,6 +389,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 /* Get the  other required items from the KeyMap. */
       astMapGet1C( kmap, "MODELS", MODEL_NAMELEN, SMF_MODEL_MAX, &nmodel,
                    modelnames );
+      astMapGet0I( kmap, "CLEANED", &cleaned );
       astMapGet0I( kmap, "POWER", &power );
       astMapGet0I( kmap, "TIME", &time );
       astMapGet0I( kmap, "RES_BEFORE", &res_before );
@@ -477,91 +488,118 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    automatically. */
       repbolo = ( ibolo == -3 );
 
+/* If this function has been called immediately before the start of the
+   first iteration, then dump the inital cleaned data if requested. */
+      if( where == -1 && cleaned ) {
+         msgOutf( "", "Diagnostics: Dumping cleaned data at start of first "
+                  "iteration.", status );
+
+         if( out ) {
+            datThere( cloc, "CLN", &there, status );
+            if( !there ) datNew( cloc, "CLN", "DIAGNOSTICS", 0, NULL,
+                                 status );
+            datFind( cloc, "CLN", &mloc, status );
+         }
+
+         if( btable ){
+            sprintf( broot, "%s_%d_cln.asc", btable, chunk );
+         }
+
+         sprintf( root, "cln_%d", chunk );
+         smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
+                   dat, SMF__RES, NULL, 1, root, 0, mingood, cube,
+                   map, addqual, tabdata, chunkfactor,
+                   btable?broot:NULL, keymap, status );
+
+/* Otherwise. */
+      } else {
+
 /* See if the current model (indicated by argument "type") is one of the
    ones that are to be written out. */
-      for( imodel = 0; imodel < nmodel && *status == SAI__OK; imodel++ ) {
-         model = smf_model_gettype( modelnames + imodel*MODEL_NAMELEN, status );
-         if( *status == SAI__OK && type == model ) {
+         for( imodel = 0; imodel < nmodel && *status == SAI__OK; imodel++ ) {
+            model = smf_model_gettype( modelnames + imodel*MODEL_NAMELEN, status );
+            if( *status == SAI__OK && type == model ) {
 
 /* Ensure we have a component for this model within the container file. */
-            modname = smf_model_getname( type, status );
-            if( out ) {
-               datThere( cloc, modname, &there, status );
-               if( !there ) datNew( cloc, modname, "DIAGNOSTICS", 0, NULL,
-                                    status );
-               datFind( cloc, modname, &mloc, status );
-            }
+               modname = smf_model_getname( type, status );
+               if( out ) {
+                  datThere( cloc, modname, &there, status );
+                  if( !there ) datNew( cloc, modname, "DIAGNOSTICS", 0, NULL,
+                                       status );
+                  datFind( cloc, modname, &mloc, status );
+               }
 
 /* If this function has been called immediately before estimating the new
    model, then dump the residuals if requested. */
-            if( where == 0 ) {
-               if( res_before && type != SMF__RES ) {
-                  msgOutf( "", "Diagnostics: Dumping residuals before subtraction of %s",
-                           status, modname );
+               if( where == 0 ) {
+                  if( res_before && type != SMF__RES ) {
+                     msgOutf( "", "Diagnostics: Dumping residuals before subtraction of %s",
+                              status, modname );
 
-                  if( btable ){
-                     sprintf( broot, "%s_%d_%d_%s_bef.asc", btable, chunk,
-                              dat->iter, modname );
+                     if( btable ){
+                        sprintf( broot, "%s_%d_%d_%s_bef.asc", btable, chunk,
+                                 dat->iter, modname );
+                     }
+
+                     sprintf( root, "bef_%d", chunk );
+                     smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
+                               dat, type, NULL, 1, root, 0, mingood, cube,
+                               map, addqual, tabdata, chunkfactor,
+                               btable?broot:NULL, keymap, status );
                   }
-
-                  sprintf( root, "bef_%d", chunk );
-                  smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
-                            dat, type, NULL, 1, root, 0, mingood, cube,
-                            map, addqual, tabdata, chunkfactor,
-                            btable?broot:NULL, keymap, status );
-               }
 
 /* If this function has been called immediately after estimating the new
    model, then dump the model and also dump the residuals if requested. */
-            } else if( where == 1 ) {
-               msgOutf( "", "Diagnostics: Dumping %s model", status, modname );
-               sprintf( root, "mod_%d", chunk );
-
-               if( btable ){
-                  sprintf( broot, "%s_%d_%d_%s_mod.asc", btable, chunk,
-                           dat->iter, modname );
-               }
-
-               smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
-                         dat, type, allmodel ? allmodel[ 0 ] : NULL,
-                         hits?-999:0, root, mask, mingood, cube, map, addqual,
-                         tabdata, chunkfactor, btable?broot:NULL, keymap, status );
-               if( res_after && type != SMF__RES ) {
-                  msgOutf( "", "Diagnostics: Dumping residuals after subtraction of %s",
-                           status, modname );
-                  sprintf( root, "aft_%d", chunk );
+               } else if( where == 1 ) {
+                  msgOutf( "", "Diagnostics: Dumping %s model", status, modname );
+                  sprintf( root, "mod_%d", chunk );
 
                   if( btable ){
-                     sprintf( broot, "%s_%d_%d_%s_aft.asc", btable, chunk,
+                     sprintf( broot, "%s_%d_%d_%s_mod.asc", btable, chunk,
                               dat->iter, modname );
                   }
 
                   smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
-                            dat, type, NULL, 1, root, 0, mingood, cube,
-                            map, addqual, tabdata, chunkfactor,
-                            btable?broot:NULL, keymap, status );
-               }
+                            dat, type, allmodel ? allmodel[ 0 ] : NULL,
+                            hits?-999:0, root, mask, mingood, cube, map, addqual,
+                            tabdata, chunkfactor, btable?broot:NULL, keymap, status );
+                  if( res_after && type != SMF__RES ) {
+                     msgOutf( "", "Diagnostics: Dumping residuals after subtraction of %s",
+                              status, modname );
+                     sprintf( root, "aft_%d", chunk );
+
+                     if( btable ){
+                        sprintf( broot, "%s_%d_%d_%s_aft.asc", btable, chunk,
+                                 dat->iter, modname );
+                     }
+
+                     smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
+                               dat, type, NULL, 1, root, 0, mingood, cube,
+                               map, addqual, tabdata, chunkfactor,
+                               btable?broot:NULL, keymap, status );
+                  }
 
 /* Any other "where" value is currently an error. */
-            } else if( *status == SAI__OK ){
-               *status = SAI__ERROR;
-               errRepf( "", "smf_diagnostics: Illegal value %d for "
-                        "argument \"where\".", status, where );
-            }
+               } else if( *status == SAI__OK ){
+                  *status = SAI__ERROR;
+                  errRepf( "", "smf_diagnostics: Illegal value %d for "
+                           "argument \"where\".", status, where );
+               }
 
 /* Annul ther locator for the model info in the container file. */
-            if( out ) datAnnul( &mloc, status );
+               if( out ) datAnnul( &mloc, status );
 
 /* Report the chosen typical bolometer if required, and store it in the
    KeyMap in place of the original BOLO value, in order to ensure that the
    same bolometer is chosen in future. */
-            if( repbolo && ibolo >= 0 ) {
-               astMapPut0I( kmap, "BOLO", ibolo, NULL );
-               msgOutf( "", "Diagnostics: using \"typical\" bolometer %d.",
-                        status, ibolo );
-               repbolo = 0;
-            }
+               if( repbolo && ibolo >= 0 ) {
+                  astMapPut0I( kmap, "BOLO", ibolo, NULL );
+                  msgOutf( "", "Diagnostics: using \"typical\" bolometer %d.",
+                           status, ibolo );
+                  repbolo = 0;
+               }
 
+            }
          }
       }
 

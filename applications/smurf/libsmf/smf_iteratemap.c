@@ -2273,6 +2273,12 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
 
             if( iter == 0 ) {
               l = 0;
+
+              /* Dump the initial cleaned data if required. */
+              smf_diagnostics( wf, -1, &dat, contchunk, keymap, NULL,
+                               SMF__RES, SMF__DIMM_FIRSTITER, chunkfactor,
+                               status );
+
             } else {
               l = whichast+1;
             }

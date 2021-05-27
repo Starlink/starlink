@@ -845,6 +845,17 @@ diag.bolo = WMEAN
 diag.btable = <undef>
 
 #-----------------------------------------------------------------
+#  Name: 	diag.cleaned
+#  Type: 	int
+#  Default: 	0
+#  Purpose: 	Qualifies the required dignostic information.
+#  Description: If non-zero, the cleaned data at the start of the first
+#               iteration is dumped. The data is stored in the same way
+#               as the models specified by parameter "diag.models" using
+#               the psuedo-model name "CLN".
+diag.cleaned = 0
+
+#-----------------------------------------------------------------
 #  Name: 	diag.cube
 #  Type: 	int
 #  Default: 	0
