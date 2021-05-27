@@ -14,9 +14,9 @@
 
 *  Invocation:
 *     smf_rebincom( ThrWorkForce *wf, smfData *comdata, smfData *gaidata,
-*                   smf_qual_t *qual, smfData *lutdata, int flags, double *map,
-*                   double *mapwgt, double *mapvar, dim_t msize,
-*                   dim_t gain_box, int *status )
+*                   smfData *vardata, smf_qual_t *qual, smfData *lutdata,
+*                   int flags, double *map, double *mapwgt, double *mapvar,
+*                   dim_t msize, dim_t gain_box, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -25,6 +25,12 @@
 *        Pointer to COM data stream to be re-gridded
 *     gaidata = smfData * (Given)
 *        Pointer to GAI data stream to be re-gridded. May be NULL.
+*     vardata = smfData* (Given)
+*        Pointer to smfData containing variance (ignore if NULL pointer). Can
+*        be either 2d (one value for each bolo), or 3d (time-varying for
+*        each bolo). In the former case ndims should still be 3, but the
+*        length of the time dimension should be 0 (e.g. a NOI model component
+*        created by smf_model_create).
 *     qual = smf_qual_t * (Given)
 *        Pointer to quality array to use.
 *     lutdata = smfData * (Given)
@@ -127,12 +133,16 @@ typedef struct SmfRebinComData {
    size_t gcstride;
    size_t tstride;
    smf_qual_t *qual;
+   dim_t vntslice;
+   size_t vbstride;
+   size_t vtstride;
+   double *var;
 } SmfRebinComData;
 
 void smf_rebincom( ThrWorkForce *wf, smfData *comdata, smfData *gaidata,
-                   smf_qual_t *qual, smfData *lutdata, int flags, double *map,
-                   double *mapwgt, double *mapvar, dim_t msize, dim_t gain_box,
-                   int *status ){
+                   smfData *vardata, smf_qual_t *qual, smfData *lutdata,
+                   int flags, double *map, double *mapwgt, double *mapvar,
+                   dim_t msize, dim_t gain_box, int *status ){
 
 /* Local Variables */
    SmfRebinComData *job_data = NULL;
@@ -151,6 +161,11 @@ void smf_rebincom( ThrWorkForce *wf, smfData *comdata, smfData *gaidata,
    size_t gcstride;
    size_t pixstep;
    size_t tstride;
+   size_t vbstride;
+   dim_t vnbolo;
+   dim_t vntslice;
+   size_t vtstride;
+   double *var;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -177,6 +192,27 @@ void smf_rebincom( ThrWorkForce *wf, smfData *comdata, smfData *gaidata,
    is 1D). */
    smf_get_dims( lutdata, NULL, NULL, &nbolo, &ntslice, NULL, &bstride,
                  &tstride, status );
+
+/* Get info about variances, if supplied. */
+   if( vardata ) {
+      var = vardata->pntr[0];
+      smf_get_dims( vardata, NULL, NULL, &vnbolo, &vntslice, NULL, &vbstride,
+                    &vtstride, status );
+
+/* Check that the variance dimensions are compatible with data */
+      if( (*status==SAI__OK) &&
+          ((vnbolo != nbolo) || ((vntslice>1)&&(vntslice!=ntslice))) ) {
+         *status = SAI__ERROR;
+         errRep(" ", "smf_rebincom: variance dimensions incompatible with data",
+                status );
+      }
+   } else {
+      var = NULL;
+      vbstride = 0;
+      vnbolo = 0;
+      vntslice = 0;
+      vtstride = 0;
+   }
 
 /* Get the strides in the GAI model. */
    if( gaidata ) {
@@ -248,6 +284,10 @@ void smf_rebincom( ThrWorkForce *wf, smfData *comdata, smfData *gaidata,
          pdata->nw = nw;
          pdata->qual = qual;
          pdata->tstride = tstride;
+         pdata->vntslice = vntslice;
+         pdata->var = var;
+         pdata->vbstride = vbstride;
+         pdata->vtstride = vtstride;
 
 /* Submit jobs to include the supplied data in the running sum arrays.
    Each thread stores its running sums in a different section of the
@@ -305,25 +345,27 @@ static void smf1_rebincom( void *job_data_ptr, int *status ) {
    dim_t ibolo;
    dim_t ip;
    dim_t itime;
-   smf_qual_t *pq0;
-   int *pl0;
-   smf_qual_t *pq;
-   int *pl;
-   double *pwg;
-   double *pwoff;
-   double comvalue;
    dim_t p1;
    dim_t p2;
    double *pc;
-   int nw;
-   size_t msize;
    double *pm;
    double *pmv;
    double *pmw;
+   double *pwg;
+   double *pwoff;
+   double comvalue;
    double s1;
    double s2;
    double s3;
+   double wgt;
+   int *pl0;
+   int *pl;
    int iw;
+   int nw;
+   size_t iv0;
+   size_t msize;
+   smf_qual_t *pq;
+   smf_qual_t *pq0;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -342,17 +384,22 @@ static void smf1_rebincom( void *job_data_ptr, int *status ) {
       size_t gbstride = pdata->gbstride;
       size_t gcstride = pdata->gcstride;
       dim_t ntslice = pdata->ntslice;
+      dim_t vntslice = pdata->vntslice;
       int nblock = pdata->nblock;
       dim_t nbolo = pdata->nbolo;
       dim_t gain_box = pdata->gain_box;
+      size_t vbstride = pdata->vbstride;
+      size_t vtstride = pdata->vtstride;
+      double *var = pdata->var;
 
 /* Allocate work space */
-      double *wg = astMalloc( ( pdata->t2 - pdata->t1 + 1 )*sizeof( *wg ) );
-      double *woff = astMalloc( ( pdata->t2 - pdata->t1 + 1 )*sizeof( *woff ) );
+      double *wg = astMalloc( ( t2 - t1 + 1 )*sizeof( *wg ) );
+      double *woff = astMalloc( ( t2 - t1 + 1 )*sizeof( *woff ) );
 
 /* Loop over all bolometers. */
       pq0 = pdata->qual + pdata->tstride*t1;
       pl0 = pdata->lut + pdata->tstride*t1;
+      iv0 = 0;
       for( ibolo = 0; ibolo < nbolo && *status == SAI__OK; ibolo++ ) {
 
 /* Skip bad bolometers */
@@ -379,10 +426,24 @@ static void smf1_rebincom( void *job_data_ptr, int *status ) {
 /* Get the COM value scaled for the bolometer. */
                   comvalue = (*pwg)*(*pc) + (*pwoff);
 
+/* Get the weight. */
+                  if( var ){
+                     wgt = var[ iv0 + ( itime % vntslice )*vtstride ];
+                     if( wgt != VAL__BADD && wgt > 0.0 ) {
+                        wgt = 1.0/wgt;
+                     } else {
+                        wgt = 0.0;
+                     }
+                  } else {
+                     wgt = 1.0;
+                  }
+
 /* Update the running sum maps. */
-                  (pdata->map)[ *pl ] += comvalue;
-                  (pdata->mapvar)[ *pl ] += comvalue*comvalue;
-                  (pdata->mapwgt)[ *pl ] += 1.0;
+                  if( wgt > 0.0 ){
+                     (pdata->map)[ *pl ] += wgt*comvalue;
+                     (pdata->mapvar)[ *pl ] += wgt*comvalue*comvalue;
+                     (pdata->mapwgt)[ *pl ] += wgt;
+                  }
                }
 
 /* Update pointers for the next time slice */
@@ -397,6 +458,7 @@ static void smf1_rebincom( void *job_data_ptr, int *status ) {
 /* Next bolometer. */
          pq0 += bstride;
          pl0 += bstride;
+         iv0 += vbstride;
       }
 
 /* Free resources */

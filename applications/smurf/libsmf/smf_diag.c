@@ -864,13 +864,20 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 /* Otherwise, bin the time-stream data to form the map. */
       } else {
 
-/* Get the indices of the first and last subarray to include in the map. */
+/* Get the indices of the first and last subarray to include in the map.
+   When dumping COM, the number of arrays is determined by the GAI model
+   since all four subarrays will share a single COM model if com.perarray
+   is zero. */
          if( map > 0 ) {
             idxlo = isub;
             idxhi = isub;
          } else {
             idxlo = 0;
-            idxhi = array->ndat - 1;
+            if( type == SMF__COM && !res ) {
+               idxhi = dat->gai[0]->ndat - 1;
+            } else {
+               idxhi = array->ndat - 1;
+            }
          }
 
 /* Allocate memory for multithreaded maps. */
@@ -893,7 +900,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
             if( idx == idxhi ) rebinflags = rebinflags | AST__REBINEND;
 
 /* Variances... */
-            if( nbolo > 1 && ntslice > 1 && dat->noi ) {
+            if( ntslice > 1 && dat->noi ) {
                noi =  dat->noi[0]->sdata[idx];
             } else {
                noi = NULL;
@@ -908,8 +915,9 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                smf_get_nsamp( (AstKeyMap *) obj, "GAIN_BOX",
                               dat->res[ 0 ]->sdata[ idx ], &gain_box, status );
                obj = astAnnul( obj );
-               smf_rebincom( wf, array->sdata[ idx ],
-                             dat->gai[ 0 ]->sdata[ idx ],
+               smf_rebincom( wf,
+                             (idx < (int) array->ndat)?array->sdata[ idx ]:array->sdata[ 0 ],
+                             dat->gai[ 0 ]->sdata[ idx ], noi,
                              smf_select_qualpntr( dat->res[ 0 ]->sdata[ idx ],
                                                   NULL, status ),
                              dat->lut[0]->sdata[idx], rebinflags,
