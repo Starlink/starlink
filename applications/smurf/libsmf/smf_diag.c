@@ -921,7 +921,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                              smf_select_qualpntr( dat->res[ 0 ]->sdata[ idx ],
                                                   NULL, status ),
                              dat->lut[0]->sdata[idx], rebinflags,
-                             wf_map, wf_mapwgt, wf_mapvar, dat->msize,
+                             wf_map, wf_mapwgt, wf_mapwgtsq, wf_mapvar, dat->msize,
                              gain_box, status );
             } else {
                smf_rebinmap1( wf, array->sdata[ idx ], noi, dat->lut[0]->sdata[idx]->pntr[0],

@@ -1882,8 +1882,8 @@ const double *smf_rebincube_tcon( smfHead *hdr, dim_t itime, double fcon,
 
 void smf_rebincom( ThrWorkForce *wf, smfData *comdata, smfData *gaidata,
                    smfData *noi, smf_qual_t *qual, smfData *lutdata, int flags,
-                   double *map, double *mapwgt, double *mapvar, dim_t msize,
-                   dim_t gain_box, int *status );
+                   double *map, double *mapwgt, double *mapwgt2, double *mapvar,
+                   dim_t msize, dim_t gain_box, int *status );
 
 void smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
                    int index, int size, AstFrameSet *outfset, int spread,

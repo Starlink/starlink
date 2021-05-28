@@ -15,8 +15,8 @@
 *  Invocation:
 *     smf_rebincom( ThrWorkForce *wf, smfData *comdata, smfData *gaidata,
 *                   smfData *vardata, smf_qual_t *qual, smfData *lutdata,
-*                   int flags, double *map, double *mapwgt, double *mapvar,
-*                   dim_t msize, dim_t gain_box, int *status )
+*                   int flags, double *map, double *mapwgt, double *mapwgt2,
+*                   double *mapvar, dim_t msize, dim_t gain_box, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -46,6 +46,11 @@
 *        have "nw*msize" elements, where "nw" is the number of worker threads
 *        in the supplied workforce. The final map is returned in the first
 *        "msize" elements.
+*     mapwgt2 = double * (Returned)
+*        Relative weighting squared for each pixel in map. The supplied array
+*        should have "nw*msize" elements, where "nw" is the number of worker
+*        threads in the supplied workforce. The final map is returned in the
+*        first "msize" elements.
 *     mapvar = double * (Returned)
 *        Variance of each pixel in map. The supplied array should have
 *        "nw*msize" elements, where "nw" is the number of worker threads in
@@ -124,6 +129,7 @@ typedef struct SmfRebinComData {
    double *map;
    double *mapvar;
    double *mapwgt;
+   double *mapwgt2;
    int *lut;
    int nblock;
    int nw;
@@ -141,8 +147,8 @@ typedef struct SmfRebinComData {
 
 void smf_rebincom( ThrWorkForce *wf, smfData *comdata, smfData *gaidata,
                    smfData *vardata, smf_qual_t *qual, smfData *lutdata,
-                   int flags, double *map, double *mapwgt, double *mapvar,
-                   dim_t msize, dim_t gain_box, int *status ){
+                   int flags, double *map, double *mapwgt, double *mapwgt2,
+                   double *mapvar, dim_t msize, dim_t gain_box, int *status ){
 
 /* Local Variables */
    SmfRebinComData *job_data = NULL;
@@ -171,7 +177,7 @@ void smf_rebincom( ThrWorkForce *wf, smfData *comdata, smfData *gaidata,
    if( *status != SAI__OK ) return;
 
 /* Check inputs */
-   if( !comdata || !map || !mapvar || !lutdata || !mapwgt ) {
+   if( !comdata || !map || !mapvar || !lutdata || !mapwgt || !mapwgt2 ) {
      *status = SAI__ERROR;
      errRep(" ", "smf_rebincom: Null inputs", status );
      return;
@@ -242,6 +248,7 @@ void smf_rebincom( ThrWorkForce *wf, smfData *comdata, smfData *gaidata,
    if( flags & AST__REBININIT ) {
       memset( map, 0, nw*msize*sizeof(*map) );
       memset( mapwgt, 0, nw*msize*sizeof(*mapwgt) );
+      memset( mapwgt2, 0, nw*msize*sizeof(*mapwgt2) );
       if( mapvar ) memset( mapvar, 0, nw*msize*sizeof(*mapvar) );
    }
 
@@ -277,6 +284,7 @@ void smf_rebincom( ThrWorkForce *wf, smfData *comdata, smfData *gaidata,
          pdata->map = map + iw*msize;
          pdata->mapvar = mapvar + iw*msize;
          pdata->mapwgt = mapwgt + iw*msize;
+         pdata->mapwgt2 = mapwgt2 + iw*msize;
          pdata->msize = msize;
          pdata->nblock = nblock;
          pdata->nbolo = nbolo;
@@ -319,6 +327,7 @@ void smf_rebincom( ThrWorkForce *wf, smfData *comdata, smfData *gaidata,
             pdata->map = map;
             pdata->mapvar = mapvar;
             pdata->mapwgt = mapwgt;
+            pdata->mapwgt2 = mapwgt2;
             pdata->oper = 2;
             thrAddJob( wf, 0, pdata, smf1_rebincom, 0, NULL, status );
          }
@@ -351,12 +360,14 @@ static void smf1_rebincom( void *job_data_ptr, int *status ) {
    double *pm;
    double *pmv;
    double *pmw;
+   double *pmw2;
    double *pwg;
    double *pwoff;
    double comvalue;
    double s1;
    double s2;
    double s3;
+   double s4;
    double wgt;
    int *pl0;
    int *pl;
@@ -443,6 +454,7 @@ static void smf1_rebincom( void *job_data_ptr, int *status ) {
                      (pdata->map)[ *pl ] += wgt*comvalue;
                      (pdata->mapvar)[ *pl ] += wgt*comvalue*comvalue;
                      (pdata->mapwgt)[ *pl ] += wgt;
+                     (pdata->mapwgt2)[ *pl ] += wgt*wgt;
                   }
                }
 
@@ -480,18 +492,22 @@ static void smf1_rebincom( void *job_data_ptr, int *status ) {
          pm = pdata->map + ip;
          pmv = pdata->mapvar + ip;
          pmw = pdata->mapwgt + ip;
+         pmw2 = pdata->mapwgt2 + ip;
          s1 = 0.0;
          s2 = 0.0;
          s3 = 0.0;
+         s4 = 0.0;
          for( iw = 0; iw < nw; iw++ ){
             s1 += *pm;
             s2 += *pmv;
             s3 += *pmw;
+            s4 += *pmw2;
 
 /* Move on to the next thread. */
             pm += msize;
             pmv += msize;
             pmw += msize;
+            pmw2 += msize;
          }
 
 /* Store the normalised values in the first map. */
@@ -499,6 +515,7 @@ static void smf1_rebincom( void *job_data_ptr, int *status ) {
             s1 /= s3;
             (pdata->mapwgt)[ ip ] = s3;
             (pdata->mapvar)[ ip ] = s2/s3 - s1*s1;
+            (pdata->mapvar)[ ip ] *= s4/(s3*s3);
             (pdata->map)[ ip ] = s1;
          } else {
             (pdata->mapwgt)[ ip ] = 0.0;
