@@ -498,26 +498,28 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 
 /* If this function has been called immediately before the start of the
    first iteration, then dump the inital cleaned data if requested. */
-      if( where == -1 && cleaned ) {
-         msgOutf( "", "Diagnostics: Dumping cleaned data at start of first "
-                  "iteration.", status );
+      if( where == -1 ) {
+         if( cleaned ) {
+            msgOutf( "", "Diagnostics: Dumping cleaned data at start of first "
+                     "iteration.", status );
 
-         if( out ) {
-            datThere( cloc, "CLN", &there, status );
-            if( !there ) datNew( cloc, "CLN", "DIAGNOSTICS", 0, NULL,
-                                 status );
-            datFind( cloc, "CLN", &mloc, status );
+            if( out ) {
+               datThere( cloc, "CLN", &there, status );
+               if( !there ) datNew( cloc, "CLN", "DIAGNOSTICS", 0, NULL,
+                                    status );
+               datFind( cloc, "CLN", &mloc, status );
+            }
+
+            if( btable ){
+               sprintf( broot, "%s_%d_cln.asc", btable, chunk );
+            }
+
+            sprintf( root, "cln_%d", chunk );
+            smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
+                      dat, SMF__RES, NULL, 1, root, 0, mingood, cube,
+                      map, addqual, tabdata, chunkfactor,
+                      btable?broot:NULL, keymap, status );
          }
-
-         if( btable ){
-            sprintf( broot, "%s_%d_cln.asc", btable, chunk );
-         }
-
-         sprintf( root, "cln_%d", chunk );
-         smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
-                   dat, SMF__RES, NULL, 1, root, 0, mingood, cube,
-                   map, addqual, tabdata, chunkfactor,
-                   btable?broot:NULL, keymap, status );
 
 /* Otherwise. */
       } else {
