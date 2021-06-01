@@ -765,7 +765,9 @@
 *       and FITS null values for vectors not within any AST island. Previously,
 *       all islands used the same value "1" and background vectors used "0".
 *    1-JUN-2021 (DSB):
-*       Check all supplied input maps have the pixel size specified by PIXSIZE.
+*       - Check all supplied input maps have the pixel size specified by PIXSIZE.
+*       - Report an error if mapvar=yes and skyloop=yes, but there are fewer 
+*       than 3 observations.
 
 '''
 
@@ -3235,6 +3237,12 @@ try:
 #  created by skyloop.
          elif mapvar and make_new_maps:
             msg_out("MAPVAR is YES, so forming new variances for {0} skyloop coadd:".format(qui))
+
+            if len(allmaps) < 3:
+               raise starutil.InvalidParameterError("\nCannot combine {0} {2} using "
+                                  "MAPVAR=YES since only {1} {0} maps are available".
+                                  format(qui, len(allmaps), "map" if (len(allmaps)==1) else "maps" ) )
+
             junk = NDG( 1 )
             invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
                    "conserve=no method=near variance=yes genvar=yes".
@@ -3319,6 +3327,11 @@ try:
                   invoke("$KAPPA_DIR/wcsalign in={0} lbnd=! out={1} ref={2} "
                          "conserve=no method=sincsinc params=\[2,0\] rebin=yes".
                          format(allmaps,catmaps,catref))
+
+                  if len(catmaps) < 3:
+                     raise starutil.InvalidParameterError("\nCannot combine {0} {2} using "
+                                  "MAPVAR=YES since only {1} {0} maps are available".
+                                  format(qui, len(catmaps), "map" if (len(catmaps)==1) else "maps" ) )
 
                   temp = NDG(1)
                   invoke("$KAPPA_DIR/wcsmosaic in={0} lbnd=! ref=! out={1} "
