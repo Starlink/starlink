@@ -235,7 +235,9 @@
 *        maps must be in units of pW. The final output I map is created by
 *        coadding any supplied I maps with the I maps created by this script.
 *        These coadded maps are created only for the required Stokes
-*        parameters - as indiciated by parameters IOUT, QOUT and UOUT.
+*        parameters - as indiciated by parameters IOUT, QOUT and UOUT. Note,
+*        an error is reported if the pixel size in any supplied map is not
+*        equal to the value of parameter PIXSIZE.
 *
 *        Any combination of the above types can be supplied. Note, if
 *        parameter REUSE is TRUE, then any required output files that
@@ -247,19 +249,25 @@
 *        contain any a priori expectations of what the final I map should look
 *        like. It is used to define the starting point for the iterative map-making
 *        algorithm, in place of the usual flat map full of zeros. The data units
-*        in the supplied NDF must be "pW". See also parameter REF. [!]
+*        in the supplied NDF must be "pW". See also parameter REF. Note, an
+*        error is reported if the pixel size in the supplied map is not equal
+*        to the value of parameter PIXSIZE. [!]
 *     INITSKYQ = NDF (Read)
 *        An NDF holding an initial guess at the final Q map. This should
 *        contain any a priori expectations of what the final Q map should look
 *        like. It is used to define the starting point for the iterative map-making
 *        algorithm, in place of the usual flat map full of zeros. The data units
-*        in the supplied NDF must be "pW". See also parameter REF. [!]
+*        in the supplied NDF must be "pW". See also parameter REF. Note, an
+*        error is reported if the pixel size in the supplied map is not equal
+*        to the value of parameter PIXSIZE. [!]
 *     INITSKYU = NDF (Read)
 *        An NDF holding an initial guess at the final U map. This should
 *        contain any a priori expectations of what the final U map should look
 *        like. It is used to define the starting point for the iterative map-making
 *        algorithm, in place of the usual flat map full of zeros. The data units
-*        in the supplied NDF must be "pW". See also parameter REF. [!]
+*        in the supplied NDF must be "pW". See also parameter REF. Note, an
+*        error is reported if the pixel size in the supplied map is not equal
+*        to the value of parameter PIXSIZE. [!]
 *     IOUT = NDF (Write)
 *        The output NDF in which to return the total intensity (I) map
 *        including all supplied observations. This will be in units of pW.
@@ -278,7 +286,9 @@
 *        accessed if parameter IPCOR is set TRUE. If null (!) is supplied
 *        for IPREF, the map supplied for parameter REF is used. The map must
 *        be in units of pW. If the same value is supplied for both IOUT
-*        and IPREF, the output I map will be used for IP correction. [!]
+*        and IPREF, the output I map will be used for IP correction. Note, an
+*        error is reported if the pixel size in the supplied map is not equal
+*        to the value of parameter PIXSIZE. [!]
 *     JY = _LOGICAL (Read)
 *        If TRUE, the I, Q and U values in the output catalogue will be
 *        in units of mJy/beam. Otherwise they will be in units of pW. Note,
@@ -342,7 +352,9 @@
 *        that specify the "external" AST and PCA masks to be used. The
 *        way in which these NDFs are used depends on the value of
 *        parameter MASKTYPE. These NDFs must be aligned in pixel
-*        coordinates with the reference map (parameter REF).
+*        coordinates with the reference map (parameter REF) Note, an
+*        error is reported if the pixel size in the supplied map is not
+*        equal to the value of parameter PIXSIZE.
 *
 *        ["AUTO"]
 *     MASKOUT1 = LITERAL (Write)
@@ -452,9 +464,9 @@
 *        Pixel dimensions in the output I, Q and U maps, in arcsec. The
 *        default is 4 arc-sec for both 450 and 850 um data. The bin size for
 *        the output catalogue can be specified separately - see parameter
-*        BINSIZE and CAT.  Note if a map is supplied for either parameter
-*        REF or parameter MASK, then PIXSIZE is ignored and the pixel size
-*        in the supplied map is used. [4]
+*        BINSIZE and CAT.  Note the pixel size within any maps supplied as
+*        input to this script should equal the value of parameter PIXSIZE.
+*        An error will be reported if this is not the case. [4]
 *     QOUT = NDF (Write)
 *        The output NDF in which to return the Q map including all supplied
 *        observations. This will be in units of pW. Supply null (!) if no Q
@@ -473,9 +485,8 @@
 *        An optional map defining the pixel grid for the output maps,
 *        and which is used to determine pointing corrections. If null
 *        (!) is supplied, then the map (if any) specified by parameter
-*        MASK is used. Note, if a map is supplied for either REF or MASK,
-*        then the PIXSIZE parameter is ignored and the pixel size in the
-*        supplied map is used.
+*        MASK is used. Note, an error is reported if the pixel size in the
+*        supplied map is not equal to the value of parameter PIXSIZE.
 *
 *        The value of the REF parameter is ignored if an NDF is supplied
 *        for one or more of parameters INITSKYI, INITSKYQ or INITSKYU. In
@@ -753,6 +764,8 @@
 *       integers for vectors within each island of emission in the AST mask,
 *       and FITS null values for vectors not within any AST island. Previously,
 *       all islands used the same value "1" and background vectors used "0".
+*    1-JUN-2021 (DSB):
+*       Check all supplied input maps have the pixel size specified by PIXSIZE.
 
 '''
 
@@ -781,6 +794,29 @@ retain = 0
 kernel = None
 
 
+#  A function to check the pixel size and units of a map and report an error
+#  if either is not the required value.
+def CheckNDF( param, ndf, pixsize, units ):
+   if ndf:
+      invoke("$KAPPA_DIR/ndftrace ndf={0}".format(ndf) )
+      if pixsize:
+         xsize = float(get_task_par( "FPIXSCALE(1)", "ndftrace" ))
+         ysize = float(get_task_par( "FPIXSCALE(2)", "ndftrace" ))
+         if abs( pixsize - xsize ) > 0.05 or abs( pixsize - ysize ) > 0.05:
+            if xsize == ysize:
+               raise starutil.InvalidParameterError("NDF '{0}' supplied for "
+                  "parameter {1} has pixel size {2} arcsec, but parameter PIXSIZE "
+                  "has value {3} arcsec.".format(ndf,param,xsize,pixsize))
+            else:
+               raise starutil.InvalidParameterError("NDF '{0}' supplied for "
+                  "parameter {1} has pixel dimensions ({2},{3}) arcsec, but "
+                  "parameter PIXSIZE has value {4} arcsec.".format(ndf,param,xsize,ysize,pixsize))
+      if units:
+         value = starutil.get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
+         if value != units:
+               raise starutil.InvalidParameterError("NDF '{0}' supplied for "
+                  "parameter {1} has units '{2}' - units must be '{3}'."
+                  .format(ndf,param,value,units))
 
 
 #  A function to create an NDF holding a two-component beam shape, as
@@ -1540,7 +1576,7 @@ try:
       circlemask = True
       maskmap = None
 
-#  Otherwise, the MASK parameter must sopecify one (if MASKTYPE is
+#  Otherwise, the MASK parameter must specify one (if MASKTYPE is
 #  "Signal") or two (if MASKTYPE is "Mask") NDFs.
    else:
       automask = False
@@ -1552,6 +1588,7 @@ try:
          if len(maskmap) != 1:
             raise starutil.InvalidParameterError("More than one NDF "
                       "supplied for parameter MASK." )
+         CheckNDF( "MASK", maskmap[0], pixsize, None )
          msg_out("Masking will be based on SNR values derived from {0}.".format(maskmap))
 
 #  See where (if at all) the masks are to be saved.
@@ -1568,6 +1605,8 @@ try:
                                             " supplied for parameter MASK." )
          astmask = maskmap[0]
          pcamask = maskmap[1]
+         CheckNDF( "MASK", astmask, pixsize, None )
+         CheckNDF( "MASK", pcamask, pixsize, None )
          msg_out("AST mask: {0}.".format(astmask))
          msg_out("PCA mask: {0}.".format(pcamask))
 
@@ -1588,16 +1627,12 @@ try:
             ly = starutil.get_task_par( "lbound(2)", "ndftrace" )
             ux = starutil.get_task_par( "ubound(1)", "ndftrace" )
             uy = starutil.get_task_par( "ubound(2)", "ndftrace" )
-
-         units = starutil.get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
-         if units != "pW":
-            raise starutil.InvalidParameterError("Map supplied for parameter {0}"
-                          " ({1}) has units '{2}' - units must be 'pW'".
-                          format(param,initskys[qui],units))
+         CheckNDF( param, initskys[qui], pixsize, "pW" )
 
 #  If no initial sky maps were supplied, get the reference map
    if ref is None:
       ref = parsys["REF"].value
+      CheckNDF( "REF", ref, pixsize, None )
    if not ref:
       if maskmap is not None:
          ref = maskmap[0]
@@ -1670,19 +1705,12 @@ try:
    if parsys["IPCOR"].value:
       ipref = parsys["IPREF"].value
       if not ipref:
-         if not ref or ref == "!":
-            raise starutil.InvalidParameterError("IP correction requested "
-                                        "but no IP reference map supplied.")
          ipref = ref
-
-      else:
-         if ipref != imap:
-            invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(ipref) )
-            units = get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
-            if units != "pW":
-               raise starutil.InvalidParameterError("IP reference map {0} is"
-                    " has units {1} - units must be pW".format(ipref,units))
-
+      if not ipref or ipref == "!":
+         raise starutil.InvalidParameterError("IP correction requested "
+                                        "but no IP reference map supplied.")
+      elif ipref != imap:
+         CheckNDF( "IPREF", ipref, pixsize, "pW" )
       ip = "ipref={0}".format(ipref)
 
 #  Ensure no history record is added to the ip reference map suggesting it
@@ -1840,18 +1868,13 @@ try:
          else:
             umaps[id] = path
 
-         inbeam = get_fits_header( NDG(path), "INBEAM" )
+         inmap = NDG(path)
+         inbeam = get_fits_header( inmap, "INBEAM" )
          if not inbeam or ("pol" not in inbeam):
             raise starutil.InvalidParameterError("One of the {0} maps ({1}) "
                                           "was not created from POL2 data or "
-                                          "is corrupt.".format(stokes,path))
-
-         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(path) )
-         units = get_task_par( "UNITS", "ndftrace" ).replace(" ", "")
-         if units != "pW":
-            raise starutil.InvalidParameterError("All supplied "
-                 "maps must be in units of 'pW', but '{0}' has units '{1}'.".
-                 format(path,units))
+                                          "is corrupt.".format(stokes,inmap))
+         CheckNDF( "IN", inmap, pixsize, "pW" )
 
 
 
