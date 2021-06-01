@@ -304,6 +304,10 @@
 /kpg/kpg1_vasv.f
 /kpg/kpg1_wmod.f
 /kpg/kpg1_xyzw.f
+/kpg/kpgCadd.c
+/kpg/kpgCdiv.c
+/kpg/kpgCmult.c
+/kpg/kpgCsub.c
 /kpg/kpgOsta8.c
 /kpg/kpg_blon.f
 /kpg/kpg_bmdn.f
