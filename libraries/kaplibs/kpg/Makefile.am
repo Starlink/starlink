@@ -95,7 +95,7 @@ kpg1_flip.gn kpg1_frac.gn kpg1_frac8.gn kpg1_gauf.gn kpg1_ghst.gn \
 kpg1_ghst8.gn kpg1_hsta.gn kpg1_hstq.gn kpg1_loct.gn kpg1_loga.gn \
 kpg1_mani.gn kpg1_mean.gn kpg1_medu.gn kpg1_mode.gn \
 kpg1_mmth.gn kpg1_mxme.gn kpg1_mxmn.gn kpg1_nois.gn \
-kpg1_nthm.gn kpg1_numb.gn kpg1_numb8.gn kpg1_past.gn kpg1_pois.gn \
+kpg1_nthm.gn kpg1_numb.gn kpg1_past.gn kpg1_pois.gn \
 kpg1_pxdp.gn kpg1_retr.gn kpg1_rmap.gn kpg1_stat.gn kpg1_stat8.gn \
 kpg1_stor.gn kpg1_tdli.gn kpg1_thrs.gn kpg1_trli.gn \
 kpg1_trsp.gn kpg1_vasv.gn kpg1_wmod.gn kpg1_mvbd.gn \
@@ -105,7 +105,7 @@ kpg_fise.gn  kpg_immm.gn kpg1_corr.gn kpg1_rms.gn kpg1_ltva.gn \
 kpg_osta8.gn kpg1_mvbd8.gn kpg1_retr8.gn kpg1_thrs8.gn \
 kpg1_bbox8.gn kpg1_fill8.gn kpg1_mxmn8.gn kpg1_past8.gn
 
-KPG_N_CGEN = kpg1_symfit.cn
+KPG_N_CGEN = kpg1_symfit.cn kpg1_numb8.cn
 
 # All except logical (include char)
 KPG_XL_GEN = kpg1_qsrt.gxl

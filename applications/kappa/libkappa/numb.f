@@ -95,12 +95,14 @@
 *     supported.
 *     -  All non-complex numeric data types can be handled.
 *     -  Any number of NDF dimensions is supported.
+*     -  Huge NDFs are supported.
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 1995, 2004 Central Laboratory of the Research
 *     Councils.
 *     Copyright (C) 2012 Science & Technology Facilities Council.
+*     Copyright (C) 2021 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -123,6 +125,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     PWD: Peter W. Draper (STARLINK)
+*     DSB: David S Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -136,6 +139,8 @@
 *        Moved CNF_PAR into declarations.
 *     2012 May 8 (MJC):
 *        Add _INT64 support.
+*     2-JUN-2021 (DSB):
+*        Add support for huge arrays.
 *     {enter_further_changes_here}
 
 *-
@@ -189,19 +194,19 @@
      :  DVMAX                  ! Maximum threshold value
 
       INTEGER
-     :  EL,                    ! Number of elements in an array
      :  IVALUE,                ! Threshold value to be tested against
      :  NC,                    ! Number of characters in text buffer
      :  NCV,                   ! Number of characters in value
      :  NDFI,                  ! Identifier for input NDF
-     :  NUMBER,                ! Number of points above threshold
      :  PNTRI( 1 )             ! Pointer to the input array
 
       INTEGER * 2
      :  WVALUE                 ! Threshold value to be tested against
 
       INTEGER * 8
-     :  KVALUE                 ! Threshold value to be tested against
+     :  EL,                    ! Number of elements in an array
+     :  KVALUE,                ! Threshold value to be tested against
+     :  NUMBER                 ! Number of points above threshold
 
       LOGICAL                  ! True if:
      :  ABOVE,                 ! Criterion uses greater than threshold
@@ -279,7 +284,7 @@
 
 *  Map the array.
 *  ==============
-      CALL KPG1_MAP( NDFI, MCOMP, ITYPE, 'READ', PNTRI, EL, STATUS )
+      CALL KPG1_MAP8( NDFI, MCOMP, ITYPE, 'READ', PNTRI, EL, STATUS )
 
 *  Process the array using the appropriate implementation data type.
 *  =================================================================
@@ -303,7 +308,7 @@
          RVALUE = VAL_DTOR( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBR( BAD, VABS, ABOVE, EL,
+         CALL KPG1_NUMB8R( BAD, VABS, ABOVE, EL,
      :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    RVALUE, NUMBER, STATUS )
 
@@ -331,7 +336,7 @@
          BVALUE = VAL_DTOB( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBB( BAD, VABS, ABOVE, EL,
+         CALL KPG1_NUMB8B( BAD, VABS, ABOVE, EL,
      :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    BVALUE, NUMBER, STATUS )
 
@@ -354,7 +359,7 @@
      :                   DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBD( BAD, VABS, ABOVE, EL,
+         CALL KPG1_NUMB8D( BAD, VABS, ABOVE, EL,
      :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    DVALUE, NUMBER, STATUS )
 
@@ -382,7 +387,7 @@
          IVALUE = VAL_DTOI( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBI( BAD, VABS, ABOVE, EL,
+         CALL KPG1_NUMB8I( BAD, VABS, ABOVE, EL,
      :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    IVALUE, NUMBER, STATUS )
 
@@ -410,7 +415,7 @@
          KVALUE = VAL_DTOK( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBK( BAD, VABS, ABOVE, EL,
+         CALL KPG1_NUMB8K( BAD, VABS, ABOVE, EL,
      :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    KVALUE, NUMBER, STATUS )
 
@@ -433,7 +438,7 @@
          BVALUE = VAL_DTOUB( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBUB( BAD, VABS, ABOVE, EL,
+         CALL KPG1_NUMB8UB( BAD, VABS, ABOVE, EL,
      :                     %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                     BVALUE, NUMBER, STATUS )
 
@@ -456,7 +461,7 @@
          WVALUE = VAL_DTOUW( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBUW( BAD, VABS, ABOVE, EL,
+         CALL KPG1_NUMB8UW( BAD, VABS, ABOVE, EL,
      :                     %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                     WVALUE, NUMBER, STATUS )
 
@@ -484,7 +489,7 @@
          WVALUE = VAL_DTOW( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBW( BAD, VABS, ABOVE, EL,
+         CALL KPG1_NUMB8W( BAD, VABS, ABOVE, EL,
      :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    WVALUE, NUMBER, STATUS )
 
@@ -494,7 +499,7 @@
       END IF
 
 *  Write the statistic to the output parameter.
-      CALL PAR_PUT0I( 'NUMBER', NUMBER, STATUS )
+      CALL PAR_PUT0K( 'NUMBER', NUMBER, STATUS )
 
 *  Report the result.
 *  ==================
@@ -542,7 +547,7 @@
 *  Make a token for the sense of the criterion, the value and the
 *  number counted.
       CALL MSG_SETC( 'VALUE', CVALUE )
-      CALL MSG_SETI( 'NUMBER', NUMBER )
+      CALL MSG_SETK( 'NUMBER', NUMBER )
       IF ( ABOVE ) THEN
          CALL MSG_SETC( 'SIGN', '>' )
       ELSE

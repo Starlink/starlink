@@ -22,8 +22,8 @@
 
      The following applications now support huge NDFs: ADD, CADD,
      CDIV, CMULT, CSUB. COLLAPSE, DIV, MFITTREND, MSTATS, MULT,
-     NDFCOPY, NDFTRACE, PERMAXES, STATS, and SUB.  Huge means more
-     than 2,147,483,647 elements in an array component.
+     NDFCOPY, NDFTRACE, NUMB, PERMAXES, STATS, and SUB.  Huge means
+     more than 2,147,483,647 elements in an array component.
 
 2 Modified_applications
 
