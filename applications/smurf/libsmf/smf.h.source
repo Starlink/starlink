@@ -1634,6 +1634,8 @@ int smf_math_fnpar( smf_math_function fid );
 
 void smf_math_cmplxerrfunc( double Rz, double Iz, double *Rr, double *Ir );
 
+void smf_median( const double *array, dim_t nel, size_t stride, int bad, double *median, int *status );
+
 void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
                         dim_t el, const double *dat,
                         const smf_qual_t *qua, size_t stride,

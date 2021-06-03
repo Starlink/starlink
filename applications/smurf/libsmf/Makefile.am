@@ -334,6 +334,7 @@ smf_mapregion_approx.c \
 smf_mask_noisy.c \
 smf_maskacsis.c \
 smf_meanshift.c \
+smf_median.c \
 smf_median_smooth.c \
 smf_model_create.c \
 smf_model_createHdr.c \
