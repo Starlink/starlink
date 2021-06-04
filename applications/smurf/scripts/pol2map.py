@@ -766,8 +766,11 @@
 *       all islands used the same value "1" and background vectors used "0".
 *    1-JUN-2021 (DSB):
 *       - Check all supplied input maps have the pixel size specified by PIXSIZE.
-*       - Report an error if mapvar=yes and skyloop=yes, but there are fewer 
+*       - Report an error if mapvar=yes and skyloop=yes, but there are fewer
 *       than 3 observations.
+*    4-JUN-2021 (DSB):
+*       Add a PCA column to the final catalogue that indicates the island
+*       within the PCA mask that contains each vector.
 
 '''
 
@@ -3442,6 +3445,17 @@ try:
                invoke( "$POLPACK_DIR/poledit in={0} out={1} ndf={2} mode=addcol "
                        "col=AST maskcol=no units=\"' '\" comment=\"'Flags indicating AST mask'\"".
                        format(tcat,outcat,astmask) )
+            except starutil.NoNdfError:
+               pass
+
+#  If we have a PCA mask, add a column (called "PCA") to the catalogue
+#  containing a non-zero value for all the source vectors inside the PCA mask.
+         if pcamask is not None:
+            try:
+               temp = NDG( pcamask, "*" )
+               invoke( "$POLPACK_DIR/poledit in={0} out={1} ndf={2} mode=addcol "
+                       "col=PCA maskcol=no units=\"' '\" comment=\"'Flags indicating PCA mask'\"".
+                       format(tcat,outcat,pcamask) )
             except starutil.NoNdfError:
                pass
 
