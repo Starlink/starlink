@@ -193,6 +193,8 @@
 *        Fix bug in initialisation of detector data structures.
 *     11-FEB-2009 (DSB):
 *        Ignore negative or zero input Tsys values.
+*     7-JUN-2021 (DSB):
+*        Include time slice index in error messages.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -252,7 +254,7 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
 
 /* Local Variables */
    AstMapping *totmap = NULL;  /* WCS->GRID Mapping from input WCS FrameSet */
-   char *detflags;             /* Flags indicating if each detector was used */
+   char *detflags = NULL;      /* Flags indicating if each detector was used */
    const char *name = NULL;    /* Pointer to current detector name */
    const double *tsys = NULL;  /* Pointer to Tsys value for first detector */
    dim_t gxout;                /* Output X grid index */
@@ -658,20 +660,24 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
                   }
 
                } else if( data->file ) {
-                  msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Detector %d "
-                             "is being ignored when processing data file '%s'.",
-                             status, idet, data->file->name );
+                  msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Detector "
+                          "%d at time slice %zu is being ignord when "
+                          "processing data file '%s'.", status, idet, (size_t) itime,
+                          data->file->name );
                }
 
             } else if( data->file ) {
-               msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Detector %d "
-                          "fell outside the output cube when processing "
-                          "data file '%s'.", status, idet, data->file->name );
+               msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Detector %d at "
+                          "time slice %zu fell outside the output cube when "
+                          "processing data file '%s'.", status, idet, (size_t) itime,
+                          data->file->name );
+
             }
          } else if( data->file ) {
-            msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Detector %d has "
-                       "an unknown position in the output cube when processing "
-                       "data file '%s'.", status, idet, data->file->name );
+            msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Detector %d at "
+                       "time slice %zu has an unknown position in the output "
+                       "cube when processing data file '%s'.", status, idet,
+                       (size_t) itime, data->file->name );
          }
       }
 

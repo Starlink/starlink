@@ -931,6 +931,11 @@
 *     29-OCT-2020 (DSB):
 *        - Added output FITS header RECPUSED.
 *        - Added parameter POINTING.
+*     7-JUN-2021 (DSB):
+*        Avoid using the group of used detectors returned by smf_rebincube when 
+*        processing the first file as the list of legal detectors supplied to 
+*        smf_rebincube when processing the next file. Instead, accumulate the 
+*        detector names returned by smf_rebincube in a separate group.
 
 *  Copyright:
 *     Copyright (C) 2017 East Asian Observatory.
@@ -1014,7 +1019,9 @@ void smurf_makecube( int *status ) {
    AstMapping *tskymap = NULL;/* GRID->SkyFrame Mapping from output tile WCS */
    AstSkyFrame *abskyfrm = NULL;/* Output SkyFrame (always absolute) */
    AstSkyFrame *oskyfrm = NULL;/* SkyFrame from the output WCS Frameset */
-   Grp *detgrp = NULL;        /* Group of detector names */
+   Grp *detgrp = NULL;        /* Group of detector names to use */
+   Grp *detgrp0 = NULL;       /* Group of detector names used by one file */
+   Grp *detgrp1 = NULL;       /* Group of detector names used by any file */
    Grp *igrp = NULL;          /* Group of input files */
    Grp *igrp4 = NULL;         /* Group holding output NDF names */
    Grp *ogrp = NULL;          /* Group containing output file */
@@ -1112,7 +1119,9 @@ void smurf_makecube( int *status ) {
    int64_t wgtsize;           /* No. of elements in the weights array */
    int64_t nused;             /* No. of input samples pasted into output cube */
    size_t idet;               /* Detector index */
+   size_t id;                 /* Detector index */
    size_t itile;              /* Output tile index */
+   size_t nd;                 /* Number of detectors */
    size_t ndet;               /* Number of detectors */
    size_t njsatile;           /* Number of output JSA tiles */
    size_t ntile;              /* Number of output tiles */
@@ -1805,6 +1814,7 @@ void smurf_makecube( int *status ) {
          nused = 0;
          ispec = 0;
          first = 1;
+         detgrp1 = NULL;
          for( ifile = 1; ifile <= tile->size && *status == SAI__OK; ifile++ ) {
 
 /* Get the zero-based index of the current input file (ifile) within the
@@ -1876,18 +1886,26 @@ void smurf_makecube( int *status ) {
 /* Handle output FITS header creation/manipulation */
                smf_fits_outhdr( data->hdr->fitshdr, &fchan, status );
 
+/* Take a copy of the supplied detgrp, since the calls below may modify
+   it. */
+               if( detgrp ){
+                  detgrp0 = grpCopy( detgrp, 0, 0, 0, status );
+               } else {
+                  detgrp0 = NULL;
+               }
+
 /* Rebin the data into the output grid. */
                if( !sparse ) {
                   smf_rebincube( wf, data, first, (ifile == ilast ), pt, badmask,
                                  is2d, abskyfrm, tskymap, ospecfrm, ospecmap,
-                                 &detgrp, moving, use_wgt, tile->elbnd,
+                                 &detgrp0, moving, use_wgt, tile->elbnd,
                                  tile->eubnd, spread, params, genvar, data_array,
                                  var_array, wgt_array, exp_array, eff_array, &fcon,
                                  &nused, &nreject, &naccept, status );
 
                } else {
                   smf_rebinsparse( data, first, pt, ospecfrm, ospecmap,
-                                   abskyfrm, &detgrp, tile->elbnd, tile->eubnd,
+                                   abskyfrm, &detgrp0, tile->elbnd, tile->eubnd,
                                    genvar, data_array, var_array, &ispec,
                                    exp_array, eff_array, &fcon, status );
                }
@@ -1899,6 +1917,21 @@ void smurf_makecube( int *status ) {
                if( data != NULL ) {
                   smf_close_file( wf, &data, status );
                   data = NULL;
+               }
+
+/* Accumulate the used detectors returned in detgrp0 by the above calls. */
+               if( !detgrp1 ) {
+                  detgrp1 = detgrp0;
+               } else if( detgrp0 ){
+                  nd = grpGrpsz( detgrp0, status );
+                  for( id = 1; id <= nd; id++ ){
+                     grpInfoc( detgrp0, id, "NAME", detname, sizeof( detname ),
+                               status );
+                     if( grpIndex( detname, detgrp1, 1, status ) == 0 ){
+                        grpPut1( detgrp1, detname, 0, status );
+                     }
+                  }
+                  grpDelet( &detgrp0, status );
                }
             }
          }
@@ -2170,12 +2203,12 @@ void smurf_makecube( int *status ) {
 
 /* Store the names of the detectors that contributed good data to the
    output cube as a space-separated list. */
-         ndet = detgrp ? grpGrpsz( detgrp, status ) : 0;
+         ndet = detgrp1 ? grpGrpsz( detgrp1, status ) : 0;
          if( ndet > 0 ) {
             detlist = NULL;
             nc = 0;
             for( idet = 1; idet <= ndet; idet++ ) {
-               grpInfoc( detgrp, idet, "NAME", detname, sizeof( detname ),
+               grpInfoc( detgrp1, idet, "NAME", detname, sizeof( detname ),
                          status );
                astChrRemoveBlanks( detname );
                detlist = astAppendStringf( detlist, &nc, " %s", detname );
@@ -2184,6 +2217,7 @@ void smurf_makecube( int *status ) {
                       status );
             detlist = astFree( detlist );
          }
+         if( detgrp1 != NULL) grpDelet( &detgrp1, status);
 
 /* If the FitsChan is not empty, store it in the FITS extension of the
    output NDF (any existing FITS extension is deleted). */
