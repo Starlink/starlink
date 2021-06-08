@@ -123,6 +123,14 @@
 *        Add new WGTS and WEIGHT arguments to KPG1_GHSTx calls.
 *     22-APR-2013 (DSB):
 *        Add "CURRENT" as a scaling option.
+*     8-JUN-2021 (DSB):
+*        If using "CURRENT", ensure the conversion of the previous
+*        scaling limits to the data type of the new image is successful.
+*        Previously, strings representing floating point numbers could
+*        be used as defaults for integer valued scaling limits, causing
+*        chr_ctoi to report an error. Now the strings are converted to
+*        integer form if required before using them as the defaults for
+*        the scaling limits.
 *     {enter_further_changes_here}
 
 *-
@@ -198,6 +206,7 @@
       INTEGER IMINV            ! Maximum value in the array
       INTEGER MAXPOS           ! Position of the maximum (not used)
       INTEGER MINPOS           ! Position of the minimum (not used)
+      INTEGER NC               ! Number of characters used
       INTEGER NINVAL           ! Number of bad values in the input array
       INTEGER NUMBIN           ! Number of bins in histogram
       INTEGER NXP              ! Number of device pixels along X axis
@@ -632,12 +641,22 @@
             IF( STATUS .NE. SAI__OK ) THEN
                CALL ERR_ANNUL( STATUS )
 
-*  Otherwise report the scaling limits for future use.
+*  Otherwise report the scaling limits for future use, converting
+*  floating point limits to integer limits if the NDF is of integer type.
             ELSE
                CALL CHR_CTOR( LOTXT, RMINV, STATUS )
                CALL CHR_CTOR( HITXT, RMAXV, STATUS )
-               CALL MSG_SETR( 'MINVAL', RMINV )
-               CALL MSG_SETR( 'MAXVAL', RMAXV )
+               IF( ITYPE .EQ. '_REAL' .OR. ITYPE .EQ. '_DOUBLE' ) THEN
+                  CALL MSG_SETR( 'MINVAL', RMINV )
+                  CALL MSG_SETR( 'MAXVAL', RMAXV )
+               ELSE
+                  IMINV = NUM_RTOI(RMINV)
+                  CALL CHR_ITOC( IMINV, LOTXT, NC )
+                  CALL MSG_SETI( 'MINVAL', IMINV )
+                  IMAXV = NUM_RTOI(RMAXV)
+                  CALL CHR_ITOC( IMAXV, HITXT, NC )
+                  CALL MSG_SETI( 'MAXVAL', IMAXV )
+               END IF
                CALL MSG_OUT( 'PVLO', 'Data will be scaled from '//
      :                       '^MINVAL to ^MAXVAL.', STATUS )
                USECUR = .TRUE.
