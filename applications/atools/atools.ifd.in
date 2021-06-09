@@ -5022,6 +5022,71 @@ iraf! {
           }
 
       }
+
+      action astdecompose {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter fmt {
+            type LITERAL
+            prompt {Format for output text file}
+            ppath DEFAULT
+            vpath DEFAULT
+            default AST
+            helpkey *
+          }
+
+         parameter invert1 {
+            type _LOGICAL
+            access WRITE
+            vpath DEFAULT
+            default TRUE
+            helpkey *
+          }
+
+         parameter invert2 {
+            type _LOGICAL
+            access WRITE
+            vpath DEFAULT
+            default TRUE
+            helpkey *
+          }
+
+         parameter map1 {
+            position 2
+            type LITERAL
+            prompt {Name of file in which to store the first component Mapping}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter map2 {
+            position 3
+            type LITERAL
+            prompt {Name of file in which to store the second component Mapping}
+            ppath DYNAMIC CURRENT
+            helpkey *
+          }
+
+         parameter series {
+            type _LOGICAL
+            access WRITE
+            vpath DEFAULT
+            default TRUE
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Mapping}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
    }
 
    command astshow {

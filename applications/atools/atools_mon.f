@@ -352,6 +352,9 @@
       ELSE IF ( NAME .EQ. 'ASTGETREGDISC' ) THEN
          CALL ASTGETREGDISC( STATUS )
 
+      ELSE IF ( NAME .EQ. 'ASTDECOMPOSE' ) THEN
+         CALL ASTDECOMPOSE( STATUS )
+
 *  If the action name is not recognised, then report an error.
       ELSE
          STATUS = SAI__ERROR
