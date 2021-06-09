@@ -95,6 +95,8 @@ void cupid_mon( int *status ) {
 *        thrGetWorkforce.
 *     19-FEB-2020 (DSB):
 *        Include used CPU time in logged information.
+*     9-JUN-2021 (DSB):
+*        Include elapsed time in logged information.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -110,7 +112,7 @@ void cupid_mon( int *status ) {
    char name[PAR__SZNAM+1];       /* C character variable to hold name */
    double junk;                   /* An unused value */
    int ast_caching;               /* Initial value of AST MemoryCaching tuning parameter */
-   int cputim[4];                 /* Context info for kpg1Cputm */
+   int times[8];                  /* Context info for kpg1Cputm/Elptm */
    int emslev1;                   /* EMS level on entry */
    int emslev2;                   /* EMS level on exit */
    int ngrp0;                     /* Number of grp ids at start */
@@ -162,8 +164,13 @@ void cupid_mon( int *status ) {
    block. */
    ndgBeggh( status );
 
-/* Record the current CPU time in CPUTIM. */
-   kpg1Cputm( cputim, &junk );
+/* Record the current CPU time in the first 4 elements of "times". */
+   junk = VAL__BADD;
+   kpg1Cputm( times, &junk );
+
+/* Record the current elapsed time in the remaining 4 elements of "times". */
+   junk = VAL__BADD;
+   kpg1Elptm( times + 4, &junk );
 
 /* Check the string against valid A-task names---if matched then call
    the relevant A-task. */
@@ -213,7 +220,7 @@ void cupid_mon( int *status ) {
 
 /* Log the task and its parameters to a log file specified by enviromnent
    variable CUPID_LOG. */
-   kpg1Lgcmd( name, "CUPID", cputim, status );
+   kpg1Lgcmd( name, "CUPID", times, status );
 
 /* Re-instate the original value of the AST ObjectCaching tuning
    parameter. */

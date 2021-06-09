@@ -218,9 +218,10 @@ void kpgStat8i( int, hdsdim, const int[], int, const float[], hdsdim *,
 
 void kpg1CrMapD( int, int, const double x[], const double y[], int, double *, int * );
 
-void kpg1Lgcmd( const char *appn, const char *pack, int *cputim, int *status );
+void kpg1Lgcmd( const char *appn, const char *pack, int *times, int *status );
 
 void kpg1Cputm( int contxt[4], double *cputim );
+void kpg1Elptm( int contxt[4], double *elptim );
 
 size_t kpg1Typsz( const char *type, int *status );
 

@@ -175,6 +175,8 @@
 *        Call NANTEN2ACSIS
 *     19-FEB-2020 (DSB):
 *        Include used CPU time in logged information.
+*     9-JUN-2021 (DSB):
+*        Include elapsed time in logged information.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -248,7 +250,7 @@ void smurf_mon( int * status ) {
   char appname[NDF__SZAPP+1];
   char filter[PAR__SZNAM+PAR__SZNAM+1];
   double junk;                 /* An unused value */
-  int cputim[4];               /* Context info for kpg1Cputm */
+  int times[8];                /* Context info for kpg1Cputm/Elptm */
   int ngrp0;                   /* Number of grp ids at start */
   int ngrp1;                   /* Number of grp ids at end */
   int nloc0;                   /* Number of active HDS Locators at start */
@@ -310,9 +312,13 @@ void smurf_mon( int * status ) {
   smurf_global_keymap = astKeyMap( "KeyCase=0" );
   astUnlock( smurf_global_keymap, 1 );
 
-  /* Record the current CPU time in CPUTIM. */
+  /* Record the current CPU time in the first 4 elements of "times". */
   junk = VAL__BADD;
-  kpg1Cputm( cputim, &junk );
+  kpg1Cputm( times, &junk );
+
+  /* Record the current elapsed time in the remaining 4 elements of "times". */
+  junk = VAL__BADD;
+  kpg1Elptm( times + 4, &junk );
 
   /* Call the subroutine associated with the requested task */
   if (strcmp( taskname, "BADBOLOS" ) == 0 ) {
@@ -465,8 +471,8 @@ void smurf_mon( int * status ) {
   ndgEndgh( status );
 
   /* Log the task and its parameters to a log file specified by enviromnent
-     variable CUPID_LOG. */
-  kpg1Lgcmd( taskname, "SMURF", cputim, status );
+     variable SMURF_LOG. */
+  kpg1Lgcmd( taskname, "SMURF", times, status );
 
   /* Clear cached info from sc2ast_createwcs. */
   sc2ast_createwcs(SC2AST__NULLSUB, NULL, NULL, NULL, NO_FTS, NULL, status);

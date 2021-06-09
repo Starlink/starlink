@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_LGCMD( APPN, PACK, CPUTIM, STATUS )
+      SUBROUTINE KPG1_LGCMD( APPN, PACK, TIMES, STATUS )
 *+
 *  Name:
 *     KPG1_LGCMD
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL  KPG1_LGCMD( APPN, PACK, CPUTIM, STATUS )
+*     CALL  KPG1_LGCMD( APPN, PACK, TIMES, STATUS )
 
 *  Description:
 *     The routine writes a record to a log file specified by environment
@@ -23,15 +23,16 @@
 *        Name of the current application.
 *     PACK = CHARACTER * ( * ) (Given)
 *        Name of the package (e.g. "KAPPA").
-*     CPUTIM( 4 ) = INTEGER (Given and returned)
-*        An array holding the CPU time at the start of the command that
-*        is being logged. This should be obtained by calling KPG1_CPUTM
-*        immediately before the command starts.
+*     TIMES( 8 ) = INTEGER (Given and returned)
+*        The first 4 elements should hold the CPU time as returned by
+*        KPG1_CPUTM. The remaining 4 elements should hold the elapsed time
+*        as returned by KPG1_ELPTM. These time should be obtained by calling
+*        KPG1_CPUTM and KPG1_ELPTM immediately before the command starts.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2015,2020 East Asian Observatory.
+*     Copyright (C) 2015,2020,2021 East Asian Observatory.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -60,6 +61,10 @@
 *        Renamed from KPS1_LGCMD to KPG1_LGCMD and added PACK argument.
 *     19-FEB-2020 (DSB):
 *        Added CPUTIM argument.
+*     19-FEB-2020 (DSB):
+*        Argument CPUTIM changed to TIMES and now includes the elapsed
+*        time as well as the CPU time. The elapsed time is now inclued in
+*        each log record.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -81,7 +86,7 @@
       CHARACTER * ( * ) PACK
 
 *  Arguments Given and Returned:
-      INTEGER CPUTIM( 4 )
+      INTEGER TIMES( 8 )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -108,7 +113,7 @@
       CHARACTER OUT( 1 )*( MXOUT ) ! Formatted output buffer
       CHARACTER PARAM*( PAR__SZNAM ) ! Parameter name
       CHARACTER VALUE*( MSG__SZMSG ) ! Parameter value
-      DOUBLE PRECISION CPUSEC    ! CPU time since previous call to KPG1_CPUTM
+      DOUBLE PRECISION SEC       ! Time since call to KPG1_CPUTM/ELPTM
       INTEGER BR                 ! Character position for breaking text
       INTEGER FD                 ! File descriptor for log file
       INTEGER IAT                ! Current length of string
@@ -166,12 +171,23 @@
             CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
 
 *  Write the CPU used to the log file, in seconds.
-            CALL KPG1_CPUTM( CPUTIM, CPUSEC )
+            CALL KPG1_CPUTM( TIMES, SEC )
             BUF = ' '
             LBUF = 0
             CALL CHR_APPND( 'CPU used:', BUF, LBUF )
             LBUF = LBUF + 1
-            CALL CHR_PUTD( CPUSEC, BUF, LBUF )
+            CALL CHR_PUTD( SEC, BUF, LBUF )
+            LBUF = LBUF + 1
+            CALL CHR_APPND( 'sec', BUF, LBUF )
+            CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
+
+*  Write the elapsed time used to the log file, in seconds.
+            CALL KPG1_ELPTM( TIMES(5), SEC )
+            BUF = ' '
+            LBUF = 0
+            CALL CHR_APPND( 'Elapsed time used:', BUF, LBUF )
+            LBUF = LBUF + 1
+            CALL CHR_PUTD( SEC, BUF, LBUF )
             LBUF = LBUF + 1
             CALL CHR_APPND( 'sec', BUF, LBUF )
             CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )

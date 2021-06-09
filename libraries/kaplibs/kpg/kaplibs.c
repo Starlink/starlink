@@ -2037,6 +2037,16 @@ void kpg1Cputm( int contxt[4], double *cputim ){
 }
 
 
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_elptm)( INTEGER_ARRAY(CONTXT),
+                            DOUBLE(ELPTIM) );
+
+void kpg1Elptm( int contxt[4], double *elptim ){
+   F77_LOCK( F77_CALL(kpg1_elptm)( contxt, elptim ); )
+}
+
+
 
 /* ------------------------------- */
 
