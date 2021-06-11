@@ -4,6 +4,11 @@
 
   The cubehelix0 colormap has been added to the quick lookups in the main panel.
 
+  A new toolbox to display IVOA MOCs over images has been added. MOCs
+  can also be export from the image regions toolbox.
+
+  Various bugs in the display of ARD regions have been fixed.
+
 
   Star-2018A Release
   ==================

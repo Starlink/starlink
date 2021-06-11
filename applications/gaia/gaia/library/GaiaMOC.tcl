@@ -106,7 +106,7 @@ itcl::class gaia::GaiaMOC {
       configure_menubutton Options -underline 0
 
       #  Add window help.
-      add_help_button stcs "On Window..."
+      add_help_button mocs "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 

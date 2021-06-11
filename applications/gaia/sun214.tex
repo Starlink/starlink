@@ -17,10 +17,10 @@
                                 Norman Gray,
                                 David S. Berry \&
                                 Mark Taylor }
-\stardocdate        {16th January 2014}
+\stardocdate        {11th June 2021}
 \stardoctitle     {GAIA --
                                 Graphical Astronomy and Image Analysis Tool}
-\stardocversion     {4.4-4}
+\stardocversion     {4.4-9}
 \stardocmanual      {User's Manual}
 \startitlepic {\includegraphics[width=0.6\textwidth]{sun214_fig}}
 
@@ -330,8 +330,13 @@ astronomical work with images:
   maximum, peak intensity \emph{etc.} will be shown. These values are
   based on a 2D gaussian fit.
 
-\item STC-S regions. STC-S region outlines (often used to define footprints of
+\item STC-S regions. IVOA STC-S region outlines (often used to define footprints of
   various kinds) can be drawn.
+
+\item MOC regions. IVOA Multi-Order Coverage region outlines (used to define
+  arbitrary regions of sky using HEALpix tessellations) can be drawn
+  when loaded from suitable FITS tables. MOCs can also be created from
+  Interactive ARD regions.
 
 \end{itemize}
 
