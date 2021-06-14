@@ -1,7 +1,7 @@
       SUBROUTINE POL1_WRTCL( CI, GOTRD, MAKERD, NDIM, GA, MAP, NCOL,
-     :                       GCOL, NROW, IDCOL, ZCOL, FD, SZBAT, LBND,
-     :                       UBND, WORK1, WORK2, WORK3, WORK4, NROWGD,
-     :                       STATUS )
+     :                       GCOL, NROW, IDCOL, ZCOL, FD, SZBAT, NZC,
+     :                       ZERCOL, LBND, UBND, WORK1, WORK2, WORK3,
+     :                       WORK4, NROWGD, STATUS )
 *+
 *  Name:
 *     POL1_WRTCL
@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     CALL POL1_WRTCL( CI, GOTRD, MAKERD, NDIM, GA, MAP, NCOL, GCOL, NROW,
-*                      IDCOL, ZCOL, FD, SZBAT, LBND, UBND, WORK1, WORK2,
-*                      WORK3, WORK4, NROWGD, STATUS )
+*                      IDCOL, ZCOL, FD, SZBAT, NZC, ZERCOL, LBND, UBND, WORK1,
+*                      WORK2, WORK3, WORK4, NROWGD, STATUS )
 
 *  Description:
 *     This routine writes out a Tcl list holding the column data in a
@@ -54,6 +54,11 @@
 *        FIO identifier for text file to hold output catalogue.
 *     SZBAT = INTEGER (Given)
 *        First dimension of work arrays.
+*     NZC = INTEGER (Given)
+*        The length of array ZERCOL.
+*     ZERCOL( * ) = INTEGER (Given)
+*        Indices into GCOL of the columns that are to have bad values
+*        replaced by zero. The array is ignored if NZC is zero.
 *     LBND( 3 ) = REAL (Retuned)
 *        The lower bounds of columns 1 (X) and 2 (Y), and the Z column.
 *     UBND( 3 ) = REAL (Retuned)
@@ -89,6 +94,8 @@
 *        Parameterize use of backslash to improve portability
 *     15-JAN-2016 (DSB):
 *        Do not write out any rows that contain one or more bad values.
+*     14-JUN-2021 (DSB):
+*        Added arguments NZC and ZERCOL.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -125,6 +132,8 @@
       INTEGER ZCOL
       INTEGER FD
       INTEGER SZBAT
+      INTEGER NZC
+      INTEGER ZERCOL( NZC )
 
 *  Arguments Returned:
       REAL LBND( 3 )
@@ -382,6 +391,17 @@
 
                END IF
 
+*  Replace bad values with zeros in the columns specified by ZERCOL.
+               IF( NZC .GT. 0 ) THEN
+                  DO J = 1, NZC
+                     K = ZERCOL( J ) - 4
+                     IF( K .GT. 0 .AND.
+     :                   WORK3( I, K ) .EQ. VAL__BADR ) THEN
+                        WORK3( I, K ) = 0.0
+                     END IF
+                  END DO
+               END IF
+
 *  See if any of the row values are bad.
                BADROW = .FALSE.
                DO J = 1, NCOL - 4, 4
@@ -472,6 +492,17 @@
                X = REAL( WORK1( I, 1 ) )
                Y = REAL( WORK1( I, 2 ) )
                JROW = IROW + I - 1
+
+*  Replace bad values with zeros in the columns specified by ZERCOL.
+               IF( NZC .GT. 0 ) THEN
+                  DO J = 1, NZC
+                     K = ZERCOL( J ) - 2
+                     IF( K .GT. 0 .AND.
+     :                   WORK3( I, K ) .EQ. VAL__BADR ) THEN
+                        WORK3( I, K ) = 0.0
+                     END IF
+                  END DO
+               END IF
 
 *  See if any of the row values are bad.
                BADROW = .FALSE.

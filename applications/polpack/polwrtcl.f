@@ -112,6 +112,9 @@
 *     19-JUN-2017 (DSB):
 *        Ensure double precision values are written out with an E exponent,
 *        rather than a D exponent (TCL does not understand D exponents).
+*     14-JUN-2021 (DSB):
+*        Replace bad values in AST and PCA columns with zeros, so that
+*        they do not prevent the row being written out.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -218,8 +221,10 @@
       INTEGER IBASE              ! Original index of WCS Base Frame
       INTEGER ICURR              ! Original index of WCS Current Frame
       INTEGER ICOL               ! Column index
+      INTEGER IDAST              ! Column index of AST column
       INTEGER IDCOL              ! Column index of ID column
       INTEGER IDLEN              ! Length of identifier strings
+      INTEGER IDPCA              ! Column index of PCA column
       INTEGER IDTYPE             ! Data type of ID column
       INTEGER IFRMPA             ! Index of POLANAL Frame
       INTEGER IFRMPX             ! Index of PIXEL Frame
@@ -238,6 +243,7 @@
       INTEGER NDIM               ! No. of dimensions in WCS Base Frame
       INTEGER NROW               ! No. of rows in input catalogue
       INTEGER NROWGD             ! No. of rows in output catalogue
+      INTEGER NZC                ! Used length of array ZERCOL
       INTEGER PXAMAP             ! Mapping from PIXEL to POLANAL
       INTEGER RACOL              ! Index of RA column within output catalogue
       INTEGER SKYFRM             ! An AST SkyFrame pointer
@@ -245,6 +251,7 @@
       INTEGER XCOL               ! Index of X column within output catalogue
       INTEGER YCOL               ! Index of Y column within output catalogue
       INTEGER ZCOL               ! Index of Z column within output catalogue
+      INTEGER ZERCOL( MXCOL )    ! Column indices for which bad->zero
       LOGICAL GOTRD              ! Will o/p catalogue have RA and DEC columns?
       LOGICAL MAKERD             ! Will we be creating new RA/DEC o/p columns?
       LOGICAL NULL               ! Is the stored value null?
@@ -299,6 +306,8 @@
       RACOL = 0
       DECCOL = 0
       IDCOL = 0
+      IDAST = 0
+      IDPCA = 0
 
       DO ICOL = 1, NCIN
 
@@ -323,6 +332,12 @@
          ELSE IF( HEAD( ICOL ) .EQ. IDCNM ) THEN
             IDCOL = ICOL
 
+         ELSE IF( HEAD( ICOL ) .EQ. "AST" ) THEN
+            IDAST = ICOL
+
+         ELSE IF( HEAD( ICOL ) .EQ. "PCA" ) THEN
+            IDPCA = ICOL
+
          END IF
 
       END DO
@@ -343,6 +358,18 @@
             IDLEN = 8
          END IF
 
+      END IF
+
+*  Construct a list of columns that are to have bad values replaced by
+*  zero.
+      NZC = 0
+      IF( IDAST .NE. 0 ) THEN
+         NZC = NZC + 1
+         ZERCOL( NZC ) = IDAST
+      END IF
+      IF( IDPCA .NE. 0 ) THEN
+         NZC = NZC + 1
+         ZERCOL( NZC ) = IDPCA
       END IF
 
 *  Abort if no X or Y column was found.
@@ -837,8 +864,8 @@
 
 *  Write values to the output file.
       CALL POL1_WRTCL( CI, GOTRD, MAKERD, NDIM, GA, MAP, NCOL, GCOL,
-     :                 NROW, IDCOL, ZCOL, FD, SZBAT, LBND, UBND,
-     :                 %VAL( CNF_PVAL( IPW1 ) ),
+     :                 NROW, IDCOL, ZCOL, FD, SZBAT, NZC, ZERCOL, LBND,
+     :                 UBND, %VAL( CNF_PVAL( IPW1 ) ),
      :                 %VAL( CNF_PVAL( IPW2 ) ),
      :                 %VAL( CNF_PVAL( IPW3 ) ),
      :                 %VAL( CNF_PVAL( IPW4 ) ), NROWGD, STATUS,
