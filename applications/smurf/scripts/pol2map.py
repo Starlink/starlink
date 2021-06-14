@@ -3427,7 +3427,7 @@ try:
             cube = tcube
 
 #  Create a FITS catalogue containing the polarisation vectors.
-         if astmask is None:
+         if astmask is None and pcamask is None:
             tcat = outcat
          else:
             tcat = NDG.tempfile(".FIT")
@@ -3440,22 +3440,28 @@ try:
 #  If we have an AST mask, add a column (called "AST") to the catalogue
 #  containing a non-zero value for all the source vectors inside the AST mask.
          if astmask is not None:
+
+            if pcamask is None:
+               tcat2 = outcat
+            else:
+               tcat2 = NDG.tempfile(".FIT")
+
             try:
-               temp = NDG( astmask, "*" )
                invoke( "$POLPACK_DIR/poledit in={0} out={1} ndf={2} mode=addcol "
                        "col=AST maskcol=no units=\"' '\" comment=\"'Flags indicating AST mask'\"".
-                       format(tcat,outcat,astmask) )
+                       format(tcat,tcat2,astmask) )
             except starutil.NoNdfError:
                pass
+         else:
+            tcat2 = tcat
 
 #  If we have a PCA mask, add a column (called "PCA") to the catalogue
 #  containing a non-zero value for all the source vectors inside the PCA mask.
          if pcamask is not None:
             try:
-               temp = NDG( pcamask, "*" )
                invoke( "$POLPACK_DIR/poledit in={0} out={1} ndf={2} mode=addcol "
                        "col=PCA maskcol=no units=\"' '\" comment=\"'Flags indicating PCA mask'\"".
-                       format(tcat,outcat,pcamask) )
+                       format(tcat2,outcat,pcamask) )
             except starutil.NoNdfError:
                pass
 
