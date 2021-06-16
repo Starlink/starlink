@@ -96,6 +96,8 @@ void ndf1Hwrt( NdfDCB *dcb, const char *appn, int nlines,
 *  History:
 *     3-APR-2019 (DSB):
 *        Original version, based on equivalent Fortran function by RFWS.
+*     16-JUN-2021 (DSB):
+*        Fix memory leak.
 
 *-
 */
@@ -209,6 +211,9 @@ void ndf1Hwrt( NdfDCB *dcb, const char *appn, int nlines,
                l = NDF_MAX( 1, l );
                datNew0C( cell, "COMMAND", l, status );
                cmpPut0C( cell, "COMMAND", lappn, status );
+
+/* Free the string, if it is not a local buffer. */
+               if( lappn != lappn_buf ) lappn = astFree( lappn );
 
 /* Obtain the user name and determine its length. Create a "user"
    component in the history record and write the name to it. */
