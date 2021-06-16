@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include <pthread.h>
 #include "sae_par.h"
 #include "dat_par.h"
@@ -54,6 +55,7 @@ static pthread_mutex_t hdsv4_mutex;
 /* Prototypes for local functions. */
 static hdsdim_v4 *dat1ExportV4Dims( const char *func, int ndim, const hdsdim *dims, int *status );
 static void dat1InitialiseV4Mutex();
+static int IsHDF( const char *path, int *status );
 
 
 /*=================================*/
@@ -3569,23 +3571,13 @@ hdsOpen(const char *file_str, const char *mode_str, HDSLoc **locator, int *statu
   EnterCheck("hdsOpen",*status);
   if (*status != SAI__OK) return *status;
 
-  /* HDSv4 can reliably spot when a file is not v4
-     format so for now we open in v4 and catch that specific error. Make
-     sure we are in a deferred error reporting context by calling emsMark
-     and emsRlse, otherwise the error may be delivered immediately rather
-     than being annuled. */
-
-  emsMark();
-
-  LOCK_MUTEX;
-  hdsOpen_v4(file_str, mode_str, locator, status);
-  UNLOCK_MUTEX;
-  if (*status == DAT__INCHK || *status == DAT__FILIN) {
-    emsAnnul(status);
+  if( IsHDF( file_str, status ) ){
     hdsOpen_v5(file_str, mode_str, locator, status);
+  } else {
+    LOCK_MUTEX;
+    hdsOpen_v4(file_str, mode_str, locator, status);
+    UNLOCK_MUTEX;
   }
-
-  emsRlse();
 
   if( *status != SAI__OK ) {
     emsRepf("hdsOpen", "hdsOpen: Failed to open '%s'", status, file_str );
@@ -3797,7 +3789,7 @@ static hdsdim_v4 *dat1ExportV4Dims( const char *func, int ndim,
          }
       }
 
-   } else {
+   } else if( ndim > 0 ) {
       *status = DAT__NOMEM;
       emsRepf( "", "%s: Failed to allocate memory for HDS V4 dimensions.",
                status, func );
@@ -3831,4 +3823,64 @@ static void dat1InitialiseV4Mutex(){
 /* Initialise the mutex using these attributes. */
    pthread_mutex_init( &hdsv4_mutex, &mta );
 }
+
+
+/*======================================================================
+   Test if a specified file is an HDF file by looking at the first 8
+   bytes. The first 8 bytes of an HDF file are always set to the
+   advertised HDF magic number pattern.
+  ====================================================================== */
+static int IsHDF( const char *path, int *status ){
+
+/* Local Variables; */
+   FILE *fd = NULL;
+   char lpath[2048];
+   const char *end;
+   int ishdf;
+   int magic[8] = { 137, 72, 68, 70, 13, 10, 26, 10 };
+   int nc;
+   unsigned char buffer[ 8 ];
+
+/* Check inherited status */
+   if( *status != SAI__OK || !path ) return 0;
+
+/* Get a pointer to the last non-space character in the supplied string. */
+   end = path + strlen( path)  - 1;
+   while( end > path && isspace( (int) *end) ) end--;
+
+/* If the file does not end with ".sdf", append ".sdf" (if there is room
+   for it in the local path buffer). Then open the file in binary read mode. */
+   nc = end - path + 1;
+   if( nc < 4 || strcmp( end - 4, ".sdf" ) ){
+      if( nc + 5 <  sizeof(lpath) ) {
+         sprintf( lpath, "%.*s.sdf", nc, path );
+         fd = fopen( lpath, "rb" );
+      }
+   } else {
+      fd = fopen( path, "rb" );
+   }
+
+/* Read the first 8 bytes into a local buffer. */
+   if( fd ) {
+      fread( buffer, 8, 1, fd );
+      fclose( fd );
+
+/* Compare the first 8 bytes with the expected HDF magic number */
+      ishdf = 1;
+      for( int i = 0; i < 8; i++ ) {
+         if( buffer[ i ] != magic[ i ] ){
+            ishdf = 0;
+            break;
+         }
+      }
+
+/* Report an error if anything went wrong. */
+   } else {
+      *status = DAT__FILRD;
+      emsRepf( " ", "hdsOpen: Failed to open %s", status, path );
+   }
+
+   return ishdf;
+}
+
 
