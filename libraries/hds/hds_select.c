@@ -3836,6 +3836,7 @@ static int IsHDF( const char *path, int *status ){
    FILE *fd = NULL;
    char lpath[2048];
    const char *end;
+   int i;
    int ishdf;
    int magic[8] = { 137, 72, 68, 70, 13, 10, 26, 10 };
    int nc;
@@ -3848,10 +3849,16 @@ static int IsHDF( const char *path, int *status ){
    end = path + strlen( path)  - 1;
    while( end > path && isspace( (int) *end) ) end--;
 
-/* If the file does not end with ".sdf", append ".sdf" (if there is room
-   for it in the local path buffer). Then open the file in binary read mode. */
+/* Save the numnber of used characters in the supplied string. */
    nc = end - path + 1;
-   if( nc < 4 || strcmp( end - 4, ".sdf" ) ){
+
+/* Work backwards looking for the first dot (.) or slash (/). */
+   while( end > path && ( *end != '.' && *end != '/' ) ) end--;
+
+/* If we found a slash first, or if we found no slash or dot, there is no
+   file type on the supplied name. So append ".sdf" (if there is room for
+   it in the local path buffer). Then open the file in binary read mode. */
+   if( *end == '/' || end == path ){
       if( nc + 5 <  sizeof(lpath) ) {
          sprintf( lpath, "%.*s.sdf", nc, path );
          fd = fopen( lpath, "rb" );
@@ -3867,7 +3874,7 @@ static int IsHDF( const char *path, int *status ){
 
 /* Compare the first 8 bytes with the expected HDF magic number */
       ishdf = 1;
-      for( int i = 0; i < 8; i++ ) {
+      for( i = 0; i < 8; i++ ) {
          if( buffer[ i ] != magic[ i ] ){
             ishdf = 0;
             break;
