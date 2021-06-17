@@ -3881,10 +3881,11 @@ static int IsHDF( const char *path, int *status ){
          }
       }
 
-/* Report an error if anything went wrong. */
+/* If it cannot be opened assume it does not yet exist. Return a value
+   that depends on the value of HDS_VERSION (i.e. the ofrmat it would
+   have it were to be created). */
    } else {
-      *status = DAT__FILRD;
-      emsRepf( " ", "hdsOpen: Failed to open %s", status, path );
+      ishdf = hds1UseVersion5();
    }
 
    return ishdf;
