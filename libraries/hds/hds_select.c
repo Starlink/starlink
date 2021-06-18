@@ -3835,57 +3835,42 @@ static int IsHDF( const char *path, int *status ){
 /* Local Variables; */
    FILE *fd = NULL;
    char lpath[2048];
-   const char *end;
    int i;
    int ishdf;
    int magic[8] = { 137, 72, 68, 70, 13, 10, 26, 10 };
-   int nc;
    unsigned char buffer[ 8 ];
 
 /* Check inherited status */
    if( *status != SAI__OK || !path ) return 0;
 
-/* Get a pointer to the last non-space character in the supplied string. */
-   end = path + strlen( path)  - 1;
-   while( end > path && isspace( (int) *end) ) end--;
+/* Expand any shell meta-characters in the path and append ".sdf" if
+   required. */
+   hdsExpandPath_v5( path, lpath, sizeof(lpath), status );
 
-/* Save the numnber of used characters in the supplied string. */
-   nc = end - path + 1;
+/* Attemp to open the file for binary reading. */
+   if( *status == SAI__OK ) {
+      fd = fopen( lpath, "rb" );
 
-/* Work backwards looking for the first dot (.) or slash (/). */
-   while( end > path && ( *end != '.' && *end != '/' ) ) end--;
-
-/* If we found a slash first, or if we found no slash or dot, there is no
-   file type on the supplied name. So append ".sdf" (if there is room for
-   it in the local path buffer). Then open the file in binary read mode. */
-   if( *end == '/' || end == path ){
-      if( nc + 5 <  sizeof(lpath) ) {
-         sprintf( lpath, "%.*s.sdf", nc, path );
-         fd = fopen( lpath, "rb" );
-      }
-   } else {
-      fd = fopen( path, "rb" );
-   }
-
-/* Read the first 8 bytes into a local buffer. */
-   if( fd ) {
-      fread( buffer, 8, 1, fd );
-      fclose( fd );
+/* If successful, read the first 8 bytes into a local buffer. */
+      if( fd ) {
+         fread( buffer, 8, 1, fd );
+         fclose( fd );
 
 /* Compare the first 8 bytes with the expected HDF magic number */
-      ishdf = 1;
-      for( i = 0; i < 8; i++ ) {
-         if( buffer[ i ] != magic[ i ] ){
-            ishdf = 0;
-            break;
+         ishdf = 1;
+         for( i = 0; i < 8; i++ ) {
+            if( buffer[ i ] != magic[ i ] ){
+               ishdf = 0;
+               break;
+            }
          }
-      }
 
 /* If it cannot be opened assume it does not yet exist. Return a value
    that depends on the value of HDS_VERSION (i.e. the ofrmat it would
    have it were to be created). */
-   } else {
-      ishdf = hds1UseVersion5();
+      } else {
+         ishdf = hds1UseVersion5();
+      }
    }
 
    return ishdf;
