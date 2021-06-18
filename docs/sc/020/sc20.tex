@@ -671,6 +671,9 @@ Efficiencies}{http://www.eaobservatory.org/jcmt/instrumentation/heterodyne/calib
 The N\=amakanui instrument is a spare receiver for the Greenland Telescope (GLT)
  on loan for use on the JCMT courtesy of ASIAA. N\=amakanui contains three inserts: 
  Ala$`$ihi , $`$\=U$`$\=u and $`$\=Aweoweo operating around 86, 230 and 345GHz.
+ Each of the thee inserts receive dual linear polarizations which are labeled using a 
+ zero based system: P0, P1. Each insert has a separate optical path and so only 
+ one receiver/frequency range can be used at any one time.
 
 \subsection{$`$\=U$`$\=u Frontend (in commissioning)}
 
@@ -860,11 +863,12 @@ and SiO\,(6$_0$-5$_0$)/SO\,(4$_3$-3$_4$) for RxA.
 \item[\textbf{Stare}]
 A stare, or sample, observation is as simple as it sounds. When you
 open reduced cubes of stare observations in \gaia\ you will see a map
-consisting of one pixel for each receptor (just one in the case of
-RxA). The left-hand panel of \cref{Figure}{fig:harpmodes}{} shows a stare
-observation opened in \gaia. You can also view the central spectrum
-using \linplot\ (see \cref{Appendix}{app:display}{Viewing your data
-with KAPPA}) or \splat.
+consisting of one pixel for each receptor; one in the case of
+$`$\=U$`$\=u, $`$\=Aweoweo and RxA and up to 16 with HARP. 
+The left-hand panel of \cref{Figure}{fig:harpmodes}{} 
+shows a stare observation (taken by HARP) opened in \gaia. You can also view the 
+central spectrum using \linplot\ (see \cref{Appendix}{app:display}{Viewing 
+your data with KAPPA}) or \splat.
 
 \item[\textbf{Jiggle}]
 A jiggle map is a common HARP observing mode. They are designed to
