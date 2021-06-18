@@ -664,12 +664,21 @@ For the latest and historical calibrations visit
 \htmladdnormallink{ACSIS Beam
 Efficiencies}{http://www.eaobservatory.org/jcmt/instrumentation/heterodyne/calibration}.
 
-\subsection{RxA3 Frontend (retired June 2018)}
 
-Receiver A3 (RxA3) is a single-element double-sideband receiver. It
-operates in the A-band between 211 and 276 GHz. In addition to stare
-observations, the most common observing mode for RxA3 is raster
-mapping. In 2016 RxA3 was updated to RxA3M. The instrument was retired in 2018.
+
+\subsection{N\=amakanui Frontend}
+
+The N\=amakanui instrument is a spare receiver for the Greenland Telescope (GLT)
+ on loan for use on the JCMT courtesy of ASIAA. N\=amakanui contains three inserts: 
+ Ala$`$ihi , $`$\=U$`$\=u and $`$\=Aweoweo operating around 86, 230 and 345GHz.
+
+\subsection{$`$\=U$`$\=u Frontend (in commissioning)}
+
+$`$\=U$`$\=u is one of three inserts held within the N\=amakanui instrument. $`$\=U$`$\=u 
+is a Sideband Separating (2SB) instrument. It operates between 215 and 
+270.6 GHz. With first light achieved October 5th 2019.  The most common observing 
+mode for $`$\=U$`$\=u is stare mode, but $`$\=U$`$\=u is also able to take jiggle and 
+raster maps. 
 
 \begin{table}[h!]
 \begin{center}
@@ -677,19 +686,40 @@ mapping. In 2016 RxA3 was updated to RxA3M. The instrument was retired in 2018.
 \hline
 Receiver &FWHM & $\eta_{\textnormal{MB}}$ & $\eta_{\textnormal{\,fss}}$\\
 \hline
-RxA3&19.\uarcs7&0.57 & 0.80\\
+$`$\=U$`$\=u&20\uarcs&0.57 & *\\
 \hline
 \end{tabular}
 \end{center}
 \end{table}
 
-RxA3M has an additional calibration step (automatically applied by our
-pipelines if you use a version after June 2019) to normalise the flux
-levels of observations between the upper and lower sideband. If you
-need more control of this in the pipeline, please see the calibration
-recipe parameters in Appendix~\ref{app:params}. The older RxA3 also
-had some variation in flux levels between the sidebands, but we do not
-have a calibration correction for this.
+
+\subsection{$`$\=Aweoweo Frontend (in commissioning)}
+
+$`$\=Aweoweo is another of three inserts held within the N\=amakanui instrument. 
+$`$\=Aweoweo, like Uu, is also a Sideband Separating (2SB) instrument. It operates 
+across a frequency range that spans between 276 and 371 GHz. 
+$`$\=Aweoweo saw first light in January 14th 2021.  Due to its sensitivity $`$\=Aweoweo's 
+most common observing mode is stare. For larger areas HARP becomes more efficient for 
+jiggle and raster mapping.
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|p{1.5cm}|p{1.2cm}|p{0.8cm}|p{0.8cm}|}
+\hline
+Receiver &FWHM & $\eta_{\textnormal{MB}}$ & $\eta_{\textnormal{\,fss}}$\\
+\hline
+$`$\=Aweoweo & * & * & * \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\subsection{Ala$`$ihi Frontend (future)}
+
+Ala$`$ihi is the other insert held within the N\=amakanui instrument. Unlike 
+$`$\=U$`$\=u and $`$\=Aweoweo, Ala$`$ihi is a Single SideBand (SSB) instrument. 
+It will operate at frequencies around 77 to 88 GHz. Its primary function at the JCMT 
+will be as part of VLBI observations. 
 
 
 \subsection{\xlabel{harp}HARP Frontend}
@@ -726,6 +756,33 @@ HARP&14\arcsec &0.63& 0.88\\
 \end{tabular}
 \end{center}
 \end{table}
+
+\subsection{RxA3 Frontend (retired June 2018)}
+
+Receiver A3 (RxA3) was a single-element double-sideband receiver. It
+operates in the A-band between 211 and 276 GHz. In addition to stare
+observations, the most common observing mode for RxA3 was raster
+mapping. In 2016 RxA3 was updated to RxA3M. The instrument was retired in 2018.
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|p{1.5cm}|p{1.2cm}|p{0.8cm}|p{0.8cm}|}
+\hline
+Receiver &FWHM & $\eta_{\textnormal{MB}}$ & $\eta_{\textnormal{\,fss}}$\\
+\hline
+RxA3&19.\uarcs7&0.57 & 0.80\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+RxA3M had an additional calibration step (automatically applied by our
+pipelines if you use a version after June 2019) to normalise the flux
+levels of observations between the upper and lower sideband. If you
+need more control of this in the pipeline, please see the calibration
+recipe parameters in Appendix~\ref{app:params}. The older RxA3 also
+had some variation in flux levels between the sidebands, but we do not
+have a calibration correction for this.
 
 
 \begin{figure}[b!]
