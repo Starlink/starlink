@@ -670,7 +670,7 @@ Efficiencies}{http://www.eaobservatory.org/jcmt/instrumentation/heterodyne/calib
 
 The N\=amakanui instrument is a spare receiver for the Greenland Telescope (GLT)
  on loan for use on the JCMT courtesy of ASIAA. N\=amakanui contains three inserts: 
- Ala$`$ihi , $`$\=U$`$\=u and $`$\=Aweoweo operating around 86, 230 and 345GHz.
+ Ala$`$ihi, $`$\=U$`$\=u and $`$\=Aweoweo operating around 86, 230 and 345GHz.
  Each of the thee inserts receive dual linear polarizations which are labeled using a 
  zero based system: P0, P1. Each insert has a separate optical path and so only 
  one receiver/frequency range can be used at any one time.
@@ -678,7 +678,7 @@ The N\=amakanui instrument is a spare receiver for the Greenland Telescope (GLT)
 \subsection{$`$\=U$`$\=u Frontend (in commissioning)}
 
 $`$\=U$`$\=u is one of three inserts held within the N\=amakanui instrument. $`$\=U$`$\=u 
-is a Sideband Separating (2SB) instrument. It operates between 215 and 
+is a dual linear polarizations Sideband Separating (2SB) instrument. It operates between 215 and 
 270.6 GHz. With first light achieved October 5th 2019.  The most common observing 
 mode for $`$\=U$`$\=u is stare mode, but $`$\=U$`$\=u is also able to take jiggle and 
 raster maps. 
@@ -699,30 +699,18 @@ $`$\=U$`$\=u&20\uarcs&0.57 & *\\
 \subsection{$`$\=Aweoweo Frontend (in commissioning)}
 
 $`$\=Aweoweo is another of three inserts held within the N\=amakanui instrument. 
-$`$\=Aweoweo, like Uu, is also a Sideband Separating (2SB) instrument. It operates 
-across a frequency range that spans between 276 and 371 GHz. 
+$`$\=Aweoweo, like Uu, is also a dual linear polarizations Sideband Separating 
+(2SB) instrument. It operates across a frequency range that spans between 276 and 371 GHz. 
 $`$\=Aweoweo saw first light in January 14th 2021.  Due to its sensitivity $`$\=Aweoweo's 
 most common observing mode is stare. For larger areas HARP becomes more efficient for 
 jiggle and raster mapping.
-
-\begin{table}[h!]
-\begin{center}
-\begin{tabular}{|p{1.5cm}|p{1.2cm}|p{0.8cm}|p{0.8cm}|}
-\hline
-Receiver &FWHM & $\eta_{\textnormal{MB}}$ & $\eta_{\textnormal{\,fss}}$\\
-\hline
-$`$\=Aweoweo & * & * & * \\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
 
 \subsection{Ala$`$ihi Frontend (future)}
 
 Ala$`$ihi is the other insert held within the N\=amakanui instrument. Unlike 
 $`$\=U$`$\=u and $`$\=Aweoweo, Ala$`$ihi is a Single SideBand (SSB) instrument. 
-It will operate at frequencies around 77 to 88 GHz. Its primary function at the JCMT 
-will be as part of VLBI observations. 
+It will operate at frequencies around 77 to 88 GHz with dual linear polarizations. 
+Its primary function at the JCMT will be as part of VLBI observations. 
 
 
 \subsection{\xlabel{harp}HARP Frontend}
@@ -962,7 +950,15 @@ include up to four frequency settings given by the different
 subsystems (00-03), while long observations may require multiple
 subscans to avoid a file size $>$512\,GB.
 
+Within each data file each receptor is named. The naming system is 
+zero-based. For HARP the receptor are labelled: H00, H01, H03... H015.
+For the N\=amakanui inserts the names follow:
 
+Instrument_Insert_Polarisation_Sideband
+
+For example $`$\=U$`$\=u receptors are: NU0L, NU0U, NU1L, NU1U, 
+with U denoting the insert. For $`$\=Aweoweo, W denotes the insert: 
+e.g. NW0L, NW0U, NW1L, NW1U and for  Ala$`$ihi, A denotes the insert. 
 
 \section{\xlabel{visualise}Visualising raw data}
 \label{sec:exam}
