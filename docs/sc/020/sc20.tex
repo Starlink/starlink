@@ -3009,7 +3009,7 @@ Occasionally you may see unexpected emission within your data. An
 example is shown in \cref{Figure}{fig:telluric1}{}. In this figure, we
 use the average spectrum feature (see
 \cref{Section}{sec:gaiaaverage}{Displaying average spectrum with
-GAIA}---and in this example---we see expected bright emission around
+GAIA})---and in this example---we see expected bright emission around
 7\kms. In addition to the expected bright emission, we see some faint
 emission around $-$30\kms.
 
@@ -3065,7 +3065,12 @@ We then use the drop-down menu next to \guithing{Standard of rest} to select
 \end{figure}
 
 Now we see the unexpected line is at 0\kms, and is therefore likely to be
-contamination from telluric lines.
+contamination from telluric lines. To confirm a telluric line we can compare the
+frequency of the unidentified line to the frequency of known telluric lines. 
+To get the frequency of the line again go to \guithing{Analysis} and click
+on \guithing{Change units} and then change the units to \guithing{Coordinates:
+Gigahertz}. Finally read off the position of the line. 
+
 
 \clearpage
 \chapter{\xlabel{gaia}Using GAIA}
