@@ -323,7 +323,7 @@ double-precision floating point.  You can either specify parameter
 values on the command line or in response to prompts.  Most parameters
 have sensible defaults leaving you to concentrate on the main
 parameters.  Parameter usage is described in a
-\xref{tutorial}{sun95}{se_param}
+\xref{tutorial}{sun95}{se_param}.
 
 \section{\xlabel{adam}How to find the current parameter values}
 \label{sec:hdstrace}
@@ -964,11 +964,11 @@ Within each data file each receptor is named. The naming system is
 zero-based. For HARP the receptor are labelled: H00, H01, H03... H015.
 For the N\=amakanui inserts the names follow:
 
-Instrument_Insert_Polarisation_Sideband
+Instrument\_Insert\_Polarisation\_Sideband
 
 For example $`$\=U$`$\=u receptors are: NU0L, NU0U, NU1L, NU1U, 
 with U denoting the insert. For $`$\=Aweoweo, W denotes the insert: 
-e.g. NW0L, NW0U, NW1L, NW1U and for  Ala$`$ihi, A denotes the insert. 
+e.g. NW0L, NW0U, NW1L, NW1U; and for Ala$`$ihi, A denotes the insert. 
 
 \section{\xlabel{visualise}Visualising raw data}
 \label{sec:exam}
@@ -1542,7 +1542,7 @@ description of all available QA parameters.
 
 If certain receptors are known to be bad for the full length of an
 observations (e.g. dead receptors), processing time can be reduced by
-not having the pipeline attempt to reduce that data. The ability to 
+not having the pipeline attempt to reduce those data. The ability to 
 masking bad receptors also provides an additional tool for those wishing 
 to examine data in more detail (e.g. when looking at data from an 
 instrument that has yet to be fully commissioned).
@@ -1980,9 +1980,9 @@ H12 H13 H04 H03 H11
 
 \subsection{Defining an output grid}
 \label{sec:outputgrid}
-You can use the \param{REF} option to define an NDF which is used to
-define an output grid. This NDF can even be in two dimensions even
-though your data may be in three dimensions.
+You can use the \param{REF} option to specify a reference NDF that
+defines an output grid. This NDF can have only two spatial dimensions,
+even though your data may be in three dimensions.
 \begin{terminalv}
 % makecube in=rawfile ref=myreffile
 \end{terminalv}
