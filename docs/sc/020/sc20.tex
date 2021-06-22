@@ -294,17 +294,24 @@ in \cref{Section}{sec:fromcadc}{Getting your data from CADC}.
 \section{File format}
 \label{sec:format}
 
-Starlink routines run on HDS files (Hierarchical Data System) which
-normally have a \file{.sdf} extension (Starlink Data File). HDS files can
-describe a multitude of formats. The most common HDS format you will
-encounter is the NDF ($N$-Dimensional Data Format)\cite{ssds}. This is the standard
-file format for storing data which represent $N$-dimensional arrays of
-numbers, such as spectra, images, etc. The parameter files discussed
-in Section~\ref{sec:hdstrace} are also HDS format.
+Starlink routines run on HDS files (Hierarchical Data System), which
+normally have a \file{.sdf} extension (Starlink Data File).
+HDS files can describe a multitude of formats. The most common HDS
+format you will encounter is the NDF ($N$-Dimensional Data
+Format)\cite{ssds}. This is the standard file format for storing data
+that represent $N$-dimensional arrays of numbers, such as spectra, and
+images.  The parameter files discussed in
+\cref{Section}{sec:hdstrace}{How to find the current parameter values}
+are also HDS format.
 
-Raw data retrieved from the JCMT Science Archive comes in FITS format.
+Raw data retrieved from the JCMT Science Archive come in FITS format.
 For information on converting between FITS and NDF see
 \cref{Appendix}{app:convert}{Converting file formats}.
+
+\begin{tip}
+The \file{.sdf} extension of HDS filenames is not required when running
+Starlink commands.
+\end{tip}
 
 \section{\xlabel{parameters}Parameters}
 \label{sec:parameters}
@@ -463,9 +470,6 @@ Full details of \ndftrace\ and \fitslist\ can be found in the
 \xref{\textsc{Kappa} manual}{sun95}{}. Details on \HDSTRACE\ can be
 found in the \xref{\textsc{hdstrace} manual}{sun102}{}.
 
-\begin{tip}
-The \file{.sdf} extension on filenames is not required when running Starlink commands.
-\end{tip}
 
 
 \section{What has already been done to the data?}
