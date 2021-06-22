@@ -862,10 +862,10 @@ and SiO\,(6$_0$-5$_0$)/SO\,(4$_3$-3$_4$) for RxA.
 A stare, or sample, observation is as simple as it sounds. When you
 open reduced cubes of stare observations in \gaia\ you will see a map
 consisting of one pixel for each receptor; one in the case of
-$`$\=U$`$\=u, $`$\=Aweoweo and RxA and up to 16 with HARP. 
-The left-hand panel of \cref{Figure}{fig:harpmodes}{} 
-shows a stare observation (taken by HARP) opened in \gaia. You can also view the 
-central spectrum using \linplot\ (see \cref{Appendix}{app:display}{Viewing 
+$`$\=U$`$\=u, $`$\=Aweoweo and RxA and up to 16 with HARP.
+The left-hand panel of \cref{Figure}{fig:harpmodes}{}
+shows a stare observation (taken by HARP) opened in \gaia. You can also view the
+central spectrum using \linplot\ (see \cref{Appendix}{app:display}{Viewing
 your data with KAPPA}) or \splat.
 
 \item[\textbf{Jiggle}]
@@ -960,15 +960,15 @@ include up to four frequency settings given by the different
 subsystems (00-03), while long observations may require multiple
 subscans to avoid a file size $>$512\,GB.
 
-Within each data file each receptor is named. The naming system is 
+Within each data file each receptor is named. The naming system is
 zero-based. For HARP the receptor are labelled: H00, H01, H03... H015.
 For the N\=amakanui inserts the names follow:
 
 Instrument\_Insert\_Polarisation\_Sideband
 
-For example $`$\=U$`$\=u receptors are: NU0L, NU0U, NU1L, NU1U, 
-with U denoting the insert. For $`$\=Aweoweo, W denotes the insert: 
-e.g. NW0L, NW0U, NW1L, NW1U; and for Ala$`$ihi, A denotes the insert. 
+For example $`$\=U$`$\=u receptors are: NU0L, NU0U, NU1L, NU1U,
+with U denoting the insert. For $`$\=Aweoweo, W denotes the insert:
+e.g. NW0L, NW0U, NW1L, NW1U; and for Ala$`$ihi, A denotes the insert.
 
 \section{\xlabel{visualise}Visualising raw data}
 \label{sec:exam}
@@ -1542,9 +1542,9 @@ description of all available QA parameters.
 
 If certain receptors are known to be bad for the full length of an
 observations (e.g. dead receptors), processing time can be reduced by
-not having the pipeline attempt to reduce those data. The ability to 
-masking bad receptors also provides an additional tool for those wishing 
-to examine data in more detail (e.g. when looking at data from an 
+not having the pipeline attempt to reduce those data. The ability to
+masking bad receptors also provides an additional tool for those wishing
+to examine data in more detail (e.g. when looking at data from an
 instrument that has yet to be fully commissioned).
 
 Information regarding bad receptors is stored in a master text file
@@ -1583,7 +1583,7 @@ file          & Reads a file called \file{bad\_receptors.lis}, which
                 first line. This file must be located in \file{\$ORAC\_DATA\_OUT}
                 and invoked by \param{-calib bad\_receptors=file}.\\
 list          & A colon-separated list of receptor names can be supplied, such as
-                \param{-calib bad\_receptors=H01:H06}, or \param{-calib 
+                \param{-calib bad\_receptors=H01:H06}, or \param{-calib
                 bad\_receptors=NU1L,NU1U}. You can append any of the other
                 options to the end of your list, such as \param{-calib bad\_receptors=H14:index}\\
 \hline
@@ -1950,7 +1950,7 @@ while the rest are ignored.
 To make a cube with only certain receptors you can use the
 \param{detectors} option on the command line. This allows you to
 either include or exclude specific receptors without the need for
-masking. The example below makes a HARP map using all HARP 
+masking. The example below makes a HARP map using all HARP
 receptors except H04 and H11.
 \begin{terminalv}
 % makecube in=rawfile autogrid out=map detectors=`"-H04,H11"'
