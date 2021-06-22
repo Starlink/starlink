@@ -1049,7 +1049,7 @@ details.
 \label{sec:badrecs}
 
 You can mask bad receptors in the time-series data with the \Kappa\
-command \chpix. In the example below all data for Receptors 7 and 8
+command \chpix. In the HARP example below all data for Receptors 7 and 8
 (on the second axis) are turned off by setting them to BAD. Note the
 commas in the \param{SECTION} parameter which specify which axis is
 being referred to; here the first (spectra) and third (time) axes are
@@ -1060,13 +1060,13 @@ for non-contiguous receptor numbers.
 % chpix in=raw out=raw_masked section="',7:8,'" newval=bad
 \end{terminalv}
 You can also mask a subset of the time stream for a particular
-receptor. The example below masks out time Steps 18 to 33 for receptor
+receptor. The example below masks out time Steps 18 to 33 for HARP receptor
 H01. See Figure~\ref{fig:maskreceptor} for instructions on how to
 identify the affected time range.
 \begin{terminalv}
 % chpix in=raw out=raw_masked section="',1:1,18:33'" newval=bad
 \end{terminalv}
-Note that the numbering for the 16 receptors here is 1--16; this is in
+Note that the numbering for the 16 HARP receptors here is 1--16; this is in
 contrast to 0--15 that you will encounter with the pipeline.
 
 For jiggle maps, where the receptors do not cover multiple sky
@@ -1084,7 +1084,7 @@ spectra (see Figures~\ref{fig:maskreceptor} and
 \includegraphics[width=1\linewidth]{sc20_maskreceptor}
 \typeout{sc20_maskreceptor inserted on page \arabic{page}}
 \caption[Identifying bad receptors in the raw data.]{\label{fig:maskreceptor}
-  The left-hand \gaia\ window shows the raw data before masking.
+  The left-hand \gaia\ window shows raw HARP data before masking.
   Clicking on a pixel will show the spectra. The spectrum shown is from
   receptor H01 at Step 18 (see circled $Y$ value). To mask this receptor
   in time from Step 18 to 33---at which point the bad baselines
@@ -1528,7 +1528,10 @@ See Appendix~\ref{app:qa} for a description of all available QA parameters.
 
 If certain receptors are known to be bad for the full length of an
 observations (e.g. dead receptors), processing time can be reduced by
-not having the pipeline attempt to reduce that data.
+not having the pipeline attempt to reduce that data. The ability to 
+masking bad receptors also provides an additional tool for those wishing 
+to examine data in more detail (e.g. when looking at data from an 
+instrument that has yet to be fully commissioned).
 
 Information regarding bad receptors is stored in a master text file
 called \file{index.bad\_receptors}, located in your
@@ -1566,7 +1569,8 @@ file          & Reads a file called \file{bad\_receptors.lis}, which
                 first line. This file must be located in \file{\$ORAC\_DATA\_OUT}
                 and invoked by \param{-calib bad\_receptors=file}.\\
 list          & A colon-separated list of receptor names can be supplied, such as
-                \param{-calib bad\_receptors=H01:H06}. You can append any of the other
+                \param{-calib bad\_receptors=H01:H06}, or \param{-calib 
+                bad\_receptors=NU1L,NU1U}. You can append any of the other
                 options to the end of your list, such as \param{-calib bad\_receptors=H14:index}\\
 \hline
 \end{tabular}
@@ -1574,6 +1578,16 @@ list          & A colon-separated list of receptor names can be supplied, such a
   The options available for the \param{-calib bad\_receptors} flag when running
   the pipeline.}
 \end{table}
+
+When reduced by \makecube\ - either by hand or through the pipeline - it
+is possible to find out which receptors are present in the data by inspecting the
+reduced data file's FITS header. This can be done using \fitslist\ or fitsval and 
+looking at the RECPUSED parameter.
+
+\begin{terminalv}
+% fitsval a20200808_00084_01_reduced001.sdf RECPUSED
+NU0L NU1L
+\end{terminalv}
 
 \section{\xlabel{starting_pl}Starting the pipeline}
 \label{sec:runpl}
@@ -1913,8 +1927,8 @@ while the rest are ignored.
 To make a cube with only certain receptors you can use the
 \param{detectors} option on the command line. This allows you to
 either include or exclude specific receptors without the need for
-masking. The example below makes a map using all receptors except H04
-and H11.
+masking. The example below makes a HARP map using all HARP 
+receptors except H04 and H11.
 \begin{terminalv}
 % makecube in=rawfile autogrid out=map detectors=`"-H04,H11"'
 \end{terminalv}
@@ -1923,6 +1937,16 @@ made with single receptors may be used to evaluate the
 receptor-to-receptor flat-field.
 \begin{terminalv}
 % makecube in=rawfile autogrid out=map detectors=`"H10"'
+\end{terminalv}
+
+When reduced by \makecube\ - either by hand or through the pipeline - it
+is possible to find out which receptors are present in the data by inspecting the
+reduced data file's FITS header. This can be done using \fitslist\ or fitsval and 
+looking at the RECPUSED parameter.
+
+\begin{terminalv}
+% fitsval a20200808_00084_01_reduced001.sdf RECPUSED
+NU0L NU1L
 \end{terminalv}
 
 
