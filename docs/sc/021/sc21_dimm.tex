@@ -14,10 +14,10 @@ The \makemap\ command can be invoked in two ways: 1) directly by typing
 indirectly as part of an ORAC-DR recipe (see
 \cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline}).
 
-This chapter describes how the map-maker produces a science image
+\textbf{This chapter describes how the map-maker produces a science image
 from raw SCUBA-2 data. It should be considered essential reading as it
 provides an understanding of how your reduced image was produced. This is
-particularly true if you wish to modify the default map-maker parameters.
+particularly true if you wish to modify the default map-maker parameters.}
 \color{red}\textbf{ If you prefer to jump straight in to the data reduction go
 to \cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline}.}\color{black}
 
@@ -75,12 +75,12 @@ science goals, be they detecting faint galaxies or mapping large
 molecular clouds. A description of these specialised configuration files
 can be found \cref{in Section}{sec:config}{here}.
 
-Note, when using the pipeline to create a map, rather than running
+\textbf{Note:} When using the pipeline to create a map, rather than running
 \makemap\ directly, the pipeline will always use a configuration
 file---one of the standard configuration files will be selected if none is
 specified by you.
 
-\section{The reduction step-by-step}
+\section{The reduction step-by-step}% (Following \underline{\href{https://ui.adsabs.harvard.edu/abs/2013MNRAS.430.2545C/abstract}{Chapin et al. (2013)}})}
 \label{sec:algorithm}
 
 This section describes the basic map-making process used by the
@@ -299,7 +299,7 @@ These models are modular however, so their order may be changed. The
 default model order is given below.
 
 \begin{terminalv}
-modelorder = (com,gai,ext,flt,ast,noi)
+modelorder = (com,gai,ext,flt,ast,noi)\footnote{If using \textsc{starlink}'s PCA background removal, one can add ``pca'' to the list: (com,gai,pca,ext,flt,ast,noi). For more information, see \href{https://www.eaobservatory.org/jcmt/2019/03/faster-pca/}{https://www.eaobservatory.org/jcmt/2019/03/faster-pca/}}
 \end{terminalv}
 
 The only configuration file not following this model order is the one tailored
@@ -335,7 +335,11 @@ form ``\param{COM.xxx}''.
   Extended emission on a scale larger than the array footprint on the
   sky will contribute a signal indistinguishable from a common-mode
   signal. This puts an upper limit on the spatial scale of
-  astronomical emission that can be recovered.\\
+  astronomical emission that can be recovered\footnote{``Fake Sources'' of 
+  known properties can be inserted into the raw SCUBA-2 time stream
+  in order to evaluate the extent of robust emission recovery. For 
+  more information, see 
+  \href{https://ui.adsabs.harvard.edu/abs/2015MNRAS.454.2557M/abstract}{Mairs et al. 2015} (\cite{extendedrecovery})}.\\
   \hline
 GAI& \model{GAI} model works with \model{COM} in removing the
   common-mode signal. \model{GAI} consists of a time-varying scale
@@ -986,6 +990,31 @@ difference is the improvement in the bowling around strong sources.
 \end{tabular}
 \end{table}
 
+\subsection{dimmconfig\_pca.lis}
+
+The newest dimmconfig file (2019) is called: dimmconfig\_pca.lis.  This parameter file can be combined with 
+other dimmconfig files to tell makemap to include a Principal Component Analysis (PCA) model in its iterative algorithm 
+(the PCA model removes noise signals that are correlated between multiple bolometer time-streams). 
+For instance, to use a PCA model when creating a map of a bright extended source, you could run makemap as follows:
+
+\begin{terminalv}
+\% more conf
+\^\$STARLINK_DIR/share/smurf/dimmconfig_bright_extended.lis
+\^\$STARLINK_DIR/share/smurf/dimmconfig_pca.lis
+\% makemap config=^conf
+\end{terminalv}
+
+To process compact sources, change “bright\_extended” above to “bright\_compact“.
+
+\begin{figure}
+\includegraphics[width=0.9\linewidth]{BrightExtendedPCA.jpg}\\
+\includegraphics[width=0.9\linewidth]{PCADifference.jpg}
+\caption[PCA dimmconfig results]
+   {\textit{Top}: Four 850 micron maps made with the basic ``bright extended'' dimmconfig. \textit{Middle}: The results of adding in the new PCA dimmconfig file. \textit{Bottom}: The mosaics of the top and middle rows (left and right, respectively) with a difference map in between.}
+   \label{fig:PCAfig}
+\end{figure}
+
+Using a PCA model can help to reduce the spurious extended structures that often appear in SCUBA-2 maps (although this benefit is bought at the cost of a much extended run time). For instance, four 850 micron maps of DR 21 are presented in Figure~\ref{fig:PCAfig} – the top row shows the maps made with the basic “bright extended” dimmconfig, the middle row shows the results of adding in the new PCA dimmconfig, and the bottom row shows mosaics of the top and middle rows (left and right, respectively) with a difference map in between.
 
 \section{\xlabel{problem}Configuration files for solving specific problems}
 \label{sec:problem}

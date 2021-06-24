@@ -86,7 +86,7 @@ For full details of the array setup and operation see Holland et al.
 \section{\xlabel{obs_modes}Observing modes}
 \label{sec:mmodes}
 
-Two observing modes are offered for SCUBA-2---\textsc{daisy} and
+Two observing modes are offered for SCUBA-2: \textsc{daisy} and
 \textsc{pong}. As the bulk of \mbox{SCUBA-2} observing involves
 large area mapping, both observing modes are scan patterns. Your
 choice depends on the size of the area you wish to map, where you
@@ -120,9 +120,38 @@ extended emission you wish to recover.
   constant velocity in a `spirograph' pattern that has the advantage
   of keeping the source on the array throughout the observation. This
   is shown in the top panel of \cref{Figure}{fig:scan}{the figure
-    below}.
+    below}. While the central $<$3~arcmin has a uniform background noise,
+    \textsc{daisy} maps cover a circular area of diameter of 12~arcmin.
 
 \end{aligndesc}
+
+\textbf{Should I use a \textsc{daisy} or a 15-arcmin \textsc{pong}?}  A 
+common issue is that a pong900 is used when possibly 
+a \textsc{daisy} would have been better, given that the latter is much faster and employs a significant 
+exposure time out to a diameter of 12~arcmin. The numbers break down as follows:
+
+\begin{figure}
+\includegraphics[width=0.47\linewidth]{DaisyRadProf.png}
+\hspace{3mm}
+\includegraphics[width=0.445\linewidth]{Pong900RadProf.png}
+\caption[Radial noise profiles for \textsc{Daisy} and \textsc{pong} maps.]{The
+radial noise profiles for a \textsc{daisy} and \textsc{pong900} map. For the same integration time, the rms in the center ($<$3~arcmin) of a \textsc{daisy} will be more than twice as good as in a \textsc{pong900}. Out to a radius of $\sim$5.5~arcmin, the noise will still be below the \textsc{pong900} target noise.}
+\label{fig:PongDaisyRadProf}
+\end{figure}
+
+\vspace{5mm}
+
+\textit{For the same integration time}, the rms in the center ($<$3~arcmin) of a Daisy will be more than twice as good as in a pong900. Out to a radius of $\sim$5.5~arcmin, the noise will still be below the pong900 target noise. Beyond this radius the noise will exceed the target noise, but that is also the case for the pong900 (see the radial profiles in Figure \ref{fig:PongDaisyRadProf}).
+
+\vspace{5mm}
+
+I.e. the trade-off is between a flatter and slightly larger map (pong900) and a somewhat smaller but much deeper map in the center with a distinct noise gradient across the field (\textsc{daisy}).
+
+\vspace{5mm}
+
+Detection experiments may well be better off with Daisies, although statistical conclusions, such as number counts, may become more complicated. The same may be true for isolated (i.e. non-mosaicked) fields where one could ask if the negative impact of the noise gradient and a smaller field out-weigh the benefits of a deeper mapping across most of the image.
+
+There are other possibilities, such as doing an initial exploratory \textsc{daisy} to the required depth in a 3~arcmin field (this can be done in less that 25\% of the time it takes for a \textsc{pong900}) and then proceed with pongs on the most promising candidate(s). \textsc{pong} and \textsc{daisy} fields can be combined. It may also be beneficial to use a pattern of offset \textsc{daisies} to mitigate somewhat for the more pronounced gradient or to better match the source morphology in the field.
 
 \subsubsection*{Why these patterns?}
 
@@ -132,12 +161,15 @@ of data taken by SCUBA-2 has a $1/f$ noise curve at lower frequencies. To
 ensure astronomical signals are far away from this $1/f$ noise, fast
 scanning speeds are required.
 
-In order to disentangle source structure from other
+In order to disentangle persistent source structure from other
 slowly varying signals (e.g. extinction, sky noise, $1/f$ noise), the
 scan pattern must pass across each region of the map from different
-directions and at different times. The scan patterns themselves, along
+directions (hour angles) and at different times. The scan patterns themselves, along
 with the associated parameters (velocity and scan-spacing), have been
-designed and optimised to meet both these criteria.
+designed and optimised to meet both these criteria. \textsc{daisies},
+\textsc{pong900}, \textsc{pong1800}, and \textsc{pong3600} have telescope
+velocities of 155$^{\prime\prime}$/s, 280$^{\prime\prime}$/s, 400$^{\prime\prime}$/s,
+and 600$^{\prime\prime}$/s, respectively.
 
 \starfig{sc21_wayne_scan}{[t!]}{width=0.98\linewidth}{fig:scan}{%
   Illustration of the SCUBA-2 observing patterns}{%
@@ -210,7 +242,7 @@ and the third time slices (sampled at roughly 200\,Hz).
 A standardised file naming scheme is used in which each file name starts
 with the sub-array name, followed by the UT date of the observation in
 the format \texttt{yyyymmdd}, followed by a five-digit observation
-number, followed by the scub-scan number. The name ends with the standard
+number, followed by the sub-scan number. The name ends with the standard
 suffix \texttt{.sdf} used by all Starlink data files. For instance, the files
 listed above hold data from the s8a sub-array for observation 34 taken on
 27th December 2013.
@@ -227,9 +259,13 @@ data---see \cref{Section}{sec:concat}{Concatenate \& apply a
 The second step is to scale the resulting map by the flux conversion factor
 (FCF) to give units of janskys. When running the
 \textsc{Orac-dr} pipeline this is done automatically.
-However it is good to check that the FCF value applied to your data is sensible.
-Checking FCF's must be done manually, instructions for this is
-given in \cref{Section}{sec:own_fcf}{Determining your own Flux conversion
-  factors}.
+% STM: We are now encouraging users to stick with the nominal FCF values since there can be a significant
+% variation over short timescales throughout the night. The long-term trends are, therefore, more robust, rather
+% than picking one or two calibrator observations on a given night that may be affected by a variety of factors.
+% Keeping this in mind, I am commenting out the lines below: 
+%However it is good to check that the FCF value applied to your data is sensible.
+%Checking FCF's must be done manually, instructions for this is
+%given in \cref{Section}{sec:own_fcf}{Determining your own Flux conversion
+%  factors}.
 
 

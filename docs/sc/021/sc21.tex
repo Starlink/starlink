@@ -5,11 +5,11 @@
 
 \stardoccategory {Starlink Cookbook}
 \stardocinitials {SC}
-\stardoccopyright{Copyright \copyright\ 2014-2015 Science and Technology Facilities Council,\\
+\stardoccopyright{Copyright \copyright\ 2014-2021 Science and Technology Facilities Council,\\
                   East Asian Observatory}
 \stardocnumber   {21.2}
 \stardoctitle    {The SCUBA-2 Data Reduction Cookbook}
-\stardocversion  {1.3}
+\stardocversion  {1.4}
 \stardocabstract {
    This cookbook provides an introduction to Starlink facilities,
    especially \textsc{smurf}, the Sub-Millimetre User Reduction Facility,
@@ -21,8 +21,8 @@
    Map-Maker, which carries out all of these steps using a single command
    controlled by a configuration file. Specialised configuration files
    are presented. }
-\stardocauthors{H.\ S.\ Thomas, M.\ J.\ Currie, D.\ S.\ Berry \& H.\ A.\ Parsons}
-\stardocdate{2015 December 10}
+\stardocauthors{H.\ S.\ Thomas, M.\ J.\ Currie, D.\ S.\ Berry, H.\ A.\ Parsons \& S. Mairs}
+\stardocdate{2021 June 23}
 \startitlepic{\includegraphics[width=0.7\textwidth]{sc21_s2logo}}
 
 
@@ -74,6 +74,7 @@
 \textbf{NDF}    & Extensible N-Dimensional Data Format\\
 \textbf{NEP}    & Noise Equivalent Power\\
 \textbf{NEFD}   & Noise Equivalent Flux Density\\
+\textbf{PCA}    & Principal Component Analysis\\
 \textbf{PSF}    & Point Spread Function\\
 \textbf{PWV}    & Precipitable Water Vapour\\
 \textbf{RMS}    & Root Mean Square\\
@@ -182,10 +183,16 @@ Telescope}}{http://dx.doi.org/10.1046/j.1365-8711.2002.05604.x},
 MNRAS, 336, 14-21 (DOI:10.1046/j.1365-8711.2002.05604.x)
 
 \bibitem{ndf}
-Jenness~T., et~al, 2014,
+Jenness~T., et~al, 2015,
 \htmladdnormallink{\textit{Learning from 25 years of the extensible
 N-Dimensional Data Format}} {http://dx.doi.org/10.1016/j.ascom.2014.11.001},
-Ast. \& Comp., in press, (DOI:10.1016/j.ascom.2014.11.001)
+Ast. \& Comp., 12:146-161, (DOI:10.1016/j.ascom.2014.11.001)
+
+\bibitem{extendedrecovery}
+Mairs~S., et~al, 2015,
+\htmladdnormallink{\textit{The JCMT Gould Belt Survey: a quantitative 
+comparison between SCUBA-2 data reduction methods}} {https://ui.adsabs.harvard.edu/abs/2015MNRAS.454.2557M/abstract},
+MNRAS, 454:2557, (\href{https://doi.org/10.1093/mnras/stv2192}{DOI:10.1093/mnras/stv2192})
 
 \bibitem{sc2ana005}
 Scott~D., Van Engelen~A., 2005, \htmladdnormallink{\textit{Scan Mode Strategies for
