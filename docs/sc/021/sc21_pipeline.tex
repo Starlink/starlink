@@ -31,7 +31,10 @@ quality of their data.
 \end{itemize}
 
 The manual for the SCUBA-2 pipeline can be found at \pipelinesun,
-while the pipeline software comes as part of the \starlink\ suite.
+while the pipeline software comes as part of the \starlink\ suite. Data
+reduction tutorials are available 
+\href{https://www.eaobservatory.org/jcmt/science/reductionanalysis-tutorials/}{online}\footnote{
+\url{https://www.eaobservatory.org/jcmt/science/reductionanalysis-tutorials/}}
 
 
 \section{\xlabel{science_pl}The Science Pipeline}
@@ -40,7 +43,7 @@ The science pipeline will perform the following:
 \vspace{-0.3cm}
 \begin{itemize}\itemsep-0.3em
 \item Run the iterative map-maker.
-\item Apply the FCF to calibrate to mJy/beam.
+\item Apply the FCF to calibrate to mJy/beam or mJy/arcsec$^2$.
 \item Co-add multiple observations of the same object.
 \item Apply the matched-filter (blank-field configuration file only)
 \item Run a source-finding algorithm.
@@ -50,27 +53,32 @@ The science pipeline will perform the following:
 \label{sec:recipes}
 
 When a project is initially created and MSBs (Minimum Scheduling Blocks)
-are created in the Observing Tool, the PI can select a pipeline recipe to assign
+are constructed using the \href{https://www.eaobservatory.org/jcmt/observing/omp/observing-tool/}{JCMT Observing Tool}, 
+the PI can select a pipeline recipe to assign
 to the data. When the data are run through the science pipeline this
 recipe is then called by default. This can be overridden on the command
 line---see \cref{Section}{sec:parameterfile}{Changing the defaults}.
-Described below are the five main \oracdr\ science recipes.
+Described below are the six main \oracdr\ science recipes. 
+
+\textbf{Note:} the ``dimmconfig*'' files can be found in: 
+
+\begin{terminalv}
+% ls $STARLINK_DIR/share/smurf/
+\end{terminalv}
 
 \subsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN}}
 
 \textbf{configuration file: \file{dimmconfig\_jsa\_generic.lis}}
 
 This recipe uses the configuration file \jsageneric\ for \makemap, unless
-the sources is identified as a calibrator. After all observations have
+the sources is identified as a calibrator in which case \file{dimmconfig\_bright\_compact.lis} is used and
+FCFs are derived from the map. After all observations have
 been processed the data are co-added and calibrated in mJy/beam using
 the default FCF. The noise and NEFD properties for the co-add are
 calculated and written to log files (\file{log.noise} and
 \file{log.nefd} respectively). Finally, the \cupid\ task \findclumps\
 is run using the FellWalker algorithm (Berry, 2015\cite{fellwalker}) to
 create a source catalogue.
-
-For calibrators, \file{dimmconfig\_bright\_compact.lis} is used and
-FCFs are derived from the map.
 
 
 \subsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN\_CHECKRMS}}
@@ -144,6 +152,8 @@ this recipe and the files produced.
 \section{\xlabel{running_pl}Running the Science Pipeline}
 \label{sec:plsteps}
 
+\textbf{Note:} Data reduction tutorials are available 
+\href{https://www.eaobservatory.org/jcmt/science/reductionanalysis-tutorials/}{online}.
 
 \begin{aligndesc}
 \item[Step~1:]
@@ -181,6 +191,22 @@ location of that file.
 written. Also used as the location for a user-specified configuration file.
 \end{itemize}
 
+Example: Setting \envvar{ORAC\_DATA\_IN} to be the current
+directory for C shells (csh, tcsh):
+
+\begin{terminalv}
+% setenv ORAC_DATA_IN ./
+\end{terminalv}
+
+\newpage 
+
+and for Bourne shells (sh, bash, zsh):
+
+\begin{terminalv}
+% export ORAC_DATA_IN=./
+\end{terminalv}
+
+
 \item[Step 3:]
 \textbf{Run the pipeline}
 
@@ -192,7 +218,8 @@ This is done by:
 \vspace{0.2cm}
 
 where the list of files that you wish to reduce can be
-an individual or multiple observations.
+an individual or multiple observations (one per line in a text file, 
+with full path names).
 
 \end{aligndesc}
 
@@ -204,7 +231,8 @@ an individual or multiple observations.
  of reduction. This is particularly recommended for new users.
 \end{tip}
 
-When executing the \oracdr command a new Xwindow will appear within which
+When executing the \oracdr command, unless ``-nodisplay'' is specified,
+a new Xwindow will appear within which
 will contain the pipeline output, as shown in Figures
 \ref{pipeline-oracdr-1}--\ref{pipeline-oracdr-4}.
 
@@ -290,7 +318,8 @@ one on the command line when starting \oracdr. For example
 
 You can find out which recipe is set in the data header via the FITS
 header \texttt{RECIPE} keyword in any of your raw files.  For
-example both of these options will return the same result:
+example both of these options will return the same result (ensure KAPPA
+commands are available before running):
 \begin{terminalv}
 % fitsval s8a20120725_00045_0003 RECIPE
 % fitslist s8a20120725_00045_0003 | grep RECIPE
@@ -436,7 +465,8 @@ iteration. The convergence can be checked from the line reporting\\*
 \hspace*{0.5cm} \texttt{smf\_iteratemap: *** NORMALIZED MAP CHANGE:
   0.10559 (mean) 2.81081 (max)}
 
-The number to look out for is the mean value. This will have to drop
+The number to look out for is the mean value of the NORMALIZED MAP CHANGE. 
+This will have to drop
 below your required \param{maptol} for convergence to be achieved.
 
 The default configuration file used in this example executes a maximum
@@ -455,26 +485,27 @@ stops after five iterations.
 
 \section{\xlabel{pl_output}Pipeline output}
 
-The pipeline will produce a group file for each object being
+The pipeline will produce a \textit{group} file for each object being
 processed. If the pipeline is given data from multiple nights, all
 those data will be included in the group co-add using inverse variance
 weighting.
 
 The final maps in your output directory will have the suffix
 \file{\_reduced}. Maps will be made for individual observations, which
-will start with an \file{s} (e.g.
+will start with an \file{s} for ``SCUBA-2'' (e.g.
 \file{s20140620\_00030\_850\_reduced.sdf}). Group maps, which may
 contain co-added observations from a single night, are also produced
-which have the prefix \file{gs} and the date/scan of the first input file
+which have the prefix \file{gs} for ``group SCUBA-2'' and the date/scan 
+of the \textit{first input file}
 (e.g. \file{gs20140620\_30\_850\_reduced.sdf}).
 
-\textbf{Note:} A group file is \emph{always} created, even if only a
-single observation is being processed.
+\textbf{Note: A group file is \emph{always} created, even if only a
+single observation is being processed.}
 
 Additionally, PNG images are made of the reduced files at a variety of
 resolutions.
 
-Another useful feature is that the pipeline will generate a log files
+Another useful feature is that the pipeline will generate log files
 to record various useful quantities. The standard log files from
 reducing science data are:
 
@@ -496,6 +527,8 @@ interface (\url{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}).
 
 To access proprietary data you will need to have your CADC username
 registered by the EAO and thereby associated with the project code.
+Please contact your friend of project or \url{helpdesk@eaobservatory.org}
+to register your account.
 
 An important search option to be aware of is `Group Type', where your
 options are Simple, Night, Project and Public. Simple (which becomes
