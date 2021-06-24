@@ -176,8 +176,8 @@ retained for diagnostic purposes; intermediate files are normally
 removed at the end of each pass through a recipe.  Reducing manually
 permits you to tidy files as you move along, but is very time consuming.
 
-Reducing RxA data and HARP stares or small jiggle maps is
-undemanding of resources.
+Reducing N\=amakanui data and HARP stares, small jiggle maps, or older
+RxA data is undemanding of resources.
 
 \section{\xlabel{software}Before you start: Starlink software}
 
@@ -604,13 +604,17 @@ spectral lines at high resolution. Heterodyne receivers take a weak
 incoming signal and mix it with a reference frequency known as the
 local oscillator (LO). This results in a signal of lower
 (intermediate) frequency (IF) which can be amplified and more easily
-sampled. The current JCMT receivers have an IF of 4\,GHz (RxA) or
-5\,GHz (HARP). This mixing produces two frequencies for each value of
+sampled. The current JCMT receivers have a standard IF of 6\,GHz for
+the  N\=amakanui insert $`$\=U$`$\=u, 5\,GHz (HARP) and 4\,GHz
+(for the retired RxA) - although these can be adjusted as needed by
+the user.This mixing produces two frequencies for each value of
 the LO ($\nu_{\textnormal{sky}} = \nu_{\textnormal{LO}}\pm\nu_{\textnormal{IF}}$) which are known as the
 upper sideband (USB) and lower sideband (LSB).
 
-In a single-sideband receiver one of these is suppressed. Double-sideband
-receivers have the two frequencies superimposed.
+In a single-sideband receiver (denoted SSB) one of these is suppressed.
+Double-sideband receivers (denoted DSB) have the two frequencies
+superimposed. In Sideband Separating mixers (denoted 2SB) both the
+USB and LSB are generated separately.
 
 Reducing the noise in the system is crucial to the efficiency of these
 receivers. The required integration time is directly proportional to
@@ -724,7 +728,8 @@ be as part of VLBI observations.
 
 \subsection{\xlabel{harp}HARP Frontend}
 
-The Heterodyne Receiver Array Programme (HARP) is a 16-receptor array
+The Heterodyne Receiver Array Programme (HARP) is single-sideband
+receiver (SSB) comprised of a16-receptor array
 arranged on a 4$\times$4 grid \cite{harp}. It operates in the B-band
 between 325 and 375 GHz. The receptors are adjacent on the focal plane
 but separated on the sky by 30 arcseconds (or approximately twice the
@@ -759,7 +764,7 @@ HARP&14\arcsec &0.63& 0.88\\
 
 \subsection{RxA3 Frontend (retired June 2018)}
 
-Receiver A3 (RxA3) was a single-element double-sideband receiver. It
+Receiver A3 (RxA3) was a single-element double-sideband (DSB) receiver. It
 operates in the A-band between 211 and 276 GHz. In addition to stare
 observations, the most common observing mode for RxA3 was raster
 mapping. In 2016 RxA3 was updated to RxA3M. The instrument was retired in 2018.
@@ -838,7 +843,8 @@ You will find each subsystem number corresponds to a different
 molecule or transition (given by the FITS headers \param{MOLECULE} and
 \param{TRANSITI}). The most common pairings are
 C$^{18}$O\,(3-2)/$^{13}$CO\,(3-2) and DCN\,(5-4)/HCN\,(4-3) for HARP,
-and SiO\,(6$_0$-5$_0$)/SO\,(4$_3$-3$_4$) for RxA.
+$^{12}$CO/$^{13}$CO/C$^{18}$O for $`$\=U$`$\=u, and with the now retired
+RxA the common pairing was SiO\,(6$_0$-5$_0$)/SO\,(4$_3$-3$_4$).
 
 \begin{figure}[t!]
 \begin{center}
@@ -862,7 +868,7 @@ and SiO\,(6$_0$-5$_0$)/SO\,(4$_3$-3$_4$) for RxA.
 A stare, or sample, observation is as simple as it sounds. When you
 open reduced cubes of stare observations in \gaia\ you will see a map
 consisting of one pixel for each receptor; one in the case of
-$`$\=U$`$\=u, $`$\=Aweoweo and RxA and up to 16 with HARP.
+$`$\=U$`$\=u, $`$\=Aweoweo and RxA, and up to 16 with HARP.
 The left-hand panel of \cref{Figure}{fig:harpmodes}{}
 shows a stare observation (taken by HARP) opened in \gaia. You can also view the
 central spectrum using \linplot\ (see \cref{Appendix}{app:display}{Viewing
