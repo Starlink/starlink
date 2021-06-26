@@ -52,6 +52,7 @@
 #include "VOTable1.1_dns.hxx"
 #include "VOTable1.2.hxx"
 #include "VOTable1.3.hxx"
+#include "VOTable1.4.hxx"
 
 using namespace std;
 
@@ -75,9 +76,9 @@ namespace gaia
         votable_12::VOTABLE *votable3_;
         votable_12::VOTABLE *openVOTable3( istream *in );
 
-        //  Open a VOTable 1.3.
-        votable_13::VOTABLE *votable4_;
-        votable_13::VOTABLE *openVOTable4( istream *in );
+        //  Open a VOTable 1.4 or 1.3.
+        votable_14::VOTABLE *votable4_;
+        votable_14::VOTABLE *openVOTable4( istream *in );
 
         //  Note for above. VOTABLE classes are not derived, so cannot
         //  simply use an array.
@@ -147,6 +148,12 @@ namespace gaia
 #undef NSVERS
 
 #define NS ::votable_13
+#define NSVERS 13
+#include "VOTableWriteFunctions.h"
+#undef NS
+#undef NSVERS
+
+#define NS ::votable_14
 #define NSVERS 13
 #include "VOTableWriteFunctions.h"
 #undef NS
