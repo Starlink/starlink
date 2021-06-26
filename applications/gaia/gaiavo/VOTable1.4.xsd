@@ -113,17 +113,17 @@
   </xs:restriction>
 </xs:simpleType>
 
-  <xs:complexType name="Min">
+  <xs:complexType name="MIN">
     <xs:attribute name="value" type="xs:string" use="required"/>
     <xs:attribute name="inclusive" type="yesno" default="yes"/>
   </xs:complexType>
-  <xs:complexType name="Max">
+  <xs:complexType name="MAX">
     <xs:attribute name="value" type="xs:string" use="required"/>
     <xs:attribute name="inclusive" type="yesno" default="yes"/>
   </xs:complexType>
-  <xs:complexType name="Option">
+  <xs:complexType name="OPTION">
     <xs:sequence>
-      <xs:element name="OPTION" type="Option" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="OPTION" type="OPTION" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
     <xs:attribute name="name" type="xs:token"/>
     <xs:attribute name="value" type="xs:string" use="required"/>
@@ -132,11 +132,11 @@
   <!-- VALUES expresses the values that can be taken by the data 
     in a column or by a parameter
   -->
-  <xs:complexType name="Values">
+  <xs:complexType name="VALUES">
     <xs:sequence>
-      <xs:element name="MIN" type="Min" minOccurs="0"/>
-      <xs:element name="MAX" type="Max" minOccurs="0"/>
-      <xs:element name="OPTION" type="Option" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="MIN" type="MIN" minOccurs="0"/>
+      <xs:element name="MAX" type="MAX" minOccurs="0"/>
+      <xs:element name="OPTION" type="OPTION" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
     <xs:attribute name="ID" type="xs:ID"/>
     <xs:attribute name="type" default="legal">
@@ -153,7 +153,7 @@
   </xs:complexType>
   
   <!-- The LINK is a URL (href) or some other kind of reference (gref) -->
-  <xs:complexType name="Link">
+  <xs:complexType name="LINK">
     <xs:annotation><xs:documentation> 
     content-role was previsouly restricted as: <![CDATA[
     <xs:attribute name="content-role">
@@ -178,7 +178,7 @@
   </xs:complexType>
   
 <!-- INFO is defined in Version 1.2 as a PARAM of String type 
-<xs:complexType name="Info">
+<xs:complexType name="INFO">
   <xs:complexContent>
     <xs:restriction base="Param">
       <xs:attribute name="unit" fixed=""/>
@@ -188,11 +188,11 @@
   </xs:complexContent>
 </xs:complexType>
  -or- as a full definition:
-<xs:complexType name="Info">
+<xs:complexType name="INFO">
   <xs:sequence> 
   <xs:element name="DESCRIPTION" type="anyTEXT" minOccurs="0"/>
-    <xs:element name="VALUES" type="Values" minOccurs="0"/>
-    <xs:element name="LINK" type="Link" minOccurs="0" maxOccurs="unbounded"/> 
+    <xs:element name="VALUES" type="VALUES" minOccurs="0"/>
+    <xs:element name="LINK" type="LINK" minOccurs="0" maxOccurs="unbounded"/> 
   </xs:sequence>
   <xs:attribute name="name" type="xs:token" use="required"/>
   <xs:attribute name="value" type="xs:string" use="required"/>
@@ -205,7 +205,7 @@
 </xs:complexType>
 -->
 <!-- No sub-element is accepted in INFO for backward compatibility -->
-<xs:complexType name="Info">
+<xs:complexType name="INFO">
   <xs:simpleContent>
     <xs:extension base="xs:string">
       <xs:attribute name="ID" type="xs:ID"/>
@@ -221,7 +221,7 @@
 </xs:complexType>
 
 <!-- Expresses the coordinate system we are using --><!-- Deprecated V1.2 -->
-<xs:complexType name="CoordinateSystem">
+<xs:complexType name="COOSYS">
   <xs:annotation><xs:documentation>
     Deprecated in Version 1.2
   </xs:documentation></xs:annotation>
@@ -256,8 +256,8 @@
         This is a time origin of a time coordinate, given as a 
         Julian Date for the the time scale and reference point
         defined.  It is usually given as a floating point
-        literal; for convenience, the magic strings “MJD-origin” 
-        (standing for 2400000.5) and “JD-origin” (standing for 0) 
+        literal; for convenience, the magic strings "MJD-origin" 
+        (standing for 2400000.5) and "JD-origin" (standing for 0) 
         are also allowed.    
     </xs:documentation>
   </xs:annotation>
@@ -301,32 +301,32 @@
   </xs:simpleContent>
 </xs:complexType>
 
-<xs:complexType name="Definitions">
+<xs:complexType name="DEFINITIONS">
   <xs:annotation><xs:documentation>
     Deprecated in Version 1.1
   </xs:documentation></xs:annotation>
   <xs:choice minOccurs="0" maxOccurs="unbounded">
-    <xs:element name="COOSYS" type="CoordinateSystem"/>
+    <xs:element name="COOSYS" type="COOSYS"/>
     <xs:element name="TIMESYS" type="TimeSystem"/>
-    <xs:element name="PARAM" type="Param"/>
+    <xs:element name="PARAM" type="PARAM"/>
   </xs:choice>
 </xs:complexType>
 
 <!-- FIELD is the definition of what is in a column of the table -->
-<xs:complexType name="Field">
+<xs:complexType name="FIELD">
   <xs:sequence> <!-- minOccurs="0" maxOccurs="unbounded" -->
     <xs:element name="DESCRIPTION" type="anyTEXT" minOccurs="0"/>
-    <xs:element name="VALUES" type="Values" minOccurs="0"/> <!-- maxOccurs="2" -->
-    <xs:element name="LINK" type="Link" minOccurs="0" maxOccurs="unbounded"/>
+    <xs:element name="VALUES" type="VALUES" minOccurs="0"/> <!-- maxOccurs="2" -->
+    <xs:element name="LINK" type="LINK" minOccurs="0" maxOccurs="unbounded"/>
   </xs:sequence>
   <xs:attribute name="ID" type="xs:ID"/>
   <xs:attribute name="unit" type="xs:token"/>
-  <xs:attribute name="datatype" type="dataType" use="required"/>
+  <xs:attribute name="datatype" type="dataType"/>
   <xs:attribute name="precision" type="precType"/>
   <xs:attribute name="width" type="xs:positiveInteger"/>
   <xs:attribute name="xtype" type="xs:token"/>
   <xs:attribute name="ref" type="xs:IDREF"/>
-  <xs:attribute name="name" type="xs:token" use="required"/>
+  <xs:attribute name="name" type="xs:token"/>
   <xs:attribute name="ucd" type="ucdType"/>
   <xs:attribute name="utype" type="xs:string"/>
   <xs:attribute name="arraysize" type="xs:string"/>
@@ -351,27 +351,27 @@
 
 <!-- A PARAM is similar to a FIELD, but it also has a "value" attribute -->
 <!--  GL: implemented here as a subtype as suggested we do in Kyoto. -->
-<xs:complexType name="Param">
+<xs:complexType name="PARAM">
   <xs:complexContent>
-    <xs:extension base="Field">
-      <xs:attribute name="value" type="xs:string" use="required"/>
+    <xs:extension base="FIELD">
+      <xs:attribute name="value" type="xs:string"/>
     </xs:extension>
   </xs:complexContent>
 </xs:complexType>
 
 
 <!-- GROUP groups columns; may include descriptions, fields/params/groups -->
-<xs:complexType name="Group">
+<xs:complexType name="GROUP">
   <xs:sequence>
     <xs:element name="DESCRIPTION" type="anyTEXT" minOccurs="0"/>
 <!--  GL I guess I can understand the next choice element as one may (?) 
       really want to group fields and params and groups in a particular order.
 -->    
     <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="FIELDref" type="FieldRef"/> 
-      <xs:element name="PARAMref" type="ParamRef"/> 
-      <xs:element name="PARAM" type="Param"/> 
-      <xs:element name="GROUP" type="Group"/> 
+      <xs:element name="FIELDref" type="FIELDref"/> 
+      <xs:element name="PARAMref" type="PARAMref"/> 
+      <xs:element name="PARAM" type="PARAM"/> 
+      <xs:element name="GROUP" type="GROUP"/> 
       <!-- GL a GroupRef could remove recursion -->
     </xs:choice>
   </xs:sequence>
@@ -386,13 +386,13 @@
      in the parent TABLE or RESOURCE -->
 <!-- GL This can not be enforced in XML Schema, so why not IDREF in <Group> ?
      In particular if the UCD and utype attributes will NOT be added -->
-<xs:complexType name="FieldRef">
+<xs:complexType name="FIELDref">
   <xs:attribute name="ref" type="xs:IDREF" use="required"/>
   <xs:attribute name="ucd"  type="ucdType"/>
   <xs:attribute name="utype" type="xs:string"/>
 </xs:complexType>
 
-<xs:complexType name="ParamRef">
+<xs:complexType name="PARAMref">
   <xs:attribute name="ref" type="xs:IDREF" use="required"/>
   <xs:attribute name="ucd"  type="ucdType"/>
   <xs:attribute name="utype" type="xs:string"/>
@@ -414,29 +414,29 @@
   </xs:complexContent>
 </xs:complexType>
  -->
-<xs:complexType name="Data">
+<xs:complexType name="DATA">
   <xs:annotation><xs:documentation>
     Added in Version 1.2: INFO for diagnostics
   </xs:documentation></xs:annotation>
   <xs:sequence>
     <xs:choice>
-      <xs:element name="TABLEDATA" type="TableData"/>
-      <xs:element name="BINARY" type="Binary"/>
-      <xs:element name="BINARY2" type="Binary2"/>
+      <xs:element name="TABLEDATA" type="TABLEDATA"/>
+      <xs:element name="BINARY" type="BINARY"/>
+      <xs:element name="BINARY2" type="BINARY2"/>
       <xs:element name="FITS" type="FITS"/>
     </xs:choice>
-    <xs:element name="INFO" type="Info" minOccurs="0" maxOccurs="unbounded"/>
+    <xs:element name="INFO" type="INFO" minOccurs="0" maxOccurs="unbounded"/>
   </xs:sequence>
 </xs:complexType>
 
 <!-- Pure XML data -->
-<xs:complexType name="TableData">
+<xs:complexType name="TABLEDATA">
   <xs:sequence>
-    <xs:element name="TR" type="Tr" minOccurs="0" maxOccurs="unbounded"/>
+    <xs:element name="TR" type="TR" minOccurs="0" maxOccurs="unbounded"/>
   </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="Td">
+<xs:complexType name="TD">
   <xs:simpleContent>
     <xs:extension base="xs:string">
       <!-- xs:attribute name="ref" type="xs:IDREF"/ -->
@@ -452,14 +452,14 @@
   </xs:simpleContent>
 </xs:complexType>
 
-<xs:complexType name="Tr">
+<xs:complexType name="TR">
   <xs:annotation><xs:documentation>
     The ID attribute is added here to the TR tag to avoid 
     problems of code generators which do not properly 
     interpret the TR/TD structures
   </xs:documentation></xs:annotation>
   <xs:sequence>
-    <xs:element name="TD" type="Td" maxOccurs="unbounded"/>
+    <xs:element name="TD" type="TD" maxOccurs="unbounded"/>
   </xs:sequence>
   <xs:attribute name="ID" type="xs:ID"/>
 </xs:complexType>
@@ -467,27 +467,27 @@
 <!-- FITS file, perhaps with specification of which extension to seek to -->
 <xs:complexType name="FITS">
   <xs:sequence>
-    <xs:element name="STREAM" type="Stream"/>
+    <xs:element name="STREAM" type="STREAM"/>
   </xs:sequence>
   <xs:attribute name="extnum" type="xs:positiveInteger"/>
 </xs:complexType>
 
 <!-- BINARY data format -->
-<xs:complexType name="Binary">
+<xs:complexType name="BINARY">
   <xs:sequence>
-    <xs:element name="STREAM" type="Stream"/>
-  </xs:sequence>
+    <xs:element name="STREAM" type="STREAM"/>
+ </xs:sequence>
 </xs:complexType>
 
 <!-- BINARY2 data format -->
-<xs:complexType name="Binary2">
+<xs:complexType name="BINARY2">
   <xs:sequence>
-    <xs:element name="STREAM" type="Stream"/>
+    <xs:element name="STREAM" type="STREAM"/>
   </xs:sequence>
 </xs:complexType>
 
 <!-- STREAM can be local or remote, encoded or not -->
-<xs:complexType name="Stream">
+<xs:complexType name="STREAM">
   <xs:simpleContent>
     <xs:extension base="xs:string">
       <xs:attribute name="type" default="locator">
@@ -519,7 +519,7 @@
 <!-- A TABLE is a sequence of FIELD/PARAMs and LINKS and DESCRIPTION, 
      possibly followed by a DATA section 
 -->
-<xs:complexType name="Table">
+<xs:complexType name="TABLE">
   <xs:annotation><xs:documentation>
     Added in Version 1.2: INFO for diagnostics
   </xs:documentation></xs:annotation>
@@ -527,31 +527,31 @@
     <xs:element name="DESCRIPTION" type="anyTEXT" minOccurs="0"/>
 <!-- GL: why a choice iso for example -->
 <!-- 
-      <xs:element name="PARAM" type="Param" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:element name="FIELD" type="Field" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:element name="GROUP" type="Group" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="PARAM" type="pARAM" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="FIELD" type="fIELD" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="GROUP" type="gROUP" minOccurs="0" maxOccurs="unbounded"/>
 -->
 <!-- 
   This could also enforce groups to be defined after the fields and params 
   to which they must have a reference, which is somewhat more logical
 -->
     <!-- Added Version 1.2: -->
-    <xs:element name="INFO" type="Info" minOccurs="0" maxOccurs="unbounded"/> 
+    <xs:element name="INFO" type="INFO" minOccurs="0" maxOccurs="unbounded"/> 
     <!-- An empty table without any FIELD/PARAM should not be acceptable -->
     <xs:choice minOccurs="1" maxOccurs="unbounded"> 
-      <xs:element name="FIELD" type="Field"/>
-      <xs:element name="PARAM" type="Param"/>
-      <xs:element name="GROUP" type="Group"/>
+      <xs:element name="FIELD" type="FIELD"/>
+      <xs:element name="PARAM" type="PARAM"/>
+      <xs:element name="GROUP" type="GROUP"/>
     </xs:choice>
-    <xs:element name="LINK" type="Link" minOccurs="0" maxOccurs="unbounded"/>
+    <xs:element name="LINK" type="LINK" minOccurs="0" maxOccurs="unbounded"/>
     <!-- This would allow several DATA parts in a table (future extension?)
     <xs:sequence minOccurs="0" maxOccurs="unbounded">  
-      <xs:element name="DATA" type="Data"/>
-      <xs:element name="INFO" type="Info" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="DATA" type="DATA"/>
+      <xs:element name="INFO" type="INFO" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
     -->
-    <xs:element name="DATA" type="Data" minOccurs="0"/>
-    <xs:element name="INFO" type="Info" minOccurs="0" maxOccurs="unbounded"/>
+    <xs:element name="DATA" type="DATA" minOccurs="0"/>
+    <xs:element name="INFO" type="INFO" minOccurs="0" maxOccurs="unbounded"/>
   </xs:sequence>
   <xs:attribute name="ID"   type="xs:ID"/>
   <xs:attribute name="name" type="xs:token"/>
@@ -562,26 +562,26 @@
 </xs:complexType>
 
 <!-- RESOURCES can contain DESCRIPTION, (INFO|PARAM|COSYS), LINK, TABLEs -->
-<xs:complexType name="Resource">
+<xs:complexType name="RESOURCE">
   <xs:annotation><xs:documentation>
      Added in Version 1.2: INFO for diagnostics in several places
   </xs:documentation></xs:annotation>
   <xs:sequence>
     <xs:element name="DESCRIPTION" type="anyTEXT" minOccurs="0"/>
-    <xs:element name="INFO" type="Info" minOccurs="0" maxOccurs="unbounded"/>
+    <xs:element name="INFO" type="INFO" minOccurs="0" maxOccurs="unbounded"/>
     <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="COOSYS" type="CoordinateSystem"/>
+      <xs:element name="COOSYS" type="COOSYS"/>
       <xs:element name="TIMESYS" type="TimeSystem"/>
-      <xs:element name="GROUP" type="Group" />
-      <xs:element name="PARAM" type="Param" />
+      <xs:element name="GROUP" type="GROUP" />
+      <xs:element name="PARAM" type="PARAM" />
     </xs:choice>
     <xs:sequence minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="LINK" type="Link" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="LINK" type="LINK" minOccurs="0" maxOccurs="unbounded"/>
       <xs:choice>
-        <xs:element name="TABLE" type="Table" />
-        <xs:element name="RESOURCE" type="Resource" />
+        <xs:element name="TABLE" type="TABLE" />
+        <xs:element name="RESOURCE" type="RESOURCE" />
       </xs:choice>
-      <xs:element name="INFO" type="Info" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="INFO" type="INFO" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
     <!-- Suggested Doug Tody, to include new RESOURCE types -->
     <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
@@ -606,16 +606,16 @@
 <xs:complexType>
   <xs:sequence>
     <xs:element name="DESCRIPTION" type="anyTEXT" minOccurs="0"/>
-    <xs:element name="DEFINITIONS" type="Definitions" minOccurs="0"/><!-- Deprecated -->
+    <xs:element name="DEFINITIONS" type="DEFINITIONS" minOccurs="0"/><!-- Deprecated -->
     <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="COOSYS" type="CoordinateSystem"/>
+      <xs:element name="COOSYS" type="COOSYS"/>
       <xs:element name="TIMESYS" type="TimeSystem"/>
-      <xs:element name="GROUP" type="Group" />
-      <xs:element name="PARAM" type="Param" />
-      <xs:element name="INFO" type="Info" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="GROUP" type="GROUP" />
+      <xs:element name="PARAM" type="PARAM" />
+      <xs:element name="INFO" type="INFO" minOccurs="0" maxOccurs="unbounded"/>
     </xs:choice>
-    <xs:element name="RESOURCE" type="Resource" minOccurs="1" maxOccurs="unbounded"/>
-    <xs:element name="INFO" type="Info" minOccurs="0" maxOccurs="unbounded"/>
+    <xs:element name="RESOURCE" type="RESOURCE" minOccurs="1" maxOccurs="unbounded"/>
+    <xs:element name="INFO" type="INFO" minOccurs="0" maxOccurs="unbounded"/>
   </xs:sequence>
   <xs:attribute name="ID" type="xs:ID"/>
   <xs:attribute name="version">
