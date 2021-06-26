@@ -208,7 +208,7 @@ namespace gaia {
             if ( strstr( line, VOTABLE_NS11 ) == NULL ) {
                 // Not 1.1
                 if ( strstr( line, VOTABLE_NS12 ) == NULL ) {
-                    //  1.3
+                    //  1.4 or 1.3
                     votable4_ = openVOTable4( in );
                 }
                 else {
@@ -284,13 +284,13 @@ namespace gaia {
             VOTABLE_write( out, *votable3_, map );
         }
 
-        using namespace votable_13;
+        using namespace votable_14;
         if ( votable4_ != NULL ) {
             ofstream out( file, ios::out );
             xml_schema::namespace_infomap map;
-            map[""].name = "http://www.ivoa.net/xml/VOTable/v1.3";
-            map[""].schema = "VOTable1.3.xsd";
-            votable4_->version( "1.3" );
+            map[""].name = "http://www.ivoa.net/xml/VOTable/v1.4";
+            map[""].schema = "VOTable1.4.xsd";
+            votable4_->version( "1.4" );
             VOTABLE_write( out, *votable4_, map );
         }
     }
@@ -451,12 +451,12 @@ namespace gaia {
     }
 
     /**
-     *  Read stream for a VOTable version 1.3 using fully qualified
+     *  Read stream for a VOTable version 1.4 or 1.3 using fully qualified
      *  namespace.
      */
-    votable_13::VOTABLE *VOTable::openVOTable4( istream *in )
+    votable_14::VOTABLE *VOTable::openVOTable4( istream *in )
     {
-        using namespace votable_13;
+        using namespace votable_14;
         try {
             auto_ptr<VOTABLE> table =
                 VOTABLE_read( *in,

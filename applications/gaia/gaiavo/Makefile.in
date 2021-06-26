@@ -540,5 +540,18 @@ VOTable1.3.C: VOTable1.3.xsd
 	rm -f generic/VOTable1.3.hxx
 	mv VOTable1.3.hxx generic/VOTable1.3.hxx
 
+VOTable1.4.C: VOTable1.4.xsd
+	xsdcxx cxx-tree --root-element VOTABLE \
+	    --generate-serialization \
+	    --namespace-map http://www.ivoa.net/xml/VOTable/v1.3=votable_14 \
+	    --parser-regex '/VOTABLE/VOTABLE_read/' \
+	    --serializer-regex '/VOTABLE/VOTABLE_write/' \
+	    --generate-wildcard \
+	    VOTable1.4.xsd
+	rm -f generic/VOTable1.4.C
+	mv VOTable1.4.cxx generic/VOTable1.4.C
+	rm -f generic/VOTable1.4.hxx
+	mv VOTable1.4.hxx generic/VOTable1.4.hxx
+
 #  Local dependencies.
 VOTableWriteFunctions.o: ./generic/VOTableWriteFunctions.icc
