@@ -36,7 +36,6 @@ reduction tutorials are available
 \href{https://www.eaobservatory.org/jcmt/science/reductionanalysis-tutorials/}{online}\footnote{
 \url{https://www.eaobservatory.org/jcmt/science/reductionanalysis-tutorials/}}
 
-
 \section{\xlabel{science_pl}The Science Pipeline}
 
 The science pipeline will perform the following:
@@ -79,7 +78,6 @@ calculated and written to log files (\file{log.noise} and
 \file{log.nefd} respectively). Finally, the \cupid\ task \findclumps\
 is run using the FellWalker algorithm (Berry, 2015\cite{fellwalker}) to
 create a source catalogue.
-
 
 \subsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN\_CHECKRMS}}
 
@@ -310,6 +308,8 @@ and is a hidden file) is specified using the \param{-log} command.
 
 
 \subsection{Changing the pipeline recipe}
+\label{subsec:ChangeRecipe}
+
 You can override the recipe set in the header by listing any different
 one on the command line when starting \oracdr. For example
 \begin{terminalv}
