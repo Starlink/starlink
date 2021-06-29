@@ -4,14 +4,23 @@
 \section{\xlabel{apply_fcf}Flux conversion factors}
 \label{sec:cmult}
 
-When your data comes out of the map-maker it is in units of picowatts
-(pW). A flux conversion factor, or FCF, needs to be applied to scale
+If you are not using the ORAC-DR pipeline to reduce your data
+(i.e. you are manually employing the map-maker as described in 
+Chapter \ref{sec:manual}), your data comes out of the map-maker
+in units of picowatts (pW). A flux conversion factor, or FCF, needs to be applied to scale
 your data from units of pW to janskys (Jy). For more information on
-calibrating SCUBA-2 data see Dempsey et al. (2013) \cite{dempsey12}.
+calibrating SCUBA-2 data see Dempsey et al. (2013) \cite{dempsey12}, 
+Mairs et al (2021) \cite{mairs21}, and Appendix~\ref{app:cal}.
 
+\vspace{5mm}
 
-Below are our default FCFs.
+\textbf{Below are the default FCF values as of Starlink 2021A and they apply to data
+obtained since 30 June 2018}. The ORAC-DR pipeline automatically accounts for changes
+in the FCFs for earlier dates (see the important notes below) but manually running
+the pipeline requires consulting Appendix~\ref{app:fcfs} for the appropriate values.
+
 \vspace{0.5cm}
+
 \renewcommand*\arraystretch{1.2}
 
 \begin{table}[h!]
@@ -26,7 +35,7 @@ Below are our default FCFs.
 \hline
 \hspace{0.4cm} 450\,$\mu$m \hspace{0.3cm} & 850\,$\mu$m & \hspace{0.4cm} 450\,$\mu$m \hspace{0.3cm}& 850\,$\mu$m \\
 \hline
-4.71 $\pm$ 0.5& 2.34 $\pm$ 0.08& 491 $\pm$ 67& 537 $\pm$ 24 \\
+3.87 $\pm$ 0.53& 2.07 $\pm$ 0.12& 472 $\pm$ 76& 495 $\pm$ 32 \\
 \hline
 \end{tabular}
 \end{table}
@@ -35,24 +44,26 @@ Below are our default FCFs.
 
 \begin{sltextbox}{IMPORTANT NOTES:}
   \begin{itemize}
-  \item The standard FCF to be applied depends on the reduction date
-    for your data. For data that have been \emph{reduced prior} to
-    July 2012 you should see \cref{Appendix}{app:fcfs}{FCFs by
+  \item The standard FCF to be applied depends on the observation date
+    of your data. For data that have been \emph{reduced prior} to
+    30 June 2018 you should consult \cref{Appendix}{app:fcfs}{FCFs by
       reduction date} for alternative FCFs.
 
   \item Due to a glitch in the WVM, data reduced between 2012
     September 19, and 2013 January 18 must be re-reduced using a
     recent version of Starlink (Hikianalia or later), or should have
     an FCF derived from a calibrator reduced at the same time (and not
-    our standard FCF) applied to it.
+    our standard FCF) applied to it. The most recent stable release of
+    the Starlink software is always recommended.
   \end{itemize}
 \end{sltextbox}
 
 
 \subsection{Aperture flux}
 
-To get the flux density of extended sources with aperture photometry
-you should apply the \fcfa.  You can then sum the emission in an
+To measure the flux density of extended sources with aperture photometry
+you should apply the \fcfa (also known as the arcsecond FCF).  
+You can then sum the emission in an
 aperture. \fcfa\ was determined using a 60-arcsec diameter
 aperture. If your aperture differs from this you should scale your
 flux accordingly---the scaling factor can be read off the curve of
@@ -61,28 +72,54 @@ the ratio of aperture flux to total flux for a range of aperture
 diameters.
 
 \fcfa\ is determined using 1-arcsec pixels. For different pixel sizes
-you will also need to multiply by the pixelsize squared.
+you will also need to multiply by the pixel size squared for a total
+flux calibrated in units of Jy. For more information, see 
+Appendix~\ref{app:cal}.
 
 \subsection{Peak flux}
 
-If you want to read off the peak flux from your map, you should apply
+If you want to read off the peak flux from your map or fit
+a function to estimate the peak brightness, you should apply
 the \fcfb\ (also known as the peak FCF).  When you open your map in
 \gaia\ the value of the brightest pixel will be the peak flux of your
-source. (If your source is point-like, the peak value in the map is
-the total flux density). Applying \fcfb\ will result in a map with
+source. Applying \fcfb\ will result in a map with
 units of Jy/beam. For point-like or compact sources smaller than the
-beam (with a Gaussian profile), this peak value will be the flux
-density of your source.
+beam (with a Gaussian profile), this peak value will be the total flux
+density of your source. For more information, see Appendix~\ref{app:cal}.
 
-\subsection{\xlabel{own_fcf}Determining your own Flux conversion factors}
+\subsection{\xlabel{own_fcf}Determining your own Flux Conversion Factors}
 \label{sec:own_fcf}
 
-Calibration observations are taken at various points throughout the
-night and we recommend you compare the FCF calculated from your
-nearest calibrator to the standard FCF. You can use this FCF to scale
-the the standard value accordingly. You should chose the calibrator
-nearest in time to your science observations, unless the weather has
-changed significantly.
+Calibration observations are obtained at various points throughout the
+night and each individual observation can be used to determine an FCF value.
+As noted in Mairs et al. (2021)~\cite{mairs21}, the spread in FCF values observed 
+over periods of months or years is comparable to the scatter that can be observed
+over an individual night.  
+
+There is no obvious parameter that is the singular dominant cause of the inherent scatter 
+in the observed FCFs. The spread is undoubtedly affected by a combination of:
+
+\begin{enumerate}
+
+\item The bright and variable atmosphere including subtle effects such as the 
+submillimeter seeing, wind speed, ambient-temperature changes, humidity and low-lying variations 
+in weather conditions with scale heights comparable to several times the height of the JCMT.
+
+\item The stability of the WVM calibration. 
+
+\item Dish instability producing variations in the beam profile.
+
+\item Instrumental noise, non-cooled optical components, and uncertainties in the {\sc{makemap}} routine's 
+modeling and removal of noise components from the time stream.
+
+\end{enumerate}
+
+We therefore recommend caution if you are calculating your own FCF 
+values to apply to data on a given night and suggest using the default values
+supplied above or in Appendix~\ref{app:fcfs}, depending on the observation date. 
+Nevertheless, below are instructions on how to perform an investigation into 
+the FCF calculated from the calibrator observations performed close in time 
+to your obtained science data:
 
 \begin{enumerate}
 \item Reduce the calibrator with the map-maker using
