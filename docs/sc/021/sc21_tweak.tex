@@ -102,8 +102,8 @@ values (no prefix) take priority over qualified values.
 \textbf{itermaps}\\
 Setting the parameter \setparam{ITERMAP}{itermap}{1} writes out the
 map containing the astronomical signal after each iteration. Setting
-\param{itermap~=~2} adds the QUALITY component.  These can be visually
-inspected with
+\param{itermap~=~2} adds the QUALITY component 
+(see Section \ref{sec:maskshow}).  These can be visually inspected with
 
 \begin{terminalv}
 % gaia 850map.more.smurf.itermaps
@@ -122,8 +122,11 @@ at the end of each iteration} for how to view these maps whilst \makemap\ is sti
 \newline\newline
 \textbf{shortmaps}\\
 If the parameter \param{shortmaps} is non-zero, a map is made from
-every group of adjacent time-slices (as specified by the parameter).
-These are stored as an NDF extension and can be viewed \gaia.
+every group of adjacent time-slices. When set to -1, a map is produced 
+each time a full pass through the scan pattern has been completed. Any 
+other negative value is interpreted as a duration in seconds, and is converted 
+to time slices using the (possibly down-sampled) sample frequency of the 
+data being mapped. These are stored as an NDF extension and can be viewed \gaia.
 
 \begin{figure}[ht!]
 \begin{center}
@@ -219,10 +222,14 @@ filtering options. By default, no filtering is applied during the
 pre-processing stage\footnote{However, the \blankfield\ configuration
 over-rides this default.} (see \xparam{FILT_EDGE_LARGESCALE}{filt\_edge\_largescale}
 and \xparam{FILT_EDGE_SMALLSCALE}{filt\_edge\_smallscale}). A high-pass
-filter is used during the iterative stage if \xparam{MODELORDER}{moelorder}
+filter is used during the iterative stage if \xparam{MODELORDER}{modelorder}
 includes \model{FLT}\footnote{The \blankfield\ configuration omits
 \model{FLT} from \param{modelorder}.}, and selected a suitable value
-for the filter size is crucial for maps containing extended emission.
+for the filter size is crucial for maps containing extended emission. See
+Mairs et al. 2015 \cite{extendedrecovery} for more information about 
+extended emission recovery, wherein model sources with known parameters
+were added to the raw SCUBA-2 timestream using 
+``\xparam{FAKEMAP}{fakemap}'' in order to investigate the effects of large-scale filtering.
 
 The maximum spatial scale of structure that can be recovered by the
 map-maker is determined by the scanning speed and frequency cut
@@ -247,7 +254,7 @@ at 850\,$\mu$m, recovering scales of 480\,arcsec at a scan speed of
 a frequency of 1.25\,Hz.
 
 Choosing a high-pass filter is especially important for the recovery
-of extended emission. The \brightextended\ configuration file sets
+of extended emission.\\ The \brightextended\ configuration file sets
 \setparam{FLT.FILT_EDGE_LARGESCALE}{flt.filt\_edge\_largescale}{480}
 for both 450\,$\mu$m and 850\,$\mu$m. Be aware that increasing filter sizes
 decreases the flatness of your background. A compromise must be made between
@@ -286,8 +293,8 @@ last iteration.
 \includegraphics[width=0.46\linewidth]{sc21_brex_18}
 \caption[Illustrating the effects of high-pass filtering]{
   Highlighting the effects of high-pass filtering on your map.
-  \textbf{(Left)} Map made with \param{850.flt.filt\_edge\_largescale}{300}.
-  \textbf{(Right)} Map made with \param{850.flt.filt\_edge\_largescale}{1000}.
+  \textbf{(Left)} Map made with \param{850.flt.filt\_edge\_largescale} = 300.
+  \textbf{(Right)} Map made with \param{850.flt.filt\_edge\_largescale} = 1000.
   All other configuration parameters remain the same.\label{fig:fltcompare}
 }
 \end{figure}
@@ -302,9 +309,9 @@ particularly effective if you find you have one sub-array noisier than
 the others.
 
 This comes with the warning however that you will lose information on
-any scales larger than the area covered by a single sub-array. It is
-therefore not recommended if you have very large-scale extended
-structure.
+any scales larger than the area covered by a single sub-array 
+($\sim$200$^{\prime\prime}$. It is therefore not recommended if 
+you have very large-scale extended structure.
 
 To initialise this option set \setparam{COM.PERARRAY}{com.perarray}{1}.
 
@@ -340,7 +347,7 @@ details.
 \label{sec:maskbe}
 
 For an introduction to the purpose and effects of masking, see
-\cref{Section}{sec:masking}{Masking}.
+\cref{Section}{sec:masking}{Masking} and Mairs et al (2015)~\cite{extendedrecovery}.
 
 As an S/N mask is redetermined after each iteration it changes with the map
  which can sometimes cause convergence problems. The mask
@@ -350,7 +357,8 @@ pixel size. A fixed externally supplied mask  can get around these problems.
 The sequence below is a summary of the procedure for generating and
 supplying an external mask. In this example the mask is generated from
 the map produced by an initial run through the map-maker.
-Alternatively maps from other observatories can be used.
+Alternatively, SNR maps or flux contours calculated from
+data obtained by other observatories can be used.
 
 These steps are followed in the example in
 \cref{Section}{sec:bright_ex}{Extended galactic sources}.
@@ -441,10 +449,10 @@ all included in the final map estimate when convergence is reached.
 
 
 
-Be aware that \task{skyloop} uses a lot of disk space. Setting
+\textbf{Be aware that \task{skyloop} uses a lot of disk space. Setting
 environment variable \envvar{STAR\_TEMP} to a suitable location
 before you start will prevent \task{skyloop} from crashing
-if you run out of temporary storage space.
+if you run out of temporary storage space.}
 \begin{terminalv}
 % setenv STAR_TEMP /some/directory/with/a/lot/of/space
 \end{terminalv}
