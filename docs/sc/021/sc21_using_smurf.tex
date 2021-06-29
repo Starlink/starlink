@@ -6,20 +6,22 @@ Users---particularly new users---are encouraged to use the pipeline for
 their map-making. However, greater control of the map-making
 process is available by running the \makemap\ command directly, rather
 than from within the pipeline. This chapter describes how to do this, but
-should be seen as ``advanced usage''.
+should be seen as \textbf{``advanced usage''}.
 
 \begin{quote}
 \emph{
 Note, when \makemap\ is run manually (rather than from the pipeline) the
-resulting image will be in units of pW, not Jy. Each pixel value
+atmospheric extinction correction is applied automatically (see Appendix \ref{app:cal}),
+but the resulting image will be in units of pW, not Jy. Each pixel value
 in the map represents the weighted mean value of the bolometer samples
-(in pW) that fall within the pixel, after removal of the noise components
-described in \cref{Section}{sec:models}{The individual models}. Each
+(in pW) that fall within the pixel, removal of the noise components
+described in \cref{Section}{sec:models}{The individual models}.  Each
 weight is the reciprocal of the variance associated with the bolometer.
 Thus each pixel value can be thought of as the astronomical power
 received by a typical bolometer at each point on the sky.
 \cref{Section}{sec:cmult}{Flux conversion factors} describes how to
-convert a map from units of pW to Jy.
+convert a map from units of pW to Jy; see Appendices \ref{app:cal},
+\ref{app:fcfs}, and \ref{app:fcfstime} for more information.
 }
 \end{quote}
 
@@ -47,7 +49,8 @@ in \xref{SUN/95}{sun95}{}. The easiest is to create a simple text
 file containing the names of the raw data files -- one per line --- and
 then supply the name of the text file, preceded by an up-caret character
 (\,\texttt{\^{}}\,), as the value for parameter \texttt{IN}. Note, the names of
-the raw data files can contain wild-cards such as ``$*$'' and ``?''.
+the raw data files can contain wild-cards such as ``$*$'' and ``?''. 
+See below for examples.
 
 \item[\texttt{OUT}] The name of the NDF in which to store the final
 map. The supplied file name should either have a file type of
@@ -572,7 +575,11 @@ together to form the final map.  The final message ``\texttt{Total
 samples available from all chunks: 19172853 (3218.54 bolos)}'' indicates
 the total number of samples (and equivalent number of bolometers) used
 from all chunks. In this case there was only one chunk, so these values
-are equal to the numbers reported at the end of the last iteration.}
+are equal to the numbers reported at the end of the last iteration.
+Chunking often results in a poorer map and should be avoided
+if possible --- see \latexhtml{the box
+describing \emph{Data Chunking} on Page~\pageref{box:chunk})~}
+{\htmlref{Data Chunking)}{box:chunk}}.}
 
 \section{Interacting with \texttt{makemap} during a long run}
 For long observations, \makemap\ can take several hours to run,
@@ -886,11 +893,13 @@ INTOPTION - What to do now (1-3) /3/ >
 \end{terminalv}
 
 At this point you should respond to the prompt for parameter
-\texttt{INTOPTION} by typing 1, 2 or 3 followed by \texttt{<return>}. Options 2
-and 3 cause \texttt{makemap} to tidy up its internals and create a map
+\texttt{INTOPTION} by typing 1, 2 or 3 followed by \texttt{<return>}. Option
+1 aborts the process with an error status. Option 2
+ causes \texttt{makemap} to tidy up its internals and create a map
 from the current models just as if the iterative process had reached
 convergence. Option 3 causes one further iteration to be performed,
-without masking (you should use this option if you have been using AST
+without masking before creating a final map
+(you should use this option if you have been using AST
 masking --- see \cref{Section}{sec:astmask}{AST masking}).
 
 \begin{tip}
