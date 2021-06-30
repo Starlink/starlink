@@ -296,10 +296,10 @@ The list of models to be evaluated (and removed) by the map-maker, and
 the order in which they are used during the iterative stage, is given by
 the \xparam{MODELORDER}{modelorder} parameter in the configuration file.
 These models are modular however, so their order may be changed. The
-default model order is given below.
+default model order is given below\footnote{If using \textsc{starlink}'s PCA background removal, one can add ``pca'' to the list: (com,gai,pca,ext,flt,ast,noi). For more information, see \href{https://www.eaobservatory.org/jcmt/2019/03/faster-pca/}{https://www.eaobservatory.org/jcmt/2019/03/faster-pca/}}.
 
 \begin{terminalv}
-modelorder = (com,gai,ext,flt,ast,noi)\footnote{If using \textsc{starlink}'s PCA background removal, one can add ``pca'' to the list: (com,gai,pca,ext,flt,ast,noi). For more information, see \href{https://www.eaobservatory.org/jcmt/2019/03/faster-pca/}{https://www.eaobservatory.org/jcmt/2019/03/faster-pca/}}
+modelorder = (com,gai,ext,flt,ast,noi)
 \end{terminalv}
 
 The only configuration file not following this model order is the one tailored

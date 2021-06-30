@@ -1,15 +1,15 @@
 \chapter{\xlabel{data_files}SCUBA-2 Diagnostic Tools}
 \label{sec:raw}
 
-This chapter describes a number of procedures visualising and
-assessing the quality of raw data files.  These steps need not be part
+\textbf{This chapter describes a number of procedures to visualise and
+assess the quality of raw data files.}  These steps need not be part
 of your data reduction process and do not concern the iterative
 map-maker.
 
-However, there are reasons you may wish to examine your raw data in
-greater depth. The most likely motivation is unusual result from  your
+There are reasons, however, that you may wish to examine your raw data in
+greater depth. The most likely motivation is an unusual result from your
 reduction such as higher than expected noise, artefacts in your map,
-or inconsistent noise across multiple tiles.  This chapter will help
+or inconsistent noise across multiple observations. This chapter will help
 you get to the bottom of many of these issues.
 
 
@@ -46,7 +46,7 @@ Here, the output will be a flat-fielded version of each science scan
 in Observation 8; the file names will be the original input
 names with \_flat appended to them.
 
-As a rule of thumb, you should apply the flat-field to your data
+As a general rule, you should apply the flat-field to your data
 before examining it.
 
 
@@ -68,8 +68,9 @@ FITS headers and dimensions of the data.
   information for any file (raw or reduced). This extensive list
   includes dates \& times, source name, scan type, pattern and
   velocity, size of the map, exposure time, start and end elevation,
-  opacity, and the temperature of the instrument. An example is given
-  below:
+  opacity, and the temperature of the instrument. An example, selecting
+  any line in the FITS header which includes the string ``SEQ\_TYPE'', is 
+  given below:
 \begin{terminalv}
 % fitslist s8a20120720_00030_000\*.sdf | grep SEQ_TYPE
 \end{terminalv}
@@ -172,7 +173,7 @@ elevations, to ensure the pattern completed successfully.
 
 
 \begin{tip}
-  Follow the \task{jcmtstate} command with \texttt{-h} to find out
+  Follow the \jcmtstate\ command with \texttt{-h} to find out
   more information.
 \end{tip}
 
@@ -208,7 +209,7 @@ unaffected.
 \section{\xlabel{display_cube}Displaying time-series data}
 \label{sec:gaiacube}
 
-Use the \starlink\ application \textsc{Gaia} to visualise the
+Use the \starlink\ application \gaia\ to visualise the
 bolometer time-series data (or indeed \emph{any} SCUBA-2 data
 file). This is initiated simply typing \texttt{gaia} into a terminal.
 
