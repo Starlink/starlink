@@ -22,11 +22,12 @@ steps: 1. running the data through the map-maker using the
 \file{dimmconfig\_blank\_field.lis} configuration file (see
 \cref{Section}{sec:config}{Specialised configuration files}), and 2.
 applying the \picard\ \drrecipe{SCUBA2\_MATCHED\_FILTER} recipe (see
-\cref{Section}{sec:mf}{Point-source extraction} and Appendix~\ref{app:mf}).
+\cref{Section}{sec:mf}{Point-source extraction} and
+\cref{Appendix}{app:mf}{}).
 \\ \\
 \textbf{Step 1: Run the map-maker}\\
 In this example the raw data are stored locally in a directory called
-\file{data}. We have three observations (\#13, \#18, \#21) of the field
+\file{data}. We have three observations (\#13, \#18, \#21) of the field,
 which we will reduce independently.
 
 \begin{terminalv}
@@ -152,7 +153,7 @@ But how can we check if these sources are real?
 \label{sec:jk}
 
 Although this method is considerably simpler to execute, the products
-have undergone more advanced processing than the manual method shown 
+have undergone more advanced processing than the manual method shown
 above. Due to these extra analysis steps, this pipeline method is particularly recommended.
 
 \textbf{Step 1: Create input file}\\
@@ -168,7 +169,7 @@ The pipeline is run using the
 recipe; this uses \file{dimmconfig\_blank\_field.lis} as the
 configuration file. If you wish to provide an alternative file you
 will need to put the name of the new configuration file in a recipe
-parameter file.  See \cref{Section}{sec:pipe}{The SCUBA-2 Pipeline}
+parameter file.  See \cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline}
 for details.
 \begin{terminalv}
 % oracdr_scuba2_850 -cwd YYYYMMDD
@@ -207,7 +208,7 @@ filter output map.
 
 The recipe processes each observation twice, a standard reduction
 first, then a re-run with a fake point source added to the time
-series (see parameter ``\xparam{FAKEMAP}{fakemap}''). This produces 
+series (see parameter ``\xparam{FAKEMAP}{fakemap}''). This produces
 a co-added signal map (\file{\_wmos}) and a
 coadded PSF map (\file{\_mappsf}).
 
@@ -275,8 +276,8 @@ The signal from extended emission varies slowly as seen by the array
 passing over it. It thus appears at lower frequencies in the power
 spectrum and complicates the high-pass filter selection. Too harsh a
 filter will make flat maps but any extended emission will have been
-removed in doing so (see Section \ref{sec:filt} and 
-Mairs et al 2015~\cite{extendedrecovery}).
+removed in doing so (see \cref{Section}{sec:filt}{Large-scale filtering} and
+Mairs et al. 2015~\cite{extendedrecovery}).
 \\ \\
 \textbf{Step 1: Running the map-maker}
 \vspace{0.2cm}\\

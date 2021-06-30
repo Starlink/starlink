@@ -1,11 +1,11 @@
-\chapter{\xlabel{fcfsred}FCFs by reduction date}
+\chapter{\xlabel{fcfsred}FCFs by Reduction Date}
 \label{app:fcfs}
 
 Ongoing development of the SCUBA-2 analysis has resulted in ongoing
-changes to the atmospheric opacity relationships and the FCFs. 
-Depending on when your data were reduced you will need to apply 
+changes to the atmospheric opacity relationships and the FCFs.
+Depending on when your data were reduced you will need to apply
 different calibration values. \textsc{orac-dr} will automatically apply
-the appropriate values. 
+the appropriate values.
 
 \textbf{Note:} As of the 2021A Starlink release, the
 opacity relations and FCF values have been updated following the
@@ -14,21 +14,21 @@ results presented by Mairs et al. 2021 \cite{mairs21}. Historical values derived
 
 \vspace{1cm}
 
-\textbf{Explanation of parameters} (see also Appendix \ref{app:cal}):
+\textbf{Explanation of parameters} (see also \cref{Appendix}{app:cal}{SCUBA-2 data calibration}):
 
 Starlink currently applies the following multiplicative extinction correction to SCUBA-2 data:
 
 \begin{equation}
 \mathrm{Extinction\:Correction} = \frac{1}{\mathrm{exp}[-\tau_{\nu}\times\mathrm{Airmass}]}
 \end{equation}
-where $\tau_{\nu}$ is the atmospheric opacity at the given frequency, $\nu$. ``Opacity relations''  
-relate the measured $\tau_{225}$ to the atmospheric opacity at the operating frequencies of 
+where $\tau_{\nu}$ is the atmospheric opacity at the given frequency, $\nu$. ``Opacity relations''
+relate the measured $\tau_{225}$ to the atmospheric opacity at the operating frequencies of
 SCUBA-2, $\tau_{666}$ (450~$\mu$m) and $\tau_{345}$ (850~$\mu$m). Their form is:
 \begin{equation}
 \label{eq:2021taurelation}
 \tau_{\nu} = \mathrm{a}\times(\tau_{225,\mathrm{zen}} + \mathrm{b} + \mathrm{c}\times\sqrt{\tau_{225,\mathrm{zen}}}),
 \end{equation}
-where a, b, and c are empirically derived coefficients (see Mairs et al 2021 \cite{mairs21}).
+where a, b, and c are empirically derived coefficients (see Mairs et al. 2021 \cite{mairs21}).
 You can find out what opacity relation was applied by using the \Kappa\ command \hislist.
 
 \begin{terminalv}
@@ -58,7 +58,9 @@ values presented below.
 
 \newpage
 
-\textbf{Results from Mairs et al 2021 \cite{mairs21}. Employed by default in Starlink versions 2021A and after. Dates are inclusive. See Figure~\ref{fig:FCFstep}}\\
+\textbf{Results from Mairs et al. 2021 \cite{mairs21}. Employed by
+default in Starlink Versions 2021A and after. Dates are inclusive. See
+\cref{Figure}{fig:FCFstep}{}}\\
 \begin{table}[h!]
 \begin{center}
 \begin{tabular}{|l|c|c|c|c|}
@@ -79,15 +81,16 @@ until 30 April 2011 &383  & 4.9 &1080 &5.0 \\
 \end{center}
 \end{table}
 
-From 1 May 2011 onwards, the a, b, and c values presented in the table below correspond to Equation \ref{eq:2021taurelation}:\\
+From 2011 May 1 onwards, the a, b, and c values presented in the table below correspond to
+\cref{Equation}{eq:2021taurelation}{}:\\
 \begin{table}[h!]
 \begin{center}
 \begin{tabular}{|l|c|c|}
  \hline
  \multicolumn{1}{|c}{Date} & \multicolumn{2}{|c|}{Opacity Relation}  \\ \cline{2-3}
                            & 450$\mu$m  & 850$\mu$m \\ \hline
-until 30 April 2011 & 32 $\times$ ($\tau_{225}$ - 0.02)    & 5.2 $\times$ ($\tau_{225}$ - 0.013)  \\
-1 May 2011 Onwards & \begin{tabular}[c]{@{}c@{}c@{}c@{}}\\a=23.3$\pm$1.5\\b=-0.018$\pm$0.006\\c=0.05$\pm$0.04\end{tabular}& \begin{tabular}[c]{@{}c@{}c@{}c@{}}\\a=3.71$\pm$0.18\\b=-0.040$\pm$0.008\\c=0.202$\pm$0.044\end{tabular}\\
+until 2011 April 30 & 32 $\times$ ($\tau_{225}$ - 0.02)    & 5.2 $\times$ ($\tau_{225}$ - 0.013)  \\
+2011 May 1 onwards & \begin{tabular}[c]{@{}c@{}c@{}c@{}}\\a=23.3$\pm$1.5\\b=-0.018$\pm$0.006\\c=0.05$\pm$0.04\end{tabular}& \begin{tabular}[c]{@{}c@{}c@{}c@{}}\\a=3.71$\pm$0.18\\b=-0.040$\pm$0.008\\c=0.202$\pm$0.044\end{tabular}\\
 \hline
 \end{tabular}
 \end{center}
@@ -103,7 +106,8 @@ until 30 April 2011 & 32 $\times$ ($\tau_{225}$ - 0.02)    & 5.2 $\times$ ($\tau
 
 \rule{1.0\textwidth}{2pt}
 
-\textbf{Results from Dempsey et al. 2013 \cite{dempsey12}: employed by default in Starlink versions 2018A and previous.}\\
+\textbf{Results from Dempsey et al. 2013 \cite{dempsey12}: employed by
+default in Starlink Versions 2018A and previous.}\\
 \begin{table}[h!]
 \begin{center}
 \begin{tabular}{|l|c|c|c|c|}
@@ -114,9 +118,9 @@ until 30 April 2011 & 32 $\times$ ($\tau_{225}$ - 0.02)    & 5.2 $\times$ ($\tau
 \cline{2-5}
 & Jy/pW/beam &Jy/pW/arcsec$^2$ & Jy/pW/beam &Jy/pW/arcsec$^2$ \\
  \hline
-until January 2012 &383  & 4.9&1080 &5.0 \\
-January 2012 - July 2012&606&6.06 &556 &2.42 \\
-July 2012 onwards&491 &4.71 &537 &2.34 \\
+until 2012 January       &383 & 4.9&1080 &5.0 \\
+2012 January--2012 July  &606&6.06 &556 &2.42 \\
+2012 July onwards        &491 &4.71 &537 &2.34 \\
 \hline
 \end{tabular}
 \end{center}
@@ -128,9 +132,9 @@ July 2012 onwards&491 &4.71 &537 &2.34 \\
  \hline
  \multicolumn{1}{|c}{Date} & \multicolumn{2}{|c|}{Opacity Relation}  \\ \cline{2-3}
                            & 450$\mu$m  & 850$\mu$m \\ \hline
-until January 2012       & 32 $\times$ ($\tau_{225}$ - 0.02)    & 5.2 $\times$ ($\tau_{225}$ - 0.013)  \\
-January 2012 - July 2012 & 26 $\times$ ($\tau_{225}$- 0.01923)  & 4.6 $\times$ ($\tau_{225}$ - 0.00435)  \\
-July 2012 onwards        & 26 $\times$ ($\tau_{225}$ - 0.01196) & 4.6 $\times$ ($\tau_{225}$ - 0.00435)  \\
+until 2012 January       & 32 $\times$ ($\tau_{225}$ - 0.02)    & 5.2 $\times$ ($\tau_{225}$ - 0.013)  \\
+2012 January--2012 July  & 26 $\times$ ($\tau_{225}$- 0.01923)  & 4.6 $\times$ ($\tau_{225}$ - 0.00435)  \\
+2012 July onwards        & 26 $\times$ ($\tau_{225}$ - 0.01196) & 4.6 $\times$ ($\tau_{225}$ - 0.00435)  \\
 \hline
 \end{tabular}
 \end{center}

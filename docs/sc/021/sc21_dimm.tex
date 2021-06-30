@@ -10,7 +10,7 @@ the resulting time-series data to produce a final science map.
 
 The \makemap\ command can be invoked in two ways: 1) directly by typing
 ``\texttt{makemap}'' in response to a unix shell prompt (see
-\cref{Chapter}{sec:manual}{Running the iterative map-maker}), or 2)
+\cref{Section}{sec:manual}{Running \task{makemap} outside the pipeline}), or 2)
 indirectly as part of an ORAC-DR recipe (see
 \cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline}).
 
@@ -150,7 +150,7 @@ models are subtracted, a sky map created and the convergence checked.
   (\model{EXT}) applies a multiplicative extinction correction to the
   data. Following this, the \model{FLT} model filters each bolometer
   time-stream independently to remove low frequencies that correspond
-  to angular scales larger than 600\,arc-sec and 300\,arc-sec at
+  to angular scales larger than 600\,arcsec and 300\,arcsec at
   450$\mu$m and 850$\mu$m, respectively.
 
   After these models have been removed, the AST model (\emph{i.e.} the
@@ -335,10 +335,10 @@ form ``\param{COM.xxx}''.
   Extended emission on a scale larger than the array footprint on the
   sky will contribute a signal indistinguishable from a common-mode
   signal. This puts an upper limit on the spatial scale of
-  astronomical emission that can be recovered\footnote{``Fake Sources'' of 
+  astronomical emission that can be recovered\footnote{``Fake Sources'' of
   known properties can be inserted into the raw SCUBA-2 time stream
-  in order to evaluate the extent of robust emission recovery. For 
-  more information, see 
+  in order to evaluate the extent of robust emission recovery. For
+  more information, see
   \href{https://ui.adsabs.harvard.edu/abs/2015MNRAS.454.2557M/abstract}{Mairs et al. 2015} (\cite{extendedrecovery})}.\\
   \hline
 GAI& \model{GAI} model works with \model{COM} in removing the
@@ -362,7 +362,7 @@ FLT& The \model{FLT} model acts on the Fourier transform of the
   to pass) and low-pass (only allows \textit{lower} frequencies to
   pass) filters can be specified. These cut-off frequencies can either
   be specified directly in Hz, or as an angular spatial scale in
-  arc-seconds that is subsequently converted into a frequency using
+  arcseconds that is subsequently converted into a frequency using
   the speed at which the telescope is moving. The most important role of
   this model is to apply a high-pass filter in order to remove the
   low frequency $1/f$ noise. Note that extended emission varies slowly
@@ -421,7 +421,7 @@ model looking (as expected) like white noise.}
 \end{figure}
 
 
-\section{\xlabel{convergence}Stopping Criteria}
+\section{\xlabel{convergence}Stopping criteria}
 \label{sec:converge}
 
 The map-maker will stop processing either when the requested number of
@@ -491,10 +491,10 @@ later in model-specific sub-sections.
 Masks fall into two broad categories:
 \begin{itemize}
 
-\item \textbf{dynamic masks} - these are masks that change shape from one
+\item \textbf{dynamic masks} -- these are masks that change shape from one
 iteration to the next.
 
-\item \textbf{static masks} - these are masks that retain the same shape
+\item \textbf{static masks} -- these are masks that retain the same shape
 for all iterations.
 
 \end{itemize}
@@ -592,7 +592,7 @@ size, you should also double the S/N thresholds to get a mask that covers a
 similar area of the sky.
 \end{tip}
 
-\subsection{\xlabel{sec_astmask}AST Masking}
+\subsection{\xlabel{sec_astmask}AST masking}
 \label{sec:astmask}
 The iterative map-maker algorithm described earlier in this chapter
 divides each cleaned bolometer value into four additive parts:
@@ -643,7 +643,7 @@ converged (see \xparam{AST.ZERO_NOTLAST}{ast.zero\_notlast}).
 All the configuration files supplied with \smurf\ use \model{AST}
 masking, with the exception of \blankfield.
 
-\subsection{\xlabel{sec_fltmask}FLT Masking}
+\subsection{\xlabel{sec_fltmask}FLT masking}
 \label{sec:fltmask}
 
 The \model{FLT} model estimates and removes a low frequency background
@@ -687,7 +687,7 @@ problem is described in \cref{Section}{sec:skip}{Skipping the AST model}.
 All the configuration files supplied with \smurf\ use \model{FLT}
 masking, with the exception of \blankfield.
 
-\subsection{\xlabel{sec_commask}COM Masking}
+\subsection{\xlabel{sec_commask}COM masking}
 \label{sec:commask}
 
 The value of the \model{COM} model at a specific time-slice is the mean
@@ -789,7 +789,7 @@ achieved by:
 
 \item Setting
 \xparam{FLT.FILT_EDGE_LARGESCALE}{flt.filt\_edge\_largescale}) to 200
-arc-seconds so that the \model{FLT} model uses a  heavier than normal
+arcseconds so that the \model{FLT} model uses a  heavier than normal
 filter.
 
 \item Setting \xparam{COM.PERARRAY}{com.perarray} to 1, indicating that four separate
@@ -843,7 +843,7 @@ blank fields.
 Applying a high-pass filter (\model{FLT}) on each iteration can result in
 convergence problems when there is little or no signal in the
 map. Instead, a single, harsher high-pass filter is applied as a
-pre-processing step (corresponding to 200-arc-sec scales at both
+pre-processing step (corresponding to 200-arcsec scales at both
 450\,$\mu$m and 850\,$\mu$m). There are also more conservative cuts to
 remove noisy/problematic bolometers. Only 4 (positive) iterations are
 requested as there is no signal to confuse to models.
@@ -956,12 +956,12 @@ bolometer baseline is also relaxed (parameter \xparam{DCTHRESH}{dcthresh}).
 
 The \brightextended\ configuration is for reducing maps that contain
 emission that is extended to some degree and contains some bright
-regions. Here, the combination of \xparam{AST.ZERO_SNR}{ast.zero\_snr} 
+regions. Here, the combination of \xparam{AST.ZERO_SNR}{ast.zero\_snr}
 and \xparam{AST.ZERO_SNRLO}{ast.zero\_snrlo} is used to identify components of
 the \model{AST} model wherever the S/N is higher than 3$\sigma$ and then
-to expand this basic mask down to an SNR equal to 2$\sigma$ without introducing 
+to expand this basic mask down to an SNR equal to 2$\sigma$ without introducing
 any new isolated source areas (see \cref{Section}{sec:astmask}{AST masking}).
-\xparam{NUMITER}{numiter} has been raised to \texttt{-40}, as more iterations are 
+\xparam{NUMITER}{numiter} has been raised to \texttt{-40}, as more iterations are
 required to maximise the sensitivity to large dynamic signal ranges in the map.
 
 The other major feature of this configuration is that the subtraction of
@@ -992,9 +992,9 @@ difference is the improvement in the bowling around strong sources.
 
 \subsection{dimmconfig\_pca.lis}
 
-The newest dimmconfig file (2019) is called: dimmconfig\_pca.lis.  This parameter file can be combined with 
-other dimmconfig files to tell makemap to include a Principal Component Analysis (PCA) model in its iterative algorithm 
-(the PCA model removes noise signals that are correlated between multiple bolometer time-streams). 
+The newest dimmconfig file (2019) is called: dimmconfig\_pca.lis.  This parameter file can be combined with
+other dimmconfig files to tell makemap to include a Principal Component Analysis (PCA) model in its iterative algorithm
+(the PCA model removes noise signals that are correlated between multiple bolometer time-streams).
 For instance, to use a PCA model when creating a map of a bright extended source, you could run makemap as follows:
 
 \begin{terminalv}
@@ -1014,7 +1014,8 @@ To process compact sources, change “bright\_extended” above to “bright\_co
    \label{fig:PCAfig}
 \end{figure}
 
-Using a PCA model can help to reduce the spurious extended structures that often appear in SCUBA-2 maps (although this benefit is bought at the cost of a much extended run time). For instance, four 850 micron maps of DR 21 are presented in Figure~\ref{fig:PCAfig} – the top row shows the maps made with the basic “bright extended” dimmconfig, the middle row shows the results of adding in the new PCA dimmconfig, and the bottom row shows mosaics of the top and middle rows (left and right, respectively) with a difference map in between.
+Using a PCA model can help to reduce the spurious extended structures that often appear in SCUBA-2 maps (although this benefit is bought at the cost of a much extended run time). For instance, four 850 micron maps of DR 21 are presented in
+\cref{Figure}{fig:PCAfig}{} – the top row shows the maps made with the basic “bright extended” dimmconfig, the middle row shows the results of adding in the new PCA dimmconfig, and the bottom row shows mosaics of the top and middle rows (left and right, respectively) with a difference map in between.
 
 \section{\xlabel{problem}Configuration files for solving specific problems}
 \label{sec:problem}
