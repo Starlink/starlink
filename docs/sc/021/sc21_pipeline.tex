@@ -36,7 +36,7 @@ Data-reduction tutorials are available
 \href{https://www.eaobservatory.org/jcmt/science/reductionanalysis-tutorials/}{online}\footnote{
 \url{https://www.eaobservatory.org/jcmt/science/reductionanalysis-tutorials/}}
 
-\section{\xlabel{science_pl}The Science Pipeline}
+\section{\xlabel{science_pl}The science pipeline}
 
 The science pipeline will perform the following:
 \vspace{-0.3cm}
@@ -147,7 +147,7 @@ in mJy/beam using a corrected FCF.  See \cref{Section}{sec:jk}{Example
 this recipe and the files produced.
 
 
-\section{\xlabel{running_pl}Running the Science Pipeline}
+\section{\xlabel{running_pl}Running the science pipeline}
 \label{sec:plsteps}
 
 \textbf{Note:} Data-reduction tutorials are available
@@ -279,7 +279,7 @@ pipeline---here we see the pipeline process has completed. \label{pipeline-oracd
 \label{sec:parameterfile}
 
 
-\subsection{Changing ORAC-DR's behavior}
+\subsection{Changing ORAC-DR's behaviour}
 
 ORAC-DR's behavior cab be changed on the command line. For help simply type
 
@@ -348,7 +348,7 @@ Then run the pipeline calling the parameter file via the
 % oracdr -file <list_of_files> -loop file -log sf -recpars myparams.ini REDUCE_SCAN_CHECKRMS
 \end{terminalv}
 
-\subsection{Parameter file options}
+\subsection{Parameter-file options}
 
 To supply both a new configuration file and a different set of
 clump-finding parameters we would update the parameter file
@@ -388,7 +388,7 @@ CALUNITS = arcsec
 
 Once the map-maker has completed you can open your output map using
 \gaia\ (see \cref{Figure}{fig:itermap}{this example}). The excerpt in
-\cref{Chapter}{sec:manual}{Running the iterative map-maker} shows the
+\cref{Chapter}{sec:manual}{Running \task{makemap} Outside the Pipeline} shows the
 output written to the terminal as you run the map-maker. There are a
 number of clues in this output that indicate the status of the
 reduction.

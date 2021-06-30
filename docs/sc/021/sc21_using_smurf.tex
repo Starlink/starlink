@@ -20,7 +20,7 @@ described in \cref{Section}{sec:models}{The individual models}.  Each
 weight is the reciprocal of the variance associated with the bolometer.
 Thus each pixel value can be thought of as the astronomical power
 received by a typical bolometer at each point on the sky.
-\cref{Section}{sec:cmult}{Flux conversion factors} describes how to
+\cref{Section}{sec:cmult}{Flux-conversion factors} describes how to
 convert a map from units of pW to Jy; see
 \cref{Appendices}{app:cal}{SCUBA-2 data calibration},
 \cref{}{app:fcfs}{FCFs by reduction date}, and
@@ -556,7 +556,7 @@ solution ``FAILED TO CONVERGE''\footnote{However a map will still be
 created, but should be used with caution.}. In such cases, you \emph{could}
 simply increase \texttt{numiter} and re-run \texttt{makemap}, but you may
 also want to investigate the cause of the slow convergence using one or more
-of the techniques described in \cref{Chapter}{sec:raw}{Chapter 9}, as it
+of the techniques described in \cref{Chapter}{sec:raw}{SCUBA-2 Diagnostic Tools}, as it
 may indicate some issue with the raw data.}
 
 \emph{Map pixels that receive a very small number of samples are automatically
@@ -571,7 +571,8 @@ observation of a calibrator, lasting only 2.6 minutes. Consequently there
 was no need to divide the data up into multiple chunks in order to fit it
 into memory.  However, for very long observations, or for shorter
 observations when using a computer with less than the recommended amount
-of memory (see \cref{Section}{sec:computing}{Chapter 1}), it may be
+of memory (see \cref{Section}{sec:computing}{Before you start:
+computing resources}), it may be
 necessary to process the raw data in multiple chunks. If this happens, a
 map is created from each chunk in turn, and all these maps are then added
 together to form the final map.  The final message ``\texttt{Total
@@ -926,7 +927,7 @@ dsb      25407  0.0  0.0  43716  1952 pts/5    0:00 makemap
 \end{tip}
 
 
-\section{Tips and Tricks}
+\section{Tips and tricks}
 \subsection{Aligning your map with a pre-existing image}
 If you want to compare SCUBA-2 data with a map of the same region taken
 with a different instrument, you will usually want to create the

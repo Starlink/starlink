@@ -10,7 +10,7 @@ the resulting time-series data to produce a final science map.
 
 The \makemap\ command can be invoked in two ways: 1) directly by typing
 ``\texttt{makemap}'' in response to a unix shell prompt (see
-\cref{Chapter}{sec:manual}{Running the iterative map-maker}), or 2)
+\cref{Section}{sec:manual}{Running \task{makemap} outside the pipeline}), or 2)
 indirectly as part of an ORAC-DR recipe (see
 \cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline}).
 
@@ -421,7 +421,7 @@ model looking (as expected) like white noise.}
 \end{figure}
 
 
-\section{\xlabel{convergence}Stopping Criteria}
+\section{\xlabel{convergence}Stopping criteria}
 \label{sec:converge}
 
 The map-maker will stop processing either when the requested number of
@@ -592,7 +592,7 @@ size, you should also double the S/N thresholds to get a mask that covers a
 similar area of the sky.
 \end{tip}
 
-\subsection{\xlabel{sec_astmask}AST Masking}
+\subsection{\xlabel{sec_astmask}AST masking}
 \label{sec:astmask}
 The iterative map-maker algorithm described earlier in this chapter
 divides each cleaned bolometer value into four additive parts:
@@ -643,7 +643,7 @@ converged (see \xparam{AST.ZERO_NOTLAST}{ast.zero\_notlast}).
 All the configuration files supplied with \smurf\ use \model{AST}
 masking, with the exception of \blankfield.
 
-\subsection{\xlabel{sec_fltmask}FLT Masking}
+\subsection{\xlabel{sec_fltmask}FLT masking}
 \label{sec:fltmask}
 
 The \model{FLT} model estimates and removes a low frequency background
@@ -687,7 +687,7 @@ problem is described in \cref{Section}{sec:skip}{Skipping the AST model}.
 All the configuration files supplied with \smurf\ use \model{FLT}
 masking, with the exception of \blankfield.
 
-\subsection{\xlabel{sec_commask}COM Masking}
+\subsection{\xlabel{sec_commask}COM masking}
 \label{sec:commask}
 
 The value of the \model{COM} model at a specific time-slice is the mean
