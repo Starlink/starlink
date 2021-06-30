@@ -5,13 +5,13 @@
 \label{sec:cmult}
 
 If you are not using the ORAC-DR pipeline to reduce your data
-(i.e. you are manually employing the map-maker as described in 
-\cref{Chapter}{sec:manual}{Running \task{makemap} Outside the Pipeline}), 
+(i.e. you are manually employing the map-maker as described in
+\cref{Chapter}{sec:manual}{Running \task{makemap} Outside the Pipeline}),
 your data come out of the map-maker
 in units of picowatts (pW). A flux-conversion factor, or FCF, needs to be applied to scale
 your data from units of pW to janskys (Jy). For more information on
 calibrating SCUBA-2 data see Dempsey et al. (2013) \cite{dempsey12}, 
-Mairs et al (2021) \cite{mairs21}, and \cref{Appendix}{app:cal}{SCUBA-2 data calibration}.
+Mairs et al. (2021) \cite{mairs21}, and \cref{Appendix}{app:cal}{SCUBA-2 data calibration}.
 
 \vspace{5mm}
 
@@ -520,10 +520,10 @@ values in the above case (0-3) are:
 \item - neither bit set, so the pixel is inside both the \model{AST} and the \model{FLT} mask
 (a source pixel).
 
-\item - bit 1 set but not bit 2, so the pixel is outside the \model{AST} mask but
+\item -- Bit 1 set, but not Bit 2, so the pixel is outside the \model{AST} mask but
 inside the \model{FLT} mask (a border-line pixel).
 
-\item - bit 2 set but not bit 1, so the pixel is inside the \model{AST} mask but
+\item -- Bit 2 set, but not Bit 1, so the pixel is inside the \model{AST} mask but
 outside the \model{FLT} mask (a border-line pixel).
 
 \item -- Both bits set, so the pixel is inside neither mask (a background
