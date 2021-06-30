@@ -52,14 +52,14 @@ The science pipeline will perform the following:
 \label{sec:recipes}
 
 When a project is initially created and MSBs (Minimum Scheduling Blocks)
-are constructed using the \href{https://www.eaobservatory.org/jcmt/observing/omp/observing-tool/}{JCMT Observing Tool}, 
+are constructed using the \href{https://www.eaobservatory.org/jcmt/observing/omp/observing-tool/}{JCMT Observing Tool},
 the PI can select a pipeline recipe to assign
 to the data. When the data are run through the science pipeline this
 recipe is then called by default. This can be overridden on the command
 line---see \cref{Section}{sec:parameterfile}{Changing the defaults}.
-Described below are the six main \oracdr\ science recipes. 
+Described below are the six main \oracdr\ science recipes.
 
-\textbf{Note:} the ``dimmconfig*'' files can be found in: 
+\textbf{Note:} the ``dimmconfig*'' files can be found in:
 
 \begin{terminalv}
 % ls $STARLINK_DIR/share/smurf/
@@ -121,7 +121,7 @@ results are written as a FITS catalogue (with file extension
 
 This is the recipe used for processing calibrator data. It can also
 be used for any map of a single bright, isolated source at the
-tracking position. 
+tracking position.
 
 This reduction constrains the map to zero beyond a radius of 1 arc-min
 from the source centre. See \cref{Section}{sec:brightcompact}{dimmconfig\_bright\_compact.lis}
@@ -196,7 +196,7 @@ directory for C shells (csh, tcsh):
 % setenv ORAC_DATA_IN ./
 \end{terminalv}
 
-\newpage 
+\newpage
 
 and for Bourne shells (sh, bash, zsh):
 
@@ -216,7 +216,7 @@ This is done by:
 \vspace{0.2cm}
 
 where the list of files that you wish to reduce can be
-an individual or multiple observations (one per line in a text file, 
+an individual or multiple observations (one per line in a text file,
 with full path names).
 
 \end{aligndesc}
@@ -465,7 +465,7 @@ iteration. The convergence can be checked from the line reporting\\*
 \hspace*{0.5cm} \texttt{smf\_iteratemap: *** NORMALIZED MAP CHANGE:
   0.10559 (mean) 2.81081 (max)}
 
-The number to look out for is the mean value of the NORMALIZED MAP CHANGE. 
+The number to look out for is the mean value of the NORMALIZED MAP CHANGE.
 This will have to drop
 below your required \param{maptol} for convergence to be achieved.
 
@@ -495,7 +495,7 @@ The final maps in your output directory will have the suffix
 will start with an \file{s} for ``SCUBA-2'' (e.g.
 \file{s20140620\_00030\_850\_reduced.sdf}). Group maps, which may
 contain co-added observations from a single night, are also produced
-which have the prefix \file{gs} for ``group SCUBA-2'' and the date/scan 
+which have the prefix \file{gs} for ``group SCUBA-2'' and the date/scan
 of the \textit{first input file}
 (e.g. \file{gs20140620\_30\_850\_reduced.sdf}).
 

@@ -10,7 +10,7 @@ If you are not using the ORAC-DR pipeline to reduce your data
 your data come out of the map-maker
 in units of picowatts (pW). A flux-conversion factor, or FCF, needs to be applied to scale
 your data from units of pW to janskys (Jy). For more information on
-calibrating SCUBA-2 data see Dempsey et al. (2013) \cite{dempsey12}, 
+calibrating SCUBA-2 data see Dempsey et al. (2013) \cite{dempsey12},
 Mairs et al. (2021) \cite{mairs21}, and \cref{Appendix}{app:cal}{SCUBA-2 data calibration}.
 
 \vspace{5mm}
@@ -64,7 +64,7 @@ reduction date} for the appropriate values.
 \subsection{Aperture flux}
 
 To measure the flux density of extended sources with aperture photometry
-you should apply the \fcfa (also known as the arcsecond FCF).  
+you should apply the \fcfa (also known as the arcsecond FCF).
 You can then sum the emission in an
 aperture. \fcfa\ was determined using a 60-arcsec diameter
 aperture. If your aperture differs from this you should scale your
@@ -75,7 +75,7 @@ diameters.
 
 \fcfa\ is determined using 1-arcsec pixels. For different pixel sizes
 you will also need to multiply by the pixel size squared for a total
-flux calibrated in units of Jy. For more information, see 
+flux calibrated in units of Jy. For more information, see
 \cref{Appendix}{app:cal}{SCUBA-2 data calibration}.
 
 \subsection{Peak flux}
@@ -95,33 +95,33 @@ density of your source. For more information, see
 
 Calibration observations are obtained at various points throughout the
 night and each individual observation can be used to determine FCF values.
-As noted in Mairs et al. (2021)~\cite{mairs21}, the spread in FCF values observed 
+As noted in Mairs et al. (2021)~\cite{mairs21}, the spread in FCF values observed
 over periods of months or years is comparable to the scatter that can be observed
-over an individual night.  
+over an individual night.
 
-There is no obvious parameter that is the singular dominant cause of the inherent scatter 
+There is no obvious parameter that is the singular dominant cause of the inherent scatter
 in the observed FCFs. The spread is undoubtedly affected by a combination of:
 
 \begin{enumerate}
 
-\item The bright and variable atmosphere including subtle effects such as the 
-submillimeter seeing, wind speed, ambient-temperature changes, humidity and low-lying variations 
+\item The bright and variable atmosphere including subtle effects such as the
+submillimeter seeing, wind speed, ambient-temperature changes, humidity and low-lying variations
 in weather conditions with scale heights comparable to several times the height of the JCMT.
 
-\item The stability of the WVM calibration. 
+\item The stability of the WVM calibration.
 
 \item Dish instability producing variations in the beam profile.
 
-\item Instrumental noise, non-cooled optical components, and uncertainties in the {\sc{makemap}} routine's 
+\item Instrumental noise, non-cooled optical components, and uncertainties in the {\sc{makemap}} routine's
 modeling and removal of noise components from the time stream.
 
 \end{enumerate}
 
-We therefore recommend caution if you are calculating your own FCF 
+We therefore recommend caution if you are calculating your own FCF
 values to apply to data on a given night and suggest using the default values
 supplied above or in \cref{Appendix}{app:fcfs}{FCFs by reduction date}, depending on the observation date.
-Nevertheless, below are instructions on how to perform an investigation into 
-the FCFs calculated from the calibrator observations performed close in time 
+Nevertheless, below are instructions on how to perform an investigation into
+the FCFs calculated from the calibrator observations performed close in time
 to your obtained science data:
 
 \begin{enumerate}
@@ -138,7 +138,7 @@ to your obtained science data:
 
 This will produce a log file (\file{log.checkcal}) which records the
 both \fcfb\ and \fcfa. Check that these values closely approximate the
-standard FCF values given above (to a reasonable margin within the 
+standard FCF values given above (to a reasonable margin within the
 uncertainties).
 
 %%
@@ -175,7 +175,7 @@ You can apply an FCF value using the \picard\ recipe
 By default, this will multiply your map by 1000$\times$\fcfb, where the default \fcfb
 value is presented at the beginning of \cref{Section}{sec:cmult}{Flux-conversion factors}
 or in \cref{Appendix}{app:fcfs}{FCFs by reduction date},
-depending on the observation date and Starlink version used. This produces a 
+depending on the observation date and Starlink version used. This produces a
 calibrated map with units of mJy/beam.
 
 You can supply a parameter file if you wish to use a different value
@@ -324,7 +324,7 @@ degrees.
 You can use the \picard\ recipe \drrecipe{SCUBA2\_MAPSTATS} to get the
 noise. This recipe estimates the RMS from both the map, the NEP, and
 the RMS predicted by the
- \href{https://www.eaobservatory.org/jcmt/instrumentation/continuum/scuba-2/itc/}{Integration 
+ \href{https://www.eaobservatory.org/jcmt/instrumentation/continuum/scuba-2/itc/}{Integration
  Time Calculator}. It then writes out
 a series of results in a log file called \file{log.mapstats}. The
 parameters written to this file are listed in
@@ -333,7 +333,7 @@ parameters written to this file are listed in
 \begin{terminalv}
 % picard SCUBA2_MAPSTATS map.sdf
 \end{terminalv}
-This recipe will report the noise in the same input units provided. 
+This recipe will report the noise in the same input units provided.
 
 
 \textbf{Note:} \drrecipe{SCUBA2\_MAPSTATS} is only designed to work on
@@ -366,8 +366,8 @@ executes the following steps to get the map noise.
 \end{terminalv}
 
 \item Run the \Kappa\ command \stats\ to extract the median value from
-the error array (the ndf extension that describes the uncertainty in each pixel, 
-calculated from the square root of the variances in the raw bolometer data 
+the error array (the ndf extension that describes the uncertainty in each pixel,
+calculated from the square root of the variances in the raw bolometer data
 that contributed to the pixel).
 
 \begin{terminalv}

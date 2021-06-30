@@ -1,4 +1,4 @@
-\chapter{\xlabel{calib}SCUBA-2 data calibration}
+y\chapter{\xlabel{calib}SCUBA-2 data calibration}
 \label{app:cal}
 
 \section{\xlabel{fcf}Flux conversion factors (FCFs)}
@@ -64,11 +64,11 @@ follows:
       \label{eq:fcf_beam}
       \mathrm{FCF_{beam}} = \frac{S_{\mathrm{peak}}}{P_{\mathrm{peak}}}
     \end{equation}
-    producing an FCF in units of Jy/beam/pW. The measured peak signal here is 
-    derived from the Gaussian fit of \task{beamfit}. The peak value is susceptible 
+    producing an FCF in units of Jy/beam/pW. The measured peak signal here is
+    derived from the Gaussian fit of \task{beamfit}. The peak value is susceptible
     to pointing and focus errors, and we have found this number to be somewhat unreliable,
     particularly at 450$\mu$m.
-    
+
    \vspace{3mm}
 
   \item\textbf{The Beammatch FCF}
@@ -81,11 +81,11 @@ follows:
 
 \end{enumerate}
 
-For a true point source, the measured peak pixel in a map calibrated in units of Jy/beam 
-(using the Beam FCF) is equivalent to the integrated total flux of the same source in a map 
+For a true point source, the measured peak pixel in a map calibrated in units of Jy/beam
+(using the Beam FCF) is equivalent to the integrated total flux of the same source in a map
 calibrated in units of Jy/arcsec$^{2}$ (using the Arcsecond FCF). The ORAC-DR processing
 routine will automatically select the appropriate FCF based on the default data-reduction recipe
-that was linked to your data at the time of observations. Note that the data-reduction recipe can 
+that was linked to your data at the time of observations. Note that the data-reduction recipe can
 easily be changed when running ORAC-DR (see
 \cref{Section}{subsec:ChangeRecipe}{Changing the pipeline recipe} for details).
 
@@ -100,8 +100,8 @@ Starlink automatically applies the following multiplicative extinction correctio
 
 where $\tau_{\nu}$ is the opacity at the given frequency, $\nu$.
 
-The atmospheric opacity at SCUBA-2’s operating frequencies are defined in 
-terms of the opacity at 225 GHz. Optimizing the uniformity of the SCUBA-2 secondary 
+The atmospheric opacity at SCUBA-2’s operating frequencies are defined in
+terms of the opacity at 225 GHz. Optimizing the uniformity of the SCUBA-2 secondary
 calibrator fluxes as a function of atmospheric transmission has allowed calculation
 of the atmospheric opacity relationships for the SCUBA-2 450\,$\mu$m and
 850\,$\mu$m pass-bands to be determined. Full details of the analysis
@@ -116,8 +116,8 @@ $\tau_{850}$. The JCMT water-vapour radiometer (WVM) uses the 183\,GHz
 water line to calculate the precipitable water vapour (PWV) along the
 line-of-sight of the telescope. This PWV is then input into an
 atmospheric model to calculate the zenith opacity at 225\,GHz
-($\tau_{225}$). Historically, this has allowed for ease of 
-comparison with the adjacent CSO 225\,GHz tipping radiometer. 
+($\tau_{225}$). Historically, this has allowed for ease of
+comparison with the adjacent CSO 225\,GHz tipping radiometer.
 
 The updated opacity relations (to be used in \cref{Equation}{eq:extcor}{})
 derived by Mairs et al. (2021)~\cite{mairs21}
@@ -131,7 +131,7 @@ and
 \tau_{850} = 3.71 \times (\tau_{225} - 0.040 + 0.20\sqrt{\tau_{225}}).
 \end{equation}
 
-Previously, (\textbf{Starlink versions 2018A and before}) adopted as defaults the opacity relations 
+Previously, (\textbf{Starlink versions 2018A and before}) adopted as defaults the opacity relations
 found by Dempsey et al. (2013)~\cite{dempsey12}:
 
 \begin{equation}
@@ -142,7 +142,7 @@ and
 \tau_{850} = 4.6 \times (\tau_{225} - 0.0043).
 \end{equation}
 
-The updated opacity relations as of Starlink release 2021A  will affect 
+The updated opacity relations as of Starlink release 2021A  will affect
 450-micron data obtained in very dry conditions and 850-micron data
 obtained in very dry or very wet conditions by up to 5\% (see \cref{Figure}{fig:NewExtCor}{}).
 
@@ -157,11 +157,11 @@ Dempsey et al 2013~\cite{dempsey12} values by default.}
 \begin{center}
 \includegraphics[width=0.4\linewidth]{sc21-NewExtCor-450} \hspace{0.02\linewidth}
 \includegraphics[width=0.4\linewidth]{sc21-NewExtCor-850}
-\caption[Updated Extinction Corrections]{The new extinction corrections 
-derived by Mairs et al (2021, \cite{mairs21}) divided by the original extinction corrections (Dempsey et al 2013~\cite{dempsey12}) 
-as a function of atmospheric transmission. Vertical lines show the atmospheric transmission of the typical JCMT 
-weather bands at each wavelength, assuming an airmass of 1.2. Left: 450 microns. Right: 850 microns. At 450 microns, 
-the original correction is modified by a maximum of 5\% in very dry weather while at 850 micronas the original correction is 
+\caption[Updated Extinction Corrections]{The new extinction corrections
+derived by Mairs et al (2021, \cite{mairs21}) divided by the original extinction corrections (Dempsey et al 2013~\cite{dempsey12})
+as a function of atmospheric transmission. Vertical lines show the atmospheric transmission of the typical JCMT
+weather bands at each wavelength, assuming an airmass of 1.2. Left: 450 microns. Right: 850 microns. At 450 microns,
+the original correction is modified by a maximum of 5\% in very dry weather while at 850 micronas the original correction is
 modified by a maximum of 5\% in very dry or very wet conditions. The
 majority of 850-micron observations, however, require no modification
 to the original correction and less than 4\% of SCUBA-2 data are obtained in weather band 5. \label{fig:NewExtCor}}

@@ -102,7 +102,7 @@ values (no prefix) take priority over qualified values.
 \textbf{itermaps}\\
 Setting the parameter \setparam{ITERMAP}{itermap}{1} writes out the
 map containing the astronomical signal after each iteration. Setting
-\param{itermap~=~2} adds the QUALITY component 
+\param{itermap~=~2} adds the QUALITY component
 (see \cref{Section}{sec:maskshow}{Displaying masks)}.  These can be visually inspected with
 
 \begin{terminalv}
@@ -122,10 +122,10 @@ at the end of each iteration} for how to view these maps whilst \makemap\ is sti
 \newline\newline
 \textbf{shortmaps}\\
 If the parameter \param{shortmaps} is non-zero, a map is made from
-every group of adjacent time-slices. When set to -1, a map is produced 
-each time a full pass through the scan pattern has been completed. Any 
-other negative value is interpreted as a duration in seconds, and is converted 
-to time slices using the (possibly down-sampled) sample frequency of the 
+every group of adjacent time-slices. When set to -1, a map is produced
+each time a full pass through the scan pattern has been completed. Any
+other negative value is interpreted as a duration in seconds, and is converted
+to time slices using the (possibly down-sampled) sample frequency of the
 data being mapped. These are stored as an NDF extension and can be viewed \gaia.
 
 \begin{figure}[ht!]
@@ -226,9 +226,9 @@ filter is used during the iterative stage if \xparam{MODELORDER}{modelorder}
 includes \model{FLT}\footnote{The \blankfield\ configuration omits
 \model{FLT} from \param{modelorder}.}, and selected a suitable value
 for the filter size is crucial for maps containing extended emission. See
-Mairs et al. 2015 \cite{extendedrecovery} for more information about 
+Mairs et al. 2015 \cite{extendedrecovery} for more information about
 extended emission recovery, wherein model sources with known parameters
-were added to the raw SCUBA-2 timestream using 
+were added to the raw SCUBA-2 timestream using
 ``\xparam{FAKEMAP}{fakemap}'' in order to investigate the effects of large-scale filtering.
 
 The maximum spatial scale of structure that can be recovered by the
@@ -309,8 +309,8 @@ particularly effective if you find you have one sub-array noisier than
 the others.
 
 This comes with the warning however that you will lose information on
-any scales larger than the area covered by a single sub-array 
-($\sim$200$^{\prime\prime}$. It is therefore not recommended if 
+any scales larger than the area covered by a single sub-array
+($\sim$200$^{\prime\prime}$. It is therefore not recommended if
 you have very large-scale extended structure.
 
 To initialise this option set \setparam{COM.PERARRAY}{com.perarray}{1}.
