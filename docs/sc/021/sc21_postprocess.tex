@@ -91,7 +91,7 @@ density of your source. For more information, see Appendix~\ref{app:cal}.
 \label{sec:own_fcf}
 
 Calibration observations are obtained at various points throughout the
-night and each individual observation can be used to determine an FCF value.
+night and each individual observation can be used to determine FCF values.
 As noted in Mairs et al. (2021)~\cite{mairs21}, the spread in FCF values observed 
 over periods of months or years is comparable to the scatter that can be observed
 over an individual night.  
@@ -118,7 +118,7 @@ We therefore recommend caution if you are calculating your own FCF
 values to apply to data on a given night and suggest using the default values
 supplied above or in Appendix~\ref{app:fcfs}, depending on the observation date. 
 Nevertheless, below are instructions on how to perform an investigation into 
-the FCF calculated from the calibrator observations performed close in time 
+the FCFs calculated from the calibrator observations performed close in time 
 to your obtained science data:
 
 \begin{enumerate}
@@ -135,35 +135,62 @@ to your obtained science data:
 
 This will produce a log file (\file{log.checkcal}) which records the
 both \fcfb\ and \fcfa. Check that these values closely approximate the
-standard FCF values given above.
+standard FCF values given above (to a reasonable margin within the 
+uncertainties).
 
-\item Re-reduce the calibrator using the map-maker with the
-  \emph{same} configuration file you used for your science
-  observations.
+%%
+%%%%%%%
+% STM - 2021, June 29. These steps don't make sense to me
+% I am reframing this section as an ``Investigation of FCFs'' rather
+% than advice on what to apply to data. Using DR recipes
+% that were not intended for maps that have one bright
+% point source in them may not accurately reflect what happens
+% to fluxes in, for example, extended galactic regions as the map-maker
+% models and removes noise components. Without a careful and
+% controlled analysis inputting Fake sources into a variety of maps
+% and comparing the results using different recipes, we should not
+% give the following advice to users.
+%%%%%%%
+%%
 
-\item Again determine the FCF using \drrecipe{SCUBA2\_CHECK\_CAL}.
+%\item Re-reduce the calibrator using the map-maker with the
+%  \emph{same} configuration file you used for your science
+%  observations.
 
-\item Apply this FCF to your reduced science data using \cmult---see
-  the next section. Remember to apply the pixel size squared factor if
-  using \fcfa.
+%\item Again determine the FCF using \drrecipe{SCUBA2\_CHECK\_CAL}.
+
+%\item Apply this FCF to your reduced science data using \cmult---see
+%  the next section. Remember to apply the pixel size squared factor if
+%  using \fcfa.
 \end{enumerate}
 
-\subsection{Applying the FCF}
+\subsection{Manually Applying the FCF}
 \label{subsec:ApplyingFCF}
 
-You can apply the FCF using the \picard\ recipe
+You can apply an FCF value using the \picard\ recipe
 \xref{\drrecipe{CALIBRATE\_SCUBA2\_DATA}}{sun265}{CALIBRATE\_SCUBA2\_DATA}.
-By default this will multiply your map by 1000$\times$\fcfb, obtained
-from the start of \cref{Section}{sec:cmult}{Flux conversion
-  factors}. This produces a calibrated map with units of mJy/beam.
+By default, this will multiply your map by 1000$\times$\fcfb, where the default \fcfb
+value is presented at the beginning of Section~\ref{sec:cmult} or in Appendix~\ref{app:fcfs},
+depending on the observation date and Starlink version used. This produces a 
+calibrated map with units of mJy/beam.
 
 You can supply a parameter file if you wish to use a different value
-for the FCF or use \fcfa. The recipe will write out the calibrated
-file with an \file{\_cal} suffix and will change the units in the map
+for the FCF or use \fcfa. For example, the lines below are written in a parameter
+file called \file{cal.ini} to calibrate the data \file{mapinpW.sdf} with \fcfa=2.07:
+
+\begin{terminalv}
+[CALIBRATE_SCUBA2_DATA]
+FCF = 2.07
+FCF_CALTYPE = ARCSEC
+\end{terminalv}
+
+The default SCUBA-2 FCF will be used if not given and FCF\_CALTYPE may either
+be BEAM (default) or ARCSEC. The recipe will write out the calibrated
+file with a \file{\_cal} suffix and will change the units in the map
 header.
 
 \begin{terminalv}
-% picard CALIBRATE_SCUBA2_DATA  mapinpW.sdf
+% picard -recpars cal.ini CALIBRATE_SCUBA2_DATA  mapinpW.sdf
 \end{terminalv}
 
 Note that the recipe will also take account of the pixel size when
@@ -292,7 +319,9 @@ degrees.
 
 You can use the \picard\ recipe \drrecipe{SCUBA2\_MAPSTATS} to get the
 noise. This recipe estimates the RMS from both the map, the NEP, and
-the RMS predicted by the Integration Time Calculator. It then writes out
+the RMS predicted by the
+ \href{https://www.eaobservatory.org/jcmt/instrumentation/continuum/scuba-2/itc/}{Integration 
+ Time Calculator}. It then writes out
 a series of results in a log file called \file{log.mapstats}. The
 parameters written to this file are listed in
 \cref{Appendix}{app:mapstats}{SCUBA2_MAPSTATS}.
@@ -309,9 +338,15 @@ produce misleading results, or even fail completely to work.
 
 If multiple files are run through \drrecipe{SCUBA2\_MAPSTATS}, either in a single call
 of PICARD or by repeatedly running PICARD in the same terminal on different
-files, the results will be appended to the existing log.mapstats file.
+files, the results will be appended to the existing \file{log.mapstats} file.
 The final columns — project, recipe and filename — are given to ensure it
 is clear to users which line of the logfile corresponds to which input file.
+This table can be viewed in an accessible way by using the Topcat software
+included in Starlink:
+
+\begin{terminalv}
+% topcat -f ascii log.mapstats
+\end{terminalv}
 
 \subsubsection*{Steps for getting your coadded-map noise}
 After applying any necessary FCF, \drrecipe{SCUBA2\_MAPSTATS} simply
@@ -321,11 +356,13 @@ executes the following steps to get the map noise.
 \item Crop the map to remove the noisy edges.
 
 \begin{terminalv}
-% picard CROP_JCMT_IMAGES map_cal.sdf
+% picard CROP_SCUBA2_IMAGES map_cal.sdf
 \end{terminalv}
 
 \item Run the \Kappa\ command \stats\ to extract the median value from
-the error array.
+the error array (the ndf extension that describes the uncertainty in each pixel, 
+calculated from the square root of the variances in the raw bolometer data 
+that contributed to the pixel).
 
 \begin{terminalv}
 % stats map_cal_crop comp=err order
@@ -579,7 +616,7 @@ the \gaiathing{Other image:} box, or selecting with
 \cref{Figure}{fig:maskdisp}{the figure below}.
 
 For more information on the use of masks by \makemap\ and the
-parameters that affect them see \cref{sectyion}{sec:masking}{Masking}.
+parameters that affect them see \cref{section}{sec:masking}{Masking}.
 
 \starfig{sc21_dispmask3}{[hb!]}{width=0.95\linewidth}{fig:maskdisp}{
    Contours of an \model{AST} mask overlaid on a map}{
@@ -652,8 +689,9 @@ pixel mask showing the clump boundaries.
 
 The shape option allows \findclumps\ to create an
 \htmladdnormallink{STC-S}{http://ivoa.net/documents/STC-S/index.html}
-description (polygonal or elliptical) for each clump. These are added
-as extra columns to the output catalogue.
+description (polygonal or elliptical) for each clump that
+can be displayed over any image in \gaia (Figure~\ref{fig:stcshapes}). 
+These are added as extra columns to the output catalogue.
 
 \begin{aligndesc}
 \item[Polygon] Each polygon will have, at most, 15 vertices. For
