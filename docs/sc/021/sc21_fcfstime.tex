@@ -1,7 +1,7 @@
 \chapter{\xlabel{fcfstime}FCFs by Time of Night}
 \label{app:fcfstime}
 
-Figure \ref{fig:FCFsTimeOfNight} shows the Beam (Peak) FCFs at 
+\cref{Figure}{fig:FCFsTimeOfNight}{} shows the Beam (Peak) FCFs at
 450 and 850 microns as a function of UT time for observations of the
 primary calibrator, Uranus along with secondary calibrators CRL\,2688, and CRL\,618.
 The Peak FCF is larger in the evening and morning primarily because thermal 
@@ -22,7 +22,7 @@ Data are coloured according to season. \label{fig:FCFsTimeOfNight}}
 \end{center}
 \end{figure}
 
-Figure \ref{fig:FCFsTimeOfNightFits} show the Peak FCF trends in detail for evening and morning 
+\cref{Figure}{fig:FCFsTimeOfNightFits}{} show the Peak FCF trends in detail for evening and morning
 observations of Uranus and CRL 2688. The data are bootstrap-fitted with linear functions and “rs” 
 indicates the Spearman-Rank correlation of the fit.
 
@@ -35,15 +35,18 @@ indicates the Spearman-Rank correlation of the fit.
 \caption[FCFs Time of Night Fits]{Linear fits to the Peak FCFs at 450 microns (left) and 850 microns (right)
  during the evening (top) and morning (bottom) when dish distortions caused by thermal gradients affect the 
  beam shape. The distributions during the stable part of the night (07:00-17:00 UTC) show no significant 
- slope and therefore require no corrections to the default FCFs shown in Appendix \ref{app:fcfs}. \label{fig:FCFsTimeOfNightFits}}
+ slope and therefore require no corrections to the default FCFs shown in
+ \cref{Appendix}{app:fcfs}{FCFs by reduction date}. \label{fig:FCFsTimeOfNightFits}}
 \end{center}
 \end{figure}
 
+
 The Peak FCFS DECREASE in the evening as the ambient temperature cools and the dish settles, while
 the Peak FCFS INCREASE in the morning as the ambient temperature warms and the dish becomes
-unstable to thermal gradients. Table \ref{tab:FCFsTimeOfNight} summarises the rate of change. 
+unstable to thermal gradients. \cref{Table}{tab:FCFsTimeOfNight}{below} summarises the rate of change.
 As of Starlink release 2021A, ORAC-DR \textbf{does not} apply these corrections by default. If
-you wish to apply these corrections, the FCFs must be modified manually (see Section \ref{subsec:ApplyingFCF}).
+you wish to apply these corrections, the FCFs must be modified manually (see
+\cref{Section}{subsec:ApplyingFCF}{Manually applying the FCF}).
 
 
 \begin{table}[h!]

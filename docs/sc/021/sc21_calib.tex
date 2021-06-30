@@ -8,7 +8,8 @@ Primary and secondary calibrator observations have been reduced using
 the specifically designed \file{dimmconfig\_bright\_compact.lis}.  The
 maps produced from this are then analysed using tailor-made \picard\
 recipes. For instructions on applying the FCFs to your map see
-\cref{Section}{sec:cmult}{this page} and Appendix~\ref{app:fcfs}.
+\cref{Section}{sec:cmult}{this page} and
+\cref{Appendix}{app:fcfs}{FCFs by reduction date}.
 
 A map reduced by the map-maker has units of pW. To calibrate the data
 into units of janskys (Jy), a set of bright, point-source objects with
@@ -72,7 +73,8 @@ follows:
 
   \item\textbf{The Beammatch FCF}
     This FCF is calculated in the same way as the Beam FCF decribed
-    above, but after a matched filter is applied to the data (see Appendix \ref{app:mf}).
+    above, but after a matched filter is applied to the data (see
+    \cref{Appendix}{app:mf}{SCUBA-2 matched filter}).
     This FCF is less commonly used than the former two types.
 
   \end{enumerate}
@@ -84,7 +86,8 @@ For a true point source, the measured peak pixel in a map calibrated in units of
 calibrated in units of Jy/arcsec$^{2}$ (using the Arcsecond FCF). The ORAC-DR processing 
 routine will automatically select the appropriate FCF based on the default data reduction recipe 
 that was linked to your data at the time of observations. Note that the data reduction recipe can 
-easily be changed when running ORAC-DR (see Section \ref{subsec:ChangeRecipe} for details).
+easily be changed when running ORAC-DR (see
+\cref{Section}{subsec:ChangeRecipe}{Changing the pipeline recipe} for details).
 
 \section{\xlabel{extinction}Extinction correction}
 
@@ -116,7 +119,7 @@ atmospheric model to calculate the zenith opacity at 225\,GHz
 ($\tau_{225}$). Historically, this has allowed for ease of 
 comparison with the adjacent CSO 225\,GHz tipping radiometer. 
 
-The updated opacity relations (to be used in Equation \ref{eq:extcor}) 
+The updated opacity relations (to be used in \cref{Equation}{eq:extcor}{})
 derived by Mairs et al. (2021)~\cite{mairs21}
 have been adopted as the default as of \textbf{Starlink release 2021A}:
 
@@ -140,14 +143,14 @@ and
 \end{equation}
 
 The updated opacity relations as of Starlink release 2021A  will affect 
-450 micron data obtained in very dry conditions and 850 micron data 
-obtained in very dry or very wet conditions by up to 5\% (see Figure \ref{fig:NewExtCor}).
+450 micron data obtained in very dry conditions and 850 micron data
+obtained in very dry or very wet conditions by up to 5\% (see \cref{Figure}{fig:NewExtCor}{}).
 
 \textbf{Note that the default extinction corrections are intrinsically connected to the default FCFs
 applied. If applying extinction corrections derived by Mairs et al. 2021 (\cite{mairs21}), the matching
-FCFs must also be applied (see Appendix \ref{app:fcfs}). The ORAC-DR software assumes the 
-Mairs et al (2021)~\cite{mairs21}
 results beginning in Starlink release 2021A. Starlink release 2018A and previous assume the 
+FCFs must also be applied (see \cref{Appendix}{app:fcfs}{FCFs by reduction date}).
+The ORAC-DR software assumes the Mairs et al (2021)~\cite{mairs21}
 Dempsey et al 2013~\cite{dempsey12} values by default.}
 
 \begin{figure}

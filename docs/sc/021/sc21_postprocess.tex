@@ -6,18 +6,20 @@
 
 If you are not using the ORAC-DR pipeline to reduce your data
 (i.e. you are manually employing the map-maker as described in 
-Chapter \ref{sec:manual}), your data comes out of the map-maker
+\cref{Chapter}{sec:manual}{Running \task{makemap} Outside the Pipeline}), 
+your data come out of the map-maker
 in units of picowatts (pW). A flux conversion factor, or FCF, needs to be applied to scale
 your data from units of pW to janskys (Jy). For more information on
 calibrating SCUBA-2 data see Dempsey et al. (2013) \cite{dempsey12}, 
-Mairs et al (2021) \cite{mairs21}, and Appendix~\ref{app:cal}.
+Mairs et al (2021) \cite{mairs21}, and \cref{Appendix}{app:cal}{SCUBA-2 data calibration}.
 
 \vspace{5mm}
 
 \textbf{Below are the default FCF values as of Starlink 2021A and they apply to data
 obtained since 30 June 2018}. The ORAC-DR pipeline automatically accounts for changes
 in the FCFs for earlier dates (see the important notes below) but manually running
-the pipeline requires consulting Appendix~\ref{app:fcfs} for the appropriate values.
+the pipeline requires consulting \cref{Appendix}{app:fcfs}{FCFs by
+reduction date} for the appropriate values.
 
 \vspace{0.5cm}
 
@@ -74,7 +76,7 @@ diameters.
 \fcfa\ is determined using 1-arcsec pixels. For different pixel sizes
 you will also need to multiply by the pixel size squared for a total
 flux calibrated in units of Jy. For more information, see 
-Appendix~\ref{app:cal}.
+\cref{Appendix}{app:cal}{SCUBA-2 data calibration}.
 
 \subsection{Peak flux}
 
@@ -85,7 +87,8 @@ the \fcfb\ (also known as the peak FCF).  When you open your map in
 source. Applying \fcfb\ will result in a map with
 units of Jy/beam. For point-like or compact sources smaller than the
 beam (with a Gaussian profile), this peak value will be the total flux
-density of your source. For more information, see Appendix~\ref{app:cal}.
+density of your source. For more information, see
+\cref{Appendix}{app:cal}{SCUBA-2 data calibration}.
 
 \subsection{\xlabel{own_fcf}Determining your own Flux Conversion Factors}
 \label{sec:own_fcf}
@@ -116,7 +119,7 @@ modeling and removal of noise components from the time stream.
 
 We therefore recommend caution if you are calculating your own FCF 
 values to apply to data on a given night and suggest using the default values
-supplied above or in Appendix~\ref{app:fcfs}, depending on the observation date. 
+supplied above or in \cref{Appendix}{app:fcfs}{FCFs by reduction date}, depending on the observation date.
 Nevertheless, below are instructions on how to perform an investigation into 
 the FCFs calculated from the calibrator observations performed close in time 
 to your obtained science data:
@@ -170,7 +173,8 @@ uncertainties).
 You can apply an FCF value using the \picard\ recipe
 \xref{\drrecipe{CALIBRATE\_SCUBA2\_DATA}}{sun265}{CALIBRATE\_SCUBA2\_DATA}.
 By default, this will multiply your map by 1000$\times$\fcfb, where the default \fcfb
-value is presented at the beginning of Section~\ref{sec:cmult} or in Appendix~\ref{app:fcfs},
+value is presented at the beginning of \cref{Section}{sec:cmult}{Flux-conversion factors}
+or in \cref{Appendix}{app:fcfs}{FCFs by reduction date},
 depending on the observation date and Starlink version used. This produces a 
 calibrated map with units of mJy/beam.
 
@@ -692,7 +696,7 @@ pixel mask showing the clump boundaries.
 The shape option allows \findclumps\ to create an
 \htmladdnormallink{STC-S}{http://ivoa.net/documents/STC-S/index.html}
 description (polygonal or elliptical) for each clump that
-can be displayed over any image in \gaia (Figure~\ref{fig:stcshapes}). 
+can be displayed over any image in \gaia (\cref{Figure}{fig:stcshapes}{}).
 These are added as extra columns to the output catalogue.
 
 \begin{aligndesc}
