@@ -998,10 +998,10 @@ other dimmconfig files to tell makemap to include a Principal Component Analysis
 For instance, to use a PCA model when creating a map of a bright extended source, you could run makemap as follows:
 
 \begin{terminalv}
-\% more conf
-\^\$STARLINK_DIR/share/smurf/dimmconfig_bright_extended.lis
-\^\$STARLINK_DIR/share/smurf/dimmconfig_pca.lis
-\% makemap config=^conf
+% more conf
+^$STARLINK_DIR/share/smurf/dimmconfig_bright_extended.lis
+^$STARLINK_DIR/share/smurf/dimmconfig_pca.lis
+% makemap config=^conf
 \end{terminalv}
 
 To process compact sources, change “bright\_extended” above to “bright\_compact“.
