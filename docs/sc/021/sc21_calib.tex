@@ -83,9 +83,9 @@ follows:
 
 For a true point source, the measured peak pixel in a map calibrated in units of Jy/beam 
 (using the Beam FCF) is equivalent to the integrated total flux of the same source in a map 
-calibrated in units of Jy/arcsec$^{2}$ (using the Arcsecond FCF). The ORAC-DR processing 
-routine will automatically select the appropriate FCF based on the default data reduction recipe 
-that was linked to your data at the time of observations. Note that the data reduction recipe can 
+calibrated in units of Jy/arcsec$^{2}$ (using the Arcsecond FCF). The ORAC-DR processing
+routine will automatically select the appropriate FCF based on the default data-reduction recipe
+that was linked to your data at the time of observations. Note that the data-reduction recipe can 
 easily be changed when running ORAC-DR (see
 \cref{Section}{subsec:ChangeRecipe}{Changing the pipeline recipe} for details).
 
@@ -143,7 +143,7 @@ and
 \end{equation}
 
 The updated opacity relations as of Starlink release 2021A  will affect 
-450 micron data obtained in very dry conditions and 850 micron data
+450-micron data obtained in very dry conditions and 850-micron data
 obtained in very dry or very wet conditions by up to 5\% (see \cref{Figure}{fig:NewExtCor}{}).
 
 \textbf{Note that the default extinction corrections are intrinsically connected to the default FCFs
@@ -162,7 +162,9 @@ derived by Mairs et al (2021, \cite{mairs21}) divided by the original extinction
 as a function of atmospheric transmission. Vertical lines show the atmospheric transmission of the typical JCMT 
 weather bands at each wavelength, assuming an airmass of 1.2. Left: 450 microns. Right: 850 microns. At 450 microns, 
 the original correction is modified by a maximum of 5\% in very dry weather while at 850 micronas the original correction is 
-modified by a maximum of 5\% in very dry or very wet conditions. The majority of 850 microns observations, however, require no modification to the original correction and less than 4\% of SCUBA-2 data is obtained in weather band 5. \label{fig:NewExtCor}}
+modified by a maximum of 5\% in very dry or very wet conditions. The
+majority of 850-micron observations, however, require no modification
+to the original correction and less than 4\% of SCUBA-2 data are obtained in weather band 5. \label{fig:NewExtCor}}
 \end{center}
 \end{figure}
 

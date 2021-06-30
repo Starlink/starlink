@@ -150,7 +150,7 @@ models are subtracted, a sky map created and the convergence checked.
   (\model{EXT}) applies a multiplicative extinction correction to the
   data. Following this, the \model{FLT} model filters each bolometer
   time-stream independently to remove low frequencies that correspond
-  to angular scales larger than 600\,arc-sec and 300\,arc-sec at
+  to angular scales larger than 600\,arcsec and 300\,arcsec at
   450$\mu$m and 850$\mu$m, respectively.
 
   After these models have been removed, the AST model (\emph{i.e.} the
@@ -362,7 +362,7 @@ FLT& The \model{FLT} model acts on the Fourier transform of the
   to pass) and low-pass (only allows \textit{lower} frequencies to
   pass) filters can be specified. These cut-off frequencies can either
   be specified directly in Hz, or as an angular spatial scale in
-  arc-seconds that is subsequently converted into a frequency using
+  arcseconds that is subsequently converted into a frequency using
   the speed at which the telescope is moving. The most important role of
   this model is to apply a high-pass filter in order to remove the
   low frequency $1/f$ noise. Note that extended emission varies slowly
@@ -491,10 +491,10 @@ later in model-specific sub-sections.
 Masks fall into two broad categories:
 \begin{itemize}
 
-\item \textbf{dynamic masks} - these are masks that change shape from one
+\item \textbf{dynamic masks} -- these are masks that change shape from one
 iteration to the next.
 
-\item \textbf{static masks} - these are masks that retain the same shape
+\item \textbf{static masks} -- these are masks that retain the same shape
 for all iterations.
 
 \end{itemize}
@@ -789,7 +789,7 @@ achieved by:
 
 \item Setting
 \xparam{FLT.FILT_EDGE_LARGESCALE}{flt.filt\_edge\_largescale}) to 200
-arc-seconds so that the \model{FLT} model uses a  heavier than normal
+arcseconds so that the \model{FLT} model uses a  heavier than normal
 filter.
 
 \item Setting \xparam{COM.PERARRAY}{com.perarray} to 1, indicating that four separate
@@ -843,7 +843,7 @@ blank fields.
 Applying a high-pass filter (\model{FLT}) on each iteration can result in
 convergence problems when there is little or no signal in the
 map. Instead, a single, harsher high-pass filter is applied as a
-pre-processing step (corresponding to 200-arc-sec scales at both
+pre-processing step (corresponding to 200-arcsec scales at both
 450\,$\mu$m and 850\,$\mu$m). There are also more conservative cuts to
 remove noisy/problematic bolometers. Only 4 (positive) iterations are
 requested as there is no signal to confuse to models.
@@ -1014,7 +1014,8 @@ To process compact sources, change “bright\_extended” above to “bright\_co
    \label{fig:PCAfig}
 \end{figure}
 
-Using a PCA model can help to reduce the spurious extended structures that often appear in SCUBA-2 maps (although this benefit is bought at the cost of a much extended run time). For instance, four 850 micron maps of DR 21 are presented in Figure~\ref{fig:PCAfig} – the top row shows the maps made with the basic “bright extended” dimmconfig, the middle row shows the results of adding in the new PCA dimmconfig, and the bottom row shows mosaics of the top and middle rows (left and right, respectively) with a difference map in between.
+Using a PCA model can help to reduce the spurious extended structures that often appear in SCUBA-2 maps (although this benefit is bought at the cost of a much extended run time). For instance, four 850 micron maps of DR 21 are presented in
+\cref{Figure}{fig:PCAfig}{} – the top row shows the maps made with the basic “bright extended” dimmconfig, the middle row shows the results of adding in the new PCA dimmconfig, and the bottom row shows mosaics of the top and middle rows (left and right, respectively) with a difference map in between.
 
 \section{\xlabel{problem}Configuration files for solving specific problems}
 \label{sec:problem}

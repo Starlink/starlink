@@ -13,10 +13,10 @@ scratch or copy one of the provided ones to your local directory and
 edit it.}
 
 The first line of each specialised configuration file is often the path
-to another configuration file --- known as the \emph{parent} configuration
+to another configuration file---known as the \emph{parent} configuration
 file. The new configuration file inherits all the parameter values
 defined by the parent configuration file, and then goes on to specify
-additional parameter settings which may supplement or over-ride those
+additional parameter settings which may supplement or override those
 defined in the parent configuration file. Parameters that are not set to
 a specific value by \emph{either} configuration file assume the default
 values listed in \cref{Appendix}{app:parameters}{Configuration-parameter
@@ -49,7 +49,7 @@ parent (the path to the parent file must be preceded
 by an up-caret (\texttt{\^}) character). Thus, all the parameter values
 set by \texttt{\$STARLINK\_DIR/share/smurf/dimmconfig\_jsa\_generic.lis} are
 first read, before adding in other parameter settings. In this case, values
-are assigned to \param{maptol} and \param{numiter}, over-riding the
+are assigned to \param{maptol} and \param{numiter}, overriding the
 values provided by the parent file.
 
 You can use more than one parent file if required (each one a separate
@@ -75,9 +75,9 @@ Objects}{sun95}{se_groups}'' in ``\xref{Starlink User Note 95}{sun95}{}''.
 \cref{Appendix}{app:parameters}{Configuration-parameter descriptions}
 lists the parameters that are more likely to be of interest to you when
 creating your own configuration files. You can also change any of the
-other more esoteric parameters not included in that list --- see
-Appendix \xref{SUN/258} {sun258}{par_full} within \xref{Starlink
-User Note 258}{sun258}{} for a full list -- but we do not advise this.
+other more esoteric parameters not included in that list---see
+Appendix~\xref{SUN/258} {sun258}{par_full} within \xref{Starlink
+User Note 258}{sun258}{} for a full list---but we do not advise this.
 
 \begin{tip}
   If some feature is switched on either by default or within
@@ -85,7 +85,7 @@ User Note 258}{sun258}{} for a full list -- but we do not advise this.
   by assigning a suitable value to the corresponding parameter within
   your own configuration file. The value needed to do this will be
   given in the parameter description in \cref{Appendix}{app:parameters}
-  {Configuration-parameter descriptions} --- for instance it may be
+  {Configuration-parameter descriptions}---for instance it may be
   \param{<undef>}, or \param{0}, or some other special value.
 \end{tip}
 
@@ -220,7 +220,7 @@ you to see the model that was fit for each component specified by the
 Some of the most important parameters to experiment with are the
 filtering options. By default, no filtering is applied during the
 pre-processing stage\footnote{However, the \blankfield\ configuration
-over-rides this default.} (see \xparam{FILT_EDGE_LARGESCALE}{filt\_edge\_largescale}
+overrides this default.} (see \xparam{FILT_EDGE_LARGESCALE}{filt\_edge\_largescale}
 and \xparam{FILT_EDGE_SMALLSCALE}{filt\_edge\_smallscale}). A high-pass
 filter is used during the iterative stage if \xparam{MODELORDER}{modelorder}
 includes \model{FLT}\footnote{The \blankfield\ configuration omits
@@ -241,13 +241,13 @@ applied to the data:
 \end{equation}
 
 The default (\emph{i.e.} if no configuration is supplied) filter sizes
-in arc-seconds are:
+in arcseconds are:
 
 \setparam{FLT.FILT_EDGE_LARGESCALE}{450.flt.filt\_edge\_largescale}{200} \\
 \setparam{FLT.FILT_EDGE_LARGESCALE}{850.flt.filt\_edge\_largescale}{480}.
 
 To make your life easier, these parameters allow you to specify the
-filter limits in terms of spatial scale in arc-seconds---in this case
+filter limits in terms of spatial scale in arcseconds---in this case
 480\,arcsec at 850\,$\mu$m and 200\,arcsec at 450\,$\mu$m. For example,
 at 850\,$\mu$m, recovering scales of 480\,arcsec at a scan speed of
 600\,arcsec/sec (default for a 1 degree \textsc{pong}) corresponds to
@@ -421,8 +421,8 @@ cut-off. Step 4 is performed to smooth the the edges of your mask.
   to map-making compared with the standard map-maker.
 }
 
-Traditionally, the map-maker divides a non-contiguous sequence of time
-series data into chunks. It processes each chuck independently
+Traditionally, the map-maker divides a non-contiguous sequence of
+time-series data into chunks. It processes each chuck independently
 before co-adding them as a final step in the the reduction---see
 \cref{Figure}{fig:skyloop}{the figure below}.
 

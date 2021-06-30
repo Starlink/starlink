@@ -8,7 +8,7 @@ If you are not using the ORAC-DR pipeline to reduce your data
 (i.e. you are manually employing the map-maker as described in 
 \cref{Chapter}{sec:manual}{Running \task{makemap} Outside the Pipeline}), 
 your data come out of the map-maker
-in units of picowatts (pW). A flux conversion factor, or FCF, needs to be applied to scale
+in units of picowatts (pW). A flux-conversion factor, or FCF, needs to be applied to scale
 your data from units of pW to janskys (Jy). For more information on
 calibrating SCUBA-2 data see Dempsey et al. (2013) \cite{dempsey12}, 
 Mairs et al (2021) \cite{mairs21}, and \cref{Appendix}{app:cal}{SCUBA-2 data calibration}.
@@ -482,7 +482,7 @@ by using a compression factor of 2.
 SCUBA-2 maps created using ``\model{AST}-masking'' (see \cref{Section}
 {sec:masking}{Masking}) will contain a \texttt{Quality} array indicating the
 background pixels that were masked (i.e. forced to zero). In itself this
-is fairly simple - background pixels have a non-zero Quality value and
+is fairly simple---background pixels have a non-zero Quality value and
 source pixels have a Quality value of zero. However, it is also possible
 to have independent masks for the \model{FLT} and \model{COM} models,
 in addition to the \model{AST} mask. For instance, maps created using
@@ -492,7 +492,7 @@ to be used when interpreting the \texttt{Quality} array.
 
 Each value in the \texttt{Quality} array is restricted to taking integer values
 between 0 and 255, and so can be thought of as 8 separate bits. Each ``bit
-plane'' within the \texttt{Quality} array holds a single mask - \model{AST},
+plane'' within the \texttt{Quality} array holds a single mask---\model{AST},
 \model{FLT} or \model{COM}. The \xref{\task{showqual}}{sun95}{SHOWQUAL}
 command can be used to find out which mask is held by which bit plane:
 
@@ -511,7 +511,7 @@ then the \model{FLT} mask would be stored in bit 1.
 The decimal integer value of any element of the \texttt{Quality} array is
 equal to the binary value formed from the bits listed by \task{showqual}.
 So in the above case the maximum \texttt{Quality} value is 3 (the decimal
-equivalent of binary ``11'' --- both bits set). Remembering that a bit is set
+equivalent of binary ``11''-e--both bits set). Remembering that a bit is set
 (\emph{i.e.} is 1) for background pixels and cleared (\emph{i.e.} is 0) for
 source pixels, it follows that the four possible decimal \texttt{Quality}
 values in the above case (0-3) are:
@@ -526,15 +526,15 @@ inside the \model{FLT} mask (a border-line pixel).
 \item - bit 2 set but not bit 1, so the pixel is inside the \model{AST} mask but
 outside the \model{FLT} mask (a border-line pixel).
 
-\item - both bits set, so the pixel is inside neither mask (a background
+\item -- Both bits set, so the pixel is inside neither mask (a background
 pixel).
 \end{enumerate}
 
 \cref{Figure}{fig:qualmap}{Quality component displayed as an image} shows
-a simple map of the \texttt{Quality} array values --- the black areas have
+a simple map of the \texttt{Quality} array values---the black areas have
 value zero and are thus inside both masks, the dark brown areas have value 2
 and are thus inside the \model{AST} mask but outside the \model{FLT} mask.
-The light brown areas have value 3 and are inside neither mask. In this
+The light-brown areas have value 3 and are inside neither mask. In this
 particular case, there are no  areas with a quality value of 1, so the
 \model{FLT} mask is contained entirely within the \model{AST} mask.
 
@@ -576,7 +576,7 @@ will set all pixels bad in \texttt{fred.sdf} except for those inside the
 \end{terminalv}
 
 will set all pixels bad except for those inside the \model{FLT} mask.  Note, the
-change made by \task{setbb} is temporary - it can be undone by doing:
+change made by \task{setbb} is temporary---it can be undone by doing:
 
 \begin{terminalv}
 % setbb fred 0

@@ -3,7 +3,7 @@
 
 \section{\xlabel{pl_overview}Pipeline overview}
 
-SCUBA-2 data reduction pipelines have been developed based on the
+SCUBA-2 data-reduction pipelines have been developed based on the
 existing \oracdr\ pipeline (Cavanagh et al., 2008\cite{oracdr}) used
 for ACSIS. There are three distinct pipelines currently utilised by
 SCUBA-2. Users will likely only need to run the science pipeline. The
@@ -18,7 +18,7 @@ made for each complete observation which are combined to create the final
 image. Users wishing to reduce their own data should use this pipeline.
 This pipeline is responsible for producing the reduced data that is
 accessible to users via CADC.
-\item The QL runs quality assurance checks on the data as it comes in.
+\item The QL runs quality-assurance checks on the data as it comes in.
 For science data it calculates the noise between 2\,Hz and 10\,Hz,
 along with the NEP and effective NEP, for each 30-second scan. These
 values undergo quality-assurance checks to ensure SCUBA-2 is within
@@ -31,8 +31,8 @@ quality of their data.
 \end{itemize}
 
 The manual for the SCUBA-2 pipeline can be found at \pipelinesun,
-while the pipeline software comes as part of the \starlink\ suite. Data
-reduction tutorials are available 
+while the pipeline software comes as part of the \starlink\ suite.
+Data-reduction tutorials are available
 \href{https://www.eaobservatory.org/jcmt/science/reductionanalysis-tutorials/}{online}\footnote{
 \url{https://www.eaobservatory.org/jcmt/science/reductionanalysis-tutorials/}}
 
@@ -150,21 +150,21 @@ this recipe and the files produced.
 \section{\xlabel{running_pl}Running the Science Pipeline}
 \label{sec:plsteps}
 
-\textbf{Note:} Data reduction tutorials are available 
+\textbf{Note:} Data-reduction tutorials are available
 \href{https://www.eaobservatory.org/jcmt/science/reductionanalysis-tutorials/}{online}.
 
 \begin{aligndesc}
 \item[Step~1:]
 \textbf{Initialise ORAC-DR}
 
-For 850 micron data, this is done by:
+For 850-micron data, this is done by:
 \begin{terminalv}
 % oracdr_scuba2_850 -cwd
 \end{terminalv}
 
 \vspace{0.2cm}
 
-For 450 micron data, this is done by:
+For 450-micron data, this is done by:
 
 \begin{terminalv}
 % oracdr_scuba2_450 -cwd
@@ -259,7 +259,7 @@ observation being reduced and the duration of the observation. \label{pipeline-o
 \caption[Output from the pipeline]{The Xwindows output from the \oracdr\
 pipeline---here we we see the FCF being applied, the graphics
 being created along with a group file (file containing co-added observations
-from a single night - if provided). \label{pipeline-oracdr-3}}
+from a single night, if provided). \label{pipeline-oracdr-3}}
 \end{center}
 \end{figure}
 
