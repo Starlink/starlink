@@ -1,14 +1,14 @@
 \chapter{\xlabel{calib}SCUBA-2 data calibration}
 \label{app:cal}
 
-\section{\xlabel{fcf}Flux conversion factors (FCF)}
+\section{\xlabel{fcf}Flux conversion factors (FCFs)}
 \label{app:fcf}
 
 Primary and secondary calibrator observations have been reduced using
 the specifically designed \file{dimmconfig\_bright\_compact.lis}.  The
 maps produced from this are then analysed using tailor-made \picard\
 recipes. For instructions on applying the FCFs to your map see
-\cref{Section}{sec:cmult}{this page}.
+\cref{Section}{sec:cmult}{this page} and Appendix~\ref{app:fcfs}.
 
 A map reduced by the map-maker has units of pW. To calibrate the data
 into units of janskys (Jy), a set of bright, point-source objects with
@@ -145,9 +145,10 @@ obtained in very dry or very wet conditions by up to 5\% (see Figure \ref{fig:Ne
 
 \textbf{Note that the default extinction corrections are intrinsically connected to the default FCFs
 applied. If applying extinction corrections derived by Mairs et al. 2021 (\cite{mairs21}), the matching
-FCFs must also be applied (see Appendix \ref{app:fcfs}). The ORAC-DR software assumes the Mairs et al 2021
+FCFs must also be applied (see Appendix \ref{app:fcfs}). The ORAC-DR software assumes the 
+Mairs et al (2021)~\cite{mairs21}
 results beginning in Starlink release 2021A. Starlink release 2018A and previous assume the 
-Dempsey et al 2013~(\cite{dempsey12}) values by default.}
+Dempsey et al 2013~\cite{dempsey12} values by default.}
 
 \begin{figure}
 \begin{center}
