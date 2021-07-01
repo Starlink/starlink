@@ -8,7 +8,7 @@ different calibration values. \textsc{orac-dr} will automatically apply
 the appropriate values.
 
 \textbf{Note:} As of the 2021A Starlink release, the
-opacity relations and FCF values have been updated following the
+opacity relationships and FCF values have been updated following the
 results presented by Mairs et al. 2021 \cite{mairs21}. Historical values derived by Dempsey et al. 2013
 \cite{dempsey12} are presented below the updated values for comparison.
 
@@ -21,15 +21,15 @@ Starlink currently applies the following multiplicative extinction correction to
 \begin{equation}
 \mathrm{Extinction\:Correction} = \frac{1}{\mathrm{exp}[-\tau_{\nu}\times\mathrm{Airmass}]}
 \end{equation}
-where $\tau_{\nu}$ is the atmospheric opacity at the given frequency, $\nu$. ``Opacity relations''
+where $\tau_{\nu}$ is the atmospheric opacity at the given frequency, $\nu$. ``Opacity relationships''
 relate the measured $\tau_{225}$ to the atmospheric opacity at the operating frequencies of
-SCUBA-2, $\tau_{666}$ (450~$\mu$m) and $\tau_{345}$ (850~$\mu$m). Their form is:
+SCUBA-2, $\tau_{666}$ (450\,$\mu$m) and $\tau_{345}$ (850\,$\mu$m). Their form is:
 \begin{equation}
 \label{eq:2021taurelation}
-\tau_{\nu} = \mathrm{a}\times(\tau_{225,\mathrm{zen}} + \mathrm{b} + \mathrm{c}\times\sqrt{\tau_{225,\mathrm{zen}}}),
+\tau_{\nu} = a\times(\tau_{225,\mathrm{zen}} + b + c\times\sqrt{\tau_{225,\mathrm{zen}}}),
 \end{equation}
-where a, b, and c are empirically derived coefficients (see Mairs et al. 2021 \cite{mairs21}).
-You can find out what opacity relation was applied by using the \Kappa\ command \hislist.
+where $a$, $b$, and $c$ are empirically derived coefficients (see Mairs et al. 2021 \cite{mairs21}).
+You can find out what opacity relationship was applied by using the \Kappa\ command \hislist.
 
 \begin{terminalv}
 %  hislist file | grep EXT.TAURELATION
@@ -40,7 +40,7 @@ This will return something like the following,
       EXT.TAURELATION.450=(23.3,-0.018,0.05),
       EXT.TAURELATION.850=(3.71,-0.040,0.202), EXT.TAUSRC=auto, FAKESCALE=1,
 \end{terminalv}
-indicating, for example, that at 850~$\mu$m, a=3.71, b=-0.040, and c=0.202.
+indicating, for example, that at 850\,$\mu$m, $a$=3.71, $b$=-0.040, and $c$=0.202.
 
 \vspace{5mm}
 
@@ -58,9 +58,9 @@ values presented below.
 
 \newpage
 
-\textbf{Results from Mairs et al. 2021 \cite{mairs21}. Employed by
-default in Starlink Versions 2021A and after. Dates are inclusive. See
-\cref{Figure}{fig:FCFstep}{}}\\
+\textbf{Results from Mairs et al. 2021 \cite{mairs21}.  These are employed %applied?
+by default from Starlink Version 2021A. Dates are inclusive. See
+\cref{Figure}{fig:FCFstep}{}.}\\
 \begin{table}[h!]
 \begin{center}
 \begin{tabular}{|l|c|c|c|c|}
@@ -80,8 +80,8 @@ until 2011 April 30           &  383       &  4.9          & 1080       &  5.0 \
 \end{center}
 \end{table}
 
-From 2011 May 1 onwards, the a, b, and c values presented in the table below correspond to
-\cref{Equation}{eq:2021taurelation}{}:\\
+From 2011 May 1 onwards, the $a$, $b$, and $c$ coefficients presented in the table below correspond to
+those in \cref{Equation}{eq:2021taurelation}{}.\\
 \begin{table}[h!]
 \begin{center}
 \begin{tabular}{|l|c|c|}
@@ -96,10 +96,28 @@ until 2011 April 30 & 32 $\times$ ($\tau_{225}$ - 0.02)    & 5.2 $\times$ ($\tau
 \end{center}
 \end{table}
 
-\begin{center}
-\begin{figure}
-\includegraphics[width=0.9\linewidth]{sc21_FCFstep}
-\caption[FCF step function]{From Mairs et al (2021)~\cite{mairs21}. FCFs derived using flux measurements of the primary calibrator Uranus during the stable part of the night (07:00-17:00 UTC) as a function of date. The gray shaded regions indicate epochs that are not included in the FCF determinations. The horizontal, shaded regions indicate the median FCF value over each span of time and the associated median absolute deviation added in quadrature with the 5\% uncertainty in the Uranus flux model. The black (dotted) lines indicate the original FCF value derived by Dempsey et al (2013)~\cite{dempsey12}, adjusted for the newly derived opacity relations, assuming the most common atmospheric transmissions during observations (see Figure 2). Left: Peak (Top) and Arcsecond (Bottom) FCFs derived at 450 microns. The solid, vertical line at the right edge of the latest gray region marks 2018 June 30 when the secondary mirror unit maintenance was completed. Data wherein the atmospheric transmission are less than 10\% are excluded. Right: Peak (Top) and Arcsecond (Bottom) FCFs derived at 850 microns. The solid, vertical line marks 2016 November, when the SCUBA-2 thermal filter stack was updated. Data wherein the atmospheric transmission are less than 25\% are excluded..}
+\begin{center} \begin{figure}
+\includegraphics[width=0.9\linewidth]{sc21_FCFstep} \caption[FCF step
+function]{From Mairs et al. (2021)~\cite{mairs21}. FCFs derived using
+flux measurements of the primary calibrator Uranus during the stable
+part of the night (07:00-17:00 UTC) as a function of date. The grey
+shaded regions indicate epochs that are not included in the FCF
+determinations. The horizontal, shaded regions indicate the median FCF
+value over each span of time and the associated median absolute
+deviation added in quadrature with the 5\% uncertainty in the Uranus
+flux model. The black (dotted) lines indicate the original FCF value
+derived by Dempsey et al. (2013)~\cite{dempsey12}, adjusted for the
+newly derived opacity relationships, assuming the most-common
+atmospheric transmissions during observations (see Figure 2 of Mairs
+et al. (2021). Left: Peak (Top) and Arcsecond (Bottom) FCFs derived at
+450\,$\mu$m. The solid, vertical line at the right edge of the latest
+grey region marks 2018 June 30 when the secondary-mirror-unit
+maintenance was completed. Data wherein the atmospheric transmission
+are less than 10\% are excluded. Right: Peak (Top) and Arcsecond
+(Bottom) FCFs derived at 850\,$\mu$m. The solid, vertical line marks
+2016 November, when the SCUBA-2 thermal-filter stack was updated. Data
+wherein the atmospheric transmission are less than 25\% are excluded.}
+
 \label{fig:FCFstep}
 \end{figure}
 \end{center}
@@ -107,7 +125,7 @@ until 2011 April 30 & 32 $\times$ ($\tau_{225}$ - 0.02)    & 5.2 $\times$ ($\tau
 \rule{1.0\textwidth}{2pt}
 
 \textbf{Results from Dempsey et al. 2013 \cite{dempsey12}: employed by
-default in Starlink Versions 2018A and previous.}\\
+default in Starlink Version 2018A and previous releases.}\\
 \begin{table}[h!]
 \begin{center}
 \begin{tabular}{|l|c|c|c|c|}
