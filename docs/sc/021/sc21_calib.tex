@@ -83,10 +83,10 @@ follows:
 
 For a true point source, the measured peak pixel in a map calibrated in units of Jy/beam
 (using the Beam FCF) is equivalent to the integrated total flux of the same source in a map
-calibrated in units of Jy/arcsec$^{2}$ (using the Arcsecond FCF). The ORAC-DR processing
+calibrated in units of Jy/arcsec$^{2}$ (using the Arcsecond FCF). The \oracdr\ processing
 routine will automatically select the appropriate FCF based on the default data-reduction recipe
 that was linked to your data at the time of observations. Note that the data-reduction recipe can
-easily be changed when running ORAC-DR (see
+easily be changed when running \oracdr\ (see
 \cref{Section}{subsec:ChangeRecipe}{Changing the pipeline recipe} for details).
 
 \section{\xlabel{extinction}Extinction correction}
@@ -149,7 +149,7 @@ obtained in very dry or very wet conditions by up to 5\% (see \cref{Figure}{fig:
 \textbf{Note that the default extinction corrections are intrinsically connected to the default FCFs
 applied. If applying extinction corrections derived by Mairs et al. 2021 (\cite{mairs21}), the matching
 FCFs must also be applied (see \cref{Appendix}{app:fcfs}{FCFs by reduction date}).
-The ORAC-DR software assumes the Mairs et al (2021)~\cite{mairs21}
+The \oracdr\ software assumes the Mairs et al (2021)~\cite{mairs21}
 results beginning in Starlink Release 2021A. Starlink Release 2018A and previous assume the
 Dempsey et al 2013~\cite{dempsey12} values by default.}
 
