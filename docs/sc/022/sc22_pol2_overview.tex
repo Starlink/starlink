@@ -306,7 +306,7 @@ pair of $Q$ and $U$ values from each segment.
 The length of each data segment is defined \textit{primarily} by the time taken for
 the HWP to make a single rotation (0.5 s). The scan speed of
 8\si{\arcsecond}/s was chosen to make this correspond to 4\si{\arcsecond}
-on the sky. The default pixel size provided by pol2map is 4\si{\arcsecond}
+on the sky. The default pixel size provided by \texttt{pol2map} is 4\si{\arcsecond}
 at both 850 and 450.
 
 The standard POLCV\_DAISY scan parameters are given in
@@ -348,7 +348,7 @@ Half-wave plate rotation frequency& \SI{2}{Hz}\\
 
 \section{The raw data}
 \label{sec:rawdata}
-SCUBA-2 is the detector for POL-2, and as such, the raw data format of
+SCUBA-2 is the detector instrument for POL-2, and as such, the raw data format of
 POL-2 data is the same as a typical SCUBA-2 observation. The sequence
 for both observations is:
 
@@ -387,10 +387,10 @@ The FITS header information may also be viewed via the \gaia\
 
 Shown below is an incomplete list of the raw files for a single
 sub-array (in this case s8a) for a short POL-2 observation. The first
-and last scans are the flat-field observations, which occur after the
-shutter opens to the sky at the start of the observation and closes at
-the end (note the identical file size); all of the scans in between
-are science scans.
+scan is the dark noise frame, and the second and last scans are the
+flat-field observations, which occur after the shutter opens to the sky
+at the start of the observation and closes at the end (note the identical
+file size); all of the scans in between are science scans.
 
 
 \begin{terminalv}
@@ -412,15 +412,10 @@ are science scans.
 \end{terminalv}
 
 The SCUBA-2 data acquisition (DA) system writes out a data file every
-30\,seconds; each of which contains 22\,MB of data. The only exception
-is the final science scan which will usually be smaller (7.9\,MB in
-the example above), typically requiring less than 30\,seconds of data
-to complete the observation.
-
-\textbf{Note:} All of these files are written out eight times, once
-for each of the eight sub-arrays. It should also be noted that the
-POL-2 instrument has not yet been fully released from commissioning at
-450\,$\mu$m (a ``shared risk'' approach is currently in use).
+30\,seconds; each of which contains 22\,MB of data. The final file listed above
+is a flat-field scan, which will usually be smaller (7.9\,MB in this example). Note
+that all of these files are written out eight times, once for each of the eight
+sub-arrays.
 
 The main data array in each NDF is a cube, with the first two
 dimensions corresponding to bolometer columns and rows within a
@@ -442,16 +437,16 @@ sub-array for Observation 34 taken on 12\textsuperscript{th} January
 \subsubsection*{Units/Calibration}
 
 Raw POL-2 data come in uncalibrated units. The first calibration step
-is to scale the raw data to units of pico Watts (pW) by applying the
+is to scale the raw data to units of picowatts (pW) by applying the
 flat-field solution. This step is performed internally by the \SMURF\
 command \xref{\task{calcqu}}{sun258}{CALCQU} -- used to calculate
-I, Q and U time-streams from the
-raw data -- but can be done manually when examining the raw data.
+I, Q and U time-streams from the raw data -- but can be done manually
+when examining the raw data.
 
 If the purpose of a given POL-2 observation is to determine the
 percentage polarisations or vector angles within a source/region of
-interest then the data may remain in pW. On the other hand, if the
-purpose is to establish the absolute polarised intensities then a
+interest, then the data may remain in pW. On the other hand, if the
+purpose is to establish the absolute polarised intensities, then a
 value for the Flux Conversion Factor (FCF) is required.
 
 The resulting map may have the FCF applied to convert it into units of
