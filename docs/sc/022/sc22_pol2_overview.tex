@@ -6,15 +6,8 @@ The POL-2 instrument is a linear polarimetry module for the
 Submillimetre Common User Bolometer Array-2 (SCUBA-2), a 10,000
 bolometer camera on the JCMT \cite{Friberg} \cite{Bastien2011}.  POL-2
 in itself is not a detector - thus requiring SCUBA-2 and its detectors
-for operation. SCUBA-2 operates simultaneously at both 850 and
-\SI{450}{\micro\metre}. The POL-2 instrument is currently commissioned
-at \SI{850}{\micro\metre} only\footnote{\SI{450}{\micro\metre} data can
-in fact be processed using the same commands as \SI{850}{\micro\metre}
-data, but the noise levels and other possible artefacts have not yet been
-fully characterised. Note, the default pixel size at 450 is 4 arc-seconds}.
-
-
-.
+for operation. SCUBA-2 (and consequently POL-2) operates simultaneously
+at both 850 and \SI{450}{\micro\metre}.
 
 \begin{figure}[t!]
 \begin{center}
@@ -32,7 +25,7 @@ fully characterised. Note, the default pixel size at 450 is 4 arc-seconds}.
 
 \subsection*{Polarisation}
 
-In polarimetric terms light is conventionally described by the four
+In polarimetric terms, light is conventionally described by the four
 Stokes parameters: $I$, $Q$, $U$ and $V$.
 
 
@@ -42,8 +35,8 @@ the radiation linearly polarised in the directions 45$^{\circ }$ to
 the reference plane; and $V$ is the circularly polarised radiation.
 
 POL-2 is designed to characterise linear polarisation.  The $V$
-parameter, consequently, is not discussed further with the focus on $I$,
-$Q$ and $U$.
+parameter, consequently, is not discussed further, with subsequent focus
+being only on $I$, $Q$ and $U$.
 
 The linear Polarised Intensity (I$_{\textnormal{p}}$) and  polarisation angle
 ($\theta$) can be described as:
@@ -130,7 +123,7 @@ $\sim$cos($\phi$) while the power is $\sim$cos$^{2}$($\phi$).
 \caption [Modulation by the HWP - basic description]{ Left: If there
   was a single rotating analyser this would be the resulting curve of
   the power transmitted of the linearly polarised component.
-  Right: With the HWP the linearly polarised component is
+  Right: With the HWP, the linearly polarised component is
   rotated at twice the speed. It may be useful to remind the reader of
   the trigonometric identity: \\ cos$^{2}$x = 0.5(1+cos(2x))}
 \end{center}
@@ -163,14 +156,14 @@ I_{\textnormal{detected}} =
 
 \subsection*{The Half-Wave Plate}
 
-As described in the POL-2 commissioning document the HWP is
+As described in the POL-2 commissioning document, the HWP is
 constructed from five individual synthetic sapphire layers
 approximately 0.9\,mm thick and 200\,mm in diameter. The transmission
-properties of sapphire are generally good at the SCUBA-2 wavelengths
+properties of sapphire are generally good at the SCUBA-2 wavelengths,
 but are dependent on the thickness and ambient temperature. The total
-effective transmission of the HWP integrated across the 850 and
+effective transmission values of the HWP integrated across the 850 and
 \SI{450}{\micro\metre} filter bands are about 86\% and 57\%
-respectively (Savini et al. 2009 - insert full reference).
+respectively \cite{Savini}.
 
 The HWP rotates the incoming linear polarisation with twice the speed
 of the wave plate angle.  The HWP is typically rotated at 2\,Hz,
@@ -366,13 +359,13 @@ for both observations is:
 
 
 The \param{SEQ$\_$TYPE} keyword in the FITS header may be used to
-identify the nature of each scan.  When you access raw data from the
+identify the nature of each scan.  When a user searches for raw data from the
 CADC archive
 \htmladdnormallink{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}\
-you will get all of the files listed above.
+all of the data types listed above will be returned.
 
 
-Critically the \param{INBEAM} keyword in the FITS header may be used
+Critically, the \param{INBEAM} keyword in the FITS header may be used
 to identify if POL-2 is in the beam, and hence differentiate between
 SCUBA-2 and POL-2 observations.
 
